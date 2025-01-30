@@ -1,0 +1,67 @@
+/* Notification popup polyfill */
+.mega-header .notif-wrapper {
+    position: relative;
+}
+.mega-header .dropdown.body {
+    display: block;
+    right: -8px;
+    top: calc(100% + 20px);
+}
+.mega-header .notification-popup .fm-notifications-bottom {
+    padding: 12px 20px 16px;
+    justify-content: flex-end;
+    border-top: 1px solid var(--divider-color);
+}
+.mega-header .top-warning-popup .fm-notifications-bottom {
+    border-top: none;
+    padding: 24px 0 0;
+    justify-content: flex-end;
+}
+.mega-header .notification-popup .notification-txt {
+    background: none;
+}
+.mega-lite-mode .mega-header .dropdown .notification {
+    display: none;
+}
+.mega-lite-mode .mega-header .back-to-mega-button {
+    display: inline-block;
+}
+
+/* Old alarm dialogs */
+#old-header-account-states-popups .dropdown-content {
+    display: none;
+    position: absolute;
+}
+#old-header-account-states-popups .dropdown.show .dropdown-content {
+    display: block;
+    right: -10px;
+}
+#old-header-account-states-popups > * {
+    width: 32px;
+    justify-content: center;
+    position: relative;
+    margin-inline-start: 24px;
+}
+#old-header-account-states-popups > * > button,
+#old-header-account-states-popups > * > i {
+    z-index: 1;
+    position: relative;
+}
+#old-header-account-states-popups > * > :not(.dropdown):hover {
+    background-color: transparent;
+    z-index: 251;
+}
+#old-header-account-states-popups > .show::before,
+#old-header-account-states-popups > :hover::before {
+    content: '';
+    background-color: var(--mobile-surface-2);
+    display: block;
+    position: absolute;
+    top: -16px;
+    left: -12px;
+    right: -12px;
+    bottom: -16px;
+}
+#old-header-account-states-popups > :not(.show):hover::before {
+    background-color: var(--mobile-surface-1);
+}

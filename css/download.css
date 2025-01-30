@@ -44,7 +44,6 @@
     display: inline-block;
     vertical-align: middle;
     color: var(--text-color-medium);
-    -webkit-padding-end: 4px;
     padding-inline-end: 4px;
 }
 .download .dark-numbers span {
@@ -156,9 +155,7 @@ button.small i.folder-with-loupe {
     color: var(--text-color-success);
 }
 .download.error-text i, .download.state-text i {
-    -webkit-margin-start: -3px;
     margin-inline-start: -3px;
-    -webkit-margin-end: 5px;
     margin-inline-end: 5px;
     margin-top: -2px;
     margin-bottom: 0;
@@ -179,7 +176,6 @@ button.small i.folder-with-loupe {
     font-size: 0;
 }
 .download.overquoata-error:not(.hidden) + button {
-    -webkit-margin-start: 12px;
     margin-inline-start: 12px;
 }
 .download.overquoata-error span {
@@ -190,7 +186,6 @@ button.small i.folder-with-loupe {
     vertical-align: top;
 }
 .download.overquoata-error i {
-     -webkit-margin-end: 8px;
     margin-inline-end: 8px;
     --icon-size: 24px;
     --mask-color: var(--text-color-error);

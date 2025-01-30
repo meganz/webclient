@@ -22,7 +22,6 @@
 }
 .mega-banner.body .versioning-body-text {
     max-width: 370px;
-    -webkit-padding-start: 8px;
     padding-inline-start: 8px;
 }
 .mega-banner.body.with-btn .versioning-body-text {
@@ -46,7 +45,6 @@
 }
 .account .mega-banner button {
     margin: 8px 0;
-    -webkit-margin-start: 24px;
     margin-inline-start: 24px;
 }
 .mega-banner i {
@@ -90,8 +88,7 @@
 /* Settings/dashboard page banner */
 .settings-banner {
     align-items: center;
-    background: var(--surface-grey-3);
-    border: 2px solid var(--stroke-grey-2);
+    background: var(--mobile-surface-1);
     border-radius: 12px;
     box-sizing: border-box;
     display: flex;

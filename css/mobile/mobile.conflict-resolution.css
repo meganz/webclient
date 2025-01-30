@@ -53,7 +53,6 @@
 
 .conflict-resolution .info-block > *:not(:last-child) {
     margin-inline-end: 16px;
-    -webkit-margin-end: 16px;
 }
 
 .conflict-resolution .info-block i {
@@ -96,7 +95,6 @@
 
 .conflict-resolution .info-block .info-props > *:not(:last-child):not(:empty) {
     margin-inline-end: 2px;
-    -webkit-margin-end: 2px;
 }
 
 .conflict-resolution .info-block .info-props > *:not(:last-child):not(:empty)::after {

@@ -1,0 +1,1035 @@
+class MegaHeader extends MegaMobileHeader {
+
+    constructor(options) {
+
+        options.avatarButtonType = MegaButton;
+
+        super(options);
+
+        /* Top block */
+
+        const navNavigation = this.domNode.querySelector('.top-block .nav-navigation');
+        const navActions = this.domNode.querySelector('.top-block .nav-actions');
+        let wrapper;
+
+        navNavigation.querySelector('.home').classList.add('.hidden');
+
+        // Remove mobile kebab menu
+        const kebab = navActions.querySelector('.menu');
+        if (kebab) {
+            kebab.remove();
+        }
+
+        if (!mega.lite.inLiteMode) {
+
+            // Search - Current using old search bar
+            this.searchInput = options.parentNode.querySelector('.searcher-wrapper');
+            this.searchInput.classList.add('search');
+            this.searchInput.classList.remove('hidden');
+            navNavigation.prepend(this.searchInput);
+
+            // Notification
+            wrapper = mCreateElement(
+                'div',
+                {class: 'menu-wrapper notif-wrapper notification js-dropdown-notification'},
+                navActions
+            );
+            navActions.prepend(wrapper);
+
+            this.notifButton = new MegaButton({
+                parentNode: wrapper,
+                type: 'icon',
+                componentClassname: 'text-icon alarm',
+                icon: 'sprite-fm-mono icon-bell-regular-outline',
+                iconSize: 24,
+                simpletip: l[862]
+            });
+
+            this.notifMenu = options.parentNode.querySelector('.notification-popup');
+
+            wrapper.append(this.notifMenu);
+
+            this.notifButton.on('click.list', e => {
+                if (this.notifButton.toggleClass('active')) {
+                    this.showNotifMenu();
+                }
+                else {
+                    this.closeNotifMenu(e);
+                }
+
+                return false;
+            });
+
+            this.notifButton.domNode.prepend(mCreateElement('span', {class: 'js-notification-num icon-badge hidden'}));
+        }
+
+        // Bento Menus
+        wrapper = mCreateElement('div', {class: 'menu-wrapper bento-wrapper bento'}, navActions);
+        navActions.prepend(wrapper);
+
+        this.bentoButton = new MegaButton({
+            parentNode: wrapper,
+            type: 'icon',
+            componentClassname: 'text-icon bento',
+            icon: 'sprite-fm-mono icon-bento-menu',
+            iconSize: 24,
+            simpletip: l.bento_title
+        });
+
+        // Component possibly
+        this.bentoMenu = mCreateElement('div', {class: 'bento-menu hidden'}, wrapper);
+        this.bentoMenu.items = {
+            drive: {
+                componentClassname: 'drive',
+                text: l.drive,
+                href: '/fm',
+                icon: 'sprite-fm-mono icon-cloud-thin-outline',
+                iconSize: 24,
+                activeCondition: () => mega.ui.topmenu.hasClass('drive')
+            },
+            chat: {
+                componentClassname: 'chat',
+                text: l[7997],
+                href: '/fm/chat',
+                icon: 'sprite-fm-mono icon-message-chat-circle-thin',
+                iconSize: 24,
+                activeCondition: () => M.chat
+            },
+            pwm: {
+                componentClassname: 'pwm',
+                text: l.passwords,
+                href: '/fm/pwm',
+                icon: 'sprite-fm-mono icon-lock-thin-outline',
+                iconSize: 24,
+                activeCondition: () => M.currentCustomView.type === 'pwm'
+            },
+            vpn: {
+                componentClassname: 'vpn extlink',
+                text: l.vpn,
+                href: 'https://mega.io/vpn',
+                target: '_blank',
+                icon: 'sprite-fm-mono icon-zap-thin-outline',
+                iconSize: 24
+            },
+            business: {
+                componentClassname: 'business',
+                text: l[19530],
+                href: '/fm/user-management',
+                icon: 'sprite-fm-mono icon-building',
+                iconSize: 24,
+                activeCondition: () => M.currentdirid.startsWith('user-management')
+            }
+        };
+
+        for (const key in this.bentoMenu.items) {
+            if (this.bentoMenu.items.hasOwnProperty(key)) {
+                const item = this.bentoMenu.items[key];
+                this.bentoMenu.items[key] = [
+                    new MegaLink({
+                        parentNode: this.bentoMenu,
+                        type: 'normal',
+                        ...item
+                    }),
+                    item.activeCondition
+                ];
+            }
+        }
+
+        this.bentoButton.on('click.list', () => {
+            if (this.bentoButton.toggleClass('active')) {
+                this.showBentoMenu();
+            }
+            else {
+                this.closeBentoMenu();
+            }
+        });
+
+        if (mega.lite.inLiteMode) {
+            const backtomega = new MegaLink({
+                parentNode: navActions,
+                text: l.back_to_mega,
+                type: "normal",
+                componentClassname: "outline",
+                prepend: true
+            });
+
+            backtomega.on('click.backtomega', () => {
+
+                // Remove the local storage variable which triggers MEGA Lite mode to load
+                delete localStorage.megaLiteMode;
+
+                // Store a log for statistics (User decided to go back to regular MEGA - Back to MEGA button)
+                // Then reload the account back into regular MEGA
+                loadingDialog.show();
+                Promise.resolve(eventlog(99897)).finally(() => location.reload());
+            });
+        }
+
+        if (!u_type) {
+
+            const loginBtn = navActions.componentSelector('.login-button');
+
+            loginBtn.addClass('outline').removeClass('action-link').off('tap').rebind('click.auth', () => {
+                if (u_type === 0) {
+                    mLogout();
+                }
+                else {
+                    var c = $('.dropdown.top-login-popup', pmlayout).attr('class');
+                    if (c && c.includes('hidden')) {
+                        if (page === 'register') {
+                            delay('registerloginevlog', () => eventlog(99818));
+                        }
+                        tooltiplogin.init();
+                        return false;
+                    }
+
+                    tooltiplogin.init(1);
+
+                }
+            });
+
+            if (u_type === 0) {
+                loginBtn.text = l.log_out;
+            }
+
+            const signupBtn = new MegaLink({
+                parentNode: navActions,
+                text: l[968],
+                type: "normal",
+                componentClassname: "create-account-button primary"
+            });
+
+            signupBtn.on('click.signup', () => {
+                if (this.hasClass('business-reg')) {
+                    loadSubPage('registerb');
+                }
+                else {
+                    if (page === 'login') {
+                        delay('loginregisterevlog', () => eventlog(99798));
+                    }
+                    loadSubPage('register');
+                }
+            });
+
+            this.topLangButton = new MegaButton({
+                parentNode: navActions,
+                type: 'normal',
+                componentClassname: 'text-icon top-language underline',
+                icon: 'sprite-fm-mono icon-languages',
+                iconSize: 24,
+                prepend: true,
+                text: getRemappedLangCode(lang).toUpperCase(),
+                onClick: () => {
+                    langDialog.show();
+                }
+            });
+
+            // Help menu
+            wrapper = mCreateElement('div', {class: 'menu-wrapper help-wrapper top-help'});
+            navActions.prepend(wrapper);
+
+            this.topHelpButton = new MegaButton({
+                parentNode: wrapper,
+                type: 'icon',
+                componentClassname: 'text-icon top-help',
+                icon: 'sprite-fm-mono icon-help-circle-thin-outline',
+                iconSize: 24,
+                prepend: true
+            });
+
+            this.topHelpMenu = mCreateElement('div', {class: 'top-help-menu hidden header-dropdown-menu'}, wrapper);
+
+            const items = Object.create(null);
+
+            items.help = new MegaLink({
+                parentNode: this.topHelpMenu,
+                type: 'fullwidth',
+                componentClassname: 'helpcentre extlink',
+                text: l[384],
+                target: '_blank',
+                href: 'https://help.mega.io/'
+            });
+
+            mCreateElement('div', {class: 'horizontal-divider'}, this.topHelpMenu);
+
+            items.csp = new MegaButton({
+                parentNode: this.topHelpMenu,
+                type: 'fullwidth',
+                componentClassname: 'cookie-settings',
+                text: l[24644],
+                onClick: () => {
+                    if ('csp' in window) {
+                        csp.trigger().dump('csp.trigger');
+                    }
+                }
+            });
+
+            items.cookie = new MegaLink({
+                parentNode: this.topHelpMenu,
+                type: 'fullwidth',
+                componentClassname: 'cookie-policy extlink',
+                text: l[24629],
+                target: '_blank',
+                href: `${getBaseUrl()}/cookie`
+            });
+
+            mCreateElement('div', {class: 'horizontal-divider'}, this.topHelpMenu);
+
+            items.terms = new MegaLink({
+                parentNode: this.topHelpMenu,
+                type: 'fullwidth',
+                componentClassname: 'terms-of-service extlink',
+                text: l[385],
+                target: '_blank',
+                href: 'https://mega.io/terms'
+            });
+
+            items.privacy = new MegaLink({
+                parentNode: this.topHelpMenu,
+                type: 'fullwidth',
+                componentClassname: 'privacy-policy extlink',
+                text: l[386],
+                target: '_blank',
+                href: 'https://mega.io/privacy'
+            });
+
+            mCreateElement('div', {class: 'horizontal-divider'}, this.topHelpMenu);
+
+            items.copyright = new MegaLink({
+                parentNode: this.topHelpMenu,
+                type: 'fullwidth',
+                componentClassname: 'copyright extlink',
+                text: l.ra_type_copyright,
+                target: '_blank',
+                href: 'https://mega.io/copyright'
+            });
+
+            this.topHelpMenu.items = items;
+
+            // Lets kill tap and move to click events
+            this.topHelpButton.rebind('click', e => {
+                if (this.topHelpButton.toggleClass('active')) {
+                    this.showTopHelpMenu();
+                }
+                else {
+                    this.closeTopHelpMenu(e);
+                }
+            });
+        }
+
+        // Temporary account status items fetch from old header until we revamp this
+        let oldPopups = document.getElementById('header-account-states-popups');
+
+        if (oldPopups) {
+            oldPopups = oldPopups.cloneNode(true);
+            oldPopups.id = 'old-header-account-states-popups';
+            const remove = oldPopups.querySelectorAll(
+                '.js-back-to-mega-button, .js-dropdown-account, .js-more-menu, .js-dropdown-notification');
+
+            for (let i = remove.length - 1; i >= 0; i--) {
+                remove[i].parentNode.removeChild(remove[i]);
+            }
+            navActions.prepend(oldPopups);
+        }
+
+        this.loader = mCreateElement('i', {class: 'fmdb-loader sprite-fm-uni icon-loading icon24'});
+
+        navActions.prepend(this.loader);
+
+        /* Bottom block */
+
+        this.domNode.querySelector('.bottom-block .nav-navigation').textContent = '';
+        this.domNode.querySelector('.bottom-block .nav-actions').textContent = '';
+
+        this.resetBottomBlock = nop;
+    }
+
+    handleMenu(type, close) {
+
+        const actions = close ? [
+            'removeClass',
+            'add',
+            _ => _(),
+            'removeEventListener'
+        ] : [
+            'addClass',
+            'remove',
+            onIdle,
+            'addEventListener'
+        ];
+
+        mega.ui.header[`${type}Button`][actions[0]]('active');
+        mega.ui.header[`${type}Menu`].classList[actions[1]]('hidden');
+
+        if (bodyel) {
+
+            actions[2](() => {
+
+                const fcType = type.replace(/^./, char => char.toUpperCase());
+
+                fmholder[actions[3]]('mouseup', mega.ui.header[`close${fcType}Menu`], true);
+                fmholder[actions[3]]('contextmenu', mega.ui.header[`close${fcType}Menu`], true);
+            });
+        }
+    }
+
+    closeNotifMenu(e) {
+
+        if (e && (e.target === mega.ui.header.notifMenu ||
+            e.target.closest('.js-notification-popup') && !e.target.closest('button, a') ||
+            e.currentTarget === fmholder && e.target.closest('button.alarm'))) {
+            return;
+        }
+
+        mega.ui.header.notifButton.parentNode.classList.remove('show');
+
+        mega.ui.header.handleMenu('notif', true);
+        notify.markAllNotificationsAsSeen();
+        notify.dynamicNotifCountdown.removeDynamicNotifCountdown();
+        mega.ui.header.notifButton.icon = mega.ui.header.notifButton.icon.replace('-filled', '-outline');
+    }
+
+    showNotifMenu() {
+        mega.ui.header.notifButton.parentNode.classList.add('show');
+        notify.renderNotifications();
+        mega.ui.header.handleMenu('notif');
+        mega.ui.header.notifButton.icon = mega.ui.header.notifButton.icon.replace('-outline', '-filled');
+    }
+
+    closeAvatarMenu(e) {
+
+        if (e && (e.target === mega.ui.header.avatarMenu ||
+            e.target.closest('.avatar-menu') && !e.target.closest('button, a') ||
+            e.target.closest('.sub-menu-wrap') || e.target.closest('.top-mega-version') ||
+            e.currentTarget === fmholder && e.target.closest('button.avatar'))) {
+            return;
+        }
+
+        mega.ui.header.setStatus.classList.add('hidden');
+
+        mega.ui.header.handleMenu('avatar', true);
+    }
+
+    showAvatarMenu() {
+
+        if (M.chat) {
+            mega.ui.header.setStatus.classList.remove('hidden');
+        }
+        else {
+            mega.ui.header.setStatus.classList.add('hidden');
+        }
+
+        MegaStorageBlock.checkUpdate();
+
+        mega.ui.header.handleMenu('avatar');
+    }
+
+    closeBentoMenu(e) {
+
+        if (e && (e.target === mega.ui.header.bentoMenu ||
+            e.currentTarget === fmholder && e.target.closest('button.bento'))) {
+            return;
+        }
+
+        mega.ui.header.handleMenu('bento', true);
+    }
+
+    showBentoMenu() {
+
+        Object.values(this.bentoMenu.items).forEach(item => {
+            if (item[1] && item[1]()) {
+                item[0].addClass('active');
+            }
+            else {
+                item[0].removeClass('active');
+            }
+        });
+
+        mega.ui.header.handleMenu('bento');
+    }
+
+    closeTopHelpMenu(e) {
+
+        if (e && (e.target === mega.ui.header.topHelpMenu ||
+            e.currentTarget === fmholder && e.target.closest('button.top-help'))) {
+            return;
+        }
+
+        mega.ui.header.handleMenu('topHelp', true);
+    }
+
+    showTopHelpMenu() {
+        mega.ui.header.handleMenu('topHelp');
+    }
+
+    updateUserName(newName) {
+        const elem = this.avatarMenu.querySelector('.avatar-menu-name');
+        elem.textContent = newName;
+        elem.dataset.simpletip = newName;
+
+        if (elem.scrollWidth > elem.offsetWidth) {
+            elem.classList.add('simpletip');
+        }
+        else {
+            elem.classList.remove('simpletip');
+        }
+
+        mega.ui.menu.calcPosition();
+    }
+
+    updateEmail(newEmail) {
+        const elem = this.avatarMenu.querySelector('.avatar-menu-email');
+        elem.textContent = newEmail;
+        elem.dataset.simpletip = newEmail;
+
+        if (elem.scrollWidth > elem.offsetWidth) {
+            elem.classList.add('simpletip');
+        }
+        else {
+            elem.classList.remove('simpletip');
+        }
+
+        mega.ui.menu.calcPosition();
+    }
+
+    set headerOptions(types) {
+        for (var key in types) {
+            if (types.hasOwnProperty(key)) {
+                var value = types[key];
+                const elements = this.domNode.getElementsByClassName(key);
+
+                for (i = elements.length; i--;) {
+
+                    const element = elements[i];
+
+                    if (typeof value === 'string') {
+                        element.textContent = value;
+                    }
+
+                    element.classList[value ? 'remove' : 'add']('hidden');
+                }
+            }
+        }
+    }
+
+    update() {
+
+        this.headerOptions = MegaHeader.getType();
+        mega.ui.topmenu.megaLink.text = MegaHeader.getHeading();
+
+        if (u_type || window.is_eplusplus) {
+            this.bentoMenu.items.chat[0].show();
+        }
+        else {
+            this.bentoMenu.items.chat[0].hide();
+        }
+
+        if (u_attr && u_attr.b && u_attr.b.m && (u_attr.b.s === 1 || u_attr.b.s === 2) && u_privk) {
+            this.bentoMenu.items.business[0].show();
+        }
+        else {
+            this.bentoMenu.items.business[0].hide();
+        }
+
+        if (M.chat && this.activityStatus) {
+            window.mega.ui.searchbar.refresh();
+            this.activityStatus.classList.remove('hidden');
+        }
+        else if (this.activityStatus) {
+            this.activityStatus.classList.add('hidden');
+        }
+
+        tooltiplogin.init(1);
+    }
+
+    renderLoggedIn(replace) {
+
+        // logged in but ephemeral
+        if (u_type === 0) {
+
+            const navActions = this.domNode.querySelector('.top-block .nav-actions');
+            const loginLink = new MegaLink({
+                parentNode: navActions,
+                text: l.log_in,
+                type: "normal",
+                componentClassname: "action-link login-button"
+            });
+
+            mBroadcaster.once('login2', () => {
+                this.renderLoggedIn(loginLink);
+            });
+
+            return;
+        }
+
+        super.renderLoggedIn(replace);
+
+        const registerBtn = this.domNode.componentSelector('.create-account-button');
+        if (registerBtn) {
+            registerBtn.destroy();
+        }
+
+        // Avatar Menu
+        useravatar.loadAvatar(u_handle).finally(() => {
+
+            const avatarMeta = generateAvatarMeta(u_handle);
+            const shortNameEl = mCreateElement('span', {}, [document.createTextNode(avatarMeta.shortName)]);
+
+            const avatar = mCreateElement('div', {class: `${u_handle} avatar-wrapper`}, [
+                avatarMeta.avatarUrl ? mCreateElement('img', {src: avatarMeta.avatarUrl})
+                    : mCreateElement('div', {class: `color${avatarMeta.color}`}, [shortNameEl])
+            ]);
+
+            // Avatar menu, this can be component later
+            this.avatarMenu = mCreateElement('div', {class: 'avatar-menu hidden header-dropdown-menu'}, [
+                mCreateElement('div', {class: 'avatar-menu-header'}, [
+                    mCreateElement('div', {class: 'avatar-menu-profile'}, [avatar.cloneNode(true)]),
+                    mCreateElement('div', {class: 'avatar-menu-details'}, [
+                        mCreateElement('div', {class: 'avatar-menu-name', 'data-simpletip': u_attr.fullname},
+                                       [document.createTextNode(u_attr.fullname)]),
+                        mCreateElement('div', {class: 'avatar-menu-email', 'data-simpletip': u_attr.email},
+                                       [document.createTextNode(u_attr.email)])
+                    ])
+                ])
+            ], this.avatarButton.domNode.parentNode);
+
+            this.avatarMenu.Ps = new PerfectScrollbar(this.avatarMenu);
+
+            window.addEventListener('resize', SoonFc(90, this.avatarMenu.Ps.update));
+
+            this.activityStatus = mCreateElement('div', {'class': 'activity-status-block js-activity-status hidden'}, [
+                mCreateElement('div', {'class': 'loading-animation'}),
+                mCreateElement('div', {'class': 'activity-status top offline'})
+            ]);
+            this.avatarButton.domNode.appendChild(this.activityStatus);
+
+            // Lets kill tap and move to click events
+            this.avatarButton.off('tap').rebind('click', e => {
+                if (this.avatarButton.toggleClass('active')) {
+                    this.showAvatarMenu();
+                }
+                else {
+                    this.closeAvatarMenu(e);
+                }
+            });
+
+            const _buildInteractable = item => {
+                const interactable = item.href ? MegaLink : MegaButton;
+
+                return new interactable({
+                    parentNode: this.avatarMenu,
+                    type: 'fullwidth',
+                    ...item
+                });
+            };
+
+            const detailBlock = this.avatarMenu.querySelector('.avatar-menu-details');
+
+            _buildInteractable({
+                parentNode: detailBlock,
+                type: 'text',
+                componentClassname: 'to-my-profile',
+                text: l[16668],
+                href: 'fm/dashboard'
+            });
+
+            this.storageBlock = new MegaStorageBlock({
+                parentNode: this.avatarMenu
+            });
+
+            mCreateElement('div', {class: 'horizontal-divider'}, this.avatarMenu);
+
+            _buildInteractable({
+                componentClassname: 'download-recovery-key',
+                text: l.recovery_key_title,
+                onClick: () => {
+                    M.showRecoveryKeyDialog(2);
+                }
+            });
+
+            mCreateElement('div', {class: 'horizontal-divider'}, this.avatarMenu);
+
+            const _createSubMenu = (options) => {
+
+                const wrapper = mCreateElement('div', {class: 'sub-menu-wrap'}, this.avatarMenu);
+                options.items[0].parentNode = wrapper;
+                const btn = _buildInteractable(options.items[0]);
+
+                const submenu = mCreateElement('div', {class: options.submenuClass}, wrapper);
+
+                for (var i = 1; i < options.items.length; i++) {
+
+                    const item = options.items[i];
+
+                    if (item.type === 'divider') {
+                        mCreateElement('div', {class: 'horizontal-divider'}, submenu);
+                    }
+                    else {
+                        item.parentNode = submenu;
+                        _buildInteractable(item);
+                    }
+                }
+
+                wrapper.addEventListener('mouseover', () => {
+
+                    $(submenu).addClass('active').position({
+                        my: "right top",
+                        at: "left top",
+                        of: btn.domNode,
+                        collision: "flipfit"
+                    });
+                });
+
+                wrapper.addEventListener('mouseout', () => {
+                    submenu.classList.remove('active');
+                });
+
+                return wrapper;
+            };
+
+            const setPresence = presence => {
+
+                if (!megaChatIsReady && !megaChatIsDisabled) {
+
+                    localStorage.megaChatPresence = presence;
+                    localStorage.megaChatPresenceMtime = unixtime();
+                    loadSubPage('fm/chat');
+                }
+
+                this.closeAvatarMenu();
+            };
+
+            this.setStatus = _createSubMenu({
+                submenuClass: 'header-dropdown-menu sub-menu status',
+                items: [
+                    {
+                        componentClassname: 'set-status',
+                        text: l[24845],
+                        rightIcon: 'sprite-fm-mono icon-chevron-right-thin-outline'
+                    },
+                    {
+                        icon: 'activity-status online',
+                        iconSize: 8,
+                        componentClassname: 'online',
+                        text: l[5923],
+                        onClick: () => {
+                            setPresence('chat');
+                        },
+                        dataset: {presence: 'online'}
+                    },
+                    {
+                        icon: 'activity-status away',
+                        iconSize: 8,
+                        componentClassname: 'away',
+                        text: l[5924],
+                        onClick: () => {
+                            setPresence('away');
+                        },
+                        dataset: {presence: 'away'}
+                    },
+                    {
+                        icon: 'activity-status busy',
+                        iconSize: 8,
+                        componentClassname: 'busy',
+                        text: l[5925],
+                        subtext: 'You will not receive any chat notifications',
+                        onClick: () => {
+                            setPresence('dnd');
+                        },
+                        dataset: {presence: 'dnd'}
+                    },
+                    {
+                        icon: 'activity-status offline',
+                        iconSize: 8,
+                        componentClassname: 'offline',
+                        text: l[5926],
+                        subtext: 'You will not appear online, but will have full access to all of MEGA.',
+                        onClick: () => {
+                            setPresence('offline');
+                        },
+                        dataset: {presence: 'offline'}
+                    }
+                ]
+            });
+
+            _buildInteractable({
+                componentClassname: 'settings',
+                text: l[823],
+                href: 'fm/account'
+            });
+
+            _buildInteractable({
+                componentClassname: 'download-desktop-app extlink',
+                target: '_blank',
+                text: l.install_desktop_app,
+                href: 'https://mega.io/desktop'
+            });
+
+            _buildInteractable({
+                componentClassname: 'download-pwm-ext extlink',
+                target: '_blank',
+                text: l.try_pass_ext_download,
+                href: this.pwmExtensionUrl
+            });
+
+            _buildInteractable({
+                componentClassname: 'reload-account',
+                text: l[23433],
+                onClick: () => {
+                    M.reload();
+                }
+            });
+
+            _buildInteractable({
+                type: 'normal',
+                componentClassname: 'logout secondary',
+                text: l.log_out,
+                onClick: () => {
+                    mLogout();
+                }
+            });
+
+
+            _buildInteractable({
+                componentClassname: 'select-language small-btn',
+                text: l[670],
+                onClick: () => {
+                    langDialog.show();
+                }
+            });
+
+            this.support = _createSubMenu({
+                submenuClass: 'sub-menu support',
+                items: [
+                    {
+                        componentClassname: 'support small-btn',
+                        text: l[383],
+                        rightIcon: 'sprite-fm-mono icon-chevron-right-thin-outline'
+                    },
+                    {
+                        componentClassname: 'feedback',
+                        text: l.join_survey_share_opinion,
+                        onClick: () => {
+                            mega.config.set('rvonbrddl', 1);
+                            window.open(
+                                'https://survey.mega.co.nz/index.php?r=survey/index&sid=692176&lang=en',
+                                '_blank',
+                                'noopener,noreferrer'
+                            );
+                            eventlog(500328);
+                        }
+                    },
+                    {
+                        componentClassname: 'helpcentre extlink',
+                        text: l[384],
+                        target: '_blank',
+                        href: 'https://help.mega.io/'
+                    },
+                    {
+                        componentClassname: 'megaio extlink',
+                        text: l.website_label,
+                        target: '_blank',
+                        href: 'https://mega.io/'
+                    }
+                ]
+            });
+
+            this.legal = _createSubMenu({
+                submenuClass: 'sub-menu legal',
+                items: [
+                    {
+                        componentClassname: 'legal small-btn',
+                        text: l[518],
+                        rightIcon: 'sprite-fm-mono icon-chevron-right-thin-outline'
+                    },
+                    {
+                        componentClassname: 'cookie-settings',
+                        text: l[24644],
+                        onClick: () => {
+                            if ('csp' in window) {
+                                csp.trigger().dump('csp.trigger');
+                            }
+                        }
+                    },
+                    {
+                        componentClassname: 'cookie-policy extlink',
+                        text: l[24629],
+                        target: '_blank',
+                        href: `${getBaseUrl()}/cookie`
+                    },
+                    {
+                        type: 'divider'
+                    },
+                    {
+                        componentClassname: 'terms-of-service extlink',
+                        text: l[385],
+                        target: '_blank',
+                        href: 'https://mega.io/terms'
+                    },
+                    {
+                        componentClassname: 'privacy-policy extlink',
+                        text: l[386],
+                        target: '_blank',
+                        href: 'https://mega.io/privacy'
+                    },
+                    {
+                        type: 'divider'
+                    },
+                    {
+                        componentClassname: 'copyright extlink',
+                        text: l.ra_type_copyright,
+                        target: '_blank',
+                        href: 'https://mega.io/copyright'
+                    }
+                ]
+            });
+
+            const footer = mCreateElement('div', {class: 'avatar-menu-footer'}, this.avatarMenu);
+
+            let versionClickCounter = 0;
+
+            _buildInteractable({
+                parentNode: footer,
+                type: 'text',
+                componentClassname: 'version top-mega-version',
+                text: `V.${M.getSiteVersion()}`,
+                onClick: () => {
+                    if (++versionClickCounter >= 3) {
+                        mega.developerSettings.show();
+                    }
+                    delay('top-version-click', () => {
+                        versionClickCounter = 0;
+                    }, 1000);
+                }
+            });
+        });
+    }
+
+    static init(update) {
+        const {topmenu, header} = mega.ui;
+
+        topmenu.hide();
+
+        if (update) {
+            header.update();
+        }
+    }
+
+    static types(index) {
+        const type = [
+            { // logged in default
+                'home': false,
+                'top-block': true,
+                'search': true,
+                'notification': !pfid && u_type,
+                'bottom-block': false,
+                'avatar': true,
+                'bento': u_type || is_eplusplus,
+                'heading': true,
+                'top-help': !u_type,
+                'top-language': !u_type,
+                'download-desktop-app': M.currentCustomView.type !== 'pwm',
+                'download-pwm-ext': M.currentCustomView.type === 'pwm'
+            },
+            { // logged out
+                'home': false,
+                'top-block': true,
+                'search': true,
+                'notification': false,
+                'bottom-block': false,
+                'avatar': false,
+                'bento': false,
+                'heading': true,
+                'top-help': true,
+                'top-language': true,
+                'download-desktop-app': false,
+                'download-pwm-ext': false
+            }
+        ][index];
+
+        if (pfcol || // Album link
+            M.chat || // Chat or meetings
+            M.currentCustomView.type === 'pwm' || // password manager
+            M.currentdirid && (
+                M.currentdirid.startsWith('account') || // settings
+                M.currentdirid === 'dashboard' || // dashboard
+                M.currentdirid.startsWith('user-management') // Business pages
+            )
+        ) {
+            type.search = false;
+        }
+
+        return type;
+    }
+
+    static getPage() {
+        if (is_fm()) {
+            if (pfid) {
+                return (pfcol) ? 'collectionlink' : 'folderlink';
+            }
+
+            if ([M.RootID, 's4', 'shares', 'out-shares', 'public-links', 'faves', M.RubbishID, 'recents',
+                 'file-requests'].includes(M.currentrootid) ||
+                M.isGalleryPage() || M.isAlbumsPage() ||
+                M.currentrootid === M.InboxID || // Temporary title for backup
+                M.currentdirid === 'devices' || M.currentdirid === 'transfers' || M.search) {
+                return 'drive';
+            }
+            else if (M.currentCustomView.type === 'pwm') {
+                return 'pwm';
+            }
+            else if (M.currentdirid === 'account') {
+                return 'settings';
+            }
+        }
+        return page;
+    }
+
+    static getType() {
+        const iType = u_attr ? 0 : 1;
+
+        return this.types(iType);
+    }
+
+    set topBlockBottomBorder(show) {
+
+        const topBlock = this.domNode.querySelector('.top-block');
+
+        if (topBlock) {
+            topBlock.classList[show ? 'add' : 'remove']('border-bottom');
+        }
+    }
+
+    get pwmExtensionUrl() {
+        return ua.details.browser === 'Edgium' ? 'https://microsoftedge.microsoft.com/addons/detail/' +
+            'mega-pass-secure-passwor/hjdopmdfeekbcakjbbienpbkdldkalfe' :
+            ua.details.browser === 'Firefox' ? 'https://addons.mozilla.org/en-US/firefox/addon/mega-password-manager/' :
+                'https://chromewebstore.google.com/detail/mega-pass/deelhmmhejpicaaelihagchjjafjapjc';
+    }
+}
+
+(mega => {
+    "use strict";
+
+    lazy(mega.ui, 'header', () => new MegaHeader({
+        parentNode: pmlayout,
+        componentClassname: 'mega-header',
+        prepend: true
+    }));
+
+})(window.mega);
+
+lazy(MegaHeader, 'headings', () => {
+    'use strict';
+
+    // We do not need mobile ones
+    delete MegaMobileHeader.headings;
+
+    return Object.freeze({
+        'drive': l.drive,
+        'pwm': l.mega_pwm,
+        'settings': l[823],
+        'folderlink': l[808],
+        'collectionlink': l.album_link
+    });
+});

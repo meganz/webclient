@@ -183,12 +183,12 @@ lazy(mega, 'rewindUi', () => {
 
             this.beforePageChangeListener = null;
             this.$rewindProgressSection = $('.fm-rewind-progress-section', '.fm-right-files-block');
-            this.$rewindProgressTopBar = $('.js-dropdown-rewind-progress', '.topbar-links');
+            this.$rewindProgressTopBar = $('.js-dropdown-rewind-progress', '.topbar-links, .mega-header');
             this.$onboardingControlPanel = $('.onboarding-control-panel', '.fm-right-files-block.visible-notification');
             if (this.$onboardingControlPanel.hasClass('hidden')) {
                 this.$onboardingControlPanel = false;
             }
-            this.$loader = $('.fmdb-loader', '.topbar');
+            this.$loader = $(mega.ui.header.loader);
 
             this.$contentEmpty.addClass('hidden');
             this.$contentTreeCacheEmpty.addClass('hidden');
@@ -2012,7 +2012,7 @@ lazy(mega, 'rewindUi', () => {
         }
 
         addDialogProgEventListeners() {
-            this.$loader = $('.fmdb-loader', '.topbar');
+            this.$loader = $(mega.ui.header.loader);
             this.$loader.addClass('pointer-c');
             this.$loader.rebind('click.rewind', () => {
                 this.$rewindProgressTopBar.removeClass('hidden');

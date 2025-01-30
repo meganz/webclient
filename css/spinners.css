@@ -77,7 +77,8 @@
     .loading-info {
         color: var(--text-color-high);
         font: var(--text-h1);
-        font-family: var(--text-font-family-light);
+        font-family: var(--text-font-family);
+        font-weight: 300;
         margin: 0;
         padding: 0;
     }
@@ -94,7 +95,8 @@
     }
     .loading-info li.status-txt {
         font: var(-text-h3);
-        font-family: var(--text-font-family-light);
+        font-family: var(--text-font-family);
+        font-weight: 300;
         line-height: inherit;
         margin-top: -40px;
         overflow: hidden;

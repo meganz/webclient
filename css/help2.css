@@ -117,11 +117,6 @@
     position: absolute;
 }
 #help2-main ul.search-suggestions-list {
-    -webkit-margin-before: 1em;
-    -webkit-margin-after: 1em;
-    -webkit-margin-start: 0;
-    -webkit-margin-end: 0;
-    -webkit-padding-start: 00px;
     padding-inline-start: 00px;
 }
 #help2-main .search-suggestions-list li a {
@@ -1578,7 +1573,6 @@
     line-height: 48px;
 }
 #help2-main .search-error-suggestions ul {
-    -webkit-padding-start: 0;
     padding-inline-start: 0;
     display: block;
     margin-block-end: 0;
@@ -1955,7 +1949,6 @@
     width: 100%;
     position: relative;
     padding-inline-start: 00px;
-    -webkit-padding-start: 0;
 }
 #help2-main .support-image-instructions li:hover {
     color: #333;
@@ -1986,11 +1979,6 @@
 }
 #help2-main ul {
     list-style: none;
-    -webkit-margin-before: 1em;
-    -webkit-margin-after: 1em;
-    -webkit-margin-start: 0;
-    -webkit-margin-end: 0;
-    -webkit-padding-start: 0;
     padding-inline-start: 0;
 }
 #help2-main .tag-space {
@@ -2197,7 +2185,6 @@
     color: #666;
 }
 #help2-main .feedback-suggestions {
-    -webkit-padding-start: 0;
     padding-inline-start: 0;
     display: block;
     margin-block-end: 0;
@@ -2808,13 +2795,11 @@
     color: #666;
     line-height: 28px;
     letter-spacing: 0.2px;
-    -webkit-padding-start: 0;
     padding-inline-start: 0;
     width: 49%;
     display: inline-block;
 }
 #help2-main ul.sortby-items {
-    -webkit-padding-start: 8px;
     padding-inline-start: 8px;
 }
 #help2-main .adv-search-radio.checked span {
@@ -3976,11 +3961,6 @@
     #help2-main .support-image-instructions ul {
         display: block;
         list-style-type: disc;
-        -webkit-margin-before: 1em;
-        -webkit-margin-after: 1em;
-        -webkit-margin-start: 0;
-        -webkit-margin-end: 0;
-        -webkit-padding-start: 30px;
     }
     #help2-main .support-interaction {
         display: none;
@@ -4167,7 +4147,6 @@
         -moz-column-gap: 00px;
         -webkit-column-gap: 00px;
         padding-inline-start: 00px;
-        -webkit-padding-start: 00px;
     }
     #help2-main .first-support-block {
         width: auto;
@@ -4391,7 +4370,6 @@
         width: 100%;
     }
     #help2-main ul.sortby-items {
-        -webkit-padding-start: 0;
         padding-inline-start: 0;
     }
     #help2-main .device-selector {
@@ -4443,9 +4421,6 @@
     }
     #help2-main ul.mobile-search-list {
         padding-inline-start: 0;
-        -webkit-padding-start: 0;
-        -webkit-margin-before: 0;
-        -webkit-margin-after: 0;
         margin-block-end: 0;
         margin-block-start: 0;
     }

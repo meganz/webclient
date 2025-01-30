@@ -38,7 +38,6 @@
 .out-shared-grid-view .grid-table th:first-child,
 .out-shared-grid-view .grid-table td:first-child {
     text-align: center;
-    -webkit-padding-start: 0;
     padding-inline-start: 0;
     padding-top: 3px;
 }
@@ -47,7 +46,6 @@
 .shared-grid-view .grid-table td:last-child,
 .out-shared-grid-view .grid-table th:last-child,
 .out-shared-grid-view .grid-table td:last-child {
-    -webkit-padding-end: 0;
     padding-inline-end: 0;
 }
 
@@ -190,7 +188,7 @@ table tr td:last-child::after {
     top: 50%;
     transform: translateY(-50%);
     left: 2px;
-    color: var(--text-color-white-high);
+    color: var(--mobile-surface-1);
 }
 .table-hover tr.ui-selected i.selected {
     display: block;
@@ -272,7 +270,7 @@ table tr.ui-selected .grid-file-request-manage {
 
 .grid-table thead tr {
     width: 100%;
-    background-color: var(--stroke-main);
+    background-color: var(--mobile-page-background);
     box-sizing: border-box;
     position: relative;
     font-size: 0;
@@ -281,7 +279,6 @@ table tr.ui-selected .grid-file-request-manage {
 
 .grid-table thead .filter-block.body {
     margin: 3px 0 0 0;
-    -webkit-margin-end: 18px;
     margin-inline-end: 18px;
 }
 .grid-table th {
@@ -293,23 +290,19 @@ table tr.ui-selected .grid-file-request-manage {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    -webkit-padding-start: 5px;
     padding-inline-start: 5px;
-    -webkit-padding-end: 13px;
     padding-inline-end: 13px;
     padding-top: 9px;
     position: sticky;
     position: -webkit-sticky;
     top: 0;
-    background: var(--surface-main);
+    background: var(--mobile-page-background);
     z-index: 201;
 }
 .grid-table th:first-child {
-    -webkit-padding-start: 16px;
     padding-inline-start: 16px;
 }
 .grid-table th:last-child {
-    -webkit-padding-end: 16px;
     padding-inline-end: 16px;
 }
 .grid-table th:first-child::after,
@@ -320,7 +313,7 @@ table tr.ui-selected .grid-file-request-manage {
     left: -26px;
     right: 0;
     bottom: 0;
-    background-color: var(--stroke-main);
+    background-color: var(--mobile-page-background);
     z-index: -1;
 }
 .grid-table th:last-child::before {
@@ -359,9 +352,7 @@ table tr.ui-selected .grid-file-request-manage {
 .grid-table th.grid-first-th {
     width: 75px;
     padding: 0;
-    -webkit-padding-start: 12px;
     padding-inline-start: 12px;
-    -webkit-padding-end: 14px;
     padding-inline-end: 14px;
     cursor: pointer;
 }
@@ -429,7 +420,7 @@ table tr.ui-selected .grid-file-request-manage {
     position: absolute;
     width: 40px;
     height: 24px;
-    background-color: var(--stroke-main);
+    background-color: var(--mobile-page-background);
     right: 0;
     top: 0;
     z-index: 209;
@@ -448,7 +439,6 @@ table tr.ui-selected .grid-file-request-manage {
 }
 .files-grid-view.fm .column-settings i {
     --icon-size: 24px;
-    -webkit-margin-start: 8px;
     margin-inline-start: 8px;
     --mask-color: var(--icon-inactive);
 }
@@ -465,7 +455,7 @@ table tr.ui-selected .grid-file-request-manage {
     padding-top: 5px;
     padding-bottom: 4px;
     border-left: 1px solid var(--stroke-grey-2);
-    background-color: var(--stroke-main);
+    background-color: var(--mobile-page-background);
 }
 
 .rtl .files-grid-view.fm .column-settings.overlap {
@@ -500,7 +490,6 @@ table.grid-table tr:empty {
 
 table.grid-table th:first-child,
 table.grid-table td:first-child {
-    -webkit-padding-start: 12px;
     padding-inline-start: 12px;
 }
 table.grid-table th:first-child,
@@ -516,9 +505,7 @@ table.grid-table td.space-maintainer-end,
 table.grid-table td {
     box-sizing: border-box;
     padding: 0;
-    -webkit-padding-start: 5px;
     padding-inline-start: 5px;
-    -webkit-padding-end: 13px;
     padding-inline-end: 13px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -543,7 +530,6 @@ table.grid-table .tranfer-filetype-txt {
     overflow: hidden;
     text-overflow: ellipsis;
     width: 100%;
-    -webkit-padding-start: 38px;
     padding-inline-start: 38px;
     box-sizing: border-box;
     display: block;
@@ -601,7 +587,6 @@ table.grid-table .ver-col-container .ver-icon.versioning .versioning-indicator {
     height: 100%;
 }
 table.grid-table .ver-col-container .ver-size {
-    -webkit-margin-start: 8px;
     margin-inline-start: 8px;
     height: 15px;
     border-radius: 8px;
@@ -726,9 +711,7 @@ table.fm td {
     font: var(--text-body2);
     line-height: 31px;
     padding: 0;
-    -webkit-padding-start: 5px;
     padding-inline-start: 5px;
-    -webkit-padding-end: 13px;
     padding-inline-end: 13px;
     color: var(--text-color-medium);
     text-align: start;
@@ -739,9 +722,7 @@ table.fm td {
 }
 table.fm [megatype="fav"] {
     text-align: center;
-    -webkit-padding-start: 30px;
     padding-inline-start: 30px;
-    -webkit-padding-end: 13px;
     padding-inline-end: 13px;
     text-overflow: initial;
 }
@@ -755,7 +736,6 @@ table.fm td[megatype="empty"] {
 table.fm th:first-child,
 table.fm td:first-child {
     width: 0;
-    -webkit-padding-start: 0;
     padding-inline-start: 0;
 }
 
@@ -804,7 +784,6 @@ table.fm .thumb .item-type-icon img {
 .terms-page-content.terms .index-table td {
     font-family: var(--text-font-family);
     padding: 8px 0;
-    -webkit-padding-end: 8px;
     padding-inline-end: 8px;
 }
 
@@ -969,7 +948,6 @@ table.fm .thumb .item-type-icon img {
 }
 .files-grid-view.user-management-view .user-management-list-table tbody tr td .icon-wrapper {
     display: inline-block;
-    -webkit-margin-end: 8px;
     margin-inline-end: 8px;
     position: relative;
     cursor: pointer;
@@ -1097,7 +1075,6 @@ table.shared-with-me .shared-folder-access i {
     display: inline-block;
     vertical-align: middle;
     margin-inline-end: 5px;
-    -webkit-margin-end: 5px;
 }
 table.shared-with-me .shared-folder-access span {
     display: inline-block;
@@ -1213,7 +1190,7 @@ table.out-shares .fm-chat-users {
     display: table-cell;
     float: none;
     top: 0;
-    background-color: var(--stroke-main);
+    background-color: var(--mobile-page-background);
     z-index: 1;
 }
 .transfer-table th:first-child span {

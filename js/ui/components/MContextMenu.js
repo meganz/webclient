@@ -128,7 +128,15 @@ class MContextMenu extends MComponent {
             this.el.style.minWidth = this._minWidth + 'px';
         }
 
-        if (x + this.el.offsetWidth > window.innerWidth) {
+        if (document.body.classList.contains('rtl')) {
+            const newPos = (proposeX === undefined) ? x - this.el.offsetWidth : proposeX - this.el.offsetWidth;
+            const parent = this.parentItem && this.parentItem.el.getBoundingClientRect();
+
+            x = (newPos > 0)
+                ? newPos
+                : MContextMenu.offsetHoriz + (parent ? parent.left + parent.width : 0);
+        }
+        else if (x + this.el.offsetWidth > window.innerWidth) {
             x = (proposeX === undefined)
                 ? window.innerWidth - this.el.offsetWidth - MContextMenu.offsetHoriz * 3
                 : proposeX - this.el.offsetWidth;

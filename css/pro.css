@@ -884,7 +884,8 @@ body:not(.mobile) .plan.pro3:not(.current) .pricing-page.plan-button:hover {
     position: relative;
 }
 .plan-tag-description b {
-    font-family: var(--text-font-family-bold);
+    font-family: var(--text-font-family);
+    font-weight: bold;
     font-weight: normal;
 }
 .plan-tag-description.visible {
@@ -942,7 +943,6 @@ body:not(.mobile) .plan.pro3:not(.current) .pricing-page.plan-button:hover {
     font-size: 15px;
     line-height: 20px;
     padding: 7px 16px;
-    -webkit-padding-start: 38px;
     padding-inline-start: 38px;
     position: relative;
     max-width: 370px;
@@ -961,7 +961,6 @@ body:not(.mobile) .plan.pro3:not(.current) .pricing-page.plan-button:hover {
     font: var(--text-body1);
     margin: 20px auto;
     padding: 3px 38px;
-    -webkit-padding-start: 16px;
     padding-inline-start: 16px;
 }
 .pricing-page.plan-feature.text-body1 .text-h2 {
@@ -975,7 +974,8 @@ body:not(.mobile) .plan.pro3:not(.current) .pricing-page.plan-button:hover {
 .pricing-page.plan-feature.strong,
 .pricing-page.plan-feature.strong * {
     color: var(--text-color-high);
-    font-family: var(--text-font-family-bold);
+    font-family: var(--text-font-family);
+    font-weight: bold;
 }
 .pricing-page.plans-row .pricing-page.plan-feature {
     margin: 0;
@@ -1162,7 +1162,6 @@ body:not(.mobile) .plan.pro3:not(.current) .pricing-page.plan-button:hover {
     height: 8px;
 }
 .business-slider .handle-wrap {
-    -webkit-margin-end: 30px;
     margin-inline-end: 30px;
     position: relative;
 }
@@ -1173,7 +1172,6 @@ body:not(.mobile) .plan.pro3:not(.current) .pricing-page.plan-button:hover {
     border-radius: 100%;
     box-shadow: none;
     height: 32px;
-    -webkit-margin-start: -1px;
     margin-inline-start: -1px;
     outline: none;
     position: absolute;
@@ -1216,14 +1214,12 @@ body:not(.mobile) .plan.pro3:not(.current) .pricing-page.plan-button:hover {
     height: 4px;
 }
 .business-calculator .handle-wrap {
-    -webkit-margin-end: 15px;
     margin-inline-end: 15px;
 }
 .business-calculator .ui-slider-handle {
     background-color: var(--text-color-white-high);
     background-position: -312px -742px;
     height: 24px;
-    -webkit-margin-start: -7px;
     margin-inline-start: -7px;
     top: -10px;
     width: 24px;
@@ -1854,12 +1850,10 @@ body:not(.mobile) .pricing-page.slider-dot:hover {
     text-align: left;
     margin: 0 320px;
     margin-inline-start: 0;
-    -webkit-margin-start: 0;
     position: relative;
 }
 .payment-page.info-content {
     margin-inline-start: 50px;
-    -webkit-margin-end: 50px;
     position: relative;
 }
 
@@ -2278,7 +2272,6 @@ body.mobile .redeem-promo-page .mega-input.title-ontop {
     }
     .payment-page.info-block {
         margin-inline-end: 240px;
-        -webkit-margin-end: 240px;
     }
 }
 
@@ -2384,7 +2377,6 @@ body.mobile .redeem-promo-page .mega-input.title-ontop {
         height: 5px;
     }
     .business-slider .handle-wrap {
-        -webkit-margin-end: 18px;
         margin-inline-end: 18px;
     }
     .business-slider .ui-slider-handle {
@@ -2417,7 +2409,6 @@ body.mobile .redeem-promo-page .mega-input.title-ontop {
         width: calc(50% + 16px);
     }
     .business-calculator .handle-wrap {
-        -webkit-margin-end: 15px;
         margin-inline-end: 15px;
     }
     .business-calculator .ui-slider-handle {
@@ -2636,7 +2627,6 @@ body.mobile .redeem-promo-page .mega-input.title-ontop {
     }
     .payment-page.info-block {
         margin-inline-end: 0;
-        -webkit-margin-end: 0;
     }
 }
 

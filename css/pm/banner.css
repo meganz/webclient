@@ -23,11 +23,9 @@
 
 .pm.mega-component.banner > *:not(:last-child) {
     margin-inline-end: 8px;
-    -webkit-margin-end: 8px;
 }
 .pm.mega-component.advertisement > *:not(:last-child) {
     margin-inline-end: 16px;
-    -webkit-margin-end: 16px;
 }
 
 /* Banner overarching types */
@@ -41,7 +39,6 @@
 }
 
 .pm.mega-component.banner .content-box {
-    -webkit-margin-end: auto;
     margin-inline-end: auto;
     display: flex;
     flex-flow: column nowrap;

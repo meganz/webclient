@@ -501,7 +501,7 @@ lazy(s4, 'ui', () => {
                     await this.renderSelected();
                 }
                 else {
-                    const $emptyBlock = $(`div[class*=fm-empty-s4-${subType}]`, '.fm-main');
+                    const $emptyBlock = $(`div[class*=fm-empty-s4-${subType}]`, '.pm-main');
                     this.$pageBlock = $(`.s4-${subType}-management-scroll`, this.$contentBlocks);
 
                     if (!this.lists[subType]) {
@@ -809,10 +809,8 @@ lazy(s4, 'ui', () => {
                     return acc + val.init || val.min;
                 }, 0);
 
-                const minWidthToResize = colsWidth +
-                    this.containerSidesPadding +
-                    $.leftPaneResizable.element.outerWidth() +
-                    s4.utils.getNodeWidth(document.querySelector('.nw-fm-left-icons-panel'));
+                const leftPaneWidth = $.leftPaneResizable && $.leftPaneResizable.element.outerWidth() || 0;
+                const minWidthToResize = colsWidth + this.containerSidesPadding + leftPaneWidth;
 
                 let headerWidth = s4.utils.getNodeWidth(header);
 

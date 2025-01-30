@@ -2,7 +2,7 @@
     padding: 8px;
     position: absolute;
     z-index: 250;
-    background: var(--surface-main);
+    background: var(--mobile-page-background);
     border-radius: 12px;
     border: var(--dropdown-border);
     min-width: 160px;
@@ -124,7 +124,6 @@
 .dropdown.body .retention-history-menu__list > .retention-history-menu__list__elem i {
     --icon-size: 24px;
     --mask-color: var(--secondary-green);
-    -webkit-margin-end: 0;
     margin-inline-end: 0;
 }
 
@@ -303,7 +302,6 @@
 .dropdown-item.contains-submenu.icon-arrow-right-after:not(.disabled-submenu)::after {
     --mask-color: var(--icon-rest);
     height: 16px;
-    -webkit-margin-start: 8px;
     margin-inline-start: 8px;
     transition: var(--transition-color);
     width: 16px;
@@ -317,7 +315,6 @@
 }
 /*  Item with tick */
 .dropdown-item.tick-item.active .status-text {
-    -webkit-margin-end: 8px;
     margin-inline-end: 8px;
 }
 .dropdown-item.tick-item.active::after {
@@ -358,13 +355,11 @@
 }
 .dropdown-item i {
     --icon-size: 24px;
-    -webkit-margin-end: 8px;
     margin-inline-end: 8px;
     transition: var(--transition-color);
 }
 .dropdown-item > span + i {
     margin: 0;
-    -webkit-margin-start: 8px;
     margin-inline-start: 8px;
     --icon-size: 16px;
 }
@@ -393,7 +388,6 @@
     padding: 0 8px;
 }
 .dropdown-warning i {
-    -webkit-margin-end: 8px;
     margin-inline-end: 8px;
 }
 .dropdown-warning span {
@@ -456,7 +450,7 @@
     line-height: 20px;
     color: var(--text-color-high-inverted);
     padding: 8px 12px;
-    background: var(--surface-grey-1-inverted);
+    background: var(--mobile-background-inverse);
     border-radius: 6px;
     white-space: nowrap;
     position: absolute;
@@ -546,7 +540,6 @@
     background-image: url(../images/mega/top-login-sprite.png);
     content: '';
     height: 14px;
-     -webkit-margin-start: 8px;
     margin-inline-start: 8px;
     width: 14px;
 }
@@ -595,9 +588,7 @@
     width: 16px;
     height: 16px;
     margin: 6px 0 8px;
-    -webkit-margin-end: 6px;
     margin-inline-end: 6px;
-    -webkit-margin-start: 6px;
     margin-inline-start: 6px;
     display: inline-block;
     border-radius: 100%;
@@ -608,7 +599,6 @@
     z-index: 1;
 }
 .dropdown-item + .dropdown-colour-item {
-    -webkit-margin-start: 12px;
     margin-inline-start: 12px;
 }
 .labels.small .dropdown-colour-item {

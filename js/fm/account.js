@@ -16,7 +16,7 @@ function accountUI() {
         return false;
     }
 
-    var $fmContainer = $('.fm-main', '.fmholder');
+    var $fmContainer = $('.pm-main', '.fmholder');
     var $settingsMenu = $('.content-panel.account', $fmContainer);
 
     accountUI.$contentBlock = $('.fm-right-account-block', $fmContainer);
@@ -26,8 +26,6 @@ function accountUI() {
     $('.fm-account-sections', accountUI.$contentBlock).addClass('hidden');
     $('.fm-right-files-block, .section.conversations, .fm-right-block.dashboard',  $fmContainer)
         .addClass('hidden');
-    $('.nw-fm-left-icon', $fmContainer).removeClass('active');
-    $('.nw-fm-left-icon.settings', $fmContainer).addClass('active');
     $('.account.data-block.storage-data', accountUI.$contentBlock).removeClass('exceeded');
     $('.fm-account-save', accountUI.$contentBlock).removeClass('disabled');
     accountUI.$contentBlock.removeClass('hidden');
@@ -337,7 +335,7 @@ accountUI.general = {
             'use strict';
 
             /* Settings and Dasboard ccontent blocks */
-            this.$contentBlock = $('.fm-right-block.dashboard, .fm-right-account-block', '.fm-main');
+            this.$contentBlock = $('.fm-right-block.dashboard, .fm-right-account-block', '.pm-main');
 
             this.bandwidthChart(account);
             this.usedStorageChart(account);
@@ -509,7 +507,7 @@ accountUI.general = {
     userUIUpdate: function() {
         'use strict';
 
-        var $fmContent = $('.fm-main', '.fmholder');
+        var $fmContent = $('.pm-main', '.fmholder');
         var $dashboardPane = $('.content-panel.dashboard', $fmContent);
 
         // Show Membership plan
@@ -760,7 +758,7 @@ accountUI.leftPane = {
 
         'use strict';
 
-        var $settingsPane = $('.content-panel.account', '.fm-main');
+        var $settingsPane = $('.content-panel.account', '.pm-main');
         var $menuItems = $('.settings-button', $settingsPane);
         var $currentMenuItem = $menuItems.filter('.' + sectionClass);
 
@@ -833,7 +831,7 @@ accountUI.leftPane = {
 
         'use strict';
 
-        var $settingsPane = $('.content-panel.account', '.fm-main');
+        var $settingsPane = $('.content-panel.account', '.pm-main');
 
         $('.settings-button', $settingsPane).rebind('click', function() {
 
@@ -894,7 +892,7 @@ accountUI.account = {
 
         'use strict';
 
-        var $settingsPane = $('.content-panel.account', '.fm-main');
+        var $settingsPane = $('.content-panel.account', '.pm-main');
         var $profileContent = $('.settings-sub-section.profile', accountUI.$contentBlock);
 
         // Profile

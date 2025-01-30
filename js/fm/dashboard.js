@@ -732,7 +732,7 @@ Object.freeze(dashboardUI);
 function initDashboardScroll() {
     "use strict";
 
-    var $scrollBlock = $('.fm-right-block.dashboard', '.fm-main');
+    var $scrollBlock = $('.fm-right-block.dashboard', '.pm-main');
 
     if (!$scrollBlock.length) {
         return false;

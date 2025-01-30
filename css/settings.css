@@ -36,13 +36,11 @@
     display: flex;
 }
 .fm-right-account-block .data-table .label-with-icon img {
-    -webkit-margin-end: 8px;
     margin-inline-end: 8px;
     width: 16px;
 }
 .fm-right-account-block .data-table .label-with-icon i {
     --icon-size: 16px;
-    -webkit-margin-end: 8px;
     margin-inline-end: 8px;
 }
 .fm-right-account-block .data-table span {
@@ -74,7 +72,6 @@
 }
 .fm-right-account-block .mega-input.title-ontop input.short-input {
     padding: 2px 0;
-    -webkit-margin-start: 8px;
     margin-inline-start: 8px;
 }
 
@@ -83,12 +80,10 @@
     align-items: center;
     display: flex;
     flex: 1;
-    -webkit-padding-end: 15px;
     padding-inline-end: 15px;
 }
 .fm-right-account-block .label-wrap.full-sized,
 .fm-right-account-block .label-wrap:last-child {
-     -webkit-padding-end: 0;
     padding-inline-end: 0;
 }
 .fm-right-account-block .label-wrap.full-sized + .label-wrap {
@@ -111,7 +106,6 @@
     width: 60px;
 }
 .account-counter-number:last-child {
-    -webkit-margin-end: 0;
     margin-inline-end: 0;
 }
 .account-counter-number.short {
@@ -157,13 +151,11 @@
     color: var(--text-color-medium);
     cursor: pointer;
     font: var(--text-body1);
-    -webkit-padding-end: 0;
     padding-inline-end: 0;
     transition: 0.3s;
     vertical-align: top;
 }
 .settings-sub-section .radio-txt:last-child {
-    -webkit-padding-end: 0;
     padding-inline-end: 0;
 }
 .settings-sub-section .radio-txt.big {
@@ -177,18 +169,6 @@
 /* Settings page content wrappers */
 
 /* Settings. Content. Main content wrappers */
-.fm-right-account-block,
-.fm-right-block {
-    height: calc(100% - 64px);
-    position: relative;
-    min-width: auto;
-    top: 16px;
-}
-.fm-right-block.full-size {
-    height: calc(100% - 48px);
-    top: 0;
-}
-
 .fm-account-sections {
     box-sizing: border-box;
     color: var(--text-color-medium);
@@ -215,7 +195,6 @@
 .settings-right-block {
     box-sizing: border-box;
     padding: 14px 0;
-    -webkit-padding-start: 56px;
     padding-inline-start: 56px;
     width: 70%;
 }
@@ -245,8 +224,7 @@
     padding: 0;
 }
 .account.data-block.account-type .settings-right-block > div {
-    background: var(--surface-grey-3);
-    border: 2px solid var(--stroke-grey-2);
+    background: var(--mobile-surface-1);
     border-radius: 12px;
     padding: 0 24px;
     margin: 35px 0;
@@ -295,7 +273,6 @@
     padding: 0;
 }
 .settings-sub-section button + button {
-    -webkit-margin-start: 8px;
     margin-inline-start: 8px;
 }
 .settings-sub-section .new-tag {
@@ -367,7 +344,6 @@
 .content-panel .settings-button .sub-title {
     color: var(--text-color-medium);
     font: var(--text-body1);
-    -webkit-padding-start: 50px;
     padding-inline-start: 50px;
 }
 .content-panel .settings-button .head-title:hover {
@@ -441,7 +417,6 @@
     cursor: pointer;
     height: 32px;
     position: relative;
-    -webkit-margin-end: 3px;
     margin-inline-end: 3px;
     width: 16px;
 }
@@ -482,7 +457,6 @@
     border-radius: 3px;
     padding: 2px 8px;
     margin-inline-start: 12px;
-    -webkit-margin-start: 12px;
 }
 
 /* Settings content. Plan section. Achievement Storage/Badwidth bars */
@@ -525,7 +499,6 @@
     margin: 5px 0 0;
 }
 .fm-right-account-block .quota-note + .quota-note {
-    -webkit-margin-start: 15px;
     margin-inline-start: 15px;
 }
 .fm-right-account-block .quota-note i {
@@ -534,7 +507,6 @@
     height: 8px;
     border-radius: 100%;
     display: inline-block;
-    -webkit-margin-end: 8px;
     margin-inline-end: 8px;
     width: 8px;
 }
@@ -663,7 +635,6 @@
     height: 20px;
     position: absolute;
     margin: 0;
-    -webkit-margin-start: -16px;
     margin-inline-start: -16px;
     top: -6px;
     width: 32px;
@@ -757,7 +728,6 @@
 .slider-tip {
     font: var(--text-body2);
     color: var(--text-color-medium);
-    -webkit-margin-start: 15px;
     margin-inline-start: 15px;
 }
 
@@ -788,7 +758,6 @@
 }
 .fm-right-account-block .push-settings-status span {
     color: var(--secondary-green);
-    -webkit-padding-start: 4px;
     padding-inline-start: 4px;
 }
 
@@ -895,7 +864,6 @@
 
 .fm-account-sections.fm-account-s4 li {
     padding: 0 0 8px;
-    -webkit-margin-start: 21px;
     margin-inline-start: 21px;
 }
 
@@ -946,7 +914,7 @@
     width: auto;
 }
 .dashboard .settings-banner {
-    background: var(--surface-grey-5);
+    background: var(--mobile-surface-1);
     max-width: 100%;
     width: 100%;
 }
@@ -982,7 +950,7 @@
     background-color: transparent;
 }
 .quota-banner .account.chart.body::after {
-    background: var(--surface-grey-5);
+    background: var(--mobile-surface-1);
 }
 .quota-banner .chart.body .perc-txt {
     font: var(--text-body1);
@@ -1110,7 +1078,6 @@
 .tiny-chart .account.chart.data {
     margin: 6px 0 0 84px;
     display: inline-block;
-    -webkit-margin-start: 16px;
     margin-inline-start: 16px;
     vertical-align: middle;
     white-space: normal;
@@ -1243,7 +1210,7 @@
     display: inline-block;
     width: 62px;
     color: var(--text-color-white-higher);
-    font-size: 17px;
+    font-size: 12px;
     margin-right: 15px;
     margin-top: 6px;
     letter-spacing: 1px;
@@ -1251,7 +1218,8 @@
 .account.account-card-info .payment-card-digits {
     font: var(--text-h1);
     color: var(--text-color-white-higher);
-    font-family: var(--text-font-family-bold);
+    font-family: var(--text-font-family);
+    font-weight: bold;
 }
 .account.account-card-info .payment-card-expiry-lbl {
     display: inline-block;
@@ -1281,7 +1249,6 @@
 .chat-settings .chat-show-wrapper {
     padding: 16px 0 0;
     padding-inline-end: 16px;
-    -webkit-padding-end: 16px;
     width: 100%;
 }
 .chat-settings .chat-hide-wrapper {

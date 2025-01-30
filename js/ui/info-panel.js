@@ -1509,6 +1509,9 @@ lazy(mega.ui, 'mInfoPanel', () => {
 
                 // Trigger a resize for the grid mode tiles to fill up the void
                 $.tresizer();
+
+                // Hide header border
+                mega.ui.header.topBlockBottomBorder = false;
             });
 
             // Render the selected node info into the panel
@@ -1516,6 +1519,9 @@ lazy(mega.ui, 'mInfoPanel', () => {
 
             // Trigger a resize for the grid tiles to move
             $.tresizer();
+
+            // Show header border
+            mega.ui.header.topBlockBottomBorder = true;
         },
 
         /**

@@ -14,10 +14,10 @@ body,
 .theme-light .custom-alpha,
 html .theme-light-forced {
     --mobile-page-background: rgba(255, 255, 255, var(--mobile-page-alpha, 1));
-    --mobile-background-inverse: rgba(73, 74, 77, var(--mobile-background-alpha, 1));
-    --mobile-surface-1: rgba(250, 250, 250, var(--mobile-surface-alpha, 1));
-    --mobile-surface-3: rgba(216, 217, 219, var(--mobile-surface-alpha, 1));
-    --mobile-surface-2: rgba(243, 244, 244, var(--mobile-surface-alpha, 1));
+    --mobile-background-inverse: rgba(42, 43, 44, var(--mobile-background-alpha, 1));
+    --mobile-surface-1: rgba(247, 247, 247, var(--mobile-surface-alpha, 1));
+    --mobile-surface-3: rgba(228, 228, 229, var(--mobile-surface-alpha, 1));
+    --mobile-surface-2: rgba(239, 239, 240, var(--mobile-surface-alpha, 1));
     --mobile-background-blur: rgba(0, 0, 0, var(--mobile-background-alpha, 0.2));
     --mobile-surface-inverse-accent: rgba(57, 66, 78, var(--mobile-surface-alpha, 1));
     --mobile-button-primary: rgba(4, 16, 30, var(--mobile-button-alpha, 1));
@@ -37,7 +37,7 @@ html .theme-light-forced {
     --mobile-button-secondary: rgba(243, 244, 244, var(--mobile-button-alpha, 1));
     --mobile-button-primary-hover: rgba(57, 66, 78, var(--mobile-button-alpha, 1));
     --mobile-button-secondary-hover: rgba(216, 217, 219, var(--mobile-button-alpha, 1));
-    --mobile-border-interactive: rgba(221, 20, 5, var(--mobile-border-alpha, 1));
+    --mobile-border-brand: rgba(221, 20, 5, var(--mobile-border-alpha, 1));
     --mobile-border-strong: rgba(216, 217, 219, var(--mobile-border-alpha, 1));
     --mobile-border-strong-selected: rgba(4, 16, 30, var(--mobile-border-alpha, 1));
     --mobile-border-subtle: rgba(243, 244, 244, var(--mobile-border-alpha, 1));
@@ -46,6 +46,7 @@ html .theme-light-forced {
     --mobile-text-primary: rgba(48, 50, 51, var(--mobile-text-alpha, 1));
     --mobile-text-secondary: rgba(97, 99, 102, var(--mobile-text-alpha, 1));
     --mobile-text-accent: rgba(4, 16, 30, var(--mobile-text-alpha, 1));
+    --mobile-text-brand: rgba(221, 20, 5, var(--mobile-text-alpha, 1));
     --mobile-text-placeholder: rgba(97, 99, 102, var(--mobile-text-alpha, 1));
     --mobile-text-inverse-accent: rgba(250, 250, 251, var(--mobile-text-alpha, 1));
     --mobile-text-on-color: rgba(250, 250, 250, var(--mobile-text-alpha, 1));
@@ -59,6 +60,7 @@ html .theme-light-forced {
     --mobile-icon-primary: rgba(48, 50, 51, var(--mobile-icon-alpha, 1));
     --mobile-icon-secondary: rgba(97, 99, 102, var(--mobile-icon-alpha, 1));
     --mobile-icon-accent: rgba(4, 16, 30, var(--mobile-icon-alpha, 1));
+    --mobile-icon-brand: rgba(221, 20, 5, var(--mobile-icon-alpha, 1));
     --mobile-icon-inverse-accent: rgba(250, 250, 251, var(--mobile-icon-alpha, 1));
     --mobile-icon-on-color: rgba(250, 250, 250, var(--mobile-icon-alpha, 1));
     --mobile-icon-on-color-disabled: rgba(169, 171, 173, var(--mobile-icon-alpha, 1));
@@ -91,11 +93,11 @@ html .theme-light-forced {
 .theme-dark,
 .theme-dark .custom-alpha,
 html .theme-dark-forced {
-    --mobile-page-background: rgba(24, 25, 26, var(--mobile-page-alpha, 1));
-    --mobile-background-inverse: rgba(243, 244, 244, var(--mobile-background-alpha, 1));
-    --mobile-surface-1: rgba(48, 50, 51, var(--mobile-surface-alpha, 1));
-    --mobile-surface-3: rgba(97, 99, 102, var(--mobile-surface-alpha, 1));
-    --mobile-surface-2: rgba(73, 74, 77, var(--mobile-surface-alpha, 1));
+    --mobile-page-background: rgba(21, 22, 22, var(--mobile-page-alpha, 1));
+    --mobile-background-inverse: rgba(239, 239, 240, var(--mobile-background-alpha, 1));
+    --mobile-surface-1: rgba(34, 35, 36, var(--mobile-surface-alpha, 1));
+    --mobile-surface-3: rgba(58, 59, 61, var(--mobile-surface-alpha, 1));
+    --mobile-surface-2: rgba(42, 43, 44, var(--mobile-surface-alpha, 1));
     --mobile-background-blur: rgba(0, 0, 0, var(--mobile-background-alpha, 0.502));
     --mobile-surface-inverse-accent: rgba(189, 192, 196, var(--mobile-surface-alpha, 1));
     --mobile-button-primary: rgba(244, 244, 245, var(--mobile-button-alpha, 1));
@@ -115,7 +117,7 @@ html .theme-dark-forced {
     --mobile-button-secondary: rgba(73, 74, 77, var(--mobile-button-alpha, 1));
     --mobile-button-primary-hover: rgba(163, 166, 173, var(--mobile-button-alpha, 1));
     --mobile-button-secondary-hover: rgba(97, 99, 102, var(--mobile-button-alpha, 1));
-    --mobile-border-interactive: rgba(251, 99, 97, var(--mobile-border-alpha, 1));
+    --mobile-border-brand: rgba(251, 99, 97, var(--mobile-border-alpha, 1));
     --mobile-border-strong: rgba(97, 99, 102, var(--mobile-border-alpha, 1));
     --mobile-border-strong-selected: rgba(244, 244, 245, var(--mobile-border-alpha, 1));
     --mobile-border-subtle: rgba(48, 50, 51, var(--mobile-border-alpha, 1));
@@ -124,6 +126,7 @@ html .theme-dark-forced {
     --mobile-text-primary: rgba(243, 244, 244, var(--mobile-text-alpha, 1));
     --mobile-text-secondary: rgba(169, 171, 173, var(--mobile-text-alpha, 1));
     --mobile-text-accent: rgba(250, 250, 251, var(--mobile-text-alpha, 1));
+    --mobile-text-brand: rgba(242, 52, 51, var(--mobile-text-alpha, 1));
     --mobile-text-placeholder: rgba(193, 194, 196, var(--mobile-text-alpha, 1));
     --mobile-text-inverse-accent: rgba(4, 16, 30, var(--mobile-text-alpha, 1));
     --mobile-text-on-color: rgba(250, 250, 250, var(--mobile-text-alpha, 1));
@@ -137,6 +140,7 @@ html .theme-dark-forced {
     --mobile-icon-primary: rgba(243, 244, 244, var(--mobile-icon-alpha, 1));
     --mobile-icon-secondary: rgba(169, 171, 173, var(--mobile-icon-alpha, 1));
     --mobile-icon-accent: rgba(250, 250, 251, var(--mobile-icon-alpha, 1));
+    --mobile-icon-brand: rgba(242, 52, 51, var(--mobile-icon-alpha, 1));
     --mobile-icon-inverse-accent: rgba(4, 16, 30, var(--mobile-icon-alpha, 1));
     --mobile-icon-on-color: rgba(250, 250, 250, var(--mobile-icon-alpha, 1));
     --mobile-icon-on-color-disabled: rgba(145, 147, 151, var(--mobile-icon-alpha, 1));

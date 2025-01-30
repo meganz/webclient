@@ -718,6 +718,13 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             var list = this.selected_list;
             if (list && !list.length) {
                 this.hideSelectionBar();
+
+                if (M.gallery && !window.pfcol && mega.gallery[M.currentdirid]) {
+                    mega.gallery[M.currentdirid].clearSelections();
+                }
+                else if (M.albums && mega.gallery.albums.grid && mega.gallery.albums.grid.timeline) {
+                    mega.gallery.albums.grid.timeline.clearSiblingSelections();
+                }
             }
         });
 
@@ -839,6 +846,10 @@ class SelectionManager2_DOM extends SelectionManager2Base {
         }
 
         mega.ui.mInfoPanel.reRenderIfVisible($.selected);
+
+        if (M.gallery && mega.gallery[M.currentdirid]) {
+            mega.gallery[M.currentdirid].enableGroupChecks();
+        }
     }
 
     /**
@@ -928,7 +939,6 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             ? this.$selectionBar
             : $('.selection-status-bar');
 
-        let scrollBarYClass = '';
         const $selCountElm = $('.sel-notif-count-total', $selectionBar);
 
         if (notificationText) {

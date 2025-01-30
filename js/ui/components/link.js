@@ -73,11 +73,31 @@ MegaLink.bindEvent = function() {
         }
 
         /* Handle redirection internally */
-        if (this.href.startsWith('/fm/')) {
+        if (!pfid && this.href.startsWith('/fm/')) {
             M.openFolder(this.href.slice(4));
+        }
+        else if (pfcol && this.href.startsWith('/collection/')){
+            M.openFolder(this.href.slice(12));
+        }
+        else if (pfid && this.href.startsWith('/folder/')) {
+            M.openFolder(this.href.slice(8));
         }
         else {
             loadSubPage(this.href);
+        }
+    });
+
+    this.on('auxclick', e => {
+
+        if (e.which === 2) {
+
+            if (isStaticPage(this.href)) {
+                mega.redirect('mega.io', this.href, false, false, false);
+            }
+
+            window.open(this.href, '_blank', 'noopener,noreferrer');
+
+            return false;
         }
     });
 };

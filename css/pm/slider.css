@@ -7,7 +7,6 @@
 .slider-container {
     position: relative;
     width: 100%;
-    -webkit-margin-end: 16px;
     margin-inline-end: 16px;
 }
 

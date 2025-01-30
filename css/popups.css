@@ -272,8 +272,6 @@ body.tl .dropdown.body.popup.contacts-search {
     width: 36px;
     height: 36px;
     line-height: 35px;
-    -moz-border-radius: 8px;
-    -webkit-border-radius: 8px;
     border-radius: 8px;
 }
 .horizontal-contacts-list .selected-contact-block .small-rounded-avatar img {
@@ -557,7 +555,7 @@ body.tl .dropdown.body.popup.contacts-search {
     opacity: 1;
 }
 .dark-direct-tooltip.simpletip-tooltip i {
-    --mask-color: var(--stroke-grey-1-inverted);
+    --mask-color: var(--mobile-background-inverse);
     --icon-size: 24px;
     height: 16px;
     overflow: hidden;

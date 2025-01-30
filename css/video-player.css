@@ -705,7 +705,6 @@
     .subtitles-grid-table table.grid-table th:first-child {
         padding: 0;
         width: 0;
-        -webkit-padding-start: 0;
         padding-inline-start: 0;
     }
     .subtitles-grid-table table th[megatype="fname"] {
@@ -748,12 +747,10 @@
     }
     .dark-direct-tooltip.breadcrumb-tip .fm-breadcrumbs-wrapper {
         height: 20px;
-        -webkit-padding-start: 0;
         padding-inline-start: 0;
         margin-top: 0;
     }
     .dark-direct-tooltip.breadcrumb-tip .fm-breadcrumbs-block:not(.hidden) {
-        -webkit-padding-end: 0;
         padding-inline-end: 0;
     }
     .dark-direct-tooltip.simpletip-tooltip .fm-breadcrumbs-wrapper i {

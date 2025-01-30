@@ -59,7 +59,6 @@
     margin-top: 12px;
 }
 .basic-info-body .row i {
-    -webkit-margin-start: 8px;
     margin-inline-start: 8px;
     cursor: pointer;
     vertical-align: top;
@@ -68,13 +67,11 @@
     color: var(--text-color-medium);
     font: var(--text-body1);
     flex-grow: 1;
-    -webkit-margin-start: 48px;
     margin-inline-start: 48px;
 }
 .s4-info-section .info-section-header {
     display: flex;
     justify-content: space-between;
-    -webkit-margin-start: 32px;
     margin-inline-start: 32px;
     align-items: center;
     color: var(--text-color-medium);
@@ -87,7 +84,6 @@
 .s4-info-section button.action span {
     color: var(--text-color-high);
     font: var(--text-body1);
-    -webkit-margin-end: 0;
     margin-inline-end: 0;
 }
 .s4-info-section .sticky-header-table-container th,
@@ -108,13 +104,11 @@
 }
 .s4-info-section .sticky-header-table-container tr th:last-child,
 .s4-info-section .sticky-header-table-container tr td:last-child {
-    -webkit-padding-end: 32px;
     padding-inline-end: 32px;
 }
 .s4-info-section .sticky-header-table-container .actions-btn a {
     color: var(--text-color-medium);
     font: var(--text-body1);
-    -webkit-padding-end: 16px;
     padding-inline-end: 16px;
     text-decoration: underline;
 }
@@ -186,7 +180,6 @@
 }
 .s4-info-section .s4-user-keys-management-scroll .s4-grid-table td.status i {
     display: inline-block;
-    -webkit-margin-end: 4px;
     margin-inline-end: 4px;
     vertical-align: middle;
 }

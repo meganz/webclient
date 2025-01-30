@@ -13,12 +13,10 @@
 }
 .fr-mgmt-container .description-field .mega-input-title > *:not(:last-child) {
     margin-inline-end: 8px;
-    -webkit-margin-end: 8px;
 }
 
 .fr-mgmt-container .description-field .mega-input-title .optional {
     margin-inline-start: 8px;
-    -webkit-margin-start: 8px;
     font: var(--mobile-font-caption-large-regular);
     color: var(--mobile-text-secondary);
 }
@@ -41,7 +39,6 @@
 .fr-updated-sheet-contents .mega-input.with-icon i:not(.alert) {
     order: 1;
     margin-inline-end: 8px;
-    -webkit-margin-end: 8px;
 }
 
 @media screen and (min-width: 769px) {

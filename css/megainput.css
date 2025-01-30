@@ -124,7 +124,6 @@
     float: none;
     padding: 0;
     position: relative;
-    -webkit-margin-start: 3px;
     margin-inline-start: 3px;
     transition: var(--transition-color);
 }
@@ -138,7 +137,6 @@
 .mega-input > span ~ i {
     --mask-color: var(--icon-inactive);
     margin: 0;
-    -webkit-margin-end: 3px;
     margin-inline-end: 3px;
 }
 .mega-input:hover > input ~ i,
@@ -182,12 +180,10 @@
     background: var(--surface-grey-2);
 }
 .mega-input.box-style > i {
-    -webkit-margin-start: 8px;
     margin-inline-start: 8px;
 }
 .mega-input.box-style > input ~ i {
     margin: 0;
-    -webkit-margin-end: 8px;
     margin-inline-end: 8px;
 }
 .mega-input.box-style .mega-input-dropdown {
@@ -198,7 +194,6 @@
 }
 .mega-input.box-style.title-ontop.with-icon .mega-input-title {
     color: var(--text-color-high);
-    -webkit-padding-start: 40px;
     padding-inline-start: 40px;
 }
 
@@ -243,7 +238,6 @@
 .mega-input.text-style > input ~ i,
 .mega-input.text-style > span ~ i {
     --mask-color: var(--icon-active);
-    -webkit-margin-end: 0;
     margin-inline-end: 0;
 }
 .mega-input.dropdown-input.text-style:hover {
@@ -296,7 +290,6 @@
     font: var(--text-body1);
     color: var(--text-color-medium);
     display: inline-block;
-    -webkit-padding-start: 8px;
     padding-inline-start: 8px;
     position: absolute;
     left: 0;
@@ -305,7 +298,6 @@
     z-index: 10;
 }
 .mega-input.title-ontop.with-icon .mega-input-title {
-    -webkit-padding-start: 35px;
     padding-inline-start: 35px;
 }
 
@@ -420,13 +412,11 @@
 .mega-input-dropdown .option i {
     --icon-size: 24px;
     margin: 0;
-    -webkit-margin-end: 8px;
     margin-inline-end: 8px;
     transition: var(--transition-color);
 }
 .mega-input-dropdown .option span + i {
     margin: 0;
-    -webkit-margin-start: 8px;
     margin-inline-start: 8px;
 }
 .mega-input-dropdown .option i.icon-check {
@@ -518,7 +508,6 @@
 .mega-input .account-pass-lines {
     background: var(--surface-mid-grey);
     border-radius: 2px;
-    -webkit-margin-end: 4px;
     margin-inline-end: 4px;
 }
 .mega-input .register-pass-status-line {
@@ -561,7 +550,8 @@
     color: var(--password-status-veryweak);
     display: none;
     font-size: 14px;
-    font-family: var(--text-font-family-black);
+    font-family: var(--text-font-family);
+    font-weight: 900;
     line-height: 24px;
     margin: 0 4px;
 }
@@ -703,7 +693,6 @@
 .mobile.mega-input.error .message-container i,
 .pm.mega-input.error .message-container i {
     margin-inline-end: 8px;
-    -webkit-margin-end: 8px;
     vertical-align: text-bottom;
 }
 .mobile.mega-input input.megaInputs:not(:placeholder-shown),
@@ -733,7 +722,6 @@
 .pm.mega-input.title-ontop.box-style .mega-input-title {
     font: var(--mobile-font-caption-large-bold);
     padding-inline-start: 0;
-    -webkit-padding-start: 0;
     color: var(--mobile-text-primary);
     max-width: 100%;
     overflow: hidden;
@@ -765,7 +753,6 @@
     display: inline-block;
     vertical-align: top;
     margin-top: 3px;
-    -webkit-margin-end: 8px;
     margin-inline-end: 8px;
 }
 .mobile.mega-input .length-check,
@@ -807,7 +794,6 @@
 .mobile.mega-input.textarea i,
 .pm.mega-input.textarea i {
     margin-inline-end: 0;
-    -webkit-margin-end: 0;
 }
 
 /* Textarea with auto height */
@@ -833,7 +819,6 @@
 .pm.mega-input.textarea.box-style.auto-height textarea ~ i {
     margin: 0;
     margin-inline-end: 6px;
-    -webkit-margin-end: 6px;
 }
 
 .mobile.mega-input.textarea.box-style.auto-height .message-container,

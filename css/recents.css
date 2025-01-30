@@ -1,5 +1,4 @@
 .fm-recents.container {
-    background-color: var(--stroke-main);
     display: flex;
     flex-direction: column;
     height: calc(100% - 48px);
@@ -38,7 +37,6 @@
     margin-left: 48px;
     margin-right: 48px;
     min-height: 48px;
-    -webkit-padding-start: 20px;
     padding-inline-start: 20px;
     border: 1px solid transparent;
     position: relative;
@@ -50,7 +48,6 @@
     color: var(--secondary-blue);
     font: var(--text-body1-bold);
     padding: 23px 0 13px;
-    -webkit-padding-start: 24px;
     padding-inline-start: 24px;
 }
 .fm-recents.date.template {
@@ -94,27 +91,9 @@
 .fm-recents .data-block-bg.video .video-thumb-details i {
     margin-top: -1px;
 }
-.fm-recents .item-type-icon-90.double {
-    left: 9px;
-    top: 5px;
-}
-.rtl .fm-recents .item-type-icon-90.double {
-    right: 9px;
-    left: auto;
-}
-.fm-recents .item-type-icon-90 .item-type-icon-90 {
-    left: -6px;
-    top: -6px;
-}
-.fm-recents .item-type-icon-90 .item-type-icon-90 {
-    right: 6px;
-    left: auto;
-}
 .fm-recents.file-info {
     margin: 0;
-    -webkit-margin-end: 130px;
     margin-inline-end: 130px;
-    -webkit-margin-start: 48px;
     margin-inline-start: 48px;
     padding: 5px 0 0 0;
 }
@@ -170,9 +149,7 @@
     display: inline-block;
     vertical-align: middle;
     margin: 0;
-    -webkit-margin-end: 5px;
     margin-inline-end: 5px;
-    -webkit-margin-start: -2px;
     margin-inline-start: -2px;
 }
 .fm-recents.file-action {
@@ -189,7 +166,6 @@
     white-space: nowrap;
     float: left;
     margin: 4px 0 0 0;
-    -webkit-margin-start: 21px;
     margin-inline-start: 21px;
 }
 .rtl .fm-recents.iteration {
@@ -285,7 +261,6 @@
 }
 .fm-recents.previews-body {
     display: inline-block;
-    -webkit-padding-start: 18px;
     padding-inline-start: 18px;
     vertical-align: top;
 }
@@ -408,6 +383,9 @@
 }
 .fm-recents.content-row.single.child-note .content::after {
     display: none;
+}
+.fm-recents.content-row .content {
+    background-color: var(--mobile-page-background);
 }
 .fm-recents.content-row:hover .content,
 .fm-recents.content-row.ui-selected .content {

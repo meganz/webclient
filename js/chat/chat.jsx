@@ -247,31 +247,33 @@ Chat.prototype.init = promisify(function(resolve, reject) {
 
     // UI events
     var $body = $(document.body);
-    $body.rebind('mousedown.megachat', '.top-user-status-popup .dropdown-item', function() {
-        var presence = $(this).data("presence");
-        self._myPresence = presence;
+    if (!is_chatlink) {
+        $(mega.ui.header.setStatus).rebind('mousedown.megachat', '.sub-menu.status button', function() {
+            var presence = $(this).data("presence");
+            self._myPresence = presence;
 
-        // presenced integration
-        var targetPresence = PresencedIntegration.cssClassToPresence(presence);
+            // presenced integration
+            var targetPresence = PresencedIntegration.cssClassToPresence(presence);
 
-        self.plugins.presencedIntegration.setPresence(targetPresence);
+            self.plugins.presencedIntegration.setPresence(targetPresence);
 
 
-        // connection management - chatd shards, presenced
-        if (targetPresence !== UserPresence.PRESENCE.OFFLINE) {
-            // going from OFFLINE -> online/away/busy, e.g. requires a connection
+            // connection management - chatd shards, presenced
+            if (targetPresence !== UserPresence.PRESENCE.OFFLINE) {
+                // going from OFFLINE -> online/away/busy, e.g. requires a connection
 
-            Object.keys(self.plugins.chatdIntegration.chatd.shards).forEach(function(k) {
-                var v = self.plugins.chatdIntegration.chatd.shards[k];
-                v.connectionRetryManager.requiresConnection();
-            });
-        }
-    });
+                Object.keys(self.plugins.chatdIntegration.chatd.shards).forEach(k => {
+                    var v = self.plugins.chatdIntegration.chatd.shards[k];
+                    v.connectionRetryManager.requiresConnection();
+                });
+            }
+        });
+    }
 
     // @todo where is this used?
     self.$container = $('.fm-chat-block');
 
-    if (!is_chatlink) {
+    if (M.chat && !is_chatlink) {
         $('.activity-status-block, .activity-status').removeClass('hidden');
         $('.js-dropdown-account .status-dropdown').removeClass('hidden');
     }

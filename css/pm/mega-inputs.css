@@ -32,7 +32,6 @@
 }
 .pm.mega-input .mega-input-title .optional {
     margin-inline-start: 8px;
-    -webkit-margin-start: 8px;
     font: var(--mobile-font-caption-large-regular);
     color: var(--mobile-text-primary);
 }
@@ -87,7 +86,6 @@
 }
 .pm.mega-input.box-style > input ~ i {
     margin: 0;
-    -webkit-margin-end: 8px;
     margin-inline-end: 8px;
 }
 .pm.mega-input.success.msg,

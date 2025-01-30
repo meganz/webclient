@@ -201,10 +201,12 @@ lazy(mega, 'sets', () => {
      * @returns {void}
      */
     const renderCleanup = () => {
-        if (!M.albums) {
-            mega.gallery.albumsRendered = false;
-            MegaGallery.dbactionPassed = false;
+        if (is_mobile || M.albums) {
+            return;
         }
+
+        mega.gallery.albumsRendered = false;
+        MegaGallery.dbactionPassed = false;
     };
 
     /**

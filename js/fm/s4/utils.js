@@ -411,7 +411,6 @@ lazy(s4, 'utils', () => {
         renderContainerTree(dialog) {
             const wrapperClass = typeof dialog === 'string' && dialog || 'js-s4-tree-panel';
             const treeWrap = document.querySelector(`.${wrapperClass}`);
-            const expIcon = treeWrap.querySelector('.js-cloudtree-expander');
             const cn = this.getContainersList();
             const prefix = dialog ? 'mc' : '';
             let treeNode = treeWrap.querySelector('.s4 .tree');
@@ -437,15 +436,6 @@ lazy(s4, 'utils', () => {
             const treeClone = treeNode.cloneNode(true);
             treeNode.textContent = '';
 
-            if (expIcon) {
-                if (cn.length) {
-                    expIcon.classList.remove('hidden');
-                }
-                else {
-                    expIcon.classList.add('hidden');
-                }
-            }
-
             // Show container if multiple containers
             if (cn.length > 1) {
                 treeNode = mCreateElement('ul', {'id': `${prefix}treesub_s4`}, treeNode);
@@ -465,7 +455,7 @@ lazy(s4, 'utils', () => {
                 let wrapNode = treeNode;
 
                 if (cn.length > 1) {
-                    wrapNode = createItem(wrapNode, cn[i].h, cn[i].name, 'icon-container-filled');
+                    wrapNode = createItem(wrapNode, cn[i].h, cn[i].name, 'icon-bucket-triangle-thin-outline');
                 }
 
                 wrapNode = mCreateElement('ul', {
@@ -474,16 +464,12 @@ lazy(s4, 'utils', () => {
                 }, wrapNode);
 
                 if (!dialog) {
-                    createItem(wrapNode, `${cn[i].h}_keys`, l.s4_keys, 'icon-key', true);
+                    createItem(wrapNode, `${cn[i].h}_keys`, l.s4_keys, 'icon-key-01-thin-outline', true);
                     createItem(
-                        wrapNode, `${cn[i].h}_policies`, l.s4_policies, 'icon-policy-filled', true
+                        wrapNode, `${cn[i].h}_policies`, l.s4_policies, 'icon-shield-thin-outline', true
                     );
-                    createItem(wrapNode, `${cn[i].h}_groups`, l.s4_groups, 'icon-contacts', true);
-                    createItem(wrapNode, `${cn[i].h}_users`, l.s4_users, 'icon-user-filled', true);
-                }
-
-                if (expIcon) {
-                    expIcon.classList.remove('hidden');
+                    createItem(wrapNode, `${cn[i].h}_groups`, l.s4_groups, 'icon-users-thin-outline', true);
+                    createItem(wrapNode, `${cn[i].h}_users`, l.s4_users, 'icon-user-thin-outline', true);
                 }
 
                 M.buildtree({h: cn[i].h}, dialog, 's4');

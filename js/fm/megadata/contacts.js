@@ -224,7 +224,7 @@ MegaData.prototype.syncUsersFullname = async function(userId, chatHandle) {
                 accountUI.account.profiles.renderFirstName();
                 accountUI.account.profiles.renderLastName();
             }
-            else if (mega.ui.menu && mega.ui.menu.name === 'avatar-menu' && mega.ui.menu.visible) {
+            if (mega.ui.header.avatarButton && mega.ui.header.avatarButton.hasClass('active')) {
                 mega.ui.header.updateUserName(u_attr.fullname);
             }
         }

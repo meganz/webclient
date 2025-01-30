@@ -61,7 +61,6 @@ footer.bottom-menu .info-group .social {
 footer.bottom-menu .info-group .social .bottom-social-button {
     display: block;
     margin-inline-end: var(--spacing-5);
-    -webkit-margin-end: var(--spacing-5);
     margin-bottom: var(--spacing-5);
     border-radius: 6px;
     background-color: var(--color-grey-100);

@@ -179,7 +179,7 @@ function resetSensitives() {
 
                         div.className = 'flex flex-row items-center py-2';
                         icon.className = `sprite-fm-mono icon-size-6 mx-4 ${ic}`;
-                        titleLine.className = 'font-title-3 text-color-high my-1';
+                        titleLine.className = 'font-title-h3 text-color-high my-1';
                         txtLine.className = 'sensitive-onboarding-txt my-0';
 
                         titleLine.textContent = t;

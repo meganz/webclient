@@ -37,11 +37,8 @@
     border-radius: 4px;
     color: var(--text-color-medium);
     height: 32px;
-    -webkit-margin-start: 15px;
     margin-inline-start: 15px;
-    -webkit-padding-end: 40px;
     padding-inline-end: 40px;
-    -webkit-padding-start: 10px;
     padding-inline-start: 10px;
     width: 125px;
 }
@@ -67,7 +64,6 @@
     cursor: pointer;
     display: block;
     padding: 5px 0 11px;
-    -webkit-padding-start: 36px;
     padding-inline-start: 36px;
     position: relative;
 }

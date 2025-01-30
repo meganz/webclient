@@ -113,7 +113,6 @@ RecentsRender.prototype.render = function(limit, until, forceInit) {
     M.onSectionUIOpen('recents');
     $('.fmholder').removeClass("transfer-panel-opened");
     $('.fm-right-files-block').addClass('hidden');
-    $('.top-head').find(".recents-tab-link").removeClass("hidden").addClass('active');
     this.$container.removeClass('hidden');
 
     M.viewmode = 1;

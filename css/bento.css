@@ -1,0 +1,49 @@
+.bento-wrapper {
+    position: relative;
+}
+.bento-menu {
+    position: absolute;
+    right: -8px;
+    top: calc(100% + 20px);
+    background-color: var(--mobile-page-background);
+    z-index: 2000;
+    border: 1px solid var(--mobile-border-subtle);
+    box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.7);
+    border-radius: 8px;
+    display: grid;
+    gap: 8px;
+    padding: 8px;
+    grid-template-columns: auto auto;
+}
+.bento-menu a.link.nav-elem {
+    width: 120px;
+    height: 65px;
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid var(--mobile-border-subtle);
+    flex-direction: column;
+    align-items: flex-start;
+    color: var(--mobile-icon-secondary);
+}
+
+body.fr .bento-menu a.link.nav-elem {
+    width: 132px;
+}
+.bento-menu a.link.nav-elem:hover {
+    background-color: var(--mobile-surface-1);
+}
+.bento-menu a.link.nav-elem.active {
+    color: var(--mobile-button-brand);
+}
+.bento-menu a.link.nav-elem.active i,
+.bento-menu a.link.nav-elem.active span {
+    color: inherit;
+}
+.bento-menu a.link.nav-elem .text-box-wrapper {
+    margin-top: auto;
+}
+.bento-menu a.link.nav-elem span {
+    font: var(--mobile-font-caption-large-regular);
+    text-decoration: none;
+    color: inherit;
+}

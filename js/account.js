@@ -878,10 +878,6 @@ function processEmailChangeActionPacket(ap) {
 
             if (ap.u === u_handle) {
                 u_attr.email = user.m;
-
-                if (M.currentdirid === 'account/profile') {
-                    $('.nw-fm-left-icon.account').trigger('click');
-                }
             }
         }
         // update the underlying fmdb cache

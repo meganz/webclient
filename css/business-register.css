@@ -73,7 +73,6 @@
 }
 .bus-reg-body .bus-reg-radio.not-first-child,
 .card-container.bus-repay .bus-reg-radio.not-first-child {
-    -webkit-margin-start: 32px;
     margin-inline-start: 32px;
 }
 .bus-reg-body .provider,
@@ -86,9 +85,7 @@
 .bus-reg-body .payment-icon {
     vertical-align: middle;
     display: inline-block;
-    -webkit-margin-start: 4px;
     margin-inline-start: 4px;
-    -webkit-margin-end: 32px;
     margin-inline-end: 32px;
 }
 .card-container.bus-repay .payment-icon i,
@@ -104,7 +101,6 @@
 }
 .bus-reg-agreement .checkdiv {
     margin: 2px 0;
-    -webkit-margin-end: 14px;
     margin-inline-end: 14px;
     vertical-align: top;
 }
@@ -319,7 +315,8 @@
 }
 .bus-reg-plan .business-plan-price .big {
     font: var(--text-data);
-    font-family: var(--text-font-family-semibold);
+    font-family: var(--text-font-family);
+    font-weight: 600;
     margin-right: 8px;
 }
 
@@ -520,7 +517,6 @@
     padding: 56px 0 0;
 }
 .main-mid-pad.bus-repay .main-left-block {
-    -webkit-padding-end: 48px;
     padding-inline-end: 48px;
 }
 .main-mid-pad.bus-repay .section-wrapper:not(:first-child) {
@@ -562,7 +558,6 @@
 .main-mid-pad.bus-repay .row-wrapper .info-txt {
     font: var(--text-body1);
     color: var(--text-color-medium);
-    -webkit-margin-start: 12px;
     margin-inline-start: 12px;
     display: inline-block;
     vertical-align: middle;
@@ -630,9 +625,7 @@
 .bus-reg-plan.repay .repay-breakdown-tb tr td:first-child {
     width: 123px;
     padding: 12px 0 8px;
-    -webkit-padding-end: 8px;
     padding-inline-end: 8px;
-    -webkit-padding-start: 12px;
     padding-inline-start: 12px;
     box-sizing: border-box;
     display: inline-block;
@@ -640,7 +633,6 @@
 .bus-reg-plan.repay .repay-breakdown-tb tr th:nth-child(2),
 .bus-reg-plan.repay .repay-breakdown-tb tr td:nth-child(2) {
    width: 113px;
-    -webkit-padding-end: 4px;
     padding-inline-end: 4px;
     box-sizing: border-box;
     display: inline-block;
@@ -654,7 +646,6 @@
 .bus-reg-plan.repay .repay-breakdown-tb tr th:last-child,
 .bus-reg-plan.repay .repay-breakdown-tb tr td:last-child {
     width: calc(100% - 244px);
-    -webkit-padding-end: 12px;
     padding-inline-end: 12px;
     box-sizing: border-box;
     text-align: end;
@@ -662,7 +653,8 @@
     opacity: unset;
 }
 .bus-reg-plan.repay .repay-breakdown-tb tr td:nth-child(3) {
-    font-family: var(--text-font-family-bold);
+    font-family: var(--text-font-family);
+    font-weight: bold;
 }
 .bus-reg-plan.repay .repay-breakdown-tb .content-desc {
     white-space: nowrap;
@@ -696,14 +688,14 @@
 .bus-reg-plan.repay .repay-breakdown-tb tr:last-child td {
     color: var(--text-color-high);
     font: var(--text-h2);
-    font-family: var(--text-font-family-bold);
+    font-family: var(--text-font-family);
+    font-weight: bold;
     text-align: start;
     width: 110px;
     height: 50px;
     opacity: unset;
 }
 .bus-reg-plan.repay .repay-breakdown-tb tr:last-child td:last-child {
-    -webkit-padding-end: 12px;
     padding-inline-end: 12px;
     width: 210px;
     text-align: end;

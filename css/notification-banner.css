@@ -10,6 +10,7 @@
     box-sizing: border-box;
     position: relative;
     top: 16px;
+    width: 100%;
 }
 .notification-banner.no-max-width {
     max-width: unset;
@@ -44,12 +45,10 @@
 .notification-banner .banner-contents > *:not(:last-child),
 .notification-banner .banner-contents .info-and-buttons > *:not(:last-child) {
     margin-inline-end: 12px;
-    -webkit-margin-end: 12px;
 }
 
 .notification-banner .banner-contents .info-and-buttons .buttons .cta-buttons > :last-child {
     margin-inline-start: 12px;
-    -webkit-margin-start: 12px;
 }
 
 .notification-banner .banner-contents .info-and-buttons {
@@ -58,7 +57,8 @@
 }
 
 .notification-banner .banner-contents .info-and-buttons .info .title {
-    font-family: var(--text-font-family-bold);
+    font-family: var(--text-font-family);
+    font-weight: bold;
     font-size: 14px;
     line-height: 20px;
 }
@@ -69,7 +69,6 @@
 
 .notification-banner .banner-contents .info-and-buttons .buttons > *:not(:last-child) {
     margin-inline-end: 24px;
-    -webkit-margin-end: 24px;
 }
 
 .notification-banner .banner-contents .info-and-buttons .buttons .cta-buttons > * {

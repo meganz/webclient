@@ -2179,23 +2179,10 @@ MegaData.prototype.labelDomUpdate = function(handle, value) {
 
             $item.addClass(colourClass);
             $('a', $item).addClass(colourClass);
-            $('.nw-fm-tree-iconwrap', $treeElements)
-                .safePrepend(color.replace('%1', M.getLabelClassFromId(labelId))).addClass('labeled');
+            // $('.nw-fm-tree-iconwrap', $treeElements)
+            //     .safePrepend(color.replace('%1', M.getLabelClassFromId(labelId))).addClass('labeled');
             if (M.megaRender) {
                 $('.label', $item).text(M.megaRender.labelsColors[lblColor]);
-            }
-        }
-
-        var currentTreeLabel = M.filterTreePanel[`${M.currentTreeType}-label`];
-        // if current tree is on filtering
-        if (currentTreeLabel && Object.keys(currentTreeLabel).length > 0) {
-            // and action is assigning new tag
-            if (labelId && currentTreeLabel[labelId]) {
-                $(`#treeli_${prefixTree}${handle}`).removeClass("tree-item-on-filter-hidden");
-            }
-            // and action is unassigning old tag
-            else {
-                $(`#treeli_${prefixTree}${handle}`).addClass("tree-item-on-filter-hidden");
             }
         }
 

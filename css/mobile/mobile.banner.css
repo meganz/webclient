@@ -72,7 +72,6 @@
 
 /* Custom button styles */
 .mega-component.banner .button.icon-only {
-    -webkit-margin-start: auto;
     margin-inline-start: auto;
     padding: 0;
     justify-self: flex-end;

@@ -7,7 +7,6 @@ div.radioOn, div.radioOff {
     display: inline-block;
     height: 18px;
     margin: 1px 0;
-    -webkit-margin-end: 12px;
     margin-inline-end: 12px;
     position: relative;
     vertical-align: top;
@@ -21,7 +20,6 @@ div.radioOn, div.radioOff {
 .objectstorage .register-radio-option2 div.radioOff,
 .objectstorage .register-radio-option3 div.radioOn,
 .objectstorage .register-radio-option3 div.radioOff {
-    -webkit-margin-end: 8px;
     margin-inline-end: 8px;
 }
 .mobile .payment-type-wrapper div.radioOn,
@@ -107,7 +105,6 @@ div.radioOff.small::before {
 .radio-txt {
     font: var(--text-body1);
     color: var(--text-color-medium);
-    -webkit-padding-end: 28px;
     padding-inline-end: 28px;
     max-width: calc(100% - 31px);
     box-sizing: border-box;

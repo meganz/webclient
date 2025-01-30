@@ -55,8 +55,6 @@
 }
 .data-block-view.semi-big {
     width: 170px;
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
     border-radius: 5px;
     padding: 4px;
 }
@@ -108,6 +106,7 @@
     z-index: 3;
     border-radius: 3px;
     color: var(--text-color-white-high);
+    color: var(--mobile-surface-1)
 }
 .fm-blocks-view .data-block-view.ui-selected i.selected,
 .fm-blocks-view .data-block-view.ui-selecting i.selected,
@@ -214,7 +213,6 @@
 .data-block-view.linked .icon-link {
     --icon-size: 16px;
     margin-inline-end: 4px;
-    -webkit-margin-end: 4px;
     margin-top: 8px;
     margin-bottom: 8px;
     background-image: none;
@@ -304,11 +302,13 @@
     border-radius: 50%;
 }
 .megaList-content .data-block-view:hover .file-settings-icon,
+.albums-grid-cell .album-settings-icon,
 .megaList-content .data-block-view.ui-selected .file-settings-icon {
     background: var(--label-grey);
 }
 .data-block-view:hover .file-settings-icon i,
-.data-block-view.ui-selected .file-settings-icon i {
+.data-block-view.ui-selected .file-settings-icon i,
+.albums-grid-cell .album-settings-icon i {
     --icon-size: 24px;
     --mask-color: var(--icon-rest);
     height: 24px;
@@ -316,7 +316,8 @@
     top: 1px;
     opacity: 1;
 }
-.data-block-view .file-settings-icon i::before {
+.data-block-view .file-settings-icon i::before,
+.albums-grid-cell .album-settings-icon i::before {
     line-height: 24px;
     transition: color 100ms ease-in-out;
 }
@@ -334,7 +335,6 @@
     left: 1px;
     height: auto;
     z-index: 2;
-    background: var(--surface-highlight-2);
     border-radius: 10px 10px 0 0;
     padding-right: 5px;
     float: right;
@@ -342,6 +342,7 @@
 
 .data-block-bg.thumb .data-block-indicators {
     border-radius: 8px 8px 0 0;
+    background: var(--surface-highlight-2);
 }
 .data-block-bg.video .data-block-indicators {
     height: 34px;

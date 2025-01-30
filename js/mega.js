@@ -82,7 +82,7 @@ lazy(mega, 'is', () => {
 lazy(self, 'mLoadingSpinner', () => {
     'use strict';
     const callers = new Map();
-    const domNode = document.querySelector('.fmdb-loader');
+    const domNode = mega.ui.header && mega.ui.header.loader;
 
     const hideToast = (id) => {
         if (id) {
@@ -1553,7 +1553,7 @@ scparser.$add('d', function(a) {
 
     if (!a.m && fminitialized && !pfid && !is_mobile) {
         M.storageQuotaCache = null;
-        delay('checkLeftStorageBlock', () => M.checkLeftStorageBlock().catch(dump));
+        delay('checkStorageBlock', () => MegaStorageBlock.checkUpdate());
     }
 });
 
@@ -1653,13 +1653,8 @@ scparser.$add('sqac', (a) => {
             }
             M.storageQuotaCache = null;
 
-            if ($.topMenu) {
-
-                topMenu();
-            }
-            else if (!pfid) {
-
-                M.checkLeftStorageBlock();
+            if (!pfid) {
+                MegaStorageBlock.checkUpdate();
             }
 
             M.checkStorageQuota(2e3);
@@ -4203,7 +4198,7 @@ function loadfm_done(mDBload) {
             mega.loadReport.stepTimeStamp = Date.now();
 
             // are we actually on an #fm/* page?
-            if (page !== 'start' && is_fm() || $('.fm-main.default').is(":visible")) {
+            if (page !== 'start' && is_fm() || $('.pm-main').is(":visible")) {
                 promise = M.initFileManager();
 
                 mega.loadReport.renderfm = Date.now() - mega.loadReport.stepTimeStamp;

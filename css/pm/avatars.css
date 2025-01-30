@@ -1,69 +1,138 @@
-.pm-account-dialog {
-    max-width: 310px;
-    overflow: hidden;
-} 
-.pm-account-dialog .account-profile {
+.mega-header .nav-elem.avatar {
+    padding: 0;
+    height: 32px;
+    width: 32px;
+    border-radius: 100%;
+    position: relative;
+}
+.mega-header .nav-elem.avatar img {
+    max-height: 100%;
+    width: auto;
+    border-radius: 100%;
+    margin: 0;
+}
+.mega-header .nav-elem.avatar .avatar-wrapper span {
+    font: var(--mobile-font-link-large-regular);
+    line-height: 32px;
+}
+.avatar-menu-header {
+    display: flex;
+    padding: 24px 24px 12px;
+    box-sizing: border-box;
+    align-items: center;
+}
+.avatar-menu-profile {
     margin-inline-end: 16px;
     margin-left: 0;
-    width: 30px;
-    height: 30px;
     border-radius: 100%;
     text-align: center;
+    align-self: baseline;
 }
-.pm-account-dialog .avatar-details {
+.avatar-menu-details {
+    text-align: start;
+    overflow: hidden;
+}
+.avatar-menu-details > * {
     overflow: hidden;
     white-space: nowrap;
+    height: 24px;
+    font: var(--text-h3);
+    color: var(--mobile-text-primary);
 }
-.pm-account-dialog .avatar-details .pm-name.simpletip {
+.avatar-menu-details .avatar-menu-name {
+    font-weight: 700;
+    text-overflow: ellipsis;
+}
+.avatar-menu-details .avatar-menu-name.simpletip {
     font: var(--mobile-font-heading-h2);
     display: -webkit-box;
     white-space: normal;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
     word-break: break-word;
     overflow: hidden;
     text-overflow: ellipsis;
 }
-.pm-account-dialog .avatar-details .pm-email.simpletip {
+.avatar-menu-details .avatar-menu-email {
     color: var(--mobile-text-secondary);
+    text-overflow: ellipsis;
+}
+.avatar-menu-details .avatar-menu-email.simpletip {
     overflow: hidden;
     text-overflow: ellipsis;
 }
-.pm-account-dialog .avatar-details .pm-email.simpletip::after {
+.avatar-menu-details .avatar-menu-email.simpletip::after {
     content: '';
     display: block;
 }
-.pm-account-dialog .account-profile div,
-.pm-account-dialog .account-profile img {
-    width: 30px;
-    height: 30px;
+.avatar-menu-details a.to-my-profile,
+.mega-header .avatar-menu a.to-my-profile {
+    text-decoration: none;
+    color: var(--mobile-link-primary);
+    font: var(--text-body1);
+}
+.avatar-menu-details a.to-my-profile .text-box-wrapper span.primary-text {
+    font: var(--text-body1);
+    line-height: 24px;
+}
+.avatar-menu-profile div,
+.avatar-menu-profile img {
+    width: 48px;
+    height: 48px;
     border-radius: 100%;
+    font-size: 24px;
+    line-height: 48px;
 }
-.pm-account-dialog .account-profile div {
+.avatar-menu-profile div {
     box-sizing: border-box;
 }
-.pm-account-dialog .avatar-header {
+.avatar-menu-profile div.color1 span{
+    font: inherit;
+}
+.avatar-menu .storage-block {
+    padding: 0 24px 12px;
+}
+.avatar-menu .storage-block .storage-usage-panel {
+    border-top: none;
+    padding: 0;
+}
+.mega-header .avatar-menu button.logout {
+    width: calc(100% - 48px);
+    font: var(--mobile-font-copy-semibold);
+    margin: 8px 24px 12px;
+}
+.mega-header .avatar-menu .avatar-menu-footer {
+    height: 32px;
     display: flex;
-    padding: 24px;
+    justify-content: space-between;
+    font: var(--mobile-font-caption-small-regular);
+    padding: 12px 24px 24px;
+}
+.mega-header .storage-usage-panel .info a.upgrade {
+    width: auto;
+    padding: 8px 0 0;
+    border: none;
+    text-decoration: underline;
+}
+.mega-header .activity-status-block {
+    margin: 0;
+    margin-inline-start: 24px;
+    position: absolute;
+    top: 0;
+    z-index: 5;
+    text-align: start;
+}
+.mega-header .activity-status,
+.mega-header .activity-status.top::before {
     box-sizing: border-box;
-    align-items: center;
+    transition: all .2s ease-in-out;
 }
-.pm-account-dialog .horizontal-divider {
-    width: 262px;
-    border-top: 1px solid var(--mobile-border-strong);
-    margin: 0 24px;
+.mega-header .activity-status.top::before {
+    border: none;
+    width: 8px;
+    height: 8px;
 }
-.pm-account-dialog .avatar-wrapper {
-    line-height: 28px;
-}
-.mega-component.avatar.nav-elem .avatar-wrapper {
-    height: 24px;
-    line-height: inherit;
-}
-.mega-component.avatar.nav-elem.normal.link:hover span {
-    color: inherit;
-}
-.avatar-menu.mega-component.context-menu.menu-container.overlay-wrap {
-    width: 312px;
-    z-index: 220;
+.mega-header .activity-status.top::after {
+    display: none;
 }

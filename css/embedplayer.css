@@ -705,8 +705,6 @@ textarea {
     -webkit-box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05);
     -moz-box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05);
     box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05);
-    -moz-border-radius: inherit;
-    -webkit-border-radius: inherit;
     border-radius: inherit;
 }
 .awatar-wrapper {
@@ -809,8 +807,6 @@ textarea {
     height: 16px;
     margin: 0 8px;
     background-color: white;
-    -moz-border-radius: 100%;
-    -webkit-border-radius: 100%;
     border-radius: 100%;
     display: inline-block;
     -webkit-animation: sk-bouncedelay 1.4s infinite ease-in-out both;

@@ -37,7 +37,6 @@
 
 .activates4 .postcard .text-pane {
     padding: var(--spacing-8) 0 var(--spacing-9);
-    -webkit-padding-start: var(--spacing-3);
     padding-inline-start: var(--spacing-7);
 }
 
@@ -66,7 +65,6 @@
 .activates4 .postcard .features .feature i {
     --icon-size: 24px;
     --mask-color: var(--color-copy-primary);
-    -webkit-margin-end: var(--spacing-3);
     margin-inline-end: var(--spacing-3);
 }
 
@@ -115,7 +113,6 @@
     flex: 0 0 auto;
     height: 20px;
     position: relative;
-    -webkit-margin-end: var(--spacing-3);
     margin-inline-end: var(--spacing-3);
     width: 20px;
 }

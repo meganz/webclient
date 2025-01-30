@@ -4,25 +4,31 @@
  * File manager layout changes if class folder-file-info-panel is added to the body tag.
  * NB: Based on a fixed panel width of 320px.
  */
- :root {
+:root {
     --info-panel-width: 320px;
+    --info-panel-space: var(--info-panel-width);
+}
+
+@media only screen and (max-width: 1200px) {
+    :root {
+        --info-panel-space: 0;
+    }
 }
 .info-panel-visible .folder-file-info-panel {
     right: 0;
 }
 .info-panel-visible .files-grid-view .grid-scrolling-table,
-.info-panel-visible .device-centre-grid-view .grid-scrolling-table,
 .info-panel-visible .out-shared-grid-view .grid-scrolling-table,
 .info-panel-visible .fm-blocks-view,
 .info-panel-visible .out-shared-blocks-view,
 .info-panel-visible .fm-blocks-view .file-block-scrolling,
 .info-panel-visible .out-shared-blocks-view .out-shared-blocks-scrolling,
 .info-panel-visible .shares-tabs-bl,
-.info-panel-visible .shared-blocks-scrolling {
-    max-width: calc(100% - var(--info-panel-width));
+.info-panel-visible .shared-blocks-scrolling,
+.info-panel-visible #media-tabs {
+    max-width: calc(100% - var(--info-panel-space));
 }
 .info-panel-visible .files-grid-view .grid-scrolling-table.ps,
-.info-panel-visible .device-centre-grid-view .grid-scrolling-table.ps,
 .info-panel-visible .out-shared-grid-view .grid-scrolling-table.ps {
     min-width: initial;
 }
@@ -34,18 +40,17 @@
 .info-panel-visible .in-chat .stream-controls,
 .info-panel-visible .in-chat .stream-head,
 .info-panel-visible #albums-view {
-    width: calc(100% - var(--info-panel-width));
+    width: calc(100% - var(--info-panel-space));
 }
 .info-panel-visible .fm-right-header .fm-header-buttons,
 .info-panel-visible .gallery-view,
 .info-panel-visible .notification-banner .banner-contents {
-    margin-right: var(--info-panel-width);
+    margin-right: var(--info-panel-space);
 }
 .info-panel-visible .files-grid-view.fm .column-settings {
-    right: var(--info-panel-width);
+    right: var(--info-panel-space);
 }
 .info-panel-visible .fm-right-header .fm-breadcrumbs-block:not(.hidden) {
-    -webkit-padding-end: 48px;
     padding-inline-end: 48px;
 }
 .info-panel-visible .gallery-view .gallery-view-scrolling.ps {
@@ -56,14 +61,14 @@
     margin-right: 344px;
 }
 .info-panel-visible .shared-details-buttons {
-    right: var(--info-panel-width);
+    right: var(--info-panel-space);
 }
 .info-panel-visible .shared-grid-view .grid-table {
     margin: 0;
-    width: calc(100% - var(--info-panel-width));
+    width: calc(100% - var(--info-panel-space));
 }
 .info-panel-visible .media-viewer button.gallery-btn.next {
-    right: var(--info-panel-width);
+    right: var(--info-panel-space);
     transition: none;
 }
 .info-panel-visible .media-viewer .play-pause-video-button {
@@ -79,16 +84,19 @@
 .info-panel-visible .folder-file-info-panel.meetings-visible {
     top: 0;
 }
+.info-panel-visible .backup-center.content-block,
 .info-panel-visible section.fm-recents,
 .info-panel-visible .s4-info-header-blocks {
-    margin-right: var(--info-panel-width);
+    margin-right: var(--info-panel-space);
 }
-.info-panel-visible .gallery-tabs-bl {
-    max-width: calc(100% - var(--info-panel-width));
+.info-panel-visible .gallery-tabs-bl,
+.info-panel-visible #media-counts {
+    max-width: calc(100% - var(--info-panel-space));
     min-width: 0;
+    box-sizing: border-box;
 }
 .info-panel-visible .shared-blocks-scrolling {
-    min-width: calc(100% - var(--info-panel-width));
+    min-width: calc(100% - var(--info-panel-space));
 }
 
 /* Right to left e.g. Arabic styles */
@@ -112,20 +120,21 @@
 /* Gif panel position */
 .info-panel-visible .meetings-call .sidebar-wrapper
 .sidebar.chat-opened .chat-textarea-block .gif-panel-wrapper {
-    right: var(--info-panel-width);
+    right: var(--info-panel-space);
 }
 
 /* Main styles for the folder/file Info panel */
 .folder-file-info-panel {
-    background-color: var(--surface-main);
-    height: 100%;
+    height: calc(100% - 65px);
     width: var(--info-panel-width);
     position: absolute;
-    top: 55px;
+    top: 65px;
     right: calc(-1 * var(--info-panel-width));
     z-index: 210;
     border-left: 1px solid var(--divider-color);
     transition: 200ms linear;
+    overflow: hidden;
+    background: var(--mobile-page-background);
 }
 .folder-file-info-panel .close {
     position: absolute;
@@ -144,7 +153,8 @@
 }
 .folder-file-info-panel .header-title {
     font-size: 16px;
-    font-weight: var(--text-font-family-semibold);
+    font-family: var(--text-font-family);
+    font-weight: 600;
     line-height: 24px;
     color: var(--text-color-higher);
     margin-top: 40px;
@@ -199,7 +209,8 @@
 .folder-file-info-panel .info-data .value {
     color: var(--text-color-high);
     font-size: 12px;
-    font-weight: var(--text-font-family-semibold);
+    font-family: var(--text-font-family);
+    font-weight: 600;
     line-height: 18px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -368,7 +379,6 @@
 .folder-file-info-panel .node-tags-section .js-btnClearTags {
     z-index: 1;
     cursor: pointer;
-    -webkit-margin-end: 4px;
     margin-inline-end: 4px;
     border: none;
     outline: transparent;

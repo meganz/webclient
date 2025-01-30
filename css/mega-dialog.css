@@ -98,7 +98,8 @@
     }
 
     .mega-dialog strong {
-        font-family: var(--text-font-family-bold);
+        font-family: var(--text-font-family);
+        font-weight: bold;
     }
 
     .mega-dialog > header h2,
@@ -164,12 +165,10 @@
     }
 
     .mega-dialog > footer button ~ button {
-        -webkit-margin-start: 8px;
         margin-inline-start: 8px;
     }
 
     .mega-dialog > footer button ~ button.large {
-        -webkit-margin-start: 12px;
         margin-inline-start: 12px;
     }
 
@@ -415,16 +414,12 @@
             }
 
             .mega-dialog.dialog-template-action > footer button {
-                -webkit-margin-end: 4px;
                 margin-inline-end: 4px;
-                -webkit-margin-start: 4px;
                 margin-inline-start: 4px;
             }
 
             .mega-dialog.dialog-template-action > footer button.large {
-                -webkit-margin-end: 6px;
                 margin-inline-end: 6px;
-                -webkit-margin-start: 6px;
                 margin-inline-start: 6px;
             }
 
@@ -447,9 +442,7 @@
             .mega-dialog.dialog-template-message > header {
                 flex-direction: row;
                 padding-top: 24px;
-                -webkit-padding-end: 72px;
                 padding-inline-end: 72px;
-                -webkit-padding-start: 24px;
                 padding-inline-start: 24px;
             }
 
@@ -457,7 +450,6 @@
                 flex-grow: 0;
                 flex-shrink: 0;
                 height: 64px;
-                -webkit-margin-end: 24px;
                 margin-inline-end: 24px;
                 width: 64px;
             }
@@ -570,7 +562,6 @@
             }
 
             .mega-dialog.dialog-template-panes footer button ~ button {
-                -webkit-margin-start: 8px;
                 margin-inline-start: 8px;
             }
 

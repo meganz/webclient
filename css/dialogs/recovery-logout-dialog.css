@@ -29,7 +29,6 @@
 }
 
 .recovery-key-logout .pass-reminder-results .result-txt i {
-    -webkit-margin-end: 8px;
     margin-inline-end: 8px;
 }
 
@@ -76,7 +75,6 @@
 @media only screen and (min-width: 769px) {
     .recoverykey-logout-overlay .image,
     .recoverykey-logout-overlay .title {
-        -webkit-margin-start: 24px;
         margin-inline-start: 24px;
     }
     .recoverykey-logout-overlay .content.fm-scrolling {

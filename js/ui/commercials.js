@@ -70,7 +70,7 @@ lazy(mega, 'commercials', () => {
     const updateCachedElements = () => {
         const fileManagerName = is_mobile
             ? '.file-manager-block'
-            : '.main-blur-block > .fm-main';
+            : '.main-blur-block > .pm-main';
 
         $fmholder = $fmholder || $(`body .fmholder`);
 
@@ -145,21 +145,13 @@ lazy(mega, 'commercials', () => {
             newSlots = [['webfilinkbs'], ['webfilinkb']];
             newPage = 'filelink';
         }
-        else if (M.currentTreeType){
-            switch (M.currentTreeType) {
-                case 'dashboard':
-                    // newSlots = ['webdashsl'];
-                    newPage = 'home';
-                    break;
-                case 'cloud-drive':
-                    // newSlots = ['webcdsl'];
-                    newPage = 'clouddrive';
-                    break;
-                case 'gallery':
-                    // newSlots = ['webphsl'];
-                    newPage = 'home';
-                    break;
-            }
+        else if (M.currentdirid === 'dashboard'){
+            // newSlots = ['webdashsl'];
+            newPage = 'home';
+        }
+        else if (M.currentdirid === 'cloud-drive') {
+            // newSlots = ['webcdsl'];
+            newPage = 'clouddrive';
         }
 
         if (newSlots.length === 2) {

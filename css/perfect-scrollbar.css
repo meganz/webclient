@@ -49,7 +49,6 @@
 }
 .ps.ps--active-x.ps--active-y > .ps__rail-x {
     margin-inline-end: 10px;
-    -webkit-margin-end: 10px;
 }
 .ps.ps--active-x.ps--active-y > .ps__rail-y {
     margin-bottom: 10px;

@@ -38,7 +38,6 @@
     --mask-color: var(--switch-handle-inactive-icon);
 }
 .mega-switch.toggle-on .mega-feature-switch {
-    -webkit-margin-start: 27px;
     margin-inline-start: 27px;
     --mask-color: var(--switch-handle-active-icon);
 }

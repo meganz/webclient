@@ -252,6 +252,13 @@
             if (p.isUndecrypted) {
                 p.t2 = htmlentities(l[8649]);
             }
+            else if (mega.backupCenter
+                && mega.backupCenter.selectedSync
+                && mega.backupCenter.selectedSync.nodeHandle === n.h
+                && mega.backupCenter.selectedSync.localName) {
+
+                p.t2 = htmlentities(mega.backupCenter.selectedSync.localName);
+            }
             else if (n.name) {
                 p.t2 = htmlentities(n.name);
             }

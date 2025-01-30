@@ -1,0 +1,33 @@
+.transfer-panel-opened .fm-transfers-block {
+    display: block;
+}
+.transfer-panel-opened .fm-left-panel {
+    height: auto;
+}
+.transfer-panel-opened .l-pane-visibility {
+    display: none;
+}
+.fm-transfers-header {
+    padding-inline-end: 16px;
+    height: 48px;
+    flex-shrink: 0;
+    box-sizing: border-box;
+    white-space: nowrap;
+    background-color: var(--mobile-page-background);
+    position: relative;
+}
+.fm-transfers-header .mega-button {
+    margin-inline-end: 8px;
+}
+.fm-transfers-header .mega-button {
+    margin-top: 5px;
+}
+.fm-transfers-header .mega-button i {
+    --mask-color: var(--icon-rest);
+}
+.fm-transfers-header .mega-button.transfer-clear-all-icon i {
+    --mask-color: var(--secondary-red);
+}
+.fm-transfers-header .mega-button span {
+    white-space: nowrap;
+}

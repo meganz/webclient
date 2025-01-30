@@ -101,7 +101,6 @@
     }
 
     .toast-rack .toast-icon:not(:first-child) {
-        -webkit-margin-start: 12px;
         margin-inline-start: 12px;
     }
 
@@ -192,7 +191,6 @@
     }
 
     .global-toast-container .toast-rack .toast button:not(:last-child) {
-        -webkit-margin-end: 8px;
         margin-inline-end: 8px;
     }
 
@@ -263,7 +261,6 @@
 
     .alert-toast-container .toast-rack .toast button.close {
         padding: 0;
-        -webkit-margin-start: 8px;
         margin-inline-start: 8px;
     }
 

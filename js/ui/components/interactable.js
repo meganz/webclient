@@ -3,17 +3,8 @@ class MegaInteractable extends MegaComponent {
     constructor(options) {
         super(options);
 
-        // Map of types to interactable classes
-        const interactableTypes = {
-            normal: 'normal',
-            fullwidth: 'full-width',
-            icon: 'icon-only',
-            text: 'text-only'
-        };
-
-        // Cache the interactableElement for future use
-        this.domNode.classList.add(
-            'nav-elem', interactableTypes[options.type] || 'normal');
+        this.domNode.classList.add('nav-elem');
+        this.interactableType = options.type;
 
         if (options.icon) {
 
@@ -61,6 +52,19 @@ class MegaInteractable extends MegaComponent {
         if (options.onClick) {
             this.on('click', options.onClick);
         }
+
+        if (options.onContextmenu) {
+            this.on('contextmenu', options.onContextmenu);
+        }
+
+        if (options.dataset) {
+            this.dataset = options.dataset;
+        }
+
+        if (options.simpletip) {
+            this.dataset.simpletip = options.simpletip;
+            this.addClass('simpletip');
+        }
     }
 
     get disabled() {
@@ -99,6 +103,15 @@ class MegaInteractable extends MegaComponent {
                 'icon-loader-throbber-light-outline-after'
             );
         }
+    }
+
+    get interactableType() {
+        return Object.values(MegaInteractable.interactableTypes).find(cls => this.domNode.classList.contains(cls));
+    }
+
+    set interactableType(type) {
+        this.removeClass(...Object.values(MegaInteractable.interactableTypes));
+        this.addClass(MegaInteractable.interactableTypes[type] || 'normal');
     }
 
     get icon() {
@@ -293,9 +306,25 @@ class MegaInteractable extends MegaComponent {
             this.domNode.classList.remove('active');
         }
     }
+
+    get dataset() {
+        return this.domNode.dataset;
+    }
+
+    set dataset(data) {
+        Object.assign(this.domNode.dataset, data);
+    }
 }
 
+MegaInteractable.interactableTypes = Object.freeze({
+    normal: 'normal',
+    fullwidth: 'full-width',
+    icon: 'icon-only',
+    text: 'text-only'
+});
+
 MegaInteractable.iconSizesClass = Object.freeze({
+    8: 'icon-size-8',
     16: 'icon-size-16',
     20: 'icon-size-20',
     22: 'icon-size-22',

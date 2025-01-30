@@ -1103,9 +1103,7 @@ async function api_setattr(n) {
     const req = {a: 'a', n: n.h, at: ab_to_base64(crypto_makeattr(n))};
     const root = M.getNodeRoot(n.h);
     if (root === M.InboxID) {
-        if (M.currentCustomView.type === mega.devices.rootId) {
-            mega.devices.ui.ackVaultWriteAccess(n.h, req);
-        }
+        mega.backupCenter.ackVaultWriteAccess(n.h, req);
     }
     else if (root === 'pwm') {
         req.vw = 1;

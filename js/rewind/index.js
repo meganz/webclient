@@ -1386,7 +1386,7 @@ lazy(mega, 'rewind', () => {
                 }
 
                 if (String(M.currentdirid).substr(0, 7) === 'search/'
-                    || mega.ui.mNodeFilter.selectedFilters.value
+                    || mega.ui.mNodeFilter.selectedFilters
                     && M.currentrootid !== 'shares') {
                     emptyFolderName = '.fm-empty-search';
                 }
@@ -1885,7 +1885,6 @@ lazy(mega, 'rewind', () => {
             }
 
             this.$rwHeaderBtn
-                .removeClass('hidden')
                 .rebind('click.rewind.header', () => {
                     $('.rw-whats-new-mini-promo', this.$fmHeaderButtons).addClass('hidden');
 
@@ -1893,6 +1892,10 @@ lazy(mega, 'rewind', () => {
                         .then(() => this._startOnEvent(500527))
                         .catch(dump);
                 });
+
+            if (!pfid) {
+                this.$rwHeaderBtn.removeClass('hidden');
+            }
         }
 
         unbindHeaderButton() {

@@ -37,6 +37,31 @@ class GalleryNodeBlock {
         }
     }
 
+    get isFav() {
+        return !!this._fav;
+    }
+
+    /**
+     * @param {Boolean} status True if the node is a favourite
+     * @returns {void}
+     */
+    set isFav(status) {
+        if (status === !!this._fav) {
+            return;
+        }
+
+        let spanFav = this.spanEl.querySelector('.data-block-fav-icon');
+
+        if (status) {
+            spanFav = document.createElement('span');
+            spanFav.className = 'data-block-fav-icon sprite-fm-mono icon-favourite-filled';
+            this.spanEl.appendChild(spanFav);
+        }
+        else if (spanFav) {
+            this.spanEl.removeChild(spanFav);
+        }
+    }
+
     fill(mode) {
         this.el.setAttribute('title', this.node.name);
 
@@ -54,6 +79,10 @@ class GalleryNodeBlock {
             div.className = 'video-thumb-details';
             this.spanEl.appendChild(div);
 
+            const playIcon = document.createElement('i');
+            playIcon.className = 'video-thumb-play sprite-fm-mono icon-play-circle';
+            this.spanEl.appendChild(playIcon);
+
             const spanTime = document.createElement('span');
             spanTime.textContent = secondsToTimeShort(MediaAttribute(this.node).data.playtime);
             div.appendChild(spanTime);
@@ -62,9 +91,7 @@ class GalleryNodeBlock {
             spanMedia.classList.add('icon-image-90');
         }
 
-        const spanFav = document.createElement('span');
-        spanFav.className = 'data-block-fav-icon sprite-fm-mono icon-favourite-filled';
-        this.spanEl.appendChild(spanFav);
+        this.isFav = !!this.node.fav;
 
         if (mode === 'm' || mode === 'y') {
             this.el.dataset.ts = this.node.mtime || this.node.ts;
@@ -127,6 +154,7 @@ class MegaGallery {
         this.type = mega.gallery.sections[id] ? 'basic' : 'discovery';
         this.shouldProcessScroll = true;
         this.inPreview = false;
+        this.maxItems = {1: 3, 2: 5, 3: 10, 4: 15};
 
         this.clearRenderCache();
         this.setObserver();
@@ -198,7 +226,7 @@ class MegaGallery {
         return cameraTree;
     }
 
-    setMode(type, pushHistory, changeRootMode) {
+    setMode(type, pushHistory, changeLastSelection = false) {
 
         if (type !== 'a' && type !== 'y' && type !== 'm' && type !== 'd') {
 
@@ -215,11 +243,8 @@ class MegaGallery {
         this.galleryBlock.classList.remove('gallery-type-a', 'gallery-type-y', 'gallery-type-m', 'gallery-type-d');
         this.galleryBlock.classList.add(`gallery-type-${type}`);
 
-        if (changeRootMode === true
-            && mega.gallery.sections[M.currentdirid]
-            && mega.gallery.rootMode[mega.gallery.sections[M.currentdirid].root]
-        ) {
-            mega.gallery.rootMode[mega.gallery.sections[M.currentdirid].root] = this.mode;
+        if (changeLastSelection) {
+            mega.gallery.lastModeSelected = type;
         }
 
         if (type === 'a') {
@@ -229,8 +254,8 @@ class MegaGallery {
             delete this.zoom;
         }
 
-        $('.gallery-tab-lnk').removeClass('active');
-        $(`.gallery-tab-lnk-${this.mode}`).addClass('active');
+        $('.gallery-tab-lnk', '#media-section-controls .gallery-section-tabs').removeClass('selected');
+        $(`.gallery-tab-lnk-${this.mode}`, '#media-section-controls .gallery-section-tabs').addClass('selected');
 
         this.dropDynamicList();
 
@@ -357,7 +382,7 @@ class MegaGallery {
         const yearKeys = Object.keys(this.groups.y);
         const newStructure = {};
 
-        for (let i = yearKeys.length - 1; i > -1; i -= 2) {
+        for (let i = yearKeys.length - 1; i > -1; i -= 3) {
             newStructure[yearKeys[i]] = {c: [this.groups.y[yearKeys[i]].c], n: [this.groups.y[yearKeys[i]].n[0]]};
 
             if (this.groups.y[yearKeys[i - 1]]) {
@@ -365,6 +390,12 @@ class MegaGallery {
                 newStructure[yearKeys[i]].sy = yearKeys[i - 1];
                 newStructure[yearKeys[i]].c.push(this.groups.y[yearKeys[i - 1]].c);
                 newStructure[yearKeys[i]].n.push(this.groups.y[yearKeys[i - 1]].n[0]);
+            }
+            if (this.groups.y[yearKeys[i - 2]]) {
+
+                newStructure[yearKeys[i]].sy = yearKeys[i - 2];
+                newStructure[yearKeys[i]].c.push(this.groups.y[yearKeys[i - 2]].c);
+                newStructure[yearKeys[i]].n.push(this.groups.y[yearKeys[i - 2]].n[0]);
             }
         }
 
@@ -1172,23 +1203,28 @@ class MegaGallery {
         else {
             this.removeNodeFromGroups({ h, mtime: this.nodes[h] });
         }
+
+        delay('gallery.reset-media-counts', mega.gallery.resetMediaCounts.bind(null, M.v));
     }
 
     // Update dom node names if changed
-    updateNodeName(n) {
+    updateNodeDetails(n) {
 
         const group = this.getGroup(n);
         const rcKeys = Object.keys(this.renderCache);
 
         for (let i = rcKeys.length; i--;) {
-
             if (rcKeys[i].startsWith(`y${group[1]}`) || rcKeys[i].startsWith(`m${group[2]}`) ||
                 rcKeys[i].startsWith(`d${group[3]}`) || rcKeys[i].startsWith(`a${group[2]}`)) {
 
                 const domNode = this.renderCache[rcKeys[i]].querySelector(`[id="${n.h}"]`);
 
-                if (domNode && domNode.title !== n.name) {
-                    domNode.title = n.name;
+                if (domNode) {
+                    if (domNode.title !== n.name) {
+                        domNode.title = n.name;
+                    }
+
+                    domNode.nodeBlock.isFav = n.fav;
                 }
             }
         }
@@ -1215,7 +1251,7 @@ class MegaGallery {
         }
 
         this.dynamicList = new MegaDynamicList(container, {
-            'contentContainerClasses': 'content',
+            'contentContainerClasses': 'content px-4',
             'itemRenderFunction': this.renderGroup.bind(this),
             'itemHeightCallback': this.getGroupHeight.bind(this),
             'onResize': this.throttledResize.bind(this),
@@ -1229,34 +1265,20 @@ class MegaGallery {
         M.initShortcutsAndSelection(container);
     }
 
-    render(rewriteModeByRoot, reset) {
-        if (rewriteModeByRoot !== false && mega.gallery.sections[M.currentdirid]) {
-            const modeResetIsNeeded = reset === true
-                && M.currentdirid === mega.gallery.sections[M.currentdirid].root
-                && (
-                    M.currentdirid === M.previousdirid
-                    ||
-                        mega.gallery.sections[M.previousdirid]
-                        && mega.gallery.sections[M.previousdirid].root === mega.gallery.sections[M.currentdirid].root
-
-                );
-
-            if (modeResetIsNeeded) {
-                this.setMode('a', 2, true);
-            }
-            else if (mega.gallery.rootMode[mega.gallery.sections[M.currentdirid].root]
-                && this.mode !== mega.gallery.rootMode[mega.gallery.sections[M.currentdirid].root]) {
-                this.setMode(mega.gallery.rootMode[mega.gallery.sections[M.currentdirid].root], 2);
-            }
+    render(keepMode) {
+        if (keepMode) {
+            this.setMode(mega.gallery.lastModeSelected, 2);
         }
 
         const rfBlock = $('.fm-right-files-block:not(.in-chat)', '.fmholder');
-        const galleryHeader = $('.gallery-tabs-bl', rfBlock);
+        const galleryHeader = $('#media-section-controls', rfBlock);
 
         galleryHeader.removeClass('hidden');
+        $('#media-tabs', rfBlock).removeClass('hidden');
+        $('.gallery-tabs-bl', galleryHeader).removeClass('hidden');
         $('.gallery-section-tabs', galleryHeader).toggleClass('hidden', M.currentdirid === 'favourites');
         rfBlock.removeClass('hidden');
-        $('.files-grid-view.fm, .fm-blocks-view.fm, .fm-right-header, .fm-empty-section', rfBlock).addClass('hidden');
+        $('.files-grid-view.fm, .fm-blocks-view.fm, .fm-empty-section', rfBlock).addClass('hidden');
         $('.fm-files-view-icon').removeClass('active').filter('.media-view').addClass('active');
 
         if (pfid && !M.v) {
@@ -1265,13 +1287,6 @@ class MegaGallery {
 
         if (window.selectionManager) {
             window.selectionManager.hideSelectionBar();
-        }
-
-        if (!mega.gallery.viewBtns) {
-            const viewBtns = $('.fm-header-buttons .view-links', rfBlock);
-            mega.gallery.viewBtns = viewBtns.clone(true);
-            galleryHeader.append(mega.gallery.viewBtns);
-            $('.view-links', galleryHeader).toggleClass('hidden', M.isGalleryPage());
         }
 
         if (M.v.length > 0) {
@@ -1291,6 +1306,7 @@ class MegaGallery {
             mega.gallery.showEmpty(M.currentdirid);
             this.galleryBlock.classList.add('hidden');
         }
+
         tryCatch(() => {
             galleryHeader.toggleClass('invisible', !M.v.length &&
                 (this.id === 'photos' || this.id === 'images' || this.id === 'videos'));
@@ -1302,8 +1318,8 @@ class MegaGallery {
 
             $($.selectddUIgrid).selectable({
                 filter: $.selectddUIitem,
-                cancel: '.ps__rail-y, .ps__rail-x, a',
-                start: e => {
+                cancel: '.ps__rail-y, .ps__rail-x, a, .checkdiv input',
+                start: (e) => {
                     $.hideContextMenu(e);
                     $.hideTopMenu();
                     $.selecting = true;
@@ -1311,6 +1327,19 @@ class MegaGallery {
                 stop: () => {
                     $.selecting = false;
                     mega.ui.mInfoPanel.reRenderIfVisible($.selected);
+
+                    if ($.selected.length) {
+                        this.checkOuterBounbdaries();
+                    }
+                    else {
+                        this.clearSelections();
+                    }
+                },
+                selecting: (_, ui) => {
+                    this.updateGroupSelect($(ui.selecting));
+                },
+                unselecting: (_, ui) => {
+                    this.updateGroupDeselect($(ui.unselecting));
                 },
                 appendTo: $.selectddUIgrid
             });
@@ -1339,7 +1368,6 @@ class MegaGallery {
     }
 
     bindEvents() {
-
         const $galleryBlock = $(this.galleryBlock);
 
         $galleryBlock.rebind('click.galleryView', '.data-block-view', e => {
@@ -1353,9 +1381,11 @@ class MegaGallery {
 
             if ($eTarget.hasClass('ui-selected')) {
                 selectionManager.remove_from_selection(h);
+                this.updateGroupDeselect($eTarget);
             }
             else {
                 selectionManager.add_to_selection(h);
+                this.updateGroupSelect($eTarget);
             }
 
             $.hideContextMenu(e);
@@ -1366,15 +1396,19 @@ class MegaGallery {
             return false;
         });
 
-        $galleryBlock.rebind('contextmenu.galleryView', '.data-block-view', e => {
+        $galleryBlock.rebind('contextmenu.galleryView', '.data-block-view', (e) => {
 
             if (this.mode !== 'a') {
                 return false;
             }
 
-            if (e.target && M.d[e.target.id] && !$.selected.includes(e.target.id)) {
+            const { currentTarget: el } = e;
+
+            if (el && M.d[el.id] && !$.selected.includes(el.id)) {
                 selectionManager.clear_selection();
-                selectionManager.add_to_selection(e.target.id);
+                this.clearSelections();
+                selectionManager.add_to_selection(el.id);
+                this.updateGroupSelect($(el));
             }
 
             $.hideContextMenu(e);
@@ -1517,6 +1551,7 @@ class MegaGallery {
         if (!this.beforePageChangeListener) {
             this.beforePageChangeListener = mBroadcaster.addListener('beforepagechange', tpage => {
                 const pageId = String(self.page).replace('fm/', '');
+
                 if (this.inPreview && (pageId.length < 5 ? M.RootID === M.currentdirid : pageId === M.currentdirid)) {
                     return;
                 }
@@ -1528,12 +1563,6 @@ class MegaGallery {
 
                 if (pfid && !tpage.startsWith('folder/')) {
                     $('.fm-files-view-icon.media-view').addClass('hidden');
-                }
-
-                const id = tpage.replace(/^fm\//, '');
-
-                if (!mega.gallery.sections[id] && !id.startsWith('discovery/')) {
-                    $('.gallery-tabs-bl', '.fm-right-files-block').addClass('hidden');
                 }
 
                 // Clear thumbnails to free memory if target page is not gallery anymore
@@ -1610,6 +1639,109 @@ class MegaGallery {
         return M.sortByModTimeFn2()(a, b, -1);
     }
 
+    getGroupMonthNodes(id, group) {
+        if (!group) {
+            group = this.getGroupById(id);
+        }
+
+        const monthNodes = [...group.n];
+        let nextKey = (id - 0.00001).toFixed(5);
+
+        while (true) {
+            const nextGroup = this.getGroupById(nextKey);
+
+            if (!nextGroup || !nextGroup.n.length) {
+                break;
+            }
+
+            monthNodes.push(...nextGroup.n);
+            nextKey = (nextKey - 0.00001).toFixed(5);
+        }
+
+        return monthNodes;
+    }
+
+    renderGroupMonthHeader(id, group, contentBlock) {
+        const chId = `select-media-${id}`;
+        const checkbox = new MCheckbox({
+            id: chId,
+            name: `select_media_${id}`,
+            passive: true
+        });
+
+        const monthNodes = this.getGroupMonthNodes(id, group);
+        let allSelected = $.selected.length >= monthNodes.length; // Presuming, based on length
+        let someSelected = false;
+        const selSet = new Set($.selected);
+
+        for (let i = 0; i < monthNodes.length; i++) {
+            if (selSet.has(monthNodes[i])) {
+                someSelected = true;
+            }
+            else if (allSelected) {
+                allSelected = false;
+            }
+
+            if (someSelected && !allSelected) {
+                break;
+            }
+        }
+
+        if (allSelected) {
+            checkbox.checked = true;
+        }
+        else if (someSelected) {
+            checkbox.checked = true;
+            checkbox.el.querySelector('.checkdiv').classList.add('checkboxMinimize');
+        }
+
+        checkbox.el.classList.add('flex', 'flex-row', 'items-center');
+        delay(`media-checkbox-${chId}`, () => {
+            checkbox.onChange = (newVal) => {
+                checkbox.checked = newVal;
+                const nodes = this.getGroupMonthNodes(id, group);
+
+                if (newVal) {
+                    for (let i = 0; i < nodes.length; i++) {
+                        selectionManager.add_to_selection(nodes[i]);
+                    }
+                }
+                else {
+                    for (let i = 0; i < nodes.length; i++) {
+                        selectionManager.remove_from_selection(nodes[i]);
+                    }
+                }
+
+                checkbox.el.classList.remove('checkboxMinimize');
+            };
+        });
+
+        const dateTitle = document.createElement('div');
+        dateTitle.classList.add(
+            'timeline-date-title',
+            'px-2',
+            'pb-2',
+            'pt-8',
+            'flex',
+            'flex-row',
+            'gap-2',
+            'items-center'
+        );
+
+        const dateLabel = document.createElement('div');
+        dateLabel.classList.add('font-bold', 'text-color-high');
+        dateLabel.textContent = group.l;
+
+        const countLabel = document.createElement('div');
+        countLabel.className = 'text-color-medium font-body-2';
+        countLabel.textContent = mega.icu.format(l.items_count, monthNodes.length);
+
+        dateTitle.appendChild(checkbox.el);
+        dateTitle.appendChild(dateLabel);
+        dateTitle.appendChild(countLabel);
+        contentBlock.appendChild(dateTitle);
+    }
+
     renderGroup(id) {
         const cacheKey = this.mode + id;
 
@@ -1628,22 +1760,22 @@ class MegaGallery {
                 return this.renderCache[cacheKey];
             }
 
-            if (this.mode !== 'm') {
-                group.n.sort(this.sortByMtime.bind(this));
+            if (group.l) {
+                groupWrap.classList.add('showDate');
+                contentBlock.dataset.date = group.l;
 
-                if (group.l) {
-                    groupWrap.classList.add('showDate');
-                    contentBlock.dataset.date = group.l;
+                if (this.mode === 'a') {
+                    this.renderGroupMonthHeader(id, group, contentBlock);
                 }
             }
 
-            let l = group.n.length;
+            let len = group.n.length;
 
             if (group.max) {
-                l = Math.min(group.max, group.n.length);
+                len = Math.min(group.max, group.n.length);
             }
 
-            for (let i = 0; i < l; i++) {
+            for (let i = 0; i < len; i++) {
 
                 const nodeElm = this.renderNode(group.n[i]);
 
@@ -1664,10 +1796,10 @@ class MegaGallery {
             }
 
             if (this.mode === 'd') {
-                this.renderNodeExtraDay(group, groupWrap, contentBlock, l);
+                this.renderNodeExtraDay(group, groupWrap, contentBlock, len);
             }
             else if (this.mode === 'm') {
-                this.renderNodeExtraMonth(group, groupWrap, contentBlock, l);
+                this.renderNodeExtraMonth(group, groupWrap, contentBlock, len);
             }
         }
 
@@ -1680,14 +1812,14 @@ class MegaGallery {
 
         const dateblock = document.createElement('a');
 
-        dateblock.classList.add('gallery-date-block');
+        dateblock.classList.add('gallery-date-block', 'flex', 'flex-row', 'items-center');
 
         // Special month corrective for Vietnamese.
         if (locale === 'vi') {
             group.ml = group.ml.toLowerCase();
         }
 
-        $(dateblock).safeHTML(group.l.replace(group.ml, `<span>${group.ml}</span>`));
+        $(dateblock).safeHTML(group.l.replace(group.ml, `<span class="mr-2">${group.ml}</span>`));
 
         const iconBlock = document.createElement('i');
 
@@ -1695,23 +1827,12 @@ class MegaGallery {
         dateblock.appendChild(iconBlock);
         groupWrap.prepend(dateblock);
 
-        if (group.r) {
-            groupWrap.classList.add('layout-3-2');
-        }
-        else {
-            groupWrap.classList.add(`layout-${l}`);
-        }
+        groupWrap.classList.add(`layout-${l}${group.r ? '-2' : ''}`);
     }
 
     renderNodeExtraDay(group, groupWrap, contentBlock, l) {
-
         // c is only numeric 0 when it is sub block
-        if (group.c === 0) {
-            groupWrap.classList.add('layout-3-2');
-        }
-        else {
-            groupWrap.classList.add(`layout-${l}`);
-        }
+        groupWrap.classList.add(`layout-${l}${group.c === 0 ? '-2' : ''}`);
 
         if (group.mc) {
 
@@ -1742,7 +1863,7 @@ class MegaGallery {
             for (var i = selectedInCache.length; i--;) {
 
                 if (selectedInCache[i].id !== $.selected[0]) {
-                    selectedInCache[i].classList.remove('ui-selected');
+                    selectedInCache[i].classList.remove('ui-selected', 'ui-selecting');
                 }
             }
         }
@@ -1781,8 +1902,7 @@ class MegaGallery {
                 height += this.getGroupHeight(key);
             }
             else {
-                const maxItems = {1: 3, 2: 5, 3: 10, 4: 15};
-                const maxItemsInRow = maxItems[this.zoom];
+                const maxItemsInRow = this.maxItems[this.zoom];
                 blockSize = this.dynamicList.$content.width() / maxItemsInRow;
                 height += Math.floor(index / maxItemsInRow) * blockSize;
                 return {
@@ -1803,31 +1923,23 @@ class MegaGallery {
         const group = this.getGroupById(id);
 
         if (this.mode === 'a') {
-
-            const maxItems = {1: 3, 2: 5, 3: 10, 4: 15};
-            const maxItemsInRow = maxItems[this.zoom];
+            const headerHeight = group.l ? 64 : 0;
+            const maxItemsInRow = this.maxItems[this.zoom];
             const blockSize = this.dynamicList.$content.width() / maxItemsInRow;
 
-            return Math.ceil(group.n.length / maxItemsInRow) * blockSize;
+            return Math.ceil(group.n.length / maxItemsInRow) * blockSize + headerHeight;
         }
-        else if (this.mode === 'd' || this.mode === 'y') {
-            return wrapWidth / 2 + (this.mode === 'y' ? 16 : 0);
+
+        if (this.mode === 'y') {
+            return 256 + 8;
         }
-        else if (this.mode === 'm') {
 
-            let height;
+        if (this.mode === 'd') {
+            return 285 + 8;
+        }
 
-            if (group.n.length <= 2) {
-                height = (wrapWidth - 20) / 2;
-            }
-            else if (group.n.length === 3) {
-                height = 380 / 620 * wrapWidth;
-            }
-            else {
-                height = 420 / 620 * wrapWidth;
-            }
-
-            return height + 64;
+        if (this.mode === 'm') {
+            return 330 + 8; // height + padding
         }
     }
 
@@ -1905,6 +2017,224 @@ class MegaGallery {
     getGroupById(id) {
         return this.activeModeList[id];
     }
+
+    /**
+     * @param {jQuery} $el Cell element
+     * @returns {void}
+     */
+    updateGroupSelect($el) {
+        if (this.mode !== 'a') {
+            return;
+        }
+
+        const groupId = $el.closest('.content-row').attr('id');
+
+        if (!groupId) {
+            return;
+        }
+
+        delay(`gallery.check-select-${groupId}`, () => {
+            const initGroupId = `${Math.ceil(groupId.replace('gallery-', ''))}.00000`;
+            const monthNodes = this.getGroupMonthNodes(initGroupId);
+            let all = true;
+            let some = false;
+            const selSet = new Set($.selected);
+
+            for (let i = 0; i < monthNodes.length; i++) {
+                if (selSet.has(monthNodes[i])) {
+                    some = true;
+                }
+                else {
+                    all = false;
+                }
+
+                // All conditions met
+                if (some && !all) {
+                    break;
+                }
+            }
+
+            const cacheBlock = this.renderCache[`a${initGroupId}`];
+            const checkbox = cacheBlock
+                ? cacheBlock.querySelector(`#${groupId.replace('.', '\\.')} .checkdiv`)
+                : null;
+
+            if (!checkbox) {
+                return;
+            }
+
+            const { mComponent: mc } = checkbox.parentNode;
+            mc.checked = all || some;
+
+            if (all || !some) {
+                checkbox.classList.remove('checkboxMinimize');
+            }
+            else {
+                checkbox.classList.add('checkboxMinimize');
+            }
+        }, 100);
+    }
+
+    /**
+     * @param {jQuery} $el Cell element
+     * @returns {void}
+     */
+    updateGroupDeselect($el) {
+        const groupId = $el.closest('.content-row').attr('id');
+
+        if (!groupId) {
+            return;
+        }
+
+        delay(`gallery.check-select-${groupId}`, () => {
+            const initGroupId = `${Math.ceil(groupId.replace('gallery-', ''))}.00000`;
+            let someSelected = false;
+
+            if ($.selected.length) {
+                const selSet = new Set($.selected);
+                const monthNodes = this.getGroupMonthNodes(initGroupId);
+
+                for (let i = 0; i < monthNodes.length; i++) {
+                    if (selSet.has(monthNodes[i])) {
+                        someSelected = true;
+                        break;
+                    }
+                }
+            }
+
+            const cacheBlock = this.renderCache[`a${initGroupId}`];
+            const checkbox = cacheBlock
+                ? cacheBlock.querySelector(`#${groupId.replace('.', '\\.')} .checkdiv`)
+                : null;
+
+            if (!checkbox) {
+                return;
+            }
+
+            const { mComponent: mc } = checkbox.parentNode;
+
+            if (someSelected) {
+                checkbox.classList.add('checkboxMinimize');
+            }
+            else {
+                mc.checked = false;
+                checkbox.classList.remove('checkboxMinimize');
+            }
+        }, 100);
+    }
+
+    enableGroupChecks() {
+        const blocks = Object.values(this.renderCache);
+        let i = blocks.length;
+
+        while (--i >= 0) {
+            const checkboxes = blocks[i].querySelectorAll('.content-row .checkdiv');
+            let j = checkboxes.length;
+
+            while (--j >= 0) {
+                const ch = checkboxes[j];
+                ch.parentNode.mComponent.checked = true;
+                ch.classList.remove('checkboxMinimize');
+            }
+        }
+    }
+
+    clearSelections() {
+        const blocks = Object.values(this.renderCache);
+        let i = blocks.length;
+
+        while (--i >= 0) {
+            const checkboxes = blocks[i].querySelectorAll('.content-row .checkdiv');
+            let j = checkboxes.length;
+
+            while (--j >= 0) {
+                const ch = checkboxes[j];
+                ch.parentNode.mComponent.checked = false;
+                ch.classList.remove('checkboxMinimize');
+            }
+
+            const selected = blocks[i].querySelectorAll('.ui-selected');
+            j = selected.length;
+
+            while (--j >= 0) {
+                selected[j].classList.remove('ui-selected', 'ui-selecting');
+            }
+        }
+    }
+
+    cellInSelectArea(index, groupOffset, offset, perRow, cellSize, helperPos) {
+        const { top, right, bottom, left } = helperPos;
+        const offsetTop = groupOffset + offset + parseInt(index / perRow) * cellSize;
+        const offsetLeft = (index % perRow) * cellSize;
+        const rightEdge = offsetLeft + cellSize;
+        const bottomEdge = offsetTop + cellSize;
+
+        const fitVert = (offsetTop >= top && offsetTop <= bottom)
+            || (bottomEdge >= top && bottomEdge <= bottom);
+        const fitHoriz = (offsetLeft <= right && offsetLeft >= left)
+            || (rightEdge >= left && rightEdge <= right);
+
+        return (fitVert && (fitHoriz || offsetLeft < left && rightEdge > right))
+            || fitHoriz && offsetTop < top && bottomEdge > bottom && fitHoriz;
+    }
+
+    checkOuterBounbdaries() {
+        const sel = $($.selectddUIgrid).selectable('instance');
+
+        if (!sel) {
+            return;
+        }
+
+        const top = sel.helper[0].offsetTop;
+        const left = sel.helper[0].offsetLeft;
+        const right = left + sel.helper[0].offsetWidth;
+        const bottom = top + sel.helper[0].offsetHeight;
+        const scrollTop = this.dynamicList.getScrollTop();
+        const containerWidth = this.dynamicList.$content.width();
+
+        // No need to check, the drag select happened within the area
+        if (top >= scrollTop && bottom <= scrollTop + this.dynamicList.listContainer.clientHeight) {
+            return;
+        }
+
+        const perRow = this.maxItems[this.zoom];
+        const cellSize = containerWidth / perRow;
+        const itemKeys = Object.values(this.dynamicList.items);
+        let i = itemKeys.length;
+
+        while (--i >= 0) {
+            const cache = this.renderCache[`a${itemKeys[i]}`];
+
+            if (!cache) {
+                continue; // Has not been rendered yet, so cannot be out by default
+            }
+
+            const groupOffset = this.dynamicList._offsets[itemKeys[i]];
+
+            if (
+                groupOffset > bottom
+                || groupOffset + this.dynamicList._heights[itemKeys[i]] < top
+            ) {
+                continue; // The entire item is out of the reach
+            }
+
+            const group = this.getGroupById(itemKeys[i]);
+            const offset = (group.l ? 64 : 0);
+            const cells = cache.querySelectorAll('.data-block-view');
+
+            for (let i = 0; i < cells.length; i++) {
+                const cell = cells[i];
+
+                if (this.cellInSelectArea(i, groupOffset, offset, perRow, cellSize, { top, right, bottom, left })) {
+                    selectionManager.add_to_selection(cell.id);
+                }
+                else {
+                    selectionManager.remove_from_selection(cell.id);
+                    cell.classList.remove('ui-selected', 'ui-selecting');
+                }
+            }
+        }
+    }
 }
 
 class MegaTargetGallery extends MegaGallery {
@@ -1972,7 +2302,7 @@ class MegaTargetGallery extends MegaGallery {
             delay(`pfid_discovery:node_update${n.h}`, () => {
                 if (M.currentdirid === n.p) {
                     if (this.nodes[n.h]) {
-                        this.updateNodeName(n);
+                        this.updateNodeDetails(n);
                     }
                     else {
                         this.addNodeToGroups(n);
@@ -2014,7 +2344,7 @@ class MegaTargetGallery extends MegaGallery {
             }
             // Lets check this is name update
             else if (this.onpage && this.renderCache && this.nodes[n.h]) {
-                this.updateNodeName(n);
+                this.updateNodeDetails(n);
             }
         }
     }
@@ -2068,7 +2398,7 @@ class MegaMediaTypeGallery extends MegaGallery {
                 const n = M.d[dbHandles[i]];
 
                 if (nodeIsValid(n)) {
-                    validHandles.push(n.p);
+                    validHandles.push(n.h);
                     nodes.push(n);
                 }
             }
@@ -2119,6 +2449,7 @@ class MegaMediaTypeGallery extends MegaGallery {
                 [...M.getTreeHandles('shares'), ...M.getTreeHandles(M.RubbishID)],
                 true
             );
+
             let toGallery = !ignoreHandles[n.p];
 
             if (this.id === 'favourites') {
@@ -2146,13 +2477,15 @@ class MegaMediaTypeGallery extends MegaGallery {
             }
             // Lets check this is name update
             else if (this.onpage && this.renderCache && this.nodes[n.h]) {
-                this.updateNodeName(n);
+                this.updateNodeDetails(n);
 
                 if (mega.gallery.pendingFaBlocks[n.h] && n.fa.includes(':1*')) {
                     MegaGallery.addThumbnails(Object.values(mega.gallery.pendingFaBlocks[n.h]));
                     delete mega.gallery.pendingFaBlocks[n.h];
                 }
             }
+
+            delay('gallery.reset-media-counts', mega.gallery.resetMediaCounts.bind(null, M.v));
         }
     }
 }
@@ -2162,8 +2495,9 @@ mega.gallery.nodeUpdated = false;
 mega.gallery.albumsRendered = false;
 mega.gallery.publicSet = Object.create(null);
 mega.gallery.titleControl = null;
+mega.gallery.typeControl = null;
 mega.gallery.emptyBlock = null;
-mega.gallery.rootMode = {photos: 'a', images: 'a', videos: 'a'};
+mega.gallery.lastModeSelected = 'a';
 mega.gallery.pendingFaBlocks = {};
 mega.gallery.pendingThumbBlocks = {};
 mega.gallery.disallowedExtensions = { 'PSD': true, 'SVG': true };
@@ -2416,7 +2750,7 @@ mega.gallery.handleNodeUpdate = (n) => {
 
     if (M.gallery) {
         tryCatch(() => mega.gallery.checkEveryGalleryUpdate(n))();
-        tryCatch(() => mega.gallery.albums.onCDNodeUpdate(n))();
+        mega.gallery.albumsRendered = false;
     }
     else if (M.albums) {
         tryCatch(() => mega.gallery.albums.onCDNodeUpdate(n))();
@@ -2467,15 +2801,17 @@ mega.gallery.resetAll = () => {
 mega.gallery.showEmpty = (type, noMoreFiles) => {
     'use strict';
 
+    const rfBlock = $('.fm-right-files-block', '.fmholder');
+
     if (noMoreFiles || M.currentrootid === M.RootID &&
         (!M.c[M.currentdirid] || !Object.values(M.c[M.currentdirid]).length)) {
-        $('.fm-empty-folder', '.fm-right-files-block').removeClass('hidden');
-        $(`.fm-empty-${M.currentdirid}`, '.fm-right-files-block').addClass('hidden');
+        $('.fm-empty-folder', rfBlock).removeClass('hidden');
+        $(`.fm-empty-${M.currentdirid}`, rfBlock).addClass('hidden');
         return;
     }
 
     if (!mega.gallery.emptyBlock) {
-        mega.gallery.emptyBlock = new GalleryEmptyBlock('.fm-main.default > .fm-right-files-block');
+        mega.gallery.emptyBlock = new GalleryEmptyBlock('.pm-main > .fm-right-files-block');
     }
 
     mega.gallery.emptyBlock.type = type;
@@ -2751,43 +3087,34 @@ mega.gallery.removeDbActionCache = () => {
 };
 
 /**
- * @param {HTMLCollection} elements The collection of the sidebar buttons
- * @param {HTMLElement} galleryBtn The gallery button
+ * @param {HTMLElement} menuNode The menu node to work with
  * @returns {Promise<void>}
  */
-mega.gallery.updateButtonsStates = async(elements, galleryBtn) => {
+mega.gallery.updateMediaPath = async() => {
     'use strict';
 
-    const galleryRoots = {
-        photos: true,
-        images: true,
-        videos: true
-    };
+    const { menuNode } = mega.ui.topmenu;
 
-    const res = await mega.ccPrefs.getItem('web.locationPref');
-
-    if (!res || typeof res !== 'object' || !elements[0].querySelector) {
+    if (!menuNode) {
         return;
     }
 
-    const keys = Object.keys(res);
+    if (!u_attr || pfid) {
+        return;
+    }
 
-    for (let i = 0; i < keys.length; i++) {
-        const pathKey = keys[i];
+    const res = await mega.ccPrefs.getItem('web.locationPref.photos');
 
-        if (!galleryRoots[pathKey]) {
-            continue;
-        }
+    if (typeof res !== 'string' || res.length === 0) {
+        return;
+    }
 
-        const btn = elements[0].querySelector(`.btn-galleries[data-link=${pathKey}]`);
+    const lnk = menuNode.querySelector('.media');
 
-        if (btn) {
-            btn.dataset.locationPref = res[pathKey];
-        }
-
-        if (pathKey === 'photos') {
-            galleryBtn.dataset.locationPref = res[pathKey];
-        }
+    if (lnk) {
+        lnk.href = `/fm/${res}`;
+        lnk.dataset.section = lnk.href;
+        lnk.dataset.locationPref = res;
     }
 };
 
@@ -2805,13 +3132,27 @@ async function galleryUI(id) {
         mega.gallery.resetAll();
     }
 
+    const $headerBlock = $('.gallery-tabs-bl', '#media-section-controls');
     let gallery = mega.gallery[M.currentdirid];
 
-    $('.gallery-close-discovery', '.gallery-tabs-bl').addClass('hidden');
+    $headerBlock.removeClass('hidden');
+    $('#media-section-controls, #media-tabs', '.fm-right-files-block').removeClass('hidden');
+    $('.gallery-close-discovery', $headerBlock).addClass('hidden');
+
+    mega.gallery.setTabs();
+
+    if (!mega.gallery.typeControl) {
+        mega.gallery.typeControl = new mega.gallery.GalleryTypeControl('.gallery-tabs-bl .gallery-section-title');
+    }
 
     if (!mega.gallery.titleControl) {
-        mega.gallery.titleControl = new GalleryTitleControl('.gallery-tabs-bl .gallery-section-title');
+        mega.gallery.titleControl = new mega.gallery.GalleryTitleControl('.gallery-tabs-bl .gallery-section-title');
     }
+
+    $('.media-filter-reset', $headerBlock).rebind('click.galleryReset', () => {
+        M.openFolder('photos');
+        mega.gallery.titleControl.clearLocationPreference();
+    });
 
     // cleanup existing (FM-side) MegaRender and such.
     M.v = [];
@@ -2828,10 +3169,6 @@ async function galleryUI(id) {
 
     if (pfid || M.gallery && !M.albums && !M.isGalleryPage()) {
         id = !id || typeof id !== 'string' ? M.currentdirid : id;
-        if (id.startsWith('device-centre/')) {
-            id = id.split('/')[2];
-            mega.devices.ui.header.hide();
-        }
         $('.view-links', '.gallery-tabs-bl').removeClass('hidden');
     }
     else {
@@ -2840,6 +3177,12 @@ async function galleryUI(id) {
 
     // This keeps the banner persistent when navigating from Recents to Gallery
     $('.fm-right-files-block').addClass('visible-notification');
+
+    const section = mega.gallery.sections[M.currentdirid];
+    const $mdProhibited = $([
+        '.media-tabs',
+        '.gallery-section-title *'
+    ].join(','), '.fm-right-files-block');
 
     // This is media discovery
     if (id) {
@@ -2860,12 +3203,16 @@ async function galleryUI(id) {
         mega.gallery.titleControl.addTooltipToTitle();
 
         gallery = mega.gallery.discovery;
+        $mdProhibited.addClass('hidden');
     }
-    else if (mega.gallery.sections[M.currentdirid]) {
+    else if (section) {
         mega.gallery.titleControl.filterSection = M.currentdirid;
-        mega.gallery.titleControl.title = mega.gallery.sections[M.currentdirid].title;
-        mega.gallery.titleControl.icon = mega.gallery.sections[M.currentdirid].icon;
+        mega.gallery.titleControl.title = section.title;
+        mega.gallery.titleControl.icon = section.icon;
         mega.gallery.titleControl.removeTooltipFromTitle();
+        mega.gallery.titleControl.toggleHighlight(M.currentdirid);
+        mega.gallery.typeControl.updateTitle(section.root);
+        $mdProhibited.removeClass('hidden');
     }
 
     if (!gallery) {
@@ -2876,7 +3223,7 @@ async function galleryUI(id) {
         if (id) {
             gallery = mega.gallery.discovery = new MegaTargetGallery(id);
         }
-        else if (mega.gallery.sections[M.currentdirid]) {
+        else if (section) {
             gallery = mega.gallery[M.currentdirid] = new MegaMediaTypeGallery();
         }
     }
@@ -2906,6 +3253,8 @@ async function galleryUI(id) {
             console.timeEnd('gallery-ui');
             console.groupEnd();
         }
+
+        mega.gallery.resetMediaCounts(M.v);
     });
 }
 
@@ -3465,5 +3814,93 @@ lazy(mega.gallery, 'reporter', () => {
                 favTimer.abort();
             }
         }
+    };
+});
+
+lazy(mega.gallery, 'setTabs', () => {
+    'use strict';
+
+    /**
+     * @param {0|1} section 0 - Media, 1 - Albums
+     * @returns {void}
+     */
+    return (section = 0) => {
+        let tabs = mega.gallery.mediaControl;
+
+        if (!tabs) {
+            const tabClasses = 'py-3 px-6';
+            tabs = new MTabs();
+
+            document.querySelector('#media-tabs').prepend(tabs.el);
+
+            tabs.el.classList.add('media-tabs', 'px-6', 'justify-start');
+            tabs.tabs = [
+                {
+                    label: l.photos_timeline,
+                    click: () => {
+                        let loc = 'photos';
+                        const { titleControl: tc } = mega.gallery;
+
+                        if (tc && tc.mediaLink && tc.mediaLink.dataset.locationPref) {
+                            loc = tc.mediaLink.dataset.locationPref;
+                        }
+
+                        loadSubPage(`fm/${loc}`);
+                    },
+                    classes: tabClasses
+                },
+                {
+                    label: l.albums,
+                    click: () => {
+                        loadSubPage('fm/albums');
+                    },
+                    classes: tabClasses
+                }
+            ];
+
+            mega.gallery.mediaControl = tabs;
+        }
+
+        tabs.activeTab = section;
+    };
+});
+
+lazy(mega.gallery, 'resetMediaCounts', () => {
+    'use strict';
+
+    /**
+     * @param {MegaNode[]} [nodes] The nodes to use for count
+     * @returns {void}
+     */
+    return (nodes = []) => {
+        const countsContainer = document.querySelector('#media-section-controls #media-counts');
+        const counts = [0, 0]; // 0 - img, 1 - vid
+
+        let i = nodes.length;
+
+        while (--i >= 0) {
+            counts[mega.gallery.isVideo(nodes[i]) ? 1 : 0]++;
+        }
+
+        const [img, vid] = counts;
+
+        if (!img && !vid) {
+            countsContainer.classList.add('hidden');
+            return;
+        }
+
+        const txtArr = [];
+        if (img > 0) {
+            txtArr.push(mega.icu.format(l.photos_count_img, img));
+        }
+
+        if (vid > 0) {
+            txtArr.push(mega.icu.format(l.photos_count_vid, vid));
+        }
+
+        const txt = txtArr.join(', ');
+
+        countsContainer.textContent = txt;
+        countsContainer.classList.remove('hidden');
     };
 });

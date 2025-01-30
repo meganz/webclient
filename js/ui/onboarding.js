@@ -1,7 +1,7 @@
 // initialising onboarding v4
 
 // Bump this version number if changes are required in an existing section or if required to reduce complexity.
-window.ONBOARD_VERSION = 2;
+window.ONBOARD_VERSION = 3;
 window.OBV4_FLAGS = {
     OBV4: 'obv4f',
     CLOUD_DRIVE: 'obcd',
@@ -11,11 +11,11 @@ window.OBV4_FLAGS = {
     CHAT: 'obmc',
     UNUSED_1: 'unused1',
     CHAT_NAV: 'obmclp',
-    UNUSED_2: 'unused2',
-    UNUSED_3: 'unused3',
-    UNUSED_4: 'unused4',
-    UNUSED_5: 'unused5',
-    UNUSED_6: 'unused6',
+    CLOUD_DRIVE_NEW_NAV: 'obcdnn',
+    CLOUD_DRIVE_NEW_NAV_START: 'obcdnns',
+    CLOUD_DRIVE_NEW_NAV_LEFT: 'obcdnnl',
+    CLOUD_DRIVE_NEW_NAV_BENTO: 'obcdnnb',
+    CLOUD_DRIVE_NEW_NAV_ACCOUNT: 'obcdnna',
     UNUSED_7: 'unused7',
     UNUSED_8: 'unused8',
     UNUSED_9: 'unused9',
@@ -25,20 +25,15 @@ window.OBV4_FLAGS = {
     CHAT_CALL_UI: 'obmcui',
     CHAT_CALL_RECORDING: 'obmcrec',
     CHAT_CALL_RAISE: 'obmcrai',
-    CLOUD_DRIVE_MP: 'obcdmp',
-    CLOUD_DRIVE_MP_TRY: 'obcdmpt',
-    CLOUD_DRIVE_MP_BUBBLE: 'obcdmpb',
-    CLOUD_DRIVE_DC: 'obcddc',
-    CLOUD_DRIVE_DC_BUBBLE: 'obcddcb'
+    UNUSED_13: 'unused13',
+    UNUSED_14: 'unused14',
+    UNUSED_15: 'unused15'
     // New onboarding flags to be added at the end of this object. Don't change the order!!!!
     // UNUSED_X flags can be repurposed.
 };
 
 mBroadcaster.addListener('fm:initialized', () => {
     'use strict';
-
-    // TODO Set the right DC release date timestamp
-    const DEVICE_CENTRE_RELEASE_DATE = 1734519600;
 
     // If user is visiting folderlink, or not complete registration do not show Onboarding V4.
     if (folderlink || u_type < 3) {
@@ -152,169 +147,128 @@ mBroadcaster.addListener('fm:initialized', () => {
     };
 
     const manipulateFlags = () => {
+
+        // Since version update required flag key changes, key position used not key itself
+        const flags = Object.values(OBV4_FLAGS);
+
         // If new user then we can ignore the first chat step
         if (u_attr.since >= 1659398400) {
-            flagMap.setSync(OBV4_FLAGS.CHAT_NAV, 1);
+            flagMap.setSync(flags[7], 1); // CHAT_NAV
             flagMap.safeCommit();
         }
         let upgraded = false;
         if (upgradeFrom !== false && upgradeFrom < 1) {
             // This is the version where the new chat path was added so convert to it.
             // Existing users shall only see the scheduled meetings changes
-            flagMap.setSync(OBV4_FLAGS.CHAT_NAV, 1);
+            flagMap.setSync(flags[7], 1); // CHAT_NAV
             // Set complete for now future schedule steps will reset it
-            flagMap.setSync(OBV4_FLAGS.CHAT, 0);
+            flagMap.setSync(flags[5], 0); // CHAT
             upgraded = true;
         }
 
         if (upgradeFrom !== false && upgradeFrom < 2) {
             // Reclaim flags from removed chat dialogs
-            flagMap.setSync(OBV4_FLAGS.UNUSED_1, 0);
-            flagMap.setSync(OBV4_FLAGS.UNUSED_2, 0);
-            flagMap.setSync(OBV4_FLAGS.UNUSED_3, 0);
-            flagMap.setSync(OBV4_FLAGS.UNUSED_4, 0);
-            flagMap.setSync(OBV4_FLAGS.UNUSED_5, 0);
-            flagMap.setSync(OBV4_FLAGS.UNUSED_6, 0);
-            flagMap.setSync(OBV4_FLAGS.UNUSED_7, 0);
-            flagMap.setSync(OBV4_FLAGS.UNUSED_8, 0);
-            flagMap.setSync(OBV4_FLAGS.UNUSED_9, 0);
-            flagMap.setSync(OBV4_FLAGS.UNUSED_10, 0);
-            flagMap.setSync(OBV4_FLAGS.UNUSED_11, 0);
-            flagMap.setSync(OBV4_FLAGS.UNUSED_12, 0);
+            flagMap.setSync(flags[6], 0); // UNUSED_1
+            flagMap.setSync(flags[8], 0); // UNUSED_2
+            flagMap.setSync(flags[9], 0); // UNUSED_3
+            flagMap.setSync(flags[10], 0); // UNUSED_4
+            flagMap.setSync(flags[11], 0); // UNUSED_5
+            flagMap.setSync(flags[12], 0); // UNUSED_6
+            flagMap.setSync(flags[13], 0); // UNUSED_7
+            flagMap.setSync(flags[14], 0); // UNUSED_8
+            flagMap.setSync(flags[15], 0); // UNUSED_9
+            flagMap.setSync(flags[16], 0); // UNUSED_10
+            flagMap.setSync(flags[17], 0); // UNUSED_11
+            flagMap.setSync(flags[18], 0); // UNUSED_12
             upgraded = true;
         }
 
-        // users registered before DC release
-        // having "Get started" onboarding not completed
-        // and DC tooltip not completed
-        // will never see DC tooltip
-        const disableDeviceCentre = u_attr.since < DEVICE_CENTRE_RELEASE_DATE &&
-            !flagMap.getSync(OBV4_FLAGS.CLOUD_DRIVE) &&
-            !flagMap.getSync(OBV4_FLAGS.CLOUD_DRIVE_DC);
+        // Remove device centre and password manager
+        if (upgradeFrom !== false && upgradeFrom < 3) {
+            flagMap.setSync(flags[22], 0); // CLOUD_DRIVE_MP > UNUSED_13
+            flagMap.setSync(flags[23], 0); // CLOUD_DRIVE_MP_TRY > UNUSED_14
+            flagMap.setSync(flags[24], 0); // CLOUD_DRIVE_MP_BUBBLE > UNUSED_15
 
-        if (disableDeviceCentre) {
-            flagMap.setSync(OBV4_FLAGS.CLOUD_DRIVE_DC, 1);
-            flagMap.setSync(OBV4_FLAGS.CLOUD_DRIVE_DC_BUBBLE, 1);
+            upgraded = true;
         }
 
         // Future upgrades may be added here
-        if (upgraded || disableDeviceCentre) {
+        if (upgraded) {
             flagMap.safeCommit();
         }
     };
 
-    const _obv4Pwm = () => {
+    const _obv4NewNav = () => {
 
         if (mega.ui.onboarding) {
-            if (u_attr.since < 1631664000 || flagMap.getSync(OBV4_FLAGS.CLOUD_DRIVE)) {
-                const _obMap = obMap || {};
-                _obMap['cloud-drive'] = {
-                    title: l.mega_pwm,
-                    flag: OBV4_FLAGS.CLOUD_DRIVE_MP,
-                    noCP: true,
-                    steps: [
-                        {
-                            name: l.mega_pwm,
-                            flag: OBV4_FLAGS.CLOUD_DRIVE_MP_TRY,
-                            actions: [
-                                {
-                                    type: 'showExtDialog',
-                                    targetElmClass: '.mega-dialog.pwm-promo-dialog',
-                                    dialogInitFunc: mega.ui.onboarding.extDlg.showPwmPromoDialog,
-                                    markComplete: true,
-                                    postComplete: () => {
-                                        $.MPNotOpened = true;
-                                    },
-                                }
-                            ]
-                        },
-                        {
-                            name: l.mega_pwm,
-                            flag: OBV4_FLAGS.CLOUD_DRIVE_MP_BUBBLE,
-                            get prerequisiteCondition() {
-                                return typeof $.MPNotOpened === 'undefined';
-                            },
-                            actions: [
-                                {
-                                    type: 'showDialog',
-                                    dialogClass: 'mcob pwm',
-                                    dialogTitle: l.pwm_promo_onboarding_title,
-                                    dialogDesc: l.pwm_promo_onboarding_content,
-                                    targetElmClass: '.nw-fm-left-icons-panel .nw-fm-left-icon.pwm',
-                                    targetElmPosition: 'right',
-                                    markComplete: true,
-                                }
-                            ]
-                        }
-                    ]
-                };
-                mega.ui.onboarding.map = _obMap;
-            }
-            mBroadcaster.addListener('pagechange', () => {
-                // Hide the control panel while the page change is finishing up.
-                $('.onboarding-control-panel').addClass('hidden');
-                onIdle(mega.ui.onboarding.start.bind(mega.ui.onboarding));
-            });
-            mega.ui.onboarding.start();
-
-            // Mega Pass onboarding requires kickstarting manually as it does not have control panel
-            if (obMap && obMap['cloud-drive'].flag === OBV4_FLAGS.CLOUD_DRIVE_MP && M.currentrootid === M.RootID) {
-                mega.ui.onboarding.currentSection.startNextOpenSteps();
-            }
-        }
-    };
-
-    const _obv4DeviceCentre = () => {
-        if (mega.ui.onboarding) {
-            if (u_attr.since < DEVICE_CENTRE_RELEASE_DATE) {
-                // users must be registered before DC release to see DC tooltip
-
-                const _obMap = obMap || {};
-                _obMap['cloud-drive'] = {
-                    title: l.mega_device_centre,
-                    flag: OBV4_FLAGS.CLOUD_DRIVE_DC,
-                    noCP: true,
-                    steps: [
-                        {
-                            name: l.mega_device_centre,
-                            flag: OBV4_FLAGS.CLOUD_DRIVE_DC_BUBBLE,
-                            get prerequisiteCondition() {
-                                return typeof $.MPNotOpened === 'undefined';
-                            },
-                            actions: [
-                                {
-                                    type: 'showDialog',
-                                    dialogClass: 'mcob dc',
-                                    dialogTitle: l.dc_promo_onboarding_title,
-                                    dialogDesc: l.dc_promo_onboarding_content,
-                                    dialogNext: l.ok_button,
-                                    skipHidden: true,
-                                    targetElmClass: '.js-myfiles-panel .device-centre span',
-                                    targetElmPosition: 'left',
-                                    targetElmPosTuning: {
-                                        top: 5,
-                                        left: 15,
-                                    },
-                                    markComplete: true,
-                                }
-                            ]
-                        }
-                    ],
-                };
-                mega.ui.onboarding.map = _obMap;
-            }
-            mBroadcaster.addListener('pagechange', () => {
-                // Hide the control panel while the page change is finishing up.
-                $('.onboarding-control-panel', '.fm-right-files-block').addClass('hidden');
-                onIdle(mega.ui.onboarding.start.bind(mega.ui.onboarding));
-            });
-            mega.ui.onboarding.start();
-
-            // Device centre onboarding requires kickstarting manually as it does not have control panel
-            const {currentSection} = mega.ui.onboarding;
-            if (currentSection.map.flag === OBV4_FLAGS.CLOUD_DRIVE_DC && M.currentrootid === M.RootID) {
-                currentSection.startNextOpenSteps();
-            }
+            const _obMap = obMap || {};
+            const isRtl = document.body.classList.contains('rtl');
+            _obMap['cloud-drive'] = {
+                title: l.mega_pwm,
+                flag: OBV4_FLAGS.CLOUD_DRIVE_NEW_NAV,
+                noCP: true,
+                dismissNoConfirm: true,
+                steps: [
+                    {
+                        name: l.promo_new_layout_1_title,
+                        flag: OBV4_FLAGS.CLOUD_DRIVE_NEW_NAV_START,
+                        actions: [
+                            {
+                                type: 'showExtDialog',
+                                dialogInitFunc: mega.ui.onboarding.extDlg.showObPromoDialog,
+                                markComplete: true
+                            }
+                        ]
+                    },
+                    {
+                        name: l.promo_new_layout_2_title,
+                        flag: OBV4_FLAGS.CLOUD_DRIVE_NEW_NAV_LEFT,
+                        actions: [
+                            {
+                                type: 'showDialog',
+                                dialogTitle: l.promo_new_layout_2_title,
+                                dialogDesc: l.promo_new_layout_2_body,
+                                targetElmClass: '.mega-top-menu',
+                                targetElmPosition: 'right',
+                                markComplete: true,
+                                dialogSkip: l.ob_end_tour
+                            }
+                        ]
+                    },
+                    {
+                        name: l.promo_new_layout_3_title,
+                        flag: OBV4_FLAGS.CLOUD_DRIVE_NEW_NAV_BENTO,
+                        actions: [
+                            {
+                                type: 'showDialog',
+                                dialogTitle: l.promo_new_layout_3_title,
+                                dialogDesc: l.promo_new_layout_3_body,
+                                targetElmClass: '.mega-header .bento',
+                                targetElmPosition: isRtl ? 'bottom right' : 'bottom left',
+                                markComplete: true,
+                                dialogSkip: l.ob_end_tour
+                            }
+                        ]
+                    },
+                    {
+                        name: l.promo_new_layout_4_title,
+                        flag: OBV4_FLAGS.CLOUD_DRIVE_NEW_NAV_ACCOUNT,
+                        actions: [
+                            {
+                                type: 'showDialog',
+                                dialogTitle: l.promo_new_layout_4_title,
+                                dialogDesc: l.promo_new_layout_4_body,
+                                targetElmClass: '.mega-header .avatar',
+                                targetElmPosition: isRtl ? 'bottom right' : 'bottom left',
+                                markComplete: true,
+                                skipHidden: true,
+                                dialogNext: l.set_new_pwd_confirm
+                            }
+                        ]
+                    }
+                ]
+            };
+            mega.ui.onboarding.map = _obMap;
         }
     };
 
@@ -332,15 +286,39 @@ mBroadcaster.addListener('fm:initialized', () => {
         }
         manipulateFlags();
 
-        // "_obv4Pwm" and "_obv4DeviceCentre" are exclusive
-        // Running both of them would cause inconsistencies in behavior
-        // PWM onboarding must be completed to see DC tooltip
-        if (!flagMap.getSync(OBV4_FLAGS.CLOUD_DRIVE_MP)) {
-            _obv4Pwm();
+        // If users are old user created before 30-01-2025 and finished CD one then show new nav onboarding
+        if (u_attr.since < 1738191600 && (flagMap.getSync(OBV4_FLAGS.CLOUD_DRIVE) || u_attr.since < 1631664000) ||
+            localStorage.obv4testnn) {
+            _obv4NewNav();
         }
-        else if (!flagMap.getSync(OBV4_FLAGS.CLOUD_DRIVE_DC)) {
-            _obv4DeviceCentre();
-        }
+
+        const isOverridden = obMap && obMap['cloud-drive'].flag === OBV4_FLAGS.CLOUD_DRIVE_NEW_NAV;
+        const _delayStart = () => {
+            delay('delayKickstartOB', () => {
+                mega.ui.onboarding.start();
+
+                // this onboarding requires kickstarting manually as it does not have control panel
+                if (isOverridden && M.currentrootid === M.RootID) {
+                    mega.ui.onboarding.currentSection.startNextOpenSteps();
+                }
+            }, 1000);
+        };
+
+        mBroadcaster.addListener('pagechange', () => {
+            // Hide the control panel while the page change is finishing up.
+            $('.onboarding-control-panel').addClass('hidden');
+
+            // Closing dialog that is not closed by background click but user try navigate to another page
+            if ($.dialog === 'onboardingDialog') {
+                closeDialog();
+            }
+
+            _delayStart();
+        });
+
+        // delay to make sure all other dialog such as expired business is apearing first
+        _delayStart();
+
     }).catch(dump);
 
     // If this is an old user don't show them the cloud-drive onboarding v4
@@ -367,8 +345,7 @@ mBroadcaster.addListener('fm:initialized', () => {
 
         start() {
 
-            const {currentSection} = this;
-            const {currentSectionName} = this;
+            const {currentSection, currentSectionName} = this;
 
             // User revisit this section
             if (currentSection) {
@@ -403,7 +380,7 @@ mBroadcaster.addListener('fm:initialized', () => {
 
         get currentSectionName() {
 
-            switch (M.currentrootid) {
+            switch (is_fm() && M.currentrootid) {
                 case M.RootID: return 'cloud-drive';
                 case M.InboxID: return 'inbox';
                 case M.RubbishID: return 'rubbish-bin';
@@ -578,7 +555,7 @@ mBroadcaster.addListener('fm:initialized', () => {
 
         startNextOpenSteps(step) {
 
-            if (this.steps.length === 0 || this.steps[step] && this.steps[step].isComplete) {
+            if (this.steps.length === 0 || this.isComplete || this.steps[step] && this.steps[step].isComplete) {
                 return false;
             }
 
@@ -837,6 +814,12 @@ mBroadcaster.addListener('fm:initialized', () => {
                     at = 'right-42 top';
                     arrowAt = 'top-left';
                     break;
+                case 'bottom left':
+                    my = 'right+34 bottom-8';
+                    at = 'left+34 top';
+                    arrowAt = 'top-right';
+                    break;
+                case 'bottom 10':
                 case 'bottom 20':
                     at = 'center bottom+26';
                     break;
@@ -863,7 +846,7 @@ mBroadcaster.addListener('fm:initialized', () => {
                 collision: 'flipfit',
                 using: (obj, info) => {
 
-                    if (arrowAt && arrowAt !== 'top-left') {
+                    if (arrowAt && arrowAt !== 'top-left' && arrowAt !== 'top-right') {
                         // Dialog position is moved due to collision on viewport swap arrow position
                         if (info.horizontal === 'right' && obj.left < info.target.left) {
                             arrowAt = 'right';
@@ -879,21 +862,13 @@ mBroadcaster.addListener('fm:initialized', () => {
                         }
                     }
 
-                    const {top, left} = this.map.targetElmPosTuning || {};
-                    if (top) {
-                        obj.top += top;
-                    }
-                    if (left) {
-                        obj.left += left;
-                    }
-
                     this.$dialog.css(obj);
                 }
             });
 
             if (arrowAt) {
                 $('#ob-dialog-arrow', this.$dialog)
-                    .removeClass('hidden top bottom left right top-left').addClass(arrowAt);
+                    .removeClass('hidden top bottom left right top-left top-right').addClass(arrowAt);
             }
             else {
                 $('#ob-dialog-arrow', this.$dialog).addClass('hidden').removeClass('top bottom left right top-left');
@@ -1091,40 +1066,42 @@ mBroadcaster.addListener('fm:initialized', () => {
     window.OnboardV4Action = OnboardV4Action;
 
     mega.ui.onboarding.extDlg = {
-        showPwmPromoDialog: () => {
+        showObPromoDialog: () => {
             "use strict";
 
-            const $dialog = $('.pwm-promo-dialog', '.mega-dialog-container');
-            const $actionButton = $('.btn-pwm-promo-action', $dialog);
+            const $dialog = $('.ob-promo-dialog', '.mega-dialog-container');
+            const $actionButton = $('.btn-ob-promo-action', $dialog);
             const $background = $('.fm-dialog-overlay', '.mega-dialog-container');
             const $clsBtn = $('.js-close', $dialog);
             const _offEvents = () => {
-                $actionButton.off('click.pwm-promo');
-                $background.off('click.pwm-promo');
-                $clsBtn.off('click.pwm-promo');
+                $actionButton.off('click.ob-promo');
+                $background.off('click.ob-promo');
+                $clsBtn.off('click.ob-promo');
             };
 
-            $actionButton.rebind('click.pwm-promo', () => {
-                eventlog(500569);
-                loadSubPage('fm/pwm');
+            const _killOBEvent = () => {
+                mega.ui.onboarding.currentSection.currentStepIndex = false;
+                mega.ui.onboarding.currentSection.markSectionComplete();
+            };
+
+            $actionButton.rebind('click.ob-promo', () => {
+                closeDialog();
+                mega.ui.onboarding.currentSection.startNextOpenSteps();
                 _offEvents();
             });
 
-            $clsBtn.rebind('click.pwm-promo', () => {
-                sessionStorage.MPNotOpened = true;
-                eventlog(500570);
+            $clsBtn.rebind('click.ob-promo', () => {
+                _killOBEvent();
                 closeDialog();
                 _offEvents();
                 return false;
             });
 
-            $background.rebind('click.pwm-promo', () => {
-                sessionStorage.MPNotOpened = true;
-                eventlog(500570);
+            $background.rebind('click.ob-promo', () => {
                 _offEvents();
             });
 
-            M.safeShowDialog('pwm-promo-dialog', $dialog);
+            M.safeShowDialog('ob-promo-dialog', $dialog);
         }
     }
 

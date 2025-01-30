@@ -1559,6 +1559,7 @@ function mLogout(aCallback, force) {
         .catch((ex) => {
             if (u_type > 2 && window.waitsc) {
                 waitsc();
+                getsc(true);
             }
             if (ex) {
                 dump(ex);
@@ -1775,20 +1776,6 @@ mBroadcaster.addListener('crossTab:owner', function _setup() {
             }
         }
     };
-});
-
-// Update account UI on other tabs when cancelling subscription
-mBroadcaster.addListener('crossTab:cancelSub', () => {
-    'use strict';
-
-    // Fetch new account data
-    if (M.account) {
-        M.account.lastupdate = 0;
-    }
-
-    if (page.indexOf('fm/account') === 0) {
-        accountUI();
-    }
 });
 
 /**

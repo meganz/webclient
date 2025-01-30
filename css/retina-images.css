@@ -60,7 +60,6 @@
     .password-status-icon,
     .login-forgot-password,
     .checkboxOn::after,
-    .checkboxOn::before,
     .checkboxOff::after,
     .contains-value .top-clear-button,
     .account-history-drop-items.active,
@@ -214,7 +213,6 @@
     .top-sprite, i.top-sprite,
     .logo,
     .languages-dialog .show-more-languages .round-arrow span,
-    .notification-txt,
     .nw-bottom-copyrights,
     .nw-bottom-social,
     .new-notification-icon,
@@ -366,7 +364,6 @@
     .free .fm-right-block:not(.active-achievements) .bandwidth .chart.data .perc-txt,
     .free .fm-right-account-block:not(.active-achievements) .bandwidth .chart.data .perc-txt,
     .no-percs .chart.data .perc-txt,
-    .nw-fm-tree-item.contains-folders .nw-fm-arrow-icon,
     .fm-add-user-scrolling .nw-contact-item,
     .fm-dialog-search,
     .verified .nw-contact-verified-icon,
@@ -402,7 +399,6 @@
     .fm-right-account-block .dialog-input-title-ontop .birth-arrow-container .down-control,
     .fm-right-account-block .tooltip-icon .medium-icon.info-icon,
     .content-panel.dashboard .small-icon.info-icon,
-    .nw-fm-left-icon.affiliate::after,
     .fm-s {
         background-image: url(../images/mega/fm-main-sprite@2x.png);
         background-size: 48px auto;

@@ -53,7 +53,6 @@
 .container-details-info .domain-value {
     font: var(--text-body1);
     color: var(--text-color-low);
-    -webkit-margin-start: 24px;
     margin-inline-start: 24px;
 }
 .container-details-info .domain-value .info {
@@ -62,7 +61,6 @@
 .container-details-info .domain-value .learn-more {
     color: var(--secondary-blue);
     cursor: pointer;
-    -webkit-margin-start: 8px;
     margin-inline-start: 8px;
 }
 .bucket-details-info .content {
@@ -86,7 +84,6 @@
 .bucket-details-info .bucket-details-pad {
     position: relative;
     overflow: hidden;
-    -webkit-margin-start: 8px;
     margin-inline-start: 8px;
 }
 .bucket-details-pad div .avatar-wrapper {
@@ -98,7 +95,6 @@
 .bucket-details-pad .bucket-details-user-info {
     display: inline-block;
     vertical-align: middle;
-    -webkit-margin-start: 4px;
     margin-inline-start: 4px;
 }
 .bucket-details-pad .bucket-details-name {
@@ -107,7 +103,6 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    -webkit-padding-end: 16px;
     padding-inline-end: 16px;
     display: inline-block;
     vertical-align: middle;
@@ -125,7 +120,6 @@
 }
 .bucket-details-buttons {
     margin-inline-start: auto;
-    -webkit-margin-start: auto;
     display: flex;
     flex-wrap: nowrap;
     margin-top: 24px;

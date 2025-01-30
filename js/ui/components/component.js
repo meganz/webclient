@@ -14,6 +14,8 @@ class MegaComponent extends MegaDataEmitter {
             return;
         }
 
+        this.parentNode = options.parentNode;
+
         // If parent node is defined start build
         this.domNode = document.createElement(options.nodeType || 'div');
         this.domNode.className = 'mega-component';
@@ -38,6 +40,14 @@ class MegaComponent extends MegaDataEmitter {
 
         if (options.skLoading) {
             this.skLoading = true;
+        }
+
+        if (options.id) {
+            this.domNode.id = options.id;
+        }
+
+        if (options.name) {
+            this.domNode.name = options.name;
         }
     }
 

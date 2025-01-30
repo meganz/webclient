@@ -15,9 +15,13 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
     let globalZoomStep = defZoomStep;
 
     const fillAlbumTimelineCell = (el) => {
-        if (el.ref.isVideo) {
+        if (el.ref.isVideo && !el.dataset.videoDuration) {
             el.dataset.videoDuration = secondsToTimeShort(MediaAttribute(el.ref.node).data.playtime);
             el.classList.add('show-video-duration');
+
+            const icon = document.createElement('i');
+            icon.className = 'video-thumb-play sprite-fm-mono icon-play-circle';
+            el.appendChild(icon);
         }
     };
 
@@ -28,7 +32,7 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
             const selections = Object.keys(albums.grid.timeline.selections);
             const albumId = scope.getAlbumIdFromPath();
             const album = albums.store[albumId];
-            const { filterFn, at, eIds, nodes } = album;
+            const { filterFn, at, eIds, nodes, id } = album;
             const { featureEnabled } = mega.sensitives;
             const options = [];
             let selectionsPreviewable = false;
@@ -99,6 +103,16 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
 
             if (options.length) {
                 options.push({});
+            }
+
+            if (id === 'fav' && selections.every(h => M.d[h].fav)) {
+                options.push({
+                    label: l[5872],
+                    icon: 'favourite-removed',
+                    click: () => {
+                        M.favourite(selections, 0);
+                    }
+                });
             }
 
             options.push(
@@ -346,7 +360,7 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
                 this.el.classList.add('ui-selected');
 
                 const check = document.createElement('i');
-                check.className = 'sprite-fm-mono icon-check-circle icon-size-6';
+                check.className = 'sprite-fm-mono icon-check';
                 this.el.appendChild(check);
                 this._selected = true;
 
@@ -356,7 +370,7 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
             }
             else {
                 this.el.classList.remove('ui-selected');
-                this.el.removeChild(this.el.querySelector('i.icon-check-circle'));
+                this.el.removeChild(this.el.querySelector('i.icon-check'));
                 this._selected = false;
             }
         }
@@ -429,15 +443,6 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
             }
         }
 
-        applyMonthLabel(label) {
-            this.el.classList.add('show-date');
-            this.el.dataset.date = label;
-        }
-
-        removeMonthLabel() {
-            this.el.classList.remove('show-date');
-        }
-
         setThumb(dataUrl) {
             let img = this.el.querySelector('img');
 
@@ -449,7 +454,6 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
 
             img.src = dataUrl;
 
-            this.el.style.backgroundColor = 'white';
             this.naturalSize = this.el.style.width;
 
             if (this.el.classList.contains('shimmer')) {
@@ -516,10 +520,6 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
 
         get selCount() {
             return this._selCount;
-        }
-
-        get rowHeight() {
-            return this.cellSize + scope.cellMargin * 2;
         }
 
         get zoomStep() {
@@ -605,7 +605,7 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
 
             this.dynamicList = new MegaDynamicList(this.el, {
                 itemRenderFunction: this.renderRow.bind(this),
-                itemHeightCallback: () => this.rowHeight,
+                itemHeightCallback: this.getRowHeight.bind(this),
                 onResize: this.onResize.bind(this),
                 perfectScrollOptions: {
                     handlers: ['click-rail', 'drag-thumb', 'wheel', 'touch'],
@@ -676,6 +676,14 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
                     this.dynamicList.options.onResize = this.onResize.bind(this);
                 }
             });
+        }
+
+        getRowHeight(index) {
+            const headerHeight = (this._nodes[index] && this._nodes[index].monthLabel)
+                ? 44
+                : 0;
+
+            return this.cellSize + scope.cellMargin * 2 + headerHeight;
         }
 
         findMiddleImage() {
@@ -803,16 +811,17 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
 
             if (keys.length) {
                 for (let i = 0; i < keys.length; i++) {
-                    const row = this.dynamicList._currentlyRendered[keys[i]];
+                    const children = this.dynamicList._currentlyRendered[keys[i]]
+                        .querySelector(':scope > div .album-timeline-cell');
 
-                    if (row.children && row.children.length) {
-                        for (let j = 0; j < row.children.length; j++) {
-                            if (scope.isInSelectArea(row.children[j], posArr, this.sidePadding)) {
-                                this.selectNode(row.children[j].ref.node);
-                                this.lastNavNode = row.children[j].ref.node;
+                    if (children && children.length) {
+                        for (let j = 0; j < children.length; j++) {
+                            if (scope.isInSelectArea(children[j], posArr, this.sidePadding)) {
+                                this.selectNode(children[j].ref.node);
+                                this.lastNavNode = children[j].ref.node;
                             }
                             else {
-                                this.deselectNode(row.children[j].ref.node);
+                                this.deselectNode(children[j].ref.node);
                             }
                         }
                     }
@@ -827,7 +836,7 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
             this.dragSelect = new mega.ui.dragSelect(
                 this.el,
                 {
-                    allowedClasses: ['MegaDynamicListItem'],
+                    allowedClasses: ['MegaDynamicListItem', 'flex-row'],
                     onDragStart: (xPos, yPos) => {
                         initX = xPos;
                         initY = this.dynamicList.getScrollTop() + yPos;
@@ -1145,7 +1154,7 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
             }
             else {
                 const bottomOverflow = newOffsetTop
-                    + this.rowHeight
+                    + this.getRowHeight(rowIndex)
                     + scope.cellMargin
                     - (scrollTop + this.el.clientHeight);
 
@@ -1155,11 +1164,98 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
             }
         }
 
+        getCellMonthCheck(cell) {
+            let titleEl = cell.el.parentNode.parentNode;
+
+            while (titleEl && !titleEl.classList.contains('has-month-label')) {
+                titleEl = titleEl.previousElementSibling;
+            }
+
+            return titleEl && titleEl.querySelector('.checkdiv');
+        }
+
+        updateGroupSelect(cell) {
+            const checkbox = this.getCellMonthCheck(cell);
+
+            if (!checkbox) {
+                return;
+            }
+
+            const rowIndex = checkbox.parentNode.dataset.row;
+
+            delay(`album_timeline.check-select-${rowIndex}`, () => {
+                const nodes = this.getMonthNodes(rowIndex);
+                let all = true;
+                let some = false;
+                const selSet = new Set(Object.keys(this.selections));
+                let i = nodes.length;
+
+                while (--i >= 0) {
+                    if (selSet.has(nodes[i])) {
+                        some = true;
+                    }
+                    else {
+                        all = false;
+                    }
+
+                    // All conditions met
+                    if (some && !all) {
+                        break;
+                    }
+                }
+
+                checkbox.parentNode.mComponent.checked = all || some;
+
+                if (all || !some) {
+                    checkbox.classList.remove('checkboxMinimize');
+                }
+                else {
+                    checkbox.classList.add('checkboxMinimize');
+                }
+            });
+        }
+
+        updateGroupDeselect(cell) {
+            const checkbox = this.getCellMonthCheck(cell);
+
+            if (!checkbox) {
+                return;
+            }
+
+            const rowIndex = checkbox.parentNode.dataset.row;
+
+            delay(`album_timeline.check-deselect-${rowIndex}`, () => {
+                const sel = Object.keys(this.selections);
+                let some = false;
+
+                if (sel.length) {
+                    const selSet = new Set(sel);
+                    const monthNodes = this.getMonthNodes(rowIndex);
+
+                    for (let i = 0; i < monthNodes.length; i++) {
+                        if (selSet.has(monthNodes[i])) {
+                            some = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (some) {
+                    checkbox.classList.add('checkboxMinimize');
+                }
+                else {
+                    checkbox.parentNode.mComponent.checked = false;
+                    checkbox.classList.remove('checkboxMinimize');
+                }
+            });
+        }
+
         /**
          * @param {Meganode} node Node to select
+         * @param {boolean} [ignoreContainerCheck] Skiping the container check
          * @returns {void}
          */
-        selectNode(node) {
+        selectNode(node, ignoreContainerCheck = false) {
             if (this.limitReached) {
                 if (!this.limitTip) {
                     this.addCountLimitTip();
@@ -1179,6 +1275,10 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
 
                 if (cell) {
                     cell.isSelected = true;
+
+                    if (!ignoreContainerCheck && cell.el.isConnected) {
+                        this.updateGroupSelect(cell);
+                    }
                 }
 
                 this._selCount++;
@@ -1197,9 +1297,10 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
 
         /**
          * @param {Meganode} node Node to deselect
+         * @param {boolean} [ignoreContainerCheck] Skiping the container check
          * @returns {void}
          */
-        deselectNode(node) {
+        deselectNode(node, ignoreContainerCheck = false) {
             if (this.selections[node.h]) {
                 delete this.selections[node.h];
 
@@ -1211,6 +1312,10 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
 
                 if (cell) {
                     cell.isSelected = false;
+
+                    if (!ignoreContainerCheck && cell.el.isConnected) {
+                        this.updateGroupDeselect(cell);
+                    }
                 }
 
                 this.adjustToBottomBar();
@@ -1318,9 +1423,122 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
             return this.cellCache[node.h];
         }
 
+        getMonthNodes(rowIndex) {
+            if (this._nodes.length <= rowIndex) {
+                return [];
+            }
+
+            let { monthLabel } = this._nodes[rowIndex];
+
+            while (!monthLabel) {
+                rowIndex--;
+                monthLabel = this._nodes[rowIndex].monthLabel;
+            }
+
+            const handles = [];
+
+            for (let i = rowIndex; i < this._nodes.length; i++) {
+                if (i !== rowIndex && this._nodes[i].monthLabel) {
+                    break;
+                }
+
+                handles.push(...this._nodes[i].list.map(({ h }) => h));
+            }
+
+            return handles;
+        }
+
+        applyMonthLabel(domNode, label, rowIndex) {
+            const checkbox = new MCheckbox({
+                id: `timeline-check-${rowIndex}`,
+                name: `timeline_check_${rowIndex}`,
+                passive: true
+            });
+
+            const monthNodes = this.getMonthNodes(rowIndex);
+            const sel = Object.keys(this.selections);
+            const selSet = new Set(sel);
+            let all = sel.length >= monthNodes.length; // Presuming, based on length
+            let some = false;
+
+            for (let i = 0; i < monthNodes.length; i++) {
+                if (selSet.has(monthNodes[i])) {
+                    some = true;
+                }
+                else if (all) {
+                    all = false;
+                }
+
+                if (some && !all) {
+                    break;
+                }
+            }
+
+            if (all) {
+                checkbox.checked = true;
+            }
+            else if (some) {
+                checkbox.checked = true;
+                checkbox.el.firstChild.classList.add('checkboxMinimize');
+            }
+
+            checkbox.el.dataset.row = rowIndex;
+            checkbox.onChange = (newVal) => {
+                checkbox.checked = newVal;
+
+                const nodes = this.getMonthNodes(rowIndex);
+
+                if (newVal) {
+                    for (let i = 0; i < nodes.length; i++) {
+                        this.selectNode(M.d[nodes[i]], true);
+                    }
+                }
+                else {
+                    for (let i = 0; i < nodes.length; i++) {
+                        this.deselectNode(M.d[nodes[i]], true);
+                    }
+                }
+
+                checkbox.el.querySelector('.checkdiv').classList.remove('checkboxMinimize');
+            };
+
+            const dateTitle = document.createElement('div');
+            dateTitle.classList.add(
+                'timeline-date-title',
+                'px-2',
+                'py-3',
+                'flex',
+                'flex-row',
+                'gap-2',
+                'items-center'
+            );
+
+            const dateLabel = document.createElement('div');
+            dateLabel.classList.add('font-bold', 'text-color-high');
+            dateLabel.textContent = label;
+
+            const countLabel = document.createElement('div');
+            countLabel.className = 'text-color-medium font-body-2';
+            countLabel.textContent = mega.icu.format(l.items_count, monthNodes.length);
+
+            dateTitle.appendChild(checkbox.el);
+            dateTitle.appendChild(dateLabel);
+            dateTitle.appendChild(countLabel);
+            domNode.appendChild(dateTitle);
+        }
+
+        removeMonthLabel(domNode) {
+            const dateTitle = domNode.querySelector('.timeline-date-title');
+
+            if (dateTitle) {
+                domNode.removeChild(dateTitle);
+            }
+        }
+
         renderRow(rowKey) {
             const div = document.createElement('div');
-            div.className = 'flex flex-row';
+            const row = document.createElement('div');
+            row.className = 'flex flex-row';
 
             const toFetchAttributes = [];
 
@@ -1328,22 +1546,23 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
                 const sizePx = `${this.cellSize}px`;
                 const { list, monthLabel } = this._nodes[rowKey];
 
+                if (this.showMonthLabel && monthLabel) {
+                    this.applyMonthLabel(div, monthLabel, rowKey);
+                    div.classList.add('has-month-label');
+                }
+                else {
+                    this.removeMonthLabel(div);
+                    div.classList.remove('has-month-label');
+                }
+
                 for (let i = 0; i < list.length; i++) {
                     const tCell = this.getCachedCell(list[i]);
 
                     tCell.el.style.width = sizePx;
                     tCell.el.style.height = sizePx;
                     tCell.el.style.backgroundImage = null;
-                    tCell.el.style.backgroundColor = null;
 
                     scope.setShimmering(tCell.el);
-
-                    if (this.showMonthLabel && !i && monthLabel) {
-                        tCell.applyMonthLabel(monthLabel);
-                    }
-                    else {
-                        tCell.removeMonthLabel();
-                    }
 
                     if (this.selections[list[i].h]) {
                         tCell.isSelected = true;
@@ -1351,7 +1570,7 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
 
                     tCell.isActive = !this.limitReached || tCell.isSelected;
 
-                    div.appendChild(tCell.el);
+                    row.appendChild(tCell.el);
                     fillAlbumTimelineCell(tCell.el);
 
                     tCell.el.ref.el = tCell.el;
@@ -1362,6 +1581,8 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
             if (toFetchAttributes.length) {
                 delay(`album_timeline:render_row${rowKey}`, () => MegaGallery.addThumbnails(toFetchAttributes));
             }
+
+            div.appendChild(row);
 
             return div;
         }
@@ -1429,7 +1650,6 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
                 'album_timeline:adjusting_to_bottom_bar',
                 () => {
                     if (this.interactiveCells) {
-                        this.el.style.height = (this.selCount) ? 'calc(100% - 65px)' : null;
                         this.el.style.minHeight = (this.selCount) ? '280px' : null;
                         this.resizeDynamicList();
                         Ps.update(this.el);

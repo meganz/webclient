@@ -87,7 +87,6 @@
 
 .top-menu-item i {
     margin: 4px;
-    -webkit-margin-end: 14px;
     margin-inline-end: 14px;
 }
 
@@ -95,19 +94,16 @@
     --icon-size: 16px;
     --mask-color: var(--icon-active);
     margin: 0 4px;
-    -webkit-margin-start: 0;
     margin-inline-start: 0;
 }
 
 .top-menu-item.underlined i {
-    -webkit-margin-end: 4px;
     margin-inline-end: 4px;
 }
 
 .top-menu-item i.x32 {
     --icon-size: 32px;
     margin: 0 2px;
-    -webkit-margin-end: 8px;
     margin-inline-end: 8px;
 }
 
@@ -145,7 +141,6 @@
 
 .top-menu-item.single span {
     flex-grow: 0;
-    -webkit-padding-end: 14px;
     padding-inline-end: 14px;
 }
 
@@ -158,6 +153,7 @@
     transition: max-height 200ms ease-in-out, opacity 200ms ease-in-out, padding 200ms ease-in-out;
     opacity: 0;
     margin: 0;
+    z-index: 1;
 }
 
 .submenu-item.expanded + .top-submenu {
@@ -169,7 +165,6 @@
     font: var(--text-body1);
     color: var(--text-color-medium);
     padding: 6px 10px;
-    -webkit-padding-start: 42px;
     padding-inline-start: 42px;
     margin: 0;
 }
@@ -253,13 +248,11 @@
 
 .block-null-spinner {
     flex: 0 0 auto;
-    -webkit-margin-end: 6px;
     margin-inline-end: 6px;
     white-space: nowrap;
 }
 .block-null-spinner.block-loading-spinner {
     margin: 0 6px;
-    -webkit-margin-end: 12px;
     margin-inline-end: 12px;
 }
 /* Side menu Account data block (logged in) */
@@ -307,7 +300,8 @@
 .top-menu-logged .user-info .name {
     color: var(--text-color-higher);
     font: var(--text-h3);
-    font-family: var(--text-font-family-bold);
+    font-family: var(--text-font-family);
+    font-weight: bold;
     line-height: inherit;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -350,7 +344,8 @@
 
 .top-menu-logged .storage-txt span {
     color: var(--text-color-success);
-    font-family: var(--text-font-family-semibold);
+    font-family: var(--text-font-family);
+    font-weight: 600;
 }
 
 .top-menu-logged .storage span {
@@ -449,7 +444,8 @@
 .pages-menu.link span {
     font-size: 18px;
     line-height: 24px;
-    font-family: var(--text-font-family-semibold);
+    font-family: var(--text-font-family);
+    font-weight: 600;
     color: var(--text-color-high);
     display: inline-block;
     padding: 0 30px;
@@ -457,9 +453,7 @@
 }
 .pages-menu.link i {
     margin-top: 2px;
-    -webkit-margin-start: -30px;
     margin-inline-start: -30px;
-    -webkit-margin-end: 0;
     margin-inline-end: 0;
     display: none;
     transition: transform 200ms ease-in-out;
@@ -522,9 +516,7 @@
     display: block;
     padding-top: 4px;
     padding-bottom: 3px;
-    -webkit-padding-start: 45px;
     padding-inline-start: 45px;
-    -webkit-padding-end: 0;
     padding-inline-end: 0;
     font-family: var(--text-font-family);
     font-size: 18px;

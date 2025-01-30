@@ -524,9 +524,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
      */
     constructor($selectable, eventHandlers) {
         super(eventHandlers);
-        this.currentdirid = M.currentrootid === mega.devices.rootId ?
-            M.currentCustomView.nodeID :
-            M.currentdirid;
+        this.currentdirid = M.currentdirid;
         this._boundEvents = [];
         this.init();
         this.$selectable = $selectable;
@@ -720,6 +718,13 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             var list = this.selected_list;
             if (list && !list.length) {
                 this.hideSelectionBar();
+
+                if (M.gallery && !window.pfcol && mega.gallery[M.currentdirid]) {
+                    mega.gallery[M.currentdirid].clearSelections();
+                }
+                else if (M.albums && mega.gallery.albums.grid && mega.gallery.albums.grid.timeline) {
+                    mega.gallery.albums.grid.timeline.clearSiblingSelections();
+                }
             }
         });
 
@@ -760,10 +765,6 @@ class SelectionManager2_DOM extends SelectionManager2Base {
                 const e = M.megaRender ? M.megaRender.getDOMNode(n) : document.getElementById(n);
                 if ((n = M.d[n])) {
                     selectionSize += n.t ? n.tb : n.s;
-                }
-                else if (M.dcd[n]) {
-                    n = M.dcd[n];
-                    selectionSize += n.tb || 0;
                 }
                 else if (M.dyh) {
                     selectionSize = 0;
@@ -845,6 +846,10 @@ class SelectionManager2_DOM extends SelectionManager2Base {
         }
 
         mega.ui.mInfoPanel.reRenderIfVisible($.selected);
+
+        if (M.gallery && mega.gallery[M.currentdirid]) {
+            mega.gallery[M.currentdirid].enableGroupChecks();
+        }
     }
 
     /**
@@ -862,7 +867,6 @@ class SelectionManager2_DOM extends SelectionManager2Base {
         ) {
             return false;
         }
-
         let itemsNum = this.selected_list.filter(h => h !== this.currentdirid).length;
 
         if (itemsNum === 0) {
@@ -935,7 +939,6 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             ? this.$selectionBar
             : $('.selection-status-bar');
 
-        let scrollBarYClass = '';
         const $selCountElm = $('.sel-notif-count-total', $selectionBar);
 
         if (notificationText) {
@@ -1073,8 +1076,8 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             const { dataset } = selectionLinkWrapper.querySelector('.selection-links-wrapper .delete');
             dataset.simpletip = M.getSelectedRemoveLabel($.selected);
 
-            if ((sourceRoot === M.RootID || sourceRoot === 's4' ||
-                M.isDynPage(sourceRoot) || sourceRoot === mega.devices.rootId) && !folderlink) {
+            if ((sourceRoot === M.RootID || sourceRoot === 's4'
+                 || M.isDynPage(sourceRoot)) && !folderlink) {
 
                 const cl = new mega.Share.ExportLink();
 
@@ -1127,36 +1130,6 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             else if (!folderlink && M.currentrootid !== 'shares' && M.currentdirid !== 'shares'
                 || M.currentrootid === 'shares' && M.currentdirid !== 'shares' && M.d[M.currentdirid].r === 2) {
                 __showBtn('delete');
-            }
-
-            if (M.dcd[selNode.h]) {
-                __hideButton('link');
-                __hideButton('share');
-                __hideButton('sendto');
-                __hideButton('download');
-                __hideButton('delete');
-            }
-
-            if (M.currentCustomView && M.currentCustomView.type === mega.devices.rootId && sharer(selNode.h)) {
-
-                const section = mega.devices.ui.getRenderSection();
-
-                if (section === 'device-centre-folders') {
-                    __hideButton('delete');
-                    __hideButton('link');
-                    __hideButton('share');
-                    __hideButton('sendto');
-                }
-                else if (section === 'cloud-drive') {
-                    if (selNode.t) {
-                        __hideButton('sendto');
-                    }
-                    if (M.getNodeRights(selNode.h) > 1) {
-                        __hideButton('link');
-                        __hideButton('share');
-                    }
-                }
-
             }
 
             if (M.currentdirid === 'file-requests') {

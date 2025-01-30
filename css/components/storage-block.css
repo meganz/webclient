@@ -1,0 +1,154 @@
+/* storage block migration */
+.storage-usage .storage-usage-panel {
+    padding: 12px 12px 0;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    box-sizing: border-box;
+}
+.storage-usage {
+    position: relative;
+    align-self: stretch;
+}
+.storage-usage .lp-storage-information-popup,
+.storage-usage .lp-storage-limit-popup {
+    position: absolute;
+    display: none;
+    bottom: 120%;
+    width: 80%;
+    max-width: 185px;
+    background-color: var(--surface-grey-1-inverted);
+    border-radius: 6px;
+    padding: 8px 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    color: var(--text-color-high-inverted);
+    z-index: 1;
+}
+
+body.ru .avatar-menu .storage-usage .lp-storage-information-popup {
+    bottom: auto;
+    top: 80%;
+}
+.storage-usage .lp-storage-limit-popup {
+    width: 205px;
+    max-width: unset;
+    bottom: 150%;
+    left: 93%;
+}
+.rtl .storage-usage .lp-storage-limit-popup {
+    left: 60%;
+}
+.storage-usage .lp-storage-information-popup::after,
+.storage-usage .lp-storage-limit-popup::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -11px;
+    margin: 0 auto;
+    width: 0;
+    height: 0;
+    border-top: 12px solid var(--surface-grey-1-inverted);
+    border-left: 15px solid transparent;
+    border-right: 15px solid transparent;
+}
+.rtl .storage-usage .lp-storage-limit-popup::after {
+    margin-right: 87%;
+}
+body.ru .avatar-menu .storage-usage .lp-storage-information-popup::after {
+    top: -11px;
+    transform: rotate(180deg);
+}
+
+.storage-usage .lp-storage-limit-popup::after {
+    bottom: auto;
+}
+.storage-usage .lp-storage-information-popup.hovered,
+.storage-usage .lp-storage-limit-popup.hovered {
+    display: flex;
+}
+.storage-usage .storage-usage-panel.hidden {
+    display: none;
+}
+.storage-usage .storage-usage-panel .title-block {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+.storage-usage .storage-usage-panel .title-block .text-and-tooltip {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+.storage-usage-panel .title-block .text-and-tooltip .storage-limit-icon {
+    width: 16px;
+    height: 18px;
+    margin-inline-start: 4px;
+    cursor: pointer;
+    color: var(--icon-rest);
+}
+.storage-usage .storage-usage-panel .title-block .plan,
+.storage-usage .storage-usage-panel .title-block .storage-txt {
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-caption-small-regular);
+    line-height: 18px;
+    white-space: nowrap;
+}
+.storage-usage .storage-usage-panel .storage-graph {
+    height: 6px;
+    background-color: var(--mobile-surface-3);
+    border-radius: 8px;
+    margin-bottom: 8px;
+    position: relative;
+    overflow: hidden;
+}
+.mega-top-menu .storage-usage .storage-usage-panel .storage-graph {
+    margin-bottom: 16px;
+}
+.storage-usage .storage-usage-panel .storage-graph span {
+    position: absolute;
+    background: var(--mobile-selection-control);
+    height: 6px;
+    left: 0;
+}
+.storage-usage.warning .storage-usage-panel .storage-graph span {
+    background: var(--secondary-orange);
+}
+.storage-usage.over .storage-usage-panel .storage-graph span {
+    background: var(--secondary-red);
+}
+.storage-usage-panel .info {
+    position: relative;
+    font: var(--text-body2);
+}
+.storage-usage-panel .info a.upgrade {
+    width: 100%;
+    justify-content: center;
+}
+.storage-usage-panel .info a.upgrade span {
+    font-weight: var(--mobile-font-weight-semibold);
+}
+.storage-usage-panel .loader.loading {
+    animation: rotate 2.5s infinite linear;
+    opacity: 1;
+}
+.storage-usage-panel .loader {
+    opacity: 0;
+    width: 12px;
+    height: 12px;
+    background-position: -6px -350px;
+}
+.storage-usage-panel .storage-txt {
+    color: var(--stroke-main-inverted);
+}
+.storage-usage-panel .storage-txt span {
+    font: inherit;
+}
+.storage-usage-panel .loader.loading + .storage-txt {
+    visibility: hidden;
+}

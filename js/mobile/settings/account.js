@@ -170,7 +170,7 @@ mobile.settings.account = Object.create(mobile.settingsHelper, {
 
             const userInfoContainer = mCreateElement('div', {}, [userName, userEmail]);
 
-            this.renderUpgradeButton(userInfoContainer);
+            MegaMobileTopMenu.renderUpgradeButton(userInfoContainer, 99836);
 
             const accountTop = mCreateElement('div', {class: 'account-information'},
                                               [avatarContainer, userInfoContainer]);
@@ -221,44 +221,6 @@ mobile.settings.account = Object.create(mobile.settingsHelper, {
             }
             return [accountTop, planContainer];
         },
-    },
-
-    renderUpgradeButton: {
-        value: function(userInfoContainer) {
-            'use strict';
-
-            let btn;
-
-            if (u_attr && !u_attr.pf && !u_attr.b) {
-                btn = new MegaLink({
-                    parentNode: userInfoContainer,
-                    href: 'pro',
-                    componentClassname: 'upgrade outline',
-                    text: l[433]
-                });
-            }
-
-            // If expired business master account show reactivate button
-            else if (u_attr && (u_attr.b && u_attr.b.m && u_attr.b.s !== pro.ACCOUNT_STATUS_ENABLED
-                || u_attr.pf && u_attr.pf.s !== pro.ACCOUNT_STATUS_ENABLED)) {
-
-                btn = new MegaLink({
-                    parentNode: userInfoContainer,
-                    href: 'repay',
-                    componentClassname: 'upgrade outline',
-                    text: l.mobile_account_reactivate
-                });
-            }
-
-            if (btn) {
-                btn.rebind('beforeRedirect', () => {
-                    if (this.overlayAccount) {
-                        mega.ui.overlay.hide();
-                    }
-                    eventlog(99836);
-                });
-            }
-        }
     },
 
     render: {

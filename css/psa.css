@@ -26,7 +26,6 @@
     display: flex;
     flex-direction: column;
     margin: auto;
-    -webkit-margin-start: 0;
     margin-inline-start: 0;
 	padding: 0 24px;
 }
@@ -58,7 +57,6 @@
 .psa-holder .anouncement img {
     height: 128px;
     width: 128px;
-    -webkit-margin-start: auto;
     margin-inline-start: auto;
 }
 
@@ -87,7 +85,6 @@
 /* Component attribute styles */
 
 .mobile .psa-holder .anouncement .message-text {
-    -webkit-padding-end: 8px;
     padding-inline-end: 8px;
     font: var(--mobile-font-caption-large-regular);
 }

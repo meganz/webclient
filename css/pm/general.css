@@ -1,11 +1,11 @@
 /* Important general classnames */
 
-.pm-main .favicon {
+.pm-main .password-list-page .favicon {
     width: 24px;
     height: 24px;
 }
 
-.pm-main .manual-favicon {
+.pm-main .password-list-page .manual-favicon {
     color: var(--favicon-text-color);
     border-radius: 4px;
     display: flex;
@@ -15,59 +15,59 @@
     background-color: var(--mobile-surface-3);
 }
 
-.pm-main .manual-favicon.color0 {
+.pm-main .password-list-page .manual-favicon.color0 {
     background-color: var(--mobile-indicator-yellow);
 }
 
-.pm-main .manual-favicon.color1 {
+.pm-main .password-list-page .manual-favicon.color1 {
     background-color: var(--mobile-indicator-blue);
 }
 
-.pm-main .manual-favicon.color2 {
+.pm-main .password-list-page .manual-favicon.color2 {
     background-color: var(--mobile-indicator-green);
 }
 
-.pm-main .favicon .favicon-brand img {
+.pm-main .password-list-page .favicon .favicon-brand img {
     width: 24px;
     height: 24px;
 }
 
-.pm-main h1 {
+.pm-main .password-list-page h1 {
     font: var(--mobile-font-heading-h1);
 }
 
-.pm-main h2 {
+.pm-main .password-list-page h2 {
     font: var(--mobile-font-heading-h2);
 }
 
-.pm-main h3 {
+.pm-main .password-list-page h3 {
     font: var(--mobile-font-heading-h3);
 }
 
-.pm-main span,
-.pm-main p {
+.pm-main .password-list-page span,
+.pm-main .password-list-page p {
     font: var(--mobile-font-caption-large-regular);
 }
 
-.pm-main a {
+.pm-main .password-list-page a {
     font: var(--mobile-font-link-large-regular);
     color: var(--mobile-link-primary);
 }
 
-.pm-main label {
+.pm-main .password-list-page label {
     font: var(--font-label-semibold);
 }
 
-.pm-main textarea {
+.pm-main .password-list-page textarea {
     resize: none;
     outline: none;
 }
 
-.pm-main input::placeholder {
+.pm-main .password-list-page input::placeholder {
     color: var(--mobile-text-placeholder);
 }
 
-.pm-main fieldset.fieldset {
+.pm-main .password-list-page fieldset.fieldset {
     border: none;
     padding: 0;
 }
@@ -75,16 +75,16 @@
 
 /* Skeleton loading */
 
-.pm-main .sk-loading {
+.pm-main .password-list-page .sk-loading {
     cursor: default !important;
 }
 
-.pm-main .sk-loading .sk-elm * {
+.pm-main .password-list-page .sk-loading .sk-elm * {
     display: none;
 }
 
-.pm-main .sk-loading i.sk-elm,
-.pm-main .sk-loading .sk-elm > * {
+.pm-main .password-list-page .sk-loading i.sk-elm,
+.pm-main .password-list-page .sk-loading .sk-elm > * {
     position: relative;
     overflow: hidden;
     inset: 0;
@@ -93,12 +93,12 @@
     animation: pm-shimmer 2s infinite linear;
     border-radius: 8px;
 }
-.pm-main .sk-loading .sk-elm::after {
+.pm-main .password-list-page .sk-loading .sk-elm::after {
     border-radius: 8px;
     display: block;
     content: "";
 }
-.pm-main .nav-elem.sk-loading .sk-elm::after {
+.pm-main .password-list-page .nav-elem.sk-loading .sk-elm::after {
     height: 0;
 }
 

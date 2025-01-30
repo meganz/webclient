@@ -190,7 +190,7 @@ button:not(.mega-button):not(.mega-component) .icon {
     text-overflow: ellipsis;
     overflow: hidden;
     position: relative;
-    text-align: left;
+    text-align: start;
     transition: all 200ms ease-in-out;
 }
 .link-button.lato {
@@ -350,13 +350,11 @@ button:not(.mega-button):not(.mega-component) .icon {
 .link-button.dropdown i {
     --icon-size: 24px;
     margin: 0;
-    -webkit-margin-end: 8px;
     margin-inline-end: 8px;
     transition: var(--transition-color);
 }
 .link-button.dropdown span + i {
     margin: 0;
-    -webkit-margin-start: 8px;
     margin-inline-start: 8px;
 }
 

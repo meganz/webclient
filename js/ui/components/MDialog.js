@@ -274,7 +274,7 @@ class MDialog extends MComponent {
         this.el.appendChild(footer);
 
         this._actionTitle = document.createElement('div');
-        this._actionTitle.className = 'flex flex-1';
+        this._actionTitle.className = 'flex-1';
         footerContainer.appendChild(this._actionTitle);
 
         if (this._cancel) {

@@ -14,7 +14,6 @@
     display: block;
     font: var(--text-h3);
     margin: 4px 0;
-    -webkit-margin-start: 6px;
     margin-inline-start: 6px;
     position: relative;
 }
@@ -168,7 +167,8 @@ i.medium-icon.business-sprite {
     font-size: 20px;
     line-height: 44px;
     position: relative;
-    font-family: var(--text-font-family-bold);
+    font-family: var(--text-font-family);
+    font-weight: bold;
     white-space: nowrap;
 }
 .business-price.montserat {
@@ -237,14 +237,16 @@ i.medium-icon.business-sprite {
     margin: 0;
 }
 .business-plan-info li strong {
-    font-family: var(--text-font-family-bold);
+    font-family: var(--text-font-family);
+    font-weight: bold;
     font-weight: normal;
 }
 .business-plan-info.strong {
     padding: 0;
 }
 .business-plan-info.strong li {
-    font-family: var(--text-font-family-bold);
+    font-family: var(--text-font-family);
+    font-weight: bold;
     font-size: 18px;
     line-height: 34px;
     padding: 0;
@@ -792,14 +794,12 @@ div.bottom-page.slider-controls {
 
 /* Compare MEGA with Goodle */
 .business-compare-data {
-    -webkit-padding-end: 40px;
     padding-inline-end: 40px;
     text-align: start;
 }
 .business-compare-result {
     font-size: 0;
     line-height: 0;
-    -webkit-margin-start: 12%;
     margin-inline-start: 12%;
     text-align: start;
 }
@@ -901,7 +901,6 @@ div.bottom-page.slider-controls {
     width: calc(50% - 12px);
 }
 .business-support .half-sized:nth-child(2n) {
-    -webkit-margin-start: 24px;
     margin-inline-start: 24px;
 }
 .business-support .error-message {

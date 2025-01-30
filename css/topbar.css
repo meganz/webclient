@@ -22,7 +22,6 @@
 
 .bottom-page .topbar .logo-wrapper button {
     margin: 0;
-    -webkit-margin-start: 20px;
     margin-inline-start: 20px;
 }
 
@@ -36,127 +35,6 @@
 }
 .topbar .fm-import-download-buttons {
     margin-left: 8px;
-}
-.topbar .searcher-wrapper {
-    flex-grow: 1;
-    display: flex;
-    justify-content: flex-start;
-    align-items: flex-end;
-    -webkit-margin-start: 12px;
-    margin-inline-start: 12px;
-}
-.topbar-searcher {
-    display: flex;
-    max-width: 800px;
-    width: 100%;
-    min-height: 40px;
-    position: relative;
-    z-index: 202;
-}
-.mega-lite-mode .topbar-searcher {
-    display: none;
-}
-.topbar-searcher form {
-    align-items: center;
-    display: flex;
-    justify-content: space-between;
-    height: 32px;
-    border-radius: 18px;
-    background: var(--surface-grey-6);
-}
-.topbar-searcher form:not(#mini-search-fake-form) {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 32px;
-    background: var(--surface-grey-6);
-    border-radius: 18px;
-    position: absolute;
-    margin: 8px 0;
-    z-index: 5;
-    width: 100%;
-}
-.topbar-searcher i {
-    --icon-size: 24px;
-    --mask-color: var(--icon-inactive);
-}
-
-.topbar-searcher i.search-icon {
-    -webkit-margin-start: 8px;
-    margin-inline-start: 8px;
-}
-.topbar-searcher input {
-    border: 0;
-    background-color: transparent;
-    padding: 6px 0;
-    margin: 0 16px;
-    box-sizing: border-box;
-    width: 100%;
-    color: var(--stroke-main-inverted);
-    font: var(--text-body1);
-}
-.topbar-searcher button {
-    cursor: pointer;
-    -webkit-margin-end: 4px;
-    margin-inline-end: 4px;
-    border: none;
-    outline: transparent;
-    background-color: transparent;
-}
-.topbar-searcher input::placeholder {
-    color: var(--stroke-main-inverted);
-    opacity: 0.3;
-}
-.topbar-searcher button i {
-    --icon-size: 16px;
-    --mask-color: var(--stroke-main-inverted);
-}
-.dropdown-search {
-    position: absolute;
-    width: calc(100% + 16px);
-    z-index: 4;
-    background: var(--stroke-main);
-    box-shadow: var(--dropdown-shadow);
-    padding-top: 56px;
-    border-radius: 18px;
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-    margin: 0 -8px;
-}
-.dropdown-search.persist {
-    display: flex !important;
-}
-.dropdown-search .dropdown-section {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 24px;
-    width: 100%;
-}
-.dropdown-search .dropdown-search-results .dropdown-search-results-item {
-    display: grid;
-    grid-template-columns: 1fr auto;
-}
-.dropdown-search .dropdown-search-results .dropdown-search-results-item-filename {
-    display: flex;
-    overflow: hidden;
-    margin-inline-start: 8px;
-}
-.dropdown-search .dropdown-search-results .dropdown-search-results-item-filename span {
-    white-space: pre;
-    opacity: 0.7;
-}
-.dropdown-search .dropdown-search-results .dropdown-search-results-item-filename .suffix {
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-.dropdown-search .dropdown-search-results .dropdown-search-results-item-filename .txt-bold {
-    opacity: 1;
-}
-.dropdown-search-results-item-file-icon {
-    text-align: start;
-    --icon-size: 24px;
 }
 .dropdown-section .dropdown-section-clear {
     color: var(--stroke-info)
@@ -197,7 +75,6 @@
     height: 48px;
     gap: 8px;
     padding: 2px 16px;
-    -webkit-padding-start: 20px;
     padding-inline-start: 20px;
 }
 .dropdown-section-body .dropdown-section-body-item:hover {
@@ -247,7 +124,6 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    -webkit-margin-start: 8px;
     margin-inline-start: 8px;
 }
 .dropdown-item-text-medium {
@@ -312,7 +188,6 @@ to {
 /* mini search */
 
 .topbar .mini-search {
-    -webkit-margin-end: 16px;
     margin-inline-end: 16px;
     overflow: hidden;
     position: relative;
@@ -469,19 +344,16 @@ to {
     border: none;
     outline: transparent;
     margin: 0;
-    -webkit-margin-end: 20px;
     margin-inline-end: 20px;
     padding: 4px;
     transition: margin 0.2s ease-in-out;
 }
 
 .topbar .btn-icon:last-child {
-    -webkit-margin-end: 0;
     margin-inline-end: 0;
 }
 
 .topbar .btn-icon.menu-open {
-    -webkit-margin-start: 220px;
     margin-inline-start: 220px;
 }
 .topbar-links .btn-icon i,
@@ -510,7 +382,6 @@ to {
     content: '';
     height: calc(100% - 8px);
     margin: 0;
-    -webkit-margin-end: 20px;
     margin-inline-end: 20px;
     width: 1px;
 }
@@ -535,7 +406,6 @@ to {
 
 .topbar .btn-icon .activity-status-block {
     margin: 0;
-    -webkit-margin-start: 15px;
     margin-inline-start: 15px;
     position: absolute;
     top: 1px;
@@ -634,7 +504,6 @@ to {
 }
 .topbar .account-dialog .account-info {
     flex-grow: 1;
-    -webkit-margin-start: 16px;
     margin-inline-start: 16px;
     display: flex;
     flex-direction: column;
@@ -723,14 +592,12 @@ to {
 }
 .topbar .account-dialog ul.links li button > i {
     --icon-size: 16px;
-     -webkit-margin-end: 8px;
     margin-inline-end: 8px;
     transition: var(--transition-color);
 }
 .topbar .account-dialog ul.links li button > span + i {
     --icon-size: 16px;
     margin: 0;
-     -webkit-margin-start: 8px;
     margin-inline-start: 8px;
 }
 .topbar .account-dialog ul.links li button.feedback.highlight {
@@ -772,17 +639,17 @@ to {
     background-color: var(--divider-color);
 }
 .topbar .notification-popup .fm-notifications-bottom {
-    padding: 12px 20px 16px;
-    justify-content: flex-end;
     border-top: 1px solid var(--divider-color);
+    justify-content: flex-end;
+    padding: 12px 20px 16px
 }
 .topbar .top-warning-popup .fm-notifications-bottom {
     border-top: none;
-    padding: 24px 0 0;
     justify-content: flex-end;
+    padding: 24px 0 0
 }
 .topbar .notification-popup .notification-txt {
-    background: none;
+    background: none
 }
 .topbar .dropdown.top-login-popup {
     position: absolute;
@@ -800,9 +667,7 @@ to {
     width: 24px;
     height: 24px;
     padding: 0;
-    -webkit-margin-end: 14px;
     margin-inline-end: 14px;
-    -webkit-margin-start: 6px;
     margin-inline-start: 6px;
     position: relative;
     top: -6px;
@@ -823,7 +688,6 @@ to {
 .top-change-language-name {
     color: var(--text-color-high);
     font: var(--text-body1-bold);
-    -webkit-padding-start: 4px;
     padding-inline-start: 4px;
 
     /* stylelint-disable-next-line property-disallowed-list */
@@ -840,13 +704,11 @@ to {
 }
 
 .top-buttons button:not(.hidden) + button {
-    -webkit-margin-start: 12px;
     margin-inline-start: 12px;
 }
 
 .top-head .top-buttons {
     display: flex;
-    -webkit-margin-end: 16px;
     margin-inline-end: 16px;
 }
 

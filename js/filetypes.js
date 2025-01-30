@@ -31,7 +31,6 @@ var extensions = {
             }),
         l[20240] || 'RAW Image'
     ],
-    'sketch': [['sketch'], 'Sketch'],
     'spreadsheet': [['ods', 'ots', 'gsheet', 'nb', 'xlr'], 'Spreadsheet'],
     'torrent': [['torrent'], 'Torrent'],
     'text': [['txt', 'ans', 'ascii', 'log', 'wpd', 'json', 'md', 'org'], 'Text', 'pages'],
@@ -632,10 +631,6 @@ function filetype(n, getFullType, ik) {
         return ext[fext][1];
     }
 
-    if (M.currentrootid === mega.devices.rootId && typeof n === 'object' && n.typeText) {
-        return n.typeText;
-    }
-
     return fext.length ? l[20366].replace('%1', fext.toUpperCase()) : l[18055];
 }
 
@@ -652,7 +647,7 @@ function deviceIcon(name, type) {
         'Android': 'mobile-android',
         'iPhone': 'mobile-ios',
         'Apple': 'pc-mac',
-        'Windows': 'pc-win',
+        'Windows': 'pc-windows',
         'Linux': 'pc-linux'
     });
 
@@ -713,9 +708,21 @@ function folderIcon(node, root) {
         return `${folderIcon}folder-public`;
     }
 
-    // Device of device folder
-    if (M.dcd[node.h] || node.isDeviceFolder) {
-        return node.icon;
+    // Backups
+    if (root === M.InboxID) {
+
+        // Backed up device icon
+        if (node.devid) {
+
+            // Get OS icon
+            return deviceIcon(node.name);
+        }
+        // Backed up external device icon
+        if (node.drvid) {
+
+            // Ignore rubbish bin suffix
+            return 'ex-device';
+        }
     }
 
     return `${folderIcon}folder`;
@@ -741,7 +748,7 @@ function fileIcon(node) {
         rubPrefix = 'rubbish-';
     }
 
-    if (node.t || M.dcd[node.h] || node.isDeviceFolder) {
+    if (node.t) {
         return folderIcon(node, root);
     }
     else if ((icon = ext[fileext(node.name, 0, 1)]) && icon[0] !== 'mega') {

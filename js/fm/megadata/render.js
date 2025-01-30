@@ -421,10 +421,8 @@ MegaData.prototype.renderChatIsLoading = function() {
     $('.fm-right-account-block').addClass('hidden');
 
     $('.shared-grid-view,.shared-blocks-view').addClass('hidden');
-    $('.fm-right-files-block, .fm-left-panel').addClass('hidden');
 
-    mega.devices.ui.$gridWrapper.addClass('hidden');
-    mega.devices.ui.header.$el.addClass('hidden');
+    $('.fm-right-files-block, .fm-left-panel').addClass('hidden');
 
     $('.section.conversations').removeClass('hidden');
     $('.section.conversations .fm-chat-is-loading').removeClass('hidden');

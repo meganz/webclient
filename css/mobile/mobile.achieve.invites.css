@@ -43,12 +43,10 @@
 .mega-sheet .how-it-works-contents ul {
     padding: 10px 0;
     padding-inline-start: 23px;
-    -webkit-padding-start: 23px;
     list-style-type: disc;
 }
 
 .mega-sheet .how-it-works-contents li {
     list-style: outside;
     padding-inline-start: 1px;
-    -webkit-padding-start: 1px;
 }

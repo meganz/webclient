@@ -88,8 +88,8 @@
 .chat-lp-body {
 
     /* Temporary fix - l-pane full height over topbar */
-    height: calc(100% + 48px);
-    margin: -48px 0 0 0;
+    height: calc(100% + 65px);
+    margin: -65px 0 0;
 }
 .chat-lp-scroll-area {
     flex: 1;
@@ -105,7 +105,7 @@
     align-content: flex-start;
     width: 100%;
     height: 100%;
-    background-color: var(--stroke-grey-2);
+    background-color: var(--mobile-surface-1);
 }
 .content-panel.conversations span.empty-conversations {
     overflow: hidden;
@@ -113,7 +113,6 @@
     margin-top: 5px;
     margin-bottom: 5px;
     margin-inline-start: 40px;
-    -webkit-margin-start: 40px;
     padding: 0 0 4px;
     width: calc(100% - 46px);
     font: var(--text-body2);
@@ -152,7 +151,6 @@
     margin-top: 4px;
     margin-bottom: 4px;
     margin-inline-end: 10px;
-    -webkit-margin-end: 10px;
     border-radius: 4px;
 }
 .rtl .conversations-pane .conversation-avatar {
@@ -190,7 +188,6 @@
     width: 100%;
     margin-bottom: 2px;
     margin-inline-end: 4px;
-    -webkit-margin-end: 4px;
 }
 .conversations-pane .upcoming-conversation .conversation-data-top {
     justify-content: space-between;
@@ -202,7 +199,6 @@
 }
 .conversation-data-top .conversation-data-name.badge-pad {
     margin-inline-end: 4px;
-    -webkit-margin-end: 4px;
 }
 .conversation-data-top .conversation-data-badges {
     flex: 0 1;
@@ -213,12 +209,10 @@
     align-self: flex-end;
     flex: 1 0;
     margin-inline-start: 4px;
-    -webkit-margin-start: 4px;
 }
 .conversation-data-badges .user-card-presence {
     margin: 7px 0 5px;
     margin-inline-end: 4px;
-    -webkit-margin-end: 4px;
 }
 .conversation-data-badges .icon-ekr-key {
     width: 12px;
@@ -259,7 +253,8 @@
     width: 20px;
 }
 .conversation-message.unread {
-    font-family: var(--text-font-family-semibold);
+    font-family: var(--text-font-family);
+    font-weight: 600;
     color: var(--text-color-high);
 }
 .conversations-separator {
@@ -278,7 +273,6 @@
     font: var(--text-body2);
     text-align: end;
     padding-inline-end: 2px;
-    -webkit-padding-end: 2px;
 }
 .conversations-pane li.active {
     background-color: var(--stroke-grey-1);
@@ -487,7 +481,7 @@ li.active .call-duration i {
     flex-direction: column;
     box-sizing: border-box;
     z-index: 130;
-    background: var(--surface-grey-2);
+    background: var(--mobile-surface-1);
 }
 
 .search-panel.expanded {
@@ -614,7 +608,7 @@ li.active .call-duration i {
 
 .search-field input {
     color: var(--text-color-medium);
-    background: var(--surface-grey-1);
+    background: var(--surface-grey-6);
     border: 0 none;
     border-radius: 18px;
     box-sizing: border-box;
@@ -623,9 +617,7 @@ li.active .call-duration i {
     padding-top: 4px;
     padding-bottom: 4px;
     padding-inline-start: 40px;
-    -webkit-padding-start: 40px;
     padding-inline-end: 30px;
-    -webkit-padding-end: 30px;
     width: 100%;
 }
 .search-field input::-webkit-input-placeholder { color: var(--text-color-low); }
@@ -636,9 +628,7 @@ li.active .call-duration i {
     position: relative;
     margin-top: 4px;
     margin-inline-start: 7px;
-    -webkit-margin-start: 7px;
     margin-inline-end: 8px;
-    -webkit-margin-end: 8px;
     padding: 4px 30px;
     border-radius: 4px;
     font: var(--text-body1-bold);
@@ -933,7 +923,7 @@ li.active .call-duration i {
  * ------------------------------------------------------------------------------------------------------------------ */
 
 .contacts-panel {
-    background: var(--surface-main);
+    background: var(--mobile-page-background);
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
@@ -1004,7 +994,6 @@ li.active .call-duration i {
 .contacts-actions {
     margin-top: 10px;
     margin-inline-end: 20px;
-    -webkit-margin-end: 20px;
     text-align: right;
 }
 .rtl .contacts-actions {
@@ -1074,7 +1063,6 @@ li.active .call-duration i {
     width: 100%;
 }
 .contacts-table thead th.verification span {
-    -webkit-padding-start: 16px;
     padding-inline-start: 16px;
 }
 .contacts-table thead th span i {
@@ -1112,7 +1100,6 @@ td.verification .contact-item {
     --icon-size: 24px;
     margin-top: -3px;
     margin-inline-end: 7px;
-    -webkit-margin-end: 7px;
     --mask-color: var(--icon-rest);
 }
 .rtl .contacts-table .contact-item-time i {
@@ -1172,7 +1159,7 @@ td.verification .contact-item {
     padding-bottom: 3px;
     box-shadow: 0 1px 0 0 var(--stroke-grey-2);
     z-index: 1;
-    background: var(--surface-main);
+    background: var(--mobile-page-background);
 }
 
 .rtl .contacts-table thead th:last-child {
@@ -1251,7 +1238,6 @@ td.verification .contact-item {
 .contacts-table th {
     padding: 0;
     padding-inline-start: 8px;
-    -webkit-padding-start: 8px;
     justify-content: space-between;
     align-items: center;
     box-sizing: border-box;
@@ -1267,7 +1253,6 @@ td.verification .contact-item {
 .contacts-table th i {
     float: right;
     padding-inline-end: 5px;
-    -webkit-padding-end: 5px;
     --mask-color: var(--icon-rest);
 }
 
@@ -1309,7 +1294,6 @@ td.verification .contact-item {
 .contacts-table .user-card-presence {
     margin-bottom: 1px;
     margin-inline-end: 8px;
-    -webkit-margin-end: 8px;
 }
 
 .contacts-content {
@@ -1404,7 +1388,6 @@ td.verification .contact-item {
     position: relative;
     float: left;
     margin-inline-end: 25px;
-    -webkit-margin-end: 25px;
 }
 .rtl .profile-head .profile-photo {
     float: right;
@@ -1446,7 +1429,6 @@ td.verification .contact-item {
 .profile-head .profile-controls button:hover,
 .profile-head .profile-controls button:focus {
     margin-inline-end: 15px;
-    -webkit-margin-end: 15px;
     background: linear-gradient(180deg, rgba(86, 210, 241, 1) 0%, rgba(43, 166, 222, 1) 100%);
 }
 
@@ -1659,7 +1641,6 @@ td.verification .contact-item {
     margin: 0 auto;
     padding-bottom: 3px;
     padding-inline-start: 32px;
-    -webkit-padding-start: 32px;
 }
 .profile-shared-folders table.shared-with-me td.fav {
     width: 75px;
@@ -1669,7 +1650,6 @@ td.verification .contact-item {
     float: right;
     width: 100px;
     margin-inline-end: 20px;
-    -webkit-margin-end: 20px;
     text-align: end;
 }
 .rtl .profile-shared-folders table.shared-with-me td.grid-url-header-nw {
@@ -1961,7 +1941,6 @@ body.theme-dark .conversationsApp .conversations-empty .chat-tile-img.empty-meet
     margin-top: 16px;
     margin-inline-end: 0;
     padding: 4px 6px;
-    -webkit-margin-end: 0;
 }
 .conversationsApp .conversations-empty-tile .tile-content button.action i {
     margin-right: 8px;

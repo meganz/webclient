@@ -19,8 +19,12 @@ var alarm = {
      */
     handler: function() {
         'use strict';
-        const holderId = is_fm() && page !== 'start' ? 'fmholder' : 'startholder';
-        const holder = document.getElementById(holderId);
+
+        if (is_fm() && page !== 'start') {
+            return document.getElementById('old-header-account-states-popups');
+        }
+
+        const holder = document.getElementById('startholder');
         return holder && holder.querySelector('.js-topbar');
     },
 

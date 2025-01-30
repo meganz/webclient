@@ -53,9 +53,6 @@
 .affiliate-program .fm-left-panel {
     display: none;
 }
-.affiliate-program .nw-fm-left-icons-panel {
-    border-right: 2px solid var(--stroke-grey-1);
-}
 .fm-affiliate .breadcrumbs {
     --mask-color: var(--text-color-medium);
     align-items: center;
@@ -63,7 +60,7 @@
     display: flex;
     min-height: 48px;
     padding: 8px 24px;
-    background: var(--surface-main);
+    background: var(--mobile-page-background);
 }
 .fm-affiliate .breadcrumbs .item {
     color: var(--text-color-medium);
@@ -89,7 +86,7 @@
     transform: rotate(180deg);
 }
 .fm-affiliate.body {
-    background-color: var(--stroke-grey-1);
+    background-color: var(--mobile-page-background);
     display: none;
     height: calc(100% - 48px);
     overflow: hidden;
@@ -353,7 +350,6 @@
     font: var(--text-body2);
     overflow-wrap: break-word;
     padding: 6px 0;
-    -webkit-padding-end: 12px;
     padding-inline-end: 12px;
     vertical-align: top;
     width: 55%;

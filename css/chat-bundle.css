@@ -996,7 +996,6 @@
 }
 .dropdown.body.button-group-menu div.button div {
   margin-inline-end: 8px;
-  -webkit-margin-end: 8px;
 }
 .dropdown.body.button-group-menu div.button span {
   margin: auto 0;
@@ -1121,7 +1120,6 @@ body div:has(+ div.dropdown.body.button-group-menu:hover) .float-video .video-no
 .chat-toast-bar .chat-toast.chat-toast-wrapper i {
   --icon-size: 24px;
   margin-inline-end: 12px;
-  -webkit-margin-start: 12px;
 }
 .chat-toast-bar .chat-toast.chat-toast-wrapper .toast-value {
   color: var(--text-color-high);
@@ -1176,7 +1174,7 @@ body div:has(+ div.dropdown.body.button-group-menu:hover) .float-video .video-no
   padding-right: 10px;
   animation: fadeInAnimation 350ms ease-out;
   z-index: 130;
-  background: var(--surface-grey-2);
+  background: var(--mobile-surface-1);
 }
 @keyframes fadeInAnimation {
   from {
@@ -1267,7 +1265,7 @@ body div:has(+ div.dropdown.body.button-group-menu:hover) .float-video .video-no
   padding: 6px;
   box-sizing: border-box;
   z-index: 10;
-  background: var(--surface-grey-2);
+  background: var(--mobile-surface-1);
 }
 .lhp-container .lhp-bottom-control {
   display: flex;
@@ -1276,10 +1274,10 @@ body div:has(+ div.dropdown.body.button-group-menu:hover) .float-video .video-no
   padding: 6px 0;
   border-radius: 4px;
   cursor: pointer;
-  background: var(--surface-grey-2);
+  background: var(--mobile-surface-1);
 }
 .lhp-container .lhp-bottom-control:hover {
-  background-color: var(--stroke-main);
+  background-color: var(--mobile-surface-2);
   box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.1);
 }
 .lhp-container .lhp-bottom-control i {
@@ -1398,7 +1396,7 @@ body.theme-dark .lhp-container .lhp-filter-tag {
   align-content: flex-start;
   width: 100%;
   height: 100%;
-  background-color: var(--stroke-grey-2);
+  background-color: var(--mobile-surface-1);
   max-height: calc(100% - 60px);
 }
 .lhp-container .lhp-meetings--content.is-upcoming {
@@ -1528,7 +1526,6 @@ body.theme-dark .lhp-container .lhp-filter-tag {
 }
 .invite-panel .content div.content-block .button.flat-button i {
   margin-inline-end: 12px;
-  -webkit-margin-end: 12px;
   --icon-size: 24px;
   --mask-color: var(--icon-active);
 }
@@ -1713,7 +1710,6 @@ body.theme-dark .lhp-container .lhp-filter-tag {
 }
 .meetings-call .stream .participants-notice.user-alone .notice-footer button {
   margin-inline-start: 10px;
-  -webkit-margin-start: 10px;
 }
 .meetings-call .stream .participants-notice-heading {
   padding: 12px 48px;
@@ -2340,7 +2336,6 @@ body.theme-dark .lhp-container .lhp-filter-tag {
   font: var(--text-body1-bold);
   padding: 0;
   margin-inline-start: 4px;
-  -webkit-margin-start: 4px;
 }
 .meetings-call .sidebar-controls {
   display: flex;
@@ -2953,7 +2948,6 @@ body.theme-dark .lhp-container .lhp-filter-tag {
   margin-top: 0;
   margin-bottom: 0;
   margin-inline-start: 5px;
-  -webkit-margin-start: 5px;
   color: var(--text-color-high);
 }
 .meetings-call .sidebar-wrapper .sidebar-head button {
@@ -3003,7 +2997,6 @@ body.theme-dark .lhp-container .lhp-filter-tag {
   cursor: pointer;
   float: right;
   margin-inline-start: 24px;
-  -webkit-margin-start: 24px;
 }
 .rtl .meetings-call .call-time-limit-banner .call-limit-banner-action {
   float: left;
@@ -4048,7 +4041,8 @@ body.theme-dark .start-meeting-preview .preview-meeting {
 }
 .meetings-alert-control a {
   color: var(--secondary-white);
-  font-family: var(--text-font-family-semibold);
+  font-family: var(--text-font-family);
+  font-weight: 600;
   text-decoration: underline;
 }
 .meetings-alert-close {

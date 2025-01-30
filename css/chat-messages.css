@@ -1,6 +1,6 @@
 .chat-topic-block {
     align-items: center;
-    background-color: var(--stroke-main);
+    background-color: var(--mobile-page-background);
     box-sizing: content-box;
     display: flex;
     padding: 0 20px 0 12px;
@@ -98,7 +98,7 @@
 }
 
 .messages-block {
-    --messages-block-bg: var(--stroke-main);
+    --messages-block-bg: var(--mobile-page-background);
     overflow: hidden;
     height: calc(100% - 49px);
     position: relative;
@@ -204,7 +204,6 @@
     margin: 0;
     padding-top: 24px;
     padding-inline-start: 48px;
-    -webkit-padding-start: 48px;
     font: var(--text-body1);
 }
 .messages.notification .info p i {
@@ -231,7 +230,6 @@
 }
 .message.content-area {
     margin-inline-start: 48px;
-    -webkit-margin-start: 48px;
     font-size: 0;
     line-height: 0;
     color: #666666;
@@ -272,7 +270,6 @@
     font: var(--text-body1);
     color: var(--text-color-higher);
     margin-inline-end: 30px;
-    -webkit-margin-end: 30px;
     word-wrap: break-word;
     min-height: 20px;
     position: relative;
@@ -334,13 +331,13 @@
     height: 14px;
 }
 .message .call-info-content .bold {
-    font-family: var(--text-font-family-semibold);
+    font-family: var(--text-font-family);
+    font-weight: 600;
 }
 .message i.call-info-icon {
     display: block;
     float: left;
     margin-inline-end: 20px;
-    -webkit-margin-end: 20px;
     --icon-size: 32px;
     --mask-color: var(--icon-rest);
 }
@@ -409,7 +406,6 @@
     max-width: calc(100% - 60px);
     height: 19px;
     padding-inline-end: 10px;
-    -webkit-padding-end: 10px;
     font: var(--text-body1-bold);
     vertical-align: top;
     color: var(--text-color-high);
@@ -424,7 +420,6 @@
     padding-top: 47px;
     padding-bottom: 9px;
     padding-inline-start: 71px;
-    -webkit-padding-start: 71px;
 }
 .message.shared-block {
     position: relative;
@@ -464,7 +459,6 @@
     text-overflow: ellipsis;
     overflow: hidden;
     padding-inline-end: 70px;
-    -webkit-padding-end: 70px;
     box-sizing: border-box;
     max-width: 100%;
 }
@@ -475,7 +469,6 @@
 .message.data-title .file-name {
     color: var(--text-color-high);
     padding-inline-start: 5px;
-    -webkit-padding-start: 5px;
 }
 .message.data-title.red {
     color: var(--text-color-error);
@@ -484,7 +477,6 @@
     display: inline-block;
     margin-top: 3px;
     margin-inline-start: -60px;
-    -webkit-margin-start: -60px;
     vertical-align: top;
     font: var(--text-body2);
     color: var(--text-color-low);
@@ -532,8 +524,6 @@
 .message.circuit-label {
     display: block;
     font-size: 12px;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
     border-radius: 4px;
     line-height: 30px;
     border: 1px solid white;
@@ -631,7 +621,6 @@
 }
 .message.content-area .buttons-block button:not(:last-of-type) {
     margin-inline-end: 8px;
-    -webkit-margin-end: 8px;
 }
 
 .shared-link.thumb.video.no-thumb img {
@@ -714,8 +703,6 @@
     height: 100%;
     left: 0;
     top: 0;
-    -moz-border-radius: inherit;
-    -webkit-border-radius: inherit;
     border-radius: inherit;
 }
 
@@ -803,7 +790,6 @@
 .message.richpreview.url-favicon {
     margin-top: 2px;
     padding-inline-end: 8px;
-    -webkit-padding-end: 8px;
     float: left;
 }
 .rtl .message.richpreview.url-favicon {
@@ -1118,7 +1104,8 @@ body.theme-dark .message .audio-player {
 }
 .reactions-bar > div > span.message.text-block {
     height: 11px;
-    font-family: var(--text-font-family-black);
+    font-family: var(--text-font-family);
+    font-weight: 900;
     font-size: 9px;
     color: var(--text-color-medium);
 }
@@ -1323,7 +1310,6 @@ body.theme-dark .message .audio-player {
     flex: 0 0 52px;
     height: 52px;
     margin-inline-end: 24px;
-    -webkit-margin-end: 24px;
     text-align: center;
 }
 

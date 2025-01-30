@@ -47,12 +47,10 @@
     float: right;
 }
 .cookie-dialog .bottom-buttons button {
-    -webkit-margin-start: 8px;
     margin-inline-start: 8px;
 }
 .cookie-dialog .bottom-buttons button.left {
     margin: 0;
-    -webkit-margin-end: 8px;
     margin-inline-end: 8px;
 }
 
@@ -161,7 +159,8 @@
 }
 .cookie-dialog .settings-header {
     color: var(--text-color-high);
-    font-family: var(--text-font-family-semibold);
+    font-family: var(--text-font-family);
+    font-weight: 600;
     font-size: 15px;
     line-height: 22px;
 }
@@ -187,7 +186,8 @@
     color: var(--text-color-high);
     display: none;
     font-size: 14px;
-    font-family: var(--text-font-family-semibold);
+    font-family: var(--text-font-family);
+    font-weight: 600;
     line-height: 17px;
     min-width: 82px;
     padding: 2px 10px 10px;
@@ -206,9 +206,9 @@
 .cookie-dialog a.settings-link {
     color: var(--text-color-medium);
     margin: 10px 0 0;
-    -webkit-margin-end: 25px;
     margin-inline-end: 25px;
-    font-family: var(--text-font-family-semibold);
+    font-family: var(--text-font-family);
+    font-weight: 600;
 }
 .cookie-dialog a.settings-link:visited {
     color: var(--text-color-medium);
@@ -218,7 +218,6 @@
     margin-right: 25px;
 }
 .cookie-dialog a.settings-link:last-child {
-    -webkit-margin-end: 0;
     margin-inline-end: 0;
 }
 .cookie-dialog .tabs {
@@ -240,7 +239,8 @@
 .cookie-dialog .settings-tab.active {
     border-bottom: 2px solid var(--stroke-success);
     color: var(--text-color-success);
-    font-family: var(--text-font-family-semibold);
+    font-family: var(--text-font-family);
+    font-weight: 600;
 }
 
 /* Visible Saved settings */
@@ -336,7 +336,6 @@
     padding: 0;
 }
 .mobile .cookie-dialog .settings-cell + * {
-    -webkit-padding-start: 8px;
     padding-inline-start: 8px;
 }
 .mobile .cookie-dialog .settings-header {
@@ -420,7 +419,8 @@
     /* Cookie dialog. Step 1. */
     .cookie-dialog .header,
     .cookie-dialog .header.medium {
-        font-family: var(--text-font-family-semibold);
+        font-family: var(--text-font-family);
+        font-weight: 600;
         font-size: 17px;
     }
     .cookie-dialog .common-info {

@@ -354,7 +354,7 @@ var mobile = {
 
         const tf = [
             "renderTree", "buildtree", "initTreePanelSorting",
-            "treePanelType", "addTreeUI", "addTreeUIDelayed", "onTreeUIExpand", "onTreeUIOpen",
+            "addTreeUI", "addTreeUIDelayed", "onTreeUIExpand", "onTreeUIOpen",
             "treeSortUI", "treeFilterUI"
         ];
 
@@ -1285,7 +1285,7 @@ mega.gallery = {
     sections: {},
     secKeys: {},
     showEmpty: nop,
-    updateButtonsStates: nop,
+    updateMediaPath: nop,
     removeDbActionCache: nop,
     handleNodeUpdate: nop,
     handleNodeRemoval: nop,

@@ -110,8 +110,6 @@ a, a:link, a:visited, a:hover, a:active {
     float: left;
     width: auto;
     border: 2px solid #d9d9d9;
-    -moz-border-radius: 8px;
-    -webkit-border-radius: 8px;
     border-radius: 8px;
     margin-right: 10px;
     margin-top: 10px;
@@ -123,8 +121,6 @@ a, a:link, a:visited, a:hover, a:active {
     background-image: url('https://eu.static.mega.co.nz/3/images/mega/browsers-page-v3.png');
     background-repeat: no-repeat;
     position: relative;
-    -moz-border-radius: 8px;
-    -webkit-border-radius: 8px;
     border-radius: 8px;
     overflow: hidden;
 }
@@ -166,8 +162,6 @@ span.browsers-update {
     display: block;
     background-color: #D22400;
     color: white;
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
     border-radius: 5px;
     display: none;
 }
@@ -195,8 +189,6 @@ span.browsers-update {
     display: block;
     background-color: #7BB328;
     color: white;
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
     border-radius: 5px;
 }
 .browsers-recommendations.supported {

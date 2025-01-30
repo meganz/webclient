@@ -1,8 +1,6 @@
 /* For the wrapper and filter chips */
 .fm-filter-chips-wrapper {
     margin-inline: 20px;
-    -webkit-margin-start: 20px;
-    -webkit-margin-end: 20px;
     min-height: 36px;
     display: flex;
 }
@@ -23,6 +21,8 @@
     color: var(--text-color-info);
     align-items: center;
     cursor: pointer;
+    background: none;
+    border: none;
 }
 .fm-filter-chips .fm-filter-chip-button {
     display: flex;
@@ -31,11 +31,12 @@
     gap: 4px;
     height: 24px;
     padding-inline: 12px;
-    -webkit-padding-start: 12px;
-    -webkit-padding-end: 12px;
     border-radius: 12px;
     background: var(--surface-grey-2);
     cursor: pointer;
+    border: none;
+    outline: none;
+    color: var(--text-color-high);
 }
 .fm-filter-chips .fm-filter-chip-button .fm-filter-chip-button-text {
     color: var(--stroke-main-inverted);
@@ -58,9 +59,6 @@
 .m-dropdown-item.hide-radio-on:focus,
 .m-dropdown-item.hide-radio-on:active img {
     --mask-color: var(--icon-rest);
-}
-.m-dropdown-item.hide-radio-on > div {
-    align-items: center;
 }
 .m-dropdown-item.hide-radio-on.selected {
     background: var(--surface-grey-2);
@@ -119,8 +117,4 @@ span.hidden-as-sensitive,
 span.hidden-as-sensitive + ul,
 tr.hidden-as-sensitive {
     display: none !important;
-}
-.m-dropdown-item.hide-radio-on .dropdown-inline-tooltip {
-    margin-left: 4px;
-    margin-right: 4px;
 }

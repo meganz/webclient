@@ -1,7 +1,7 @@
 class MTabs extends MComponent {
     buildElement() {
         this.el = document.createElement('div');
-        this.el.className = 'm-tabs flex items-center justify-center';
+        this.el.className = 'm-tabs flex flex-row items-center';
     }
 
     /**
@@ -15,7 +15,10 @@ class MTabs extends MComponent {
         this._activeTab = index;
 
         for (let i = 0; i < this._tabs.length; i++) {
-            this._tabs[i].el.classList[i === index ? 'add' : 'remove']('active');
+            const tab = this._tabs[i];
+            const classes = ['active', ...(tab.activeClasses && tab.activeClasses.split(' ') || [])];
+
+            tab.el.classList[i === index ? 'add' : 'remove'](...classes);
         }
     }
 
@@ -28,9 +31,9 @@ class MTabs extends MComponent {
         this.resetTabs();
 
         for (let i = 0; i < tabs.length; i++) {
-            const { label, click } = tabs[i];
+            const { label, click, classes, activeClasses } = tabs[i];
 
-            const tab = new MTab(label, click);
+            const tab = new MTab(label, click, classes, activeClasses);
 
             this._tabs.push(tab);
             this.el.appendChild(tab.el);

@@ -8,7 +8,7 @@
     height: 100%;
     text-align: center;
     flex-grow: 1;
-    background: var(--surface-grey-1);
+    background: var(--mobile-page-background);
     transition: 200ms linear;
 }
 .fm-empty-pad {
@@ -91,7 +91,7 @@
     font: var(--text-body1);
     color: var(--text-color-medium);
     max-width: 192px;
-    margin: 72px 30px 0;
+    margin: 32px 30px 0;
 }
 .fm-empty-options .fm-empty-options-item i {
     --icon-size: 48px;
@@ -136,7 +136,6 @@
     --icon-size: 24px;
     --mask-color: var(--secondary-blue);
     display: inline-block;
-    -webkit-margin-end: 8px;
     margin-inline-end: 8px;
     vertical-align: middle;
 }
@@ -147,51 +146,9 @@
 /* file-request */
 .fm-empty-file-requests .fm-empty-description {
     max-width: 511px;
-    font-family: var(--text-font-family-semibold);
+    font-family: var(--text-font-family);
+    font-weight: 600;
 }
 .fm-empty-file-requests .fm-empty-options-item {
     margin-top: 6px;
-}
-
-/* device-list */
-.fm-empty-device-list .fm-empty-description {
-    max-width: 560px;
-    margin: 0 auto;
-}
-
-.fm-empty-device-list a {
-    color: var(--secondary-blue);
-    text-decoration: underline;
-    cursor: pointer;
-}
-
-.fm-empty-device-list .fm-app-links {
-    display: flex;
-    justify-content: center;
-}
-
-.fm-empty-device-list .fm-mega-app-link-container {
-    display: flex;
-    flex-direction: column;
-    width: min-content;
-}
-
-.fm-empty-device-list .fm-mega-app-link-container > button {
-    padding: 6px 12px;
-}
-
-.fm-empty-device-list .fm-mega-app-link-container > button:not(:last-child) {
-    margin-bottom: 16px;
-}
-
-.fm-empty-device-list .fm-add-sb-actions > button {
-    margin: 0;
-}
-
-.fm-empty-device-list .fm-add-sb-actions > button:not(:last-child) {
-    margin-right: 16px;
-}
-
-.rtl .fm-empty-device-list .fm-add-sb-actions > button:not(:last-child) {
-    margin-left: 16px;
 }

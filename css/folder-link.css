@@ -1,16 +1,5 @@
-.transfer-panel-opened .active-folder-link .nw-fm-left-icons-panel {
-    box-shadow: 1px 0 0 0 rgba(0, 0, 0, 0.1);
-}
 .active-folder-link .fm-left-panel {
     box-shadow: inset 1px 0 0 0 rgba(0, 0, 0, 0.1);
-}
-.active-folder-link .nw-fm-left-icons-panel .logo {
-    --icon-size: 48px;
-    background: none;
-    display: block;
-    height: auto;
-    margin: 8px;
-    width: auto;
 }
 .active-folder-link .l-pane-control {
     float: left;
@@ -36,9 +25,8 @@
     height: calc(100% - 12px);
 }
 .active-folder-link .fm-import-download-buttons {
-    display: block;
-    -webkit-padding-end: 12px;
-    padding-inline-end: 12px;
+    display: flex;
+    flex-direction: row-reverse;
 }
 .active-folder-link .merge-mega-button.download {
     position: relative;
@@ -51,7 +39,11 @@
 }
 .active-folder-link .download-dropdown-content {
     top: 46px;
+    right: 0;
+}
+.rtl .active-folder-link .download-dropdown-content {
     left: 0;
+    right: auto;
 }
 .active-folder-link .download-dropdown-content > div {
     display: inline-block;
@@ -64,25 +56,9 @@
     gap: 10px;
 }
 .active-folder-link .folder-link-btns-container .mega-button {
-    -webkit-margin-end: 0;
     margin-inline-end: 0;
 }
 .active-folder-link .folder-link-btns-container .mega-button > span {
     font: var(--text-body1);
     white-space: nowrap;
-}
-.active-folder-link .nw-fm-tree-item .nw-fm-tree-arrow {
-    -webkit-margin-start: 8px;
-    margin-inline-start: 8px;
-}
-.active-folder-link .nw-fm-tree-item .nw-fm-tree-folder,
-.active-folder-link .nw-fm-tree-item .nw-fm-tree-icon-wrap {
-    -webkit-margin-start: 28px;
-    margin-inline-start: 28px;
-}
-/**
- * hide sections of the site if the current visited link is a folder share link
- */
-.active-folder-link .nw-fm-left-icon:not(.transfers) {
-    display: none;
 }

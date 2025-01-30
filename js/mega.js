@@ -82,7 +82,7 @@ lazy(mega, 'is', () => {
 lazy(self, 'mLoadingSpinner', () => {
     'use strict';
     const callers = new Map();
-    const domNode = document.querySelector('.fmdb-loader');
+    const domNode = mega.ui.header && mega.ui.header.loader;
 
     const hideToast = (id) => {
         if (id) {
@@ -1553,7 +1553,7 @@ scparser.$add('d', function(a) {
 
     if (!a.m && fminitialized && !pfid && !is_mobile) {
         M.storageQuotaCache = null;
-        delay('checkLeftStorageBlock', () => M.checkLeftStorageBlock().catch(dump));
+        delay('checkStorageBlock', () => MegaStorageBlock.checkUpdate());
     }
 });
 
@@ -1653,13 +1653,8 @@ scparser.$add('sqac', (a) => {
             }
             M.storageQuotaCache = null;
 
-            if ($.topMenu) {
-
-                topMenu();
-            }
-            else if (!pfid) {
-
-                M.checkLeftStorageBlock();
+            if (!pfid) {
+                MegaStorageBlock.checkUpdate();
             }
 
             M.checkStorageQuota(2e3);
@@ -1797,7 +1792,7 @@ scparser.$add('_sn', function(a) {
     if (d) {
         console.info(` --- New SN: ${a.sn}`);
     }
-    onIdle(() => setsn(a.sn));
+    setsn(a.sn);
 
     // rewrite accumulated RSA keys to AES to save CPU & bandwidth & space
     crypto_node_rsa2aes();
@@ -2145,6 +2140,50 @@ function initworkerpool() {
     }
 }
 
+Object.defineProperty(fm_fullreload, 'sink', {
+    value(reason) {
+        'use strict';
+
+        if (self.fminitialized) {
+
+            if (window.loadingDialog) {
+                // 1141: 'Please be patient.'
+                loadingInitDialog.hide('force');
+                loadingDialog.show(reason, l[1141]);
+                loadingDialog.show = loadingDialog.hide = nop;
+            }
+
+            mBroadcaster.crossTab.leave();
+            watchdog.notify(`halt(${reason})`);
+
+            // stop further SC processing
+            window.execsc = nop;
+
+            // and error reporting, if any
+            window.onerror = null;
+
+            // nuke w/sc connection
+            getsc.stop(-1, reason);
+
+            window.getsc = nop;
+            window.waitsc = nop;
+
+            getsc.stop = nop;
+            getsc.validate = nop;
+
+            // shutdown chat..
+            if (self.megaChatIsReady) {
+                megaChat.destroy(true);
+            }
+
+            // abort any scheduled task
+            if (self.delay) {
+                delay.abort();
+            }
+        }
+    }
+});
+
 /**
  * Queue a DB invalidation-plus-reload request to the FMDB subsystem.
  * If it isn't up, reload directly.
@@ -2167,6 +2206,8 @@ async function fm_fullreload(light, logMsg) {
     // without restarting them.
     // until then - it's the sledgehammer method; can't be anything
     // more surgical :(
+    fm_fullreload.sink('full-reload');
+
     if (light !== true) {
         if (light instanceof MEGAPIRequest) {
             light.abort();
@@ -2179,27 +2220,7 @@ async function fm_fullreload(light, logMsg) {
             localStorage.force = 1;
             delete sessionStorage.lightTreeReload;
         }
-
     }
-
-    if (window.loadingDialog) {
-        // 1141: 'Please be patient.'
-        loadingInitDialog.hide('force');
-        loadingDialog.show('full-reload', l[1141]);
-        loadingDialog.show = loadingDialog.hide = nop;
-    }
-
-    // stop further SC processing
-    window.execsc = nop;
-
-    // and error reporting, if any
-    window.onerror = null;
-
-    // nuke w/sc connection
-    getsc.stop(-1, 'full-reload');
-    window.getsc = nop;
-    getsc.stop = nop;
-    getsc.validate = nop;
 
     return Promise.allSettled([
         fmdb && fmdb.invalidate(),
@@ -2581,9 +2602,9 @@ function loadfm(force) {
                     console.time(`get-tree(f:db)`);
                 }
 
-                fmdb.init(localStorage.force)
+                Promise.all([fmdb.init(localStorage.force), mBroadcaster.setup()])
                     .catch(dump)
-                    .then(fetchfm)
+                    .then((a) => fetchfm(a && a[0]))
                     .catch((ex) => {
                         console.error(ex);
                         siteLoadError(ex, 'loadfm');
@@ -4177,7 +4198,7 @@ function loadfm_done(mDBload) {
             mega.loadReport.stepTimeStamp = Date.now();
 
             // are we actually on an #fm/* page?
-            if (page !== 'start' && is_fm() || $('.fm-main.default').is(":visible")) {
+            if (page !== 'start' && is_fm() || $('.pm-main').is(":visible")) {
                 promise = M.initFileManager();
 
                 mega.loadReport.renderfm = Date.now() - mega.loadReport.stepTimeStamp;
@@ -4276,9 +4297,6 @@ function fmviewmode(id, e)
     var viewmodes = {};
     if (typeof fmconfig.viewmodes !== 'undefined')
         viewmodes = fmconfig.viewmodes;
-
-    id = getSafeViewModeId(id);
-
     if (e === 2) {
         viewmodes[id] = 2;
     }
@@ -4287,30 +4305,6 @@ function fmviewmode(id, e)
     else
         viewmodes[id] = 0;
     mega.config.set('viewmodes', viewmodes);
-}
-
-/**
- * Returns the viewmode for the given id or 0 as default
- * @param {String} id - id to get viewmode for
- * @returns {Number | undefined} viewmode for the given id or 0 as default
- */
-function getFmViewMode(id) {
-    'use strict';
-    return self.fmconfig && fmconfig.viewmodes && fmconfig.viewmodes[getSafeViewModeId(id)];
-}
-
-/**
- * Returns a safe id for viewmode config
- * In case id length > 63, only the last 63 characters are considered
- * This is because config shrink.views function adds wide chars at the beginning of the id
- *  when id.length > 63, what makes asmcrypto "string_to_bytes" function to throw
- *  an Error: "Wide characters are not allowed"
- * @param {String} id - id of the viewmode
- * @returns {String} safe id for viewmode config
- */
-function getSafeViewModeId(id) {
-    'use strict';
-    return id && id.length > 63 ? id.slice(-63) : id;
 }
 
 /** @property window.thumbnails */

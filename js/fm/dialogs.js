@@ -182,11 +182,6 @@
         else if ($.selectFolderDialog && section === 'cloud-drive' && $.mcselected !== M.RootID) {
             $btn.removeClass('disabled');
         }
-        else if (M.currentCustomView.type === mega.devices.rootId && $.dialog === 'stop-backup') {
-            // Enforce Selection
-            $.selected = [M.currentCustomView.nodeID];
-            $btn.removeClass('disabled');
-        }
         else {
             var forceEnabled = $.copyToShare || $.copyToUpload || $.onImportCopyNodes || $.saveToDialog || $.nodeSaveAs;
 
@@ -965,11 +960,9 @@
             showDialogContent('s4', 'ul');
         }
 
-        if (!treesearch) {
-            $('.nw-fm-tree-item', '.fm-picker-dialog')
-                .removeClass('expanded active opened selected');
-            $('.nw-fm-tree-item + ul', '.fm-picker-dialog').removeClass('opened');
-        }
+        $('.nw-fm-tree-item', '.fm-picker-dialog')
+            .removeClass('expanded active opened selected');
+        $('.nw-fm-tree-item + ul', '.fm-picker-dialog').removeClass('opened');
 
         disableFolders();
         onIdle(() => {
@@ -1501,7 +1494,6 @@
                 return false;
             }
 
-            treesearch = false;
             handleDialogContent(section);
             $('.search-bar input', $dialog).val('');
             $('.search-bar.placeholder .search-icon-reset', $dialog).addClass('hidden');
@@ -1650,13 +1642,9 @@
             }
             else {
                 if (exit) {
-                    treesearch = false;
                     if (value) {
                         $(this).val('').trigger("blur");
                     }
-                }
-                else {
-                    treesearch = value;
                 }
 
                 delay('mctree:search', buildDialogTree);
@@ -1731,15 +1719,12 @@
 
         $dialog.rebind('click', '.nw-fm-tree-item', function(e) {
 
-            var ts = treesearch;
             var old = $.mcselected;
             const $scrollBlock = $('.right-pane.active .dialog-tree-panel-scroll', $dialog);
 
             setDialogBreadcrumb(String($(this).attr('id')).replace('mctreea_', ''));
 
-            treesearch = false;
             M.buildtree({h: $.mcselected}, 'fm-picker-dialog', section);
-            treesearch = ts;
             disableFolders();
 
             var c = $(e.target).attr('class');

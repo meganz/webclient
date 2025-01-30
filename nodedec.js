@@ -409,6 +409,12 @@ function crypto_makeattr(n, nn) {
     if (typeof n.f != 'undefined') {
         ar.f = n.f;
     }
+    if (typeof n.devid !== 'undefined') {
+        ar['dev-id'] = n.devid;
+    }
+    if (typeof n.drvid !== 'undefined') {
+        ar['drv-id'] = n.drvid;
+    }
     if (typeof n.sds !== 'undefined') {
         ar.sds = n.sds;
     }
@@ -435,7 +441,7 @@ function crypto_makeattr(n, nn) {
 function crypto_clearattr(n) {
     // derived node attr directory, see crypto_procattr()
     const dattrs = [
-        'ar', 'des', 'f', 'fav', 'gps',
+        'ar', 'des', 'devid', 'drvid', 'f', 'fav', 'gps',
         'hash', 'lbl', 'mtime', 'name',
         'rr', 's4', 'sds', 'sen', 'tags'
     ];
@@ -456,7 +462,7 @@ function crypto_restoreattr(n, old) {
     Object.assign(n, old);
 }
 
-// if decryption of .a is successful, set .name, .hash, .mtime, .k, .sds and .ar and clear .a
+// if decryption of .a is successful, set .name, .hash, .mtime, .k, .sds, .devid/.drvid and .ar and clear .a
 function crypto_procattr(n, key) {
     var ab = base64_to_ab(n.a);
     var o = ab && dec_attr(ab, key);
@@ -1032,7 +1038,7 @@ lazy(self, 'decWorkerPool', function decWorkerPool() {
     /** @class decWorkerPool */
     return new class extends Array {
         get url() {
-            const WORKER_VERSION = 10;
+            const WORKER_VERSION = 9;
             return `${window.is_extension || window.is_karma ? '' : '/'}nodedec.js?v=${WORKER_VERSION}`;
         }
 

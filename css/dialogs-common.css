@@ -12,7 +12,6 @@
 }
 
 .mega-banner-template {
-    --border-radius: 24px;
     --mask-color: var(--text-color-high);
     background: var(--surface-main);
     bottom: 0;
@@ -76,7 +75,6 @@
     height: 74px;
     flex: 0 0 auto;
     margin: 0 2px;
-    -webkit-margin-end: 20px;
     margin-inline-end: 20px;
     width: 74px;
 }
@@ -120,12 +118,10 @@
 .mega-banner-template .buttons {
     display: flex;
     flex: 0 0  auto;
-    -webkit-margin-start: 60px;
     margin-inline-start: 60px;
 }
 
 .mega-banner-template .buttons button ~ button {
-    -webkit-margin-start: 16px;
     margin-inline-start: 16px;
 }
 
@@ -203,7 +199,6 @@
     }
 
     .mega-banner-template .buttons {
-        -webkit-margin-start: 24px;
         margin-inline-start: 24px;
     }
 }
@@ -278,7 +273,8 @@
     margin-bottom: 16px;
 }
 .mega-dialog.verify-email .content-block .text strong {
-    font-family: var(--text-font-family-semibold);
+    font-family: var(--text-font-family);
+    font-weight: 600;
 }
 .mega-dialog.dialog-template-action.verify-email > header .graphic {
     height: 79px;

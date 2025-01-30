@@ -273,7 +273,6 @@
     font: var(--text-copy-secondary-pricing);
     color: var(--color-copy-secondary);
     position: absolute;
-    -webkit-padding-end: 24px;
     padding-inline-end: 24px;
     white-space: initial;
 }
@@ -555,7 +554,6 @@ i.dropbox-icon {
     display: inline-block;
     vertical-align: top;
     margin-inline-end: 8px;
-    -webkit-margin-end: 8px;
     background-size: auto;
 }
 .pricing-compare-cards .pricing-compare-cards-title {
@@ -801,7 +799,6 @@ i.pricing-i-icon {
 }
 .pricing-plans-compare-table-container .pricing-plans-compare-table-show > *:not(:last-child) {
     margin-inline-end: 12px;
-    -webkit-margin-end: 12px;
 }
 .pricing-pg.pricing-plans-compare-table-container .pricing-plans-compare-table {
     display: grid;
@@ -1027,7 +1024,6 @@ i.pricing-i-icon {
 .pricing-flexi-block-estimator-slider-headers-container input.pricing-flexi-block-estimator-slider-input {
     height: 48px;
     max-width: 100px;
-    -webkit-margin-start: 12px;
     margin-inline-start: 12px;
     background-color: var(--color-bg-page);
     border: none;
@@ -1037,7 +1033,6 @@ i.pricing-i-icon {
 .pricing-flexi-block-estimator-slider-headers-container .pricing-flexi-block-estimator-slider-input-container span {
     font: var(--text-copy-medium-pricing);
     color: var(--color-disabled);
-    -webkit-padding-end: 12px;
     padding-inline-end: 12px;
 }
 .pricing-flexi-block-estimator-contianer .pricing-flexi-block-estimator-total-container {
@@ -1087,7 +1082,6 @@ i.pricing-i-icon {
     justify-content: space-between;
 }
 .pricing-flexi-block-estimator-slider-marks-business-users .pricing-flexi-block-estimator-slider-mark.start {
-    -webkit-padding-start: 8px;
     padding-inline-start: 8px;
 }
 .pricing-pg .invisible {

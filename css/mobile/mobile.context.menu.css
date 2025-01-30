@@ -22,9 +22,7 @@
     display: flex;
     flex-direction: column;
     margin-inline-start: 15px;
-    -webkit-margin-start: 15px;
 }
 .sheet .context-menu-container {
     padding-inline-end: 16px;
-    -webkit-padding-end: 16px;
 }

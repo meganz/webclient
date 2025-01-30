@@ -4,22 +4,16 @@ MegaData.prototype.sortBy = function(fn, d) {
     if (!d) {
         d = 1;
     }
+    this.v.sort(function(a, b) {
+        if (a.t > b.t) {
+            return -1;
+        }
+        else if (a.t < b.t) {
+            return 1;
+        }
 
-    if (this.skipSortByTypeAsDefault) {
-        this.v.sort((a, b) => fn(a, b, d));
-    }
-    else {
-        this.v.sort((a, b) => {
-            if (a.t > b.t) {
-                return -1;
-            }
-            else if (a.t < b.t) {
-                return 1;
-            }
-
-            return fn(a, b, d);
-        });
-    }
+        return fn(a, b, d);
+    });
     this.sortfn = fn;
     this.sortd = d;
 };
@@ -312,8 +306,8 @@ MegaData.prototype.getSortBySizeFn = function() {
 MegaData.prototype.sortByType = function(d) {
     this.sortfn = function(a, b, d) {
         if (typeof a.name === 'string' && typeof b.name === 'string') {
-            var type1 = filetype(a);
-            var type2 = filetype(b);
+            var type1 = filetype(a.name);
+            var type2 = filetype(b.name);
 
             if (type1 !== type2) {
                 return M.compareStrings(type1, type2, d);
@@ -630,7 +624,6 @@ MegaData.prototype.doSort = function(n, d) {
     this.sortmode = {n: n, d: d};
 
     if (typeof this.sortRules[n] === 'function') {
-        this.skipSortByTypeAsDefault = mega.devices.ui.isCustomRender();
         this.sortRules[n](d);
 
         if (this.fmsorting) {
@@ -818,112 +811,6 @@ MegaData.prototype.sortByPlaytimeFn = function(d) {
         }
         else if (bPlayTime) {
             return d < 0 ? -bPlayTime * d : bPlayTime * d;
-        }
-
-        return M.doFallbackSortWithFolder(a, b);
-    };
-};
-
-/**
- * Sort by num of folders
- * @param {Number} d sort direction
- * @returns {void}
- */
-MegaData.prototype.sortByNumFolders = function(d) {
-    'use strict';
-
-    var fn = this.sortfn = this.sortByNumFoldersFn(d);
-    this.sortd = d;
-
-    if (!d) {
-        d = 1;
-    }
-
-    // num folders sort is not doing folder sorting first. therefore using view sort directly to avoid.
-    this.v.sort((a, b) => {
-        return fn(a, b, d);
-    });
-};
-
-/**
- * Sort nodes having number of folders always first and then the rest including folders.
- * @param {Number} d sort direction
- * @returns {Function} sort compare function
- */
-MegaData.prototype.sortByNumFoldersFn = function(d) {
-    "use strict";
-
-    return function(a, b) {
-        const aNumFolders = a.td;
-        const bNumFolders = b.td;
-
-        const aNumFiles = a.tf;
-        const bNumFiles = b.tf;
-
-        if (aNumFolders !== undefined && bNumFolders !== undefined) {
-            if (aNumFolders === bNumFolders) {
-                if (aNumFiles === bNumFiles) {
-                    return M.doFallbackSortWithName(a, b, d);
-                }
-                return (aNumFiles < bNumFiles ? -1 : 1) * d;
-            }
-            return (aNumFolders < bNumFolders ? -1 : 1) * d;
-        }
-        else if (aNumFolders) {
-            return d < 0 ? aNumFolders * d : -aNumFolders * d;
-        }
-        else if (bNumFolders) {
-            return d < 0 ? -bNumFolders * d : bNumFolders * d;
-        }
-
-        return M.doFallbackSortWithFolder(a, b);
-    };
-};
-
-/**
- * Sort by heartbeat time
- * @param {Number} d sort direction
- * @returns {void}
- */
-MegaData.prototype.sortByHeartbeatTime = function(d) {
-    'use strict';
-
-    var fn = this.sortfn = this.sortByHeartbeatTimeFn(d);
-    this.sortd = d;
-
-    if (!d) {
-        d = 1;
-    }
-
-    // hbtime sort is not doing folder sorting first. therefore using view sort directly to avoid.
-    this.v.sort((a, b) => {
-        return fn(a, b, d);
-    });
-};
-
-/**
- * Sort nodes having heartbeat always first and then the rest including folders.
- * @param {Number} d sort direction
- * @returns {Function} sort compare function
- */
-MegaData.prototype.sortByHeartbeatTimeFn = function(d) {
-    "use strict";
-
-    return function(a, b) {
-        const aHbTs = a.hb.ts;
-        const bHbTs = b.hb.ts;
-
-        if (aHbTs !== undefined && bHbTs !== undefined) {
-            if (aHbTs === bHbTs) {
-                return M.doFallbackSortWithName(a, b, d);
-            }
-            return (aHbTs < bHbTs ? -1 : 1) * d;
-        }
-        else if (aHbTs) {
-            return d < 0 ? aHbTs * d : -aHbTs * d;
-        }
-        else if (bHbTs) {
-            return d < 0 ? -bHbTs * d : bHbTs * d;
         }
 
         return M.doFallbackSortWithFolder(a, b);

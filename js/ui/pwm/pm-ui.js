@@ -28,7 +28,9 @@ mega.ui.pm = {
         }
 
         if (pmlayout) {
-            pmlayout.classList.remove('hidden');
+            // Manually close some old elements after layout update, deprecate this after merging
+            pmlayout.querySelector('.section.conversations').classList.add('hidden');
+            pmlayout.querySelector('.js-fm-left-panel').classList.add('hidden');
         }
 
         // Business and flexi user has read only access to password manager even it is expired
@@ -60,35 +62,43 @@ mega.ui.pm = {
         window.addEventListener('online', this._online);
         window.addEventListener('offline', this._offline);
 
+        document.body.classList.add('pwm-ui');
+
         if (d) {
             console.info('PWM Initialized.');
         }
 
         // if user visit pwm page, we treated they are finished promotion and update their flags
         mega.ui.onboarding.flagStorage.setSync(OBV4_FLAGS.CLOUD_DRIVE_MP_BUBBLE,1);
+
+        // Change to PWM logo
+        mega.ui.topmenu.megaLink.icon = 'sprite-fm-uni icon-pwm';
+
+        // Remove chat padding hack for rtl
+        mega.ui.header.domNode.style.paddingInlineEnd = '';
     },
 
     closeUI() {
         'use strict';
 
-        if (pmlayout) {
-            pmlayout.classList.add('hidden');
-        }
+        document.body.classList.remove('pwm-ui');
 
-        if (fmholder) {
-            fmholder.classList.remove('pmholder');
-        }
-
-        if (!mega.pm.pwmFeature) {
+        if (!mega.pm.pwmFeature && !u_attr.b && !u_attr.pf) {
             return;
         }
 
         if (this.list) {
             this.list.removeResizeListener();
+            this.list.hide();
         }
+
+        mega.ui.pm.settings.closeUI();
 
         window.removeEventListener('online', this._online);
         window.removeEventListener('offline', this._offline);
+
+        // Change to Mega logo
+        mega.ui.topmenu.megaLink.icon = 'sprite-fm-uni icon-mega-logo';
     },
 
     _online() {

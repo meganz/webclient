@@ -107,7 +107,7 @@
 
 /* Data table */
 .data-table {
-    background: var(--surface-main);
+    background: var(--mobile-page-background);
     border: 2px solid var(--table-border);
     border-collapse: separate;
     border-radius: 12px;
@@ -136,11 +136,9 @@
 }
 .data-table tr th:first-child {
     border: 0;
-    -webkit-padding-start: 22px;
     padding-inline-start: 22px;
 }
 .data-table tr th:last-child {
-    -webkit-padding-end: 22px;
     padding-inline-end: 22px;
 }
 .data-table td {
@@ -163,11 +161,9 @@
     display: none;
 }
 .data-table tr td:first-child {
-    -webkit-padding-start: 22px;
     padding-inline-start: 22px;
 }
 .data-table tr td:last-child {
-    -webkit-padding-end: 22px;
     padding-inline-end: 22px;
 }
 .data-table-scroll {
@@ -299,9 +295,8 @@
 
 /* Data box table */
 .mega-data-box {
-    background: var(--surface-main);
+    background: var(--mobile-surface-1);
     border-radius: 12px;
-    box-shadow: var(--table-border) 0 0 0 2px;
     position: relative;
 }
 .mega-data-box table th {
@@ -363,7 +358,6 @@
 .mega-data-box table th.sortable {
     --mask-color: var(--text-color-high);
     cursor: pointer;
-    -webkit-padding-end: 24px;
     padding-inline-end: 24px;
 }
 .mega-data-box table th.sortable i.icon-dropdown {
@@ -371,7 +365,6 @@
     display: inline-block;
     float: none;
     margin: auto;
-    -webkit-margin-end: -8px;
     margin-inline-end: -8px;
     padding: 0;
 }
@@ -486,7 +479,7 @@
     overflow: auto;
 }
 .sticky-header-table-container .data-table th {
-    background: var(--surface-main);
+    background: var(--mobile-page-background);
     position: sticky;   /* Shouldn't be changed as sticky isn't working on thead and tr on Chrome! */
     position: -webkit-sticky;
     top: 0;

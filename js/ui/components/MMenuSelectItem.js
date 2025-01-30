@@ -44,7 +44,7 @@ class MMenuSelectItem extends MComponent {
         }
 
         const labelDiv = document.createElement('div');
-        labelDiv.className = 'flex flex-1 text-ellipsis';
+        labelDiv.className = 'flex-1 text-ellipsis';
 
         if (label) {
             if (typeof label === 'function') {
@@ -105,13 +105,15 @@ class MMenuSelectItem extends MComponent {
                 return;
             }
 
-            const { x, y, right, bottom } = this.el.getBoundingClientRect();
+            const { x, y, right, bottom, left } = this.el.getBoundingClientRect();
+            const isRtl = document.body.classList.contains('rtl');
+            const xPos = (isRtl) ? left - MContextMenu.offsetHoriz : right + MContextMenu.offsetHoriz;
 
             this.subMenu = new MMenuSelect();
             this.subMenu.parentItem = this;
 
             this.subMenu.options = children;
-            this.subMenu.show(right + MContextMenu.offsetHoriz, y - 8, x - MContextMenu.offsetHoriz, bottom);
+            this.subMenu.show(xPos, y - 8, x - MContextMenu.offsetHoriz, bottom);
             this.el.classList.add('opened');
         });
 

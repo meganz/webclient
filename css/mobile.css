@@ -976,7 +976,6 @@ ul, li {
 }
 .fm-scrolling.scroller-space > *:not(.full-width) {
     margin-inline-end: 12px;
-    -webkit-margin-end: 12px;
 }
 .terms-of-service .fm-scrolling {
     overflow: visible;
@@ -4617,10 +4616,12 @@ div.checkboxOn {
 .mobile.alert-banner .alert-text-container .alert-text a {
     color: white;
     text-decoration: underline;
-    font-family: var(--text-font-family-bold);
+    font-family: var(--text-font-family);
+    font-weight: bold;
 }
 .mobile.alert-banner .alert-text-container .alert-text span {
-    font-family: var(--text-font-family-bold);
+    font-family: var(--text-font-family);
+    font-weight: bold;
 }
 .mobile.alert-banner .alert-icon.close {
     /*height: 30px;*/
@@ -6161,8 +6162,6 @@ textarea.mobile.support-text-field {
     font-size: 16px;
     color: #495057;
     padding: 0 0;
-    -webkit-margin-before: 0em;
-    -webkit-margin-after: 0em;
     margin: 0 0;
     text-align: center;
 }
@@ -6204,11 +6203,8 @@ textarea.mobile.support-text-field {
     list-style-type: disc;
     margin-block-start: 1em;
     margin-block-end: 0;
-    -webkit-margin-start: 0;
     margin-inline-start: 0;
-    -webkit-margin-end: 0;
     margin-inline-end: 0;
-    -webkit-padding-start: 20px;
     padding-inline-start: 20px;
 }
 .mobile .improved-recovery-steps .container-information li {
@@ -6240,10 +6236,6 @@ textarea.mobile.support-text-field {
     font-size: 20px;
     color: var(--text-color-high);
     line-height: 30px;
-    -webkit-margin-before: 0.4em;
-    -webkit-margin-after: 20px;
-    -webkit-margin-start: 0px;
-    -webkit-margin-end: 0px;
     text-align: center;
     font-family:'LatoWebSemibold', 'source_sans_prosemibold';
     font-weight: initial;
@@ -6602,11 +6594,6 @@ textarea.mobile.support-text-field {
 }
 .mobile .improved-recovery-steps ol.app-instructions-list {
     list-style-type: none;
-    -webkit-margin-before: 1em;
-    -webkit-margin-after: 0;
-    -webkit-margin-start: 0;
-    -webkit-margin-end: 0;
-    -webkit-padding-start: 00;
     padding: 8px 0 0 8px;
 }
 .mobile .improved-recovery-steps li.list-point:before{
@@ -11286,7 +11273,8 @@ code, c {
 .mobile.payment-card-page .card-info.payment-card .payment-card-digits {
     font: var(--text-h3);
     color: var(--text-color-white-higher);
-    font-family: var(--text-font-family-bold);
+    font-family: var(--text-font-family);
+    font-weight: bold;
     margin-top: 2px;
 }
 .mobile.payment-card-page .card-info.payment-card .payment-card-expiry-lbl {

@@ -46,7 +46,6 @@ a.shared-link.show-more {
     text-align: center;
     vertical-align: middle;
     font-size: 0;
-    -moz-border-radius: 4px;
 	-webkit-border-radius: 4px;
 	border-radius: 4px;
     overflow: hidden;
@@ -73,7 +72,6 @@ a.shared-link.show-more {
     position: absolute;
     left: 50%;
     top: 50%;
-    -moz-border-radius: 100%;
 	-webkit-border-radius: 100%;
 	border-radius: 100%;
     margin: -18px 0 0 -18px;
@@ -97,7 +95,6 @@ a.shared-link.show-more {
     position: absolute;
     left: 50%;
     top: 50%;
-    -moz-border-radius: 100%;
 	-webkit-border-radius: 100%;
 	border-radius: 100%;
     margin: -18px 0 0 -18px;

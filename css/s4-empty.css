@@ -29,9 +29,7 @@
     flex-grow: 1;
     max-width: 428px;
     text-align: start;
-    -webkit-margin-start: 16px;
     margin-inline-start: 16px;
-    -webkit-margin-end: 44px;
     margin-inline-end: 44px;
 }
 .fm-empty-s4-container .create-new-bkt-wrapper .new-bkt-title {

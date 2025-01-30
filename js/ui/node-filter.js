@@ -3,8 +3,9 @@ lazy(mega.ui, 'mNodeFilter', () => {
     'use strict';
 
     // DOM caches
-    const $fmFilterChipsWrapper = $('.fm-filter-chips-wrapper', '.fm-right-files-block');
-    const $resetFilterChips = $('.fm-filter-reset', $fmFilterChipsWrapper);
+    const $filterChipsWrapper = $('.fm-filter-chips-wrapper');
+    const $filterChips = $('.fm-filter-chips', $filterChipsWrapper);
+    const $resetFilterChips = $('.fm-filter-reset', $filterChips);
 
     // For modified date calculation, use today's date
     const today = new Date();
@@ -17,10 +18,8 @@ lazy(mega.ui, 'mNodeFilter', () => {
         'shares', 'out-shares', 'file-requests', 'faves', 'recents'
     ]);
 
-    const selectedFilters = {
-        value: 0,
-        data: null
-    };
+    // filtering bitfield
+    let selectedFilters = 0;
 
     // Available filters
     const filters = {
@@ -252,10 +251,11 @@ lazy(mega.ui, 'mNodeFilter', () => {
                 // Get root dir name (or handle) e.g. what M.currentrootid would give if in a specific area
                 const root = M.getNodeRoot(n.h);
 
-                // Match nodes in Cloud Drive, Favourites, Rubbish bin, Incoming shares,
+                // Match nodes in Cloud Drive, Favourites, Backups, Rubbish bin, Incoming shares,
                 // or Outgoing shares (NB: Outgoing shares (includes the external links - for now)
                 if ((this.selection.includes('cloud') && root === M.RootID) ||
                    (this.selection.includes('favourites') && n.fav) ||
+                   (this.selection.includes('backups') && n.devid) ||
                    (this.selection.includes('rubbish') && root === M.RubbishID) ||
                    (this.selection.includes('incoming') && root === 'shares') ||
                    (this.selection.includes('outgoing') && n.shares)) {
@@ -304,6 +304,12 @@ lazy(mega.ui, 'mNodeFilter', () => {
                     eid: 99983
                 },
                 {
+                    icon: 'database-filled',
+                    label: l.restricted_folder_button,
+                    data: ['backups'],
+                    eid: 99984
+                },
+                {
                     icon: 'bin-filled',
                     label: l['168'],
                     data: ['rubbish'],
@@ -335,30 +341,17 @@ lazy(mega.ui, 'mNodeFilter', () => {
         /**
          * Create a FilterChip.
          * @param {String} name static filter identifier.
-         * @param {String} ctxPrefix the context of where the filter chips are used (e.g. 'fm', 'dc')
-         *                           the HTML classes should match this prefix
-         * @param {jQuery} $chipsWrapper - jQuery object, points to the filter chip container
-         * @param {Object} filters - Contains the info, labels, and event handlers for each filter
-         * @param {Object} selectedFilters - Wrapper to hold the currently selected option bitfield
          */
-        constructor(name, ctxPrefix, $chipsWrapper, filters, selectedFilters) {
+        constructor(name) {
             super(null, ['hide-radio-on']);
 
-            this.filters = filters;
-
-            this.selectedFilters = selectedFilters || { value: 0, data: null };
-            this.$filterChipsWrapper = $chipsWrapper;
-            this.$qMarkTooltipTemplate = $('.tooltip-question-mark-template', this.$filterChipsWrapper);
-            this.$selectedMarkTemplate = $('.selected-mark-template', this.$filterChipsWrapper);
-            this.$element = $(`.${ctxPrefix}-filter-chip-${name}`, this.$filterChipsWrapper);
-            this.$text = $(`.${ctxPrefix}-filter-chip-button-text`, this.$element);
-
-            this.$filterChips = $(`.${ctxPrefix}-filter-chips`, this.$filterChipsWrapper);
-            this.$resetFilterChips = $(`.${ctxPrefix}-filter-reset`, this.$filterChips);
+            this.$selectedMarkTemplate = $('.selected-mark-template', $filterChipsWrapper);
+            this.$element = $(`.fm-filter-chip-${name}`, $filterChipsWrapper);
+            this.$text = $('.fm-filter-chip-button-text', this.$element);
 
             Object.defineProperty(this, 'name', {value: name});
-            Object.defineProperty(this, 'ident', {value: 1 << Object.keys(this.filters).indexOf(name)});
-            Object.defineProperty(this, 'ctx', {value: this.filters[name]});
+            Object.defineProperty(this, 'ident', {value: 1 << Object.keys(filters).indexOf(name)});
+            Object.defineProperty(this, 'ctx', {value: filters[name]});
 
             // @todo make this 'click' still optional for our purpose in MMenuSelect(?)
             for (let i = this.ctx.menu.length; i--;) {
@@ -382,7 +375,7 @@ lazy(mega.ui, 'mNodeFilter', () => {
                 }
             });
 
-            this.$resetFilterChips.rebind(`click.resetFilterBy${name}`, () => this.resetToDefault());
+            $resetFilterChips.rebind(`click.resetFilterBy${name}`, () => this.resetToDefault());
         }
 
         /**
@@ -412,15 +405,14 @@ lazy(mega.ui, 'mNodeFilter', () => {
                 this._options[i].el.classList.remove('selected');
             }
 
-            this.selectedFilters.value &= ~this.ident;
-            this.selectedFilters.data = null;
+            selectedFilters &= ~this.ident;
 
             this.ctx.selection = false;
             this.$text.text(this.ctx.title);
             this.$element.removeClass('selected');
 
-            if (!this.selectedFilters.value) {
-                this.$resetFilterChips.addClass('hidden');
+            if (!selectedFilters) {
+                $resetFilterChips.addClass('hidden');
             }
 
             if (this.ctx.shouldShow) {
@@ -433,12 +425,10 @@ lazy(mega.ui, 'mNodeFilter', () => {
          * Handles the selection of an item.
          * @param {number} index - The index of the selected item.
          * @param {Object} item - The selected item object.
-         * @param {Function} clickFn - Onclick function, not used here.
-         * @param {Boolean} [preventReload] - Prevents reload after selection.
          *
          * @returns {undefined}
          */
-        onItemSelect(index, item, clickFn, preventReload) {
+        onItemSelect(index, item) {
 
             if (index === this.selectedIndex) {
                 this.resetToDefault();
@@ -470,38 +460,31 @@ lazy(mega.ui, 'mNodeFilter', () => {
             }
             this.ctx.selection = entry.data;
 
-            this.selectedFilters.value |= this.ident;
-            this.selectedFilters.data = freeze({ name: this.name, index });
+            selectedFilters |= this.ident;
             this.$text.text(item.el.innerText);
             this.$element.addClass('selected');
-            this.$resetFilterChips.removeClass('hidden');
+            $resetFilterChips.removeClass('hidden');
 
             // @todo instead of going all through openFolder() we may want to filterBy(search|parent) + renderMain()
-            if (!preventReload) {
-                M.openFolder(M.currentdirid, true);
-            }
+            M.openFolder(M.currentdirid, true);
         }
     }
 
     // Public API.
     return freeze({
         /**
-         * The Filter Chip Component, to be used in other modules
-         */
-        FilterChipComponent: FilterChip,
-        /**
          * Sets up the chips, checking the current page and initializing the type filter chip if applicable.
          *
          * @returns {undefined}
          */
         initSearchFilter() {
-            $fmFilterChipsWrapper.removeClass('hidden');
+            $filterChipsWrapper.removeClass('hidden');
 
             for (const name in filters) {
                 const ctx = filters[name];
 
                 if (!ctx.component) {
-                    ctx.component = new FilterChip(name, 'fm', $fmFilterChipsWrapper, filters, selectedFilters);
+                    ctx.component = new FilterChip(name);
                 }
             }
 
@@ -544,14 +527,13 @@ lazy(mega.ui, 'mNodeFilter', () => {
             const hidden = M.gallery || M.chat || M.albums
                 || M.currentrootid === M.RubbishID
                 || hiddenSections.has(M.currentdirid)
+                || M.currentrootid && M.currentrootid === (M.BackupsId && M.getNodeByHandle(M.BackupsId).p)
                 || M.currentrootid === 's4' && M.currentCustomView.subType !== 'bucket'
                 || String(M.currentdirid).startsWith('user-management')
-                || folderlink
-                || mega.devices.ui.getRenderSection() === 'device-centre-devices'
-                || mega.devices.ui.getRenderSection() === 'device-centre-folders';
+                || folderlink;
 
             if (hidden) {
-                $fmFilterChipsWrapper.addClass('hidden');
+                $filterChipsWrapper.addClass('hidden');
             }
             else {
                 this.initSearchFilter();

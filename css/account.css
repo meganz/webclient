@@ -35,7 +35,6 @@
 }
 .account.register-form .checkbox {
     margin: 2px 0;
-    -webkit-margin-end: 14px;
     margin-inline-end: 14px;
 }
 .account.register-form .radio-txt {
@@ -69,7 +68,8 @@
 .account.login-form .dialog-dark-bottom.register a {
     font-size: 15px;
     color: var(--text-color-medium);
-    font-family: var(--text-font-family-semibold);
+    font-family: var(--text-font-family);
+    font-weight: 600;
     margin-left: 4px;
     text-decoration: underline;
 }
@@ -129,9 +129,7 @@
 .account.input-wrapper {
     border-bottom: 1px solid var(--stroke-grey-2);
     padding: 14px 0 5px 0;
-    -webkit-padding-end: 8px;
     padding-inline-end: 8px;
-    -webkit-padding-start: 38px;
     padding-inline-start: 38px;
     margin: 0 0 24px 0;
     position: relative;
@@ -142,7 +140,6 @@
 }
 .account.input-wrapper.small {
     margin: 0;
-    -webkit-margin-start: 8px;
     margin-inline-start: 8px;
 }
 .account.input-wrapper.top-placeholder {
@@ -293,7 +290,6 @@ body.ar .sms-verification-number-input {
     position: absolute;
     left: 100%;
     bottom: 0;
-    -webkit-margin-start: 20px;
     margin-inline-start: 20px;
     display: none;
     z-index: 10;
@@ -442,8 +438,6 @@ button.loading .loader {
     width: 360px;
     background-color: white;
     float: right;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
     border-radius: 4px;
     -webkit-box-shadow: 0 0 20px 0 rgba(0,0,0,0.05);
     -moz-box-shadow: 0 0 20px 0 rgba(0,0,0,0.05);
@@ -489,8 +483,6 @@ button.loading .loader {
 .account.business-plan-price {
     height: 72px;
     background-color: #00BFA5;
-    -moz-border-radius: 2px;
-    -webkit-border-radius: 2px;
     border-radius: 2px;
     color: white;
     padding: 15px 0 0 0;

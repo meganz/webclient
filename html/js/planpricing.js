@@ -1832,7 +1832,8 @@ lazy(pro, 'proplan2', () => {
             await fetchBusinessPlanInfo();
             parsepage(pages.planpricing);
 
-            if (mega.ui.header) {
+            // Temporary fix for desktop propay as it does not using new header
+            if (is_mobile && mega.ui.header) {
                 mega.ui.header.update();
             }
             if (mega.ui.alerts) {

@@ -340,6 +340,7 @@ mBroadcaster.once('fm:initialized', () => {
     // Do not show on the below pages
     const isInvalidDialogPage = M.currentdirid === 'transfers'
         || String(M.currentdirid).includes('account')
+        || String(M.currentdirid).includes('devices')
         || folderlink;
 
     // Also do not show on mobile web or to paid users

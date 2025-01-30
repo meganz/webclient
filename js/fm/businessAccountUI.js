@@ -99,7 +99,9 @@ function BusinessAccountUI() {
         $('.fm-left-panel .nw-tree-panel-header').addClass('hidden');
         $('.user-management-tree-panel-header.enabled-accounts', '.fm-left-panel').removeClass('hidden');
         $('.user-management-tree-panel-header.disabled-accounts', '.fm-left-panel').removeClass('hidden');
-        $('.fm-left-panel').addClass('user-management');
+        if (u_attr.b) {
+            $('.fm-left-panel').addClass('user-management');
+        }
 
         // headers
         $('.fm-right-header-user-management .user-management-main-page-buttons').removeClass('hidden');
@@ -1941,6 +1943,7 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
                         usersM.viewBusinessInvoicesPage();
 
                         $('.fm-right-files-block', '.fmholder').removeClass('hidden emptied');
+                        $('.fm-right-block.dashboard').addClass('hidden');
 
                         if (mega.ui.mNodeFilter) {
                             mega.ui.mNodeFilter.resetFilterSelections();
@@ -2709,6 +2712,9 @@ BusinessAccountUI.prototype.viewBusinessInvoicesPage = function () {
     var prepareInvoiceListSection = function (st, invoicesList) {
 
         var unhideSection = function () {
+
+            $('.fm-right-files-block').removeClass('hidden');
+
             $businessAccountContainer.removeClass('hidden');
             $accountContainer.removeClass('hidden');
             $invoiceContainer.removeClass('hidden');

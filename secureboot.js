@@ -685,7 +685,6 @@ var mega = {
     state: 0,
     utils: {},
     slideshow: {settings: {}},
-    devices: {rootId: 'device-centre', sections: {}, uiElems: {}},
     uaoref: window.uaoref,
     updateURL: defaultStaticPath + 'current_ver.txt',
     chrome: (
@@ -2363,20 +2362,10 @@ else if (!browserUpdate) {
         jsl.push({f:'js/ui/keySignatureWarningDialog.js', n: 'mega_js', j:1,w:7});
         jsl.push({f:'js/ui/feedbackDialog.js', n: 'feedbackdialogui_js', j:1,w:1});
         jsl.push({f:'js/ui/forcedUpgradeProDialog.js', n: 'forcedupgradeprodialog_js', j:1,w:1});
-        jsl.push({f:'js/ui/dcAppPromoDialog.js', n: 'dcAppPromoDialog_js', j:1,w:1});
         jsl.push({f:'js/ui/alarm.js', n: 'alarm_js', j:1,w:1});
         jsl.push({f:'js/ui/toast.js', n: 'toast_js', j:1,w:1});
         jsl.push({f:'js/ui/top-tooltip-login.js', n: 'top-tooltip-login', j:1});
         jsl.push({f:'js/fm/transfer-progress-widget.js', n: 'tpw_js', j:1});
-
-        // minimal device centre resources
-        jsl.push({f:'js/fm/devices/models.js', n: 'devices_models_js', j: 1, w: 1});
-        jsl.push({f:'js/fm/devices/data.js', n: 'devices_data_js', j: 1, w: 1});
-        jsl.push({f:'js/fm/devices/ui-elems/header.js', n: 'devices_ui_elems_header_js', j: 1, w: 1});
-        jsl.push({f:'js/fm/devices/ui-elems/shimmer.js', n: 'devices_ui_elems_shimmer_js', j: 1, w: 1});
-        jsl.push({f:'js/fm/devices/ui-elems/notification.js', n: 'devices_ui_elems_notification_js', j: 1, w: 1});
-        jsl.push({f:'js/fm/devices/ui.js', n: 'devices_ui_js', j: 1, w: 1});
-        jsl.push({f:'css/device-centre.css', n: 'devices_css', j:2, w:30, c:1, d:1, cache:1});
 
         // Bottom pages for desktop
         jsl.push({f:'css/bottom-pages-animations.css', n: 'bottom-pages-animations_css', j:2,w:5,c:1,d:1,cache:1});
@@ -2510,6 +2499,13 @@ else if (!browserUpdate) {
     jsl.push({f:'js/ui/components/overlay.js', n: 'overlay_js', j: 1, w:1});
     jsl.push({f:'js/ui/components/sheet.js', n: 'sheet_js', j: 1, w:1});
 
+    // Mobile component for inheriting
+    jsl.push({f:'js/mobile/mobile.header.js', n: 'mobile_header_js', j: 1, w: 1});
+    jsl.push({f:'js/mobile/mobile.top.menu.js', n: 'mobile_top_menu_js', j: 1, w: 1});
+
+    jsl.push({f:'css/mobile/mobile.header.css', n: 'mobile_header_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
+    jsl.push({f:'css/mobile/mobile.top.menu.css', n: 'mobile_top_menu_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
+
     if (!is_mobile) {
 
         jsl.push({f:'css/buttons.css', n: 'buttons_css', j:2,w:5,c:1,d:1,cache:1});
@@ -2530,6 +2526,8 @@ else if (!browserUpdate) {
 
         jsl.push({f:'html/top.html', n: 'top', j:0});
         jsl.push({f:'css/style.css', n: 'style_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/tree.css', n: 'tree_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/transfer.css', n: 'style_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'css/fm-header.css', n: 'fm_header_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/fm-breadcrumb.css', n: 'fm_breadcrumb_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/fm-lists.css', n: 'fm_lists_css', j:2,w:5,c:1,d:1,cache:1});
@@ -2537,10 +2535,16 @@ else if (!browserUpdate) {
         jsl.push({f:'css/tabs.css', n: 'tabs_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/empty-pages.css', n: 'empty_page_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/pm/onboarding.css', n: 'pm_onboarding_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/pm/avatars.css', n:'pwm_avatars_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/bento.css', n:'bento_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/notification.css', n: 'notification_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/search.css', n: 'search_css', j:2, w:30, c:1, d:1, cache:1});
+
         jsl.push({f:'js/vendor/megaDynamicList.js', n: 'mega_dynamic_list_js', j:1, w:5});
         jsl.push({f:'js/fm/quickfinder.js', n: 'fm_quickfinder_js', j:1, w:1});
         jsl.push({f:'js/fm/selectionManager2.js', n: 'fm_selectionmanager2_js', j:1, w:1});
         jsl.push({f:'js/fm.js', n: 'fm_js', j:1, w:12});
+        jsl.push({f:'js/fm/backupsUI.js', n: 'fm_backups_ui_js', j:1, w:5});
         jsl.push({f:'js/fm/dashboard.js', n: 'fmdashboard_js', j:1, w:5});
         jsl.push({f:'js/fm/recents.js', n: 'fmrecents_js', j:1, w:5});
         jsl.push({f:'js/time_checker.js', n: 'time_checker_js', j:1});
@@ -2562,17 +2566,18 @@ else if (!browserUpdate) {
         jsl.push({f:'js/fm/affiliate.js', n: 'fm_affiliate_js', j: 1});
         jsl.push({f:'js/fm/vpn.js', n: 'fmvpn_js', j: 1});
 
+        jsl.push({f:'css/gallery.css', n: 'gallery_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'js/fm/gallery/gallery.js', n: 'fm_gallery_js', j:1});
+
         // Gallery helpers
         jsl.push({f:'js/fm/gallery/helpers/GalleryTitleControl.js', n: 'fm_gallery_title_control_js', j:1});
+        jsl.push({f:'js/fm/gallery/helpers/GalleryTypeControl.js', n: 'fm_gallery_type_control_js', j:1});
         jsl.push({f:'js/fm/gallery/helpers/GalleryEmptyBlock.js', n: 'fm_gallery_empty_block_js', j:1});
         jsl.push({f:'js/fm/gallery/helpers/GalleryEmptyPhotos.js', n: 'fm_gallery_empty_photos_js', j:1});
         jsl.push({f:'js/fm/gallery/helpers/GalleryEmptyImages.js', n: 'fm_gallery_empty_images_js', j:1});
         jsl.push({f:'js/fm/gallery/helpers/GalleryEmptyVideos.js', n: 'fm_gallery_empty_videos_js', j:1});
         jsl.push({f:'js/fm/gallery/helpers/GalleryEmptyFavourites.js', n: 'fm_gallery_empty_favourites_js', j:1});
         jsl.push({f:'js/fm/gallery/helpers/GalleryEmptyDiscovery.js', n: 'fm_gallery_empty_discovery_js', j:1});
-
-        jsl.push({f:'css/gallery.css', n: 'gallery_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'js/fm/gallery/gallery.js', n: 'fm_gallery_js', j:1});
 
         jsl.push({f:'js/fm/albums/Albums.js', n: 'fm_albums_js', j:1});
         jsl.push({f:'js/fm/albums/AlbumTimeline.js', n: 'fm_albums_timeline_js', j:1});
@@ -2598,6 +2603,7 @@ else if (!browserUpdate) {
         jsl.push({f:'css/settings.css', n: 'settings_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/media-print.css', n: 'media_print_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/affiliate-program.css', n: 'affiliate_program_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/backup-center.css', n: 'backup_center_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'css/top-menu.css', n: 'top_menu_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'css/context-menu.css', n: 'context_menu_css', j:2, w:5, c:1, d:1, cache:1});
         jsl.push({f:'css/tables.css', n: 'tables_css', j:2, w:30, c:1, d:1, cache:1});
@@ -2608,6 +2614,7 @@ else if (!browserUpdate) {
         // CSS Revamp changes
         jsl.push({f:'css/components/fm-left-pane.css', n: 'components_fm_left_pane_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'css/components/info-panel.css', n: 'components_info_panel_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/components/storage-block.css', n: 'storage_block_css', j:2, w:30, c:1, d:1, cache:1});
 
         // `Meetings` UI styles
         jsl.push({f:'css/chat-bundle.css', n: 'meetings_css', j:2, w:30, c:1, d:1, cache:1});
@@ -2619,12 +2626,18 @@ else if (!browserUpdate) {
         jsl.push({f:'html/dialogs.html', n: 'dialogs', j:0,w:2});
         jsl.push({f:'images/mega/contact-avatar.svg', n: 'contact_avatar', j:0});
         jsl.push({f:'html/rewind.html', n: 'rewind', j:0});
-        jsl.push({f:'html/device-centre-shimmer.html', n: 'device_centre_shimmer_html', j:0});
         jsl.push({f:'css/topbar.css', n: 'topbar_css', j:2,w:5,c:1,d:1,cache:1});
 
         // Notification banner
         jsl.push({f:'css/notification-banner.css', n: 'notification-banner_css', j: 2, w: 5});
         jsl.push({f:'js/ui/notificationBanner.js', n: 'notificationBanner_js', j:1,w:1});
+
+        jsl.push({f:'js/ui/components/header.js', n:'header_js', j:1, w:1});
+        jsl.push({f:'js/ui/components/top-menu.js', n:'top_menu_js', j:1, w:1});
+        jsl.push({f:'js/ui/components/storage-block.js', n:'storage_block_js', j:1, w:1});
+        jsl.push({f:'css/pm/layout.css', n:'pm_layout_css', j:2, w:1});
+        jsl.push({f:'css/components/header.css', n:'header_css', j:2, w:1});
+        jsl.push({f:'css/components/top-menu.css', n:'top_menu_css', j:2, w:1});
     } // !is_mobile
 
     // do not change the order...
@@ -2683,8 +2696,6 @@ else if (!browserUpdate) {
         jsl.push({f:'css/mobile/mobile.radio.button.css', n: 'mobile_radio_button_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/components/toggle-button.css', n: 'toggle_button_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/mobile/mobile.footer.css', n: 'mobile_footer_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/mobile/mobile.header.css', n: 'mobile_header_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/mobile/mobile.top.menu.css', n: 'mobile_top_menu_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/mobile/mobile.msgdialog.css', n: 'mobile_msgdialog_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/mobile/mobile.rubbish-bin.css', n: 'mobile_rubbish_bin_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/mobile/mobile.banner.css', n: 'mobile_banner_css', j:2,w:5,c:1,d:1,cache:1});
@@ -2775,8 +2786,6 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/mobile.radio.group.js', n: 'mobile_radio_group_js', j: 1, w:1});
         jsl.push({f:'js/ui/components/toggle-button.js', n: 'toggle_button_js', j: 1, w:1});
         jsl.push({f:'js/mobile/mobile.footer.js', n: 'mobile_footer_js', j: 1, w:1});
-        jsl.push({f:'js/mobile/mobile.header.js', n: 'mobile_header_js', j: 1, w:1});
-        jsl.push({f:'js/mobile/mobile.top.menu.js', n: 'mobile_top_menu_js', j: 1, w:1});
         jsl.push({f:'js/mobile/settings/appearance.js', n: 'mobile_settings_appearance_js', j: 1, w:1});
         jsl.push({f:'js/mobile/settings/settingsHelper.js', n: 'mobile_settings_js', j: 1, w:1});
         jsl.push({f:'js/mobile/settings/settings.js', n: 'mobile_settings_js', j: 1, w:1});
@@ -3008,14 +3017,6 @@ else if (!browserUpdate) {
             'rewind_utils_js': {f:'js/rewind/utils.js', n: 'rewind_utils_js', j: 1, w: 1},
             'rewind_storage_js': {f:'js/rewind/storage.js', n: 'rewind_storage_js', j: 1, w: 1}
         },
-        'devices': {
-            'devices_utils_js': {f:'js/fm/devices/utils.js', n: 'devices_utils_js', j: 1, w: 1},
-            'devices_tree_js': {f:'js/fm/devices/tree.js', n: 'devices_tree_js', j: 1, w: 1},
-            'devices_main_js': {f:'js/fm/devices/main.js', n: 'devices_main_js', j: 1, w: 1},
-            'devices_s_devices_js': {f:'js/fm/devices/sections/devices.js', n: 'devices_s_devices_js', j: 1, w: 1},
-            'devices_s_device_folders_js': {f:'js/fm/devices/sections/device-folders.js', n: 'devices_s_device_folders_js', j: 1, w: 1},
-            'devices_s_folder_children_js': {f:'js/fm/devices/sections/folder-children.js', n: 'devices_s_folder_children_js', j: 1, w: 1},
-        },
         'chat': {
             /* chat related css */
             'chat_messages_css':{f:'css/chat-messages.css', n: 'chat_messages_css', j:2,'w':5,'c':1,'cache':1,'d':1},
@@ -3075,17 +3076,12 @@ else if (!browserUpdate) {
             'pwm:mobile_fm_mono_css': {f:'css/sprites/mobile-fm-mono@mono.css', n: 'mobile_fm_mono_css', j:2, w:30, c:1, d:1, cache:1},
             'pwm:mobile_fm_dark_css': {f:'css/sprites/mobile-fm-theme@dark.css', n: 'mobile_fm_dark_css', j:2, w:30, c:1, d:1, cache:1},
             'pwm:mobile_fm_light_css': {f:'css/sprites/mobile-fm-theme@light.css', n: 'mobile_fm_light_css', j:2, w:30, c:1, d:1, cache:1},
-            'pwm:mobile_header_css': {f:'css/mobile/mobile.header.css', n: 'mobile_header_css', j:2, w:1},
-            'pwm:mobile_top_menu_css': {f:'css/mobile/mobile.top.menu.css', n: 'mobile_top_menu_css', j:2, w:1},
-            'pwm:header_css': {f:'css/pm/header.css', n: 'header_css', j: 2, w:1},
-            'pwm:top_menu_css': {f:'css/pm/top-menu.css', n: 'top_menu_css', j: 2, w:1},
             'pwm:form_css': {f:'css/pm/form.css', n: 'pm_form_css', j:2, w:1},
             'pwm:pm_password_list_page_css': {f:'css/pm/password-list-page.css', n: 'pm_password_list_page_css', j:2, w:1},
             'pwm:top_nav_css': {f:'css/pm/top-nav.css', n: 'pm_top_nav_css', j:2, w:1},
             'pwm:clickable_css': {f:'css/pm/clickable.css', n: 'pm_clickable_css', j:2, w:1},
             'pwm:mega_inputs_css': {f:'css/pm/mega-inputs.css', n: 'pm_mega_inputs_css', j:2, w:1},
             'pwm:general_css': {f:'css/pm/general.css', n: 'pm_general_css', j:2, w:1},
-            'pwm:layout_css': {f:'css/pm/layout.css', n: 'pm_layout_css', j:2, w:1},
             'pwm:banner_css': {f:'css/pm/banner.css', n: 'pm_banner_css', j:2, w:1},
             'pwm:spinners_css': {f:'css/pm/spinners.css', n: 'pm_spinners_css', j:2, w:1},
             'pwm:dropdown_css': {f:'css/pm/dropdown.css', n: 'pm_dropdown_css', j:2, w:1},
@@ -3096,7 +3092,6 @@ else if (!browserUpdate) {
             'pwm:menu_css': {f:'css/pm/menu.css', n: 'pm_menu_css', j:2, w:1},
             'pwm:password_item_form_css': {f:'css/pm/password-item-form.css', n: 'pm_password_item_form_css', j:2, w:1},
             'pwm:subscription_dialog_css': {f:'css/pm/subscription-dialog.css', n: 'subscription_dialog_css', j:2, w:1},
-            'pwm:avatars_css': {f:'css/pm/avatars.css', n: 'pwm_avatars_css', j:2, w:1},
             'pwm:settings_css': {f:'css/pm/settings/settings.css', n: 'settings_css', j:2, w:1},
             'pwm:settings_list_css': {f:'css/pm/settings/list.css', n: 'settings_list_css', j:2, w:1},
 
@@ -3105,15 +3100,11 @@ else if (!browserUpdate) {
             'pwm:read_only_field_js': {f:'js/ui/components/read-only-field.js', n: 'read_only_field_js', j: 1, w:1},
             'pwm:mobile_message_overlay_js': {f:'js/mobile/mobile.message-overlay.js', n: 'mobile_message_overlay_js', j: 1, w:1},
             'pwm:mobile_banner_js': {f:'js/mobile/mobile.banner.js', n: 'mobile_banner_js', j: 1, w:1},
-            'pwm:mobile_header_js': {f:'js/mobile/mobile.header.js', n: 'mobile_header_js', j: 1, w:1},
-            'pwm:mobile_top_menu_js': {f:'js/mobile/mobile.top.menu.js', n: 'mobile_top_menu_js', j: 1, w:1},
             'pwm:pm_js': {f:'js/ui/pwm/pm.js', n: 'pm_js', j: 1, w:1},
             'pwm:pm_ui_js': {f:'js/ui/pwm/pm-ui.js', n: 'pm_ui_js', j: 1, w:1},
             'pwm:pm_ui_settings_js': {f:'js/ui/pwm/pm-ui-settings.js', n: 'pm_ui_settings_js', j: 1, w:1},
             'pwm:functions_js': {f:'js/ui/pwm/functions.js', n: 'pm_functions_js', j: 1, w:1},
             'pwm:functions_settings_js': {f:'js/ui/pwm/functions-settings.js', n: 'pm_functions_settings_js', j: 1, w:1},
-            'pwm:header_js': {f:'js/ui/pwm/component/header.js', n: 'header_js', j: 1, w:1},
-            'pwm:top_menu_js': {f:'js/ui/pwm/component/top-menu.js', n: 'top_menu_js', j: 1, w:1},
             'pwm:top_nav_js': {f:'js/ui/pwm/component/top-nav.js', n: 'top_nav_js', j: 1, w:1},
             'pwm:banner_js': {f:'js/ui/pwm/component/banner.js', n: 'banner_js', j: 1, w:1},
             'pwm:view_js': {f:'js/ui/pwm/component/view.js', n: 'view_js', j: 1, w:1},

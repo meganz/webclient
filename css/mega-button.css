@@ -126,12 +126,24 @@
         display: inline-flex;
         align-items: center;
     }
+    .merge-mega-button:hover .mega-button.action:not(.disabled) {
+        background: var(--action-hover);
+    }
     .merge-mega-button > :not(:first-child,:last-child) {
         border-radius: 0;
     }
     .merge-mega-button > button:first-child,
     .merge-mega-button > :first-child > button {
         border-radius: 4px 0 0 4px;
+    }
+    .merge-mega-button > button.action:first-child,
+    .merge-mega-button > :first-child > button.action {
+        margin-inline-end: 0;
+        padding-inline-end: 0;
+    }
+    .merge-mega-button > button.action:first-child > span,
+    .merge-mega-button > :first-child > button.action > span {
+        margin-inline-end: 0;
     }
     .rtl .merge-mega-button > button:first-child,
     .rtl .merge-mega-button > :first-child > button {
@@ -142,10 +154,18 @@
         border-radius: 0 4px 4px 0;
         margin-left: -2px;
     }
+    .merge-mega-button > button.action:last-child,
+    .merge-mega-button > :last-child > button.action {
+        margin-left: 0;
+    }
     .rtl .merge-mega-button > button:last-child,
     .rtl .merge-mega-button > :last-child > button {
         border-radius: 4px 0 0 4px;
         margin-right: -2px;
+    }
+    .rtl .merge-mega-button > button.action:last-child,
+    .rtl .merge-mega-button > :last-child > button.action {
+        margin-right: 0;
     }
 
 /* end: shape modifiers */
@@ -239,12 +259,10 @@
             }
 
             .mega-button.large > div ~ span {
-                -webkit-margin-start: 12px;
                 margin-inline-start: 12px;
             }
 
             .mega-button.large > span ~ div {
-                -webkit-margin-start: -4px;
                 margin-inline-start: -4px;
             }
 
@@ -291,7 +309,6 @@
         text-overflow: ellipsis;
         min-width: 0;
         overflow: hidden;
-        -webkit-margin-end: 16px;
         margin-inline-end: 16px;
         padding: 4px var(--outer-padding);
     }

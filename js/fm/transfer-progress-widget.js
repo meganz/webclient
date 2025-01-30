@@ -138,7 +138,7 @@ mega.tpw = new function TransferProgressWidget() {
 
         // open transfer page
         $('.js-tpm-open', $widgetHeadAndBody).rebind('click.tpw', () => {
-            $('.nw-fm-left-icon.transfers.js-fm-tab', '#fmholder').trigger('click');
+            M.openFolder('transfers');
         });
 
         // open section

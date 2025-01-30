@@ -25,7 +25,6 @@
 .mega-bottom-bar .text-actions > *:not(:first-child),
 .mega-bottom-bar .icon-actions > *:not(:first-child) {
     margin-inline-start: 8px;
-    -webkit-margin-start: 8px;
 }
 
 .mega-bottom-bar .icon-actions:empty {

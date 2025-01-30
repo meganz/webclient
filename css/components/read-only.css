@@ -1,4 +1,4 @@
-.read-only-field {
+.mega-component.read-only-field {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -9,13 +9,13 @@
     margin-bottom: 24px;
 }
 
-.read-only-field.grouped {
+.mega-component.read-only-field.grouped {
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
     margin-bottom: 0;
 }
 
-.read-only-field.grouped .divider {
+.mega-component.read-only-field.grouped .divider {
     box-sizing: border-box;
     padding: 2px 12px;
     width: 100%;
@@ -23,17 +23,17 @@
     margin-top: 12px;
 }
 
-.read-only-field.grouped:not(.hidden) + .read-only-field:not(.grouped) {
+.mega-component.read-only-field.grouped:not(.hidden) + .read-only-field:not(.grouped) {
     border-top-left-radius: 0;
     border-top-right-radius: 0;
 }
 
-.read-only-field .read-only-label {
+.mega-component.read-only-field .read-only-label {
     font: var(--mobile-font-caption-large-bold);
     margin-bottom: 8px;
 }
 
-.read-only-field .read-only-output {
+.mega-component.read-only-field .read-only-output {
     width: 100%;
     display: flex;
     line-break: anywhere;
@@ -43,27 +43,27 @@
     font: var(--mobile-font-input-regular);
 }
 
-.read-only-field .read-only-output .read-only-value {
+.mega-component.read-only-field .read-only-output .read-only-value {
     font: var(--mobile-font-input-regular);
     margin-right: 16px;
 }
 
-.read-only-field .read-only-output .read-only-value.password-colorized span {
+.mega-component.read-only-field .read-only-output .read-only-value.password-colorized span {
     font: var(--font-input-password);
     letter-spacing: 2px;
 }
 
-.read-only-field .read-only-output a {
+.mega-component.read-only-field .read-only-output a {
     font: var(--mobile-font-link-large-regular);
     color: var(--mobile-link-primary);
 }
 
-.read-only-field .read-only-actions {
+.mega-component.read-only-field .read-only-actions {
     display: flex;
     --icon-size: 20px;
 }
 
-.read-only-field .read-only-actions button.icon-only {
+.mega-component.read-only-field .read-only-actions button.icon-only {
     background-color: transparent;
     width: auto;
     height: auto;
@@ -72,23 +72,23 @@
     --icon-size: 20px;
 }
 
-.read-only-field .read-only-actions button:last-child:not(:first-child) {
+.mega-component.read-only-field .read-only-actions button:last-child:not(:first-child) {
     margin-inline-start: 16px;
 }
 
-.read-only-field .read-only-actions i {
+.mega-component.read-only-field .read-only-actions i {
     cursor: pointer;
     padding: 4px;
 }
 
-.read-only-field .read-only-help {
+.mega-component.read-only-field .read-only-help {
     display: flex;
     margin-top: 8px;
     font: var(--mobile-font-caption-large-regular);
     color: var(--mobile-text-secondary);
 }
 
-.read-only-field .read-only-help i {
+.mega-component.read-only-field .read-only-help i {
     margin-top: 3px;
     margin-inline-end: 8px;
 }

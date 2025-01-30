@@ -216,7 +216,7 @@ var notificationBanner = {
                     this.$banner.insertBefore($('.widgets.content-block', '.fm-right-block.dashboard'));
                 }
                 else {
-                    this.$banner.insertAfter($('#topmenu'));
+                    this.$banner.insertBefore($('.onboarding-control-panel'));
                 }
 
                 this.updateFMContainerHeight(true);
@@ -246,14 +246,12 @@ var notificationBanner = {
         if (M.currentdirid === 'recents') {
             activeFMContainer = '.fm-recents.container';
         }
+        else if (M.currentdirid === 'devices') {
+            activeFMContainer = '.fm-right-block.full-size';
+        }
 
         if (bannerShown) {
-            if (M.currentdirid === 'albums') {
-                $('.albums-grid', '#albums-view').height(`calc(100vh - 97px - ${this.$banner.outerHeight()}px)`);
-            }
-            else {
-                $(activeFMContainer).height(`calc(100% - 48px - ${this.$banner.outerHeight()}px)`);
-
+            if (M.currentdirid !== 'albums') {
                 // If a gallery empty state is visible, add a scroller to it so the contents
                 // can be seen
                 const $emptySection = $('.fm-empty-section:not(.hidden)', $(activeFMContainer));

@@ -45,7 +45,6 @@
 
 .toast-notification > button {
     margin-inline-start: 10px;
-    -webkit-margin-start: 10px;
 }
 
 .toast-notification .message-body {

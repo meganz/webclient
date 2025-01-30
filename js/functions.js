@@ -1559,6 +1559,7 @@ function mLogout(aCallback, force) {
         .catch((ex) => {
             if (u_type > 2 && window.waitsc) {
                 waitsc();
+                getsc(true);
             }
             if (ex) {
                 dump(ex);

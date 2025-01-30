@@ -122,6 +122,14 @@ class MegaPasswordItemDetail {
             id: 'website',
             label: l.website_label,
             isLink: true,
+            actions: [{
+                icon: 'sprite-pm-mono icon-copy-thin-outline',
+                onClick() {
+                    mega.ui.pm.utils.copyPMToClipboard(this.inputValue, l.website_copied);
+                    return false;
+                },
+                hint: l.copy_website
+            }],
         });
 
         this.websiteField.on('click', () => {

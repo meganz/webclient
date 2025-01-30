@@ -39,7 +39,7 @@ class MegaMenu extends MegaOverlay {
         super.hide();
 
         // Enable scrolling
-        if (mega.pwmh && mega.pm.pwmFeature && mega.ui.pm.list.passwordList.Ps) {
+        if (mega.pwmh && (mega.pm.pwmFeature || u_attr.b || u_attr.pf) && mega.ui.pm.list.passwordList.Ps) {
             Ps.enable(mega.ui.pm.list.passwordList.Ps.element);
         }
     }

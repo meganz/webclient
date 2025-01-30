@@ -108,7 +108,7 @@
             if (this.BackupsId) {
                 cases[this.BackupsId] = () => {
                     typeClass = 'backups';
-                    name = l.restricted_folder_button;
+                    // name = l.restricted_folder_button; // temporary solution for backup page show no root
                 };
             }
 

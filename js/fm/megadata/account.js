@@ -801,8 +801,8 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
     var $strgdlgBodyFull = $('.fm-dialog-body.storage-dialog.full', $strgdlg).removeClass('odq');
     var $strgdlgBodyAFull = $('.fm-dialog-body.storage-dialog.almost-full', $strgdlg);
 
-    var prevState = $('.fm-main').is('.almost-full, .full');
-    $('.fm-main').removeClass('fm-notification almost-full full');
+    var prevState = $('.pm-main').is('.almost-full, .full');
+    $('.pm-main').removeClass('fm-notification almost-full full');
     var $odqWarn = $('.odq-warning', $strgdlgBodyFull).addClass('hidden');
     var $upgradeBtn = $('.choose-plan span', $strgdlg).text(l[8696]);
     const $headerFull = $('header h2.full', $strgdlg);
@@ -825,7 +825,7 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
                 });
             });
         }
-        $('.fm-main').addClass('fm-notification full');
+        $('.pm-main').addClass('fm-notification full');
 
         $strgdlg.addClass('full');
         $('.body-header', $strgdlgBodyFull).text(l[23519]);
@@ -902,14 +902,14 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
         var myOptions = Object(options);
         if (quota.isFull) {
             $strgdlg.addClass('full');
-            $('.fm-main').addClass('fm-notification full');
+            $('.pm-main').addClass('fm-notification full');
             $('header h2', $strgdlgBodyFull).text(myOptions.title || l[16302]);
             $('.body-header', $strgdlgBodyFull).safeHTML(myOptions.body || l[16360]);
             $headerFull.text(l.cloud_strg_100_percent_full);
         }
         else if (quota.isAlmostFull || myOptions.custom) {
             if (quota.isAlmostFull) {
-                $('.fm-main').addClass('fm-notification almost-full');
+                $('.pm-main').addClass('fm-notification almost-full');
                 if (mega.tpw.initialized && mega.tpw.isWidgetVisibile()) {
                     mega.tpw.showAlmostOverquota();
                 }
@@ -952,7 +952,7 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
             if ($strgdlg.is(':visible')) {
                 window.closeDialog();
             }
-            $('.fm-main').removeClass('fm-notification almost-full full');
+            $('.pm-main').removeClass('fm-notification almost-full full');
 
             return Promise.reject();
         }
@@ -1010,7 +1010,7 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
 
     $('.fm-notification-block .fm-notification-close')
         .rebind('click', function() {
-            $('.fm-main').removeClass('fm-notification almost-full full');
+            $('.pm-main').removeClass('fm-notification almost-full full');
             $.tresizer();
         });
 

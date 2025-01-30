@@ -2344,3 +2344,25 @@ i.account-icon.menu {
 .medium-icon.dialog-sprite.right-arrow {
     background-position: -136px -7008px;
 }
+
+/* Double icons with 2x 90 icon */
+body .item-type-icon-90.double {
+    background-position: calc(var(--icon-size) / -14) calc(var(--icon-size) / 16);
+    background-color: inherit;
+    overflow: hidden;
+}
+body.rtl .item-type-icon-90.double {
+    background-position: calc(var(--icon-size) / 14) calc(var(--icon-size) / 16);
+}
+body .item-type-icon-90.double .item-type-icon-90 {
+    background-color: inherit;
+    background-position: calc(var(--icon-size) / -8) calc(var(--icon-size) / 12);
+    border-radius: calc(var(--icon-size) / 12);
+    left: calc(var(--icon-size) / 5);
+    top: calc(var(--icon-size) / -6);
+}
+body.rtl .item-type-icon-90.double .item-type-icon-90 {
+    right: calc(var(--icon-size) / 5);
+    left: auto;
+    background-position: calc(var(--icon-size) / 8) calc(var(--icon-size) / 12);
+}

@@ -184,7 +184,10 @@ var tooltiplogin = {
                 topPopupAlign('.top-buttons.business .top-login-button', '.dropdown.top-login-popup', 60);
             }
             else {
-                topPopupAlign('.top-login-button:visible', '.dropdown.top-login-popup', 60);
+                topPopupAlign(
+                    '.top-login-button:visible, .nav-elem.login-button:visible',
+                    '.dropdown.top-login-popup', 60
+                );
             }
         }
 

@@ -188,15 +188,7 @@ function topMenu(close) {
             $('.top-menu-logged .loader', $topMenu).addClass('loading');
 
             Promise.resolve(M.storageQuotaCache || M.getStorageQuota())
-                .then((data) => {
-
-                    topMenuDataUpdate(data);
-
-                    if (fminitialized && !folderlink && M.currentTreeType === 'cloud-drive') {
-
-                        return M.checkLeftStorageBlock(data);
-                    }
-                })
+                .then(topMenuDataUpdate)
                 .catch(dump);
         }
 
@@ -234,10 +226,10 @@ function topMenuDataUpdate(data) {
 
     // Show only space_used for Business and Pro Flexi accounts
     if (u_attr && (u_attr.b || u_attr.pf)) {
-        storageHtml = '<span>' +  space_used + '</span>';
+        storageHtml = '<span>' + space_used + '</span>';
     }
     else {
-        storageHtml = l[1607].replace('%1', '<span>' +  space_used + '</span>')
+        storageHtml = l[1607].replace('%1', '<span>' + space_used + '</span>')
             .replace('%2', space);
     }
 
@@ -1749,7 +1741,6 @@ function init_page() {
                     // queued work is continued when user accept terms of service
                     let $icon = $('.transfer-pause-icon').removeClass('active');
                     $('i', $icon).removeClass('icon-play-small').addClass('icon-pause');
-                    $('.nw-fm-left-icon.transfers').removeClass('paused');
                     dlQueue.resume();
                     ulQueue.resume();
                     uldl_hold = false;
@@ -1803,7 +1794,6 @@ function init_page() {
             $('#startholder').empty();
         }
 
-        $('.nw-fm-left-icons-panel').removeClass('hidden');
         let fmholder = document.getElementById('fmholder');
         // try to determinate visibility, without needing to use :visible
         if (!fmholder || fmholder.classList.contains("hidden") || fmholder.style.display === "none") {
@@ -2238,6 +2228,11 @@ function topmenuUI() {
         });
     }
 
+    if (u_type > 0 || is_fm()) {
+        $headerButtons.addClass('hidden');
+        $headerIndividual.addClass('hidden');
+    }
+
     if (u_type > 0) {
 
         $menuHomeItem.addClass('hidden');
@@ -2257,7 +2252,6 @@ function topmenuUI() {
             }, 888);
         }
 
-        $headerButtons.addClass('hidden');
         $loginButton.addClass('hidden');
         $('.dropdown.top-login-popup', $topHeader).addClass('hidden');
         $('.membership-status', $topHeader).removeClass('hidden');
@@ -2419,7 +2413,6 @@ function topmenuUI() {
         $menuLoggedBlock.addClass('hidden');
         $('.membership-status-block', $topHeader).addClass('hidden');
         $headerAchievements.addClass('hidden');
-        $headerButtons.removeClass('hidden');
         $headerRegisterBotton.removeClass('hidden');
 
         $headerRegisterBotton.rebind('click.register', function() {
@@ -2513,14 +2506,14 @@ function topmenuUI() {
             topMenu(1);
         }
 
-        if (!e || e.target.closest('.top-menu-popup') &&
+        if (!e || !e.target.closest('.top-menu-popup') &&
             (!c || !c.includes('activity-status') && !c.includes('loading'))) {
             $headerActivityBlock.removeClass('active');
         }
 
         if (!e || !e.target.closest('.top-login-popup') &&
             (!c || !c.includes('top-login-popup') && !c.includes('top-login-button'))) {
-            $topHeader.find('.dropdown.top-login-popup').addClass('hidden');
+            $('#pmlayout .dropdown.top-login-popup').addClass('hidden');
         }
 
         if (!e || !e.target.closest('.create-new-folder') &&
@@ -2565,7 +2558,7 @@ function topmenuUI() {
             elements = document.getElementsByClassName('js-dropdown-rewind-progress');
 
             for (i = elements.length; i--;) {
-                if (!elements[i].classList.contains('active') || e && e.target.closest('.topbar-links')) {
+                if (!elements[i].classList.contains('active') || e && e.target.closest('.topbar-links, .mega-header')) {
                     elements[i].classList.remove('show');
                 }
             }
@@ -2845,7 +2838,7 @@ function topmenuUI() {
             clearTimeout($.liTooltipTimer);
         }
         $.liTooltipTimer = window.setTimeout(
-            function () {
+            () => {
                 if (!$tooltip.parent().is(':visible')) {
                     return;
                 }
@@ -2869,15 +2862,10 @@ function topmenuUI() {
                 $tooltip.addClass('hovered');
             }, 100);
     })
-        .rebind('mouseout.nw-fm-left-icon', function () {
+        .rebind('mouseout.nw-fm-left-icon', function() {
             $(this).find('.dark-tooltip').removeClass('hovered');
             clearTimeout($.liTooltipTimer);
         });
-
-    // If the user name in the header is clicked, take them to the account overview page
-    $('.user-name', $topHeader).rebind('click.showaccount', function() {
-        loadSubPage('fm/account');
-    });
 
     // If the main Mega M logo in the header is clicked
     $('.logo, .logo-full', '.top-head, .fm-main, .bar-table').rebind('click', () => {
@@ -2910,9 +2898,6 @@ function topmenuUI() {
             loadSubPage($.dlhash);
         }
         else if (folderlink && M.lastSeenFolderLink) {
-            mBroadcaster.once('mega:openfolder', SoonFc(function () {
-                $('.nw-fm-left-icon.transfers').click();
-            }));
             loadSubPage(M.lastSeenFolderLink);
         }
         else {

@@ -217,13 +217,9 @@ ChatdIntegration.decryptMessageHelper = async function(message, chatRoom) {
 };
 
 ChatdIntegration.prototype.requiresUpdate = function(source) {
-    if (window.location.toString().indexOf("/chat")) {
-        $('.nw-fm-left-icon.cloud-drive').triggerHandler('click');
-    }
 
     megaChat.destroy();
     megaChatIsDisabled = true;
-    $('.nw-fm-left-icon.conversations').hide();
 
     // because msgDialog would be closed on location.hash change... we need to do this a bit later....
     Soon(function() {

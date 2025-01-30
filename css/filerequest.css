@@ -233,21 +233,17 @@ body.file-request-drag .file-request-upload-page .page-main .page-content .block
     border-style: solid;
     flex-direction: column;
     padding-inline-end: 2px;
-    -webkit-padding-end: 2px;
 }
 
 .file-request-upload-page .page-main .page-content .block-uploading .block-uploading-scroll {
     height: 314px;
     overflow-y: scroll;
-    -webkit-padding-start: 11px;
     padding-inline-start: 11px;
-    -webkit-padding-end: 9px;
     padding-inline-end: 9px;
     box-sizing: border-box;
 }
 
 .file-request-upload-page .page-main .page-content .block-uploading .block-uploading-scroll.ps.ps--active-y {
-    -webkit-padding-end: 15px;
     padding-inline-end: 15px;
 }
 
@@ -286,16 +282,13 @@ body.file-request-drag .file-request-upload-page .page-main .page-content .block
 .file-request-upload-page .page-main .page-content .block-uploading .block-uploading-item .item-details .item-size {
     width: 70px;
     margin-inline-start: 16px;
-    -webkit-margin-start: 16px;
     margin-inline-end: 16px;
-    -webkit-margin-end: 16px;
     color: var(--color-text-secondary);
     flex: 0 0 70px;
 }
 
 .file-request-upload-page .page-main .page-content .block-uploading .block-uploading-item .item-details .item-status {
     margin-inline-start: auto;
-    -webkit-margin-start: auto;
     color: var(--color-text-secondary);
     text-align: right;
 
@@ -326,7 +319,6 @@ body.file-request-drag .file-request-upload-page .page-main .page-content .block
 
 .file-request-upload-page .page-main .page-content .block-uploading .block-uploading-item .item-error .error-message {
     margin-inline-start: 8px;
-    -webkit-margin-start: 8px;
 }
 
 .file-request-upload-page .page-main .page-content .block-uploading .block-uploading-item .item-error .error-reupload {
@@ -334,7 +326,6 @@ body.file-request-drag .file-request-upload-page .page-main .page-content .block
     color: var(--color-link-primary);
     font: var(--text-link-small);
     margin-inline-start: 3px;
-    -webkit-margin-start: 3px;
 }
 
 .file-request-upload-page .page-main .page-content .block-uploading .block-uploading-item .item-error .error-icon i {
@@ -506,7 +497,6 @@ body.file-request-drag .file-request-upload-page .page-main .page-content .block
 
     .file-request-upload-page .page-main .page-content .content-details.content-error .detail-wrapper {
         margin-inline-start: 8px;
-        -webkit-margin-start: 8px;
         row-gap: unset;
     }
 
@@ -537,7 +527,6 @@ body.file-request-drag .file-request-upload-page .page-main .page-content .block
 
     .file-request-upload-page .page-main .page-content .block-uploading .block-uploading-item .item-error .error-message {
         margin-inline-start: 0;
-        -webkit-margin-start: 0;
     }
 
     .file-request-upload-page .page-main .page-content .block-empty {

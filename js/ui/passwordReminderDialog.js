@@ -422,7 +422,7 @@
         showIcon() {
             if (!this.topIcon || this.topIcon.classList.contains('hidden') || !document.body.contains(this.topIcon)) {
                 // because, we have plenty of top menus, that may not be visible/active
-                const $icon = $('.js-pass-reminder', '.top-head');
+                const $icon = $('.js-pass-reminder', '.top-head, .mega-header');
                 this.topIcon = $icon[0];
                 if (this.topIcon) {
                     $icon.removeClass('hidden').rebind('click.prd', () => this.showDialog());
@@ -729,8 +729,8 @@
                 // Skip link
                 this.skipLink = new MegaLink({
                     parentNode: this.dialog,
-                    type: 'normal',
-                    componentClassname: 'text-only skip-link',
+                    type: 'text',
+                    componentClassname: 'skip-link',
                     text: l[1379]
                 });
                 this.skipLink.on('click.skip', () => {

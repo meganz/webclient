@@ -180,9 +180,6 @@
 .sprite-fm-uni.icon-folder-upload, .sprite-fm-uni-before.icon-folder-upload-before::before, .sprite-fm-uni-after.icon-folder-upload-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-folder-upload");
 }
-.sprite-fm-uni.icon-folder-upload-1, .sprite-fm-uni-before.icon-folder-upload-1-before::before, .sprite-fm-uni-after.icon-folder-upload-1-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-folder-upload-1");
-}
 .sprite-fm-uni.icon-gallery, .sprite-fm-uni-before.icon-gallery-before::before, .sprite-fm-uni-after.icon-gallery-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-gallery");
 }
@@ -356,5 +353,8 @@
 }
 .sprite-fm-uni.icon-youtube, .sprite-fm-uni-before.icon-youtube-before::before, .sprite-fm-uni-after.icon-youtube-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-youtube");
+}
+.sprite-fm-uni.mime-image-stack-solid, .sprite-fm-uni-before.mime-image-stack-solid-before::before, .sprite-fm-uni-after.mime-image-stack-solid-after::after {
+   background-image: url("../../images/sprites/fm-uni@uni.svg#mime-image-stack-solid");
 }
 

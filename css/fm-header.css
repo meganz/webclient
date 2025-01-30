@@ -1,44 +1,18 @@
 .fm-right-header {
     overflow: visible;
-    -webkit-padding-end: 8px;
     padding-inline-end: 8px;
     display: flex;
     justify-content: flex-end;
+    min-height: 48px;
 }
 .rtl .fm-right-header {
     direction: rtl;
     display: flex;
 }
-.fm-transfers-header {
-    -webkit-padding-end: 16px;
-    padding-inline-end: 16px;
-    margin-bottom: 4px;
-}
-.fm-right-header,
-.fm-transfers-header {
-    height: 48px;
-    flex-shrink: 0;
-    box-sizing: border-box;
-    white-space: nowrap;
-    background-color: var(--stroke-main);
-    position: relative;
-}
-.fm-right-header .mega-button,
-.fm-transfers-header .mega-button {
-    -webkit-margin-end: 8px;
+.fm-right-header .mega-button {
     margin-inline-end: 8px;
 }
-.fm-transfers-header .mega-button {
-    margin-top: 5px;
-}
-.fm-transfers-header .mega-button i {
-    --mask-color: var(--icon-rest);
-}
-.fm-transfers-header .mega-button.transfer-clear-all-icon i {
-    --mask-color: var(--secondary-red);
-}
-.fm-right-header .mega-button span,
-.fm-transfers-header .mega-button span {
+.fm-right-header .mega-button span {
     white-space: nowrap;
 }
 .fm-right-header .mega-button.fm-new-shared-folder {
@@ -53,9 +27,7 @@
     display: flex;
     align-items: center;
     padding-inline-start: 28px;
-    -webkit-padding-start: 28px;
     margin-inline-end: auto;
-    -webkit-margin-end: auto;
 }
 .fm-header-buttons {
     font-size: 0;
@@ -86,21 +58,18 @@
     height: 24px;
 }
 .properties-breadcrumb .fm-breadcrumbs-wrapper.info {
-    -webkit-padding-start: 8px;
     padding-inline-start: 8px;
     margin-top: unset;
 }
 .fm-breadcrumbs-wrapper {
     display: flex;
     align-items: center;
-    -webkit-padding-start: 20px;
     padding-inline-start: 20px;
 }
 .fm-breadcrumbs-block:not(.hidden) {
     width: 100%;
     display: flex;
     align-items: center;
-    -webkit-padding-end: 24px;
     padding-inline-end: 24px;
     transition: 200ms linear;
 }
@@ -152,7 +121,7 @@
     display: flex;
     align-items: center;
     padding: 0 4px;
-    background-color: var(--stroke-main);
+    background-color: var(--mobile-page-background);
 }
 .properties-breadcrumb .crumb-overflow-link {
     background-color: unset;
@@ -220,8 +189,17 @@
 }
 
 .fm-files-view-icon i {
-    --mask-color: var(--stroke-mid-grey);
+    --mask-color: var(--mobile-icon-primary);
     --icon-size: 24px;
+}
+.fm-files-view-icon.block-view {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+}
+.fm-files-view-icon.block-view i {
+    --icon-size: 16px;
+    padding: 4px;
 }
 .fm-files-view-icon .listing-view-icon {
     background-position: -4px -1333px;

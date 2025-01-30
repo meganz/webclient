@@ -14,7 +14,6 @@
     display: flex;
     flex-direction: column;
     margin-inline-start: 16px;
-    -webkit-margin-start: 16px;
 }
 
 .link-mgmt-container .selected-node .node-details .num-files {
@@ -36,7 +35,6 @@
 
 .link-mgmt-container .toggle-container .mega-input.with-icon i:not(.alert) {
     order: 1;
-    -webkit-margin-end: 8px;
     margin-inline-end: 8px;
 }
 

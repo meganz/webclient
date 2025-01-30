@@ -661,7 +661,7 @@ function fmtopUI() {
         .addClass('hidden');
 
     $('.fm-clearbin-button,.fm-add-user,.fm-new-folder,.fm-file-upload,.fm-folder-upload,.fm-uploads')
-        .add('.fm-new-shared-folder,.fm-new-link')
+        .add('.fm-new-shared-folder,.fm-new-link,.fm-rewind')
         .add('.fm-new-file-request')
         .addClass('hidden');
     $('.fm-new-folder').removeClass('filled-input');
@@ -753,6 +753,8 @@ function fmtopUI() {
         else if (M.currentrootid === 'public-links') {
 
             M.sharesUI();
+            $sharesTabBlock.removeClass('hidden');
+            $('.public-links', $sharesTabBlock).addClass('active');
             $('.fm-right-files-block').addClass('visible-notification');
 
             if (M.currentdirid === M.currentrootid) {
@@ -763,6 +765,9 @@ function fmtopUI() {
             }
         }
         else if (M.currentrootid === 'file-requests') {
+            M.sharesUI();
+            $sharesTabBlock.removeClass('hidden');
+            $('.file-requests', $sharesTabBlock).addClass('active');
             $('.fm-right-files-block', document).addClass('visible-notification');
 
             if (M.currentdirid === M.currentrootid) {
@@ -849,10 +854,7 @@ function initTreeScroll() {
     var treeClass = 'js-myfiles-panel';
     var scrollBlock;
 
-    if (M.currentTreeType === 'gallery') {
-        treeClass = 'js-gallery-panel';
-    }
-    else if (folderlink || M.currentTreeType !== 'cloud-drive') {
+    if (folderlink || !mega.ui.topmenu.activeItem) {
         treeClass = 'js-other-tree-panel';
 
         $('.js-other-tree-panel .section-title')
@@ -892,23 +894,23 @@ function fmLeftMenuUI() {
     }
 
     // handle the RubbishBin icon changes
-    var $icon = $('.fm-left-panel .rubbish-bin');
+    var rubBtn = mega.ui.topmenu.rubbishBtn;
     var rubNodes = Object.keys(M.c[M.RubbishID] || {});
 
     if (rubNodes.length) {
 
-        if (!$icon.hasClass('filled')) {
-            $icon.addClass('filled');
+        if (!rubBtn.hasClass('filled')) {
+            rubBtn.addClass('filled');
         }
-        else if (!$icon.hasClass('glow')) {
-            $icon.addClass('glow');
+        else if (rubBtn.hasClass('glow')) {
+            rubBtn.removeClass('glow');
         }
         else {
-            $icon.removeClass('glow');
+            rubBtn.addClass('glow');
         }
     }
     else {
-        $icon.removeClass('filled glow');
+        rubBtn.removeClass('filled', 'glow');
     }
 }
 
@@ -3082,7 +3084,6 @@ function closeDialog(ev) {
     }
 
     delete $.dialog;
-    treesearch = false;
 
     if ($.registerDialog) {
         // if the terms dialog was closed from the register dialog
@@ -3577,7 +3578,8 @@ function fm_resize_handler(force) {
         console.time('fm_resize_handler');
     }
 
-    if (M.currentdirid !== 'transfers') {
+    // Only for old left pane pages
+    if (!mega.ui.topmenu.activeItem) {
         initTreeScroll();
     }
 
@@ -3601,7 +3603,7 @@ function fm_resize_handler(force) {
         fm_tfsupdate(); // this will call $.transferHeader();
     }
     else if (M.currentdirid && M.currentdirid.substr(0, 7) === 'account') {
-        var $accountContent = $('.fm-account-main', '.fm-main');
+        var $accountContent = $('.fm-account-main', '.pm-main');
 
         $accountContent.removeClass('low-width');
 
@@ -3613,7 +3615,7 @@ function fm_resize_handler(force) {
         accountUI.initAccountScroll();
     }
     else if (M.currentdirid && M.currentdirid.substr(0, 9) === 'dashboard') {
-        var $dashboardContent = $('.fm-right-block.dashboard', '.fm-main');
+        var $dashboardContent = $('.fm-right-block.dashboard', '.pm-main');
 
         $dashboardContent.removeClass('low-width');
 
@@ -3651,12 +3653,16 @@ function fm_resize_handler(force) {
 
     if (M.currentdirid !== 'transfers') {
         var treePaneWidth = Math.round($('.fm-left-panel:visible').outerWidth());
-        var leftPaneWidth = Math.round($('.nw-fm-left-icons-panel:visible').outerWidth());
+
+        if (megaChatIsReady && megaChat.resized) {
+            megaChat.resized();
+        }
+
         $('.popup.transfer-widget').outerWidth(treePaneWidth - 9);
     }
 
     if (M.currentrootid === 'shares') {
-        var $sharedDetailsBlock = $('.shared-details-block', '.fm-main');
+        var $sharedDetailsBlock = $('.shared-details-block', '.pm-main');
         var sharedHeaderHeight = Math.round($('.shared-top-details', $sharedDetailsBlock).outerHeight());
 
         $('.files-grid-view, .fm-blocks-view', $sharedDetailsBlock).css({
@@ -4117,6 +4123,14 @@ function FMResizablePane(element, opts) {
             $element.removeClass('small-left-panel');
         }
 
+        // Temporary RTL hack for chat left pane resize to adjust new header
+        if (document.body.classList.contains('rtl') && M.chat) {
+            mega.ui.header.domNode.style.paddingInlineEnd = `${width}px`;
+        }
+        else {
+            mega.ui.header.domNode.style.paddingInlineEnd = '';
+        }
+
         if (d > 1) {
             console.warn([this], width);
         }
@@ -4226,7 +4240,7 @@ Object.defineProperty(FMResizablePane, 'refresh', {
         'use strict';
         if (M.fmTabPages) {
             // @todo revamp if we ever use other than '.fm-left-panel' for these
-            const cl = $('.fm-left-panel:visible').data('fmresizable');
+            const cl = $('.fm-left-panel:visible, .mega-top-menu.ui-resizable:not(.hidden)').data('fmresizable');
 
             if (cl) {
 

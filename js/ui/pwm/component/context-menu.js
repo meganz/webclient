@@ -55,13 +55,6 @@ class MegaContextMenu extends MegaComponentGroup {
             menuItems['.edit-item'] = 1;
             menuItems['.delete-item'] = 1;
         }
-        else if (this.name === 'avatar-menu') {
-            menuItems['.logout'] = 1;
-            menuItems['.reload'] = 1;
-            menuItems['.import'] = 1;
-            menuItems['.download-extension'] = 1;
-            menuItems['.settings'] = 1;
-        }
 
         for (let i = this.keys.length; i--;) {
             const key = this.keys[i];
@@ -143,52 +136,6 @@ class MegaContextMenu extends MegaComponentGroup {
                     mega.ui.pm.utils.copyPMToClipboard(node.pwm.pwd, l[19602]);
                     eventlog(500541);
                 }
-            },
-            '.logout': {
-                text: l.mobile_settings_log_out_button,
-                icon: 'sprite-mobile-fm-mono icon-home-01-thin-outline',
-                onClick: () => mLogout()
-            },
-            '.reload': {
-                text: l[23433],
-                icon: 'sprite-mobile-fm-mono icon-rotate-cw-thin-outline',
-                onClick: () => M.reload()
-            },
-            '.import': {
-                text: l.import_password,
-                icon: 'sprite-mobile-fm-mono icon-file-upload-thin-outline',
-                onClick: () => {
-                    loadSubPage('fm/pwm/account');
-
-                    const scrollToImport = () => {
-                        const settingsWrap = document.querySelector('.settings-wrap');
-                        const targetDiv = settingsWrap ? settingsWrap.querySelector('#import') : null;
-
-                        if (!targetDiv || settingsWrap.classList.contains('hidden')) {
-                            return setTimeout(scrollToImport, 100);
-                        }
-
-                        targetDiv.scrollIntoView();
-                    };
-
-                    scrollToImport();
-                }
-            },
-            '.download-extension': {
-                text: l.download_extension,
-                icon: 'sprite-pm-mono icon-magic-wand-thin-outline',
-                onClick: () => {
-                    const link = ua.details.browser === 'Edgium' ?
-                        `https://microsoftedge.microsoft.com/addons/detail/mega-pass-secure-passwor/
-hjdopmdfeekbcakjbbienpbkdldkalfe`
-                        : 'https://chromewebstore.google.com/detail/mega-pass/deelhmmhejpicaaelihagchjjafjapjc';
-                    window.open(link, '_blank', 'noopener,noreferrer');
-                }
-            },
-            '.settings': {
-                text: l.mega_settings,
-                icon: 'sprite-pm-mono icon-settings-thin-outline',
-                onClick: () => loadSubPage('fm/account')
             }
         };
     });

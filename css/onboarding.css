@@ -41,7 +41,12 @@
 }
 #ob-dialog-arrow.top-left {
     transform: rotate(180deg);
-    left: 48px;
+    left: 56px;
+    top: -8px;
+}
+#ob-dialog-arrow.top-right {
+    transform: rotate(180deg);
+    right: 40px;
     top: -8px;
 }
 #ob-dialog .link-button {
@@ -92,7 +97,6 @@
 }
 #ob-dialog.mcob header {
     padding-inline-end: 24px;
-    -webkit-padding-end: 24px;
 }
 #ob-dialog.mcob #ob-dialog-title {
     font: var(--text-h2-bold);
@@ -225,7 +229,6 @@
     display: flex;
     align-items: center;
     position: relative;
-    -webkit-margin-start: 24px;
     margin-inline-start: 24px;
     flex-shrink: 0;
     flex-grow: 0;
@@ -269,9 +272,7 @@
     height: 100%;
     width: 70%;
     position: relative;
-    -webkit-margin-end: 36px;
     margin-inline-end: 36px;
-    -webkit-margin-start: 30px;
     margin-inline-start: 30px;
     align-items: center;
 }
@@ -348,17 +349,13 @@
 }
 .onboarding-control-panel .onboarding-control-panel-dismiss .mega-button,
 .onboarding-control-panel .onboarding-control-panel-complete .mega-button {
-    -webkit-margin-start: 8px;
     margin-inline-start: 8px;
-    -webkit-margin-end: 0;
     margin-inline-end: 0;
     flex: 0 0 auto;
 }
 .onboarding-control-panel .onboarding-control-panel-dismiss .question-content,
 .onboarding-control-panel .onboarding-control-panel-complete .question-content {
-    -webkit-margin-start: 10px;
     margin-inline-start: 10px;
-    -webkit-margin-end: auto;
     margin-inline-end: auto;
     font: var(--text-body1);
 }
@@ -379,17 +376,13 @@
     --mask-color: var(--text-color-white-high);
 }
 .onboarding-control-panel .onboarding-control-panel-complete .icon-accept {
-    -webkit-margin-start: 17px;
     margin-inline-start: 17px;
-    -webkit-margin-end: 0;
     margin-inline-end: 0;
     flex: 0 0 auto;
 }
 .onboarding-control-panel .onboarding-control-panel-complete .question-content {
     font: var(--text-h3-bold);
-    -webkit-margin-start: 13px;
     margin-inline-start: 13px;
-    -webkit-margin-end: 36px;
     margin-inline-end: 36px;
     vertical-align: middle;
 }
@@ -421,7 +414,6 @@
     .onboarding-control-panel .onboarding-control-panel-step {
         width: 100%;
         margin-bottom: 24px;
-        -webkit-margin-start: 6px;
         margin-inline-start: 6px;
     }
 }

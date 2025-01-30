@@ -27,7 +27,6 @@
 
 .achievements-page .nav-elem.full-width > *:not(:last-child) {
     margin-inline-end: 12px;
-    -webkit-margin-end: 12px;
 }
 
 .achievements-page .links {

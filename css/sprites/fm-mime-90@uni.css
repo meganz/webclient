@@ -19,9 +19,6 @@
 .item-type-icon-90.icon-audio-90, .sprite-fm-mime-90.icon-audio-90, .sprite-fm-mime-90-before.icon-audio-90-before::before, .sprite-fm-mime-90-after.icon-audio-90-after::after {
    background-image: url("../../images/sprites/fm-mime-90@uni.svg#icon-audio-90");
 }
-.item-type-icon-90.icon-backup-90, .sprite-fm-mime-90.icon-backup-90, .sprite-fm-mime-90-before.icon-backup-90-before::before, .sprite-fm-mime-90-after.icon-backup-90-after::after {
-   background-image: url("../../images/sprites/fm-mime-90@uni.svg#icon-backup-90");
-}
 .item-type-icon-90.icon-bucket-90, .sprite-fm-mime-90.icon-bucket-90, .sprite-fm-mime-90-before.icon-bucket-90-before::before, .sprite-fm-mime-90-after.icon-bucket-90-after::after {
    background-image: url("../../images/sprites/fm-mime-90@uni.svg#icon-bucket-90");
 }
@@ -36,9 +33,6 @@
 }
 .item-type-icon-90.icon-dmg-90, .sprite-fm-mime-90.icon-dmg-90, .sprite-fm-mime-90-before.icon-dmg-90-before::before, .sprite-fm-mime-90-after.icon-dmg-90-after::after {
    background-image: url("../../images/sprites/fm-mime-90@uni.svg#icon-dmg-90");
-}
-.item-type-icon-90.icon-ex-drive-90, .sprite-fm-mime-90.icon-ex-drive-90, .sprite-fm-mime-90-before.icon-ex-drive-90-before::before, .sprite-fm-mime-90-after.icon-ex-drive-90-after::after {
-   background-image: url("../../images/sprites/fm-mime-90@uni.svg#icon-ex-drive-90");
 }
 .item-type-icon-90.icon-excel-90, .sprite-fm-mime-90.icon-excel-90, .sprite-fm-mime-90-before.icon-excel-90-before::before, .sprite-fm-mime-90-after.icon-excel-90-after::after {
    background-image: url("../../images/sprites/fm-mime-90@uni.svg#icon-excel-90");
@@ -73,6 +67,12 @@
 .item-type-icon-90.icon-folder-sync-90, .item-type-icon-90.icon-rubbish-folder-sync-90, .sprite-fm-mime-90.icon-folder-sync-90, .sprite-fm-mime-90-before.icon-folder-sync-90-before::before, .sprite-fm-mime-90-after.icon-folder-sync-90-after::after {
    background-image: url("../../images/sprites/fm-mime-90@uni.svg#icon-folder-sync-90");
 }
+.item-type-icon-90.icon-folder-upload-90, .item-type-icon-90.icon-rubbish-folder-upload-90, .sprite-fm-mime-90.icon-folder-upload-90, .sprite-fm-mime-90-before.icon-folder-upload-90-before::before, .sprite-fm-mime-90-after.icon-folder-upload-90-after::after {
+   background-image: url("../../images/sprites/fm-mime-90@uni.svg#icon-folder-upload-90");
+}
+.item-type-icon-90.icon-folder-users-90, .item-type-icon-90.icon-rubbish-folder-users-90, .sprite-fm-mime-90.icon-folder-users-90, .sprite-fm-mime-90-before.icon-folder-users-90-before::before, .sprite-fm-mime-90-after.icon-folder-users-90-after::after {
+   background-image: url("../../images/sprites/fm-mime-90@uni.svg#icon-folder-users-90");
+}
 .item-type-icon-90.icon-font-90, .sprite-fm-mime-90.icon-font-90, .sprite-fm-mime-90-before.icon-font-90-before::before, .sprite-fm-mime-90-after.icon-font-90-after::after {
    background-image: url("../../images/sprites/fm-mime-90@uni.svg#icon-font-90");
 }
@@ -91,15 +91,6 @@
 .item-type-icon-90.icon-keynote-90, .sprite-fm-mime-90.icon-keynote-90, .sprite-fm-mime-90-before.icon-keynote-90-before::before, .sprite-fm-mime-90-after.icon-keynote-90-after::after {
    background-image: url("../../images/sprites/fm-mime-90@uni.svg#icon-keynote-90");
 }
-.item-type-icon-90.icon-mobile-90, .sprite-fm-mime-90.icon-mobile-90, .sprite-fm-mime-90-before.icon-mobile-90-before::before, .sprite-fm-mime-90-after.icon-mobile-90-after::after {
-   background-image: url("../../images/sprites/fm-mime-90@uni.svg#icon-mobile-90");
-}
-.item-type-icon-90.icon-mobile-android-90, .sprite-fm-mime-90.icon-mobile-android-90, .sprite-fm-mime-90-before.icon-mobile-android-90-before::before, .sprite-fm-mime-90-after.icon-mobile-android-90-after::after {
-   background-image: url("../../images/sprites/fm-mime-90@uni.svg#icon-mobile-android-90");
-}
-.item-type-icon-90.icon-mobile-ios-90, .sprite-fm-mime-90.icon-mobile-ios-90, .sprite-fm-mime-90-before.icon-mobile-ios-90-before::before, .sprite-fm-mime-90-after.icon-mobile-ios-90-after::after {
-   background-image: url("../../images/sprites/fm-mime-90@uni.svg#icon-mobile-ios-90");
-}
 .item-type-icon-90.icon-numbers-90, .sprite-fm-mime-90.icon-numbers-90, .sprite-fm-mime-90-before.icon-numbers-90-before::before, .sprite-fm-mime-90-after.icon-numbers-90-after::after {
    background-image: url("../../images/sprites/fm-mime-90@uni.svg#icon-numbers-90");
 }
@@ -108,18 +99,6 @@
 }
 .item-type-icon-90.icon-pages-90, .sprite-fm-mime-90.icon-pages-90, .sprite-fm-mime-90-before.icon-pages-90-before::before, .sprite-fm-mime-90-after.icon-pages-90-after::after {
    background-image: url("../../images/sprites/fm-mime-90@uni.svg#icon-pages-90");
-}
-.item-type-icon-90.icon-pc-90, .sprite-fm-mime-90.icon-pc-90, .sprite-fm-mime-90-before.icon-pc-90-before::before, .sprite-fm-mime-90-after.icon-pc-90-after::after {
-   background-image: url("../../images/sprites/fm-mime-90@uni.svg#icon-pc-90");
-}
-.item-type-icon-90.icon-pc-linux-90, .sprite-fm-mime-90.icon-pc-linux-90, .sprite-fm-mime-90-before.icon-pc-linux-90-before::before, .sprite-fm-mime-90-after.icon-pc-linux-90-after::after {
-   background-image: url("../../images/sprites/fm-mime-90@uni.svg#icon-pc-linux-90");
-}
-.item-type-icon-90.icon-pc-mac-90, .sprite-fm-mime-90.icon-pc-mac-90, .sprite-fm-mime-90-before.icon-pc-mac-90-before::before, .sprite-fm-mime-90-after.icon-pc-mac-90-after::after {
-   background-image: url("../../images/sprites/fm-mime-90@uni.svg#icon-pc-mac-90");
-}
-.item-type-icon-90.icon-pc-win-90, .sprite-fm-mime-90.icon-pc-win-90, .sprite-fm-mime-90-before.icon-pc-win-90-before::before, .sprite-fm-mime-90-after.icon-pc-win-90-after::after {
-   background-image: url("../../images/sprites/fm-mime-90@uni.svg#icon-pc-win-90");
 }
 .item-type-icon-90.icon-pdf-90, .sprite-fm-mime-90.icon-pdf-90, .sprite-fm-mime-90-before.icon-pdf-90-before::before, .sprite-fm-mime-90-after.icon-pdf-90-after::after {
    background-image: url("../../images/sprites/fm-mime-90@uni.svg#icon-pdf-90");
@@ -136,11 +115,11 @@
 .item-type-icon-90.icon-raw-90, .sprite-fm-mime-90.icon-raw-90, .sprite-fm-mime-90-before.icon-raw-90-before::before, .sprite-fm-mime-90-after.icon-raw-90-after::after {
    background-image: url("../../images/sprites/fm-mime-90@uni.svg#icon-raw-90");
 }
-.item-type-icon-90.icon-sketch-90, .sprite-fm-mime-90.icon-sketch-90, .sprite-fm-mime-90-before.icon-sketch-90-before::before, .sprite-fm-mime-90-after.icon-sketch-90-after::after {
-   background-image: url("../../images/sprites/fm-mime-90@uni.svg#icon-sketch-90");
-}
 .item-type-icon-90.icon-spreadsheet-90, .sprite-fm-mime-90.icon-spreadsheet-90, .sprite-fm-mime-90-before.icon-spreadsheet-90-before::before, .sprite-fm-mime-90-after.icon-spreadsheet-90-after::after {
    background-image: url("../../images/sprites/fm-mime-90@uni.svg#icon-spreadsheet-90");
+}
+.item-type-icon-90.icon-takedown-90, .sprite-fm-mime-90.icon-takedown-90, .sprite-fm-mime-90-before.icon-takedown-90-before::before, .sprite-fm-mime-90-after.icon-takedown-90-after::after {
+   background-image: url("../../images/sprites/fm-mime-90@uni.svg#icon-takedown-90");
 }
 .item-type-icon-90.icon-text-90, .sprite-fm-mime-90.icon-text-90, .sprite-fm-mime-90-before.icon-text-90-before::before, .sprite-fm-mime-90-after.icon-text-90-after::after {
    background-image: url("../../images/sprites/fm-mime-90@uni.svg#icon-text-90");
@@ -150,6 +129,9 @@
 }
 .item-type-icon-90.icon-torrent-90, .sprite-fm-mime-90.icon-torrent-90, .sprite-fm-mime-90-before.icon-torrent-90-before::before, .sprite-fm-mime-90-after.icon-torrent-90-after::after {
    background-image: url("../../images/sprites/fm-mime-90@uni.svg#icon-torrent-90");
+}
+.item-type-icon-90.icon-undecrypted-90, .sprite-fm-mime-90.icon-undecrypted-90, .sprite-fm-mime-90-before.icon-undecrypted-90-before::before, .sprite-fm-mime-90-after.icon-undecrypted-90-after::after {
+   background-image: url("../../images/sprites/fm-mime-90@uni.svg#icon-undecrypted-90");
 }
 .item-type-icon-90.icon-url-90, .sprite-fm-mime-90.icon-url-90, .sprite-fm-mime-90-before.icon-url-90-before::before, .sprite-fm-mime-90-after.icon-url-90-after::after {
    background-image: url("../../images/sprites/fm-mime-90@uni.svg#icon-url-90");

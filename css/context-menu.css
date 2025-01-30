@@ -94,14 +94,11 @@
     flex-grow: 0;
     flex-shrink: 0;
     --icon-size: 24px;
-    -webkit-margin-end: 8px;
     margin-inline-end: 8px;
     transition: var(--transition-color);
 }
 .context-menu li span ~ i {
-    -webkit-margin-end: 0;
     margin-inline-end: 0;
-    -webkit-margin-start: 8px;
     margin-inline-start: 8px;
 }
 .context-menu span {
@@ -110,7 +107,6 @@
 .context-menu .shortcut {
     color: var(--text-color-low);
     flex-shrink: 0;
-    -webkit-margin-start: 8px;
     margin-inline-start: 8px;
     min-width: 50px;
     text-align: end;

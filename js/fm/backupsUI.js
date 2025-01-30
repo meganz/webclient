@@ -1292,7 +1292,7 @@ lazy(mega, 'backupCenter', () => {
                 // Show Device icon
                 const dIcon = deviceIcon(deviceUserAgent || deviceName, this.data[i].type);
                 mCreateElement('i', {
-                    'class':`medium-file-icon item-type-icon-90 icon-${dIcon}-90`
+                    'class':`medium-file-icon sprite-fm-theme icon-${dIcon}-filled`
                 }, nameNode);
 
                 // Show Device name
@@ -1363,7 +1363,7 @@ lazy(mega, 'backupCenter', () => {
                 const deviceIconClass = `icon-${deviceIcon(
                     deviceData.dua || deviceName,
                     deviceData.type
-                )}-90`;
+                )}-filled`;
 
                 M.safeShowDialog('device-rename-dialog', () => {
                     $dialog.removeClass('hidden').addClass('active');
@@ -1434,7 +1434,7 @@ lazy(mega, 'backupCenter', () => {
 
                 $('.item-type-icon-90', $dialog)
                     .attr('class',
-                          `item-type-icon-90 ${deviceIconClass}`
+                          `item-type-icon-90 sprite-fm-theme ${deviceIconClass}`
                     );
 
                 $input.rebind('focus.deviceRenameDialog', () => {

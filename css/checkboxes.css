@@ -22,7 +22,6 @@
     height: 16px;
     box-sizing: border-box;
     cursor: pointer;
-    -webkit-margin-end: 11px;
     margin-inline-end: 11px;
     border-radius: 3px;
     position: relative;
@@ -46,39 +45,12 @@
     height: 14px;
     margin: 0 11px 0 0;
 }
-.checkboxOn::before {
-    content: "";
-    background-position: -27px -1852px;
-    background-image: url(../images/mega/top-login-sprite.png);
-    background-repeat: no-repeat;
-    width: 100%;
-    height: 100%;
-    display: block;
-    position: absolute;
-    top: 0;
-}
-.small.checkboxOn::before {
-    background-position: -35px -446px;
-}
-.album-item .checkboxOn::before {
-    content: "";
-    background-image: none;
-    position: absolute;
-    left: 5px;
-    top: 1px;
-    width: 4px;
-    height: 10px;
-    border: solid var(--surface-highlight-1);
-    border-width: 0 3px 3px 0;
-    transform: rotate(45deg);
-}
 .checkbox-block {
     display: flex;
 }
 .checkbox-txt {
     font: var(--text-body1);
     color: var(--text-color-medium);
-    -webkit-padding-end: 28px;
     padding-inline-end: 28px;
     max-width: calc(100% - 31px);
     box-sizing: border-box;
@@ -87,13 +59,27 @@
     vertical-align: middle;
 }
 
-.checkboxMinimize::before {
+.checkboxMinimize::before,
+.checkboxOn::before {
     background-repeat: no-repeat;
     background-size: 100%;
     display: block;
     content: '';
     width: var(--icon-size, 16px);
     height: var(--icon-size, 16px);
+    position: absolute;
+    top: 0;
+    bottom: 0;
+}
+
+.theme-light .checkboxOn::before,
+.theme-light-forced .checkboxOn::before {
+   background-image: url("../images/sprites/fm-theme@light.svg#icon-checkbox-on");
+}
+
+.theme-dark .checkboxOn::before,
+.theme-dark-forced .checkboxOn::before {
+   background-image: url("../images/sprites/fm-theme@dark.svg#icon-checkbox-on");
 }
 
 .theme-light .checkboxMinimize::before,

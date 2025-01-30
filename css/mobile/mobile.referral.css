@@ -60,14 +60,12 @@
     counter-increment: item;
     margin: 0;
     margin-inline-start: 20px;
-    -webkit-margin-start: 20px;
 }
 
 .mega-sheet .referral-comission-info p::before {
     content: counter(item)'.';
     font: var(--mobile-font-copy-bold);
     margin-inline-start: -20px;
-    -webkit-margin-start: -20px;
     position: absolute;
 }
 
@@ -135,11 +133,9 @@
 
 .account-referral .list-item > *:not(:last-child) {
     margin-inline-end: 16px;
-    -webkit-margin-end: 16px;
 }
 
 .account-referral .list-item > .num {
     font: var(--mobile-font-link-small-semibold);
     margin-inline-start: auto;
-    -webkit-margin-start: auto;
 }

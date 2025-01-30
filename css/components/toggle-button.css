@@ -17,7 +17,6 @@
 }
 
 .mega-toggle-button .toggle-labels {
-    -webkit-padding-end: 16px;
     padding-inline-end: 16px;
     display: flex;
     flex-direction: column;

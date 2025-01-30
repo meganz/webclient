@@ -1,8 +1,8 @@
 /* .nav-elem Semantic element */
-.nav-elem,
-.nav-elem button,
-.nav-elem button.mega-pm-button,
-.nav-elem a {
+.password-list-page .nav-elem,
+.password-list-page .nav-elem button,
+.password-list-page .nav-elem button.mega-pm-button,
+.password-list-page .nav-elem a {
     display: inline-flex;
     flex-flow: row nowrap;
     justify-content: center;
@@ -11,60 +11,59 @@
     border: none;
 }
 
-.nav-elem > *:not(:last-child),
-.nav-elem button > *:not(:last-child),
-.nav-elem button.mega-pm-button > *:not(:last-child),
-.nav-elem a > *:not(:last-child) {
+.password-list-page .nav-elem > *:not(:last-child),
+.password-list-page .nav-elem button > *:not(:last-child),
+.password-list-page .nav-elem button.mega-pm-button > *:not(:last-child),
+.password-list-page .nav-elem a > *:not(:last-child) {
     margin-inline-end: 10px;
-    -webkit-margin-end: 10px;
 }
 
-.nav-elem.password-item:hover {
+.password-list-page .nav-elem.password-item:hover {
     background: var(--mobile-surface-1);
 }
 
-.nav-elem:active {
+.password-list-page .nav-elem:active {
     background: inherit;
     color: inherit;
 }
 
-.nav-elem.primary:not(.icon-only):active,
-.nav-elem.primary:active {
+.password-list-page .nav-elem.primary:not(.icon-only):active,
+.password-list-page .nav-elem.primary:active {
     background: var(--mobile-button-primary-pressed);
     color: var(--mobile-text-inverse);
 }
-.nav-elem.password-item.sk-loading:hover {
+.password-list-page .nav-elem.password-item.sk-loading:hover {
     background: var(--mobile-page-background);
 }
 
-.nav-elem.active {
+.password-list-page .nav-elem.active {
     background: var(--mobile-surface-2);
 }
 
 /* Button and Link styles */
-.nav-elem.text-only.link {
+.password-list-page .nav-elem.text-only.link {
     font: var(--mobile-font-label-underline);
     text-decoration: none;
 }
-.nav-elem.text-only.link:hover .primary-text,
-.nav-elem.text-only.link:active .primary-text,
-.nav-elem.text-only.link:focus .primary-text {
+.password-list-page .nav-elem.text-only.link:hover .primary-text,
+.password-list-page .nav-elem.text-only.link:active .primary-text,
+.password-list-page .nav-elem.text-only.link:focus .primary-text {
     color: var(--mobile-button-primary-pressed);
 }
-.nav-elem.text-only.link:active .primary-text {
+.password-list-page .nav-elem.text-only.link:active .primary-text {
     color: var(--mobile-button-primary-pressed);
 }
-.nav-elem.text-only.link:focus {
+.password-list-page .nav-elem.text-only.link:focus {
     outline: var(--outline);
 }
-.nav-elem i.notification-loading-spinner {
+.password-list-page .nav-elem i.notification-loading-spinner {
     display: none;
 }
 
-.nav-elem.loading.sprite-fm-theme-after::after,
-.nav-elem.mega-pm-loading.sprite-fm-theme-after::after,
-.nav-elem.loading.sprite-fm-uni-after::after,
-.nav-elem.mega-pm-loading.sprite-fm-uni-after::after  {
+.password-list-page .nav-elem.loading.sprite-fm-theme-after::after,
+.password-list-page .nav-elem.mega-pm-loading.sprite-fm-theme-after::after,
+.password-list-page .nav-elem.loading.sprite-fm-uni-after::after,
+.password-list-page .nav-elem.mega-pm-loading.sprite-fm-uni-after::after  {
     animation-name: rotate;
     animation-duration: 1000ms;
     animation-iteration-count: infinite;
@@ -75,14 +74,14 @@
     position: absolute;
 }
 
-.nav-elem.loading .text-box-wrapper.sk-elm,
-.nav-elem.mega-pm-loading span {
+.password-list-page .nav-elem.loading .text-box-wrapper.sk-elm,
+.password-list-page .nav-elem.mega-pm-loading span {
     opacity: 0;
 }
 
 /* Default type */
-.nav-elem,
-.nav-elem.normal {
+.password-list-page .nav-elem,
+.password-list-page .nav-elem.normal {
     height: 48px;
     width: auto;
     border-radius: var(--mobile-border-radius-medium);
@@ -92,59 +91,59 @@
     color: var(--mobile-text-primary);
 }
 
-button.nav-elem,
-button.nav-elem.normal,
-button.mega-pm-button.nav-elem,
-button.mega-pm-button.nav-elem.normal,
-.nav-elem.primary {
+.password-list-page button.nav-elem,
+.password-list-page button.nav-elem.normal,
+.password-list-page button.mega-pm-button.nav-elem,
+.password-list-page button.mega-pm-button.nav-elem.normal,
+.password-list-page .nav-elem.primary {
     color: var(--mobile-text-inverse);
     background: var(--mobile-button-primary);
     font: var(--mobile-font-label-underline);
 }
 
-button.nav-elem.outline,
-button.mega-pm-button.nav-elem.outline {
+.password-list-page button.nav-elem.outline,
+.password-list-page button.mega-pm-button.nav-elem.outline {
     background: none;
     border: solid 2px var(--mobile-button-outline);
     color: var(--mobile-button-outline);
 }
-button.nav-elem.normal.outline span.primary-text {
+.password-list-page button.nav-elem.normal.outline span.primary-text {
     color: var(--mobile-button-outline);
 }
-button.nav-elem.outline.disabled,
-button.nav-elem.outline.disabled:active {
+.password-list-page button.nav-elem.outline.disabled,
+.password-list-page button.nav-elem.outline.disabled:active {
     background: none;
     border: solid 2px var(--mobile-border-disabled);
     color: var(--mobile-text-disabled);
 }
-button.nav-elem.normal.outline:not(.icon-only):active {
+.password-list-page button.nav-elem.normal.outline:not(.icon-only):active {
     background: none;
     border: solid 2px var(--mobile-button-primary-pressed);
     color: var(--mobile-button-primary-pressed);
 }
-button.nav-elem.text-icon.outline:not(.icon-only):focus span.primary-text,
-button.nav-elem.text-icon.outline:not(.icon-only):focus .sprite-pm-mono {
+.password-list-page button.nav-elem.text-icon.outline:not(.icon-only):focus span.primary-text,
+.password-list-page button.nav-elem.text-icon.outline:not(.icon-only):focus .sprite-pm-mono {
     color: var(--mobile-text-primary);
 }
-button.nav-elem.outline:not(.icon-only):active .primary-text,
-button.nav-elem.normal.outline:active .sprite-pm-mono {
+.password-list-page button.nav-elem.outline:not(.icon-only):active .primary-text,
+.password-list-page button.nav-elem.normal.outline:active .sprite-pm-mono {
     color: var(--mobile-button-primary-pressed);
 }
-button.nav-elem:focus {
+.password-list-page button.nav-elem:focus {
     background: var(--mobile-button-primary-pressed);
     color: var(--mobile-text-inverse-accent);
 }
-.nav-elem.normal.block {
+.password-list-page .nav-elem.normal.block {
     width: 100%;
     max-width: 380px;
 }
 
-.nav-elem.normal.block .primary-text {
+.password-list-page .nav-elem.normal.block .primary-text {
     font-weight: var(--mobile-font-weight-semibold);
 }
 
 /* Full width of container */
-.nav-elem.full-width {
+.password-list-page .nav-elem.full-width {
     width: 100%;
     height: 56px;
     border-radius: 0;
@@ -153,44 +152,43 @@ button.nav-elem:focus {
     --icon-size: 24px;
 }
 
-.nav-elem.full-width > *:not(:last-child) {
+.password-list-page .nav-elem.full-width > *:not(:last-child) {
     margin-inline-end: 16px;
-    -webkit-margin-end: 16px;
 }
 
 /* .nav-elem text */
-.nav-elem span {
+.password-list-page .nav-elem span {
     color: inherit;
     text-decoration: inherit;
     font: var(--mobile-font-copy-regular);
 }
-.nav-elem.semibold span {
+.password-list-page .nav-elem.semibold span {
     font-weight: var(--mobile-font-weight-semibold);
 }
 
-button.nav-elem.normal span.primary-text {
+.password-list-page button.nav-elem.normal span.primary-text {
     color: var(--mobile-text-inverse-accent);
 }
 
-.nav-elem.button span.primary-text {
+.password-list-page .nav-elem.button span.primary-text {
     font: var(--font-button-label);
 }
 
-.nav-elem.semibold span {
+.password-list-page .nav-elem.semibold span {
     font-weight: var(--mobile-font-weight-semibold);
 }
 
-.nav-elem .text-box-wrapper {
+.password-list-page .nav-elem .text-box-wrapper {
     display: inline-flex;
     flex-flow: column nowrap;
     align-items: flex-start;
 }
 
-.nav-elem .multi-text-box > *:not(:last-child) {
+.password-list-page .nav-elem .multi-text-box > *:not(:last-child) {
     margin-bottom: 2px;
 }
 
-.nav-elem .multi-text-box .sub-text {
+.password-list-page .nav-elem .multi-text-box .sub-text {
     font: var(--mobile-font-caption-small-regular);
     color: var(--mobile-text-secondary);
     line-height: 120%;
@@ -199,7 +197,7 @@ button.nav-elem.normal span.primary-text {
 /* Only enforce a default background for
 button-type elements.
  */
-button.nav-elem {
+.password-list-page button.nav-elem {
     color: var(--mobile-text-inverse-accent);
     background: var(--mobile-button-primary);
     cursor: pointer;
@@ -208,151 +206,151 @@ button.nav-elem {
     cursor: pointer;
 }
 
-button.nav-elem.destructive,
-.nav-elem.destructive,
-.nav-elem.destructive.no-active:active,
-button.nav-elem.normal.destructive:not(.icon-only):hover,
-button.nav-elem.loading.destructive:focus {
+.password-list-page button.nav-elem.destructive,
+.password-list-page .nav-elem.destructive,
+.password-list-page .nav-elem.destructive.no-active:active,
+.password-list-page button.nav-elem.normal.destructive:not(.icon-only):hover,
+.password-list-page button.nav-elem.loading.destructive:focus {
     background: var(--mobile-button-error);
     color: var(--mobile-text-on-color);
 }
-.nav-elem.destructive.disabled,
-.nav-elem.destructive.disabled:active {
+.password-list-page .nav-elem.destructive.disabled,
+.password-list-page .nav-elem.destructive.disabled:active {
     background: var(--mobile-button-disabled);
     color: var(--mobile-text-on-color-disabled);
 }
-button.nav-elem.normal.destructive:active,
-.nav-elem.destructive:active {
+.password-list-page button.nav-elem.normal.destructive:active,
+.password-list-page .nav-elem.destructive:active {
     background: var(--mobile-button-error-pressed);
     color: var(--mobile-text-on-color);
 }
 
-button.nav-elem.destructive span.primary-text {
+.password-list-page button.nav-elem.destructive span.primary-text {
     color: inherit;
 }
 
-.nav-elem.text-only,
-button.mega-pm-button.nav-elem.text-only,
-button.nav-elem.text-icon,
-button.mega-pm-button.nav-elem.text-icon {
+.password-list-page .nav-elem.text-only,
+.password-list-page button.mega-pm-button.nav-elem.text-only,
+.password-list-page button.nav-elem.text-icon,
+.password-list-page button.mega-pm-button.nav-elem.text-icon {
     background: none;
     color: var(--mobile-text-primary);
     text-decoration: none;
 }
-.nav-elem.text-only,
-button.nav-elem.text-icon {
+.password-list-page .nav-elem.text-only,
+.password-list-page button.nav-elem.text-icon {
     text-decoration: underline;
 }
-.nav-elem.text-only.no-deco,
-.nav-elem.full-width.text-icon,
-.nav-elem.full-width.text-only {
+.password-list-page .nav-elem.text-only.no-deco,
+.password-list-page .nav-elem.full-width.text-icon,
+.password-list-page .nav-elem.full-width.text-only {
     text-decoration: none;
 }
-button.nav-elem.text-icon.normal span.primary-text,
-button.mega-pm-button.nav-elem.text-icon span.primary-text {
+.password-list-page button.nav-elem.text-icon.normal span.primary-text,
+.password-list-page button.mega-pm-button.nav-elem.text-icon span.primary-text {
     background: none;
     color: var(--mobile-text-primary);
 }
-button.nav-elem.text-icon.normal:not(.icon-only):hover,
-button.nav-elem.text-icon.normal:not(.icon-only):active,
-button.nav-elem.text-icon.normal:not(.icon-only):active .sprite-pm-mono {
+.password-list-page button.nav-elem.text-icon.normal:not(.icon-only):hover,
+.password-list-page button.nav-elem.text-icon.normal:not(.icon-only):active,
+.password-list-page button.nav-elem.text-icon.normal:not(.icon-only):active .sprite-pm-mono {
     background: none;
     color: var(--mobile-button-primary-pressed);
 }
-button.nav-elem.text-icon.normal:active .sprite-pm-mono,
-button.nav-elem.text-icon.normal:active span.primary-text {
+.password-list-page button.nav-elem.text-icon.normal:active .sprite-pm-mono,
+.password-list-page button.nav-elem.text-icon.normal:active span.primary-text {
     color: var(--mobile-button-primary-pressed);
 }
-button.nav-elem.text-icon.normal:not(.icon-only):hover span.primary-text,
-button.nav-elem.text-icon.normal:not(.icon-only):hover .sprite-pm-mono,
-button.nav-elem.text-icon.normal:not(.icon-only):focus span.primary-text,
-button.nav-elem.text-icon.normal:not(.icon-only):focus .sprite-pm-mono {
+.password-list-page button.nav-elem.text-icon.normal:not(.icon-only):hover span.primary-text,
+.password-list-page button.nav-elem.text-icon.normal:not(.icon-only):hover .sprite-pm-mono,
+.password-list-page button.nav-elem.text-icon.normal:not(.icon-only):focus span.primary-text,
+.password-list-page button.nav-elem.text-icon.normal:not(.icon-only):focus .sprite-pm-mono {
     color: var(--mobile-button-primary-pressed);
 }
-.nav-elem.text-icon.disabled,
-.nav-elem.text-icon.disabled:active {
+.password-list-page .nav-elem.text-icon.disabled,
+.password-list-page .nav-elem.text-icon.disabled:active {
     color: var(--mobile-text-disabled);
 }
-.nav-elem.text-icon.disabled span,
-.nav-elem.text-icon.disabled:active span {
+.password-list-page .nav-elem.text-icon.disabled span,
+.password-list-page .nav-elem.text-icon.disabled:active span {
     border-bottom: 1px solid var(--mobile-text-disabled);
 }
-button.nav-elem.normal:not(.icon-only):hover {
+.password-list-page button.nav-elem.normal:not(.icon-only):hover {
     background: var(--mobile-button-primary-hover);
 }
-button.nav-elem.normal.secondary:not(.icon-only):hover,
-button.nav-elem.normal.secondary:focus {
+.password-list-page button.nav-elem.normal.secondary:not(.icon-only):hover,
+.password-list-page button.nav-elem.normal.secondary:focus {
     background: var(--mobile-button-secondary-hover);
 }
-button.nav-elem.normal:not(.icon-only):active {
+.password-list-page button.nav-elem.normal:not(.icon-only):active {
     background: var(--mobile-button-primary-pressed);
 }
-button.nav-elem.normal.secondary:active {
+.password-list-page button.nav-elem.normal.secondary:active {
     background: var(--mobile-button-secondary-pressed);
 }
-button.nav-elem.normal:hover span.primary-text,
-button.nav-elem.normal:focus span.primary-text,
-button.nav-elem.normal:hover .sprite-pm-mono,
-button.nav-elem.normal:focus .sprite-pm-mono {
+.password-list-page button.nav-elem.normal:hover span.primary-text,
+.password-list-page button.nav-elem.normal:focus span.primary-text,
+.password-list-page button.nav-elem.normal:hover .sprite-pm-mono,
+.password-list-page button.nav-elem.normal:focus .sprite-pm-mono {
     color: var(--mobile-text-on-color);
 }
-button.nav-elem.normal.secondary:hover span.primary-text,
-button.nav-elem.normal.secondary:hover i,
-button.nav-elem.icon-only.secondary:hover i,
-button.nav-elem.normal.secondary:focus span.primary-text,
-button.nav-elem.normal.secondary:focus i,
-button.nav-elem.icon-only.secondary:focus i {
+.password-list-page button.nav-elem.normal.secondary:hover span.primary-text,
+.password-list-page button.nav-elem.normal.secondary:hover i,
+.password-list-page button.nav-elem.icon-only.secondary:hover i,
+.password-list-page button.nav-elem.normal.secondary:focus span.primary-text,
+.password-list-page button.nav-elem.normal.secondary:focus i,
+.password-list-page button.nav-elem.icon-only.secondary:focus i {
     color: var(--mobile-text-secondary);
 }
-button.nav-elem.normal.secondary:active span.primary-text,
-button.nav-elem.normal.secondary:active i,
-button.nav-elem.icon-only.secondary:active i {
+.password-list-page button.nav-elem.normal.secondary:active span.primary-text,
+.password-list-page button.nav-elem.normal.secondary:active i,
+.password-list-page button.nav-elem.icon-only.secondary:active i {
     color: var(--mobile-text-placeholder);
 }
-button.nav-elem.normal:active span.primary-text,
-button.nav-elem.normal:active .sprite-pm-mono {
+.password-list-page button.nav-elem.normal:active span.primary-text,
+.password-list-page button.nav-elem.normal:active .sprite-pm-mono {
     color: var(--mobile-text-inverse-accent);
 }
-button.nav-elem.loading {
+.password-list-page button.nav-elem.loading {
     pointer-events: none;
 }
-button.nav-elem.loading:hover,
-button.nav-elem.loading:focus,
-button.nav-elem.loading:active,
-button.nav-elem.mega-pm-loading:hover,
-button.nav-elem.mega-pm-loading:focus,
-button.nav-elem.mega-pm-loading:active {
+.password-list-page button.nav-elem.loading:hover,
+.password-list-page button.nav-elem.loading:focus,
+.password-list-page button.nav-elem.loading:active,
+.password-list-page button.nav-elem.mega-pm-loading:hover,
+.password-list-page button.nav-elem.mega-pm-loading:focus,
+.password-list-page button.nav-elem.mega-pm-loading:active {
     color: var(--mobile-text-inverse);
     background: var(--mobile-button-primary);
 }
 
-button.nav-elem.icon-only,
-a.nav-elem.icon-only {
+.password-list-page button.nav-elem.icon-only,
+.password-list-page a.nav-elem.icon-only {
     padding: 12px;
     height: 40px;
 }
-.nav-elem.icon-only {
+.password-list-page .nav-elem.icon-only {
     cursor: pointer;
 }
 
-.nav-elem.normal.link {
+.password-list-page .nav-elem.normal.link {
     padding: 0;
     background: none;
 }
 
-.nav-elem.normal.link span,
-.nav-elem.normal.link i {
+.password-list-page .nav-elem.normal.link span,
+.password-list-page .nav-elem.normal.link i {
     color: var(--mobile-text-primary);
     text-decoration: underline;
 }
 
-.nav-elem.normal.link span {
+.password-list-page .nav-elem.normal.link span {
     font: var(--font-button-label);
 }
-.nav-elem.normal.link:hover span,
-.nav-elem.normal.link:active span,
-.nav-elem.normal.link:hover i,
-.nav-elem.normal.link:active i {
+.password-list-page .nav-elem.normal.link:hover span,
+.password-list-page .nav-elem.normal.link:active span,
+.password-list-page .nav-elem.normal.link:hover i,
+.password-list-page .nav-elem.normal.link:active i {
     color: var(--mobile-button-primary-pressed);
 }
 
@@ -390,44 +388,44 @@ a.nav-elem.icon-only {
     font-size: 0 !important;
 }
 
-button.nav-elem.secondary {
+.password-list-page button.nav-elem.secondary {
     background: var(--mobile-button-secondary);
 }
-button.nav-elem.normal.secondary span.primary-text,
-button.nav-elem.normal.secondary i,
-button.nav-elem.icon-only.secondary i {
+.password-list-page button.nav-elem.normal.secondary span.primary-text,
+.password-list-page button.nav-elem.normal.secondary i,
+.password-list-page button.nav-elem.icon-only.secondary i {
     color: var(--mobile-text-primary);
 }
 
-button.nav-elem.normal.disabled,
-button.nav-elem.normal:disabled {
+.password-list-page button.nav-elem.normal.disabled,
+.password-list-page button.nav-elem.normal:disabled {
     background: var(--mobile-button-disabled);
     pointer-events: none;
 }
 
-button.nav-elem.normal.disabled .primary-text,
-button.nav-elem.normal:disabled .primary-text {
+.password-list-page button.nav-elem.normal.disabled .primary-text,
+.password-list-page button.nav-elem.normal:disabled .primary-text {
     color: var(--mobile-text-on-color-disabled);
 }
 
-a.nav-elem.secondary {
+.password-list-page a.nav-elem.secondary {
     background: var(--mobile-button-secondary);
     color: var(--mobile-text-primary);
 }
 
-a.nav-elem.secondary:hover {
+.password-list-page a.nav-elem.secondary:hover {
     background: var(--mobile-button-secondary-hover);
     color: var(--mobile-text-secondary);
 }
 
-a.nav-elem.secondary:active {
+.password-list-page a.nav-elem.secondary:active {
     background: var(--mobile-button-secondary-hover);
     color: var(--mobile-text-inverse);
 }
 
 /* Overridden component styles for webclient layout */
 
-button.nav-elem,
-button.nav-elem.normal {
+.password-list-page button.nav-elem,
+.password-list-page button.nav-elem.normal {
     font: var(--mobile-font-copy-regular);
 }

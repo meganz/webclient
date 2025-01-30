@@ -20,8 +20,6 @@ function affiliateUI() {
     }
 
     $('.fm-right-files-block, .section.conversations, .fm-right-block.dashboard').addClass('hidden');
-    $('.nw-fm-left-icon').removeClass('active');
-    $('.nw-fm-left-icon.affiliate').addClass('active').removeClass('animate');
 
     M.onSectionUIOpen('affiliate');
     loadingDialog.show('affiliateRefresh');

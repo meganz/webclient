@@ -1158,10 +1158,10 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
                     const n = M.getNodeByHandle(id);
 
                     if (n.s4 && 'kernel' in s4 && s4.kernel.getS4NodeType(n) === 'bucket') {
-                        $('i', $openItem).removeClass('icon-folder-open').addClass('icon-bucket');
+                        $('i', $openItem).removeClass('icon-folder-open').addClass('icon-bucket-outline');
                     }
                     else {
-                        $('i', $openItem).removeClass('icon-bucket').addClass('icon-folder-open');
+                        $('i', $openItem).removeClass('icon-bucket-outline').addClass('icon-folder-open');
                     }
                 }
 
@@ -1430,7 +1430,7 @@ MegaData.prototype.reCalcMenuPosition = function(m, x, y, ico) {
     var maxY = wH - TOP_MARGIN;// max vertical coordinate, bottom side of window
 
     // min horizontal coordinate, left side of right panel
-    var minX = SIDE_MARGIN + $('nav.nw-fm-left-icons-panel').outerWidth();
+    var minX = SIDE_MARGIN;
     var minY = TOP_MARGIN;// min vertical coordinate, top side of window
     var wMax = x + cmW;// coordinate of context menu right edge
     var hMax = y + cmH;// coordinate of context menu bottom edge

@@ -1885,7 +1885,6 @@ lazy(mega, 'rewind', () => {
             }
 
             this.$rwHeaderBtn
-                .removeClass('hidden')
                 .rebind('click.rewind.header', () => {
                     $('.rw-whats-new-mini-promo', this.$fmHeaderButtons).addClass('hidden');
 
@@ -1893,6 +1892,10 @@ lazy(mega, 'rewind', () => {
                         .then(() => this._startOnEvent(500527))
                         .catch(dump);
                 });
+
+            if (!pfid) {
+                this.$rwHeaderBtn.removeClass('hidden');
+            }
         }
 
         unbindHeaderButton() {

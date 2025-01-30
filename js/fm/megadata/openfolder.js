@@ -382,6 +382,8 @@
             return this.openFolder('fm').catch(dump);
         }
 
+        $('#pmlayout > section').addClass('hidden');
+
         const $fmRightFilesBlock = $('.fm-right-files-block');
         const $fmRightHeader = $('.fm-right-header', $fmRightFilesBlock);
         const $resultsCount = $('.fm-search-count', $fmRightHeader).addClass('hidden');
@@ -417,6 +419,10 @@
             mega.ui.pm.closeUI();
         }
 
+        if (!is_mobile) {
+            mega.ui.topmenu.toggleActive();
+        }
+
         if (id === undefined && folderlink) {
             // Error reading shared folder link! (Eg, server gave a -11 (EACCESS) error)
             // Force cleaning the current cloud contents and showing an empty msg
@@ -439,8 +445,8 @@
                 // Remove shares-specific UI.
                 sharedFolderUI();
             }
-
             if (this.gallery || window.pfcol) {
+                $fmRightFilesBlock.removeClass('hidden');
                 queueMicrotask(() => {
                     galleryUI(this.gallery > 1 && this.currentCustomView.nodeID);
                 });
@@ -455,7 +461,9 @@
                 console.time('time for rendering');
             }
 
-            $fmRightFilesBlock.removeClass('hidden');
+            if (id !== 'transfers') {
+                $fmRightFilesBlock.removeClass('hidden');
+            }
 
             if (id === 'transfers') {
                 this.v = [];
@@ -630,12 +638,11 @@
             loadSubPage(path);
         }
 
+        if (!this.gallery && !this.albums) {
+            $('#media-section-controls, #media-tabs', $fmRightFilesBlock).addClass('hidden');
+        }
+
         M.initLabelFilter(this.v);
-        // Potentially getting back?
-        // M.treeSearchUI();
-        // M.treeSortUI();
-        // M.treeFilterUI();
-        // M.redrawTreeFilterUI();
     };
 
     // ------------------------------------------------------------------------
@@ -690,7 +697,6 @@
             )
         ) {
             // @todo call completion (?)
-            $('.gallery-tabs-bl', '.fm-right-files-block').removeClass('hidden');
         }
         else {
             this.gallery = false;
@@ -843,7 +849,7 @@
 
             this.gallery = 2;
         }
-        else if (cv.type === 'gallery') {
+        else if (cv.type === 'gallery' && !pfcol) {
             this.gallery = 1;
         }
         else if (cv.type === 's4') {

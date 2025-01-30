@@ -118,7 +118,6 @@ class MCheckbox extends MComponent {
 
     buildElement() {
         this.el = document.createElement('div');
-        this.el.className = 'key';
 
         this.checkDiv = document.createElement('div');
         this.checkDiv.className = 'checkdiv';
@@ -158,7 +157,6 @@ class MCheckbox extends MComponent {
             this.attachEvent(
                 'change',
                 (evt) => {
-
                     this.checked = evt.target.checked;
 
                     if (this._onChange) {

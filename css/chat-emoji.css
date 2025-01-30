@@ -49,7 +49,6 @@
     float: left;
     margin-top: 15px;
     margin-inline-start: 10px;
-    -webkit-margin-start: 10px;
 }
 .rtl .emoji.title {
     float: right;

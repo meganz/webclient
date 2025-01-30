@@ -53,7 +53,6 @@ Implemented styles:
 .nav-elem button > *:not(:last-child),
 .nav-elem a > *:not(:last-child) {
     margin-inline-end: 8px;
-    -webkit-margin-end: 8px;
 }
 
 /* Default type */
@@ -107,7 +106,6 @@ Implemented styles:
 
 .nav-elem.full-width > *:not(:last-child) {
     margin-inline-end: 18px;
-    -webkit-margin-end: 18px;
 }
 
 /* Grey out icons */
@@ -260,7 +258,6 @@ button.nav-elem.no-active:active,
     order: 90; /* Close to the end of the list for now */
     margin: 0 8px;
     margin-inline-start: auto;
-    -webkit-margin-start: auto;
 }
 
 /* Style added for toast component */
@@ -273,7 +270,8 @@ button.nav-elem.no-active:active,
     font: var(--mobile-font-label-bold);
     text-decoration: none;
 }
-.nav-elem.action-link.login-button {
+.nav-elem.action-link.login-button,
+.nav-elem.action-link.create-account-button {
     color: var(--mobile-text-primary);
     text-decoration: underline;
 }
@@ -291,11 +289,17 @@ button.nav-elem.no-active:active,
     text-decoration: inherit;
     font: var(--mobile-font-link-large-regular);
 }
+.nav-elem.underline span {
+    text-decoration: underline;
+}
 
 .nav-elem.semibold span {
     font-weight: var(--mobile-font-weight-semibold);
 }
 
+.nav-elem i.icon-size-8 {
+    --icon-size: 8px;
+}
 .nav-elem i.icon-size-16 {
     --icon-size: 16px;
 }
@@ -327,7 +331,6 @@ button.nav-elem.no-active:active,
 }
 
 .nav-elem .right-icon {
-    -webkit-margin-start: auto;
     margin-inline-start: auto;
     order: 100; /* Last in list */
     --icon-size: 16px; /* Default size */
@@ -343,7 +346,6 @@ button.nav-elem.no-active:active,
     --mask-color: var(--mobile-icon-secondary);
     order: 50; /* Mid in list */
     margin-inline-start: -8px;
-    -webkit-margin-start: -8px;
 }
 
 .nav-elem.loading.sprite-fm-theme-after::after,
@@ -372,4 +374,23 @@ button.nav-elem.no-active:active,
     color: var(--mobile-text-secondary);
     font: var(--mobile-font-link-small-regular);
     margin-top: 2px;
+}
+
+/* Icon badge. Used in notification button */
+.nav-elem.icon-only span.icon-badge {
+    background-color: var(--secondary-red);
+    font-size: 12px;
+    color: var(--text-color-white-higher);
+    text-align: center;
+    width: auto;
+    border-radius: 9px;
+    position: absolute !important;
+    top: 0;
+    left: 17px;
+    display: inline;
+    line-height: 14px;
+    padding: 1px 4px 0;
+    z-index: 1;
+    text-decoration: none;
+    min-width: 7px;
 }

@@ -26,9 +26,7 @@
 
 .mega-radio-button.align-right .radio-wrapper {
     margin-inline-start: auto;
-    -webkit-margin-start: auto;
     margin-inline-end: 0;
-    -webkit-margin-end: 0;
 }
 
 .mega-radio-button .label-wrapper {
@@ -62,7 +60,6 @@
     background: var(--mobile-icon-inverse);
     position: relative;
     margin-inline-end: 16px;
-    -webkit-margin-end: 16px;
 }
 .mega-radio-button.disabled .radio-wrapper {
     border: 1px solid var(--mobile-border-disabled);
@@ -100,7 +97,6 @@
     display: inline-block;
     vertical-align: middle;
     margin-inline-end: 16px;
-    -webkit-margin-end: 16px;
     margin-bottom: 3px;
 }
 .mega-radio-button .radio-action[for="labels-1"]::before {

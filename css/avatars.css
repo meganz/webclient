@@ -11,7 +11,6 @@
     position: relative;
     background: white;
 }
-
 .multi-avatar {
     position: relative;
 }
@@ -66,8 +65,6 @@
     left: 19px;
 }
 .avatar-wrapper img {
-    -moz-border-radius: inherit;
-    -webkit-border-radius: inherit;
     border-radius: inherit;
     width: inherit;
 }
@@ -155,8 +152,6 @@
     height: 260px;
     font-size: 80px;
     line-height: 260px;
-    -moz-border-radius: 9px;
-    -webkit-border-radius: 9px;
     border-radius: 9px;
 }
 .shared-data .user-card-verified {
@@ -171,8 +166,6 @@
     display: block;
     width: 96px;
     height: 96px;
-    -moz-border-radius: 48px;
-    -webkit-border-radius: 48px;
     border-radius: 48px;
     position: relative;
     margin: 0 auto;
@@ -186,8 +179,6 @@
     display: block;
     width: 96px;
     height: 96px;
-    -moz-border-radius: 9px;
-    -webkit-border-radius: 9px;
     border-radius: 9px;
     position: relative;
     margin: 0 auto;
@@ -199,8 +190,6 @@
     line-height: 24px;
     border: 0px solid rgba(0,0,0,0);
     box-shadow: none;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
     border-radius: 4px;
     margin-top: 4px;
 }
@@ -213,8 +202,6 @@
     margin: 0 0;
     border: 0px solid rgba(0,0,0,0);
     box-shadow: none;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
     border-radius: 4px;
 }
 .group-chat .chat-right-pad .avatar-letter::before {
@@ -229,8 +216,6 @@
 .group-chat .chat-right-pad .small-rounded-avatar img {
     width: 24px;
     height: 24px;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
     border-radius: 4px;
 }
 .color1 {

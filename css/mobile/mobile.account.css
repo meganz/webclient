@@ -7,7 +7,6 @@
 
 .mega-mobile-settings.account .account-information > *:not(:last-child) {
     margin-inline-end: 16px;
-    -webkit-margin-end: 16px;
 }
 
 .mega-mobile-settings.account .avatar-container {

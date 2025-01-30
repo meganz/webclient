@@ -1,7 +1,6 @@
 .shares-tabs-bl,
-.gallery-tabs-bl,
 .s4-tabs-bl {
-    background-color: var(--surface-main);
+    background-color: var(--mobile-page-background);
     border-bottom: 1px solid var(--surface-grey-2);
     padding: 0 15px;
     box-sizing: border-box;
@@ -11,20 +10,7 @@
     transition: 200ms linear;
 }
 .shares-tabs-bl {
-    padding: 14px 4px 0;
-}
-.gallery-tabs-bl {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    height: 48px;
-    flex-shrink: 0;
-    border-bottom: 1px solid var(--surface-main);
-    min-width: 700px;
-    padding-left: 20px;
-}
-.gallery-tabs-bl .gallery-section-tabs {
-    padding-top: 14px;
+    padding: 12px 24px 0;
 }
 .rtl .gallery-tabs-bl,
 .rtl .s4-user-tabs-bl {
@@ -37,10 +23,6 @@
     font: var(--text-body1);
     color: var(--text-color-high);
     line-height: 26px;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-    flex: 10000 1 0%;
 }
 .gallery-section-discovery {
     flex: 10000 1 0%;
@@ -59,35 +41,32 @@ body:not(.rtl) .gallery-section-discovery {
 .gallery-section-title i {
     --icon-size: 24px;
     --mask-color: var(--secondary-blue);
-    -webkit-margin-end: 8px;
     margin-inline-end: 8px;
 }
 .shares-tab-lnk,
-.gallery-tab-lnk,
 .s4-tab-lnk {
     cursor: pointer;
     font: var(--text-h3);
     color: var(--text-color-high);
     opacity: 0.7;
-    padding: 0 0 8px;
-    margin: 0 24px;
+    padding: 12px 24px;
+    margin: 0;
     background-color: transparent;
     border: 0;
     outline: 0;
     border-bottom: 2px solid transparent;
     float: left;
     box-sizing: border-box;
-    height: 32px;
+    height: 48px;
     position: relative;
     margin-bottom: -1px;
+    white-space: nowrap;
 }
 .shares-tab-lnk.filled,
-.gallery-tab-lnk.filled,
 .s4-tab-lnk.filled {
     padding: 4px 5px 0 24px;
 }
 .shares-tab-lnk span,
-.gallery-tab-lnk span,
 .s4-tab-lnk span {
     font: var(--text-body2);
     line-height: 14px;
@@ -101,15 +80,13 @@ body:not(.rtl) .gallery-section-discovery {
     border-radius: 4px;
 }
 .shares-tab-lnk.filled span,
-.gallery-tab-lnk.filled span,
 .s4-tab-lnk.filled span {
     display: inline-block;
 }
 .shares-tab-lnk.active,
-.gallery-tab-lnk.active,
 .s4-tab-lnk.active {
     font: var(--text-h3-bold);
-    border-color: var(--secondary-blue);
+    border-color: var(--mobile-border-brand);
     color: var(--text-color-high);
     opacity: 1;
 }

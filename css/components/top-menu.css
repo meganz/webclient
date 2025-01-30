@@ -1,0 +1,127 @@
+.mega-top-menu,
+.rtl .mega-top-menu {
+    position: relative;
+    transform: none;
+    top: 0 !important;
+    height: 100% !important;
+    opacity: 1;
+    pointer-events: all;
+    width: 256px;
+    max-width: 400px;
+}
+.rtl .mega-top-menu {
+    direction: rtl;
+}
+.mega-top-menu .top-nav .home {
+    display: flex;
+    width: auto;
+    height: 40px;
+    pointer-events: none;
+    text-decoration: none;
+}
+.mega-top-menu .top-nav .home.nav-elem span {
+    font: var(--mobile-font-heading-h1);
+    text-decoration: none;
+}
+.mega-top-menu .top-nav,
+.mega-top-menu .menu {
+    background-color: var(--mobile-surface-1);
+}
+.mega-top-menu .top-nav .close,
+.mega-top-menu nav.menu > * {
+    display: none;
+}
+.mega-top-menu.drive nav.menu > *.drive,
+.mega-top-menu.pwm nav.menu > *.pwm,
+.mega-top-menu.folderlink nav.menu > *.root-folder {
+    display: flex;
+}
+.mega-top-menu .menu {
+    overflow-y: auto;
+}
+.mega-top-menu .menu.ps.ps--active-x > .ps__rail-x {
+    margin-inline-end: 10px;
+}
+.mega-top-menu .menu.ps.ps--active-x.ps--active-y > .ps__rail-x {
+    margin-inline-end: 20px;
+}
+.mega-top-menu .menu .ps__rail-y {
+    right: 12px;
+}
+.mega-top-menu:not(.drive):not(.root-folder) .menu > .nav-elem:not(.drive):not(.root-folder):last-of-type {
+    margin-top: auto;
+}
+.mega-top-menu .menu .nav-elem:nth-last-child(2) {
+    margin-top: 0;
+}
+.mega-top-menu .menu .nav-elem.active span {
+    font-weight: var(--mobile-font-weight-bold);
+}
+.mega-top-menu .nav-elem.button span.primary-text {
+    text-align: start;
+}
+.mega-top-menu .menu .spacer {
+    padding: 12px;
+}
+.mega-top-menu nav.menu button.tree-expander.icon-only {
+    padding: 0;
+    background-color: transparent;
+    position: absolute;
+    left: 8px;
+    top: 20px;
+    transform: rotateZ(-90deg);
+    cursor: pointer;
+    height: auto;
+}
+.rtl .mega-top-menu nav.menu button.tree-expander.icon-only {
+    left: auto;
+    right: 8px;
+    transform: rotateZ(90deg);
+}
+.mega-top-menu nav.menu button.tree-expander.icon-only.expanded {
+    transform: none;
+}
+.mega-top-menu .storage-block {
+    width: 100%;
+    flex-shrink: 0;
+}
+.mega-top-menu .storage-usage {
+    padding: 0;
+    height: auto;
+    bottom: 0;
+    background-color: var(--mobile-surface-1);
+}
+.mega-top-menu .nav-elem:not(.active):active {
+    background-color: initial;
+}
+.mega-top-menu button {
+    cursor: pointer;
+}
+.mega-top-menu .nw-fm-tree-item .nw-fm-tree-iconwrap {
+    display: inline-block;
+    vertical-align: middle;
+    position: sticky;
+    position: -webkit-sticky;
+    right: -1px;
+    background: var(--surface-tree-iconwrap);
+    padding-inline-start: 24px;
+    padding-inline-end: 4px;
+}
+.mega-top-menu .nw-fm-tree-item.selected .nw-fm-tree-iconwrap {
+    background: var(--surface-tree-iconwrap-active);
+}
+.mega-top-menu .nw-fm-tree-item:not(.selected):hover .nw-fm-tree-iconwrap {
+    background: var(--surface-tree-iconwrap-hover);
+}
+.rtl .mega-top-menu .nw-fm-tree-item .nw-fm-tree-iconwrap {
+    background: var(--surface-tree-iconwrap-rtl);
+}
+.rtl .mega-top-menu .nw-fm-tree-item.selected .nw-fm-tree-iconwrap {
+    background: var(--surface-tree-iconwrap-rtl-active);
+}
+.rtl .mega-top-menu .nw-fm-tree-item:not(.selected):hover .nw-fm-tree-iconwrap {
+    background: var(--surface-tree-iconwrap-rtl-hover);
+}
+.mega-top-menu .nw-fm-tree-item .nw-fm-tree-iconwrap > * {
+    display: none;
+}

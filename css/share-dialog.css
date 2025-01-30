@@ -7,7 +7,6 @@
 }
 .mega-dialog.share-dialog .share-dialog-bottom {
     background: var(--surface-grey-1);
-    -webkit-padding-end: 0;
     padding-inline-end: 0;
 }
 
@@ -48,14 +47,12 @@
     /* display: inline-block; */
     display: none;
     float: right;
-    -webkit-padding-end: 4px;
     padding-inline-end: 4px;
     vertical-align: middle;
 }
 
 .share-dialog-top-body .share-dialog-copy-link-msg {
     padding-top: 12px;
-    -webkit-padding-end: 4px;
     padding-inline-end: 4px;
     text-align: right;
 }
@@ -66,7 +63,6 @@
     background-repeat: no-repeat;
     display: inline-block;
     height: 16px;
-    -webkit-padding-start: 8px;
     padding-inline-start: 8px;
     vertical-align: middle;
     width: 16px;
@@ -79,7 +75,6 @@
 
 .share-dialog-top-body .item-type-icon-90 {
     display: inline-block;
-    -webkit-margin-end: 8px;
     margin-inline-end: 8px;
     --icon-size: 48px;
     vertical-align: middle;
@@ -108,10 +103,10 @@
 
 .share-dialog-bottom-body .share-dialog-access-title {
     color: var(--text-color-high);
-    font-family: var(--text-font-family-semibold);
+    font-family: var(--text-font-family);
+    font-weight: 600;
     letter-spacing: 0;
     margin-bottom: 16px;
-    -webkit-margin-end: 12px;
     margin-inline-end: 12px;
 }
 
@@ -140,7 +135,6 @@
     vertical-align: middle;
     width: 428px;
     min-width: 0;
-    -webkit-margin-end: auto;
     margin-inline-end: auto;
 }
 
@@ -229,9 +223,7 @@
     --mask-color: var(--text-color-medium);
     cursor: pointer;
     display: inline-block;
-    -webkit-margin-end: 20px;
     margin-inline-end: 20px;
-    -webkit-margin-start: 3px;
     margin-inline-start: 3px;
     opacity: 0;
 }
@@ -274,14 +266,12 @@
     --mask-color: var(--secondary-orange);
     color: var(--secondary-orange);
     display: inline-block;
-    -webkit-margin-start: 2px;
     margin-inline-start: 2px;
     vertical-align: middle;
 }
 
 .share-dialog-bottom-body .remove-share,
 .share-add-dialog-bottom-body .cancel-add-share {
-    -webkit-margin-end: 12px;
     margin-inline-end: 12px;
 }
 
@@ -327,7 +317,6 @@
     border-radius: 9px;
     display: inline-block;
     line-height: 18px;
-    -webkit-margin-start: 10px;
     margin-inline-start: 10px;
     margin-top: -3px;
     padding: 0 5px;
@@ -386,7 +375,6 @@
 }
 
 .share-add-dialog-bottom .add-share {
-    -webkit-margin-start: 8px;
     margin-inline-start: 8px;
 }
 .share-add-dialog-bottom .multiple-input i {
@@ -461,7 +449,6 @@
 }
 
 .mega-dialog.share-add-dialog .contacts-search-subsection .contacts-search-list {
-    -webkit-padding-end: 12px;
     padding-inline-end: 12px;
     width: 336px;
 }
@@ -509,7 +496,6 @@
 
 .mega-dialog.share-add-dialog .contacts-search-list .user-card-data {
     padding-top: 4px;
-    -webkit-padding-start: 32px;
     padding-inline-start: 32px;
 }
 
@@ -527,7 +513,6 @@
 
 .mega-dialog.share-add-dialog .contacts-search-list .user-card-status {
     display: inline;
-    -webkit-margin-start: 5px;
     margin-inline-start: 5px;
 }
 
@@ -537,7 +522,6 @@
 
 .mega-dialog.share-add-dialog .chat-contactspicker-no-contacts .fm-empty-contacts-bg {
     margin-top: 63px;
-    -webkit-margin-end: 12px;
     margin-inline-end: 12px;
 }
 

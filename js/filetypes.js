@@ -31,7 +31,6 @@ var extensions = {
             }),
         l[20240] || 'RAW Image'
     ],
-    'sketch': [['sketch'], 'Sketch'],
     'spreadsheet': [['ods', 'ots', 'gsheet', 'nb', 'xlr'], 'Spreadsheet'],
     'torrent': [['torrent'], 'Torrent'],
     'text': [['txt', 'ans', 'ascii', 'log', 'wpd', 'json', 'md', 'org'], 'Text', 'pages'],
@@ -648,7 +647,7 @@ function deviceIcon(name, type) {
         'Android': 'mobile-android',
         'iPhone': 'mobile-ios',
         'Apple': 'pc-mac',
-        'Windows': 'pc-win',
+        'Windows': 'pc-windows',
         'Linux': 'pc-linux'
     });
 

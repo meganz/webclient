@@ -277,7 +277,7 @@ lazy(mega.ui, 'searchbar', () => {
      * @return {undefined}
      */
     function initSearch(currentPage) {
-        $topbar = $('#startholder .js-topbar, #fmholder .js-topbar');
+        $topbar = $('#startholder .js-topbar, #fmholder .mega-header');
         $dropdownSearch = $('.dropdown-search', $topbar);
 
         refreshSearch(currentPage);
@@ -316,7 +316,7 @@ lazy(mega.ui, 'searchbar', () => {
                     }
                     onIdle(() => {
                         // get topbars again for switching between static and fm pages
-                        $topbar = $('#startholder .js-topbar, #fmholder .js-topbar');
+                        $topbar = $('#startholder .js-topbar, #fmholder .mega-header');
                         $dropdownSearch = $('.dropdown-search', $topbar);
                         $fileSearch = $('.js-filesearcher', $topbar);
                         $fileSearch.val(val);

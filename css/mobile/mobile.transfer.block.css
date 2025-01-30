@@ -25,11 +25,9 @@
     display: flex;
     align-items: center;
     margin-inline-start: 12px;
-    -webkit-margin-start: 12px;
 }
 .mega-transfer-block .file-info .file-actions > *:not(:first-child) {
     margin-inline-start: 16px;
-    -webkit-margin-start: 16px;
 }
 .mega-transfer-block .file-info .file-status {
     display: flex;
@@ -43,7 +41,6 @@
     color: var(--mobile-support-error);
     --icon-size: 24px;
     margin-inline-end: 12px;
-    -webkit-margin-end: 12px;
 }
 .mega-transfer-block .nav-elem.icon-only {
     padding: 0;
@@ -78,5 +75,4 @@
 .mega-transfer-block.error .file-error i {
     --icon-size: 24px;
     margin-inline-end: 12px;
-    -webkit-margin-end: 12px;
 }

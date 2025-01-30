@@ -1,0 +1,211 @@
+.fm-tree-panel {
+    box-sizing: border-box;
+    min-width: 100%;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+/* Old user management to fit new layout TODO remove it once merged to component */
+.user-management .fm-tree-panel {
+    flex: 1;
+}
+.lp-usermanagement-header {
+    display: none;
+}
+.user-management .lp-usermanagement-header {
+    display: block;
+}
+/* End old user management */
+
+.content-panel {
+    display: none;
+}
+.chat-lp-body .content-panel {
+    overflow: hidden;
+}
+.fm-tree-panel ul {
+    margin: 0;
+    list-style: none;
+    display: block;
+    padding: 0;
+}
+.mega-dialog .fm-picker-dialog-tree-panel ul,
+.share-add-dialog-bottom-bo.share-add-dialog-bottom-body ul {
+    margin: 0;
+    list-style: none;
+    display: block;
+    transition: all 200ms ease-in-out;
+}
+.fm-picker-dialog .dialog-content-block > ul {
+    padding-inline-start: 0;
+}
+.fm-tree-panel ul ul,
+.mega-dialog .fm-picker-dialog-tree-panel ul ul {
+    display: none;
+}
+.fm-tree-panel ul ul.opened,
+.mega-dialog .fm-picker-dialog-tree-panel ul ul.opened {
+    display: block;
+}
+ul ul .nw-fm-tree-item {
+    padding-inline-start: 24px;
+}
+ul ul ul .nw-fm-tree-item {
+    padding-inline-start: 48px;
+}
+ul ul ul ul .nw-fm-tree-item {
+    padding-inline-start: 72px;
+}
+ul ul ul ul ul .nw-fm-tree-item {
+    padding-inline-start: 96px;
+}
+ul ul ul ul ul ul .nw-fm-tree-item {
+    padding-inline-start: 120px;
+}
+ul ul ul ul ul ul ul .nw-fm-tree-item {
+    padding-inline-start: 144px;
+}
+ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+    padding-inline-start: 168px;
+}
+ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+    padding-inline-start: 192px;
+}
+ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+    padding-inline-start: 216px;
+}
+ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+    padding-inline-start: 240px;
+}
+ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+    padding-inline-start: 264px;
+}
+ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+    padding-inline-start: 288px;
+}
+ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+    padding-inline-start: 312px;
+}
+ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+    padding-inline-start: 336px;
+}
+ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+    padding-inline-start: 360px;
+}
+.nw-fm-tree-item {
+    display: flex;
+    line-height: 0;
+    background-color: rgba(217, 0, 7, 0);
+    padding: 4px 0;
+}
+.fm-other-tree-panel .nw-fm-tree-item {
+    overflow: hidden;
+}
+.nw-fm-tree-item .data-item-icon {
+    top: 2px;
+    right: 12px;
+}
+.nw-fm-tree-item.disabled,
+.dropdown-item.disabled,
+.nw-conversations-item.disabled {
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
+    -moz-opacity: 0.5;
+    -khtml-opacity: 0.5;
+    opacity: 0.5;
+}
+.fm-tree-panel li,
+.mega-dialog .fm-picker-dialog-tree-panel li,
+.share-add-dialog-bottom-body li {
+    display: block;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    white-space: nowrap;
+    position: relative;
+}
+.nw-fm-tree-folder,
+.nw-fm-tree-icon-wrap {
+    display: inline-block;
+    margin-inline-start: 45px;
+    padding-inline-start: 32px;
+    box-sizing: border-box;
+    white-space: nowrap;
+    font-size: 14px;
+    line-height: 24px;
+    color: var(--mobile-text-primary);
+    height: 24px;
+    position: relative;
+    width: auto;
+}
+.nw-fm-tree-item:hover .nw-fm-tree-folder,
+.nw-fm-tree-item.selected .nw-fm-tree-folder,
+.nw-fm-tree-item.dragover .nw-fm-tree-folder {
+    color: white;
+}
+/* overriding for new tree view, need to merge with above style after dialog tree is reworked */
+.mega-component.mega-top-menu .nw-fm-tree-item {
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+.mega-component.mega-top-menu .nw-fm-tree-item.selected {
+    border-inline-start: 4px solid var(--mobile-border-brand);
+    background: var(--mobile-page-background);
+}
+.mega-component.mega-top-menu .nw-fm-tree-item:not(.selected):hover {
+    background: var(--mobile-surface-2)
+}
+.mega-component.mega-top-menu .nw-fm-tree-item.selected .nw-fm-tree-folder,
+.mega-component.mega-top-menu .nw-fm-tree-item.selected .nw-fm-tree-icon-wrap {
+    margin-inline-start: 41px;
+}
+.mega-component.mega-top-menu .nw-fm-tree-item .nw-fm-tree-arrow {
+    top: 12px;
+}
+.mega-component.mega-top-menu .nw-fm-tree-item.selected .nw-fm-tree-arrow {
+    margin-inline-start: 20px;
+}
+.mega-component.mega-top-menu ul ul .nw-fm-tree-item {
+    padding-inline-start: 12px;
+}
+.mega-component.mega-top-menu ul ul ul .nw-fm-tree-item {
+    padding-inline-start: 24px;
+}
+.mega-component.mega-top-menu ul ul ul ul .nw-fm-tree-item {
+    padding-inline-start: 36px;
+}
+.mega-component.mega-top-menu ul ul ul ul ul .nw-fm-tree-item {
+    padding-inline-start: 48px;
+}
+.mega-component.mega-top-menu ul ul ul ul ul ul .nw-fm-tree-item {
+    padding-inline-start: 60px;
+}
+.mega-component.mega-top-menu ul ul ul ul ul ul ul .nw-fm-tree-item {
+    padding-inline-start: 72px;
+}
+.mega-component.mega-top-menu ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+    padding-inline-start: 84px;
+}
+.mega-component.mega-top-menu ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+    padding-inline-start: 96px;
+}
+.mega-component.mega-top-menu ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+    padding-inline-start: 108px;
+}
+.mega-component.mega-top-menu ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+    padding-inline-start: 120px;
+}
+.mega-component.mega-top-menu ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+    padding-inline-start: 132px;
+}
+.mega-component.mega-top-menu ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+    padding-inline-start: 144px;
+}
+.mega-component.mega-top-menu ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+    padding-inline-start: 156px;
+}
+.mega-component.mega-top-menu ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+    padding-inline-start: 168px;
+}
+.mega-component.mega-top-menu ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+    padding-inline-start: 180px;
+}

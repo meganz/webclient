@@ -1505,20 +1505,22 @@ Chat.prototype.init = promisify(function (resolve, reject) {
     console.timeEnd('megachat:plugins:init');
   }
   const $body = $(document.body);
-  $body.rebind('mousedown.megachat', '.top-user-status-popup .dropdown-item', function () {
-    const presence = $(this).data("presence");
-    self._myPresence = presence;
-    const targetPresence = PresencedIntegration.cssClassToPresence(presence);
-    self.plugins.presencedIntegration.setPresence(targetPresence);
-    if (targetPresence !== UserPresence.PRESENCE.OFFLINE) {
-      Object.keys(self.plugins.chatdIntegration.chatd.shards).forEach((k) => {
-        const v = self.plugins.chatdIntegration.chatd.shards[k];
-        v.connectionRetryManager.requiresConnection();
-      });
-    }
-  });
-  self.$container = $('.fm-chat-block');
   if (!is_chatlink) {
+    $(mega.ui.header.setStatus).rebind('mousedown.megachat', '.sub-menu.status button', function () {
+      const presence = $(this).data("presence");
+      self._myPresence = presence;
+      const targetPresence = PresencedIntegration.cssClassToPresence(presence);
+      self.plugins.presencedIntegration.setPresence(targetPresence);
+      if (targetPresence !== UserPresence.PRESENCE.OFFLINE) {
+        Object.keys(self.plugins.chatdIntegration.chatd.shards).forEach(k => {
+          const v = self.plugins.chatdIntegration.chatd.shards[k];
+          v.connectionRetryManager.requiresConnection();
+        });
+      }
+    });
+  }
+  self.$container = $('.fm-chat-block');
+  if (M.chat && !is_chatlink) {
     $('.activity-status-block, .activity-status').removeClass('hidden');
     $('.js-dropdown-account .status-dropdown').removeClass('hidden');
   }

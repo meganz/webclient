@@ -39,49 +39,10 @@ class MegaMobileHeader extends MegaComponent {
         actionsNode.className = 'nav-actions';
         targetNode.appendChild(actionsNode);
 
-        const _renderLoggedIn = replace => {
-            const avatarButton = new MegaLink({
-                parentNode: actionsNode,
-                type: 'normal',
-                componentClassname: 'avatar'
-            });
-
-            useravatar.loadAvatar(u_handle).finally(() => {
-
-                const avatarMeta = generateAvatarMeta(u_handle);
-
-                const shortNameEl = mCreateElement('span');
-                shortNameEl.textContent = avatarMeta.shortName;
-
-                const avatar = avatarMeta.avatarUrl
-                    ? mCreateElement('img', {src: avatarMeta.avatarUrl})
-                    : mCreateElement('div', {class: `color${avatarMeta.color}`},[shortNameEl]);
-
-                avatarButton.domNode.appendChild(avatar);
-
-                avatarButton.on('tap.account', () => {
-
-                    if (!is_fm() || pfid) {
-                        return mobile.settings.account.init();
-                    }
-
-                    loadSubPage('fm/account');
-
-                    if (mega.ui.topmenu.visible) {
-                        mega.ui.topmenu.hide();
-                    }
-                });
-            });
-
-            if (replace) {
-
-                replace.domNode.replaceWith(avatarButton.domNode);
-                replace.destroy();
-            }
-        };
+        this.avatarButtonType = options.avatarButtonType || MegaLink;
 
         if (u_attr) {
-            _renderLoggedIn();
+            this.renderLoggedIn();
         }
         else {
             const loginLink = new MegaLink({
@@ -98,7 +59,7 @@ class MegaMobileHeader extends MegaComponent {
             });
 
             mBroadcaster.once('login2', () => {
-                _renderLoggedIn(loginLink);
+                this.renderLoggedIn(loginLink);
             });
         }
 
@@ -272,7 +233,10 @@ class MegaMobileHeader extends MegaComponent {
             });
         }
 
-        mBroadcaster.addListener('mega:openfolder', this.update.bind(this));
+        const _throttledUpdate = SoonFc(100, this.update.bind(this));
+
+        mBroadcaster.addListener('mega:openfolder', _throttledUpdate);
+        mBroadcaster.addListener('pagechange', _throttledUpdate);
         window.addEventListener('resize', this.resetBottomBlock.bind(this));
     }
 
@@ -388,6 +352,55 @@ class MegaMobileHeader extends MegaComponent {
             this.bottomBlock.originalHeight = this.bottomBlock.offsetHeight;
             this.showBottomBlock();
         });
+    }
+
+    renderLoggedIn(replace) {
+
+        const actionsNode = this.domNode.querySelector('.top-block .nav-actions');
+
+        this.avatarButton = new this.avatarButtonType({
+            parentNode: actionsNode,
+            type: 'normal',
+            componentClassname: 'avatar'
+        });
+
+        useravatar.loadAvatar(u_handle).finally(() => {
+
+            const avatarMeta = generateAvatarMeta(u_handle);
+
+            const shortNameEl = mCreateElement('span');
+            shortNameEl.textContent = avatarMeta.shortName;
+
+            const avatar = mCreateElement('div', {class: `${u_handle} avatar-wrapper`}, [
+                avatarMeta.avatarUrl ? mCreateElement('img', {src: avatarMeta.avatarUrl})
+                    : mCreateElement(
+                        'div',
+                        {class: `color${avatarMeta.color} avatar-wrapper ${u_handle} small-rounded-avatar`},
+                        [shortNameEl]
+                    )
+            ]);
+
+            this.avatarButton.domNode.appendChild(avatar);
+
+            this.avatarButton.on('tap.account', () => {
+
+                if (!is_fm() || pfid) {
+                    return mobile.settings.account.init();
+                }
+
+                loadSubPage('fm/account');
+
+                if (mega.ui.topmenu.visible) {
+                    mega.ui.topmenu.hide();
+                }
+            });
+        });
+
+        if (replace) {
+
+            replace.domNode.replaceWith(this.avatarButton.domNode);
+            replace.destroy();
+        }
     }
 
     static init(update) {
@@ -780,7 +793,11 @@ class MegaMobileHeader extends MegaComponent {
 
     static getHeading() {
 
-        let heading = MegaMobileHeader.headings[MegaMobileHeader.getPage()];
+        if (!M.currentdirid) {
+            return;
+        }
+
+        let heading = this.headings[this.getPage()];
 
         if (!heading) {
 

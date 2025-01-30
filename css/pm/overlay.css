@@ -153,7 +153,6 @@
 .overlay-wrap .actions button:last-child:nth-child(even) {
     margin-top: 0;
     margin-inline-end: 16px;
-    -webkit-margin-end: 16px;
 }
 .overlay-wrap .title h1,
 .overlay-wrap .title h2 {
@@ -165,7 +164,6 @@
 }
 .overlay-wrap .content.ps {
     padding-inline-end: 12px;
-    -webkit-pading-end: 12px;
     box-sizing: border-box;
 }
 .overlay-wrap .actions {
@@ -189,7 +187,6 @@
 }
 .overlay-wrap .title h2.text-container > * {
     margin-inline-start: 4px;
-    -webkit-margin-start: 4px;
 }
 .overlay-wrap.modal-dialog .main a {
     color: var(--mobile-link-primary);

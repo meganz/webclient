@@ -13,7 +13,6 @@
 }
 .fm-node.perm-node > i {
     margin-inline-end: 4px;
-    -webkit-margin-end: 4px;
 }
 .fm-node.perm-node.green {
     color: var(--mobile-text-success);

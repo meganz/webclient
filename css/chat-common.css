@@ -3,8 +3,9 @@
     height: 100%;
 }
 .section.conversations {
-    height: calc(100% - 48px);
     transition: 200ms linear;
+    height: calc(100% - 65px);
+    padding-top: 65px;
 }
 .section.conversations .fm-right-files-block {
     height: 100%;
@@ -63,7 +64,7 @@
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-    background-color: var(--stroke-main);
+    background-color: var(--mobile-page-background);
     position: absolute;
     right: 0;
 }
@@ -106,8 +107,6 @@
     height: 16px;
     padding: 0 6px;
     margin: 2px 0 0 0;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
     border-radius: 4px;
     color: white;
     font-size: 11px;
@@ -135,8 +134,6 @@
     padding: 0;
 }
 .short .small-rounded-avatar {
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
     border-radius: 4px;
     width: 32px;
     height: 32px;
@@ -233,9 +230,7 @@
 .contacts-info .user-card-data {
     line-height: 0;
     padding-inline-start: 10px;
-    -webkit-padding-start: 10px;
     padding-inline-end: 15px;
-    -webkit-padding-end: 15px;
 }
 .rtl .contacts-info .user-card-data {
     max-width: 74%;
@@ -360,8 +355,6 @@
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-    -moz-border-radius: 100%;
-    -webkit-border-radius: 100%;
     border-radius: 100%;
     -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.1);
     -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.1);
@@ -378,7 +371,6 @@
     float: right;
     margin-top: 5px;
     margin-inline-end: 4px;
-    -webkit-margin-end: 4px;
 }
 .rtl .contacts-info .contacts-icon {
     float: left;
@@ -396,9 +388,7 @@
     height: 32px;
     line-height: 32px;
     margin-inline-end: 15px;
-    -webkit-margin-end: 15px;
     padding-inline-end: 0;
-    -webkit-padding-end: 0;
 }
 .chat-heading-area {
     height: 36px;
@@ -448,8 +438,6 @@
     height: 16px;
     padding: 0 6px;
     margin: 2px 0 0 0;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
     border-radius: 4px;
     color: #666;
     border: 1px solid #777;
@@ -579,9 +567,7 @@
 .chat-dropdown .link-button.light span,
 .chat-dropdown .dropdown-item.link-button.light span {
     padding-inline-start: 35px;
-    -webkit-padding-start: 35px;
     padding-inline-end: 0;
-    -webkit-padding-end: 0;
 }
 .rtl .chat-dropdown .link-button.light span {
     text-align: right;
@@ -669,8 +655,6 @@
     width: 36px;
     height: 36px;
         margin: 9px 0 0 0;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
     border-radius: 4px;
     overflow: hidden;
     float: left;
@@ -1046,7 +1030,6 @@ button.fm-empty-button {
 }
 .main-start-chat-dropdown.lhp-contact-selector .button-wrapper .button-title {
     padding-inline-start: 8px;
-    -webkit-padding-start: 8px;
 }
 
 .dropdown.body.popup.contacts-search > div {
@@ -1187,7 +1170,6 @@ button.fm-empty-button {
 }
 
 .fm-right-files-block.in-chat.chatlink {
-    -webkit-margin-start: 0;
     margin-inline-start: 0;
 }
 .chat-links-preview {
@@ -1308,7 +1290,6 @@ button.fm-empty-button {
 .chat-occurrences-list-inner {
     padding-top: 5px;
     padding-inline-end: 12px;
-    -webkit-padding-end: 12px;
 }
 
 .chat-occurrences-list-inner .loading-sketch {
@@ -1395,7 +1376,6 @@ button.fm-empty-button {
 .chat-occurrence-control {
     float: left;
     margin-inline-end: 8px;
-    -webkit-margin-end: 8px;
     cursor: pointer;
 }
 
@@ -1414,7 +1394,6 @@ button.fm-empty-button {
 }
 .mega-dialog.scheduled-description-dialog .description-scroller {
     padding-inline-end: 26px;
-    -webkit-padding-end: 26px;
 }
 .mega-dialog.scheduled-description-dialog span {
     overflow-wrap: break-word;

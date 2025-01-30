@@ -115,7 +115,7 @@
 
     .mega-sheet.modal-dialog .actions {
         padding: 24px 48px;
-        width: calc(100% - 96px);
+        width: 100%;
     }
 }
 

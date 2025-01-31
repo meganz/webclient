@@ -219,18 +219,6 @@
         isAttachable,
         getBroadcastChannel,
 
-        async setup() {
-            if (self.u_type > 2) {
-                const {handle} = this.crossTab;
-
-                console.assert(!handle, 'FIXME: cross-tab already initialized.', handle, u_handle);
-                console.assert(!handle || handle === u_handle, 'Unmatched cross-tab handle', handle, u_handle);
-
-                assert(!isPublicLink(), `shall not run on public-link(s)...`);
-                return this.crossTab.initialize();
-            }
-        },
-
         /**
          * Add broadcast event listener.
          * @param {String} topic A string representing the event type to listen for.

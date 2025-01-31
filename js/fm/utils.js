@@ -431,6 +431,7 @@ MegaUtils.prototype.reload = function megaUtilsReload(force) {
             sessionStorage.fmAetherReload = 1;
         }
         location.reload(true);
+        loadingDialog.hide();
     };
 
     if (u_type !== 3 && page !== 'download') {
@@ -462,10 +463,6 @@ MegaUtils.prototype.reload = function megaUtilsReload(force) {
 
         promise.then(() => {
             const waitingPromises = [];
-
-            if (self.fminitialized) {
-                fm_fullreload.sink('full-reload');
-            }
 
             loadingDialog.show();
             waitsc.stop();

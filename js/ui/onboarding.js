@@ -286,8 +286,8 @@ mBroadcaster.addListener('fm:initialized', () => {
         }
         manipulateFlags();
 
-        // If users are old user created before 30-01-2025 and finished CD one then show new nav onboarding
-        if (u_attr.since < 1738191600 && (flagMap.getSync(OBV4_FLAGS.CLOUD_DRIVE) || u_attr.since < 1631664000) ||
+        // If users are old user created before 31-01-2025 and finished CD one then show new nav onboarding
+        if (u_attr.since < 1738279000 && (flagMap.getSync(OBV4_FLAGS.CLOUD_DRIVE) || u_attr.since < 1631664000) ||
             localStorage.obv4testnn) {
             _obv4NewNav();
         }
@@ -1069,39 +1069,42 @@ mBroadcaster.addListener('fm:initialized', () => {
         showObPromoDialog: () => {
             "use strict";
 
-            const $dialog = $('.ob-promo-dialog', '.mega-dialog-container');
-            const $actionButton = $('.btn-ob-promo-action', $dialog);
-            const $background = $('.fm-dialog-overlay', '.mega-dialog-container');
-            const $clsBtn = $('.js-close', $dialog);
-            const _offEvents = () => {
-                $actionButton.off('click.ob-promo');
-                $background.off('click.ob-promo');
-                $clsBtn.off('click.ob-promo');
-            };
+            M.safeShowDialog('ob-promo-dialog', () => {
 
-            const _killOBEvent = () => {
-                mega.ui.onboarding.currentSection.currentStepIndex = false;
-                mega.ui.onboarding.currentSection.markSectionComplete();
-            };
+                const $dialog = $('.ob-promo-dialog', '.mega-dialog-container');
+                const $actionButton = $('.btn-ob-promo-action', $dialog);
+                const $background = $('.fm-dialog-overlay', '.mega-dialog-container');
+                const $clsBtn = $('.js-close', $dialog);
+                const _offEvents = () => {
+                    $actionButton.off('click.ob-promo');
+                    $background.off('click.ob-promo');
+                    $clsBtn.off('click.ob-promo');
+                };
 
-            $actionButton.rebind('click.ob-promo', () => {
-                closeDialog();
-                mega.ui.onboarding.currentSection.startNextOpenSteps();
-                _offEvents();
+                const _killOBEvent = () => {
+                    mega.ui.onboarding.currentSection.currentStepIndex = false;
+                    mega.ui.onboarding.currentSection.markSectionComplete();
+                };
+
+                $actionButton.rebind('click.ob-promo', () => {
+                    closeDialog();
+                    mega.ui.onboarding.currentSection.startNextOpenSteps();
+                    _offEvents();
+                });
+
+                $clsBtn.rebind('click.ob-promo', () => {
+                    _killOBEvent();
+                    closeDialog();
+                    _offEvents();
+                    return false;
+                });
+
+                $background.rebind('click.ob-promo', () => {
+                    _offEvents();
+                });
+
+                return $dialog;
             });
-
-            $clsBtn.rebind('click.ob-promo', () => {
-                _killOBEvent();
-                closeDialog();
-                _offEvents();
-                return false;
-            });
-
-            $background.rebind('click.ob-promo', () => {
-                _offEvents();
-            });
-
-            M.safeShowDialog('ob-promo-dialog', $dialog);
         }
     }
 

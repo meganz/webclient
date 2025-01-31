@@ -375,7 +375,7 @@ class MegaHeader extends MegaMobileHeader {
 
     closeNotifMenu(e) {
 
-        if (e && (e.target === mega.ui.header.notifMenu ||
+        if (!mega.ui.header.notifMenu || e && (e.target === mega.ui.header.notifMenu ||
             e.target.closest('.js-notification-popup') && !e.target.closest('button, a') ||
             e.currentTarget === fmholder && e.target.closest('button.alarm'))) {
             return;
@@ -398,14 +398,16 @@ class MegaHeader extends MegaMobileHeader {
 
     closeAvatarMenu(e) {
 
-        if (e && (e.target === mega.ui.header.avatarMenu ||
+        if (!mega.ui.header.avatarMenu || e && (e.target === mega.ui.header.avatarMenu ||
             e.target.closest('.avatar-menu') && !e.target.closest('button, a') ||
             e.target.closest('.sub-menu-wrap') || e.target.closest('.top-mega-version') ||
             e.currentTarget === fmholder && e.target.closest('button.avatar'))) {
             return;
         }
 
-        mega.ui.header.setStatus.classList.add('hidden');
+        if (mega.ui.header.setStatus) {
+            mega.ui.header.setStatus.classList.add('hidden');
+        }
 
         mega.ui.header.handleMenu('avatar', true);
     }
@@ -426,7 +428,7 @@ class MegaHeader extends MegaMobileHeader {
 
     closeBentoMenu(e) {
 
-        if (e && (e.target === mega.ui.header.bentoMenu ||
+        if (!mega.ui.header.bentoMenu || e && (e.target === mega.ui.header.bentoMenu ||
             e.currentTarget === fmholder && e.target.closest('button.bento'))) {
             return;
         }
@@ -450,7 +452,7 @@ class MegaHeader extends MegaMobileHeader {
 
     closeTopHelpMenu(e) {
 
-        if (e && (e.target === mega.ui.header.topHelpMenu ||
+        if (!mega.ui.header.topHelpMenu || e && (e.target === mega.ui.header.topHelpMenu ||
             e.currentTarget === fmholder && e.target.closest('button.top-help'))) {
             return;
         }

@@ -403,6 +403,7 @@ mBroadcaster.addListener('fm:initialized', () => {
             this.map = map;
             this.steps = [];
             this.parent = parent;
+            this.$obControlPanel = $('.onboarding-control-panel')
             this.init();
         }
 
@@ -437,7 +438,7 @@ mBroadcaster.addListener('fm:initialized', () => {
 
             let html = '';
 
-            this.$obControlPanel = $('.onboarding-control-panel').removeClass('hidden');
+            this.$obControlPanel.removeClass('hidden');
 
             $('.onboarding-control-panel-title', this.$obControlPanel).text(this.map.title);
 

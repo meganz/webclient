@@ -101,6 +101,8 @@ class MegaTopMenu extends MegaMobileTopMenu {
                 text: l.shared_items,
                 icon: 'sprite-fm-mono icon-folder-users-thin-outline',
                 href: '/fm/shares',
+                hasTree: 'shared-with-me', // hidden tree for copy dialog
+                treeWrapClass: 'hidden-tree',
                 name: 'shares',
                 typeClassname: 'drive'
             },

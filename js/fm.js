@@ -888,13 +888,13 @@ function fmLeftMenuUI() {
         M.openFolder(M.RootID);
     }
 
-    // handle the Backups button changes
-    if (!M.BackupsId) {
-        $('.js-lp-myfiles .js-backups-btn', '.fmholder').addClass('hidden');
-    }
-
     // handle the RubbishBin icon changes
     var rubBtn = mega.ui.topmenu.rubbishBtn;
+
+    if (!rubBtn) {
+        return;
+    }
+
     var rubNodes = Object.keys(M.c[M.RubbishID] || {});
 
     if (rubNodes.length) {

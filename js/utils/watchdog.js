@@ -18,9 +18,6 @@ lazy(self, 'watchdog', () => {
     // event overriders
     const overrides = Object.create(null);
 
-    // @private ident-tag.
-    const gEntTag = Symbol(`<ack!>`);
-
     // statically defined handlers, for anything transient do consider using registerOverrider() or attach()!
     const mWatchDogHandlers = freeze({
         'Q!Rep!y'(data) {
@@ -69,7 +66,7 @@ lazy(self, 'watchdog', () => {
             }
         },
         'loadfm_done'(data, origin) {
-            if (storage.login === origin || gEntTag === storage.login) {
+            if (storage.login === origin) {
                 location.reload(true);
             }
         },
@@ -134,22 +131,6 @@ lazy(self, 'watchdog', () => {
             if (M.hasPendingTransfers()) {
                 // to be used in 'logout' event, as this is only invoked from M.logoutAbortTransfers()
                 storage.atfs = M.abortTransfers(true);
-            }
-        },
-        'halt(full-reload)'(data) {
-            if (self.fminitialized) {
-                fm_fullreload.sink('ack:halt', data);
-                storage.login = gEntTag;
-            }
-        },
-        'refresh-account-ui'() {
-            if (self.fminitialized) {
-                if (M.account) {
-                    M.account.lastupdate = 0;
-                }
-                if (String(page).startsWith('fm/account')) {
-                    accountUI();
-                }
             }
         },
         'chat-event'(data) {

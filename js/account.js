@@ -344,7 +344,15 @@ function u_checklogin3a(res, ctx) {
                 // in normal users there's no problem, however in business the user will be disabled
                 // till they pay. therefore, if the importing didnt finish before 'upb' then the importing
                 // will fail.
-                if ($.createanonuser === u_attr.u) {
+                if (r > 2 && !is_iframed) {
+                    const {handle} = mBroadcaster.crossTab;
+
+                    console.assert(!handle, 'FIXME: cross-tab already initialized.', handle, u_handle);
+                    console.assert(!handle || handle === u_handle, 'Unmatched cross-tab handle', handle, u_handle);
+
+                    return mBroadcaster.crossTab.initialize();
+                }
+                else if ($.createanonuser === u_attr.u) {
                     delete $.createanonuser;
 
                     if (pfid) {

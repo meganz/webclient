@@ -68,7 +68,7 @@
 .fm-empty-section.fm-empty-s4-groups,
 .fm-empty-section.fm-empty-s4-keys,
 .fm-empty-section.fm-empty-s4-policies {
-    background: var(--surface-main);
+    background: var(--mobile-page-background);
 }
 .fm-empty-s4-users .fm-empty-s4-users-txt,
 .fm-empty-s4-groups .fm-empty-s4-groups-txt,

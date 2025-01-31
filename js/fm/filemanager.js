@@ -4747,7 +4747,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         }
     }
 
-    if ((M.isGalleryPage() || M.isAlbumsPage()) && mega.gallery.albums) {
+    if (M.isAlbumsPage() && mega.gallery.albums) {
         mega.gallery.albums.init();
     }
 
@@ -4890,12 +4890,6 @@ FileManager.prototype.getMyBackups = async function() {
     }
 
     M.BackupsId = handle;
-
-    const lPaneButton = document.querySelector('.js-lp-myfiles .js-backups-btn');
-
-    if (lPaneButton.classList.contains('hidden')) {
-        lPaneButton.classList.remove('hidden');
-    }
 };
 
 FileManager.prototype.getCameraUploads = async function() {

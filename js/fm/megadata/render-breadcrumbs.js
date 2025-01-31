@@ -224,7 +224,7 @@
                 icon = 'icon-object-storage';
             }
             else if (item.type === 's4-buckets') {
-                icon = 'icon-bucket-filled';
+                icon = 'icon-bucket-solid';
             }
             else if (item.type === 's4-policies') {
                 icon = 'icon-policy-filled';

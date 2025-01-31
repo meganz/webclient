@@ -497,7 +497,6 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
 
             this.rowIndexCache = {};
             this.cellCache = {};
-            this.initialRender = true;
 
             this.selections = {};
             this.selectArea = null;
@@ -1560,7 +1559,6 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
 
                     tCell.el.style.width = sizePx;
                     tCell.el.style.height = sizePx;
-                    tCell.el.style.backgroundImage = null;
 
                     scope.setShimmering(tCell.el);
 

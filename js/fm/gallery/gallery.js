@@ -2366,52 +2366,9 @@ class MegaMediaTypeGallery extends MegaGallery {
             return false;
         }
 
-        let nodes = [];
-        const cameraTree = MegaGallery.getCameraHandles();
-        const rubTree = array.to.object(M.getTreeHandles(M.RubbishID), true);
-        const sharesTree = array.to.object(M.getTreeHandles('shares'), true);
+        const nodes = await mega.gallery.initialiseMediaNodes(this.typeFilter.bind(this));
 
-        const nodeIsValid = n => n && !n.t
-            && !rubTree[n.p]
-            && !sharesTree[n.p]
-            && n.s > 0
-            && !n.fv
-            && this.typeFilter(n, cameraTree)
-            && (this.id !== 'favourites' || n.fav)
-            && mega.sensitives.shouldShowNode(n);
-
-        if (MegaGallery.dbActionPassed) {
-            nodes = Object.values(M.d).filter(nodeIsValid);
-        }
-        else {
-            const validHandles = [];
-            const dbNodes = await MegaGallery.dbAction()
-                .catch(() => { // Fetching all available nodes in case of DB failure
-                    console.warn('Local DB failed. Fetching existing FM nodes.');
-                    return Object.values(M.d);
-                });
-
-            const dbHandles = dbNodes.map(({ h }) => h);
-            await dbfetch.geta(dbHandles).catch(nop);
-
-            for (let i = 0; i < dbHandles.length; i++) {
-                const n = M.d[dbHandles[i]];
-
-                if (nodeIsValid(n)) {
-                    validHandles.push(n.h);
-                    nodes.push(n);
-                }
-            }
-
-            MegaGallery.dbActionPassed = true;
-
-            this.updNode = Object.create(null);
-
-            // Initializing albums here for the performace's sake
-            if (mega.gallery.albums.awaitingDbAction) {
-                mega.gallery.albums.init(validHandles);
-            }
-        }
+        this.updNode = Object.create(null);
 
         // This sort is needed for building groups, do not remove
         const sortFn = M.sortByModTimeFn2();
@@ -3493,6 +3450,8 @@ MegaGallery.dbAction = async(p) => {
         const res = [];
         const parents = Object.create(null);
 
+        await dbfetch.geta(M.getTreeHandles(M.RootID)).catch(nop);
+
         p = p || M.RootID;
         await dbfetch.media(9e3, (r) => {
             for (let i = r.length; i--;) {
@@ -3506,6 +3465,7 @@ MegaGallery.dbAction = async(p) => {
                 }
             }
         });
+
         return res;
     }
 
@@ -3593,13 +3553,6 @@ lazy(mega.gallery, 'sections', () => {
             root: 'videos',
             filterFn: (n, cameraTree) => (!cameraTree || !cameraTree.includes(n.p)) && mega.gallery.isVideo(n),
             title: l.gallery_from_cloud_drive
-        },
-        favourites: {
-            path: 'favourites',
-            icon: 'favourite-filled',
-            root: 'favourites',
-            filterFn: n => mega.gallery.isImage(n) || mega.gallery.isVideo(n),
-            title: l.gallery_favourites
         }
     };
 });
@@ -3902,5 +3855,36 @@ lazy(mega.gallery, 'resetMediaCounts', () => {
 
         countsContainer.textContent = txt;
         countsContainer.classList.remove('hidden');
+    };
+});
+
+lazy(mega.gallery, 'initialiseMediaNodes', () => {
+    'use strict';
+
+    return async(filterFn) => {
+        const rubTree = array.to.object(M.getTreeHandles(M.RubbishID), true);
+        const sharesTree = array.to.object(M.getTreeHandles('shares'), true);
+        const cameraTree = MegaGallery.getCameraHandles();
+
+        const allowedInMedia = n => n && !n.t
+            && !rubTree[n.p]
+            && !sharesTree[n.p]
+            && !n.fv
+            && n.s
+            && mega.sensitives.shouldShowNode(n)
+            && (!filterFn || filterFn(n, cameraTree));
+
+        if (!MegaGallery.dbActionPassed) {
+            const dbNodes = await MegaGallery.dbAction()
+                .catch(() => { // Fetching all available nodes in case of DB failure
+                    console.warn('Local DB failed. Fetching existing FM nodes.');
+                    return Object.values(M.d);
+                });
+
+            await dbfetch.geta(dbNodes.map(({ h }) => h)).catch(nop);
+            MegaGallery.dbActionPassed = true;
+        }
+
+        return Object.values(M.d).filter(allowedInMedia);
     };
 });

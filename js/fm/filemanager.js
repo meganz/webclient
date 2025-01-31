@@ -4747,7 +4747,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         }
     }
 
-    if ((M.isGalleryPage() || M.isAlbumsPage()) && mega.gallery.albums) {
+    if (M.isAlbumsPage() && mega.gallery.albums) {
         mega.gallery.albums.init();
     }
 

@@ -11653,7 +11653,7 @@ div.camera-bottom-txt {
     position: fixed;
     bottom: 0;
     left: 8px;
-    z-index: 1221;
+    z-index: 221;
 }
 .active-folder-link .corner-messages {
     bottom: 24px;

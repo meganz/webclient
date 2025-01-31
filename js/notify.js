@@ -598,6 +598,9 @@ var notify = {
         'use strict';
         if (notify.$popup !== null && this.$popup.closest('.js-dropdown-notification').hasClass('show')) {
             this.$popup.closest('.js-dropdown-notification').removeClass('show');
+            if (mega.ui.header && typeof mega.ui.header.closeNotifMenu === 'function') {
+                mega.ui.header.closeNotifMenu();
+            }
             notify.markAllNotificationsAsSeen();
         }
         notify.dynamicNotifCountdown.removeDynamicNotifCountdown();

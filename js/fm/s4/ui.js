@@ -309,7 +309,7 @@ lazy(s4, 'ui', () => {
                 }
 
                 if ((iconNode = document.querySelector(`[id="treea_${n.h}"] .nw-fm-tree-folder`))) {
-                    iconNode.className = 'nw-fm-tree-icon-wrap sprite-fm-mono icon-bucket-filled';
+                    iconNode.className = 'nw-fm-tree-icon-wrap sprite-fm-mono icon-bucket-solid';
                 }
 
                 // Update grid element

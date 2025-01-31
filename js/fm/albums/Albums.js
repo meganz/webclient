@@ -3590,6 +3590,8 @@ lazy(mega.gallery, 'albums', () => {
                         albumId,
                         this.timeline.el
                     ).reinitialize();
+
+                    applyPs(this.el);
                 }
             });
 
@@ -4101,7 +4103,6 @@ lazy(mega.gallery, 'albums', () => {
      */
     class Albums {
         constructor() {
-            this.awaitingDbAction = false;
             this.grid = null;
             this.store = { // The length of the key should be always as per predefinedKeyLength
                 gif: {
@@ -4307,9 +4308,15 @@ lazy(mega.gallery, 'albums', () => {
             }
 
             scope.albumsRendered = false;
-            MegaGallery.dbActionPassed = true;
+            const availableNodes = [];
 
-            const availableNodes = this.getAvailableNodes(handles);
+            for (let i = 0; i < handles.length; i++) {
+                const n = M.d[handles[i]];
+                console.assert(n, `node ${handles[i]} not in memory...`);
+                if (n) {
+                    availableNodes.push(n);
+                }
+            }
 
             if (availableNodes.length) {
                 sortInAlbumNodes(availableNodes);
@@ -4321,7 +4328,6 @@ lazy(mega.gallery, 'albums', () => {
 
             this.showAlbum(albumData.id);
 
-            this.awaitingDbAction = false;
             this.subscribeToSetsChanges();
 
             $('.files-grid-view.fm, .fm-blocks-view.fm, .fm-right-header, .fm-empty-section').addClass('hidden');
@@ -4353,52 +4359,27 @@ lazy(mega.gallery, 'albums', () => {
         }
 
         /**
-         * @param {String[]} handles Node handles to work with
-         * @returns {void}
+         * @returns {Promise<void>}
          */
-        init(handles) {
+        async init() {
             this.isPublic = false;
             const isAlbums = M.isAlbumsPage();
-            const isGallery = M.isGalleryPage();
 
-            if (!isAlbums && !isGallery) {
-                // It is either not a Gallery page or dom is broken
+            if (!isAlbums) {
                 return;
             }
 
-            if (!MegaGallery.dbActionPassed) {
-                if (this.awaitingDbAction) {
-                    return; // Some other part has already requested this
-                }
-
-                this.awaitingDbAction = true;
-
-                if (isGallery) {
-                    return;// Handles will be retrieved by Gallery
-                }
-
-                Albums.fetchDBDataFromGallery();
-                return; // Fetch will re-trigger Albums.init() the second time after the db data is retrieved.
-            }
-
-            const availableNodes = this.getAvailableNodes(handles);
+            const availableNodes = await mega.gallery.initialiseMediaNodes();
 
             if (availableNodes.length) {
                 sortInAlbumNodes(availableNodes);
             }
 
             this.buildAlbumsList(availableNodes).then(() => {
-                if (isAlbums) {
-                    scope.fillMainView(availableNodes);
-                    const id = M.currentdirid.replace(/albums\/?/i, '');
+                scope.fillMainView(availableNodes);
+                const id = M.currentdirid.replace(/albums\/?/i, '');
 
-                    this.showAlbum(id);
-                }
-                else {
-                    loadingDialog.hide('MegaGallery');
-                }
-
-                this.awaitingDbAction = false;
+                this.showAlbum(id);
             });
 
             this.subscribeToSetsChanges();
@@ -4509,7 +4490,6 @@ lazy(mega.gallery, 'albums', () => {
          */
         async buildAlbumsList(nodesArr) {
             if (!scope.albumsRendered) {
-
                 if (!this.isPublic) {
                     const albums = Object.values(this.store);
 
@@ -4799,7 +4779,10 @@ lazy(mega.gallery, 'albums', () => {
                 return;
             }
 
-            if (!node.fav && scope.albums.store.fav.nodes.some(({ h }) => h === node.h)) {
+            if (!node.fav
+                && scope.albums.store.fav.nodes
+                && scope.albums.store.fav.nodes.some(({ h }) => h === node.h)
+            ) {
                 this.onCDNodeRemove(node);
                 return;
             }
@@ -5006,56 +4989,6 @@ lazy(mega.gallery, 'albums', () => {
             delay('timeline_dialog:update_items', () => {
                 timeline.nodes = nodes;
             });
-        }
-
-        /**
-         * Fetching the data from the local DB for the albums
-         * @returns {void}
-         */
-        static fetchDBDataFromGallery() {
-            const passDbAction = (handles) => {
-                MegaGallery.dbActionPassed = true;
-
-                if (scope.albums.awaitingDbAction) {
-                    scope.albums.init(handles);
-                }
-            };
-
-            /**
-             * @param {Object[]} nodes Nodes fetched from local DB to parse
-             * @param {Boolean} skipDbFetch Skipping individual node fetch, when it is being loaded already
-             * @returns {void}
-             */
-            const parseNodes = (nodes, skipDbFetch) => {
-                const handles = [];
-
-                if (Array.isArray(nodes)) {
-                    for (let i = 0; i < nodes.length; i++) {
-                        if (scope.isGalleryNode(nodes[i]) && mega.sensitives.shouldShowNode(nodes[i])) {
-                            handles.push(nodes[i].h);
-                        }
-                    }
-                }
-
-                if (skipDbFetch) {
-                    passDbAction(handles);
-                }
-                else {
-                    dbfetch.geta(handles)
-                        .then(() => {
-                            passDbAction(handles);
-                        })
-                        .catch(nop);
-                }
-            };
-
-            MegaGallery.dbAction()
-                .then(parseNodes)
-                .catch(() => {
-                    console.warn('Local DB failed. Fetching nodes from memory...');
-                    const ignoreHandles = unwantedHandles() || false;
-                    parseNodes(Object.values(M.d).filter((n) => n.fa && !n.fv && !ignoreHandles[n.p]), true);
-                });
         }
 
         requestAlbumElementsRemoval() {

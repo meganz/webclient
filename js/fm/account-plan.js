@@ -1203,7 +1203,7 @@ accountUI.plan = {
                         accountUI();
 
                         // Notify any other open tabs of the cancelled subscription
-                        watchdog.notify('refresh-account-ui');
+                        mBroadcaster.crossTab.notify('cancelSub', 1);
                     }, 1e3);
                 });
             }

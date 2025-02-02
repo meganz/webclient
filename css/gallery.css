@@ -909,8 +909,8 @@ body.rtl .gallery-view.gallery-type-m .gallery-date-block i::before {
 }
 .locations-dialog-nav,
 .timeline-location {
-    width: calc(100% + 0.5rem);
-    margin-left: -0.25rem;
+    width: calc(100% + 1rem);
+    margin-left: -0.5rem;
 }
 .empty-albums-section i {
     --icon-size: 192px;

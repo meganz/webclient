@@ -3493,23 +3493,21 @@ lazy(mega.gallery, 'sections', () => {
             path: 'photos',
             icon: 'photos',
             root: 'photos',
-            filterFn: n => mega.gallery.isGalleryNode(n),
+            filterFn: () => true,
             title: l.gallery_all_locations
         },
         [mega.gallery.secKeys.cuphotos]: {
             path: mega.gallery.secKeys.cuphotos,
             icon: 'photos',
             root: 'photos',
-            filterFn: (n, cameraTree) => cameraTree && cameraTree.includes(n.p)
-                && (mega.gallery.isImage(n) || mega.gallery.isVideo(n)),
+            filterFn: (n, cameraTree) => cameraTree && cameraTree.includes(n.p),
             title: l.gallery_camera_uploads
         },
         [mega.gallery.secKeys.cdphotos]: {
             path: mega.gallery.secKeys.cdphotos,
             icon: 'photos',
             root: 'photos',
-            filterFn: (n, cameraTree) => (!cameraTree || !cameraTree.includes(n.p))
-                && (mega.gallery.isImage(n) || mega.gallery.isVideo(n)),
+            filterFn: (n, cameraTree) => !cameraTree || !cameraTree.includes(n.p),
             title: l.gallery_from_cloud_drive
         },
         images: {
@@ -3862,15 +3860,19 @@ lazy(mega.gallery, 'initialiseMediaNodes', () => {
     'use strict';
 
     return async(filterFn) => {
-        const rubTree = array.to.object(M.getTreeHandles(M.RubbishID), true);
-        const sharesTree = array.to.object(M.getTreeHandles('shares'), true);
         const cameraTree = MegaGallery.getCameraHandles();
+        const disallowedFolders = array.to.object([
+            ...M.getTreeHandles(M.RubbishID),
+            ...M.getTreeHandles('shares'),
+            ...(M.BackupsId ? M.getTreeHandles(M.BackupsId) : []),
+            ...M.getTreeHandles('s4')
+        ], true);
 
         const allowedInMedia = n => n && !n.t
-            && !rubTree[n.p]
-            && !sharesTree[n.p]
+            && !disallowedFolders[n.p]
             && !n.fv
             && n.s
+            && mega.gallery.isGalleryNode(n)
             && mega.sensitives.shouldShowNode(n)
             && (!filterFn || filterFn(n, cameraTree));
 

@@ -36,6 +36,12 @@
 .mega-top-menu.folderlink nav.menu > *.root-folder {
     display: flex;
 }
+
+/* This is hidden tree for using on copy/move dialog */
+.mega-top-menu nav.menu > .hidden-tree > .tree-expander,
+.mega-top-menu nav.menu > .hidden-tree > .content-panel.shared-with-me {
+    display: none;
+}
 .mega-top-menu .menu {
     overflow-y: auto;
 }

@@ -1653,7 +1653,7 @@ scparser.$add('sqac', (a) => {
             }
             M.storageQuotaCache = null;
 
-            if (!pfid) {
+            if (!pfid && !is_mobile) {
                 MegaStorageBlock.checkUpdate();
             }
 

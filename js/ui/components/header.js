@@ -930,7 +930,7 @@ class MegaHeader extends MegaMobileHeader {
                 'heading': true,
                 'top-help': !u_type,
                 'top-language': !u_type,
-                'download-desktop-app': M.currentCustomView.type !== 'pwm',
+                'download-desktop-app': M.currentCustomView.type !== 'pwm' && !window.useMegaSync,
                 'download-pwm-ext': M.currentCustomView.type === 'pwm'
             },
             { // logged out

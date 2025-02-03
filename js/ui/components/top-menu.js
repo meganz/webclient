@@ -63,6 +63,11 @@ class MegaTopMenu extends MegaMobileTopMenu {
     // Override for desktop
     get menuItems() {
 
+        const _openContext = ev => {
+            M.contextMenuUI(ev.originalEvent, 1);
+            return false;
+        };
+
         if (pfid) {
 
             this.ready |= 1;
@@ -74,16 +79,12 @@ class MegaTopMenu extends MegaMobileTopMenu {
                 hasTree: pfcol ? false : 'cloud-drive',
                 treeWrapClass: 'js-public-tree-panel',
                 name: 'root-folder',
-                typeClassname: 'root-folder'
+                typeClassname: 'root-folder folder-link',
+                onContextmenu: _openContext
             }];
         }
 
         this.ready |= 2;
-
-        const _openContext = ev => {
-            M.contextMenuUI(ev.originalEvent, 1);
-            return false;
-        };
 
         const loggedInCD = [
             // Cloud drive menus

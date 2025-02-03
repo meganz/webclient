@@ -1639,7 +1639,9 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
 
         adjustHeader() {
             delay('album_timeline:render_header', () => {
-                albums.grid.header.update(scope.getAlbumIdFromPath(), Object.keys(this.selections));
+                if (albums.grid) {
+                    albums.grid.header.update(scope.getAlbumIdFromPath(), Object.keys(this.selections));
+                }
             }, 100);
         }
 

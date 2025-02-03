@@ -41,13 +41,13 @@
   "readmeFilename": "README.md",
   "sideEffects": false,
   "dependencies": {
-    "@babel/core": "7.26.0",
+    "@babel/core": "7.26.7",
     "@babel/plugin-proposal-decorators": "7.25.9",
     "@babel/plugin-transform-class-properties": "7.25.9",
     "@babel/plugin-transform-runtime": "7.25.9",
-    "@babel/preset-env": "7.26.0",
+    "@babel/preset-env": "7.26.7",
     "@babel/preset-react": "7.26.3",
-    "@babel/runtime": "7.26.0",
+    "@babel/runtime": "7.26.7",
     "@lodder/grunt-postcss": "3.1.1",
     "babel-loader": "9.2.1",
     "babel-plugin-minify-constant-folding": "0.5.0",
@@ -94,9 +94,9 @@
     "sass": "1.83.4",
     "sass-loader": "16.0.4",
     "sinon": "15.0.3",
-    "stylelint": "16.13.2",
+    "stylelint": "16.14.1",
     "stylelint-config-standard": "37.0.0",
-    "stylelint-no-unsupported-browser-features": "8.0.2",
+    "stylelint-no-unsupported-browser-features": "8.0.4",
     "webpack-dev-server": "5.2.0"
   }
 }

@@ -653,6 +653,9 @@ function fmtopUI() {
     };
 
     initRewindHeaderButton();
+    const $rewindNotifBanner =
+        $('.fm-notification-block.new-feature-rewind-notification', '.fm-right-files-block');
+    $rewindNotifBanner.addClass('hidden');
 
     $('.shares-tab-lnk.active', $sharesTabBlock).removeClass('active');
     $('.gallery-tab-lnk.active', $galleryTabBlock).removeClass('active');
@@ -697,20 +700,20 @@ function fmtopUI() {
             $('.fm-clearbin-button').removeClass('hidden');
         }
 
-        const $rewindNotification = $('.fm-notification-block.new-feature-rewind-notification');
         if (mega.config.get('dsmRubRwd')) {
-            $rewindNotification.addClass('hidden');
+            $rewindNotifBanner.addClass('hidden');
         }
         else {
+            $rewindNotifBanner.removeClass('hidden');
             delay('rubbish-bin:rewind-prom', () => eventlog(500530, true), 4e3);
 
-            $('.fm-notification-close', $rewindNotification).rebind('click', () => {
+            $('.fm-notification-close', $rewindNotifBanner).rebind('click.rewindnotifbanner', () => {
                 eventlog(500529);
                 mega.config.set('dsmRubRwd', 1);
-                $rewindNotification.addClass('hidden');
+                $rewindNotifBanner.addClass('hidden');
             });
 
-            $('.learn-more a', $rewindNotification).rebind('click.rnb-lm', () => eventlog(500528));
+            $('.learn-more a', $rewindNotifBanner).rebind('click.rnb-lm', () => eventlog(500528));
         }
 
         $('.fm-right-files-block').addClass('rubbish-bin visible-notification');

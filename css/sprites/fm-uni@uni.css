@@ -9,6 +9,9 @@
     height: var(--icon-size, 16px);
 }
 
+.sprite-fm-uni.icon-1password, .sprite-fm-uni-before.icon-1password-before::before, .sprite-fm-uni-after.icon-1password-after::after {
+   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-1password");
+}
 .sprite-fm-uni.icon-accounts, .sprite-fm-uni-before.icon-accounts-before::before, .sprite-fm-uni-after.icon-accounts-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-accounts");
 }
@@ -44,6 +47,9 @@
 }
 .sprite-fm-uni.icon-backup-selected, .sprite-fm-uni-before.icon-backup-selected-before::before, .sprite-fm-uni-after.icon-backup-selected-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-backup-selected");
+}
+.sprite-fm-uni.icon-bitwarden, .sprite-fm-uni-before.icon-bitwarden-before::before, .sprite-fm-uni-after.icon-bitwarden-after::after {
+   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-bitwarden");
 }
 .sprite-fm-uni.icon-business, .sprite-fm-uni-before.icon-business-before::before, .sprite-fm-uni-after.icon-business-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-business");
@@ -141,6 +147,9 @@
 .sprite-fm-uni.icon-crests-pro-flexi-details, .sprite-fm-uni-before.icon-crests-pro-flexi-details-before::before, .sprite-fm-uni-after.icon-crests-pro-flexi-details-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-crests-pro-flexi-details");
 }
+.sprite-fm-uni.icon-dashlane, .sprite-fm-uni-before.icon-dashlane-before::before, .sprite-fm-uni-after.icon-dashlane-after::after {
+   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-dashlane");
+}
 .sprite-fm-uni.icon-disable, .sprite-fm-uni-before.icon-disable-before::before, .sprite-fm-uni-after.icon-disable-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-disable");
 }
@@ -149,6 +158,9 @@
 }
 .sprite-fm-uni.icon-document, .sprite-fm-uni-before.icon-document-before::before, .sprite-fm-uni-after.icon-document-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-document");
+}
+.sprite-fm-uni.icon-edge, .sprite-fm-uni-before.icon-edge-before::before, .sprite-fm-uni-after.icon-edge-after::after {
+   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-edge");
 }
 .sprite-fm-uni.icon-ekr, .sprite-fm-uni-before.icon-ekr-before::before, .sprite-fm-uni-after.icon-ekr-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-ekr");
@@ -173,6 +185,9 @@
 }
 .sprite-fm-uni.icon-files-selected, .sprite-fm-uni-before.icon-files-selected-before::before, .sprite-fm-uni-after.icon-files-selected-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-files-selected");
+}
+.sprite-fm-uni.icon-firefox, .sprite-fm-uni-before.icon-firefox-before::before, .sprite-fm-uni-after.icon-firefox-after::after {
+   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-firefox");
 }
 .sprite-fm-uni.icon-folder-new, .sprite-fm-uni-before.icon-folder-new-before::before, .sprite-fm-uni-after.icon-folder-new-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-folder-new");
@@ -207,6 +222,12 @@
 .sprite-fm-uni.icon-jcb, .sprite-fm-uni-before.icon-jcb-before::before, .sprite-fm-uni-after.icon-jcb-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-jcb");
 }
+.sprite-fm-uni.icon-keepassxc, .sprite-fm-uni-before.icon-keepassxc-before::before, .sprite-fm-uni-after.icon-keepassxc-after::after {
+   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-keepassxc");
+}
+.sprite-fm-uni.icon-lastpass, .sprite-fm-uni-before.icon-lastpass-before::before, .sprite-fm-uni-after.icon-lastpass-after::after {
+   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-lastpass");
+}
 .sprite-fm-uni.icon-link, .sprite-fm-uni-before.icon-link-before::before, .sprite-fm-uni-after.icon-link-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-link");
 }
@@ -234,6 +255,9 @@
 .sprite-fm-uni.icon-new, .sprite-fm-uni-before.icon-new-before::before, .sprite-fm-uni-after.icon-new-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-new");
 }
+.sprite-fm-uni.icon-nordpass, .sprite-fm-uni-before.icon-nordpass-before::before, .sprite-fm-uni-after.icon-nordpass-after::after {
+   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-nordpass");
+}
 .sprite-fm-uni.icon-owner, .sprite-fm-uni-before.icon-owner-before::before, .sprite-fm-uni-after.icon-owner-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-owner");
 }
@@ -251,6 +275,9 @@
 }
 .sprite-fm-uni.icon-plan-expiry, .sprite-fm-uni-before.icon-plan-expiry-before::before, .sprite-fm-uni-after.icon-plan-expiry-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-plan-expiry");
+}
+.sprite-fm-uni.icon-protonpass, .sprite-fm-uni-before.icon-protonpass-before::before, .sprite-fm-uni-after.icon-protonpass-after::after {
+   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-protonpass");
 }
 .sprite-fm-uni.icon-pwm, .sprite-fm-uni-before.icon-pwm-before::before, .sprite-fm-uni-after.icon-pwm-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-pwm");

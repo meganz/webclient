@@ -3094,6 +3094,7 @@ async function galleryUI(id) {
 
     $headerBlock.removeClass('hidden');
     $('#media-section-controls, #media-tabs', '.fm-right-files-block').removeClass('hidden');
+    $('.fm-notification-block.new-feature-rewind-notification', '.fm-right-files-block').addClass('hidden');
     $('.gallery-close-discovery', $headerBlock).addClass('hidden');
 
     mega.gallery.setTabs();

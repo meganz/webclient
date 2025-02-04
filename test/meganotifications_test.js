@@ -26,6 +26,7 @@ describe("MegaNotifications Unit Test", function() {
             }
         });
         mStub(window, 'bootstaticpath', './');
+        mStub(window, 'fmconfig', window.fmconfig || {});
 
         // Initialize notifications
         mega.notif.setup(fmconfig.anf);
@@ -145,7 +146,7 @@ describe("MegaNotifications Unit Test", function() {
 
         expect(megaNotifications.favico instanceof Favico).to.eql(true);
 
-        delay('tick', function() {
+        tSleep(.3).then(function() {
             expect(megaNotifications.favico.badge.callCount).to.eql(1);
             expect(megaNotifications.favico.badge.calledWith(1)).to.eql(true);
 
@@ -161,7 +162,7 @@ describe("MegaNotifications Unit Test", function() {
             expect(ion.sound.play.calledWith("type1-sound")).to.eql(true);
 
             n.setUnread(false);
-            delay('tick', function() {
+            tSleep(.3).then(function() {
 
                 expect(ion.sound.stop.callCount).to.eql(3);
                 expect(ion.sound.stop.calledWith("type1-sound")).to.eql(true);

@@ -49,7 +49,8 @@
     font: var(--mobile-font-caption-large-regular);
 }
 
-.pm-main .password-list-page a {
+.pm-main .password-list-page a,
+.pm-main .settings-wrap a.clickurl {
     font: var(--mobile-font-link-large-regular);
     color: var(--mobile-link-primary);
 }
@@ -75,16 +76,16 @@
 
 /* Skeleton loading */
 
-.pm-main .password-list-page .sk-loading {
+.pm-main .sk-loading {
     cursor: default !important;
 }
 
-.pm-main .password-list-page .sk-loading .sk-elm * {
+.pm-main .sk-loading .sk-elm * {
     display: none;
 }
 
-.pm-main .password-list-page .sk-loading i.sk-elm,
-.pm-main .password-list-page .sk-loading .sk-elm > * {
+.pm-main .sk-loading i.sk-elm,
+.pm-main .sk-loading .sk-elm > * {
     position: relative;
     overflow: hidden;
     inset: 0;
@@ -93,12 +94,12 @@
     animation: pm-shimmer 2s infinite linear;
     border-radius: 8px;
 }
-.pm-main .password-list-page .sk-loading .sk-elm::after {
+.pm-main .sk-loading .sk-elm::after {
     border-radius: 8px;
     display: block;
     content: "";
 }
-.pm-main .password-list-page .nav-elem.sk-loading .sk-elm::after {
+.pm-main .nav-elem.sk-loading .sk-elm::after {
     height: 0;
 }
 

@@ -34,6 +34,11 @@
     width: 280px;
 }
 
+.mega-component.menu-container.overlay-wrap .menu,
+.mega-component.menu-container.overlay-wrap .dropdown {
+    width: 100%;
+}
+
 .mega-component.context-menu .context-menu-items {
     padding: 8px 16px;
 }

@@ -4,7 +4,7 @@ class MegaPasswordList extends MegaView {
 
         this.vaultPasswords = [];
         this.orderDir = '1';
-        this.addClass('password-list-page');
+        this.addClass('password-list-page', 'password-wrapper');
 
         this.initPasswordList();
 

@@ -1983,7 +1983,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[/A]', '</a>');
 
     l.recovery_key_subtitle = escapeHTML(l.recovery_key_subtitle)
-        .replace('[A]', `<a href="${recoveryKeyLink}" target="_blank">`)
+        .replace('[A]', `<a class="clickurl" href="${recoveryKeyLink}" target="_blank">`)
         .replace('[/A]', '</a>');
 
     l.select_file_notes = escapeHTML(l.select_file_notes)
@@ -1991,7 +1991,8 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[/B]', '</b>');
 
     l.import_notes = escapeHTML(l.import_notes)
-        .replace('[A]', `<a href="https://help.mega.io/pass/features/import-passwords" target="_blank">`)
+        .replace('[A]',
+                 `<a class="clickurl" href="https://help.mega.io/pass/features/import-passwords" target="_blank">`)
         .replace('[/A]', '</a>');
 
     l.referral_close_full = escapeHTML(l.referral_close_full)

@@ -5,7 +5,7 @@ mega.ui.pm.settings = {
 
         if (!this.wrap) {
             const settingsWrap = document.createElement('div');
-            settingsWrap.className = 'settings-wrap';
+            settingsWrap.className = 'settings-wrap password-wrapper';
             pmlayout.append(settingsWrap);
             this.wrap = settingsWrap;
 

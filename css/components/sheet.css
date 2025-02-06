@@ -19,7 +19,8 @@
 .mega-sheet .sheet .main,
 .mega-sheet .sheet .actions {
     padding: 0 24px;
-    width: calc(100% - 48px);
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .mega-sheet .sheet > .close {

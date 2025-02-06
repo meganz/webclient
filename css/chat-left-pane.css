@@ -250,7 +250,6 @@
     display: flex;
     justify-content: flex-end;
     text-align: right;
-    width: 20px;
 }
 .conversation-message.unread {
     font-family: var(--text-font-family);
@@ -308,10 +307,33 @@
     height: 17px;
     box-sizing: border-box;
     border-radius: 100%;
-    font: var(--text-body2);
+    font: var(--text-caption);
     color: var(--text-color-white-high);
     text-align: center;
     background-color: var(--secondary-blue);
+}
+.unread-messages.items-2 {
+    display: flex;
+    justify-content: center;
+    /*width: 26px;*/
+    width: 32px;
+    border-radius: 200px;
+}
+.unread-messages.items-2 span {
+    font: var(--text-caption);
+    padding: 0 2px 0 0;
+}
+.unread-messages.unread-spaced,
+.unread-messages-container.unread-spaced {
+    width: 32px;
+}
+.unread-messages.unread-spaced i,
+.unread-messages-container.unread-spaced i {
+    margin: 0;
+}
+.unread-messages.unread-spaced span,
+.unread-messages-container.unread-spaced span {
+    padding: 0;
 }
 .unread-messages.unread-upcoming {
     display: block;
@@ -326,7 +348,7 @@
 }
 .conversations-pane li .items-2 .tiny-icon.white-handset,
 .conversations-pane li .items-2 .tiny-icon.blue-handset {
-    margin-right: 4px;
+    margin-right: 1px;
 }
 .call-duration {
     position: absolute;

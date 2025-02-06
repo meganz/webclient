@@ -18862,6 +18862,7 @@ const ConversationsListItem = (_dec = utils.Ay.SoonFcWrap(40, true), _dec2 = (0,
                                             unread-messages
                                             items-${notificationItems.length}
                                             unread-upcoming
+                                            ${unreadCount > 9 && notificationItems.length > 1 ? 'unread-spaced' : ''}
                                         `
     }, notificationItems) : null)) : REaCt().createElement("div", {
       className: "conversation-message-info"
@@ -18870,7 +18871,10 @@ const ConversationsListItem = (_dec = utils.Ay.SoonFcWrap(40, true), _dec2 = (0,
     }, REaCt().createElement("div", {
       className: "date-time"
     }, this.getConversationTimestamp()), notificationItems.length > 0 ? REaCt().createElement("div", {
-      className: "unread-messages-container"
+      className: `
+                                    unread-messages-container
+                                    ${unreadCount > 9 && notificationItems.length > 1 ? 'unread-spaced' : ''}
+                                `
     }, REaCt().createElement("div", {
       className: `unread-messages items-${notificationItems.length}`
     }, notificationItems)) : null));

@@ -25576,7 +25576,8 @@ class ParticipantsNotice extends mixins.w9 {
       return null;
     }
     return REaCt().createElement("div", {
-      ref: this.domRef
+      ref: this.domRef,
+      className: `${ParticipantsNotice.NAMESPACE}-container`
     }, call.isSharingScreen() ? null : REaCt().createElement(videoNode.Cn, {
       className: "local-stream-mirrored",
       chatRoom,

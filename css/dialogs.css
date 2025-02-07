@@ -5401,6 +5401,9 @@ body.de .mega-dialog.contact-picker-widget {
         border-radius: 4px;
         color: var(--banner-text-error);
     }
+    .mega-dialog.cancel-subscription-st1 .cancel-option-info:empty {
+        display: none;
+    }
     .mega-dialog.cancel-subscription-st1.error-select-reason footer,
     .mega-dialog.cancel-subscription-st1.error-select-contact footer {
         margin-top: 16px;

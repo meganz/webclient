@@ -19,7 +19,11 @@ mobile.settings.account.cancelSubscription = Object.create(mobile.settingsHelper
 
                 this.cancelFeatureSub = '';
                 this.feature = '';
+                this.cancelPlanNum = 0;
                 this.subIdToCancel = '';
+                this.showingFeatureBenefits = false;
+                this.showingSurvey = false;
+                this.skipSurvey = true;
 
                 this.subscriptions = !u_attr.b && M.account.subs;
 
@@ -43,6 +47,9 @@ mobile.settings.account.cancelSubscription = Object.create(mobile.settingsHelper
                         this.feature = this.cancelFeatureSub && Object.keys(subscription.features)[0];
 
                         this.subIdToCancel = subscription.id;
+                        this.cancelPlanNum = (this.cancelFeatureSub)
+                            ? pro[`ACCOUNT_LEVEL_FEATURE_${this.feature.toUpperCase()}`]
+                            : subscription.al;
                     }
                 }
 
@@ -79,6 +86,8 @@ mobile.settings.account.cancelSubscription = Object.create(mobile.settingsHelper
             else {
                 this.initCancelSection();
             }
+
+            eventlog(500650, this.cancelPlanNum);
 
             this.show();
         }
@@ -156,6 +165,10 @@ mobile.settings.account.cancelSubscription = Object.create(mobile.settingsHelper
                             && id === this.subIdToCancel
                     );
                     this.feature = this.cancelFeatureSub && Object.keys(this.cancelFeatureSub.features)[0];
+
+                    this.cancelPlanNum = (this.cancelFeatureSub)
+                        ? pro[`ACCOUNT_LEVEL_FEATURE_${this.feature.toUpperCase()}`]
+                        : subscription.al;
                 }
             });
 
@@ -172,18 +185,28 @@ mobile.settings.account.cancelSubscription = Object.create(mobile.settingsHelper
         value() {
             'use strict';
 
+            if (this.cancelPlanSection && this.cancelPlanSection.parentNode) {
+                this.cancelPlanSection.parentNode.removeChild(this.cancelPlanSection);
+            }
+
             this.cancelPlanSection = document.createElement('div');
             this.cancelPlanSection.className = 'cancel-plan-section';
             this.domNode.append(this.cancelPlanSection);
 
             this.addCancelSubInfo();
 
-            if (this.cancelFeatureSub) {
+            if (this.cancelFeatureSub && !this.showingFeatureBenefits) {
                 this.showFeaturesTable();
             }
             else {
+                if (this.showingFeatureBenefits) {
+                    eventlog(500652, this.cancelPlanNum);
+                    this.showingFeatureBenefits = false;
+                    this.cancelPlanSection.querySelector('.cancel-sub-prompt').textContent = l[7005];
+                }
+
+                this.showingSurvey = true;
                 this.reasonNumber = '';
-                this.reasonString = '';
                 this.canContactUser = '';
 
                 this.createReasonRadioOptions();
@@ -209,6 +232,8 @@ mobile.settings.account.cancelSubscription = Object.create(mobile.settingsHelper
             if (!features || !features.cancelSubFeatures) {
                 return;
             }
+
+            this.showingFeatureBenefits = true;
 
             const featuresTable = document.createElement('div');
             featuresTable.className = 'features-table';
@@ -275,6 +300,8 @@ mobile.settings.account.cancelSubscription = Object.create(mobile.settingsHelper
 
             featuresTable.append(featuresTableHeader, featuresTableContents);
             featuresTableHeader.append(ftHeaderCol1, ftHeaderCol2, ftHeaderCol3);
+
+            this.cancelPlanSection.querySelector('.cancel-sub-prompt').classList.add('top');
         }
     },
 
@@ -316,12 +343,29 @@ mobile.settings.account.cancelSubscription = Object.create(mobile.settingsHelper
             cancelSubResult.textContent = resultText;
             cancelSubPrompt.textContent = promptText;
 
-            if (cancelFeatureSub) {
-                cancelSubPrompt.classList.add('top');
-            }
-
             cancelSubWarnings.append(cancelSubResult, cancelSubPrompt);
             cancelPlanSection.append(cancelSubWarnings);
+        }
+    },
+
+    /**
+     * Setting survey to mandatory in case it is needed
+     * @returns {void}
+     */
+    setSurveyToMandatory: {
+        value() {
+            'use strict';
+
+            if (!this.skipSurvey) {
+                return;
+            }
+
+            this.skipSurvey = false;
+            const btn = (this.cancelPlanNum === pro.ACCOUNT_LEVEL_FEATURE_VPN) ? this.secondBtn : this.firstBtn;
+
+            if (btn) {
+                btn.text = l.submit_and_cancel;
+            }
         }
     },
 
@@ -337,71 +381,36 @@ mobile.settings.account.cancelSubscription = Object.create(mobile.settingsHelper
             const radioOptions = document.createElement('div');
             radioOptions.className = 'cancel-sub-options';
 
-            const options = array.randomize([
-                {
+            let options = (this.cancelFeatureSub)
+                ? [
+                    [11, l.cancel_sub_vpn_conn_reason],
+                    [12, l.cancel_sub_vpn_speed_reason],
+                    [13, l.cancel_sub_vpn_tmp_reason],
+                    [14, l.cancel_sub_vpn_servers_reason],
+                    [15, l.cancel_sub_vpn_difficult_reason],
+                    [16, l.cancel_sub_vpn_security_reason]
+                ]
+                : [
+                    [1, l.cancel_sub_temp_plan_reason],
+                    [2, l.cancel_sub_too_expensive_reason],
+                    [3, l.cancel_sub_too_much_storage_quota_reason],
+                    [4, l.cancel_sub_lack_of_features_reason],
+                    [5, l.cancel_sub_switching_provider_reason],
+                    [6, l.cancel_sub_difficult_to_use_reason],
+                    [7, l.cancel_sub_poor_support_reason],
+                    [9, l.cancel_sub_cant_afford_reason],
+                    [10, l.cancel_sub_no_sub_reason]
+                ];
+
+            options = array.randomize(options.map(([value, label]) => {
+                return {
                     parentNode: radioOptions,
-                    label: l.cancel_sub_temp_plan_reason,
-                    value: 1,
+                    label,
+                    value,
                     checked: false,
                     otherOption: false
-                },
-                {
-                    parentNode: radioOptions,
-                    label: l.cancel_sub_too_expensive_reason,
-                    value: 2,
-                    checked: false,
-                    otherOption: false
-                },
-                {
-                    parentNode: radioOptions,
-                    label: l.cancel_sub_too_much_storage_quota_reason,
-                    value: 3,
-                    checked: false,
-                    otherOption: false
-                },
-                {
-                    parentNode: radioOptions,
-                    label: l.cancel_sub_lack_of_features_reason,
-                    value: 4,
-                    checked: false,
-                    otherOption: false
-                },
-                {
-                    parentNode: radioOptions,
-                    label: l.cancel_sub_switching_provider_reason,
-                    value: 5,
-                    checked: false,
-                    otherOption: false
-                },
-                {
-                    parentNode: radioOptions,
-                    label: l.cancel_sub_difficult_to_use_reason,
-                    value: 6,
-                    checked: false,
-                    otherOption: false
-                },
-                {
-                    parentNode: radioOptions,
-                    label: l.cancel_sub_poor_support_reason,
-                    value: 7,
-                    checked: false,
-                    otherOption: false
-                },
-                {
-                    parentNode: radioOptions,
-                    label: l.cancel_sub_cant_afford_reason,
-                    value: 9,
-                    checked: false,
-                    otherOption: false
-                },
-                {
-                    parentNode: radioOptions,
-                    label: l.cancel_sub_no_sub_reason,
-                    value: 10,
-                    checked: false,
-                    otherOption: false
-                },
-            ]);
+                };
+            }));
 
             options.push({
                 parentNode: radioOptions,
@@ -416,6 +425,7 @@ mobile.settings.account.cancelSubscription = Object.create(mobile.settingsHelper
                 radios: options,
                 align: 'left',
                 onChange: (e) => {
+                    this.setSurveyToMandatory();
                     this.reasonNumber = e.currentTarget.value;
 
                     const selectedRadioBtnOptions = options.filter((option) => {
@@ -423,7 +433,6 @@ mobile.settings.account.cancelSubscription = Object.create(mobile.settingsHelper
                     })[0];
 
                     this.otherOptionChosen = selectedRadioBtnOptions.otherOption;
-                    this.reasonString = this.otherOptionChosen ? '' : selectedRadioBtnOptions.label;
 
                     this.otherReasonTextArea.$wrapper.toggleClass('hidden', !this.otherOptionChosen);
                     this.otherReasonTextArea.hideError();
@@ -491,6 +500,7 @@ mobile.settings.account.cancelSubscription = Object.create(mobile.settingsHelper
                 radios: options,
                 align: 'left',
                 onChange: (e) => {
+                    this.setSurveyToMandatory();
                     this.canContactUser = e.currentTarget.value;
 
                     if (this.inlineConsentAlert.visible) {
@@ -529,28 +539,45 @@ mobile.settings.account.cancelSubscription = Object.create(mobile.settingsHelper
             const surveyButtons = document.createElement('div');
             surveyButtons.className = 'buttons-container';
 
-            const { cancelFeatureSub, subSelectionArea, cancelPlanSection, feature } = this;
+            const {
+                cancelFeatureSub,
+                subSelectionArea,
+                cancelPlanSection,
+                feature,
+                cancelPlanNum,
+                showingSurvey,
+                showingFeatureBenefits
+            } = this;
 
             const canContinueCancellation = isShowingPlanPicker || cancelFeatureSub;
 
-            let primaryBtnText;
+            let primaryBtnText = l.skip_and_cancel;
+            let secondBtnText = l.dont_cancel_sub_btn_label;
+
             if (isShowingPlanPicker) {
                 primaryBtnText = l.dont_cancel_sub_btn_label;
             }
-            else {
+            else if (cancelFeatureSub) {
                 // Label keys:
                 // l.vpn_keep_plan
                 // l.pwm_keep_plan
-                primaryBtnText = cancelFeatureSub ? l[`${feature}_keep_plan`] : l.cancel_sub_btn_label;
+                primaryBtnText = l[`${feature}_keep_plan`];
             }
 
-            /* eslint-disable no-new */
-            new MegaButton({
+            if (showingSurvey && cancelPlanNum === pro.ACCOUNT_LEVEL_FEATURE_VPN) {
+                secondBtnText = l.skip_and_cancel;
+            }
+            else if (canContinueCancellation) {
+                secondBtnText = l.cancel_pro_continue;
+            }
+
+            this.firstBtn = new MegaButton({
                 parentNode: surveyButtons,
                 text: primaryBtnText,
                 componentClassname: 'block primary'
             }).on('tap', () => {
                 if (canContinueCancellation) {
+                    eventlog(500651, cancelPlanNum);
                     loadSubPage('fm/account');
                 }
                 else {
@@ -560,12 +587,17 @@ mobile.settings.account.cancelSubscription = Object.create(mobile.settingsHelper
 
             this.secondBtn = new MegaButton({
                 parentNode: surveyButtons,
-                text: canContinueCancellation ? l.cancel_pro_continue : l.dont_cancel_sub_btn_label,
-                componentClassname: canContinueCancellation ? 'text-only' : 'block secondary',
+                text: secondBtnText,
+                componentClassname: canContinueCancellation && !showingSurvey && !showingFeatureBenefits
+                    ? 'text-only'
+                    : 'block secondary',
                 disabled: isShowingPlanPicker
             }).on('tap', () => {
                 if (isShowingPlanPicker) {
                     subSelectionArea.textContent = '';
+                    this.initCancelSection();
+                }
+                else if (showingFeatureBenefits && cancelPlanNum === pro.ACCOUNT_LEVEL_FEATURE_VPN) {
                     this.initCancelSection();
                 }
                 else if (cancelFeatureSub) {
@@ -573,6 +605,7 @@ mobile.settings.account.cancelSubscription = Object.create(mobile.settingsHelper
                 }
                 else {
                     loadSubPage('fm/account');
+                    eventlog(500651, cancelPlanNum);
                 }
             });
 
@@ -594,15 +627,21 @@ mobile.settings.account.cancelSubscription = Object.create(mobile.settingsHelper
             'use strict';
 
             // Setup standard request to 'cccs' = Credit Card Cancel Subscriptions
-            const ccReq = { a: 'cccs', sub: this.subIdToCancel };
+            const ccReq = { a: 'cccs', sub: this.subIdToCancel, m: '1' }; // m stands for mobile
             const requests = [ccReq];
 
-            if (!this.cancelFeatureSub) {
-                const reason = this.otherOptionChosen ?
-                    this.otherReasonTextArea.$input.val() :
-                    this.reasonNumber ? `${this.reasonNumber} - ${this.reasonString}` : '';
+            if (!this.skipSurvey) {
+                const reason = {
+                    r: this.reasonNumber,
+                    p: String(Array.from(this.domNode.querySelectorAll('.cancel-sub-options .radio-wrapper input'))
+                        .findIndex(({ value}) => value === this.reasonNumber) + 1)
+                };
 
-                if (!this.reasonNumber || !this.canContactUser.length || !reason.length) {
+                if (this.otherOptionChosen) {
+                    reason.t = this.otherReasonTextArea.$input.val();
+                }
+
+                if (!this.reasonNumber || !this.canContactUser.length) {
                     if (!this.reasonNumber) {
                         this.inlineReasonAlert.show();
                     }
@@ -621,7 +660,7 @@ mobile.settings.account.cancelSubscription = Object.create(mobile.settingsHelper
                     return;
                 }
 
-                ccReq.r = reason;
+                ccReq.r = [reason];
                 ccReq.cc = this.canContactUser;
 
                 // If they were Pro Flexi, we need to also downgrade the user from Pro Flexi to Free
@@ -629,6 +668,8 @@ mobile.settings.account.cancelSubscription = Object.create(mobile.settingsHelper
                     requests.push({ a: 'urpf' });
                 }
             }
+
+            eventlog(this.skipSurvey ? 500653 : 500654, this.cancelPlanNum);
 
             // Show a loading dialog while sending request to API
             loadingDialog.show();

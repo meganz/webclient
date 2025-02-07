@@ -1694,6 +1694,7 @@ MegaData.prototype.labelSortMenuUI = function(event, rightClick) {
     // Close label filtering sorting menu on second Name column click
     if ($menu.is(':visible') && !rightClick) {
         $menu.addClass('hidden');
+        $(window).off('resize.lblsortmenu');
         return false;
     }
 
@@ -1710,24 +1711,39 @@ MegaData.prototype.labelSortMenuUI = function(event, rightClick) {
         .filter('*[data-by=' + sorting.n + ']')
         .addClass('active');
 
+    const headerNode = event.target;
+    let xRelativeOffset  = false;
+    let yRelativeOffset = false;
     var tmpFn = function() {
-        x = event.clientX;
-        y = event.clientY;
+        const { top, left, width, height } = headerNode.getBoundingClientRect();
+        const { offsetX, offsetY } = event;
+        if (xRelativeOffset === false) {
+            xRelativeOffset = offsetX / width;
+            yRelativeOffset = offsetY / height;
+        }
 
-        $menu.css('left', x + 'px');
-        $menu.css('top', y + 'px');
+        let xAbsoluteOffset = xRelativeOffset * width + left;
+        const yAbsoluteOffset = yRelativeOffset * height + top;
+
+        if (document.body.classList.contains('rtl')) {
+            const { width } = $menu[0].getBoundingClientRect();
+            xAbsoluteOffset -= width;
+        }
+        $menu.css('left', `${xAbsoluteOffset}px`);
+        $menu.css('top', `${yAbsoluteOffset}px`);
     };
+
+    $.hideTopMenu();
+    $.hideContextMenu();
+    $menu.removeClass('hidden');
 
     if (rightClick) {// FM right mouse click on node
         M.adjustContextMenuPosition(event, $menu);
     }
     else {
         tmpFn();
+        $(window).rebind('resize.lblsortmenu', tmpFn);
     }
-
-    $.hideTopMenu();
-    $.hideContextMenu();
-    $menu.removeClass('hidden');
 
     $('.colour-sorting-menu').off('click', '.dropdown-item');
     $('.colour-sorting-menu').on('click', '.dropdown-item', function() {

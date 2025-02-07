@@ -364,6 +364,7 @@
     background: none;
     box-shadow: none;
     position: unset;
+    width: 100%;
 }
 .mobile .cookie-banner > .content {
     flex-direction: column;

@@ -123,6 +123,9 @@
     padding: 0 4px;
     background-color: var(--mobile-page-background);
 }
+.fm-picker-dialog .crumb-overflow-link {
+    background-color: var(--surface-main);
+}
 .properties-breadcrumb .crumb-overflow-link {
     background-color: unset;
 }

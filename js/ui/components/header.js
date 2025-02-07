@@ -85,7 +85,8 @@ class MegaHeader extends MegaMobileHeader {
                 href: '/fm',
                 icon: 'sprite-fm-mono icon-cloud-thin-outline',
                 iconSize: 24,
-                activeCondition: () => mega.ui.topmenu.hasClass('drive')
+                activeCondition: () => mega.ui.topmenu.hasClass('drive'),
+                eventLog: 500446
             },
             chat: {
                 componentClassname: 'chat',
@@ -93,7 +94,8 @@ class MegaHeader extends MegaMobileHeader {
                 href: '/fm/chat',
                 icon: 'sprite-fm-mono icon-message-chat-circle-thin',
                 iconSize: 24,
-                activeCondition: () => M.chat
+                activeCondition: () => M.chat,
+                eventLog: 500294
             },
             pwm: {
                 componentClassname: 'pwm',
@@ -101,7 +103,8 @@ class MegaHeader extends MegaMobileHeader {
                 href: '/fm/pwm',
                 icon: 'sprite-fm-mono icon-lock-thin-outline',
                 iconSize: 24,
-                activeCondition: () => M.currentCustomView.type === 'pwm'
+                activeCondition: () => M.currentCustomView.type === 'pwm',
+                eventLog: 500628
             },
             vpn: {
                 componentClassname: 'vpn extlink',
@@ -109,7 +112,8 @@ class MegaHeader extends MegaMobileHeader {
                 href: 'https://mega.io/vpn',
                 target: '_blank',
                 icon: 'sprite-fm-mono icon-zap-thin-outline',
-                iconSize: 24
+                iconSize: 24,
+                eventLog: 500629
             },
             business: {
                 componentClassname: 'business',
@@ -117,7 +121,8 @@ class MegaHeader extends MegaMobileHeader {
                 href: '/fm/user-management',
                 icon: 'sprite-fm-mono icon-building',
                 iconSize: 24,
-                activeCondition: () => M.currentdirid.startsWith('user-management')
+                activeCondition: () => M.currentdirid.startsWith('user-management'),
+                eventLog: 500630
             }
         };
 
@@ -394,6 +399,7 @@ class MegaHeader extends MegaMobileHeader {
         notify.renderNotifications();
         mega.ui.header.handleMenu('notif');
         mega.ui.header.notifButton.icon = mega.ui.header.notifButton.icon.replace('-outline', '-filled');
+        eventlog(500322);
     }
 
     closeAvatarMenu(e) {
@@ -424,6 +430,8 @@ class MegaHeader extends MegaMobileHeader {
         MegaStorageBlock.checkUpdate();
 
         mega.ui.header.handleMenu('avatar');
+
+        eventlog(500323);
     }
 
     closeBentoMenu(e) {
@@ -448,6 +456,8 @@ class MegaHeader extends MegaMobileHeader {
         });
 
         mega.ui.header.handleMenu('bento');
+
+        eventlog(500646);
     }
 
     closeTopHelpMenu(e) {
@@ -632,7 +642,8 @@ class MegaHeader extends MegaMobileHeader {
                 type: 'text',
                 componentClassname: 'to-my-profile',
                 text: l[16668],
-                href: 'fm/dashboard'
+                href: 'fm/dashboard',
+                eventLog: 500445
             });
 
             this.storageBlock = new MegaStorageBlock({
@@ -646,7 +657,8 @@ class MegaHeader extends MegaMobileHeader {
                 text: l.recovery_key_title,
                 onClick: () => {
                     M.showRecoveryKeyDialog(2);
-                }
+                },
+                eventLog: 500312
             });
 
             mCreateElement('div', {class: 'horizontal-divider'}, this.avatarMenu);
@@ -757,14 +769,16 @@ class MegaHeader extends MegaMobileHeader {
             _buildInteractable({
                 componentClassname: 'settings',
                 text: l[823],
-                href: 'fm/account'
+                href: 'fm/account',
+                eventLog: 500325
             });
 
             _buildInteractable({
                 componentClassname: 'download-desktop-app extlink',
                 target: '_blank',
                 text: l.install_desktop_app,
-                href: 'https://mega.io/desktop'
+                href: 'https://mega.io/desktop',
+                eventLog: 500327
             });
 
             _buildInteractable({
@@ -788,7 +802,8 @@ class MegaHeader extends MegaMobileHeader {
                 text: l.log_out,
                 onClick: () => {
                     mLogout();
-                }
+                },
+                eventLog: 500329
             });
 
 

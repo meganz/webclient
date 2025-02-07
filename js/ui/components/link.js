@@ -51,6 +51,9 @@ MegaLink.bindEvent = function() {
 
     if (this.native) {
         this.off('click');
+        if (this.eventLog) {
+            this.on('click.eventLog', () => eventlog(this.eventLog));
+        }
         return;
     }
 

@@ -8,7 +8,8 @@ MegaData.prototype.sharesUI = function() {
         var $this = $(this);
         var folder = escapeHTML($this.attr('data-folder'));
 
-        M.openFolder(folder);
+        const eid = $this.attr('data-eventid');
+        M.openFolder(folder).then(() => eid && eventlog(eid));
     });
 };
 

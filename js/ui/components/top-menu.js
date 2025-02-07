@@ -96,7 +96,8 @@ class MegaTopMenu extends MegaMobileTopMenu {
                 treeWrapClass: 'js-myfile-tree-panel',
                 name: 'cloud-drive',
                 typeClassname: 'drive',
-                onContextmenu: _openContext
+                onContextmenu: _openContext,
+                eventLog: 500631
             },
             {
                 text: l.shared_items,
@@ -105,7 +106,8 @@ class MegaTopMenu extends MegaMobileTopMenu {
                 hasTree: 'shared-with-me', // hidden tree for copy dialog
                 treeWrapClass: 'hidden-tree',
                 name: 'shares',
-                typeClassname: 'drive'
+                typeClassname: 'drive',
+                eventLog: 500641
             },
             {
                 type: 'spacer',
@@ -116,7 +118,8 @@ class MegaTopMenu extends MegaMobileTopMenu {
                 icon: 'sprite-fm-mono icon-arrows-up-down-circle-thin-outline',
                 href: '/fm/transfers',
                 name: 'transfers',
-                typeClassname: 'drive'
+                typeClassname: 'drive',
+                eventLog: 500634
             },
             {
                 text: l[167],
@@ -124,7 +127,8 @@ class MegaTopMenu extends MegaMobileTopMenu {
                 href: '/fm/rubbish',
                 name: 'rubbish-bin',
                 typeClassname: 'drive',
-                onContextmenu: _openContext
+                onContextmenu: _openContext,
+                eventLog: 500635
             },
 
             // Password Manager menus
@@ -152,7 +156,8 @@ class MegaTopMenu extends MegaMobileTopMenu {
                 icon: 'sprite-fm-mono icon-image-01-thin-outline',
                 href: '/fm/photos',
                 name: 'media',
-                typeClassname: 'drive'
+                typeClassname: 'drive',
+                eventLog: 500447
             });
 
             loggedInCD.splice(3, 0, {
@@ -160,7 +165,8 @@ class MegaTopMenu extends MegaMobileTopMenu {
                 icon: 'sprite-fm-mono icon-devices-thin-outline',
                 href: '/fm/devices',
                 name: 'devices',
-                typeClassname: 'drive'
+                typeClassname: 'drive',
+                eventLog: 500448
             });
 
             loggedInCD.splice(5, 0, {
@@ -168,13 +174,15 @@ class MegaTopMenu extends MegaMobileTopMenu {
                 icon: 'sprite-fm-mono icon-clock-thin-outline',
                 href: '/fm/recents',
                 name: 'recents',
-                typeClassname: 'drive'
+                typeClassname: 'drive',
+                eventLog: 500632
             }, {
                 text: l.gallery_favourites,
                 icon: 'sprite-fm-mono icon-heart-thin-outline',
                 href: '/fm/faves',
                 name: 'faves',
-                typeClassname: 'drive'
+                typeClassname: 'drive',
+                eventLog: 500633
             });
         }
 
@@ -194,7 +202,8 @@ class MegaTopMenu extends MegaMobileTopMenu {
                 hasTree: 's4',
                 treeWrapClass: 'js-s4-tree-panel',
                 name: 's4',
-                typeClassname: 'drive'
+                typeClassname: 'drive',
+                eventLog: 500636
             });
         }
 

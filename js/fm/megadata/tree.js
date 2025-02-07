@@ -847,6 +847,7 @@ MegaData.prototype.addTreeUI = function() {
         var id = $this.attr('id').replace('treea_', '');
         var tmpId = id;
         var cv = M.isCustomView(id);
+        const eid = $this.attr('data-eventid');
 
         id = cv ? cv.nodeID : id;
 
@@ -901,6 +902,10 @@ MegaData.prototype.addTreeUI = function() {
                         mega.ui.mInfoPanel.reRenderIfVisible([id]);
                     }
                 });
+        }
+
+        if (eid) {
+            eventlog(eid);
         }
 
         return false;

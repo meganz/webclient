@@ -23063,6 +23063,7 @@ class Call extends mixins.w9 {
       guest: isGuest(),
       waitingRoomPeers: [],
       raisedHandPeers: [],
+      raisedHandToast: false,
       initialCallRinging: false,
       onboardingUI: false,
       onboardingRecording: false,
@@ -23100,6 +23101,45 @@ class Call extends mixins.w9 {
       });
     };
     this.customIsEventuallyVisible = () => true;
+    this.renderRaisedHandToast = () => {
+      const {
+        raisedHandPeers
+      } = this.state;
+      window.toaster.main.hideAll();
+      toaster.main.show({
+        buttons: [{
+          text: l[16797],
+          onClick: () => this.setState({
+            sidebar: true,
+            view: VIEW.PARTICIPANTS,
+            raisedHandToast: false
+          }, () => window.toaster.main.hideAll())
+        }],
+        onClose: () => this.setState({
+          raisedHandToast: false
+        }, () => window.toaster.main.hideAll()),
+        classes: ['theme-dark-forced', 'call-toast'],
+        icons: ['sprite-fm-uni icon-raise-hand'],
+        timeout: 0,
+        content: (() => {
+          const peerName = M.getNameByHandle(raisedHandPeers[0]);
+          const peersCount = raisedHandPeers.length;
+          const withCurrentPeer = raisedHandPeers.includes(u_handle);
+          const CONTENT = {
+            1: () => l.raise_peer_raised.replace('%s', peerName),
+            2: () => {
+              const message = withCurrentPeer ? l.raise_self_peers_raised : l.raise_two_raised;
+              return mega.icu.format(message, peersCount - 1).replace('%s', peerName);
+            },
+            rest: () => {
+              const message = withCurrentPeer ? l.raise_self_peers_raised : l.raise_peers_raised;
+              return mega.icu.format(message, withCurrentPeer ? peersCount - 1 : peersCount);
+            }
+          };
+          return (CONTENT[peersCount] || CONTENT.rest)();
+        })()
+      });
+    };
     this.bindCallEvents = () => {
       const {
         chatRoom
@@ -23238,39 +23278,9 @@ class Call extends mixins.w9 {
           raisedHandPeers
         } = this.state;
         if (userHandle !== u_handle && !this.props.minimized) {
-          window.toaster.main.hideAll();
-          toaster.main.show({
-            buttons: [{
-              text: l[16797],
-              onClick: () => {
-                window.toaster.main.hideAll();
-                this.setState({
-                  sidebar: true,
-                  view: VIEW.PARTICIPANTS
-                });
-              }
-            }],
-            classes: ['theme-dark-forced', 'call-toast'],
-            icons: ['sprite-fm-uni icon-raise-hand'],
-            timeout: 10e3,
-            content: (() => {
-              const peerName = M.getNameByHandle(raisedHandPeers[0]);
-              const peersCount = raisedHandPeers.length;
-              const withCurrentPeer = raisedHandPeers.includes(u_handle);
-              const CONTENT = {
-                1: () => l.raise_peer_raised.replace('%s', peerName),
-                2: () => {
-                  const message = withCurrentPeer ? l.raise_self_peers_raised : l.raise_two_raised;
-                  return mega.icu.format(message, peersCount - 1).replace('%s', peerName);
-                },
-                rest: () => {
-                  const message = withCurrentPeer ? l.raise_self_peers_raised : l.raise_peers_raised;
-                  return mega.icu.format(message, withCurrentPeer ? peersCount - 1 : peersCount);
-                }
-              };
-              return (CONTENT[peersCount] || CONTENT.rest)();
-            })()
-          });
+          this.setState({
+            raisedHandToast: true
+          }, () => this.renderRaisedHandToast());
         }
         mBroadcaster.sendMessage('meetings:raisedHand', raisedHandPeers);
       }));
@@ -23280,12 +23290,16 @@ class Call extends mixins.w9 {
         raisedHandPeers: state.raisedHandPeers.filter(h => h !== userHandle)
       }), () => {
         const {
-          raisedHandPeers
+          raisedHandPeers,
+          raisedHandToast
         } = this.state;
-        if (!raisedHandPeers.length) {
-          window.toaster.main.hideAll();
-        }
         mBroadcaster.sendMessage('meetings:raisedHand', raisedHandPeers);
+        if (raisedHandPeers && raisedHandPeers.length) {
+          return raisedHandToast ? this.renderRaisedHandToast() : null;
+        }
+        return this.setState({
+          raisedHandToast: false
+        }, () => window.toaster.main.hideAll());
       }));
       chatRoom.rebind(`onRecordingActivePeer.${NAMESPACE}`, (ev, {
         userHandle
@@ -24873,7 +24887,6 @@ class FloatingVideo extends REaCt().Component {
         collapsed: !state.collapsed
       }));
     };
-    this.onLoadedData = () => {};
   }
   componentWillUnmount() {
     mBroadcaster.removeListener(this.collapseListener);
@@ -25097,6 +25110,7 @@ class Stream extends mixins.w9 {
     this.renderMiniMode = source => {
       const {
         call,
+        chatRoom,
         mode,
         minimized,
         isPresenterNode,
@@ -25105,18 +25119,15 @@ class Stream extends mixins.w9 {
       if (call.isOnHold) {
         return this.renderOnHoldVideoNode();
       }
-      let VideoClass = videoNode.zu;
-      if (source.isLocal) {
-        VideoClass = isPresenterNode ? videoNode.Cn : videoNode.bJ;
-      }
+      const VideoClass = source.isLocal ? isPresenterNode ? videoNode.Cn : videoNode.bJ : videoNode.zu;
       return REaCt().createElement(VideoClass, {
-        chatRoom: this.props.chatRoom,
+        key: source,
+        source,
+        chatRoom,
         mode,
         minimized,
         isPresenterNode,
-        onLoadedData,
-        source,
-        key: source
+        onLoadedData
       });
     };
     this.renderSelfView = () => {
@@ -26508,7 +26519,6 @@ class Admit extends mixins.w9 {
   }
 }
 ;// ./js/chat/ui/meetings/stream.jsx
-
 
 
 

@@ -237,6 +237,7 @@ export default class Call extends MegaRenderMixin {
         guest: isGuest(),
         waitingRoomPeers: [],
         raisedHandPeers: [],
+        raisedHandToast: false,
         initialCallRinging: false,
         onboardingUI: false,
         onboardingRecording: false,
@@ -396,6 +397,46 @@ export default class Call extends MegaRenderMixin {
                 this.flagMap && !this.flagMap.getSync(OBV4_FLAGS.CHAT_CALL_RAISE);
         }
     }
+
+    renderRaisedHandToast = () => {
+        const { raisedHandPeers } = this.state;
+        window.toaster.main.hideAll();
+        toaster.main.show({
+            buttons: [{
+                text: l[16797] /* `View` */,
+                onClick: () =>
+                    this.setState(
+                        { sidebar: true, view: VIEW.PARTICIPANTS, raisedHandToast: false },
+                        () => window.toaster.main.hideAll()
+                    )
+            }],
+            onClose: () => this.setState({ raisedHandToast: false }, ()=>window.toaster.main.hideAll()),
+            classes: ['theme-dark-forced', 'call-toast'],
+            icons: ['sprite-fm-uni icon-raise-hand'],
+            timeout: 0 /* No auto hiding */,
+            content: (() => {
+                const peerName = M.getNameByHandle(raisedHandPeers[0]);
+                const peersCount = raisedHandPeers.length;
+                const withCurrentPeer = raisedHandPeers.includes(u_handle);
+                const CONTENT = {
+                    1: () =>
+                        // `${NAME} raised their hand`
+                        l.raise_peer_raised.replace('%s', peerName),
+                    2: () => {
+                        // `You and 1 other raised their hand` || `${NAME} and 1 other raised their hand`
+                        const message = withCurrentPeer ? l.raise_self_peers_raised : l.raise_two_raised;
+                        return mega.icu.format(message, peersCount - 1).replace('%s', peerName);
+                    },
+                    rest: () => {
+                        // `You and N people raised their hand` || `N people raised their hand`
+                        const message = withCurrentPeer ? l.raise_self_peers_raised : l.raise_peers_raised;
+                        return mega.icu.format(message, withCurrentPeer ? peersCount - 1 : peersCount);
+                    }
+                };
+                return (CONTENT[peersCount] || CONTENT.rest)();
+            })()
+        });
+    };
 
     /**
      * bindCallEvents
@@ -569,40 +610,7 @@ export default class Call extends MegaRenderMixin {
             this.setState(state => ({ raisedHandPeers: [...state.raisedHandPeers, userHandle] }), () => {
                 const { raisedHandPeers } = this.state;
                 if (userHandle !== u_handle && !this.props.minimized) {
-                    window.toaster.main.hideAll();
-                    toaster.main.show({
-                        buttons: [{
-                            text: l[16797] /* `View` */,
-                            onClick: () => {
-                                window.toaster.main.hideAll();
-                                this.setState({ sidebar: true, view: VIEW.PARTICIPANTS });
-                            }
-                        }],
-                        classes: ['theme-dark-forced', 'call-toast'],
-                        icons: ['sprite-fm-uni icon-raise-hand'],
-                        timeout: 10e3 /* 10 seconds */,
-                        content: (() => {
-                            const peerName = M.getNameByHandle(raisedHandPeers[0]);
-                            const peersCount = raisedHandPeers.length;
-                            const withCurrentPeer = raisedHandPeers.includes(u_handle);
-                            const CONTENT = {
-                                1: () =>
-                                    // `${NAME} raised their hand`
-                                    l.raise_peer_raised.replace('%s', peerName),
-                                2: () => {
-                                    // `You and 1 other raised their hand` || `${NAME} and 1 other raised their hand`
-                                    const message = withCurrentPeer ? l.raise_self_peers_raised : l.raise_two_raised;
-                                    return mega.icu.format(message, peersCount - 1).replace('%s', peerName);
-                                },
-                                rest: () => {
-                                    // `You and N people raised their hand` || `N people raised their hand`
-                                    const message = withCurrentPeer ? l.raise_self_peers_raised : l.raise_peers_raised;
-                                    return mega.icu.format(message, withCurrentPeer ? peersCount - 1 : peersCount);
-                                }
-                            };
-                            return (CONTENT[peersCount] || CONTENT.rest)();
-                        })()
-                    });
+                    this.setState({ raisedHandToast: true }, () => this.renderRaisedHandToast());
                 }
                 // [...] TODO: abstract into HOC, consumed in `participants.jsx`,`float.jsx`, `videoNode.jsx`
                 mBroadcaster.sendMessage('meetings:raisedHand', raisedHandPeers);
@@ -611,14 +619,20 @@ export default class Call extends MegaRenderMixin {
 
         chatRoom.rebind(`onRaisedHandDel.${NAMESPACE}`, (ev, { userHandle }) =>
             this.isMounted() &&
-            this.setState(state => ({ raisedHandPeers: state.raisedHandPeers.filter(h => h !== userHandle) }), () => {
-                const { raisedHandPeers } = this.state;
-                if (!raisedHandPeers.length) {
-                    window.toaster.main.hideAll();
+            this.setState(
+                state => ({ raisedHandPeers: state.raisedHandPeers.filter(h => h !== userHandle) }),
+                () => {
+                    const { raisedHandPeers, raisedHandToast } = this.state;
+                    // [...] TODO: abstract into HOC, consumed in `participants.jsx`,`float.jsx`, `videoNode.jsx`
+                    mBroadcaster.sendMessage('meetings:raisedHand', raisedHandPeers);
+                    if (raisedHandPeers && raisedHandPeers.length) {
+                        // Update the toaster once a peer removes their raised hand if the toaster is currently shown
+                        return raisedHandToast ? this.renderRaisedHandToast() : null;
+                    }
+                    // Last peer removed their raised hand -> hide the toaster
+                    return this.setState({ raisedHandToast: false }, ()=>window.toaster.main.hideAll());
                 }
-                // [...] TODO: abstract into HOC, consumed in `participants.jsx`,`float.jsx`, `videoNode.jsx`
-                mBroadcaster.sendMessage('meetings:raisedHand', raisedHandPeers);
-            })
+            )
         );
 
         chatRoom.rebind(

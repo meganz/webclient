@@ -3087,6 +3087,7 @@ function closeDialog(ev) {
     }
 
     delete $.dialog;
+    treesearch = false;
 
     if ($.registerDialog) {
         // if the terms dialog was closed from the register dialog

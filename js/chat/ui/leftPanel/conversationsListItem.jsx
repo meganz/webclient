@@ -306,6 +306,7 @@ export default class ConversationsListItem extends MegaRenderMixin {
                                             unread-messages
                                             items-${notificationItems.length}
                                             unread-upcoming
+                                            ${unreadCount > 9 && notificationItems.length > 1 ? 'unread-spaced' : ''}
                                         `}>
                                         {notificationItems}
                                     </div> :
@@ -323,7 +324,11 @@ export default class ConversationsListItem extends MegaRenderMixin {
                     <div className="date-time-wrapper">
                         <div className="date-time">{this.getConversationTimestamp()}</div>
                         {notificationItems.length > 0 ?
-                            <div className="unread-messages-container">
+                            <div
+                                className={`
+                                    unread-messages-container
+                                    ${unreadCount > 9 && notificationItems.length > 1 ? 'unread-spaced' : ''}
+                                `}>
                                 <div className={`unread-messages items-${notificationItems.length}`}>
                                     {notificationItems}
                                 </div>

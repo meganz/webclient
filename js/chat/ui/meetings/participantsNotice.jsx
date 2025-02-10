@@ -125,7 +125,9 @@ export default class ParticipantsNotice extends MegaRenderMixin {
         }
 
         return (
-            <div ref={this.domRef}>
+            <div
+                ref={this.domRef}
+                className={`${ParticipantsNotice.NAMESPACE}-container`}>
                 {call.isSharingScreen() ? null : (
                     <LocalVideoHiRes
                         className="local-stream-mirrored"

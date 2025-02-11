@@ -412,7 +412,14 @@ async function u_checklogin4(sid) {
 
         u_type = res;
         u_checked = true;
-        onIdle(topmenuUI);
+        onIdle(() => {
+            topmenuUI();
+
+            // until old header deprecated, pmlayout check is required
+            if (typeof pmlayout !== 'undefined') {
+                mega.ui.header.update();
+            }
+        });
 
         if (typeof dlmanager === 'object') {
             dlmanager.setUserFlags();

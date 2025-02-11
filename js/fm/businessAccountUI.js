@@ -2711,6 +2711,9 @@ BusinessAccountUI.prototype.viewBusinessInvoicesPage = function () {
     // private function to fill the list of invoices on UI
     var prepareInvoiceListSection = function (st, invoicesList) {
 
+        if (!String(page).includes('invoices')) {
+            return;
+        }
         var unhideSection = function () {
 
             $('.fm-right-files-block').removeClass('hidden');
@@ -2823,6 +2826,7 @@ BusinessAccountUI.prototype.initBreadcrumbClickHandlers = function($pageHeader) 
         // If Pro Flexi, when clicking on Dashboard breadcrumbs, go back to the Dashboard
         if (u_attr.pf) {
             loadSubPage('fm/dashboard');
+            return;
         }
 
         return this.viewSubAccountListUI();

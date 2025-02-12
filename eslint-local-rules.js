@@ -181,7 +181,16 @@ module.exports = {
             return {
                 MemberExpression(node) {
                     if (node.parent.type === 'AssignmentExpression') {
-                        const {object: {name: o}, property: {name: p}} = node;
+                        const {
+                            object: {
+                                name: o,
+                                property: {name: op} = false
+                            },
+                            parent: {
+                                right: {type: as} = false
+                            },
+                            property: {name: p}
+                        } = node;
 
                         if (o === "$" && p === "dialog") {
                             context.report(node,
@@ -193,6 +202,10 @@ module.exports = {
 
                             context.report(node,
                                 'Assigning to (self|window).location.* will not work over our browser extension.');
+                        }
+                        else if (op === 'prototype' && as === 'ArrowFunctionExpression') {
+
+                            context.report(node, 'Unexpected arrow-function assignment on prototypal method.');
                         }
                     }
                 },

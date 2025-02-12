@@ -110,8 +110,6 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 0 24px;
-    width: calc(100% - 48px);
 }
 .overlay-wrap .main > *:not(:last-child),
 .mega-overlay .overlay > .close {
@@ -198,7 +196,8 @@ body.mobile .overlay-wrap .image i.password {
     display: flex;
     align-items: center;
     padding: 0 24px;
-    width: calc(100% - 48px);
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .overlay-wrap .header > * {

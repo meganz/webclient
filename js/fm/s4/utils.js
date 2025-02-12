@@ -415,7 +415,7 @@ lazy(s4, 'utils', () => {
             const prefix = dialog ? 'mc' : '';
             let treeNode = treeWrap.querySelector('.s4 .tree');
 
-            const createItem = (node, id, name, icon, staticItem) => {
+            const createItem = (node, id, name, icon, staticItem, eventId) => {
                 const itemWrap = mCreateElement('li', {
                     'class': staticItem ? 's4-static-item' : 's4-item',
                     'id': `${prefix}treeli_${id}`
@@ -423,7 +423,8 @@ lazy(s4, 'utils', () => {
 
                 const itemNode = mCreateElement('span', {
                     'class': `nw-fm-tree-item${M.tree[id] || M.tree.s4[id] ? ' contains-folders' : ''}`,
-                    'id': `${prefix}treea_${id}`
+                    'id': `${prefix}treea_${id}`,
+                    'data-eventid': eventId,
                 }, itemWrap);
                 mCreateElement('span', {'class': 'nw-fm-tree-arrow'}, itemNode);
                 mCreateElement('span', {
@@ -464,12 +465,12 @@ lazy(s4, 'utils', () => {
                 }, wrapNode);
 
                 if (!dialog) {
-                    createItem(wrapNode, `${cn[i].h}_keys`, l.s4_keys, 'icon-key-01-thin-outline', true);
+                    createItem(wrapNode, `${cn[i].h}_keys`, l.s4_keys, 'icon-key-01-thin-outline', true, 500637);
                     createItem(
-                        wrapNode, `${cn[i].h}_policies`, l.s4_policies, 'icon-shield-thin-outline', true
+                        wrapNode, `${cn[i].h}_policies`, l.s4_policies, 'icon-shield-thin-outline', true, 500638
                     );
-                    createItem(wrapNode, `${cn[i].h}_groups`, l.s4_groups, 'icon-users-thin-outline', true);
-                    createItem(wrapNode, `${cn[i].h}_users`, l.s4_users, 'icon-user-thin-outline', true);
+                    createItem(wrapNode, `${cn[i].h}_groups`, l.s4_groups, 'icon-users-thin-outline', true, 500639);
+                    createItem(wrapNode, `${cn[i].h}_users`, l.s4_users, 'icon-user-thin-outline', true, 500640);
                 }
 
                 M.buildtree({h: cn[i].h}, dialog, 's4');

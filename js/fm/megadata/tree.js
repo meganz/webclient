@@ -19,6 +19,7 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sSubMap) {
     }
 
     var folders = [];
+    var _ts_l = (typeof treesearch !== 'undefined' && treesearch) ? treesearch.toLowerCase() : undefined;
     var _tf;
     var _a = 'treea_';
     var _li = 'treeli_';
@@ -405,14 +406,43 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sSubMap) {
                 }
             }
 
+            if (_ts_l) {
+                node = document.getElementById(_li + curItemHandle);
+                if (node) {
+                    if (_tf) {
+                        node.classList.add('tree-item-on-filter-hidden');
+                    }
+                    else {
+                        node.classList.remove('tree-item-on-filter-hidden');
+                    }
+                }
+                if (name.toLowerCase().indexOf(_ts_l) === -1) {
+                    if (node) {
+                        node.classList.add('tree-item-on-search-hidden');
+                    }
+                }
+                else {
+                    $(document.getElementById(_a + curItemHandle))
+                        .parents('li').removeClass('tree-item-on-search-hidden').each(expand)
+                        .parents('ul').addClass('opened');
+                }
+
+                if (firstRun) {
+                    sSubMap = this.getSearchedTreeHandles(curItemHandle, _ts_l);
+                }
+
+                buildnode = sSubMap[curItemHandle];
+            }
+
             if (_tf && _tf[folders[idx].lbl]) {
                 labelhash[curItemHandle] = true;
             }
             // need to add function for hide parent folder for color
             if (buildnode) {
 
-                sSubMap++;
-
+                if (!_ts_l) {
+                    sSubMap++;
+                }
                 M.buildtree(folders[idx], dialog, stype, sSubMap);
             }
         }// END of for folders loop
@@ -432,6 +462,10 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sSubMap) {
     if (firstRun) {
         if (d) {
             console.timeEnd('buildtree');
+        }
+
+        if (_ts_l) {
+            mBroadcaster.sendMessage('treesearch', _ts_l, stype);
         }
     }
 };
@@ -586,6 +620,8 @@ MegaData.prototype.initTreePanelSorting = function() {
         }
     }
 };
+
+var treesearch = false;
 
 /**
  * redrawTree
@@ -847,6 +883,7 @@ MegaData.prototype.addTreeUI = function() {
         var id = $this.attr('id').replace('treea_', '');
         var tmpId = id;
         var cv = M.isCustomView(id);
+        const eid = $this.attr('data-eventid');
 
         id = cv ? cv.nodeID : id;
 
@@ -901,6 +938,10 @@ MegaData.prototype.addTreeUI = function() {
                         mega.ui.mInfoPanel.reRenderIfVisible([id]);
                     }
                 });
+        }
+
+        if (eid) {
+            eventlog(eid);
         }
 
         return false;

@@ -19,7 +19,8 @@
 .mega-sheet .sheet .main,
 .mega-sheet .sheet .actions {
     padding: 0 24px;
-    width: calc(100% - 48px);
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .mega-sheet .sheet > .close {
@@ -115,7 +116,7 @@
 
     .mega-sheet.modal-dialog .actions {
         padding: 24px 48px;
-        width: calc(100% - 96px);
+        width: 100%;
     }
 }
 

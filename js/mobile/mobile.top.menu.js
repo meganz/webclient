@@ -253,10 +253,6 @@ class MegaMobileTopMenu extends MegaComponent {
             if (item.name === 'rubbish-bin') {
                 this.rubbishBtn = menuItem;
             }
-
-            if (item.eventLog) {
-                menuItem.rebind('click.eventlog', () => eventlog(item.eventLog));
-            }
         }
     }
 
@@ -435,7 +431,8 @@ class MegaMobileTopMenu extends MegaComponent {
                 parentNode: userInfoContainer,
                 href: 'pro',
                 componentClassname: 'upgrade outline',
-                text: l[433]
+                text: l[433],
+                eventLog: eventid
             });
         }
 
@@ -447,7 +444,8 @@ class MegaMobileTopMenu extends MegaComponent {
                 parentNode: userInfoContainer,
                 href: 'repay',
                 componentClassname: 'upgrade outline',
-                text: l.mobile_account_reactivate
+                text: l.mobile_account_reactivate,
+                eventLog: eventid
             });
         }
 
@@ -456,7 +454,6 @@ class MegaMobileTopMenu extends MegaComponent {
                 if (this.overlayAccount) {
                     mega.ui.overlay.hide();
                 }
-                eventlog(eventid);
             });
         }
 

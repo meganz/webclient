@@ -65,6 +65,11 @@
     background: var(--mobile-surface-1);
     color: var(--mobile-text-secondary);
 }
+.recoverykey-logout-overlay .overlay-footer label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
 .recoverykey-logout-overlay button {
     cursor: pointer;
 }

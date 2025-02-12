@@ -31,7 +31,7 @@ class MegaStorageBlock extends MegaComponent {
 
         let eventid = 500477;
 
-        if (options.parentNode === mega.ui.header.avatarMenu) {
+        if (this.parentNode === mega.ui.header.avatarMenu) {
             eventid = 500478;
         }
 
@@ -114,9 +114,11 @@ class MegaStorageBlock extends MegaComponent {
                     eventlog(eventId, eventMessage);
                 };
 
-                $upgradeBtn.removeClass('hidden').rebind('click.sendEvent', () => {
-                    _sendEvent(500282);
-                });
+                if (this.parentNode !== mega.ui.header.avatarMenu) {
+                    $upgradeBtn.removeClass('hidden').rebind('click.sendEvent', () => {
+                        _sendEvent(500282);
+                    });
+                }
 
                 this.storageBlock.querySelector('.text-and-tooltip').classList.remove('hidden');
 

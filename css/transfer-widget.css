@@ -554,6 +554,8 @@ button.btn-icon .transfer-progress-icon {
     height: 24px;
     padding: 6px 0;
     background-color: var(--stroke-grey-2);
+    display: flex;
+    justify-content: flex-end;
 }
 .transfer-widget-footer button {
     height: 24px;
@@ -562,6 +564,12 @@ button.btn-icon .transfer-progress-icon {
 .transfer-widget-footer .transfer-clear-all-icon {
     margin-right: 18px;
     margin-left: 8px;
+}
+.transfer-widget-footer button.action span {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 .transfer-widget-footer button i {
     --mask-color: var(--icon-rest);

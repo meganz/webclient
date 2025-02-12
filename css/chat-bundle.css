@@ -1711,6 +1711,11 @@ body.theme-dark .lhp-container .lhp-filter-tag {
 .meetings-call .stream .participants-notice.user-alone .notice-footer button {
   margin-inline-start: 10px;
 }
+.meetings-call .stream .participants-notice-container {
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+}
 .meetings-call .stream .participants-notice-heading {
   padding: 12px 48px;
   border-radius: 34px;

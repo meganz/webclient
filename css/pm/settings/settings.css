@@ -76,6 +76,7 @@
 
 .settings-container .dropdown-options-wrap {
     top: calc(100% + 4px);
+    z-index: 1;
 }
 
 .settings-container .dropdown-options-wrap.top {

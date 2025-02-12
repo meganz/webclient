@@ -53,6 +53,7 @@ mobile.settingsHelper = {
             icon: opt.icon,
             parentNode: targetNode,
             href: opt.binding ? '' : opt.href,
+            eventLog: opt.eventLog
         };
         let item;
 
@@ -63,9 +64,6 @@ mobile.settingsHelper = {
         }
         else {
             item = new MegaLink(props);
-        }
-        if (opt.eventLog) {
-            item.rebind('tap.eventlog', () => eventlog(opt.eventLog));
         }
         return item;
     },

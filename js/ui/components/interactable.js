@@ -65,6 +65,11 @@ class MegaInteractable extends MegaComponent {
             this.dataset.simpletip = options.simpletip;
             this.addClass('simpletip');
         }
+
+        if (options.eventLog) {
+            this.eventLog = options.eventLog;
+            this.on('click.eventLog', () => eventlog(options.eventLog));
+        }
     }
 
     get disabled() {

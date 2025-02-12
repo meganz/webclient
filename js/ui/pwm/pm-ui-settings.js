@@ -5,7 +5,7 @@ mega.ui.pm.settings = {
 
         if (!this.wrap) {
             const settingsWrap = document.createElement('div');
-            settingsWrap.className = 'settings-wrap';
+            settingsWrap.className = 'settings-wrap password-wrapper';
             pmlayout.append(settingsWrap);
             this.wrap = settingsWrap;
 
@@ -310,7 +310,7 @@ mega.ui.pm.settings = {
             title: l.delete_passwords,
             items: {
                 'delete-all': {
-                    title: l.delete_all_btn,
+                    title: l.delete_all,
                     subtitle: l.delete_all_msg,
                     componentClassname: 'wrap',
                     textInteractable: {

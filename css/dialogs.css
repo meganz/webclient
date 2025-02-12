@@ -1826,6 +1826,10 @@ body.de .mega-dialog.contact-picker-widget {
 .mega-dialog footer aside .checkdiv {
     margin-top: 0;
 }
+.mega-dialog footer aside .checkdiv.checkboxOff {
+    background: var(--checkbox-fill-inactive-2);
+    box-shadow: inset 0 0 0 1px var(--checkbox-border-inactive-2);
+}
 
 /* ****** Styling for dialog content ****** */
 
@@ -5400,6 +5404,9 @@ body.de .mega-dialog.contact-picker-widget {
         border: 1px solid var(--banner-border-error);
         border-radius: 4px;
         color: var(--banner-text-error);
+    }
+    .mega-dialog.cancel-subscription-st1 .cancel-option-info:empty {
+        display: none;
     }
     .mega-dialog.cancel-subscription-st1.error-select-reason footer,
     .mega-dialog.cancel-subscription-st1.error-select-contact footer {

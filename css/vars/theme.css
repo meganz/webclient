@@ -289,7 +289,7 @@ html .theme-light-forced {
         --checkbox-border-inactive: rgba(0, 0, 0, 0.05);
 
         --checkbox-fill-inactive-2: #FFFFFF;
-       --checkbox-border-inactive-2: rgba(85, 85, 85, 1);
+        --checkbox-border-inactive-2: rgba(85, 85, 85, 1);
 
     /* radio */
 

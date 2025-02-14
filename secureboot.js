@@ -2355,7 +2355,7 @@ else if (!browserUpdate) {
         // UI Elements
         jsl.push({f:'js/ui/megaRender.js', n: 'megarender_js', j:1,w:1});
         jsl.push({f:'js/ui/dialog.js', n: 'dialogui_js', j:1,w:1});
-        jsl.push({f:'js/ui/components/MComponent.js', n: 'm_component_js', j:1});
+        jsl.push({f:'js/ui/components/meganz/MComponent.js', n: 'm_component_js', j:1});
         jsl.push({f:'js/ui/credentialsWarningDialog.js', n: 'creddialogui_js', j:1,w:1});
         jsl.push({f:'js/ui/loginRequiredDialog.js', n: 'loginrequireddialog_js', j:1,w:1});
         jsl.push({f:'js/ui/registerDialog.js', n: 'registerdialog_js', j:1,w:1});
@@ -2495,7 +2495,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/ui/components/checkbox.js', n: 'checkbox_js', j: 1, w:1});
     jsl.push({f:'js/ui/components/rack-slot.js', n: 'rack_slot_js', j: 1, w:1});
     jsl.push({f:'js/ui/components/rack.js', n: 'rack_js', j: 1, w:1});
-    jsl.push({f:'js/ui/components/toast.js', n: 'toast_js', j: 1, w:1});
+    jsl.push({f:'js/ui/components/toast.js', n: 'components_toast_js', j: 1, w:1});
     jsl.push({f:'js/ui/components/overlay.js', n: 'overlay_js', j: 1, w:1});
     jsl.push({f:'js/ui/components/sheet.js', n: 'sheet_js', j: 1, w:1});
 
@@ -2512,17 +2512,17 @@ else if (!browserUpdate) {
         jsl.push({f:'css/components.css', n: 'components_css', j:2, w:30, c:1, d:1, cache:1});
 
         // MComponents
-        jsl.push({f:'js/ui/components/MButton.js', n: 'm_button_js', j:1});
-        jsl.push({f:'js/ui/components/MCheckbox.js', n: 'm_checkbox_js', j:1});
-        jsl.push({f:'js/ui/components/MContextMenu.js', n: 'm_context_menu_js', j:1});
-        jsl.push({f:'js/ui/components/MDialog.js', n: 'm_dialog_js', j:1});
-        jsl.push({f:'js/ui/components/MEmptyPad.js', n: 'm_empty_pad_js', j:1});
-        jsl.push({f:'js/ui/components/MHint.js', n: 'm_hint_js', j:1});
-        jsl.push({f:'js/ui/components/MMenuSelect.js', n: 'm_menu_select_js', j:1});
-        jsl.push({f:'js/ui/components/MMenuSelectItem.js', n: 'm_menu_select_item_js', j:1});
-        jsl.push({f:'js/ui/components/MSidebarButton.js', n: 'm_sidebar_button_js', j:1});
-        jsl.push({f:'js/ui/components/MTab.js', n: 'm_tab_js', j:1});
-        jsl.push({f:'js/ui/components/MTabs.js', n: 'm_tabs_js', j:1});
+        jsl.push({f:'js/ui/components/meganz/MButton.js', n: 'm_button_js', j:1});
+        jsl.push({f:'js/ui/components/meganz/MCheckbox.js', n: 'm_checkbox_js', j:1});
+        jsl.push({f:'js/ui/components/meganz/MContextMenu.js', n: 'm_context_menu_js', j:1});
+        jsl.push({f:'js/ui/components/meganz/MDialog.js', n: 'm_dialog_js', j:1});
+        jsl.push({f:'js/ui/components/meganz/MEmptyPad.js', n: 'm_empty_pad_js', j:1});
+        jsl.push({f:'js/ui/components/meganz/MHint.js', n: 'm_hint_js', j:1});
+        jsl.push({f:'js/ui/components/meganz/MMenuSelect.js', n: 'm_menu_select_js', j:1});
+        jsl.push({f:'js/ui/components/meganz/MMenuSelectItem.js', n: 'm_menu_select_item_js', j:1});
+        jsl.push({f:'js/ui/components/meganz/MSidebarButton.js', n: 'm_sidebar_button_js', j:1});
+        jsl.push({f:'js/ui/components/meganz/MTab.js', n: 'm_tab_js', j:1});
+        jsl.push({f:'js/ui/components/meganz/MTabs.js', n: 'm_tabs_js', j:1});
 
         jsl.push({f:'html/top.html', n: 'top', j:0});
         jsl.push({f:'css/style.css', n: 'style_css', j:2, w:30, c:1, d:1, cache:1});
@@ -2534,8 +2534,8 @@ else if (!browserUpdate) {
         jsl.push({f:'css/grid-table.css', n: 'grid_table_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/tabs.css', n: 'tabs_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/empty-pages.css', n: 'empty_page_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/pm/onboarding.css', n: 'pm_onboarding_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/pm/avatars.css', n:'pwm_avatars_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/pwm/onboarding.css', n: 'pwm_onboarding_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/pwm/avatars.css', n:'pwm_avatars_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/bento.css', n:'bento_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/notification.css', n: 'notification_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'css/search.css', n: 'search_css', j:2, w:30, c:1, d:1, cache:1});
@@ -2612,9 +2612,9 @@ else if (!browserUpdate) {
         jsl.push({f:'css/transfer-widget.css', n: 'transfer_widget_css', j:2, w:30, c:1, d:1, cache:1});
 
         // CSS Revamp changes
-        jsl.push({f:'css/components/fm-left-pane.css', n: 'components_fm_left_pane_css', j:2, w:30, c:1, d:1, cache:1});
-        jsl.push({f:'css/components/info-panel.css', n: 'components_info_panel_css', j:2, w:30, c:1, d:1, cache:1});
-        jsl.push({f:'css/components/storage-block.css', n: 'storage_block_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/components/meganz/fm-left-pane.css', n: 'fm_left_pane_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/components/meganz/info-panel.css', n: 'info_panel_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/components/meganz/storage-block.css', n: 'storage_block_css', j:2, w:30, c:1, d:1, cache:1});
 
         // `Meetings` UI styles
         jsl.push({f:'css/chat-bundle.css', n: 'meetings_css', j:2, w:30, c:1, d:1, cache:1});
@@ -2632,12 +2632,12 @@ else if (!browserUpdate) {
         jsl.push({f:'css/notification-banner.css', n: 'notification-banner_css', j: 2, w: 5});
         jsl.push({f:'js/ui/notificationBanner.js', n: 'notificationBanner_js', j:1,w:1});
 
-        jsl.push({f:'js/ui/components/header.js', n:'header_js', j:1, w:1});
-        jsl.push({f:'js/ui/components/top-menu.js', n:'top_menu_js', j:1, w:1});
-        jsl.push({f:'js/ui/components/storage-block.js', n:'storage_block_js', j:1, w:1});
-        jsl.push({f:'css/pm/layout.css', n:'pm_layout_css', j:2, w:1});
-        jsl.push({f:'css/components/header.css', n:'header_css', j:2, w:1});
-        jsl.push({f:'css/components/top-menu.css', n:'top_menu_css', j:2, w:1});
+        jsl.push({f:'js/ui/components/meganz/header.js', n:'header_js', j:1, w:1});
+        jsl.push({f:'js/ui/components/meganz/top-menu.js', n:'top_menu_js', j:1, w:1});
+        jsl.push({f:'js/ui/components/meganz/storage-block.js', n:'storage_block_js', j:1, w:1});
+        jsl.push({f:'css/layout.css', n:'layout_css', j:2, w:1});
+        jsl.push({f:'css/components/meganz/header.css', n:'header_css', j:2, w:1});
+        jsl.push({f:'css/components/meganz/top-menu.css', n:'top_menu_css', j:2, w:1});
     } // !is_mobile
 
     // do not change the order...
@@ -2681,7 +2681,7 @@ else if (!browserUpdate) {
     jsl.push({f:'css/vars/mobile-theme.css', n: 'vars_mobile_theme_css', j:2, w:30, c:1, d:1, cache:1});
     jsl.push({f:'css/vars/mobile-theme-auto.css', n: 'vars_mobile_theme_auto_css', j:2, w:30, c:1, d:1, cache:1});
     jsl.push({f:'css/components/rack.css', n: 'rack_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/components/toast.css', n: 'toast_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/components/toast.css', n: 'components_toast_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/components/interactable.css', n: 'interactable_css', j: 2, w: 30, c: 1, d: 1, m: 1});
     jsl.push({f:'css/components/checkbox.css', n: 'checkbox_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/components/overlay.css', n: 'overlay_css', j:2, w:1});
@@ -2828,7 +2828,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/chat/strongvelope.js', n: 'strongvelope_js', j: 1, w: 3});
         jsl.push({f:'js/mobile/mobile.promo.banner.js', n: 'mobile_promo_banner_js', j: 1, w:1});
 
-        jsl.push({f:'js/ui/components/MDialogMobile.js', n: 'mobile_m_dialog_mobile_js', j:1});
+        jsl.push({f:'js/ui/components/meganz/MDialogMobile.js', n: 'mobile_m_dialog_mobile_js', j:1});
     }
     jsl.push({f:'html/chatlink.html', n: 'chatlink', j: 0});
 
@@ -3072,32 +3072,32 @@ else if (!browserUpdate) {
             'pwm:vars_pm_theme_css': {f:'css/vars/pm-theme.css', n: 'vars_pm_theme_css', j:2, w:30, c:1, d:1, cache:1},
             'pwm:pm_mono_css': {f:'css/sprites/pm-mono@mono.css', n: 'pm_mono_css', j:2, w:30, c:1, d:1, cache:1},
             'pwm:toggle_css': {f:'css/components/toggle-button.css', n: 'toggle_button_css', j:2, w:1},
-            'pwm:read_only_field_css': {f:'css/components/read-only.css', n: 'read_only_field_css', j:2, w:1},
+            'pwm:read_only_field_css': {f:'css/pwm/components/read-only.css', n: 'read_only_field_css', j:2, w:1},
             'pwm:mobile_fm_mono_css': {f:'css/sprites/mobile-fm-mono@mono.css', n: 'mobile_fm_mono_css', j:2, w:30, c:1, d:1, cache:1},
             'pwm:mobile_fm_dark_css': {f:'css/sprites/mobile-fm-theme@dark.css', n: 'mobile_fm_dark_css', j:2, w:30, c:1, d:1, cache:1},
             'pwm:mobile_fm_light_css': {f:'css/sprites/mobile-fm-theme@light.css', n: 'mobile_fm_light_css', j:2, w:30, c:1, d:1, cache:1},
-            'pwm:form_css': {f:'css/pm/form.css', n: 'pm_form_css', j:2, w:1},
-            'pwm:pm_password_list_page_css': {f:'css/pm/password-list-page.css', n: 'pm_password_list_page_css', j:2, w:1},
-            'pwm:top_nav_css': {f:'css/pm/top-nav.css', n: 'pm_top_nav_css', j:2, w:1},
-            'pwm:clickable_css': {f:'css/pm/clickable.css', n: 'pm_clickable_css', j:2, w:1},
-            'pwm:mega_inputs_css': {f:'css/pm/mega-inputs.css', n: 'pm_mega_inputs_css', j:2, w:1},
-            'pwm:general_css': {f:'css/pm/general.css', n: 'pm_general_css', j:2, w:1},
-            'pwm:banner_css': {f:'css/pm/banner.css', n: 'pm_banner_css', j:2, w:1},
-            'pwm:spinners_css': {f:'css/pm/spinners.css', n: 'pm_spinners_css', j:2, w:1},
-            'pwm:dropdown_css': {f:'css/pm/dropdown.css', n: 'pm_dropdown_css', j:2, w:1},
-            'pwm:context_menu_css': {f:'css/pm/context-menu.css', n: 'pm_context_menu_css', j:2, w:1},
-            'pwm:overlay_css': {f:'css/pm/overlay.css', n: 'pm_overlay_css', j:2, w:1},
-            'pwm:slider_css': {f:'css/pm/slider.css', n: 'pm_slider_css', j:2, w:1},
-            'pwm:password_generator_css': {f:'css/pm/password-generator.css', n: 'pm_password_generator_css', j:2, w:1},
-            'pwm:menu_css': {f:'css/pm/menu.css', n: 'pm_menu_css', j:2, w:1},
-            'pwm:password_item_form_css': {f:'css/pm/password-item-form.css', n: 'pm_password_item_form_css', j:2, w:1},
-            'pwm:subscription_dialog_css': {f:'css/pm/subscription-dialog.css', n: 'subscription_dialog_css', j:2, w:1},
-            'pwm:settings_css': {f:'css/pm/settings/settings.css', n: 'settings_css', j:2, w:1},
-            'pwm:settings_list_css': {f:'css/pm/settings/list.css', n: 'settings_list_css', j:2, w:1},
+            'pwm:form_css': {f:'css/pwm/form.css', n: 'pm_form_css', j:2, w:1},
+            'pwm:pm_password_list_page_css': {f:'css/pwm/password-list-page.css', n: 'pm_password_list_page_css', j:2, w:1},
+            'pwm:top_nav_css': {f:'css/pwm/top-nav.css', n: 'pm_top_nav_css', j:2, w:1},
+            'pwm:clickable_css': {f:'css/pwm/clickable.css', n: 'pm_clickable_css', j:2, w:1},
+            'pwm:mega_inputs_css': {f:'css/pwm/mega-inputs.css', n: 'pm_mega_inputs_css', j:2, w:1},
+            'pwm:general_css': {f:'css/pwm/general.css', n: 'pm_general_css', j:2, w:1},
+            'pwm:banner_css': {f:'css/pwm/banner.css', n: 'pm_banner_css', j:2, w:1},
+            'pwm:spinners_css': {f:'css/pwm/spinners.css', n: 'pm_spinners_css', j:2, w:1},
+            'pwm:dropdown_css': {f:'css/pwm/dropdown.css', n: 'pm_dropdown_css', j:2, w:1},
+            'pwm:context_menu_css': {f:'css/pwm/context-menu.css', n: 'pm_context_menu_css', j:2, w:1},
+            'pwm:overlay_css': {f:'css/pwm/overlay.css', n: 'pm_overlay_css', j:2, w:1},
+            'pwm:slider_css': {f:'css/pwm/slider.css', n: 'pm_slider_css', j:2, w:1},
+            'pwm:password_generator_css': {f:'css/pwm/password-generator.css', n: 'pm_password_generator_css', j:2, w:1},
+            'pwm:menu_css': {f:'css/pwm/menu.css', n: 'pm_menu_css', j:2, w:1},
+            'pwm:password_item_form_css': {f:'css/pwm/password-item-form.css', n: 'pm_password_item_form_css', j:2, w:1},
+            'pwm:subscription_dialog_css': {f:'css/pwm/subscription-dialog.css', n: 'subscription_dialog_css', j:2, w:1},
+            'pwm:settings_css': {f:'css/pwm/settings/settings.css', n: 'settings_css', j:2, w:1},
+            'pwm:settings_list_css': {f:'css/pwm/settings/list.css', n: 'settings_list_css', j:2, w:1},
 
             'pwm:group_js': {f:'js/ui/components/group.js', n: 'group_js', j: 1, w:1},
             'pwm:toggle_button_js': {f:'js/ui/components/toggle-button.js', n: 'toggle_button_js', j: 1, w:1},
-            'pwm:read_only_field_js': {f:'js/ui/components/read-only-field.js', n: 'read_only_field_js', j: 1, w:1},
+            'pwm:read_only_field_js': {f:'js/ui/pwm/components/read-only-field.js', n: 'read_only_field_js', j: 1, w:1},
             'pwm:mobile_message_overlay_js': {f:'js/mobile/mobile.message-overlay.js', n: 'mobile_message_overlay_js', j: 1, w:1},
             'pwm:mobile_banner_js': {f:'js/mobile/mobile.banner.js', n: 'mobile_banner_js', j: 1, w:1},
             'pwm:pm_js': {f:'js/ui/pwm/pm.js', n: 'pm_js', j: 1, w:1},
@@ -3105,21 +3105,21 @@ else if (!browserUpdate) {
             'pwm:pm_ui_settings_js': {f:'js/ui/pwm/pm-ui-settings.js', n: 'pm_ui_settings_js', j: 1, w:1},
             'pwm:functions_js': {f:'js/ui/pwm/functions.js', n: 'pm_functions_js', j: 1, w:1},
             'pwm:functions_settings_js': {f:'js/ui/pwm/functions-settings.js', n: 'pm_functions_settings_js', j: 1, w:1},
-            'pwm:top_nav_js': {f:'js/ui/pwm/component/top-nav.js', n: 'top_nav_js', j: 1, w:1},
-            'pwm:banner_js': {f:'js/ui/pwm/component/banner.js', n: 'banner_js', j: 1, w:1},
-            'pwm:view_js': {f:'js/ui/pwm/component/view.js', n: 'view_js', j: 1, w:1},
-            'pwm:form_js': {f:'js/ui/pwm/component/form.js', n: 'form_js', j: 1, w:1},
-            'pwm:password_item_form_js': {f:'js/ui/pwm/component/password-item-form.js', n: 'password_item_form_js', j: 1, w:1},
-            'pwm:password_list_js': {f:'js/ui/pwm/component/password-list.js', n: 'password_list_js', j: 1, w:1},
-            'pwm:password_item_detail_js': {f:'js/ui/pwm/component/password-item-detail.js', n: 'password_item_detail_js', j: 1, w:1},
-            'pwm:dropdown_items_js': {f:'js/ui/pwm/component/dropdown-items.js', n: 'dropdown_items_js', j: 1, w:1},
-            'pwm:dropdown_js': {f:'js/ui/pwm/component/dropdown.js', n: 'dropdown_js', j: 1, w:1},
-            'pwm:menu_js': {f:'js/ui/pwm/component/menu.js', n: 'menu_js', j: 1, w:1},
-            'pwm:context_menu_js': {f:'js/ui/pwm/component/context-menu.js', n: 'context_menu_js', j: 1, w:1},
-            'pwm:range_slider_js': {f:'js/ui/pwm/component/range-slider.js', n: 'range_slider_js', j: 1, w:1},
-            'pwm:password_generator_js': {f:'js/ui/pwm/component/password-generator.js', n: 'password_generator_js', j: 1, w:1},
-            'pwm:megaPassList_js': {f:'js/ui/pwm/component/settings/megaPassList.js', n: 'megaPassList_js', j: 1, w:1},
-            'pwm:megaPassListItem_js': {f:'js/ui/pwm/component/settings/megaPassListItem.js', n: 'megaPassListItem_js', j: 1, w:1},
+            'pwm:top_nav_js': {f:'js/ui/pwm/components/top-nav.js', n: 'top_nav_js', j: 1, w:1},
+            'pwm:banner_js': {f:'js/ui/pwm/components/banner.js', n: 'banner_js', j: 1, w:1},
+            'pwm:view_js': {f:'js/ui/pwm/components/view.js', n: 'view_js', j: 1, w:1},
+            'pwm:form_js': {f:'js/ui/pwm/components/form.js', n: 'form_js', j: 1, w:1},
+            'pwm:password_item_form_js': {f:'js/ui/pwm/components/password-item-form.js', n: 'password_item_form_js', j: 1, w:1},
+            'pwm:password_list_js': {f:'js/ui/pwm/components/password-list.js', n: 'password_list_js', j: 1, w:1},
+            'pwm:password_item_detail_js': {f:'js/ui/pwm/components/password-item-detail.js', n: 'password_item_detail_js', j: 1, w:1},
+            'pwm:dropdown_items_js': {f:'js/ui/pwm/components/dropdown-items.js', n: 'dropdown_items_js', j: 1, w:1},
+            'pwm:dropdown_js': {f:'js/ui/pwm/components/dropdown.js', n: 'dropdown_js', j: 1, w:1},
+            'pwm:menu_js': {f:'js/ui/pwm/components/menu.js', n: 'menu_js', j: 1, w:1},
+            'pwm:context_menu_js': {f:'js/ui/pwm/components/context-menu.js', n: 'context_menu_js', j: 1, w:1},
+            'pwm:range_slider_js': {f:'js/ui/pwm/components/range-slider.js', n: 'range_slider_js', j: 1, w:1},
+            'pwm:password_generator_js': {f:'js/ui/pwm/components/password-generator.js', n: 'password_generator_js', j: 1, w:1},
+            'pwm:megaPassList_js': {f:'js/ui/pwm/components/settings/megaPassList.js', n: 'megaPassList_js', j: 1, w:1},
+            'pwm:megaPassListItem_js': {f:'js/ui/pwm/components/settings/megaPassListItem.js', n: 'megaPassListItem_js', j: 1, w:1},
             'pwm:megaInputs_pmTextArea_js': {f:'js/ui/pwm/utils/megaInputs-pmTextArea.js', n: 'megaInputs_pmTextArea_js', j: 1, w:1},
             'pwm:megaInputs_pmText_js': {f:'js/ui/pwm/utils/megaInputs-pmText.js', n: 'megaInputs_pmText_js', j: 1, w:1},
             'pwm:sort_js': {f:'js/ui/pwm/utils/sort.js', n: 'sort_js', j: 1, w:1},

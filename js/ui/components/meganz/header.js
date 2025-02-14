@@ -378,11 +378,16 @@ class MegaHeader extends MegaMobileHeader {
         }
     }
 
+    isSubmenuClose(opts, e) {
+
+        return !opts[0] || e && (e.target === opts[0] ||
+            e.target.closest([opts[1]]) && (!e.target.closest('button, a') || e.which !== 1) ||
+            e.currentTarget === fmholder && e.target.closest(opts[2]));
+    }
+
     closeNotifMenu(e) {
 
-        if (!mega.ui.header.notifMenu || e && (e.target === mega.ui.header.notifMenu ||
-            e.target.closest('.js-notification-popup') && !e.target.closest('button, a') ||
-            e.currentTarget === fmholder && e.target.closest('button.alarm'))) {
+        if (mega.ui.header.isSubmenuClose([mega.ui.header.notifMenu, '.js-notification-popup', 'button.alarm'], e)) {
             return;
         }
 
@@ -404,10 +409,8 @@ class MegaHeader extends MegaMobileHeader {
 
     closeAvatarMenu(e) {
 
-        if (!mega.ui.header.avatarMenu || e && (e.target === mega.ui.header.avatarMenu ||
-            e.target.closest('.avatar-menu') && !e.target.closest('button, a') ||
-            e.target.closest('.sub-menu-wrap') || e.target.closest('.top-mega-version') ||
-            e.currentTarget === fmholder && e.target.closest('button.avatar'))) {
+        if (mega.ui.header.isSubmenuClose([mega.ui.header.avatarMenu, '.header-dropdown-menu', 'button.avatar'], e) ||
+            e && (e.target.closest('.sub-menu-wrap') || e.target.closest('.top-mega-version'))) {
             return;
         }
 
@@ -436,8 +439,7 @@ class MegaHeader extends MegaMobileHeader {
 
     closeBentoMenu(e) {
 
-        if (!mega.ui.header.bentoMenu || e && (e.target === mega.ui.header.bentoMenu ||
-            e.currentTarget === fmholder && e.target.closest('button.bento'))) {
+        if (mega.ui.header.isSubmenuClose([mega.ui.header.bentoMenu, '.bento-menu', 'button.bento'], e)) {
             return;
         }
 
@@ -462,8 +464,7 @@ class MegaHeader extends MegaMobileHeader {
 
     closeTopHelpMenu(e) {
 
-        if (!mega.ui.header.topHelpMenu || e && (e.target === mega.ui.header.topHelpMenu ||
-            e.currentTarget === fmholder && e.target.closest('button.top-help'))) {
+        if (mega.ui.header.isSubmenuClose([mega.ui.header.topHelpMenu, '.top-help-menu', 'button.top-help'], e)) {
             return;
         }
 

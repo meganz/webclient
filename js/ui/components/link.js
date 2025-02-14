@@ -69,7 +69,11 @@ MegaLink.bindEvent = function() {
             mega.textEditorUI.doClose();
         }
 
-        this.trigger('beforeRedirect');
+        const result = await this.trigger('beforeRedirect');
+
+        if (result === false) {
+            return;
+        }
 
         if (isStaticPage(this.href)) {
             return mega.redirect('mega.io', this.href, false, false, false);

@@ -8,7 +8,6 @@ import ChatToaster from "../chatToaster.jsx";
 import ParticipantsBlock from './participantsBlock.jsx';
 import VideoNodeMenu from './videoNodeMenu.jsx';
 import Button from './button.jsx';
-import { Emoji } from '../../../ui/utils.jsx';
 import StreamHead from './streamHead.jsx';
 import Admit from './waitingRoom/admit.jsx';
 

@@ -26,27 +26,8 @@ export default class FloatingVideo extends React.Component {
         collapsed: false,
     };
 
-    // Historic adaptive ratio class behaviour
-    // gcd = (width, height) => {
-    //     return height === 0 ? width : this.gcd(height, width % height);
-    // };
-    //
-    // getRatio = (width, height) => {
-    //     return `${width / this.gcd(width, height)}:${height / this.gcd(width, height)}`;
-    // };
-    //
-    // getRatioClass = () => {
-    //     const { ratio } = this.state;
-    //     return ratio ? `ratio-${ratio.replace(':', '-')}` : '';
-    // };
-
     toggleCollapsedMode = () => {
         return this.setState(state => ({ collapsed: !state.collapsed }));
-    };
-
-    onLoadedData = ev => {
-        // const { videoWidth, videoHeight } = ev.target;
-        // this.setState({ ratio: this.getRatio(videoWidth, videoHeight) });
     };
 
     componentWillUnmount() {
@@ -345,25 +326,26 @@ class Stream extends MegaRenderMixin {
         );
     };
 
-    renderMiniMode = (source) => {
-        const { call, mode, minimized, isPresenterNode, onLoadedData } = this.props;
+    renderMiniMode = source => {
+        const { call, chatRoom, mode, minimized, isPresenterNode, onLoadedData } = this.props;
 
         if (call.isOnHold) {
             return this.renderOnHoldVideoNode();
         }
-        let VideoClass = PeerVideoHiRes;
-        if (source.isLocal) {
-            VideoClass = isPresenterNode ? LocalVideoHiRes : LocalVideoThumb;
-        }
+
+        const VideoClass = source.isLocal ?
+            isPresenterNode ? LocalVideoHiRes : LocalVideoThumb :
+            PeerVideoHiRes;
+
         return (
             <VideoClass
-                chatRoom={this.props.chatRoom}
+                key={source}
+                source={source} // Ignored for LocalVideoHiRes
+                chatRoom={chatRoom}
                 mode={mode}
                 minimized={minimized}
                 isPresenterNode={isPresenterNode}
                 onLoadedData={onLoadedData}
-                source={source} // ignored for LocalVideoHiRes
-                key={source}
             />
         );
     };
@@ -751,22 +733,16 @@ class Minimized extends MegaRenderMixin {
         this.waitingPeersListener =
             mBroadcaster.addListener(
                 'meetings:peersWaiting',
-                waitingRoomPeers => this.setState({
-                    waitingRoomPeers,
-                    hideWrList: false,
-                    hideHandsList: false
-                }, () => this.safeForceUpdate())
+                waitingRoomPeers =>
+                    this.setState({ waitingRoomPeers, hideWrList: false, hideHandsList: false }, () => this.safeForceUpdate())
             );
 
         // [...] TODO: higher-order component
         this.raisedHandListener =
             mBroadcaster.addListener(
                 'meetings:raisedHand',
-                raisedHandPeers => this.setState({
-                    raisedHandPeers,
-                    hideWrList: false,
-                    hideHandsList: false
-                }, () => this.safeForceUpdate())
+                raisedHandPeers =>
+                    this.setState({ raisedHandPeers, hideWrList: false, hideHandsList: false }, () => this.safeForceUpdate())
             );
 
         // --
@@ -813,10 +789,9 @@ class Minimized extends MegaRenderMixin {
                     />
                     {this.renderStreamControls()}
                 </div>
-                {
-                    (waitingRoomPeers && waitingRoomPeers.length || raisedHandPeers && raisedHandPeers.length) ?
-                        this.renderPeersList() :
-                        null
+                {waitingRoomPeers && waitingRoomPeers.length || raisedHandPeers && raisedHandPeers.length ?
+                    this.renderPeersList() :
+                    null
                 }
                 {unread ?
                     <div className={`${FloatingVideo.NAMESPACE}-notifications`}>

@@ -484,6 +484,8 @@ class MegaHeader extends MegaMobileHeader {
 
         MegaStorageBlock.checkUpdate();
 
+        mega.ui.header.updateUserName(u_attr.fullname);
+        mega.ui.header.updateEmail(u_attr.email);
         mega.ui.header.handleMenu('avatar');
 
         eventlog(500323);
@@ -538,8 +540,6 @@ class MegaHeader extends MegaMobileHeader {
         else {
             elem.classList.remove('simpletip');
         }
-
-        mega.ui.pm.menu.calcPosition();
     }
 
     updateEmail(newEmail) {
@@ -553,8 +553,6 @@ class MegaHeader extends MegaMobileHeader {
         else {
             elem.classList.remove('simpletip');
         }
-
-        mega.ui.pm.menu.calcPosition();
     }
 
     set headerOptions(types) {

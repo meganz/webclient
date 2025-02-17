@@ -495,9 +495,6 @@ mobile.uploadOverlay = {
         // Hide confirm close sheet
         mega.ui.sheet.hide();
 
-        // Abort ulmanager
-        ulmanager.abort(null);
-
         // Undo previous pause mode
         uldl_hold = false;
 
@@ -514,9 +511,18 @@ mobile.uploadOverlay = {
         }
         for (const id in this.erroredTransfers) {
             if (this.erroredTransfers.hasOwnProperty(id)) {
+
+                // if there is errored transfer marked as completeing phase, remove it as it has to be clear on mobile
+                if (ulmanager.ulCompletingPhase[id]) {
+                    delete ulmanager.ulCompletingPhase[id];
+                }
+
                 this.remove(this.erroredTransfers, id);
             }
         }
+
+        // Abort ulmanager
+        ulmanager.abort(null);
 
         // Re-render current folder
         M.openFolder(M.currentdirid, true);

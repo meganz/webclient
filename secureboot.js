@@ -177,7 +177,8 @@ function isPublicLink(page) {
                 value: ptr[0] === 'folder' || ptr[0] === 'collection'
             },
             link: {
-                value: ptr[0] + '/' + ptr[1] + '#' + ptr[2] + (ptr.length > 3 ? '/' + ptr.slice(3).join('/') : '')
+                value: ptr[0] + '/' + ptr[1] + (ptr.length > 2 ?
+                    ('#' + ptr[2] + (ptr.length > 3 ? '/' + ptr.slice(3).join('/') : '')) : '')
             }
         });
     }

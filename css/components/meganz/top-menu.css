@@ -83,6 +83,12 @@
     cursor: pointer;
     height: auto;
 }
+.mega-top-menu nav.menu :not(.js-s4-tree-panel) button.tree-expander.icon-only {
+    display: none;
+}
+.mega-top-menu nav.menu .contains-tree button.tree-expander.icon-only {
+    display: inline-flex;
+}
 .rtl .mega-top-menu nav.menu button.tree-expander.icon-only {
     left: auto;
     right: 8px;

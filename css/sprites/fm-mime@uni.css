@@ -16,6 +16,9 @@
 .item-type-icon.icon-aftereffects-24, .sprite-fm-mime.icon-aftereffects-24, .sprite-fm-mime-before.icon-aftereffects-24-before::before, .sprite-fm-mime-after.icon-aftereffects-24-after::after {
    background-image: url("../../images/sprites/fm-mime@uni.svg#icon-aftereffects-24");
 }
+.item-type-icon.icon-album-24, .sprite-fm-mime.icon-album-24, .sprite-fm-mime-before.icon-album-24-before::before, .sprite-fm-mime-after.icon-album-24-after::after {
+   background-image: url("../../images/sprites/fm-mime@uni.svg#icon-album-24");
+}
 .item-type-icon.icon-audio-24, .sprite-fm-mime.icon-audio-24, .sprite-fm-mime-before.icon-audio-24-before::before, .sprite-fm-mime-after.icon-audio-24-after::after {
    background-image: url("../../images/sprites/fm-mime@uni.svg#icon-audio-24");
 }

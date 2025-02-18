@@ -1430,6 +1430,7 @@ body.theme-dark .lhp-container .lhp-filter-tag {
   flex-direction: column;
   margin: 143px 0;
   text-align: center;
+  white-space: normal;
 }
 .lhp-container .lhp-meetings--content .conversations-holder .lhp-nil.half-sized {
   margin: 0 0 22px;
@@ -1443,6 +1444,7 @@ body.theme-dark .lhp-container .lhp-filter-tag {
 .lhp-container .lhp-meetings--content .conversations-holder .lhp-nil span {
   display: block;
   margin: 17px 0 0;
+  padding: 0 6px;
   font: var(--text-h3);
   color: var(--text-color-medium);
 }

@@ -167,6 +167,10 @@ mega.textEditorUI = new function TextEditorUI() {
             });
         }
 
+        if (is_mobile) {
+            editor.options.readOnly = editor.options.readOnly && 'nocursor';
+        }
+
         savedFileData = txt;
         editor.setValue(txt);
 

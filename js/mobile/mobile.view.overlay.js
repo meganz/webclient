@@ -355,7 +355,7 @@ class MegaMobileViewOverlay extends MegaComponent {
                 contentBlock.classList.add('v-hidden');
                 loadingDialog.show();
 
-                if (this.bottomBar) {
+                if (this.bottomBar && !dlid) {
                     this.bottomBar.actions[0].disabled = true;
                 }
 

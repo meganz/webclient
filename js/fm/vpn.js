@@ -110,7 +110,6 @@ class VpnPage {
         this.credTpl = this.page.querySelector('template#cred-slot-tpl');
         this.createCredBtn = this.page.querySelector('.js-create-cred');
         this.postCreateSection = this.page.querySelector('.post-create-section');
-        this.emailSupport = this.page.querySelector('.email-support');
         this.downloadConfigBtn = this.postCreateSection.querySelector('.js-download-config');
         this.configQr = this.postCreateSection.querySelector('.config-qr .qr-img');
         this.configDiv = this.postCreateSection.querySelector('.config-output');
@@ -119,22 +118,6 @@ class VpnPage {
         this.knownSlotCount = 5;
 
         this._initLocationDropdown();
-
-        const planName = pro.getProPlanName(u_attr.p);
-
-        const mailtoBody = `${l.support_email_prefill_write_feedback}
-
-
-
-                            ${l.support_email_prefill_user_app_info}
-                            ${l.support_email_prefill_user_app_name} ${l.pr_vpn}
-
-                            ${l.support_email_prefill_user_information}
-                            ${l[670]}: ${lang}
-                            ${l.support_email_prefill_user_timezone} ${mega.ipcc}
-                            ${l.support_email_prefill_user_account} ${u_attr.email} (${planName})`;
-
-        this.emailSupport.href = `${this.emailSupport.href}&body=${encodeURIComponent(mailtoBody)}`;
 
         this.createCred = this.createCred.bind(this);
         this.removeCred = this.removeCred.bind(this);

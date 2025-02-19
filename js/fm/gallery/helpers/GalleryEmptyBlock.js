@@ -38,9 +38,6 @@ class GalleryEmptyBlock {
             case mega.gallery.sections[mega.gallery.secKeys.cdvideos].path:
                 this._child = new GalleryEmptyVideos(this.el);
                 break;
-            case mega.gallery.sections.favourites.path:
-                this._child = new GalleryEmptyFavourites(this.el);
-                break;
             default:
                 if (M.currentrootid === 'discovery' || M.gallery) {
                     this._child = new GalleryEmptyDiscovery(this.el);

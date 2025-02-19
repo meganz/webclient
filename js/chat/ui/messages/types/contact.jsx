@@ -62,7 +62,7 @@ export default class Contact extends AbstractGenericMessage {
     }
 
     _getContactDeleteButton(message) {
-        if (message.userId === u_handle && unixtime() - message.delay < MESSAGE_NOT_EDITABLE_TIMEOUT) {
+        if (message.isEditable()) {
             return (
                 <>
                     <hr/>

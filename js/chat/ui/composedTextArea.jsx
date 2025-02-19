@@ -14,7 +14,6 @@ const ComposedTextArea = ({ chatRoom, parent, containerRef }) =>
             disabled={chatRoom.isReadOnly()}
             persist={true}
             onUpEditPressed={() => {
-                const time = unixtime();
                 const keys = chatRoom.messagesBuff.messages.keys();
                 for (var i = keys.length; i--;) {
                     var message = chatRoom.messagesBuff.messages[keys[i]];
@@ -26,12 +25,10 @@ const ComposedTextArea = ({ chatRoom, parent, containerRef }) =>
                     }
 
                     if (
-                        contact.u === u_handle &&
-                        time - message.delay < MESSAGE_NOT_EDITABLE_TIMEOUT &&
+                        message.isEditable() &&
                         !message.requiresManualRetry &&
                         !message.deleted &&
-                        (!message.type ||
-                            message instanceof Message) &&
+                        (!message.type || message instanceof Message) &&
                         (!message.isManagement || !message.isManagement())
                     ) {
                         parent.historyPanel.editMessage(message.messageId);

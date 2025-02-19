@@ -1774,6 +1774,7 @@ MegaData.prototype.labelSortMenuUI = function(event, rightClick) {
 
         M.doSort(data.by, dir);
         M.renderMain();
+        M.fmEventLog(data.by);
 
         return false;
     });

@@ -2603,4 +2603,23 @@ MegaUtils.prototype.updatePaymentCardState = () => {
     });
 };
 
+MegaUtils.prototype.fmEventLog = function(eid) {
+    'use strict';
+    if (!self.pfid && !self.buildOlderThan10Days) {
+        const map = {
+            'fav': 500707,
+            'name': 500708,
+            'label': 500709,
+            'size': 500710,
+            'type': 500711,
+            'date': 500712,
+            'mtime': 500713,
+            'versions': 500714,
+            'playtime': 500715,
+            'settings': 500716
+        };
+        eventlog(map[eid] || eid, true);
+    }
+};
+
 Object.freeze(MegaUtils.prototype);

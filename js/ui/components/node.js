@@ -1,4 +1,4 @@
-class MegaMobileNode extends MegaComponent {
+class MegaNodeComponent extends MegaComponent {
 
     constructor(options) {
 
@@ -26,7 +26,9 @@ class MegaMobileNode extends MegaComponent {
         });
 
         Object.defineProperty(this, 'node', {
-            value: M.getNodeByHandle(options.nodeHandle),
+            value: options.nodeHandle.length === 8 ?
+                M.getNodeByHandle(options.nodeHandle) :
+                M.getUserByHandle(options.nodeHandle),
             writable: false
         });
 
@@ -121,7 +123,7 @@ class MegaMobileNode extends MegaComponent {
         props.appendChild(subNode);
 
         // show correct link icon
-        MegaMobileNode.updateLinkIcon(this);
+        MegaNodeComponent.updateLinkIcon(this);
 
         // fav - show fav only if the file/folder is not taken down
         if (!this.takedown && M.currentrootid !== 'shares') {
@@ -149,22 +151,39 @@ class MegaMobileNode extends MegaComponent {
             componentClassname: 'context-btn open-context-menu text-icon'
         });
 
-        btnNode.on('tap', () => {
-            mega.ui.contextMenu.show(this.handle);
+        if (is_mobile) {
+            btnNode.on('click', () => {
+                mega.ui.contextMenu.show(this.handle);
 
-            return false;
-        });
+                return false;
+            });
+        }
+        else {
+            btnNode.hide();
+        }
 
-        this.on('tap', () => {
+        this.on('click', () => {
+            if (!is_mobile) {
+                $.hideContextMenu();
+            }
 
             if (typeof options.onTap === 'function') {
                 options.onTap(this.node);
             }
-            else if (this.node.t === 1) {
-                const target = M.currentCustomView ? `${M.currentrootid}/${this.handle}` : this.handle;
+            else if (typeof options.onClick === 'function') {
+                options.onClick(this.node);
+            }
+            else if (!this.contact && this.node.t === 1) {
+                const target = !options.ignoreCustomRoute && M.currentCustomView ?
+                    `${M.currentrootid}/${this.handle}` : this.handle;
                 M.openFolder(target);
             }
             else {
+                // @todo full desktop support of previews, context menu, etc...
+                if (!is_mobile) {
+                    M.isInvalidUserStatus();
+                    return false;
+                }
                 if (!validateUserAction()) {
                     return false;
                 }
@@ -235,7 +254,7 @@ class MegaMobileNode extends MegaComponent {
     }
 
     get icon() {
-        return MegaMobileNode.mFileIcon(this.node);
+        return MegaNodeComponent.mFileIcon(this.node);
     }
 
     get fileType() {
@@ -271,6 +290,10 @@ class MegaMobileNode extends MegaComponent {
         return M.getNodeRights(this.handle);
     }
 
+    get contact() {
+        return this.handle.length === 11;
+    }
+
     static updateLinkIcon(component) {
 
         const {linked, domNode} = component;
@@ -289,7 +312,7 @@ class MegaMobileNode extends MegaComponent {
             const fileExt = ext[fileext(node.name)];
 
             if (node.t) {
-                return MegaMobileNode.mFolderIcon(node);
+                return MegaNodeComponent.mFolderIcon(node);
             }
             else if (fileExt && fileExt[0] !== 'mega') {
                 icon = fileExt[0] === 'threed' ? '3d' : fileExt[0];
@@ -319,14 +342,17 @@ class MegaMobileNode extends MegaComponent {
             && mega.fileRequestCommon.storage.cache.puHandle[node.h].s !== 1
             && mega.fileRequestCommon.storage.cache.puHandle[node.h].p
         ) {
-            icon = 'folder-request';
+            icon = is_mobile ? 'folder-request' : 'folder-public';
         }
         // Camera uploads
         else if (node.h === M.CameraId) {
             icon = 'folder-camera-uploads';
         }
 
-        return `sprite-mobile-fm-uni mime-${icon}-solid`;
+        if (is_mobile) {
+            return `sprite-mobile-fm-uni mime-${icon}-solid`;
+        }
+        return `item-type-icon icon-${icon}-24`;
     }
 
     update(type) {
@@ -382,7 +408,7 @@ class MegaMobileNode extends MegaComponent {
             this.linked = M.getNodeShare(this.handle);
 
             this.domNode.classList.remove('taken-down', 'linked');
-            MegaMobileNode.updateLinkIcon(this);
+            MegaNodeComponent.updateLinkIcon(this);
         }
 
         if (_shouldUpdate('versioned')) {
@@ -395,7 +421,7 @@ class MegaMobileNode extends MegaComponent {
     }
 }
 
-MegaMobileNode.getNodeComponentByHandle = h => {
+MegaNodeComponent.getNodeComponentByHandle = h => {
 
     'use strict';
 

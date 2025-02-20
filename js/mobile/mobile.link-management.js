@@ -494,7 +494,7 @@ mobile.linkManagement = {
         const selectedNode = document.createElement('div');
         selectedNode.className = 'selected-node';
 
-        const itemComponent = MegaMobileNode.getNodeComponentByHandle(this.handle);
+        const itemComponent = MegaNodeComponent.getNodeComponentByHandle(this.handle);
         let itemNode = itemComponent && itemComponent.domNode;
         if (!itemNode && mega.ui.viewerOverlay.visible) {
             itemNode = mega.ui.viewerOverlay.nodeComponent.domNode;

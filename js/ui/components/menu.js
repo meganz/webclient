@@ -1,9 +1,9 @@
-class MegaPMMenu extends MegaMenu {
+class MegaMenu extends MegaOverlay {
     /**
      * Show mega menu
-     * @param {Object} options Options for the MegaPMMenu
+     * @param {Object} options Options for the MegaMenu
      * @example
-     * mega.ui.pm.menu.show({
+     * mega.ui.menu.show({
      *      name: 'context-menu',
      *      showClose: true,
      *      scrollTo: false,
@@ -13,22 +13,18 @@ class MegaPMMenu extends MegaMenu {
      * @returns {void}
      */
     show(options) {
+        super.show({
+            ...options,
+            showClose: false,
+            centered: false
+        });
 
-        // Disable scrolling
-        if (options && options.name === 'item-list-menu'
-            && mega.ui.pm.list.passwordList.Ps) {
-            Ps.disable(mega.ui.pm.list.passwordList.Ps.element);
-        }
+        this.event = options.event;
+        this.calcPosition();
 
-        super.show(options);
-    }
-
-    hide() {
-        super.hide();
-
-        // Enable scrolling
-        if (mega.pwmh && (mega.pm.pwmFeature || u_attr.b || u_attr.pf) && mega.ui.pm.list.passwordList.Ps) {
-            Ps.enable(mega.ui.pm.list.passwordList.Ps.element);
+        // This is opened by click event.
+        if (options.eventTarget) {
+            this.eventTarget = options.eventTarget;
         }
     }
 
@@ -44,9 +40,6 @@ class MegaPMMenu extends MegaMenu {
 
         const leftMenuWidth = mega.ui.topmenu.domNode.offsetWidth;
 
-        var POPUP_WIDTH = leftMenuWidth + mega.ui.pm.list.passwordPanel.offsetWidth;
-        var POPUP_HEIGHT = window.innerHeight;
-
         const dialog = this.domNode;
         const dialogStyle = dialog.style;
         dialogStyle.height = null;
@@ -57,19 +50,19 @@ class MegaPMMenu extends MegaMenu {
         let menuHeight = parseFloat(dialog.offsetHeight);
 
         // calculate the max width & height available for the context menu dialog
-        const maxHeight = POPUP_HEIGHT - mega.ui.pm.POPUP_TOP_MARGIN;
+        const maxHeight = window.innerHeight;
 
         if (this.event.type === 'contextmenu') {
             posLeft = this.event.originalEvent.clientX;
             posTop = this.event.originalEvent.clientY;
 
             // if the left side of the popup is out of the window, move it to fit the right side of the window
-            if (posLeft + menuWidth + mega.ui.pm.POPUP_SIDE_MARGIN > POPUP_WIDTH) {
-                posLeft = POPUP_WIDTH - menuWidth - mega.ui.pm.POPUP_SIDE_MARGIN;
+            if (posLeft + menuWidth > leftMenuWidth) {
+                posLeft = leftMenuWidth - menuWidth;
             }
             // if the bottom side of the popup is out of the window, move it to fit the bottom side of the window
-            if (posTop + menuHeight + mega.ui.pm.POPUP_TOP_MARGIN > POPUP_HEIGHT) {
-                posTop = POPUP_HEIGHT - menuHeight - mega.ui.pm.POPUP_TOP_MARGIN;
+            if (posTop + menuHeight > maxHeight) {
+                posTop = maxHeight - menuHeight;
             }
         }
         else {
@@ -85,11 +78,9 @@ class MegaPMMenu extends MegaMenu {
                 posTop = Math.abs(top - menuHeight);
             }
 
-            const minPosWidth = leftMenuWidth + mega.ui.pm.POPUP_SIDE_MARGIN;
-
             // show the dialog taking into account the position of the left menu to avoid overlapping it
-            if (posLeft < minPosWidth) {
-                posLeft = minPosWidth;
+            if (posLeft < leftMenuWidth) {
+                posLeft = leftMenuWidth;
             }
 
             const maxPosHeight = posTop + menuHeight;
@@ -110,12 +101,23 @@ mBroadcaster.once('startMega', () => {
     'use strict';
 
     document.body.addEventListener('click', event => {
-        if (mega.ui.pm.menu.eventTarget && (event.target === mega.ui.pm.menu.eventTarget.domNode ||
-            mega.ui.pm.menu.eventTarget.domNode.contains(event.target))) {
+        if (mega.ui.menu.eventTarget && (event.target === mega.ui.menu.eventTarget.domNode ||
+            mega.ui.menu.eventTarget.domNode.contains(event.target))) {
             return;
         }
 
-        mega.ui.pm.menu.hide();
-        mega.ui.pm.menu.trigger('close');
+        mega.ui.menu.hide();
+        mega.ui.menu.trigger('close');
     }, true);
 });
+
+(mega => {
+    "use strict";
+
+    lazy(mega.ui, 'menu', () => new MegaMenu({
+        parentNode: document.body,
+        componentClassname: 'menu-container context-menu',
+        wrapperClassname: 'menu'
+    }));
+
+})(window.mega);

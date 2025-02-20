@@ -175,8 +175,8 @@ class MobileMegaRender {
 
         if (!this.nodeMap[h] && (n || M.getNodeByHandle(h))) {
             this.nodeMap[h] = M.currentdirid === 'shares' ?
-                new MegaMobileSharedNode({parentNode: this.container, nodeHandle: h}).domNode :
-                new MegaMobileNode({parentNode: this.container, nodeHandle: h}).domNode;
+                new MegaSharedNode({parentNode: this.container, nodeHandle: h}).domNode :
+                new MegaNodeComponent({parentNode: this.container, nodeHandle: h}).domNode;
         }
 
         return this.nodeMap[h];
@@ -195,7 +195,7 @@ class MobileMegaRender {
             delete this.nodeMap[h];
 
             if (aRemove) {
-                if (node.component instanceof MegaMobileNode) {
+                if (node.component instanceof MegaNodeComponent) {
                     node.component.destroy();
                 }
                 else {

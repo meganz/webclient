@@ -276,7 +276,10 @@ ChatRouting.gPageHandlers = {
 const scheduleMetaChange = REQ_(757);
 // EXTERNAL MODULE: ./js/chat/chatRoom.jsx + 1 modules
 const chat_chatRoom = REQ_(553);
+// EXTERNAL MODULE: ./js/chat/ui/meetings/schedule/helpers.jsx
+const helpers = REQ_(110);
 ;// ./js/chat/meetingsManager.jsx
+
 
 
 class Occurrence {
@@ -843,6 +846,36 @@ class MeetingsManager {
       chatRoom
     } = scheduledMeeting;
     tSleep(2).then(() => chatRoom.hasUserMessages() ? null : chatRoom.archive());
+  }
+  filterUpcomingMeetings(conversations) {
+    const upcomingMeetings = Object.values(conversations || {}).filter(c => {
+      return c.isDisplayable() && c.isMeeting && c.scheduledMeeting && c.scheduledMeeting.isUpcoming && c.iAmInRoom() && !c.havePendingCall();
+    }).sort((a, b) => a.scheduledMeeting.nextOccurrenceStart - b.scheduledMeeting.nextOccurrenceStart || a.ctime - b.ctime);
+    const nextOccurrences = upcomingMeetings.reduce((nextOccurrences, chatRoom) => {
+      const {
+        nextOccurrenceStart
+      } = chatRoom.scheduledMeeting;
+      if ((0,helpers.cK)(nextOccurrenceStart)) {
+        nextOccurrences.today.push(chatRoom);
+      } else if ((0,helpers.ef)(nextOccurrenceStart)) {
+        nextOccurrences.tomorrow.push(chatRoom);
+      } else {
+        const date = time2date(nextOccurrenceStart / 1000, 19);
+        if (!nextOccurrences.rest[date]) {
+          nextOccurrences.rest[date] = [];
+        }
+        nextOccurrences.rest[date].push(chatRoom);
+      }
+      return nextOccurrences;
+    }, {
+      today: [],
+      tomorrow: [],
+      rest: {}
+    });
+    return {
+      upcomingMeetings,
+      nextOccurrences
+    };
   }
   getOccurrenceStrings(meta) {
     const res = [];
@@ -1903,24 +1936,17 @@ Chat.prototype.getRoomFromUrlHash = function (urlHash) {
   }
 };
 Chat.prototype.updateSectionUnreadCount = SoonFc(function () {
-  const self = this;
-  if (!self.favico) {
-    assert(Favico, 'Favico.js is missing.');
-    $('link[rel="icon"]').attr('href', `${location.hostname === 'mega.nz' ? 'https://mega.nz/' : bootstaticpath  }favicon.ico`);
-    self.favico = new Favico({
-      type: 'rectangle',
-      animation: 'popFade',
-      bgColor: '#fff',
-      textColor: '#d00'
-    });
-  }
   let unreadCount = 0;
   const notificationsCount = {
     unreadChats: 0,
-    unreadMeetings: 0
+    unreadMeetings: 0,
+    unreadUpcoming: 0,
+    chatsCall: false,
+    meetingCall: false
   };
   let havePendingCall = false;
-  self.chats.forEach(chatRoom => {
+  let haveAdHocMessage = false;
+  this.chats.forEach(chatRoom => {
     if (chatRoom.isArchived() || chatRoom.state === ChatRoom.STATE.LEFT) {
       return;
     }
@@ -1928,42 +1954,41 @@ Chat.prototype.updateSectionUnreadCount = SoonFc(function () {
     unreadCount += unreads;
     if (unreads) {
       notificationsCount[chatRoom.isMeeting ? 'unreadMeetings' : 'unreadChats'] += unreads;
+      if (chatRoom.scheduledMeeting && chatRoom.scheduledMeeting.isUpcoming) {
+        notificationsCount.unreadUpcoming += unreads;
+      }
     }
-    if (!havePendingCall && chatRoom.havePendingCall() && chatRoom.uniqueCallParts && !chatRoom.uniqueCallParts[u_handle]) {
+    if (chatRoom.havePendingCall() && chatRoom.uniqueCallParts && !chatRoom.uniqueCallParts[u_handle]) {
       havePendingCall = true;
+      if (chatRoom.isMeeting) {
+        notificationsCount.meetingCall = true;
+        if (!chatRoom.scheduledMeeting && unreads) {
+          haveAdHocMessage = true;
+        }
+      } else {
+        notificationsCount.chatsCall = true;
+      }
     }
   });
   unreadCount = unreadCount > 9 ? "9+" : unreadCount;
-  let haveContents = false;
-  if (havePendingCall) {
-    haveContents = true;
-    $('.new-messages-indicator .chat-pending-call').removeClass('hidden');
-  } else {
-    $('.new-messages-indicator .chat-pending-call').addClass('hidden').removeClass("call-exists");
-  }
-  if (self._lastUnreadCount !== unreadCount) {
-    if (unreadCount && (unreadCount === "9+" || unreadCount > 0)) {
-      $('.new-messages-indicator .chat-unread-count').removeClass('hidden').text(unreadCount);
+  if (!is_chatlink && mega.ui.header) {
+    if (notificationsCount.unreadChats || notificationsCount.unreadUpcoming || haveAdHocMessage) {
+      mega.ui.header.chatsButton.addClass('decorated');
     } else {
-      $('.new-messages-indicator .chat-unread-count').addClass('hidden');
+      mega.ui.header.chatsButton.removeClass('decorated');
     }
-    self._lastUnreadCount = unreadCount;
-    delay('notifFavicoUpd', () => {
-      self.favico.reset();
-      tryCatch(() => self.favico.badge(unreadCount))();
-    });
+    const phoneIcon = mega.ui.header.domNode.querySelector('.top-chats-call');
+    if (phoneIcon) {
+      phoneIcon.classList[havePendingCall ? 'remove' : 'add']('hidden');
+    }
   }
-  if (!this._lastNotifications || this._lastNotifications.unreadChats !== notificationsCount.unreadChats || this._lastNotifications.unreadMeetings !== notificationsCount.unreadMeetings) {
+  if (this._lastUnreadCount !== unreadCount) {
+    this._lastUnreadCount = unreadCount;
+    notify.updateNotificationIndicator();
+  }
+  if (!this._lastNotifications || !shallowEqual(this._lastNotifications, notificationsCount)) {
     this._lastNotifications = notificationsCount;
     megaChat.trigger('onUnreadCountUpdate', notificationsCount);
-  }
-  if (unreadCount && (unreadCount === "9+" || unreadCount > 0)) {
-    haveContents = true;
-  }
-  if (!haveContents) {
-    $('.new-messages-indicator').addClass('hidden');
-  } else {
-    $('.new-messages-indicator').removeClass('hidden');
   }
 }, 100);
 Chat.prototype.dropAllDatabases = promisify(function (resolve, reject) {
@@ -2372,6 +2397,9 @@ Chat.prototype.renderListing = async function megaChatRenderListing(location, is
   M.hideEmptyGrids();
   this.refreshConversations();
   this.hideAllChats();
+  if (!is_chatlink && mega.ui.flyout && (mega.ui.flyout.name.startsWith('contact') || mega.ui.flyout.name === 'chat')) {
+    mega.ui.flyout.hide();
+  }
   $('.files-grid-view').addClass('hidden');
   $('.fm-blocks-view').addClass('hidden');
   $('.fm-chat-block').addClass('hidden');
@@ -15189,6 +15217,9 @@ Start.STREAMS = {
   AUDIO: 1,
   VIDEO: 2
 };
+window.StartMeetingDialogUI = {
+  Start
+};
 // EXTERNAL MODULE: ./js/ui/perfectScrollbar.jsx
 const perfectScrollbar = REQ_(486);
 // EXTERNAL MODULE: ./js/chat/ui/contacts.jsx
@@ -16685,6 +16716,7 @@ let _Schedule;
 
 
 
+
 class Schedule extends mixins.w9 {
   constructor(...args) {
     super(...args);
@@ -16848,7 +16880,10 @@ class Schedule extends mixins.w9 {
           await megaChat.plugins.meetingsManager[chatRoom ? 'updateMeeting' : 'createMeeting'](...params);
           this.setState({
             isLoading: false
-          }, () => onClose());
+          }, () => {
+            onClose();
+            megaChat.trigger(conversations_EVENTS.NAV_RENDER_VIEW, VIEWS.MEETINGS);
+          });
         });
       }
       return this.setState({
@@ -17221,6 +17256,9 @@ class Schedule extends mixins.w9 {
 _Schedule = Schedule;
 Schedule.NAMESPACE = 'schedule-dialog';
 Schedule.dialogName = `meetings-${_Schedule.NAMESPACE}`;
+window.ScheduleMeetingDialogUI = {
+  Schedule
+};
 const CloseDialog = ({
   onToggle,
   onClose
@@ -19065,30 +19103,10 @@ class Meetings extends mixins.w9 {
       conversations: ongoingMeetings
     })) : null;
     this.Upcoming = () => {
-      const upcomingMeetings = Object.values(this.props.conversations || {}).filter(c => {
-        return c.isDisplayable() && c.isMeeting && c.scheduledMeeting && c.scheduledMeeting.isUpcoming && c.iAmInRoom() && !c.havePendingCall();
-      }).sort((a, b) => a.scheduledMeeting.nextOccurrenceStart - b.scheduledMeeting.nextOccurrenceStart || a.ctime - b.ctime);
-      const nextOccurrences = upcomingMeetings.reduce((nextOccurrences, chatRoom) => {
-        const {
-          nextOccurrenceStart
-        } = chatRoom.scheduledMeeting;
-        if ((0,helpers.cK)(nextOccurrenceStart)) {
-          nextOccurrences.today.push(chatRoom);
-        } else if ((0,helpers.ef)(nextOccurrenceStart)) {
-          nextOccurrences.tomorrow.push(chatRoom);
-        } else {
-          const date = time2date(nextOccurrenceStart / 1000, 19);
-          if (!nextOccurrences.rest[date]) {
-            nextOccurrences.rest[date] = [];
-          }
-          nextOccurrences.rest[date].push(chatRoom);
-        }
-        return nextOccurrences;
-      }, {
-        today: [],
-        tomorrow: [],
-        rest: {}
-      });
+      const {
+        upcomingMeetings,
+        nextOccurrences
+      } = megaChat.plugins.meetingsManager.filterUpcomingMeetings(this.props.conversations);
       const upcomingItem = chatRoom => REaCt().createElement(ConversationsListItem, {
         key: chatRoom.roomId,
         chatRoom
@@ -19481,6 +19499,9 @@ const ContactSelectorDialog = ({
   },
   onSelectDone
 }));
+window.ContactSelectorDialogUI = {
+  ContactSelectorDialog
+};
 const ui_contactSelectorDialog = ContactSelectorDialog;
 ;// ./js/chat/ui/conversations.jsx
 
@@ -19505,6 +19526,10 @@ const VIEWS = {
 };
 const conversations_EVENTS = {
   NAV_RENDER_VIEW: 'navRenderView'
+};
+window.convAppConstants = {
+  VIEWS,
+  EVENTS: conversations_EVENTS
 };
 class ConversationsApp extends mixins.w9 {
   constructor(props) {
@@ -22986,6 +23011,7 @@ const inProgressAlert = (isJoin, chatRoom) => {
     resolve();
   });
 };
+window.inProgressAlert = inProgressAlert;
 class RecordingConsentDialog extends REaCt().Component {
   componentWillUnmount() {
     if ($.dialog && $.dialog === RecordingConsentDialog.dialogName) {

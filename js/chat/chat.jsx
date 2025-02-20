@@ -778,33 +778,19 @@ Chat.prototype.getRoomFromUrlHash = function(urlHash) {
 
 
 Chat.prototype.updateSectionUnreadCount = SoonFc(function() {
-    var self = this;
-
-    if (!self.favico) {
-        assert(Favico, 'Favico.js is missing.');
-
-
-        $('link[rel="icon"]').attr('href',
-            (location.hostname === 'mega.nz' ? 'https://mega.nz/' : bootstaticpath) + 'favicon.ico'
-        );
-
-        self.favico = new Favico({
-            type : 'rectangle',
-            animation: 'popFade',
-            bgColor : '#fff',
-            textColor : '#d00'
-        });
-    }
-    // update the "global" conversation tab unread counter
-    var unreadCount = 0;
+    // update the "global" conversation header unread counter
+    let unreadCount = 0;
     const notificationsCount = {
         unreadChats: 0,
-        unreadMeetings: 0
+        unreadMeetings: 0,
+        unreadUpcoming: 0,
+        chatsCall: false,
+        meetingCall: false,
     };
 
-
-    var havePendingCall = false;
-    self.chats.forEach(chatRoom => {
+    let havePendingCall = false;
+    let haveAdHocMessage = false;
+    this.chats.forEach(chatRoom => {
         if (chatRoom.isArchived() || chatRoom.state === ChatRoom.STATE.LEFT) {
             return;
         }
@@ -814,70 +800,56 @@ Chat.prototype.updateSectionUnreadCount = SoonFc(function() {
 
         if (unreads) {
             notificationsCount[chatRoom.isMeeting ? 'unreadMeetings' : 'unreadChats'] += unreads;
+            if (chatRoom.scheduledMeeting && chatRoom.scheduledMeeting.isUpcoming) {
+                notificationsCount.unreadUpcoming += unreads;
+            }
         }
 
         if (
-            !havePendingCall &&
             chatRoom.havePendingCall() &&
             chatRoom.uniqueCallParts &&
             !chatRoom.uniqueCallParts[u_handle]
         ) {
             havePendingCall = true;
+            if (chatRoom.isMeeting) {
+                notificationsCount.meetingCall = true;
+                if (!chatRoom.scheduledMeeting && unreads) {
+                    haveAdHocMessage = true;
+                }
+            }
+            else {
+                notificationsCount.chatsCall = true;
+            }
         }
     });
 
 
     unreadCount = unreadCount > 9 ? "9+" : unreadCount;
 
-    var haveContents = false;
-    // try NOT to touch the DOM if not needed...
-    if (havePendingCall) {
-        haveContents = true;
-        $('.new-messages-indicator .chat-pending-call')
-            .removeClass('hidden');
-    }
-    else {
-        $('.new-messages-indicator .chat-pending-call')
-            .addClass('hidden')
-            .removeClass("call-exists");
-    }
-
-    if (self._lastUnreadCount !== unreadCount) {
-        if (unreadCount && (unreadCount === "9+" || unreadCount > 0)) {
-            $('.new-messages-indicator .chat-unread-count')
-                .removeClass('hidden')
-                .text(unreadCount);
+    // Update header
+    if (!is_chatlink && mega.ui.header) {
+        if (notificationsCount.unreadChats || notificationsCount.unreadUpcoming || haveAdHocMessage) {
+            mega.ui.header.chatsButton.addClass('decorated');
         }
         else {
-            $('.new-messages-indicator .chat-unread-count')
-                .addClass('hidden');
+            mega.ui.header.chatsButton.removeClass('decorated');
         }
-        self._lastUnreadCount = unreadCount;
-
-        delay('notifFavicoUpd', () => {
-            self.favico.reset();
-            tryCatch(() => self.favico.badge(unreadCount))();
-        });
+        const phoneIcon = mega.ui.header.domNode.querySelector('.top-chats-call');
+        if (phoneIcon) {
+            phoneIcon.classList[havePendingCall ? 'remove' : 'add']('hidden');
+        }
     }
 
-    if (
-        !this._lastNotifications ||
-        this._lastNotifications.unreadChats !== notificationsCount.unreadChats ||
-        this._lastNotifications.unreadMeetings !== notificationsCount.unreadMeetings
-    ) {
+    // Update favico
+    if (this._lastUnreadCount !== unreadCount) {
+        this._lastUnreadCount = unreadCount;
+        notify.updateNotificationIndicator();
+    }
+
+    // Update listeners
+    if (!this._lastNotifications || !shallowEqual(this._lastNotifications, notificationsCount)) {
         this._lastNotifications = notificationsCount;
         megaChat.trigger('onUnreadCountUpdate', notificationsCount);
-    }
-
-    if (unreadCount && (unreadCount === "9+" || unreadCount > 0)) {
-        haveContents = true;
-    }
-
-    if (!haveContents) {
-        $('.new-messages-indicator').addClass('hidden');
-    }
-    else {
-        $('.new-messages-indicator').removeClass('hidden');
     }
 }, 100);
 
@@ -1580,6 +1552,13 @@ Chat.prototype.renderListing = async function megaChatRenderListing(location, is
     M.hideEmptyGrids();
     this.refreshConversations();
     this.hideAllChats();
+    if (
+        !is_chatlink &&
+        mega.ui.flyout &&
+        (mega.ui.flyout.name.startsWith('contact') || mega.ui.flyout.name === 'chat')
+    ) {
+        mega.ui.flyout.hide();
+    }
 
     $('.files-grid-view').addClass('hidden');
     $('.fm-blocks-view').addClass('hidden');

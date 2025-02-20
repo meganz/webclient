@@ -1,0 +1,132 @@
+.mega-node.mega-chat-item.fm-item {
+    grid-template-columns: 40px auto 24px;
+}
+.mega-node.mega-chat-item.fm-item:active {
+    background: var(--mobile-surface-2);
+}
+.mega-chat-item .fm-item-img .icon-chat-group {
+    border-radius: 100%;
+}
+.mega-chat-item .chat-item-decorator {
+    display: none;
+    grid-column: 3 / 4;
+    grid-row: 1 / 4;
+}
+.mega-chat-item.in-call .chat-item-decorator {
+    grid-row: 1 / 3;
+}
+.mega-chat-item.in-call.recurring.notification .chat-item-decorator {
+    margin-inline-start: -8px;
+    width: 100%;
+}
+.mega-chat-item .chat-item-decorator .chat-item-notification {
+    background-color: var(--mobile-icon-brand);
+    border-radius: 100%;
+    display: none;
+    height: 7px;
+    margin: auto 0;
+    width: 7px;
+}
+.mega-chat-item .chat-item-decorator .icon-repeat-thin-solid {
+    display: none;
+    --icon-size: 24px;
+}
+.mega-chat-item .chat-item-decorator .icon-phone {
+    display: none;
+}
+.mega-chat-item.recurring .chat-item-decorator,
+.mega-chat-item.notification .chat-item-decorator,
+.mega-chat-item:not(.meeting).in-call .chat-item-decorator {
+    display: flex;
+    justify-content: space-between;
+}
+.mega-chat-item:not(.meeting).in-call.notification .chat-item-decorator {
+    margin-inline-start: 16px;
+}
+.mega-chat-item.recurring .icon-repeat-thin-solid,
+.mega-chat-item.notification .chat-item-notification {
+    display: block;
+}
+.mega-chat-item .mega-chat-room-topic {
+    font: var(--mobile-font-caption-large-regular);
+}
+.mega-chat-item.notification .mega-chat-room-topic {
+    font: var(--mobile-font-caption-large-bold);
+}
+.mega-chat-item.notification:not(.meeting) .props span {
+    font: var(--mobile-font-caption-large-semibold);
+}
+.mega-chat-item.meeting.recurring,
+.mega-chat-item:not(.meeting).in-call {
+    grid-template-columns: 40px auto 24px 24px;
+}
+.mega-chat-item.notification.recurring {
+    grid-template-columns: 40px auto 48px 32px;
+}
+.mega-chat-item:not(.meeting).notification.in-call {
+    grid-template-columns: 40px auto 64px 24px;
+}
+.mega-chat-item.meeting.in-call {
+    grid-template-columns: 40px auto 32px 24px;
+    height: 100px;
+}
+.mega-chat-item:not(.meeting).in-call .chat-item-decorator .icon-phone {
+    display: block;
+}
+.mega-chat-item.meeting.self-in-call {
+    height: 40px;
+}
+.mega-chat-item.meeting.in-call.notification {
+    grid-template-columns: 40px auto 16px 24px;
+}
+.mega-chat-item.meeting.in-call.recurring {
+    grid-template-columns: 40px auto 32px 24px;
+}
+.mega-chat-item.meeting.in-call.recurring.notification {
+    grid-template-columns: 40px auto 48px 24px;
+}
+.mega-chat-item.meeting .mobile.fm-item-img {
+    display: none;
+}
+.mega-chat-item.meeting .mobile.fm-item-name,
+.mega-chat-item.meeting .mobile.props {
+    grid-column: 1 / 3;
+}
+.mega-chat-item.meeting.in-call .mobile.fm-item-img {
+    display: block;
+    grid-row: 1 / 3;
+}
+.mega-chat-item i.icon-phone {
+    background: var(--mobile-notification-info);
+    border-radius: 100%;
+    padding: 4px;
+    --icon-size: 16px;
+    --mask-color: var(--mobile-icon-primary);
+}
+.mega-chat-item.meeting.in-call .mobile.fm-item-name,
+.mega-chat-item.meeting.in-call .mobile.props {
+    grid-column: 2 / 3;
+}
+.mega-chat-item.meeting .chat-action-button {
+    cursor: pointer;
+    grid-column: 1 / 4;
+    grid-row: 4 / 5;
+    margin-top: 8px;
+}
+.mega-chat-item img.emoji,
+.mega-chat-item img.emoji.big {
+    height: 16px;
+    margin: 0;
+    width: 16px;
+}
+.mega-chat-item .avatar.small {
+    position: relative;
+}
+.mega-chat-item .activity-status {
+    position: absolute;
+    bottom: -5px;
+    right: -5px;
+    height: 12px;
+    width: 12px;
+    border: solid 2px var(--mobile-page-background);
+}

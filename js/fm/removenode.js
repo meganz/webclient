@@ -210,6 +210,14 @@ function removeUInode(h, parent) {
         }
     }
 
+    if (n.su && mega.ui.header.contactsButton.hasClass('active')) {
+        delay('flyout-contact-refresh', () => {
+            if (mega.ui.flyout.name === `contact-${n.su}`) {
+                mega.ui.flyout.showContactFlyout(n.su);
+            }
+        });
+    }
+
     M.nodeRemovalUIRefresh(h,  parent);
 }
 
@@ -318,7 +326,11 @@ async function fmremove(selectedNodes, skipDelWarning) {
                 promises.push(api.screq({a: 'ur2', u: h, l: '0'}));
             }
 
-            return Promise.allSettled(promises).dump('delete-contact');
+            return Promise.allSettled(promises).then(() => {
+                if (c === 1) {
+                    mega.ui.toast.show(l.contact_removed);
+                }
+            }).dump('delete-contact');
         };
 
         msgDialog('delete-contact', l[1001], l[1002].replace('[X]', replaceString), sharedFoldersAlertMessage, ack);

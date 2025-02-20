@@ -236,7 +236,7 @@ var mobile = {
         Object.defineProperty(ctx, 'favourite' + 'DomUpdate', {
             value: function(node) {
 
-                const component = MegaMobileNode.getNodeComponentByHandle(node.h);
+                const component = MegaNodeComponent.getNodeComponentByHandle(node.h);
 
                 if (component) {
                     component.update('fav');
@@ -256,7 +256,7 @@ var mobile = {
         Object.defineProperty(ctx, 'labelDo' + 'mUpdate', {
             value: function(h) {
 
-                const component = MegaMobileNode.getNodeComponentByHandle(h);
+                const component = MegaNodeComponent.getNodeComponentByHandle(h);
                 const node = M.d[h] || false;
 
                 if (component) {
@@ -277,7 +277,7 @@ var mobile = {
         Object.defineProperty(ctx, 'onRename' + 'UIUpdate', {
             value: function(h) {
 
-                const component = MegaMobileNode.getNodeComponentByHandle(h);
+                const component = MegaNodeComponent.getNodeComponentByHandle(h);
                 const node = M.d[h] || false;
 
                 if (component) {
@@ -1240,7 +1240,7 @@ function openRecents() {
 function sharedUInode(nodeHandle) {
     // t === 1, folder
     if (M.d[nodeHandle] && M.d[nodeHandle].t && M.megaRender) {
-        const node = MegaMobileNode.getNodeComponentByHandle(nodeHandle);
+        const node = MegaNodeComponent.getNodeComponentByHandle(nodeHandle);
 
         if (node) {
             node.update('icon');

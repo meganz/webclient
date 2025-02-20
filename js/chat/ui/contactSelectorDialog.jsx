@@ -51,4 +51,7 @@ const ContactSelectorDialog = ({
         />
     </ModalDialogsUI.ModalDialog>;
 
+window.ContactSelectorDialogUI = {
+    ContactSelectorDialog
+};
 export default ContactSelectorDialog;

@@ -174,3 +174,69 @@ h5 {
 .register-loading-icon img {
     width: 16px;
 }
+
+/* Skeleton loading */
+.sk-loading {
+    cursor: default !important;
+}
+.sk-loading .sk-elm * {
+    display: none;
+}
+.sk-loading i.sk-elm,
+.sk-loading .sk-elm > * {
+    position: relative;
+    overflow: hidden;
+    inset: 0;
+    background-image: linear-gradient(90deg, var(--mobile-surface-2) 50px, var(--mobile-surface-1) 150px, var(--mobile-surface-2) 250px);
+    background-size: 1000px 100%;
+    animation: loading-shimmer 2s infinite linear;
+    border-radius: 8px;
+}
+.sk-loading .sk-elm::after {
+    border-radius: 8px;
+    display: block;
+    content: "";
+}
+.nav-elem.sk-loading .sk-elm::after {
+    height: 0;
+}
+.nav-elem.sk-loading .sk-elm > * {
+    height: 32px;
+    display: block;
+    width: 200px;
+}
+.nav-elem.sk-loading .sk-elm .primary-text {
+    height: 14px;
+    width: 120px;
+}
+.nav-elem.sk-loading .sk-elm .sub-text {
+    height: 14px;
+}
+.nav-elem.sk-loading i.sk-elm,
+.nav-elem.sk-loading i.sk-elm::after,
+.sk-loading .nav-elem i.sk-elm::after {
+    width: 32px;
+    height: 32px;
+}
+.sk-loading.nav-elem .multi-text-box > *:not(:last-child) {
+    margin-bottom: 4px;
+}
+.sk-loading.nav-elem.full-width {
+    height: 64px;
+}
+.sk-loading.nav-elem {
+    padding: 16px 24px;
+}
+.sk-loading .sk-elm > * {
+    color: transparent !important;
+    font-size: 0 !important;
+}
+
+@keyframes loading-shimmer {
+    0% {
+        background-position: 0;
+    }
+    100% {
+        background-position: 1000px;
+    }
+}

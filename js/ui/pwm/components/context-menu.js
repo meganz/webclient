@@ -71,7 +71,7 @@ class MegaContextMenu extends MegaComponentGroup {
             contents = [options.parentNode];
         }
 
-        mega.ui.menu.show({
+        mega.ui.pm.menu.show({
             ...options,
             contents
         });

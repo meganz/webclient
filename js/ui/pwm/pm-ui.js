@@ -385,4 +385,10 @@ mega.ui.pm = {
         scrollOverlay: true,
     }));
 
+    lazy(mega.ui.pm, 'menu', () => new MegaPMMenu({
+        parentNode: document.body,
+        componentClassname: 'menu-container context-menu',
+        wrapperClassname: 'menu'
+    }));
+
 })(window.mega);

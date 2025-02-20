@@ -456,6 +456,12 @@
     position: absolute;
     display: none;
 }
+.dark-direct-tooltip.mobile-theme-tip {
+    padding: 6px 12px;
+    background: var(--mobile-background-inverse);
+    color: var(--mobile-text-inverse);
+    font: var(--mobile-font-caption-large-regular);
+}
 .dark-direct-tooltip.inverted,
 .dark-direct-tooltip.in-call {
     background: var(--surface-grey-1);

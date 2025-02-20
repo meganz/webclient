@@ -1232,6 +1232,7 @@ var languages = {
     'ro': [['ro', 'ro-'], 'Romanian', 'Română'],
     'ru': [['ru', 'ru-mo'], 'Russian', 'Pусский'],
     'th': [['||', 'th'], 'Thai', 'ไทย'],
+    'tr': [['tr', 'tr-'], 'Turkish', 'Türkçe'],
     'vi': [['vn', 'vi'], 'Vietnamese', 'Tiếng Việt']
 };
 

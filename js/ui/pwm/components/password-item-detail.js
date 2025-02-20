@@ -45,11 +45,11 @@ class MegaPasswordItemDetail {
                 });
             }
             else {
-                mega.ui.menu.hide();
+                mega.ui.pm.menu.hide();
             }
         });
 
-        mega.ui.menu.on('close.menu', () => {
+        mega.ui.pm.menu.on('close.menu', () => {
             contextMenuBtn.domNode.classList.remove('active');
         });
 

@@ -3,7 +3,7 @@ class MegaSheet extends MegaOverlay {
     constructor(options) {
         super(options);
 
-        this.rebind('click.closeSheet', (e) => {
+        this.rebind(`${is_mobile ? 'tap' : 'click'}.closeSheet`, (e) => {
             if (e.target === this.domNode
                 // do not close sheet when an input element is focussed
                 && !this.domNode.querySelector('.mega-input.active')) {

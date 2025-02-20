@@ -3,7 +3,7 @@ class MegaDropdownItemList {
         const listItems = {};
         const keys = Object.keys(options.dropdownItems);
 
-        this.dropdownMenu = options.dropdown.dropdownMenu = new MegaMenu({
+        this.dropdownMenu = options.dropdown.dropdownMenu = new MegaPMMenu({
             parentNode: options.optionsWrap,
             componentClassname: 'menu-container dropdown-menu',
             wrapperClassname: 'dropdown'

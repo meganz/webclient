@@ -349,6 +349,8 @@ mBroadcaster.once('boot_done', () => {
                 }
 
                 _download();
+
+                M.fmEventLog(500695);
             }
         },
         // Phase 2
@@ -402,6 +404,8 @@ mBroadcaster.once('boot_done', () => {
                 }
 
                 mobile.linkManagement.checkCopyRightAndGetLink(nodeHandle);
+
+                M.fmEventLog(500696);
             }
         },
         '.removelink-item': {
@@ -452,6 +456,8 @@ mBroadcaster.once('boot_done', () => {
                         ]
                     });
                 }
+
+                M.fmEventLog(500697);
             }
         },
         '.file-request-create': {
@@ -534,6 +540,8 @@ mBroadcaster.once('boot_done', () => {
                 eventlog(99914);
 
                 goToMobileApp(MegaMobileViewOverlay.getAppLink(nodeHandle));
+
+                M.fmEventLog(500698);
             }
         },
         '.move-item': {
@@ -545,9 +553,12 @@ mBroadcaster.once('boot_done', () => {
                 if (!validateUserAction()) {
                     return false;
                 }
+
                 mobile.nodeSelector.registerPreviousViewNode();
                 mega.ui.viewerOverlay.hide();
                 mobile.nodeSelector.show('move', nodeHandle);
+
+                M.fmEventLog(500699);
             }
         },
         '.copy-item': {
@@ -559,9 +570,12 @@ mBroadcaster.once('boot_done', () => {
                 if (!validateUserAction()) {
                     return false;
                 }
+
                 mobile.nodeSelector.registerPreviousViewNode();
                 mega.ui.viewerOverlay.hide();
                 mobile.nodeSelector.show('copy', nodeHandle);
+
+                M.fmEventLog(500700);
             }
         },
         '.rename-item': {
@@ -579,6 +593,8 @@ mBroadcaster.once('boot_done', () => {
                     mobile.renameNode = new MobileNodeNameControl({type: 'rename'});
                 }
                 mobile.renameNode.show(nodeHandle);
+
+                M.fmEventLog(500701);
             }
         },
         '.add-sensitive-item': {
@@ -597,6 +613,8 @@ mBroadcaster.once('boot_done', () => {
                 else {
                     mega.sensitives.toggleStatus($.selected, !M.getNodeByHandle(handle).sen);
                 }
+
+                M.fmEventLog(500702);
             }
         },
         '.add-star-item': {
@@ -610,6 +628,8 @@ mBroadcaster.once('boot_done', () => {
                 }
 
                 M.favourite($.selected, M.isFavourite(nodeHandle) ^ 1);
+
+                M.fmEventLog(500703);
             }
         },
         '.colour-label-items': {
@@ -665,6 +685,8 @@ mBroadcaster.once('boot_done', () => {
                         onClick: () => _setLabel()
                     }]
                 });
+
+                M.fmEventLog(500704);
             }
         },
         '.properties-item': {
@@ -674,6 +696,8 @@ mBroadcaster.once('boot_done', () => {
             classNames: '',
             onClick: (nodeHandle) => {
                 mega.ui.viewerOverlay.show(nodeHandle, true);
+
+                M.fmEventLog(500705);
             }
         },
         '.revert-item': {
@@ -756,6 +780,8 @@ mBroadcaster.once('boot_done', () => {
                 }
 
                 mobile.rubbishBin.removeItem(nodeHandle);
+
+                M.fmEventLog(500706);
             }
         }
     };

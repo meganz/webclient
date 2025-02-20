@@ -354,40 +354,6 @@ button-type elements.
     color: var(--mobile-button-primary-pressed);
 }
 
-/* Skeleton loading */
-.pm-main .nav-elem.sk-loading .sk-elm > * {
-    height: 32px;
-    display: block;
-    width: 200px;
-}
-.pm-main .nav-elem.sk-loading.password-item .sk-elm .primary-text {
-    height: 14px;
-    width: 120px;
-}
-.pm-main .nav-elem.sk-loading.password-item .sk-elm .sub-text {
-    height: 14px;
-}
-
-.pm-main .nav-elem.sk-loading i.sk-elm,
-.nav-elem.sk-loading i.sk-elm::after,
-.sk-loading .nav-elem i.sk-elm::after {
-    width: 32px;
-    height: 32px;
-}
-.pm-main .sk-loading.nav-elem .multi-text-box > *:not(:last-child) {
-    margin-bottom: 4px;
-}
-.pm-main .sk-loading.nav-elem.full-width {
-    height: 64px;
-}
-.pm-main .sk-loading.nav-elem {
-    padding: 16px 24px;
-}
-.pm-main .sk-loading .sk-elm > * {
-    color: transparent !important;
-    font-size: 0 !important;
-}
-
 .password-wrapper button.nav-elem.secondary {
     background: var(--mobile-button-secondary);
 }

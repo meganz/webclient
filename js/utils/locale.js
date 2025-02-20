@@ -2003,6 +2003,13 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[A]', '<a href="https://mega.io/refer" target="_blank">')
         .replace('[/A]', '</a>');
 
+    l.chat_protected = escapeHTML(l.chat_protected)
+        .replace('[A]', '<a class="clickurl" href="https://mega.io/chatandmeetings" target="_blank">')
+        .replace('[/A]', '</a>');
+    l.meeting_protected = escapeHTML(l.meeting_protected)
+        .replace('[A]', '<a class="clickurl" href="https://mega.io/chatandmeetings" target="_blank">')
+        .replace('[/A]', '</a>');
+
     const common = [
         15536, 16119, 16120, 16313, 16316, 16360, 18228, 18268, 18282,
         18284, 18285, 18286, 18287, 18289, 18290, 18291, 18294, 18295, 18296, 18297, 18298, 18302, 18303, 18304,

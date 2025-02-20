@@ -23,6 +23,11 @@ export const EVENTS = {
     NAV_RENDER_VIEW: 'navRenderView'
 };
 
+window.convAppConstants = {
+    VIEWS,
+    EVENTS,
+};
+
 class ConversationsApp extends MegaRenderMixin {
     domRef = React.createRef();
     chatRoomRef = null;

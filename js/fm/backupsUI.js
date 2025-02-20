@@ -1529,17 +1529,21 @@ lazy(mega, 'backupCenter', () => {
                     'data-type': folder.id ? folder.t : ''
                 }, tableNode);
 
-                if (folder.id && folder.t === 5) {
-                    icon = 'icon-folder-backup-24 folder-backup';
-                    type = l[20606];
-                }
-                else if (folder.id && folder.t === 3) {
-                    icon = 'icon-folder-camera-uploads-24 folder-camera';
-                    type = l.camera_uploads;
-                }
-                else if (folder.id && folder.t !== 4) {
-                    icon = 'icon-folder-sync-24 folder-sync';
-                    type = l[17621];
+                if (folder.id) {
+                    switch (folder.t) {
+                        case 5:
+                            icon = 'icon-folder-backup-24 folder-backup';
+                            type = l[20606];
+                            break;
+                        case 4:
+                        case 3:
+                            icon = 'icon-folder-camera-uploads-24 folder-camera';
+                            type = l.camera_uploads;
+                            break;
+                        default:
+                            icon = 'icon-folder-sync-24 folder-sync';
+                            type = l[17621];
+                    }
                 }
 
                 // Show folder name

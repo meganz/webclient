@@ -1,5 +1,6 @@
 import ScheduleMetaChange from './ui/messages/scheduleMetaChange.jsx';
 import { MCO_FLAGS } from './chatRoom.jsx';
+import { isToday, isTomorrow } from "./ui/meetings/schedule/helpers.jsx";
 
 class Occurrence {
     constructor(megaChat, occurrence) {
@@ -520,6 +521,45 @@ class MeetingsManager {
         // TODO: temp timeout, ping api and remove re: race condition where `mcfpc` is received twice
         // w/ toggled `f` attribute?
         tSleep(2).then(() => chatRoom.hasUserMessages() ? null : chatRoom.archive());
+    }
+
+    filterUpcomingMeetings(conversations) {
+        const upcomingMeetings = Object.values(conversations || {})
+            .filter(c => {
+                return (
+                    c.isDisplayable() &&
+                    c.isMeeting &&
+                    c.scheduledMeeting &&
+                    c.scheduledMeeting.isUpcoming &&
+                    c.iAmInRoom() &&
+                    !c.havePendingCall()
+                );
+            })
+            .sort((a, b) =>
+                a.scheduledMeeting.nextOccurrenceStart - b.scheduledMeeting.nextOccurrenceStart ||
+                a.ctime - b.ctime
+            );
+        const nextOccurrences = upcomingMeetings
+            .reduce((nextOccurrences, chatRoom) => {
+                const { nextOccurrenceStart } = chatRoom.scheduledMeeting;
+
+                if (isToday(nextOccurrenceStart)) {
+                    nextOccurrences.today.push(chatRoom);
+                }
+                else if (isTomorrow(nextOccurrenceStart)) {
+                    nextOccurrences.tomorrow.push(chatRoom);
+                }
+                else {
+                    const date = time2date(nextOccurrenceStart / 1000, 19);
+                    if (!nextOccurrences.rest[date]) {
+                        nextOccurrences.rest[date] = [];
+                    }
+                    nextOccurrences.rest[date].push(chatRoom);
+                }
+
+                return nextOccurrences;
+            }, { today: [], tomorrow: [], rest: {} });
+        return { upcomingMeetings, nextOccurrences };
     }
 
     // --

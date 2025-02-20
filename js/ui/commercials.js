@@ -685,6 +685,9 @@ lazy(mega, 'commercials', () => {
         if (pfid) {
             req.ph = pfid;
         }
+        if (typeof dlpage_ph !== 'undefined') {
+            req.ph = dlpage_ph;
+        }
 
         api.req(req).then((res) => {
             res = res.result;

@@ -9,6 +9,7 @@ import Recurring from './recurring.jsx';
 import { DateTime } from './datetime.jsx';
 import { MCO_FLAGS } from '../../../chatRoom.jsx';
 import { ParsedHTML } from '../../../../ui/utils';
+import { EVENTS, VIEWS } from '../../conversations.jsx';
 
 export class Schedule extends MegaRenderMixin {
     static NAMESPACE = 'schedule-dialog';
@@ -302,7 +303,10 @@ export class Schedule extends MegaRenderMixin {
                         delay('chat-events-sm-settings', () => this.submitStateEvents({ ...this.state }));
 
                         await megaChat.plugins.meetingsManager[chatRoom ? 'updateMeeting' : 'createMeeting'](...params);
-                        this.setState({ isLoading: false }, () => onClose());
+                        this.setState({ isLoading: false }, () => {
+                            onClose();
+                            megaChat.trigger(EVENTS.NAV_RENDER_VIEW, VIEWS.MEETINGS);
+                        });
                     })
             );
         }
@@ -722,6 +726,10 @@ export class Schedule extends MegaRenderMixin {
         );
     }
 }
+
+window.ScheduleMeetingDialogUI = {
+    Schedule,
+};
 
 // --
 

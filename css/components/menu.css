@@ -16,3 +16,7 @@
     background-color: var(--mobile-page-background);
     box-shadow: var(--mobile-shadow-medium);
 }
+
+.menu-container button.mega-component {
+    text-align: start;
+}

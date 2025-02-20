@@ -355,7 +355,7 @@ class MegaMobileViewOverlay extends MegaComponent {
                 contentBlock.classList.add('v-hidden');
                 loadingDialog.show();
 
-                if (this.bottomBar) {
+                if (this.bottomBar && !dlid) {
                     this.bottomBar.actions[0].disabled = true;
                 }
 
@@ -363,7 +363,7 @@ class MegaMobileViewOverlay extends MegaComponent {
                 mega.textEditorUI.cleanup();
 
                 mega.fileTextEditor.getFile(nodeHandle)
-                    .then(data => 
+                    .then(data =>
                         mega.textEditorUI.setupEditor(
                             this.nodeComponent.name,
                             data,
@@ -414,8 +414,8 @@ class MegaMobileViewOverlay extends MegaComponent {
      * @returns {void}
      */
     setNode(nodeHandle) {
-        this.nodeComponent = MegaMobileNode.getNodeComponentByHandle(nodeHandle) ||
-            new MegaMobileNode({parentNode: document.createElement('div'), nodeHandle: nodeHandle});
+        this.nodeComponent = MegaNodeComponent.getNodeComponentByHandle(nodeHandle) ||
+            new MegaNodeComponent({parentNode: document.createElement('div'), nodeHandle});
 
         this.domNode.querySelector('.media-viewer-container .file-name').textContent = this.nodeComponent.name;
 

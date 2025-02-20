@@ -1570,6 +1570,8 @@ FileManager.prototype.initContextUI = function() {
         if (c && (c.indexOf('contains-submenu') > -1 || c.indexOf('msync-found') > -1)) {
             M.addDownload($.selected);
         }
+
+        M.fmEventLog(500677);
     });
 
     $(c + '.download-standart-item').rebind('click', function() {
@@ -1643,6 +1645,7 @@ FileManager.prototype.initContextUI = function() {
             }
         }
 
+        M.fmEventLog(500679);
     });
 
     $(c + '.removelink-item, ' + c + '.cd-removelink-item').rebind('click', (e) => {
@@ -1716,6 +1719,8 @@ FileManager.prototype.initContextUI = function() {
         if ($(e.currentTarget).hasClass('cd-removelink-item')) {
             eventlog(500031);
         }
+
+        M.fmEventLog(500680);
     });
 
     $(c + '.dispute-item').rebind('click', function() {
@@ -1740,11 +1745,13 @@ FileManager.prototype.initContextUI = function() {
             return;
         }
         renameDialog();
+        M.fmEventLog(500689);
     });
 
     $(c + '.sh4r1ng-item').rebind('click', function() {
         M.openSharingDialog($.selected[0]);
         eventlog(500029);
+        M.fmEventLog(500681);
     });
 
     $(`${c}.removeshare-item, ${c}.cd-removeshare-item`).rebind('click', (e) => {
@@ -1761,6 +1768,7 @@ FileManager.prototype.initContextUI = function() {
         if ($(e.currentTarget).hasClass('cd-removeshare-item')) {
             eventlog(500033);
         }
+        M.fmEventLog(500682);
     });
 
     $(c + '.cd-sh4r1ng-item').rebind('click', (e) => {
@@ -1777,9 +1785,17 @@ FileManager.prototype.initContextUI = function() {
     });
 
     // Move Dialog
-    $(c + '.advanced-item, ' + c + '.move-item').rebind('click', openMoveDialog);
+    $(c + '.advanced-item, ' + c + '.move-item').rebind('click', (e) => {
+        openMoveDialog(e);
 
-    $(c + '.copy-item').rebind('click', openCopyDialog);
+        M.fmEventLog(500691);
+    });
+
+    $(c + '.copy-item').rebind('click', (e) => {
+        openCopyDialog(e);
+
+        M.fmEventLog(500692);
+    });
 
     $(c + '.revert-item').rebind('click', function() {
         if (M.isInvalidUserStatus()) {
@@ -1848,6 +1864,7 @@ FileManager.prototype.initContextUI = function() {
         }
         closeDialog();
         fmremove();
+        M.fmEventLog(500694);
     });
 
     $(c + '.addcontact-item').rebind('click', function() {
@@ -1984,6 +2001,8 @@ FileManager.prototype.initContextUI = function() {
 
     $(c + '.properties-item').rebind('click', function() {
         mega.ui.mInfoPanel.initInfoPanel();
+
+        M.fmEventLog(500683);
     });
 
     $(c + '.device-rename-item').rebind('click', () => {
@@ -2040,6 +2059,8 @@ FileManager.prototype.initContextUI = function() {
 
     $(c + '.properties-versions').rebind('click', function() {
         fileversioning.fileVersioningDialog();
+
+        M.fmEventLog(500684);
     });
 
     $(c + '.clearprevious-versions').rebind('click', function() {
@@ -2131,6 +2152,8 @@ FileManager.prototype.initContextUI = function() {
                 }
             });
         }
+
+        M.fmEventLog(500685);
     });
 
     $(c + '.findupes-item').rebind('click', M.findDupes);
@@ -2151,6 +2174,8 @@ FileManager.prototype.initContextUI = function() {
         }
 
         M.favourite($.selected, newFavState);
+
+        M.fmEventLog(500686);
     });
 
     $(`${c}.add-sensitive-item`).rebind('click.sensitive_toggle', function() {
@@ -2159,6 +2184,8 @@ FileManager.prototype.initContextUI = function() {
         }
 
         mega.sensitives.toggleStatus($.selected, !this.classList.contains('sensitive-added'));
+
+        M.fmEventLog(500688);
     });
 
     $(`${c}.send-to-contact-item, ${c}.cd-send-to-contact-item`).rebind('click', (ev) => {
@@ -2168,6 +2195,8 @@ FileManager.prototype.initContextUI = function() {
             // eveng log for send contact folder
             eventlog(500027);
         }
+
+        M.fmEventLog(500678);
     });
 
     $('.submenu.labels .dropdown-colour-item').rebind('click', function() {
@@ -2184,6 +2213,8 @@ FileManager.prototype.initContextUI = function() {
         }
 
         M.labeling($.selected, labelId);
+
+        M.fmEventLog(500687);
     });
 
     $('.colour-sorting-menu .filter-by .dropdown-colour-item').rebind('click', function(e) {
@@ -2328,6 +2359,8 @@ FileManager.prototype.initContextUI = function() {
         }
 
         M.openFolder(target);
+
+        M.fmEventLog(500675);
     });
 
     $(c + '.verify-credential').rebind('click', () => fingerprintDialog(M.d[$.selected[0]].su));
@@ -2451,6 +2484,8 @@ FileManager.prototype.initContextUI = function() {
 
         closeDialog();
         slideshow($.selected[0]);
+
+        M.fmEventLog(500676);
     });
 
     $(c + '.play-item').rebind('click', function() {
@@ -2521,6 +2556,8 @@ FileManager.prototype.initContextUI = function() {
 
     $(`${c}.add-to-album`).rebind('click.add-to-album', () => {
         mega.gallery.albums.addToAlbum($.selected);
+
+        M.fmEventLog(500690);
     });
 
     $(`${c}.new-bucket-item`)
@@ -3933,6 +3970,7 @@ FileManager.prototype.addGridUI = function(refresh) {
 
                     M.doSort(sortBy, dir);
                     M.renderMain();
+                    M.fmEventLog(sortBy);
 
                     break;
                 }
@@ -3951,17 +3989,17 @@ FileManager.prototype.addGridUI = function(refresh) {
 
     $('.grid-table th').rebind('contextmenu', e => showColumnsContextMenu(e));
 
-    $('.column-settings.overlap').rebind('click',
-        function(e) {
-            var $me = $(this);
-            if ($me.hasClass('c-opened')) {
-                $.hideContextMenu();
-                return false;
-            }
-            showColumnsContextMenu(e);
-            $me.addClass('c-opened');
+    $('.column-settings.overlap').rebind('click', function(e) {
+        var $me = $(this);
+        if ($me.hasClass('c-opened')) {
+            $.hideContextMenu();
             return false;
-        });
+        }
+        showColumnsContextMenu(e);
+        $me.addClass('c-opened');
+        M.fmEventLog('settings');
+        return false;
+    });
 
     $('.files-menu.context .dropdown-item.visible-col-select').rebind('click', function(e) {
         var $me = $(this);
@@ -4035,6 +4073,7 @@ FileManager.prototype.addGridUI = function(refresh) {
                 if (c.indexOf(f) !== -1) {
                     M.doSort(f, d);
                     M.renderMain();
+                    M.fmEventLog(f);
                     break;
                 }
             }

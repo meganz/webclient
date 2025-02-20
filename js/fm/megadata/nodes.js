@@ -1950,6 +1950,14 @@ MegaData.prototype.nodeUpdated = function(n, ignoreDB) {
                 }
             }
 
+            if (n.su && mega.ui.header.contactsButton.hasClass('active')) {
+                delay('flyout-contact-refresh', () => {
+                    if (mega.ui.flyout.name === `contact-${n.su}`) {
+                        mega.ui.flyout.showContactFlyout(n.su);
+                    }
+                });
+            }
+
             mBroadcaster.sendMessage(`nodeUpdated:${n.h}`);
         }
     }

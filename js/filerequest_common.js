@@ -26,7 +26,7 @@ lazy(mega, 'fileRequestCommon', () => {
     };
 
     const updateMobileNodeIcon = (nodeHandle) => {
-        const component = MegaMobileNode.getNodeComponentByHandle(nodeHandle);
+        const component = MegaNodeComponent.getNodeComponentByHandle(nodeHandle);
 
         if (component) {
             component.update('icon');

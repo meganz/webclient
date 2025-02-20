@@ -259,10 +259,7 @@ function megatitle(nperc) {
         nperc = '';
     }
 
-    let a = document.querySelector('.js-notification-num');
-    a = (a = a && parseInt(a.textContent)) > 0 ? `(${a}) ` : '';
-
-    document.title = a + mega_title + nperc;
+    document.title = mega_title + nperc;
 }
 
 function countrydetails(isocode) {

@@ -166,3 +166,7 @@ export class Start extends React.Component {
         );
     }
 }
+
+window.StartMeetingDialogUI = {
+    Start
+};

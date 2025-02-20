@@ -1247,14 +1247,21 @@ class MegaFlyoutMenu extends MegaComponent {
                 text: l.new_meeting_start,
                 icon: 'sprite-fm-mono icon-video-plus',
                 onClick() {
-                    eventlog(list.length ? 500669 : 500670);
-                    showReactDialog(StartMeetingDialogUI.Start, {
-                        onStart(topic, audio, video) {
-                            megaChat.createAndStartMeeting(topic, audio, video);
-                            closeReactDialog();
-                        },
-                        onClose: closeReactDialog,
-                    });
+                    if (megaChat.hasSupportForCalls) {
+                        return window.inProgressAlert()
+                            .then(() => {
+                                eventlog(list.length ? 500669 : 500670);
+                                showReactDialog(StartMeetingDialogUI.Start, {
+                                    onStart(topic, audio, video) {
+                                        megaChat.createAndStartMeeting(topic, audio, video);
+                                        closeReactDialog();
+                                    },
+                                    onClose: closeReactDialog,
+                                });
+                            })
+                            .catch(() => d && console.warn('Already in a call.'));
+                    }
+                    showToast('warning', l[7211]);
                 }
             });
             MegaButton.factory({

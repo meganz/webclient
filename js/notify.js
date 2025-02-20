@@ -45,6 +45,9 @@ var notify = {
     dynamicNotifs: {},
     lastSeenDynamic: undefined,
 
+    newNotifications: 0,
+    lastFavicoState: false,
+
     /**
      * Initialise the notifications system
      */
@@ -496,9 +499,10 @@ var notify = {
             $popup.addClass('hidden').text(newNotifications);
             $(document.body).trigger('onMegaNotification', false);
         }
+        this.newNotifications = newNotifications;
 
         // Update page title
-        megatitle();
+        notify.updateNotificationIndicator();
     },
 
     /**
@@ -534,7 +538,8 @@ var notify = {
         notify.$popupNum.html(0);
 
         // Update page title
-        megatitle();
+        this.newNotifications = 0;
+        notify.updateNotificationIndicator();
 
         // Send 'set last acknowledged' API request to inform it which notifications have been seen
         // up to this point then they won't show these notifications as new next time they are fetched
@@ -2233,5 +2238,39 @@ var notify = {
                 }
             }
         }
+    },
+
+    updateNotificationIndicator() {
+        'use strict';
+        if (!this.favico) {
+            assert(Favico, 'Favico.js is missing.');
+
+            const link = document.querySelector('link[rel="icon"]');
+            if (link) {
+                link.href = `${location.hostname === 'mega.nz' ? 'https://mega.nz/' : bootstaticpath}favicon.ico`;
+            }
+
+            this.favico = new Favico({
+                type: 'circle',
+                animation: 'popFade',
+                bgColor: '#31D0FE',
+                textColor: '#FFF',
+            });
+        }
+        const show = !!(this.newNotifications || (window.megaChat && megaChat._lastUnreadCount));
+        if (this.lastFavicoState !== show) {
+            delay('notifFavicoUpd', tryCatch(() => {
+                this.favico.reset();
+                if (show) {
+                    // Show if any notifications from this or chat.
+                    this.favico.badge(' ');
+                }
+                else {
+                    this.favico.badge('');
+                }
+                this.lastFavicoState = show;
+            }));
+        }
+
     }
 };

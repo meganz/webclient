@@ -19,6 +19,13 @@
     overflow: hidden;
     height: 40px;
 }
+.mega-node.fm-item:hover,
+.mega-node.fm-item:active {
+    background: var(--mobile-surface-1);
+}
+.mega-node.fm-item.user:active {
+    background: var(--mobile-surface-2);
+}
 .mega-node .mobile.fm-item-img {
     grid-row: 1/4;
     grid-column: 1/2;
@@ -250,4 +257,54 @@ a.is-sensitive img {
     .grid-view .mega-node .fm-item-img i {
         --icon-size: 56px;
     }
+}
+
+
+.fm-item.user {
+    grid-template-columns: 40px auto 24px;
+}
+.mega-node.user .email {
+    color: var(--mobile-text-secondary);
+    font: var(--mobile-font-caption-small-regular);
+}
+
+.mega-node.user .avatar {
+    height: 48px;
+    width: 48px;
+    border-radius: 100%;
+}
+
+.mega-node.user .avatar img {
+    display: block;
+    max-height: 100%;
+    width: auto;
+    border-radius: inherit;
+}
+.mega-node.user .avatar div {
+    width: 100%;
+    text-align: center;
+    border-radius: inherit;
+}
+.mega-node.user .avatar div span {
+    border-radius: inherit;
+    font-family: var(--text-font-family);
+    color: white;
+    font-size: 24px;
+    height: 48px;
+    line-height: 48px;
+    margin: 0 auto;
+    padding: 0;
+    width: 48px;
+    display: block;
+}
+
+.mega-node.user .avatar.small {
+    height: 24px;
+    width: 24px;
+}
+.mega-node.user .avatar.small div span {
+    height: 24px;
+    width: 24px;
+    line-height: 24px;
+    font-size: 12px;
 }

@@ -1,0 +1,48 @@
+.mega-component.tab-group {
+    background: var(--mobile-page-background);
+    display: flex;
+    width: 100%;
+}
+.mega-component.tab-group .mega-tab-option {
+    border-radius: 0;
+    cursor: pointer;
+    flex: 1;
+    height: 48px;
+    padding: 12px 24px;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+}
+.mega-component.tab-group .mega-tab-option span.primary-text {
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-copy-regular);
+}
+.mega-component.tab-group .mega-tab-option.selected {
+    border-color: var(--mobile-border-brand);
+}
+.mega-component.tab-group .mega-tab-option:active {
+    background: transparent;
+}
+.mega-component.tab-group .mega-tab-option:active span.primary-text {
+    color: var(--mobile-button-primary-pressed);
+}
+.mega-component.tab-group .mega-tab-option.selected span.primary-text {
+    font: var(--mobile-font-link-large-semibold);
+}
+.mega-component.tab-group .mega-tab-option.disabled {
+    background: transparent;
+    border-color: transparent;
+}
+.mega-component.tab-group .mega-tab-option.disabled span.primary-text {
+    color: var(--mobile-text-disabled);
+    font: var(--mobile-text-primary);
+}
+.mega-component.tab-group .mega-tab-option.decorated::after {
+    background: var(--mobile-icon-brand);
+    border-radius: 200px;
+    content: '';
+    height: 6px;
+    margin-inline-start: 4px;
+    min-width: 6px;
+    position: relative;
+    top: -8px;
+}

@@ -1,4 +1,4 @@
-class MegaMobileSharedNode extends MegaMobileNode {
+class MegaSharedNode extends MegaNodeComponent {
 
     constructor(options) {
         super(options);
@@ -40,7 +40,7 @@ class MegaMobileSharedNode extends MegaMobileNode {
     }
 
     get accessRightDetails() {
-        return MegaMobileSharedNode.accessRights[this.node.r];
+        return MegaSharedNode.accessRights[this.node.r];
     }
 }
 
@@ -48,7 +48,7 @@ class MegaMobileSharedNode extends MegaMobileNode {
 mBroadcaster.once('fm:initialized', () => {
     'use strict';
 
-    MegaMobileSharedNode.accessRights = [
+    MegaSharedNode.accessRights = [
         [l[55], 'read-only', 'icon-read-only', 'grey'],
         [l[56], 'read-and-write', 'icon-permissions-write', 'blue'],
         [l[57], 'full-access', 'icon-star', 'green'],

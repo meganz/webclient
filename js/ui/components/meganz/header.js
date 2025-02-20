@@ -63,6 +63,58 @@ class MegaHeader extends MegaMobileHeader {
             this.notifButton.domNode.prepend(mCreateElement('span', {class: 'js-notification-num icon-badge hidden'}));
         }
 
+        // Contacts menu
+        wrapper = mCreateElement('div', {class: 'menu-wrapper contacts-wrapper top-contacts'}, navActions);
+        this.contactsButton = new MegaButton({
+            parentNode: wrapper,
+            type: 'icon',
+            componentClassname: 'text-icon contacts flyout-option simpletip',
+            icon: 'sprite-fm-mono icon-user-square-outline',
+            iconSize: 24,
+            dataset: {
+                simpletip: l[165],
+                simpletipClass: 'mobile-theme-tip',
+            },
+            onClick: () => {
+                if (mega.ui.flyout.name === 'contacts') {
+                    mega.ui.flyout.hide();
+                }
+                else {
+                    mega.ui.flyout.showContactsFlyout();
+                    eventlog(500656);
+                }
+            }
+        });
+        navActions.prepend(wrapper);
+
+        // Chats menu
+        wrapper = mCreateElement('div', {class: 'menu-wrapper chats-wrapper top-chats'}, navActions);
+        this.chatsButton = new MegaButton({
+            parentNode: wrapper,
+            type: 'icon',
+            componentClassname: 'text-icon chats flyout-option simpletip',
+            icon: 'sprite-fm-mono icon-message-chat-circle',
+            iconSize: 24,
+            dataset: {
+                simpletip: l[7997],
+                simpletipClass: 'mobile-theme-tip',
+            },
+            onClick: () => {
+                if (!megaChatIsReady) {
+                    return;
+                }
+                if (mega.ui.flyout.name === 'chat') {
+                    mega.ui.flyout.hide();
+                }
+                else {
+                    mega.ui.flyout.showChatsFlyout();
+                    eventlog(500657);
+                }
+            }
+        });
+        mCreateElement('i', {class: 'sprite-fm-mono icon-phone hidden top-chats-call'}, wrapper);
+        navActions.prepend(wrapper);
+
         // Bento Menus
         wrapper = mCreateElement('div', {class: 'menu-wrapper bento-wrapper bento'}, navActions);
         navActions.prepend(wrapper);
@@ -487,7 +539,7 @@ class MegaHeader extends MegaMobileHeader {
             elem.classList.remove('simpletip');
         }
 
-        mega.ui.menu.calcPosition();
+        mega.ui.pm.menu.calcPosition();
     }
 
     updateEmail(newEmail) {
@@ -502,7 +554,7 @@ class MegaHeader extends MegaMobileHeader {
             elem.classList.remove('simpletip');
         }
 
-        mega.ui.menu.calcPosition();
+        mega.ui.pm.menu.calcPosition();
     }
 
     set headerOptions(types) {
@@ -553,6 +605,9 @@ class MegaHeader extends MegaMobileHeader {
         }
 
         tooltiplogin.init(1);
+        if (mega.ui.flyout) {
+            mega.ui.flyout.closeIfNeeded();
+        }
     }
 
     renderLoggedIn(replace) {
@@ -947,7 +1002,9 @@ class MegaHeader extends MegaMobileHeader {
                 'top-help': !u_type,
                 'top-language': !u_type,
                 'download-desktop-app': M.currentCustomView.type !== 'pwm' && !window.useMegaSync,
-                'download-pwm-ext': M.currentCustomView.type === 'pwm'
+                'download-pwm-ext': M.currentCustomView.type === 'pwm',
+                'top-contacts': !pfid && u_type,
+                'top-chats': !pfid && u_type,
             },
             { // logged out
                 'home': false,
@@ -961,7 +1018,9 @@ class MegaHeader extends MegaMobileHeader {
                 'top-help': true,
                 'top-language': true,
                 'download-desktop-app': false,
-                'download-pwm-ext': false
+                'download-pwm-ext': false,
+                'top-contacts': false,
+                'top-chats': false,
             }
         ][index];
 
@@ -975,6 +1034,13 @@ class MegaHeader extends MegaMobileHeader {
             )
         ) {
             type.search = false;
+        }
+        if (!megaChatIsReady) {
+            type['top-chats'] = false;
+        }
+        if (M.chat) {
+            type['top-contacts'] = false;
+            type['top-chats'] = false;
         }
 
         return type;

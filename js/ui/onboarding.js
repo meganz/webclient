@@ -1,7 +1,7 @@
 // initialising onboarding v4
 
 // Bump this version number if changes are required in an existing section or if required to reduce complexity.
-window.ONBOARD_VERSION = 3;
+window.ONBOARD_VERSION = 4;
 window.OBV4_FLAGS = {
     OBV4: 'obv4f',
     CLOUD_DRIVE: 'obcd',
@@ -16,8 +16,8 @@ window.OBV4_FLAGS = {
     CLOUD_DRIVE_NEW_NAV_LEFT: 'obcdnnl',
     CLOUD_DRIVE_NEW_NAV_BENTO: 'obcdnnb',
     CLOUD_DRIVE_NEW_NAV_ACCOUNT: 'obcdnna',
-    UNUSED_7: 'unused7',
-    UNUSED_8: 'unused8',
+    CLOUD_DRIVE_NEW_NAV_CHAT: 'obcdnnc',
+    CLOUD_DRIVE_NEW_NAV_CONTACT: 'obcdnnp',
     UNUSED_9: 'unused9',
     UNUSED_10: 'unused10',
     UNUSED_11: 'unused11',
@@ -192,6 +192,18 @@ mBroadcaster.addListener('fm:initialized', () => {
             upgraded = true;
         }
 
+        if (upgradeFrom !== false && upgradeFrom < 4) {
+            const wasFinished = flagMap.getSync(flags[8]);
+            flagMap.setSync(flags[8], 0); // CLOUD_DRIVE_NEW_NAV -> reset for new chat/contacts nav options.
+            if (wasFinished) {
+                // Ensure dialogs start showing again from the new chats/contacts options.
+                flagMap.setSync(flags[9], 1);
+                flagMap.setSync(flags[10], 1);
+                flagMap.setSync(flags[11], 1);
+            }
+            upgraded = true;
+        }
+
         // Future upgrades may be added here
         if (upgraded) {
             flagMap.safeCommit();
@@ -201,6 +213,7 @@ mBroadcaster.addListener('fm:initialized', () => {
     const _obv4NewNav = () => {
 
         if (mega.ui.onboarding) {
+            const afterContactDone = mega.ui.onboarding.flagStorage.getSync(OBV4_FLAGS.CLOUD_DRIVE_NEW_NAV_ACCOUNT);
             const _obMap = obMap || {};
             const isRtl = document.body.classList.contains('rtl');
             _obMap['cloud-drive'] = {
@@ -246,6 +259,41 @@ mBroadcaster.addListener('fm:initialized', () => {
                                 targetElmClass: '.mega-header .bento',
                                 targetElmPosition: isRtl ? 'bottom right' : 'bottom left',
                                 markComplete: true,
+                                dialogSkip: l.ob_end_tour
+                            }
+                        ]
+                    },
+                    {
+                        name: l[7997],
+                        flag: OBV4_FLAGS.CLOUD_DRIVE_NEW_NAV_CHAT,
+                        get prerequisiteCondition() {
+                            return megaChatIsReady && mega.ui.header.chatsButton.visible;
+                        },
+                        actions: [
+                            {
+                                type: 'showDialog',
+                                dialogTitle: l.promo_new_layout_5_title,
+                                dialogDesc: l.promo_new_layout_5_body,
+                                targetElmClass: '.mega-header .top-chats',
+                                targetElmPosition: isRtl ? 'bottom right' : 'bottom left',
+                                markComplete: true,
+                                dialogSkip: l.ob_end_tour
+                            }
+                        ]
+                    },
+                    {
+                        name: l[165],
+                        flag: OBV4_FLAGS.CLOUD_DRIVE_NEW_NAV_CONTACT,
+                        actions: [
+                            {
+                                type: 'showDialog',
+                                dialogTitle: l.promo_new_layout_6_title,
+                                dialogDesc: l.promo_new_layout_6_body,
+                                targetElmClass: '.mega-header .top-contacts',
+                                targetElmPosition: isRtl ? 'bottom right' : 'bottom left',
+                                markComplete: true,
+                                dialogNext: afterContactDone ? l[726] : l[556],
+                                skipHidden: afterContactDone,
                                 dialogSkip: l.ob_end_tour
                             }
                         ]

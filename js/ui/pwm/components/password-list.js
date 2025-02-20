@@ -361,7 +361,7 @@ class MegaPasswordList extends MegaView {
 
             const _ = event => {
                 item.trigger('click', window.innerWidth < 1080);
-                mega.ui.menu.hide();
+                mega.ui.pm.menu.hide();
                 mega.ui.contextMenu.show({
                     name: 'item-list-menu',
                     handle: passwordNode.h,
@@ -373,12 +373,12 @@ class MegaPasswordList extends MegaView {
             };
             contextMenuBtn.on('click', function(e) {
                 if (this.active) {
-                    mega.ui.menu.hide();
+                    mega.ui.pm.menu.hide();
                 }
                 else {
                     this.active = true;
                     _(e);
-                    mega.ui.menu.one('hide.contextbtn', () => {
+                    mega.ui.pm.menu.one('hide.contextbtn', () => {
                         this.active = false;
                     });
                 }

@@ -1497,6 +1497,9 @@ lazy(mega.ui, 'mInfoPanel', () => {
          */
         initInfoPanel() {
 
+            if (mega.ui.flyout.name) {
+                mega.ui.flyout.hide();
+            }
             // Scroll to element
             scrollToNode($.selected[0]);
 

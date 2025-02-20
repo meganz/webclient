@@ -68,7 +68,7 @@ mobile.cloud = {
         if (node.t === 1) {
             if (M.megaRender) {
                 // update only for folder type
-                const component = MegaMobileNode.getNodeComponentByHandle(node.h);
+                const component = MegaNodeComponent.getNodeComponentByHandle(node.h);
 
                 if (component) {
                     component.update('subNodeCount');
@@ -234,7 +234,7 @@ mobile.cloud = {
         'use strict';
 
         if (M.megaRender) {
-            const component = MegaMobileNode.getNodeComponentByHandle(nodeHandle);
+            const component = MegaNodeComponent.getNodeComponentByHandle(nodeHandle);
 
             if (component) {
                 component.update('linked');

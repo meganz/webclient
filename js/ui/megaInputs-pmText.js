@@ -218,7 +218,7 @@ mega.ui.MegaInputs.prototype.pmText._withIconOrPrefix = function() {
     }
 
     if ($input.hasClass('clearButton')) {
-        const icon = 'sprite-pm-mono icon-x-thin-outline';
+        const icon = 'sprite-fm-mono icon-dialog-close-thin';
 
         $wrapper.safeAppend(`<i class="${icon} clear-input icon"></i>`);
 

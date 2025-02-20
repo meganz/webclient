@@ -211,3 +211,23 @@ body.pwm-ui .mega-header .top-block {
     padding: 16px 0;
     width: 280px;
 }
+.mega-header .chats-wrapper .flyout-option.chats.decorated::after {
+    background: var(--mobile-icon-brand);
+    border-radius: 200px;
+    content: '';
+    height: 8px;
+    position: absolute;
+    right: 0;
+    top: 2px;
+    width: 8px;
+}
+.mega-header .chats-wrapper i.top-chats-call {
+    background: var(--mobile-notification-info);
+    border-radius: 100%;
+    bottom: -5px;
+    padding: 4px;
+    position: absolute;
+    right: -6px;
+    --icon-size: 12px;
+    --mask-color: var(--mobile-icon-primary);
+}

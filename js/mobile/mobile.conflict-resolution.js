@@ -85,7 +85,7 @@ mBroadcaster.once('startMega', () => {
     'use strict';
 
     fileIcon = function(node) {
-        return MegaMobileNode.mFileIcon(node);
+        return MegaNodeComponent.mFileIcon(node);
     };
 
     /**

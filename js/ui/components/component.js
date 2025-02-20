@@ -231,6 +231,10 @@ class MegaComponent extends MegaDataEmitter {
 
         return null;
     }
+
+    static factory(options) {
+        return new this(options);
+    }
 }
 
 // Custom events list, this is used to prepare required native event for custom event and also bind element with it

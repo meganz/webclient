@@ -127,6 +127,7 @@ export const inProgressAlert = (isJoin, chatRoom) => {
         resolve();
     });
 };
+window.inProgressAlert = inProgressAlert;
 
 class RecordingConsentDialog extends React.Component {
     static dialogName = `${NAMESPACE}-consent`;

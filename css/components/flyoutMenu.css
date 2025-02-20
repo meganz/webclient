@@ -1,0 +1,247 @@
+#pmlayout .flyout-holder {
+    display: none;
+    background-color: var(--mobile-page-background);
+    overflow: hidden;
+    width: 0;
+    border-left: 1px solid var(--mobile-border-strong);
+    padding: 16px 0;
+    transition: 200ms linear;
+    box-sizing: border-box;
+}
+
+#pmlayout .flyout-holder.flyout-shown {
+    display: block;
+    grid-row: 3/4;
+    grid-column: 3/4;
+}
+#pmlayout .flyout-holder.flyout-shown.ready {
+    width: 320px;
+}
+
+
+@media only screen and (max-width: 1200px) {
+    #pmlayout .flyout-holder {
+        position: absolute;
+        right: 0;
+        height: calc(100% - 55px);
+        top: 55px;
+        z-index: 210;
+        border-top: 1px solid var(--mobile-border-strong);
+    }
+}
+
+.flyout-main {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.flyout-header {
+    margin: 0 24px 8px;
+}
+
+.flyout-header .flyout-controls {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 16px;
+}
+.flyout-header .flyout-controls .mega-component.nav-elem.icon-only {
+    cursor: pointer;
+    height: 24px;
+    padding: 0;
+    margin-inline-start: 16px;
+}
+.flyout-header .flyout-controls .mega-component.nav-elem.back-button {
+    margin-inline: 0 auto;
+}
+
+.flyout-header .top-section .top-section-label {
+    margin: 16px 0;
+}
+
+.flyout-header .top-section .top-section-label .mega-node.fm-item.user {
+    cursor: default;
+    height: 48px;
+    grid-template-rows: repeat(auto-fill, 24px);
+    grid-template-columns: 60px auto;
+}
+.flyout-header .top-section .top-section-label .mega-node.user:hover {
+    background: transparent;
+}
+.flyout-header .top-section .top-section-label .mega-node.user .fm-item-name {
+    font: var(--mobile-font-heading-h2);
+}
+.flyout-header .top-section .top-section-label .mega-node.user .email {
+    font: var(--mobile-font-caption-large-regular);
+}
+
+.flyout-header .top-section .top-section-label.text-only {
+    font: var(--mobile-font-heading-h1);
+    color: var(--mobile-text-primary);
+}
+
+.flyout-header .top-section .top-section-search .pm.mega-input.search-bar {
+    margin: 0;
+}
+.flyout-header .top-section .top-section-search .pm.mega-input input:focus::placeholder {
+    color: transparent;
+}
+
+.flyout-header .top-section .top-section-actions {
+    margin: 24px 0 8px;
+}
+
+.flyout-header .top-section .top-section-actions button.nav-elem.block {
+    cursor: pointer;
+    height: 48px;
+    width: 48px;
+    margin: 0 6px;
+}
+.flyout-header .top-section .top-section-actions button.nav-elem.block:first-child {
+    margin-inline-start: 0;
+}
+.flyout-header .top-section .top-section-actions button.nav-elem.block:last-child {
+    margin-inline-end: 0;
+}
+
+.flyout-body-header span.body-label {
+    box-sizing: border-box;
+    display: block;
+    padding: 8px 24px;
+    width: 100%;
+    overflow-wrap: break-word;
+}
+.flyout-body-header span.body-label.label-bold {
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-caption-large-bold);
+}
+.flyout-body-header .tab-group.flyout-tabs {
+    border-bottom: 1px solid var(--mobile-border-strong);
+}
+
+.flyout-body .ps__rail-y {
+    margin: 0;
+}
+
+.flyout-footer {
+    margin-top: auto;
+    padding: 16px 24px 0;
+    border-top: 1px solid var(--mobile-border-subtle);
+}
+
+.flyout-footer button.nav-elem.button.secondary {
+    cursor: pointer;
+    font: var(--mobile-font-copy-semibold);
+    white-space: nowrap;
+    width: 100%;
+}
+.flyout-footer button.mega-component.nav-elem i {
+    margin-inline: 0 10px;
+    --mask-color: var(--mobile-icon-primary);
+}
+
+.flyout-body a.mega-node {
+    padding-inline-start: 24px;
+}
+.flyout-body a.mega-node.fm-item.folder:active {
+    background: var(--mobile-surface-2);
+}
+
+.flyout-body .list-header {
+    color: var(--mobile-text-secondary);
+    font: var(--mobile-font-caption-large-regular);
+    line-height: 17px;
+    padding: 8px 24px;
+}
+
+.flyout-body .list-header.meetings-dates {
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-caption-large-bold);
+    padding: 12px 24px 8px;
+}
+.flyout-body .list-header.meetings-dates:first-child {
+    padding-top: 20px;
+}
+
+.flyout-holder .flyout-overlay {
+    display: none;
+    position: relative;
+    top: 0;
+    left: 0;
+}
+.flyout-holder .flyout-overlay.active {
+    display: flex;
+    overflow: hidden;
+}
+.flyout-overlay .overlay.overlay-container {
+    justify-content: center;
+    text-align: center;
+}
+.flyout-overlay .overlay.overlay-container .main {
+    height: auto;
+    padding: 0 24px;
+}
+.flyout-overlay .overlay.overlay-container .title {
+    width: 100%;
+}
+.flyout-overlay .overlay.overlay-container .main h1 {
+    overflow-wrap: break-word;
+}
+.flyout-overlay .overlay.overlay-container .image {
+    align-self: center;
+}
+.flyout-overlay .overlay.overlay-container .subtitle {
+    margin-top: 16px;
+    width: 100%;
+}
+.flyout-overlay .overlay.overlay-container .subtitle a {
+    color: var(--mobile-link-primary);
+    text-decoration: underline;
+}
+.flyout-overlay .overlay.overlay-container .subtitle span {
+    overflow-wrap: break-word;
+}
+.flyout-overlay .overlay.overlay-container .actions {
+    margin: 0 24px;
+    padding: 0;
+}
+.flyout-overlay .overlay.overlay-container button {
+    margin: auto;
+    width: auto;
+}
+.flyout-overlay .image i {
+    background-size: contain;
+    width: 120px;
+    height: 120px;
+}
+.flyout-overlay i.contact-book {
+    background-image: url("../../images/mega/contacts-book.png");
+}
+.flyout-overlay i.search {
+    background-image: url("../../images/mega/glass-details.png");
+}
+.flyout-overlay i.folder {
+    background-image: url("../../images/mega/glass-folder.png");
+}
+.flyout-overlay i.chats {
+    background-image: url("../../images/mega/glass-message-call.png");
+}
+.flyout-overlay i.meetings {
+    background-image: url("../../images/mega/glass-video.png");
+}
+.flyout-overlay .meeting-dropdown-button i.right-icon {
+    --icon-size: 24px;
+    --mask-color: var(--mobile-icon-inverse-accent);
+}
+
+.menu-container.context-menu.flyout-meeting-menu {
+    padding: 16px 24px;
+    z-index: 211;
+}
+.menu-container.context-menu.flyout-meeting-menu .main.centered {
+    padding: 0;
+}
+.flyout-menu-dropdown button {
+    cursor: pointer;
+    padding: 0;
+}

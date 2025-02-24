@@ -218,6 +218,11 @@ function removeUInode(h, parent) {
         });
     }
 
+    if (typeof selectionManager !== 'undefined' && $.selected && $.selected.includes(h)) {
+        selectionManager.remove_from_selection(h);
+        $.hideContextMenu();
+    }
+
     M.nodeRemovalUIRefresh(h,  parent);
 }
 

@@ -22354,7 +22354,7 @@ class Guest extends REaCt().Component {
     }), REaCt().createElement("span", null, copy)), REaCt().createElement(meetings_button.A, {
       className: "mega-button positive register-button",
       onClick: () => loadSubPage('register')
-    }, l[968])));
+    }, l.sign_up_btn)));
   }
 }
 ;// ./js/chat/ui/meetings/sidebar.jsx

@@ -29,7 +29,7 @@ export default class Guest extends React.Component {
                     <Button
                         className="mega-button positive register-button"
                         onClick={() => loadSubPage('register')}>
-                        {l[968] /* `Create Account` */}
+                        {l.sign_up_btn /* `Create Account` */}
                     </Button>
                 </div>
             </div>

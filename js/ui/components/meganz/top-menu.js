@@ -37,6 +37,9 @@ class MegaTopMenu extends MegaMobileTopMenu {
             });
         });
 
+        mBroadcaster.addListener('updFileManagerUI', () => {
+            this.rootBtnWrap.classList.toggle('contains-tree', !!M.tree[M.RootID]);
+        });
     }
 
     renderMenuItems() {
@@ -45,6 +48,11 @@ class MegaTopMenu extends MegaMobileTopMenu {
 
         if (pfid && !(this.ready & 1) || !pfid && !(this.ready & 2)) {
             super.renderMenuItems();
+        }
+
+        this.rootBtnWrap = this.domNode.querySelector(pfid ? '.js-public-tree-panel' : '.js-myfile-tree-panel');
+        if (this.rootBtnWrap) {
+            this.rootBtnWrap.classList.toggle('contains-tree', !!M.tree[M.RootID]);
         }
     }
 

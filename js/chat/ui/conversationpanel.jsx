@@ -621,7 +621,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                     1
                 );
             }
-            return this.setState({ contactPickerDialog: true });
+            return M.safeShowDialog('contact-picker', () => this.setState({ contactPickerDialog: true }));
         }
         msgDialog( // new user adding a partcipant
             `confirmationa:!^${l[8726]}!${l[82]}`,
@@ -873,7 +873,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                 onClick={() =>
                     Object.values(M.u.toJS()).some(u => u.c === 1) ?
                         !allContactsInChat(exParticipants)
-                            ? this.setState({ contactPickerDialog: true }) :
+                            ? M.safeShowDialog('contact-picker', () => this.setState({ contactPickerDialog: true })) :
                             msgDialog(
                                 `confirmationa:!^${l[8726]}!${l[82]}`,
                                 null,
@@ -1455,11 +1455,11 @@ export class ConversationPanel extends MegaRenderMixin {
     }
 
     openAttachCloudDialog() {
-        this.setState({ 'attachCloudDialog': true });
+        M.safeShowDialog('attach-cloud-dialog', () => this.setState({ attachCloudDialog: true }));
     }
 
     openSendContactDialog() {
-        this.setState({ 'sendContactDialog': true });
+        M.safeShowDialog('send-contact-dialog', () => this.setState({ sendContactDialog: true }));
     }
 
     openSchedDescDialog() {
@@ -1548,7 +1548,7 @@ export class ConversationPanel extends MegaRenderMixin {
         });
 
         chatRoom.rebind('openSendFilesDialog.cpanel', () => {
-            this.setState({ attachCloudDialog: true });
+            this.openAttachCloudDialog();
         });
 
         chatRoom.rebind('showGetChatLinkDialog.ui', () => {
@@ -2125,7 +2125,7 @@ export class ConversationPanel extends MegaRenderMixin {
                     ? l.meeting_archive_dlg_text /* `Are you sure you want to archive this meeting?` */
                     : l[19069] /* `Are you sure you want to archive this chat?` */}
                 icon="sprite-fm-uni icon-question"
-                name="archive-conversation"
+                name="archive-conversation-dialog"
                 pref="4"
                 onClose={() => {
                     self.setState({'archiveDialog': false});
@@ -2151,7 +2151,7 @@ export class ConversationPanel extends MegaRenderMixin {
                     ? l.meeting_unarchive_dlg_text /* `Are you sure you want to unarchive this meeting?` */
                     : l[19064] /* `Are you sure you want to unarchive this conversation?` */}
                 icon="sprite-fm-uni icon-question"
-                name="unarchive-conversation"
+                name="unarchive-conversation-dialog"
                 pref="5"
                 onClose={() => {
                     self.setState({'unarchiveDialog': false});
@@ -2516,10 +2516,14 @@ export class ConversationPanel extends MegaRenderMixin {
                             self.setState({'truncateDialog': true});
                         }}
                         onArchiveClicked={function() {
-                            self.setState({'archiveDialog': true});
+                            M.safeShowDialog('archive-conversation-dialog', () =>
+                                self.setState({ archiveDialog: true })
+                            );
                         }}
                         onUnarchiveClicked={function() {
-                            self.setState({'unarchiveDialog': true});
+                            M.safeShowDialog('unarchive-conversation-dialog', () =>
+                                this.setState({ unarchiveDialog: true })
+                            );
                         }}
                         onRenameClicked={function() {
                             self.setState({
@@ -2544,12 +2548,12 @@ export class ConversationPanel extends MegaRenderMixin {
                         onSwitchOffPublicMode = {function(topic) {
                             room.switchOffPublicMode(topic);
                         }}
-                        onAttachFromCloudClicked={function() {
-                            self.setState({'attachCloudDialog': true});
-                        }}
-                        onPushSettingsClicked={function() {
-                            self.setState({ 'pushSettingsDialog': true });
-                        }}
+                        onAttachFromCloudClicked={() =>
+                            M.safeShowDialog('start-group-chat', () => this.setState({ attachCloudDialog: true }))
+                        }
+                        onPushSettingsClicked={() =>
+                            M.safeShowDialog('push-settings-dialog', () => this.setState({ pushSettingsDialog: true }))
+                        }
                         onPushSettingsToggled={function() {
                             return room.dnd || room.dnd === 0 ?
                                 self.setState({ pushSettingsValue: null }, () =>
@@ -2581,11 +2585,14 @@ export class ConversationPanel extends MegaRenderMixin {
                                 ]
                             );
                         }}
-                        onShowScheduledDescription={() => {
-                            if (room.scheduledMeeting) {
-                                this.setState({ descriptionDialog: true });
-                            }
-                        }}
+                        onShowScheduledDescription={() =>
+                            room.scheduledMeeting ?
+                                M.safeShowDialog(
+                                    'scheduled-description-dialog',
+                                    () => this.setState({ descriptionDialog: true })
+                                ) :
+                                null
+                        }
                     /> : null}
 
                     {privateChatDialog}

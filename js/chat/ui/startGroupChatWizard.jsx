@@ -6,6 +6,8 @@ import ModalDialogsUI from './../../ui/modalDialogs.jsx';
 
 
 export class StartGroupChatWizard extends MegaRenderMixin {
+    dialogName = 'start-group-chat';
+
     domRef = React.createRef();
     inputContainerRef = React.createRef();
     inputRef = React.createRef();
@@ -54,17 +56,20 @@ export class StartGroupChatWizard extends MegaRenderMixin {
         this.onSelectClicked = this.onSelectClicked.bind(this);
         this.onSelected = this.onSelected.bind(this);
     }
+
     onSelected(nodes) {
         this.setState({'selected': nodes});
         if (this.props.onSelected) {
             this.props.onSelected(nodes);
         }
     }
+
     onSelectClicked() {
         if (this.props.onSelectClicked) {
             this.props.onSelectClicked();
         }
     }
+
     onFinalizeClick(e) {
         if (e) {
             e.preventDefault();
@@ -80,6 +85,19 @@ export class StartGroupChatWizard extends MegaRenderMixin {
         this.props.onClose(this);
         eventlog(500236);
     }
+
+    componentDidMount() {
+        super.componentDidMount();
+        M.safeShowDialog(this.dialogName, nop);
+    }
+
+    componentWillUnmount() {
+        super.componentWillUnmount();
+        if ($.dialog === this.dialogName) {
+            closeDialog();
+        }
+    }
+
     render() {
         var self = this;
 

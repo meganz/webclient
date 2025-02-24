@@ -132,6 +132,8 @@ var nicknames = {
      */
     setNicknameDialog: {
 
+        dialogName: 'update-nickname-dialog',
+
         /** Cache of the jQuery selector for the dialog */
         $dialog: null,
 
@@ -411,23 +413,28 @@ var nicknames = {
         /**
          * Show the dialog
          */
-        showDialog: function() {
+        showDialog() {
 
             'use strict';
 
-            this.$dialog.removeClass('hidden');
-            fm_showoverlay();
+            M.safeShowDialog(this.dialogName, () => {
+                this.$dialog.removeClass('hidden');
+                fm_showoverlay();
+            });
         },
 
         /**
          * Close the dialog
          */
-        closeDialog: function() {
+        closeDialog() {
 
             'use strict';
 
             this.$dialog.addClass('hidden');
             fm_hideoverlay();
+            if ($.dialog === this.dialogName) {
+                closeDialog();
+            }
         }
     }
 };

@@ -378,7 +378,7 @@ async function fmremove(selectedNodes, skipDelWarning) {
             toastMessage = mega.icu.format(l[13762], itemscnt);
         }
 
-        msgDialog('clear-bin:' + l[83], l[1003], dlgMessage, l[1007], function(e) {
+        msgDialog('clear-bin:' + l[1730], l[1003], dlgMessage, l[1007], (e) => {
             if (e) {
                 var tmp = null;
                 if (String(M.currentdirid).substr(0, 7) === 'search/') {

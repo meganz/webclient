@@ -271,9 +271,7 @@ export class ContactButton extends ContactAwareComponent {
                             ? l.set_nickname_label /* `Set nickname` */
                             : l.edit_nickname_label /* `Edit nickname` */
                     }
-                    onClick={() => {
-                        nicknames.setNicknameDialog.init(contact.u);
-                    }}
+                    onClick={() => nicknames.setNicknameDialog.init(contact.u)}
                 />
             );
         }

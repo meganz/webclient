@@ -11,12 +11,14 @@ const LIMIT = {
 };
 
 export class HistoryRetentionDialog extends Component {
+    dialogName = 'msg-retention-dialog';
     inputRef = React.createRef();
 
     state = {
         selectedTimeFormat: RETENTION_FORMAT.HOURS,
         timeRange: undefined
-    }
+    };
+
     constructor(props) {
         super(props);
         const { chatRoom } = props;
@@ -33,7 +35,7 @@ export class HistoryRetentionDialog extends Component {
 
     hasInput() {
         return this.state.timeRange && parseInt(this.state.timeRange, 10) >= 1;
-    };
+    }
 
     getMaxTimeRange(selectedTimeFormat) {
         switch (selectedTimeFormat) {
@@ -93,7 +95,7 @@ export class HistoryRetentionDialog extends Component {
         if (e.keyCode !== 8 && isNaN(checkingValue)) {
             e.preventDefault();
         }
-    }
+    };
 
     handleOnTimeChange = e => {
         const timeValue = e.target.value;
@@ -149,19 +151,24 @@ export class HistoryRetentionDialog extends Component {
                 />
             );
         });
-    };
+    }
 
     componentDidMount() {
-        $(document.body).rebind('keydown.historyRetentionDialog', e => {
-            const key = e.keyCode || e.which;
-            if (key === 13) {
-                this.handleOnSubmit(e);
-            }
+        M.safeShowDialog(this.dialogName, () => {
+            $(document.body).rebind('keydown.historyRetentionDialog', e => {
+                const key = e.keyCode || e.which;
+                if (key === 13) {
+                    this.handleOnSubmit(e);
+                }
+            });
         });
     }
 
     componentWillUnmount() {
         $(document.body).off('keydown.historyRetentionDialog');
+        if ($.dialog === this.dialogName) {
+            closeDialog();
+        }
     }
 
     render() {
@@ -172,7 +179,7 @@ export class HistoryRetentionDialog extends Component {
                 {...this.state}
                 chatRoom={chatRoom}
                 onClose={onClose}
-                dialogName="msg-retention-dialog"
+                dialogName={this.dialogName}
                 dialogType="tool"
                 onClick={() => this.inputRef.current.focus()}>
 

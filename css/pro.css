@@ -2185,6 +2185,11 @@ body.mobile .redeem-promo-page .mega-input.title-ontop {
     position: absolute;
     right: 0.25rem;
 }
+.rtl.mobile .sen-pro-only {
+    position: absolute;
+    left: 0.25rem;
+    right: unset;
+}
 .payment-success-cloak {
     position: fixed;
     top: 0;

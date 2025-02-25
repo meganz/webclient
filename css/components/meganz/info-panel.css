@@ -342,6 +342,9 @@
 }
 
 /* Tags */
+.folder-file-info-panel .node-tags-section.expired .node-tags-input {
+    pointer-events: none;
+}
 .folder-file-info-panel .node-tags-section .node-tags-input {
     padding: 8px 4px 8px 16px;
 }
@@ -365,10 +368,10 @@
     color: var(--text-color-high);
 }
 .folder-file-info-panel .node-tags-section .node-tags-dropdown.top.active .dropdown-body {
-    max-height: 200px;    
+    max-height: 200px;
 }
 .folder-file-info-panel .node-tags-section .node-tags-dropdown.top.active .dropdown-body .suggestions {
-    max-height: 165px;    
+    max-height: 165px;
 }
 .folder-file-info-panel .node-tags-section .top .node-tags-tips,
 .folder-file-info-panel .node-tags-section .top .dropdown-content-add:last-child {
@@ -512,6 +515,6 @@
 /* End of Description & Tags */
 
 .pads {
-    height: 40px; 
+    height: 40px;
     width: 100%;
 }

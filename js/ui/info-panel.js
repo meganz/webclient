@@ -598,6 +598,7 @@ lazy(mega.ui, 'mInfoPanel', () => {
         if (M.getNodeRights(node.h) < 2 || M.currentrootid === M.RubbishID ||
             folderlink || M.getNodeRoot(node.h) === M.InboxID || node.ch ||
             M.getNodeRoot(node.h) === M.RubbishID) {
+
             $descInput.attr('disabled','disabled');
             $descInput.attr('placeholder', l.info_panel_description_empty);
             $descPermission.removeClass('hidden');
@@ -641,7 +642,7 @@ lazy(mega.ui, 'mInfoPanel', () => {
             return;
         }
 
-        $section.removeClass('hidden');
+        $section.removeClass('hidden expired').off('click.expired');
         $('.node-tag-chip', $nodeChips).remove();
         $dropDownBody.addClass('hidden');
         $nodeTagsDropdown.removeClass('hidden top bottom');
@@ -653,28 +654,41 @@ lazy(mega.ui, 'mInfoPanel', () => {
         $emptyTags.addClass('hidden');
         $clearInputTag.addClass('hidden');
 
-        // If the A/B test flag is not enabled (or localStorage test flag) then hide the whole UI for tags
-        if (!mega.flags.ab_cntag && !localStorage.tagsFeatureEnabled || isShares) {
+        // If is a share then hide the whole UI for tags
+        if (isShares) {
             $section.addClass('hidden');
             return;
         }
-        else if (u_attr && !u_attr.p) {
-            // Otherwise, the tags feature is enabled by flag, but if they are not a Pro/Business account we will
-            // disable functionality for adding/updating/removing of tags. We will still show existing tags though.
-            $tagsLbl.addClass('pro-only');
 
+        // Otherwise, if they are an expired Pro Flexi/Business account we will disable functionality
+        // for adding/updating/removing of tags. We will still show existing tags though.
+        else if (u_attr && (u_attr.pf && u_attr.pf.s === pro.ACCOUNT_STATUS_EXPIRED)
+            || (u_attr.b && u_attr.b.s === pro.ACCOUNT_STATUS_EXPIRED)) {
+
+            // Hide close icons on existing tags
             if (selectedNodesHaveTags(nodes)) {
-                $nodeTagsDropdown.addClass('hidden');
                 $tagCloseIcons.addClass('hidden');
             }
-            else {
-                // No existing tags, so hide completely
-                $nodeTagsDropdown.addClass('hidden');
-                $nodeChips.addClass('hidden');
-            }
-            // On PRO options click, go to the Pro page
-            $('.pro-only', $section).rebind('click.openpro', () => {
-                window.open(`${getBaseUrl()}/pro`, '_blank', 'noopener,noreferrer');
+
+            // Add an expired CSS class (with pointer-events: none, so click is passed to the event behind)
+            $section.addClass('expired');
+
+            // Disable current functionality
+            $inputTag.addClass('disabled').attr('disabled', 'disabled');
+
+            // On clicking the tags section, show the Pro Flexi/Business account expired dialog
+            $section.rebind('click.expired', () => {
+
+                // Make sure the files are loaded
+                M.require('businessAcc_js', 'businessAccUI_js').done(() => {
+
+                    const busUI = new BusinessAccountUI();
+                    const isMaster = u_attr.b && u_attr.b.m || u_attr.pf;
+
+                    return busUI.showExpiredDialog(isMaster);
+                });
+
+                return false;
             });
         }
 
@@ -849,7 +863,7 @@ lazy(mega.ui, 'mInfoPanel', () => {
                 return;
             }
 
-            if (tag && u_attr.p && !isShares) {
+            if (tag && !isShares) {
                 tag = tag.toLowerCase();
                 const validNodes = nodes.filter((n) => !isReadOnly(n) && (!n.tags || n.tags.length < 10));
                 $inputTag.addClass('disabled').attr('disabled', 'disabled');

@@ -388,15 +388,20 @@
             hideIfShown = hideIfShown && (!this.passwordField || this.passwordField.value === '') && !this.isLogout;
 
             if (this.canShowDialog) {
+                const selectors = [
+                    'textarea:focus',
+                    'input:focus, select:focus',
+                    '.dropdown-content:visible:first',
+                    '.dropdown-section:visible:first',
+                    '.mega-dialog:visible:first'
+                ];
+
                 // skip recheck in case:
                 // - there is no top-icon, i.e. we are on a custom page
                 // - there is a visible .dropdown
                 // - the user had a textarea, input or select field focused
                 // - there is a visible/active dialog
-                const skipShowingDialog = !this.showIcon()
-                    || $(
-                        'textarea:focus, input:focus, select:focus, .dropdown:visible:first, .mega-dialog:visible:first'
-                    ).length > 0;
+                const skipShowingDialog = !this.showIcon() || $(selectors.join(',')).length > 0;
 
                 if (
                     !skipShowingDialog &&

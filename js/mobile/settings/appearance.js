@@ -32,7 +32,7 @@ mobile.appearance = {
                     'checked': curVal === 2
                 }
             ];
-            this.themeGroup = new MegaMobileRadioGroup({
+            mobile.appearance.themeGroup = new MegaMobileRadioGroup({
                 name: 'theme',
                 radios: themes,
                 align: 'right',

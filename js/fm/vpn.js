@@ -93,7 +93,7 @@ class VpnCredsManager {
         let config = '[Interface]\n';
         config += `PrivateKey = ${btoa(ab_to_str(cred.keypair.secretKey))}\n`;
         config += `Address = ${cred.interfaceV4Address}/32, ${cred.interfaceV6Address}/128\n`;
-        config += 'DNS = 8.8.8.8, 2001:4860:4860::8888\n\n';
+        config += 'DNS = 10.0.0.1, fc00::\n\n';
         config += '[Peer]\n';
         config += `PublicKey = ${btoa(base64urldecode(cred.peerPublicKey))}\n`;
         config += 'AllowedIPs = 0.0.0.0/0, ::/0\n';

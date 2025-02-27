@@ -19627,7 +19627,7 @@ class ConversationsApp extends mixins.w9 {
       }
       const $target = $(e.target);
       if (megaChat.currentlyOpenedChat) {
-        if ($target.is(".messages-textarea,a,input,textarea,select,button") || $target.closest('.messages.scroll-area').length > 0 || $target.closest('.mega-dialog').length > 0 || this.hasOpenDialog() || document.querySelector('textarea:focus,select:focus,input:focus') || window.getSelection().toString()) {
+        if ($target.is(".messages-textarea,a,input,textarea,select,button") || $target.is('i') && $target.parent().is('a,input,select,button') || $target.closest('.messages.scroll-area').length > 0 || $target.closest('.mega-dialog').length > 0 || this.hasOpenDialog() || document.querySelector('textarea:focus,select:focus,input:focus') || window.getSelection().toString()) {
           return;
         }
         const $typeArea = $('.messages-textarea:visible:first');

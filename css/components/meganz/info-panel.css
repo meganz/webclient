@@ -34,13 +34,16 @@
 }
 .info-panel-visible .selection-status-bar,
 .info-panel-visible .fm-right-files-block.emptied .fm-empty-section,
-.info-panel-visible .media-viewer-container,
 .info-panel-visible .section.conversations,
 .info-panel-visible .in-chat .meetings-call,
 .info-panel-visible .in-chat .stream-controls,
 .info-panel-visible .in-chat .stream-head,
 .info-panel-visible #albums-view {
     width: calc(100% - var(--info-panel-space));
+}
+.info-panel-visible .media-viewer-container {
+    width: calc(100% - var(--info-panel-width));
+    min-width: calc(768px - var(--info-panel-width));
 }
 .info-panel-visible .fm-right-header .fm-header-buttons,
 .info-panel-visible .gallery-view,

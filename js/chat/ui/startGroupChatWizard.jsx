@@ -88,7 +88,9 @@ export class StartGroupChatWizard extends MegaRenderMixin {
 
     componentDidMount() {
         super.componentDidMount();
-        M.safeShowDialog(this.dialogName, nop);
+        if (!this.props.subDialog) {
+            M.safeShowDialog(this.dialogName, nop);
+        }
     }
 
     componentWillUnmount() {

@@ -607,7 +607,7 @@ mBroadcaster.once('boot_done', () => {
                     return;
                 }
 
-                if (event.target.classList.contains('icon-help-circle-thin-outline')) {
+                if (event && event.target.classList.contains('icon-help-circle-thin-outline')) {
                     mega.sensitives.showOnboardingDialog(l.ok_button);
                 }
                 else {

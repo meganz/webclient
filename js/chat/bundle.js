@@ -7133,9 +7133,7 @@ class ContactButton extends _mixins1__.u9 {
         key: "set-nickname",
         icon: "sprite-fm-mono icon-rename",
         label: contact.nickname === '' ? l.set_nickname_label : l.edit_nickname_label,
-        onClick: () => {
-          nicknames.setNicknameDialog.init(contact.u);
-        }
+        onClick: () => nicknames.setNicknameDialog.init(contact.u)
       }));
     }
     if (dropdownRemoveButton && dropdownRemoveButton.length) {
@@ -10464,6 +10462,7 @@ const LIMIT = {
 class HistoryRetentionDialog extends React_.Component {
   constructor(props) {
     super(props);
+    this.dialogName = 'msg-retention-dialog';
     this.inputRef = REaCt().createRef();
     this.state = {
       selectedTimeFormat: chat_chatRoom.RETENTION_FORMAT.HOURS,
@@ -10581,15 +10580,20 @@ class HistoryRetentionDialog extends React_.Component {
     });
   }
   componentDidMount() {
-    $(document.body).rebind('keydown.historyRetentionDialog', e => {
-      const key = e.keyCode || e.which;
-      if (key === 13) {
-        this.handleOnSubmit(e);
-      }
+    M.safeShowDialog(this.dialogName, () => {
+      $(document.body).rebind('keydown.historyRetentionDialog', e => {
+        const key = e.keyCode || e.which;
+        if (key === 13) {
+          this.handleOnSubmit(e);
+        }
+      });
     });
   }
   componentWillUnmount() {
     $(document.body).off('keydown.historyRetentionDialog');
+    if ($.dialog === this.dialogName) {
+      closeDialog();
+    }
   }
   render() {
     const {
@@ -10603,7 +10607,7 @@ class HistoryRetentionDialog extends React_.Component {
     return REaCt().createElement(modalDialogs.A.ModalDialog, (0,esm_extends.A)({}, this.state, {
       chatRoom,
       onClose,
-      dialogName: "msg-retention-dialog",
+      dialogName: this.dialogName,
       dialogType: "tool",
       onClick: () => this.inputRef.current.focus()
     }), REaCt().createElement("header", null, REaCt().createElement("h2", {
@@ -13056,9 +13060,9 @@ class ConversationRightArea extends mixins.w9 {
           }
         }, 1);
       }
-      return this.setState({
+      return M.safeShowDialog('contact-picker', () => this.setState({
         contactPickerDialog: true
-      });
+      }));
     }
     msgDialog(`confirmationa:!^${l[8726]}!${l[82]}`, null, `${l.no_contacts}`, `${l.no_contacts_text}`, resp => {
       if (resp) {
@@ -13248,9 +13252,9 @@ class ConversationRightArea extends mixins.w9 {
       icon: "sprite-fm-mono icon-add-small",
       label: l[8007],
       disabled: (0,call.P)() || room.isReadOnly() || !(room.iAmOperator() || room.type !== 'private' && room.options[MCO_FLAGS.OPEN_INVITE]),
-      onClick: () => Object.values(M.u.toJS()).some(u => u.c === 1) ? !allContactsInChat(exParticipants) ? this.setState({
+      onClick: () => Object.values(M.u.toJS()).some(u => u.c === 1) ? !allContactsInChat(exParticipants) ? M.safeShowDialog('contact-picker', () => this.setState({
         contactPickerDialog: true
-      }) : msgDialog(`confirmationa:!^${l[8726]}!${l[82]}`, null, `${l.all_contacts_added}`, `${l.all_contacts_added_to_chat}`, res => {
+      })) : msgDialog(`confirmationa:!^${l[8726]}!${l[82]}`, null, `${l.all_contacts_added}`, `${l.all_contacts_added_to_chat}`, res => {
         if (res) {
           contactAddDialog(null, false);
         }
@@ -13661,14 +13665,14 @@ const ConversationPanel = (conversationpanel_dec = utils.Ay.SoonFcWrap(360), _de
     return this.props.chatRoom.isCurrentlyActive;
   }
   openAttachCloudDialog() {
-    this.setState({
-      'attachCloudDialog': true
-    });
+    M.safeShowDialog('attach-cloud-dialog', () => this.setState({
+      attachCloudDialog: true
+    }));
   }
   openSendContactDialog() {
-    this.setState({
-      'sendContactDialog': true
-    });
+    M.safeShowDialog('send-contact-dialog', () => this.setState({
+      sendContactDialog: true
+    }));
   }
   openSchedDescDialog() {
     this.setState({
@@ -13746,9 +13750,7 @@ const ConversationPanel = (conversationpanel_dec = utils.Ay.SoonFcWrap(360), _de
       }
     });
     chatRoom.rebind('openSendFilesDialog.cpanel', () => {
-      this.setState({
-        attachCloudDialog: true
-      });
+      this.openAttachCloudDialog();
     });
     chatRoom.rebind('showGetChatLinkDialog.ui', () => {
       createTimeoutPromise(() => chatRoom.topic && chatRoom.state === ChatRoom.STATE.READY, 350, 15000).always(() => {
@@ -14211,7 +14213,7 @@ const ConversationPanel = (conversationpanel_dec = utils.Ay.SoonFcWrap(360), _de
         title: room.isMeeting ? l.meeting_archive_dlg : l[19068],
         subtitle: room.isMeeting ? l.meeting_archive_dlg_text : l[19069],
         icon: "sprite-fm-uni icon-question",
-        name: "archive-conversation",
+        name: "archive-conversation-dialog",
         pref: "4",
         onClose: () => {
           self.setState({
@@ -14233,7 +14235,7 @@ const ConversationPanel = (conversationpanel_dec = utils.Ay.SoonFcWrap(360), _de
         title: room.isMeeting ? l.meeting_unarchive_dlg : l[19063],
         subtitle: room.isMeeting ? l.meeting_unarchive_dlg_text : l[19064],
         icon: "sprite-fm-uni icon-question",
-        name: "unarchive-conversation",
+        name: "unarchive-conversation-dialog",
         pref: "5",
         onClose: () => {
           self.setState({
@@ -14531,14 +14533,14 @@ const ConversationPanel = (conversationpanel_dec = utils.Ay.SoonFcWrap(360), _de
         });
       },
       onArchiveClicked () {
-        self.setState({
-          'archiveDialog': true
-        });
+        M.safeShowDialog('archive-conversation-dialog', () => self.setState({
+          archiveDialog: true
+        }));
       },
       onUnarchiveClicked () {
-        self.setState({
-          'unarchiveDialog': true
-        });
+        M.safeShowDialog('unarchive-conversation-dialog', () => this.setState({
+          unarchiveDialog: true
+        }));
       },
       onRenameClicked () {
         self.setState({
@@ -14565,16 +14567,12 @@ const ConversationPanel = (conversationpanel_dec = utils.Ay.SoonFcWrap(360), _de
       onSwitchOffPublicMode (topic) {
         room.switchOffPublicMode(topic);
       },
-      onAttachFromCloudClicked () {
-        self.setState({
-          'attachCloudDialog': true
-        });
-      },
-      onPushSettingsClicked () {
-        self.setState({
-          'pushSettingsDialog': true
-        });
-      },
+      onAttachFromCloudClicked: () => M.safeShowDialog('start-group-chat', () => this.setState({
+        attachCloudDialog: true
+      })),
+      onPushSettingsClicked: () => M.safeShowDialog('push-settings-dialog', () => this.setState({
+        pushSettingsDialog: true
+      })),
       onPushSettingsToggled () {
         return room.dnd || room.dnd === 0 ? self.setState({
           pushSettingsValue: null
@@ -14600,13 +14598,9 @@ const ConversationPanel = (conversationpanel_dec = utils.Ay.SoonFcWrap(360), _de
           topic: ''
         }]);
       },
-      onShowScheduledDescription: () => {
-        if (room.scheduledMeeting) {
-          this.setState({
-            descriptionDialog: true
-          });
-        }
-      }
+      onShowScheduledDescription: () => room.scheduledMeeting ? M.safeShowDialog('scheduled-description-dialog', () => this.setState({
+        descriptionDialog: true
+      })) : null
     }) : null, privateChatDialog, nonLoggedInJoinChatDialog, attachCloudDialog, sendContactDialog, confirmDeleteDialog, historyRetentionDialog, null, pushSettingsDialog, descriptionDialog, this.state.chatLinkDialog && REaCt().createElement(ChatlinkDialog, {
       chatRoom: this.props.chatRoom,
       onClose: () => this.setState({
@@ -17499,6 +17493,7 @@ const React = REQ_(594);
 class StartGroupChatWizard extends mixins.w9 {
   constructor(props) {
     super(props);
+    this.dialogName = 'start-group-chat';
     this.domRef = React.createRef();
     this.inputContainerRef = React.createRef();
     this.inputRef = React.createRef();
@@ -17555,6 +17550,16 @@ class StartGroupChatWizard extends mixins.w9 {
     });
     this.props.onClose(this);
     eventlog(500236);
+  }
+  componentDidMount() {
+    super.componentDidMount();
+    M.safeShowDialog(this.dialogName, nop);
+  }
+  componentWillUnmount() {
+    super.componentWillUnmount();
+    if ($.dialog === this.dialogName) {
+      closeDialog();
+    }
   }
   render() {
     const self = this;
@@ -19453,52 +19458,73 @@ class FreeCallEnded extends REaCt().Component {
 
 
 
-const ContactSelectorDialog = ({
-  active,
-  selectFooter,
-  exclude,
-  allowEmpty,
-  multiple,
-  topButtons,
-  showAddContact,
-  className,
-  multipleSelectedButtonLabel,
-  singleSelectedButtonLabel,
-  nothingSelectedButtonLabel,
-  onClose,
-  onSelectDone
-}) => REaCt().createElement(modalDialogs.A.ModalDialog, {
-  className: `
-            popup
-            contacts-search
-            ${className}
-        `,
-  onClose
-}, REaCt().createElement(ui_contacts.ContactPickerWidget, {
-  active,
-  className: "popup contacts-search small-footer",
-  contacts: M.u,
-  selectFooter,
-  megaChat,
-  exclude,
-  allowEmpty,
-  multiple,
-  topButtons,
-  showAddContact,
-  multipleSelectedButtonLabel,
-  singleSelectedButtonLabel,
-  nothingSelectedButtonLabel,
-  onClose,
-  onAddContact: () => {
-    eventlog(500237);
-    onClose();
-  },
-  onSelected: () => {
-    eventlog(500238);
-    onClose();
-  },
-  onSelectDone
-}));
+
+class ContactSelectorDialog extends mixins.w9 {
+  constructor(...args) {
+    super(...args);
+    this.dialogName = 'contact-selector-dialog';
+  }
+  componentDidMount() {
+    super.componentDidMount();
+    M.safeShowDialog(this.dialogName, () => $(`.${this.dialogName}`));
+  }
+  componentWillUnmount() {
+    super.componentWillUnmount();
+    if ($.dialog === this.dialogName) {
+      closeDialog();
+    }
+  }
+  render() {
+    const {
+      active,
+      selectFooter,
+      exclude,
+      allowEmpty,
+      multiple,
+      topButtons,
+      showAddContact,
+      className,
+      multipleSelectedButtonLabel,
+      singleSelectedButtonLabel,
+      nothingSelectedButtonLabel,
+      onClose,
+      onSelectDone
+    } = this.props;
+    return REaCt().createElement(modalDialogs.A.ModalDialog, {
+      className: `
+                    popup
+                    contacts-search
+                    ${className}
+                    ${this.dialogName}
+                `,
+      onClose
+    }, REaCt().createElement(ui_contacts.ContactPickerWidget, {
+      active,
+      className: "popup contacts-search small-footer",
+      contacts: M.u,
+      selectFooter,
+      megaChat,
+      exclude,
+      allowEmpty,
+      multiple,
+      topButtons,
+      showAddContact,
+      multipleSelectedButtonLabel,
+      singleSelectedButtonLabel,
+      nothingSelectedButtonLabel,
+      onClose,
+      onAddContact: () => {
+        eventlog(500237);
+        onClose();
+      },
+      onSelected: () => {
+        eventlog(500238);
+        onClose();
+      },
+      onSelectDone
+    }));
+  }
+}
 window.ContactSelectorDialogUI = {
   ContactSelectorDialog
 };
@@ -19601,7 +19627,7 @@ class ConversationsApp extends mixins.w9 {
       }
       const $target = $(e.target);
       if (megaChat.currentlyOpenedChat) {
-        if ($target.is(".messages-textarea,a,input,textarea,select,button") || $target.closest('.messages.scroll-area').length > 0 || $target.closest('.mega-dialog').length > 0 || this.hasOpenDialog() || document.querySelector('textarea:focus,select:focus,input:focus') || window.getSelection().toString()) {
+        if ($target.is(".messages-textarea,a,input,textarea,select,button") || $target.is('i') && $target.parent().is('a,input,select,button') || $target.closest('.messages.scroll-area').length > 0 || $target.closest('.mega-dialog').length > 0 || this.hasOpenDialog() || document.querySelector('textarea:focus,select:focus,input:focus') || window.getSelection().toString()) {
           return;
         }
         const $typeArea = $('.messages-textarea:visible:first');
@@ -20771,8 +20797,7 @@ const HistoryPanel = (_dec = (0,mixins.hG)(450, true), _class = class HistoryPan
     this.domRef = REaCt().createRef();
     this.state = {
       editing: false,
-      toast: false,
-      pusherHeight: 0
+      toast: false
     };
     this.onKeyboardScroll = ({
       keyCode
@@ -21030,22 +21055,6 @@ const HistoryPanel = (_dec = (0,mixins.hG)(450, true), _class = class HistoryPan
         delay(`hp:reinit-scroll:${this.getUniqueId()}`, () => {
           if (this.messagesListScrollable) {
             this.messagesListScrollable.reinitialise(true, true);
-            if (this.state.pusherHeight || this.messagesListScrollable.getScrollHeight() === 0) {
-              if (room.messagesBuff.haveMoreHistory()) {
-                let _this$domRef3;
-                const innerHeight = $('.messages.content-area > div', (_this$domRef3 = this.domRef) == null ? void 0 : _this$domRef3.current).not('.hp-pusher').toArray().map(a => a.getBoundingClientRect().height).reduce((a, b) => a + b);
-                const pusherHeight = Math.max(this.messagesListScrollable.getClientHeight() - innerHeight + 50, 0);
-                if (Math.abs(this.state.pusherHeight - pusherHeight) > 50) {
-                  this.setState({
-                    pusherHeight
-                  });
-                }
-              } else {
-                this.setState({
-                  pusherHeight: 0
-                });
-              }
-            }
           }
         }, 30);
       }
@@ -21416,12 +21425,7 @@ const HistoryPanel = (_dec = (0,mixins.hG)(450, true), _class = class HistoryPan
         'top': '50%',
         'left': '50%'
       }
-    })), !!this.state.pusherHeight && REaCt().createElement("div", {
-      className: "hp-pusher",
-      style: {
-        height: this.state.pusherHeight
-      }
-    }), messagesList))), this.renderToast());
+    })), messagesList))), this.renderToast());
   }
 }, (0,applyDecoratedDescriptor.A)(_class.prototype, "enableScrollbar", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "enableScrollbar"), _class.prototype), _class);
 
@@ -22354,7 +22358,7 @@ class Guest extends REaCt().Component {
     }), REaCt().createElement("span", null, copy)), REaCt().createElement(meetings_button.A, {
       className: "mega-button positive register-button",
       onClick: () => loadSubPage('register')
-    }, l[968])));
+    }, l.sign_up_btn)));
   }
 }
 ;// ./js/chat/ui/meetings/sidebar.jsx
@@ -36340,66 +36344,64 @@ class SelectContactDialog extends mixins.w9 {
   constructor(props) {
     super(props);
     this.state = {
-      'selected': this.props.selected ? this.props.selected : []
+      selected: []
     };
+    this.state.selected = this.props.selected || [];
     this.onSelected = this.onSelected.bind(this);
   }
   onSelected(nodes) {
+    let _this$props$onSelecte, _this$props;
     this.setState({
-      'selected': nodes
+      selected: nodes
     });
-    if (this.props.onSelected) {
-      this.props.onSelected(nodes);
-    }
-  }
-  onSelectClicked() {
-    this.props.onSelectClicked();
+    (_this$props$onSelecte = (_this$props = this.props).onSelected) == null || _this$props$onSelecte.call(_this$props, nodes);
   }
   render() {
-    const self = this;
-    const classes = `send-contact contrast small-footer dialog-template-tool ${  self.props.className}`;
     return modalDialogs_React.createElement(ModalDialog, {
       title: l.share_contact_title,
-      className: classes,
-      selected: self.state.selected,
-      onClose: () => {
-        self.props.onClose(self);
-      },
+      className: `
+                    send-contact
+                    contrast
+                    small-footer
+                    dialog-template-tool
+                    ${this.props.className}
+                `,
+      selected: this.state.selected,
       buttons: [{
-        "label": self.props.cancelLabel,
-        "key": "cancel",
-        "onClick" (e) {
-          self.props.onClose(self);
-          e.preventDefault();
-          e.stopPropagation();
+        key: "cancel",
+        label: this.props.cancelLabel,
+        onClick: ev => {
+          this.props.onClose();
+          ev.preventDefault();
+          ev.stopPropagation();
         }
       }, {
-        "label": self.props.selectLabel,
-        "key": "select",
-        "className": self.state.selected.length === 0 ? "positive disabled" : "positive",
-        "onClick" (e) {
-          if (self.state.selected.length > 0) {
-            if (self.props.onSelected) {
-              self.props.onSelected(self.state.selected);
-            }
-            self.props.onSelectClicked(self.state.selected);
+        key: "select",
+        label: this.props.selectLabel,
+        className: this.state.selected.length === 0 ? 'positive disabled' : 'positive',
+        onClick: ev => {
+          if (this.state.selected.length > 0) {
+            let _this$props$onSelecte2, _this$props2;
+            (_this$props$onSelecte2 = (_this$props2 = this.props).onSelected) == null || _this$props$onSelecte2.call(_this$props2, this.state.selected);
+            this.props.onSelectClicked(this.state.selected);
           }
-          e.preventDefault();
-          e.stopPropagation();
+          ev.preventDefault();
+          ev.stopPropagation();
         }
-      }]
+      }],
+      onClose: this.props.onClose
     }, modalDialogs_React.createElement("section", {
       className: "content"
     }, modalDialogs_React.createElement("div", {
       className: "content-block"
     }, modalDialogs_React.createElement(ContactsUI.ContactPickerWidget, {
-      megaChat: self.props.megaChat,
-      exclude: self.props.exclude,
+      megaChat: this.props.megaChat,
+      exclude: this.props.exclude,
       selectableContacts: "true",
-      onSelectDone: self.props.onSelectClicked,
-      onSelected: self.onSelected,
-      onClose: self.props.onClose,
-      selected: self.state.selected,
+      onSelectDone: this.props.onSelectClicked,
+      onSelected: this.onSelected,
+      onClose: this.props.onClose,
+      selected: this.state.selected,
       contacts: M.u,
       headerClasses: "left-aligned",
       multiple: true
@@ -36408,9 +36410,9 @@ class SelectContactDialog extends mixins.w9 {
 }
 SelectContactDialog.clickTime = 0;
 SelectContactDialog.defaultProps = {
-  'selectLabel': l.share_contact_action,
-  'cancelLabel': l[82],
-  'hideable': true
+  selectLabel: l.share_contact_action,
+  cancelLabel: l[82],
+  hideable: true
 };
 class ConfirmDialog extends mixins.w9 {
   static saveState(o) {
@@ -36437,28 +36439,30 @@ class ConfirmDialog extends mixins.w9 {
   }
   componentDidMount() {
     super.componentDidMount();
-    queueMicrotask(() => {
-      if (!this.isMounted()) {
-        return;
-      }
-      if (this._autoConfirm) {
-        if (!this._wasAutoConfirmed) {
-          this._wasAutoConfirmed = 1;
-          queueMicrotask(() => {
-            this.onConfirmClicked();
-          });
+    M.safeShowDialog(this.props.name || 'confirm-dialog', () => {
+      queueMicrotask(() => {
+        if (!this.isMounted()) {
+          return;
         }
-        return;
-      }
-      $(document).rebind(this._keyUpEventName, e => {
-        if (e.which === 13 || e.keyCode === 13) {
-          if (!this.isMounted()) {
-            this.unbindEvents();
-            return;
+        if (this._autoConfirm) {
+          if (!this._wasAutoConfirmed) {
+            this._wasAutoConfirmed = 1;
+            queueMicrotask(() => {
+              this.onConfirmClicked();
+            });
           }
-          this.onConfirmClicked();
-          return false;
+          return;
         }
+        $(document).rebind(this._keyUpEventName, e => {
+          if (e.which === 13 || e.keyCode === 13) {
+            if (!this.isMounted()) {
+              this.unbindEvents();
+              return;
+            }
+            this.onConfirmClicked();
+            return false;
+          }
+        });
       });
     });
   }

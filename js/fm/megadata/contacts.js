@@ -209,6 +209,7 @@ MegaData.prototype.syncUsersFullname = async function(userId, chatHandle) {
     // only clear old avatar if the old one was a text one and was different then the new names
     if (user.avatar && user.avatar.type !== "image" && name !== user.name) {
         user.avatar = false;
+        useravatar.generateContactAvatarMeta(userId);
         useravatar.loaded(userId);
     }
 

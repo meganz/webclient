@@ -13,11 +13,12 @@
     }
     .media-viewer .bar {
         display: flex;
-        flex: 0 0 200px;
+        flex: 0 0 48px;
         justify-content: flex-start;
         list-style: none;
         margin: 0;
         padding: 8px 0;
+        flex-grow: 1;
     }
     .media-viewer .bar:last-child,
     .media-viewer .bar.control {

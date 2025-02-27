@@ -1,6 +1,6 @@
 var React = require("react");
-import utils  from "./utils.jsx";
-import {MegaRenderMixin} from "../chat/mixins";
+import utils from "./utils.jsx";
+import { MegaRenderMixin } from "../chat/mixins";
 import Forms from "./forms.jsx";
 
 var ContactsUI = require('./../chat/ui/contacts.jsx');
@@ -22,7 +22,7 @@ class ModalDialog extends MegaRenderMixin {
         'selectedNum': 0
     };
 
-    constructor (props) {
+    constructor(props) {
         super(props);
         this.onBlur = this.onBlur.bind(this);
         this.onCloseClicked = this.onCloseClicked.bind(this);
@@ -67,6 +67,7 @@ class ModalDialog extends MegaRenderMixin {
             }
         });
     }
+
     onBlur(e) {
         var $element = $(this.domRef?.current);
 
@@ -80,6 +81,7 @@ class ModalDialog extends MegaRenderMixin {
             this.onCloseClicked();
         }
     }
+
     componentWillUnmount() {
         super.componentWillUnmount();
         if (!this.props.noCloseOnClickOutside) {
@@ -96,6 +98,7 @@ class ModalDialog extends MegaRenderMixin {
         $(this.domNode).off('dialog-closed.modalDialog' + this.getUniqueId());
         $(document).off('keyup.modalDialog' + this.getUniqueId());
     }
+
     onCloseClicked() {
         var self = this;
 
@@ -103,6 +106,7 @@ class ModalDialog extends MegaRenderMixin {
             self.props.onClose(self);
         }
     }
+
     onPopupDidMount(elem) {
         this.domNode = elem;
 
@@ -113,6 +117,7 @@ class ModalDialog extends MegaRenderMixin {
             this.props.popupDidMount(elem);
         }
     }
+
     render() {
         var self = this;
 
@@ -125,7 +130,7 @@ class ModalDialog extends MegaRenderMixin {
         var otherElements = [];
 
         var x = 0;
-        React.Children.forEach(self.props.children, function (child) {
+        React.Children.forEach(self.props.children, function(child) {
             if (!child) {
                 // skip if undefined
                 return;
@@ -185,13 +190,13 @@ class ModalDialog extends MegaRenderMixin {
                             }} key={v.key + i}>
                             {v.iconBefore ?
                                 <div>
-                                    <i className={v.iconBefore} />
+                                    <i className={v.iconBefore}/>
                                 </div> : null
                             }
                             <span>{v.label}</span>
                             {v.iconAfter ?
                                 <div>
-                                    <i className={v.iconAfter} />
+                                    <i className={v.iconAfter}/>
                                 </div> : null
                             }
                         </button>
@@ -236,7 +241,7 @@ class ModalDialog extends MegaRenderMixin {
                                 <header>
                                     {
                                         self.props.icon ?
-                                            <i className={`graphic ${self.props.icon}`} />
+                                            <i className={`graphic ${self.props.icon}`}/>
                                             : self.props.iconElement
                                     }
                                     <div>
@@ -251,7 +256,7 @@ class ModalDialog extends MegaRenderMixin {
                                 <header>
                                     {
                                         self.props.icon ?
-                                            <i className={`graphic ${self.props.icon}`} />
+                                            <i className={`graphic ${self.props.icon}`}/>
                                             : self.props.iconElement
                                     }
                                     <h2 id={self.props.dialogName ? self.props.dialogName + "-title" : null}>
@@ -274,81 +279,76 @@ class ModalDialog extends MegaRenderMixin {
 }
 
 
-
 class SelectContactDialog extends MegaRenderMixin {
     static clickTime = 0;
     static defaultProps = {
-        'selectLabel': l.share_contact_action, /* `Share` */
-        'cancelLabel': l[82],
-        'hideable': true
+        selectLabel: l.share_contact_action, /* `Share` */
+        cancelLabel: l[82],
+        hideable: true
     };
 
-    constructor (props) {
-        super(props);
-        this.state = {
-            'selected': this.props.selected ? this.props.selected : []
-        };
+    state = {
+        selected: []
+    };
 
+    constructor(props) {
+        super(props);
+        this.state.selected = this.props.selected || [];
         this.onSelected = this.onSelected.bind(this);
     }
+
     onSelected(nodes) {
-        this.setState({'selected': nodes});
-        if (this.props.onSelected) {
-            this.props.onSelected(nodes);
-        }
+        this.setState({ selected: nodes });
+        this.props.onSelected?.(nodes);
     }
-    onSelectClicked() {
-        this.props.onSelectClicked();
-    }
+
     render() {
-        var self = this;
-
-        var classes = "send-contact contrast small-footer dialog-template-tool " + self.props.className;
-
         return (
             <ModalDialog
                 title={l.share_contact_title /* `Share contact` */}
-                className={classes}
-                selected={self.state.selected}
-                onClose={() => {
-                    self.props.onClose(self);
-                }}
+                className={`
+                    send-contact
+                    contrast
+                    small-footer
+                    dialog-template-tool
+                    ${this.props.className}
+                `}
+                selected={this.state.selected}
                 buttons={[
                     {
-                        "label": self.props.cancelLabel,
-                        "key": "cancel",
-                        "onClick": function(e) {
-                            self.props.onClose(self);
-                            e.preventDefault();
-                            e.stopPropagation();
+                        key: "cancel",
+                        label: this.props.cancelLabel,
+                        onClick: ev => {
+                            this.props.onClose();
+                            ev.preventDefault();
+                            ev.stopPropagation();
                         }
                     },
                     {
-                        "label": self.props.selectLabel,
-                        "key": "select",
-                        "className": self.state.selected.length === 0 ? "positive disabled" : "positive",
-                        "onClick": function(e) {
-                            if (self.state.selected.length > 0) {
-                                if (self.props.onSelected) {
-                                    self.props.onSelected(self.state.selected);
-                                }
-                                self.props.onSelectClicked(self.state.selected);
+                        key: "select",
+                        label: this.props.selectLabel,
+                        className: this.state.selected.length === 0 ? 'positive disabled' : 'positive',
+                        onClick: ev => {
+                            if (this.state.selected.length > 0) {
+                                this.props.onSelected?.(this.state.selected);
+                                this.props.onSelectClicked(this.state.selected);
                             }
-                            e.preventDefault();
-                            e.stopPropagation();
+                            ev.preventDefault();
+                            ev.stopPropagation();
                         }
                     },
-                ]}>
+                ]}
+                onClose={this.props.onClose}>
                 <section className="content">
                     <div className="content-block">
                         <ContactsUI.ContactPickerWidget
-                            megaChat={self.props.megaChat}
-                            exclude={self.props.exclude}
+                            megaChat={this.props.megaChat}
+                            exclude={this.props.exclude}
                             selectableContacts="true"
-                            onSelectDone={self.props.onSelectClicked}
-                            onSelected={self.onSelected}
-                            onClose={self.props.onClose}
-                            selected={self.state.selected}
+                            onSelectDone={this.props.onSelectClicked}
+                            onSelected={this.onSelected}
+                            onClose={this.props.onClose}
+                            selected={this.state.selected}
                             contacts={M.u}
                             headerClasses="left-aligned"
                             multiple={true}
@@ -389,48 +389,54 @@ class ConfirmDialog extends MegaRenderMixin {
             && this.props.dontShowAgainCheckbox
             && ConfirmDialog.autoConfirm(this));
     }
+
     unbindEvents() {
         $(document).off(this._keyUpEventName);
     }
+
     componentDidMount() {
         super.componentDidMount();
 
-        // since ModalDialogs can be opened in other keyup (on enter) event handlers THIS is required to be delayed a
-        // bit...otherwise the dialog would open up and get immediately confirmed
-        queueMicrotask(() => {
-            if (!this.isMounted()) {
-                // can be automatically hidden/unmounted, so this would bind the event AFTER the unbind in
-                // componentWillUnmount executed.
-                return;
-            }
-
-            if (this._autoConfirm) {
-                if (!this._wasAutoConfirmed) {
-                    this._wasAutoConfirmed = 1;
-
-                    // this would most likely cause a .setState, so it should be done in a separate cycle/call stack.
-                    queueMicrotask(() => {
-                        this.onConfirmClicked();
-                    });
+        M.safeShowDialog(this.props.name || 'confirm-dialog', () => {
+            // since ModalDialogs can be opened in other keyup (on enter) event handlers THIS is required to be
+            // delayed a bit...otherwise the dialog would open up and get immediately confirmed
+            queueMicrotask(() => {
+                if (!this.isMounted()) {
+                    // can be automatically hidden/unmounted, so this would bind the event AFTER the unbind in
+                    // componentWillUnmount executed.
+                    return;
                 }
 
-                return;
-            }
+                if (this._autoConfirm) {
+                    if (!this._wasAutoConfirmed) {
+                        this._wasAutoConfirmed = 1;
 
-            $(document).rebind(this._keyUpEventName, (e) => {
-                if (e.which === 13 || e.keyCode === 13) {
-                    if (!this.isMounted()) {
-                        // we need to be 10000% sure that the dialog is still shown, otherwise, we may trigger some
-                        // unwanted action.
-                        this.unbindEvents();
-                        return;
+                        // this would most likely cause a .setState, so it should be done in a
+                        // separate cycle/call stack.
+                        queueMicrotask(() => {
+                            this.onConfirmClicked();
+                        });
                     }
-                    this.onConfirmClicked();
-                    return false;
+
+                    return;
                 }
+
+                $(document).rebind(this._keyUpEventName, (e) => {
+                    if (e.which === 13 || e.keyCode === 13) {
+                        if (!this.isMounted()) {
+                            // we need to be 10000% sure that the dialog is still shown, otherwise, we may trigger some
+                            // unwanted action.
+                            this.unbindEvents();
+                            return;
+                        }
+                        this.onConfirmClicked();
+                        return false;
+                    }
+                });
             });
         });
     }
+
     componentWillUnmount() {
         super.componentWillUnmount();
         var self = this;
@@ -473,6 +479,7 @@ class ConfirmDialog extends MegaRenderMixin {
                 </Forms.Checkbox>
             </div>;
         }
+
         return (
             <ModalDialog
                 title={this.props.title}
@@ -506,11 +513,11 @@ class ConfirmDialog extends MegaRenderMixin {
                             e.stopPropagation();
                         }
                     },
-            ]}>
+                ]}>
 
                 {self.props.children}
 
-                { dontShowCheckbox ?
+                {dontShowCheckbox ?
                     <ExtraFooterElement>
                         {dontShowCheckbox}
                     </ExtraFooterElement>

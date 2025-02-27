@@ -1542,7 +1542,7 @@ lazy(mega, 'backupCenter', () => {
                             break;
                         default:
                             icon = 'icon-folder-sync-24 folder-sync';
-                            type = l[17621];
+                            type = l.footer_item_sync;
                     }
                 }
 

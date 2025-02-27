@@ -11,7 +11,7 @@ import Call, { inProgressAlert } from './meetings/call.jsx';
 import ChatToaster from './chatToaster.jsx';
 import LeftPanel from './leftPanel/leftPanel.jsx';
 import { FreeCallEnded as FreeCallEndedDialog } from './meetings/workflow/freeCallEnded.jsx';
-import ContactSelectorDialog from "./contactSelectorDialog";
+import ContactSelectorDialog from './contactSelectorDialog.jsx';
 
 export const VIEWS = {
     CHATS: 0x00,
@@ -134,6 +134,7 @@ class ConversationsApp extends MegaRenderMixin {
                 // is visible/active at the moment
                 if (
                     $target.is(".messages-textarea,a,input,textarea,select,button") ||
+                    $target.is('i') && $target.parent().is('a,input,select,button') ||
                     $target.closest('.messages.scroll-area').length > 0 ||
                     $target.closest('.mega-dialog').length > 0 ||
                     this.hasOpenDialog() ||
@@ -280,10 +281,8 @@ class ConversationsApp extends MegaRenderMixin {
                                 key: 'newGroupChat',
                                 title: l[19483] /* `New group chat` */,
                                 icon: 'sprite-fm-mono icon-chat-filled',
-                                onClick: () => this.setState({
-                                    startGroupChatDialog: true,
-                                    contactSelectorDialog: false
-                                })
+                                onClick: () =>
+                                    this.setState({ startGroupChatDialog: true, contactSelectorDialog: false })
                             }
                         ]}
                         showAddContact={ContactsPanel.hasContacts()}

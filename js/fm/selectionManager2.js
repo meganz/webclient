@@ -21,6 +21,7 @@ class SelectionManager2Base {
          */
         this.selected_list = [];
         this.removing_list = [];
+        this.removing_sizes = Object.create(null);
 
         this.selected_totalSize = 0;
 
@@ -236,6 +237,7 @@ class SelectionManager2Base {
             }
 
             this.removing_list.push(nodeId);
+            this.removing_sizes[nodeId] = M.d[nodeId].t ? M.d[nodeId].tb : M.d[nodeId].s;
         }
         else if (this.debugMode) {
             console.error("can't remove:", nodeId, JSON.stringify(this.selected_list), JSON.stringify($.selected));
@@ -813,13 +815,19 @@ class SelectionManager2_DOM extends SelectionManager2Base {
 
             if (this.selected_list.length !== 0 && this.removing_list.length > 1) {
 
-                const cb = (pv, c) => pv + (M.d[c] ? M.d[c].tb === undefined ? M.d[c].s : M.d[c].tb : 0);
+                const cb = (pv, c) => pv + (M.d[c] ?
+                    M.d[c].tb === undefined ? M.d[c].s : M.d[c].tb :
+                    this.removing_sizes[c] || 0);
                 const removingSize = this.removing_list.reduce(cb, 0);
                 nid = this.selected_totalSize - removingSize;
             }
 
+            if (typeof nid !== 'number' && !M.d[nid]) {
+                nid = this.selected_totalSize - (this.removing_sizes[nid] || 0);
+            }
             this.selectionNotification(nid, false, scrollTo);
             this.removing_list = [];
+            this.removing_sizes = Object.create(null);
         }, 50);
     }
 

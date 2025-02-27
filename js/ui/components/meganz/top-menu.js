@@ -171,10 +171,10 @@ class MegaTopMenu extends MegaMobileTopMenu {
             loggedInCD.splice(3, 0, {
                 text: l.device_centre,
                 icon: 'sprite-fm-mono icon-devices-thin-outline',
-                href: '/fm/devices',
-                name: 'devices',
-                typeClassname: 'drive',
-                eventLog: 500448
+                href: '/fm/device-centre',
+                treeWrapClass: 'js-device-centre-tree-panel',
+                name: 'device-centre',
+                typeClassname: 'drive'
             });
 
             loggedInCD.splice(5, 0, {
@@ -244,8 +244,10 @@ class MegaTopMenu extends MegaMobileTopMenu {
             else if (M.currentdirid === M.RootID) {
                 selected = items['cloud-drive'];
             }
-            else if (M.currentdirid === 'devices' || M.currentrootid === M.InboxID) {
-                selected = items.devices;
+            else if (M.onDeviceCenter
+                || M.currentrootid === M.InboxID
+            ) {
+                selected = items['device-centre'];
             }
             else if (['shares', 'out-shares', 'public-links', 'file-requests'].includes(M.currentrootid)) {
                 selected = items.shares;

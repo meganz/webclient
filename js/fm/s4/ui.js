@@ -486,7 +486,7 @@ lazy(s4, 'ui', () => {
                 if (M.v.length === 0 && M.currentLabelFilter) {
                     $('.fm-empty-filter', '.fm-right-files-block').removeClass('hidden');
                 }
-                else if (M.v.length === 0 && (!mega.ui.mNodeFilter || !mega.ui.mNodeFilter.selectedFilters)) {
+                else if (M.v.length === 0 && (!mega.ui.mNodeFilter || !mega.ui.mNodeFilter.selectedFilters.value)) {
                     $(`.fm-empty-s4-${subType}`, '.fm-right-files-block').removeClass('hidden');
                     this.$contentBlocks.addClass('hidden');
                 }

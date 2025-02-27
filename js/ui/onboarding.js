@@ -27,13 +27,18 @@ window.OBV4_FLAGS = {
     CHAT_CALL_RAISE: 'obmcrai',
     UNUSED_13: 'unused13',
     UNUSED_14: 'unused14',
-    UNUSED_15: 'unused15'
+    UNUSED_15: 'unused15',
+    CLOUD_DRIVE_DC: 'obcddc',
+    CLOUD_DRIVE_DC_BUBBLE: 'obcddcb'
     // New onboarding flags to be added at the end of this object. Don't change the order!!!!
     // UNUSED_X flags can be repurposed.
 };
 
 mBroadcaster.addListener('fm:initialized', () => {
     'use strict';
+
+    // TODO Set the right DC release date timestamp
+    const DEVICE_CENTRE_RELEASE_DATE = 1734519600;
 
     // If user is visiting folderlink, or not complete registration do not show Onboarding V4.
     if (folderlink || u_type < 3) {
@@ -204,8 +209,21 @@ mBroadcaster.addListener('fm:initialized', () => {
             upgraded = true;
         }
 
+        // users registered before DC release
+        // having "Get started" onboarding not completed
+        // and DC tooltip not completed
+        // will never see DC tooltip
+        const disableDeviceCentre = u_attr.since < DEVICE_CENTRE_RELEASE_DATE &&
+            !flagMap.getSync(OBV4_FLAGS.CLOUD_DRIVE) &&
+            !flagMap.getSync(OBV4_FLAGS.CLOUD_DRIVE_DC);
+
+        if (disableDeviceCentre) {
+            flagMap.setSync(OBV4_FLAGS.CLOUD_DRIVE_DC, 1);
+            flagMap.setSync(OBV4_FLAGS.CLOUD_DRIVE_DC_BUBBLE, 1);
+        }
+
         // Future upgrades may be added here
-        if (upgraded) {
+        if (upgraded || disableDeviceCentre) {
             flagMap.safeCommit();
         }
     };
@@ -320,6 +338,60 @@ mBroadcaster.addListener('fm:initialized', () => {
         }
     };
 
+    const _obv4DeviceCentre = () => {
+        if (mega.ui.onboarding) {
+            if (u_attr.since < DEVICE_CENTRE_RELEASE_DATE) {
+                // users must be registered before DC release to see DC tooltip
+
+                const _obMap = obMap || {};
+                _obMap['cloud-drive'] = {
+                    title: l.mega_device_centre,
+                    flag: OBV4_FLAGS.CLOUD_DRIVE_DC,
+                    noCP: true,
+                    steps: [
+                        {
+                            name: l.mega_device_centre,
+                            flag: OBV4_FLAGS.CLOUD_DRIVE_DC_BUBBLE,
+                            get prerequisiteCondition() {
+                                return $.MPNotOpened === undefined;
+                            },
+                            actions: [
+                                {
+                                    type: 'showDialog',
+                                    dialogClass: 'mcob dc',
+                                    dialogTitle: l.dc_promo_onboarding_title,
+                                    dialogDesc: l.dc_promo_onboarding_content,
+                                    dialogNext: l.ok_button,
+                                    skipHidden: true,
+                                    targetElmClass: '.js-myfiles-panel .device-centre span',
+                                    targetElmPosition: 'left',
+                                    targetElmPosTuning: {
+                                        top: 5,
+                                        left: 15,
+                                    },
+                                    markComplete: true,
+                                }
+                            ]
+                        }
+                    ],
+                };
+                mega.ui.onboarding.map = _obMap;
+            }
+            mBroadcaster.addListener('pagechange', () => {
+                // Hide the control panel while the page change is finishing up.
+                $('.onboarding-control-panel', '.fm-right-files-block').addClass('hidden');
+                onIdle(mega.ui.onboarding.start.bind(mega.ui.onboarding));
+            });
+            mega.ui.onboarding.start();
+
+            // Device centre onboarding requires kickstarting manually as it does not have control panel
+            const {currentSection} = mega.ui.onboarding;
+            if (currentSection.map.flag === OBV4_FLAGS.CLOUD_DRIVE_DC && M.currentrootid === M.RootID) {
+                currentSection.startNextOpenSteps();
+            }
+        }
+    };
+
     flagMap.isReady().then((res) => {
         if (res) {
             // ENOENT so migrate any old flags to this attribute
@@ -338,6 +410,9 @@ mBroadcaster.addListener('fm:initialized', () => {
         if (u_attr.since < 1738279000 && (flagMap.getSync(OBV4_FLAGS.CLOUD_DRIVE) || u_attr.since < 1631664000) ||
             localStorage.obv4testnn) {
             _obv4NewNav();
+        }
+        else if (!flagMap.getSync(OBV4_FLAGS.CLOUD_DRIVE_DC)) {
+            _obv4DeviceCentre();
         }
 
         const isOverridden = obMap && obMap['cloud-drive'].flag === OBV4_FLAGS.CLOUD_DRIVE_NEW_NAV;
@@ -909,6 +984,14 @@ mBroadcaster.addListener('fm:initialized', () => {
                         else if (info.vertical === 'bottom' && obj.top < info.target.top) {
                             arrowAt = 'bottom';
                         }
+                    }
+
+                    const {top, left} = this.map.targetElmPosTuning || {};
+                    if (top) {
+                        obj.top += top;
+                    }
+                    if (left) {
+                        obj.left += left;
                     }
 
                     this.$dialog.css(obj);

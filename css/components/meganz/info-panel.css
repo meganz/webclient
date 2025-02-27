@@ -4,7 +4,7 @@
  * File manager layout changes if class folder-file-info-panel is added to the body tag.
  * NB: Based on a fixed panel width of 320px.
  */
-:root {
+ :root {
     --info-panel-width: 320px;
     --info-panel-space: var(--info-panel-width);
 }
@@ -18,6 +18,7 @@
     right: 0;
 }
 .info-panel-visible .files-grid-view .grid-scrolling-table,
+.info-panel-visible .device-centre-grid-view .grid-scrolling-table,
 .info-panel-visible .out-shared-grid-view .grid-scrolling-table,
 .info-panel-visible .fm-blocks-view,
 .info-panel-visible .out-shared-blocks-view,
@@ -29,6 +30,7 @@
     max-width: calc(100% - var(--info-panel-space));
 }
 .info-panel-visible .files-grid-view .grid-scrolling-table.ps,
+.info-panel-visible .device-centre-grid-view .grid-scrolling-table.ps,
 .info-panel-visible .out-shared-grid-view .grid-scrolling-table.ps {
     min-width: initial;
 }
@@ -87,7 +89,6 @@
 .info-panel-visible .folder-file-info-panel.meetings-visible {
     top: 0;
 }
-.info-panel-visible .backup-center.content-block,
 .info-panel-visible section.fm-recents,
 .info-panel-visible .s4-info-header-blocks {
     margin-right: var(--info-panel-space);

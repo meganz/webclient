@@ -612,9 +612,15 @@ function fmtopUI() {
     if ($fmShareButton.length) {
         // Show share button unless for root id, out shares, s4, etc
         const pages = ['s4', 'out-shares', 'shares', 'file-requests', 'faves', M.RubbishID];
-        const dirPages = [M.BackupsId, M.RootID, M.currentrootid];
-        const showButton = !pages.includes(M.currentrootid) && !dirPages.includes(M.currentdirid)
-            && M.currentrootid !== (M.BackupsId && M.getNodeByHandle(M.BackupsId).p);
+        const dirPages = [M.RootID, M.currentrootid];
+        const hideButtonInDC = M.onDeviceCenter && (
+            M.currentCustomView.nodeID === M.RootID
+            || sharer(M.currentCustomView.nodeID)
+            || mega.devices.ui.isBackupRelated(M.currentCustomView.nodeID)
+        );
+        const showButton = !pages.includes(M.currentrootid)
+                            && !dirPages.includes(M.currentdirid)
+                            && !hideButtonInDC;
 
         if (showButton) {
             const h = String(M.currentdirid).split('/').pop();
@@ -639,7 +645,10 @@ function fmtopUI() {
      */
     const initRewindHeaderButton = (cur = 0, max = 3) => {
         if (mega.rewind) {
-            if (M.getSelectedSourceRoot() === M.RootID && M.currentrootid === M.RootID) {
+            if (
+                M.getSelectedSourceRoot() === M.RootID && M.currentrootid === M.RootID
+                && !M.onDeviceCenter
+            ) {
                 mega.rewind.bindHeaderButton();
             }
             else {
@@ -666,6 +675,7 @@ function fmtopUI() {
     $('.fm-clearbin-button,.fm-add-user,.fm-new-folder,.fm-file-upload,.fm-folder-upload,.fm-uploads')
         .add('.fm-new-shared-folder,.fm-new-link,.fm-rewind')
         .add('.fm-new-file-request')
+        .add('.fm-add-syncs, .fm-add-backup')
         .addClass('hidden');
     $('.fm-new-folder').removeClass('filled-input');
     $('.fm-right-files-block').removeClass('visible-notification rubbish-bin');
@@ -825,6 +835,17 @@ function fmtopUI() {
                     $('.fm-s4-new-group').removeClass('hidden');
                 }
             }
+        }
+        else if (M.onDeviceCenter) {
+            if (mega.devices.ui.isCustomRender()) {
+                $('.fm-files-view-icon', document).addClass('hidden');
+            }
+            else if (!mega.devices.ui.isBackupRelated([M.currentdirid.split('/').pop()])) {
+                showUploadBlock();
+            }
+
+            $('.fm-right-files-block', document).addClass('visible-notification');
+            mega.devices.ui.handleAddBtnVisibility();
         }
         else if (String(M.currentdirid).length === 8
             && M.getNodeRights(M.currentdirid) > 0) {
@@ -1183,7 +1204,7 @@ function FMShortcuts() {
 
             var remItems = selectionManager.get_selected();
             if (remItems.length === 0 || (M.getNodeRights(M.currentdirid || '') | 0) < 2 ||
-                M.currentrootid === M.InboxID || M.currentdirid === 'devices') {
+                M.currentrootid === M.InboxID) {
                 return; // dont do anything.
             }
 
@@ -1376,7 +1397,6 @@ function renameDialog() {
                             errMsg = l[23219];
                         }
                         else if (!s4Folder || !(errMsg = s4.ui.getInvalidNodeNameError(n, value))) {
-
                             M.rename(n.h, value).catch(tell);
                         }
                     }
@@ -1710,7 +1730,9 @@ function msgDialog(type, title, msg, submsg, callback, checkboxSetting) {
                 || checkboxSetting === 'skipcdtos4'
                 || checkboxSetting === 'skips4tocd'
                 || checkboxSetting === 'skips4tos4'
-                || checkboxSetting === 'rwReinstate', checkboxSetting);
+                || checkboxSetting === 'rwReinstate'
+                || checkboxSetting === 'dcPause', checkboxSetting);
+
 
             $('#msgDialog .checkbox-block .checkdiv,' +
                 '#msgDialog .checkbox-block input')
@@ -3185,8 +3207,11 @@ function createFolderDialog(close) {
                     return awaitingPromise;
                 }
 
+                const {type, original} = M.currentCustomView;
+                const id = type === mega.devices.rootId ? original : Object(M.d[h]).p || target;
+
                 // By default, auto-select the newly created folder as long no awaiting promise
-                return M.openFolder(Object(M.d[h]).p || target)
+                return M.openFolder(id)
                     .always(() => {
                         $.selected = [h];
                         reselect(1);
@@ -3602,6 +3627,9 @@ function fm_resize_handler(force) {
         else {
             initPerfectScrollbar($('.grid-scrolling-table', '.out-shared-grid-view'));
         }
+    }
+    else if (M.onDeviceCenter && !M.viewmode && mega.devices.ui.isCustomRender()) {
+        initPerfectScrollbar($('.grid-scrolling-table', mega.devices.ui.gridWrapperSelector));
     }
     else if (M.currentdirid === 'transfers') {
         fm_tfsupdate(); // this will call $.transferHeader();

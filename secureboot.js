@@ -686,6 +686,7 @@ var mega = {
     state: 0,
     utils: {},
     slideshow: {settings: {}},
+    devices: {rootId: 'device-centre', sections: {}, uiElems: {}},
     uaoref: window.uaoref,
     updateURL: defaultStaticPath + 'current_ver.txt',
     chrome: (
@@ -2364,10 +2365,20 @@ else if (!browserUpdate) {
         jsl.push({f:'js/ui/keySignatureWarningDialog.js', n: 'mega_js', j:1,w:7});
         jsl.push({f:'js/ui/feedbackDialog.js', n: 'feedbackdialogui_js', j:1,w:1});
         jsl.push({f:'js/ui/forcedUpgradeProDialog.js', n: 'forcedupgradeprodialog_js', j:1,w:1});
+        jsl.push({f:'js/ui/dcAppPromoDialog.js', n: 'dcAppPromoDialog_js', j:1,w:1});
         jsl.push({f:'js/ui/alarm.js', n: 'alarm_js', j:1,w:1});
         jsl.push({f:'js/ui/toast.js', n: 'toast_js', j:1,w:1});
         jsl.push({f:'js/ui/top-tooltip-login.js', n: 'top-tooltip-login', j:1});
         jsl.push({f:'js/fm/transfer-progress-widget.js', n: 'tpw_js', j:1});
+
+        // minimal device centre resources
+        jsl.push({f:'js/fm/devices/models.js', n: 'devices_models_js', j: 1, w: 1});
+        jsl.push({f:'js/fm/devices/data.js', n: 'devices_data_js', j: 1, w: 1});
+        jsl.push({f:'js/fm/devices/ui-elems/header.js', n: 'devices_ui_elems_header_js', j: 1, w: 1});
+        jsl.push({f:'js/fm/devices/ui-elems/shimmer.js', n: 'devices_ui_elems_shimmer_js', j: 1, w: 1});
+        jsl.push({f:'js/fm/devices/ui-elems/notification.js', n: 'devices_ui_elems_notification_js', j: 1, w: 1});
+        jsl.push({f:'js/fm/devices/ui.js', n: 'devices_ui_js', j: 1, w: 1});
+        jsl.push({f:'css/device-centre.css', n: 'devices_css', j:2, w:30, c:1, d:1, cache:1});
 
         // Bottom pages for desktop
         jsl.push({f:'css/bottom-pages-animations.css', n: 'bottom-pages-animations_css', j:2,w:5,c:1,d:1,cache:1});
@@ -2552,7 +2563,6 @@ else if (!browserUpdate) {
         jsl.push({f:'js/fm/quickfinder.js', n: 'fm_quickfinder_js', j:1, w:1});
         jsl.push({f:'js/fm/selectionManager2.js', n: 'fm_selectionmanager2_js', j:1, w:1});
         jsl.push({f:'js/fm.js', n: 'fm_js', j:1, w:12});
-        jsl.push({f:'js/fm/backupsUI.js', n: 'fm_backups_ui_js', j:1, w:5});
         jsl.push({f:'js/fm/dashboard.js', n: 'fmdashboard_js', j:1, w:5});
         jsl.push({f:'js/fm/recents.js', n: 'fmrecents_js', j:1, w:5});
         jsl.push({f:'js/time_checker.js', n: 'time_checker_js', j:1});
@@ -2611,7 +2621,6 @@ else if (!browserUpdate) {
         jsl.push({f:'css/settings.css', n: 'settings_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/media-print.css', n: 'media_print_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/affiliate-program.css', n: 'affiliate_program_css', j:2, w:30, c:1, d:1, cache:1});
-        jsl.push({f:'css/backup-center.css', n: 'backup_center_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'css/top-menu.css', n: 'top_menu_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'css/context-menu.css', n: 'context_menu_css', j:2, w:5, c:1, d:1, cache:1});
         jsl.push({f:'css/tables.css', n: 'tables_css', j:2, w:30, c:1, d:1, cache:1});
@@ -2634,6 +2643,7 @@ else if (!browserUpdate) {
         jsl.push({f:'html/dialogs.html', n: 'dialogs', j:0,w:2});
         jsl.push({f:'images/mega/contact-avatar.svg', n: 'contact_avatar', j:0});
         jsl.push({f:'html/rewind.html', n: 'rewind', j:0});
+        jsl.push({f:'html/device-centre-shimmer.html', n: 'device_centre_shimmer_html', j:0});
         jsl.push({f:'css/topbar.css', n: 'topbar_css', j:2,w:5,c:1,d:1,cache:1});
 
         // Notification banner
@@ -3029,6 +3039,13 @@ else if (!browserUpdate) {
             'rewind_ui_js': {f:'js/rewind/ui.js', n: 'rewind_ui_js', j: 1, w: 1},
             'rewind_utils_js': {f:'js/rewind/utils.js', n: 'rewind_utils_js', j: 1, w: 1},
             'rewind_storage_js': {f:'js/rewind/storage.js', n: 'rewind_storage_js', j: 1, w: 1}
+        },
+        'devices': {
+            'devices_utils_js': {f:'js/fm/devices/utils.js', n: 'devices_utils_js', j: 1, w: 1},
+            'devices_main_js': {f:'js/fm/devices/main.js', n: 'devices_main_js', j: 1, w: 1},
+            'devices_s_devices_js': {f:'js/fm/devices/sections/devices.js', n: 'devices_s_devices_js', j: 1, w: 1},
+            'devices_s_device_folders_js': {f:'js/fm/devices/sections/device-folders.js', n: 'devices_s_device_folders_js', j: 1, w: 1},
+            'devices_s_folder_children_js': {f:'js/fm/devices/sections/folder-children.js', n: 'devices_s_folder_children_js', j: 1, w: 1},
         },
         'chat': {
             /* chat related css */

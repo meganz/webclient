@@ -3127,6 +3127,11 @@ async function galleryUI(id) {
 
     if (pfid || M.gallery && !M.albums && !M.isGalleryPage()) {
         id = !id || typeof id !== 'string' ? M.currentdirid : id;
+        if (id.startsWith('device-centre/')) {
+            id = id.split('/')[2];
+            mega.devices.ui.header.hide();
+            mega.devices.ui.handleAddBtnVisibility();
+        }
         $('.view-links', '.gallery-tabs-bl').removeClass('hidden');
     }
     else {

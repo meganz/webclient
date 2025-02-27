@@ -631,6 +631,10 @@ function filetype(n, getFullType, ik) {
         return ext[fext][1];
     }
 
+    if (n && n.typeText && M.onDeviceCenter) {
+        return n.typeText;
+    }
+
     return fext.length ? l[20366].replace('%1', fext.toUpperCase()) : l[18055];
 }
 
@@ -708,21 +712,9 @@ function folderIcon(node, root) {
         return `${folderIcon}folder-public`;
     }
 
-    // Backups
-    if (root === M.InboxID) {
-
-        // Backed up device icon
-        if (node.devid) {
-
-            // Get OS icon
-            return deviceIcon(node.name);
-        }
-        // Backed up external device icon
-        if (node.drvid) {
-
-            // Ignore rubbish bin suffix
-            return 'ex-device';
-        }
+    // Device of device folder
+    if (M.dcd[node.h] || node.isDeviceFolder) {
+        return node.icon;
     }
 
     return `${folderIcon}folder`;
@@ -748,7 +740,7 @@ function fileIcon(node) {
         rubPrefix = 'rubbish-';
     }
 
-    if (node.t) {
+    if (node.t || M.dcd[node.h] || node.isDeviceFolder) {
         return folderIcon(node, root);
     }
     else if ((icon = ext[fileext(node.name, 0, 1)]) && icon[0] !== 'mega') {

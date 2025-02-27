@@ -4276,9 +4276,9 @@ span.orange {
     margin-inline-start: 4px;
     cursor: pointer;
 }
-/* Temporarily hide Versions and Backups in the dashboard bottom table for MEGA Lite mode until supported properly */
-.mega-lite-mode .account.data-table .account-data-item-versions,
-.mega-lite-mode .account.data-table .account-data-item-backups {
+
+/* Temporarily hide Versions in the dashboard bottom table for MEGA Lite mode until supported properly */
+.mega-lite-mode .account.data-table .account-data-item-versions {
 	display: none;
 }
 .account.data-table i.versioning-settings:hover {

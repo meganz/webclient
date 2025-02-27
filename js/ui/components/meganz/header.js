@@ -1054,7 +1054,8 @@ class MegaHeader extends MegaMobileHeader {
                  'file-requests'].includes(M.currentrootid) ||
                 M.isGalleryPage() || M.isAlbumsPage() ||
                 M.currentrootid === M.InboxID || // Temporary title for backup
-                M.currentdirid === 'devices' || M.currentdirid === 'transfers' || M.search) {
+                M.onDeviceCenter ||
+                M.currentdirid === 'transfers' || M.search) {
                 return 'drive';
             }
             else if (M.currentCustomView.type === 'pwm') {
@@ -1112,6 +1113,7 @@ lazy(MegaHeader, 'headings', () => {
         'pwm': l.mega_pwm,
         'settings': l[823],
         'folderlink': l[808],
-        'collectionlink': l.album_link
+        'collectionlink': l.album_link,
+        'device-centre': l.device_centre,
     });
 });

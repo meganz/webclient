@@ -129,6 +129,7 @@ class ConversationsApp extends MegaRenderMixin {
                 // is visible/active at the moment
                 if (
                     $target.is(".messages-textarea,a,input,textarea,select,button") ||
+                    $target.is('i') && $target.parent().is('a,input,select,button') ||
                     $target.closest('.messages.scroll-area').length > 0 ||
                     $target.closest('.mega-dialog').length > 0 ||
                     this.hasOpenDialog() ||

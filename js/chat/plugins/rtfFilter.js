@@ -12,6 +12,7 @@ var RtfFilter = function(megaChat) {
     self.regexps = {};
     self.regexps['(^|\\s)\\*{1,2}([^\\*\\n]{1,})\\*{1,2}'] = ['gi', '$1<strong>$2</strong>', '$1 $2'];
     self.regexps['(^|\\s)_{1,2}([^_\\n]{1,})_{1,2}'] = ['gi', '$1<em class="rtf-italic">$2</em>', '$1 $2'];
+    self.regexps['(^|\\s)~{1,2}([^~\\n]{1,})~{1,2}'] = ['gi', '$1<s>$2</s>', '$1 $2'];
     self.regexps['^&gt;(.*)'] = ['gm', '<pre class="rtf-quote">$1</pre>', '$1']; // support > style.
 
     megaChat.on("onBeforeRenderMessage", function(e, eventData) {

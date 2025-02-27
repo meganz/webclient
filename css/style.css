@@ -5048,7 +5048,6 @@ button.loading span i {
 strong, b {
     font-family: var(--text-font-family);
     font-weight: bold;
-    font-weight: normal;
 }
 .share-folder-block {
     min-height: 90px;

@@ -20797,8 +20797,7 @@ const HistoryPanel = (_dec = (0,mixins.hG)(450, true), _class = class HistoryPan
     this.domRef = REaCt().createRef();
     this.state = {
       editing: false,
-      toast: false,
-      pusherHeight: 0
+      toast: false
     };
     this.onKeyboardScroll = ({
       keyCode
@@ -21056,22 +21055,6 @@ const HistoryPanel = (_dec = (0,mixins.hG)(450, true), _class = class HistoryPan
         delay(`hp:reinit-scroll:${this.getUniqueId()}`, () => {
           if (this.messagesListScrollable) {
             this.messagesListScrollable.reinitialise(true, true);
-            if (this.state.pusherHeight || this.messagesListScrollable.getScrollHeight() === 0) {
-              if (room.messagesBuff.haveMoreHistory()) {
-                let _this$domRef3;
-                const innerHeight = $('.messages.content-area > div', (_this$domRef3 = this.domRef) == null ? void 0 : _this$domRef3.current).not('.hp-pusher').toArray().map(a => a.getBoundingClientRect().height).reduce((a, b) => a + b);
-                const pusherHeight = Math.max(this.messagesListScrollable.getClientHeight() - innerHeight + 50, 0);
-                if (Math.abs(this.state.pusherHeight - pusherHeight) > 50) {
-                  this.setState({
-                    pusherHeight
-                  });
-                }
-              } else {
-                this.setState({
-                  pusherHeight: 0
-                });
-              }
-            }
           }
         }, 30);
       }
@@ -21442,12 +21425,7 @@ const HistoryPanel = (_dec = (0,mixins.hG)(450, true), _class = class HistoryPan
         'top': '50%',
         'left': '50%'
       }
-    })), !!this.state.pusherHeight && REaCt().createElement("div", {
-      className: "hp-pusher",
-      style: {
-        height: this.state.pusherHeight
-      }
-    }), messagesList))), this.renderToast());
+    })), messagesList))), this.renderToast());
   }
 }, (0,applyDecoratedDescriptor.A)(_class.prototype, "enableScrollbar", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "enableScrollbar"), _class.prototype), _class);
 

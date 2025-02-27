@@ -20,8 +20,7 @@ export default class HistoryPanel extends MegaRenderMixin {
 
     state = {
         editing: false,
-        toast: false,
-        pusherHeight: 0,
+        toast: false
     };
 
     constructor(props) {
@@ -235,27 +234,6 @@ export default class HistoryPanel extends MegaRenderMixin {
                 delay(`hp:reinit-scroll:${this.getUniqueId()}`, () => {
                     if (this.messagesListScrollable) {
                         this.messagesListScrollable.reinitialise(true, true);
-                        if (this.state.pusherHeight || this.messagesListScrollable.getScrollHeight() === 0) {
-                            if (room.messagesBuff.haveMoreHistory()) {
-                                // Height of the messages, dividers, etc.. excluding the pusher.
-                                const innerHeight =
-                                    $('.messages.content-area > div', this.domRef?.current)
-                                        .not('.hp-pusher')
-                                        .toArray()
-                                        .map(a => a.getBoundingClientRect().height)
-                                        .reduce((a, b) => a + b);
-                                const pusherHeight = Math.max(
-                                    this.messagesListScrollable.getClientHeight() - innerHeight + 50,
-                                    0
-                                );
-                                if (Math.abs(this.state.pusherHeight - pusherHeight) > 50) {
-                                    this.setState({ pusherHeight });
-                                }
-                            }
-                            else {
-                                this.setState({ pusherHeight: 0 });
-                            }
-                        }
                     }
                 }, 30);
             }
@@ -830,14 +808,6 @@ export default class HistoryPanel extends MegaRenderMixin {
                                     style={{ 'position': 'fixed', 'top': '50%', 'left': '50%' }}
                                 />
                             </div>
-                            {
-                                !!this.state.pusherHeight &&
-                                <div
-                                    className="hp-pusher"
-                                    style={{ height: this.state.pusherHeight }}
-                                />
-                            }
-                            {/* add a naive pre-pusher that would eventually keep the the scrollbar realistic */}
                             {messagesList}
                         </div>
                     </div>

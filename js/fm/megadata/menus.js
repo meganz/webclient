@@ -313,15 +313,16 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
             }
         }
 
+        // If Full Access node rights
         if (M.getNodeRights(selNode.h) > 1) {
             items['.rename-item'] = 1;
+            items['.colour-label-items'] = 1;
 
             const isInshareRelated = isInShare
                 || M.onDeviceCenter && sharer(selNode.h);
 
             if (!isInshareRelated) {
                 items['.add-star-item'] = 1;
-                items['.colour-label-items'] = 1;
 
                 if (M.isFavourite(selNode.h)) {
 

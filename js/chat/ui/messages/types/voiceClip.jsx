@@ -4,24 +4,10 @@ import { Dropdown, DropdownItem } from '../../../../ui/dropdowns.jsx';
 import { Button } from '../../../../ui/buttons.jsx';
 import AudioContainer from './partials/audioContainer.jsx';
 
-// 1h as confirmed by Mathias
-// eslint-disable-next-line id-length
-const MESSAGE_NOT_EDITABLE_TIMEOUT = window.MESSAGE_NOT_EDITABLE_TIMEOUT = 60 * 60;
-
 export default class VoiceClip extends AbstractGenericMessage {
-    constructor(props) {
-        super(props);
-    }
-
     _getActionButtons() {
-        const { message } = this.props;
-        const contact = this.getContact();
-        const iAmSender = contact && contact.u === u_handle;
-        const stillEditable = unixtime() - message.delay < MESSAGE_NOT_EDITABLE_TIMEOUT;
-        const isBeingEdited = this.props.isBeingEdited() === true;
-        const chatIsReadOnly = this.props.chatRoom.isReadOnly() === true;
-
-        if (iAmSender && stillEditable && !isBeingEdited && !chatIsReadOnly && !this.props.dialog) {
+        const { isBeingEdited, chatRoom, message, dialog, onDelete } = this.props;
+        if (message.isEditable() && !isBeingEdited() && !chatRoom.isReadOnly() && !dialog) {
             return (
                 <Button
                     className="tiny-button"
@@ -31,12 +17,11 @@ export default class VoiceClip extends AbstractGenericMessage {
                         noArrow={true}
                         positionMy="left bottom"
                         positionAt="right bottom"
-                        horizOffset={4}
-                    >
+                        horizOffset={4}>
                         <DropdownItem
                             icon="sprite-fm-mono icon-dialog-close"
                             label={l[1730] /* `Delete` */}
-                            onClick={(e) => this.props.onDelete(e, message)}
+                            onClick={ev => onDelete(ev, message)}
                         />
                     </Dropdown>
                 </Button>

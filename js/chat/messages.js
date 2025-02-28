@@ -617,6 +617,8 @@ Message.MESSAGE_META_TYPE = {
     "GIPHY": "\x03"
 };
 
+Message.MESSAGE_NOT_EDITABLE_TIMEOUT = 24 * 60 * 60 /* 24 hours */;
+
 Message._stateToText = Object.create(null);
 Message._stateToText[Message.STATE.NULL] = 'error';
 Message._stateToText[Message.STATE.NOT_SEEN] = 'unread';
@@ -711,7 +713,8 @@ Message.prototype.getMessageRetentionSummary = function() {
 };
 
 Message.prototype.isEditable = function() {
-    return this.userId === u_handle && (unixtime() - this.delay) < MESSAGE_NOT_EDITABLE_TIMEOUT;
+    'use strict';
+    return this.userId === u_handle && unixtime() - this.delay < Message.MESSAGE_NOT_EDITABLE_TIMEOUT;
 };
 
 Message.prototype.toPersistableObject = function() {

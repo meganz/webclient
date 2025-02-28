@@ -105,45 +105,41 @@ export default class Text extends AbstractGenericMessage {
         }
 
         // edit and delete
-        if (!message.deleted) {
-            const contact = this.getContact();
-
-            if (
-                contact && contact.u === u_handle &&
-                unixtime() - message.delay < MESSAGE_NOT_EDITABLE_TIMEOUT &&
-                isBeingEdited() !== true &&
-                chatRoom.isReadOnly() === false &&
-                !message.requiresManualRetry
-            ) {
-                const editButton = !IS_GEOLOCATION && (
-                    <DropdownItem
-                        icon="sprite-fm-mono icon-rename"
-                        label={l[1342] /* `Edit` */}
-                        onClick={() => this.props.onEditToggle(true)} />
-                );
-                messageActionButtons = (
-                    <Button
-                        key="delete-msg"
-                        className="tiny-button"
-                        icon="sprite-fm-mono icon-options">
-                        <Dropdown
-                            className="white-context-menu attachments-dropdown"
-                            noArrow={true}
-                            positionMy="left bottom"
-                            positionAt="right bottom"
-                            horizOffset={4}>
-                            {extraPreButtons}
-                            {editButton}
-                            {editButton ? <hr/> : null}
-                            <DropdownItem
-                                icon="sprite-fm-mono icon-dialog-close"
-                                label={l[1730] /* `Delete` */}
-                                onClick={e => this.props.onDelete(e, message)}
-                            />
-                        </Dropdown>
-                    </Button>
-                );
-            }
+        if (
+            !message.deleted &&
+            message.isEditable() &&
+            !isBeingEdited() &&
+            !chatRoom.isReadOnly() &&
+            !message.requiresManualRetry
+        ) {
+            const editButton = !IS_GEOLOCATION && (
+                <DropdownItem
+                    icon="sprite-fm-mono icon-rename"
+                    label={l[1342] /* `Edit` */}
+                    onClick={() => this.props.onEditToggle(true)} />
+            );
+            messageActionButtons = (
+                <Button
+                    key="delete-msg"
+                    className="tiny-button"
+                    icon="sprite-fm-mono icon-options">
+                    <Dropdown
+                        className="white-context-menu attachments-dropdown"
+                        noArrow={true}
+                        positionMy="left bottom"
+                        positionAt="right bottom"
+                        horizOffset={4}>
+                        {extraPreButtons}
+                        {editButton}
+                        {editButton ? <hr/> : null}
+                        <DropdownItem
+                            icon="sprite-fm-mono icon-dialog-close"
+                            label={l[1730] /* `Delete` */}
+                            onClick={e => this.props.onDelete(e, message)}
+                        />
+                    </Dropdown>
+                </Button>
+            );
         }
 
         let parentButtons;

@@ -1529,8 +1529,16 @@ scparser.$add('d', function(a) {
     M.delNode(a.n, false, !!a.m);
 
     // was selected, now clear the selected array.
-    if ($.selected && ($.selected[0] === a.n)) {
-        $.selected = [];
+    if ($.selected) {
+        if (typeof selectionManager === 'undefined') {
+            const idx = $.selected.indexOf(a.n);
+            if (idx > -1) {
+                $.selected.splice(idx, 1);
+            }
+        }
+        else {
+            selectionManager.remove_from_selection(a.n);
+        }
     }
     if (!pfid && a.ou) {
         scparser.$notify(a);

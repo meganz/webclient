@@ -237,7 +237,9 @@ class SelectionManager2Base {
             }
 
             this.removing_list.push(nodeId);
-            this.removing_sizes[nodeId] = M.d[nodeId].t ? M.d[nodeId].tb : M.d[nodeId].s;
+            if (M.d[nodeId]) {
+                this.removing_sizes[nodeId] = M.d[nodeId].t ? M.d[nodeId].tb : M.d[nodeId].s;
+            }
         }
         else if (this.debugMode) {
             console.error("can't remove:", nodeId, JSON.stringify(this.selected_list), JSON.stringify($.selected));
@@ -998,6 +1000,10 @@ class SelectionManager2_DOM extends SelectionManager2Base {
         M.renderSearchBreadcrumbs();
 
         this.updateScrollBar();
+
+        if ($('.c-opened', this.$selectionBar).length) {
+            $.hideContextMenu();
+        }
     }
 
     /**

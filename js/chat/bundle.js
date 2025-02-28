@@ -17553,7 +17553,9 @@ class StartGroupChatWizard extends mixins.w9 {
   }
   componentDidMount() {
     super.componentDidMount();
-    M.safeShowDialog(this.dialogName, nop);
+    if (!this.props.subDialog) {
+      M.safeShowDialog(this.dialogName, nop);
+    }
   }
   componentWillUnmount() {
     super.componentWillUnmount();

@@ -272,6 +272,7 @@ MegaData.prototype.initShareAddDialog = function(alreadyAddedContacts, $extraCon
         closeDlgOnClickOverlay: false,
         emailTooltips: true,
         extraContent: $extraContent[0],
+        subDialog: true,
         onExtraContentDidMount: extraContentDidMount,
         onSelected: function(nodes) {
             $.contactPickerSelected = nodes;

@@ -2563,7 +2563,20 @@ var addressDialog = {
                     const warningTitle = planNumber === pro.ACCOUNT_LEVEL_FEATURE_VPN
                         ? l.vpn_free_trial_used_h
                         : l.pwm_free_trial_used_h;
-                    msgDialog('warninga', l[135], warningTitle, l.vpn_free_trial_used_b);
+
+                    msgDialog(
+                        `confirmationa:!^${l.subscribe_btn}!${l[82]}`,
+                        '',
+                        warningTitle,
+                        l.vpn_free_trial_used_b,
+                        (yes) => {
+                            if (yes) {
+                                localStorage.ignoreTrial = '1';
+                                window.location.reload();
+                            }
+                        }
+                    );
+
                     onIdle(() => eventlog(500522));
                 }
                 else {

@@ -731,7 +731,7 @@ lazy(mega, 'rewind', () => {
                     const packetPromise = mega.promise;
                     mBroadcaster.once('rewind:packet:done', (response) => {
                         sn = response.sn;
-                        packets.push(...response.packets);
+                        packets = packets.concat(response.packets);
                         logger.info(`Rewind.loadActionPacket - #Rewind #API - ActionPacket - Loaded from API - ` +
                             `${response.packets.length} action packets`);
                         packetPromise.resolve();
@@ -1098,7 +1098,7 @@ lazy(mega, 'rewind', () => {
 
             const childrenNodes = this.nodeChildrenDictionary[selectedHandle];
             const currentNode = this.nodeDictionary[selectedHandle];
-            const nodes = [];
+            let nodes = [];
             let sortedNodes = [];
             let childrenKeys = [];
 
@@ -1128,7 +1128,7 @@ lazy(mega, 'rewind', () => {
                                 currentLevel: currentLevel + 1,
                                 ts,
                             });
-                            nodes.push(...result);
+                            nodes = nodes.concat(result);
                         }
                         else if (!node.fv) {
                             nodes.push(node.h);

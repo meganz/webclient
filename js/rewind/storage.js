@@ -66,7 +66,7 @@ lazy(mega, 'rewindStorage', () => {
         }
 
         async getChunk(table, key, options) {
-            const results = [];
+            let results = [];
             let whereInstance = null;
             if (key instanceof this.WhereClause || key instanceof this.Collection) {
                 whereInstance = key;
@@ -101,7 +101,7 @@ lazy(mega, 'rewindStorage', () => {
                     break;
                 }
 
-                results.push(...rows);
+                results = results.concat(rows);
                 const resultLength = results.length;
 
                 if (callback) {

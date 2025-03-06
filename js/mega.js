@@ -1017,7 +1017,9 @@ scparser.$add('s', {
 
         if (fminitialized) {
             sharedUInode(a.n);
-            mega.devices.ui.onSharedUpdated(a.n);
+            if (mega.devices.ui) {
+                mega.devices.ui.onSharedUpdated(a.n);
+            }
         }
         scsharesuiupd = true;
         scContactsSharesUIUpdate = a.o ? a.o : false;
@@ -2113,7 +2115,9 @@ function fm_updated(n) {
         if (M.megaRender) {
             M.megaRender.revokeDOMNode(n.h, true);
         }
-        mega.devices.ui.updateNode(n);
+        if (mega.devices.ui) {
+            mega.devices.ui.updateNode(n);
+        }
         M.updFileManagerUI().catch(dump);
     }
 }

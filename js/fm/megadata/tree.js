@@ -524,7 +524,7 @@ MegaData.prototype.initTreePanelSorting = function() {
     // Sorting sections for tree panels, dialogs, and per field.
     // XXX: do NOT change the order, add new entries at the tail, and ask before removing anything..
     const sections = [
-        'folder-link', 'contacts', 'conversations',
+        'folder-link', 'contacts', 'conversations', 'backups',
         'shared-with-me', 'cloud-drive', 'rubbish-bin',
         'out-shares', 'public-links', 's4'
     ];

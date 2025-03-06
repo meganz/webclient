@@ -662,8 +662,10 @@ lazy(mega.ui, 'mInfoPanel', () => {
 
         // Otherwise, if they are an expired Pro Flexi/Business account we will disable functionality
         // for adding/updating/removing of tags. We will still show existing tags though.
-        else if (u_attr && (u_attr.pf && u_attr.pf.s === pro.ACCOUNT_STATUS_EXPIRED)
-            || (u_attr.b && u_attr.b.s === pro.ACCOUNT_STATUS_EXPIRED)) {
+        else if (u_attr
+            && ((u_attr.pf && u_attr.pf.s === pro.ACCOUNT_STATUS_EXPIRED)
+                || (u_attr.b && u_attr.b.s === pro.ACCOUNT_STATUS_EXPIRED))
+        ) {
 
             // Hide close icons on existing tags
             if (selectedNodesHaveTags(nodes)) {

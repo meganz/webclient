@@ -1004,11 +1004,11 @@ lazy(mega.devices, 'ui', () => {
          * @returns {Promise<void>} void
          */
         async render(id, options) {
-            if (M.currentCustomView.type !== rootId) {
+            const {isRefresh, isSkipFetch, isSkipPathCheck} = options || {};
+
+            if (M.currentCustomView.type !== rootId && !isSkipPathCheck) {
                 return;
             }
-
-            const {isRefresh, isSkipFetch, isSkipPathCheck} = options || {};
 
             const path = id.split('/');
             if ((!path.length || path[0] !== rootId || path.length > 3) && !isSkipPathCheck) {
@@ -1173,7 +1173,9 @@ lazy(mega.devices, 'ui', () => {
             }
             else if (isParent) {
                 const {device} = await this.getOuterViewData(node.h);
-                path.push(device.h);
+                if (device) {
+                    path.push(device.h);
+                }
             }
 
             return path.join('/');

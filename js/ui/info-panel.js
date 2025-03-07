@@ -17,7 +17,9 @@ lazy(mega.ui, 'mInfoPanel', () => {
         const dcElem = document.querySelector('.info-data.path-section [data-node-id="device-centre"]');
         if (dcElem) {
             const deviceElem = dcElem.nextElementSibling;
-            return deviceElem.dataset.nodeId;
+            if (deviceElem && deviceElem.dataset) {
+                return deviceElem.dataset.nodeId;
+            }
         }
         return '';
     });

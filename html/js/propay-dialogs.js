@@ -3815,7 +3815,6 @@ var bitcoinDialog = {
         });
     }
 };
-
 var insertEmailToPayResult = function($overlay) {
     "use strict";
 
@@ -3826,3 +3825,4 @@ var insertEmailToPayResult = function($overlay) {
         $overlay.find('.payment-result-txt .user-email').text(acc.email);
     }
 };
+

@@ -2866,11 +2866,11 @@ var addressDialog = {
         if (isStripe && !((typeof utcResult.EUR === 'object') && utcResult.EUR.error)) {
             this.stripeSaleId = null;
             if (utcResult.EUR) {
-                const $stripeDialog = this.getStripeDialog().toggleClass('edit', !!utcResult.edit);
+                const $stripeDialog = this.getStripeDialog().toggleClass('edit', !!utcResult.edit);
                 const $iframeContainer = pro.propay.paymentButton
                     ? $('.iframe-container', $stripeDialog)
                     : $('.mobile.payment-stripe-dialog .iframe-container,' +
-                          ' .payment-stripe-dialog .iframe-container');
+                        ' .payment-stripe-dialog .iframe-container');
                 let $stripeIframe = $('iframe#stripe-widget');
                 $stripeIframe.remove();
                 const sandBoxCSP = 'allow-scripts allow-same-origin allow-forms allow-popups allow-top-navigation';

@@ -332,6 +332,7 @@ body.de .mega-dialog.contact-picker-widget {
 }
 .mega-dialog.add-from-cloud .fm-header-buttons {
     background: transparent;
+    flex-direction: row-reverse;
 }
 .mega-dialog.add-from-cloud .fm-header-buttons input {
     padding: 5px;
@@ -369,6 +370,16 @@ body.de .mega-dialog.contact-picker-widget {
     position: absolute;
     top: 5px;
     right: 14px;
+}
+.mega-dialog.add-from-cloud .fm-breadcrumbs .right-arrow-bg {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.mega-dialog.add-from-cloud .fm-breadcrumbs:last-of-type {
+    max-width: 70%;
+}
+.mega-dialog.add-from-cloud .fm-breadcrumbs:only-child {
+    max-width: 100%;
 }
 .mega-dialog.add-from-cloud .chat-fm-view-mode-selector i {
     --mask-color: var(--icon-inactive);
@@ -424,6 +435,8 @@ body.de .mega-dialog.contact-picker-widget {
 .mega-dialog .breadcrumb-dropdown {
     position: absolute;
     top: 100%;
+    bottom: unset;
+    transform: unset;
 }
 .mega-dialog .breadcrumbs-bottom .breadcrumb-dropdown {
     bottom: 100%;
@@ -3581,6 +3594,8 @@ body.de .mega-dialog.contact-picker-widget {
     .mega-dialog.fm-picker-dialog .fm-breadcrumbs .right-arrow-bg {
         font: var(--text-body1);
         cursor: pointer;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
     .mega-dialog.fm-picker-dialog .fm-breadcrumbs.has-next-button .sprite-fm-mono.icon-arrow-right {
         top: 3px;

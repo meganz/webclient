@@ -2346,7 +2346,6 @@ body.loading .light-overlay {
     display: none;
     flex-shrink: 0;
     font: var(--text-body1);
-    margin: 8px 24px;
     overflow: hidden;
     padding: 4px 8px;
     position: relative;
@@ -6961,9 +6960,6 @@ div.new-bottom-pages li, div.new-bottom-pages p {
 .mega-lite-mode .shared-details-buttons .mega-button.fm-share-download,
 .mega-lite-mode .shared-details-buttons .mega-button.fm-share-copy {
     display: none;
-}
-.files-grid-view.shared-folder-content, .fm-blocks-view.shared-folder-content {
-    height: calc(100% - 128px);
 }
 .shared-details-block .files-grid-view.shared-folder-content {
     padding-top: 14px;

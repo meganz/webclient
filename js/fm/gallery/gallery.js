@@ -1279,7 +1279,7 @@ class MegaGallery {
         $('.gallery-section-tabs', galleryHeader).toggleClass('hidden', M.currentdirid === 'favourites');
         rfBlock.removeClass('hidden');
         $('.files-grid-view.fm, .fm-blocks-view.fm, .fm-empty-section', rfBlock).addClass('hidden');
-        $('.fm-files-view-icon').removeClass('active').filter('.media-view').addClass('active');
+        mega.ui.secondaryNav.updateGalleryLayout();
 
         if (pfid && !M.v) {
             $('.fm-empty-section', rfBlock).removeClass('hidden');
@@ -1562,7 +1562,7 @@ class MegaGallery {
                 this.clearRenderCache();
 
                 if (pfid && !tpage.startsWith('folder/')) {
-                    $('.fm-files-view-icon.media-view').addClass('hidden');
+                    mega.ui.secondaryNav.updateGalleryLayout(true);
                 }
 
                 // Clear thumbnails to free memory if target page is not gallery anymore
@@ -2721,12 +2721,12 @@ mega.gallery.handleNodeUpdate = (n) => {
 
 mega.gallery.clearMdView = () => {
     'use strict';
-    const $mediaIcon = $('.fm-files-view-icon.media-view').addClass('hidden');
+    mega.ui.secondaryNav.updateGalleryLayout(true);
 
     if (M.gallery) {
         $mediaIcon.removeClass('active');
         $('.gallery-tabs-bl').addClass('hidden');
-        $(`.fm-files-view-icon.${M.viewmode ? 'block-view' : 'listing-view'}`).addClass('active');
+        mega.ui.secondaryNav.updateLayoutButton();
 
         assert(pfid);
         M.gallery = false;
@@ -3829,36 +3829,10 @@ lazy(mega.gallery, 'resetMediaCounts', () => {
      * @param {MegaNode[]} [nodes] The nodes to use for count
      * @returns {void}
      */
-    return (nodes = []) => {
-        const countsContainer = document.querySelector('#media-section-controls #media-counts');
-        const counts = [0, 0]; // 0 - img, 1 - vid
-
-        let i = nodes.length;
-
-        while (--i >= 0) {
-            counts[mega.gallery.isVideo(nodes[i]) ? 1 : 0]++;
+    return () => {
+        if (mega.ui.secondaryNav.cardComponent) {
+            mega.ui.secondaryNav.cardComponent.update();
         }
-
-        const [img, vid] = counts;
-
-        if (!img && !vid) {
-            countsContainer.classList.add('hidden');
-            return;
-        }
-
-        const txtArr = [];
-        if (img > 0) {
-            txtArr.push(mega.icu.format(l.photos_count_img, img));
-        }
-
-        if (vid > 0) {
-            txtArr.push(mega.icu.format(l.photos_count_vid, vid));
-        }
-
-        const txt = txtArr.join(', ');
-
-        countsContainer.textContent = txt;
-        countsContainer.classList.remove('hidden');
     };
 });
 

@@ -24,6 +24,7 @@ lazy(mega.devices.sections, 'folderChildren', () => {
              * {Object} syncSection - contains sections constants
              */
             syncSection,
+            syncType,
         },
 
         /**
@@ -91,32 +92,93 @@ lazy(mega.devices.sections, 'folderChildren', () => {
                 }
             }
 
+            mega.ui.secondaryNav.hideCard();
+            mega.ui.secondaryNav.updateInfoPanelButton(true);
             if (!M.gallery) {
+                const isBackup = ui.isBackupRelated(h);
+                mega.ui.secondaryNav.updateGalleryLayout(isBackup);
                 if (hasToRenderHeader) {
-                    this._renderHeader(folder);
+                    const { isDeviceFolder, t, status } = folder;
+                    const isShareLimitedNode = sharer(h) && M.getNodeRights(h) < 2;
+                    const isFullSync = isDeviceFolder && h === M.RootID;
+                    const hideButtons = !(isDeviceFolder && t !== syncType.cameraUpload) ||
+                        isFullSync ||
+                        isShareLimitedNode ||
+                        status.errorState === 14;
+                    mega.ui.secondaryNav.showCard(
+                        h,
+                        {
+                            componentClassname: `outline ${hideButtons ? 'hidden' : ''}`,
+                            text: status.pausedSyncs ? l.dc_run : l.dc_pause,
+                            onClick: () => {
+                                $.selected = [h];
+                                ui.desktopApp.common.togglePause();
+                            }
+                        },
+                        {
+                            componentClassname: `destructive ${hideButtons ? 'hidden' : ''}`,
+                            text: isBackup ? l.stop_backup_button : l.stop_syncing_button,
+                            onClick: () => {
+                                $.selected = [h];
+                                ui.desktopApp.common.remove();
+                            }
+                        },
+                        (ev) => {
+                            ev.preventDefault();
+                            const path = M.currentdirid.split('/');
+                            if (path.length > 1) {
+                                $.hideContextMenu();
+
+                                selectionManager.resetTo(path.pop());
+
+                                ev.originalEvent.delegateTarget = ev.currentTarget.domNode;
+                                M.contextMenuUI(ev.originalEvent, 1);
+
+                                delay('deviceFolders:hide:selectionBar', () => {
+                                    selectionManager.hideSelectionBar();
+                                }, 80);
+                            }
+                        }
+                    );
+                    const infoIcon = mega.ui.secondaryNav.cardComponent.domNode.querySelector('.dc-badge-info-icon');
+                    if (infoIcon && isDeviceFolder) {
+                        const {
+                            twoWay,
+                            oneWayUp,
+                            oneWayDown,
+                            cameraUpload,
+                            mediaUpload,
+                            backup,
+                        } = syncType;
+                        let tip = '';
+                        switch (t) {
+                            case twoWay:
+                            case oneWayUp:
+                            case oneWayDown:
+                                tip = l.sync_folder_header_tooltip;
+                                break;
+                            case cameraUpload:
+                            case mediaUpload:
+                                tip = l.camera_upload_folder_header_tooltip;
+                                break;
+                            case backup:
+                                tip = l.backup_folder_header_tooltip;
+                                break;
+                        }
+                        infoIcon.dataset.simpletip = tip;
+                    }
+                    else if (infoIcon) {
+                        infoIcon.classList.add('hidden');
+                    }
                 }
                 else {
-                    ui.header.hide();
+                    mega.ui.secondaryNav.hideCard();
                 }
                 if (!isRefresh) {
                     // items already managed by mega render system, no need to re-render on refresh
                     this._renderItems(h);
                 }
             }
-        }
-
-        /**
-         * Renders UI folder list header
-         * @param {DeviceCentreFolder} folder - folder to render header for
-         * @returns {void}
-         */
-        _renderHeader(folder) {
-            ui.header.show(
-                folder,
-                StatusUI.get(folder.status),
-                ui.contextMenu,
-                true
-            );
         }
 
         /**

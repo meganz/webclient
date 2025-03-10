@@ -146,7 +146,7 @@ class MegaNodeComponent extends MegaComponent {
         const btnNode = new MegaButton({
             type: 'icon',
             parentNode: this.domNode,
-            icon: 'sprite-mobile-fm-mono icon-more-horizontal-thin-outline',
+            icon: 'sprite-fm-mono icon-more-horizontal-thin-outline',
             iconSize: 24,
             componentClassname: 'context-btn open-context-menu text-icon'
         });
@@ -254,7 +254,10 @@ class MegaNodeComponent extends MegaComponent {
     }
 
     get icon() {
-        return MegaNodeComponent.mFileIcon(this.node);
+        const iconSize = M.viewmode ? 90 : 24;
+        const iconSpriteClass = `item-type-icon${M.viewmode ? '-90' : ''}`;
+
+        return `${iconSpriteClass} icon-${fileIcon(this.node)}-${iconSize}`;
     }
 
     get fileType() {
@@ -304,55 +307,49 @@ class MegaNodeComponent extends MegaComponent {
         }
     }
 
-    static mFileIcon(node) {
-        let icon = 'generic';
+    static mAvatarNode(userHandle, domNode, options) {
+        if (!userHandle || !(userHandle in M.u) || !domNode) {
+            return;
+        }
 
-        if (!this.takedown && !this.undecryptable) {
-            const media = is_video(node);
-            const fileExt = ext[fileext(node.name)];
+        options = options || {};
+        useravatar.loadAvatar(userHandle).always(() => {
+            const avatarMeta = generateAvatarMeta(userHandle);
 
-            if (node.t) {
-                return MegaNodeComponent.mFolderIcon(node);
+            const shortNameEl = mCreateElement('span');
+            shortNameEl.textContent = avatarMeta.shortName;
+
+            const avatar = avatarMeta.avatarUrl
+                ? mCreateElement('img', {src: avatarMeta.avatarUrl})
+                : mCreateElement('div', {class: `color${avatarMeta.color}`},[shortNameEl]);
+
+            domNode.textContent = '';
+            domNode.appendChild(avatar);
+            if (options.presence) {
+                const presence = document.createElement('i');
+                const p = M.u[userHandle].presence;
+                /**
+                 * Presence values without requiring megaChat/presence to be loaded.
+                 * @see UserPresence.PRESENCE
+                 * */
+                if (p === 1) {
+                    presence.className = 'activity-status online';
+                }
+                else if (p === 2) {
+                    presence.className = 'activity-status away';
+                }
+                else if (p === 3) {
+                    presence.className = 'activity-status online';
+                }
+                else if (p === 4) {
+                    presence.className = 'activity-status busy';
+                }
+                else {
+                    presence.className = 'activity-status black';
+                }
+                domNode.appendChild(presence);
             }
-            else if (fileExt && fileExt[0] !== 'mega') {
-                icon = fileExt[0] === 'threed' ? '3d' : fileExt[0];
-            }
-            else if (media > 0) {
-                icon = media > 1 ? 'audio' : 'video';
-            }
-        }
-
-        return `sprite-mobile-fm-uni mime-${icon}-solid`;
-    }
-
-    static mFolderIcon(node) {
-        let icon = 'folder';
-
-        // Outgoing share
-        if (node.t & M.IS_SHARED || M.ps[node.h] || M.getNodeShareUsers(node, 'EXP').length) {
-            icon = 'folder-outgoing';
-        }
-        // Incoming share
-        else if (node.su) {
-            icon = 'folder-incoming';
-        }
-        // File request folder
-        else if (
-            mega.fileRequestCommon.storage.cache.puHandle[node.h]
-            && mega.fileRequestCommon.storage.cache.puHandle[node.h].s !== 1
-            && mega.fileRequestCommon.storage.cache.puHandle[node.h].p
-        ) {
-            icon = is_mobile ? 'folder-request' : 'folder-public';
-        }
-        // Camera uploads
-        else if (node.h === M.CameraId) {
-            icon = 'folder-camera-uploads';
-        }
-
-        if (is_mobile) {
-            return `sprite-mobile-fm-uni mime-${icon}-solid`;
-        }
-        return `item-type-icon icon-${icon}-24`;
+        });
     }
 
     update(type) {

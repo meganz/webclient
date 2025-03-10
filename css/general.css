@@ -231,6 +231,9 @@ h5 {
     color: transparent !important;
     font-size: 0 !important;
 }
+.sk-loading.nav-elem:hover {
+    background: none;
+}
 
 @keyframes loading-shimmer {
     0% {

@@ -95,7 +95,7 @@ function removeUInode(h, parent) {
                     $('.fm-empty-trashbin').removeClass('hidden');
                 }
 
-                $('.fm-clearbin-button').addClass('hidden');
+                mega.ui.secondaryNav.hideActionButtons();
             }
             break;
         case M.RootID:

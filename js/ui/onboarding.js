@@ -71,7 +71,7 @@ mBroadcaster.addListener('fm:initialized', () => {
                             type: 'showDialog',
                             dialogTitle: l.onboard_v4_upload_dialog_title,
                             dialogDesc: l.onboard_v4_upload_dialog_desc,
-                            targetElmClass: '.button.fm-uploads',
+                            targetElmClass: '.button.fm-new-menu',
                             targetElmPosition: 'left bottom',
                             targetHotSpot: true,
                             markComplete: true

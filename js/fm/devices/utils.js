@@ -220,7 +220,7 @@ lazy(mega.devices, 'utils', () => {
             }
         },
         attention: ({itemNode, iClass}) => {
-            StatusElements.icon(itemNode, iClass, 'error icon-close-component');
+            StatusElements.icon(itemNode, iClass, 'error icon-alert-triangle-thin-outline');
             StatusElements.text(itemNode, 'error', l.dc_attention_needed);
             StatusElements.tooltip(itemNode, iClass, l.dc_attention_needed_tip);
         },

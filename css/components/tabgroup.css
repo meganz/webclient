@@ -19,7 +19,8 @@
 .mega-component.tab-group .mega-tab-option.selected {
     border-color: var(--mobile-border-brand);
 }
-.mega-component.tab-group .mega-tab-option:active {
+.mega-component.tab-group .mega-tab-option:active,
+.mega-component.tab-group .mega-tab-option:hover {
     background: transparent;
 }
 .mega-component.tab-group .mega-tab-option:active span.primary-text {

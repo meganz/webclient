@@ -2118,6 +2118,13 @@ function fm_updated(n) {
         if (mega.devices.ui) {
             mega.devices.ui.updateNode(n);
         }
+        if (
+            mega.ui.secondaryNav &&
+            mega.ui.secondaryNav.cardComponent &&
+            mega.ui.secondaryNav.cardComponent.handle === n.h
+        ) {
+            mega.ui.secondaryNav.cardComponent.update();
+        }
         M.updFileManagerUI().catch(dump);
     }
 }

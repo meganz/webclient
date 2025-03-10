@@ -10005,7 +10005,7 @@ class Breadcrumbs extends mixins.w9 {
         });
       }
     }, REaCt().createElement("i", {
-      className: "menu-icon sprite-fm-mono icon-options icon24"
+      className: "menu-icon sprite-fm-mono icon-options icon16"
     })), REaCt().createElement("i", {
       className: "sprite-fm-mono icon-arrow-right icon16"
     })), breadcrumb) : breadcrumb), breadcrumbDropdownContents.length ? REaCt().createElement("div", {

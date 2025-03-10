@@ -369,18 +369,6 @@
             };
         };
 
-        M.renderBreadcrumbs(path, scope, dictionary, id => {
-            var $elm = $('#mctreea_' + id, $dialog);
-            if ($elm.length) {
-                $elm.trigger('click');
-            }
-            else {
-                $('.fm-picker-dialog-button.active', $dialog).trigger('click');
-            }
-            $('.breadcrumb-dropdown.active', $dialog).removeClass('active');
-            return false;
-        });
-
         const placeholder = dialog.querySelector('.summary-input.placeholder');
         if (path.length) {
             placeholder.classList.add('correct-input');
@@ -396,6 +384,18 @@
                 section === 'conversations' ? 'icon-chat-filled' : 'icon-folder-filled'
             );
         }
+
+        M.renderBreadcrumbs(path, scope, dictionary, id => {
+            var $elm = $('#mctreea_' + id, $dialog);
+            if ($elm.length) {
+                $elm.trigger('click');
+            }
+            else {
+                $('.fm-picker-dialog-button.active', $dialog).trigger('click');
+            }
+            $('.breadcrumb-dropdown.active', $dialog).removeClass('active');
+            return false;
+        });
 
         if ($.copyToUpload) {
             // auto-select entries once

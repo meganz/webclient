@@ -124,7 +124,7 @@ MegaData.prototype.checkSendToChat = function(isSearch, sourceRoot) {
             const nRoot = isSearch ? n && n.u === u_handle && M.getNodeRoot($.selected[i]) : sourceRoot;
 
             if (!n || n.t && (nRoot !== M.RootID && nRoot !== M.InboxID &&
-                nRoot !== 's4' && nRoot !== mega.devices.rootId && !M.isDynPage(nRoot)) ||
+                nRoot !== 's4' && nRoot !== mega.devices.rootId && !M.isDynPage(nRoot) && nRoot !== 'out-shares') ||
                 nRoot === M.RubbishID) {
 
                 return false;
@@ -174,6 +174,9 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
         await dbfetch.geta(nodes).catch(dump);
     }
 
+    const isHeaderContext = evt && evt.currentTarget.classList &&
+        evt.currentTarget.classList.contains('fm-header-context');
+
     if (M.onDeviceCenter) {
         const { ui } = mega.devices;
         const section = ui.getRenderSection();
@@ -181,7 +184,7 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
             || ui.isFullSyncRelated($.selected[0])
             || ui.isBackupRelated($.selected)
         ) {
-            return ui.getContextMenuItems($.selected);
+            return ui.getContextMenuItems($.selected, isHeaderContext);
         }
     }
 
@@ -221,6 +224,9 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
                 }
 
                 items['.sh4r1ng-item'] = 1;
+                if (sourceRoot !== 's4' && sourceRoot !== M.RootID && isHeaderContext) {
+                    delete items['.sh4r1ng-item'];
+                }
 
                 if (shares.length || M.ps[selNode.h]) {
                     items['.removeshare-item'] = 1;
@@ -237,7 +243,9 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
                                     : ':not(.file-request-page)';
                         }
 
-                        items[`.file-request-manage${fileRequestPageClass}`] = 1;
+                        if (!isHeaderContext) {
+                            items[`.file-request-manage${fileRequestPageClass}`] = 1;
+                        }
                         items[`.file-request-copy-link${fileRequestPageClass}`] = 1;
                         items[`.file-request-remove${fileRequestPageClass}`] = 1;
                     }
@@ -446,7 +454,7 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
         delete items['.open-in-location'];
     }
 
-    if ((sourceRoot === M.RootID
+    if ((sourceRoot === M.RootID || sourceRoot === 'out-shares'
          || sourceRoot === 's4' || M.isDynPage(M.currentrootid)) && !folderlink) {
 
         items['.move-item'] = 1;
@@ -667,6 +675,35 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
         }
     }
 
+    if (isHeaderContext) {
+        delete items['.open-item'];
+        if (sourceRoot === 'shares') {
+            delete items['.download-item'];
+            delete items['.zipdownload-item'];
+        }
+        if (sourceRoot === 's4') {
+            delete items['.settings-item'];
+        }
+        if (sourceRoot === 'out-shares' && selNode && this.getNodeShareUsers(selNode, 'EXP').length) {
+            items['.removeshare-item'] = 1;
+        }
+        if (M.currentrootid === 'file-requests' && mega.fileRequest.publicFolderExists(selNode.h)) {
+            delete items['.move-item'];
+            delete items['.copy-item'];
+            delete items['.getlink-item'];
+            delete items['.embedcode-item'];
+            delete items['.removelink-item'];
+            delete items['.sh4r1ng-item'];
+            delete items['.send-to-contact-item'];
+        }
+        if (M.onDeviceCenter && mega.ui.secondaryNav) {
+            const node = mega.ui.secondaryNav.domNode.querySelector('.fm-share-folder');
+            if (node && !node.classList.contains('hidden')) {
+                delete items['.sh4r1ng-item'];
+            }
+        }
+    }
+
     return items;
 };
 
@@ -849,28 +886,18 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
             itemsViewed = true;
         }
 
-        if (!ignoreGrideExtras && M.viewmode) {
+        if (!ignoreGrideExtras && M.viewmode === 1) {
             itemsViewed = true;
             $('.files-menu.context .dropdown-item.sort-grid-item-main').removeClass('hidden');
-            if (M.currentdirid === 'shares') {
-                $('.files-menu.context .dropdown-item.sort-grid-item').addClass('hidden');
-                $('.files-menu.context .dropdown-item.sort-grid-item.s-inshare').removeClass('hidden');
+            $('.files-menu.context .dropdown-item.sort-grid-item').addClass('hidden');
+            $('.files-menu.context .dropdown-item.sort-grid-item.s-fm').removeClass('hidden');
+            if (folderlink) {
+                $('.files-menu.context .dropdown-item.sort-grid-item.s-fm.sort-label').addClass('hidden');
+                $('.files-menu.context .dropdown-item.sort-grid-item.s-fm.sort-fav').addClass('hidden');
             }
-            else if (M.currentdirid === 'out-shares') {
-                $('.files-menu.context .dropdown-item.sort-grid-item').addClass('hidden');
-                $('.files-menu.context .dropdown-item.sort-grid-item.s-outshare').removeClass('hidden');
-            }
-            else {
-                $('.files-menu.context .dropdown-item.sort-grid-item').addClass('hidden');
-                $('.files-menu.context .dropdown-item.sort-grid-item.s-fm').removeClass('hidden');
-                if (folderlink) {
-                    $('.files-menu.context .dropdown-item.sort-grid-item.s-fm.sort-label').addClass('hidden');
-                    $('.files-menu.context .dropdown-item.sort-grid-item.s-fm.sort-fav').addClass('hidden');
-                }
 
-                if (M.currentrootid === M.RubbishID) {
-                    $('.files-menu.context .dropdown-item.sort-grid-item.s-fm.sort-fav').addClass('hidden');
-                }
+            if (M.currentrootid === M.RubbishID) {
+                $('.files-menu.context .dropdown-item.sort-grid-item.s-fm.sort-fav').addClass('hidden');
             }
         }
         if (!itemsViewed) {
@@ -982,6 +1009,10 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
             // File manager breadcrumb path click
             else if (id.startsWith('pathbc-')) {
                 id = id.replace('pathbc-', '');
+            }
+            // File manager header context item click
+            else if (id.startsWith('fmhead_')) {
+                id = id.replace('fmhead_', '');
             }
         }
 

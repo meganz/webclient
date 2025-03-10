@@ -14,7 +14,8 @@
   box-shadow: var(--dropdown-shadow);
   left: 24px;
   position: absolute;
-  top: 32px;
+  bottom: 0;
+  transform: translateY(100%);
 }
 .fm-breadcrumbs-wrapper .breadcrumb-dropdown.active {
     max-height: 85vh;

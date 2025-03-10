@@ -215,7 +215,7 @@ export default class Breadcrumbs extends MegaRenderMixin {
                                                 !this.state.breadcrumbDropdownVisible
                                         });
                                     }}>
-                                    <i className="menu-icon sprite-fm-mono icon-options icon24" />
+                                    <i className="menu-icon sprite-fm-mono icon-options icon16" />
                                 </a>
                                 <i className="sprite-fm-mono icon-arrow-right icon16" />
                             </div>

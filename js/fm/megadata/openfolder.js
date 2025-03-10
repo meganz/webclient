@@ -413,15 +413,14 @@
             if (fmconfig.uiviewmode | 0 && fmconfig.viewmode === 2 || fmViewMode === 2) {
                 this.gallery = 1;
             }
-            if (!isDCInshareOrBackup) {
-                $('.fm-files-view-icon', '.fm-right-files-block').filter('.media-view').removeClass('hidden');
+            if (!isDCInshareOrBackup && mega.ui.secondaryNav) {
+                mega.ui.secondaryNav.updateGalleryLayout(false);
+                mega.ui.secondaryNav.updateLayoutButton();
             }
         }
-        else {
-            $('.fm-files-view-icon', '.fm-right-files-block').filter('.media-view').addClass('hidden');
-            if (this.onDeviceCenter && mega.devices.ui.isCustomRender()) {
-                $('.fm-files-view-icon', '.fm-right-files-block').addClass('hidden');
-            }
+        else if (mega.ui.secondaryNav) {
+            mega.ui.secondaryNav.updateGalleryLayout(true);
+            mega.ui.secondaryNav.updateLayoutButton(this.onDeviceCenter && mega.devices.ui.isCustomRender());
         }
 
         if (mega.ui.mNodeFilter) {
@@ -701,9 +700,10 @@
         }
         let cv = this.isCustomView(id);
 
-        const $viewIcons =
-            $(`.fm-files-view-icon${pfid ? '' : ':not(.media-view)'}`)
-                .removeClass('hidden');
+        if (mega.ui.secondaryNav) {
+            mega.ui.secondaryNav.updateGalleryLayout(pfid);
+            mega.ui.secondaryNav.updateLayoutButton();
+        }
         $('.fm-right-account-block, .fm-right-block, .fm-filter-chips-wrapper').addClass('hidden');
 
         this.chat = false;
@@ -715,7 +715,7 @@
             this.gallery
             && (
                 mega.gallery.sections[id]
-                || (pfid && $viewIcons.filter('.media-view').hasClass('active'))
+                || (pfid && mega.ui.secondaryNav && mega.ui.secondaryNav.layoutIcon === 'icon-image-04-thin-outline')
             )
         ) {
             // @todo call completion (?)

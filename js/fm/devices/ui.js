@@ -1401,20 +1401,12 @@ lazy(mega.devices, 'ui', () => {
             if (!this.hasDevices) {
                 if (appIsInstalled) {
                     this.hideAppDlButtons();
-                    this.hideFmHeaderAddButtons();
                     this.showEmptyActionButtons();
                 }
                 else {
                     this.showAppDlButtons();
-                    this.hideFmHeaderAddButtons();
                     this.hideEmptyActionButtons();
                 }
-            }
-            else if (this.isCustomRender()) {
-                this.showFmHeaderAddButtons();
-            }
-            else {
-                this.hideFmHeaderAddButtons();
             }
         }
 
@@ -1465,25 +1457,6 @@ lazy(mega.devices, 'ui', () => {
                 onIdle(clickURLs);
                 this.handleAddBtnVisibility(appFound);
             });
-        }
-
-        /**
-         * Shows the Add Backup & Add Sync header buttons
-         * @returns {void}
-         */
-        showFmHeaderAddButtons() {
-            this.$addBackup.removeClass('hidden');
-            this.$addSyncs.removeClass('hidden');
-
-        }
-
-        /**
-         * Hides the Add Backup & Add Sync header buttons
-         * @returns {void}
-         */
-        hideFmHeaderAddButtons() {
-            this.$addBackup.addClass('hidden');
-            this.$addSyncs.addClass('hidden');
         }
 
         /**
@@ -2036,9 +2009,10 @@ lazy(mega.devices, 'ui', () => {
          * Returns a list of context menu items for device centre entities
          *
          * @param {Array<String>} handles The handles of the selected nodes
+         * @param {boolean} isHeaderContext If the context menu is in the header of the page (parent node)
          * @returns {object.<string,number>} Context menu item selectors
          */
-        getContextMenuItems(handles) {
+        getContextMenuItems(handles, isHeaderContext) {
 
             const items = Object.create(null);
             const currentSection = this.getRenderSection();
@@ -2085,7 +2059,7 @@ lazy(mega.devices, 'ui', () => {
             const folder = device.folders[h];
 
             // Device folders
-            if (currentSection === renderSection.deviceFolders) {
+            if (currentSection === renderSection.deviceFolders || isHeaderContext && folder) {
                 this._populateDeviceFolderCtxItems(
                     folder, selNode, items, isSharedFolder, hasSharedLink, isInShare);
             }
@@ -2122,6 +2096,16 @@ lazy(mega.devices, 'ui', () => {
             }
 
             this._filterRestrictedItems(handles, items);
+            if (isHeaderContext) {
+                delete items['.open-item'];
+                if (folder) {
+                    delete items[this.desktopApp.common.pauseMenuItemSelector];
+                    delete items['.stopbackup-item'];
+                }
+                else {
+                    delete items['.sh4r1ng-item'];
+                }
+            }
 
             return items;
         }

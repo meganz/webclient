@@ -689,11 +689,11 @@ function folderIcon(node, root) {
             return `${folderIcon}bucket-share`;
         }
 
-        return `${folderIcon}folder-outgoing`;
+        return `${folderIcon}folder-users`;
     }
     // Incoming share
     else if (node.su) {
-        return `${folderIcon}folder-incoming`;
+        return `${folderIcon}folder-users`;
     }
     // My chat files
     else if (node.h === M.cf.h) {

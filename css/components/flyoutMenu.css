@@ -51,6 +51,11 @@
     padding: 0;
     margin-inline-start: 16px;
 }
+.flyout-header .flyout-controls .mega-component.nav-elem.icon-only:active,
+.flyout-header .flyout-controls .mega-component.nav-elem.icon-only:hover {
+    background: transparent;
+    color: var(--mobile-text-primary);
+}
 .flyout-header .flyout-controls .mega-component.nav-elem.back-button {
     margin-inline: 0 auto;
 }

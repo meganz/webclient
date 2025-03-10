@@ -2563,6 +2563,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/fm/quickfinder.js', n: 'fm_quickfinder_js', j:1, w:1});
         jsl.push({f:'js/fm/selectionManager2.js', n: 'fm_selectionmanager2_js', j:1, w:1});
         jsl.push({f:'js/fm.js', n: 'fm_js', j:1, w:12});
+        jsl.push({f:'js/ui/components/meganz/fm-secondary-nav.js', n: 'fm_secondary_nav_js', j: 1, w: 1});
         jsl.push({f:'js/fm/dashboard.js', n: 'fmdashboard_js', j:1, w:5});
         jsl.push({f:'js/fm/recents.js', n: 'fmrecents_js', j:1, w:5});
         jsl.push({f:'js/time_checker.js', n: 'time_checker_js', j:1});

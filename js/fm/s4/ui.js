@@ -391,8 +391,6 @@ lazy(s4, 'ui', () => {
 
             $('.files-grid-view.fm, .fm-blocks-view.fm', this.$fmBlock).addClass('active-header');
             this.$infoHeaderBlocks.removeClass('hidden');
-            const $bucketHeader = $('.s4-info-header-bucket', this.$infoHeaderBlocks)
-                .removeClass('hidden');
             const $notification = $('.bucket-access-warning', this.$infoHeaderBlocks)
                 .removeClass('hidden');
             const publicAccess = s4.kernel.getPublicAccessLevel(this.bucket);
@@ -406,13 +404,6 @@ lazy(s4, 'ui', () => {
             else {
                 $notification.safeHTML(l.s4_bkt_access_origin_tip);
             }
-
-            $('.bucket-details-name', $bucketHeader).text(this.bucket.name);
-            $('.bucket-domain', $bucketHeader)
-                .text(s4.kernel.bucket.getHostDomain(this.bucket.h));
-
-            $('.bkt-settings-btn', this.$fmBlock)
-                .rebind('click.bucket-settings', () => this.showDialog(s4.buckets.dialogs.settings, this.bucket));
 
             $('a', $notification).rebind('click.openHelpCenter', () => {
                 window.open(

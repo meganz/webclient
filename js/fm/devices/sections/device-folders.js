@@ -19,6 +19,7 @@ lazy(mega.devices.sections, 'deviceFolders', () => {
              * {Object} syncSection - contains sections constants
              */
             syncSection,
+            syncType,
         },
 
         /**
@@ -143,11 +144,68 @@ lazy(mega.devices.sections, 'deviceFolders', () => {
          * @returns {void}
          */
         _renderHeader(device) {
-            ui.header.show(
-                device,
-                StatusUI.get(device.status),
-                ui.contextMenu
+            mega.ui.secondaryNav.showCard(
+                device.h,
+                {
+                    text: l.add_backup_button,
+                    onClick: () => {
+                        ui.desktopApp.backup.add();
+                    }
+                },
+                {
+                    text: l.add_syncs_button,
+                    onClick: () => {
+                        ui.desktopApp.sync.add();
+                    }
+                },
+                (ev) => {
+                    ev.preventDefault();
+                    const path = M.currentdirid.split('/');
+                    if (path.length > 1) {
+                        $.hideContextMenu();
+
+                        selectionManager.resetTo(path.pop());
+
+                        ev.originalEvent.delegateTarget = ev.currentTarget.domNode;
+                        ui.contextMenu(ev.originalEvent);
+
+                        delay('deviceFolders:hide:selectionBar', () => {
+                            selectionManager.hideSelectionBar();
+                        }, 80);
+                    }
+                }
             );
+
+            const infoIcon = mega.ui.secondaryNav.cardComponent.domNode.querySelector('.dc-badge-info-icon');
+            if (infoIcon && device.isDeviceFolder) {
+                const {
+                    twoWay,
+                    oneWayUp,
+                    oneWayDown,
+                    cameraUpload,
+                    mediaUpload,
+                    backup,
+                } = syncType;
+                let tip = '';
+                switch (device.t) {
+                    case twoWay:
+                    case oneWayUp:
+                    case oneWayDown:
+                        tip = l.sync_folder_header_tooltip;
+                        break;
+                    case cameraUpload:
+                    case mediaUpload:
+                        tip = l.camera_upload_folder_header_tooltip;
+                        break;
+                    case backup:
+                        tip = l.backup_folder_header_tooltip;
+                        break;
+                }
+                infoIcon.dataset.simpletip = tip;
+            }
+            else if (infoIcon) {
+                infoIcon.classList.add('hidden');
+            }
         }
 
         /**

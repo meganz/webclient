@@ -1,51 +1,63 @@
 /* For the wrapper and filter chips */
 .fm-filter-chips-wrapper {
-    margin-inline: 20px;
+    margin-inline: 20px 48px;
     min-height: 36px;
     display: flex;
+    margin-bottom: 12px;
 }
+
 .rtl .fm-filter-chips-wrapper {
-    flex-direction: row-reverse;
+    margin-inline-end: 100px;
 }
 .fm-filter-chips-wrapper .fm-filter-chips {
     width: fit-content;
     display: flex;
     gap: 8px;
 }
-.rtl .fm-filter-chips-wrapper .fm-filter-chips {
-    flex-direction: row-reverse;
-}
 .fm-filter-chips .fm-filter-reset {
     display: flex;
     height: 24px;
-    color: var(--text-color-info);
+    color: var(--mobile-text-secondary);
+    text-decoration: underline;
     align-items: center;
     cursor: pointer;
     background: none;
     border: none;
+    white-space: nowrap;
 }
 .fm-filter-chips .fm-filter-chip-button {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 4px;
     height: 24px;
     padding-inline: 12px;
-    border-radius: 12px;
-    background: var(--surface-grey-2);
+    border-radius: 16px;
+    background: var(--mobile-button-secondary);
     cursor: pointer;
     border: none;
     outline: none;
-    color: var(--text-color-high);
+    color: var(--mobile-text-primary);
+    white-space: nowrap;
+}
+.fm-filter-chips .fm-filter-chip-button:hover {
+    background: var(--mobile-button-secondary-hover);
 }
 .fm-filter-chips .fm-filter-chip-button .fm-filter-chip-button-text {
-    color: var(--stroke-main-inverted);
+    color: var(--mobile-text-primary);
+    margin-inline-end: 8px;
 }
 .rtl .fm-filter-chips .fm-filter-chip-button .nw-fm-tree-arrow::before {
     transform: rotate(90deg) !important;
 }
-.fm-filter-chips .fm-filter-chip-button.selected {
-    background: rgba(0, 191, 165, 0.30);
+.fm-filter-chips .fm-filter-chip-button.selected,
+.fm-filter-chips .fm-filter-chip-button.selected .fm-filter-chip-button-text{
+    background: rgba(252, 239, 239, 1);
+    color: rgba(123, 33, 24, 1);
+}
+.theme-dark .fm-filter-chips .fm-filter-chip-button.selected,
+.theme-dark .fm-filter-chips .fm-filter-chip-button.selected .fm-filter-chip-button-text{
+    background: rgba(91, 19, 13, 1);
+    color: rgba(252, 239, 239, 1);
 }
 
 /* For the MComponent dropdowns */

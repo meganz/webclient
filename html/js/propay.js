@@ -1730,7 +1730,7 @@ pro.propay = {
 
 
         const htmlString = `<span class="card-brand">${this.savedCard.brand}</span>
-            <span class="dots"> •••• </span>
+            <span class="dots"> *** </span>
             <span class="last-4">${this.savedCard.last4}</span>`;
 
         // $savedCard.removeClass('hidden').empty().safeAppend(htmlString);

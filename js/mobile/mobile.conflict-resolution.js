@@ -84,10 +84,6 @@ mobile.conflictResolution = {
 mBroadcaster.once('startMega', () => {
     'use strict';
 
-    fileIcon = function(node) {
-        return MegaNodeComponent.mFileIcon(node);
-    };
-
     /**
      * Get container from file conflict dialog.
      * @returns {Object} Container

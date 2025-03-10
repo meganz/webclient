@@ -156,7 +156,8 @@ class MegaChatItem extends MegaComponent {
             return 'sprite-fm-mono icon-phone';
         }
         if (this.chatRoom.type === 'private') {
-            this.fetchAvatar().dump();
+            const handle = this.chatRoom.getParticipantsExceptMe()[0];
+            MegaNodeComponent.mAvatarNode(handle, this.iconNode, { presence: true });
             return '';
         }
         return 'sprite-fm-uni icon-chat-group';
@@ -220,26 +221,6 @@ class MegaChatItem extends MegaComponent {
                         l[7006] : l[8000];
             }
         }
-    }
-
-    async fetchAvatar() {
-        const handle = this.chatRoom.getParticipantsExceptMe()[0];
-        useravatar.loadAvatar(handle).always(() => {
-            const avatarMeta = generateAvatarMeta(handle);
-
-            const shortNameEl = document.createElement('span');
-            shortNameEl.textContent = avatarMeta.shortName;
-
-            const avatar = avatarMeta.avatarUrl
-                ? mCreateElement('img', {src: avatarMeta.avatarUrl})
-                : mCreateElement('div', {class: `color${avatarMeta.color}`},[shortNameEl]);
-
-            this.iconNode.textContent = '';
-            this.iconNode.appendChild(avatar);
-            const presence = document.createElement('i');
-            presence.className = this.presence;
-            this.iconNode.appendChild(presence);
-        });
     }
 
     parsedSafeNode(content, attrs) {

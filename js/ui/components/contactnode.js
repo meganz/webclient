@@ -10,7 +10,7 @@ class MegaContactNode extends MegaNodeComponent {
         avatar.className = `avatar ${options.smallAvatar ? 'small' : ''}`;
         this.iconNode.parentNode.replaceChild(avatar, this.iconNode);
         this.iconNode = avatar;
-        this.fetchAvatar().catch(dump);
+        MegaNodeComponent.mAvatarNode(this.handle, this.iconNode);
 
         if (this.node.m) {
             const email = document.createElement('span');
@@ -75,33 +75,13 @@ class MegaContactNode extends MegaNodeComponent {
         return false;
     }
 
-    async fetchAvatar() {
-        if (!this.contact) {
-            return;
-        }
-
-        useravatar.loadAvatar(this.handle).always(() => {
-            const avatarMeta = generateAvatarMeta(this.handle);
-
-            const shortNameEl = mCreateElement('span');
-            shortNameEl.textContent = avatarMeta.shortName;
-
-            const avatar = avatarMeta.avatarUrl
-                ? mCreateElement('img', {src: avatarMeta.avatarUrl})
-                : mCreateElement('div', {class: `color${avatarMeta.color}`},[shortNameEl]);
-
-            this.iconNode.textContent = '';
-            this.iconNode.appendChild(avatar);
-        });
-    }
-
     update(type) {
         const _shouldUpdate = key => !type || type === key;
         if (_shouldUpdate('name')) {
             super.update('name');
         }
         if (_shouldUpdate('icon')) {
-            this.fetchAvatar().catch(dump);
+            MegaNodeComponent.mAvatarNode(this.handle, this.iconNode);
         }
     }
 }

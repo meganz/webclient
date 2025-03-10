@@ -1845,6 +1845,28 @@ mBroadcaster.once('boot_done', function populate_l() {
     l.available_commission_tip = escapeHTML(l.available_commission_tip)
         .replace('[A]', '<a class="clickurl" href="/pro">').replace('[/A]', '</a>');
 
+    l.dc_empty_desc_noapp = escapeHTML(l.dc_empty_desc_noapp)
+        .replace('[A]', `<a href="${l.mega_help_host}/installs-apps/desktop/backup-vs-sync"
+                            target="_blank" class="clickurl">`)
+        .replace('[/A]', '</a>');
+
+    l.dc_empty_desc_withapp = escapeHTML(l.dc_empty_desc_withapp)
+        .replace('[A]', `<a href="${l.mega_help_host}/installs-apps/desktop/backup-vs-sync"
+                            target="_blank" class="clickurl">`)
+        .replace('[/A]', '</a>');
+
+    l.dc_no_active_devices_desc = escapeHTML(l.dc_no_active_devices_desc)
+        .replace('[S]', '<span class="js-inactive-filter-select">')
+        .replace('[/S]', '</span>')
+        .replace('[A1]', '<a href="https://mega.io/desktop" target="_blank" class="clickurl">')
+        .replace('[/A1]', '</a>')
+        .replace('[A2]', '<a href="https://mega.io/mobile" target="_blank" class="clickurl">')
+        .replace('[/A2]', '</a>');
+
+    l.dc_no_active_folders_desc = escapeHTML(l.dc_no_active_folders_desc)
+        .replace('[S]', '<span class="js-inactive-filter-select">')
+        .replace('[/S]', '</span>');
+
     l.etd_link_removed_body = escapeHTML(l.etd_link_removed_body)
         .replace('[A1]', `<a href="https://mega.io/terms" target="_blank">`)
         .replace('[/A1]', '</a>')
@@ -1908,6 +1930,26 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[/A1]', '</a>')
         .replace('[A2]', `<a ${rewindLinkAttr} href="${rewindHelpLink}">`)
         .replace('[/A2]', '</a>');
+
+    l.dc_app_promo_gstarted_desc = escapeHTML(l.dc_app_promo_gstarted_desc)
+        .replace('[A1]', '<a class="clickurl" href="https://mega.io/desktop" target="_blank">')
+        .replace('[/A1]', '</a>')
+        .replace('[A2]', '<a class="clickurl" href="https://mega.io/mobile" target="_blank">')
+        .replace('[/A2]', '</a>');
+    l.dc_app_promo_backup_desc = escapeHTML(l.dc_app_promo_backup_desc)
+        .replace('[A]', '<a class="clickurl" href="https://mega.io/desktop" target="_blank">')
+        .replace('[/A]', '</a>');
+    l.dc_app_promo_sync_desc = escapeHTML(l.dc_app_promo_sync_desc)
+        .replace('[A1]', '<a class="clickurl" href="https://mega.io/desktop" target="_blank">')
+        .replace('[/A1]', '</a>')
+        .replace('[A2]', `<a class="clickurl"
+            target="_blank"
+            href="https://play.google.com/store/apps/details?id=mega.privacy.android.app&referrer=meganzdc">`)
+        .replace('[/A2]', '</a>');
+    l.dc_app_promo_cuploads_desc = escapeHTML(l.dc_app_promo_cuploads_desc)
+        .replace('[A]', '<a class="clickurl" href="https://mega.io/mobile">')
+        .replace('[/A]', '</a>');
+
     l.agree_vpn_tos = escapeHTML(l.agree_vpn_tos)
         .replace('[A]', '<a class="clickurl" href="https://mega.io/vpn-terms" target="_blank">')
         .replace('[/A]', '</a>');
@@ -2009,6 +2051,21 @@ mBroadcaster.once('boot_done', function populate_l() {
     l.meeting_protected = escapeHTML(l.meeting_protected)
         .replace('[A]', '<a class="clickurl" href="https://mega.io/chatandmeetings" target="_blank">')
         .replace('[/A]', '</a>');
+    l.pro_for_duration = escapeHTML(l.pro_for_duration)
+        .replace('[S1]', '<span class="plan-name">').replace('[/S1]', '</span>')
+        .replace('[S2]', '<span class="plan-duration">').replace('[/S2]', '</span>')
+        .replace('[S3]', '<span class="plan-duration">').replace('[/S3]', '</span>');
+    l.after_trial_card_charged_m = escapeHTML(l.after_trial_card_charged_m)
+        .replace('[S1]', '<span class="plan-name">').replace('[/S1]', '</span>')
+        .replace('[S2]', '<span class="plan-price">').replace('[/S2]', '</span>');
+    l.you_have_selected_vpn = escapeHTML(l.you_have_selected_vpn)
+        .replace('[S]', '<span>').replace('[/S]', '</span>');
+    l.you_have_selected_pass = escapeHTML(l.you_have_selected_pass)
+        .replace('[S]', '<span>').replace('[/S]', '</span>');
+    l.you_have_selected_vpn_trial = escapeHTML(l.you_have_selected_vpn_trial)
+        .replace('[S]', '<span>').replace('[/S]', '</span>');
+    l.you_have_selected_pass_trial = escapeHTML(l.you_have_selected_pass_trial)
+        .replace('[S]', '<span>').replace('[/S]', '</span>');
 
     const common = [
         15536, 16119, 16120, 16313, 16316, 16360, 18228, 18268, 18282,

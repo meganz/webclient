@@ -607,52 +607,16 @@ function fmtopUI() {
     var $galleryTabBlock = $('.gallery-tabs-bl');
     const $galleryTabLink = $('.gallery-tab-lnk');
     const $header = $('.fm-right-header', '.fmholder');
-    const $fmShareButton = $('.fm-share-folder').off('click.shareFolder').addClass('hidden');
 
-    if ($fmShareButton.length) {
-        // Show share button unless for root id, out shares, s4, etc
-        const pages = ['s4', 'out-shares', 'shares', 'file-requests', 'faves', M.RubbishID];
-        const dirPages = [M.BackupsId, M.RootID, M.currentrootid];
-        const showButton = !pages.includes(M.currentrootid) && !dirPages.includes(M.currentdirid)
-            && M.currentrootid !== (M.BackupsId && M.getNodeByHandle(M.BackupsId).p);
+    let primary = false;
+    let secondary = false;
+    let contextMenuItem = false;
 
-        if (showButton) {
-            const h = String(M.currentdirid).split('/').pop();
-            const n = M.getNodeByHandle(h);
-
-            if (M.getNodeRights(n.h) > 1) {
-                $fmShareButton.removeClass('hidden').rebind('click.shareFolder', () => {
-                    $.selected = [n.h];
-                    M.openSharingDialog($.selected[0]);
-                    eventlog(500034);
-                    return false;
-                });
-            }
-        }
+    const id = M.currentdirid.split('/').pop();
+    if (mega.rewind && M.getSelectedSourceRoot() === M.RootID && M.currentrootid === M.RootID && !pfid) {
+        contextMenuItem = id;
     }
 
-    /**
-     * Initialise the Rewind header button functionality in case of Rewindable folders
-     * Retries management in case mega.rewind not yet loaded
-     * @param {Number} cur - current attempt number
-     * @param {Number} max - max number of attempts before giving up
-     */
-    const initRewindHeaderButton = (cur = 0, max = 3) => {
-        if (mega.rewind) {
-            if (M.getSelectedSourceRoot() === M.RootID && M.currentrootid === M.RootID) {
-                mega.rewind.bindHeaderButton();
-            }
-            else {
-                mega.rewind.unbindHeaderButton();
-            }
-        }
-        else if (cur < max) {
-            // this is needed on first webclient load of rewindable empty folders
-            delay('fm-header:rewind-btn', () => initRewindHeaderButton(cur + 1, max), 1e3);
-        }
-    };
-
-    initRewindHeaderButton();
     const $rewindNotifBanner =
         $('.fm-notification-block.new-feature-rewind-notification', '.fm-right-files-block');
     $rewindNotifBanner.addClass('hidden');
@@ -663,41 +627,22 @@ function fmtopUI() {
     $('.fm-s4-settings, .fm-s4-new-bucket, .fm-s4-new-key, .fm-s4-new-user, .fm-s4-new-group', $header)
         .addClass('hidden');
 
-    $('.fm-clearbin-button,.fm-add-user,.fm-new-folder,.fm-file-upload,.fm-folder-upload,.fm-uploads')
-        .add('.fm-new-shared-folder,.fm-new-link,.fm-rewind')
-        .add('.fm-new-file-request')
-        .addClass('hidden');
-    $('.fm-new-folder').removeClass('filled-input');
+    if (M.currentrootid !== 'shares' && !M.onDeviceCenter) {
+        mega.ui.secondaryNav.hideCard();
+        mega.ui.secondaryNav.hideActionButtons();
+    }
+    mega.ui.secondaryNav.updateLayoutButton(
+        M.currentdirid === 'shares' ||
+        M.currentdirid === 'out-shares' ||
+        M.currentdirid === 'file-requests'
+    );
+    mega.ui.secondaryNav.updateInfoPanelButton(id && M.d[id] && M.d[id].t);
+    mega.ui.secondaryNav.showBreadcrumb();
     $('.fm-right-files-block').removeClass('visible-notification rubbish-bin');
-    $('.fm-breadcrumbs-block').removeClass('hidden');
-    $('button.link-button.accept-all').addClass('hidden');
-
-    var showUploadBlock = function _showUploadBlock() {
-
-        if (M.InboxID && (M.currentrootid === M.InboxID
-            || M.getNodeRoot(M.currentdirid.split('/').pop()) === M.InboxID)) {
-            return false;
-        }
-
-        $('.fm-new-folder').removeClass('hidden');
-        $('.fm-file-upload').removeClass('hidden');
-        $('.fm-uploads').removeClass('hidden');
-
-        if ($.hasWebKitDirectorySupport === undefined) {
-            $.hasWebKitDirectorySupport = 'webkitdirectory' in document.createElement('input');
-        }
-
-        if ($.hasWebKitDirectorySupport) {
-            $('.fm-folder-upload').removeClass('hidden');
-        }
-        else {
-            $('.fm-file-upload').addClass('last-button');
-        }
-    };
 
     if (M.currentrootid === M.RubbishID) {
         if (M.v.length) {
-            $('.fm-clearbin-button').removeClass('hidden');
+            primary = '.fm-clearbin-button';
         }
 
         if (mega.config.get('dsmRubRwd')) {
@@ -734,8 +679,18 @@ function fmtopUI() {
             $sharesTabBlock.find('.in-shares').addClass('active');
             $('.fm-right-files-block').addClass('visible-notification');
 
-            if (M.currentdirid !== 'shares' && M.getNodeRights(M.currentdirid) > 0) {
-                showUploadBlock();
+            if (M.currentdirid !== 'shares' && !M.d[M.currentdirid].su) {
+                if (M.getNodeRights(M.currentdirid) > 0) {
+                    primary = '.fm-new-menu';
+                    secondary = '.fm-download';
+                }
+                else {
+                    primary = '.fm-download';
+                }
+                contextMenuItem = contextMenuItem || M.currentdirid;
+            }
+            else if (M.currentdirid !== 'shares') {
+                mega.ui.secondaryNav.hideBreadcrumb();
             }
         }
         else if (M.currentrootid === 'out-shares') {
@@ -745,12 +700,18 @@ function fmtopUI() {
             $('.out-shares', $sharesTabBlock).addClass('active');
             $('.fm-right-files-block').addClass('visible-notification');
 
-            if (M.currentdirid !== M.currentrootid) {
-                showUploadBlock();
+            if (M.currentdirid === M.currentrootid) {
+                primary = '.fm-new-shared-folder';
+                mega.ui.secondaryNav.hideBreadcrumb();
+            }
+            else if (M.getNodeShareUsers(M.d[M.currentdirid.replace('out-shares/', '')], 'EXP').length) {
+                primary = '.fm-new-menu';
+                secondary = '.fm-manage-share-folder';
+                contextMenuItem = contextMenuItem || id;
             }
             else {
-                $('.fm-new-shared-folder').removeClass('hidden');
-                $sharesTabBlock.removeClass('hidden');
+                primary = '.fm-new-menu';
+                contextMenuItem = contextMenuItem || id;
             }
         }
         else if (M.currentrootid === 'public-links') {
@@ -761,10 +722,13 @@ function fmtopUI() {
             $('.fm-right-files-block').addClass('visible-notification');
 
             if (M.currentdirid === M.currentrootid) {
-                $('.fm-new-link').removeClass('hidden');
+                primary = '.fm-new-link';
+                mega.ui.secondaryNav.hideBreadcrumb();
             }
             else {
-                showUploadBlock();
+                primary = '.fm-new-menu';
+                secondary = '.fm-manage-link';
+                contextMenuItem = contextMenuItem || id;
             }
         }
         else if (M.currentrootid === 'file-requests') {
@@ -774,10 +738,13 @@ function fmtopUI() {
             $('.fm-right-files-block', document).addClass('visible-notification');
 
             if (M.currentdirid === M.currentrootid) {
-                $('.fm-new-file-request', document).removeClass('hidden');
+                primary = '.fm-new-file-request';
+                mega.ui.secondaryNav.hideBreadcrumb();
             }
             else {
-                showUploadBlock();
+                primary = '.fm-new-menu';
+                secondary = mega.fileRequest.storage.getPuHandleByNodeHandle(id) ? '.fm-manage-file-request' : false;
+                contextMenuItem = contextMenuItem || id;
             }
         }
         else if (M.isGalleryPage()) {
@@ -796,41 +763,92 @@ function fmtopUI() {
             }
         }
         else if (M.currentrootid === 's4') {
-            const {subType, original} = M.currentCustomView;
+            const {subType, original, nodeID, containerID} = M.currentCustomView;
+            mega.ui.secondaryNav.updateLayoutButton(!subType.startsWith('bucket'));
             if (subType === 'container') {
-                $('.fm-s4-new-bucket, .fm-s4-settings', '.fm-header-buttons').removeClass('hidden');
+                primary = '.fm-s4-new-bucket';
+                secondary = '.fm-s4-settings';
             }
             else if (subType === 'bucket') {
-                $('.fm-new-folder').removeClass('hidden');
-                $('.fm-uploads').removeClass('hidden');
-                $('.fm-file-upload').removeClass('hidden');
-                $('.fm-folder-upload').removeClass('hidden');
+                if (M.d[nodeID].p === containerID) {
+                    mega.ui.secondaryNav.showCard(
+                        nodeID,
+                        {
+                            text: l.add_item_btn,
+                            icon: 'sprite-fm-mono icon-plus-light-solid',
+                            onClick: (ev) => {
+                                mega.ui.secondaryNav.openNewMenu(ev);
+                            }
+                        },
+                        {
+                            text: l.s4_bkt_settings,
+                            onClick: () => {
+                                s4.ui.showDialog(s4.buckets.dialogs.settings, s4.ui.bucket);
+                            }
+                        },
+                        (ev) => {
+                            mega.ui.secondaryNav.openContextMenu(ev);
+                        }
+                    );
+                }
+                else {
+                    primary = '.fm-new-menu';
+                    contextMenuItem = contextMenuItem || nodeID;
+                }
             }
             else if (subType === 'keys') {
-                $('.fm-files-view-icon').addClass('hidden');
-                $('.fm-s4-new-key').removeClass('hidden');
+                primary = '.fm-s4-new-key';
             }
             else if (subType === 'policies') {
-                $('.fm-files-view-icon').addClass('hidden');
             }
             else if (subType === 'users') {
-                $('.fm-files-view-icon').addClass('hidden');
                 if (original.endsWith('users')) {
-                    $('.fm-s4-new-user').removeClass('hidden');
+                    primary = '.fm-s4-new-user';
                 }
             }
             else if (subType === 'groups') {
-                $('.fm-files-view-icon').addClass('hidden');
                 if (original.endsWith('groups')) {
-                    $('.fm-s4-new-group').removeClass('hidden');
+                    primary = '.fm-s4-new-group';
                 }
             }
+        }
+        else if (M.onDeviceCenter) {
+            if (M.currentdirid === M.currentrootid && mega.devices.ui.hasDevices && mega.devices.ui.isCustomRender()) {
+                primary = '.fm-add-backup';
+                secondary = '.fm-add-syncs';
+                mega.ui.secondaryNav.hideCard();
+            }
+            if (mega.devices.ui.isCustomRender()) {
+                mega.ui.secondaryNav.updateLayoutButton(true);
+            }
+            else {
+                const h = M.currentCustomView.nodeID;
+                const { device } = mega.devices.ui.getCurrentDirData();
+                const isBackup = mega.devices.ui.isBackupRelated(h);
+                if (device && !device.folders[h]) {
+                    primary = isBackup ? '.fm-share-folder' : '.fm-new-menu';
+                    secondary = isBackup ? false : '.fm-share-folder';
+                    contextMenuItem = contextMenuItem || h;
+                }
+            }
+
+            $('.fm-right-files-block', document).addClass('visible-notification');
+            mega.devices.ui.handleAddBtnVisibility();
         }
         else if (String(M.currentdirid).length === 8
             && M.getNodeRights(M.currentdirid) > 0) {
 
             $('.fm-right-files-block').addClass('visible-notification');
-            showUploadBlock();
+            primary = '.fm-new-menu';
+            secondary = M.currentdirid === M.RootID ? false : '.fm-share-folder';
+            contextMenuItem = contextMenuItem || id;
+        }
+        else if (folderlink) {
+            primary = '.fm-import-to-cloudrive';
+            secondary = '.fm-download';
+        }
+        else if (String(M.currentdirid).substring(0, 6) === 'search') {
+            mega.ui.secondaryNav.hideBreadcrumb();
         }
     }
     $('.fm-clearbin-button').rebind('click', function() {
@@ -845,6 +863,8 @@ function fmtopUI() {
         mega.fileRequest.rebindTopMenuCreateIcon();
     }
     $.tresizer();
+
+    mega.ui.secondaryNav.showActionButtons(primary, secondary, contextMenuItem);
 }
 
 /**
@@ -1183,7 +1203,7 @@ function FMShortcuts() {
 
             var remItems = selectionManager.get_selected();
             if (remItems.length === 0 || (M.getNodeRights(M.currentdirid || '') | 0) < 2 ||
-                M.currentrootid === M.InboxID || M.currentdirid === 'devices') {
+                M.currentrootid === M.InboxID) {
                 return; // dont do anything.
             }
 
@@ -1376,7 +1396,6 @@ function renameDialog() {
                             errMsg = l[23219];
                         }
                         else if (!s4Folder || !(errMsg = s4.ui.getInvalidNodeNameError(n, value))) {
-
                             M.rename(n.h, value).catch(tell);
                         }
                     }
@@ -1710,7 +1729,9 @@ function msgDialog(type, title, msg, submsg, callback, checkboxSetting) {
                 || checkboxSetting === 'skipcdtos4'
                 || checkboxSetting === 'skips4tocd'
                 || checkboxSetting === 'skips4tos4'
-                || checkboxSetting === 'rwReinstate', checkboxSetting);
+                || checkboxSetting === 'rwReinstate'
+                || checkboxSetting === 'dcPause', checkboxSetting);
+
 
             $('#msgDialog .checkbox-block .checkdiv,' +
                 '#msgDialog .checkbox-block input')
@@ -2997,7 +3018,6 @@ function closeDialog(ev) {
 
         // add contact popup
         $('.add-user-popup').addClass('hidden');
-        $('.fm-add-user').removeClass('active');
 
         $('.add-contact-multiple-input').tokenInput("clearOnCancel");
         $('.share-multiple-input').tokenInput("clearOnCancel");
@@ -3185,8 +3205,11 @@ function createFolderDialog(close) {
                     return awaitingPromise;
                 }
 
+                const {type, original} = M.currentCustomView;
+                const id = type === mega.devices.rootId ? original : Object(M.d[h]).p || target;
+
                 // By default, auto-select the newly created folder as long no awaiting promise
-                return M.openFolder(Object(M.d[h]).p || target)
+                return M.openFolder(id)
                     .always(() => {
                         $.selected = [h];
                         reselect(1);
@@ -3588,20 +3611,13 @@ function fm_resize_handler(force) {
     }
 
     if (M.currentdirid === 'shares') {
-        if (M.viewmode) {
-            initPerfectScrollbar($('.shared-blocks-scrolling', '.shared-blocks-view'));
-        }
-        else {
-            initPerfectScrollbar($('.grid-scrolling-table', '.shared-grid-view'));
-        }
+        initPerfectScrollbar($('.grid-scrolling-table', '.shared-grid-view'));
     }
     else if (M.currentdirid === 'out-shares') {
-        if (M.viewmode) {
-            initPerfectScrollbar($('.out-shared-blocks-scrolling', '.out-shared-blocks-view'));
-        }
-        else {
-            initPerfectScrollbar($('.grid-scrolling-table', '.out-shared-grid-view'));
-        }
+        initPerfectScrollbar($('.grid-scrolling-table', '.out-shared-grid-view'));
+    }
+    else if (M.onDeviceCenter && !M.viewmode && mega.devices.ui.isCustomRender()) {
+        initPerfectScrollbar($('.grid-scrolling-table', mega.devices.ui.gridWrapperSelector));
     }
     else if (M.currentdirid === 'transfers') {
         fm_tfsupdate(); // this will call $.transferHeader();
@@ -3692,38 +3708,22 @@ function sharedFolderUI() {
         $('.shared-details-block .files-grid-view, .shared-details-block .fm-blocks-view').removeAttr('style');
         $('.shared-details-block .shared-folder-content').unwrap();
         $('.shared-folder-content').removeClass('shared-folder-content');
-        $('.shared-top-details').remove();
         browsingSharedContent = true;
     }
 
     // are we in an inshare?
+    if (M.currentrootid === 'shares' || M.currentrootid === 'out-shares') {
+        mega.ui.secondaryNav.hideCard();
+    }
     while (nodeData && !nodeData.su) {
         nodeData = M.d[nodeData.p];
     }
 
     if (nodeData) {
 
-        var rights = l[55];
         var rightPanelView = '.files-grid-view.fm';
 
-        // Handle of initial share owner
-        var ownersHandle = nodeData.su;
-        var folderName = M.getNameByHandle((M.d[M.currentdirid] || nodeData).h);
-        var displayName = escapeHTML(M.getNameByHandle(ownersHandle));
-        var avatar = useravatar.contact(M.d[ownersHandle]);
         $('.shared-blocks-view', '.fm-right-files-block').addClass('hidden');
-
-        if (Object(M.u[ownersHandle]).m) {
-            displayName += '<span>' + escapeHTML(M.u[ownersHandle].m) + '</span>';
-        }
-
-        // Access rights
-        if (nodeData.r === 1) {
-            rights = l[56];
-        }
-        else if (nodeData.r === 2) {
-            rights = l[57];
-        }
 
         if (M.viewmode === 1) {
             rightPanelView = '.fm-blocks-view.fm';
@@ -3731,52 +3731,42 @@ function sharedFolderUI() {
 
         $(rightPanelView).wrap('<div class="shared-details-block"></div>');
 
-        $('.shared-details-block').prepend(
-            '<div class="shared-top-details">'
-                + '<i class="shared-details-icon item-type-icon-90 icon-folder-incoming-90"></i>'
-                + '<div class="shared-details-info-block">'
-                    + '<div class="shared-details-pad">'
-                        + '<div class="shared-details-folder-name">' + escapeHTML(folderName) + '</div>'
-                        + '<div class="shared-folder-access">'
-                            + '<span>' + escapeHTML(rights) + '</span>'
-                        + '</div>'
-                        + '<a href="javascript:;" class="grid-url-arrow">'
-                        + '<i class="sprite-fm-mono icon-options"></i></a>'
-                        + '<div class="clear"></div>'
-                        + avatar
-                        + '<div class="fm-chat-user-info">'
-                            + '<div class="fm-chat-user">' + displayName + '</div>'
-                        + '</div>'
-                    + '</div>'
-                    + '<div class="shared-details-buttons">'
-                        + '<button class="mega-button fm-share-download">'
-                            + '<span class="fm-chatbutton-arrow inshare-dl-button0">' + escapeHTML(l[58]) + '</span>'
-                        + '</button>'
-                        + '<button class="mega-button fm-share-copy">'
-                            + '<span>'
-                                + escapeHTML(l[63])
-                            + '</span>'
-                        + '</button>'
-                        + '<button class="mega-button negative fm-leave-share">'
-                            + '<span>'
-                                + escapeHTML(l[5866])
-                            + '</span>'
-                        + '</button>'
-                    + '</div>'
-                    + '<div class="clear"></div>'
-                + '</div>'
-            + '</div>');
-
-        $(rightPanelView).addClass('shared-folder-content');
-
-        if (mega.keyMgr.getWarningValue('cv') === '1') {
-            const ed = authring.getContactAuthenticated(ownersHandle, 'Ed25519');
-
-            if (!(ed && ed.method >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON)) {
-                $('.shared-details-block .shared-details-icon')
-                    .addClass('sprite-fm-uni-after icon-warning-after');
+        const { r } = nodeData;
+        const downloadButton = {
+            text: l[58],
+            onClick(ev) {
+                mega.ui.secondaryNav.openDownloadMenu(ev);
+            }
+        };
+        const newButton = {
+            text: l.add_item_btn,
+            icon: 'sprite-fm-mono icon-plus-light-solid',
+            onClick(ev) {
+                mega.ui.secondaryNav.openNewMenu(ev);
+            }
+        };
+        const onContextMenu = (ev) => {
+            mega.ui.secondaryNav.openContextMenu(ev);
+        };
+        if (nodeData.h === M.currentdirid) {
+            mega.ui.secondaryNav.hideBreadcrumb();
+            if (r === 1 || r === 2) {
+                mega.ui.secondaryNav.showCard(M.currentdirid, newButton, downloadButton, onContextMenu);
+            }
+            else {
+                mega.ui.secondaryNav.showCard(
+                    M.currentdirid,
+                    downloadButton,
+                    { componentClassname: 'hidden' },
+                    onContextMenu
+                );
             }
         }
+        else {
+            mega.ui.secondaryNav.showBreadcrumb();
+        }
+
+        $(rightPanelView).addClass('shared-folder-content');
 
         if (M.d[M.currentdirid] !== nodeData || M.d[nodeData.p]) {
             // hide leave-share under non-root shares

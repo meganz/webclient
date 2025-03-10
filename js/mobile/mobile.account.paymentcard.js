@@ -86,7 +86,7 @@ mobile.settings.account.paymentCard = new function() {
 
         loadingDialog.show();
 
-        api_req({ a: 'cci' }, {
+        api_req({ a: 'cci', v: 2 }, {
             callback: (res) => {
 
                 loadingDialog.hide();

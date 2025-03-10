@@ -144,6 +144,10 @@ button.nav-elem.no-active:active,
     background: var(--mobile-button-primary-pressed);
     color: var(--mobile-text-inverse);
 }
+.nav-elem:hover,
+.nav-elem.primary:hover {
+    background: var(--mobile-button-primary-hover);
+}
 
 .nav-elem.secondary,
 .nav-elem.secondary.no-active:active {
@@ -158,6 +162,9 @@ button.nav-elem.no-active:active,
 .nav-elem.secondary:active {
     background: var(--mobile-button-secondary-pressed);
     color: var(--mobile-text-primary);
+}
+.nav-elem.secondary:hover {
+    background: var(--mobile-button-secondary-hover);
 }
 
 .nav-elem.outline,
@@ -177,6 +184,10 @@ button.nav-elem.no-active:active,
     border: solid 2px var(--mobile-button-primary-pressed);
     color: var(--mobile-button-primary-pressed);
 }
+.nav-elem.outline:hover {
+    background: none;
+    border: solid 2px var(--mobile-button-outline-hover);
+}
 
 .nav-elem.destructive,
 .nav-elem.destructive.no-active:active {
@@ -191,6 +202,9 @@ button.nav-elem.no-active:active,
 .nav-elem.destructive:active {
     background: var(--mobile-button-error-pressed);
     color: var(--mobile-text-on-color);
+}
+.nav-elem.destructive:hover {
+    background: var(--mobile-button-error-hover);
 }
 
 .nav-elem.text-only,
@@ -221,6 +235,9 @@ button.nav-elem.no-active:active,
 .nav-elem.text-only:not(.no-deco):active {
     color: var(--mobile-button-secondary-pressed);
     text-decoration: underline var(--mobile-button-secondary-pressed);
+}
+.nav-elem.text-only:hover {
+    color: var(--mobile-button-primary-pressed);
 }
 .nav-elem.text-icon.disabled,
 .nav-elem.text-icon.disabled:active {

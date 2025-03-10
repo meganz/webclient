@@ -324,12 +324,6 @@ lazy(mega.gallery, 'albums', () => {
     const predefinedKeyLength = 3;
 
     /**
-     * The maximum number of buttons allowed without grouping to `More`
-     * @type {Number}
-     */
-    const headerBtnLimit = 2;
-
-    /**
      * This is the default name to be used when
      * @type {String}
      */
@@ -2576,9 +2570,15 @@ lazy(mega.gallery, 'albums', () => {
     }
 
     class AlbumOptionsContextMenu extends MMenuSelect {
-        constructor(options) {
+        constructor(options, parentButton) {
             super();
             this.options = options;
+            this.parentButton = parentButton;
+        }
+
+        hide(hideSiblings) {
+            super.hide(hideSiblings);
+            this.parentButton.classList.remove('active');
         }
     }
 
@@ -3042,73 +3042,10 @@ lazy(mega.gallery, 'albums', () => {
      */
     class AlbumsGridHeader {
         constructor(parent) {
-            /**
-             * @type {HTMLElement?}
-             */
-            this.breadcrumbs = null;
-
-            /**
-             * @type {HTMLElement?}
-             */
-            this.rightButtons = null;
-
             if (!parent) {
                 return;
             }
-
-            this.el = document.createElement('div');
-            this.el.className = 'albums-header flex flex-row items-center justify-between pt-4 pb-2';
-
-            parent.appendChild(this.el);
             parent.classList.remove('hidden');
-
-            this.setBreadcrumbs();
-
-        }
-
-        setBreadcrumbs(albumId) {
-            if (this.breadcrumbs) {
-                this.el.removeChild(this.breadcrumbs);
-            }
-
-            this.breadcrumbs = document.createElement('div');
-
-            if (albumId && scope.albums.store[albumId]) {
-                if (!scope.albums.isPublic) {
-                    const btn = new MButton(
-                        scope.albums.store[albumId].label,
-                        'icon-down rot-90',
-                        () => {
-                            openMainPage();
-                        },
-                        'mega-button breadcrumb-btn action'
-                    );
-
-                    btn.el.title = l[822];
-                    this.breadcrumbs.appendChild(btn.el);
-                }
-
-                this.breadcrumbs.className = 'flex flex-row items-center text-ellipsis';
-            }
-            else {
-                const span = document.createElement('span');
-                span.textContent = '';
-                this.breadcrumbs.prepend(span);
-            }
-
-            this.el.prepend(this.breadcrumbs);
-        }
-
-        setBreadcrumbsTitle(albumId) {
-            if (!this.breadcrumbs) {
-                this.setBreadcrumbs(albumId);
-                return;
-            }
-
-            const span = this.breadcrumbs.querySelector('span');
-
-            span.title = scope.albums.store[albumId].label;
-            span.textContent = span.title;
         }
 
         setSpecificAlbumButtons(albumId) {
@@ -3123,26 +3060,152 @@ lazy(mega.gallery, 'albums', () => {
             const buttons = [];
             const needSlideshow = scope.nodesAllowSlideshow(nodes);
 
-            if (!filterFn && !isPublic) {
+            const hidden = { componentClassname: 'hidden' };
+
+            const onDownload = () => {
+                if (M.isInvalidUserStatus()) {
+                    return;
+                }
+
+                const handles = scope.getAlbumsHandles([albumId]);
+
+                if (handles.length) {
+                    scope.reportDownload();
+                    M.addDownload(handles);
+                }
+            };
+
+            if (isPublic) {
+                mega.ui.secondaryNav.showCard(
+                    albumId,
+                    {
+                        text: l.context_menu_import,
+                        onClick: () => {
+                            eventlog(99831);
+                            M.importFolderLinkNodes([M.RootID]);
+                        }
+                    },
+                    nodesAvailable ?
+                        {
+                            text: l.album_download,
+                            onClick: onDownload
+                        } :
+                        hidden,
+                    needSlideshow && ((ev) => {
+                        const parent = ev.currentTarget.domNode;
+                        const contextMenu = new AlbumOptionsContextMenu([{
+                            label: l.album_play_slideshow,
+                            icon: 'play-square',
+                            click: () => {
+                                scope.playSlideshow(albumId, true);
+                            },
+                            parent
+                        }], parent);
+
+                        const { x, y, right, bottom } = parent.getBoundingClientRect();
+                        contextMenu.show(x, bottom + MContextMenu.offsetVert, right, y + MContextMenu.offsetVert);
+                    })
+                );
+            }
+            else if (filterFn) {
+                const slideshow = needSlideshow ? {
+                    text: l.album_play_slideshow,
+                    onClick: () => {
+                        scope.playSlideshow(albumId, true);
+                    }
+                } : hidden;
+                const download = nodesAvailable ? {
+                    text: l.album_download,
+                    onClick: (ev) => {
+                        const { x, bottom } = ev.currentTarget.domNode.getBoundingClientRect();
+                        const menu = new DownloadContextMenu(albumId);
+
+                        menu.show(x, bottom + 4);
+                    }
+                } : false;
+                mega.ui.secondaryNav.showCard(
+                    albumId,
+                    download || slideshow,
+                    download ? slideshow : hidden
+                );
+            }
+            else {
+                if (needSlideshow) {
+                    buttons.push({
+                        label: l.album_play_slideshow,
+                        icon: 'play-square',
+                        click: () => {
+                            scope.playSlideshow(albumId, true);
+                        },
+                    });
+                }
+
+                if (nodesAvailable) {
+                    buttons.push({
+                        label: l.album_download,
+                        icon: 'download',
+                        click: onDownload,
+                        isDisabled: false,
+                        children: isMSync() ? undefined : generateDownloadOptions([albumId])
+                    });
+                }
+
+                if (p) {
+                    buttons.push({
+                        label: l[6821],
+                        icon: 'link-remove',
+                        click: () => {
+                            removeShareWithConfirmation([albumId]);
+                        },
+                    });
+                }
+
                 buttons.push(
-                    [
-                        l.add_album_items,
-                        'add icon-green',
-                        () => {
+                    {
+                        label: l.rename_album,
+                        icon: 'rename',
+                        click: () => {
+                            if (M.isInvalidUserStatus()) {
+                                return;
+                            }
+
+                            const dialog = new AlbumNameDialog(albumId);
+                            dialog.show();
+                        },
+                    },
+                    {
+                        label: l.delete_album,
+                        icon: 'bin',
+                        click: () => {
+                            if (M.isInvalidUserStatus()) {
+                                return;
+                            }
+
+                            const dialog = new RemoveAlbumDialog([albumId]);
+                            dialog.show();
+                        },
+                        isDisabled: false,
+                        children: undefined,
+                        classes: ['red']
+                    }
+                );
+
+                mega.ui.secondaryNav.showCard(
+                    albumId,
+                    {
+                        text: l.add_album_items,
+                        onClick: () => {
                             if (M.isInvalidUserStatus()) {
                                 return;
                             }
 
                             const dialog = new AlbumItemsDialog(albumId);
                             dialog.show();
-                        },
-                        this.rightButtons,
-                        !M.v.length
-                    ],
-                    [
-                        p ? l[6909] : mega.icu.format(l.album_share_link, 1),
-                        'link icon-yellow',
-                        () => {
+                        }
+                    },
+                    {
+                        text: p ? l[6909] : mega.icu.format(l.album_share_link, 1),
+                        onClick: () => {
                             if (M.isInvalidUserStatus()) {
                                 return;
                             }
@@ -3161,202 +3224,52 @@ lazy(mega.gallery, 'albums', () => {
                             else {
                                 scope.albums.addShare([albumId]);
                             }
-                        },
-                        this.rightButtons,
-                        !M.v.length
-                    ]
-                );
-            }
-
-            if (needSlideshow) {
-                buttons.push([
-                    l.album_play_slideshow,
-                    'play-square icon-blue',
-                    () => {
-                        scope.playSlideshow(albumId, true);
-                    },
-                    this.rightButtons
-                ]);
-            }
-
-            if (nodesAvailable) {
-                buttons.push([
-                    l.album_download,
-                    'download icon-green',
-                    (component) => {
-                        if (M.isInvalidUserStatus()) {
-                            return;
-                        }
-
-                        if (component) {
-                            const { x, bottom } = component.el.getBoundingClientRect();
-                            const menu = new DownloadContextMenu(albumId);
-
-                            menu.show(x, bottom + 4);
-                        }
-                        else {
-                            const handles = scope.getAlbumsHandles([albumId]);
-
-                            if (handles.length) {
-                                scope.reportDownload();
-                                M.addDownload(handles);
-                            }
                         }
                     },
-                    this.rightButtons,
-                    false,
-                    (isMSync()) ? undefined : generateDownloadOptions([albumId])
-                ]);
-            }
+                    (ev) => {
+                        const parent = ev.currentTarget.domNode;
+                        const contextMenu = new AlbumOptionsContextMenu(buttons, parent);
 
-            if (isPublic) {
-                const last = buttons.length - 1;
-                [buttons[last - 1], buttons[last]] = [buttons[last], buttons[last - 1]];
-
-                buttons.unshift([
-                    (u_type) ? l.context_menu_import : l.btn_imptomega,
-                    'add-circle icon-green',
-                    () => {
-                        eventlog(99831);
-                        M.importFolderLinkNodes([M.RootID]);
-                    },
-                    this.rightButtons
-                ]);
-            }
-            else {
-                if (p) {
-                    buttons.push([
-                        l[6821],
-                        'link-remove',
-                        () => {
-                            removeShareWithConfirmation([albumId]);
-                        },
-                        this.rightButtons
-                    ]);
-                }
-
-                if (!filterFn) {
-                    buttons.push(
-                        [
-                            l.rename_album,
-                            'rename',
-                            () => {
-                                if (M.isInvalidUserStatus()) {
-                                    return;
-                                }
-
-                                const dialog = new AlbumNameDialog(albumId);
-                                dialog.show();
-                            },
-                            this.rightButtons
-                        ],
-                        [
-                            l.delete_album,
-                            'bin',
-                            () => {
-                                if (M.isInvalidUserStatus()) {
-                                    return;
-                                }
-
-                                const dialog = new RemoveAlbumDialog([albumId]);
-                                dialog.show();
-                            },
-                            this.rightButtons,
-                            false,
-                            undefined,
-                            ['red']
-                        ]
-                    );
-                }
-            }
-
-            for (let i = 0; i < headerBtnLimit; i++) {
-                if (buttons[i]) {
-                    AlbumsGridHeader.attachButton(...buttons[i]);
-                }
-            }
-
-            const remaining = buttons.length - headerBtnLimit;
-
-            if (remaining < 1) {
-                return;
-            }
-
-            if (remaining === 1) {
-                AlbumsGridHeader.attachButton(...buttons[headerBtnLimit]);
-            }
-            else {
-                const optionsBtn = AlbumsGridHeader.attachButton(
-                    l.album_options_more,
-                    'options',
-                    () => {
-                        const contextMenu = new AlbumOptionsContextMenu(
-                            buttons.slice(headerBtnLimit).map(([
-                                label,
-                                icon,
-                                click,
-                                parent,
-                                isDisabled,
-                                children,
-                                classes
-                            ]) => {
-                                return {
-                                    label,
-                                    click,
-                                    icon: icon.replace(/icon-blue|icon-green/, ''),
-                                    children,
-                                    parent,
-                                    isDisabled,
-                                    classes
-                                };
-                            })
-                        );
-
-                        const { x, y, right, bottom } = optionsBtn.el.getBoundingClientRect();
+                        const { x, y, right, bottom } = parent.getBoundingClientRect();
                         contextMenu.show(x, bottom + MContextMenu.offsetVert, right, y + MContextMenu.offsetVert);
-                    },
-                    this.rightButtons,
-                    !M.v.length
+                    }
                 );
             }
         }
 
         setGlobalButtons() {
-            AlbumsGridHeader.attachButton(
-                l.new_album,
-                'add icon-green',
-                () => {
+            if (Object.values(scope.albums.store).filter(scope.albumIsRenderable).length === 0) {
+                mega.ui.secondaryNav.hideActionButtons();
+                return;
+            }
+            mega.ui.secondaryNav.addActionButton({
+                componentClassname: 'fm-new-album',
+                text: l.new_album,
+                onClick: () => {
                     if (M.isInvalidUserStatus()) {
                         return;
                     }
 
                     const dialog = new AlbumNameDialog();
                     dialog.show();
-                },
-                this.rightButtons
-            );
+                }
+            });
+            mega.ui.secondaryNav.showActionButtons('.fm-new-album');
         }
 
         update(albumId) {
             this.setRightControls(albumId);
-            this.setBreadcrumbs(albumId);
 
             // Only 'Albums' section needs this. Otherwise the banner does not appear in albums
             $('.fm-right-files-block').addClass('visible-notification');
         }
 
         setRightControls(albumId) {
-            if (this.rightButtons) {
-                while (this.rightButtons.firstChild) {
-                    this.rightButtons.removeChild(this.rightButtons.firstChild);
-                }
-            }
-            else {
-                this.rightButtons = document.createElement('div');
-                this.rightButtons.className = 'flex flex-row';
-                this.el.appendChild(this.rightButtons);
-            }
-
+            mega.ui.secondaryNav.updateInfoPanelButton(false);
+            mega.ui.secondaryNav.hideCard();
+            mega.ui.secondaryNav.hideActionButtons();
+            mega.ui.secondaryNav.hideBreadcrumb();
+            mega.ui.secondaryNav.updateLayoutButton(true);
             if (albumId) {
                 this.setSpecificAlbumButtons(albumId);
             }
@@ -3365,26 +3278,6 @@ lazy(mega.gallery, 'albums', () => {
             }
         }
     }
-
-    AlbumsGridHeader.attachButton = (label, icon, clickFn, parent, isDisabled) => {
-        const button = new MButton(
-            label,
-            `icon-${icon}`,
-            clickFn,
-            'mega-button action me-0'
-        );
-
-        if (parent) {
-            parent.appendChild(button.el);
-        }
-
-        if (isDisabled) {
-            button.el.disabled = true;
-            button.el.classList.add('disabled');
-        }
-
-        return button;
-    };
 
     /**
      * Creates a grid of available albums
@@ -3653,13 +3546,11 @@ lazy(mega.gallery, 'albums', () => {
                     else {
                         this.updateGridState(0, false);
                         this.addEmptyBlock(new NoMediaNoAlbums());
-                        this.header.el.classList.add('hidden');
                     }
                 }
                 else {
                     this.removeEmptyBlock();
                 }
-                this.header.el.classList.toggle('invisible', isEmpty && !M.v.length);
             }
 
             delay('render:update_albums_grid', () => {
@@ -4034,7 +3925,6 @@ lazy(mega.gallery, 'albums', () => {
 
         removeHeader() {
             if (this.header) {
-                this.header.el.parentNode.removeChild(this.header.el);
                 this.header = null;
             }
         }
@@ -4204,9 +4094,6 @@ lazy(mega.gallery, 'albums', () => {
                             }
                         }, 100);
                     }
-                    else if (M.currentdirid === 'albums/' + id && this.grid) {
-                        this.grid.header.setBreadcrumbsTitle(id);
-                    }
                 }),
                 mega.sets.subscribe('asr', 'albums', ({ id }) => {
                     this.removeAlbumFromGrid(id);
@@ -4330,7 +4217,7 @@ lazy(mega.gallery, 'albums', () => {
 
             this.subscribeToSetsChanges();
 
-            $('.files-grid-view.fm, .fm-blocks-view.fm, .fm-right-header, .fm-empty-section').addClass('hidden');
+            $('.files-grid-view.fm, .fm-blocks-view.fm, .fm-empty-section').addClass('hidden');
 
             const icon = mega.ui.topmenu.menuNode.querySelector('.root-folder i');
 

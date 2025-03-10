@@ -74,8 +74,6 @@ lazy(mega, 'rewind', () => {
             });
 
             this.$fmHeaderButtons = $('.fm-header-buttons', '.fm-right-header');
-            this.$rwHeaderBtn = $('.fm-rewind', this.$fmHeaderButtons);
-            this.$rwMiniPromo = $('.rw-whats-new-mini-promo-container', this.$fmHeaderButtons);
 
             const openSidebarListener = (isAccUpgraded) => {
                 const listContainer = mega.rewind.getListContainer();
@@ -115,48 +113,6 @@ lazy(mega, 'rewind', () => {
 
             mBroadcaster.addListener('rewind:accountUpgraded', () => openSidebarListener(true));
             mBroadcaster.addListener('mega:openfolder', () => openSidebarListener());
-        }
-
-        async setHeaderButtonDiscovery() {
-            if (Date.now() - u_attr.since * 1000 < 30 * 24 * 60 * 60 * 1000) {
-                return;
-            }
-            $('.blinking-highlight-dot', this.$rwHeaderBtn).addClass('hidden');
-            this.$rwMiniPromo.addClass('suppressed');
-            return mega.attr.set2(null, 'rwHeaderDisc', 1, -2);
-        }
-
-        setMiniPromoEvents() {
-            const isRTL = $('body').hasClass('rtl');
-            const headerBtnOffset = this.$rwHeaderBtn.offset();
-
-            const getOffsets = () => {
-                return {
-                    left: isRTL
-                        ? headerBtnOffset.left
-                        : headerBtnOffset.left
-                            - this.$rwMiniPromo.outerWidth()
-                            + this.$rwHeaderBtn.outerWidth(),
-                    top: headerBtnOffset.top + this.$rwHeaderBtn.outerHeight(),
-                };
-            };
-
-            this.$rwMiniPromo.offset(getOffsets());
-
-            this.$rwMiniPromo.rebind('mouseleave.rewind', () => {
-                if (!this.$rwHeaderBtn.is(':hover')) {
-                    eventlog(500568, true);
-                }
-            });
-
-            $('.btn-rw-mini-promo-action', this.$rwMiniPromo)
-                .rebind('click.rewind', () => {
-                    $('.rw-whats-new-mini-promo', this.$fmHeaderButtons).addClass('hidden');
-
-                    this.setHeaderButtonDiscovery()
-                        .then(() => this._startOnEvent(500565))
-                        .catch(dump);
-                });
         }
 
         async removeNodeListener() {
@@ -731,7 +687,7 @@ lazy(mega, 'rewind', () => {
                     const packetPromise = mega.promise;
                     mBroadcaster.once('rewind:packet:done', (response) => {
                         sn = response.sn;
-                        packets.push(...response.packets);
+                        packets = packets.concat(response.packets);
                         logger.info(`Rewind.loadActionPacket - #Rewind #API - ActionPacket - Loaded from API - ` +
                             `${response.packets.length} action packets`);
                         packetPromise.resolve();
@@ -1098,7 +1054,7 @@ lazy(mega, 'rewind', () => {
 
             const childrenNodes = this.nodeChildrenDictionary[selectedHandle];
             const currentNode = this.nodeDictionary[selectedHandle];
-            const nodes = [];
+            let nodes = [];
             let sortedNodes = [];
             let childrenKeys = [];
 
@@ -1128,7 +1084,7 @@ lazy(mega, 'rewind', () => {
                                 currentLevel: currentLevel + 1,
                                 ts,
                             });
-                            nodes.push(...result);
+                            nodes = nodes.concat(result);
                         }
                         else if (!node.fv) {
                             nodes.push(node.h);
@@ -1386,7 +1342,7 @@ lazy(mega, 'rewind', () => {
                 }
 
                 if (String(M.currentdirid).substr(0, 7) === 'search/'
-                    || mega.ui.mNodeFilter.selectedFilters
+                    || mega.ui.mNodeFilter.selectedFilters.value
                     && M.currentrootid !== 'shares') {
                     emptyFolderName = '.fm-empty-search';
                 }
@@ -1849,62 +1805,6 @@ lazy(mega, 'rewind', () => {
         bindContextMenu() {
             $('.dropdown-item.rewind-item', '.dropdown.body.context')
                 .rebind('click.rewind.contextMenu', () => this._startOnEvent(500469, true));
-        }
-
-        async shouldHideBlueDot() {
-            return Date.now() - u_attr.since * 1000 < 30 * 24 * 60 * 60 * 1000
-            || await Promise.resolve(mega.attr.get(u_handle, 'rwHeaderDisc', -2)).catch(nop) | 0;
-        }
-
-        async bindHeaderButton() {
-            const hideBlueDot = await this.shouldHideBlueDot();
-
-            // Blue dot (hotspot) - only show mini promo and bind events if blue dot is visible
-            if (hideBlueDot) {
-                $('.blinking-highlight-dot', this.$rwHeaderBtn).addClass('hidden');
-                this.$rwHeaderBtn.unbind('mouseover.rewind');
-                this.$rwHeaderBtn.unbind('mouseleave.rewind');
-                this.$rwMiniPromo.addClass('suppressed');
-            }
-            else {
-                $('.blinking-highlight-dot', this.$rwHeaderBtn).removeClass('hidden');
-                this.$rwMiniPromo.removeClass('suppressed');
-                this.setMiniPromoEvents();
-
-                this.$rwHeaderBtn.rebind('mouseover.rewind', () => {
-                    $('.mega-dialog.rw-whats-new-mini-promo', this.$rwMiniPromo)
-                        .removeClass('hidden');
-                    this.setMiniPromoEvents();
-                    eventlog(500567, true);
-                });
-                this.$rwHeaderBtn.rebind('mouseleave.rewind', () => {
-                    if (!this.$rwMiniPromo.is(':hover')) {
-                        eventlog(500568, true);
-                    }
-                });
-            }
-
-            this.$rwHeaderBtn
-                .rebind('click.rewind.header', () => {
-                    $('.rw-whats-new-mini-promo', this.$fmHeaderButtons).addClass('hidden');
-
-                    this.setHeaderButtonDiscovery()
-                        .then(() => this._startOnEvent(500527))
-                        .catch(dump);
-                });
-
-            if (!pfid) {
-                this.$rwHeaderBtn.removeClass('hidden');
-            }
-        }
-
-        unbindHeaderButton() {
-            const $headerButton = $('.action.fm-rewind', this.$fmHeaderButtons);
-            $headerButton
-                .addClass('hidden')
-                .unbind('click.rewind.header')
-                .unbind('mouseover.rewind')
-                .unbind('mouseleave.rewind');
         }
 
         /**

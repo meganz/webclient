@@ -4,7 +4,7 @@
  * File manager layout changes if class folder-file-info-panel is added to the body tag.
  * NB: Based on a fixed panel width of 320px.
  */
-:root {
+ :root {
     --info-panel-width: 320px;
     --info-panel-space: var(--info-panel-width);
 }
@@ -18,6 +18,7 @@
     right: 0;
 }
 .info-panel-visible .files-grid-view .grid-scrolling-table,
+.info-panel-visible .device-centre-grid-view .grid-scrolling-table,
 .info-panel-visible .out-shared-grid-view .grid-scrolling-table,
 .info-panel-visible .fm-blocks-view,
 .info-panel-visible .out-shared-blocks-view,
@@ -25,10 +26,12 @@
 .info-panel-visible .out-shared-blocks-view .out-shared-blocks-scrolling,
 .info-panel-visible .shares-tabs-bl,
 .info-panel-visible .shared-blocks-scrolling,
-.info-panel-visible #media-tabs {
+.info-panel-visible #media-tabs,
+.info-panel-visible .fm-right-header {
     max-width: calc(100% - var(--info-panel-space));
 }
 .info-panel-visible .files-grid-view .grid-scrolling-table.ps,
+.info-panel-visible .device-centre-grid-view .grid-scrolling-table.ps,
 .info-panel-visible .out-shared-grid-view .grid-scrolling-table.ps {
     min-width: initial;
 }
@@ -45,10 +48,12 @@
     width: calc(100% - var(--info-panel-width));
     min-width: calc(768px - var(--info-panel-width));
 }
-.info-panel-visible .fm-right-header .fm-header-buttons,
 .info-panel-visible .gallery-view,
 .info-panel-visible .notification-banner .banner-contents {
     margin-right: var(--info-panel-space);
+}
+.rtl.info-panel-visible .fm-right-header .fm-header-buttons {
+    margin-right: 0;
 }
 .info-panel-visible .files-grid-view.fm .column-settings {
     right: var(--info-panel-space);
@@ -59,7 +64,7 @@
 .info-panel-visible .gallery-view .gallery-view-scrolling.ps {
     min-width: initial;
 }
-.info-panel-visible .fm-notification-block,
+.info-panel-visible .fm-notification-block:not(.bucket-access-warning),
 .info-panel-visible .onboarding-control-panel {
     margin-right: 344px;
 }
@@ -87,7 +92,6 @@
 .info-panel-visible .folder-file-info-panel.meetings-visible {
     top: 0;
 }
-.info-panel-visible .backup-center.content-block,
 .info-panel-visible section.fm-recents,
 .info-panel-visible .s4-info-header-blocks {
     margin-right: var(--info-panel-space);
@@ -103,9 +107,6 @@
 }
 
 /* Right to left e.g. Arabic styles */
-.info-panel-visible.rtl .fm-filter-chips-wrapper {
-    margin-right: 360px;
-}
 .info-panel-visible.rtl .folder-file-info-panel .header-title,
 .info-panel-visible.rtl .folder-file-info-panel .info-data .description,
 .info-panel-visible.rtl .folder-file-info-panel .info-data .value,
@@ -341,6 +342,9 @@
 }
 
 /* Tags */
+.folder-file-info-panel .node-tags-section.expired .node-tags-input {
+    pointer-events: none;
+}
 .folder-file-info-panel .node-tags-section .node-tags-input {
     padding: 8px 4px 8px 16px;
 }
@@ -364,10 +368,10 @@
     color: var(--text-color-high);
 }
 .folder-file-info-panel .node-tags-section .node-tags-dropdown.top.active .dropdown-body {
-    max-height: 200px;    
+    max-height: 200px;
 }
 .folder-file-info-panel .node-tags-section .node-tags-dropdown.top.active .dropdown-body .suggestions {
-    max-height: 165px;    
+    max-height: 165px;
 }
 .folder-file-info-panel .node-tags-section .top .node-tags-tips,
 .folder-file-info-panel .node-tags-section .top .dropdown-content-add:last-child {
@@ -511,6 +515,6 @@
 /* End of Description & Tags */
 
 .pads {
-    height: 40px; 
+    height: 40px;
     width: 100%;
 }

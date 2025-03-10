@@ -1,0 +1,806 @@
+/* General page stylings */
+#propay {
+    margin-top: 120px;
+    font: var(--text-copy-medium-pricing);
+    color: var(--text-color-high);
+    display: flex;
+    flex-direction: row;
+    background-color: var(--surface-grey-2);
+
+    --left-panel-width: 58%;
+    --right-panel-width: 42%;
+
+    --plan-card-left-gap: 64px;
+}
+#propay.mobile-device {
+    margin-top: 0;
+    margin: 0 auto -120px;
+}
+#propay h1 {
+    font: var(--text-h5-pricing);
+}
+#propay h2 {
+    font: var(--text-h6-pricing);
+    text-align: start;
+}
+/* Page types */
+#propay .s4 {
+    display: none;
+}
+#propay.s4 .s4 {
+    display: flex;
+    flex-direction: column;
+}
+/* Mobile and desktop hidden vs show */
+#propay .mobile {
+    display: none;
+}
+#propay .desktop {
+    display: flex;
+}
+#propay button {
+    cursor: pointer;
+}
+/* Radios */
+#propay .duration-option {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    border: 1px solid var(--color-disabled);
+    border-radius: 8px;
+    /* font: var(--text-h2); */
+    font: var(--text-copy-medium-pricing);
+    padding: 16px 24px;
+    cursor: pointer;
+}
+#propay .duration-option:has(.radioOn) {
+    border: 1px solid var(--text-color-high);
+}
+#propay div.radioOn::before{
+    background: var(--text-color-high);
+    height: 10px;
+    width: 10px;
+    margin: 4px;
+}
+#propay div.radioOn::after {
+    display: flex;
+    box-shadow: inset 0 0 0 1px var(--text-color-high);
+}
+#propay div.radio.radioOff::after {
+    display: none;
+}
+#propay .radio-txt {
+    font: var(--text-copy-medium-pricing);
+}
+/* Dropdown */
+#propay .dropdown-wrapper-primary .mega-input-dropdown {
+    border-radius: 0;
+    top: 40px;
+    left: 0;
+}
+#propay .mega-input.dropdown-input > span {
+    font: var(--text-copy-medium-pricing);
+}
+#propay .mega-input-dropdown .option {
+    font: var(--text-copy-medium-pricing);
+}
+/* Error */
+#propay .error {
+    border-color: var(--input-text-underline-error);
+}
+#propay .error-message {
+    display: none;
+}
+#propay .error .error-message {
+    margin-top: 6px;
+    display: flex;
+    color: var(--banner-text-error);
+    font: var(--text-copy-small-pricing);
+    align-items: center;
+}
+#propay .error .error-message i {
+    margin-right: 8px;
+}
+
+/* Main page elements */
+#propay .left-block-wrapper {
+    display: flex;
+    /* width: 66%; */
+    width: var(--left-panel-width);
+    justify-content: flex-end;
+    /* max-width: 1062px; */
+    background-color: var(--surface-main);
+}
+#propay .left-block {
+    display: flex;
+    flex-direction: column;
+    padding: 64px;
+    width: 100%;
+    max-width: 621px;
+    /* gap: 64px; */
+}
+#propay .left-block > *:not(.s4):not(footer) {
+    display: flex;
+    flex-direction: column;
+}
+#propay .left-block .s4-wrapper {
+    flex-direction: column;
+}
+#propay .left-block .s4-wrapper .content{
+    border: 1px solid var(--stroke-mid-grey);
+    border-radius: 8px;
+    padding: 16px 24px;
+}
+#propay .left-block .s4-wrapper i.bucket {
+    color: var(--color-primary-red-500);
+}
+#propay .left-block .s4-wrapper button {
+    height: 48px;
+    border-radius: 8px;
+    background: var(--surface-grey-2);
+    padding: 0 24px;
+    border: none;
+    gap: 10px;
+}
+#propay .left-block .s4-wrapper button span {
+    margin: 0;
+    padding: 0;
+}
+#propay .left-block .s4-wrapper button.active .add,
+#propay .left-block .s4-wrapper button .remove {
+    display: none;
+}
+#propay .left-block .s4-wrapper button .add,
+#propay .left-block .s4-wrapper button.active .remove {
+    display: flex;
+}
+#propay .s4-tos .tos > *{
+    cursor: pointer;
+}
+#propay .left-block .method-duration-wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-top: 32px;
+}
+#propay .left-block .method-duration-wrapper > *  {
+    display: flex;
+    flex-direction: column;
+}
+#propay .left-block > *:not(:last-child):not(:first-child):not(.s4-wrapper) {
+    margin-bottom: 56px;
+    padding-bottom: 56px;
+    border-bottom: 1px solid var(--stroke-mid-grey);
+}
+#propay .left-block .mega-input::before {
+    border: 1px solid var(--stroke-mid-grey);
+    border-radius: 8px;
+}
+#propay .left-block .mega-input.error::before {
+    border: 1px solid var(--input-text-underline-error);
+}
+#propay .left-block h1.plan-name {
+    display: inline-block;
+}
+#propay .left-block .plan-name span {
+    color: var(--color-primary-red-500);
+}
+#propay .left-block .option {
+    cursor: pointer;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    height: 52px;
+    margin: 0;
+    padding: 0 16px;
+    color: var(--text-color-high);
+}
+#propay .left-block .option .tick {
+    display: none;
+}
+#propay .left-block .option.selected {
+    background: var(--surface-grey-2);
+}
+#propay .left-block .option.selected .tick {
+    display: flex;
+    margin: 0 -8px 0 auto
+}
+#propay .left-block .option .simpletip {
+    margin-left: 10px;
+}
+#propay .left-block .option .label-wrapper {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+#propay .left-block .payment-method {
+    display: flex;
+    width: 100%;
+}
+#propay .left-block .payment-method .dropdown-wrapper-primary .payment-options {
+    font: var(--text-body1);
+    width: max-content;
+    min-width: 308px;
+}
+#propay .left-block .payment-method .dropdown-wrapper-primary .payment-options.active i.icon-dropdown {
+    transform: rotate(180deg);
+}
+#propay .left-block .payment-method .payment-options-secondary {
+    display: flex;
+    flex-direction: column;
+}
+#propay .left-block .payment-method .payment-options-secondary .option {
+    margin: 4px 16px 0 0;
+}
+#propay .left-block .payment-method .see-all-btn {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    background: none;
+    border: none;
+    align-items: center;
+    justify-content: center;
+    width: max-content;
+    margin-top: 32px;
+    margin-left: 16px;
+    margin: 32px 16px 0 0;
+    cursor: pointer;
+}
+#propay .left-block .payment-method .see-all-btn.see-less i {
+    transform: rotate(180deg);
+}
+#propay .left-block .payment-method .free-trial-unsupported {
+    display: flex;
+    font: var(--text-copy-small-pricing);
+    color: rgba(181, 84, 7, 1);
+    margin-top: 6px;
+}
+#propay .left-block .payment-method .free-trial-unsupported i {
+    margin-right: 8px;
+}
+#propay .left-block .duration {
+    margin-top: 42px;
+}
+#propay .left-block .duration .options-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+#propay .left-block .duration .duration-head {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+}
+#propay .left-block .duration .duration-head .duration-savings {
+    padding: 2px 6px;
+    border-radius: 4px;
+    background-color: var(--banner-borderless-background-info);
+    color: var(--banner-borderless-text-info);
+    font: var(--text-copy-small-pricing);
+}
+#propay .left-block .duration .duration-option .monthly-price {
+    font: var(--font-copy-sm)
+}
+#propay .left-block .duration .one-off-payment-info {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-top: 18px;
+    font: var(--font-copy-sm);
+    color:rgba(181, 84, 7, 1);
+}
+#propay .left-block .billing-address .billing-info .empty,
+#propay .left-block .billing-address .billing-info .filled {
+    display: none;
+    flex-direction: column;
+    gap: 16px;
+}
+#propay .left-block .billing-address .billing-info:not(.empty) .filled,
+#propay .left-block .billing-address .billing-info.empty .empty {
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
+    justify-content: flex-start;
+}
+#propay .left-block .billing-address .billing-info .action {
+    display: flex;
+    flex-direction: row;
+    height: max-content;
+    align-items: center;
+    cursor: pointer;
+}
+#propay .left-block .billing-address .edit {
+    text-decoration: underline;
+    font: var(--text-copy-medium-bold-pricing);
+}
+#propay .left-block .billing-address .info {
+    color: var(--color-copy-secondary);
+}
+#propay .left-block .billing-address .info .name {
+    font: var(--text-copy-medium-bold-pricing);
+}
+#propay .left-block .propay-inline-dialog {
+    font: var(--text-copy-secondary-pricing)
+}
+#propay .right-block {
+    background-color: var(--surface-grey-2);
+    display: flex;
+    /* justify-content: flex-end; */
+    align-items: flex-end;
+    /* padding: 70px 113px 70px 84px; */
+    padding: 70px 0;
+    /* width: 0; */
+    /* width: 33%; */
+    width: var(--right-panel-width);
+    /* height: max-content; */
+}
+#propay .right-block-card-wrapper {
+    height: max-content;
+    position: sticky;
+}
+#propay .right-block .plan-card {
+    display: flex;
+    background-color: var(--surface-main);
+    flex-direction: column;
+    width: 369px;
+    height: fit-content;
+    color: var(--text-color-high);
+    font: var(--text-h2);
+    border: 1px solid var(--surface-grey-2);
+    border-radius: 16px;
+    padding-bottom: 24px;
+}
+#propay .right-block .plan-card.fixed {
+    position: fixed;
+    top: 190px;
+    left: calc(var(--left-panel-width) + var(--plan-card-left-gap));
+}
+.rtl #propay .right-block .plan-card.fixed {
+    left: initial;
+    right: calc(var(--left-panel-width) + var(--plan-card-left-gap));
+}
+#propay .right-block .plan-card.relative {
+    position: relative;
+    top: 0;
+    left: calc(var(--plan-card-left-gap) + 9px);
+}
+.rtl #propay .right-block .plan-card.relative {
+    left: initial;
+    right: calc(var(--plan-card-left-gap) + 9px);
+}
+#propay .right-block .plan-card .content {
+    padding: 48px 24px 0 24px;
+}
+#propay .right-block .plan-card .free-trial-card .content {
+    padding: 0 0 24px 0;
+}
+
+#propay .right-block .plan-card .regular {
+    display: flex;
+}
+#propay .right-block .plan-card .flexi {
+    display: none;
+}
+#propay .right-block .plan-card.flexi .regular {
+    display: none;
+}
+#propay .right-block .plan-card.flexi .flexi {
+    display: flex;
+}
+
+#propay .right-block .plan-card .discount-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    font: var(--text-copy-medium-bold-pricing);
+    background-color: var(--color-primary-red-500);
+    color: var(--text-color-white-high);
+    border-radius: 16px 16px 0 0;
+}
+#propay .right-block .plan-card .plan-name {
+    font: var(--text-h5-pricing);
+}
+#propay .right-block .plan-card .plan-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 32px;
+    font: var(--text-copy-medium-bold-pricing);
+    transition: 600ms ease-in-out;
+}
+#propay .right-block .plan-card .includes {
+    margin-top: 24px;
+    font: var(--text-copy-card-pricing-medium-bold)
+}
+#propay .right-block .plan-card .includes .includes-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 16px;
+    font: var(--text-copy-medium-pricing);
+}
+#propay .right-block .plan-card .includes .includes-content > * {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+}
+#propay .right-block .plan-card .includes .includes-content i {
+    --icon-size: 20px;
+    font: var(--text-body1-bold);
+    color: var(--color-primary-red-500);
+}
+#propay .right-block .plan-card .pricing,
+#propay .right-block .plan-card .estimated-price {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid var(--surface-grey-2);
+    font: var(--text-copy-large-pricing);
+    color: var(--color-copy-secondary);
+}
+#propay .right-block .plan-card .estimated-price {
+    font: var(--text-copy-small-pricing);
+    text-align: left;
+    margin: 32px 24px 0;
+}
+#propay .right-block .plan-card .pricing .pricing-element {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+}
+#propay:not(.discount) .right-block .plan-card .pricing .pricing-element.discount {
+    display: none;
+}
+#propay .right-block .plan-card .pricing .pricing-element.discount {
+    justify-content: flex-end;
+    text-decoration: line-through;
+    font-style: italic;
+    margin-top: -25px;
+    color: var(--text-color-low);
+}
+#propay .right-block .plan-card .pricing .pricing-element .price {
+    font: var(--text-quotation-pricing);
+}
+#propay .right-block .plan-card .pricing .pricing-element .price span {
+    font: var(--text-copy-medium-pricing);
+}
+#propay.flexi .right-block .plan-card .pricing .extra-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font: var(--text-copy-small-pricing);
+}
+#propay .right-block .plan-card .pricing .extra-info .additional-title {
+    font: var(--text-copy-card-pricing-medium-bold);
+}
+
+#propay button.continue {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 130px;
+    width: max-content;
+    height: 48px;
+    border-radius: 8px;
+    padding: 14px 24px;
+    cursor: pointer;
+    background-color: var(--color-primary-red-500);
+    color: var(--color-grey-50);
+    border: none;
+    font: var(--text-h3-bold);
+}
+#propay .stripe-button.payment-stripe-dialog {
+    position: relative;
+    height: 90px;
+}
+#propay .stripe-button.payment-stripe-dialog .loader {
+    position: absolute;
+    width: 100%;
+    height: 90px;
+}
+#propay .stripe-button.payment-stripe-dialog .loader i {
+    margin-top: 16px;
+    width: 100%;
+    height: 100%;
+    max-width: 300px;
+    max-height: 53px;
+}
+
+#propay .specific-payment-info {
+    position: relative;
+}
+#propay .specific-payment-info > *:not(.payment-stripe-dialog) {
+    background: var(--surface-main);
+}
+#propay .specific-payment-info .payment-loading-spinner {
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 0;
+    position: absolute;
+}
+#propay .specific-payment-info .payment-loading-spinner .payment-main-loader {
+    background: center / 100% no-repeat url(../images/mega/loader-dark.gif);
+    background-color: var(--progress-bar-fill4);
+    border-radius: 100%;
+    height: 72px;
+    left: 50%;
+    margin: -36px 0 0 -36px;
+    position: absolute;
+    top: -28px;
+    width: 72px;
+}
+#propay .specific-payment-info .propay-inline-dialog {
+    position: relative;
+    z-index: 1;
+}
+
+#propay .specific-payment-info .propay-inline-dialog.payment-stripe-dialog .iframe-container {
+    height: 351px;
+}
+#propay .specific-payment-info .bitcoin-invoice-dialog .content {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+#propay .specific-payment-info .bitcoin-invoice-dialog .content h1 {
+    margin-bottom: 4px;
+}
+#propay .specific-payment-info .bitcoin-invoice-dialog .content .grey {
+    color: var(--color-copy-secondary);
+}
+#propay .specific-payment-info .bitcoin-invoice-dialog .content .price-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+#propay .specific-payment-info .bitcoin-invoice-dialog .content .time-info {
+    font: var(--text-copy-small-bold-pricing);
+}
+#propay .specific-payment-info .bitcoin-invoice-dialog .content .time-info {
+    font: var(--text-copy-small-pricing);
+    color: var(--text-color-high);
+}
+#propay .specific-payment-info .bitcoin-invoice-dialog .content .price-info .bitcoin-price {
+    display: flex;
+    gap: 8px;
+    font: var(--text-h5-pricing);
+    color: var(--text-color-high);
+}
+#propay .specific-payment-info .bitcoin-invoice-dialog .content .time-to-expire {
+    margin-top: 8px;
+}
+#propay .specific-payment-info .voucher-block {
+    display: flex;
+    flex-direction: column;
+    font: var(--text-copy-medium);
+    margin-top: 25px;
+}
+#propay .specific-payment-info .voucher-block .redeem-voucher-title {
+    font: var(--text-copy-medium-bold-pricing);
+}
+#propay .specific-payment-info .voucher-block .redeem-voucher {
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+    color: var(--text-color-high);
+    border: none;
+    background: initial;
+}
+#propay .specific-payment-info .voucher-block .redeem-voucher .fm-account-input {
+    flex-grow: 1;
+    margin-right: 24px;
+}
+#propay .specific-payment-info .voucher-block .redeem-voucher .fm-account-input input {
+    width: 100%;
+    height: 44px;
+    border: 1px solid var(--text-color-low);
+    border-radius: 8px;
+    padding-left: 12px;
+    background-color: var(--surface-main);
+}
+#propay .specific-payment-info .voucher-block .redeem-voucher button {
+    flex-shrink: 0;
+    height: 48px;
+    background: var(--surface-main);
+    border: 2px solid var(--text-color-high);
+    border-radius: 8px;
+    color: var(--text-color-high);
+    font: var(--text-copy-medium-bold-pricing);
+}
+#propay .specific-payment-info .voucher-block .insufficient-balance,
+#propay .specific-payment-info .voucher-block .insufficient-balance-redeemed {
+    color: rgba(181, 84, 7, 1);
+}
+#propay .specific-payment-info .voucher-block .redeemed {
+    color: rgba(0, 124, 62, 1);
+}
+#propay .specific-payment-info .voucher-block .info > * {
+    display: flex;
+    align-items: normal;
+    margin-top: 8px;
+}
+#propay .specific-payment-info .voucher-block .info i {
+    margin-top: 2px;
+}
+#propay .specific-payment-info .voucher-block .voucher-information-help {
+    margin-top: 24px;
+    font: var(--text-copy-small-pricing);
+}
+#propay .astropay-dialog .redirect-info {
+    margin-bottom: 4px;
+}
+#propay .astropay-dialog .mega-input.box-style::before {
+    background: var(--surface-main);
+}
+#propay .astropay-dialog .astropay-label {
+    font: var(--text-copy-small-bold-pricing);
+    margin: 18px 0 4px 0;
+}
+
+#propay footer .subscription-info {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    font: var(--font-copy-sm);
+}
+#propay footer .subscription-info a {
+    color: var(--text-color-info);
+}
+#propay footer .balance {
+    font:var(--text-copy-medium-bold-pricing);
+    margin-top: 24px;
+}
+#propay footer button {
+    margin-top: 32px;
+}
+
+#propay .propay-dialog {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 560px;
+}
+/* #propay .propay-dialog.payment-address-dialog {
+    max-width: 100vw;
+    min-width: ;
+    width: auto;
+} */
+#propay .payment-address-dialog {
+    width: 100%;
+    max-width: 560px;
+    max-height: 100%;
+    overflow: auto;
+}
+/* #propay .payment-address-dialog .propay-address-input {
+    border: 1px solid var(--surface-grey-2);
+    border-radius: 8px;
+} */
+#propay .payment-address-dialog section.content {
+    padding: 0 48px;
+}
+#propay .payment-address-dialog .column-pair {
+    display: flex;
+    justify-content: space-between;
+}
+#propay .payment-address-dialog .column-pair > *{
+    width: calc(50% - 9px);
+}
+#propay .payment-address-dialog .input-block {
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+}
+#propay .payment-address-dialog .input-block > span,
+#propay .payment-address-dialog .input-block > span > .taxcode-title {
+    font: var(--text-copy-medium-bold-pricing);
+    color: var(--text-color-high);
+    margin-top: 2px;
+}
+#propay .payment-address-dialog .input-block span.optional {
+    font: var(--text-copy-medium-pricing);
+    /* color: var(--text-color-low); */
+}
+#propay .payment-address-dialog .input-block .mega-input {
+    margin: 0;
+}
+#propay .payment-address-dialog .input-block .mega-input::before {
+    border-width: 1px;
+    border-radius: 8px;
+}
+#propay .payment-address-dialog aside {
+    display: none;
+}
+#propay .payment-address-dialog footer button {
+    background: var(--surface-black);
+    border-radius: 8px;
+}
+.pricing-pg.bottom-page .payment-result.main-block {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    z-index: 98;
+    top: 0;
+    left: 0;
+}
+
+.mobile .payment-processing-mobile {
+    position: fixed;
+    width: 101%;
+    height: 100%;
+    top: 50%;
+    left: 50%;
+    z-index: 11;
+    transform: translate(-50%, -50%);
+    background: rgba(34,34,34,0.95);
+}
+
+#propay .block {
+    display: flex;
+    gap: 16px;
+}
+#propay footer.mobile {
+    padding: 64px 24px;
+}
+
+@media only screen and (max-width: 1320px) {
+    #propay {
+        --plan-card-left-gap: 40px;
+    }
+    #propay .left-block {
+        padding: 64px 40px ;
+    }
+}
+
+/* Mobile */
+@media only screen and (max-width: 1079px) {
+    #propay {
+        /* color: purple; */
+        flex-direction: column;
+    }
+    #propay .mobile {
+        display: flex;
+        flex-direction: column;
+        background: var(--surface-main);
+    }
+    #propay .desktop {
+        display: none;
+    }
+    #propay .left-block-wrapper {
+        width: auto;
+    }
+    #propay .left-block {
+        width: 100%;
+        margin: auto;
+        padding: 24px;
+    }
+    #propay .right-block {
+        background-color: var(--surface-main);
+        padding: 0 24px;
+        width: auto;
+        justify-content: center;
+    }
+    #propay .right-block .plan-card {
+        width: auto;
+        margin: auto;
+    }
+    #propay .left-block .payment-method .dropdown-wrapper-primary .payment-options {
+        width: 100%;
+    }
+    #propay .right-block .plan-card.relative {
+        left: initial;
+    }
+    #propay button.continue {
+        width: 100%;
+        max-width: 621px;
+        margin-right: auto;
+        margin-left: auto;
+    }
+}

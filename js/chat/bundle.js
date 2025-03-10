@@ -6814,7 +6814,6 @@ const ComposedTextArea = ({
   disabled: chatRoom.isReadOnly(),
   persist: true,
   onUpEditPressed: () => {
-    const time = unixtime();
     const keys = chatRoom.messagesBuff.messages.keys();
     for (let i = keys.length; i--;) {
       const message = chatRoom.messagesBuff.messages[keys[i]];
@@ -6822,7 +6821,7 @@ const ComposedTextArea = ({
       if (!contact) {
         continue;
       }
-      if (contact.u === u_handle && time - message.delay < MESSAGE_NOT_EDITABLE_TIMEOUT && !message.requiresManualRetry && !message.deleted && (!message.type || message instanceof Message) && (!message.isManagement || !message.isManagement())) {
+      if (message.isEditable() && !message.requiresManualRetry && !message.deleted && (!message.type || message instanceof Message) && (!message.isManagement || !message.isManagement())) {
         parent.historyPanel.editMessage(message.messageId);
         return true;
       }
@@ -10006,7 +10005,7 @@ class Breadcrumbs extends mixins.w9 {
         });
       }
     }, REaCt().createElement("i", {
-      className: "menu-icon sprite-fm-mono icon-options icon24"
+      className: "menu-icon sprite-fm-mono icon-options icon16"
     })), REaCt().createElement("i", {
       className: "sprite-fm-mono icon-arrow-right icon16"
     })), breadcrumb) : breadcrumb), breadcrumbDropdownContents.length ? REaCt().createElement("div", {
@@ -29601,7 +29600,7 @@ class Contact extends AbstractGenericMessage {
     });
   }
   _getContactDeleteButton(message) {
-    if (message.userId === u_handle && unixtime() - message.delay < MESSAGE_NOT_EDITABLE_TIMEOUT) {
+    if (message.isEditable()) {
       return REaCt().createElement(REaCt().Fragment, null, REaCt().createElement("hr", null), REaCt().createElement(dropdowns.DropdownItem, {
         icon: "sprite-fm-mono icon-dialog-close",
         label: l[83],
@@ -30246,21 +30245,16 @@ AudioContainer.defaultProps = {
 
 
 
-const voiceClip_MESSAGE_NOT_EDITABLE_TIMEOUT = window.MESSAGE_NOT_EDITABLE_TIMEOUT = 3600;
 class VoiceClip extends AbstractGenericMessage {
-  constructor(props) {
-    super(props);
-  }
   _getActionButtons() {
     const {
-      message
+      isBeingEdited,
+      chatRoom,
+      message,
+      dialog,
+      onDelete
     } = this.props;
-    const contact = this.getContact();
-    const iAmSender = contact && contact.u === u_handle;
-    const stillEditable = unixtime() - message.delay < voiceClip_MESSAGE_NOT_EDITABLE_TIMEOUT;
-    const isBeingEdited = this.props.isBeingEdited() === true;
-    const chatIsReadOnly = this.props.chatRoom.isReadOnly() === true;
-    if (iAmSender && stillEditable && !isBeingEdited && !chatIsReadOnly && !this.props.dialog) {
+    if (message.isEditable() && !isBeingEdited() && !chatRoom.isReadOnly() && !dialog) {
       return REaCt().createElement(buttons.$, {
         className: "tiny-button",
         icon: "tiny-icon icons-sprite grey-dots"
@@ -30273,7 +30267,7 @@ class VoiceClip extends AbstractGenericMessage {
       }, REaCt().createElement(dropdowns.DropdownItem, {
         icon: "sprite-fm-mono icon-dialog-close",
         label: l[1730],
-        onClick: e => this.props.onDelete(e, message)
+        onClick: ev => onDelete(ev, message)
       })));
     }
     return null;
@@ -30770,30 +30764,27 @@ class Text extends AbstractGenericMessage {
         })];
       }
     }
-    if (!message.deleted) {
-      const contact = this.getContact();
-      if (contact && contact.u === u_handle && unixtime() - message.delay < MESSAGE_NOT_EDITABLE_TIMEOUT && isBeingEdited() !== true && chatRoom.isReadOnly() === false && !message.requiresManualRetry) {
-        const editButton = !IS_GEOLOCATION && REaCt().createElement(dropdowns.DropdownItem, {
-          icon: "sprite-fm-mono icon-rename",
-          label: l[1342],
-          onClick: () => this.props.onEditToggle(true)
-        });
-        messageActionButtons = REaCt().createElement(buttons.$, {
-          key: "delete-msg",
-          className: "tiny-button",
-          icon: "sprite-fm-mono icon-options"
-        }, REaCt().createElement(dropdowns.Dropdown, {
-          className: "white-context-menu attachments-dropdown",
-          noArrow: true,
-          positionMy: "left bottom",
-          positionAt: "right bottom",
-          horizOffset: 4
-        }, extraPreButtons, editButton, editButton ? REaCt().createElement("hr", null) : null, REaCt().createElement(dropdowns.DropdownItem, {
-          icon: "sprite-fm-mono icon-dialog-close",
-          label: l[1730],
-          onClick: e => this.props.onDelete(e, message)
-        })));
-      }
+    if (!message.deleted && message.isEditable() && !isBeingEdited() && !chatRoom.isReadOnly() && !message.requiresManualRetry) {
+      const editButton = !IS_GEOLOCATION && REaCt().createElement(dropdowns.DropdownItem, {
+        icon: "sprite-fm-mono icon-rename",
+        label: l[1342],
+        onClick: () => this.props.onEditToggle(true)
+      });
+      messageActionButtons = REaCt().createElement(buttons.$, {
+        key: "delete-msg",
+        className: "tiny-button",
+        icon: "sprite-fm-mono icon-options"
+      }, REaCt().createElement(dropdowns.Dropdown, {
+        className: "white-context-menu attachments-dropdown",
+        noArrow: true,
+        positionMy: "left bottom",
+        positionAt: "right bottom",
+        horizOffset: 4
+      }, extraPreButtons, editButton, editButton ? REaCt().createElement("hr", null) : null, REaCt().createElement(dropdowns.DropdownItem, {
+        icon: "sprite-fm-mono icon-dialog-close",
+        label: l[1730],
+        onClick: e => this.props.onDelete(e, message)
+      })));
     }
     let parentButtons;
     if (super.getMessageActionButtons) {

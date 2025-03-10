@@ -1017,6 +1017,9 @@ scparser.$add('s', {
 
         if (fminitialized) {
             sharedUInode(a.n);
+            if (mega.devices.ui) {
+                mega.devices.ui.onSharedUpdated(a.n);
+            }
         }
         scsharesuiupd = true;
         scContactsSharesUIUpdate = a.o ? a.o : false;
@@ -2111,6 +2114,16 @@ function fm_updated(n) {
         newnodes.push(n);
         if (M.megaRender) {
             M.megaRender.revokeDOMNode(n.h, true);
+        }
+        if (mega.devices.ui) {
+            mega.devices.ui.updateNode(n);
+        }
+        if (
+            mega.ui.secondaryNav &&
+            mega.ui.secondaryNav.cardComponent &&
+            mega.ui.secondaryNav.cardComponent.handle === n.h
+        ) {
+            mega.ui.secondaryNav.cardComponent.update();
         }
         M.updFileManagerUI().catch(dump);
     }
@@ -4279,6 +4292,9 @@ function fmviewmode(id, e)
     var viewmodes = {};
     if (typeof fmconfig.viewmodes !== 'undefined')
         viewmodes = fmconfig.viewmodes;
+
+    id = getSafeViewModeId(id);
+
     if (e === 2) {
         viewmodes[id] = 2;
     }
@@ -4287,6 +4303,30 @@ function fmviewmode(id, e)
     else
         viewmodes[id] = 0;
     mega.config.set('viewmodes', viewmodes);
+}
+
+/**
+ * Returns the viewmode for the given id or 0 as default
+ * @param {String} id - id to get viewmode for
+ * @returns {Number | undefined} viewmode for the given id or 0 as default
+ */
+function getFmViewMode(id) {
+    'use strict';
+    return self.fmconfig && fmconfig.viewmodes && fmconfig.viewmodes[getSafeViewModeId(id)];
+}
+
+/**
+ * Returns a safe id for viewmode config
+ * In case id length > 63, only the last 63 characters are considered
+ * This is because config shrink.views function adds wide chars at the beginning of the id
+ *  when id.length > 63, what makes asmcrypto "string_to_bytes" function to throw
+ *  an Error: "Wide characters are not allowed"
+ * @param {String} id - id of the viewmode
+ * @returns {String} safe id for viewmode config
+ */
+function getSafeViewModeId(id) {
+    'use strict';
+    return id && id.length > 63 ? id.slice(-63) : id;
 }
 
 /** @property window.thumbnails */

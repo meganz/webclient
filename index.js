@@ -71,7 +71,7 @@ mBroadcaster.once('startMega', function() {
     if (is_mobile) {
 
         const usingMobPages = ['placeholder', 'register', 'key', 'support', 'keybackup',
-                               'disputenotice', 'download', 'reset', 'propay', 'login'];
+                               'disputenotice', 'download', 'reset', 'login'];
 
         for (let i = usingMobPages.length; i--;) {
 
@@ -2516,18 +2516,11 @@ function topmenuUI() {
             $('#pmlayout .dropdown.top-login-popup').addClass('hidden');
         }
 
-        if (!e || !e.target.closest('.create-new-folder') &&
-            (!c || !c.includes('fm-new-folder'))) {
+        if (!e || !e.target.closest('.create-new-folder')) {
 
             const c3 = String(e && e.target && Object(e.target.parentNode).className || '');
 
             if (!c3.includes('fm-new-folder')) {
-
-                element = document.getElementsByClassName('fm-new-folder').item(0);
-
-                if (element) {
-                    element.classList.remove('active', 'filled-input');
-                }
 
                 element = document.getElementsByClassName('create-new-folder').item(0);
 

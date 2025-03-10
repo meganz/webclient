@@ -2346,7 +2346,6 @@ body.loading .light-overlay {
     display: none;
     flex-shrink: 0;
     font: var(--text-body1);
-    margin: 8px 24px;
     overflow: hidden;
     padding: 4px 8px;
     position: relative;
@@ -3049,13 +3048,8 @@ input.summary-ff-name.error {
     --mask-color: var(--icon-rest);
     --icon-size: 16px;
 }
-.bitcoin-invoice-dialog .bitcoin-qr-code {
-    margin: 25px 0 20px 26px;
-    width: 276px;
-}
 .bitcoin-invoice-dialog .bitcoin-qr-code canvas {
-    padding: 10px;
-    border-radius: 10px;
+    padding: 3px;
     background-color: #f2f2f2;
 }
 .fm-blocks-view .versioning .versioning-indicator,
@@ -4276,9 +4270,9 @@ span.orange {
     margin-inline-start: 4px;
     cursor: pointer;
 }
-/* Temporarily hide Versions and Backups in the dashboard bottom table for MEGA Lite mode until supported properly */
-.mega-lite-mode .account.data-table .account-data-item-versions,
-.mega-lite-mode .account.data-table .account-data-item-backups {
+
+/* Temporarily hide Versions in the dashboard bottom table for MEGA Lite mode until supported properly */
+.mega-lite-mode .account.data-table .account-data-item-versions {
 	display: none;
 }
 .account.data-table i.versioning-settings:hover {
@@ -6961,9 +6955,6 @@ div.new-bottom-pages li, div.new-bottom-pages p {
 .mega-lite-mode .shared-details-buttons .mega-button.fm-share-download,
 .mega-lite-mode .shared-details-buttons .mega-button.fm-share-copy {
     display: none;
-}
-.files-grid-view.shared-folder-content, .fm-blocks-view.shared-folder-content {
-    height: calc(100% - 128px);
 }
 .shared-details-block .files-grid-view.shared-folder-content {
     padding-top: 14px;

@@ -118,7 +118,6 @@
 }
 /* Temporarily hide Recents, Backups and Favourites in the left panel in MEGA Lite mode */
 .mega-lite-mode .lp-myfiles .btn-myfiles.recents,
-.mega-lite-mode .lp-myfiles .btn-myfiles.backups,
 .mega-lite-mode .lp-myfiles .btn-myfiles.faves {
     display: none;
 }

@@ -1319,7 +1319,7 @@ accountUI.plan = {
 
             // check if we should show the section (uq response)
             if (this.validateUser(account)) {
-                api.req({ a: 'cci' }).then(({ result: res }) => {
+                api.req({ a: 'cci', v: 2 }).then(({ result: res }) => {
                     if (typeof res === 'object' && this.validateCardResponse(res)) {
                         return this.render(res);
                     }

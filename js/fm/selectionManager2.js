@@ -528,7 +528,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
      */
     constructor($selectable, eventHandlers) {
         super(eventHandlers);
-        this.currentdirid = M.currentdirid;
+        this.currentdirid = M.onDeviceCenter || M.currentdirid;
         this._boundEvents = [];
         this.init();
         this.$selectable = $selectable;
@@ -767,8 +767,13 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             for (let i = this.selected_list.length; i--;) {
                 let n = this.selected_list[i];
                 const e = M.megaRender ? M.megaRender.getDOMNode(n) : document.getElementById(n);
-                if ((n = M.d[n])) {
+                if (M.d[n]) {
+                    n = M.d[n];
                     selectionSize += n.t ? n.tb : n.s;
+                }
+                else if (M.dcd[n]) {
+                    n = M.dcd[n];
+                    selectionSize += n.tb || 0;
                 }
                 else if (M.dyh) {
                     selectionSize = 0;
@@ -877,13 +882,23 @@ class SelectionManager2_DOM extends SelectionManager2Base {
         ) {
             return false;
         }
+
         let itemsNum = this.selected_list.filter(h => h !== this.currentdirid).length;
 
         if (itemsNum === 0) {
             this.hideSelectionBar();
         }
         else {
-            const showRemoveAll = (this.currentdirid !== 'out-shares') && (this.currentdirid !== 'shares');
+            let isSkipOnDeviceCentre = false;
+            if (M.onDeviceCenter) {
+                const {device, folder} = mega.devices.ui.getCurrentDirData();
+                isSkipOnDeviceCentre = !device || !folder;
+            }
+
+            const showRemoveAll = this.currentdirid !== 'out-shares' &&
+                this.currentdirid !== 'shares' &&
+                !isSkipOnDeviceCentre;
+
             var totalNodes = this.items.length;
 
             var itemsTotalSize = "";
@@ -1090,8 +1105,8 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             const { dataset } = selectionLinkWrapper.querySelector('.selection-links-wrapper .delete');
             dataset.simpletip = M.getSelectedRemoveLabel($.selected);
 
-            if ((sourceRoot === M.RootID || sourceRoot === 's4'
-                 || M.isDynPage(sourceRoot)) && !folderlink) {
+            if ((sourceRoot === M.RootID || sourceRoot === 's4' ||
+                M.isDynPage(sourceRoot) || sourceRoot === mega.devices.rootId) && !folderlink) {
 
                 const cl = new mega.Share.ExportLink();
 
@@ -1144,6 +1159,36 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             else if (!folderlink && M.currentrootid !== 'shares' && M.currentdirid !== 'shares'
                 || M.currentrootid === 'shares' && M.currentdirid !== 'shares' && M.d[M.currentdirid].r === 2) {
                 __showBtn('delete');
+            }
+
+            if (M.dcd[selNode.h]) {
+                __hideButton('link');
+                __hideButton('share');
+                __hideButton('sendto');
+                __hideButton('download');
+                __hideButton('delete');
+            }
+
+            if (M.onDeviceCenter && sharer(selNode.h)) {
+
+                const section = mega.devices.ui.getRenderSection();
+
+                if (section === 'device-centre-folders') {
+                    __hideButton('delete');
+                    __hideButton('link');
+                    __hideButton('share');
+                    __hideButton('sendto');
+                }
+                else if (section === 'cloud-drive') {
+                    if (selNode.t) {
+                        __hideButton('sendto');
+                    }
+                    if (M.getNodeRights(selNode.h) > 1) {
+                        __hideButton('link');
+                        __hideButton('share');
+                    }
+                }
+
             }
 
             if (M.currentdirid === 'file-requests') {

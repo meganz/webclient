@@ -286,7 +286,7 @@ class MegaMobileTopMenu extends MegaComponent {
                 text: l.mobile_settings_lang_title,
                 subtext: languages[lang][2],
                 icon: 'sprite-mobile-fm-mono icon-globe-01-thin-outline',
-                binding: is_mobile && mobile.languageMenu.init
+                binding: mobile.languageMenu.init
             },
             {
                 text: l[823],
@@ -313,13 +313,13 @@ class MegaMobileTopMenu extends MegaComponent {
             {
                 text: l.mobile_settings_appearance_title,
                 icon: 'sprite-mobile-fm-mono icon-palette-thin-outline',
-                binding: is_mobile && mobile.appearance.init
+                binding: mobile.appearance.init
             },
             {
                 text: l.mobile_settings_lang_title,
                 subtext: languages[lang][2],
                 icon: 'sprite-mobile-fm-mono icon-globe-01-thin-outline',
-                binding: is_mobile && mobile.languageMenu.init
+                binding: mobile.languageMenu.init
             },
             {
                 text: l.log_in,

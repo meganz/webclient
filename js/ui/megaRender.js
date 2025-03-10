@@ -63,6 +63,80 @@
             '</a>'
         ],
 
+        'device-centre-devices': [
+            // List view mode
+            '<table>' +
+                '<tr>' +
+                    '<td></td>' +
+                    '<td megatype="fname">' +
+                        '<div ' +
+                            'class="device-centre-item-icon medium-file-icon sprite-fm-theme"' +
+                        '>' +
+                        '</div>' +
+                        '<div class="device-centre-item-info-block">' +
+                            '<div class="device-centre-item-name"></div>' +
+                            '<div class="device-centre-item-info"></div>' +
+                        '</div>' +
+                    '</td>' +
+                    '<td megatype="numFolders">' +
+                        '<div class="device-centre-item-contain"></div>' +
+                    '</td>' +
+                    '<td megatype="size">' +
+                        '<div class="device-centre-item-size"></div>' +
+                    '</td>' +
+                    '<td class="grid-url-header-nw">' +
+                        '<a class="grid-url-arrow"><i class="sprite-fm-mono icon-options"></i></a>' +
+                    '</td>' +
+                    '<td class="space-maintainer-end" megatype="empty"></td>' +
+                '</tr>' +
+            '</table>',
+
+            // Icon view mode: view not available
+            '<span></span>'
+        ],
+
+        'device-centre-folders': [
+            // List view mode
+            '<table>' +
+                '<tr>' +
+                    '<td></td>' +
+                    '<td megatype="fname">' +
+                        '<div ' +
+                            'class="device-centre-item-icon medium-file-icon item-type-icon-90"' +
+                        '>' +
+                        '</div>' +
+                        '<div class="device-centre-item-info-block">' +
+                            '<div class="device-centre-item-name"></div>' +
+                            '<div class="device-centre-item-info"></div>' +
+                        '</div>' +
+                    '</td>' +
+                    '<td megatype="type">' +
+                        '<div class="device-centre-item-type"></div>' +
+                    '</td>' +
+                    '<td megatype="size">' +
+                        '<div class="device-centre-item-size"></div>' +
+                    '</td>' +
+                    '<td megatype="timeAd">' +
+                        '<div class="device-centre-item-added"></div>' +
+                    '</td>' +
+                    '<td megatype="hbtime">' +
+                        '<div class="device-centre-item-modified"></div>' +
+                    '</td>' +
+                    '<td megatype="extras" class="grid-url-field own-data">' +
+                        '<a class="grid-url-arrow"><i class="sprite-fm-mono icon-options"></i></a>' +
+                        '<span class="versioning-indicator">' +
+                            '<i class="sprite-fm-mono icon-versions-previous"></i>' +
+                        '</span>' +
+                        '<i class="sprite-fm-mono icon-link"></i>' +
+                    '</td>' +
+                    '<td class="space-maintainer-end" megatype="empty"></td>' +
+                '</tr>' +
+            '</table>',
+
+            // Icon view mode: view not available
+            '<span></span>'
+        ],
+
         'shares': [
             // List view mode
             '<table>' +
@@ -70,7 +144,7 @@
                     '<td></td>' +
                     '<td>' +
                         '<div ' +
-                            'class="item-type-icon-90 icon-folder-incoming-90 sprite-fm-uni-after icon-warning-after"' +
+                            'class="item-type-icon-90 icon-folder-users-90 sprite-fm-uni-after icon-warning-after"' +
                         '>' +
                         '</div>' +
                         '<div class="shared-folder-info-block">' +
@@ -106,7 +180,7 @@
                        '<span class="file-status-icon indicator sprite-fm-mono"></span>' +
                        '<span class="shared-folder-access indicator sprite-fm-mono"></span>' +
                     '</span>' +
-                    '<span class="item-type-icon-90 icon-folder-incoming-90"></span>' +
+                    '<span class="item-type-icon-90 icon-folder-users-90"></span>' +
                     '<span class="file-settings-icon"><i class="sprite-fm-mono icon-options"></i></span>' +
                     '<div class="video-thumb-details">' +
                         '<i class="sprite-fm-mono icon-play"></i>' +
@@ -129,7 +203,7 @@
                         '<span class="grid-status-icon sprite-fm-mono icon-dot"></span>' +
                     '</td>' +
                     '<td>' +
-                        '<div class="item-type-icon-90 icon-folder-outgoing-90"></div>' +
+                        '<div class="item-type-icon-90 icon-folder-users-90"></div>' +
                         '<div class="shared-folder-info-block">' +
                             '<div class="shared-folder-name"></div>' +
                             '<div class="shared-folder-info"></div>' +
@@ -160,7 +234,7 @@
                     '<span class="data-block-indicators">' +
                        '<span class="file-status-icon indicator sprite-fm-mono"></span>' +
                     '</span>' +
-                    '<span class="item-type-icon-90 icon-folder-outgoing-90"></span>' +
+                    '<span class="item-type-icon-90 icon-folder-users-90"></span>' +
                     '<span class="file-settings-icon"><i class="sprite-fm-mono icon-options"></i></span>' +
                     '<div class="video-thumb-details">' +
                         '<i class="sprite-fm-mono icon-play"></i>' +
@@ -258,17 +332,23 @@
             '.grid-table.fm',
             '.fm-blocks-view.fm .file-block-scrolling',
         ],
+        'device-centre-devices': [
+            '.device-centre-grid-view .devices .grid-table.device-centre',
+            '.device-centre-blocks-scrolling'
+        ],
+        'device-centre-folders': [
+            '.device-centre-grid-view .folders .grid-table.device-centre',
+            '.device-centre-blocks-scrolling'
+        ],
         'shares': [
-            '.shared-grid-view .grid-table.shared-with-me',
-            '.shared-blocks-scrolling'
+            '.shared-grid-view .grid-table.shared-with-me'
         ],
         'out-shares': [
-            '.out-shared-grid-view .grid-table.out-shares',
-            '.out-shared-blocks-scrolling'
+            '.out-shared-grid-view .grid-table.out-shares'
         ],
         'file-requests': [
             '.grid-table.fm',
-            '.fm-blocks-view.fm .file-block-scrolling',
+            '.fm-blocks-view.fm .file-block-scrolling'
         ],
         'subtitles': [
             '.mega-dialog .grid-table'
@@ -334,14 +414,26 @@
         var section = 'cloud-drive';
         var location = 'default';
 
+        // Force to set viewMode 0 (list) for file-requests and in/out shares
         if (M.currentdirid === 'shares') {
             section = 'shares';
+            aViewMode = 0;
         }
         else if (M.currentdirid === 'out-shares') {
             section = 'out-shares';
+            aViewMode = 0;
         }
         else if (M.currentrootid === 'file-requests') {
             section = 'file-requests';
+            if (M.currentdirid === 'file-requests') {
+                aViewMode = 0;
+            }
+        }
+        if (M.getS4NodeType(M.currentdirid) === 'container') {
+            aViewMode = 0;
+        }
+        else if (mega.devices.ui.isCustomRender()) {
+            section = mega.devices.ui.getRenderSection();
         }
         else if (typeof aViewMode === 'string') {
             section = aViewMode;
@@ -359,8 +451,7 @@
             location =
                 M.currentdirid === 'public-links' ? 'mixed-content' :
                     M.currentrootid === M.RubbishID ? 'trashcan' :
-                        M.currentrootid === M.InboxID ? 'backups' :
-                            M.isDynPage(M.currentdirid) ? 'dyn-page' : location;
+                        M.isDynPage(M.currentdirid) ? 'dyn-page' : location;
         }
         else {
             this.chatIsReady = megaChatIsReady;
@@ -433,8 +524,6 @@
 
                 $('.grid-table tbody tr').not('.conversationsApp .grid-table tbody tr').remove();
                 $('.file-block-scrolling a').remove();
-                $('.shared-blocks-scrolling a').remove();
-                $('.out-shared-blocks-scrolling a').remove();
 
                 // eslint-disable-next-line local-rules/jquery-replacements
                 $(aListSelector).show().parent().children('table').show();
@@ -458,10 +547,10 @@
 
                 if (M.RubbishID && M.currentdirid === M.RubbishID) {
                     $('.fm-empty-trashbin').removeClass('hidden');
-                    $('.fm-clearbin-button').addClass('hidden');
+                    mega.ui.secondaryNav.hideActionButtons();
                 }
                 else if (String(M.currentdirid).substr(0, 7) === 'search/'
-                        || mega.ui.mNodeFilter.selectedFilters
+                        || mega.ui.mNodeFilter.selectedFilters.value
                         && M.currentrootid !== 'shares') {
                     $('.fm-empty-search').removeClass('hidden');
                 }
@@ -530,6 +619,28 @@
                 else if (M.isDynPage(M.currentdirid)) {
                     if (d > 2) {
                         console.log('Deferred dyn-page.', M.currentdirid);
+                    }
+                }
+                else if (M.onDeviceCenter
+                    && mega.devices.ui.getRenderSection() !== 'cloud-drive') {
+
+                    // TODO: [iha] Add new empty states for (1. devices, 2. folders)
+                    // TODO: [iha] Check if we have the correct option selected
+                    const currSect = mega.devices.ui.getRenderSection();
+                    const filterData = mega.devices.ui.filterChipUtils.selectedFilters.data;
+
+                    switch (currSect) {
+                        case 'device-centre-devices':
+                            if (filterData && filterData.name === 'deviceactivity' && filterData.index === 0) {
+                                $('.fm-no-active-devices', '.fm-right-files-block').removeClass('hidden');
+                            }
+                            break;
+                        case 'device-centre-folders':
+                            if (filterData && filterData.name === 'folderactivity' && filterData.index === 0) {
+                                $('.fm-no-active-folders', '.fm-right-files-block').removeClass('hidden');
+                            }
+                            break;
+
                     }
                 }
                 else if (this.logger) {
@@ -884,14 +995,20 @@
              */
             '*': function(aNode, aHandle, aExtendedInfo) {
                 const props = {classNames: []};
-                const share = M.getNodeShare(aNode);
+                const share = M.getNodeShare(aNode.d ? aNode.h : aNode);
                 let itemIcon = fileIcon(aNode);
 
                 if (aNode.su) {
                     props.classNames.push('inbound-share');
                 }
 
-                if (aNode.s4 && M.getS4NodeType(aNode) === 'bucket') {
+                if (M.dcd[aNode.h]) {
+                    props.classNames.push('device-item');
+                }
+                else if (aNode.isDeviceFolder) {
+                    props.size = bytesToSize(aNode.tb || 0);
+                }
+                else if (aNode.s4 && M.getS4NodeType(aNode) === 'bucket') {
                     props.type = l.s4_bucket_type;
                     props.classNames.push('folder');
                     props.size = bytesToSize(aNode.tb || 0);
@@ -972,6 +1089,10 @@
                         props.labelC = this.labelsColors[colourLabel];
                     }
                 }
+                else if (!aExtendedInfo && aNode.d && share) {
+                    props.linked = true;
+                    props.classNames.push('linked');
+                }
                 if (aNode.su) {
                     props.parentName = l[5542];
                 }
@@ -983,6 +1104,20 @@
                     props.parentName = M.getNameByHandle(pHandle);
                 }
 
+                return props;
+            },
+            'device-centre-devices'(aNode, aHandle) {
+                const props = this.nodeProperties['*'].call(this, aNode, aHandle, false);
+                if (mega.devices.main) {
+                    mega.devices.main.run('updateProps', props, aNode);
+                }
+                return props;
+            },
+            'device-centre-folders'(aNode, aHandle) {
+                const props = this.nodeProperties['*'].call(this, aNode, aHandle, false);
+                if (mega.devices.main) {
+                    mega.devices.main.run('updateProps', props, aNode);
+                }
                 return props;
             },
             'shares': function(aNode, aHandle, aExtendedInfo) {
@@ -1009,26 +1144,19 @@
                     props.accessRightsIcon = 'icon-read-only';
                 }
 
-                if (this.viewmode) {
-                    if (aExtendedInfo !== false) {
-                        avatar = useravatar.contact(props.userHandle, '', 'span');
+                props.shareInfo = fm_contains(aNode.tf, aNode.td);
+
+                if (this.chatIsReady) {
+                    var contact = M.u[props.userHandle];
+                    if (contact) {
+                        props.onlineStatus = M.onlineStatusClass(
+                            contact.presence || "unavailable"
+                        );
                     }
                 }
-                else {
-                    props.shareInfo = fm_contains(aNode.tf, aNode.td);
 
-                    if (this.chatIsReady) {
-                        var contact = M.u[props.userHandle];
-                        if (contact) {
-                            props.onlineStatus = M.onlineStatusClass(
-                                contact.presence ? contact.presence : "unavailable"
-                            );
-                        }
-                    }
-
-                    if (aExtendedInfo !== false) {
-                        avatar = useravatar.contact(props.userHandle);
-                    }
+                if (aExtendedInfo !== false) {
+                    avatar = useravatar.contact(props.userHandle);
                 }
 
                 if (avatar) {
@@ -1073,17 +1201,7 @@
                 props.lastSharedAt = time2date(props.lastSharedAt);
                 props.folderSize = bytesToSize(aNode.tb + (aNode.tvb || 0));
 
-                if (this.viewmode) {
-                    if (aExtendedInfo !== false) {
-                        for (i = 0; i < props.userHandles.length && i < 4; i++) {
-                            props.avatars.push(parseHTML(useravatar.contact(props.userHandles[i], '', 'span'))
-                                .firstChild);
-                        }
-                    }
-                }
-                else {
-                    props.shareInfo = fm_contains(aNode.tf, aNode.td);
-                }
+                props.shareInfo = fm_contains(aNode.tf, aNode.td);
 
                 // Colour label
                 if (aNode.lbl && !folderlink && (aNode.su !== u_handle)) {
@@ -1110,25 +1228,14 @@
                 var tmp;
                 var title = [];
                 let elm;
-                const isBackup = this.location === 'backups'
-                    || this.location === 'mixed-content' && M.getNodeRoot(aNode.h) === M.InboxID;
 
                 if (aNode.fav && !folderlink && this.location !== 'trashcan' && M.currentrootid !== 'shares') {
                     elm = aTemplate.querySelector(this.viewmode ? '.file-status-icon' : '.grid-status-icon');
                     elm.classList.add('icon-favourite-filled');
                     elm.classList.remove('icon-dot');
                 }
-
                 if (mega.sensitives.shouldBlurNode(aNode)) {
                     aTemplate.classList.add('is-sensitive');
-                }
-
-                if (isBackup) {
-
-                    elm = aTemplate.querySelector(this.viewmode ? '.file-status-icon' : '.grid-status-icon');
-                    if (elm) {
-                        elm.classList.add('read-only');
-                    }
                 }
 
                 if (!aNode.t && aNode.tvf) {
@@ -1244,49 +1351,45 @@
 
                 return aTemplate;
             },
+            'device-centre-devices'(aNode, aProperties, aTemplate) {
+                if (mega.devices.main) {
+                    mega.devices.main.run('updateTemplate', aNode, aProperties, aTemplate);
+                }
+                return aTemplate;
+            },
+            'device-centre-folders'(aNode, aProperties, aTemplate) {
+                if (mega.devices.main) {
+                    mega.devices.main.run('updateTemplate', aNode, aProperties, aTemplate);
+                }
+                return aTemplate;
+            },
             'shares': function(aNode, aProperties, aTemplate) {
                 aTemplate.querySelector('.shared-folder-name').textContent = aProperties.name;
 
                 var tmp = aTemplate.querySelector('.shared-folder-access');
 
                 if (aProperties.avatar) {
-                    var avatar = this.viewmode ? '.shared-folder-info-block' : '.fm-chat-user-info';
-                    avatar = aTemplate.querySelector(avatar);
+                    var avatar = aTemplate.querySelector('.fm-chat-user-info');
 
                     avatar.parentNode.insertBefore(aProperties.avatar, avatar);
                 }
 
-                if (this.viewmode) {
 
-                    aTemplate.querySelector('.item-type-icon-90').classList.add(aProperties.blockIcon);
-                    tmp.classList.add(aProperties.accessRightsIcon);
+                tmp.querySelector('span').textContent = aProperties.accessRightsText;
+                tmp.querySelector('i').classList.add(aProperties.accessRightsIcon);
 
-                    aTemplate.querySelector('.shared-folder-info')
-                        .textContent = l[17590].replace('%1', aProperties.userName);
-
-                    if (String(aProperties.name).length > 20) {
-                        aTemplate.setAttribute('title', aProperties.name);
-                    }
+                tmp = aTemplate.querySelector('.fm-chat-user-info');
+                tmp.classList.add(aProperties.userHandle);
+                if (aProperties.onlineStatus) {
+                    tmp.classList.add(aProperties.onlineStatus[1]);
                 }
-                else {
 
-                    tmp.querySelector('span').textContent = aProperties.accessRightsText;
-                    tmp.querySelector('i').classList.add(aProperties.accessRightsIcon);
+                aTemplate.querySelector('.fm-chat-user span').textContent = aProperties.userName;
+                aTemplate.querySelector('.shared-folder-info').textContent = aProperties.shareInfo;
+                aTemplate.querySelector('.shared-folder-size').textContent = aProperties.folderSize;
 
-                    tmp = aTemplate.querySelector('.fm-chat-user-info');
-                    tmp.classList.add(aProperties.userHandle);
-                    if (aProperties.onlineStatus) {
-                        tmp.classList.add(aProperties.onlineStatus[1]);
-                    }
-
-                    aTemplate.querySelector('.fm-chat-user span').textContent = aProperties.userName;
-                    aTemplate.querySelector('.shared-folder-info').textContent = aProperties.shareInfo;
-                    aTemplate.querySelector('.shared-folder-size').textContent = aProperties.folderSize;
-
-                    if (String(aProperties.name).length > 78) {
-                        aTemplate.setAttribute('title', aProperties.name);
-                    }
-
+                if (String(aProperties.name).length > 78) {
+                    aTemplate.setAttribute('title', aProperties.name);
                 }
 
                 const contactVerification = mega.keyMgr.getWarningValue('cv') | 0;
@@ -1311,88 +1414,43 @@
             },
             'out-shares': function(aNode, aProperties, aTemplate) {
 
-                let elm;
+                const elm = aTemplate.querySelector('.grid-status-icon');
 
                 if (aNode.fav && !folderlink) {
-                    elm = aTemplate.querySelector(this.viewmode ? '.file-status-icon' : '.grid-status-icon');
                     elm.classList.add('icon-favourite-filled');
                     elm.classList.remove('icon-dot');
                 }
 
                 if (M.getNodeRoot(aNode.h) === M.InboxID) {
-                    elm = aTemplate.querySelector(this.viewmode ? '.file-status-icon' : '.grid-status-icon');
                     elm.classList.add('read-only');
                 }
 
                 aTemplate.querySelector('.shared-folder-name').textContent = aProperties.name;
 
-                if (this.viewmode) {
-                    elm = aTemplate.querySelector('.item-type-icon-90');
+                tmp = aTemplate.querySelector('.fm-chat-user-info');
 
-                    if (aProperties.avatars) {
-
-                        var avatarElement;
-                        var avatar = this.viewmode ? '.shared-folder-info-block' : '.fm-chat-user-info';
-                        avatar = aTemplate.querySelector(avatar);
-
-                        if (aProperties.avatars.length === 1) {
-                            avatarElement = aProperties.avatars[0];
-                        }
-                        else {
-                            avatarElement = document.createElement("div");
-                            avatarElement.classList = 'multi-avatar multi-avatar-' + aProperties.avatars.length;
-
-                            for (var i in aProperties.avatars) {
-                                if (aProperties.avatars[i]) {
-                                    aProperties.avatars[i].classList += ' avatar-' + i;
-                                    avatarElement.appendChild(aProperties.avatars[i]);
-                                }
-                            }
-                        }
-
-                        avatar.parentNode.insertBefore(avatarElement, avatar);
-
-                    }
-
-                    if (aProperties.blockIcon) {
-                        aTemplate.querySelector('.item-type-icon-90').classList.add(aProperties.blockIcon);
-                    }
-
-                    if (String(aProperties.name).length > 20) {
-                        aTemplate.setAttribute('title', aProperties.name);
-                    }
-
-                    var shareContactInfo = aTemplate.querySelector('.shared-contact-info');
-                    shareContactInfo.textContent = mega.icu.format(l.contact_count, aProperties.userNames.length);
-                    shareContactInfo.classList += ' simpletip';
-                    shareContactInfo.dataset.simpletip = aProperties.userNames.join(",[BR]");
+                var otherCount = 0;
+                var userNames = aProperties.userNames;
+                if (aProperties.userNames.length > 3) {
+                    userNames = userNames.slice(0, 3);
+                    otherCount = aProperties.userNames.length - 3;
+                    var sharedUserWrapper = aTemplate.querySelector('.fm-chat-users-wrapper');
+                    sharedUserWrapper.classList += ' simpletip';
+                    sharedUserWrapper.dataset.simpletip = aProperties.userNames.join(",[BR]");
+                    aTemplate.querySelector('.fm-chat-users-other').textContent = mega.icu
+                        .format(l.users_share_other_count, otherCount);
                 }
-                else {
-                    tmp = aTemplate.querySelector('.fm-chat-user-info');
+                aTemplate.querySelector('.fm-chat-users').textContent = userNames.join(', ');
+                aTemplate.querySelector('.shared-folder-info').textContent = aProperties.shareInfo;
+                aTemplate.querySelector('.shared-folder-size').textContent = aProperties.folderSize;
+                aTemplate.querySelector('.last-shared-time').textContent = aProperties.lastSharedAt;
 
-                    var otherCount = 0;
-                    var userNames = aProperties.userNames;
-                    if (aProperties.userNames.length > 3) {
-                        userNames = userNames.slice(0, 3);
-                        otherCount = aProperties.userNames.length - 3;
-                        var sharedUserWrapper = aTemplate.querySelector('.fm-chat-users-wrapper');
-                        sharedUserWrapper.classList += ' simpletip';
-                        sharedUserWrapper.dataset.simpletip = aProperties.userNames.join(",[BR]");
-                        aTemplate.querySelector('.fm-chat-users-other').textContent = mega.icu
-                            .format(l.users_share_other_count, otherCount);
-                    }
-                    aTemplate.querySelector('.fm-chat-users').textContent = userNames.join(', ');
-                    aTemplate.querySelector('.shared-folder-info').textContent = aProperties.shareInfo;
-                    aTemplate.querySelector('.shared-folder-size').textContent = aProperties.folderSize;
-                    aTemplate.querySelector('.last-shared-time').textContent = aProperties.lastSharedAt;
+                if (String(aProperties.name).length > 78) {
+                    aTemplate.setAttribute('title', aProperties.name);
+                }
 
-                    if (String(aProperties.name).length > 78) {
-                        aTemplate.setAttribute('title', aProperties.name);
-                    }
-
-                    if (aProperties.icon) {
-                        aTemplate.querySelector('.item-type-icon-90').classList.add(aProperties.icon);
-                    }
+                if (aProperties.icon) {
+                    aTemplate.querySelector('.item-type-icon-90').classList.add(aProperties.icon);
                 }
 
                 return aTemplate;
@@ -1600,10 +1658,10 @@
                 if (DYNLIST_ENABLED) {
                     if (!aUpdate) {
                         var container = document.querySelector(viewModeContainers[this.section][this.viewmode]);
-                        this.addClasses(
-                            document.querySelector(viewModeContainers[this.section][0 + !this.viewmode]),
-                            ["hidden"]
-                        );
+                        var toHide = document.querySelector(viewModeContainers[this.section][0 + !this.viewmode]);
+                        if (toHide) {
+                            this.addClasses(toHide, ["hidden"]);
+                        }
 
                         this.addClasses(container, ['megaListContainer']);
 

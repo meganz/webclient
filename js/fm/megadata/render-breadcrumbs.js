@@ -19,12 +19,9 @@
         const block = scope.querySelector('.fm-breadcrumbs-block');
         const $block = $(block);
         const dropdown = scope.querySelector('.breadcrumb-dropdown');
+        $block.empty();
 
-        let { html, extraItems } = getPathHTML(items, dictionary, block);
-
-        if (html && html !== '') {
-            $block.safeHTML(html);
-        }
+        const extraItems = prepareBreadcrumbItems(items, dictionary, block);
 
         removeSimpleTip($('.fm-breadcrumbs', $block));
         showHideBreadcrumbDropdown(extraItems, scope, dropdown);
@@ -50,6 +47,11 @@
         }
 
         let items = this.getPath(fileHandle || this.currentdirid);
+
+        if (M.onDeviceCenter) {
+            items = mega.devices.ui.getFolderChildrenPath(items);
+        }
+
         const hasRewind = scope.classList.contains('rewind');
 
         const dictionary = handle => {
@@ -81,19 +83,15 @@
                 },
                 shares: () => {
                     typeClass = 'shared-with-me';
-                    name = l[5542];
                 },
                 'out-shares': () => {
                     typeClass = 'out-shares';
-                    name = l[5543];
                 },
                 'public-links': () => {
                     typeClass = 'pub-links';
-                    name = l[16516];
                 },
                 'file-requests': () => {
                     typeClass = 'file-requests';
-                    name = l.file_request_title;
                 },
                 [this.RubbishID]: () => {
                     typeClass = 'rubbish-bin';
@@ -102,15 +100,12 @@
                 messages: () => {
                     typeClass = 'messages';
                     name = l[166];
-                }
+                },
+                [mega.devices.rootId]: () => {
+                    typeClass = mega.devices.rootId;
+                    name = l.device_centre;
+                },
             };
-
-            if (this.BackupsId) {
-                cases[this.BackupsId] = () => {
-                    typeClass = 'backups';
-                    // name = l.restricted_folder_button; // temporary solution for backup page show no root
-                };
-            }
 
             if (cases[handle]) {
                 cases[handle]();
@@ -125,6 +120,13 @@
                         typeClass = 'folder';
                     }
                 }
+                else {
+                    const {name: deviceName} = this.dcd[handle] || {};
+                    if (deviceName) {
+                        name = deviceName;
+                    }
+                }
+
                 if (handle.length === 11) {
                     typeClass = 'contact selectable-txt';
 
@@ -167,18 +169,30 @@
             };
         };
 
-        this.renderBreadcrumbs(items, scope, dictionary, id => {
-            if (hasRewind) {
-                return;
-            }
-
-            breadcrumbClickHandler.call(this, id);
-        });
-
         // if in custom component we do not want to open the file versioning dialog
-        if (!is_mobile && fileHandle && !wrapperNode) {
-            fileversioning.fileVersioningDialog(fileHandle);
+        if (M.search) {
+            const node = M.d[items[0]];
+            const isBackup = node && M.getNodeRoot(node.h) === M.InboxID;
+            if (isBackup) {
+                items = mega.devices.ui.getNodePathFromOuterView(node.h);
+            }
         }
+
+        Promise.resolve(items)
+            .then((items) => {
+                this.renderBreadcrumbs(items, scope, dictionary, id => {
+                    if (hasRewind) {
+                        return;
+                    }
+                    breadcrumbClickHandler.call(this, id);
+                });
+                // if in custom component we do not want to open the file versioning dialog
+                if (!is_mobile && fileHandle && !wrapperNode) {
+                    fileversioning.fileVersioningDialog(fileHandle);
+                }
+            })
+            .catch(tell);
+
     };
 
     /**
@@ -217,37 +231,8 @@
         let contents = '';
 
         for (let item of items) {
-
-            let icon = '';
-
-            if (item.type === 's4-object-storage') {
-                icon = 'icon-object-storage';
-            }
-            else if (item.type === 's4-buckets') {
-                icon = 'icon-bucket-solid';
-            }
-            else if (item.type === 's4-policies') {
-                icon = 'icon-policy-filled';
-            }
-            else if (item.type === 's4-users') {
-                icon = 'icon-user-filled';
-            }
-            else if (item.type === 's4-groups') {
-                icon = 'icon-contacts';
-            }
-            else if (item.type === 'cloud-drive') {
-                icon = 'icon-cloud';
-            }
-            else if (item.type === 'backups') {
-                icon = 'icon-database-filled';
-            }
-            else if (item.type === 'folder' || item.type === 'folder-link') {
-                icon = 'icon-folder-filled';
-            }
-
             contents +=
                 `<a class="crumb-drop-link" data-id="${escapeHTML(item.id)}">
-                    ${icon === '' ? '' : `<i class="sprite-fm-mono ${icon} icon24"></i>`}
                     <span>${escapeHTML(item.name)}</span>
                 </a>`;
         }
@@ -289,6 +274,7 @@
                 if ($(this).hasClass('info-dlg')) {
                     e.stopPropagation();
                 }
+                this.classList.toggle('active');
 
                 dropdown.classList.toggle('active');
 
@@ -300,11 +286,16 @@
                         Ps.initialize(dropdown);
                     }
                 }
+                return false;
             });
 
         $('.crumb-drop-link, .fm-breadcrumbs', scope).rebind('click.breadcrumb', function(e) {
             dropdown.classList.remove('active');
             let id = $(e.currentTarget).data('id');
+            const link = scope.querySelector('a');
+            if (link) {
+                link.classList.remove('active');
+            }
 
             if (id) {
                 clickAction(id);
@@ -316,6 +307,31 @@
         });
     }
 
+    function updateBreadcrumbNode(sizingNode, typeClass, name, isRoot, isDyhRoot, isLastItem) {
+        sizingNode.className = `fm-breadcrumbs ${typeClass} ${isRoot || isDyhRoot ? 'root' : ''} ui-droppable`;
+        sizingNode.textContent = '';
+        const span = document.createElement('span');
+        span.className = 'right-arrow-bg simpletip simpletip-tc';
+        sizingNode.appendChild(span);
+        if (isRoot) {
+            const innerSpan = document.createElement('span');
+            innerSpan.className = 'not-loading selectable-txt';
+            innerSpan.textContent = name;
+            span.appendChild(innerSpan);
+            const icon = document.createElement('i');
+            icon.className = 'loading sprite-fm-theme icon-loading-spinner';
+            span.appendChild(icon);
+        }
+        else {
+            span.textContent = name;
+        }
+        if (!isLastItem) {
+            const iconNode = document.createElement('i');
+            iconNode.className = `next-arrow ${mega.ui.sprites.mono} icon-chevron-right-thin-outline icon16`;
+            sizingNode.appendChild(iconNode);
+        }
+    }
+
     /**
      * Returns the HTML for a full set of breadcrumbs.
      *
@@ -324,26 +340,34 @@
      * @param {HTMLElement} container - the HTMLElement that contains the breadcrumbs
      * @return {object} - the HTML for the breadcrumbs and the list of parent folders not in the breadcrumbs
      */
-    function getPathHTML(items, dictionary, container) {
-        let html = '';
-        let currentPathLength = items.length === 3 ? 12 : 0;
-        const maxPathLength = getMaxPathLength(14, container);
+    function prepareBreadcrumbItems(items, dictionary, container) {
+        let containerWidth = container.clientWidth;
+        let totalWidth = 0;
+        let remainItems = 4;
+        const sizingNode = document.createElement('a');
+        container.appendChild(sizingNode);
+
         let extraItems = [];
-        let isInfoBlock = false;
         let isSimpletip = false;
+        let isDyhRoot = false;
         let lastPos = 0;
 
         if (container.parentNode.parentNode.classList.contains('simpletip-tooltip')) {
             isSimpletip = true;
+            containerWidth = Infinity;
         }
         else if (container.classList.contains('location')) {
             items.shift(); // Show location of item without item itself
         }
         else if (container.classList.contains('info')) {
-            isInfoBlock = true;
+            remainItems = 2;
+            containerWidth = Infinity;
         }
 
-        const isDyhRoot = M.dyh ? M.dyh('is-breadcrumb-root', items) : false;
+        if (M.dyh && M.dyh('is-breadcrumb-root', items)) {
+            isDyhRoot = true;
+            containerWidth = Infinity;
+        }
 
         for (let i = 0; i < items.length; i++) {
 
@@ -358,51 +382,45 @@
             if (name !== '') {
                 const isLastItem = isSimpletip ? i === lastPos + 1 : i === lastPos;
                 const isRoot = i === items.length - 1;
-                const icon = `${mega.ui.sprites.mono} icon-arrow-right`;
-                let item;
-                // if we won't have space, add it to the dropdown, but always render the current folder,
-                // and root if there are no extraItems
-                // for info block we show max 2 items in the in-view breadcrumb
-                if (!isDyhRoot && !isLastItem && !isSimpletip &&
-                    (currentPathLength > maxPathLength && !isInfoBlock) || (isInfoBlock && i > 1)) {
-                    extraItems.push({
-                        name,
-                        type: typeClass,
-                        id
-                    });
-                }
-                // otherwise, add it to the main breadcrumb
-                else {
-                    name = escapeHTML(name);
-                    item = escapeHTML(items[i]);
-                    html =
-                        `<a class="fm-breadcrumbs ${escapeHTML(typeClass)} ${
-                            isRoot || isDyhRoot ? 'root' : ''} ui-droppable"
-                            data-id="${item}" id="pathbc-${item}">
-                            <span
-                                class="right-arrow-bg simpletip simpletip-tc">
-                                ${isRoot ? `<span class="not-loading selectable-txt">
-                                        ${name}
-                                    </span>
-                                    <i class="loading sprite-fm-theme icon-loading-spinner"></i>` : name}
-                            </span>
-                            ${isLastItem ? '' : `<i class="next-arrow ${icon} icon16"></i>`}
-                        </a>` + html;
+                updateBreadcrumbNode(sizingNode, typeClass, name, isRoot, isDyhRoot, isLastItem);
 
-                    // add on some space for the arrow
-                    if (isLastItem) {
-                        currentPathLength += 6;
+                const nodeWidth = sizingNode.clientWidth;
+                const prepareRealNode = (node) => {
+                    node = node.cloneNode(true);
+                    node.dataset.id = id;
+                    node.id = `pathbc-${items[i]}`;
+                    return node;
+                };
+                if (!remainItems || totalWidth + nodeWidth > containerWidth) {
+                    if (totalWidth) {
+                        extraItems.push({
+                            name,
+                            type: typeClass,
+                            id,
+                        });
                     }
+                    else {
+                        sizingNode.classList.add('overflow-breadcrumb');
+                        container.prepend(prepareRealNode(sizingNode));
+                        sizingNode.classList.remove('overflow-breadcrumb');
+                    }
+                    totalWidth = containerWidth;
+                    remainItems = 0;
                 }
-                currentPathLength += name.length;
+                else {
+                    totalWidth += nodeWidth;
+                    container.prepend(prepareRealNode(sizingNode));
+                    remainItems--;
+                }
             }
             // if items in front have empty name, treat next item as last item.
             else if (lastPos === i) {
                 lastPos++;
             }
         }
+        sizingNode.remove();
 
-        return { html, extraItems };
+        return extraItems;
     }
 
     function removeSimpleTip($breadCrumbs) {
@@ -444,7 +462,8 @@
             'shares',
             'out-shares',
             'public-links',
-            'file-requests'
+            'file-requests',
+            mega.devices.rootId
         ];
         mBroadcaster.sendMessage('trk:event', 'breadcrumb', 'click', id);
 
@@ -466,16 +485,26 @@
                 && M.currentCustomView.type !== 'albums'
                 && !(M.currentCustomView.prefixPath === 'discovery/' && id === M.RootID)
             ) {
-                id = M.currentCustomView.prefixPath + id;
+                id = M.onDeviceCenter
+                    ? mega.devices.ui.getCurrentDirPath(id)
+                    : M.currentCustomView.prefixPath + id;
+            }
+            else if (M.getNodeRoot(id) === M.InboxID) {
+                id = mega.devices.ui.getNodeURLPathFromOuterView(n, !n.t);
             }
 
-            this.openFolder(id)
+            Promise.resolve(id)
+                .then((id) => this.openFolder(id))
                 .always(() => {
                     if (toSelect) {
                         $.selected = [toSelect];
                         reselect(1);
                     }
-                });
+                })
+                .catch(tell);
+        }
+        else if (M.dcd[id]) {
+            this.openFolder(`device-centre/${id}`);
         }
         else if (specialCases.includes(id)) {
             this.openFolder(id);

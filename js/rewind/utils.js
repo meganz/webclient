@@ -249,7 +249,7 @@ lazy(mega, 'rewindUtils', () => {
             }
 
             // store the residual f response for perusal once all workers signal that they're done
-            this.residual.push(...response);
+            this.residual = this.residual.concat(response);
 
             // This is just to check if we are done processing
             // from worker earlier than expected and residue

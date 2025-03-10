@@ -13,18 +13,21 @@ lazy(mega, 'templates', () => {
      * Get a template from the DOM, clone it and change the id
      * @param {string} id - The id of the template to clone
      * @param {string} newID - The new id to assign to the cloned template
+     * @param {JQuery<HTMLElement>} [$templateLocation] - The location of the template, if not in main templates container
      * @returns {JQuery<HTMLElement>} - The cloned template
      */
-    const getTemplate = (id, newID) => {
+    const getTemplate = (id, newID, $templateLocation) => {
+
+        $templateLocation = $templateLocation || $templates;
 
         // Ensure that there is no item with duplicated ID
-        const elem = document.getElementById(newID);
+        const elem = newID && document.getElementById(newID);
         if (elem) {
             elem.remove();
         }
 
         // Return a clone of the template with the new ID, or no ID if not provided
-        return $(`#${id}`, $templates)
+        return $(`#${id}`, $templateLocation)
             .clone()
             .removeClass('template')
             .attr('id', newID || null);

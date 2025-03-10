@@ -538,6 +538,10 @@
             <i class="sprite-fm-mono icon-logout"></i>
             <span>[$5866]</span>
         </a>
+        <a class="dropdown-item togglepausesync-item">
+            <i class="sprite-fm-mono"></i>
+            <span></span>
+        </a>
         <a class="dropdown-item stopbackup-item">
             <i class="sprite-fm-mono icon-clear"></i>
             <span>[$stop_backup_button]</span>
@@ -1158,6 +1162,59 @@
                     </div>
                 </div>
             </div>
+            <div class="fm-banner-holder">
+                <div class="s4-info-header-blocks hidden">
+                    <div class="fm-notification-block bucket-access-warning"></div>
+                </div>
+                <div class="fm-notification-block mega-lite-mode-warning">
+                    <i class="notification-block-icon sprite-fm-mono icon-lock"></i>
+                    <span>[$in_mega_lite_mode_banner]</span>
+                </div>
+                <div class="fm-notification-block unverified-share">
+                    <i class="notification-block-icon sprite-fm-mono icon-info"></i>
+                    <span></span>
+                </div>
+                <div class="fm-notification-block full">
+                    <i class="notification-block-icon sprite-fm-mono icon-offline"></i>
+                    <span>[$22667]</span>
+                </div>
+                <div class="fm-notification-block expired-business">
+
+                </div>
+                <div class="fm-notification-block almost-full">
+                    <i class="notification-block-icon sprite-fm-mono icon-offline"></i>
+                    <span>[$16316]</span>
+                    <i class="fm-notification-close sprite-fm-mono icon-close-component"></i>
+                </div>
+                <div class="fm-notification-block grace-business">
+                    <span>[$16316]</span>
+                </div>
+                <div class="fm-notification-block business-next-tier"></div>
+                <div class="fm-notification-block duplicated-items-found">
+                    <span>[$22101]</span>
+                    <a class="fix-me-btn">[$22102]</a>
+                    <div class="fm-notification-close fix-me-close sprite-fm-mono icon-close-component"></div>
+                </div>
+                <div class="fm-notification-block payment-card-status">
+                    <i class="notification-block-icon sprite-fm-mono icon-alert-circle-thin-outline"></i>
+                    <span class="payment-banner-content-wrapper">
+                            <span class="banner-title"></span>
+                            <span class="banner-txt"></span>
+                            <a>[$update_card]</a>
+                        </span>
+                </div>
+                <div class="fm-notification-block new-feature-rewind-notification">
+                    <span>[$new_feature_rewind_message]</span>
+                    <div class="learn-more">
+                        <span>[$new_feature_rewind_learn_more]</span>
+                        <i class="fm-notification-close sprite-fm-mono icon-close-component"></i>
+                    </div>
+                </div>
+                <div class="fm-notification-block device-centre">
+                    <i class="notification-block-icon sprite-fm-mono icon-offline"></i>
+                    <span></span>
+                </div>
+            </div>
             <div class="onboarding-control-panel hidden">
                 <div class="onboarding-control-panel-content">
                     <button class="close js-close mega-button action icon" aria-label="[$148]">
@@ -1193,14 +1250,115 @@
                 <div class="clear"></div>
             </div>
 
+            <div id="media-tabs"></div>
+
             <div class="fm-right-header fm hidden">
-        
+
+                <input type="file" id="fileselect1" title="" class="hidden" multiple />
+                <input type="file" id="fileselect2" title="" class="hidden" webkitdirectory multiple />
+
+                <div class="fm-header-buttons">
+                    <button class="mega-component nav-elem normal button action fm-share-folder hidden" title="[$5631]">
+                        <div class="text-box-wrapper sk-elm">
+                            <span class="primary-text">[$5631]</span>
+                        </div>
+                    </button>
+
+                    <button class="mega-component nav-elem normal button action fm-manage-share-folder hidden" title="[$manage_share]">
+                        <div class="text-box-wrapper sk-elm">
+                            <span class="primary-text">[$manage_share]</span>
+                        </div>
+                    </button>
+
+                    <button class="mega-component nav-elem normal button action fm-clearbin-button hidden">
+                        <div class="text-box-wrapper sk-elm">
+                            <span class="primary-text">[$7741]</span>
+                        </div>
+                    </button>
+
+                    <button class="mega-component nav-elem normal button action fm-new-shared-folder hidden">
+                        <div class="text-box-wrapper sk-elm">
+                            <span class="primary-text">[$16533]</span>
+                        </div>
+                    </button>
+
+                    <button class="mega-component nav-elem normal button action fm-new-link hidden">
+                        <div class="text-box-wrapper sk-elm">
+                            <span class="primary-text">[$20667]</span>
+                        </div>
+                    </button>
+
+                    <button class="mega-component nav-elem normal button action fm-new-file-request hidden">
+                        <div class="text-box-wrapper sk-elm">
+                            <span class="primary-text">[$file_request_action_create]</span>
+                        </div>
+                    </button>
+
+                    <button class="mega-component nav-elem normal button action fm-s4-new-bucket js-s4-new-bucket hidden" title="[$s4_create_bkt]">
+                        <div class="text-box-wrapper sk-elm">
+                            <span class="primary-text">[$s4_create_bkt]</span>
+                        </div>
+                    </button>
+
+                    <button class="mega-component nav-elem normal button action fm-s4-settings js-s4-settings hidden" title="[$823]">
+                        <div class="text-box-wrapper sk-elm">
+                            <span class="primary-text">[$823]</span>
+                        </div>
+                    </button>
+
+                    <button class="mega-component nav-elem normal button action fm-s4-new-key hidden" title="[$s4_key_create]">
+                        <div class="text-box-wrapper sk-elm">
+                            <span class="primary-text">[$s4_key_create]</span>
+                        </div>
+                    </button>
+
+                    <button class="mega-component nav-elem normal button action fm-s4-new-user hidden" title="Create new user">
+                        <div class="text-box-wrapper sk-elm">
+                            <span class="primary-text">[$s4_user_create_button]</span>
+                        </div>
+                    </button>
+
+                    <button class="mega-component nav-elem normal button action fm-s4-new-group hidden" title="Create new group">
+                        <div class="text-box-wrapper sk-elm">
+                            <span class="primary-text">[$s4_group_create_button]</span>
+                        </div>
+                    </button>
+
+                    <button class="mega-component nav-elem normal button action fm-add-backup" title="[$add_backup_button]">
+                        <div class="text-box-wrapper sk-elm">
+                            <span class="primary-text">[$add_backup_button]</span>
+                        </div>
+                    </button>
+
+                    <button class="mega-component nav-elem normal button action fm-add-syncs" title="[$add_syncs_button]">
+                        <div class="text-box-wrapper sk-elm">
+                            <span class="primary-text">[$add_syncs_button]</span>
+                        </div>
+                    </button>
+
+                    <button class="mega-component nav-elem normal button action fm-import-to-cloudrive hidden" title="[$btn_imptomega]">
+                        <div class="text-box-wrapper sk-elem">
+                            <span class="primary-text">[$btn_imptomega]</span>
+                        </div>
+                    </button>
+
+                    <button class="mega-component nav-elem normal button fm-download hidden">
+                        <div class="text-box-wrapper sk-elm">
+                            <span class="primary-text">[$58]</span>
+                        </div>
+                    </button>
+
+                </div>
+
+                <div class="fm-card-holder"></div>
+
+
                 <div class="fm-breadcrumbs-wrapper">
                     <div class="crumb-overflow-link dropdown">
                         <a class="breadcrumb-dropdown-link">
-                            <i class="menu-icon sprite-fm-mono icon-options icon24"></i>
+                            <i class="menu-icon sprite-fm-mono icon-options icon16"></i>
                         </a>
-                        <i class="sprite-fm-mono icon-arrow-right icon16"></i>
+                        <i class="sprite-fm-mono icon-chevron-right-thin-outline icon16"></i>
                     </div>
                     <div class="fm-breadcrumbs-block"></div>
                     <div class="breadcrumb-dropdown"></div>
@@ -1253,276 +1411,52 @@
                     </div>
                 </div>
 
-                <div class="fm-header-buttons">
-                
-                    <div class="view-links flex flex-row gap-3 items-center pl-4">
-                        <a class="fm-files-view-icon media-view hidden" title="[$md_view]">
-                            <i class="sprite-fm-mono icon-images"></i>
-                        </a>
-                        <a class="fm-files-view-icon listing-view active" title="[$5553]">
-                            <i class="sprite-fm-mono icon-view-medium-list"></i>
-                        </a>
-                        <a class="fm-files-view-icon block-view" title="[$5552]">
-                            <i class="sprite-fm-mono icon-grid-4-regular-outline"></i>
-                        </a>
-                    </div>
-                
-                    <div class="button link-button dropdown fm-uploads">
-                        <i class="sprite-fm-mono icon-upload icon-blue"></i>
-                        <span>[$24765]</span>
-                        <i class="arrow-icon sprite-fm-mono icon-dropdown"></i>
-                        <div class="dropdown-content">
-                            <button class="fm-folder-upload dropdown-btn">
-                                <i class="sprite-fm-mono icon-folder-upload"></i>
-                                <span>[$98]</span>
-                            </button>
-                            <input type="file" id="fileselect2" title="" class="hidden" webkitdirectory multiple />
-                            <button class="fm-file-upload dropdown-btn">
-                                <i class="sprite-fm-mono icon-upload-file"></i>
-                                <span>[$99]</span>
-                            </button>
-                            <input type="file" id="fileselect1" title="" class="hidden" multiple />
-                        </div>
-                    </div>
-                
-                    <button class="mega-button action fm-new-folder" title="[$5545]">
-                        <div>
-                            <i class="sprite-fm-mono icon-add-circle icon-green"></i>
-                        </div>
-                        <span>[$68]</span>
-                    </button>
-                
-                    <button class="mega-button action fm-share-folder" title="[$5631]">
-                        <div>
-                            <i class="sprite-fm-mono icon-folder-outgoing-share icon-yellow"></i>
-                        </div>
-                        <span>[$5631]</span>
-                    </button>
-                
-                    <button class="mega-button action fm-rewind hidden" title="[$rewind_action_label]">
-                        <div>
-                            <i class="sprite-fm-mono icon-rewind icon-yellow"></i>
-                        </div>
-                        <span>[$rewind_action_label]</span>
-                        <div class="blinking-highlight-dot"></div>
-                    </button>
-                
-                    <div class="rw-whats-new-mini-promo-container hidden suppressed">
-                        <div class="mega-dialog dialog-template-graphic rw-whats-new-mini-promo hidden" role="dialog"
-                            aria-labelledby="rw-whats-new-mini-promo-title" aria-modal="true">
-                
-                            <header>
-                                <div class="graphic sprite-fm-illustration img-rw-whats-new-mini-promo"></div>
-                                <span class="rw-whats-new-mini-promo-highlight">[$whats_new]</span>
-                                <h2 class="rw-whats-new-mini-promo-title">[$rewind]</h2>
-                            </header>
-                
-                            <section class="content">
-                                <div class="content-block">
-                                    <p>
-                                        [$rw_mini_promo_dialog_desc]
-                                    </p>
-                                </div>
-                            </section>
-                
-                            <footer>
-                                <aside>
-                                    <button class="mega-button positive btn-rw-mini-promo-action">
-                                        <span>[$try_it_out]</span>
-                                    </button>
-                                </aside>
-                            </footer>
-                
-                            <i class="sprite-fm-mono icon-tooltip-arrow tooltip-arrow rw-mini-promo-tooltip-arrow"></i>
-                
-                        </div>
-                    </div>
-                
-                    <button class="mega-button action fm-add-user hidden">
-                        <div>
-                            <i class="sprite-fm-mono icon-add-circle icon-green"></i>
-                        </div>
-                        <span>[$101]</span>
-                    </button>
-                
-                    <button class="mega-button action accept-all hidden">
-                        <div>
-                            <i class="sprite-fm-mono icon-accept icon-green"></i>
-                        </div>
-                        <span>[$19062]</span>
-                    </button>
-                
-                    <button class="mega-button action fm-clearbin-button hidden">
-                        <div>
-                            <i class="sprite-fm-mono icon-clear icon-red"></i>
-                        </div>
-                        <span>[$7741]</span>
-                    </button>
-                
-                    <button class="mega-button action search-files-result hidden">
-                        <div>
-                            <i class="sprite-fm-mono icon-search icon-green"></i>
-                        </div>
-                        <span>
-                            <span class="number">12</span>&nbsp;
-                            <span>[$1392]</span>
-                        </span>
-                    </button>
-                
-                    <button class="mega-button action search-messages-result hidden">
-                        <div>
-                            <i class="sprite-fm-mono icon-search icon-green"></i>
-                        </div>
-                        <span>
-                            <span>[$6868]</span>&nbsp;
-                            <span class="number">5</span>
-                        </span>
-                    </button>
-                
-                    <button class="mega-button action fm-new-shared-folder hidden">
-                        <div>
-                            <i class="sprite-fm-mono icon-share-circle icon-blue"></i>
-                        </div>
-                        <span>[$16533]</span>
-                    </button>
-                
-                    <button class="mega-button action fm-new-link hidden">
-                        <div>
-                            <i class="sprite-fm-mono icon-link-circle icon-blue"></i>
-                        </div>
-                        <span>[$20667]</span>
-                    </button>
-                
-                    <button class="mega-button action fm-new-file-request hidden">
-                        <div>
-                            <i class="sprite-fm-mono icon-add-circle icon-green"></i>
-                        </div>
-                        <span>[$file_request_action_create]</span>
-                    </button>
-                
-                    <button class="mega-button action fm-s4-settings js-s4-settings hidden" title="[$823]">
-                        <div>
-                            <i class="sprite-fm-mono icon-settings-outline icon-blue"></i>
-                        </div>
-                        <span>[$823]</span>
-                    </button>
-                
-                    <button class="mega-button action fm-s4-new-bucket js-s4-new-bucket hidden" title="[$s4_create_bkt]">
-                        <div>
-                            <i class="sprite-fm-mono icon-add-circle icon-green"></i>
-                        </div>
-                        <span>[$s4_create_bkt]</span>
-                    </button>
-                
-                    <button class="mega-button action fm-s4-new-key hidden" title="[$s4_key_create]">
-                        <div>
-                            <i class="sprite-fm-mono icon-add-circle icon-green"></i>
-                        </div>
-                        <span>[$s4_key_create]</span>
-                    </button>
-                
-                    <button class="mega-button action fm-s4-new-user hidden" title="Create new user">
-                        <div>
-                            <i class="sprite-fm-mono icon-add-circle icon-green"></i>
-                        </div>
-                        <span>[$s4_user_create_button]</span>
-                    </button>
-                
-                    <button class="mega-button action fm-s4-new-group hidden" title="Create new group">
-                        <div>
-                            <i class="sprite-fm-mono icon-add-circle icon-green"></i>
-                        </div>
-                        <span>[$s4_group_create_button]</span>
-                    </button>
-                    <div class="fm-import-download-buttons">
-                        <div class="merge-mega-button download">
-                            <button class="mega-button action fm-download-as-zip" title="[$58]">
-                                <div>
-                                    <i class="sprite-fm-mono icon-download icon-green"></i>
-                                </div>
-                                <span>[$58]</span>
-                            </button>
-                        
-                            <div class="download-dropdown">
-                                <button class="mega-button action icon square">
-                                    <i class="sprite-fm-mono icon-arrow-down"></i>
-                                </button>
-                                <div class="download-dropdown-content">
-                                    <div>
-                                        <a class="fm-download-as-zip">
-                                            <i class="sprite-fm-mono icon-download-zip"></i>
-                                            <span>[$folder_link_download]</span>
-                                        </a>
-                                        <a class="fm-megasync-download">
-                                            <i class="sprite-fm-mono icon-session-history"></i>
-                                            <span>[$btn_dlwitdeskapp]</span>
-                                            <i class="sprite-fm-mono icon-question-filled simpletip" data-simpletip="[$tooltip_why_desktop_app]"
-                                                data-simpletip-class="large-width center-align"></i>
-                                        </a>
-                                    </div>
-                                </div>
+                <div class="fm-filter-chips-wrapper hidden">
+                    <i class="sprite-fm-mono icon-check selected-mark selected-mark-template hidden"></i>
+                    <div class="fm-filter-chips">
+                        <div class="fm-filter-chip-button fm-filter-chip-location hidden">
+                            <div class="fm-filter-chip-button-text">
+                                [$17818]
                             </div>
+                            <i class="sprite-fm-mono icon-chevron-down-thin-outline"></i>
                         </div>
-                        <button class="mega-button action fm-import-to-cloudrive" title="[$btn_imptomega]">
-                            <div>
-                                <i class="sprite-fm-mono icon-add-circle icon-green"></i>
+
+                        <div class="fm-filter-chip-button fm-filter-chip-type">
+                            <div class="fm-filter-chip-button-text">
+                                [$filter_chip_type]
                             </div>
-                            <span>[$btn_imptomega]</span>
-                        </button>
+                            <i class="sprite-fm-mono icon-chevron-down-thin-outline"></i>
+                        </div>
+                        <div class="fm-filter-chip-button fm-filter-chip-mtime">
+                            <div class="fm-filter-chip-button-text">
+                                [$filter_chip_mdate]
+                            </div>
+                            <i class="sprite-fm-mono icon-chevron-down-thin-outline"></i>
+                        </div>
+                        <div class="fm-filter-chip-button fm-filter-chip-dateadded">
+                            <div class="fm-filter-chip-button-text">
+                                [$17445]
+                            </div>
+                            <i class="sprite-fm-mono icon-chevron-down-thin-outline"></i>
+                        </div>
+                        <div class="fm-filter-reset hidden">
+                            [$filter_chip_reset]
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div id="media-tabs"></div>
-        
-            <div class="fm-notification-block mega-lite-mode-warning">
-                <i class="notification-block-icon sprite-fm-mono icon-lock"></i>
-                <span>[$in_mega_lite_mode_banner]</span>
-            </div>
-            <div class="fm-notification-block unverified-share">
-                <i class="notification-block-icon sprite-fm-mono icon-info"></i>
-                <span></span>
-            </div>
-            <div class="fm-notification-block full">
-                <i class="notification-block-icon sprite-fm-mono icon-offline"></i>
-                <span>[$22667]</span>
-            </div>
-            <div class="fm-notification-block expired-business">
-        
-            </div>
-            <div class="fm-notification-block almost-full">
-                <i class="notification-block-icon sprite-fm-mono icon-offline"></i>
-                <span>[$16316]</span>
-                <i class="fm-notification-close sprite-fm-mono icon-close-component"></i>
-            </div>
-            <div class="fm-notification-block grace-business">
-                <span>[$16316]</span>
-            </div>
-            <div class="fm-notification-block business-next-tier"></div>
-            <div class="fm-notification-block duplicated-items-found">
-                <span>[$22101]</span>
-                <a class="fix-me-btn">[$22102]</a>
-                <div class="fm-notification-close fix-me-close sprite-fm-mono icon-close-component"></div>
-            </div>
-            <div class="fm-notification-block payment-card-status">
-                <i class="notification-block-icon sprite-fm-mono icon-alert-circle-thin-outline"></i>
-                <span class="payment-banner-content-wrapper">
-                    <span class="banner-title"></span>
-                    <span class="banner-txt"></span>
-                    <a>[$update_card]</a>
-                </span>
-            </div>
-            <div class="fm-notification-block new-feature-rewind-notification">
-                <span>[$new_feature_rewind_message]</span>
-                <div class="learn-more">
-                    <span>[$new_feature_rewind_learn_more]</span>
-                    <i class="fm-notification-close sprite-fm-mono icon-close-component"></i>
+                <div class="fm-header-bottom">
+                    <button class="mega-component nav-elem icon-only transparent-icon fm-files-view-icon">
+                        <i class="sprite-fm-mono icon-grid-4-thin-outline"></i>
+                    </button>
+                    <button class="mega-component nav-elem icon-only transparent-icon fm-header-info hidden">
+                        <i class="sprite-fm-mono icon-info-thin-outline"></i>
+                    </button>
                 </div>
             </div>
 
             <!-- Gallery controls -->
             <div id="media-section-controls" class="hidden">
-                <div id="media-counts" class="flex flex-row gap-2 justify-end pt-4 px-6"></div>
                 <div class="gallery-tabs-bl flex flex-row gap-2 fm-filter-chips py-4 px-5 hidden">
                     <div class="gallery-section-title flex-1 flex flex-row gap-2 items-center">
                         <div class="media-filter-reset">
@@ -1545,11 +1479,6 @@
                         </button>
                     </div>
                 </div>
-            </div>
-
-            <div class="fm-notification-block device-centre">
-                <i class="notification-block-icon sprite-fm-mono icon-offline"></i>
-                <span></span>
             </div>
 
             <!-- Users Management Header -->
@@ -1618,61 +1547,58 @@
             </div>
         
             <!-- End Users Management Header -->
-        
-            <div class="s4-info-header-blocks hidden">
-                <div class="s4-info-header-bucket">
-                    <div class="bucket-details-info">
-                        <div class="content">
-                            <div class="bucket-details-info-block">
-                                <i class="bucket-details-icon item-type-icon-90 icon-bucket-90"></i>
-                                <div class="bucket-details-pad">
-                                    <div class="bucket-details-pad-bucket">
-                                        <div class="bucket-details-name"></div>
-                                    </div>
-                                    <div class="bucket-domain js-selectable-text"></div>
-                                </div>
-                                <div class="bucket-details-buttons">
-                                    <button class="mega-button bkt-settings-btn"><span>[$s4_bkt_settings]</span></button>
-                                </div>
-                                <div class="clear"></div>
-                            </div>
+
+            <div class="dc-filter-chips-wrapper hidden">
+                <i class="sprite-fm-mono icon-check selected-mark selected-mark-template hidden"></i>
+                <i class="sprite-fm-mono icon-question-filled simpletip tooltip-question-mark-template dropdown-inline-tooltip hidden"></i>
+                <div class="dc-filter-chips">
+                    <div class="dc-filter-chip-button dc-filter-chip-deviceactivity">
+                        <div class="dc-filter-chip-button-text">
+                            [$dc_fchips_all_devices]
                         </div>
+                        <span class="nw-fm-tree-arrow rot-90"></span>
+                    </div>
+                    <div class="dc-filter-chip-button dc-filter-chip-folderactivity">
+                        <div class="dc-filter-chip-button-text">
+                            [$dc_fchips_all_folders]
+                        </div>
+                        <span class="nw-fm-tree-arrow rot-90"></span>
                     </div>
                 </div>
-                <div class="fm-notification-block bucket-access-warning"></div>
             </div>
-        
-            <div class="fm-filter-chips-wrapper hidden">
-                <i class="sprite-fm-mono icon-check selected-mark selected-mark-template hidden"></i>
-                <div class="fm-filter-chips">
-                    <div class="fm-filter-chip-button fm-filter-chip-location hidden">
-                        <div class="fm-filter-chip-button-text">
-                            [$17818]
+
+            <div class="device-centre-shimmer hidden"></div>
+
+            <div class="device-centre-header hidden">
+                <div class="device-centre-header-data">
+                    <div class="device-centre-header-icon">
+                        <i class="device-centre-header-icon"></i>
+                    </div>
+                    <div class="device-centre-header-info">
+                        <div class="first-row">
+                            <div class="name"></div>
+                            <i class="device-centre-tooltip-icon sprite-fm-mono icon-info-filled simpletip hidden"
+                                data-simpletip=""
+                                data-simpletipposition="top"
+                                data-simpletipoffset="2">
+                            </i>
+                            <div class="options">
+                                <a href="" class="options-link hidden">
+                                    <i class="sprite-fm-mono icon-options"></i>
+                                </a>
+                            </div>
                         </div>
-                        <span class="nw-fm-tree-arrow rot-90"></span>
+                        <div class="device-centre-item-info status"></div>
                     </div>
-        
-                    <div class="fm-filter-chip-button fm-filter-chip-type">
-                        <div class="fm-filter-chip-button-text">
-                            [$filter_chip_type]
-                        </div>
-                        <span class="nw-fm-tree-arrow rot-90"></span>
-                    </div>
-                    <div class="fm-filter-chip-button fm-filter-chip-mtime">
-                        <div class="fm-filter-chip-button-text">
-                            [$filter_chip_mdate]
-                        </div>
-                        <span class="nw-fm-tree-arrow rot-90"></span>
-                    </div>
-                    <div class="fm-filter-chip-button fm-filter-chip-dateadded">
-                        <div class="fm-filter-chip-button-text">
-                            [$17445]
-                        </div>
-                        <span class="nw-fm-tree-arrow rot-90"></span>
-                    </div>
-                    <div class="fm-filter-reset hidden">
-                        [$filter_chip_reset]
-                    </div>
+                </div>
+                <div class="device-centre-header-actions">
+                    <button class="mega-button secondary togglepause-button js-dc-togglepause-sync-button hidden" type="button">
+                        <i class="sprite-fm-mono"></i>
+                        <span></span>
+                    </button>
+                    <button class="mega-button negative stop-button js-dc-remove-sync-button hidden" type="button">
+                        <span></span>
+                    </button>
                 </div>
             </div>
 
@@ -1682,7 +1608,6 @@
                     <div class="fm-empty-cloud-txt">[$gallery_favourites_empty]</div>
                 </div>
             </div>
-        
             <div class="fm-empty-section fm-empty-cloud hidden">
                 <div class="fm-empty-pad">
                     <i class="section-icon sprite-fm-mono icon-cloud-drive"></i>
@@ -1697,6 +1622,52 @@
                     </div>
                 </div>
             </div>
+            <div class="fm-empty-section fm-empty-device-list hidden">
+                <div class="fm-empty-pad">
+                    <i class="section-icon sprite-fm-theme icon-empty-state-backup"></i>
+                    <div class="fm-empty-cloud-txt">[$devices_empty_title]</div>
+                    <div class="fm-empty-description"></div>
+                    <div class="fm-app-links hidden">
+                        <div class="fm-mega-app-link-container">
+                            <button class="mega-app-desktop mega-button positive">[$download_desktop_app]</button>
+                            <button class="mega-app-mobile mega-button secondary">[$download_mobile_app]</button>
+                        </div>
+                    </div>
+                    <div class="fm-add-sb-actions hidden">
+                        <button class="mega-button action cta-add-backup" title="[$add_backup_button]">
+                            <div>
+                                <i class="sprite-fm-mono icon-database icon-green"></i>
+                            </div>
+                            <span>[$add_backup_button]</span>
+                        </button>
+                        <button class="mega-button action cta-add-syncs" title="[$add_syncs_button]">
+                            <div>
+                                <i class="sprite-fm-mono icon-sync icon-blue"></i>
+                            </div>
+                            <span>[$add_syncs_button]</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="fm-empty-section fm-no-active-devices hidden">
+                <div class="fm-empty-pad">
+                    <i class="section-icon sprite-fm-theme icon-empty-state-backup"></i>
+                    <div class="fm-empty-cloud-txt">[$dc_no_active_devices_title]</div>
+                    <div class="fm-empty-description">
+                        [$dc_no_active_devices_desc]
+                    </div>
+                </div>
+            </div>
+            <div class="fm-empty-section fm-no-active-folders hidden">
+                <div class="fm-empty-pad">
+                    <i class="section-icon icon-folder-3d"></i>
+                    <div class="fm-empty-cloud-txt">[$dc_no_active_folders_title]</div>
+                    <div class="fm-empty-description">
+                        [$dc_no_active_folders_desc]
+                    </div>
+                </div>
+            </div>
+
             <div class="fm-empty-section fm-empty-folder hidden">
                 <div class="fm-empty-pad">
                     <i class="section-icon sprite-fm-mono icon-folder-filled"></i>
@@ -2677,6 +2648,78 @@
             </div>
 			<div id="albums-view" class="flex flex-column hidden"></div>
 
+            <!-- Device centre view -->
+            <div class="device-centre-grid-view hidden">
+                <div class="devices grid-scrolling-table hidden">
+                    <div class="grid-wrapper">
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table device-centre table-hover">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th megatype="fname" class="full-width-col" data-minwidth="250">
+                                        <div class="arrow name label desc sprite-fm-mono icon-dropdown">[$86]</div>
+                                        <div class="grid-view-resize">&nbsp;</div>
+                                    </th>
+                                    <th megatype="numFolders" width="258" data-minwidth="180">
+                                        <div class="arrow numFolders sprite-fm-mono icon-dropdown">[$device_centre_contain]</div>
+                                        <div class="grid-view-resize">&nbsp;</div>
+                                    </th>
+                                    <th megatype="size" width="118" data-minwidth="75">
+                                        <div class="arrow size sprite-fm-mono icon-dropdown">[$87]</div>
+                                        <div class="grid-view-resize">&nbsp;</div>
+                                    </th>
+                                    <th class="grid-url-header-nw" width="60"></th>
+                                    <th class="grid-empty-spacer"></th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="folders grid-scrolling-table hidden">
+                    <div class="grid-wrapper">
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table device-centre table-hover">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th megatype="fname" class="full-width-col" data-minwidth="250">
+                                        <div class="arrow name label desc sprite-fm-mono icon-dropdown">[$86]</div>
+                                        <div class="grid-view-resize">&nbsp;</div>
+                                    </th>
+                                    <th megatype="type" width="258" data-minwidth="180">
+                                        <div class="arrow type sprite-fm-mono icon-dropdown">[$93]</div>
+                                        <div class="grid-view-resize">&nbsp;</div>
+                                    </th>
+                                    <th megatype="size" width="118" data-minwidth="75">
+                                        <div class="arrow size sprite-fm-mono icon-dropdown">[$87]</div>
+                                        <div class="grid-view-resize">&nbsp;</div>
+                                    </th>
+                                    <th megatype="timeAd" width="118" data-minwidth="75">
+                                        <div class="arrow date sprite-fm-mono icon-dropdown">[$17445]</div>
+                                        <div class="grid-view-resize">&nbsp;</div>
+                                    </th>
+                                    <th megatype="hbtime" width="118" data-minwidth="75">
+                                        <div class="arrow hbtime sprite-fm-mono icon-dropdown">[$last_updated_label]</div>
+                                        <div class="grid-view-resize">&nbsp;</div>
+                                    </th>
+                                    <th class="grid-url-header-nw" width="60"></th>
+                                    <th class="grid-empty-spacer"></th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="device-centre-blocks-view hidden">
+                <div class="device-centre-blocks-scrolling">
+                </div>
+                <div class="blocks-view-data"></div>
+            </div>
+
+            <!-- Device centre view - END-->
+
             <div class="s4-grid-view hidden">
                 <div class="s4-keys-management-scroll sticky-header-table-container hidden">
                     <table class="s4-grid-table table-hover data-table medium-list">
@@ -3169,7 +3212,7 @@
             <div class="search-bottom-wrapper hidden">
                 <div class="crumb-overflow-link dropdown">
                     <a class="breadcrumb-dropdown-link">
-                        <i class="menu-icon sprite-fm-mono icon-options icon24"></i>
+                        <i class="menu-icon sprite-fm-mono icon-options icon16"></i>
                     </a>
                     <i class="sprite-fm-mono icon-arrow-right icon16"></i>
                 </div>
@@ -3177,56 +3220,6 @@
                 <div class="breadcrumb-dropdown"></div>
             </div>
             <div class="commercial-wrapper hidden" id="commercial-wrapper-weblinkb"></div>
-        </section>
-
-        <!-- Backup center - Backups section !-->
-        <section class="fm-right-block full-size backup hidden">
-        
-            <div class="loading-spinner js-bc-loader">
-                <div class="main-loader"></div>
-            </div>
-        
-            <!-- Empty section !-->
-            <div class="backup-center empty-section hidden">
-                <div class="empty-wrap">
-                    <i class="sprite-fm-theme icon-empty-state-backup"></i>
-                    <h2>[$no_backups_header]</h2>
-                    <div class="new-backup-wrapper">
-                        <div class="new-backup mobile">
-                            <i class="sprite-fm-mono icon-mobile"></i>
-                            <div class="title">
-                                [$backup_mobiles_header]
-                            </div>
-                            <div class="info">
-                                [$backup_mobiles_info]
-                            </div>
-                        </div>
-                        <div class="new-backup desktop">
-                            <i class="sprite-fm-mono icon-pc"></i>
-                            <div class="title">
-                                [$backup_pcs_header]
-                            </div>
-                            <div class="info">
-                                [$backup_pcs_info]
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        
-            <!-- Content block !-->
-            <div class="backup-center content-block hidden">
-                <div class="content-header">
-                    <button class="mega-button action js-backup-computer" title="[$new_backup_btn]">
-                        <div><i class="sprite-fm-mono icon-add-circle icon-green"></i></div>
-                        <span>[$new_backup_btn]</span>
-                    </button>
-                </div>
-        
-                <div class="content-body">
-                    <div class="content-wrap"></div>
-                </div>
-            </div>
         </section>
 
         <section class="fm-right-block dashboard hidden">
@@ -3493,17 +3486,6 @@
                                         </td>
                                         <td class="ff-occupy"> </td>
                                     </tr>
-                                    <!--<tr class="account data-item used-storage-info ba-inshare-ex">
-                                                                <td>
-                                                                    <i class="folder-small-icon ex-in-share"></i>
-                                                                    <span>[$19187]</span>
-                                                                </td>
-                                                                <td>
-                                                                    <div class="folder-number">32 folders</div>,
-                                                                    <div class="file-number">322 files</div>
-                                                                </td>
-                                                                <td class="ff-occupy">758.6 MB</td>
-                                                            </tr>-->
                                     <tr class="account data-item used-storage-info ba-outshare">
                                         <td>
                                             <i class="sprite-fm-mono icon-share-outgoing"></i>
@@ -3515,28 +3497,6 @@
                                         </td>
                                         <td class="ff-occupy"> </td>
                                     </tr>
-                                    <tr class="account data-item used-storage-info ba-backups js-backups-el">
-                                        <td>
-                                            <i class="sprite-fm-mono icon-database"></i>
-                                            <span>[$restricted_folder_button]</span>
-                                        </td>
-                                        <td>
-                                            <div class="folder-number"> </div>,
-                                            <div class="file-number"> </div>
-                                        </td>
-                                        <td class="ff-occupy"> </td>
-                                    </tr>
-                                    <!--<tr class="used-storage-info ba-outshare-ex">
-                                                                <td>
-                                                                    <i class="folder-small-icon ex-out-share"></i>
-                                                                    <span>[$5543]</span>
-                                                                </td>
-                                                                <td>
-                                                                    <div class="folder-number">32 folders</div>,
-                                                                    <div class="file-number">322 files</div>
-                                                                </td>
-                                                                <td class="ff-occupy">758.6 MB</td>
-                                                            </tr>-->
                                     <tr class="account data-item used-storage-info ba-rubbish">
                                         <td>
                                             <i class="sprite-fm-mono icon-bin"></i>
@@ -3893,18 +3853,6 @@
                                     <td class="account">
                                         <i class="sprite-fm-mono icon-share-outgoing"></i>
                                         <span class="outgoing pointer-c">[$5543]</span>
-                                    </td>
-                                    <td class="account">
-                                        0 folders
-                                    </td>
-                                    <td class="account right-textalign">
-                                        0 MB
-                                    </td>
-                                </tr>
-                                <tr class="account data-item account-data-item-backups js-backups-el">
-                                    <td class="account">
-                                        <i class="sprite-fm-mono icon-database"></i>
-                                        <span class="backups pointer-c">[$restricted_folder_button]</span>
                                     </td>
                                     <td class="account">
                                         0 folders
@@ -5184,6 +5132,12 @@
                                     <div class="mega-feature-switch no-trans-init"></div>
                                 </div>
                             </div>
+                            <div class="settings-sub-section">
+                                <div class="subtitle-txt">[$dc_confirm_pause_sync_setting_label]</div>
+                                <div class="mega-switch toggle-on" id="dcPause">
+                                    <div class="mega-feature-switch no-trans-init"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -5785,6 +5739,10 @@
                     <div class="value name-value"></div>
                     <div class="takedown-warning">[$item_subject_to_takedown]</div>
                 </div>
+                <div class="info-data status-section">
+                    <div class="description">[$89]</div>
+                    <div class="device-centre-item-info"></div>
+                </div>
                 <div class="info-data type-section">
                     <div class="description">[$93]</div>
                     <div class="value type-value"></div>
@@ -5830,6 +5788,10 @@
                 <div class="info-data date-added-section">
                     <div class="description">[$info_panel_date_added]</div>
                     <div class="value date-added-value"></div>
+                </div>
+                <div class="info-data last-updated-section">
+                    <div class="description">[$last_updated_label]</div>
+                    <div class="value last-updated-value"></div>
                 </div>
                 <div class="info-data node-description-section bottom hidden">
                     <div class="description">[$info_panel_description]</div>

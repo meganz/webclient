@@ -125,18 +125,16 @@
     margin-top: 24px;
 }
 .bucket-access-warning.fm-notification-block {
-    color: var(--banner-text-warning);
-    background-color: var(--banner-background-warning);
-    border: 1px solid var(--banner-border-warning);
-    border-radius: 4px;
+    color: var(--mobile-text-primary);
+    background-color: var(--mobile-notification-info);
+    border-radius: 0;
     display: block;
-    margin: 8px 24px;
-    padding: 1px 8px;
+    padding: 12px 24px;
 }
 .bucket-access-warning.fm-notification-block a,
 .bucket-access-warning.fm-notification-block a:link,
 .bucket-access-warning.fm-notification-block a:visited {
-    color: var(--banner-text-warning);
+    color: var(--mobile-text-primary);
 }
 .dark-direct-tooltip.simpletip-tooltip.bucket-settings {
     max-width: 240px;

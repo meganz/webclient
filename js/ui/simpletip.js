@@ -78,7 +78,7 @@
         '<div class="fm-breadcrumbs-wrapper info">' +
             '<div class="crumb-overflow-link dropdown">' +
                 '<a class="breadcrumb-dropdown-link info-dlg">' +
-                    '<i class="menu-icon sprite-fm-mono icon-options icon24"></i>' +
+                    '<i class="menu-icon sprite-fm-mono icon-options icon16"></i>' +
                 '</a>' +
                 '<i class="sprite-fm-mono icon-arrow-right icon16"></i>' +
             '</div>' +

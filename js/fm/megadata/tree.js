@@ -896,7 +896,7 @@ MegaData.prototype.addTreeUI = function() {
             if ($uls.length > 1) {
                 $.selected = $uls.attrs('id')
                     .map(function(id) {
-                        return id.replace(/treea_+|(os_|pl_)/g, '');
+                        return id.replace(/treea_+|(os_|pl_|device-centre_)/g, '');
                     });
             }
             else {
@@ -1027,9 +1027,6 @@ MegaData.prototype.onTreeUIOpen = function(id, event, ignoreScroll) {
     else if (cv) {
         this.onSectionUIOpen(id_r || id_s);
     }
-    else if (this.InboxID && id_r === this.InboxID) {
-        this.onSectionUIOpen('backups');
-    }
     else if (id_r === this.RootID) {
         this.onSectionUIOpen('cloud-drive');
     }
@@ -1053,6 +1050,9 @@ MegaData.prototype.onTreeUIOpen = function(id, event, ignoreScroll) {
     }
     else if (id_s === 'recents') {
         this.onSectionUIOpen('recents');
+    }
+    else if (id_s === mega.devices.rootId) {
+        this.onSectionUIOpen(mega.devices.rootId);
     }
     else if (M.isDynPage(id_s)) {
         this.onSectionUIOpen(id_s);
@@ -1130,9 +1130,7 @@ MegaData.prototype.onTreeUIOpen = function(id, event, ignoreScroll) {
 
     if (target) {
         target.classList.add('selected');
-        if ((fmconfig.uiviewmode | 0) && fmconfig.viewmode === 2 ||
-            typeof fmconfig.viewmodes !== 'undefined' && typeof fmconfig.viewmodes[id] !== 'undefined'
-            && fmconfig.viewmodes[id] === 2) {
+        if (fmconfig.uiviewmode | 0 && fmconfig.viewmode === 2 || getFmViewMode(id) === 2) {
             target.classList.add('on-gallery');
         }
     }

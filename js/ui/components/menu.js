@@ -18,6 +18,9 @@ class MegaMenu extends MegaOverlay {
             showClose: false,
             centered: false
         });
+        if (options.classList) {
+            this.addedClasses = options.classList;
+        }
 
         this.event = options.event;
         this.calcPosition();
@@ -25,6 +28,35 @@ class MegaMenu extends MegaOverlay {
         // This is opened by click event.
         if (options.eventTarget) {
             this.eventTarget = options.eventTarget;
+        }
+
+        if (!is_mobile && options.resizeHandler) {
+            this.onResize = SoonFc(90, () => {
+                if (this.name === options.name) {
+                    this.calcPosition();
+                }
+            });
+            window.addEventListener('resize', this.onResize);
+        }
+    }
+
+    clear() {
+        super.clear();
+        if (this.addedClasses) {
+            this.removeClass(...this.addedClasses);
+            delete this.addedClasses;
+        }
+        if (this.onResize) {
+            window.removeEventListener('resize', this.onResize);
+            delete this.onResize;
+        }
+    }
+
+    hide() {
+        super.hide();
+        if (this.onResize) {
+            window.removeEventListener('resize', this.onResize);
+            delete this.onResize;
         }
     }
 

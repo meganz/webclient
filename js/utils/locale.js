@@ -1942,7 +1942,7 @@ mBroadcaster.once('boot_done', function populate_l() {
     l.dc_app_promo_sync_desc = escapeHTML(l.dc_app_promo_sync_desc)
         .replace('[A1]', '<a class="clickurl" href="https://mega.io/desktop" target="_blank">')
         .replace('[/A1]', '</a>')
-        .replace('[A2]', `<a class="clickurl" 
+        .replace('[A2]', `<a class="clickurl"
             target="_blank"
             href="https://play.google.com/store/apps/details?id=mega.privacy.android.app&referrer=meganzdc">`)
         .replace('[/A2]', '</a>');
@@ -2051,6 +2051,21 @@ mBroadcaster.once('boot_done', function populate_l() {
     l.meeting_protected = escapeHTML(l.meeting_protected)
         .replace('[A]', '<a class="clickurl" href="https://mega.io/chatandmeetings" target="_blank">')
         .replace('[/A]', '</a>');
+    l.pro_for_duration = escapeHTML(l.pro_for_duration)
+        .replace('[S1]', '<span class="plan-name">').replace('[/S1]', '</span>')
+        .replace('[S2]', '<span class="plan-duration">').replace('[/S2]', '</span>')
+        .replace('[S3]', '<span class="plan-duration">').replace('[/S3]', '</span>');
+    l.after_trial_card_charged_m = escapeHTML(l.after_trial_card_charged_m)
+        .replace('[S1]', '<span class="plan-name">').replace('[/S1]', '</span>')
+        .replace('[S2]', '<span class="plan-price">').replace('[/S2]', '</span>');
+    l.you_have_selected_vpn = escapeHTML(l.you_have_selected_vpn)
+        .replace('[S]', '<span>').replace('[/S]', '</span>');
+    l.you_have_selected_pass = escapeHTML(l.you_have_selected_pass)
+        .replace('[S]', '<span>').replace('[/S]', '</span>');
+    l.you_have_selected_vpn_trial = escapeHTML(l.you_have_selected_vpn_trial)
+        .replace('[S]', '<span>').replace('[/S]', '</span>');
+    l.you_have_selected_pass_trial = escapeHTML(l.you_have_selected_pass_trial)
+        .replace('[S]', '<span>').replace('[/S]', '</span>');
 
     const common = [
         15536, 16119, 16120, 16313, 16316, 16360, 18228, 18268, 18282,

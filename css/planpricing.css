@@ -47,6 +47,7 @@
     --font-top-ref: 12px/28px;
     --font-top-arstrisk: 28px/36px;
     --font-quotation: 32px/44px;
+    --font-copy-small: 14px/17px;
     --font-copy-medium: 16px/24px;
     --text-h2-pricing: normal 400 var(--font-size-h2) var(--font-poppins-sb-pricing);
     --text-h3-pricing: normal 400 var(--font-size-h3) var(--font-poppins-sb-pricing);
@@ -55,6 +56,8 @@
     --text-top-reference2: normal 400 var(--font-top-ref) var(--font-poppins-sb-pricing);
     --text-h6-pricing: normal 400 var(--font-size-h6) var(--font-noto-b-pricing);
     --text-copy-secondary-pricing: normal 400 14px/20px var(--font-noto-r-pricing);
+    --text-copy-small-pricing: normal 400 var(--font-copy-small) var(--font-noto-r-pricing);
+    --text-copy-small-bold-pricing: normal 400 var(--font-copy-small) var(--font-noto-b-pricing);
     --text-copy-medium-pricing: normal 400 var(--font-copy-medium) var(--font-noto-r-pricing);
     --text-copy-large-pricing: normal 400 18px/28px var(--font-noto-r-pricing);
     --text-quotation-pricing: normal 400 var(--font-quotation) var(--font-noto-r-pricing);

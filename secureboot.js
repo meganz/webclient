@@ -2307,7 +2307,8 @@ else if (!browserUpdate) {
     jsl.push({f:'css/bottom-pages.css', n: 'bottom-pages_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/bottom-menu.css', n: 'bottom-menu_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/business.css', n: 'business_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/pro.css', n: 'pro_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f: 'css/pro.css', n: 'pro_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
+    jsl.push({f: 'css/propay.css', n: 'propay_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
     jsl.push({f:'css/planpricing.css', n: 'planpricing_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/activate-s4.css', n: 'activates4_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/startpage.css', n: 'startpage_css', j:2,w:5,c:1,d:1,cache:1});

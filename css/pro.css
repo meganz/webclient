@@ -478,39 +478,49 @@ i.pricing-sprite,
     display: flex;
     background: var(--surface-main);
     max-width: 444px;
-    margin: 24px 0 46px
+    margin: 24px 0 0 0;
 }
 .payment-page .free-trial-card {
-    padding: 24px;
     font: var(--text-body1)
+}
+.payment-page .free-trial-card .main-content {
+    grid-template-columns: 24px auto;
+    column-gap: 16px;
 }
 .payment-page .free-trial-card .title {
     color :var(--text-color-high);
-    font: var(--text-h2-bold);
+    font: var(--text-copy-medium-bold-pricing);
     margin-bottom: 22px;
 }
 .payment-page .free-trial-card .secondary-title {
     color: var(--text-color-high);
     font: var(--text-body1-bold);
 }
-.payment-page .free-trial-card .icons {
+.payment-page .free-trial-card .secondary-title.price {
+    border-top: 1px solid var(--surface-grey-2);
+    padding-top: 24px;
+}
+.payment-page:not(.euro) .free-trial-card .secondary-title.price {
+    margin-bottom: -8px;
+}
+/* .payment-page .free-trial-card .icons {
     width: 40px;
     justify-content: space-between;
     align-items: center;
     margin: 0 0 12.5%;
-}
-.payment-page .free-trial-card .icons i {
+} */
+.payment-page .free-trial-card i {
     --icon-size: 24px;
     color: rgb(255, 51, 51)
 }
-.payment-page .free-trial-card .icons .line {
-    height: 25%;
+.payment-page .free-trial-card .line {
+    height: 60%;
     width: 0;
     border: 1px solid var(--surface-grey-2);
     border-radius: 2px;
-    margin: 4px 0 8px;
+    margin: 4px auto 8px;
 }
-.payment-page .free-trial-card .steps .info-block {
+.payment-page .free-trial-card .info-block {
     min-height: 72px;
 }
 .payment-page .free-trial-card button.start {

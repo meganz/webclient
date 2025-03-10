@@ -1,363 +1,735 @@
-/**
- * Functionality for the Pro page Step 2 where the user has chosen their Pro plan and now they
- * will choose the payment provider and plan duration.
- */
 pro.propay = {
 
-    /** The selected Pro plan number e.g. 1 - 4 */
-    planNum: null,
+    DEFAULT_DURATION: 12,
 
-    /** The selected Pro plan name e.g. Pro I - III & Pro Lite */
-    planName: null,
+    BITCOIN_GATE_ID: 4,
 
-    /** The selected Pro plan features, if any */
-    planFeatures: 0,
-
-    /** All payment gateways loaded from the API */
-    allGateways: [],
-
-    /** The user's account balance */
-    proBalance: 0,
-
-    /** The selected Pro package details */
-    selectedProPackage: null,
-
-    /** The gateway name of the selected payment method */
-    proPaymentMethod: null,
-
-    /** Whether they selected the PRO plan immediately after completing the registration process */
-    planChosenAfterRegistration: false,
-
-    /** Darker background modal overlay */
-    $backgroundOverlay: null,
-
-    /** Overlays for loading/processing/redirecting */
-    $loadingOverlay: null,
-
-    /** Selector for the Pro Pay page (step 2 of the process) */
     $page: null,
 
-    $pricingBox: null,
-    $planName: null,
-    $priceNum: null,
-    $pricePeriod: null,
-    $storageAmount: null,
-    $storageTip: null,
-    $bandwidthAmount: null,
-    $bandwidthTip: null,
-    $euroPrice: null,
-    $currncyAbbrev: null,
-    $todayText: null,
-    $selectedPlanTitle: null,
+    planNum: null,
+    selectedPeriod: null,
+    planObj: null,
+    proBalance: 0,
+    selectedProPackage: null,
 
-    paymentStatusChecker: null,
+    paymentGateways: {
+        primary: null,
+        secondary: null,
+    },
 
-    /** The user's subscription payment gateway id */
-    userSubsGatewayId: null,
+    gateSupportsTrial: false,
 
-    /** @var Dialog Log in / register dialog displayed when not signed in */
-    accountRequiredDialog: null,
-
-    /** A plan object of the same level as the users chosen plan */
-    planObjOfChosenLevel: null,
-
-    selectedPlan: null,
-
-    freeTrialCardController: null,
-
-    purchaseButton: null,
-
-    initialPaymentOptionIsStripe: false,
-
-    stripeSupported: false,     // Does the user have a stripe payment gateway available?
-
-    trial: null,
-
-    currentPlanData: null,
+    pageInfo: {
+        'initialized': false,
+    },
 
     gatewaysByName: Object.create(null),
+
+    currentGatewayName: null,
+    currentGateway: null,
+
+    proPaymentMethod: null,
+
+    loadingPage: false,
+
+    cachedGateways: Object.create(null),
+
+    switchers: Object.create(null),
+
+    savedCard: false,
+
+    paymentButtons: new Set(['stripeGP', 'stripeAP']),
+
+    paymentButton: false,
+
+    useSavedCard: null,
+    savedCardInitiated: false,
+    sca: false,
+
+    trial: 1,
+
+    usingBalance: false,
+
+    paymentType: null,
+
+    browser: null,
+    googlePayBrowsers: new Set(['Chrome', 'Edgium', 'Opera', 'Safari']),
+    applePayBrowsers: new Set(['Safari']),
+
+    warnings: {
+        'voucher': l.voucher_only_one_off,
+        'balance': l.balance_only_one_off,
+        'minAMount': l.min_amount_restriction,
+    },
+
+
+    // TODO: This value should be dynamic once fully implemented in API
+    requiresBillingAddress: {
+        19: true,
+        16: true,
+    },
+
+    shouldShowTrial() {
+        return (this.gateSupportsTrial || !this.currentGateway) && (this.planObj && this.planObj.trial);
+    },
+
+    onPropayPage() {
+        'use strict';
+        return page.includes('propay');
+    },
+
+    initSwitchers() {
+
+        const recurringElements = {
+            'recurring': {
+                $element: $('.recurring', this.$page),
+                initialised: true,
+            },
+            'one-time': {
+                $element: $('.one-time', this.$page),
+                initialised: true,
+            },
+            'trial': {
+                $element: $('.trial', this.$page),
+                initialised: true,
+            },
+        };
+
+        if (this.switchers.recurring) {
+            this.switchers.recurring.remove();
+        }
+
+        const defaultState = this.shouldShowTrial()
+            ? 'trial'
+            : 'recurring';
+
+        this.switchers.recurring = mega.elementSwitcher(
+            recurringElements,      // elements
+            defaultState,        // default
+            'propay-recurring-switcher',        // switcherName
+            true);      // hide all elements on initialization
+
+    },
+
+    showErrors(reasons) {
+        reasons = reasons || this.blockFlow();
+        $('.error', this.$page).removeClass('error');
+
+        if (reasons === true) {
+            this.errors = false;
+            return false;
+        }
+
+        if (!reasons) {
+            this.errors = false;
+            return false;
+        }
+
+        if (reasons.gatewayNeeded) {
+            this.errors = true
+            $('.dropdown-wrapper-primary', this.$page).addClass('error');
+            $('.dropdown-wrapper-primary .mega-input', this.$page).addClass('error');
+        }
+
+        if (reasons.addressNeeded || reasons.addressInvalid) {
+            this.errors = true
+            $('.billing-address .billing-info', this.$page).addClass('error');
+        }
+
+        if (reasons.s4TosNeeded) {
+            this.errors = true
+            $('.s4-tos', this.$page).addClass('error');
+        }
+
+        if (this.errors) {
+            $('.error', this.$page)[0].scrollIntoView({behavior: "smooth", block: "center", inline: "nearest"});
+        }
+    },
+
+    blockFlow() {
+
+        const reasons = Object.create(null);
+
+        const gatewayId = this.currentGateway && this.currentGateway.gatewayId;
+
+        if (!this.currentGateway) {
+            reasons.gatewayNeeded = 1;
+        }
+
+        if (this.requiresBilling()) {
+            if (!addressDialog.validInputs) {
+                addressDialog.validateAndPay(false, true)
+            }
+            if (addressDialog.validInputs === null) {
+                reasons.addressNeeded = 1;
+            }
+            else if (addressDialog.validInputs === false) {
+                reasons.addressInvalid = 1;
+            }
+        }
+
+        if (window.s4ac && this.s4Active && !this.s4TosAccepted) {
+            reasons.s4TosNeeded = 1;
+        }
+
+        return Object.keys(reasons).length && reasons;
+    },
+
+    getTempGate() {
+        const key = this.planObj.id + '_' + this.currentGatewayName;
+        let gateways = localStorage.cachedGateways
+            ? JSON.parse(localStorage.cachedGateways)
+            : {};
+
+        if (gateways[key]) {
+            return gateways[key];
+        }
+        return false;
+    },
+
+    setTempGate(data) {
+        if (this.getTempGate()) {
+            return this.getTempGate();
+        }
+
+
+        const key = this.planObj.id + '_' + this.currentGatewayName;
+        let gateways = localStorage.cachedGateways
+            ? JSON.parse(localStorage.cachedGateways)
+            : {};
+
+        gateways[key] = data;
+        localStorage.cachedGateways = JSON.stringify(gateways);
+        return gateways[key];
+    },
+
+    getPageType() {
+        if (this.gateSupportsTrial && this.planObj.trial) {
+            return 'trial';
+        }
+        return 'regular';
+    },
+
+    async getSavedCard() {
+        this.savedCard = await api.req({a: 'cci', v: 2}).then(res => {
+            // res.result.reuse = 1
+            return typeof res.result === 'object'
+                ? !!res.result.reuse && res.result
+                : false;
+        }).catch(() => false);
+        return this.savedCard;
+    },
 
     planNumsByName: {
         'vpn': pro.ACCOUNT_LEVEL_FEATURE_VPN,
         'pwm': pro.ACCOUNT_LEVEL_FEATURE_PWM,
     },
 
-    /**
-     * @returns {Object} Purchasable feature plans. Each feature plan should include
-     * an array of features to show on the features table when the user goes
-     * to cancel their subscription
-     */
-    purchasableFeaturePlans() {
+    getPreSelectedDuration() {
         'use strict';
-        return {
-            'vpn': {
-                'cancelSubFeatures': [
-                    l.vpn_cancel_subfeature1,
-                    l.vpn_cancel_subfeature2,
-                    l.vpn_cancel_subfeature3,
-                    l.vpn_cancel_subfeature4,
-                ]
-            },
-            'pwm': {
-                'cancelSubFeatures': [
-                    l.pwm_cancel_subfeature1,
-                    l.pwm_cancel_subfeature2,
-                    l.pwm_cancel_subfeature3,
-                ]
-            },
-        };
-    },
+        let selectedPeriod;
 
-    shouldShowTrial() {
-        'use strict';
-        return (!pro.propay.freeTrialCardController || (pro.propay.freeTrialCardController.getVal() !== 'error'))
-            && pro.propay.trial;
-    },
-
-    userOnPropayPage() {
-        'use strict';
-        return page.includes('propay');
-    },
-
-    /**
-     * Initialises the page and functionality
-     */
-    init: function() {
-        "use strict";
-
-        // If Business sub-user or account is not expired/grace period, don't allow
-        // access to this Pro Pay page or they would end up purchasing a new plan
-        if (u_attr && u_attr.b && (!u_attr.b.m || !pro.isExpiredOrInGracePeriod(u_attr.b.s))) {
-            loadSubPage('start');
-            return;
-        }
-
-        // If Business master user is expired or in grace period, redirect to repay page
-        if (u_attr && u_attr.b && u_attr.b.m && pro.isExpiredOrInGracePeriod(u_attr.b.s)) {
-            loadSubPage('repay');
-            return;
-        }
-
-        // If a current Pro Flexi user (not expired/grace period), don't allow
-        // access to this Pro Pay page or they would end up purchasing a new plan
-        if (u_attr && u_attr.pf && !pro.isExpiredOrInGracePeriod(u_attr.pf.s)) {
-            // Unless they have entered the S4 Object Storage RYI flow, in which case send them to that landing page.
-            if (window.s4ac) {
-                loadSubPage('activate-s4');
-                return;
-            }
-
-            loadSubPage('start');
-            return;
-        }
-
-        // If a previous Pro Flexi user is expired or in grace period, they must use the Repay page to pay again
-        if (u_attr && u_attr.pf && pro.isExpiredOrInGracePeriod(u_attr.pf.s)) {
-            loadSubPage('repay');
-            return;
-        }
-
-        // Cache current Pro Payment page selector
-        this.$page = $('.payment-section', '#startholder');
-
-        pro.propay.purchaseButton = {
-            $button: $('button.purchase', this.$page),
-            canProceedLoaded: false,
-            termsAccepted: true // No special terms by default
-        };
-
-        // Preload loading/transferring/processing animation
-        pro.propay.preloadAnimation();
-
-        // Ephemeral accounts (accounts not registered at all but have a few files in the cloud
-        // drive) are *not* allowed to reach the Pro Pay page as we can't track their payment (no email address).
-        // Accounts that have registered but have not confirmed their email address yet *are* allowed to reach the Pro
-        // Pay page e.g. if they registered on the Pro Plan selection page first (this gets more conversions).
-        if (u_type === 0 && typeof localStorage.awaitingConfirmationAccount === 'undefined') {
-            loadSubPage('pro');
-            return;
-        }
-
-        // If the plan number is not set in the URL e.g. propay_4, go back to Pro page step 1 so they can choose a plan
-        if (!pro.propay.setProPlanFromUrl()) {
-            loadSubPage('pro');
-            return;
-        }
-
-        if (pro.propay.freeTrialCardController) {
-            pro.propay.freeTrialCardController = pro.propay.freeTrialCardController.remove();
-        }
-        if (pro.propay.thirdSectionController) {
-            pro.propay.thirdSectionController = pro.propay.thirdSectionController.remove();
-        }
-
-        pro.propay.currentPlanData = null;
-
-        let discountInfo = pro.propay.getDiscount();
-        if (discountInfo && discountInfo.used) {
-            delete mega.discountCode;
-            delete mega.discountInfo;
-            discountInfo = null;
-        }
-
-        // Apply discount info if applicable
-        if (discountInfo && discountInfo.pd) {
-            const discountTitle = discountInfo.m === 12 ? l[24680]
-                : (discountInfo.m === 1 ? l[24849] : l[24850]);
-            $('.top-header.plan-title', this.$page).safeHTML(discountTitle
-                .replace('%1', escapeHTML(pro.propay.planName))
-                .replace('%2', formatPercentage(discountInfo.pd / 100)));
-            $('.stores-desc', this.$page).addClass('hidden');
-        }
-
-        if (!pro.planInFilter(pro.propay.planNum, 'supportsGooglePlay')) {
-            $('.bottom-page .bottom-page.stores-desc', this.$page).addClass('hidden');
-        }
-
-        // Show loading spinner because some stuff may not be rendered properly yet
-        loadingDialog.show('propayReady');
-        pro.propay.loading = true;
-
-        // Initialise some extra stuff just for mobile
-        if (is_mobile) {
-            mobile.propay.init();
-            if ((discountInfo && discountInfo.pd) || !pro.planInFilter(pro.propay.planNum, 'supportsGooglePlay')) {
-                $('.mobile.external-payment-options', '.mobile.fm-content').addClass('hidden');
-            }
-        }
-
-        // If the user is not logged in, show the login / register dialog
-        if (u_type === false) {
-            loadingDialog.hide('propayReady');
-            pro.propay.showAccountRequiredDialog();
-
-            // login / register action while on /propay_x will recall init()
-            return;
-        }
-
-        if (discountInfo) {
-            mega.discountInfo.used = true;
-        }
-
-        // If the user does has more stored than the current plan offers, go back to Pro page
-        // so they may select a plan that provides more storage space
-        const proceed = new Promise((resolve, reject) => {
-            M.getStorageQuota().then((storage) => {
-                checkPlanStorage(storage.used, pro.propay.planNum).then((res) => {
-                    if (res) {
-                        pro.propay.purchaseButton.canProceedLoaded = true;
-                        resolve();
-                    }
-                    else {
-                        loadSubPage('pro');
-                        reject(new Error('Selected plan does not have enough storage space; ' +
-                        `Or plan ${pro.getProPlanName(pro.propay.planNum)} (${pro.propay.planNum}) is not available`));
-                    }
-                });
-            });
-        });
-
-        // Initialise the main purchase button
-        pro.propay.purchaseButton.$button.rebind('click.purchase', () => {
-            const canProceed = pro.propay.purchaseButton.canProceedLoaded
-                && pro.propay.purchaseButton.termsAccepted;
-
-            if (!canProceed) {
-                return false;
-            }
-            if (is_mobile) {
-                pro.propay.userSubsGatewayId =
-                    M.account.sgwids && M.account.sgwids.length > 0 ? M.account.sgwids[0] : null;
-            }
-            pro.propay.startPurchaseProcess();
-            return false;
-        });
-
-        // Init/hide S4 UI
-        if (window.s4ac && pro.propay.planNum === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
-            $('.plan-feature.subtext',  this.$page).text(l.pro_page_flexi_feature_subtext).removeClass('hidden');
-            $('.s4-tos', this.$page).removeClass('hidden');
-
-            pro.propay.initS4TermsCheckbox();
+        if (sessionStorage.fromOverquotaPeriod) {
+            selectedPeriod = sessionStorage.fromOverquotaPeriod;
+            delete sessionStorage.fromOverquotaPeriod;
         }
         else {
-            $('.plan-feature.subtext',  this.$page).addClass('hidden');
-            $('.s4-tos', this.$page).addClass('hidden');
+            selectedPeriod = sessionStorage['pro.period'];
         }
 
-        clickURLs();
+        selectedPeriod = parseInt(selectedPeriod) || this.DEFAULT_DURATION;
 
-        // Load payment plans
-        pro.loadMembershipPlans(function() {
+        return selectedPeriod;
+    },
 
-            // Get the user's account balance
-            voucherDialog.getLatestBalance(function() {
+    requiresBilling() {
+        if (!this.currentGateway) {
+            return false;
+        }
+        if (!this.requiresBillingAddress[this.currentGateway.gatewayId]) {
+            return false;
+        }
 
-                // Load payment providers and do the rest of the rendering if the selected plan
-                // has enough storage. Otherwuse do not proceed with rendering the page.
-                proceed.then(async () => {
+        return this.currentGateway.requireBilling !== false
+    },
 
-                    const userHasVpn = pro.proplan2.getUserFeature('vpn');
-                    const userHasPwm = pro.proplan2.getUserFeature('pwm');
+    updatePageInfo() {
 
-                    let strings;
+        const recurringAllowed = !this.currentGateway || this.currentGateway.supportsRecurring;
 
-                    pro.propay.trial = pro.getPlan(pro.propay.planNum)[pro.UTQA_RES_INDEX_EXTRAS].trial;
+        const gatewayId = this.currentGateway && this.currentGateway.gatewayId;
 
-                    /** @todo this should be an actual 'plan has-feature' check */
-                    if (pro.propay.planNum === pro.ACCOUNT_LEVEL_FEATURE_VPN) {
-                        strings = await pro.propay.checkFeatureEligibility(
-                            userHasVpn, true, pro.propay.planNum);
+        this.paymentButton = this.currentGateway
+            && this.paymentButtons.has(this.currentGateway.gatewayName)
+            && this.currentGateway.gatewayName;
+
+
+        const state = this.shouldShowTrial()
+            ? 'trial'
+            : recurringAllowed ? 'recurring' : 'one-time';
+
+        this.switchers.recurring.showElement(state);
+
+        const $oneTimeInfo = $('footer div.one-time', this.$page);
+        const $recurringInfo = $('footer div.recurring', this.$page);
+        const $trialInfo = $('footer div.trial', this.$page);
+
+        $('.billing-address', this.$page).toggleClass('hidden', !this.requiresBilling());
+
+        if (state === 'trial') {
+            $('span.trial-duration', $trialInfo).text(mega.icu.format(l.days_chat_history_plural, this.planObj.trial.days));
+            $('span.plan-price', $trialInfo).text(this.planObj.getFormattedPrice('narrowSymbol')
+                + (this.planObj.currency === 'EUR' ? '' : '*')
+                + ' ' + this.planObj.currency);
+            $('span.plan-name', $trialInfo).text(this.planObj.name);
+        }
+        else {
+            $('span.plan-name', $oneTimeInfo).text(this.planObj.name);
+            $('span.plan-duration', $oneTimeInfo).text(this.getNumOfMonthsWording(this.planObj.months));
+        }
+
+        if (state === 'recurring') {
+            let selector = 'span.recurring'
+            const planLevel = this.planObj.level
+            $('span', $recurringInfo).addClass('hidden');
+            if (pro.getPlanObj(planLevel, 1)) {
+                selector += '-monthly'
+            }
+            if (pro.getPlanObj(planLevel, 12)) {
+                selector += '-yearly'
+            }
+            $(selector, $recurringInfo).removeClass('hidden');
+        }
+
+        if (gatewayId === 0) {
+            voucherDialog.setPropayWarning();
+        }
+
+        if (this.trial !== this.shouldShowTrial()) {
+            this.renderPlanInfo();
+            this.trial = this.shouldShowTrial();
+        }
+
+        $('.free-trial-unsupported', this.$page)
+            .toggleClass('hidden', (!!this.shouldShowTrial() === !!this.planObj.trial));
+    },
+
+    /**
+    * Process results from the API User Transaction Complete call
+    * @param {Object|Number} utcResult The results from the UTC call or a negative number on failure
+    * @param {String} saleId The sale ID
+    */
+    async processUtcResults(utcResult, saleId) {
+        'use strict';
+
+        this.sca = utcResult.sca ? {utcResult, saleId} : false;
+
+        const welDlgAttr =
+            parseInt(await Promise.resolve(mega.attr.get(u_handle, 'welDlg', -2, true)).catch(nop)) | 0;
+
+        // If the user has purchased a subscription and they haven't seen the welcome dialog before (
+        // u_attr[^!welDlg] = 0), set welDlg to 1 which will show it when the psts notification arrives.
+        // If the payment fails the welcome dialog will check if the user has a pro plan, and as such should still
+        // work as expected.
+        if (!welDlgAttr) {
+            mega.attr.set('welDlg', 1, -2, true);
+        }
+
+        // Handle results for different payment providers
+        switch (pro.lastPaymentProviderId) {
+
+            // If using prepaid balance
+            case voucherDialog.gatewayId:
+                voucherDialog.showSuccessfulPayment();
+                break;
+
+            // If Bitcoin provider then show the Bitcoin invoice dialog
+            case bitcoinDialog.gatewayId:
+                bitcoinDialog.processUtcResult(utcResult);
+                break;
+
+            // If Dynamic/Union Pay provider then redirect to their site
+            case unionPay.gatewayId:
+                unionPay.redirectToSite(utcResult);
+                break;
+
+            // If credit card provider
+            case cardDialog.gatewayId:
+                cardDialog.processUtcResult(utcResult);
+                break;
+
+            // If paysafecard provider then redirect to their site
+            case paysafecard.gatewayId:
+                paysafecard.redirectToSite(utcResult);
+                break;
+
+            // If AstroPay result, redirect
+            case astroPayDialog.gatewayId:
+                astroPayDialog.processUtcResult(utcResult);
+                break;
+
+            // If Ecomprocessing result, redirect
+            case addressDialog.gatewayId:
+                addressDialog.processUtcResult(utcResult);
+                break;
+
+            // If tpay, redirect to the site
+            case tpay.gatewayId:
+                tpay.redirectToSite(utcResult);
+                break;
+
+            // If 6media, redirect to the site
+            case directReseller.gatewayId:
+                directReseller.redirectToSite(utcResult);
+                break;
+
+            // If sabadell, redirect to the site
+            case sabadell.gatewayId:
+                sabadell.redirectToSite(utcResult);
+                break;
+
+            case addressDialog.gatewayId_stripe:
+                if (!this.sca) {
+                    addressDialog.processUtcResult(utcResult, true, saleId);
+                }
+                break;
+        }
+    },
+
+    isUtcCached() {
+        return false
+
+        const key = this.planObj.id + '_' + this.currentGatewayName;
+        let gateways = localStorage.cachedUtc
+            ? JSON.parse(localStorage.cachedUtc)
+            : {};
+
+        if (gateways[key]) {
+            return gateways[key];
+        }
+        return false;
+    },
+
+    getCachedUtcRequest(saleId) {
+        if (this.isUtcCached()) {
+            return this.isUtcCached();
+        }
+    },
+
+    setCachedUtcRequest(data) {
+
+        const key = this.planObj.id + '_' + this.currentGatewayName;
+
+        if (this.currentGatewayName.toLowerCase() === 'bitcoin') {
+            setTimeout(() => {
+                delete localStorage.cachedUtc[key];
+            }, 1000 * 60 * 10);
+        }
+
+        let gateways = localStorage.cachedUtc
+            ? JSON.parse(localStorage.cachedUtc)
+            : {};
+
+        gateways[key] = data;
+        localStorage.cachedUtc = JSON.stringify(gateways);
+        return gateways[key];
+    },
+
+    sendPurchaseToApi(paymentTypeId) {
+
+        if (paymentTypeId === undefined) {
+            console.error('No payment type ID provided for purchase');
+            return;
+        }
+
+        if (!this.proPaymentMethod || !this.currentGateway || (this.currentGateway.gatewayId !== paymentTypeId)) {
+            return;
+        }
+
+        // TODO: Show inline loading dialog for stripe and bitcoin
+
+        const apiId = this.planObj.id;
+        const price = this.planObj.priceEuro;
+        const currency = 'EUR';
+        const itemNum = this.planObj.itemNum;
+
+        // Convert from boolean to integer for API
+        const fromBandwidthDialog = ((Date.now() - parseInt(localStorage.seenOverQuotaDialog)) < 2 * 3600000) ? 1 : 0;
+        const fromPreWarnBandwidthDialog = ((Date.now() - parseInt(localStorage.seenQuotaPreWarn)) < 2 * 36e5) ? 1 : 0;
+
+        // uts = User Transaction Sale
+        const utsRequest = {
+            a: 'uts',
+            it: itemNum,
+            si: apiId,
+            p: price,
+            c: currency,
+            aff: mega.affid,
+            m: m,
+            bq: fromBandwidthDialog,
+            pbq: fromPreWarnBandwidthDialog
+        };
+
+        if (mega.uaoref) {
+            utsRequest.uao = escapeHTML(mega.uaoref);
+        }
+
+        // If the plan was chosen immediately after registration, add an 'fr' (from registration) log to the request
+        if (pro.propay.planChosenAfterRegistration) {
+            utsRequest.fr = 1;
+        }
+        if (localStorage.keycomplete) {
+            delete localStorage.keycomplete;
+        }
+
+        // Add the discount information to the User Transaction Sale request
+        if (mega.discountInfo && mega.discountInfo.dc) {
+            utsRequest.dc = mega.discountInfo.dc;
+        }
+
+        // Add S4 parameters
+        const s4Flexi = this.s4Active && window.s4ac && pro.propay.planNum === pro.ACCOUNT_LEVEL_PRO_FLEXI;
+
+        if (s4Flexi) {
+            utsRequest.s4 = 1;
+        }
+
+        const setValues = (extra, saleId) => {
+
+            if (this.proPaymentMethod === 'voucher' || this.proPaymentMethod === 'pro_prepaid') {
+                pro.lastPaymentProviderId = 0;
+            }
+            else if (this.proPaymentMethod === 'bitcoin') {
+                pro.lastPaymentProviderId = 4;
+            }
+            else if (this.proPaymentMethod === 'perfunctio') {
+                pro.lastPaymentProviderId = 8;
+            }
+            else if (this.proPaymentMethod === 'dynamicpay') {
+                pro.lastPaymentProviderId = 5;
+            }
+            else if (this.proPaymentMethod === 'fortumo') {
+                // pro.lastPaymentProviderId = 6;
+                // Fortumo does not do a utc request, we immediately redirect
+                fortumo.redirectToSite(saleId);
+                return false;
+            }
+            else if (this.proPaymentMethod === 'infobip') {
+                // pro.lastPaymentProviderId = 9;
+                // Centili does not do a utc request, we immediately redirect
+                centili.redirectToSite(saleId);
+                return false;
+            }
+            else if (this.proPaymentMethod === 'paysafecard') {
+                pro.lastPaymentProviderId = 10;
+            }
+            else if (this.proPaymentMethod === 'tpay') {
+                pro.lastPaymentProviderId = tpay.gatewayId; // 14
+            }
+            else if (this.proPaymentMethod.indexOf('directreseller') === 0) {
+                pro.lastPaymentProviderId = directReseller.gatewayId; // 15
+            }
+
+            // If AstroPay, send extra details
+            else if (this.proPaymentMethod.indexOf('astropay') > -1) {
+                pro.lastPaymentProviderId = astroPayDialog.gatewayId;
+                extra.bank = astroPayDialog.selectedProvider.extra.code;
+                extra.name = astroPayDialog.fullName;
+                extra.address = astroPayDialog.address;
+                extra.city = astroPayDialog.city;
+                extra.cpf = astroPayDialog.taxNumber;
+            }
+
+            // If Ecomprocessing, send extra details
+            else if (this.proPaymentMethod.indexOf('ecp') === 0) {
+                pro.lastPaymentProviderId = addressDialog.gatewayId;
+                Object.assign(extra, addressDialog.extraDetails);
+            }
+            else if (this.proPaymentMethod.indexOf('sabadell') === 0) {
+                pro.lastPaymentProviderId = sabadell.gatewayId; // 17
+
+                // If the provider supports recurring payments set extra.recurring as true
+                extra.recurring = true;
+            }
+            else if (this.proPaymentMethod.toLowerCase().indexOf('stripe') === 0) {
+                Object.assign(extra, addressDialog.extraDetails);
+                pro.lastPaymentProviderId = addressDialog.gatewayId_stripe;
+                extra.pmid = this.useSavedCard && this.savedCard.id;
+            }
+
+            return true;
+        };
+
+        // delete localStorage.tempGatewayOptions
+
+        let temp = this.getTempGate();
+
+
+        if (this.getCachedUtcRequest() && temp) {
+            console.error('Cached UTC request found.')
+            setValues({}, temp.result);
+            this.processUtcResults(this.getCachedUtcRequest(), temp.result);
+            return;
+        };
+
+        // Setup the 'uts' API request
+        (temp
+            ? Promise.resolve({result: temp})
+            :
+            api.screq(utsRequest)
+        )
+            .then(({result: saleId}) => {
+
+                if (this.currentGateway.gatewayId !== paymentTypeId) {
+                    if (d) {
+                        console.warn('Gateway was changed during loading, do not proceed')
                     }
-                    else if (pro.propay.planNum === pro.ACCOUNT_LEVEL_FEATURE_PWM) {
-                        strings = await pro.propay.checkFeatureEligibility(
-                            userHasPwm, true, pro.propay.planNum);
-                    }
-                    else if (userHasVpn) {
-                        strings = await pro.propay.checkFeatureEligibility(
-                            userHasVpn, true, pro.ACCOUNT_LEVEL_FEATURE_VPN);
-                    }
-                    else if (userHasPwm) {
-                        strings = await pro.propay.checkFeatureEligibility(
-                            userHasPwm, true, pro.ACCOUNT_LEVEL_FEATURE_PWM);
-                    }
+                    return;
+                }
 
-                    if (strings) {
-                        const status = await pro.propay.showFeatureWarning(
-                            strings.blockerTitle, strings.blockerText, strings.btnLabelCancel, strings.btnLabel);
+                // this.setTempGate({result: saleId});
+                if (saleId.result) {
+                    saleId = saleId.result;
+                }
 
-                        if (status === 2 || !strings.canContinue) {
-                            loadSubPage('pro');
-                            return;
+                // Extra gateway specific details for UTC call
+                var extra = {};
+
+                if (!setValues(extra, saleId)) {
+                    return false;
+                }
+
+                // If saleId is already an array of sale IDs use that, otherwise add to an array
+                const saleIdArray = Array.isArray(saleId) ? saleId : [saleId];
+
+                // Complete the transaction
+                let utcReqObj = {
+                    a: 'utc',                       // User Transaction Complete
+                    s: saleIdArray,                 // Array of Sale IDs
+                    m: pro.lastPaymentProviderId,   // Gateway number
+                    bq: fromBandwidthDialog,        // Log for bandwidth quota triggered
+                    extra: extra                    // Extra information for the specific gateway
+                };
+
+                const discountInfo = pro.propay.getDiscount();
+                if (discountInfo && discountInfo.dc) {
+                    utcReqObj.dc = discountInfo.dc;
+                }
+
+                return api.screq(utcReqObj).then(({result}) => {
+                    if (this.currentGateway.gatewayId !== paymentTypeId) {
+                        if (d) {
+                            console.warn('Gateway was changed during loading, do not proceed');
                         }
-                        else if ((status === 1) && pro.propay.loading) {
-                            loadingDialog.show('propayReady');
-                        }
-                        // User left propay page
-                        else if (status === -1) {
-                            return;
-                        }
+                        return;
                     }
-
-                    if (pro.propay.trial) {
-                        pro.propay.$selectedPlanTitleTrial = $(`.top-header.plan-title.free-trial`, pro.propay.$page);
-                    }
-                    pro.propay.$selectedPlanTitle = $(`.top-header.plan-title.paid-only`, pro.propay.$page);
-
-                    await pro.propay.loadPaymentGatewayOptions();
-
-                    pro.propay.updatePurchaseButton();
-                    pro.propay.updateMainPageDisplay();
-                    loadingDialog.hide('propayReady');
-                    pro.propay.loading = false;
-
-                    const propayPageVisitEventId = pro.propay.getPropayPageEventId(pro.propay.planNum);
-                    eventlog(propayPageVisitEventId);
-                }).catch((ex) => {
-                    console.error(ex);
+                    this.setCachedUtcRequest(result);
+                    this.processUtcResults(result, saleId);
                 });
+            })
+            .catch((ex) => {
+
+                console.error(ex);
+                // Default error is "Something went wrong. Try again later..."
+                let errorMessage;
+
+                // Get S4 error messages
+                if (s4Flexi && (errorMessage = ActivateS4.instance.getErrorMsg(ex))) {
+                    delete window.s4ac;
+                }
+                // Handle specific discount errors
+                else if (ex === EEXPIRED) {
+                    // The discount code has expired.
+                    errorMessage = l[24675];
+                }
+                else if (ex === EEXIST) {
+                    // This discount code has already been redeemed.
+                    errorMessage = l[24678];
+                }
+                else if (ex === EOVERQUOTA && pro.lastPaymentProviderId === voucherDialog.gatewayId) {
+
+                    // Insufficient balance, try again...
+                    errorMessage = l[514];
+                }
+                else {
+                    errorMessage = ex < 0 ? api_strerror(ex) : ex;
+                }
+
+                // Hide the loading overlay and show an error
+                pro.propay.hideLoadingOverlay();
+
+                eventlog(500717, String(ex))
+
+                tell(errorMessage);
             });
-        });
+    },
+
+    setPlanFromUrl() {
+        const pageParts = page.split('_');
+
+        if (typeof pageParts[1] === 'undefined') {
+            return false;
+        }
+
+        if (parseInt(pageParts[2])) {
+            sessionStorage.fromOverquotaPeriod = pageParts[2];
+        }
+
+        const proNum = this.planNumsByName[pageParts[1]] || parseInt(pageParts[1]);
+
+        if ((mega.flags
+            && (mega.flags.pf !== 1))
+            && (proNum === pro.ACCOUNT_LEVEL_PRO_FLEXI)) {
+            return false;
+        }
+
+        const validNums = new Set([
+            ...pro.filter.simple.validPurchases,
+            ...pro.filter.simple.validFeatures
+        ]);
+
+        // Check the URL has propay_XXX format
+        if (validNums.has(proNum)) {
+
+            // Get the Pro number e.g. 2 then the name e.g. Pro I - III, Pro Lite, Pro Flexi etc
+            pro.propay.planNum = proNum;
+
+            return true;
+        }
+
+        return false;
+    },
+
+    /**
+     * Get the event ID to log for the propay_x page visit
+     * @param {Number} planNum The plan number e.g. 1, 2, 3, 4, 11, 12, 13, 101
+     * @returns {Number} The event ID to log the propay_x page visit against
+     */
+    getPropayPageEventId: (planNum) => {
+        'use strict';
+
+        switch (planNum) {
+            case 1:     // Pro I
+                return 500440;
+            case 2:     // Pro II
+                return 500441;
+            case 3:     // Pro III
+                return 500442;
+            case 4:     // Pro Lite
+                return 500439;
+            case 11:    // Starter
+                return 500436;
+            case 12:    // Basic
+                return 500437;
+            case 13:    // Essential
+                return 500438;
+            case 101:   // Pro Flexi
+                return 500443;
+            case 100000: // VPN
+                return 500472;
+            default:    // Other plan
+                return 500473;
+        }
     },
 
     shouldShowTrialBlocker: (blockerText, blockerTitle) => {
@@ -368,106 +740,13 @@ pro.propay = {
             && !blockerTitle;
     },
 
-    async checkFeatureEligibility(userHasFeature, planHasFeature, feature) {
-        'use strict';
-
-        let blockerTitle;
-        let blockerText;
-        let btnLabel;
-        let btnLabelCancel;
-        let canContinue = false;
-
-        const statusIsNotTrial = (sub, plan) => {
-            return (sub && !sub.is_trial) || (plan && !plan.is_trial);
-        };
-
-        const isProUser = u_attr && u_attr.p && !u_attr.b;
-        const warningStrings = pro.propay.warningStrings[feature];
-
-        if (!planHasFeature && !userHasFeature) {
-            return;
-        }
-
-        if (isProUser && planHasFeature && !pro.filter.simple.validPurchases.has(pro.propay.planNum)) {
-            blockerTitle = warningStrings.added_title;
-            blockerText = warningStrings.is_attached_text;
-        }
-        else if (!isProUser && userHasFeature) {
-            if (pro.filter.simple.validPurchases.has(pro.propay.planNum)) {
-                const status = await pro.propay.checkMultiFeatures(feature);
-
-                if (status === 2) { // The user refused to proceed
-                    loadSubPage('pro');
-                    return;
-                }
-
-                loadingDialog.show('propayReady');
-            }
-            else if (planHasFeature) {
-
-                const {currentSub, currentPlan} = await pro.propay.checkCurrentFeatureStatus(feature);
-
-                if (statusIsNotTrial(currentSub, currentPlan)) {
-                    blockerTitle = warningStrings.added_title;
-                    blockerText = warningStrings.added_text;
-                }
-            }
-        }
-
-        if (pro.propay.shouldShowTrialBlocker(blockerText, blockerTitle)) {
-            blockerTitle = l.free_trial_unavailable;
-            blockerText = l.subs_to_make_online_life_x;
-            btnLabel = l.subscribe_btn;
-            btnLabelCancel = l[82];
-            canContinue = true;
-        }
-
-        if (blockerText) {
-            return {
-                blockerTitle,
-                blockerText,
-                btnLabel,
-                btnLabelCancel,
-                canContinue,
-            };
-        }
-
-        return false;
-    },
-
-    /**
-     * Init S4 Tos checkbox and change states when clicked
-     * @param {Boolean} state True setting initial state On
-     * @returns {void} void
-     */
-    initS4TermsCheckbox: (state) => {
-        'use strict';
-
-        const $check = $('.s4-tos .checkbox', this.$page);
-
-        const changeState = (state) => {
-            if (state) {
-                $check.removeClass('checkboxOff').addClass('checkboxOn');
-                pro.propay.purchaseButton.termsAccepted = true;
-            }
-            else {
-                $check.addClass('checkboxOff').removeClass('checkboxOn');
-                pro.propay.purchaseButton.termsAccepted = false;
-            }
-            pro.propay.updatePurchaseButton();
-        };
-
-        $check.rebind('click.changeState', () => changeState($check.hasClass('checkboxOff')));
-        changeState(state);
-    },
-
     showFeatureWarning(title, text, cancelTxt, proceedText) {
         'use strict';
 
 
         return new Promise((resolve) => {
 
-            if (!pro.propay.userOnPropayPage()) {
+            if (!pro.propay.onPropayPage()) {
                 resolve(-1);
                 return;
             }
@@ -488,7 +767,7 @@ pro.propay = {
                     }
                 },
                 onclose: () => {
-                    if (pro.propay.userOnPropayPage()) {
+                    if (pro.propay.onPropayPage()) {
                         resolve(2);
                     }
                 },
@@ -512,92 +791,6 @@ pro.propay = {
 
             loadingDialog.hide('propayReady');
             dialog.show();
-        });
-    },
-
-    updatePurchaseButton() {
-        'use strict';
-        // Check membership plans loaded
-        pro.propay.purchaseButton.$button.toggleClass(
-            'disabled',
-            !(pro.propay.purchaseButton.canProceedLoaded && pro.propay.purchaseButton.termsAccepted)
-        );
-    },
-
-    async getUserPlanInfo() {
-        'use strict';
-
-        if (!pro.propay.currentPlanData) {
-            pro.propay.currentPlanData = await M.getUserPlanInfo().then(({subs, plans}) => {
-                return {subs, plans};
-            });
-        }
-    },
-
-    checkUserFeature(planLevel) {
-        'use strict';
-
-        if (!pro.propay.currentPlanData) {
-            console.error('Must call getUserPlanInfo before checkUserFeature');
-            return;
-        }
-
-        const {subs, plans} = pro.propay.currentPlanData;
-
-        let currentSub = false;
-        let currentSubMobile = false;
-        let currentPlan = false;
-
-        for (let i = 0; i < subs.length; i++) {
-            const sub = subs[i];
-            if ((sub.al + pro.getStandaloneBits(sub.features)) === planLevel) {
-                const gateway = sub.gwid;
-                if ((gateway === 2) || (gateway === 3)) {
-                    currentSubMobile = sub;
-                }
-                currentSub = sub;
-                break;
-            }
-        }
-
-        if (!currentSub) {
-            currentPlan = plans.find((plan) => {
-                return (plan.al + pro.getStandaloneBits(plan.features)) === planLevel;
-            }) || false;
-        }
-
-        return {
-            currentSub,
-            currentSubMobile,
-            currentPlan,
-        };
-
-    },
-
-    async checkCurrentFeatureStatus(planLevel) {
-        'use strict';
-
-        await pro.propay.getUserPlanInfo();
-        return pro.propay.checkUserFeature(planLevel);
-    },
-
-    async handleMultipleFeatures(userFeatures) {
-        'use strict';
-
-        // Cache the user plan info to avoid multiple API calls
-        await pro.propay.getUserPlanInfo();
-
-        return userFeatures.filter(feature => {
-            const {currentSub, currentSubMobile} =
-                pro.propay.checkUserFeature(pro.propay.planNumsByName[feature]);
-
-            if (currentSub && currentSub.is_trial) {
-                return !!currentSubMobile;
-            }
-            else if (currentSub) {
-                return true;
-            }
-            return false;
         });
     },
 
@@ -674,12 +867,32 @@ pro.propay = {
             }).catch(() => resolve(0));
     },
 
+    async handleMultipleFeatures(userFeatures) {
+        'use strict';
+
+        // Cache the user plan info to avoid multiple API calls
+        await pro.propay.getUserPlanInfo();
+
+        return userFeatures.filter(feature => {
+            const {currentSub, currentSubMobile} =
+                pro.propay.checkUserFeature(pro.propay.planNumsByName[feature]);
+
+            if (currentSub && currentSub.is_trial) {
+                return !!currentSubMobile;
+            }
+            else if (currentSub) {
+                return true;
+            }
+            return false;
+        });
+    },
+
     /**
-     * Checks whether the user has multiple active features, and proceeds to check features and show the warning dialog
-     * if needed
-     * @param {string | number} feature - The feature name or number
-     * @returns {Promise<0|1|2>} // Returns 0 if the feature is not enabled, 1 if OK clicked and 2 if Cancel clicked
-     */
+    * Checks whether the user has multiple active features, and proceeds to check features and show the warning dialog
+    * if needed
+    * @param {string | number} feature - The feature name or number
+    * @returns {Promise<0|1|2>} // Returns 0 if the feature is not enabled, 1 if OK clicked and 2 if Cancel clicked
+    */
     checkMultiFeatures: (feature) => {
         'use strict';
 
@@ -741,127 +954,1467 @@ pro.propay = {
         });
     },
 
-    /**
-     * Gets the Pro plan number e.g. 4 from the URL e.g. propay_4
-     * @returns {Boolean} Returns true if set correctly, otherwise returns false
-     */
-    setProPlanFromUrl: function() {
+    async checkFeatureEligibility(userHasFeature, planHasFeature, feature) {
+        'use strict';
 
-        // The URL should be in format /propay_x (1-4)
-        const pageParts = page.split('_');
+        let blockerTitle;
+        let blockerText;
+        let btnLabel;
+        let btnLabelCancel;
+        let canContinue = false;
 
-        if (typeof pageParts[1] === 'undefined') {
-            return false;
+        const statusIsNotTrial = (sub, plan) => {
+            return (sub && !sub.is_trial) || (plan && !plan.is_trial);
+        };
+
+        const isProUser = u_attr && u_attr.p && !u_attr.b;
+        const warningStrings = pro.propay.warningStrings[feature];
+
+        if (!planHasFeature && !userHasFeature) {
+            return;
         }
 
-        const proNumInt = pro.propay.planNumsByName[pageParts[1]] || parseInt(pageParts[1]);
+        if (isProUser && planHasFeature && !pro.filter.simple.validPurchases.has(pro.propay.planNum)) {
+            blockerTitle = warningStrings.added_title;
+            blockerText = warningStrings.is_attached_text;
+        }
+        else if (!isProUser && userHasFeature) {
+            if (pro.filter.simple.validPurchases.has(pro.propay.planNum)) {
+                const status = await pro.propay.checkMultiFeatures(feature);
 
-        // If the Pro Flexi enabled (pf) flag is not on and they're trying to access the page, don't allow
-        if (mega.flags && mega.flags.pf !== 1 && proNumInt === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
-            return false;
+                if (status === 2) { // The user refused to proceed
+                    loadSubPage('pro');
+                    return;
+                }
+
+                loadingDialog.show('propayReady');
+            }
+            else if (planHasFeature) {
+
+                const {currentSub, currentPlan} = await pro.propay.checkCurrentFeatureStatus(feature);
+
+                if (statusIsNotTrial(currentSub, currentPlan)) {
+                    blockerTitle = warningStrings.added_title;
+                    blockerText = warningStrings.added_text;
+                }
+            }
         }
 
-        const validNums = new Set([
-            ...pro.filter.simple.validPurchases,
-            ...pro.filter.simple.validFeatures
-        ]);
+        if (pro.propay.shouldShowTrialBlocker(blockerText, blockerTitle)) {
+            blockerTitle = l.free_trial_unavailable;
+            blockerText = l.subs_to_make_online_life_x;
+            btnLabel = l.subscribe_btn;
+            btnLabelCancel = l[82];
+            canContinue = true;
+        }
 
-        // Check the URL has propay_XXX format
-        if (validNums.has(proNumInt)) {
-
-            // Get the Pro number e.g. 2 then the name e.g. Pro I - III, Pro Lite, Pro Flexi etc
-            pro.propay.planNum = proNumInt;
-            pro.propay.planName = pro.getProPlanName(pro.propay.planNum);
-
-            return true;
+        if (blockerText) {
+            return {
+                blockerTitle,
+                blockerText,
+                btnLabel,
+                btnLabelCancel,
+                canContinue,
+            };
         }
 
         return false;
     },
 
-    /**
-     * Get the event ID to log for the propay_x page visit
-     * @param {Number} planNum The plan number e.g. 1, 2, 3, 4, 11, 12, 13, 101
-     * @returns {Number} The event ID to log the propay_x page visit against
-     */
-    getPropayPageEventId: (planNum) => {
+    checkUserFeature(planLevel) {
         'use strict';
 
-        switch (planNum) {
-            case 1:     // Pro I
-                return 500440;
-            case 2:     // Pro II
-                return 500441;
-            case 3:     // Pro III
-                return 500442;
-            case 4:     // Pro Lite
-                return 500439;
-            case 11:    // Starter
-                return 500436;
-            case 12:    // Basic
-                return 500437;
-            case 13:    // Essential
-                return 500438;
-            case 101:   // Pro Flexi
-                return 500443;
-            case 100000: // VPN
-                return 500472;
-            default:    // Other plan
-                return 500473;
+        if (!pro.propay.currentPlanData) {
+            console.error('Must call getUserPlanInfo before checkUserFeature');
+            return;
+        }
+
+        const {subs, plans} = pro.propay.currentPlanData;
+
+        let currentSub = false;
+        let currentSubMobile = false;
+        let currentPlan = false;
+
+        for (let i = 0; i < subs.length; i++) {
+            const sub = subs[i];
+            if ((sub.al + pro.getStandaloneBits(sub.features)) === planLevel) {
+                const gateway = sub.gwid;
+                if ((gateway === 2) || (gateway === 3)) {
+                    currentSubMobile = sub;
+                }
+                currentSub = sub;
+                break;
+            }
+        }
+
+        if (!currentSub) {
+            currentPlan = plans.find((plan) => {
+                return (plan.al + pro.getStandaloneBits(plan.features)) === planLevel;
+            }) || false;
+        }
+
+        return {
+            currentSub,
+            currentSubMobile,
+            currentPlan,
+        };
+
+    },
+
+    async getUserPlanInfo() {
+        'use strict';
+
+        if (!pro.propay.currentPlanData) {
+            pro.propay.currentPlanData = await M.getUserPlanInfo().then(({subs, plans}) => {
+                return {subs, plans};
+            });
         }
     },
 
-    /**
-     * Preloads the large loading animation so it displays immediately when shown
-     */
-    preloadAnimation: function() {
+    async checkCurrentFeatureStatus(planLevel) {
+        'use strict';
 
-        pro.propay.$backgroundOverlay = $('.fm-dialog-overlay', 'body');
-        pro.propay.$loadingOverlay = $('.payment-processing', 'body');
-
-        // Check if using retina display
-        var retina = (window.devicePixelRatio > 1) ? '@2x' : '';
-
-        // Preload loading animation
-        pro.propay.$loadingOverlay.find('.payment-animation').attr('src',
-            staticpath + '/images/mega/payment-animation' + retina + '.gif'
-        );
+        await pro.propay.getUserPlanInfo();
+        return pro.propay.checkUserFeature(planLevel);
     },
 
-    getDiscount: function() {
-        'use strict';
-        if (mega.discountInfo && mega.discountInfo.pd && mega.discountInfo.al === pro.propay.planNum) {
-            return mega.discountInfo;
+    async checkUserFeatures() {
+        const userHasVpn = pro.proplan2.getUserFeature('vpn');
+        const userHasPwm = pro.proplan2.getUserFeature('pwm');
+
+        let strings;
+
+        pro.propay.trial = pro.getPlan(pro.propay.planNum)[pro.UTQA_RES_INDEX_EXTRAS].trial;
+
+        /** @todo this should be an actual 'plan has-feature' check */
+        if (pro.propay.planNum === pro.ACCOUNT_LEVEL_FEATURE_VPN) {
+            strings = await pro.propay.checkFeatureEligibility(
+                userHasVpn, true, pro.propay.planNum);
         }
-        return false;
+        else if (pro.propay.planNum === pro.ACCOUNT_LEVEL_FEATURE_PWM) {
+            strings = await pro.propay.checkFeatureEligibility(
+                userHasPwm, true, pro.propay.planNum);
+        }
+        else if (userHasVpn) {
+            strings = await pro.propay.checkFeatureEligibility(
+                userHasVpn, true, pro.ACCOUNT_LEVEL_FEATURE_VPN);
+        }
+        else if (userHasPwm) {
+            strings = await pro.propay.checkFeatureEligibility(
+                userHasPwm, true, pro.ACCOUNT_LEVEL_FEATURE_PWM);
+        }
+
+        if (strings) {
+            const status = await pro.propay.showFeatureWarning(
+                strings.blockerTitle, strings.blockerText, strings.btnLabelCancel, strings.btnLabel);
+
+            if (status === 2 || !strings.canContinue) {
+                loadSubPage('pro');
+                return;
+            }
+            else if ((status === 1)) {
+                loadingDialog.show('propayReady');
+            }
+            // User left propay page
+            else if (status === -1) {
+                return;
+            }
+        }
+
+        pro.propay.loading = false;
+
+        const propayPageVisitEventId = pro.propay.getPropayPageEventId(pro.propay.planNum);
+        eventlog(propayPageVisitEventId);
+    },
+
+    async loadPlansAndCheckStorage() {
+
+        // TODO: replace with trycatch
+        try {
+            // Fetch storage quota and membership plans in parallel
+            const [storage] = await Promise.all([
+                M.getStorageQuota(),
+                voucherDialog.getLatestBalance(),
+                pro.loadMembershipPlans(),
+            ]);
+
+            this.planObj = pro.getPlanObj(this.planNum, this.getPreSelectedDuration());
+
+            // If no plan of selected duration found, see if there are any plans of the same level
+            if (!this.planObj) {
+                this.planObj = pro.getPlanObj(this.planNum);
+
+                // If no plan found for the selected level, exit early
+                if (!this.planObj) {
+                    console.error('No plan found for selected level');
+                    return false;
+                }
+            }
+
+            this.selectedPeriod = this.planObj.months;
+            this.selectedProPackage = this.planObj.planArray;
+
+            await this.checkUserFeatures();
+
+            // Check storage against the plan and handle the result
+            const enoughStorage = checkPlanStorage(storage.used, this.planNum);
+            if (!enoughStorage) {
+                console.error('Selected plan does not have enough storage space');
+            }
+            return enoughStorage;
+
+        }
+        catch (ex) {
+            console.error("Error loading plans or checking storage:", ex);
+            return false;
+        }
+    },
+
+    checkGateway(gate) {
+        'use strict';
+
+        // If plan is flexi and the gateway doesn't support business(and flexi)
+        if (this.planObj.level === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
+            if (gate.supportsBusinessPlans !== 1) {
+                return false;
+            }
+        }
+        // If plan is not flexi and the gateway doesn't support individual plans
+        else if ((gate.supportsIndividualPlans !== undefined) && !gate.supportsIndividualPlans) {
+            return false;
+        }
+
+        // Exclude voucher from list of VPN gateways (TODO: Request a flag from API instead of using gatewayId)
+        if (!gate.gatewayId && this.planObj.isIn('validFeatures')) {
+            return false;
+        }
+
+        // If the gateway has a required price, and it is more than the plans max price
+        if (gate.minimumEURAmountSupported > this.planObj.maxCorrPriceEuro) {
+            return false;
+        }
+
+        // If the gateway does not support features, and the plan is a feature
+        if (!gate.supportsFeaturePlans && this.planObj.isIn('validFeatures')) {
+            return false;
+        }
+
+        if (gate.gatewayId === 19) {
+            if ((gate.gatewayName === 'stripeAP')
+                && !is_ios
+                && !this.applePayBrowsers.has(this.browser)) {
+                return false;
+            }
+            else if (gate.gatewayName === 'stripeGP') {
+                if (!this.googlePayBrowsers.has(this.browser)) {
+                    return false;
+                }
+            }
+        }
+
+        // Gateway supports the current plan
+        return gate;
+    },
+
+    getPageElements() {
+        'use strict';
+
+        if (this.pageInfo.initialized) {
+            return this.pageInfo;
+        }
+
+        this.$page = $('#propay');
+
+        if (!this.$page.length) {
+            return false;
+        }
+
+        this.pageInfo = Object.create(null);
+
+        this.pageInfo.$templates = $('#propay-page-templates');
+
+        this.pageInfo.$leftBlock = $('.left-block', this.$page);
+        this.pageInfo.$rightBlock = $('.right-block-card-wrapper', this.$page);
+
+        this.pageInfo.$durationOptionsWrapper = $('.duration .options-wrapper', this.pageInfo.$leftBlock);
+
+        this.pageInfo.$dropdownWrapper = $('.dropdown-wrapper', this.pageInfo.$leftBlock);
+
+        this.pageInfo.initialized = true;
+
+        return this.pageInfo;
+    },
+
+    renderPlanInfo() {
+        'use strict';
+
+        const isEuro = this.planObj.currency === 'EUR';
+
+        const planCardInitialized = this.pageInfo.$planCard && this.pageInfo.$planCard.length;
+        const isFlexi = this.planObj.level === pro.ACCOUNT_LEVEL_PRO_FLEXI;
+
+        let $trialSection;
+
+        this.pageInfo.$planCard = (planCardInitialized && this.pageInfo.$planCard)
+            || mega.templates.getTemplate('propay-page-plan-card-tmplt', false, this.pageInfo.$templates);
+
+        this.pageInfo.$planCard.toggleClass('flexi', isFlexi);
+
+        if (isFlexi) {
+            $('.additional-content', this.pageInfo.$planCard)
+                .text(l.pr_flexi_extra_charge_note
+                    .replace('%1', bytesToSize(this.planObj.storage))
+                    .replace('%2', formatCurrency(this.planObj.transferCost, this.planObj.currency) + (isEuro ? '' : '*')));
+        }
+
+        if (this.shouldShowTrial()) {
+
+            const information = {
+                type: this.planObj.featureBits,
+                days: this.planObj.trial.days
+            }
+
+            $trialSection = this.createFreeTrialSection(this.planObj
+                .getFormattedPrice('narrowSymbol'), this.planObj.currency, information).removeClass('hidden');
+            $('.how-it-works', this.pageInfo.$planCard)
+                .removeClass('hidden')
+                .empty()
+                .safeAppend($trialSection.prop('outerHTML'));
+            $('.pricing', this.pageInfo.$planCard).addClass('hidden');
+        }
+        else {
+            $('.how-it-works', this.pageInfo.$planCard).addClass('hidden');
+            $('.pricing', this.pageInfo.$planCard).removeClass('hidden');
+        }
+
+        $('.plan-name span', this.$page).text(this.planObj.name);
+
+        const {$planCard} = this.pageInfo;
+
+
+        let planNameTitleString;
+        let planNameCardString;
+
+        if (this.planObj.isIn('validFeatures')) {
+            let titleStringKey;
+            if (this.planObj.level === pro.ACCOUNT_LEVEL_FEATURE_PWM) {
+                titleStringKey = 'you_have_selected_pass';
+                if (this.shouldShowTrial()) {
+                    titleStringKey += '_trial';
+                    planNameCardString = l.pass_free_trial
+                }
+            }
+            else if (this.planObj.level === pro.ACCOUNT_LEVEL_FEATURE_VPN) {
+                titleStringKey = 'you_have_selected_vpn';
+                if (this.shouldShowTrial()) {
+                    titleStringKey += '_trial';
+                    planNameCardString = l.vpn_free_trial
+                }
+            }
+
+            planNameTitleString = l[titleStringKey];
+        }
+        else {
+            planNameTitleString = l.you_have_selected_pro_plan.replace('%1', `<span>${this.planObj.name}</span>`);
+        }
+
+        planNameCardString = planNameCardString || this.planObj.name;
+
+        $('.left-block .plan-name.title', this.$page).safeHTML(planNameTitleString);
+
+
+        $('.plan-name', $planCard).text(planNameCardString);
+
+        if (this.planObj.storage && this.planObj.transfer) {
+            const $planInfo = $('.plan-info', $planCard).removeClass('hidden');
+            $('.storage', $planInfo).text(bytesToSize(this.planObj.storage, 3, 4) + ' storage');
+            $('.transfer', $planInfo).text(bytesToSize(this.planObj.transfer, 3, 4) + ' transfer');
+        }
+
+        const $includesContent = $('.includes-content', $planCard);
+
+        $includesContent.empty();
+        if (this.planObj.isIn('showFeatureInfo')) {
+            for (const feature of this.planObj.featureStrings) {
+                let HTMLString = '<div>';
+                if (feature.icon) {
+                    HTMLString += `<i class="sprite-fm-mono ${feature.icon}"></i>`;
+                }
+                HTMLString += feature.text;
+                HTMLString += '</div>';
+
+                $includesContent.safeAppend(HTMLString);
+            }
+
+            if ((this.planObj.level === pro.ACCOUNT_LEVEL_PRO_FLEXI) && window.s4ac) {
+                $includesContent.safeAppend(`<div class="plan-card-s4"><i class="sprite-fm-mono icon-bucket-triangle-thin-outline"></i>${'MEGA S4 Object Storage'}</div>`);
+            }
+
+            $('.includes', $planCard).removeClass('hidden');
+            $includesContent.removeClass('hidden');
+        }
+        else {
+            $includesContent.addClass('hidden');
+        }
+
+        const priceText = `${this.planObj.getFormattedPrice('narrowSymbol')}
+        <span class="currency"> ${this.planObj.currency}</span>
+        <span class="local">${isEuro ? '' : '*'}<span>`;
+
+        $('.pricing-element .duration-type', $planCard).text(this.selectedPeriod === 1 ? 'Monthly' : 'Yearly');
+        $('.pricing-element .price', $planCard).safeHTML(priceText);
+
+
+        const discountInfo = this.getDiscount();
+        const discountDuration = discountInfo
+            && (discountInfo.m || discountInfo.md || this.planObj.months)
+
+        if (discountInfo) {
+            $('.pricing-element .duration-type', $planCard)
+                .text(this.getNumOfMonthsWording(discountDuration));
+
+            $('.plan-info .transfer', $planCard)
+                .text(bytesToSize(this.planObj.baseTransfer * discountInfo.m, 3, 4) + ' transfer');
+        }
+
+        // TODO: Clean this up
+        if (discountInfo && discountInfo.md && discountInfo.pd && discountInfo.al === pro.propay.planNum) {
+
+            let oldPrice;
+
+            const createPriceHTML = (price, noAsterisk) => {
+                return `${price}
+                <span class="currency"> ${this.planObj.currency}</span>
+                <span class="local">${(isEuro || noAsterisk) ? '' : '*'}<span>`;
+            };
+
+            $('.pricing-element .price', $planCard).safeHTML(priceText);
+
+            if (discountInfo.ltp || discountInfo.etp) {
+                // oldPrice = formatCurrency(discountInfo.ltp || discountInfo.etp, this.planObj.currency, 'narrowSymbol');
+                oldPrice = createPriceHTML(formatCurrency(discountInfo.ltp || discountInfo.etp, this.planObj.currency, 'narrowSymbol'), true);
+            }
+            else {
+                // oldPrice = this.planObj.getFormattedPrice('narrowSymbol', false, false, discountDuration);
+                oldPrice = createPriceHTML(this.planObj
+                    .getFormattedPrice('narrowSymbol', false, false, discountDuration), true);
+            }
+
+            // const oldPrice = discountInfo.ltp || discountInfo.etp || this.planObj.getFormattedPrice('narrowSymbol', false, false, discountDuration);
+            const newPrice = createPriceHTML(formatCurrency(isEuro
+                ? discountInfo.edtp
+                : discountInfo.ldtp, this.planObj.currency));
+
+            const $discountHeader = $('.discount-header', $planCard);
+            $discountHeader.text(l.special_deal_perc_off
+                .replace('%1', formatPercentage(discountInfo.pd / 100))
+                + ` (${this.getNumOfMonthsWording(discountDuration)})`
+            ).removeClass('hidden');
+
+            $('.price', $planCard).safeHTML(newPrice);
+            $('.pre-discount-price', $planCard).safeHTML(oldPrice);
+            $('.discount', $planCard).removeClass('hidden');
+        }
+        else if (discountInfo && discountInfo.al && discountInfo.pd && discountInfo.al === pro.propay.planNum) {
+
+            const duration = this.planObj.months;
+            const oldPrice = this.planObj.getFormattedPrice('narrowSymbol');
+            const newPrice = duration === 1
+                ? discountInfo.lmp
+                : discountInfo.lyp;
+
+
+            const $discountHeader = $('.discount-header', $planCard);
+            $discountHeader.text(l.special_deal_perc_off
+                .replace('%1', formatPercentage(discountInfo.pd / 100))
+            ).removeClass('hidden');
+
+            $('.price', $planCard).text(newPrice + (isEuro ? '' : '*'));
+            $('.pre-discount-price', $planCard).text(oldPrice + (isEuro ? '' : '*'));
+            $('.discount', $planCard).removeClass('hidden');
+        }
+        else {
+            $('.discount', $planCard).addClass('hidden');
+        }
+
+
+
+
+
+        if (!planCardInitialized) {
+            this.pageInfo.$rightBlock.safeAppend($planCard.prop('outerHTML'));
+            this.pageInfo.$planCard = $('.plan-card', this.pageInfo.$rightBlock);
+        }
+
     },
 
     /**
-     * Loads the payment gateway options into Payment options section
+     *
+     * @param {Object} plan - Plan to get the text string for
+     * @param {1 | 12} months - Number of months to get the string for
+     * @returns {string} - The formatted string
      */
-    loadPaymentGatewayOptions: async function() {
+    getTxtString(plan, months, givenString) {
+        givenString = givenString || l[(months === 12 ? 'per_year' : 'per_month')]
+        return givenString
+            .replace('%1', plan.getFormattedPrice('narrowSymbol', false, false, months)
+                + (plan.currency === 'EUR'
+                    ? '' : '*')
+                + ' ' + plan.currency);
+    },
 
+    renderDurations() {
         'use strict';
 
-        // If testing flag is enabled, enable all the gateways for easier debugging (this only works on Staging API)
-        var enableAllPaymentGateways = (localStorage.enableAllPaymentGateways) ? 1 : 0;
+        const $containedRadioTemplate = mega.templates
+            .getTemplate('propay-contained-radio', false, this.pageInfo.$templates);
 
-        // Do API request (User Forms of Payment Query Full) to get the valid list of currently active
-        // payment providers. Returns an array of objects e.g.
-        // {
-        //   "gatewayid":11,"gatewayname":"astropayB","type":"subgateway","displayname":"Bradesco",
-        //   "supportsRecurring":0,"supportsMonthlyPayment":1,"supportsAnnualPayment":1,
-        //   "supportsExpensivePlans":1,"extra":{"code":"B","taxIdLabel":"CPF"}
+        const monthlyPlan = this.planObj.months === 1 ? this.planObj : this.planObj.correlatedPlan;
+        const yearlyPlan = this.planObj.months === 12 ? this.planObj : this.planObj.correlatedPlan;
+
+        const isRecurring = !this.currentGateway || !!this.currentGateway.supportsRecurring;
+
+        let $yearlyRadio;
+        let $monthlyRadio;
+
+        this.pageInfo.$durationOptionsWrapper.empty();
+
+        let discountMonths;
+        let discountRenewalDuration;
+
+        let blockedByMinAmount = false;
+
+        // TODO: Check viability of a function the same as below to run for the regular durations
+        const renderDiscountDuration = (duration, type) => {
+            const discountMonths = duration;
+            const discountRenewalDuration = discountMonths % 12 === 0 ? 12 : 1;
+            const monthsWording = mega.icu.format(l[922], discountMonths)
+
+            let discountedTotalPriceString;
+            let discountAmountString;
+
+            const isEuro = this.planObj.currency === 'EUR';
+
+            const monthlyYearlyWord = discountRenewalDuration === 12 ? 'yearly' : 'monthly';
+
+            if (type === 1) {
+                const discountedTotalPrice = isEuro
+                    ? this.discountInfo.edtp
+                    : this.discountInfo.ldtp;
+
+                const discountAmount = isEuro
+                    ? this.discountInfo.eda
+                    : this.discountInfo.lda;
+
+                discountedTotalPriceString = formatCurrency(discountedTotalPrice, this.planObj.currency);
+                discountAmountString = formatCurrency(discountAmount, this.planObj.currency);
+            }
+            else if (type === 0) {
+
+                discountedTotalPriceString = duration === 1
+                    ? this.discountInfo.lmp
+                    : this.discountInfo.lyp;
+            }
+
+
+            const $discountRadio = $containedRadioTemplate.clone()
+                .removeClass('hidden template')
+                .addClass(`duration-option ${monthlyYearlyWord}`)
+                .attr('duration', discountRenewalDuration);
+
+            $('.duration-head .duration-type', $discountRadio).text(monthsWording);
+            $(`.${monthlyYearlyWord}-price`, $discountRadio).text(discountedTotalPriceString)
+                .removeClass('hidden');
+
+
+            // If the radio is monthly, it needs to be put before the yearly radio
+            const appendPrependFunction = discountRenewalDuration === 1 ? 'safePrepend' : 'safeAppend';
+
+            this.pageInfo.$durationOptionsWrapper[appendPrependFunction]($discountRadio.prop('outerHTML'));
+        }
+
+
+        if (this.discountInfo && this.discountInfo.md && this.discountInfo.pd) {
+            discountMonths = this.discountInfo.m;
+            discountRenewalDuration = discountMonths % 12 === 0 ? 12 : 1;
+        }
+
+        if (monthlyPlan && yearlyPlan) {
+            if (discountRenewalDuration !== 1 && discountMonths !== 0) {
+
+                $monthlyRadio = $containedRadioTemplate.clone()
+                    .removeClass('hidden template')
+                    .addClass('duration-option monthly')
+                    .attr('duration', 1);
+                $('.duration-head .duration-type', $monthlyRadio).text(isRecurring
+                    ? l.recurring_monthly
+                    : this.getNumOfMonthsWording(1));
+
+                $('.monthly-price', $monthlyRadio).text(pro.propay.getTxtString(monthlyPlan, 1, '%1')).toggleClass('hidden', isRecurring);
+                $('.yearly-price', $monthlyRadio).text(pro.propay.getTxtString(monthlyPlan, 12)).toggleClass('hidden', !isRecurring);
+
+
+                if (this.currentGateway && this.currentGateway.minimumEURAmountSupported > monthlyPlan.priceEuro) {
+                    $monthlyRadio.addClass('disabled');
+                    blockedByMinAmount = true;
+                    this.planObj = yearlyPlan;
+                    this.selectedPeriod = this.planObj.months;
+                }
+                else if (discountRenewalDuration === 12) {
+                    $monthlyRadio.addClass('disabled');
+                    this.planObj = yearlyPlan;
+                    this.selectedPeriod = this.planObj.months;
+                }
+
+                this.pageInfo.$durationOptionsWrapper.safeAppend($monthlyRadio.prop('outerHTML'));
+            }
+
+            if ((discountRenewalDuration !== 12) && (discountMonths !== 0)) {
+
+                $yearlyRadio = $containedRadioTemplate.clone()
+                    .removeClass('hidden template')
+                    .addClass('duration-option yearly')
+                    .attr('duration', 12);
+
+                $('.duration-head .duration-type', $yearlyRadio).text(isRecurring ?
+                    l.yearly_unit
+                    : this.getNumOfMonthsWording(12));
+
+                $('.duration-head .duration-savings', $yearlyRadio)
+                    .text(l.pay_10m_get_2m)
+                    .removeClass('hidden');
+
+
+                $('.yearly-price', $yearlyRadio)
+                    .text(pro.propay.getTxtString(yearlyPlan, 12, isRecurring ? false : '%1'))
+                    .removeClass('hidden');
+
+                $('.monthly-price', $yearlyRadio)
+                    .text(pro.propay.getTxtString(yearlyPlan, 1))
+                    .toggleClass('hidden', !isRecurring);
+
+                if (discountRenewalDuration === 1) {
+                    $yearlyRadio.addClass('disabled');
+                    this.planObj = monthlyPlan;
+                    this.selectedPeriod = this.planObj.months;
+                }
+
+                this.pageInfo.$durationOptionsWrapper.safeAppend($yearlyRadio.prop('outerHTML'));
+            }
+            $('.duration', this.pageInfo.$leftBlock).removeClass('hidden');
+
+            if (this.currentGateway) {
+
+                let warning
+
+                if (this.currentGateway.gatewayId === 0) {
+                    warning = this.usingBalance ? this.warnings.balance : this.warnings.voucher;
+                }
+                else if (blockedByMinAmount) {
+                    warning = this.warnings.minAmount;
+                }
+
+                const $warning = $('.one-off-payment-info', this.pageInfo.$leftBlock).toggleClass('hidden', !warning);
+                if (warning) {
+                    $('.warning-txt', $warning).text(warning);
+                }
+                else {
+                    $('.warning-txt', $warning);
+                }
+            }
+
+        }
+        else if (!discountMonths) {
+            $('.duration', this.pageInfo.$leftBlock).addClass('hidden');
+        }
+
+        // If there is a discount
+        if (discountRenewalDuration) {
+
+            // 1 = multi discount, 0 = old style discount
+            const discountType = this.discountInfo.md ? 1 : 0;
+
+            // If discount is for 1 month AND 12 months
+            if (discountMonths === 0) {
+                renderDiscountDuration(1, discountType);
+                renderDiscountDuration(12, discountType);
+
+            }
+            // If discount is for 1 month XOR 12 months
+            else {
+                if (discountRenewalDuration === 1) {
+                    $('.duration-savings', this.pageInfo.$durationOptionsWrapper).addClass('hidden');
+                }
+                renderDiscountDuration(discountMonths, discountType);
+            }
+        }
+
+        $('.duration-option', this.pageInfo.$durationOptionsWrapper).rebind('click', (e) => {
+            const $this = $(e.currentTarget);
+            const duration = +$this.attr('duration');
+
+            if ((this.selectedPeriod === duration) || $this.hasClass('disabled')) {
+                return;
+            }
+
+            $('.duration-option.monthly .radio-item', this.pageInfo.$durationOptionsWrapper)
+                .toggleClass('radioOn', duration === 1)
+                .toggleClass('radioOff', duration !== 1);
+
+            $('.duration-option.yearly .radio-item', this.pageInfo.$durationOptionsWrapper)
+                .toggleClass('radioOn', duration === 12)
+                .toggleClass('radioOff', duration !== 12);
+
+            this.selectedPeriod = duration;
+            sessionStorage['pro.period'] = this.selectedPeriod;
+            this.planObj = pro.getPlanObj(this.planNum, this.selectedPeriod);
+
+            if (this.currentGateway && this.currentGateway.gatewayId === 0) {
+                this.usingBalance = this.usingBalance && pro.propay.useBalance();
+            }
+
+            this.renderPlanInfo();
+            this.updatePayment();
+        });
+
+        $(`.duration-option.${this.selectedPeriod === 1
+            ? 'monthly'
+            : 'yearly'} .radio-item`, this.pageInfo.$durationOptionsWrapper)
+            .addClass('radioOn')
+            .removeClass('radioOff');
+    },
+
+    getPaymentType(gateway) {
+        'use strict';
+
+        gateway = gateway || this.currentGateway;
+
+        if (typeof gateway === 'string') {
+            gateway = this.gatewaysByName[gateway];
+        }
+        if (!gateway) {
+            return;
+        }
+
+        const gatewayId = gateway.gatewayId;
+        const gatewayName = String(pro.getPaymentGatewayName(gatewayId, gateway).name);
+
+        if ((gatewayName.indexOf('ecp') === 0)
+            || gatewayName.toLowerCase().indexOf('stripe') === 0) {
+            return 'creditcard';
+        }
+        else if (gatewayId === astroPayDialog.gatewayId) {
+            return 'astropay';
+        }
+        else if ((gatewayName === 'voucher') || (gatewayName === 'wiretransfer')) {
+            return gatewayName;
+        }
+        else {
+            return 'other';
+        }
+    },
+
+    renderSavedCard() {
+        'use strict';
+
+        if (this.savedCardInitiated) {
+            return;
+        }
+        this.savedCardInitiated = true;
+        const $savedCard = $('.saved-card', this.$page);
+
+        if (!this.savedCard || !(this.savedCard.gw === this.currentGateway.gatewayId)) {
+            $('.saved-card', this.$page).addClass('hidden');
+            return;
+        }
+
+
+        const htmlString = `<span class="card-brand">${this.savedCard.brand}</span>
+            <span class="dots"> •••• </span>
+            <span class="last-4">${this.savedCard.last4}</span>`;
+
+        // $savedCard.removeClass('hidden').empty().safeAppend(htmlString);
+
+        const items = [
+            {
+                html: htmlString,
+                icon: 'sprite-fm-mono icon-payment',
+                value: 'saved',
+                selected: true,
+            },
+            {
+                text: 'Add credit or debit card',
+                icon: 'sprite-fm-mono icon-add',
+                value: 'new',
+            }
+        ];
+
+        $savedCard.empty();
+
+        const $radioItemTemplate = mega.templates.getTemplate('radio-with-icon-label-tmplt');
+
+        for (let i = 0; i < items.length; i++) {
+            const item = items[i];
+            const $radioItem = $radioItemTemplate.clone()
+                .removeClass('hidden template')
+                .addClass('option payment')
+                .attr('data-value', item.value);
+            if (item.html) {
+                $('.radio-txt', $radioItem).safeAppend(item.html);
+            }
+            else {
+                $('.radio-txt', $radioItem).text(item.text);
+            }
+
+            if (item.selected) {
+                $('.radio', $radioItem).removeClass('radioOff').addClass('radioOn');
+            }
+
+            $savedCard.safeAppend($radioItem.prop('outerHTML'));
+        }
+
+        this.useSavedCard = this.useSavedCard === null ? true : this.useSavedCard;
+        let currentlySelected = 'saved';
+        $('.option', $savedCard).rebind('click.propay', (e) => {
+
+            const $this = $(e.currentTarget);
+            const selected = $this.attr('data-value');
+
+            if (selected === currentlySelected) {
+                return;
+            }
+
+            currentlySelected = selected;
+
+            $('.radio', $savedCard).removeClass('radioOn').addClass('radioOff');
+            $('.radio', $this).removeClass('radioOff').addClass('radioOn');
+
+            this.useSavedCard = selected === 'saved';
+
+            this.updatePayment();
+
+            // handleProviderClick(e, optionType);
+        });
+
+    },
+
+    updatePayment() {
+        if (page === 'registerb') {
+            return;
+        }
+
+        // if (this.currentGateway && this.gatewaysByName) {
+        this.currentGateway = this.gatewaysByName[this.currentGatewayName];
+        this.gateSupportsTrial = this.currentGateway && this.currentGateway.supportsTrial;
         // }
-        let {result: gatewayOptions} = await api.req({ a: 'ufpqfull', t: 0, d: enableAllPaymentGateways });
 
-        // The propage has been abandoned, no need to proceed
-        if (typeof page !== 'string' || !page.startsWith('propay')) {
-            return false;
+
+        this.updatePageInfo();
+        this.renderDurations();
+        this.setContinuebuttonText();
+
+        addressDialog.closeDialog();
+
+        if (!this.currentGateway) {
+            $('.specific-payment-info', this.$page).addClass('hidden');
+            return;
         }
 
-        const $placeholderText = $('.loading-placeholder-text', pro.propay.$page);
-        const $pricingBox = $('.pricing-page.plan', pro.propay.$page);
+        $('iframe#stripe-widget', addressDialog.getStripeDialog()).addClass('hidden');
+
+        const gatewayId = this.currentGateway.gatewayId;
+
+        if (this.requiresBillingAddress[gatewayId]
+            && (!addressDialog.billingInfoFilled || (addressDialog.validInputs === false))) {
+            $('.specific-payment-info', this.$page).addClass('hidden');
+            return;
+        }
+
+        const usingBalanceOnVoucher = this.usingBalance && (gatewayId === 0);
+
+        const showPaymentSection = !this.paymentButton
+            && !(this.currentGateway.gatewayId === 16)
+            && !usingBalanceOnVoucher;
+
+        const showPaymentButton = this.paymentButton && !this.blockFlow()
+
+        $('.specific-payment-info', this.$page).toggleClass('hidden', !showPaymentSection);
+
+        const $stripeButton = $('.stripe-button', this.$page).toggleClass('hidden', !showPaymentButton);
+        $('.loader', $stripeButton).toggleClass('hidden', !showPaymentButton);
+
+        $('.iframe-container', $stripeButton).empty();
+
+        const paymentType = this.getPaymentType(this.currentGateway);
+
+        this.proPaymentMethod = this.currentGateway.gatewayName;
+
+        $('.propay-inline-dialog', this.$page).addClass('hidden');
+
+        // check all required fields are filled
+
+        $('.balance:not(.option)', this.$page).addClass('hidden');
+
+        this.updateRightBlock();
+
+        // TODO: Refactor the below options to be more readable and make more sense. Temp fix to reduce risk of breaking
+        if (paymentType === 'voucher') {
+            voucherDialog.init();
+            $('.balance', this.$page).removeClass('hidden');
+        }
+
+        if (!showPaymentSection && !showPaymentButton) {
+            return;
+        }
+
+        if (paymentType === 'astropay') {
+            astroPayDialog.init(this.currentGateway);
+        }
+        else if (paymentType === 'creditcard') {
+            // Reset the stripe payment card details
+            this.renderSavedCard();
+
+            $('.specific-payment-info .payment-stripe-dialog', this.$page).removeClass('hidden');
+
+            if (this.useSavedCard
+                && this.savedCard
+                && (this.savedCard.gw === this.currentGateway.gatewayId)) {
+                $('.specific-payment-info .payment-stripe-dialog .content', this.$page).addClass('hidden');
+            }
+            else {
+                $('.specific-payment-info .payment-stripe-dialog .content', this.$page).removeClass('hidden');
+                addressDialog.showDialog(true);
+                if (this.currentGateway.gatewayId === 19) {
+                    addressDialog.validateAndPay(pro.propay.initBillingInfo);
+                }
+            }
+
+        }
+        else if (paymentType === 'other') {
+            if (this.currentGateway.gatewayName === 'bitcoin') {
+                // bitcoinDialog.processUtcResult(utcResult);
+                this.sendPurchaseToApi(this.currentGateway.gatewayId);
+            }
+        }
+    },
+
+    createDropdownItem(option) {
+
+        const tickIcon = document.createElement('i');
+        tickIcon.className = 'sprite-fm-mono icon-check-thin-outline tick';
+
+        const optionContainer = document.createElement('div');
+        optionContainer.className = option.className;
+        optionContainer.textContent = option.text;
+        // optionContainer.value = option.value || option.text;
+
+        if (option.svg) {
+            const svg = document.createElement('i');
+            svg.className = `sprite-fm-mono ${option.svg} mr-4`;
+            optionContainer.prepend(svg);
+        }
+        else if (option.icon) {
+            const icon = document.createElement('div');
+            icon.className = `provider-icon ${option.icon} mr-4`;
+            optionContainer.prepend(icon);
+        }
+
+        if (option.tooltip) {
+            const tooltip = document.createElement('i');
+            tooltip.className = 'pricing-i-icon simpletip';
+            tooltip.setAttribute('data-simpletip', option.tooltip);
+            tooltip.setAttribute('data-simpletipposition', 'bottom');
+            tooltip.setAttribute('data-simpletipoffset', '3');
+            tooltip.setAttribute('data-simpletip-class', 'pricing-tip transformed propay');
+            tooltip.setAttribute('data-simpletipwrapper', '.content');
+            optionContainer.appendChild(tooltip);
+        }
+
+        optionContainer.appendChild(tickIcon.cloneNode(true));
+
+        return optionContainer;
+    },
+
+    /**
+     *
+     * @param {JQuery} $container - The container to append the dropdown to
+     * @param {Object} options - The options for the dropdown
+     * @param {String} options.placeholder - The placeholder text for the dropdown
+     * @param {Array} options.items - The items to display in the dropdown
+     * @param {String} options.items.className - The class name for the item
+     * @param {String} options.items.text - The text for the item
+     * @param {String | Number} options.items.value - The value for the item
+     * @param {String} options.selected - The selected item
+     * @returns {void}
+     */
+    createDropdown($container, options) {
+        'use strict';
+        $container.empty();
+
+        const optionsWrapper = document.createElement('div');
+        optionsWrapper.className = 'mega-input-dropdown dropdown-scroll hidden';
+        let $optionsWrapper = $(optionsWrapper);
+
+        const text = options.selected || options.placeholder;
+
+        $container.safeAppend('<span>');
+        $container.safeAppend('<i class="sprite-fm-mono icon-dropdown">');
+
+        const $span = $('span', $container);
+
+        $span.text(text);
+
+        for (let i = 0; i < options.items.length; i++) {
+            const option = options.items[i];
+            const optionContainer = this.createDropdownItem(option);
+
+
+            $optionsWrapper.safeAppend($(optionContainer).attr('data-value', i).prop('outerHTML'));
+        }
+
+        $container.safeAppend($optionsWrapper.prop('outerHTML'));
+
+        let isOpen = false;
+
+        const handleIsOpen = (close) => {
+            if (close) {
+                isOpen = false;
+                $container.removeClass('active');
+                $optionsWrapper.addClass('hidden');
+            }
+            else {
+                isOpen = !isOpen;
+                $container.toggleClass('active', isOpen);
+                $optionsWrapper.toggleClass('hidden', !isOpen);
+            }
+        };
+
+        $optionsWrapper = $('.mega-input-dropdown', $container);
+        $container.rebind('click', () => {
+            handleIsOpen();
+        });
+        $('.option', $optionsWrapper).rebind('click', (e) => {
+            $span.text($(e.currentTarget).text());
+            options.click(e);
+        });
+
+        $('i.simpletip', $optionsWrapper).rebind('click', (e) => {
+            e.stopPropagation();
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!$container.has(e.target).length) {
+                $optionsWrapper.addClass('hidden');
+                handleIsOpen(true);
+            }
+        });
+    },
+
+    useBalance(gateway) {
+        gateway = gateway || this.currentGateway;
+        return (gateway && (gateway.gatewayId === 0))
+            && (pro.propay.proBalance >= pro.propay.planObj.priceEuro);
+    },
+
+    updateBalanceDropdownOption() {
+        const $balanceOption = $('#propay-payment-dropdown-pri .balance.option');
+        $balanceOption.replaceWith(this.createDropdownItem({
+            className: 'option balance',
+            text: `${l[7108]}: ${formatCurrency(pro.propay.proBalance)}`,
+            value: 'balance',
+            icon: 'voucher',
+            svg: 'icon-ticket',
+            tooltip: l.balance_limited_one_off,
+        }).outerHTML).rebind('click', (e) => {
+            handleProviderClick(e, 'primary')
+        });
+    },
+
+    renderGateways() {
+        'use strict';
+
+        const $primaryOptionsContainer = $('#propay-payment-dropdown-pri');
+        const $secondaryOptionsContainer = $('.payment-options-secondary');
+        const $tertiaryOptionsContainer = $('#propay-payment-dropdown-ter');
+
+        const optionArrays = {
+            'primary': this.paymentGateways.primary.map(
+                gateway => gateway.displayName),
+            'secondary': this.paymentGateways.secondary.length && this.paymentGateways.secondary.map(
+                gateway => gateway.displayName),
+            'tertiary': this.paymentGateways.tertiary.length && this.paymentGateways.tertiary.map(
+                gateway => gateway.displayName),
+        };
+
+        if (optionArrays.secondary) {
+            optionArrays.primary.push('More Options...');
+        }
+
+        const renderSecondaryOptions = () => {
+            const $secondaryOptionTemplate = mega.templates.getTemplate('radio-with-icon-label-tmplt');
+            const $seeAllBtn = optionArrays.tertiary
+                && mega.templates.getTemplate('down-arrow-text-after-tmplt')
+                    .addClass('see-all-btn')
+                    .removeClass('hidden template');
+
+            $secondaryOptionsContainer.empty();
+
+            for (let i = 0; i < optionArrays.secondary.length; i++) {
+                const $secondaryOption = $secondaryOptionTemplate.clone()
+                    .removeClass('hidden template')
+                    .addClass('option secondary')
+                    .attr('data-value', i);
+
+                $('.radio-txt', $secondaryOption).text(optionArrays.secondary[i]);
+                const gateway = pro.propay.gatewaysByName[optionArrays.secondary[i]];
+                if (gateway) {
+                    $('.radio-icon', $secondaryOption)
+                        .addClass('provider-icon mr-2 ' + gateway.gatewayName)
+                        .removeClass('hidden');
+                }
+
+                $secondaryOptionsContainer.safeAppend($secondaryOption.prop('outerHTML'));
+            }
+
+            if (optionArrays.tertiary) {
+
+                for (let i = 0; i < optionArrays['tertiary'].length; i++) {
+                    const $tertiaryOption = $secondaryOptionTemplate.clone()
+                        .removeClass('template')
+                        .addClass('option tertiary hidden')
+                        .attr('data-value', i);
+
+                    $('.radio-txt', $tertiaryOption).text(optionArrays.tertiary[i]);
+                    const gateway = pro.propay.gatewaysByName[optionArrays.tertiary[i]];
+                    if (gateway) {
+                        $('.radio-icon', $tertiaryOption)
+                            .addClass('provider-icon mr-2 ' + gateway.gatewayName)
+                            .removeClass('hidden');
+                    }
+
+                    $secondaryOptionsContainer.safeAppend($tertiaryOption.prop('outerHTML'));
+                }
+
+                $('.txt', $seeAllBtn).text('See all');
+                $secondaryOptionsContainer.safeAppend($seeAllBtn.prop('outerHTML'));
+
+                let showingAll = false;
+
+                $('.see-all-btn', $secondaryOptionsContainer).rebind('click.propay', () => {
+                    showingAll = !showingAll;
+                    $('.option.tertiary', $secondaryOptionsContainer).toggleClass('hidden', !showingAll);
+                    $('.see-all-btn', $secondaryOptionsContainer).toggleClass('see-less', showingAll);
+                    $('.see-all-btn .txt', $secondaryOptionsContainer).text(l[showingAll ? 'see_less' : 'see_all']);
+                });
+
+            }
+
+            $('.option', $secondaryOptionsContainer).rebind('click.propay', (e) => {
+
+                const $this = $(e.currentTarget);
+                const optionType = $this.is('.option.secondary') ? 'secondary' : 'tertiary';
+                const index = +$this.attr('data-value');
+                const options = optionArrays[optionType];
+
+                if (options[index] === this.currentGatewayName) {
+                    return;
+                }
+
+                $('.radio', $secondaryOptionsContainer).removeClass('radioOn').addClass('radioOff');
+
+                $('.radio', $this).removeClass('radioOff').addClass('radioOn');
+
+                handleProviderClick(e, optionType);
+            });
+        };
+
+        const handleProviderClick = (e, type) => {
+
+            const $target = $(e.currentTarget);
+
+            if ($target.is('i.tooltip')) {
+                return;
+            }
+
+            const optionIndex = +$target.attr('data-value');
+
+            const options = optionArrays[type];
+
+            if (type === 'primary') {
+
+                $('.selected', $primaryOptionsContainer).removeClass('selected');
+                $target.addClass('selected');
+
+                // If 'More options' clicked, show more options and do not change the current gateway
+                if (optionArrays.secondary && (optionIndex === options.length - 1)) {
+                    $secondaryOptionsContainer.removeClass('hidden');
+                    if (optionArrays.tertiary) {
+                        $tertiaryOptionsContainer.removeClass('hidden');
+                    }
+
+                    return;
+                }
+
+                $secondaryOptionsContainer.addClass('hidden');
+                $tertiaryOptionsContainer.addClass('hidden');
+            }
+
+            this.currentGatewayName = options[optionIndex];
+
+            this.updatePayment();
+
+        };
+
+        pro.propay.handleProviderClick = handleProviderClick;
+
+
+        const renderPrimaryDropdown = () => {
+
+            this.usingBalance = false;
+
+            pro.propay.createDropdown($primaryOptionsContainer, {
+
+                placeholder: l['1523'],
+                click: (e) => {handleProviderClick(e, 'primary')},
+                items: optionArrays['primary'].reduce((acc, item) => {
+                    const gateway = this.gatewaysByName[item];
+
+                    let text = item;
+                    let tooltip;
+                    let svg;
+                    let extraClasses = '';
+
+                    if (gateway) {
+                        if (gateway.gatewayId === 0) {
+                            if (pro.propay.useBalance(gateway)) {
+                                extraClasses += ' balance';
+                                this.usingBalance = true;
+                                text = `${l[7108]}: ${formatCurrency(pro.propay.proBalance)}`;
+                                tooltip = l.balance_limited_one_off;
+                            }
+                            else {
+                                tooltip = l.voucher_limited_one_off;
+                            }
+
+                            svg = 'icon-ticket';
+                        }
+                        else if (gateway.gatewayName === 'stripe') {
+                            svg = 'icon-credit-card';
+                        }
+                        else if (gateway.gatewayName === 'stripeGP') {
+                            svg = ' sprite-fm-uni icon-google';
+                        }
+                        else if (gateway.gatewayName === 'stripeAP') {
+                            svg = ' icon-apple';
+                        }
+                    }
+
+
+                    acc.push({
+                        className: 'option' + extraClasses,
+                        text: text,
+                        value: item,
+                        svg: svg,
+                        icon: gateway && gateway.gatewayName,
+                        tooltip: tooltip
+                    });
+                    return acc;
+                }, []),
+            });
+
+
+            $('.option', $primaryOptionsContainer).rebind('click.propay', (e) => handleProviderClick(e, 'primary'));
+        };
+
+        renderPrimaryDropdown();
+        if (optionArrays.secondary) {
+            renderSecondaryOptions();
+        }
+    },
+
+    initContinueButton() {
+        'use strict';
+        const $continueButton = $('.continue', this.$page);
+        $continueButton.rebind('click.propay', () => {
+
+            const reasons = this.blockFlow();
+
+            if (reasons) {
+                this.showErrors(reasons);
+                return;
+            }
+
+            let showLoading = false;
+
+            const paymentType = this.getPaymentType(this.currentGateway);
+
+            if (paymentType === 'creditcard') {
+                showLoading = true;
+            }
+
+            // Show different loading animation text depending on the payment methods
+            switch (showLoading && this.proPaymentMethod) {
+                case 'bitcoin':
+                    pro.propay.showLoadingOverlay('loading');
+                    break;
+                case 'pro_prepaid':
+                case 'perfunctio':
+                    pro.propay.showLoadingOverlay('processing');
+                    break;
+                default:
+                    pro.propay.showLoadingOverlay('transferring');
+            }
+
+
+            const gatewayId = this.currentGateway.gatewayId;
+            pro.propay.paymentType = gatewayId;
+
+            if (gatewayId === 0) {
+                pro.propay.sendPurchaseToApi(gatewayId);
+            }
+            else if (gatewayId === 19) {
+                if (this.sca) {
+                    addressDialog.processUtcResult(this.sca.utcResult, this.sca.saleId);
+                }
+                const iframe = document.getElementById('stripe-widget');
+                if (iframe && iframe.contentWindow) {
+                    iframe.contentWindow.postMessage('submit', '*');
+                }
+            }
+            else if (gatewayId === 16) {
+                addressDialog.validateAndPay(pro.propay.initBillingInfo, false, true)
+            }
+            else if (gatewayId === astroPayDialog.gatewayId) {
+                astroPayDialog.submit();
+            }
+        });
+        this.setContinuebuttonText();
+    },
+
+    setContinuebuttonText() {
+        'use strict';
+        const recurringEnabled = this.currentGateway && this.currentGateway.supportsRecurring;
+        const gatewayId = this.currentGateway && this.currentGateway.gatewayId;
+        const $continueButton = $('.continue', this.$page)
+            .toggleClass('hidden', !!this.paymentButton || (gatewayId === this.BITCOIN_GATE_ID));
+
+        if (this.errors) {
+            this.showErrors();
+        }
+
+        if (this.paymentButton) {
+            return;
+        }
+
+        if (this.shouldShowTrial()) {
+            $continueButton.text(l.start_free_trial);
+        }
+        else if ((!gatewayId && (gatewayId !== 0)) || (gatewayId === 16)) {
+            $continueButton.text(l.continue_to_payment);
+        }
+        else if (gatewayId === 0) {
+            $continueButton.text(l['6190']);
+        }
+        else if (recurringEnabled) {
+            $continueButton.text(l.subscribe_btn);
+        }
+        else {
+            $continueButton.text(l.continue_to_payment);
+        }
+    },
+
+    fillBillingInfo(info) {
+        'use strict';
+        const $billingInfoTemplate = mega.templates
+            .getTemplate('billing-info-tmplt', false, pro.propay.pageInfo.$templates)
+            .removeClass('hidden template');
+
+        if (!info || !info.firstname || !info.lastname || !info.address1 || !info.city || !info.country) {
+            $billingInfoTemplate.addClass('empty');
+        }
+        else {
+            $('.name', $billingInfoTemplate).text(info.firstname + ' ' + info.lastname);
+            $('.address-1', $billingInfoTemplate).text(info.address1);
+            if (info.address2) {
+                $('.address-2', $billingInfoTemplate).text(info.address2);
+            }
+            else {
+                $('.address-2', $billingInfoTemplate).addClass('hidden');
+            }
+            $('.city', $billingInfoTemplate).text(info.city);
+            $('.country', $billingInfoTemplate).text(info.country + ', ' + info.postcode);
+        }
+        $('.billing-address .wrapper', this.$page).empty();
+        $('.billing-address .wrapper', this.$page).safeAppend($billingInfoTemplate.prop('outerHTML'));
+        $('.billing-address .wrapper .action', this.$page).rebind('click.propay', () => {
+            addressDialog.init();
+        });
+    },
+
+
+    async initBillingInfo(info) {
+        'use strict';
+
+        try {
+            info = info || await mega.attr.get(u_attr.u, 'billinginfo', false, true).catch(dump);
+        }
+        catch (ex) {
+            if (ex !== ENOENT) {
+                eventlog(500718, String(ex));
+                console.error(ex);
+            }
+        }
+
+        pro.propay.fillBillingInfo(info);
+    },
+
+    renderLocaleInfo() {
+        'use strict';
+
+        const isEuro = this.planObj.currency === 'EUR';
+
+        $('.euro', this.$page).toggleClass('hidden', isEuro);
+    },
+
+    clearPage() {
+        'use strict';
+        this.currentGateway = null;
+        this.currentGatewayName = null;
+        this.savedCardInitiated = false;
+        this.paymentButton = null;
+
+        this.showErrors(true);
+        $('.continue', this.$page).removeClass('hidden');
+
+        addressDialog.billingInfoFilled = false;
+    },
+
+    renderPropayPage() {
+        'use strict';
+
+        this.clearPage();
+        this.getPageElements();
+
+        addressDialog.init(false, false, false, true);
+
+        this.renderGateways();
+        this.renderDurations();
+        this.initBillingInfo();
+        this.renderPlanInfo();
+        this.initContinueButton();
+        this.renderLocaleInfo();
+        this.updatePageInfo();
+
+        return true;
+    },
+
+    async loadPaymentGatewayOptions() {
+        'use strict';
+        const enableAllPaymentGateways = (localStorage.enableAllPaymentGateways) ? 1 : 1;
+
+        const {result: gatewayOptions} = await api.req({a: 'ufpqfull', t: 0, d: enableAllPaymentGateways, v: 3});
+
+        // TODO: Check if still on propay page
 
         // If an API error (negative number) exit early
         if ((typeof gatewayOptions === 'number') && (gatewayOptions < 0)) {
@@ -869,53 +2422,25 @@ pro.propay = {
             return false;
         }
 
-        // If the user navigated away from the page during loading, do not attempt to render the gateways
-        if (!pro.propay.userOnPropayPage()) {
-            return false;
-        }
+        this.trialSupported = false;
 
-        pro.propay.planObjOfChosenLevel = pro.getPlanObj(pro.propay.planNum);
+        this.browser = String((ua.details || false).browser || '')
 
-        const checkGateway = (gate) => {
-            // If plan is flexi and the gateway doesn't support business(and flexi)
-            if (pro.propay.planNum === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
-                if (gate.supportsBusinessPlans !== 1) {
-                    return false;
-                }
+        let tempGatewayOptions = gatewayOptions.filter((gate) => {
+            const validGate = this.checkGateway(gate);
+            if (validGate) {
+                this.trialSupported |= validGate.supportsTrial;
+                const info = pro.getPaymentGatewayName(validGate.gatewayId, validGate);
+                validGate.displayName = info.displayName;
+                this.gatewaysByName[validGate.displayName] = validGate;
             }
-            // If plan is not flexi and the gateway doesn't support individual plans
-            else if (typeof gate.supportsIndividualPlans !== 'undefined' && !gate.supportsIndividualPlans) {
-                return false;
-            }
-
-            // Exclude voucher from list of VPN gateways (TODO: Request a flag from API instead of using gatewayId)
-            if (!gate.gatewayId && pro.filter.simple.validFeatures.has(pro.propay.planNum)) {
-                return false;
-            }
-
-            // If the gateway has a required price, and it is more than the plans max price
-            if (gate.minimumEURAmountSupported > pro.getPlanObj(pro.propay.planNum, 1).maxCorrPriceEuro) {
-                return false;
-            }
-
-            // Gateway supports the current plan
-            return gate;
-        };
-
-        const addGatewayToObject = (gate) => {
-            pro.propay.gatewaysByName[gate.gatewayName] = gate;
-        };
-
-        pro.propay.stripeSupported = false;
-
-        var tempGatewayOptions = gatewayOptions.filter((gate) => {
-            addGatewayToObject(gate);
-            const validGate = checkGateway(gate);
-            pro.propay.stripeSupported = pro.propay.stripeSupported || (validGate && validGate.supportsTrial);
             return validGate;
         });
 
-        // if this user has a discount, clear gateways that are not supported.
+        if (is_mobile) {
+            tempGatewayOptions = mobile.propay.filterPaymentProviderOptions(tempGatewayOptions);
+        }
+
         const discountInfo = pro.propay.getDiscount();
         const testGateway = localStorage.testGateway;
         if (discountInfo) {
@@ -923,29 +2448,17 @@ pro.propay = {
                 if (gate.supportsMultiDiscountCodes && gate.supportsMultiDiscountCodes === 1) {
                     return true;
                 }
-                return testGateway;
+                return testGateway ;
             });
         }
 
-        gatewayOptions = tempGatewayOptions;
+        // TODO: If discout, filter out gateways that don't support discount
 
-        // Filter out if they don't support expensive plans
-        if (parseInt(pro.propay.planNum) !== 4) {
-            gatewayOptions = gatewayOptions.filter((opt) => {
-                return opt.supportsExpensivePlans !== 0;
-            });
-        }
+        // TODO: filter out plans that dont support expensive plans
 
-        // Make a clone of the array so it can be modified
-        pro.propay.allGateways = JSON.parse(JSON.stringify(gatewayOptions));
+        // TODO: handle mobile
 
-        // If mobile, filter out all gateways except the supported ones
-        if (is_mobile) {
-            pro.propay.allGateways = mobile.propay.filterPaymentProviderOptions(pro.propay.allGateways);
-        }
-
-        // Check if the API has some issue and not returning any gateways at all
-        if (pro.propay.allGateways.length === 0) {
+        if (tempGatewayOptions.length === 0) {
             console.error('No valid gateways returned from the API');
             msgDialog('warningb', '', l.no_payment_providers, '', () => {
                 loadSubPage('pro');
@@ -953,1334 +2466,438 @@ pro.propay = {
             return false;
         }
 
-        // Separate into two groups, the first group has 6 providers, the second has the rest
-        var primaryGatewayOptions = gatewayOptions.splice(0, 9);
-        var secondaryGatewayOptions = gatewayOptions;
+        const primaryOptions = [];
+        const remainingOptions = [];
 
-        // Show payment duration (e.g. month or year) and renewal option radio options
-        pro.propay.renderPlanDurationOptions(discountInfo);
-        pro.propay.initPlanDurationClickHandler();
+        let astropayCount = 0;
 
-        // Hide/show Argentian warning message depending on ipcc
-        if (u_attr.ipcc === 'AR') {
-            $('.argentina-only', pro.propay.$page).removeClass('hidden');
-        }
-        else {
-            $('.argentina-only', pro.propay.$page).addClass('hidden');
-        }
-
-        // If mobile, show all supported options at once and they can scroll vertically
-        if (is_mobile) {
-            pro.propay.renderPaymentProviderOptions(pro.propay.allGateways, 'primary');
-        }
-        else {
-            // Otherwise if desktop, render the two groups and a Show More button will show the second group
-            pro.propay.renderPaymentProviderOptions(primaryGatewayOptions, 'primary');
-            pro.propay.renderPaymentProviderOptions(secondaryGatewayOptions, 'secondary');
+        const sortValues = {
+            'stripe': 1,
+            'ecp': 1.1,
+            'stripeAP': 2,
+            'stripeGP': 3,
+            'astropay': 4,
+            'voucher': 7,
+            'bitcoin': 8,
         }
 
-        // Change radio button states when clicked
-        pro.propay.initPaymentMethodRadioButtons();
-        pro.propay.preselectPreviousPaymentOption();
-        pro.propay.updateDurationOptionsOnProviderChange();
-        pro.propay.initShowMoreOptionsButton();
+        // TODO: Add VALUE for each gateway id
+        const primaryGatewayIds = new Set([0, 4, 11, 16, 19])
+        const primaryStripe = new Set(['stripe', 'stripeAP', 'stripeGP',])
 
-        // Update the pricing and whether is a regular payment or subscription
-        pro.propay.updateMainPrice(undefined, discountInfo);
-        pro.propay.updateTextDependingOnRecurring();
-
-        // Show the pricing box on the right (it is hidden while everything loads)
-        $pricingBox.removeClass('loading');
-    },
-
-    /**
-     * Renders the pro plan prices into the Plan Duration dropdown
-     * @param {Object}  discountInfo    Discount info object if any
-     */
-    renderPlanDurationOptions: function(discountInfo) {
-        'use strict';
-
-        // Sort plan durations by lowest number of months first
-        pro.propay.sortMembershipPlans();
-
-        // Cache the duration options list
-        const $durationList = $('.duration-options-list', this.$page);
-
-        // Clear the radio options, in case they revisted the page
-        $('.payment-duration', $durationList).not('.template').remove();
-
-        const planIsSingleDuration = pro.planInFilter(pro.propay.planNum, 'singleDurationPlans');
-
-        // Loop through the available plan durations for the current membership plan
-        for (var i = 0, length = pro.membershipPlans.length; i < length; i++) {
-
-            var currentPlan = pro.membershipPlans[i];
-
-            // If match on the membership plan, display that pricing option in the dropdown
-            if (currentPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL] === parseInt(pro.propay.planNum)) {
-
-                // If this is a new multi discount code, follow rendering logic for that
-                if (discountInfo && discountInfo.md && discountInfo.pd) {
-
-                    // Calculate if the plan renews yearly (will renew yearly if it is a clean multiple of 12 months)
-                    // e.g. 12, 24, 36. Mixed months e.g. 18 months, 32 months etc will renew monthly as per the API.
-                    const discountMonths = discountInfo.m;
-                    const willRenewYearly = discountMonths % 12 === 0;
-
-                    // If the plan will renew yearly, and the current plan's number of months is 12 (yearly), then
-                    // render the single option only. Or if the plan will renew monthly, and the current plan's number
-                    // of months is 1, then also render. We want the plan index number (i) to be corresponding to the
-                    // plan that will be used on renewal so correct renewal text is shown.
-                    if (willRenewYearly && currentPlan[pro.UTQA_RES_INDEX_MONTHS] === 12 ||
-                        !willRenewYearly && currentPlan[pro.UTQA_RES_INDEX_MONTHS] === 1) {
-                        pro.propay.renderNewMutiDiscountRadio(discountInfo, currentPlan, i);
-                        break;
+        for (let i = 0; i < tempGatewayOptions.length; i++) {
+            const gateway = tempGatewayOptions[i];
+            if (primaryGatewayIds.has(gateway.gatewayId)) {
+                if (gateway.gatewayId === 11) {
+                    if (astropayCount++ < 3) {
+                        primaryOptions.push(gateway);
                     }
-
-                    // Try find the correct plan in the next loop iteration
-                    continue;
-                }
-
-                // Get the price and number of months duration
-                var numOfMonths = currentPlan[pro.UTQA_RES_INDEX_MONTHS];
-                var price = currentPlan[pro.UTQA_RES_INDEX_PRICE];
-                var currency = 'EUR';
-                var discountedPriceY = '';
-                var discountedPriceM = '';
-                var discountSaveY = '';
-                var discountSaveM = '';
-
-                if (currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE]) {
-                    price = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE];
-                    currency = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY];
-                    if (discountInfo && discountInfo.pd) {
-                        const discountPerc = 1 - (discountInfo.pd / 100).toFixed(2);
-                        if (numOfMonths === 12) {
-                            discountedPriceY = (price * discountPerc).toFixed(2);
-                            discountSaveY = (price - discountedPriceY).toFixed(2);
-                        }
-                        else if (numOfMonths === 1) {
-                            discountedPriceM = (price * discountPerc).toFixed(2);
-                            discountSaveM = (price - discountedPriceM).toFixed(2);
-                        }
+                    else {
+                        remainingOptions.push(gateway);
                     }
                 }
-                else if (discountInfo && (discountInfo.emp || discountInfo.eyp)) {
-                    discountedPriceY = discountInfo.eyp || '';
-                    discountedPriceM = discountInfo.emp || '';
-                    discountSaveY = discountedPriceY ? (price - discountedPriceY).toFixed(2) : '';
-                    discountSaveM = discountedPriceM ? (price - discountedPriceM).toFixed(2) : '';
-                }
-
-                if (discountInfo && discountInfo.m !== 0 && discountInfo.m !== numOfMonths) {
-                    continue;
-                }
-
-                // Change wording depending on number of months
-                var monthsWording = l[922];     // 1 month
-                if (numOfMonths === 12) {
-                    monthsWording = l[923];     // 1 year
+                else if (gateway.gatewayId === 19) {
+                    if (primaryStripe.has(gateway.gatewayName)) {
+                        primaryOptions.push(gateway);
+                    }
+                    else {
+                        remainingOptions.push(gateway);
+                    }
                 }
                 else {
-                    monthsWording = mega.icu.format(l[922], numOfMonths);  // x months
+                    primaryOptions.push(gateway);
                 }
-
-                // Build select option
-                const $durationOption = $('.payment-duration.template', this.$page).first().clone();
-
-                // Update months and price
-                $durationOption.removeClass('template');
-                $durationOption.attr('data-plan-index', i);
-                $durationOption.attr('data-plan-months', numOfMonths);
-                $('.duration', $durationOption).text(monthsWording);
-                $('.price', $durationOption).text(formatCurrency(price, currency));
-
-                // Show amount they will save
-                if (numOfMonths === 12) {
-
-                    const discount = discountSaveY || pro.getPlanObj(currentPlan).yearlyDiscount;
-
-                    $('.save-money', $durationOption).removeClass('hidden');
-                    $('.save-money .amount', $durationOption).text(formatCurrency(discount, currency));
-                    if (discountedPriceY) {
-                        $('.oldPrice', $durationOption).text($('.price', $durationOption).text())
-                            .removeClass('hidden');
-                        $('.crossline', $durationOption).removeClass('hidden');
-                        $('.price', $durationOption).text(formatCurrency(discountedPriceY, currency));
-                        $('.membership-radio-label', $durationOption).addClass('discounted');
-                    }
-                }
-                else if (numOfMonths === 1 && discountedPriceM) {
-                    const savedAmount = formatCurrency(discountSaveM, currency);
-                    const $saveContainer = $('.save-money', $durationOption).removeClass('hidden');
-
-                    $('.amount', $saveContainer).text(savedAmount);
-                    $('.oldPrice', $durationOption).text($('.price', $durationOption).text())
-                        .removeClass('hidden');
-                    $('.crossline', $durationOption).removeClass('hidden');
-                    $('.price', $durationOption).text(formatCurrency(discountedPriceM, currency));
-                    $('.membership-radio-label', $durationOption).addClass('discounted');
-                }
-
-                // Update the list of duration options
-                $durationOption.appendTo('.duration-options-list');
+            }
+            else {
+                remainingOptions.push(gateway);
             }
         }
 
-        // Otherwise pre-select the chosen period (from previous page, or storage / transfer
-        // quota dialog if a mini plan is shown there)
-        // TODO: Handle different durations from different locations in a tidy way
-        let selectedPeriod;
-
-        if (sessionStorage.fromOverquotaPeriod) {
-            selectedPeriod = sessionStorage.fromOverquotaPeriod;
-            delete sessionStorage.fromOverquotaPeriod;
-        }
-        else {
-            selectedPeriod = (sessionStorage['pro.period'] | 0) || 12;
+        const getSortVal = (gateway) => {
+            return gateway.gatewayId === 11 ? 'astropay' : gateway.gatewayName;
         }
 
-        let $selectedOption = $(`.payment-duration[data-plan-months=${selectedPeriod}]`, $durationList);
-
-        // Otherwise pre-select yearly payment (or monthly if plan is Pro Flexi)
-        if (!$selectedOption.length) {
-            $selectedOption = $('.payment-duration:not(.template)', $durationList).last();
-        }
-
-        const eventId = parseInt(selectedPeriod) === 1 ? 500367 : 500368;
-        eventlog(eventId, pro.propay.planName);
-
-        $('input', $selectedOption).prop('checked', true);
-        $('.membership-radio', $selectedOption).addClass('checked');
-        $('.membership-radio-label', $selectedOption).addClass('checked');
-
-        $(`${is_mobile ? '.pro-payment-block' : '.payment-page.plan-info'} > .payment-period`, this.$page)
-            .toggleClass('hidden', planIsSingleDuration);
-    },
-
-    /**
-     * Renders the single option for the new discount scheme which can be redeemed by multiple users
-     * @param {Object} discountInfo The discount information cached from the 'dci' API request
-     * @param {Array} currentPlan The current plan data
-     * @param {Number} dataPlanIndex The array index of the plan in pro.membershipPlans
-     */
-    renderNewMutiDiscountRadio: function(discountInfo, currentPlan, dataPlanIndex) {
-
-        'use strict';
-
-        // Change wording depending on number of months
-        const numOfMonths = discountInfo.m;
-        const monthsWording = mega.icu.format(l[922], numOfMonths);
-
-        let currencyCode = 'EUR';
-        let discountedTotalPrice = discountInfo.edtp;   // Euro Discounted Total Price
-        let discountAmount = discountInfo.eda;          // Euro Discount Amount
-
-        // Get local amounts if applicable
-        if (currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE]) {
-            currencyCode = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY];
-            discountedTotalPrice = discountInfo.ldtp;   // Local Discounted Total Price
-            discountAmount = discountInfo.lda;          // Local Discount Amount
-        }
-
-        // Format for webclient styled currency
-        const formattedDiscountAmount = formatCurrency(discountAmount, currencyCode);
-        const formattedDiscountedTotalPrice = formatCurrency(discountedTotalPrice, currencyCode);
-
-        // Build select option
-        const $durationOption = $('.payment-duration.template', this.$page).first().clone();
-        const $saveContainer = $('.save-money', $durationOption).removeClass('hidden');
-
-        // Update months and price
-        $durationOption.removeClass('template');
-        $durationOption.attr('data-plan-index', dataPlanIndex);
-        $durationOption.attr('data-plan-months', numOfMonths);
-        $('.amount', $saveContainer).text(formattedDiscountAmount);
-        $('.duration', $durationOption).text(monthsWording);
-        $('.price', $durationOption).text(formattedDiscountedTotalPrice);
-
-        // Update the list of duration options
-        $durationOption.appendTo('.duration-options-list');
-    },
-
-    /**
-     * Sorts plan durations by lowest number of months first
-     */
-    sortMembershipPlans: function() {
-
-        pro.membershipPlans.sort(function (planA, planB) {
-
-            var numOfMonthsPlanA = planA[pro.UTQA_RES_INDEX_MONTHS];
-            var numOfMonthsPlanB = planB[pro.UTQA_RES_INDEX_MONTHS];
-
-            if (numOfMonthsPlanA < numOfMonthsPlanB) {
-                return -1;
+        primaryOptions.sort((a, b) => {
+            const sortValA = getSortVal(a);
+            const sortValB = getSortVal(b);
+            if (!sortValues[sortValA] || !sortValues[sortValB]) {
+                if (sortValues[sortValA]) {
+                    return -1;
+                }
+                else if (sortValues[sortValB]) {
+                    return 1;
+                }
+                return 0;
             }
-            if (numOfMonthsPlanA > numOfMonthsPlanB) {
-                return 1;
-            }
-
-            return 0;
+            return sortValues[getSortVal(a)] - sortValues[getSortVal(b)];
         });
+
+
+
+        this.paymentGateways.primary = primaryOptions;
+        this.paymentGateways.secondary = remainingOptions.splice(0, 5);
+        this.paymentGateways.tertiary = remainingOptions;
+
+        return this.paymentGateways;
     },
 
-    /**
-     * Add click handler for the radio buttons which are used for selecting the plan/subscription duration
-     */
-    initPlanDurationClickHandler: function() {
+    handleS4() {
+        'use strict';
 
-        var $durationOptions = $('.payment-duration', '.payment-section');
+        const $s4 = $('.s4-wrapper', this.$page);
 
-        // Add click handler
-        $durationOptions.rebind('click', function() {
+        this.s4Active = !!window.s4ac;
+        this.s4TosAccepted = false;
 
-            var $this = $(this);
-            if ($this.hasClass('disabled')) {
-                return;
-            }
-            var planIndex = $this.attr('data-plan-index');
-            const planMonths = $this.attr('data-plan-months');
+        const $button = $('button', $s4);
+        const $s4Checkbox = $('.s4-tos', this.$page).removeClass('hidden');
+        const $checkboxParts = $('.checkbox-item', $s4Checkbox);
 
-            const $input = $('input', $this);
+        $button.rebind('click', () => {
 
-            if (!$input.prop('checked')) {
-                const eventId = parseInt(planMonths) === 1 ? 500369 : 500370;
-                eventlog(eventId, pro.propay.planName);
-            }
+            this.s4Active = !this.s4Active;
 
-            // Remove checked state on the other buttons
-            $('.membership-radio', $durationOptions).removeClass('checked');
-            $('.membership-radio-label', $durationOptions).removeClass('checked');
-            $('input', $durationOptions).prop('checked', false);
+            $('.plan-card-s4', this.pageInfo.$planCard).toggleClass('hidden', !this.s4Active);
 
-            // Add checked state to just to the clicked one
-            $('.membership-radio', $this).addClass('checked');
-            $('.membership-radio-label', $this).addClass('checked');
-            $input.prop('checked', true);
-
-            // Update the main price and wording for one-time or recurring
-            pro.propay.updateMainPrice(planIndex);
-            pro.propay.updateTextDependingOnRecurring();
-
-            pro.propay.currentPlanArr = pro.membershipPlans[planIndex];
+            $button.toggleClass('active', this.s4Active);
+            $s4Checkbox.toggleClass('hidden', !this.s4Active);
         });
+
+        $s4Checkbox.rebind('click', () => {
+            this.s4TosAccepted = !this.s4TosAccepted;
+
+            $checkboxParts.removeClass('checkboxOn checkboxOff');
+            $checkboxParts.addClass(this.s4TosAccepted ? 'checkboxOn' : 'checkboxOff');
+
+            pro.propay.updatePayment();
+
+        })
     },
 
-    updateFeaturePlanDetails() {
-        'use strict';
-        let storageTxt = '';
-        let bandwidthTxt = '';
-        let extraTxt = '';
 
-        if ([pro.ACCOUNT_LEVEL_FEATURE_PWM, pro.ACCOUNT_LEVEL_FEATURE_VPN].includes(pro.propay.planNum)) {
-
-            const planStrings = pro.propay.selectedPlan[pro.UTQA_RES_INDEX_EXTRAS].featureStrings;
-            storageTxt = planStrings[0].text;
-            bandwidthTxt = planStrings[1].text;
-            extraTxt = planStrings[2].text;
-        }
-
-        pro.propay.$storageAmount.text(storageTxt);
-        pro.propay.$bandwidthAmount.text(bandwidthTxt);
-
-        if (extraTxt) {
-            pro.propay.$extraFeature.text(extraTxt).removeClass('hidden');
-        }
-
-        if (pro.propay.shouldShowTrial()) {
-            pro.propay.updateTrialPlanCard(pro.propay.selectedPlan);
-            return false;
-        }
-        return true;
-    },
-
-    updateFreeTrialPlanDetails() {
+    init() {
         'use strict';
 
-        const features = pro.featureInfo[pro.propay.planNum];
+        const userBusInfo = u_attr && u_attr.b;
+        const userIsBusMasterAcc = userBusInfo && u_attr.b.m;
+        const userFlexiInfo = u_attr && u_attr.pf;
+        const userExpOrGrace = pro.isExpiredOrInGracePeriod((userBusInfo || userFlexiInfo || Object.create(null)).s);
 
-        if (!features) {
-            console.assert(!d, 'Unknown free trial plan:', pro.propay.planNum);
-            return false;
+        if (userBusInfo) {
+            // If Business sub-user or account is not expired/grace period, don't allow access to propay
+            if (!userIsBusMasterAcc || !userExpOrGrace) {
+                loadSubPage('start');
+                return;
+            }
+            // If Business master account and expired/grace period, redirect to repay page
+            if (userIsBusMasterAcc && userExpOrGrace) {
+                loadSubPage('repay');
+                return;
+            }
         }
 
-        // Remove all direct children except the template
-        const $target = pro.propay.$freeTrialTemplate.parent();
-        $('> *:not(.template)', $target).remove();
-
-        for (const f of features) {
-            const $feature = pro.propay.$freeTrialTemplate.clone().removeClass('hidden template').text(f.text);
-            $target.safeAppend($feature.prop('outerHTML'));
-        }
-    },
-
-    // TODO: Make updateMainPrice(...) not run twice every load
-    /**
-     * Updates the main price
-     * @param {Number} planIndex    The array index of the plan in pro.membershipPlans
-     * @param {Object} discountInfo Discount info object if any
-     */
-    updateMainPrice: function(planIndex, discountInfo) {
-        'use strict';
-        // If not passed in (e.g. inital load), get it from the currently selected duration radio option
-        if (typeof planIndex === 'undefined') {
-            planIndex = $('.duration-options-list .membership-radio.checked', '.payment-section')
-                .parent().attr('data-plan-index');
+        if (userFlexiInfo) {
+            // If Pro Flexi account is not expired/grace period, don't allow access to propay
+            if (!userExpOrGrace) {
+                // Unless they have entered the S4 Object Storage RYI flow, in which case send them to that page.
+                if (window.s4ac) {
+                    loadSubPage('activate-s4');
+                    return;
+                }
+                loadSubPage('start');
+                return;
+            }
+            // If Pro Flexi account and expired/grace period, redirect to repay page
+            loadSubPage('repay');
+            return;
         }
 
-        // Change the wording to month or year
-        var currentPlan = pro.membershipPlans[planIndex];
-        var numOfMonths = currentPlan[pro.UTQA_RES_INDEX_MONTHS];
-        var monthOrYearWording = numOfMonths === 1 ? l[931] : l[932];
-        var bandwidthText = numOfMonths === 1 ? l[23808] : l[24065];
-
-        // Get the current plan price
-        var localCurrency = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY];
-        var euroPrice = formatCurrency(currentPlan[pro.UTQA_RES_INDEX_PRICE]);
-
-        // Get the current plan's storage, formatted as 'x GBs' or 'x TBs', up to 3 decimal places
-        const storageValue = bytesToSize(currentPlan[pro.UTQA_RES_INDEX_STORAGE] * pro.BYTES_PER_GB, 3, 4);
-
-        // Get the current plan's bandwidth, formatted as 'x GBs' or 'x TBs', up to 3 decimal places
-        const bandwidthValue = bytesToSize(currentPlan[pro.UTQA_RES_INDEX_TRANSFER] * pro.BYTES_PER_GB, 3, 4);
-
-        // Set selectors
-        pro.propay.$pricingBox = $('.pricing-page.plan', this.$page);
-        pro.propay.$planName = $('.plan-title', pro.propay.$pricingBox);
-        pro.propay.$priceNum = $('.plan-price .price', pro.propay.$pricingBox);
-        pro.propay.$pricePeriod = $('.plan-period', pro.propay.$pricingBox);
-        pro.propay.$storageAmount = $('.plan-feature.storage', pro.propay.$pricingBox);
-        pro.propay.$storageTip = $('i', pro.propay.$storageAmount);
-        pro.propay.$bandwidthAmount = $('.plan-feature.transfer', pro.propay.$pricingBox);
-        pro.propay.$bandwidthTip = $('i', pro.propay.$bandwidthAmount);
-        pro.propay.$euroPrice = $('.euro-price', pro.propay.$pricingBox);
-        pro.propay.$currncyAbbrev = $('.plan-currency', pro.propay.$pricingBox);
-        pro.propay.$pricePeriodFree = $('.free-trial-period', pro.propay.$pricingBox);
-        pro.propay.$freeTrialTemplate = $('.template.free-trial.plan-feature', pro.propay.$pricingBox);
-        pro.propay.$extraFeature = $('.plan-feature.extra', pro.propay.$pricingBox).addClass('hidden');
-
-        const {
-            $pricingBox, $planName, $priceNum, $pricePeriod, $storageAmount, $storageTip, $bandwidthAmount,
-            $bandwidthTip, $euroPrice, $currncyAbbrev
-        } = pro.propay;
-
-        var localPrice;
-
-        const initElementSwitcher = () => {
-            if (pro.propay.freeTrialCardController) {
+        // If a current Pro Flexi user (not expired/grace period), don't allow
+        // access to this Pro Pay page or they would end up purchasing a new plan
+        if (u_attr && u_attr.pf && !pro.isExpiredOrInGracePeriod(u_attr.pf.s)) {
+            // Unless they have entered the S4 Object Storage RYI flow, in which case send them to that landing page.
+            if (window.s4ac) {
+                loadSubPage('activate-s4');
                 return;
             }
 
-            let trial;
-            const $error = $('.error-box-not-stripe', pro.propay.$page);
-            const standaloneBits = pro.getStandaloneBits(currentPlan[pro.UTQA_RES_INDEX_EXTRAS].f);
-
-            let $mobileTrial;
-
-            if (is_mobile) {
-                $mobileTrial = mobile.propay.createMobilePaymentCard(
-                    $('.payment-options .mobile.pro-plan-card-container', this.$page),
-                    'pr-payment-card-mob',
-                    currentPlan);
-            }
-
-            if (!pro.propay.trial) {
-                return;
-            }
-
-            if (is_mobile) {
-                trial = {
-                    $element: $mobileTrial,
-                    initialised: true,
-                };
-            }
-            else {
-                const options = {
-                    id: 'propay-free-trial-card',
-                    days: pro.propay.trial.days,
-                    type: standaloneBits,
-                };
-
-                const price = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE] || currentPlan[pro.UTQA_RES_INDEX_PRICE];
-                const currency = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY] || 'EUR';
-
-                trial = {
-                    $element: pro.propay.createFreeTrialCard(
-                        formatCurrency(price, currency, 'narrowSymbol'),
-                        currency,
-                        options
-                    ),
-                    $target: $('.payment-page.info-block.plan-info .free-trial-card-container', pro.propay.$page)
-                        .removeClass('hidden'),
-                };
-            }
-
-            pro.propay.freeTrialCardController = mega.elementSwitcher({
-                trial,
-                'error': {
-                    $element: $error,
-                    initialised: true,
-                },
-                onElementChange: () => {
-                    pro.propay.updateMainPageDisplay();
-                    if (is_mobile) {
-                        mobile.propay.updateMobilePaymentCard(currentPlan, !pro.propay.shouldShowTrial());
-                    }
-                },
-
-            }, pro.propay.initialPaymentOptionIsStripe ? 'trial' : 'error', 'free-trial-payment-switcher');
-        };
-
-        if (pro.propay.trial || is_mobile) {
-            initElementSwitcher();
+            loadSubPage('start');
+            return;
         }
 
-        if (currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE]) {
-            this.$page.addClass('local-currency');
-            $currncyAbbrev.text(localCurrency);
-            $euroPrice.text(euroPrice);
-            localPrice = formatCurrency(currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE], localCurrency, 'narrowSymbol');
-            if (!is_mobile) {
-                $('.local-currency-tip', this.$page).removeClass('hidden');
-            }
-        }
-        else {
-            this.$page.removeClass('local-currency');
-            $('.local-currency-tip', this.$page).addClass('hidden');
+        // Ephemeral accounts (accounts not registered at all but have a few files in the cloud
+        // drive) are *not* allowed to reach the Pro Pay page as we can't track their payment (no email address).
+        // Accounts that have registered but have not confirmed their email address yet *are* allowed to reach the Pro
+        // Pay page e.g. if they registered on the Pro Plan selection page first (this gets more conversions).
+        if (u_type === 0 && typeof localStorage.awaitingConfirmationAccount === 'undefined') {
+            loadSubPage('pro');
+            return;
         }
 
-        // If mobile, name at the top
-        if (is_mobile) {
-            let planNameText;
-            const $proCardContainer = $('.mobile.pro-card-container', this.$page);
-            const $mobilePlanName = $('.plan-name', $proCardContainer);
-
-            if (pro.propay.shouldShowTrial()) {
-                planNameText = mega.icu
-                    .format(l.try_plan_free_for_days, currentPlan[pro.UTQA_RES_INDEX_EXTRAS].trial.days)
-                    .replace('%1', pro.propay.planName);
-            }
-            else {
-                planNameText = pro.propay.planName;
-            }
-
-            $mobilePlanName.text(planNameText);
+        if (!this.setPlanFromUrl()) {
+            loadSubPage('pro');
+            return;
         }
 
-        // Update the style of the dialog to be Pro I-III or Lite, also change the plan name
-        $pricingBox.addClass('pro' + pro.propay.planNum);
-        $pricingBox.attr('data-payment', pro.propay.planNum);
-        $planName.text(pro.propay.planName);
-
-        // Default to svg sprite icon format icon-crests-pro-x-details
-        let iconClass = 'no-icon';
-        let updatePrice = true;
-
-        if (pro.planInFilter(pro.propay.planNum, 'validFeatures')) {
-            pro.propay.planObj = pro.getPlanObj(currentPlan);
-            updatePrice = pro.propay.updateFeaturePlanDetails();
-            if (pro.propay.shouldShowTrial()) {
-                pro.propay.updateFreeTrialPlanDetails();
-            }
-
-            if (pro.propay.planNum === pro.ACCOUNT_LEVEL_FEATURE_VPN) {
-                iconClass = 'sprite-fm-uni icon-crest-vpn';
-            }
-        }
-        if (updatePrice) {
-            if (pro.propay.planNum === pro.ACCOUNT_LEVEL_PRO_LITE) {
-                iconClass = 'sprite-fm-uni icon-crests-lite-details';
-            }
-            else if (pro.filter.simple.hasIcon.has(pro.propay.planNum)) {
-                iconClass = `sprite-fm-uni icon-crests-pro-${pro.propay.planNum}-details`;
-            }
-            else if (pro.propay.planNum === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
-                iconClass = 'sprite-fm-uni icon-crests-pro-flexi-details';
-            }
-
-            // Add svg icon class (for desktop and mobile)
-            $('.plan-icon', this.$page).addClass(iconClass);
-
-            // Update the price of the plan and the /month or /year next to the price box
-            // work for local currency if present
-            if (localPrice) {
-                $priceNum.text(localPrice);
-            }
-            else {
-                $priceNum.text(euroPrice);
-            }
-            $pricePeriod.text('/' + monthOrYearWording);
-
-            // Update storage
-            if ($storageTip && $storageTip.attr('data-simpletip')) {
-                $('span span', $storageAmount).text(storageValue);
-                $storageTip.attr('data-simpletip', l[23807].replace('%1', '[U]' + storageValue + '[/U]'));
-            }
-
-            // Update bandwidth
-            if ($bandwidthTip && $bandwidthTip.data('simpletip')) {
-                $('span span', $bandwidthAmount).text(bandwidthValue);
-                $bandwidthTip.attr('data-simpletip', bandwidthText.replace('%1', '[U]' + bandwidthValue + '[/U]'));
-            }
-
-            discountInfo = discountInfo || pro.propay.getDiscount();
-        }
-
-        // Handle new multi-use discounts
-        if (discountInfo && discountInfo.md && discountInfo.pd && discountInfo.al === pro.propay.planNum) {
-            const $discountHeader = $('.payment-page.discount-header', this.$page);
-
-            $('.discount-header-text', $discountHeader)
-                .text(l[24670].replace('$1', formatPercentage(discountInfo.pd / 100)));
-            $discountHeader.removeClass('hidden');
-
-            let currency = 'EUR';
-            const euroDiscountedTotalPrice = formatCurrency(discountInfo.edtp); // Euro Discounted Total Price
-            let discountedTotalPrice = discountInfo.edtp;       // Euro Discounted Total Price
-            let normalTotalPrice = discountInfo.etp;            // Euro Total Price (undiscounted)
-
-            // Get local amounts if applicable
-            if (currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE]) {
-                currency = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY];
-                discountedTotalPrice = discountInfo.ldtp;   // Local Discounted Total Price
-                normalTotalPrice = discountInfo.ltp;        // Local Total Price (undiscounted)
-            }
-
-            // Format for webclient styled currency
-            const formattedDiscountedTotalPrice = formatCurrency(discountedTotalPrice, currency);
-            const formattedNormalTotalPrice = formatCurrency(normalTotalPrice, currency);
-
-            // Only show Euro price if there is a local price shown (no point showing Euro price in 2 places)
-            if (currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE]) {
-                $('.euro-price', $pricingBox).text(euroDiscountedTotalPrice);
-            }
-
-            $('.old-plan-price', $pricingBox).text(formattedNormalTotalPrice).removeClass('hidden');
-            $('.cross-line', $pricingBox).removeClass('hidden');
-            $('.plan-period', $pricingBox).addClass('hidden');
-            if (discountInfo.m !== 1 && discountInfo.m !== 12) {
-                $pricePeriod.text(`/${mega.icu.format(l.months_chat_history_plural, discountInfo.m)}`);
-                // All bandwidth will be available as the plan starts so update the values
-                const appliedBw = bytesToSize(
-                    (currentPlan[pro.UTQA_RES_INDEX_TRANSFER] / currentPlan[pro.UTQA_RES_INDEX_MONTHS]) *
-                    discountInfo.m * pro.BYTES_PER_GB,
-                    3,
-                    4
-                );
-                $('span span', $bandwidthAmount).text(appliedBw);
-                $bandwidthTip.attr(
-                    'data-simpletip',
-                    mega.icu.format(l.bw_applied_per_months, discountInfo.m).replace('%1', `[U]${appliedBw}[/U]`)
-                );
-            }
-            $priceNum.parent('.pricing-page.plan-price').addClass('discounted');
-            $priceNum.text(formattedDiscountedTotalPrice);
-        }
-
-        // Handle old style discounts
-        else if (discountInfo && discountInfo.al && discountInfo.pd && discountInfo.al === pro.propay.planNum) {
-            const $discountHeader = $('.payment-page.discount-header', this.$page);
-
-            $('.discount-header-text', $discountHeader)
-                .text(l[24670].replace('$1', formatPercentage(discountInfo.pd / 100)));
-            $discountHeader.removeClass('hidden');
-
-            const oldPriceText = $priceNum.text();
-            let newPriceText = oldPriceText;
-            const oldEuroText = $euroPrice.text();
-            let newEuroText = oldEuroText;
-            let localDiscountPrice = '';
-
-            if (currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE]) {
-                const discountPerc = 1 - (discountInfo.pd / 100).toFixed(2);
-                localDiscountPrice = (currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE] * discountPerc).toFixed(2);
-                localDiscountPrice = formatCurrency(localDiscountPrice, localCurrency);
-            }
-
-            if (numOfMonths === 1) {
-                const euroFormatted = discountInfo.emp ? formatCurrency(discountInfo.emp) : '';
-                newPriceText = localDiscountPrice || euroFormatted || oldPriceText;
-                newEuroText = euroFormatted || oldEuroText;
-            }
-            else {
-                const euroFormatted = discountInfo.eyp ? formatCurrency(discountInfo.eyp) : '';
-                newPriceText = localDiscountPrice || euroFormatted || oldPriceText;
-                newEuroText = euroFormatted || oldEuroText;
-            }
-
-            $('.old-plan-price', $pricingBox).text(oldPriceText).removeClass('hidden');
-            $('.cross-line', $pricingBox).removeClass('hidden');
-            $priceNum.text(newPriceText).parent('.pricing-page.plan-price').addClass('discounted');
-            $euroPrice.text(newEuroText);
-        }
-    },
-
-    initThirdSectionSwitcher() {
-        'use strict';
-
-        const elements = {
-            'regular': {
-                $element: $('.third-section.paid-only, .bottom-page .pro-plan', pro.propay.$page),
-                initialised: true,
-            },
-            'feature': {
-                $element: $('.third-section.feature-only', pro.propay.$page),
-                initialised: true,
-            },
-        };
-        pro.propay.thirdSectionController = mega.elementSwitcher(
-            elements,
-            pro.planInFilter(pro.propay.planNum, 'validFeatures') ? 'feature' : 'regular',
-            'payment-sect-three',
-            true);
-    },
-
-    updateMainPageDisplay() {
-        'use strict';
-
-        const isTrial = !!pro.propay.shouldShowTrial();
-        const isFeaturePlan = pro.planInFilter(pro.propay.planNum, 'validFeatures');
-
-        const $page = pro.propay.$page.toggleClass('free-trial', isTrial);
-
-        // Show the free trial elements, and hide the paid only elements
-        $('.free-trial:not(.template, .mobile.pro-card-container)', $page).toggleClass('hidden', !isTrial);
-        $('.paid-only', $page).toggleClass('hidden', isTrial);
-
-        // Show the VPN specific elements
-        if (!pro.propay.thirdSectionController) {
-            pro.propay.initThirdSectionSwitcher();
-        }
-        $('.feature-only', $page).toggleClass('hidden', !isFeaturePlan);
-        pro.propay.thirdSectionController.showElement(isFeaturePlan ? 'feature' : 'regular');
-
-
-        // Update header text with plan
-        if (isTrial && pro.propay.$selectedPlanTitleTrial) {
-            pro.propay.$selectedPlanTitleTrial.text(mega.icu.format(l.try_plan_free_for_days, pro.propay.trial.days)
-                .replace('%1', pro.propay.planName));
-        }
-        else if (isFeaturePlan) {
-            pro.propay.$selectedPlanTitle.text(pro.propay.planName);
-        }
-        else {
-            pro.propay.$selectedPlanTitle.text(l[6976].replace('%1', pro.propay.planName));
-        }
-
-        if (is_mobile) {
-            $('.mobile.pro-card-container', pro.propay.$page).toggleClass('free-trial', isTrial);
-        }
-    },
-
-    /**
-     * Updates the text on the page depending on the payment option they've selected and
-     * the duration/period so it is accurate for a recurring subscription or one off payment.
-     */
-    updateTextDependingOnRecurring: function() {
-
-        'use strict';
-
-        if (pro.propay.allGateways.length === 0) {
-            return false;
-        }
-
-        var $paymentAddressDialog = $('.payment-address-dialog', 'body');
-        var $numbers;
-
-        // Update whether this selected option is recurring or one-time
-        const $selectDurationOption = $('.duration-options-list .membership-radio.checked', this.$page);
-        const selectedGatewayName = $('.payment-options-list input:checked', this.$page).val();
-        const selectedProvider = pro.propay.gatewaysByName[selectedGatewayName] || false;
-
-        // Set text to subscribe or purchase
-        var planIndex = $selectDurationOption.parent().attr('data-plan-index');
-        var currentPlan = pro.membershipPlans[planIndex];
-        var numOfMonths = currentPlan[pro.UTQA_RES_INDEX_MONTHS];
-        var price = formatCurrency(currentPlan[pro.UTQA_RES_INDEX_PRICE]);
-        var localPrice = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE];
-
-        if (localPrice) {
-            price = formatCurrency(localPrice, currentPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY]) + '*';
-        }
-
-        // Set the value for whether the plan should renew automatically
-        // based on whether the provider supports doing so
-        const recurringEnabled = selectedProvider.supportsRecurring;
-
-        // Set text
-        var recurringOrNonRecurring = (recurringEnabled) ? '(' + l[6965] + ')' : l[6941];
-        var recurringMonthlyOrAnnuallyMessage = (numOfMonths === 1) ? l[10628] : l[10629];
-        var autoRenewMonthOrYearQuestion = (numOfMonths === 1) ? l[10638] : l[10639];
-        var chargeInfoDuration = l[10642].replace('%1', price);
-
-        // Find the pricing period in the pricing box and the plan duration options
-        const $sidePanelPeriod = $('.pricing-page.plan .period', this.$page);
-        const discountInfo = pro.propay.getDiscount();
-
-        // Otherwise if new multi-use discount code
-        if (discountInfo && discountInfo.md) {
-
-            // If it's a compulsory subscription after the discount offer ends, show text "You will be
-            // charged the normal plan price of 0.00 after the first month when the subscription renews.
-            if (discountInfo.cs || recurringEnabled) {
-                chargeInfoDuration = pro.propay.getDiscountRecurringWording(currentPlan, discountInfo);
-            }
-            else {
-                let discountedTotalPrice = formatCurrency(mega.discountInfo.edtp);    // Euro Discounted Total Price
-                const perMonthLocalPrice = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE];
-
-                // Get the local discounted per month price and discounted total price
-                if (perMonthLocalPrice) {
-                    const localCurrency = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY];
-
-                    // Get the Local Discounted Total Price and add * on the end (links to note about billed in Euros)
-                    discountedTotalPrice = mega.discountInfo.ldtp;
-                    discountedTotalPrice = formatCurrency(discountedTotalPrice, localCurrency, 'narrowSymbol', false);
-                    discountedTotalPrice += '*';
-                }
-
-                // Set text "You will be charged x.xx one time."
-                chargeInfoDuration = l[10642].replace('%1', discountedTotalPrice);
-            }
-        }
-
-        // Change the charge information below the recurring yes/no question
-        else if ((recurringEnabled) && (numOfMonths === 1)) {
-            chargeInfoDuration = l[10640].replace('%1', price);     // You will be charged 0.00 monthly.
-            if (discountInfo && (discountInfo.lmp || discountInfo.emp)) {
-
-                // You will be charged the normal plan price of 0.00 after the first month when the subscription renews.
-                chargeInfoDuration = l[24699].replace('%1', price);
-            }
-        }
-        else if ((recurringEnabled) && (numOfMonths === 12)) {
-            chargeInfoDuration = l[10641].replace('%1', price);     // You will be charged 0.00 annually.
-            if (discountInfo && (discountInfo.lyp || discountInfo.eyp)) {
-
-                // You will be charged the full plan price of 0.00 after the first year when the subscription renews.
-                chargeInfoDuration = l[24698].replace('%1', price);
-            }
-        }
-        else if (discountInfo && (discountInfo.lmp || discountInfo.emp) && !recurringEnabled && numOfMonths === 1) {
-
-            // You will be charged 0.00 one time.
-            chargeInfoDuration = l[10642]
-                .replace('%1', (discountInfo.lmp ? discountInfo.lmp + '*' : discountInfo.emp));
-        }
-        else if (discountInfo && (discountInfo.lyp || discountInfo.eyp) && !recurringEnabled && numOfMonths === 12) {
-
-            // You will be charged 0.00 one time.
-            chargeInfoDuration = l[10642]
-                .replace('%1', (discountInfo.lyp ? discountInfo.lyp + '*' : discountInfo.eyp));
-        }
-
-        // Set to monthly or annually in the pricing box on the right
-        if (recurringEnabled) {
-            if (numOfMonths === 1) {
-                $sidePanelPeriod.text('/' + l[918]);  // monthly
-            }
-            else {
-                $sidePanelPeriod.text('/' + l[919]);  // annually
-            }
-        }
-        else {
-            if (numOfMonths === 1) {
-                $sidePanelPeriod.text('/' + l[913]);  // month
-            }
-            else {
-                $sidePanelPeriod.text('/' + l[932]);  // year
-            }
-        }
-
-        const isFlexiPlan = currentPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL] === pro.ACCOUNT_LEVEL_PRO_FLEXI;
-
-        // Show the extra Question 3 recurring option section if the plan being bought
-        // is Pro Flexi (forced recurring)
-        $('.renewal-option', this.$page).toggleClass('hidden', !isFlexiPlan);
-
-        $numbers = $('.number:visible', this.$page);
-
-        // Reorder options numbering
-        for (var i = 0, length = $numbers.length; i < length; i++) {
-            $($numbers[i]).text(i + 1);
-        }
-
-        const $planTextStandard = $('.payment-plan-txt.js-plan-txt-normal', $paymentAddressDialog);
-        const $planTextRecurringDiscount = $('.payment-plan-txt.js-plan-txt-discount', $paymentAddressDialog);
-        const $noteDiscountRecurring = $('.payment-note-first.js-multi-discount-recurring', $paymentAddressDialog);
-        const $noteStandardRecurring = $('.payment-note-first.recurring', $paymentAddressDialog);
-        const $noteOneTime = $('.payment-note-first.one-time', $paymentAddressDialog);
-        const $subscriptionInstructions = $('.subscription-instructions', this.$page);
-
-        // By default, hide all address dialog notes
-        $planTextStandard.add($planTextRecurringDiscount).addClass('hidden');
-        $noteDiscountRecurring.add($noteStandardRecurring).add($noteOneTime).addClass('hidden');
-
-        // If there is a percent discount and if using the new multi-discount system
-        if (mega.discountInfo && mega.discountInfo.pd && mega.discountInfo.md) {
-
-            // If recurring subscription, update dialog text below the
-            // Pro plan name, show only the recurring discount text
-            if (recurringEnabled) {
-                recurringOrNonRecurring = l.promotion_recurring_subscription_monthly;
-
-                // If the number of months is cleanly divisible by 12 then it will renew yearly after the promo
-                if (discountInfo.m % 12 === 0) {
-                    recurringOrNonRecurring = l.promotion_recurring_subscription_yearly;
-                }
-
-                $noteDiscountRecurring.removeClass('hidden');
-            }
-            else {
-                // Otherwise update text below the Pro plan name and show only the standard one-off payment text
-                recurringOrNonRecurring = l.promotion_one_off_subscription_text;
-                $noteOneTime.removeClass('hidden');
-            }
-
-            // Show the discount recurring/non-recurring text block below the Pro plan name
-            $planTextRecurringDiscount.removeClass('hidden').text(recurringOrNonRecurring);
-        }
-        else if (!pro.propay.shouldShowTrial()) {
-            // If recurring subscription is chosen, show only the standard recurring text in the dialog
-            if (recurringEnabled) {
-                $noteStandardRecurring.removeClass('hidden');
-                $('.duration', $noteStandardRecurring).text(recurringMonthlyOrAnnuallyMessage);
-            }
-            else {
-                // Show only the standard one-off payment text
-                $noteOneTime.removeClass('hidden');
-            }
-
-            // Show the standard 1 month/year (recurring/non-recurring) text block below the Pro plan name
-            $planTextStandard.removeClass('hidden');
-            $('.recurring', $planTextStandard).text(recurringOrNonRecurring);
+        this.preloadAnimation();
+
+        let discountInfo = pro.propay.getDiscount();
+        if (discountInfo && discountInfo.used) {
+            delete mega.discountCode;
+            delete mega.discountInfo;
+            discountInfo = null;
         }
 
 
-        // If plan is monthly only trial, and recurring:
-        if (pro.propay.trial
-            && !pro.getPlan(pro.propay.planNum, 12)
-            && (numOfMonths === 1)
-            && recurringEnabled
-            && pro.propay.shouldShowTrial()) {
+        loadingDialog.show('propayReady');
+        this.loadingPage = true;
 
-            $subscriptionInstructions.removeClass('hidden')
-                .safeHTML(mega.icu.format(l.after_days_card_charged_m, pro.propay.trial.days) + ' ' + l['10630']);
-        }
-        // Elif recurring, always show recurring info box above the Pro pay page Purchase button and init click handler
-        else if (recurringEnabled && !is_mobile) {
-            $subscriptionInstructions.removeClass('hidden').safeHTML(l['10637'] + ' ' + l['10630']);
-        }
-        else {
-            // Otherwise hide it
-            $subscriptionInstructions.addClass('hidden');
+        // If the user is not logged in, show the login / register dialog
+        if (u_type === false) {
+            loadingDialog.hide('propayReady');
+            pro.propay.showAccountRequiredDialog();
+
+            // login / register action while on /propay_x will recall init()
+            return;
         }
 
-        // If discount with compulsory subscription or Pro Flexi, hide the No option so it'll be forced recurring
-        if ((discountInfo && discountInfo.cs) || isFlexiPlan) {
-            $('.renewal-options-list .renewal-option', this.$page).last().addClass('hidden');
+        if (pro.propay.pageChangeHandler) {
+            mBroadcaster.removeListener(pro.propay.pageChangeHandler);
+            delete pro.propay.pageChangeHandler;
         }
 
-        // Update depending on recurring or one off payment
-        $('.choose-renewal .duration-text', this.$page).text(autoRenewMonthOrYearQuestion);
-        $('.charge-information', this.$page).text(chargeInfoDuration);
-    },
+        pro.propay.pageChangeHandler = mBroadcaster.addListener('pagechange', () => {
+            'use strict';
 
-    /**
-     * Gets the recurring wording for the new multi-discount system, used in a few places
-     * @param {Array} currentPlan The array from the 'utqa' response with the details of the selected Pro plan
-     * @param {Object} discountInfo The discount information from the 'dci' response
-     * @returns {String} Returns the wording for when the plan renews and at what monthly/yearly rate
-     */
-    getDiscountRecurringWording: function(currentPlan, discountInfo) {
-
-        'use strict';
-
-        const numOfMonths = discountInfo.m;
-
-        // Default to monthly recurring subscription wording
-        let monthsOrYears = numOfMonths;
-        let discountRecurringText = l.promotion_recurring_info_text_monthly;
-
-        // If the number of months is cleanly divisible by 12 the subscription will recur yearly after the promo
-        if (numOfMonths % 12 === 0) {
-            monthsOrYears = numOfMonths / 12;
-            discountRecurringText = l.promotion_recurring_info_text_yearly;
-        }
-
-        // Default to Euros
-        let price = formatCurrency(currentPlan[pro.UTQA_RES_INDEX_PRICE]);
-
-        // Get the local price if available
-        if (currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE]) {
-            const localPrice = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE];
-            const localCurrency = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY];
-
-            // Get the Local Discounted Total Price and add * on the end (links to note about billed in Euros)
-            price = formatCurrency(localPrice, localCurrency, 'narrowSymbol', false);
-            price += '*';
-        }
-
-        // Set the date to current date e.g. 3 May 2022 (will be converted to local language wording/format)
-        const date = new Date();
-        date.setMonth(date.getMonth() + numOfMonths);
-
-        // Get the selected Pro plan name
-        const proPlanName = pro.getProPlanName(discountInfo.al);
-
-        // Update text for "When the #-month/year promotion ends on 26 April, 2024 you will start a
-        // recurring monthly/yearly subscription for Pro I of EUR9.99 and your card will be billed monthly/yearly."
-        discountRecurringText = mega.icu.format(discountRecurringText, monthsOrYears);
-        discountRecurringText = discountRecurringText.replace('%1', time2date(date.getTime() / 1000, 2));
-        discountRecurringText = discountRecurringText.replace('%2', proPlanName);
-        discountRecurringText = discountRecurringText.replace('%3', price);
-
-        return discountRecurringText;
-    },
-
-    /**
-     * Render the payment providers as radio buttons
-     * @param {Object} gatewayOptions The list of gateways from the API
-     * @param {String} primaryOrSecondary Which list to render the gateways into i.e. 'primary' or 'secondary'
-     */
-    renderPaymentProviderOptions: function(gatewayOptions, primaryOrSecondary) {
-
-        // Get their plan price from the currently selected duration radio button
-        var selectedPlanIndex = $('.duration-options-list .membership-radio.checked', 'body')
-            .parent().attr('data-plan-index');
-        pro.propay.selectedPlan = pro.membershipPlans[selectedPlanIndex];
-        var selectedPlanNum = pro.propay.selectedPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL];
-        var selectedPlanPrice = pro.propay.selectedPlan[pro.UTQA_RES_INDEX_PRICE];
-
-        // Convert to float for numeric comparisons
-        var planPriceFloat = parseFloat(selectedPlanPrice);
-        var balanceFloat = parseFloat(pro.propay.proBalance);
-        var gatewayHtml = '';
-
-        // Cache the template selector
-        var $template = $('.payment-options-list.primary .payment-method.template', 'body');
-
-        // Remove existing providers and so they are re-rendered
-        $('.payment-options-list.' + primaryOrSecondary
-          + ' .payment-method:not(.template)', 'body').remove();
-        $('.loading-placeholder-text', 'body').addClass('hidden');
-
-        const svgicons = {
-            visa: 'icon-visa-border',
-            mastercard: 'icon-mastercard',
-            'unionpay': 'icon-union-pay',
-            'american express': 'icon-amex',
-            jcb: 'icon-jcb',
-        };
-
-        // Loop through gateway providers (change to use list from API soon)
-        for (var i = 0, length = gatewayOptions.length; i < length; i++) {
-
-            var $gateway = $template.clone();
-            var gatewayOpt = gatewayOptions[i];
-            var gatewayId = gatewayOpt.gatewayId;
-
-            // Get the gateway name and display name
-            var gatewayInfo = pro.getPaymentGatewayName(gatewayId, gatewayOpt);
-            var gatewayName = gatewayInfo.name;
-            var displayName = gatewayInfo.displayName;
-
-            // If it couldn't find the name (e.g. new provider, use the name from the API)
-            if (gatewayInfo.name === 'unknown') {
-                continue;
+            if (!pro.propay.onPropayPage()) {
+                pro.propay.hideLoadingOverlay();
+                mBroadcaster.removeListener(pro.propay.pageChangeHandler);
+                delete pro.propay.pageChangeHandler;
             }
+        });
 
-            // Add hidden class if this payment method is not supported for this plan
-            if ((gatewayOpt.supportsExpensivePlans === 0) && pro.filter.simple.supportsExpensive.has(selectedPlanNum)) {
-                $gateway.addClass('hidden');
-                $gateway.attr('title', l[7162]);
-            }
+        this.loadPlansAndCheckStorage().then((canProceed) => {
 
-            // If the voucher/balance option
-            if ((gatewayId === 0) && (balanceFloat >= planPriceFloat)) {
-
-                // Show "Balance (x.xx)" if they have enough to purchase this plan
-                displayName = l[7108] + ' (' + balanceFloat.toFixed(2) + ' \u20ac)';
-            }
-
-            // Create a radio button with icon for each payment gateway
-            $gateway.removeClass('template').attr('eventid', pro.getPaymentEventId(gatewayName));
-            $('input', $gateway).attr('name', gatewayName);
-            $('input', $gateway).attr('id', gatewayName);
-            $('input', $gateway).val(gatewayName);
-
-            const iconkeys = Object.keys(svgicons);
-            let iconkey;
-
-            for (let i = iconkeys.length; i--;) {
-                if (displayName.toLowerCase().includes(iconkeys[i])) {
-                    iconkey = iconkeys[i];
-                    break;
-                }
-            }
-
-            if (iconkey) {
-                $('.provider-icon', $gateway).addClass('svgicon')
-                    .safeHTML(`<i class="sprite-fm-uni ${svgicons[iconkey]}"></i>`);
-            }
-            else {
-                $('.provider-icon', $gateway).addClass(gatewayName);
-            }
-            $('.provider-name', $gateway).text(displayName).prop('title', displayName);
-
-            // Build the html
-            gatewayHtml += $gateway.prop('outerHTML');
-        }
-
-        // Update the page
-        $(gatewayHtml).appendTo($('.payment-options-list.' + primaryOrSecondary));
-    },
-
-    /**
-     * Change payment method radio button states when clicked
-     */
-    initPaymentMethodRadioButtons: function() {
-
-        // Cache selector
-        var $paymentOptionsList = $('.payment-options-list', '.fmholder');
-
-        // Add click handler to all payment methods
-        $('.payment-method', $paymentOptionsList).rebind('click.changeState', function() {
-
-            var $this = $(this);
-
-            // Don't let the user select this option if it's disabled e.g. it is disabled because
-            // they must select a cheaper plan to work with this payment provider e.g. Fortumo
-            if ($this.hasClass('disabled')) {
+            if (!canProceed || !this.onPropayPage()) {
+                loadSubPage('pro');
                 return false;
             }
 
-            const $input = $('input', $this);
-
-            if (!$input.prop('checked')) {
-                eventlog($this.attr('eventid'), pro.propay.planName);
+            if (discountInfo) {
+                mega.discountInfo.used = true;
+                pro.propay.discountInfo = discountInfo;
             }
 
-            // Remove checked state from all radio inputs
-            $('.membership-radio', $paymentOptionsList).removeClass('checked');
-            $('.provider-details', $paymentOptionsList).removeClass('checked');
-            $('input', $paymentOptionsList).prop('checked', false);
-
-            // Add checked state for this radio button
-            $input.prop('checked', true);
-            $('.membership-radio', $this).addClass('checked');
-            $('.provider-details', $this).addClass('checked');
-
-            if (pro.propay.trial && pro.propay.freeTrialCardController) {
-                const selectedProvider = pro.propay.gatewaysByName[$input.val()];
-                pro.propay.freeTrialCardController.showElement(selectedProvider.supportsTrial
-                    ? 'trial'
-                    : 'error');
+            if (is_mobile) {
+                mobile.propay.init();
             }
 
-            pro.propay.updateTextDependingOnRecurring();
-            pro.propay.updateDurationOptionsOnProviderChange();
+            const isFlexi = this.planObj.level === pro.ACCOUNT_LEVEL_PRO_FLEXI;
+
+            this.$page = $('#propay')
+                .toggleClass('discount', !!discountInfo)
+                .toggleClass('euro', this.planObj.currency === 'EUR')
+                .toggleClass('flexi', isFlexi)
+                .toggleClass('mobile-device', !!is_mobile)
+                .toggleClass('s4', !!(window.s4ac && isFlexi));
+
+            this.trial = this.planObj.trial;
+
+            clickURLs()
+
+            Promise.all([this.loadPaymentGatewayOptions(), this.getSavedCard()]).then(() => {
+
+                if (!pro.propay.onPropayPage()) {
+                    return;
+                }
+
+                this.pageInfo.initialized = false;
+
+                this.initSwitchers();
+
+                this.renderPropayPage();
+
+                this.updateRightBlock = this.initScrollHandler();
+                this.updateRightBlock();
+
+                this.initResizeHandler();
+
+                if (window.s4ac && isFlexi) {
+                    this.handleS4();
+                }
+
+                // updateOnClicks();
+
+                loadingDialog.hide('propayReady');
+
+                const propayPageVisitEventId = pro.propay.getPropayPageEventId(pro.propay.planNum);
+                eventlog(propayPageVisitEventId);
+            });
+        }).catch((ex) => {
+            eventlog(500719, String(ex));
+            console.error(ex);
+        });
+
+    },
+
+    initResizeHandler() {
+        'use strict';
+
+        const breakpoint = 1080;
+
+        let previousWidth = $(window).width();
+        let newWidth;
+
+        $(window).rebind('resize.propay-page', () => {
+            if (page.slice(0, 7) !== 'propay_') {
+                $(window).off('resize.propay-page');
+                return;
+            }
+
+            this.updateRightBlock();
+
+            if (!this.paymentButton) {
+                return;
+            }
+
+            newWidth = $(window).width();
+            if ((previousWidth < breakpoint) && (newWidth >= breakpoint)
+            || (previousWidth >= breakpoint) && (newWidth < breakpoint)) {
+                previousWidth = newWidth;
+                this.updatePayment();
+            }
         });
     },
 
-    /**
-     * Preselect an option they previously paid with if applicable
-     */
-    preselectPreviousPaymentOption: function() {
+    initScrollHandler() {
+        'use strict';
 
-        // If they have paid before and their plan has expired, then re-select their last payment method
-        if (alarm.planExpired.lastPayment) {
+        const $fmHolder = $('.fmholder', 'body.bottom-pages');
 
-            // Get the last gateway they paid with
-            var lastPayment = alarm.planExpired.lastPayment;
-            var gatewayId = lastPayment.gw;
+        const topPadding = 140;
 
-            // Get the gateway name, if it's a subgateway, then it will have it's own name
-            var gatewayInfo = pro.getPaymentGatewayName(gatewayId);
-            var extraData = (typeof lastPayment.gwd !== 'undefined') ? lastPayment.gwd : null;
-            var gatewayName = (typeof lastPayment.gwd !== 'undefined') ? extraData.gwname : gatewayInfo.name;
+        const child = document.querySelector('.plan-card:not(#propay-page-plan-card-tmplt)');
 
-            // Find the gateway
-            var $gatewayInput = $('#' + gatewayName);
+        const updateRightBlock = () => {
 
-            // If it is still in the list (e.g. valid provider still)
-            if ($gatewayInput.length) {
+            if (!pro.propay.onPropayPage()) {
+                $fmHolder.off('scroll.propay-page');
+                return;
+            }
 
-                // Get the elements which need to be set
-                var $membershipRadio = $gatewayInput.parent();
-                var $providerDetails = $membershipRadio.next();
-                var $secondaryPaymentOptions = $('.payment-options-list.secondary', 'body');
-                var $showMoreButton = $('.provider-show-more', '.payment-section');
+            const parentHeight = $('#propay > div.right-block').outerHeight();
+            const childHeight = child.offsetHeight;
 
-                // Set to checked
-                $gatewayInput.prop('checked', true);
-                $membershipRadio.addClass('checked');
-                $providerDetails.addClass('checked');
+            const distanceScrolled = $fmHolder.scrollTop();
 
-                // If the gateway is in the secondary list, then show the secondary list and hide the button
-                if ($secondaryPaymentOptions.find('#' + gatewayName).prop('checked')) {
-                    $secondaryPaymentOptions.removeClass('hidden');
-                    $showMoreButton.hide();
-                }
+            if ((distanceScrolled + childHeight) < parentHeight - topPadding) {
+                child.classList.add('fixed');
+                child.classList.remove('relative');
             }
             else {
-                // Otherwise select the first available payment option because this provider is no longer available
-                pro.propay.preselectPaymentOption();
+                child.classList.remove('fixed');
+                child.classList.add('relative');
             }
-        }
-        else {
-            // Otherwise select the first available payment option
-            pro.propay.preselectPaymentOption();
-        }
+        };
 
-        const preSelectedProvider = $('.payment-options-list .membership-radio.checked input', '.fmholder').val();
-        pro.propay.initialPaymentOptionIsStripe = pro.propay.gatewaysByName[preSelectedProvider].supportsTrial;
+        $fmHolder.rebind('scroll.propay-page', updateRightBlock);
+
+        // updateRightBlock();
+
+        return updateRightBlock;
+
     },
 
-    /**
-     * Preselects the payment option in the list of payment providers. Pro balance should be selected first if
-     * they have a balance, otherwise the next payment provider should be selected (which is usually Visa)
-     */
-    preselectPaymentOption: function() {
+    getDiscount() {
+        'use strict';
+
+        if (mega.discountInfo) {
+            if (d && localStorage.discountDuration) {
+                mega.discountInfo.m = parseInt(localStorage.discountDuration);
+            }
+            if (d && localStorage.discount) {
+                mega.discountInfo = JSON.parse(localStorage.discount);
+            }
+        }
+        if (mega.discountInfo && mega.discountInfo.pd && mega.discountInfo.al === pro.propay.planNum) {
+            return mega.discountInfo;
+        }
+        return false;
+    },
+
+    redeemFreeTrial() {
 
         'use strict';
 
-        // Find the primary payment options
-        var $payOptions = $(
-            '.payment-options-list.primary .payment-method:not(.template)',
-            '.fmholder:not(.hidden)'
-        );
+        if (!(pro.propay.proPaymentMethod.toLowerCase().indexOf('stripe') === 0)) {
+            console.error('redeemFreeTrial: Invalid payment method:', pro.propay.proPaymentMethod);
+            return;
+        }
 
-        let $option = null;
+        pro.lastPaymentProviderId = addressDialog.gatewayId_stripe;
 
-        if (pro.propay.trial) {
-            let stripePaymentFound = false;
-            let counter = 0;
-            const numberOfOptions = $payOptions.length;
+        const rftRequest = {
+            a: 'rft',
+            it: pro.propay.selectedProPackage[pro.UTQA_RES_INDEX_ITEMNUM],
+            id: pro.propay.selectedProPackage[pro.UTQA_RES_INDEX_ID],
+            gw: addressDialog.gatewayId_stripe,
+            extra: addressDialog.extraDetails,
+        };
 
-            while (!stripePaymentFound && (counter++ < numberOfOptions)) {
-                const $payOption = $payOptions.eq(counter - 1);
-                const gatewayName = $('input', $payOption).val();
-                const gateway = pro.propay.gatewaysByName[gatewayName];
-
-                stripePaymentFound = !!gateway.supportsTrial;
-                if (stripePaymentFound) {
-                    $option = $payOption;
-                }
+        return api.screq(rftRequest).then(({result}) => {
+            if (this.currentGateway.gatewayId !== addressDialog.gatewayId_stripe) {
+                console.warn('Payment type changed during loading');
+                return
             }
-        }
-
-        // If they have a Pro balance, select the first option, otherwise select
-        // the next payment option (usually API will have it ordered to be Visa)
-        if (!$option) {
-            $option = parseFloat(pro.propay.proBalance) > 0
-                ? $payOptions.first()
-                : $payOptions.length > 1 ? $payOptions.eq(1) : $payOptions.eq(0);
-        }
-
-        // Check the radio button option
-        $('input', $option).prop('checked', true);
-        $('.membership-radio', $option).addClass('checked');
-        $('.provider-details', $option).addClass('checked');
+            pro.propay.trial.trialId = result.id;
+            addressDialog.processUtcResult({'EUR': result.url}, true, result.id);
+        }).catch((ex) => {
+            eventlog(500720, String(ex));
+            reportError(ex);
+            tell(ex < 0 ? api_strerror(ex) : ex);
+        });
     },
 
+
     /**
-     * Updates the duration/renewal period options if they select a payment method. For example
-     * for the wire transfer option we only want to accept one year one-off payments
+     * Gets the wording for the plan subscription duration in months or years.
+     * This is used by a number of the payment provider dialogs.
+     * @param {Number} numOfMonths The number of months
+     * @returns {String} Returns the number of months e.g. '1 month', '1 year'
      */
-    updateDurationOptionsOnProviderChange: function() {
+    getNumOfMonthsWording(numOfMonths) {
+        'use strict';
 
-        var $durationOptionsList = $('.duration-options-list', 'body');
-        var $durationOptions = $('.payment-duration:not(.template)', $durationOptionsList);
-        var selectedPlanIndex = $('.membership-radio.checked', $durationOptionsList).parent()
-                                    .attr('data-plan-index');
-        var selectedGatewayName = $('.payment-options-list input:checked', 'body').val();
-        var selectedProvider = pro.propay.allGateways.filter(function(val) {
-            return (val.gatewayName === selectedGatewayName);
-        })[0];
-
-        // Reset all options, they will be hidden or checked again if necessary below
-        $durationOptions.removeClass('hidden');
-        $('.membership-radio', $durationOptions).removeClass('checked');
-        $('.membership-radio-label', $durationOptions).removeClass('checked');
-        $('input', $durationOptions).prop('checked', false);
-
-        // Loop through renewal period options (1 month, 1 year)
-        $.each($durationOptions, function(key, durationOption) {
-
-            var $durOpt = $(durationOption);
-            // Get the plan's number of months
-            var planIndex = $durOpt.attr('data-plan-index');
-            var currentPlan = pro.membershipPlans[planIndex];
-            var numOfMonths = currentPlan[pro.UTQA_RES_INDEX_MONTHS];
-
-            $durOpt.removeClass('disabled');
-
-            // If the currently selected payment option e.g. Wire transfer
-            // doesn't support a 1 month payment hide the option
-            if (((!selectedProvider.supportsMonthlyPayment) && (numOfMonths === 1)) ||
-                ((!selectedProvider.supportsAnnualPayment) && (numOfMonths === 12))) {
-                $durOpt.addClass('hidden');
-            }
-            else {
-                // Show the option otherwise
-                $durOpt.removeClass('hidden');
-                if (selectedProvider.minimumEURAmountSupported &&
-                    selectedProvider.minimumEURAmountSupported > currentPlan[pro.UTQA_RES_INDEX_PRICE]) {
-                    $durOpt.addClass('disabled');
-                }
-            }
-        });
-
-        // Select the first remaining option or previously selected (if its not hidden)
-        var $newDurationOption;
-        var newPlanIndex;
-        $newDurationOption = $('[data-plan-index=' + selectedPlanIndex + ']', $durationOptionsList);
-        if ($newDurationOption.length && !$newDurationOption.hasClass('hidden') &&
-            !$newDurationOption.hasClass('disabled')) {
-            newPlanIndex = selectedPlanIndex;
+        let monthsWording;
+        // Change wording depending on number of months
+        if (numOfMonths === 12) {
+            monthsWording = l[923];     // 1 year
         }
         else {
-            $newDurationOption = $('.payment-duration:not(.template, .hidden, .disabled)', $durationOptionsList)
-                .first();
-            newPlanIndex = $newDurationOption.attr('data-plan-index');
+            monthsWording = mega.icu.format(l[922], numOfMonths); // 1 month
         }
-        $('.membership-radio', $newDurationOption).addClass('checked');
-        $('.membership-radio-label', $newDurationOption).addClass('checked');
-        $('input', $newDurationOption).prop('checked', true);
 
-        // Update the text for one-time or recurring
-        pro.propay.updateMainPrice(newPlanIndex);
-        pro.propay.updateTextDependingOnRecurring();
+        return monthsWording;
+    },
+
+    getPlan(returnArr) {
+        'use strict';
+        return returnArr ? this.planObj.planArray : this.planObj;
     },
 
     /**
-     * Initialise the button to show more payment options
+     * Hides the payment processing/transferring/loading overlay
      */
-    initShowMoreOptionsButton: function() {
-
-        // If there are more than 6 payment options, enable the button to show more
-        if (pro.propay.allGateways.length > 9) {
-
-            var $showMoreButton = $('.provider-show-more', '.payment-section');
-
-            // Show the button
-            $showMoreButton.removeClass('hidden');
-
-            // On clicking 'Click here to show more payment options'
-            $showMoreButton.rebind('click.shoMore', function() {
-
-                // Show the other payment options and then hide the button
-                $('.payment-options-list.secondary', 'body').removeClass('hidden');
-                $showMoreButton.hide();
-
-                // Trigger resize or you can't scroll to the bottom of the page anymore
-                $(window).trigger('resize');
-            });
+    hideLoadingOverlay() {
+        'use strict';
+        if (pro.propay.$backgroundOverlay && pro.propay.$loadingOverlay) {
+            pro.propay.$backgroundOverlay.addClass('hidden')
+                .removeClass('payment-dialog-overlay');
+            pro.propay.$loadingOverlay.addClass('hidden');
         }
     },
 
-    createFreeTrialCard(formattedPrice, curr, information) {
+    createFreeTrialSection(formattedPrice, curr, information) {
         'use strict';
         information = information || Object.create(null);
         if (!formattedPrice || !curr) {
@@ -2291,12 +2908,12 @@ pro.propay = {
             1: {    // VPN Feature (bits)
                 0: l.unlock_secure_browsing,
                 5: l.email_before_trial_end,
-                7: l.sub_start_d_can_cancel,
+                7: l.sub_start_day,
             },
             2: {    // PWM Feature (bits)
-                0: l.free_trial_today_desc,
+                0: l.fast_login_secure_passwords,
                 10: l.email_before_trial_end,
-                14: l.free_trial_end_desc,
+                14: l.sub_start_day,
             }
         };
 
@@ -2324,404 +2941,39 @@ pro.propay = {
 
         for (let i = 0; i < stringKeys.length; i++) {
             const $infoBlock = $('.step' + i, $template);
-            $('.content', $infoBlock).text(strings[stringKeys[i]]).removeClass('hidden');
-            $('.when', $infoBlock).text(i === 0
+            $(`.step${i}.content`, $template).text(strings[stringKeys[i]]).removeClass('hidden');
+            $(`.step${i}.when`, $template).text(i === 0
                 ? l[1301]
                 : mega.icu.format(l.on_day_n, stringKeys[i]));
         }
+        //     $('.content', $infoBlock).text(strings[stringKeys[i]]).removeClass('hidden');
+        //     $('.when', $infoBlock).text(i === 0
+        //         ? l[1301]
+        //         : mega.icu.format(l.on_day_n, stringKeys[i]));
+        // }
 
         $('.price', $template).text(priceText);
 
         return $template;
     },
 
-    updateTrialPlanCard(plan) {
-        'use strict';
-        const price = plan[pro.UTQA_RES_INDEX_LOCALPRICE] || plan[pro.UTQA_RES_INDEX_PRICE];
-        const currency = plan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY] || 'EUR';
-        const formattedPrice = formatCurrency(price, currency, 'narrowSymbol');
-        pro.propay.$planName.text(l.free_trial_caps);
-        pro.propay.$priceNum.text(formatCurrency(0, currency, 'narrowSymbol'));
-        pro.propay.$pricePeriodFree.safeHTML(
-            mega.icu.format(l.then_price_m_after_n_days, pro.propay.trial.days)
-                .replace('%1', formattedPrice)
-                .replace('%2', currency)
-        );
-        $('.asterisk', pro.propay.$pricePeriodFree).toggleClass('hidden', currency === 'EUR');
-    },
-
     /**
-     * Start the purchase process
+     * Preloads the large loading animation so it displays immediately when shown
      */
-    startPurchaseProcess: function() {
-
-        // Get the selected payment duration and gateway
-        const $selectedPaymentDuration = $('.duration-options-list .membership-radio.checked', this.$page);
-        const $selectedPaymentGateway = $('.payment-options-list input:checked', this.$page);
-
-        // Selected payment method and package
-        var selectedPaymentGatewayName = $selectedPaymentGateway.val();
-        var selectedProvider = pro.propay.allGateways.filter(function(val) {
-            return (val.gatewayName === selectedPaymentGatewayName);
-        })[0];
-
-        // Get array index of the Pro package in the list of plans from the API
-        var selectedProPackageIndex = $selectedPaymentDuration.parent().attr('data-plan-index');
-
-        // Set the pro package (used in pro.propay.sendPurchaseToApi function)
-        pro.propay.selectedProPackage = pro.membershipPlans[selectedProPackageIndex];
-
-        // log button clicking
-        delay('subscribe.plan', eventlog.bind(null, 99788));
-
-        if (u_type === false) {
-
-            u_storage = init_storage(localStorage);
-            loadingDialog.show();
-
-            u_checklogin({ checkloginresult: function() {
-                pro.propay.sendPurchaseToApi();
-
-            }}, true);
-        }
-        else {
-            // Store the gateway name for later
-            pro.propay.proPaymentMethod = selectedPaymentGatewayName;
-            console.assert(pro.propay.proPaymentMethod, 'check this...invalid gateway');
-
-            // For credit card we show the dialog first, then do the uts/utc calls
-            if (pro.propay.proPaymentMethod === 'perfunctio') {
-                cardDialog.init();
-            }
-            else if (String(pro.propay.proPaymentMethod).indexOf('ecp') === 0
-                || String(pro.propay.proPaymentMethod).toLowerCase().indexOf('stripe') === 0) {
-
-                if (pro.propay.userSubsGatewayId === 2 || pro.propay.userSubsGatewayId === 3) {
-                    // Detect the user has subscribed to a Pro plan with Google Play or Apple store
-                    // pop up the warning dialog but let the user proceed with an upgrade
-                    msgDialog('warninga', '', l.warning_has_subs_with_3p, '', () => {
-                        addressDialog.init();
-                    });
-                }
-                else {
-                    addressDialog.init();
-                }
-            }
-            else if (pro.propay.proPaymentMethod === 'voucher') {
-                voucherDialog.init();
-            }
-            else if (pro.propay.proPaymentMethod === 'wiretransfer') {
-                wireTransferDialog.init();
-            }
-            else if (selectedProvider.gatewayId === astroPayDialog.gatewayId) {
-                astroPayDialog.init(selectedProvider);
-            }
-            else {
-                // For other methods we do a uts and utc call to get the provider details first
-                pro.propay.sendPurchaseToApi();
-            }
-        }
-    },
-
-    /**
-     * Continues the Pro purchase and initiates the
-     */
-    sendPurchaseToApi: function() {
-
-        // Show different loading animation text depending on the payment methods
-        switch (pro.propay.proPaymentMethod) {
-            case 'bitcoin':
-                pro.propay.showLoadingOverlay('loading');
-                break;
-            case 'pro_prepaid':
-            case 'perfunctio':
-                pro.propay.showLoadingOverlay('processing');
-                break;
-            default:
-                pro.propay.showLoadingOverlay('transferring');
-        }
-
-        // Data for API request
-        var apiId = pro.propay.selectedProPackage[pro.UTQA_RES_INDEX_ID];
-        var price = pro.propay.selectedProPackage[pro.UTQA_RES_INDEX_PRICE];
-        var currency = pro.propay.selectedProPackage[pro.UTQA_RES_INDEX_CURRENCY];
-        const itemNum = pro.propay.selectedProPackage[pro.UTQA_RES_INDEX_ITEMNUM];
-
-        // Convert from boolean to integer for API
-        var fromBandwidthDialog = ((Date.now() - parseInt(localStorage.seenOverQuotaDialog)) < 2 * 3600000) ? 1 : 0;
-        var fromPreWarnBandwidthDialog = ((Date.now() - parseInt(localStorage.seenQuotaPreWarn)) < 2 * 36e5) ? 1 : 0;
-
-        // uts = User Transaction Sale
-        var utsRequest = {
-            a:  'uts',
-            it:  itemNum,
-            si:  apiId,
-            p:   price,
-            c:   currency,
-            aff: mega.affid,
-            m:   m,
-            bq:  fromBandwidthDialog,
-            pbq: fromPreWarnBandwidthDialog
-        };
-
-        if (mega.uaoref) {
-            utsRequest.uao = escapeHTML(mega.uaoref);
-        }
-
-        // If the plan was chosen immediately after registration, add an 'fr' (from registration) log to the request
-        if (pro.propay.planChosenAfterRegistration) {
-            utsRequest.fr = 1;
-        }
-        if (localStorage.keycomplete) {
-            delete localStorage.keycomplete;
-        }
-
-        // Add the discount information to the User Transaction Sale request
-        if (mega.discountInfo && mega.discountInfo.dc) {
-            utsRequest.dc = mega.discountInfo.dc;
-        }
-
-        // Add S4 parameters
-        const s4Flexi = window.s4ac && pro.propay.planNum === pro.ACCOUNT_LEVEL_PRO_FLEXI;
-
-        if (s4Flexi) {
-            utsRequest.s4 = 1;
-        }
-
-        const setValues = (extra, saleId) => {
-
-            if (pro.propay.proPaymentMethod === 'voucher' || pro.propay.proPaymentMethod === 'pro_prepaid') {
-                pro.lastPaymentProviderId = 0;
-            }
-            else if (pro.propay.proPaymentMethod === 'bitcoin') {
-                pro.lastPaymentProviderId = 4;
-            }
-            else if (pro.propay.proPaymentMethod === 'perfunctio') {
-                pro.lastPaymentProviderId = 8;
-            }
-            else if (pro.propay.proPaymentMethod === 'dynamicpay') {
-                pro.lastPaymentProviderId = 5;
-            }
-            else if (pro.propay.proPaymentMethod === 'fortumo') {
-                // pro.lastPaymentProviderId = 6;
-                // Fortumo does not do a utc request, we immediately redirect
-                fortumo.redirectToSite(saleId);
-                return false;
-            }
-            else if (pro.propay.proPaymentMethod === 'infobip') {
-                // pro.lastPaymentProviderId = 9;
-                // Centili does not do a utc request, we immediately redirect
-                centili.redirectToSite(saleId);
-                return false;
-            }
-            else if (pro.propay.proPaymentMethod === 'paysafecard') {
-                pro.lastPaymentProviderId = 10;
-            }
-            else if (pro.propay.proPaymentMethod === 'tpay') {
-                pro.lastPaymentProviderId = tpay.gatewayId; // 14
-            }
-            else if (pro.propay.proPaymentMethod.indexOf('directreseller') === 0) {
-                pro.lastPaymentProviderId = directReseller.gatewayId; // 15
-            }
-
-            // If AstroPay, send extra details
-            else if (pro.propay.proPaymentMethod.indexOf('astropay') > -1) {
-                pro.lastPaymentProviderId = astroPayDialog.gatewayId;
-                extra.bank = astroPayDialog.selectedProvider.extra.code;
-                extra.name = astroPayDialog.fullName;
-                extra.address = astroPayDialog.address;
-                extra.city = astroPayDialog.city;
-                extra.cpf = astroPayDialog.taxNumber;
-            }
-
-            // If Ecomprocessing, send extra details
-            else if (pro.propay.proPaymentMethod.indexOf('ecp') === 0) {
-                pro.lastPaymentProviderId = addressDialog.gatewayId;
-                Object.assign(extra, addressDialog.extraDetails);
-            }
-            else if (pro.propay.proPaymentMethod.indexOf('sabadell') === 0) {
-                pro.lastPaymentProviderId = sabadell.gatewayId; // 17
-
-                // If the provider supports recurring payments set extra.recurring as true
-                extra.recurring = true;
-            }
-            else if (pro.propay.proPaymentMethod.toLowerCase().indexOf('stripe') === 0) {
-                Object.assign(extra, addressDialog.extraDetails);
-                pro.lastPaymentProviderId = addressDialog.gatewayId_stripe;
-            }
-
-            return true;
-        };
-
-        // Setup the 'uts' API request
-        api.screq(utsRequest)
-            .then(({result: saleId}) => {
-
-                // Extra gateway specific details for UTC call
-                var extra = {};
-
-                if (!setValues(extra, saleId)) {
-                    return false;
-                }
-
-                // If saleId is already an array of sale IDs use that, otherwise add to an array
-                const saleIdArray = Array.isArray(saleId) ? saleId : [saleId];
-
-                // Complete the transaction
-                let utcReqObj = {
-                    a: 'utc',                       // User Transaction Complete
-                    s: saleIdArray,                 // Array of Sale IDs
-                    m: pro.lastPaymentProviderId,   // Gateway number
-                    bq: fromBandwidthDialog,        // Log for bandwidth quota triggered
-                    extra: extra                    // Extra information for the specific gateway
-                };
-                const discountInfo = pro.propay.getDiscount();
-                if (discountInfo && discountInfo.dc) {
-                    utcReqObj.dc = discountInfo.dc;
-                }
-
-                return api.screq(utcReqObj).then(({result}) => this.processUtcResults(result, saleId));
-            })
-            .catch((ex) => {
-                // Default error is "Something went wrong. Try again later..."
-                let errorMessage;
-
-                // Get S4 error messages
-                if (s4Flexi && (errorMessage = ActivateS4.instance.getErrorMsg(ex))) {
-                    delete window.s4ac;
-                }
-                // Handle specific discount errors
-                else if (ex === EEXPIRED) {
-                    // The discount code has expired.
-                    errorMessage = l[24675];
-                }
-                else if (ex === EEXIST) {
-                    // This discount code has already been redeemed.
-                    errorMessage = l[24678];
-                }
-                else if (ex === EOVERQUOTA && pro.lastPaymentProviderId === voucherDialog.gatewayId) {
-
-                    // Insufficient balance, try again...
-                    errorMessage = l[514];
-                }
-                else {
-                    errorMessage = ex < 0 ? api_strerror(ex) : ex;
-                }
-
-                // Hide the loading overlay and show an error
-                pro.propay.hideLoadingOverlay();
-
-                tell(errorMessage);
-            });
-    },
-
-    redeemFreeTrial() {
-
+    preloadAnimation() {
         'use strict';
 
-        pro.propay.showLoadingOverlay();
+        pro.propay.$backgroundOverlay = $('.fm-dialog-overlay', 'body');
+        pro.propay.$loadingOverlay = is_mobile
+            ? $('.payment-processing-mobile', 'body')
+            : $('.payment-processing', 'body');
 
-        if (!(pro.propay.proPaymentMethod.toLowerCase().indexOf('stripe') === 0)) {
-            console.error('redeemFreeTrial: Invalid payment method:', pro.propay.proPaymentMethod);
-            return;
-        }
+        // Check if using retina display
+        var retina = (window.devicePixelRatio > 1) ? '@2x' : '';
 
-        pro.lastPaymentProviderId = addressDialog.gatewayId_stripe;
-
-        const rftRequest = {
-            a: 'rft',
-            it: pro.propay.selectedProPackage[pro.UTQA_RES_INDEX_ITEMNUM],
-            id: pro.propay.selectedProPackage[pro.UTQA_RES_INDEX_ID],
-            gw: addressDialog.gatewayId_stripe,
-            extra: addressDialog.extraDetails,
-        };
-
-        return api.screq(rftRequest).then(({result}) => {
-            pro.propay.trial.trialId = result.id;
-            addressDialog.processUtcResult({'EUR': result.url}, true, result.id);
-        }).catch((ex) => {
-            reportError(ex);
-            pro.propay.hideLoadingOverlay();
-            tell(ex < 0 ? api_strerror(ex) : ex);
-        });
-    },
-
-    /**
-     * Process results from the API User Transaction Complete call
-     * @param {Object|Number} utcResult The results from the UTC call or a negative number on failure
-     * @param {String}        saleId    The saleIds of the purchase.
-     */
-    async processUtcResults(utcResult, saleId) {
-        'use strict';
-
-        const welDlgAttr =
-            parseInt(await Promise.resolve(mega.attr.get(u_handle, 'welDlg', -2, true)).catch(nop)) | 0;
-
-        // If the user has purchased a subscription and they haven't seen the welcome dialog before (
-        // u_attr[^!welDlg] = 0), set welDlg to 1 which will show it when the psts notification arrives.
-        // If the payment fails the welcome dialog will check if the user has a pro plan, and as such should still
-        // work as expected.
-        if (!welDlgAttr) {
-            mega.attr.set('welDlg', 1, -2, true);
-        }
-
-        // Handle results for different payment providers
-        switch (pro.lastPaymentProviderId) {
-
-            // If using prepaid balance
-            case voucherDialog.gatewayId:
-                voucherDialog.showSuccessfulPayment();
-                break;
-
-            // If Bitcoin provider then show the Bitcoin invoice dialog
-            case bitcoinDialog.gatewayId:
-                bitcoinDialog.processUtcResult(utcResult);
-                break;
-
-            // If Dynamic/Union Pay provider then redirect to their site
-            case unionPay.gatewayId:
-                unionPay.redirectToSite(utcResult);
-                break;
-
-            // If credit card provider
-            case cardDialog.gatewayId:
-                cardDialog.processUtcResult(utcResult);
-                break;
-
-            // If paysafecard provider then redirect to their site
-            case paysafecard.gatewayId:
-                paysafecard.redirectToSite(utcResult);
-                break;
-
-            // If AstroPay result, redirect
-            case astroPayDialog.gatewayId:
-                astroPayDialog.processUtcResult(utcResult);
-                break;
-
-            // If Ecomprocessing result, redirect
-            case addressDialog.gatewayId:
-                addressDialog.processUtcResult(utcResult);
-                break;
-
-            // If tpay, redirect over there
-            case tpay.gatewayId:
-                tpay.redirectToSite(utcResult);
-                break;
-
-            // If 6media, redirect to the site
-            case directReseller.gatewayId:
-                directReseller.redirectToSite(utcResult);
-                break;
-
-            // If sabadell, redirect to the site
-            case sabadell.gatewayId:
-                sabadell.redirectToSite(utcResult);
-                break;
-
-            case addressDialog.gatewayId_stripe:
-                addressDialog.processUtcResult(utcResult, true, saleId);
-                break;
-        }
+        // Preload loading animation
+        pro.propay.$loadingOverlay.find('.payment-animation')
+            .attr('src',staticpath + '/images/mega/payment-animation' + retina + '.gif');
     },
 
     /**
@@ -2759,148 +3011,29 @@ pro.propay = {
     },
 
     /**
-     * Hides the payment processing/transferring/loading overlay
+     * @returns {Object} Purchasable feature plans. Each feature plan should include
+     * an array of features to show on the features table when the user goes
+     * to cancel their subscription
      */
-    hideLoadingOverlay: function() {
-        if (pro.propay.$backgroundOverlay && pro.propay.$loadingOverlay) {
-            pro.propay.$backgroundOverlay.addClass('hidden')
-                .removeClass('payment-dialog-overlay');
-            pro.propay.$loadingOverlay.addClass('hidden');
-        }
-    },
-
-    /**
-     * Gets the wording for the plan subscription duration in months or years.
-     * This is used by a number of the payment provider dialogs.
-     * @param {Number} numOfMonths The number of months
-     * @returns {String} Returns the number of months e.g. '1 month', '1 year'
-     */
-    getNumOfMonthsWording: function(numOfMonths) {
-
-        let monthsWording;
-        // Change wording depending on number of months
-        if (numOfMonths === 12) {
-            monthsWording = l[923];     // 1 year
-        }
-        else {
-            monthsWording = mega.icu.format(l[922], numOfMonths); // 1 month
-        }
-
-        return monthsWording;
-    },
-
-    /** This function to show the discount offer dialog if applies */
-    showDiscountOffer: function() {
+    purchasableFeaturePlans() {
         'use strict';
-        if (window.offerPopupTimer) {
-            clearTimeout(window.offerPopupTimer);
-        }
-        if (is_mobile || typeof page !== 'string' || page.includes('propay')) {
-            return;
-        }
-
-        if (u_attr && u_attr.mkt && Array.isArray(u_attr.mkt.dc) && u_attr.mkt.dc.length) {
-            // if we have multiple offers, we have no preferences we will take the first one.
-            const offer = u_attr.mkt.dc[0];
-
-            // check if we previewed a popup in the past 20 hours
-            let discountOffers = u_attr['^!discountoffers'] ? JSON.parse(u_attr['^!discountoffers']) : null;
-            if (discountOffers && discountOffers[offer.dc]) {
-                const timeDif = new Date().getTime() - discountOffers[offer.dc];
-                if (timeDif < 72e6) {
-                    if (timeDif > 0) {
-                        window.offerPopupTimer = setTimeout(pro.propay.showDiscountOffer, 72e6 - timeDif + 10);
-                    }
-                    return;
-                }
-            }
-            discountOffers = discountOffers || Object.create(null);
-
-            if (offer.al && offer.pd && typeof offer.m !== 'undefined') {
-                const $discountDlg = $('.mega-dialog.pro-discount', 'body');
-                let title = l[24703];
-                if (offer.m === 1) {
-                    title = l[24702];
-                }
-                else if (offer.m === 12) {
-                    title = l[24701];
-                }
-                title = title.replace('%1', offer.pd + '%').replace('%2', pro.getProPlanName(offer.al));
-                $('.discount-title', $discountDlg).text(title);
-                pro.loadMembershipPlans(() => {
-                    const matchedPlan = pro.membershipPlans.find(plan => {
-                        return plan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL] === offer.al
-                            && plan[pro.UTQA_RES_INDEX_MONTHS] === (offer.m || 12);
-                    });
-                    if (matchedPlan) {
-                        const storageFormatted = numOfBytes(matchedPlan[pro.UTQA_RES_INDEX_STORAGE] * 1073741824, 0);
-                        const desc = l[24704]
-                            .replace('%1', Math.round(storageFormatted.size) + ' ' + storageFormatted.unit);
-                        $('.discount-desc', $discountDlg).text(desc);
-
-                        let discountPopupPref = new Date().getTime();
-                        let reTrigger = true;
-
-                        const storeViewTime = () => {
-                            discountOffers[offer.dc] = discountPopupPref;
-                            mega.attr.set('discountoffers', JSON.stringify(discountOffers), -2, true);
-                        };
-
-                        // binding events
-                        $('button.js-close, .close-btn', $discountDlg).rebind('click.discount', (ev) => {
-                            storeViewTime();
-                            window.closeDialog();
-                            if (reTrigger) {
-                                window.offerPopupTimer = setTimeout(pro.propay.showDiscountOffer, 72e6);
-                            }
-                            mBroadcaster.sendMessage(
-                                'trk:event',
-                                'discountPopup',
-                                'closed',
-                                'btnUsed',
-                                ev.currentTarget.className.indexOf('close-btn') > -1 ? 1 : 0);
-                            mBroadcaster.sendMessage(
-                                'trk:event',
-                                'discountPopup',
-                                'closed',
-                                'notShowAgain',
-                                reTrigger ? 0 : 1);
-                        });
-
-                        $('.get-btn', $discountDlg).rebind('click.discount', () => {
-                            storeViewTime();
-                            $discountDlg.addClass('hidden');
-                            if (reTrigger) {
-                                window.offerPopupTimer = setTimeout(pro.propay.showDiscountOffer, 72e6);
-                            }
-                            loadSubPage('discount' + offer.dc);
-                            mBroadcaster.sendMessage(
-                                'trk:event',
-                                'discountPopup',
-                                'requested',
-                                'notShowAgain',
-                                reTrigger ? 0 : 1);
-                        });
-
-                        $('.fm-picker-notagain.checkbox-block', $discountDlg).rebind('click.discount', () => {
-                            const $check = $('.fm-picker-notagain.checkbox-block .checkdiv', $discountDlg);
-                            if ($check.hasClass('checkboxOff')) {
-                                $check.removeClass('checkboxOff').addClass('checkboxOn');
-                                discountPopupPref = new Date(9999, 11, 30).getTime();
-                                reTrigger = false;
-                            }
-                            else {
-                                $check.addClass('checkboxOff').removeClass('checkboxOn');
-                                discountPopupPref = new Date().getTime();
-                                reTrigger = true;
-                            }
-                        });
-                        M.safeShowDialog('discount-offer', $discountDlg, true);
-                        mBroadcaster.sendMessage('trk:event', 'discountPopup', 'shown');
-                    }
-                });
-            }
-        }
+        return {
+            'vpn': {
+                'cancelSubFeatures': [
+                    l.vpn_cancel_subfeature1,
+                    l.vpn_cancel_subfeature2,
+                    l.vpn_cancel_subfeature3,
+                    l.vpn_cancel_subfeature4,
+                ]
+            },
+            'pwm': {
+                'cancelSubFeatures': [
+                    l.pwm_cancel_subfeature1,
+                    l.pwm_cancel_subfeature2,
+                    l.pwm_cancel_subfeature3,
+                ]
+            },
+        };
     },
 
     showAccountRequiredDialog() {
@@ -2982,10 +3115,11 @@ pro.propay = {
         onIdle(() => eventlog(500511));
     },
 };
-mBroadcaster.once('login2', () => {
-    'use strict';
-    delay('ShowDiscountOffer', pro.propay.showDiscountOffer, 5000);
-});
+
+// mBroadcaster.once('login2', () => {
+//     'use strict';
+//     delay('ShowDiscountOffer', pro.propay.showDiscountOffer, 5000);
+// });
 
 // Lazy load, as locale.js has not yet run
 lazy(pro.propay, 'warningStrings', () => {

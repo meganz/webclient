@@ -18,18 +18,6 @@ mobile.propay = {
         var $backButton = $stepTwo.find('.js-back-to-plans');
 
         // Add click handler for the contact button
-        $contactUsButton.off('tap').on('tap', function() {
-            loadSubPage('contact');
-            return false;
-        });
-
-        // Add click handler to go back to the Pro page
-        $backButton.off('tap').on('tap', function() {
-            loadSubPage('pro');
-            return false;
-        });
-
-        M.accountData();
 
         // Show the page for mobile
         $stepTwo.removeClass('hidden');
@@ -52,12 +40,25 @@ mobile.propay = {
         // Enabled payment providers for mobile so far are vouchers, the credit card options and direct resellers
         var mobileEnabledGateways = [
             'voucher', 'astropayVI', 'astropayMC', 'ecpVI', 'ecpMC', 'sabadellVI', 'sabadellMC',
-            'directreseller', 'Stripe2', 'stripeVI', 'stripeMC', 'stripeDD', 'stripeUP', 'stripeJC', 'stripeAE'
+            'directreseller', 'Stripe2', 'stripeVI', 'stripeMC', 'stripeDD', 'stripeUP', 'stripeJC', 'stripeAE',
+            'stripeAP', 'stripeGP'
         ];
 
         // Filter out anything else
         var filteredGateways = gatewayOptions.filter(function(val) {
-            return mobileEnabledGateways.indexOf(val.gatewayName) > -1;
+            if (mobileEnabledGateways.indexOf(val.gatewayName) > -1) {
+                return true;
+            }
+
+            if (val.gatewayId === 16) {
+                return val.gatewayName === 'ecp';
+            }
+
+            if (val.gatewayId === 19) {
+                return val.gatewayName === 'stripe';
+            }
+
+            return false;
         });
 
         return filteredGateways;

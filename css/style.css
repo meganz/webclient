@@ -3048,13 +3048,8 @@ input.summary-ff-name.error {
     --mask-color: var(--icon-rest);
     --icon-size: 16px;
 }
-.bitcoin-invoice-dialog .bitcoin-qr-code {
-    margin: 25px 0 20px 26px;
-    width: 276px;
-}
 .bitcoin-invoice-dialog .bitcoin-qr-code canvas {
-    padding: 10px;
-    border-radius: 10px;
+    padding: 3px;
     background-color: #f2f2f2;
 }
 .fm-blocks-view .versioning .versioning-indicator,

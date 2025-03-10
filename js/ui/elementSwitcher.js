@@ -3,6 +3,28 @@ lazy(mega, 'elementSwitcher', () => {
 
     const setUpSwitchers = {};
 
+
+    /**
+     * Creates an element switcher for managing the visibility and lifecycle of multiple elements, when only one should
+     * be shown at a time.
+     *
+     * @param {Object} elements - An object where each key corresponds to an element configuration.
+     * @param {JQuery} elements[].$element - A jQuery object representing the element to manage.
+     * @param {JQuery} elements[].$target - A jQuery object where the element will be appended.
+     * @param {Boolean} [elements[].initialised] - Indicates whether the element has been initialized (default: false).
+     * @param {Function} [elements[].onElementAppend] - Callback triggered after the element is appended.
+     * @param {Function} [elements[].onElementShow] - Callback triggered when the element is shown.
+     * @param {Function} [elements[].onElementChange] - Callback triggered when the visible element changes.
+     * @param {Object} [elements[].extras] - Additional data to be passed to the callbacks.
+     * @param {String} [initialState] - The key of the initial element to display.
+     * @param {String} switcherName - A unique name for the switcher instance to prevent duplication.
+     * @param {Boolean} [hideAllOnInit] - Whether to hide all elements during initialization.
+     * @returns {Object} - An object containing methods to interact with the switcher:
+     *   - {Function} showElement(elementKey): Shows the specified element.
+     *   - {Function} remove(elementKey): Removes the specified element or all elements if no key is provided.
+     *   - {Function} hide(): Hides the currently visible element.
+     *   - {Function} getVal(): Returns the key of the currently visible element.
+     */
     return (elements, initialState, switcherName, hideAllOnInit) => {
 
         if (d && !switcherName) {
@@ -71,7 +93,7 @@ lazy(mega, 'elementSwitcher', () => {
             const {onElementShow, extras} = elements[elementKey];
 
             const $element = appendElement(elementKey);
-            const elementChaged = elementKey !== currentElement;
+            const elementChanged = elementKey !== currentElement;
 
 
             const doOnElementShow = () => {
@@ -95,7 +117,7 @@ lazy(mega, 'elementSwitcher', () => {
 
                 doOnElementShow();
 
-                if (elementChaged) {
+                if (elementChanged) {
                     const {onElementChange} = elements;
                     if (typeof onElementChange === 'function') {
                         onElementChange($element);
@@ -105,6 +127,9 @@ lazy(mega, 'elementSwitcher', () => {
         };
 
         const remove = (elementKey) => {
+            if (!setUpSwitchers[switcherName]) {
+                return;
+            }
             if (elements[elementKey]) {
                 if (elements[elementKey].appendedBySwitcher) {
                     elements[elementKey].$element.remove();

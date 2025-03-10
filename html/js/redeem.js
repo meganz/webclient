@@ -1130,7 +1130,9 @@ var redeem = {
                     else {
                         redeem();
                     }
-                    loadingDialog.hide();
+                    if (!pro.propay.onPropayPage() || data.promotional) {
+                        loadingDialog.hide();
+                    }
                 })
                 .catch(function(ex) {
                     if (ex) {

@@ -688,6 +688,11 @@ var pro = {
                     planArray: plan,
                     features: plan[pro.UTQA_RES_INDEX_EXTRAS].f,
                     trial: plan[pro.UTQA_RES_INDEX_EXTRAS].trial,
+                    featureStrings: pro.featureInfo[plan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL]],
+                    baseTransfer: plan[pro.UTQA_RES_INDEX_TRANSFER]
+                        && ((plan[pro.UTQA_RES_INDEX_TRANSFER] / plan[pro.UTQA_RES_INDEX_MONTHS])
+                            * pro.BYTES_PER_GB),
+                    transferCost: plan[13] || plan[12]
                 };
 
                 lazy(thisPlan, 'id', () => plan[pro.UTQA_RES_INDEX_ID]);
@@ -706,6 +711,8 @@ var pro = {
                 lazy(thisPlan, 'save', () => plan[pro.UTQA_RES_INDEX_LOCALPRICESAVE] || false);
                 lazy(thisPlan, 'monthlyBasePrice', () => plan[pro.UTQA_RES_INDEX_MONTHLYBASEPRICE] || false);
                 lazy(thisPlan, 'hasLocal', () => !!plan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY]);
+                lazy(thisPlan, 'trialStrings', () => thisPlan.trial && pro.featureInfo[thisPlan.level + '-trial']);
+                lazy(thisPlan, 'featureBits', () => thisPlan.features && pro.getStandaloneBits(thisPlan.features));
 
                 lazy(thisPlan, 'correlatedPlan', () => {
                     if (thisPlan._correlatedPlan === null) {
@@ -740,14 +747,14 @@ var pro = {
 
                 lazy(thisPlan, 'maxCorrPriceEuro', () => {
                     if (thisPlan._maxCorrPriceEur === null) {
-                        let maxCorrPrice = thisPlan.priceEuro;
+                        let maxCorrPriceEuro = thisPlan.priceEuro;
                         if (thisPlan.correlatedPlan) {
-                            maxCorrPrice = Math.max(thisPlan.priceEuro, thisPlan.correlatedPlan.priceEuro);
-                            thisPlan.correlatedPlan._maxCorrPriceEur = maxCorrPrice;
+                            maxCorrPriceEuro= Math.max(thisPlan.priceEuro, thisPlan.correlatedPlan.priceEuro);
+                            thisPlan.correlatedPlan._maxCorrPriceEur = maxCorrPriceEuro;
                         }
-                        thisPlan._maxCorrPrice = maxCorrPrice;
+                        thisPlan._maxCorrPriceEur = maxCorrPriceEuro;
                     }
-                    return thisPlan._maxCorrPrice;
+                    return thisPlan._maxCorrPriceEur;
                 });
 
                 lazy(thisPlan, 'yearlyDiscount', () => {
@@ -762,6 +769,7 @@ var pro = {
                     // Multiply by 100 and then divide by 100 to avoid floating point issues as JS hates decimals
                     return (baseYearly * 100 - thisPlan.price * 100) / 100;
                 });
+
 
                 /**
                  * Checks if the plan is in a filter, returns boolean or level of the plan in the filter.
@@ -784,9 +792,15 @@ var pro = {
                  * @param {boolean} noDecimals - If the price should be returned without decimals
                  * @returns {string} - The formatted price
                  */
-                thisPlan.getFormattedPrice = (display, returnEuro, noDecimals) => {
+                thisPlan.getFormattedPrice = (display, returnEuro, noDecimals, months) => {
+
+                    const monthMultiplier = +(months || thisPlan.months) / thisPlan.months;
+
+                    let localPrice = returnEuro ? thisPlan.priceEuro : thisPlan.price
+                    let price = localPrice * monthMultiplier;
+
                     return formatCurrency(
-                        returnEuro ? thisPlan.priceEuro : thisPlan.price,
+                        price,
                         returnEuro ? thisPlan.currencyEuro : thisPlan.currency,
                         display,
                         noDecimals
@@ -1178,6 +1192,13 @@ lazy(pro, 'filter', () => {
                     pro.ACCOUNT_LEVEL_PRO_LITE, pro.ACCOUNT_LEVEL_PRO_I, pro.ACCOUNT_LEVEL_PRO_II,
                     pro.ACCOUNT_LEVEL_PRO_III, pro.ACCOUNT_LEVEL_PRO_FLEXI
                 ]),
+
+            // showFeatureInfo: 4, 1, 2, 3 - plans that should show feature info on propay page
+            showFeatureInfo:
+                new Set([
+                    pro.ACCOUNT_LEVEL_PRO_LITE, pro.ACCOUNT_LEVEL_PRO_I, pro.ACCOUNT_LEVEL_PRO_II,
+                    pro.ACCOUNT_LEVEL_PRO_III, pro.ACCOUNT_LEVEL_PRO_FLEXI,
+                ]),
         },
 
         // Sets of plans to invert (all plans minus specified plans), will then
@@ -1285,12 +1306,15 @@ lazy(pro, 'featureInfo', () => {
 
     const general = [
         {
+            icon: 'sprite-fm-mono icon-shield-thin-outline',
             text: l.mega_vpn
         },
         {
-            text: l.pr_no_meet_time_limits
+            icon: 'sprite-fm-mono icon-lock-thin-outline',
+            text: l.mega_pwm
         },
         {
+            icon: 'sprite-fm-mono icon-users-thin-outline',
             text: l.pr_unlimited_participants
         }
     ];

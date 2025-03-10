@@ -31,9 +31,32 @@
     <div id="free-trial-card-temp" class="template hidden free-trial-container">
         <div class="free-trial-card">
             <div class="title">[$heres_how_it_works]</div>
-            <div class="main-content flex flex-column gap-4">
-                <div class="steps flex gap-4">
-                    <div class="icons flex flex-column">
+            <div class="main-content grid">
+
+
+                    <i class="sprite-fm-mono icon-lock"></i>
+                    <div class="when step0 secondary-title">[$1301]</div>
+                    <div class="line"></div>
+                    <div class="content step0">[$unlock_secure_browsing]</div>
+
+
+                    <i class="sprite-fm-mono icon-notification"></i>
+                    <div class="when step1 secondary-title day-5"></div>
+                    <div class="line"></div>
+                    <div class="content step1">[$email_before_trial_end]</div>
+
+
+                    <i class="sprite-fm-mono icon-star"></i>
+                    <div class="when step2 secondary-title day-7"></div>
+                    <div></div>
+                    <div class="content step2"></div>
+
+
+
+
+                <!-- <div class="steps flex gap-4"> -->
+
+                    <!-- <div class="icons flex flex-column">
                         <i class="sprite-fm-mono icon-lock"></i>
                         <div class="line"></div>
                         <i class="sprite-fm-mono icon-notification"></i>
@@ -53,10 +76,11 @@
                             <div class="when secondary-title day-7"></div>
                             <div class="content"></div>
                         </div>
-                    </div>
-                </div>
-                <div class="price secondary-title"></div>
+                    </div> -->
+
+                <!-- </div> -->
             </div>
+            <div class="price secondary-title"></div>
         </div>
     </div>
     <div class="suboption-radio flex flex-column gap-2" id="cancel-suboption-wrapper-temp">
@@ -68,4 +92,21 @@
             <div class="radio-txt"></div>
         </div>
     </div>
+
+    <div id="radio-with-icon-label-tmplt" class="hidden template">
+        <div class="error-message"></div>
+        <div class="label-wrapper">
+            <div class="radio radioOff">
+                <input type="radio" class="radio radioOff">
+            </div>
+            <div class="radio-icon hidden"></div>
+            <div class="radio-txt"></div>
+        </div>
+    </div>
+
+    <button id="down-arrow-text-after-tmplt" class="hidden template">
+        <i class="chevron-down-icon transition"></i>
+        <div class="txt"></div>
+    </button>
+
 </div>

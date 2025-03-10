@@ -5,229 +5,559 @@
             ((PAGESMENU))
         </div>
 
-        <div class="bottom-page full-block fadein">
-
-            <div class="bottom-page centered-textalign top-bl bott-pad">
-                <div class="bottom-page horizontal-centered-bl mid-wide">
-                    <div class="pricing-page top-header plan-title paid-only hidden"></div>
-                    <div class="pricing-page top-header plan-title free-trial hidden"></div>
-                    <div class="bottom-page small-txt no-pad stores-desc">[$16167]</div>
+        <div id="propay-page-templates" class="hidden">
+            <div id="propay-contained-radio" class="template hidden">
+                <div class="radio radioOff radio-item">
+                    <input type="radio" class="radioOff radio-item">
+                </div>
+                <div class="radio-content">
+                    <div class="title">
+                        <div class="duration-head">
+                            <span class="duration-type"></span>
+                            <span class="duration-savings hidden"></span>
+                        </div>
+                        <div class="savings hidden"></div>
+                    </div>
+                    <div class="yearly-price hidden"></div>
+                    <div class="monthly-price hidden"></div>
                 </div>
             </div>
 
-            <div class="bottom-page grey-block top-pad left-txt-align">
-                <div class="bottom-page horizontal-centered-bl mid-wide">
-
-                    <div class="payment-page plan-wrap">
-                        <div class="payment-page discount-header hidden">
-                            <div class="discount-header-text">
-                            </div>
-                        </div>
-                        <div class="pricing-page plan main">
-                            <div class="pricing-page plan-title"></div>
-                            <div class="pricing-page plan-info"></div>
-                            <div class="pricing-page plan-content">
-                                <div class="pricing-page old-plan-price hidden"></div>
-                                <div class="pricing-page cross-line hidden"></div>
-                                <div class="pricing-page plan-price">
-                                    <span class="price"></span><span class="asterisk">*</span>
-                                    <span class="today">[$today_occurrence_label]</span>
-                                </div>
-                                <div class="pricing-page plan-currency paid-only"></div>
-                                <div class="pricing-page plan-period paid-only">
-                                    /[$7195]
-                                </div>
-                                <div class="pricing-page euro-price paid-only"></div>
-                                <div class="clear paid-only"></div>
-                                <div class="pricing-page free-trial free-trial-period hidden"></div>
-                            </div>
-                        </div>
-                        <div class="pricing-page plan details paid-only">
-                            <div class="pricing-page plan-feature storage strong">
-                                <span>[$23789.s]</span>
-                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$23807]" data-simpletipposition="top"  data-simpletipoffset="5" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i>
-                            </div>
-                             <div class="pricing-page plan-feature strong transfer">
-                                <span>[$23790.s]</span>
-                                <i class="pricing-sprite i-icon simpletip" data-simpletip="[$23808]" data-simpletipposition="top"  data-simpletipoffset="5" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i>
-                            </div>
-                            <div class="pricing-page plan-feature extra strong hidden"></div>
-                            <div class="pricing-page plan-feature subtext hidden"></div>
-                        </div>
-                        <div class="pricing-page plan details free-trial hidden">
-                            <div class="pricing-page plan-feature template strong free-trial hidden">
-                                <span></span>
-                            </div>
-                        </div>
-
-                        <div class="subscription-instructions hidden">
-                            [$10637] [$10630]
-                        </div>
+            <div id="propay-page-plan-card-tmplt" class="plan-card">
+                <div class="discount-header hidden"></div>
+                <div class="content">
+                    <div class="plan-icon"></div>
+                    <div class="plan-name title"></div>
+                    <div class="plan-info hidden">
+                        <div class="storage"></div>
+                        <div class="transfer"></div>
                     </div>
-
-                    <div class="payment-page info-block plan-info">
-                        <div class="payment-page info-content">
-                            <div class="payment-page header">
-                                <span class="number">1</span>
-                                [$7992]
-                            </div>
-                            <div class="payment-options-list primary">
-                                <div class="payment-method template">
-                                    <div class="membership-radio">
-                                        <input type="radio" name="" value="">
-                                        <div></div>
-                                    </div>
-                                    <div class="provider-details">
-                                        <div class="provider-icon"></div>
-                                        <div class="provider-name"></div>
-                                    </div>
-                                </div>
-                                <span class="loading-placeholder-text">[$5533]</span>
-                            </div>
-                            <div class="payment-options-list secondary hidden"></div>
-                            <div class="provider-show-more hidden">
-                                <div class="left-bar">
-                                    <div class="left-bar-grey">&nbsp;</div>
-                                </div>
-                                <div class="button">[$7993]</div>
-                                <div class="right-bar">
-                                    <div class="right-bar-grey">&nbsp;</div>
-                                </div>
-                            </div>
-
-                            <div class="free-trial-card-container hidden"></div>
-                            <div class="mega-error-box error-box-not-stripe hidden">
-                                [$err_prov_doesnt_supp_trial]
-                            </div>
-
-                            <div class="payment-period">
-                                <div class="membership-info-pad">
-                                    <div class="payment-page header choose-duration">
-                                        <span class="number">2</span>
-                                        <span class="duration-question">[$7994]</span>
-                                    </div>
-                                    <span class="loading-placeholder-text">[$5533]</span>
-                                    <div class="charge-information-container">
-                                        <div class="charge-information"></div>
-                                    </div>
-                                    <div class="duration-options-list">
-                                        <div class="payment-duration template">
-                                            <div class="membership-radio">
-                                                <input type="radio">
-                                                <div class="payment-icon"></div>
-                                            </div>
-                                            <div class="membership-radio-label">
-                                                <div class="duration"></div>
-                                                <div class="oldPrice hidden">$15.55</div>
-                                                <div class="crossline hidden"></div>
-                                                <div class="hyphen">-</div>
-                                                <div class="price">0.00</div>
-                                            </div>
-                                            <div class="save-money hidden">
-                                                [$16649]
-                                            </div>
-                                            <div class="opt-note">
-                                                [$25073]
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="orange-notification body with-btn argentina-only hidden">
-                                <div class="orange-notification">
-                                    <i class="icons-sprite fvnotice"></i>
-                                </div>
-                                <div class="orange-notification cell text-cell">
-                                    <div class="versioning-body-text">[$23132]</div>
-                                </div>
-                            </div>
-
-                            <div class="renewal-option hidden">
-                                <div class="payment-page header choose-renewal">
-                                    <span class="number">3</span>
-                                    <span class="duration-text">[$10638]</span>
-                                </div>
-                                <div class="renewal-options-list">
-                                    <div class="renewal-option">
-                                        <div class="membership-radio checked">
-                                            <input type="radio" name="renewal-option" checked="checked" value="yes">
-                                            <div class="payment-icon"></div>
-                                        </div>
-                                        <div class="membership-radio-label checked">
-                                            <span>[$78]</span>
-                                        </div>
-                                    </div>
-                                    <div class="renewal-option">
-                                        <div class="membership-radio">
-                                            <input type="radio" name="renewal-option" value="no">
-                                            <div class="payment-icon"></div>
-                                        </div>
-                                        <div class="membership-radio-label">
-                                            <span>[$79]</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="additional-tos s4-tos hidden">
-                            <div class="checkbox checkboxOff">
-                                <input id="confirm-addition-s4-tos" class="checkboxOff confirm-s4-tos" type="checkbox">
-                            </div>
-                            <label for="confirm-addition-s4-tos" class="radio-txt">[$agree_s4_tos]</label>
-                        </div>
-                        <button class="mega-button positive large purchase disabled pro-plan">
-                            <span class="free-trial hidden">[$507]</span>
-                            <span class="paid-only">[$continue_to_payment]</span>
-                        </button>
+                    <div class="how-it-works hidden"></div>
+                    <div class="includes hidden">
+                        <div class="includes-title regular">[$pr_includes]</div>
+                        <div class="includes-title flexi">[$ft_also_includes]</div>
+                        <div class="includes-content"></div>
                     </div>
-
-                </div>
-                <div class="local-currency-tip-wrapper pro-plan hidden">
-                    <div class="pricing-page local-currency-tip hidden">
-                        *[$18770]
+                    <div class="pricing">
+                        <div class="pricing-element">
+                            <span class="duration-name">[$duration]</span>
+                            <span class="duration-type"></span>
+                        </div>
+                        <div class="pricing-element">
+                            <span class="due-now">[$pr_due_now]</span>
+                            <span class="price"></span>
+                        </div>
+                        <div class="pricing-element discount">
+                            <span class="pre-discount-price"></span>
+                        </div>
+                        <div class="flexi extra-info">
+                            <span class="additional-title">[$flexible_quotas]</span>
+                            <span class="additional-content"></span>
+                        </div>
                     </div>
                 </div>
-
+                <div class="estimated-price euro hidden">
+                    * [$est_price_acc_billed_euro]
+                </div>
             </div>
 
+            <div id ="billing-info-tmplt" class="billing-info hidden">
+                <div class="empty">
+                    <div class="action">
+                        <i class="sprite-fm-mono icon-add icon24 mr-2"></i>
+                        <div class="edit">[$add]</div>
+                    </div>
+                    <div class="info"></div>
+                </div>
 
+                <div class="filled">
+                    <div class="action">
+                        <i class="sprite-fm-mono icon-edit mr-2"></i>
+                        <div class="edit">[$edit_item]</div>
+                    </div>
+                    <div class="info">
+                        <div class="name"></div>
+                        <div class="address-1"></div>
+                        <div class="address-2"></div>
+                        <div class="city"></div>
+                        <div class="country"></div>
+                    </div>
+                </div>
 
-            <div class="bottom-page pricing-page white-block top-pad bott-pad third-section hidden">
-                <div class="bottom-page horizontal-centered-bl mid-wide">
+                <div class="error-message">
+                    <i class="sprite-fm-mono icon-alert-triangle"></i>
+                    <span class="error-message-text">[$enter_billing_address]</span>
+                </div>
+            </div>
+        </div>
 
-                    <div class="payment-page info-block">
-                        <div class="payment-page info-content">
-                            <div class="payment-page header choose-duration">
-                                <span class="number">3</span>
-                                <span class="duration-question">[$7995]</span>
+        <div class="pricing-pg bottom-page full-block fadein">
+
+            <div class="propay flex flex-row payment-page" id="propay">
+                <div class="left-block-wrapper">
+
+                    <div class="left-block">
+                        <h1 class="plan-name title">
+                            <!-- You have selected <span></span> -->
+                        </h1>
+                        <div class="s4-wrapper s4">
+                            <h2 class="title">[$enhance_flexi]</h2>
+
+                            <div class="flex flex-row items-center gap-4 content icon24">
+                                <i class="icon sprite-fm-mono icon-bucket-triangle-thin-outline bucket"></i>
+                                <div class="flex flex-column">
+                                    <div class="s4-title">[$ri_s4_tab]</div>
+                                    <div class="s4-content">[$handle_data_with_flexi]</div>
+                                </div>
+                                <button class="s4-add flex flex-row active flex-center">
+                                    <i class="sprite-fm-mono icon-plus-light-solid add"></i>
+                                    <span class="add">[$add]</span>
+                                    <i class="sprite-fm-mono icon-trash-thin-outline remove"></i>
+                                    <span class="remove">[$83]</span>
+                                </button>
                             </div>
-                            <div class="payment-instructions">[$7996]</div>
-                            <div class="clear"></div>
+                        </div>
+                        <div class="method-duration-wrapper">
+                            <div class="payment-method">
+                                <h2 class="title">[$478]</h2>
+                                <div class="dropdown-wrapper-primary">
+                                    <div class="mega-input dropdown-input payment-options" id="propay-payment-dropdown-pri">
+                                        <span>[$select_payment_method]</span>
+                                        <i class="sprite-fm-mono icon-dropdown"></i>
+                                        <div class="mega-input-dropdown hidden">
+                                            <div class="dropdown-scroll"></div>
+                                        </div>
+                                    </div>
+                                    <div class="error-message">
+                                        <i class="sprite-fm-mono icon-alert-triangle"></i>
+                                        <span class="error-message-text">[$select_a_payment_method]</span>
+                                    </div>
+                                </div>
+                                <div class="payment-options-secondary hidden"></div>
+                                <div class="free-trial-unsupported hidden">
+                                    <i class="sprite-fm-mono icon-alert-circle-thin-outline"></i>
+                                    [$method_does_not_support_trial]
+                                </div>
+                            </div>
+                            <div class="duration">
+                                <h2 class="title recurring hidden">[$how_often_want_to_pay]</h2>
+                                <h2 class="title one-time hidden">[$7994]</h2>
+                                <div class="options-wrapper"></div>
+                                <div class="one-off-payment-info hidden">
+                                    <i class="sprite-fm-mono icon-shield-thin-outline"></i>
+                                    <div class="warning-txt"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="billing-address">
+                            <h2 class="title">[$my_billing_address]</h2>
+                            <div class="wrapper"></div>
+                        </div>
+                        <div class="specific-payment-info hidden">
+                            <div class="payment-loading-spinner active">
+                                <div class="payment-main-loader"></div>
+                            </div>
+                            <div class="astropay-dialog propay-inline-dialog hidden" role="dialog" aria-labelledby="astropay-dialog-title"
+                                aria-modal="true">
+
+                                <h2>[$enter_details_below]</h2>
+                                <div class="redirect-info">[$redirect_to_third_party_info]</div>
+
+                                <section class="content">
+                                    <div class="content-block gap-1 flex flex-column">
+                                        <!-- <div class="astropay-information">[$7991] [$7986]</div> -->
+                                        <label class="astropay-label" for="propay-astropay-name-field">[$7987]:</label>
+                                        <div class="mega-input box-style">
+                                            <input id="propay-astropay-name-field" class="astropay-name-field" type="text" placeholder="[$7988]">
+                                        </div>
+
+                                        <label class="astropay-label address" for="propay-astropay-address-field">[$561]:</label>
+                                        <div class="mega-input box-style">
+                                            <input id="propay-astropay-address-field" class="astropay-address-field" type="text" placeholder="[$561]">
+                                        </div>
+
+                                        <label class="astropay-label city" for="propay-astropay-city-field">[$565]:</label>
+                                        <div class="mega-input box-style">
+                                            <input id="propay-astropay-city-field" class="astropay-city-field" type="text" placeholder="[$565]">
+                                        </div>
+
+                                        <label class="astropay-label tax" for="propay-astropay-tax-field">[$7989]:</label>
+                                        <div class="mega-input box-style">
+                                            <input id="propay-astropay-tax-field" class="astropay-tax-field" type="text" placeholder="[$7990]">
+                                        </div>
+                                    </div>
+                                </section>
+                            </div>
+                            <div class="propay-inline-dialog dialog-template-tool payment-stripe-dialog hidden" role="dialog" aria-modal="true">
+
+                                <div class="my-card">
+                                    <div class="saved-card">Debit (ANZ) **** 0000</div>
+                                </div>
+
+                                <section class="content">
+                                    <div class="content-block iframe-container">
+                                        <!-- iframe will be inserted here -->
+                                    </div>
+                                </section>
+                            </div>
+                            <div class="propay-inline-dialog bitcoin-invoice-dialog hidden" role="dialog" aria-labelledby="bitcoin-invoice-dialog-title"
+                                aria-modal="true">
+
+                                <section class="content">
+                                        <h1>[$bitcoin_scan_qr_code]</h1>
+                                        <div id="bitcoin-invoice-dialog-title" class="scan-code-instruction">
+                                            [$scan_bitcoin_info]
+                                        </div>
+                                        <div class="bitcoin-qr-code"></div>
+                                        <div class="bitcoin-address selectable-txt grey"></div>
+                                        <div class="price-info">
+                                            <div class="bitcoin-price">
+                                                <div class="plan-price-bitcoins selectable"></div>
+                                                <div class="plan-price-bitcoins-btc">[$6813]</div>
+                                            </div>
+                                            <div class="helper-explanation grey mt-2">[$7231]</div>
+                                        </div>
+                                        <div class="time-info">
+                                            <div class="invoice-date-time grey"></div>
+                                            <div class="time-to-expire"></div>
+                                        </div>
+                                        <!-- <div class="expiry-instruction"><span class="clock-icon"></span>[$6814]</div> -->
+                                </section>
+                            </div>
+                            <div class="propay-inline-dialog dialog-template-tool voucher-dialog hidden" role="dialog" aria-labelledby="voucher-dialog-title"
+                                aria-modal="true">
+
+                                <section class="content">
+                                    <div class="content-block">
+
+                                        <h2 class="title">
+                                            [$enter_voucher_code]
+                                        </h2>
+
+                                        <div class="voucher-block">
+                                            <div class="redeem-voucher-title">
+                                                [$487]
+                                            </div>
+                                            <div class="redeem-voucher">
+                                                <!-- TODO:: voucher-code-input needs to not be an ID, as it is duplicated -->
+
+                                                <div id="voucher-code-input" class="fm-account-input">
+                                                    <input type="text" value="" />
+                                                </div>
+                                                <button class="mega-button positive voucher-redeem-now">
+                                                    <span>[$7160]</span>
+                                                </button>
+                                            </div>
+                                            <div class="info">
+                                                <div class="insufficient-balance error-message">
+                                                    <i class="sprite-fm-mono icon-alert-circle-thin-outline"></i>
+                                                    <span></span>
+                                                </div>
+                                                <div class="redeemed error-message">
+                                                    <i class="sprite-fm-mono icon-check-circle-thin-outline"></i>
+                                                    <span></span>
+                                                </div>
+                                                <div class="insufficient-balance-redeemed error-message">
+                                                    <i class="sprite-fm-mono icon-alert-circle-thin-outline"></i>
+                                                    <span></span>
+                                                </div>
+                                            </div>
+                                            <div class="voucher-information-help">[$7202]</div>
+                                        </div>
+                                    </div>
+                                </section>
+                            </div>
+                        </div>
+                        <footer class="desktop flex-column">
+                            <div class="subscription-info">
+                                <div class="additional-tos s4-tos s4 hidden">
+                                    <div class="tos flex items-center">
+                                        <div class="checkbox checkbox-item checkboxOff">
+                                            <input class="checkboxOff checkbox-item confirm-s4-tos" type="checkbox">
+                                        </div>
+                                        <label for="confirm-addition-s4-tos">[$agree_s4_tos]</label>
+                                    </div>
+                                    <div class="error-message">
+                                        <i class="sprite-fm-mono icon-alert-triangle"></i>
+                                        <span class="error-message-text">[$must_agree_tos]</span>
+                                    </div>
+                                </div>
+                                <div class="recurring hidden">
+                                    <span class="recurring-monthly-yearly">
+                                        [$10637]
+                                    </span>
+                                    <span class="recurring-monthly">
+                                        [$10628]
+                                    </span>
+                                    <span class="recurring-yearly">
+                                        [$10629]
+                                    </span>
+                                    [$10630]
+                                </div>
+                                <div class="allow recurring hidden">[$allow_future_charges_fp]</div>
+                                <div class="one-time hidden">
+                                    [$pro_for_duration]
+                                </div>
+                                <div class="trial hidden">
+                                    [$after_trial_card_charged_m]
+                                    [$trial_details_visit_tos]
+                                </div>
+                            </div>
+                            <div class="balance hidden">
+                                <span class="balance-amount">0.00</span>
+                            </div>
+                            <button class="continue"></button>
+                            <div class="stripe-button payment-stripe-dialog">
+                                <div class="loader sk-loading hidden">
+                                    <i class="sk-elm"></i>
+                                </div>
+                                <section class="content">
+                                    <div class="content-block iframe-container">
+                                        <!-- iframe will be inserted here -->
+                                    </div>
+                                </section>
+                            </div>
+                        </footer>
+                    </div>
+                </div>
+
+                <div class="right-block">
+                    <div class="right-block-card-wrapper"></div>
+                </div>
+                <footer class="mobile">
+                    <div class="additional-tos s4-tos s4 hidden">
+                        <div class="tos">
+                            <div class="checkbox checkbox-item checkboxOff">
+                                <input class="checkboxOff checkbox-item confirm-s4-tos" type="checkbox">
+                            </div>
+                            <label for="confirm-addition-s4-tos">[$agree_s4_tos]</label>
+                        </div>
+                        <div class="error-message">
+                            <i class="sprite-fm-mono icon-alert-triangle"></i>
+                            <span class="error-message-text">[$tos_must_agree]</span>
                         </div>
                     </div>
+                    <div class="recurring hidden">
+                        [$10637]
+                        [$10630]
+                    </div>
+                    <div class="allow recurring hidden">[$allow_future_charges_fp]</div>
+                    <div class="one-time hidden">
+                        [$pro_for_duration]
+                    </div>
+                    <div class="trial hidden">
+                        [$after_trial_card_charged_m]
+                        [$trial_details_visit_tos]
+                    </div>
+                    <div class="balance hidden">
+                        <span class="balance-amount">0.00</span>
+                    </div>
+                    <button class="continue"></button>
+                    <div class="stripe-button payment-stripe-dialog">
+                        <div class="loader sk-loading hidden">
+                            <i class="sk-elm"></i>
+                        </div>
+                        <section class="content">
+                            <div class="content-block iframe-container">
+                                <!-- iframe will be inserted here -->
+                            </div>
+                        </section>
+                    </div>
+                </footer>
 
-                    <button class="mega-button positive large purchase disabled">
-                        <span>[$6190]</span>
+                <div class="mega-dialog dialog-template-action payment-address-dialog propay-dialog hidden" role="dialog"
+                    aria-labelledby="payment-address-dialog-title" aria-modal="true">
+
+                    <button class="close js-close close-payment-dialog" aria-label="[$148]">
+                        <i class="sprite-fm-mono icon-dialog-close"></i>
                     </button>
 
-                    <div class="clear"></div>
+                    <header>
+                        <h2>[$10632]</h2>
+                    </header>
 
-                    <div class="pricing-page local-currency-tip  hidden">
-                        *[$18770]
+                    <section class="content">
+
+                        <div class="input-block">
+                            <span>[$654]</span>
+                            <select class="countries mobile-device default-select sprite-fm-mono icon-arrow-down" tabindex="6">
+                                <option class="default" value="">[$481]</option>
+                            </select>
+
+                            <div class="countries  desktop-device mega-input dropdown-input underlinedText" tabindex="1">
+                                <span>[$481]</span>
+                                <i class="sprite-fm-mono icon-dropdown"></i>
+                                <div class="mega-input-dropdown hidden">
+                                    <div class="dropdown-scroll"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="column-pair">
+
+                            <div class="input-block">
+                                <span>[$1096]</span>
+                                <input class="first-name underlinedText no-title-top" type="text" value="" tabindex="2">
+                            </div>
+                                <div class="input-block">
+                                <span>[$1097]</span>
+                                <input class="last-name underlinedText" type="text" value="" tabindex="3">
+                            </div>
+
+                            </div>
+                        <div class="input-block">
+                            <span>[$561] 1</span>
+                            <input class="address1 underlinedText" type="text" value="" tabindex="4">
+                        </div>
+                        <div class="input-block">
+                            <span>[$561] 2 <span class="optional">([$2028])</span></span>
+                            <input class="address2 underlinedText" type="text" value="" tabindex="5">
+                        </div>
+
+                        <div class="column-pair">
+                            <div class="input-block">
+                                <span>[$565]</span>
+                                <input class="city underlinedText" type="text" value=""  tabindex="6">
+                            </div>
+                            <div class="input-block">
+                                <span>State/Province</span>
+                                <select class="states mobile-device default-select sprite-fm-mono icon-arrow-down" tabindex="8" disabled>
+                                    <option value="">[$7192]</option>
+                                </select>
+                                <div class="states desktop-device mega-input dropdown-input underlinedText" tabindex="-1" disabled>
+                                    <span>[$7192]</span>
+                                    <i class="sprite-fm-mono icon-dropdown"></i>
+                                    <div class="mega-input-dropdown hidden">
+                                        <div class="dropdown-scroll">
+                                            <div class="option">[$7192]</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="column-pair">
+                            <div class="input-block">
+                                <span>[$10659]</span>
+                                <input class="postcode underlinedText" type="text" value="" tabindex="7">
+                            </div>
+                            <div class="input-block">
+                                <span><span class="taxcode-title"></span><span class="optional"> ([$2028])</span></span>
+                                <input class="taxcode underlinedText" type="text" value="" tabindex="8">
+                            </div>
+                        </div>
+
+                        <div class="error-message hidden">[$10633]</div>
+                        <div class="remember-billing-info-wrapper hidden">
+                            <div class="checkbox checkboxOn">
+                                <input id="address-dialog-save-billing-info" class="checkboxOn remember-billing-info" type="checkbox">
+                            </div>
+                            <label for="address-dialog-save-billing-info" class="radio-txt">[$20237]</label>
+                        </div>
+                    </section>
+
+                    <footer>
+                        <div class="footer-container">
+                            <button class="mega-button positive large payment-buy-now">
+                                <span>[$870]</span>
+                            </button>
+                        </div>
+
+                        <aside>
+                            <div class="payment-note-second">
+                                [$10634]<br>
+                                [$10635]
+                            </div>
+                        </aside>
+                    </footer>
+                </div>
+
+            </div>
+            <div class="mobile payment-result main-block success hidden">
+                <div class="mobile content-row first">
+                    <div class="mobile content-cell">
+                        <div class="payment-close">
+                            <div class="payment-close-icon"></div>
+                            <span></span>
+                        </div>
+                        <div class="mobile white-block">
+                            <div class="mobile empty-icon big-green-tick"></div>
+                            <div class="payment-result-pad">
+                                <div class="payment-result-header">[$6961]</div>
+                                <div class="payment-result-txt">[$19512]</div>
+                                <div class="mobile promo-voucher-block onboarding-suggestions hidden">
+                                    <div class="mobile promo-voucher-card red-block">
+                                        <div class="mobile promo-voucher-inner-wrapper">
+                                            <div class="mobile pro-crest-container">
+                                                <div class="mobile pro-crest">
+                                                    <div class="mobile plan-icon">
+                                                        <i class="pro1 sprite-fm-uni icon-crests-pro-1-details"></i>
+                                                        <i class="pro2 sprite-fm-uni icon-crests-pro-2-details"></i>
+                                                        <i class="pro3 sprite-fm-uni icon-crests-pro-3-details"></i>
+                                                        <i class="pro4 sprite-fm-uni icon-crests-lite-details"></i>
+                                                        <i class="pro101 sprite-fm-uni icon-crests-pro-flexi-details"></i>
+                                                        <i class="business sprite-fm-uni icon-crests-business-details"></i>
+                                                        <i class="feature"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="mobile pro-detail-wrapper">
+                                                <div class="mobile storage-block">
+                                                    <div class="mobile pro-detail-aligners storage-amount">
+                                                    </div>
+                                                </div>
+                                                <div class="mobile transfer-block">
+                                                    <div class="mobile pro-detail-aligners transfer-amount">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="payment-result-icon"></div>
+                                <div class="mobile payment-result-button"> <i></i> <span>[$6690]</span> </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="bottom-page pricing-page white-block bott-pad third-section feature-only hidden">
-                <div class="bottom-page horizontal-centered-bl mid-wide continue-section">
-                    <button class="mega-button positive large purchase disabled">
-                        <span class="free-trial hidden">[$507]</span>
-                        <span class="paid-only">[$continue_to_payment]</span>
-                    </button>
-                    <div class="clear"></div>
-                    <div class="pricing-page local-currency-tip hidden">
-                        *[$18770]
+
+            <div class="mobile loginrequired-dialog hidden">
+                <div class="mobile main-block">
+                    <div class="mobile content-row first">
+                        <div class="mobile content-cell">
+                            <a class="mobile logo"></a>
+                            <div class="mobile fm-dialog-close"></div>
+                            <div class="mobile white-block">
+                                <div class="mobile empty-icon custom-login-icon"></div>
+                                <div class="mobile information">
+                                    <div class="mobile dialog-heading-text">[$5841].</div><br />
+
+                                    <div class="dialog-body-text">[$7679]</div>
+                                </div>
+                                <div class="mobile buttons inline-buttons">
+                                    <a class="mobile red-button first register"> <i></i> <span>[$1076]</span> </a>
+                                    <a class="mobile red-button second login"> <i></i> <span>[$193]</span> </a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+                </div>
+            </div>
+
+            <div class="payment-processing-mobile hidden">
+                <div class="payment-animation-pad">
+                    <img class="payment-animation" alt="">
+                    <div class="payment-animation-txt">[$6960]</div>
+                </div>
+            </div>
+
+            <div class="fm-dialog mobile full-page-scrollable payment-stripe-success-dialog hidden">
+                <div class="btn-close-dialog"></div>
+                <i class="graphic sprite-fm-uni icon-success success-logo"></i>
+                <div class="success-head">[$25047]</div>
+                <div class="success-desc">
+                    [$25048]
                 </div>
             </div>
 
@@ -235,4 +565,6 @@
         </div>
 
     </div>
+
+
 </div>

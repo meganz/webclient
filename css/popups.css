@@ -588,3 +588,7 @@ body.tl .dropdown.body.popup.contacts-search {
     top: 2px;
     width: 16px;
 }
+.dark-direct-tooltip.simpletip-tooltip.propay {
+    max-width: 206px;
+    text-align: start;
+}

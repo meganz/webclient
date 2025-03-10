@@ -275,6 +275,9 @@ html .theme-light-forced {
         --banner-background-success: rgba(29, 176, 123, 0.1);
         --banner-background-warning: rgba(255, 165, 0, 0.1);
 
+        --banner-borderless-background-info: rgba(223, 244, 254, 1);
+        --banner-borderless-text-info: rgba(0, 120, 164, 1);
+
     /* input border */
 
         --input-text-underline-active: rgba(43, 166, 222, 1);

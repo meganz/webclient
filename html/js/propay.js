@@ -2946,11 +2946,6 @@ pro.propay = {
                 ? l[1301]
                 : mega.icu.format(l.on_day_n, stringKeys[i]));
         }
-        //     $('.content', $infoBlock).text(strings[stringKeys[i]]).removeClass('hidden');
-        //     $('.when', $infoBlock).text(i === 0
-        //         ? l[1301]
-        //         : mega.icu.format(l.on_day_n, stringKeys[i]));
-        // }
 
         $('.price', $template).text(priceText);
 

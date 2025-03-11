@@ -840,7 +840,7 @@ body.theme-dark .rewind-datepicker-calendar .datepicker--cell.-current- {
 
 .fm-rewind-progress-section {
     position: absolute;
-    top: 48px;
+    top: 0;
     left: 0;
     width: 100%;
     height: 100%;

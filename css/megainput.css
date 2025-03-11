@@ -109,6 +109,11 @@
     width: 100%;
     z-index: 11;
 }
+.theme-dark .white-container-box .mega-input input,
+.theme-dark .white-container-box .mega-input textarea,
+.theme-dark .white-container-box .mega-input.dropdown-input > span {
+    color: var(--text-color-high-inverted);
+}
 .mega-input textarea {
     padding: 8px;
     resize: none;
@@ -296,6 +301,9 @@
     top: 8px;
     transition: font-size 0.2s ease-in, color 0.2s ease-in, top 0.2s cubic-bezier(0.4, 0, 1, 1);
     z-index: 10;
+}
+.theme-dark .white-container-box .mega-input.title-ontop .mega-input-title {
+    color: var(--text-color-medium-inverted);
 }
 .mega-input.title-ontop.with-icon .mega-input-title {
     padding-inline-start: 35px;

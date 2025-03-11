@@ -158,7 +158,7 @@ class MegaMobileTopMenu extends MegaComponent {
                 menuItem.on('beforeRedirect.topmenu', () => {
 
                     mega.ui.topmenu.hide();
-                    this.closeActiveOverlays();
+                    return this.closeActiveOverlays();
                 });
 
                 if (menuItem.href === '/login') {

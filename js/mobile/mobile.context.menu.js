@@ -356,7 +356,7 @@ mBroadcaster.once('boot_done', () => {
         // Phase 2
         // '.sh4r1ng-item': {
         //     text: l[60],
-        //     icon: 'sprite-mobile-fm-mono icon-settings-thin-outline',
+        //     icon: 'sprite-fm-mono icon-settings-thin-outline',
         //     subMenu: false,
         //     classNames: '',
         //     callback: function() {

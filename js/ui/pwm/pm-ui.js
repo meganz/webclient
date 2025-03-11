@@ -199,7 +199,7 @@ mega.ui.pm = {
                         description: l.free_trial_today_desc
                     },
                     {
-                        icon: 'sprite-mobile-fm-mono icon-bell-thin',
+                        icon: 'sprite-fm-mono icon-bell-thin-outline',
                         day: mega.icu.format(l.on_day_n, 10),
                         description: l.email_before_trial_end
                     },

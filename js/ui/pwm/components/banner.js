@@ -167,8 +167,8 @@ MegaBanner.iconSizesClass = freeze({
     lazy(mega.ui, 'banner', () => {
         return {
             icon: {
-                // info: 'sprite-mobile-fm-mono icon-alert-circle-thin-outline',
-                // warning: 'sprite-mobile-fm-mono icon-alert-circle-thin-outline',
+                // info: 'sprite-fm-mono icon-alert-circle-thin-outline',
+                // warning: 'sprite-fm-mono icon-alert-circle-thin-outline',
                 error: 'sprite-pm-mono icon-alert-triangle-regular-outline',
                 // advertisement: 'sprite-mobile-fm-uni icon-mega-logo-rounded-square',
                 success: 'sprite-pm-mono icon-check-circle-regular-outline'

@@ -1006,7 +1006,7 @@ lazy(mega.devices, 'ui', () => {
         async render(id, options) {
             const {isRefresh, isSkipFetch, isSkipPathCheck} = options || {};
 
-            if (M.currentCustomView.type !== rootId && !isSkipPathCheck) {
+            if ((M.currentCustomView.type !== rootId || !is_fm()) && !isSkipPathCheck) {
                 return;
             }
 

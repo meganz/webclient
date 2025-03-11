@@ -93,6 +93,9 @@ Implemented styles:
     height: 40px;
     padding: 16px;
 }
+.nav-elem.icon-only:hover {
+    background: transparent;
+}
 
 /* Full width of container */
 .nav-elem.full-width {

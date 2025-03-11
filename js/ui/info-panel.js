@@ -123,7 +123,6 @@ lazy(mega.ui, 'mInfoPanel', () => {
         $('.owner-section', $container).addClass('hidden');
         $('.owner-value', $container).text('');
         $('.version-section', $container).addClass('hidden');
-        $('.version-value', $container).text('');
         $('.current-version-section', $container).addClass('hidden');
         $('.current-version-value', $container).text('');
         $('.prev-version-section', $container).addClass('hidden');
@@ -1347,14 +1346,18 @@ lazy(mega.ui, 'mInfoPanel', () => {
                 // Show version count
                 $('.version-section', $container).removeClass('hidden');
 
+                const versionValue = $('.version-value', $container);
+
                 if (node.t) {
-                    $('.version-value', $container).text(versionCount);
+                    versionValue.text(versionCount);
                 }
                 else {
+                    versionValue.text('');
+
                     const $span = document.createElement('span');
                     $span.textContent = versionCount;
                     $span.dataset.nodeId = node.h;
-                    $('.version-value', $container).get(0).appendChild($span);
+                    versionValue.get(0).appendChild($span);
 
                     addClickHandlerVersionsValue();
                 }

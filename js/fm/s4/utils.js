@@ -434,6 +434,10 @@ lazy(s4, 'utils', () => {
                 return itemWrap;
             };
 
+            if (dialog !== undefined) {
+                treeNode.textContent = '';
+            }
+
             const treeClone = treeNode.cloneNode(true);
             treeNode.textContent = '';
 

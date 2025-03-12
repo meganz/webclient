@@ -156,7 +156,7 @@ class MegaTopMenu extends MegaMobileTopMenu {
             },
             {
                 text: l[823],
-                icon: 'sprite-mobile-fm-mono icon-settings-thin-outline',
+                icon: 'sprite-fm-mono icon-settings-thin-outline',
                 href: '/fm/pwm/account',
                 typeClassname: 'pwm',
                 name: 'pwm-settings',

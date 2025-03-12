@@ -290,7 +290,7 @@ class MegaMobileTopMenu extends MegaComponent {
             },
             {
                 text: l[823],
-                icon: 'sprite-mobile-fm-mono icon-settings-thin-outline',
+                icon: 'sprite-fm-mono icon-settings-thin-outline',
                 href: '/fm/account/settings',
                 eventLog: 99903
             }

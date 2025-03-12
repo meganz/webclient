@@ -19,7 +19,7 @@ mobile.settings = Object.create(mobile.settingsHelper, {
             const menuItems1 = [
                 {
                     text: l.mobile_settings_notifications_title,
-                    icon: 'sprite-mobile-fm-mono icon-bell-thin',
+                    icon: 'sprite-fm-mono icon-bell-thin-outline',
                     href: 'fm/account/notifications',
                     eventLog: 99840
                 },

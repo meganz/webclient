@@ -114,12 +114,12 @@ class MegaNodeComponent extends MegaComponent {
 
         // takedown-link
         subNode = document.createElement('i');
-        subNode.className = 'mobile icon-takedown sprite-mobile-fm-mono icon-alert-triangle-thin-solid';
+        subNode.className = 'mobile icon-takedown sprite-fm-mono icon-alert-triangle-thin-solid';
         props.appendChild(subNode);
 
         // link
         subNode = document.createElement('i');
-        subNode.className = 'mobile icon-link sprite-mobile-fm-mono icon-link-thin-outline icon';
+        subNode.className = 'mobile icon-link sprite-fm-mono icon-link-thin-outline icon';
         props.appendChild(subNode);
 
         // show correct link icon
@@ -129,7 +129,7 @@ class MegaNodeComponent extends MegaComponent {
         if (!this.takedown && M.currentrootid !== 'shares') {
             subNode = document.createElement('i');
 
-            subNode.className = 'mobile icon-favourite sprite-mobile-fm-mono icon-heart-thin-solid icon';
+            subNode.className = 'mobile icon-favourite sprite-fm-mono icon-heart-thin-solid icon';
             props.appendChild(subNode);
 
             if (this.fav) {

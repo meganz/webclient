@@ -255,7 +255,7 @@ describe("chat.rtf_filter unit test", function() {
                 "a*test*b\n" +
                 "a <strong>test</strong> b\n" +
                 "a <strong>test</strong> b <strong>test2</strong> <strong>test 3 space</strong>\n" +
-                "a ***test***\n" +
+                "a <strong><em class=\"rtf-italic\">test</em></strong>\n" +
                 "a *\n" +
                 "test\n" +
                 "b*\n" +

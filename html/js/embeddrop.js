@@ -2,7 +2,6 @@
 function startMega() {
     "use strict";
 
-    mBroadcaster.sendMessage("startMega");
     if (!startMega.eventlog) {
         startMega.eventlog = 1;
         var xhr = new XMLHttpRequest();

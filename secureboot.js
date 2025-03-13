@@ -2025,58 +2025,25 @@ else if (!browserUpdate) {
             if (__cd_t) clearTimeout(__cd_t);
             var report = tryCatch(function()
             {
-                function ctx(id)
-                {
-                    return {
-                        callback : function(res)
-                        {
-                            if (res === EOVERQUOTA)
-                            {
-                                __cdumps = new Array(4);
-                                if (__cd_t) clearTimeout(__cd_t);
-
-                                if (id)
-                                {
-                                    var crashes = JSON.parse(localStorage.crashes || '{}');
-                                    delete crashes[id];
-                                    localStorage.crashes = JSON.stringify(crashes);
-                                }
-                            }
-                        }
-                    };
-                }
-                var ids = [], uds = [], r = 1;
-                for (var i in __cdumps)
-                {
-                    var dump = __cdumps[i];
-
-                    if (dump.x) { ids.push(dump.x); delete dump.x; }
-                    if (dump.d) { uds.push(dump.d); delete dump.d; }
-                    if (dump.l < 0) r = 0;
-                }
-
-                var report = {};
-                report.ua = navigator.userAgent;
-                report.io = window.dlMethod && dlMethod.name;
-                report.sb = sbid;
-                report.tp = typeof $ !== 'undefined' && $.transferprogress;
-                report.id = ids.join(",");
-                report.ud = uds;
-                report.cc = cc;
-
-                report = JSON.stringify(r? report:{});
-
+                // @todo revamp and move elsewhere to a dedicated file.
                 for (var i = __cdumps.length; i--;)
                 {
                     if (!/\w/.test(__cdumps[i].m || '')) continue;
 
-                    api_req({
+                    var payload = {
                         a: 'cd2',
                         c: JSON.stringify(__cdumps[i]),
-                        // v: report,
-                        // s: window.location.host,
                         t: version
-                    }, ctx(ids[i]));
+                    };
+
+                    if (self.api) {
+                        api.req(payload).catch(nop);
+                    }
+                    else {
+                        var xhr = new XMLHttpRequest();
+                        xhr.open('POST', apipath + 'cs?id=0', true);
+                        xhr.send(JSON.stringify([payload]));
+                    }
                 }
                 __cd_t = 0;
                 __cdumps = [];
@@ -4061,7 +4028,9 @@ else if (!browserUpdate) {
             }
         }
 
-        mBroadcaster.sendMessage('boot_done');
+        if (!is_drop) {
+            mBroadcaster.sendMessage('boot_done');
+        }
 
         if (u_checked) {
             startMega();

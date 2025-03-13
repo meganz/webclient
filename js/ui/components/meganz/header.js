@@ -800,7 +800,7 @@ class MegaHeader extends MegaMobileHeader {
                         iconSize: 8,
                         componentClassname: 'busy',
                         text: l[5925],
-                        subtext: 'You will not receive any chat notifications',
+                        subtext: l[19786],
                         onClick: () => {
                             setPresence('dnd');
                         },
@@ -811,7 +811,7 @@ class MegaHeader extends MegaMobileHeader {
                         iconSize: 8,
                         componentClassname: 'offline',
                         text: l[5926],
-                        subtext: 'You will not appear online, but will have full access to all of MEGA.',
+                        subtext: l[19787],
                         onClick: () => {
                             setPresence('offline');
                         },

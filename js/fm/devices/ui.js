@@ -644,6 +644,16 @@ lazy(mega.devices, 'ui', () => {
              */
             this.lastReq = 0;
 
+            /**
+             * {Set<String>} updatedNodeHandles - set of handles related to nodes updated
+             */
+            this.updatedNodeHandles = new Set();
+
+            /**
+             * {Set<String>} updatedSharedNodeHandles - set of handles related to shared nodes updated
+             */
+            this.updatedSharedNodeHandles = new Set();
+
             /*
              * {String} beforePageChangeListener - The ID identifying the event
              */
@@ -993,6 +1003,8 @@ lazy(mega.devices, 'ui', () => {
             this._setupListeners(id);
 
             if (this.isReady) {
+                this._updateNodes();
+
                 if (!this.isLoading && !isSkipFetch) {
                     this.isLoading = true;
                     this._fetch().finally(() => {
@@ -1017,52 +1029,6 @@ lazy(mega.devices, 'ui', () => {
             this._postRender();
 
             delay(refreshEventName, () => this.render(id, {isRefresh: true}).catch(dump), refreshMillis);
-        }
-
-        /**
-         * Renders device centre UI if shared node updated is a synced folder
-         * and it's not in permissions error state
-         * @param {String} handle - Sahred node handle
-         * @return {void} void
-         */
-        onSharedUpdated(handle) {
-            let folder;
-            const devices = Object.values(M.dcd);
-            for (let i = 0; i < devices.length; i++) {
-                folder = devices[i].folders[handle];
-                if (folder) {
-                    break;
-                }
-            }
-
-            if (folder && folder.status.errorState !== 14) {
-                // cancel current delay to avoid potential race condition
-                delay.cancel(refreshEventName);
-                // clear last request to get new data
-                this.clearLastReq();
-                // render delayed: it might take time to get an updated API response after shared node updated
-                delay('device-centre:on-shared-updated', () => {
-                    this.render(M.currentdirid, {isRefresh: true}).catch(dump);
-                }
-                , 3e3);
-            }
-        }
-
-        /**
-         * Updates device and folder data when a node is updated
-         * @param {MegaNode} node - node to update
-         * @returns {void} void
-         */
-        updateNode(node) {
-            const devices = Object.values(M.dcd);
-            for (let i = 0; i < devices.length; i++) {
-                const device = devices[i];
-                const folder = device.folders[node.h];
-                if (folder) {
-                    const newFolder = mega.devices.data.Parser.buildDeviceFolder(folder, node);
-                    M.dcd[device.h].folders[folder.h] = newFolder;
-                }
-            }
         }
 
         /**
@@ -1654,6 +1620,106 @@ lazy(mega.devices, 'ui', () => {
         }
 
         /**
+         * Updates device centre data and UI when a node is updated
+         * @param {String} handle - node handle updated
+         * @param {Boolean} isSkipRender - whether to skip rendering
+         * @returns {void} void
+         */
+        onUpdateNode(handle, isSkipRender) {
+            if (!this.isReady) {
+                return;
+            }
+
+            const node = M.d[handle];
+            if (!node) {
+                return;
+            }
+
+            if (M.onDeviceCenter) {
+                const folders = this._findAllFolders(node.h);
+                for (let j = 0; j < folders.length; j++) {
+                    this._updateDataAndUI(folders[j], node);
+                }
+
+                if (!isSkipRender) {
+                    this.render(M.currentdirid, {isRefresh: true}).catch(dump);
+                }
+            }
+            else {
+                this.updatedNodeHandles.add(handle);
+            }
+        }
+
+        /**
+         * Updates device centre data and UI when a shared node is updated
+         * @param {String} handle - node handle updated
+         * @param {Boolean} isSkipRender - whether to skip rendering
+         * @returns {void} void
+         */
+        onUpdateSharedNode(handle, isSkipRender) {
+            if (!this.isReady) {
+                return;
+            }
+
+            const node = M.d[handle];
+            if (!node) {
+                return;
+            }
+
+            if (M.onDeviceCenter) {
+                if (M.getNodeRights(node.h) < 2) {
+                    const folders = this._findAllFolders(node.h);
+                    for (let j = 0; j < folders.length; j++) {
+                        const folder = folders[j];
+                        if (folder.status.errorState !== 14) {
+                            folder.syncState = 2;
+                            folder.ss = 14;
+                            this._updateDataAndUI(folder, node);
+                        }
+                    }
+                }
+
+                if (!isSkipRender) {
+                    this.render(M.currentdirid, {isRefresh: true}).catch(dump);
+                }
+            }
+            else {
+                this.updatedSharedNodeHandles.add(handle);
+            }
+        }
+
+        /**
+         * Updates device centre nodes with new data
+         * @returns {void}
+         */
+        _updateNodes() {
+            for (const handle of this.updatedNodeHandles) {
+                this.onUpdateNode(handle, true);
+            }
+            this.updatedNodeHandles.clear();
+
+            for (const handle of this.updatedSharedNodeHandles) {
+                this.onUpdateSharedNode(handle, true);
+            }
+            this.updatedSharedNodeHandles.clear();
+        }
+
+        /**
+         * Updates device centre data and revokes node from UI to be re-rendered again
+         * @param {Object} folder - device folder
+         * @param {MegaNode} node - node associated with the device folder
+         * @returns {DeviceCentreFolder} device folder object
+         */
+        _updateDataAndUI(folder, node) {
+            const newFolder = mega.devices.data.Parser.buildDeviceFolder(folder, node);
+            M.dcd[newFolder.d].folders[newFolder.h] = newFolder;
+
+            if (M.megaRender) {
+                M.megaRender.revokeDOMNode(newFolder.h, true);
+            }
+        }
+
+        /**
          * Initializes listener "beforepagechange" to destroy handlers when leaving device-center page
          * @returns {void}
          */
@@ -1765,6 +1831,25 @@ lazy(mega.devices, 'ui', () => {
             }
 
             return null;
+        }
+
+        /**
+         * Scans all device folders having handle as passed by argument
+         * @param {String} handle - folder handle to find
+         * @returns {Array<DeviceCentreFolder>} List of folders
+         */
+        _findAllFolders(handle) {
+            const folders = [];
+            if (M.dcd && Object.keys(M.dcd).length) {
+                for (const device of Object.values(M.dcd)) {
+                    const folder = device.folders[handle];
+                    if (folder) {
+                        folders.push(folder);
+                    }
+                }
+            }
+
+            return folders;
         }
 
         /**

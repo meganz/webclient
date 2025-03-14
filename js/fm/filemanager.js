@@ -1474,10 +1474,6 @@ FileManager.prototype.updFileManagerUI = async function() {
         }
     }
 
-    if (M.onDeviceCenter) {
-        mega.devices.ui.render(M.currentdirid, {isRefresh: true});
-    }
-
     if (u_type === 0) {
         // Show "ephemeral session warning"
         topmenuUI();

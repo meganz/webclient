@@ -243,6 +243,10 @@ function sharedUInode(nodeHandle, force) {
     if (M.recentsRender) {
         M.recentsRender.nodeChanged(nodeHandle);
     }
+
+    if (mega.devices.ui) {
+        mega.devices.ui.onUpdateSharedNode(nodeHandle);
+    }
 }
 
 /**

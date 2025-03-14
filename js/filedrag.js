@@ -481,7 +481,7 @@
                 return;
             }
 
-            var $fileAndFolderUploadWrap = $('.fm-file-upload').parent();
+            var $fileAndFolderUploadWrap = $('.fm-right-header');
 
             $('input', $fileAndFolderUploadWrap).remove();
             $fileAndFolderUploadWrap.safeAppend('<input type="file" class="hidden" id="fileselect1" title="' +

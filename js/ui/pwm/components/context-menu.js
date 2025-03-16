@@ -110,7 +110,7 @@ class MegaContextMenu extends MegaComponentGroup {
                 }
             },
             '.launch-website': {
-                text: "Launch website",
+                text: l.launch_website,
                 icon: 'sprite-pm-mono icon-external-link-thin-outline',
                 onClick: (nodeHandle) => {
                     const node = M.getNodeByHandle(nodeHandle);
@@ -120,7 +120,7 @@ class MegaContextMenu extends MegaComponentGroup {
                 }
             },
             '.copy-username': {
-                text: "Copy username",
+                text: l.copy_username,
                 icon: 'sprite-pm-mono icon-copy-user-thin-outline',
                 onClick: (nodeHandle) => {
                     const node = M.getNodeByHandle(nodeHandle);

@@ -38,7 +38,7 @@ mobile.settings.about  = Object.create(mobile.settingsHelper, {
                 },
                 {
                     text: l[24644],
-                    icon: 'sprite-mobile-fm-mono icon-settings-thin-outline',
+                    icon: 'sprite-fm-mono icon-settings-thin-outline',
                     binding: () => {
                         if ('csp' in window) {
                             csp.trigger().dump('csp.trigger');

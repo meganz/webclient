@@ -411,9 +411,7 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
     }
     items['.refresh-item'] = 1;
 
-    if (M.gallery || mega.gallery.canShowAddToAlbum()
-        && $.selected.every(h => mega.gallery.isGalleryNode(M.getNodeByHandle(h)))
-    ) {
+    if (mega.gallery.canShowAddToAlbum() && $.selected.every(h => mega.gallery.isGalleryNode(M.getNodeByHandle(h)))) {
         items['.add-to-album'] = 1;
     }
 
@@ -1400,7 +1398,7 @@ MegaData.prototype.setContextMenuShareText = function() {
     // If the node has shares or pending shares, set to 'Manage share', else, 'Share folder'
     if (n && M.getNodeShareUsers(n, 'EXP').length || M.ps[n]) {
         getLinkText = l.manage_share;
-        getLinkIcon = 'sprite-mobile-fm-mono icon-settings-thin-outline';
+        getLinkIcon = 'sprite-fm-mono icon-settings-thin-outline';
         cdShareToggle('add');
     }
     else {

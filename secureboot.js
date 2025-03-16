@@ -2025,58 +2025,25 @@ else if (!browserUpdate) {
             if (__cd_t) clearTimeout(__cd_t);
             var report = tryCatch(function()
             {
-                function ctx(id)
-                {
-                    return {
-                        callback : function(res)
-                        {
-                            if (res === EOVERQUOTA)
-                            {
-                                __cdumps = new Array(4);
-                                if (__cd_t) clearTimeout(__cd_t);
-
-                                if (id)
-                                {
-                                    var crashes = JSON.parse(localStorage.crashes || '{}');
-                                    delete crashes[id];
-                                    localStorage.crashes = JSON.stringify(crashes);
-                                }
-                            }
-                        }
-                    };
-                }
-                var ids = [], uds = [], r = 1;
-                for (var i in __cdumps)
-                {
-                    var dump = __cdumps[i];
-
-                    if (dump.x) { ids.push(dump.x); delete dump.x; }
-                    if (dump.d) { uds.push(dump.d); delete dump.d; }
-                    if (dump.l < 0) r = 0;
-                }
-
-                var report = {};
-                report.ua = navigator.userAgent;
-                report.io = window.dlMethod && dlMethod.name;
-                report.sb = sbid;
-                report.tp = typeof $ !== 'undefined' && $.transferprogress;
-                report.id = ids.join(",");
-                report.ud = uds;
-                report.cc = cc;
-
-                report = JSON.stringify(r? report:{});
-
+                // @todo revamp and move elsewhere to a dedicated file.
                 for (var i = __cdumps.length; i--;)
                 {
                     if (!/\w/.test(__cdumps[i].m || '')) continue;
 
-                    api_req({
+                    var payload = {
                         a: 'cd2',
                         c: JSON.stringify(__cdumps[i]),
-                        // v: report,
-                        // s: window.location.host,
                         t: version
-                    }, ctx(ids[i]));
+                    };
+
+                    if (self.api) {
+                        api.req(payload).catch(nop);
+                    }
+                    else {
+                        var xhr = new XMLHttpRequest();
+                        xhr.open('POST', apipath + 'cs?id=0', true);
+                        xhr.send(JSON.stringify([payload]));
+                    }
                 }
                 __cd_t = 0;
                 __cdumps = [];
@@ -2307,8 +2274,8 @@ else if (!browserUpdate) {
     jsl.push({f:'css/bottom-pages.css', n: 'bottom-pages_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/bottom-menu.css', n: 'bottom-menu_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/business.css', n: 'business_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f: 'css/pro.css', n: 'pro_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
-    jsl.push({f: 'css/propay.css', n: 'propay_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
+    jsl.push({f:'css/pro.css', n: 'pro_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/propay.css', n: 'propay_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/planpricing.css', n: 'planpricing_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/activate-s4.css', n: 'activates4_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/startpage.css', n: 'startpage_css', j:2,w:5,c:1,d:1,cache:1});
@@ -3104,9 +3071,6 @@ else if (!browserUpdate) {
             'pwm:pm_mono_css': {f:'css/sprites/pm-mono@mono.css', n: 'pm_mono_css', j:2, w:30, c:1, d:1, cache:1},
             'pwm:toggle_css': {f:'css/components/toggle-button.css', n: 'toggle_button_css', j:2, w:1},
             'pwm:read_only_field_css': {f:'css/pwm/components/read-only.css', n: 'read_only_field_css', j:2, w:1},
-            'pwm:mobile_fm_mono_css': {f:'css/sprites/mobile-fm-mono@mono.css', n: 'mobile_fm_mono_css', j:2, w:30, c:1, d:1, cache:1},
-            'pwm:mobile_fm_dark_css': {f:'css/sprites/mobile-fm-theme@dark.css', n: 'mobile_fm_dark_css', j:2, w:30, c:1, d:1, cache:1},
-            'pwm:mobile_fm_light_css': {f:'css/sprites/mobile-fm-theme@light.css', n: 'mobile_fm_light_css', j:2, w:30, c:1, d:1, cache:1},
             'pwm:form_css': {f:'css/pwm/form.css', n: 'pm_form_css', j:2, w:1},
             'pwm:pm_password_list_page_css': {f:'css/pwm/password-list-page.css', n: 'pm_password_list_page_css', j:2, w:1},
             'pwm:top_nav_css': {f:'css/pwm/top-nav.css', n: 'pm_top_nav_css', j:2, w:1},
@@ -4064,7 +4028,9 @@ else if (!browserUpdate) {
             }
         }
 
-        mBroadcaster.sendMessage('boot_done');
+        if (!is_drop) {
+            mBroadcaster.sendMessage('boot_done');
+        }
 
         if (u_checked) {
             startMega();

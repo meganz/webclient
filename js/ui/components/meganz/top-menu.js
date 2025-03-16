@@ -59,13 +59,20 @@ class MegaTopMenu extends MegaMobileTopMenu {
     closeActiveOverlays() {
 
         if (mega.ui.pm && (mega.pm.pwmFeature || u_attr.b || u_attr.pf) && mega.ui.pm.overlay.visible) {
-            mega.ui.passform.discard(mega.ui.passform.isFormChanged).then(res => {
-                if (res) {
-                    mega.ui.pm.overlay.hide();
-                    mega.ui.passform.clear();
-                }
-            });
+            return mega.ui.passform.discard(mega.ui.passform.isFormChanged)
+                .then(res => {
+                    if (res) {
+                        mega.ui.pm.overlay.hide();
+                        mega.ui.passform.clear();
+                    }
+                    return res;
+                })
+                .catch((ex) => {
+                    tell(ex);
+                    return false;
+                });
         }
+        return true;
     }
 
     // Override for desktop
@@ -149,7 +156,7 @@ class MegaTopMenu extends MegaMobileTopMenu {
             },
             {
                 text: l[823],
-                icon: 'sprite-mobile-fm-mono icon-settings-thin-outline',
+                icon: 'sprite-fm-mono icon-settings-thin-outline',
                 href: '/fm/pwm/account',
                 typeClassname: 'pwm',
                 name: 'pwm-settings',

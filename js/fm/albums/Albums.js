@@ -4256,6 +4256,7 @@ lazy(mega.gallery, 'albums', () => {
                 return;
             }
 
+            pendingName = '';
             const availableNodes = await mega.gallery.initialiseMediaNodes();
 
             if (availableNodes.length) {

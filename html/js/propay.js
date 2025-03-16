@@ -1550,8 +1550,8 @@ pro.propay = {
                     ? l.recurring_monthly
                     : this.getNumOfMonthsWording(1));
 
-                $('.monthly-price', $monthlyRadio).text(pro.propay.getTxtString(monthlyPlan, 1, '%1')).toggleClass('hidden', isRecurring);
-                $('.yearly-price', $monthlyRadio).text(pro.propay.getTxtString(monthlyPlan, 12)).toggleClass('hidden', !isRecurring);
+                $('.monthly-price', $monthlyRadio)
+                    .text(pro.propay.getTxtString(monthlyPlan, 1, isRecurring ? false : '%1')).removeClass('hidden');
 
 
                 if (this.currentGateway && this.currentGateway.minimumEURAmountSupported > monthlyPlan.priceEuro) {

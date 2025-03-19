@@ -1733,11 +1733,13 @@ lazy(mega.devices, 'ui', () => {
             if (this.$addBackup) {
                 this.$addBackup.rebind('click.dc.backup.add', () => {
                     this.desktopApp.backup.add();
+                    eventlog(500749);
                 });
             }
             if (this.$addSyncs) {
                 this.$addSyncs.rebind('click.dc.syncs.add', () => {
                     this.desktopApp.sync.add();
+                    eventlog(500750);
                 });
             }
             if (this.$emptyActiveDevices) {

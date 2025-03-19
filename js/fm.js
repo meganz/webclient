@@ -784,6 +784,7 @@ function fmtopUI() {
                             text: l.s4_bkt_settings,
                             onClick: () => {
                                 s4.ui.showDialog(s4.buckets.dialogs.settings, s4.ui.bucket);
+                                eventlog(500745);
                             }
                         },
                         (ev) => {
@@ -857,6 +858,7 @@ function fmtopUI() {
         }
 
         doClearbin(true);
+        eventlog(500740);
     });
 
     if (M.currentrootid === 'file-requests') {
@@ -3735,6 +3737,7 @@ function sharedFolderUI() {
             text: l[58],
             onClick(ev) {
                 mega.ui.secondaryNav.openDownloadMenu(ev);
+                eventlog(500733);
             }
         };
         const newButton = {

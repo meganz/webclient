@@ -150,12 +150,14 @@ lazy(mega.devices.sections, 'deviceFolders', () => {
                     text: l.add_backup_button,
                     onClick: () => {
                         ui.desktopApp.backup.add();
+                        eventlog(500751);
                     }
                 },
                 {
                     text: l.add_syncs_button,
                     onClick: () => {
                         ui.desktopApp.sync.add();
+                        eventlog(500752);
                     }
                 },
                 (ev) => {

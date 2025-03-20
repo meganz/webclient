@@ -91,7 +91,7 @@ lazy(mega.devices.sections, 'folderChildren', () => {
             mega.ui.secondaryNav.updateInfoPanelButton(true);
             if (!M.gallery) {
                 const isBackup = ui.isBackupRelated(h);
-                mega.ui.secondaryNav.updateGalleryLayout(isBackup);
+                mega.ui.secondaryNav.updateGalleryLayout();
                 if (hasToRenderHeader) {
                     const { isDeviceFolder, t, status } = folder;
                     const isShareLimitedNode = sharer(h) && M.getNodeRights(h) < 2;

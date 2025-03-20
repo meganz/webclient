@@ -107,6 +107,13 @@
                 },
             };
 
+            if (window.vw) {
+                cases[this.InboxID] = () => {
+                    typeClass = 'inbox';
+                    name = l[166];
+                };
+            }
+
             if (cases[handle]) {
                 cases[handle]();
             }
@@ -474,6 +481,7 @@
         else if (n) {
             id = n.h;
             let toSelect;
+            let isInboxRoot = false;
 
             if (!n.t) {
                 toSelect = id;
@@ -490,11 +498,17 @@
                     : M.currentCustomView.prefixPath + id;
             }
             else if (M.getNodeRoot(id) === M.InboxID) {
+                isInboxRoot = true;
                 id = mega.devices.ui.getNodeURLPathFromOuterView(n, !n.t);
             }
 
             Promise.resolve(id)
-                .then((id) => this.openFolder(id))
+                .then((id) => {
+                    if (window.vw && isInboxRoot && id === mega.devices.rootId) {
+                        id = n.h;
+                    }
+                    return this.openFolder(id);
+                })
                 .always(() => {
                     if (toSelect) {
                         $.selected = [toSelect];

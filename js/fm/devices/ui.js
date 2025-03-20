@@ -1119,14 +1119,18 @@ lazy(mega.devices, 'ui', () => {
          * @returns {Promise<Object>} device and folder data
          */
         async getOuterViewData(handle) {
+            const path = M.getPath(handle);
+
+            if (!path.includes(M.BackupsId)) {
+                return {device: null, folder: null};
+            }
+
             if (!Object.keys(M.dcd).length) {
                 await this.render(M.currentdirid, {isSkipPathCheck: true});
             }
 
             let folder = this._findFolder(handle);
             if (!folder) {
-                const path = M.getPath(handle);
-
                 // parent index for backup (4) or sync (2) in node parent path
                 const index = path[path.length - 1] === M.InboxID ? 4 : 2;
                 if (path.length > index) {
@@ -1374,11 +1378,17 @@ lazy(mega.devices, 'ui', () => {
         }
 
         /**
-         * Returns whether a node is a deprecated backup, so its parent, grandparent or itself is M.InboxID
+         * Returns whether a node is deprecated or not based in root node
+         * "true" in case is InboxID and "window.vw" flag disabled
+         * "false" otherwise
          * @param {MegaNode} node - node to check
-         * @returns {Boolen} Whether the node is a deprecated backup
+         * @returns {Boolen} Whether the node is in inbox
          */
-        isDeprecatedBackups(node) {
+        isDeprecated(node) {
+            if (window.vw) {
+                return false;
+            }
+
             if (node.h === M.InboxID || node.p === M.InboxID) {
                 return true;
             }

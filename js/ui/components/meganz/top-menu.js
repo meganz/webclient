@@ -237,8 +237,8 @@ class MegaTopMenu extends MegaMobileTopMenu {
         const items = this.domNode.getElementsByClassName('menu-item');
         const _isMedia = () => M.isGalleryPage() && mega.gallery.sections[M.currentdirid] ||
             (M.isGalleryPage() || M.isAlbumsPage()) && mega.gallery.albums;
-        const _isTreeItemOrSearch = () => M.currentrootid === M.RootID ||
-            M.currentCustomView.type === 's4' || M.search;
+        const _isTreeItemOrSearch = () => M.currentrootid === M.RootID
+            || M.currentrootid === M.InboxID || M.currentCustomView.type === 's4' || M.search;
         const _getSelected = () => {
 
             let selected;
@@ -251,9 +251,7 @@ class MegaTopMenu extends MegaMobileTopMenu {
             else if (M.currentdirid === M.RootID) {
                 selected = items['cloud-drive'];
             }
-            else if (M.onDeviceCenter
-                || M.currentrootid === M.InboxID
-            ) {
+            else if (M.onDeviceCenter) {
                 selected = items['device-centre'];
             }
             else if (['shares', 'out-shares', 'public-links', 'file-requests'].includes(M.currentrootid)) {

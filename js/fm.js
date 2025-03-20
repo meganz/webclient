@@ -903,11 +903,10 @@ function initTreeScroll() {
 }
 
 function fmLeftMenuUI() {
-
     "use strict";
 
     // handle the Inbox section use cases
-    if (M.InboxID && M.currentdirid === M.InboxID) {
+    if (!self.vw && M.InboxID && M.currentdirid === M.InboxID) {
         M.openFolder(M.RootID);
     }
 

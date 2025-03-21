@@ -728,7 +728,7 @@ lazy(mega.ui, 'searchbar', () => {
             filterFn(M.getFilterBySearchFn(term), ({ sen }) => !sen || mega.sensitives.showGlobally)
         );
 
-        const nodes = results.filter(n => n.p !== M.RubbishID && !mega.devices.ui.isDeprecatedBackups(n))
+        const nodes = results.filter(n => n.p !== M.RubbishID && !mega.devices.ui.isDeprecated(n))
             .sort((a, b) => a.name.localeCompare(b.name))
             .sort((a, b) => a.name.length - b.name.length);
 
@@ -777,6 +777,9 @@ lazy(mega.ui, 'searchbar', () => {
             else if (node.p === M.RubbishID) {
                 dir = l[167];
             }
+            else if (window.vw && node.p === M.InboxID) {
+                dir = l[166];
+            }
 
             $item.removeClass('dropdown-search-results-item-template hidden');
             $item.attr('id', node.h);
@@ -823,13 +826,19 @@ lazy(mega.ui, 'searchbar', () => {
                 }
                 $('.top-context-menu').addClass('hidden');
 
-                const isBackup = M.getNodeRoot(n) === M.InboxID;
-                if (isBackup) {
-                    // Backup type folder target only available in device centre
+                const isInboxRoot = M.getNodeRoot(n) === M.InboxID;
+                if (isInboxRoot) {
                     h = mega.devices.ui.getNodeURLPathFromOuterView(n);
                 }
 
-                Promise.resolve(h).then((h) => M.openFolder(h)).catch(tell);
+                Promise.resolve(h)
+                    .then((h) => {
+                        if (window.vw && isInboxRoot && h === mega.devices.rootId && n.h !== M.BackupsId) {
+                            h = n.h;
+                        }
+                        return M.openFolder(h);
+                    })
+                    .catch(tell);
             }
             else if (M.getNodeRoot(n.h) === M.RubbishID) {
                 propertiesDialog();

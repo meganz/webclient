@@ -1100,7 +1100,11 @@ lazy(mega, 'fileRequest', () => {
 
         rebindTopMenuCreateIcon() {
             $('.fm-header-buttons .fm-new-file-request', document)
-                .rebind('click.frtmc', openNewDialogHandler);
+                .rebind('click.frtmc', (ev) => {
+                    openNewDialogHandler(ev);
+                    eventlog(500738);
+                    return false;
+                });
         }
 
         rebindPageEmptyCreateButton() {

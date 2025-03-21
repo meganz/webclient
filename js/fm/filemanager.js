@@ -855,6 +855,7 @@ FileManager.prototype.initFileManagerUI = function() {
             }
             $.selected = [id];
             M.getLinkAction();
+            eventlog(500737);
         }
     });
     mega.ui.secondaryNav.addActionButton({
@@ -866,6 +867,7 @@ FileManager.prototype.initFileManagerUI = function() {
                 return;
             }
             mega.fileRequest.dialogs.manageDialog.init({ h });
+            eventlog(500739);
         }
     });
     mega.ui.secondaryNav.addActionButton({
@@ -2366,7 +2368,10 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(c + '.open-item').rebind('click', function() {
-        var target = $.selected[0];
+        const originalTarget = $.selected[0];
+        let target = originalTarget;
+        let isInboxRoot = false;
+
         if (
             M.currentrootid === 'out-shares' ||
             M.currentrootid === 'public-links' ||
@@ -2381,12 +2386,17 @@ FileManager.prototype.initContextUI = function() {
             target = M.dyh('folder-id', target);
         }
         else if (M.getNodeRoot(target) === M.InboxID) {
-            // Backup type folder target only available in device centre
+            isInboxRoot = true;
             target = mega.devices.ui.getNodeURLPathFromOuterView(M.d[target]);
         }
 
         Promise.resolve(target)
-            .then((target) => M.openFolder(target))
+            .then((target) => {
+                if (window.vw && isInboxRoot && target === mega.devices.rootId) {
+                    target = originalTarget;
+                }
+                return M.openFolder(target);
+            })
             .then(() => {
                 M.fmEventLog(500675);
             })
@@ -2643,6 +2653,7 @@ FileManager.prototype.createFolderUI = function() {
         if (M.getNodeRights(n.h) > 1) {
             $.selected = [n.h];
             M.openSharingDialog($.selected[0]);
+            eventlog(500735);
             return false;
         }
     });
@@ -2661,6 +2672,9 @@ FileManager.prototype.createFolderUI = function() {
     $('.fm-download').rebind('click', (ev) => {
         ev.currentTarget.domNode = ev.currentTarget;
         mega.ui.secondaryNav.openDownloadMenu(ev);
+        if (folderlink) {
+            eventlog(500741);
+        }
     });
 
     $('.create-folder-button').rebind('click', doCreateFolder);
@@ -2733,6 +2747,7 @@ FileManager.prototype.createFolderUI = function() {
         }
         else {
             openNewSharedFolderDialog().catch(dump);
+            eventlog(500734);
         }
     });
 
@@ -2748,6 +2763,7 @@ FileManager.prototype.createFolderUI = function() {
             M.safeShowDialog('create-new-link', function () {
                 M.initFileAndFolderSelectDialog('create-new-link');
             });
+            eventlog(500736);
         }
     });
 };
@@ -4061,18 +4077,23 @@ FileManager.prototype.addGridUI = function(refresh) {
         const node = M.getNodeByHandle(h);
 
         // Incoming Shares section if shared folder doesn't have parent
-        let target = node.su && (!node.p || !M.d[node.p]) ? 'shares' : node.p;
+        const originalTarget = node.su && (!node.p || !M.d[node.p]) ? 'shares' : node.p;
+        let target = originalTarget;
 
-        const isBackup = M.getNodeRoot(target) === M.InboxID;
-        if (isBackup) {
-            // Backup type folder target only available in device centre
+        const isInboxRoot = M.getNodeRoot(target) === M.InboxID;
+        if (isInboxRoot) {
             target = mega.devices.ui.getNodeURLPathFromOuterView(node, true);
         }
 
         Promise.resolve(target)
-            .then((target) => M.openFolder(target))
+            .then((target) => {
+                if (window.vw && isInboxRoot && target === mega.devices.rootId) {
+                    target = originalTarget;
+                }
+                return M.openFolder(target);
+            })
             .then(() => {
-                if (!isBackup) {
+                if (!isInboxRoot || target !== mega.devices.rootId) {
                     selectionManager.add_to_selection(node.h, true);
                 }
             })
@@ -4423,6 +4444,7 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
         }
 
         if (n.t || M.dcd[n.h]) {
+            let isInboxRoot = false;
             if (e.ctrlKey) {
                 $.ofShowNoFolders = true;
             }
@@ -4441,11 +4463,18 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
                 h = M.dyh('folder-id', h);
             }
             else if (M.getNodeRoot(n.h) === M.InboxID) {
-                // Backup type folder target only available in device centre
+                isInboxRoot = true;
                 h = mega.devices.ui.getNodeURLPathFromOuterView(n);
             }
 
-            Promise.resolve(h).then((h) => M.openFolder(h)).catch(tell);
+            Promise.resolve(h)
+                .then((h) => {
+                    if (window.vw && isInboxRoot && h === mega.devices.rootId && n.h !== M.BackupsId) {
+                        h = n.h;
+                    }
+                    return M.openFolder(h);
+                })
+                .catch(tell);
         }
         else if (is_image2(n) || is_video(n)) {
             if (is_video(n)) {

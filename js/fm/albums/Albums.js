@@ -3088,7 +3088,10 @@ lazy(mega.gallery, 'albums', () => {
                     nodesAvailable ?
                         {
                             text: l.album_download,
-                            onClick: onDownload
+                            onClick: () => {
+                                onDownload();
+                                eventlog(500742);
+                            }
                         } :
                         hidden,
                     needSlideshow && ((ev) => {
@@ -3112,6 +3115,7 @@ lazy(mega.gallery, 'albums', () => {
                     text: l.album_play_slideshow,
                     onClick: () => {
                         scope.playSlideshow(albumId, true);
+                        eventlog(500730);
                     }
                 } : hidden;
                 const download = nodesAvailable ? {
@@ -3121,6 +3125,7 @@ lazy(mega.gallery, 'albums', () => {
                         const menu = new DownloadContextMenu(albumId);
 
                         menu.show(x, bottom + 4);
+                        eventlog(500729);
                     }
                 } : false;
                 mega.ui.secondaryNav.showCard(
@@ -3201,6 +3206,7 @@ lazy(mega.gallery, 'albums', () => {
 
                             const dialog = new AlbumItemsDialog(albumId);
                             dialog.show();
+                            eventlog(500731);
                         }
                     },
                     {
@@ -3224,6 +3230,7 @@ lazy(mega.gallery, 'albums', () => {
                             else {
                                 scope.albums.addShare([albumId]);
                             }
+                            eventlog(500732);
                         }
                     },
                     (ev) => {
@@ -3252,6 +3259,7 @@ lazy(mega.gallery, 'albums', () => {
 
                     const dialog = new AlbumNameDialog();
                     dialog.show();
+                    eventlog(500728);
                 }
             });
             mega.ui.secondaryNav.showActionButtons('.fm-new-album');

@@ -38,6 +38,9 @@ lazy(mega.ui, 'mInfoPanel', () => {
         }
         else if (isBackup) {
             pathItems = await mega.devices.ui.getNodeFullPathFromOuterView(node);
+            if (pathItems.length === 1 && pathItems[0] === mega.devices.rootId && node.h !== M.BackupsId) {
+                pathItems = M.getPath(node.h);
+            }
         }
         else {
             pathItems = M.getPath(node.h);
@@ -69,6 +72,9 @@ lazy(mega.ui, 'mInfoPanel', () => {
             }
             else if (pathItemHandle === mega.devices.rootId) {
                 nodeName = l.device_centre;
+            }
+            else if (pathItemHandle === M.InboxID) {
+                nodeName = l[166];
             }
 
             // Skip if no node name available
@@ -275,12 +281,14 @@ lazy(mega.ui, 'mInfoPanel', () => {
                 // If an image, load the slideshow
                 else if (is_image2(node)) {
                     slideshow(nodeHandle);
+                    checkCurrentView();
                 }
 
                 // If it's a video, load the video viewer
                 else if (is_video(node)) {
                     $.autoplay = nodeHandle;
                     slideshow(nodeHandle);
+                    checkCurrentView();
                 }
 
                 // If a text file, load the text editor

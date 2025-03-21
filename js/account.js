@@ -230,6 +230,10 @@ function u_checklogin3a(res, ctx) {
         if (r === 3) {
             document.body.classList.add('logged');
             document.body.classList.remove('not-logged');
+
+            if (self.u_handle === 'pGTOqu7_Fek') {
+                self.vw = 1;
+            }
         }
 
         // Recovery key has been saved

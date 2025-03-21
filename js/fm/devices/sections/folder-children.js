@@ -108,6 +108,7 @@ lazy(mega.devices.sections, 'folderChildren', () => {
                             onClick: () => {
                                 $.selected = [h];
                                 ui.desktopApp.common.togglePause();
+                                eventlog(isBackup ? 500755 : 500756);
                             }
                         },
                         {
@@ -116,6 +117,7 @@ lazy(mega.devices.sections, 'folderChildren', () => {
                             onClick: () => {
                                 $.selected = [h];
                                 ui.desktopApp.common.remove();
+                                eventlog(isBackup ? 500753 : 500754);
                             }
                         },
                         (ev) => {

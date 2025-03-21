@@ -40,7 +40,7 @@ class MegaHeader extends MegaMobileHeader {
                 parentNode: wrapper,
                 type: 'icon',
                 componentClassname: 'text-icon alarm',
-                icon: 'sprite-fm-mono icon-bell-regular-outline',
+                icon: 'sprite-fm-mono icon-bell-thin-outline',
                 iconSize: 24,
                 simpletip: l[862]
             });
@@ -69,7 +69,7 @@ class MegaHeader extends MegaMobileHeader {
             parentNode: wrapper,
             type: 'icon',
             componentClassname: 'text-icon contacts flyout-option simpletip',
-            icon: 'sprite-fm-mono icon-user-square-outline',
+            icon: 'sprite-fm-mono icon-user-square-thin-outline',
             iconSize: 24,
             dataset: {
                 simpletip: l[165],
@@ -93,7 +93,7 @@ class MegaHeader extends MegaMobileHeader {
             parentNode: wrapper,
             type: 'icon',
             componentClassname: 'text-icon chats flyout-option simpletip',
-            icon: 'sprite-fm-mono icon-message-chat-circle',
+            icon: 'sprite-fm-mono icon-message-chat-circle-thin',
             iconSize: 24,
             dataset: {
                 simpletip: l[7997],
@@ -448,14 +448,14 @@ class MegaHeader extends MegaMobileHeader {
         mega.ui.header.handleMenu('notif', true);
         notify.markAllNotificationsAsSeen();
         notify.dynamicNotifCountdown.removeDynamicNotifCountdown();
-        mega.ui.header.notifButton.icon = mega.ui.header.notifButton.icon.replace('-filled', '-outline');
+        mega.ui.header.notifButton.icon = mega.ui.header.notifButton.icon.replace('regular-filled', 'thin-outline');
     }
 
     showNotifMenu() {
         mega.ui.header.notifButton.parentNode.classList.add('show');
         notify.renderNotifications();
         mega.ui.header.handleMenu('notif');
-        mega.ui.header.notifButton.icon = mega.ui.header.notifButton.icon.replace('-outline', '-filled');
+        mega.ui.header.notifButton.icon = mega.ui.header.notifButton.icon.replace('thin-outline', 'regular-filled');
         eventlog(500322);
     }
 

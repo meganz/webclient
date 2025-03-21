@@ -3218,6 +3218,10 @@ async function galleryUI(id) {
         }
 
         mega.gallery.resetMediaCounts(M.v);
+
+        if (id) {
+            onIdle(fmtopUI);
+        }
     });
 }
 

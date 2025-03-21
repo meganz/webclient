@@ -364,7 +364,7 @@
             return this.openFolder('fm');
         }
 
-        if (this.InboxID && this.currentrootid === this.InboxID) {
+        if (!window.vw && this.InboxID && this.currentrootid === this.InboxID) {
             return this.openFolder(mega.devices.rootId);
         }
         if (this.currentrootid === this.RootID) {
@@ -915,7 +915,7 @@
                     console.info(`Using deferred sink for ${id}...`);
                 }
             }
-            else if (id === 'devices' || this.InboxID && this.d[id] && this.d[id].p === this.InboxID) {
+            else if (id === 'devices' || !window.vw && this.InboxID && this.d[id] && this.d[id].p === this.InboxID) {
                 return this.openFolder(mega.devices.rootId);
             }
             else if (!this.d[id] || this.d[id].t && !this.c[id]) {

@@ -586,6 +586,10 @@ body.de .mega-dialog.contact-picker-widget {
     right: 5px;
     position: absolute;
 }
+.rtl .fm-picker-header .fm-header-buttons {
+    left: 5px;
+    right: unset;
+}
 .fm-dialog-scroll, .add-from-cloud .dialog-empty-block {
     height: 434px !important;
 }

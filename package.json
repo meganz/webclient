@@ -91,10 +91,10 @@
     "karma-sinon": "1.0.5",
     "mocha": "11.1.0",
     "react-hot-loader": "4.13.1",
-    "sass": "1.85.1",
+    "sass": "1.86.0",
     "sass-loader": "16.0.5",
     "sinon": "15.0.3",
-    "stylelint": "16.15.0",
+    "stylelint": "16.16.0",
     "stylelint-config-standard": "37.0.0",
     "stylelint-no-unsupported-browser-features": "8.0.4",
     "webpack-dev-server": "5.2.0"

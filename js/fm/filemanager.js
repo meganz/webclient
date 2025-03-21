@@ -855,6 +855,7 @@ FileManager.prototype.initFileManagerUI = function() {
             }
             $.selected = [id];
             M.getLinkAction();
+            eventlog(500737);
         }
     });
     mega.ui.secondaryNav.addActionButton({
@@ -866,6 +867,7 @@ FileManager.prototype.initFileManagerUI = function() {
                 return;
             }
             mega.fileRequest.dialogs.manageDialog.init({ h });
+            eventlog(500739);
         }
     });
     mega.ui.secondaryNav.addActionButton({
@@ -2651,6 +2653,7 @@ FileManager.prototype.createFolderUI = function() {
         if (M.getNodeRights(n.h) > 1) {
             $.selected = [n.h];
             M.openSharingDialog($.selected[0]);
+            eventlog(500735);
             return false;
         }
     });
@@ -2669,6 +2672,9 @@ FileManager.prototype.createFolderUI = function() {
     $('.fm-download').rebind('click', (ev) => {
         ev.currentTarget.domNode = ev.currentTarget;
         mega.ui.secondaryNav.openDownloadMenu(ev);
+        if (folderlink) {
+            eventlog(500741);
+        }
     });
 
     $('.create-folder-button').rebind('click', doCreateFolder);
@@ -2741,6 +2747,7 @@ FileManager.prototype.createFolderUI = function() {
         }
         else {
             openNewSharedFolderDialog().catch(dump);
+            eventlog(500734);
         }
     });
 
@@ -2756,6 +2763,7 @@ FileManager.prototype.createFolderUI = function() {
             M.safeShowDialog('create-new-link', function () {
                 M.initFileAndFolderSelectDialog('create-new-link');
             });
+            eventlog(500736);
         }
     });
 };

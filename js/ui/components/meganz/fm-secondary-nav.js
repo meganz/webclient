@@ -385,6 +385,7 @@ lazy(mega.ui, 'secondaryNav', () => {
                 return;
             }
             createFileDialog();
+            eventlog(500722);
         }
     });
 
@@ -491,6 +492,7 @@ lazy(mega.ui, 'secondaryNav', () => {
         onClick(ev) {
             if (!ev.currentTarget.rightIcon) {
                 viewChangeHandler(0);
+                eventlog(500724);
             }
         }
     });
@@ -503,6 +505,7 @@ lazy(mega.ui, 'secondaryNav', () => {
         onClick(ev) {
             if (!ev.currentTarget.rightIcon) {
                 viewChangeHandler(1);
+                eventlog(500725);
             }
         }
     });
@@ -515,6 +518,7 @@ lazy(mega.ui, 'secondaryNav', () => {
         onClick(ev) {
             if (!ev.currentTarget.rightIcon) {
                 viewChangeHandler(2);
+                eventlog(500726);
             }
         }
     });
@@ -565,6 +569,7 @@ lazy(mega.ui, 'secondaryNav', () => {
                     target.removeClass('active');
                 }
             });
+            eventlog(500721);
         },
         openDownloadMenu(ev) {
             const target = ev.currentTarget;
@@ -695,12 +700,14 @@ lazy(mega.ui, 'secondaryNav', () => {
                     ev.stopPropagation();
                     if (mega.ui.mInfoPanel.isOpen()) {
                         mega.ui.mInfoPanel.closeIfOpen();
+                        eventlog(500727);
                         return;
                     }
                     const id = M.currentdirid.split('/').pop();
                     if (id) {
                         $.selected = [id];
                         mega.ui.mInfoPanel.initInfoPanel();
+                        eventlog(500727);
                     }
                 });
             }
@@ -720,6 +727,7 @@ lazy(mega.ui, 'secondaryNav', () => {
                     const event = new MegaDataEvent(ev);
                     event.currentTarget = ev.currentTarget;
                     this.showLayoutDropdown(event);
+                    eventlog(500723);
                 });
                 layoutButtonBound = true;
             }

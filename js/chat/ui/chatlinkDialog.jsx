@@ -17,9 +17,14 @@ export class ChatlinkDialog extends React.Component {
         newTopic: ''
     };
 
-    retrieveChatLink() {
+    retrieveChatLink(forced) {
         const { chatRoom } = this.props;
-        if (!chatRoom.topic) {
+
+        if (is_chatlink) {
+            return this.setState({ link: `${getBaseUrl()}/chat/${is_chatlink.ph}#${is_chatlink.key}` });
+        }
+
+        if (!chatRoom.topic && !forced) {
             delete this.loading;
             return;
         }
@@ -36,16 +41,6 @@ export class ChatlinkDialog extends React.Component {
     onClose = () => {
         if (this.props.onClose) {
             this.props.onClose();
-        }
-    };
-
-    onTopicFieldChanged = e => {
-        this.setState({ newTopic: e.target.value });
-    };
-
-    onTopicFieldKeyPress = e => {
-        if (e.which === 13) {
-            this.props.chatRoom.setRoomTitle(this.state.newTopic);
         }
     };
 
@@ -87,7 +82,8 @@ export class ChatlinkDialog extends React.Component {
                     title={chatRoom.iAmOperator() && !chatRoom.topic
                         ? chatRoom.isMeeting
                             ? l.rename_meeting /* `Rename Meeting` */
-                            : l[9080] /* `Rename Group` */ : ''}
+                            : l[9080] /* `Rename Group` */ : ''
+                    }
                     className={`
                         chat-rename-dialog
                         export-chat-links-dialog
@@ -112,8 +108,13 @@ export class ChatlinkDialog extends React.Component {
                                         name="newTopic"
                                         value={newTopic}
                                         style={{ paddingLeft: 8, }}
-                                        onChange={this.onTopicFieldChanged}
-                                        onKeyPress={this.onTopicFieldKeyPress}
+                                        onChange={ev => this.setState({ newTopic: ev.target.value })}
+                                        onKeyPress={ev =>
+                                            ev.which === 13 /* RET */ &&
+                                            chatRoom.setRoomTopic(newTopic)
+                                                .then(() => this.retrieveChatLink(true))
+                                                .catch(dump)
+                                        }
                                         placeholder={l[20616] /* `Add a description for this chat` */}
                                         maxLength={ChatRoom.TOPIC_MAX_LENGTH}
                                     />
@@ -142,7 +143,9 @@ export class ChatlinkDialog extends React.Component {
                                             value={this.loading ? l[5533] : !chatRoom.topic ? l[20660] : link}
                                         />
                                     </div>
-                                    <div className="info">{chatRoom.publicLink ? publicLinkDetails : null}</div>
+                                    <div className="info">
+                                        {chatRoom.publicLink || is_chatlink ? publicLinkDetails : null}
+                                    </div>
                                 </div>
                             </section>
                         </>
@@ -169,7 +172,7 @@ export class ChatlinkDialog extends React.Component {
                             }
 
                             {chatRoom.topic ?
-                                chatRoom.publicLink ?
+                                chatRoom.publicLink || is_chatlink ?
                                     <button
                                         className={`
                                             mega-button
@@ -193,9 +196,13 @@ export class ChatlinkDialog extends React.Component {
                                             mega-button
                                             positive
                                             links-button
-                                            ${newTopic && $.trim(newTopic) ? '' : 'disabled'}
+                                            ${newTopic && newTopic.trim() ? '' : 'disabled'}
                                         `}
-                                        onClick={() => chatRoom.iAmOperator() && chatRoom.setRoomTitle(newTopic)}>
+                                        onClick={() =>
+                                            chatRoom.setRoomTopic(newTopic)
+                                                .then(() => this.retrieveChatLink(true))
+                                                .catch(dump)
+                                        }>
                                         <span>{l[20615] /* `Set description` */}</span>
                                     </button>
                                     :

@@ -1433,6 +1433,8 @@ export class ConversationPanel extends MegaRenderMixin {
         waitingRoom: false,
         callUserLimit: false,
         historyTimeOutBanner: DISMISS_TRANSITIONS.NOT_SHOWN,
+        renameDialog: false,
+        renameDialogValue: undefined
     };
 
     constructor(props) {
@@ -1527,6 +1529,61 @@ export class ConversationPanel extends MegaRenderMixin {
         }
         return null;
     }
+
+    RenameDialog = () => {
+        const { chatRoom } = this.props;
+        const { renameDialogValue } = this.state;
+        const isDisabled = renameDialogValue === chatRoom.getRoomTitle() || !$.trim(renameDialogValue).length;
+        const onSubmit = () =>
+            chatRoom.setRoomTopic(renameDialogValue)
+                .then(() => this.setState({ renameDialog: false, renameDialogValue: undefined }))
+                .catch(dump);
+
+        return (
+            <ModalDialogsUI.ModalDialog
+                chatRoom={chatRoom}
+                title={chatRoom.isMeeting ? l.rename_meeting /* `Rename Meeting` */ : l[9080] /* `Rename Group` */}
+                name="rename-group"
+                className="chat-rename-dialog dialog-template-main"
+                onClose={() => this.setState({ renameDialog: false, renameDialogValue: undefined })}
+                buttons={[
+                    {
+                        label: l[1686] /* `Cancel` */,
+                        onClick: () => this.setState({ renameDialog: false, renameDialogValue: undefined })
+                    },
+                    {
+                        label: l[61] /* `Rename` */,
+                        className: `
+                            positive
+                            ${isDisabled ? 'disabled' : ''}
+                        `,
+                        onClick: isDisabled ? null : onSubmit
+                    },
+                ]}>
+                <section className="content">
+                    <div className="content-block">
+                        <div className="dialog secondary-header">
+                            <div className="rename-input-bl">
+                                <input
+                                    type="text"
+                                    name="newTopic"
+                                    className="chat-rename-group-dialog"
+                                    value={
+                                        renameDialogValue === undefined ? chatRoom.getRoomTitle() : renameDialogValue
+                                    }
+                                    maxLength={ChatRoom.TOPIC_MAX_LENGTH}
+                                    onChange={ev =>
+                                        this.setState({ renameDialogValue: ev.target.value.substr(0, 30) })
+                                    }
+                                    onKeyUp={ev => isDisabled ? null : ev.which === 13 /* RET */ && onSubmit()}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </ModalDialogsUI.ModalDialog>
+        );
+    };
 
     componentDidMount() {
         super.componentDidMount();
@@ -2167,78 +2224,6 @@ export class ConversationPanel extends MegaRenderMixin {
                 }}
             />;
         }
-        if (self.state.renameDialog === true) {
-            var onEditSubmit = function(e) {
-                if (self.props.chatRoom.setRoomTitle(self.state.renameDialogValue)) {
-                    self.setState({'renameDialog': false, 'renameDialogValue': undefined});
-                }
-                e.preventDefault();
-                e.stopPropagation();
-            };
-            var renameDialogValue = typeof(self.state.renameDialogValue) !== 'undefined' ?
-                self.state.renameDialogValue :
-                self.props.chatRoom.getRoomTitle();
-
-            confirmDeleteDialog = <ModalDialogsUI.ModalDialog
-                chatRoom={room}
-                title={room.isMeeting
-                    ? l.rename_meeting /* `Rename Meeting` */
-                    : l[9080] /* `Rename Group` */}
-                name="rename-group"
-                className="chat-rename-dialog dialog-template-main"
-                onClose={() => {
-                    self.setState({'renameDialog': false, 'renameDialogValue': undefined});
-                }}
-                buttons={[
-                    {
-                        "label": l[1686],
-                        "key": "cancel",
-                        "onClick": function(e) {
-                            self.setState({'renameDialog': false, 'renameDialogValue': undefined});
-                            e.preventDefault();
-                            e.stopPropagation();
-                        }
-                    },
-                    {
-                        "label": l[61],
-                        "key": "rename",
-                        "className": (
-                            $.trim(self.state.renameDialogValue).length === 0 ||
-                            self.state.renameDialogValue === self.props.chatRoom.getRoomTitle() ?
-                                "positive disabled" : "positive"
-                        ),
-                        "onClick": function(e) {
-                            onEditSubmit(e);
-                        }
-                    },
-                ]}>
-                <section className="content">
-                    <div className="content-block">
-                        <div className="dialog secondary-header">
-                            <div className="rename-input-bl">
-                                <input
-                                    type="text"
-                                    className="chat-rename-group-dialog"
-                                    name="newTopic"
-                                    value={renameDialogValue}
-                                    maxLength={ChatRoom.TOPIC_MAX_LENGTH}
-                                    onChange={(e) => {
-                                        self.setState({
-                                            'renameDialogValue': e.target.value.substr(0, 30)
-                                        });
-                                    }}
-                                    onKeyUp={(e) => {
-                                        if (e.which === 13) {
-                                            onEditSubmit(e);
-                                        }
-                                    }}
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </section>
-            </ModalDialogsUI.ModalDialog>
-        }
 
         let { descriptionDialog } = this.state;
         descriptionDialog = descriptionDialog ? <ModalDialogsUI.ModalDialog
@@ -2604,6 +2589,8 @@ export class ConversationPanel extends MegaRenderMixin {
                     {confirmTruncateDialog}
                     {pushSettingsDialog}
                     {descriptionDialog}
+
+                    {this.state.renameDialog && <this.RenameDialog />}
 
                     {this.state.chatLinkDialog &&
                         <ChatlinkDialog

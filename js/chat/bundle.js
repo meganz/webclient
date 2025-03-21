@@ -15711,22 +15711,17 @@ class ChatlinkDialog extends REaCt().Component {
         this.props.onClose();
       }
     };
-    this.onTopicFieldChanged = e => {
-      this.setState({
-        newTopic: e.target.value
-      });
-    };
-    this.onTopicFieldKeyPress = e => {
-      if (e.which === 13) {
-        this.props.chatRoom.setRoomTitle(this.state.newTopic);
-      }
-    };
   }
-  retrieveChatLink() {
+  retrieveChatLink(forced) {
     const {
       chatRoom
     } = this.props;
-    if (!chatRoom.topic) {
+    if (is_chatlink) {
+      return this.setState({
+        link: `${getBaseUrl()}/chat/${is_chatlink.ph}#${is_chatlink.key}`
+      });
+    }
+    if (!chatRoom.topic && !forced) {
       delete this.loading;
       return;
     }
@@ -15801,8 +15796,10 @@ class ChatlinkDialog extends REaCt().Component {
       style: {
         paddingLeft: 8
       },
-      onChange: this.onTopicFieldChanged,
-      onKeyPress: this.onTopicFieldKeyPress,
+      onChange: ev => this.setState({
+        newTopic: ev.target.value
+      }),
+      onKeyPress: ev => ev.which === 13 && chatRoom.setRoomTopic(newTopic).then(() => this.retrieveChatLink(true)).catch(dump),
       placeholder: l[20616],
       maxLength: ChatRoom.TOPIC_MAX_LENGTH
     })))) : REaCt().createElement(REaCt().Fragment, null, REaCt().createElement("header", null, chatRoom.isMeeting ? REaCt().createElement("div", {
@@ -15827,7 +15824,7 @@ class ChatlinkDialog extends REaCt().Component {
       value: this.loading ? l[5533] : !chatRoom.topic ? l[20660] : link
     })), REaCt().createElement("div", {
       className: "info"
-    }, chatRoom.publicLink ? publicLinkDetails : null)))), REaCt().createElement("footer", null, REaCt().createElement("div", {
+    }, chatRoom.publicLink || is_chatlink ? publicLinkDetails : null)))), REaCt().createElement("footer", null, REaCt().createElement("div", {
       className: "footer-container"
     }, chatRoom.iAmOperator() && chatRoom.publicLink && REaCt().createElement("button", {
       key: "deleteLink",
@@ -15840,7 +15837,7 @@ class ChatlinkDialog extends REaCt().Component {
         chatRoom.updatePublicHandle(1);
         this.onClose();
       }
-    }, REaCt().createElement("span", null, chatRoom.isMeeting ? l.meeting_link_delete : l[20487])), chatRoom.topic ? chatRoom.publicLink ? REaCt().createElement("button", {
+    }, REaCt().createElement("span", null, chatRoom.isMeeting ? l.meeting_link_delete : l[20487])), chatRoom.topic ? chatRoom.publicLink || is_chatlink ? REaCt().createElement("button", {
       className: `
                                             mega-button
                                             positive
@@ -15859,9 +15856,9 @@ class ChatlinkDialog extends REaCt().Component {
                                             mega-button
                                             positive
                                             links-button
-                                            ${newTopic && $.trim(newTopic) ? '' : 'disabled'}
+                                            ${newTopic && newTopic.trim() ? '' : 'disabled'}
                                         `,
-      onClick: () => chatRoom.iAmOperator() && chatRoom.setRoomTitle(newTopic)
+      onClick: () => chatRoom.setRoomTopic(newTopic).then(() => this.retrieveChatLink(true)).catch(dump)
     }, REaCt().createElement("span", null, l[20615])) : closeButton))));
   }
 }
@@ -17949,16 +17946,73 @@ const ConversationPanel = (conversationpanel_dec = utils.Ay.SoonFcWrap(360), _de
       occurrencesLoading: false,
       waitingRoom: false,
       callUserLimit: false,
-      historyTimeOutBanner: DISMISS_TRANSITIONS.NOT_SHOWN
+      historyTimeOutBanner: DISMISS_TRANSITIONS.NOT_SHOWN,
+      renameDialog: false,
+      renameDialogValue: undefined
+    };
+    this.RenameDialog = () => {
+      const {
+        chatRoom
+      } = this.props;
+      const {
+        renameDialogValue
+      } = this.state;
+      const isDisabled = renameDialogValue === chatRoom.getRoomTitle() || !$.trim(renameDialogValue).length;
+      const onSubmit = () => chatRoom.setRoomTopic(renameDialogValue).then(() => this.setState({
+        renameDialog: false,
+        renameDialogValue: undefined
+      })).catch(dump);
+      return REaCt().createElement(modalDialogs.A.ModalDialog, {
+        chatRoom,
+        title: chatRoom.isMeeting ? l.rename_meeting : l[9080],
+        name: "rename-group",
+        className: "chat-rename-dialog dialog-template-main",
+        onClose: () => this.setState({
+          renameDialog: false,
+          renameDialogValue: undefined
+        }),
+        buttons: [{
+          label: l[1686],
+          onClick: () => this.setState({
+            renameDialog: false,
+            renameDialogValue: undefined
+          })
+        }, {
+          label: l[61],
+          className: `
+                            positive
+                            ${isDisabled ? 'disabled' : ''}
+                        `,
+          onClick: isDisabled ? null : onSubmit
+        }]
+      }, REaCt().createElement("section", {
+        className: "content"
+      }, REaCt().createElement("div", {
+        className: "content-block"
+      }, REaCt().createElement("div", {
+        className: "dialog secondary-header"
+      }, REaCt().createElement("div", {
+        className: "rename-input-bl"
+      }, REaCt().createElement("input", {
+        type: "text",
+        name: "newTopic",
+        className: "chat-rename-group-dialog",
+        value: renameDialogValue === undefined ? chatRoom.getRoomTitle() : renameDialogValue,
+        maxLength: ChatRoom.TOPIC_MAX_LENGTH,
+        onChange: ev => this.setState({
+          renameDialogValue: ev.target.value.substr(0, 30)
+        }),
+        onKeyUp: ev => isDisabled ? null : ev.which === 13 && onSubmit()
+      }))))));
     };
     const {
-      chatRoom
+      chatRoom: _chatRoom
     } = this.props;
-    chatRoom.rebind(`openAttachCloudDialog.${this.getUniqueId()}`, () => this.openAttachCloudDialog());
-    chatRoom.rebind(`openSendContactDialog.${this.getUniqueId()}`, () => this.openSendContactDialog());
-    chatRoom.rebind(`openSchedDescDialog.${this.getUniqueId()}`, () => this.openSchedDescDialog());
+    _chatRoom.rebind(`openAttachCloudDialog.${this.getUniqueId()}`, () => this.openAttachCloudDialog());
+    _chatRoom.rebind(`openSendContactDialog.${this.getUniqueId()}`, () => this.openSendContactDialog());
+    _chatRoom.rebind(`openSchedDescDialog.${this.getUniqueId()}`, () => this.openSchedDescDialog());
     this.handleKeyDown = SoonFc(120, ev => this._handleKeyDown(ev));
-    this.state.waitingRoom = chatRoom.options.w && (chatRoom.isAnonymous() || megaChat.initialChatId || is_eplusplus);
+    this.state.waitingRoom = _chatRoom.options.w && (_chatRoom.isAnonymous() || megaChat.initialChatId || is_eplusplus);
   }
   customIsEventuallyVisible() {
     return this.props.chatRoom.isCurrentlyActive;
@@ -18550,74 +18604,6 @@ const ConversationPanel = (conversationpanel_dec = utils.Ay.SoonFcWrap(360), _de
         }
       });
     }
-    if (self.state.renameDialog === true) {
-      const onEditSubmit = function (e) {
-        if (self.props.chatRoom.setRoomTitle(self.state.renameDialogValue)) {
-          self.setState({
-            'renameDialog': false,
-            'renameDialogValue': undefined
-          });
-        }
-        e.preventDefault();
-        e.stopPropagation();
-      };
-      const renameDialogValue = typeof self.state.renameDialogValue !== 'undefined' ? self.state.renameDialogValue : self.props.chatRoom.getRoomTitle();
-      confirmDeleteDialog = REaCt().createElement(modalDialogs.A.ModalDialog, {
-        chatRoom: room,
-        title: room.isMeeting ? l.rename_meeting : l[9080],
-        name: "rename-group",
-        className: "chat-rename-dialog dialog-template-main",
-        onClose: () => {
-          self.setState({
-            'renameDialog': false,
-            'renameDialogValue': undefined
-          });
-        },
-        buttons: [{
-          "label": l[1686],
-          "key": "cancel",
-          "onClick" (e) {
-            self.setState({
-              'renameDialog': false,
-              'renameDialogValue': undefined
-            });
-            e.preventDefault();
-            e.stopPropagation();
-          }
-        }, {
-          "label": l[61],
-          "key": "rename",
-          "className": $.trim(self.state.renameDialogValue).length === 0 || self.state.renameDialogValue === self.props.chatRoom.getRoomTitle() ? "positive disabled" : "positive",
-          "onClick" (e) {
-            onEditSubmit(e);
-          }
-        }]
-      }, REaCt().createElement("section", {
-        className: "content"
-      }, REaCt().createElement("div", {
-        className: "content-block"
-      }, REaCt().createElement("div", {
-        className: "dialog secondary-header"
-      }, REaCt().createElement("div", {
-        className: "rename-input-bl"
-      }, REaCt().createElement("input", {
-        type: "text",
-        className: "chat-rename-group-dialog",
-        name: "newTopic",
-        value: renameDialogValue,
-        maxLength: ChatRoom.TOPIC_MAX_LENGTH,
-        onChange: e => {
-          self.setState({
-            'renameDialogValue': e.target.value.substr(0, 30)
-          });
-        },
-        onKeyUp: e => {
-          if (e.which === 13) {
-            onEditSubmit(e);
-          }
-        }
-      }))))));
-    }
     let {
       descriptionDialog
     } = this.state;
@@ -18900,7 +18886,7 @@ const ConversationPanel = (conversationpanel_dec = utils.Ay.SoonFcWrap(360), _de
       onShowScheduledDescription: () => room.scheduledMeeting ? M.safeShowDialog('scheduled-description-dialog', () => this.setState({
         descriptionDialog: true
       })) : null
-    }) : null, privateChatDialog, nonLoggedInJoinChatDialog, attachCloudDialog, sendContactDialog, confirmDeleteDialog, historyRetentionDialog, null, pushSettingsDialog, descriptionDialog, this.state.chatLinkDialog && REaCt().createElement(ChatlinkDialog, {
+    }) : null, privateChatDialog, nonLoggedInJoinChatDialog, attachCloudDialog, sendContactDialog, confirmDeleteDialog, historyRetentionDialog, null, pushSettingsDialog, descriptionDialog, this.state.renameDialog && REaCt().createElement(this.RenameDialog, null), this.state.chatLinkDialog && REaCt().createElement(ChatlinkDialog, {
       chatRoom: this.props.chatRoom,
       onClose: () => this.setState({
         chatLinkDialog: false
@@ -22280,25 +22266,20 @@ ChatRoom.prototype.getRoomTitle = function () {
 ChatRoom.prototype.getTruncatedRoomTopic = function (maxLength = ChatRoom.TOPIC_MAX_LENGTH) {
   return this.topic && this.topic.length > maxLength ? `${this.topic.substr(0, maxLength)  }...` : this.topic;
 };
-ChatRoom.prototype.setRoomTitle = function (newTopic, allowEmpty) {
-  const self = this;
-  newTopic = allowEmpty ? newTopic : String(newTopic);
-  if ((allowEmpty || newTopic.trim().length > 0) && newTopic !== self.getRoomTitle()) {
-    self.scrolledToBottom = true;
-    const participants = self.protocolHandler.getTrackedParticipants();
-    return ChatdIntegration._ensureKeysAreLoaded(undefined, participants).then(() => {
-      const topic = self.protocolHandler.embeddedEncryptTo(newTopic, strongvelope.MESSAGE_TYPES.TOPIC_CHANGE, participants, undefined, self.type === "public");
-      if (topic) {
-        return asyncApiReq({
-          a: "mcst",
-          id: self.chatId,
-          ct: base64urlencode(topic),
-          v: Chatd.VERSION
-        });
-      }
-    }).catch(dump);
-  } else {
-    return false;
+ChatRoom.prototype.setRoomTopic = async function (newTopic) {
+  if (newTopic && newTopic.trim().length && newTopic !== this.getRoomTitle()) {
+    this.scrolledToBottom = true;
+    const participants = this.protocolHandler.getTrackedParticipants();
+    await ChatdIntegration._ensureKeysAreLoaded(undefined, participants);
+    const topic = this.protocolHandler.embeddedEncryptTo(newTopic, strongvelope.MESSAGE_TYPES.TOPIC_CHANGE, participants, undefined, this.type === 'public');
+    if (topic) {
+      return api.req({
+        a: 'mcst',
+        id: this.chatId,
+        ct: base64urlencode(topic),
+        v: Chatd.VERSION
+      });
+    }
   }
 };
 ChatRoom.prototype.leave = function (notify) {

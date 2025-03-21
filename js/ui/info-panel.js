@@ -275,12 +275,14 @@ lazy(mega.ui, 'mInfoPanel', () => {
                 // If an image, load the slideshow
                 else if (is_image2(node)) {
                     slideshow(nodeHandle);
+                    checkCurrentView();
                 }
 
                 // If it's a video, load the video viewer
                 else if (is_video(node)) {
                     $.autoplay = nodeHandle;
                     slideshow(nodeHandle);
+                    checkCurrentView();
                 }
 
                 // If a text file, load the text editor

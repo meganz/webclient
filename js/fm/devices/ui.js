@@ -1389,7 +1389,7 @@ lazy(mega.devices, 'ui', () => {
                 return false;
             }
 
-            if (node.h === M.InboxID || node.p === M.InboxID) {
+            if (M.InboxID && (node.h === M.InboxID || node.p === M.InboxID)) {
                 return true;
             }
 

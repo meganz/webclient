@@ -276,6 +276,21 @@
     user-select: text;
     white-space: pre-wrap;
 }
+.message.text-block hr {
+    width: 100%;
+    height: 1px;
+    border: 0 none;
+    background: var(--divider-color);
+}
+.message.text-block .chat-message-heading {
+    margin-bottom: 0;
+}
+.message.text-block h4 {
+    font-size: 14px;
+}
+.message.text-block h5 {
+    font-size: 12px;
+}
 .message.text-block a {
     user-select: text;
 }

@@ -918,6 +918,7 @@ MegaUtils.prototype.logout = function megaUtilsLogout() {
         if (window.is_eplusplus) {
             promises.push(M.delPersistentData('e++ck'));
         }
+        promises.push(M.delPersistentData('jid'));
 
         Promise.allSettled(promises)
             .then((res) => {

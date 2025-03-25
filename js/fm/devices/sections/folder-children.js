@@ -9,11 +9,6 @@ lazy(mega.devices.sections, 'folderChildren', () => {
     const {
         utils: {
             /**
-             * {StatusUI} StatusUI - Status UI handler
-             */
-            StatusUI,
-
-            /**
              * {Object<MegaLogger>} logger - logger instance
              */
             logger,

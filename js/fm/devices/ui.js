@@ -1336,7 +1336,7 @@ lazy(mega.devices, 'ui', () => {
 
         /**
          * Returns whether there is any backup folder in given handles
-         * @param {Array<String>} handles - list of handles to get folders of
+         * @param {String|Array<String>} handles - list of handles to get folders of
          * @returns {Boolean} whether backup folder exists in given handles
          */
         isBackupRelated(handles) {

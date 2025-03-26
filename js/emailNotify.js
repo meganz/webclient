@@ -89,7 +89,7 @@
     'achievements',
     'quota',
     'account-inactive',
-    'referral-program',
+    'DEPRECATED-referral-program',
     'RESERVED-business-usage',
     'card-expiry'
 ]);

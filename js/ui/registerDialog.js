@@ -105,10 +105,6 @@
                     };
                     u_attr.terms = 1;
 
-                    if (mega.affid) {
-                        ops.aff = mega.affid;
-                    }
-
                     api_req(ops);
                 }
                 registrationDone();

@@ -566,13 +566,12 @@ var redeem = {
         var price = vd.price;
         var currency = vd.currency;
         var gatewayId = 0;                                  // Prepay / account balance
-        var aff = mega.affid;
 
         // Start loading spinner
         loadingDialog.show();
 
         // User Transaction Sale API call
-        api.screq({a: 'uts', it: 0, si: apiId, p: price, c: currency, aff})
+        api.screq({a: 'uts', it: 0, si: apiId, p: price, c: currency})
             .then(({result: saleId}) => {
 
                 // User Transaction Complete API call

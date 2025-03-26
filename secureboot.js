@@ -382,23 +382,6 @@ function getCleanSitePath(path) {
             var target = window.mega || window;
             target.uaoref = path.uao;
         }
-        if (path.aff) {
-            tryCatch(function() {
-                if (!path.aff_time) {
-                    sessionStorage.affid = path.aff;
-                    sessionStorage.affts = Date.now();
-                    sessionStorage.afftype = 1;
-                }
-                else if (!(sessionStorage.affts > (path.aff_time *= 1000))) {
-                    sessionStorage.affid = path.aff;
-                    sessionStorage.affts = path.aff_time;
-
-                    // Future proof, currently only public link affiliate data is coming from other agent.
-                    // Later, url from other agents will contains type for it to support other type.
-                    sessionStorage.afftype = path.aff_type || 2;
-                }
-            }, false)();
-        }
 
         tryCatch(function() {
             if (path.csp) {
@@ -805,13 +788,6 @@ var mega = {
             to += '/' + page;
         }
 
-        var affid = sessionStorage.affid || storage.affid;
-        var affts = sessionStorage.affts || storage.affts;
-        if (mega.refsunref && affid && affts && !(Date.now() - affts > 864e5)) {
-            to += '?aff=' + affid;
-            getCount++;
-        }
-
         var _getSeperator = function() {
             if (toMegaIo) {
                 return getCount++ ? '&' : '?';
@@ -955,19 +931,6 @@ Object.defineProperty(mega, 'pwmh', {
     get: function() {
         'use strict';
         return typeof u_attr === 'object' && u_attr.pwmh || false;
-    }
-});
-
-Object.defineProperty(mega, 'refsunref', {
-    get: function() {
-        'use strict';
-        return (this.flags.ff_refsun | 0) < 1;
-    }
-});
-Object.defineProperty(mega, 'refsuncom', {
-    get: function() {
-        'use strict';
-        return (this.flags.ff_refsun | 0) < 2;
     }
 });
 
@@ -2551,7 +2514,6 @@ else if (!browserUpdate) {
         jsl.push({f:'js/notify.js', n: 'notify_js', j:1});
         jsl.push({f:'js/vendor/favico.js', n: 'favico_js', j:1});
         jsl.push({f:'js/vendor/avatar.js', n: 'avatar_js', j:1, w:3});
-        jsl.push({f:'js/fm/affiliate.js', n: 'fm_affiliate_js', j: 1});
         jsl.push({f:'js/fm/vpn.js', n: 'fmvpn_js', j: 1});
 
         jsl.push({f:'css/gallery.css', n: 'gallery_css', j:2,w:5,c:1,d:1,cache:1});
@@ -2589,7 +2551,6 @@ else if (!browserUpdate) {
         jsl.push({f:'css/recovery.css', n: 'recovery_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/settings.css', n: 'settings_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/media-print.css', n: 'media_print_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/affiliate-program.css', n: 'affiliate_program_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'css/top-menu.css', n: 'top_menu_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'css/context-menu.css', n: 'context_menu_css', j:2, w:5, c:1, d:1, cache:1});
         jsl.push({f:'css/tables.css', n: 'tables_css', j:2, w:30, c:1, d:1, cache:1});
@@ -2652,9 +2613,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/fm/megadata/reset.js', n: 'fm_megadata_reset_js', j: 1});
     jsl.push({f:'html/js/megasync.js', n: 'megasync_js', j: 1});
     jsl.push({f:'js/fm/linkinfohelper.js', n: 'fm_linkinfohelper_js', j: 1});
-    jsl.push({f:'js/fm/affiliatedata.js', n: 'fm_affiliatedata_js', j: 1});
     jsl.push({f:'js/eaffiliate.js', n: 'eaffiliate_js', j: 1});
-    jsl.push({f:'js/fm/affiliateRedemption.js', n: 'fm_affiliateredemption_js', j: 1});
 
     if (localStorage.makeCache) {
         jsl.push({f:'makecache.js', n: 'makecache', j:1});
@@ -2716,7 +2675,6 @@ else if (!browserUpdate) {
         jsl.push({f:'css/mobile/mobile.settings.css', n: 'mobile_settings_css', j: 2, w: 30, c: 1, d: 1, m: 1});
         jsl.push({f:'css/mobile/mobile.settings.history.css', n: 'mobile_settings_history_css', j: 2, w: 30, c: 1, d: 1, m: 1});
         jsl.push({f:'css/mobile/mobile.link-management.css', n: 'mobile_link_management_css', j: 2, w: 30, c: 1, d: 1, m: 1});
-        jsl.push({f:'css/mobile/mobile.referral.css', n: 'mobile_referral_css', j: 2, w: 30, c: 1, d: 1, m: 1});
         jsl.push({f:'css/mobile-help.css', n: 'mobile_help_css', j: 2, w: 30, c: 1, d: 1, m: 1});
         jsl.push({f:'css/mobile-top-menu.css', n: 'mobile_top_menu_css',  j: 2, w: 30, c: 1, d: 1, m: 1});
         jsl.push({f:'css/mobile-media-viewer.css', n: 'mobile_media_viewer_css', j:2,w:5,c:1,d:1,cache:1});
@@ -2735,7 +2693,6 @@ else if (!browserUpdate) {
         jsl.push({f:'js/vendor/jquery.mobile.js', n: 'jquery_mobile_js', j: 1, w: 5});
         jsl.push({f:'js/mobile/mobile.js', n: 'mobile_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.megaRender.js', n: 'mobile_mega_render_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.affiliate.js', n: 'mobile_affiliate_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.cloud.js', n: 'mobile_cloud_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.cloud.action-bar.js', n: 'mobile_cloud_action_bar_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.node-name-control.js', n: 'mobile_node_name_control_js', j: 1, w: 1});
@@ -2803,8 +2760,6 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/settings/backupRecovery.js', n: 'mobile_backup_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/settings/fileManagement.js', n: 'mobile_file_management_js', j: 1, w:1});
         jsl.push({f:'js/mobile/settings/notifications.js', n: 'mobile_account_notifications_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/settings/referral.js', n: 'mobile_referral_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/settings/referralDistribution.js', n: 'mobile_referral_distribution_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/settings/termsPolicies.js', n: 'mobile_terms_policies_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/settings/twofactorSettings.js', n: 'mobile_twofactor_settings_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.msgdialog.js', n: 'mobile_msgdialog_js', j: 1, w:1});
@@ -4284,14 +4239,6 @@ mBroadcaster.once('startMega', function() {
         onIdle(function() {
             eventlog(99988, window.uTagMCT);
             delete window.uTagMCT;
-        });
-    }
-
-    if (sessionStorage.affid && 'csp' in window) {
-        delay('aff:cspchk:movelocal', function() {
-            if ('affiliate' in M) {
-                M.affiliate.persist();
-            }
         });
     }
 

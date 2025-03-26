@@ -122,7 +122,7 @@ class MegaMobileHeader extends MegaComponent {
         backLink.on('tap.back', () => {
 
             if (!M.currentdirid || M.currentrootid === 'out-shares' || M.currentrootid === 'public-links'
-                    || M.currentdirid.startsWith('account/') || M.currentdirid.startsWith('refer')) {
+                    || M.currentdirid.startsWith('account/')) {
 
                 if (typeof mobile.settingsHelper.currentPage !== 'undefined'){
                     mobile.settingsHelper.currentPage.hide();
@@ -781,7 +781,7 @@ class MegaMobileHeader extends MegaComponent {
         if (page === 'fm/account' || page === 'keybackup') {
             iType = 2;
         }
-        if (page.startsWith('fm/account/') || page.startsWith('fm/refer') || page === 'support') {
+        if (page.startsWith('fm/account/') || page === 'support') {
             iType = 3;
         }
         if (is_mobile && mobile.nodeSelector.active) {
@@ -844,11 +844,6 @@ lazy(MegaMobileHeader, 'headings', () => {
         'fm/account/plan': l[16166],
         'fm/account/notifications': l[862],
         'fm/two-factor-confirmation': l[19194],
-        'fm/refer': l[22682],
-        'fm/refer/guide': l[22683],
-        'fm/refer/history': l[22808],
-        'fm/refer/distribution': l[22709],
-        'fm/refer/redeem': l[23403],
         'fm/account/security': l.mobile_settings_privacy_security_title,
         'fm/account/security/backup-key': l[8839],
         'fm/account/security/lost-auth-device': l.lost_auth_device,

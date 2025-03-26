@@ -1029,10 +1029,6 @@ function init_page() {
         loadSubPage('fm/account/plan');
         return false;
     }
-    else if (!mega.flags.refpr && page.substr(0, 8) === 'fm/refer') {
-        loadSubPage('fm');
-        return false;
-    }
     else if (is_mobile && (page.startsWith('twofactor') || page.startsWith('sms'))) {
         loadSubPage(`fm/account/${page}`);
         return false;
@@ -2087,7 +2083,6 @@ function topmenuUI() {
     var $menuPricingItem = $('.top-menu-item.pro', $topMenu);
     const $menuAchievementsItem = $('.top-menu-item.achievements', $topMenu);
     var $menuBackupItem = $('.top-menu-item.backup', $topMenu);
-    var $menuReferItem = $('.top-menu-item.refer', $topMenu);
     var $menuFeedbackItem = $('.top-menu-item.feedback', $topMenu);
     var $menuUserinfo = $('.top-menu-account-info', $menuLoggedBlock);
     var $menuUsername = $('.name', $menuUserinfo);
@@ -2105,6 +2100,7 @@ function topmenuUI() {
     var $headerDownloadMega = $('.js-accountbtn.downloadmega', $topHeader);
     const $topBarAvatar = $('.js-topbaravatar', $topBar);
     const $topMenuActivityBlock = $('.activity-status-block', $menuUserinfo);
+    const $headerPlans = $('.top-menu-item.plans', $topMenu);
 
     if (u_type === 0) {
         $('span', $loginButton).text(l[967]);
@@ -2119,11 +2115,11 @@ function topmenuUI() {
     $menuLogoutButton.addClass('hidden');
     $menuAuthButtons.addClass('hidden');
     $menuRefreshItem.addClass('hidden');
-    $menuReferItem.addClass('hidden');
     $menuUsername.addClass('hidden');
     $menuUpgradeAccount.removeClass('hidden');
     $menuAvatar.removeClass('presence');
     $topMenuActivityBlock.addClass('hidden');
+    $headerPlans.removeClass('hidden');
 
     $headerActivityBlock.addClass('hidden');
     $headerIndividualSpan.text(l[19702]); // try Mega Business
@@ -2164,13 +2160,6 @@ function topmenuUI() {
         section = page.split('/')[1];
     }
 
-    if (page.indexOf('fm/refer') === 0) {
-        section = 'affiliate-dashboard';
-    }
-    else if (page === 'refer') {
-        section = 'affiliate';
-    }
-
     // Get all menu items
     var $topMenuItems = $('.top-menu-item', $topMenu);
 
@@ -2203,10 +2192,6 @@ function topmenuUI() {
     if (u_type === 3 && u_attr.fullname) {
         $('.user-name', $topHeader).text(u_attr.fullname).removeClass('hidden');
         $menuUsername.text(u_attr.fullname).removeClass('hidden');
-    }
-
-    if (mega.flags.refpr) {
-        $menuReferItem.removeClass('hidden');
     }
 
     // Show language in top menu
@@ -2481,6 +2466,10 @@ function topmenuUI() {
             $('.top-menu-item.login', $topMenu).addClass('o-hidden');
             $menuLogoutButton.removeClass('hidden');
         }
+    }
+
+    if ($menuPricingItem.hasClass('hidden') && $menuAchievementsItem.hasClass('hidden')) {
+        $headerPlans.addClass('hidden');
     }
 
     $.hideTopMenu = function (e) {

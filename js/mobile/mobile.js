@@ -1057,39 +1057,6 @@ function accountUI() {
     }
 }
 
-function affiliateUI() {
-
-    'use strict';
-
-    if (!fminitialized || !u_type || !page.startsWith('fm/refer')) {
-        return loadSubPage('start');
-    }
-
-    document.getElementsByClassName('file-manager-block')[0].classList.add('hidden');
-    if (mobile.settingsHelper && mobile.settingsHelper.currentPage) {
-        mobile.settingsHelper.currentPage.hide();
-    }
-
-    if (page === 'fm/refer') {
-        mobile.settings.account.referral.init();
-    }
-    else if (page === 'fm/refer/redeem') {
-        mobile.affiliate.initRedeemPage();
-    }
-    else if (mega.refsunref && page === 'fm/refer/guide') {
-        mobile.affiliate.initGuidePage();
-    }
-    else if (page === 'fm/refer/history') {
-        mobile.affiliate.initHistoryPage();
-    }
-    else if (page === 'fm/refer/distribution') {
-        mobile.settings.account.referralDistribution.init();
-    }
-    else {
-        loadSubPage('fm/refer');
-    }
-}
-
 accountUI.session = {
     update: function() {
 

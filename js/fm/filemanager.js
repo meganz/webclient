@@ -327,7 +327,6 @@ FileManager.prototype.initFileManagerUI = function() {
             || $.dialog === 'share'
             || $.dialog === 'share-add'
             || $.dialog === 'cookies-dialog'
-            || $.dialog === 'affiliate-redeem-dialog'
             || $.dialog === 'discount-offer'
             || $.dialog === 'voucher-info-dlg'
             || $.dialog === "chat-incoming-call"
@@ -732,7 +731,7 @@ FileManager.prototype.initFileManagerUI = function() {
         ];
         var ALLOWED_PARENTS =
             '#startholder, .fm-account-main, .export-link-item, .contact-fingerprint-txt, .fm-breadcrumbs, ' +
-            '.fm-affiliate, .text-editor-container, .media-viewer .img-wrap';
+            '.text-editor-container, .media-viewer .img-wrap';
         var ALLOWED_CLOSEST =
             '.multiple-input, .create-folder-input-bl, .content-panel.conversations, ' +
             '.messages.content-area, .chat-right-pad .user-card-data';
@@ -1047,7 +1046,7 @@ FileManager.prototype.initFileManagerUI = function() {
             },
             'transfers':       {root: 'transfers', prev: null},
             'account':         {root: 'account',   prev: null},
-            'dashboard':       {root: 'dashboard', prev: null, subpages: ['refer']},
+            'dashboard':       {root: 'dashboard', prev: null},
             'user-management': {root: 'user-management', prev: null},
             'shared-with-me':  {root: 'shares',    prev: null, subpages: ['out-shares']},
             'public-links':    {root: 'public-links',    prev: null},
@@ -1144,10 +1143,6 @@ FileManager.prototype.initFileManagerUI = function() {
                 }
             }
             else if (this.classList.contains('dashboard')) {
-                if (M.currentdirid !== 'refer' && self.fmTabState.dashboard.prev === 'refer') {
-                    loadSubPage('fm/refer');
-                    return false;
-                }
                 self.fmTabState.dashboard.prev = null;
                 loadSubPage('fm/dashboard');
 

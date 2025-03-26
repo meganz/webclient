@@ -286,9 +286,6 @@
             recents() {
                 openRecents();
             },
-            refer() {
-                affiliateUI();
-            },
             transfers() {
                 console.assert(M.v && M.v.length === 0, 'view list must be empty');
             }
@@ -456,7 +453,6 @@
             id.substr(0, 7) === 'account' ||
             id.substr(0, 9) === 'dashboard' ||
             id.substr(0, 15) === 'user-management' ||
-            id.substr(0, 5) === 'refer' ||
             id.startsWith('pwm')) {
 
             this.v = [];

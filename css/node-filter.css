@@ -1,14 +1,15 @@
 /* For the wrapper and filter chips */
 .fm-filter-chips-wrapper {
-    margin-inline: 20px 48px;
-    min-height: 36px;
+    height: 32px;
+    padding-inline: 24px 88px;
+    padding-bottom: 8px;
+    transition: 200ms linear;
     display: flex;
-    margin-bottom: 12px;
+    align-items: center;
+    margin-inline-end: auto;
+    margin-top: 8px;
 }
 
-.rtl .fm-filter-chips-wrapper {
-    margin-inline-end: 100px;
-}
 .fm-filter-chips-wrapper .fm-filter-chips {
     width: fit-content;
     display: flex;

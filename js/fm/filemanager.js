@@ -1459,15 +1459,6 @@ FileManager.prototype.updFileManagerUI = async function() {
             });
         }
 
-        if (window.selectionManager) {
-            // update the total count of nodes
-            var tmp = selectionManager.vSelectionBar;
-            if (tmp) {
-                var mm = String(tmp.textContent).split('/').map(Number);
-                tmp.textContent = mm[0] + ' / ' + M.v.length;
-            }
-        }
-
         if (newpassword && UImain === 'pwm' && mega.pwmh && mega.pm && mega.pm.pwmFeature) {
             tryCatch(() => mega.ui.pm.list.initLayout().catch(reportError))();
         }
@@ -4636,17 +4627,19 @@ FileManager.prototype.onSectionUIOpen = function(id) {
     }
 
     if (id !== 'conversations') {
+        mega.ui.secondaryNav.actionsHolder.classList.remove('hidden');
         if (id === 'user-management') {
             $('.fm-right-header').addClass('hidden');
             $('.fm-right-header-user-management').removeClass('hidden');
             M.hideEmptyGrids();
         }
         else if (M.isGalleryPage(id) || isAlbums) {
+            mega.ui.secondaryNav.domNode.classList.remove('hidden');
             if (M.isGalleryPage(id)) {
-                $('.fm-right-header').addClass('hidden');
-            }
-            else {
-                $('.fm-right-header').removeClass('hidden');
+                mega.ui.secondaryNav.hideCard();
+                mega.ui.secondaryNav.actionsHolder.classList.add('hidden');
+                mega.ui.secondaryNav.updateLayoutButton(true);
+                mega.ui.secondaryNav.updateInfoPanelButton();
             }
             $('.fm-right-header-user-management').addClass('hidden');
         }
@@ -4847,12 +4840,25 @@ FileManager.prototype.initStatusBarLinks = function() {
     "use strict";
 
     // Set hover text to Share link or Share links depending on number selected
-    const linkHoverText = mega.icu.format(l.share_link, $.selected.length);
+    const linkCount = $.selected.reduce((a, b) => {
+        return a + (M.getNodeShare(b) ? 1 : 0);
+    }, 0);
+    const linkButton = mega.ui.secondaryNav.selectionBar.querySelector('.link');
+    if (linkButton) {
+        linkButton.dataset.simpletip = linkCount === 0 ?
+            mega.icu.format(l.share_link, $.selected.length) :
+            linkCount === 1 ? l[6909] : l[17520];
+    }
     const $selectionStatusBar = $('.selection-status-bar');
 
-    $('.js-statusbarbtn.link', $selectionStatusBar).attr('data-simpletip', linkHoverText);
     $('.js-statusbarbtn', $selectionStatusBar).rebind('click', function(e) {
+        if ($.selected !== selectionManager.selected_list) {
+            $.selected = selectionManager.selected_list;
+        }
         const isMegaList = M.dyh ? M.dyh('is-mega-list') : true;
+        if (!this.classList.contains('options')) {
+            $.hideContextMenu();
+        }
         if (!isMegaList) {
             M.dyh('init-status-bar-links', e, this.classList);
         }
@@ -4866,9 +4872,6 @@ FileManager.prototype.initStatusBarLinks = function() {
         }
         else if (this.classList.contains('share')) {
             M.openSharingDialog($.selected[0]);
-        }
-        else if (this.classList.contains('sendto')) {
-            openCopyDialog('conversations');
         }
         else if (this.classList.contains('link')) {
             M.getLinkAction();
@@ -4902,6 +4905,49 @@ FileManager.prototype.initStatusBarLinks = function() {
         }
         else if (this.classList.contains('delete-from-album')) {
             mega.gallery.albums.requestAlbumElementsRemoval();
+        }
+        else if (this.classList.contains('manage-file-request')) {
+            if (M.isInvalidUserStatus()) {
+                return false;
+            }
+            mega.fileRequest.dialogs.manageDialog.init({
+                h: $.selected[0],
+            });
+        }
+        else if (this.classList.contains('add-to-album')) {
+            mega.gallery.albums.addToAlbum($.selected);
+        }
+        else if (this.classList.contains('rename')) {
+            if (M.isInvalidUserStatus()) {
+                return false;
+            }
+            if (M.onDeviceCenter) {
+                const section = mega.devices.ui.getRenderSection();
+                if (section === 'device-centre-devices') {
+                    mega.devices.ui.renameDevice();
+                    return;
+                }
+            }
+            renameDialog();
+        }
+        else if (this.classList.contains('move')) {
+            openMoveDialog();
+        }
+        else if (this.classList.contains('info')) {
+            mega.ui.mInfoPanel.initInfoPanel();
+        }
+        else if (this.classList.contains('restore')) {
+            if (M.isInvalidUserStatus()) {
+                return false;
+            }
+            mLoadingSpinner.show('restore-nodes');
+            M.revertRubbishNodes($.selected)
+                .catch((ex) => {
+                    if (ex !== EBLOCKED) {
+                        tell(ex);
+                    }
+                })
+                .finally(() => mLoadingSpinner.hide('restore-nodes'));
         }
 
         return false;

@@ -225,6 +225,12 @@ function sharedUInode(nodeHandle, force) {
         if (typeof nodeHandle !== 'undefined' && (M.currentdirid === 'out-shares' || M.currentdirid === 'shares')) {
             selectionManager.remove_from_selection(nodeHandle);
         }
+        else if (selectionManager.selected_list.includes(nodeHandle)) {
+            selectionManager.updateSelectionNotification();
+        }
+    }
+    else if (selectionManager.selected_list.includes(nodeHandle)) {
+        selectionManager.updateSelectionNotification();
     }
 
     // If no export link is available, remove export link from left and right panels (list and block view)

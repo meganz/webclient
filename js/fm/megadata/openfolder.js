@@ -428,10 +428,25 @@
                 stash = this.search && String(this.previousdirid).substr(0, 6) === 'search';
             }
             mega.ui.mNodeFilter.resetFilterSelections(stash);
+            if (
+                stash &&
+                window.selectionManager &&
+                window.selectionManager.selected_list.length &&
+                mega.ui.secondaryNav
+            ) {
+                mega.ui.secondaryNav.filterChipsHolder.classList.add('hidden');
+            }
         }
         if (mega.ui.mNodeFilter && mega.devices && mega.devices.ui && mega.devices.ui.filterChipUtils) {
             const stash = this.previousdirid === this.currentdirid;
             mega.devices.ui.filterChipUtils.resetSelections(stash);
+        }
+        if (
+            mega.ui.secondaryNav &&
+            this.previousdirid !== this.currentdirid &&
+            !(String(this.previousdirid).startsWith('search') && String(this.currentdirid).startsWith('search'))
+        ) {
+            mega.ui.secondaryNav.onPageChange();
         }
 
         if (mega.ui.pm) {
@@ -656,7 +671,8 @@
         }
 
         if (!this.gallery && !this.albums) {
-            $('#media-section-controls, #media-tabs', $fmRightFilesBlock).addClass('hidden');
+            $('#media-section-controls, #media-tabs, #media-section-right-controls', $fmRightFilesBlock)
+                .addClass('hidden');
         }
 
         M.initLabelFilter(this.v);

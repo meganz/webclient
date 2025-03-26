@@ -1411,72 +1411,164 @@
                     </div>
                 </div>
 
-                <div class="fm-filter-chips-wrapper hidden">
-                    <i class="sprite-fm-mono icon-check selected-mark selected-mark-template hidden"></i>
-                    <div class="fm-filter-chips">
-                        <div class="fm-filter-chip-button fm-filter-chip-location hidden">
-                            <div class="fm-filter-chip-button-text">
-                                [$17818]
+                <div class="fm-header-chips-and-view-buttons">
+                    <div class="fm-filter-chips-wrapper hidden">
+                        <i class="sprite-fm-mono icon-check selected-mark selected-mark-template hidden"></i>
+                        <div class="fm-filter-chips">
+                            <div class="fm-filter-chip-button fm-filter-chip-location hidden">
+                                <div class="fm-filter-chip-button-text">
+                                    [$17818]
+                                </div>
+                                <i class="sprite-fm-mono icon-chevron-down-thin-outline"></i>
                             </div>
-                            <i class="sprite-fm-mono icon-chevron-down-thin-outline"></i>
-                        </div>
 
-                        <div class="fm-filter-chip-button fm-filter-chip-type">
-                            <div class="fm-filter-chip-button-text">
-                                [$filter_chip_type]
+                            <div class="fm-filter-chip-button fm-filter-chip-type">
+                                <div class="fm-filter-chip-button-text">
+                                    [$filter_chip_type]
+                                </div>
+                                <i class="sprite-fm-mono icon-chevron-down-thin-outline"></i>
                             </div>
-                            <i class="sprite-fm-mono icon-chevron-down-thin-outline"></i>
-                        </div>
-                        <div class="fm-filter-chip-button fm-filter-chip-mtime">
-                            <div class="fm-filter-chip-button-text">
-                                [$filter_chip_mdate]
+                            <div class="fm-filter-chip-button fm-filter-chip-mtime">
+                                <div class="fm-filter-chip-button-text">
+                                    [$filter_chip_mdate]
+                                </div>
+                                <i class="sprite-fm-mono icon-chevron-down-thin-outline"></i>
                             </div>
-                            <i class="sprite-fm-mono icon-chevron-down-thin-outline"></i>
-                        </div>
-                        <div class="fm-filter-chip-button fm-filter-chip-dateadded">
-                            <div class="fm-filter-chip-button-text">
-                                [$17445]
+                            <div class="fm-filter-chip-button fm-filter-chip-dateadded">
+                                <div class="fm-filter-chip-button-text">
+                                    [$17445]
+                                </div>
+                                <i class="sprite-fm-mono icon-chevron-down-thin-outline"></i>
                             </div>
-                            <i class="sprite-fm-mono icon-chevron-down-thin-outline"></i>
-                        </div>
-                        <div class="fm-filter-reset hidden">
-                            [$filter_chip_reset]
+                            <div class="fm-filter-reset hidden">
+                                [$filter_chip_reset]
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="fm-header-bottom">
-                    <button class="mega-component nav-elem icon-only transparent-icon fm-files-view-icon">
-                        <i class="sprite-fm-mono icon-grid-4-thin-outline"></i>
-                    </button>
-                    <button class="mega-component nav-elem icon-only transparent-icon fm-header-info hidden">
-                        <i class="sprite-fm-mono icon-info-thin-outline"></i>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Gallery controls -->
-            <div id="media-section-controls" class="hidden">
-                <div class="gallery-tabs-bl flex flex-row gap-2 fm-filter-chips py-4 px-5 hidden">
-                    <div class="gallery-section-title flex-1 flex flex-row gap-2 items-center">
-                        <div class="media-filter-reset">
-                            <button class="fm-filter-reset">[$filter_chip_reset]</button>
+                    <div class="selection-status-bar hidden">
+                        <div class="items-center">
+                            <div class="selection-bar-col"></div>
+                            <div class="spacer">&#183;</div>
+                            <div class="selection-bar-size"></div>
+                        </div>
+                        <div class="selection-links-wrapper">
+                            <button class="mega-component nav-elem icon-only transparent-icon simpletip small js-statusbarbtn s4-key-download" data-simpletip="[$58]">
+                                <i class="sprite-fm-mono icon-arrow-down-circle-thin-outline"></i>
+                            </button>
+                            <button class="mega-component nav-elem icon-only transparent-icon simpletip small js-statusbarbtn s4-key-enable" data-simpletip="[$s4_key_enable]">
+                                <i class="sprite-fm-mono icon-check-circle-thin-outline"></i>
+                            </button>
+                            <button class="mega-component nav-elem icon-only transparent-icon simpletip small js-statusbarbtn s4-key-disable" data-simpletip="[$s4_key_disable]">
+                                <i class="sprite-fm-mono icon-minus-circle-thin-outline"></i>
+                            </button>
+                            <button class="mega-component nav-elem icon-only transparent-icon simpletip small js-statusbarbtn s4-key-copy-config" data-simpletip="[$63]">
+                                <i class="sprite-fm-mono icon-copy-thin-outline"></i>
+                            </button>
+                            <button class="mega-component nav-elem icon-only transparent-icon simpletip small js-statusbarbtn s4-policy-copy-arn" data-simpletip="[$63]">
+                                <i class="sprite-fm-mono icon-copy-thin-outline"></i>
+                            </button>
+                            <button class="mega-component nav-elem icon-only transparent-icon simpletip small js-statusbarbtn s4-key-rename" data-simpletip="[$61]">
+                                <i class="sprite-fm-mono icon-edit-03-thin-outline"></i>
+                            </button>
+                            <button class="mega-component nav-elem icon-only transparent-icon simpletip small js-statusbarbtn s4-key-delete" data-simpletip="[$1730]">
+                                <i class="sprite-fm-mono icon-trash-thin-outline"></i>
+                            </button>
+                            <button class="mega-component nav-elem icon-only transparent-icon simpletip small js-statusbarbtn s4-user-copy-arn" data-simpletip="[$s4_copy_arn]">
+                                <i class="sprite-fm-mono icon-copy-thin-outline"></i>
+                            </button>
+                            <button class="mega-component nav-elem icon-only transparent-icon simpletip small js-statusbarbtn s4-user-rename" data-simpletip="[$61]">
+                                <i class="sprite-fm-mono icon-edit-03-thin-outline"></i>
+                            </button>
+                            <button class="mega-component nav-elem icon-only transparent-icon simpletip small js-statusbarbtn s4-user-delete" data-simpletip="[$1730]">
+                                <i class="sprite-fm-mono icon-trash-thin-outline"></i>
+                            </button>
+                            <button class="mega-component nav-elem icon-only transparent-icon simpletip small js-statusbarbtn s4-group-copy-arn" data-simpletip="[$s4_copy_arn]">
+                                <i class="sprite-fm-mono icon-copy-thin-outline"></i>
+                            </button>
+                            <button class="mega-component nav-elem icon-only transparent-icon simpletip small js-statusbarbtn s4-group-rename" data-simpletip="[$61]">
+                                <i class="sprite-fm-mono icon-edit-03-thin-outline"></i>
+                            </button>
+                            <button class="mega-component nav-elem icon-only transparent-icon simpletip small js-statusbarbtn s4-group-delete" data-simpletip="[$1730]">
+                                <i class="sprite-fm-mono icon-trash-thin-outline"></i>
+                            </button>
+                            <button class="mega-component nav-elem icon-only transparent-icon simpletip small js-statusbarbtn download" data-simpletip="[$58]">
+                                <i class="sprite-fm-mono icon-arrow-down-circle-thin-outline"></i>
+                            </button>
+                            <button class="mega-component nav-elem icon-only transparent-icon simpletip small js-statusbarbtn link" data-simpletip="[$share_link]">
+                                <i class="sprite-fm-mono icon-link-thin-outline"></i>
+                            </button>
+                            <button class="mega-component nav-elem icon-only transparent-icon simpletip small js-statusbarbtn share" data-simpletip="[$5631]">
+                                <i class="sprite-fm-mono icon-folder-users-thin-outline"></i>
+                            </button>
+                            <button class="mega-component nav-elem icon-only transparent-icon simpletip small js-statusbarbtn manage-file-request" data-simpletip="[$file_request_dropdown_manage]">
+                                <i class="sprite-fm-mono icon-folder-arrow-02-thin-outline"></i>
+                            </button>
+                            <button class="mega-component nav-elem icon-only transparent-icon simpletip small js-statusbarbtn add-to-album" data-simpletip="[$add_to_album]">
+                                <i class="sprite-fm-mono icon-rectangle-stack-plus-thin-outline"></i>
+                            </button>
+                            <button class="mega-component nav-elem icon-only transparent-icon simpletip small js-statusbarbtn rename" data-simpletip="[$61]">
+                                <i class="sprite-fm-mono icon-edit-03-thin-outline"></i>
+                            </button>
+                            <button class="mega-component nav-elem icon-only transparent-icon simpletip small js-statusbarbtn move" data-simpletip="[$62]">
+                                <i class="sprite-fm-mono icon-move-thin-outline"></i>
+                            </button>
+                            <button class="mega-component nav-elem icon-only transparent-icon simpletip small js-statusbarbtn info" data-simpletip="[$6859]">
+                                <i class="sprite-fm-mono icon-info-thin-outline"></i>
+                            </button>
+                            <button class="mega-component nav-elem icon-only transparent-icon simpletip small js-statusbarbtn restore" data-simpletip="[$5726]">
+                                <i class="sprite-fm-mono icon-clock-rotate-thin-outline"></i>
+                            </button>
+                            <button class="mega-component nav-elem icon-only transparent-icon simpletip small js-statusbarbtn delete" data-simpletip="[$83]">
+                                <i class="sprite-fm-mono icon-trash-thin-outline"></i>
+                            </button>
+                            <button class="mega-component nav-elem icon-only transparent-icon simpletip small js-statusbarbtn delete-from-album" data-simpletip="[$album_item_remove_label]">
+                                <i class="sprite-fm-mono icon-trash-thin-outline"></i>
+                            </button>
+                            <button class="mega-component nav-elem icon-only transparent-icon simpletip small js-statusbarbtn options" data-simpletip="[$tooltip_more]">
+                                <i class="sprite-fm-mono icon-more-vertical-thin-outline"></i>
+                            </button>
                         </div>
                     </div>
-                    <div class="gallery-section-tabs flex flex-row items-center gap-2">
-                        <button class="gallery-tab-lnk fm-filter-chip-button gallery-tab-lnk-y years" data-folder="y">[$gallery_years]</button>
-                        <button class="gallery-tab-lnk fm-filter-chip-button gallery-tab-lnk-m months" data-folder="m">[$gallery_months]</button>
-                        <button class="gallery-tab-lnk fm-filter-chip-button gallery-tab-lnk-d days" data-folder="d">[$gallery_days]</button>
-                        <div class="vert-separator"></div>
-                        <button class="gallery-tab-lnk fm-filter-chip-button gallery-tab-lnk-a all" data-folder="a">[$gallery_all]</button>
-                    </div>
-                    <div class="gallery-section-discovery hidden">
-                        <button class="mega-button action gallery-close-discovery">
-                            <div>
-                                <i class="sprite-fm-mono icon-dialog-close"></i>
+
+                    <!-- Gallery controls -->
+                    <div id="media-section-controls" class="hidden">
+                        <div class="gallery-tabs-bl flex flex-row gap-2 fm-filter-chips py-4 px-5 hidden">
+                            <div class="gallery-section-title flex-1 flex flex-row gap-2 items-center">
+                                <div class="media-filter-reset">
+                                    <button class="fm-filter-reset">[$filter_chip_reset]</button>
+                                </div>
                             </div>
-                            <span>[$gallery_exit_discovery]</span>
+                        </div>
+                    </div>
+
+                    <div class="fm-header-bottom">
+                        <button class="mega-component nav-elem icon-only transparent-icon fm-files-view-icon">
+                            <i class="sprite-fm-mono icon-grid-4-thin-outline"></i>
                         </button>
+                        <button class="mega-component nav-elem icon-only transparent-icon fm-header-info hidden">
+                            <i class="sprite-fm-mono icon-info-thin-outline"></i>
+                        </button>
+                    </div>
+
+                    <div id="media-section-right-controls" class="hidden">
+                        <div class="gallery-tabs-bl flex flex-row gap-2 fm-filter-chips py-4 px-5 hidden">
+                            <div class="gallery-section-tabs flex flex-row items-center gap-2">
+                                <button class="gallery-tab-lnk fm-filter-chip-button gallery-tab-lnk-y years" data-folder="y">[$gallery_years]</button>
+                                <button class="gallery-tab-lnk fm-filter-chip-button gallery-tab-lnk-m months" data-folder="m">[$gallery_months]</button>
+                                <button class="gallery-tab-lnk fm-filter-chip-button gallery-tab-lnk-d days" data-folder="d">[$gallery_days]</button>
+                                <div class="vert-separator"></div>
+                                <button class="gallery-tab-lnk fm-filter-chip-button gallery-tab-lnk-a all" data-folder="a">[$gallery_all]</button>
+                            </div>
+                            <div class="gallery-section-discovery hidden">
+                                <button class="mega-button action gallery-close-discovery">
+                                    <div>
+                                        <i class="sprite-fm-mono icon-dialog-close"></i>
+                                    </div>
+                                    <span>[$gallery_exit_discovery]</span>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -3112,101 +3204,6 @@
                             </table>
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <div class="selection-status-bar hidden">
-                <div class="flex items-center">
-                    <button class="deselect-all hidden">
-                        <div class="icon"></div>
-                    </button>
-                    <span class="selection-bar-col"></span>
-                </div>
-                <div class="selection-links-wrapper">
-                    <button class="mega-button simpletip small action js-statusbarbtn s4-key-enable" data-simpletipoffset="2"
-                        data-simpletip="[$s4_key_enable]" data-simpletipposition="top">
-                        <div><i class="sprite-fm-mono icon-enable-small"></i></div>
-                    </button>
-                    <button class="mega-button simpletip small action js-statusbarbtn s4-key-disable" data-simpletipoffset="2"
-                        data-simpletip="[$s4_key_disable]" data-simpletipposition="top">
-                        <div><i class="sprite-fm-mono icon-disable-small"></i></div>
-                    </button>
-                    <button class="mega-button simpletip small action js-statusbarbtn s4-key-download" data-simpletipoffset="2"
-                        data-simpletip="[$58]" data-simpletipposition="top">
-                        <div><i class="sprite-fm-mono icon-download-small"></i></div>
-                    </button>
-                    <button class="mega-button simpletip small action js-statusbarbtn s4-key-copy-config"
-                        data-simpletipoffset="2" data-simpletip="[$63]" data-simpletipposition="top">
-                        <div><i class="sprite-fm-mono icon-copy"></i></div>
-                    </button>
-                    <button class="mega-button simpletip small action js-statusbarbtn s4-policy-copy-arn"
-                        data-simpletipoffset="2" data-simpletip="[$63]" data-simpletipposition="top">
-                        <div><i class="sprite-fm-mono icon-copy"></i></div>
-                    </button>
-                    <button class="mega-button simpletip small action js-statusbarbtn s4-key-rename" data-simpletipoffset="2"
-                        data-simpletip="[$61]" data-simpletipposition="top">
-                        <div><i class="sprite-fm-mono icon-rename"></i></div>
-                    </button>
-                    <button class="mega-button simpletip small action js-statusbarbtn s4-key-delete" data-simpletipoffset="2"
-                        data-simpletip="[$1730]" data-simpletipposition="top">
-                        <div><i class="sprite-fm-mono icon-bin"></i></div>
-                    </button>
-                    <button class="mega-button simpletip small action js-statusbarbtn s4-user-copy-arn" data-simpletipoffset="2"
-                        data-simpletip="[$s4_copy_arn]" data-simpletipposition="top">
-                        <div><i class="sprite-fm-mono icon-copy"></i></div>
-                    </button>
-                    <button class="mega-button simpletip small action js-statusbarbtn s4-user-rename" data-simpletipoffset="2"
-                        data-simpletip="[$61]" data-simpletipposition="top">
-                        <div><i class="sprite-fm-mono icon-rename"></i></div>
-                    </button>
-                    <button class="mega-button simpletip small action js-statusbarbtn s4-user-delete" data-simpletipoffset="2"
-                        data-simpletip="[$1730]" data-simpletipposition="top">
-                        <div><i class="sprite-fm-mono icon-bin"></i></div>
-                    </button>
-                    <button class="mega-button simpletip small action js-statusbarbtn s4-group-copy-arn"
-                        data-simpletipoffset="2" data-simpletip="[$s4_copy_arn]" data-simpletipposition="top">
-                        <div><i class="sprite-fm-mono icon-copy"></i></div>
-                    </button>
-                    <button class="mega-button simpletip small action js-statusbarbtn s4-group-rename" data-simpletipoffset="2"
-                        data-simpletip="[$61]" data-simpletipposition="top">
-                        <div><i class="sprite-fm-mono icon-rename"></i></div>
-                    </button>
-                    <button class="mega-button simpletip small action js-statusbarbtn s4-group-delete" data-simpletipoffset="2"
-                        data-simpletip="[$1730]" data-simpletipposition="top">
-                        <div><i class="sprite-fm-mono icon-bin"></i></div>
-                    </button>
-                    <button class="mega-button simpletip small action js-statusbarbtn preview" data-simpletipoffset="2"
-                        data-simpletip="[$1899]" data-simpletipposition="top">
-                        <div><i class="sprite-fm-mono icon-preview-reveal"></i></div>
-                    </button>
-                    <button class="mega-button simpletip small action js-statusbarbtn download" data-simpletipoffset="2"
-                        data-simpletip="[$58]" data-simpletipposition="top">
-                        <div><i class="sprite-fm-mono icon-download-small"></i></div>
-                    </button>
-                    <button class="mega-button simpletip small action js-statusbarbtn hidden share" data-simpletipoffset="2"
-                        data-simpletip="[$5631]" data-simpletipposition="top">
-                        <div><i class="sprite-fm-mono icon-folder-outgoing-share"></i></div>
-                    </button>
-                    <button class="mega-button simpletip small action js-statusbarbtn sendto" data-simpletipoffset="2"
-                        data-simpletip="[$17764]" data-simpletipposition="top">
-                        <div><i class="sprite-fm-mono icon-send-to-chat"></i></div>
-                    </button>
-                    <button class="mega-button simpletip small action js-statusbarbtn link" data-simpletipoffset="2"
-                        data-simpletip="[$share_link]" data-simpletipposition="top">
-                        <div><i class="sprite-fm-mono icon-link"></i></div>
-                    </button>
-                    <button class="mega-button simpletip small action js-statusbarbtn delete" data-simpletipoffset="2"
-                        data-simpletip="[$83]" data-simpletipposition="top">
-                        <div><i class="sprite-fm-mono icon-bin"></i></div>
-                    </button>
-                    <button class="mega-button simpletip small action js-statusbarbtn delete-from-album"
-                        data-simpletipoffset="2" data-simpletip="[$album_item_remove_label]" data-simpletipposition="top">
-                        <div><i class="sprite-fm-mono icon-bin"></i></div>
-                    </button>
-                    <button class="mega-button simpletip small action js-statusbarbtn options" data-simpletipoffset="2"
-                        data-simpletip="[$tooltip_more]" data-simpletipposition="top">
-                        <div><i class="sprite-fm-mono icon-options"></i></div>
-                    </button>
                 </div>
             </div>
             <div class="search-bottom-wrapper hidden">

@@ -1428,7 +1428,7 @@ lazy(mega.devices, 'ui', () => {
             this._bindEvents();
 
             if (this.hasDevices) {
-                if (M.currentrootid === rootId) {
+                if (M.currentrootid === rootId && mega.ui.secondaryNav.selectionBar.classList.contains('hidden')) {
                     this.filterChipUtils.init();
                 }
 
@@ -1533,6 +1533,13 @@ lazy(mega.devices, 'ui', () => {
             const handle = $.selected[0];
             const devNames = Object.create(null);
             const currentDeviceData = M.dcd[handle];
+            if (!currentDeviceData) {
+                if (handle && M.d[handle]) {
+                    // Temporary patch for when there is a node here but not in M.dcd.
+                    renameDialog();
+                }
+                return;
+            }
 
             for (const {h, name} of Object.values(M.dcd)) {
                 devNames[h] = name;
@@ -2034,6 +2041,7 @@ lazy(mega.devices, 'ui', () => {
                 items['.properties-item'] = 1;
                 items['.download-item'] = 1;
                 items['.zipdownload-item'] = 1;
+                items['.send-to-contact-item'] = 1;
 
                 this._populateSensitiveCtxItems(handles, items);
                 this._filterRestrictedItems(handles, items);

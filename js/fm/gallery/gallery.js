@@ -254,8 +254,8 @@ class MegaGallery {
             delete this.zoom;
         }
 
-        $('.gallery-tab-lnk', '#media-section-controls .gallery-section-tabs').removeClass('selected');
-        $(`.gallery-tab-lnk-${this.mode}`, '#media-section-controls .gallery-section-tabs').addClass('selected');
+        $('.gallery-tab-lnk', '#media-section-right-controls .gallery-section-tabs').removeClass('selected');
+        $(`.gallery-tab-lnk-${this.mode}`, '#media-section-right-controls .gallery-section-tabs').addClass('selected');
 
         this.dropDynamicList();
 
@@ -1271,7 +1271,7 @@ class MegaGallery {
         }
 
         const rfBlock = $('.fm-right-files-block:not(.in-chat)', '.fmholder');
-        const galleryHeader = $('#media-section-controls', rfBlock);
+        const galleryHeader = $('#media-section-controls', rfBlock).add('#media-section-right-controls', rfBlock);
 
         galleryHeader.removeClass('hidden');
         $('#media-tabs', rfBlock).removeClass('hidden');
@@ -1280,6 +1280,7 @@ class MegaGallery {
         rfBlock.removeClass('hidden');
         $('.files-grid-view.fm, .fm-blocks-view.fm, .fm-empty-section', rfBlock).addClass('hidden');
         mega.ui.secondaryNav.updateGalleryLayout();
+        mega.ui.secondaryNav.hideBreadcrumb();
 
         if (pfid && !M.v) {
             $('.fm-empty-section', rfBlock).removeClass('hidden');
@@ -3147,6 +3148,13 @@ async function galleryUI(id) {
         '.gallery-section-title *'
     ].join(','), '.fm-right-files-block');
 
+    const rightSectionControls = document.getElementById('media-section-right-controls');
+    if (id) {
+        rightSectionControls.classList.add('wrap');
+    }
+    else {
+        rightSectionControls.classList.remove('wrap');
+    }
     // This is media discovery
     if (id) {
         if (!pfid) {

@@ -609,9 +609,6 @@ async function setupSingleDownloadPage(res) {
             if (prevBut) {
                 showPreviewButton();
             }
-
-            // This file link is valid to affiliate
-            M.affiliate.storeAffiliate(dlpage_ph, 2);
         }
         else {
             return mKeyDialog(dlpage_ph, false, key)

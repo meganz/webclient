@@ -1443,7 +1443,6 @@ BusinessAccount.prototype.doPaymentWithAPI = async function(payDetails, business
         si: businessPlan.id,
         p: boughtItemPrice,
         c: businessPlan.c,
-        aff: mega.affid,
         m: m,
         bq: 0,
         pbq: 0,

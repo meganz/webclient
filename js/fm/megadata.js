@@ -235,9 +235,3 @@ function MegaData() {
 
 MegaData.prototype = new MegaUtils();
 MegaData.prototype.constructor = MegaData;
-
-// Initialize affiliate dataset on-demand
-lazy(MegaData.prototype, 'affiliate', () => {
-    'use strict';
-    return new AffiliateData();
-});

@@ -81,11 +81,6 @@ function init_embed(ph, key, g) {
             $('.viewer-bottom-bl').addClass('no-grad');
             $('.media-viewer').addClass('no-bg-color');
         }
-        else if (mega.refsunref) {
-            localStorage.affid = ph;
-            localStorage.affts = Date.now();
-            localStorage.afftype = 2;
-        }
 
         $('.play-video-button, .viewonmega-item, .filename').rebind('click', function() {
             open(getBaseUrl() + link);

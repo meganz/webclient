@@ -166,11 +166,6 @@ function dashboardUI(updProcess) {
             $('.fm-right-block.dashboard').removeClass('active-achievements');
         }
 
-        if (!updProcess) {
-            // Only render the referral program widget if loading the dashboard page UI initially
-            dashboardUI.renderReferralWidget();
-        }
-
         const accountStatus = (u_attr.b && u_attr.b.s) || (u_attr.pf && u_attr.pf.s);
 
         // Elements for free/pro accounts. Expires date / Registration date
@@ -591,72 +586,6 @@ function dashboardUI(updProcess) {
         });
     });
 }
-dashboardUI.renderReferralWidget = function() {
-    "use strict";
-
-    // Referrals Widget
-    if (mega.flags.refpr) {
-        M.affiliate.getBalance().then(() => {
-            let prefix = '.non-business-dashboard ';
-
-            // If Business or Pro Flexi, use the business-dashboard parent selector
-            if (u_attr.b || u_attr.pf) {
-                prefix = '.business-dashboard ';
-            }
-            if (!mega.refsunref) {
-                $('.refer-programme-banner', prefix).removeClass('hidden');
-                $('.referrals .account.widget.text', prefix).text(l.referral_close_desc);
-                $('.refer-programme-banner i', prefix).rebind('click.refsun', () => {
-                    $('.refer-programme-banner', prefix).addClass('hidden');
-                });
-            }
-
-            const $referralWidget = $(prefix + '.account.widget.referrals');
-            const balance = M.affiliate.balance;
-            var localCurrency;
-            var localTotal;
-            var localAvailable;
-
-            if (balance) {
-                localCurrency = balance.localCurrency;
-
-                $referralWidget.removeClass('hidden');
-
-                if (localCurrency === 'EUR') {
-                    localTotal = formatCurrency(balance.localTotal);
-                    localAvailable = formatCurrency(balance.localAvailable);
-
-                    $('.euro', $referralWidget).addClass('hidden');
-                }
-                else {
-                    localTotal = formatCurrency(balance.localTotal, localCurrency, 'number');
-                    localAvailable = formatCurrency(balance.localAvailable, localCurrency, 'number');
-
-                    $('.euro', $referralWidget).removeClass('hidden');
-                    $('.referral-value.local .currency', $referralWidget).text(localCurrency);
-                    $('.referral-value.total.euro', $referralWidget)
-                        .text(formatCurrency(balance.pending + balance.available));
-                    $('.referral-value.available.euro', $referralWidget).text(formatCurrency(balance.available));
-                }
-
-                $('.referral-value.total.local .value', $referralWidget)
-                    .text(localTotal);
-                $('.referral-value.available.local .value', $referralWidget)
-                    .text(localAvailable);
-
-                // Referral widget button
-                $('button.referral-program', $referralWidget).rebind('click.refer', () => {
-                    loadSubPage('/fm/refer');
-                    eventlog(500476);
-                });
-            }
-        }).catch(ex => {
-            if (d) {
-                console.error('Update affiliate data failed: ', ex);
-            }
-        });
-    }
-};
 
 dashboardUI.updateCloudDataWidget = function() {
     const files = l.file_count;

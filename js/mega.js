@@ -3816,8 +3816,6 @@ function loadfm_callback(res) {
 
             return mKeyDialog(pfid, true, true).catch(() => loadSubPage('start'));
         }
-
-        M.affiliate.storeAffiliate(folderlink, 2);
     }
 
     if (res.noc) {

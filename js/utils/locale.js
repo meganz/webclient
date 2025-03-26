@@ -1312,95 +1312,10 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace(/\[S]/g, '<span>').replace(/\[\/S]/g, '</span>')
         .replace('[A]', '<a class="clickurl" href="/pro" data-eventid="500490">')
         .replace('[/A]', '</a>');
-    l[22685] = escapeHTML(l[22685]).replace('[B]', '<strong>').replace('[/B]', '</strong>');
-    l[22689] = escapeHTML(l[22689]).replace('[B]', '<strong>').replace('[/B]', '</strong>');
-    l[22696] = escapeHTML(l[22696])
-        .replace('[A]', '<a class="clickurl" href="/pro" data-eventid="500481">').replace('[/A]', '</a>')
-        .replace('[S]', '<span class="no-buisness">').replace('[/S]', '</span>');
-    l[22700] = escapeHTML(l[22700]).replace('[S]', '<i class="sprite-fm-mono icon-up"></i><span>')
-        .replace('[/S]', '</span>').replace('%1', '');
-    l[22723] = escapeHTML(l[22723]).replace('[B]', '<strong>').replace('[/B]', '</strong>');
-    l['22726.m'] = escapeHTML(l[22726]).replace('[B]', '<strong>').replace('[/B]', '*</strong>');
-    l[22726] = escapeHTML(l[22726]).replace('[B]', '<strong>').replace('[/B]', '</strong>');
-    l[22771] = escapeHTML(l[22771]).replace('[B]', '<strong>').replace('[/B]', '</strong>');
-    l[22898] = escapeHTML(l[22898]).replace('[A]', '<a class="clickurl" href="https://mega.io/mobile" target="_blank">')
-        .replace('[/A]', '</a>')
-        .replace('[BR]', '<br>');
     l[22900] = escapeHTML(l[22900]).replace('[A]', '<a class="reg-success-change-email-btn">').replace('[/A]', '</a>');
     l['23062.k'] = escapeHTML(l[23062]).replace('[%s]', l[7049]);
-    let referral_program_rules = '';
-    const breaks = '[BR][BR]';
-    const referralProgramStrings = [
-        l.referral_program_rules_p0,
-        '[BR]',
-        l.referral_program_rules_l0,
-        l.referral_program_rules_l1,
-        l.referral_program_rules_l2,
-        '[BR]',
-        l.referral_program_rules_p1,
-        breaks,
-        l.referral_program_rules_p2,
-        breaks,
-        l.referral_program_rules_p3,
-        breaks,
-        l.referral_program_rules_p4,
-        breaks,
-        l.referral_program_rules_p5,
-        breaks,
-        l.referral_program_rules_p6,
-        breaks,
-        l.referral_program_rules_p7,
-        breaks,
-        l.referral_program_rules_p8,
-        breaks,
-        l.referral_program_rules_p9,
-        breaks,
-        l.referral_program_rules_p10,
-        breaks,
-        l.referral_program_rules_p11,
-        breaks,
-        l.referral_program_rules_p12,
-        breaks,
-        l.referral_program_rules_p13,
-        breaks,
-        l.referral_program_rules_p14,
-        breaks,
-        l.referral_program_rules_p15,
-        breaks,
-        l.referral_program_rules_p16,
-        breaks,
-        l.referral_program_rules_p17
-    ];
-    for (let i = 0; i < referralProgramStrings.length; i++){
-        referral_program_rules += referralProgramStrings[i];
-    }
-    l['referral_program_rules.d'] = escapeHTML(referral_program_rules)
-        .replace(/\[P]/g, '').replace(/\[\/P]/g, '')
-        .replace(/\[L]/g, '<i class="sprite-fm-mono icon-check"></i><div class="affiliate-guide info">')
-        .replace(/\[\/L]/g, '</div>')
-        .replace(/\[BR]/g, '<br>')
-        .replace(/\[A]/g, '<a class="clickurl" href="https://mega.io/terms" target="_blank">')
-        .replace(/\[\/A]/g, '</a>');
-    l['referral_program_rules.m'] = escapeHTML(referral_program_rules)
-        .replace(/\[P]/g, '<div class="mobile button-block no-bg"><div class="mobile label-info no-icon">')
-        .replace(/\[\/P]/g, '</div></div>')
-        .replace(/\[L]/g, '<div class="mobile button-block no-bg"><div class="mobile fm-icon green-tick">' +
-            '</div><div class="mobile label-info">').replace(/\[\/L]/g, '</div></div>')
-        .replace(/\[BR]/g, '')
-        .replace(/\[A]/g, '<a class="clickurl" href="https://mega.io/terms" target="_blank">')
-        .replace(/\[\/A]/g, '</a>');
-    l[23214] = escapeHTML(l[23214]).replace('[A]', '<a class="fm-affiliate guide-dialog to-rules">')
-        .replace('[/A]', '</a>');
     l[23243] = escapeHTML(l[23243])
         .replace('[A]', '<a href="https://mega.io/terms" class="clickurl" target="_blank">')
-        .replace('[/A]', '</a>');
-    l[23370] = escapeHTML(l[23370]).replace('[A]', '<a class="mailto" href="mailto:support@mega.nz">')
-        .replace('[/A]', '</a>');
-    l[23371] = escapeHTML(l[23371]).replace('[A]', '<a class="mailto" href="mailto:support@mega.nz">')
-        .replace('[/A]', '</a>');
-    l[23372] = escapeHTML(l[23372]).replace('[A]', '<a class="mailto" href="mailto:support@mega.nz">')
-        .replace('[/A]', '</a>');
-    l[23373] = escapeHTML(l[23373]).replace('[A]', '<a class="mailto" href="mailto:support@mega.nz">')
         .replace('[/A]', '</a>');
     l[24431] = escapeHTML(l[24431]).replace('[A]', '<a href="/repay" class="clickurl">').replace('[/A]', '</a>')
         .replace('[S]', '<span>').replace('[/S]', '</span>');
@@ -1588,10 +1503,6 @@ mBroadcaster.once('boot_done', function populate_l() {
     l.file_request_upload_caption_2 = escapeHTML(l.file_request_upload_caption_2)
         .replace('[A]', '<a target="_blank" href="https://help.mega.io/files-folders/sharing/upload-file-request">')
         .replace('[/A]', '</a>');
-    l.redemption_support_email = escapeHTML(l.redemption_support_email)
-        .replace('[S]', '<span>').replace('[/S]', '</span>');
-    l.estimated_price_text_min_50 = escapeHTML(l.estimated_price_text_min_50)
-        .replace('[S]', '<span>').replace('[/S]', '</span>');
 
     // TODO: Combine all of these limited dl strings to be done at once in a new array?
     l.dl_limited_tq_mini = escapeHTML(l.dl_limited_tq_mini)
@@ -1842,8 +1753,6 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace(/\[\/S\d]/g, '</span>');
 
     l.invite_subject_text = escapeHTML(encodeURIComponent(l.invite_subject_text));
-    l.available_commission_tip = escapeHTML(l.available_commission_tip)
-        .replace('[A]', '<a class="clickurl" href="/pro">').replace('[/A]', '</a>');
 
     l.dc_empty_desc_noapp = escapeHTML(l.dc_empty_desc_noapp)
         .replace('[A]', `<a href="${l.mega_help_host}/installs-apps/desktop/backup-vs-sync"
@@ -2072,17 +1981,13 @@ mBroadcaster.once('boot_done', function populate_l() {
         18284, 18285, 18286, 18287, 18289, 18290, 18291, 18294, 18295, 18296, 18297, 18298, 18302, 18303, 18304,
         18305, 18314, 18315, 18316, 18419, 19807, 19808, 19810, 19811, 19812, 19813, 19814, 19854, 19821, 20402,
         20462, 20969, 20970, 20971, 20973, 10637,
-        23524, 23534, 23296, 23299, 23304, 23819, 24077, 24099,
+        23524, 23534, 23819, 24077, 24099,
         24680, 24849, 24850,
 
         // Non numeric ids
         'bsn_calc_min_users',
         'pro_flexi_account_suspended_description',
         'cannot_leave_share_content',
-        'available_commission_tip',
-        'pending_commission_tip',
-        'commission_amount_tip',
-        'go_to_pro',
         'after_days_card_charged_m',
         's4_disable_feature_info',
     ];

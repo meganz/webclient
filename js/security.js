@@ -1031,10 +1031,6 @@ security.register = {
             name2: base64urlencode(to8(firstName + ' ' + lastName))
         };
 
-        if (mega.affid) {
-            options.aff = mega.affid;
-        }
-
         // Send API request
         api_req(options);
     },

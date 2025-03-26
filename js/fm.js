@@ -1954,9 +1954,6 @@ function openContactInfoLink(contactLink) {
 
                     return false;
                 });
-
-                // This contact link is valid to be affilaited
-                M.affiliate.storeAffiliate(contactLink, 4);
             }
         }
         else {
@@ -1970,11 +1967,6 @@ function openContactInfoLink(contactLink) {
                 mBroadcaster.once('fm:initialized', function () {
                     openContactInfoLink(contactLink);
                 });
-
-                // This contact link is not checked but stored for register case
-                // and also user click `add contact` anyway so it's user's call
-                M.affiliate.storeAffiliate(contactLink, 4);
-
                 login_next = page;
                 login_txt = l[1298];
                 return loadSubPage('login');

@@ -2673,7 +2673,7 @@ FileManager.prototype.createFolderUI = function() {
         ev.currentTarget.domNode = ev.currentTarget;
         mega.ui.secondaryNav.openDownloadMenu(ev);
         if (folderlink) {
-            eventlog(500741);
+            eventlog(99766);
         }
     });
 

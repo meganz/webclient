@@ -1098,35 +1098,24 @@ ChatRoom.prototype.getTruncatedRoomTopic = function(maxLength = ChatRoom.TOPIC_M
 /**
  * Set the room topic
  * @param {String} newTopic
- * @param allowEmpty
  */
-ChatRoom.prototype.setRoomTitle = function(newTopic, allowEmpty) {
-    var self = this;
-    newTopic = allowEmpty ? newTopic : String(newTopic);
 
-    if (
-        (allowEmpty || newTopic.trim().length > 0) &&
-        newTopic !== self.getRoomTitle()
-    ) {
-        self.scrolledToBottom = true;
-        var participants = self.protocolHandler.getTrackedParticipants();
-        return ChatdIntegration._ensureKeysAreLoaded(undefined, participants).then(() => {
-            // self.state.value
-            var topic = self.protocolHandler.embeddedEncryptTo(
-                newTopic,
-                strongvelope.MESSAGE_TYPES.TOPIC_CHANGE,
-                participants,
-                undefined,
-                self.type === "public"
-            );
+ChatRoom.prototype.setRoomTopic = async function(newTopic) {
+    if (newTopic && newTopic.trim().length && newTopic !== this.getRoomTitle()) {
+        this.scrolledToBottom = true;
+        const participants = this.protocolHandler.getTrackedParticipants();
+        await ChatdIntegration._ensureKeysAreLoaded(undefined, participants);
+        const topic = this.protocolHandler.embeddedEncryptTo(
+            newTopic,
+            strongvelope.MESSAGE_TYPES.TOPIC_CHANGE,
+            participants,
+            undefined,
+            this.type === 'public'
+        );
 
-            if (topic) {
-                return asyncApiReq({a: "mcst", id: self.chatId, ct: base64urlencode(topic), v: Chatd.VERSION});
-            }
-        }).catch(dump);
-    }
-    else {
-        return false;
+        if (topic) {
+            return api.req({ a: 'mcst', id: this.chatId, ct: base64urlencode(topic), v: Chatd.VERSION });
+        }
     }
 };
 

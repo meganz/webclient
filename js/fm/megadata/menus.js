@@ -1285,8 +1285,20 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
 
                     // Hide items for selection Bar Options button
                     if (!$currentTarget.attr('id')) {
-                        $menuCMI.filter('.download-item, .sh4r1ng-item, .send-to-contact-item,' +
-                            '.getlink-item, .remove-item').addClass('hidden');
+                        const items = mega.ui.secondaryNav && mega.ui.secondaryNav.selectionBarItems ?
+                            [...mega.ui.secondaryNav.selectionBarItems] :
+                            ['.download-item', '.sh4r1ng-item', '.getlink-item', '.remove-item'];
+                        if ($.menuForcedItems && $.menuForcedItems.length) {
+                            for (const menuItem of $.menuForcedItems) {
+                                const idx = items.indexOf(menuItem);
+                                if (idx > -1) {
+                                    items.splice(idx, 1);
+                                }
+                            }
+                        }
+                        if (items.length) {
+                            $menuCMI.filter(items.join(', ')).addClass('hidden');
+                        }
                     }
 
                     onIdle(showContextMenu);

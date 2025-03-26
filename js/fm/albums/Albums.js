@@ -208,12 +208,8 @@ lazy(mega.gallery, 'albums', () => {
                     }
                     else {
                         window.selectionManager.showSelectionBar(
-                            mega.icu.format(l.album_selected_items_count, album.nodes.length)
-                                .replace('%1', selHandles.length),
-                            undefined,
-                            undefined,
-                            undefined,
-                            true
+                            mega.icu.format(l.selected_count, selHandles.length),
+                            scope.albums.grid.timeline.selSize
                         );
                     }
                 });
@@ -735,12 +731,8 @@ lazy(mega.gallery, 'albums', () => {
 
                     if (grid.timeline.selCount > 0) {
                         window.selectionManager.showSelectionBar(
-                            mega.icu.format(l.album_selected_items_count, album.nodes.length)
-                                .replace('%1', grid.timeline.selCount),
-                            undefined,
-                            undefined,
-                            undefined,
-                            true
+                            mega.icu.format(l.selected_count, grid.timeline.selCount),
+                            grid.timeline.selSize
                         );
                     }
                     else {
@@ -3423,12 +3415,8 @@ lazy(mega.gallery, 'albums', () => {
 
                             if (this.timeline.selCount) {
                                 window.selectionManager.showSelectionBar(
-                                    mega.icu.format(l.album_selected_items_count, album.nodes.length)
-                                        .replace('%1', this.timeline.selCount),
-                                    undefined,
-                                    undefined,
-                                    undefined,
-                                    true
+                                    mega.icu.format(l.selected_count, this.timeline.selCount),
+                                    this.timeline.selSize
                                 );
 
                                 if (!prevCount) {
@@ -3958,17 +3946,6 @@ lazy(mega.gallery, 'albums', () => {
                         if (timeline) {
                             timeline.nodes = album.nodes;
                             header.update(s);
-
-                            if (timeline.selCount > 0) {
-                                window.selectionManager.showSelectionBar(
-                                    mega.icu.format(l.album_selected_items_count, album.nodes.length)
-                                        .replace('%1', timeline.selCount),
-                                    undefined,
-                                    undefined,
-                                    undefined,
-                                    true
-                                );
-                            }
                         }
 
                         mega.gallery.resetMediaCounts(album.nodes);
@@ -4806,17 +4783,6 @@ lazy(mega.gallery, 'albums', () => {
                         if (this.grid && this.grid.timeline) {
                             this.grid.timeline.nodes = album.nodes;
                             this.grid.header.update(albumId);
-
-                            if (this.grid.timeline.selCount > 0) {
-                                window.selectionManager.showSelectionBar(
-                                    mega.icu.format(l.album_selected_items_count, album.nodes.length)
-                                        .replace('%1', this.grid.timeline.selCount),
-                                    undefined,
-                                    undefined,
-                                    undefined,
-                                    true
-                                );
-                            }
                         }
                     });
                 }

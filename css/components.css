@@ -2,48 +2,44 @@
         selection-status-bar
 \* =============================== */
 .selection-status-bar {
-    background-color: var(--stroke-grey-2);
-    height: 64px;
-    padding: 6px 12px;
-    box-sizing: border-box;
-    cursor: default;
-    flex-shrink: 0;
-    border-left: 2px solid var(--stroke-main);
+    height: 32px;
+    padding-inline: 24px;
+    padding-bottom: 8px;
     transition: 200ms linear;
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    margin-top: 8px;
+    flex: 1;
+    overflow: hidden;
 }
-.rtl .selection-status-bar {
-    display: rtl;
-}
-.fm-right-files-block.item-selected .selection-status-bar {
-    margin-bottom: 0;
-    -khtml-toast-notification: 1;
-    opacity: 1;
-    visibility: visible;
-    z-index: 11;
+.selection-status-bar.gallery-pad {
+    padding-top: 8px;
 }
 
-.selection-status-bar button.deselect-all {
-    cursor: pointer;
-    position: relative;
-    border-radius: 3px;
-    background: var(--checkbox-fill-active);
-    width: 16px;
-    height: 16px;
+.selection-status-bar .items-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 24px;
+    padding-inline: 12px;
+    margin-inline-end: 24px;
+    border-radius: 16px;
+    background: rgba(252, 239, 239, 1);
+    color: rgba(123, 33, 24, 1);
     border: none;
-    margin-right: 10px;
-    margin-top: 2px;
+    outline: none;
+    white-space: nowrap;
 }
-.selection-status-bar button.deselect-all .icon {
-    content: "";
-    width: 10px;
-    height: 2px;
-    background: var(--mobile-surface-1);
-    position: absolute;
-    top: 4px;
-    left: 3px;
+.theme-dark .selection-status-bar .items-center,
+.theme-dark .selection-status-bar .items-center .fm-filter-chip-button-text {
+    background: rgba(91, 19, 13, 1);
+    color: rgba(252, 239, 239, 1);
+}
+.selection-status-bar .spacer {
+    margin: 8px;
+}
+.selection-status-bar .spacer:empty {
+    margin: 0;
 }
 
 .selection-status-bar .selection-bar-col .sel-notif-size-total {
@@ -64,33 +60,22 @@
 }
 
 .selection-status-bar .selection-bar-col {
-    font: var(--text-body1);
-    color: var(--text-color-high);
-    /* margin-top: 13px; */
-    line-height: 28px;
-    /* float: left; */
+    font: var(--mobile-font-caption-large-semibold);
 }
 
-/* .rtl .selection-status-bar .selection-bar-col {
-    float: right;
-} */
-
-/* .selection-links-wrapper {
-    float: right;
-    top: 12px;
-    position: relative;
-} */
-.rtl .selection-links-wrapper {
-    float: left;
+.selection-links-wrapper {
+    border-inline-start: 1px solid var(--mobile-border-strong);
+    padding-inline-start: 12px;
+    white-space: nowrap;
 }
 
-.selection-status-bar .mega-button {
-    margin-inline-start: 18px;
-}
-
-.selection-status-bar .mega-button.small > div i {
+.selection-links-wrapper .icon-only.transparent-icon.small {
+    cursor: pointer;
+    height: 32px;
+    margin: 0 12px;
+    padding: 4px;
+    width: 32px;
     --icon-size: 24px;
-    --mask-color: var(--icon-rest);
 }
 
 /* =============================== *\

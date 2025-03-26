@@ -26,7 +26,6 @@
 .info-panel-visible .out-shared-blocks-view .out-shared-blocks-scrolling,
 .info-panel-visible .shares-tabs-bl,
 .info-panel-visible .shared-blocks-scrolling,
-.info-panel-visible #media-tabs,
 .info-panel-visible .fm-right-header {
     max-width: calc(100% - var(--info-panel-space));
 }
@@ -35,7 +34,6 @@
 .info-panel-visible .out-shared-grid-view .grid-scrolling-table.ps {
     min-width: initial;
 }
-.info-panel-visible .selection-status-bar,
 .info-panel-visible .fm-right-files-block.emptied .fm-empty-section,
 .info-panel-visible .section.conversations,
 .info-panel-visible .in-chat .meetings-call,
@@ -96,7 +94,6 @@
 .info-panel-visible .s4-info-header-blocks {
     margin-right: var(--info-panel-space);
 }
-.info-panel-visible .gallery-tabs-bl,
 .info-panel-visible #media-counts {
     max-width: calc(100% - var(--info-panel-space));
     min-width: 0;

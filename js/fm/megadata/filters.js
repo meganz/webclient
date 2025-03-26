@@ -241,7 +241,7 @@ MegaData.prototype.getFilterBySearchFn = function(searchTerm) {
         return node.name && node.name.toLowerCase().includes(str)
             && node.p !== 'contacts'
             && !(node.s4 && node.p === M.RootID && M.getS4NodeType(node) === 'container')
-            && node.h !== M.BackupsId && node.p !== M.BackupsId
+            && (!M.BackupsId || node.h !== M.BackupsId && node.p !== M.BackupsId)
             && !mega.devices.ui.isDeprecated(node);
     };
 };

@@ -621,7 +621,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                     1
                 );
             }
-            return M.safeShowDialog('contact-picker', () => this.setState({ contactPickerDialog: true }));
+            return this.setState({ contactPickerDialog: true });
         }
         msgDialog( // new user adding a partcipant
             `confirmationa:!^${l[8726]}!${l[82]}`,
@@ -873,7 +873,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                 onClick={() =>
                     Object.values(M.u.toJS()).some(u => u.c === 1) ?
                         !allContactsInChat(exParticipants)
-                            ? M.safeShowDialog('contact-picker', () => this.setState({ contactPickerDialog: true })) :
+                            ? this.setState({ contactPickerDialog: true }) :
                             msgDialog(
                                 `confirmationa:!^${l[8726]}!${l[82]}`,
                                 null,
@@ -1405,8 +1405,11 @@ export class ConversationRightArea extends MegaRenderMixin {
 export class ConversationPanel extends MegaRenderMixin {
     domRef = React.createRef();
     messagesBlockRef = React.createRef();
+
     $container = undefined;
     $messages = undefined;
+
+    selectedNodes = [];
 
     state = {
         startCallPopupIsActive: false,
@@ -1441,9 +1444,10 @@ export class ConversationPanel extends MegaRenderMixin {
         super(props);
 
         const { chatRoom } = this.props;
-        chatRoom.rebind(`openAttachCloudDialog.${this.getUniqueId()}`, () => this.openAttachCloudDialog());
-        chatRoom.rebind(`openSendContactDialog.${this.getUniqueId()}`, () => this.openSendContactDialog());
-        chatRoom.rebind(`openSchedDescDialog.${this.getUniqueId()}`, () => this.openSchedDescDialog());
+        const uniqueId = this.getUniqueId();
+        chatRoom.rebind(`openAttachCloudDialog.${uniqueId}`, () => this.setState({ attachCloudDialog: true }));
+        chatRoom.rebind(`openSendContactDialog.${uniqueId}`, () => this.setState({ sendContactDialog: true }));
+        chatRoom.rebind(`openDescriptionDialog.${uniqueId}`, () => this.setState({ descriptionDialog: true }));
 
         this.handleKeyDown = SoonFc(120, (ev) => this._handleKeyDown(ev));
 
@@ -1454,18 +1458,6 @@ export class ConversationPanel extends MegaRenderMixin {
 
     customIsEventuallyVisible() {
         return this.props.chatRoom.isCurrentlyActive;
-    }
-
-    openAttachCloudDialog() {
-        M.safeShowDialog('attach-cloud-dialog', () => this.setState({ attachCloudDialog: true }));
-    }
-
-    openSendContactDialog() {
-        M.safeShowDialog('send-contact-dialog', () => this.setState({ sendContactDialog: true }));
-    }
-
-    openSchedDescDialog() {
-        this.setState({ descriptionDialog: true });
     }
 
     @utils.SoonFcWrap(360)
@@ -1585,6 +1577,102 @@ export class ConversationPanel extends MegaRenderMixin {
         );
     };
 
+    CloudBrowserDialog = () => {
+        const { chatRoom } = this.props;
+
+        return (
+            <CloudBrowserModalDialog.CloudBrowserDialog
+                room={chatRoom}
+                allowAttachFolders={true}
+                onSelected={nodes => {
+                    this.selectedNodes = nodes;
+                }}
+                onAttachClicked={() => {
+                    this.setState({ attachCloudDialog: false }, () => {
+                        chatRoom.scrolledToBottom = true;
+                        chatRoom.attachNodes(this.selectedNodes).catch(dump);
+                    });
+                }}
+                onClose={() => {
+                    this.setState({ attachCloudDialog: false }, () => {
+                        this.selectedNodes = [];
+                    });
+                }}
+            />
+        );
+    };
+
+    SelectContactDialog = () => {
+        const { chatRoom } = this.props;
+        const excludedContacts = chatRoom.getParticipantsExceptMe().filter(userHandle => userHandle in M.u);
+
+        return (
+            <ModalDialogsUI.SelectContactDialog
+                chatRoom={chatRoom}
+                exclude={excludedContacts}
+                onSelectClicked={selected =>
+                    this.setState({ sendContactDialog: false }, () => chatRoom.attachContacts(selected))
+                }
+                onClose={() => this.setState({ sendContactDialog: false })}
+            />
+        );
+    };
+
+    DescriptionDialog = () => {
+        const { chatRoom } = this.props;
+        const dialogName = 'scheduled-description-dialog';
+
+        return (
+            <ModalDialogsUI.ModalDialog
+                className={dialogName}
+                meeting={chatRoom.scheduledMeeting}
+                popupDidMount={() => M.safeShowDialog(dialogName, () => $(`.${dialogName}`))}
+                popupWillUnmount={() => $.dialog === dialogName && closeDialog()}
+                onClose={() => this.setState({ descriptionDialog: false })}>
+                <header>
+                    <h3>{l.schedule_desc_dlg_title /* `Meeting description` */}</h3>
+                </header>
+                <section className="content">
+                    <PerfectScrollbar className="description-scroller">
+                        <ParsedHTML
+                            content={
+                                megaChat.html(chatRoom.scheduledMeeting.description).replace(/\n/g, '<br>') ||
+                                l.schedule_no_desc /* `The description has been removed` */
+                            }
+                        />
+                    </PerfectScrollbar>
+                </section>
+            </ModalDialogsUI.ModalDialog>
+        );
+    };
+
+    PushSettingsDialog = () => {
+        const { chatRoom } = this.props;
+        const { pushSettingsValue } = this.state;
+        const state = { pushSettingsDialog: false, pushSettingsValue: null };
+
+        return (
+            <PushSettingsDialog
+                room={chatRoom}
+                pushSettingsValue={pushSettingsValue}
+                onClose={() =>
+                    this.setState(
+                        { ...state, pushSettingsValue },
+                        () => $.dialog === 'push-settings-dialog' && closeDialog()
+                    )
+                }
+                onConfirm={pushSettingsValue =>
+                    this.setState({ ...state, pushSettingsValue }, () =>
+                        pushNotificationSettings.setDnd(
+                            chatRoom.chatId,
+                            pushSettingsValue === Infinity ? 0 : unixtime() + pushSettingsValue * 60
+                        )
+                    )
+                }
+            />
+        );
+    };
+
     componentDidMount() {
         super.componentDidMount();
         const { chatRoom } = this.props;
@@ -1604,9 +1692,7 @@ export class ConversationPanel extends MegaRenderMixin {
             }
         });
 
-        chatRoom.rebind('openSendFilesDialog.cpanel', () => {
-            this.openAttachCloudDialog();
-        });
+        chatRoom.rebind('openSendFilesDialog.cpanel', () => this.setState({ attachCloudDialog: true }));
 
         chatRoom.rebind('showGetChatLinkDialog.ui', () => {
             createTimeoutPromise(() => chatRoom.topic && chatRoom.state === ChatRoom.STATE.READY, 350, 15000)
@@ -1735,12 +1821,12 @@ export class ConversationPanel extends MegaRenderMixin {
 
         mBroadcaster.removeListener(this.pageChangeListener);
 
-        this.props.chatRoom.unbind("openAttachCloudDialog." + this.getUniqueId());
-        this.props.chatRoom.unbind("openSendContactDialog." + this.getUniqueId());
-        this.props.chatRoom.unbind(`openSchedDescDialog.${this.getUniqueId()}`);
+        this.props.chatRoom.unbind(`openAttachCloudDialog.${this.getUniqueId()}`);
+        this.props.chatRoom.unbind(`openSendContactDialog.${this.getUniqueId()}`);
+        this.props.chatRoom.unbind(`openDescriptionDialog.${this.getUniqueId()}`);
         window.removeEventListener('keydown', self.handleKeyDown);
-        $(document).off("fullscreenchange.megaChat_" + chatRoom.roomId);
-        $(document).off('keydown.keyboardScroll_' + chatRoom.roomId);
+        $(document).off(`fullscreenchange.megaChat_${chatRoom.roomId}`);
+        $(document).off(`keydown.keyboardScroll_${chatRoom.roomId}`);
         this.props.chatRoom.unbind(`wrOnJoinNotAllowed.${this.getUniqueId()}`);
         this.props.chatRoom.unbind(`wrOnJoinAllowed.${this.getUniqueId()}`);
         megaChat.unbind(`onIncomingCall.${this.getUniqueId()}`);
@@ -1786,7 +1872,6 @@ export class ConversationPanel extends MegaRenderMixin {
         }
 
 
-
         if (self.$messages && self.isComponentEventuallyVisible()) {
             $(window).rebind('pastedimage.chatRoom', function(e, blob, fileName) {
                 if (self.$messages && self.isComponentEventuallyVisible()) {
@@ -1818,30 +1903,6 @@ export class ConversationPanel extends MegaRenderMixin {
         var topicBlockClass = "chat-topic-block";
         if (room.type !== "public") {
             topicBlockClass += " privateChat";
-        }
-
-
-        var attachCloudDialog = null;
-        if (self.state.attachCloudDialog === true) {
-            var selected = [];
-            attachCloudDialog = <CloudBrowserModalDialog.CloudBrowserDialog
-                allowAttachFolders={true}
-                room={room}
-                onClose={() => {
-                    self.setState({'attachCloudDialog': false});
-                    selected = [];
-                }}
-                onSelected={(nodes) => {
-                    selected = nodes;
-                }}
-                onAttachClicked={() => {
-                    self.setState({'attachCloudDialog': false});
-
-                    self.props.chatRoom.scrolledToBottom = true;
-
-                    room.attachNodes(selected).catch(dump);
-                }}
-            />;
         }
 
         var nonLoggedInJoinChatDialog = null;
@@ -1945,34 +2006,6 @@ export class ConversationPanel extends MegaRenderMixin {
                     </footer>
                 </ModalDialogsUI.ModalDialog>
             );
-        }
-
-        var sendContactDialog = null;
-        if (self.state.sendContactDialog === true) {
-            var excludedContacts = [];
-            if (room.type == "private") {
-                room.getParticipantsExceptMe().forEach(function(userHandle) {
-                    if (userHandle in M.u) {
-                        excludedContacts.push(
-                            M.u[userHandle].u
-                        );
-                    }
-                });
-            }
-
-            sendContactDialog = <ModalDialogsUI.SelectContactDialog
-                chatRoom={room}
-                exclude={excludedContacts}
-                onClose={() => {
-                    self.setState({'sendContactDialog': false});
-                    selected = [];
-                }}
-                onSelectClicked={(selected) => {
-                    self.setState({'sendContactDialog': false});
-
-                    room.attachContacts(selected);
-                }}
-            />
         }
 
         var confirmDeleteDialog = null;
@@ -2120,28 +2153,6 @@ export class ConversationPanel extends MegaRenderMixin {
         // Push notification settings
         // ----------------------------------------------------------------------
 
-        let pushSettingsDialog = null;
-        if (self.state.pushSettingsDialog === true) {
-            const state = { pushSettingsDialog: false, pushSettingsValue: null };
-            pushSettingsDialog = (
-                <PushSettingsDialog
-                    room={room}
-                    pushSettingsValue={this.state.pushSettingsValue}
-                    onClose={() =>
-                        this.setState({ ...state, pushSettingsValue: this.state.pushSettingsValue })
-                    }
-                    onConfirm={pushSettingsValue =>
-                        self.setState({ ...state, pushSettingsValue }, () =>
-                            pushNotificationSettings.setDnd(
-                                room.chatId,
-                                pushSettingsValue === Infinity ? 0 : unixtime() + pushSettingsValue * 60
-                            )
-                        )
-                    }
-                />
-            );
-        }
-
         var confirmTruncateDialog = null;
         if (self.state.truncateDialog === true) {
             confirmDeleteDialog = <ModalDialogsUI.ConfirmDialog
@@ -2223,29 +2234,6 @@ export class ConversationPanel extends MegaRenderMixin {
                 }}
             />;
         }
-
-        let { descriptionDialog } = this.state;
-        descriptionDialog = descriptionDialog ? <ModalDialogsUI.ModalDialog
-            className="scheduled-description-dialog"
-            meeting={room.scheduledMeeting}
-            onClose={() => {
-                this.setState({ descriptionDialog: false });
-            }}>
-            <header>
-                <h3>{l.schedule_desc_dlg_title /* `Meeting description` */}</h3>
-            </header>
-            <section className="content">
-                <PerfectScrollbar className="description-scroller">
-                    <ParsedHTML>
-                        {
-                            megaChat.html(room.scheduledMeeting.description).replace(/\n/g, '<br>')
-                            || l.schedule_no_desc /* `The description has been removed` */
-                        }
-                    </ParsedHTML>
-
-                </PerfectScrollbar>
-            </section>
-        </ModalDialogsUI.ModalDialog> : null;
 
         var additionalClass = "";
 
@@ -2499,16 +2487,8 @@ export class ConversationPanel extends MegaRenderMixin {
                         onTruncateClicked={function() {
                             self.setState({'truncateDialog': true});
                         }}
-                        onArchiveClicked={function() {
-                            M.safeShowDialog('archive-conversation-dialog', () =>
-                                self.setState({ archiveDialog: true })
-                            );
-                        }}
-                        onUnarchiveClicked={function() {
-                            M.safeShowDialog('unarchive-conversation-dialog', () =>
-                                this.setState({ unarchiveDialog: true })
-                            );
-                        }}
+                        onArchiveClicked={() => this.setState({ archiveDialog: true })}
+                        onUnarchiveClicked={() => this.setState({ unarchiveDialog: true })}
                         onRenameClicked={function() {
                             self.setState({
                                 'renameDialog': true,
@@ -2532,9 +2512,7 @@ export class ConversationPanel extends MegaRenderMixin {
                         onSwitchOffPublicMode = {function(topic) {
                             room.switchOffPublicMode(topic);
                         }}
-                        onAttachFromCloudClicked={() =>
-                            M.safeShowDialog('start-group-chat', () => this.setState({ attachCloudDialog: true }))
-                        }
+                        onAttachFromCloudClicked={() => this.setState({ attachCloudDialog: true })}
                         onPushSettingsClicked={() =>
                             M.safeShowDialog('push-settings-dialog', () => this.setState({ pushSettingsDialog: true }))
                         }
@@ -2569,25 +2547,21 @@ export class ConversationPanel extends MegaRenderMixin {
                                 ]
                             );
                         }}
-                        onShowScheduledDescription={() =>
-                            room.scheduledMeeting ?
-                                M.safeShowDialog(
-                                    'scheduled-description-dialog',
-                                    () => this.setState({ descriptionDialog: true })
-                                ) :
-                                null
+                        onShowScheduledDescription={
+                            room.scheduledMeeting ? () => this.setState({ descriptionDialog: true }) : null
                         }
                     /> : null}
 
+                    {this.state.attachCloudDialog && <this.CloudBrowserDialog/>}
+                    {this.state.sendContactDialog && <this.SelectContactDialog/>}
+                    {this.state.descriptionDialog && <this.DescriptionDialog/>}
+                    {this.state.pushSettingsDialog && <this.PushSettingsDialog/>}
+
                     {privateChatDialog}
                     {nonLoggedInJoinChatDialog}
-                    {attachCloudDialog}
-                    {sendContactDialog}
                     {confirmDeleteDialog}
                     {historyRetentionDialog}
                     {confirmTruncateDialog}
-                    {pushSettingsDialog}
-                    {descriptionDialog}
 
                     {this.state.renameDialog && <this.RenameDialog />}
 

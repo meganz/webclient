@@ -973,7 +973,7 @@ var notify = {
                 loadSubPage(`fm/chat/${chatId}`);
                 if ($(e.currentTarget).attr('data-desc') === '1') {
                     delay(`showSchedDescDialog-${chatId}`, () => {
-                        megaChat.chats[chatId].trigger('openSchedDescDialog');
+                        megaChat.chats[chatId].trigger('openDescriptionDialog');
                     }, 1500);
                 }
 

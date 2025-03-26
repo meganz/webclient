@@ -9,6 +9,7 @@ const MIN_SEARCH_LENGTH = 2;
 
 class CloudBrowserDialog extends MegaRenderMixin {
     domRef = React.createRef();
+    dialogName = 'attach-cloud-dialog';
 
     static defaultProps = {
         'selectLabel': l[8023],
@@ -210,6 +211,18 @@ class CloudBrowserDialog extends MegaRenderMixin {
         });
     }
 
+    componentDidMount() {
+        super.componentDidMount();
+        M.safeShowDialog(this.dialogName, () => $(`.${this.dialogName}`));
+    }
+
+    componentWillUnmount() {
+        super.componentWillUnmount();
+        if ($.dialog === this.dialogName) {
+            closeDialog();
+        }
+    }
+
     render() {
         var self = this;
 
@@ -379,7 +392,8 @@ class CloudBrowserDialog extends MegaRenderMixin {
                     classes +
                     // Amend the container height when the bottom breadcrumb is visible,
                     // i.e. in search mode, incl. having file/folder selected
-                    (isSearch && this.state.selected.length > 0 ? 'has-breadcrumbs-bottom' : '')
+                    (isSearch && this.state.selected.length > 0 ? 'has-breadcrumbs-bottom' : '') +
+                    this.dialogName
                 }
                 onClose={() => {
                     self.props.onClose(self);

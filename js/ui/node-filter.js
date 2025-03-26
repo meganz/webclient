@@ -367,13 +367,25 @@ lazy(mega.ui, 'mNodeFilter', () => {
             this.options = this.ctx.menu;
             this.selectedIndex = -1;
 
+            const position = () => {
+                let {x, bottom, width} = this.$element.get(0).getBoundingClientRect();
+                bottom++;
+                if (document.body.classList.contains('rtl')) {
+                    x += width;
+                }
+                if (this.isShowing) {
+                    this.setPositionByCoordinates(x, bottom);
+                }
+                else {
+                    this.show(x, bottom);
+                }
+            };
             this.$element.rebind(`click.filterByType${name}`, () => {
                 if (this.ctx.eid) {
                     eventlog(this.ctx.eid);
                 }
 
-                const {x, bottom} = this.$element.get(0).getBoundingClientRect();
-                this.show(x, bottom + 1);
+                position();
 
                 // If no item has been selected yet, reset to the default state
                 if (this.selectedIndex === -1) {
@@ -381,6 +393,14 @@ lazy(mega.ui, 'mNodeFilter', () => {
                     this.$element.removeClass('selected');
                 }
             });
+
+            if (document.body.classList.contains('rtl')) {
+                window.addEventListener('resize', SoonFc(90, () => {
+                    if (this.isShowing) {
+                        position();
+                    }
+                }));
+            }
 
             this.$resetFilterChips.rebind(`click.resetFilterBy${name}`, () => this.resetToDefault());
         }

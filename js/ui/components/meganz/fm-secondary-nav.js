@@ -385,6 +385,7 @@ lazy(mega.ui, 'secondaryNav', () => {
                 return;
             }
             createFileDialog();
+            eventlog(500722);
         }
     });
 
@@ -491,6 +492,7 @@ lazy(mega.ui, 'secondaryNav', () => {
         onClick(ev) {
             if (!ev.currentTarget.rightIcon) {
                 viewChangeHandler(0);
+                eventlog(500724);
             }
         }
     });
@@ -503,6 +505,7 @@ lazy(mega.ui, 'secondaryNav', () => {
         onClick(ev) {
             if (!ev.currentTarget.rightIcon) {
                 viewChangeHandler(1);
+                eventlog(500725);
             }
         }
     });
@@ -515,9 +518,12 @@ lazy(mega.ui, 'secondaryNav', () => {
         onClick(ev) {
             if (!ev.currentTarget.rightIcon) {
                 viewChangeHandler(2);
+                eventlog(500726);
             }
         }
     });
+    let filterChipShown = false;
+    let dcChipShown = false;
 
     return {
         domNode: document.querySelector('.fm-right-header'),
@@ -546,6 +552,12 @@ lazy(mega.ui, 'secondaryNav', () => {
         get infoButton() {
             return this.domNode.querySelector('.fm-header-info');
         },
+        get selectionBar() {
+            return this.domNode.querySelector('.selection-status-bar');
+        },
+        get filterChipsHolder() {
+            return this.domNode.querySelector('.fm-filter-chips-wrapper');
+        },
         openNewMenu(ev) {
             const target = ev.currentTarget;
             if (
@@ -565,6 +577,7 @@ lazy(mega.ui, 'secondaryNav', () => {
                     target.removeClass('active');
                 }
             });
+            eventlog(500721);
         },
         openDownloadMenu(ev) {
             const target = ev.currentTarget;
@@ -646,12 +659,12 @@ lazy(mega.ui, 'secondaryNav', () => {
                     secondary.classList.add('secondary');
                 }
             }
-            if (contextMenuItem) {
-                const context = this.actionsHolder.querySelector('.fm-context');
-                context.id = `fmhead_${contextMenuItem}`;
-                context.classList.remove('hidden');
-
-            }
+            contextMenuItem = false;
+            // if (contextMenuItem) {
+            //     const context = this.actionsHolder.querySelector('.fm-context');
+            //     context.id = `fmhead_${contextMenuItem}`;
+            //     context.classList.remove('hidden');
+            // }
             if (primarySelector || secondarySelector || contextMenuItem) {
                 this.actionsHolder.classList.remove('hidden');
             }
@@ -672,7 +685,7 @@ lazy(mega.ui, 'secondaryNav', () => {
                 nodeHandle,
                 primaryButton,
                 secondaryButton,
-                onContextMenu
+                // onContextMenu,
             });
         },
         hideCard() {
@@ -695,12 +708,17 @@ lazy(mega.ui, 'secondaryNav', () => {
                     ev.stopPropagation();
                     if (mega.ui.mInfoPanel.isOpen()) {
                         mega.ui.mInfoPanel.closeIfOpen();
+                        eventlog(500727);
                         return;
                     }
                     const id = M.currentdirid.split('/').pop();
                     if (id) {
                         $.selected = [id];
                         mega.ui.mInfoPanel.initInfoPanel();
+                        if (window.selectionManager && selectionManager.selected_list.length) {
+                            $.selected = selectionManager.selected_list;
+                        }
+                        eventlog(500727);
                     }
                 });
             }
@@ -720,6 +738,7 @@ lazy(mega.ui, 'secondaryNav', () => {
                     const event = new MegaDataEvent(ev);
                     event.currentTarget = ev.currentTarget;
                     this.showLayoutDropdown(event);
+                    eventlog(500723);
                 });
                 layoutButtonBound = true;
             }
@@ -761,6 +780,58 @@ lazy(mega.ui, 'secondaryNav', () => {
                 }
             });
             return false;
-        }
+        },
+        showSelectionBar() {
+            if (!this.selectionBar.classList.contains('hidden')) {
+                return;
+            }
+            this.selectionBar.classList.remove('hidden');
+            if (this.filterChipsHolder.classList.contains('hidden')) {
+                filterChipShown = false;
+            }
+            else {
+                this.filterChipsHolder.classList.add('hidden');
+                filterChipShown = true;
+            }
+            if (M.gallery) {
+                this.selectionBar.classList.add('gallery-pad');
+                const media = document.getElementById('media-section-controls');
+                if (media) {
+                    media.classList.add('hidden');
+                }
+            }
+            if (M.onDeviceCenter) {
+                const dcChip = document.querySelector('.dc-filter-chips-wrapper');
+                dcChipShown = dcChip ? !dcChip.classList.contains('hidden') : false;
+                mega.devices.ui.filterChipUtils.hide();
+            }
+        },
+        hideSelectionBar() {
+            if (this.selectionBar.classList.contains('hidden')) {
+                return;
+            }
+            this.selectionBar.classList.add('hidden');
+            this.selectionBar.classList.remove('gallery-pad');
+            if (M.gallery) {
+                filterChipShown = false;
+                const media = document.getElementById('media-section-controls');
+                if (media) {
+                    media.classList.remove('hidden');
+                }
+            }
+            if (filterChipShown) {
+                this.filterChipsHolder.classList.remove('hidden');
+            }
+            if (M.onDeviceCenter && dcChipShown) {
+                mega.devices.ui.filterChipUtils.resetSelections(true);
+            }
+        },
+        onPageChange() {
+            filterChipShown = false;
+            if (window.selectionManager) {
+                // selectionManager should eventually reset but this needs to be empty now for some context menu updates
+                selectionManager.selected_list = [];
+            }
+        },
     };
 });

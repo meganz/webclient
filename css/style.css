@@ -8147,33 +8147,6 @@ div.camera-bottom-txt {
     border-color: var(--banner-border-error);
     color: var(--banner-text-error);
 }
-.account.refer-programme-banner {
-    display: flex;
-    border-radius: 8px;
-    box-sizing: border-box;
-    padding: 8px;
-    background: var(--secondary-blue);
-    color: var(--secondary-white);
-    justify-content: space-between;
-    font: var(--text-body1);
-    margin-top: 8px;
-    width: 100%
-}
-.account.refer-programme-banner span {
-    align-self: flex-start;
-}
-.account.refer-programme-banner .refer-banner-actions {
-    align-self: flex-end;
-}
-.account.refer-programme-banner .refer-banner-actions a {
-    text-decoration: underline;
-    color: var(--secondary-white);
-}
-.account.refer-programme-banner .refer-banner-actions i {
-    margin-inline-start: 10px;
-    --icon-size: 20px;
-    cursor: pointer;
-}
 
 .account.widget.content {
     position: relative;

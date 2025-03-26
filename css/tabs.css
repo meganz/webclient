@@ -23,6 +23,10 @@
     font: var(--text-body1);
     color: var(--text-color-high);
     line-height: 26px;
+    margin-inline-end: auto;
+}
+.gallery-tabs-bl {
+    padding-inline: 20px 0;
 }
 .gallery-section-discovery {
     flex: 10000 1 0%;

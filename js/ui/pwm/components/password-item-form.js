@@ -44,9 +44,9 @@ class PasswordItemForm extends MegaForm {
                 },
                 {
                     nodeType: 'button',
-                    text: l.generate_password_title,
-                    classname: 'generate-password text-icon',
-                    icon: 'sprite-pm-mono icon-sync-thin-outline',
+                    type: 'icon',
+                    classname: 'generate-password text-icon secondary',
+                    icon: 'sprite-fm-mono icon-refresh-01-thin-outline',
                     typeAttr: 'button',
                     onClick: () => {
                         mega.ui.passwordGenerator.show();
@@ -155,6 +155,9 @@ class PasswordItemForm extends MegaForm {
         this.outer.append(span);
         this.megaTitleInput.$wrapper[0].appendChild(this.outer);
         this.megaTitleInput.$wrapper.addClass('has-favicon');
+
+        this.megaPwdInput.$wrapper[0].appendChild(mega.ui.pm.overlay.contentNode.querySelector('.generate-password'));
+        this.megaPwdInput.$wrapper.addClass('has-favicon');
     }
 
     show(options) {

@@ -368,7 +368,8 @@ lazy(mega.devices, 'data', () => {
 
             let deviceStatus;
 
-            apiFolders.sort((a, b) => a.d.localeCompare(b.d));
+            // sort api folders by device name and most recent heartbeat timestamp
+            apiFolders.sort((a, b) => a.d.localeCompare(b.d) || getHeartbeat(b) - getHeartbeat(a));
 
             for (let i = 0; i < apiFolders.length; i++) {
                 const apiFolder = {...apiFolders[i], syncState: apiFolders[i].s};
@@ -396,11 +397,11 @@ lazy(mega.devices, 'data', () => {
                         deviceStatus = null;
                     }
 
-                    device.props = Parser._buildStorageStats(device, node);
-
-                    // keep only the latest one in case duplicated folders in the same device
+                    // keep only the latest one (first appearance) in case duplicated folders in the same device
                     const deviceFolder = device.folders[apiFolder.h];
-                    if (!deviceFolder || getHeartbeat(apiFolder) > getHeartbeat(deviceFolder)) {
+                    if (!deviceFolder) {
+                        device.props = Parser._buildStorageStats(device, node);
+
                         const folder = Parser.buildDeviceFolder(apiFolder, node);
                         device.folders[folder.h] = folder;
 

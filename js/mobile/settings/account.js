@@ -243,13 +243,6 @@ mobile.settings.account = Object.create(mobile.settingsHelper, {
                     componentClassname: 'hidden achievement-btn'
                 },
                 {
-                    text:l[22682],
-                    icon: 'sprite-mobile-fm-mono icon-users-thin-outline',
-                    href: 'fm/refer',
-                    eventLog: 99845,
-                    componentClassname: 'hidden referrals-btn'
-                },
-                {
                     text: l[23262],
                     icon: 'sprite-mobile-fm-mono icon-lock-thin-outline',
                     href: 'fm/account/security/change-password',
@@ -324,13 +317,6 @@ mobile.settings.account = Object.create(mobile.settingsHelper, {
                         }
                     }
                 });
-            }
-
-            if (mega.flags.refpr) {
-                const referralsBtn = this.domNode.componentSelector('.referrals-btn');
-                if (referralsBtn) {
-                    referralsBtn.show();
-                }
             }
 
             if (u_attr && (!u_attr.b || u_attr.b.m)) {

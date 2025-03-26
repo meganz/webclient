@@ -899,10 +899,6 @@ async function api_createuser(ctx, invitecode, invitename) {
         ctx.uh = ab_to_base64(derivedAuthenticationKeyBytes);
     }
 
-    if (mega.affid) {
-        req.aff = mega.affid;
-    }
-
     watchdog.notify('user-created');
     return api.screq(req, ctx);
 }
@@ -1131,10 +1127,6 @@ function stringhash(s, aes) {
 // Can also be used to set keys and to confirm accounts (.c)
 function api_updateuser(ctx, newuser) {
     newuser.a = 'up';
-
-    if (mega.affid) {
-        newuser.aff = mega.affid;
-    }
 
     api_req(newuser, ctx);
 }

@@ -521,18 +521,23 @@ lazy(s4, 'ui', () => {
             }
             $('.js-s4-settings', this.$fmBlock).rebind('click.open-settings', () => {
                 loadSubPage('fm/account/s4');
+                eventlog(500744);
             });
             $('.js-s4-new-bucket', this.$fmBlock).rebind('click.create-bucket', () => {
                 this.showDialog(s4.buckets.dialogs.create);
+                eventlog(500743);
             });
             $('.fm-s4-new-group', this.$fmBlock).rebind('click.create-group', () => {
                 this.showDialog(s4.groups.dialogs.create);
+                eventlog(500747);
             });
             $('.fm-s4-new-user', this.$fmBlock).rebind('click.create-user', () => {
                 this.showDialog(s4.users.dialogs.create);
+                eventlog(500748);
             });
             $('.fm-s4-new-key', this.$fmBlock).rebind('click.create-key', () => {
                 this.showDialog(s4.keys.dialogs.create);
+                eventlog(500746);
             });
         }
 

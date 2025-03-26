@@ -1604,48 +1604,67 @@ export class ContactPickerWidget extends MegaRenderMixin {
     }
 }
 
-export const ContactPickerDialog = ({
-    active,
-    allowEmpty,
-    className,
-    exclude,
-    megaChat,
-    multiple,
-    multipleSelectedButtonLabel,
-    name,
-    nothingSelectedButtonLabel,
-    selectFooter,
-    singleSelectedButtonLabel,
-    inviteWarningLabel,
-    chatRoom,
-    onClose,
-    onSelectDone,
-}) => {
-    return (
-        <ModalDialogs.ModalDialog
-            name={name}
-            className={`
-                ${className}
-                contact-picker-dialog contacts-search
-            `}
-            onClose={onClose}>
-            <ContactPickerWidget
-                active={active}
-                allowEmpty={allowEmpty}
-                className="popup contacts-search small-footer"
-                contacts={M.u}
-                exclude={exclude}
-                megaChat={megaChat}
-                multiple={multiple}
-                multipleSelectedButtonLabel={multipleSelectedButtonLabel}
-                nothingSelectedButtonLabel={nothingSelectedButtonLabel}
-                selectFooter={selectFooter}
-                singleSelectedButtonLabel={singleSelectedButtonLabel}
-                inviteWarningLabel={inviteWarningLabel}
-                chatRoom={chatRoom}
-                onClose={onClose}
-                onSelectDone={onSelectDone}
-            />
-        </ModalDialogs.ModalDialog>
-    );
-};
+export class ContactPickerDialog extends MegaRenderMixin {
+    dialogName = 'contact-picker-dialog';
+
+    componentDidMount() {
+        super.componentDidMount();
+        M.safeShowDialog(this.dialogName, () => $(`.${this.dialogName}`));
+    }
+
+    componentWillUnmount() {
+        super.componentWillUnmount();
+        if ($.dialog === this.dialogName) {
+            closeDialog();
+        }
+    }
+
+    render() {
+        const {
+            active,
+            allowEmpty,
+            className,
+            exclude,
+            megaChat,
+            multiple,
+            multipleSelectedButtonLabel,
+            name,
+            nothingSelectedButtonLabel,
+            selectFooter,
+            singleSelectedButtonLabel,
+            inviteWarningLabel,
+            chatRoom,
+            onClose,
+            onSelectDone,
+        } = this.props;
+
+        return (
+            <ModalDialogs.ModalDialog
+                name={name}
+                className={`
+                    ${className}
+                    ${this.dialogName}
+                    contacts-search
+                `}
+                onClose={onClose}>
+                <ContactPickerWidget
+                    active={active}
+                    allowEmpty={allowEmpty}
+                    className="popup contacts-search small-footer"
+                    contacts={M.u}
+                    exclude={exclude}
+                    megaChat={megaChat}
+                    multiple={multiple}
+                    multipleSelectedButtonLabel={multipleSelectedButtonLabel}
+                    nothingSelectedButtonLabel={nothingSelectedButtonLabel}
+                    selectFooter={selectFooter}
+                    singleSelectedButtonLabel={singleSelectedButtonLabel}
+                    inviteWarningLabel={inviteWarningLabel}
+                    chatRoom={chatRoom}
+                    onClose={onClose}
+                    onSelectDone={onSelectDone}
+                />
+            </ModalDialogs.ModalDialog>
+        );
+    }
+}

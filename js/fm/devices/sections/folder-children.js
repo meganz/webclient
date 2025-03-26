@@ -9,11 +9,6 @@ lazy(mega.devices.sections, 'folderChildren', () => {
     const {
         utils: {
             /**
-             * {StatusUI} StatusUI - Status UI handler
-             */
-            StatusUI,
-
-            /**
              * {Object<MegaLogger>} logger - logger instance
              */
             logger,
@@ -113,6 +108,7 @@ lazy(mega.devices.sections, 'folderChildren', () => {
                             onClick: () => {
                                 $.selected = [h];
                                 ui.desktopApp.common.togglePause();
+                                eventlog(isBackup ? 500755 : 500756);
                             }
                         },
                         {
@@ -121,6 +117,7 @@ lazy(mega.devices.sections, 'folderChildren', () => {
                             onClick: () => {
                                 $.selected = [h];
                                 ui.desktopApp.common.remove();
+                                eventlog(isBackup ? 500753 : 500754);
                             }
                         },
                         (ev) => {

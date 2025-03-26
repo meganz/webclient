@@ -378,6 +378,7 @@
     padding: 2px 8px;
     font: var(--text-body2);
     color: var(--progress-bar-fill3);
+    margin-inline-start: 24px;
 }
 
 /* Dropdown warning notification */

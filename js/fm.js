@@ -225,6 +225,12 @@ function sharedUInode(nodeHandle, force) {
         if (typeof nodeHandle !== 'undefined' && (M.currentdirid === 'out-shares' || M.currentdirid === 'shares')) {
             selectionManager.remove_from_selection(nodeHandle);
         }
+        else if (selectionManager.selected_list.includes(nodeHandle)) {
+            selectionManager.updateSelectionNotification();
+        }
+    }
+    else if (selectionManager.selected_list.includes(nodeHandle)) {
+        selectionManager.updateSelectionNotification();
     }
 
     // If no export link is available, remove export link from left and right panels (list and block view)
@@ -784,6 +790,7 @@ function fmtopUI() {
                             text: l.s4_bkt_settings,
                             onClick: () => {
                                 s4.ui.showDialog(s4.buckets.dialogs.settings, s4.ui.bucket);
+                                eventlog(500745);
                             }
                         },
                         (ev) => {
@@ -857,6 +864,7 @@ function fmtopUI() {
         }
 
         doClearbin(true);
+        eventlog(500740);
     });
 
     if (M.currentrootid === 'file-requests') {
@@ -903,11 +911,10 @@ function initTreeScroll() {
 }
 
 function fmLeftMenuUI() {
-
     "use strict";
 
     // handle the Inbox section use cases
-    if (M.InboxID && M.currentdirid === M.InboxID) {
+    if (!self.vw && M.InboxID && M.currentdirid === M.InboxID) {
         M.openFolder(M.RootID);
     }
 
@@ -1953,9 +1960,6 @@ function openContactInfoLink(contactLink) {
 
                     return false;
                 });
-
-                // This contact link is valid to be affilaited
-                M.affiliate.storeAffiliate(contactLink, 4);
             }
         }
         else {
@@ -1969,11 +1973,6 @@ function openContactInfoLink(contactLink) {
                 mBroadcaster.once('fm:initialized', function () {
                     openContactInfoLink(contactLink);
                 });
-
-                // This contact link is not checked but stored for register case
-                // and also user click `add contact` anyway so it's user's call
-                M.affiliate.storeAffiliate(contactLink, 4);
-
                 login_next = page;
                 login_txt = l[1298];
                 return loadSubPage('login');
@@ -3736,6 +3735,7 @@ function sharedFolderUI() {
             text: l[58],
             onClick(ev) {
                 mega.ui.secondaryNav.openDownloadMenu(ev);
+                eventlog(500733);
             }
         };
         const newButton = {

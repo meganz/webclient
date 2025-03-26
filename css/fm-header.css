@@ -221,13 +221,16 @@
 .fm-right-header .fm-header-bottom .icon-only.transparent-icon.active {
     background: var(--mobile-button-disabled);
 }
-.fm-header-bottom {
-    padding-inline-end: 24px;
-    padding-bottom: 12px;
-    bottom: 0;
+.fm-header-chips-and-view-buttons {
     display: flex;
-    position: absolute;
-    right: 0;
+    align-items: center;
+    padding-bottom: 16px;
+    padding-inline-end: 16px;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+}
+.fm-header-bottom {
+    display: inline-flex;
     background: var(--mobile-page-background);
 }
 .fm-header-bottom .fm-files-view-icon,
@@ -241,9 +244,15 @@
 .fm-header-bottom .fm-header-info {
     margin-inline-start: 8px;
 }
-.rtl .fm-header-bottom {
-    left: 0;
-    right: unset;
+#media-section-controls {
+    flex: 1;
+}
+#media-section-right-controls {
+    display: flex;
+    justify-content: flex-end;
+}
+#media-section-right-controls.wrap {
+    width: 100%;
 }
 .fm-files-view-icon i,
 .fm-header-info i {

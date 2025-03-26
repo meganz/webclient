@@ -10,7 +10,7 @@ mega.metatags = new function() {
         // XXX: add new items sorted alphabetically.
         var excludedPages = [
             'activate-s4', 'keybackup', 'businessinvite', 'businesssignup',
-            'cancel', 'chat', 'confirm', 'debug', 'discount', 'download',
+            'cancel', 'confirm', 'debug', 'discount', 'download',
             'emailverify', 'key', 'filerequest', 'payment', 'recover',
             'recoverybykey', 'recoverybypark', 'recoveryenterkey',
             'recoverykeychangepass', 'recoveryparkchangepass',
@@ -34,7 +34,7 @@ mega.metatags = new function() {
     };
 
     var stopBots = function(metaRobots, noReporting) {
-        if (!noReporting && !isPageExcluded(page) && !is_fm() && !is_extension) {
+        if (!noReporting && !isPageExcluded(page) && !is_fm() && !is_extension && !is_chatlink) {
             if (d) {
                 console.error('A page without title. Please handle. Page: ' + page);
             }
@@ -344,7 +344,7 @@ mega.metatags = new function() {
         }
         if (!mTags.mega_desc) {
             mTags.mega_desc = l[24023] || mega.whoami;
-            if (!isPageExcluded(page) && !is_fm() && !is_extension) {
+            if (!isPageExcluded(page) && !is_fm() && !is_extension && !is_chatlink) {
                 if (d) {
                     console.error('A page without Description. Please handle. Page: ' + page);
                 }

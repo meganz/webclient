@@ -286,9 +286,6 @@
             recents() {
                 openRecents();
             },
-            refer() {
-                affiliateUI();
-            },
             transfers() {
                 console.assert(M.v && M.v.length === 0, 'view list must be empty');
             }
@@ -364,7 +361,7 @@
             return this.openFolder('fm');
         }
 
-        if (this.InboxID && this.currentrootid === this.InboxID) {
+        if (!window.vw && this.InboxID && this.currentrootid === this.InboxID) {
             return this.openFolder(mega.devices.rootId);
         }
         if (this.currentrootid === this.RootID) {
@@ -431,10 +428,25 @@
                 stash = this.search && String(this.previousdirid).substr(0, 6) === 'search';
             }
             mega.ui.mNodeFilter.resetFilterSelections(stash);
+            if (
+                stash &&
+                window.selectionManager &&
+                window.selectionManager.selected_list.length &&
+                mega.ui.secondaryNav
+            ) {
+                mega.ui.secondaryNav.filterChipsHolder.classList.add('hidden');
+            }
         }
         if (mega.ui.mNodeFilter && mega.devices && mega.devices.ui && mega.devices.ui.filterChipUtils) {
             const stash = this.previousdirid === this.currentdirid;
             mega.devices.ui.filterChipUtils.resetSelections(stash);
+        }
+        if (
+            mega.ui.secondaryNav &&
+            this.previousdirid !== this.currentdirid &&
+            !(String(this.previousdirid).startsWith('search') && String(this.currentdirid).startsWith('search'))
+        ) {
+            mega.ui.secondaryNav.onPageChange();
         }
 
         if (mega.ui.pm) {
@@ -456,7 +468,6 @@
             id.substr(0, 7) === 'account' ||
             id.substr(0, 9) === 'dashboard' ||
             id.substr(0, 15) === 'user-management' ||
-            id.substr(0, 5) === 'refer' ||
             id.startsWith('pwm')) {
 
             this.v = [];
@@ -660,7 +671,8 @@
         }
 
         if (!this.gallery && !this.albums) {
-            $('#media-section-controls, #media-tabs', $fmRightFilesBlock).addClass('hidden');
+            $('#media-section-controls, #media-tabs, #media-section-right-controls', $fmRightFilesBlock)
+                .addClass('hidden');
         }
 
         M.initLabelFilter(this.v);
@@ -915,7 +927,7 @@
                     console.info(`Using deferred sink for ${id}...`);
                 }
             }
-            else if (id === 'devices' || this.InboxID && this.d[id] && this.d[id].p === this.InboxID) {
+            else if (id === 'devices' || !window.vw && this.InboxID && this.d[id] && this.d[id].p === this.InboxID) {
                 return this.openFolder(mega.devices.rootId);
             }
             else if (!this.d[id] || this.d[id].t && !this.c[id]) {

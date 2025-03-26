@@ -901,17 +901,6 @@ var pro = {
         };
 
         // TODO: Update Min lazys to use getMinStoragePlan, when it will not require extra QA to do so
-        lazy(pro.filter, 'affMin', () => {
-            const plans = pro.filter.plans.affPlans;
-            let currentMin = plans[0];
-            for (let i = 1; i < plans.length; i++) {
-                if (plans[i][pro.UTQA_RES_INDEX_STORAGE] < currentMin[pro.UTQA_RES_INDEX_STORAGE]) {
-                    currentMin = plans[i];
-                }
-            }
-            return currentMin;
-        });
-
         lazy(pro.filter, 'miniMin', () => {
             const plans = pro.filter.plans.miniPlans;
             if (!plans.length) {
@@ -1118,13 +1107,6 @@ lazy(pro, 'filter', () => {
                 new Set([
                     pro.ACCOUNT_LEVEL_STARTER, pro.ACCOUNT_LEVEL_BASIC, pro.ACCOUNT_LEVEL_ESSENTIAL,
                     pro.ACCOUNT_LEVEL_PRO_LITE
-                ]),
-
-            // affPlans: 4, 1, 2, 3 - plans that can show in the affiliate redeem section
-            affPlans:
-                new Set([
-                    pro.ACCOUNT_LEVEL_PRO_LITE, pro.ACCOUNT_LEVEL_PRO_I, pro.ACCOUNT_LEVEL_PRO_II,
-                    pro.ACCOUNT_LEVEL_PRO_III
                 ]),
 
             // miniPlans: 11, 12, 13 - mini plans available to targeted users

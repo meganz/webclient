@@ -1119,14 +1119,18 @@ lazy(mega.devices, 'ui', () => {
          * @returns {Promise<Object>} device and folder data
          */
         async getOuterViewData(handle) {
+            const path = M.getPath(handle);
+
+            if (!path.includes(M.BackupsId)) {
+                return {device: null, folder: null};
+            }
+
             if (!Object.keys(M.dcd).length) {
                 await this.render(M.currentdirid, {isSkipPathCheck: true});
             }
 
             let folder = this._findFolder(handle);
             if (!folder) {
-                const path = M.getPath(handle);
-
                 // parent index for backup (4) or sync (2) in node parent path
                 const index = path[path.length - 1] === M.InboxID ? 4 : 2;
                 if (path.length > index) {
@@ -1332,7 +1336,7 @@ lazy(mega.devices, 'ui', () => {
 
         /**
          * Returns whether there is any backup folder in given handles
-         * @param {Array<String>} handles - list of handles to get folders of
+         * @param {String|Array<String>} handles - list of handles to get folders of
          * @returns {Boolean} whether backup folder exists in given handles
          */
         isBackupRelated(handles) {
@@ -1374,12 +1378,18 @@ lazy(mega.devices, 'ui', () => {
         }
 
         /**
-         * Returns whether a node is a deprecated backup, so its parent, grandparent or itself is M.InboxID
+         * Returns whether a node is deprecated or not based in root node
+         * "true" in case is InboxID and "window.vw" flag disabled
+         * "false" otherwise
          * @param {MegaNode} node - node to check
-         * @returns {Boolen} Whether the node is a deprecated backup
+         * @returns {Boolen} Whether the node is in inbox
          */
-        isDeprecatedBackups(node) {
-            if (node.h === M.InboxID || node.p === M.InboxID) {
+        isDeprecated(node) {
+            if (window.vw) {
+                return false;
+            }
+
+            if (M.InboxID && (node.h === M.InboxID || node.p === M.InboxID)) {
                 return true;
             }
 
@@ -1418,7 +1428,7 @@ lazy(mega.devices, 'ui', () => {
             this._bindEvents();
 
             if (this.hasDevices) {
-                if (M.currentrootid === rootId) {
+                if (M.currentrootid === rootId && mega.ui.secondaryNav.selectionBar.classList.contains('hidden')) {
                     this.filterChipUtils.init();
                 }
 
@@ -1523,6 +1533,13 @@ lazy(mega.devices, 'ui', () => {
             const handle = $.selected[0];
             const devNames = Object.create(null);
             const currentDeviceData = M.dcd[handle];
+            if (!currentDeviceData) {
+                if (handle && M.d[handle]) {
+                    // Temporary patch for when there is a node here but not in M.dcd.
+                    renameDialog();
+                }
+                return;
+            }
 
             for (const {h, name} of Object.values(M.dcd)) {
                 devNames[h] = name;
@@ -1723,11 +1740,13 @@ lazy(mega.devices, 'ui', () => {
             if (this.$addBackup) {
                 this.$addBackup.rebind('click.dc.backup.add', () => {
                     this.desktopApp.backup.add();
+                    eventlog(500749);
                 });
             }
             if (this.$addSyncs) {
                 this.$addSyncs.rebind('click.dc.syncs.add', () => {
                     this.desktopApp.sync.add();
+                    eventlog(500750);
                 });
             }
             if (this.$emptyActiveDevices) {
@@ -2022,6 +2041,7 @@ lazy(mega.devices, 'ui', () => {
                 items['.properties-item'] = 1;
                 items['.download-item'] = 1;
                 items['.zipdownload-item'] = 1;
+                items['.send-to-contact-item'] = 1;
 
                 this._populateSensitiveCtxItems(handles, items);
                 this._filterRestrictedItems(handles, items);

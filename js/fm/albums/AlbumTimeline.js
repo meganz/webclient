@@ -512,6 +512,7 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
             this._zoomStep = skipGlobalZoom ? defZoomStep : globalZoomStep;
             this._limitReached = false;
             this._selCount = 0;
+            this._selSize = 0;
 
             this.el.classList.add(`album-timeline-zoom-${this._zoomStep}`);
             this.attachEvents();
@@ -519,6 +520,10 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
 
         get selCount() {
             return this._selCount;
+        }
+
+        get selSize() {
+            return bytesToSize(this._selSize || 0);
         }
 
         get zoomStep() {
@@ -1281,6 +1286,7 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
                 }
 
                 this._selCount++;
+                this._selSize += node.s;
 
                 if (
                     this.selectionLimit > 1
@@ -1320,6 +1326,7 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
                 this.adjustToBottomBar();
 
                 this._selCount--;
+                this._selSize -= node.s;
 
                 if (
                     this.limitReached

@@ -464,7 +464,6 @@ pro.propay = {
             si: apiId,
             p: price,
             c: currency,
-            aff: mega.affid,
             m: m,
             bq: fromBandwidthDialog,
             pbq: fromPreWarnBandwidthDialog

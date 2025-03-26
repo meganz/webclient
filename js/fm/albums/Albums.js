@@ -208,12 +208,8 @@ lazy(mega.gallery, 'albums', () => {
                     }
                     else {
                         window.selectionManager.showSelectionBar(
-                            mega.icu.format(l.album_selected_items_count, album.nodes.length)
-                                .replace('%1', selHandles.length),
-                            undefined,
-                            undefined,
-                            undefined,
-                            true
+                            mega.icu.format(l.selected_count, selHandles.length),
+                            scope.albums.grid.timeline.selSize
                         );
                     }
                 });
@@ -735,12 +731,8 @@ lazy(mega.gallery, 'albums', () => {
 
                     if (grid.timeline.selCount > 0) {
                         window.selectionManager.showSelectionBar(
-                            mega.icu.format(l.album_selected_items_count, album.nodes.length)
-                                .replace('%1', grid.timeline.selCount),
-                            undefined,
-                            undefined,
-                            undefined,
-                            true
+                            mega.icu.format(l.selected_count, grid.timeline.selCount),
+                            grid.timeline.selSize
                         );
                     }
                     else {
@@ -3088,7 +3080,10 @@ lazy(mega.gallery, 'albums', () => {
                     nodesAvailable ?
                         {
                             text: l.album_download,
-                            onClick: onDownload
+                            onClick: () => {
+                                onDownload();
+                                eventlog(500742);
+                            }
                         } :
                         hidden,
                     needSlideshow && ((ev) => {
@@ -3112,6 +3107,7 @@ lazy(mega.gallery, 'albums', () => {
                     text: l.album_play_slideshow,
                     onClick: () => {
                         scope.playSlideshow(albumId, true);
+                        eventlog(500730);
                     }
                 } : hidden;
                 const download = nodesAvailable ? {
@@ -3121,6 +3117,7 @@ lazy(mega.gallery, 'albums', () => {
                         const menu = new DownloadContextMenu(albumId);
 
                         menu.show(x, bottom + 4);
+                        eventlog(500729);
                     }
                 } : false;
                 mega.ui.secondaryNav.showCard(
@@ -3201,6 +3198,7 @@ lazy(mega.gallery, 'albums', () => {
 
                             const dialog = new AlbumItemsDialog(albumId);
                             dialog.show();
+                            eventlog(500731);
                         }
                     },
                     {
@@ -3224,6 +3222,7 @@ lazy(mega.gallery, 'albums', () => {
                             else {
                                 scope.albums.addShare([albumId]);
                             }
+                            eventlog(500732);
                         }
                     },
                     (ev) => {
@@ -3252,6 +3251,7 @@ lazy(mega.gallery, 'albums', () => {
 
                     const dialog = new AlbumNameDialog();
                     dialog.show();
+                    eventlog(500728);
                 }
             });
             mega.ui.secondaryNav.showActionButtons('.fm-new-album');
@@ -3415,12 +3415,8 @@ lazy(mega.gallery, 'albums', () => {
 
                             if (this.timeline.selCount) {
                                 window.selectionManager.showSelectionBar(
-                                    mega.icu.format(l.album_selected_items_count, album.nodes.length)
-                                        .replace('%1', this.timeline.selCount),
-                                    undefined,
-                                    undefined,
-                                    undefined,
-                                    true
+                                    mega.icu.format(l.selected_count, this.timeline.selCount),
+                                    this.timeline.selSize
                                 );
 
                                 if (!prevCount) {
@@ -3950,17 +3946,6 @@ lazy(mega.gallery, 'albums', () => {
                         if (timeline) {
                             timeline.nodes = album.nodes;
                             header.update(s);
-
-                            if (timeline.selCount > 0) {
-                                window.selectionManager.showSelectionBar(
-                                    mega.icu.format(l.album_selected_items_count, album.nodes.length)
-                                        .replace('%1', timeline.selCount),
-                                    undefined,
-                                    undefined,
-                                    undefined,
-                                    true
-                                );
-                            }
                         }
 
                         mega.gallery.resetMediaCounts(album.nodes);
@@ -4798,17 +4783,6 @@ lazy(mega.gallery, 'albums', () => {
                         if (this.grid && this.grid.timeline) {
                             this.grid.timeline.nodes = album.nodes;
                             this.grid.header.update(albumId);
-
-                            if (this.grid.timeline.selCount > 0) {
-                                window.selectionManager.showSelectionBar(
-                                    mega.icu.format(l.album_selected_items_count, album.nodes.length)
-                                        .replace('%1', this.grid.timeline.selCount),
-                                    undefined,
-                                    undefined,
-                                    undefined,
-                                    true
-                                );
-                            }
                         }
                     });
                 }

@@ -1396,15 +1396,6 @@
         uaPacketParserHandler['^!enotif'] = function() {
             mega.enotif.handleAttributeUpdate();
         };
-        uaPacketParserHandler['^!affid'] = function(userHandle) {
-            mega.attr.get(userHandle, 'affid', -2, 1, function(res, ctx) {
-                u_attr[ctx.ua] = res;
-
-                if (fminitialized) {
-                    M.affiliate.id = res;
-                }
-            });
-        };
         uaPacketParserHandler['^!webtheme'] = function(userHandle) {
 
             mega.attr.get(userHandle, 'webtheme', -2, 1, function(res, ctx) {

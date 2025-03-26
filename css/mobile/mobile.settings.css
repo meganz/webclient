@@ -55,7 +55,7 @@
 }
 
 .mega-mobile-settings.default-form p:first-child {
-    padding-top: 0;   
+    padding-top: 0;
 }
 
 /* Settings form. Inputs */
@@ -298,17 +298,6 @@ body.bottom-pages .fmholder {
     grid-column: -2/-1;
 }
 
-.mobile .affiliate-guide-page,
-.mobile .affiliate-history-page,
-.mobile .affiliate-page {
-    background: #F5F6F7;
-}
-
-.mobile .affiliate-redeem-page {
-    height: 100%;
-    overflow: auto;
-}
-
 .mobile.context-menu-container .fm-icon {
     display: inline-block;
     margin: 0 8px;
@@ -332,7 +321,7 @@ body.bottom-pages .fmholder {
 .mega-overlay .mega-mobile-settings.default-form.fixed-width {
     margin: 0 auto;
 }
-    
+
 /* End of Settings form */
 
 /* 2FA setup in Settings */

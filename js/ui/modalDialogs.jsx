@@ -97,6 +97,7 @@ class ModalDialog extends MegaRenderMixin {
         }
         $(this.domNode).off('dialog-closed.modalDialog' + this.getUniqueId());
         $(document).off('keyup.modalDialog' + this.getUniqueId());
+        this.props.popupWillUnmount?.();
     }
 
     onCloseClicked() {
@@ -280,6 +281,7 @@ class ModalDialog extends MegaRenderMixin {
 
 
 class SelectContactDialog extends MegaRenderMixin {
+    dialogName = 'send-contact-dialog';
     static clickTime = 0;
     static defaultProps = {
         selectLabel: l.share_contact_action, /* `Share` */
@@ -302,6 +304,18 @@ class SelectContactDialog extends MegaRenderMixin {
         this.props.onSelected?.(nodes);
     }
 
+    componentDidMount() {
+        super.componentDidMount();
+        M.safeShowDialog(this.dialogName, () => $(`.${this.dialogName}`));
+    }
+
+    componentWillUnmount() {
+        super.componentWillUnmount();
+        if ($.dialog === this.dialogName) {
+            closeDialog();
+        }
+    }
+
     render() {
         return (
             <ModalDialog
@@ -312,6 +326,7 @@ class SelectContactDialog extends MegaRenderMixin {
                     small-footer
                     dialog-template-tool
                     ${this.props.className}
+                    ${this.dialogName}
                 `}
                 selected={this.state.selected}
                 buttons={[
@@ -361,6 +376,7 @@ class SelectContactDialog extends MegaRenderMixin {
 }
 
 class ConfirmDialog extends MegaRenderMixin {
+    dialogName = 'confirm-dialog';
 
     static saveState(o) {
         let state = mega.config.get('xcod') >>> 0;
@@ -382,6 +398,7 @@ class ConfirmDialog extends MegaRenderMixin {
         super(props);
         this._wasAutoConfirmed = undefined;
         this._keyUpEventName = 'keyup.confirmDialog' + this.getUniqueId();
+        this.dialogName = this.props.name || this.dialogName;
 
         /** @property this._autoConfirm */
         lazy(this, '_autoConfirm', () =>
@@ -397,7 +414,7 @@ class ConfirmDialog extends MegaRenderMixin {
     componentDidMount() {
         super.componentDidMount();
 
-        M.safeShowDialog(this.props.name || 'confirm-dialog', () => {
+        M.safeShowDialog(this.dialogName, () => {
             // since ModalDialogs can be opened in other keyup (on enter) event handlers THIS is required to be
             // delayed a bit...otherwise the dialog would open up and get immediately confirmed
             queueMicrotask(() => {
@@ -439,8 +456,10 @@ class ConfirmDialog extends MegaRenderMixin {
 
     componentWillUnmount() {
         super.componentWillUnmount();
-        var self = this;
-        self.unbindEvents();
+        this.unbindEvents();
+        if ($.dialog === this.dialogName) {
+            closeDialog();
+        }
         delete this._wasAutoConfirmed;
     }
 

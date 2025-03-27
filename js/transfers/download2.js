@@ -1650,7 +1650,7 @@ var dlmanager = {
         $('button.js-close, .fm-dialog-close, .dialog-action', $dialog).add($('.fm-dialog-overlay'))
             .rebind('click.closeOverQuotaDialog', () => {
 
-                unbindEvents();
+                closeDialog();
             });
 
         $('button.positive.upgrade, .plan-button', $dialog).rebind('click', onclick);
@@ -1857,7 +1857,15 @@ var dlmanager = {
 
                 const requiredQuota = storageObj.mstrg || 0;
 
-                const lowestRequiredMiniPlan = pro.filter.lowestRequired(requiredQuota, 'miniPlans', ignoreStorageReq);
+                const freeOrLowerTier = !u_attr.p ||
+                    [
+                        pro.ACCOUNT_LEVEL_STARTER,
+                        pro.ACCOUNT_LEVEL_BASIC,
+                        pro.ACCOUNT_LEVEL_ESSENTIAL
+                    ].includes(u_attr.p);
+
+                const lowestRequiredMiniPlan = freeOrLowerTier
+                    && pro.filter.lowestRequired(requiredQuota, 'miniPlans', ignoreStorageReq);
                 const lowestPlanIsMini = !!lowestRequiredMiniPlan;
 
                 let miniPlanId;

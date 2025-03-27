@@ -1125,7 +1125,9 @@ MegaUtils.prototype.fmSearchNodes = function(searchTerm) {
                     }
                 }
                 M.currentdirid = 'search/' + searchTerm;
-                M.gallery = false;
+                if (mega.gallery) {
+                    mega.gallery.clearMdView();
+                }
                 M.renderMain();
                 M.onSectionUIOpen('cloud-drive');
                 $('.fm-right-header .fm-breadcrumbs-wrapper').addClass('hidden');

@@ -326,10 +326,6 @@ lazy(mega.ui, 'searchbar', () => {
                         $('.js-btnclearSearch', $topbar).removeClass('hidden');
                         hideDropdown();
 
-                        if (pfid && mega.gallery) {
-                            mega.gallery.clearMdView();
-                        }
-
                         // fix a redirect from a bottompage with an 'old' class on it
                         $('body').removeClass('old');
                     });

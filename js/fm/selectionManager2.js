@@ -820,6 +820,11 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             // Lets deduplicate and filter reselected
             this.removing_list = [...new Set(this.removing_list)].filter(h => !selListMap[h]);
 
+            if (this.removing_list.length === 0) {
+                this.removing_sizes = Object.create(null);
+                return;
+            }
+
             if (this.selected_list.length !== 0 && this.removing_list.length > 1) {
 
                 const cb = (pv, c) => pv + (M.d[c] ?

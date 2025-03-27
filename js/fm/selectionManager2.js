@@ -1294,7 +1294,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
                     if ($.selected.length === 1) {
                         __showBtn('rename');
                     }
-                    if ($.selected.length > 1) {
+                    if ($.selected.length > 1 && M.currentdirid !== 'shares') {
                         __showBtn('move');
                     }
                 }

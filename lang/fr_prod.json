@@ -2684,6 +2684,7 @@
     "2fa_already_enabled": "L\u2019authentification \u00e0 deux facteurs (A2F) a d\u00e9j\u00e0 \u00e9t\u00e9 activ\u00e9e. Pour la d\u00e9sactiver, acc\u00e9der aux Param\u00e8tres &gt; S\u00e9curit\u00e9 &gt; A2F",
     "2fa_menu": "Authentification \u00e0 deux facteurs (A2F)",
     "5883": "Quitter l\u2019appel",
+    "22899": "Du %d1 au %d2",
     "23549": "La recherche est en pause",
     "B": "L",
     "EmptyName": "Veuillez indiquer un nom de dossier",

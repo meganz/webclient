@@ -2684,6 +2684,7 @@
     "2fa_already_enabled": "Die Zwei-Faktor-Authentifizierung (2FA) ist bereits aktiviert. Zum Deaktivieren gehen Sie zu Einstellungen &gt; Sicherheit &gt; 2FA.",
     "2fa_menu": "Zwei-Faktor-Authentifizierung (2FA)",
     "5883": "Konferenz verlassen",
+    "22899": "%d1 - %d2",
     "23549": "Suche angehalten",
     "B": "B",
     "EmptyName": "Bitte geben Sie einen Ordernamen ein",

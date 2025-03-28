@@ -2684,6 +2684,7 @@
     "2fa_already_enabled": "L'autenticazione a due fattori (2FA) \u00e8 gi\u00e0 stata attivata. Per disattivarla, vai in Impostazioni &gt; Sicurezza &gt; 2FA.",
     "2fa_menu": "Autenticazione a due fattori (2FA)",
     "5883": "Lascia la chiamata",
+    "22899": "%d1 - %d2",
     "23549": "Ricerca in pausa",
     "B": "B",
     "EmptyName": "Per favore, specifica un nome per la cartella",

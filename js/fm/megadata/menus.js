@@ -365,7 +365,26 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
 
     // Allow to mark as Favourite/Labeled from multi-selection
     if ($.selected.length > 1) {
-        items['.colour-label-items'] = 1;
+
+        let allNodesFullAccess = true;
+
+        // Check all selected nodes
+        for (let i = 0; i < $.selected.length; i++) {
+
+            const selectedHandle = $.selected[i];
+
+            // If not Full Access node rights, disable
+            if (M.getNodeRights(selectedHandle) < 2) {
+                allNodesFullAccess = false;
+                break;
+            }
+        }
+
+        // If all nodes have Full Access node rights, show colour label option
+        if (allNodesFullAccess) {
+            items['.colour-label-items'] = 1;
+        }
+
         let allAreFavourite = !isInShare;
 
         if (!isInShare) {

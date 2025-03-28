@@ -2684,6 +2684,7 @@
     "2fa_already_enabled": "Two-factor authentication (2FA) has already been enabled. To disable, go to Settings &gt; Security &gt; 2FA.",
     "2fa_menu": "Two-factor authentication (2FA)",
     "5883": "Leave call",
+    "22899": "%d1 - %d2",
     "23549": "Search paused",
     "B": "B",
     "EmptyName": "Please specify a folder name",

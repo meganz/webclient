@@ -206,7 +206,7 @@ lazy(mega.gallery, 'albums', () => {
                     if (M.isAlbumsPage(1) || !selHandles.length) {
                         window.selectionManager.hideSelectionBar();
                     }
-                    else {
+                    else if (M.isAlbumsPage(2)) {
                         window.selectionManager.showSelectionBar(
                             mega.icu.format(l.selected_count, selHandles.length),
                             scope.albums.grid.timeline.selSize

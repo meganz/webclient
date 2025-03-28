@@ -2746,9 +2746,7 @@ FileManager.prototype.createFolderUI = function() {
             ephemeralDialog(l[1005]);
         }
         else {
-            M.safeShowDialog('create-new-link', function () {
-                M.initFileAndFolderSelectDialog('create-new-link');
-            });
+            M.initFileAndFolderSelectDialog('create-new-link');
             eventlog(500736);
         }
     });
@@ -2780,15 +2778,17 @@ FileManager.prototype.initFileAndFolderSelectDialog = function(type, OnSelectCal
     // Using existing File selector dialog from chat.
     var dialogPlacer = document.createElement('div');
     var selected = [];
-    var constructor;
+    let $$rootRef;
+    let isClosing = false;
     var doClose = function(noClearSelected) {
-        ReactDOM.unmountComponentAtNode(dialogPlacer);
-        constructor.domNode.remove();
-        dialogPlacer.remove();
-        if (!noClearSelected) {
-            selected = [];
+        if (!isClosing) {
+            isClosing = true;
+            $$rootRef.unmount();
+            dialogPlacer.remove();
+            if (!noClearSelected) {
+                selected = [];
+            }
         }
-        closeDialog();
     };
 
     var options = {
@@ -2852,9 +2852,9 @@ FileManager.prototype.initFileAndFolderSelectDialog = function(type, OnSelectCal
         prop.customFilterFn = options[type].customFilterFn;
     }
 
-    var dialog = React.createElement(CloudBrowserModalDialogUI.CloudBrowserDialog, prop);
-
-    constructor = ReactDOM.render(dialog, dialogPlacer);
+    const dialog = React.createElement(CloudBrowserModalDialogUI.CloudBrowserDialog, prop);
+    $$rootRef = ReactDOM.createRoot(dialogPlacer);
+    $$rootRef.render(dialog);
 };
 
 FileManager.prototype.initNewChatlinkDialog = function() {

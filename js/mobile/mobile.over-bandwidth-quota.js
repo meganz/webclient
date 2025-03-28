@@ -15,6 +15,12 @@ mobile.overBandwidthQuota = {
         this.quotaExceeded = quotaExceeded;
         this.proPlanAttribute = Object(u_attr).p;
         this.lowestPlanIsMini = false;
+        const freeOrLowerTier = !this.proPlanAttribute ||
+            [
+                pro.ACCOUNT_LEVEL_STARTER,
+                pro.ACCOUNT_LEVEL_BASIC,
+                pro.ACCOUNT_LEVEL_ESSENTIAL
+            ].includes(this.proPlanAttribute);
 
         const contentsDiv = document.createElement('div');
         contentsDiv.className =
@@ -25,7 +31,8 @@ mobile.overBandwidthQuota = {
         contentsDiv.append(blurbDiv);
 
         pro.loadMembershipPlans(() => {
-            this.lowestPlanIsMini = pro.filter.simple.miniPlans.has(pro.minPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL]);
+            this.lowestPlanIsMini =
+                freeOrLowerTier && pro.filter.simple.miniPlans.has(pro.minPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL]);
             const miniPlanId = this.lowestPlanIsMini ? pro.filter.miniMin[pro.UTQA_RES_INDEX_ACCOUNTLEVEL] : '';
 
             this.setSheetButtons();

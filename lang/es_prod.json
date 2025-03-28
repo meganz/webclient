@@ -2684,6 +2684,7 @@
     "2fa_already_enabled": "La autenticaci\u00f3n de dos factores (2FA) ya est\u00e1 activa. Puedes desactivarla en Ajustes &gt; Seguridad &gt; 2FA ",
     "2fa_menu": "Autenticaci\u00f3n de dos factores (2FA)",
     "5883": "Abandonar llamada",
+    "22899": "%d1 - %d2",
     "23549": "Busqueda en pausa",
     "B": "A",
     "EmptyName": "Introduce el nombre de la carpeta",

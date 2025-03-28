@@ -2684,6 +2684,7 @@
     "2fa_already_enabled": "A autentica\u00e7\u00e3o de dois fatores (2FA) j\u00e1 foi ativada. Para desativ\u00e1-la, acesse Configura\u00e7\u00f5es - Seguran\u00e7a - Autentica\u00e7\u00e3o de dois fatores.",
     "2fa_menu": "Autentica\u00e7\u00e3o de dois fatores (2FA)",
     "5883": "Sair da chamada",
+    "22899": "De %d1 a %d2",
     "23549": "Pesquisa pausada",
     "B": "B",
     "EmptyName": "Por favor, digite o nome da pasta",

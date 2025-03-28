@@ -183,12 +183,16 @@ class PasswordItemForm extends MegaForm {
             return;
         }
 
+        if (mega.ui.pm.overlay.visible) {
+            this.clear();
+        }
+
         super.show(options);
 
         this.formType = options.type;
 
         if (this.formType === 'update') {
-            this.setValue(mega.ui.pm.list.passwordItem.item);
+            this.setValue(M.getNodeByHandle(mega.ui.pm.comm.getLastSelected()));
         }
 
         mega.ui.pm.overlay.show({

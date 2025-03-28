@@ -1718,7 +1718,7 @@ function init_page() {
                 M.currentdirid = id;
             }
         }
-        else if ((!pfid || flhashchange) && (id && id !== M.currentdirid || page === 'start')) {
+        else if ((!pfid || flhashchange) && (id && id !== M.currentdirid || page === 'start' || page === 'fm/pwm')) {
             M.openFolder(id, true);
         }
         else {

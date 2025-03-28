@@ -2725,7 +2725,6 @@ mega.gallery.clearMdView = () => {
     mega.ui.secondaryNav.updateGalleryLayout(true);
 
     if (M.gallery) {
-        $mediaIcon.removeClass('active');
         $('.gallery-tabs-bl').addClass('hidden');
         mega.ui.secondaryNav.updateLayoutButton();
 

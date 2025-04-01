@@ -221,15 +221,17 @@ function sharedUInode(nodeHandle, force) {
             }
         }
 
-        // Remove the share node selection on incoming and outgoing shares pages
-        if (typeof nodeHandle !== 'undefined' && (M.currentdirid === 'out-shares' || M.currentdirid === 'shares')) {
-            selectionManager.remove_from_selection(nodeHandle);
-        }
-        else if (selectionManager.selected_list.includes(nodeHandle)) {
-            selectionManager.updateSelectionNotification();
+        if (window.selectionManager) {
+            // Remove the share node selection on incoming and outgoing shares pages
+            if (nodeHandle !== undefined && (M.currentdirid === 'out-shares' || M.currentdirid === 'shares')) {
+                selectionManager.remove_from_selection(nodeHandle);
+            }
+            else if (selectionManager.selected_list.includes(nodeHandle)) {
+                selectionManager.updateSelectionNotification();
+            }
         }
     }
-    else if (selectionManager.selected_list.includes(nodeHandle)) {
+    else if (window.selectionManager && selectionManager.selected_list.includes(nodeHandle)) {
         selectionManager.updateSelectionNotification();
     }
 

@@ -363,7 +363,7 @@
                     .safeHTML(escapeHTML(l[17550]).replace('%1', '<strong>' + name + '</strong>'));
             }
             else {
-                $icons.addClass(is_mobile ? fileIcon(node) : `icon-${fileIcon(node)}-90`);
+                $icons.addClass(`icon-${fileIcon(node)}-90`);
 
                 // Check whether the user have full-access to the target, required to replace or create versions
                 if (M.getNodeRights(target) < 2) {

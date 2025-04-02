@@ -102,6 +102,10 @@ class MContextMenu extends MComponent {
         }
 
         this.toggleScrolls(true);
+
+        if (typeof this.onHide === 'function') {
+            this.onHide();
+        }
     }
 
     /**

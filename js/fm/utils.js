@@ -171,7 +171,7 @@ MegaUtils.prototype.resetUploadDownload = function megaUtilsResetUploadDownload(
         ulmanager.isUploading = false;
         ASSERT(ulQueue._running === 0, 'ulQueue._running inconsistency on completion');
         ulQueue._pending = [];
-        ulQueue.setSize((fmconfig.ul_maxSlots | 0) || 4);
+        ulQueue.setSize((fmconfig.ul_maxSlots | 0) || ulmanager.ulDefConcurrency || 4);
 
         if (is_megadrop) {
             mega.fileRequestUpload.onUploadCompletion();

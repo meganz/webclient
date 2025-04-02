@@ -119,6 +119,12 @@
 .mega-overlay:not(.action-button-bottom) .overlay > .actions {
     margin-top: 16px;
 }
+.overlay-wrap .main.ps {
+    padding-bottom: 4px;
+}
+.overlay-wrap .main .ps__rail-x {
+    margin-bottom: 0;
+}
 .overlay-wrap .actions .button {
     max-width: var(--mobile-elem-max-width);
     width: 100%;

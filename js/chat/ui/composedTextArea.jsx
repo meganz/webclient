@@ -62,8 +62,8 @@ const ComposedTextArea = ({ chatRoom, parent, containerRef }) =>
                         });
 
                         chatRoom.sendMessage(messageContents);
-                        messagesListScrollable.disable();
-                        messagesListScrollable.scrollToBottom(true);
+                        messagesListScrollable?.disable();
+                        messagesListScrollable?.scrollToBottom(true);
                     }
                     else {
                         chatRoom.sendMessage(messageContents);

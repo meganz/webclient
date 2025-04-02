@@ -196,7 +196,12 @@ export class PerfectScrollbar extends MegaRenderMixin {
     }
 
     reinitialise(skipReinitialised, bottom) {
-        var $elem = this.domRef?.current;
+        const $elem = this.domRef?.current;
+
+        if (!$elem) {
+            return;
+        }
+
         this.isUserScroll = false;
         if (bottom) {
             $elem.scrollTop = this.getScrollHeight();

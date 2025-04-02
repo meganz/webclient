@@ -207,7 +207,7 @@ lazy(mega.devices, 'ui', () => {
              */
             this.config = {
                 megaDesktopUrl: 'https://mega.io/desktop',
-                minVersion: 5.2,
+                minVersion: '5.9',
                 err: {
                     issueFound: -2,
                     wrongUserSync: -9,
@@ -272,8 +272,7 @@ lazy(mega.devices, 'ui', () => {
                     eventlog(this.config.event.add);
                 }
                 if (!err && is) {
-                    if (typeof is === 'object' && is.v
-                        && (Number.isNaN(parseFloat(is.v)) || parseFloat(is.v) < this.config.minVersion)) {
+                    if (typeof is === 'object' && is.v && M.vtol(is.v) < M.vtol(this.config.minVersion)) {
                         msgDialog(
                             `confirmation:!^${l[20826]}!${l[1597]}`,
                             l[23967],
@@ -296,16 +295,6 @@ lazy(mega.devices, 'ui', () => {
                     // Once version check passes, proceed with MegaSync request
                     const { config } = this;
                     const addSyncReq = config.requests.add;
-
-                    // TODO: Once v5.9.0 is released,
-                    //
-                    // 1. Remove this `if` block
-                    // 2. Change the request body
-                    // 3. Set `config.minVersion` to `5.9`
-                    if (parseFloat(is.v) >= 5.9) {
-                        addSyncReq.h = null;
-                        addSyncReq.u = u_handle;
-                    }
 
                     megasync.megaSyncRequest(addSyncReq, (_, res) => {
                         // Invalid user handle
@@ -760,8 +749,7 @@ lazy(mega.devices, 'ui', () => {
                     requests: {
                         add: {
                             a: 's',
-                            h: M.RootID,
-                            // u: u_handle, //TODO: Add this param after 5.9.0 is released
+                            u: u_handle,
                         },
                     },
                     event: {

@@ -522,6 +522,10 @@ table.grid-table .item-type-icon {
     position: absolute;
     top: 3px;
 }
+.rtl table.grid-table .item-type-icon {
+    left: unset;
+    right: 3px;
+}
 
 table.grid-table .tranfer-filetype-txt {
     left: 0;

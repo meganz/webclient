@@ -32,7 +32,7 @@
 .shared-blocks-scrolling,
 .out-shared-blocks-scrolling {
     height: 100%;
-    padding-right: 14px;
+    padding-inline-end: 20px;
     box-sizing: border-box;
 }
 .file-block-scrolling .megaList-content {

@@ -1132,7 +1132,7 @@ window.redirect = ['about', 'achievements', 'android', 'bird', 'business', 'chro
                    'contact', 'cookie', 'copyright', 'corporate', 'credits', 'desktop', 'dev',
                    'developers', 'dispute', 'doc', 'edge', 'extensions', 'firefox', 'gdpr', 'help', 'ios',
                    'megabackup', 'mobile', 'nas', 'objectstorage',
-                   'plugin', 'privacy', 'refer', 'resellers', 'sdk', 'securechat',
+                   'plugin', 'privacy', 'refer', 'sdk', 'securechat',
                    'security', 'sourcecode', 'start', 'storage', 'sync', 'takedown', 'terms', 'uwp', 'wp'];
 var isStaticPage = function(page) {
     'use strict';

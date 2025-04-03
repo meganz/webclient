@@ -5294,49 +5294,6 @@ strong, b {
 .widget-circle.percents-100 {
     background-position: 0 -1000px;
 }
-.resellers-main-block {
-    margin: 0 -25px;
-    font-size: 0;
-}
-.resellers-link {
-    width: 33.333333%;
-    width: calc(33.333333% - 50px);
-    min-height: 160px;
-    display: inline-block;
-    vertical-align: top;
-    margin: 25px 25px 25px 25px;
-    border: 2px solid #d9d9d9;
-    border-radius: 5px;
-    text-align: center;
-    box-sizing: border-box;
-    transition: all 200ms ease-in-out;
-}
-.resellers-link:hover {
-    border-color: #D42400;
-}
-.resellers-link.single {
-    margin-left: 3px;
-}
-.resellers-logo {
-    display: block;
-    margin: 48px auto 29px auto;
-    width: 220px;
-}
-.resellers-logo.cb {
-    margin-top: 44px;
-}
-.resellers-payment {
-    width: 32px;
-    display: inline-block;
-    margin: 0 4px 0 4px;
-    opacity: 0.5;
-}
-.resellers-link:hover .resellers-payment {
-    opacity: 1;
-}
-.resellers-top-txt {
-    padding: 20px 0 17px 0;
-}
 .top-login-input-tooltip.active {
     display: block;
 }

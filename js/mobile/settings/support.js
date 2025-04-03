@@ -30,10 +30,11 @@ mobile.settings.support  = Object.create(mobile.settingsHelper, {
                     rightIcon: null
                 },
                 {
-                    text: l[516],
+                    text: l.menu_item_priority_support,
                     icon: 'sprite-mobile-fm-mono icon-message-circle-thin-outline',
                     href: 'support',
-                    rightIcon: null
+                    rightIcon: null,
+                    componentClassname: 'priority-support'
                 }
             ];
 
@@ -42,6 +43,20 @@ mobile.settings.support  = Object.create(mobile.settingsHelper, {
             }
 
             this.show();
+        }
+    },
+
+    show: {
+        value: function() {
+
+            mobile.settingsHelper.show.call(this);
+
+            if (u_attr.p) {
+                this.domNode.componentSelector('.priority-support').show();
+            }
+            else {
+                this.domNode.componentSelector('.priority-support').hide();
+            }
         }
     }
 });

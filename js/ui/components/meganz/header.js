@@ -488,6 +488,10 @@ class MegaHeader extends MegaMobileHeader {
         mega.ui.header.updateEmail(u_attr.email);
         mega.ui.header.handleMenu('avatar');
 
+        if (u_attr.p) {
+            mega.ui.header.domNode.componentSelector('.priority-support').removeClass('hidden');
+        }
+
         eventlog(500323);
     }
 
@@ -895,6 +899,11 @@ class MegaHeader extends MegaMobileHeader {
                         text: l[384],
                         target: '_blank',
                         href: 'https://help.mega.io/'
+                    },
+                    {
+                        componentClassname: 'priority-support hidden',
+                        text: l.menu_item_priority_support,
+                        href: '/support'
                     },
                     {
                         componentClassname: 'megaio extlink',

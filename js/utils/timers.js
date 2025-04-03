@@ -154,10 +154,25 @@ lazy(self, 'tSleep', function tSleep() {
 
     const pending = new Set();
     const symbol = Symbol('^^tSleep::scheduler~~');
+    const tbsp = Promise.resolve();
 
     let pid = 0;
     let tid = null;
     let threshold = MAX_THRESHOLD;
+
+    const asap = async(ms) => {
+        const xid = pid;
+        const now = Date.now();
+        ms |= 1;
+        // console.warn(`asap:${ms}`);
+        do {
+            await navigator.locks.request(`<t-sleep:asap/trap/>`, () => tbsp);
+            if (xid !== pid) {
+                break;
+            }
+        }
+        while (Date.now() - now < ms);
+    };
 
     const dequeue = () => {
         const tick = performance.now();
@@ -184,10 +199,11 @@ lazy(self, 'tSleep', function tSleep() {
             if (self.d > 2) {
                 console.warn(`tSleep rescheduled for ${threshold | 0}ms`, pending);
             }
-            if (document.hidden && self.tSleep !== self.sleep) {
+            if (document.hidden) {
                 tid = -1;
                 const xid = ++pid;
-                return sleep(threshold / 1e3).then(() => xid === pid && dequeue());
+                const ready = self.tSleep === self.sleep ? asap(threshold) : sleep(threshold / 1e3);
+                return ready.finally(() => xid === pid && dequeue());
             }
             tid = gSetTimeout(dequeue, threshold);
         }
@@ -376,6 +392,9 @@ lazy(self, 'tSleep', function tSleep() {
 
         return obj.timer;
     };
+
+    // @private
+    tSleep.asap = asap;
 
     return freeze(tSleep);
 });
@@ -637,7 +656,7 @@ mBroadcaster.once('boot_done', tryCatch(() => {
         }
 
         if (elapsed > IDLE_THRESHOLD) {
-            logger.warn('Caught unreliable requestIdleCallback()...', lax, elapsed);
+            logger.warn('Caught unreliable idleCallback() dispatcher...', lax, elapsed, document.hidden);
 
             if (!document.hidden && ++lax < 2 && self.buildOlderThan10Days === false) {
 
@@ -654,7 +673,7 @@ mBroadcaster.once('boot_done', tryCatch(() => {
 
         if (!IDLE_PIPELINE.pid) {
             if (document.hidden) {
-                IDLE_PIPELINE.pid = sleep((IDLE_THRESHOLD - 50) / 1e3).then(idleCallbackHandler);
+                IDLE_PIPELINE.pid = tSleep.asap(IDLE_THRESHOLD >> 1).finally(idleCallbackHandler);
             }
             else if (lax > 1) {
                 IDLE_PIPELINE.pid = requestAnimationFrame(idleCallbackHandler);

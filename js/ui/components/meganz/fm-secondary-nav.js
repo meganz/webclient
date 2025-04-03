@@ -828,6 +828,7 @@ lazy(mega.ui, 'secondaryNav', () => {
         },
         onPageChange() {
             filterChipShown = false;
+            dcChipShown = false;
             if (window.selectionManager) {
                 // selectionManager should eventually reset but this needs to be empty now for some context menu updates
                 selectionManager.selected_list = [];

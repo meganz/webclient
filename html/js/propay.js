@@ -733,7 +733,9 @@ pro.propay = {
 
     shouldShowTrialBlocker: (blockerText, blockerTitle) => {
         'use strict';
-        return !pro.filter.simple.validPurchases.has(pro.propay.planNum)
+
+        return !pro.propay.ignoreTrial
+            && !pro.filter.simple.validPurchases.has(pro.propay.planNum)
             && !pro.propay.trial
             && !blockerText
             && !blockerTitle;
@@ -1441,6 +1443,7 @@ pro.propay = {
 
 
         if (!planCardInitialized) {
+            $('.plan-card', this.pageInfo.$rightBlock).remove(); // In case there is a card present from another session
             this.pageInfo.$rightBlock.safeAppend($planCard.prop('outerHTML'));
             this.pageInfo.$planCard = $('.plan-card', this.pageInfo.$rightBlock);
         }

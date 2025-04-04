@@ -272,6 +272,16 @@ var pro = {
                     if (d && localStorage.useDevOptions) {
                         pro.applyDevSettings();
                     }
+
+                    if (localStorage.ignoreTrial) {
+                        for (let i = 0; i < pro.membershipPlans.length; i++) {
+                            pro.membershipPlans[i][pro.UTQA_RES_INDEX_EXTRAS].trial = false;
+                        }
+
+                        pro.propay.ignoreTrial = true;
+                        delete localStorage.ignoreTrial;
+                    }
+
                     pro.lastLoginStatus = u_type;
                     pro.maxPlan = maxPlan;
                     pro.minPlan = minPlan;

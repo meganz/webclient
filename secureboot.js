@@ -414,6 +414,9 @@ function getCleanSitePath(path) {
         if (path.mct) {
             window.uTagMCT = path.mct;
         }
+        if (path.miojid) {
+            window.uTagMJID = path.miojid;
+        }
 
         if (path.next) {
             window.nextPage = b64decode(path.next);
@@ -4236,6 +4239,13 @@ mBroadcaster.once('startMega', function() {
         onIdle(function() {
             eventlog(99988, window.uTagMCT);
             delete window.uTagMCT;
+        });
+    }
+
+    if (window.uTagMJID && self.u_attr) {
+        onIdle(function() {
+            api.req({ a: 'log', e: 500674, j: window.uTagMJID }).dump('miojid');
+            delete window.uTagMJID;
         });
     }
 

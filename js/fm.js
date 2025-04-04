@@ -619,7 +619,11 @@ function fmtopUI() {
     let contextMenuItem = false;
 
     const id = String(M.currentdirid || '').split('/').pop();
-    if (mega.rewind && M.getSelectedSourceRoot() === M.RootID && M.currentrootid === M.RootID && !pfid) {
+    if (mega.rewind
+        && M.getSelectedSourceRoot() === M.RootID
+        && M.currentrootid === M.RootID
+        && !pfid && M.onDeviceCenter !== M.RootID
+    ) {
         contextMenuItem = id;
     }
 

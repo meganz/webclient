@@ -95,9 +95,7 @@ lazy(mega.devices.sections, 'folderChildren', () => {
                 if (hasToRenderHeader) {
                     const { isDeviceFolder, t, status } = folder;
                     const isShareLimitedNode = sharer(h) && M.getNodeRights(h) < 2;
-                    const isFullSync = isDeviceFolder && h === M.RootID;
                     const hideButtons = !(isDeviceFolder && t !== syncType.cameraUpload) ||
-                        isFullSync ||
                         isShareLimitedNode ||
                         status.errorState === 14;
                     mega.ui.secondaryNav.showCard(

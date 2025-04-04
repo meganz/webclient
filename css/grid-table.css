@@ -792,14 +792,6 @@ table.fm .thumb .item-type-icon img {
 }
 
 /* ======================================== *\
-   developer-settings-table
-\* ======================================== */
-.bottom-page.developer-settings .developer-settings-table {
-    margin: auto;
-    text-align: start;
-}
-
-/* ======================================== *\
    megasync-table
 \* ======================================== */
 .megasync-table {

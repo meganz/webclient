@@ -219,10 +219,6 @@ accountUI.renderAccountPage = function(account) {
             accountUI.calls.init();
             break;
         case '/fm/account/vpn':
-            if (u_attr.b) {
-                loadSubPage('fm/account');
-                return false;
-            }
             $('.fm-account-vpn', accountUI.$contentBlock).removeClass('hidden');
             sectionClass = 'vpn';
 
@@ -771,12 +767,6 @@ accountUI.leftPane = {
         if (u_attr.s4) {
             // Show s4 button on naviation
             $menuItems.filter('.s4').removeClass('hidden');
-        }
-
-        // Show VPN settings
-        if (u_attr.b) {
-            // hide VPN button on naviation
-            $menuItems.filter('.vpn').addClass('hidden');
         }
 
         if (accountUI.plan.paymentCard.validateUser(M.account)) {

@@ -156,7 +156,6 @@ lazy(mega.devices, 'utils', () => {
             let text = '';
             let textClass = '';
             let tooltip = '';
-            let isWarning = false;
 
             if (status.overquotaSyncs) {
                 iconClass = 'error icon-cloud-storage-over-quota';
@@ -195,13 +194,11 @@ lazy(mega.devices, 'utils', () => {
                 text = mega.icu.format(l.stalled_sync_state, isDevice ? status.stalledSyncs : 1);
             }
             else if (status.offlineSyncs) {
-                const daysNum = 7; // Max Offline days to show warning
                 iconClass = 'icon-offline';
                 text = l[5926];
-                isWarning = true;
-                if (isDevice &&
-                    (status.currentDate - status.lastHeartbeat * 1000) / (1000 * 3600 * 24) >= daysNum) {
-                    tooltip = mega.icu.format(l.offline_device_tip, daysNum);
+
+                if (status.isMobile) {
+                    tooltip = l.dc_check_mobile_app_tip;
                 }
             }
             else if (status.stoppedSyncs) {
@@ -216,7 +213,7 @@ lazy(mega.devices, 'utils', () => {
                 StatusElements.text(itemNode, textClass, text);
             }
             if (tooltip && !isDevice) {
-                StatusElements.tooltip(itemNode, iClass, tooltip, {isWarning});
+                StatusElements.tooltip(itemNode, iClass, tooltip);
             }
         },
         attention: ({itemNode, iClass}) => {
@@ -233,6 +230,10 @@ lazy(mega.devices, 'utils', () => {
             if (status.pausedSyncs) {
                 iconClass = 'icon-pause';
                 text = l[1651];
+
+                if (status.isMobile) {
+                    tooltip = l.dc_check_mobile_app_tip;
+                }
             }
             else if (status.disabledSyncs) {
                 iconClass = 'warning icon-disable';

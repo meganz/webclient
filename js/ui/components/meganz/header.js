@@ -966,7 +966,7 @@ class MegaHeader extends MegaMobileHeader {
                 text: `V.${M.getSiteVersion()}`,
                 onClick: () => {
                     if (++versionClickCounter >= 3) {
-                        mega.developerSettings.show();
+                        msgDialog('info', '', 'Developer tools have moved. Ask the team for access!');
                     }
                     delay('top-version-click', () => {
                         versionClickCounter = 0;

@@ -360,11 +360,7 @@ mobile.settings.account = Object.create(mobile.settingsHelper, {
 
             version.rebind('tap.versionupdate', () => {
                 if (++versionClickCounter >= 3) {
-                    mega.developerSettings.show();
-
-                    if (this.overlayAccount) {
-                        mega.ui.overlay.hide();
-                    }
+                    msgDialog('info', '', 'Developer tools have moved. Ask the team for access!');
                 }
                 delay('top-version-click', () => {
                     versionClickCounter = 0;

@@ -2264,8 +2264,6 @@ else if (!browserUpdate) {
     jsl.push({f:'js/ui/megaInputs-currencyField.js', n: 'megainputs_currencyfield_js', j:1, w:1});
     jsl.push({f:'js/ui/megaInputs-pmText.js', n: 'megaInputs_pmText_js', j: 1, w:1});
     jsl.push({f:'html/registerb.html', n: 'registerb',j:0});
-    jsl.push({f:'html/developersettings.html', n: 'developersettings', j:0});
-    jsl.push({f:'html/js/developersettings.js', n: 'developersettings_js', j:1 });
     jsl.push({f:'html/repay.html', n: 'repay', j:0 });
     jsl.push({f:'html/js/repay.js', n: 'repay_js', j:1 });
     jsl.push({f:'js/ui/passwordReminderDialog.js', n: 'prd_js', j:1,w:1});
@@ -3095,7 +3093,6 @@ else if (!browserUpdate) {
         'recover': ['reset', 'reset_js'],
         'redeem': ['redeem', 'redeem_js'],
         'unsub': ['unsub', 'unsub_js'],
-        'developersettings': ['developersettings', 'developersettings_js'],
         'filerequest': ['filerequest', 'filerequest_upload_js']
     };
 

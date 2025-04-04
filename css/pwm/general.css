@@ -72,3 +72,8 @@
     border: none;
     padding: 0;
 }
+
+/* Hide the password reveal button in Microsoft Edge */
+.pm-main ::-ms-reveal {
+    display: none;
+}

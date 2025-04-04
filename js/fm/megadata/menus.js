@@ -123,7 +123,7 @@ MegaData.prototype.checkSendToChat = function(isSearch, sourceRoot) {
             let n = M.d[$.selected[i]];
             const nRoot = isSearch ? n && n.u === u_handle && M.getNodeRoot($.selected[i]) : sourceRoot;
 
-            if (!n || n.t && (nRoot !== M.RootID && nRoot !== M.InboxID &&
+            if (!n || n.h === M.RootID || n.t && (nRoot !== M.RootID && nRoot !== M.InboxID &&
                 nRoot !== 's4' && nRoot !== mega.devices.rootId && !M.isDynPage(nRoot) && nRoot !== 'out-shares') ||
                 nRoot === M.RubbishID) {
 

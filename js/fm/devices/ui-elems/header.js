@@ -73,7 +73,6 @@ lazy(mega.devices.uiElems, 'Header', () => {
             const {h, isDeviceFolder, name, icon, t, status} = item;
 
             const isSharedLimitedNode = sharer(h) && M.getNodeRights(h) < 2;
-            const isFullSync = isDeviceFolder && h === M.RootID;
 
             const iconClass = `device-centre-header-icon ${
                 M.dcd[h]
@@ -121,10 +120,6 @@ lazy(mega.devices.uiElems, 'Header', () => {
                 if (isSharedLimitedNode || status.errorState === 14) {
                     this.$removeButton.addClass('hidden');
                     this.$togglePauseButton.addClass('hidden');
-                }
-                else if (isFullSync) {
-                    this.$togglePauseButton.addClass('hidden');
-                    this.$removeButton.addClass('hidden');
                 }
                 else {
                     const $togglePauseIcon = $('.sprite-fm-mono', this.$togglePauseButton);

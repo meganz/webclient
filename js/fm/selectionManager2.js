@@ -1097,6 +1097,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             const selNode = M.getNodeByHandle($.selected[0]);
             const sourceRoot = M.getSelectedSourceRoot(isSearch);
             const shareButton = selectionLinkWrapper.querySelector(`.js-statusbarbtn.share`);
+            const isRootSelected = $.selected.length === 1 && selNode.h === M.RootID;
 
             let showGetLink;
             let restrictedFolders = false;
@@ -1156,9 +1157,9 @@ class SelectionManager2_DOM extends SelectionManager2Base {
                     __showBtn = nop;
                 }
 
-                showGetLink = 1;
+                showGetLink = !isRootSelected;
 
-                if (selNode.t && $.selected.length === 1) {
+                if (!isRootSelected && selNode.t && $.selected.length === 1) {
                     __showBtn('share');
                 }
                 if (M.currentdirid === mega.devices.rootId) {
@@ -1172,7 +1173,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             }
 
             // Temporarily hide download button for now in MEGA Lite mode (still accessible via zip in context menu)
-            if (M.getNodeRoot(M.currentdirid) !== M.RubbishID &&
+            if (selNode.h !== M.RootID && M.getNodeRoot(M.currentdirid) !== M.RubbishID &&
                 (!mega.lite.inLiteMode || !mega.lite.containsFolderInSelection($.selected))) {
                 __showBtn('download');
             }
@@ -1191,7 +1192,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
                 }
                 __showBtn('link');
             }
-            else if (!folderlink && M.currentrootid !== 'shares' && M.currentdirid !== 'shares'
+            else if (!isRootSelected && !folderlink && M.currentrootid !== 'shares' && M.currentdirid !== 'shares'
                 || M.currentrootid === 'shares' && M.currentdirid !== 'shares' && M.d[M.currentdirid].r === 2) {
                 __showBtn('delete');
             }
@@ -1254,7 +1255,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
                 const section = mega.devices.ui.getRenderSection();
                 const isBackup = mega.devices.ui.isBackupRelated(selNode.h);
                 __hideButton('move');
-                if (isBackup) {
+                if (isBackup || isRootSelected) {
                     __hideButton('rename');
                 }
                 if (sharer(selNode.h)) {

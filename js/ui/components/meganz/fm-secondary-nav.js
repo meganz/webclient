@@ -91,13 +91,16 @@ class MegaNavCard extends MegaComponent {
                 this.isS4 = true;
                 return node;
             }
-            if (node.t === 1) {
+            if (node.t === 1 || M.onDeviceCenter && node.t === 2) {
                 if (M.onDeviceCenter) {
                     const { folder } = mega.devices.ui.getCurrentDirData();
                     if (!folder) {
                         return false;
                     }
-                    this.isBackup = mega.devices.ui.isBackupRelated(handle);
+                    if (node.h === M.RootID) {
+                        folder.name = l[164];
+                    }
+                    this.isBackup = M.getNodeRoot(handle) === M.InboxID;
                     this.isSync = !this.isBackup;
                     return folder;
                 }

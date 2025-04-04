@@ -268,6 +268,35 @@ lazy(mega.devices, 'ui', () => {
                 appPromoPageNum: config.appPromoPageNum,
             };
         }
+        /**
+         * Handles the `sds` attribute updates - necessary to propagate state changes to the client
+         * @param {string} node - The MegaNode
+         * @param {string} id - The backup id of the sync/backup (not the handle)
+         * @param {Number} sdsCode - The SDS code (1: Resume, 3: Pause, 8: Remove/Stop)
+         *
+         * @returns {Promise} The attribute write promise
+         */
+        async _handleSdsAttributes(node, id, sdsCode) {
+            if (!node || !node.h) {
+                return;
+            }
+
+            const {h} = node;
+
+            // Full sync - Changes the sds user attribute
+            if (h === M.RootID) {
+                const oldSds = u_attr['*!sds'] ? tlvstore.decrypt(u_attr['*!sds']) : {};
+                const sds = { ...oldSds, [id]: `${sdsCode}`};
+                return mega.attr.set2(
+                    null, 'sds', sds, false, true, true
+                );
+            }
+            // Anything except a full sync - Changes the node attribute
+            const sds = node.sds
+                ? `${node.sds},${id}:${sdsCode}`
+                : `${id}:${sdsCode}`;
+            return api.setNodeAttributes(node, {sds});
+        }
 
         /**
          * Triggers Desktop App dialog to add backup or sync folder
@@ -379,10 +408,7 @@ lazy(mega.devices, 'ui', () => {
                 if (node) {
                     // Set `sds` attr to make sure that SDK will try to clear heartbeat record too
                     if (id && id !== h) {
-                        const sds = node.sds
-                            ? `${node.sds},${id}:${config.sdsCodes.remove}`
-                            : `${id}:${config.sdsCodes.remove}`;
-                        await api.setNodeAttributes(node, {sds});
+                        await this._handleSdsAttributes(node, id, config.sdsCodes.remove);
                     }
 
                     // Backup/stopped backup folder
@@ -602,14 +628,16 @@ lazy(mega.devices, 'ui', () => {
                 : 'pause';
 
             const proceedWithTogglePause = async() => {
+
                 await api.req(config.requests[action](selectedSync.id));
-                const sds = `${selectedSync.id}:${config.sdsCodes[action]}`;
-                await api.setNodeAttributes(node, {sds});
+                await this._handleSdsAttributes(
+                    node, selectedSync.id, config.sdsCodes[action]
+                );
 
                 const {ui} = mega.devices;
                 ui.clearLastReq();
 
-                if (M.currentrootid === rootId) {
+                if (M.onDeviceCenter) {
                     return ui.render(M.currentdirid, {isRefresh: true});
                 }
             };
@@ -1107,7 +1135,7 @@ lazy(mega.devices, 'ui', () => {
                 M.megaRender.revokeDOMNode(handle, true);
             }
 
-            if (M.currentrootid === rootId) {
+            if (M.onDeviceCenter) {
                 mega.devices.ui.render(M.currentdirid, {isRefresh: true});
             }
         }
@@ -1318,7 +1346,7 @@ lazy(mega.devices, 'ui', () => {
          * @returns {Boolean} whether is custom render
          */
         isCustomRender() {
-            return M.currentrootid === rootId &&
+            return M.onDeviceCenter &&
                 (M.currentdirid === rootId || !!M.dcd[M.currentCustomView.nodeID]);
         }
 
@@ -1327,7 +1355,7 @@ lazy(mega.devices, 'ui', () => {
          * @returns {Boolean} whether current path is a device folder
          */
         isCurrentPathDeviceFolder() {
-            if (M.currentrootid === rootId) {
+            if (M.onDeviceCenter) {
                 const {device, folder} = this.getCurrentDirData();
                 return !!(device && folder);
             }
@@ -1428,7 +1456,7 @@ lazy(mega.devices, 'ui', () => {
             this._bindEvents();
 
             if (this.hasDevices) {
-                if (M.currentrootid === rootId && mega.ui.secondaryNav.selectionBar.classList.contains('hidden')) {
+                if (M.onDeviceCenter && mega.ui.secondaryNav.selectionBar.classList.contains('hidden')) {
                     this.filterChipUtils.init();
                 }
 
@@ -1690,7 +1718,7 @@ lazy(mega.devices, 'ui', () => {
         _setupListeners() {
             if (!this.beforePageChangeListener) {
                 this.beforePageChangeListener = mBroadcaster.addListener('beforepagechange', () => {
-                    if (M.currentrootid === rootId) {
+                    if (M.onDeviceCenter) {
                         // Hide transient state of filter chip
                         this.filterChipUtils.hide();
                         this.filterChipUtils.selectedFilters.manual = false;
@@ -1814,17 +1842,18 @@ lazy(mega.devices, 'ui', () => {
             } = mega.devices.models.syncType;
 
             items['.open-item'] = 1;
-            items['.download-item'] = 1;
-            items['.zipdownload-item'] = 1;
             items['.properties-item'] = 1;
 
             // Full sync
             if (node.h === M.RootID) {
                 items['.open-cloud-item'] = 1;
+                items['.stopsync-item'] = 1;
             }
             // Inshare + Selective sync
             else if (folder.t === twoWay && isInShare) {
                 items['.copy-item'] = 1;
+                items['.download-item'] = 1;
+                items['.zipdownload-item'] = 1;
                 items['.open-in-location'] = 1;
                 items['.leaveshare-item'] = 1;
                 if (M.getNodeRights(folder.h) > 1) {
@@ -1845,6 +1874,8 @@ lazy(mega.devices, 'ui', () => {
             }
             // Backup
             else if (folder.t === backup) {
+                items['.download-item'] = 1;
+                items['.zipdownload-item'] = 1;
                 items['.stopbackup-item'] = 1;
                 items['.copy-item'] = 1;
                 items['.getlink-item'] = 1;
@@ -2121,6 +2152,7 @@ lazy(mega.devices, 'ui', () => {
                 if (folder) {
                     delete items[this.desktopApp.common.pauseMenuItemSelector];
                     delete items['.stopbackup-item'];
+                    delete items['.stopsync-item'];
                 }
                 else {
                     delete items['.sh4r1ng-item'];
@@ -2156,10 +2188,6 @@ lazy(mega.devices, 'ui', () => {
 
             const togglePauseSelector = this.desktopApp.common.pauseMenuItemSelector;
 
-            if (folder.h === M.RootID) {
-                delete items[togglePauseSelector];
-                return;
-            }
             const {
                 twoWay, oneWayUp, oneWayDown, backup
             } = mega.devices.models.syncType;
@@ -2221,12 +2249,12 @@ lazy(mega.devices, 'ui', () => {
             const {data = {}, outdated = []} = res || {};
             M.dcd = typeof data === 'object' && data || Object.create(null);
 
-            if (M.currentrootid === rootId) {
+            if (M.onDeviceCenter) {
                 if (M.megaRender) {
                     const {device, folder} = this.getCurrentDirData();
 
                     for (let i = 0; i < outdated.length; i++) {
-                        if (M.currentdirid === rootId) {
+                        if (M.currentdirid === rootId || !device && outdated[i].device) {
                             M.megaRender.revokeDOMNode(outdated[i].device, true);
                         }
                         else if (!folder && device.h === outdated[i].device) {

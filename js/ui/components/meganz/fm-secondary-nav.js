@@ -234,13 +234,13 @@ class MegaNavCard extends MegaComponent {
         else if (this.isSync || this.isBackup) {
             const { status } = this.node;
             if (status.priority > 0 && status.priority <= mega.devices.utils.StatusUI.folderHandlers.length) {
+                const {error, disabled, updating, success} = mega.devices.utils.folderStatusPriority;
                 let statusName = {
-                    0: 'inactive',
-                    1: 'error',
-                    2: 'clear',
-                    3: 'updating',
-                    4: 'success',
-                }[status.priority - 1] || 'status-unknown';
+                    [error]: 'error',
+                    [disabled]: 'clear',
+                    [updating]: 'updating',
+                    [success]: 'success',
+                }[status.priority] || 'status-unknown';
                 if (statusName === 'clear' && status.disabledSyncs) {
                     statusName = 'warning';
                 }
@@ -262,16 +262,13 @@ class MegaNavCard extends MegaComponent {
         }
         else if (this.isDevice) {
             const { status } = this.node;
+            const {error, disabled, updating, success} = mega.devices.utils.folderStatusPriority;
             let statusName = {
-                1: 'inactive',
-                2: 'attention',
-                3: 'attention',
-                4: 'updating',
-                5: 'success',
+                [error]: 'attention',
+                [disabled]: 'attention',
+                [updating]: 'updating',
+                [success]: 'success',
             }[status.priority] || 'status-unknown';
-            if (status.priority === 1 && mega.devices.data.isActive(status.lastHeartbeat)) {
-                statusName = 'attention';
-            }
             const itemNode = this.domNode.querySelector('.fm-item-badge');
             itemNode.textContent = '';
             itemNode.classList.add('dc-badge-status', statusName);

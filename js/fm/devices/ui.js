@@ -119,42 +119,6 @@ lazy(mega.devices, 'ui', () => {
                     // eid: 99943
                 },
             ]
-        },
-        folderactivity: {
-            title: "All folders",
-            selection: false,
-            shouldShow() {
-                const {ui} = mega.devices;
-                const {device} = ui.getCurrentDirData();
-                return ui.getRenderSection() === renderSection.deviceFolders
-                    && device
-                    && !Object.keys(device.folders).every(h => ui.isActive(device.folders[h]));
-            },
-            get defaultOption() {
-                return this.menu.findIndex(opt => opt.defaultOption);
-            },
-            // eid: 99941,
-            match(n) {
-                return n.status && this.selection(n.status.lastHeartbeat);
-            },
-            menu: [
-                {
-                    defaultOption: true,
-                    label: l.dc_fchips_active_folders,
-                    get data() {
-                        return (hb) => mega.devices.data.isActive(hb);
-                    },
-                    // eid: 99942
-                },
-                {
-                    tooltip: l.dc_fchips_inactive_folders_tooltip,
-                    label: l.dc_fchips_inactive_folders,
-                    get data() {
-                        return (hb) => !mega.devices.data.isActive(hb);
-                    },
-                    // eid: 99943
-                },
-            ]
         }
     };
 
@@ -878,7 +842,6 @@ lazy(mega.devices, 'ui', () => {
                     if (!hideWrapper && !this.selectedFilters.manual && window.selectionManager) {
                         this.toggleActiveFilter(true);
                         this.selectedFilters.manual = true;
-                        M.openFolder(M.currentdirid, true);
                     }
                 },
 
@@ -973,11 +936,6 @@ lazy(mega.devices, 'ui', () => {
                     switch (currSect) {
                         case renderSection.devices:
                             this.autoSelect('deviceactivity', 0, preventReload);
-                            break;
-                        case renderSection.deviceFolders:
-                            // If current device is inactive, we autoselect the "inactive folders" filter
-                            folderFilterOption = (device && !ui.isActive(device)) | 0;
-                            this.autoSelect('folderactivity', folderFilterOption, preventReload);
                             break;
                         default:
                             this.resetSelections();
@@ -1463,10 +1421,6 @@ lazy(mega.devices, 'ui', () => {
                 if (this.filterChipUtils.selectedFilters.value) {
                     M.filterByParent(M.currentdirid);
                     M.renderMain();
-                    const {name, index} = this.filterChipUtils.selectedFilters.data;
-                    if (!M.v.length && name === 'folderactivity' && index) {
-                        this.$emptyFolder.removeClass('hidden');
-                    }
                 }
                 else {
                     const {main: {section}, models: {syncSection}} = mega.devices;

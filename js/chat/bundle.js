@@ -2559,7 +2559,7 @@ const getTimeIntervals = (timestamp, offsetFrom, interval = 30) => {
     });
     while (targetDate.getDate() === initialDate.getDate()) {
       const timestamp = targetDate.getTime();
-      const diff = offsetFrom && isSameDay(timestamp, offsetFrom) && timestamp - offsetFrom;
+      const diff = offsetFrom && timestamp - offsetFrom;
       increments.push({
         value: timestamp,
         label: toLocaleTime(timestamp),
@@ -29146,15 +29146,17 @@ class Select extends mixins.w9 {
   }
   getFormattedDuration(duration) {
     duration = moment.duration(duration);
+    const days = duration.get('days');
     const hours = duration.get('hours');
     const minutes = duration.get('minutes');
-    if (!hours && !minutes) {
+    if (!hours && !minutes && !days) {
       return '';
     }
+    const totalHours = days ? ~~duration.asHours() : hours;
     if (!hours && minutes) {
-      return '([[MINUTES]]\u00a0m)'.replace('[[MINUTES]]', minutes);
+      return days ? `(${totalHours}\u00a0h ${minutes}\u00a0m)` : `(${minutes}\u00a0m)`;
     }
-    return (minutes ? '([[HOURS]]\u00a0h [[MINUTES]]\u00a0m)' : '([[HOURS]]\u00a0h)').replace('[[HOURS]]', hours).replace('[[MINUTES]]', minutes);
+    return minutes ? `(${totalHours}\u00a0h ${minutes}\u00a0m)` : `(${totalHours}\u00a0h)`;
   }
   componentWillUnmount() {
     super.componentWillUnmount();

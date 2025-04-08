@@ -539,6 +539,9 @@
     .media-viewer .wrapper .v-btn:hover ~ .tooltip {
         display: block;
     }
+    .media-viewer .wrapper .v-btn:hover ~ .tooltip.no-sound {
+        width: 100px;
+    }
     .media-viewer li:first-child .tooltip {
         transform: translateX(-50%);
     }

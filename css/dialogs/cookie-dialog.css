@@ -24,6 +24,13 @@
     position: relative;
     -webkit-overflow-scrolling: touch;
 }
+.mobile .cookie-settings-sheet .main.centered {
+    padding-inline: 24px 0;
+    width: calc(100% - 24px);
+}
+.mobile .cookie-dialog .step2 {
+    padding-inline-end: 24px;
+}
 .cookie-dialog .step2 .scrollable-block {
     padding: 0 30px;
 }

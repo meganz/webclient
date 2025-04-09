@@ -3064,7 +3064,7 @@ accountUI.transfers = {
                 var $uploadSettings = $('.upload-settings', accountUI.$contentBlock);
 
                 accountUI.transfers.uploadAndDownload.setSlider($uploadSettings, '#slider-range-max', {
-                    min: 1, max: 8, range: "min", value: fmconfig.ul_maxSlots || 4,
+                    min: 1, max: 8, range: "min", value: fmconfig.ul_maxSlots || ulmanager.ulDefConcurrency || 4,
                     change: function(e, ui) {
                         if (M.currentdirid === 'account/transfers' && ui.value !== fmconfig.ul_maxSlots) {
                             mega.config.setn('ul_maxSlots', ui.value);

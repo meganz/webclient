@@ -43,6 +43,7 @@ var uldl_hold = false;
 var ulmanager = {
     ulFaId: 0,
     ulSize: 0,
+    ulDefConcurrency: 8,
     ulIDToNode: Object.create(null),
     ulEventData: Object.create(null),
     isUploading: false,
@@ -1808,7 +1809,7 @@ FileUpload.prototype.run = function(done) {
             }
         }
         else {
-            ulQueue.setSize((fmconfig.ul_maxSlots | 0) || 4);
+            ulQueue.setSize((fmconfig.ul_maxSlots | 0) || ulmanager.ulDefConcurrency || 4);
         }
 
         file = self = false;

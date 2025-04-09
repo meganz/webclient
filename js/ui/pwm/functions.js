@@ -266,6 +266,26 @@ lazy(mega.ui.pm, 'utils', () => {
             }
 
             return success;
+        },
+
+        getButton(container, type) {
+            const parentWithButton = container.closest('.mega-component');
+            return parentWithButton ? parentWithButton.componentSelector(`.mega-component.${type}`) : null;
+        },
+
+        toggleButtonState(container, type, disable) {
+            const button = this.getButton(container, type);
+            if (button) {
+                button.disabled = disable;
+            }
+        },
+
+        createMessage(message, type, iconHTML, extraClasses = '') {
+            const messageElement = document.createElement('span');
+            messageElement.className = `message ${type} ${extraClasses}`.trim();
+            messageElement.textContent = message;
+            messageElement.prepend(parseHTML(iconHTML));
+            return messageElement;
         }
     });
 });

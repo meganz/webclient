@@ -2449,6 +2449,11 @@ else if (!browserUpdate) {
     jsl.push({f:'js/ui/components/contactnode.js', n: 'contactnode_js', j: 1, w:1});
     jsl.push({f:'js/ui/components/megaInput.js', n: 'megainput_js', j: 1, w: 1});
     jsl.push({f:'js/ui/components/menu.js', n: 'menu_js', j: 1, w:1});
+    jsl.push({f:'js/ui/components/stepper.js', n: 'stepper_js', j: 1, w:1});
+    jsl.push({f:'js/ui/components/onboarding-journey.js', n: 'onboarding_journey_js', j:1,w:1});
+    jsl.push({f:'js/ui/components/card.js', n: 'card_js', j: 1, w:1});
+    jsl.push({f:'js/ui/components/card-group.js', n: 'card_select_js', j: 1, w:1});
+    jsl.push({f:'js/ui/components/checkbox-group.js', n: 'checkbox_select_js', j: 1, w:1});
 
     // Mobile component for inheriting
     jsl.push({f:'js/mobile/mobile.header.js', n: 'mobile_header_js', j: 1, w: 1});
@@ -2643,6 +2648,9 @@ else if (!browserUpdate) {
     jsl.push({f:'css/components/sharednode.css', n: 'sharednode_css', j: 2, w: 1});
     jsl.push({f:'css/components/context-menu.css', n: 'comp_context_menu_css', j:2, w:1});
     jsl.push({f:'css/components/menu.css', n: 'comp_menu_css', j:2, w:1});
+    jsl.push({f:'css/components/stepper.css', n: 'stepper_css', j:2, w:30, c:1, d:1, cache:1});
+    jsl.push({f:'css/components/onboarding-journey.css', n: 'onboarding_journey_css', j:2, w:30, c:1, d:1, cache:1});
+    jsl.push({f:'css/components/card.css', n: 'card_css', j:2, w:30, c:1, d:1, cache:1});
 
     // Load files common to all mobile pages
     if (is_mobile) {
@@ -3039,6 +3047,8 @@ else if (!browserUpdate) {
             'pwm:overlay_css': {f:'css/pwm/overlay.css', n: 'pm_overlay_css', j:2, w:1},
             'pwm:slider_css': {f:'css/pwm/slider.css', n: 'pm_slider_css', j:2, w:1},
             'pwm:password_generator_css': {f:'css/pwm/password-generator.css', n: 'pm_password_generator_css', j:2, w:1},
+            'pwm:pass_import_selector_css': {f:'css/pwm/pass-import-selector.css', n: 'pm_pass_import_selector_css', j:2, w:1},
+            'pwm:pass_import_data_handler_css': {f:'css/pwm/pass-import-data-handler.css', n: 'pm_pass_import_data_handler_css', j:2, w:1},
             'pwm:password_item_form_css': {f:'css/pwm/password-item-form.css', n: 'pm_password_item_form_css', j:2, w:1},
             'pwm:subscription_dialog_css': {f:'css/pwm/subscription-dialog.css', n: 'subscription_dialog_css', j:2, w:1},
             'pwm:settings_css': {f:'css/pwm/settings/settings.css', n: 'settings_css', j:2, w:1},
@@ -3066,6 +3076,9 @@ else if (!browserUpdate) {
             'pwm:context_menu_js': {f:'js/ui/pwm/components/context-menu.js', n: 'context_menu_js', j: 1, w:1},
             'pwm:range_slider_js': {f:'js/ui/pwm/components/range-slider.js', n: 'range_slider_js', j: 1, w:1},
             'pwm:password_generator_js': {f:'js/ui/pwm/components/password-generator.js', n: 'password_generator_js', j: 1, w:1},
+            'pwm:pass_import_selector_js': {f:'js/ui/pwm/components/pass-import-selector.js', n: 'pass_import_selector_js', j: 1, w:1},
+            'pwm:pass_import_data_handler_js': {f:'js/ui/pwm/components/pass-import-data-handler.js', n: 'pass_import_data_handler_js', j: 1, w:1},
+            'pwm:pass_extension_selector_js': {f:'js/ui/pwm/components/pass-extension-selector.js', n: 'pass_extension_selector_js', j: 1, w:1},
             'pwm:megaPassList_js': {f:'js/ui/pwm/components/settings/megaPassList.js', n: 'megaPassList_js', j: 1, w:1},
             'pwm:megaPassListItem_js': {f:'js/ui/pwm/components/settings/megaPassListItem.js', n: 'megaPassListItem_js', j: 1, w:1},
             'pwm:megaInputs_pmTextArea_js': {f:'js/ui/pwm/utils/megaInputs-pmTextArea.js', n: 'megaInputs_pmTextArea_js', j: 1, w:1},

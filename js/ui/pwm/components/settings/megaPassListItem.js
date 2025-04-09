@@ -15,6 +15,7 @@ class MegaPassListItem extends MegaComponent {
         if (options.leftIcon) {
             this.leftIcon = document.createElement('div');
             this.leftIcon.className = 'mega-list-item-left-icon';
+            this.leftIcon.appendChild(options.leftIcon);
             this.domNode.append(this.leftIcon);
         }
 
@@ -111,6 +112,15 @@ class MegaPassListItem extends MegaComponent {
                 ...options.toggle
             });
             toggleButton.setButtonState(options.toggle.checked);
+        }
+
+        if (options.checkbox) {
+            const checkbox = new MegaCheckbox({
+                parentNode: this.rightcontainer,
+                componentClassname: 'mega-checkbox',
+                ...options.checkbox
+            });
+            checkbox.show();
         }
 
         if (options.dropdown) {

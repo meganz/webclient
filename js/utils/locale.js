@@ -1942,6 +1942,11 @@ mBroadcaster.once('boot_done', function populate_l() {
                  `<a class="clickurl" href="https://help.mega.io/pass/features/import-passwords" target="_blank">`)
         .replace('[/A]', '</a>');
 
+    l.import_password_subtitle = escapeHTML(l.import_password_subtitle)
+        .replace('[A]',
+                 `<a class="clickurl" href="https://help.mega.io/pass/features/import-passwords" target="_blank">`)
+        .replace('[/A]', '</a>');
+
     l.referral_close_full = escapeHTML(l.referral_close_full)
         .replace('[A]', '<a href="https://mega.io/refer" target="_blank" class="clickurl">')
         .replace('[/A]', '</a>');

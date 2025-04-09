@@ -29,7 +29,9 @@ window.OBV4_FLAGS = {
     UNUSED_14: 'unused14',
     UNUSED_15: 'unused15',
     CLOUD_DRIVE_DC: 'obcddc',
-    CLOUD_DRIVE_DC_BUBBLE: 'obcddcb'
+    CLOUD_DRIVE_DC_BUBBLE: 'obcddcb',
+    PASS: 'obmp',
+    PASS_INIT: 'obmpi'
     // New onboarding flags to be added at the end of this object. Don't change the order!!!!
     // UNUSED_X flags can be repurposed.
 };
@@ -147,6 +149,100 @@ mBroadcaster.addListener('fm:initialized', () => {
                         }
                     ]
                 },
+            ]
+        },
+        pwm: {
+            title: 'MEGA Pass',
+            flag: OBV4_FLAGS.PASS,
+            steps: [
+                {
+                    name: l.mega_pwm,
+                    flag: OBV4_FLAGS.PASS_INIT,
+                    actions: [
+                        {
+                            type: 'showOnBoardingDialog',
+                            options: {
+                                steps: [
+                                    {
+                                        label: l[20556],
+                                        title: l.mega_pass_onboarding,
+                                        description: l.mega_pass_onboarding_desc,
+                                        imageClass: 'pwm-image',
+                                        nextText: l[556],
+                                        skipText: l.mega_pass_onboarding_skip,
+                                        onNext: 2
+                                    },
+                                    {
+                                        label: l.import_password,
+                                        subtitle: l.import_password_subtitle,
+                                        nextText: l[99],
+                                        skipText: l.import_password_skip,
+                                        onNext: () => {
+                                            mega.ui.onboarding.selector.uploadFile()
+                                                .then((data) => {
+                                                    if (data) {
+                                                        mega.ui.onboarding.dataHandler =
+                                                            new MegaImportPassDataHandler(data);
+                                                        mega.ui.onboarding.sheet.goToStep(2.1, true);
+                                                    }
+                                                });
+                                        },
+                                        onSkip: 3,
+                                        nextDisabled: true,
+                                        customContent: () => {
+                                            mega.ui.onboarding.selector = new MegaImportPassSelector();
+                                            return mega.ui.onboarding.selector.container;
+                                        },
+                                        secondaryStep: {
+                                            label: l.manage_password,
+                                            subtitle: l.manage_password_subtitle,
+                                            nextText: l.import_selected_items,
+                                            skipText: l[822],
+                                            onNext: () => {
+                                                mega.ui.onboarding.dataHandler.saveData()
+                                                    .then((result) => {
+                                                        if (result) {
+                                                            mega.ui.onboarding.sheet.goToStep(3);
+                                                        }
+                                                    });
+                                            },
+                                            onSkip: () => {
+                                                mega.ui.onboarding.sheet.goToStep(2, true);
+                                            },
+                                            customContent: () => mega.ui.onboarding.dataHandler.container
+                                        }
+                                    },
+                                    {
+                                        label: l.install_extension,
+                                        title: l.install_extension_title,
+                                        subtitle: l.install_extension_subtitle,
+                                        nextText: l.install_extension,
+                                        skipText: l[18682],
+                                        onNext: () => {
+                                            mega.ui.onboarding.extension.installExtension();
+                                            mega.ui.onboarding.sheet.nextStep();
+                                        },
+                                        onSkip: () => {
+                                            mega.ui.onboarding.sheet.nextStep();
+                                        },
+                                        nextDisabled: true,
+                                        customContent: () => {
+                                            mega.ui.onboarding.extension = new MegaExtensionPassSelector();
+                                            return mega.ui.onboarding.extension.container;
+                                        },
+                                    },
+                                    {
+                                        title: l.mega_pass_onboarding_finish_title,
+                                        description: l.mega_pass_onboarding_finish_subtitle,
+                                        imageClass: 'green-check',
+                                        nextText: l.mega_pass_onboarding_finish_button
+                                    }
+                                ]
+                            },
+                            markComplete: true
+                        }
+                    ]
+                }
             ]
         }
     };
@@ -415,6 +511,31 @@ mBroadcaster.addListener('fm:initialized', () => {
             _obv4DeviceCentre();
         }
 
+        const _handleMegaPassSteps = () => {
+            if (!mega.ui.pm) {
+                delay('waitForMegaUiPm', _handleMegaPassSteps, 500);
+                return;
+            }
+            const pwmFeature = u_attr.features && u_attr.features.find(elem => elem[1] === 'pwm');
+            if (!pwmFeature || pwmFeature[0] <= Date.now() / 1000) {
+                return;
+            }
+            const {onboarding} = mega.ui;
+
+            if (onboarding && onboarding.currentSection) {
+                const {currentSection} = onboarding;
+
+                // Check if the current section is relevant and execute open steps
+                if (
+                    currentSection.map &&
+                    currentSection.map.flag === OBV4_FLAGS.PASS &&
+                    M.currentdirid === 'pwm'
+                ) {
+                    currentSection.startNextOpenSteps();
+                }
+            }
+        };
+
         const isOverridden = obMap && obMap['cloud-drive'].flag === OBV4_FLAGS.CLOUD_DRIVE_NEW_NAV;
         const _delayStart = () => {
             delay('delayKickstartOB', () => {
@@ -441,6 +562,8 @@ mBroadcaster.addListener('fm:initialized', () => {
                 if (isOverridden && M.currentrootid === M.RootID) {
                     mega.ui.onboarding.currentSection.startNextOpenSteps();
                 }
+
+                _handleMegaPassSteps();
             }, 1000);
         };
 
@@ -525,6 +648,7 @@ mBroadcaster.addListener('fm:initialized', () => {
                 case M.InboxID: return 'inbox';
                 case M.RubbishID: return 'rubbish-bin';
                 case 'chat': return 'chat';
+                case 'pwm': return 'pwm';
                 default: return M.currentrootid === undefined ? M.currentdirid : M.currentrootid;
             }
         }
@@ -1207,6 +1331,20 @@ mBroadcaster.addListener('fm:initialized', () => {
 
             mBroadcaster.once('closedialog', this.parentStep.toNextAction.bind(this.parentStep));
         }
+
+        showOnBoardingDialog() {
+
+            mega.ui.onboarding.sheet = new MegaOnboardingJourney(this.map.options);
+            mega.ui.onboarding.sheet.show();
+
+            if (this.map.markComplete) {
+                this.parentStep.markDone();
+                if (typeof this.map.postComplete === 'function') {
+                    this.map.postComplete();
+                }
+            }
+        }
+
     }
 
     mega.ui.onboarding = new OnboardV4(obMap, flagMap);

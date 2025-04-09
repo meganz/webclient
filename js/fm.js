@@ -1903,7 +1903,7 @@ function closeMsg() {
     var $dialog = $('#msgDialog').addClass('hidden');
     $dialog.parent().removeClass('msg-dialog-container');
 
-    if ($.dialog && !(M.chat && $.dialog === 'onboardingDialog')) {
+    if ($.dialog && !((M.chat && $.dialog === 'onboardingDialog') || $.dialog === 'Mega-Onboarding')) {
         $('.mega-dialog').removeClass('arrange-to-back');
         $('.mega-dialog-container.common-container').removeClass('arrange-to-back');
     }

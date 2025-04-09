@@ -460,7 +460,7 @@ body.de .mega-dialog.contact-picker-widget {
 }
 .fm-dialog-table.grid-table {
     width: calc(100% - 34px);
-    margin: 0 24px 0 8px;
+    margin-inline: 8px 24px;
 }
 .fm-dialog-table.grid-table td.extras-column {
     width: 24px;

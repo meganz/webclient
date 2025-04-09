@@ -402,15 +402,10 @@
             || this.onDeviceCenter && !mega.devices.ui.isCustomRender()) {
 
             this.gallery = 0;
-            const isDCInshareOrBackup = this.onDeviceCenter
-                                            && (
-                                                sharer(M.currentCustomView.nodeID)
-                                                || mega.devices.ui.isBackupRelated([M.currentCustomView.nodeID])
-                                            );
             if (fmconfig.uiviewmode | 0 && fmconfig.viewmode === 2 || fmViewMode === 2) {
                 this.gallery = 1;
             }
-            if (!isDCInshareOrBackup && mega.ui.secondaryNav) {
+            if (mega.ui.secondaryNav) {
                 mega.ui.secondaryNav.updateGalleryLayout(false);
                 mega.ui.secondaryNav.updateLayoutButton();
             }

@@ -3,8 +3,8 @@ lazy(mega.ui, 'mNodeFilter', () => {
     'use strict';
 
     // DOM caches
-    const $fmFilterChipsWrapper = $('.fm-filter-chips-wrapper', '.fm-right-files-block');
-    const $resetFilterChips = $('.fm-filter-reset', $fmFilterChipsWrapper);
+    let $fmFilterChipsWrapper;
+    let $resetFilterChips;
 
     // For modified date calculation, use today's date
     const today = new Date();
@@ -518,6 +518,9 @@ lazy(mega.ui, 'mNodeFilter', () => {
          * @returns {undefined}
          */
         initSearchFilter() {
+            $fmFilterChipsWrapper = $('.fm-filter-chips-wrapper', '.fm-right-files-block');
+            $resetFilterChips = $('.fm-filter-reset', $fmFilterChipsWrapper);
+
             $fmFilterChipsWrapper.removeClass('hidden');
 
             for (const name in filters) {
@@ -574,6 +577,8 @@ lazy(mega.ui, 'mNodeFilter', () => {
                 || mega.devices.ui.getRenderSection() === 'device-centre-folders';
 
             if (hidden) {
+                $fmFilterChipsWrapper =
+                    $fmFilterChipsWrapper || $('.fm-filter-chips-wrapper', '.fm-right-files-block');
                 $fmFilterChipsWrapper.addClass('hidden');
             }
             else {

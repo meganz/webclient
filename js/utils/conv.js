@@ -88,6 +88,21 @@
     };
 
     /**
+     * Helper to extend Array(s) where the use of the spread operator would fail.
+     * @param {Array} dst The destination array (what would be mutated with Array.push(...x) otherwise)
+     * @param {Array} src The source array to expand the destination one with.
+     * @param {Boolean} [unique] optionally, whether to return only non-duplicated entries.
+     * @returns {Array} newly extended array
+     * @memberOf array
+     */
+    array.extend = function(dst, src, unique = true) {
+        src = dst.concat(src);
+        dst = unique ? this.unique(src) : src;
+        // @todo optionally, mutate the dst array(?)
+        return dst;
+    };
+
+    /**
      * Remove an element from an array
      * @param {Array} input The input array
      * @param {*} value The value to remove

@@ -1091,7 +1091,7 @@ MegaData.prototype.copyNodes = async function(cn, t, del, tree) {
             for (let i = pkt.length; i--;) {
                 const {scnodes} = pkt[i];
                 if (scnodes) {
-                    result.push(...scnodes.map(n => n.h));
+                    result = array.extend(result, scnodes.map(n => n.h));
                 }
             }
 

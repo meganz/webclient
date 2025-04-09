@@ -2352,6 +2352,7 @@ body.loading .light-overlay {
     text-align: start;
     white-space: normal;
     transition: 200ms linear;
+    margin-bottom: 4px;
 }
 .fm-notification-block.visible,
 .mega-lite-mode .fm-notification-block.mega-lite-mode-warning {

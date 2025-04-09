@@ -19511,20 +19511,12 @@ class ConversationMessageMixin extends _mixins1__.u9 {
   getTimestampAsString() {
     return toLocaleTime(this.getTimestamp());
   }
-  getTimestamp() {
-    const {message} = this.props;
-    let timestampInt;
-    if (message.getDelay) {
-      timestampInt = message.getDelay();
-    } else if (message.delay) {
-      timestampInt = message.delay;
-    } else {
-      timestampInt = unixtime();
-    }
-    if (timestampInt && message.updated && message.updated > 0) {
-      timestampInt += message.updated;
-    }
-    return timestampInt;
+  getTimestamp(forUpdated) {
+    const {
+      message
+    } = this.props;
+    const timestamp = (message.getDelay == null ? void 0 : message.getDelay()) || message.delay || unixtime();
+    return forUpdated && message.updated > 0 ? timestamp + message.updated : timestamp;
   }
   componentDidUpdate() {
     const self = this;
@@ -33868,7 +33860,9 @@ class AbstractGenericMessage extends mixin.M {
       className: "message content-area selectable-txt"
     }, this.getName && this.getName(), this.getMessageTimestamp ? this.getMessageTimestamp() : grouped ? null : REaCt().createElement("div", {
       className: "message date-time simpletip",
-      "data-simpletip": time2date(this.getTimestamp(), 17)
+      "data-simpletip": time2date(this.getTimestamp(), 17),
+      "data-simpletipposition": "top",
+      "data-simpletipoffset": "4"
     }, this.getTimestampAsString()), !hideActionButtons && this.getMessageActionButtons && this.renderMessageActionButtons(this.getMessageActionButtons()), this.getContents && this.getContents(), hideActionButtons ? null : this.getEmojisImages()));
   }
 }
@@ -35560,7 +35554,9 @@ class Text extends AbstractGenericMessage {
       });
     } else {
       if (message.updated > 0 && !message.metaType) {
-        textMessage = `${textMessage} <em class="edited">${l[8887]}</em>`;
+        textMessage = `${textMessage} <em class="edited simpletip"
+                    data-simpletip="${toLocaleTime(this.getTimestamp(true))}"
+                    data-simpletipposition="top" data-simpletipoffset="4"> ${l[8887]} </em>`;
       }
       if (this.props.initTextScrolling) {
         messageDisplayBlock = REaCt().createElement(perfectScrollbar.O, {

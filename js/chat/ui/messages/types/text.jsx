@@ -295,7 +295,9 @@ export default class Text extends AbstractGenericMessage {
         }
         else {
             if (message.updated > 0 && !message.metaType) {
-                textMessage = `${textMessage} <em class="edited">${l[8887] /* `(edited)` */}</em>`;
+                textMessage = `${textMessage} <em class="edited simpletip"
+                    data-simpletip="${toLocaleTime(this.getTimestamp(true))}"
+                    data-simpletipposition="top" data-simpletipoffset="4"> ${l[8887] /* `(edited)` */} </em>`;
             }
             if (this.props.initTextScrolling) {
                 messageDisplayBlock =

@@ -86,7 +86,9 @@ export default class AbstractGenericMessage extends ConversationMessageMixin {
                     {this.getMessageTimestamp ? this.getMessageTimestamp() : grouped ? null : (
                         <div
                             className="message date-time simpletip"
-                            data-simpletip={time2date(this.getTimestamp(), 17)}>
+                            data-simpletip={time2date(this.getTimestamp(), 17)}
+                            data-simpletipposition="top"
+                            data-simpletipoffset="4">
                             {this.getTimestampAsString()}
                         </div>
                     )}

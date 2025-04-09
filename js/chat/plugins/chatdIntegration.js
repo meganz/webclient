@@ -1761,7 +1761,6 @@ ChatdIntegration.prototype.sendMessage = async function(chatRoom, messageObject)
 };
 
 ChatdIntegration.prototype.updateMessage = function(chatRoom, msgnum, newMessage) {
-    // a msgupd is only possible up to 1hour after the indicated (client-supplied) UTC timestamp.
     var cipher;
 
     var self = this;

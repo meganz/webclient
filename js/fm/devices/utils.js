@@ -144,6 +144,16 @@ lazy(mega.devices, 'utils', () => {
     };
 
     /**
+     * {Object} folderStatusPriority - Sync folders status priority definition
+     */
+    const folderStatusPriority = {
+        error: 1,
+        disabled: 2,
+        updating: 3,
+        success: 4,
+    };
+
+    /**
      * {Object} priorityHandlers - definition for priority based handlers to create Status UI elements
      */
     const priorityHandlers = {
@@ -303,7 +313,6 @@ lazy(mega.devices, 'utils', () => {
          * {Array<Function>} folderHandlers - array of functions to handle different status for folders
          */
         folderHandlers: [
-            priorityHandlers.inactive,
             priorityHandlers.error,
             priorityHandlers.disabled,
             priorityHandlers.updating,
@@ -314,7 +323,6 @@ lazy(mega.devices, 'utils', () => {
          * {Array<Function>} deviceHandlers - array of functions to handle different status for devices
          */
         deviceHandlers: [
-            priorityHandlers.inactive,
             priorityHandlers.attention,
             priorityHandlers.updating,
             priorityHandlers.success,
@@ -330,17 +338,18 @@ lazy(mega.devices, 'utils', () => {
         get: (status) => {
             if (status) {
                 if (status.isDevice) {
-                    const i = {
-                        1: 0,
-                        2: 1,
-                        3: 1,
-                        4: 2,
-                        5: 3,
+                    const {error, disabled, updating, success} = folderStatusPriority;
+
+                    // map from folder status priority to device status priority
+                    const deviceHandlerIndex = {
+                        [error]: 0,
+                        [disabled]: 0,
+                        [updating]: 1,
+                        [success]: 2,
                     }[status.priority];
 
-                    if (i !== undefined) {
-                        const isForceAttention = i === 0 && mega.devices.data.isActive(status.lastHeartbeat);
-                        return StatusUI.deviceHandlers[isForceAttention ? 1 : i];
+                    if (deviceHandlerIndex !== undefined) {
+                        return StatusUI.deviceHandlers[deviceHandlerIndex];
                     }
                 }
                 else if (status.priority > 0 && status.priority <= StatusUI.folderHandlers.length) {
@@ -361,6 +370,7 @@ lazy(mega.devices, 'utils', () => {
     return freeze({
         logger,
         timer: new Timer(),
+        folderStatusPriority,
         StatusUI,
     });
 });

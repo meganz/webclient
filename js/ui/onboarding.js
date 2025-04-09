@@ -418,6 +418,23 @@ mBroadcaster.addListener('fm:initialized', () => {
         const isOverridden = obMap && obMap['cloud-drive'].flag === OBV4_FLAGS.CLOUD_DRIVE_NEW_NAV;
         const _delayStart = () => {
             delay('delayKickstartOB', () => {
+
+                // If previewer will open delay onboarding execution until previewer is closed.
+                if (sessionStorage.previewNode) {
+
+                    const previewClosedEvent = mBroadcaster.addListener('slideshow:close', () => {
+
+                        mBroadcaster.removeListener(previewClosedEvent);
+                        _delayStart();
+                    });
+
+                    return;
+                }
+
+                if (pfid) {
+                    return;
+                }
+
                 mega.ui.onboarding.start();
 
                 // this onboarding requires kickstarting manually as it does not have control panel

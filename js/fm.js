@@ -2983,11 +2983,6 @@ function closeDialog(ev) {
         }
     }
 
-    if ($.dialog === 'recoverykey-logout-overlay') {
-        // PasswordReminderDialog manages its own states, so don't do anything.
-        return;
-    }
-
     if ($.dialog === 'terms' && $.registerDialog) {
         $('.mega-dialog.bottom-pages-dialog').addClass('hidden');
     }

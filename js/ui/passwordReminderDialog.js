@@ -545,9 +545,6 @@
                 component.hide();
                 component.clear();
             }
-            if ($.dialog === this.NAMESPACE) {
-                delete $.dialog;
-            }
         }
 
         async recheckLogoutDialog() {

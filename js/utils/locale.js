@@ -1090,10 +1090,6 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[7156] = escapeHTML(l[7156])
         .replace('[A]', '<a href="https://mega.io/mobile" target="_blank" class="clickurl">')
         .replace('[/A]', '</a>');
-    l[7202] = escapeHTML(l[7202]).replace(
-        '[A]',
-        '<a href="https://mega.io/resellers" target="_blank" rel="noopener noreferrer" class="voucher-reseller-link">'
-    ).replace('[/A]', '</a>');
     l[7709] = escapeHTML(l[7709]).replace('[S]', '<span class="complete-text">').replace('[/S]', '</span>');
     l[7945] = escapeHTML(l[7945]).replace('[B]', '<b>').replace('[/B]', '</b>');
     l[7991] = escapeHTML(l[7991])

@@ -780,7 +780,6 @@ function init_page() {
         && (page !== 'privacy')
         && (page !== 'gdpr')
         && (page !== 'takendown')
-        && (page !== 'resellers')
         && (page !== 'security')
         && (page !== 'storage')
         && (page !== 'objectstorage')
@@ -1432,9 +1431,6 @@ function init_page() {
     }
     else if (page == 'cmd') {
         mega.redirect('mega.io', 'cmd', false, false);
-    }
-    else if (page == 'resellers') {
-        mega.redirect('mega.io', 'resellers', false, false);
     }
     else if (page === 'storage') {
         mega.redirect('mega.io', 'storage', false, false);
@@ -2701,7 +2697,7 @@ function topmenuUI() {
                     'corporate', 'credits', 'desktop', 'developers', 'dispute', 'doc',
                     'extensions', 'keybackup', 'login', 'media', 'mega', 'megabackup', 'mobile',
                     'mobileapp', 'nas', 'objectstorage',
-                    'privacy', 'pro', 'register', 'reliability', 'resellers', 'sdk',
+                    'privacy', 'pro', 'register', 'reliability', 'sdk',
                     'securechat', 'security', 'share', 'sitemap', 'sourcecode', 'special',
                     'start', 'storage', 'support', 'syncing', 'takedown', 'terms', 'transparency',
                     'refer', 'individuals', 'freelancers', 'small-business', 'vpn', 'media-files',
@@ -2711,7 +2707,7 @@ function topmenuUI() {
                     'chatandmeetings', 'cmd', 'collaboration', 'contact', 'cookie', 'copyright',
                     'corporate', 'desktop', 'developers', 'dispute', 'doc', 'extensions', 'media',
                     'megabackup', 'mobile', 'mobileapp', 'nas', 'objectstorage', 'privacy',
-                    'refer', 'reliability', 'resellers', 'sdk', 'securechat', 'security', 'share',
+                    'refer', 'reliability', 'sdk', 'securechat', 'security', 'share',
                     'sourcecode', 'storage', 'syncing', 'takedown', 'terms', 'transparency', 'individuals',
                     'freelancers', 'small-business', 'vpn', 'media-files',
                 ];

@@ -623,7 +623,7 @@ class MegaMobileHeader extends MegaComponent {
 
             mega.ui.sheet.addContent(targetNode);
 
-            const selectedRadio = sortByGroup.children[sortByGroup.value || 'name'];
+            const selectedRadio = sortByGroup.getChild(sortByGroup.value || 'name');
 
             let orderArrowParent;
             if (selectedRadio && selectedRadio.domNode) {

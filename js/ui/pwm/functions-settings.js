@@ -38,95 +38,101 @@ lazy(mega.ui.pm.settings, 'utils', () => {
          */
         parseCSV(text, type) {
 
-            const lineEnd = text.charAt(text.indexOf('\n') - 1) === '\r' ? 'windows' : 'linux';
-            const lines = text.split('\n');
             const result = [];
             const headers = this.getHeaders(type);
 
             let inQuotes = false;
-            let currentLine = [];
+            let currentItem = '';
+            let currentLine = {};
+            let col = 0;
+            let lineNum = 1;
 
-            for (let i = 1; i < lines.length; i++) {
+            const _validateLine = line => {
 
-                if (lines[i].length === 0) {
-                    continue;
-                }
-
-                if (inQuotes) {
-                    let split = [];
-                    ({line: split, inQuotes} = this.splitCSVLine(lines[i], true));
-                    currentLine[currentLine.length - 1] = `${currentLine[currentLine.length - 1]}\n${split[0]}`;
-                    currentLine = [...currentLine, ...split.slice(1)];
-                }
-                else {
-                    ({line: currentLine, inQuotes} = this.splitCSVLine(lines[i], false));
+                // check first line is same as known header structure
+                if (lineNum === 1) {
+                    return Object.values(line).join(',') === headers.join(',');
                 }
 
-                if (type === '1password') {
-                    inQuotes = !currentLine[8].length;
-                }
-                else if (type === 'keepass') {
-                    inQuotes = !lines[i].endsWith('"');
-                }
-                else if ((type === 'google' || type === 'other') && lineEnd === 'windows') {
-                    inQuotes = !lines[i].trimEnd().endsWith(',')
-                        && !lines[i].trimEnd().endsWith('"') && !lines[i].endsWith('\r');
-                }
-                else {
-                    inQuotes = currentLine.length !== headers.length;
+                // check header and line has same column length
+                if (Object.keys(line).length !== headers.length) {
+                    return false;
                 }
 
-                if (!inQuotes && currentLine.length === headers.length) {
-                    const obj = {};
-                    for (let j = 0; j < headers.length; j++) {
-                        obj[headers[j]] = currentLine[j].trim();
+                if (type === 'nordpass' || type === 'proton') {
+                    const allowedType = type === 'nordpass' ? 'password' : 'login';
+
+                    if (line.type.trim() !== allowedType) {
+                        return false;
                     }
-                    if (type === 'nordpass' && obj.type !== 'password' || type === 'proton' && obj.type !== 'login') {
-                        continue;
-                    }
-                    result.push(obj);
                 }
-            }
-            return result;
-        },
 
-        /**
-         * Splits a line of CSV text into an array of values, handling quotes and escaped quotes.
-         *
-         * @param {string} line - A single line of CSV text to split.
-         * @param {boolean} inQuotes - Whether the line starts within a quoted section.
-         * @returns {{line: string[], inQuotes: boolean}} An object with the line as an array
-         * and the updated inQuotes status.
-         */
-        splitCSVLine(line, inQuotes) {
+                return true;
+            };
 
-            const result = [];
-            let current = '';
-
-            for (let i = 0; i < line.length; i++) {
-                const char = line[i];
+            // check every character in the text to determine row parsing
+            for (let i = 0; i < text.length; i++) {
+                const char = text[i];
+                const nextChar = text[i + 1];
 
                 if (char === '"') {
-                    if (inQuotes && i + 1 < line.length && line[i + 1] === '"') {
-                        // Escaped quote inside a quoted value
-                        current += '"';
-                        i++;
+                    if (inQuotes && nextChar === '"') {
+                        // This is an escaped double quote, just add it to the current line
+                        currentItem += char;
+                        i++; // skip the next double quote
                     }
                     else {
-                        // Toggle inQuotes flag
+                        // this is real double quote
                         inQuotes = !inQuotes;
                     }
                 }
-                else if (char === ',' && !inQuotes) {
-                    result.push(current);
-                    current = '';
+                else if (!inQuotes && (char === ',' || char === '\n' || char === '\r' && nextChar === '\n')) {
+
+                    // end of column or this is new line let's add to the result array
+                    currentLine[headers[col]] = currentItem.trim();
+                    currentItem = '';
+                    col++;
+
+                    // if this is new line, increment the line number
+                    if (char !== ',') {
+
+                        if (!_validateLine(currentLine)) {
+                            tell(`invalid_csv_file: ln: ${lineNum}`);
+                            return false;
+                        }
+                        else if (lineNum !== 1) {
+                            result.push(currentLine);
+                        }
+
+                        lineNum++;
+                        currentLine = {};
+                        col = 0;
+
+                        // if this is windows newline, skip the next character('\n')
+                        if (char === '\r') {
+                            i++;
+                        }
+                    }
                 }
                 else {
-                    current += char;
+                    currentItem += char;
                 }
             }
-            result.push(current);
-            return {line: result, inQuotes};
+
+            // add the last item after the loop if it does not finished with new line
+            if (col !== 0) {
+                currentLine[headers[col]] = currentItem.trim();
+
+                if (!_validateLine(currentLine)) {
+                    tell(`invalid_csv_file: ln: ${lineNum}`);
+                    return false;
+                }
+                else if (lineNum !== 1) {
+                    result.push(currentLine);
+                }
+            }
+
+            return result;
         },
 
         async saveData(data, type) {
@@ -216,6 +222,195 @@ lazy(mega.ui.pm.settings, 'utils', () => {
             else if (type === 'dashlane') {
                 return {name: entry.title, pwm: {pwd: entry.password, u: entry.username, n: entry.note,
                                                  url: entry.url}};
+            }
+        },
+
+        /**
+         * Processes the imported file and parses its content.
+         *
+         * @param {File} file The file to be processed
+         * @param {Object} importBtn The button triggering the import action
+         * @param {HTMLElement} errorMessage The element used to display error messages
+         * @returns {Promise<Array>} A promise that resolves with the parsed data from the file
+         * @throws {Error} Rejects if the file is invalid or there is an error during the file processing
+         */
+        processFile(file, importBtn, errorMessage) {
+            return new Promise((resolve, reject) => {
+                if (!file || !mega.pm.validateUserStatus()) {
+                    reject('Invalid file or user status.');
+                    return;
+                }
+
+                const isCSV = file.type === 'text/csv' || file.name.endsWith('.csv');
+                if (!isCSV) {
+                    reject('Invalid file type.');
+                    return;
+                }
+
+                const reader = new FileReader();
+
+                reader.onloadstart = function() {
+                    importBtn.loading = true;
+                    mega.ui.pm.settings.importInFlight = true;
+                    errorMessage.classList.add('hidden');
+                };
+
+                reader.onload = function(e) {
+                    const text = e.target.result;
+                    const data = mega.ui.pm.settings.utils.parseCSV(text, mega.ui.pm.settings.importSelected);
+                    if (data.length > 0) {
+                        resolve(data);
+                    }
+                    else {
+                        mega.ui.pm.settings.importInFlight = false;
+                        reject('No data found in CSV.');
+                    }
+                };
+
+                reader.onerror = function() {
+                    mega.ui.pm.settings.importInFlight = false;
+                    reject('Error reading file.');
+                };
+
+                reader.readAsText(file);
+            });
+        },
+
+        /**
+         * Imports the selected file and handles the subsequent actions.
+         *
+         * @param {File} file The file to be imported
+         * @param {Object} importBtn The button triggering the import action
+         * @param {HTMLElement} errorMessage The element used to display error messages
+         * @param {HTMLElement} chooseFileBtn The file selection button
+         * @param {HTMLElement} importBtnText The element used to display the status of the import process
+         * @param {HTMLInputElement} fileInput The input element used for file selection
+         * @returns {void}
+         * Handles the file processing, saving data, and updating the UI accordingly
+         */
+        importFile(file, importBtn, errorMessage, chooseFileBtn, importBtnText, fileInput) {
+            this.processFile(file, importBtn, errorMessage)
+                .then(data => this.saveImportedData(data))
+                .then(() => {
+                    mega.ui.toast.show(l.import_success_toast);
+                    importBtn.disabled = true;
+                    importBtnText.textContent = l.import_passwords_label;
+                    fileInput.value = '';
+                    mega.ui.pm.settings.file = null;
+                })
+                .catch(() => {
+                    errorMessage.classList.remove('hidden');
+                    importBtn.disabled = false;
+                    importBtn.domNode.blur();
+                })
+                .finally(() => {
+                    chooseFileBtn.disabled = false;
+                    importBtn.loading = false;
+                });
+        },
+
+        /**
+         * Saves the imported data to the system.
+         *
+         * @param {Array} data The data to be saved
+         * @returns {Promise<void>} A promise that resolves when the data has been successfully saved
+         * @throws {Error} Rejects if an error occurs while saving the data
+         */
+        saveImportedData(data) {
+            if (!navigator.onLine) {
+                if (!mega.ui.pm.settings.saveDataCalled) {
+                    mega.ui.pm.settings.importInFlight = false;
+                }
+                return Promise.reject(new Error('No internet connection'));
+            }
+
+            mega.ui.pm.settings.importInFlight = true;
+            mega.ui.pm.settings.saveDataCalled = true;
+
+            return mega.ui.pm.settings.utils.saveData(data, mega.ui.pm.settings.importSelected)
+                .then(() => {
+                    eventlog(this.getImportEventId(mega.ui.pm.settings.importSelected));
+                })
+                .catch(ex => {
+                    throw ex;
+                })
+                .finally(() => {
+                    mega.ui.pm.settings.importInFlight = false;
+                    mega.ui.pm.settings.saveDataCalled = false;
+                });
+        },
+
+        /**
+         * Retrieves the event ID associated with the import provider.
+         *
+         * @param {string} type The import provider type (e.g., 'google', 'keepass', etc.)
+         * @returns {number} The event ID corresponding to the given import provider type
+         */
+        getImportEventId(type) {
+            const eventMap = {
+                'google': 500604,
+                'keepass': 500605,
+                'lastpass': 500606,
+                'dashlane': 500607,
+                '1password': 500608,
+                'bitwarden': 500609,
+                'nordpass': 500610,
+                'proton': 500611,
+                'other': 500612
+            };
+            return eventMap[type];
+        },
+
+        handleImportFlow(nodeID, isOffline = false) {
+            if (nodeID === 'account') {
+                const importBtn = pmlayout.componentSelector('.import-file');
+                const errorMessage = pmlayout.querySelector('.import-error-message');
+                const chooseFileBtn = pmlayout.querySelector('.choose-file');
+                if (isOffline) {
+                    this.handleErrorOnImportInFlight(importBtn, errorMessage, null, chooseFileBtn);
+                }
+                else {
+                    this.handleResumeOnImportInFlight(importBtn, errorMessage);
+                }
+            }
+            else if (mega.ui.onboarding.sheet && mega.ui.onboarding.sheet.dialog.visible) {
+                const dialogNode = mega.ui.onboarding.sheet.dialog.domNode;
+                const importBtn = dialogNode.componentSelector('.next-button');
+                const errorMessage = dialogNode.querySelector('.main-content-div:not(.hidden) .message.error');
+                const infoMessage = dialogNode.querySelector('.main-content-div:not(.hidden) .message.info');
+                if (isOffline) {
+                    this.handleErrorOnImportInFlight(importBtn, errorMessage, infoMessage);
+                }
+                else {
+                    this.handleResumeOnImportInFlight(importBtn, errorMessage, infoMessage);
+                }
+            }
+        },
+
+        handleErrorOnImportInFlight(importBtn, errorMessage, infoMessage = null, chooseFileBtn = null) {
+            if (mega.ui.pm.settings.importInFlight) {
+                errorMessage.classList.remove('hidden');
+                importBtn.loading = false;
+                importBtn.disabled = false;
+
+                if (infoMessage) {
+                    infoMessage.classList.add('hidden');
+                }
+
+                if (chooseFileBtn) {
+                    chooseFileBtn.disabled = false;
+                }
+            }
+        },
+
+        handleResumeOnImportInFlight(importBtn, errorMessage, infoMessage = null) {
+            if (mega.ui.pm.settings.importInFlight) {
+                errorMessage.classList.add('hidden');
+                importBtn.loading = true;
+
+                if (infoMessage) {
+                    infoMessage.classList.remove('hidden');
+                }
             }
         },
 

@@ -847,7 +847,7 @@ class MegaHeader extends MegaMobileHeader {
                 componentClassname: 'download-pwm-ext extlink',
                 target: '_blank',
                 text: l.try_pass_ext_download,
-                href: this.pwmExtensionUrl
+                href: this.getPwmExtensionUrl()
             });
 
             _buildInteractable({
@@ -1096,10 +1096,10 @@ class MegaHeader extends MegaMobileHeader {
         }
     }
 
-    get pwmExtensionUrl() {
-        return ua.details.browser === 'Edgium' ? 'https://microsoftedge.microsoft.com/addons/detail/' +
+    getPwmExtensionUrl(browser = ua.details.browser) {
+        return browser === 'Edgium' ? 'https://microsoftedge.microsoft.com/addons/detail/' +
             'mega-pass-secure-passwor/hjdopmdfeekbcakjbbienpbkdldkalfe' :
-            ua.details.browser === 'Firefox' ? 'https://addons.mozilla.org/en-US/firefox/addon/mega-password-manager/' :
+            browser === 'Firefox' ? 'https://addons.mozilla.org/en-US/firefox/addon/mega-password-manager/' :
                 'https://chromewebstore.google.com/detail/mega-pass/deelhmmhejpicaaelihagchjjafjapjc';
     }
 }

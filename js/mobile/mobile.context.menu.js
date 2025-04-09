@@ -676,7 +676,7 @@ mBroadcaster.once('boot_done', () => {
                     name: 'label-selector',
                     showClose: true,
                     title: l[17398],
-                    contents: Object.values(labelGroup.children).map(c => c.domNode),
+                    contents: labelGroup.map(c => c.domNode),
                     type: 'normal',
                     actions: n.lbl && [{
                         type: 'normal',

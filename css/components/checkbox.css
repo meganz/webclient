@@ -11,8 +11,8 @@
 }
 
 .mega-checkbox .checkbox-wrapper {
-    width: 18px;
-    height: 18px;
+    width: 24px;
+    height: 24px;
     order: 0;
     flex-grow: 0;
     border-radius: 2px;
@@ -26,8 +26,9 @@
     border: 1px solid var(--mobile-border-strong-selected);
 }
 
-.mega-checkbox .icon-check-after::after {
-    --icon-size: 18px;
+.mega-checkbox .icon-check-thin-outline,
+.mega-checkbox .icon-minus-regular-outline {
+    --icon-size: 24px;
     background: var(--mobile-selection-control);
     color: var(--mobile-icon-inverse);
 }

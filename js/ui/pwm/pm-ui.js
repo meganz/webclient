@@ -110,6 +110,9 @@ mega.ui.pm = {
         'use strict';
 
         mega.ui.alerts.hideSlots();
+
+        const nodeID = M.currentdirid === 'pwm' ? 'pwm' : M.currentCustomView.nodeID;
+        mega.ui.pm.settings.utils.handleImportFlow(nodeID, false);
     },
 
     _offline() {
@@ -117,16 +120,8 @@ mega.ui.pm = {
 
         mega.ui.banner.show('', l.no_internet, '', 'error', false, true, true);
 
-        const importBtn = pmlayout.querySelector('.import-file');
-        const chooseFileBtn = pmlayout.querySelector('.choose-file');
-        const errorMessage = pmlayout.querySelector('.import-error-message');
-
-        if (mega.ui.pm.settings.importInFlight) {
-            errorMessage.classList.remove('hidden');
-            chooseFileBtn.disabled = false;
-            importBtn.disabled = false;
-            importBtn.loading = false;
-        }
+        const nodeID = M.currentdirid === 'pwm' ? 'pwm' : M.currentCustomView.nodeID;
+        mega.ui.pm.settings.utils.handleImportFlow(nodeID, true);
     },
 
     comm: {

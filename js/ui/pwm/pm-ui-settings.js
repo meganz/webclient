@@ -160,75 +160,9 @@ mega.ui.pm.settings = {
             disabled: true,
             componentClassname: 'import-file',
             onClick: () => {
-                if (this.file && mega.pm.validateUserStatus()) {
-                    const reader = new FileReader();
-
-                    reader.onloadstart = function() {
-                        importBtn.loading = true;
-                        mega.ui.pm.settings.importInFlight = true;
-                        errorMessage.classList.add('hidden');
-                    };
-
-                    reader.onload = function(e) {
-                        const text = e.target.result;
-                        const data = mega.ui.pm.settings.utils.parseCSV(text, mega.ui.pm.settings.importSelected);
-                        if (data.length > 0) {
-                            mega.ui.pm.settings.utils.saveData(data, mega.ui.pm.settings.importSelected)
-                                .then(() => {
-                                    chooseFileBtn.disabled = false;
-                                    importBtn.disabled = true;
-                                    importBtn.loading = false;
-                                    mega.ui.toast.show(l.import_success_toast);
-                                    importBtnText.textContent = l.import_passwords_label;
-                                    fileInput.value = '';
-                                    mega.ui.pm.settings.file = null;
-                                    mega.ui.pm.settings.importInFlight = false;
-                                    let importEventId;
-                                    switch (mega.ui.pm.settings.importSelected) {
-                                        case 'keepass':
-                                            importEventId = 500605;
-                                            break;
-                                        case 'lastpass':
-                                            importEventId = 500606;
-                                            break;
-                                        case 'dashlane':
-                                            importEventId = 500607;
-                                            break;
-                                        case '1password':
-                                            importEventId = 500608;
-                                            break;
-                                        case 'bitwarden':
-                                            importEventId = 500609;
-                                            break;
-                                        case 'nordpass':
-                                            importEventId = 500610;
-                                            break;
-                                        case 'proton':
-                                            importEventId = 500611;
-                                            break;
-                                        case 'other':
-                                            importEventId = 500612;
-                                            break;
-                                        default:
-                                            importEventId = 500604;
-                                    }
-                                    eventlog(importEventId);
-                                })
-                                .catch((ex) => {
-                                    importBtn.loading = false;
-                                    tell(ex);
-                                });
-                        }
-                        else {
-                            errorMessage.classList.remove('hidden');
-                            chooseFileBtn.disabled = false;
-                            importBtn.disabled = false;
-                            importBtn.loading = false;
-                            importBtn.domNode.blur();
-                        }
-                    };
-                    reader.readAsText(this.file);
-                }
+                mega.ui.pm.settings.utils.importFile(
+                    this.file, importBtn, errorMessage, chooseFileBtn, importBtnText, fileInput
+                );
             }
         });
         importBlock.listNode.append(importButtonItem);

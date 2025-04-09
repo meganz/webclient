@@ -94,3 +94,9 @@ body.pwm-ui .pm-main .mega-header {
 .theme-dark .pm-main .sprite-fm-illustration-wide.img-mega-logo {
     background: url('../../images/pm/favicons/pwm_logo_darkmode.svg') no-repeat;
 }
+
+/* RTL support */
+body.rtl .pm-main,
+body.rtl .overlay-wrap {
+   direction: rtl;
+}

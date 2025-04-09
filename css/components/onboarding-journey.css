@@ -1,0 +1,113 @@
+.mega-sheet.on-boarding .sheet {
+    max-width: 900px;
+    height: 680px;
+    padding: 0;
+    background: var(--mobile-page-background);
+    border: 1px solid var(--mobile-border-subtle);
+}
+
+.mega-sheet.on-boarding .sheet .main,
+.mega-sheet.on-boarding .sheet .actions {
+    width: 100%;
+    padding: 0;
+}
+
+.mega-sheet.on-boarding .sheet .content {
+    height: 100%;
+}
+
+.mega-on-boarding {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    height: 100%;
+}
+
+.mega-on-boarding .steps {
+    width: 248px;
+    padding: 48px 24px;
+    box-sizing: border-box;
+}
+
+.mega-on-boarding .main-content {
+    display: flex;
+    flex-direction: column;
+    padding: 48px 0;
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    border-inline-start: 1px solid var(--mobile-border-strong);
+    box-sizing: border-box;
+}
+
+.mega-on-boarding .main-content-div {
+    max-height: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.mega-on-boarding .main-content .image-wrapper > div {
+    border-radius: 0;
+    margin-bottom: 20px;
+}
+
+.mega-on-boarding .main-content .image-wrapper .green-check {
+    background-image: url("../../images/onboarding/green-check-3d.png");
+    background-size: contain;
+    width: 96px;
+    height: 96px;
+}
+
+.mega-on-boarding .main-content h1 {
+    font: var(--mobile-font-heading-h1);
+    margin: 0 0 4px;
+}
+
+.mega-on-boarding .main-content a {
+    color: var(--mobile-link-primary);
+}
+
+.mega-on-boarding .main-content p.subtitle {
+    font: var(--mobile-font-caption-small-regular);
+    color: var(--mobile-text-secondary);
+    line-height: 18px;
+    letter-spacing: 0.24px;
+    margin-top: 0;
+    margin-bottom: 16px;
+}
+
+.mega-on-boarding .main-content .custom-div,
+.mega-on-boarding .main-content .custom-div > div {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.mega-on-boarding .main-content-div > *:not(.custom-div),
+.mega-sheet.on-boarding .sheet .actions,
+.mega-on-boarding .custom-div > div > *:not(.mega-component) {
+    padding: 0 48px;
+}
+
+.mega-on-boarding .main-content .actions,
+.mega-sheet .sheet .actions {
+    margin-top: auto;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.mega-on-boarding .main-content .actions button {
+    width: auto;
+}
+
+@media only screen and (max-width: 1079px) {
+
+    .mega-sheet.on-boarding .sheet {
+        max-width: 600px;
+    }
+
+    .mega-on-boarding .steps {
+        width: 80px;
+    }
+}

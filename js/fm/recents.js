@@ -1358,6 +1358,9 @@ RecentsRender.prototype._onResize = function() {
         this._resizeListeners[i]();
     }
     fm_thumbnails();
+    if (this._dynamicList && this._dynamicList.listContainer && this._dynamicList.listContainer.Ps) {
+        this._dynamicList.listContainer.Ps.update();
+    }
     if (d) {
         console.timeEnd("recents.resizeListeners");
     }

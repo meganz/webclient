@@ -80,7 +80,7 @@
 .dropdown-section-body .dropdown-section-body-item:hover {
     background: var(--stroke-grey-2);
 }
-.dropdown-results .dropdown-section-body .dropdown-section-body-item:last-child:hover {
+.dropdown-search .dropdown-recents .dropdown-section.last-section .dropdown-section-body-item:last-child:hover {
     border-radius: 0 0 18px 18px;
 }
 .dropdown-section-body .dropdown-recently-searched-item {

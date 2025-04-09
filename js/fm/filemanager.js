@@ -901,8 +901,18 @@ FileManager.prototype.initFileManagerUI = function() {
             if (!(a && a.classList.contains('breadcrumb-dropdown-link'))) {
                 $('.breadcrumb-dropdown, .fm-breadcrumbs-wrapper .breadcrumb-dropdown-link').removeClass('active');
             }
+
+            const $dropdownSearch = $('.dropdown-search', '#startholder .js-topbar, #fmholder .mega-header');
+            const persistDropdownSearch = $dropdownSearch.length && currentNodeClass
+                                            && (
+                                                currentNodeClass.contains('js-filesearcher')
+                                                || $.contains($dropdownSearch.get(0), event.target)
+                                            );
+
+            if (!persistDropdownSearch) {
+                $('.dropdown-search', '.js-topbar-searcher').addClass('hidden');
+            }
         }
-        $('.dropdown-search').addClass('hidden');
         $('.nw-sorting-menu').addClass('hidden');
         $('.colour-sorting-menu').addClass('hidden');
         $('.nw-tree-panel-arrows.active').removeClass('active');

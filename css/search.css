@@ -102,8 +102,7 @@
     margin-top: 0;
 }
 .dropdown-search .dropdown-search-results .dropdown-search-results-item {
-    display: grid;
-    grid-template-columns: 1fr auto;
+    display: flex;
 }
 .dropdown-search .dropdown-search-results .dropdown-search-results-item-filename {
     display: flex;
@@ -120,6 +119,17 @@
 }
 .dropdown-search .dropdown-search-results .dropdown-search-results-item-filename .txt-bold {
     opacity: 1;
+}
+.dropdown-search .dropdown-search-results .dropdown-search-results-item > div {
+    max-width: 50%;
+}
+.dropdown-search .dropdown-search-results .dropdown-search-results-item > div:not(:last-child) {
+    margin-inline-end: 64px;
+}
+.dropdown-search .dropdown-search-results .dropdown-search-results-item .dropdown-item-text-medium {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 .dropdown-search-results-item-file-icon {
     text-align: start;

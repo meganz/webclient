@@ -778,6 +778,41 @@
                             </div>
                         </div>
                     </div>
+                    <div class="search-loader hidden"></div>
+                    <!-- Search Results section -->
+                    <div class="dropdown-results dropdown-section hidden">
+                        <div class="dropdown-search-results dropdown-section-item">
+                            <!-- Every section has a header -->
+                            <div class="dropdown-section-header">
+                                <div class="dropdown-section-header-contents">
+                                    <div class="dropdown-section-header-text">
+                                        [$searchbar_result_label]
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Every section has a body -->
+                            <div class="dropdown-section-body">
+                                <!-- Suggestion search result - dynamically populated -->
+                            </div>
+                            <!-- Template for search result item -->
+                            <a
+                                class="dropdown-search-results-item dropdown-section-body-item dropdown-search-results-item-template hidden">
+                                <div class="dropdown-item-file dropdown-search-results-file">
+                                    <div class="dropdown-search-results-item-file-icon">
+                                        <span class="item-type-icon">
+                                            <img>
+                                        </span>
+                                    </div>
+                                    <div class="dropdown-search-results-item-filename">
+                                        <span class="prefix"></span>
+                                        <span class="txt-bold"></span>
+                                        <span class="suffix"></span>
+                                    </div>
+                                </div>
+                                <div class="dropdown-search-results-item-location dropdown-item-text-medium"></div>
+                            </a>
+                        </div>
+                    </div>
                     <div class="dropdown-recents dropdown-section">
                         <!-- Recently Searched section -->
                         <div class="dropdown-section dropdown-recently-searched-wrapper">
@@ -837,41 +872,6 @@
                             </div>
                         </div>
                     </div>
-                    <!-- Search Results section -->
-                    <div class="dropdown-results dropdown-section hidden">
-                        <div class="dropdown-search-results dropdown-section-item">
-                            <!-- Every section has a header -->
-                            <div class="dropdown-section-header">
-                                <div class="dropdown-section-header-contents">
-                                    <div class="dropdown-section-header-text">
-                                        [$searchbar_result_label]
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- Every section has a body -->
-                            <div class="dropdown-section-body">
-                                <!-- Suggestion search result - dynamically populated -->
-                            </div>
-                            <!-- Template for search result item -->
-                            <a
-                                class="dropdown-search-results-item dropdown-section-body-item dropdown-search-results-item-template hidden">
-                                <div class="dropdown-item-file dropdown-search-results-file">
-                                    <div class="dropdown-search-results-item-file-icon">
-                                        <span class="item-type-icon">
-                                            <img>
-                                        </span>
-                                    </div>
-                                    <div class="dropdown-search-results-item-filename">
-                                        <span class="prefix"></span>
-                                        <span class="txt-bold"></span>
-                                        <span class="suffix"></span>
-                                    </div>
-                                </div>
-                                <div class="dropdown-search-results-item-location dropdown-item-text-medium"></div>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="search-loader hidden"></div>
                 </div>
                 <form autocomplete="disabled" id="main-search-fake-form">
                     <i class="search-icon sprite-fm-mono icon-preview-reveal"></i>

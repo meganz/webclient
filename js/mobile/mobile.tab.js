@@ -98,7 +98,7 @@ class MegaMobileTab extends MegaComponent {
                 return false;
             }
 
-            this.activeTab = e.target.key;
+            this.activeTab = e.target.key || e.currentTarget.key;
             this.applyDomChange();
 
             if (typeof item.onSelect === 'function') {

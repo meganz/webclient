@@ -110,6 +110,8 @@ class MegaSheet extends MegaOverlay {
                 return;
             }
 
+            this.safeShow = true;
+
             M.safeShowDialog(options.name, () => {
                 super.show(options);
                 this.type = options.type || 'normal';
@@ -138,16 +140,18 @@ class MegaSheet extends MegaOverlay {
         tryCatch(() => document.activeElement.blur())();
     }
 
-    hide() {
-        super.hide();
+    hide(name) {
         mega.ui.overlay.domNode.classList.remove('arrange-to-back');
 
         if ($.msgDialog) {
             closeMsg();
         }
-        else if ($.dialog) {
+        else if (this.safeShow && $.dialog === this.name) {
             closeDialog();
+            this.safeShow = false;
         }
+
+        super.hide(name);
     }
 
     clear() {
@@ -164,13 +168,17 @@ class MegaSheet extends MegaOverlay {
      *
      * @returns {void}
      */
-    addTitle(title) {
+    addTitle(title, className) {
         this.clearTitle();
         let subNode = title;
 
         if (typeof subNode === 'string') {
             subNode = document.createElement('h2');
             subNode.textContent = title;
+
+            if (className) {
+                subNode.className = className;
+            }
         }
 
         this.titleNode.appendChild(subNode);

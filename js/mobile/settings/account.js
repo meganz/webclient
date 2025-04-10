@@ -17,7 +17,7 @@ mobile.settings.account = Object.create(mobile.settingsHelper, {
 
 
             this.domNode = useOverlay ?
-                mCreateElement('div', {class: 'mega-mobile-settings account'}) : this.generatePage('account');
+                mCreateElement('div', {class: 'mega-mobile-settings account mob-px-6'}) : this.generatePage('account');
 
             this.overlayAccount = useOverlay;
 
@@ -360,11 +360,7 @@ mobile.settings.account = Object.create(mobile.settingsHelper, {
 
             version.rebind('tap.versionupdate', () => {
                 if (++versionClickCounter >= 3) {
-                    mega.developerSettings.show();
-
-                    if (this.overlayAccount) {
-                        mega.ui.overlay.hide();
-                    }
+                    msgDialog('info', '', 'Developer tools have moved. Ask the team for access!');
                 }
                 delay('top-version-click', () => {
                     versionClickCounter = 0;

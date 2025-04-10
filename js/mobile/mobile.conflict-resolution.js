@@ -10,7 +10,7 @@ mobile.conflictResolution = {
         'use strict';
 
         if (!this.container) {
-            this.container = mCreateElement('div', {'class': 'conflict-resolution'});
+            this.container = mCreateElement('div', {'class': 'conflict-resolution px-6'});
             mCreateElement('div', {'class': 'info-txt-fn'}, this.container);
 
             // Action block a1
@@ -38,7 +38,6 @@ mobile.conflictResolution = {
                 parentNode: aside,
                 componentClassname: 'mega-checkbox duplicates-checkbox',
                 checkboxName: 'duplicates-checkbox',
-                checkboxAlign: 'left',
                 labelTitle: l[16494],
                 checked: false
             });

@@ -1,0 +1,58 @@
+.mega-sheet.on-boarding span.select-title {
+    font: var(--mobile-font-caption-large-bold);
+    margin-bottom: 16px;
+}
+
+.mega-sheet.on-boarding div.card-select-container {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0 48px;
+    box-sizing: border-box;
+    margin-bottom: 24px;
+    flex-grow: 1;
+    max-height: 100%;
+}
+
+.mega-sheet.on-boarding div.card-select-container.scrollable {
+    border-top: 1px solid var(--mobile-border-subtle);
+    border-bottom: 1px solid var(--mobile-border-subtle);
+    padding-top: 24px;
+}
+
+.mega-sheet.on-boarding div.card-select-container > .card {
+    margin-inline-end: 16px;
+    margin-bottom: 16px;
+}
+
+.mega-sheet.on-boarding .mega-component.fileField {
+    margin: 0 48px 24px;
+}
+
+.mega-sheet.on-boarding .mega-component.fileField .read-only-output .read-only-value {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.mega-sheet.on-boarding .message {
+    font: var(--mobile-font-caption-large-regular);
+    display: flex;
+    margin-bottom: 16px;
+}
+
+.mega-sheet.on-boarding .message i {
+    margin-inline-end: 8px;
+    margin-top: 4px;
+}
+
+.mega-sheet.on-boarding .message.error {
+    color: var(--mobile-text-error);
+}
+
+.mega-sheet.on-boarding .message.info {
+    color: var(--mobile-text-secondary);
+}
+
+.mega-sheet.on-boarding .mega-component.fileField:not(.hidden) ~ .message {
+    margin-top: -16px;
+}

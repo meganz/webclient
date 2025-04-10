@@ -2352,6 +2352,7 @@ body.loading .light-overlay {
     text-align: start;
     white-space: normal;
     transition: 200ms linear;
+    margin-bottom: 4px;
 }
 .fm-notification-block.visible,
 .mega-lite-mode .fm-notification-block.mega-lite-mode-warning {
@@ -5293,49 +5294,6 @@ strong, b {
 }
 .widget-circle.percents-100 {
     background-position: 0 -1000px;
-}
-.resellers-main-block {
-    margin: 0 -25px;
-    font-size: 0;
-}
-.resellers-link {
-    width: 33.333333%;
-    width: calc(33.333333% - 50px);
-    min-height: 160px;
-    display: inline-block;
-    vertical-align: top;
-    margin: 25px 25px 25px 25px;
-    border: 2px solid #d9d9d9;
-    border-radius: 5px;
-    text-align: center;
-    box-sizing: border-box;
-    transition: all 200ms ease-in-out;
-}
-.resellers-link:hover {
-    border-color: #D42400;
-}
-.resellers-link.single {
-    margin-left: 3px;
-}
-.resellers-logo {
-    display: block;
-    margin: 48px auto 29px auto;
-    width: 220px;
-}
-.resellers-logo.cb {
-    margin-top: 44px;
-}
-.resellers-payment {
-    width: 32px;
-    display: inline-block;
-    margin: 0 4px 0 4px;
-    opacity: 0.5;
-}
-.resellers-link:hover .resellers-payment {
-    opacity: 1;
-}
-.resellers-top-txt {
-    padding: 20px 0 17px 0;
 }
 .top-login-input-tooltip.active {
     display: block;
@@ -11487,83 +11445,6 @@ div.camera-bottom-txt {
     color: #868686;
 }
 
-.bottom-page.developer-settings .developer-settings-container {
-    margin-bottom: 100px;
-}
-.bottom-page.developer-settings h3 {
-    text-align: center;
-}
-.bottom-page.developer-settings .apply {
-    color: white;
-    background-color: #F0373A;
-    margin: 10px auto;
-    width: 300px;
-    display: flex;
-}
-.bottom-page.developer-settings .developer-setting {
-    width: 100%;
-}
-.bottom-page.developer-settings .misc {
-    display: grid;
-    flex-direction: column;
-    gap: 5px;
-}
-.bottom-page.developer-settings .user-attr-settings .entry-item {
-    width: 95%;
-}
-.bottom-page.developer-settings .api-setting-item {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    align-items: center;
-    gap: 12px;
-    padding: 4px;
-    position: relative;
-}
-.bottom-page.developer-settings .api-setting-item:not(.user-attr-settings) {
-    border-bottom: 1px solid #ccc;
-    padding-bottom: 10px;
-}
-.bottom-page.developer-settings .api-setting-item .simple-button {
-    grid-column: 1 / span 2;
-}
-.bottom-page.developer-settings .api-setting-item:last-child {
-    border-bottom: none;
-}
-.bottom-page.developer-settings .misc .api-setting-item .large-input {
-    grid-column: 2 / span 2;
-}
-.bottom-page.developer-settings .misc .api-setting-item.set-used-transfer input,
-.bottom-page.developer-settings .misc .api-setting-item .status-input select{
-    width: calc(100% - 60px);
-}
-.bottom-page.developer-settings .error {
-    outline: 2px solid red;
-    border-radius: 4px;
-}
-.bottom-page.developer-settings .user-attr-settings.error,
-.bottom-page.developer-settings .misc-dev.error {
-    padding-top: 14px;
-}
-.bottom-page.developer-settings .error::before {
-    position: absolute;
-    content: "Please enter name and value";
-    top: 0;
-    left: 3px;
-    font: var(--text-body2);
-    color: var(--text-color-error);
-}
-.bottom-page.developer-settings .set-used-transfer.error::before {
-    content: "Please enter desired quota";
-}
-.bottom-page.developer-settings .info {
-    font: var(--text-caption);
-    grid-column: 5;
-}
-.bottom-page.developer-settings .misc button {
-    width: max-content;
-}
-/** End Developer Settings Page **/
-
 /*temp code, will be removed after generic component.css is merged*/
 .button-container.default {
     width: 100%;
@@ -11645,6 +11526,9 @@ div.camera-bottom-txt {
 a.pr-faded-link {
     text-decoration: underline;
     color: var(--color-copy-secondary);
+}
+a.underline-offset-4 {
+    text-decoration-line: underline;
 }
 .mega-error-box {
     color: var(--text-color-error);

@@ -456,6 +456,10 @@ class MegaHeader extends MegaMobileHeader {
         notify.renderNotifications();
         mega.ui.header.handleMenu('notif');
         mega.ui.header.notifButton.icon = mega.ui.header.notifButton.icon.replace('thin-outline', 'regular-filled');
+        if (document.body.classList.contains('rtl')) {
+            this.notifMenu.style.right = fmconfig.leftPaneWidth <= 270 ?
+                `-${8 + (270 - fmconfig.leftPaneWidth)}px` : '-8px';
+        }
         eventlog(500322);
     }
 
@@ -487,6 +491,10 @@ class MegaHeader extends MegaMobileHeader {
         mega.ui.header.updateUserName(u_attr.fullname);
         mega.ui.header.updateEmail(u_attr.email);
         mega.ui.header.handleMenu('avatar');
+
+        if (u_attr.p) {
+            mega.ui.header.domNode.componentSelector('.priority-support').removeClass('hidden');
+        }
 
         eventlog(500323);
     }
@@ -839,7 +847,7 @@ class MegaHeader extends MegaMobileHeader {
                 componentClassname: 'download-pwm-ext extlink',
                 target: '_blank',
                 text: l.try_pass_ext_download,
-                href: this.pwmExtensionUrl
+                href: this.getPwmExtensionUrl()
             });
 
             _buildInteractable({
@@ -895,6 +903,11 @@ class MegaHeader extends MegaMobileHeader {
                         text: l[384],
                         target: '_blank',
                         href: 'https://help.mega.io/'
+                    },
+                    {
+                        componentClassname: 'priority-support hidden',
+                        text: l.menu_item_priority_support,
+                        href: '/support'
                     },
                     {
                         componentClassname: 'megaio extlink',
@@ -966,7 +979,7 @@ class MegaHeader extends MegaMobileHeader {
                 text: `V.${M.getSiteVersion()}`,
                 onClick: () => {
                     if (++versionClickCounter >= 3) {
-                        mega.developerSettings.show();
+                        msgDialog('info', '', 'Developer tools have moved. Ask the team for access!');
                     }
                     delay('top-version-click', () => {
                         versionClickCounter = 0;
@@ -1083,10 +1096,10 @@ class MegaHeader extends MegaMobileHeader {
         }
     }
 
-    get pwmExtensionUrl() {
-        return ua.details.browser === 'Edgium' ? 'https://microsoftedge.microsoft.com/addons/detail/' +
+    getPwmExtensionUrl(browser = ua.details.browser) {
+        return browser === 'Edgium' ? 'https://microsoftedge.microsoft.com/addons/detail/' +
             'mega-pass-secure-passwor/hjdopmdfeekbcakjbbienpbkdldkalfe' :
-            ua.details.browser === 'Firefox' ? 'https://addons.mozilla.org/en-US/firefox/addon/mega-password-manager/' :
+            browser === 'Firefox' ? 'https://addons.mozilla.org/en-US/firefox/addon/mega-password-manager/' :
                 'https://chromewebstore.google.com/detail/mega-pass/deelhmmhejpicaaelihagchjjafjapjc';
     }
 }

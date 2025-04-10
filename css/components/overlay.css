@@ -28,7 +28,7 @@
     flex-direction: column;
     width: 100%;
     box-sizing: border-box;
-    padding: 24px 0;
+    padding: 40px 0;
     background: var(--mobile-page-background);
     transform: translateY(100%);
     transition: transform 0.2s ease-out;
@@ -53,17 +53,10 @@
     position: relative;
 }
 
-.overlay-wrap .nav-elem.close {
-    padding: 0;
-    margin-left: auto;
-}
-
 .overlay-wrap .main {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 0 24px;
-    width: calc(100% - 48px);
     overflow: hidden;
     height: 100%;
 }
@@ -118,6 +111,12 @@
 .overlay-wrap .actions > *:not(:first-child),
 .mega-overlay:not(.action-button-bottom) .overlay > .actions {
     margin-top: 16px;
+}
+.overlay-wrap .main.ps {
+    padding-bottom: 4px;
+}
+.overlay-wrap .main .ps__rail-x {
+    margin-bottom: 0;
 }
 .overlay-wrap .actions .button {
     max-width: var(--mobile-elem-max-width);
@@ -195,13 +194,18 @@ body.mobile .overlay-wrap .image i.password {
 .overlay-wrap .header {
     display: flex;
     align-items: center;
-    padding: 0 24px;
     width: 100%;
     box-sizing: border-box;
 }
 
-.overlay-wrap .header > * {
-    margin-bottom: 16px;
+.overlay-wrap .header .close {
+    top: -1.5rem;
+    right: 1rem;
+    width: fit-content;
+}
+
+.rtl .overlay-wrap .header .close {
+    left: 1rem;
 }
 
 .overlay-wrap .header-title {
@@ -213,9 +217,8 @@ body.mobile .overlay-wrap .image i.password {
     flex-direction: column;
     width: 100%;
     box-sizing: border-box;
-    padding: 4px 24px 16px;
+    padding: 16px 40px 40px;
     transition: transform 0.2s ease-out;
-    max-height: 48px;
 }
 
 @media only screen and (orientation: landscape) and (max-height: 359px) {
@@ -224,8 +227,10 @@ body.mobile .overlay-wrap .image i.password {
     }
 }
 
-@media only screen and (min-width: 769px) {
-    .overlay-wrap .overlay-footer {
-        padding-top: 16px;
-    }
+.overlay-wrap.export-links-dialog .overlay-footer {
+    padding-top: 12px;
+}
+
+.overlay-wrap.export-links-dialog .overlay-footer {
+    padding-top: 12px;
 }

@@ -15,6 +15,7 @@
     display: flex;
     align-items: center;
     width: 100%;
+    box-sizing: border-box;
 }
 .context-menu .fm-item-info {
     white-space: nowrap;

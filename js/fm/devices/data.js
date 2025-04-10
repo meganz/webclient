@@ -56,6 +56,11 @@ lazy(mega.devices, 'data', () => {
              * {Timer} timer - Instance of timer
              */
             timer,
+
+            /**
+             * {Object} folderStatusPriority - Status priorities definition
+             */
+            folderStatusPriority,
         }
     } = mega.devices;
 
@@ -70,23 +75,12 @@ lazy(mega.devices, 'data', () => {
          */
         handlers: [
             {
-                is: ({folderHeartbeat}) => {
-                    return !isActive(folderHeartbeat);
-                },
-                run: ({status}) => {
-                    if (!status.priority || status.priority > 1) {
-                        status.priority = 1;
-                    }
-                    status.inactiveSyncs++;
-                }
-            },
-            {
                 is: ({folder}) => {
                     return M.getNodeRoot(folder.h) === M.RubbishID;
                 },
                 run: ({status}) => {
-                    if (!status.priority || status.priority > 2) {
-                        status.priority = 2;
+                    if (!status.priority || status.priority > folderStatusPriority.error) {
+                        status.priority = folderStatusPriority.error;
                     }
                     status.blockedSyncs++;
                     status.errorState = 20;
@@ -97,8 +91,8 @@ lazy(mega.devices, 'data', () => {
                     return !folder.syncState;
                 },
                 run: ({status}) => {
-                    if (!status.priority || status.priority > 2) {
-                        status.priority = 2;
+                    if (!status.priority || status.priority > folderStatusPriority.error) {
+                        status.priority = folderStatusPriority.error;
                     }
                     status.stoppedSyncs++;
                 }
@@ -128,8 +122,8 @@ lazy(mega.devices, 'data', () => {
                         folder.t === syncType.oneWayDown && folder.syncState >= 6;
                 },
                 run: ({status}) => {
-                    if (!status.priority || status.priority > 3) {
-                        status.priority = 3;
+                    if (!status.priority || status.priority > folderStatusPriority.disabled) {
+                        status.priority = folderStatusPriority.disabled;
                     }
                     status.pausedSyncs++;
                 }
@@ -139,8 +133,8 @@ lazy(mega.devices, 'data', () => {
                     return folder.syncState === 2 || folder.syncState === 3;
                 },
                 run: ({status, folder}) => {
-                    if (!status.priority || status.priority > 2) {
-                        status.priority = 2;
+                    if (!status.priority || status.priority > folderStatusPriority.error) {
+                        status.priority = folderStatusPriority.error;
                     }
 
                     status.errorState = folder.ss;
@@ -158,8 +152,8 @@ lazy(mega.devices, 'data', () => {
                     return folder.hb && folder.hb.s === 6;
                 },
                 run: ({status}) => {
-                    if (!status.priority || status.priority > 2) {
-                        status.priority = 2;
+                    if (!status.priority || status.priority > folderStatusPriority.error) {
+                        status.priority = folderStatusPriority.error;
                     }
                     status.stalledSyncs++;
                 }
@@ -169,8 +163,8 @@ lazy(mega.devices, 'data', () => {
                     return folder.syncState === 4;
                 },
                 run: ({status}) => {
-                    if (!status.priority || status.priority > 3) {
-                        status.priority = 3;
+                    if (!status.priority || status.priority > folderStatusPriority.disabled) {
+                        status.priority = folderStatusPriority.disabled;
                     }
                     status.disabledSyncs++;
                 }
@@ -189,8 +183,8 @@ lazy(mega.devices, 'data', () => {
                     // or if MEGA folder was created > 10mins ago
                     if (!M.d[folder.h]
                         || (status.currentDate - M.d[folder.h].ts * 1000) / (1000 * 60) > 10) {
-                        if (!status.priority || status.priority > 2) {
-                            status.priority = 2;
+                        if (!status.priority || status.priority > folderStatusPriority.error) {
+                            status.priority = folderStatusPriority.error;
                         }
                         status.offlineSyncs++;
                     }
@@ -213,8 +207,8 @@ lazy(mega.devices, 'data', () => {
                     // Up to date
                     // if working fine or unrelated transfer type is paused
                     // and there is no heartbeat state or Up to date/unknown/not active
-                    if (!status.priority || status.priority > 5) {
-                        status.priority = 5;
+                    if (!status.priority || status.priority > folderStatusPriority.success) {
+                        status.priority = folderStatusPriority.success;
                     }
                     status.upToDateSyncs++;
                 }
@@ -224,8 +218,8 @@ lazy(mega.devices, 'data', () => {
                     return folder.hb && folder.hb.s === 5;
                 },
                 run: ({status}) => {
-                    if (!status.priority || status.priority > 4) {
-                        status.priority = 4;
+                    if (!status.priority || status.priority > folderStatusPriority.updating) {
+                        status.priority = folderStatusPriority.updating;
                     }
                     status.initializingSyncs++;
                 }
@@ -238,8 +232,8 @@ lazy(mega.devices, 'data', () => {
                     // Syncing. If 'p' value exitsts in backup, then the sync engine is working
                     // If it doesn't not exist, then we think that backup if synced
                     // as rest states will be filtered before
-                    if (!status.priority || status.priority > 4) {
-                        status.priority = 4;
+                    if (!status.priority || status.priority > folderStatusPriority.updating) {
+                        status.priority = folderStatusPriority.updating;
                     }
                     status.syncingPercs += folder.hb.p;
                     status.inProgressSyncs++;
@@ -250,8 +244,8 @@ lazy(mega.devices, 'data', () => {
                     return folder.hb && folder.hb.s === 3;
                 },
                 run: ({status}) => {
-                    if (!status.priority || status.priority > 4) {
-                        status.priority = 4;
+                    if (!status.priority || status.priority > folderStatusPriority.updating) {
+                        status.priority = folderStatusPriority.updating;
                     }
                     status.scaningSyncs++;
                 }
@@ -288,28 +282,28 @@ lazy(mega.devices, 'data', () => {
                 status.isDevice = status.isDevice || folder.status.isDevice;
                 status.isMobile = status.isMobile || folder.status.isMobile;
             }
-            else {
-                status = {
-                    'currentDate': Date.now(),
-                    'inactiveSyncs': 0,
-                    'blockedSyncs': 0,
-                    'disabledSyncs': 0,
-                    'errorState': undefined,
-                    'initializingSyncs': 0,
-                    'inProgressSyncs': 0,
-                    'isDevice': false,
-                    'isMobile': false,
-                    'lastHeartbeat': 0,
-                    'offlineSyncs': 0,
-                    'overquotaSyncs': 0,
-                    'pausedSyncs': 0,
-                    'scaningSyncs': 0,
-                    'stalledSyncs': 0,
-                    'stoppedSyncs': 0,
-                    'syncingPercs': 0,
-                    'syncsNumber': 0,
-                    'upToDateSyncs': 0
-                };
+
+            status = {
+                'currentDate': Date.now(),
+                'inactiveSyncs': 0,
+                'blockedSyncs': 0,
+                'disabledSyncs': 0,
+                'errorState': undefined,
+                'initializingSyncs': 0,
+                'inProgressSyncs': 0,
+                'isDevice': false,
+                'isMobile': false,
+                'lastHeartbeat': 0,
+                'offlineSyncs': 0,
+                'overquotaSyncs': 0,
+                'pausedSyncs': 0,
+                'scaningSyncs': 0,
+                'stalledSyncs': 0,
+                'stoppedSyncs': 0,
+                'syncingPercs': 0,
+                'syncsNumber': 0,
+                'upToDateSyncs': 0,
+                ...status,
             }
 
             let folderHeartbeat = 0;
@@ -335,6 +329,10 @@ lazy(mega.devices, 'data', () => {
             const handler = StatusBuilder.get({status, folder, folderHeartbeat: status.lastHeartbeat, timeDifference});
             if (handler) {
                 handler.run({status, folder});
+            }
+
+            if (!isActive(Math.min(status.lastHeartbeat, folderHeartbeat))) {
+                status.inactiveSyncs++;
             }
 
             return status;
@@ -408,9 +406,8 @@ lazy(mega.devices, 'data', () => {
                         foldersAddedSet.add(`${folder.d}:${folder.h}`);
                         Parser._outdatedByChecksum(currentData, outdated, device, folder);
 
-                        deviceStatus = deviceStatus ? StatusBuilder.build(folder, deviceStatus) : {...folder.status};
+                        deviceStatus = StatusBuilder.build(folder, deviceStatus || {isDevice: true});
                         deviceStatus.syncsNumber += 1;
-                        deviceStatus.isDevice = true;
 
                         if (getHeartbeat(apiFolder) > getHeartbeat(device)) {
                             device.props = {hb: apiFolder.hb};

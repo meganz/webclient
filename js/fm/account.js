@@ -219,10 +219,6 @@ accountUI.renderAccountPage = function(account) {
             accountUI.calls.init();
             break;
         case '/fm/account/vpn':
-            if (u_attr.b) {
-                loadSubPage('fm/account');
-                return false;
-            }
             $('.fm-account-vpn', accountUI.$contentBlock).removeClass('hidden');
             sectionClass = 'vpn';
 
@@ -771,12 +767,6 @@ accountUI.leftPane = {
         if (u_attr.s4) {
             // Show s4 button on naviation
             $menuItems.filter('.s4').removeClass('hidden');
-        }
-
-        // Show VPN settings
-        if (u_attr.b) {
-            // hide VPN button on naviation
-            $menuItems.filter('.vpn').addClass('hidden');
         }
 
         if (accountUI.plan.paymentCard.validateUser(M.account)) {
@@ -3074,7 +3064,7 @@ accountUI.transfers = {
                 var $uploadSettings = $('.upload-settings', accountUI.$contentBlock);
 
                 accountUI.transfers.uploadAndDownload.setSlider($uploadSettings, '#slider-range-max', {
-                    min: 1, max: 8, range: "min", value: fmconfig.ul_maxSlots || 4,
+                    min: 1, max: 8, range: "min", value: fmconfig.ul_maxSlots || ulmanager.ulDefConcurrency || 4,
                     change: function(e, ui) {
                         if (M.currentdirid === 'account/transfers' && ui.value !== fmconfig.ul_maxSlots) {
                             mega.config.setn('ul_maxSlots', ui.value);

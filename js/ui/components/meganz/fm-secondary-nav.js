@@ -91,13 +91,16 @@ class MegaNavCard extends MegaComponent {
                 this.isS4 = true;
                 return node;
             }
-            if (node.t === 1) {
+            if (node.t === 1 || M.onDeviceCenter && node.t === 2) {
                 if (M.onDeviceCenter) {
                     const { folder } = mega.devices.ui.getCurrentDirData();
                     if (!folder) {
                         return false;
                     }
-                    this.isBackup = mega.devices.ui.isBackupRelated(handle);
+                    if (node.h === M.RootID) {
+                        folder.name = l[164];
+                    }
+                    this.isBackup = M.getNodeRoot(handle) === M.InboxID;
                     this.isSync = !this.isBackup;
                     return folder;
                 }
@@ -231,13 +234,13 @@ class MegaNavCard extends MegaComponent {
         else if (this.isSync || this.isBackup) {
             const { status } = this.node;
             if (status.priority > 0 && status.priority <= mega.devices.utils.StatusUI.folderHandlers.length) {
+                const {error, disabled, updating, success} = mega.devices.utils.folderStatusPriority;
                 let statusName = {
-                    0: 'inactive',
-                    1: 'error',
-                    2: 'clear',
-                    3: 'updating',
-                    4: 'success',
-                }[status.priority - 1] || 'status-unknown';
+                    [error]: 'error',
+                    [disabled]: 'clear',
+                    [updating]: 'updating',
+                    [success]: 'success',
+                }[status.priority] || 'status-unknown';
                 if (statusName === 'clear' && status.disabledSyncs) {
                     statusName = 'warning';
                 }
@@ -259,16 +262,13 @@ class MegaNavCard extends MegaComponent {
         }
         else if (this.isDevice) {
             const { status } = this.node;
+            const {error, disabled, updating, success} = mega.devices.utils.folderStatusPriority;
             let statusName = {
-                1: 'inactive',
-                2: 'attention',
-                3: 'attention',
-                4: 'updating',
-                5: 'success',
+                [error]: 'attention',
+                [disabled]: 'attention',
+                [updating]: 'updating',
+                [success]: 'success',
             }[status.priority] || 'status-unknown';
-            if (status.priority === 1 && mega.devices.data.isActive(status.lastHeartbeat)) {
-                statusName = 'attention';
-            }
             const itemNode = this.domNode.querySelector('.fm-item-badge');
             itemNode.textContent = '';
             itemNode.classList.add('dc-badge-status', statusName);
@@ -828,6 +828,7 @@ lazy(mega.ui, 'secondaryNav', () => {
         },
         onPageChange() {
             filterChipShown = false;
+            dcChipShown = false;
             if (window.selectionManager) {
                 // selectionManager should eventually reset but this needs to be empty now for some context menu updates
                 selectionManager.selected_list = [];

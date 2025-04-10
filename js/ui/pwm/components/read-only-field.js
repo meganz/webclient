@@ -168,7 +168,7 @@ class MegaReadOnlyField extends MegaComponent {
      * @returns {void}
      */
     passwordStrength() {
-        const strength = mega.ui.pm.utils.classifyPMPassword(this._originalValue);
+        const strength = MegaUtils.classifyPMPassword(this._originalValue);
 
         this.strenghtText.textContent = strength.string1;
         this.strengthCheck.className = `strength-checker ${strength.className}`;

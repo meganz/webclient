@@ -144,6 +144,16 @@ lazy(mega.devices, 'utils', () => {
     };
 
     /**
+     * {Object} folderStatusPriority - Sync folders status priority definition
+     */
+    const folderStatusPriority = {
+        error: 1,
+        disabled: 2,
+        updating: 3,
+        success: 4,
+    };
+
+    /**
      * {Object} priorityHandlers - definition for priority based handlers to create Status UI elements
      */
     const priorityHandlers = {
@@ -156,7 +166,6 @@ lazy(mega.devices, 'utils', () => {
             let text = '';
             let textClass = '';
             let tooltip = '';
-            let isWarning = false;
 
             if (status.overquotaSyncs) {
                 iconClass = 'error icon-cloud-storage-over-quota';
@@ -195,13 +204,11 @@ lazy(mega.devices, 'utils', () => {
                 text = mega.icu.format(l.stalled_sync_state, isDevice ? status.stalledSyncs : 1);
             }
             else if (status.offlineSyncs) {
-                const daysNum = 7; // Max Offline days to show warning
                 iconClass = 'icon-offline';
                 text = l[5926];
-                isWarning = true;
-                if (isDevice &&
-                    (status.currentDate - status.lastHeartbeat * 1000) / (1000 * 3600 * 24) >= daysNum) {
-                    tooltip = mega.icu.format(l.offline_device_tip, daysNum);
+
+                if (status.isMobile) {
+                    tooltip = l.dc_check_mobile_app_tip;
                 }
             }
             else if (status.stoppedSyncs) {
@@ -216,7 +223,7 @@ lazy(mega.devices, 'utils', () => {
                 StatusElements.text(itemNode, textClass, text);
             }
             if (tooltip && !isDevice) {
-                StatusElements.tooltip(itemNode, iClass, tooltip, {isWarning});
+                StatusElements.tooltip(itemNode, iClass, tooltip);
             }
         },
         attention: ({itemNode, iClass}) => {
@@ -233,6 +240,10 @@ lazy(mega.devices, 'utils', () => {
             if (status.pausedSyncs) {
                 iconClass = 'icon-pause';
                 text = l[1651];
+
+                if (status.isMobile) {
+                    tooltip = l.dc_check_mobile_app_tip;
+                }
             }
             else if (status.disabledSyncs) {
                 iconClass = 'warning icon-disable';
@@ -302,7 +313,6 @@ lazy(mega.devices, 'utils', () => {
          * {Array<Function>} folderHandlers - array of functions to handle different status for folders
          */
         folderHandlers: [
-            priorityHandlers.inactive,
             priorityHandlers.error,
             priorityHandlers.disabled,
             priorityHandlers.updating,
@@ -313,7 +323,6 @@ lazy(mega.devices, 'utils', () => {
          * {Array<Function>} deviceHandlers - array of functions to handle different status for devices
          */
         deviceHandlers: [
-            priorityHandlers.inactive,
             priorityHandlers.attention,
             priorityHandlers.updating,
             priorityHandlers.success,
@@ -329,17 +338,18 @@ lazy(mega.devices, 'utils', () => {
         get: (status) => {
             if (status) {
                 if (status.isDevice) {
-                    const i = {
-                        1: 0,
-                        2: 1,
-                        3: 1,
-                        4: 2,
-                        5: 3,
+                    const {error, disabled, updating, success} = folderStatusPriority;
+
+                    // map from folder status priority to device status priority
+                    const deviceHandlerIndex = {
+                        [error]: 0,
+                        [disabled]: 0,
+                        [updating]: 1,
+                        [success]: 2,
                     }[status.priority];
 
-                    if (i !== undefined) {
-                        const isForceAttention = i === 0 && mega.devices.data.isActive(status.lastHeartbeat);
-                        return StatusUI.deviceHandlers[isForceAttention ? 1 : i];
+                    if (deviceHandlerIndex !== undefined) {
+                        return StatusUI.deviceHandlers[deviceHandlerIndex];
                     }
                 }
                 else if (status.priority > 0 && status.priority <= StatusUI.folderHandlers.length) {
@@ -360,6 +370,7 @@ lazy(mega.devices, 'utils', () => {
     return freeze({
         logger,
         timer: new Timer(),
+        folderStatusPriority,
         StatusUI,
     });
 });

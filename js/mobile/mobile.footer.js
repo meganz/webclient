@@ -147,7 +147,7 @@ class MegaMobileFooter extends MegaComponent {
             mega.ui.sheet.showClose = true;
 
             const menuNode = document.createElement('div');
-            menuNode.className = 'general-actions';
+            menuNode.className = 'general-actions px-6';
             mega.ui.sheet.addContent(menuNode);
 
             const buildItem = (item) => {
@@ -167,6 +167,9 @@ class MegaMobileFooter extends MegaComponent {
             for (const item of this.menuItems) {
                 buildItem(item);
             }
+
+            mega.ui.sheet.name = 'mobile-footer-actions';
+            mega.ui.sheet.safeShow = true;
 
             mega.ui.sheet.show();
         });

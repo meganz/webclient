@@ -522,6 +522,10 @@ table.grid-table .item-type-icon {
     position: absolute;
     top: 3px;
 }
+.rtl table.grid-table .item-type-icon {
+    left: unset;
+    right: 3px;
+}
 
 table.grid-table .tranfer-filetype-txt {
     left: 0;
@@ -789,14 +793,6 @@ table.fm .thumb .item-type-icon img {
 
 .terms-page-content.terms .index-table td:not(:first-child) {
     text-align: end;
-}
-
-/* ======================================== *\
-   developer-settings-table
-\* ======================================== */
-.bottom-page.developer-settings .developer-settings-table {
-    margin: auto;
-    text-align: start;
 }
 
 /* ======================================== *\

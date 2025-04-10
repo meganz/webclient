@@ -306,7 +306,7 @@ accountUI.plan = {
                         },
                         setContent() {
                             const div = document.createElement('div');
-                            div.className = 'cancel-subscription-benefits-content px-6';
+                            div.className = 'cancel-subscription-benefits-content mob-px-6';
 
                             // String keys:
                             // l.vpn_trial_cancel_confirm
@@ -1405,7 +1405,7 @@ accountUI.plan = {
 
                     eventlog(500486);
 
-                    $('.fm-account-overlay, .fm-purchase-voucher, .fm-voucher-button')
+                    $('.fm-account-overlay, .fm-voucher-button')
                         .add('.fm-voucher-popup button.js-close')
                         .rebind('click.closeDialog', () => {
                             $('.fm-account-overlay').addClass('hidden');
@@ -1454,11 +1454,6 @@ accountUI.plan = {
                             msgDialog('warninga', l[135], ex, sub);
                         }
                     });
-            });
-
-            $('.fm-purchase-voucher, button.topup').rebind('click', () => {
-                mega.redirect('mega.io', 'resellers', false, false, false);
-                eventlog(500485);
             });
         }
     },

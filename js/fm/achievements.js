@@ -24,6 +24,7 @@ Object.defineProperty(mega, 'achievem', {
                     if (action) {
                         switch (action[0]) {
                             case '!':
+                                eventlog(500794);
                                 var pf = navigator.platform.toUpperCase();
                                 if (pf.indexOf('WIN') !== -1) {
                                     open('https://mega.nz/MEGAsyncSetup.exe');
@@ -37,6 +38,7 @@ Object.defineProperty(mega, 'achievem', {
                                 mega.redirect('mega.io', 'desktop', false, false, false);
                                 break;
                             case '/':
+                                eventlog(500795);
                                 if (action === '/mobile') {
                                     mega.redirect('mega.io', 'mobile', false, false, false);
                                     break;
@@ -45,6 +47,7 @@ Object.defineProperty(mega, 'achievem', {
                                 break;
 
                             case '~':
+                                eventlog(500796);
                                 var fn = action.substr(1);
                                 if (typeof mega.achievem[fn] === 'function') {
                                     if (fn.toLowerCase().indexOf('dialog') > 0) {
@@ -274,6 +277,7 @@ mega.achievem.achievementsListDialog = function achievementsListDialog(onDialogC
             if (onDialogClosed) {
                 onIdle(onDialogClosed);
             }
+            eventlog(500797);
             closeDialog();
             return false;
         });
@@ -307,6 +311,7 @@ mega.achievem.achievementsListDialog = function achievementsListDialog(onDialogC
         mega.achievem.invitationStatusDialog();
     });
     $('.js-dashboard-btn', $dialog).rebind('click', () => {
+        eventlog(500793);
         closeDialog();
         loadSubPage('fm/dashboard');
     });

@@ -45,16 +45,18 @@ class MegaMobileRadioGroup extends MegaComponentGroup {
     }
 
     applyDomChange() {
-
-        for (const radioButton of Object.values(this.children)) {
-            radioButton.toggleDom();
-        }
+        this.each(radioBtn => radioBtn.toggleDom());
     }
 
     setValue(value) {
 
-        if (value !== this.value && this.children[value]) {
-            this.children[value].trigger('tap');
+        if (value !== this.value) {
+
+            const child = this.getChild(value);
+
+            if (child) {
+                child.trigger('tap');
+            }
         }
     }
 }

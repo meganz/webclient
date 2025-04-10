@@ -8,7 +8,7 @@ class MegaToggleButton extends MegaComponent {
             return;
         }
 
-        this.setButtonState = (val) => {
+        this.setButtonState = (val, triggerOnChange) => {
             if (!this.input) {
                 return false;
             }
@@ -21,6 +21,10 @@ class MegaToggleButton extends MegaComponent {
 
             if (this.checked) {
                 this.domNode.classList.add('on');
+            }
+
+            if (triggerOnChange && typeof options.onChange === 'function') {
+                options.onChange.call(this);
             }
         };
 

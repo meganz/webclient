@@ -578,6 +578,31 @@
 .mega-input .account.password-status.checked {
     display: block;
 }
+.pm.mega-input .account.password-status {
+    font: var(--mobile-font-caption-large-regular);
+    display: none;
+    align-items: center;
+    position: absolute;
+    top: 41px;
+    left: 0;
+    width: 100%;
+    margin: 10px 0 24px;
+}
+.pm.mega-input .account.password-status.checked {
+    display: flex;
+}
+.strength-checker.strong,
+.mega-input .account.password-status.strong {
+    color: var(--mobile-text-success);
+}
+.strength-checker.moderate,
+.mega-input .account.password-status.moderate {
+    color: var(--mobile-text-warning);
+}
+.pm-main .password-list-page span,
+.pm-main .password-list-page p {
+    font: var(--mobile-font-caption-large-regular);
+}
 
 /* Input loading */
 .mega-input .register-loading-icon {
@@ -687,6 +712,9 @@
     font: var(--mobile-font-input-regular);
     color: var(--mobile-text-placeholder);
     -webkit-opacity: 1;
+}
+.pm.mega-input input.enter-pass::placeholder {
+    font: var(--text-body2);
 }
 .mobile.mega-input.error .message-container,
 .mobile.mega-input-wrapper.error .message-container,
@@ -888,4 +916,20 @@
 .mobile.mega-input input:-webkit-autofill {
     padding: 2px 8px !important;
     box-shadow: 0 0 0 50px var(--mobile-page-background) inset;
+}
+
+.export-links-settings-dialog .pm.mega-input.strengthChecker {
+    margin-bottom: 2rem;
+    height: 36px;
+    box-sizing: border-box;
+    line-height: 12px;
+    width: 268px;
+}
+
+.export-links-settings-dialog .pm.mega-input.strengthChecker input {
+    padding: 10px;
+}
+
+.mega-sheet.export-links-settings-dialog .account.password-status {
+    top: 32px;
 }

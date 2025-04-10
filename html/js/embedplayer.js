@@ -67,10 +67,7 @@ function init_embed(ph, key, g) {
     add_layout();
 
     if (node) {
-        var link = '#!' + ph + '!' + key;
-        if (mega.flags.nlfe) {
-            link = '/file/' + ph + '#' + key;
-        }
+        const link = '/file/' + ph + '#' + key;
 
         // XXX: as needed for mega.io given we cannot access the parent domain reliably of course..
         var unfortunateHackpatch = ph === 'RvY01QZB' || ph === '8rI0GIrQ';
@@ -129,8 +126,7 @@ function init_embed(ph, key, g) {
 
             (function _() {
                 $('.tab-link', $block).removeClass('active').rebind('click', _);
-                $('.share-link .tab-content', $block)
-                    .text(url.replace('/embed', '/' + (mega.flags.nlfe ? 'file' : '')));
+                $('.share-link .tab-content', $block).text(url.replace('/embed', '/file'));
                 $('.embed-code .tab-content', $block).text(embed.replace('%', url));
             }).call(this);
 
@@ -523,12 +519,8 @@ function pagemetadata() {
     append('robots', 'noindex', 'name');
 
     if (ep_node) {
-        var url = getBaseUrl() + '/embed#!' + ep_node.link;
-        var data = MediaAttribute(ep_node).data;
-
-        if (mega.flags.nlfe) {
-            url = getBaseUrl() + '/embed/' + ep_node.link.replace('!', '#');
-        }
+        const url = getBaseUrl() + '/embed/' + ep_node.link.replace('!', '#');
+        const data = MediaAttribute(ep_node).data;
 
         if (data) {
             append('og:duration', data.playtime);

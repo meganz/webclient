@@ -265,6 +265,7 @@ lazy(self, 'csp', () => {
                         mega.ui.overlay.show({
                             name: 'cookie-settings-overlay',
                             showClose: false,
+                            classList: ['cookie-settings-sheet'],
                             contents: [dialog],
                         });
                         return;

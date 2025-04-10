@@ -50,7 +50,7 @@ class MegaInteractable extends MegaComponent {
         }
 
         if (options.onClick) {
-            this.on('click', options.onClick);
+            this.on('click.onclick', options.onClick);
         }
 
         if (options.onContextmenu) {

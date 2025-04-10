@@ -29,11 +29,6 @@
 .mega-overlay.mega-overlay-view .mega-bottom-bar {
     position: relative;
 }
-.overlay-wrap .nav-elem.close {
-    padding: 0;
-    margin-left: auto;
-    height: auto;
-}
 .overlay-wrap .main {
     display: flex;
     flex-direction: column;

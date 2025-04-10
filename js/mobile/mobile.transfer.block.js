@@ -14,7 +14,7 @@ class MegaMobileTransferBlock extends MegaComponent {
             }
         }
 
-        this.domNode.classList.add('mega-transfer-block');
+        this.domNode.classList.add('mega-transfer-block', 'mob-px-6');
 
         const {transfer, id, callbacks} = options;
 

@@ -20,17 +20,21 @@ mega.pm = {
         const node = M.getNodeByHandle(handle);
 
         if (node && typeof newItem === 'object') {
-            const {name, n, pwd, u, url} = newItem;
-            const {n: oldNotes, pwd: oldPwd, u: oldUname, url: oldUrl} = node.pwm;
-            const oldName = node.name;
 
-            if (oldName !== name || oldNotes !== n || oldPwd !== pwd || oldUname !== u || oldUrl !== url) {
-                const prop = {name, pwm: {n, pwd, u, url}};
+            const prop = {name: node.name, pwm: {...node.pwm}};
+            let hasChanges = false;
 
-                return api.setNodeAttributes(node, prop);
+            for (const key in newItem) {
+                if (newItem.hasOwnProperty(key)) {
+                    const target = key === 'name' ? prop : prop.pwm;
+                    if (newItem[key] !== target[key]) {
+                        target[key] = newItem[key];
+                        hasChanges = true;
+                    }
+                }
             }
 
-            return false;
+            return hasChanges ? api.setNodeAttributes(node, prop) : false;
         }
     },
 

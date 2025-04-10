@@ -221,15 +221,17 @@ function sharedUInode(nodeHandle, force) {
             }
         }
 
-        // Remove the share node selection on incoming and outgoing shares pages
-        if (typeof nodeHandle !== 'undefined' && (M.currentdirid === 'out-shares' || M.currentdirid === 'shares')) {
-            selectionManager.remove_from_selection(nodeHandle);
-        }
-        else if (selectionManager.selected_list.includes(nodeHandle)) {
-            selectionManager.updateSelectionNotification();
+        if (window.selectionManager) {
+            // Remove the share node selection on incoming and outgoing shares pages
+            if (nodeHandle !== undefined && (M.currentdirid === 'out-shares' || M.currentdirid === 'shares')) {
+                selectionManager.remove_from_selection(nodeHandle);
+            }
+            else if (selectionManager.selected_list.includes(nodeHandle)) {
+                selectionManager.updateSelectionNotification();
+            }
         }
     }
-    else if (selectionManager.selected_list.includes(nodeHandle)) {
+    else if (window.selectionManager && selectionManager.selected_list.includes(nodeHandle)) {
         selectionManager.updateSelectionNotification();
     }
 
@@ -619,7 +621,11 @@ function fmtopUI() {
     let contextMenuItem = false;
 
     const id = String(M.currentdirid || '').split('/').pop();
-    if (mega.rewind && M.getSelectedSourceRoot() === M.RootID && M.currentrootid === M.RootID && !pfid) {
+    if (mega.rewind
+        && M.getSelectedSourceRoot() === M.RootID
+        && M.currentrootid === M.RootID
+        && !pfid && M.onDeviceCenter !== M.RootID
+    ) {
         contextMenuItem = id;
     }
 
@@ -1897,7 +1903,7 @@ function closeMsg() {
     var $dialog = $('#msgDialog').addClass('hidden');
     $dialog.parent().removeClass('msg-dialog-container');
 
-    if ($.dialog && !(M.chat && $.dialog === 'onboardingDialog')) {
+    if ($.dialog && !((M.chat && $.dialog === 'onboardingDialog') || $.dialog === 'Mega-Onboarding')) {
         $('.mega-dialog').removeClass('arrange-to-back');
         $('.mega-dialog-container.common-container').removeClass('arrange-to-back');
     }
@@ -2975,11 +2981,6 @@ function closeDialog(ev) {
             .hasClass('disabled')) {
             return false;
         }
-    }
-
-    if ($.dialog === 'recoverykey-logout-overlay') {
-        // PasswordReminderDialog manages its own states, so don't do anything.
-        return;
     }
 
     if ($.dialog === 'terms' && $.registerDialog) {

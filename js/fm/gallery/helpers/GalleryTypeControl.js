@@ -76,6 +76,12 @@ lazy(mega.gallery, 'GalleryTypeControl', () => {
             if (!this._menu) {
                 this._menu = new MMenuSelect(this.el, [], false);
                 this._menu.width = 200;
+                this._menu.onHide = () => {
+                    if (this.onResize) {
+                        window.removeEventListener('resize', this.onResize);
+                        delete this.onResize;
+                    }
+                };
             }
         }
 
@@ -110,6 +116,20 @@ lazy(mega.gallery, 'GalleryTypeControl', () => {
 
             this._menu.selectItem(selectedIndex);
             this._menu.toggle();
+            const rtl = document.body.classList.contains('rtl');
+            if (this._menu.isShowing && rtl && !this.onResize) {
+                this.onResize = SoonFc(90, () => {
+                    let { x, bottom, width } = this.el.getBoundingClientRect();
+                    bottom += MContextMenu.offsetVert;
+                    x += width;
+                    this._menu.setPositionByCoordinates(x, bottom);
+                });
+                window.addEventListener('resize', this.onResize);
+            }
+            else if (rtl && this.onResize) {
+                window.removeEventListener('resize', this.onResize);
+                delete this.onResize;
+            }
         }
     }
 

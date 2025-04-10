@@ -1354,7 +1354,7 @@ lazy(mega.gallery, 'albums', () => {
                 title: l[1028],
                 text: mega.icu.format(l.export_link_decrypt_tip, albumIds.length),
                 img: 'illustration sprite-fm-illustration img-dialog-decryption-key',
-                link: 'https://help.mega.io/files-folders/sharing/encrypted-links',
+                link: `${l.mega_help_host}/security/data-protection/make-links-more-secure`,
                 classes: 'icon-size-6 cursor-pointer mx-2'
             });
 

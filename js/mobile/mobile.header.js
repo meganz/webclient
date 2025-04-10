@@ -470,7 +470,7 @@ class MegaMobileHeader extends MegaComponent {
             // show view options if the page is not a shared items page
             if (!['shares','out-shares','public-links'].includes(M.currentdirid)) {
                 targetNode = document.createElement('div');
-                targetNode.className = 'filter';
+                targetNode.className = 'filter px-6';
                 subNode = document.createElement('h3');
                 subNode.textContent = l.filter_view;
                 targetNode.appendChild(subNode);
@@ -500,7 +500,7 @@ class MegaMobileHeader extends MegaComponent {
             }
 
             targetNode = document.createElement('div');
-            targetNode.className = 'filter';
+            targetNode.className = 'filter px-6';
             subNode = document.createElement('h3');
             subNode.textContent = l[6170];
             targetNode.appendChild(subNode);
@@ -623,7 +623,7 @@ class MegaMobileHeader extends MegaComponent {
 
             mega.ui.sheet.addContent(targetNode);
 
-            const selectedRadio = sortByGroup.children[sortByGroup.value || 'name'];
+            const selectedRadio = sortByGroup.getChild(sortByGroup.value || 'name');
 
             let orderArrowParent;
             if (selectedRadio && selectedRadio.domNode) {
@@ -669,6 +669,9 @@ class MegaMobileHeader extends MegaComponent {
 
                 mega.ui.sheet.hide();
             });
+
+            mega.ui.sheet.name = 'mobile-header-filters';
+            mega.ui.sheet.safeShow = true;
 
             mega.ui.sheet.show();
         });

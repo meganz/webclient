@@ -8,7 +8,7 @@ class MegaCheckbox extends MegaComponent {
             return;
         }
 
-        this.domNode.classList.add(`align-${options.checkboxAlign}`);
+        this.domNode.classList.add('flex', 'flex-row', 'items-center');
 
         let targetNode = this.domNode;
         let subNode = document.createElement('div');
@@ -37,7 +37,8 @@ class MegaCheckbox extends MegaComponent {
                 this.onToggle();
                 return;
             }
-            this.checked = !this.checked;
+            this.checked = this.checkedPartially ? false : !this.checked;
+            this.trigger('change');
             return false;
         });
     }
@@ -48,6 +49,17 @@ class MegaCheckbox extends MegaComponent {
 
     set checked(checked) {
         this.input.checked = checked;
+        this.input.checkedPartially = false;
+        this.onToggle();
+    }
+
+    get checkedPartially() {
+        return this.input.checkedPartially;
+    }
+
+    set checkedPartially(value) {
+        this.input.checked = false;
+        this.input.checkedPartially = value;
         this.onToggle();
     }
 
@@ -73,13 +85,17 @@ class MegaCheckbox extends MegaComponent {
 
     onToggle() {
         const checkboxWrapper = this.domNode.querySelector('.checkbox-wrapper');
-        const checkedClassList = [mega.ui.sprites.mono, 'icon-check-thin-outline'];
+        checkboxWrapper.className = 'checkbox-wrapper';
+
         if (this.checked) {
-            checkboxWrapper.classList.add(...checkedClassList);
+            checkboxWrapper.classList.add(
+                mega.ui.sprites.mono, 'icon-check-thin-outline', 'checkbox-on');
         }
-        else {
-            checkboxWrapper.classList.remove(...checkedClassList);
+        else if (this.checkedPartially) {
+            checkboxWrapper.classList.add(
+                mega.ui.sprites.mono, 'icon-minus-regular-outline');
         }
+
         this.trigger('toggle', this.checked);
     }
 }

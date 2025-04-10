@@ -8,7 +8,7 @@ class MegaMobileContextMenu extends MegaComponentGroup {
         this.hide = this.sheet.hide;
 
         this.domNode = document.createElement('div');
-        this.domNode.className = 'context-menu-container';
+        this.domNode.className = 'context-menu-container px-6';
 
         const menuNode = document.createElement('menu');
         menuNode.className = 'context-menu-items items';
@@ -96,7 +96,6 @@ class MegaMobileContextMenu extends MegaComponentGroup {
             delete items['.copy-item'];
             delete items['.move-item'];
             delete items['.getlink-item'];
-            delete items['.embedcode-item'];
             delete items['.colour-label-items'];
             delete items['.send-to-contact-item'];
         }
@@ -241,6 +240,9 @@ class MegaMobileContextMenu extends MegaComponentGroup {
                 rubbishBinElm.component.text = sourceRoot === M.RubbishID ?
                     l.delete_permanently : l.move_to_rubbish_bin;
             }
+
+            mega.ui.sheet.name = 'mobile-context-menu';
+            mega.ui.sheet.safeShow = true;
 
             this.sheet.show();
         });
@@ -676,7 +678,9 @@ mBroadcaster.once('boot_done', () => {
                     name: 'label-selector',
                     showClose: true,
                     title: l[17398],
-                    contents: Object.values(labelGroup.children).map(c => c.domNode),
+                    contents: [
+                        mCreateElement('div', { class: 'px-6' }, labelGroup.map(c => c.domNode))
+                    ],
                     type: 'normal',
                     actions: n.lbl && [{
                         type: 'normal',

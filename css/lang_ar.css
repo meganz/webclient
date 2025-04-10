@@ -277,6 +277,11 @@ body.ar .user-management-account-settings .invoice-detail .invoice-button {
     width: 620px;
 }
 
+/* Cancel subscription benefits dialog */
+body.ar .mega-dialog.cancel-subscription-benefits header h3 {
+    text-align: right;
+}
+
 /* FM table view */
 
 body.rtl table.fm.table-hover tr i.selected {

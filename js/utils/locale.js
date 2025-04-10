@@ -1090,10 +1090,6 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[7156] = escapeHTML(l[7156])
         .replace('[A]', '<a href="https://mega.io/mobile" target="_blank" class="clickurl">')
         .replace('[/A]', '</a>');
-    l[7202] = escapeHTML(l[7202]).replace(
-        '[A]',
-        '<a href="https://mega.io/resellers" target="_blank" rel="noopener noreferrer" class="voucher-reseller-link">'
-    ).replace('[/A]', '</a>');
     l[7709] = escapeHTML(l[7709]).replace('[S]', '<span class="complete-text">').replace('[/S]', '</span>');
     l[7945] = escapeHTML(l[7945]).replace('[B]', '<b>').replace('[/B]', '</b>');
     l[7991] = escapeHTML(l[7991])
@@ -1655,7 +1651,8 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace(/\[\/S\d]/g, '</span>');
 
     l.manage_link_export_link_text = escapeHTML(l.manage_link_export_link_text)
-        .replace('[A]', '<a target="_blank" href="https://help.mega.io/files-folders/sharing/encrypted-links">')
+        .replace('[A]',
+                 '<a target="_blank" href="https://help.mega.io/security/data-protection/make-links-more-secure">')
         .replace('[/A]', '</a>');
     l.terms_dialog_text = escapeHTML(l.terms_dialog_text)
         .replace('[A]', '<a href="https://mega.io/terms" target="_blank" rel="noopener noreferrer">')
@@ -1942,6 +1939,11 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[/B]', '</b>');
 
     l.import_notes = escapeHTML(l.import_notes)
+        .replace('[A]',
+                 `<a class="clickurl" href="https://help.mega.io/pass/features/import-passwords" target="_blank">`)
+        .replace('[/A]', '</a>');
+
+    l.import_password_subtitle = escapeHTML(l.import_password_subtitle)
         .replace('[A]',
                  `<a class="clickurl" href="https://help.mega.io/pass/features/import-passwords" target="_blank">`)
         .replace('[/A]', '</a>');

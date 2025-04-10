@@ -1163,17 +1163,17 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
         // for (var ur = 0; ur < u.length; ur++) {
         //    mega.tpw.addDownloadUpload(mega.tpw.UPLOAD, u[ur]);
         // }
+        if (!added) {
+            ulmanager.logger.warn('Nothing added to upload.');
+            return;
+        }
+
         tfsheadupdate({
             a: u.map((u) => {
                 return `ul_${u.id}`;
             })
         });
         mega.tpw.addDownloadUpload(mega.tpw.UPLOAD, u);
-
-        if (!added) {
-            ulmanager.logger.warn('Nothing added to upload.');
-            return;
-        }
         if (!$.transferHeader) {
             M.addTransferPanelUI();
         }

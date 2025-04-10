@@ -96,7 +96,7 @@ body.pwm-ui .pm-main .mega-header {
 }
 
 /* RTL support */
-body.rtl .pm-main,
-body.rtl .overlay-wrap {
+body.rtl.pwm-ui .pm-main,
+body.rtl.pwm-ui .overlay-wrap {
    direction: rtl;
 }

@@ -416,6 +416,9 @@ mobile.settings.account.twofactorSettings = Object.create(mobile.settingsHelper,
                     text: l.ok_button
                 }).on('tap.closeAppsSheet', () => mega.ui.sheet.hide());
 
+                mega.ui.sheet.name = 'mobile-two-fa-apps';
+                mega.ui.sheet.safeShow = true;
+
                 // Show content
                 mega.ui.sheet.show();
             });

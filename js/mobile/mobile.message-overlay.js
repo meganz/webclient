@@ -234,6 +234,10 @@ var megaMsgDialog = (() => {
             if (safeShow) {
                 M.safeShowDialog(`mobile-messageOverlay-${dialogName}`, () => {
                     _sheet();
+
+                    targetSheet.name = `mobile-messageOverlay-${dialogName}`;
+                    targetSheet.safeShow = true;
+
                     targetSheet.show();
                 });
             }

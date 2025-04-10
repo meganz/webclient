@@ -42,6 +42,9 @@ mobile.appearance = {
                 }
             });
 
+            mega.ui.sheet.name = 'mobile-settings-appearance';
+            mega.ui.sheet.safeShow = true;
+
             mega.ui.sheet.show();
         });
     },

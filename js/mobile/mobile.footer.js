@@ -168,6 +168,9 @@ class MegaMobileFooter extends MegaComponent {
                 buildItem(item);
             }
 
+            mega.ui.sheet.name = 'mobile-footer-actions';
+            mega.ui.sheet.safeShow = true;
+
             mega.ui.sheet.show();
         });
     }

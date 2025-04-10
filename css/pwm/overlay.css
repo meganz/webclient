@@ -34,6 +34,9 @@
     margin-left: auto;
     height: auto;
 }
+body.rtl .overlay-wrap .nav-elem.close {
+    margin-left: 0;
+}
 .overlay-wrap .main {
     display: flex;
     flex-direction: column;

@@ -4,7 +4,7 @@
     width: 100%;
     box-sizing: border-box;
     padding: 24px 0;
-    background: var(--mobile-surface-1);
+    background: var(--mobile-page-background);
     border-radius: var(--mobile-border-radius-large) var(--mobile-border-radius-large) 0 0;
     transform: translateY(calc(50% + 50vh));
     transition: transform 0.2s ease-out;
@@ -82,12 +82,24 @@
     font-weight: var(--mobile-font-weight-semibold);
 }
 
+
 .mega-sheet .image:empty,
 .mega-sheet .header-title:empty
 .mega-sheet .title:empty,
 .mega-sheet .content:empty,
 .mega-sheet .actions:empty {
     display: none;
+}
+
+.export-links-dialog .sheet,
+.export-links-settings-dialog .sheet,
+.link-embed-dialog .sheet {
+    background: var(--mobile-page-background);
+    border: 1px var(--mobile-border-subtle) solid;
+}
+
+.export-links-dialog .sheet .overlay-footer {
+    margin-top: 0;
 }
 
 @media only screen and (min-width: 769px) {
@@ -117,6 +129,14 @@
     .mega-sheet.modal-dialog .actions {
         padding: 24px 48px;
         width: 100%;
+    }
+
+    .mega-sheet.export-links-dialog .sheet,
+    .mega-sheet.export-links-settings-dialog .sheet,
+    .mega-sheet.link-embed-dialog .sheet,
+    .mega-sheet.remove-link-dialog .sheet,
+    .mega-sheet.link-settings-discard-dialog .sheet {
+        max-width: 640px;
     }
 }
 

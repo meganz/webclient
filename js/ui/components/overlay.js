@@ -371,11 +371,20 @@ class MegaOverlay extends MegaComponent {
         if (clear) {
             this.clearFooter();
         }
-        if (!['checkbox', 'link'].includes(options.type)) {
+
+        const { type, classList = [], slot } = options;
+        const hasSlot = Array.isArray(slot) && slot.length;
+
+        if (!['checkbox', 'link'].includes(type) && !hasSlot) {
             return;
         }
-        const { type, classList = [] } = options;
-        if (type === 'checkbox') {
+
+        if (hasSlot) {
+            for (let i = 0; i < slot.length; i++) {
+                this.footerNode.appendChild(slot[i]);
+            }
+        }
+        else if (type === 'checkbox') {
             this.footerComp = new MegaCheckbox({
                 parentNode: this.footerNode,
                 componentClassname: 'mega-checkbox',

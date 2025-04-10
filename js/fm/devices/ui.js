@@ -1971,7 +1971,6 @@ lazy(mega.devices, 'ui', () => {
                 delete items['.copy-item'];
                 delete items['.move-item'];
                 delete items['.getlink-item'];
-                delete items['.embedcode-item'];
                 delete items['.colour-label-items'];
                 delete items['.send-to-contact-item'];
             }
@@ -1981,7 +1980,6 @@ lazy(mega.devices, 'ui', () => {
 
                 if (isTakenDown) {
                     delete items['.getlink-item'];
-                    delete items['.embedcode-item'];
                     delete items['.removelink-item'];
                     delete items['.sh4r1ng-item'];
                     delete items['.add-star-item'];

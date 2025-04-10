@@ -44,11 +44,6 @@
     font: var(--mobile-font-heading-h3);
 }
 
-.pm-main .password-list-page span,
-.pm-main .password-list-page p {
-    font: var(--mobile-font-caption-large-regular);
-}
-
 .pm-main .password-list-page a,
 .pm-main .settings-wrap a.clickurl {
     font: var(--mobile-font-link-large-regular);

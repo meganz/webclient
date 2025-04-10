@@ -168,13 +168,17 @@ class MegaSheet extends MegaOverlay {
      *
      * @returns {void}
      */
-    addTitle(title) {
+    addTitle(title, className) {
         this.clearTitle();
         let subNode = title;
 
         if (typeof subNode === 'string') {
             subNode = document.createElement('h2');
             subNode.textContent = title;
+
+            if (className) {
+                subNode.className = className;
+            }
         }
 
         this.titleNode.appendChild(subNode);

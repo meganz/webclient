@@ -2438,6 +2438,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/ui/components/interactable.js', n: 'interactable_js', j: 1, w:1});
     jsl.push({f:'js/ui/components/link.js', n: 'link_js', j: 1, w:1});
     jsl.push({f:'js/ui/components/button.js', n: 'button_js', j: 1, w:1});
+    jsl.push({f:'js/ui/components/toggle-button.js', n: 'toggle_button_js', j: 1, w:1});
     jsl.push({f:'js/ui/components/checkbox.js', n: 'checkbox_js', j: 1, w:1});
     jsl.push({f:'js/ui/components/rack-slot.js', n: 'rack_slot_js', j: 1, w:1});
     jsl.push({f:'js/ui/components/rack.js', n: 'rack_js', j: 1, w:1});
@@ -2648,6 +2649,7 @@ else if (!browserUpdate) {
     jsl.push({f:'css/components/sharednode.css', n: 'sharednode_css', j: 2, w: 1});
     jsl.push({f:'css/components/context-menu.css', n: 'comp_context_menu_css', j:2, w:1});
     jsl.push({f:'css/components/menu.css', n: 'comp_menu_css', j:2, w:1});
+    jsl.push({f:'css/components/toggle-button.css', n: 'toggle_button_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/components/stepper.css', n: 'stepper_css', j:2, w:30, c:1, d:1, cache:1});
     jsl.push({f:'css/components/onboarding-journey.css', n: 'onboarding_journey_css', j:2, w:30, c:1, d:1, cache:1});
     jsl.push({f:'css/components/card.css', n: 'card_css', j:2, w:30, c:1, d:1, cache:1});
@@ -2659,7 +2661,6 @@ else if (!browserUpdate) {
         jsl.push({f:'css/mobile/mobile.dropdown.css', n: 'mobile_dropdown_css', j: 2, w: 1});
         jsl.push({f:'css/mobile/mobile.context.menu.css', n: 'mobile_context_menu_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'css/mobile/mobile.radio.button.css', n: 'mobile_radio_button_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/components/toggle-button.css', n: 'toggle_button_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/mobile/mobile.footer.css', n: 'mobile_footer_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/mobile/mobile.msgdialog.css', n: 'mobile_msgdialog_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/mobile/mobile.rubbish-bin.css', n: 'mobile_rubbish_bin_css', j:2,w:5,c:1,d:1,cache:1});
@@ -2742,7 +2743,6 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/mobile.info-menu-item.js', n: 'mobile_info_menu_item_js', j: 1, w:1});
         jsl.push({f:'js/mobile/mobile.radio.button.js', n: 'mobile_radio_button_js', j: 1, w:1});
         jsl.push({f:'js/mobile/mobile.radio.group.js', n: 'mobile_radio_group_js', j: 1, w:1});
-        jsl.push({f:'js/ui/components/toggle-button.js', n: 'toggle_button_js', j: 1, w:1});
         jsl.push({f:'js/mobile/mobile.footer.js', n: 'mobile_footer_js', j: 1, w:1});
         jsl.push({f:'js/mobile/settings/appearance.js', n: 'mobile_settings_appearance_js', j: 1, w:1});
         jsl.push({f:'js/mobile/settings/settingsHelper.js', n: 'mobile_settings_js', j: 1, w:1});
@@ -3033,7 +3033,6 @@ else if (!browserUpdate) {
         'pwm': {
             'pwm:vars_pm_theme_css': {f:'css/vars/pm-theme.css', n: 'vars_pm_theme_css', j:2, w:30, c:1, d:1, cache:1},
             'pwm:pm_mono_css': {f:'css/sprites/pm-mono@mono.css', n: 'pm_mono_css', j:2, w:30, c:1, d:1, cache:1},
-            'pwm:toggle_css': {f:'css/components/toggle-button.css', n: 'toggle_button_css', j:2, w:1},
             'pwm:read_only_field_css': {f:'css/pwm/components/read-only.css', n: 'read_only_field_css', j:2, w:1},
             'pwm:form_css': {f:'css/pwm/form.css', n: 'pm_form_css', j:2, w:1},
             'pwm:pm_password_list_page_css': {f:'css/pwm/password-list-page.css', n: 'pm_password_list_page_css', j:2, w:1},
@@ -3054,7 +3053,6 @@ else if (!browserUpdate) {
             'pwm:settings_css': {f:'css/pwm/settings/settings.css', n: 'settings_css', j:2, w:1},
             'pwm:settings_list_css': {f:'css/pwm/settings/list.css', n: 'settings_list_css', j:2, w:1},
 
-            'pwm:toggle_button_js': {f:'js/ui/components/toggle-button.js', n: 'toggle_button_js', j: 1, w:1},
             'pwm:read_only_field_js': {f:'js/ui/pwm/components/read-only-field.js', n: 'read_only_field_js', j: 1, w:1},
             'pwm:mobile_message_overlay_js': {f:'js/mobile/mobile.message-overlay.js', n: 'mobile_message_overlay_js', j: 1, w:1},
             'pwm:mobile_banner_js': {f:'js/mobile/mobile.banner.js', n: 'mobile_banner_js', j: 1, w:1},

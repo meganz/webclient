@@ -670,6 +670,9 @@ class MegaMobileHeader extends MegaComponent {
                 mega.ui.sheet.hide();
             });
 
+            mega.ui.sheet.name = 'mobile-header-filters';
+            mega.ui.sheet.safeShow = true;
+
             mega.ui.sheet.show();
         });
     }

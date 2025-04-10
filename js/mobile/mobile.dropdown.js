@@ -58,6 +58,9 @@ class MegaMobileDropdown extends MegaComponent {
                 this.items = new MegaMobileDropdownItemList(options);
             }
 
+            mega.ui.sheet.name = 'mobile-dropdown';
+            mega.ui.sheet.safeShow = true;
+
             this.items.show();
         });
     }

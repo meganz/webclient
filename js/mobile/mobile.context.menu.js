@@ -241,6 +241,9 @@ class MegaMobileContextMenu extends MegaComponentGroup {
                     l.delete_permanently : l.move_to_rubbish_bin;
             }
 
+            mega.ui.sheet.name = 'mobile-context-menu';
+            mega.ui.sheet.safeShow = true;
+
             this.sheet.show();
         });
     }

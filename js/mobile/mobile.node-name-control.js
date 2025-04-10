@@ -104,6 +104,9 @@ class MobileNodeNameControl {
                 return false;
             });
 
+            mega.ui.sheet.name = typeInfo.name;
+            mega.ui.sheet.safeShow = true;
+
             mega.ui.sheet.show();
         });
     }

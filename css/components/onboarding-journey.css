@@ -1,4 +1,4 @@
-.mega-sheet.on-boarding .sheet {
+body.web-desktop .mega-sheet.on-boarding .sheet {
     max-width: 900px;
     height: 680px;
     padding: 0;
@@ -103,7 +103,7 @@
 
 @media only screen and (max-width: 1079px) {
 
-    .mega-sheet.on-boarding .sheet {
+    body.web-desktop .mega-sheet.on-boarding .sheet {
         max-width: 600px;
     }
 

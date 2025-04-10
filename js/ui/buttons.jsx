@@ -44,38 +44,31 @@ export class Button extends MegaRenderMixin {
     }
 
     renderChildren() {
-        if (React.Children.count(this.props.children) < 1) {
-            return null;
-        }
-
-        return React.Children.map(this.props.children, child => {
-            if (!child) {
-                return;
-            }
-            if (typeof child.type === 'string' || typeof child.type === 'undefined') {
-                // DOM element or Raw text
-                return child;
-            }
-
-            return React.cloneElement(child, {
-                active: this.state.focused,
-                closeDropdown: () => {
-                    this.setState({ focused: false });
-                    this.unbindEvents();
-                },
-                onActiveChange: newVal => {
-                    const $element = $(this.domRef?.current);
-                    const $scrollables = $element.parents('.ps');
-                    if ($scrollables.length > 0) {
-                        $scrollables.map((k, element) => Ps[newVal ? 'disable' : 'enable'](element));
-                    }
-                    if (child.props.onActiveChange) {
-                        child.props.onActiveChange(newVal);
-                    }
-                    return newVal ? this.bindEvents() : this.unbindEvents();
-                }
-            });
-        });
+        return (
+            this.props.children &&
+            React.Children.map(this.props.children, child =>
+                child && (
+                    typeof child.type === 'string' || child.type === undefined ?
+                        child : // DOM element or Raw text
+                        React.cloneElement(child, {
+                            active: this.state.focused,
+                            closeDropdown: () =>
+                                this.setState({ focused: false }, () =>
+                                    this.unbindEvents()
+                                ),
+                            onActiveChange: active => {
+                                const $element = $(this.domRef?.current || this.domNode);
+                                const $scrollables = $element.parents('.ps');
+                                if ($scrollables.length > 0) {
+                                    $scrollables.map((k, element) => Ps[active ? 'disable' : 'enable'](element));
+                                }
+                                child.props.onActiveChange?.(active);
+                                return this[active ? 'bindEvents' : 'unbindEvents']();
+                            }
+                        })
+                )
+            )
+        );
     }
 
     onBlur = e => {

@@ -974,9 +974,6 @@ ul, li {
     flex-direction: column;
     z-index: 90;
 }
-.fm-scrolling.scroller-space > *:not(.full-width) {
-    margin-inline-end: 12px;
-}
 .terms-of-service .fm-scrolling {
     overflow: visible;
 }

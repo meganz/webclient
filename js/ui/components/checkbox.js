@@ -8,7 +8,7 @@ class MegaCheckbox extends MegaComponent {
             return;
         }
 
-        this.domNode.classList.add(`align-${options.checkboxAlign}`);
+        this.domNode.classList.add('flex', 'flex-row', 'items-center');
 
         let targetNode = this.domNode;
         let subNode = document.createElement('div');
@@ -89,7 +89,7 @@ class MegaCheckbox extends MegaComponent {
 
         if (this.checked) {
             checkboxWrapper.classList.add(
-                mega.ui.sprites.mono, 'icon-check-thin-outline');
+                mega.ui.sprites.mono, 'icon-check-thin-outline', 'checkbox-on');
         }
         else if (this.checkedPartially) {
             checkboxWrapper.classList.add(

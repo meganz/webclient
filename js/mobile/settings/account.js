@@ -17,7 +17,7 @@ mobile.settings.account = Object.create(mobile.settingsHelper, {
 
 
             this.domNode = useOverlay ?
-                mCreateElement('div', {class: 'mega-mobile-settings account'}) : this.generatePage('account');
+                mCreateElement('div', {class: 'mega-mobile-settings account mob-px-6'}) : this.generatePage('account');
 
             this.overlayAccount = useOverlay;
 

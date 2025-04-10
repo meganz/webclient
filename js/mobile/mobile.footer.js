@@ -147,7 +147,7 @@ class MegaMobileFooter extends MegaComponent {
             mega.ui.sheet.showClose = true;
 
             const menuNode = document.createElement('div');
-            menuNode.className = 'general-actions';
+            menuNode.className = 'general-actions px-6';
             mega.ui.sheet.addContent(menuNode);
 
             const buildItem = (item) => {

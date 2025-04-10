@@ -1651,7 +1651,8 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace(/\[\/S\d]/g, '</span>');
 
     l.manage_link_export_link_text = escapeHTML(l.manage_link_export_link_text)
-        .replace('[A]', '<a target="_blank" href="https://help.mega.io/files-folders/sharing/encrypted-links">')
+        .replace('[A]',
+                 '<a target="_blank" href="https://help.mega.io/security/data-protection/make-links-more-secure">')
         .replace('[/A]', '</a>');
     l.terms_dialog_text = escapeHTML(l.terms_dialog_text)
         .replace('[A]', '<a href="https://mega.io/terms" target="_blank" rel="noopener noreferrer">')

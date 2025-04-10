@@ -3,12 +3,16 @@
     flex-direction: column;
     width: 100%;
     box-sizing: border-box;
-    padding: 24px 0;
+    padding: 40px 0;
     background: var(--mobile-page-background);
     border-radius: var(--mobile-border-radius-large) var(--mobile-border-radius-large) 0 0;
     transform: translateY(calc(50% + 50vh));
     transition: transform 0.2s ease-out;
     max-height: calc(100% - 16px);
+}
+
+.mobile .mega-sheet .sheet {
+    padding-bottom: 16px;
 }
 
 .mega-sheet.with-footer .sheet {
@@ -18,9 +22,15 @@
 .mega-sheet .sheet .header,
 .mega-sheet .sheet .main,
 .mega-sheet .sheet .actions {
-    padding: 0 24px;
+    padding: 0 40px;
     width: 100%;
     box-sizing: border-box;
+}
+
+body.mobile .mega-sheet .sheet .header,
+body.mobile .mega-sheet .sheet .main,
+body.mobile .mega-sheet .sheet .actions {
+    padding: 0 24px;
 }
 
 .mega-sheet .sheet > .close {
@@ -38,6 +48,10 @@
 .mega-sheet.normal .main {
     align-items: flex-start;
     text-align: start;
+}
+
+body.mobile .mega-sheet.normal .sheet .main {
+    padding: 0;
 }
 
 .mega-sheet.modal-dialog .main {
@@ -91,6 +105,11 @@
     display: none;
 }
 
+.rtl .mega-sheet .image,
+.rtl .mega-sheet .title {
+    margin-left: auto;
+}
+
 .export-links-dialog .sheet,
 .export-links-settings-dialog .sheet,
 .link-embed-dialog .sheet {
@@ -102,41 +121,37 @@
     margin-top: 0;
 }
 
-@media only screen and (min-width: 769px) {
-    .mega-sheet {
-        justify-content: center;
-    }
-
-    .mega-sheet .sheet,
-    .mega-sheet .sheet.ps {
-        border-radius: var(--mobile-border-radius-large);
-        max-width: 562px;
-        min-width: unset;
-        max-height: 95%;
-        margin: auto;
-    }
-
-    .mega-sheet .actions {
-        flex-flow: row wrap;
-        justify-content: center;
-    }
-
-    .mega-sheet .overlay-footer {
-        margin-top: 24px;
-        border-radius: 0 0 var(--mobile-border-radius-large) var(--mobile-border-radius-large);
-    }
-
-    .mega-sheet.modal-dialog .actions {
-        padding: 24px 48px;
-        width: 100%;
-    }
-
-    .mega-sheet.export-links-dialog .sheet,
-    .mega-sheet.export-links-settings-dialog .sheet,
-    .mega-sheet.link-embed-dialog .sheet,
-    .mega-sheet.remove-link-dialog .sheet,
-    .mega-sheet.link-settings-discard-dialog .sheet {
-        max-width: 640px;
-    }
+body.web-desktop .mega-sheet {
+    justify-content: center;
 }
 
+body.web-desktop .mega-sheet .sheet {
+    width: calc(100% - 16px);
+}
+
+body.web-desktop .mega-sheet .sheet,
+body.web-desktop .mega-sheet .sheet.ps {
+    border-radius: var(--mobile-border-radius-extra-large);
+    max-width: 562px;
+    min-width: unset;
+    max-height: 95%;
+    margin: auto;
+}
+
+body.web-desktop .mega-sheet .overlay-footer {
+    margin-top: 24px;
+    border-radius: 0 0 var(--mobile-border-radius-large) var(--mobile-border-radius-large);
+}
+
+body.web-desktop .mega-sheet.modal-dialog .actions {
+    padding: 24px 48px;
+    width: 100%;
+}
+
+body.web-desktop .mega-sheet.export-links-dialog .sheet,
+body.web-desktop .mega-sheet.export-links-settings-dialog .sheet,
+body.web-desktop .mega-sheet.link-embed-dialog .sheet,
+body.web-desktop .mega-sheet.remove-link-dialog .sheet,
+body.web-desktop .mega-sheet.link-settings-discard-dialog .sheet {
+    max-width: 640px;
+}

@@ -2054,6 +2054,9 @@ body.de .mega-dialog.contact-picker-widget {
         line-height: 12px;
         width: 268px;
     }
+    .export-links-settings-dialog input.set-date::placeholder {
+        color: var(--mobile-text-placeholder);
+    }
     .share-link-expiry-calendar {
         position: absolute;
         padding: 8px 0;
@@ -2103,6 +2106,91 @@ body.de .mega-dialog.contact-picker-widget {
     }
     .share-link-expiry-calendar .datepicker--cell.-other-month- {
         color: var(--text-color-low);
+    }
+    .mega-dialog.export-links-dialog .item-link {
+        display: flex;
+        width: 100%;
+        height: 40px;
+        border: 1px solid var(--stroke-grey-2);
+        border-radius: 4px;
+        position: relative;
+    }
+    .mega-dialog.export-links-dialog .input-wrap {
+        flex: 1;
+        vertical-align: top;
+        width: 100%;
+    }
+    .mega-dialog.export-links-dialog .item-link i {
+        position: absolute;
+        left: 6px;
+        top: 7px;
+        --icon-size: 24px;
+        --mask-color: var(--text-color-medium);
+    }
+    .mega-dialog.export-links-dialog .item-link input {
+        font-size: 12px;
+        height: 38px;
+        box-sizing: border-box;
+        width: 100%;
+        padding: 0 10px;
+        padding-inline-start: 36px;
+        margin: 0;
+        border: 0;
+        background-color: transparent;
+        caret-color: transparent;
+        color: var(--text-color-high);
+    }
+    .mega-dialog.export-links-dialog .keys-tip {
+        width: 320px;
+        left: 50%;
+        bottom: 34px;
+        margin-inline-start: -160px;
+        text-align: center;
+        padding: 12px;
+        font: var(--text-body1);
+        color: var(--text-color-medium);
+        border-radius: 24px;
+        background: var(--surface-main);
+    }
+    .mega-dialog.export-links-dialog .keys-tip.left-arrow {
+        bottom: auto;
+        top: -47px;
+        left: 34px;
+        margin: 0;
+    }
+    .rtl .mega-dialog.export-links-dialog .keys-tip.left-arrow {
+        left: auto;
+        right: 34px;
+    }
+    .mega-dialog.export-links-dialog .keys-tip.left-arrow i,
+    .m-context-menu.keys-tip.left-arrow > i {
+        top: 64px;
+    }
+    .mega-dialog.export-links-dialog .illustration,
+    .m-context-menu.keys-tip .illustration {
+        width: 128px;
+        --width: 128px;
+        height: 92px;
+        margin: 16px auto;
+    }
+    .mega-dialog.export-links-dialog .keys-tip .tip-header,
+    .m-context-menu.keys-tip .tip-header {
+        font: var(--text-h3);
+        color: var(--text-color-high);
+        margin-bottom: 8px;
+    }
+    .mega-dialog.export-links-dialog .keys-tip .tip-text,
+    .m-context-menu.keys-tip .tip-text {
+        padding: 0 0 8px;
+    }
+    .mega-dialog.export-links-dialog .keys-tip .tip-link,
+    .mega-dialog.export-links-dialog .keys-tip .tip-link:visited,
+    .m-context-menu.keys-tip .tip-link,
+    .m-context-menu.keys-tip .tip-link:visited {
+        font: var(--text-body2);
+        color: var(--text-color-info);
+        cursor: pointer;
+        position: relative;
     }
 
 /* end export-links-dialog */

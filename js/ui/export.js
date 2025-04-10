@@ -841,6 +841,10 @@ var exportExpiry = {
 
             // Change Month select box width on showing the calendar (clicking the text input triggers this)
             onShow: (inst) => {
+                // Checking if the date has been already preset
+                if (!inst.selectedDates.length && this.presetValue) {
+                    inst.selectedDates.push(new Date(this.presetValue * 1000));
+                }
 
                 // Checking if the date has been already preset
                 if (!inst.selectedDates.length) {
@@ -893,6 +897,7 @@ var exportExpiry = {
             },
 
             onSelect: (dateText, date, inst) => {
+                this.presetValue = false;
 
                 const $inputClicked = inst.$el;
 
@@ -927,7 +932,6 @@ var exportExpiry = {
 
         if (this.presetValue) {
             exportExpiry.updateInputText(new Date(this.presetValue * 1000));
-            this.presetValue = false;
         }
         else {
             $setDateInput.trigger('focus');
@@ -1078,8 +1082,9 @@ function logExportEvt(evtId, data) {
     /**
      * Render public link dialog and handle events
      * @param {Boolean} close To close or to show public link dialog
+     * @param {Object.<String, any>} [options] Options to pass to the dialog
      */
-    ExportLinkDialog.prototype.linksDialog = function(close) {
+    ExportLinkDialog.prototype.linksDialog = function(close, options) {
         'use strict';
 
         if (M.isInvalidUserStatus()) {
@@ -1090,7 +1095,7 @@ function logExportEvt(evtId, data) {
             scope.mega.Dialog.ExportLink.view.hide();
         }
         else {
-            scope.mega.Dialog.ExportLink[($.itemExportEmbed) ? 'embed' : 'view'].show();
+            scope.mega.Dialog.ExportLink[($.itemExportEmbed) ? 'embed' : 'view'].show(options);
             scope.mega.Dialog.ExportLink.settings.resetValues();
         }
     };
@@ -1215,7 +1220,7 @@ function logExportEvt(evtId, data) {
                 header
             );
 
-            nameRow.textContent = htmlentities(item.name);
+            nameRow.textContent = item.name;
             const numFolders = M.d[nodeHandle].td;
             const numFiles = M.d[nodeHandle].tf;
 
@@ -1370,48 +1375,26 @@ function logExportEvt(evtId, data) {
             const { sheet, toast } = mega.ui;
             const count = $.itemExport.length;
 
-            const addSettingsBtn = (parentNode, ks) => new MegaButton({
+            const addSettingsBtn = (parentNode) => new MegaButton({
                 parentNode,
                 text: l.link_settings,
-                componentClassname: 'text-icon font-600 underline-offset-4 whitespace-nowrap slim',
+                componentClassname: 'text-icon font-600 underline-offset-4 whitespace-nowrap slim no-px',
                 type: 'button',
             }).on('click.link-settings', () => {
                 ExportLink.view.hide();
-                ExportLink.settings.show(ks);
+                ExportLink.settings.show();
                 logExportEvt(500760);
             });
 
-            /**
-             * @param {HTMLDivElement[]} items Items to populate the contents with
-             * @param {Object.<String, Boolean|String[]>} options Options to apply
-             * @returns {HTMLDivElement}
-             */
-            const createContents = (items, { dec: ks }) => {
-                const contents = mCreateElement('div', { class: 'relative px-4' }, items);
-
-                if (folderlink) {
-                    // Nothing is needed
-                }
-                else if (items.length === 1) {
-                    addSettingsBtn(contents.querySelector('.node-link-block .block-naming'), ks);
-                }
-                else {
-                    const btn = addSettingsBtn(contents, ks);
-                    btn.domNode.classList.add('absolute', 'right-0', '-top-16');
-                }
-
-                return contents;
-            };
-
             const footerElements = [
-                mCreateElement('div', { class: 'link-access-text mb-10 px-4' }),
-                mCreateElement('div', { class: 'flex flex-row-reverse px-4 mb-4' })
+                mCreateElement('div', { class: 'link-access-text mb-10 text-left' }),
+                mCreateElement('div', { class: 'flex flex-row-reverse' })
             ];
 
             const explainer = (dialogOpts.pwd)
                 ? (count === 1 ? l.password_link_access_explainer : l.password_link_access_explainer_multiple)
-                : l.link_access_explainer;
-            footerElements[0].textContent = mega.icu.format(explainer, count);
+                : mega.icu.format(l.link_access_explainer, count);
+            footerElements[0].textContent = explainer;
 
             const counts = [0, 0];
             let i = count;
@@ -1446,28 +1429,31 @@ function logExportEvt(evtId, data) {
 
             const options = {
                 name,
-                contents: [createContents(itemExportLink(dialogOpts), dialogOpts)],
+                contents: [mCreateElement('div', { class: 'relative' }, itemExportLink(dialogOpts))],
                 showClose: true,
                 footer: {
                     slot: footerElements
                 },
+                header: mega.icu.format(l.share_link, count),
                 onShow: () => {
-                    const { ignoreCopy, isUpdated } = dialogOpts;
+                    const { createdCount, isUpdated } = dialogOpts;
                     const heading = mCreateElement('div');
 
                     if (isUpdated) {
                         const banner = mCreateElement(
                             'div',
-                            { class: 'mx-4 mb-4 overflow-y-hidden max-h-100 transition-max-h' },
+                            { class: 'mb-4 overflow-y-hidden max-h-100 transition-max-h' },
                             heading
                         );
 
                         const bannerTxt = mCreateElement(
                             'div',
-                            { class: 'p-3 bg-banner-success rounded-xl' },
+                            { class: 'p-3 bg-banner-success rounded-xl font-body-1' },
                             banner
                         );
                         bannerTxt.textContent = (count === 1) ? l.link_updated : l.links_updated;
+
+                        sheet.contentNode.prepend(heading);
 
                         tSleep(3).then(() => {
                             banner.classList.remove('max-h-100');
@@ -1475,15 +1461,27 @@ function logExportEvt(evtId, data) {
                         });
                     }
 
-                    const h2 = mCreateElement('h2', { class: 'px-4' }, heading);
-                    h2.textContent = mega.icu.format(l.share_link, count);
 
-                    sheet.addTitle(heading);
-
-                    if (!ignoreCopy) {
+                    if (createdCount !== undefined) {
                         copyToClipboard(getClipboardLinks());
-                        toast.show(mega.icu.format(l.toast_link_created_and_copied, count), 4);
+                        toast.show(
+                            (createdCount > 0)
+                                ? mega.icu.format(l.toast_link_created_and_copied, count)
+                                : (count === 1 ? l[1642] : l.links_copied),
+                            4
+                        );
                     }
+
+                    if (!folderlink) {
+                        addSettingsBtn(
+                            ($.itemExport.length === 1)
+                                ? sheet.contentNode.querySelector('.node-link-block .block-naming')
+                                : sheet.headerTitleNode
+                        );
+                    }
+                },
+                onClose: () => {
+                    sheet.removeClass(name);
                 }
             };
 
@@ -1507,23 +1505,26 @@ function logExportEvt(evtId, data) {
 
         const show = () => {
             const { sheet } = mega.ui;
+            const timestamps = exportExpiry.getExpiryDates();
 
             const getExpTimestamp = () => {
-                const timestamps = exportExpiry.getExpiryDates();
-
                 if (!timestamps.length) {
-                    return false;
+                    return 0;
+                }
+
+                if (timestamps.length !== $.itemExport.length) {
+                    return '';
                 }
 
                 let i = timestamps.length - 1;
                 let last = timestamps[i];
 
                 while (--i >= 0) {
-                    if (timestamp[i] !== last) {
-                        return false;
+                    if (timestamps[i] !== last) {
+                        return '';
                     }
 
-                    last = timestamp[i];
+                    last = timestamps[i];
                 }
 
                 return last;
@@ -1534,7 +1535,7 @@ function logExportEvt(evtId, data) {
                 values.dec = false;
                 values.pwd = '';
                 values.pwdArr = [];
-                values.exp = getExpTimestamp() || 0;
+                values.exp = getExpTimestamp();
             }
 
             const onBack = (skipConfirm, isUpdated) => {
@@ -1543,7 +1544,7 @@ function logExportEvt(evtId, data) {
                 const doLeave = () => {
                     resetNewValues();
                     ExportLink.settingsDiscard.hide();
-                    ExportLink.view.show({ ...values, ignoreCopy: true, isUpdated });
+                    ExportLink.view.show({ ...values, isUpdated });
                 };
 
                 if (Object.keys(newValues).length && !skipConfirm) {
@@ -1559,11 +1560,9 @@ function logExportEvt(evtId, data) {
             };
 
             const createContents = () => {
-                const header = mCreateElement('div', { class: 'flex flex-row items-center px-4' }, []);
-
                 const createRow = (id, contentFn, checkFn, uncheckFn, options) => {
                     const action = mCreateElement('div');
-                    const row = mCreateElement('div', { class: 'flex flex-row font-body-1 mt-4 px-4' }, [
+                    const row = mCreateElement('div', { class: 'flex flex-row font-body-1 mt-4' }, [
                         mCreateElement('div', { class: 'flex-1' }),
                         action
                     ]);
@@ -1606,18 +1605,6 @@ function logExportEvt(evtId, data) {
                     return row;
                 };
 
-                MegaButton.factory({
-                    parentNode: header,
-                    icon: 'sprite-fm-mono icon-arrow-left-regular-outline rtl-rot-180',
-                    componentClassname: 'transparent-icon text-icon secondary',
-                    type: 'icon'
-                }).on('click.back', () => {
-                    logExportEvt(500770);
-                    onBack();
-                });
-
-                mCreateElement('h2', { class: 'font-bold my-0 px-2' }, header).textContent = l.link_settings;
-
                 const decr = createRow(
                     'link-dec-toggle',
                     (row) => {
@@ -1626,7 +1613,7 @@ function logExportEvt(evtId, data) {
                         mCreateElement('span', null, decrTxt).textContent = l.send_decryption_key_separately;
                         const link = mCreateElement('a', {
                             class: 'learn-more-text px-1',
-                            href: `${l.mega_help_host}/files-folders/sharing/encrypted-links`,
+                            href: `${l.mega_help_host}/security/data-protection/make-links-more-secure`,
                             target: '_blank',
                             rel: 'noopener noreferrer'
                         }, decrTxt);
@@ -1672,7 +1659,7 @@ function logExportEvt(evtId, data) {
                         mCreateElement(
                             'input',
                             {
-                                class: 'set-date border border-radius-2 font-body-2'
+                                class: 'set-date border-1 border-radius-2 font-body-2'
                                     + ' text-color-medium focus-border-strong',
                                 type: 'text',
                                 name: 'share-link-expiry-datepicker',
@@ -1702,6 +1689,7 @@ function logExportEvt(evtId, data) {
                         newValues.exp = 0;
 
                         logExportEvt(500765, [0]);
+                        exportExpiry.presetValue = false;
                     }
                 );
                 const pwd = createRow(
@@ -1733,7 +1721,9 @@ function logExportEvt(evtId, data) {
                                 type: 'password',
                                 placeholder: l.start_typing,
                                 name: 'share-link-pwd',
-                                value: ''
+                                value: ('pwd' in newValues)
+                                    ? newValues.pwd
+                                    : values.pwd || ''
                             },
                             pwdContainer
                         );
@@ -1754,7 +1744,7 @@ function logExportEvt(evtId, data) {
                                 'div',
                                 {
                                     id: 'decr-key-off',
-                                    class: 'p-3 font-body-1 mx-4 mb-4 mt-1 bg-banner-info rounded-xl'
+                                    class: 'p-3 font-body-1 mb-4 mt-1 bg-banner-info rounded-xl'
                                 }
                             );
                             keyOff.textContent = l.decr_key_off;
@@ -1788,9 +1778,8 @@ function logExportEvt(evtId, data) {
                 );
 
                 const elements = [
-                    header,
                     decr,
-                    mCreateElement('hr', { class: 'border-b border-t-none border-x-none mx-4' }),
+                    mCreateElement('hr', { class: 'border-b border-t-none border-x-none' }),
                     exp,
                     pwd
                 ];
@@ -1804,7 +1793,7 @@ function logExportEvt(evtId, data) {
                         'div',
                         {
                             class: 'hoverable flex flex-row items-center py-3 px-4 transition-colors'
-                                + ' border-radius-2 cursor-pointer'
+                                + ' border-radius-2 cursor-pointer -mx-4'
                         },
                         [
                             mCreateElement('div', { class: 'flex-1' }, [
@@ -1826,7 +1815,7 @@ function logExportEvt(evtId, data) {
                         : l.embed_audio_msg;
 
                     elements.push(
-                        mCreateElement('hr', { class: 'border-b border-t-none border-x-none mx-4' }),
+                        mCreateElement('hr', { class: 'border-b border-t-none border-x-none' }),
                         embedBtn
                     );
 
@@ -1840,14 +1829,14 @@ function logExportEvt(evtId, data) {
                 return mCreateElement('div', null, elements);
             };
 
-            const footer = mCreateElement('div', { class: 'flex flex-row pr-4 mb-4' }, [
+            const footer = mCreateElement('div', { class: 'flex flex-row' }, [
                 mCreateElement('div', { class: 'flex-1' })
             ]);
 
             const removeBtn = new MegaButton({
                 parentNode: footer.querySelector(':scope > .flex-1'),
                 text: ($.itemExport.length === 1) ? l[6821] : l[8735],
-                componentClassname: 'red text-icon underline-offset-4 font-600 slim'
+                componentClassname: 'red text-icon underline-offset-4 font-600 slim no-px'
             }).on('click.remove', () => {
                 ExportLink.settings.hide();
                 removeLink('settings');
@@ -1879,7 +1868,6 @@ function logExportEvt(evtId, data) {
                         'pointer-events-none',
                         'visible-txt'
                     ];
-                    const promises = [];
 
                     const stopLoading = () => {
                         removeBtn.disabled = false;
@@ -1896,31 +1884,63 @@ function logExportEvt(evtId, data) {
                     backBtn.disabled = true;
                     saveBtn.domNode.classList.add(...loadingClasses);
 
-                    if ('pwd' in newValues) {
-                        // Checking if the password is too weak
-                        const pwdStatus = mega.ui.sheet.contentNode.querySelector('.strengthChecker .password-status');
+                    // Contains a backup of all the expiry dates for each node before we recreate links
+                    let nodeExpiryTimestamps = [];
+                    const { pwd } = newValues;
+                    const hasNewPwd = typeof pwd === 'string';
 
-                        if (newValues.pwd
-                            && (
-                                newValues.pwd.length < security.minPasswordLength
-                                || !pwdStatus
-                                || pwdStatus.classList.contains('weak')
-                            )
-                        ) {
-                            pwdStatus.querySelector('.strength-text').textContent = l[9067];
+                    if (hasNewPwd) {
+                        nodeExpiryTimestamps = $.itemExport.map((h) => {
+                            const node = M.d[h];
+                            const { ets } = M.getNodeShare(node);
+
+                            // If it has an expiry time, add it to the array
+                            return ets && { n: node.h, ets };
+                        }).filter(Boolean);
+
+                        const pwdIsWeak = () => {
+                            const { contentNode } = sheet;
+
+                            if (!contentNode.querySelector('div#link-pwd-toggle').component.checked) {
+                                return true;
+                            }
+
+                            const pwdStatus = contentNode.querySelector('.strengthChecker .password-status');
+                            const { minPasswordLength } = security;
+
+                            if (!pwdStatus) {
+                                return false;
+                            }
+                            else if (pwd.length < minPasswordLength) {
+                                pwdStatus.querySelector('.strength-text').textContent = l[9067];
+                                pwdStatus.classList.add('weak', 'checked');
+                                pwdStatus.querySelector('span.strength-icon')
+                                    .classList.add('sprite-fm-mono', 'icon-alert-triangle-thin-outline');
+
+                                return false;
+                            }
+                            else if (pwdStatus.classList.contains('weak')) {
+                                pwdStatus.querySelector('.strength-text').textContent = l[9067];
+                                return false;
+                            }
+
+                            return true;
+                        };
+
+                        if (!pwdIsWeak()) {
                             stopLoading();
                             return;
                         }
 
                         linkUpdated = true;
 
-                        if (newValues.pwd !== values.pwd) {
+                        if (pwd !== values.pwd) {
                             // Security measure to drop the previous public access
                             await exportPassword.removeLinksAndReAdd($.itemExport);
                         }
 
-                        if (newValues.pwd) {
-                            const links = await exportPassword.encrypt.startEncryption(newValues.pwd);
+                        if (pwd) {
+                            const links = await exportPassword.encrypt.startEncryption(pwd);
 
                             if (!Array.isArray(links) || !links.length) {
                                 return;
@@ -1932,21 +1952,34 @@ function logExportEvt(evtId, data) {
                             delete values.pwdArr;
                         }
 
-                        values.pwd = newValues.pwd;
+                        values.pwd = pwd;
                     }
 
-                    if ('exp' in newValues || 'pwd' in newValues) {
-                        const newEts = newValues.exp || null;
-                        let i = $.itemExport.length;
+                    const hasNewExp = 'exp' in newValues;
+                    if (hasNewExp || hasNewPwd) {
+                        const promises = [];
 
-                        while (--i >= 0) {
-                            promises.push(api.screq({ a: 'l', n: $.itemExport[i], ets: newEts }));
+                        if (hasNewExp) {
+                            const ets = newValues.exp || null;
+                            let i = $.itemExport.length;
+
+                            while (--i >= 0) {
+                                promises.push(api.screq({ a: 'l', n: $.itemExport[i], ets }));
+                            }
+
+                            values.exp = ets;
+                        }
+                        else if (hasNewPwd && nodeExpiryTimestamps.length) {
+                            let i = nodeExpiryTimestamps.length;
+
+                            while (--i >= 0) {
+                                const { n, ets } = nodeExpiryTimestamps[i];
+                                promises.push(api.screq({ a: 'l', n, ets }));
+                            }
                         }
 
-                        values.exp = newEts;
+                        await Promise.all(promises);
                     }
-
-                    await Promise.all(promises);
 
                     stopLoading();
 
@@ -1959,8 +1992,8 @@ function logExportEvt(evtId, data) {
                 while (--i >= 0) {
                     counts[M.d[$.itemExport[i]].t]++;
                 }
-                logExportEvt(500768, counts);
 
+                logExportEvt(500768, counts);
                 onBack(true, linkUpdated);
             });
 
@@ -1968,23 +2001,15 @@ function logExportEvt(evtId, data) {
                 name,
                 contents: [createContents()],
                 showClose: true,
+                header: l.link_settings,
                 footer: {
                     slot: [footer]
                 },
-                onClose: () => {
-                    if (Object.keys(newValues).length) {
-                        ExportLink.settingsDiscard.show(
-                            l.discard_and_exit,
-                            l.discard_and_exit_msg,
-                            () => {
-                                ExportLink.settings.resetNewValues();
-                                ExportLink.settingsDiscard.hide();
-                            }
-                        );
-                    }
+                onBack: () => {
+                    logExportEvt(500770);
+                    onBack();
                 },
                 onShow: () => {
-
                     if (
                         ('dec' in newValues && newValues.dec)
                         || (!('dec' in newValues) && values.dec)) {
@@ -1996,11 +2021,27 @@ function logExportEvt(evtId, data) {
                         exportExpiry.presetValue = exp;
                         sheet.contentNode.querySelector('#link-exp-toggle').component.setButtonState(true, true);
                     }
+                    else if (timestamps.length) { // There are different expiration dates
+                        sheet.contentNode.querySelector('#link-exp-toggle').component.setButtonState(true, true);
+                    }
 
-                    const pwd = 'pwd' in newValues && newValues.pwd || !('pwd' in newValues) && values.pwd;
-                    if (pwd) {
+                    if ('pwd' in newValues && newValues.pwd || !('pwd' in newValues) && values.pwd) {
                         sheet.contentNode.querySelector('#link-pwd-toggle').component.setButtonState(true, true);
-                        sheet.contentNode.querySelector('input.enter-pass').value = pwd;
+                    }
+                },
+                onClose: () => {
+                    sheet.removeClass(name);
+                    exportExpiry.presetValue = false;
+
+                    if (Object.keys(newValues).length) {
+                        ExportLink.settingsDiscard.show(
+                            l.discard_and_exit,
+                            l.discard_and_exit_msg,
+                            () => {
+                                ExportLink.settings.resetNewValues();
+                                ExportLink.settingsDiscard.hide();
+                            }
+                        );
                     }
                 }
             };
@@ -2011,7 +2052,10 @@ function logExportEvt(evtId, data) {
 
         return {
             show,
-            hide: hideDialog.bind(null, name),
+            hide: () => {
+                exportExpiry.presetValue = false;
+                hideDialog(name);
+            },
             updateExp: (ts) => { // Used in exportExpiry's onSelect
                 newValues.exp = ts;
             },
@@ -2041,6 +2085,8 @@ function logExportEvt(evtId, data) {
                 if (prevDialog && ExportLink[prevDialog]) {
                     ExportLink[prevDialog].show();
                 }
+
+                sheet.removeClass(name);
             };
 
             // Use message about removal of 'items' for when both files and folders are selected
@@ -2068,6 +2114,7 @@ function logExportEvt(evtId, data) {
             }
 
             const txt = mCreateElement('div');
+            txt.className = 'text-left';
             txt.textContent = contents;
 
             const footerElements = [
@@ -2079,7 +2126,6 @@ function logExportEvt(evtId, data) {
                 parentNode: footerElements[0],
                 componentClassname: 'mega-checkbox mb-4',
                 checkboxName: 'nowarnpl-checkbox',
-                checkboxAlign: 'left',
                 labelTitle: l.do_not_show_again1,
                 checked: false
             });
@@ -2111,12 +2157,15 @@ function logExportEvt(evtId, data) {
             const options = {
                 name,
                 contents: [txt],
-                title: mega.icu.format(l.remove_link_question, handles.length),
+                header: mega.icu.format(l.remove_link_question, handles.length),
                 showClose: true,
                 footer: {
                     slot: footerElements
                 },
-                onClose: showPrevDialog
+                onClose: () => {
+                    sheet.removeClass(name);
+                    showPrevDialog();
+                }
             };
 
             sheet.show(options);
@@ -2130,7 +2179,7 @@ function logExportEvt(evtId, data) {
         const { ExportLink } = scope.mega.Dialog;
         const name = 'link-settings-discard-dialog';
 
-        const show = (title, contents, onProceed, onBack) => {
+        const show = (header, contents, onProceed, onBack) => {
             const { sheet } = mega.ui;
 
             if (!onBack) {
@@ -2159,12 +2208,15 @@ function logExportEvt(evtId, data) {
             const options = {
                 name,
                 contents,
-                title,
+                header,
                 showClose: true,
                 footer: {
                     slot: [footer]
                 },
-                onClose: onBack
+                onClose: () => {
+                    sheet.removeClass(name);
+                    onBack();
+                }
             };
 
             sheet.show(options);
@@ -2180,18 +2232,14 @@ function logExportEvt(evtId, data) {
 
         const show = (mediaType) => {
             const { sheet, toast } = mega.ui;
+            const audio = mediaType === 2; // 1 - Video, 2 - Audio
 
-            /**
-             * @param {1|2} mediaType 1 - Video, 2 - Audio
-             * @returns {String}
-             */
-            const setCode = (mediaType) => {
+            const setCode = () => {
                 const n = M.d[$.itemExport[0]];
                 const link = getBaseUrl() + '/embed/' + n.ph + '#' + a32_to_base64(n.k);
 
                 const iframe = '<iframe width="%w" height="%h" frameborder="0" src="%s" allowfullscreen %a></iframe>\n';
                 const { sheet } = mega.ui;
-                const audio = mediaType === 2;
                 const dialog = sheet.contentNode;
 
                 let time = 0;
@@ -2267,41 +2315,22 @@ function logExportEvt(evtId, data) {
                 ExportLink.settings.show();
             };
 
-            /**
-             * @param {1|2} mediaType 1 - Video, 2 - Audio
-             * @returns {HTMLDivElement}
-             */
-            const createContents = (mediaType) => {
+            const createContents = () => {
                 const node = M.d[$.itemExport[0]];
-                const isAudio = mediaType === 2;
-                const title = (isAudio) ? l.embed_audio : l.embed_video ;
-                const header = mCreateElement('div', { class: 'flex flex-row items-center mb-4 px-4' });
                 const naming = mCreateElement(
                     'div',
-                    { class: 'flex flex-row items-center font-body-1 mb-4 px-4' },
+                    { class: 'flex flex-row items-center font-body-1 mb-4' },
                     [
                         mCreateElement('i', { class: `item-type-icon icon-${fileIcon(node)}-24 icon-size-8` }),
                         mCreateElement('div', { class: 'flex-1 text-ellipsis px-2' })
                     ]
                 );
 
-                naming.querySelector(':scope > div.flex-1').textContent = htmlentities(node.name);
-
-                MegaButton.factory({
-                    parentNode: header,
-                    icon: 'sprite-fm-mono icon-arrow-left-regular-outline rtl-rot-180',
-                    componentClassname: 'transparent-icon text-icon secondary',
-                    type: 'icon'
-                }).on('click.back', () => {
-                    logExportEvt(500776);
-                    onBack();
-                });
-
-                mCreateElement('h2', { class: 'font-bold my-0 px-2' }, header).textContent = title;
+                naming.querySelector(':scope > div.flex-1').textContent = node.name;
 
                 const textBlock = mCreateElement(
                     'div',
-                    { class: 'border-radius-2 bg-surface-grey-1 relative mx-4' },
+                    { class: 'border-radius-2 bg-surface-grey-1 relative' },
                     [
                         mCreateElement(
                             'textarea',
@@ -2331,14 +2360,13 @@ function logExportEvt(evtId, data) {
                 });
 
                 const elements = [
-                    header,
                     naming,
                     textBlock,
-                    mCreateElement('hr', { class: 'border-b border-t-none border-x-none my-4 mx-4' })
+                    mCreateElement('hr', { class: 'border-b border-t-none border-x-none my-4' })
                 ];
 
-                if (isAudio) {
-                    const copyBlock = mCreateElement('div', { class: 'flex flex-row items-center px-4' }, [
+                if (audio) {
+                    const copyBlock = mCreateElement('div', { class: 'flex flex-row items-center' }, [
                         mCreateElement('div', { class: 'flex-1 font-body-1' }),
                         mCreateElement('div')
                     ]);
@@ -2354,7 +2382,7 @@ function logExportEvt(evtId, data) {
                         checked: false,
                         role: 'switch',
                         onChange() {
-                            setCode(mediaType);
+                            setCode();
                             logExportEvt(500782, [this.checked & 1]);
                         }
                     });
@@ -2365,7 +2393,7 @@ function logExportEvt(evtId, data) {
                     const { playtime } = MediaAttribute(node).data;
                     const startBlock = mCreateElement(
                         'div',
-                        { class: 'flex flex-row items-center mb-4 px-4', id: 'embed-start-at' },
+                        { class: 'flex flex-row items-center mb-4', id: 'embed-start-at' },
                         [
                             mCreateElement('div', { class: 'flex-1' }, [
                                 mCreateElement('div', { class: 'font-body-1' }),
@@ -2374,7 +2402,7 @@ function logExportEvt(evtId, data) {
                             mCreateElement(
                                 'div',
                                 {
-                                    class: 'flex flex-row items-center border border-radius-2 p-2 w-40'
+                                    class: 'flex flex-row items-center border-1 border-radius-2 p-2 w-40'
                                         + ' box-border focus-within-border-strong'
                                 },
                                 [
@@ -2396,7 +2424,7 @@ function logExportEvt(evtId, data) {
                     );
 
                     const input = startBlock.querySelector('input');
-                    input.addEventListener('input', setCode.bind(null, mediaType));
+                    input.addEventListener('input', setCode.bind(null));
                     input.addEventListener('click', logExportEvt.bind(null, 500777));
 
                     startBlock.querySelector('span.seconds-suffix').textContent = mega.icu.format(l.seconds_suffix, 0);
@@ -2406,10 +2434,12 @@ function logExportEvt(evtId, data) {
 
                     const min = 128;
                     const max = 9999;
+                    const inputClass = 'border-1 border-radius-2 p-2 flex-1 focus-border-strong'
+                        + ' bg-inherit text-color-high';
 
                     const dimensionsBlock = mCreateElement(
                         'div',
-                        { class: 'flex flex-row items-center mb-4 px-4', id: 'embed-sizes' },
+                        { class: 'flex flex-row items-center mb-4', id: 'embed-sizes' },
                         [
                             mCreateElement('div', { class: 'flex-1 font-body-1' }),
                             mCreateElement(
@@ -2419,7 +2449,7 @@ function logExportEvt(evtId, data) {
                                     mCreateElement(
                                         'input',
                                         {
-                                            class: 'border border-radius-2 p-2 bg-inherit flex-1 focus-border-strong',
+                                            class: inputClass,
                                             type: 'number',
                                             min,
                                             max,
@@ -2431,7 +2461,7 @@ function logExportEvt(evtId, data) {
                                     mCreateElement(
                                         'input',
                                         {
-                                            class: 'border border-radius-2 p-2 bg-inherit flex-1 focus-border-strong',
+                                            class: inputClass,
                                             type: 'number',
                                             min,
                                             max,
@@ -2445,13 +2475,13 @@ function logExportEvt(evtId, data) {
                     );
 
                     dimensionsBlock.querySelectorAll('input').forEach((input) => {
-                        input.addEventListener('input', setCode.bind(null, mediaType));
+                        input.addEventListener('input', setCode.bind(null));
                         input.addEventListener('click', logExportEvt.bind(null, parseInt(input.dataset.clickEvtId)));
                     });
                     dimensionsBlock.querySelector(':scope > div.flex-1').textContent = l[17823];
                     dimensionsBlock.querySelector(':scope span.x').textContent = String.fromCharCode(215);
 
-                    const autoPlayBlock = mCreateElement('div', { class: 'flex flex-row items-center px-4' }, [
+                    const autoPlayBlock = mCreateElement('div', { class: 'flex flex-row items-center' }, [
                         mCreateElement('div', { class: 'font-body-1' }),
                         mCreateElement(
                             'i',
@@ -2474,12 +2504,12 @@ function logExportEvt(evtId, data) {
                         checked: false,
                         role: 'switch',
                         onChange() {
-                            setCode(mediaType);
+                            setCode();
                             logExportEvt(500780, [this.checked & 1]);
                         }
                     });
 
-                    const muteBlock = mCreateElement('div', { class: 'flex flex-row items-center px-4' }, [
+                    const muteBlock = mCreateElement('div', { class: 'flex flex-row items-center' }, [
                         mCreateElement('div', { class: 'flex-1 font-body-1' }),
                         mCreateElement('div')
                     ]);
@@ -2495,7 +2525,7 @@ function logExportEvt(evtId, data) {
                         checked: false,
                         role: 'switch',
                         onChange() {
-                            setCode(mediaType);
+                            setCode();
                             logExportEvt(500781, [this.checked & 1]);
                         }
                     });
@@ -2511,14 +2541,14 @@ function logExportEvt(evtId, data) {
                 return mCreateElement('div', null, elements);
             };
 
-            const footer = mCreateElement('div', { class: 'flex flex-row pr-4 mb-4' }, [
+            const footer = mCreateElement('div', { class: 'flex flex-row' }, [
                 mCreateElement('div', { class: 'flex-1' })
             ]);
 
             MegaButton.factory({
                 parentNode: footer.querySelector(':scope > .flex-1'),
-                text: mega.icu.format(l.remove_links, $.itemExport.length),
-                componentClassname: 'red text-icon underline-offset-4 font-600 slim'
+                text: ($.itemExport.length === 1) ? l[6821] : l[8735],
+                componentClassname: 'red text-icon underline-offset-4 font-600 slim no-px'
             }).on('click.remove', () => {
                 ExportLink.embed.hide();
                 removeLink('embed');
@@ -2547,13 +2577,20 @@ function logExportEvt(evtId, data) {
 
             const options = {
                 name,
-                contents: [createContents(mediaType)],
+                contents: [createContents()],
+                header: (audio) ? l.embed_audio : l.embed_video,
                 showClose: true,
                 footer: {
                     slot: [footer],
                 },
-                onShow: setCode.bind(null, mediaType),
+                onBack: () => {
+                    logExportEvt(500776);
+                    onBack();
+                },
+                onShow: setCode.bind(null),
                 onClose: () => {
+                    sheet.removeClass(name);
+
                     if (!Object.keys(ExportLink.settings.getNewValues()).length) {
                         return;
                     }
@@ -2636,9 +2673,9 @@ function logExportEvt(evtId, data) {
         };
 
         self.options = $.extend(true, {}, defaultOptions, opts);
-
         // Number of nodes left to process
         self.nodesLeft = self.options.nodesToProcess.length;
+        self.nodesNeedCopy = 0;
         self.logger = MegaLogger.getLogger('ExportLink');
     };
 
@@ -2669,7 +2706,7 @@ function logExportEvt(evtId, data) {
             }
 
             var exportLinkDialog = new mega.Dialog.ExportLink();
-            return exportLinkDialog.linksDialog();
+            return exportLinkDialog.linksDialog(false, { createdCount: 0 });
         }
         else if (is_mobile) {
             eventlog(99634); // Created public link on mobile webclient
@@ -2781,6 +2818,8 @@ function logExportEvt(evtId, data) {
             }
         }
 
+        this.nodesNeedCopy++;
+
         // Get all child nodes of root folder with nodeId
         return api_setshare(nodeId, [{u: 'EXP', r: 0}])
             .then((result) => {
@@ -2821,7 +2860,7 @@ function logExportEvt(evtId, data) {
             if (!--this.nodesLeft) {
                 if (this.options.showExportLinkDialog) {
                     var exportLinkDialog = new mega.Dialog.ExportLink();
-                    exportLinkDialog.linksDialog();
+                    exportLinkDialog.linksDialog(false, { createdCount: this.nodesNeedCopy });
                 }
 
                 console.assert($.getExportLinkInProgress);
@@ -2850,6 +2889,8 @@ function logExportEvt(evtId, data) {
         if (share.h === nodeId && Object(M.d[nodeId]).ph) {
             return done(nodeId);
         }
+
+        this.nodesNeedCopy++;
 
         // If the Expiry Timestamp (ets) is already set locally, resend in the request or it gets removed
         if (share.ets) {

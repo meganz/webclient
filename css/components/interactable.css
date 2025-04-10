@@ -68,6 +68,10 @@ Implemented styles:
 .nav-elem.slim {
     height: 36px;
 }
+.nav-elem.no-px {
+    padding-left: 0;
+    padding-right: 0;
+}
 
 .nav-elem.normal.block {
     width: 100%;

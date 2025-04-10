@@ -622,6 +622,10 @@ if (!browserUpdate) try
     if (localStorage.getItem('darkMode') === '1') {
         document.documentElement.classList.add('dark-mode');
     }
+
+    if (!is_mobile) {
+        document.body.classList.add('web-desktop');
+    }
 }
 catch(e) {
     if (!is_mobile || !cookiesDisabled) {

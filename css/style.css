@@ -11527,6 +11527,9 @@ a.pr-faded-link {
     text-decoration: underline;
     color: var(--color-copy-secondary);
 }
+a.underline-offset-4 {
+    text-decoration-line: underline;
+}
 .mega-error-box {
     color: var(--text-color-error);
     font: var(--text-body1);

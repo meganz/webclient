@@ -58,6 +58,10 @@
     margin-left: auto;
 }
 
+body.rtl .overlay-wrap .nav-elem.close {
+    margin-left: 0;
+}
+
 .overlay-wrap .main {
     display: flex;
     flex-direction: column;
@@ -221,7 +225,6 @@ body.mobile .overlay-wrap .image i.password {
     box-sizing: border-box;
     padding: 4px 24px 16px;
     transition: transform 0.2s ease-out;
-    max-height: 48px;
 }
 
 @media only screen and (orientation: landscape) and (max-height: 359px) {
@@ -234,4 +237,8 @@ body.mobile .overlay-wrap .image i.password {
     .overlay-wrap .overlay-footer {
         padding-top: 16px;
     }
+}
+
+.overlay-wrap.export-links-dialog .overlay-footer {
+    padding-top: 12px;
 }

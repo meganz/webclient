@@ -3521,9 +3521,7 @@ MegaData.prototype.createPublicLink = async function(handle) {
 
     const res = {n, ph: n.ph, key: n.t ? u_sharekeys[n.h][0] : n.k};
 
-    res.link = mega.flags.nlfe
-        ? `${getBaseUrl()}/${n.t ? 'folder' : 'file'}/${res.ph}#${a32_to_base64(res.key)}`
-        : `${getBaseUrl()}/#${n.t ? 'F' : ''}!${res.ph}!${a32_to_base64(res.key)}`;
+    res.link = `${getBaseUrl()}/${n.t ? 'folder' : 'file'}/${res.ph}#${a32_to_base64(res.key)}`;
 
     return res;
 };

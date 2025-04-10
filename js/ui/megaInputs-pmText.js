@@ -44,7 +44,7 @@ mega.ui.MegaInputs.prototype.pmText._init = function() {
         // Wrap it with another div for styling and animation
         $input.wrap(`<div class="mega-input pm box-style ${wrapperClass}"></div>`);
 
-        const $wrapper = this.$wrapper = $input.closest(`.mega-input`);
+        const $wrapper = this.$wrapper = $input.parent();
 
         // Hide wrapper if input has hidden class
         if ($input.hasClass('hidden')) {
@@ -264,9 +264,9 @@ mega.ui.MegaInputs.prototype.pmText._withIconOrPrefix = function() {
     }
 
     if (this.type === 'password') {
-        const iconSprite = 'sprite-pm-mono';
-        const showTextIcon = 'icon-eye-thin-outline';
-        const hideTextIcon = 'icon-eye-off-thin-outline';
+        const iconSprite = 'sprite-fm-mono';
+        const showTextIcon = 'icon-eye-reveal1';
+        const hideTextIcon = 'icon-eye-hidden1';
 
         $wrapper.safeAppend(`<i class="${iconSprite} ${showTextIcon} pass-visible
             ${this.options.iconClass || 'icon'}"></i>`);
@@ -335,7 +335,7 @@ mega.ui.MegaInputs.prototype.pmText._strengthChecker = function() {
         // Strength wording
         $wrapper.safeAppend('<div class="account password-status">' +
             '<span class="strength-icon"></span>' +
-            '<span class="strength-text"></span>' +
+            '<span class="strength-text px-2"></span>' +
             '</div>');
 
         var _bindStrengthChecker = () => {
@@ -362,7 +362,7 @@ mega.ui.MegaInputs.prototype.pmText._strengthChecker = function() {
                             'icon-alert-circle-thin-outline',
                             'icon-alert-triangle-thin-outline');
 
-                const strength = mega.ui.pm.utils.classifyPMPassword($input.val());
+                const strength = MegaUtils.classifyPMPassword($input.val());
 
                 if (typeof strength === 'object') {
                     $passStatus.addClass(`${strength.className} checked`);

@@ -43,6 +43,9 @@
     font: var(--font-input-password);
     text-overflow: clip;
 }
+.pm.mega-input input.password.enter-pass {
+    font: var(--text-body2);
+}
 .pm.mega-input .password-colorized {
     position: absolute;
     top: auto;
@@ -58,22 +61,6 @@
 }
 .pm.mega-input.strengthChecker.title-ontop {
     margin-bottom: 30px;
-}
-.pm.mega-input .account.password-status {
-    font: var(--mobile-font-caption-large-regular);
-    display: none;
-    align-items: center;
-    position: absolute;
-    top: 41px;
-    left: 0;
-    width: 100%;
-    margin: 10px 0 24px;
-}
-.pm.mega-input .account.password-status.checked {
-    display: flex;
-}
-.pm.mega-input .account.password-status .strength-text {
-    margin-left: 8px;
 }
 .pm.mega-input input[type="number"] {
     appearance: textfield;

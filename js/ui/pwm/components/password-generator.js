@@ -39,7 +39,7 @@
             const strengthIcon = document.createElement('span');
             strengthIcon.className = 'strength-icon sprite-pm-mono';
             const strengthText = document.createElement('span');
-            strengthText.className = 'strength-text';
+            strengthText.className = 'strength-text px-2';
             this.strength.append(strengthIcon, strengthText);
 
             this.passwordGenerator.append(preview, this.strength);

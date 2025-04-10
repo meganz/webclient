@@ -97,329 +97,13 @@ var exportPassword = {
             "use strict";
 
             // Cache dialog selector
-            this.$dialog = $('.mega-dialog.export-links-dialog', 'body');
-
-            // Update protected/not protected components UI and update links/keys values
-            this.updatePasswordComponentsUI();
-            this.updateLinkInputValues();
+            this.$dialog = $('.mega-sheet.export-links-settings-dialog', 'body');
 
             // If they are a Pro user, enable set password feature
             if (u_attr.p) {
-                this.initPasswordToggleButton();
                 this.loadPasswordEstimatorLibrary();
                 this.initPasswordStrengthCheck();
-                this.initPasswordVisibilityHandler();
-                this.initConfirmPasswordButton();
             }
-        },
-
-        /**
-         * Update protected/not protected components UI
-         */
-        updatePasswordComponentsUI: function() {
-
-            "use strict";
-
-            const $items = $('.item', this.$dialog);
-            const $protectedItems = $items.filter('.password-protect-link');
-            const $setPasswordBtn = $('.js-confirm-password', this.$dialog);
-            const $removePasswordBtn = $('.js-reset-password', this.$dialog);
-
-            // If password protected links
-            if ($protectedItems.length) {
-
-                // Hide the Confirm password button
-                $setPasswordBtn.addClass('hidden');
-
-                // Show Remove password button
-                $removePasswordBtn.removeClass('hidden');
-            }
-            else {
-                // Show Confirm password button
-                $setPasswordBtn.removeClass('hidden');
-
-                // Hide Remove password button
-                $removePasswordBtn.addClass('hidden');
-            }
-        },
-
-        /**
-         * Update links/keys values
-         */
-        updateLinkInputValues: function() {
-
-            "use strict";
-
-            var isSeparateKeys = $('.js-export-keys-switch', this.$dialog).hasClass('toggle-on');
-            var $items = $('.item:not(.password-protect-link)', this.$dialog);
-
-            // Update not password protected Link input values
-            $items.get().forEach(function(e) {
-
-                var $this = $(e);
-                var $linkInput = $('.item-link.link input', $this);
-                var $keyInput = $('.item-link.key input', $this);
-                var linkWithoutKey = $linkInput.data('link');
-                var key = $linkInput.data('key');
-
-                // Set key without # or !
-                $keyInput.val($keyInput.data('key'));
-
-                // Set link
-                if (isSeparateKeys) {
-                    $linkInput.val(linkWithoutKey);
-                }
-                else {
-                    $linkInput.val(linkWithoutKey + key);
-                }
-            });
-        },
-
-        /**
-         * Setup the password toggle
-         */
-        initPasswordToggleButton: function() {
-
-            "use strict";
-
-            const $exportKeysSwitch = $('.js-export-keys-switch', this.$dialog);
-            const $linkAccessText = $('.js-link-access-text', this.$dialog);
-            const $passwordContainer = $('.password-container', this.$dialog);
-            const $passwordInput = $('.js-password-input', this.$dialog);
-            const $passwordInputWrapper = $passwordInput.parent();
-            const $passwordToggleSwitch = $('.js-password-switch', this.$dialog);
-            const $passwordToggleIcon = $('.mega-feature-switch', $passwordToggleSwitch);
-            const $passwordVisibilityToggle = $('.js-toggle-password-visible', this.$dialog);
-            const $passwordStrengthText = $('.js-strength-indicator', this.$dialog);
-            const $updateSuccessBanner = $('.js-update-success-banner', this.$dialog);
-
-            // Init toggle to show/hide password section
-            $passwordToggleSwitch.rebind('click.changePasswordView', () => {
-
-                const passwordToggleIsOn = $passwordToggleSwitch.hasClass('toggle-on');
-
-                // If toggle is currently on, we will turn it off
-                if (passwordToggleIsOn) {
-
-                    // If no password has been entered, no need to recreate links,
-                    // so just reset the password UI elements to default off state
-                    if ($passwordInput.val() === '') {
-                        exportPassword.encrypt.turnOffPasswordUI();
-                        return;
-                    }
-                    loadingDialog.show();
-
-                    // Remove the existing links and re-add them
-                    exportPassword.removeLinksAndReAdd($.itemExport)
-                        .then(() => {
-
-                            const $items = $('.item', this.$dialog);
-                            const linkCount = $.itemExport.length;
-
-                            // If a password has actually been set
-                            if ($items.first().hasClass('password-protect-link')) {
-
-                                // Show success banner telling them to re-copy the links
-                                $updateSuccessBanner.text(mega.icu.format(l.links_updated_copy_again, linkCount));
-                                $updateSuccessBanner.removeClass('hidden');
-
-                                // Hide again after 3 seconds
-                                setTimeout(() => {
-                                    $updateSuccessBanner.addClass('hidden');
-                                }, 3000);
-                            }
-
-                            // Reset the password UI elements to default off state
-                            return exportPassword.encrypt.turnOffPasswordUI();
-                        })
-                        .catch(tell)
-                        .finally(() => {
-                            loadingDialog.hide();
-                        });
-                }
-                else {
-                    // The toggle is currently off, so we will turn it on
-                    // First, turn off the separate keys toggle if it's on
-                    if ($exportKeysSwitch.hasClass('toggle-on')) {
-                        $exportKeysSwitch.trigger('click');
-                    }
-
-                    // Disable the separate keys toggle
-                    $exportKeysSwitch.addClass('disabled');
-
-                    // Turn on toggle and show the password section
-                    $passwordToggleSwitch.addClass('toggle-on').removeClass('toggle-off');
-                    $passwordToggleIcon.addClass('icon-check-after').removeClass('icon-minimise-after');
-                    $passwordContainer.removeClass('hidden');
-
-                    // Focus the input so they can immediately enter the password
-                    $passwordInput.focus();
-                }
-            });
-        },
-
-        /**
-         * Turns off the password related UI, used in initialisation of the dialog to reset the password elements,
-         * also in turning off the toggle switch. It was useful to be able to reset the UI elements to the off state
-         * without triggering the toggle switch to off (which has a side effect of recreating the password links).
-         * @returns {undefined}
-         */
-        turnOffPasswordUI: function() {
-
-            'use strict';
-
-            const $exportKeysSwitch = $('.js-export-keys-switch', this.$dialog);
-            const $linkAccessText = $('.js-link-access-text', this.$dialog);
-            const $passwordContainer = $('.password-container', this.$dialog);
-            const $passwordInput = $('.js-password-input', this.$dialog);
-            const $passwordInputWrapper = $passwordInput.parent();
-            const $passwordToggleSwitch = $('.js-password-switch', this.$dialog);
-            const $passwordToggleIcon = $('.mega-feature-switch', $passwordToggleSwitch);
-            const $passwordVisibilityToggle = $('.js-toggle-password-visible', this.$dialog);
-            const $passwordStrengthText = $('.js-strength-indicator', this.$dialog);
-            const $items = $('.item', this.$dialog);
-            const linkCount = $.itemExport.length;
-
-            // Set links and keys into text boxes
-            $items.removeClass('password-protect-link');
-
-            // Update Password buttons and links UI
-            exportPassword.encrypt.updatePasswordComponentsUI();
-
-            // Update Link input values
-            exportPassword.encrypt.updateLinkInputValues();
-
-            // Turn off toggle and hide the password section
-            $passwordToggleSwitch.addClass('toggle-off').removeClass('toggle-on');
-            $passwordToggleIcon.addClass('icon-minimise-after').removeClass('icon-check-after');
-            $passwordContainer.addClass('hidden');
-
-            // Re-enable the separate link/key toggle
-            $exportKeysSwitch.removeClass('disabled');
-
-            // Reset password input to default state
-            $passwordInput.val('');
-            $passwordInput.prop('readonly', false);
-            $passwordStrengthText.text('');
-            $passwordInputWrapper.removeClass('good1 good2 good3 good4 good5');
-
-            // Prepare MegaInput field and hide previous errors
-            mega.ui.MegaInputs($passwordInput);
-            $passwordInput.data('MegaInputs').hideError();
-
-            // Revert to default state for the password visibility 'eye' icon
-            if ($passwordVisibilityToggle.hasClass('icon-eye-hidden')) {
-                $passwordVisibilityToggle.trigger('click');
-            }
-
-            // Change link access description back to 'Anyone with this link can view and download your data'
-            $linkAccessText.text(mega.icu.format(l.link_access_explainer, linkCount));
-        },
-
-        /**
-         * Setup Set remove password button
-         */
-        initResetPasswordButton: function() {
-
-            "use strict";
-
-            const $removePasswordBtn = $('.js-reset-password', this.$dialog);
-            const $linkAccessText = $('.js-link-access-text', this.$dialog);
-            const $passwordVisibilityToggle = $('.js-toggle-password-visible', this.$dialog);
-            const $passwordInput = $('.js-password-input', this.$dialog);
-            const $passwordInputWrapper = $passwordInput.parent();
-            const $passwordStrengthText = $('.js-strength-indicator', this.$dialog);
-
-            // On Remove password click
-            $removePasswordBtn.rebind('click.removePass', () => {
-                loadingDialog.show();
-
-                // Remove the existing links and re-add them
-                exportPassword.removeLinksAndReAdd($.itemExport)
-                    .then(() => {
-                        const $items = $('.item', this.$dialog);
-                        const linkCount = $.itemExport.length;
-
-                        // Set links and keys into text boxes
-                        $items.removeClass('password-protect-link');
-
-                        // Update Password buttons and links UI
-                        exportPassword.encrypt.updatePasswordComponentsUI();
-
-                        // Update Link input values
-                        exportPassword.encrypt.updateLinkInputValues();
-
-                        // Change link access description back to 'Anyone with this link can view your data'
-                        $linkAccessText.text(mega.icu.format(l.link_access_explainer, linkCount));
-
-                        // Reset password input to default state
-                        $passwordInput.val('');
-                        $passwordInput.focus();
-                        $passwordInput.prop('readonly', false);
-                        $passwordStrengthText.text('');
-                        $passwordInputWrapper.removeClass('good1 good2 good3 good4 good5');
-
-                        // Revert to default state for the password visibility 'eye' icon
-                        if ($passwordVisibilityToggle.hasClass('icon-eye-hidden')) {
-                            $passwordVisibilityToggle.trigger('click');
-                        }
-                    })
-                    .catch(tell)
-                    .finally(() => {
-                        loadingDialog.hide();
-                    });
-
-                return false;
-            });
-        },
-
-        /**
-         * Initialise the Confirm password button to set the link/s password
-         */
-        initConfirmPasswordButton: function() {
-
-            'use strict';
-
-            // Add click handler to the confirm button
-            $('.js-confirm-password', this.$dialog).rebind('click.setPass', () => {
-                loadingDialog.show();
-
-                // Remove the existing links and re-add them
-                exportPassword.removeLinksAndReAdd($.itemExport)
-                    .then(() => {
-                        // @todo revamp to get back the crypto promise
-                        return exportPassword.encrypt.startEncryption();
-                    })
-                    .catch(tell)
-                    .finally(() => {
-                        loadingDialog.hide();
-                    });
-            });
-        },
-
-        /**
-         * Add click handler on the eye icon inside the password field to toggle the password as text/dots
-         */
-        initPasswordVisibilityHandler: function() {
-
-            'use strict';
-
-            const $passwordInput = $('.js-password-input', this.$dialog);
-            const $togglePasswordVisibileIcon = $('.js-toggle-password-visible', this.$dialog);
-
-            $togglePasswordVisibileIcon.rebind('click.showPass', () => {
-
-                // If the eye icon is showing, reveal the password using text field
-                if ($togglePasswordVisibileIcon.hasClass('icon-eye-reveal')) {
-                    $togglePasswordVisibileIcon.removeClass('icon-eye-reveal').addClass('icon-eye-hidden');
-                    $passwordInput[0].type = 'text';
-                }
-                else {
-                    // Otherwise revert back to dots
-                    $togglePasswordVisibileIcon.removeClass('icon-eye-hidden').addClass('icon-eye-reveal');
-                    $passwordInput[0].type = 'password';
-                }
-            });
         },
 
         /**
@@ -431,14 +115,7 @@ var exportPassword = {
 
             if (typeof zxcvbn === 'undefined') {
 
-                // Show loading spinner
-                const $loader = $('.estimator-loading-icon', this.$dialog).addClass('loading');
-
-                // On completion of loading, hide the loading spinner
-                M.require('zxcvbn_js')
-                    .done(function() {
-                        $loader.removeClass('loading');
-                    });
+                M.require('zxcvbn_js').done(nop);
             }
         },
 
@@ -449,104 +126,28 @@ var exportPassword = {
 
             "use strict";
 
-            const $passwordStrengthField = $('.js-strength-indicator', this.$dialog);
-            const $passwordInput = $('.js-password-input', this.$dialog);
-            const $encryptButton = $('.js-confirm-password', this.$dialog);
-            const $inputWrapper = $passwordInput.parent();
+            mega.ui.MegaInputs($('.enter-pass', this.$dialog));
+        },
 
-            // Add keyup event to the password text field
-            $passwordInput.rebind('keyup', function(event) {
-
-                // Don't attempt to do add any strength checker text if the field is disabled for typing
-                if ($passwordInput.prop('readonly')) {
-                    return false;
-                }
-
-                // Make sure the ZXCVBN password strength estimator library is loaded first
-                if (typeof zxcvbn !== 'undefined') {
-
-                    // Estimate the password strength
-                    var password = $.trim($passwordInput.val());
-                    var passwordScore = zxcvbn(password).score;
-                    var passwordLength = password.length;
-
-                    // Remove previous strength classes that were added
-                    $inputWrapper.removeClass('good1 good2 good3 good4 good5');
-
-                    // Add colour coding and text
-                    if (password.length === 0) {
-                        $passwordStrengthField.text('');   // No password entered, hide text
-                    }
-                    else if (passwordLength < 8) {
-                        $inputWrapper.addClass('good1');
-                        $passwordStrengthField.text(l[18700]);    // Too short
-                    }
-                    else if (passwordScore === 4) {
-                        $inputWrapper.addClass('good5');
-                        $passwordStrengthField.text(l[1128]);    // Strong
-                    }
-                    else if (passwordScore === 3) {
-                        $inputWrapper.addClass('good4');
-                        $passwordStrengthField.text(l[1127]);    // Good
-                    }
-                    else if (passwordScore === 2) {
-                        $inputWrapper.addClass('good3');
-                        $passwordStrengthField.text(l[1126]);    // Medium
-                    }
-                    else if (passwordScore === 1) {
-                        $inputWrapper.addClass('good2');
-                        $passwordStrengthField.text(l[1125]);    // Weak
-                    }
-                    else {
-                        $inputWrapper.addClass('good1');
-                        $passwordStrengthField.text(l[1124]);    // Very Weak
-                    }
-                }
-
-                // If Enter key is pressed, trigger encryption button clicking
-                if (event.keyCode === 13) {
-                    $encryptButton.trigger('click');
-                }
-            });
-
-            // Add keyup event to the password field
-            $passwordInput.rebind('keyup.setPass', (event) => {
-
-                // If Enter key is pressed, trigger encryption button clicking
-                if (event.keyCode === 13) {
-                    $encryptButton.trigger('click');
-                }
-            });
+        showErrorToast(content) {
+            'use strict';
+            toaster.main.show({ icons: ['sprite-fm-mono icon-alert-triangle-thin-outline red'], content });
         },
 
         /**
          * Start key derivation of each link in the dialog
          */
-        startEncryption: function() {
+        async startEncryption(password) {
 
-            "use strict";
+            'use strict';
 
-            const $linkAccessText = $('.js-link-access-text', this.$dialog);
-            const $passwordVisibilityToggle = $('.js-toggle-password-visible', this.$dialog);
-            const $passwordInput = $('.js-password-input', this.$dialog);
-            const $passwordInputWrapper = $passwordInput.parent();
-            const $passwordStrengthText = $('.js-strength-indicator', this.$dialog);
-            const $updateSuccessBanner = $('.js-update-success-banner', this.$dialog);
-
-            // Prepare MegaInput field
-            mega.ui.MegaInputs($passwordInput);
-
-            // Hide previous errors
-            $passwordInput.data('MegaInputs').hideError();
-
-            // Get the password
-            const password = $passwordInput.val();
+            const $passwordInput = $('input.enter-pass', this.$dialog);
 
             // Check if TextEncoder function is available for the stringToByteArray function
             if (!window.TextEncoder) {
 
                 // This feature is not supported in your browser...
-                $passwordInput.data('MegaInputs').showError(l[9065]);
+                this.showErrorToast(l[9065]);
                 return false;
             }
 
@@ -554,66 +155,45 @@ var exportPassword = {
             if (typeof zxcvbn === 'undefined') {
 
                 // The password strength verifier is still initializing
-                $passwordInput.data('MegaInputs').showError(l[1115]);
+                this.showErrorToast(l[1115]);
                 return false;
             }
 
             // Check that the password length is sufficient and exclude very weak passwords
-            if (password.length < security.minPasswordLength || $passwordInput.parent().hasClass('good1')) {
+            if (
+                password.length < security.minPasswordLength
+                || $('.password-status', $passwordInput.parent()).hasClass('weak')
+            ) {
 
                 // Please use a stronger password
-                $passwordInput.data('MegaInputs').showError(l[9067]);
+                this.showErrorToast(l[9067]);
                 return false;
             }
 
             // Get information for each selected link showing in the dialog and convert the password to bytes
-            var links = exportPassword.encrypt.getLinkInfo();
+            const links = exportPassword.encrypt.getLinkInfo();
+            const pwdLinks = [];
 
             // An anonymous function to derive the key and on completion create the password protected link
-            var processLinkInfo = function(linkInfo, algorithm, saltBytes, password) {
-                exportPassword.deriveKey(algorithm, saltBytes, password, function(derivedKeyBytes) {
-                    exportPassword.encrypt.encryptAndMakeLink(linkInfo, derivedKeyBytes);
+            const processLinkInfo = (linkInfo, algorithm, saltBytes, password) => new Promise((resolve) => {
+                exportPassword.deriveKey(algorithm, saltBytes, password, (derivedKeyBytes) => {
+                    resolve(exportPassword.encrypt.encryptAndMakeLink(linkInfo, derivedKeyBytes));
                 });
-            };
+            });
 
             // For each selected link
             for (let i = 0; i < links.length; i++) {
 
                 // Get the link information and random salt
                 const link = links[i];
-                const linkCount = links.length;
                 const saltBytes = link.saltBytes;
                 const algorithm = exportPassword.currentAlgorithm;
 
                 // Derive the key and create the password protected link
-                processLinkInfo(link, algorithm, saltBytes, password);
-
-                // If this is the last link
-                if (i === linkCount - 1) {
-
-                    // Show a success banner telling them to re-copy the links
-                    $updateSuccessBanner.text(mega.icu.format(l.links_updated_copy_again, linkCount));
-                    $updateSuccessBanner.removeClass('hidden');
-
-                    // Hide again after 3 seconds
-                    setTimeout(() => {
-                        $updateSuccessBanner.addClass('hidden');
-                    }, 3000);
-
-                    // Change link access description to 'Only people with the password can open the link/s'
-                    $linkAccessText.text(mega.icu.format(l.password_link_access_explainer, linkCount));
-
-                    // Set password input to read only and hide the strength display
-                    $passwordInput.prop('readonly', true);
-                    $passwordStrengthText.text('');
-                    $passwordInputWrapper.removeClass('good1 good2 good3 good4 good5');
-
-                    // Revert to default state for the password visibility 'eye' icon
-                    if ($passwordVisibilityToggle.hasClass('icon-eye-hidden')) {
-                        $passwordVisibilityToggle.trigger('click');
-                    }
-                }
+                pwdLinks.push(await processLinkInfo(link, algorithm, saltBytes, password).catch(tell));
             }
+
+            return pwdLinks;
         },
 
         /**
@@ -691,17 +271,7 @@ var exportPassword = {
                 mobile.linkManagement.pwdProtectedLink = protectedUrl;
             }
             else {
-                // Get the HTML block for this link by using the node handle
-                var $item = $('.item[data-node-handle="' + linkInfo.handle + '"]', this.$dialog);
-
-                // Set the password into the text box and add a class for styling this block
-                $('.item-link.link input', $item).val(protectedUrl);
-                $('.item-link.key input', $item).val('');
-                $item.addClass('password-protect-link');
-
-                // Update Password buttons and links UI
-                exportPassword.encrypt.updatePasswordComponentsUI();
-                exportPassword.encrypt.initResetPasswordButton();
+                return protectedUrl;
             }
 
             // Log to see if encryption feature is used much
@@ -716,28 +286,16 @@ var exportPassword = {
 
             "use strict";
 
-            var links = [];
-            var $links = $('.item', this.$dialog);
-            var $selectedLink =  $links.filter('.selected');
-            var handles = [];
-
-            // Create array of available links handles
-            if ($selectedLink.length) {
-                handles.push($selectedLink.data('node-handle'));
-            }
-            else {
-                $links.get().forEach(function(e) {
-                    handles.push($(e).data('node-handle'));
-                });
-            }
+            const links = [];
+            const handles = $.itemExport;
 
             // Iterate through the selected handles
             for (var i in handles) {
                 if (handles.hasOwnProperty(i)) {
 
                     // Get the node information
-                    var node = M.d[handles[i]];
-                    var linkInfo = {};
+                    const node = M.d[handles[i]];
+                    const linkInfo = Object.create(null);
 
                     // Only nodes with public handle
                     if (node && node.ph) {
@@ -759,8 +317,8 @@ var exportPassword = {
                         linkInfo.publicHandle = node.ph;
 
                         // Generate a random salt for encrypting this link
-                        var algorithm = exportPassword.currentAlgorithm;
-                        var saltLengthBytes = exportPassword.algorithms[algorithm].saltLength / 8;
+                        const algorithm = exportPassword.currentAlgorithm;
+                        const saltLengthBytes = exportPassword.algorithms[algorithm].saltLength / 8;
                         linkInfo.saltBytes = crypto.getRandomValues(new Uint8Array(saltLengthBytes));
 
                         // Add object to array
@@ -969,14 +527,8 @@ var exportPassword = {
                 var handleUrlEncoded = exportPassword.base64UrlEncode(handleBytes);
                 var decryptedKeyUrlEncoded = exportPassword.base64UrlEncode(decryptedKey);
                 var folderIdentifier = (linkType === exportPassword.LINK_TYPE_FOLDER) ? 'F' : '';
-                var url = folderIdentifier + '!' + handleUrlEncoded + '!' + decryptedKeyUrlEncoded;
 
-
-                if (mega.flags.nlfe) {
-                    url = (folderIdentifier ? '/folder/' : '/file/') + handleUrlEncoded
-                        + '#' + decryptedKeyUrlEncoded;
-                }
-
+                const url = `${folderIdentifier ? '/folder/' : '/file/'}${handleUrlEncoded}#${decryptedKeyUrlEncoded}`;
 
                 // Show completed briefly before redirecting
                 $decryptButtonProgress.addClass('hidden');
@@ -1009,22 +561,10 @@ var exportPassword = {
      *
      * @param {Array} nodesToRecreate The node handles of the links to be removed and recreated
      * @param {Function} completeCallback The function to be called once done
-     * @returns {Promise}
+     * @returns {Promise<void>}
      */
     async removeLinksAndReAdd(nodesToRecreate) {
         'use strict';
-
-        // Contains a backup of all the expiry dates for each node before we recreate links
-        const nodeExpiryTimestamps =
-            nodesToRecreate.map((h) => {
-                // Get the node handle
-                const node = M.d[h];
-                const nodeHandle = node.h;
-                const expiryTimestamp = M.getNodeShare(node).ets;
-
-                // If it has an expiry time, add it to the array
-                return expiryTimestamp && {nodeHandle, expiryTimestamp};
-            }).filter(Boolean);
 
         // Disable sharing on links / perform the remove links operation
         const exportLink = new mega.Share.ExportLink({
@@ -1034,50 +574,7 @@ var exportPassword = {
         await exportLink.removeExportLink(true);
 
         // When all links are finished being recreated
-        const res = await exportLink.getExportLink(true);
-
-        if (nodeExpiryTimestamps.length) {
-            // Update the link API side with the previous expiry timestamps for each node
-
-            await Promise.all(
-                nodeExpiryTimestamps.map(({nodeHandle, expiryTimestamp}) => {
-
-                    return exportPassword.setExpiryOnNode(nodeHandle, expiryTimestamp);
-                })
-            );
-        }
-
-        // Go through each link handle
-        for (let i = 0; i < nodesToRecreate.length; i++) {
-
-            const nodeHandle = nodesToRecreate[i];
-            const node = M.d[nodeHandle];
-            const nodePubHandle = node.ph;
-            const nodeType = node.t;
-
-            // Create the links
-            const newLink = getBaseUrl() + (nodeType ? '/folder/' : '/file/') + escapeHTML(nodePubHandle);
-
-            // Update UI
-            const $item = $(`.item[data-node-handle='${nodeHandle}']`, exportPassword.encrypt.$dialog);
-            const $itemInputLink = $('.item-link.link input', $item);
-
-            // Update data attribute - text input value is updated later
-            $itemInputLink.data('link', newLink);
-        }
-
-        return res;
-    },
-
-    /**
-     * Sets an expiry timestamp on a share link node
-     * @param {String} n The node handle to set the expiry for
-     * @param {Number} ets The expiry timestamp
-     * @returns {Promise} The promise to be resolved/rejected once the API operation is complete
-     */
-    setExpiryOnNode(n, ets) {
-        'use strict';
-        return api.screq({a: 'l', n, ets});
+        await exportLink.getExportLink(true);
     },
 
     /**
@@ -1267,19 +764,23 @@ var exportExpiry = {
     datepicker: null,
 
     /**
+     * Control value to ignore autofocus event
+     */
+    presetValue: false,
+
+    /**
      * Initialise function
      */
     init: function() {
 
         "use strict";
 
-        this.$dialog = $('.mega-dialog.export-links-dialog');
+        this.$dialog = $('.mega-sheet.export-links-settings-dialog', 'body');
 
         // If they are a pro user, load the datepicker library
         if (u_attr.p) {
             M.require('datepicker_js').done(() => {
                 exportExpiry.initExpiryDatePicker();
-                exportExpiry.initExpiryOptionToggle();
             });
         }
     },
@@ -1292,8 +793,6 @@ var exportExpiry = {
         "use strict";
 
         const $setDateInput = $('.set-date', this.$dialog);
-        const $setDateInputIcon = $('.js-datepicker-calendar-icon', this.$dialog);
-        const $scroll = $('.links-scroll', this.$dialog);
         const minDate = new Date();
         const maxDate = new Date(2060, 11, 31);
 
@@ -1343,6 +842,15 @@ var exportExpiry = {
             // Change Month select box width on showing the calendar (clicking the text input triggers this)
             onShow: (inst) => {
 
+                // Checking if the date has been already preset
+                if (!inst.selectedDates.length) {
+                    const prevTs = parseInt($setDateInput.attr('data-ts'));
+
+                    if (!Number.isNaN(prevTs)) {
+                        inst.selectedDates.push(new Date(prevTs * 1000));
+                    }
+                }
+
                 // Get any dates set previously (in updateDatepickerAndTextInput function)
                 const newDate = inst.selectedDates[0];
 
@@ -1380,11 +888,6 @@ var exportExpiry = {
                     inst.setPosition();
                 });
 
-                // Disable scrolling
-                delay('disableExportScroll', function() {
-                    Ps.disable($scroll[0]);
-                }, 100);
-
                 // Close export dropdown
                 $('.dropdown.export', this.$dialog).addClass('hidden');
             },
@@ -1393,23 +896,16 @@ var exportExpiry = {
 
                 const $inputClicked = inst.$el;
 
-                // Select link item
-                $('.item.selected', this.$dialog).removeClass('selected');
                 $inputClicked.closest('.item').addClass('selected');
                 $inputClicked.trigger('change.logDateChange');
 
-                // Update the link API side with the new expiry timestamp
-                exportExpiry.updateLinksOnApi(dateText / 1000 || undefined);
-
                 // Update the text input
                 exportExpiry.updateInputText(date);
+
+                mega.Dialog.ExportLink.settings.updateExp(date ? date.getTime() / 1000 : 0);
             },
 
             onHide: () => {
-
-                // Enable scroll
-                Ps.enable($scroll[0]);
-
                 // Unbind dialog positioning
                 $(window).unbind('resize.setDatepickerPosition');
             }
@@ -1429,10 +925,13 @@ var exportExpiry = {
             }
         });
 
-        // Trigger the datepicker to open when clicking the icon inside the text input
-        $setDateInputIcon.rebind('click.calendariconclick', () => {
+        if (this.presetValue) {
+            exportExpiry.updateInputText(new Date(this.presetValue * 1000));
+            this.presetValue = false;
+        }
+        else {
             $setDateInput.trigger('focus');
-        });
+        }
     },
 
     /**
@@ -1445,13 +944,14 @@ var exportExpiry = {
 
         // Make sure the date is set
         if (date) {
-            const $setDateInput = $('.set-date', self.$dialog);
+            const $setDateInput = $('input.set-date', self.$dialog);
 
             // Convert to readable date e.g. 3 August 2023
             const dateTimestamp = Math.round(date.getTime() / 1000);
             const inputText = time2date(dateTimestamp, 2);
 
             $setDateInput.val(inputText);
+            $setDateInput.attr('data-ts', String(dateTimestamp));
         }
     },
 
@@ -1502,134 +1002,6 @@ var exportExpiry = {
     },
 
     /**
-     * Initialise the expiry option toggle switch
-     */
-    initExpiryOptionToggle: function() {
-
-        'use strict';
-
-        const $linksTab = $('section .content-block.links-content', this.$dialog);
-        const $expiryOptionToggle = $('.js-expiry-switch', this.$dialog);
-        const $setDateInput = $('input.set-date', this.$dialog);
-        const $expiryContainer = $('.expiry-container', this.$dialog);
-        const $expiryOptionToggleIcon = $('.mega-feature-switch', $expiryOptionToggle);
-
-        // Init toggle to show/hide Expiry picker
-        $expiryOptionToggle.rebind('click.changeExpiryView', () => {
-
-            const isChecked = $expiryOptionToggle.hasClass('toggle-on');
-            const $selectedLink = $('.item.selected', $linksTab);
-
-            // If checked
-            if (isChecked) {
-
-                // Turn off the toggle and hide the expiry block
-                exportExpiry.disableToggleAndHideExpiry();
-
-                // Update the selected links API side and remove the expiry timestamps
-                exportExpiry.updateLinksOnApi(null);
-
-                // Remove selected date from all items
-                exportExpiry.datepicker.clear();
-
-                // Set text to 'Set an expiry date' (probably won't be seen as turning on the toggle sets to min date)
-                $setDateInput.val(l[8953]);
-            }
-            else {
-                // Otherwise if not checked, turn on toggle
-                $expiryOptionToggle.addClass('toggle-on').removeClass('toggle-off');
-                $expiryOptionToggleIcon.addClass('icon-check-after').removeClass('icon-minimise-after');
-                $expiryContainer.removeClass('hidden');
-
-                // Update the datepicker and input
-                exportExpiry.updateDatepickerAndTextInput();
-
-                // Show the date picker dropdown when toggle is on
-                $setDateInput.trigger('focus');
-
-                // Log to see if "Set an expiry date" is clicked much
-                logExportEvt(2, $selectedLink);
-            }
-        });
-
-        // Get the current expiry dates for the selected items from local state in M.d
-        const expiryTimestamps = exportExpiry.getExpiryDates();
-
-        // If there are expiry dates set on at least one selected item and the toggle is currently off,
-        //  turn it on and this will also trigger the current expiry date to be shown in the datepicker
-        if (expiryTimestamps.length && $expiryOptionToggle.hasClass('toggle-off')) {
-            $expiryOptionToggle.trigger('click');
-            $setDateInput.trigger('blur');
-        }
-    },
-
-    /**
-     * Update datepicker and text input (button to trigger the datepicker)
-     */
-    updateDatepickerAndTextInput: function() {
-
-        "use strict";
-
-        const $setDateInput = $('input.set-date', this.$dialog);
-
-        // Get all the expiry timestamps from the selected nodes in an array
-        const expiryTimestamps = exportExpiry.getExpiryDates();
-
-        let inputText = '';
-
-        // Clear active dates
-        exportExpiry.datepicker.selectedDates = [];
-
-        // If there is at least one expiry date set
-        if (expiryTimestamps.length) {
-
-            // Check if all dates are the same
-            for (let i = 0; i < expiryTimestamps.length; i++) {
-
-                const timestamp = expiryTimestamps[i];
-
-                // If timestamps are different, use "Multiple dates set" as input text
-                if (inputText && inputText !== timestamp) {
-                    $setDateInput.val(l[23674]);
-                    return false;
-                }
-
-                inputText = timestamp;
-            }
-
-            // If it is Unixtimestamp, convert it to necessary formats and set active date to the datepicker
-            if (Number(inputText)) {
-
-                // Set active date in datepicker component
-                exportExpiry.datepicker.selectDate(new Date(inputText * 1000));
-
-                // Change input text
-                inputText = time2date(inputText, 2);
-            }
-
-            // Set expiry date to text input
-            $setDateInput.val(inputText);
-        }
-        else {
-            // Otherwise set minimum date at least 1 day in the future
-            const minDate = new Date();
-            minDate.setDate(minDate.getDate() + 1);
-
-            // Get minimum date timestamp
-            const minDateTimestamp = Math.round(minDate.getTime() / 1000);
-
-            // Set active date in datepicker component
-            exportExpiry.datepicker.selectDate(minDate);
-
-            // Save the result to API
-            exportExpiry.updateLinksOnApi(minDateTimestamp);
-
-            // Update input text
-            exportExpiry.updateInputText(minDate);
-        }
-    },
-
-    /**
      * Update selected links on the API with details about the expiry of the link
      * @param {Number} expiryTimestamp The expiry timestamp of the link. Set to null to remove the expiry time
      */
@@ -1637,9 +1009,9 @@ var exportExpiry = {
 
         "use strict";
 
-        var $links = $('.item', this.$dialog);
-        var $selectedLink =  $('.item.selected', this.$dialog);
-        var handles = [];
+        const $links = $('.item', this.$dialog);
+        const $selectedLink =  $('.item.selected', this.$dialog);
+        const handles = [];
 
         // Create array of available links handles
         if ($selectedLink.length) {
@@ -1668,37 +1040,14 @@ var exportExpiry = {
 
 
 /**
- * Log public-link dialog events:
- * 1: "Export link decryption key separately" click
- * 2: "Set an expiry date" buttons click
- * 3: Select expiry date in the calendar
- * 4: "Set password" buttons click
- * 5: "Cog" icon click to show context menu
- * 6: "Remove link" button click
- * @param {Number} type 1-6
- * @param {Object} target Target elem selector
+ * Log public-link dialog events
+ * @param {Number} evtId Stat event id
+ * @param {any[]|Object.<String, any>} data Data to pass with the stat event
  * @returns {void}
  */
-function logExportEvt(type, target) {
-
+function logExportEvt(evtId, data) {
     'use strict';
-
-    const h = $(target).closest('.item').data('node-handle');
-    let folders = 0;
-    let files = 0;
-
-    if (h && M.d[h].t) {
-        folders++;
-    }
-    else if (h) {
-        files++;
-    }
-    else {
-        folders = $.exportFolderLinks;
-        files = $.exportFileLinks;
-    }
-
-    eventlog(99790, JSON.stringify([1, type, folders, files]));
+    eventlog(evtId, JSON.stringify(data));
 }
 
 
@@ -1731,703 +1080,18 @@ function logExportEvt(type, target) {
      * @param {Boolean} close To close or to show public link dialog
      */
     ExportLinkDialog.prototype.linksDialog = function(close) {
-
-        "use strict";
+        'use strict';
 
         if (M.isInvalidUserStatus()) {
             return;
         }
 
-        /* jshint -W074 */
-        var self = this;
-        var $linksDialog = $('.mega-dialog.export-links-dialog');
-        var $linksTab = $('section .content-block.links-content', $linksDialog);
-        var $linksHeader = $('header .get-link', $linksDialog);
-        var $linkContent = $('.links-content.links', $linksDialog);
-        const $separateKeysBlock = $('.export-keys-separately-block', $linksDialog);
-        const $separateKeysToggle = $('.js-export-keys-switch', $linksTab);
-        const $removeLinkButton = $('.js-remove-link-button', $linksDialog);
-        const $removeLinkButtonText = $('.remove-link-text', $removeLinkButton);
-        const $linkAccessText = $('.js-link-access-text', $linksDialog);
-        const $updateSuccessBanner = $('.js-update-success-banner', $linksDialog);
-        const $linksContainer = $('.links-content.links', $linksDialog);
-        const $expiryOptionToggle = $('.js-expiry-switch', $linksDialog);
-        const $passwordToggleSwitch = $('.js-password-switch ', $linksDialog);
-        const $passwordVisibilityToggle = $('.js-toggle-password-visible', $linksDialog);
-        const $passwordInput = $('.js-password-input', $linksDialog);
-        const $passwordInputWrapper = $passwordInput.parent();
-        const $passwordStrengthText = $('.js-strength-indicator', $linksDialog);
-        const $linksFooter = $('.links-footer', $linksDialog);
-        const $copyAllLinksButton = $('button.copy.links', $linksFooter);
-        const $copyAllKeysButton = $('button.copy.keys', $linksFooter);
-        var $embedHeader  = $('header .embed-header', $linksDialog);
-        var $embedTab = $('.embed-content', $linksDialog);
-        var $embedFooter = $('footer .embed-footer', $linksDialog);
-        var $options = $('.options', $linksTab);
-        var $proOptions = $('.pro', $options);
-        var $proOnlyLink = $('.pro-only-feature', $proOptions);
-        var $setExpiryItem = $('.link-button.set-exp-date', $linksTab);
-        var $removeItem = $('.link-button.remove-item', $linksTab);
-        var $bottomBar = $('.links-footer', $linksDialog);
-        var $datepickerInputs = $('.set-date', $linksDialog);
-        var html = '';
-        var $scroll = $('.links-scroll', $linksTab);
-        var links;
-        var toastTxt;
-        var linksNum;
-
-        // Close dialog
         if (close) {
-
-            closeDialog();
-
-            if (window.onCopyEventHandler) {
-                document.removeEventListener('copy', window.onCopyEventHandler, false);
-                delete window.onCopyEventHandler;
-            }
-
-            // Remove Datepicker dialogs
-            for (var i = $datepickerInputs.length; i--;) {
-
-                var $datepicker = $($datepickerInputs[i]).data('datepicker');
-
-                if ($datepicker && $datepicker.inited) {
-                    $datepicker.destroy();
-                }
-            }
-
-            $('.datepicker.share-link-expiry-calendar', '.datepickers-container').remove();
-
-            return true;
-        }
-
-        // Delete old Export links scrolling
-        if ($scroll.is('.ps')) {
-            Ps.destroy($scroll[0]);
-        }
-
-        // Generate content
-        html = itemExportLink();
-
-        // Fill with content
-        if (!html.length) { // some how we dont have a link
-            msgDialog('warninga', l[17564], l[17565]);
-            return true;
-        }
-        $scroll.safeHTML(html);
-
-        // Hide embed tab
-        $('header h2', $linksDialog).removeClass('active');
-        $('.preview-embed', $linksDialog).addClass('hidden');
-        $embedHeader.addClass('hidden');
-        $embedTab.addClass('hidden');
-        $embedFooter.addClass('hidden');
-
-        // Show Export links tab
-        $linksTab.removeClass('hidden');
-        $linkContent.removeClass('hidden');
-        $('.dropdown.export', $linksTab).addClass('hidden');
-
-        // Set Export links default states
-        $setExpiryItem.addClass('hidden');
-        $removeItem.addClass('hidden');
-        $options.addClass('hidden');
-        $proOptions.addClass('hidden disabled');
-        $proOnlyLink.unbind('click.openpro');
-        $updateSuccessBanner.addClass('hidden');
-        $linksContainer.removeClass('multiple-links');
-        $passwordInput.val('');
-        $passwordInput.prop('readonly', false);
-        $passwordStrengthText.text('');
-        $passwordInputWrapper.removeClass('good1 good2 good3 good4 good5');
-
-        // Prepare MegaInput field and hide previous errors
-        mega.ui.MegaInputs($passwordInput);
-        $passwordInput.data('MegaInputs').hideError();
-
-        // Revert to off state for separate decryption key and link view
-        if ($separateKeysToggle.hasClass('toggle-on')) {
-            $separateKeysToggle.trigger('click');
-        }
-
-        // Revert to off state for expiry date
-        if ($expiryOptionToggle.hasClass('toggle-on')) {
-            exportExpiry.disableToggleAndHideExpiry();
-        }
-
-        // Revert to off state for password feature
-        if ($passwordToggleSwitch.hasClass('toggle-on')) {
-            exportPassword.encrypt.turnOffPasswordUI();
-        }
-
-        // Revert to default state for the password visibility 'eye' icon
-        if ($passwordVisibilityToggle.hasClass('icon-eye-hidden')) {
-            $passwordVisibilityToggle.trigger('click');
-        }
-
-        // Embed code handling
-        var n = Object($.itemExport).length === 1 && M.d[$.itemExport[0]];
-
-        if ($.itemExportEmbed || is_video(n) && !folderlink) {
-
-            var link;
-            var iframe = '<iframe width="%w" height="%h" frameborder="0" src="%s" allowfullscreen %a></iframe>\n';
-            const audio = is_audio(n);
-
-            // Add special class to dialog
-            $linksDialog.addClass('embed');
-
-            if (mega.flags.nlfe) {
-                link = getBaseUrl() + '/embed/' + n.ph + '#' + a32_to_base64(n.k);
-            }
-            else {
-                link = getBaseUrl() + '/embed#!' + n.ph + '!' + a32_to_base64(n.k);
-            }
-
-            var setCode = function() {
-
-                var time = 0;
-                var width = 0;
-                var height = 0;
-                var autoplay = false;
-                var muted = false;
-                var optionAdded = false;
-                let copy = true;
-                var $time = $('.start-video-at .embed-setting', $embedTab);
-                var $vres = $('.change-video-resolution .embed-setting', $embedTab);
-                var $enauto = $('.enable-autoplay .checkdiv', $embedTab);
-                var $muted = $('.mute-video .checkdiv', $embedTab);
-                const $copy = $('.allow-copy-link .checkdiv', $embedTab);
-
-                var getValue = function(s, c) {
-
-                    var $input = $(s, c);
-                    var value = String($input.val() || '').replace(/\.\d*$/g, '').replace(/\D/g, '');
-
-                    value = Math.min(Math.max(parseInt(value) || 0, $input.attr('min') | 0),
-                                     parseInt($input.attr('max')) || Number.MAX_SAFE_INTEGER) >>> 0;
-                    return value;
-                };
-
-                const inputTime = getValue('input', $time) || 0;
-                const timeString = mega.icu.format(l.start_video_at_embed, inputTime);
-                const timeArray = timeString.split(/\[A]|\[\/A]/);
-
-                $('#embed_start_at_txt_1', $embedTab).text(timeArray[0]);
-                $('#embed_start_at_txt_2', $time).text(timeArray[2]);
-
-                if (!$time.hasClass('disabled')) {
-                    time = getValue('input', $time);
-                    optionAdded = true;
-                    const timeStringD = mega.icu.format(l.start_video_at_embed, time);
-                    const timeArrayD = timeStringD.split(/\[A]|\[\/A]/);
-
-                    $('#embed_start_at_txt_1', $embedTab).text(timeArrayD[0]);
-                    $('#embed_start_at_txt_2', $time).text(timeArrayD[2]);
-                }
-
-                if (!$vres.hasClass('disabled')) {
-                    width = getValue('.width-video input', $vres);
-                    height = getValue('.height-video input', $vres);
-                }
-
-                if ($enauto.hasClass('checkboxOn')) {
-                    autoplay = true;
-                    optionAdded = true;
-                }
-
-                if ($muted.hasClass('checkboxOn')) {
-                    muted = true;
-                    optionAdded = true;
-                }
-
-                if (audio) {
-                    width = 711;
-                    height = 144;
-                    optionAdded = true;
-                    if (!$copy.hasClass('checkboxOn')) {
-                        copy = false;
-                    }
-                }
-
-                var code = iframe
-                    .replace('%w', width > 0 && height > 0 ? width : 640)
-                    .replace('%h', width > 0 && height > 0 ? height : 360)
-                    .replace('%s', link + (optionAdded ? '!' : '') + (time > 0 ? time + 's' : '') +
-                        (autoplay ? '1a' : '') + (muted ? '1m' : '') + (audio ? '1v' : '') + (copy ? '' : '1c'))
-                    .replace('%a', autoplay ? 'allow="autoplay;"' : '');
-
-                $('.code-field .code', $embedTab).text(code);
-            };
-
-            uiCheckboxes($('.settings-container', $linksDialog), function(enabled) {
-
-                var $row = $(this).closest('.settings-row');
-                var $setting = $('.embed-setting', $row);
-
-                if (enabled) {
-                    $setting.removeClass('disabled').find('input').prop('readonly', false).rebind('input', setCode);
-                }
-                else {
-                    $setting.addClass('disabled').find('input').prop('readonly', true).off('input');
-                }
-                setCode();
-            });
-
-            // Reset share options
-            $('.settings-container', $embedTab).addClass('hidden');
-            $('.settings-container', $embedTab).get(audio ? 1 : 0).classList.remove('hidden');
-
-            // Reset all numeric inputs under Share Options
-            $('.settings-container .embed-setting', $embedTab).addClass('disabled');
-            $('.settings-container input[type=number]', $embedTab).get().forEach(function(e) {
-
-                var $this = $(e);
-
-                $this.val($this.attr('value'));
-                $this.prop('readonly', true);
-            });
-            $embedHeader.removeClass('hidden');
-
-            (function _() {
-
-                $('header .embed-header, header .get-link', $linksDialog)
-                    .removeClass('active').rebind('click.switchTab', _);
-
-                if (this === window || $(this).is('.embed-header')) {
-                    $embedHeader.addClass('active');
-                    $embedTab.removeClass('hidden');
-                    $embedFooter.removeClass('hidden');
-
-                    // Hide regular Export Links footer etc
-                    $linksTab.addClass('hidden');
-                    $linksFooter.addClass('hidden');
-                }
-                else {
-                    $embedTab.addClass('hidden');
-                    $embedFooter.addClass('hidden');
-
-                    // Show regular Export Links footer etc
-                    $linksHeader.addClass('active');
-                    $linksTab.removeClass('hidden');
-                    $linksFooter.removeClass('hidden');
-                }
-
-            }).call($.itemExportEmbed ? window : {});
-
-            $.itemExportEmbed = null;
-
-            const playtime = MediaAttribute(n).data.playtime;
-            $('.video-filename span', $embedTab).text(n.name);
-            $('.video-attributes .size', $embedTab).text(bytesToSize(n.s));
-            $('.video-attributes .duration', $embedTab)
-                .text(secondsToTimeShort(playtime));
-            $('.start-video-at .embed-setting input', $embedTab).attr('max', playtime || 0);
-            $('.start-video-at', $embedTab).toggleClass('opacity-50 pointer-events-none', !playtime);
-
-            const thumbURI = audio ? `${staticpath}/images/mega/audio.png` : noThumbURI;
-            var $thumb = $('.video-thumbnail img', $embedTab).attr('src', thumbURI);
-
-            getImage(n, 1).then((uri) => $thumb.attr('src', uri)).catch(dump);
-
-            $('.code-field .code', $embedTab).rebind('click.selectTxt', function() {
-                selectText('embed-code-field');
-                return false;
-            });
-
-            $('.preview-embed', $embedTab).rebind('click.embed', function() {
-
-                if ($(this).text() !== l[1899]) {
-                    $(this).text(l[148]);
-                    $('.video-thumbnail-container', $embedTab).addClass('hidden');
-                    $('.video-player-container', $embedTab).removeClass('hidden')
-                        .safeHTML(iframe.replace('%s', link));
-                }
-                else {
-                    $(this).text(l[1899]);
-                    $('.video-thumbnail-container', $embedTab).removeClass('hidden');
-                    $('.video-player-container', $embedTab).addClass('hidden').text('');
-                }
-            });
-
-            // Let's hide it for now...
-            $('.preview-embed', $embedTab).addClass('hidden');
-
-            setCode();
+            scope.mega.Dialog.ExportLink.view.hide();
         }
         else {
-            // Remove special Embed class
-            $linksDialog.removeClass('embed');
-        }
-
-        if ($.dialog === 'onboardingDialog') {
-            closeDialog();
-        }
-
-        // Show export dialog
-        M.safeShowDialog('links', function() {
-
-            // Show dialog
-            fm_showoverlay();
-            $linksDialog.removeClass('hidden');
-
-            // Init Scrolling
-            Ps.initialize($scroll[0]);
-            $scroll.scrollTop(0);
-
-            return $linksDialog;
-        });
-
-        // Close dialog button
-        $('button.js-close', $linksDialog).rebind('click.closeDialog', function() {
-            self.linksDialog(1);
-        });
-
-        // Pluralise dialog text
-        const linkCount = $.itemExport.length;
-        const hasMultipleLinks = linkCount > 1;
-
-        // Pluralise button text if applicable
-        $linksHeader.text(mega.icu.format(l.share_link, linkCount));
-        $removeLinkButtonText.text(hasMultipleLinks ? l[8735] : l[6821]);
-        $linkAccessText.text(mega.icu.format(l.link_access_explainer, linkCount));
-
-        // If there are multiple links showing
-        if (hasMultipleLinks) {
-
-            // Add an extra class to restyle the buttons
-            $linksContainer.addClass('multiple-links');
-
-            // Show just the Copy All button for now (until the toggle is switched on)
-            $copyAllLinksButton.removeClass('hidden');
-            $copyAllKeysButton.addClass('hidden');
-        }
-        else {
-            // Otherwise hide both Copy All Links and Copy All Keys buttons
-            $copyAllLinksButton.addClass('hidden');
-            $copyAllKeysButton.addClass('hidden');
-        }
-
-        // Change links view: w/o keys
-        $separateKeysToggle.rebind('click.changeView', function() {
-
-            const isToggleOn = $(this).hasClass('toggle-on');
-            const $separateKeysToggleIcon = $('.mega-feature-switch', $separateKeysToggle);
-
-            // Disable toggle (e.g. for when password is showing)
-            if ($separateKeysToggle.hasClass('disabled') || $passwordToggleSwitch.hasClass('toggle-on')) {
-                return false;
-            }
-
-            // If there are multiple links, show the Copy All Links and Copy All Keys buttons
-            if (hasMultipleLinks) {
-                $copyAllLinksButton.removeClass('hidden');
-                $copyAllKeysButton.removeClass('hidden');
-            }
-            else {
-                // Otherwise keep hidden if there's only one link
-                $copyAllLinksButton.addClass('hidden');
-                $copyAllKeysButton.addClass('hidden');
-            }
-
-            // If toggle is already on
-            if (isToggleOn) {
-
-                // Turn the toggle off and show links as normal
-                $separateKeysToggle.addClass('toggle-off').removeClass('toggle-on');
-                $separateKeysToggleIcon.addClass('icon-minimise-after').removeClass('icon-check-after');
-                $linkContent.removeClass('separately');
-
-                // Hide the Copy All Keys button
-                $copyAllKeysButton.addClass('hidden');
-
-                // Log to see if "export link decryption key separately" is used much
-                logExportEvt(1);
-            }
-            else {
-                // Turn the toggle on and show the links and keys separately
-                $separateKeysToggle.addClass('toggle-on').removeClass('toggle-off');
-                $separateKeysToggleIcon.addClass('icon-check-after').removeClass('icon-minimise-after');
-                $linkContent.addClass('separately');
-            }
-
-            // Update Link input values
-            exportPassword.encrypt.updateLinkInputValues();
-        });
-
-        // Remove link/s button functionality
-        $removeLinkButton.rebind('click.removeLink', (evt) => {
-            if ($(evt.target).is('a')) {
-                evt.preventDefault();
-            }
-
-            // Pluralise dialog text
-            const msg = mega.icu.format(l.remove_link_question, linkCount);
-            const cancelButtonText = l.dont_remove;
-            const confirmButtonText = l['83'];
-
-            let folderCount = 0;
-            let fileCount = 0;
-
-            // Determine number of files and folders so the dialog wording is correct
-            $.itemExport.forEach((value) => {
-
-                const node = M.d[value];
-
-                if (node.t) {
-                    folderCount++;
-                }
-                else {
-                    fileCount++;
-                }
-            });
-
-            // Use message about removal of 'items' for when both files and folders are selected
-            let subMsg = l.remove_link_confirmation_mix_items;
-
-            // Change message to folder/s or file/s depending on number of files and folders
-            if (folderCount === 0) {
-                subMsg = mega.icu.format(l.remove_link_confirmation_files_only, fileCount);
-            }
-            else if (fileCount === 0) {
-                subMsg = mega.icu.format(l.remove_link_confirmation_folders_only, folderCount);
-            }
-
-            // The confirm remove link/s function
-            const confirmFunction = () => {
-
-                // Remove in "quiet" mode without overlay
-                const exportLink = new mega.Share.ExportLink({ 'updateUI': true, 'nodesToProcess': $.itemExport });
-                exportLink.removeExportLink(true);
-
-                // Close the dialog as there are no more link items
-                self.linksDialog(1);
-            };
-
-            // If they have already checked the Don't show this again checkbox, just remove the link/s
-            if (mega.config.get('nowarnpl')) {
-                confirmFunction();
-                return false;
-            }
-
-            // Show confirmation dialog
-            msgDialog(`*confirmation:!^${confirmButtonText}!${cancelButtonText}`, null, msg, subMsg, (res) => {
-                if (res) {
-                    confirmFunction();
-                }
-            }, 'nowarnpl');
-        });
-
-        // Copy all links/keys to clipboard
-        $('button.copy', $linksDialog).rebind('click.copyToClipboard', function() {
-
-            var $this = $(this);
-            var $links = $('.item', $linksDialog);
-            var $item = $this.hasClass('current') ? $this.closest('.item') : undefined;
-            var pwProtectedNum = $links.filter('.password-protect-link').length;
-            var mode = $this.hasClass('keys') ? 'keys' : undefined;
-            var data;
-
-            if ($this.is('.disabled')) {
-                return false;
-            }
-
-            // If Copy  button locates in Embed tab
-            if ($('.embed-header', $linksDialog).hasClass('active')) {
-                toastTxt = l[371];
-                data =  $('.code-field .code', $linksDialog).text();
-            }
-            else {
-                // If the button copies Keys only
-                if (mode) {
-                    linksNum = $item ? 1 : $links.length - pwProtectedNum;
-                    toastTxt = mega.icu.format(l.toast_copy_key, linksNum);
-                }
-                else {
-                    linksNum = $item ? 1 : $links.length;
-                    toastTxt = mega.icu.format(l.toast_copy_link, linksNum);
-                }
-
-                // Set toast notification and data to copy
-                data = $.trim(getClipboardLinks($item, mode));
-            }
-
-            // Copy to clipboard
-            copyToClipboard(data, toastTxt, null, 2000);
-
-            return false;
-        });
-
-        // Init FREE export links events
-        const initFreeEvents = () => {
-
-            // Add click event to Remove link dropdown item
-            $removeItem.rebind('click.removeLink', (e) => {
-
-                const $bottomBar = $('footer', this.$dialog);
-                const $selectedLink = $('.item.selected', $linksTab);
-                const handle = $selectedLink.data('node-handle');
-                let $items;
-                let itemsLength;
-
-                // Create Remove link function
-                var removeLink = function() {
-
-                    // New export link
-                    var exportLink = new mega.Share.ExportLink({'updateUI': true, 'nodesToProcess': [handle]});
-
-                    // Remove link in "quite" mode without overlay
-                    exportLink.removeExportLink(true);
-
-                    // Remove Link item from DOM
-                    $selectedLink.remove();
-
-                    if (M.d[handle].t) {
-                        $.exportFolderLinks--;
-                    }
-                    else {
-                        $.exportFileLinks--;
-                    }
-
-                    // Update Export links scrolling
-                    if ($scroll.is('.ps')) {
-                        Ps.update($scroll[0]);
-                    }
-
-                    // Get link items length
-                    $items = $('.item', $linksTab);
-                    itemsLength = $items.length;
-
-                    // Close the dialog If there is no link items
-                    if (itemsLength < 1) {
-                        self.linksDialog(1);
-                        return false;
-                    }
-
-                    // Update Password buttons and links UI
-                    exportPassword.encrypt.updatePasswordComponentsUI();
-
-                    // Update common Set Expiry Date button
-                    exportExpiry.updateDatepickerAndTextInput();
-                };
-
-                // Show confirmartion dialog if handle is media
-                if (is_video(M.d[handle])) {
-                    msgDialog('confirmation', l[882], l[17824], 0, function(e) {
-                        if (e) {
-                            removeLink();
-                        }
-                    });
-                }
-                else {
-                    removeLink();
-                }
-
-                // Log to see if Remove link is used much
-                logExportEvt(6, e.currentTarget);
-            });
-
-            // Click anywhere in Export link dialog to hide dropdown
-            $linksDialog.rebind('click.closeDropdown', function(e) {
-
-                var $target = $(e.target);
-                var $dropdown = $('.dropdown.export', $linksTab);
-
-                if (!$target.is('.dropdown.export') && !$target.is('.cog')
-                    && !$dropdown.is('.hidden')) {
-
-                    // Enable scrolling
-                    Ps.enable($scroll[0]);
-
-                    // Close dropdown
-                    $dropdown.addClass('hidden');
-                }
-            });
-
-            // Set buttons default states, init events if available
-            exportExpiry.init();
-            exportPassword.encrypt.init();
-        };
-
-        // Init PRO events links events
-        const initProEvents = () => {
-
-            const $calendarInputs = $('.set-date', $linksDialog);
-
-            // Log to see if "Set an expiry date" is clicked much
-            $calendarInputs.rebind('mousedown.logClickEvt', (e) => logExportEvt(2, e.currentTarget));
-
-            // Log to see if Expiry date is set much
-            $calendarInputs.rebind('change.logDateChange', (e) => logExportEvt(3, e.currentTarget));
-
-            // Log to see if "Set password" is clicked much
-            $('button.password', $linksTab).rebind('click.logClickEvt', (e) => logExportEvt(4, e.currentTarget));
-        };
-
-        // Show and init options
-        if (page === 'download') {
-
-            // Show options/features
-            $options.removeClass('hidden');
-
-            // Hide certain blocks not applicable for download page
-            $separateKeysBlock.addClass('hidden');
-            $removeLinkButton.addClass('hidden');
-
-            return false;
-        }
-        else if (folderlink) {
-
-            // Show options/features
-            $options.removeClass('hidden');
-
-            // Hide certain blocks not applicable for download page
-            $removeLinkButton.addClass('hidden');
-        }
-        // Init FREE options
-        else if (!u_attr.p) {
-
-            // Show options/features
-            $options.removeClass('hidden');
-            $proOptions.removeClass('hidden');
-            $removeItem.removeClass('hidden');
-
-            // On PRO options click, go to the Pro page
-            $proOnlyLink.rebind('click.openpro', () => {
-                open(getAppBaseUrl() + '#pro');
-            });
-
-            // Init FREE events
-            initFreeEvents();
-        }
-        // Init PRO options
-        else if (u_attr.p) {
-
-            // Enable PRO options
-            $options.removeClass('hidden');
-            $proOptions.removeClass('hidden disabled');
-
-            // Show PRO menu items
-            $removeItem.removeClass('hidden');
-            $setExpiryItem.removeClass('hidden');
-
-            // Init FREE and PRO events
-            initFreeEvents();
-            initProEvents();
-        }
-
-        // If not on the embed dialog
-        if (!$('.embed-header', $linksDialog).hasClass('active')) {
-
-            // Set data and toast message 'Link/s created and copied to your clipboard'
-            const $items = $('.item', $linksDialog);
-            const data = $.trim(getClipboardLinks($items));
-            const toastText = mega.icu.format(l.toast_link_created_and_copied, $items.length);
-
-            // Copy to clipboard
-            tSleep(4 / 10).then(() => {
-                copyToClipboard(data, toastText, null, 2000);
-            });
+            scope.mega.Dialog.ExportLink[($.itemExportEmbed) ? 'embed' : 'view'].show();
+            scope.mega.Dialog.ExportLink.settings.resetValues();
         }
     };
 
@@ -2439,62 +1103,44 @@ function logExportEvt(type, target) {
 
     /**
      * getClipboardLinks
-     *
-     * Gether all available public links for selected items (files/folders).
+     * Gather all available public links for selected items (files/folders).
      * @returns {String} links URLs or decryption keys for selected items separated with newline '\n'.
-     * @param {Object} $items Links selector
-     * @param {String} mode Contains View mode name: Show links w/o keys
+     * @param {Boolean} keysOnly Whether to copy keys only
      */
-    function getClipboardLinks($items, mode) {
+    function getClipboardLinks(keysOnly) {
+        'use strict';
 
-        "use strict";
+        const values = [];
+        const rows = mega.ui.sheet.contentNode
+            .querySelectorAll(keysOnly ? '.decr-key-value > span' : '.link-value > span');
 
-        var links = [];
-        var $dialog = $('.mega-dialog.export-links-dialog', 'body');
-
-        if (!$items) {
-            $items = $('.item', $dialog);
+        if (rows) {
+            for (let i = 0; i < rows.length; i++) {
+                values.push(rows[i].textContent);
+            }
         }
 
-        // Otherwise add all regular links
-        $items.get().forEach(function(e) {
-
-            var nodeUrlWithPublicHandle = $('.link input', e).val();
-            var nodeDecryptionKey = $('.key input', e).val();
-
-            // Check export/public link dialog drop down list selected option
-            if (mode === 'keys' && !$(this).hasClass('password')) {
-                if (nodeDecryptionKey) {
-                    links.push(nodeDecryptionKey);
-                }
-            }
-            else {
-                links.push(nodeUrlWithPublicHandle);
-            }
-        });
-
-        return links.join("\n");
+        return values.join('\n');
     }
 
     /**
      * itemExportLinkHtml
      *
-     * @param {Object} item
+     * @param {Object} item Node item to work with
+     * @param {Boolean} keySeparated Whether the key should be rendered separately or not
+     * @param {String} [protectedLink] Link protected with password
      * @returns {String}
      * @private
      */
-    function itemExportLinkHtml(item) {
-        "use strict";
-        var key;
-        var type;
-        var fileSize;
-        var html = '';
-        var nodeHandle = item.h;
-        var fileUrlKey;
-        var fileUrlWithoutKey;
-        var fileUrlNodeHandle = '';
-        let hideSeparatorClass = '';
-        let folderContents = '';
+    function itemExportLinkHtml(item, keySeparated, protectedLink) {
+        'use strict';
+
+        const nodeHandle = item.h;
+        let key;
+        let type;
+        let fileUrlKey;
+        let fileUrlWithoutKey;
+        let fileUrlNodeHandle = '';
 
         if (folderlink) {
             if (item.foreign) {
@@ -2505,20 +1151,11 @@ function logExportEvt(type, target) {
                 }
                 key = item.k;
             }
-            else if (mega.flags.nlfe) {
+            else {
                 fileUrlWithoutKey = getBaseUrl() + '/folder/' + pfid;
                 fileUrlKey = '#' + pfkey;
                 fileUrlNodeHandle = (item.t ? '/folder/' : '/file/') + item.h;
             }
-            else {
-                fileUrlWithoutKey = getBaseUrl() + '/#F!' + pfid;
-                fileUrlKey = '!' + pfkey;
-                fileUrlNodeHandle = (item.t ? '!' : '?') + item.h;
-            }
-            fileSize = item.s && bytesToSize(item.s) || '';
-
-            // Hide the | separator after the folder name
-            hideSeparatorClass = ' hide-separator';
         }
         else if (item.t) {
             // Shared item type is folder
@@ -2530,133 +1167,1418 @@ function logExportEvt(type, target) {
             }
 
             type = 'F';
-            fileSize = '';
-
-            const numFolders = M.d[nodeHandle].td;
-            const numFiles = M.d[nodeHandle].tf;
-
-            // If there are at least a file or subfolder
-            if (numFolders > 0 || numFiles > 0) {
-                const folderWording = mega.icu.format(l.folder_count, numFolders);
-                const fileWording = mega.icu.format(l.file_count, numFiles);
-
-                // Set wording to x folder/s . x file/s
-                folderContents = folderWording + ' \u22C5 ' + fileWording;
-            }
-            else {
-                // Hide the | separator after the folder name because there are no subfolders or files
-                hideSeparatorClass = ' hide-separator';
-            }
         }
         else {
             // Shared item type is file
             type = '';
             key = item.k;
-            fileSize = bytesToSize(item.s);
         }
 
         if (!fileUrlWithoutKey) {
-            if (mega.flags.nlfe) {
-                fileUrlWithoutKey = (getBaseUrl() + (type ? '/folder/' : '/file/') + htmlentities(item.ph));
-            }
-            else {
-                fileUrlWithoutKey = (getBaseUrl() + '/#' + type + '!' + htmlentities(item.ph));
-            }
+            fileUrlWithoutKey = getBaseUrl() + (type ? '/folder/' : '/file/') + htmlentities(item.ph);
         }
 
         if (!fileUrlKey) {
-            if (mega.flags.nlfe) {
-                fileUrlKey = (key ? '#' + a32_to_base64(key) : '');
-            }
-            else {
-                fileUrlKey = (key ? '!' + a32_to_base64(key) : '');
-            }
+            fileUrlKey = key ? '#' + a32_to_base64(key) : '';
         }
 
-        html = '<div class="item" data-node-handle="' + nodeHandle + '">'
-             +      '<div class="icons">'
-             +          '<i class="sprite-fm-theme icon-settings cog"></i>'
-             +          '<i class="sprite-fm-uni icon-lock lock hidden"></i>'
-             +          '<i class="sprite-fm-uni icon-calendar calendar vo-hidden">'
-             +              '<input type="text" data-node-handle="' + nodeHandle + '">'
-             +          '</i>'
-             +      '</div>'
-             +      '<div class="item-type-icon icon-' + fileIcon(item) + '-24" ></div>'
-             +      '<div class="item-title selectable-txt">' + htmlentities(item.name) + '</div>'
-             +      '<div class="item-size' + hideSeparatorClass + '">'
-             +          htmlentities(fileSize) + htmlentities(folderContents)
-             +      '</div>'
-             +      '<div class="clear"></div>'
-             +      '<div class="item-link link">'
-             +          '<div class="input-wrap">'
-             +              '<i class="sprite-fm-mono icon-link chain"></i>'
-             +              '<input type="text" data-link="' + fileUrlWithoutKey + '" data-key="'
-             +                  fileUrlKey + fileUrlNodeHandle + '" '
-             +                  'value="' + fileUrlWithoutKey + fileUrlKey + fileUrlNodeHandle + '" readonly>'
-             +          '</div>'
-             +          '<button class="mega-button positive copy current">'
-             +              '<span>'
-             +                  l[1394]
-             +              '</span>'
-             +          '</button>'
-             +      '</div>'
-             +      '<div class="item-link key">'
-             +          '<div class="input-wrap">'
-             +              '<i class="sprite-fm-mono icon-key key"></i>'
-             +              '<input type="text" data-key="' + fileUrlKey.substring(1) + fileUrlNodeHandle + '" value="'
-             +              fileUrlKey.substring(1) + fileUrlNodeHandle + '" readonly>'
-             +          '</div>'
-             +          '<button class="mega-button positive copy current keys">'
-             +              '<span>'
-             +                  l[17386]
-             +              '</span>'
-             +          '</button>'
-             +      '</div>'
-             +      '<div class="clear"></div>'
-             +  '</div>';
+        const composeBlock = () => {
+            const addCopyRow = (text, parent, klass, simpletip, copiedMsg, copyEvtId) => {
+                const row = mCreateElement(
+                    'div',
+                    { class: `flex flex-row items-center text-color-high ${klass || ''}` },
+                    parent
+                );
+                mCreateElement('span', { class: 'flex-1 text-ellipsis' }, row).textContent = text;
 
-        return html;
+                MegaButton.factory({
+                    parentNode: row,
+                    icon: 'sprite-fm-mono icon-copy-thin-outline icon-size-20',
+                    componentClassname: 'transparent-icon text-icon copy-field simpletip secondary',
+                    type: 'icon',
+                    dataset: { simpletip }
+                }).on('click.copy', () => {
+                    copyToClipboard(text);
+                    mega.ui.toast.show(copiedMsg, 4);
+                    logExportEvt(copyEvtId);
+                });
+
+                return row;
+            };
+
+            const header = mCreateElement('div', { class: 'flex flex-row items-center mt-4 mb-2 block-naming' }, [
+                mCreateElement('i', {class: `item-type-icon icon-${fileIcon(item)}-24 icon-size-8`})
+            ]);
+            const nameRow = mCreateElement(
+                'span',
+                { class: 'text-ellipsis px-2' },
+                header
+            );
+
+            nameRow.textContent = htmlentities(item.name);
+            const numFolders = M.d[nodeHandle].td;
+            const numFiles = M.d[nodeHandle].tf;
+
+            if (item.t && (numFiles || numFolders)) {
+                let wording = '';
+
+                if (numFolders > 0) {
+                    wording = mega.icu.format(l.folder_count, numFolders);
+                }
+
+                if (numFiles > 0) {
+                    wording += (wording ? ' \u2E31 ' : '') + mega.icu.format(l.file_count, numFiles);
+                }
+
+                if (wording) {
+                    mCreateElement(
+                        'span',
+                        { class: 'text-color-medium separator-before px-2 flex-1 whitespace-nowrap' },
+                        header
+                    ).textContent = wording;
+                }
+            }
+            else {
+                nameRow.classList.add('flex-1');
+            }
+
+            const block = mCreateElement(
+                'div',
+                { class: 'node-link-block font-body-1', 'data-node-handle': nodeHandle },
+                [header]
+            );
+            const linkData = mCreateElement('div', { class: 'bg-surface-grey-1 border-radius-2 p-3' }, block);
+
+            if (protectedLink) {
+                addCopyRow(protectedLink, linkData, 'link-value', l.copy_link, l[1642], 500759);
+            }
+            else {
+                if (keySeparated) {
+                    mCreateElement('span', { class: 'font-bold text-color-high' }, linkData).textContent = l.link;
+                }
+
+                addCopyRow(
+                    fileUrlWithoutKey + (keySeparated ? '' : fileUrlKey + fileUrlNodeHandle),
+                    linkData,
+                    'link-value',
+                    l.copy_link,
+                    l[1642],
+                    500759
+                );
+
+                if (keySeparated) {
+                    mCreateElement('hr', { class: 'mb-4 border-b border-t-none border-x-none' }, linkData);
+                    mCreateElement('span', { class: 'font-bold text-color-high' }, linkData).textContent = l[1028];
+                    addCopyRow(
+                        fileUrlKey.substring(1),
+                        linkData,
+                        'decr-key-value',
+                        l[17386],
+                        l.key_copied,
+                        500762
+                    );
+                }
+            }
+
+            return block;
+        };
+
+        return composeBlock();
     }
 
     /**
      * generates file url for shared item
-     *
-     * @returns {String} html
+     * @param {Object.<String, Boolean|String[]>} opts Options to apply
+     * @returns {HTMLDivElementp[]}
      * @private
      */
-    function itemExportLink() {
+    function itemExportLink(opts) {
 
-        "use strict";
+        'use strict';
 
-        var html = '';
+        const { dec, pwdArr } = opts;
+        const items = [];
 
-        $.exportFolderLinks = 0;
-        $.exportFileLinks = 0;
-
-        $.each($.itemExport, function(index, value) {
-
-            var node = M.d[value];
+        for (let i = 0; i < $.itemExport.length; i++) {
+            const value = $.itemExport[i];
+            const node = M.d[value];
 
             if (node && (folderlink || node.ph)) {
-                html += itemExportLinkHtml(node);
+                items.push(itemExportLinkHtml(node, dec, (pwdArr || [])[i]));
             }
+        }
 
-            if (node.t) {
-                $.exportFolderLinks++;
-            }
-            else {
-                $.exportFileLinks++;
-            }
-        });
-
-        return html;
+        return items;
     }
+
+    const hideDialog = (name) => {
+        const { sheet } = mega.ui;
+
+        sheet.removeClass(name);
+
+        if (sheet.name === name) {
+            sheet.hide();
+            sheet.clear();
+        }
+
+        if ($.dialog === name) {
+            delete $.dialog;
+        }
+    };
+
+    const removeLink = (prevDialog) => {
+        const { ExportLink } = scope.mega.Dialog;
+        const doRemove = () => {
+            // Remove in "quiet" mode without overlay
+            const exportLink = new mega.Share.ExportLink({ 'updateUI': true, 'nodesToProcess': $.itemExport });
+            exportLink.removeExportLink(true);
+            ExportLink.settings.resetNewValues();
+        };
+
+        // If they have already checked the Don't show this again checkbox, just remove the link/s
+        if (mega.config.get('nowarnpl')) {
+            doRemove();
+        }
+        else {
+            ExportLink.remove.show(null, null, doRemove, prevDialog);
+        }
+
+        const counts = [0, 0];
+        let i = $.itemExport.length;
+
+        while (--i >= 0) {
+            counts[M.d[$.itemExport[i]].t]++;
+        }
+
+        logExportEvt(500767, counts);
+    };
 
     // export
     scope.mega = scope.mega || {};
     scope.mega.Dialog = scope.mega.Dialog || {};
     scope.mega.Dialog.ExportLink = ExportLinkDialog;
 
+    lazy(scope.mega.Dialog.ExportLink, 'view', () => {
+        const { ExportLink } = scope.mega.Dialog;
+        const name = 'export-links-dialog';
+
+        /**
+         * @param {Object.<String, Boolean|String[]>} dialogOpts Whether to show the decryption key separately or not
+         * @returns {void}
+         */
+        const show = (dialogOpts = Object.create(null)) => {
+            const { sheet, toast } = mega.ui;
+            const count = $.itemExport.length;
+
+            const addSettingsBtn = (parentNode, ks) => new MegaButton({
+                parentNode,
+                text: l.link_settings,
+                componentClassname: 'text-icon font-600 underline-offset-4 whitespace-nowrap slim',
+                type: 'button',
+            }).on('click.link-settings', () => {
+                ExportLink.view.hide();
+                ExportLink.settings.show(ks);
+                logExportEvt(500760);
+            });
+
+            /**
+             * @param {HTMLDivElement[]} items Items to populate the contents with
+             * @param {Object.<String, Boolean|String[]>} options Options to apply
+             * @returns {HTMLDivElement}
+             */
+            const createContents = (items, { dec: ks }) => {
+                const contents = mCreateElement('div', { class: 'relative px-4' }, items);
+
+                if (folderlink) {
+                    // Nothing is needed
+                }
+                else if (items.length === 1) {
+                    addSettingsBtn(contents.querySelector('.node-link-block .block-naming'), ks);
+                }
+                else {
+                    const btn = addSettingsBtn(contents, ks);
+                    btn.domNode.classList.add('absolute', 'right-0', '-top-16');
+                }
+
+                return contents;
+            };
+
+            const footerElements = [
+                mCreateElement('div', { class: 'link-access-text mb-10 px-4' }),
+                mCreateElement('div', { class: 'flex flex-row-reverse px-4 mb-4' })
+            ];
+
+            const explainer = (dialogOpts.pwd)
+                ? (count === 1 ? l.password_link_access_explainer : l.password_link_access_explainer_multiple)
+                : l.link_access_explainer;
+            footerElements[0].textContent = mega.icu.format(explainer, count);
+
+            const counts = [0, 0];
+            let i = count;
+
+            while (--i >= 0) {
+                counts[M.d[$.itemExport[i]].t]++;
+            }
+
+            MegaButton.factory({
+                parentNode: footerElements[1],
+                text: (count === 1) ? l.copy_link : l[23625],
+                componentClassname: 'slim',
+                type: 'button'
+            }).on('click.copyLinks', () => {
+                copyToClipboard(getClipboardLinks());
+                toast.show((count === 1) ? l[1642] : l.links_copied, 4);
+                logExportEvt(500758, counts);
+            });
+
+            if (dialogOpts.dec && !dialogOpts.pwd) {
+                MegaButton.factory({
+                    parentNode: footerElements[1],
+                    text: (count === 1) ? l[17386] : l[23624],
+                    componentClassname: 'secondary mx-2 slim',
+                    type: 'normal'
+                }).on('click.copyKeys', () => {
+                    copyToClipboard(getClipboardLinks(true));
+                    toast.show((count === 1) ? l.key_copied : l.keys_copied, 4);
+                    logExportEvt(500761, counts);
+                });
+            }
+
+            const options = {
+                name,
+                contents: [createContents(itemExportLink(dialogOpts), dialogOpts)],
+                showClose: true,
+                footer: {
+                    slot: footerElements
+                },
+                onShow: () => {
+                    const { ignoreCopy, isUpdated } = dialogOpts;
+                    const heading = mCreateElement('div');
+
+                    if (isUpdated) {
+                        const banner = mCreateElement(
+                            'div',
+                            { class: 'mx-4 mb-4 overflow-y-hidden max-h-100 transition-max-h' },
+                            heading
+                        );
+
+                        const bannerTxt = mCreateElement(
+                            'div',
+                            { class: 'p-3 bg-banner-success rounded-xl' },
+                            banner
+                        );
+                        bannerTxt.textContent = (count === 1) ? l.link_updated : l.links_updated;
+
+                        tSleep(3).then(() => {
+                            banner.classList.remove('max-h-100');
+                            banner.classList.add('max-h-0');
+                        });
+                    }
+
+                    const h2 = mCreateElement('h2', { class: 'px-4' }, heading);
+                    h2.textContent = mega.icu.format(l.share_link, count);
+
+                    sheet.addTitle(heading);
+
+                    if (!ignoreCopy) {
+                        copyToClipboard(getClipboardLinks());
+                        toast.show(mega.icu.format(l.toast_link_created_and_copied, count), 4);
+                    }
+                }
+            };
+
+            sheet.show(options);
+            sheet.addClass(options.name);
+        };
+
+        return { show, hide: hideDialog.bind(null, name) };
+    });
+
+    lazy(scope.mega.Dialog.ExportLink, 'settings', () => {
+        const { ExportLink } = scope.mega.Dialog;
+        const name = 'export-links-settings-dialog';
+
+        let values;
+        let newValues = Object.create(null);
+
+        const resetNewValues = () => {
+            newValues = Object.create(null);
+        };
+
+        const show = () => {
+            const { sheet } = mega.ui;
+
+            const getExpTimestamp = () => {
+                const timestamps = exportExpiry.getExpiryDates();
+
+                if (!timestamps.length) {
+                    return false;
+                }
+
+                let i = timestamps.length - 1;
+                let last = timestamps[i];
+
+                while (--i >= 0) {
+                    if (timestamp[i] !== last) {
+                        return false;
+                    }
+
+                    last = timestamp[i];
+                }
+
+                return last;
+            };
+
+            if (!values) {
+                values = Object.create(null);
+                values.dec = false;
+                values.pwd = '';
+                values.pwdArr = [];
+                values.exp = getExpTimestamp() || 0;
+            }
+
+            const onBack = (skipConfirm, isUpdated) => {
+                ExportLink.settings.hide();
+
+                const doLeave = () => {
+                    resetNewValues();
+                    ExportLink.settingsDiscard.hide();
+                    ExportLink.view.show({ ...values, ignoreCopy: true, isUpdated });
+                };
+
+                if (Object.keys(newValues).length && !skipConfirm) {
+                    ExportLink.settingsDiscard.show(
+                        l.discard_changes,
+                        l.discard_changes_msg,
+                        doLeave
+                    );
+                }
+                else {
+                    doLeave();
+                }
+            };
+
+            const createContents = () => {
+                const header = mCreateElement('div', { class: 'flex flex-row items-center px-4' }, []);
+
+                const createRow = (id, contentFn, checkFn, uncheckFn, options) => {
+                    const action = mCreateElement('div');
+                    const row = mCreateElement('div', { class: 'flex flex-row font-body-1 mt-4 px-4' }, [
+                        mCreateElement('div', { class: 'flex-1' }),
+                        action
+                    ]);
+
+                    const { checked, ignorePro } = options || {};
+
+                    if (ignorePro || u_attr.p) {
+                        MegaToggleButton.factory({
+                            parentNode: action,
+                            componentClassname: 'mega-toggle-button',
+                            disabled: false,
+                            value: id,
+                            id,
+                            checked: !!checked,
+                            role: 'switch',
+                            onChange() {
+                                if (this.checked) {
+                                    checkFn(row);
+                                }
+                                else {
+                                    uncheckFn(row);
+                                }
+                            }
+                        });
+                    }
+                    else {
+                        MegaButton.factory({
+                            parentNode: action,
+                            text: l[8695],
+                            componentClassname: 'pro-only outline link',
+                            type: 'button'
+                        }).on('click.pro', () => {
+                            ExportLink.settings.hide();
+                            loadSubPage('pro');
+                        });
+                    }
+
+                    contentFn(row);
+
+                    return row;
+                };
+
+                MegaButton.factory({
+                    parentNode: header,
+                    icon: 'sprite-fm-mono icon-arrow-left-regular-outline rtl-rot-180',
+                    componentClassname: 'transparent-icon text-icon secondary',
+                    type: 'icon'
+                }).on('click.back', () => {
+                    logExportEvt(500770);
+                    onBack();
+                });
+
+                mCreateElement('h2', { class: 'font-bold my-0 px-2' }, header).textContent = l.link_settings;
+
+                const decr = createRow(
+                    'link-dec-toggle',
+                    (row) => {
+                        const decrTxt = row.querySelector('.flex-1');
+
+                        mCreateElement('span', null, decrTxt).textContent = l.send_decryption_key_separately;
+                        const link = mCreateElement('a', {
+                            class: 'learn-more-text px-1',
+                            href: `${l.mega_help_host}/files-folders/sharing/encrypted-links`,
+                            target: '_blank',
+                            rel: 'noopener noreferrer'
+                        }, decrTxt);
+
+                        link.textContent = l[8742];
+                        link.addEventListener('click', logExportEvt.bind(null, 500764));
+                    },
+                    () => {
+                        newValues.dec = true;
+
+                        // Log to see if "export link decryption key separately" is used much
+                        logExportEvt(500763, [1]);
+                    },
+                    () => {
+                        newValues.dec = false;
+                        logExportEvt(500763, [0]);
+                    },
+                    { ignorePro: true, checked: !!values.dec }
+                );
+                decr.classList.add('items-center');
+
+                const exp = createRow(
+                    'link-exp-toggle',
+                    (row) => {
+                        const parent = row.querySelector('.flex-1');
+                        mCreateElement('p', { class: 'my-0' }, parent).textContent = l.expiry_date;
+                        mCreateElement(
+                            'p',
+                            { class: 'text-color-medium font-body-2 my-0' },
+                            parent
+                        ).textContent = l.link_exp_txt;
+                        mCreateElement(
+                            'div',
+                            { class: 'exp-input max-h-0 mt-2 transition-max-h overflow-y-hidden' },
+                            parent
+                        );
+                    },
+                    (row) => { // Checked
+                        const expContainer = row.querySelector(':scope > .flex-1 > .exp-input');
+                        expContainer.classList.remove('max-h-0');
+                        expContainer.classList.add('max-h-100');
+
+                        mCreateElement(
+                            'input',
+                            {
+                                class: 'set-date border border-radius-2 font-body-2'
+                                    + ' text-color-medium focus-border-strong',
+                                type: 'text',
+                                name: 'share-link-expiry-datepicker',
+                                placeholder: l[8953],
+                                readonly: '',
+                                value: ''
+                            },
+                            expContainer
+                        );
+
+                        exportExpiry.init();
+
+                        logExportEvt(500765, [1]);
+                    },
+                    (row) => { // Unchecked
+                        const expContainer = row.querySelector(':scope > .flex-1 .exp-input');
+                        expContainer.classList.remove('max-h-100');
+                        expContainer.classList.add('max-h-0');
+
+                        const input = expContainer.querySelector(':scope > input');
+
+                        if (input) {
+                            expContainer.removeChild(input);
+                        }
+
+                        exportExpiry.datepicker.clear();
+                        newValues.exp = 0;
+
+                        logExportEvt(500765, [0]);
+                    }
+                );
+                const pwd = createRow(
+                    'link-pwd-toggle',
+                    (row) => {
+                        const parent = row.querySelector(':scope > .flex-1');
+                        mCreateElement('p', { class: 'my-0' }, parent).textContent = l[17454];
+                        mCreateElement(
+                            'p',
+                            { class: 'text-color-medium font-body-2 my-0' },
+                            parent
+                        ).textContent = l.link_pwd_txt;
+                        mCreateElement(
+                            'div',
+                            { class: 'pwd-input max-h-0 mt-2 transition-max-h overflow-y-hidden w-full' },
+                            parent
+                        );
+                    },
+                    (row) => { // Checked
+                        const pwdContainer = row.querySelector(':scope > .flex-1 > .pwd-input');
+                        pwdContainer.classList.remove('max-h-0');
+                        pwdContainer.classList.add('max-h-100');
+
+                        const input = mCreateElement(
+                            'input',
+                            {
+                                class: 'enter-pass no-title-top no-wrap-css'
+                                    + ' pmText strengthChecker clearButton',
+                                type: 'password',
+                                placeholder: l.start_typing,
+                                name: 'share-link-pwd',
+                                value: ''
+                            },
+                            pwdContainer
+                        );
+
+                        input.addEventListener('input', ({ target }) => {
+                            newValues.pwd = String(target.value);
+                        });
+
+                        exportPassword.encrypt.init();
+                        logExportEvt(500766, [1]);
+
+                        const { component, classList } = decr.querySelector('.mega-toggle-button');
+                        classList.add('opacity-50');
+                        component.disabled = true;
+
+                        if (!decr.nextSibling || decr.nextSibling.id !== 'decr-key-off') {
+                            const keyOff = mCreateElement(
+                                'div',
+                                {
+                                    id: 'decr-key-off',
+                                    class: 'p-3 font-body-1 mx-4 mb-4 mt-1 bg-banner-info rounded-xl'
+                                }
+                            );
+                            keyOff.textContent = l.decr_key_off;
+
+                            decr.insertAdjacentElement('afterend', keyOff);
+                        }
+                    },
+                    (row) => { // Unchecked
+                        const pwdContainer = row.querySelector(':scope > .flex-1 .pwd-input');
+                        pwdContainer.classList.remove('max-h-100');
+                        pwdContainer.classList.add('max-h-0');
+
+                        const input = pwdContainer.querySelector(':scope > .mega-input');
+
+                        if (input) {
+                            pwdContainer.removeChild(input);
+                        }
+
+                        newValues.pwd = '';
+                        logExportEvt(500766, [0]);
+
+                        const { component, classList } = decr.querySelector('.mega-toggle-button');
+                        const { nextSibling, parentNode } = decr;
+                        classList.remove('opacity-50');
+                        component.disabled = false;
+
+                        if (nextSibling && nextSibling.id === 'decr-key-off') {
+                            parentNode.removeChild(nextSibling);
+                        }
+                    }
+                );
+
+                const elements = [
+                    header,
+                    decr,
+                    mCreateElement('hr', { class: 'border-b border-t-none border-x-none mx-4' }),
+                    exp,
+                    pwd
+                ];
+
+                // 0 - no need, 1 - is_video, 2 - is_audio
+                const needsEmbed = $.itemExport.length === 1 && M.d[$.itemExport[0]].fa
+                    && is_video(M.d[$.itemExport[0]]) || 0;
+
+                if (needsEmbed) {
+                    const embedBtn = mCreateElement(
+                        'div',
+                        {
+                            class: 'hoverable flex flex-row items-center py-3 px-4 transition-colors'
+                                + ' border-radius-2 cursor-pointer'
+                        },
+                        [
+                            mCreateElement('div', { class: 'flex-1' }, [
+                                mCreateElement('p', { class: 'mt-0 mb-0 font-body-1' }),
+                                mCreateElement('p', { class: 'font-body-2 text-color-medium my-0' })
+                            ]),
+                            mCreateElement(
+                                'i',
+                                { class: 'sprite-fm-mono icon-chevron-right-thin-outline icon-size-6 rtl-rot-180' }
+                            )
+                        ]
+                    );
+
+                    embedBtn.querySelector(':scope p:first-child').textContent = (needsEmbed === 1)
+                        ? l.embed_video
+                        : l.embed_audio;
+                    embedBtn.querySelector(':scope p:nth-of-type(2)').textContent = (needsEmbed === 1)
+                        ? l.embed_video_msg
+                        : l.embed_audio_msg;
+
+                    elements.push(
+                        mCreateElement('hr', { class: 'border-b border-t-none border-x-none mx-4' }),
+                        embedBtn
+                    );
+
+                    embedBtn.addEventListener('click', () => {
+                        logExportEvt(needsEmbed === 1 ? 500771 : 500772);
+                        ExportLink.settings.hide();
+                        ExportLink.embed.show(needsEmbed);
+                    });
+                }
+
+                return mCreateElement('div', null, elements);
+            };
+
+            const footer = mCreateElement('div', { class: 'flex flex-row pr-4 mb-4' }, [
+                mCreateElement('div', { class: 'flex-1' })
+            ]);
+
+            const removeBtn = new MegaButton({
+                parentNode: footer.querySelector(':scope > .flex-1'),
+                text: ($.itemExport.length === 1) ? l[6821] : l[8735],
+                componentClassname: 'red text-icon underline-offset-4 font-600 slim'
+            }).on('click.remove', () => {
+                ExportLink.settings.hide();
+                removeLink('settings');
+            });
+
+            const backBtn = new MegaButton({
+                parentNode: footer,
+                text: l[822],
+                componentClassname: 'mx-2 secondary slim',
+                type: 'normal'
+            }).on('click.settingsBack', () => {
+                logExportEvt(500769);
+                onBack();
+            });
+
+            const saveBtn = new MegaButton({
+                parentNode: footer,
+                text: l[19631],
+                componentClassname: 'slim',
+                type: 'button'
+            }).on('click.save', async() => {
+                let linkUpdated = false;
+
+                if (Object.keys(newValues).length) {
+                    const loadingClasses = [
+                        'loading',
+                        'sprite-fm-theme-after',
+                        'icon-loader-throbber-light-outline-after',
+                        'pointer-events-none',
+                        'visible-txt'
+                    ];
+                    const promises = [];
+
+                    const stopLoading = () => {
+                        removeBtn.disabled = false;
+                        backBtn.disabled = false;
+                        saveBtn.domNode.classList.remove(...loadingClasses);
+                    };
+
+                    if ('dec' in newValues) {
+                        linkUpdated = true;
+                        values.dec = newValues.dec;
+                    }
+
+                    removeBtn.disabled = true;
+                    backBtn.disabled = true;
+                    saveBtn.domNode.classList.add(...loadingClasses);
+
+                    if ('pwd' in newValues) {
+                        // Checking if the password is too weak
+                        const pwdStatus = mega.ui.sheet.contentNode.querySelector('.strengthChecker .password-status');
+
+                        if (newValues.pwd
+                            && (
+                                newValues.pwd.length < security.minPasswordLength
+                                || !pwdStatus
+                                || pwdStatus.classList.contains('weak')
+                            )
+                        ) {
+                            pwdStatus.querySelector('.strength-text').textContent = l[9067];
+                            stopLoading();
+                            return;
+                        }
+
+                        linkUpdated = true;
+
+                        if (newValues.pwd !== values.pwd) {
+                            // Security measure to drop the previous public access
+                            await exportPassword.removeLinksAndReAdd($.itemExport);
+                        }
+
+                        if (newValues.pwd) {
+                            const links = await exportPassword.encrypt.startEncryption(newValues.pwd);
+
+                            if (!Array.isArray(links) || !links.length) {
+                                return;
+                            }
+
+                            values.pwdArr = links;
+                        }
+                        else {
+                            delete values.pwdArr;
+                        }
+
+                        values.pwd = newValues.pwd;
+                    }
+
+                    if ('exp' in newValues || 'pwd' in newValues) {
+                        const newEts = newValues.exp || null;
+                        let i = $.itemExport.length;
+
+                        while (--i >= 0) {
+                            promises.push(api.screq({ a: 'l', n: $.itemExport[i], ets: newEts }));
+                        }
+
+                        values.exp = newEts;
+                    }
+
+                    await Promise.all(promises);
+
+                    stopLoading();
+
+                    newValues = Object.create(null);
+                }
+
+                const counts = [0, 0];
+                let i = $.itemExport.length;
+
+                while (--i >= 0) {
+                    counts[M.d[$.itemExport[i]].t]++;
+                }
+                logExportEvt(500768, counts);
+
+                onBack(true, linkUpdated);
+            });
+
+            const options = {
+                name,
+                contents: [createContents()],
+                showClose: true,
+                footer: {
+                    slot: [footer]
+                },
+                onClose: () => {
+                    if (Object.keys(newValues).length) {
+                        ExportLink.settingsDiscard.show(
+                            l.discard_and_exit,
+                            l.discard_and_exit_msg,
+                            () => {
+                                ExportLink.settings.resetNewValues();
+                                ExportLink.settingsDiscard.hide();
+                            }
+                        );
+                    }
+                },
+                onShow: () => {
+
+                    if (
+                        ('dec' in newValues && newValues.dec)
+                        || (!('dec' in newValues) && values.dec)) {
+                        sheet.contentNode.querySelector('#link-dec-toggle').component.setButtonState(true);
+                    }
+
+                    const exp = 'exp' in newValues && newValues.exp || !('exp' in newValues) && values.exp;
+                    if (exp) {
+                        exportExpiry.presetValue = exp;
+                        sheet.contentNode.querySelector('#link-exp-toggle').component.setButtonState(true, true);
+                    }
+
+                    const pwd = 'pwd' in newValues && newValues.pwd || !('pwd' in newValues) && values.pwd;
+                    if (pwd) {
+                        sheet.contentNode.querySelector('#link-pwd-toggle').component.setButtonState(true, true);
+                        sheet.contentNode.querySelector('input.enter-pass').value = pwd;
+                    }
+                }
+            };
+
+            sheet.show(options);
+            sheet.addClass(options.name);
+        };
+
+        return {
+            show,
+            hide: hideDialog.bind(null, name),
+            updateExp: (ts) => { // Used in exportExpiry's onSelect
+                newValues.exp = ts;
+            },
+            getNewValues: () => newValues,
+            resetNewValues,
+            resetValues: () => {
+                values = null;
+            }
+        };
+    });
+
+    lazy(scope.mega.Dialog.ExportLink, 'remove', () => {
+        const { ExportLink } = scope.mega.Dialog;
+        const name = 'remove-link-dialog';
+
+        const show = (handles, msg, removeFn, prevDialog) => {
+            const { sheet } = mega.ui;
+            handles = handles || $.itemExport;
+
+            if (!Array.isArray(handles) || !handles.length) {
+                return; // No nodes supplied to the dialog
+            }
+
+            let i = handles.length;
+
+            const showPrevDialog = () => {
+                if (prevDialog && ExportLink[prevDialog]) {
+                    ExportLink[prevDialog].show();
+                }
+            };
+
+            // Use message about removal of 'items' for when both files and folders are selected
+            let contents;
+
+            if (msg) {
+                contents = msg;
+            }
+            else {
+                contents = l.remove_link_confirmation_mix_items;
+                const counts = [0, 0]; // File count, Folder count
+
+                // Determine number of files and folders so the dialog wording is correct
+                while (--i >= 0) {
+                    counts[M.d[handles[i]].t]++;
+                }
+
+                // Change message to folder/s or file/s depending on number of files and folders
+                if (counts[0] === 0) {
+                    contents = mega.icu.format(l.remove_link_confirmation_folders_only, counts[1]);
+                }
+                else if (counts[1] === 0) {
+                    contents = mega.icu.format(l.remove_link_confirmation_files_only, counts[0]);
+                }
+            }
+
+            const txt = mCreateElement('div');
+            txt.textContent = contents;
+
+            const footerElements = [
+                mCreateElement('div', { class: 'flex flex-row' }),
+                mCreateElement('div', { class: 'flex flex-row-reverse' })
+            ];
+
+            const ch = new MegaCheckbox({
+                parentNode: footerElements[0],
+                componentClassname: 'mega-checkbox mb-4',
+                checkboxName: 'nowarnpl-checkbox',
+                checkboxAlign: 'left',
+                labelTitle: l.do_not_show_again1,
+                checked: false
+            });
+
+            ch.on('toggle', function() {
+                mega.config.set('nowarnpl', !!this.checked | 0);
+            });
+
+            MegaButton.factory({
+                parentNode: footerElements[1],
+                type: 'normal',
+                componentClassname: 'slim',
+                text: l[83],
+            }).on('click.removeLink', () => {
+                ExportLink.remove.hide();
+                removeFn();
+            });
+
+            MegaButton.factory({
+                parentNode: footerElements[1],
+                type: 'normal',
+                text: l.dont_remove,
+                componentClassname: 'secondary mx-2 slim'
+            }).on('click.showSettings', () => {
+                ExportLink.remove.hide();
+                showPrevDialog();
+            });
+
+            const options = {
+                name,
+                contents: [txt],
+                title: mega.icu.format(l.remove_link_question, handles.length),
+                showClose: true,
+                footer: {
+                    slot: footerElements
+                },
+                onClose: showPrevDialog
+            };
+
+            sheet.show(options);
+            sheet.addClass(options.name);
+        };
+
+        return { show, hide: hideDialog.bind(null, name) };
+    });
+
+    lazy(scope.mega.Dialog.ExportLink, 'settingsDiscard', () => {
+        const { ExportLink } = scope.mega.Dialog;
+        const name = 'link-settings-discard-dialog';
+
+        const show = (title, contents, onProceed, onBack) => {
+            const { sheet } = mega.ui;
+
+            if (!onBack) {
+                onBack = () => {
+                    ExportLink.settingsDiscard.hide();
+                    ExportLink.settings.show();
+                };
+            }
+
+            const footer = mCreateElement('div', { class: 'flex flex-row-reverse' });
+
+            MegaButton.factory({
+                parentNode: footer,
+                text: l.discard,
+                componentClassname: 'slim',
+                type: 'button'
+            }).on('click.settingsDiscardProceed', onProceed);
+
+            MegaButton.factory({
+                parentNode: footer,
+                text: l[82],
+                componentClassname: 'mx-2 secondary slim',
+                type: 'normal'
+            }).on('click.settingsDiscardBack', onBack);
+
+            const options = {
+                name,
+                contents,
+                title,
+                showClose: true,
+                footer: {
+                    slot: [footer]
+                },
+                onClose: onBack
+            };
+
+            sheet.show(options);
+            sheet.addClass(options.name);
+        };
+
+        return { show, hide: hideDialog.bind(null, name) };
+    });
+
+    lazy(scope.mega.Dialog.ExportLink, 'embed', () => {
+        const { ExportLink } = scope.mega.Dialog;
+        const name = 'link-embed-dialog';
+
+        const show = (mediaType) => {
+            const { sheet, toast } = mega.ui;
+
+            /**
+             * @param {1|2} mediaType 1 - Video, 2 - Audio
+             * @returns {String}
+             */
+            const setCode = (mediaType) => {
+                const n = M.d[$.itemExport[0]];
+                const link = getBaseUrl() + '/embed/' + n.ph + '#' + a32_to_base64(n.k);
+
+                const iframe = '<iframe width="%w" height="%h" frameborder="0" src="%s" allowfullscreen %a></iframe>\n';
+                const { sheet } = mega.ui;
+                const audio = mediaType === 2;
+                const dialog = sheet.contentNode;
+
+                let time = 0;
+                let width = 0;
+                let height = 0;
+                let autoplay = false;
+                let muted = false;
+                let optionAdded = false;
+                let copy = true;
+
+                const getValue = (input) => {
+                    var value = String(input.value || '').replace(/\.\d*$/g, '').replace(/\D/g, '');
+
+                    return Math.min(Math.max(parseInt(value) || 0, input.getAttribute('min') | 0),
+                                    parseInt(input.getAttribute('max')) || Number.MAX_SAFE_INTEGER) >>> 0;
+                };
+
+                if (audio) {
+                    width = 711;
+                    height = 144;
+                    optionAdded = true;
+
+                    const checkbox = dialog.querySelector('input#embed-allow-copy');
+                    copy = !!checkbox && checkbox.checked;
+                }
+                else {
+                    const startInput = dialog.querySelector('#embed-start-at input');
+
+                    if (startInput) {
+                        time = getValue(startInput);
+
+                        if (time) {
+                            optionAdded = true;
+                        }
+
+                        startInput.nextSibling.textContent = mega.icu.format(l.seconds_suffix, time);
+                    }
+
+                    const [w, h] = dialog.querySelectorAll('#embed-sizes input');
+
+                    if (w && h) {
+                        width = getValue(w);
+                        height = getValue(h);
+                    }
+
+                    const autoplayCheckbox = dialog.querySelector('#embed-video-autoplay input');
+
+                    if (autoplayCheckbox && autoplayCheckbox.checked) {
+                        autoplay = true;
+                        optionAdded = true;
+                    }
+
+                    const muteCheckbox = dialog.querySelector('#embed-video-mute input');
+
+                    if (muteCheckbox && muteCheckbox.checked) {
+                        muted = true;
+                        optionAdded = true;
+                    }
+                }
+
+                const composeCode = () => iframe
+                    .replace('%w', width > 0 && height > 0 ? width : 640)
+                    .replace('%h', width > 0 && height > 0 ? height : 360)
+                    .replace('%s', link + (optionAdded ? '!' : '') + (time > 0 ? time + 's' : '') +
+                        (autoplay ? '1a' : '') + (muted ? '1m' : '') + (audio ? '1v' : '') + (copy ? '' : '1c'))
+                    .replace('%a', autoplay ? 'allow="autoplay;"' : '');
+
+                sheet.contentNode.querySelector('textarea.embed-code').value = composeCode();
+            };
+
+            const onBack = () => {
+                ExportLink.embed.hide();
+                ExportLink.settings.show();
+            };
+
+            /**
+             * @param {1|2} mediaType 1 - Video, 2 - Audio
+             * @returns {HTMLDivElement}
+             */
+            const createContents = (mediaType) => {
+                const node = M.d[$.itemExport[0]];
+                const isAudio = mediaType === 2;
+                const title = (isAudio) ? l.embed_audio : l.embed_video ;
+                const header = mCreateElement('div', { class: 'flex flex-row items-center mb-4 px-4' });
+                const naming = mCreateElement(
+                    'div',
+                    { class: 'flex flex-row items-center font-body-1 mb-4 px-4' },
+                    [
+                        mCreateElement('i', { class: `item-type-icon icon-${fileIcon(node)}-24 icon-size-8` }),
+                        mCreateElement('div', { class: 'flex-1 text-ellipsis px-2' })
+                    ]
+                );
+
+                naming.querySelector(':scope > div.flex-1').textContent = htmlentities(node.name);
+
+                MegaButton.factory({
+                    parentNode: header,
+                    icon: 'sprite-fm-mono icon-arrow-left-regular-outline rtl-rot-180',
+                    componentClassname: 'transparent-icon text-icon secondary',
+                    type: 'icon'
+                }).on('click.back', () => {
+                    logExportEvt(500776);
+                    onBack();
+                });
+
+                mCreateElement('h2', { class: 'font-bold my-0 px-2' }, header).textContent = title;
+
+                const textBlock = mCreateElement(
+                    'div',
+                    { class: 'border-radius-2 bg-surface-grey-1 relative mx-4' },
+                    [
+                        mCreateElement(
+                            'textarea',
+                            {
+                                readonly: '',
+                                class: 'embed-code box-border border-none bg-surface-grey-1 border-radius-2'
+                                    + ' w-full py-2 pl-3 pr-8 font-body-1 h-28 text-color-high overflow-y-hidden'
+                            }
+                        )
+                    ]
+                );
+
+                const componentClassname = 'transparent-icon text-icon copy-field secondary'
+                    + ' absolute bottom-2 simpletip'
+                    + (document.body.classList.contains('rtl') ? ' left-2' : ' right-2');
+
+                MegaButton.factory({
+                    parentNode: textBlock,
+                    icon: 'sprite-fm-mono icon-copy-thin-outline icon-size-5',
+                    componentClassname,
+                    type: 'icon',
+                    dataset: { simpletip: l[17408] }
+                }).on('click.copyCode', () => {
+                    copyToClipboard(textBlock.querySelector(':scope textarea').value);
+                    toast.show(l.code_copied, 4);
+                    logExportEvt(500773, [mediaType]);
+                });
+
+                const elements = [
+                    header,
+                    naming,
+                    textBlock,
+                    mCreateElement('hr', { class: 'border-b border-t-none border-x-none my-4 mx-4' })
+                ];
+
+                if (isAudio) {
+                    const copyBlock = mCreateElement('div', { class: 'flex flex-row items-center px-4' }, [
+                        mCreateElement('div', { class: 'flex-1 font-body-1' }),
+                        mCreateElement('div')
+                    ]);
+
+                    copyBlock.querySelector(':scope > div.flex-1').textContent = l.allow_copy_link;
+
+                    MegaToggleButton.factory({
+                        parentNode: copyBlock.querySelector(':scope > div:nth-of-type(2)'),
+                        componentClassname: 'mega-toggle-button',
+                        disabled: false,
+                        value: 'embed-allow-copy',
+                        id: 'embed-allow-copy',
+                        checked: false,
+                        role: 'switch',
+                        onChange() {
+                            setCode(mediaType);
+                            logExportEvt(500782, [this.checked & 1]);
+                        }
+                    });
+
+                    elements.push(copyBlock);
+                }
+                else {
+                    const { playtime } = MediaAttribute(node).data;
+                    const startBlock = mCreateElement(
+                        'div',
+                        { class: 'flex flex-row items-center mb-4 px-4', id: 'embed-start-at' },
+                        [
+                            mCreateElement('div', { class: 'flex-1' }, [
+                                mCreateElement('div', { class: 'font-body-1' }),
+                                mCreateElement('div', { class: 'font-body-2 text-color-medium' })
+                            ]),
+                            mCreateElement(
+                                'div',
+                                {
+                                    class: 'flex flex-row items-center border border-radius-2 p-2 w-40'
+                                        + ' box-border focus-within-border-strong'
+                                },
+                                [
+                                    mCreateElement(
+                                        'input',
+                                        {
+                                            class: 'border-none border-radius-2 w-12 font-body-2'
+                                                + ' bg-inherit text-color-high flex-1',
+                                            type: 'number',
+                                            min: 0,
+                                            max: playtime,
+                                            value: 0
+                                        }
+                                    ),
+                                    mCreateElement('span', { class: 'seconds-suffix font-body-2 text-color-medium' })
+                                ]
+                            )
+                        ]
+                    );
+
+                    const input = startBlock.querySelector('input');
+                    input.addEventListener('input', setCode.bind(null, mediaType));
+                    input.addEventListener('click', logExportEvt.bind(null, 500777));
+
+                    startBlock.querySelector('span.seconds-suffix').textContent = mega.icu.format(l.seconds_suffix, 0);
+                    startBlock.querySelector(':scope > .flex-1 > div:first-child').textContent = l[17822];
+                    startBlock.querySelector(':scope > .flex-1 > div:nth-of-type(2)').textContent = l.total_vid_len
+                        .replace('%1', secondsToTimeShort(playtime));
+
+                    const min = 128;
+                    const max = 9999;
+
+                    const dimensionsBlock = mCreateElement(
+                        'div',
+                        { class: 'flex flex-row items-center mb-4 px-4', id: 'embed-sizes' },
+                        [
+                            mCreateElement('div', { class: 'flex-1 font-body-1' }),
+                            mCreateElement(
+                                'div',
+                                { class: 'flex flex-row w-40 text-color-high font-body-2 items-center' },
+                                [
+                                    mCreateElement(
+                                        'input',
+                                        {
+                                            class: 'border border-radius-2 p-2 bg-inherit flex-1 focus-border-strong',
+                                            type: 'number',
+                                            min,
+                                            max,
+                                            value: 640,
+                                            'data-click-evt-id': 500778
+                                        }
+                                    ),
+                                    mCreateElement('span', { class: 'x px-2' }),
+                                    mCreateElement(
+                                        'input',
+                                        {
+                                            class: 'border border-radius-2 p-2 bg-inherit flex-1 focus-border-strong',
+                                            type: 'number',
+                                            min,
+                                            max,
+                                            value: 360,
+                                            'data-click-evt-id': 500779
+                                        }
+                                    )
+                                ]
+                            )
+                        ]
+                    );
+
+                    dimensionsBlock.querySelectorAll('input').forEach((input) => {
+                        input.addEventListener('input', setCode.bind(null, mediaType));
+                        input.addEventListener('click', logExportEvt.bind(null, parseInt(input.dataset.clickEvtId)));
+                    });
+                    dimensionsBlock.querySelector(':scope > div.flex-1').textContent = l[17823];
+                    dimensionsBlock.querySelector(':scope span.x').textContent = String.fromCharCode(215);
+
+                    const autoPlayBlock = mCreateElement('div', { class: 'flex flex-row items-center px-4' }, [
+                        mCreateElement('div', { class: 'font-body-1' }),
+                        mCreateElement(
+                            'i',
+                            {
+                                class: 'sprite-fm-mono icon-help-circle-thin-outline simpletip mx-1',
+                                'data-simpletip': l[23718]
+                            }
+                        ),
+                        mCreateElement('div', { class: 'flex-1' })
+                    ]);
+
+                    autoPlayBlock.querySelector(':scope > div:first-child').textContent = l[22188];
+
+                    MegaToggleButton.factory({
+                        parentNode: autoPlayBlock.querySelector(':scope > div.flex-1'),
+                        componentClassname: 'mega-toggle-button',
+                        disabled: false,
+                        value: 'embed-video-autoplay',
+                        id: 'embed-video-autoplay',
+                        checked: false,
+                        role: 'switch',
+                        onChange() {
+                            setCode(mediaType);
+                            logExportEvt(500780, [this.checked & 1]);
+                        }
+                    });
+
+                    const muteBlock = mCreateElement('div', { class: 'flex flex-row items-center px-4' }, [
+                        mCreateElement('div', { class: 'flex-1 font-body-1' }),
+                        mCreateElement('div')
+                    ]);
+
+                    muteBlock.querySelector(':scope > div.flex-1').textContent = l.embed_dlg_mute;
+
+                    MegaToggleButton.factory({
+                        parentNode: muteBlock.querySelector(':scope > div:nth-of-type(2)'),
+                        componentClassname: 'mega-toggle-button',
+                        disabled: false,
+                        value: 'embed-video-mute',
+                        id: 'embed-video-mute',
+                        checked: false,
+                        role: 'switch',
+                        onChange() {
+                            setCode(mediaType);
+                            logExportEvt(500781, [this.checked & 1]);
+                        }
+                    });
+
+                    elements.push(
+                        startBlock,
+                        dimensionsBlock,
+                        autoPlayBlock,
+                        muteBlock
+                    );
+                }
+
+                return mCreateElement('div', null, elements);
+            };
+
+            const footer = mCreateElement('div', { class: 'flex flex-row pr-4 mb-4' }, [
+                mCreateElement('div', { class: 'flex-1' })
+            ]);
+
+            MegaButton.factory({
+                parentNode: footer.querySelector(':scope > .flex-1'),
+                text: mega.icu.format(l.remove_links, $.itemExport.length),
+                componentClassname: 'red text-icon underline-offset-4 font-600 slim'
+            }).on('click.remove', () => {
+                ExportLink.embed.hide();
+                removeLink('embed');
+            });
+
+            MegaButton.factory({
+                parentNode: footer,
+                text: l[822],
+                componentClassname: 'mx-2 secondary slim',
+                type: 'normal'
+            }).on('click.settingsBack', () => {
+                logExportEvt(500775);
+                onBack();
+            });
+
+            MegaButton.factory({
+                parentNode: footer,
+                text: l[17408],
+                componentClassname: 'slim',
+                type: 'button'
+            }).on('click.copy', () => {
+                copyToClipboard(sheet.contentNode.querySelector('textarea.embed-code').value);
+                toast.show(l.code_copied, 4);
+                logExportEvt(500774, [mediaType]);
+            });
+
+            const options = {
+                name,
+                contents: [createContents(mediaType)],
+                showClose: true,
+                footer: {
+                    slot: [footer],
+                },
+                onShow: setCode.bind(null, mediaType),
+                onClose: () => {
+                    if (!Object.keys(ExportLink.settings.getNewValues()).length) {
+                        return;
+                    }
+
+                    ExportLink.settingsDiscard.show(
+                        l.discard_and_exit,
+                        l.discard_and_exit_msg,
+                        () => {
+                            ExportLink.settings.resetNewValues();
+                            ExportLink.settingsDiscard.hide();
+                        },
+                        () => {
+                            ExportLink.settingsDiscard.hide();
+                            ExportLink.embed.show(mediaType);
+                        }
+                    );
+                }
+            };
+
+            sheet.show(options);
+            sheet.addClass(options.name);
+        };
+
+        return { show, hide: hideDialog.bind(null, name) };
+    });
 })(jQuery, window);
 
 
@@ -3110,8 +3032,8 @@ function logExportEvt(type, target) {
     scope.mega.Share = scope.mega.Share || {};
     scope.mega.Share.ExportLink = ExportLink;
     scope.mega.Share.initCopyrightsDialog = initCopyrightsDialog;
+    scope.mega.ui = scope.mega.UI || {};
 })(jQuery, window);
-
 
 (function($, scope) {
     /**
@@ -3318,13 +3240,13 @@ function logExportEvt(type, target) {
 })(jQuery, window);
 
 /** Export Link as string **/
-(function($, scope) {
+lazy(mega, 'getPublicNodeExportLink', () => {
     'use strict';
 
-    scope.getPublicNodeExportLink = function(node) {
+    return (node) => {
 
-        var fileUrlWithoutKey;
-        var type;
+        let fileUrlWithoutKey;
+        let type;
 
         if (folderlink) {
             fileUrlWithoutKey = getBaseUrl() + '/#F!' + pfid + (node.t ? '!' : '?') + node.h;
@@ -3339,5 +3261,4 @@ function logExportEvt(type, target) {
 
         return fileUrlWithoutKey || (getBaseUrl() + '/#' + type + '!' + htmlentities(node.ph));
     };
-
-})(jQuery, mega);
+});

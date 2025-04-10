@@ -65,6 +65,9 @@ Implemented styles:
     text-decoration: none;
     --icon-size: 22px;
 }
+.nav-elem.slim {
+    height: 36px;
+}
 
 .nav-elem.normal.block {
     width: 100%;
@@ -222,6 +225,10 @@ button.nav-elem.no-active:active,
 .nav-elem.text-icon {
     text-decoration: underline;
 }
+.nav-elem.text-only.red,
+.nav-elem.text-icon.red {
+    color: var(--secondary-red);
+}
 .nav-elem.text-only.no-deco,
 .nav-elem.full-width.text-icon,
 .nav-elem.full-width.text-only {
@@ -309,8 +316,15 @@ button.nav-elem.no-active:active,
     text-decoration: inherit;
     font: var(--mobile-font-link-large-regular);
 }
-.nav-elem.underline span {
+.nav-elem.slim span {
+    font: var(--mobile-font-link-small-regular);
+}
+.nav-elem.underline span,
+.nav-elem.underline-offset-4 span {
     text-decoration: underline;
+}
+.nav-elem.font-600 span {
+    font-weight: 600;
 }
 
 .nav-elem.semibold span {
@@ -380,8 +394,18 @@ button.nav-elem.no-active:active,
     position: absolute;
 }
 
+.nav-elem.loading.sprite-fm-theme-after.visible-txt::after,
+.nav-elem.loading.sprite-fm-uni-after.visible-txt::after {
+    position: relative;
+    margin-left: 0.5rem;
+}
+
 .nav-elem.loading .text-box-wrapper.sk-elm {
     opacity: 0;
+}
+
+.nav-elem.loading.visible-txt .text-box-wrapper.sk-elm {
+    opacity: 1;
 }
 
 .nav-elem .multi-text-box {
@@ -413,4 +437,16 @@ button.nav-elem.no-active:active,
     z-index: 1;
     text-decoration: none;
     min-width: 7px;
+}
+
+/* Badge button */
+button.nav-elem.pro-only,
+button.nav-elem.pro-only:hover,
+button.nav-elem.pro-only:active {
+    color: var(--secondary-red);
+    border-color: var(--secondary-red);
+    font-size: 12px;
+    padding: 0 8px;
+    height: 28px;
+    cursor: pointer;
 }

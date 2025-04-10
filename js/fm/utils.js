@@ -2626,3 +2626,63 @@ MegaUtils.prototype.fmEventLog = function(eid) {
 };
 
 Object.freeze(MegaUtils.prototype);
+
+lazy(MegaUtils, 'classifyPMPassword', () => {
+    'use strict';
+
+    return (password) => {
+
+        if (typeof zxcvbn !== 'function') {
+            onIdle(() => {
+                throw new Error('zxcvbn init fault');
+            });
+            console.error('zxcvbn is not inited');
+            return false;
+        }
+
+        const passwordLength = password.length;
+        if (passwordLength === 0) {
+            return false;
+        }
+
+        let passwordScore = 0;
+
+        if (passwordLength < 32) {
+            passwordScore = zxcvbn(password).score;
+        }
+        else {
+            passwordScore = zxcvbn(password.slice(0, 32)).score;
+
+            if (passwordScore < 4) {
+                passwordScore = zxcvbn(password).score;
+            }
+        }
+
+        // Calculate the password score using the ZXCVBN library and its length
+
+        if (passwordScore === 3 || passwordScore === 4) {
+            return {
+                string1: l.password_strength_strong,
+                string2: l[1123],
+                className: 'strong',                     // Strong
+                icon: 'strength-icon sprite-fm-mono icon-check-circle-thin-outline'
+            };
+        }
+        else if (passwordScore === 2) {
+            return {
+                string1: l.password_strength_moderate,
+                string2: l[1122],
+                className: 'moderate',                     // Moderate
+                icon: 'strength-icon sprite-fm-mono icon-alert-circle-thin-outline'
+            };
+        }
+
+        return {
+            string1: l.password_strength_weak,
+            string2: l[1120],
+            className: 'weak',                     // Weak
+            icon: 'strength-icon sprite-fm-mono icon-alert-triangle-thin-outline'
+        };
+
+    };
+});

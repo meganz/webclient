@@ -1624,7 +1624,7 @@ FileManager.prototype.initContextUI = function() {
         $.hideContextMenu();
     });
 
-    $(c + '.getlink-item, ' + c + '.embedcode-item, ' + c + '.cd-getlink-item').rebind('click', function(e) {
+    $(c + '.getlink-item, ' + c + '.cd-getlink-item').rebind('click', function(e) {
 
         if (e.shiftKey && (e.ctrlKey || e.metaKey)) {
             $('button', $('#link-hidden-repair-proc').removeClass('hidden'))
@@ -1674,30 +1674,22 @@ FileManager.prototype.initContextUI = function() {
             ephemeralDialog(l[1005]);
         }
         else {
-            var media = false;
-            var handles = Array.isArray($.selected) && $.selected.concat();
-            var removeLink = function(e) {
-                if (e) {
-                    var exportLink = new mega.Share.ExportLink({'updateUI': true, 'nodesToProcess': handles});
-                    exportLink.removeExportLink();
-                }
+            let media = false;
+            const handles = Array.isArray($.selected) && $.selected.concat();
+            const removeLink = () => {
+                const exportLink = new mega.Share.ExportLink({'updateUI': true, 'nodesToProcess': handles});
+                exportLink.removeExportLink();
             };
-            let files = 0;
-            let folders = 0;
-            for (var i = handles.length; i--;) {
+
+            for (let i = handles.length; i--;) {
                 if (is_video(M.d[handles[i]]) === 1) {
                     media = true;
-                }
-                if (M.d[handles[i]].t) {
-                    folders++;
-                }
-                else {
-                    files++;
+                    break;
                 }
             }
 
-            var mediaRemoveLink = () => {
-                msgDialog('confirmation', l[882], l[17824], 0, removeLink);
+            const mediaRemoveLink = () => {
+                mega.Dialog.ExportLink(l[17824], removeLink);
             };
 
             if (mega.config.get('nowarnpl')) {
@@ -1709,26 +1701,7 @@ FileManager.prototype.initContextUI = function() {
                 }
             }
             else {
-                // Pluralise dialog text
-                const linkCount = folders + files;
-                const msg = mega.icu.format(l.remove_link_question, linkCount);
-                const cancelButtonText = l.dont_remove;
-                const confirmButtonText = l['83'];
-
-                // Use message about removal of 'items' for when both files and folders are selected
-                let subMsg = l.remove_link_confirmation_mix_items;
-
-                // Change message to folder/s or file/s depending on number of files and folders
-                if (folders === 0) {
-                    subMsg = mega.icu.format(l.remove_link_confirmation_files_only, files);
-                }
-                else if (files === 0) {
-                    subMsg = mega.icu.format(l.remove_link_confirmation_folders_only, folders);
-                }
-
-                // Show confirmation dialog
-                msgDialog(`*confirmation:!^${confirmButtonText}!${cancelButtonText}`, null, msg, subMsg, removeLink,
-                    'nowarnpl');
+                mega.Dialog.ExportLink.remove.show(handles, null, removeLink);
             }
         }
 
@@ -4821,10 +4794,9 @@ FileManager.prototype.getLinkAction = function() {
         ephemeralDialog(l[1005]);
     }
     else {
-        var isEmbed = $(this).hasClass('embedcode-item');
         var selNodes = Array.isArray($.selected) ? $.selected.concat() : [];
         var showDialog = function() {
-            mega.Share.initCopyrightsDialog(selNodes, isEmbed);
+            mega.Share.initCopyrightsDialog(selNodes);
         };
 
         const mdList = mega.fileRequestCommon.storage.isDropExist(selNodes);

@@ -90,7 +90,7 @@
 /* Settings form. Overlay */
 
 .mega-overlay .mega-mobile-settings.default-form {
-    padding: 0;
+    box-sizing: border-box;
 }
 
 /* End of Settings  form */

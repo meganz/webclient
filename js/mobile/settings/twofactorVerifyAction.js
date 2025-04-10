@@ -79,7 +79,7 @@ mobile.settings.account.twofactorVerifyAction = Object.create(mobile.settingsHel
         value: function() {
             'use strict';
 
-            this.domNode.classList.add('default-form', 'fixed-width');
+            this.domNode.classList.add('default-form', 'fixed-width', 'mob-px-6');
             this.msgNode.textContent = this.msg || l.enter_two_fa_code;
 
             // Hide Lost device button when enabling 2FA

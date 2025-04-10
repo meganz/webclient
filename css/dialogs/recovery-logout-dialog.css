@@ -64,6 +64,7 @@
 .recoverykey-logout-overlay .overlay-footer {
     background: var(--mobile-surface-1);
     color: var(--mobile-text-secondary);
+    padding-bottom: 16px;
 }
 .recoverykey-logout-overlay .overlay-footer label {
     overflow: hidden;
@@ -77,23 +78,13 @@
     height: auto;
 }
 
-@media only screen and (min-width: 769px) {
-    .recoverykey-logout-overlay .image,
-    .recoverykey-logout-overlay .title {
-        margin-inline-start: 24px;
-    }
-    .recoverykey-logout-overlay .content.fm-scrolling {
-        margin: 0 24px;
-        width: calc(100% - 48px);
-    }
-    .recoverykey-logout-overlay .recovery-key.container,
-    .recoverykey-logout-overlay .mega-component.block.dlButton,
-    .recoverykey-logout-overlay .pass-reminder.container .mega-input.mobile,
-    .recoverykey-logout-overlay .mega-component.block.confirmButton {
-        max-width: 100%;
-    }
+.recoverykey-logout-overlay .recovery-key.container,
+.recoverykey-logout-overlay .mega-component.block.dlButton,
+.recoverykey-logout-overlay .pass-reminder.container .mega-input.mobile,
+.recoverykey-logout-overlay .mega-component.block.confirmButton {
+    max-width: 100%;
+}
 
-    .recoverykey-logout-overlay .pass-reminder-forgot {
-        margin-bottom: 40px;
-    }
+.recoverykey-logout-overlay .pass-reminder-forgot {
+    margin-bottom: 40px;
 }

@@ -306,7 +306,7 @@ accountUI.plan = {
                         },
                         setContent() {
                             const div = document.createElement('div');
-                            div.className = 'cancel-subscription-benefits-content px-6';
+                            div.className = 'cancel-subscription-benefits-content mob-px-6';
 
                             // String keys:
                             // l.vpn_trial_cancel_confirm

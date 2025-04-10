@@ -594,6 +594,10 @@ mobile.linkManagement = {
             nodeUrlWithPublicHandle = getBaseUrl() + '/folder/' + pfid + '#';
         }
         else {
+            if (this.node.t) {
+                type = 'F';
+            }
+
             type = (type) ? '/folder/' : '/file/';
             nodeUrlWithPublicHandle = getBaseUrl() + type + this.node.ph + '#';
         }

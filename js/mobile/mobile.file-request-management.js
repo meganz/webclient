@@ -28,7 +28,7 @@ mobile.fileRequestManagement = {
         }
 
         this.container = document.createElement('div');
-        this.container.className = 'fr-mgmt-container';
+        this.container.className = 'fr-mgmt-container mob-px-6';
 
         // Blurb text
         const frBlurbDiv = document.createElement('div');

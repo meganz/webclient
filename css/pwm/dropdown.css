@@ -146,6 +146,9 @@ ul.sort-password-list li i {
 .dropdown-options-wrap .dropdown-menu.overlay-wrap {
     position: relative;
 }
+.dropdown-options-wrap .dropdown-menu .header {
+    margin-bottom: 0;
+}
 
 /* Overridden component styles for webclient layout */
 

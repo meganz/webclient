@@ -116,9 +116,16 @@ span.rot-90::before {
     margin-left: 1rem;
     margin-right: 1rem;
 }
+.me-4 {
+    margin-inline-end: 0.5rem;
+}
 .mx-auto {
     margin-left: auto;
     margin-right: auto;
+}
+.-mx-4 {
+    margin-left: -1rem;
+    margin-right: -1rem;
 }
 .p-2 {
     padding: 0.5rem;
@@ -198,6 +205,10 @@ span.rot-90::before {
     padding-right: 1.25rem;
 }
 .px-6 {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+}
+.mobile .mob-px-6 {
     padding-left: 1.5rem;
     padding-right: 1.5rem;
 }
@@ -537,7 +548,7 @@ i.green-check-circle {
 .border-radius-2 {
     border-radius: 8px;
 }
-.border {
+.border-1 {
     border: 1px solid var(--mobile-border-strong);
 }
 .border-none {
@@ -566,6 +577,9 @@ i.green-check-circle {
 .top-0 {
     top: 0;
 }
+.-top-8 {
+    top: -2rem;
+}
 .right-0 {
     right: 0;
 }
@@ -581,12 +595,6 @@ i.green-check-circle {
 .left-2 {
     left: 0.5rem;
 }
-.-top-8 {
-    top: -2rem;
-}
-.-top-16 {
-    top: -4rem;
-}
 .bottom-0 {
     bottom: 0;
 }
@@ -595,9 +603,6 @@ i.green-check-circle {
 }
 .tooltip-popin {
     animation: tooltippopin 0.2s ease;
-}
-.bg-surface-main {
-    background: var(--surface-main);
 }
 .rounded {
     border-radius: 0.25rem;

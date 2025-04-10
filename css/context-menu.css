@@ -20,6 +20,9 @@
 .context-menu .context-menu {
     top: -8px;
 }
+.context-menu .header {
+    margin-bottom: 0;
+}
 .context-menu .context-menu.open-right {
     left: 80%;
     right: auto;

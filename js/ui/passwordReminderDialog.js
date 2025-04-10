@@ -500,7 +500,6 @@
                     type: 'checkbox',
                     componentClassname: 'mega-checkbox',
                     checkboxName: 'show-again',
-                    checkboxAlign: 'left',
                     labelTitle: l.remind_recovery_check,
                     checked: false
                 };
@@ -571,8 +570,8 @@
 
         initDialogContents() {
             if (!this.dialog) {
-                this.dialog = mCreateElement('div', {'class': 'recovery-key-logout'}, [
-                    mCreateElement('span', {'class': 'text info'}, [parseHTML(l.logout_recovery_key)])
+                this.dialog = mCreateElement('div', {'class': 'recovery-key-logout mob-px-6'}, [
+                    mCreateElement('span', {'class': 'text info text-left'}, [parseHTML(l.logout_recovery_key)])
                 ]);
 
                 const recoveryKey = a32_to_base64(window.u_k || '');
@@ -581,11 +580,11 @@
 
                 // Step 1: Actual recovery key input + download button
                 const recoveryKeyContainer = mCreateElement('div', {'class': 'recovery-key container'}, [
-                    mCreateElement('span', {'class': 'recovery-key blurb'}, [document.createTextNode(
+                    mCreateElement('span', {'class': 'recovery-key blurb text-left'}, [document.createTextNode(
                         l.logout_recovery_key_title)]),
                     rkinput = mCreateElement('div', {'class': 'recovery-key input'}, [
                         mCreateElement('input', {
-                            'class': 'recovery-key string',
+                            'class': 'recovery-key string text-left',
                             'type': 'text',
                             'readonly': '',
                             'value': recoveryKey

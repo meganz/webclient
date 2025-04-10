@@ -8,7 +8,7 @@ class MegaMobileContextMenu extends MegaComponentGroup {
         this.hide = this.sheet.hide;
 
         this.domNode = document.createElement('div');
-        this.domNode.className = 'context-menu-container';
+        this.domNode.className = 'context-menu-container px-6';
 
         const menuNode = document.createElement('menu');
         menuNode.className = 'context-menu-items items';
@@ -675,7 +675,9 @@ mBroadcaster.once('boot_done', () => {
                     name: 'label-selector',
                     showClose: true,
                     title: l[17398],
-                    contents: labelGroup.map(c => c.domNode),
+                    contents: [
+                        mCreateElement('div', { class: 'px-6' }, labelGroup.map(c => c.domNode))
+                    ],
                     type: 'normal',
                     actions: n.lbl && [{
                         type: 'normal',

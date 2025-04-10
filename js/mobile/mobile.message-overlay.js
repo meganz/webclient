@@ -60,7 +60,6 @@ var megaMsgDialog = (() => {
                 parentNode: targetSheet.actionsNode,
                 componentClassname: 'mega-checkbox',
                 checkboxName: 'show-again',
-                checkboxAlign: 'left',
                 labelTitle: l[229], // Do not show again
                 checked: false
             });

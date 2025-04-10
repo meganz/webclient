@@ -19,18 +19,18 @@ class MegaOverlay extends MegaComponent {
         targetNode = overlay;
 
         subNode = document.createElement('div');
-        subNode.className = 'header';
+        subNode.className = 'header mb-4 relative';
         targetNode.appendChild(subNode);
         targetNode = subNode;
 
         this.headerTitleNode = subNode = document.createElement('div');
-        subNode.className = 'header-title';
+        subNode.className = 'header-title flex flex-row items-center';
         targetNode.appendChild(subNode);
 
         this.closeButton = new MegaButton({
             parentNode: targetNode,
             type: 'icon',
-            componentClassname: 'text-icon close',
+            componentClassname: 'text-icon close absolute',
             icon: `${mega.ui.sprites.mono} icon-dialog-close`,
             iconSize: 24
         });
@@ -48,11 +48,11 @@ class MegaOverlay extends MegaComponent {
         targetNode = subNode;
 
         this.imageNode = subNode = document.createElement('div');
-        subNode.className = 'image';
+        subNode.className = 'image mob-px-6';
         targetNode.appendChild(subNode);
 
         this.titleNode = subNode = document.createElement('div');
-        subNode.className = 'title';
+        subNode.className = 'title mob-px-6';
         targetNode.appendChild(subNode);
 
         this.subTitleNode = subNode = document.createElement('div');
@@ -130,6 +130,10 @@ class MegaOverlay extends MegaComponent {
 
             if (options.header) {
                 this.addHeader(options.header, options.headerType);
+            }
+
+            if (options.onBack) {
+                this.addBackBtn(options.onBack);
             }
 
             if (options.title) {
@@ -217,6 +221,7 @@ class MegaOverlay extends MegaComponent {
     }
 
     clear() {
+        this.clearBackBtn();
         this.clearHeader();
         this.clearTitle();
         this.clearSubTitle();
@@ -259,14 +264,36 @@ class MegaOverlay extends MegaComponent {
 
     clearTitle() {
         this.titleNode.textContent = '';
-        this.titleNode.className = 'title';
+        this.titleNode.className = 'title mob-px-6';
     }
 
-    addHeader(title, headerType) {
+    addHeader(title, headerType, className = 'my-0 font-600 flex-1 text-left') {
         this.clearHeader();
         const subNode = document.createElement(headerType || 'h2');
         subNode.textContent = title;
+        subNode.className = className;
         this.headerTitleNode.appendChild(subNode);
+    }
+
+    addBackBtn(cb) {
+        this.clearBackBtn();
+
+        const btn = new MegaButton({
+            parentNode: this.headerTitleNode,
+            icon: 'sprite-fm-mono icon-arrow-left-regular-outline rtl-rot-180',
+            componentClassname: 'transparent-icon text-icon secondary me-4',
+            type: 'icon'
+        }).on('click.dialogBack', cb.bind(null));
+
+        this.headerTitleNode.prepend(btn.domNode);
+    }
+
+    clearBackBtn() {
+        const btn = this.headerTitleNode.querySelector('button.back-btn');
+
+        if (btn) {
+            this.headerTitleNode.removeChild(btn);
+        }
     }
 
     clearHeader() {
@@ -288,7 +315,7 @@ class MegaOverlay extends MegaComponent {
 
     clearImage() {
         this.imageNode.textContent = '';
-        this.imageNode.className = 'image';
+        this.imageNode.className = 'image mob-px-6';
     }
 
     addImage(imageClass, icon = true) {

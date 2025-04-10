@@ -1,6 +1,8 @@
 .link-mgmt-container {
     display: flex;
     flex-direction: column;
+    margin-left: 24px;
+    margin-right: 24px;
 }
 
 .link-mgmt-container .selected-node {

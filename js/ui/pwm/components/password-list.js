@@ -28,7 +28,7 @@ class MegaPasswordList extends MegaView {
         });
 
         installBanner.actionButton.on('click', () => {
-            window.open(mega.ui.header.pwmExtensionUrl, '_blank', 'noopener,noreferrer');
+            window.open(mega.ui.header.getPwmExtensionUrl(), '_blank', 'noopener,noreferrer');
         });
 
         let showBanner = true;

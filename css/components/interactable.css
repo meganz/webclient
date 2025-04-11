@@ -374,7 +374,9 @@ button.nav-elem.no-active:active,
     --icon-size: 16px; /* Default size */
     --mask-color: var(--mobile-icon-secondary);
 }
-
+.rtl .nav-elem .right-icon.icon-chevron-right-thin-outline {
+    transform: rotateY(180deg);
+}
 .nav-elem .left-icon {
     order: -1; /* First in list */
 }

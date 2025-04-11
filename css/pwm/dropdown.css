@@ -130,14 +130,27 @@ ul.sort-password-list li i {
     display: none;
     box-shadow: var(--mobile-shadow-medium);
 }
+.rtl .dropdown-options-wrap {
+    right: 0;
+    left: auto;
+}
 .dropdown-options-wrap.top {
     top: 0;
     transform: translateY(-100%);
     right: 0;
 }
+.rtl .dropdown-options-wrap.top {
+    transform: translateY(100%);
+    left: 0;
+    right: auto;
+}
 .dropdown-options-wrap.right {
     left: auto;
     right: 0;
+}
+.rtl .dropdown-options-wrap.right {
+    left: 0;
+    right: auto;
 }
 .dropdown-button.active .dropdown-options-wrap {
     display: block;

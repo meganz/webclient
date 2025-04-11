@@ -96,7 +96,7 @@ body.pwm-ui .pm-main .mega-header {
 }
 
 /* RTL support */
-body.rtl.pwm-ui .pm-main,
-body.rtl.pwm-ui .overlay-wrap {
+body.rtl.pwm-ui .pm-main > :not(.password-wrapper),
+body.rtl.pwm-ui .pm-main > .password-wrapper > * {
    direction: rtl;
 }

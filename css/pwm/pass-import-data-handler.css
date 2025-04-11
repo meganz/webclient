@@ -22,6 +22,16 @@
     height: 24px;
 }
 
+.mega-sheet.on-boarding .mega-list-container.handler-data-list .mega-list .mega-list-item {
+    justify-content: flex-start;
+}
+
+.mega-sheet.on-boarding .mega-list-container.handler-data-list .mega-list .mega-list-item-left-icon {
+    margin-right: 16px;
+    min-width: 24px;
+    text-align: center;
+}
+
 .mega-sheet.on-boarding .mega-list-container.handler-data-list .mega-list .mega-list-item-text {
     min-width: 150px;
 }
@@ -29,4 +39,16 @@
 .mega-sheet.on-boarding .mega-list-container.handler-data-list .mega-list .mega-list-item-text .mega-item-list-title {
     font: var(--mobile-font-caption-large-semibold);
     margin-bottom: 0;
+}
+
+.mega-sheet.on-boarding .mega-list-container.handler-data-list .mega-list .mega-list-item-right {
+    flex: 1;
+}
+
+.mega-sheet.on-boarding .mega-list-container.handler-data-list .mega-list .mega-list-item-right .mega-checkbox {
+    flex-direction: row-reverse;
+}
+
+.mega-sheet.on-boarding .mega-list-container.handler-data-list .mega-list .mega-list-item-right .mega-checkbox .checkbox-action {
+    width: auto;
 }

@@ -933,3 +933,8 @@
 .mega-sheet.export-links-settings-dialog .account.password-status {
     top: 32px;
 }
+
+/* Hide the password reveal button in Microsoft Edge */
+.mega-input input[type="password"]::-ms-reveal {
+    display: none;
+}

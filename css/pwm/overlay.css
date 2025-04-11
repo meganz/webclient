@@ -121,6 +121,13 @@
     height: initial;
 }
 
+.overlay-wrap.pm-overlay .close {
+    position: relative;
+    top: auto;
+    right: auto;
+    margin-left: auto;
+}
+
 .overlay-wrap.pm-overlay .main {
     height: initial;
     overflow: initial;

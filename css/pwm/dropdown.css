@@ -140,7 +140,6 @@ ul.sort-password-list li i {
     right: 0;
 }
 .rtl .dropdown-options-wrap.top {
-    transform: translateY(100%);
     left: 0;
     right: auto;
 }

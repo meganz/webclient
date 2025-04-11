@@ -10,13 +10,13 @@ class MegaTabGroup extends MegaComponentGroup {
     }
 
     addTab(options, id) {
-        id = options.tabid || id || Object.keys(this.children).length;
+        id = options.tabid || id || this.children.length;
         this.addChild(id, new MegaInteractable({
             componentClassname:
                 `mega-tab-option ${options.selected ? 'selected' : ''} ${options.decorated ? 'decorated' : ''}`,
             ...options,
             onClick: () => {
-                if (this.children[id].hasClass('selected')) {
+                if (this.getChild(id).hasClass('selected')) {
                     return false;
                 }
                 this.selectTab(id);
@@ -31,18 +31,19 @@ class MegaTabGroup extends MegaComponentGroup {
     }
 
     selectTab(selId) {
-        if (!this.children[selId]) {
+        if (this.childMap[selId] === undefined) {
             return;
         }
-        for (const [id, tab] of Object.entries(this.children)) {
+        for (const [id, tabId] of Object.entries(this.childMap)) {
+            const tab = this.children[tabId];
             tab[`${id === selId ? 'add' : 'remove'}Class`]('selected');
         }
         this.selected = selId;
     }
 
     decorateTab(id, enable) {
-        if (this.children[id]) {
-            this.children[id][`${enable ? 'add' : 'remove'}Class`]('decorated');
+        if (this.childMap[id] !== undefined) {
+            this.getChild(id)[`${enable ? 'add' : 'remove'}Class`]('decorated');
         }
     }
 }

@@ -46,3 +46,7 @@
 .mega-component.context-menu .context-menu-items .nav-elem {
     padding: 16px 8px;
 }
+
+.rtl .mega-component.context-menu {
+    direction: rtl;
+}

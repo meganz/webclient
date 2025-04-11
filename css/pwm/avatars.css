@@ -23,7 +23,7 @@
 }
 .avatar-menu-profile {
     margin-inline-end: 16px;
-    margin-left: 0;
+    margin-inline-start: 0;
     border-radius: 100%;
     text-align: center;
     align-self: baseline;

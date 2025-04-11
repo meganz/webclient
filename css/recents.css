@@ -13,10 +13,9 @@
     color: var(--text-color-high);
     font: var(--text-body1-bold);
     border-bottom: 1px solid var(--stroke-grey-2);
-    padding: 14px 0;
-}
-.fm-recents.header {
-    padding-inline: 28px 0;
+    padding-top: 14px;
+    padding-bottom: 14px;
+    padding-inline-start: 28px;
 }
 .fm-recents.content {
     padding-bottom: 100px;

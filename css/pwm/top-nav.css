@@ -23,7 +23,8 @@
 .pm.mega-input.search-bar {
     width: auto;
     flex-grow: 1;
-    margin: 0 16px 0 0;
+    margin: 0;
+    margin-inline-end: 16px;
 }
 
 .search-bar .form-element {

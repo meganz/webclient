@@ -17368,9 +17368,9 @@ class ConversationRightArea extends mixins.w9 {
           }
         };
         if (isRecurring) {
-          return chatRoom.hasUserMessages() ? msgDialog(`confirmation:!^${l.cancel_meeting_button}!${l.schedule_cancel_abort}`, null, l.schedule_cancel_dialog_title.replace('%s', title), l.schedule_cancel_dialog_move_recurring, doConfirm, 1) : msgDialog(`confirmation:!^${l.schedule_cancel_dialog_confirm}!${l.schedule_cancel_abort}`, null, l.schedule_cancel_dialog_title.replace('%s', title), l.schedule_cancel_dialog_archive_recurring, doConfirm, 1);
+          return chatRoom.hasUserMessages() ? msgDialog(`confirmation:!^${l.cancel_meeting_button}!${l.schedule_cancel_abort}`, null, l.schedule_cancel_dialog_title.replace('%s', megaChat.html(title)), l.schedule_cancel_dialog_move_recurring, doConfirm, 1) : msgDialog(`confirmation:!^${l.schedule_cancel_dialog_confirm}!${l.schedule_cancel_abort}`, null, l.schedule_cancel_dialog_title.replace('%s', megaChat.html(title)), l.schedule_cancel_dialog_archive_recurring, doConfirm, 1);
         }
-        return chatRoom.hasUserMessages() ? msgDialog(`confirmation:!^${l.cancel_meeting_button}!${l.schedule_cancel_abort}`, null, l.schedule_cancel_dialog_title.replace('%s', title), l.schedule_cancel_dialog_move_single, doConfirm, 1) : msgDialog(`confirmation:!^${l.schedule_cancel_dialog_confirm}!${l.schedule_cancel_abort}`, null, l.schedule_cancel_dialog_title.replace('%s', title), l.schedule_cancel_dialog_archive_single, doConfirm, 1);
+        return chatRoom.hasUserMessages() ? msgDialog(`confirmation:!^${l.cancel_meeting_button}!${l.schedule_cancel_abort}`, null, l.schedule_cancel_dialog_title.replace('%s', megaChat.html(title)), l.schedule_cancel_dialog_move_single, doConfirm, 1) : msgDialog(`confirmation:!^${l.schedule_cancel_dialog_confirm}!${l.schedule_cancel_abort}`, null, l.schedule_cancel_dialog_title.replace('%s', megaChat.html(title)), l.schedule_cancel_dialog_archive_single, doConfirm, 1);
       }
     };
   }

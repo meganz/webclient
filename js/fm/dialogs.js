@@ -1394,7 +1394,7 @@
         const target = await selectFolderDialog().catch(dump);
         if (target) {
             M.addSelectedNodes(target);
-            return M.openSharingDialog(target);
+            return mega.ui.mShareDialog.init(target);
         }
     };
 

@@ -247,7 +247,7 @@ MegaData.prototype.syncUsersFullname = async function(userId, chatHandle) {
 
     if ($.dialog === 'share') {
         // Re-render the content of access list in share dialog to update contacts' latest names
-        renderShareDialogAccessList();
+        mega.ui.mShareDialog.renderAccessList();
     }
 
     return user.name;
@@ -713,10 +713,13 @@ MegaData.prototype.ignorePendingContactRequest = function(id) {
 
 // Searches M.opc for the pending contact
 MegaData.prototype.findOutgoingPendingContactIdByEmail = function(email) {
+
+    const emailLowercase = String(email).toLowerCase();
+
     for (var index in this.opc) {
         var opc = this.opc[index];
 
-        if (opc.m === email) {
+        if (String(opc.m).toLowerCase() === emailLowercase) {
             return opc.p;
         }
     }

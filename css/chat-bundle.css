@@ -1626,17 +1626,6 @@ body.theme-dark .lhp-container .lhp-filter-tag {
 .meetings-call.with-active-element .stream-head {
   top: 0;
 }
-.meetings-call.with-timeout-banner {
-  /* [...] */
-}
-.meetings-call.with-timeout-banner .sidebar-wrapper .sidebar {
-  height: calc(100% - 200px);
-  margin-top: 16px;
-}
-.meetings-call.with-timeout-banner .stream-wrapper {
-  height: calc(100% - 200px);
-  padding-top: 102px;
-}
 .meetings-call-onboarding {
   /* [...] */
 }
@@ -1870,6 +1859,10 @@ body.theme-dark .lhp-container .lhp-filter-tag {
   bottom: 6px;
   left: 6px;
 }
+body.rtl .meetings-call .stream .stream-participants-block .participants-container .participants-grid .video-node-status {
+  left: unset;
+  right: 5px;
+}
 .meetings-call .stream .stream-participants-block .participants-container .participants-grid .video-node-status span {
   margin: 0 2px 0 0;
 }
@@ -2102,6 +2095,10 @@ body.theme-dark .lhp-container .lhp-filter-tag {
   --icon-size: 20px;
   justify-content: center;
 }
+.meetings-call.with-timeout-banner .stream-wrapper {
+  height: calc(100% - 200px);
+  padding-top: 102px;
+}
 .meetings-call div.recording-control {
   position: absolute;
   left: 32px;
@@ -2210,7 +2207,7 @@ body.theme-dark .lhp-container .lhp-filter-tag {
   background: #222;
   z-index: 12;
 }
-.meetings-call .overlayed .stream-controls {
+.overlayed .meetings-call .stream-controls {
   bottom: 0;
 }
 .meetings-call .stream-controls ul {
@@ -2607,9 +2604,15 @@ body.theme-dark .lhp-container .lhp-filter-tag {
   padding-top: 8px;
   padding-inline-start: 10px;
 }
+body.rtl .meetings-call .sidebar-wrapper .sidebar .participants ul li .name {
+  float: right;
+}
 .meetings-call .sidebar-wrapper .sidebar .participants ul li .name span {
   display: block;
   float: left;
+}
+body.rtl .meetings-call .sidebar-wrapper .sidebar .participants ul li .name span {
+  float: right;
 }
 .meetings-call .sidebar-wrapper .sidebar .participants ul li .name span:first-child {
   overflow: hidden;
@@ -2641,6 +2644,9 @@ body.theme-dark .lhp-container .lhp-filter-tag {
   display: flex;
   align-items: center;
   margin: 5px 0 0 auto;
+}
+body.rtl .meetings-call .sidebar-wrapper .sidebar .participants ul li .status {
+  float: left;
 }
 .meetings-call .sidebar-wrapper .sidebar .participants ul li .status .recording-status {
   display: block;
@@ -2722,6 +2728,10 @@ body.theme-dark .lhp-container .lhp-filter-tag {
   right: 8px;
   width: max-content;
   z-index: 11;
+}
+body.rtl .meetings-call .sidebar-wrapper .sidebar .participants ul li .participants-menu-content {
+  left: 0;
+  right: unset;
 }
 .meetings-call .sidebar-wrapper .sidebar .participants ul li .participants-menu-content ul {
   margin: 0;
@@ -2841,6 +2851,9 @@ body.theme-dark .lhp-container .lhp-filter-tag {
   top: 0;
   left: 0;
 }
+body.rtl .meetings-call .sidebar-wrapper .sidebar.chat-opened .sidebar-head {
+  width: calc(100% - 32px);
+}
 .meetings-call .sidebar-wrapper .sidebar.chat-opened .in-call {
   display: flex;
   align-items: start;
@@ -2929,6 +2942,9 @@ body.theme-dark .lhp-container .lhp-filter-tag {
   max-width: 100%;
   height: 100%;
 }
+.rtl .meetings-call .sidebar-wrapper .sidebar {
+  direction: rtl;
+}
 .meetings-call .sidebar-wrapper .sidebar ul {
   list-style: none;
   margin: 0;
@@ -2960,6 +2976,18 @@ body.theme-dark .lhp-container .lhp-filter-tag {
 .meetings-call .sidebar-wrapper .sidebar-head button {
   margin: 0 5px 0 0;
 }
+.meetings-call .sidebar-wrapper .sidebar-head button.add {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+}
+.meetings-call .sidebar-wrapper .sidebar-head button.add i {
+  --mask-color: var(--secondary-white) ;
+}
+body.rtl .meetings-call .sidebar-wrapper .sidebar-head button.add {
+  left: 20px;
+  right: unset;
+}
 .meetings-call .sidebar-wrapper .sidebar-head button i {
   margin: 0 auto;
   --icon-size: 24px;
@@ -2969,6 +2997,10 @@ body.theme-dark .lhp-container .lhp-filter-tag {
   position: fixed;
   bottom: -9999px;
   visibility: hidden;
+}
+.meetings-call.with-timeout-banner .sidebar-wrapper .sidebar {
+  height: calc(100% - 200px);
+  margin-top: 16px;
 }
 .meetings-call button.call-action {
   background: transparent;
@@ -4280,6 +4312,10 @@ body.theme-dark #schedule-dialog .recurring-edit-banner a {
   left: auto;
   right: 0;
   height: 220px;
+}
+body.rtl #schedule-dialog .meetings-select .mega-input .mega-input-dropdown {
+  left: 0;
+  right: auto;
 }
 #schedule-dialog .meetings-invite {
   width: 100%;

@@ -1255,6 +1255,10 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[23709] = escapeHTML(l[23709]).replace('[B]', '').replace('[/B]', '');
     l['23789.s'] = escapeHTML(l[23789]).replace('%1', '<span></span>');
     l['23790.s'] = escapeHTML(l[23790]).replace('%1', '<span></span>');
+    l.share_unverified_dialog_desc = escapeHTML(l.share_unverified_dialog_desc)
+        .replace('[A]', '<a href="https://help.mega.io/security/data-protection/contact-verification-reminders" ' +
+            'target="_blank" rel="noopener noreferrer">')
+        .replace('[/A]', '</a>');
 
     // Mobile only
     if (is_mobile) {

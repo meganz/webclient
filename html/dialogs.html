@@ -2527,7 +2527,7 @@
         <header>
             <div class="graphic sprite-fm-illustration img-dialog-email">
             </div>
-            <h2 id="contact-info-title"></h2>
+            <h2 id="contact-info-title" class="contact-info-title"></h2>
         </header>
 
         <section>
@@ -2558,7 +2558,7 @@
         </button>
 
         <header>
-            <h2 id="share-dialog-title">[$1344]</h2>
+            <h2 id="share-dialog-title">[$5631]</h2>
         </header>
 
         <section class="content">
@@ -2584,6 +2584,70 @@
             </div>
 
             <div class="content-block share-dialog-bottom">
+                <div class="share-dialog-invite-container">
+                    <div class="share-dialog-invite-background">
+                        <div class="contact-search-block empty">
+                            <div class="selected-contacts-container">
+                                <div class="contact-selected-item-input">
+                                    <input type="text" name="contact-search-input" autocomplete="off" placeholder="[$share_add_contact_placeholder]" class="megaInputs contact-search-input">
+                                </div>
+                            </div>
+                            <div class="contact-dropdown-container">
+                                <div class="contact-dropdown-container-wrapper"></div>
+                            </div>
+
+                            <template class="contact-selected-template">
+                                <div class="contact-selected-item" data-contact-handle="">
+                                    <div class="avatar-container"></div>
+                                    <div class="selected-contact-name"></div>
+                                    <button class="remove-contact-button" aria-label="Remove contact">
+                                        <i class="sprite-fm-mono icon-dialog-close"></i>
+                                    </button>
+                                </div>
+                            </template>
+                            <template class="contact-item-template">
+                                <div class="contact-item" data-contact-handle="">
+                                    <div class="avatar-container"></div>
+                                    <div class="contact-name"></div>
+                                    <div class="contact-email"></div>
+                                </div>
+                            </template>
+                        </div>
+                        <div class="permissions-dropdown-button">
+                            <div class="button-option read-only">[$55]</div>
+                            <div class="button-option read-and-write">[$56]</div>
+                            <div class="button-option full-access">[$57]</div>
+                            <div class="down-arrow sprite-fm-mono icon-dropdown"></div>
+
+                            <div class="permissions-dropdown-container hidden">
+                                <div class="dropdown-option" data-attr-permission="read-only">
+                                    <div class="title">[$55]</div>
+                                    <div class="description">[$share_permission_readonly_description]</div>
+                                    <div class="selected-check sprite-fm-mono-after icon-check-after"></div>
+                                </div>
+                                <div class="dropdown-option" data-attr-permission="read-and-write">
+                                    <div class="title">[$56]</div>
+                                    <div class="description">[$share_permission_readwrite_description]</div>
+                                    <div class="selected-check sprite-fm-mono-after icon-check-after"></div>
+                                </div>
+                                <div class="dropdown-option" data-attr-permission="full-access">
+                                    <div class="title">[$57]</div>
+                                    <div class="description">[$share_permission_fullaccess_description]</div>
+                                    <div class="selected-check sprite-fm-mono-after icon-check-after"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="mega-button positive invite-contact-button disabled">
+                        <span>[$60]</span>
+                    </button>
+
+                    <div class="error-message"></div>
+
+                    <textarea id="share-dialog-invite-note" placeholder="[$share_add_note_placeholder]" rows="1" class="megaInputs invite-note hidden" maxlength="800"></textarea>
+                </div>
+
                 <div class="share-dialog-bottom-body">
                     <div class="mega-input-dropdown share-dialog-permissions-menu hidden">
                         <div class="option full-access">
@@ -2606,12 +2670,6 @@
                     <div class="mega-banner body warning-template contact-verify-notification"><span></span></div>
                     <div class="mega-banner body warning-template contact-verify-warning">[$undec_outshare_warning_banner]</div>
                     <div class="share-dialog-access-list"></div>
-                    <button class="mega-button action share-dialog-access-add">
-                        <div>
-                            <i class="sprite-fm-uni icon-add"></i>
-                        </div>
-                        <span>[$23707]</span>
-                    </button>
                     <div class="mega-banner body warning-template"></div>
                 </div>
             </div>
@@ -2619,15 +2677,30 @@
 
         <footer>
             <div class="footer-container alt-background">
-                <button class="mega-button remove-share disabled">
+                <button class="mega-button remove-share disabled hidden">
                     <span>[$23737]</span>
                 </button>
-                <button class="mega-button positive done-share disabled">
+                <button class="mega-button positive done-share hidden">
                     <span>[$726]</span>
                 </button>
             </div>
             <div class="share-dialog-bottom-msg"><span class="v-hidden">[$23708]</span></div>
         </footer>
+    </div>
+
+    <!-- Share access list dialog -->
+    <div class="mega-dialog dialog-template-main share-access-contacts-dialog hidden"
+         role="dialog"
+         aria-modal="true">
+        <button class="close js-button-close" aria-label="[$148]">
+            <i class="sprite-fm-mono icon-dialog-close"></i>
+        </button>
+        <header>
+            <h2><i class="sprite-fm-mono icon-arrow-left-thin"></i>[$23706]</h2>
+        </header>
+        <section>
+            <div class="share-dialog-access-list"></div>
+        </section>
     </div>
 
     <!-- Dialog: partial dialog used by the share-add-dialog in React-->
@@ -2657,6 +2730,42 @@
             </div>
         </div>
     </template>
+
+    <div class="mega-dialog dialog-template-main share-with-unverified-contacts hidden"
+         role="dialog"
+         aria-modal="true">
+
+        <button class="close js-button-close" aria-label="[$148]">
+            <i class="sprite-fm-mono icon-dialog-close"></i>
+        </button>
+
+        <header>
+            <h2>[$share_unverified_dialog_title]</h2>
+        </header>
+
+        <section>
+            <div class="content-block">
+                <p class="sub-title-txt">[$share_unverified_dialog_desc]</p>
+                <div class="contact-items"></div>
+            </div>
+            <template class="contact-item-template">
+                <div class="contact-item" data-contact-handle="">
+                    <div class="avatar-container"></div>
+                    <div class="contact-name"></div>
+                    <div class="verify-credentials-button">[$verify_credentials_button]</div>
+                    <div class="share-without-verifying-button">[$share_without_verifying_button]</div>
+                </div>
+            </template>
+        </section>
+
+        <footer>
+            <div class="footer-container">
+                <button class="mega-button share-all-without-verifying-button">
+                    <span>[$share_to_all_without_verifying_button]</span>
+                </button>
+            </div>
+        </footer>
+    </div>
 
     <!-- Dialog: fingerprint-dialog -->
     <div class="mega-dialog dialog-template-main fingerprint-dialog hidden"

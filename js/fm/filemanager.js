@@ -323,9 +323,9 @@ FileManager.prototype.initFileManagerUI = function() {
     $('button.l-pane-visibility').removeClass('active');
 
     $('.fm-dialog-overlay').rebind('click.fm', function(ev) {
+
+        // Disable click handler for these dialogs
         if ($.dialog === 'pro-login-dialog'
-            || $.dialog === 'share'
-            || $.dialog === 'share-add'
             || $.dialog === 'cookies-dialog'
             || $.dialog === 'discount-offer'
             || $.dialog === 'voucher-info-dlg'
@@ -340,6 +340,7 @@ FileManager.prototype.initFileManagerUI = function() {
             || String($.dialog).startsWith('verify-email')
             || String($.dialog).startsWith('s4-managed')
             || localStorage.awaitingConfirmationAccount) {
+
             return false;
         }
         showLoseChangesWarning().done(function() {
@@ -711,7 +712,6 @@ FileManager.prototype.initFileManagerUI = function() {
     M.createFolderUI();
     M.initTreePanelSorting();
     M.initContextUI();
-    initShareDialog();
     M.addTransferPanelUI();
     M.initUIKeyEvents();
     M.onFileManagerReady(topmenuUI);
@@ -1734,7 +1734,7 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(c + '.sh4r1ng-item').rebind('click', function() {
-        M.openSharingDialog($.selected[0]);
+        mega.ui.mShareDialog.init($.selected[0]);
         eventlog(500029);
         M.fmEventLog(500681);
     });
@@ -1757,7 +1757,7 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(c + '.cd-sh4r1ng-item').rebind('click', (e) => {
-        M.openSharingDialog($.selected[0]);
+        mega.ui.mShareDialog.init($.selected[0]);
 
         if ($(e.currentTarget).hasClass('manage-share')) {
             // event log for manage folder
@@ -2617,7 +2617,7 @@ FileManager.prototype.createFolderUI = function() {
 
         if (M.getNodeRights(n.h) > 1) {
             $.selected = [n.h];
-            M.openSharingDialog($.selected[0]);
+            mega.ui.mShareDialog.init(n.h);
             eventlog(500735);
             return false;
         }
@@ -2628,7 +2628,7 @@ FileManager.prototype.createFolderUI = function() {
         if (node && M.getNodeRights(node.h) > 1) {
             $.hideContextMenu();
             $.selected = [node.h];
-            M.openSharingDialog(node.h);
+            mega.ui.mShareDialog.init(node.h);
             eventlog(500034);
             return false;
         }
@@ -3061,13 +3061,6 @@ FileManager.prototype.initUIKeyEvents = function() {
                     M.addDownload($.selected);
                 }
             }
-        }
-        else if ((e.keyCode === 13) && ($.dialog === 'share')) {
-            addNewContact($('.add-user-popup-button'), false).done(function() {
-                var share = new mega.Share();
-                share.updateNodeShares();
-                $('.token-input-token-mega').remove();
-            });
         }
         else if ((e.keyCode === 13) && ($.dialog === 'rename')) {
             $('.rename-dialog-button.rename').trigger('click');
@@ -4849,7 +4842,7 @@ FileManager.prototype.initStatusBarLinks = function() {
             }
         }
         else if (this.classList.contains('share')) {
-            M.openSharingDialog($.selected[0]);
+            mega.ui.mShareDialog.init($.selected[0]);
         }
         else if (this.classList.contains('link')) {
             M.getLinkAction();
@@ -5023,7 +5016,11 @@ FileManager.prototype.cameraUploadUI = function() {
         register: ['terms'],
         selectFolder: ['createfolder'],
         saveAs: ['createfolder'],
-        share: ['share-add', 'fingerprint-dialog'],
+        share: [
+            'share-with-unverified-contacts', 'fingerprint-dialog', 'contact-info', 'share-access-contacts-dialog'
+        ],
+        'share-with-unverified-contacts': ['fingerprint-dialog'],
+        'share-access-contacts-dialog': ['fingerprint-dialog'],
         'stripe-pay': ['stripe-pay-success', 'stripe-pay-failure']
     };
 

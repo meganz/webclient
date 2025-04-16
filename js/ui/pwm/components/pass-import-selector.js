@@ -33,6 +33,7 @@ class MegaImportPassSelector {
         const cardGroup = new CardGroup({
             cards: this.getManagerCardData(cardList),
             onClick: (e) => {
+                this.clearFileSelection();
                 mega.ui.pm.settings.utils.getFile();
                 mega.ui.pm.settings.importSelected = e.currentTarget.value;
             }
@@ -89,6 +90,7 @@ class MegaImportPassSelector {
             this.fileField.inputValue = this.file.name;
             this.fileField.removeClass('hidden');
             this.errorMessage.classList.add('hidden');
+            this.errorType.classList.add('hidden');
             mega.ui.pm.utils.toggleButtonState(this.container, 'primary', false);
         }
     }
@@ -97,6 +99,7 @@ class MegaImportPassSelector {
         this.fileField.addClass('hidden');
         this.fileInput.value = '';
         this.errorMessage.classList.add('hidden');
+        this.errorType.classList.add('hidden');
         mega.ui.pm.utils.toggleButtonState(this.container, 'primary', true);
     }
 
@@ -109,9 +112,8 @@ class MegaImportPassSelector {
             })
             .catch((ex) => {
                 if (ex === 'Invalid file type.') {
-                    this.errorType.classList.remove('hidden');
-                    this.errorMessage.classList.add('hidden');
                     this.clearFileSelection();
+                    this.errorType.classList.remove('hidden');
                 }
                 else {
                     this.errorMessage.classList.remove('hidden');

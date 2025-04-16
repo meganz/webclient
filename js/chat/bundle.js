@@ -2460,8 +2460,8 @@ const ComposedTextArea = ({
           }
         });
         chatRoom.sendMessage(messageContents);
-        messagesListScrollable.disable();
-        messagesListScrollable.scrollToBottom(true);
+        messagesListScrollable == null || messagesListScrollable.disable();
+        messagesListScrollable == null || messagesListScrollable.scrollToBottom(true);
       } else {
         chatRoom.sendMessage(messageContents);
       }
@@ -17976,7 +17976,6 @@ const ConversationPanel = (conversationpanel_dec = utils.Ay.SoonFcWrap(360), _de
       isFullscreenModeEnabled: false,
       mouseOverDuringCall: false,
       attachCloudDialog: false,
-      messagesToggledInCall: false,
       sendContactDialog: false,
       confirmDeleteDialog: false,
       pasteImageConfirmDialog: false,
@@ -18221,9 +18220,6 @@ const ConversationPanel = (conversationpanel_dec = utils.Ay.SoonFcWrap(360), _de
     this.$container = $('.conversation-panel', '#fmholder');
     this.$messages = $('.messages.scroll-area > .perfectScrollbarContainer', this.$container);
     window.addEventListener('keydown', this.handleKeyDown);
-    chatRoom.rebind('call-ended.jspHistory call-declined.jspHistory', () => {
-      this.callJustEnded = true;
-    });
     chatRoom.rebind('onSendMessage.scrollToBottom', () => {
       chatRoom.scrolledToBottom = true;
       if (this.messagesListScrollable) {
@@ -18361,15 +18357,6 @@ const ConversationPanel = (conversationpanel_dec = utils.Ay.SoonFcWrap(360), _de
     const self = this;
     const room = this.props.chatRoom;
     room.megaChat.updateSectionUnreadCount();
-    if (prevState.messagesToggledInCall !== self.state.messagesToggledInCall || self.callJustEnded) {
-      if (self.callJustEnded) {
-        self.callJustEnded = false;
-      }
-      self.$messages.trigger('forceResize', [true, 1]);
-      Soon(() => {
-        self.messagesListScrollable.scrollToBottom(true);
-      });
-    }
     if (prevProps.isActive === false && self.props.isActive === true) {
       const $typeArea = $('.messages-textarea:visible:first', this.$container);
       if ($typeArea.length === 1) {
@@ -19233,6 +19220,7 @@ class ConversationPanels extends mixins.w9 {
 class EmptyConvPanel extends REaCt().Component {
   constructor(...args) {
     super(...args);
+    this.domRef = REaCt().createRef();
     this.state = {
       linkData: ''
     };
@@ -19263,7 +19251,8 @@ class EmptyConvPanel extends REaCt().Component {
   }
   componentDidMount() {
     (M.account && M.account.contactLink ? Promise.resolve(M.account.contactLink) : api.send('clc')).then(res => {
-      if (this.isMounted() && typeof res === 'string') {
+      let _this$domRef;
+      if ((_this$domRef = this.domRef) != null && _this$domRef.current && typeof res === 'string') {
         const prefix = res.startsWith('C!') ? '' : 'C!';
         this.setState({
           linkData: `${getBaseUrl()}/${prefix}${res}`
@@ -19282,6 +19271,7 @@ class EmptyConvPanel extends REaCt().Component {
       linkData
     } = this.state;
     return REaCt().createElement("div", {
+      ref: this.domRef,
       className: "conversations-empty"
     }, REaCt().createElement("div", {
       className: "conversations-empty-header"
@@ -20079,6 +20069,9 @@ const PerfectScrollbar = (_dec = (0,_chat_mixins0__.hG)(30, true), _dec2 = (0,_c
   reinitialise(skipReinitialised, bottom) {
     let _this$domRef2;
     const $elem = (_this$domRef2 = this.domRef) == null ? void 0 : _this$domRef2.current;
+    if (!$elem) {
+      return;
+    }
     this.isUserScroll = false;
     if (bottom) {
       $elem.scrollTop = this.getScrollHeight();
@@ -27662,14 +27655,13 @@ const HistoryPanel = (_dec = (0,mixins.hG)(450, true), _class = class HistoryPan
                     messages-toast
                     ${this.state.toast ? 'active' : ''}
                 `,
-        onClick: () => {
-          this.setState({
-            toast: false
-          }, () => {
-            this.messagesListScrollable.scrollToBottom();
-            chatRoom.scrolledToBottom = true;
-          });
-        }
+        onClick: () => this.isMounted() && this.setState({
+          toast: false
+        }, () => {
+          let _this$messagesListScr2;
+          (_this$messagesListScr2 = this.messagesListScrollable) == null || _this$messagesListScr2.scrollToBottom();
+          chatRoom.scrolledToBottom = true;
+        })
       }, REaCt().createElement("i", {
         className: "sprite-fm-mono icon-down"
       }), unreadCount > 0 && REaCt().createElement("span", null, unreadCount > 9 ? '9+' : unreadCount));
@@ -27865,8 +27857,10 @@ const HistoryPanel = (_dec = (0,mixins.hG)(450, true), _class = class HistoryPan
     const currentContents = v.textContents;
     v.edited = false;
     if (messageContents === false || messageContents === currentContents) {
-      self.messagesListScrollable.scrollToBottom(true);
+      let _self$messagesListScr;
+      (_self$messagesListScr = self.messagesListScrollable) == null || _self$messagesListScr.scrollToBottom(true);
     } else if (messageContents) {
+      let _self$messagesListScr2;
       room.trigger('onMessageUpdating', v);
       room.megaChat.plugins.chatdIntegration.updateMessage(room, v.internalId ? v.internalId : v.orderValue, messageContents);
       if (v.getState && (v.getState() === Message.STATE.NOT_SENT || v.getState() === Message.STATE.SENT) && !v.requiresManualRetry) {
@@ -27885,7 +27879,7 @@ const HistoryPanel = (_dec = (0,mixins.hG)(450, true), _class = class HistoryPan
         v.trigger('onChange', [v, "textContents", "", messageContents]);
         megaChat.plugins.richpreviewsFilter.processMessage({}, v, false, true);
       }
-      self.messagesListScrollable.scrollToBottom(true);
+      (_self$messagesListScr2 = self.messagesListScrollable) == null || _self$messagesListScr2.scrollToBottom(true);
     } else if (messageContents.length === 0) {
       this.props.onDeleteClicked(v);
     }
@@ -28157,7 +28151,6 @@ const HistoryPanel = (_dec = (0,mixins.hG)(450, true), _class = class HistoryPan
       },
       onUserScroll: this.onMessagesScrollUserScroll,
       className: "js-messages-scroll-area perfectScrollbarContainer",
-      messagesToggledInCall: this.state.messagesToggledInCall,
       ref: ref => {
         this.messagesListScrollable = ref;
         $(document).rebind(`keydown.keyboardScroll_${  this.props.chatRoom.roomId}`, this.onKeyboardScroll);

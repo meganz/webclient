@@ -1417,7 +1417,6 @@ export class ConversationPanel extends MegaRenderMixin {
         isFullscreenModeEnabled: false,
         mouseOverDuringCall: false,
         attachCloudDialog: false,
-        messagesToggledInCall: false,
         sendContactDialog: false,
         confirmDeleteDialog: false,
         pasteImageConfirmDialog: false,
@@ -1681,10 +1680,6 @@ export class ConversationPanel extends MegaRenderMixin {
 
         window.addEventListener('keydown', this.handleKeyDown);
 
-        chatRoom.rebind('call-ended.jspHistory call-declined.jspHistory', () => {
-            this.callJustEnded = true;
-        });
-
         chatRoom.rebind('onSendMessage.scrollToBottom', () => {
             chatRoom.scrolledToBottom = true;
             if (this.messagesListScrollable) {
@@ -1838,20 +1833,6 @@ export class ConversationPanel extends MegaRenderMixin {
         var room = this.props.chatRoom;
 
         room.megaChat.updateSectionUnreadCount();
-
-
-        if (prevState.messagesToggledInCall !== self.state.messagesToggledInCall || self.callJustEnded) {
-            if (self.callJustEnded) {
-                self.callJustEnded = false;
-            }
-            self.$messages.trigger('forceResize', [
-                true,
-                1
-            ]);
-            Soon(function() {
-                self.messagesListScrollable.scrollToBottom(true);
-            });
-        }
 
         if (prevProps.isActive === false && self.props.isActive === true) {
             const $typeArea = $('.messages-textarea:visible:first', this.$container);
@@ -3020,6 +3001,8 @@ export class ConversationPanels extends MegaRenderMixin {
 }
 
 export class EmptyConvPanel extends React.Component {
+    domRef = React.createRef();
+
     state = {
         linkData: '',
     };
@@ -3027,7 +3010,7 @@ export class EmptyConvPanel extends React.Component {
     componentDidMount() {
         (M.account && M.account.contactLink ? Promise.resolve(M.account.contactLink) : api.send('clc'))
             .then(res => {
-                if (this.isMounted() && typeof res === 'string') {
+                if (this.domRef?.current && typeof res === 'string') {
                     const prefix = res.startsWith('C!') ? '' : 'C!';
                     this.setState({ linkData: `${getBaseUrl()}/${prefix}${res}` });
                 }
@@ -3061,8 +3044,11 @@ export class EmptyConvPanel extends React.Component {
     render() {
         const { isMeeting, onNewChat, onStartMeeting, onScheduleMeeting } = this.props;
         const { linkData } = this.state;
+
         return (
-            <div className="conversations-empty">
+            <div
+                ref={this.domRef}
+                className="conversations-empty">
                 <div className="conversations-empty-header">
                     <h1>{
                         isMeeting ?

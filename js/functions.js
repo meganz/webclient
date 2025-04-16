@@ -1983,28 +1983,25 @@ if (typeof sjcl !== 'undefined') {
     Share.prototype.addContactToFolderShare = function addContactToFolderShare() {
         let promise;
 
-        // Share button enabled
-        if ($.dialog === 'share' && !$('.done-share', '.share-dialog').is('.disabled')) {
-            const targets = [];
-            const [selectedNode] = $.selected;
+        const targets = [];
+        const [selectedNode] = $.selected;
 
-            // Is there a new contacts planned for addition to share
-            if (Object.keys($.addContactsToShare).length > 0) {
+        // Is there a new contacts planned for addition to share
+        if (Object.keys($.addContactsToShare).length > 0) {
 
-                // Add new planned contact to list
-                for (var i in $.addContactsToShare) {
-                    const {u: userEmail, r: permissionLevel} = $.addContactsToShare[i];
+            // Add new planned contact to list
+            for (var i in $.addContactsToShare) {
+                const {u: userEmail, r: permissionLevel} = $.addContactsToShare[i];
 
-                    if (userEmail && permissionLevel !== undefined) {
-                        targets.push({u: userEmail, r: permissionLevel});
-                    }
+                if (userEmail && permissionLevel !== undefined) {
+                    targets.push({u: userEmail, r: permissionLevel});
                 }
             }
+        }
 
-            // Add new contacts to folder share
-            if (targets.length > 0) {
-                promise = doShare(selectedNode, targets, true);
-            }
+        // Add new contacts to folder share
+        if (targets.length > 0) {
+            promise = doShare(selectedNode, targets, true);
         }
 
         return promise || Promise.resolve();
@@ -2023,13 +2020,12 @@ if (typeof sjcl !== 'undefined') {
                 promises.push(this.addContactToFolderShare());
 
                 $('.export-links-warning').addClass('hidden');
-                console.assert($.dialog === 'share');
-                closeDialog();
 
                 return Promise.all(promises);
             })
-            .finally(() => loadingDialog.hide());
-
+            .finally(() => {
+                loadingDialog.hide();
+            });
     };
 
 

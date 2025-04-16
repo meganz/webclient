@@ -2625,6 +2625,10 @@ else if (!browserUpdate) {
     jsl.push({f:'html/js/megasync.js', n: 'megasync_js', j: 1});
     jsl.push({f:'js/fm/linkinfohelper.js', n: 'fm_linkinfohelper_js', j: 1});
     jsl.push({f:'js/eaffiliate.js', n: 'eaffiliate_js', j: 1});
+    jsl.push({f:'js/ui/share-dialog.js', n: 'fm_share_js', j: 1});
+    jsl.push({f:'js/ui/share-unverified-contacts-dialog.js', n: 'fm_share_unverified_contacts_js', j: 1});
+    jsl.push({f:'js/ui/share-collaborators-dialog.js', n: 'fm_share_collaborators_js', j: 1});
+
 
     if (localStorage.makeCache) {
         jsl.push({f:'makecache.js', n: 'makecache', j:1});

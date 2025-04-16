@@ -59,7 +59,7 @@ var useravatar = (function() {
      * @private
      */
     function _getAvatarProperties(user) {
-        user = String(user.u || user);
+        user = String(user.u || user.h || user);
         var name  = M.getNameByHandle(user) || user;
         if (name === user && M.suba[user] && M.suba[user].firstname) {
             // Acquire the avatar matches the first letter for pending accounts in business account

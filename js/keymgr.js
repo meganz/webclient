@@ -1439,7 +1439,7 @@ lazy(mega, 'keyMgr', () => {
 
         // write out a new share-key was successfully used in s/s2.cr
         async setUsedNewShareKey(node) {
-            this.removeShareSnapshot(node);
+            // this.removeShareSnapshot(node);
 
             if (!this.trustedsharekeys[node]
                 || this.trustedsharekeys[node] & 2) {

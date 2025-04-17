@@ -38,15 +38,15 @@ mobile.propay = {
         'use strict';
 
         // Enabled payment providers for mobile so far are vouchers, the credit card options and direct resellers
-        var mobileEnabledGateways = [
+        const mobileEnabledGateways = new Set([
             'voucher', 'astropayVI', 'astropayMC', 'ecpVI', 'ecpMC', 'sabadellVI', 'sabadellMC',
             'directreseller', 'Stripe2', 'stripeVI', 'stripeMC', 'stripeDD', 'stripeUP', 'stripeJC', 'stripeAE',
             'stripeAP', 'stripeGP'
-        ];
+        ]);
 
         // Filter out anything else
         var filteredGateways = gatewayOptions.filter(function(val) {
-            if (mobileEnabledGateways.indexOf(val.gatewayName) > -1) {
+            if (mobileEnabledGateways.has(val.gatewayName)) {
                 return true;
             }
 

@@ -1947,6 +1947,9 @@ MegaData.prototype.nodeUpdated = function(n, ignoreDB) {
             }
 
             mega.gallery.handleNodeUpdate(n);
+            if (mega.devices.ui) {
+                mega.devices.ui.onUpdateNode(n.h);
+            }
 
             // TODO: Improve the list rendering to only update each node if the action packet does not affect
             // list ordering.
@@ -3863,10 +3866,12 @@ MegaData.prototype.getUserByHandle = function(handle) {
  * @return {Object} The user object, of false if not found
  */
 MegaData.prototype.getUserByEmail = function(email) {
-    var user = false;
+
+    let user = false;
+    const emailLowercase = String(email).toLowerCase();
 
     M.u.every((contact, u) => {
-        if (M.u[u].m === email) {
+        if (String(M.u[u].m).toLowerCase() === emailLowercase) {
             // Found the user object
             user = M.u[u];
 

@@ -1017,9 +1017,6 @@ scparser.$add('s', {
 
         if (fminitialized) {
             sharedUInode(a.n);
-            if (mega.devices.ui) {
-                mega.devices.ui.onSharedUpdated(a.n);
-            }
         }
         scsharesuiupd = true;
         scContactsSharesUIUpdate = a.o ? a.o : false;
@@ -1840,7 +1837,7 @@ scparser.$add('ub', function() {
 // Pro Flexi account change which requires reload (such as payment against expired account)
 scparser.$add('upf', () => {
     "use strict";
-    if (!folderlink) {
+    if (!folderlink && !addressDialog.paymentInProcess) {
         fm_fullreload(null, 'upf-proflexi').catch(dump);
     }
 });
@@ -1962,8 +1959,13 @@ scparser.$finalize = async() => {
             }
 
             if ($.dialog === 'share') {
-                // Re-render the content of access list in share dialog
-                renderShareDialogAccessList();
+                // Re-render the content of the Access list in the Share dialog
+                mega.ui.mShareDialog.renderAccessList();
+            }
+
+            if ($.dialog === 'share-access-contacts-dialog') {
+                // Re-render the contents of the Share Collaborators dialog and its Access list
+                mega.ui.mShareCollaboratorsDialog.render();
             }
         });
 
@@ -2114,9 +2116,6 @@ function fm_updated(n) {
         newnodes.push(n);
         if (M.megaRender) {
             M.megaRender.revokeDOMNode(n.h, true);
-        }
-        if (mega.devices.ui) {
-            mega.devices.ui.updateNode(n);
         }
         if (
             mega.ui.secondaryNav &&

@@ -173,7 +173,7 @@ class MegaHeader extends MegaMobileHeader {
                 href: '/fm/user-management',
                 icon: 'sprite-fm-mono icon-building',
                 iconSize: 24,
-                activeCondition: () => M.currentdirid.startsWith('user-management'),
+                activeCondition: () => M.currentdirid && M.currentdirid.startsWith('user-management'),
                 eventLog: 500630
             }
         };

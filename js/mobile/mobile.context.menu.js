@@ -363,7 +363,7 @@ mBroadcaster.once('boot_done', () => {
         //     classNames: '',
         //     callback: function() {
         //         // TODO: Update the functionality once the designs are ready
-        //         // M.openSharingDialog();
+        //         // mega.ui.mShareDialog.init();
         //     }
         // },
         '.removeshare-item': {

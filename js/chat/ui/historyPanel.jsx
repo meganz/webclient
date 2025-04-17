@@ -340,7 +340,7 @@ export default class HistoryPanel extends MegaRenderMixin {
         v.edited = false;
 
         if (messageContents === false || messageContents === currentContents) {
-            self.messagesListScrollable.scrollToBottom(true);
+            self.messagesListScrollable?.scrollToBottom(true);
         }
         else if (messageContents) {
             room.trigger('onMessageUpdating', v);
@@ -384,7 +384,7 @@ export default class HistoryPanel extends MegaRenderMixin {
                 megaChat.plugins.richpreviewsFilter.processMessage({}, v, false, true);
             }
 
-            self.messagesListScrollable.scrollToBottom(true);
+            self.messagesListScrollable?.scrollToBottom(true);
         }
         else if (messageContents.length === 0) {
             this.props.onDeleteClicked(v);
@@ -419,12 +419,13 @@ export default class HistoryPanel extends MegaRenderMixin {
                     messages-toast
                     ${this.state.toast ? 'active' : ''}
                 `}
-                onClick={() => {
+                onClick={() =>
+                    this.isMounted() &&
                     this.setState({ toast: false }, () => {
-                        this.messagesListScrollable.scrollToBottom();
+                        this.messagesListScrollable?.scrollToBottom();
                         chatRoom.scrolledToBottom = true;
-                    });
-                }}>
+                    })
+                }>
                 <i className="sprite-fm-mono icon-down" />
                 {unreadCount > 0 && <span>{unreadCount > 9 ? '9+' : unreadCount}</span>}
             </div>
@@ -769,7 +770,6 @@ export default class HistoryPanel extends MegaRenderMixin {
                     }}
                     onUserScroll={this.onMessagesScrollUserScroll}
                     className="js-messages-scroll-area perfectScrollbarContainer"
-                    messagesToggledInCall={this.state.messagesToggledInCall}
                     ref={(ref) => {
                         this.messagesListScrollable = ref;
                         $(document).rebind(

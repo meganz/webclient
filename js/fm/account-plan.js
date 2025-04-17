@@ -214,7 +214,7 @@ accountUI.plan = {
                 $planDetails.removeClass('paid').attr('subid', '');
                 $('.account.plan-info.accounttype span', $planContent).text(l[1150]);
                 $('.account .plan-icon', $planContent).addClass('free');
-                $('.account.plan-info.expiry', $planContent).removeClass('red').text(l[436]);
+                $('.account.plan-info.expiry span', $planContent).removeClass('red').text(l[436]);
                 $('.sub-container.subscription:not(.feature)', $planContent).addClass('hidden');
                 if (account.mxfer) {
                     $('.account.plan-info.bandwidth', $planContent).parent().removeClass('hidden');

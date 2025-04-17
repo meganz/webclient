@@ -445,7 +445,7 @@ const dialogTest = {
     /* Dialog: share-dialog --> */
     ['share-dialog']: () => {
         $.selected = [dialogTest.validFileHandle];
-        M.openSharingDialog();
+        mega.ui.mShareDialog.init();
     },
 
 

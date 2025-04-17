@@ -36,6 +36,9 @@ function removeUInode(h, parent) {
     }
 
     mega.gallery.handleNodeRemoval(n);
+    if (mega.devices.ui) {
+        mega.devices.ui.onUpdateNode(n.h);
+    }
 
     if (M.isDynPage(M.currentdirid) > 1) {
         M.dynContentLoader[M.currentdirid].sync(n);

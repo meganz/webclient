@@ -830,8 +830,10 @@ class MegaFlyoutMenu extends MegaComponent {
                     onClick() {
                         mega.ui.flyout.flyoutMenu.hide();
                         eventlog(500661);
-                        loadSubPage(`fm/chat/p/${contactHandle}`);
-                        megaChat.trigger(convAppConstants.EVENTS.NAV_RENDER_VIEW, convAppConstants.VIEWS.CHATS);
+                        chatReady.then(() => {
+                            loadSubPage(`fm/chat/p/${contactHandle}`);
+                            megaChat.trigger(convAppConstants.EVENTS.NAV_RENDER_VIEW, convAppConstants.VIEWS.CHATS);
+                        });
                     }
                 },
                 {

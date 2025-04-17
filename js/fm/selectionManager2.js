@@ -1097,7 +1097,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             const selNode = M.getNodeByHandle($.selected[0]);
             const sourceRoot = M.getSelectedSourceRoot(isSearch);
             const shareButton = selectionLinkWrapper.querySelector(`.js-statusbarbtn.share`);
-            const isRootSelected = $.selected.length === 1 && selNode.h === M.RootID;
+            const isRootSelected = $.selected.includes(M.RootID);
 
             let showGetLink;
             let restrictedFolders = false;
@@ -1190,7 +1190,9 @@ class SelectionManager2_DOM extends SelectionManager2Base {
                 if (selNode.t && $.selected.length === 1) {
                     __showBtn('share');
                 }
-                __showBtn('link');
+                if (!isRootSelected) {
+                    __showBtn('link');
+                }
             }
             else if (!isRootSelected && !folderlink && M.currentrootid !== 'shares' && M.currentdirid !== 'shares'
                 || M.currentrootid === 'shares' && M.currentdirid !== 'shares' && M.d[M.currentdirid].r === 2) {

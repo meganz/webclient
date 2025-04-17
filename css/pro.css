@@ -7,6 +7,10 @@
     vertical-align: top;
     width: 20px;
 }
+.provider-icon.mr-4 {
+    margin-right: 0;
+    margin-inline-end: 1rem;
+}
 .provider-icon.svgicon {
     background-image: none;
     position: relative;
@@ -478,7 +482,7 @@ i.pricing-sprite,
     display: flex;
     background: var(--surface-main);
     max-width: 444px;
-    margin: 24px 0 0 0;
+    margin: 24px 0 0;
 }
 .payment-page .free-trial-card {
     font: var(--text-body1)
@@ -503,12 +507,6 @@ i.pricing-sprite,
 .payment-page:not(.euro) .free-trial-card .secondary-title.price {
     margin-bottom: -8px;
 }
-/* .payment-page .free-trial-card .icons {
-    width: 40px;
-    justify-content: space-between;
-    align-items: center;
-    margin: 0 0 12.5%;
-} */
 .payment-page .free-trial-card i {
     --icon-size: 24px;
     color: rgb(255, 51, 51)
@@ -2638,7 +2636,7 @@ body.mobile .redeem-promo-page .mega-input.title-ontop {
         padding-right: 50px;
     }
     .payment-page .free-trial-container {
-        margin: 24px auto 46px;
+        margin: 24px auto 0;
     }
     .payment-page.info-block {
         margin-inline-end: 0;

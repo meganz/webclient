@@ -6,8 +6,6 @@
 }
 .mega-dialog.share-dialog .share-dialog-bottom {
     background: var(--surface-grey-1);
-    padding-inline-end: 0;
-    padding: 0 48px;
 }
 
 .mega-dialog.share-dialog > header {

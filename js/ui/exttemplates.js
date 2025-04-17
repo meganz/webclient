@@ -13,7 +13,7 @@ lazy(mega, 'templates', () => {
      * Get a template from the DOM, clone it and change the id
      * @param {string} id - The id of the template to clone
      * @param {string} newID - The new id to assign to the cloned template
-     * @param {JQuery<HTMLElement>} [$templateLocation] - The location of the template, if not in main templates container
+     * @param {JQuery<HTMLElement>} [$templateLocation] - The location of the template, if not in main templates
      * @returns {JQuery<HTMLElement>} - The cloned template
      */
     const getTemplate = (id, newID, $templateLocation) => {

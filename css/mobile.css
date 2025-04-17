@@ -2660,6 +2660,16 @@ div.checkboxOn {
     border: none;
     border-radius: 3px;
 }
+#propay div.checkboxOff,
+#propay div.checkboxOn {
+    width: 18px;
+    height: 18px;
+    box-sizing: border-box;
+    cursor: pointer;
+    margin-inline-end: 11px;
+    border-radius: 3px;
+    border: 1px solid rgba(4, 16, 30, 1);
+}
 .checkboxOff span,
 .checkboxOn span {
 	display: block;
@@ -3224,11 +3234,9 @@ div.checkboxOn {
     box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
     border-radius: inherit;
 }
-.mobile.payment-address-dialog .mega-input.title-ontop.valued .mega-input-title {
-    color: var(--text-color-black-medium);
-}
 .mobile.payment-address-dialog .mega-input input,
-.mobile.payment-address-dialog .mega-input.title-ontop .mega-input-title {
+.mobile.payment-address-dialog .mega-input.title-ontop .mega-input-title,
+.mobile.payment-address-dialog .mega-input.title-ontop.valued .mega-input-title {
     color: var(--text-color-black-medium);
 }
 .mobile.payment-address-dialog .white-container-box::before {

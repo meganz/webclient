@@ -48,7 +48,8 @@ pro.propay = {
 
     trial: 1,
 
-    usingBalance: false,
+    usingBalance: false,    // User has not entered into voucher flow, only sees balance
+    balanceStringForDropdown: false,    // Dropdown filled out with the string balance instead of voucher
 
     paymentType: null,
 
@@ -56,10 +57,10 @@ pro.propay = {
     googlePayBrowsers: new Set(['Chrome', 'Edgium', 'Opera', 'Safari']),
     applePayBrowsers: new Set(['Safari']),
 
-    warnings: {
-        'voucher': l.voucher_only_one_off,
-        'balance': l.balance_only_one_off,
-        'minAMount': l.min_amount_restriction,
+
+    isVoucherBalance() {
+        'use strict';
+        return this.currentGateway && this.currentGateway.gatewayId === 0;
     },
 
 
@@ -69,8 +70,14 @@ pro.propay = {
         16: true,
     },
 
+    /**
+     * Checks if the current gateway and selections support a trial
+     * @returns {boolean|object} - Returns false if a trial should not be shown, or the trial object if it should
+     */
     shouldShowTrial() {
-        return (this.gateSupportsTrial || !this.currentGateway) && (this.planObj && this.planObj.trial);
+        return (this.gateSupportsTrial || !this.currentGateway)
+            && this.onPropayPage()
+            && (this.planObj && this.planObj.trial);
     },
 
     onPropayPage() {
@@ -79,6 +86,7 @@ pro.propay = {
     },
 
     initSwitchers() {
+        'use strict';
 
         const recurringElements = {
             'recurring': {
@@ -112,6 +120,8 @@ pro.propay = {
     },
 
     showErrors(reasons) {
+        'use strict';
+
         reasons = reasons || this.blockFlow();
         $('.error', this.$page).removeClass('error');
 
@@ -126,18 +136,18 @@ pro.propay = {
         }
 
         if (reasons.gatewayNeeded) {
-            this.errors = true
+            this.errors = true;
             $('.dropdown-wrapper-primary', this.$page).addClass('error');
             $('.dropdown-wrapper-primary .mega-input', this.$page).addClass('error');
         }
 
         if (reasons.addressNeeded || reasons.addressInvalid) {
-            this.errors = true
+            this.errors = true;
             $('.billing-address .billing-info', this.$page).addClass('error');
         }
 
         if (reasons.s4TosNeeded) {
-            this.errors = true
+            this.errors = true;
             $('.s4-tos', this.$page).addClass('error');
         }
 
@@ -147,10 +157,9 @@ pro.propay = {
     },
 
     blockFlow() {
+        'use strict';
 
         const reasons = Object.create(null);
-
-        const gatewayId = this.currentGateway && this.currentGateway.gatewayId;
 
         if (!this.currentGateway) {
             reasons.gatewayNeeded = 1;
@@ -158,7 +167,7 @@ pro.propay = {
 
         if (this.requiresBilling()) {
             if (!addressDialog.validInputs) {
-                addressDialog.validateAndPay(false, true)
+                addressDialog.validateAndPay(false, true);
             }
             if (addressDialog.validInputs === null) {
                 reasons.addressNeeded = 1;
@@ -176,8 +185,10 @@ pro.propay = {
     },
 
     getTempGate() {
+        'use strict';
+
         const key = this.planObj.id + '_' + this.currentGatewayName;
-        let gateways = localStorage.cachedGateways
+        const gateways = localStorage.cachedGateways
             ? JSON.parse(localStorage.cachedGateways)
             : {};
 
@@ -188,13 +199,15 @@ pro.propay = {
     },
 
     setTempGate(data) {
+        'use strict';
+
         if (this.getTempGate()) {
             return this.getTempGate();
         }
 
 
         const key = this.planObj.id + '_' + this.currentGatewayName;
-        let gateways = localStorage.cachedGateways
+        const gateways = localStorage.cachedGateways
             ? JSON.parse(localStorage.cachedGateways)
             : {};
 
@@ -204,6 +217,8 @@ pro.propay = {
     },
 
     getPageType() {
+        'use strict';
+
         if (this.gateSupportsTrial && this.planObj.trial) {
             return 'trial';
         }
@@ -211,8 +226,9 @@ pro.propay = {
     },
 
     async getSavedCard() {
+        'use strict';
+
         this.savedCard = await api.req({a: 'cci', v: 2}).then(res => {
-            // res.result.reuse = 1
             return typeof res.result === 'object'
                 ? !!res.result.reuse && res.result
                 : false;
@@ -239,10 +255,16 @@ pro.propay = {
 
         selectedPeriod = parseInt(selectedPeriod) || this.DEFAULT_DURATION;
 
+        const eventId = selectedPeriod === 1 ? 500367 : 500368;
+        eventlog(eventId, pro.getProPlanName(this.planNum));
+
+
         return selectedPeriod;
     },
 
     requiresBilling() {
+        'use strict';
+
         if (!this.currentGateway) {
             return false;
         }
@@ -250,10 +272,11 @@ pro.propay = {
             return false;
         }
 
-        return this.currentGateway.requireBilling !== false
+        return this.currentGateway.requireBilling !== false;
     },
 
     updatePageInfo() {
+        'use strict';
 
         const recurringAllowed = !this.currentGateway || this.currentGateway.supportsRecurring;
 
@@ -277,10 +300,13 @@ pro.propay = {
         $('.billing-address', this.$page).toggleClass('hidden', !this.requiresBilling());
 
         if (state === 'trial') {
-            $('span.trial-duration', $trialInfo).text(mega.icu.format(l.days_chat_history_plural, this.planObj.trial.days));
-            $('span.plan-price', $trialInfo).text(this.planObj.getFormattedPrice('narrowSymbol')
-                + (this.planObj.currency === 'EUR' ? '' : '*')
-                + ' ' + this.planObj.currency);
+            $('span.trial-duration', $trialInfo)
+                .text(mega.icu.format(l.days_chat_history_plural, this.planObj.trial.days));
+            $('span.plan-price', $trialInfo)
+                .text(this.planObj.getFormattedPrice('narrowSymbol')
+                    + (((this.planObj.currency === 'EUR') || this.isVoucherBalance()) ? '' : '*')
+                    + ' '
+                    + this.planObj.currency);
             $('span.plan-name', $trialInfo).text(this.planObj.name);
         }
         else {
@@ -289,14 +315,14 @@ pro.propay = {
         }
 
         if (state === 'recurring') {
-            let selector = 'span.recurring'
-            const planLevel = this.planObj.level
+            let selector = 'span.recurring';
+            const planLevel = this.planObj.level;
             $('span', $recurringInfo).addClass('hidden');
             if (pro.getPlanObj(planLevel, 1)) {
-                selector += '-monthly'
+                selector += '-monthly';
             }
             if (pro.getPlanObj(planLevel, 12)) {
-                selector += '-yearly'
+                selector += '-yearly';
             }
             $(selector, $recurringInfo).removeClass('hidden');
         }
@@ -310,8 +336,11 @@ pro.propay = {
             this.trial = this.shouldShowTrial();
         }
 
+        this.updateS4Continue();
+
         $('.free-trial-unsupported', this.$page)
             .toggleClass('hidden', (!!this.shouldShowTrial() === !!this.planObj.trial));
+        this.renderLocaleInfo(this.isVoucherBalance());
     },
 
     /**
@@ -397,10 +426,12 @@ pro.propay = {
     },
 
     isUtcCached() {
-        return false
+        'use strict';
+
+        return false;
 
         const key = this.planObj.id + '_' + this.currentGatewayName;
-        let gateways = localStorage.cachedUtc
+        const gateways = localStorage.cachedUtc
             ? JSON.parse(localStorage.cachedUtc)
             : {};
 
@@ -410,13 +441,16 @@ pro.propay = {
         return false;
     },
 
-    getCachedUtcRequest(saleId) {
+    getCachedUtcRequest() {
+        'use strict';
+
         if (this.isUtcCached()) {
             return this.isUtcCached();
         }
     },
 
     setCachedUtcRequest(data) {
+        'use strict';
 
         const key = this.planObj.id + '_' + this.currentGatewayName;
 
@@ -426,7 +460,7 @@ pro.propay = {
             }, 1000 * 60 * 10);
         }
 
-        let gateways = localStorage.cachedUtc
+        const gateways = localStorage.cachedUtc
             ? JSON.parse(localStorage.cachedUtc)
             : {};
 
@@ -436,6 +470,7 @@ pro.propay = {
     },
 
     sendPurchaseToApi(paymentTypeId) {
+        'use strict';
 
         if (paymentTypeId === undefined) {
             console.error('No payment type ID provided for purchase');
@@ -459,12 +494,12 @@ pro.propay = {
 
         // uts = User Transaction Sale
         const utsRequest = {
+            m,
             a: 'uts',
             it: itemNum,
             si: apiId,
             p: price,
             c: currency,
-            m: m,
             bq: fromBandwidthDialog,
             pbq: fromPreWarnBandwidthDialog
         };
@@ -482,8 +517,10 @@ pro.propay = {
         }
 
         // Add the discount information to the User Transaction Sale request
-        if (mega.discountInfo && mega.discountInfo.dc) {
-            utsRequest.dc = mega.discountInfo.dc;
+
+        const discountInfo = pro.propay.getDiscount();
+        if (discountInfo && discountInfo.dc) {
+            utsRequest.dc = discountInfo.dc;
         }
 
         // Add S4 parameters
@@ -553,35 +590,35 @@ pro.propay = {
             else if (this.proPaymentMethod.toLowerCase().indexOf('stripe') === 0) {
                 Object.assign(extra, addressDialog.extraDetails);
                 pro.lastPaymentProviderId = addressDialog.gatewayId_stripe;
-                extra.pmid = this.useSavedCard && this.savedCard.id;
+
+                // Do not set pmid if user is not using a saved card
+                if (this.useSavedCard && this.savedCard.id && !this.paymentButton) {
+                    extra.pmid = this.savedCard.id;
+                }
             }
 
             return true;
         };
 
-        // delete localStorage.tempGatewayOptions
-
-        let temp = this.getTempGate();
-
+        const temp = this.getTempGate();
 
         if (this.getCachedUtcRequest() && temp) {
-            console.error('Cached UTC request found.')
+            console.error('Cached UTC request found.');
             setValues({}, temp.result);
             this.processUtcResults(this.getCachedUtcRequest(), temp.result);
             return;
-        };
+        }
 
         // Setup the 'uts' API request
         (temp
             ? Promise.resolve({result: temp})
-            :
-            api.screq(utsRequest)
+            : api.screq(utsRequest)
         )
             .then(({result: saleId}) => {
 
-                if (this.currentGateway.gatewayId !== paymentTypeId) {
+                if (!this.currentGateway || (this.currentGateway.gatewayId !== paymentTypeId)) {
                     if (d) {
-                        console.warn('Gateway was changed during loading, do not proceed')
+                        console.warn('Gateway was changed during loading, do not proceed');
                     }
                     return;
                 }
@@ -602,12 +639,12 @@ pro.propay = {
                 const saleIdArray = Array.isArray(saleId) ? saleId : [saleId];
 
                 // Complete the transaction
-                let utcReqObj = {
+                const utcReqObj = {
                     a: 'utc',                       // User Transaction Complete
                     s: saleIdArray,                 // Array of Sale IDs
                     m: pro.lastPaymentProviderId,   // Gateway number
                     bq: fromBandwidthDialog,        // Log for bandwidth quota triggered
-                    extra: extra                    // Extra information for the specific gateway
+                    extra                           // Extra information for the specific gateway
                 };
 
                 const discountInfo = pro.propay.getDiscount();
@@ -616,7 +653,7 @@ pro.propay = {
                 }
 
                 return api.screq(utcReqObj).then(({result}) => {
-                    if (this.currentGateway.gatewayId !== paymentTypeId) {
+                    if (!this.currentGateway || (this.currentGateway.gatewayId !== paymentTypeId)) {
                         if (d) {
                             console.warn('Gateway was changed during loading, do not proceed');
                         }
@@ -657,16 +694,18 @@ pro.propay = {
                 // Hide the loading overlay and show an error
                 pro.propay.hideLoadingOverlay();
 
-                eventlog(500717, String(ex))
+                eventlog(500717, String(ex));
 
                 tell(errorMessage);
             });
     },
 
     setPlanFromUrl() {
+        'use strict';
+
         const pageParts = page.split('_');
 
-        if (typeof pageParts[1] === 'undefined') {
+        if (pageParts[1] === undefined) {
             return false;
         }
 
@@ -726,6 +765,8 @@ pro.propay = {
                 return 500443;
             case 100000: // VPN
                 return 500472;
+            case 100001: // Pass
+                return 500792;
             default:    // Other plan
                 return 500473;
         }
@@ -822,7 +863,7 @@ pro.propay = {
                 }
 
                 // If the warning should not be shown, or the user has left the payment page, resolve with 0
-                if (!shouldShowWarning || !pro.propay.userOnPropayPage()) {
+                if (!shouldShowWarning || !pro.propay.onPropayPage()) {
                     resolve(0);
                     return;
                 }
@@ -1080,6 +1121,8 @@ pro.propay = {
     },
 
     async checkUserFeatures() {
+        'use strict';
+
         const userHasVpn = pro.proplan2.getUserFeature('vpn');
         const userHasPwm = pro.proplan2.getUserFeature('pwm');
 
@@ -1129,6 +1172,7 @@ pro.propay = {
     },
 
     async loadPlansAndCheckStorage() {
+        'use strict';
 
         // TODO: replace with trycatch
         try {
@@ -1201,15 +1245,25 @@ pro.propay = {
         }
 
         if (gate.gatewayId === 19) {
-            if ((gate.gatewayName === 'stripeAP')
-                && !is_ios
-                && !this.applePayBrowsers.has(this.browser)) {
-                return false;
-            }
-            else if (gate.gatewayName === 'stripeGP') {
-                if (!this.googlePayBrowsers.has(this.browser)) {
+
+            if (gate.gatewayName === 'stripeAP') {
+                if (this.planObj.trial) {
                     return false;
                 }
+                delete gate.supportsTrial;
+                delete gate.supportsDiscountCodes;
+                delete gate.supportsMultiDiscountCodes;
+            }
+
+            const isApplePayAndBlocked = (gate.gatewayName === 'stripeAP')
+                && !is_ios
+                && !this.applePayBrowsers.has(this.browser);
+
+            const isGooglePayAndBlocked = (gate.gatewayName === 'stripeGP')
+                && !this.googlePayBrowsers.has(this.browser);
+
+            if (isApplePayAndBlocked || isGooglePayAndBlocked) {
+                return false;
             }
         }
 
@@ -1264,8 +1318,9 @@ pro.propay = {
         if (isFlexi) {
             $('.additional-content', this.pageInfo.$planCard)
                 .text(l.pr_flexi_extra_charge_note
-                    .replace('%1', bytesToSize(this.planObj.storage))
-                    .replace('%2', formatCurrency(this.planObj.transferCost, this.planObj.currency) + (isEuro ? '' : '*')));
+                    .replace('%1', bytesToSize(this.planObj.storage, 3, 4))
+                    .replace('%2', formatCurrency(
+                        this.planObj.transferCost, this.planObj.currency) + (isEuro ? '' : '*')));
         }
 
         if (this.shouldShowTrial()) {
@@ -1273,10 +1328,15 @@ pro.propay = {
             const information = {
                 type: this.planObj.featureBits,
                 days: this.planObj.trial.days
-            }
+            };
 
-            $trialSection = this.createFreeTrialSection(this.planObj
-                .getFormattedPrice('narrowSymbol'), this.planObj.currency, information).removeClass('hidden');
+            $trialSection = this
+                .createFreeTrialSection(
+                    this.planObj.getFormattedPrice('narrowSymbol'),
+                    this.isVoucherBalance() ? 'EUR' : this.planObj.currency,
+                    information
+                ).removeClass('hidden');
+
             $('.how-it-works', this.pageInfo.$planCard)
                 .removeClass('hidden')
                 .empty()
@@ -1302,14 +1362,14 @@ pro.propay = {
                 titleStringKey = 'you_have_selected_pass';
                 if (this.shouldShowTrial()) {
                     titleStringKey += '_trial';
-                    planNameCardString = l.pass_free_trial
+                    planNameCardString = l.pass_free_trial;
                 }
             }
             else if (this.planObj.level === pro.ACCOUNT_LEVEL_FEATURE_VPN) {
                 titleStringKey = 'you_have_selected_vpn';
                 if (this.shouldShowTrial()) {
                     titleStringKey += '_trial';
-                    planNameCardString = l.vpn_free_trial
+                    planNameCardString = l.vpn_free_trial;
                 }
             }
 
@@ -1348,7 +1408,13 @@ pro.propay = {
             }
 
             if ((this.planObj.level === pro.ACCOUNT_LEVEL_PRO_FLEXI) && window.s4ac) {
-                $includesContent.safeAppend(`<div class="plan-card-s4"><i class="sprite-fm-mono icon-bucket-triangle-thin-outline"></i>${'MEGA S4 Object Storage'}</div>`);
+                $includesContent
+                    .safeAppend(
+                        `<div class="plan-card-s4">
+                            <i class="sprite-fm-mono icon-bucket-triangle-thin-outline"></i>
+                            ${l.ri_s4_tab}
+                        </div>`
+                    );
             }
 
             $('.includes', $planCard).removeClass('hidden');
@@ -1358,21 +1424,29 @@ pro.propay = {
             $includesContent.addClass('hidden');
         }
 
-        const priceText = `${this.planObj.getFormattedPrice('narrowSymbol')}
-        <span class="currency"> ${this.planObj.currency}</span>
+        const priceText = `${this.planObj.getFormattedPrice('narrowSymbol', this.isVoucherBalance())}
+        <span class="currency"> ${this.isVoucherBalance() ? 'EUR' : this.planObj.currency}</span>
         <span class="local">${isEuro ? '' : '*'}<span>`;
 
-        $('.pricing-element .duration-type', $planCard).text(this.selectedPeriod === 1 ? 'Monthly' : 'Yearly');
+
+        const isRecurring = !this.currentGateway || !!this.currentGateway.supportsRecurring;
+        const durationText = isRecurring
+            ? this.planObj.months === 12 ? l.yearly_unit : l.recurring_monthly
+            : this.getNumOfMonthsWording(this.planObj.months, this.discountInfo);
+
+        $('.pricing-element .duration-type', $planCard)
+            .text(durationText);
+
         $('.pricing-element .price', $planCard).safeHTML(priceText);
 
 
         const discountInfo = this.getDiscount();
         const discountDuration = discountInfo
-            && (discountInfo.m || discountInfo.md || this.planObj.months)
+            && (discountInfo.m || discountInfo.md || this.planObj.months);
 
         if (discountInfo) {
             $('.pricing-element .duration-type', $planCard)
-                .text(this.getNumOfMonthsWording(discountDuration));
+                .text(this.getNumOfMonthsWording(discountDuration, true));
 
             $('.plan-info .transfer', $planCard)
                 .text(bytesToSize(this.planObj.baseTransfer * discountInfo.m, 3, 4) + ' transfer');
@@ -1392,24 +1466,24 @@ pro.propay = {
             $('.pricing-element .price', $planCard).safeHTML(priceText);
 
             if (discountInfo.ltp || discountInfo.etp) {
-                // oldPrice = formatCurrency(discountInfo.ltp || discountInfo.etp, this.planObj.currency, 'narrowSymbol');
-                oldPrice = createPriceHTML(formatCurrency(discountInfo.ltp || discountInfo.etp, this.planObj.currency, 'narrowSymbol'), true);
+                oldPrice = createPriceHTML(
+                    formatCurrency(discountInfo.ltp || discountInfo.etp, this.planObj.currency, 'narrowSymbol'),
+                    true
+                );
             }
             else {
-                // oldPrice = this.planObj.getFormattedPrice('narrowSymbol', false, false, discountDuration);
                 oldPrice = createPriceHTML(this.planObj
-                    .getFormattedPrice('narrowSymbol', false, false, discountDuration), true);
+                    .getFormattedPrice('narrowSymbol', this.isVoucherBalance(), false, discountDuration), true);
             }
 
-            // const oldPrice = discountInfo.ltp || discountInfo.etp || this.planObj.getFormattedPrice('narrowSymbol', false, false, discountDuration);
             const newPrice = createPriceHTML(formatCurrency(isEuro
                 ? discountInfo.edtp
-                : discountInfo.ldtp, this.planObj.currency));
+                : discountInfo.ldtp, this.planObj.currency, 'narrowSymbol'));
 
             const $discountHeader = $('.discount-header', $planCard);
             $discountHeader.text(l.special_deal_perc_off
                 .replace('%1', formatPercentage(discountInfo.pd / 100))
-                + ` (${this.getNumOfMonthsWording(discountDuration)})`
+                + ` (${this.getNumOfMonthsWording(discountDuration, true)})`
             ).removeClass('hidden');
 
             $('.price', $planCard).safeHTML(newPrice);
@@ -1419,7 +1493,7 @@ pro.propay = {
         else if (discountInfo && discountInfo.al && discountInfo.pd && discountInfo.al === pro.propay.planNum) {
 
             const duration = this.planObj.months;
-            const oldPrice = this.planObj.getFormattedPrice('narrowSymbol');
+            const oldPrice = this.planObj.getFormattedPrice('narrowSymbol', this.isVoucherBalance());
             const newPrice = duration === 1
                 ? discountInfo.lmp
                 : discountInfo.lyp;
@@ -1438,10 +1512,6 @@ pro.propay = {
             $('.discount', $planCard).addClass('hidden');
         }
 
-
-
-
-
         if (!planCardInitialized) {
             $('.plan-card', this.pageInfo.$rightBlock).remove(); // In case there is a card present from another session
             this.pageInfo.$rightBlock.safeAppend($planCard.prop('outerHTML'));
@@ -1457,12 +1527,17 @@ pro.propay = {
      * @returns {string} - The formatted string
      */
     getTxtString(plan, months, givenString) {
-        givenString = givenString || l[(months === 12 ? 'per_year' : 'per_month')]
+        'use strict';
+
+        givenString = givenString || l[(months === 12 ? 'per_year' : 'per_month')];
+
+        const isBalance = this.isVoucherBalance();
+
         return givenString
-            .replace('%1', plan.getFormattedPrice('narrowSymbol', false, false, months)
-                + (plan.currency === 'EUR'
+            .replace('%1', plan.getFormattedPrice('narrowSymbol', isBalance, false, months)
+                + (plan.currency === 'EUR' || isBalance
                     ? '' : '*')
-                + ' ' + plan.currency);
+                + (isBalance ? '' : ' ' + plan.currency));
     },
 
     renderDurations() {
@@ -1486,62 +1561,33 @@ pro.propay = {
 
         let blockedByMinAmount = false;
 
-        // TODO: Check viability of a function the same as below to run for the regular durations
-        const renderDiscountDuration = (duration, type) => {
-            const discountMonths = duration;
-            const discountRenewalDuration = discountMonths % 12 === 0 ? 12 : 1;
-            const monthsWording = mega.icu.format(l[922], discountMonths)
+        let warning;
 
-            let discountedTotalPriceString;
-            let discountAmountString;
-
-            const isEuro = this.planObj.currency === 'EUR';
-
-            const monthlyYearlyWord = discountRenewalDuration === 12 ? 'yearly' : 'monthly';
-
-            if (type === 1) {
-                const discountedTotalPrice = isEuro
-                    ? this.discountInfo.edtp
-                    : this.discountInfo.ldtp;
-
-                const discountAmount = isEuro
-                    ? this.discountInfo.eda
-                    : this.discountInfo.lda;
-
-                discountedTotalPriceString = formatCurrency(discountedTotalPrice, this.planObj.currency);
-                discountAmountString = formatCurrency(discountAmount, this.planObj.currency);
-            }
-            else if (type === 0) {
-
-                discountedTotalPriceString = duration === 1
-                    ? this.discountInfo.lmp
-                    : this.discountInfo.lyp;
-            }
-
-
-            const $discountRadio = $containedRadioTemplate.clone()
-                .removeClass('hidden template')
-                .addClass(`duration-option ${monthlyYearlyWord}`)
-                .attr('duration', discountRenewalDuration);
-
-            $('.duration-head .duration-type', $discountRadio).text(monthsWording);
-            $(`.${monthlyYearlyWord}-price`, $discountRadio).text(discountedTotalPriceString)
-                .removeClass('hidden');
-
-
-            // If the radio is monthly, it needs to be put before the yearly radio
-            const appendPrependFunction = discountRenewalDuration === 1 ? 'safePrepend' : 'safeAppend';
-
-            this.pageInfo.$durationOptionsWrapper[appendPrependFunction]($discountRadio.prop('outerHTML'));
-        }
-
-
+        const $promoEndsInfo = $('.promo-ends-info', this.pageInfo.$leftBlock);
         if (this.discountInfo && this.discountInfo.md && this.discountInfo.pd) {
             discountMonths = this.discountInfo.m;
             discountRenewalDuration = discountMonths % 12 === 0 ? 12 : 1;
+
+            const date = new Date();
+            date.setMonth(date.getMonth() + discountMonths);
+
+            const text = (discountRenewalDuration === 12
+                ? l.discounted_price_years
+                : l.discounted_price_months)
+                .replace('%1', date.toLocaleDateString(undefined, {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                }))
+                .replace('%2', pro.getPlanObj(this.discountInfo.al, discountRenewalDuration)
+                    .getFormattedPrice('narrowSymbol', this.isVoucherBalance(), false));
+
+            $('.promo-info-txt', $promoEndsInfo).text(text);
         }
 
-        if (monthlyPlan && yearlyPlan) {
+        $promoEndsInfo.toggleClass('hidden', !discountMonths || !isRecurring);
+
+        if (monthlyPlan && yearlyPlan && !discountRenewalDuration) {
             if (discountRenewalDuration !== 1 && discountMonths !== 0) {
 
                 $monthlyRadio = $containedRadioTemplate.clone()
@@ -1555,7 +1601,6 @@ pro.propay = {
                 $('.monthly-price', $monthlyRadio)
                     .text(pro.propay.getTxtString(monthlyPlan, 1, isRecurring ? false : '%1')).removeClass('hidden');
 
-
                 if (this.currentGateway && this.currentGateway.minimumEURAmountSupported > monthlyPlan.priceEuro) {
                     $monthlyRadio.addClass('disabled');
                     blockedByMinAmount = true;
@@ -1563,7 +1608,7 @@ pro.propay = {
                     this.selectedPeriod = this.planObj.months;
                 }
                 else if (discountRenewalDuration === 12) {
-                    $monthlyRadio.addClass('disabled');
+                    $monthlyRadio.addClass('disabled hidden');
                     this.planObj = yearlyPlan;
                     this.selectedPeriod = this.planObj.months;
                 }
@@ -1578,12 +1623,27 @@ pro.propay = {
                     .addClass('duration-option yearly')
                     .attr('duration', 12);
 
-                $('.duration-head .duration-type', $yearlyRadio).text(isRecurring ?
-                    l.yearly_unit
-                    : this.getNumOfMonthsWording(12));
+                $('.duration-head .duration-type', $yearlyRadio)
+                    .text(isRecurring
+                        ? l.yearly_unit
+                        : this.getNumOfMonthsWording(12));
+
+                let savingsAmount = l.redemption_save_16_percent;
+                let price;
+
+                if (!isRecurring) {
+                    if (this.isVoucherBalance()) {
+                        price = (monthlyPlan.priceEuro * 12) - yearlyPlan.priceEuro;
+                        savingsAmount = l.save_amount.replace('%1', formatCurrency(price, 'EUR'));
+                    }
+                    else {
+                        price = (monthlyPlan.price * 12) - yearlyPlan.price;
+                        savingsAmount = l.save_amount.replace('%1', formatCurrency(price, this.planObj.currency));
+                    }
+                }
 
                 $('.duration-head .duration-savings', $yearlyRadio)
-                    .text(l.pay_10m_get_2m)
+                    .text(savingsAmount)
                     .removeClass('hidden');
 
 
@@ -1596,7 +1656,7 @@ pro.propay = {
                     .toggleClass('hidden', !isRecurring);
 
                 if (discountRenewalDuration === 1) {
-                    $yearlyRadio.addClass('disabled');
+                    $yearlyRadio.addClass('disabled hidden');
                     this.planObj = monthlyPlan;
                     this.selectedPeriod = this.planObj.months;
                 }
@@ -1607,48 +1667,22 @@ pro.propay = {
 
             if (this.currentGateway) {
 
-                let warning
-
                 if (this.currentGateway.gatewayId === 0) {
-                    warning = this.usingBalance ? this.warnings.balance : this.warnings.voucher;
+                    warning = this.usingBalance ? this.warningStrings.balance : this.warningStrings.voucher;
                 }
                 else if (blockedByMinAmount) {
-                    warning = this.warnings.minAmount;
-                }
-
-                const $warning = $('.one-off-payment-info', this.pageInfo.$leftBlock).toggleClass('hidden', !warning);
-                if (warning) {
-                    $('.warning-txt', $warning).text(warning);
-                }
-                else {
-                    $('.warning-txt', $warning);
+                    warning = this.warningStrings.minAmount;
                 }
             }
-
         }
-        else if (!discountMonths) {
+        else if (!discountMonths || discountRenewalDuration) {
             $('.duration', this.pageInfo.$leftBlock).addClass('hidden');
+            return;
         }
 
-        // If there is a discount
-        if (discountRenewalDuration) {
-
-            // 1 = multi discount, 0 = old style discount
-            const discountType = this.discountInfo.md ? 1 : 0;
-
-            // If discount is for 1 month AND 12 months
-            if (discountMonths === 0) {
-                renderDiscountDuration(1, discountType);
-                renderDiscountDuration(12, discountType);
-
-            }
-            // If discount is for 1 month XOR 12 months
-            else {
-                if (discountRenewalDuration === 1) {
-                    $('.duration-savings', this.pageInfo.$durationOptionsWrapper).addClass('hidden');
-                }
-                renderDiscountDuration(discountMonths, discountType);
-            }
+        const $warning = $('.one-off-payment-info', this.pageInfo.$leftBlock).toggleClass('hidden', !warning);
+        if (warning) {
+            $('.warning-txt', $warning).text(warning);
         }
 
         $('.duration-option', this.pageInfo.$durationOptionsWrapper).rebind('click', (e) => {
@@ -1658,6 +1692,11 @@ pro.propay = {
             if ((this.selectedPeriod === duration) || $this.hasClass('disabled')) {
                 return;
             }
+
+            $('.duration-option.monthly, .duration-option.yearly', this.pageInfo.$durationOptionsWrapper)
+                .removeClass('selected');
+
+            $this.addClass('selected');
 
             $('.duration-option.monthly .radio-item', this.pageInfo.$durationOptionsWrapper)
                 .toggleClass('radioOn', duration === 1)
@@ -1671,6 +1710,8 @@ pro.propay = {
             sessionStorage['pro.period'] = this.selectedPeriod;
             this.planObj = pro.getPlanObj(this.planNum, this.selectedPeriod);
 
+            eventlog(duration === 1 ? 500369 : 500370, this.planObj.name);
+
             if (this.currentGateway && this.currentGateway.gatewayId === 0) {
                 this.usingBalance = this.usingBalance && pro.propay.useBalance();
             }
@@ -1678,6 +1719,11 @@ pro.propay = {
             this.renderPlanInfo();
             this.updatePayment();
         });
+
+        $('.duration-option.monthly', this.pageInfo.$durationOptionsWrapper)
+            .toggleClass('selected', this.selectedPeriod === 1);
+        $('.duration-option.yearly', this.pageInfo.$durationOptionsWrapper)
+            .toggleClass('selected', this.selectedPeriod === 12);
 
         $(`.duration-option.${this.selectedPeriod === 1
             ? 'monthly'
@@ -1732,10 +1778,10 @@ pro.propay = {
 
 
         const htmlString = `<span class="card-brand">${this.savedCard.brand}</span>
-            <span class="dots"> *** </span>
+            <span class="dots"> \u2022\u2022\u2022\u2022 </span>
             <span class="last-4">${this.savedCard.last4}</span>`;
 
-        // $savedCard.removeClass('hidden').empty().safeAppend(htmlString);
+        $savedCard.removeClass('hidden').empty().safeAppend(htmlString);
 
         const items = [
             {
@@ -1794,33 +1840,34 @@ pro.propay = {
             this.useSavedCard = selected === 'saved';
 
             this.updatePayment();
-
-            // handleProviderClick(e, optionType);
         });
 
     },
 
     updatePayment() {
+        'use strict';
+
         if (page === 'registerb') {
             return;
         }
 
-        // if (this.currentGateway && this.gatewaysByName) {
         this.currentGateway = this.gatewaysByName[this.currentGatewayName];
         this.gateSupportsTrial = this.currentGateway && this.currentGateway.supportsTrial;
-        // }
 
-
-        this.updatePageInfo();
         this.renderDurations();
+        this.updatePageInfo();
         this.setContinuebuttonText();
 
         addressDialog.closeDialog();
+        astroPayDialog.hideDialog(true);
 
         if (!this.currentGateway) {
             $('.specific-payment-info', this.$page).addClass('hidden');
             return;
         }
+
+
+        $('.payment-loading-spinner', this.$page).removeClass('hidden');
 
         $('iframe#stripe-widget', addressDialog.getStripeDialog()).addClass('hidden');
 
@@ -1833,12 +1880,24 @@ pro.propay = {
         }
 
         const usingBalanceOnVoucher = this.usingBalance && (gatewayId === 0);
+        const isAstropay = this.currentGateway.gatewayId === astroPayDialog.gatewayId;
+
+        let shouldBlockFlow = false;
+        const blockFlowReasons = this.blockFlow();
+
+        // If s4Tos needed but not accepted, still load payment option
+        if (blockFlowReasons) {
+            delete blockFlowReasons.s4TosNeeded;
+            shouldBlockFlow = Object.keys(blockFlowReasons).length;
+        }
 
         const showPaymentSection = !this.paymentButton
-            && !(this.currentGateway.gatewayId === 16)
-            && !usingBalanceOnVoucher;
+            && !(this.currentGateway.gatewayId === 16)      // ecp
+            && !isAstropay
+            && !usingBalanceOnVoucher
+            && !shouldBlockFlow;
 
-        const showPaymentButton = this.paymentButton && !this.blockFlow()
+        const showPaymentButton = this.paymentButton && !this.blockFlow();
 
         $('.specific-payment-info', this.$page).toggleClass('hidden', !showPaymentSection);
 
@@ -1865,7 +1924,7 @@ pro.propay = {
             $('.balance', this.$page).removeClass('hidden');
         }
 
-        if (!showPaymentSection && !showPaymentButton) {
+        if (!showPaymentSection && !showPaymentButton && !isAstropay) {
             return;
         }
 
@@ -1880,8 +1939,12 @@ pro.propay = {
 
             if (this.useSavedCard
                 && this.savedCard
-                && (this.savedCard.gw === this.currentGateway.gatewayId)) {
+                && (this.savedCard.gw === this.currentGateway.gatewayId)
+                && !showPaymentButton) {
+
                 $('.specific-payment-info .payment-stripe-dialog .content', this.$page).addClass('hidden');
+                $('.payment-loading-spinner', this.$page).addClass('hidden');
+
             }
             else {
                 $('.specific-payment-info .payment-stripe-dialog .content', this.$page).removeClass('hidden');
@@ -1890,25 +1953,27 @@ pro.propay = {
                     addressDialog.validateAndPay(pro.propay.initBillingInfo);
                 }
             }
-
         }
-        else if (paymentType === 'other') {
-            if (this.currentGateway.gatewayName === 'bitcoin') {
-                // bitcoinDialog.processUtcResult(utcResult);
-                this.sendPurchaseToApi(this.currentGateway.gatewayId);
-            }
+        else if ((paymentType === 'other')
+            && (this.currentGateway.gatewayName === 'bitcoin')) {
+            this.sendPurchaseToApi(this.currentGateway.gatewayId);
         }
     },
 
     createDropdownItem(option) {
+        'use strict';
 
         const tickIcon = document.createElement('i');
         tickIcon.className = 'sprite-fm-mono icon-check-thin-outline tick';
 
         const optionContainer = document.createElement('div');
         optionContainer.className = option.className;
-        optionContainer.textContent = option.text;
-        // optionContainer.value = option.value || option.text;
+
+        const textContainer = document.createElement('span');
+        textContainer.className = 'text';
+        textContainer.textContent = option.text;
+
+        optionContainer.appendChild(textContainer);
 
         if (option.svg) {
             const svg = document.createElement('i');
@@ -1924,11 +1989,11 @@ pro.propay = {
         if (option.tooltip) {
             const tooltip = document.createElement('i');
             tooltip.className = 'pricing-i-icon simpletip';
-            tooltip.setAttribute('data-simpletip', option.tooltip);
-            tooltip.setAttribute('data-simpletipposition', 'bottom');
-            tooltip.setAttribute('data-simpletipoffset', '3');
+            tooltip.dataset.simpletip = option.tooltip;
+            tooltip.dataset.simpletipposition = 'bottom';
+            tooltip.dataset.simpletipoffset = '3';
+            tooltip.dataset.simpletipwrapper = '.content';
             tooltip.setAttribute('data-simpletip-class', 'pricing-tip transformed propay');
-            tooltip.setAttribute('data-simpletipwrapper', '.content');
             optionContainer.appendChild(tooltip);
         }
 
@@ -1986,6 +2051,11 @@ pro.propay = {
             }
             else {
                 isOpen = !isOpen;
+
+                if (isOpen) {
+                    eventlog(500783);    // Dropdown opened
+                }
+
                 $container.toggleClass('active', isOpen);
                 $optionsWrapper.toggleClass('hidden', !isOpen);
             }
@@ -1997,7 +2067,9 @@ pro.propay = {
         });
         $('.option', $optionsWrapper).rebind('click', (e) => {
             $span.text($(e.currentTarget).text());
-            options.click(e);
+            if (typeof options.click === 'function') {
+                options.click(e);
+            }
         });
 
         $('i.simpletip', $optionsWrapper).rebind('click', (e) => {
@@ -2013,23 +2085,25 @@ pro.propay = {
     },
 
     useBalance(gateway) {
+        'use strict';
         gateway = gateway || this.currentGateway;
         return (gateway && (gateway.gatewayId === 0))
             && (pro.propay.proBalance >= pro.propay.planObj.priceEuro);
     },
 
     updateBalanceDropdownOption() {
-        const $balanceOption = $('#propay-payment-dropdown-pri .balance.option');
-        $balanceOption.replaceWith(this.createDropdownItem({
-            className: 'option balance',
-            text: `${l[7108]}: ${formatCurrency(pro.propay.proBalance)}`,
-            value: 'balance',
-            icon: 'voucher',
-            svg: 'icon-ticket',
-            tooltip: l.balance_limited_one_off,
-        }).outerHTML).rebind('click', (e) => {
-            handleProviderClick(e, 'primary')
-        });
+        'use strict';
+
+        const $dropdown = $('#propay-payment-dropdown-pri');
+        const text = `${l[7108]}: ${formatCurrency(pro.propay.proBalance)}`;
+
+        $('.balance.option span', $dropdown).text(text);
+
+        if (this.balanceStringForDropdown
+            && this.currentGateway
+            && (this.currentGateway.gatewayId === 0)) {
+            $('> span', $dropdown).text(text);
+        }
     },
 
     renderGateways() {
@@ -2049,8 +2123,80 @@ pro.propay = {
         };
 
         if (optionArrays.secondary) {
-            optionArrays.primary.push('More Options...');
+            optionArrays.primary.push(l.more_options_eli);
         }
+
+        const providerEventIds = {
+            'stripe': 500784,
+            'ecp': 500785,
+            'bitcoin': 500786,
+            'stripeGP': 500787,
+            'stripeAP': 500788,
+            'astropayGeneric': 500789,
+            'voucher': 500790,
+            'unknown': 500791,
+        };
+
+        const logProviderClick = (gateway) => {
+            let eventId;
+            const gatewayName = gateway.gatewayName;
+            if (providerEventIds[gatewayName]) {
+                eventId = providerEventIds[gatewayName];
+            }
+            else if (gatewayName.includes('astropay')) {
+                eventId = providerEventIds.astropayGeneric;
+            }
+            else {
+                eventId = providerEventIds.unknown;
+            }
+
+            eventlog(eventId, gatewayName || JSON.stringify(gateway));
+        };
+
+        const handleProviderClick = (e, type) => {
+
+            const $target = $(e.currentTarget);
+
+            if ($target.is('i.tooltip')) {
+                return;
+            }
+
+            const optionIndex = +$target.attr('data-value');
+
+            const options = optionArrays[type];
+
+            $('.payment-method .selected').removeClass('selected');
+
+            if (type === 'primary') {
+
+                $target.addClass('selected');
+
+                // If 'More options' clicked, show more options and do not change the current gateway
+                if (optionArrays.secondary && (optionIndex === options.length - 1)) {
+                    $secondaryOptionsContainer.removeClass('hidden');
+                    if (optionArrays.tertiary) {
+                        $tertiaryOptionsContainer.removeClass('hidden');
+                    }
+                    this.currentGatewayName = null;
+                    this.renderPlanInfo();
+                    this.updatePayment();
+
+                    return;
+                }
+                $('.radio', $secondaryOptionsContainer).removeClass('radioOn').addClass('radioOff');
+
+                $secondaryOptionsContainer.addClass('hidden');
+                $tertiaryOptionsContainer.addClass('hidden');
+            }
+
+
+            this.currentGatewayName = options[optionIndex];
+            logProviderClick(this.gatewaysByName[this.currentGatewayName]);
+
+            this.updatePayment();
+            this.renderPlanInfo();
+
+        };
 
         const renderSecondaryOptions = () => {
             const $secondaryOptionTemplate = mega.templates.getTemplate('radio-with-icon-label-tmplt');
@@ -2080,7 +2226,7 @@ pro.propay = {
 
             if (optionArrays.tertiary) {
 
-                for (let i = 0; i < optionArrays['tertiary'].length; i++) {
+                for (let i = 0; i < optionArrays.tertiary.length; i++) {
                     const $tertiaryOption = $secondaryOptionTemplate.clone()
                         .removeClass('template')
                         .addClass('option tertiary hidden')
@@ -2130,55 +2276,18 @@ pro.propay = {
             });
         };
 
-        const handleProviderClick = (e, type) => {
-
-            const $target = $(e.currentTarget);
-
-            if ($target.is('i.tooltip')) {
-                return;
-            }
-
-            const optionIndex = +$target.attr('data-value');
-
-            const options = optionArrays[type];
-
-            if (type === 'primary') {
-
-                $('.selected', $primaryOptionsContainer).removeClass('selected');
-                $target.addClass('selected');
-
-                // If 'More options' clicked, show more options and do not change the current gateway
-                if (optionArrays.secondary && (optionIndex === options.length - 1)) {
-                    $secondaryOptionsContainer.removeClass('hidden');
-                    if (optionArrays.tertiary) {
-                        $tertiaryOptionsContainer.removeClass('hidden');
-                    }
-
-                    return;
-                }
-
-                $secondaryOptionsContainer.addClass('hidden');
-                $tertiaryOptionsContainer.addClass('hidden');
-            }
-
-            this.currentGatewayName = options[optionIndex];
-
-            this.updatePayment();
-
-        };
-
         pro.propay.handleProviderClick = handleProviderClick;
 
 
         const renderPrimaryDropdown = () => {
 
             this.usingBalance = false;
+            this.balanceStringForDropdown = false;
 
             pro.propay.createDropdown($primaryOptionsContainer, {
 
                 placeholder: l['1523'],
-                click: (e) => {handleProviderClick(e, 'primary')},
-                items: optionArrays['primary'].reduce((acc, item) => {
+                items: optionArrays.primary.reduce((acc, item) => {
                     const gateway = this.gatewaysByName[item];
 
                     let text = item;
@@ -2191,14 +2300,15 @@ pro.propay = {
                             if (pro.propay.useBalance(gateway)) {
                                 extraClasses += ' balance';
                                 this.usingBalance = true;
+                                this.balanceStringForDropdown = true;
                                 text = `${l[7108]}: ${formatCurrency(pro.propay.proBalance)}`;
                                 tooltip = l.balance_limited_one_off;
+                                svg = 'icon-mega-thin-solid';
                             }
                             else {
                                 tooltip = l.voucher_limited_one_off;
+                                svg = 'icon-ticket';
                             }
-
-                            svg = 'icon-ticket';
                         }
                         else if (gateway.gatewayName === 'stripe') {
                             svg = 'icon-credit-card';
@@ -2213,12 +2323,12 @@ pro.propay = {
 
 
                     acc.push({
+                        text,
+                        svg,
+                        tooltip,
                         className: 'option' + extraClasses,
-                        text: text,
                         value: item,
-                        svg: svg,
                         icon: gateway && gateway.gatewayName,
-                        tooltip: tooltip
                     });
                     return acc;
                 }, []),
@@ -2240,56 +2350,102 @@ pro.propay = {
         $continueButton.rebind('click.propay', () => {
 
             const reasons = this.blockFlow();
+            const paymentType = this.getPaymentType(this.currentGateway);
+            const gatewayId = this.currentGateway && this.currentGateway.gatewayId;
+            pro.propay.paymentType = gatewayId;
 
+            const proceedPayment = () => {
+                let showLoading = false;
+                if (paymentType === 'creditcard') {
+                    showLoading = true;
+                }
+
+                // Show different loading animation text depending on the payment methods
+                switch (showLoading && this.proPaymentMethod) {
+                    case 'stripe':
+                        break;
+                    case 'bitcoin':
+                        pro.propay.showLoadingOverlay('loading');
+                        break;
+                    case 'pro_prepaid':
+                    case 'perfunctio':
+                        pro.propay.showLoadingOverlay('processing');
+                        break;
+                    default:
+                        pro.propay.showLoadingOverlay('transferring');
+                }
+
+                if (gatewayId === 0) {
+                    pro.propay.sendPurchaseToApi(gatewayId);
+                }
+                else if (gatewayId === 19) {
+                    if (this.sca) {
+                        addressDialog.processUtcResult(this.sca.utcResult, this.sca.saleId);
+                    }
+                    else if (this.useSavedCard) {
+                        addressDialog.validateAndPay(pro.propay.initBillingInfo, false, true);
+
+                    }
+                    const iframe = document.getElementById('stripe-widget');
+                    if (iframe && iframe.contentWindow) {
+                        iframe.contentWindow.postMessage('submit', '*');
+                    }
+                }
+                else if (gatewayId === 16) {
+                    addressDialog.validateAndPay(pro.propay.initBillingInfo, false, true);
+                }
+                else if (gatewayId === astroPayDialog.gatewayId) {
+                    astroPayDialog.submit();
+                }
+            };
+
+            this.showErrors(reasons);
             if (reasons) {
-                this.showErrors(reasons);
                 return;
             }
 
-            let showLoading = false;
+            this.userSubsGatewayId =
+                M.account.sgwids && M.account.sgwids.length > 0 ? M.account.sgwids[0] : null;
 
-            const paymentType = this.getPaymentType(this.currentGateway);
+            delay('subscribe.plan', eventlog.bind(null, 99788));
 
-            if (paymentType === 'creditcard') {
-                showLoading = true;
+            if (u_type === false) {
+
+                u_storage = init_storage(localStorage);
+                loadingDialog.show();
+
+                u_checklogin({
+                    checkloginresult() {
+                        pro.propay.proceedPayment();
+
+                    }
+                }, true);
             }
+            else {
+                // Store the gateway name for later
+                console.assert(pro.propay.proPaymentMethod, 'check this...invalid gateway');
 
-            // Show different loading animation text depending on the payment methods
-            switch (showLoading && this.proPaymentMethod) {
-                case 'bitcoin':
-                    pro.propay.showLoadingOverlay('loading');
-                    break;
-                case 'pro_prepaid':
-                case 'perfunctio':
-                    pro.propay.showLoadingOverlay('processing');
-                    break;
-                default:
-                    pro.propay.showLoadingOverlay('transferring');
-            }
+                if (String(pro.propay.proPaymentMethod).indexOf('ecp') === 0
+                    || String(pro.propay.proPaymentMethod).toLowerCase().indexOf('stripe') === 0) {
 
-
-            const gatewayId = this.currentGateway.gatewayId;
-            pro.propay.paymentType = gatewayId;
-
-            if (gatewayId === 0) {
-                pro.propay.sendPurchaseToApi(gatewayId);
-            }
-            else if (gatewayId === 19) {
-                if (this.sca) {
-                    addressDialog.processUtcResult(this.sca.utcResult, this.sca.saleId);
+                    if (pro.propay.userSubsGatewayId === 2 || pro.propay.userSubsGatewayId === 3) {
+                        // Detect the user has subscribed to a Pro plan with Google Play or Apple store
+                        // pop up the warning dialog but let the user proceed with an upgrade
+                        msgDialog('warninga', '', l.warning_has_subs_with_3p, '', () => {
+                            proceedPayment();
+                        });
+                    }
+                    else {
+                        proceedPayment();
+                    }
                 }
-                const iframe = document.getElementById('stripe-widget');
-                if (iframe && iframe.contentWindow) {
-                    iframe.contentWindow.postMessage('submit', '*');
+                else {
+                    // For other methods we do a uts and utc call to get the provider details first
+                    proceedPayment();
                 }
-            }
-            else if (gatewayId === 16) {
-                addressDialog.validateAndPay(pro.propay.initBillingInfo, false, true)
-            }
-            else if (gatewayId === astroPayDialog.gatewayId) {
-                astroPayDialog.submit();
             }
         });
+
         this.setContinuebuttonText();
     },
 
@@ -2311,13 +2467,13 @@ pro.propay = {
         if (this.shouldShowTrial()) {
             $continueButton.text(l.start_free_trial);
         }
-        else if ((!gatewayId && (gatewayId !== 0)) || (gatewayId === 16)) {
+        else if (gatewayId === 16) {
             $continueButton.text(l.continue_to_payment);
         }
         else if (gatewayId === 0) {
             $continueButton.text(l['6190']);
         }
-        else if (recurringEnabled) {
+        else if ((!gatewayId && (gatewayId !== 0)) || recurringEnabled) {
             $continueButton.text(l.subscribe_btn);
         }
         else {
@@ -2357,6 +2513,7 @@ pro.propay = {
     async initBillingInfo(info) {
         'use strict';
 
+
         try {
             info = info || await mega.attr.get(u_attr.u, 'billinginfo', false, true).catch(dump);
         }
@@ -2367,13 +2524,36 @@ pro.propay = {
             }
         }
 
-        pro.propay.fillBillingInfo(info);
+
+        const getBillingProp = (propName, encoded) => {
+            if (!info[propName] || !encoded) {
+                return info[propName];
+            }
+            const val = tryCatch(() => from8(info[propName]), () => {
+                console.error(`Invalid utf-8 encoded key value ${propName} -> ${info[propName]}`);
+            })();
+
+            return val || info[propName];
+        };
+
+        let decodedInfo = false;
+
+        if (info) {
+            const isEncoded = !!info.version;
+
+            decodedInfo = Object.keys(info).reduce((acc, value) => {
+                acc[value] = getBillingProp(value, isEncoded);
+                return acc;
+            }, Object.create(null));
+        }
+
+        pro.propay.fillBillingInfo(decodedInfo);
     },
 
-    renderLocaleInfo() {
+    renderLocaleInfo(forceEuro) {
         'use strict';
 
-        const isEuro = this.planObj.currency === 'EUR';
+        const isEuro = forceEuro || (this.planObj.currency === 'EUR');
 
         $('.euro', this.$page).toggleClass('hidden', isEuro);
     },
@@ -2387,6 +2567,8 @@ pro.propay = {
 
         this.showErrors(true);
         $('.continue', this.$page).removeClass('hidden');
+        $('#voucher-code-input input').val('');
+
 
         addressDialog.billingInfoFilled = false;
     },
@@ -2412,7 +2594,7 @@ pro.propay = {
 
     async loadPaymentGatewayOptions() {
         'use strict';
-        const enableAllPaymentGateways = (localStorage.enableAllPaymentGateways) ? 1 : 1;
+        const enableAllPaymentGateways = (localStorage.enableAllPaymentGateways) ? 1 : 0;
 
         const {result: gatewayOptions} = await api.req({a: 'ufpqfull', t: 0, d: enableAllPaymentGateways, v: 3});
 
@@ -2426,7 +2608,7 @@ pro.propay = {
 
         this.trialSupported = false;
 
-        this.browser = String((ua.details || false).browser || '')
+        this.browser = String((ua.details || false).browser || '');
 
         let tempGatewayOptions = gatewayOptions.filter((gate) => {
             const validGate = this.checkGateway(gate);
@@ -2446,7 +2628,12 @@ pro.propay = {
         const discountInfo = pro.propay.getDiscount();
         const testGateway = localStorage.testGateway;
         if (discountInfo) {
+            const discountPriceEuro = discountInfo.edtp;
+
             tempGatewayOptions = tempGatewayOptions.filter(gate => {
+                if (gate.minimumEURAmountSupported > discountPriceEuro) {
+                    return false;
+                }
                 if (gate.supportsMultiDiscountCodes && gate.supportsMultiDiscountCodes === 1) {
                     return true;
                 }
@@ -2481,11 +2668,11 @@ pro.propay = {
             'astropay': 4,
             'voucher': 7,
             'bitcoin': 8,
-        }
+        };
 
         // TODO: Add VALUE for each gateway id
-        const primaryGatewayIds = new Set([0, 4, 11, 16, 19])
-        const primaryStripe = new Set(['stripe', 'stripeAP', 'stripeGP',])
+        const primaryGatewayIds = new Set([0, 4, 11, 16, 19]);
+        const primaryStripe = new Set(['stripe', 'stripeAP', 'stripeGP',]);
 
         for (let i = 0; i < tempGatewayOptions.length; i++) {
             const gateway = tempGatewayOptions[i];
@@ -2517,7 +2704,7 @@ pro.propay = {
 
         const getSortVal = (gateway) => {
             return gateway.gatewayId === 11 ? 'astropay' : gateway.gatewayName;
-        }
+        };
 
         primaryOptions.sort((a, b) => {
             const sortValA = getSortVal(a);
@@ -2565,15 +2752,26 @@ pro.propay = {
             $s4Checkbox.toggleClass('hidden', !this.s4Active);
         });
 
-        $s4Checkbox.rebind('click', () => {
+        $('div.tos', $s4Checkbox).rebind('click', () => {
             this.s4TosAccepted = !this.s4TosAccepted;
 
             $checkboxParts.removeClass('checkboxOn checkboxOff');
             $checkboxParts.addClass(this.s4TosAccepted ? 'checkboxOn' : 'checkboxOff');
 
-            pro.propay.updatePayment();
+            const currentGatewayName = pro.propay.currentGateway && pro.propay.currentGateway.gatewayName;
 
-        })
+            if ((currentGatewayName === 'stripeGP') || (currentGatewayName === 'stripeAP')) {
+                pro.propay.updatePayment();
+            }
+            else {
+                pro.propay.updatePageInfo();
+            }
+        });
+    },
+
+    updateS4Continue() {
+        'use strict';
+        $('.continue', this.$page).toggleClass('disabled', !!(window.s4ac && this.blockFlow()));
     },
 
 
@@ -2631,7 +2829,7 @@ pro.propay = {
         // drive) are *not* allowed to reach the Pro Pay page as we can't track their payment (no email address).
         // Accounts that have registered but have not confirmed their email address yet *are* allowed to reach the Pro
         // Pay page e.g. if they registered on the Pro Plan selection page first (this gets more conversions).
-        if (u_type === 0 && typeof localStorage.awaitingConfirmationAccount === 'undefined') {
+        if ((u_type === 0) && (localStorage.awaitingConfirmationAccount === undefined)) {
             loadSubPage('pro');
             return;
         }
@@ -2649,6 +2847,7 @@ pro.propay = {
             delete mega.discountInfo;
             discountInfo = null;
         }
+        this.discountInfo = discountInfo;
 
 
         loadingDialog.show('propayReady');
@@ -2669,8 +2868,6 @@ pro.propay = {
         }
 
         pro.propay.pageChangeHandler = mBroadcaster.addListener('pagechange', () => {
-            'use strict';
-
             if (!pro.propay.onPropayPage()) {
                 pro.propay.hideLoadingOverlay();
                 mBroadcaster.removeListener(pro.propay.pageChangeHandler);
@@ -2705,7 +2902,7 @@ pro.propay = {
 
             this.trial = this.planObj.trial;
 
-            clickURLs()
+            clickURLs();
 
             Promise.all([this.loadPaymentGatewayOptions(), this.getSavedCard()]).then(() => {
 
@@ -2776,7 +2973,7 @@ pro.propay = {
 
         const $fmHolder = $('.fmholder', 'body.bottom-pages');
 
-        const topPadding = 140;
+        const topPadding = 14;
 
         const child = document.querySelector('.plan-card:not(#propay-page-plan-card-tmplt)');
 
@@ -2849,7 +3046,7 @@ pro.propay = {
         return api.screq(rftRequest).then(({result}) => {
             if (this.currentGateway.gatewayId !== addressDialog.gatewayId_stripe) {
                 console.warn('Payment type changed during loading');
-                return
+                return;
             }
             pro.propay.trial.trialId = result.id;
             addressDialog.processUtcResult({'EUR': result.url}, true, result.id);
@@ -2867,12 +3064,12 @@ pro.propay = {
      * @param {Number} numOfMonths The number of months
      * @returns {String} Returns the number of months e.g. '1 month', '1 year'
      */
-    getNumOfMonthsWording(numOfMonths) {
+    getNumOfMonthsWording(numOfMonths, forceMonths) {
         'use strict';
 
         let monthsWording;
         // Change wording depending on number of months
-        if (numOfMonths === 12) {
+        if (!forceMonths && (numOfMonths === 12)) {
             monthsWording = l[923];     // 1 year
         }
         else {
@@ -2936,13 +3133,12 @@ pro.propay = {
             .replace('%1', formattedPrice + (curr === 'EUR' ? '' : '*'))
             .replace('%2', curr);
 
-        const strings = steps[information.type] || steps.vpn;
+        const strings = steps[information.type] || steps['1'];
         const stringKeys = Object.keys(strings);
         strings[stringKeys[stringKeys.length - 1]] = strings[stringKeys[stringKeys.length - 1]]
             .replace('%1', information.startDate);
 
         for (let i = 0; i < stringKeys.length; i++) {
-            const $infoBlock = $('.step' + i, $template);
             $(`.step${i}.content`, $template).text(strings[stringKeys[i]]).removeClass('hidden');
             $(`.step${i}.when`, $template).text(i === 0
                 ? l[1301]
@@ -3111,6 +3307,120 @@ pro.propay = {
 
         onIdle(() => eventlog(500511));
     },
+
+    /** This function to show the discount offer dialog if applies */
+    showDiscountOffer() {
+        'use strict';
+        if (window.offerPopupTimer) {
+            clearTimeout(window.offerPopupTimer);
+        }
+        if (is_mobile || typeof page !== 'string' || page.includes('propay')) {
+            return;
+        }
+
+        if (u_attr && u_attr.mkt && Array.isArray(u_attr.mkt.dc) && u_attr.mkt.dc.length) {
+            // if we have multiple offers, we have no preferences we will take the first one.
+            const offer = u_attr.mkt.dc[0];
+
+            // check if we previewed a popup in the past 20 hours
+            let discountOffers = u_attr['^!discountoffers'] ? JSON.parse(u_attr['^!discountoffers']) : null;
+            if (discountOffers && discountOffers[offer.dc]) {
+                const timeDif = Date.now() - discountOffers[offer.dc];
+                if (timeDif < 72e6) {
+                    if (timeDif > 0) {
+                        window.offerPopupTimer = setTimeout(pro.propay.showDiscountOffer, 72e6 - timeDif + 10);
+                    }
+                    return;
+                }
+            }
+            discountOffers = discountOffers || Object.create(null);
+
+            if (offer.al && offer.pd && (offer.m !== undefined)) {
+                const $discountDlg = $('.mega-dialog.pro-discount', 'body');
+                let title = l[24703];
+                if (offer.m === 1) {
+                    title = l[24702];
+                }
+                else if (offer.m === 12) {
+                    title = l[24701];
+                }
+                title = title.replace('%1', offer.pd + '%').replace('%2', pro.getProPlanName(offer.al));
+                $('.discount-title', $discountDlg).text(title);
+                pro.loadMembershipPlans(() => {
+                    const matchedPlan = pro.membershipPlans.find(plan => {
+                        return plan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL] === offer.al
+                            && plan[pro.UTQA_RES_INDEX_MONTHS] === (offer.m || 12);
+                    });
+                    if (matchedPlan) {
+                        const storageFormatted = numOfBytes(matchedPlan[pro.UTQA_RES_INDEX_STORAGE] * 1073741824, 0);
+                        const desc = l[24704]
+                            .replace('%1', Math.round(storageFormatted.size) + ' ' + storageFormatted.unit);
+                        $('.discount-desc', $discountDlg).text(desc);
+
+                        let discountPopupPref = Date.now();
+                        let reTrigger = true;
+
+                        const storeViewTime = () => {
+                            discountOffers[offer.dc] = discountPopupPref;
+                            mega.attr.set('discountoffers', JSON.stringify(discountOffers), -2, true);
+                        };
+
+                        // binding events
+                        $('button.js-close, .close-btn', $discountDlg).rebind('click.discount', (ev) => {
+                            storeViewTime();
+                            window.closeDialog();
+                            if (reTrigger) {
+                                window.offerPopupTimer = setTimeout(pro.propay.showDiscountOffer, 72e6);
+                            }
+                            mBroadcaster.sendMessage(
+                                'trk:event',
+                                'discountPopup',
+                                'closed',
+                                'btnUsed',
+                                ev.currentTarget.className.indexOf('close-btn') > -1 ? 1 : 0);
+                            mBroadcaster.sendMessage(
+                                'trk:event',
+                                'discountPopup',
+                                'closed',
+                                'notShowAgain',
+                                reTrigger ? 0 : 1);
+                        });
+
+                        $('.get-btn', $discountDlg).rebind('click.discount', () => {
+                            storeViewTime();
+                            $discountDlg.addClass('hidden');
+                            if (reTrigger) {
+                                window.offerPopupTimer = setTimeout(pro.propay.showDiscountOffer, 72e6);
+                            }
+                            loadSubPage('discount' + offer.dc);
+                            mBroadcaster.sendMessage(
+                                'trk:event',
+                                'discountPopup',
+                                'requested',
+                                'notShowAgain',
+                                reTrigger ? 0 : 1);
+                        });
+
+                        $('.fm-picker-notagain.checkbox-block', $discountDlg).rebind('click.discount', () => {
+                            const $check = $('.fm-picker-notagain.checkbox-block .checkdiv', $discountDlg);
+                            if ($check.hasClass('checkboxOff')) {
+                                $check.removeClass('checkboxOff').addClass('checkboxOn');
+                                discountPopupPref = new Date(9999, 11, 30).getTime();
+                                reTrigger = false;
+                            }
+                            else {
+                                $check.addClass('checkboxOff').removeClass('checkboxOn');
+                                discountPopupPref = Date.now();
+                                reTrigger = true;
+                            }
+                        });
+                        M.safeShowDialog('discount-offer', $discountDlg, true);
+                        mBroadcaster.sendMessage('trk:event', 'discountPopup', 'shown');
+                    }
+                });
+            }
+        }
+    },
 };
 
 // mBroadcaster.once('login2', () => {
@@ -3134,5 +3444,9 @@ lazy(pro.propay, 'warningStrings', () => {
             added_title: l.pwm_added_title,
             to_disable_text: l.pwm_to_disable_text,
         },
+        balance: l.balance_only_one_off,
+        discountMonthly: l.only_available_monthly,
+        minAmount: l.min_amount_restriction,
+        voucher: l.voucher_only_one_off,
     };
 });

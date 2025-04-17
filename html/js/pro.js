@@ -759,7 +759,7 @@ var pro = {
                     if (thisPlan._maxCorrPriceEur === null) {
                         let maxCorrPriceEuro = thisPlan.priceEuro;
                         if (thisPlan.correlatedPlan) {
-                            maxCorrPriceEuro= Math.max(thisPlan.priceEuro, thisPlan.correlatedPlan.priceEuro);
+                            maxCorrPriceEuro = Math.max(thisPlan.priceEuro, thisPlan.correlatedPlan.priceEuro);
                             thisPlan.correlatedPlan._maxCorrPriceEur = maxCorrPriceEuro;
                         }
                         thisPlan._maxCorrPriceEur = maxCorrPriceEuro;
@@ -806,8 +806,8 @@ var pro = {
 
                     const monthMultiplier = +(months || thisPlan.months) / thisPlan.months;
 
-                    let localPrice = returnEuro ? thisPlan.priceEuro : thisPlan.price
-                    let price = localPrice * monthMultiplier;
+                    const localPrice = returnEuro ? thisPlan.priceEuro : thisPlan.price;
+                    const price = localPrice * monthMultiplier;
 
                     return formatCurrency(
                         price,

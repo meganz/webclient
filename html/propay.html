@@ -1,8 +1,7 @@
-<div class="bottom-page scroll-block light-blue-top animated-page payment-section lato selectable-txt">
+<div class="bottom-page scroll-block animated-page payment-section lato selectable-txt propay">
     <div class="bottom-page content">
         <div class="pages-menu-wrap">
             ((TOP))
-            ((PAGESMENU))
         </div>
 
         <div id="propay-page-templates" class="hidden">
@@ -32,6 +31,7 @@
                         <div class="storage"></div>
                         <div class="transfer"></div>
                     </div>
+                    <div class="s4 available">[$available_for_cloud_object]</div>
                     <div class="how-it-works hidden"></div>
                     <div class="includes hidden">
                         <div class="includes-title regular">[$pr_includes]</div>
@@ -97,10 +97,8 @@
                 <div class="left-block-wrapper">
 
                     <div class="left-block">
-                        <h1 class="plan-name title">
-                            <!-- You have selected <span></span> -->
-                        </h1>
-                        <div class="s4-wrapper s4">
+                        <h1 class="plan-name title"></h1>
+                        <div class="s4-wrapper s4 hidden">
                             <h2 class="title">[$enhance_flexi]</h2>
 
                             <div class="flex flex-row items-center gap-4 content icon24">
@@ -132,6 +130,10 @@
                                         <i class="sprite-fm-mono icon-alert-triangle"></i>
                                         <span class="error-message-text">[$select_a_payment_method]</span>
                                     </div>
+                                    <div class="duration-note promo-ends-info hidden">
+                                        <i class="sprite-fm-mono icon-info"></i>
+                                        <div class="promo-info-txt"></div>
+                                    </div>
                                 </div>
                                 <div class="payment-options-secondary hidden"></div>
                                 <div class="free-trial-unsupported hidden">
@@ -139,12 +141,43 @@
                                     [$method_does_not_support_trial]
                                 </div>
                             </div>
+                                                        <div class="astropay-dialog propay-inline-dialog hidden" role="dialog" aria-labelledby="astropay-dialog-title"
+                                                            aria-modal="true">
+
+                                                            <h2>[$enter_details_below]</h2>
+                                                            <div class="redirect-info">[$redirect_to_third_party_info]</div>
+
+                                                            <section class="content">
+                                                                <div class="content-block gap-1 flex flex-column">
+                                                                    <label class="astropay-label" for="propay-astropay-name-field">[$7987]:</label>
+                                                                    <div class="mega-input box-style">
+                                                                        <input id="propay-astropay-name-field" class="astropay-name-field" type="text" placeholder="[$7988]">
+                                                                    </div>
+
+                                                                    <label class="astropay-label address" for="propay-astropay-address-field">[$561]:</label>
+                                                                    <div class="mega-input box-style">
+                                                                        <input id="propay-astropay-address-field" class="astropay-address-field" type="text"
+                                                                            placeholder="[$561]">
+                                                                    </div>
+
+                                                                    <label class="astropay-label city" for="propay-astropay-city-field">[$565]:</label>
+                                                                    <div class="mega-input box-style">
+                                                                        <input id="propay-astropay-city-field" class="astropay-city-field" type="text" placeholder="[$565]">
+                                                                    </div>
+
+                                                                    <label class="astropay-label tax" for="propay-astropay-tax-field">[$7989]:</label>
+                                                                    <div class="mega-input box-style">
+                                                                        <input id="propay-astropay-tax-field" class="astropay-tax-field" type="text" placeholder="[$7990]">
+                                                                    </div>
+                                                                </div>
+                                                            </section>
+                                                        </div>
                             <div class="duration">
                                 <h2 class="title recurring hidden">[$how_often_want_to_pay]</h2>
                                 <h2 class="title one-time hidden">[$7994]</h2>
                                 <div class="options-wrapper"></div>
-                                <div class="one-off-payment-info hidden">
-                                    <i class="sprite-fm-mono icon-shield-thin-outline"></i>
+                                <div class="duration-note one-off-payment-info hidden">
+                                    <i class="sprite-fm-mono icon-message-alert"></i>
                                     <div class="warning-txt"></div>
                                 </div>
                             </div>
@@ -156,37 +189,6 @@
                         <div class="specific-payment-info hidden">
                             <div class="payment-loading-spinner active">
                                 <div class="payment-main-loader"></div>
-                            </div>
-                            <div class="astropay-dialog propay-inline-dialog hidden" role="dialog" aria-labelledby="astropay-dialog-title"
-                                aria-modal="true">
-
-                                <h2>[$enter_details_below]</h2>
-                                <div class="redirect-info">[$redirect_to_third_party_info]</div>
-
-                                <section class="content">
-                                    <div class="content-block gap-1 flex flex-column">
-                                        <!-- <div class="astropay-information">[$7991] [$7986]</div> -->
-                                        <label class="astropay-label" for="propay-astropay-name-field">[$7987]:</label>
-                                        <div class="mega-input box-style">
-                                            <input id="propay-astropay-name-field" class="astropay-name-field" type="text" placeholder="[$7988]">
-                                        </div>
-
-                                        <label class="astropay-label address" for="propay-astropay-address-field">[$561]:</label>
-                                        <div class="mega-input box-style">
-                                            <input id="propay-astropay-address-field" class="astropay-address-field" type="text" placeholder="[$561]">
-                                        </div>
-
-                                        <label class="astropay-label city" for="propay-astropay-city-field">[$565]:</label>
-                                        <div class="mega-input box-style">
-                                            <input id="propay-astropay-city-field" class="astropay-city-field" type="text" placeholder="[$565]">
-                                        </div>
-
-                                        <label class="astropay-label tax" for="propay-astropay-tax-field">[$7989]:</label>
-                                        <div class="mega-input box-style">
-                                            <input id="propay-astropay-tax-field" class="astropay-tax-field" type="text" placeholder="[$7990]">
-                                        </div>
-                                    </div>
-                                </section>
                             </div>
                             <div class="propay-inline-dialog dialog-template-tool payment-stripe-dialog hidden" role="dialog" aria-modal="true">
 
@@ -273,6 +275,7 @@
                                 <div class="additional-tos s4-tos s4 hidden">
                                     <div class="tos flex items-center">
                                         <div class="checkbox checkbox-item checkboxOff">
+                                            <i class="sprite-fm-mono icon-check selected"></i>
                                             <input class="checkboxOff checkbox-item confirm-s4-tos" type="checkbox">
                                         </div>
                                         <label for="confirm-addition-s4-tos">[$agree_s4_tos]</label>
@@ -307,7 +310,7 @@
                                 <span class="balance-amount">0.00</span>
                             </div>
                             <button class="continue"></button>
-                            <div class="stripe-button payment-stripe-dialog">
+                            <div class="stripe-button payment-stripe-dialog hidden">
                                 <div class="loader sk-loading hidden">
                                     <i class="sk-elm"></i>
                                 </div>
@@ -325,35 +328,46 @@
                     <div class="right-block-card-wrapper"></div>
                 </div>
                 <footer class="mobile">
-                    <div class="additional-tos s4-tos s4 hidden">
-                        <div class="tos">
-                            <div class="checkbox checkbox-item checkboxOff">
-                                <input class="checkboxOff checkbox-item confirm-s4-tos" type="checkbox">
+                    <div class="subscription-info">
+                        <div class="additional-tos s4-tos s4 hidden">
+                            <div class="tos flex items-center">
+                                <div class="checkbox checkbox-item checkboxOff">
+                                    <i class="sprite-fm-mono icon-check selected"></i>
+                                    <input class="checkboxOff checkbox-item confirm-s4-tos" type="checkbox">
+                                </div>
+                                <label for="confirm-addition-s4-tos">[$agree_s4_tos]</label>
                             </div>
-                            <label for="confirm-addition-s4-tos">[$agree_s4_tos]</label>
+                            <div class="error-message">
+                                <i class="sprite-fm-mono icon-alert-triangle"></i>
+                                <span class="error-message-text">[$tos_must_agree]</span>
+                            </div>
                         </div>
-                        <div class="error-message">
-                            <i class="sprite-fm-mono icon-alert-triangle"></i>
-                            <span class="error-message-text">[$tos_must_agree]</span>
+                        <div class="recurring hidden">
+                            <span class="recurring-monthly-yearly">
+                                [$10637]
+                            </span>
+                            <span class="recurring-monthly">
+                                [$10628]
+                            </span>
+                            <span class="recurring-yearly">
+                                [$10629]
+                            </span>
+                            [$10630]
                         </div>
-                    </div>
-                    <div class="recurring hidden">
-                        [$10637]
-                        [$10630]
-                    </div>
-                    <div class="allow recurring hidden">[$allow_future_charges_fp]</div>
-                    <div class="one-time hidden">
-                        [$pro_for_duration]
-                    </div>
-                    <div class="trial hidden">
-                        [$after_trial_card_charged_m]
-                        [$trial_details_visit_tos]
+                        <div class="allow recurring hidden">[$allow_future_charges_fp]</div>
+                        <div class="one-time hidden">
+                            [$pro_for_duration]
+                        </div>
+                        <div class="trial hidden">
+                            [$after_trial_card_charged_m]
+                            [$trial_details_visit_tos]
+                        </div>
                     </div>
                     <div class="balance hidden">
                         <span class="balance-amount">0.00</span>
                     </div>
                     <button class="continue"></button>
-                    <div class="stripe-button payment-stripe-dialog">
+                    <div class="stripe-button payment-stripe-dialog hidden">
                         <div class="loader sk-loading hidden">
                             <i class="sk-elm"></i>
                         </div>
@@ -531,7 +545,7 @@
                             <div class="mobile white-block">
                                 <div class="mobile empty-icon custom-login-icon"></div>
                                 <div class="mobile information">
-                                    <div class="mobile dialog-heading-text">[$5841].</div><br />
+                                    <div class="mobile dialog-heading-text">[$user_not_logged_in]</div><br />
 
                                     <div class="dialog-body-text">[$7679]</div>
                                 </div>
@@ -560,11 +574,7 @@
                     [$25048]
                 </div>
             </div>
-
-            ((BOTTOM))
         </div>
 
     </div>
-
-
 </div>

@@ -1837,7 +1837,7 @@ scparser.$add('ub', function() {
 // Pro Flexi account change which requires reload (such as payment against expired account)
 scparser.$add('upf', () => {
     "use strict";
-    if (!folderlink) {
+    if (!folderlink && !addressDialog.paymentInProcess) {
         fm_fullreload(null, 'upf-proflexi').catch(dump);
     }
 });

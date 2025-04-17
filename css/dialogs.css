@@ -8690,7 +8690,7 @@ body.de .mega-dialog.contact-picker-widget {
         border-radius: 24px;
         background: none;
         display: block;
-        min-height: 615px;
+        min-height: 620px;
         max-height: 640px;
         width: 640px;
     }
@@ -10336,7 +10336,7 @@ body.de .mega-dialog.contact-picker-widget {
 }
 .mega-dialog.dc-app-promo-dialog .content .info-container .title-and-description {
     width: auto;
-    margin-top: 4px;    
+    margin-top: 4px;
     margin-bottom: 4px;
     text-align: center;
 }

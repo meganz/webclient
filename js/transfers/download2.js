@@ -1660,7 +1660,7 @@ var dlmanager = {
         }
         else if (!(flags & this.LMT_ISREGISTERED)) {
             if (preWarning && !u_wasloggedin()) {
-                api_req({a: 'log', e: 99646, m: 'on pre-warning not-logged-in'});
+                eventlog(99646); // on pre-warning not-logged-in
             }
 
             var $pan = $('.not-logged.no-achievements', $dialog);
@@ -1840,7 +1840,7 @@ var dlmanager = {
         return typeof res.mstrg === 'number' ? res : M.getStorageQuota();
     },
 
-    setPlanPrices($dialog, showDialogCb, ignoreStorageReq) {
+    setPlanPrices($dialog, ignoreStorageReq) {
         'use strict';
 
         var $scrollBlock = $('.scrollable', $dialog);
@@ -1849,7 +1849,7 @@ var dlmanager = {
         $scrollBlock.scrollTop(0);
 
         // Load the membership plans, and the required storage quota if needed
-        Promise.all([!ignoreStorageReq && this.getRequiredStorageQuota(), pro.loadMembershipPlans()])
+        return Promise.all([!ignoreStorageReq && this.getRequiredStorageQuota(), pro.loadMembershipPlans()])
             .then(([storageObj]) => {
 
                 const slideshowPreview = slideshowid && is_video(M.getNodeByHandle(slideshowid));
@@ -1857,7 +1857,7 @@ var dlmanager = {
 
                 const requiredQuota = storageObj.mstrg || 0;
 
-                const freeOrLowerTier = !u_attr.p ||
+                const freeOrLowerTier = !Object(self.u_attr).p ||
                     [
                         pro.ACCOUNT_LEVEL_STARTER,
                         pro.ACCOUNT_LEVEL_BASIC,
@@ -1906,11 +1906,6 @@ var dlmanager = {
                             Ps.initialize($scrollBlock[0]);
                         }
                     }
-                }
-
-                // Run the callback function (to show the dialog) if one exists
-                if (typeof showDialogCb === 'function') {
-                    showDialogCb();
                 }
             });
     },
@@ -1962,7 +1957,7 @@ var dlmanager = {
         $dialog.removeClass('exceeded achievements pro3 pro pro-mini no-cards uploads');
 
         // Load the membership plans, then show the dialog
-        dlmanager.setPlanPrices($dialog, () => {
+        dlmanager.setPlanPrices($dialog, true).then(() => {
             M.safeShowDialog('download-pre-warning', () => {
                 eventlog(99617);// overquota pre-warning shown.
 
@@ -1971,7 +1966,7 @@ var dlmanager = {
 
                 return $dialog;
             });
-        }, true);
+        });
     },
 
     showOverQuotaDialog: function DM_quotaDialog(dlTask, flags) {
@@ -2019,7 +2014,7 @@ var dlmanager = {
         $dialog.removeClass('achievements pro3 pro pro-mini no-cards uploads').addClass('exceeded');
 
         // Load the membership plans, then show the dialog
-        dlmanager.setPlanPrices($dialog, () => {
+        dlmanager.setPlanPrices($dialog, true).then(() => {
             M.safeShowDialog('download-overquota', () => {
                 $('.header-before-icon.exceeded', $dialog).text(l[17]);
 
@@ -2044,7 +2039,7 @@ var dlmanager = {
 
                 return $dialog;
             });
-        }, true);
+        });
     },
 
     doCloseModal(overlayEvent, $dialog) {

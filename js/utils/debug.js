@@ -664,7 +664,7 @@ mBroadcaster.once('boot_done', function radSetup() {
 
 ((global, debug) => {
     'use strict';
-    if (!debug) {
+    if (self.buildOlderThan10Days && !debug) {
         return;
     }
     const seen = new Map();
@@ -680,7 +680,7 @@ mBroadcaster.once('boot_done', function radSetup() {
             }
             seen.clear();
         }
-    }, 2e4);
+    }, 1e4);
 
     global.addEventListener('unhandledrejection', ({promise, reason}) => {
         queueMicrotask(scheduler);

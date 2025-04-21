@@ -146,7 +146,7 @@ describe("MegaNotifications Unit Test", function() {
 
         expect(megaNotifications.favico instanceof Favico).to.eql(true);
 
-        return tSleep(.2).then(() => {
+        return tSleep(.6).then(() => {
             expect(megaNotifications.favico.badge.callCount).to.eql(1);
             expect(megaNotifications.favico.badge.calledWith(1)).to.eql(true);
 
@@ -162,7 +162,7 @@ describe("MegaNotifications Unit Test", function() {
             expect(ion.sound.play.calledWith("type1-sound")).to.eql(true);
 
             n.setUnread(false);
-            return tSleep(.3).then(() => {
+            return tSleep(.8).then(() => {
 
                 expect(ion.sound.stop.callCount).to.eql(3);
                 expect(ion.sound.stop.calledWith("type1-sound")).to.eql(true);

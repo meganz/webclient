@@ -956,6 +956,12 @@ lazy(mega, 'rewindEnabled', function() {
     return (mega.flags.rw || localStorage.rewindEnable) && !is_mobile;
 });
 
+/** @property mega.xferit */
+lazy(mega, 'xferit', function() {
+    'use strict';
+    return self.d > 0 && !self.is_livesite || self.is_livesite && this.flags.ff_xferit;
+});
+
 /** @property mega.viewID */
 lazy(mega, 'viewID', function() {
     'use strict';

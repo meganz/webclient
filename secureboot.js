@@ -1514,10 +1514,7 @@ function siteLoadError(error, filename) {
         logStaticServerFailure(error, filename, staticpath);
     }
 
-    var message = ['MEGA failed to load because '];
-    if (location.host !== 'mega.nz') {
-        message[0] += '..';
-    }
+    var message = [(document.title || 'The site') + ' failed to load,'];
 
     if (error === load_error_types.file_corrupt) {
         message.push('The file "' + filename + '" is corrupt.');
@@ -1535,11 +1532,11 @@ function siteLoadError(error, filename) {
     }
 
     message.push('Please click OK to refresh and try again.');
-    message.push("If the problem persists, please try disabling all third-party browser extensions, " +
-                 "update your browser and MEGA browser extension to the latest version. " +
-                 "If that does not help, contact support@mega.nz");
+    message.push("If the problem persists, please try disabling all third-party browser extensions " +
+        "and ensure your browser is up to date. " +
+        "If that does not help, contact support@" + location.host);
 
-    message.push('BrowserID: ' + (typeof mozBrowserID !== 'undefined' ? mozBrowserID : ua) + '\n' +
+    message.push('BrowserID: ' + self.ua + '\n' +
                  'Static server: ' + staticpath + '\n' +
                  'Flipped to default static: ' + (staticServerLoading.flippedToDefault ? 'yes' : 'no') + '\n' +
                  'Date/time: ' + new Date().toISOString());
@@ -1761,29 +1758,14 @@ else if (!browserUpdate) {
     jj = window.jj || 0;
 
     // Do not report exceptions if this build is older than 10 days
-    var exTimeLeft = (is_extension || !nocontentcheck) && (buildVersion.timestamp + 10 * 86400) * 1000 > Date.now();
-    window.buildOlderThan10Days = !exTimeLeft;
+    Object.defineProperty(self, 'buildOlderThan10Days', {
+        value: !((is_extension || !nocontentcheck) && (buildVersion.timestamp + 10 * 86400) * 1000 > Date.now())
+    });
 
-    // Override to see logs being sent
-    if (localStorage.getItem('sendStaticFailureLogs') !== null) {
-        window.buildOlderThan10Days = false;
-    }
-
-    if (!d && exTimeLeft && is_livesite)
-    {
+    if (!self.buildOlderThan10Days) {
         var __cdumps = [], __cd_t;
         window.onerror = function __MEGAExceptionHandler(msg, url, ln, cn, errobj)
         {
-            function mTrim(s)
-            {
-                return String(s)
-                    .replace('-extension://', '~')
-                    .replace(/blob:[^:\s]+/, '..')
-                    .replace(/([^'])\w+:\/\/[^\s:]+/, '$1..')
-                    .replace(/\.\.:\/\/[^:\s]+/, '..')
-                    .replace(/(?: line \d+ > eval)+/g,' >.eval')
-                    .trim();
-            }
             if (__cdumps.length > 3) return false;
 
             if (url && ln < 2) {
@@ -1792,235 +1774,15 @@ else if (!browserUpdate) {
             }
 
             var expectedSourceOrigin = url || ln > 999;
-            var dump = {
-                l: ln,
-                f: mTrim(url),
-                m: mTrim(msg)
-                    .replace(/'[a-z]+:\/+[^']+(?:'|$)/gi, function(url) {
-                        url = url.substr(1);
-                        if (url[url.length - 1] === "'") {
-                            url = url.substr(0, url.length - 1);
-                        }
-                        var a = document.createElement('a');
-                        a.href = url;
-                        return "'" + (a.origin !== 'null' && a.origin
-                            || (a.protocol + '//' + a.hostname)) + "...'";
-                    })
-                    .replace(/(Cannot read propert[\w\s]+)\(?([\w\s]*'[\w-]{8}')/, "$1'<h>?'")
-                    .replace(/(Access to '\.\.).*(' from script denied)/, '$1$2')
-                    .replace(/gfs\w+\.userstorage/, 'gfs...userstorage')
-                    .replace(/^Uncaught\W*(?:exception\W*)?/i, ''),
-            }, cc;
-            var sbid = +(''+(document.querySelector('script[src*="secureboot"]')||{}).src).split('=').pop()|0;
-
-            if (~dump.m.indexOf('[[:i]]')) {
-                return false;
-            }
-
-            if (dump.m.indexOf("Failed to construct 'Worker'") !== -1) {
-                errobj = {};
-                dump.l = ln = 1; // enforce deduplication..
-            }
-
-            if (~dump.m.indexOf("\n")) {
-                var lns = dump.m.split(/\r?\n/).map(String.trim).filter(String);
-
-                if (lns.length > 6) {
-                    dump.m = [].concat(lns.slice(0,2), "[..!]", lns.slice(-2)).join(" ");
-                }
-            }
-            dump.m = (
-                is_mobile ? '[mobile] ' :
-                    is_embed ? '[embed] ' :
-                        window.pfid ? '[FL] ' :
-                            mega.infinity ? '[INF] ' :
-                        is_drop ? '[drop] ' : ''
-            ) + dump.m.replace(/\s+/g, ' ');
-
-            var injectedScript =
-                /userscript|user\.js|EvalError/.test(dump.m + url + (errobj && errobj.stack))
-                || dump.m.indexOf('Permission denied to access property') !== -1
-                || dump.m.indexOf('Cannot redefine property') !== -1
-                || dump.m.indexOf("evaluating 'ze(e,t)'") !== -1
-                || dump.m.indexOf("evaluating 'r(a,c)'") !== -1
-                || dump.m.indexOf("evaluating 'a.L") !== -1
-                || dump.m.indexOf('Error: hookFull') !== -1;
-
-            if (injectedScript) {
-                window.onerror = null;
-                window.log99723 = true;
-                expectedSourceOrigin = false;
-            }
-
             if (expectedSourceOrigin && !window.u_checked) {
                 // Alert the user if there was an uncaught exception while
                 // loading the site, this should only happen on some fancy
                 // browsers other than what we use during development, and
                 // hopefully they'll report it back to us for troubleshoot
-                return siteLoadError(dump.m, url + '^~' + ln);
+                return siteLoadError(msg, url + '^~' + ln);
             }
 
-            if (injectedScript) {
-                // Some third party extension is injecting bogus script(s)...
-                console.warn('Your account is only as secure as your computer...');
-                console.warn('Check your installed extensions for the one injecting bogus scripts on this page...');
-                console.error(dump.m, dump, errobj);
-                return false;
-            }
-
-            if (/NS_ERR|out[\s_]+of[\s_]+mem|dead\s+object|allocation\s+failed/i.test(dump.m)
-                && (!window.ua || !ua.details || !ua.details.blink)) {
-
-                window.onerror = null;
-                console.error(dump.m, dump, errobj);
-                return false;
-            }
-
-            if (!expectedSourceOrigin) {
-                window.onerror = null;
-                console.error(dump.m, dump, errobj);
-
-                if (!/SyntaxError|Script\serror/.test(dump.m)) {
-                    onIdle(function() {
-                        var xhr = new XMLHttpRequest();
-                        xhr.open('POST', apipath + 'cs?id=0', true);
-                        xhr.send(
-                            JSON.stringify(
-                                [{a: 'log', e: 99806, m: JSON.stringify([1, dump.m, url + ':' + ln])}]
-                            )
-                        );
-                    });
-                }
-                return;
-            }
-
-            var version = buildVersion.website;
-
-            if (is_extension) {
-                if (is_firefox_web_ext) {
-                    version = buildVersion.firefox;
-                }
-                else if (mega.chrome) {
-                    version = buildVersion.chrome;
-                }
-            }
-
-            if (errobj)
-            {
-                if (errobj.stack)
-                {
-                    var maxStackLines = 15;
-                    var omsg = String(msg).trim();
-                    var re = RegExp(
-                        omsg.substr(0, 70)
-                        .replace(/^\w+:\s/, '')
-                        .replace(/([^\w])/g, '\\$1')
-                        + '[^\r\n]+'
-                    );
-
-                    dump.s = String(errobj.stack)
-                        .replace(omsg, '').replace(re, '')
-                        .split("\n").map(mTrim)
-                        .filter(function(s, idx, a) {
-                            return s.length && a[idx - 1] !== s;
-                        });
-
-                    for (var idx = 1; idx < dump.s.length; idx++) {
-                        var s = dump.s[idx];
-
-                        if (s.indexOf('@resource:') > 0 || s.indexOf('@jar:') > 0) {
-                            maxStackLines = idx;
-                            break;
-                        }
-                    }
-
-                    if (dump.m.indexOf(':skull:') > 0) {
-                        maxStackLines = 50;
-                    }
-
-                    dump.s = dump.s.splice(0, maxStackLines).join("\n");
-
-                    if (dump.s.indexOf('Unknown script code:') !== -1
-                        || dump.s.indexOf('Function code:') !== -1
-                        || dump.s.indexOf('(eval code:') !== -1
-                        || dump.s.indexOf('(unknown source)') !== -1
-                        || /<anonymous>:\d+:/.test(dump.s)) {
-
-                        console.warn('Got uncaught exception from unknown resource,'
-                            + ' your MEGA account might be compromised.');
-                        console.error(msg, errobj, errobj && errobj.stack, url, ln);
-                        return false;
-                    }
-                }
-
-                if (typeof eventlog === 'function' && !errobj.udata && /\w/.test(msg || '')) {
-                    eventlog(99702, JSON.stringify([version, ln, msg]), true);
-                }
-            }
-            if (cn) dump.c = cn;
-
-            if (/Access to (?:the script at )?'.*(?:' from script|'?is) denied|origin 'null'/.test(dump.m)) {
-                console.error(dump.m, dump);
-                return false;
-            }
-
-            if (ln == 0 && !dump.s)
-            {
-                if (dump.m.toLowerCase().indexOf('out of memory') != -1) dump.m = '!Fatal! Out Of Memory.';
-                else dump.m = dump.m.replace(/[^\s\w]/gi,'') || ('[!] ' + msg);
-            }
-
-            try
-            {
-                var crashes = JSON.parse(localStorage.crashes || '{}');
-                var checksum = wchecksum(JSON.stringify(dump), 0x4ef5391a);
-
-                if (crashes.v != sbid) crashes = { v : sbid };
-
-                if (crashes[checksum])
-                {
-                    // Reported less than 10 days ago?
-                    if (Date.now() - crashes[checksum] < 864000000) return false;
-                }
-                dump.x = checksum;
-                crashes[checksum] = Date.now();
-                localStorage.crashes = JSON.stringify(crashes);
-                cc = Object.keys(crashes).length;
-            }
-            catch(e) {
-                delete localStorage.crashes;
-            }
-
-            __cdumps.push(dump);
-            if (__cd_t) clearTimeout(__cd_t);
-            var report = tryCatch(function()
-            {
-                // @todo revamp and move elsewhere to a dedicated file.
-                for (var i = __cdumps.length; i--;)
-                {
-                    if (!/\w/.test(__cdumps[i].m || '')) continue;
-
-                    var payload = {
-                        a: 'cd2',
-                        c: JSON.stringify(__cdumps[i]),
-                        t: version
-                    };
-
-                    if (self.api) {
-                        api.req(payload).catch(nop);
-                    }
-                    else {
-                        var xhr = new XMLHttpRequest();
-                        xhr.open('POST', apipath + 'cs?id=0', true);
-                        xhr.send(JSON.stringify([payload]));
-                    }
-                }
-                __cd_t = 0;
-                __cdumps = [];
-            });
-            __cd_t = setTimeout(function() {
-                report();
-            }, 3000);
+            __cdumps.push([msg, url, ln, cn, errobj]);
 
             return false;
         };
@@ -2189,6 +1951,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/utils/media.js', n: 'js_utils_pictools_js', j: 1});
     jsl.push({f:'js/utils/megalite.js', n: 'js_utils_megalite_js', j: 1});
     jsl.push({f:'js/utils/network.js', n: 'js_utils_network_js', j: 1});
+    jsl.push({f:'js/utils/sentinel.js', n: 'js_utils_sentinel_js', j: 1});
     jsl.push({f:'js/utils/splitter.js', n: 'js_utils_splitter_js', j: 1});
     jsl.push({f:'js/utils/test.js', n: 'js_utils_test_js', j: 1});
     jsl.push({f:'js/utils/timers.js', n: 'js_utils_timers_js', j: 1});

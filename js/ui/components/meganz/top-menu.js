@@ -181,7 +181,8 @@ class MegaTopMenu extends MegaMobileTopMenu {
                 href: '/fm/device-centre',
                 treeWrapClass: 'js-device-centre-tree-panel',
                 name: 'device-centre',
-                typeClassname: 'drive'
+                typeClassname: 'drive',
+                eventLog: 500613
             });
 
             loggedInCD.splice(5, 0, {

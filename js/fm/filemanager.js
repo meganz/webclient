@@ -1620,7 +1620,7 @@ FileManager.prototype.initContextUI = function() {
         $.hideContextMenu();
     });
 
-    $(c + '.getlink-item, ' + c + '.cd-getlink-item').rebind('click', function(e) {
+    $(c + '.getlink-item, ' + c + '.embedcode-item, ' + c + '.cd-getlink-item').rebind('click', function(e) {
 
         if (e.shiftKey && (e.ctrlKey || e.metaKey)) {
             $('button', $('#link-hidden-repair-proc').removeClass('hidden'))
@@ -2510,6 +2510,8 @@ FileManager.prototype.initContextUI = function() {
 
     $(`${c}.managepuburl-item`)
         .rebind('click.managePA', () => s4.ui.showDialog(s4.objects.dialogs.access, M.d[$.selected[0]]));
+
+    $(c + '.transferit-item').rebind('click', () => mega.xferit &&  M.openTransferItOverlay($.selected).catch(tell));
 
     if (window.pfcol) {
         $(`${c}.play-slideshow, ${c}.preview-item, ${c}.play-item`).rebind('click', function() {
@@ -4783,9 +4785,10 @@ FileManager.prototype.getLinkAction = function() {
         ephemeralDialog(l[1005]);
     }
     else {
+        var isEmbed = $(this).hasClass('embedcode-item');
         var selNodes = Array.isArray($.selected) ? $.selected.concat() : [];
         var showDialog = function() {
-            mega.Share.initCopyrightsDialog(selNodes);
+            mega.Share.initCopyrightsDialog(selNodes, isEmbed);
         };
 
         const mdList = mega.fileRequestCommon.storage.isDropExist(selNodes);

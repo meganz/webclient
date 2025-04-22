@@ -1907,6 +1907,7 @@ lazy(mega.devices, 'ui', () => {
                 items['.copy-item'] = 1;
                 items['.getlink-item'] = 1;
                 items['.sh4r1ng-item'] = 1;
+                items['.transferit-item'] = 1;
                 items['.send-to-contact-item'] = 1;
                 if (isSharedFolder) {
                     items['.removeshare-item'] = 1;
@@ -1958,6 +1959,7 @@ lazy(mega.devices, 'ui', () => {
             if (node.t) {
                 items['.open-item'] = 1;
                 items['.sh4r1ng-item'] = 1;
+                items['.transferit-item'] = 1;
                 this._populateFileReqCtxItems(node, items);
             }
             if (isSharedFolder) {
@@ -2056,6 +2058,7 @@ lazy(mega.devices, 'ui', () => {
                 delete items['.copy-item'];
                 delete items['.move-item'];
                 delete items['.getlink-item'];
+                delete items['.embedcode-item'];
                 delete items['.colour-label-items'];
                 delete items['.send-to-contact-item'];
             }
@@ -2065,8 +2068,10 @@ lazy(mega.devices, 'ui', () => {
 
                 if (isTakenDown) {
                     delete items['.getlink-item'];
+                    delete items['.embedcode-item'];
                     delete items['.removelink-item'];
                     delete items['.sh4r1ng-item'];
+                    delete items['.transferit-item'];
                     delete items['.add-star-item'];
                     delete items['.colour-label-items'];
                     delete items['.download-item'];
@@ -2181,6 +2186,7 @@ lazy(mega.devices, 'ui', () => {
                 }
                 else {
                     delete items['.sh4r1ng-item'];
+                    delete items['.transferit-item'];
                 }
             }
 

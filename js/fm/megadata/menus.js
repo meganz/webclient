@@ -224,8 +224,10 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
                 }
 
                 items['.sh4r1ng-item'] = 1;
+                items['.transferit-item'] = 1;
                 if (sourceRoot !== 's4' && sourceRoot !== M.RootID && isHeaderContext) {
                     delete items['.sh4r1ng-item'];
+                    delete items['.transferit-item'];
                 }
 
                 if (shares.length || M.ps[selNode.h]) {
@@ -284,6 +286,10 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
 
                 if (mediaType) {
                     items['.play-item'] = 1;
+
+                    if (sourceRoot !== M.RubbishID && sourceRoot !== "shares") {
+                        items['.embedcode-item'] = 1;
+                    }
                 }
                 else if (is_text(selNode)) {
                     items['.edit-file-item'] = 1;
@@ -434,6 +440,7 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
     if (folderlink) {
         delete items['.copy-item'];
         delete items['.add-star-item'];
+        delete items['.embedcode-item'];
         delete items['.colour-label-items'];
         delete items['.properties-versions'];
         delete items['.clearprevious-versions'];
@@ -461,6 +468,7 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
             delete items['.add-star-item'];
         }
         delete items['.colour-label-items'];
+        delete items['.embedcode-item'];
         delete items['.properties-versions'];
         delete items['.clearprevious-versions'];
         delete items['.open-in-location'];
@@ -485,8 +493,10 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
         // If any of selected items is taken down remove actions from context menu
         if (isTakenDown) {
             delete items['.getlink-item'];
+            delete items['.embedcode-item'];
             delete items['.removelink-item'];
             delete items['.sh4r1ng-item'];
+            delete items['.transferit-item'];
             delete items['.add-star-item'];
             delete items['.colour-label-items'];
             delete items['.download-item'];
@@ -602,8 +612,10 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
         delete items['.copy-item'];
         delete items['.open-in-location'];
         delete items['.getlink-item'];
+        delete items['.embedcode-item'];
         delete items['.removelink-item'];
         delete items['.sh4r1ng-item'];
+        delete items['.transferit-item'];
         delete items['.send-to-contact-item'];
     }
 
@@ -612,6 +624,7 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
         // delete items['.download-item'];
         delete items['.copy-item'];
         delete items['.sh4r1ng-item'];
+        delete items['.transferit-item'];
         delete items['.remove-item'];
         delete items['.togglepausesync-item'];
     }
@@ -625,6 +638,7 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
         delete items['.rename-item'];
         delete items['.add-star-item'];
         delete items['.colour-label-items'];
+        delete items['.embedcode-item'];
 
         if (!self.vw) {
             delete items['.remove-item'];
@@ -647,6 +661,7 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
 
         if ($.selected.length === 1 && selNode.t) {
             items['.sh4r1ng-item'] = 1;
+            items['.transferit-item'] = 1;
 
             if (M.getNodeShareUsers(selNode, 'EXP').length || M.ps[selNode]) {
                 items['.removeshare-item'] = 1;
@@ -700,16 +715,23 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
             delete items['.move-item'];
             delete items['.copy-item'];
             delete items['.getlink-item'];
+            delete items['.embedcode-item'];
             delete items['.removelink-item'];
             delete items['.sh4r1ng-item'];
+            delete items['.transferit-item'];
             delete items['.send-to-contact-item'];
         }
         if (M.onDeviceCenter && mega.ui.secondaryNav) {
             const node = mega.ui.secondaryNav.domNode.querySelector('.fm-share-folder');
             if (node && !node.classList.contains('hidden')) {
                 delete items['.sh4r1ng-item'];
+                delete items['.transferit-item'];
             }
         }
+    }
+
+    if (!mega.xferit) {
+        delete items['.transferit-item'];
     }
 
     return items;
@@ -1265,6 +1287,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
                         $menuCMI.filter('.copy-item').addClass('hidden');
                         $menuCMI.filter('.move-item').addClass('hidden');
                         $menuCMI.filter('.getlink-item').addClass('hidden');
+                        $menuCMI.filter('.embedcode-item').addClass('hidden');
                         $menuCMI.filter('.colour-label-items').addClass('hidden');
                         $menuCMI.filter('.send-to-contact-item').addClass('hidden');
                     }

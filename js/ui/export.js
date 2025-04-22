@@ -2287,7 +2287,10 @@ function logExportEvt(evtId, data) {
 
         const show = (mediaType) => {
             const { sheet, toast } = mega.ui;
-            const audio = mediaType === 2; // 1 - Video, 2 - Audio
+            // 1 - Video, 2 - Audio
+            const audio = typeof mediaType === 'number' ?
+                mediaType === 2 :
+                ($.itemExport.length === 1 && M.d[$.itemExport[0]].fa && is_video(M.d[$.itemExport[0]]) || 0) === 2;
 
             const setCode = () => {
                 const n = M.d[$.itemExport[0]];

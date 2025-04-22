@@ -2045,6 +2045,23 @@ body.de .mega-dialog.contact-picker-widget {
     .mega-sheet button {
         cursor: pointer;
     }
+    .mega-sheet.export-links-dialog .sheet.has-it-banner {
+        max-height: calc(100vh - 220px);
+    }
+    .mega-sheet.export-links-dialog .it-banner {
+        bottom: calc(100% + 56px);
+    }
+    .mega-sheet.export-links-dialog .it-banner::after {
+        content: "";
+        position: absolute;
+        bottom: -14px;
+        left: 40px;
+        width: 0;
+        height: 0;
+        border-left: 11px solid transparent;
+        border-right: 11px solid transparent;
+        border-top: 14px solid var(--mobile-brand-it);
+    }
     .export-links-settings-dialog input.set-date {
         cursor: pointer;
         background-color: var(--mobile-page-background);

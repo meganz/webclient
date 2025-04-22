@@ -159,6 +159,9 @@ body,
 
     /* FM selection */
         --hover-grey-main: #444444;
+
+    /* Brand colors */
+        --mobile-brand-it: rgb(24, 117, 255);
 }
 
 

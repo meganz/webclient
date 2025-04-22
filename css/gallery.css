@@ -654,9 +654,6 @@ body.rtl .gallery-view.gallery-type-m .gallery-date-block i::before {
     background-color: var(--surface-grey-2);
     border-radius: 12px;
 }
-.albums-grid-cell.rounded {
-    border-radius: 0.25rem;
-}
 .albums-grid-cell.shimmer > div {
     background: none;
     color: var(--stroke-main-inverted);

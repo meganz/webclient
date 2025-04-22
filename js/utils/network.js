@@ -426,7 +426,6 @@ function hostname(url) {
     return url && url[1];
 }
 
-
 // fire an event log
 function eventlog(id, msg, once) {
     'use strict';
@@ -455,6 +454,10 @@ function eventlog(id, msg, once) {
                 }
                 delete req.m;
             }
+        }
+
+        if (id > 99799 && self.buildOlderThan10Days) {
+            return self.d && console.info('eventlog(%d)', id, once, [req]);
         }
 
         if (!once || !eventlog.sent[id]) {

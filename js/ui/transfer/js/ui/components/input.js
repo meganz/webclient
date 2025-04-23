@@ -43,6 +43,11 @@ lazy(T.ui, 'input', () => {
                     this.initDatePicker(n);
                 }
 
+                // If tags
+                if (n.dataset.subtype === 'chips') {
+                    this.initChips(n);
+                }
+
                 n.addEventListener('focus', (e) => {
                     e.target.closest('.it-input').classList.add('focused');
                 });
@@ -77,8 +82,8 @@ lazy(T.ui, 'input', () => {
 
                 n = n.closest('.it-input');
                 if (n) {
-                    n.addEventListener('click', (e) => {
-                        e.target.closest('.it-input').querySelector('input, textarea').focus();
+                    n.addEventListener('click', () => {
+                        n.querySelector('.input-field > input, .input-field > textarea').focus();
                     });
                 }
             }
@@ -219,6 +224,108 @@ lazy(T.ui, 'input', () => {
                 stop(e);
                 input.click();
             });
+        },
+
+        // todo: refactor/improve
+        initChips(input, opts = {}) {
+            const wrap = input.closest('.it-input');
+
+            const validate = (val) => {
+                if (!val.trim()) {
+                    return false;
+                }
+                return opts.validate ? opts.validate(val) : true;
+            };
+
+            const addChip = (val) => {
+                let body = wrap.querySelector('.chips-body');
+                if (!body) {
+                    body = ce('div', null, { class: 'chips-body' });
+                    input.parentNode.prepend(body);
+                }
+
+                const chip = ce('div', body, { class: 'chip sm-size' });
+                ce('span', chip).textContent = val;
+                ce('input', chip, { type: 'hidden' }).value = val;
+
+                const btn = ce('a', chip, { href: '', class: 'it-button ghost sm-size'});
+                ce('i', btn, { class: 'sprite-it-x16-mono icon-close'});
+
+                btn.addEventListener('click', (e) => {
+                    stop(e);
+                    chip.remove();
+                    input.focus();
+                });
+            };
+
+            const renderChips = () => {
+                const tags = input.value.trim().split(/,| /g);
+                for (const i in tags) {
+                    if (validate(tags[i])) {
+                        addChip(tags[i]);
+                    }
+                }
+                input.value = '';
+            };
+
+            input.addEventListener('blur', () => {
+                renderChips();
+            });
+
+            input.addEventListener('keypress', (e) => {
+                const val = e.currentTarget.value.trim();
+                if (e.code === 'Space' || e.code === 'Comma' || e.code === 'Enter') {
+                    stop(e);
+                    if (validate(val)) {
+                        renderChips();
+                    }
+                }
+            });
+
+            input.addEventListener('keyup', (e) => {
+                let last = input.parentNode.querySelector('.chip:last-child');
+                if (e.code === 'Backspace' && input.value.length === 0 &&
+                    (last = input.parentNode.querySelector('.chip:last-child'))) {
+                    stop(e);
+                    input.value = last.querySelector('input').value;
+                    last.remove();
+                }
+            });
+
+            wrap.classList.add('chips');
+            input.dataset.subtype = 'chips';
+        },
+
+        getValue(input) {
+            if (input.dataset.subtype === 'chips') {
+                const vals = [];
+
+                for (const elm of input.closest('.it-input').querySelectorAll('.chips-body input')) {
+                    if (elm.value.trim()) {
+                        vals.push(elm.value.trim());
+                    }
+                }
+                return vals;
+            }
+
+            return input.value.trim();
+        },
+
+        clear(inputs) {
+            inputs = inputs.length === undefined ? [inputs] : inputs;
+
+            for (let i = inputs.length; i--;) {
+                const n = inputs[i];
+                const chips = n.dataset.subtype === 'chips' &&
+                      n.closest('.it-input').querySelector('.chips-body');
+
+                if (chips) {
+                    chips.remove();
+                }
+
+                n.value = '';
+                this.errorMsg(n);
+            }
         },
 
         errorMsg(input, msg) {

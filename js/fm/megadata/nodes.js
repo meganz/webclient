@@ -3035,6 +3035,7 @@ MegaData.prototype.getRecentActionsList = function(limit, until) {
                     pathPart: true
                 });
                 b.inshare = true;
+                b.su = t.su;
             }
         }
         return b;

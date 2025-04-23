@@ -1,0 +1,69 @@
+/*
+ * Account data component
+*/
+
+.it-account-data {
+    align-items: center;
+    display: flex;
+}
+
+.it-account-data > .data {
+    color: var(--main-neutral-secondary);
+    font: var(--text-body-sm);
+    overflow: hidden;
+}
+
+.it-account-data > .data span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.it-account-data > .data .name {
+    color: var(--main-neutral-primary);
+    font: var(--text-btn-lg);
+}
+
+.it-account-data .it-avatar + .data {
+    margin-inline-start: 12px;
+}
+
+button.it-avatar {
+    cursor: pointer;
+}
+
+.it-avatar {
+    -webkit-tap-highlight-color: transparent;
+    align-items: center;
+    background-color: var(--main-overlay-primary);
+    border: 0;
+    border-radius: 100%;
+    color: var(--main-primary);
+    display: inline-flex;
+    flex: 0 0 auto;
+    justify-content: center;
+    margin: 0;
+    outline: none;
+    position: relative;
+    transition: var(--transition-shadow);
+    /* stylelint-disable-next-line */
+    text-transform: uppercase;
+}
+
+.it-avatar img {
+    border-radius: inherit;
+    height: 100%;
+    position: absolute;
+    width: 100%;
+}
+
+.it-avatar.lg-size {
+    font: var(--text-btn-lg);
+    height: 48px;
+    width: 48px;
+}
+
+.it-avatar:focus {
+    box-shadow: var(--shadow-focused);
+    transition: var(--transition-shadow) .2s;
+}
+

@@ -116,7 +116,7 @@
             'cws', 'ctt', 'viewmode', 'dbDropOnLogout', 'dlThroughMEGAsync', 'sdss', 'tpp', 'ulddd',
             'cbvm', 'mgvm', 'uiviewmode', 'uisorting', 'uidateformat', 'skipsmsbanner', 'skipDelWarning', 'rsv0',
             'nowarnpl', 'zip64n', 'callemptytout', 'callinout', 'showHideChat', 'showRecents', 'nocallsup', 'cslrem',
-            'showSen', 'noSubfolderMd', 'rwReinstate', 'rsv2', 'rsv3', 'dcPause'
+            'showSen', 'noSubfolderMd', 'rwReinstate', 'rsv2', 'rsv3', 'dcPause', 'skiptritwarn'
         ]
     });
     shrink.zero = new Set([...Object.keys(shrink.bitdef), 'xs1', 'xs2', 'xs3', 'xs4', 'xs5']);

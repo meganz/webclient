@@ -1,0 +1,82 @@
+/*
+ * Checkbox component
+ *
+ * Usage:
+ *   <label class="it-checkbox-label">
+ *       <span class="it-checkbox">
+ *          <input type="checkbox" name="" class="" />
+ *          <span class="box">
+ *               <i class="sprite-it-x16-mono icon-checked"></i>
+ *          </span>
+ *       </span>
+ *       <span>Do not show me this message again</span>
+ *   </label>
+*/
+
+.it-checkbox-label {
+    align-items: center;
+    display: flex;
+}
+
+.it-checkbox-label .it-checkbox + span {
+    margin-inline-start: 8px;
+}
+
+.it-checkbox {
+    flex: 0;
+    margin: 4px;
+    position: relative;
+}
+
+.it-checkbox input {
+    border: 0;
+    display: block;
+    height: 16px;
+    position: relative;
+    margin: 0;
+    width: 16px;
+    opacity: 0;
+    z-index: 2;
+}
+
+.it-checkbox .box {
+    box-shadow: inset 0 0 0 1.5px var(--main-neutral-secondary);
+    border-radius: var(--radius-i-xs);
+    display: block;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    transition: var(--transition-bg-color), var(--transition-shadow);
+    width: 100%;
+}
+
+.it-checkbox .box i {
+    --icon-size: 24px;
+    --mask-color: var(--main-forced-white);
+    opacity: 0;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    transition: var(--transition-opacity);
+}
+
+.it-checkbox input:checked + .box {
+    background-color: var(--main-primary);
+    box-shadow: inset 0 0 0 1.5px var(--main-primary);
+}
+
+.it-checkbox input:checked + .box i {
+    opacity: 1;
+}
+
+
+/* States. Focused state */
+
+.it-checkbox input:focus + .box {
+    box-shadow: var(--shadow-focused);
+}
+
+.it-checkbox input:checked:focus + .box {
+    box-shadow: inset 0 0 0 1.5px var(--main-primary), var(--shadow-focused);
+}

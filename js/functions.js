@@ -299,12 +299,12 @@ function numOfBytes(bytes, precision, isSpd) {
 function bytesToSize(bytes, precision, format) {
     'use strict'; /* jshint -W074 */
 
-    var s_b = l[20158];
-    var s_kb = l[7049];
-    var s_mb = l[20159];
-    var s_gb = l[17696];
-    var s_tb = l[20160];
-    var s_pb = l[23061];
+    var s_b = l[20158] || 'B';
+    var s_kb = l[7049] || 'KB';
+    var s_mb = l[20159] || 'MB';
+    var s_gb = l[17696] || 'GB';
+    var s_tb = l[20160] || 'TB';
+    var s_pb = l[23061] || 'PB';
 
     var kilobyte = 1024;
     var megabyte = kilobyte * 1024;
@@ -1574,7 +1574,7 @@ mBroadcaster.addListener('crossTab:owner', function _setup() {
     mBroadcaster.once('crossTab:leave', _exit);
 
     // The fm must be initialized before proceeding
-    if (!folderlink && fminitialized) {
+    if (self.fminitialized && !folderlink) {
         _fmready();
     }
     else {

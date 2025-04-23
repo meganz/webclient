@@ -1,0 +1,97 @@
+/*
+ * General styling
+*/
+
+html {
+    background: no-repeat center / cover var(--wall-img1-url) var(--main-surface-primary);
+    height: 100%;
+    overflow: hidden;
+    -webkit-text-size-adjust: 100%;
+    width: 100%;
+}
+
+body {
+    color: var(--main-neutral-primary);
+    font: var(--text-body-md);
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+    overflow-y: auto;
+    padding: 0;
+    scrollbar-color: var(--scroll-bar-handle) var(--scroll-bar-background);
+    transition: var(--transition-bg-color);
+    width: 100%;
+}
+
+body * {
+    box-sizing: border-box;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+    /* scrollbar-width: thin; */
+}
+
+#chromeclipboard,
+#i-ping {
+    left: -100%;
+    opacity: 0;
+    position:absolute;
+    top: -100%;
+}
+
+
+/* Fonts */
+
+.bold {
+    font-weight: 800;
+}
+
+
+/* Display */
+
+.hidden {
+    display: none !important;
+}
+
+.vo-hidden {
+    opacity: 0 !important;
+}
+
+.v-hidden, .vo-hidden {
+    visibility: hidden !important;
+}
+
+
+/* RTL */
+
+.rtl {
+    direction: rtl;
+}
+
+
+/* Scrollbars */
+
+.scrollable {
+    overflow: hidden;
+    overflow-y: auto;
+}
+
+::-webkit-scrollbar {
+    height: 8px;
+    width: 8px;
+}
+ 
+::-webkit-scrollbar-track {
+    box-shadow: none; 
+    border-radius: 10px;
+}
+ 
+::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background: var(--scroll-bar-handle); 
+    box-shadow: none; 
+}
+
+::-webkit-scrollbar-thumb:window-inactive {
+	background: var(--scroll-bar-handle-inactive); 
+}

@@ -1,0 +1,42 @@
+/*
+* General variables
+*/
+
+.transferit-vars {
+
+    /* Interactive border radius */
+    --radius-i-dialog: 48px;
+    --radius-i-box: 24px;
+
+    --radius-i-xxl: 32px;
+    --radius-i-xl: 20px;
+    --radius-i-lg: 16px;
+    --radius-i-md: 12px;
+    --radius-i-sm: 8px;
+    --radius-i-xs: 4px;
+
+
+    /* Desktop scrolling spaces for focused items */
+
+    --box-scroll-space: 18px;
+
+
+    /* Transitions */
+
+    --transition-all: all .2s ease-in-out;
+    --transition-bg-color: background-color .2s ease-in-out;
+    --transition-border: border .2s ease-in-out;
+    --transition-border-color: border-color .2s ease-in-out;
+    --transition-border-radius: border-radius .2s ease-in-out;
+    --transition-color: color .2s ease-in-out;
+    --transition-height: height .2s ease-in-out;
+    --transition-left: left .2s ease-in-out;
+    --transition-margin: margin .2s ease-in-out;
+    --transition-opacity: opacity .2s ease-in-out;
+    --transition-padding: padding .2s ease-in-out;
+    --transition-shadow: box-shadow .2s ease-in-out;
+    --transition-transform: transform .2s ease-in-out;
+    --transition-visibility: visibility .2s ease-in-out;
+    --transition-width: width .2s ease-in-out;
+
+}

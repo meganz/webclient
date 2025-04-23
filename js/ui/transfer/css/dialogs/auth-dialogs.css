@@ -1,0 +1,106 @@
+/*
+ * Authentication dialogs
+*/
+
+/* Content */
+
+.it-dialog.auth-dialog .content-body {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    margin: 0 auto;
+    max-width: 496px;
+    overflow: hidden;
+    overflow-y: auto;
+    padding: 0 48px;
+}
+
+.it-dialog.auth-dialog .illustration-body.auth {
+    max-width: 1200px;
+}
+
+.it-dialog.auth-dialog .logo {
+    --icon-size: 64px;
+    --mask-color: var(--main-forced-white);
+    background-color: var(--main-primary);
+    border-radius: 100%;
+    height: 64px;
+    margin: 8px 0 48px;
+    width: 64px;
+}
+
+.it-dialog.auth-dialog .img1 {
+    content: var(--url-login-img);
+}
+
+.it-dialog.auth-dialog p {
+    font: var(--text-caption-lg);
+    margin: 12px 0 24px;
+    text-align: center;
+}
+
+.it-dialog.auth-dialog form {
+    display: grid;
+    gap: 16px;
+    margin: 48px 0 0;
+    width: 100%;
+}
+
+.it-dialog.auth-dialog .bottom-info {
+    font: var(--text-caption-lg);
+    margin: 8px 0;
+    text-align: center;
+}
+
+.it-dialog.auth-dialog .bottom-info a.link,
+.it-dialog.auth-dialog .bottom-info a.link:visited {
+    color: var(--main-neutral-secondary);
+}
+
+.it-dialog.auth-dialog .bottom-info a.link.strong,
+.it-dialog.auth-dialog .bottom-info a.link.strong:visited {
+    color: var(--main-neutral-primary);
+    font-weight: 700;
+}
+
+
+/* Login 2FA */
+
+.it-dialog.auth-dialog .two-fa-cn {
+    position: relative;
+}
+
+.it-dialog.auth-dialog .two-fa-cn .content-body {
+    max-width: 424px;
+}
+
+.it-dialog.auth-dialog .two-fa-cn .back-btn {
+    left: 0;
+    margin: 0;
+    position: absolute;
+    top: 0;
+}
+
+.rtl .it-dialog.auth-dialog .two-fa-cn .back-btn {
+    left: auto;
+    right: 0;
+}
+
+.it-dialog.auth-dialog .two-fa-cn .multiple-inputs {
+    display: flex;
+}
+
+.it-dialog.auth-dialog .two-fa-cn .error-text {
+    color: var(--supportive-error);
+    font: var(--text-btn-lg);
+    text-align: center;
+}
+
+.it-dialog.auth-dialog .two-fa-cn .it-input input {
+    text-align: center;
+}
+
+.it-dialog.auth-dialog .two-fa-cn .it-input + .it-input {
+    margin-inline-start: 8px;
+}
+

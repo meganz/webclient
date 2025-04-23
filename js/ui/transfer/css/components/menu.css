@@ -1,0 +1,150 @@
+/*
+ * Menu component
+ *
+ * Default state: Select
+ *
+ * Usage:
+ *
+ *
+*/
+
+.it-menu {
+    background-color: var(--main-surface-primary);
+    border-radius: var(--radius-i-box);
+    box-shadow: var(--shadow-lg);
+    opacity: 0;
+    overflow: hidden;
+    padding: 24px;
+    position: absolute;
+    margin: 8px 0;
+    transition: var(--transition-opacity), var(--transition-visibility);
+    visibility: hidden;
+    z-index: 1000;
+}
+
+.it-menu > .body {
+    min-width: 100%;
+}
+
+.it-menu.visible {
+    display: block;
+    opacity: 1;
+    visibility: visible;
+}
+
+.it-menu > .body > .section + .section {
+    border-top: 1px solid var(--main-borders-and-lines);
+    margin: 12px 0 0;
+    padding: 12px 0 0;
+}
+
+.it-menu-item {
+    --icon-size: 24px;
+    --mask-color: var(--main-neutral-secondary);
+    align-items: center;
+    background: transparent;
+    border-radius: var(--radius-i-sm);
+    border: 0;
+    color: var(--main-neutral-primary);
+    cursor: pointer;
+    display: flex;
+    margin: 0;
+    outline: none;
+    overflow: hidden;
+    padding: 12px 8px;
+    position: relative;
+    text-align: start;
+    text-overflow: ellipsis;
+    transition: var(--transition-bg-color);
+    white-space: nowrap;
+    width: 100%;
+}
+
+.it-menu-item.negative {
+    --mask-color: var(--supportive-error);
+    color: var(--supportive-error);
+}
+
+.it-menu-item span {
+    flex: 1 1 auto;
+    font: var(--text-btn-lg);
+    padding: 0 4px;
+    overflow: hidden;
+    position: relative;
+    text-overflow: ellipsis;
+}
+
+.it-menu-item i {
+    display: block;
+    position: relative;
+}
+
+.it-menu-item i.active-only {
+    opacity: 0;
+    transition: var(--transition-opacity);
+}
+
+.it-menu-item > * + * {
+    margin-inline-start: 4px;
+}
+
+
+/* Types */
+
+/* Types. Context menu */
+
+.it-menu.context {
+    border-radius: var(--radius-i-md);
+    box-shadow: var(--shadow-sm);
+    padding: 4px;
+    position: absolute;
+    margin: 0;
+    z-index: 250;
+}
+
+.it-menu.context .it-menu-item {
+    padding: 8px;
+}
+
+.it-menu.context .it-menu-item span {
+    font: var(--text-body-sm);
+}
+
+
+/* States */
+
+/* States. Hover  state */
+
+@media (hover: hover) {
+
+    .it-menu-item:hover {
+        background-color: var(--main-overlay-soft);
+    }
+
+}
+
+/* States. Focused state */
+
+.it-menu-item:focus {
+    background-color: var(--main-overlay-medium);
+}
+
+/* States. Active state */
+
+.it-menu-item.active {
+    background-color: var(--main-overlay-primary);
+}
+
+.it-menu-item.active span {
+    color: var(--main-primary);
+    font-weight: 700;
+}
+
+.it-menu-item.active i {
+    --mask-color: var(--main-primary);
+}
+
+.it-menu-item.active i.active-only {
+    opacity: 1;
+}
+

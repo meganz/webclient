@@ -1,0 +1,312 @@
+/*
+ * Button component
+ *
+ * Default button: Button fill type, Medium size.
+ *
+ * Usage:
+ *
+ *    <button class="it-button ghost lg-size">
+ *        <i class="sprite-it-x24-mono icon-bell"></i>
+ *        <span>Button</span>
+ *    </button>
+ *
+*/
+
+.it-button,
+.it-button:link,
+.it-button:visited {
+    --icon-size: 24px;
+    --mask-color: var(--main-forced-white);
+    -webkit-tap-highlight-color: transparent;
+    align-items: center;
+    background-color: var(--main-primary);
+    border: 0;
+    border-radius: var(--radius-i-sm);
+    color: var(--main-forced-white);
+    cursor: pointer;
+    display: inline-flex;
+    justify-content: center;
+    margin: 0;
+    outline: none;
+    padding: 8px;
+    position: relative;
+    text-decoration: none;
+    transition: var(--transition-color), var(--transition-shadow);
+}
+
+.it-button::before {
+    border-radius: inherit;
+    box-sizing: border-box;
+    content: '';
+    display: block;
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    transition: var(--transition-border), var(--transition-bg-color);
+    width: 100%;
+    z-index: 0;
+}
+
+.it-button span {
+    display: inline-block;
+    flex: 1 1 auto;
+    font: var(--text-btn-md);
+    margin: 4px 8px;
+    position: relative;
+}
+
+.it-button i {
+    position: relative;
+    transition: var(--transition-color);
+}
+
+
+/* Types */
+
+/* Types. Progressbar */
+
+.it-button.progress {
+    background-color: var(--main-primary-0-32);
+    cursor: default;
+    overflow: hidden;
+}
+
+.it-button.progress.disabled {
+    opacity: 1;
+}
+
+.it-button .progress-bar,
+.it-button.progress::before {
+    display: none;
+    z-index: 1;
+}
+
+.it-button.progress span,
+.it-button.progress i {
+    z-index: 2;
+}
+
+.it-button.progress .progress-bar {
+    background-color: var(--main-primary);
+    display: block;
+    height: 100%;
+    left: 0;
+    margin: 0;
+    position: absolute;
+    top: 0;
+    width: 0;
+    z-index: 0;
+}
+
+.it-button.progress + .progress-status {
+    color: var(--main-neutral-secondary);
+    font: var(--text-caption-sm);
+    margin: 10px auto -14px;
+}
+
+/* Types. Negative */
+
+.it-button.negative {
+    background-color: var(--supportive-error);
+}
+
+.it-button.ghost.negative {
+    --mask-color: var(--supportive-error);
+    color: var(--supportive-error);
+}
+
+/* Types. Outline */
+
+.it-button.outline {
+    --mask-color: var(--main-neutral-primary);
+    background-color: transparent;
+    color: var(--main-neutral-primary);
+}
+
+.it-button.outline::before {
+    border: 2px solid var(--main-neutral-terciary);
+}
+
+/* Types. Ghost */
+
+.it-button.ghost {
+    --mask-color: var(--main-neutral-secondary);
+    background-color: transparent;
+    color: var(--main-neutral-secondary);
+}
+
+.it-button.ghost.l-icon {
+    --mask-color: var(--main-neutral-primary);
+}
+
+.it-button.ghost.mask-color-brand,
+.it-button.ghost.mask-color-brand:focus {
+    --mask-color: var(--main-primary);
+}
+
+/* Types. Full width */
+
+.it-button.f-w {
+    width: 100%;
+}
+
+
+/* Sizes */
+
+/* Sizes. Extra large size */
+
+.it-button.xl-size {
+    padding: 16px;
+}
+
+.it-button.xl-size span {
+    font: var(--text-btn-lg);
+    margin: 0 8px;
+}
+
+.it-button.xl-size i ~ span {
+    margin-inline-start: 16px;
+}
+
+.it-button.xl-size span ~ i {
+    margin-inline-start: 8px;
+}
+
+/* Sizes. Large size */
+
+.it-button.lg-size {
+    padding: 12px;
+}
+
+.it-button.lg-size span {
+    font: var(--text-btn-lg);
+    margin: 0 4px;
+}
+
+.it-button.lg-size i ~ span {
+    margin-inline-start: 12px;
+}
+
+.it-button.lg-size span ~ i {
+    margin-inline-start: 12px;
+}
+
+/* Sizes. Small size */
+
+.it-button.sm-size {
+    --icon-size: 16px;
+}
+
+.it-button.sm-size span {
+    font: var(--text-btn-sm);
+    margin: 0 4px;
+}
+
+/* Sizes. Small and Extra small size. Outline button */
+
+.it-button.outline.sm-size::before,
+.it-button.outline.xs-size::before {
+    border-width: 1.5px;
+}
+
+/* Sizes. Extra small size */
+
+.it-button.xs-size {
+    --icon-size: 16px;
+    border-radius: var(--radius-i-xs);
+    padding: 4px;
+}
+
+.it-button.xs-size span {
+    font: var(--text-btn-sm);
+    margin: 0 4px;
+}
+
+
+/* States */
+
+/* States. Hover state. Only for non-touch devices. */
+
+@media (hover: hover) {
+
+    /* Default button */
+
+    .it-button:hover::before {
+        background-color: var(--main-overlay-soft);
+    }
+
+    /* Ghost button */
+
+    .it-button.ghost:hover {
+        --mask-color: var(--main-neutral-primary);
+        color: var(--main-neutral-primary);
+    }
+
+    .it-button.ghost.mask-color-brand:hover {
+        --mask-color: var(--main-primary);
+    }
+
+    /* Types. Negative */
+
+    .it-button.ghost.negative {
+        --mask-color: var(--supportive-error);
+        color: var(--supportive-error);
+    }
+
+}
+
+
+/* States. Focused state */
+
+.it-button:focus {
+    box-shadow: var(--shadow-focused);
+    transition: var(--transition-shadow) .2s;
+}
+
+.it-button:focus::before {
+    background-color: var(--main-overlay-soft);
+}
+
+/* States. Focused state. Outline button */
+
+.it-button.outline:focus::before {
+    border: 2px solid transparent;
+}
+
+/* States. Focused state. Ghost button */
+
+.it-button.ghost:focus {
+    --mask-color: var(--main-neutral-primary);
+    color: var(--main-neutral-primary);
+}
+
+
+/* States. Active state */
+
+.it-button.ghost.active,
+.it-button.ghost.active:hover {
+    --mask-color: var(--main-primary);
+    color: var(--main-primary);
+}
+
+.it-button.ghost.active-bg.active {
+    background-color: var(--main-overlay-primary);
+}
+
+.it-button.ghost.active:hover::before,
+.it-button.ghost.active:focus::before {
+    background-color: transparent;
+}
+
+
+/* States. Disabled state */
+
+.it-button.disabled {
+    cursor: default;
+    opacity: 0.32;
+}
+
+.it-button.disabled::before {
+    display: none;
+}

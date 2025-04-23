@@ -1,0 +1,137 @@
+/*
+ * Tab component
+ *
+ * Default tab: Tab fill type, Medium size.
+
+    <div id="tabs-label-id"></div>
+    <div class="it-tab-list" role="tablist" aria-labelledby="tabs-label-id">
+        <div class="it-tabs-container">
+            <button class="it-tab"
+                role="tab"
+                type="button"
+                id="tab-1-id"
+                aria-selected="true"
+                aria-controls="tabpanel-1-id">
+                <span></span>
+            </button>
+        </div>
+
+        <div class="it-tab-panel"
+            role="tabpanel"
+            id="tabpanel-1-id"
+            tabindex="0"
+            aria-labelledby="tab-1-id">
+        </div>
+    </div>
+
+*/
+
+.it-tab-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.it-tabs-container {
+    display: flex;
+    flex: 0 0 auto;
+    width: 100%;
+}
+
+.it-tabs-container.underline {
+    box-shadow: inset 0 -1px 0 0 var(--main-borders-and-lines);
+}
+
+.it-tab {
+    --icon-size: 24px;
+    --mask-color: var(--main-neutral-primary);
+    -webkit-tap-highlight-color: transparent;
+    align-items: center;
+    background: none;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    color: var(--main-neutral-primary);
+    cursor: pointer;
+    display: inline-flex;
+    justify-content: center;
+    margin: 0;
+    outline: none;
+    overflow: hidden;
+    padding: 8px 8px 6px;
+    position: relative;
+    transition: var(--transition-color), var(--transition-border-color), var(--transition-shadow);
+}
+
+.it-tab + .it-tab {
+    margin-inline-start: 8px;
+}
+
+.it-tab i {
+    transition: var(--transition-color);
+}
+
+.it-tab span {
+    font: 700 var(--text-body-sm);
+    overflow: hidden;
+    max-width: 100%;
+    padding: 0 8px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.it-tab span:first-child {
+    margin-inline-start: 8px;
+}
+
+.it-tab span:last-child {
+    margin-inline-end: 8px;
+}
+
+/* States. Extra spacing. */
+
+.it-tabs-container.extra-space .it-tab {
+    padding-bottom: 14px;
+    padding-top: 16px;
+}
+
+.it-tabs-container.secondary .it-tab {
+    --mask-color: var(--main-neutral-secondary);
+    color: var(--main-neutral-secondary);
+}
+
+
+/* States */
+
+/* States. Hover state. Only for non-touch devices. */
+
+@media (hover: hover) {
+
+    /* Default button */
+
+    .it-tab:hover,
+    .it-tabs-container.secondary .it-tab:hover {
+        --mask-color: var(--main-primary);
+        color: var(--main-primary);
+    }
+
+}
+
+
+/* States. Focused state */
+
+.it-tab:focus,
+.it-tab.active:focus {
+    --mask-color: var(--main-primary);
+    color: var(--main-primary);
+}
+
+
+/* States. Active state */
+
+.it-tab.active,
+.it-tab.active:hover,
+.it-tabs-container.secondary .it-tab.active,
+.it-tabs-container.secondary .it-tab.active:hover {
+    --mask-color: var(--main-primary);
+    border-color: var(--main-primary);
+    color: var(--main-primary);
+}

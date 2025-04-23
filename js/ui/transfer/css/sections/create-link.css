@@ -43,14 +43,14 @@
 }
 
 .it-box.get-link-box .desktop-scroll-area {
-    height: 288px;
+    max-height: 288px;
     padding-bottom: 12px;
     padding-top: 12px;
     position: relative;
 }
 
 .it-box.get-link-box .desktop-scroll-area.ext {
-    height: 356px;
+    max-height: 364px;
 }
 
 .it-box.get-link-box .form-header .it-button {
@@ -516,9 +516,10 @@
 
 @media only screen and (max-width: 960px), only screen and (max-height: 400px) {
 
-    .it-box.get-link-box .desktop-scroll-area,
-    .it-box.get-link-box .desktop-scroll-area.ext {
-        height: auto;
+    .page-content .it-box-holder .it-box.get-link-box .desktop-scroll-area {
+        max-height: none;
+        padding-bottom: 12px;
+        padding-top: 12px;
     }
 
 }

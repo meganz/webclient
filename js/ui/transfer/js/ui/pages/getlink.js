@@ -145,6 +145,23 @@ lazy(T.ui, 'addFilesLayout', () => {
                 cn.querySelectorAll('input[type="password"], input[type="text"], textarea')
             );
 
+            // Init chips (multiple values)
+            let timeout = false;
+            T.ui.input.initChips(rn, {
+                validate: (val) => {
+                    const is_valid = isValidEmail(val);
+                    if (!is_valid) {
+                        T.ui.input.errorMsg(rn, l[7415]);
+                        clearTimeout(timeout);
+
+                        timeout = setTimeout(() => {
+                            T.ui.input.errorMsg(rn);
+                        }, 2e3);
+                    }
+                    return is_valid;
+                }
+            });
+
             email.addEventListener('change', () => {
                 if (String(email.value).trim()) {
                     cn.querySelector('.dl-notif').classList.remove('disabled');
@@ -200,6 +217,8 @@ lazy(T.ui, 'addFilesLayout', () => {
 
             // Init "Send to" input evt
             rn.addEventListener('input', () => this.updateGetLinkBtn());
+            rn.addEventListener('blur', () => this.updateGetLinkBtn());
+            rn.addEventListener('focus', () => this.updateGetLinkBtn());
 
             // Init Terms and Privacy checkbox
             terms.addEventListener('change', () => this.updateGetLinkBtn());
@@ -429,9 +448,9 @@ lazy(T.ui, 'addFilesLayout', () => {
             exp.value = ''; // Expiry date input
             msg.value = ''; // Message textarea
             pw.value = ''; // Password input
-            rn.value = ''; // Recipients input
             sched.value = 'None'; // scheduled input
             tn.value = ''; // Title input
+            T.ui.input.clear(rn); // Recipients input
             delete tn.dataset.customVal;
 
             // Reset Get link button
@@ -566,10 +585,11 @@ lazy(T.ui, 'addFilesLayout', () => {
             const { files } = this.data;
             const { cn, btn, rn, tn, terms } = this.addedFiles;
             const sgm = cn.querySelector('input[name="glb-manage-sgm"]:checked');
+            const recipients = isValidEmail(rn.value) || T.ui.input.getValue(rn).length;
 
             // Check files, email, recipients (if sending a link)
             if (tn.value.trim() && files.length && terms.checked
-                && (sgm.value === '1' && rn.value.trim() || sgm.value === '0')) {
+                && (sgm.value === '1' && recipients || sgm.value === '0')) {
                 btn.classList.remove('disabled');
             }
             else {
@@ -666,10 +686,9 @@ lazy(T.ui, 'addFilesLayout', () => {
         */
         async finishTransferring() {
             if (!this.data.stashing) {
-                const {cn} = this.addedFiles;
+                const {cn, rn} = this.addedFiles;
 
-                const email = cn.querySelector('input[name="glb-manage-sgm"]:checked').value > 0
-                    && document.getElementById('glb-recipients-input').value;
+                const emails = T.ui.input.getValue(rn);
 
                 const {value: sender} = document.getElementById('glb-email-input');
                 const {value: message} = document.getElementById('glb-msg-area');
@@ -685,8 +704,11 @@ lazy(T.ui, 'addFilesLayout', () => {
                     const en = cn.querySelector('.exp-notif input').checked | 0;
                     p.push(T.core.setTransferAttributes(xh, {sender, message, password, expiry, en}));
                 }
-                if (email) {
-                    p.push(T.core.setTransferRecipients(xh, {email, schedule}));
+
+                if (emails.length) {
+                    p.push(T.core.setMultiTransferRecipients(
+                        xh, emails.map((email) => ({email, xh}))
+                    ));
                 }
 
                 this.data.stashing = Promise.all(p);

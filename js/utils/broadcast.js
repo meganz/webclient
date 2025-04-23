@@ -435,9 +435,11 @@
                             if (self.d) {
                                 crossTab.logger.info(`\u{1F9F2} CROSS-TAB MESSAGING INITIALIZED AS ${type} \u{1F440}`);
 
-                                console.log(str(ua));
-                                console.log(buildVersion);
-                                console.log(browserdetails(ua).prod + u_handle);
+                                console.log(str(self.ua));
+                                console.log(self.buildVersion);
+                                if (self.browserdetails) {
+                                    console.log(browserdetails(ua).prod + u_handle);
+                                }
                             }
                             mBroadcaster.sendMessage('crossTab:setup', this.owner);
 

@@ -237,6 +237,9 @@ html/*-postbuild.html
 ## Miscellaneous
 #############
 
+*.7z
+*.tgz
+
 # Translations
 *.mo
 

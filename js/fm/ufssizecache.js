@@ -204,7 +204,7 @@ UFSSizeCache.prototype.addToDB = function(n) {
     if (n.t) {
         this.addTreeNode(n);
 
-        if (fminitialized) {
+        if (self.fminitialized) {
             // onFolderSizeChangeUIUpdate will quit if not correct path
             M.onFolderSizeChangeUIUpdate(n);
         }

@@ -535,7 +535,7 @@ var ulmanager = {
                 else {
                     errorstr = reason.substr(0, 50) + '...';
                 }
-                if (!file.isCreateFile) {
+                if (!file.ulSilent) {
                     $('#ul_' + file.id + ' .transfer-status').text(errorstr);
                 }
                 msgDialog('warninga', l[1309], l[1498] + ': ' + fileName, reason);
@@ -691,6 +691,9 @@ var ulmanager = {
             target = mega.fileRequestUpload.getUploadPageOwnerHandle();
             dir = mega.fileRequestUpload.getUploadPagePuHandle();
         }
+        else if (file.xput) {
+            req_type = 'xp';
+        }
 
         var req = {
             v: 3,
@@ -700,7 +703,7 @@ var ulmanager = {
                 t: 0,
                 h: file.response,
                 a: ab_to_base64(crypto_makeattr(n)),
-                k: target.length === 11
+                k: req_type === 'xp' ? a32_to_base64(file.filekey) : target.length === 11
                     ? base64urlencode(encryptto(target, a32_to_str(file.filekey)))
                     : a32_to_base64(encrypt_key(u_k_aes, file.filekey))
             }],
@@ -983,7 +986,7 @@ var ulmanager = {
             }
         }
 
-        if (!file.isCreateFile) {
+        if (!file.ulSilent) {
             M.ulstart(file);
         }
         if (file.done_starting) {
@@ -991,15 +994,23 @@ var ulmanager = {
         }
     },
 
-    ulComplete: function(req, ctx) {
+    ulComplete(payload, ctx) {
         'use strict';
-        api.screq(req)
+        api.screq(payload, payload.a === 'xp' && {apipath: 'https://bt7.api.mega.co.nz/'})
             .catch(echo)
             .then((res) => {
-                ulmanager.ulCompletePending2(
-                    typeof res === 'number' && res < 0 ? { result: res, payload: req } : res,
-                    ctx
-                );
+                const result = Number(res.result || res) | 0;
+                if (result < 0) {
+                    res = freeze({...res, payload, result});
+                }
+                else if (payload.a === 'xp') {
+                    if (self.T && 'core' in T) {
+                        T.core.populate(res.result.f, ctx.file.xput);
+                    }
+                    res = freeze({...res, handle: res.result.f[0].h});
+                }
+
+                ulmanager.ulCompletePending2(res, ctx);
             })
             .catch(reportError);
     },
@@ -1294,7 +1305,7 @@ var ulmanager = {
             }
         };
 
-        if (is_megadrop) {
+        if (is_megadrop || self.is_transferit) {
             return startUpload();
         }
 
@@ -1354,18 +1365,24 @@ var ulmanager = {
 };
 
 
-function UploadQueue() {}
-inherits(UploadQueue, Array);
+class UploadQueue extends Array {
+    push(...args) {
+        if (!self.u_k_aes) {
+            if (!self.mkwarn) {
+                self.mkwarn = 1;
+                tell(l[8853]);
+            }
+            return;
+        }
+        const pos = super.push(...args) - 1;
+        const file = this[pos];
 
-UploadQueue.prototype.push = function() {
-    var pos = Array.prototype.push.apply(this, arguments) - 1;
-    var file = this[pos];
+        file.pos = pos;
+        ulQueue.poke(file);
 
-    file.pos = pos;
-    ulQueue.poke(file);
-
-    return pos + 1;
-};
+        return pos + 1;
+    }
+}
 
 
 function ChunkUpload(file, start, end, altport) {
@@ -1411,7 +1428,7 @@ ChunkUpload.prototype.updateprogress = function() {
     this.file.progressevents = (this.file.progressevents || 0) + 1;
     p = GlobalProgress[this.gid].speed = this.file.speedometer ? this.file.speedometer.progress(tp) : 0;
 
-    if (!this.file.isCreateFile) {
+    if (!this.file.ulSilent) {
         M.ulprogress(this.file, Math.floor(tp / this.file.size * 100), tp, this.file.size, p);
     }
 
@@ -1523,7 +1540,17 @@ ChunkUpload.prototype.onXHRready = function(xhrEvent) {
                     u8 = undefined;
                 }
                 else {
-                    console.assert(false, 'check this...');
+                    const cl = this.logger ? this : ulmanager;
+                    const cmpl = ulmanager.ulCompletingPhase[this.gid];
+                    const m = cmpl
+                        ? 'Unexpected upload completion flow on %s!'
+                        : 'Unrecoverable upload error for %s';
+                    cl.logger.warn(m, this.gid, this.xid, cmpl, [this]);
+
+                    if (!cmpl) {
+                        cl.logger.error('starting over...', [this]);
+                        return this.onXHRerror("$FATAL", null, l[16]);
+                    }
                 }
             }
 
@@ -1763,11 +1790,20 @@ FileUpload.prototype.run = function(done) {
     file.xr = dlmanager.mGetXR();
     file.ul_lastreason = file.ul_lastreason || 0;
 
-    var domNode = document.getElementById('ul_' + file.id);
-    if (ulmanager.ulStartingPhase || !(domNode || file.isCreateFile)) {
-        done();
-        ASSERT(0, "This shouldn't happen");
-        return ulQueue.pushFirst(this);
+    if (!(file.ulSilent || file.xput)) {
+        const domNode = document.getElementById(`ul_${file.id}`);
+
+        if (ulmanager.ulStartingPhase || !domNode) {
+            done();
+            ASSERT(0, "This shouldn't happen");
+            return ulQueue.pushFirst(this);
+        }
+        domNode.classList.add('transfer-initiliazing');
+
+        const transferStatus = domNode.querySelector('.transfer-status');
+        if (transferStatus) {
+            transferStatus.textContent = l[1042];
+        }
     }
 
     if (!GlobalProgress[this.gid].started) {
@@ -1776,13 +1812,6 @@ FileUpload.prototype.run = function(done) {
 
     if (d) {
         ulmanager.logger.info(file.name, "starting upload", file.id);
-    }
-    if (!file.isCreateFile) {
-        domNode.classList.add('transfer-initiliazing');
-        const transferStatus = domNode.querySelector('.transfer-status');
-        if (transferStatus) {
-            transferStatus.textContent = l[1042];
-        }
     }
 
     ulmanager.ulSize += file.size;
@@ -1925,7 +1954,7 @@ ulQueue.poke = function(file, meth) {
     }
 
     if (meth !== 0xdead) {
-        if (!meth && file.isCreateFile && file.size === 0) {
+        if (!meth && file.ulSilent && file.size === 0) {
             meth = 'pushFirst';
         }
 
@@ -1945,7 +1974,7 @@ ulQueue.validateTask = function(pzTask) {
 
     if (pzTask instanceof FileUpload
         && !ulmanager.ulStartingPhase
-        && (document.getElementById('ul_' + pzTask.file.id) || pzTask.file.isCreateFile)) {
+        && (pzTask.file.xput || pzTask.file.ulSilent || document.getElementById(`ul_${pzTask.file.id}`))) {
 
         return true;
     }
@@ -1959,7 +1988,7 @@ ulQueue.canExpand = function(max) {
 };
 
 Object.defineProperty(ulQueue, 'maxActiveTransfers', {
-    get: is_mobile
+    get: is_mobile || self.is_transferit
         ? function() {
             // If on mobile, there's only 1 upload at a time and the desktop calculation below fails
             return 1;

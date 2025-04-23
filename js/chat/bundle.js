@@ -6782,6 +6782,57 @@ class ExtraFooterElement extends modalDialogs_React.Component {
     return this.props.children;
   }
 }
+class SafeShowDialogController extends mixins.w9 {
+  constructor(props) {
+    super(props);
+    this.dialogName = 'unnamed-dialog';
+    this.dialogBecameVisible = null;
+    const {
+      render
+    } = this;
+    this.render = () => {
+      if (this.dialogBecameVisible) {
+        console.assert($.dialog === this.dialogName, `${this.dialogName} state overridden.`);
+        return render.call(this);
+      }
+      return null;
+    };
+  }
+  componentDidMount() {
+    super.componentDidMount();
+    M.safeShowDialog(this.dialogName, () => {
+      if (!this.isMounted()) {
+        throw new Error(`${this.dialogName} component is no longer mounted.`);
+      }
+      this.dialogBecameVisible = 1;
+      this.forceUpdate();
+    });
+  }
+  componentWillUnmount() {
+    super.componentWillUnmount();
+    if (this.dialogBecameVisible) {
+      this.dialogBecameVisible = false;
+      console.assert($.dialog === this.dialogName);
+      if ($.dialog === this.dialogName) {
+        closeDialog();
+      }
+    }
+  }
+  componentDidUpdate() {
+    assert(this.dialogBecameVisible);
+    super.componentDidUpdate();
+    if (++this.dialogBecameVisible === 2) {
+      requestAnimationFrame(() => {
+        const dialog = document.querySelectorAll(`.${this.dialogName}`);
+        console.assert(dialog.length === 1, `Unexpected ${this.dialogName} state.`);
+        console.assert($.dialog === this.dialogName, `${this.dialogName} state overridden.`);
+        if (dialog.length === 1 && $.dialog === this.dialogName) {
+          dialog[0].classList.remove('hidden', 'arrange-to-back');
+        }
+      });
+    }
+  }
+}
 class ModalDialog extends mixins.w9 {
   constructor(props) {
     super(props);
@@ -7187,6 +7238,7 @@ lazy(ConfirmDialog, 'defaultProps', () => {
 const modalDialogs = {
   ModalDialog,
   SelectContactDialog,
+  SafeShowDialogController,
   ConfirmDialog
 };
 
@@ -14357,9 +14409,19 @@ const fmView = REQ_(701);
 
 
 
-
 const MIN_SEARCH_LENGTH = 2;
-class CloudBrowserDialog extends mixins.w9 {
+class CloudBrowserDialog extends modalDialogs.A.SafeShowDialogController {
+  static getFilterFunction(customFilterFn) {
+    return tryCatch(n => {
+      if (n.s4 && n.p === M.RootID && M.getS4NodeType(n) === 'container') {
+        return false;
+      }
+      if (!n.name || missingkeys[n.h] || M.getNodeShare(n).down) {
+        return false;
+      }
+      return !customFilterFn || customFilterFn(n);
+    });
+  }
   constructor(props) {
     super(props);
     this.domRef = REaCt().createRef();
@@ -14529,17 +14591,8 @@ class CloudBrowserDialog extends mixins.w9 {
       'highlighted': []
     });
   }
-  componentDidMount() {
-    super.componentDidMount();
-    M.safeShowDialog(this.dialogName, () => $(`.${this.dialogName}`));
-  }
-  componentWillUnmount() {
-    super.componentWillUnmount();
-    if ($.dialog === this.dialogName) {
-      closeDialog();
-    }
-  }
   render() {
+    assert(this.dialogBecameVisible);
     const self = this;
     const viewMode = mega.config.get('cbvm') | 0;
     const classes = `add-from-cloud ${self.props.className} dialog-template-tool `;
@@ -14548,7 +14601,7 @@ class CloudBrowserDialog extends mixins.w9 {
     let isS4Cn = false;
     const isSearch = this.state.currentlyViewedEntry === 'search';
     const entryId = isSearch ? self.state.highlighted[0] : self.state.currentlyViewedEntry;
-    const filterFn = entryId === M.RootID && M.tree.s4 ? n => !M.tree.s4[n.h] : null;
+    const filterFn = CloudBrowserDialog.getFilterFunction(this.props.customFilterFn);
     const isIncomingShare = M.getNodeRoot(entryId) === "shares";
     this.state.highlighted.forEach(nodeId => {
       if (M.d[nodeId] && M.d[nodeId].t === 1) {
@@ -14563,9 +14616,12 @@ class CloudBrowserDialog extends mixins.w9 {
       "label": this.props.cancelLabel,
       "key": "cancel",
       "onClick": e => {
-        this.props.onClose(this);
         e.preventDefault();
         e.stopPropagation();
+        if (this.props.onCancel) {
+          this.props.onCancel(this);
+        }
+        this.props.onClose(this);
       }
     }];
     if (folderIsHighlighted) {
@@ -14649,9 +14705,7 @@ class CloudBrowserDialog extends mixins.w9 {
         "className": `positive ${  this.state.selected.length === 0 || share && share.down || isS4Cn ? "disabled" : ""}`,
         "onClick": e => {
           if (this.state.selected.length > 0) {
-            this.props.onSelected(this.state.selected.filter(node => {
-              return !M.getNodeShare(node).down && !(M.tree.s4 && M.tree.s4[node.h]);
-            }));
+            this.props.onSelected(this.state.selected);
             this.props.onAttachClicked();
           }
           e.preventDefault();
@@ -14785,9 +14839,9 @@ CloudBrowserDialog.defaultProps = {
   'hideable': true,
   'className': ''
 };
-window.CloudBrowserModalDialogUI = {
-  CloudBrowserDialog
-};
+Object.defineProperty(mega, 'CloudBrowserDialog', {
+  value: CloudBrowserDialog
+});
 const cloudBrowserModalDialog = {
   CloudBrowserDialog
 };
@@ -24942,7 +24996,7 @@ class ColumnSize extends genericNodePropsComponent.B {
     return REaCt().createElement("td", {
       megatype: ColumnSize.megatype,
       className: "size"
-    }, !nodeAdapter.nodeProps.isFolder ? nodeAdapter.nodeProps.size : "");
+    }, nodeAdapter.nodeProps.size);
   }
 }
 ColumnSize.sortable = true;
@@ -25512,35 +25566,32 @@ class FMView extends mixins.w9 {
     const sortBy = newState && newState.sortBy || self.state.sortBy;
     const order = sortBy[1] === "asc" ? 1 : -1;
     const entries = [];
+    let sortFunc, filterFunc, dataSource;
     const minSearchLength = self.props.minSearchLength || 3;
     const showSen = mega.sensitives.showGlobally;
     if (self.props.currentlyViewedEntry === "search" && self.props.searchValue && self.props.searchValue.length >= minSearchLength) {
-      M.getFilterBy(M.getFilterBySearchFn(self.props.searchValue)).forEach((n) => {
-        if (!n.h || n.h.length === 11 || n.fv || !showSen && mega.sensitives.isSensitive(n)) {
-          return;
-        }
-        if (self.props.customFilterFn && !self.props.customFilterFn(n)) {
-          return;
-        }
-        entries.push(n);
-      });
+      dataSource = this.dataSource;
+      filterFunc = M.getFilterBySearchFn(self.props.searchValue);
     } else {
-      Object.keys(M.c[self.props.currentlyViewedEntry] || M.tree[self.props.currentlyViewedEntry] || self.props.dataSource || {}).forEach(h => {
+      const tmp = M.c[self.props.currentlyViewedEntry] || M.tree[self.props.currentlyViewedEntry] || this.props.dataSource;
+      dataSource = Object.create(null);
+      for (const h in tmp) {
         if (this.dataSource[h]) {
-          if (!showSen && mega.sensitives.isSensitive(this.dataSource[h])) {
-            return;
-          }
-          if (self.props.customFilterFn) {
-            if (self.props.customFilterFn(this.dataSource[h])) {
-              entries.push(this.dataSource[h]);
-            }
-          } else {
-            entries.push(this.dataSource[h]);
-          }
+          dataSource[h] = this.dataSource[h];
         }
-      });
+      }
     }
-    let sortFunc;
+    const {
+      customFilterFn
+    } = this.props;
+    for (const h in dataSource) {
+      const n = dataSource[h];
+      const e = n && (!n.h || n.h.length === 8 && crypto_keyok(n) || n.h.length === 11);
+      const s = e && !n.fv && (showSen || !mega.sensitives.isSensitive(n));
+      if (s && (!customFilterFn || customFilterFn(n)) && (!filterFunc || filterFunc(n))) {
+        entries.push(n);
+      }
+    }
     if (sortBy[0] === "name") {
       sortFunc = M.getSortByNameFn();
     } else if (sortBy[0] === "size") {
@@ -36809,7 +36860,7 @@ class NodeProperties {
       return !!node.fav;
     });
     lazy(this, 'size', () => {
-      return bytesToSize(node.s);
+      return bytesToSize(node.tb || node.s);
     });
     lazy(this, 'timestamp', () => {
       return time2date(node.ts);

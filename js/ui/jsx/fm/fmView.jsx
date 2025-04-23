@@ -120,6 +120,7 @@ export default class FMView extends MegaRenderMixin {
         var order = sortBy[1] === "asc" ? 1 : -1;
         var entries = [];
 
+        let sortFunc, filterFunc, dataSource;
         const minSearchLength = self.props.minSearchLength || 3;
         const showSen = mega.sensitives.showGlobally;
 
@@ -128,46 +129,33 @@ export default class FMView extends MegaRenderMixin {
             self.props.searchValue &&
             self.props.searchValue.length >= minSearchLength
         ) {
-            M.getFilterBy(M.getFilterBySearchFn(self.props.searchValue))
-                .forEach(function(n) {
-                    // skip contacts and invalid data.
-                    if (
-                        !n.h
-                        || n.h.length === 11
-                        || n.fv
-                        || (!showSen && mega.sensitives.isSensitive(n))
-                    ) {
-                        return;
-                    }
-                    if (self.props.customFilterFn && !self.props.customFilterFn(n)) {
-                        return;
-                    }
-                    entries.push(n);
-                });
+            dataSource = this.dataSource;
+            filterFunc = M.getFilterBySearchFn(self.props.searchValue);
         }
         else {
-            Object.keys(
+            const tmp =
                 M.c[self.props.currentlyViewedEntry]
                 || M.tree[self.props.currentlyViewedEntry]
-                || self.props.dataSource || {}
-            ).forEach((h) => {
+                || this.props.dataSource;
+            dataSource = Object.create(null);
+            for (const h in tmp) {
                 if (this.dataSource[h]) {
-                    if (!showSen && mega.sensitives.isSensitive(this.dataSource[h])) {
-                        return;
-                    }
-                    if (self.props.customFilterFn) {
-                        if (self.props.customFilterFn(this.dataSource[h])) {
-                            entries.push(this.dataSource[h]);
-                        }
-                    }
-                    else {
-                        entries.push(this.dataSource[h]);
-                    }
+                    dataSource[h] = this.dataSource[h];
                 }
-            });
+            }
         }
 
-        var sortFunc;
+        const {customFilterFn} = this.props;
+        for (const h in dataSource) {
+            const n = dataSource[h];
+            const e = n && (!n.h || (n.h.length === 8 && crypto_keyok(n) || n.h.length === 11));
+            const s = e && !n.fv && (showSen || !mega.sensitives.isSensitive(n));
+
+            if (s && (!customFilterFn || customFilterFn(n)) && (!filterFunc || filterFunc(n))) {
+
+                entries.push(n);
+            }
+        }
 
         if (sortBy[0] === "name") {
             sortFunc = M.getSortByNameFn();

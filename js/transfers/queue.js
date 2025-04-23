@@ -48,6 +48,7 @@ function MegaQueue(worker, limit, name) {
     this._expanded = 0;
     this._qpaused = {};
     this._pending = [];
+    this._events = Object.create(null);
 
     Object.defineProperty(this, "qname", {
         value: String(name || 'unk'),
@@ -78,12 +79,32 @@ function MegaQueue(worker, limit, name) {
     if (MegaQueue.weakRef) {
         MegaQueue.weakRef.set(this, Object.getPrototypeOf(this));
     }
-
-    MegaEvents.call(this);
 }
-inherits(MegaQueue, MegaEvents);
 
 MegaQueue.weakRef = window.d > 1 && new WeakMap();
+
+MegaQueue.prototype.trigger = function(name, args) {
+    'use strict';
+    let res = false;
+    const evs = this._events && this._events[name];
+    if (evs) {
+        for (let i = 0; i < evs.length; ++i) {
+            evs[i].apply(null, args || []);
+            ++res;
+        }
+    }
+    return res;
+};
+MegaQueue.prototype.on = function(callback) {
+    'use strict';
+    if (this._events) {
+        if (!this._events[name]) {
+            this._events[name] = [];
+        }
+        this._events[name].push(tryCatch(callback));
+    }
+    return this;
+};
 
 MegaQueue.prototype.getSize = function() {
     return this._limit;

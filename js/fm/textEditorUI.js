@@ -53,7 +53,7 @@ mega.textEditorUI = new function TextEditorUI() {
 
         var openFile = function() {
             loadingDialog.show('common', l[23130]);
-            var nodeHandle = ($.selected && $.selected[0]) || (selected && selected[0]);
+            const nodeHandle = selected && selected[0];
             if (!nodeHandle) {
                 loadingDialog.hide();
                 return;
@@ -307,7 +307,7 @@ mega.textEditorUI = new function TextEditorUI() {
         $('.file-menu .open-f', $menuBar).rebind(
             'click.txt-editor',
             function openFileClick() {
-                M.initFileAndFolderSelectDialog('openFile', selectedItemOpen);
+                M.initFileAndFolderSelectDialog('open-file').then(selectedItemOpen).catch(tell);
             }
         );
 

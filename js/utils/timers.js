@@ -10,7 +10,9 @@ function later(callback) {
  */
 function Soon(callback) {
     'use strict';
-    queueMicrotask(callback);
+    if (typeof callback === 'function') {
+        queueMicrotask(callback);
+    }
 }
 
 /**
@@ -539,7 +541,7 @@ lazy(self, 'sleep', function sleep() {
                 if (done) {
                     break;
                 }
-                await fetch(`https://bt1.api.mega.co.nz/to?${v >> 1}`).catch(nop);
+                await fetch(`${self.apipath}to?${v >> 1}`).catch(nop);
             }
             while (performance.now() - now < v * 1e3);
         };

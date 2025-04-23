@@ -2727,8 +2727,15 @@ FileManager.prototype.createFolderUI = function() {
             ephemeralDialog(l[1005]);
         }
         else {
-            M.initFileAndFolderSelectDialog('create-new-link');
-            eventlog(500736);
+            M.initFileAndFolderSelectDialog('create-new-link')
+                .then((nodes) => {
+                    if (nodes.length) {
+                        M.addSelectedNodes(nodes, true);
+                        return M.getLinkAction();
+                    }
+                })
+                .then(() => eventlog(500736))
+                .catch(tell);
         }
     });
 };
@@ -2736,106 +2743,96 @@ FileManager.prototype.createFolderUI = function() {
 /**
  * Initialize file and folder select dialog from chat.
  * This will fill up $.selected with what user selected on the dialog.
- * @param {String} type Type of dialog for select default options, e.g. newLink for New public link
+ * @param {String|Object} type Type of dialog for select default options, or an options object
+ * @returns {Promise<Array>} selected nodes, if any.
  */
-FileManager.prototype.initFileAndFolderSelectDialog = function(type, OnSelectCallback) {
+FileManager.prototype.initFileAndFolderSelectDialog = async function(type) {
     'use strict';
-    /* eslint-enable id-length */
+
     // If chat is not ready.
     if (!megaChatIsReady) {
         if (megaChatIsDisabled) {
-            console.error('Mega Chat is disabled, cannot proceed');
+            throw new Error('This feature requires MEGAchat, which is disabled.');
         }
-        else {
-            // Waiting for chat_initialized broadcaster.
-            loadingDialog.show();
-            mBroadcaster.once('chat_initialized', this.initFileAndFolderSelectDialog.bind(this, type));
-        }
-        return false;
-    }
 
-    loadingDialog.hide();
+        // Waiting for chat_initialized broadcaster.
+        loadingDialog.show();
+        await mBroadcaster.when('chat_initialized')
+            .finally(() => loadingDialog.hide());
+    }
+    const {promise, resolve} = Promise.withResolvers();
 
     // Using existing File selector dialog from chat.
     var dialogPlacer = document.createElement('div');
     var selected = [];
     let $$rootRef;
-    let isClosing = false;
-    var doClose = function(noClearSelected) {
-        if (!isClosing) {
-            isClosing = true;
-            $$rootRef.unmount();
+    const doClose = tryCatch(() => {
+        if ($$rootRef) {
+            resolve(selected);
+            setTimeout((e) => e.unmount(), 20, $$rootRef);
+            $$rootRef = null;
             dialogPlacer.remove();
-            if (!noClearSelected) {
-                selected = [];
-            }
         }
-    };
+    });
 
-    var options = {
+    const diag = freeze({
         'create-new-link': {
             title: l[20667],
-            classes: 'no-incoming', // Hide incoming share tab
+            className: 'no-incoming', // Hide incoming share tab
             selectLabel: l[1523],
-            folderSelectable: true, // Can select folder(s)
-            onAttach: function() {
-                doClose(true);
-                $.selected = selected;
-                M.getLinkAction();
-            }
+            folderSelectable: true
         },
-        'openFile': {
+        'open-file': {
             title: l[22666],
-            classes: 'no-incoming', // Hide incoming share tab
+            className: 'no-incoming', // Hide incoming share tab
             selectLabel: l[865],
             folderSelectNotAllowed: true,
             folderSelectable: false, // Can select folder(s)
-            customFilterFn: function(node) {
+            customFilterFn(node) {
                 if (node.t) {
                     return true;
                 }
                 if (node.s >= 20971520) {
                     return false;
                 }
-
-                if (is_text(node)) {
-                    return true;
-                }
-                return false;
-            },
-            onAttach: function() {
-                doClose(true);
-                $.selected = selected;
-                if (OnSelectCallback) {
-                    OnSelectCallback(selected);
-                }
+                return !!is_text(node);
             }
         }
-    };
+    });
+    assert(typeof type !== 'string' || diag[type], `Invalid ${type} type provided.`);
+    let options = typeof type === 'string' && diag[type];
 
-    var prop = {
-        title: options[type].title,
-        folderSelectable: options[type].folderSelectable,
-        selectLabel: options[type].selectLabel,
-        className: options[type].classes,
-        onClose: function() {
+    if (!options) {
+        options = {...type};
+        const {onClose} = options;
+
+        options.onClose = () => {
+            if (typeof onClose === 'function') {
+                onIdle(onClose);
+            }
             doClose();
-        },
-        onSelected: function(node) {
-            selected = node;
-        },
-        onAttachClicked: options[type].onAttach,
-    };
-    if (options[type].folderSelectNotAllowed) {
-        prop.folderSelectNotAllowed = options[type].folderSelectNotAllowed;
-    }
-    if (options[type].customFilterFn) {
-        prop.customFilterFn = options[type].customFilterFn;
+        };
     }
 
-    const dialog = React.createElement(CloudBrowserModalDialogUI.CloudBrowserDialog, prop);
+    const dialog = React.createElement(mega.CloudBrowserDialog, {
+        title: l[8011],
+        selectLabel: l[1523],
+        folderSelectable: true,
+        className: 'no-incoming',
+        onClose: doClose,
+        onAttachClicked: doClose,
+        onCancel() {
+            selected = false;
+        },
+        onSelected(sel) {
+            selected = sel;
+        },
+        ...options
+    });
     $$rootRef = ReactDOM.createRoot(dialogPlacer);
     $$rootRef.render(dialog);
+
+    return promise;
 };
 
 FileManager.prototype.initNewChatlinkDialog = function() {

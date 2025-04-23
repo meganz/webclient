@@ -297,6 +297,10 @@ function api_reqfailed(channel, error) {
             mega.loadReport.errs++;
         }
     }
+    else if (self.is_transferit) {
+        console.error(`unhandled request-level error on #${c}...`, e);
+        return e;
+    }
     else if (self.is_iframed) {
         // most of the functions used here are not available on i-framed contexts, show a generic message.
         tell(e);
@@ -1069,7 +1073,10 @@ function api_getsid2(res, ctx) {
         emailchange.verify(new sjcl.cipher.aes(ctx.passwordkey), { k1: res.k, k2: k });
     }
 
-    ctx.result(ctx, r);
+    if (ctx.result) {
+        ctx.result(ctx, r);
+    }
+    return r;
 }
 
 // We call ug using the sid from setsid() and the user's master password to obtain the master key (and other credentials)
@@ -1618,6 +1625,10 @@ function api_storefileattr(id, type, key, data, ctx, ph) {
             storedattr[id] = Object.create(null);
         }
 
+        if (self.d > 1) {
+            console.info(id | 0, `fa(${type})`, mObjectURL([data], 'image/jpeg'));
+        }
+
         if (key) {
             data = asmCrypto.AES_CBC.encrypt(data, a32_to_ab(key), false);
         }
@@ -1646,7 +1657,12 @@ function api_storefileattr(id, type, key, data, ctx, ph) {
         req.ph = ctx.ph;
     }
 
-    api_req(req, ctx, pfid ? 1 : 0);
+    return api.req(req, self.pfid ? 1 : 0)
+        .catch(echo)
+        .then((res) => {
+            const result = Number(res.result || res) | 0;
+            ctx.callback(result < 0 ? result : res.result, ctx, {q: !1});
+        });
 }
 
 async function api_getfileattr(fa, type, procfa, errfa) {
@@ -1731,8 +1747,10 @@ async function api_getfileattr(fa, type, procfa, errfa) {
 lazy(fa_handler, 'lru', () => {
     'use strict';
     const lru = Object.create(null);
-    lazy(lru, 0, () => LRUMegaDexie.create('fa-handler.0', 1e4));
-    lazy(lru, 1, () => LRUMegaDexie.create('fa-handler.1', 1e3));
+    if (self.LRUMegaDexie) {
+        lazy(lru, 0, () => LRUMegaDexie.create('fa-handler.0', 1e4));
+        lazy(lru, 1, () => LRUMegaDexie.create('fa-handler.1', 1e3));
+    }
     return lru;
 });
 

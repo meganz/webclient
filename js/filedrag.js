@@ -1,10 +1,6 @@
 (function(scope) {
     'use strict';
 
-    var dir_inflight = 0;
-    var filedrag_u = [];
-    var filedrag_paths = Object.create(null);
-
     const optionReference = {
         touchedElement: 0,
         fileRequestEnabled: false,
@@ -49,99 +45,22 @@
 
         if (M.isFileDragPage(page) || straight) {
             M.addUpload(files, false, emptyFolders);
+
+            start_upload();
         }
-        else {
+        else if (self.fminitialized) {
             openCopyUploadDialog(files, emptyFolders);
         }
-    }
-
-    function pushUpload() {
-        if (!--dir_inflight && $.dostart) {
-            var emptyFolders = Object.keys(filedrag_paths)
-                .filter(function(p) {
-                    return filedrag_paths[p] < 1;
-                });
-
-            addUpload(filedrag_u, emptyFolders);
-            filedrag_u = [];
-            filedrag_paths = Object.create(null);
-
-            if (M.isFileDragPage(page)) {
-                start_upload();
-            }
-        }
-    }
-
-    function pushFile(file, path) {
-        if (d > 1) {
-            console.warn('Adding file %s', file.name, file);
-        }
-        if (file) {
-            file.path = path;
-            filedrag_u.push(file);
-        }
-        pushUpload();
-    }
-
-    function getFile(entry) {
-        return new Promise(function(resolve, reject) {
-            entry.file(resolve, reject);
-        });
-    }
-
-    function traverseFileTree(item, path, symlink) {
-        path = path || "";
-
-        if (item.isFile) {
-            dir_inflight++;
-            getFile(item).then(function(file) {
-                pushFile(file, path);
-            }).catch(function(error) {
-                if (d) {
-                    var fn = symlink ? 'debug' : 'warn';
-
-                    console[fn]('Failed to get File from FileEntry for "%s", %s',
-                        item.name, Object(error).name, error, item);
-                }
-                pushFile(symlink, path);
-            });
-        }
-        else if (item.isDirectory) {
-            var newPath = path + item.name + "/";
-            filedrag_paths[newPath] = 0;
-            dir_inflight++;
-            var dirReader = item.createReader();
-            var dirReaderIterator = function() {
-                dirReader.readEntries(function(entries) {
-                    if (entries.length) {
-                        var i = entries.length;
-                        while (i--) {
-                            traverseFileTree(entries[i], newPath);
-                        }
-                        filedrag_paths[newPath] += entries.length;
-
-                        dirReaderIterator();
-                    }
-                    else {
-                        pushUpload();
-                    }
-                }, function(error) {
-                    console.warn('Unable to traverse folder "%s", %s',
-                        item.name, Object(error).name, error, item);
-
-                    pushUpload();
-                });
-            };
-            dirReaderIterator();
-        }
-        if (d && dir_inflight == 0) {
-            console.log('end');
+        else {
+            console.error(`don't know where to upload...`);
         }
     }
 
     function start_upload() {
         if (u_type && u_attr) { // logged in user landing on start-page
-            loadSubPage('fm');
+            if (!self.fminitialized) {
+                loadSubPage('fm');
+            }
             return;
         }
         if (u_wasloggedin()) {
@@ -434,68 +353,44 @@
             return M.require('videostream').then(() => Streamer(files[0], video)).catch(dump);
         }
 
-        if (e.dataTransfer
-                && e.dataTransfer.items
-                && e.dataTransfer.items.length > 0 && e.dataTransfer.items[0].webkitGetAsEntry) {
-            var items = e.dataTransfer.items;
-            for (var i = 0; i < items.length; i++) {
-                if (items[i].webkitGetAsEntry) {
-                    var item = items[i].webkitGetAsEntry();
-                    if (item) {
-                        filedrag_u = [];
-                        if (i == items.length - 1) {
-                            $.dostart = true;
-                        }
-                        traverseFileTree(item, '', item.isFile && items[i].getAsFile());
-                    }
+        const now = Math.floor(Date.now() / 1000);
+        const filter = (f) => {
+            if (f.name !== '.') {
+                if (self.eventlog && Math.floor(f.lastModified / 1000) === now) {
+                    // file modification time uses current time for uploading?
+                    eventlog(99659, true);
                 }
+                return true;
             }
-        }
-        else {
-            var u = [];
-            var gecko = dataTransfer && ("mozItemCount" in dataTransfer) || Object(ua.details).browser === 'Firefox';
-            if (gecko && parseFloat(Object(ua.details).version) > 51) {
-                // No need to check for folder upload attempts through zero-bytes on latest Firefox versions
-                gecko = false;
-            }
-            for (var i = 0, f; f = files[i]; i++) {
-                if (f.webkitRelativePath) {
-                    f.path = String(f.webkitRelativePath).replace(RegExp("[\\/]"
-                            + String(f.name).replace(/([^\w])/g,'\\$1') + "$"), '');
-                }
-                if (gecko) {
-                    f.gecko = true;
-                }
-                if (f.name != '.') {
-                    u.push(f);
-                    if (Math.floor(f.lastModified / 1000) === Math.floor(Date.now() / 1000)) {
-                        api_req({a: 'log', e: 99659, m: 'file modification time uses current time for uploading.'});
-                    }
-                }
-            }
-            M.addUpload(u);
-            if (M.isFileDragPage(page)) {
-                start_upload();
-            }
-            if (!window.InitFileDrag) {
-                return;
-            }
+        };
+        factory.require('file-list').getFileList(e, filter)
+            .then((files) => {
+                addUpload(files, files.empty);
+            })
+            .catch(tell)
+            .finally(() => {
+                if (self.InitFileDrag) {
+                    const $fileAndFolderUploadWrap = $('.fm-right-header');
+                    const html = `
+                        <input type="file" class="hidden" id="fileselect1" title="${l[99]}" multiple="" />
+                        <input type="file" class="hidden" id="fileselect2" webkitdirectory="" title="${l[98]}"
+                         multiple="" />
+                        `;
 
-            var $fileAndFolderUploadWrap = $('.fm-right-header');
+                    $('input', $fileAndFolderUploadWrap).remove();
+                    $fileAndFolderUploadWrap.safeAppend(html);
 
-            $('input', $fileAndFolderUploadWrap).remove();
-            $fileAndFolderUploadWrap.safeAppend('<input type="file" class="hidden" id="fileselect1" title="' +
-                l[99] + '" multiple="">' + // File input
-                '<input type="file" class="hidden" id="fileselect2" webkitdirectory="" title="' +
-                l[98] + '" multiple="">'); // Folder input
-            $('input#fileselect3').remove();
-            $('.files-menu .fileupload-item')
-                .after('<input type="file" id="fileselect3" class="hidden" name="fileselect3" multiple="">');
-            $('input#fileselect4').remove();
-            $('.files-menu .folderupload-item').after('<input type="file" id="fileselect4"' +
-                ' name="fileselect4" webkitdirectory="" multiple="" class="hidden">');
-            InitFileDrag();
-        }
+                    $('input#fileselect3').remove();
+                    $('.files-menu .fileupload-item')
+                        .after('<input type="file" id="fileselect3" class="hidden" name="fileselect3" multiple="">');
+                    $('input#fileselect4').remove();
+                    $('.files-menu .folderupload-item').after('<input type="file" id="fileselect4"' +
+                        ' name="fileselect4" webkitdirectory="" multiple="" class="hidden">');
+
+                    InitFileDrag();
+                }
+            });
+
         return true;
     }
 

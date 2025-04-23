@@ -1349,7 +1349,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
             streamer.currentTime = Math.min(props.duration, Math.max(0, streamer.currentTime + sec));
         };
 
-        if (is_embed !== 2) {
+        if (is_embed !== 2 && self.contextMenu) {
             // Playback Speed context menu
             speedMenu = $('.context-menu.playback-speed', $wrapper).get(0);
             if (!speedMenu) {

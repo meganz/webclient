@@ -3,10 +3,12 @@ mBroadcaster.once('boot_done', () => {
     const storage = localStorage;
     const domain2event = freeze({
         'mega.nz': 99702,
-        'transfer.it': 99623
+        'transfer.it': 99623,
+        'smoketest.transfer.it': 99623
     });
+    const eid = self.is_extension ? 99702 : domain2event[location.host];
 
-    if (!domain2event[location.host]
+    if (!eid
         || self.buildOlderThan10Days
         || storage.mSentinelOptOut) {
 
@@ -98,7 +100,7 @@ mBroadcaster.once('boot_done', () => {
             }
         }
 
-        if (stack.includes(':skull:')) {
+        if (msg.includes(':skull:')) {
             maxStackLines = 50;
         }
         return stack.splice(0, maxStackLines).join("\n");
@@ -166,7 +168,7 @@ mBroadcaster.once('boot_done', () => {
         return tag ? `[${tag}] ` : '';
     });
 
-    const validateCrashReport = (dump, msg, url, ln, errobj) => {
+    const validateCrashReport = (dump, msg, url, ln, errobj, version) => {
 
         if (thirdPartyScript(dump, `${url}${errobj && errobj.stack}`)) {
             console.warn('Your account is only as secure as your computer...');
@@ -203,7 +205,7 @@ mBroadcaster.once('boot_done', () => {
 
             if (!errobj.udata && /\w/.test(msg || '')) {
 
-                eventlog(domain2event[location.host], JSON.stringify([version, ln, msg]), true);
+                eventlog(eid, JSON.stringify([version, ln, msg]), true);
             }
         }
 
@@ -249,7 +251,18 @@ mBroadcaster.once('boot_done', () => {
         }
         dump.m = canSubmitCrash.env + dump.m.replace(/\s+/g, ' ');
 
-        if (!validateCrashReport(dump, msg, url, ln, errobj)) {
+        let version = buildVersion.website;
+
+        if (self.is_extension) {
+            if (self.is_firefox_web_ext) {
+                version = buildVersion.firefox;
+            }
+            else if (mega.chrome) {
+                version = buildVersion.chrome;
+            }
+        }
+
+        if (!validateCrashReport(dump, msg, url, ln, errobj, version)) {
 
             return disable(dump.m, dump, errobj);
         }
@@ -260,22 +273,11 @@ mBroadcaster.once('boot_done', () => {
                 : dump.m.replace(/[^\s\w]/gi, '') || `[!] ${msg}`;
         }
 
-        if (/\w/.test(dump.m)) {
-
-            let version = buildVersion.website;
-
-            if (self.is_extension) {
-                if (self.is_firefox_web_ext) {
-                    version = buildVersion.firefox;
-                }
-                else if (mega.chrome) {
-                    version = buildVersion.chrome;
-                }
-            }
+        if (/\w/.test(dump.m) && eid === 99702) {
 
             const payload = {
                 a: 'cd2',
-                c: JSON.stringify(__cdumps[i]),
+                c: JSON.stringify(dump),
                 t: version
             };
 

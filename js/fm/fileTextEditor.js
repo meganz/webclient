@@ -170,7 +170,7 @@ mega.fileTextEditor = new function FileTextEditor() {
         nFile.target = fileNode.p;
         nFile.id = ++__ul_id;
         nFile.path = '';
-        nFile.isCreateFile = true;
+        nFile.ulSilent = true;
         nFile._replaces = handle;
         nFile.promiseToInvoke = operationPromise;
 
@@ -232,7 +232,7 @@ mega.fileTextEditor = new function FileTextEditor() {
             nFile.target = directory;
             nFile.id = ++__ul_id;
             nFile.path = '';
-            nFile.isCreateFile = true;
+            nFile.ulSilent = true;
             (nFile.promiseToInvoke = mega.promise)
                 .then((nHandle) => {
                     storeFileData(nHandle, content);

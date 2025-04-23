@@ -11,6 +11,63 @@ export class ExtraFooterElement extends React.Component {
     }
 }
 
+class SafeShowDialogController extends MegaRenderMixin {
+    dialogName = 'unnamed-dialog';
+
+    constructor(props) {
+        super(props);
+        this.dialogBecameVisible = null;
+
+        const {render} = this;
+        this.render = () => {
+            if (this.dialogBecameVisible) {
+                console.assert($.dialog === this.dialogName, `${this.dialogName} state overridden.`);
+                return render.call(this);
+            }
+            return null;
+        };
+    }
+
+    componentDidMount() {
+        super.componentDidMount();
+        M.safeShowDialog(this.dialogName, () => {
+            if (!this.isMounted()) {
+                throw new Error(`${this.dialogName} component is no longer mounted.`);
+            }
+            this.dialogBecameVisible = 1;
+            this.forceUpdate();
+        });
+    }
+
+    componentWillUnmount() {
+        super.componentWillUnmount();
+        if (this.dialogBecameVisible) {
+            this.dialogBecameVisible = false;
+            console.assert($.dialog === this.dialogName);
+            if ($.dialog === this.dialogName) {
+                closeDialog();
+            }
+        }
+    }
+
+    componentDidUpdate() {
+        assert(this.dialogBecameVisible);
+        super.componentDidUpdate();
+        if (++this.dialogBecameVisible === 2) {
+            requestAnimationFrame(() => {
+                const dialog = document.querySelectorAll(`.${this.dialogName}`);
+
+                console.assert(dialog.length === 1, `Unexpected ${this.dialogName} state.`);
+                console.assert($.dialog === this.dialogName, `${this.dialogName} state overridden.`);
+
+                if (dialog.length === 1 && $.dialog === this.dialogName) {
+                    dialog[0].classList.remove('hidden', 'arrange-to-back');
+                }
+            });
+        }
+    }
+}
+
 class ModalDialog extends MegaRenderMixin {
     domRef = React.createRef();
 
@@ -560,5 +617,6 @@ lazy(ConfirmDialog, 'defaultProps', () => {
 export default {
     ModalDialog,
     SelectContactDialog,
+    SafeShowDialogController,
     ConfirmDialog
 };

@@ -14,7 +14,7 @@ export class ColumnSize extends GenericNodePropsComponent {
         let {nodeAdapter} = this.props;
 
         return <td megatype={ColumnSize.megatype} className="size">
-            {!nodeAdapter.nodeProps.isFolder ? nodeAdapter.nodeProps.size : ""}
+            {nodeAdapter.nodeProps.size}
         </td>;
     }
 }

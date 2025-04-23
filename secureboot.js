@@ -244,6 +244,7 @@ var is_bot = !is_extension && /bot|crawl/i.test(ua);
 var is_webcache = location.host === 'webcache.googleusercontent.com';
 var is_livesite = location.host === 'mega.nz' || location.host === 'mega.io'
     || location.host === 'smoketest.mega.nz' || is_extension;
+var is_transferit = !is_livesite && (localStorage.it || /^(?:[\w-]*it|testbed)\.dev|transfer\.it$/.test(location.host));
 
 function getMobileStoreLink() {
     'use strict';
@@ -582,7 +583,7 @@ if (!browserUpdate) try
         }, 4000);
     }
 
-    if (!is_livesite && !is_karma && !is_webcache) {
+    if (!is_livesite && !is_karma && !is_webcache && !self.is_transferit) {
         d = d > 0 ? d : !localStorage.nfd;
         jj = d > 0 && !sessionStorage.dbgContentCheck;
         dd = 1;
@@ -604,6 +605,15 @@ if (!browserUpdate) try
         defaultStaticPath = staticpath;
         d = 1;
         sessionStorage.rad = 1;
+    }
+    else if (location.host === 'smoketest.transfer.it') {
+        staticpath = 'https://smkstatic.transfer.it/';
+        defaultStaticPath = staticpath;
+        d = 1;
+    }
+    else if (location.host === 'transfer.it') {
+        staticpath = 'https://st.transfer.it/';
+        defaultStaticPath = staticpath;
     }
 
     if (d > 0) {
@@ -1592,6 +1602,33 @@ if (is_mobile) {
     mCreateElement('meta', {name: "apple-mobile-web-app-status-bar-style", content: "black"}, 'head');
 }
 
+if (is_transferit) {
+    mCreateElement('link', {
+        type: 'image/png',
+        href: staticpath + 'js/ui/transfer/images/favicons/favicon-96x96.png',
+        sizes: '96x96'
+    }, 'head');
+    mCreateElement('link', {
+        type: 'image/svg+xml',
+        href: staticpath + 'js/ui/transfer/images/favicons/favicon.svg'
+    }, 'head');
+    mCreateElement('link', {
+        rel: 'shortcut icon',
+        href: staticpath + 'js/ui/transfer/images/favicons/favicon.ico'
+    }, 'head');
+    mCreateElement('link', {
+        rel: 'apple-touch-icon',
+        sizes: '180x180',
+        href: staticpath + 'js/ui/transfer/images/favicons/apple-touch-icon.png'
+    }, 'head');
+    mCreateElement('link', {
+        rel: 'manifest',
+        href: staticpath + 'js/ui/transfer/images/favicons/site.webmanifest'
+    }, 'head');
+
+    mCreateElement('meta', {name: 'apple-mobile-web-app-title', content: 'Transfer it'}, 'head');
+}
+
 if (is_livesite && !is_extension) {
     mCreateElement('link', {rel: "manifest", href: "/manifest.json"}, 'head');
 }
@@ -1897,7 +1934,7 @@ else if (!browserUpdate) {
     };
 
     tryCatch(function() {
-        if (!is_mobile && !is_iframed && 'serviceWorker' in navigator) {
+        if (!is_mobile && !is_iframed && 'serviceWorker' in navigator && !self.is_transferit) {
             // The service worker isn't listened to until much later so just queue any messages for now.
             var handler = function(ev) {
                 mega.pendingServiceWorkerMsgs.push({data: ev.data});
@@ -1951,7 +1988,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/utils/dom.js', n: 'js_utils_dom_js', j: 1});
     jsl.push({f:'js/utils/events.js', n: 'js_utils_events_js', j: 1});
     jsl.push({f:'js/utils/icu.js', n: 'js_utils_icu_js', j: 1});
-    jsl.push({f:'js/keymgr.js', n: 'keymgr_js', j:1});
+    jsl.push({f:'js/utils/intl.js', n: 'js_utils_intl_js', j: 1});
     jsl.push({f:'js/utils/locale.js', n: 'js_utils_locale_js', j: 1});
     jsl.push({f:'js/utils/md5.js', n: 'js_utils_md5_js', j: 1});
     jsl.push({f:'js/utils/media.js', n: 'js_utils_pictools_js', j: 1});
@@ -1966,6 +2003,14 @@ else if (!browserUpdate) {
     jsl.push({f:'js/utils/trans.js', n: 'js_utils_trans_js', j: 1});
     jsl.push({f:'js/utils/webgl.js', n: 'webgl_js', j:1});
     jsl.push({f:'js/utils/subtitles.js', n: 'subtitles_js', j: 1});
+
+    jsl.push({f:'js/utils/factory/file-list.js', n: 'factory:filelist_js', j:1});
+    jsl.push({f:'js/utils/factory/pbkdf2.js', n: 'factory:pbkdf2_js', j: 1});
+    jsl.push({f:'js/utils/factory/mkdir.js', n: 'factory:mkdir_js', j:1});
+    jsl.push({f:'js/utils/factory/safe-name.js', n: 'factory:safename_js', j:1});
+    jsl.push({f:'js/utils/factory/safe-path.js', n: 'factory:safepath_js', j:1});
+    // Key Management.
+    jsl.push({f:'js/keymgr.js', n: 'keymgr_js', j:1});
 
     // Content consumption settings wrapper
     jsl.push({f:'js/utils/cc-prefs.js', n: 'cc_prefs_js', j:1});
@@ -2005,24 +2050,24 @@ else if (!browserUpdate) {
 
     jsl.push({f:'js/ui/simpletip.js', n: 'simpletip_js', j:1,w:1});
     jsl.push({f:'js/useravatar.js', n: 'contact_avatar_js', j:1,w:3});
-    jsl.push({f:'css/avatars.css', n: 'avatars_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/avatars.css', n: 'avatars_css', j:2,w:5});
 
     // Common desktop and mobile, bottom pages
-    jsl.push({f:'css/mio.css', n: 'mio_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/fonts.css', n: 'fonts_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/bottom-pages.css', n: 'bottom-pages_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/bottom-menu.css', n: 'bottom-menu_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/business.css', n: 'business_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/pro.css', n: 'pro_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/propay.css', n: 'propay_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/planpricing.css', n: 'planpricing_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/activate-s4.css', n: 'activates4_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/startpage.css', n: 'startpage_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/icons.css', n: 'icons_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
-    jsl.push({f:'css/spinners.css', n: 'spinners_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
-    jsl.push({f:'css/business-register.css', n: 'business-register_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/psa.css', n: 'psa_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
-    jsl.push({f:'css/features.css', n: 'features_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/mio.css', n: 'mio_css', j:2,w:5});
+    jsl.push({f:'css/fonts.css', n: 'fonts_css', j:2,w:5});
+    jsl.push({f:'css/bottom-pages.css', n: 'bottom-pages_css', j:2,w:5});
+    jsl.push({f:'css/bottom-menu.css', n: 'bottom-menu_css', j:2,w:5});
+    jsl.push({f:'css/business.css', n: 'business_css', j:2,w:5});
+    jsl.push({f:'css/pro.css', n: 'pro_css', j:2,w:5});
+    jsl.push({f:'css/propay.css', n: 'propay_css', j:2,w:5});
+    jsl.push({f:'css/planpricing.css', n: 'planpricing_css', j:2,w:5});
+    jsl.push({f:'css/activate-s4.css', n: 'activates4_css', j:2,w:5});
+    jsl.push({f:'css/startpage.css', n: 'startpage_css', j:2,w:5});
+    jsl.push({f:'css/icons.css', n: 'icons_css', j: 2, w: 5});
+    jsl.push({f:'css/spinners.css', n: 'spinners_css', j: 2, w: 5});
+    jsl.push({f:'css/business-register.css', n: 'business-register_css', j:2,w:5});
+    jsl.push({f:'css/psa.css', n: 'psa_css', j: 2, w: 5});
+    jsl.push({f:'css/features.css', n: 'features_css', j:2,w:5});
     jsl.push({f:'html/js/bottompage.js', n: 'bottompage_js', j:1});
     jsl.push({f:'html/pagesmenu.html', n: 'pagesmenu', j:0});
     jsl.push({f:'html/bottom2.html', n: 'bottom2',j:0});
@@ -2044,16 +2089,16 @@ else if (!browserUpdate) {
     jsl.push({f:'html/js/repay.js', n: 'repay_js', j:1 });
     jsl.push({f:'js/ui/passwordReminderDialog.js', n: 'prd_js', j:1,w:1});
     jsl.push({f:'html/dialogs-common.html', n: 'dialogs-common', j:0,w:2});
-    jsl.push({f:'css/dialogs-common.css', n: 'dialogs-common_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/dialogs/cookie-dialog.css', n: 'cookie-dialog_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/dialogs-common.css', n: 'dialogs-common_css', j:2,w:5});
+    jsl.push({f:'css/dialogs/cookie-dialog.css', n: 'cookie-dialog_css', j:2,w:5});
     jsl.push({f:'js/metatags.js', n: 'metatags_js', j:1 });
     jsl.push({f:'js/vendor/verge.js', n: 'verge', j:1, w:5});
     jsl.push({f:'js/vendor/perfect-scrollbar.js', n: 'ps_js', j:1,w:1});
     jsl.push({f:'js/ui/languageDialog.js', n: 'languageDialog_js', j:1,w:7});
-    jsl.push({f:'css/jquery-ui.extra.css', n: 'jquery_ui_extra_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/jquery-ui.extra.css', n: 'jquery_ui_extra_css', j:2,w:5});
     jsl.push({f:'js/ui/commercials.js', n: 'commercials', j:1,w:1});
     jsl.push({f:'html/cookiepolicy.html', n: 'cookiepolicy', j:0});
-    jsl.push({f:'css/cookiepolicy.css', n: 'cookiepolicy_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/cookiepolicy.css', n: 'cookiepolicy_css', j:2,w:5});
 
     if (!is_mobile) {
         jsl.push({f:'js/jquery.tokeninput.js', n: 'jquerytokeninput_js', j:1});
@@ -2086,14 +2131,14 @@ else if (!browserUpdate) {
         jsl.push({f:'css/device-centre.css', n: 'devices_css', j:2, w:30, c:1, d:1, cache:1});
 
         // Bottom pages for desktop
-        jsl.push({f:'css/bottom-pages-animations.css', n: 'bottom-pages-animations_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/bottom-pages-animations.css', n: 'bottom-pages-animations_css', j:2,w:5});
     } // !is_mobile
 
     // TextEditor
     jsl.push({f:'js/fm/fileTextEditor.js', n: 'filetexteditor_js', j:1});
     jsl.push({f:'js/fm/textEditorUI.js', n: 'texteditorui_js', j:1});
-    jsl.push({f:'css/codemirror.css', n: 'codemirror_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/txteditor.css', n: 'txteditor_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/codemirror.css', n: 'codemirror_css', j:2,w:5});
+    jsl.push({f:'css/txteditor.css', n: 'txteditor_css', j:2,w:5});
 
     // Transfers
     jsl.push({f:'js/transfers/xhr2.js', n: 'xhr_js', j:1});
@@ -2158,6 +2203,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/ui/slideshow/settings/sub.js', n: 'slideshowSubSetting_js', j:1});
     jsl.push({f:'js/ui/slideshow/settings/settingsManager.js', n: 'slideshowSettingsManager_js', j:1});
     jsl.push({f:'js/ui/imagesViewer.js', n: 'imagesViewer_js', j:1});
+    jsl.push({f:'js/ui/megaZoomPan.js', n: 'mega_zoompan_js', j: 1, w:1});
     jsl.push({f:'js/filerequest_common.js', n: 'filerequest_common_js', j:1});
     jsl.push({f:'js/filerequest_components.js', n: 'filerequest_components_js', j:1});
     jsl.push({f:'js/filerequest.js', n: 'filerequest_js', j:1});
@@ -2166,33 +2212,33 @@ else if (!browserUpdate) {
     jsl.push({f:'js/ui/megaGesture.js', n: 'mega_gesture_js', j: 1, w:1});
 
     // Variables which can be used across all stylesheets
-    jsl.push({f:'css/vars/theme.css', n: 'vars_theme_css', j:2, w:30, c:1, d:1, cache:1});
-    jsl.push({f:'css/switches.css', n: 'switches_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/vars/theme.css', n: 'vars_theme_css', j:2, w:30});
+    jsl.push({f:'css/switches.css', n: 'switches_css', j:2,w:5});
 
     // Sprites
-    jsl.push({f:'css/sprites/fm-uni@uni.css', n: 'fm_uni_css', j:2, w:30, c:1, d:1, cache:1});
-    jsl.push({f:'css/sprites/fm-mime@uni.css', n: 'fm_mime_css', j:2, w:30, c:1, d:1, cache:1});
-    jsl.push({f:'css/sprites/fm-mime-90@uni.css', n: 'fm_mime_90_css', j:2, w:30, c:1, d:1, cache:1});
-    jsl.push({f:'css/sprites/fm-mono@mono.css', n: 'fm_mono_css', j:2, w:30, c:1, d:1, cache:1});
-    jsl.push({f:'css/sprites/fm-theme@dark.css', n: 'fm_dark_css', j:2, w:30, c:1, d:1, cache:1});
-    jsl.push({f:'css/sprites/fm-theme@light.css', n: 'fm_light_css', j:2, w:30, c:1, d:1, cache:1});
-    jsl.push({f:'css/sprites/fm-illustrations.css', n: 'fm_illustration_css', j:2, w:30, c:1, d:1, cache:1});
+    jsl.push({f:'css/sprites/fm-uni@uni.css', n: 'fm_uni_css', j:2, w:30});
+    jsl.push({f:'css/sprites/fm-mime@uni.css', n: 'fm_mime_css', j:2, w:30});
+    jsl.push({f:'css/sprites/fm-mime-90@uni.css', n: 'fm_mime_90_css', j:2, w:30});
+    jsl.push({f:'css/sprites/fm-mono@mono.css', n: 'fm_mono_css', j:2, w:30});
+    jsl.push({f:'css/sprites/fm-theme@dark.css', n: 'fm_dark_css', j:2, w:30});
+    jsl.push({f:'css/sprites/fm-theme@light.css', n: 'fm_light_css', j:2, w:30});
+    jsl.push({f:'css/sprites/fm-illustrations.css', n: 'fm_illustration_css', j:2, w:30});
 
     // Dialog templates
-    jsl.push({f:'css/mega-dialog.css', n: 'mega_dialog_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/vars/dialog.css', n: 'vars_dialog_css', j:2, w:30, c:1, d:1, cache:1});
+    jsl.push({f:'css/mega-dialog.css', n: 'mega_dialog_css', j:2,w:5});
+    jsl.push({f:'css/vars/dialog.css', n: 'vars_dialog_css', j:2, w:30});
 
     // Inputs
-    jsl.push({f:'css/vars/button.css', n: 'vars_button_css', j:2, w:30, c:1, d:1, cache:1});
-    jsl.push({f:'css/radios.css', n: 'radios_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/mega-button.css', n: 'mega_button_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/checkboxes.css', n: 'checkboxes_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/vars/button.css', n: 'vars_button_css', j:2, w:30});
+    jsl.push({f:'css/radios.css', n: 'radios_css', j:2,w:5});
+    jsl.push({f:'css/mega-button.css', n: 'mega_button_css', j:2,w:5});
+    jsl.push({f:'css/checkboxes.css', n: 'checkboxes_css', j:2,w:5});
 
-    jsl.push({f:'css/media-viewer.css', n: 'media_viewer_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/video-player.css', n: 'video_player_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/perfect-scrollbar.css', n: 'vendor_ps_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/animations.css', n: 'animations_css', j:2, w:30, c:1, d:1, cache:1});
-    jsl.push({f:'css/ui/mcomponents.css', n: 'm_components_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/media-viewer.css', n: 'media_viewer_css', j:2,w:5});
+    jsl.push({f:'css/video-player.css', n: 'video_player_css', j:2,w:5});
+    jsl.push({f:'css/perfect-scrollbar.css', n: 'vendor_ps_css', j:2,w:5});
+    jsl.push({f:'css/animations.css', n: 'animations_css', j:2, w:30});
+    jsl.push({f:'css/ui/mcomponents.css', n: 'm_components_css', j:2,w:5});
 
     // Megalist
     jsl.push({f:'js/vendor/megalist.js', n: 'megalist_js', j:1, w:5});
@@ -2233,13 +2279,13 @@ else if (!browserUpdate) {
     jsl.push({f:'js/mobile/mobile.header.js', n: 'mobile_header_js', j: 1, w: 1});
     jsl.push({f:'js/mobile/mobile.top.menu.js', n: 'mobile_top_menu_js', j: 1, w: 1});
 
-    jsl.push({f:'css/mobile/mobile.header.css', n: 'mobile_header_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
-    jsl.push({f:'css/mobile/mobile.top.menu.css', n: 'mobile_top_menu_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
+    jsl.push({f:'css/mobile/mobile.header.css', n: 'mobile_header_css', j: 2, w: 5});
+    jsl.push({f:'css/mobile/mobile.top.menu.css', n: 'mobile_top_menu_css', j: 2, w: 5});
 
     if (!is_mobile) {
 
-        jsl.push({f:'css/buttons.css', n: 'buttons_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/components.css', n: 'components_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/buttons.css', n: 'buttons_css', j:2,w:5});
+        jsl.push({f:'css/components.css', n: 'components_css', j:2, w:30});
 
         // MComponents
         jsl.push({f:'js/ui/components/meganz/MButton.js', n: 'm_button_js', j:1});
@@ -2255,18 +2301,18 @@ else if (!browserUpdate) {
         jsl.push({f:'js/ui/components/meganz/MTabs.js', n: 'm_tabs_js', j:1});
 
         jsl.push({f:'html/top.html', n: 'top', j:0});
-        jsl.push({f:'css/style.css', n: 'style_css', j:2, w:30, c:1, d:1, cache:1});
-        jsl.push({f:'css/tree.css', n: 'tree_css', j:2, w:30, c:1, d:1, cache:1});
-        jsl.push({f:'css/transfer.css', n: 'style_css', j:2, w:30, c:1, d:1, cache:1});
-        jsl.push({f:'css/fm-header.css', n: 'fm_header_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/fm-breadcrumb.css', n: 'fm_breadcrumb_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/fm-lists.css', n: 'fm_lists_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/grid-table.css', n: 'grid_table_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/tabs.css', n: 'tabs_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/empty-pages.css', n: 'empty_page_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/pwm/onboarding.css', n: 'pwm_onboarding_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/pwm/avatars.css', n:'pwm_avatars_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/bento.css', n:'bento_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/style.css', n: 'style_css', j:2, w:30});
+        jsl.push({f:'css/tree.css', n: 'tree_css', j:2, w:30});
+        jsl.push({f:'css/transfer.css', n: 'style_css', j:2, w:30});
+        jsl.push({f:'css/fm-header.css', n: 'fm_header_css', j:2,w:5});
+        jsl.push({f:'css/fm-breadcrumb.css', n: 'fm_breadcrumb_css', j:2,w:5});
+        jsl.push({f:'css/fm-lists.css', n: 'fm_lists_css', j:2,w:5});
+        jsl.push({f:'css/grid-table.css', n: 'grid_table_css', j:2,w:5});
+        jsl.push({f:'css/tabs.css', n: 'tabs_css', j:2,w:5});
+        jsl.push({f:'css/empty-pages.css', n: 'empty_page_css', j:2,w:5});
+        jsl.push({f:'css/pwm/onboarding.css', n: 'pwm_onboarding_css', j:2,w:5});
+        jsl.push({f:'css/pwm/avatars.css', n:'pwm_avatars_css', j:2,w:5});
+        jsl.push({f:'css/bento.css', n:'bento_css', j:2,w:5});
         jsl.push({f:'css/notification.css', n: 'notification_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'css/search.css', n: 'search_css', j:2, w:30, c:1, d:1, cache:1});
 
@@ -2296,7 +2342,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/vendor/avatar.js', n: 'avatar_js', j:1, w:3});
         jsl.push({f:'js/fm/vpn.js', n: 'fmvpn_js', j: 1});
 
-        jsl.push({f:'css/gallery.css', n: 'gallery_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/gallery.css', n: 'gallery_css', j:2,w:5});
         jsl.push({f:'js/fm/gallery/gallery.js', n: 'fm_gallery_js', j:1});
 
         // Gallery helpers
@@ -2312,31 +2358,31 @@ else if (!browserUpdate) {
         jsl.push({f:'js/fm/albums/AlbumTimeline.js', n: 'fm_albums_timeline_js', j:1});
 
         jsl.push({f:'html/onboarding.html', n: 'onboarding', j:0,w:2});
-        jsl.push({f:'css/onboarding.css', n: 'onboarding_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/onboarding.css', n: 'onboarding_css', j:2,w:5});
 
-        jsl.push({f:'css/download.css', n: 'download_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/user-card.css', n: 'user_card_css', j:2, w:5, c:1, d:1, cache:1});
+        jsl.push({f:'css/download.css', n: 'download_css', j:2,w:5});
+        jsl.push({f:'css/user-card.css', n: 'user_card_css', j:2, w:5});
 
-        jsl.push({f:'css/account.css', n: 'account_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/banners.css', n: 'banners_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/account.css', n: 'account_css', j:2,w:5});
+        jsl.push({f:'css/banners.css', n: 'banners_css', j:2,w:5});
 
-        jsl.push({f:'css/dropdowns.css', n: 'dropdowns_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/jq-ui-custom.css', n: 'jq_ui_custom_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/labels-and-filters.css', n: 'labels-and-filters_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/dialogs.css', n: 'dialogs_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/share-dialog.css', n: 'share_dialog_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/popups.css', n: 'popups_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/data-blocks-view.css', n: 'data_blocks_view_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/dropdowns.css', n: 'dropdowns_css', j:2,w:5});
+        jsl.push({f:'css/jq-ui-custom.css', n: 'jq_ui_custom_css', j:2,w:5});
+        jsl.push({f:'css/labels-and-filters.css', n: 'labels-and-filters_css', j:2,w:5});
+        jsl.push({f:'css/dialogs.css', n: 'dialogs_css', j:2,w:5});
+        jsl.push({f:'css/share-dialog.css', n: 'share_dialog_css', j:2,w:5});
+        jsl.push({f:'css/popups.css', n: 'popups_css', j:2,w:5});
+        jsl.push({f:'css/data-blocks-view.css', n: 'data_blocks_view_css', j:2,w:5});
 
-        jsl.push({f:'css/recovery.css', n: 'recovery_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/settings.css', n: 'settings_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/media-print.css', n: 'media_print_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/top-menu.css', n: 'top_menu_css', j:2, w:30, c:1, d:1, cache:1});
-        jsl.push({f:'css/context-menu.css', n: 'context_menu_css', j:2, w:5, c:1, d:1, cache:1});
-        jsl.push({f:'css/tables.css', n: 'tables_css', j:2, w:30, c:1, d:1, cache:1});
-        jsl.push({f:'css/recents.css', n: 'recents_css', j:2, w:30, c:1, d:1, cache:1});
-        jsl.push({f:'css/vpn.css', n: 'vpn_css', j:2, w:30, c:1, d:1, cache:1});
-        jsl.push({f:'css/transfer-widget.css', n: 'transfer_widget_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/recovery.css', n: 'recovery_css', j:2,w:5});
+        jsl.push({f:'css/settings.css', n: 'settings_css', j:2,w:5});
+        jsl.push({f:'css/media-print.css', n: 'media_print_css', j:2,w:5});
+        jsl.push({f:'css/top-menu.css', n: 'top_menu_css', j:2, w:30});
+        jsl.push({f:'css/context-menu.css', n: 'context_menu_css', j:2, w:5});
+        jsl.push({f:'css/tables.css', n: 'tables_css', j:2, w:30});
+        jsl.push({f:'css/recents.css', n: 'recents_css', j:2, w:30});
+        jsl.push({f:'css/vpn.css', n: 'vpn_css', j:2, w:30});
+        jsl.push({f:'css/transfer-widget.css', n: 'transfer_widget_css', j:2, w:30});
 
         // CSS Revamp changes
         jsl.push({f:'css/components/meganz/fm-left-pane.css', n: 'fm_left_pane_css', j:2, w:30, c:1, d:1, cache:1});
@@ -2344,7 +2390,7 @@ else if (!browserUpdate) {
         jsl.push({f:'css/components/meganz/storage-block.css', n: 'storage_block_css', j:2, w:30, c:1, d:1, cache:1});
 
         // `Meetings` UI styles
-        jsl.push({f:'css/chat-bundle.css', n: 'meetings_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/chat-bundle.css', n: 'meetings_css', j:2, w:30});
 
         jsl.push({f:'html/key.html', n: 'key', j:0});
         jsl.push({f:'html/login.html', n: 'login', j:0});
@@ -2354,7 +2400,7 @@ else if (!browserUpdate) {
         jsl.push({f:'images/mega/contact-avatar.svg', n: 'contact_avatar', j:0});
         jsl.push({f:'html/rewind.html', n: 'rewind', j:0});
         jsl.push({f:'html/device-centre-shimmer.html', n: 'device_centre_shimmer_html', j:0});
-        jsl.push({f:'css/topbar.css', n: 'topbar_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/topbar.css', n: 'topbar_css', j:2,w:5});
 
         // Notification banner
         jsl.push({f:'css/notification-banner.css', n: 'notification-banner_css', j: 2, w: 5});
@@ -2367,11 +2413,11 @@ else if (!browserUpdate) {
         jsl.push({f:'css/components/meganz/header.css', n:'header_css', j:2, w:1});
         jsl.push({f:'css/components/meganz/top-menu.css', n:'top_menu_css', j:2, w:1});
         jsl.push({f:'js/ui/components/flyoutMenu.js', n: 'flyoutmenu_js', j: 1, w:1});
-        jsl.push({f:'css/components/flyoutMenu.css', n: 'flyoutmenu_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/components/flyoutMenu.css', n: 'flyoutmenu_css', j:2,w:5});
         jsl.push({f:'js/ui/components/tabgroup.js', n: 'tabgroup_js', j: 1, w:1});
-        jsl.push({f:'css/components/tabgroup.css', n: 'tabgroup_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/components/tabgroup.css', n: 'tabgroup_css', j:2,w:5});
         jsl.push({f:'js/ui/components/chatitem.js', n: 'chatitem_js', j: 1, w:1});
-        jsl.push({f:'css/components/chatitem.css', n: 'chatitem_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/components/chatitem.css', n: 'chatitem_css', j:2,w:5});
     } // !is_mobile
 
     // do not change the order...
@@ -2416,17 +2462,17 @@ else if (!browserUpdate) {
     // Shared component styles
     jsl.push({f:'css/vars/mobile-theme.css', n: 'vars_mobile_theme_css', j:2, w:30, c:1, d:1, cache:1});
     jsl.push({f:'css/vars/mobile-theme-auto.css', n: 'vars_mobile_theme_auto_css', j:2, w:30, c:1, d:1, cache:1});
-    jsl.push({f:'css/components/rack.css', n: 'rack_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/components/toast.css', n: 'components_toast_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/components/rack.css', n: 'rack_css', j:2,w:5});
+    jsl.push({f:'css/components/toast.css', n: 'components_toast_css', j:2,w:5});
     jsl.push({f:'css/components/interactable.css', n: 'interactable_css', j: 2, w: 30, c: 1, d: 1, m: 1});
-    jsl.push({f:'css/components/checkbox.css', n: 'checkbox_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/components/checkbox.css', n: 'checkbox_css', j:2,w:5});
     jsl.push({f:'css/components/overlay.css', n: 'overlay_css', j:2, w:1});
     jsl.push({f:'css/components/sheet.css', n: 'sheet_css', j:2, w:30, c:1, d:1, cache:1});
     jsl.push({f:'css/components/node.css', n: 'node_css', j: 2, w: 30, c: 1, d: 1, m: 1});
     jsl.push({f:'css/components/sharednode.css', n: 'sharednode_css', j: 2, w: 1});
     jsl.push({f:'css/components/context-menu.css', n: 'comp_context_menu_css', j:2, w:1});
     jsl.push({f:'css/components/menu.css', n: 'comp_menu_css', j:2, w:1});
-    jsl.push({f:'css/components/toggle-button.css', n: 'toggle_button_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/components/toggle-button.css', n: 'toggle_button_css', j:2,w:5});
     jsl.push({f:'css/components/stepper.css', n: 'stepper_css', j:2, w:30, c:1, d:1, cache:1});
     jsl.push({f:'css/components/onboarding-journey.css', n: 'onboarding_journey_css', j:2, w:30, c:1, d:1, cache:1});
     jsl.push({f:'css/components/card.css', n: 'card_css', j:2, w:30, c:1, d:1, cache:1});
@@ -2436,25 +2482,25 @@ else if (!browserUpdate) {
 
         // Variables which can be used across all mobile stylesheets
         jsl.push({f:'css/mobile/mobile.dropdown.css', n: 'mobile_dropdown_css', j: 2, w: 1});
-        jsl.push({f:'css/mobile/mobile.context.menu.css', n: 'mobile_context_menu_css', j:2, w:30, c:1, d:1, cache:1});
-        jsl.push({f:'css/mobile/mobile.radio.button.css', n: 'mobile_radio_button_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/mobile/mobile.footer.css', n: 'mobile_footer_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/mobile/mobile.msgdialog.css', n: 'mobile_msgdialog_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/mobile/mobile.rubbish-bin.css', n: 'mobile_rubbish_bin_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/mobile/mobile.banner.css', n: 'mobile_banner_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/mobile/mobile.node-selector.css', n: 'mobile_node_selector_css', j:2, w:5, c:1, d:1, cache:1});
+        jsl.push({f:'css/mobile/mobile.context.menu.css', n: 'mobile_context_menu_css', j:2, w:30});
+        jsl.push({f:'css/mobile/mobile.radio.button.css', n: 'mobile_radio_button_css', j:2,w:5});
+        jsl.push({f:'css/mobile/mobile.footer.css', n: 'mobile_footer_css', j:2,w:5});
+        jsl.push({f:'css/mobile/mobile.msgdialog.css', n: 'mobile_msgdialog_css', j:2,w:5});
+        jsl.push({f:'css/mobile/mobile.rubbish-bin.css', n: 'mobile_rubbish_bin_css', j:2,w:5});
+        jsl.push({f:'css/mobile/mobile.banner.css', n: 'mobile_banner_css', j:2,w:5});
+        jsl.push({f:'css/mobile/mobile.node-selector.css', n: 'mobile_node_selector_css', j:2, w:5});
         jsl.push({f:'css/mobile/mobile.empty.state.css', n: 'mobile_empty_state_css', j:2, w:1});
-        jsl.push({f:'css/mobile/mobile.transfer.block.css', n: 'mobile_transfer_block_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/mobile/mobile.bottom.bar.css', n: 'mobile_bottom_bar_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/mobile/mobile.account.css', n: 'mobile_account_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/mobile/mobile.download.css', n: 'mobile_download_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/mobile/mobile.promo.banner.css', n: 'mobile_promo_banner_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/mobile/mobile.transfer.block.css', n: 'mobile_transfer_block_css', j:2,w:5});
+        jsl.push({f:'css/mobile/mobile.bottom.bar.css', n: 'mobile_bottom_bar_css', j:2,w:5});
+        jsl.push({f:'css/mobile/mobile.account.css', n: 'mobile_account_css', j:2,w:5});
+        jsl.push({f:'css/mobile/mobile.download.css', n: 'mobile_download_css', j:2,w:5});
+        jsl.push({f:'css/mobile/mobile.promo.banner.css', n: 'mobile_promo_banner_css', j:2,w:5});
 
         // Sprites
-        jsl.push({f:'css/sprites/mobile-fm-uni@uni.css', n: 'mobile_fm_uni_css', j:2, w:30, c:1, d:1, cache:1});
-        jsl.push({f:'css/sprites/mobile-fm-mono@mono.css', n: 'mobile_fm_mono_css', j:2, w:30, c:1, d:1, cache:1});
-        jsl.push({f:'css/sprites/mobile-fm-theme@dark.css', n: 'mobile_fm_dark_css', j:2, w:30, c:1, d:1, cache:1});
-        jsl.push({f:'css/sprites/mobile-fm-theme@light.css', n: 'mobile_fm_light_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/sprites/mobile-fm-uni@uni.css', n: 'mobile_fm_uni_css', j:2, w:30});
+        jsl.push({f:'css/sprites/mobile-fm-mono@mono.css', n: 'mobile_fm_mono_css', j:2, w:30});
+        jsl.push({f:'css/sprites/mobile-fm-theme@dark.css', n: 'mobile_fm_dark_css', j:2, w:30});
+        jsl.push({f:'css/sprites/mobile-fm-theme@light.css', n: 'mobile_fm_light_css', j:2, w:30});
 
         jsl.push({f:'html/top-mobile.html', n: 'top-mobile', j:0});
         jsl.push({f:'html/mobile-add-contact-card.html', n: 'mobile-add-contact-card', j:0});
@@ -2464,7 +2510,7 @@ else if (!browserUpdate) {
         jsl.push({f:'css/mobile/mobile.link-management.css', n: 'mobile_link_management_css', j: 2, w: 30, c: 1, d: 1, m: 1});
         jsl.push({f:'css/mobile-help.css', n: 'mobile_help_css', j: 2, w: 30, c: 1, d: 1, m: 1});
         jsl.push({f:'css/mobile-top-menu.css', n: 'mobile_top_menu_css',  j: 2, w: 30, c: 1, d: 1, m: 1});
-        jsl.push({f:'css/mobile-media-viewer.css', n: 'mobile_media_viewer_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/mobile-media-viewer.css', n: 'mobile_media_viewer_css', j:2,w:5});
         jsl.push({f:'css/mobile/mobile.tab.css', n: 'mobile_tab_css', j: 2, w: 1});
         jsl.push({f:'css/mobile/mobile.public.link.css', n: 'mobile_public_linkcss', j: 2, w: 1});
         jsl.push({f:'css/mobile/mobile.datepicker.css', n: 'mobile_datepicker_css', j: 2, w: 1});
@@ -2565,11 +2611,11 @@ else if (!browserUpdate) {
     }
     jsl.push({f:'html/chatlink.html', n: 'chatlink', j: 0});
 
-    jsl.push({f:'css/toast.css', n: 'toast_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/toast.css', n: 'toast_css', j:2,w:5});
     jsl.push({f:'css/general.css', n: 'general_css', j:2, w:5, c:1, d:1, cache: 1});
     jsl.push({f:'css/megainput.css', n: 'megainput_css', j:2, w:5, c:1, d:1, cache: 1});
-    jsl.push({f:'css/vars/text-input.css', n: 'vars_text_input_css', j:2, w:30, c:1, d:1, cache:1});
-    jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
+    jsl.push({f:'css/vars/text-input.css', n: 'vars_text_input_css', j:2, w:30});
+    jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j: 2, w: 5});
 
     // Shared dialog/sheet styles
     jsl.push({f:'css/dialogs/recovery-logout-dialog.css', n: 'recovery_logout_css', j: 2, w: 1});
@@ -2631,8 +2677,132 @@ else if (!browserUpdate) {
         jsl.push({f:'html/embedplayer.html', n: 'index', j: 0});
         jsl.push({f:'css/embedplayer.css', n: 'embedplayer_css', j: 2, w: 5});
         jsl.push({f:'css/video-player.css', n: 'video_player_css', j: 2});
-        jsl.push({f:'css/vars/theme.css', n: 'vars_theme_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/vars/theme.css', n: 'vars_theme_css', j:2, w:30});
         jsl.push({f:'css/sprites/embed-mono@mono.css', n: 'embed_mono_css', j:2});
+    }
+
+    if (is_transferit) {
+        jsl = [{f: langFilepath, n: 'lang', j: 3}];
+        jsl.push({f:'sjcl.js', n: 'sjcl_js', j: 1});
+        jsl.push({f:'nodedec.js', n: 'nodedec_js', j: 1});
+        jsl.push({f:'js/vendor/jquery.js', n: 'jquery', j: 1, w: 10});
+        jsl.push({f:'js/jquery.protect.js', n: 'jqueryprotect_js', j: 1});
+        jsl.push({f:'js/jquery.misc.js', n: 'jquerymisc_js', j:1});
+        jsl.push({f:'js/utils/polyfills.js', n: 'js_utils_polyfills_js', j: 1});
+        jsl.push({f:'js/utils/timers.js', n: 'js_utils_timers_js', j: 1});
+        jsl.push({f:'js/mouse.js', n: 'mouse_js', j:1});
+        jsl.push({f:'js/security.js', n: 'security_js', j: 1, w: 5});
+        jsl.push({f:'js/fm/ufssizecache.js', n: 'ufssizecache_js', j: 1});
+        jsl.push({f:'js/ui/transfer/boot.js', n: 'js_ui_transfer_boot_js', j: 1});
+
+        jsl.push({f:'js/vendor/jquery-ui.js', n: 'jquery_ui', j: 1, w: 10});
+        jsl.push({f:'js/vendor/jquery.fullscreen.js', n: 'jquery_fullscreen', j:1, w:10});
+        jsl.push({f:'js/vendor/jquery.mousewheel.js', n: 'jquerymouse_js', j:1});
+
+        jsl.push({f:'js/utils/broadcast.js', n: 'js_utils_broadcast_js', j: 1});
+        jsl.push({f:'js/utils/clipboard.js', n: 'js_utils_clipboard_js', j: 1});
+        jsl.push({f:'js/utils/api.js', n: 'js_utils_api_js', j: 1});
+        jsl.push({f:'js/utils/browser.js', n: 'js_utils_browser_js', j: 1});
+        jsl.push({f:'js/utils/conv.js', n: 'js_utils_conv_js', j: 1});
+        jsl.push({f:'js/utils/dom.js', n: 'js_utils_dom_js', j: 1});
+        jsl.push({f:'js/utils/icu.js', n: 'js_utils_icu_js', j: 1});
+        jsl.push({f:'js/utils/intl.js', n: 'js_utils_intl_js', j: 1});
+        jsl.push({f:'js/utils/media.js', n: 'js_utils_pictools_js', j: 1});
+        jsl.push({f:'js/utils/network.js', n: 'js_utils_network_js', j: 1});
+        jsl.push({f:'js/utils/sentinel.js', n: 'js_utils_sentinel_js', j: 1});
+        jsl.push({f:'js/utils/watchdog.js', n: 'js_utils_watchdog_js', j: 1});
+        jsl.push({f:'js/utils/webgl.js', n: 'webgl_js', j:1});
+        jsl.push({f:'js/utils/workers.js', n: 'js_utils_workers_js', j: 1});
+
+        jsl.push({f:'js/crypto.js', n: 'crypto_js', j: 1, w: 5});
+        jsl.push({f:'js/account.js', n: 'account_js', j: 1});
+        jsl.push({f:'js/filetypes.js', n: 'filetypes_js', j:1});
+        jsl.push({f:'js/thumbnail.js', n: 'thumbnail_js', j:1});
+        jsl.push({f:'js/vendor/exif.js', n: 'exif_js', j:1, w:3});
+        jsl.push({f:'js/vendor/smartcrop.js', n: 'smartcrop_js', j:1, w:7});
+
+        jsl.push({f:'js/transfers/xhr2.js', n: 'xhr_js', j:1});
+        jsl.push({f:'js/transfers/queue.js', n: 'queue', j:1,w:4});
+        jsl.push({f:'js/transfers/utils.js', n: 'tutils', j:1,w:4});
+        jsl.push({f:'js/transfers/download2.js', n: 'dl_js', j:1,w:3});
+        jsl.push({f:'js/transfers/upload2.js', n: 'upload_js', j:1,w:2});
+        jsl.push({f:'js/transfers/downloader.js', n: 'dl_downloader', j: 1, w: 3});
+        jsl.push({f:'js/transfers/reader.js', n: 'upload_reader_js', j: 1, w: 2});
+
+        jsl.push({f:'js/utils/factory/file-list.js', n: 'factory:filelist_js', j:1});
+        jsl.push({f:'js/utils/factory/pbkdf2.js', n: 'factory:pbkdf2_js', j: 1});
+        jsl.push({f:'js/utils/factory/mkdir.js', n: 'factory:mkdir_js', j:1});
+        jsl.push({f:'js/utils/factory/safe-name.js', n: 'factory:safename_js', j:1});
+        jsl.push({f:'js/utils/factory/safe-path.js', n: 'factory:safepath_js', j:1});
+
+        jsl.push({f:'js/ui/transfer/js/ui/components/breadcrumbs.js', n: 'ui_breadcrumbs_js', j: 1});
+        jsl.push({f:'js/ui/transfer/js/ui/components/loader.js', n: 'ui_loader_js', j: 1});
+        jsl.push({f:'js/ui/transfer/js/ui/components/simpletip.js', n: 'ui_simpletip_js', j: 1});
+        jsl.push({f:'js/ui/transfer/js/ui/components/toast.js', n: 'ui_toast_js', j: 1});
+        jsl.push({f:'js/ui/transfer/js/ui/theme.js', n: 'ui_theme_js', j: 1});
+        jsl.push({f:'js/ui/transfer/js/ui/pages/page.js', n: 'ui_page_js', j: 1});
+        jsl.push({f:'js/ui/transfer/js/ui/pages/pageheader.js', n: 'ui_pageheader_js', j: 1});
+        jsl.push({f:'js/ui/transfer/js/ui/pages/dashboard.js', n: 'ui_dashboard_js', j: 1});
+        jsl.push({f:'js/ui/transfer/js/ui/pages/fm.js', n: 'ui_fm_js', j: 1});
+        jsl.push({f:'js/ui/transfer/js/ui/dialogs/lang-dialog.js', n: 'ui_lang_dialog_js', j: 1});
+        jsl.push({f:'js/ui/transfer/js/ui/dialogs/login-dialog.js', n: 'ui_login_dialog_js', j: 1});
+        jsl.push({f:'js/ui/transfer/js/ui/dialogs/msg-dialog.js', n: 'ui_msg_dialog_js', j: 1});
+        jsl.push({f:'js/ui/transfer/js/ui/dialogs/nav-dialog.js', n: 'ui_nav_dialog_js', j: 1});
+        jsl.push({f:'js/ui/transfer/js/keyboard.js', n: 'utils_keyboard_js', j: 1});
+        jsl.push({f:'js/ui/transfer/js/sort.js', n: 'utils_sort_js', j: 1});
+
+        jsl.push({f:'js/ui/imagesViewer.js', n: 'imagesViewer_js', j:1});
+        jsl.push({f:'js/ui/megaZoomPan.js', n: 'mega_zoompan_js', j: 1, w:1});
+
+        // HTML
+        jsl.push({f:'js/ui/transfer/html/dialogs.html', n: 'js_ui_transfer_dialogs', j:0});
+        jsl.push({f:'js/ui/transfer/html/overlays.html', n: 'js_ui_transfer_overlays', j:0});
+
+        // CSS
+        jsl.push({f:'js/ui/transfer/css/sprites/it-mime-lg@uni.css', n: 'it_mime_lg_css', j:2, w:30});
+        jsl.push({f:'js/ui/transfer/css/sprites/fm-mono@mono.css', n: 'fm_mono_css', j:2, w:30});
+        jsl.push({f:'js/ui/transfer/css/general/style.css', n: 'general_style_css', j:2, w:30});
+        jsl.push({f:'js/ui/transfer/css/components/avatar.css', n: 'avatar_css', j:2, w:30});
+        jsl.push({f:'js/ui/transfer/css/components/breadcrumbs.css', n: 'breadcrumbs_css', j:2, w:30});
+        jsl.push({f:'js/ui/transfer/css/components/datepicker.css', n: 'datepicker_css', j:2, w:30});
+        jsl.push({f:'js/ui/transfer/css/components/tab.css', n: 'tab_css', j:2, w:30});
+        jsl.push({f:'js/ui/transfer/css/components/tip.css', n: 'tip_css', j:2, w:30});
+        jsl.push({f:'js/ui/transfer/css/components/toast.css', n: 'toast_css', j:2, w:30});
+        jsl.push({f:'js/ui/transfer/css/sections/dashboard.css', n: 'dashboard_css', j:2, w:30});
+        jsl.push({f:'js/ui/transfer/css/sections/fm.css', n: 'fm_css', j:2, w:30});
+        jsl.push({f:'js/ui/transfer/css/dialogs/auth-dialogs.css', n: 'auth_dialogs_css', j:2, w:30});
+        jsl.push({f:'js/ui/transfer/css/dialogs/lang-dialog.css', n: 'lang_dialog_css', j:2, w:30});
+        jsl.push({f:'js/ui/transfer/css/dialogs/nav-dialog.css', n: 'nav_dialog_css', j:2, w:30});
+        jsl.push({f:'js/ui/transfer/css/overlays/media-viewer.css', n: 'media_viewer_css', j:2,w:5});
+        jsl.push({f:'js/ui/transfer/css/overlays/video-player.css', n: 'video_player_css', j:2,w:5});
+
+        // Subpages
+        // @todo: move to jsl3 transferit subpages
+        jsl.push({f:'js/ui/transfer/js/ui/subpages/compare.js', n: 'js_ui_compare_js', j: 1});
+        jsl.push({f:'js/ui/transfer/js/ui/subpages/contact.js', n: 'js_ui_contact_js', j: 1});
+        jsl.push({f:'js/ui/transfer/js/ui/subpages/error.js', n: 'js_ui_error_js', j: 1});
+        jsl.push({f:'js/ui/transfer/js/ui/subpages/faq.js', n: 'js_ui_faq_js', j: 1});
+        jsl.push({f:'js/ui/transfer/js/ui/subpages/features.js', n: 'js_ui_features_js', j: 1});
+        jsl.push({f:'js/ui/transfer/js/ui/subpages/privacy.js', n: 'js_ui_privacy_js', j: 1});
+        jsl.push({f:'js/ui/transfer/js/ui/subpages/terms.js', n: 'js_ui_terms_js', j: 1});
+
+        jsl.push({f:'js/ui/transfer/html/subpages/compare.html', n: 'js_ui_subpages_compare', j:0});
+        jsl.push({f:'js/ui/transfer/html/subpages/contact.html', n: 'js_ui_subpages_contact', j:0});
+        jsl.push({f:'js/ui/transfer/html/subpages/error.html', n: 'js_ui_subpages_error', j:0});
+        jsl.push({f:'js/ui/transfer/html/subpages/faq.html', n: 'js_ui_subpages_faq', j:0});
+        jsl.push({f:'js/ui/transfer/html/subpages/faq-body.html', n: 'js_ui_subpages_faq_body', j:0});
+        jsl.push({f:'js/ui/transfer/html/subpages/features.html', n: 'js_ui_subpages_features', j:0});
+        jsl.push({f:'js/ui/transfer/html/subpages/privacy.html', n: 'js_ui_subpages_privacy', j:0});
+        jsl.push({f:'js/ui/transfer/html/subpages/rtu-body.html', n: 'js_ui_subpages_rtu_body', j:0});
+        jsl.push({f:'js/ui/transfer/html/subpages/terms.html', n: 'js_ui_subpages_terms', j:0});
+
+        jsl.push({f:'js/ui/transfer/css/vars/subpages.css', n: 'js_ui_vars_subpages_css', j:2, w:30});
+        jsl.push({f:'js/ui/transfer/css/subpages/subpage.css', n: 'js_ui_subpage_css', j:2, w:30});
+        jsl.push({f:'js/ui/transfer/css/subpages/compare.css', n: 'js_ui_compare_css', j:2, w:30});
+        jsl.push({f:'js/ui/transfer/css/subpages/contact.css', n: 'js_ui_contact_css', j:2, w:30});
+        jsl.push({f:'js/ui/transfer/css/subpages/error.css', n: 'js_ui_error_css', j:2, w:30});
+        jsl.push({f:'js/ui/transfer/css/subpages/faq.css', n: 'js_ui_faq_css', j:2, w:30});
+        jsl.push({f:'js/ui/transfer/css/subpages/features.css', n: 'js_ui_features_css', j:2, w:30});
     }
 
     if (is_drop) {
@@ -2704,7 +2874,7 @@ else if (!browserUpdate) {
         'codemirror_js': {f:'js/vendor/codemirror.js', n: 'codemirror_js', j:1},
         'codemirrorscroll_js': {f:'js/vendor/simplescrollbars.js', n: 'codemirrorscroll_js', j:1},
         'reportabuse_js': {f:'js/ui/reportAbuse.js', n:'reportabuse_js', j:1},
-        'folderlink_css':{f:'css/folder-link.css', n: 'folderlink_css', j: 2, w: 5, c: 1, d: 1, cache: 1},
+        'folderlink_css':{f:'css/folder-link.css', n: 'folderlink_css', j: 2, w: 5},
         'time_checker_js': {f:'js/time_checker.js', n:'time_checker_js', j:1},
         'filerequest_js': {f:'js/filerequest.js', n: 'filerequest_js', j:1 },
         'filerequest_upload_js': {f:'js/filerequest_upload.js', n: 'filerequest_upload_js', j:1 },
@@ -2756,6 +2926,68 @@ else if (!browserUpdate) {
             'devices_s_devices_js': {f:'js/fm/devices/sections/devices.js', n: 'devices_s_devices_js', j: 1, w: 1},
             'devices_s_device_folders_js': {f:'js/fm/devices/sections/device-folders.js', n: 'devices_s_device_folders_js', j: 1, w: 1},
             'devices_s_folder_children_js': {f:'js/fm/devices/sections/folder-children.js', n: 'devices_s_folder_children_js', j: 1, w: 1},
+        },
+        'transferit': {
+            'it:0001': {f:'js/ui/transfer/core.js', n: 'js_ui_transfer_core_js', j: 1},
+            'it:0002': {f:'js/vendor/datepicker.js', n: 'datepicker_js', j: 1, w: 3},
+
+            'it:0010': {f:'js/ui/transfer/js/ui/components/dropdown.js', n: 'ui_dropdown_js', j: 1},
+            'it:0011': {f:'js/ui/transfer/js/ui/components/input.js', n: 'ui_input_js', j: 1},
+            'it:0012': {f:'js/ui/transfer/js/ui/components/radio.js', n: 'ui_radio_js', j: 1},
+
+            // Pages/Sections
+            'it:0030': {f:'js/ui/transfer/js/ui/pages/getlink.js', n: 'ui_getlink_js', j: 1},
+
+            // Dialogs
+            'it:0040': {f:'js/ui/transfer/js/ui/dialogs/dialog.js', n: 'ui_dialog_js', j: 1},
+
+            'it:0050': {f:'js/ui/transfer/js/common.js', n: 'utils_common_js', j: 1},
+
+            // HTML
+            'it:0060': {f:'js/ui/transfer/html/header.html', n: 'js_ui_transfer_header', j: 0},
+            'it:0061': {f:'js/ui/transfer/html/content.html', n: 'js_ui_transfer_content', j: 0, w: 3},
+            'it:0062': {f:'js/ui/transfer/html/footer.html', n: 'js_ui_transfer_footer', j: 0},
+
+            // Icons
+            'it:0070': {f:'js/ui/transfer/css/sprites/it-mime@uni.css', n: 'it_mime_css', j: 2, w: 30},
+            'it:0071': {f:'js/ui/transfer/css/sprites/it-x16-mono@mono.css', n: 'it_x16_mono_css', j: 2, w: 30},
+            'it:0072': {f:'js/ui/transfer/css/sprites/it-x24-mono@mono.css', n: 'it_x24_mono_css', j: 2, w: 30},
+            'it:0073': {f:'js/ui/transfer/css/sprites/it-x32-mono@mono.css', n: 'it_x32_mono_css', j: 2, w: 30},
+
+            // Variables
+            'it:0080': {f:'js/ui/transfer/css/vars/colors.css', n: 'vars_colors_css', j: 2, w: 30},
+            'it:0081': {f:'js/ui/transfer/css/vars/typo.css', n: 'vars_typo_css', j: 2, w: 30},
+            'it:0082': {f:'js/ui/transfer/css/vars/general.css', n: 'vars_general_css', j: 2, w: 30},
+            'it:0083': {f:'js/ui/transfer/css/vars/illustrations.css', n: 'vars_illustrations_css', j: 2, w: 30},
+
+            // General styles
+            'it:0090': {f:'js/ui/transfer/css/general/fonts.css', n: 'general_fonts_css', j: 2, w: 30},
+            'it:0092': {f:'js/ui/transfer/css/general/structure.css', n: 'general_structure_css', j: 2, w: 30},
+            'it:0093': {f:'js/ui/transfer/css/general/header.css', n: 'general_header_css', j: 2, w: 30},
+
+            // Components
+            'it:0110': {f:'js/ui/transfer/css/components/button.css', n: 'js_ui_transfer_button_css', j: 2, w: 30},
+            'it:0111': {f:'js/ui/transfer/css/components/checkbox.css', n: 'js_ui_transfer_checkbox_css', j: 2, w: 30},
+            'it:0112': {f:'js/ui/transfer/css/components/content-box.css', n: 'js_ui_transfer_content_box_css', j: 2, w: 30},
+            'it:0113': {f:'js/ui/transfer/css/components/dialog.css', n: 'js_ui_transfer_dialog_css', j: 2, w: 30},
+            'it:0114': {f:'js/ui/transfer/css/components/dropdown.css', n: 'js_ui_transfer_dropdown_css', j: 2, w: 30},
+            'it:0115': {f:'js/ui/transfer/css/components/grid.css', n: 'js_ui_transfer_grid_css', j: 2, w: 30},
+            'it:0116': {f:'js/ui/transfer/css/components/input.css', n: 'js_ui_transfer_input_css', j: 2, w: 30},
+            'it:0117': {f:'js/ui/transfer/css/components/link.css', n: 'js_ui_transfer_link_css', j: 2, w: 30},
+            'it:0118': {f:'js/ui/transfer/css/components/menu.css', n: 'js_ui_transfer_menu_css', j: 2, w: 30},
+            'it:0119': {f:'js/ui/transfer/css/components/overlay.css', n: 'js_ui_transfer_overlay_css', j: 2, w: 30},
+            'it:0120': {f:'js/ui/transfer/css/components/radio.css', n: 'js_ui_transfer_radio_css', j: 2, w: 30},
+            'it:0121': {f:'js/ui/transfer/css/components/segmented-control.css', n: 'js_ui_transfer_segmented_control_css', j: 2, w: 30},
+            'it:0122': {f:'js/ui/transfer/css/components/thumb-base.css', n: 'js_ui_transfer_thumb_base_css', j: 2, w: 30},
+            'it:0123': {f:'js/ui/transfer/css/components/toggle.css', n: 'js_ui_transfer_toggle_css', j: 2, w: 30},
+
+            // Sections !-->
+            'it:0130': {f:'js/ui/transfer/css/sections/create-link.css', n: 'create_link_css', j: 2, w: 30},
+
+            // Transfer it overlay integrated in MEGA
+            'it:0160': {f:'js/ui/transfer/html/transferit-overlay.html', n: 'js_ui_transferit_overlay', j: 0},
+            'it:0161': {f:'js/ui/transfer/js/ui/dialogs/transferit-overlay.js', n: 'ui_transferit_overlay_js', j: 1},
+            'it:0162': {f:'js/ui/transfer/css/overlays/transferit-overlay.css', n: 'transferit_overlay_css', j: 2, w: 30},
         },
         'chat': {
             /* chat related css */
@@ -2893,13 +3125,16 @@ else if (!browserUpdate) {
     }
 
     if (page.substr(0, 5) === 'chat/') {
-        // jsl = [{f: langFilepath, n: 'lang', j: 3}];
-        // ^ @todo: consider loading only needed files...
-        // jsl.push({f:'html/chatlink.html', n: 'chatlink', j: 0});
-
         tmp = Object.keys(jsl3.chat);
         for (var u = 0; u < tmp.length; ++u) {
             jsl.push(jsl3.chat[tmp[u]]);
+        }
+        tmp = 0;
+    }
+    else if (is_transferit) {
+        tmp = Object.keys(jsl3.transferit);
+        for (var y = 0; y < tmp.length; ++y) {
+            jsl.push(jsl3.transferit[tmp[y]]);
         }
         tmp = 0;
     }
@@ -2909,7 +3144,7 @@ else if (!browserUpdate) {
         'computerbild2019': 'redeem'
     })[page] || page;
 
-    if (page && !is_iframed)
+    if (page && !is_iframed && !self.is_transferit)
     {
         for (var p in subpages)
         {
@@ -3461,7 +3696,7 @@ else if (!browserUpdate) {
         'use strict';
         return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
     })();
-    mCreateElement('style', {type: 'text/css'}, 'body').textContent = 'div, span, input {outline: none;}.hidden {display: none;}.clear {clear: both;margin: 0px;padding: 0px;display: block;}.loading-main-block {width: 100%;height: 100%;position: fixed;z-index: 10000;font-family:Arial, Helvetica, sans-serif;top:0;left:0;}.main-blur-block,.bottom-page.scroll-block{display:none}.loading-mid-white-block {height: 100%;width:100%;' + (darkloader ? 'background-color: #222' : '') + '}.loading-cloud {width: 225px;position: fixed;height: 160px;background-image: url(' + istaticpath + 'loading-sprite_' + (darkloader ? 'dark' : 'light') + '.png);background-repeat: no-repeat;background-position: center 0;left:50%;top:50%;margin:-80px 0 0 -112px;}.loading-m-block{width:60px;height:60px;position:absolute; left:82px;top:66px;background-color:' + (darkloader ? '#222' : 'white') + ';background-image: url(' + istaticpath + 'loading-sprite_' + (darkloader ? 'dark' : 'light') + '.png);background-repeat: no-repeat;background-position: -86px -61px;border-radius: 100%;-webkit-border-radius: 100%;border-radius: 100%;z-index:10;}.loading-percentage { width: 80px;height: 80px; background-color: ' + (darkloader ? '#444' : '#e1e1e1') + ';position: absolute;-moz-border-radius: 100%;-webkit-border-radius: 100%;border-radius: 100%;overflow: hidden;left:72px;top:56px;}.loading-percentage ul {list-style-type: none;-moz-border-radius: 100%;-webkit-border-radius: 100%;border-radius: 100%;overflow: hidden;}.loading-percentage li {position: absolute;top: 0px;}.loading-percentage p, .loading-percentage li, .loading-percentage ul{width: 80px;height: 80px;padding: 0;margin: 0;}.loading-percentage span {display: block;width: 40px;height: 80px;}.loading-percentage ul :nth-child(odd) {clip: rect(0px, 80px, 80px, 40px);}.loading-percentage ul :nth-child(even) {clip: rect(0px, 40px, 80px, 0px);}.loading-percentage .right-c span {-moz-border-radius-topleft: 40px;-moz-border-radius-bottomleft: 40px;-webkit-border-top-left-radius: 40px;-webkit-border-bottom-left-radius: 40px;border-top-left-radius: 40px;border-bottom-left-radius: 40px;background-color:#dc0000;}.loading-percentage .left-c span {margin-left: 40px;-moz-border-radius-topright: 40px;-moz-border-radius-bottomright: 40px;-webkit-border-top-right-radius: 40px;-webkit-border-bottom-right-radius: 40px;border-top-right-radius: 40px;border-bottom-right-radius: 40px;background-color:#dc0000;}.st-social-block-load {position: fixed;bottom: 20px;left: 0;width: 100%;height: 43px;text-align: center;}.st-bottom-button {height: 24px;width: 24px;margin: 0 8px;display: inline-block;background-image: url(' + istaticpath + 'loading-sprite_' + (darkloader ? 'dark' : 'light') + '.png);background-repeat: no-repeat;background-position: 11px -171px;cursor: pointer;-moz-border-radius: 100%;-webkit-border-radius: 100%;border-radius: 100%;-webkit-transition: all 200ms ease-in-out;-moz-transition: background-color 200ms ease-in-out;-o-transition: background-color 200ms ease-in-out;-ms-transition: background-color 200ms ease-in-out;transition: background-color 200ms ease-in-out;background-color:#999999;}..st-bottom-button.st-google-button {background-position: -69px -171px;}.st-bottom-button.st-twitter-button{background-position: -29px -171px;}.st-bottom-button:hover {background-color:#334f8d;}.st-bottom-button.st-twitter-button:hover {background-color:#1a96f0;}.st-bottom-button.st-google-button:hover {background-color:#d0402a;}@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {.st-bottom-button, .loading-m-block, .loading-cloud {background-image: url(' + istaticpath + 'loading-sprite_' + (darkloader ? 'dark' : 'light') + '@2x.png); background-size: 225px auto;}}';
+    mCreateElement('style', {type: 'text/css'}, 'body').textContent = 'div, span, input {outline: none;}.hidden {display: none;}.clear {clear: both;margin: 0px;padding: 0px;display: block;}.loading-main-block {width: 100%;height: 100%;position: fixed;z-index: 10000;font-family:Arial, Helvetica, sans-serif;top:0;left:0;}.main-blur-block,.bottom-page.scroll-block{display:none}.loading-mid-white-block {height: 100%;width:100%;' + (self.is_transferit ? darkloader ? 'background-color: rgb(30, 33, 36);' : 'background-color: rgb(250, 252, 255);' : darkloader ? 'background-color: #222' : '') + '}.loading-cloud {width: 225px;position: fixed;height: 160px;' + (self.is_transferit ? '' : 'background-image: url(' + istaticpath + 'loading-sprite_' + (darkloader ? 'dark' : 'light') + '.png);') + 'background-repeat: no-repeat;background-position: center 0;left:50%;top:50%;margin:-80px 0 0 -112px;}.loading-m-block{' + (self.is_transferit ? 'width:100px;height:100px;left:50%; top:50%;transform:translate(-50%, -50%);' : 'width:60px;height:60px;left:82px;top:66px;') + 'position:absolute;background-color:' + (self.is_transferit ? darkloader ? 'rgb(30, 33, 36);' : 'rgb(250, 252, 255);' : darkloader ? '#222' : 'white') + ';background-image: url(' + istaticpath + (self.is_transferit ? 'transferit-loading.svg' : 'loading-sprite_' + (darkloader ? 'dark' : 'light') + '.png') + ');background-repeat: no-repeat;background-position: ' + (self.is_transferit ? 'center;background-size:52px;' : '-86px -61px;') + 'border-radius: 100%;z-index:10;}.loading-percentage {' + (self.is_transferit ? 'width: 116px;height: 116px;left: 50%;top: 50%;transform: translate(-50%, -50%);' : 'width: 80px;height: 80px;left:72px;top:56px;') + ' background-color:' + (self.is_transferit ? 'rgba(29, 129, 255, 0.1)' : darkloader ? '#444' : '#e1e1e1') + ';position: absolute;border-radius: 100%;overflow: hidden;}.loading-percentage ul {list-style-type: none;border-radius: 100%;overflow: hidden;}.loading-percentage li {position: absolute;top: 0px;}.loading-percentage p, .loading-percentage li, .loading-percentage ul{width: 100%;height: 100%;padding: 0;margin: 0;}.loading-percentage span {display: block;width: 50%;height: 100%;}.loading-percentage ul :nth-child(odd) {' + (self.is_transferit ? 'clip: rect(0px, 116px, 116px, 58px);' : 'clip: rect(0, 80px, 80px, 40px);') + '}.loading-percentage ul :nth-child(even) {' + (self.is_transferit ? 'clip: rect(0, 58px, 116px, 0);' : 'clip: rect(0, 40px, 80px, 0);') + '}.loading-percentage .right-c span {border-top-left-radius: 50%;border-bottom-left-radius: 50%;background-color:' + (self.is_transferit ? '#1D81FF' : '#dc0000') + ';}.loading-percentage .left-c span {margin-left: 50%;border-top-right-radius: 50%;border-bottom-right-radius: 50%;background-color:' + (self.is_transferit ? '#1D81FF' : '#dc0000') + ';}.st-social-block-load {position: fixed;bottom: 20px;left: 0;width: 100%;height: 43px;text-align: center;}.st-bottom-button {height: 24px;width: 24px;margin: 0 8px;display: inline-block;background-image: url(' + istaticpath + 'loading-sprite_' + (darkloader ? 'dark' : 'light') + '.png);background-repeat: no-repeat;background-position: 11px -171px;cursor: pointer;border-radius: 100%;-webkit-transition: all 200ms ease-in-out;-moz-transition: background-color 200ms ease-in-out;-o-transition: background-color 200ms ease-in-out;-ms-transition: background-color 200ms ease-in-out;transition: background-color 200ms ease-in-out;background-color:#999999;}..st-bottom-button.st-google-button {background-position: -69px -171px;}.st-bottom-button.st-twitter-button{background-position: -29px -171px;}.st-bottom-button:hover {background-color:#334f8d;}.st-bottom-button.st-twitter-button:hover {background-color:#1a96f0;}.st-bottom-button.st-google-button:hover {background-color:#d0402a;}@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {.st-bottom-button, .loading-m-block, .loading-cloud {' + (self.is_transferit ? '' : 'background-image: url(' + istaticpath + 'loading-sprite_' + (darkloader ? 'dark' : 'light') + '@2x.png);background-size: 225px auto;') + '}}';
 
     mCreateElement('div', { "class": "loading-main-block", id: "loading"}, 'body')
         .innerHTML =
@@ -3475,10 +3710,11 @@ else if (!browserUpdate) {
             '        </div>'+
             '        <div class="loading-m-block"></div>'+
             '    </div>'+
+            (self.is_transferit ? '' :
             '    <div class="st-social-block-load" id="bootbottom">'+
             '        <a href="https://www.facebook.com/MEGAprivacy" target="_blank" rel="noopener noreferrer" class="st-bottom-button st-facebook-button"></a>'+
             '        <a href="https://www.twitter.com/MEGAprivacy" target="_blank" rel="noopener noreferrer" class="st-bottom-button st-twitter-button"></a>'+
-            '    </div>'+
+            '    </div>') +
             '</div>';
 
     if (is_iframed || window.top !== window) {
@@ -3489,6 +3725,7 @@ else if (!browserUpdate) {
             document.body.textContent = '';
             document.body.style.background = is_drop ? '#fff' : '#000';
             document.body.className = is_drop ? 'theme-light' : 'theme-dark-forced';
+
             jsl_progress = function() {};
         }
         catch (ex) {
@@ -3775,7 +4012,7 @@ else if (!browserUpdate) {
             mBroadcaster.sendMessage('boot_done');
         }
 
-        if (u_checked) {
+        if (self.u_checked) {
             startMega();
         }
         else if (loginresponse === -15) {
@@ -3977,7 +4214,10 @@ function echo(a) {
 // Promise.catch helper
 function tell(ex) {
     'use strict';
-    if (d) {
+    if (self.reportError && ex instanceof Error) {
+        reportError(ex);
+    }
+    else if (self.d) {
         console.error(ex);
     }
     msgDialog('warninga', l[135], l[47], ex < 0 ? api_strerror(ex) : ex);
@@ -4041,3 +4281,5 @@ mBroadcaster.once('startMega', function() {
 });
 
 Object.defineProperty(self, 's4', {value: Object.create(null)});
+Object.defineProperty(self, 'T', {value: Object.create(null)});
+Object.defineProperty(T, 'ui', {value: Object.create(null)});

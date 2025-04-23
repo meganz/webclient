@@ -1,0 +1,88 @@
+/*
+ * Page structure
+*/
+
+/* Body */
+
+.global-page-container {
+    height: 100%;
+}
+
+.page-body {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+
+/* Header */
+
+.page-header {
+    display: flex;
+    margin: 12px;
+    max-width: 100%;
+    position: relative;
+    transition: var(--transition-margin);
+}
+
+
+/* Content */
+
+.page-content {
+    display: flex;
+    flex: 1 1 auto;
+    justify-content: center;
+}
+
+/* Content. Boxes styling */
+
+.page-content > .it-box-holder > .it-box {
+    flex: 1 1 auto;
+    margin: 0 12px 12px;
+    overflow: hidden;
+    width: calc(100% - 24px);
+}
+
+.page-content .it-box .desktop-scroll-area {
+    margin: 0 calc(0px - var(--box-scroll-space));
+    overflow: auto;
+    padding: 0 var(--box-scroll-space);
+}
+
+.page-content .it-box .desktop-scroll-area.bottom {
+    margin-bottom: calc(0px - var(--box-scroll-space));
+    padding-bottom: var(--box-scroll-space);
+}
+
+
+/* Footer */
+
+.page-footer {
+    display: flex;
+    justify-content: center;
+    margin: 0 12px 12px;
+}
+
+.page-footer > .it-box.tag {
+    flex: 0 0 auto;
+    margin: 12px 0;
+}
+
+
+/* Adaptive layout */
+
+@media only screen and (max-width: 960px), only screen and (max-height: 400px) {
+
+    .page-content .it-box-holder .it-box.modal {
+        max-width: none;
+    }
+
+    .page-content .it-box-holder .it-box .desktop-scroll-area,
+    .page-content .it-box-holder .it-box .desktop-scroll-area.bottom {
+        margin: 0;
+        max-height: none;
+        overflow: visible;
+        padding: 0;
+    }
+
+}

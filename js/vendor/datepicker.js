@@ -785,6 +785,11 @@
         },
 
         setPosition: function (position) {
+            if (this.opts.setPosition) {
+                this.opts.setPosition(this.$datepicker);
+                return;
+            }
+
             position = position || this.opts.position;
 
             var dims = this._getDimensions(this.$el),

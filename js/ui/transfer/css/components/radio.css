@@ -1,0 +1,134 @@
+/*
+ * Radio button component
+ *
+*/
+
+.it-radio-button {
+    height: 24px;
+    position: relative;
+    width: 24px;
+}
+
+.it-radio-button .box {
+    display: block;
+}
+
+.it-radio-button .box::before,
+.it-radio-button .box::after {
+    border-radius: 100%;
+    content: '';
+    display: block;
+    height: 8px;
+    margin: 8px;
+    position: absolute;
+    top: 0;
+    transition: var(--transition-bg-color);
+    width: 8px;
+}
+
+.it-radio-button .box::after {
+    box-shadow: inset 0 0 0 1.5px var(--main-neutral-secondary);
+    height: 16px;
+    margin: 4px;
+    transition: var(--transition-shadow);
+    width: 16px;
+}
+
+.it-radio-button input:checked ~ .box::after {
+    box-shadow: inset 0 0 0 1.5px var(--main-primary);
+}
+
+.it-radio-button input:checked ~ .box::before {
+    background-color: var(--main-primary);
+}
+
+.it-radio-button input {
+    height: 100%;
+    margin: 0;
+    opacity: 0;
+    padding: 0;
+    position: absolute;
+    width: 100%;
+}
+
+.it-radio-label {
+    align-items: center;
+    color: var(--main-neutral-primary);
+    display: flex;
+    font: var(--text-body-sm);
+}
+
+.it-radio-label span {
+    display: inline-flex;
+}
+
+.it-radio-label span + span {
+    margin-inline-start: 8px;
+}
+
+/* Label. Button type */
+
+.it-radio-label.btn-type {
+    background: transparent;
+    border-radius: var(--radius-i-sm);
+    border: 0;
+    color: var(--main-neutral-primary);
+    cursor: pointer;
+    display: flex;
+    font: var(--text-body-sm);
+    margin: 0;
+    outline: none;
+    overflow: hidden;
+    padding: 8px;
+    text-align: start;
+    transition: var(--transition-bg-color);
+    white-space: nowrap;
+    width: 100%;
+}
+
+.it-radio-label.btn-type > * {
+    flex: 0 0 auto;
+}
+
+.it-radio-label.btn-type > span.name {
+    display: inline-block;
+    flex: 1 1 auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.it-radio-label.btn-type > * + * {
+    margin-inline-start: 8px;
+}
+
+.it-radio-label.btn-type > .name:first-child {
+    margin-inline-start: 4px;
+}
+
+.it-radio-label.btn-type > .name:last-child {
+    margin-inline-end: 4px;
+}
+
+
+/* States */
+
+/* States. Hover  state */
+
+@media (hover: hover) {
+
+    .it-radio-label.btn-type:hover {
+        background-color: var(--main-overlay-soft);
+    }
+
+}
+
+/* States. Focused state */
+
+.it-dropdown-button:focus {
+    box-shadow: var(--shadow-focused);
+    transition: var(--transition-shadow) .2s;
+}
+
+.it-dropdown-body .option:focus {
+    background-color: var(--main-overlay-soft);
+}

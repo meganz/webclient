@@ -1,0 +1,524 @@
+/*
+ * Create link section
+*/
+
+/* Add files box */
+
+.it-box.add-files-box {
+    box-shadow: 0 0 4px 0 var(--main-overlay-primary), var(--shadow-lg);
+}
+
+.it-box.add-files-box .content {
+    align-items: center;
+    border: 3px dashed var(--main-overlay-primary);
+    border-radius: 12px;
+    padding: 0 24px 40px;
+}
+
+.it-box.add-files-box label {
+    display: flex;
+    flex-direction: column;
+}
+
+.it-box.add-files-box .head-icon {
+    --icon-size: 64px;
+    --mask-color: var(--main-primary);
+    font-weight: normal;
+    margin: 64px;
+}
+
+.it-box.add-files-box .link {
+    color: var(--main-primary);
+    font: var(--text-btn-md);
+    margin: 12px 0 0;
+}
+
+
+/* Get link box */
+
+.it-box.get-link-box .form-header {
+    align-items: center;
+    display: flex;
+    margin: 0 0 12px;
+}
+
+.it-box.get-link-box .desktop-scroll-area {
+    height: 288px;
+    padding-bottom: 12px;
+    padding-top: 12px;
+    position: relative;
+}
+
+.it-box.get-link-box .desktop-scroll-area.ext {
+    height: 356px;
+}
+
+.it-box.get-link-box .form-header .it-button {
+    flex: 0 0 auto;
+    margin-inline-start: 12px; 
+}
+
+.it-box.get-link-box form {
+    display: grid;
+    gap: 12px;
+}
+
+.it-box.get-link-box .it-input:not(.hidden) + .it-input,
+.it-box.get-link-box .it-dropdown + .it-input,
+.it-box.get-link-box .it-toggle + .it-toggle {
+    margin: 12px 0 0;
+}
+
+/*Link settings */
+
+.it-box.get-link-box .form-header .it-button i {
+    transition: transform 400ms  ease-in-out;
+}
+
+.it-box.get-link-box .form-header .it-button.active-icon i {
+    transform: rotate(180deg);
+}
+
+.it-box.get-link-box .settings-body {
+    display: none;
+}
+
+.it-box.get-link-box .visible-settings .settings-body {
+    display: block;
+}
+
+.it-box.get-link-box .settings-body .section {
+    border-top: 1px solid var(--main-borders-and-lines);
+    margin: 24px 0 0;
+    padding: 24px 0 0;
+}
+
+.it-box.get-link-box .settings-body .caption {
+    color: var(--main-neutral-primary);
+    font: var(--text-btn-lg);
+}
+
+.it-box.get-link-box .settings-body .info {
+    color: var(--main-neutral-secondary);
+    font: var(--text-body-sm);
+    padding: 0 0 24px;
+}
+
+.it-box.get-link-box .it-dropdown-body {
+    min-width: 160px;
+}
+
+.it-box.get-link-box .dialog-error-msg {
+    --icon-size: 24px;
+    --mask-color: var(--supportive-error);
+    align-items: center;
+    color: var(--supportive-error);
+    display: flex;
+    font: var(--text-body-sm);
+    margin: 0 0 12px;
+}
+
+.it-box.get-link-box .dialog-error-msg span {
+    margin-inline-start: 12px;
+}
+
+.it-box.get-link-box .it-checkbox-label {
+    align-items: start;
+    color: var(--main-neutral-primary);
+    font: var(--text-body-sm);
+    margin: -12px 0 12px;
+}
+
+.it-box.get-link-box .it-checkbox-label a.link {
+    color: var(--main-primary);
+}
+
+
+/* Add more files box */
+
+.it-box.add-more-files-box .add-files {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.it-box.add-more-files-box .it-menu.context {
+    min-width: 212px;
+}
+
+.it-box.add-more-files-box .add-files .inv-input {
+    --icon-size: 32px;
+    --mask-color: var(--main-primary);
+    align-items: center;
+    border: 3px dashed var(--main-overlay-primary);
+    border-radius: var(--radius-i-sm);
+    cursor: pointer;
+    display: flex;
+    flex: 0 0 calc(50% - 6px);
+    flex-direction: column;
+    overflow: hidden;
+    padding: 16px;
+    white-space: nowrap;
+}
+
+.it-box.add-more-files-box .add-files  .inv-input span {
+    color: var(--main-neutral-primary);
+    display: block;
+    font: 700 var(--text-body-sm);
+    margin: 8px 0 0;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.it-box.add-more-files-box .items-wrap {
+    border-top: 1px solid var(--main-borders-and-lines);
+}
+
+.it-box.add-more-files-box .files-info {
+    align-items: center;
+    display: flex;
+    padding: 16px 12px;
+    padding-inline-end: 4px;
+}
+
+.it-box.add-more-files-box .files-info .it-grid-info {
+    flex: 1 1 auto;
+}
+
+.it-box.add-more-files-box .files-info button {
+    margin-inline-start: 8px;
+}
+
+/* Add more files box. Files grid */
+
+.it-box.add-more-files-box .it-grid {
+    gap: 16px;
+    padding: 16px 0 0;
+    position: relative;
+}
+
+.it-box.add-more-files-box .it-grid:empty {
+    display: none;
+}
+
+.it-box.add-more-files-box .it-grid .col > span.md-font-size {
+    font-weight: normal;
+}
+
+.it-box.add-more-files-box .desktop-scroll-area {
+    max-height: 315px;
+}
+
+.it-box.add-more-files-box .it-grid-item .col > span {
+    transition: var(--transition-opacity), var(--transition-visibility);
+}
+
+.it-box.add-more-files-box .it-grid-item .col > button {
+    opacity: 0;
+    position: absolute;
+    right: 0;
+    transition: var(--transition-opacity), var(--transition-shadow), var(--transition-visibility);
+    visibility: hidden;
+    z-index: 2;
+}
+
+.rtl .it-box.add-more-files-box .it-grid-item .col > button {
+    left: 0;
+    right: auto;
+}
+
+.it-box.add-more-files-box .it-grid-item:hover .col > button {
+    opacity: 1;
+    visibility: visible;
+}
+
+.it-box.add-more-files-box .it-grid-item:hover .col > button + span {
+    opacity: 0;
+    visibility: hidden;
+}
+
+
+/* Transfering files box */
+
+.it-box.transferring-box .content {
+    align-items: center;
+    padding: 0 0 24px;
+}
+
+/* Transfering files box. Progress bar */
+
+.it-box.transferring-box .progress-bar {
+    height: 160px;
+    margin: 20px 0 0;
+    overflow: hidden;
+    position: relative;
+    width: 160px;
+}
+
+.it-box.transferring-box .progress-bar .bg {
+    background-color: var(--main-overlay-primary);
+    border-radius: 100%;
+    height: 100%;
+    position: absolute;
+    transition: var(--transition-bg-color);
+    width: 100%;
+}
+
+.it-box.transferring-box .progress-bar .icon-wrap {
+    --icon-size: 128px;
+    --mask-color: var(--main-forced-white);
+    background-color: var(--main-primary);
+    border: 8px solid var(--main-surface-primary);
+    border-radius: 100%;
+    height: calc(100% - 16px);
+    position: absolute;
+    margin: 8px;
+    top: 0;
+    transition: var(--transition-bg-color);
+    width: calc(100% - 16px);
+}
+
+.it-box.transferring-box .progress-bar p,
+.it-box.transferring-box .progress-bar li,
+.it-box.transferring-box .progress-bar ul {
+    height: 160px;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    width: 160px;
+}
+
+.it-box.transferring-box .progress-bar li {
+    position: absolute;
+    top: 0;
+}
+
+.it-box.transferring-box .progress-bar ul :nth-child(odd) {
+    clip: rect(0, 160px, 160px, 80px);
+}
+
+.it-box.transferring-box .progress-bar ul :nth-child(even) {
+    clip: rect(0, 80px, 160px, 0);
+}
+
+.it-box.transferring-box .progress-bar li span {
+    border-radius: 80px 0 0 80px;
+    background-color: var(--main-accent);
+    display: block;
+    height: 160px;
+    transition: var(--transition-bg-color);
+    width: 80px;
+}
+
+.it-box.transferring-box .progress-bar li.left-c span {
+    margin-left: 80px;
+    border-radius: 0 80px 80px 0;
+}
+
+/* Transfering files box. Info */
+
+.it-box.transferring-box h4 {
+    margin: 32px 0 0;
+}
+
+.it-box.transferring-box .details {
+    align-items: center;
+    color: var(--main-neutral-secondary);
+    display: flex;
+    flex-direction: column;
+    font: 700 var(--text-body-sm);
+    padding: 36px 0 0;
+    transition: var(--transition-opacity);
+}
+
+.it-box.transferring-box .status-info.align-mid {
+    align-items: center;
+    display: flex;
+}
+
+.it-box.transferring-box .status-info i {
+    --icon-size: 24px;
+    --mask-color: var(--main-accent);
+    font-weight: normal;
+    margin-inline-end: 8px;
+    display: none;
+}
+
+.it-box.transferring-box .status-info.tick i {
+    display: block;
+}
+
+.it-box.transferring-box .status-info + .status-info {
+    padding: 9px 0 0;
+}
+
+
+.it-box.transferring-box .status-info span {
+    color: var(--main-neutral-primary);
+}
+
+.it-box.transferring-box .status-info span.speed::before {
+    color: var(--main-neutral-secondary);
+    content: '\2022';
+    padding: 0 12px;
+    padding-inline-start: 10px;
+}
+
+/* Transfering files box. Completed transfer */
+
+.it-box.transferring-box.completed .progress-bar li span,
+.it-box.transferring-box.completed .progress-bar .bg,
+.it-box.transferring-box.completed .progress-bar .icon-wrap {
+    background-color: var(--main-accent);
+}
+
+/* Transfering files box. Cancel transfer */
+
+.it-box.transferring-box.cancel .progress-bar .bg {
+    --supportive-alpha: 0.2;
+}
+
+.it-box.transferring-box.cancel .progress-bar li span,
+.it-box.transferring-box.cancel .progress-bar .bg,
+.it-box.transferring-box.cancel .progress-bar .icon-wrap {
+    background-color: var(--supportive-error);
+}
+
+.it-box.transferring-box.cancel .details {
+    opacity: .1;
+}
+
+
+/* Link ready box */
+
+/* Link ready box. Copy link step */
+
+.it-box.link-ready-box .data-ready-img {
+    content: var(--url-link-ready-img);
+    width: 240px;
+}
+
+.it-box.link-ready-box .btns-pane {
+    display: flex;
+    justify-content: space-between;
+    margin: 24px 0 0;
+    max-width: 600px;
+    width: 100%;
+}
+
+.it-box.link-ready-box form {
+    display: flex;
+    margin: 24px 0 0;
+    width: 100%;
+}
+
+.it-box.link-ready-box form .it-input {
+    flex: 1 1 auto;
+}
+
+.it-box.link-ready-box form .it-input + .it-button {
+    margin-inline-start: 10px;
+}
+
+/* Link ready box. Copy link step.  Share button states */
+
+@media (hover: hover) {
+
+    .it-box.link-ready-box .it-button.transferit-vars {
+        --supportive-alpha: 0.12;
+    }
+
+    .it-box.link-ready-box .it-button.transferit-vars:hover i {
+        --supportive-alpha: 1;
+    }
+
+    .it-box.link-ready-box .it-button.facebook:hover::before {
+        background-color: var(--supportive-blue);
+    }
+
+    .it-box.link-ready-box .it-button.facebook:hover i {
+        --mask-color: var(--supportive-blue);
+    }
+
+    .it-box.link-ready-box .it-button.reddit:hover::before {
+        background-color: var(--supportive-nasa-orange);
+    }
+
+    .it-box.link-ready-box .it-button.reddit:hover i {
+        --mask-color: var(--supportive-nasa-orange);
+    }
+
+    .it-box.link-ready-box .it-button.mega:hover::before {
+        background-color: var(--supportive-mega);
+    }
+
+    .it-box.link-ready-box .it-button.mega:hover i {
+        --mask-color: var(--supportive-mega);
+    }
+}
+
+/* Link ready box. View content step */
+
+.it-box.link-ready-box .back-button {
+    margin: -8px;
+    position: absolute;
+    z-index: 5;
+}
+
+.rtl .it-box.link-ready-box .back-button i {
+    transform: rotate(180deg);
+}
+
+.it-box.link-ready-box .view-content-img {
+    width: 320px;
+}
+
+.it-box.link-ready-box .it-grid-info {
+    margin: 36px 0 0;
+}
+
+/* Link ready box. View content step. Files grid */
+
+.it-box.link-ready-box .items-wrap {
+    border: 0 solid var(--main-borders-and-lines);
+    border-width: 1px 0;
+    margin: 16px 0 0;
+    width: 100%;
+}
+
+.it-box.link-ready-box .desktop-scroll-area {
+    max-height: 208px;
+}
+
+.it-box.link-ready-box .it-grid {
+    padding: 16px 0;
+    position: relative;
+}
+
+.it-box.link-ready-box .it-grid .col > span.md-font-size {
+    font-weight: normal;
+}
+
+
+/* Ready to download box */
+
+.it-box.ready-to-download-box .data-ready-img {
+    content: var(--url-ready-to-dl-img);
+    width: 240px;
+}
+
+.it-box.ready-to-download-box .it-grid-info {
+    margin: 12px 0 0;
+}
+
+/* Adaptive layout */
+
+@media only screen and (max-width: 960px), only screen and (max-height: 400px) {
+
+    .it-box.get-link-box .desktop-scroll-area,
+    .it-box.get-link-box .desktop-scroll-area.ext {
+        height: auto;
+    }
+
+}

@@ -479,6 +479,7 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
 
         items['.move-item'] = 1;
         items['.getlink-item'] = 1;
+        items['.transferit-item'] = 1;
 
         var cl = new mega.Share();
         var hasExportLink = cl.hasExportLink($.selected);
@@ -624,7 +625,6 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
         // delete items['.download-item'];
         delete items['.copy-item'];
         delete items['.sh4r1ng-item'];
-        delete items['.transferit-item'];
         delete items['.remove-item'];
         delete items['.togglepausesync-item'];
     }
@@ -632,6 +632,7 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
     if (restrictedFolders || $.selected.length === 1
         && sourceRoot === M.InboxID) {
 
+        delete items['.transferit-item'];
         delete items['.open-cloud-item'];
         delete items['.open-in-location'];
         delete items['.move-item'];
@@ -661,7 +662,6 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
 
         if ($.selected.length === 1 && selNode.t) {
             items['.sh4r1ng-item'] = 1;
-            items['.transferit-item'] = 1;
 
             if (M.getNodeShareUsers(selNode, 'EXP').length || M.ps[selNode]) {
                 items['.removeshare-item'] = 1;

@@ -1,0 +1,281 @@
+<!-- Media viewer overlay !-->
+<section class="media-viewer-container theme-dark-forced hidden">
+    <div class="media-viewer">
+        <header>
+            <nav class="viewer-bars">
+                <ul class="bar menu">
+                    <button class="it-button lg-size js-download-t-file">
+                        <span>[$preview_download_tip]</span>
+                    </button>
+                </ul>
+                <div class="file-info">
+                    <div class="file-name"></div>
+                    <div class="file-size"></div>
+                </div>
+                <ul class="bar control">
+                     <li>
+                        <button class="it-button ghost simpletip js-close-slideshow" aria-label="Close" data-simpletip="Close" data-simpletipoffset="2" data-simpletip-class="theme-dark-forced">
+                            <i class="sprite-it-x24-mono icon-close"></i>
+                        </button>
+                    </li>
+                </ul>
+            </nav>
+        </header>
+
+        <section class="content" data-fullscreen="false" id="videoContainer">
+
+            <div class="img-wrap" data-count="">
+                <img alt="" class="img1" />
+                <img alt="" class="img2" />
+            </div>
+
+            <video id="video" data-autoplayvideo="false" data-playvideoonclick="false"></video>
+
+            <button class="gallery-btn previous" aria-label="[[previous]]">
+                <i class="sprite-it-x24-mono icon-arrow-big-left"></i>
+            </button>
+            <button class="gallery-btn next" aria-label="[[next]]">
+                <i class="sprite-it-x24-mono icon-arrow-big-right"></i>
+            </button>
+
+            <div class="loader-grad hidden">
+                <i class="sprite-fm-mono icon-loader-grad-small-regular-outline"></i>
+            </div>
+
+            <div class="rnd-button play-video-button hidden">
+                <i class="sprite-fm-mono icon-play-small-regular-solid"></i>
+            </div>
+
+            <div class="rnd-button play-pause-video-button hidden">
+                <i class="sprite-fm-mono icon-pause-small-regular-solid"></i>
+            </div>
+
+            <div class="it-button lg-size watch-again-button hidden">
+                <span>[$video_player_watch_again]</span>
+            </div>
+
+            <div class="watch-again-button-overlay"></div>
+
+            <div class="bouncing-loader viewer-pending hidden">
+                <span></span><span></span><span></span>
+            </div>
+
+            <div class="loader-grad-overlay"></div>
+
+            <div class="viewer-progress vo-hidden">
+                <ul>
+                    <li class="right-c"><p><span></span></p></li>
+                    <li class="left-c"><p><span></span></p></li>
+                </ul>
+            </div>
+
+        </section>
+
+        <footer>
+
+            <nav class="viewer-bars video-controls hidden" data-state="">
+                <div class="video-progress-block">
+                    <div class="video-progress-bar">
+                        <div class="video-time-bar"></div>
+                        <div class="video-expected-time-bar">
+                            <div class="video-progress-time">
+                                00:00
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <ul class="bar">
+                    <li>
+                        <div class="playpause-wrapper wrapper">
+                            <button class="it-button ghost l-icon v-btn playpause" aria-label="[[play pause]]" data-state="play">
+                                <i class="sprite-fm-mono icon-play-small-regular-outline"></i>
+                            </button>
+                        </div>
+                        <div class="vol-wrapper wrapper audio">
+                            <button class="it-button ghost l-icon v-btn mute" data-state="mute" aria-label="[[volume]]">
+                                <i class="sprite-fm-mono icon-volume-max-small-regular-outline"></i>
+                            </button>
+                            <div class="video-vol-range">
+                                <div class="volume-bar"><span></span></div>
+                            </div>
+                        </div>
+                        <div class="timing">
+                            <div class="video-timing current">
+                                00:00
+                            </div>
+                            <div>
+                                /
+                            </div>
+                            <div class="video-timing duration">
+                                00:00
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="speed-wrapper wrapper hidden">
+                            <button class="it-button ghost l-icon v-btn speed" aria-label="[[speed]]" data-state="speed">
+                                <i class="sprite-it-x24-mono icon-pause"></i>
+                            </button>
+                        </div>
+                        <div class="repeat-wrapper wrapper">
+                            <button class="it-button ghost l-icon v-btn repeat" aria-label="[[repeat]]" data-state="repeat">
+                                <i class="sprite-fm-mono icon-repeat-one-small-regular-solid"></i>
+                            </button>
+                        </div>
+                        <div class="subtitles-wrapper wrapper hidden">
+                            <button class="it-button ghost l-icon v-btn subtitles" aria-label="[[subtitles]]" data-state="subtitles">
+                                <i class="sprite-fm-mono icon-subtitles-02-small-regular-outline"></i>
+                            </button>
+                        </div>
+                        <div class="settings-wrapper wrapper hidden">
+                            <button class="it-button ghost l-icon v-btn settings" aria-label="[[settings]]" data-state="settings">
+                                <i class="sprite-fm-mono icon-settings-02-small-regular-outline"></i>
+                            </button>
+                        </div>
+                        <div class="fs-wrapper wrapper">
+                            <button class="it-button ghost l-icon v-btn fs" aria-label="[[fullscreen]]" data-state="go-fullscreen">
+                                <!-- Active state: .icon-fullscreen-leave !-->
+                                <i class="sprite-fm-mono icon-maximize-02-small-regular-outline"></i>
+                            </button>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+
+            <template id="media-viewer-speed-menu">
+                <nav class="context-menu playback-speed options-menu avoid-bottom" aria-expanded="false">
+                    <ul>
+                        <li>
+                            <div class="title">[$video_player_playback_speed]</div>
+                        </li>
+                        <li>
+                            <button class="05x">
+                                <span>[$video_player_speed_0.5x]</span>
+                                <i class="sprite-fm-mono icon-active icon-check-small-regular-outline hidden"></i>
+                            </button>
+                        </li>
+                        <li>
+                            <button class="1x">
+                                <span>[$video_player_speed_1x]</span>
+                                <i class="sprite-fm-mono icon-active icon-check-small-regular-outline"></i>
+                            </button>
+                        </li>
+                        <li>
+                            <button class="15x">
+                                <span>[$video_player_speed_1.5x]</span>
+                                <i class="sprite-fm-mono icon-active icon-check-small-regular-outline hidden"></i>
+                            </button>
+                        </li>
+                        <li>
+                            <button class="2x">
+                                <span>[$video_player_speed_2x]</span>
+                                <i class="sprite-fm-mono icon-active icon-check-small-regular-outline hidden"></i>
+                            </button>
+                        </li>
+                    </ul>
+                </nav>
+            </template>
+            <template id="media-viewer-subtitles-menu">
+                <nav class="context-menu subtitles options-menu avoid-bottom" aria-expanded="false">
+                    <ul>
+                        <li>
+                            <div class="title">[$video_player_subtitles]</div>
+                        </li>
+                        <li class="options">
+                            <div class="options-wrapper">
+                                <button class="off">
+                                    <span>[$video_player_off]</span>
+                                    <i class="sprite-fm-mono icon-active icon-check-small-regular-outline"></i>
+                                </button>
+                            </div>
+                        </li>
+                        <li class="divider">
+                            <hr/>
+                        </li>
+                        <li>
+                            <button class="add">
+                                <span>[$video_player_add_subtitles]</span>
+                            </button>
+                        </li>
+                    </ul>
+                </nav>
+            </template>
+            <template id="subtitles-dialog-subtitles-grid-table">
+                <div class="subtitles-grid-table grid-scrolling-table">
+                    <div class="grid-wrapper">
+                        <table class="grid-table table-hover">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th megatype="fname">
+                                        <div class="name">[$86]</div>
+                                    </th>
+                                    <th megatype="size">
+                                        <div class="size">[$87]</div>
+                                    </th>
+                                    <th megatype="timeAd">
+                                        <div class="date">[$17445]</div>
+                                    </th>
+                                    <th megatype="location">
+                                        <div class="location">[$17818]</div>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </template>
+            <template id="subtitles-dialog-empty-subtitles">
+                <div class="empty-subtitles">
+                    <div class="empty-subtitles-wrapper">
+                        <i class="empty-subtitles-icon sprite-fm-mono icon-subtitles-02-small-regular-solid"></i>
+                        <div class="empty-subtitles-txt">[$video_player_no_subtitle_files]</div>
+                    </div>
+                </div>
+            </template>
+            <template id="media-viewer-video-settings-menu">
+                <nav class="context-menu settings options-menu avoid-bottom" aria-expanded="false">
+                    <ul>
+                        <li>
+                            <div class="settings-wrapper">
+                                <span>[$video_player_brightness]</span>
+                                <div class="settings-range">
+                                    <span>0</span>
+                                    <div class="settings-bar brightness-bar"><span></span></div>
+                                    <div class="value">50</div>
+                                    <span>100</span>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="settings-wrapper">
+                                <span>[$video_player_contrast]</span>
+                                <div class="settings-range">
+                                    <span>0</span>
+                                    <div class="settings-bar contrast-bar"><span></span></div>
+                                    <div class="value">50</div>
+                                    <span>100</span>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="settings-wrapper">
+                                <span>[$video_player_saturation]</span>
+                                <div class="settings-range">
+                                    <span>0</span>
+                                    <div class="settings-bar saturate-bar"><span></span></div>
+                                    <div class="value">50</div>
+                                    <span>100</span>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <button class="reset-all invisible">[$video_player_reset_all]</button>
+                        </li>
+                    </ul>
+                </nav>
+            </template>
+        </footer>
+    </div>
+</section>

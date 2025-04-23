@@ -1,0 +1,148 @@
+/*
+ * FM section
+*/
+
+/* Common structure */
+
+.it-box.items-box > .body {
+    height: 100%;
+}
+
+.it-box.items-box .items-wrap {
+    flex: 1 1 auto;
+    position: relative;
+}
+
+.it-box.items-box .items-wrap .content-body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+}
+
+.it-box.items-box .items-wrap .content-body > .content {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 100%;
+    width: 100%;
+}
+
+.it-box.items-box .items-wrap .content-body > .footer {
+    margin: 24px 0 0;
+    text-align: center;
+}
+
+.it-box.items-box .items-wrap .content-body > .footer .progress-status {
+    margin: 6px 0 -18px;
+}
+
+/* Test version of scrolling in FM */
+.it-box.items-box .desktop-scroll-area {
+    height: calc(100% + var(--box-scroll-space));
+    position: absolute;
+    width: calc(100% + var(--box-scroll-space) * 2);
+}
+
+
+/* File magager box */
+
+/* Items grid*/
+
+/* Items grid. Header */
+
+.it-box.file-manager-box .it-grid.grid-type {
+    padding: 0 0 24px;
+}
+
+.it-box.file-manager-box .grid-header {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+}
+
+.it-box.file-manager-box .info-header {
+    align-items: center;
+    display: flex;
+}
+
+.it-box.file-manager-box .link-name {
+    font: 700 var(--text-body-md);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.it-box.file-manager-box .link-name + button {
+    margin-inline-start: 8px;
+}
+
+.it-box.file-manager-box .view-content {
+    align-items: center;
+    display: flex;
+    justify-content: end;
+}
+
+.it-box.file-manager-box .view-btns,
+.it-box.file-manager-box .it-dropdown {
+    margin: 0 0 24px;
+}
+
+.it-box.file-manager-box .files-info {
+    line-height: 0;
+}
+
+.it-box.file-manager-box .info-body {
+    flex: 1 1 auto;
+    margin: -4px 0 20px;
+    margin-inline-end: 24px;
+    min-width: 0;
+}
+
+.it-box.file-manager-box .view-btns {
+    display: flex;
+    margin-inline-start: 24px;
+}
+
+.it-box.file-manager-box .view-btns button + button {
+    margin-inline-start: 12px;
+}
+
+.it-box.file-manager-box .it-dropdown-button {
+    min-width: 240px;
+}
+
+/* Items grid. List type*/
+
+.it-box.file-manager-box .it-grid.list-type .it-button {
+    margin-inline-start: auto;
+}
+
+
+/* Adaptive layout */
+
+@media only screen and (max-width: 960px), only screen and (max-height: 400px) {
+
+    .it-box.items-box .desktop-scroll-area {
+        position: relative;
+        height: auto;
+        width: auto;
+    }
+
+    .it-box.file-manager-box .it-grid.grid-type .lg-size .items-group-body {
+        grid-template-columns: repeat(auto-fill, minmax(246px, 1fr));
+    }
+
+}
+
+@media only screen and (max-width: 780px) {
+
+    .it-box.file-manager-box .view-content {
+        flex-wrap: wrap;
+        width: 100%;
+    }
+
+    .it-box.file-manager-box .grid-header {
+        flex-wrap: wrap;
+    }
+
+}

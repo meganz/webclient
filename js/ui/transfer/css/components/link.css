@@ -1,0 +1,73 @@
+/*
+ * Links styling
+*/
+
+a,
+a:focus,
+a:link,
+a:visited,
+a:hover,
+a:active {
+    outline: none; /* TODO: Add custom focus */
+}
+
+.link,
+a.link,
+a.link:visited {
+    color: var(--main-neutral-secondary);
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.link.sm-size,
+a.link.sm-size {
+    font: var(--text-body-sm);
+}
+
+.link.sm-size.bold,
+a.link.sm-size.bold {
+    font: bold var(--text-body-sm);
+}
+
+.link:focus,
+a.link:focus {
+    text-decoration: none;
+}
+
+
+/* States */
+
+/* States. Hover state. Only for non-touch devices. */
+
+@media (hover: hover) {
+
+    .link:hover,
+    a.link:hover {
+        text-decoration: none;
+    }
+
+}
+
+
+/* Link type label */
+
+label.link span {
+    text-decoration: underline;
+}
+
+label.link input:focus + span {
+    text-decoration: none;
+}
+
+
+/* Link type label. States */
+
+/* Link type label. States. Hover state. Only for non-touch devices. */
+
+@media (hover: hover) {
+
+    label.link:hover span {
+        text-decoration: none;
+    }
+
+}

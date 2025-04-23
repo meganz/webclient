@@ -1487,45 +1487,46 @@ function logExportEvt(evtId, data) {
                                 ? sheet.contentNode.querySelector('.node-link-block .block-naming')
                                 : sheet.headerTitleNode
                         );
-                    }
 
-                    if (mega.xferit) {
-                        const header = sheet.overlayNode.querySelector('.header');
-                        const title = mCreateElement('div', { class: 'font-title-h3' });
-                        const txt = mCreateElement('div', { class: 'font-body-1' });
-                        itBanner = mCreateElement(
-                            'div',
-                            {
-                                class: 'it-banner absolute bg-it p-6 flex flex-row items-center w-full left-0'
-                                    + ' text-color-white box-border rounded-3xl box-border opacity-0 transition-opacity'
-                            },
-                            [
-                                mCreateElement('i', { class: 'sprite-fm-mono icon-upload-filled icon-size-8' }),
-                                mCreateElement('div', { class: 'flex-1 px-4' }, [ title, txt ])
-                            ]
-                        );
+                        if (mega.xferit) {
+                            const header = sheet.overlayNode.querySelector('.header');
+                            const title = mCreateElement('div', { class: 'font-title-h3' });
+                            const txt = mCreateElement('div', { class: 'font-body-1' });
+                            itBanner = mCreateElement(
+                                'div',
+                                {
+                                    class: 'it-banner absolute bg-it p-6 flex flex-row items-center w-full left-0'
+                                        + ' text-color-white box-border rounded-3xl'
+                                        + ' box-border opacity-0 transition-opacity'
+                                },
+                                [
+                                    mCreateElement('i', { class: 'sprite-fm-mono icon-upload-filled icon-size-8' }),
+                                    mCreateElement('div', { class: 'flex-1 px-4' }, [ title, txt ])
+                                ]
+                            );
 
-                        title.textContent = l.it_banner_title;
-                        txt.textContent = l.it_banner_txt;
+                            title.textContent = l.it_banner_title;
+                            txt.textContent = l.it_banner_txt;
 
-                        header.prepend(itBanner);
+                            header.prepend(itBanner);
 
-                        MegaButton.factory({
-                            parentNode: itBanner,
-                            text: l.it_banner_btn,
-                            componentClassname: 'primary whitespace-nowrap font-600 slim',
-                            type: 'button'
-                        }).on('click.pro', () => {
-                            M.openTransferItOverlay().catch(tell);
-                        });
+                            MegaButton.factory({
+                                parentNode: itBanner,
+                                text: l.it_banner_btn,
+                                componentClassname: 'primary whitespace-nowrap font-600 slim theme-dark-forced',
+                                type: 'button'
+                            }).on('click.pro', () => {
+                                M.openTransferItOverlay().catch(tell);
+                            });
 
-                        sheet.overlayNode.classList.add('has-it-banner');
+                            sheet.overlayNode.classList.add('has-it-banner');
 
-                        tSleep(0.3).then(() => {
-                            if (itBanner) {
-                                itBanner.classList.add('opacity-100');
-                            }
-                        });
+                            tSleep(0.3).then(() => {
+                                if (itBanner) {
+                                    itBanner.classList.add('opacity-100');
+                                }
+                            });
+                        }
                     }
                 },
                 onClose: () => {

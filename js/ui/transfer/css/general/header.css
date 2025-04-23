@@ -1,0 +1,116 @@
+/*
+ * Main header
+*/
+
+.page-header .it-box > .body {
+    align-items: center;
+    justify-content: space-between;
+    overflow: hidden;
+}
+
+.page-header .it-box > .body > * {
+    flex: 1 1 calc(100% / 3);
+}
+
+
+/*Logo groups */
+
+.logo-group,
+a.logo-group,
+a.logo-group:visited {
+    align-items: center;
+    color: var(--main-neutral-primary);
+    display: inline-flex;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.it-logo {
+    --icon-size: 32px;
+    --mask-color: var(--main-forced-white);
+    background-color: var(--main-primary);
+    border-radius: 100%;
+    height: 32px;
+    width: 32px;
+}
+
+.logo-group .label {
+    font: 700 var(--text-body-md);
+    margin-inline-start: 16px;
+}
+
+.logo-group.mega
+a.logo-group.mega,
+a.logo-group.mega:visited {
+    --mask-color: var(--supportive-mega);
+    color: var(--main-neutral-secondary);
+    font: 400 var(--text-caption-md);
+}
+
+.logo-group.mega .label {
+    font: normal var(--text-caption-md);
+    margin: 0 4px;
+}
+
+.logo-group.mega i {
+    --mask-color: var(--supportive-mega);
+}
+
+
+/*Section buttons */
+
+.page-header .it-button {
+    white-space: nowrap;
+}
+
+.page-header .sections {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    margin: 0 12px;
+}
+
+.page-header .sections  > * {
+    margin: 0 6px;
+}
+
+
+/*General buttons */
+
+.page-header .account {
+    align-items: center;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.page-header .account > * + * {
+    margin-inline-start: 24px;
+}
+
+
+/* Account menu */
+
+.page-header .it-menu.account {
+    margin: 8px 0;
+    max-width: 100%;
+    right: 0;
+    top: 100%;
+    width: 360px;
+}
+
+.rtl .page-header .it-menu.account {
+    left: 0;
+    right: auto;
+}
+
+
+/* Adaptive layout */
+
+@media only screen and (max-width: 960px) {
+
+    .page-header .section.logged-out {
+        display: none;
+    }
+
+}
+

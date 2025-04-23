@@ -1,0 +1,36 @@
+/*
+ * Typo variables
+*/
+
+.transferit-vars {
+
+    /* Font family */
+
+    --text-font-family: 'Nunito Sans', sans-serif;
+
+
+    /* Font */
+
+    --text-hero: 700 72px/76px var(--text-font-family);
+    --text-h1: 700 64px/72px var(--text-font-family);
+    --text-h2: 700 48px/56px var(--text-font-family);
+    --text-h3: 700 40px/48px var(--text-font-family);
+    --text-h4: 700 32px/40px var(--text-font-family);
+    --text-h5: 700 24px/32px var(--text-font-family);
+
+    --text-body-lg: 24px/32px var(--text-font-family);
+    --text-body-md: 18px/24px var(--text-font-family);
+    --text-body-sm: 14px/24px var(--text-font-family);
+
+    --text-caption-lg: 16px/24px var(--text-font-family);
+    --text-caption-md: 12px/16px var(--text-font-family);
+    --text-caption-sm: 10px/16px var(--text-font-family);
+
+    --text-hairline-lg: 800 16px/24px var(--text-font-family);
+    --text-hairline-md: 800 10px/16px var(--text-font-family);
+
+    --text-btn-lg: 700 16px/24px var(--text-font-family);
+    --text-btn-md: 700 14px/16px var(--text-font-family);
+    --text-btn-sm: 700 12px/16px var(--text-font-family);
+
+}

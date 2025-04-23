@@ -1,0 +1,42 @@
+/*
+ * Wallpapers and images
+*/
+
+/* Light theme */
+
+.theme-light.transferit-vars,
+.theme-light .transferit-vars,
+.transferit-vars .theme-light-forced {
+
+    /* Wallpapers */
+
+    --wall-img1-url: url('../../images/wallpapers/w1-light.jpg');
+
+
+    /* Illustrations */
+
+    --url-login-img: url('../../images/illustrations/auth-illustration.png');
+    --url-link-ready-img: url('../../images/illustrations/link-ready.png');
+    --url-ready-to-dl-img: url('../../images/illustrations/ready-to-dl.png');
+
+}
+
+
+/* Dark theme */
+
+.theme-dark.transferit-vars,
+.theme-dark .transferit-vars,
+.transferit-vars .theme-dark-forced {
+
+    /* Wallpapers */
+
+    --wall-img1-url: url('../../images/wallpapers/w1-dark.jpg');
+
+
+    /* Illustrations */
+
+    --url-login-img: url('../../images/illustrations/auth-illustration-dark.png');
+    --url-link-ready-img: url('../../images/illustrations/link-ready-dark.png');
+    --url-ready-to-dl-img: url('../../images/illustrations/ready-to-dl-dark.png');
+
+}

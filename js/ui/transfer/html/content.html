@@ -1,0 +1,723 @@
+<!-- Context menu !-->
+<div class="it-menu context js-dashboard-menu" tabindex="0">
+    <div class="body">
+        <div class="section">
+            <button class="it-menu-item js-tr-download">
+                <i class="sprite-it-x24-mono icon-arrow-small-down"></i>
+                <span>[$58]</span>
+            </button>
+            <button class="it-menu-item js-tr-copy-link">
+                <i class="sprite-it-x24-mono icon-chain"></i>
+                <span>[$1394]</span>
+            </button>
+            <button class="it-menu-item js-tr-edit-link-title">
+                <i class="sprite-it-x24-mono icon-edit"></i>
+                <span>[$transferit_edit_title]</span>
+            </button>
+            <button class="it-menu-item js-tr-change-password">
+                <i class="sprite-it-x24-mono icon-lock-open"></i>
+                <span>[$23262]</span>
+            </button>
+            <button class="it-menu-item js-tr-change-exp-date">
+                <i class="sprite-it-x24-mono icon-calendar"></i>
+                <span>[$transferit_change_exp_date]</span>
+            </button>
+            <button class="it-menu-item js-tr-change-schedule">
+                <i class="sprite-it-x24-mono icon-calendar"></i>
+                <span>[$transferit_change_schedule]</span>
+            </button>
+            <button class="it-menu-item js-tr-delete-transfer negative">
+                <i class="sprite-it-x24-mono icon-trash-can"></i>
+                <span>[$transferit_delete_transfer]</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Add files !-->
+<div class="it-box-holder js-add-files-section hidden">
+    <section class="it-box lg-shadow modal add-files-box">
+        <div class="body">
+            <div class="content">
+                <h5>
+                    <label class="inv-input">
+                        <i class="sprite-it-x32-mono icon-file-add-narrow head-icon"></i>
+                        <input type="file" name="select-file" class="upload-picker" multiple/>
+                        <span>[$transferit_add_files]</span>
+                    </label>
+                </h5>
+                <label class="inv-input link">
+                    <input type="file" name="select-folder" class="upload-picker" webkitdirectory multiple/>
+                    <span>[$transferit_or_select_folder]</span>
+                </label>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- Addeded files. Use "top-line-align" class for multiple boxes in "page-body" !-->
+<div class="it-box-holder top-line-align js-added-files-section hidden">
+
+    <!-- Addeded files. Create link/Send file box !-->
+    <section class="it-box lg-shadow modal minor get-link-box">
+        <div class="body">
+            <div class="content">
+
+                <!-- Create link/Send file !-->
+                <div class="form-header">
+                    <div class="it-sgm-control lg-size f-w">
+                        <div class="button">
+                            <input type="radio" id="glb-create-link-sgm" name="glb-manage-sgm" value="0" checked="">
+                            <label for="glb-create-link-sgm"><span>[$transferit_create_link]</span></label>
+                        </div>
+                        <div class="button">
+                            <input type="radio" id="glb-send-files-sgm" name="glb-manage-sgm" value="1">
+                            <label for="glb-send-files-sgm"><span>[$6834]</span></label>
+                        </div>
+                    </div>
+                    <button class="it-button xl-size ghost js-link-settings" aria-role="Link settings">
+                        <i class="sprite-it-x24-mono icon-settings"></i>
+                    </button>
+                </div>
+                <form>
+                    <div class="desktop-scroll-area js-inputs-body">
+                        <div class="js-default-inputs">
+                            <div class="it-input fl-label xl-size hidden">
+                                <div class="input-box">
+                                    <div class="input-field">
+                                        <input type="text" placeholder="[$transferit_email_to]" name="recipients" id="glb-recipients-input" value="" required />
+                                        <label for="glb-recipients-input">[$transferit_email_to]</label>
+                                    </div>
+                                </div>
+                                <div class="error-text"></div>
+                            </div>
+
+                            <div class="it-input fl-label xl-size">
+                                <div class="input-box">
+                                    <div class="input-field">
+                                        <input type="text" placeholder="[$transferit_your_email]" name="glb-email-input" id="glb-email-input" value="" required />
+                                        <label for="glb-email-input">[$transferit_your_email_opt]</label>
+                                    </div>
+                                </div>
+                                <div class="error-text"></div>
+                            </div>
+
+                             <div class="it-input fl-label xl-size">
+                                <div class="input-box">
+                                    <div class="input-field">
+                                        <input type="text" placeholder="[$transferit_enter_title]" name="glb-title-input" id="glb-title-input" value="" required />
+                                        <label for="glb-title-input">[$file_request_title_heading]</label>
+                                    </div>
+                                </div>
+                                <div class="error-text"></div>
+                            </div>
+
+                             <div class="it-input fl-label xl-size textarea">
+                                <div class="input-box">
+                                    <div class="input-field">
+                                        <textarea placeholder="[$7368]" name="glb-msg-area" id="glb-msg-area"  rows="4" required></textarea>
+                                        <label for="glb-msg-area">[$transferit_msg_opt]</label>
+                                    </div>
+                                </div>
+                                 <div class="error-text"></div>
+                            </div>
+                        </div>
+
+                        <div class="settings-body js-settings-body">
+                            <div class="section">
+                                <div class="caption">[$transferit_add_pass]</div>
+                                <div class="info">[$transferit_lock_access_to_tr]</div>
+                                <div class="it-input fl-label xl-size it-input-password">
+                                    <div class="input-box">
+                                        <div class="input-field">
+                                            <input type="password" placeholder="[$17454]" name="glb-password-input"
+                                                   id="glb-password-input" value="" required
+                                                   autocomplete="new-password"/>
+                                            <label for="glb-password-input">[$909]</label>
+                                        </div>
+                                    </div>
+                                    <div class="error-text"></div>
+                                </div>
+                            </div>
+                            <div class="section">
+                                <div class="caption">[$862]</div>
+                                <div class="info">[$transferit_receive_emails]</div>
+                                <div class="it-toggle dl-notif disabled">
+                                    <label>
+                                        <span class="label-name">[$transferit_notify_if_accessed]</span>
+                                        <span class="toggle-body">
+                                            <input type="checkbox" name="checkbox-name" checked>
+                                            <span class="toggle-box"></span>
+                                        </span>
+                                    </label>
+                                </div>
+                                <div class="it-toggle exp-notif disabled">
+                                    <label>
+                                        <span class="label-name">[$transferit_notify_before_exp]</span>
+                                        <span class="toggle-body">
+                                            <input type="checkbox" name="checkbox-name" checked>
+                                            <span class="toggle-box"></span>
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="section">
+                                <div class="caption">[$transferit_availability]</div>
+                                <div class="info"></div>
+                                <div class="it-dropdown js-expires-dropdown">
+                                     <div class="it-input fl-label xl-size js-select-button">
+                                        <div class="input-box">
+                                            <div class="input-field">
+                                                <input type="text" placeholder="[$transferit_expires_in]" name="glb-expires-input" id="glb-expires-input" value="" readonly required />
+                                                <label for="glb-expires-input">[$transferit_expires_in]</label>
+                                            </div>
+                                        </div>
+                                        <div class="error-text"></div>
+                                    </div>
+                                    <div class="it-dropdown-body top-align js-dropdown">
+                                        <label class="js-option it-radio-label btn-type">
+                                            <span class="it-radio-button" data-name="glb-expire-radio">
+                                                <input type="radio" name="glb-expire-radio" value="0" />
+                                                <span class="box"></span>
+                                            </span>
+                                            <span class="name">[$1051]</span>
+                                        </label>
+                                        <label class="js-option it-radio-label btn-type">
+                                            <span class="it-radio-button" data-name="glb-expire-radio">
+                                                <input type="radio" name="glb-expire-radio" value="7" />
+                                                <span class="box"></span>
+                                            </span>
+                                            <span class="name" data-value="7" data-string="922">7 days</span>
+                                        </label>
+                                        <label class="js-option it-radio-label btn-type">
+                                            <span class="it-radio-button" data-name="glb-expire-radio">
+                                                <input type="radio" name="glb-expire-radio" value="30"/>
+                                                <span class="box"></span>
+                                            </span>
+                                            <span class="name" data-value="30" data-string="922">30 days</span>
+                                        </label>
+                                        <label class="js-option it-radio-label btn-type default">
+                                            <span class="it-radio-button" data-name="glb-expire-radio">
+                                                <input type="radio" name="glb-expire-radio" value="90" data-string="922" />
+                                                <span class="box"></span>
+                                            </span>
+                                            <span class="name" data-value="90" data-string="922">90 days</span>
+                                        </label>
+                                        <label class="js-option it-radio-label btn-type">
+                                            <span class="it-radio-button" data-name="glb-expire-radio">
+                                                <input type="radio" name="glb-expire-radio" value="180"/>
+                                                <span class="box"></span>
+                                            </span>
+                                            <span class="name"  data-value="6" data-string="days_chat_history_plural">6 months</span>
+                                        </label>
+                                        <label class="js-option it-radio-label btn-type">
+                                            <span class="it-radio-button" data-name="glb-expire-radio">
+                                                <input type="radio" name="glb-expire-radio" value="365"/>
+                                                <span class="box"></span>
+                                            </span>
+                                            <span class="name">[$923]</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="it-input fl-label xl-size glb-schedule-option hidden">
+                                    <div class="input-box">
+                                        <div class="input-field">
+                                            <input type="text" placeholder="[$transferit_sending_date]" name="glb-scheduled-input" id="glb-scheduled-input" data-set="calendar" value="" required />
+                                            <label for="glb-scheduled-input">[$transferit_sending_date]</label>
+                                        </div>
+                                    </div>
+                                    <div class="error-text"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="it-checkbox-label">
+                        <div class="it-checkbox">
+                            <input type="checkbox" name="glb-terms-and-privacy" class="" checked>
+                            <div class="box">
+                                <i class="sprite-it-x16-mono icon-check"></i>
+                            </div>
+                        </div>
+                        <span>[$transferit_agree_tos]</span>
+                    </div>
+
+                    <div class="dialog-error-msg js-invalid-error hidden">
+                        <i class="sprite-it-x24-mono icon-warning-triangle"></i>
+                        <span>[$transferit_share_uploaded_error]</span>
+                    </div>
+
+                    <button class="it-button xl-size f-w js-get-link-button">
+                        <span>[$transferit_transfer_btn]</span>
+                    </button>
+
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Addeded files. Add more files box !-->
+    <section class="it-box lg-shadow modal add-more-files-box">
+        <div class="body">
+            <div class="content">
+
+                <div class="add-files main">
+                    <label class="inv-input">
+                        <input type="file" name="select-file" class="upload-picker" multiple/>
+                        <i class="sprite-it-x32-mono icon-file-add"></i>
+                        <span>[$transferit_add_files]</span>
+                    </label>
+                    <label class="inv-input">
+                        <input type="file" name="select-folder" class="upload-picker"  webkitdirectory multiple/>
+                        <i class="sprite-it-x32-mono icon-folder-add"></i>
+                        <span>[$transferit_add_folders]</span>
+                    </label>
+                </div>
+
+                <div class="add-files mega hidden">
+                    <div class="inv-input js-add-from-mega">
+                        <i class="sprite-it-x24-mono icon-mega-circle"></i>
+                        <span>[$transferit_add_from_mega]</span>
+                    </div>
+                    <div class="inv-input js-add-from-local">
+                        <i class="sprite-it-x24-mono icon-laptop"></i>
+                        <span>[$transferit_upload_from_local]</span>
+                    </div>
+                </div>
+
+                <div class="files-info">
+                    <div class="it-grid-info bold">
+                        <span class="num"></span>
+                        <span class="size"></span>
+                    </div>
+                    <button class="it-button ghost js-clear-invalid simpletip hidden" data-simpletip="[$transferit_clear_invalid_files]" data-simpletipposition="top" data-simpletipoffset="4" aria-label="[$transferit_clear_invalid_files]">
+                        <i class="sprite-it-x24-mono icon-eraser"></i>
+                    </button>
+                    <button class="it-button ghost js-remove-all simpletip" data-simpletip="[$transferit_remove_all]" data-simpletipposition="top" data-simpletipoffset="4" aria-label="[$transferit_remove_all]">
+                        <i class="sprite-it-x24-mono icon-trash-can"></i>
+                    </button>
+                </div>
+                <div class="items-wrap">
+                    <div class="desktop-scroll-area bottom">
+                        <div class="it-grid list-type grid-2-1 js-files-container"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- Transfering files !-->
+<div class="it-box-holder js-transfer-section hidden">
+    <!-- Add "cancel"/"completed" classnames to change UI !-->
+    <section class="it-box lg-shadow modal transferring-box">
+        <div class="body">
+            <div class="content">
+                <div class="progress-bar">
+                    <div class="bg transferit-vars"></div>
+                    <ul>
+                        <li class="right-c">
+                            <p id="transferfilesright"><span></span></p>
+                        </li>
+                        <li class="left-c">
+                            <p id="transferfilesleft"><span></span></p>
+                        </li>
+                    </ul>
+                    <div class="icon-wrap">
+                        <i class="sprite-it-x32-mono icon-it-logo"></i>
+                    </div>
+                </div>
+                <h4>[$transferit_transferring]</h4>
+                <div class="details">
+                    <div class="status-info tick align-mid js-link-tick">
+                        <i class="sprite-it-x24-mono icon-check"></i>
+                        <span>[$transferit_link_generated]</span>
+                    </div>
+                    <div class="status-info">
+                        [$transferit_uploading_x_of_y] <span class="speed"></span>
+                    </div>
+                    <div class="status-info">
+                        <span class="left"></span>
+                    </div>
+                </div>
+            </div>
+            <footer class="inline-content">
+                <button class="it-button xl-size outline js-cancel">
+                    <span>[$1597]</span>
+                </button>
+                <button class="it-button xl-size js-copy-link">
+                    <span>[$1394]</span>
+                </button>
+                <button class="it-button xl-size outline js-resume hidden">
+                    <span>[$578]</span>
+                </button>
+                <button class="it-button xl-size js-confirm hidden">
+                    <span>[$78]</span>
+                </button>
+            </footer>
+        </div>
+    </section>
+</div>
+
+<!-- Link ready !-->
+<div class="it-box-holder js-link-ready-section hidden">
+    <section class="it-box lg-shadow modal link-ready-box">
+
+        <!-- Link ready. Copy link step !-->
+        <div class="body step-1">
+            <div class="content align-center">
+                <img class="data-ready-img" alt="" src="data:,">
+                <h4>[$transferit_link_ready]</h4>
+                <p>[$transferit_link_ready_tip]</p>
+                <div class="btns-pane hidden">
+                    <button class="it-button ghost lg-size transferit-vars facebook simpletip" data-simpletip="Share this link on Facebook">
+                        <i class="sprite-it-x24-mono icon-facebook transferit-vars"></i>
+                    </button>
+                    <button class="it-button ghost lg-size x simpletip" data-simpletip="Share this link on X">
+                        <i class="sprite-it-x24-mono icon-x "></i>
+                    </button>
+                    <button class="it-button ghost lg-size transferit-vars reddit simpletip" data-simpletip="Share this link on Reddit">
+                        <i class="sprite-it-x24-mono icon-reddit transferit-vars"></i>
+                    </button>
+                    <button class="it-button ghost lg-size transferit-vars mega simpletip" data-simpletip="Share this link on MEGA Chat">
+                        <i class="sprite-it-x24-mono icon-mega transferit-vars"></i>
+                    </button>
+                    <button class="it-button ghost lg-size email simpletip" data-simpletip="Share this link by email">
+                        <i class="sprite-it-x24-mono icon-email"></i>
+                    </button>
+                </div>
+                <form>
+                    <div class="it-input lg-size it-input-text">
+                        <div class="input-box">
+                            <div class="input-field">
+                                <input type="text" name="lrb-link" autocomplete="off" readonly required/>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="it-button lg-size js-copy-to-clipboard">
+                        <i class="sprite-it-x24-mono icon-copy"></i>
+                        <span>[$63]</span>
+                    </button>
+                </form>
+
+            </div>
+            <footer>
+                <button class="it-button xl-size ghost js-show-content">
+                    <span>[$transferit_view_content]</span>
+                </button>
+                <button class="it-button xl-size js-new-link">
+                    <span>[$transferit_create_another_lnk]</span>
+                </button>
+            </footer>
+        </div>
+
+        <!-- Link ready. View content step !-->
+        <div class="body step-2 hidden">
+            <button class="it-button ghost back-button js-back-button">
+                <i class="sprite-it-x24-mono icon-arrow-big-left"></i>
+                <span>[$822]</span>
+            </button>
+            <section class="content align-center">
+                <img alt="" class="view-content-img" src="data:,">
+                <div class="files-info">
+                    <div class="it-grid-info bold js-items-info">
+                        <span class="num"></span>
+                        <span class="size"></span>
+                    </div>
+                </div>
+
+                <div class="items-wrap">
+                    <div class="desktop-scroll-area">
+                        <div class="it-grid list-type grid-3-1">
+                            <div class="it-grid-item" tabindex="0">
+                                <div class="col">
+                                   <!-- MIME icon !-->
+                                    <div class="it-thumb-base generic">
+                                        <i class="sprite-it-mime generic"></i>
+                                    </div>
+                                    <span class="md-font-size pr-color">File_name.ext</span></div>
+                                <div class="col"><span class="align-end">XX MB</span></div>
+                                <div class="col">
+                                    <button class="it-button xs-size ghost">
+                                        <i class="sprite-it-x16-mono icon-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <footer>
+                <button class="it-button xl-size js-download-btn">
+                    <span>[$58]</span>
+                </button>
+            </footer>
+        </div>
+    </section>
+</div>
+
+<!-- Ready to download !-->
+<div class="it-box-holder js-ready-to-dl-section hidden">
+    <section class="it-box lg-shadow modal ready-to-download-box">
+
+        <div class="body">
+            <div class="content align-center">
+                <img class="data-ready-img" alt="" src="data:,">
+                <h4>[$transferit_ready_to_dl]</h4>
+                <div class="it-grid-info bold">
+                    <span class="num"></span>
+                    <span class="size"></span>
+                </div>
+            </div>
+            <footer class="separated">
+                <button class="it-button xl-size ghost js-view-content">
+                    <span>[$transferit_view_content]</span>
+                </button>
+                <button class="it-button xl-size js-download">
+                    <span>[$transferit_download_all]</span>
+                    <span class="progress-bar"></span>
+                </button>
+                <div class="progress-status hidden"></div>
+            </footer>
+        </div>
+
+    </section>
+</div>
+
+<!-- File manager !-->
+<div class="it-box-holder js-fm-section hidden">
+    <section class="it-box lg-shadow file-manager-box items-box">
+        <div class="body">
+            <div class="content">
+
+                <!-- FM header !-->
+                <div class="grid-header">
+                    <div class="info-body">
+                        <div class="info-header">
+                            <div class="link-name"></div>
+                            <button class="it-button xs-size ghost simpletip js-download-all" data-simpletip="[$transferit_download_all]">
+                                <i class="sprite-it-x16-mono icon-arrow-big-down"></i>
+                            </button>
+                        </div>
+
+                        <div class="files-info">
+
+                            <!-- Files/folders number and size. Hide when breadcrumbs are visible !-->
+                            <div class="it-grid-info hidden">
+                                <span class="num"></span>
+                                <span class="size"></span>
+                            </div>
+
+                            <!-- Breadcrumbs wrapper !-->
+                           <div class="breadcrumbs-wrap hidden"></div>
+                        </div>
+                    </div>
+                    <div class="view-content">
+
+                        <!-- Dropdown component !-->
+                        <div class="it-dropdown js-sorting-select">
+                            <button class="it-dropdown-button select-type js-select-button">
+                                <span class="label"></span>
+                                <i class="sprite-it-x24-mono icon-chevron-down"></i>
+                            </button>
+                            <div class="it-dropdown-body js-dropdown">
+                                <form>
+                                    <label class="js-option it-radio-label btn-type" data-label="[$transferit_sort_by_type]">
+                                        <span class="it-radio-button" data-name="fmb-sorting">
+                                            <input type="radio" name="fmb-sorting" value="type" />
+                                            <span class="box"></span>
+                                        </span>
+                                        <span class="name">[$93]</span>
+                                    </label>
+                                    <label class="js-option it-radio-label btn-type" data-label="[$transferit_sort_by_name]">
+                                        <span class="it-radio-button" data-name="fmb-sorting">
+                                            <input type="radio" name="fmb-sorting" value="name" />
+                                            <span class="box"></span>
+                                        </span>
+                                        <span class="name">[$1764]</span>
+                                    </label>
+                                    <label class="js-option it-radio-label btn-type" data-label="[$transferit_sort_by_size]">
+                                        <span class="it-radio-button" data-name="fmb-sorting">
+                                            <input type="radio" name="fmb-sorting" value="size" />
+                                            <span class="box"></span>
+                                        </span>
+                                        <span class="name">[$87]</span>
+                                    </label>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- View buttons !-->
+                        <div class="view-btns">
+                            <button class="it-button ghost active-bg js-list-view-btn" data-type="list" aria-label="[$transferit_list_view]">
+                                <i class="sprite-it-x24-mono icon-view-list" data-icon="icon-view-list"></i>
+                            </button>
+                            <button class="it-button ghost active-bg js-grid-view-btn" data-type="grid" aria-label="[$transferit_grid_view]">
+                                <i class="sprite-it-x24-mono icon-view-grid" data-icon="icon-view-grid"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="items-wrap">
+                    <div class="desktop-scroll-area bottom">
+                        <div class="content-body">
+                            <div class="content"></div>
+                            <div class="footer">
+                                <button class="it-button xl-size js-download-all">
+                                    <span>[$transferit_download_all]</span>
+                                    <span class="progress-bar"></span>
+                                </button>
+                                <div class="progress-status hidden"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- Dashboard !-->
+<div class="it-box-holder js-dashboard-section hidden">
+
+    <section class="it-box lg-shadow dashboard-box items-box">
+        <div class="body">
+            <div class="content js-list-content">
+                <h5 class="align-start">[$1346]</h5>
+                <div class="it-tab-list">
+                    <div class="it-tabs-container extra-space secondary underline js-transfers-tabs">
+                        <button class="it-tab default active">
+                            <i class="sprite-it-x24-mono icon-arrow-up-circle"></i>
+                            <span>[$transferit_all_transfers]</span>
+                        </button>
+                        <button class="it-tab js-transfers-tab" data-filter="ac" data-page="accessed">
+                            <i class="sprite-it-x24-mono icon-eye"></i>
+                            <span>[$transferit_all_accessed]</span>
+                        </button>
+                        <button class="it-tab js-transfers-tab" data-filter="sched" data-page="scheduled">
+                            <i class="sprite-it-x24-mono icon-calendar"></i>
+                            <span>[$transferit_all_scheduled]</span>
+                        </button>
+                        <button class="it-tab js-transfers-tab" data-filter="pw" data-page="protected">
+                            <i class="sprite-it-x24-mono icon-lock"></i>
+                            <span>[$transferit_all_pw_protected]</span>
+                        </button>
+                    </div>
+
+                    <div class="data-managing">
+                        <div class="search-body">
+                            <div class="it-input">
+                                <div class="input-box">
+                                    <i class="sprite-it-x24-mono icon-search"></i>
+                                    <div class="input-field">
+                                        <input type="text" placeholder="[$transferit_search_by_kw]"
+                                               name="tfrs-search-input" id="tfrs-search-input" value=""/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="sorting-body">
+                            <div class="it-dropdown js-sorting-select">
+                                <button class="it-dropdown-button secondary js-select-button">
+                                    <span class="label">[$transferit_sort_by_date]</span>
+                                    <i class="sprite-it-x24-mono icon-chevron-down"></i>
+                                </button>
+                                <div class="it-dropdown-body end-align js-dropdown">
+                                    <form>
+                                        <label class="js-option it-radio-label btn-type" data-label="[$transferit_sort_by_date]">
+                                            <span class="it-radio-button checked" data-name="tfrs-sorting">
+                                                <input type="radio" name="tfrs-sorting" value="date" checked />
+                                                <span class="box"></span>
+                                            </span>
+                                            <span class="name">[$17023]</span>
+                                        </label>
+                                        <label class="js-option it-radio-label btn-type" data-label="[$transferit_sort_by_name]">
+                                            <span class="it-radio-button" data-name="tfrs-sorting">
+                                                <input type="radio" name="tfrs-sorting" value="name" />
+                                                <span class="box"></span>
+                                            </span>
+                                            <span class="name">[$1764]</span>
+                                        </label>
+                                    </form>
+                                </div>
+                            </div>
+                            <!-- And class "reverse" !-->
+                            <button class="it-button xs-size ghost sort-btn js-srt-dir-btn" aria-label="[$transferit_reverse_order]">
+                                <i class="sprite-it-x16-mono icon-arrow-small-up"></i>
+                                <i class="sprite-it-x16-mono icon-arrow-small-down"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="items-wrap it-tab-panel" tabindex="0">
+                        <div class="desktop-scroll-area bottom">
+                            <div class="content-body">
+                                <div class="content js-list-container">
+                                    <div class="it-grid list-type alternating-bg transfers js-list-container"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="content details-body js-details-content hidden">
+                <div>
+                    <button class="it-button ghost lg-size js-back">
+                        <i class="sprite-it-x24-mono icon-arrow-big-left"></i>
+                        <span>[$transferit_back_to_transfers]</span>
+                    </button>
+                </div>
+                <div class="items-wrap">
+                    <div class="desktop-scroll-area bottom">
+                        <div class="section">
+                            <div class="info-body">
+                                <div class="name-body">
+                                    <h5 class="align-start js-name"></h5>
+                                    <button class="it-button ghost js-tr-edit-link-title">
+                                        <i class="sprite-it-x24-mono icon-edit"></i>
+                                    </button>
+                                </div>
+                                <div class="info js-transfer-info"></div>
+                                <div class="items-label js-total-views"></div>
+                            </div>
+                        </div>
+                        <div class="section">
+                            <div class="control-btns js-ctrl-btns">
+                                <button class="it-button ghost js-tr-download">
+                                    <i class="sprite-it-x24-mono icon-arrow-small-down"></i>
+                                    <span>[$58]</span>
+                                </button>
+                                <button class="it-button ghost js-tr-copy-link">
+                                    <i class="sprite-it-x24-mono icon-chain"></i>
+                                    <span>[$1394]</span>
+                                </button>
+                                <button class="it-button ghost js-tr-change-password">
+                                    <i class="sprite-it-x24-mono icon-lock-open"></i>
+                                    <span>[$23262]</span>
+                                </button>
+                                <button class="it-button ghost js-tr-change-exp-date">
+                                    <i class="sprite-it-x24-mono icon-calendar"></i>
+                                    <span>[$transferit_change_exp_date]</span>
+                                </button>
+                                <button class="it-button ghost js-tr-change-schedule">
+                                    <i class="sprite-it-x24-mono icon-calendar"></i>
+                                    <span>[$transferit_change_schedule]</span>
+                                </button>
+                                <button class="it-button ghost js-tr-delete-transfer negative">
+                                    <i class="sprite-it-x24-mono icon-trash-can"></i>
+                                    <span>[$transferit_delete_transfer]</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="section">
+                            <div class="items-label js-recipients-num"></div>
+                            <div class="it-grid list-type alternating-bg recipients js-recipients-container"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>

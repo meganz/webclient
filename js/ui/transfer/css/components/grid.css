@@ -1,0 +1,395 @@
+/*
+ * List component
+ *
+*/
+
+/* Empty section */
+
+.grid-empty-content {
+    align-items: center;
+    color: var(--main-neutral-primary);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin: auto;
+    padding: 0 16px;
+    text-align: center;
+}
+
+.grid-empty-content i {
+    --icon-size: 128px;
+    --mask-color: var(--main-primary);
+    margin: 0 24px;
+}
+
+.grid-empty-content > span {
+    font: var(--text-caption-lg);
+    margin: 0 auto;
+    max-width: 374px;
+}
+
+.grid-empty-content button {
+    margin: 48px 0 0;
+    min-width: 160px;
+}
+
+/* General */
+
+.it-grid,
+.it-list-wrapper {
+    display: grid;
+    gap: 6px;
+}
+
+.it-grid .it-grid-item {
+    overflow: hidden;
+    outline: none;
+    position: relative;
+    text-overflow: ellipsis;
+    transition: var(--transition-bg-color), var(--transition-shadow);
+}
+
+.it-grid .it-grid-item > * {
+    position: relative;
+}
+
+.it-grid .it-grid-item::before {
+    border-radius: inherit;
+    box-sizing: border-box;
+    content: '';
+    display: block;
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    transition: var(--transition-border), var(--transition-bg-color);
+    width: 100%;
+    z-index: 0;
+}
+
+/* Types */
+
+/* Types. List type */
+
+.it-grid.list-type .it-grid-header,
+.it-grid.list-type .it-grid-item {
+    --icon-size: 24px;
+    border-radius: var(--radius-i-sm);
+    display: grid;
+    gap: 12px;
+    grid-auto-flow: column;
+    grid-template-columns: minmax(30%, 1fr) minmax(10%, 200px) minmax(10%, 200px) minmax(120px, auto);
+    padding: 12px;
+}
+
+.it-grid.alternating-bg .it-grid-item:nth-child(odd) {
+    background-color: var(--main-surface-secondary);
+}
+
+.it-grid.list-type .col {
+    align-items: center;
+    display: flex;
+}
+
+.it-grid.list-type .col > span {
+    color: var(--main-neutral-secondary);
+    flex: 1 1 auto;
+    font: 700 var(--text-caption-md);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.it-grid.list-type .col > .it-thumb-base + span {
+    margin-inline-start: 12px;
+}
+
+.it-grid.list-type .col > span.md-font-size {
+    font: 700 var(--text-body-sm);
+}
+
+.it-grid.list-type .col > span.pr-color {
+    color: var(--main-neutral-primary);
+}
+
+.it-grid.list-type .col > span.align-end {
+    text-align: end;
+}
+
+.it-grid.list-type .it-grid-item.invalid .col > span {
+    color: var(--supportive-error);
+    font-weight: bold;
+}
+
+/* Types. List type. Header */
+
+.it-grid.list-type .it-grid-header {
+    background-color: var(--main-surface-primary);
+    border-radius: 0;
+    margin: 0 calc(0px - var(--box-scroll-space));
+    padding: 0 calc(12px + var(--box-scroll-space));
+    position: sticky;
+    top: 0;
+    width: calc(100% + var(--box-scroll-space) * 2);
+    z-index: 2;
+}
+
+.it-grid.list-type .it-grid-header::after {
+    border-bottom: 1px solid var(--main-borders-and-lines);
+    content: '';
+    display: block;
+    left: var(--box-scroll-space);
+    position: absolute;
+    bottom: 0;
+    width: calc(100% - var(--box-scroll-space) * 2);
+}
+
+.it-grid.list-type .it-grid-header .col > .label {
+    color: var(--main-neutral-primary);
+    font: var(--text-caption-md);
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    width: 100%;
+}
+
+.it-grid.list-type .it-grid-header .col > .label i {
+    display: none;
+    margin-inline-start: 12px;
+}
+
+.it-grid.list-type .it-grid-header .col > .label.clickable {
+    cursor: pointer;
+}
+
+.it-grid.list-type .it-grid-header .col > .label.selected i {
+    --icon-size: 16px;
+    --mask-color: var(--main-neutral-secondary);
+    display: block;
+    font-weight: normal;
+}
+
+
+/* Types. List type. Sizes */
+
+.it-grid.list-type.grid-2-1 .it-grid-item {
+    grid-template-columns: minmax(100px, 3fr) minmax(60px, max-content);
+}
+
+.it-grid.list-type.grid-3-1 .it-grid-item {
+    grid-template-columns: minmax(100px, 3fr) minmax(60px, max-content) 24px;
+}
+
+.it-grid.list-type.grid-2-1 .col > span.md-font-size,
+.it-grid.list-type.grid-2-1 .col > span.md-font-size {
+    font-weight: normal;
+}
+
+
+/* Types. Grid type */
+
+/* Types. Grid type. Medium size */
+
+.it-grid.grid-type {
+    gap: 0;
+    position: relative;
+}
+
+.it-grid.grid-type::before {
+    border-top: 1px solid var(--main-borders-and-lines);
+    content: '';
+    position: sticky;
+    top: 0;
+    width: 100%;
+}
+
+
+/* Types. Grid type. Medium size. Grid item group */
+
+.it-grid.grid-type .items-group {
+    padding: 64px 0 0;
+}
+
+.it-grid.grid-type .items-group-body {
+    display: grid;
+    grid-gap: 48px;
+    grid-template-columns: repeat(auto-fill, minmax(auto, 448px));
+    padding: 24px 0 0;
+}
+
+.it-grid.grid-type .items-group ~ .items-group {
+    border-top: 1px solid var(--main-borders-and-lines);
+    padding: 48px 0 0;
+    margin: 48px 0 0;
+}
+
+.it-grid.grid-type .items-group-header {
+    color: var(--main-neutral-terciary);
+    font: var(--text-hairline-lg);
+}
+
+/* Types. Grid type. Medium size. Grid item */
+
+.it-grid.grid-type .it-grid-item {
+    --icon-size: 96px;
+    align-items: center;
+    border-radius: var(--radius-i-lg);
+    display: flex;
+    padding: 8px;
+}
+
+.it-grid.grid-type .it-thumb-base {
+    height: 96px;
+    width: 96px;
+}
+
+.it-grid.grid-type .item-data-body {
+    align-items: center;
+    display: flex;
+    overflow: hidden;
+    padding: 0 8px;
+    padding-inline-start: 24px;
+    width: 100%;
+}
+
+.it-grid.grid-type .item-data {
+    flex: 1 1 auto;
+    padding-inline-end: 8px;
+    overflow: hidden;
+}
+
+.it-grid.grid-type .it-grid-info {
+    display: flex;
+}
+
+.it-grid.grid-type .item-name {
+    color: var(--main-neutral-primary);
+    font: 700 var(--text-body-md);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.it-grid.grid-type .item-tag {
+    --icon-size: 16px;
+    background-color: var(--main-borders-and-lines);
+    border-radius: var(--radius-i-xs);
+    color: var(--main-neutral-primary);
+    display: inline-flex;
+    font: var(--text-hairline-md);
+    margin: 8px 0 0;
+    padding: 4px;
+}
+
+.it-grid.grid-type .item-tag span {
+    padding: 0 8px;
+}
+
+
+/* Types. Grid type. Large size */
+
+/* Types. Grid type. Large size. Grid item group */
+
+.it-grid.grid-type .lg-size .items-group-body {
+    grid-template-columns: repeat(auto-fill, minmax(auto, 336px));
+}
+
+/* Types. Grid type. Large size. Grid item*/
+
+.it-grid.grid-type .items-group.lg-size .it-grid-item {
+    align-items: flex-start;
+    flex-direction: column;
+}
+
+.it-grid.grid-type .items-group.lg-size .it-thumb-base {
+    height: 240px;
+    margin: 0;
+    width: 100%;
+}
+
+.it-grid.grid-type .items-group.lg-size .item-data-body {
+    padding: 24px 8px 8px;
+}
+
+.it-grid.grid-type .item-name {
+    font: 700 var(--text-body-md);
+}
+
+
+/* States */
+
+/* States. Hover state. Only for non-touch devices. */
+
+@media (hover: hover) {
+
+    .it-grid .it-grid-item:hover {
+        background-color: var(--main-surface-primary);
+    }
+
+    .it-grid .it-grid-item:hover::before {
+        background-color: var(--main-overlay-soft);
+    }
+
+    .it-grid.alternating-bg .it-grid-item:nth-child(odd):hover {
+        background-color: var(--main-surface-secondary);
+    }
+
+    .it-grid.alternating-bg .it-grid-item:hover:nth-child(odd):hover::before {
+        background-color: var(--main-overlay-soft);
+    }
+
+}
+
+/* States. Active state */
+
+.it-grid .it-grid-item:active {
+    background-color: var(--main-surface-primary);
+}
+
+.it-grid .it-grid-item:active::before {
+    background-color: var(--main-overlay-medium);
+}
+
+.it-grid.alternating-bg .it-grid-item:nth-child(even):active {
+    background-color: var(--main-surface-secondary);
+}
+
+.it-grid.alternating-bg .it-grid-item:hover:nth-child(odd):active::before {
+    background-color: var(--main-overlay-medium);
+}
+
+/* States. Focused state */
+
+.it-grid .it-grid-item:focus {
+    box-shadow: var(--shadow-focused);
+}
+
+/* States. Selected state */
+
+.it-grid .it-grid-item.selected::before {
+    border: 4px solid var(--main-primary);
+}
+
+
+/* Grid info block */
+
+.it-grid-info {
+    color: var(--main-neutral-secondary);
+    display: inline-flex;
+    flex-wrap: wrap;
+    font: var(--text-body-sm);
+}
+
+.it-grid-info.bold {
+    font-weight: 700;
+}
+
+.it-grid-info .num {
+    color: var(--main-neutral-primary);
+}
+
+.it-grid-info .num::after {
+    color: var(--main-neutral-secondary);
+    content: '\2022';
+    padding: 0 12px;
+}

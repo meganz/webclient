@@ -23,14 +23,6 @@ var extensions = {
     'powerpoint': [['pps', 'ppt', 'pptx'], 'Powerpoint'],
     'premiere': [['prproj', 'ppj'], 'Adobe Premiere'],
     'experiencedesign': [['xd'], 'Adobe XD'],
-    'raw': [
-        Object.keys(is_image.raw)
-            .map(function(e) {
-                'use strict';
-                return e.toLowerCase();
-            }),
-        l[20240] || 'RAW Image'
-    ],
     'spreadsheet': [['ods', 'ots', 'gsheet', 'nb', 'xlr'], 'Spreadsheet'],
     'torrent': [['torrent'], 'Torrent'],
     'text': [['txt', 'ans', 'ascii', 'log', 'wpd', 'json', 'md', 'org'], 'Text', 'pages'],
@@ -582,6 +574,11 @@ mBroadcaster.once('boot_done', () => {
         'swift': l[22677]
     };
 
+    extensions.raw = [
+        Object.keys(is_image.raw).map((e) => e.toLowerCase()),
+        l[20240] || 'RAW Image'
+    ];
+
     for (const idx in freeze(extensions)) {
         const type = extensions[idx][0];
         const desc = extensions[idx][1];
@@ -708,7 +705,7 @@ function folderIcon(node, root) {
         return `${folderIcon}bucket`;
     }
     // File request folder
-    else if (mega.fileRequest.publicFolderExists(node.h)) {
+    else if (mega.fileRequest && mega.fileRequest.publicFolderExists(node.h)) {
         return `${folderIcon}folder-public`;
     }
 

@@ -1,0 +1,334 @@
+<!-- msg dialog !-->
+<dialog class="it-dialog-holder msg-holder js-msg-dialog hidden"
+    aria-labelledby="msg-dialog-title"
+    aria-modal="true">
+
+    <section class="it-box it-dialog lg-shadow msg-dialog modal md-size" >
+        <div class="body">
+            <header>
+                <h5 id="msg-dialog-title"></h5>
+                <button class="it-button ghost icon xl-size js-close" aria-label="Close">
+                    <i class="sprite-it-x32-mono icon-close"></i>
+                </button>
+            </header>
+            <div class="content">
+                <p></p>
+            </div>
+            <footer class="end-align">
+                <button class="it-button outline xl-size js-negative-btn hidden">
+                    <span></span>
+                </button>
+                <button class="it-button xl-size js-positive-btn">
+                    <span></span>
+                </button>
+            </footer>
+        </div>
+    </section>
+</dialog>
+
+<!-- Navigation dialog !-->
+<dialog class="it-dialog-holder js-nav-dialog side hidden"
+    aria-label="[$169]"
+    aria-modal="true">
+
+    <section class="it-dialog navigation-dialog">
+        <div class="body">
+            <header>
+                <div class="it-account-data js-acc-info">
+                    <div class="it-avatar lg-size js-avatar">
+                        <span></span>
+                    </div>
+                    <div class="data">
+                        <div class="name"></div>
+                        <div class="email"></div>
+                    </div>
+                </div>
+                <button class="it-button lg-size js-login-btn hidden">
+                    <span>[$transferit_login_w_mega]</span>
+                </button>
+                <button class="it-button ghost icon js-close" aria-label="Close">
+                    <i class="sprite-it-x32-mono icon-close"></i>
+                </button>
+            </header>
+            <div class="content">
+                <div class="items-body">
+                    <div class="items">
+                        <div class="section">
+                            <button class="it-menu-item" data-page="features">
+                                <span>[$23377]</span>
+                            </button>
+                            <button class="it-menu-item" data-page="compare">
+                                <span>[$transferit_compare]</span>
+                            </button>
+                            <button class="it-menu-item" data-page="contact">
+                                <span>[$399]</span>
+                            </button>
+                            <button class="it-menu-item" data-page="faq">
+                                <span>[$transferit_faq]</span>
+                            </button>
+                            <button class="it-menu-item" data-page="terms">
+                                <span>[$385]</span>
+                            </button>
+                            <button class="it-menu-item" data-page="privacy">
+                                <span>[$transferit_privacy]</span>
+                            </button>
+                        </div>
+                        <div class="section">
+                            <button class="it-menu-item js-logout-btn">
+                                <span>[$967]</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <footer>
+                <button class="it-button ghost js-set-language">
+                    <i class="sprite-it-x24-mono icon-globe"></i>
+                    <span></span>
+                </button>
+                <button class="it-button ghost js-set-theme hidden" aria-label="[$24063]">
+                    <i class="sprite-it-x24-mono icon-sun"></i>
+                </button>
+                <div class="it-toggle">
+                    <label>
+                        <span class="toggle-body">
+                            <input type="checkbox" name="nav-switch-theme">
+                            <span class="toggle-box">
+                               <span class="icons">
+                                    <i class="sprite-it-x24-mono icon-moon"></i>
+                                    <i class="sprite-it-x24-mono icon-sun"></i>
+                                </span>
+                            </span>
+                        </span>
+                    </label>
+                </div>
+            </footer>
+        </div>
+    </section>
+
+</dialog>
+
+<!-- Language dialog !-->
+<dialog class="it-dialog-holder js-lang-dialog ghost hidden"
+    aria-labelledby="lang-dialog-title"
+    aria-modal="true">
+
+    <section class="it-box it-dialog lang-dialog">
+        <div class="body">
+            <header>
+                <h5 id="lang-dialog-title">
+                    [$1038]
+                </h5>
+                <button class="it-button ghost icon js-close" aria-label="Close">
+                    <i class="sprite-it-x24-mono icon-close"></i>
+                </button>
+            </header>
+            <div class="content scroll-area">
+                <div class="lang-items"></div>
+            </div>
+            <footer>
+                <button class="it-button outline lg-size js-close">
+                    <span>[$1597]</span>
+                </button>
+            </footer>
+        </div>
+    </section>
+
+</dialog>
+
+<!-- Login dialog !-->
+<dialog class="it-dialog-holder js-login-dialog blur hidden"
+    aria-labelledby="login-dialog-title"
+    aria-modal="true">
+
+    <section class="it-box it-dialog fh-size lg-shadow auth-dialog login">
+        <div class="body">
+            <button class="it-button ghost icon close-btn js-close" aria-label="Close">
+                <i class="sprite-it-x32-mono icon-close-circle"></i>
+            </button>
+            <div class="split-content">
+                <div class="content illustration">
+                    <div class="illustration-body auth">
+                        <img alt class="icon img1" src="data:,">
+                    </div>
+                </div>
+                <div class="content login-cn">
+                    <div class="scroll-area">
+                        <div class="content-body">
+                            <div class="logo">
+                                <i class="sprite-it-x32-mono icon-it-logo"></i>
+                            </div>
+                            <h5 id="login-dialog-title">
+                                [$transferit_welcome_hdr]
+                            </h5>
+                            <form>
+                                <div class="it-input fl-label xl-size">
+                                    <div class="input-box">
+                                        <div class="input-field">
+                                            <input type="text" placeholder="[$transferit_your_email_adress]" name="login-dlg-email-input" id="login-dlg-email-input" value="" required />
+                                            <label for="login-dlg-email-input">[$transferit_email_adress]</label>
+                                        </div>
+                                    </div>
+                                    <div class="error-text"></div>
+                                </div>
+
+                                <div class="it-input fl-label xl-size">
+                                    <div class="input-box">
+                                        <div class="input-field">
+                                            <input type="password" placeholder="[$transferit_your_email_pass]" name="login-dlg-password-input" id="login-dlg-password-input" value="" required />
+                                            <label for="login-dlg-password-input">[$909]</label>
+                                        </div>
+                                    </div>
+                                    <div class="error-text"></div>
+                                </div>
+
+                                <a href="https://mega.nz/recovery" target="_blank" class="link sm-size bold">[$1934]</a>
+
+                                <button class="it-button xl-size f-w js-continue-button">
+                                    <span>[$transferit_continue_w_mega]</span>
+                                </button>
+
+                                <div class="bottom-info">
+                                    [$transferit_dont_have_acc] <a href="https://mega.nz/register" target="_blank" class="link strong js-sign-in">[$transferit_create_mega_acc]</a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="content two-fa-cn hidden">
+                    <button class="it-button ghost lg-size back-btn js-back">
+                        <i class="sprite-it-x24-mono icon-arrow-big-left"></i>
+                        <span>[$822]</span>
+                    </button>
+                    <div class="scroll-area">
+                        <div class="content-body">
+                            <div class="logo">
+                                <i class="sprite-it-x32-mono icon-it-logo"></i>
+                            </div>
+                            <h5>
+                                [$transferit_enter_mega_2fa]
+                            </h5>
+                            <form>
+                                <div class="multiple-inputs">
+                                    <div class="it-input xl-size">
+                                        <div class="input-box">
+                                            <div class="input-field">
+                                                <input type="number" maxlength="1" data-number="1" value="" required />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="it-input xl-size">
+                                        <div class="input-box">
+                                            <div class="input-field">
+                                                <input type="number" maxlength="1" data-number="2" value="" required />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="it-input xl-size">
+                                        <div class="input-box">
+                                            <div class="input-field">
+                                                <input type="number" maxlength="1" data-number="3" value="" required />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="it-input xl-size">
+                                        <div class="input-box">
+                                            <div class="input-field">
+                                                <input type="number" maxlength="1" data-number="4" value="" required />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="it-input xl-size">
+                                        <div class="input-box">
+                                            <div class="input-field">
+                                                <input type="number" maxlength="1" data-number="5" value="" required />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="it-input xl-size">
+                                        <div class="input-box">
+                                            <div class="input-field">
+                                                <input type="number" maxlength="1" data-number="6" value="" required />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="error-text v-hidden">
+                                    [$19192]
+                                </div>
+
+                                <button class="it-button xl-size f-w js-submit-2fa">
+                                    <span>[$1694]</span>
+                                </button>
+
+                                <div class="bottom-info">
+                                    <a href="https://mega.nz/recover" target="_blank" class="link">[$19215]</a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</dialog>
+
+
+<!-- Create account dialog !-->
+<dialog class="it-dialog-holder js-create-acc-dialog blur hidden"
+    aria-labelledby="create-acc-dialog-title"
+    aria-modal="true">
+
+    <section class="it-box it-dialog fh-size lg-shadow auth-dialog create-account">
+        <div class="body">
+            <button class="it-button ghost icon close-btn js-close" aria-label="Close">
+                <i class="sprite-it-x32-mono icon-close-circle"></i>
+            </button>
+            <div class="split-content">
+                <div class="content illustration">
+                    <div class="illustration-body auth">
+                        <img alt class="icon img1" src="data:,">
+                    </div>
+                </div>
+                <div class="content">
+                    <div class="scroll-area">
+                        <div class="content-body">
+                            <div class="logo">
+                                <i class="sprite-it-x32-mono icon-it-logo"></i>
+                            </div>
+                            <h5 id="create-acc-dialog-title">
+                                Create your free account
+                            </h5>
+                            <p>
+                                Enjoy faster, larger, and more secure file transfers. No limits, no hassle - just seamless sharing
+                            </p>
+                            <form>
+                                <div class="it-input fl-label xl-size">
+                                    <div class="input-box">
+                                        <div class="input-field">
+                                            <input type="text" placeholder="Email Adress" name="create-acc--dlg-email" id="create-acc-dlg-email" value="" required />
+                                            <label for="create-acc-dlg-email">Email Adress</label>
+                                        </div>
+                                    </div>
+                                    <div class="error-text"></div>
+                                </div>
+
+                                <button class="it-button xl-size f-w js-create-account-button">
+                                    <span>Create account</span>
+                                </button>
+
+                                <div class="bottom-info">
+                                    Already have an account? <a href="" class="link js-login">Login</a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</dialog>
+

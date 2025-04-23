@@ -11,8 +11,7 @@ lazy(mega.devices, 'data', () => {
     /**
      * {Number} maxDaysNoActivity - maximum number of days a device with no activity is yet considered active
      */
-    // @todo revert this to a const
-    let maxDaysNoActivity = 60;
+    const maxDaysNoActivity = 60;
 
     /**
      * Returns true if device is active based on last heartbeat timestamp
@@ -538,19 +537,10 @@ lazy(mega.devices, 'data', () => {
     };
 
     return freeze({
-
-        // @todo remove this function and change the getter for maxDaysNoActivity
-        setInactivityThreshold(minutes) {
-            minutes |= 0;
-            maxDaysNoActivity = minutes ? minutes / 1440 : 60;
-        },
-
         /**
          * {Number} maxDaysNoActivity - maximum number of days a device with no activity is yet considered active
          */
-        get maxDaysNoActivity() {
-            return maxDaysNoActivity;
-        },
+        maxDaysNoActivity,
 
         /**
          * {Parser} Parser - Parses API formatted data to application format

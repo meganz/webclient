@@ -326,13 +326,13 @@ lazy(FS, 'Secureboot', () => {
         }
         {
             const langs = eval(out.match(/languages\s*=\s*\{[\s\S]*?}/)[0]);
-            const files = FS.ls(path.join(cwd, 'lang'), /\b\w{2}\.json$/)
-                .filter((f) => !!langs[basename(f).split('.')[0]]);
+            const files = FS.ls(path.join(cwd, 'lang'), /_prod\.json$/)
+                .filter((f) => !!langs[basename(f).split('_')[0]]);
 
             for (let i = files.length; i--;) {
                 const f = files[i];
                 const h = createHash('sha256').update(FS.read(f)).digest('hex');
-                const o = f.replace('.', `_${h}.`);
+                const o = f.replace('_', `_${h}`);
                 const n = basename(o);
 
                 sh1.push(`lang/${n}`);

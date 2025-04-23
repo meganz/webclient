@@ -62,8 +62,7 @@ if [[ -n $(git status -s) ]]; then
   [[ -z $(git status -s) ]] || fatal "You have unstaged changes, commit or stash them."
 fi
 
-./scripts/transifex.py
-#./scripts/transifex.py --production
+./scripts/transifex.py --production
 
 ./node_modules/.bin/grunt --debug it | sed 's!^Done.!Please wait...!'
 

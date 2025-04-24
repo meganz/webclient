@@ -520,7 +520,7 @@ class MeetingsManager {
         const { chatRoom } = scheduledMeeting;
         // TODO: temp timeout, ping api and remove re: race condition where `mcfpc` is received twice
         // w/ toggled `f` attribute?
-        tSleep(2).then(() => chatRoom.hasUserMessages() ? null : chatRoom.archive());
+        tSleep(2).then(() => chatRoom.hasMessages(true) ? null : chatRoom.archive());
     }
 
     filterUpcomingMeetings(conversations) {

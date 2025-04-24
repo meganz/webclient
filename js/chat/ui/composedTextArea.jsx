@@ -96,7 +96,7 @@ const ComposedTextArea = ({ chatRoom, parent, containerRef }) =>
                         disabled={mega.paywall}
                         onClick={() => chatRoom.uploadFromComputer()}
                     />
-                    {!is_eplusplus && !is_chatlink &&
+                    {!is_eplusplus && !is_chatlink && !chatRoom.isNote &&
                         <>
                             <hr/>
                             <DropdownItem

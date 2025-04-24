@@ -111,36 +111,26 @@ export default class ConversationsListItem extends MegaRenderMixin {
         var nameClassString = "user-card-name conversation-name selectable-txt";
 
         var contactId;
-        var presenceClass;
         var id;
         let contact;
 
-        if (chatRoom.type === "private") {
+        if (chatRoom.type === 'private') {
             const handle = chatRoom.getParticipantsExceptMe()[0];
-            if (!handle || !(handle in M.u)) {
-                return null;
-            }
-            contact = M.u[handle];
-            id = 'conversation_' + htmlentities(contact.u);
-
-            presenceClass = chatRoom.megaChat.userPresenceToCssClass(
-                contact.presence
-            );
+            contact = handle ? M.u[handle] : M.u[u_handle];
+            id = `conversation_${htmlentities(contact.u)}`;
         }
-        else if (chatRoom.type === "group") {
+        else if (chatRoom.type === 'group') {
             contactId = roomId;
-            id = 'conversation_' + contactId;
-            presenceClass = 'group';
+            id = `conversation_${contactId}`;
             classString += ' groupchat';
         }
-        else if (chatRoom.type === "public") {
+        else if (chatRoom.type === 'public') {
             contactId = roomId;
-            id = 'conversation_' + contactId;
-            presenceClass = 'group';
+            id = `conversation_${contactId}`;
             classString += ' groupchat public';
         }
         else {
-            return "unknown room type: " + chatRoom.roomId;
+            return `Unknown room type for ${chatRoom.roomId}`;
         }
 
         var unreadCount = chatRoom.messagesBuff.getUnreadCount();
@@ -224,12 +214,13 @@ export default class ConversationsListItem extends MegaRenderMixin {
                 </div>;
         }
 
-        if (chatRoom.type !== "public") {
-            nameClassString += " privateChat";
+        if (chatRoom.type !== 'public') {
+            nameClassString += ' privateChat';
         }
         let roomTitle = <OFlowParsedHTML>{megaChat.html(chatRoom.getRoomTitle())}</OFlowParsedHTML>;
-        if (chatRoom.type === "private") {
-            roomTitle =
+        if (chatRoom.type === 'private') {
+            roomTitle = megaChat.WITH_SELF_NOTE && chatRoom.isNote ?
+                <span className="note-chat-label">{l.note_label}</span> :
                 <span>
                     <div className="user-card-wrapper">
                         <OFlowParsedHTML>{megaChat.html(chatRoom.getRoomTitle())}</OFlowParsedHTML>
@@ -241,6 +232,7 @@ export default class ConversationsListItem extends MegaRenderMixin {
         const { scheduledMeeting, isMeeting } = chatRoom;
         const isUpcoming = scheduledMeeting && scheduledMeeting.isUpcoming;
         const { startTime, endTime } = this.getScheduledDateTime() || {};
+        const isEmptyNote = chatRoom.isNote && !chatRoom.hasMessages();
 
         return (
             <li
@@ -249,6 +241,7 @@ export default class ConversationsListItem extends MegaRenderMixin {
                 className={`
                     ${classString}
                     ${isUpcoming ? 'upcoming-conversation' : ''}
+                    ${this.props.className || ''}
                 `}
                 data-room-id={roomId}
                 data-jid={contactId}
@@ -269,7 +262,17 @@ export default class ConversationsListItem extends MegaRenderMixin {
                             />
                         </div>
                     }
-                    {chatRoom.type === 'private' && contact && <Avatar contact={contact} />}
+                    {chatRoom.type === 'private' && contact &&
+                        chatRoom.isNote ?
+                            <div
+                                className={`
+                                    note-chat-signifier
+                                    ${isEmptyNote ? 'note-chat-empty' : ''}
+                                `}>
+                                <i className="sprite-fm-mono icon-file-text-thin-outline note-chat-icon" />
+                            </div> :
+                            <Avatar contact={contact}/>
+                    }
                 </div>
                 <div className="conversation-data">
                     <div className="conversation-data-top">
@@ -280,16 +283,19 @@ export default class ConversationsListItem extends MegaRenderMixin {
                                 null
                             }
                         </div>
-                        <div className="conversation-data-badges">
-                            {chatRoom.type === 'private' ? <ContactPresence contact={contact} /> : null}
-                            {chatRoom.type === 'group' || chatRoom.type === 'private' ?
-                                <i className="sprite-fm-uni icon-ekr-key simpletip" data-simpletip={l[20935]} /> :
-                                null
-                            }
-                            {scheduledMeeting && scheduledMeeting.isUpcoming && scheduledMeeting.isRecurring &&
-                                <i className="sprite-fm-mono icon-repeat-thin-solid" />
-                            }
-                        </div>
+                        {chatRoom.isNote ?
+                            null :
+                            <div className="conversation-data-badges">
+                                {chatRoom.type === 'private' ? <ContactPresence contact={contact} /> : null}
+                                {chatRoom.type === 'group' || chatRoom.type === 'private' ?
+                                    <i className="sprite-fm-uni icon-ekr-key simpletip" data-simpletip={l[20935]} /> :
+                                    null
+                                }
+                                {scheduledMeeting && scheduledMeeting.isUpcoming && scheduledMeeting.isRecurring &&
+                                    <i className="sprite-fm-mono icon-repeat-thin-solid" />
+                                }
+                            </div>
+                        }
                     </div>
                     <div className="clear" />
                     {isUpcoming ?
@@ -315,11 +321,11 @@ export default class ConversationsListItem extends MegaRenderMixin {
                             </div>
                         </div> :
                         <div className="conversation-message-info">
-                            {lastMessageDiv}
+                            {isEmptyNote ? null : lastMessageDiv}
                         </div>
                     }
                 </div>
-                {isUpcoming ?
+                {isUpcoming || isEmptyNote ?
                     null :
                     <div className="date-time-wrapper">
                         <div className="date-time">{this.getConversationTimestamp()}</div>

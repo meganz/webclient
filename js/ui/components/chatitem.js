@@ -25,6 +25,12 @@ class MegaChatItem extends MegaComponent {
         if (this.chatRoom.type === 'private') {
             this.iconNode = document.createElement('div');
             this.iconNode.classList.add('avatar', 'small');
+            if (this.chatRoom.isNote) {
+                this.iconNode.classList.add('note-chat-signifier');
+                if (!this.chatRoom.hasMessages()) {
+                    this.iconNode.classList.add('note-chat-empty');
+                }
+            }
             classNames.push('user');
         }
         else {
@@ -155,6 +161,9 @@ class MegaChatItem extends MegaComponent {
             }
             return 'sprite-fm-mono icon-phone';
         }
+        if (this.chatRoom.isNote) {
+            return 'sprite-fm-mono icon-file-text-thin-outline note-chat-icon';
+        }
         if (this.chatRoom.type === 'private') {
             const handle = this.chatRoom.getParticipantsExceptMe()[0];
             MegaNodeComponent.mAvatarNode(handle, this.iconNode, { presence: true });
@@ -218,7 +227,7 @@ class MegaChatItem extends MegaComponent {
                     messagesBuff.messagesHistoryIsLoading() ||
                     messagesBuff.joined === false ||
                     messagesBuff.isDecrypting ?
-                        l[7006] : l[8000];
+                        l[7006] : this.chatRoom.isNote && !this.chatRoom.hasMessages() ? '' : l[8000];
             }
         }
     }
@@ -236,7 +245,13 @@ class MegaChatItem extends MegaComponent {
 
     set name(value) {
         this.labelNode.textContent = '';
-        this.labelNode.appendChild(this.parsedSafeNode(value, {'class': 'mega-chat-room-topic'}));
+        this.labelNode.appendChild(this.parsedSafeNode(value, {
+            'class': `
+                mega-chat-room-topic
+                ${this.chatRoom.isNote ? 'note-chat-label' : ''}
+                ${this.chatRoom.isNote && !this.chatRoom.hasMessages() ? 'note-chat-empty' : ''}
+            `
+        }));
     }
 
     set details(value) {

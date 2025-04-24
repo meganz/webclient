@@ -50,6 +50,7 @@ class ContactSelectorDialog extends MegaRenderMixin {
                     contacts={M.u}
                     selectFooter={selectFooter}
                     megaChat={megaChat}
+                    withSelfNote={megaChat.WITH_SELF_NOTE}
                     exclude={exclude}
                     allowEmpty={allowEmpty}
                     multiple={multiple}

@@ -55,6 +55,7 @@ function Chat() {
     this.archivedChatsCount = 0;
 
     this.FORCE_EMAIL_LOADING = localStorage.fel;
+    this.WITH_SELF_NOTE = mega.flags.ff_n2s || localStorage.withSelfNote;
 
     this._imageLoadCache = Object.create(null);
     this._imagesToBeLoaded = Object.create(null);
@@ -1101,12 +1102,7 @@ Chat.prototype.openChat = function(userHandles, type, chatId, chatShard, chatdUr
 
     if (type === "private") {
         this.initContacts(userHandles, 2);
-        roomId = array.one(userHandles, u_handle);
-        if (!roomId) {
-            // found a chat where I'm the only user in?
-            $promise.reject();
-            return $promise;
-        }
+        roomId = userHandles.length > 1 ? array.one(userHandles, u_handle) : u_handle;
         if (self.chats[roomId]) {
             $promise.resolve(roomId, self.chats[roomId]);
             return [roomId, self.chats[roomId], $promise];
@@ -1283,8 +1279,9 @@ Chat.prototype.smartOpenChat = function(...args) {
         };
 
         // Check whether we can prevent the actual call to openChat()
-        if (args[0].length === 2 && args[1] === 'private') {
-            var chatRoom = self.chats[array.one(args[0], u_handle)];
+        const [members, type] = args;
+        if (members.length === 2 && type === 'private') {
+            const chatRoom = self.chats[members.every(h => h === members[0]) ? u_handle : array.one(members, u_handle)];
             if (chatRoom) {
                 if (args[5]) {
                     chatRoom.show();
@@ -1572,7 +1569,7 @@ Chat.prototype.renderListing = async function megaChatRenderListing(location, is
 
     let room;
     if (!location && this.chats.length) {
-        const valid = (room) => room && room._leaving !== true && room.isDisplayable() && room;
+        const valid = (room) => room && room._leaving !== true && !room.isNote && room.isDisplayable() && room;
         room = valid(this.chats[this.lastOpenedChat]);
 
         if (!room) {
@@ -2068,17 +2065,8 @@ Chat.prototype.createAndShowPrivateRoom = promisify(function(resolve, reject, h)
         .catch(reject);
 });
 
-Chat.prototype.createAndShowGroupRoomFor = function(contactHashes, topic, opts = {}) {
-    this.trigger(
-        'onNewGroupChatRequest',
-        [
-            contactHashes,
-            {
-                'topic': topic || "",
-                ...opts
-            }
-        ]
-    );
+Chat.prototype.createAndShowGroupRoomFor = function(contactHashes, topic = '', opts = {}) {
+    this.trigger('onNewGroupChatRequest', [contactHashes, { topic, ...opts }]);
 };
 
 Chat.prototype.createAndStartMeeting = function(topic, audio, video) {
@@ -2320,6 +2308,16 @@ Chat.prototype.getChatById = function(chatdId) {
         }
     });
     return found;
+};
+
+/**
+* getNoteChat
+* @description Returns the message to yourself chat; 1-on-1 chat with the current user as the only participant
+* @returns {ChatRoom}
+*/
+
+Chat.prototype.getNoteChat = function() {
+    return Object.values(this.chats).find(c => c.isNote);
 };
 
 

@@ -134,12 +134,19 @@
     border-top: 1px solid var(--mobile-border-subtle);
 }
 
-.flyout-footer button.nav-elem.button.secondary {
+.flyout-footer button.nav-elem.button.secondary,
+.flyout-footer button.nav-elem.button.invite-contact-button {
     cursor: pointer;
     font: var(--mobile-font-copy-semibold);
     white-space: nowrap;
     width: 100%;
+    margin: 8px 0 0;
 }
+
+.flyout-footer button.nav-elem.button.invite-contact-button i {
+    --mask-color: var(--mobile-text-inverse);
+}
+
 .flyout-footer button.mega-component.nav-elem i {
     margin-inline: 0 10px;
     --mask-color: var(--mobile-icon-primary);
@@ -211,7 +218,6 @@
     padding: 0;
 }
 .flyout-overlay .overlay.overlay-container button {
-    margin: auto;
     width: auto;
 }
 .flyout-overlay .image i {

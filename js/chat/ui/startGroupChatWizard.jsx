@@ -345,7 +345,7 @@ export class StartGroupChatWizard extends MegaRenderMixin {
                     className="content-block">
                     {chatInfoElements}
                     <ContactPickerWidget
-                        changedHashProp={self.state.step}
+                        step={self.state.step}
                         exclude={self.props.exclude}
                         contacts={contacts}
                         selectableContacts="true"
@@ -375,7 +375,7 @@ export class StartGroupChatWizard extends MegaRenderMixin {
             </ModalDialogsUI.ModalDialog>
         );
     }
-};
+}
 
 window.StartGroupChatDialogUI = {
     StartGroupChatWizard,

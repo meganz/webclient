@@ -102,6 +102,8 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
     this.ringingCalls = new MegaDataMap(this);
 
     this.isMeeting = isMeeting;
+    this.isNote = type === 'private' && roomId === u_handle;
+
     // Only applies when the user joins a call and the SFU kicks them out due to the user limitation for free plans.
     this.callUserLimited = false;
 
@@ -1067,6 +1069,10 @@ ChatRoom.prototype.getRoomTitle = function() {
     const formattedDate =
         l[19077 /* `Chat created on %s1` */].replace('%s1', new Date(this.ctime * 1000).toLocaleString());
 
+    if (this.isNote) {
+        return l.note_label;
+    }
+
     // 1-on-1 chat -> use other participant's name as a topic
     if (this.type === 'private') {
         const participants = this.getParticipantsExceptMe();
@@ -1416,7 +1422,7 @@ ChatRoom.prototype.getRoomUrl = function(getRawLink) {
 
     if (self.type === "private") {
         var participants = self.getParticipantsExceptMe();
-        var contact = M.u[participants[0]];
+        const contact = M.u[participants[0] || u_handle];
         if (contact) {
             return "fm/chat/p/" + contact.u;
         }
@@ -1662,19 +1668,17 @@ ChatRoom.prototype._attachNodes = mutex('chatroom-attach-nodes', function _(reso
     let link = Object.create(null);
     let nmap = Object.create(null);
     var members = self.getParticipantsExceptMe();
-    var attach = (nodes) => {
-        console.assert(self.type === 'public' || users.length, 'No users to send to?!');
-
-        return this._sendNodes(nodes, users).then((res) => {
-            for (let i = res.length; i--;) {
-                const n = nmap[res[i]] || M.getNodeByHandle(res[i]);
-                console.assert(n.h, `Node not found... ${res[i]}`);
+    const sendMessage = nodes => {
+        return new Promise(resolve => {
+            for (let i = nodes.length; i--;) {
+                const n = nmap[nodes[i]] || M.getNodeByHandle(nodes[i]);
+                console.assert(n.h, `Node not found... ${nodes[i]}`);
 
                 if (n.h) {
                     const name = names && (names[n.hash] || names[n.h]) || n.name;
 
                     // 1b, 1b, JSON
-                    self.sendMessage(
+                    this.sendMessage(
                         Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT +
                         Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT +
                         JSON.stringify([
@@ -1685,7 +1689,12 @@ ChatRoom.prototype._attachNodes = mutex('chatroom-attach-nodes', function _(reso
                     );
                 }
             }
+            resolve();
         });
+    };
+    const attach = nodes => {
+        console.assert(this.type === 'public' || users.length || this.isNote, 'No users to send to?!');
+        return this.isNote ? sendMessage(nodes) : this._sendNodes(nodes, users).then(res => sendMessage(res));
     };
 
     var done = function() {
@@ -1913,14 +1922,14 @@ ChatRoom.prototype.getMessageById = function(messageId) {
 };
 
 /**
- * hasUserMessages
- * @description Check if the current room has any chat history, excl. management messages
+ * hasMessages
+ * @description Check if the current room has any chat history
+ * @param {boolean} userMessagesOnly Filter for user messages only and ignore any management messages
  * @returns boolean
  */
 
-ChatRoom.prototype.hasUserMessages = function() {
-    const { messages } = this.messagesBuff;
-    return !!messages.length && messages.some(m => m.messageHtml);
+ChatRoom.prototype.hasMessages = function(userMessagesOnly = false) {
+    return this.messagesBuff.messages.some(m => !userMessagesOnly || m.messageHtml);
 };
 
 /**

@@ -252,6 +252,7 @@
             }
             else {
                 aTarget = chats[0] || String(aTarget || '').split('/').pop();
+                names[u_handle] = aTarget === u_handle ? l.note_label : names[u_handle];
             }
             if (aTarget && String(aTarget).indexOf("#") > -1) {
                 aTarget = aTarget.split("#")[0];
@@ -847,8 +848,6 @@
         }
 
         if (myContacts && myContacts.length) {
-            myContacts.sort(M.sortObjFn("name", 1));
-
             for (var a = 0; a < myContacts.length; a++) {
                 if (addedContactsByRecent.includes(myContacts[a].handle)) {
                     continue;
@@ -867,6 +866,22 @@
                 }
                 contactGeneratedList += ctElem;
             }
+        }
+
+        if (megaChat.WITH_SELF_NOTE) {
+            const noteChat = megaChat.getNoteChat();
+            const isEmptyNote = noteChat && !noteChat.hasMessages();
+            contactGeneratedList =
+                `<li id="cpy-dlg-chat-itm-${u_handle}">
+                <span id="cpy-dlg-chat-itm-spn-${u_handle}" class="nw-contact-item">
+                    <span class="encrypted-spacer"></span>
+                    <span class="nw-note-signifier ${isEmptyNote ? 'note-chat-empty' : 'boo'}">
+                        <i class="sprite-fm-mono icon-file-text-thin-outline note-chat-icon"></i>
+                    </span>
+                    <span class="nw-contact-name nw-note-name note-chat-label">${l.note_label}</span>
+                </span>
+            </li>
+            ${contactGeneratedList}`;
         }
 
         if (

@@ -343,6 +343,7 @@ lazy(mega.ui, 'secondaryNav', () => {
         text: l[99],
         onClick: () => {
             eventlog(500011);
+            $.doStraightUpload = true;
             document.querySelector('#fileselect1').click();
         }
     });
@@ -354,6 +355,7 @@ lazy(mega.ui, 'secondaryNav', () => {
         text: l[98],
         onClick: () => {
             eventlog(500009);
+            $.doStraightUpload = true;
             document.querySelector('#fileselect2').click();
         }
     });

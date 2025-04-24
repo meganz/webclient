@@ -1481,7 +1481,7 @@ function logExportEvt(evtId, data) {
                         );
                     }
 
-                    if (!folderlink) {
+                    if (!folderlink && !dlid) {
                         addSettingsBtn(
                             ($.itemExport.length === 1)
                                 ? sheet.contentNode.querySelector('.node-link-block .block-naming')

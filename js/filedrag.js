@@ -34,6 +34,7 @@
         const straight = $.doStraightUpload || Object(window.fmconfig).ulddd
             || M.currentrootid === M.RubbishID || files.length === 0;
 
+        delete $.doStraightUpload;
         console.assert(M.isFileDragPage(page) || window.fminitialized, 'check this...');
 
         if (M.InboxID && M.currentrootid && (M.currentrootid === M.InboxID

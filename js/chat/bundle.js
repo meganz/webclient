@@ -18316,7 +18316,7 @@ const ConversationPanel = (conversationpanel_dec = utils.Ay.SoonFcWrap(360), _de
     }
     chatRoom._uiIsMounted = true;
     chatRoom.$rConversationPanel = this;
-    chatRoom.trigger('onComponentDidMount');
+    onIdle(() => this.isMounted() && chatRoom.trigger('onComponentDidMount'));
     ChatdIntegration._waitForProtocolHandler(chatRoom, () => {
       if (this.isMounted()) {
         const hasInvalidKeys = chatRoom.hasInvalidKeys();

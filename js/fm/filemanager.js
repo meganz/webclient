@@ -2712,8 +2712,7 @@ FileManager.prototype.createFolderUI = function() {
             M.initFileAndFolderSelectDialog('create-new-link')
                 .then((nodes) => {
                     if (nodes.length) {
-                        M.addSelectedNodes(nodes, true);
-                        return M.getLinkAction();
+                        return M.getLinkAction(nodes);
                     }
                 })
                 .then(() => eventlog(500736))
@@ -2748,8 +2747,11 @@ FileManager.prototype.initFileAndFolderSelectDialog = async function(type) {
     var dialogPlacer = document.createElement('div');
     var selected = [];
     let $$rootRef;
-    const doClose = tryCatch(() => {
+    const doClose = tryCatch((noClearSelected) => {
         if ($$rootRef) {
+            if (!noClearSelected) {
+                selected = [];
+            }
             resolve(selected);
             setTimeout((e) => e.unmount(), 20, $$rootRef);
             $$rootRef = null;
@@ -2801,8 +2803,12 @@ FileManager.prototype.initFileAndFolderSelectDialog = async function(type) {
         selectLabel: l[1523],
         folderSelectable: true,
         className: 'no-incoming',
-        onClose: doClose,
-        onAttachClicked: doClose,
+        onClose: () => {
+            doClose();
+        },
+        onAttachClicked: () => {
+            doClose(true);
+        },
         onCancel() {
             selected = false;
         },
@@ -4749,7 +4755,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
 };
 
 
-FileManager.prototype.getLinkAction = function() {
+FileManager.prototype.getLinkAction = function(selNodes) {
     'use strict';
 
     if (M.isInvalidUserStatus()) {
@@ -4765,7 +4771,7 @@ FileManager.prototype.getLinkAction = function() {
     }
     else {
         var isEmbed = $(this).hasClass('embedcode-item');
-        var selNodes = Array.isArray($.selected) ? $.selected.concat() : [];
+        selNodes = Array.isArray(selNodes) ? selNodes : Array.isArray($.selected) ? $.selected.concat() : [];
         var showDialog = function() {
             mega.Share.initCopyrightsDialog(selNodes, isEmbed);
         };

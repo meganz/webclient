@@ -2262,6 +2262,7 @@ body.loading .light-overlay {
     display: flex;
     padding: 11px 0 0 8px;
     float: left;
+    margin-inline-end: auto;
 }
 
 .transfer-table .transfer-type, .transfer-table .tranfer-filetype-txt {

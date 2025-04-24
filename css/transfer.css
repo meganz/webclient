@@ -15,6 +15,13 @@
     white-space: nowrap;
     background-color: var(--mobile-page-background);
     position: relative;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+}
+.fm-transfers-header .transfer-panel-actions {
+    display: flex;
+    flex-direction: row-reverse;
 }
 .fm-transfers-header .mega-button {
     margin-inline-end: 8px;

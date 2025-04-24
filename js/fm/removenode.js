@@ -472,7 +472,8 @@ async function fmremove(selectedNodes, skipDelWarning) {
             }
 
             if (filecnt + foldercnt === 1) {
-                message = message.replace('%1', escapeHTML(M.d[selectedNodes[0]].name));
+                const n = M.getNodeByHandle(selectedNodes[0]);
+                message = message.replace('%1', escapeHTML(n.name || ''));
             }
 
             msgDialog(

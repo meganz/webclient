@@ -1068,7 +1068,7 @@ var slideshowid;
         mBroadcaster.sendMessage('slideshow:open', n);
 
         if (page !== 'download') {
-            sessionStorage.setItem('previewNode', id);
+            tryCatch(() => sessionStorage.setItem('previewNode', id))();
             pushHistoryState(true, Object.assign({subpage: page}, history.state, {view: slideshowid}));
         }
 

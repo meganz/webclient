@@ -288,10 +288,12 @@ mBroadcaster.once('boot_done', () => {
     if (self.__cdumps && __cdumps.length) {
         console.warn('Handling %d deferred runtime exceptions...', __cdumps.length, __cdumps);
 
-        for (let i = 0; i < __cdumps.length; ++i) {
-            gExceptionHandler(...__cdumps[i]);
-        }
-        delete self.__cdumps;
+        tryCatch(() => {
+            for (let i = 0; i < __cdumps.length; ++i) {
+                gExceptionHandler(...__cdumps[i]);
+            }
+            self.__cdumps.length = 0;
+        })();
     }
     self.onerror = gExceptionHandler;
 });

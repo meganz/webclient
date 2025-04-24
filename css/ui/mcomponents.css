@@ -643,6 +643,10 @@ i.green-check-circle {
 .pointer-events-none {
     pointer-events: none;
 }
+.select-text {
+    user-select: text;
+    -webkit-user-select: text;
+}
 .object-cover {
     object-fit: cover;
 }

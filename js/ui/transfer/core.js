@@ -168,7 +168,7 @@ lazy(self.T, 'core', () => {
                 if (k === 'se' || k === 'p') {
                     return [1, v.trim() || undefined];
                 }
-                else if (k === 't') {
+                else if (k === 't' || k === 'm') {
                     v = to8(v.trim());
                 }
                 break;
@@ -503,7 +503,7 @@ lazy(self.T, 'core', () => {
             }
             if ((en = cast(e > 0 && en))) {
 
-                en = en > 1 ? en : ~~(e - 3 * 864e3);
+                en = en > 1 ? en : 3 * 864e3;
             }
             mc = cast(mc, 'mc');
 

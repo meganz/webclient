@@ -1623,7 +1623,7 @@ var slideshowid;
         var eot = function eot(h, err) {
             delete preqs[h];
             delete pfails[h];
-            if (n.s > 13e7) {
+            if (n.s > 13e7 || !M.addDownload) {
                 return previewimg(h, null);
             }
             M.addDownload([h], false, err ? -1 : true);
@@ -1674,7 +1674,7 @@ var slideshowid;
             return false;
         }
 
-        if (is_video(n)) {
+        if (is_video(n) || is_audio(n)) {
             if (!preqs[n.h]) {
                 preqs[n.h] = 1;
 

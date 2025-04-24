@@ -109,8 +109,13 @@ lazy(T.ui, 'viewFilesLayout', () => {
         },
 
         isMediaFile(n) {
-            return crypto_keyok(n) &&
-                (String(n.fa).includes(':0*') || is_image2(n) || is_video(n) || MediaInfoLib.isFileSupported(n));
+            if (!crypto_keyok(n)) {
+                return null;
+            }
+            if (String(n.fa).includes(':0*') || is_image2(n)) {
+                return 1;
+            }
+            return is_video(n) || MediaInfoLib.isFileSupported(n) ? 2 : false;
         },
 
         async preload(xh) {
@@ -501,16 +506,19 @@ lazy(T.ui, 'viewFilesLayout', () => {
                 if (n.t) {
                     this.init(n.xh, n.h).catch(tell);
                 }
-                else if (String(n.fa).includes(':0*') || is_image2(n)
-                    || is_video(n) || MediaInfoLib.isFileSupported(n)) {
-                    if (is_video(n)) {
-                        $.autoplay = n.h;
-                    }
-
-                    slideshow(n);
-                }
                 else {
-                    download();
+                    const media = this.isMediaFile(n);
+
+                    if (media) {
+                        if (media > 1) {
+                            $.autoplay = n.h;
+                        }
+
+                        slideshow(n);
+                    }
+                    else {
+                        download();
+                    }
                 }
             };
 

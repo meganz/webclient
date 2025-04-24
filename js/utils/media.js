@@ -41,7 +41,7 @@ if (!isMediaSourceSupported()) {
  */
 function is_audio(n) {
     'use strict';
-    return is_video(n) === 2;
+    return is_video(n) === 2 || /\.(mp3|wav|flac)$/i.test(n && n.name);
 }
 
 /**

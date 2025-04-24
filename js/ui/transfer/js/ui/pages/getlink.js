@@ -706,9 +706,9 @@ lazy(T.ui, 'addFilesLayout', () => {
                 }
 
                 if (emails.length) {
-                    p.push(T.core.setMultiTransferRecipients(
-                        xh, emails.map((email) => ({email, xh}))
-                    ));
+                    const bulk = emails.map((email) => ({email, schedule}));
+
+                    p.push(T.core.setMultiTransferRecipients(xh, bulk));
                 }
 
                 this.data.stashing = Promise.all(p);

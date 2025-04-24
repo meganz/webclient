@@ -321,7 +321,6 @@ mBroadcaster.once('boot_done', () => {
             return res || false;
         }
     });
-    self.eventlog = self.dump;
     self.percent_megatitle = dummy;
     self.loadingDialog = {show: () => T.ui.loader.show(), hide: () => T.ui.loader.hide()};
     self.ASSERT = (e, m) => e || dump(m);

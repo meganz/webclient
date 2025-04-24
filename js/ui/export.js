@@ -1436,6 +1436,34 @@ function logExportEvt(evtId, data) {
                 });
             }
 
+            if ($.isCtrlShift && counts[1] && !folderlink) {
+                MegaButton.factory({
+                    parentNode: footerElements[1],
+                    text: l.repair,
+                    componentClassname: 'secondary mx-2 slim simpletip',
+                    type: 'normal',
+                    dataset: { simpletip: l.repair_note }
+                }).on('click.repairLink', () => {
+                    const p = [];
+                    let i = $.itemExport.length;
+
+                    while (--i >= 0) {
+                        const { t, h } = M.getNodeByHandle($.itemExport[i]);
+
+                        if (t) {
+                            p.push(api_setshare(h, [{u: 'EXP', r: 0, rsk: 1}]));
+                        }
+                    }
+
+                    if (p.length) {
+                        loadingDialog.show('rsk', l[1141]);
+                        Promise.all(p).catch(tell).finally(() => loadingDialog.hide('rsk'));
+                    }
+                });
+
+                delete $.isCtrlShift;
+            }
+
             const options = {
                 name,
                 contents: [mCreateElement('div', { class: 'relative' }, itemExportLink(dialogOpts))],

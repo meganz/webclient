@@ -1623,25 +1623,7 @@ FileManager.prototype.initContextUI = function() {
     $(c + '.getlink-item, ' + c + '.embedcode-item, ' + c + '.cd-getlink-item').rebind('click', function(e) {
 
         if (e.shiftKey && (e.ctrlKey || e.metaKey)) {
-            $('button', $('#link-hidden-repair-proc').removeClass('hidden'))
-                .rebind('click', () => {
-                    const p = [];
-
-                    for (const elm of document.querySelectorAll('.export-links-dialog .item')) {
-                        const n = M.getNodeByHandle(elm.dataset.nodeHandle);
-                        if (n.t) {
-                            p.push(api_setshare(n.h, [{u: 'EXP', r: 0, rsk: 1}]));
-                        }
-                    }
-
-                    if (p.length) {
-                        loadingDialog.show('rsk', l[1141]);
-                        Promise.all(p).catch(tell).finally(() => loadingDialog.hide('rsk'));
-                    }
-                });
-        }
-        else {
-            $('#link-hidden-repair-proc').addClass('hidden').off();
+            $.isCtrlShift = true;
         }
 
         M.getLinkAction.call(this);

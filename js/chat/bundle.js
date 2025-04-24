@@ -37026,38 +37026,22 @@ class Button extends _chat_mixins_js1__.w9 {
     this.unbindEvents();
   }
   renderChildren() {
-    if (react0().Children.count(this.props.children) < 1) {
-      return null;
-    }
-    return react0().Children.map(this.props.children, child => {
-      if (!child) {
-        return;
-      }
-      if (typeof child.type === 'string' || typeof child.type === 'undefined') {
-        return child;
-      }
-      return react0().cloneElement(child, {
-        active: this.state.focused,
-        closeDropdown: () => {
-          this.setState({
-            focused: false
-          });
-          this.unbindEvents();
-        },
-        onActiveChange: newVal => {
-          let _this$domRef3;
-          const $element = $((_this$domRef3 = this.domRef) == null ? void 0 : _this$domRef3.current);
-          const $scrollables = $element.parents('.ps');
-          if ($scrollables.length > 0) {
-            $scrollables.map((k, element) => Ps[newVal ? 'disable' : 'enable'](element));
-          }
-          if (child.props.onActiveChange) {
-            child.props.onActiveChange(newVal);
-          }
-          return newVal ? this.bindEvents() : this.unbindEvents();
+    return this.props.children && react0().Children.map(this.props.children, child => child && (typeof child.type === 'string' || child.type === undefined ? child : react0().cloneElement(child, {
+      active: this.state.focused,
+      closeDropdown: () => this.setState({
+        focused: false
+      }, () => this.unbindEvents()),
+      onActiveChange: active => {
+        let _this$domRef3;
+        const $element = $(((_this$domRef3 = this.domRef) == null ? void 0 : _this$domRef3.current) || this.domNode);
+        const $scrollables = $element.parents('.ps');
+        if ($scrollables.length > 0) {
+          $scrollables.map((k, element) => Ps[active ? 'disable' : 'enable'](element));
         }
-      });
-    });
+        child.props.onActiveChange == null || child.props.onActiveChange(active);
+        return this[active ? 'bindEvents' : 'unbindEvents']();
+      }
+    })));
   }
   bindEvents() {
     $(BLURRABLE_CLASSES).rebind(`mousedown.button--${this.getUniqueId()}`, this.onBlur);

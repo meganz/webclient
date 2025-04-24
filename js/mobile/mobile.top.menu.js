@@ -451,7 +451,7 @@ class MegaMobileTopMenu extends MegaComponent {
 
         if (btn) {
             btn.rebind('beforeRedirect', () => {
-                if (this.overlayAccount) {
+                if (this.overlayAccount || is_mobile && mobile.settings.account.overlayAccount) {
                     mega.ui.overlay.hide();
                 }
             });

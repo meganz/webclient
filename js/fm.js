@@ -3484,6 +3484,7 @@ function FMResizablePane(element, opts) {
             maxWidth: opts.maxWidth,
             start: function(e, ui) {
                 $(self.element).addClass('resizable-pane-active');
+                $.hideContextMenu();
             },
             resize: function(e, ui) {
                 var css_attrs = {

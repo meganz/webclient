@@ -1746,7 +1746,11 @@ MegaData.prototype.reCalcMenuPosition = function(m, x, y, ico) {
     else {// right click
 
         if (rtl) {
-            dPos = { 'x': x - 10 - m.outerWidth(), 'y': y + 10 };
+            dPos = { 'x': x - 10 - cmW, 'y': y + 10 };
+            if (dPos.x < minX) {
+                // Flip to other side
+                dPos.x = minX;
+            }
         }
         else {
             dPos = { 'x': x + 10, 'y': y + 10 };

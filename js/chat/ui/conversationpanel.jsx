@@ -1741,7 +1741,7 @@ export class ConversationPanel extends MegaRenderMixin {
         }
         chatRoom._uiIsMounted = true;
         chatRoom.$rConversationPanel = this;
-        chatRoom.trigger('onComponentDidMount');
+        onIdle(() => this.isMounted() && chatRoom.trigger('onComponentDidMount'));
 
         ChatdIntegration._waitForProtocolHandler(chatRoom, () => {
             if (this.isMounted()) {

@@ -95,7 +95,7 @@ MegaQueue.prototype.trigger = function(name, args) {
     }
     return res;
 };
-MegaQueue.prototype.on = function(callback) {
+MegaQueue.prototype.on = function(name, callback) {
     'use strict';
     if (this._events) {
         if (!this._events[name]) {

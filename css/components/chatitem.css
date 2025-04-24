@@ -50,6 +50,13 @@
 .mega-chat-item .mega-chat-room-topic {
     font: var(--mobile-font-caption-large-regular);
 }
+.mega-chat-item .mega-chat-room-topic.note-chat-label {
+    font: var(--mobile-font-caption-large-semibold);
+}
+.mega-chat-item .mega-chat-room-topic.note-chat-empty {
+    display: block;
+    padding: 20px 0 0;
+}
 .mega-chat-item.notification .mega-chat-room-topic {
     font: var(--mobile-font-caption-large-bold);
 }
@@ -121,6 +128,17 @@
 }
 .mega-chat-item .avatar.small {
     position: relative;
+}
+.mega-chat-item .note-chat-signifier {
+    padding: 4px 0 0;
+    box-sizing: border-box;
+    text-align: center;
+}
+.mega-chat-item .note-chat-signifier.note-chat-icon {
+    --mask-color: var(--secondary-white);
+}
+.mega-chat-item .note-chat-signifier.note-chat-empty {
+    --mask-color: var(--icon-active);
 }
 .mega-chat-item .activity-status {
     position: absolute;

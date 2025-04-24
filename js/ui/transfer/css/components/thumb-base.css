@@ -1,0 +1,174 @@
+/*
+ * FM item thumb
+*/
+
+.it-thumb-base {
+    background: var(--thumb-dk-grey);
+    border-radius: var(--radius-i-xs);
+    box-shadow: var(--thumb-shadow-sm);
+    display: flex;
+    flex: 0 0 auto;
+    height: 24px;
+    overflow: hidden;
+    position: relative;
+    width: 24px;
+}
+
+.it-thumb-base i {
+    --icon-size: 24px;
+    font-weight: normal;
+    margin: auto;
+}
+
+.it-thumb-base img {
+    display: none;
+    margin: auto;
+    left: 50%;
+    min-height: 100%;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+}
+
+
+/* Sizes */
+
+/* Large size */
+
+.it-thumb-base.lg-size {
+    border-radius: var(--radius-i-sm);
+    box-shadow: var(--thumb-shadow-lg);
+    height: 96px;
+    width: 96px;
+}
+
+.it-thumb-base.lg-size i {
+    --icon-size: 96px;
+}
+
+
+/* MIME backgrounds */
+
+.it-thumb-base.audio,
+.it-thumb-base.image,
+.it-thumb-base.keynote,
+.it-thumb-base.raw,
+.it-thumb-base.video,
+.it-thumb-base.word {
+    background: var(--thumb-blue);
+}
+
+.it-thumb-base.compressed,
+.it-thumb-base.generic,
+.it-thumb-base.text {
+    background: var(--thumb-dk-grey);
+}
+
+.it-thumb-base.excel {
+    background: var(--thumb-green);
+}
+
+.it-thumb-base.cad,
+.it-thumb-base.pdf,
+.it-thumb-base.powerpoint {
+    background: var(--thumb-red);
+}
+
+.it-thumb-base.pages,
+.it-thumb-base.vector {
+    background: var(--thumb-orange);
+}
+
+.it-thumb-base.numbers {
+    background: var(--thumb-br-green);
+}
+
+/* Folder icon tweak */
+
+.it-thumb-base.folder {
+    background: none;
+    box-shadow: none;
+}
+
+.it-thumb-base i.folder {
+    background: no-repeat center / 24px 24px url("../../images/3d-icons/folder.png");
+    display: block;
+    height: inherit;
+    width: inherit;
+}
+
+.it-thumb-base.lg-size i.folder {
+    background: no-repeat center / 96px 96px url("../../images/3d-icons/folder-lg.png");
+}
+
+
+/* Image thumb */
+
+.it-thumb-base.thumb {
+    background: var(--image-background);
+    background-size: 20px 20px;
+    background-position: 0 0, 0 10px, 10px -10px, -10px 0;
+    box-shadow: none;
+}
+
+.it-thumb-base.thumb > i {
+    display: none;
+}
+
+.it-thumb-base.thumb > img {
+    display: block;
+}
+
+
+/* Video/GIF tag */
+
+.it-thumb-base .tag {
+    background-color: var(--main-forced-black);
+    border-radius: var(--radius-i-xs);
+    bottom: 0;
+    display: flex;
+    margin: 8px;
+    padding: 4px;
+    position: absolute;
+    right: 0;
+    z-index: 1;
+}
+
+.rtl .it-thumb-base .tag {
+    left: 0;
+    right: auto;
+}
+
+.it-thumb-base .tag span {
+    color: var(--main-forced-white);
+    font: var(--text-caption-md);
+    padding: 0 4px;
+}
+
+.it-thumb-base .tag i {
+    --icon-size: 16px;
+    --mask-color: var(--main-accent);
+}
+
+
+/* Play video icon */
+
+.it-thumb-base .play-icon {
+    background-color: var(--main-surface-primary);
+    border-radius: 100%;
+    display: flex;
+    height: 56px;
+    left: 50%;
+    margin: -28px;
+    position: absolute;
+    top: 50%;
+    width: 56px;
+    z-index: 1;
+}
+
+.it-thumb-base .play-icon i {
+    --icon-size: 24px;
+    --mask-color: var(--main-primary);
+    margin: auto;
+}

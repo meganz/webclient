@@ -37,6 +37,18 @@ mBroadcaster.once('boot_done', function() {
             return value;
         });
     }
+
+    if (!Intl.NumberFormat.prototype.formatToParts) {
+        // weak silly polyfill -- Safari < 13
+        Object.defineProperty(Intl.NumberFormat.prototype, 'formatToParts', {
+            value(n) {
+                const [i, f] = this.format(n).split(/[,.]/);
+                return [
+                    {type: 'integer', value: i | 0}, {type: 'decimal', value: '.'}, {type: 'fraction', value: f | 0}
+                ];
+            }
+        });
+    }
 });
 
 if (typeof window.queueMicrotask !== "function") {
@@ -732,6 +744,40 @@ lazy(self, 'deepFreeze', () => {
         refs = null;
         return rv || false;
     };
+});
+
+/**
+ * Simplistic module loader.
+ * @todo deprecate secureboot.js, move to SRI, and use import(map) statements.
+ * @name factory
+ * @global
+ */
+lazy(self, 'factory', () => {
+    'use strict';
+    const nil = freeze({});
+    const cache = Object.create(null);
+    const modules = Object.create(null);
+
+    return freeze({
+        define(name, module) {
+            console.assert(!modules[name], `overriding module '${name}'`);
+            modules[name] = tryCatch(module);
+        },
+        lazy(target, module, name) {
+            return lazy(target, name, () => factory.require(module)[name]);
+        },
+        require(name) {
+            if (cache[name] === undefined) {
+                if (typeof modules[name] !== 'function') {
+                    throw new SyntaxError(`No module named ${name}`);
+                }
+                cache[name] = false;
+                cache[name] = modules[name](factory) || cache[name];
+                delete modules[name];
+            }
+            return cache[name] || nil;
+        }
+    });
 });
 
 // }}} END: Helpers, with direct dependency on polyfills or latest ECMAScript

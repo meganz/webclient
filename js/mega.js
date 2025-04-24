@@ -2306,7 +2306,7 @@ function emplacenode(node, noc) {
         M.d[node.h] = node;
     }
     else {
-        M.d[node.h] = Object.setPrototypeOf(node, MegaNode.prototype);
+        M.d[node.h] = node instanceof MegaNode ? node : Object.setPrototypeOf(node, MegaNode.prototype);
     }
 }
 

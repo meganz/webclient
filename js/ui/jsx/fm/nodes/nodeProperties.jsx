@@ -247,7 +247,7 @@ export class NodeProperties {
             return !!node.fav;
         });
         lazy(this, 'size', () => {
-            return bytesToSize(node.s);
+            return bytesToSize(node.tb || node.s);
         });
         lazy(this, 'timestamp', () => {
             return time2date(node.ts);

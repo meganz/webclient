@@ -616,15 +616,16 @@ MegaUtils.prototype.require = function megaUtilsRequire() {
     toArray.apply(null, arguments).forEach(function(rsc) {
         // check if a group of resources was provided
         if (jsl3[rsc]) {
-            var group = Object.keys(jsl3[rsc]);
+            for (const k in jsl3[rsc]) {
+                const f = jsl3[rsc][k];
 
-            args = args.concat(group);
-
-            // inject them into jsl2
-            for (var i = group.length; i--;) {
-                if (!jsl2[group[i]]) {
-                    (jsl2[group[i]] = jsl3[rsc][group[i]]).n = group[i];
+                if (jsl2[f.n]) {
+                    console.assert(jsl2[f.n].f === f.f, `misnamed jsl3 resource, ${f.n}`);
                 }
+                else {
+                    jsl2[f.n] = f;
+                }
+                args.push(f.n);
             }
         }
         else {
@@ -1275,6 +1276,20 @@ mBroadcaster.addListener('mega:openfolder', SoonFc(300, function(id) {
     }
 }));
 
+/**
+ * Open Transfer.it overlay.
+ * @returns {Promise<*>} any
+ */
+MegaUtils.prototype.openTransferItOverlay = async function(aPreSelectNodes) {
+    'use strict';
+    if (!(self.T && 'core' in T)) {
+        loadingDialog.show();
+        await this.require('transferit')
+            .finally(() => loadingDialog.hide());
+        assert('core' in T);
+    }
+    return T.ui.transferItOverlay.show(aPreSelectNodes);
+};
 
 /**
  * Handle a redirect from the mega.co.nz/#pro page to mega.nz/#pro page
@@ -1431,23 +1446,8 @@ MegaUtils.prototype.setTabAndScroll = function(target) {
  * @param {String} name The filename
  * @returns {String}
  */
-MegaUtils.prototype.getSafeName = function(name) {
-    // http://msdn.microsoft.com/en-us/library/aa365247(VS.85)
-    name = ('' + name).replace(/["*/:<>?\\|]+/g, '.');
+factory.lazy(MegaUtils.prototype, 'safe-name', 'getSafeName');
 
-    if (name.length > 250) {
-        name = name.substr(0, 250) + '.' + name.split('.').pop();
-    }
-    name = name.replace(/[\t\n\r\f\v]+/g, ' ');
-    name = name.replace(/\u202E|\u200E|\u200F/g, '');
-
-    var end = name.lastIndexOf('.');
-    end = ~end && end || name.length;
-    if (/^(?:CON|PRN|AUX|NUL|COM\d|LPT\d)$/i.test(name.substr(0, end))) {
-        name = '!' + name;
-    }
-    return name;
-};
 /**
  * checking if name (file|folder)is satisfaying all OSs [Win + linux + Mac + Android + iOs] rules,
  * so syncing to local disks won't cause any issue...
@@ -1480,13 +1480,7 @@ MegaUtils.prototype.isSafeName = function(name, allowPathSep) {
  * @param {String} [file] Optional filename to append
  * @returns {Array} Each sanitised path component as array members
  */
-MegaUtils.prototype.getSafePath = function(path, file) {
-    var res = ('' + (path || '')).split(/[\\\/]+/).map(this.getSafeName).filter(String);
-    if (file) {
-        res.push(this.getSafeName(file));
-    }
-    return res;
-};
+factory.lazy(MegaUtils.prototype, 'safe-path', 'getSafePath');
 
 /**
  * Retrieve transfer quota details, i.e. by firing an uq request.

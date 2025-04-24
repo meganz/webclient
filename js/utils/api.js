@@ -208,6 +208,9 @@ class MEGAPIRequest {
         // Unique request start ID
         this.seqNo = -Math.log(Math.random()) * 0x10000000 >>> 0;
 
+        // Dynamic handler to invoke whenever an API request is being retried.
+        this.retryHandler = null;
+
         /**
          * Unique Lexicographically Sortable Identifier
          * @property MEGAPIRequest.lex
@@ -287,6 +290,7 @@ class MEGAPIRequest {
         this.received = 0;
         this.residual = false;
         this.response = null;
+        this.retrying = 0;
         this.status = 0;
         this.symb = 0;
         this.timer = false;
@@ -484,6 +488,7 @@ class MEGAPIRequest {
         }
         else {
             this.inflight = null;
+            this.retryHandler = null;
             this.__ident_1 = Math.random().toString(31).slice(-7);
             queueMicrotask(() => this.flush().catch((ex) => self.d && this.logger.warn(ex)));
         }
@@ -538,13 +543,18 @@ class MEGAPIRequest {
         }
     }
 
-    notifyUpstreamFailure(error) {
+    async notifyUpstreamFailure(error) {
+        let result = error;
+
         for (let i = this.inflight.length; !this.cancelled && i--;) {
             const {options, payload, reject} = this.inflight[i];
 
             if (typeof options.notifyUpstreamFailure === 'function') {
-                let res = tryCatch(options.notifyUpstreamFailure)(error, payload, i, this.inflight.length);
+                let res = options.notifyUpstreamFailure(error, payload, {...options}, i, this.inflight.length);
 
+                if (res instanceof Promise) {
+                    res = await res.catch(echo);
+                }
                 if (res === EROLLEDBACK || res === EEXPIRED) {
                     if (self.d) {
                         this.logger.warn('Inflight request trap(%d)', res, payload);
@@ -565,11 +575,13 @@ class MEGAPIRequest {
 
                     if (res === EEXPIRED) {
 
+                        result = EAGAIN;
                         this.createRequestURL(this.inflight);
                     }
                 }
             }
         }
+        return result;
     }
 
     async errorHandler(res) {
@@ -584,7 +596,7 @@ class MEGAPIRequest {
 
             if (this.symb && !this.cancelled && this.inflight) {
 
-                this.notifyUpstreamFailure(res);
+                res = await this.notifyUpstreamFailure(res);
             }
 
             if (!this.cancelled) {
@@ -640,6 +652,9 @@ class MEGAPIRequest {
         const options = {method: body ? 'POST' : 'GET', body, signal};
 
         while (true) {
+            if (this.retryHandler && this.retrying++) {
+                this.retryHandler(options, this.retrying);
+            }
             response = await fetch(uri, options);
             if (response.status !== 402) {
                 break;
@@ -654,7 +669,10 @@ class MEGAPIRequest {
             const y = parseInt(cash[1]);
             this.logger.assert(x === 1 && y >= 0 && y < 256, `Invalid 402 response, mismatch ${cash}`);
 
-            options.headers = {'X-Hashcash': `1:${cash[3]}:${await this.gencash(cash[3], y)}`};
+            options.headers = {
+                ...options.headers,
+                'X-Hashcash': `1:${cash[3]}:${await this.gencash(cash[3], y)}`
+            };
         }
 
         this.response = response;
@@ -1227,7 +1245,7 @@ class MEGAKeepAliveStream {
 
     async fetch(options) {
         this.schedule(36);
-        const {body, ok, status, statusText} = await fetch(this.url, options);
+        const {body, ok, status, statusText} = await this.fire(options);
 
         this.status = status;
         if (!(ok && status === 200)) {
@@ -1241,6 +1259,9 @@ class MEGAKeepAliveStream {
 
         this.reader = body.getReader();
         return new ReadableStream(this);
+    }
+    fire(options) {
+        return fetch(this.url, options);
     }
 
     async start(controller) {
@@ -1338,16 +1359,16 @@ lazy(self, 'api', () => {
     'use strict';
     const chunkedSplitHandler = freeze({
         cs: freeze({
-            '[': tree_residue,     // tree residue
-            '[{[f{': tree_node,    // tree node
-            '[{[f2{': tree_node,   // tree node (versioned)
-            '[{[ok0{': tree_ok0    // tree share owner key
+            '[': self.tree_residue,     // tree residue
+            '[{[f{': self.tree_node,    // tree node
+            '[{[f2{': self.tree_node,   // tree node (versioned)
+            '[{[ok0{': self.tree_ok0    // tree share owner key
         }),
         sc: freeze({
-            '{': sc_residue,       // SC residue
-            '{[a{': sc_packet,     // SC command
-            '{[a{{t[f{': sc_node,  // SC node
-            '{[a{{t[f2{': sc_node  // SC node (versioned)
+            '{': self.sc_residue,       // SC residue
+            '{[a{': self.sc_packet,     // SC command
+            '{[a{{t[f{': self.sc_node,  // SC node
+            '{[a{{t[f2{': self.sc_node  // SC node (versioned)
         })
     });
     const channels = [
@@ -1369,8 +1390,11 @@ lazy(self, 'api', () => {
         // WSC interface (chunked mode)
         [5, 'wsc', chunkedSplitHandler.sc],
 
-        // off band attribute requests (keys) for chat
-        [6, 'cs']
+        // off band requests for chat
+        [6, 'cs'],
+
+        // off band, general purpose
+        [7, 'cs']
     ];
     const apixs = [];
     const catchup = new Set();
@@ -1623,7 +1647,7 @@ lazy(self, 'api', () => {
     });
 
     Object.defineProperty(inflight, 'remove', {
-        value: function(...args) {
+        value(...args) {
             for (let i = args.length; i--;) {
                 this.delete(args[i]);
             }
@@ -1714,8 +1738,9 @@ lazy(self, 'api', () => {
                 if (options.apipath || options.queryString) {
                     options.symb |= MEGAPIRequest.SYMB_CUSTOMREQUEST;
                 }
-                if (options.notifyUpstreamFailure) {
+                if (typeof options.notifyUpstreamFailure === 'function') {
                     options.symb |= MEGAPIRequest.SYMB_NOTIFYFAILURE;
+                    options.notifyUpstreamFailure = tryCatch(options.notifyUpstreamFailure.bind(channel));
                 }
 
                 instance.enqueue({type, payload, options, resolve, reject}).catch(reject);
@@ -1755,6 +1780,9 @@ lazy(self, 'api', () => {
                     }
                     else if (typeof res === 'function') {
                         promise = promise.then(res);
+                    }
+                    if (res && 'retryHandler' in res) {
+                        instance.retryHandler = res.retryHandler;
                     }
                 }
             }
@@ -2060,6 +2088,38 @@ lazy(self, 'api', () => {
                     req.timer.cancel(true);
                 }
             }
+        },
+
+        /**
+         * Helper used for yielding to the main thread once an API request has been dispatched,
+         * so that we can continue execution while awaiting a server response, with the
+         * continuation scheduled as a prioritized task.
+         * @param {Number} [channel] API channel.
+         * @returns {!Promise<*>} void
+         * @memberOf api
+         */
+        async yield(channel) {
+            if (channel >= 0 && channel < channels.length) {
+
+                if (channels[channel]) {
+                    const xs = apixs[channel];
+
+                    await navigator.locks.request(xs.__ident_0, () => lock(channel));
+
+                    while (xs.flushing && !xs.inflight) {
+
+                        await tSleep(-1);
+                    }
+                }
+            }
+            else if (channel === undefined) {
+
+                for (let i = channels.length; i--;) {
+
+                    await this.yield(i).catch(dump);
+                }
+            }
+            return document.hidden || scheduler.yield();
         },
 
         /**

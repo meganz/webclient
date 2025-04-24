@@ -1,0 +1,96 @@
+/*
+ * Fonts
+*/
+
+@font-face {
+    font-family: 'Nunito Sans';
+    src: url('../../fonts/nunito/NunitoSans-Bold.eot');
+    src: local('Nunito Sans Bold'), local('NunitoSans-Bold'),
+        url('../../fonts/nunito/NunitoSans-Bold.eot?#iefix') format('embedded-opentype'),
+        url('../../fonts/nunito/NunitoSans-Bold.woff2') format('woff2'),
+        url('../../fonts/nunito/NunitoSans-Bold.woff') format('woff'),
+        url('../../fonts/nunito/NunitoSans-Bold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
+
+
+@font-face {
+    font-family: 'Nunito Sans';
+    src: url('../../fonts/nunito/NunitoSans-Bold.eot');
+    src: local('Nunito Sans Bold'), local('NunitoSans-Bold'),
+        url('../../fonts/nunito/NunitoSans-Bold.eot?#iefix') format('embedded-opentype'),
+        url('../../fonts/nunito/NunitoSans-Bold.woff2') format('woff2'),
+        url('../../fonts/nunito/NunitoSans-Bold.woff') format('woff'),
+        url('../../fonts/nunito/NunitoSans-Bold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Nunito Sans';
+    src: url('../../fonts/nunito/NunitoSans-BoldItalic.eot');
+    src: local('Nunito Sans Bold Italic'), local('NunitoSans-BoldItalic'),
+        url('../../fonts/nunito/NunitoSans-BoldItalic.eot?#iefix') format('embedded-opentype'),
+        url('../../fonts/nunito/NunitoSans-BoldItalic.woff2') format('woff2'),
+        url('../../fonts/nunito/NunitoSans-BoldItalic.woff') format('woff'),
+        url('../../fonts/nunito/NunitoSans-BoldItalic.ttf') format('truetype');
+    font-weight: bold;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Nunito Sans';
+    src: url('../../fonts/nunito/NunitoSans-ExtraBold.eot');
+    src: local('Nunito Sans ExtraBold'), local('NunitoSans-ExtraBold'),
+        url('../../fonts/nunito/NunitoSans-ExtraBold.eot?#iefix') format('embedded-opentype'),
+        url('../../fonts/nunito/NunitoSans-ExtraBold.woff2') format('woff2'),
+        url('../../fonts/nunito/NunitoSans-ExtraBold.woff') format('woff'),
+        url('../../fonts/nunito/NunitoSans-ExtraBold.ttf') format('truetype');
+    font-weight: 800;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Nunito Sans';
+    src: url('../../fonts/nunito/NunitoSans-ExtraBoldItalic.eot');
+    src: local('Nunito Sans ExtraBold Italic'), local('NunitoSans-ExtraBoldItalic'),
+        url('../../fonts/nunito/NunitoSans-ExtraBoldItalic.eot?#iefix') format('embedded-opentype'),
+        url('../../fonts/nunito/NunitoSans-ExtraBoldItalic.woff2') format('woff2'),
+        url('../../fonts/nunito/NunitoSans-ExtraBoldItalic.woff') format('woff'),
+        url('../../fonts/nunito/NunitoSans-ExtraBoldItalic.ttf') format('truetype');
+    font-weight: 800;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Nunito Sans';
+    src: url('../../fonts/nunito/NunitoSans-Italic.eot');
+    src: local('Nunito Sans Italic'), local('NunitoSans-Italic'),
+        url('../../fonts/nunito/NunitoSans-Italic.eot?#iefix') format('embedded-opentype'),
+        url('../../fonts/nunito/NunitoSans-Italic.woff2') format('woff2'),
+        url('../../fonts/nunito/NunitoSans-Italic.woff') format('woff'),
+        url('../../fonts/nunito/NunitoSans-Italic.ttf') format('truetype');
+    font-weight: normal;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Nunito Sans';
+    src: url('../../fonts/nunito/NunitoSans-Regular.eot');
+    src: local('Nunito Sans Regular'), local('NunitoSans-Regular'),
+        url('../../fonts/nunito/NunitoSans-Regular.eot?#iefix') format('embedded-opentype'),
+        url('../../fonts/nunito/NunitoSans-Regular.woff2') format('woff2'),
+        url('../../fonts/nunito/NunitoSans-Regular.woff') format('woff'),
+        url('../../fonts/nunito/NunitoSans-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+

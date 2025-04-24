@@ -28,7 +28,7 @@ class MMenuSelectItem extends MComponent {
 
         // This is a clickable item
         if (typeof selectFn === 'function') {
-            this.el.classList.add('m-dropdown-item', 'border-radius-1');
+            this.el.classList.add('m-dropdown-item', 'rounded');
 
             if (Array.isArray(additionalClasses) && additionalClasses.length) {
                 this.el.classList.add(...additionalClasses);

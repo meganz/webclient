@@ -1,5 +1,4 @@
 import React from 'react';
-import {MegaRenderMixin} from "../chat/mixins";
 import ModalDialogsUI from './modalDialogs.jsx';
 import ViewModeSelector from "./jsx/fm/viewModeSelector.jsx";
 import Breadcrumbs from "./jsx/fm/breadcrumbs.jsx";
@@ -7,7 +6,7 @@ import FMView from "./jsx/fm/fmView.jsx";
 
 const MIN_SEARCH_LENGTH = 2;
 
-class CloudBrowserDialog extends MegaRenderMixin {
+class CloudBrowserDialog extends ModalDialogsUI.SafeShowDialogController {
     domRef = React.createRef();
     dialogName = 'attach-cloud-dialog';
 
@@ -18,6 +17,22 @@ class CloudBrowserDialog extends MegaRenderMixin {
         'hideable': true,
         'className': ''
     };
+
+    static getFilterFunction(customFilterFn) {
+        // XXX: Carefully check usages around the codebase before making any changes here...
+        return tryCatch((n) => {
+            // Filter non S4-container items
+            if (n.s4 && n.p === M.RootID && M.getS4NodeType(n) === 'container') {
+                return false;
+            }
+
+            if (!n.name || missingkeys[n.h] || M.getNodeShare(n).down) {
+                return false;
+            }
+
+            return !customFilterFn || customFilterFn(n);
+        });
+    }
 
     constructor(props) {
         super(props);
@@ -211,19 +226,8 @@ class CloudBrowserDialog extends MegaRenderMixin {
         });
     }
 
-    componentDidMount() {
-        super.componentDidMount();
-        M.safeShowDialog(this.dialogName, () => $(`.${this.dialogName}`));
-    }
-
-    componentWillUnmount() {
-        super.componentWillUnmount();
-        if ($.dialog === this.dialogName) {
-            closeDialog();
-        }
-    }
-
     render() {
+        assert(this.dialogBecameVisible);
         var self = this;
 
         const viewMode = mega.config.get('cbvm') | 0;
@@ -235,9 +239,7 @@ class CloudBrowserDialog extends MegaRenderMixin {
         let isS4Cn = false;
         let isSearch = this.state.currentlyViewedEntry === 'search';
         const entryId = isSearch ? self.state.highlighted[0] : self.state.currentlyViewedEntry;
-
-        // Filter non S4-container items
-        const filterFn = entryId === M.RootID && M.tree.s4 ? n => !M.tree.s4[n.h] : null;
+        const filterFn = CloudBrowserDialog.getFilterFunction(this.props.customFilterFn);
 
         // Flag that the specific node is part of the `Incoming Shares` node chain;
         // The `Attach` button is not available for isIncomingShare nodes.
@@ -259,9 +261,12 @@ class CloudBrowserDialog extends MegaRenderMixin {
             "label": this.props.cancelLabel,
             "key": "cancel",
             "onClick": e => {
-                this.props.onClose(this);
                 e.preventDefault();
                 e.stopPropagation();
+                if (this.props.onCancel) {
+                    this.props.onCancel(this);
+                }
+                this.props.onClose(this);
             }
         }];
 
@@ -356,11 +361,7 @@ class CloudBrowserDialog extends MegaRenderMixin {
                     (this.state.selected.length === 0 || share && share.down || isS4Cn ? "disabled" : ""),
                 "onClick": e => {
                     if (this.state.selected.length > 0) {
-                        this.props.onSelected(
-                            this.state.selected.filter(node => {
-                                return !M.getNodeShare(node).down && !(M.tree.s4 && M.tree.s4[node.h]);
-                            })
-                        );
+                        this.props.onSelected(this.state.selected);
                         this.props.onAttachClicked();
                     }
 
@@ -517,9 +518,7 @@ class CloudBrowserDialog extends MegaRenderMixin {
     }
 }
 
-window.CloudBrowserModalDialogUI = {
-    CloudBrowserDialog,
-};
+Object.defineProperty(mega, 'CloudBrowserDialog', {value: CloudBrowserDialog});
 
 export default {
     CloudBrowserDialog

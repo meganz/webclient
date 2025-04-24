@@ -1,0 +1,326 @@
+/* Media viewer */
+
+
+/* Common styles */
+
+.media-viewer-container {
+    height: 100%;
+    left: 0;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    transition: 200ms linear;
+}
+
+.media-viewer {
+    background: var(--main-surface-primary);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.media-viewer header,
+.media-viewer footer {
+    display: flex;
+    flex: 0 0 auto;
+    flex-direction: column;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    z-index: 10;
+}
+
+.media-viewer footer {
+    bottom: 0;
+    top: auto;
+}
+
+
+/* Header */
+
+.media-viewer .file-info {
+    flex: 1 1 auto;
+    overflow: hidden;
+    padding: 0 16px;
+    position: relative;
+    text-align: center;
+    text-overflow: ellipsis;
+}
+
+.media-viewer .file-name {
+    color: var(--main-neutral-primary);
+    font: 800 var(--text-body-md);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.media-viewer .file-size {
+    color: var(--main-neutral-secondary);
+    display: inline-flex;
+    font: var(--text-body-sm);
+}
+
+
+/* Content */
+
+.media-viewer .content {
+    display: flex;
+    flex: 1 1 auto;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+    height: 100%;
+}
+
+.media-viewer button {
+    -webkit-tap-highlight-color: transparent;
+}
+
+.media-viewer button.gallery-btn {
+    -webkit-backdrop-filter: blur(48px);
+    backdrop-filter: blur(48px);
+    background-color: var(--main-surface-primary-op-0-7);
+    border-radius: var(--radius-i-sm);
+    border: 0;
+    cursor: pointer;
+    left: 0;
+    margin: -24px 12px 0;
+    padding: 12px;
+    position: fixed;
+    top: 50%;
+    transition: var(--transition-bg-color), var(--transition-opacity), var(--transition-visibility);
+    z-index: 10;
+}
+
+.media-viewer button.gallery-btn.next {
+    left: auto;
+    right: 0;
+}
+
+.media-viewer button.gallery-btn i {
+    --icon-size: 24px;
+    --mask-color: var(--main-neutral-secondary);
+}
+
+@media (hover: hover) {
+
+    .media-viewer button.gallery-btn:hover {
+        background-color: var(--main-surface-primary-op-0-9);
+    }
+
+}
+
+
+/* Images viewer */
+
+/*Images viewer  content */
+
+.media-viewer .img-wrap {
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+}
+
+.media-viewer .img-wrap.picked {
+    cursor: move;
+}
+
+.media-viewer .img-wrap img,
+.media-viewer .img-wrap img[src=""].active {
+    opacity: 0;
+    position: absolute;
+    transition: opacity 10ms ease-in-out;
+}
+
+.media-viewer .img-wrap img.broken-eye,
+.media-viewer .img-wrap img.broken-eye[src=""].active {
+    background: none;
+}
+
+.slideshow .media-viewer .content img {
+    transition: opacity 900ms ease-in-out;
+}
+
+.media-viewer .content img.active,
+.slideshow .media-viewer .content img.active {
+    opacity: 1;
+}
+
+.media-viewer .content embed,
+.media-viewer .content iframe {
+    border: 0;
+    height: auto;
+    width: 100%;
+}
+
+.media-viewer-container.docx .media-viewer header,
+.media-viewer-container.pdf .media-viewer header {
+    position: relative;
+}
+
+
+/* On mouse idle */
+
+.mouse-idle .viewer-bars,
+.mouse-idle button.gallery-btn {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.vad.mouse-idle .video-progress-bar.vad,
+.mouse-idle .vad .video-progress-bar.vad {
+    opacity: 1;
+    visibility: visible;
+}
+
+.mouse-idle {
+    cursor: none !important;
+}
+
+.vad.mouse-idle .viewer-vad-control {
+    bottom: 16px;
+}
+
+
+/* Errors */
+
+.viewer-error-header {
+    color: var(--main-neutral-primary);
+    font: var(--text-body-lg);
+}
+
+.viewer-error-txt {
+    color: var(--main-neutral-primary);
+    padding: 40px;
+}
+
+.viewer-error-button {
+    white-space: nowrap;
+}
+
+.viewer-error-buttons div {
+    color: var(--main-neutral-primary);
+    display: inline-block;
+    font-size: 14px;
+    line-height: 28px;
+    margin: 0 16px;
+}
+
+
+/* Progress bar */
+
+.viewer-progress {
+    -webkit-backdrop-filter: blur(48px);
+    backdrop-filter: blur(48px);
+    background-color: var(--main-surface-primary);
+    border-radius: 100%;
+    bottom: 20px;
+    height: 36px;
+    overflow: hidden;
+    position: absolute;
+    right: 20px;
+    transition: var(--transition-all);
+    visibility: visible;
+    width: 36px;
+    z-index: 10;
+}
+
+.viewer-progress ul {
+    background-color: var(--main-borders-and-lines);
+    height: 100%;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    position: relative;
+    width: 100%;
+}
+
+.viewer-progress ul::after {
+    background-color: var(--main-surface-primary-op-0-9);
+    border-radius: 100%;
+    content: '';
+    display: block;
+    height: 28px;
+    left: 4px;
+    overflow: hidden;
+    position: absolute;
+    top: 4px;
+    width: 28px;
+}
+
+.viewer-progress ul li {
+    height: 36px;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    width: 36px;
+}
+
+.viewer-progress .right-c {
+    clip: rect(0, 36px, 36px, 18px);
+}
+
+.viewer-progress .left-c {
+    clip: rect(0, 18px, 36px, 0);
+}
+
+.viewer-progress p {
+    height: 36px;
+    margin: 0;
+    width: 36px;
+}
+
+.viewer-progress span {
+    background-color: var(--main-primary);
+    display: block;
+    height: 36px;
+    width: 18px;
+}
+
+.viewer-progress .right-c span {
+    border-radius: 18px 0 0 18px;
+}
+
+.viewer-progress .left-c span {
+    border-radius: 0 18px 18px 0;
+    margin-left: 18px;
+}
+
+
+/* Rotation fixes */
+
+.exif-rotation-2 {
+    transform: rotateY(180deg);
+}
+
+.exif-rotation-3 {
+    transform: rotate(180deg);
+}
+
+.exif-rotation-4 {
+    transform: rotate(180deg) rotateY(180deg);
+}
+
+.exif-rotation-5 {
+    transform: rotate(270deg) rotateY(180deg);
+    transform-origin: top left;
+}
+
+.exif-rotation-6 {
+    transform: translateY(-100%) rotate(90deg);
+    transform-origin: bottom left;
+}
+
+.exif-rotation-7 {
+    transform: translateY(-100%) translateX(-100%) rotate(90deg) rotateY(180deg);
+    transform-origin: bottom right;
+}
+
+.exif-rotation-8 {
+    transform: translateX(-100%) rotate(270deg);
+    transform-origin: top right;
+}

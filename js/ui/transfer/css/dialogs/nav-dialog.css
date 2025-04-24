@@ -1,0 +1,53 @@
+/*
+ * Language dialog
+*/
+
+/* Content */
+
+.it-dialog.navigation-dialog {
+    max-width: 500px;
+    width: 100%;
+}
+
+.it-dialog.navigation-dialog header .it-button {
+    --icon-size: 32px;
+}
+
+.it-dialog.navigation-dialog  > .body > .content {
+    margin: 36px 0;
+}
+
+.it-dialog.navigation-dialog .it-account-data {
+    flex: 1 1 auto;
+    padding-inline-end: 24px;
+}
+
+.it-dialog.navigation-dialog .items-body {
+    align-items: center;
+    display: flex;
+    min-height: 100%;
+    width: 100%;
+}
+
+.it-dialog.navigation-dialog .items {
+    width: 100%;
+}
+
+.it-dialog.navigation-dialog .it-menu-item {
+    color: var(--main-neutral-secondary);
+}
+
+.it-dialog.navigation-dialog .section {
+    display: grid;
+    gap: 24px;
+}
+
+.it-dialog.navigation-dialog .section + .section {
+    border-top: 1px solid var(--main-borders-and-lines);
+    margin: 24px 0 0;
+    padding: 24px 0 0;
+}
+
+.it-dialog.navigation-dialog .toggle-body {
+    width: 60px;
+}

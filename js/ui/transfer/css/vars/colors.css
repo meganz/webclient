@@ -1,0 +1,169 @@
+/*
+* Color variables
+*/
+
+.transferit-vars {
+
+    /* Main colors */
+
+    --main-forced-white: rgba(255, 255, 255, var(--color-alpha, 1));
+    --main-forced-black: rgba(0, 0, 0, var(--color-alpha, 1));
+
+    /* Supportive colors */
+
+    --supportive-warning: rgba(255, 179, 25, var(--supportive-alpha, 1));
+    --supportive-error: rgba(255, 78, 100, var(--supportive-alpha, 1));
+    --supportive-success: rgba(73, 179, 86, var(--supportive-alpha, 1));
+
+    --supportive-mega: rgba(242, 52, 51, var(--supportive-alpha, 1));
+    --supportive-neon: rgba(118, 250, 210, var(--supportive-alpha, 1));
+    --supportive-copper: rgba(189, 128, 63, var(--supportive-alpha, 1));
+
+    --supportive-blue: rgba(8, 102, 255, var(--supportive-alpha, 1));
+    --supportive-purple: rgba(108, 51, 207, var(--supportive-alpha, 1));
+    --supportive-nasa-orange: rgba(255, 69, 0, var(--supportive-alpha, 1));
+    
+    --supportive-mega-10: rgba(242, 52, 51, 0.12);
+    --supportive-neon-10: rgba(118, 250, 210, 0.12);
+    --supportive-copper-10: rgba(189, 128, 63, 0.12);
+
+    --supportive-blue-10: rgba(8, 102, 255, 0.12);
+    --supportive-purple-10: rgba(108, 51, 207, 0.12);
+    --supportive-warning-10: rgba(255, 179, 25, 0.12);
+
+    /* MIME icon colors */
+
+    --thumb-blue: linear-gradient(132.12deg, rgba(82, 151, 255, 1) 2.74%, rgba(24, 117, 255, 1) 107.91%);
+    --thumb-green: linear-gradient(132.12deg, #06C79B 2.74%, #03B17D 107.91%);
+    --thumb-br-green: linear-gradient(132.12deg, #57EA4E 2.74%, #23D625 107.91%);
+    --thumb-dk-grey: linear-gradient(132.12deg, #647285 2.74%, #556274 107.91%);
+    --thumb-light-grey: linear-gradient(132.12deg, #EAEAEC 2.74%, #DADCDE 107.91%);
+    --thumb-white: linear-gradient(132.12deg, #FFFFFF 2.74%, #F4F4F5 107.91%);
+    --thumb-red: linear-gradient(132.12deg, #FF6561 2.74%, #FF4743 107.91%);
+    --thumb-orange: linear-gradient(132.12deg, #FFB043 2.74%, #FF952A 107.91%);
+    --thumb-yellow: linear-gradient(132.12deg, #FFE043 2.74%, #FFCA2A 107.91%);
+
+    --thumb-shadow-lg: 0px -2px 0px 0px rgba(0, 0, 0, 0.12) inset;
+    --thumb-shadow-sm: 0px -1px 0px 0px rgba(0, 0, 0, 0.12) inset;
+
+    /* Overlays */
+
+    --main-overlay: radial-gradient(ellipse at center, rgba(76, 76, 76, 1) 0, rgba(0, 0, 0, 1) 100%);
+}
+
+
+/* Light theme */
+
+.theme-light.transferit-vars,
+.theme-light .transferit-vars,
+.transferit-vars .theme-light-forced {
+
+    /* Main colors */
+
+    --main-primary: rgba(24, 117, 255, var(--color-alpha, 1));
+    --main-accent: rgba(0, 212, 161, var(--color-alpha, 1));
+
+    --main-borders-and-lines: rgba(8, 10, 13, 0.06);
+    --main-surface-primary: rgba(255, 255, 255, var(--color-alpha, 1));
+    --main-surface-secondary: rgba(249, 249, 249, var(--color-alpha, 1));
+
+    --main-neutral-primary: rgba(8, 10, 13, var(--color-alpha, 1));
+    --main-neutral-secondary: rgba(89, 92, 97, var(--color-alpha, 1));
+    --main-neutral-terciary: rgba(122, 125, 129, var(--color-alpha, 1));
+
+    --main-overlay-primary: rgba(24, 117, 255, 0.12);
+    --main-overlay-accent: rgba(0, 212, 161, 1);
+    --main-overlay-soft: rgba(8, 10, 13, 0.08);
+    --main-overlay-medium: rgba(8, 10, 13, 0.12);
+    --main-overlay-strong: rgba(8, 10, 13, 0.56);
+
+    --main-primary-0-32: rgba(24, 117, 255, 0.32);
+    --main-surface-primary-op-0-9: rgba(255, 255, 255, 0.9);
+    --main-surface-primary-op-0-8: rgba(255, 255, 255, 0.8);
+    --main-surface-primary-op-0-7: rgba(255, 255, 255, 0.7);
+    --main-surface-secondary-op-0-8: rgba(249, 249, 249, 0.8);
+    --main-surface-inverted-op-0-25: rgba(0, 0, 0, 0.25);
+
+    /* scroll bar */
+
+    --scroll-bar-background: rgba(0, 0, 0, 0);
+    --scroll-bar-handle: rgba(0, 0, 0, 0.5);
+    --scroll-bar-handle-inactive: rgba(0, 0, 0, 0.4);
+
+    /* shadows */
+
+    --shadow-sm-narrow: 0 6px 6px -6px rgba(0, 0, 0, 0.16), 0 0 1px 0 rgba(0, 0, 0, 0.08);
+    --shadow-sm: 0 6px 6px 0 rgba(0, 0, 0, 0.16), 0 0 1px 0 rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 0 1px 0 rgba(0, 0, 0, 0.4), 0 12px 12px -6px rgba(0, 0, 0, 0.16);
+    --shadow-lg: 0 0 1px 0 rgba(0, 0, 0, 0.4), 0 8px 24px -6px rgba(0, 0, 0, 0.16);
+    --shadow-xl: 0 0 1px 0 rgba(0, 0, 0, 0.2), 0 0 32px -8px rgba(0, 0, 0, 0.12), 0 32px 32px -8px rgba(0, 0, 0, 0.08);
+
+    --shadow-focused: 0 0 0 2px rgba(255, 255, 255, 1), 0 0 0 6px rgba(24, 117, 255, 0.56);
+
+    /* Image thumb background */
+
+    --image-background:
+        linear-gradient(45deg, var(--main-overlay-soft) 25%, transparent 25%),
+        linear-gradient(-45deg, var(--main-overlay-soft) 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, var(--main-overlay-soft) 75%),
+        linear-gradient(-45deg, transparent 75%, var(--main-overlay-soft) 75%);
+}
+
+
+/* Dark theme */
+
+.theme-dark.transferit-vars,
+.theme-dark .transferit-vars,
+.transferit-vars .theme-dark-forced {
+
+    /* Main colors */
+
+    --main-primary: rgba(29, 129, 255, var(--color-alpha, 1));
+    --main-accent: rgba(0, 219, 173, var(--color-alpha, 1));
+
+    --main-borders-and-lines: rgba(250, 250, 251, 0.08);
+    --main-surface-primary: rgba(30, 31, 32, var(--color-alpha, 1));
+    --main-surface-secondary: rgba(20, 22, 24, var(--color-alpha, 1));
+
+    --main-neutral-primary: rgba(250, 250, 251, var(--color-alpha, 1));
+    --main-neutral-secondary: rgba(189, 192, 196, var(--color-alpha, 1));
+    --main-neutral-terciary: rgba(151, 153, 157, var(--color-alpha, 1));
+
+    --main-overlay-primary: rgba(29, 129, 255, 0.32);
+    --main-overlay-accent: rgba(0, 219, 173, 0.32);
+    --main-overlay-soft: rgba(250, 250, 251, 0.16);
+    --main-overlay-medium: rgba(250, 250, 251, 0.24);
+    --main-overlay-strong: rgba(8, 10, 13, 0.56);
+
+    --main-primary-0-32: rgba(29, 129, 255, 0.32);
+    --main-surface-primary-op-0-9: rgba(30, 31, 32, 0.9);
+    --main-surface-primary-op-0-8: rgba(30, 31, 32, 0.8);
+    --main-surface-primary-op-0-7: rgba(30, 31, 32, 0.7);
+    --main-surface-secondary-op-0-8: rgba(20, 22, 24, 0.9);
+    --main-surface-inverted-op-0-25: rgba(255, 255, 255, 0.25);
+
+    /* scroll bar */
+
+    --scroll-bar-background: rgba(0, 0, 0, 0);
+    --scroll-bar-handle: rgba(255, 255, 255, 0.5);
+    --scroll-bar-handle-inactive: rgba(255, 255, 255, 0.4);
+
+    /* shadows */
+
+    --shadow-sm-narrow: 0px 6px 6px -6px rgba(0, 0, 0, 0.64), 0 0 1px 0 rgba(0, 0, 0, 0.56);
+    --shadow-sm: 0px 6px 6px 0 rgba(0, 0, 0, 0.64), 0 0 1px 0 rgba(0, 0, 0, 0.56);
+    --shadow-md: 0 0 1px 0 rgba(0, 0, 0, 0.56), 0 12px 12px -6px rgba(0, 0, 0, 0.64);
+    --shadow-lg: 0 0 1px 0 rgba(0, 0, 0, 0.56), 0 24px 24px -6px rgba(0, 0, 0, 0.64);
+    --shadow-xl: 0 0 1px 0 rgba(0, 0, 0, 0.72), 0px 48px 48px -6px rgba(0, 0, 0, 0.88);
+
+    --shadow-focused: 0 0 0 2px rgba(30, 31, 32, 1), 0 0 0 6px rgba(29, 129, 255, 0.56);
+
+    /* Image thumb background */
+
+    --image-background:
+        linear-gradient(45deg, var(--main-overlay-soft) 25%, transparent 25%),
+        linear-gradient(-45deg, var(--main-overlay-soft) 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, var(--main-overlay-soft) 75%),
+        linear-gradient(-45deg, transparent 75%, var(--main-overlay-soft) 75%);
+
+}

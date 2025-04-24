@@ -33,6 +33,7 @@ body.mobile .mega-sheet .sheet .actions {
     padding: 0 24px;
 }
 
+body.mobile .mega-sheet .sheet .main,
 .mega-sheet .sheet > .close {
     margin-bottom: 16px;
 }

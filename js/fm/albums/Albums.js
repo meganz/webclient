@@ -1126,7 +1126,7 @@ lazy(mega.gallery, 'albums', () => {
 
         buildElement() {
             this.el = document.createElement('div');
-            this.el.className = 'bg-surface-main p-3 mt-2 border-radius-1';
+            this.el.className = 'bg-surface-main p-3 mt-2 rounded';
 
             const headerContainer = document.createElement('div');
             headerContainer.className = 'relative';

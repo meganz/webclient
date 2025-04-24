@@ -1,0 +1,114 @@
+/* 
+ * Subpages. Contact
+*/
+
+/* Content */
+
+.subpage-box .cnt-head-media {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    transform: translateX(-50%);
+}
+
+.subpage-box .cnt-section.img1 {
+    content: var(--cnt-img1-url);
+    display: block;
+    margin: var(--subpage-text-content-gap) 0 0;
+    width: 1297px;
+}
+
+.subpage-box .cnt-section.img2 {
+    content: var(--cnt-img2-url);
+}
+
+.subpage-box .cnt-section.img3 {
+    content: var(--cnt-img3-url);
+}
+
+.subpage-box .cnt-section.img4 {
+    content: var(--cnt-img4-url);
+}
+
+.subpage-box .cnt-section.img5 {
+    content: var(--cnt-img5-url);
+}
+
+.subpage-box .cnt-section.img6 {
+    content: var(--cnt-img6-url);
+}
+
+.subpage-box .cnt-grid {
+    display: grid;
+    gap: 40px;
+    grid-template-columns: 1fr 1fr;
+    margin: 0 auto;
+    max-width: 1024px;
+    padding: 80px 0 0;
+}
+
+.subpage-box .cnt-grid .col {
+    background-color: var(--main-surface-primary);
+    border-radius: var(--radius-i-xxl);
+    box-shadow: var(--shadow-lg);
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+}
+
+.subpage-box .cnt-grid .col h3 {
+    padding: 32px 0 0;
+}
+
+.subpage-box .cnt-grid .col p {
+    padding: 12px 0 0;
+}
+
+.subpage-box .cnt-grid .col p + p {
+    padding: 24px 0 0;
+}
+
+.subpage-box .cnt-grid .col .it-button {
+    margin: 32px 24px 0;
+}
+
+.subpage-box .cnt-grid .col .info {
+    flex: 1 1 auto;
+    padding: 0 24px;
+}
+
+.subpage-box .cnt-grid .col .media {
+    background-color: var(--main-surface-secondary);
+    border-radius: var(--radius-i-lg);
+    height: 320px;
+    margin: 48px 0 0;
+    overflow: hidden;
+    position: relative;
+}
+
+.subpage-box .cnt-grid .col .media img {
+    left: 50%;
+    max-width: 460px;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+}
+
+
+/* Adaptive layout */
+
+@media only screen and (max-width: 960px) {
+
+    .subpage-box .cnt-grid {
+        gap: 32px;
+        grid-template-columns: 1fr;
+        max-width: 600px;
+        padding: 32px 0 0;
+    }
+
+    .subpage-box .cnt-grid .col h3 {
+        font: var(--text-h5);
+    }
+
+}

@@ -31,9 +31,10 @@ function selectText(elementId) {
  * @param {Number} [timeout] Optional toast notification time (millis) until dismiss
  * @returns {Boolean} Whether the operation was successful
  */
-function copyToClipboard(content, toastText, classname, timeout) {
+async function copyToClipboard(content, toastText, classname, timeout) {
     'use strict';
-    const success = clip(content);
+    const success = 'clipboard' in navigator
+        && await navigator.clipboard.writeText(content).then(() => !0).catch(dump) || clip(content);
 
     if (success && toastText) {
 

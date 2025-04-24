@@ -1,0 +1,465 @@
+/*
+ * Input component
+ *
+ * Default state: Medium size.
+ *
+ * Usage:
+ *
+ *    <div class="it-input">
+ *        <label for="input-1-id">Input label</label>
+ *        <div class="input-box">
+ *            <div class="input-field">
+ *                <input type="text" placeholder="Input placeholder" name="input-1-name" id="input-1-id" value="" required />
+ *            </div>
+ *        </div>
+ *    </div>
+ *
+ * Disabled XL size input with Floating label, icons, helper and error:
+ *
+ *    <div class="it-input fl-label xl-size helper error disabled">
+ *        <div class="input-box">
+ *            <i class="sprite-it-x24-mono icon-bell"></i>
+ *            <div class="input-field">
+ *                <input type="text" placeholder="Input placeholder" name="input-2-name" id="input-2-id" value="" required disabled />
+ *                <label for="input-2-id">Floating label</label>
+ *            </div>
+  *           <i class="sprite-it-x24-mono icon-bell clickable"></i>
+ *        </div>
+ *        <div class="error-text">Error message</div>
+ *        <div class="helper-text">Helper text</div>
+ *    </div>
+ *
+*/
+
+input,
+textarea {
+    outline: none;
+    resize: none;
+    -webkit-user-select: all;
+    user-select: all;
+}
+
+input[type='number'] {
+    appearance: textfield;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    appearance: none;
+}
+
+
+/* Invisible input inside label */
+
+label.inv-input {
+    cursor: pointer;
+    position: relative;
+    text-decoration: none;
+}
+
+label.inv-input input {
+    cursor: pointer;
+    height: 100%;
+    left: 0;
+    opacity: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+}
+
+label.inv-input span {
+    cursor: pointer;
+    position: relative;
+}
+
+label.inv-input input:focus ~ span {
+    text-decoration: underline;
+}
+
+
+/* It Input component */
+
+.it-input {
+    display: flex;
+    flex-direction: column;
+}
+
+.it-input label {
+    color: var(--main-neutral-primary);
+    font: var(--text-caption-md);
+    padding: 0 0 8px;
+}
+
+.it-input label:empty {
+    display: none;
+}
+
+.it-input .input-box {
+    --icon-size: 24px;
+    --mask-color: var(--main-neutral-secondary);
+    align-items: center;
+    background-color: var(--main-surface-primary);
+    border-radius: var(--radius-i-sm);
+    box-shadow: 0 0 0 1px var(--main-borders-and-lines) inset;
+    cursor: text;
+    display: flex;
+    padding: 8px;
+    position: relative;
+    transition: var(--transition-shadow);
+}
+
+.it-input .input-box::before {
+    border-radius: inherit;
+    content: '';
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    transition: var(--transition-shadow);
+}
+
+.it-input .input-box > i {
+    margin: 0;
+    margin-inline-end: 4px;
+}
+
+.it-input.xl-size .input-box > i {
+    margin: 0;
+    margin-inline-end: 4px;
+}
+
+.it-input.xl-size .input-box .input-field ~ i {
+    margin: 0;
+    margin-inline-start: 4px;
+}
+
+.it-input .input-box > i.clickable {
+    cursor: pointer;
+}
+
+.it-input .input-field {
+    flex: 1 1 auto;
+    left: 0;
+    line-height: 0;
+    overflow: hidden;
+    position: relative;
+    top: 0;
+}
+
+.it-input .input-field label {
+    display: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 100%;
+}
+
+.it-input input,
+.it-input textarea {
+    background-color: transparent;
+    border: 0;
+    color: var(--main-neutral-primary);
+    font: var(--text-body-sm);
+    padding: 0 4px;
+    margin: 0;
+    position: relative;
+    transition: var(--transition-margin);
+    width: 100%;
+    z-index: 1;
+}
+
+.it-input input::selection,
+.it-input textarea::selection {
+    background-color: var(--main-overlay-primary);
+}
+
+.it-input input:-webkit-autofill {
+    box-shadow: 0 0 0 50px var(--main-surface-primary) inset;
+    -webkit-text-fill-color: var(--main-neutral-primary);
+}
+
+.it-input input::placeholder,
+.it-input textarea::placeholder {
+    color: var(--main-neutral-secondary);
+}
+
+
+/* Types */
+
+
+/* Types. Textarea */
+
+.it-input.textarea .input-box {
+    align-items: flex-start;
+}
+
+
+/* Types. Floating label */
+
+.it-input.fl-label > label {
+    display: none;
+}
+
+.it-input.fl-label .input-field label:not(:empty) {
+    display: block;
+    color: var(--main-neutral-secondary);
+    font: var(--text-body-sm);
+    left: 0;
+    padding: 0 4px;
+    position: absolute;
+    top: 0;
+    transition: var(--transition-all);
+}
+
+.it-input.fl-label input::placeholder,
+.it-input.fl-label textarea::placeholder {
+    opacity: 0;
+    transition: var(--transition-opacity);
+    transition-duration: .15s;
+}
+
+
+/* Types. Helper text */
+
+.it-input .helper {
+    color: var(--main-neutral-secondary);
+    display: none;
+    font: var(--text-caption-md);
+    padding: 4px 12px 0;
+}
+
+.it-input.helper-text .helper {
+    display: block;
+}
+
+
+/* Types. Chips*/
+
+.it-input.chips .input-field {
+    max-height: 120px;
+    overflow-y: auto;
+}
+
+.it-input.fl-label .input-field .chips-body:not(:empty) ~ input {
+    opacity: 0;
+    position: absolute;
+}
+
+.it-input.chips .chips-body {
+    padding: 12px 0 0;
+}
+
+.it-input.chips .chips-body:empty {
+    display: none;
+}
+
+.it-input.chips .chip {
+    align-items: center;
+    background-color: var(--main-overlay-soft);
+    border-radius: var(--radius-i-sm);
+    color: var(--main-neutral-primary);
+    cursor: default;
+    display: inline-flex;
+    margin: 4px 0 0;
+    margin-inline-end: 4px;
+    max-width: 100%;
+    padding: 8px;
+    transition: var(--transition-color), var(--transition-bg-color);
+}
+
+.it-input.chips .chip.error {
+    color: var(--supportive-error);
+}
+
+.it-input.chips .chip span {
+    flex: 1 1 auto;
+    font: var(--text-body-sm);
+    overflow: hidden;
+    padding: 0 4px;
+    text-overflow: ellipsis;
+}
+
+.it-input.chips .chip span + a {
+    margin-inline-start: 4px;
+}
+
+/* Types. Chips. Small-size */
+
+.it-input.chips .chip.sm-size {
+    border-radius: var(--radius-i-xs);
+    padding: 0;
+}
+
+.it-input.chips .chip.sm-size span {
+    font: var(--text-caption-md);
+    max-width: 100%;
+    overflow: hidden;
+    padding: 4px 8px;
+    text-overflow: ellipsis;
+}
+
+.it-input.chips .chip span + a {
+    border-radius: var(--radius-i-xs);
+    margin-inline-start: -8px;
+}
+
+
+/* Sizes */
+
+/* Sizes. Extra large size */
+
+.it-input.xl-size .input-box > i {
+    margin: 8px;
+    margin-inline-end: 0;
+}
+
+.it-input.xl-size .input-box .input-field ~ i {
+    margin: 8px;
+    margin-inline-start: 0;
+}
+
+.it-input.xl-size .input-field input,
+.it-input.xl-size .input-field textarea {
+    font: var(--text-caption-lg);
+    padding: 0 8px;
+    margin: 8px 0;
+}
+
+/* Sizes. Extra large size with floating label */
+
+.it-input.fl-label.xl-size .input-box > i {
+    margin: 8px;
+}
+
+.it-input.fl-label.xl-size .input-field label {
+    font: var(--text-caption-lg);
+    padding: 8px;
+}
+
+.it-input .error-text {
+    padding: 4px 16px 0;
+}
+
+/* Sizes. Large size */
+
+.it-input.lg-size .input-box > i {
+    margin: 4px;
+}
+
+.it-input.lg-size .input-field input,
+.it-input.lg-size .input-field textarea {
+    font: var(--text-caption-lg);
+    margin: 4px 0;
+}
+
+/* Sizes. Large size with floating label */
+
+.it-input.fl-label.lg-size .input-field label {
+    font: var(--text-caption-lg);
+    padding: 4px;
+}
+
+/* Sizes. Small size */
+
+.it-input.sm-size .input-box {
+    --icon-size: 16px;
+    padding: 4px;
+}
+
+.it-input.sm-size .input-box > i {
+    margin: 0 4px;
+}
+
+
+/* States */
+
+/* States. Hover state. Only for non-touch devices. */
+
+@media (hover: hover) {
+
+    .it-input .input-box:hover {
+        box-shadow: 0 0 0 1.5px var(--main-primary) inset, 0 0 0 1.5px var(--main-overlay-soft) inset;
+    }
+
+}
+
+/* States. Focused state */
+
+.it-input.focused .input-box {
+    box-shadow: 0 0 0 1.5px var(--main-primary) inset, 0 0 0 1.5px var(--main-overlay-soft) inset;
+}
+
+.it-input.focused .input-box::before {
+    box-shadow: var(--shadow-focused);
+}
+
+/* States. Focused state with floating label */
+
+.it-input.fl-label.focused .input-field input,
+.it-input.fl-label.focused .input-field .chips-body:not(:empty) ~ input,
+.it-input.fl-label .input-field input:valid,
+.it-input.fl-label.focused .input-field textarea,
+.it-input.fl-label .input-field textarea:valid,
+.it-input.fl-label .input-field input[readonly],
+.it-input.fl-label .input-field textarea[readonly] {
+    margin: 16px 0 0;
+    opacity: 1;
+    position: static;
+}
+
+.it-input.fl-label.focused .input-field label,
+.it-input.fl-label .input-field .chips-body:not(:empty) ~ input + label,
+.it-input.fl-label .input-field input:valid + label,
+.it-input.fl-label .input-field textarea:valid + label,
+.it-input.fl-label .input-field input[readonly] + label,
+.it-input.fl-label .input-field textarea[readonly] + label {
+    font: var(--text-caption-md);
+    padding-top: 0;
+}
+
+.it-input.fl-label.focused .input-field input::placeholder,
+.it-input.fl-label.focused .input-field textarea::placeholder,
+.it-input.fl-label .input-field input[readonly]::placeholder,
+.it-input.fl-label .input-field textarea[readonly]::placeholder {
+    opacity: 1;
+    transition: var(--transition-opacity);
+    transition-duration: .55s;
+}
+
+/* States. Error state */
+
+.it-input .error-text {
+    color: var(--supportive-error);
+    display: none;
+    font: var(--text-caption-md);
+    padding: 4px 12px 0;
+}
+
+.it-input.error .error-text {
+    display: block;
+}
+
+.it-input.error .input-box {
+    box-shadow: 0 0 0 1.5px var(--supportive-error) inset;
+}
+
+/* States. Disabled state */
+
+.it-input.disabled {
+    opacity: .32;
+}
+
+.it-input.disabled .input-box,
+.it-input.disabled .input-box input,
+.it-input.disabled .input-box textarea {
+    cursor: not-allowed;
+}
+
+.it-input.disabled .input-box {
+    box-shadow: 0 0 0 1px var(--main-borders-and-lines) inset;
+}
+
+.it-input.disabled .input-box::before {
+    box-shadow: none;
+}

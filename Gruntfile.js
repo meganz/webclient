@@ -1,4 +1,4 @@
-var fileLimit = 512*1024;
+const fileLimit = 640 * 1024;
 
 const fs = require('fs');
 const path = require("path");
@@ -48,6 +48,10 @@ class FS {
         return fs.mkdirSync(path.join(...paths), {recursive: true});
     }
 
+    static mkdirp(filename) {
+        return fs.mkdirSync(path.dirname(filename), {recursive: true});
+    }
+
     static stat(path) {
         try {
             return fs.statSync(path);
@@ -60,33 +64,300 @@ class FS {
         const s = this.stat(path);
         return s && s.isDirectory();
     }
+
+    static read(filename, e = 'utf8') {
+        return fs.readFileSync(filename).toString(e);
+    }
+
+    static write(filename, data) {
+        if (Array.isArray(data)) {
+            data = data.map(String).join('\n');
+        }
+        FS.mkdirp(filename);
+        return fs.writeFileSync(filename, data);
+    }
+
+    static copy(src, dst) {
+        FS.mkdirp(dst);
+        return fs.copyFileSync(src, dst);
+    }
 }
 
-var Secureboot = function() {
+FS.endpoint = String(process.env.ENDPOINT || `prod`).toLowerCase();
+
+
+function die() {
+    console.error.apply(console, arguments);
+    process.exit(1);
+}
+
+function tryCatch(fn) {
+    return (...args) => {
+        try {
+            return fn(...args);
+        }
+        catch (_) {
+        }
+    };
+}
+
+function lazy(target, property, stub) {
+    return Object.defineProperty(target, property, {
+        get: function() {
+            Object.defineProperty(this, property, {
+                value: stub.call(this),
+                enumerable: property[0] !== '_'
+            });
+            return this[property];
+        },
+        configurable: true
+    });
+}
+
+function date2version() {
+    const now = new Date();
+    const year = now.getUTCFullYear();
+
+    const soy = new Date(Date.UTC(year, 0, 0));
+    const doy = Math.floor((now - soy) / 864e5);
+
+    const sod =
+        now.getUTCHours() * 3600 +
+        now.getUTCMinutes() * 60 +
+        now.getUTCSeconds();
+
+    return `${year % 100}.${doy}.${sod}`;
+}
+
+lazy(FS, 'Secureboot', () => {
     var content = fs.readFileSync("secureboot.js").toString().split("\n");
-    var jsl = getFiles();
-    var ns  = {};
-    var jsl3;
+
+    let jsl3;
+    let tmp = [];
+    let show = true;
+    let jslp = false;
+    let capture = false;
+
+    const ns = {};
+    const s0 = `if (is_transferit) {`;
+    const p1 = `langFilepath = getLanguageFilePath`;
+    const p2 = `var jsl2 =`;
+    const p3 = `var subpages =`;
+
+    const spt = {
+        it(ln) {
+            let res = !!show;
+
+            if (show) {
+                if (show < 0) {
+                    if (/^\s+}$/.test(ln)) {
+                        res = false;
+                        show = true;
+                    }
+                }
+                else if (ln.includes(p1)) {
+                    jslp = true;
+                    show = false;
+                }
+                else if (ln.includes(p2)) {
+                    capture = [];
+                }
+                else if (jslp && ln.includes(`if (is_drop) {`)) {
+                    show = 2;
+                }
+                else if (show > 1) {
+                    if (/^ {4}}$/.test(ln)) {
+                        show = 1;
+                    }
+                    else {
+                        res = false;
+                    }
+                }
+            }
+            else if (ln.includes(s0)) {
+                show = -1;
+            }
+            if (capture) {
+                if (ln.includes(p3)) {
+                    eval(capture.join('\n'));
+
+                    for (const k in jsl2) {
+                        if (!/^(?:dc|pdf|tiff|vid|med|doc)/.test(k)) {
+                            delete jsl2[k];
+                        }
+                    }
+                    delete jsl3.s4;
+                    delete jsl3.pwm;
+                    delete jsl3.chat;
+                    delete jsl3.rewind;
+                    delete jsl3.devices;
+
+                    [jsl2, jsl3].forEach((o, i) => {
+                        const out = JSON.stringify(o).replace(/"/g, "'").replace(/'(\w)':/g, '$1:');
+                        tmp.push(`\tvar jsl${i + 2} = ${out};`);
+                    });
+
+                    capture = false;
+                }
+                else {
+                    res = false;
+                    capture.push(ln);
+                }
+            }
+            return res;
+        }
+    };
+
+    content = content.filter(spt[FS.endpoint] || ((ln) => {
+        let res = !!show;
+
+        if (res) {
+            if (ln.includes(s0)) {
+                res = show = false;
+            }
+            else if (ln.startsWith('var is_transferit =')) {
+                if (!ln.includes(';')) {
+                    die('unexpected multi-line var');
+                }
+                res = false;
+            }
+        }
+        else if (/^(?: {4})?}$/.test(ln)) {
+            show = true;
+        }
+        return res;
+    }));
+
+    if (tmp.length) {
+        const buildVersion = {
+            commit: '<COMMIT_SHA>',
+            website: date2version(),
+            timestamp: ~~(Date.now() / 1e3),
+            dateTime: new Date().toISOString()
+        };
+        tmp = content.join('\n')
+            .replace(p3, tmp.join('\n\n') + '\n\n\t' + p3)
+            .replace(/buildVersion[^;]+/, `buildVersion = ${JSON.stringify(buildVersion)}`)
+            .replace(/js\/ui\/transfer\/images/g, 'images');
+        content = tmp.split('\n');
+    }
 
     function getWeight(filename) {
-        return Math.round((fs.statSync(filename)['size']/fileLimit)*30);
+        return Math.round((fs.statSync(filename)['size'] / fileLimit) * 30);
     }
 
-    function die() {
-        console.error.apply(console, arguments);
-        process.exit(1);
-    }
+    const fget = (s) => {
+        if (!s.includes('{') || s.includes('langFilepath')) {
+            return false;
+        }
+        s = s.slice(s.indexOf('{'), s.lastIndexOf('}') + 1);
+        s = s.replace(/'/g, '"').replace(/(\w+):(\s*["\d])/g, '"$1":$2');
+        return s && JSON.parse(s);
+    };
+    const unique = (a) => [...new Set(a)].filter(Boolean);
 
-    function getFiles() {
+    const matchAll = (data, rex, map = (x) => x) => {
+        const res = [...data.matchAll(rex)].map((m) => m.pop()).map(map);
+        return unique(res);
+    };
+
+    const buildReleasePackage = async(filename) => {
+        const content = FS.read(filename);
+        const target = path.join(cwd, TARGET, 'package');
+        const files = matchAll(content, /\{f:[^}]+}/g, fget);
+
+        if (debug) {
+            console.info(`Got %d files on ${filename}`, files.length);
+        }
+        const sh1 = [];
+        const copy = [];
+        const {createHash} = require('node:crypto');
+
+        let st = Date.now();
+        for (let i = files.length; i--;) {
+            const f = files[i];
+
+            f.hash = createHash('sha256').update(FS.read(f.f)).digest('hex');
+        }
+
+        if (debug) {
+            console.log(`Files hashed in %sms...`, Date.now() - st);
+        }
+
+        let out = content.slice(0);
+        for (let i = files.length; i--;) {
+            const f = files[i];
+            const ext = f.f.split('.').pop();
+            const file = f.f.replace(new RegExp(`\\.${ext}$`), `_${f.hash}.${ext}`);
+
+            sh1.push(file);
+            FS.copy(f.f, path.join(target, file));
+
+            do {
+                out = out.replace(f.f, file);
+            }
+            while (out.includes(f.f));
+
+            if (f.f.endsWith('.json')) {
+                const rex = /\{staticpath}([^"'\\?#]+)/g;
+                const files = matchAll(FS.read(f.f), rex, (url) => url.replace(/^["'./\\]+/, ''));
+                copy.push(...files);
+            }
+            else if (f.f.endsWith('.css')) {
+                const files = matchAll(FS.read(f.f), /url\(([^)]+)\)/g, (url) => {
+                    url = url.replace(/^["'./\\]+/, '').split(/[?#"']/)[0];
+                    return !url.startsWith('data:') && url;
+                });
+                copy.push(...files);
+            }
+        }
+
+        for (let a = unique(copy), i = a.length; i--;) {
+            let f = a[i];
+            let p = getBuildFile(f);
+
+            if (!fs.existsSync(p)) {
+                p = path.join(cwd, f);
+                if (!fs.existsSync(p)) {
+                    p = path.join(cwd, ...`js/ui/transfer/${f}`.split(/[\\\/]+/).filter(String));
+                }
+            }
+            FS.copy(p, path.join(target, f));
+        }
+        {
+            const langs = eval(out.match(/languages\s*=\s*\{[\s\S]*?}/)[0]);
+            const files = FS.ls(path.join(cwd, 'lang'), /_prod\.json$/)
+                .filter((f) => !!langs[basename(f).split('_')[0]]);
+
+            for (let i = files.length; i--;) {
+                const f = files[i];
+                const h = createHash('sha256').update(FS.read(f)).digest('hex');
+                const o = f.replace('_prod', `_${h}`);
+                const n = basename(o);
+
+                sh1.push(`lang/${n}`);
+                FS.copy(f, path.join(target, 'lang', n));
+            }
+        }
+        out = out.replace('var sh = []', `var sh1 = ${JSON.stringify(sh1)}`);
+
+        return FS.write(path.join(target, filename.replace(`.${FS.endpoint}`, '')), out);
+    };
+
+    lazy(FS, 'jsl', () => {
         var jsl   = [];
         var begin = false;
         var lines = [];
-        for (var i in content) {
+        for (let i = 0; i < content.length; ++i) {
             var line = content[i];
-            if (line.match(/jsl\.push.+(html|js)/)) {
+
+            if (begin) {
+                if (line.includes(p2)) {
+                    break;
+                }
+            }
+            else if (/jsl\.push.+(html|js)/.test(line)) {
                 begin = true;
-            } else if (line.match(/var.+jsl2/)) {
-                break;
             }
             if (begin) {
                 if (line.trim().match(/^(\}.+)?(if|else)/)) {
@@ -110,7 +381,7 @@ var Secureboot = function() {
 
         eval(lines.join("\n"));
         return jsl;
-    };
+    });
 
     ns.addHeader = function(lines, files) {
         lines.push("    /* Bundle Includes:");
@@ -120,7 +391,7 @@ var Secureboot = function() {
         lines.push("     */");
     }
 
-    ns.rewrite = function(name) {
+    ns.rewrite = async function(name) {
         var addedHtml = false;
         var lines = [];
         var errors = [];
@@ -146,14 +417,9 @@ var Secureboot = function() {
                     continue;
                 }
             }
-            var file = null;
-            if (content[i].match(/jsl\.push.+(js)/)) {
-                file = content[i].match(/'.+\.(js)'/);
-                if (!file) {
-                    lines.push(content[i]);
-                    continue;
-                }
-                file = file[0].substr(1, file[0].length - 2);
+            var file = content[i].includes('jsl.push') && fget(content[i]) || false;
+            if (file.f && file.f.endsWith('.js')) {
+                file = file.f;
                 if (file === 'js/staticPages.js') {
                     allowExtraHTML = true;
                 }
@@ -166,13 +432,9 @@ var Secureboot = function() {
                     outOfBundle.push(content[i]);
                     lines.push(content[i]);
                 }
-            } else if (content[i].match(/jsl\.push.+(css)/)) {
-                file = content[i].match(/'.+\.(css)'/);
-                if (!file) {
-                    lines.push(content[i]);
-                    continue;
-                }
-                file = file[0].substr(1, file[0].length - 2);
+            }
+            else if (file.f && file.f.endsWith('.css')) {
+                file = file.f;
                 if (usePostCSS) {
                     file = getBuildFile(file);
                 }
@@ -185,7 +447,9 @@ var Secureboot = function() {
                     outOfBundle.push(content[i]);
                     lines.push(content[i]);
                 }
-            } else if (content[i].match(/jsl\.push.+html/) && content[i].indexOf('embedplayer') < 0) {
+            }
+            else if (file.f && file.f.endsWith('.html') && content[i].indexOf('embedplayer') < 0) {
+                file = file.f;
                 if (!addedHtml || allowExtraHTML ) {
                     lines.push("    jsl.push({f:'html/templates.json', n: 'templates', j: 0, w: " + getWeight("html/templates.json") +  "});");
                     if (allowExtraHTML) {
@@ -194,6 +458,7 @@ var Secureboot = function() {
                 }
                 addedHtml = true;
             } else {
+                file = null;
                 lines.push(content[i]);
 
                 var currentSection =
@@ -235,6 +500,7 @@ var Secureboot = function() {
             if (jsl3) {
                 var js  = {};
                 var css = {};
+                const json = Object.create(null);
                 for (var group in jsl3) {
                     var rscs = jsl3[group];
 
@@ -251,6 +517,12 @@ var Secureboot = function() {
                         else if (f.j === 2) {
                             f.n = j;
                             css[group].push(f);
+                        }
+                        else if (f.j === 0) {
+                            if (!json[group]) {
+                                json[group] = Object.create(null);
+                            }
+                            json[group][f.n] = f;
                         }
                         else {
                             die('Unknown jsl3 resource', f);
@@ -298,17 +570,49 @@ var Secureboot = function() {
                                 content.push(fs.readFileSync(f.f).toString());
                                 continue;
                             }
-                            var size = fs.statSync(f.f).size;
+                            let file = f.f;
+                            if (r === css && usePostCSS) {
+                                const bf = getBuildFile(file);
+                                if (fs.existsSync(bf)) {
+                                    file = bf;
+                                }
+                            }
+                            var size = fs.statSync(file).size;
                             if (length + size > fileLimit) {
                                 write(g);
                             }
-                            content.push(fs.readFileSync(f.f).toString());
+                            content.push(fs.readFileSync(file).toString());
                             length += size;
                         }
 
                         write(g);
                     }
                 });
+
+                for (const g in json) {
+                    const rsc = json[g];
+
+                    for (const name in rsc) {
+                        const f = rsc[name];
+                        const c = rsc[name] = fs.readFileSync(usePostHTML ? getBuildFile(f.f) : f.f).toString();
+                        if (!(c && c.length)) {
+                            die(`empty content for ${name} ?!`);
+                        }
+                    }
+                    const path = `html/${g}-templates.json`;
+                    const name = basename(path).split('.')[0];
+                    fs.writeFileSync(path, JSON.stringify(json[g]));
+
+                    if (!jsl3_new[g]) {
+                        jsl3_new[g] = {};
+                    }
+                    jsl3_new[g][name] = {
+                        f: path,
+                        n: name,
+                        j: 0,
+                        w: 23
+                    };
+                }
 
                 m = 'jsl3 = ' + JSON.stringify(jsl3_new).replace(/"/g, "'").replace(/'(\w)':/g, '$1:') + '\n';
             }
@@ -399,27 +703,26 @@ var Secureboot = function() {
         for (let idx = errors.length; idx--;) {
             console.error(...errors[idx]);
         }
+
+        if (FS.endpoint === 'it') {
+
+            return buildReleasePackage(name);
+        }
     };
 
     ns.getJS = function() {
-        return jsl.filter(function(f) {
-            return f.f.match(/jsx?$/);
-        });
+        return FS.jsl.filter((f) => /\.jsx?$/.test(f.f));
     };
 
     ns.getCSS = function() {
-        return jsl.filter(function(f) {
-            return f.f.match(/(?:css|jsx)$/);
-        }).map(function(f) {
-            if (usePostCSS && String(f.f).startsWith('css/')) {
-                f.f = getBuildFile(f.f);
-            }
-            return f;
-        });
+        return FS.jsl.filter((f) => /\.(?:css|jsx)$/.test(f.f))
+            .map((f) => {
+                return {...f, f: usePostCSS && String(f.f).endsWith('.css') ? getBuildFile(f.f) : f.f};
+            });
     };
 
     ns.getHTML = function() {
-        return jsl.filter((f) => /\.html?$/.test(f.f))
+        return FS.jsl.filter((f) => /\.html?$/.test(f.f))
             .map((f) => {
                 return {...f, bf: usePostHTML ? getBuildFile(f.f) : f.f};
             });
@@ -448,7 +751,7 @@ var Secureboot = function() {
         while (groups.length > 0) {
             var id = groups.indexOf(null);
             if (id > 1) {
-                files['css/mega-' + (++i) + '.css'] = groups.splice(0, id);
+                files['css/BDL-' + (++i) + '.css'] = groups.splice(0, id);
             }
             groups.splice(0, 1);
         }
@@ -480,8 +783,6 @@ var Secureboot = function() {
     ns.getJSGroups = function() {
         var groups = [];
         var size = 0;
-        var sjcl = -1;
-        var limit = fileLimit;
         this.getJS().forEach(function(f) {
             if (f.f == "\0.jsx") {
                 groups.push(null);
@@ -491,7 +792,6 @@ var Secureboot = function() {
                 groups.push(null);
                 size = 0;
             }else {
-                // if (f.f === 'sjcl.js' && ++sjcl) fileLimit = 78e4; // bigger files for embed player
                 var fsize = f.f.startsWith('js/mobile/') ? 0 : fs.statSync(f.f)['size'];
                 if (size + fsize > fileLimit) {
                     size = 0;
@@ -508,17 +808,16 @@ var Secureboot = function() {
         while (groups.length > 0) {
             var id = groups.indexOf(null);
             if (id > 1) {
-                files['js/mega-' + (++i) + '.js'] = groups.splice(0, id);
+                files['js/BDL-' + (++i) + '.js'] = groups.splice(0, id);
             }
             groups.splice(0, 1);
         }
 
-        fileLimit = limit;
         return files;
     };
 
     return ns;
-}();
+});
 
 const stdout = process.stdout;
 const write = stdout.write;
@@ -783,7 +1082,7 @@ const [postTaskFinalizer, postHtmlTreeWalker, postHtmlURLRebase, postCssURLRebas
             },
             eachURL(url) {
                 if (!url.startsWith('{staticpath}')) {
-                    if (!url.startsWith('data:')) {
+                    if (url && !url.startsWith('data:')) {
                         console.warn(`WARNING: Unexpected Resource URL ${url}`);
                     }
                     return url;
@@ -851,7 +1150,16 @@ module.exports = function(grunt) {
                     }
                 ])
             },
-            dist: {expand: true, flatten: false, src: ['css/*.css', 'css/**/*.css'], dest: TARGET}
+            dist: {
+                expand: true,
+                flatten: false,
+                get src() {
+                    return FS.endpoint === 'it'
+                        ? ['css/{pdf,doc}*.css', 'js/ui/transfer/css/*.css', 'js/ui/transfer/css/**/*.css']
+                        : ['css/*.css', 'css/**/*.css', 'js/ui/**/css/*.css', 'js/ui/**/css/**/*.css'];
+                },
+                dest: TARGET
+            }
         },
         posthtml: {
             options: {
@@ -873,7 +1181,16 @@ module.exports = function(grunt) {
                     })
                 ])
             },
-            dist: {expand: true, flatten: false, src: ['html/*.html', 'html/**/*.html'], dest: TARGET}
+            dist: {
+                expand: true,
+                flatten: false,
+                get src() {
+                    return FS.endpoint === 'it'
+                        ? ['html/{pdf,doc}*.html', 'js/ui/transfer/html/*.html', 'js/ui/transfer/html/**/*.html']
+                        : ['html/*.html', 'html/**/*.html', 'js/ui/**/html/*.html', 'js/ui/**/html/**/*.html'];
+                },
+                dest: TARGET
+            }
         },
         concat: {
             prod: {
@@ -894,7 +1211,7 @@ module.exports = function(grunt) {
                     if (!concatGroups) {
                         stdout.write = write;
                         postTaskFinalizer();
-                        concatGroups = Secureboot.getGroups(true);
+                        concatGroups = FS.Secureboot.getGroups(true);
                     }
                     return concatGroups;
                 },
@@ -905,7 +1222,7 @@ module.exports = function(grunt) {
     grunt.registerTask('htmljson', () => {
         const res = {};
         const exclude = {embedplayer: 1};
-        const files = Secureboot.getHTML().sort();
+        const files = FS.Secureboot.getHTML().sort();
 
         for (let i = files.length; i--;) {
             const {bf: file, n} = files[i];
@@ -931,11 +1248,10 @@ module.exports = function(grunt) {
             console.log('Cleaning up old build files...');
 
             FS.rm(build);
-            FS.rm(path.join(cwd, 'html', 'templates.json'));
 
-            FS.ls(path.join(cwd, 'html'), /-postbuild\.html$/,
-                FS.ls(path.join(cwd, 'js'), /(?:-group\d+|mega-\d+)\.js$/,
-                    FS.ls(path.join(cwd, 'css'), /(?:-group\d+|mega-\d+|-postbuild)\.css$/))).forEach(FS.rm);
+            FS.ls(path.join(cwd, 'html'), /(?:-postbuild\.html|templates\.json)$/,
+                FS.ls(path.join(cwd, 'js'), /(?:-group\d+|BDL-\d+)\.js$/,
+                    FS.ls(path.join(cwd, 'css'), /(?:-group\d+|BDL-\d+|-postbuild)\.css$/))).forEach(FS.rm);
         }
 
         if (useImageryMode) {
@@ -943,6 +1259,9 @@ module.exports = function(grunt) {
         }
     });
 
+    if (grunt.cli.tasks.includes('it')) {
+        FS.endpoint = 'it';
+    }
     grunt.loadNpmTasks('grunt-contrib-concat');
 
     // Default task(s).
@@ -956,11 +1275,13 @@ module.exports = function(grunt) {
         tasks.unshift('posthtml');
     }
     grunt.registerTask('secureboot', function() {
-        console.log("Write secureboot.prod.js");
-        Secureboot.rewrite("secureboot.prod.js");
+        const done = this.async();
+        console.log(`Creating secureboot.${FS.endpoint}.js...`);
+        FS.Secureboot.rewrite(`secureboot.${FS.endpoint}.js`).then(done).catch(die);
     });
 
     tasks.unshift('cleanup');
     grunt.registerTask('default', tasks);
     grunt.registerTask('prod', tasks); // <- remove me if unused
+    grunt.registerTask('it', tasks);
 };

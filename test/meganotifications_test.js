@@ -129,7 +129,7 @@ describe("MegaNotifications Unit Test", function() {
         done();
     });
 
-    it("desktop and audio (+ loop) notif. are triggered correctly", function(done) {
+    it("desktop and audio (+ loop) notif. are triggered correctly", () => {
         var n = megaNotifications.notify(
             "type1",
             {
@@ -146,7 +146,7 @@ describe("MegaNotifications Unit Test", function() {
 
         expect(megaNotifications.favico instanceof Favico).to.eql(true);
 
-        tSleep(.3).then(function() {
+        return tSleep(.6).then(() => {
             expect(megaNotifications.favico.badge.callCount).to.eql(1);
             expect(megaNotifications.favico.badge.calledWith(1)).to.eql(true);
 
@@ -162,13 +162,12 @@ describe("MegaNotifications Unit Test", function() {
             expect(ion.sound.play.calledWith("type1-sound")).to.eql(true);
 
             n.setUnread(false);
-            tSleep(.3).then(function() {
+            return tSleep(.8).then(() => {
 
                 expect(ion.sound.stop.callCount).to.eql(3);
                 expect(ion.sound.stop.calledWith("type1-sound")).to.eql(true);
                 expect(megaNotifications.favico.badge.callCount).to.eql(2);
                 expect(megaNotifications.favico.badge.calledWith(0)).to.eql(true);
-
 
                 var wasTriggered = false;
                 megaNotifications.bind("onUnreadChanged", function(e, notif, v) {
@@ -179,8 +178,6 @@ describe("MegaNotifications Unit Test", function() {
                 n.setUnread(true);
 
                 expect(wasTriggered).to.eql(true);
-
-                done();
             });
         });
     });

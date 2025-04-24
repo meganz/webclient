@@ -3,7 +3,6 @@
 var u_p; // prepared password
 var u_attr; // attributes
 
-/* jshint -W098 */  // It is used in another file
 // log in
 // returns user type if successful, false if not
 // valid user types are: 0 - anonymous, 1 - email set, 2 - confirmed, but no RSA, 3 - complete
@@ -17,12 +16,11 @@ function u_login(ctx, email, password, uh, pinCode, permanent) {
 
     api_getsid(ctx, email, keypw, uh, pinCode);
 }
-/* jshint +W098 */
 
 function u_login2(ctx, ks) {
     if (ks !== false) {
         sessionStorage.signinorup = 1;
-        security.login.rememberMe = !!ctx.permanent;
+        security.login.rememberMe = ctx.permanent !== false;
         security.login.loginCompleteCallback = (res) => {
             ctx.checkloginresult(ctx, res);
             ctx = ks = undefined;
@@ -298,7 +296,7 @@ function u_checklogin3a(res, ctx) {
                 }
             })
             .then(() => {
-                if (!r || is_iframed || pfid || isPublicLink()) {
+                if (!r || !mega.keyMgr || is_iframed || self.pfid || isPublicLink()) {
                     // Nothing to do here.
                     return;
                 }
@@ -359,7 +357,7 @@ function u_checklogin3a(res, ctx) {
                 else if ($.createanonuser === u_attr.u) {
                     delete $.createanonuser;
 
-                    if (pfid) {
+                    if (self.pfid) {
                         M.importWelcomePDF().catch(dump);
                     }
                     else {
@@ -975,8 +973,10 @@ function setLandingPage(page) {
  * @returns {undefined}
  */
 function initMegaIoIframe(loginStatus, planNum) {
-
     'use strict';
+    if (!self.is_livesite) {
+        return Promise.resolve();
+    }
 
     // Set constants for URLs (easier to change for local testing)
     const megapagesUrl = 'https://mega.io';

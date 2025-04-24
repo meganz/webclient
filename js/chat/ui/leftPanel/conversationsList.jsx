@@ -4,46 +4,52 @@ import { PerfectScrollbar } from '../../../ui/perfectScrollbar.jsx';
 import ConversationsListItem from './conversationsListItem.jsx';
 import { FILTER, NAMESPACE } from './leftPanel.jsx';
 import Button from '../meetings/button.jsx';
-import { isToday, isTomorrow } from '../meetings/schedule/helpers.jsx';
 
-export const ConversationsList = ({ conversations, className, children }) =>
-    <PerfectScrollbar
-        className="chat-lp-scroll-area"
-        didMount={(id, ref) => {
-            megaChat.$chatTreePanePs = [...megaChat.$chatTreePanePs, { id, ref }];
-        }}
-        willUnmount={id => {
-            megaChat.$chatTreePanePs = megaChat.$chatTreePanePs.filter(ref => ref.id !== id);
-        }}
-        conversations={conversations}>
-        <ul
-            className={`
-                conversations-pane
-                ${className || ''}
-            `}>
-            {children || conversations.map(chatRoom =>
-                chatRoom.roomId &&
-                <ConversationsListItem
-                    key={chatRoom.roomId}
-                    chatRoom={chatRoom}
-                    {...(chatRoom.type === 'private' && { contact: M.u[chatRoom.getParticipantsExceptMe()[0]] })}
-                />
-            )}
-        </ul>
-    </PerfectScrollbar>;
+export const ConversationsList = ({ conversations, className, children }) => {
+    return (
+        <PerfectScrollbar
+            className="chat-lp-scroll-area"
+            didMount={(id, ref) => {
+                megaChat.$chatTreePanePs = [...megaChat.$chatTreePanePs, { id, ref }];
+            }}
+            willUnmount={id => {
+                megaChat.$chatTreePanePs = megaChat.$chatTreePanePs.filter(ref => ref.id !== id);
+            }}
+            conversations={conversations}>
+            <ul
+                className={`
+                    conversations-pane
+                    ${className || ''}
+                `}>
+                {children ||
+                    conversations.map(c =>
+                        c.roomId &&
+                        <ConversationsListItem
+                            key={c.roomId}
+                            chatRoom={c}
+                            {...(c.type === 'private' && { contact: M.u[c.getParticipantsExceptMe()[0]] })}
+                        />
+                    )
+                }
+            </ul>
+        </PerfectScrollbar>
+    );
+};
 
 // --
 
 export const Chats = ({ conversations, onArchivedClicked, filter }) => {
     conversations = Object.values(conversations || {})
         .filter(c =>
-            !c.isMeeting && c.isDisplayable() &&
+            !c.isMeeting &&
+            c.isDisplayable() &&
             (!filter ||
                 filter === FILTER.UNREAD && c.messagesBuff.getUnreadCount() > 0 ||
                 filter === FILTER.MUTED && c.isMuted()
             )
         )
         .sort(M.sortObjFn(c => c.lastActivity || c.ctime, -1));
+    const noteChat = megaChat.getNoteChat();
 
     return (
         <>
@@ -54,8 +60,23 @@ export const Chats = ({ conversations, onArchivedClicked, filter }) => {
                         <span>{l.filter_heading__recent}</span>
                     </div>
                 }
-                {conversations && conversations.length ?
-                    <ConversationsList conversations={conversations} /> :
+
+                {conversations && conversations.length >= 1 ?
+                    <ConversationsList conversations={conversations}>
+                        {megaChat.WITH_SELF_NOTE && noteChat && noteChat.isDisplayable() ?
+                            <ConversationsListItem chatRoom={noteChat} /> :
+                            null
+                        }
+                        {conversations.map(c =>
+                            c.roomId &&
+                            !c.isNote &&
+                            <ConversationsListItem
+                                key={c.roomId}
+                                chatRoom={c}
+                                {...(c.type === 'private' && { contact: M.u[c.getParticipantsExceptMe()[0]] })}
+                            />
+                        )}
+                    </ConversationsList> :
                     <div
                         className={`
                             ${NAMESPACE}-nil
@@ -80,7 +101,14 @@ export const Chats = ({ conversations, onArchivedClicked, filter }) => {
                         }
                     </div>
                 }
+
+                {megaChat.WITH_SELF_NOTE && conversations && conversations.length === 1 && noteChat &&
+                    <ConversationsList conversations={conversations}>
+                        <ConversationsListItem chatRoom={noteChat} />
+                    </ConversationsList>
+                }
             </div>
+
             <div className={`${NAMESPACE}-bottom`}>
                 <div className={`${NAMESPACE}-bottom-control`}>
                     <div

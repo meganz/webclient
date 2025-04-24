@@ -1021,6 +1021,20 @@ class MegaNode {
 
 Object.setPrototypeOf(MegaNode.prototype, null);
 
+class TransferNode extends MegaNode {
+    constructor(n, value) {
+        if (n.a) {
+            crypto_procattr(n, base64_to_a32(n.k));
+        }
+        super(n);
+        Object.defineProperty(this, 'xh', {value});
+    }
+
+    get [Symbol.toStringTag]() {
+        return 'TransferNode';
+    }
+}
+
 // --------------------------------------------------------------------------
 
 lazy(self, 'decWorkerPool', function decWorkerPool() {
@@ -1032,7 +1046,7 @@ lazy(self, 'decWorkerPool', function decWorkerPool() {
     /** @class decWorkerPool */
     return new class extends Array {
         get url() {
-            const WORKER_VERSION = 10;
+            const WORKER_VERSION = 11;
             return `${window.is_extension || window.is_karma ? '' : '/'}nodedec.js?v=${WORKER_VERSION}`;
         }
 

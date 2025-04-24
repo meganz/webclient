@@ -505,7 +505,7 @@ def inspecthtml(file, ln, line, result):
 
     # check for relative URLs without 'clickurl' class
     match = re.search(r'href\s*=\s*["\']?/', line)
-    if match and not re.search('clickurl', line):
+    if match and not re.search('clickurl', line) and not re.search('<link', line):
         fatal += 1
         result.append('{}:{}: {}\n{}^ Missing clickurl class.'.format(file, ln, line, indent))
 

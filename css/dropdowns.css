@@ -1342,3 +1342,13 @@ body.in-call .gif-panel .gif-panel-results {
     width: auto;
     flex-grow: 1;
 }
+.files-menu.context .transferit-item .right-badge {
+    border-radius: 2px;
+    border: unset;
+    font: var(--mobile-font-caption-small-semibold);
+    padding: 2px 4px;
+    background: rgb(24, 117, 255);
+    color: var(--mobile-text-on-color);
+    margin-inline-start: 8px;
+    order: 100;
+}

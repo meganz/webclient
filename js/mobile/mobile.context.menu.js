@@ -96,6 +96,7 @@ class MegaMobileContextMenu extends MegaComponentGroup {
             delete items['.copy-item'];
             delete items['.move-item'];
             delete items['.getlink-item'];
+            delete items['.embedcode-item'];
             delete items['.colour-label-items'];
             delete items['.send-to-contact-item'];
         }

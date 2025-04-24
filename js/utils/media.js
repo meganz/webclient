@@ -41,7 +41,7 @@ if (!isMediaSourceSupported()) {
  */
 function is_audio(n) {
     'use strict';
-    return is_video(n) === 2;
+    return is_video(n) === 2 || /\.(mp3|wav|flac)$/i.test(n && n.name);
 }
 
 /**
@@ -1224,13 +1224,14 @@ FullScreenManager.prototype.enterFullscreen = function() {
             }
             // Mute button
             else if (type === 'mute') {
+                const $muteTooltip = $('.vol-wrapper .tooltip', $wrapper).removeClass('no-sound');
                 if (videoElement.muted) {
                     $('i', $mute).removeClass().addClass(`${SPRITE} icon-volume-x-small-regular-outline`);
-                    $('.vol-wrapper .tooltip', $wrapper).text(l.video_player_unmute);
+                    $muteTooltip.text(l.video_player_unmute);
                 }
                 else {
                     $('i', $mute).removeClass().addClass(`${SPRITE} ${volumeIcon(streamer.volume)}`);
-                    $('.vol-wrapper .tooltip', $wrapper).text(l.video_player_mute);
+                    $muteTooltip.text(l.video_player_mute);
                 }
             }
         };
@@ -1348,7 +1349,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
             streamer.currentTime = Math.min(props.duration, Math.max(0, streamer.currentTime + sec));
         };
 
-        if (is_embed !== 2) {
+        if (is_embed !== 2 && self.contextMenu) {
             // Playback Speed context menu
             speedMenu = $('.context-menu.playback-speed', $wrapper).get(0);
             if (!speedMenu) {
@@ -1480,7 +1481,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                             title = escapeHTML(l[19060]).replace('%1', streamer.hasUnsupportedAudio);
                         }
                         $('i', $vc).removeClass().addClass(`${SPRITE} icon-volume-x-small-regular-outline`);
-                        $('.vol-wrapper .tooltip', $wrapper).text(title);
+                        $('.vol-wrapper .tooltip', $wrapper).addClass('no-sound').text(title);
                     }
 
                     streamer._megaNode = node;

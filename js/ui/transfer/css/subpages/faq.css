@@ -1,0 +1,99 @@
+/* 
+ * Subpages. FAQ
+*/
+
+.subpage-box .faq-body {
+    margin: 0 auto;
+    max-width: 752px;
+    text-align: center;
+}
+
+.subpage-box .faq-body h2 + p {
+    padding: 8px 0 0;
+}
+
+.subpage-box .faq-content {
+    margin: 64px 0 0;
+}
+
+.subpage-box.faq-box .faq-body h2 {
+    display: none;
+}
+
+.subpage-box.faq-box .faq-content {
+    margin: 0;
+}
+
+.subpage-box .faq-content .item {
+    border-radius: 12px;
+    padding: 32px 24px 24px;
+    position: relative;
+    text-align: start;
+    transition: var(--transition-bg-color);
+}
+
+.subpage-box .faq-content .item::before {
+    background-color: var(--main-borders-and-lines);
+    content: '';
+    height: 1px;
+    left: 0;
+    margin: 0 24px;
+    position: absolute;
+    top: 0;
+    transition: var(--transition-opacity);
+    width: calc(100% - 48px);
+}
+
+.subpage-box .faq-content .item .details {
+    color: var(--main-neutral-secondary);
+    font: var(--text-body-sm);
+    height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transform: scaleY(0);
+    transition: var(--transition-all);
+    visibility: hidden;
+}
+
+.subpage-box .faq-content .item .details ul,
+.subpage-box .faq-content .item .details ol {
+    padding-inline-start: 24px;
+}
+
+.subpage-box .faq-content .item.active {
+    background-color: var(--main-surface-secondary);
+}
+
+.subpage-box .faq-content .item.active .details {
+    height: auto;
+    opacity: 1;
+    transform: scaleY(1);
+    visibility: visible;
+}
+
+.subpage-box .faq-content .item.active::before {
+    opacity: 0;
+}
+
+.subpage-box .faq-content .item .header {
+    cursor: pointer;
+    display: flex;
+    width: 100%; 
+}
+
+.subpage-box .faq-content .item .header span {
+    color: var(--main-neutral-primary);
+    flex: 1 1 auto;
+    font: 700 var(--text-caption-lg);
+}
+
+.subpage-box .faq-content .item .header button {
+    border-radius: 100%;
+    margin-inline-start: 24px;
+    padding: 0;
+}
+
+.subpage-box .faq-content .item .header button:hover::before,
+.subpage-box .faq-content .item .header button:focus::before {
+    background-color: transparent;
+}

@@ -3392,71 +3392,9 @@ MegaData.prototype.createFolder = promisify(function(resolve, reject, target, na
  */
 MegaData.prototype.createFolders = promisify(function(resolve, reject, paths, target) {
     'use strict';
-    const kind = Symbol('~\\:<p*>');
-    const logger = d && MegaLogger.getLogger('mkdir', false, this.logger);
+    const {mkdir} = factory.require('mkdir');
 
-    // paths walker to create hierarchy
-    var walk = function(paths, s) {
-        var p = paths.shift();
-
-        if (p) {
-            s = walk(paths, s[p] = s[p] || Object.create(null));
-        }
-        return s;
-    };
-
-    var struct = Object.create(null);
-    var folders = Object.keys(paths);
-
-    // create paths hierarchy
-    for (var i = folders.length; i--;) {
-        var path = folders[i];
-
-        Object.defineProperty(walk(M.getSafePath(path), struct), kind, {value: path});
-    }
-    folders = folders.length;
-
-    (function _mkdir(s, t) {
-        if (d > 1) {
-            logger.debug('mkdir under %s (%s) for...', t, M.getNodeByHandle(t).name, s);
-        }
-        Object.keys(s).forEach((name) => {
-            M.createFolder(t, name).always((res) => {
-                if (res.length !== 8) {
-                    if (d) {
-                        const err = 'Failed to create folder "%s" on target %s(%s)';
-                        logger.warn(err, name, t, M.getNodeByHandle(t).name, res);
-                    }
-                    return reject(res);
-                }
-
-                var c = s[name]; // children for the just created folder
-
-                if (c[kind]) {
-                    if (d) {
-                        console.assert(paths[c[kind]] === null, 'Hmm... check this...');
-                    }
-
-                    // record created folder node handle
-                    paths[c[kind]] = res;
-                    folders--;
-                }
-
-                if (d > 1) {
-                    logger.debug('folder "%s" got handle %s on %s (%s)', name, res, t, M.getNodeByHandle(t).name);
-                }
-
-                onIdle(_mkdir.bind(null, c, res));
-            });
-        });
-
-        if (!folders) {
-            if (d) {
-                logger.info('Operation completed.', paths);
-            }
-            resolve(paths);
-        }
-    })(struct, target);
+    return mkdir(target, paths, (t, name) => this.createFolder(t, name)).then(resolve).catch(reject);
 });
 
 // leave incoming share h

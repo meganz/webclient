@@ -426,7 +426,6 @@ function hostname(url) {
     return url && url[1];
 }
 
-
 // fire an event log
 function eventlog(id, msg, once) {
     'use strict';
@@ -457,8 +456,12 @@ function eventlog(id, msg, once) {
             }
         }
 
+        if (id > 99799 && self.buildOlderThan10Days) {
+            return self.d && console.info('eventlog(%d)', id, once, [req]);
+        }
+
         if (!once || !eventlog.sent[id]) {
-            eventlog.sent[id] = [Date.now(), M.getStack()];
+            eventlog.sent[id] = Date.now();
             return api.req(req).catch((ex) => dump(id, ex));
         }
     }

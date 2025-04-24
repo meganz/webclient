@@ -1194,7 +1194,7 @@ function logExportEvt(evtId, data) {
                     { class: `flex flex-row items-center text-color-high ${klass || ''}` },
                     parent
                 );
-                mCreateElement('span', { class: 'flex-1 text-ellipsis' }, row).textContent = text;
+                mCreateElement('span', { class: 'flex-1 text-ellipsis select-text' }, row).textContent = text;
 
                 MegaButton.factory({
                     parentNode: row,
@@ -1216,7 +1216,7 @@ function logExportEvt(evtId, data) {
             ]);
             const nameRow = mCreateElement(
                 'span',
-                { class: 'text-ellipsis px-2' },
+                { class: 'text-ellipsis px-2 select-text' },
                 header
             );
 
@@ -1252,7 +1252,7 @@ function logExportEvt(evtId, data) {
                 { class: 'node-link-block font-body-1', 'data-node-handle': nodeHandle },
                 [header]
             );
-            const linkData = mCreateElement('div', { class: 'bg-surface-grey-1 border-radius-2 p-3' }, block);
+            const linkData = mCreateElement('div', { class: 'bg-surface-grey-1 rounded-xl p-3' }, block);
 
             if (protectedLink) {
                 addCopyRow(protectedLink, linkData, 'link-value', l.copy_link, l[1642], 500759);
@@ -1366,13 +1366,48 @@ function logExportEvt(evtId, data) {
     lazy(scope.mega.Dialog.ExportLink, 'view', () => {
         const { ExportLink } = scope.mega.Dialog;
         const name = 'export-links-dialog';
+        const { sheet, toast } = mega.ui;
+
+        const onKeyDown = (evt) => {
+            const { key, ctrlKey, metaKey } = evt;
+
+            if ((ctrlKey || metaKey) && key === 'a') {
+                evt.preventDefault();
+
+                const texts = sheet.contentNode.querySelectorAll('.select-text');
+
+                const selection = window.getSelection();
+                selection.removeAllRanges();
+
+                const range = document.createRange();
+                range.selectNodeContents(texts[0]);
+
+                if (texts.length > 1) {
+                    let i = 0;
+
+                    while (++i < texts.length) {
+                        range.setEndAfter(texts[i]);
+                    }
+                }
+
+                selection.addRange(range);
+            }
+        };
+
+        let itBanner = null;
+
+        const removeItBanner = () => {
+            if (itBanner) {
+                itBanner.remove();
+                itBanner = null;
+            }
+        };
 
         /**
          * @param {Object.<String, Boolean|String[]>} dialogOpts Whether to show the decryption key separately or not
          * @returns {void}
          */
         const show = (dialogOpts = Object.create(null)) => {
-            const { sheet, toast } = mega.ui;
             const count = $.itemExport.length;
 
             const addSettingsBtn = (parentNode) => new MegaButton({
@@ -1427,6 +1462,34 @@ function logExportEvt(evtId, data) {
                 });
             }
 
+            if ($.isCtrlShift && counts[1] && !folderlink) {
+                MegaButton.factory({
+                    parentNode: footerElements[1],
+                    text: l.repair,
+                    componentClassname: 'secondary mx-2 slim simpletip',
+                    type: 'normal',
+                    dataset: { simpletip: l.repair_note }
+                }).on('click.repairLink', () => {
+                    const p = [];
+                    let i = $.itemExport.length;
+
+                    while (--i >= 0) {
+                        const { t, h } = M.getNodeByHandle($.itemExport[i]);
+
+                        if (t) {
+                            p.push(api_setshare(h, [{u: 'EXP', r: 0, rsk: 1}]));
+                        }
+                    }
+
+                    if (p.length) {
+                        loadingDialog.show('rsk', l[1141]);
+                        Promise.all(p).catch(tell).finally(() => loadingDialog.hide('rsk'));
+                    }
+                });
+
+                delete $.isCtrlShift;
+            }
+
             const options = {
                 name,
                 contents: [mCreateElement('div', { class: 'relative' }, itemExportLink(dialogOpts))],
@@ -1472,16 +1535,60 @@ function logExportEvt(evtId, data) {
                         );
                     }
 
-                    if (!folderlink) {
+                    if (!folderlink && !dlid) {
                         addSettingsBtn(
                             ($.itemExport.length === 1)
                                 ? sheet.contentNode.querySelector('.node-link-block .block-naming')
                                 : sheet.headerTitleNode
                         );
+
+                        if (mega.xferit) {
+                            const header = sheet.overlayNode.querySelector('.header');
+                            const title = mCreateElement('div', { class: 'font-title-h3' });
+                            const txt = mCreateElement('div', { class: 'font-body-1' });
+                            itBanner = mCreateElement(
+                                'div',
+                                {
+                                    class: 'it-banner absolute bg-it p-6 flex flex-row items-center w-full left-0'
+                                        + ' text-color-white box-border rounded-3xl'
+                                        + ' box-border opacity-0 transition-opacity'
+                                },
+                                [
+                                    mCreateElement('i', { class: 'sprite-fm-mono icon-upload-filled icon-size-8' }),
+                                    mCreateElement('div', { class: 'flex-1 px-4' }, [ title, txt ])
+                                ]
+                            );
+
+                            title.textContent = l.it_banner_title;
+                            txt.textContent = l.it_banner_txt;
+
+                            header.prepend(itBanner);
+
+                            MegaButton.factory({
+                                parentNode: itBanner,
+                                text: l.it_banner_btn,
+                                componentClassname: 'primary whitespace-nowrap font-600 slim theme-dark-forced',
+                                type: 'button'
+                            }).on('click.pro', () => {
+                                M.openTransferItOverlay().catch(tell);
+                            });
+
+                            sheet.overlayNode.classList.add('has-it-banner');
+
+                            tSleep(0.3).then(() => {
+                                if (itBanner) {
+                                    itBanner.classList.add('opacity-100');
+                                }
+                            });
+                        }
+
+                        document.addEventListener('keydown', onKeyDown, true);
                     }
                 },
                 onClose: () => {
+                    document.removeEventListener('keydown', onKeyDown, true);
                     sheet.removeClass(name);
+                    removeItBanner();
                 }
             };
 
@@ -1489,7 +1596,14 @@ function logExportEvt(evtId, data) {
             sheet.addClass(options.name);
         };
 
-        return { show, hide: hideDialog.bind(null, name) };
+        return {
+            show,
+            hide: () => {
+                document.removeEventListener('keydown', onKeyDown, true);
+                hideDialog(name);
+                removeItBanner();
+            }
+        };
     });
 
     lazy(scope.mega.Dialog.ExportLink, 'settings', () => {
@@ -1659,7 +1773,7 @@ function logExportEvt(evtId, data) {
                         mCreateElement(
                             'input',
                             {
-                                class: 'set-date border-1 border-radius-2 font-body-2'
+                                class: 'set-date border-1 rounded-xl font-body-2'
                                     + ' text-color-medium focus-border-strong',
                                 type: 'text',
                                 name: 'share-link-expiry-datepicker',
@@ -1793,7 +1907,7 @@ function logExportEvt(evtId, data) {
                         'div',
                         {
                             class: 'hoverable flex flex-row items-center py-3 px-4 transition-colors'
-                                + ' border-radius-2 cursor-pointer -mx-4'
+                                + ' rounded-xl cursor-pointer -mx-4'
                         },
                         [
                             mCreateElement('div', { class: 'flex-1' }, [
@@ -2232,7 +2346,10 @@ function logExportEvt(evtId, data) {
 
         const show = (mediaType) => {
             const { sheet, toast } = mega.ui;
-            const audio = mediaType === 2; // 1 - Video, 2 - Audio
+            // 1 - Video, 2 - Audio
+            const audio = typeof mediaType === 'number' ?
+                mediaType === 2 :
+                ($.itemExport.length === 1 && M.d[$.itemExport[0]].fa && is_video(M.d[$.itemExport[0]]) || 0) === 2;
 
             const setCode = () => {
                 const n = M.d[$.itemExport[0]];
@@ -2330,13 +2447,13 @@ function logExportEvt(evtId, data) {
 
                 const textBlock = mCreateElement(
                     'div',
-                    { class: 'border-radius-2 bg-surface-grey-1 relative' },
+                    { class: 'rounded-xl bg-surface-grey-1 relative' },
                     [
                         mCreateElement(
                             'textarea',
                             {
                                 readonly: '',
-                                class: 'embed-code box-border border-none bg-surface-grey-1 border-radius-2'
+                                class: 'embed-code box-border border-none bg-surface-grey-1 rounded-xl'
                                     + ' w-full py-2 pl-3 pr-8 font-body-1 h-28 text-color-high overflow-y-hidden'
                             }
                         )
@@ -2402,14 +2519,14 @@ function logExportEvt(evtId, data) {
                             mCreateElement(
                                 'div',
                                 {
-                                    class: 'flex flex-row items-center border-1 border-radius-2 p-2 w-40'
+                                    class: 'flex flex-row items-center border-1 rounded-xl p-2 w-40'
                                         + ' box-border focus-within-border-strong'
                                 },
                                 [
                                     mCreateElement(
                                         'input',
                                         {
-                                            class: 'border-none border-radius-2 w-12 font-body-2'
+                                            class: 'border-none rounded-xl w-12 font-body-2'
                                                 + ' bg-inherit text-color-high flex-1',
                                             type: 'number',
                                             min: 0,
@@ -2434,7 +2551,7 @@ function logExportEvt(evtId, data) {
 
                     const min = 128;
                     const max = 9999;
-                    const inputClass = 'border-1 border-radius-2 p-2 flex-1 focus-border-strong'
+                    const inputClass = 'border-1 rounded-xl p-2 flex-1 focus-border-strong'
                         + ' bg-inherit text-color-high';
 
                     const dimensionsBlock = mCreateElement(

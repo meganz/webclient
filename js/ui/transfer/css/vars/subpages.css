@@ -1,0 +1,135 @@
+/*
+ * Subpage vars
+*/
+
+.transferit-vars body.subpage {
+
+    --subpage-h-padding: 128px;
+    --subpage-content-gap: 136px;
+    --subpage-text-content-gap: 80px;
+
+    /* Illustrations */
+
+    /* Features subpage */
+
+    --ftr-img1-bubbles-url: url('../../images/illustrations/subpages/ftr-01-bubbles.png');
+    --ftr-img2-url: url('../../images/illustrations/subpages/ftr-02.png');
+    --ftr-img3-url: url('../../images/illustrations/subpages/ftr-03.png');
+    --ftr-img4-url: url('../../images/illustrations/subpages/ftr-04.png');
+    --ftr-img6-url: url('../../images/illustrations/subpages/ftr-06.png');
+    --ftr-img7-url: url('../../images/illustrations/subpages/ftr-07-bubbles.png');
+    --ftr-img15-url: url('../../images/illustrations/subpages/ftr-15.png');
+    --ftr-img16-url: url('../../images/illustrations/subpages/ftr-16.png');
+    --ftr-img17-url: url('../../images/illustrations/subpages/ftr-17.png');
+    --ftr-img19-url: url('../../images/illustrations/subpages/ftr-19.png');
+
+    /* Contact subpage */
+
+    --cnt-img1-url: url('../../images/illustrations/subpages/cnt-01.png');
+
+}
+
+
+/* Light theme */
+
+.theme-light.transferit-vars body.subpage,
+.theme-light .transferit-vars body.subpage,
+.transferit-vars .theme-light-forced body.subpage {
+
+    /* Illustrations */
+
+    /* Features subpage */
+
+    --ftr-img1-url: url('../../images/illustrations/subpages/ftr-01.png');
+    --ftr-img5-url: url('../../images/illustrations/subpages/ftr-05.png');
+    --ftr-img6-1-url: url('../../images/illustrations/subpages/ftr-06-1.png');
+    --ftr-img6-2-url: url('../../images/illustrations/subpages/ftr-06-2.png');
+    --ftr-img8-url: url('../../images/illustrations/subpages/ftr-08.png');
+    --ftr-img10-url: url('../../images/illustrations/subpages/ftr-10.png');
+    --ftr-img11-url: url('../../images/illustrations/subpages/ftr-11.png');
+    --ftr-img12-url: url('../../images/illustrations/subpages/ftr-12.png');
+    --ftr-img13-url: url('../../images/illustrations/subpages/ftr-13.png');
+    --ftr-img14-url: url('../../images/illustrations/subpages/ftr-14.png');
+    --ftr-img18-url: url('../../images/illustrations/subpages/ftr-18.png');
+
+    /* Error page */
+
+    --error-img1-url: url('../../images/illustrations/subpages/error-01.png');
+
+    /* Compare page */
+
+    --cmpr-img1-url: url('../../images/illustrations/subpages/cmpr-01.png');
+
+    /* Contact subpage */
+
+    --cnt-img2-url: url('../../images/illustrations/subpages/cnt-02.png');
+    --cnt-img3-url: url('../../images/illustrations/subpages/cnt-03.png');
+    --cnt-img4-url: url('../../images/illustrations/subpages/cnt-04.png');
+    --cnt-img5-url: url('../../images/illustrations/subpages/cnt-05.png');
+    --cnt-img6-url: url('../../images/illustrations/subpages/cnt-06.png');
+
+}
+
+
+/* Dark theme */
+
+.theme-dark.transferit-vars body.subpage,
+.theme-dark .transferit-vars body.subpage,
+.transferit-vars .theme-dark-forced body.subpage {
+
+
+    /* Illustrations */
+
+    /* Features subpage */
+
+    --ftr-img1-url: url('../../images/illustrations/subpages/ftr-01-dark.png');
+    --ftr-img5-url: url('../../images/illustrations/subpages/ftr-05-dark.png');
+    --ftr-img6-1-url: url('../../images/illustrations/subpages/ftr-06-1-dark.png');
+    --ftr-img6-2-url: url('../../images/illustrations/subpages/ftr-06-2-dark.png');
+    --ftr-img8-url: url('../../images/illustrations/subpages/ftr-08-dark.png');
+    --ftr-img10-url: url('../../images/illustrations/subpages/ftr-10-dark.png');
+    --ftr-img11-url: url('../../images/illustrations/subpages/ftr-11-dark.png');
+    --ftr-img12-url: url('../../images/illustrations/subpages/ftr-12-dark.png');
+    --ftr-img13-url: url('../../images/illustrations/subpages/ftr-13-dark.png');
+    --ftr-img14-url: url('../../images/illustrations/subpages/ftr-14-dark.png');
+    --ftr-img18-url: url('../../images/illustrations/subpages/ftr-18-dark.png');
+
+    /* Error page */
+
+    --error-img1-url: url('../../images/illustrations/subpages/error-01-dark.png');
+
+    /* Compare page */
+
+    --cmpr-img1-url: url('../../images/illustrations/subpages/cmpr-01-dark.png');
+
+    /* Contact subpage */
+
+    --cnt-img2-url: url('../../images/illustrations/subpages/cnt-02-dark.png');
+    --cnt-img3-url: url('../../images/illustrations/subpages/cnt-03-dark.png');
+    --cnt-img4-url: url('../../images/illustrations/subpages/cnt-04-dark.png');
+    --cnt-img5-url: url('../../images/illustrations/subpages/cnt-05-dark.png');
+    --cnt-img6-url: url('../../images/illustrations/subpages/cnt-06-dark.png');
+
+}
+
+
+/* Adaptive layout */
+
+@media only screen and (max-width: 1024px) {
+
+    .transferit-vars body.subpage {
+        --subpage-h-padding: 80px;
+        --subpage-content-gap: 96px;
+    }
+
+}
+
+@media only screen and (max-width: 960px) {
+
+    .transferit-vars body.subpage {
+        --subpage-h-padding: 24px;
+        --subpage-content-gap: 64px;
+        --subpage-text-contect-gap: 48px;
+    }
+
+}

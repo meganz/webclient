@@ -797,7 +797,7 @@ lazy(T.ui, 'addFilesLayout', () => {
                 .then((res) => {
                     if (res) {
                         this.data.xh = res[0];
-                        this.data.link = `${getBaseUrl()}/t/${this.data.xh}`;
+                        this.data.link = `https://transfer.it/t/${this.data.xh}`;
                     }
                     return Promise.all(res);
                 })
@@ -811,8 +811,10 @@ lazy(T.ui, 'addFilesLayout', () => {
                     copyBtn.classList.remove('disabled');
                     domTick.classList.remove('hidden');
 
+                    if (T.ui.dashboardLayout) {
+                        T.ui.dashboardLayout.data.refresh = true;
+                    }
                     delete T.ui.ulprogress;
-                    T.ui.dashboardLayout.data.refresh = true;
 
                     this.finishTransferring().catch(dump);
                 })

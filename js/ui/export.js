@@ -1194,7 +1194,7 @@ function logExportEvt(evtId, data) {
                     { class: `flex flex-row items-center text-color-high ${klass || ''}` },
                     parent
                 );
-                mCreateElement('span', { class: 'flex-1 text-ellipsis' }, row).textContent = text;
+                mCreateElement('span', { class: 'flex-1 text-ellipsis select-text' }, row).textContent = text;
 
                 MegaButton.factory({
                     parentNode: row,
@@ -1216,7 +1216,7 @@ function logExportEvt(evtId, data) {
             ]);
             const nameRow = mCreateElement(
                 'span',
-                { class: 'text-ellipsis px-2' },
+                { class: 'text-ellipsis px-2 select-text' },
                 header
             );
 
@@ -1366,6 +1366,33 @@ function logExportEvt(evtId, data) {
     lazy(scope.mega.Dialog.ExportLink, 'view', () => {
         const { ExportLink } = scope.mega.Dialog;
         const name = 'export-links-dialog';
+        const { sheet, toast } = mega.ui;
+
+        const onKeyDown = (evt) => {
+            const { key, ctrlKey, metaKey } = evt;
+
+            if ((ctrlKey || metaKey) && key === 'a') {
+                evt.preventDefault();
+
+                const texts = sheet.contentNode.querySelectorAll('.select-text');
+
+                const selection = window.getSelection();
+                selection.removeAllRanges();
+
+                const range = document.createRange();
+                range.selectNodeContents(texts[0]);
+
+                if (texts.length > 1) {
+                    let i = 0;
+
+                    while (++i < texts.length) {
+                        range.setEndAfter(texts[i]);
+                    }
+                }
+
+                selection.addRange(range);
+            }
+        };
 
         let itBanner = null;
 
@@ -1381,7 +1408,6 @@ function logExportEvt(evtId, data) {
          * @returns {void}
          */
         const show = (dialogOpts = Object.create(null)) => {
-            const { sheet, toast } = mega.ui;
             const count = $.itemExport.length;
 
             const addSettingsBtn = (parentNode) => new MegaButton({
@@ -1555,9 +1581,12 @@ function logExportEvt(evtId, data) {
                                 }
                             });
                         }
+
+                        document.addEventListener('keydown', onKeyDown, true);
                     }
                 },
                 onClose: () => {
+                    document.removeEventListener('keydown', onKeyDown, true);
                     sheet.removeClass(name);
                     removeItBanner();
                 }
@@ -1570,6 +1599,7 @@ function logExportEvt(evtId, data) {
         return {
             show,
             hide: () => {
+                document.removeEventListener('keydown', onKeyDown, true);
                 hideDialog(name);
                 removeItBanner();
             }

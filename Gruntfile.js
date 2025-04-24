@@ -332,7 +332,7 @@ lazy(FS, 'Secureboot', () => {
             for (let i = files.length; i--;) {
                 const f = files[i];
                 const h = createHash('sha256').update(FS.read(f)).digest('hex');
-                const o = f.replace('_', `_${h}`);
+                const o = f.replace('_prod', `_${h}`);
                 const n = basename(o);
 
                 sh1.push(`lang/${n}`);

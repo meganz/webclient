@@ -2492,7 +2492,7 @@ const ComposedTextArea = ({
   label: l[19795] || 'My computer',
   disabled: mega.paywall,
   onClick: () => chatRoom.uploadFromComputer()
-}), !is_eplusplus && !is_chatlink && REaCt().createElement(REaCt().Fragment, null, REaCt().createElement("hr", null), REaCt().createElement(dropdowns.DropdownItem, {
+}), !is_eplusplus && !is_chatlink && !chatRoom.isNote && REaCt().createElement(REaCt().Fragment, null, REaCt().createElement("hr", null), REaCt().createElement(dropdowns.DropdownItem, {
   className: "link-button",
   icon: "sprite-fm-mono icon-send-contact",
   label: l.share_contact_button,
@@ -5433,49 +5433,48 @@ class ContactCard extends _mixins1__.u9 {
     this._attachRerenderCbContacts(['presence']);
   }
   specShouldComponentUpdate(nextProps, nextState) {
-    const self = this;
-    const foundKeys = Object.keys(self.props);
-    if (foundKeys.indexOf('dropdowns') >= 0) {
+    const foundKeys = Object.keys(this.props);
+    if (foundKeys.includes('dropdowns')) {
       array.remove(foundKeys, 'dropdowns', true);
     }
     let shouldUpdate;
     if (foundKeys.length) {
       const k = foundKeys[0];
-      shouldUpdate = shallowEqual(nextProps[k], self.props[k]);
+      shouldUpdate = shallowEqual(nextProps[k], this.props[k]);
     }
     if (!shouldUpdate) {
-      shouldUpdate = shallowEqual(nextState, self.state);
+      shouldUpdate = shallowEqual(nextState, this.state);
     }
-    if (!shouldUpdate && self.state.props.dropdowns && nextProps.state.dropdowns) {
-      if (self.state.props.dropdowns.map && nextProps.state.dropdowns.map) {
-        const oldKeys = self.state.props.dropdowns.map(child => child.key);
-        const newKeys = nextProps.state.dropdowns.map(child => child.key);
-        if (!shallowEqual(oldKeys, newKeys)) {
-          shouldUpdate = true;
-        }
+    if (!shouldUpdate && this.state.props.dropdowns && nextProps.state.dropdowns && this.state.props.dropdowns.map && nextProps.state.dropdowns.map) {
+      const oldKeys = this.state.props.dropdowns.map(child => child.key);
+      const newKeys = nextProps.state.dropdowns.map(child => child.key);
+      if (!shallowEqual(oldKeys, newKeys)) {
+        shouldUpdate = true;
       }
     }
     return shouldUpdate;
   }
   render() {
-    const self = this;
-    const {contact} = this.props;
+    let _this$props$chatRoom;
+    const {
+      contact
+    } = this.props;
     if (!contact) {
       return null;
     }
     const pres = megaChat.userPresenceToCssClass(contact.presence);
-    let username = (this.props.namePrefix ? this.props.namePrefix : "") + (M.getNameByHandle(contact.u) || contact.m);
+    let username = (this.props.namePrefix || '') + (M.getNameByHandle(contact.u) || contact.m);
     if (contact.u === u_handle) {
-      username += ` (${  escapeHTML(l[8885])  })`;
+      username += ` (${escapeHTML(l[8885])})`;
     }
     let escapedUsername = react0().createElement(_ui_utils_jsx5__.sp, null, username);
-    const dropdowns = this.props.dropdowns ? this.props.dropdowns : [];
-    const noContextMenu = this.props.noContextMenu ? this.props.noContextMenu : "";
-    const noContextButton = this.props.noContextButton ? this.props.noContextButton : "";
-    const dropdownRemoveButton = self.props.dropdownRemoveButton ? self.props.dropdownRemoveButton : [];
-    const highlightSearchValue = self.props.highlightSearchValue ? self.props.highlightSearchValue : false;
-    const emailTooltips = self.props.emailTooltips ? self.props.emailTooltips : false;
-    const searchValue = self.props.searchValue ? self.props.searchValue : "";
+    const dropdowns = this.props.dropdowns || [];
+    const noContextMenu = this.props.noContextMenu || '';
+    const noContextButton = this.props.noContextButton || '';
+    const dropdownRemoveButton = this.props.dropdownRemoveButton || [];
+    const highlightSearchValue = this.props.highlightSearchValue || false;
+    const emailTooltips = this.props.emailTooltips || false;
+    const searchValue = this.props.searchValue || "";
     let usernameBlock;
     if (!noContextMenu) {
       usernameBlock = react0().createElement(ContactButton, {
@@ -5504,93 +5503,96 @@ class ContactCard extends _mixins1__.u9 {
           escapedUsername = react0().createElement(_ui_utils_jsx5__.P9, null, megaChat.highlight(megaChat.html(username), matches, true));
         }
       }
-      if (emailTooltips) {
-        usernameBlock = react0().createElement("div", {
-          className: "user-card-name light simpletip selectable-txt",
-          "data-simpletip": contact.m,
-          "data-simpletipposition": "top"
-        }, escapedUsername);
-      } else {
-        usernameBlock = react0().createElement("div", {
-          className: "user-card-name light selectable-txt"
-        }, escapedUsername);
-      }
+      usernameBlock = emailTooltips ? react0().createElement("div", {
+        className: "user-card-name light simpletip selectable-txt",
+        "data-simpletip": contact.m,
+        "data-simpletipposition": "top"
+      }, escapedUsername) : react0().createElement("div", {
+        className: "user-card-name light selectable-txt"
+      }, escapedUsername);
     }
     let userCard = null;
-    const className = this.props.className || "";
-    if (className.indexOf("short") >= 0) {
-      userCard = react0().createElement("div", {
-        className: "user-card-data"
-      }, usernameBlock, react0().createElement("div", {
-        className: "user-card-status"
-      }, this.props.isInCall ? react0().createElement("div", {
-        className: "audio-call"
-      }, react0().createElement("i", {
-        className: "sprite-fm-mono icon-phone"
-      })) : null, react0().createElement(LastActivity, {
-        contact,
-        showLastGreen: this.props.showLastGreen
-      })));
-    } else {
-      userCard = react0().createElement("div", {
-        className: "user-card-data"
-      }, usernameBlock, react0().createElement(ContactPresence, {
-        contact,
-        className: this.props.presenceClassName
-      }), this.props.isInCall ? react0().createElement("div", {
-        className: "audio-call"
-      }, react0().createElement("i", {
-        className: "sprite-fm-mono icon-phone"
-      })) : null, react0().createElement("div", {
-        className: "user-card-email selectable-txt"
-      }, contact.m));
-    }
-    let selectionTick = null;
-    if (this.props.selectable) {
-      selectionTick = react0().createElement("div", {
-        className: "user-card-tick-wrap"
-      }, react0().createElement("i", {
-        className: "sprite-fm-mono icon-check"
-      }));
-    }
-    return react0().createElement("div", {
-      className: `contacts-info body ${  pres === "offline" ? "offline" : ""  }${className ? ` ${  className}` : ""}`,
-      onClick: e => {
-        if (self.props.onClick) {
-          self.props.onClick(contact, e);
-        }
-      },
-      onDoubleClick: e => {
-        if (self.props.onDoubleClick) {
-          self.props.onDoubleClick(contact, e);
-        }
-      },
-      style: self.props.style
-    }, react0().createElement(Avatar, {
+    const className = this.props.className || '';
+    userCard = className.includes('short') ? react0().createElement("div", {
+      className: "user-card-data"
+    }, usernameBlock, react0().createElement("div", {
+      className: "user-card-status"
+    }, this.props.isInCall ? react0().createElement("div", {
+      className: "audio-call"
+    }, react0().createElement("i", {
+      className: "sprite-fm-mono icon-phone"
+    })) : null, react0().createElement(LastActivity, {
       contact,
+      showLastGreen: this.props.showLastGreen
+    }))) : react0().createElement("div", {
+      className: "user-card-data"
+    }, usernameBlock, react0().createElement(ContactPresence, {
+      contact,
+      className: this.props.presenceClassName
+    }), this.props.isInCall ? react0().createElement("div", {
+      className: "audio-call"
+    }, react0().createElement("i", {
+      className: "sprite-fm-mono icon-phone"
+    })) : null, react0().createElement("div", {
+      className: "user-card-email selectable-txt"
+    }, contact.m));
+    return react0().createElement("div", {
+      className: `
+                    contacts-info body
+                    ${pres === 'offline' ? 'offline' : ''}
+                    ${className || ''}
+                `,
+      style: this.props.style,
+      onClick: ev => {
+        let _this$props$onClick, _this$props;
+        return (_this$props$onClick = (_this$props = this.props).onClick) == null ? void 0 : _this$props$onClick.call(_this$props, contact, ev);
+      },
+      onDoubleClick: ev => {
+        let _this$props$onDoubleC, _this$props2;
+        return (_this$props$onDoubleC = (_this$props2 = this.props).onDoubleClick) == null ? void 0 : _this$props$onDoubleC.call(_this$props2, contact, ev);
+      }
+    }, this.props.withSelfNote ? react0().createElement("div", {
+      className: `
+                            note-chat-signifier
+                            ${(_this$props$chatRoom = this.props.chatRoom) != null && _this$props$chatRoom.hasMessages() ? '' : 'note-chat-empty'}
+                        `
+    }, react0().createElement("i", {
+      className: "sprite-fm-mono icon-file-text-thin-outline note-chat-icon"
+    })) : react0().createElement(Avatar, {
       className: "avatar-wrapper small-rounded-avatar",
+      contact,
       chatRoom: this.props.chatRoom
     }), is_chatlink || noContextButton ? null : react0().createElement(ContactButton, {
       key: "button",
       dropdowns,
-      dropdownIconClasses: self.props.dropdownIconClasses ? self.props.dropdownIconClasses : "",
-      disabled: self.props.dropdownDisabled,
+      dropdownIconClasses: this.props.dropdownIconClasses || '',
+      disabled: this.props.dropdownDisabled,
       noContextMenu,
       contact,
-      className: self.props.dropdownButtonClasses,
+      className: this.props.dropdownButtonClasses,
       dropdownRemoveButton,
-      noLoading: self.props.noLoading,
-      chatRoom: self.props.chatRoom,
+      noLoading: this.props.noLoading,
+      chatRoom: this.props.chatRoom,
       verticalOffset: 0
-    }), selectionTick, userCard);
+    }), this.props.selectable ? react0().createElement("div", {
+      className: "user-card-tick-wrap"
+    }, react0().createElement("i", {
+      className: "sprite-fm-mono icon-check"
+    })) : null, megaChat.WITH_SELF_NOTE && this.props.withSelfNote ? react0().createElement("div", {
+      className: "user-card-data"
+    }, react0().createElement("div", {
+      className: "user-card-name light selectable-txt note-chat-label"
+    }, l.note_label), react0().createElement("div", {
+      className: "user-card-status"
+    })) : userCard);
   }
 }
 ContactCard.defaultProps = {
-  'dropdownButtonClasses': "tiny-button",
-  'dropdownIconClasses': "tiny-icon icons-sprite grey-dots",
-  'presenceClassName': '',
-  'manualDataChangeTracking': true,
-  'skipQueuedUpdatesOnResize': true
+  dropdownButtonClasses: "tiny-button",
+  dropdownIconClasses: "tiny-icon icons-sprite grey-dots",
+  presenceClassName: '',
+  manualDataChangeTracking: true,
+  skipQueuedUpdatesOnResize: true
 };
 class ContactItem extends _mixins1__.u9 {
   render() {
@@ -5760,7 +5762,11 @@ class ContactPickerWidget extends _mixins1__.w9 {
   }
   _eventuallyAddContact(v, contacts, selectableContacts, forced) {
     const self = this;
-    if (!forced && (v.c !== 1 || v.u === u_handle)) {
+    const withSelfNote = this.props.withSelfNote && v.u === u_handle;
+    if (v.u === u_handle && !this.props.step && !withSelfNote) {
+      return false;
+    }
+    if (!forced && v.c !== 1 && v.u !== u_handle) {
       return false;
     }
     if (self.props.exclude && self.props.exclude.indexOf(v.u) > -1) {
@@ -5785,6 +5791,7 @@ class ContactPickerWidget extends _mixins1__.w9 {
     if (self.state.searchValue && self.state.searchValue.length > 0) {
       const norm = s => ChatSearch._normalize_str(String(s || '').toLowerCase());
       const sv = norm(this.state.searchValue);
+      v.name = withSelfNote ? l.note_label : v.name;
       const skip = !norm(v.name).includes(sv) && !norm(v.nickname).includes(sv) && !norm(v.fullname).includes(sv) && !norm(M.getNameByHandle(v.u)).includes(sv) && (this.props.notSearchInEmails || !norm(v.m).includes(sv));
       if (skip) {
         return false;
@@ -5795,9 +5802,10 @@ class ContactPickerWidget extends _mixins1__.w9 {
       selectedClass = "selected";
     }
     contacts.push(react0().createElement(ContactCard, {
+      withSelfNote,
       disabled: isDisabled,
       contact: v,
-      chatRoom: false,
+      chatRoom: withSelfNote && megaChat.getNoteChat(),
       className: `contacts-search short ${  selectedClass  }${isDisabled ? " disabled" : ""}`,
       noContextButton: "true",
       selectable: selectableContacts,
@@ -5867,6 +5875,7 @@ class ContactPickerWidget extends _mixins1__.w9 {
     let selectFooter = null;
     let selectedContacts = false;
     const isSearching = !!self.state.searchValue;
+    megaChat.getNoteChat();
     const onAddContact = e => {
       e.preventDefault();
       e.stopPropagation();
@@ -6019,7 +6028,7 @@ class ContactPickerWidget extends _mixins1__.w9 {
     });
     const sortFn = M.getSortByNameFn2(1);
     contacts.sort((a, b) => {
-      return sortFn(a.props.contact, b.props.contact);
+      return b.props.withSelfNote - a.props.withSelfNote || sortFn(a.props.contact, b.props.contact);
     });
     if (Object.keys(alreadyAdded).length === 0) {
       hideFrequents = true;
@@ -6029,7 +6038,7 @@ class ContactPickerWidget extends _mixins1__.w9 {
       self._eventuallyAddContact(M.u[u_handle], contacts, selectableContacts, true);
     }
     let noOtherContacts = false;
-    if (contacts.length === 0) {
+    if (contacts.length === 0 || !_contactsPanel_contactsPanel_jsx9__.A.hasContacts() && this.props.step !== 1) {
       noOtherContacts = true;
       let noContactsMsg = "";
       if (M.u.length < 2) {
@@ -6098,7 +6107,7 @@ class ContactPickerWidget extends _mixins1__.w9 {
         }, frequentContacts.length === 0 ? this.props.readOnly ? l[16217] : l[165] : l[165]), react0().createElement("div", {
           className: "contacts-search-list",
           style: innerDivStyles
-        }, contacts)) : undefined));
+        }, contacts)) : null));
       }
     } else if (self.props.newNoContact) {
       multipleContacts = "";
@@ -6123,17 +6132,15 @@ class ContactPickerWidget extends _mixins1__.w9 {
         className: "fm-empty-description small"
       }, l[19115]), react0().createElement("button", {
         className: "mega-button positive large fm-empty-button",
-        onClick () {
+        onClick: () => {
           contactAddDialog();
-          if (self.props.onClose) {
-            self.props.onClose();
-          }
+          self.props.onClose == null || self.props.onClose();
         }
       }, react0().createElement("span", null, l[101])), react0().createElement("div", {
         className: `
-                        ${this.state.publicLink ? '' : 'loading'}
-                        empty-share-public
-                    `
+                            ${this.state.publicLink ? '' : 'loading'}
+                            empty-share-public
+                        `
       }, react0().createElement("i", {
         className: "sprite-fm-mono icon-link-circle"
       }), react0().createElement(_ui_utils_jsx5__.P9, null, l[19111])));
@@ -6156,7 +6163,7 @@ class ContactPickerWidget extends _mixins1__.w9 {
         className,
         title,
         onClick
-      } = button;
+      } = button || {};
       return react0().createElement("div", {
         key,
         className: "button-wrapper",
@@ -6169,13 +6176,10 @@ class ContactPickerWidget extends _mixins1__.w9 {
                                             ${className || ''}
                                             ${key === 'newChatLink' ? 'branded-blue' : ''}
                                             mega-button
-                                            round
-                                            positive
                                         `,
-        icon
-      }), react0().createElement("span", {
-        className: "button-title"
-      }, title));
+        icon,
+        label: title
+      }));
     })), multipleContacts, !this.props.readOnly && haveContacts && !this.props.hideSearch && react0().createElement(react0().Fragment, null, react0().createElement("div", {
       className: `
                                 contacts-search-header
@@ -6209,19 +6213,19 @@ class ContactPickerWidget extends _mixins1__.w9 {
       className: "sprite-fm-mono icon-close-component"
     })))), this.props.inviteWarningLabel && this.props.chatRoom && this.renderInviteWarning(), !this.props.readOnly && haveContacts && !this.props.hideSearch && react0().createElement("div", {
       className: "contacts-search-header-separator"
-    }), this.props.participantsList ? this.renderParticipantsList() : contactsList, selectFooter, _contactsPanel_contactsPanel_jsx9__.A.hasContacts() && this.props.showAddContact && react0().createElement("div", {
+    }), this.props.participantsList ? this.renderParticipantsList() : contactsList, selectFooter, this.props.showAddContact && _contactsPanel_contactsPanel_jsx9__.A.hasContacts() ? react0().createElement("div", {
       className: "contacts-search-bottom"
     }, react0().createElement(_ui_buttons_jsx3__.$, {
       className: "mega-button action positive",
       icon: "sprite-fm-mono icon-add-circle",
       label: l[71],
       onClick: () => {
-        let _this$props$onAddCont, _this$props;
+        let _this$props$onAddCont, _this$props3;
         contactAddDialog();
         closeDropdowns();
-        (_this$props$onAddCont = (_this$props = this.props).onAddContact) == null || _this$props$onAddCont.call(_this$props);
+        (_this$props$onAddCont = (_this$props3 = this.props).onAddContact) == null || _this$props$onAddCont.call(_this$props3);
       }
-    })));
+    })) : null);
   }
 }
 ContactPickerWidget.defaultProps = {
@@ -8087,7 +8091,7 @@ class MeetingsManager {
     const {
       chatRoom
     } = scheduledMeeting;
-    tSleep(2).then(() => chatRoom.hasUserMessages() ? null : chatRoom.archive());
+    tSleep(2).then(() => chatRoom.hasMessages(true) ? null : chatRoom.archive());
   }
   filterUpcomingMeetings(conversations) {
     const upcomingMeetings = Object.values(conversations || {}).filter(c => {
@@ -8637,6 +8641,7 @@ function Chat() {
   this.lastOpenedChat = null;
   this.archivedChatsCount = 0;
   this.FORCE_EMAIL_LOADING = localStorage.fel;
+  this.WITH_SELF_NOTE = mega.flags.ff_n2s || localStorage.withSelfNote;
   this._imageLoadCache = Object.create(null);
   this._imagesToBeLoaded = Object.create(null);
   this._imageAttributeCache = Object.create(null);
@@ -9365,11 +9370,7 @@ Chat.prototype.openChat = function (userHandles, type, chatId, chatShard, chatdU
   const $promise = new MegaPromise();
   if (type === "private") {
     this.initContacts(userHandles, 2);
-    roomId = array.one(userHandles, u_handle);
-    if (!roomId) {
-      $promise.reject();
-      return $promise;
-    }
+    roomId = userHandles.length > 1 ? array.one(userHandles, u_handle) : u_handle;
     if (self.chats[roomId]) {
       $promise.resolve(roomId, self.chats[roomId]);
       return [roomId, self.chats[roomId], $promise];
@@ -9486,8 +9487,9 @@ Chat.prototype.smartOpenChat = function (...args) {
       } = aRoom;
       createTimeoutPromise(verify, 300, 3e4, false, `waitForReadyState(${roomId})`).then(ready).catch(reject);
     };
-    if (args[0].length === 2 && args[1] === 'private') {
-      const chatRoom = self.chats[array.one(args[0], u_handle)];
+    const [members, type] = args;
+    if (members.length === 2 && type === 'private') {
+      const chatRoom = self.chats[members.every(h => h === members[0]) ? u_handle : array.one(members, u_handle)];
       if (chatRoom) {
         if (args[5]) {
           chatRoom.show();
@@ -9652,7 +9654,7 @@ Chat.prototype.renderListing = async function megaChatRenderListing(location, is
   M.onSectionUIOpen('conversations');
   let room;
   if (!location && this.chats.length) {
-    const valid = room => room && room._leaving !== true && room.isDisplayable() && room;
+    const valid = room => room && room._leaving !== true && !room.isNote && room.isDisplayable() && room;
     room = valid(this.chats[this.lastOpenedChat]);
     if (!room) {
       let idx = 0;
@@ -9989,9 +9991,9 @@ Chat.prototype.createAndShowPrivateRoom = promisify(function (resolve, reject, h
     resolve(room);
   }).catch(reject);
 });
-Chat.prototype.createAndShowGroupRoomFor = function (contactHashes, topic, opts = {}) {
+Chat.prototype.createAndShowGroupRoomFor = function (contactHashes, topic = '', opts = {}) {
   this.trigger('onNewGroupChatRequest', [contactHashes, {
-    'topic': topic || "",
+    topic,
     ...opts
   }]);
 };
@@ -10173,6 +10175,9 @@ Chat.prototype.getChatById = function (chatdId) {
     }
   });
   return found;
+};
+Chat.prototype.getNoteChat = function () {
+  return Object.values(this.chats).find(c => c.isNote);
 };
 Chat.prototype.getMessageByMessageId = async function (chatId, messageId) {
   const chatRoom = this.getChatById(chatId);
@@ -17246,7 +17251,7 @@ class Occurrences extends mixins.w9 {
     if (nextOccurrences.length > 1) {
       return msgDialog(`confirmation:!^${l.cancel_meeting_occurrence_button}!${l.schedule_cancel_abort}`, 'cancel-occurrence', l.schedule_cancel_occur_dlg_title, l.schedule_cancel_occur_dlg_text, cb => cb && occurrence.cancel(), 1);
     }
-    return chatRoom.hasUserMessages() ? msgDialog(`confirmation:!^${l.cancel_meeting_button}!${l.schedule_cancel_abort}`, 'cancel-occurrence', l.schedule_cancel_all_dialog_title, l.schedule_cancel_all_dialog_move, cb => cb && megaChat.plugins.meetingsManager.cancelMeeting(scheduledMeeting, scheduledMeeting.chatId), 1) : msgDialog(`confirmation:!^${l.cancel_meeting_button}!${l.schedule_cancel_abort}`, 'cancel-occurrence', l.schedule_cancel_all_dialog_title, l.schedule_cancel_all_dialog_archive, cb => cb && megaChat.plugins.meetingsManager.cancelMeeting(scheduledMeeting, scheduledMeeting.chatId), 1);
+    return chatRoom.hasMessages(true) ? msgDialog(`confirmation:!^${l.cancel_meeting_button}!${l.schedule_cancel_abort}`, 'cancel-occurrence', l.schedule_cancel_all_dialog_title, l.schedule_cancel_all_dialog_move, cb => cb && megaChat.plugins.meetingsManager.cancelMeeting(scheduledMeeting, scheduledMeeting.chatId), 1) : msgDialog(`confirmation:!^${l.cancel_meeting_button}!${l.schedule_cancel_abort}`, 'cancel-occurrence', l.schedule_cancel_all_dialog_title, l.schedule_cancel_all_dialog_archive, cb => cb && megaChat.plugins.meetingsManager.cancelMeeting(scheduledMeeting, scheduledMeeting.chatId), 1);
   }
   renderLoading() {
     return REaCt().createElement("div", {
@@ -17422,9 +17427,9 @@ class ConversationRightArea extends mixins.w9 {
           }
         };
         if (isRecurring) {
-          return chatRoom.hasUserMessages() ? msgDialog(`confirmation:!^${l.cancel_meeting_button}!${l.schedule_cancel_abort}`, null, l.schedule_cancel_dialog_title.replace('%s', megaChat.html(title)), l.schedule_cancel_dialog_move_recurring, doConfirm, 1) : msgDialog(`confirmation:!^${l.schedule_cancel_dialog_confirm}!${l.schedule_cancel_abort}`, null, l.schedule_cancel_dialog_title.replace('%s', megaChat.html(title)), l.schedule_cancel_dialog_archive_recurring, doConfirm, 1);
+          return chatRoom.hasMessages(true) ? msgDialog(`confirmation:!^${l.cancel_meeting_button}!${l.schedule_cancel_abort}`, null, l.schedule_cancel_dialog_title.replace('%s', megaChat.html(title)), l.schedule_cancel_dialog_move_recurring, doConfirm, 1) : msgDialog(`confirmation:!^${l.schedule_cancel_dialog_confirm}!${l.schedule_cancel_abort}`, null, l.schedule_cancel_dialog_title.replace('%s', megaChat.html(title)), l.schedule_cancel_dialog_archive_recurring, doConfirm, 1);
         }
-        return chatRoom.hasUserMessages() ? msgDialog(`confirmation:!^${l.cancel_meeting_button}!${l.schedule_cancel_abort}`, null, l.schedule_cancel_dialog_title.replace('%s', megaChat.html(title)), l.schedule_cancel_dialog_move_single, doConfirm, 1) : msgDialog(`confirmation:!^${l.schedule_cancel_dialog_confirm}!${l.schedule_cancel_abort}`, null, l.schedule_cancel_dialog_title.replace('%s', megaChat.html(title)), l.schedule_cancel_dialog_archive_single, doConfirm, 1);
+        return chatRoom.hasMessages(true) ? msgDialog(`confirmation:!^${l.cancel_meeting_button}!${l.schedule_cancel_abort}`, null, l.schedule_cancel_dialog_title.replace('%s', megaChat.html(title)), l.schedule_cancel_dialog_move_single, doConfirm, 1) : msgDialog(`confirmation:!^${l.schedule_cancel_dialog_confirm}!${l.schedule_cancel_abort}`, null, l.schedule_cancel_dialog_title.replace('%s', megaChat.html(title)), l.schedule_cancel_dialog_archive_single, doConfirm, 1);
       }
     };
   }
@@ -17751,9 +17756,7 @@ class ConversationRightArea extends mixins.w9 {
       isVisible: room.isCurrentlyActive,
       chatRoom: room
     }, REaCt().createElement("div", {
-      className: `
-                            chat-right-pad
-                        `
+      className: "chat-right-pad"
     }, REaCt().createElement(Accordion, (0,esm_extends.A)({}, this.state, {
       chatRoom: room,
       onToggle: SoonFc(20, () => {
@@ -17801,14 +17804,15 @@ class ConversationRightArea extends mixins.w9 {
       title: l[7537],
       chatRoom: room,
       sfuClient: window.sfuClient
-    }, REaCt().createElement(REaCt().Fragment, null, addParticipantBtn, startAudioCallButton, startVideoCallButton, REaCt().createElement(EndCallButton, {
+    }, REaCt().createElement(REaCt().Fragment, null, room.isNote ? null : REaCt().createElement(REaCt().Fragment, null, addParticipantBtn, startAudioCallButton, startVideoCallButton, REaCt().createElement(EndCallButton, {
       call: room.havePendingGroupCall() || room.haveActiveCall(),
       chatRoom: room
     }), scheduledMeeting && REaCt().createElement("div", {
       className: `
-                                            link-button light schedule-view-desc
-                                            ${room.isReadOnly() || !scheduledMeeting.description ? 'disabled' : ''}
-                                        `,
+                                                        link-button light
+                                                        schedule-view-desc
+                                                        ${room.isReadOnly() || !scheduledMeeting.description ? 'disabled' : ''}
+                                                    `,
       onClick: () => {
         if (!room.isReadOnly() && scheduledMeeting.description) {
           onShowScheduledDescription();
@@ -17830,16 +17834,11 @@ class ConversationRightArea extends mixins.w9 {
       className: "sprite-fm-mono icon-rename"
     }), REaCt().createElement("span", null, room.isMeeting ? l.rename_meeting : l[9080])) : null, scheduledMeeting ? REaCt().createElement("div", {
       className: `
-                                                link-button
-                                                light
-                                                ${room.iAmOperator() ? '' : 'disabled'}
-                                            `,
-      onClick: () => {
-        const {
-          plugins
-        } = megaChat;
-        return room.iAmOperator() ? megaChat.trigger(plugins.meetingsManager.EVENTS.EDIT, room) : null;
-      }
+                                                        link-button
+                                                        light
+                                                        ${room.iAmOperator() ? '' : 'disabled'}
+                                                    `,
+      onClick: () => room.iAmOperator() ? megaChat.trigger(megaChat.plugins.meetingsManager.EVENTS.EDIT, room) : null
     }, REaCt().createElement("i", {
       className: "sprite-fm-mono icon-rename"
     }), scheduledMeeting.isRecurring ? REaCt().createElement("span", null, l.edit_meeting_series_button) : REaCt().createElement("span", null, l.edit_meeting_button)) : null, room.type === 'public' && !room.isMeeting ? REaCt().createElement("div", {
@@ -17854,10 +17853,10 @@ class ConversationRightArea extends mixins.w9 {
       className: "sprite-fm-mono icon-link-filled"
     }), REaCt().createElement("span", null, l[20481])) : null, scheduledMeeting ? REaCt().createElement("div", {
       className: `
-                                                link-button
-                                                light
-                                                ${room.iAmOperator() && !scheduledMeeting.canceled ? '' : 'disabled'}
-                                            `,
+                                                        link-button
+                                                        light
+                                                        ${room.iAmOperator() && !scheduledMeeting.canceled ? '' : 'disabled'}
+                                                    `,
       onClick: () => {
         if (room.iAmOperator() && !scheduledMeeting.canceled) {
           this.handleCancelMeeting();
@@ -17903,7 +17902,7 @@ class ConversationRightArea extends mixins.w9 {
       onClick: () => {
         this.props.onAttachFromComputerClicked();
       }
-    })))), this.renderPushSettingsButton(), room.type === 'private' ? null : REaCt().createElement(REaCt().Fragment, null, room.scheduledMeeting && this.OptionsButton(waitingRoomButton), this.OptionsButton(openInviteButton), this.renderOptionsBanner(), AVseperator), REaCt().createElement(buttons.$, {
+    })))), this.renderPushSettingsButton()), room.type === 'private' ? null : REaCt().createElement(REaCt().Fragment, null, room.scheduledMeeting && this.OptionsButton(waitingRoomButton), this.OptionsButton(openInviteButton), this.renderOptionsBanner(), AVseperator), REaCt().createElement(buttons.$, {
       className: "link-button light export-chat-button",
       disabled: ((_room$messagesBuff4 = room.messagesBuff) == null ? void 0 : _room$messagesBuff4.messages.length) === 0 || room.exportIo,
       onClick: () => {
@@ -17923,7 +17922,7 @@ class ConversationRightArea extends mixins.w9 {
       className: "sprite-fm-mono icon-remove"
     }), REaCt().createElement("span", {
       className: "accordion-clear-history-text"
-    }, room.isMeeting ? l.meeting_clear_hist : l[8871])), retentionHistoryBtn, room.iAmOperator() && room.type === 'public' && !scheduledMeeting ? REaCt().createElement("div", {
+    }, room.isMeeting ? l.meeting_clear_hist : l[8871])), room.isNote ? null : retentionHistoryBtn, room.iAmOperator() && room.type === 'public' && !scheduledMeeting ? REaCt().createElement("div", {
       className: "chat-enable-key-rotation-paragraph"
     }, AVseperator, REaCt().createElement("div", {
       className: `
@@ -17971,7 +17970,7 @@ class ConversationRightArea extends mixins.w9 {
       title: l[19796] || 'Shared Files',
       chatRoom: room,
       sharedFiles: (_room$messagesBuff5 = room.messagesBuff) == null ? void 0 : _room$messagesBuff5.sharedFiles
-    }), room.type === "private" ? REaCt().createElement(IncSharesAccordionPanel, {
+    }), room.type === 'private' && !room.isNote ? REaCt().createElement(IncSharesAccordionPanel, {
       key: "incomingShares",
       title: l[5542],
       chatRoom: room
@@ -18452,10 +18451,6 @@ const ConversationPanel = (conversationpanel_dec = utils.Ay.SoonFcWrap(360), _de
     const contacts = room.getParticipantsExceptMe();
     let contactHandle;
     let contact;
-    let topicBlockClass = "chat-topic-block";
-    if (room.type !== "public") {
-      topicBlockClass += " privateChat";
-    }
     let nonLoggedInJoinChatDialog = null;
     if (self.state.nonLoggedInJoinChatDialog === true) {
       const usersCount = Object.keys(room.members).length;
@@ -18729,14 +18724,22 @@ const ConversationPanel = (conversationpanel_dec = utils.Ay.SoonFcWrap(360), _de
       }))));
     } else {
       contactHandle = contacts[0];
-      contact = M.u[contactHandle];
-      topicInfo = REaCt().createElement(ui_contacts.ContactCard, {
+      contact = M.u[contactHandle || u_handle];
+      topicInfo = megaChat.WITH_SELF_NOTE && room.isNote ? REaCt().createElement("div", {
+        className: "note-chat-topic"
+      }, REaCt().createElement("div", {
+        className: "note-chat-signifier"
+      }, REaCt().createElement("i", {
+        className: "sprite-fm-mono icon-file-text-thin-outline note-chat-icon"
+      })), REaCt().createElement("span", {
+        className: "note-chat-label"
+      }, l.note_label)) : REaCt().createElement(ui_contacts.ContactCard, {
+        key: contact.u,
         className: "short",
         chatRoom: room,
-        noContextButton: "true",
         contact,
-        showLastGreen: true,
-        key: contact.u
+        noContextButton: true,
+        showLastGreen: true
       });
     }
     let historyRetentionDialog = null;
@@ -18882,8 +18885,11 @@ const ConversationPanel = (conversationpanel_dec = utils.Ay.SoonFcWrap(360), _de
         }
       }
     }), REaCt().createElement("div", {
-      className: `chat-content-block ${  !room.megaChat.chatUIFlags.convPanelCollapse ? "with-pane" : "no-pane"}`
-    }, !room.megaChat.chatUIFlags.convPanelCollapse ? REaCt().createElement(ConversationRightArea, {
+      className: `
+                        chat-content-block
+                        ${room.megaChat.chatUIFlags.convPanelCollapse ? 'no-pane' : 'with-pane'}
+                    `
+    }, room.megaChat.chatUIFlags.convPanelCollapse ? null : REaCt().createElement(ConversationRightArea, {
       isVisible: this.props.chatRoom.isCurrentlyActive,
       chatRoom: this.props.chatRoom,
       roomFlags: this.props.chatRoom.flags,
@@ -18892,61 +18898,45 @@ const ConversationPanel = (conversationpanel_dec = utils.Ay.SoonFcWrap(360), _de
       pushSettingsValue: pushNotificationSettings.getDnd(this.props.chatRoom.chatId),
       occurrencesLoading: this.state.occurrencesLoading,
       onStartCall: mode => (0,call.dQ)(room.haveActiveCall(), room).then(() => this.startCall(mode)).catch(() => d && console.warn('Already in a call.')),
-      onAttachFromComputerClicked () {
-        self.props.chatRoom.uploadFromComputer();
-      },
-      onTruncateClicked () {
-        self.setState({
-          'truncateDialog': true
-        });
-      },
+      onAttachFromComputerClicked: () => this.props.chatRoom.uploadFromComputer(),
+      onTruncateClicked: () => this.setState({
+        truncateDialog: true
+      }),
       onArchiveClicked: () => this.setState({
         archiveDialog: true
       }),
       onUnarchiveClicked: () => this.setState({
         unarchiveDialog: true
       }),
-      onRenameClicked () {
-        self.setState({
-          'renameDialog': true,
-          'renameDialogValue': self.props.chatRoom.getRoomTitle()
+      onRenameClicked: () => {
+        this.setState({
+          renameDialog: true,
+          renameDialogValue: this.props.chatRoom.getRoomTitle()
         });
       },
-      onGetManageChatLinkClicked () {
-        self.setState({
-          'chatLinkDialog': true
-        });
-      },
-      onMakePrivateClicked () {
-        self.setState({
-          'privateChatDialog': true
-        });
-      },
-      onCloseClicked () {
-        room.destroy();
-      },
-      onJoinViaPublicLinkClicked () {
-        room.joinViaPublicHandle();
-      },
-      onSwitchOffPublicMode (topic) {
-        room.switchOffPublicMode(topic);
-      },
+      onGetManageChatLinkClicked: () => this.setState({
+        chatLinkDialog: true
+      }),
+      onMakePrivateClicked: () => this.setState({
+        privateChatDialog: true
+      }),
+      onCloseClicked: () => room.destroy(),
+      onJoinViaPublicLinkClicked: () => room.joinViaPublicHandle(),
+      onSwitchOffPublicMode: topic => room.switchOffPublicMode(topic),
       onAttachFromCloudClicked: () => this.setState({
         attachCloudDialog: true
       }),
       onPushSettingsClicked: () => M.safeShowDialog('push-settings-dialog', () => this.setState({
         pushSettingsDialog: true
       })),
-      onPushSettingsToggled () {
-        return room.dnd || room.dnd === 0 ? self.setState({
+      onPushSettingsToggled: () => {
+        return room.dnd || room.dnd === 0 ? this.setState({
           pushSettingsValue: null
         }, () => pushNotificationSettings.disableDnd(room.chatId)) : pushNotificationSettings.setDnd(room.chatId, 0);
       },
-      onHistoryRetentionConfig () {
-        self.setState({
-          showHistoryRetentionDialog: true
-        });
-      },
+      onHistoryRetentionConfig: () => this.setState({
+        showHistoryRetentionDialog: true
+      }),
       onAddParticipantSelected: contactHashes => {
         room.scrolledToBottom = true;
         if (room.type === 'group' || room.type === 'public') {
@@ -18965,7 +18955,7 @@ const ConversationPanel = (conversationpanel_dec = utils.Ay.SoonFcWrap(360), _de
       onShowScheduledDescription: room.scheduledMeeting ? () => this.setState({
         descriptionDialog: true
       }) : null
-    }) : null, this.state.attachCloudDialog && REaCt().createElement(this.CloudBrowserDialog, null), this.state.sendContactDialog && REaCt().createElement(this.SelectContactDialog, null), this.state.descriptionDialog && REaCt().createElement(this.DescriptionDialog, null), this.state.pushSettingsDialog && REaCt().createElement(this.PushSettingsDialog, null), privateChatDialog, nonLoggedInJoinChatDialog, confirmDeleteDialog, historyRetentionDialog, null, this.state.renameDialog && REaCt().createElement(this.RenameDialog, null), this.state.chatLinkDialog && REaCt().createElement(ChatlinkDialog, {
+    }), this.state.attachCloudDialog && REaCt().createElement(this.CloudBrowserDialog, null), this.state.sendContactDialog && REaCt().createElement(this.SelectContactDialog, null), this.state.descriptionDialog && REaCt().createElement(this.DescriptionDialog, null), this.state.pushSettingsDialog && REaCt().createElement(this.PushSettingsDialog, null), privateChatDialog, nonLoggedInJoinChatDialog, confirmDeleteDialog, historyRetentionDialog, null, this.state.renameDialog && REaCt().createElement(this.RenameDialog, null), this.state.chatLinkDialog && REaCt().createElement(ChatlinkDialog, {
       chatRoom: this.props.chatRoom,
       onClose: () => this.setState({
         chatLinkDialog: false
@@ -18981,7 +18971,7 @@ const ConversationPanel = (conversationpanel_dec = utils.Ay.SoonFcWrap(360), _de
     }), l[8882])), REaCt().createElement("div", {
       className: `
                             chat-topic-block
-                            ${topicBlockClass}
+                            ${room.isNote ? 'is-note' : ''}
                         `
     }, REaCt().createElement("div", {
       className: "chat-topic-buttons"
@@ -18996,15 +18986,15 @@ const ConversationPanel = (conversationpanel_dec = utils.Ay.SoonFcWrap(360), _de
       disableCheckingVisibility: true,
       icon: "sprite-fm-mono icon-info-filled",
       onClick: () => room.megaChat.toggleUIFlag('convPanelCollapse')
-    }), REaCt().createElement("div", {
+    }), room.isNote ? null : REaCt().createElement(REaCt().Fragment, null, REaCt().createElement("div", {
       "data-simpletip": l.unsupported_browser_video,
       "data-simpletipposition": "top",
       "data-simpletipoffset": "5",
       className: `
-                                    ${!megaChat.hasSupportForCalls ? 'simpletip' : ''}
-                                    right
-                                    ${startCallDisabled ? 'disabled' : ''}
-                                `
+                                            ${!megaChat.hasSupportForCalls ? 'simpletip' : ''}
+                                            right
+                                            ${startCallDisabled ? 'disabled' : ''}
+                                        `
     }, REaCt().createElement(buttons.$, {
       icon: "sprite-fm-mono icon-video-call-filled",
       onClick: () => startCallDisabled ? false : (0,call.dQ)(room.haveActiveCall(), room).then(() => this.startCall(call.ZE.VIDEO)).catch(() => d && console.warn('Already in a call.')).then(() => room.isMeeting ? eventlog(500289) : eventlog(500290))
@@ -19013,14 +19003,14 @@ const ConversationPanel = (conversationpanel_dec = utils.Ay.SoonFcWrap(360), _de
       "data-simpletipposition": "top",
       "data-simpletipoffset": "5",
       className: `
-                                    ${!megaChat.hasSupportForCalls ? 'simpletip' : ''}
-                                    right
-                                    ${startCallDisabled ? 'disabled' : ''}
-                                `
+                                            ${!megaChat.hasSupportForCalls ? 'simpletip' : ''}
+                                            right
+                                            ${startCallDisabled ? 'disabled' : ''}
+                                        `
     }, REaCt().createElement(buttons.$, {
       icon: "sprite-fm-mono icon-phone",
       onClick: () => startCallDisabled ? false : (0,call.dQ)(room.haveActiveCall(), room).then(() => this.startCall(call.ZE.AUDIO)).catch(() => d && console.warn('Already in a call.')).then(() => room.isMeeting ? eventlog(500291) : eventlog(500292))
-    }))), topicInfo), REaCt().createElement("div", {
+    })))), topicInfo), REaCt().createElement("div", {
       ref: this.messagesBlockRef,
       className: `
                             messages-block
@@ -21725,6 +21715,7 @@ const ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, c
   this.activeCallIds = new MegaDataMap(this);
   this.ringingCalls = new MegaDataMap(this);
   this.isMeeting = isMeeting;
+  this.isNote = type === 'private' && roomId === u_handle;
   this.callUserLimited = false;
   this.members = Object.create(null);
   Object.defineProperty(this.members, 'hasOwnProperty', {
@@ -22329,6 +22320,9 @@ ChatRoom.prototype.getParticipantsTruncated = function (maxMembers = 5, maxLengt
 };
 ChatRoom.prototype.getRoomTitle = function () {
   const formattedDate = l[19077].replace('%s1', new Date(this.ctime * 1000).toLocaleString());
+  if (this.isNote) {
+    return l.note_label;
+  }
   if (this.type === 'private') {
     const participants = this.getParticipantsExceptMe();
     return participants && Array.isArray(participants) ? M.getNameByHandle(participants[0]) : formattedDate;
@@ -22567,7 +22561,7 @@ ChatRoom.prototype.getRoomUrl = function (getRawLink) {
   const self = this;
   if (self.type === "private") {
     const participants = self.getParticipantsExceptMe();
-    const contact = M.u[participants[0]];
+    const contact = M.u[participants[0] || u_handle];
     if (contact) {
       return `fm/chat/p/${  contact.u}`;
     }
@@ -22719,15 +22713,14 @@ ChatRoom.prototype._attachNodes = mutex('chatroom-attach-nodes', function _(reso
   let link = Object.create(null);
   let nmap = Object.create(null);
   const members = self.getParticipantsExceptMe();
-  const attach = nodes => {
-    console.assert(self.type === 'public' || users.length, 'No users to send to?!');
-    return this._sendNodes(nodes, users).then(res => {
-      for (let i = res.length; i--;) {
-        const n = nmap[res[i]] || M.getNodeByHandle(res[i]);
-        console.assert(n.h, `Node not found... ${res[i]}`);
+  const sendMessage = nodes => {
+    return new Promise(resolve => {
+      for (let i = nodes.length; i--;) {
+        const n = nmap[nodes[i]] || M.getNodeByHandle(nodes[i]);
+        console.assert(n.h, `Node not found... ${nodes[i]}`);
         if (n.h) {
           const name = names && (names[n.hash] || names[n.h]) || n.name;
-          self.sendMessage(Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT + Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT + JSON.stringify([{
+          this.sendMessage(Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT + Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT + JSON.stringify([{
             h: n.h,
             k: n.k,
             t: n.t,
@@ -22740,7 +22733,12 @@ ChatRoom.prototype._attachNodes = mutex('chatroom-attach-nodes', function _(reso
           }]));
         }
       }
+      resolve();
     });
+  };
+  const attach = nodes => {
+    console.assert(this.type === 'public' || users.length || this.isNote, 'No users to send to?!');
+    return this.isNote ? sendMessage(nodes) : this._sendNodes(nodes, users).then(res => sendMessage(res));
   };
   const done = function () {
     if (--step < 1) {
@@ -22906,11 +22904,8 @@ ChatRoom.prototype.getMessageById = function (messageId) {
   }
   return false;
 };
-ChatRoom.prototype.hasUserMessages = function () {
-  const {
-    messages
-  } = this.messagesBuff;
-  return !!messages.length && messages.some(m => m.messageHtml);
+ChatRoom.prototype.hasMessages = function (userMessagesOnly = false) {
+  return this.messagesBuff.messages.some(m => !userMessagesOnly || m.messageHtml);
 };
 ChatRoom.prototype.renderContactTree = function () {
   const self = this;
@@ -27616,6 +27611,57 @@ const HistoryPanel = (_dec = (0,mixins.hG)(450, true), _class = class HistoryPan
       editing: false,
       toast: false
     };
+    this.renderNotice = label => REaCt().createElement("div", {
+      className: "dropdown body dropdown-arrow down-arrow tooltip not-sent-notification-cancel hidden"
+    }, REaCt().createElement("i", {
+      className: "dropdown-white-arrow"
+    }), REaCt().createElement("div", {
+      className: "dropdown notification-text"
+    }, REaCt().createElement("i", {
+      className: "small-icon conversations"
+    }), label));
+    this.renderLoadingSpinner = () => REaCt().createElement("div", {
+      style: {
+        top: '50%'
+      },
+      className: `
+                loading-spinner
+                js-messages-loading
+                light
+                manual-management
+                ${this.loadingShown ? '' : 'hidden'}
+            `
+    }, REaCt().createElement("div", {
+      className: "main-loader",
+      style: {
+        position: 'fixed',
+        top: '50%',
+        left: '50%'
+      }
+    }));
+    this.renderNavigationToast = () => {
+      const {
+        chatRoom
+      } = this.props;
+      const unreadCount = chatRoom.messagesBuff.getUnreadCount();
+      return REaCt().createElement("div", {
+        className: `
+                    theme-dark-forced
+                    messages-toast
+                    ${this.state.toast ? 'active' : ''}
+                `,
+        onClick: () => {
+          this.setState({
+            toast: false
+          }, () => {
+            this.messagesListScrollable.scrollToBottom();
+            chatRoom.scrolledToBottom = true;
+          });
+        }
+      }, REaCt().createElement("i", {
+        className: "sprite-fm-mono icon-down"
+      }), unreadCount > 0 && REaCt().createElement("span", null, unreadCount > 9 ? '9+' : unreadCount));
+    };
     this.onKeyboardScroll = ({
       keyCode
     }) => {
@@ -27694,28 +27740,6 @@ const HistoryPanel = (_dec = (0,mixins.hG)(450, true), _class = class HistoryPan
       return this.isMounted() && this.setState({
         toast: !chatRoom.scrolledToBottom && !((_this$messagesListScr = this.messagesListScrollable) != null && _this$messagesListScr.isCloseToBottom != null && _this$messagesListScr.isCloseToBottom(30))
       }, () => this.state.toast ? null : chatRoom.trigger('onChatIsFocused'));
-    };
-    this.renderToast = () => {
-      const {
-        chatRoom
-      } = this.props;
-      const unreadCount = chatRoom.messagesBuff.getUnreadCount();
-      return REaCt().createElement("div", {
-        className: `
-                    theme-dark-forced
-                    messages-toast
-                    ${this.state.toast ? 'active' : ''}
-                `,
-        onClick: () => this.isMounted() && this.setState({
-          toast: false
-        }, () => {
-          let _this$messagesListScr2;
-          (_this$messagesListScr2 = this.messagesListScrollable) == null || _this$messagesListScr2.scrollToBottom();
-          chatRoom.scrolledToBottom = true;
-        })
-      }, REaCt().createElement("i", {
-        className: "sprite-fm-mono icon-down"
-      }), unreadCount > 0 && REaCt().createElement("span", null, unreadCount > 9 ? '9+' : unreadCount));
     };
     this.handleWindowResize = this._handleWindowResize.bind(this);
   }
@@ -27961,7 +27985,7 @@ const HistoryPanel = (_dec = (0,mixins.hG)(450, true), _class = class HistoryPan
     } else if (contacts && contacts.length > 1) {
       contactName = room.getRoomTitle();
     }
-    const messagesList = [];
+    let messagesList = [];
     if (this.isLoading()) {
       self.loadingShown = true;
     } else {
@@ -27972,23 +27996,40 @@ const HistoryPanel = (_dec = (0,mixins.hG)(450, true), _class = class HistoryPan
       }
       delete self.loadingShown;
       if (room.historyTimedOut || mb.joined === true && !self.scrollPullHistoryRetrieval && mb.haveMoreHistory() === false) {
-        let headerText = l[8002];
-        headerText = contactName ? headerText.replace('%s', `<span>${megaChat.html(contactName)}</span>`) : megaChat.html(room.getRoomTitle());
-        messagesList.push(REaCt().createElement("div", {
-          className: "messages notification",
-          key: "initialMsg"
-        }, REaCt().createElement("div", {
-          className: "header"
+        const $$WELCOME_MESSAGE = ({
+          heading,
+          title,
+          info,
+          className
+        }) => REaCt().createElement("div", {
+          className: `
+                            messages
+                            welcome-message
+                            ${className || ''}
+                        `
         }, REaCt().createElement(utils.P9, {
-          tag: "div",
-          content: room.scheduledMeeting ? megaChat.html(room.getRoomTitle()) : headerText
-        })), REaCt().createElement("div", {
-          className: "info"
-        }, l[8080], REaCt().createElement("p", null, REaCt().createElement("i", {
-          className: "sprite-fm-mono icon-lock"
-        }), REaCt().createElement(utils.P9, null, l[8540].replace("[S]", "<strong>").replace("[/S]", "</strong>"))), REaCt().createElement("p", null, REaCt().createElement("i", {
-          className: "sprite-fm-mono icon-accept"
-        }), REaCt().createElement(utils.P9, null, l[8539].replace("[S]", "<strong>").replace("[/S]", "</strong>"))))));
+          tag: "h1",
+          content: heading
+        }), title && REaCt().createElement("span", null, title), info);
+        messagesList = [...messagesList, room.isNote ? $$WELCOME_MESSAGE({
+          heading: l.note_heading,
+          info: REaCt().createElement("p", null, REaCt().createElement("i", {
+            className: "sprite-fm-mono icon-file-text-thin-outline note-chat-icon"
+          }), l.note_description),
+          className: 'note-chat-info'
+        }) : $$WELCOME_MESSAGE({
+          heading: room.scheduledMeeting || !contactName ? megaChat.html(room.getRoomTitle()) : l[8002].replace('%s', `<span>${megaChat.html(contactName)}</span>`),
+          title: l[8080],
+          info: REaCt().createElement(REaCt().Fragment, null, REaCt().createElement("p", null, REaCt().createElement("i", {
+            className: "sprite-fm-mono icon-lock"
+          }), REaCt().createElement(utils.P9, {
+            content: l[8540].replace("[S]", "<strong>").replace("[/S]", "</strong>")
+          })), REaCt().createElement("p", null, REaCt().createElement("i", {
+            className: "sprite-fm-mono icon-accept"
+          }), REaCt().createElement(utils.P9, {
+            content: l[8539].replace("[S]", "<strong>").replace("[/S]", "</strong>")
+          })))
+        })];
       }
     }
     let lastTimeMarker;
@@ -28177,72 +28218,36 @@ const HistoryPanel = (_dec = (0,mixins.hG)(450, true), _class = class HistoryPan
       className: `
                     messages
                     scroll-area
-                    ${this.props.className ? this.props.className : ''}
+                    ${this.props.className || ''}
                 `
-    }, REaCt().createElement("div", {
-      className: "dropdown body dropdown-arrow down-arrow tooltip not-sent-notification-manual hidden"
-    }, REaCt().createElement("i", {
-      className: "dropdown-white-arrow"
-    }), REaCt().createElement("div", {
-      className: "dropdown notification-text"
-    }, REaCt().createElement("i", {
-      className: "small-icon conversations"
-    }), l[8883])), REaCt().createElement("div", {
-      className: "dropdown body dropdown-arrow down-arrow tooltip not-sent-notification-cancel hidden"
-    }, REaCt().createElement("i", {
-      className: "dropdown-white-arrow"
-    }), REaCt().createElement("div", {
-      className: "dropdown notification-text"
-    }, REaCt().createElement("i", {
-      className: "small-icon conversations"
-    }), l[8884])), REaCt().createElement(perfectScrollbar.O, {
-      onFirstInit: ps => {
-        ps.scrollToBottom(true);
-        this.props.chatRoom.scrolledToBottom = 1;
-      },
-      onUserScroll: this.onMessagesScrollUserScroll,
+    }, this.renderNotice(l[8883]), this.renderNotice(l[8884]), REaCt().createElement(perfectScrollbar.O, {
       className: "js-messages-scroll-area perfectScrollbarContainer",
       ref: ref => {
+        let _this$props$onMessage, _this$props;
         this.messagesListScrollable = ref;
-        $(document).rebind(`keydown.keyboardScroll_${  this.props.chatRoom.roomId}`, this.onKeyboardScroll);
-        if (this.props.onMessagesListScrollableMount) {
-          this.props.onMessagesListScrollableMount(ref);
-        }
+        $(document).rebind(`keydown.keyboardScroll_${room.roomId}`, this.onKeyboardScroll);
+        (_this$props$onMessage = (_this$props = this.props).onMessagesListScrollableMount) == null || _this$props$onMessage.call(_this$props, ref);
       },
-      chatRoom: this.props.chatRoom,
-      messagesBuff: this.props.chatRoom.messagesBuff,
+      chatRoom: room,
+      messagesBuff: room.messagesBuff,
       editDomElement: this.state.editDomElement,
       editingMessageId: this.state.editing,
       confirmDeleteDialog: this.state.confirmDeleteDialog,
       renderedMessagesCount: messagesList.length,
-      isLoading: this.props.chatRoom.messagesBuff.messagesHistoryIsLoading() || this.props.chatRoom.activeSearches > 0 || this.loadingShown,
       options: {
-        'suppressScrollX': true
-      }
+        suppressScrollX: true
+      },
+      isLoading: room.messagesBuff.messagesHistoryIsLoading() || room.activeSearches > 0 || this.loadingShown,
+      onFirstInit: ps => {
+        ps.scrollToBottom(true);
+        room.scrolledToBottom = 1;
+      },
+      onUserScroll: this.onMessagesScrollUserScroll
     }, REaCt().createElement("div", {
       className: "messages main-pad"
     }, REaCt().createElement("div", {
       className: "messages content-area"
-    }, REaCt().createElement("div", {
-      key: "loadingSpinner",
-      style: {
-        top: "50%"
-      },
-      className: `
-                                    loading-spinner
-                                    js-messages-loading
-                                    light
-                                    manual-management
-                                    ${this.loadingShown ? '' : 'hidden'}
-                                `
-    }, REaCt().createElement("div", {
-      className: "main-loader",
-      style: {
-        'position': 'fixed',
-        'top': '50%',
-        'left': '50%'
-      }
-    })), messagesList))), this.renderToast());
+    }, this.renderLoadingSpinner(), messagesList))), this.renderNavigationToast());
   }
 }, (0,applyDecoratedDescriptor.A)(_class.prototype, "enableScrollbar", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "enableScrollbar"), _class.prototype), _class);
 
@@ -31290,7 +31295,7 @@ class StartGroupChatWizard extends mixins.w9 {
       ref: this.domRef,
       className: "content-block"
     }, chatInfoElements, React.createElement(ui_contacts.ContactPickerWidget, {
-      changedHashProp: self.state.step,
+      step: self.state.step,
       exclude: self.props.exclude,
       contacts,
       selectableContacts: "true",
@@ -32275,24 +32280,20 @@ const ConversationsListItem = (_dec = utils.Ay.SoonFcWrap(40, true), _dec2 = (0,
     let contactId;
     let id;
     let contact;
-    if (chatRoom.type === "private") {
+    if (chatRoom.type === 'private') {
       const handle = chatRoom.getParticipantsExceptMe()[0];
-      if (!handle || !(handle in M.u)) {
-        return null;
-      }
-      contact = M.u[handle];
-      id = `conversation_${  htmlentities(contact.u)}`;
-      chatRoom.megaChat.userPresenceToCssClass(contact.presence);
-    } else if (chatRoom.type === "group") {
+      contact = handle ? M.u[handle] : M.u[u_handle];
+      id = `conversation_${htmlentities(contact.u)}`;
+    } else if (chatRoom.type === 'group') {
       contactId = roomId;
-      id = `conversation_${  contactId}`;
+      id = `conversation_${contactId}`;
       classString += ' groupchat';
-    } else if (chatRoom.type === "public") {
+    } else if (chatRoom.type === 'public') {
       contactId = roomId;
-      id = `conversation_${  contactId}`;
+      id = `conversation_${contactId}`;
       classString += ' groupchat public';
     } else {
-      return `unknown room type: ${  chatRoom.roomId}`;
+      return `Unknown room type for ${chatRoom.roomId}`;
     }
     const unreadCount = chatRoom.messagesBuff.getUnreadCount();
     let isUnread = false;
@@ -32344,12 +32345,14 @@ const ConversationsListItem = (_dec = utils.Ay.SoonFcWrap(40, true), _dec2 = (0,
         className: lastMsgDivClasses
       }, this.state.isLoading ? l[7006] : l[8000]);
     }
-    if (chatRoom.type !== "public") {
-      nameClassString += " privateChat";
+    if (chatRoom.type !== 'public') {
+      nameClassString += ' privateChat';
     }
     let roomTitle = REaCt().createElement(utils.oM, null, megaChat.html(chatRoom.getRoomTitle()));
-    if (chatRoom.type === "private") {
-      roomTitle = REaCt().createElement("span", null, REaCt().createElement("div", {
+    if (chatRoom.type === 'private') {
+      roomTitle = megaChat.WITH_SELF_NOTE && chatRoom.isNote ? REaCt().createElement("span", {
+        className: "note-chat-label"
+      }, l.note_label) : REaCt().createElement("span", null, REaCt().createElement("div", {
         className: "user-card-wrapper"
       }, REaCt().createElement(utils.oM, null, megaChat.html(chatRoom.getRoomTitle()))));
     }
@@ -32363,12 +32366,14 @@ const ConversationsListItem = (_dec = utils.Ay.SoonFcWrap(40, true), _dec2 = (0,
       startTime,
       endTime
     } = this.getScheduledDateTime() || {};
+    const isEmptyNote = chatRoom.isNote && !chatRoom.hasMessages();
     return REaCt().createElement("li", {
       ref: this.domRef,
       id,
       className: `
                     ${classString}
                     ${isUpcoming ? 'upcoming-conversation' : ''}
+                    ${this.props.className || ''}
                 `,
       "data-room-id": roomId,
       "data-jid": contactId,
@@ -32385,7 +32390,14 @@ const ConversationsListItem = (_dec = utils.Ay.SoonFcWrap(40, true), _dec2 = (0,
                             `
     }, REaCt().createElement("i", {
       className: isMeeting ? 'sprite-fm-mono icon-video-call-filled' : 'sprite-fm-uni icon-chat-group'
-    })), chatRoom.type === 'private' && contact && REaCt().createElement(ui_contacts.Avatar, {
+    })), chatRoom.type === 'private' && contact && chatRoom.isNote ? REaCt().createElement("div", {
+      className: `
+                                    note-chat-signifier
+                                    ${isEmptyNote ? 'note-chat-empty' : ''}
+                                `
+    }, REaCt().createElement("i", {
+      className: "sprite-fm-mono icon-file-text-thin-outline note-chat-icon"
+    })) : REaCt().createElement(ui_contacts.Avatar, {
       contact
     })), REaCt().createElement("div", {
       className: "conversation-data"
@@ -32395,7 +32407,7 @@ const ConversationsListItem = (_dec = utils.Ay.SoonFcWrap(40, true), _dec2 = (0,
       className: `conversation-data-name ${nameClassString}`
     }, roomTitle, chatRoom.isMuted() ? REaCt().createElement("i", {
       className: "sprite-fm-mono icon-notification-off-filled muted-conversation-icon"
-    }) : null), REaCt().createElement("div", {
+    }) : null), chatRoom.isNote ? null : REaCt().createElement("div", {
       className: "conversation-data-badges"
     }, chatRoom.type === 'private' ? REaCt().createElement(ui_contacts.ContactPresence, {
       contact
@@ -32421,7 +32433,7 @@ const ConversationsListItem = (_dec = utils.Ay.SoonFcWrap(40, true), _dec2 = (0,
                                         `
     }, notificationItems) : null)) : REaCt().createElement("div", {
       className: "conversation-message-info"
-    }, lastMessageDiv)), isUpcoming ? null : REaCt().createElement("div", {
+    }, isEmptyNote ? null : lastMessageDiv)), isUpcoming || isEmptyNote ? null : REaCt().createElement("div", {
       className: "date-time-wrapper"
     }, REaCt().createElement("div", {
       className: "date-time"
@@ -32444,47 +32456,56 @@ const ConversationsListItem = (_dec = utils.Ay.SoonFcWrap(40, true), _dec2 = (0,
 
 
 
-
 const ConversationsList = ({
   conversations,
   className,
   children
-}) => REaCt().createElement(perfectScrollbar.O, {
-  className: "chat-lp-scroll-area",
-  didMount: (id, ref) => {
-    megaChat.$chatTreePanePs = [...megaChat.$chatTreePanePs, {
-      id,
-      ref
-    }];
-  },
-  willUnmount: id => {
-    megaChat.$chatTreePanePs = megaChat.$chatTreePanePs.filter(ref => ref.id !== id);
-  },
-  conversations
-}, REaCt().createElement("ul", {
-  className: `
-                conversations-pane
-                ${className || ''}
-            `
-}, children || conversations.map(chatRoom => chatRoom.roomId && REaCt().createElement(ConversationsListItem, (0,esm_extends.A)({
-  key: chatRoom.roomId,
-  chatRoom
-}, chatRoom.type === 'private' && {
-  contact: M.u[chatRoom.getParticipantsExceptMe()[0]]
-})))));
+}) => {
+  return REaCt().createElement(perfectScrollbar.O, {
+    className: "chat-lp-scroll-area",
+    didMount: (id, ref) => {
+      megaChat.$chatTreePanePs = [...megaChat.$chatTreePanePs, {
+        id,
+        ref
+      }];
+    },
+    willUnmount: id => {
+      megaChat.$chatTreePanePs = megaChat.$chatTreePanePs.filter(ref => ref.id !== id);
+    },
+    conversations
+  }, REaCt().createElement("ul", {
+    className: `
+                    conversations-pane
+                    ${className || ''}
+                `
+  }, children || conversations.map(c => c.roomId && REaCt().createElement(ConversationsListItem, (0,esm_extends.A)({
+    key: c.roomId,
+    chatRoom: c
+  }, c.type === 'private' && {
+    contact: M.u[c.getParticipantsExceptMe()[0]]
+  })))));
+};
 const Chats = ({
   conversations,
   onArchivedClicked,
   filter
 }) => {
   conversations = Object.values(conversations || {}).filter(c => !c.isMeeting && c.isDisplayable() && (!filter || filter === FILTER.UNREAD && c.messagesBuff.getUnreadCount() > 0 || filter === FILTER.MUTED && c.isMuted())).sort(M.sortObjFn(c => c.lastActivity || c.ctime, -1));
+  const noteChat = megaChat.getNoteChat();
   return REaCt().createElement(REaCt().Fragment, null, REaCt().createElement("div", {
     className: "conversations-holder"
   }, filter ? null : REaCt().createElement("div", {
     className: "conversations-category"
-  }, REaCt().createElement("span", null, l.filter_heading__recent)), conversations && conversations.length ? REaCt().createElement(ConversationsList, {
+  }, REaCt().createElement("span", null, l.filter_heading__recent)), conversations && conversations.length >= 1 ? REaCt().createElement(ConversationsList, {
     conversations
-  }) : REaCt().createElement("div", {
+  }, megaChat.WITH_SELF_NOTE && noteChat && noteChat.isDisplayable() ? REaCt().createElement(ConversationsListItem, {
+    chatRoom: noteChat
+  }) : null, conversations.map(c => c.roomId && !c.isNote && REaCt().createElement(ConversationsListItem, (0,esm_extends.A)({
+    key: c.roomId,
+    chatRoom: c
+  }, c.type === 'private' && {
+    contact: M.u[c.getParticipantsExceptMe()[0]]
+  })))) : REaCt().createElement("div", {
     className: `
                             ${NAMESPACE}-nil
                             ${filter ? `${NAMESPACE}-nil--chats` : ''}
@@ -32493,7 +32514,11 @@ const Chats = ({
     className: "sprite-fm-mono icon-notification-off-filled"
   }), REaCt().createElement("h3", null, l.filter_nil__muted_chats)), filter === FILTER.UNREAD && REaCt().createElement(REaCt().Fragment, null, REaCt().createElement("i", {
     className: "sprite-fm-mono icon-eye-thin-solid"
-  }), REaCt().createElement("h3", null, l.filter_nil__unread_messages))) : REaCt().createElement("span", null, l.no_chats_lhp))), REaCt().createElement("div", {
+  }), REaCt().createElement("h3", null, l.filter_nil__unread_messages))) : REaCt().createElement("span", null, l.no_chats_lhp)), megaChat.WITH_SELF_NOTE && conversations && conversations.length === 1 && noteChat && REaCt().createElement(ConversationsList, {
+    conversations
+  }, REaCt().createElement(ConversationsListItem, {
+    chatRoom: noteChat
+  }))), REaCt().createElement("div", {
     className: `${NAMESPACE}-bottom`
   }, REaCt().createElement("div", {
     className: `${NAMESPACE}-bottom-control`
@@ -33016,6 +33041,7 @@ class ContactSelectorDialog extends mixins.w9 {
       contacts: M.u,
       selectFooter,
       megaChat,
+      withSelfNote: megaChat.WITH_SELF_NOTE,
       exclude,
       allowEmpty,
       multiple,
@@ -33174,6 +33200,17 @@ class ConversationsApp extends mixins.w9 {
         freeCallEndedDialog: true
       });
     });
+    if (megaChat.WITH_SELF_NOTE) {
+      if (!megaChat.getNoteChat()) {
+        api.req({
+          a: 'mcc',
+          u: [],
+          m: 0,
+          g: 0,
+          v: Chatd.VERSION
+        }).catch(dump);
+      }
+    }
   }
   componentWillUnmount() {
     super.componentWillUnmount();
@@ -33258,11 +33295,9 @@ class ConversationsApp extends mixins.w9 {
       currentlyOpenedChat,
       isEmpty,
       chatUIFlags,
-      onToggleExpandedFlag: () => {
-        this.setState(() => ({
-          callExpanded: call.Ay.isExpanded()
-        }));
-      },
+      onToggleExpandedFlag: () => this.setState(() => ({
+        callExpanded: call.Ay.isExpanded()
+      })),
       onMount: () => {
         const chatRoom = megaChat.getCurrentRoom();
         const view = chatRoom && chatRoom.isMeeting ? MEETINGS : CHATS;
@@ -33273,6 +33308,7 @@ class ConversationsApp extends mixins.w9 {
         });
       }
     })));
+    const noteChat = megaChat.getNoteChat();
     return REaCt().createElement("div", {
       ref: this.domRef,
       className: "conversationsApp"
@@ -33282,12 +33318,20 @@ class ConversationsApp extends mixins.w9 {
       topButtons: [{
         key: 'newGroupChat',
         title: l[19483],
-        icon: 'sprite-fm-mono icon-chat-filled',
+        className: 'positive',
         onClick: () => this.setState({
           startGroupChatDialog: true,
           contactSelectorDialog: false
         })
-      }],
+      }, ...megaChat.WITH_SELF_NOTE ? contactsPanel.A.hasContacts() || noteChat && noteChat.hasMessages() ? [] : [{
+        key: 'noteChat',
+        title: l.note_label,
+        icon: 'sprite-fm-mono icon-file-text-thin-outline note-chat-icon',
+        onClick: () => {
+          closeDialog();
+          loadSubPage(`fm/chat/p/${u_handle}`);
+        }
+      }] : []],
       showAddContact: contactsPanel.A.hasContacts(),
       onClose: () => this.setState({
         contactSelectorDialog: false

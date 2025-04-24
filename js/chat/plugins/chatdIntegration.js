@@ -1705,19 +1705,10 @@ ChatdIntegration.prototype.sendMessage = async function(chatRoom, messageObject)
     const messageContents = messageObject.textContents || messageObject.message || "";
 
     var promises = [];
-    if (chatRoom.type !== "public") {
-        var participants = chatRoom.getParticipantsExceptMe();
-        if (participants.length === 0 && chatRoom.type === "private") {
-            return;
-        }
-
-        promises.push(
-            ChatdIntegration._ensureKeysAreLoaded(undefined, participants)
-        );
+    if (chatRoom.type !== 'public') {
+        const participants = chatRoom.getParticipantsExceptMe();
+        promises.push(ChatdIntegration._ensureKeysAreLoaded(undefined, participants));
     }
-
-    // chatRoom.logger.warn('sendMessage', promises.length, !chatRoom.protocolHandler, messageObject);
-
     await Promise.all([...promises, ChatdIntegration._waitForProtocolHandler(chatRoom)]);
 
     var refs = this.chatd.msgreferencelist(base64urldecode(chatRoom.chatId));

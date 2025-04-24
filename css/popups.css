@@ -163,7 +163,7 @@ body.tl .dropdown.body.popup.contacts-search {
     padding: 4px 12px;
 }
 .contacts-search-list .contacts-info .user-card-data {
-    max-width: 80%;
+    width: 90%;
     padding-inline-start: 10px;
 }
 .rtl .invite-meeting-contacts .contacts-search-list .contacts-info .user-card-data,
@@ -350,9 +350,9 @@ body.tl .dropdown.body.popup.contacts-search {
     display: flex;
     padding: 48px 48px 24px 48px;
     align-items: center;
-    justify-content: space-between;
 }
 .contacts-search-buttons .button-wrapper {
+    margin: 0 18px 0 0;
     text-align: center;
 }
 .contacts-search-buttons .button-wrapper .new-meeting {
@@ -423,6 +423,13 @@ body.tl .dropdown.body.popup.contacts-search {
 }
 .contacts-search-list {
     padding: 7px 0 0 0;
+}
+.contacts-search-list .note-chat-signifier {
+    width: 26px;
+    height: 24px;
+}
+.contacts-search-list .note-chat-signifier i {
+    --icon-size: 16px;
 }
 .add-participant-selector .contacts-search-header {
     margin: 0 48px;

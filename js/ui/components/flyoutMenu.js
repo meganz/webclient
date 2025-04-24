@@ -86,6 +86,18 @@ class MegaFlyoutMenu extends MegaComponent {
         this.footer.className = 'flyout-footer hidden';
         this.domNode.append(this.footer);
 
+        this.inviteButton = new MegaButton({
+            parentNode: this.footer,
+            type: 'full-width',
+            componentClassname: 'invite-contact-button hidden',
+            icon: 'sprite-fm-mono icon-user-plus-thin-outline',
+            onClick: () => {
+                contactAddDialog();
+                eventlog(500668);
+            }
+        });
+        this.inviteButton.text = l.invite_friend_btn;
+
         this.footerButton = new MegaButton({
             parentNode: this.footer,
             type: 'full-width',
@@ -205,7 +217,7 @@ class MegaFlyoutMenu extends MegaComponent {
         this.body.Ps.update();
     }
 
-    updateFooter(options) {
+    updateFooter(options, withInvite) {
         const { label, icon, onClick } = options;
         this.footer.classList.remove('hidden');
         this.footerButton.rebind('click', (ev) => onClick(ev));
@@ -216,6 +228,7 @@ class MegaFlyoutMenu extends MegaComponent {
             footerIcon.parentNode.removeChild(footerIcon);
             delete this.footerButton.domNode.rightIcon;
         }
+        this.inviteButton.domNode.classList[withInvite ? 'remove' : 'add']('hidden');
     }
 
     resetUI() {
@@ -434,6 +447,7 @@ class MegaFlyoutMenu extends MegaComponent {
     };
 
     const showStartGroupChatDialog = () => {
+        const noteChat = megaChat.getNoteChat();
         showReactDialog(ContactSelectorDialogUI.ContactSelectorDialog, {
             className: 'main-start-chat-dropdown lhp-contact-selector',
             multiple: false,
@@ -441,7 +455,7 @@ class MegaFlyoutMenu extends MegaComponent {
                 {
                     key: 'newGroupChat',
                     title: l[19483],
-                    icon: 'sprite-fm-mono icon-chat-filled',
+                    className: 'positive',
                     onClick() {
                         eventlog(500658);
                         closeReactDialog();
@@ -452,7 +466,18 @@ class MegaFlyoutMenu extends MegaComponent {
                             onConfirmClicked: closeReactDialog,
                         });
                     }
-                }
+                },
+                ...megaChat.WITH_SELF_NOTE ?
+                    this.hasContacts || noteChat && noteChat.hasMessages() ? [] : [{
+                        key: 'noteChat',
+                        title: l.note_label,
+                        icon: 'sprite-fm-mono icon-file-text-thin-outline note-chat-icon',
+                        onClick: () => {
+                            closeDialog();
+                            loadSubPage(`fm/chat/p/${u_handle}`);
+                        }
+                    }] :
+                    []
             ],
             showAddContact: true,
             onSelectDone(selected) {
@@ -613,6 +638,8 @@ class MegaFlyoutMenu extends MegaComponent {
      * @property {*} mega.ui.flyout
      */
     lazy(mega.ui, 'flyout', () => ({
+        hasContacts: M.u.some(contact => contact.c === 1),
+
         flyoutMenu: new MegaFlyoutMenu({
             parentNode: document.getElementsByClassName('flyout-holder')[0],
             componentClassname: 'flyout-main',
@@ -1075,14 +1102,15 @@ class MegaFlyoutMenu extends MegaComponent {
             lastChatsPane = 'chat';
             flyoutState.clearListeners();
             this.emptyState({ name: 'chat', hide: true });
-            const list = Object.values(megaChat.chats)
-                .filter(c => !c.isMeeting && c.isDisplayable())
-                .sort(M.sortObjFn(c => c.lastActivity || c.ctime, -1))
-                .map(c => ({
-                    nodeHandle: c.roomId,
-                    chatId: c.roomId,
-                    itemComp: 'chat',
-                }));
+            const chats = Object.values(megaChat.chats)
+                .filter(c => !c.isMeeting && c.isDisplayable() && (megaChat.WITH_SELF_NOTE || !c.isNote));
+            let list =
+                // Empty state
+                !chats.length || chats.length === 1 && chats[0].isNote && !chats[0].hasMessages() ?
+                    {} :
+                    chats
+                        .sort(M.sortObjFn(c => c.lastActivity || c.ctime, -1))
+                        .map(c => ({ nodeHandle: c.roomId, chatId: c.roomId, itemComp: 'chat', }));
             if (list.length) {
                 this.flyoutMenu.updateFooter({
                     label: l.add_chat,
@@ -1091,8 +1119,12 @@ class MegaFlyoutMenu extends MegaComponent {
                         showStartGroupChatDialog();
                         eventlog(500664);
                     },
-                });
+                }, !this.hasContacts && chats.length === 1 && chats[0].isNote);
                 this.flyoutMenu.listHeaders = false;
+                const noteChat = megaChat.getNoteChat();
+                list = megaChat.WITH_SELF_NOTE && noteChat && noteChat.isDisplayable() ?
+                    [{ nodeHandle: noteChat.roomId,  chatId: noteChat.roomId, itemComp: 'chat' }, ...list] :
+                    list;
                 this.flyoutMenu.list = list;
                 const participants = new Set();
                 const updateChatsTab = () => {
@@ -1105,7 +1137,7 @@ class MegaFlyoutMenu extends MegaComponent {
                 const attachedTo = new Set();
                 for (const item of list) {
                     const chatRoom = megaChat.chats[item.chatId];
-                    const parts = chatRoom.getParticipantsExceptMe();
+                    const parts = chatRoom.isNote ? [u_handle] : chatRoom.getParticipantsExceptMe();
                     for (const part of parts) {
                         if (!usersFetched.has(part)) {
                             participants.add(part);
@@ -1128,13 +1160,22 @@ class MegaFlyoutMenu extends MegaComponent {
                 }
                 return;
             }
-            this.flyoutMenu.footer.classList.add('hidden');
+            if (this.hasContacts) {
+                this.flyoutMenu.footer.classList.add('hidden');
+            }
             this.emptyState({
                 name: 'chat',
                 icon: 'chats',
                 title: l.chat_privately,
                 actions: [
-                    M.u.some(contact => contact.c === 1) ?
+                    ...megaChat.WITH_SELF_NOTE ?
+                        [{
+                            text: l.note_label,
+                            icon: 'sprite-fm-mono icon-file-text-thin-outline note-chat-icon',
+                            className: 'note-chat-button outline',
+                            onClick: () => loadSubPage(`fm/chat/p/${u_handle}`)
+                        }] : [],
+                    this.hasContacts ?
                         {
                             text: l.add_chat,
                             icon: 'sprite-fm-mono icon-plus-light-solid',

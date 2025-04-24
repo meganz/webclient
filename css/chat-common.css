@@ -161,14 +161,13 @@
     flex: 1 1 auto;
     font-size: 0;
     line-height: 0;
-    overflow: hidden;
 }
 .chat-topic-block .small-rounded-avatar {
     margin: 8px 0;
 }
 .chat-topic-block .contacts-info .user-card-data {
     overflow: hidden;
-    padding: 0 0 0 12px;
+    padding-inline-start: 12px;
 }
 .chat-topic-block .contacts-info .user-card-data .user-card-name {
     max-width: 100%;

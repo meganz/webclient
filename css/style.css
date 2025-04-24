@@ -2454,8 +2454,33 @@ body.loading .light-overlay {
     width: calc(50% - 56px);
     color: inherit;
 }
+.mega-dialog.fm-picker-dialog .right-pane .dialog-tree-panel-scroll .note-chat-label {
+    margin-inline-start: 8px;
+    font: var(--text-body1-bold);
+}
 .mega-dialog .nw-contact-name img.emoji {
     margin-top: 0;
+}
+.mega-dialog .nw-note-signifier {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    margin-inline-start: 6px;
+    border-radius: 2px;
+    background: #2ba6de;
+    background: linear-gradient(45deg, #2ba6de 0%,#55d2f0 100%);
+}
+.mega-dialog .nw-note-signifier.note-chat-empty {
+    background: transparent;
+}
+.mega-dialog .nw-note-signifier.note-chat-empty i {
+    --mask-color: var(--icon-active);
+}
+.mega-dialog .nw-note-signifier i {
+    --icon-size: 14px;
+    --mask-color: var(--secondary-white);
 }
 .mega-dialog .nw-contact-status {
     width: 8px;

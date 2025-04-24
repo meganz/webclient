@@ -145,6 +145,9 @@
 .conversations-pane li:hover .unread-messages-container {
     background-color: var(--stroke-main);
 }
+.conversations-pane li.is-note i {
+    --icon-size: 24px;
+}
 .conversations-pane .conversation-avatar {
     float: left;
     width: 32px;
@@ -480,14 +483,6 @@ li.active .call-duration i {
     40%, 60% {
         transform: translate3d(0, 2px, 0);
     }
-}
-
-/* Private Chat Styles */
-.privateChat + .icon-ekr-key {
-    display: inline-block;
-    height: 10px;
-    vertical-align: middle;
-    width: 12px;
 }
 
 /*

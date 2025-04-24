@@ -175,6 +175,14 @@ class ConversationsApp extends MegaRenderMixin {
         megaChat.rebind('onCallTimeLimitExceeded', () => {
             this.setState({ freeCallEndedDialog: true });
         });
+
+        // --
+
+        if (megaChat.WITH_SELF_NOTE) {
+            if (!megaChat.getNoteChat()) {
+                api.req({ a: 'mcc', u: [], m: 0, g: 0, v: Chatd.VERSION }).catch(dump);
+            }
+        }
     }
 
     componentWillUnmount() {
@@ -244,7 +252,7 @@ class ConversationsApp extends MegaRenderMixin {
                         onScheduleMeeting={() => this.setState({ scheduleMeetingDialog: true })}
                     />
                 }
-                {!isLoading && (
+                {!isLoading &&
                     <ConversationPanels
                         {...this.props}
                         className={routingSection === 'chat' ? '' : 'hidden'}
@@ -252,9 +260,7 @@ class ConversationsApp extends MegaRenderMixin {
                         currentlyOpenedChat={currentlyOpenedChat}
                         isEmpty={isEmpty}
                         chatUIFlags={chatUIFlags}
-                        onToggleExpandedFlag={() => {
-                            this.setState(() => ({ callExpanded: Call.isExpanded() }));
-                        }}
+                        onToggleExpandedFlag={() => this.setState(() => ({ callExpanded: Call.isExpanded() }))}
                         onMount={() => {
                             const chatRoom = megaChat.getCurrentRoom();
                             const view = chatRoom && chatRoom.isMeeting ? MEETINGS : CHATS;
@@ -263,15 +269,15 @@ class ConversationsApp extends MegaRenderMixin {
                             });
                         }}
                     />
-                )}
+                }
             </div>
         );
 
+        const noteChat = megaChat.getNoteChat();
         return (
             <div
                 ref={this.domRef}
                 className="conversationsApp">
-
                 {contactSelectorDialog && (
                     <ContactSelectorDialog
                         className={`main-start-chat-dropdown ${LeftPanel.NAMESPACE}-contact-selector`}
@@ -280,10 +286,21 @@ class ConversationsApp extends MegaRenderMixin {
                             {
                                 key: 'newGroupChat',
                                 title: l[19483] /* `New group chat` */,
-                                icon: 'sprite-fm-mono icon-chat-filled',
+                                className: 'positive',
                                 onClick: () =>
                                     this.setState({ startGroupChatDialog: true, contactSelectorDialog: false })
-                            }
+                            },
+                            ...megaChat.WITH_SELF_NOTE ?
+                                ContactsPanel.hasContacts() || noteChat && noteChat.hasMessages() ? [] : [{
+                                    key: 'noteChat',
+                                    title: l.note_label,
+                                    icon: 'sprite-fm-mono icon-file-text-thin-outline note-chat-icon',
+                                    onClick: () => {
+                                        closeDialog();
+                                        loadSubPage(`fm/chat/p/${u_handle}`);
+                                    }
+                                }] :
+                                []
                         ]}
                         showAddContact={ContactsPanel.hasContacts()}
                         onClose={() => this.setState({ contactSelectorDialog: false })}

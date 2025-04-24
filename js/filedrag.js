@@ -44,7 +44,7 @@
             return false;
         }
 
-        if (M.isFileDragPage(page) || straight) {
+        if (M.isFileDragPage(page) || straight || M.currentdirid) {
             M.addUpload(files, false, emptyFolders);
 
             start_upload();

@@ -3079,7 +3079,7 @@ else if (!browserUpdate) {
             'pwm:password_item_detail_js': {f:'js/ui/pwm/components/password-item-detail.js', n: 'password_item_detail_js', j: 1, w:1},
             'pwm:dropdown_items_js': {f:'js/ui/pwm/components/dropdown-items.js', n: 'dropdown_items_js', j: 1, w:1},
             'pwm:dropdown_js': {f:'js/ui/pwm/components/dropdown.js', n: 'dropdown_js', j: 1, w:1},
-            'pwm:menu_js': {f:'js/ui/pwm/components/menu.js', n: 'menu_js', j: 1, w:1},
+            'pwm:menu_js': {f:'js/ui/pwm/components/menu.js', n: 'pm_menu_js', j: 1, w:1},
             'pwm:context_menu_js': {f:'js/ui/pwm/components/context-menu.js', n: 'context_menu_js', j: 1, w:1},
             'pwm:range_slider_js': {f:'js/ui/pwm/components/range-slider.js', n: 'range_slider_js', j: 1, w:1},
             'pwm:password_generator_js': {f:'js/ui/pwm/components/password-generator.js', n: 'password_generator_js', j: 1, w:1},

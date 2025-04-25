@@ -1008,14 +1008,6 @@ class MegaFlyoutMenu extends MegaComponent {
                 topSection: {
                     label: l[7997],
                 },
-                footer: {
-                    label: l.add_chat,
-                    icon: 'sprite-fm-mono icon-plus-light-solid',
-                    onClick() {
-                        showStartGroupChatDialog();
-                        eventlog(500664);
-                    },
-                },
                 list: [],
                 targetPage: 'fm/chat',
                 targetLabel: l.open_chat,
@@ -1116,15 +1108,15 @@ class MegaFlyoutMenu extends MegaComponent {
                     chats
                         .sort(M.sortObjFn(c => c.lastActivity || c.ctime, -1))
                         .map(c => ({ nodeHandle: c.roomId, chatId: c.roomId, itemComp: 'chat', }));
+            this.flyoutMenu.updateFooter({
+                label: l.add_chat,
+                icon: 'sprite-fm-mono icon-plus-light-solid',
+                onClick() {
+                    showStartGroupChatDialog();
+                    eventlog(500664);
+                },
+            }, !this.hasContacts && chats.length === 1 && chats[0].isNote && chats[0].hasMessages());
             if (list.length) {
-                this.flyoutMenu.updateFooter({
-                    label: l.add_chat,
-                    icon: 'sprite-fm-mono icon-plus-light-solid',
-                    onClick() {
-                        showStartGroupChatDialog();
-                        eventlog(500664);
-                    },
-                }, !this.hasContacts && chats.length === 1 && chats[0].isNote);
                 this.flyoutMenu.listHeaders = false;
                 const noteChat = megaChat.getNoteChat();
                 list = megaChat.WITH_SELF_NOTE && noteChat && noteChat.isDisplayable() ?

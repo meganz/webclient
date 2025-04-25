@@ -1550,7 +1550,7 @@ function siteLoadError(error, filename) {
     message.push('Please click OK to refresh and try again.');
     message.push("If the problem persists, please try disabling all third-party browser extensions " +
         "and ensure your browser is up to date. " +
-        "If that does not help, contact support@" + location.host);
+        "If that does not help, contact support@" + (self.is_extension ? 'mega.nz' : location.host));
 
     message.push('BrowserID: ' + self.ua + '\n' +
                  'Static server: ' + staticpath + '\n' +

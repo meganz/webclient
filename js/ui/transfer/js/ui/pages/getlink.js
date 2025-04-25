@@ -668,7 +668,13 @@ lazy(T.ui, 'addFilesLayout', () => {
 
             confirmBtn.addEventListener('click', () => {
                 ulmanager.abort(null);
-                this.initAddedFiles();
+
+                loadingDialog.show();
+                (async() => {
+                    while (ulmanager.isUploading) {
+                        await tSleep(-1);
+                    }
+                })().finally(() => T.ui.loadPage());
             });
 
             resumeBtn.addEventListener('click', () => {
@@ -766,24 +772,26 @@ lazy(T.ui, 'addFilesLayout', () => {
 
             let tick = 0;
             let tock = 0;
+            const files = this.getTransferFiles();
+
             T.ui.ulprogress = (ul, p, bl, bt, bps) => {
                 const tp = $.transferprogress;
                 const gid = ulmanager.getGID(ul);
+                if (files.local) {
+                    domUploaded.parentNode.classList.remove('hidden');
+                    files.local = false;
+                }
                 tp[gid] = [bl, bt, bps];
                 console.info('ul-progress(%s)... %s% (%s/%s)...', gid, p, bl, bt, [ul]);
 
                 tick = ++tock;
                 requestAnimationFrame(() => tick === tock && updateProgress());
             };
-            const files = this.getTransferFiles();
 
-            if (files.local) {
-                domUploaded.parentNode.classList.remove('hidden');
-            }
-            else {
-                domUploaded.parentNode.classList.add('hidden');
-            }
+            domSize.textContent = '';
+            domUploaded.textContent = '';
             domTick.classList.add('hidden');
+            domUploaded.parentNode.classList.add('hidden');
 
             T.core.upload(files, name)
                 .then((res) => {

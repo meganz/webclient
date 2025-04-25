@@ -1301,7 +1301,12 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[/A]', '</a>');
     l[22074] = escapeHTML(l[22074]).replace('[S]', '<span class="purchase">').replace('[/S]', '</span>');
     l[22077] = escapeHTML(l[22077]).replace('[S]', '<span class="green strong">').replace('[S]', '</span>');
-    l[22248] = escapeHTML(l[22248]).replace(/\[S]/g, '<strong>').replace(/\[\/S]/g, '</strong>');
+    l[22248] = escapeHTML(l[22248]).replace(/\[S]/g, '<strong>').replace(/\[\/S]/g, '</strong>')
+        .replace('[A]',
+                 `<a target="_blank" class="clickurl" href="${
+                     l.mega_help_host
+                 }/security/data-protection/credential-stuffing">`)
+        .replace('[/A]', '</a>');
     l[22667] = escapeHTML(l[22667])
         .replace(/\[S]/g, '<span>').replace(/\[\/S]/g, '</span>')
         .replace('[A]', '<a class="clickurl" href="/pro" data-eventid="500491">')

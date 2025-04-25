@@ -1287,7 +1287,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                                                 : l[8871] /* `Clear Chat History` */}
                                         </span>
                                     </Button>
-                                    {room.isNote ? null : retentionHistoryBtn}
+                                    {retentionHistoryBtn}
                                     {room.iAmOperator() && room.type === 'public' && !scheduledMeeting ?
                                         <div className="chat-enable-key-rotation-paragraph">
                                             {AVseperator}

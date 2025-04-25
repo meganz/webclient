@@ -479,6 +479,9 @@ RecentsRender.prototype.populateBreadCrumb = function($container, action) {
                 $.hideTopMenu();
                 return M.contextMenuUI(e, 1) ? true : false;
             });
+        if (node.h === M.RootID) {
+            $breadCrumb.addClass('cloud-drive');
+        }
         return $breadCrumb;
     };
 

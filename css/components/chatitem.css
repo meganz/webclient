@@ -57,6 +57,9 @@
     display: block;
     padding: 20px 0 0;
 }
+.mega-chat-item .mega-chat-item--loading.mega-chat-room-topic.note-chat-empty {
+    padding: 0;
+}
 .mega-chat-item.notification .mega-chat-room-topic {
     font: var(--mobile-font-caption-large-bold);
 }

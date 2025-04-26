@@ -99,7 +99,7 @@ factory.define('file-list', () => {
             }
             const res = data.files.filter(flt);
 
-            res.sort((a, b) => a.size < b.size ? 1 : -1);
+            res.sort((a, b) => a.size < b.size ? -1 : 1);
 
             return Object.defineProperties(res, {
                 paths: {

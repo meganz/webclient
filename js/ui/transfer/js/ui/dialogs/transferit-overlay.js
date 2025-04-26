@@ -35,7 +35,7 @@ lazy(T.ui, 'transferItOverlay', () => {
     visitBtn.classList.remove('hidden');
     closeBtn.classList.remove('hidden');
 
-    header.querySelector('.logo-group').addEventListener('click', (e) => {
+    header.querySelector('.it-logo').addEventListener('click', (e) => {
         e.preventDefault();
         T.ui.addFilesLayout.init();
     });

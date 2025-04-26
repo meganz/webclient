@@ -862,7 +862,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             this.add_to_selection(this.selected_list.pop(), false, true);
         }
         if (currentNode) {
-            this.selectionNotification(currentNode.tb);
+            this.updateSelectionNotification();
         }
 
         mega.ui.mInfoPanel.reRenderIfVisible($.selected);

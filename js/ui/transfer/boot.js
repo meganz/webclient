@@ -115,6 +115,8 @@ mBroadcaster.once('boot_done', () => {
         tree: Object.create(null)
     });
     const wrap = freeze({
+        ul_maxSlots: 16,
+
         async gfsfetch(h, offset = 0, length = -1) {
             const n = this.getNodeByHandle(h);
 
@@ -177,10 +179,8 @@ mBroadcaster.once('boot_done', () => {
             }
             ul.promiseToInvoke.resolve(h);
             ul_queue[ul.pos] = freeze({});
-            if (!ul_queue.some(isQueueActive)) {
-                ul_queue = new UploadQueue();
-                ulmanager.isUploading = false;
-            }
+
+            M.resetUploadDownload();
         },
         require(...files) {
             const promise = mutex.lock(`<jsl_start(require)>`)
@@ -218,6 +218,17 @@ mBroadcaster.once('boot_done', () => {
         getShareNodesSync: dummy,
         shouldCreateThumbnail: () => true,
         hasPendingTransfers: () => !!ulmanager.isUploading,
+        resetUploadDownload() {
+            if (!ul_queue.some(isQueueActive)) {
+                ul_queue = new UploadQueue();
+                ulmanager.isUploading = false;
+                ulQueue._pending = [];
+                ulQueue.setSize(fmconfig.ul_maxSlots);
+
+                clearTransferXHRs();
+                delete $.transferprogress;
+            }
+        },
         getNodeRoot(h) {
             while (M.d[h]) {
                 if (!M.d[h].p) {
@@ -354,7 +365,17 @@ mBroadcaster.once('boot_done', () => {
     }
 
     // @todo
-    self.time2date = (v) => new Date(v * 1e3).toISOString();
+    self.time2date = (unixTime, format) => {
+        const date = new Date(unixTime * 1e3 || 0);
+        if (format === 3) {
+            const months = [
+                l[408], l[409], l[410], l[411], l[412], l[413],
+                l[414], l[415], l[416], l[417], l[418], l[419]
+            ];
+            return `${months[date.getMonth()]} ${date.getFullYear()}`;
+        }
+        return date.toDateString();
+    };
 
     asmCrypto.random.seed(mega.getRandomValues(384));
 });

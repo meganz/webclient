@@ -15,7 +15,7 @@ lazy(T.ui, 'pageHeader', () => {
     T.ui.setTheme();
 
     // Logo
-    cn.querySelector('.logo-group').addEventListener('click', (e) => {
+    cn.querySelector('.it-logo').addEventListener('click', (e) => {
         e.preventDefault();
         T.ui.loadPage('start');
     });

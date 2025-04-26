@@ -672,11 +672,24 @@ mBroadcaster.once('boot_done', function radSetup() {
     const warn = (m, ...args) => console.warn(`PromiseRejectionEvent \u26a0\u26a0 ${m}`, m && m.stack, ...args);
     const info = (m, ...args) => console.info(`PromiseRejectionEvent \u26a0\u26a0 ${m}`, m && m.stack, ...args);
 
+    const getError = (ex) => {
+        const ei = ex instanceof Error;
+        const es = `${ei && ex.stack || ex && ex.message || ex || ''}`;
+
+        return ei && ex.name === 'AbortError'
+        || es.includes(api_strerror(EROLLEDBACK))
+        || es.includes('Restarting connection due ') ? 0 : es;
+    };
+
     const scheduler = () => delay(stag, () => {
         if (seen.size) {
             for (const [promise, ex] of seen) {
                 warn(ex, promise);
-                reportError(new Error(`Unhandled Promise Rejection :x: ${ex instanceof Error && ex.stack || ex}`));
+
+                const error = getError(ex);
+                if (error) {
+                    reportError(new Error(`Unhandled Promise Rejection :x: ${error}`));
+                }
             }
             seen.clear();
         }

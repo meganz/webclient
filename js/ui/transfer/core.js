@@ -131,7 +131,10 @@ lazy(self.T, 'core', () => {
     };
 
     const createPassword = async(xh, p) => {
-        const salt = Uint8Array.from(base64urldecode(xh).slice(-7, -1).repeat(3), s => s.charCodeAt(0));
+        xh = xh.length > 12
+            ? base64urldecode(base64urldecode(xh)).slice(-7, -1)
+            : base64urldecode(xh).slice(-6);
+        const salt = Uint8Array.from(xh.repeat(3), s => s.charCodeAt(0));
         return ab_to_base64(await factory.require('pbkdf2').sha256(p, salt));
     };
 
@@ -444,7 +447,8 @@ lazy(self.T, 'core', () => {
             const files = !isNode && !isBlob && await factory.require('file-list').getFileList(file);
 
             if (!xh) {
-                [to, xh] = await this.create(to || "\u{1F4BE}");
+                const def = `Transfer.it ${new Date().toISOString().replace('T', ' ').split('.')[0]}`;
+                [to, xh] = await this.create(to || def);
             }
             if (files) {
                 const p = [];
@@ -486,6 +490,8 @@ lazy(self.T, 'core', () => {
             file.promiseToInvoke = promise;
 
             ul_queue.push(file);
+            assert(ul_queue.length > 0);
+            ulmanager.isUploading = true;
 
             return promise;
         },

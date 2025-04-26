@@ -19,14 +19,11 @@
     max-width: 1200px;
 }
 
-.it-dialog.auth-dialog .logo {
-    --icon-size: 64px;
-    --mask-color: var(--main-forced-white);
-    background-color: var(--main-primary);
-    border-radius: 100%;
+.it-dialog.auth-dialog .it-logo {
+    background-size: auto 64px; 
     height: 64px;
-    margin: 8px 0 48px;
     width: 64px;
+    margin: 8px 0 48px;
 }
 
 .it-dialog.auth-dialog .img1 {

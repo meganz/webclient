@@ -35,8 +35,8 @@ input,
 textarea {
     outline: none;
     resize: none;
-    -webkit-user-select: all;
-    user-select: all;
+    user-select: text;
+    -webkit-user-select: text;
 }
 
 input[type='number'] {

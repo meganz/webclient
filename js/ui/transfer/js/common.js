@@ -26,6 +26,12 @@ Object.defineProperty(T.ui, 'loadPage', {
             tryCatch(T.ui.sweeper)();
             delete T.ui.sweeper;
         }
+        tryCatch(() => {
+            const e = document.querySelector('input[type="file"]');
+            if (e) {
+                e.value = '';
+            }
+        })();
         let res;
         const [p, s, h] = String(page).split(/[^\w-]/);
 

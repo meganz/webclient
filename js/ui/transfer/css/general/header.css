@@ -26,12 +26,12 @@ a.logo-group:visited {
 }
 
 .it-logo {
-    --icon-size: 32px;
-    --mask-color: var(--main-forced-white);
-    background-color: var(--main-primary);
-    border-radius: 100%;
+    background-image: var(--logo-url);
+    background-size: auto 32px;
+    background-repeat: no-repeat;
+    display: block;
     height: 32px;
-    width: 32px;
+    width: 148px;
 }
 
 .logo-group .label {
@@ -114,3 +114,10 @@ a.logo-group.mega:visited {
 
 }
 
+@media only screen and (max-width: 600px) {
+
+    .page-header .it-logo {
+        width: 32px;
+    }
+
+}

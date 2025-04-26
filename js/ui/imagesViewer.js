@@ -878,7 +878,6 @@ var slideshowid;
             options.onPinchZoom = function(ev, mag) {
 
                 mega.ui.viewerOverlay.zoom *= mag;
-                slideshow_zoom($(elm), 0, mega.ui.viewerOverlay.zoom);
             };
         }
         else if (type === 'DOCX') {
@@ -1069,7 +1068,7 @@ var slideshowid;
         mBroadcaster.sendMessage('slideshow:open', n);
 
         if (page !== 'download') {
-            sessionStorage.setItem('previewNode', id);
+            tryCatch(() => sessionStorage.setItem('previewNode', id))();
             pushHistoryState(true, Object.assign({subpage: page}, history.state, {view: slideshowid}));
         }
 

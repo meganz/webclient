@@ -10227,7 +10227,7 @@ Chat.prototype.openChatAndSendFilesDialog = function (user_handle) {
       room.trigger('openSendFilesDialog');
     } else {
       room.one('onComponentDidMount.sendFilesDialog', () => {
-        room.trigger('openSendFilesDialog');
+          onIdle(() => room.trigger('openSendFilesDialog'));
       });
     }
     room.setActive();

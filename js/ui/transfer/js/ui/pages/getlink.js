@@ -643,6 +643,10 @@ lazy(T.ui, 'addFilesLayout', () => {
                 if (!elm.classList.contains('disabled')) {
                     elm.classList.add('disabled');
 
+                    if (this.data.link) {
+                        T.ui.copyLinkToClipboard(this.data.link);
+                    }
+
                     loadingDialog.show();
                     this.finishTransferring()
                         .then(() => this.renderLinkReady())
@@ -733,11 +737,13 @@ lazy(T.ui, 'addFilesLayout', () => {
                 this.transferring;
             const leftNode = cn.querySelector('#transferfilesleft');
             const rightNode = cn.querySelector('#transferfilesright');
+            const domTransfer = cn.querySelector('.status-info.transfer');
+            const domTime = cn.querySelector('.status-info.time');
             const domTick = cn.querySelector('.js-link-tick');
-            const domSize = cn.querySelector('.status-info .size');
-            const domLeft = cn.querySelector('.status-info .left');
-            const domSpeed = cn.querySelector('.status-info .speed');
-            const domUploaded = cn.querySelector('.status-info .uploaded');
+            const domSize = domTransfer.querySelector('.size');
+            const domLeft = domTime.querySelector('.left');
+            const domSpeed = domTransfer.querySelector('.speed');
+            const domUploaded = domTransfer.querySelector('.uploaded');
 
             box.classList.remove('completed', 'cancel');
             header.textContent = l.transferit_transferring;
@@ -746,6 +752,8 @@ lazy(T.ui, 'addFilesLayout', () => {
             resumeBtn.classList.add('hidden');
             copyBtn.classList.remove('hidden');
             cancelBtn.classList.remove('hidden');
+            domTransfer.classList.add('hidden');
+            domTime.classList.add('hidden');
             leftNode.removeAttribute('style');
             rightNode.removeAttribute('style');
 
@@ -756,12 +764,17 @@ lazy(T.ui, 'addFilesLayout', () => {
             const updateProgress = () => {
                 const {done, total, speed, left, percent} = this.calculateUploadProgress();
                 const deg = 360 * Math.min(99, percent) / 100;
+                const esimate = secondsToTimeShort(left);
                 if (deg <= 180) {
                     rightNode.style.transform = `rotate(${deg}deg)`;
                 }
                 else {
                     rightNode.style.transform = 'rotate(180deg)';
                     leftNode.style.transform = `rotate(${deg - 180}deg)`;
+                }
+                domTransfer.classList.remove('hidden');
+                if (esimate) {
+                    domTime.classList.remove('hidden');
                 }
                 domSize.textContent = bytesToSize(total);
                 domSpeed.textContent = bytesToSpeed(speed);
@@ -778,7 +791,7 @@ lazy(T.ui, 'addFilesLayout', () => {
                 const tp = $.transferprogress;
                 const gid = ulmanager.getGID(ul);
                 if (files.local) {
-                    domUploaded.parentNode.classList.remove('hidden');
+                    domTransfer.classList.remove('hidden');
                     files.local = false;
                 }
                 tp[gid] = [bl, bt, bps];
@@ -791,7 +804,6 @@ lazy(T.ui, 'addFilesLayout', () => {
             domSize.textContent = '';
             domUploaded.textContent = '';
             domTick.classList.add('hidden');
-            domUploaded.parentNode.classList.add('hidden');
 
             T.core.upload(files, name)
                 .then((res) => {
@@ -810,6 +822,8 @@ lazy(T.ui, 'addFilesLayout', () => {
                     cancelBtn.classList.add('disabled');
                     copyBtn.classList.remove('disabled');
                     domTick.classList.remove('hidden');
+                    domTransfer.classList.add('hidden');
+                    domTime.classList.add('hidden');
 
                     if (T.ui.dashboardLayout) {
                         T.ui.dashboardLayout.data.refresh = true;

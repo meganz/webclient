@@ -20,14 +20,14 @@ body {
     padding: 0;
     scrollbar-color: var(--scroll-bar-handle) var(--scroll-bar-background);
     transition: var(--transition-bg-color);
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
     width: 100%;
 }
 
 body * {
     box-sizing: border-box;
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    user-select: none;
     /* scrollbar-width: thin; */
 }
 

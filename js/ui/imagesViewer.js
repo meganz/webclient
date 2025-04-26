@@ -878,7 +878,6 @@ var slideshowid;
             options.onPinchZoom = function(ev, mag) {
 
                 mega.ui.viewerOverlay.zoom *= mag;
-                slideshow_zoom($(elm), 0, mega.ui.viewerOverlay.zoom);
             };
         }
         else if (type === 'DOCX') {

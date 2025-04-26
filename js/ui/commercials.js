@@ -454,7 +454,7 @@ lazy(mega, 'commercials', () => {
 
         const slotWrapper = getCommWrapper(commID)[0];
 
-        if (slotWrapper) {
+        if (slotWrapper && slotWrapper.replaceChildren) {
             const newIframe = document.createElement('iframe');
 
             handleCookies();
@@ -621,7 +621,8 @@ lazy(mega, 'commercials', () => {
         */
         for (let i = 0; i < res.length; i++) {
             if (!newUserClosedSlots.has(res[i].id.toLowerCase())) {
-                createComm(res[i]);
+
+                createComm(res[i]).catch(dump);
             }
         }
         // }

@@ -1181,7 +1181,7 @@ else if ((page = isPublicLink())) {
     // folder or file link: always keep the hash URL to ensure that keys remain client side
     // history.replaceState so that back button works in new URL paradigm
     dl_res = !!page.dl;
-    page = page.link || page;
+    page = String(page.link || page);
     pushHistoryState(true, page);
 }
 else {

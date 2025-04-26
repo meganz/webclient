@@ -1554,7 +1554,7 @@ function logExportEvt(evtId, data) {
                                         + ' box-border opacity-0 transition-opacity'
                                 },
                                 [
-                                    mCreateElement('i', { class: 'sprite-fm-mono icon-upload-filled icon-size-8' }),
+                                    mCreateElement('i', { class: 'sprite-fm-mono icon-transfer-it icon-size-8' }),
                                     mCreateElement('div', { class: 'flex-1 px-4' }, [ title, txt ])
                                 ]
                             );

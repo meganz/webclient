@@ -40,3 +40,19 @@
     --transition-width: width .2s ease-in-out;
 
 }
+
+.theme-light.transferit-vars,
+.theme-light .transferit-vars,
+.transferit-vars .theme-light-forced {
+
+    --logo-url: url('../../images/svg/logo.svg');
+
+}
+
+.theme-dark.transferit-vars,
+.theme-dark .transferit-vars,
+.transferit-vars .theme-dark-forced {
+
+    --logo-url: url('../../images/svg/logo-dark.svg');
+
+}

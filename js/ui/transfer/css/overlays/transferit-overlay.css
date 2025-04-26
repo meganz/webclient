@@ -46,12 +46,8 @@
     max-width: 960px;
 }
 
-.it-dialog.open-transferit-overlay .logo-wrap {
-    --icon-size: 48px;
-    --mask-color: var(--main-forced-white);
-    background-color: var(--main-primary);
-    border-radius: 100%;
-    display: block;
+.it-dialog.open-transferit-overlay .it-logo {
+    background-size: auto 48px; 
     height: 48px;
     width: 48px;
 }

@@ -311,7 +311,8 @@ pro.propay = {
         }
         else {
             $('span.plan-name', $oneTimeInfo).text(this.planObj.name);
-            $('span.plan-duration', $oneTimeInfo).text(this.getNumOfMonthsWording(this.planObj.months));
+            $('span.plan-duration', $oneTimeInfo)
+                .text(this.getNumOfMonthsWording((this.discountInfo && this.discountInfo.m) || this.planObj.months));
         }
 
         if (state === 'recurring') {
@@ -594,6 +595,9 @@ pro.propay = {
                 // Do not set pmid if user is not using a saved card
                 if (this.useSavedCard && this.savedCard.id && !this.paymentButton) {
                     extra.pmid = this.savedCard.id;
+                }
+                if (!this.currentGateway.supportsRecurring) {
+                    extra.recurring = false;
                 }
             }
 
@@ -1560,6 +1564,8 @@ pro.propay = {
         let discountRenewalDuration;
 
         let blockedByMinAmount = false;
+        let blockedByYearlyOnly = false;
+        let blockedByMonthlyOnly = false;
 
         let warning;
 
@@ -1601,14 +1607,23 @@ pro.propay = {
                 $('.monthly-price', $monthlyRadio)
                     .text(pro.propay.getTxtString(monthlyPlan, 1, isRecurring ? false : '%1')).removeClass('hidden');
 
+                let updatePlan = false;
+
                 if (this.currentGateway && this.currentGateway.minimumEURAmountSupported > monthlyPlan.priceEuro) {
+                    updatePlan = true;
                     $monthlyRadio.addClass('disabled');
                     blockedByMinAmount = true;
-                    this.planObj = yearlyPlan;
-                    this.selectedPeriod = this.planObj.months;
+                }
+                else if (this.currentGateway && !this.currentGateway.supportsMonthlyPayment) {
+                    updatePlan = true;
+                    $monthlyRadio.addClass('disabled');
+                    blockedByYearlyOnly = true;
                 }
                 else if (discountRenewalDuration === 12) {
                     $monthlyRadio.addClass('disabled hidden');
+                }
+
+                if (updatePlan) {
                     this.planObj = yearlyPlan;
                     this.selectedPeriod = this.planObj.months;
                 }
@@ -1642,7 +1657,7 @@ pro.propay = {
                     }
                 }
 
-                $('.duration-head .duration-savings', $yearlyRadio)
+                const $durationSavings = $('.duration-head .duration-savings', $yearlyRadio)
                     .text(savingsAmount)
                     .removeClass('hidden');
 
@@ -1655,8 +1670,20 @@ pro.propay = {
                     .text(pro.propay.getTxtString(yearlyPlan, 1))
                     .toggleClass('hidden', !isRecurring);
 
+                let updatePlan = false;
+
                 if (discountRenewalDuration === 1) {
+                    updatePlan = true;
                     $yearlyRadio.addClass('disabled hidden');
+                }
+                if (this.currentGateway && !this.currentGateway.supportsAnnualPayment) {
+                    updatePlan = true;
+                    $yearlyRadio.addClass('disabled');
+                    $durationSavings.addClass('hidden');
+                    blockedByMonthlyOnly = true;
+                }
+
+                if (updatePlan) {
                     this.planObj = monthlyPlan;
                     this.selectedPeriod = this.planObj.months;
                 }
@@ -1669,6 +1696,12 @@ pro.propay = {
 
                 if (this.currentGateway.gatewayId === 0) {
                     warning = this.usingBalance ? this.warningStrings.balance : this.warningStrings.voucher;
+                }
+                else if (blockedByYearlyOnly) {
+                    warning = this.warningStrings.yearlyOnly;
+                }
+                else if (blockedByMonthlyOnly) {
+                    warning = this.warningStrings.monthlyOnly;
                 }
                 else if (blockedByMinAmount) {
                     warning = this.warningStrings.minAmount;
@@ -2596,7 +2629,7 @@ pro.propay = {
         'use strict';
         const enableAllPaymentGateways = (localStorage.enableAllPaymentGateways) ? 1 : 0;
 
-        const {result: gatewayOptions} = await api.req({a: 'ufpqfull', t: 0, d: enableAllPaymentGateways, v: 3});
+        const {result: gatewayOptions} = await api.req({a: 'ufpqfull', t: 0, d: enableAllPaymentGateways, v: 4});
 
         // TODO: Check if still on propay page
 
@@ -2632,6 +2665,10 @@ pro.propay = {
 
             tempGatewayOptions = tempGatewayOptions.filter(gate => {
                 if (gate.minimumEURAmountSupported > discountPriceEuro) {
+                    return false;
+                }
+                if ((discountInfo.m < 12) && !gate.supportsMonthlyPayment
+                    || (!(discountInfo.m % 12) && !gate.supportsAnnualPayment)) {
                     return false;
                 }
                 if (gate.supportsMultiDiscountCodes && gate.supportsMultiDiscountCodes === 1) {
@@ -3448,5 +3485,7 @@ lazy(pro.propay, 'warningStrings', () => {
         discountMonthly: l.only_available_monthly,
         minAmount: l.min_amount_restriction,
         voucher: l.voucher_only_one_off,
+        monthlyOnly: l.payment_monthly_only,
+        yearlyOnly: l.payment_yearly_only,
     };
 });

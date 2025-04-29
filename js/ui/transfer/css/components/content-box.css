@@ -89,6 +89,21 @@
     text-align: center;
 }
 
+.it-box .box-error-msg {
+    --icon-size: 24px;
+    --mask-color: var(--supportive-error);
+    align-items: center;
+    color: var(--supportive-error);
+    display: flex;
+    font: var(--text-body-sm);
+    margin: 0 0 12px;
+}
+
+.it-box .box-error-msg span {
+    margin-inline-start: 12px;
+}
+
+
 /* Box. Footer */
 
 .it-box > .body > footer {

@@ -3055,6 +3055,10 @@ function loadSubPage(tpage, event) {
         slideshow(0, 1);
     }
 
+    if ('transferItOverlay' in T.ui && T.ui.transferItOverlay.data.active) {
+        T.ui.transferItOverlay.hide();
+    }
+
     if (window.textEditorVisible) {
         // if we are loading a page and text editor was visible, then hide it.
         mega.textEditorUI.doClose();

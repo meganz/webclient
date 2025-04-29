@@ -89,6 +89,7 @@ lazy(T.ui, 'addFilesLayout', () => {
 
             // Init Select folders evt
             for (const elm of T.ui.page.content.querySelectorAll('.upload-picker')) {
+                elm.value = '';
                 elm.addEventListener('change', upload);
             }
 
@@ -98,6 +99,7 @@ lazy(T.ui, 'addFilesLayout', () => {
             // Unbind dragAndDrop input evts on page change
             this.data.pcl = mBroadcaster.addListener('it:beforepagechange', () => {
                 for (const elm of T.ui.page.content.querySelectorAll('.upload-picker')) {
+                    elm.value = '';
                     elm.removeEventListener('change', upload);
                 }
                 T.ui.page.content.removeEventListener('drop', drop);
@@ -162,25 +164,33 @@ lazy(T.ui, 'addFilesLayout', () => {
                 }
             });
 
-            email.addEventListener('change', () => {
-                if (String(email.value).trim()) {
-                    cn.querySelector('.dl-notif').classList.remove('disabled');
+            // Enable/disable notification toggles
+            const switchNotif = (checkbox) => {
+                if (isValidEmail(email.value)
+                    && !(checkbox.name === 'gbl-exp-notif'
+                    && cn.querySelector('input[name="glb-expire-radio"]:checked').value === '0')) {
+                    checkbox.closest('.it-toggle').classList.remove('disabled');
+                    checkbox.disabled = false;
+                    checkbox.checked = true;
                 }
                 else {
-                    cn.querySelector('.dl-notif').classList.add('disabled');
+                    checkbox.closest('.it-toggle').classList.add('disabled');
+                    checkbox.disabled = true;
+                    checkbox.checked = false;
+                }
+            };
+
+            email.addEventListener('input', () => {
+                for (const elm of cn.querySelectorAll('.notifications input')) {
+                    switchNotif(elm);
                 }
             });
 
             // Init Expiry dropdown
             T.ui.dropdown.clone(cn.querySelector('.js-expires-dropdown'), {
                 position: 'right center',
-                onChange: (value) => {
-                    if (value === l[1051]) {
-                        cn.querySelector('.exp-notif').classList.add('disabled');
-                    }
-                    else {
-                        cn.querySelector('.exp-notif').classList.remove('disabled');
-                    }
+                onChange: () => {
+                    switchNotif(cn.querySelector('input[name="gbl-exp-notif"]'));
                 }
             });
 
@@ -363,6 +373,7 @@ lazy(T.ui, 'addFilesLayout', () => {
                 }
                 return true;
             };
+            const showSpinner = !sel;
 
             sel = sel || await M.initFileAndFolderSelectDialog({customFilterFn});
             if (!(sel && sel.length)) {
@@ -372,7 +383,9 @@ lazy(T.ui, 'addFilesLayout', () => {
             if (mega.CloudBrowserDialog) {
                 customFilterFn = mega.CloudBrowserDialog.getFilterFunction(customFilterFn);
             }
-            loadingDialog.show();
+            if (showSpinner) {
+                loadingDialog.show();
+            }
 
             if (self.d) {
                 console.group('Adding files from cloud-drive...');
@@ -445,6 +458,7 @@ lazy(T.ui, 'addFilesLayout', () => {
 
             // Reset inputs
             email.value = ''; // Email input
+            email.dispatchEvent(new Event('input'));
             exp.value = ''; // Expiry date input
             msg.value = ''; // Message textarea
             pw.value = ''; // Password input
@@ -604,7 +618,7 @@ lazy(T.ui, 'addFilesLayout', () => {
             const tp = $.transferprogress;
             for (let i = ul_queue.length; i--;) {
                 const ul = ul_queue[i];
-                const tu = tp[ulmanager.getGID(ul)];
+                const tu = tp && tp[ulmanager.getGID(ul)];
 
                 if (tu) {
                     done += tu[0];
@@ -620,7 +634,7 @@ lazy(T.ui, 'addFilesLayout', () => {
                 total += tp.ulc || 0;
             }
             if (!speed) {
-                const spent = (tick || Date.now()) - tp.ust;
+                const spent = tp && (tick || Date.now()) - tp.ust;
                 speed = spent > 0 ? done / (spent / 1e3) : 0;
             }
             return {done, total, speed, percent: ~~(done / total * 100), left: speed && (total - done) / speed};

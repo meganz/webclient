@@ -246,6 +246,10 @@ label.inv-input input:focus ~ span {
     position: absolute;
 }
 
+.it-input.fl-label .input-field .chips-body:not(:empty) ~ input::placeholder {
+    opacity: 0;
+}
+
 .it-input.chips .chips-body {
     padding: 12px 0 0;
 }

@@ -23,22 +23,8 @@ lazy(T.ui, 'transferItOverlay', () => {
     const visitBtn = header.querySelector('.js-visit-it');
     const closeBtn = header.querySelector('.js-close');
 
-    visitBtn.addEventListener('click', (ev) => {
-        stop(ev);
-        T.core.transfer();
-    });
-
-    closeBtn.addEventListener('click', () => {
-        gn.classList.add('hidden');
-    });
-
     visitBtn.classList.remove('hidden');
     closeBtn.classList.remove('hidden');
-
-    header.querySelector('.it-logo').addEventListener('click', (e) => {
-        e.preventDefault();
-        T.ui.addFilesLayout.init();
-    });
 
     /** @temp property T.ui.page */
     lazy(T.ui, 'page', () => {
@@ -68,6 +54,18 @@ lazy(T.ui, 'transferItOverlay', () => {
         init() {
             const cn = this.data.cn = gn.querySelector('.js-transferit-overlay');
 
+            closeBtn.addEventListener('click', () => history.back());
+
+            visitBtn.addEventListener('click', (ev) => {
+                stop(ev);
+                T.core.transfer();
+            });
+
+            header.querySelector('.it-logo').addEventListener('click', (e) => {
+                e.preventDefault();
+                T.ui.addFilesLayout.init();
+            });
+
             cn.querySelector('.js-continue').addEventListener('click', () => {
                 if (cn.querySelector('.js-skip-overlay').checked) {
                     mega.config.set('skiptritwarn', 1);
@@ -77,15 +75,22 @@ lazy(T.ui, 'transferItOverlay', () => {
                 }
                 cn.classList.add('hidden');
             });
-            cn.querySelector('.js-close').addEventListener('click', () => this.hide());
-            cn.querySelector('.js-cancel').addEventListener('click', () => this.hide());
+            cn.querySelector('.js-close').addEventListener('click', () => history.back());
+            cn.querySelector('.js-cancel').addEventListener('click', () => history.back());
         },
 
         show(psn) {
+            loadSubPage('');
+
             if (!this.data.cn) {
                 this.init();
             }
+            if (this.data.active) {
+                console.warn('transferItOverlay already visible?');
+                return;
+            }
 
+            this.data.active = true;
             gn.classList.remove('hidden');
 
             if (!mega.config.get('skiptritwarn')) {
@@ -96,6 +101,7 @@ lazy(T.ui, 'transferItOverlay', () => {
         },
 
         hide() {
+            this.data.active = false;
             this.data.cn.classList.add('hidden');
             gn.classList.add('hidden');
         }

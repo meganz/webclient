@@ -193,7 +193,7 @@ lazy(T.ui, 'input', () => {
                 });
             };
 
-            $(input).datepicker({
+            const dp = $(input).datepicker({
                 dateFormat: 'mm/dd/yyyy',
                 minDate: new Date(),
                 maxDate: new Date(2077, 11, 31),
@@ -220,6 +220,11 @@ lazy(T.ui, 'input', () => {
                     changePos($node);
                 }
             });
+
+            if (input.dataset.value) {
+                dp.data('datepicker').selectDate(new Date(parseInt(input.dataset.value) * 1e3));
+            }
+
             btn.addEventListener('click', (e) => {
                 stop(e);
                 input.click();

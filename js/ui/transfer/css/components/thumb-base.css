@@ -22,12 +22,12 @@
 
 .it-thumb-base img {
     display: none;
+    object-fit: cover;
     margin: auto;
-    left: 50%;
-    min-height: 100%;
+    left: 0;
+    height: 100%;
     position: absolute;
-    top: 50%;
-    transform: translate(-50%, -50%);
+    top: 0;
     width: 100%;
 }
 

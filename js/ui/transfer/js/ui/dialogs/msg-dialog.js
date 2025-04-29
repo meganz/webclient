@@ -103,6 +103,7 @@ lazy(T.ui, 'msgDialog', () => {
             submsg,
             onload,
             placeholders = [],
+            value,
             type = 'warning',
             buttons = [l.ok_button],
             joy = true
@@ -121,6 +122,10 @@ lazy(T.ui, 'msgDialog', () => {
                     elm.querySelector('label').textContent = placeholders[0];
                     input.placeholder = placeholders[1] || placeholders[0];
                 }
+                if (value) {
+                    input.dataset.value = value;
+                }
+
                 T.ui.input.init(input);
 
                 if (type !== 'calendar') {

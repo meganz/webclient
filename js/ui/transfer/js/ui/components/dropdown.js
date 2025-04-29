@@ -104,7 +104,11 @@ lazy(T.ui, 'dropdown', () => {
                 })(onChange);
 
                 for (const label of target.querySelectorAll('.js-option')) {
-
+                    const name = label.querySelector('.name');
+                    const ds = name.dataset;
+                    if (ds.string && ds.value) {
+                        name.textContent = mega.icu.format(l[ds.string], parseInt(ds.value));
+                    }
                     label.addEventListener('change', onChange);
                 }
             }

@@ -106,13 +106,12 @@ lazy(T.ui, 'dashboardLayout', () => {
 
             // Init tabs
             for (const tab of cn.querySelectorAll('.js-transfers-tabs button')) {
-                tab.addEventListener('click', (e) => {
-                    stop(e);
+                tab.addEventListener('click', () => {
                     const activeBtn = tab.parentElement.querySelector('button.active');
                     if (activeBtn) {
                         activeBtn.classList.remove('active');
                     }
-                    e.currentTarget.classList.add('active');
+                    tab.classList.add('active');
 
                     return this.renderListContent();
                 });
@@ -503,14 +502,15 @@ lazy(T.ui, 'dashboardLayout', () => {
             });
 
             cn.querySelector('.js-tr-change-schedule').addEventListener('click', () => {
-                const {xh} = this.data.selected;
+                const {xh, xrf} = this.data.selected;
                 const opt = {
                     title: l.transferit_change_sched_hdr,
                     type: 'calendar',
                     buttons: [l[776], l[82]],
-                    placeholders: [l.transferit_sending_date]
+                    placeholders: [l.transferit_sending_date],
+                    value: xrf.length ? xrf[0].s : null
                 };
-                T.ui.prompt(l.ransferit_change_sched_info, opt)
+                T.ui.prompt(l.transferit_change_sched_info, opt)
                     .then((e) => e > 0 && T.core.setTransferRecipients(xh, {e}))
                     .then((s) => s && this.init(true))
                     .catch(tell);

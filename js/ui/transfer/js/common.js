@@ -27,9 +27,9 @@ Object.defineProperty(T.ui, 'loadPage', {
             delete T.ui.sweeper;
         }
         tryCatch(() => {
-            const e = document.querySelector('input[type="file"]');
-            if (e) {
-                e.value = '';
+            for (const elm of document.querySelectorAll('.upload-picker')) {
+
+                elm.value = '';
             }
         })();
         let res;

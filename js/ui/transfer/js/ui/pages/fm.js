@@ -32,7 +32,7 @@ lazy(T.ui, 'viewFilesLayout', () => {
         }
 
         if ($.len(thumbs)) {
-            return api_getfileattr(thumbs, 0, (_, fa, data) => {
+            return api_getfileattr(thumbs, 1, (_, fa, data) => {
                 if (data.byteLength) {
                     const uri = mObjectURL([data.buffer], 'image/jpeg');
                     thumbnails.add(fa, uri, (n) => thumb(n, uri));
@@ -295,7 +295,7 @@ lazy(T.ui, 'viewFilesLayout', () => {
             info.querySelector('.size').textContent = bytesToSize(tb);
 
             info.querySelector('.num').textContent =
-                `${mega.icu.format(l.folder_count, td - 1)}, ${mega.icu.format(l.file_count, tf)}`;
+                `${td - 1 ? mega.icu.format(l.folder_count, td - 1) + ', ' : ''}${mega.icu.format(l.file_count, tf)}`;
         },
 
         initViewModeBtns() {

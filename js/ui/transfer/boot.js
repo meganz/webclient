@@ -158,7 +158,9 @@ mBroadcaster.once('boot_done', () => {
             $.transferprogress = Object($.transferprogress);
         },
         ulprogress(...a) {
-            T.ui.ulprogress(...a);
+            if (T.ui.ulprogress) {
+                T.ui.ulprogress(...a);
+            }
         },
         ulerror(ul, e) {
             ul.promiseToInvoke.reject(e);

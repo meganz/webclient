@@ -255,6 +255,21 @@ mBroadcaster.once('boot_done', () => {
         filterByParent(p) {
             const {v} = this;
 
+            while (M.c[p]) {
+                const l = Object.keys(M.c[p]);
+                if (l.length === 1) {
+                    const n = this.getNodeByHandle(l[0]);
+                    if (n.t) {
+                        if (self.d) {
+                            console.info(`Only one folder in ${p}, showing the contents for ${n.h}`);
+                        }
+                        p = n.h;
+                        continue;
+                    }
+                }
+                break;
+            }
+
             v.length = 0;
             for (const h in M.c[p]) {
                 const n = this.getNodeByHandle(h);

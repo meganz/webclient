@@ -165,9 +165,9 @@ lazy(T.ui, 'viewFilesLayout', () => {
         },
 
         async pollZipDownload(xh, elm) {
-            const {z, zp} = this.data.xi;
+            const {z, zp, size: [, files]} = this.data.xi;
 
-            if (!z) {
+            if (!z && files > 1) {
                 elm.classList.add('disabled');
                 this.zipDownloadQueue.dom.add(elm);
 

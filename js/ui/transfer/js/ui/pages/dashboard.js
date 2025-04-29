@@ -469,8 +469,8 @@ lazy(T.ui, 'dashboardLayout', () => {
                     placeholders: [l[17454], l[909]],
                 };
                 T.ui.prompt(msg, opt)
-                    .then((p) => p && T.core.setTransferAttributes(xh, {p}))
-                    .then((s) => s && this.init(true))
+                    .then((pw) => pw && T.core.setTransferAttributes(xh, {pw}))
+                    .then((s) => s === 0 && this.init(true))
                     .catch(tell);
             });
 
@@ -511,7 +511,15 @@ lazy(T.ui, 'dashboardLayout', () => {
                     value: xrf.length ? xrf[0].s : null
                 };
                 T.ui.prompt(l.transferit_change_sched_info, opt)
-                    .then((e) => e > 0 && T.core.setTransferRecipients(xh, {e}))
+                    .then((s) => {
+                        if (s > 0) {
+                            const p = [];
+                            for (let i = xrf.length; i--;) {
+                                p.push(T.core.setTransferRecipients(xh, {s}, xrf[i].rh));
+                            }
+                            return Promise.all(p);
+                        }
+                    })
                     .then((s) => s && this.init(true))
                     .catch(tell);
             });

@@ -279,6 +279,8 @@
 .mobile .media-viewer .content-info .fm-breadcrumbs-wrapper.info span {
     font: var(--mobile-font-caption-large-regular);
     color: var(--mobile-text-secondary);
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .mobile .media-viewer .content-info .fm-breadcrumbs {

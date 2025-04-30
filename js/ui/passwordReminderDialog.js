@@ -538,9 +538,8 @@
 
             const component = is_mobile ? mega.ui.overlay : mega.ui.sheet;
 
-            component.removeClass(this.NAMESPACE);
-
             if (component.name === this.NAMESPACE) {
+                component.removeClass(this.NAMESPACE);
                 component.hide();
                 component.clear();
             }

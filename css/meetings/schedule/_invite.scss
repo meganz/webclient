@@ -55,10 +55,11 @@
                     width: 100%;
 
                     .avatar-wrapper {
-                        border-radius: 4px;
+                        width: 24px;
                         height: 24px;
                         line-height: 24px;
-                        width: 24px;
+                        border-radius: 4px;
+                        flex-shrink: 0;
 
                         .user-card-verified {
                             position: absolute;

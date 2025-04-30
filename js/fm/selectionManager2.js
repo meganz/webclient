@@ -919,6 +919,11 @@ class SelectionManager2_DOM extends SelectionManager2Base {
 
     updateSelectionNotification() {
         delay('sel-update-notif', () => {
+            if (!this.selected_list) {
+                // May be destroyed so just hide the bar.
+                mega.ui.secondaryNav.hideSelectionBar();
+                return;
+            }
             const itemsNum = this.selected_list.filter(h => h !== this.currentdirid).length;
             if (itemsNum === 0) {
                 this.hideSelectionBar();

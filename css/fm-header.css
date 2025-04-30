@@ -165,6 +165,8 @@
 .search-bottom-wrapper .crumb-overflow-link .breadcrumb-dropdown-link {
     height: 24px;
     border-radius: 12px;
+    display: flex;
+    align-items: center;
 }
 .search-bottom-wrapper .crumb-overflow-link .breadcrumb-dropdown-link:hover {
     background: var(--surface-grey-1);

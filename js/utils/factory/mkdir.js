@@ -14,7 +14,6 @@ factory.define('mkdir', () => {
     };
 
     const walk = (paths) => {
-        const tmp = paths;
         const res = Object.create(null);
 
         if (paths instanceof FileList) {
@@ -27,8 +26,7 @@ factory.define('mkdir', () => {
         // create folder hierarchy
         for (let i = paths.length; i--;) {
             const value = paths[i];
-            const safe = !(tmp && tmp[value] === true);
-            Object.defineProperty(traverse(safe ? [value] : getSafePath(value), res), kind, {value});
+            Object.defineProperty(traverse(getSafePath(value), res), kind, {value});
         }
 
         return res;
@@ -51,21 +49,22 @@ factory.define('mkdir', () => {
                     const p = paths[i];
                     const t = p && p.path || typeof p === 'string' && p;
                     if (t) {
-                        tmp[t] = tmp[t] || p instanceof Blob || null;
+                        tmp[t] = null;
                     }
                 }
                 paths = tmp;
             }
-            const tree = walk(paths);
-            let folders = Object.keys(paths).length;
+            let folders = Object.keys(paths);
+            const tree = walk(folders);
 
+            folders = folders.length;
             (function _mkdir(s, t) {
                 Object.keys(s).forEach((name) => {
                     stub(t, name)
                         .then((h) => {
                             const c = s[name]; // children for the just created folder
                             if (c[kind]) {
-                                console.assert(paths[c[kind]] === null || paths[c[kind]] === true);
+                                console.assert(paths[c[kind]] === null);
 
                                 // record the created folder node handle
                                 paths[c[kind]] = h;

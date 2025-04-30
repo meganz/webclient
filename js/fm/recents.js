@@ -466,7 +466,7 @@ RecentsRender.prototype.populateBreadCrumb = function($container, action) {
     var newBreadCrumb = function(node) {
         var $breadCrumb = $('<span/>');
         $breadCrumb
-            .attr('id', node.h)
+            .attr('data-id', node.h)
             .text(node.name)
             .rebind('click dblclick', function () {
                 M.openFolder(node.h);
@@ -1429,9 +1429,25 @@ RecentsRender.prototype.nodeChanged = function(handle) {
     'use strict';
     // Parent/breadcrumb change
     if (this._isBreadcrumb(handle)) {
-        const nodeId = $(`#${handle}`, '.fm-recents.container')
-            .closest('.fm-recents.content-row').attr('id');
-        this._updateNodeBreadcrumb(nodeId);
+        const $nodes = $(`.parent-folder-name[data-id='${handle}']`, '.fm-recents.container');
+        for (const node of $nodes) {
+            const row = node.closest('.fm-recents.content-row');
+            if (row.id) {
+                this._updateNodeBreadcrumb(row.id);
+            }
+            else {
+                let actionId = '';
+                for (const cls of row.classList) {
+                    if (cls.startsWith('action-')) {
+                        actionId = cls.split('-')[1];
+                        break;
+                    }
+                }
+                if (actionId && this.actionIdMap[actionId]) {
+                    this._updateNodeBreadcrumb(actionId);
+                }
+            }
+        }
     }
     // Action row change
     else if (handle && M.d[handle] && this._nodeActionMap[handle] && this._dynamicList) {
@@ -1483,7 +1499,7 @@ RecentsRender.prototype.nodeChanged = function(handle) {
  */
 RecentsRender.prototype._isBreadcrumb = function(handle) {
     'use strict';
-    return $(`#${handle}`, '.fm-recents.container').hasClass('parent-folder-name');
+    return $(`.parent-folder-name[data-id='${handle}']`, '.fm-recents.container').length;
 };
 
 /**
@@ -1762,14 +1778,17 @@ RecentsRender.prototype._updateNodeBreadcrumb = function(id) {
         this._fillActionIds(actions);
         for (let i = 0; i < actions.length; i++) {
             const $item = $(this._renderCache[actions[i].id]);
-            if ($item.length && $item.attr('id') === id) {
+            if ($item.length && ($item.attr('id') === id || $item.hasClass(`action-${id}`))) {
                 this.actionIdMap[actions[i].id] = actions[i];
                 return actions[i];
             }
         }
     }).then(action => {
         if (action) {
-            const $oldBreadcrumb = $('.fm-recents.breadcrumbs', `#${id}`);
+            let $oldBreadcrumb = $('.fm-recents.breadcrumbs', `#${id}`);
+            if ($oldBreadcrumb.length === 0) {
+                $oldBreadcrumb = $('.fm-recents.breadcrumbs', `.action-${id}`);
+            }
             $oldBreadcrumb.empty();
             // Correct names
             for (let i = 0; i < action.path.length; i++) {

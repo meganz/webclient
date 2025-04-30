@@ -132,8 +132,8 @@ MegaData.prototype.sortByModTimeFn = function() {
             return M.doFallbackSortWithName(a, b, d);
         }
 
-        var time1 = a.mtime - a.mtime % 60;
-        var time2 = b.mtime - b.mtime % 60;
+        var time1 = a.mtime;
+        var time2 = b.mtime;
         if (time1 !== time2) {
             return (time1 < time2 ? -1 : 1) * d;
         }
@@ -186,14 +186,14 @@ MegaData.prototype.getSortByDateTimeFn = function(type) {
             var max = 0;
             for (var i in shares) {
                 if (i !== 'EXP') {
-                    max = Math.max(max, shares[i].ts - shares[i].ts % 60);
+                    max = Math.max(max, shares[i].ts);
                 }
             }
             return max;
         };
 
-        var time1 = a.ts - a.ts % 60;
-        var time2 = b.ts - b.ts % 60;
+        var time1 = a.ts;
+        var time2 = b.ts;
 
         if (M.currentdirid === 'out-shares' || type === 'out-shares') {
             time1 = M.ps[a.h] ? getMaxShared(M.ps[a.h]) : getMaxShared(a.shares);

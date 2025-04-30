@@ -31420,9 +31420,10 @@ class MessageRow extends mixins.w9 {
       index,
       onResultOpen
     } = this.props;
-    const isGroup = room && roomIsGroup(room);
+    const isGroup = roomIsGroup(room);
     const contact = room.getParticipantsExceptMe();
     const summary = room.messagesBuff.getRenderableSummary(data);
+    const date = todayOrYesterday(data.delay * 1000) ? getTimeMarker(data.delay) : time2date(data.delay, 17);
     return REaCt().createElement("div", {
       ref: node => {
         this.domRef = node;
@@ -31438,17 +31439,21 @@ class MessageRow extends mixins.w9 {
       }, () => onResultOpen(this.domRef))
     }, REaCt().createElement("div", {
       className: "message-result-avatar"
-    }, isGroup ? REaCt().createElement("div", {
+    }, isGroup && REaCt().createElement("div", {
       className: "chat-topic-icon"
     }, REaCt().createElement("i", {
       className: "sprite-fm-uni icon-chat-group"
-    })) : REaCt().createElement(ui_contacts.Avatar, {
+    })), room.isNote && REaCt().createElement("div", {
+      className: "note-chat-signifier"
+    }, REaCt().createElement("i", {
+      className: "sprite-fm-mono icon-file-text-thin-outline note-chat-icon"
+    })), room.type === 'private' && REaCt().createElement(ui_contacts.Avatar, {
       contact: M.u[contact]
     })), REaCt().createElement("div", {
       className: "user-card"
     }, REaCt().createElement("span", {
       className: "title"
-    }, isGroup ? REaCt().createElement(utils.sp, null, room.getRoomTitle()) : REaCt().createElement(ui_contacts.ContactAwareName, {
+    }, isGroup && REaCt().createElement(utils.sp, null, room.getRoomTitle()), room.isNote && REaCt().createElement("span", null, l.note_label), room.type === 'private' && REaCt().createElement(ui_contacts.ContactAwareName, {
       contact: M.u[contact],
       overflow: true
     })), isGroup ? null : REaCt().createElement(ui_contacts.ContactPresence, {
@@ -31467,7 +31472,7 @@ class MessageRow extends mixins.w9 {
       className: "sprite-fm-mono icon-dot"
     })), REaCt().createElement("span", {
       className: "date"
-    }, getTimeMarker(data.delay, true)))));
+    }, date))));
   }
 }
 class ChatRow extends mixins.w9 {
@@ -31494,7 +31499,9 @@ class ChatRow extends mixins.w9 {
       className: USER_CARD_CLASS
     }, REaCt().createElement("div", {
       className: "graphic"
-    }, REaCt().createElement(utils.oM, null, result)), lastActivity(room)), REaCt().createElement("div", {
+    }, REaCt().createElement(utils.oM, null, result)), REaCt().createElement("div", {
+      className: "result-last-activity"
+    }, lastActivity(room))), REaCt().createElement("div", {
       className: "clear"
     }));
   }

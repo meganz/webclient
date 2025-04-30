@@ -120,13 +120,9 @@ function date2version() {
 
     const soy = new Date(Date.UTC(year, 0, 0));
     const doy = Math.floor((now - soy) / 864e5);
+    const mod = now.getUTCHours() * 60 + now.getUTCMinutes();
 
-    const sod =
-        now.getUTCHours() * 3600 +
-        now.getUTCMinutes() * 60 +
-        now.getUTCSeconds();
-
-    return `${year % 100}.${doy}.${sod}`;
+    return `${(year % 100) - 24}.${doy}.${mod}`;
 }
 
 lazy(FS, 'Secureboot', () => {

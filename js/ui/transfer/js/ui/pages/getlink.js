@@ -438,7 +438,7 @@ lazy(T.ui, 'addFilesLayout', () => {
             this.appendAddedFiles(lst);
             this.data.ko.push(...await prom);
 
-            this.renderAddedFiles();
+            this.renderUploadList();
         },
 
         appendAddedFiles(lst) {
@@ -583,7 +583,7 @@ lazy(T.ui, 'addFilesLayout', () => {
             const { files } = this.data;
             const { cn, tn } = this.addedFiles;
 
-            if (!tn.dataset.customVal) {
+            if (!tn.dataset.customVal || !tn.value.trim()) {
                 tn.value = files.length === 1 ? files[0].name :
                     files.length ? l.transferit_multiple_files : '';
             }

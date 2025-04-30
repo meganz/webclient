@@ -224,9 +224,7 @@ class MegaChatItem extends MegaComponent {
             }
             else {
                 this.details =
-                    messagesBuff.messagesHistoryIsLoading() ||
-                    messagesBuff.joined === false ||
-                    messagesBuff.isDecrypting ?
+                    this.chatRoom.isLoading() ?
                         l[7006] : this.chatRoom.isNote && !this.chatRoom.hasMessages() ? '' : l[8000];
             }
         }
@@ -250,6 +248,7 @@ class MegaChatItem extends MegaComponent {
                 mega-chat-room-topic
                 ${this.chatRoom.isNote ? 'note-chat-label' : ''}
                 ${this.chatRoom.isNote && !this.chatRoom.hasMessages() ? 'note-chat-empty' : ''}
+                ${this.chatRoom.isLoading() ? 'mega-chat-item--loading' : ''}
             `
         }));
     }

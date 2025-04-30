@@ -708,6 +708,7 @@ lazy(mega.ui, 'secondaryNav', () => {
                 infoButtonBound = true;
                 this.infoButton.addEventListener('click', (ev) => {
                     ev.stopPropagation();
+                    $.hideContextMenu();
                     if (mega.ui.mInfoPanel.isOpen()) {
                         mega.ui.mInfoPanel.closeIfOpen();
                         eventlog(500727);

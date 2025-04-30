@@ -136,8 +136,7 @@ export const getTimeIntervals = (timestamp, offsetFrom, interval = 30) => {
 
         while (targetDate.getDate() === initialDate.getDate()) {
             const timestamp = targetDate.getTime();
-            // `duration` is set only if `offsetFrom` is passed *and* both dates are the same day
-            const diff = offsetFrom && isSameDay(timestamp, offsetFrom) && timestamp - offsetFrom;
+            const diff = offsetFrom && timestamp - offsetFrom;
             increments.push({
                 value: timestamp,
                 label: toLocaleTime(timestamp),

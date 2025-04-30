@@ -19,22 +19,27 @@ export default class Select extends MegaRenderMixin {
 
     getFormattedDuration(duration) {
         duration = moment.duration(duration);
+        const days = duration.get('days');
         const hours = duration.get('hours');
         const minutes = duration.get('minutes');
 
-        if (!hours && !minutes) {
+        if (!hours && !minutes && !days) {
             return '';
         }
 
+        const totalHours = days ? ~~duration.asHours() : hours;
+
         if (!hours && minutes) {
             // return l.time_offset_om;
-            return '([[MINUTES]]\u00a0m)'.replace('[[MINUTES]]', minutes);
+            return days ?
+                `(${totalHours}\u00a0h ${minutes}\u00a0m)` :
+                `(${minutes}\u00a0m)`;
         }
 
         // return (minutes ? l.time_offset_wm : l.time_offset_wh).replace('%d', hours);
-        return (minutes ? '([[HOURS]]\u00a0h [[MINUTES]]\u00a0m)' : '([[HOURS]]\u00a0h)')
-            .replace('[[HOURS]]', hours)
-            .replace('[[MINUTES]]', minutes);
+        return minutes ?
+            `(${totalHours}\u00a0h ${minutes}\u00a0m)` :
+            `(${totalHours}\u00a0h)`;
     }
 
     handleMousedown = ({ target }) =>

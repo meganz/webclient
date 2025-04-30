@@ -51,3 +51,8 @@
 .it-dialog.navigation-dialog .toggle-body {
     width: 60px;
 }
+
+.it-dialog.navigation-dialog .version {
+    color: var(--main-neutral-secondary);
+    font: var(--text-btn-md);
+}

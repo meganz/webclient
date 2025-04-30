@@ -1,4 +1,4 @@
-/** @property T.ui.langDialog */
+/** @property T.ui.navDialog */
 lazy(T.ui, 'navDialog', () => {
     'use strict';
 
@@ -19,10 +19,36 @@ lazy(T.ui, 'navDialog', () => {
             .finally(() => loadingDialog.hide());
     };
 
-    // Close
+    let vn = cn.querySelector('.version');
+    if (vn) {
+        tryCatch(() => {
+            vn.querySelector('span').textContent = buildVersion.website || 'dev';
+            if (buildVersion.commit) {
+                const a = vn.querySelector('a');
+                a.href += buildVersion.commit;
+                a.textContent = `(${buildVersion.commit})`;
+            }
+        })();
+    }
+    let verClickCnt = 0;
+
+    // Close or show/hide version
     cn.addEventListener('click', (e) => {
         if (e.target === cn || e.target.closest('button')) {
             T.ui.dialog.hide(cn);
+            return false;
+        }
+        if (e.target.closest('label')) {
+            return false;
+        }
+        if (vn) {
+            if (++verClickCnt > 7) {
+                vn.classList.remove('hidden');
+                vn = null;
+            }
+            delay('nav-dialog-click', () => {
+                verClickCnt = 0;
+            }, 350);
         }
     });
 
@@ -77,3 +103,18 @@ lazy(T.ui, 'navDialog', () => {
         }
     });
 });
+
+mBroadcaster.once('boot_done', tryCatch(() => {
+    'use strict';
+    const audio = new Audio();
+    audio.src = b64decode('aHR0cHM6Ly93d3cubXlpbnN0YW50cy5jb20vbWVkaWEvc291bmRzL2hhZG91a2VuLm1wMw');
+    audio.load();
+
+    mBroadcaster.addListener('it-key-combo', tryCatch((seq) => {
+        if (seq === 'SDA') {
+            Promise.resolve(audio.play()).catch(dump);
+            T.ui.navDialog.show();
+            document.querySelector('.js-nav-dialog .version').classList.remove('hidden');
+        }
+    }));
+}));

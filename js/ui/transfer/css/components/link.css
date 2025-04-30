@@ -19,6 +19,18 @@ a.link:visited {
     text-decoration: underline;
 }
 
+.link.primary,
+a.link.primary,
+a.link.primary {
+    color: var(--main-primary);
+}
+
+.link.n-primary,
+a.link.n-primary,
+a.link.n-primary {
+    color: var(--main-neutral-primary);
+}
+
 .link.sm-size,
 a.link.sm-size {
     font: var(--text-body-sm);

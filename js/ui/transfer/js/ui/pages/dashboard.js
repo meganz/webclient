@@ -454,7 +454,7 @@ lazy(T.ui, 'dashboardLayout', () => {
                 T.ui.prompt(l.transferit_enter_new_title, opt)
                     .catch(echo)
                     .then((title) => title && T.core.setTransferAttributes(xh, {title}))
-                    .then((s) => s && this.init(true))
+                    .then((s) => s === 0 && this.init(true))
                     .catch(tell);
             });
 
@@ -497,7 +497,7 @@ lazy(T.ui, 'dashboardLayout', () => {
                 };
                 T.ui.msgDialog.show(opt)
                     .then((e) => e >= 0 && T.core.setTransferAttributes(xh, {e}))
-                    .then((s) => s && this.init(true))
+                    .then((s) => s === 0 && this.init(true))
                     .catch(tell);
             });
 

@@ -106,13 +106,12 @@ lazy(T.ui, 'dashboardLayout', () => {
 
             // Init tabs
             for (const tab of cn.querySelectorAll('.js-transfers-tabs button')) {
-                tab.addEventListener('click', (e) => {
-                    stop(e);
+                tab.addEventListener('click', () => {
                     const activeBtn = tab.parentElement.querySelector('button.active');
                     if (activeBtn) {
                         activeBtn.classList.remove('active');
                     }
-                    e.currentTarget.classList.add('active');
+                    tab.classList.add('active');
 
                     return this.renderListContent();
                 });
@@ -455,7 +454,7 @@ lazy(T.ui, 'dashboardLayout', () => {
                 T.ui.prompt(l.transferit_enter_new_title, opt)
                     .catch(echo)
                     .then((title) => title && T.core.setTransferAttributes(xh, {title}))
-                    .then((s) => s && this.init(true))
+                    .then((s) => s === 0 && this.init(true))
                     .catch(tell);
             });
 
@@ -470,8 +469,8 @@ lazy(T.ui, 'dashboardLayout', () => {
                     placeholders: [l[17454], l[909]],
                 };
                 T.ui.prompt(msg, opt)
-                    .then((p) => p && T.core.setTransferAttributes(xh, {p}))
-                    .then((s) => s && this.init(true))
+                    .then((pw) => pw && T.core.setTransferAttributes(xh, {pw}))
+                    .then((s) => s === 0 && this.init(true))
                     .catch(tell);
             });
 
@@ -498,20 +497,29 @@ lazy(T.ui, 'dashboardLayout', () => {
                 };
                 T.ui.msgDialog.show(opt)
                     .then((e) => e >= 0 && T.core.setTransferAttributes(xh, {e}))
-                    .then((s) => s && this.init(true))
+                    .then((s) => s === 0 && this.init(true))
                     .catch(tell);
             });
 
             cn.querySelector('.js-tr-change-schedule').addEventListener('click', () => {
-                const {xh} = this.data.selected;
+                const {xh, xrf} = this.data.selected;
                 const opt = {
                     title: l.transferit_change_sched_hdr,
                     type: 'calendar',
                     buttons: [l[776], l[82]],
-                    placeholders: [l.transferit_sending_date]
+                    placeholders: [l.transferit_sending_date],
+                    value: xrf.length ? xrf[0].s : null
                 };
-                T.ui.prompt(l.ransferit_change_sched_info, opt)
-                    .then((e) => e > 0 && T.core.setTransferRecipients(xh, {e}))
+                T.ui.prompt(l.transferit_change_sched_info, opt)
+                    .then((s) => {
+                        if (s > 0) {
+                            const p = [];
+                            for (let i = xrf.length; i--;) {
+                                p.push(T.core.setTransferRecipients(xh, {s}, xrf[i].rh));
+                            }
+                            return Promise.all(p);
+                        }
+                    })
                     .then((s) => s && this.init(true))
                     .catch(tell);
             });

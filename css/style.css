@@ -6391,6 +6391,7 @@ div.new-bottom-pages li, div.new-bottom-pages p {
 .search-bottom-wrapper {
     background-color: var(--stroke-grey-2);
     border-left: 2px solid var(--stroke-main);
+    display: flex;
     height: 64px;
     z-index: 12;
     width: 100%;

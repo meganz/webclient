@@ -165,10 +165,10 @@ lazy(self.T, 'core', () => {
         switch (k) {
             case 't':
             case 'm':
-            case 'p':
+            case 'pw':
             case 'se':
                 v = String(v || '');
-                if (k === 'se' || k === 'p') {
+                if (k === 'se' || k === 'pw') {
                     return [1, v.trim() || undefined];
                 }
                 else if (k === 't' || k === 'm') {
@@ -393,7 +393,7 @@ lazy(self.T, 'core', () => {
             const setLink = (base) => {
                 M.l[h] = `${base}${encodeURIComponent(name)}`;
                 if (xPwStore[xh]) {
-                    M.l[h] += `${M.l[h].includes('?') ? '&' : '?'}pw=${xPwStore[xh]}`; // @todo !!!...!!!...
+                    M.l[h] += `${M.l[h].includes('?') ? '&' : '?'}pw=${xPwStore[xh]}`;
                 }
             };
 
@@ -424,13 +424,24 @@ lazy(self.T, 'core', () => {
         },
 
         async zipDownload(xh) {
-            const {z, pw} = xLinkInfo[xh] || await this.getTransferInfo(xh);
-            if (!z) {
+            const {z, pw, size: [, files]} = xLinkInfo[xh] || await this.getTransferInfo(xh);
+            let n = {h: z, xh, name: `${xh}${z}.zip`};
+            if (files === 1) {
+                let v = Object.values(M.d).filter(n => !n.t);
+                if (!v.length && pw) {
+                    await this.fetch(xh);
+                    v = Object.values(M.d).filter(n => !n.t);
+                }
+                console.assert(v.length === 1, 'invalid number of local nodes per xi..?');
+                if (v.length === 1) {
+                    n = v[0];
+                }
+            }
+            if (!n.h) {
                 console.info(`no zip available for ${xh}`);
                 return false;
             }
-            const name = `${xh}${z}.zip`;
-            const url = this.getDownloadLink({h: z, xh, name});
+            const url = this.getDownloadLink(n);
 
             if (pw && !url.includes('pw=')) {
                 M.l[z] = null;
@@ -496,16 +507,16 @@ lazy(self.T, 'core', () => {
             return promise;
         },
 
-        async setTransferAttributes(xh, {t, title, m, message, p, password, e, expiry, se, sender, en, mc}) {
+        async setTransferAttributes(xh, {t, title, m, message, pw, password, e, expiry, se, sender, en, mc}) {
 
             t = cast(title || t, 't');
             e = cast(expiry || e, 'e');
             m = cast(message || m, 'm');
             se = cast(sender || se, 'se');
 
-            if ((p = cast(password || p, 'p'))) {
+            if ((pw = cast(password || pw, 'pw'))) {
 
-                p = await createPassword(xh, p);
+                pw = await createPassword(xh, pw);
             }
             if ((en = cast(e > 0 && en))) {
 
@@ -513,7 +524,7 @@ lazy(self.T, 'core', () => {
             }
             mc = cast(mc, 'mc');
 
-            return sendAPIRequest({a: 'xm', xh, t, e, m, p, se, en, mc});
+            return sendAPIRequest({a: 'xm', xh, t, e, m, pw, se, en, mc});
         },
 
         async setTransferRecipients(xh, {e, email, s, schedule, ex, execution}, rh) {

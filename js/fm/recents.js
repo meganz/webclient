@@ -466,7 +466,7 @@ RecentsRender.prototype.populateBreadCrumb = function($container, action) {
     var newBreadCrumb = function(node) {
         var $breadCrumb = $('<span/>');
         $breadCrumb
-            .attr('id', node.h)
+            .attr('data-id', node.h)
             .text(node.name)
             .rebind('click dblclick', function () {
                 M.openFolder(node.h);
@@ -485,10 +485,12 @@ RecentsRender.prototype.populateBreadCrumb = function($container, action) {
         return $breadCrumb;
     };
 
-    var getActionUserString = function(isOtherUser, isCreated) {
+    var getActionUserString = function(isOtherUser, isCreated, isUnknownUser) {
         var actionUserString = '<span>';
         if (isOtherUser) {
-            actionUserString += isCreated ? l[19937] : l[19940];
+            actionUserString += isCreated
+                ? isUnknownUser ? l.recents_shared_by : l[19937]
+                : l[19940];
             actionUserString = actionUserString
                 .replace("%3", '<span class="link action-user-name"></span>');
         }
@@ -530,7 +532,11 @@ RecentsRender.prototype.populateBreadCrumb = function($container, action) {
         "data-simpletipposition": "top"
     });
 
-    $container.safeAppend(getActionUserString(action.user !== u_handle, action.action === "added"));
+    $container.safeAppend(getActionUserString(
+        action.user !== u_handle,
+        action.action === "added",
+        !M.getNameByHandle(action.user) && action.su
+    ));
 };
 
 /**
@@ -541,12 +547,20 @@ RecentsRender.prototype.populateBreadCrumb = function($container, action) {
 RecentsRender.prototype.handleByUserHandle = function($newRow, action) {
     'use strict';
     var self = this;
-    var user = M.getUserByHandle(action.user);
+
+    // If the user is not a contact, and the added node belongs in an inshare w/o full-access,
+    // we show '[Node name] shared by [Sharer]'
+    const useInshareUser =
+        action.action === 'added'
+        && !M.getNameByHandle(action.user)
+        && action.su;
+
+    var user = useInshareUser ? M.getUserByHandle(useInshareUser) : M.getUserByHandle(action.user);
     var $userNameContainer = $(".breadcrumbs .action-user-name", $newRow);
 
     $userNameContainer
         .removeClass("hidden")
-        .text(M.getNameByHandle(action.user) || l[24061])
+        .text(M.getNameByHandle(useInshareUser || action.user) || l[24061]);
 
     if (!user.h) {
         // unknown/deleted contact, no business here...
@@ -823,6 +837,7 @@ RecentsRender.prototype._renderFiles = function($newRow, action, actionId) {
             clone.recent = this.recent;
             if (this.inshare) {
                 clone.inshare = this.inshare;
+                clone.su = this.su;
             }
             if (this.outshare) {
                 clone.outshare = this.outshare;
@@ -1429,9 +1444,25 @@ RecentsRender.prototype.nodeChanged = function(handle) {
     'use strict';
     // Parent/breadcrumb change
     if (this._isBreadcrumb(handle)) {
-        const nodeId = $(`#${handle}`, '.fm-recents.container')
-            .closest('.fm-recents.content-row').attr('id');
-        this._updateNodeBreadcrumb(nodeId);
+        const $nodes = $(`.parent-folder-name[data-id='${handle}']`, '.fm-recents.container');
+        for (const node of $nodes) {
+            const row = node.closest('.fm-recents.content-row');
+            if (row.id) {
+                this._updateNodeBreadcrumb(row.id);
+            }
+            else {
+                let actionId = '';
+                for (const cls of row.classList) {
+                    if (cls.startsWith('action-')) {
+                        actionId = cls.split('-')[1];
+                        break;
+                    }
+                }
+                if (actionId && this.actionIdMap[actionId]) {
+                    this._updateNodeBreadcrumb(actionId);
+                }
+            }
+        }
     }
     // Action row change
     else if (handle && M.d[handle] && this._nodeActionMap[handle] && this._dynamicList) {
@@ -1483,7 +1514,7 @@ RecentsRender.prototype.nodeChanged = function(handle) {
  */
 RecentsRender.prototype._isBreadcrumb = function(handle) {
     'use strict';
-    return $(`#${handle}`, '.fm-recents.container').hasClass('parent-folder-name');
+    return $(`.parent-folder-name[data-id='${handle}']`, '.fm-recents.container').length;
 };
 
 /**
@@ -1762,14 +1793,17 @@ RecentsRender.prototype._updateNodeBreadcrumb = function(id) {
         this._fillActionIds(actions);
         for (let i = 0; i < actions.length; i++) {
             const $item = $(this._renderCache[actions[i].id]);
-            if ($item.length && $item.attr('id') === id) {
+            if ($item.length && ($item.attr('id') === id || $item.hasClass(`action-${id}`))) {
                 this.actionIdMap[actions[i].id] = actions[i];
                 return actions[i];
             }
         }
     }).then(action => {
         if (action) {
-            const $oldBreadcrumb = $('.fm-recents.breadcrumbs', `#${id}`);
+            let $oldBreadcrumb = $('.fm-recents.breadcrumbs', `#${id}`);
+            if ($oldBreadcrumb.length === 0) {
+                $oldBreadcrumb = $('.fm-recents.breadcrumbs', `.action-${id}`);
+            }
             $oldBreadcrumb.empty();
             // Correct names
             for (let i = 0; i < action.path.length; i++) {

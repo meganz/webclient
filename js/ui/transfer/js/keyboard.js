@@ -69,6 +69,17 @@ mBroadcaster.once('startMega', () => {
 
     // -----------------------------------------------------------------------
 
+    const combo = [];
+
+    $(window).rebind('keyup.it-key-events', (ev) => {
+        if (String(combo.slice(-1)) === ev.code) {
+            combo.pop();
+        }
+        delay('it-combo-clear', () => {
+            combo.length = 0;
+        }, 768);
+    });
+
     $(window).rebind('keydown.it-key-events', (ev) => {
         let returnValue = null;
         const {key, code, target} = ev;
@@ -80,6 +91,11 @@ mBroadcaster.once('startMega', () => {
             returnValue = true;
         }
         else {
+
+            combo.push(code);
+            if (code === 'KeyA') {
+                mBroadcaster.sendMessage('it-key-combo', combo.map((k) => k.slice(-1)).join(''));
+            }
 
             switch (key) {
                 case 'ArrowUp':

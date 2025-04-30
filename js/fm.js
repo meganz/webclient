@@ -223,7 +223,9 @@ function sharedUInode(nodeHandle, force) {
 
         if (window.selectionManager) {
             // Remove the share node selection on incoming and outgoing shares pages
-            if (nodeHandle !== undefined && (M.currentdirid === 'out-shares' || M.currentdirid === 'shares')) {
+            if (nodeHandle !== undefined && (M.currentdirid === 'out-shares' || M.currentdirid === 'shares')
+                || !M.getNodeRoot(nodeHandle) && M.search
+            ) {
                 selectionManager.remove_from_selection(nodeHandle);
             }
             else if (selectionManager.selected_list.includes(nodeHandle)) {
@@ -2484,7 +2486,14 @@ function createFolderDialog(close) {
                 }
 
                 const {type, original} = M.currentCustomView;
-                const id = type === mega.devices.rootId ? original : Object(M.d[h]).p || target;
+                let id = type === mega.devices.rootId ? original : Object(M.d[h]).p || target;
+                if (
+                    M.currentrootid === 'out-shares' ||
+                    M.currentrootid === 'file-requests' ||
+                    M.currentrootid === 'public-links'
+                ) {
+                    id = `${M.currentrootid}/${id}`;
+                }
 
                 // By default, auto-select the newly created folder as long no awaiting promise
                 return M.openFolder(id)
@@ -3475,6 +3484,7 @@ function FMResizablePane(element, opts) {
             maxWidth: opts.maxWidth,
             start: function(e, ui) {
                 $(self.element).addClass('resizable-pane-active');
+                $.hideContextMenu();
             },
             resize: function(e, ui) {
                 var css_attrs = {
@@ -3548,6 +3558,7 @@ function initDownloadDesktopAppDialog() {
 
     $('.download-app', $dialog).rebind('click.downloadDesktopAppDialog', () => {
 
+        eventlog(500806);
         switch (ua.details.os) {
             case "Apple":
                 window.location = megasync.getMegaSyncUrl('mac');
@@ -3569,7 +3580,10 @@ function initDownloadDesktopAppDialog() {
     $('aside a', $dialog).rebind('click.downloadDesktopAppDialog', closeDialog);
 
     // Close the share dialog
-    $('button.js-close', $dialog).rebind('click.downloadDesktopAppDialog', closeDialog);
+    $('button.js-close', $dialog).rebind('click.downloadDesktopAppDialog', (ev) => {
+        eventlog(500805);
+        return closeDialog(ev);
+    });
 
     M.safeShowDialog('onboardingDesktopAppDialog', $dialog);
 }

@@ -30,6 +30,7 @@
     bottom: 52px;
     top: auto;
     z-index: 200;
+    transform: unset;
 }
 
 .breadcrumb-dropdown a {

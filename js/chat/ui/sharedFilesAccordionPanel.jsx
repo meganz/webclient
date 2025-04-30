@@ -206,7 +206,10 @@ class SharedFilesAccordionPanel extends MegaRenderMixin {
                 </div>;
             }
             contents = <div className="chat-dropdown content have-animation">
-                {sharedNodesContainer}
+                {room.hasMessages() ?
+                    sharedNodesContainer :
+                    <div className="chat-dropdown empty-txt">{l[19985]}</div>
+                }
                 {self.isLoadingMore ?
                     <div className="loading-spinner light small"><div className="main-loader"></div></div> :
                     null

@@ -50,6 +50,7 @@ class MegaHeader extends MegaMobileHeader {
             wrapper.append(this.notifMenu);
 
             this.notifButton.on('click.list', e => {
+                $.hideContextMenu();
                 if (this.notifButton.toggleClass('active')) {
                     this.showNotifMenu();
                 }

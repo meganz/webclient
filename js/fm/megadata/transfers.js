@@ -1477,7 +1477,10 @@ MegaData.prototype.ulprogress = function(ul, perc, bl, bt, bps) {
 
         domElement = ul.domElement = document.getElementById('ul_' + id);
         if (!domElement) {
-            console.error('DOM Element not found...', id, ul);
+            if (!ul.xput) {
+                // @todo reuse the function from boot.js, associated per ul-queue entry
+                console.error('DOM Element not found...', id, ul);
+            }
             return false;
         }
 

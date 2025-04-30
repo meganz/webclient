@@ -76,9 +76,12 @@ mBroadcaster.addListener('fm:initialized', () => {
                             targetElmClass: '.button.fm-new-menu',
                             targetElmPosition: 'left bottom',
                             targetHotSpot: true,
-                            markComplete: true
+                            markComplete: true,
+                            nextEvent: 500802,
+                            skipEvent: 500801,
                         }
-                    ]
+                    ],
+                    cpEvent: 500799,
                 },
                 {
                     name: l.onboard_v4_manage_file_control_button,
@@ -97,7 +100,9 @@ mBroadcaster.addListener('fm:initialized', () => {
                                 return M.viewmode ? 'right' : 'bottom';
                             },
                             markComplete: true,
-                            nextActionTrigger: 'contextmenu'
+                            nextActionTrigger: 'contextmenu',
+                            nextEvent: 500804,
+                            skipEvent: 500803,
                         },
                         {
                             type: 'markContextMenu',
@@ -708,7 +713,8 @@ mBroadcaster.addListener('fm:initialized', () => {
 
             for (let i = 0; i < currentSteps.length; i++) {
 
-                html += `<button class="onboarding-step-link mega-button action no-hover">
+                const eventId = currentSteps[i].cpEvent || 0;
+                html += `<button class="onboarding-step-link mega-button action no-hover" data-eventid="${eventId}">
                             <div class="onboarding-step mega-button icon">
                                 <i class="onboarding-step-complete-icon sprite-fm-mono icon-check"></i>
                                 <span class="onboarding-step-count">${i + 1}</span>
@@ -735,6 +741,10 @@ mBroadcaster.addListener('fm:initialized', () => {
                 if (clickedStep === this.currentStepIndex) {
                     return false;
                 }
+                const eventId = parseInt(e.currentTarget.dataset.eventid, 10);
+                if (eventId) {
+                    eventlog(eventId);
+                }
 
                 onIdle(() => {
                     this.startNextOpenSteps(clickedStep);
@@ -744,7 +754,10 @@ mBroadcaster.addListener('fm:initialized', () => {
             });
 
             $('.onboarding-control-panel-content .js-close', this.$obControlPanel)
-                .rebind('click.onboarding', this.showConfirmDismiss.bind(this));
+                .rebind('click.onboarding', () => {
+                    this.showConfirmDismiss();
+                    eventlog(500800);
+                });
             $('.onboarding-control-panel-complete .js-close', this.$obControlPanel)
                 .rebind('click.onboarding', this.markSectionComplete.bind(this));
             $('.js-dismiss', this.$obControlPanel).rebind('click.onboarding', this.markSectionComplete.bind(this));
@@ -1024,7 +1037,9 @@ mBroadcaster.addListener('fm:initialized', () => {
                 $('#ob-dialog-title').text(this.map.dialogTitle);
                 $('#ob-dialog-text').text(this.map.dialogDesc);
                 $('.js-next span', this.$dialog).text(this.map.dialogNext || l[556]);
+                $('.js-next', this.$dialog).attr('data-eventid', this.map.nextEvent || 0);
                 $('.js-skip', this.$dialog)
+                    .attr('data-eventid', this.map.skipEvent || 0)
                     .text(this.map.dialogSkip || l.onboard_v4_dialog_skip)
                     .removeClass('hidden')
                     .addClass(this.map.skipHidden ? 'hidden' : '');
@@ -1259,15 +1274,23 @@ mBroadcaster.addListener('fm:initialized', () => {
             });
 
             // Next button clicked, close dialog and move to next available step
-            $('.js-next', this.$dialog).rebind('click.onboarding', () => {
+            $('.js-next', this.$dialog).rebind('click.onboarding', (ev) => {
 
+                const eventId = parseInt(ev.currentTarget.dataset.eventid, 10);
+                if (eventId) {
+                    eventlog(eventId);
+                }
                 __closeDialogAction();
                 this.parentStep.parentSection.startNextOpenSteps();
             });
 
             // Skip button clicked, close dialog and mark step as completed
-            $('.js-skip', this.$dialog).rebind('click.onboarding', () => {
+            $('.js-skip', this.$dialog).rebind('click.onboarding', (ev) => {
 
+                const eventId = parseInt(ev.currentTarget.dataset.eventid, 10);
+                if (eventId) {
+                    eventlog(eventId);
+                }
                 __closeDialogAction(true);
                 this.parentStep.parentSection.showConfirmDismiss();
             });

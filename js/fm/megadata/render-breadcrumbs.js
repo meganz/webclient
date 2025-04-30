@@ -370,6 +370,11 @@
             remainItems = 2;
             containerWidth = Infinity;
         }
+        if (is_mobile) {
+            // Mobile doesn't support extraItems well so force all crumbs into the container.
+            remainItems = Infinity;
+            containerWidth = Infinity;
+        }
 
         if (M.dyh && M.dyh('is-breadcrumb-root', items)) {
             isDyhRoot = true;

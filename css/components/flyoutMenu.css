@@ -213,12 +213,19 @@
 .flyout-overlay .overlay.overlay-container .subtitle span {
     overflow-wrap: break-word;
 }
+.flyout-overlay .overlay.overlay-container .header {
+    padding: 0;
+}
 .flyout-overlay .overlay.overlay-container .actions {
     margin: 0 24px;
     padding: 0;
+    flex-direction: column;
 }
 .flyout-overlay .overlay.overlay-container button {
     width: auto;
+}
+.flyout-overlay .overlay.overlay-container button:last-child:nth-child(even) {
+    margin: 16px 0 0;
 }
 .flyout-overlay .image i {
     background-size: contain;

@@ -4,7 +4,7 @@
 
 /* Content */
 
-.it-dialog.auth-dialog .content-body {
+.it-dialog.auth-dialog  .scroll-area > .content-body {
     align-items: center;
     display: flex;
     flex-direction: column;
@@ -12,7 +12,7 @@
     max-width: 496px;
     overflow: hidden;
     overflow-y: auto;
-    padding: 0 48px;
+    padding: 0 24px;
 }
 
 .it-dialog.auth-dialog .illustration-body.auth {
@@ -23,7 +23,7 @@
     background-size: auto 64px; 
     height: 64px;
     width: 64px;
-    margin: 8px 0 48px;
+    margin: 0 0 48px;
 }
 
 .it-dialog.auth-dialog .img1 {
@@ -36,6 +36,10 @@
     text-align: center;
 }
 
+.it-dialog.auth-dialog .scroll-area {
+    margin: 48px 0;
+}
+ 
 .it-dialog.auth-dialog form {
     display: grid;
     gap: 16px;
@@ -45,7 +49,7 @@
 
 .it-dialog.auth-dialog .bottom-info {
     font: var(--text-caption-lg);
-    margin: 8px 0;
+    margin: 8px 0 0;
     text-align: center;
 }
 
@@ -87,6 +91,12 @@
     display: flex;
 }
 
+.it-dialog.auth-dialog .two-fa-cn .multiple-inputs .input-box,
+.it-dialog.auth-dialog .two-fa-cn .multiple-inputs input {
+    padding-left: 0;
+    padding-right: 0;
+}
+
 .it-dialog.auth-dialog .two-fa-cn .error-text {
     color: var(--supportive-error);
     font: var(--text-btn-lg);
@@ -99,5 +109,20 @@
 
 .it-dialog.auth-dialog .two-fa-cn .it-input + .it-input {
     margin-inline-start: 8px;
+}
+
+/* Adaptive layout */
+
+@media only screen and (max-width: 960px) {
+    
+    .it-dialog.auth-dialog > .body {
+        padding: 24px 6px;
+    }
+
+    .it-dialog.auth-dialog  .scroll-area > .content-body {
+        max-width: 448px;
+        padding: 0 18px;
+    }
+
 }
 

@@ -108,20 +108,6 @@
     min-width: 160px;
 }
 
-.it-box.get-link-box .dialog-error-msg {
-    --icon-size: 24px;
-    --mask-color: var(--supportive-error);
-    align-items: center;
-    color: var(--supportive-error);
-    display: flex;
-    font: var(--text-body-sm);
-    margin: 0 0 12px;
-}
-
-.it-box.get-link-box .dialog-error-msg span {
-    margin-inline-start: 12px;
-}
-
 .it-box.get-link-box .it-checkbox-label {
     align-items: start;
     color: var(--main-neutral-primary);

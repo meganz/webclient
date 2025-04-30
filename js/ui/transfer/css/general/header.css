@@ -71,6 +71,7 @@ a.logo-group.mega:visited {
 }
 
 .page-header .sections  > * {
+    display: flex;
     margin: 0 6px;
 }
 

@@ -2484,7 +2484,14 @@ function createFolderDialog(close) {
                 }
 
                 const {type, original} = M.currentCustomView;
-                const id = type === mega.devices.rootId ? original : Object(M.d[h]).p || target;
+                let id = type === mega.devices.rootId ? original : Object(M.d[h]).p || target;
+                if (
+                    M.currentrootid === 'out-shares' ||
+                    M.currentrootid === 'file-requests' ||
+                    M.currentrootid === 'public-links'
+                ) {
+                    id = `${M.currentrootid}/${id}`;
+                }
 
                 // By default, auto-select the newly created folder as long no awaiting promise
                 return M.openFolder(id)

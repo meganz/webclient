@@ -10227,7 +10227,7 @@ Chat.prototype.openChatAndSendFilesDialog = function (user_handle) {
       room.trigger('openSendFilesDialog');
     } else {
       room.one('onComponentDidMount.sendFilesDialog', () => {
-          onIdle(() => room.trigger('openSendFilesDialog'));
+        onIdle(() => room.trigger('openSendFilesDialog'));
       });
     }
     room.setActive();
@@ -15633,7 +15633,9 @@ const SharedFilesAccordionPanel = (_dec = utils.Ay.SoonFcWrap(350), _class = cla
       }
       contents = sharedFilesAccordionPanel_React.createElement("div", {
         className: "chat-dropdown content have-animation"
-      }, sharedNodesContainer, self.isLoadingMore ? sharedFilesAccordionPanel_React.createElement("div", {
+      }, room.hasMessages() ? sharedNodesContainer : sharedFilesAccordionPanel_React.createElement("div", {
+        className: "chat-dropdown empty-txt"
+      }, l[19985]), self.isLoadingMore ? sharedFilesAccordionPanel_React.createElement("div", {
         className: "loading-spinner light small"
       }, sharedFilesAccordionPanel_React.createElement("div", {
         className: "main-loader"

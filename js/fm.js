@@ -223,7 +223,9 @@ function sharedUInode(nodeHandle, force) {
 
         if (window.selectionManager) {
             // Remove the share node selection on incoming and outgoing shares pages
-            if (nodeHandle !== undefined && (M.currentdirid === 'out-shares' || M.currentdirid === 'shares')) {
+            if (nodeHandle !== undefined && (M.currentdirid === 'out-shares' || M.currentdirid === 'shares')
+                || !M.getNodeRoot(nodeHandle) && M.search
+            ) {
                 selectionManager.remove_from_selection(nodeHandle);
             }
             else if (selectionManager.selected_list.includes(nodeHandle)) {

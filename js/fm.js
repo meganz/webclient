@@ -3558,6 +3558,7 @@ function initDownloadDesktopAppDialog() {
 
     $('.download-app', $dialog).rebind('click.downloadDesktopAppDialog', () => {
 
+        eventlog(500806);
         switch (ua.details.os) {
             case "Apple":
                 window.location = megasync.getMegaSyncUrl('mac');
@@ -3579,7 +3580,10 @@ function initDownloadDesktopAppDialog() {
     $('aside a', $dialog).rebind('click.downloadDesktopAppDialog', closeDialog);
 
     // Close the share dialog
-    $('button.js-close', $dialog).rebind('click.downloadDesktopAppDialog', closeDialog);
+    $('button.js-close', $dialog).rebind('click.downloadDesktopAppDialog', (ev) => {
+        eventlog(500805);
+        return closeDialog(ev);
+    });
 
     M.safeShowDialog('onboardingDesktopAppDialog', $dialog);
 }

@@ -6,11 +6,6 @@ mobile.settings.account.paymentCard = new function() {
     'use strict';
     let $page;
 
-    const validateCardResponse = (res) => {
-        return res && (res.gw === (addressDialog || {}).gatewayId_stripe || 19) && res.brand && res.last4
-            && res.exp_month && res.exp_year;
-    };
-
     const render = (cardInfo) => {
 
         if (cardInfo) {
@@ -77,6 +72,11 @@ mobile.settings.account.paymentCard = new function() {
         return Array.isArray(account.subs) && account.subs.some(({ gwid }) => gwid === 19);
     };
 
+    this.validateCardResponse = (res) => {
+        return res && (res.gw === (addressDialog || {}).gatewayId_stripe || 19) && res.brand && res.last4
+            && res.exp_month && res.exp_year;
+    };
+
     this.init = function() {
         // the check of existence of needed data goes here
         // ..
@@ -90,7 +90,7 @@ mobile.settings.account.paymentCard = new function() {
             callback: (res) => {
 
                 loadingDialog.hide();
-                if (typeof res === 'object' && validateCardResponse(res)) {
+                if (typeof res === 'object' && mobile.settings.account.paymentCard.validateCardResponse(res)) {
                     return render(res);
                 }
 

@@ -185,9 +185,9 @@ mBroadcaster.addListener('fm:initialized', () => {
                                         onNext: () => {
                                             mega.ui.onboarding.selector.uploadFile()
                                                 .then((data) => {
-                                                    if (data) {
+                                                    if (data && data[0].length) {
                                                         mega.ui.onboarding.dataHandler =
-                                                            new MegaImportPassDataHandler(data);
+                                                            new MegaImportPassDataHandler(data[0]);
                                                         mega.ui.onboarding.sheet.goToStep(2.1, true);
                                                     }
                                                 });

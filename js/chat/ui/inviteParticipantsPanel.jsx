@@ -56,7 +56,16 @@ export class InviteParticipantsPanel extends React.Component {
             .replace('%1', u_attr.name)
             .replace('%2', chatRoom.getRoomTitle())
             .replace('%3', link);
-        return encode ? encodeURIComponent(body) : body;
+
+        if (encode) {
+            return typeof body.toWellFormatted === 'function' ?
+                body.toWellFormatted() :
+                body.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, '')
+                    .replace(/[\uD800-\uDBFF]/g, '\uFFFD')
+                    .replace(/[\uDC00-\uDFFF]/g, '\uFFFD');
+        }
+
+        return body;
     }
 
     render() {

@@ -8784,7 +8784,7 @@ Chat.prototype.init = promisify(function (resolve, reject) {
   if (d) {
     console.timeEnd('megachat:plugins:init');
   }
-  const $body = $(document.body);
+  $(document.body);
   if (!is_chatlink) {
     $(mega.ui.header.setStatus).rebind('mousedown.megachat', '.sub-menu.status button', function () {
       const presence = $(this).data("presence");
@@ -8804,22 +8804,6 @@ Chat.prototype.init = promisify(function (resolve, reject) {
     $('.activity-status-block, .activity-status').removeClass('hidden');
     $('.js-dropdown-account .status-dropdown').removeClass('hidden');
   }
-  $body.rebind('mouseover.notsentindicator', '.tooltip-trigger', function () {
-    const $this = $(this);
-    const $notification = $(`.tooltip.${  $this.attr('data-tooltip')}`).removeClass('hidden');
-    const iconTopPos = $this.offset().top;
-    const iconLeftPos = $this.offset().left;
-    const notificatonHeight = $notification.outerHeight() + 10;
-    const notificatonWidth = $notification.outerWidth() / 2 - 10;
-    $notification.offset({
-      top: iconTopPos - notificatonHeight,
-      left: iconLeftPos - notificatonWidth
-    });
-  });
-  $body.rebind('mouseout.notsentindicator click.notsentindicator', '.tooltip-trigger', () => {
-    const $notification = $('.tooltip');
-    $notification.addClass('hidden').removeAttr('style');
-  });
   if (is_chatlink) {
     const {
       ph,
@@ -18963,14 +18947,6 @@ const ConversationPanel = (conversationpanel_dec = utils.Ay.SoonFcWrap(360), _de
         chatLinkDialog: false
       })
     }), REaCt().createElement("div", {
-      className: "dropdown body dropdown-arrow down-arrow tooltip not-sent-notification hidden"
-    }, REaCt().createElement("i", {
-      className: "dropdown-white-arrow"
-    }), REaCt().createElement("div", {
-      className: "dropdown notification-text"
-    }, REaCt().createElement("i", {
-      className: "small-icon conversations"
-    }), l[8882])), REaCt().createElement("div", {
       className: `
                             chat-topic-block
                             ${room.isNote ? 'is-note' : ''}
@@ -33145,7 +33121,7 @@ const HistoryPanel = (_dec = (0,mixins.hG)(450, true), _class = class HistoryPan
                     scroll-area
                     ${this.props.className || ''}
                 `
-    }, this.renderNotice(l[8883]), this.renderNotice(l[8884]), REaCt().createElement(perfectScrollbar.O, {
+    }, REaCt().createElement(perfectScrollbar.O, {
       className: "js-messages-scroll-area perfectScrollbarContainer",
       ref: ref => {
         let _this$props$onMessage, _this$props;
@@ -35448,6 +35424,7 @@ const perfectScrollbar = REQ_(486);
 
 
 
+
 class Text extends AbstractGenericMessage {
   isRichPreview(message) {
     return message.metaType === Message.MESSAGE_META_TYPE.RICH_PREVIEW;
@@ -35466,6 +35443,49 @@ class Text extends AbstractGenericMessage {
             ${REQUIRES_CONFIRMATION ? 'preview-requires-confirmation-container' : ''}
             ${grouped ? 'grouped' : ''}
         `;
+  }
+  renderMessageIndicators() {
+    const {
+      message,
+      spinnerElement,
+      isBeingEdited,
+      onRetry,
+      onCancelRetry
+    } = this.props;
+    if (!message || spinnerElement || isBeingEdited()) {
+      return null;
+    }
+    const state = message.getState == null ? void 0 : message.getState();
+    if (![Message.STATE.NOT_SENT, Message.STATE.NOT_SENT_EXPIRED].includes(state)) {
+      return null;
+    }
+    const props = {
+      'data-simpletipposition': 'top',
+      'data-simpletipoffset': 8
+    };
+    return message.requiresManualRetry ? REaCt().createElement("div", {
+      className: "not-sent-indicator clickable"
+    }, REaCt().createElement("span", (0,esm_extends.A)({
+      className: "simpletip"
+    }, props, {
+      "data-simpletip": l[8883],
+      onClick: ev => onRetry(ev, message)
+    }), REaCt().createElement("i", {
+      className: "small-icon refresh-circle"
+    })), REaCt().createElement("span", (0,esm_extends.A)({
+      className: "simpletip"
+    }, props, {
+      "data-simpletip": l[8884],
+      onClick: ev => onCancelRetry(ev, message)
+    }), REaCt().createElement("i", {
+      className: "sprite-fm-mono icon-dialog-close"
+    }))) : REaCt().createElement("div", (0,esm_extends.A)({
+      className: "not-sent-indicator simpletip"
+    }, props, {
+      "data-simpletip": l[8882]
+    }), REaCt().createElement("i", {
+      className: "small-icon yellow-triangle"
+    }));
   }
   getMessageActionButtons() {
     const {
@@ -35580,7 +35600,6 @@ class Text extends AbstractGenericMessage {
       isBeingEdited,
       spinnerElement
     } = this.props;
-    let messageNotSendIndicator;
     let textMessage = message.messageHtml;
     const IS_GEOLOCATION = this.isGeoLocation(message);
     const {
@@ -35615,38 +35634,6 @@ class Text extends AbstractGenericMessage {
           message,
           chatRoom
         })];
-      }
-    }
-    if (message && message.getState && (message.getState() === Message.STATE.NOT_SENT || message.getState() === Message.STATE.NOT_SENT_EXPIRED)) {
-      if (!spinnerElement) {
-        if (message.requiresManualRetry) {
-          if (isBeingEdited() !== true) {
-            messageNotSendIndicator = REaCt().createElement("div", {
-              className: "not-sent-indicator"
-            }, REaCt().createElement("span", {
-              className: "tooltip-trigger",
-              key: "retry",
-              "data-tooltip": "not-sent-notification-manual",
-              onClick: e => this.props.onRetry(e, message)
-            }, REaCt().createElement("i", {
-              className: "small-icon refresh-circle"
-            })), REaCt().createElement("span", {
-              className: "tooltip-trigger",
-              key: "cancel",
-              "data-tooltip": "not-sent-notification-cancel",
-              onClick: e => this.props.onCancelRetry(e, message)
-            }, REaCt().createElement("i", {
-              className: "sprite-fm-mono icon-dialog-close"
-            })));
-          }
-        } else {
-          messageNotSendIndicator = REaCt().createElement("div", {
-            className: "not-sent-indicator tooltip-trigger",
-            "data-tooltip": "not-sent-notification"
-          }, REaCt().createElement("i", {
-            className: "small-icon yellow-triangle"
-          }));
-        }
       }
     }
     let messageDisplayBlock;
@@ -35697,7 +35684,7 @@ class Text extends AbstractGenericMessage {
         }, REaCt().createElement(utils.P9, null, textMessage));
       }
     }
-    return REaCt().createElement(REaCt().Fragment, null, messageNotSendIndicator, IS_GEOLOCATION ? null : messageDisplayBlock, subMessageComponent, spinnerElement, IS_GEOLOCATION && REaCt().createElement(geoLocation, {
+    return REaCt().createElement(REaCt().Fragment, null, this.renderMessageIndicators(), IS_GEOLOCATION ? null : messageDisplayBlock, subMessageComponent, spinnerElement, IS_GEOLOCATION && REaCt().createElement(geoLocation, {
       latitude,
       lng
     }));

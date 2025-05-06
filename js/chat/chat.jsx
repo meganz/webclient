@@ -279,22 +279,6 @@ Chat.prototype.init = promisify(function(resolve, reject) {
         $('.js-dropdown-account .status-dropdown').removeClass('hidden');
     }
 
-    $body.rebind('mouseover.notsentindicator', '.tooltip-trigger', function() {
-        var $this = $(this);
-        var $notification = $('.tooltip.' + $this.attr('data-tooltip')).removeClass('hidden');
-        var iconTopPos = $this.offset().top;
-        var iconLeftPos = $this.offset().left;
-        var notificatonHeight = $notification.outerHeight() + 10;
-        var notificatonWidth = $notification.outerWidth() / 2 - 10;
-        $notification.offset({top: iconTopPos - notificatonHeight, left: iconLeftPos - notificatonWidth});
-    });
-
-    $body.rebind('mouseout.notsentindicator click.notsentindicator', '.tooltip-trigger', function() {
-        // hide all tooltips
-        var $notification = $('.tooltip');
-        $notification.addClass('hidden').removeAttr('style');
-    });
-
     if (is_chatlink) {
         const {ph, key} = is_chatlink;
         Chat.mcf[ph] = key;

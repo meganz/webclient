@@ -67,7 +67,7 @@ class MegaPasswordList extends MegaView {
         super.show();
 
         // Required for the webclient layout
-        this.initLayout(true).catch(reportError);
+        return this.initLayout(true).catch(reportError);
     }
 
     /**

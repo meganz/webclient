@@ -1335,6 +1335,17 @@ MegaUtils.prototype.transferFromMegaCoNz = function(data) {
                     }
                 }
             }
+            else if (toPage.startsWith('pwmredir')) {
+                const [, target, value] = toPage.split('!');
+
+                if (target === 'add' || target === 'edit') {
+                    window.pwmredir = [target, value];
+                    toPage = 'fm/pwm';
+                }
+                else {
+                    toPage = value || target;
+                }
+            }
 
             // If the user is already logged in here with the same account
             // we can avoid a lot and just take them to the correct page

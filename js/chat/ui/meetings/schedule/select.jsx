@@ -1,9 +1,10 @@
 import React from 'react';
-import { MegaRenderMixin } from '../../../mixins.js';
+import { compose } from '../../../mixins.js';
 import { PerfectScrollbar } from '../../../../ui/perfectScrollbar.jsx';
 import { stringToTime } from './helpers.jsx';
+import { withDateObserver } from './dateObserver';
 
-export default class Select extends MegaRenderMixin {
+class Select extends React.Component {
     static NAMESPACE = 'meetings-select';
 
     domRef = React.createRef();
@@ -54,7 +55,6 @@ export default class Select extends MegaRenderMixin {
     };
 
     componentWillUnmount() {
-        super.componentWillUnmount();
         document.removeEventListener('mousedown', this.handleMousedown);
         if (this.inputRef && this.inputRef.current) {
             $(this.inputRef.current).unbind(`keyup.${Select.NAMESPACE}`);
@@ -62,7 +62,6 @@ export default class Select extends MegaRenderMixin {
     }
 
     componentDidMount() {
-        super.componentDidMount();
         document.addEventListener('mousedown', this.handleMousedown);
         const inputRef = this.inputRef?.current;
         if (inputRef) {
@@ -177,3 +176,5 @@ export default class Select extends MegaRenderMixin {
         );
     }
 }
+
+export default compose(withDateObserver)(Select);

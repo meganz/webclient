@@ -1,6 +1,8 @@
 import React from 'react';
+import { compose } from '../../../mixins.js';
+import { withDateObserver } from './dateObserver';
 
-export default class Datepicker extends React.Component {
+class Datepicker extends React.Component {
     static NAMESPACE = 'meetings-datepicker';
 
     OPTIONS = {
@@ -34,7 +36,8 @@ export default class Datepicker extends React.Component {
             const prevDate = new Date(+this.props.value);
             const nextDate = new Date(+dateText);
             nextDate.setHours(prevDate.getHours(), prevDate.getMinutes());
-            return this.props.onSelect(nextDate.getTime());
+            this.props.onSelect(nextDate.getTime());
+            mBroadcaster.sendMessage(withDateObserver.NAMESPACE, nextDate.getTime());
         }
     };
 
@@ -126,3 +129,5 @@ export default class Datepicker extends React.Component {
         );
     }
 }
+
+export default compose(withDateObserver)(Datepicker);

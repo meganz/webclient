@@ -803,8 +803,6 @@ export default class HistoryPanel extends MegaRenderMixin {
                     scroll-area
                     ${this.props.className || ''}
                 `}>
-                {this.renderNotice(l[8883] /* `Message not sent. Click here if you want to resend it.` */)}
-                {this.renderNotice(l[8884] /* `Message not sent. Click here if you want to cancel it.` */)}
                 <PerfectScrollbar
                     className="js-messages-scroll-area perfectScrollbarContainer"
                     ref={ref => {

@@ -2560,15 +2560,6 @@ export class ConversationPanel extends MegaRenderMixin {
                         />
                     }
 
-                    <div className="dropdown body dropdown-arrow down-arrow tooltip not-sent-notification hidden">
-                        <i className="dropdown-white-arrow" />
-                        <div className="dropdown notification-text">
-                            <i className="small-icon conversations" />
-                            {l[8882] /* `Message not sent. Will keep retrying.` */}
-                        </div>
-                    </div>
-
-
                     <div
                         className={`
                             chat-topic-block

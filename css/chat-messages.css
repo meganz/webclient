@@ -581,14 +581,14 @@ body.rtl .chat-topic-block {
 }
 .not-sent-indicator {
     position: absolute;
-    z-index: 1;
+    z-index: 10;
     right: 22px;
     margin: 5px 0 0 0;
     transition: all 100ms ease-in-out;
 }
-.message.content-area:hover .not-sent-indicator,
-.message.content-area:hover .small-blue-spinner {
-    opacity: 0;
+.rtl .not-sent-indicator {
+    left: 52px;
+    right: auto;
 }
 .message.circuit-label {
     display: block;
@@ -626,6 +626,10 @@ body.rtl .chat-topic-block {
     margin-top: -15px;
     transition: all 100ms ease-in-out;
 }
+.rtl .message.content-area .small-blue-spinner {
+    left: 54px;
+    right: auto;
+}
 .message.warning-text {
     font: var(--text-code1);
     color: var(--text-color-low);
@@ -638,10 +642,15 @@ body.rtl .chat-topic-block {
 .message.body.dialog-wrapper .not-sent-indicator {
     display: none;
 }
-.not-sent.retrying .tiny-button {
-    right: 0;
+.message.body.sending .tiny-button,
+.message.body.not-sent.retrying .tiny-button {
+    right: 23px;
 }
-.not-sent-indicator i {
+.rtl .message.body.sending .tiny-button,
+.rtl .message.body.not-sent.retrying .tiny-button {
+    right: 2px;
+}
+.not-sent-indicator .clickable {
     cursor: pointer;
 }
 .message em.rtf-italic {

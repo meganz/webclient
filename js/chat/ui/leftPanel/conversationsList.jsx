@@ -64,7 +64,7 @@ export const Chats = ({ conversations, onArchivedClicked, filter }) => {
                 {conversations && conversations.length >= 1 ?
                     <ConversationsList conversations={conversations}>
                         {megaChat.WITH_SELF_NOTE && noteChat && noteChat.isDisplayable() ?
-                            <ConversationsListItem chatRoom={noteChat} /> :
+                            filter ? null : <ConversationsListItem chatRoom={noteChat}/> :
                             null
                         }
                         {conversations.map(c =>

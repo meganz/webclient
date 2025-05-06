@@ -17924,7 +17924,7 @@ class ConversationRightArea extends mixins.w9 {
       className: "sprite-fm-mono icon-remove"
     }), REaCt().createElement("span", {
       className: "accordion-clear-history-text"
-    }, room.isMeeting ? l.meeting_clear_hist : l[8871])), room.isNote ? null : retentionHistoryBtn, room.iAmOperator() && room.type === 'public' && !scheduledMeeting ? REaCt().createElement("div", {
+    }, room.isMeeting ? l.meeting_clear_hist : l[8871])), retentionHistoryBtn, room.iAmOperator() && room.type === 'public' && !scheduledMeeting ? REaCt().createElement("div", {
       className: "chat-enable-key-rotation-paragraph"
     }, AVseperator, REaCt().createElement("div", {
       className: `
@@ -21757,7 +21757,7 @@ const ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, c
     }
   });
   self.rebind('onMessagesBuffAppend.lastActivity', (e, msg) => {
-    if (is_chatlink) {
+    if (is_chatlink || self.isNote) {
       return;
     }
     const ts = msg.delay ? msg.delay : msg.ts;

@@ -33204,16 +33204,14 @@ class ConversationsApp extends mixins.w9 {
         freeCallEndedDialog: true
       });
     });
-    if (megaChat.WITH_SELF_NOTE) {
-      if (!megaChat.getNoteChat()) {
-        api.req({
-          a: 'mcc',
-          u: [],
-          m: 0,
-          g: 0,
-          v: Chatd.VERSION
-        }).catch(dump);
-      }
+    if (megaChat.WITH_SELF_NOTE && !megaChat.getNoteChat() && !is_chatlink) {
+      api.req({
+        a: 'mcc',
+        u: [],
+        m: 0,
+        g: 0,
+        v: Chatd.VERSION
+      }).catch(dump);
     }
   }
   componentWillUnmount() {

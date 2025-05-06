@@ -705,8 +705,13 @@ li.active .call-duration i {
     max-height: 14px;
 }
 
+.result-table .result-table-row .result-last-activity {
+    font: var(--text-body2);
+    color: var(--text-color-medium);
+}
+
 .result-table .result-table-row.nil:hover {
-    background: var(--surface-grey-2);
+    background: var(--mobile-surface-1);
 }
 
 .result-table .result-table-row:hover,
@@ -718,7 +723,6 @@ li.active .call-duration i {
 .result-table .result-table-row .chat-topic-icon {
     width: 32px;
     height: 32px;
-    border-radius: 4px;
     box-sizing: border-box;
 }
 
@@ -853,6 +857,7 @@ li.active .call-duration i {
 }
 
 .result-table .result-table-row.message .result-separator {
+    display: none;
     float: left;
     margin: 3px 1px 0 2px;
 }
@@ -864,10 +869,11 @@ li.active .call-duration i {
 }
 
 .result-table .result-table-row.message span.date {
+    width: 40%;
+    padding-inline-end: 8px;
+    text-align: right;
     font: var(--text-body2);
     color: var(--text-color-medium);
-    width: 40%;
-    text-align: right;
 }
 
 .rtl .result-table .result-table-row.message span.date {
@@ -898,7 +904,7 @@ li.active .call-duration i {
 }
 
 .result-table.nil .result-table-row:hover {
-    background: var(--surface-grey-2);
+    background: var(--mobile-surface-1);
 }
 
 .result-table .result-table-row .nil-container {

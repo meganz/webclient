@@ -43,6 +43,24 @@ class PasswordItemForm extends MegaForm {
                     }
                 },
                 {
+                    nodeType: 'input',
+                    type: 'text',
+                    title: l.otp_label_optional,
+                    classNames: 'form-element pmText clearButton trim optional',
+                    megaInputOptions: {
+                        name: 'megaTOTPInput',
+                        event: 'blur',
+                        on: () => {
+                            const otp = this.megaTOTPInput.$input.val().replace(/\s+/g, '');
+                            this.megaTOTPInput.setValue(otp);
+                            if (otp && !mega.pm.otp.base32ToUint8Array(otp)) {
+                                const alertIcon = '<i class="sprite-pm-mono icon-alert-triangle-thin-outline"></i>';
+                                this.megaTOTPInput.$input.megaInputsShowError(`${alertIcon} ${l.otp_key_error}`);
+                            }
+                        }
+                    }
+                },
+                {
                     nodeType: 'button',
                     type: 'icon',
                     classname: 'generate-password text-icon secondary',
@@ -204,7 +222,44 @@ class PasswordItemForm extends MegaForm {
         });
 
         // delay for the overlay transition to happen and set focus
-        delay('password-item-title-focus', () => this.megaTitleInput.$input.focus());
+        delay('password-item-title-focus', () => {
+            this.megaTitleInput.$input.focus();
+
+            const infoIcon = '<i class="sprite-fm-mono icon-help-circle-thin-outline"></i>';
+            this.megaTOTPInput.showInfoMessage(`${infoIcon} ${l.otp_field_instructions}`);
+
+            const wrapper = this.megaTOTPInput.$wrapper[0];
+            const link = wrapper.querySelector('div.message-container.mega-banner a');
+            if (link) {
+                link.addEventListener('click', () => {
+                    this.showInfoSheet({
+                        name: 'totp-info',
+                        title: l.otp_info_title,
+                        contents: [
+                            l.otp_info_description,
+                            l.otp_tutorial_prompt,
+                            parseHTML(l.otp_learn_more)
+                        ],
+                        actions: [
+                            {
+                                type: 'normal',
+                                text: l.otp_start_tutorial,
+                                className: 'secondary invisible',
+                                onClick: () => {
+                                    // TODO: Implement tutorial link
+                                }
+                            },
+                            {
+                                type: 'normal',
+                                text: l.ok_button,
+                                className: 'primary',
+                                onClick: () => mega.ui.sheet.hide()
+                            }
+                        ]
+                    });
+                });
+            }
+        });
         mega.ui.pm.overlay.on('close.overlay', () => this.clear());
 
         this.initialcurrentFormValues = this.currentFormValues;
@@ -216,7 +271,8 @@ class PasswordItemForm extends MegaForm {
             uname: this.megaUnameInput.$input.val().trim(),
             pwd: this.megaPwdInput.$input.val(),
             url: this.megaWebsiteInput.$input.val().trim(),
-            notes: this.megaNotesInput.$input.val()
+            notes: this.megaNotesInput.$input.val(),
+            totp: this.megaTOTPInput.$input.val().replace(/\s+/g, '')
         };
     }
 
@@ -227,10 +283,19 @@ class PasswordItemForm extends MegaForm {
     }
 
     async createItem() {
-        const {title, uname, pwd, url, notes} = this.currentFormValues;
+        const {title, uname, pwd, url, notes, totp} = this.currentFormValues;
         const pwmh = mega.pwmh;
 
-        const n = {name: title, pwm: {pwd, u: uname, n: notes, url}};
+        const n = {
+            name: title,
+            pwm: {
+                pwd,
+                u: uname,
+                n: notes,
+                url,
+                totp: totp ? {shse: totp, nd: '6', t: '30', alg: 'sha1'} : undefined
+            }
+        };
         const name = title;
         const target = pwmh;
 
@@ -243,9 +308,20 @@ class PasswordItemForm extends MegaForm {
     }
 
     async updateItem() {
-        const {title, uname, pwd, url, notes} = this.currentFormValues;
-        const n = {name: title, pwd, u: uname, n: notes, url};
+        const {title, uname, pwd, url, notes, totp} = this.currentFormValues;
         const handle = mega.ui.pm.list.passwordItem.item.h;
+        const node = M.getNodeByHandle(handle);
+        const totpObj = {...(node.pwm && node.pwm.totp ? node.pwm.totp : {})};
+        const n = {
+            name: title,
+            pwd,
+            u: uname,
+            n: notes,
+            url,
+            totp: totp ?
+                {shse: totp, nd: totpObj.nd || '6', t: totpObj.t || '30', alg: totpObj.alg || 'sha1'}
+                : undefined
+        };
 
         const res = await mega.ui.pm.comm.updateItem(n, handle);
 
@@ -278,6 +354,9 @@ class PasswordItemForm extends MegaForm {
         this.megaTitleInput.setValue(pwdItem.name);
         this.megaUnameInput.setValue(pwdItem.pwm.u);
         this.megaNotesInput.setValue(pwdItem.pwm.n);
+        if (pwdItem.pwm.totp) {
+            this.megaTOTPInput.setValue(pwdItem.pwm.totp.shse);
+        }
 
         this.setPass(pwdItem.pwm.pwd);
     }
@@ -291,6 +370,7 @@ class PasswordItemForm extends MegaForm {
         const title = this.megaTitleInput.$input.val();
         const url = this.megaWebsiteInput.$input.val();
         const pwd = this.megaPwdInput.$input.val();
+        const otp = this.megaTOTPInput.$input.val();
         let success = true;
 
         if (!title) {
@@ -308,6 +388,11 @@ class PasswordItemForm extends MegaForm {
             success = false;
         }
 
+        if (otp && !mega.pm.otp.base32ToUint8Array(otp)) {
+            this.megaTOTPInput.$input.megaInputsShowError(`${alertIcon} ${l.otp_key_error}`);
+            success = false;
+        }
+
         if (title) {
             const [node] = mega.ui.pm.list.vaultPasswords.filter(item => item.name === title);
 
@@ -319,5 +404,34 @@ class PasswordItemForm extends MegaForm {
         }
 
         return success;
+    }
+
+    showInfoSheet({ name, title, contents = [], actions = [] }) {
+        const targetNode = document.createElement('div');
+
+        for (let i = 0; i < contents.length; i++) {
+            const content = contents[i];
+            if (typeof content === 'string') {
+                mCreateElement('p', {}, targetNode).textContent = content;
+            }
+            else if (typeof content === 'object') {
+                targetNode.appendChild(content);
+            }
+        }
+
+        mega.ui.sheet.show({
+            name,
+            showClose: true,
+            preventBgClosing: true,
+            title,
+            contents: [targetNode],
+            actions: actions.length > 0 ? actions : [
+                {
+                    type: 'normal',
+                    text: l.ok_button,
+                    onClick: () => mega.ui.sheet.hide()
+                }
+            ]
+        });
     }
 }

@@ -65,7 +65,7 @@ class MegaPasswordItemDetail {
             id: 'username',
             grouped: true,
             actions: [{
-                icon: 'sprite-pm-mono icon-copy-user-thin-outline',
+                icon: 'sprite-pm-mono icon-copy-thin-outline',
                 onClick() {
                     mega.ui.pm.utils.copyPMToClipboard(this.inputValue, l.username_copied);
                     eventlog(500546);
@@ -83,6 +83,7 @@ class MegaPasswordItemDetail {
         this.passwordField = new MegaReadOnlyField({
             parentNode: detailForm,
             id: 'password',
+            grouped: true,
             actions: [
                 {
                     icon: 'sprite-pm-mono icon-eye-thin-outline',
@@ -100,7 +101,7 @@ class MegaPasswordItemDetail {
                     hint: l.show_password
                 },
                 {
-                    icon: 'sprite-pm-mono icon-copy-password-thin-outline',
+                    icon: 'sprite-pm-mono icon-copy-thin-outline',
                     onClick() {
                         mega.ui.pm.utils.copyPMToClipboard(this.inputValue, l[19602]);
                         eventlog(500548);
@@ -113,6 +114,24 @@ class MegaPasswordItemDetail {
             isPassword: true,
             onClick() {
                 mega.ui.pm.utils.copyPMToClipboard(this.inputValue, l[19602]);
+                return false;
+            }
+        });
+
+        this.otpField = new MegaReadOnlyField({
+            parentNode: detailForm,
+            id: 'otp',
+            label: l.otp_info_title,
+            actions: [{
+                icon: 'sprite-pm-mono icon-copy-thin-outline',
+                onClick() {
+                    mega.ui.pm.utils.copyPMToClipboard(this.inputValue.replace(/\s/, ''), l.otp_copied);
+                    return false;
+                },
+                hint: l.copy_otp
+            }],
+            onClick() {
+                mega.ui.pm.utils.copyPMToClipboard(this.inputValue.replace(/\s/, ''), l.otp_copied);
                 return false;
             }
         });
@@ -167,21 +186,67 @@ class MegaPasswordItemDetail {
      * Populate the detail panel form with the selected password item.
      *
      * @param {string} pH password Handle
-     * @returns {void}
+     * @param {*} [noShow] no...show?
+     * @returns {Promise<*>}
      */
     async showDetail(pH, noShow = false) {
-        this.item = await M.getNodeByHandle(pH);
+        this.item = M.getNodeByHandle(pH);
 
         if (!this.item) {
             return;
         }
 
-        const {u, pwd, n, url} = this.item.pwm;
+        let otp = null;
+        const {u, pwd, n, url, totp: otpData} = this.item.pwm;
+
+        if (otpData) {
+            otp = await this.generateOtpValue(otpData).catch(dump);
+
+            // convert to seconds since Unix epoch
+            const epochSeconds = Math.floor(Date.now() / 1000);
+            // calculate seconds that has passed in the current t sec window
+            const delaySeconds = epochSeconds % otpData.t;
+
+            if (this.otpField.radial) {
+                this.otpField.radial.destroy();
+            }
+
+            this.otpField.radial = new MegaTimerRadialComponent({
+                parentNode: mega.ui.pm.list.passwordItem.otpField.output.querySelector('.read-only-actions'),
+                timerDuration: otpData.t,
+                animationDelay: delaySeconds,
+                prepend: true
+            });
+
+            const _onCycleComplete = () => {
+                const {totp: otpData} = this.item.pwm;
+                if (otpData) {
+                    this.generateOtpValue(otpData)
+                        .then((otp) => {
+                            this.otpField.inputValue = otp;
+                        })
+                        .catch(dump);
+                }
+            };
+
+            // remaining seconds
+            const wait = otpData.t - delaySeconds;
+
+            tSleep(wait).then(() => {
+                this.otpField.radial.startCycleTimer(_onCycleComplete);
+                _onCycleComplete();
+            });
+
+            this.otpField.radial.show();
+        }
 
         this.usernameField.inputValue = u;
         this.passwordField.inputValue = pwd;
         this.websiteField.inputValue = url;
         this.notesField.inputValue = n;
+        this.otpField.inputValue = otp || '';
+        this.otpField[otp ? 'removeClass' : 'addClass']('hidden');
+        this.passwordField[otp ? 'addClass' : 'removeClass']('grouped');
         this.usernameField[u ? 'removeClass' : 'addClass']('hidden');
         this.websiteField[url ? 'removeClass' : 'addClass']('hidden');
         this.notesField[n ? 'removeClass' : 'addClass']('hidden');
@@ -222,5 +287,15 @@ class MegaPasswordItemDetail {
                 this.domNode.Ps = new PerfectScrollbar(this.domNode);
             }
         });
+    }
+
+    async generateOtpValue(otpData) {
+        const otp = await mega.pm.otp.generateOtp(otpData);
+        const len = otp.length;
+
+        const isOdd = len % 2 !== 0;
+        const count = Math.floor(len / 2) + Number(isOdd);
+
+        return `${otp.slice(0, count)} ${otp.slice(count)}`;
     }
 }

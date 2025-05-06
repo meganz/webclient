@@ -176,6 +176,9 @@ mega.ui.MegaInputs.prototype.pmText._bindEvent = function() {
         $input.rebind('input.pmText', () => {
             if (this.$wrapper.hasClass('error')) {
                 this.hideError();
+                if (this.$wrapper.hasClass('info')) {
+                    this.showInfoMessage();
+                }
             }
         });
     }
@@ -229,6 +232,9 @@ mega.ui.MegaInputs.prototype.pmText._withIconOrPrefix = function() {
 
             if ($input.hasClass('errored')) {
                 this.hideError();
+                if (this.$wrapper.hasClass('info')) {
+                    this.showInfoMessage();
+                }
             }
             this.setValue('');
         });
@@ -356,6 +362,7 @@ mega.ui.MegaInputs.prototype.pmText._strengthChecker = function() {
                 var strengthText = wrapperElement.querySelector('.strength-text');
 
                 $passStatus.removeClass('weak strong moderate checked');
+                $wrapper.removeClass('checked');
 
                 strengthIcon.classList
                     .remove('icon-check-circle-thin-outline',
@@ -366,6 +373,7 @@ mega.ui.MegaInputs.prototype.pmText._strengthChecker = function() {
 
                 if (typeof strength === 'object') {
                     $passStatus.addClass(`${strength.className} checked`);
+                    $wrapper.addClass('checked');
                     strengthIcon.className = strength.icon;
                     strengthText.textContent = strength.string1;
                 }
@@ -491,4 +499,25 @@ mega.ui.MegaInputs.prototype.pmText._updateShowHideErrMsg = function() {
 
     // Hide all error upon reinitialize
     this.hideError();
+
+    /**
+     * Display an informational message below the input's underline.
+     *
+     * @param {String} msg - The informational message to display.
+     * @returns {Void}
+     */
+    this.showInfoMessage = function(msg) {
+
+        if (typeof this.options.onShowInfoMessage === 'function') {
+            this.options.onShowInfoMessage(msg);
+        }
+        else {
+            if (msg) {
+                this.infoMsg = msg;
+            }
+
+            this.showMessage(this.infoMsg);
+            this.$wrapper.addClass('info');
+        }
+    };
 };

@@ -1985,6 +1985,15 @@ mBroadcaster.once('boot_done', function populate_l() {
     l.you_have_selected_pass_trial = escapeHTML(l.you_have_selected_pass_trial)
         .replace('[S]', '<span>').replace('[/S]', '</span>');
 
+    l.otp_field_instructions = escapeHTML(l.otp_field_instructions)
+        .replace('[S]', '<span>').replace('[/S]', '</span>')
+        .replace('[A]', '<a class="clickurl">').replace('[/A]', '</a>');
+
+    const otpHelpLink = 'https://help.mega.io/mega-pass-features/one-time-passwords';
+    l.otp_learn_more = escapeHTML(l.otp_learn_more)
+        .replace('[A]', `<a class="clickurl" href=${otpHelpLink}" target="_blank">`)
+        .replace('[/A]', '</a>');
+
     const common = [
         15536, 16119, 16120, 16313, 16316, 16360, 18228, 18268, 18282,
         18284, 18285, 18286, 18287, 18289, 18290, 18291, 18294, 18295, 18296, 18297, 18298, 18302, 18303, 18304,

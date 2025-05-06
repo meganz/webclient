@@ -36,7 +36,8 @@
     --icon-size: 24px;
     color: var(--mobile-button-brand);
 }
-p.timeline-day {
+p.timeline-day,
+.overlay-wrap .content p.timeline-day {
     grid-area: 1 / 2 / 2 / 3;
     text-align: start;
     font: var(--mobile-font-copy-bold);
@@ -50,7 +51,8 @@ p.timeline-day {
     border-radius: var(--mobile-border-radius-circle);
     place-self: start center;
 }
-.timeline-description {
+.timeline-description,
+.overlay-wrap .content p.timeline-description {
     grid-area: 2 / 2 / 3 / 3;
     text-align: start;
     margin: 0;

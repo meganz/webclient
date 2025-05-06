@@ -57,6 +57,9 @@
     width: 100%;
     height: auto;
 }
+.overlay-wrap .content p {
+    margin: 0 auto 18px;
+}
 .overlay-wrap .actions {
     display: flex;
     flex-direction: row;
@@ -138,7 +141,7 @@
 }
 .overlay-wrap.pm-overlay .main.centered {
     max-width: 528px;
-    margin: auto;
+    margin: 0 auto;
     padding: 0 24px;
     box-sizing: border-box;
 }

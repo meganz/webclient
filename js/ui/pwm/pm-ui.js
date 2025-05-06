@@ -33,6 +33,10 @@ mega.ui.pm = {
             pmlayout.querySelector('.js-fm-left-panel').classList.add('hidden');
         }
 
+        queueMicrotask(() => {
+            mBroadcaster.sendMessage('pwm-initialized');
+        });
+
         // Business and flexi user has read only access to password manager even it is expired
         if (!mega.pm.pwmFeature && !u_attr.b && !u_attr.pf) {
             return;

@@ -518,7 +518,10 @@ mBroadcaster.addListener('fm:initialized', () => {
 
         const _handleMegaPassSteps = () => {
             if (!mega.ui.pm) {
-                delay('waitForMegaUiPm', _handleMegaPassSteps, 500);
+                if (!_handleMegaPassSteps.onceAwait) {
+                    _handleMegaPassSteps.onceAwait = true;
+                    mBroadcaster.once('pwm-initialized', _handleMegaPassSteps);
+                }
                 return;
             }
             const pwmFeature = u_attr.features && u_attr.features.find(elem => elem[1] === 'pwm');

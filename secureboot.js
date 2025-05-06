@@ -2273,6 +2273,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/ui/components/card.js', n: 'card_js', j: 1, w:1});
     jsl.push({f:'js/ui/components/card-group.js', n: 'card_select_js', j: 1, w:1});
     jsl.push({f:'js/ui/components/checkbox-group.js', n: 'checkbox_select_js', j: 1, w:1});
+    jsl.push({f:'js/ui/components/radial.js', n: 'radial_js', j: 1, w:1});
 
     // Mobile component for inheriting
     jsl.push({f:'js/mobile/mobile.header.js', n: 'mobile_header_js', j: 1, w: 1});
@@ -2475,6 +2476,7 @@ else if (!browserUpdate) {
     jsl.push({f:'css/components/stepper.css', n: 'stepper_css', j:2, w:30, c:1, d:1, cache:1});
     jsl.push({f:'css/components/onboarding-journey.css', n: 'onboarding_journey_css', j:2, w:30, c:1, d:1, cache:1});
     jsl.push({f:'css/components/card.css', n: 'card_css', j:2, w:30, c:1, d:1, cache:1});
+    jsl.push({f:'css/components/radial.css', n: 'radial_css', j:2, w:30, c:1, d:1, cache:1});
 
     // Load files common to all mobile pages
     if (is_mobile) {

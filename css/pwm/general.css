@@ -7,7 +7,7 @@
 
 .pm-main .password-list-page .manual-favicon {
     color: var(--favicon-text-color);
-    border-radius: 4px;
+    border-radius: var(--mobile-border-radius-medium);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -55,6 +55,11 @@
     color: var(--mobile-link-primary);
 }
 
+.pwm-ui .overlay-wrap a.clickurl {
+    font: inherit;
+    color: var(--mobile-link-primary);
+}
+
 .pm-main .password-list-page label {
     font: var(--font-label-semibold);
 }
@@ -71,4 +76,8 @@
 .pm-main .password-list-page fieldset.fieldset {
     border: none;
     padding: 0;
+}
+
+.pwm-ui .overlay-wrap .invisible {
+    visibility: hidden;
 }

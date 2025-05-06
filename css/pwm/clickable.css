@@ -36,8 +36,14 @@
     background: var(--mobile-page-background);
 }
 
-.password-wrapper .nav-elem.active {
+.password-wrapper .nav-elem.active,
+.password-wrapper .nav-elem:hover {
     background: var(--mobile-surface-2);
+}
+
+.password-wrapper .nav-elem.nav-elem.icon-only.active,
+.password-wrapper .nav-elem.nav-elem.icon-only:active {
+    background: var(--mobile-surface-3);
 }
 
 /* Button and Link styles */
@@ -331,6 +337,9 @@ button-type elements.
 }
 .password-wrapper .nav-elem.icon-only {
     cursor: pointer;
+    padding: 0;
+    width: 36px;
+    height: 36px;
 }
 
 .password-wrapper .nav-elem.normal.link {

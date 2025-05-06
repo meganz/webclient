@@ -772,6 +772,11 @@
     text-align: start;
     top: 51px;
 }
+.mobile.mega-input.info .message-container,
+.pm.mega-input.info .message-container {
+    color: var(--mobile-text-secondary);
+    display: flex;
+}
 .mobile.mega-input.warning .message-container,
 .pm.mega-input.warning .message-container {
     color: var(--mobile-text-warning);

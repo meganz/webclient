@@ -13,6 +13,7 @@
 
 .mobile .mega-sheet .sheet {
     padding-bottom: 16px;
+    background: var(--mobile-surface-1);
 }
 
 .mega-sheet.with-footer .sheet {

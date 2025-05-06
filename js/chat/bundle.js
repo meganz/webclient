@@ -32502,7 +32502,7 @@ const Chats = ({
     className: "conversations-category"
   }, REaCt().createElement("span", null, l.filter_heading__recent)), conversations && conversations.length >= 1 ? REaCt().createElement(ConversationsList, {
     conversations
-  }, megaChat.WITH_SELF_NOTE && noteChat && noteChat.isDisplayable() ? REaCt().createElement(ConversationsListItem, {
+  }, megaChat.WITH_SELF_NOTE && noteChat && noteChat.isDisplayable() ? filter ? null : REaCt().createElement(ConversationsListItem, {
     chatRoom: noteChat
   }) : null, conversations.map(c => c.roomId && !c.isNote && REaCt().createElement(ConversationsListItem, (0,esm_extends.A)({
     key: c.roomId,

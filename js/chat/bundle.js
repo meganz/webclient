@@ -3685,8 +3685,8 @@ ColumnContactVerifiedStatus.verifiedLabel = REaCt().createElement("div", {
 const dropdowns = REQ_(911);
 // EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 11 modules
 const call = REQ_(3);
-// EXTERNAL MODULE: ./js/chat/ui/conversations.jsx + 20 modules
-const conversations = REQ_(823);
+// EXTERNAL MODULE: ./js/chat/ui/conversations.jsx + 21 modules
+const conversations = REQ_(732);
 ;// ./js/chat/ui/contactsPanel/contextMenu.jsx
 
 
@@ -7260,8 +7260,8 @@ const React_ = REQ_(594);
 const REaCt = REQ_.n(React_);
 // EXTERNAL MODULE: external "ReactDOM"
 const ReactDOM_ = REQ_(206);
-// EXTERNAL MODULE: ./js/chat/ui/conversations.jsx + 20 modules
-const conversations = REQ_(823);
+// EXTERNAL MODULE: ./js/chat/ui/conversations.jsx + 21 modules
+const conversations = REQ_(732);
 ;// ./js/chat/chatRouting.jsx
 let _ChatRouting;
 class ChatRouting {
@@ -25843,2698 +25843,7 @@ class MetaRichpreviewLoading extends ConversationMessageMixin {
 
 },
 
-757:
-(_, EXP_, REQ_) => {
-
-"use strict";
-REQ_.d(EXP_, {
-A: () => ScheduleMetaChange
-});
-const react0__ = REQ_(594);
-const react0 = REQ_.n(react0__);
-const _mixin_jsx1__ = REQ_(446);
-const _contacts_jsx2__ = REQ_(251);
-const _ui_utils_jsx3__ = REQ_(314);
-const _ui_buttons_jsx4__ = REQ_(994);
-
-
-
-
-
-class ScheduleMetaChange extends _mixin_jsx1__.M {
-  constructor(...args) {
-    super(...args);
-    this.state = {
-      link: ''
-    };
-  }
-  componentDidMount() {
-    super.componentDidMount();
-    if (this.props.mode === ScheduleMetaChange.MODE.CREATED) {
-      if (is_chatlink) {
-        this.setState({
-          link: `${getBaseUrl()}/chat/${is_chatlink.ph}#${is_chatlink.key}`
-        });
-      } else {
-        const {
-          chatRoom
-        } = this.props;
-        chatRoom.updatePublicHandle().then(() => {
-          if (this.isMounted() && !this.state.link && chatRoom.publicLink) {
-            this.setState({
-              link: `${getBaseUrl()}/${chatRoom.publicLink}`
-            });
-          }
-        }).catch(dump);
-      }
-    }
-    if (this.props.message.meta.ap) {
-      const {
-        meetingsManager
-      } = megaChat.plugins;
-      this.redrawListener = `${meetingsManager.EVENTS.OCCURRENCES_UPDATE}.redraw${this.getUniqueId()}`;
-      megaChat.rebind(this.redrawListener, () => {
-        onIdle(() => {
-          const {
-            meta
-          } = this.props.message;
-          if (!meta.ap) {
-            return;
-          }
-          this.props.message.meta = meetingsManager.noCsMeta(meta.handle, meta.ap, megaChat.chats[meta.cid]);
-          this.safeForceUpdate();
-        });
-        megaChat.off(this.redrawListener);
-        delete this.redrawListener;
-      });
-    }
-  }
-  componentWillUnmount() {
-    super.componentWillUnmount();
-    if (this.redrawListener) {
-      megaChat.off(this.redrawListener);
-    }
-  }
-  specShouldComponentUpdate(nextProps) {
-    if (this.props.mode === ScheduleMetaChange.MODE.CREATED && this.props.link !== nextProps.link) {
-      return true;
-    }
-    return null;
-  }
-  componentDidUpdate(prevProps) {
-    if (this.props.mode === ScheduleMetaChange.MODE.CREATED && prevProps.link !== this.props.link) {
-      this.setState({
-        link: this.props.link ? `${getBaseUrl()}/${this.props.link}` : ''
-      });
-    }
-  }
-  onAddToCalendar() {
-    const {
-      chatRoom
-    } = this.props;
-    const {
-      id,
-      title
-    } = chatRoom && chatRoom.scheduledMeeting || {};
-    if (id) {
-      delay(`fetchical${id}`, () => {
-        eventlog(500038);
-        asyncApiReq({
-          a: 'mcsmfical',
-          id
-        }).then(([, res]) => {
-          delay(`saveical${id}`, () => {
-            M.saveAs(base64urldecode(res), `${title.replace(/\W/g, '')}.ics`).then(nop).catch(() => {
-              msgDialog('error', '', l.calendar_add_failed, '');
-            });
-          }, 1000);
-        }).catch(() => {
-          msgDialog('error', '', l.calendar_add_failed, '');
-        });
-      }, 250);
-    }
-  }
-  static getTitleText(meta) {
-    const {
-      mode,
-      recurring,
-      occurrence,
-      converted,
-      prevTiming
-    } = meta;
-    const {
-      MODE
-    } = ScheduleMetaChange;
-    switch (mode) {
-      case MODE.CREATED:
-        {
-          return recurring ? l.schedule_mgmt_new_recur : l.schedule_mgmt_new;
-        }
-      case MODE.EDITED:
-        {
-          if (converted) {
-            return recurring ? l.schedule_mgmt_update_convert_recur : l.schedule_mgmt_update_convert;
-          }
-          if (occurrence) {
-            return l.schedule_mgmt_update_occur;
-          }
-          if (prevTiming) {
-            return recurring ? l.schedule_mgmt_update_recur : l.schedule_mgmt_update;
-          }
-          return l.schedule_mgmt_update_desc;
-        }
-      case MODE.CANCELLED:
-        {
-          if (recurring) {
-            return occurrence ? l.schedule_mgmt_cancel_occur : l.schedule_mgmt_cancel_recur;
-          }
-          return l.schedule_mgmt_cancel;
-        }
-    }
-    return '';
-  }
-  renderTimingBlock() {
-    const {
-      message,
-      mode
-    } = this.props;
-    const {
-      meta
-    } = message;
-    const {
-      MODE
-    } = ScheduleMetaChange;
-    if (mode === MODE.CANCELLED && !meta.occurrence) {
-      return null;
-    }
-    const [now, prev] = megaChat.plugins.meetingsManager.getOccurrenceStrings(meta);
-    return react0().createElement("div", {
-      className: "schedule-timing-block"
-    }, meta.prevTiming && react0().createElement("s", null, prev || ''), now);
-  }
-  checkAndFakeOccurrenceMeta(meta) {
-    const {
-      MODE
-    } = ScheduleMetaChange;
-    if (meta.occurrence && meta.mode === MODE.CANCELLED && !meta.calendar) {
-      const meeting = megaChat.plugins.meetingsManager.getMeetingOrOccurrenceParent(meta.handle);
-      if (meeting) {
-        const occurrences = meeting.getOccurrencesById(meta.handle);
-        if (occurrences) {
-          meta.calendar = {
-            date: new Date(occurrences[0].start).getDate(),
-            month: time2date(Math.floor(occurrences[0].start / 1000), 12)
-          };
-          meta.timeRules.startTime = Math.floor(occurrences[0].start / 1000);
-          meta.timeRules.endTime = Math.floor(occurrences[0].end / 1000);
-        }
-      }
-    }
-  }
-  render() {
-    const {
-      chatRoom,
-      message,
-      mode,
-      contact
-    } = this.props;
-    const {
-      meta,
-      messageId
-    } = message;
-    const {
-      scheduledMeeting
-    } = chatRoom;
-    const {
-      MODE
-    } = ScheduleMetaChange;
-    const {
-      link
-    } = this.state;
-    if (meta.gone) {
-      return null;
-    }
-    this.checkAndFakeOccurrenceMeta(meta);
-    return react0().createElement("div", null, react0().createElement("div", {
-      className: "message body",
-      "data-id": `id${messageId}`,
-      key: messageId
-    }, react0().createElement(_contacts_jsx2__.Avatar, {
-      contact: contact.u,
-      className: "message avatar-wrapper small-rounded-avatar",
-      chatRoom
-    }), react0().createElement("div", {
-      className: "message schedule-message content-area small-info-txt selectable-txt"
-    }, react0().createElement(_contacts_jsx2__.ContactButton, {
-      className: "message",
-      chatRoom,
-      contact,
-      label: react0().createElement(_ui_utils_jsx3__.zT, null, M.getNameByHandle(contact.u))
-    }), react0().createElement("div", {
-      className: "message date-time simpletip",
-      "data-simpletip": time2date(this.getTimestamp())
-    }, this.getTimestampAsString()), react0().createElement("div", {
-      className: "message text-block"
-    }, ScheduleMetaChange.getTitleText(meta), " ", !!d && meta.handle), react0().createElement("div", {
-      className: "message body-block"
-    }, (meta.prevTiming || meta.calendar || meta.topic && meta.onlyTitle || meta.recurring) && react0().createElement("div", {
-      className: "schedule-detail-block"
-    }, meta.calendar && scheduledMeeting && (meta.recurring && !scheduledMeeting.recurring || meta.occurrence && meta.mode === MODE.CANCELLED || !meta.recurring) && react0().createElement("div", {
-      className: "schedule-calendar-icon"
-    }, react0().createElement("div", {
-      className: "schedule-date"
-    }, meta.calendar.date), react0().createElement("div", {
-      className: "schedule-month"
-    }, meta.calendar.month)), react0().createElement("div", {
-      className: "schedule-detail-main"
-    }, react0().createElement("div", {
-      className: "schedule-meeting-title"
-    }, mode === MODE.CANCELLED ? react0().createElement("s", null, meta.topic || chatRoom.topic) : meta.topic || chatRoom.topic), this.renderTimingBlock()), chatRoom.iAmInRoom() && scheduledMeeting && mode !== MODE.CANCELLED && react0().createElement(_ui_buttons_jsx4__.$, {
-      className: "mega-button",
-      onClick: () => this.onAddToCalendar()
-    }, react0().createElement("span", null, mode === MODE.CREATED && !meta.occurrence ? l.schedule_add_calendar : l.schedule_update_calendar))), mode === MODE.CREATED && scheduledMeeting && scheduledMeeting.description && react0().createElement("div", {
-      className: "schedule-description"
-    }, react0().createElement(_ui_utils_jsx3__.P9, null, megaChat.html(scheduledMeeting.description).replace(/\n/g, '<br>'))), link && react0().createElement("div", null, react0().createElement("div", {
-      className: "schedule-link-instruction"
-    }, l.schedule_mgmt_link_instruct), react0().createElement("div", {
-      className: "schedule-meeting-link"
-    }, react0().createElement("span", null, link), react0().createElement(_ui_buttons_jsx4__.$, {
-      className: "mega-button positive",
-      onClick: () => {
-        copyToClipboard(link, l[7654]);
-        delay('chat-event-sm-copy-link', () => eventlog(500039));
-      }
-    }, react0().createElement("span", null, l[63]))), react0().createElement("span", null, l.schedule_link_note))))));
-  }
-}
-ScheduleMetaChange.MODE = {
-  CREATED: 1,
-  EDITED: 2,
-  CANCELLED: 3
-};
-window.ScheduleMetaChange = ScheduleMetaChange;
-
-},
-
-772:
-(_, EXP_, REQ_) => {
-
-"use strict";
-REQ_.d(EXP_, {
-Q: () => withMicObserver
-});
-const _extends3__ = REQ_(168);
-const react0__ = REQ_(594);
-const react0 = REQ_.n(react0__);
-const _mixins1__ = REQ_(137);
-const _button_jsx2__ = REQ_(959);
-
-
-
-
-const withMicObserver = Component => class extends _mixins1__.w9 {
-  constructor(props) {
-    super(props);
-    this.namespace = `SO-${Component.NAMESPACE}`;
-    this.inputObserver = `onNoMicInput.${this.namespace}`;
-    this.sendObserver = `onAudioSendDenied.${this.namespace}`;
-    this.state = {
-      signal: true,
-      blocked: false
-    };
-    this.renderSignalWarning = this.renderSignalWarning.bind(this);
-    this.renderBlockedWarning = this.renderBlockedWarning.bind(this);
-  }
-  bindObservers() {
-    this.props.chatRoom.rebind(this.inputObserver, () => this.setState({
-      signal: false
-    })).rebind(this.sendObserver, () => {
-      this.setState({
-        blocked: true
-      }, () => {
-        if (this.props.minimized) {
-          const toast = new ChatToast(l.max_speakers_toast, {
-            icon: 'sprite-fm-uni icon-hazard',
-            close: true
-          });
-          toast.dispatch();
-        }
-      });
-    });
-  }
-  renderSignalDialog() {
-    return msgDialog('warningb', null, l.no_mic_title, l.chat_mic_off_tooltip, null, 1);
-  }
-  renderSignalWarning() {
-    return react0().createElement("div", {
-      className: `
-                    ${this.namespace}
-                        meetings-signal-issue
-                        simpletip
-                    `,
-      "data-simpletip": l.show_info,
-      "data-simpletipposition": "top",
-      "data-simpletipoffset": "5",
-      "data-simpletip-class": "theme-dark-forced",
-      onClick: () => this.renderSignalDialog()
-    }, react0().createElement("i", {
-      className: "sprite-fm-mono icon-exclamation-filled"
-    }));
-  }
-  renderBlockedWarning() {
-    return react0().createElement("div", {
-      className: "stream-toast theme-dark-forced"
-    }, react0().createElement("div", {
-      className: "stream-toast-content"
-    }, react0().createElement("i", {
-      className: "stream-toast-icon sprite-fm-uni icon-warning"
-    }), react0().createElement("div", {
-      className: "stream-toast-message"
-    }, l.max_speakers_toast), react0().createElement(_button_jsx2__.A, {
-      className: "mega-button action stream-toast-close",
-      icon: "sprite-fm-mono icon-close-component",
-      onClick: () => this.setState({
-        blocked: false
-      })
-    })));
-  }
-  componentWillUnmount() {
-    super.componentWillUnmount();
-    this.props.chatRoom.unbind(this.inputObserver);
-  }
-  componentDidMount() {
-    super.componentDidMount();
-    this.bindObservers();
-  }
-  render() {
-    return react0().createElement(Component, (0,_extends3__.A)({}, this.props, {
-      signal: this.state.signal,
-      renderSignalWarning: this.renderSignalWarning,
-      blocked: this.state.blocked,
-      renderBlockedWarning: this.renderBlockedWarning
-    }));
-  }
-};
-
-},
-
-793:
-(__webpack_module__, EXP_, REQ_) => {
-
-"use strict";
-REQ_.d(EXP_, {
-A: () => _applyDecoratedDescriptor
-});
-function _applyDecoratedDescriptor(i, e, r, n, l) {
-  let a = {};
-  return Object.keys(n).forEach((i) => {
-    a[i] = n[i];
-  }), a.enumerable = !!a.enumerable, a.configurable = !!a.configurable, ("value" in a || a.initializer) && (a.writable = !0), a = r.slice().reverse().reduce((r, n) => {
-    return n(i, e, r) || r;
-  }, a), l && void 0 !== a.initializer && (a.value = a.initializer ? a.initializer.call(l) : void 0, a.initializer = void 0), void 0 === a.initializer ? (Object.defineProperty(i, e, a), null) : a;
-}
-
-
-},
-
-795:
-(_, EXP_, REQ_) => {
-
-"use strict";
-
-// EXPORTS
-REQ_.d(EXP_, {
-  T: () => TypingArea
-});
-
-// EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/esm/applyDecoratedDescriptor.js
-const applyDecoratedDescriptor = REQ_(793);
-// EXTERNAL MODULE: external "React"
-const React_ = REQ_(594);
-const REaCt = REQ_.n(React_);
-// EXTERNAL MODULE: ./js/ui/utils.jsx
-const utils = REQ_(314);
-// EXTERNAL MODULE: ./js/chat/mixins.js
-const mixins = REQ_(137);
-// EXTERNAL MODULE: ./js/ui/emojiDropdown.jsx
-const emojiDropdown = REQ_(844);
-// EXTERNAL MODULE: ./js/ui/buttons.jsx
-const ui_buttons = REQ_(994);
-;// ./js/chat/ui/emojiAutocomplete.jsx
-
-
-
-class EmojiAutocomplete extends mixins.w9 {
-  constructor(props) {
-    super(props);
-    this.domRef = REaCt().createRef();
-    this.state = {
-      'selected': 0
-    };
-    this.loading = false;
-    this.data_emojis = [];
-  }
-  preload_emojis() {
-    if (this.loading === false) {
-      this.loading = true;
-      megaChat.getEmojiDataSet('emojis').then(emojis => {
-        this.loading = 0;
-        this.data_emojis = emojis;
-        this.safeForceUpdate();
-      });
-    }
-  }
-  unbindKeyEvents() {
-    $(document).off(`keydown.emojiAutocomplete${  this.getUniqueId()}`);
-  }
-  bindKeyEvents() {
-    const self = this;
-    $(document).rebind(`keydown.emojiAutocomplete${  self.getUniqueId()}`, (e) => {
-      if (!self.props.emojiSearchQuery) {
-        self.unbindKeyEvents();
-        return;
-      }
-      let key = e.keyCode || e.which;
-      if (!$(e.target).is("textarea")) {
-        console.error("this should never happen.");
-        return;
-      }
-      if (e.altKey || e.metaKey) {
-        return;
-      }
-      let selected = $.isNumeric(self.state.selected) ? self.state.selected : 0;
-      if (document.body.classList.contains('rtl') && (key === 37 || key === 39)) {
-        key = key === 37 ? 39 : 37;
-      }
-      let handled = false;
-      if (!e.shiftKey && (key === 37 || key === 38)) {
-        selected = selected - 1;
-        selected = selected < 0 ? self.maxFound - 1 : selected;
-        if (self.found[selected] && self.state.selected !== selected) {
-          self.setState({
-            selected,
-            'prefilled': true
-          });
-          handled = true;
-          self.props.onPrefill(false, `:${  self.found[selected].n  }:`);
-        }
-      } else if (!e.shiftKey && (key === 39 || key === 40 || key === 9)) {
-        selected = selected + (key === 9 ? e.shiftKey ? -1 : 1 : 1);
-        selected = selected < 0 ? Object.keys(self.found).length - 1 : selected;
-        selected = selected >= self.props.maxEmojis || selected >= Object.keys(self.found).length ? 0 : selected;
-        if (self.found[selected] && (key === 9 || self.state.selected !== selected)) {
-          self.setState({
-            selected,
-            'prefilled': true
-          });
-          self.props.onPrefill(false, `:${  self.found[selected].n  }:`);
-          handled = true;
-        }
-      } else if (key === 13) {
-        self.unbindKeyEvents();
-        if (selected === -1) {
-          if (self.found.length > 0) {
-            for (let i = 0; i < self.found.length; i++) {
-              if (`:${  self.found[i].n  }:` === `${self.props.emojiSearchQuery  }:`) {
-                self.props.onSelect(false, `:${  self.found[0].n  }:`);
-                handled = true;
-              }
-            }
-          }
-          if (!handled && key === 13) {
-            self.props.onCancel();
-          }
-          return;
-        } else if (self.found.length > 0 && self.found[selected]) {
-          self.props.onSelect(false, `:${  self.found[selected].n  }:`);
-          handled = true;
-        } else {
-          self.props.onCancel();
-        }
-      } else if (key === 27) {
-        self.unbindKeyEvents();
-        self.props.onCancel();
-        handled = true;
-      }
-      if (handled) {
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
-      } else {
-        if (self.isMounted()) {
-          self.setState({
-            'prefilled': false
-          });
-        }
-      }
-    });
-  }
-  componentDidUpdate() {
-    if (!this.props.emojiSearchQuery) {
-      this.unbindKeyEvents();
-    } else {
-      this.bindKeyEvents();
-    }
-  }
-  componentWillUnmount() {
-    super.componentWillUnmount();
-    this.unbindKeyEvents();
-  }
-  render() {
-    const self = this;
-    if (!self.props.emojiSearchQuery) {
-      return null;
-    }
-    self.preload_emojis();
-    if (self.loading) {
-      return REaCt().createElement("div", {
-        className: "textarea-autofill-bl"
-      }, REaCt().createElement("div", {
-        className: "textarea-autofill-info"
-      }, l[5533]));
-    }
-    const q = self.props.emojiSearchQuery.substr(1, self.props.emojiSearchQuery.length);
-    let exactMatch = [];
-    let partialMatch = [];
-    const emojis = self.data_emojis || [];
-    for (var i = 0; i < emojis.length; i++) {
-      const emoji = emojis[i];
-      const match = emoji.n.indexOf(q);
-      if (match !== -1) {
-        if (match === 0) {
-          exactMatch.push(emoji);
-        } else if (partialMatch.length < self.props.maxEmojis - exactMatch.length) {
-          partialMatch.push(emoji);
-        }
-      }
-      if (exactMatch.length >= self.props.maxEmojis) {
-        break;
-      }
-    }
-    exactMatch.sort((a, b) => {
-      if (a.n === q) {
-        return -1;
-      } else if (b.n === q) {
-        return 1;
-      } else {
-        return 0;
-      }
-    });
-    const found = exactMatch.concat(partialMatch).slice(0, self.props.maxEmojis);
-    exactMatch = partialMatch = null;
-    this.maxFound = found.length;
-    this.found = found;
-    if (!found || found.length === 0) {
-      queueMicrotask(() => {
-        self.props.onCancel();
-      });
-      return null;
-    }
-    const emojisDomList = [];
-    for (var i = 0; i < found.length; i++) {
-      const meta = found[i];
-      const filename = twemoji.convert.toCodePoint(meta.u);
-      emojisDomList.push(REaCt().createElement("div", {
-        className: `emoji-preview shadow ${  this.state.selected === i ? "active" : ""}`,
-        key: `${meta.n  }_${  this.state.selected === i ? "selected" : "inselected"}`,
-        title: `:${  meta.n  }:`,
-        onClick (e) {
-          self.props.onSelect(e, e.target.title);
-          self.unbindKeyEvents();
-        }
-      }, REaCt().createElement("img", {
-        width: "20",
-        height: "20",
-        className: "emoji emoji-loading",
-        draggable: "false",
-        alt: meta.u,
-        onLoad: e => {
-          e.target.classList.remove('emoji-loading');
-        },
-        onError: e => {
-          e.target.classList.remove('emoji-loading');
-          e.target.classList.add('emoji-loading-error');
-        },
-        src: `${staticpath  }images/mega/twemojis/2_v2/72x72/${  filename  }.png`
-      }), REaCt().createElement("div", {
-        className: "emoji title"
-      }, `:${  meta.n  }:`)));
-    }
-    return REaCt().createElement("div", {
-      ref: this.domRef,
-      className: "textarea-autofill-bl"
-    }, REaCt().createElement(utils.P9, {
-      tag: "div",
-      className: "textarea-autofill-info"
-    }, l.emoji_suggestion_instruction), REaCt().createElement("div", {
-      className: "textarea-autofill-emoji"
-    }, emojisDomList));
-  }
-}
-EmojiAutocomplete.defaultProps = {
-  'requiresUpdateOnResize': true,
-  'emojiSearchQuery': false,
-  'disableCheckingVisibility': true,
-  'maxEmojis': 12
-};
-// EXTERNAL MODULE: ./js/chat/ui/gifPanel/gifPanel.jsx + 3 modules
-const gifPanel = REQ_(691);
-// EXTERNAL MODULE: ./js/ui/perfectScrollbar.jsx
-const perfectScrollbar = REQ_(486);
-;// ./js/chat/ui/typingArea.jsx
-
-let _dec, _class;
-
-
-
-
-
-
-
-
-const TypingArea = (_dec = (0,mixins.hG)(54, true), _class = class TypingArea extends mixins.w9 {
-  constructor(props) {
-    super(props);
-    this.domRef = REaCt().createRef();
-    this.state = {
-      emojiSearchQuery: false,
-      typedMessage: '',
-      textareaHeight: 20,
-      gifPanelActive: false
-    };
-    this.getTextareaMaxHeight = () => {
-      const {
-        containerRef
-      } = this.props;
-      if (containerRef && containerRef.current) {
-        return this.isMounted() ? containerRef.current.offsetHeight * 0.4 : 100;
-      }
-      return 100;
-    };
-    const {
-      chatRoom
-    } = props;
-    this.logger = d && MegaLogger.getLogger("TypingArea", {}, chatRoom && chatRoom.logger || megaChat.logger);
-    this.onEmojiClicked = this.onEmojiClicked.bind(this);
-    this.onTypeAreaKeyUp = this.onTypeAreaKeyUp.bind(this);
-    this.onTypeAreaKeyDown = this.onTypeAreaKeyDown.bind(this);
-    this.onTypeAreaBlur = this.onTypeAreaBlur.bind(this);
-    this.onTypeAreaChange = this.onTypeAreaChange.bind(this);
-    this.onCopyCapture = this.onCopyCapture.bind(this);
-    this.onPasteCapture = this.onPasteCapture.bind(this);
-    this.onCutCapture = this.onCutCapture.bind(this);
-    this.state.typedMessage = this.props.initialText || '';
-  }
-  onEmojiClicked(e, slug) {
-    if (this.props.disabled) {
-      e.preventDefault();
-      e.stopPropagation();
-      return;
-    }
-    slug = slug[0] === ':' || slug.substr(-1) === ':' ? slug : `:${slug}:`;
-    const textarea = $('.messages-textarea', this.domRef.current)[0];
-    const cursorPosition = this.getCursorPosition(textarea);
-    this.setState({
-      typedMessage: this.state.typedMessage.slice(0, cursorPosition) + slug + this.state.typedMessage.slice(cursorPosition)
-    }, () => {
-      textarea.selectionEnd = cursorPosition + slug.length;
-      this.onTypeAreaChange(e, this.state.typedMessage);
-    });
-  }
-  stoppedTyping() {
-    if (this.props.disabled || !this.props.chatRoom) {
-      return;
-    }
-    this.iAmTyping = false;
-    this.props.chatRoom.trigger('stoppedTyping');
-  }
-  typing() {
-    if (this.props.disabled || !this.props.chatRoom) {
-      return;
-    }
-    const self = this;
-    const now = Date.now();
-    delay(this.getReactId(), () => self.iAmTyping && self.stoppedTyping(), 4e3);
-    if (!self.iAmTyping || now - self.lastTypingStamp > 4e3) {
-      self.iAmTyping = true;
-      self.lastTypingStamp = now;
-      self.props.chatRoom.trigger('typing');
-    }
-  }
-  triggerOnUpdate(forced) {
-    const self = this;
-    if (!self.props.onUpdate || !self.isMounted()) {
-      return;
-    }
-    let shouldTriggerUpdate = forced ? forced : false;
-    if (!shouldTriggerUpdate && self.state.typedMessage !== self.lastTypedMessage) {
-      self.lastTypedMessage = self.state.typedMessage;
-      shouldTriggerUpdate = true;
-    }
-    if (!shouldTriggerUpdate) {
-      const $textarea = $('.chat-textarea:visible textarea:visible', self.domRef.current);
-      if (!self._lastTextareaHeight || self._lastTextareaHeight !== $textarea.height()) {
-        self._lastTextareaHeight = $textarea.height();
-        shouldTriggerUpdate = true;
-        if (self.props.onResized) {
-          self.props.onResized();
-        }
-      }
-    }
-    if (shouldTriggerUpdate) {
-      self.props.onUpdate();
-    }
-  }
-  onCancelClicked() {
-    const self = this;
-    self.setState({
-      typedMessage: ""
-    });
-    if (self.props.chatRoom && self.iAmTyping) {
-      self.stoppedTyping();
-    }
-    self.onConfirmTrigger(false);
-    self.triggerOnUpdate();
-  }
-  onSaveClicked() {
-    const self = this;
-    if (self.props.disabled || !self.isMounted()) {
-      return;
-    }
-    const val = $.trim($('.chat-textarea:visible textarea:visible', this.domRef.current).val());
-    if (self.onConfirmTrigger(val) !== true) {
-      self.setState({
-        typedMessage: ""
-      });
-    }
-    if (self.props.chatRoom && self.iAmTyping) {
-      self.stoppedTyping();
-    }
-    self.triggerOnUpdate();
-  }
-  onConfirmTrigger(val) {
-    const {
-      onConfirm,
-      persist,
-      chatRoom
-    } = this.props;
-    const result = onConfirm(val);
-    if (val !== false && result !== false) {
-      $('.textarea-scroll', this.domRef.current).scrollTop(0);
-    }
-    if (persist) {
-      const {
-        persistedTypeArea
-      } = chatRoom.megaChat.plugins;
-      if (persistedTypeArea) {
-        if (d > 2) {
-          this.logger.info('Removing persisted-typed value...');
-        }
-        persistedTypeArea.removePersistedTypedValue(chatRoom);
-      }
-    }
-    return result;
-  }
-  onTypeAreaKeyDown(e) {
-    if (this.props.disabled) {
-      e.preventDefault();
-      e.stopPropagation();
-      return;
-    }
-    const self = this;
-    const key = e.keyCode || e.which;
-    const element = e.target;
-    const val = $.trim(element.value);
-    if (self.state.emojiSearchQuery) {
-      return;
-    }
-    if (key === 13 && !e.shiftKey && !e.ctrlKey && !e.altKey) {
-      if (e.isPropagationStopped() || e.isDefaultPrevented()) {
-        return;
-      }
-      if (self.onConfirmTrigger(val) !== true) {
-        self.setState({
-          typedMessage: ""
-        });
-        $(document).trigger('closeDropdowns');
-      }
-      e.preventDefault();
-      e.stopPropagation();
-      if (self.props.chatRoom && self.iAmTyping) {
-        self.stoppedTyping();
-      }
-    }
-  }
-  onTypeAreaKeyUp(e) {
-    if (this.props.disabled) {
-      e.preventDefault();
-      e.stopPropagation();
-      return;
-    }
-    const self = this;
-    const key = e.keyCode || e.which;
-    const element = e.target;
-    const val = $.trim(element.value);
-    if (key === 13 && !e.shiftKey && !e.ctrlKey && !e.altKey) {
-      e.preventDefault();
-      e.stopPropagation();
-    } else if (key === 13) {
-      if (self.state.emojiSearchQuery) {
-        return;
-      }
-      if (e.altKey) {
-        let content = element.value;
-        const cursorPos = self.getCursorPosition(element);
-        content = `${content.substring(0, cursorPos)  }\n${  content.substring(cursorPos, content.length)}`;
-        self.setState({
-          typedMessage: content
-        });
-        self.onUpdateCursorPosition = cursorPos + 1;
-        e.preventDefault();
-      } else if ($.trim(val).length === 0) {
-        e.preventDefault();
-      }
-    } else if (key === 38) {
-      if (self.state.emojiSearchQuery) {
-        return;
-      }
-      if ($.trim(val).length === 0) {
-        if (self.props.onUpEditPressed && self.props.onUpEditPressed() === true) {
-          e.preventDefault();
-        }
-      }
-    } else if (key === 27) {
-      if (self.state.emojiSearchQuery) {
-        return;
-      }
-      if (self.props.showButtons === true) {
-        e.preventDefault();
-        self.onCancelClicked(e);
-      }
-    } else {
-      if (self.prefillMode && (key === 8 || key === 32 || key === 186 || key === 13)) {
-        self.prefillMode = false;
-      }
-      const currentContent = element.value;
-      const currentCursorPos = self.getCursorPosition(element) - 1;
-      if (self.prefillMode && (currentCursorPos > self.state.emojiEndPos || currentCursorPos < self.state.emojiStartPos)) {
-        self.prefillMode = false;
-        self.setState({
-          'emojiSearchQuery': false,
-          'emojiStartPos': false,
-          'emojiEndPos': false
-        });
-        return;
-      }
-      if (self.prefillMode) {
-        return;
-      }
-      const char = String.fromCharCode(key);
-      if (key === 16 || key === 17 || key === 18 || key === 91 || key === 8 || key === 37 || key === 39 || key === 40 || key === 38 || key === 9 || /[\w:-]/.test(char)) {
-        const parsedResult = mega.utils.emojiCodeParser(currentContent, currentCursorPos);
-        self.setState({
-          'emojiSearchQuery': parsedResult[0],
-          'emojiStartPos': parsedResult[1],
-          'emojiEndPos': parsedResult[2]
-        });
-        return;
-      }
-      if (self.state.emojiSearchQuery) {
-        self.setState({
-          'emojiSearchQuery': false
-        });
-      }
-    }
-  }
-  onTypeAreaBlur(e) {
-    if (this.props.disabled) {
-      e.preventDefault();
-      e.stopPropagation();
-      return;
-    }
-    const self = this;
-    if (self.state.emojiSearchQuery) {
-      setTimeout(() => {
-        if (self.isMounted()) {
-          self.setState({
-            'emojiSearchQuery': false,
-            'emojiStartPos': false,
-            'emojiEndPos': false
-          });
-        }
-      }, 300);
-    }
-  }
-  onTypeAreaChange(e, value) {
-    if (this.props.disabled) {
-      e.preventDefault();
-      e.stopPropagation();
-      return;
-    }
-    const self = this;
-    value = String(value || e.target.value || '').replace(/^\s+/, '');
-    if (self.state.typedMessage !== value) {
-      self.setState({
-        typedMessage: value
-      });
-      self.forceUpdate();
-    }
-    if (value.length) {
-      self.typing();
-    } else {
-      self.stoppedTyping();
-    }
-    if (this.props.persist) {
-      const {
-        chatRoom
-      } = this.props;
-      const {
-        megaChat
-      } = chatRoom;
-      const {
-        persistedTypeArea
-      } = megaChat.plugins;
-      if (persistedTypeArea) {
-        if (d > 2) {
-          this.logger.debug('%s persisted-typed value...', value.length ? 'Updating' : 'Removing');
-        }
-        if (value.length) {
-          persistedTypeArea.updatePersistedTypedValue(chatRoom, value);
-        } else {
-          persistedTypeArea.removePersistedTypedValue(chatRoom);
-        }
-      }
-    }
-    self.updateScroll();
-  }
-  focusTypeArea() {
-    if (this.props.disabled) {
-      return;
-    }
-    if ($('.chat-textarea:visible textarea:visible', this.domRef.current).length > 0 && !$('.chat-textarea:visible textarea:visible:first', this.domRef.current).is(":focus")) {
-      moveCursortoToEnd($('.chat-textarea:visible:first textarea', this.domRef.current)[0]);
-    }
-  }
-  componentDidMount() {
-    super.componentDidMount();
-    this._lastTextareaHeight = 20;
-    this.lastTypedMessage = this.props.initialText || this.lastTypedMessage;
-    chatGlobalEventManager.addEventListener('resize', `typingArea${this.getUniqueId()}`, () => this.handleWindowResize());
-    this.triggerOnUpdate(true);
-    this.updateScroll();
-    megaChat.rebind(`viewstateChange.gifpanel${this.getUniqueId()}`, e => {
-      const {
-        gifPanelActive
-      } = this.state;
-      const {
-        state
-      } = e.data;
-      if (state === 'active' && !gifPanelActive && this.gifResume) {
-        this.setState({
-          gifPanelActive: true
-        });
-        delete this.gifResume;
-      } else if (state !== 'active' && gifPanelActive && !this.gifResume) {
-        this.gifResume = true;
-        this.setState({
-          gifPanelActive: false
-        });
-      }
-    });
-  }
-  UNSAFE_componentWillMount() {
-    const {
-      chatRoom,
-      initialText,
-      persist
-    } = this.props;
-    const {
-      megaChat,
-      roomId
-    } = chatRoom;
-    const {
-      persistedTypeArea
-    } = megaChat.plugins;
-    if (persist && persistedTypeArea) {
-      if (!initialText) {
-        persistedTypeArea.getPersistedTypedValue(chatRoom).then(res => {
-          if (res && this.isMounted() && !this.state.typedMessage) {
-            this.setState({
-              'typedMessage': res
-            });
-          }
-        }).catch(ex => {
-          if (this.logger && ex !== undefined) {
-            this.logger.warn(`Failed to retrieve persistedTypeArea for ${roomId}: ${ex}`, [ex]);
-          }
-        });
-      }
-      persistedTypeArea.addChangeListener(this.getUniqueId(), (e, k, v) => {
-        if (roomId === k) {
-          this.setState({
-            'typedMessage': v || ''
-          });
-          this.triggerOnUpdate(true);
-        }
-      });
-    }
-  }
-  componentWillUnmount() {
-    super.componentWillUnmount();
-    const self = this;
-    self.triggerOnUpdate();
-    if (megaChat.plugins.persistedTypeArea) {
-      megaChat.plugins.persistedTypeArea.removeChangeListener(self.getUniqueId());
-    }
-    chatGlobalEventManager.removeEventListener('resize', `typingArea${  self.getUniqueId()}`);
-    megaChat.off(`viewstateChange.gifpanel${this.getUniqueId()}`);
-  }
-  componentDidUpdate() {
-    if (this.isComponentEventuallyVisible() && !window.getSelection().toString() && $('textarea:focus,select:focus,input:focus').filter(":visible").length === 0) {
-      this.focusTypeArea();
-    }
-    this.updateScroll();
-    if (this.onUpdateCursorPosition) {
-      const el = $('.chat-textarea:visible:first textarea:visible', this.domRef.current)[0];
-      el.selectionStart = el.selectionEnd = this.onUpdateCursorPosition;
-      this.onUpdateCursorPosition = false;
-    }
-  }
-  updateScroll() {
-    if (!this.isComponentEventuallyVisible() || !this.$node && !this.domRef && !this.domRef.current) {
-      return;
-    }
-    const $node = this.$node = this.$node || this.domRef.current;
-    const $textarea = this.$textarea = this.$textarea || $('textarea:first', $node);
-    const $scrollBlock = this.$scrollBlock = this.$scrollBlock || $textarea.closest('.textarea-scroll');
-    const $preview = $('.message-preview', $scrollBlock).safeHTML(`${megaChat.html($textarea.val()).replace(/\n/g, '<br />')} <br>`);
-    const textareaHeight = $preview.height();
-    $scrollBlock.height(Math.min(textareaHeight, this.getTextareaMaxHeight()));
-    if (textareaHeight !== this._lastTextareaHeight) {
-      this._lastTextareaHeight = textareaHeight;
-      this.setState({
-        textareaHeight
-      });
-      if (this.props.onResized) {
-        this.props.onResized();
-      }
-      $textarea.height(textareaHeight);
-    }
-    if (this.textareaScroll) {
-      this.textareaScroll.reinitialise();
-    }
-  }
-  getCursorPosition(el) {
-    let pos = 0;
-    if ('selectionStart' in el) {
-      pos = el.selectionStart;
-    } else if ('selection' in document) {
-      el.focus();
-      const sel = document.selection.createRange(),
-        selLength = document.selection.createRange().text.length;
-      sel.moveStart('character', -el.value.length);
-      pos = sel.text.length - selLength;
-    }
-    return pos;
-  }
-  customIsEventuallyVisible() {
-    return this.props.chatRoom.isCurrentlyActive;
-  }
-  handleWindowResize(e) {
-    if (!this.isComponentEventuallyVisible()) {
-      return;
-    }
-    if (e) {
-      this.updateScroll();
-    }
-    this.triggerOnUpdate();
-  }
-  isActive() {
-    return document.hasFocus() && this.$messages && this.$messages.is(":visible");
-  }
-  resetPrefillMode() {
-    this.prefillMode = false;
-  }
-  onCopyCapture() {
-    this.resetPrefillMode();
-  }
-  onCutCapture() {
-    this.resetPrefillMode();
-  }
-  onPasteCapture() {
-    this.resetPrefillMode();
-  }
-  render() {
-    const self = this;
-    const room = this.props.chatRoom;
-    let buttons = null;
-    if (self.props.showButtons === true) {
-      buttons = [REaCt().createElement(ui_buttons.$, {
-        key: "save",
-        className: `${"mega-button right"} positive`,
-        label: l[776],
-        onClick: self.onSaveClicked.bind(self)
-      }), REaCt().createElement(ui_buttons.$, {
-        key: "cancel",
-        className: "mega-button right",
-        label: l[1718],
-        onClick: self.onCancelClicked.bind(self)
-      })];
-    }
-    const textareaStyles = {
-      height: self.state.textareaHeight
-    };
-    const textareaScrollBlockStyles = {};
-    const newHeight = Math.min(self.state.textareaHeight, self.getTextareaMaxHeight());
-    if (newHeight > 0) {
-      textareaScrollBlockStyles.height = newHeight;
-    }
-    let emojiAutocomplete = null;
-    if (self.state.emojiSearchQuery) {
-      emojiAutocomplete = REaCt().createElement(EmojiAutocomplete, {
-        emojiSearchQuery: self.state.emojiSearchQuery,
-        emojiStartPos: self.state.emojiStartPos,
-        emojiEndPos: self.state.emojiEndPos,
-        typedMessage: self.state.typedMessage,
-        onPrefill (e, emojiAlias) {
-          if ($.isNumeric(self.state.emojiStartPos) && $.isNumeric(self.state.emojiEndPos)) {
-            const msg = self.state.typedMessage;
-            const pre = msg.substr(0, self.state.emojiStartPos);
-            let post = msg.substr(self.state.emojiEndPos + 1, msg.length);
-            const startPos = self.state.emojiStartPos;
-            const fwdPos = startPos + emojiAlias.length;
-            let endPos = fwdPos;
-            self.onUpdateCursorPosition = fwdPos;
-            self.prefillMode = true;
-            if (post.substr(0, 2) == "::" && emojiAlias.substr(-1) == ":") {
-              emojiAlias = emojiAlias.substr(0, emojiAlias.length - 1);
-              endPos -= 1;
-            } else {
-              post = post ? post.substr(0, 1) !== " " ? ` ${  post}` : post : " ";
-              self.onUpdateCursorPosition++;
-            }
-            self.setState({
-              'typedMessage': pre + emojiAlias + post,
-              'emojiEndPos': endPos
-            });
-          }
-        },
-        onSelect (e, emojiAlias, forceSend) {
-          if ($.isNumeric(self.state.emojiStartPos) && $.isNumeric(self.state.emojiEndPos)) {
-            const msg = self.state.typedMessage;
-            const pre = msg.substr(0, self.state.emojiStartPos);
-            let post = msg.substr(self.state.emojiEndPos + 1, msg.length);
-            if (post.substr(0, 2) == "::" && emojiAlias.substr(-1) == ":") {
-              emojiAlias = emojiAlias.substr(0, emojiAlias.length - 1);
-            } else {
-              post = post ? post.substr(0, 1) !== " " ? ` ${  post}` : post : " ";
-            }
-            const val = pre + emojiAlias + post;
-            self.prefillMode = false;
-            self.setState({
-              'typedMessage': val,
-              'emojiSearchQuery': false,
-              'emojiStartPos': false,
-              'emojiEndPos': false
-            });
-            if (forceSend) {
-              if (self.onConfirmTrigger($.trim(val)) !== true) {
-                self.setState({
-                  typedMessage: ""
-                });
-              }
-            }
-          }
-        },
-        onCancel () {
-          self.prefillMode = false;
-          self.setState({
-            'emojiSearchQuery': false,
-            'emojiStartPos': false,
-            'emojiEndPos': false
-          });
-        }
-      });
-    }
-    const disabledTextarea = !!(room.pubCu25519KeyIsMissing === true || this.props.disabled);
-    return REaCt().createElement("div", {
-      ref: this.domRef,
-      className: `
-                    typingarea-component
-                    ${this.props.className}
-                `
-    }, this.state.gifPanelActive && REaCt().createElement(gifPanel.Ay, {
-      chatRoom: this.props.chatRoom,
-      onToggle: () => {
-        this.setState({
-          gifPanelActive: false
-        });
-        delete this.gifResume;
-      }
-    }), REaCt().createElement("div", {
-      className: `
-                        chat-textarea
-                        ${this.props.className}
-                    `
-    }, emojiAutocomplete, self.props.children, self.props.editing ? null : REaCt().createElement(ui_buttons.$, {
-      className: `
-                                popup-button
-                                gif-button
-                                ${this.state.gifPanelActive ? 'active' : ''}
-                            `,
-      icon: "small-icon gif",
-      disabled: this.props.disabled,
-      onClick: () => this.setState(state => {
-        delete this.gifResume;
-        return {
-          gifPanelActive: !state.gifPanelActive
-        };
-      })
-    }), REaCt().createElement(ui_buttons.$, {
-      className: "popup-button emoji-button",
-      icon: "sprite-fm-theme icon-emoji",
-      iconHovered: "sprite-fm-theme icon-emoji-active",
-      disabled: this.props.disabled
-    }, REaCt().createElement(emojiDropdown.L, {
-      className: "popup emoji",
-      vertOffset: 17,
-      onClick: this.onEmojiClicked
-    })), REaCt().createElement("hr", null), REaCt().createElement(perfectScrollbar.O, {
-      chatRoom: self.props.chatRoom,
-      className: "chat-textarea-scroll textarea-scroll",
-      options: {
-        'suppressScrollX': true
-      },
-      style: textareaScrollBlockStyles,
-      ref: ref => {
-        self.textareaScroll = ref;
-      }
-    }, REaCt().createElement("div", {
-      className: "messages-textarea-placeholder"
-    }, self.state.typedMessage ? null : REaCt().createElement(utils.zT, null, (l[18763] || `Write message to \u201c%s\u201d\u2026`).replace('%s', room.getRoomTitle()))), REaCt().createElement("textarea", {
-      className: `
-                                ${"messages-textarea"}
-                                ${disabledTextarea ? 'disabled' : ''}
-                            `,
-      onKeyUp: this.onTypeAreaKeyUp,
-      onKeyDown: this.onTypeAreaKeyDown,
-      onBlur: this.onTypeAreaBlur,
-      onChange: this.onTypeAreaChange,
-      onCopyCapture: this.onCopyCapture,
-      onPasteCapture: this.onPasteCapture,
-      onCutCapture: this.onCutCapture,
-      value: self.state.typedMessage,
-      style: textareaStyles,
-      disabled: disabledTextarea,
-      readOnly: disabledTextarea
-    }), REaCt().createElement("div", {
-      className: "message-preview"
-    }))), buttons);
-  }
-}, (0,applyDecoratedDescriptor.A)(_class.prototype, "handleWindowResize", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "handleWindowResize"), _class.prototype), _class);
-
-},
-
-814:
-(_, EXP_, REQ_) => {
-
-"use strict";
-
-// EXPORTS
-REQ_.d(EXP_, {
-  A: () => HistoryPanel
-});
-
-// EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/esm/applyDecoratedDescriptor.js
-const applyDecoratedDescriptor = REQ_(793);
-// EXTERNAL MODULE: external "React"
-const React_ = REQ_(594);
-const REaCt = REQ_.n(React_);
-// EXTERNAL MODULE: ./js/chat/mixins.js
-const mixins = REQ_(137);
-// EXTERNAL MODULE: ./js/ui/utils.jsx
-const utils = REQ_(314);
-;// ./js/chat/ui/messages/alterParticipants.jsx
-const React = REQ_(594);
-const ContactsUI = REQ_(251);
-const ConversationMessageMixin = REQ_(446).M;
-
-class AltPartsConvMessage extends ConversationMessageMixin {
-  haveMoreContactListeners() {
-    if (!this.props.message || !this.props.message.meta) {
-      return false;
-    }
-    const {
-      included,
-      excluded
-    } = this.props.message.meta;
-    return array.unique([...included || [], ...excluded || []]);
-  }
-  render() {
-    const self = this;
-    const {message} = this.props;
-    const contact = self.getContact();
-    const timestampInt = self.getTimestamp();
-    const timestamp = self.getTimestampAsString();
-    const datetime = React.createElement("div", {
-      className: "message date-time simpletip",
-      "data-simpletip": time2date(timestampInt, 17)
-    }, timestamp);
-    let displayName;
-    if (contact) {
-      displayName = M.getNameByHandle(contact.u);
-    } else {
-      displayName = contact;
-    }
-    const messages = [];
-    message.meta.included.forEach((h) => {
-      const otherContact = M.u[h] ? M.u[h] : {
-        'u': h,
-        h,
-        'c': 0
-      };
-      const avatar = React.createElement(ContactsUI.Avatar, {
-        contact: otherContact,
-        chatRoom: self.props.chatRoom,
-        className: "message avatar-wrapper small-rounded-avatar"
-      });
-      const otherDisplayName = M.getNameByHandle(otherContact.u);
-      const isSelfJoin = h === contact.u;
-      let text = isSelfJoin ? l[23756] : l[8907];
-      if (self.props.chatRoom.isMeeting) {
-        text = isSelfJoin ? l.meeting_mgmt_user_joined : l.meeting_mgmt_user_added;
-      }
-      text = text.replace('%1', megaChat.html(otherDisplayName));
-      if (!isSelfJoin) {
-        text = text.replace('%2', `<strong>${megaChat.html(displayName)}</strong>`);
-      }
-      messages.push(React.createElement("div", {
-        className: "message body",
-        "data-id": `id${  message.messageId}`,
-        key: `${message.messageId  }_${  h}`
-      }, avatar, React.createElement("div", {
-        className: "message content-area small-info-txt selectable-txt"
-      }, React.createElement(ContactsUI.ContactButton, {
-        className: "message",
-        contact: otherContact,
-        chatRoom: self.props.chatRoom,
-        label: React.createElement(utils.zT, null, otherDisplayName)
-      }), datetime, React.createElement("div", {
-        className: "message text-block"
-      }, React.createElement(utils.P9, null, text)))));
-    });
-    message.meta.excluded.forEach((h) => {
-      const otherContact = M.u[h] ? M.u[h] : {
-        'u': h,
-        h,
-        'c': 0
-      };
-      const avatar = React.createElement(ContactsUI.Avatar, {
-        contact: otherContact,
-        chatRoom: self.props.chatRoom,
-        className: "message avatar-wrapper small-rounded-avatar"
-      });
-      const otherDisplayName = M.getNameByHandle(otherContact.u);
-      let text;
-      if (otherContact.u === contact.u) {
-        text = self.props.chatRoom.isMeeting ? l.meeting_mgmt_left : l[8908];
-      } else {
-        text = (self.props.chatRoom.isMeeting ? l.meeting_mgmt_kicked : l[8906]).replace("%s", `<strong>${megaChat.html(displayName)}</strong>`);
-      }
-      messages.push(React.createElement("div", {
-        className: "message body",
-        "data-id": `id${  message.messageId}`,
-        key: `${message.messageId  }_${  h}`
-      }, avatar, React.createElement("div", {
-        className: "message content-area small-info-txt selectable-txt"
-      }, React.createElement(ContactsUI.ContactButton, {
-        className: "message",
-        chatRoom: self.props.chatRoom,
-        contact: otherContact,
-        label: React.createElement(utils.zT, null, otherDisplayName)
-      }), datetime, React.createElement("div", {
-        className: "message text-block"
-      }, React.createElement(utils.P9, null, text)))));
-    });
-    return React.createElement("div", null, messages);
-  }
-}
-
-;// ./js/chat/ui/messages/truncated.jsx
-const truncated_React = REQ_(594);
-const truncated_ContactsUI = REQ_(251);
-const truncated_ConversationMessageMixin = REQ_(446).M;
-
-class TruncatedMessage extends truncated_ConversationMessageMixin {
-  render() {
-    const self = this;
-    let cssClasses = "message body";
-    const {message} = this.props;
-    const {chatRoom} = this.props.message;
-    const contact = self.getContact();
-    const timestampInt = self.getTimestamp();
-    const timestamp = self.getTimestampAsString();
-    let datetime = truncated_React.createElement("div", {
-      className: "message date-time simpletip",
-      "data-simpletip": time2date(timestampInt, 17)
-    }, timestamp);
-    let displayName;
-    if (contact) {
-      displayName = M.getNameByHandle(contact.u);
-    } else {
-      displayName = contact;
-    }
-    let avatar = null;
-    if (this.props.grouped) {
-      cssClasses += " grouped";
-    } else {
-      avatar = truncated_React.createElement(truncated_ContactsUI.Avatar, {
-        contact,
-        className: "message avatar-wrapper small-rounded-avatar",
-        chatRoom
-      });
-      datetime = truncated_React.createElement("div", {
-        className: "message date-time simpletip",
-        "data-simpletip": time2date(timestampInt, 17)
-      }, timestamp);
-    }
-    return truncated_React.createElement("div", {
-      className: cssClasses,
-      "data-id": `id${  message.messageId}`,
-      key: message.messageId
-    }, avatar, truncated_React.createElement("div", {
-      className: "message content-area small-info-txt selectable-txt"
-    }, truncated_React.createElement(truncated_ContactsUI.ContactButton, {
-      contact,
-      className: "message",
-      label: truncated_React.createElement(utils.zT, null, displayName),
-      chatRoom
-    }), datetime, truncated_React.createElement("div", {
-      className: "message text-block"
-    }, l[8905])));
-  }
-}
-
-;// ./js/chat/ui/messages/privilegeChange.jsx
-const privilegeChange_React = REQ_(594);
-const privilegeChange_ContactsUI = REQ_(251);
-const privilegeChange_ConversationMessageMixin = REQ_(446).M;
-
-class PrivilegeChange extends privilegeChange_ConversationMessageMixin {
-  haveMoreContactListeners() {
-    if (!this.props.message.meta || !this.props.message.meta.targetUserId) {
-      return false;
-    }
-    const uid = this.props.message.meta.targetUserId;
-    if (uid && M.u[uid]) {
-      return uid;
-    }
-    return false;
-  }
-  render() {
-    const self = this;
-    const {message} = this.props;
-    const {chatRoom} = this.props.message;
-    const contact = self.getContact();
-    const timestampInt = self.getTimestamp();
-    const timestamp = self.getTimestampAsString();
-    const datetime = privilegeChange_React.createElement("div", {
-      className: "message date-time simpletip",
-      "data-simpletip": time2date(timestampInt, 17)
-    }, timestamp);
-    let displayName;
-    if (contact) {
-      displayName = M.getNameByHandle(contact.u);
-    } else {
-      displayName = contact;
-    }
-    const messages = [];
-    const otherContact = M.u[message.meta.targetUserId] ? M.u[message.meta.targetUserId] : {
-      'u': message.meta.targetUserId,
-      'h': message.meta.targetUserId,
-      'c': 0
-    };
-    const avatar = privilegeChange_React.createElement(privilegeChange_ContactsUI.Avatar, {
-      contact: otherContact,
-      className: "message avatar-wrapper small-rounded-avatar",
-      chatRoom
-    });
-    const otherDisplayName = M.getNameByHandle(otherContact.u);
-    let newPrivilegeText = "";
-    if (message.meta.privilege === 3) {
-      newPrivilegeText = l.priv_change_to_op;
-    } else if (message.meta.privilege === 2) {
-      newPrivilegeText = l.priv_change_to_std;
-    } else if (message.meta.privilege === 0) {
-      newPrivilegeText = l.priv_change_to_ro;
-    }
-    const text = newPrivilegeText.replace('[S]', '<strong>').replace('[/S]', '</strong>').replace('%s', `<strong>${megaChat.html(displayName)}</strong>`);
-    messages.push(privilegeChange_React.createElement("div", {
-      className: "message body",
-      "data-id": `id${  message.messageId}`,
-      key: message.messageId
-    }, avatar, privilegeChange_React.createElement("div", {
-      className: "message content-area small-info-txt selectable-txt"
-    }, privilegeChange_React.createElement(privilegeChange_ContactsUI.ContactButton, {
-      className: "message",
-      chatRoom: self.props.chatRoom,
-      contact: otherContact,
-      label: privilegeChange_React.createElement(utils.zT, null, otherDisplayName)
-    }), datetime, privilegeChange_React.createElement("div", {
-      className: "message text-block"
-    }, privilegeChange_React.createElement(utils.P9, null, text)))));
-    return privilegeChange_React.createElement("div", null, messages);
-  }
-}
-
-;// ./js/chat/ui/messages/topicChange.jsx
-const topicChange_React = REQ_(594);
-const topicChange_ContactsUI = REQ_(251);
-const topicChange_ConversationMessageMixin = REQ_(446).M;
-
-class TopicChange extends topicChange_ConversationMessageMixin {
-  render() {
-    const self = this;
-    const {message} = this.props;
-    const {megaChat} = this.props.message.chatRoom;
-    const {chatRoom} = this.props.message;
-    if (message.meta.isScheduled) {
-      return null;
-    }
-    const contact = self.getContact();
-    const timestampInt = self.getTimestamp();
-    const timestamp = self.getTimestampAsString();
-    const datetime = topicChange_React.createElement("div", {
-      className: "message date-time simpletip",
-      "data-simpletip": time2date(timestampInt, 17)
-    }, timestamp);
-    let displayName;
-    if (contact) {
-      displayName = M.getNameByHandle(contact.u);
-    } else {
-      displayName = contact;
-    }
-    const messages = [];
-    const avatar = topicChange_React.createElement(topicChange_ContactsUI.Avatar, {
-      contact,
-      chatRoom,
-      className: "message avatar-wrapper small-rounded-avatar"
-    });
-    const topic = megaChat.html(message.meta.topic);
-    const oldTopic = megaChat.html(message.meta.oldTopic) || '';
-    messages.push(topicChange_React.createElement("div", {
-      className: "message body",
-      "data-id": `id${  message.messageId}`,
-      key: message.messageId
-    }, avatar, topicChange_React.createElement("div", {
-      className: "message content-area small-info-txt selectable-txt"
-    }, topicChange_React.createElement(topicChange_ContactsUI.ContactButton, {
-      className: "message",
-      chatRoom,
-      contact,
-      label: topicChange_React.createElement(utils.zT, null, displayName)
-    }), datetime, topicChange_React.createElement("div", {
-      className: "message text-block"
-    }, topicChange_React.createElement(utils.P9, null, (chatRoom.scheduledMeeting ? l.schedule_mgmt_title.replace('%1', `<strong>${oldTopic}</strong>`) : l[9081]).replace('%s', `<strong>${topic}</strong>`))))));
-    return topicChange_React.createElement("div", null, messages);
-  }
-}
-
-;// ./js/chat/ui/messages/closeOpenMode.jsx
-const closeOpenMode_React = REQ_(594);
-const closeOpenMode_ContactsUI = REQ_(251);
-const closeOpenMode_ConversationMessageMixin = REQ_(446).M;
-
-class CloseOpenModeMessage extends closeOpenMode_ConversationMessageMixin {
-  render() {
-    const self = this;
-    let cssClasses = "message body";
-    const {message} = this.props;
-    const contact = self.getContact();
-    const timestampInt = self.getTimestamp();
-    const timestamp = self.getTimestampAsString();
-    let datetime = closeOpenMode_React.createElement("div", {
-      className: "message date-time",
-      title: time2date(timestampInt)
-    }, timestamp);
-    let displayName;
-    if (contact) {
-      displayName = M.getNameByHandle(contact.u);
-    } else {
-      displayName = contact;
-    }
-    let avatar = null;
-    if (this.props.grouped) {
-      cssClasses += " grouped";
-    } else {
-      avatar = closeOpenMode_React.createElement(closeOpenMode_ContactsUI.Avatar, {
-        contact,
-        className: "message  avatar-wrapper small-rounded-avatar",
-        chatRoom: this.props.chatRoom
-      });
-      datetime = closeOpenMode_React.createElement("div", {
-        className: "message date-time",
-        title: time2date(timestampInt)
-      }, timestamp);
-    }
-    return closeOpenMode_React.createElement("div", {
-      className: cssClasses,
-      "data-id": `id${  message.messageId}`,
-      key: message.messageId
-    }, avatar, closeOpenMode_React.createElement("div", {
-      className: "message content-area small-info-txt selectable-txt"
-    }, closeOpenMode_React.createElement("div", {
-      className: "message user-card-name"
-    }, closeOpenMode_React.createElement(utils.zT, null, displayName)), datetime, closeOpenMode_React.createElement("div", {
-      className: "message text-block"
-    }, l[20569])));
-  }
-}
-
-;// ./js/chat/ui/messages/chatHandle.jsx
-const chatHandle_React = REQ_(594);
-const chatHandle_ContactsUI = REQ_(251);
-const chatHandle_ConversationMessageMixin = REQ_(446).M;
-
-class ChatHandleMessage extends chatHandle_ConversationMessageMixin {
-  render() {
-    const self = this;
-    let cssClasses = "message body";
-    const {message} = this.props;
-    const contact = self.getContact();
-    const timestampInt = self.getTimestamp();
-    const timestamp = self.getTimestampAsString();
-    let datetime = chatHandle_React.createElement("div", {
-      className: "message date-time",
-      title: time2date(timestampInt)
-    }, timestamp);
-    let displayName;
-    if (contact) {
-      displayName = M.getNameByHandle(contact.u);
-    } else {
-      displayName = contact;
-    }
-    let avatar = null;
-    if (this.props.grouped) {
-      cssClasses += " grouped";
-    } else {
-      avatar = chatHandle_React.createElement(chatHandle_ContactsUI.Avatar, {
-        contact,
-        className: "message  avatar-wrapper small-rounded-avatar",
-        chatRoom: this.props.chatRoom
-      });
-      datetime = chatHandle_React.createElement("div", {
-        className: "message date-time",
-        title: time2date(timestampInt)
-      }, timestamp);
-    }
-    return chatHandle_React.createElement("div", {
-      className: cssClasses,
-      "data-id": `id${  message.messageId}`,
-      key: message.messageId
-    }, avatar, chatHandle_React.createElement("div", {
-      className: "message content-area small-info-txt selectable-txt"
-    }, chatHandle_React.createElement("div", {
-      className: "message user-card-name"
-    }, chatHandle_React.createElement(utils.zT, null, displayName)), datetime, chatHandle_React.createElement("div", {
-      className: "message text-block"
-    }, message.meta.handleUpdate === 1 ? l[20570] : l[20571])));
-  }
-}
-
-// EXTERNAL MODULE: ./js/chat/ui/messages/generic.jsx + 14 modules
-const generic = REQ_(890);
-// EXTERNAL MODULE: ./js/ui/perfectScrollbar.jsx
-const perfectScrollbar = REQ_(486);
-// EXTERNAL MODULE: ./js/chat/ui/messages/mixin.jsx
-const mixin = REQ_(446);
-// EXTERNAL MODULE: ./js/chat/ui/contacts.jsx
-const contacts = REQ_(251);
-;// ./js/chat/ui/messages/retentionChange.jsx
-
-
-
-
-class RetentionChange extends mixin.M {
-  render() {
-    const {
-      message
-    } = this.props;
-    const contact = this.getContact();
-    return REaCt().createElement("div", {
-      className: "message body",
-      "data-id": `id${  message.messageId}`,
-      key: message.messageId
-    }, REaCt().createElement(contacts.Avatar, {
-      contact,
-      className: "message avatar-wrapper small-rounded-avatar"
-    }), REaCt().createElement("div", {
-      className: "message content-area small-info-txt selectable-txt"
-    }, REaCt().createElement(contacts.ContactButton, {
-      contact,
-      className: "message",
-      label: REaCt().createElement(utils.zT, null, M.getNameByHandle(contact.u))
-    }), REaCt().createElement("div", {
-      className: "message date-time simpletip",
-      "data-simpletip": time2date(this.getTimestamp(), 17)
-    }, this.getTimestampAsString()), REaCt().createElement("div", {
-      className: "message text-block"
-    }, message.getMessageRetentionSummary())));
-  }
-}
-// EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 11 modules
-const call = REQ_(3);
-// EXTERNAL MODULE: ./js/chat/ui/messages/scheduleMetaChange.jsx
-const scheduleMetaChange = REQ_(757);
-;// ./js/chat/ui/historyPanel.jsx
-
-let _dec, _class;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-const HistoryPanel = (_dec = (0,mixins.hG)(450, true), _class = class HistoryPanel extends mixins.w9 {
-  constructor(props) {
-    super(props);
-    this.$container = null;
-    this.$messages = null;
-    this.domRef = REaCt().createRef();
-    this.state = {
-      editing: false,
-      toast: false
-    };
-    this.renderNotice = label => REaCt().createElement("div", {
-      className: "dropdown body dropdown-arrow down-arrow tooltip not-sent-notification-cancel hidden"
-    }, REaCt().createElement("i", {
-      className: "dropdown-white-arrow"
-    }), REaCt().createElement("div", {
-      className: "dropdown notification-text"
-    }, REaCt().createElement("i", {
-      className: "small-icon conversations"
-    }), label));
-    this.renderLoadingSpinner = () => REaCt().createElement("div", {
-      style: {
-        top: '50%'
-      },
-      className: `
-                loading-spinner
-                js-messages-loading
-                light
-                manual-management
-                ${this.loadingShown ? '' : 'hidden'}
-            `
-    }, REaCt().createElement("div", {
-      className: "main-loader",
-      style: {
-        position: 'fixed',
-        top: '50%',
-        left: '50%'
-      }
-    }));
-    this.renderNavigationToast = () => {
-      const {
-        chatRoom
-      } = this.props;
-      const unreadCount = chatRoom.messagesBuff.getUnreadCount();
-      return REaCt().createElement("div", {
-        className: `
-                    theme-dark-forced
-                    messages-toast
-                    ${this.state.toast ? 'active' : ''}
-                `,
-        onClick: () => {
-          this.setState({
-            toast: false
-          }, () => {
-            this.messagesListScrollable.scrollToBottom();
-            chatRoom.scrolledToBottom = true;
-          });
-        }
-      }, REaCt().createElement("i", {
-        className: "sprite-fm-mono icon-down"
-      }), unreadCount > 0 && REaCt().createElement("span", null, unreadCount > 9 ? '9+' : unreadCount));
-    };
-    this.onKeyboardScroll = ({
-      keyCode
-    }) => {
-      let _scrollbar$domRef;
-      const scrollbar = this.messagesListScrollable;
-      const domNode = scrollbar == null || (_scrollbar$domRef = scrollbar.domRef) == null ? void 0 : _scrollbar$domRef.current;
-      if (domNode && this.isComponentEventuallyVisible() && !this.state.attachCloudDialog) {
-        const scrollPositionY = scrollbar.getScrollPositionY();
-        const offset = parseInt(domNode.style.height);
-        const PAGE = {
-          UP: 33,
-          DOWN: 34
-        };
-        switch (keyCode) {
-          case PAGE.UP:
-            scrollbar.scrollToY(scrollPositionY - offset, true);
-            this.onMessagesScrollUserScroll(scrollbar, 100);
-            break;
-          case PAGE.DOWN:
-            if (!scrollbar.isAtBottom()) {
-              scrollbar.scrollToY(scrollPositionY + offset, true);
-            }
-            break;
-        }
-      }
-    };
-    this.onMessagesScrollUserScroll = (ps, offset = 5) => {
-      const {
-        chatRoom
-      } = this.props;
-      const {
-        messagesBuff
-      } = chatRoom;
-      const scrollPositionY = ps.getScrollPositionY();
-      if (messagesBuff.messages.length === 0) {
-        chatRoom.scrolledToBottom = true;
-        return;
-      }
-      if (ps.isCloseToBottom(30) === true) {
-        if (!chatRoom.scrolledToBottom) {
-          messagesBuff.detachMessages();
-        }
-        chatRoom.scrolledToBottom = true;
-      } else {
-        chatRoom.scrolledToBottom = false;
-      }
-      if (!this.scrollPullHistoryRetrieval && !messagesBuff.isRetrievingHistory && (ps.isAtTop() || scrollPositionY < offset && ps.getScrollHeight() > 500) && messagesBuff.haveMoreHistory()) {
-        ps.disable();
-        this.scrollPullHistoryRetrieval = true;
-        this.lastScrollPosition = scrollPositionY;
-        let msgAppended = 0;
-        const scrYOffset = ps.getScrollHeight();
-        chatRoom.one('onMessagesBuffAppend.pull', () => {
-          msgAppended++;
-        });
-        chatRoom.off('onHistoryDecrypted.pull');
-        chatRoom.one('onHistoryDecrypted.pull', () => {
-          chatRoom.off('onMessagesBuffAppend.pull');
-          if (msgAppended > 0) {
-            this._reposOnUpdate = scrYOffset;
-          }
-          this.scrollPullHistoryRetrieval = -1;
-        });
-        messagesBuff.retrieveChatHistory();
-      }
-      if (this.lastScrollPosition !== scrollPositionY) {
-        this.lastScrollPosition = scrollPositionY;
-      }
-      delay('chat-toast', this.initToast, 200);
-    };
-    this.initToast = () => {
-      let _this$messagesListScr;
-      const {
-        chatRoom
-      } = this.props;
-      return this.isMounted() && this.setState({
-        toast: !chatRoom.scrolledToBottom && !((_this$messagesListScr = this.messagesListScrollable) != null && _this$messagesListScr.isCloseToBottom != null && _this$messagesListScr.isCloseToBottom(30))
-      }, () => this.state.toast ? null : chatRoom.trigger('onChatIsFocused'));
-    };
-    this.handleWindowResize = this._handleWindowResize.bind(this);
-  }
-  customIsEventuallyVisible() {
-    return this.props.chatRoom.isCurrentlyActive;
-  }
-  UNSAFE_componentWillMount() {
-    let _chatRoom$messagesBuf;
-    const {
-      chatRoom
-    } = this.props;
-    chatRoom.rebind('onHistoryDecrypted.cp', () => this.eventuallyUpdate());
-    this._messagesBuffChangeHandler = (_chatRoom$messagesBuf = chatRoom.messagesBuff) == null ? void 0 : _chatRoom$messagesBuf.addChangeListener(SoonFc(() => {
-      if (this.isComponentEventuallyVisible()) {
-        let _this$domRef;
-        $('.js-messages-scroll-area', (_this$domRef = this.domRef) == null ? void 0 : _this$domRef.current).trigger('forceResize', [true]);
-      }
-      this.refreshUI();
-    }));
-  }
-  componentDidMount() {
-    super.componentDidMount();
-    const {
-      chatRoom,
-      onMount
-    } = this.props;
-    window.addEventListener('resize', this.handleWindowResize);
-    window.addEventListener('keydown', this.handleKeyDown);
-    this.$container = $(`.conversation-panel[data-room-id="${chatRoom.chatId}"]`);
-    this.eventuallyInit();
-    chatRoom.trigger('onHistoryPanelComponentDidMount');
-    if (onMount) {
-      onMount(this);
-    }
-  }
-  componentWillUnmount() {
-    super.componentWillUnmount();
-    const {
-      chatRoom
-    } = this.props;
-    if (this._messagesBuffChangeHandler) {
-      let _chatRoom$messagesBuf2;
-      (_chatRoom$messagesBuf2 = chatRoom.messagesBuff) == null || _chatRoom$messagesBuf2.removeChangeListener(this._messagesBuffChangeHandler);
-      delete this._messagesBuffChangeHandler;
-    }
-    window.removeEventListener('resize', this.handleWindowResize);
-    window.removeEventListener('keydown', this.handleKeyDown);
-    $(document).off(`fullscreenchange.megaChat_${chatRoom.roomId}`);
-    $(document).off(`keydown.keyboardScroll_${chatRoom.roomId}`);
-  }
-  componentDidUpdate(prevProps, prevState) {
-    let _self$domRef;
-    const self = this;
-    self.eventuallyInit(false);
-    const domNode = (_self$domRef = self.domRef) == null ? void 0 : _self$domRef.current;
-    const jml = domNode && domNode.querySelector('.js-messages-loading');
-    if (jml) {
-      if (self.loadingShown) {
-        jml.classList.remove('hidden');
-      } else {
-        jml.classList.add('hidden');
-      }
-    }
-    self.handleWindowResize();
-    if (prevState.editing === false && self.state.editing !== false && self.messagesListScrollable) {
-      self.messagesListScrollable.reinitialise(false);
-      Soon(() => {
-        if (self.editDomElement && self.editDomElement.length === 1) {
-          self.messagesListScrollable.scrollToElement(self.editDomElement[0], false);
-        }
-      });
-    }
-    if (self._reposOnUpdate !== undefined) {
-      const ps = self.messagesListScrollable;
-      ps.__prevPosY = ps.getScrollHeight() - self._reposOnUpdate + self.lastScrollPosition;
-      ps.scrollToY(ps.__prevPosY, true);
-    }
-  }
-  eventuallyInit(doResize) {
-    let _this$domRef2;
-    if (this.initialised) {
-      return;
-    }
-    const domNode = (_this$domRef2 = this.domRef) == null ? void 0 : _this$domRef2.current;
-    if (domNode) {
-      this.initialised = true;
-    } else {
-      return;
-    }
-    this.$messages = $('.messages.scroll-area > .perfectScrollbarContainer', this.$container);
-    this.$messages.droppable({
-      tolerance: 'pointer',
-      drop(e, ui) {
-        $.doDD(e, ui, 'drop', 1);
-      },
-      over(e, ui) {
-        $.doDD(e, ui, 'over', 1);
-      },
-      out(e, ui) {
-        $.doDD(e, ui, 'out', 1);
-      }
-    });
-    this.lastScrollPosition = null;
-    this.props.chatRoom.scrolledToBottom = true;
-    if (doResize !== false) {
-      this.handleWindowResize();
-    }
-  }
-  _handleWindowResize(e, scrollToBottom) {
-    if (!M.chat) {
-      return;
-    }
-    if (!this.isMounted()) {
-      this.componentWillUnmount();
-      return;
-    }
-    if (!this.isComponentEventuallyVisible()) {
-      return;
-    }
-    const self = this;
-    self.eventuallyInit(false);
-    if (!self.$messages) {
-      return;
-    }
-    if (call.Ay.isExpanded()) {
-      const $container = $('.meetings-call');
-      const $messages = $('.js-messages-scroll-area', $container);
-      const $textarea = $('.chat-textarea-block', $container);
-      const $sidebar = $('.sidebar', $container);
-      const scrollBlockHeight = parseInt($sidebar.outerHeight(), 10) - parseInt($textarea.outerHeight(), 10) - 72;
-      if ($sidebar.hasClass('chat-opened') && scrollBlockHeight !== $messages.outerHeight()) {
-        $messages.css('height', scrollBlockHeight);
-        self.refreshUI(true);
-      }
-      return;
-    }
-    const scrollBlockHeight = $('.chat-content-block', self.$container).outerHeight() - ($('.chat-topic-block', self.$container).outerHeight() || 0) - (is_chatlink ? $('.join-chat-block', self.$container).outerHeight() : $('.messages-block .chat-textarea-block', self.$container).outerHeight());
-    if (scrollBlockHeight !== self.$messages.outerHeight()) {
-      self.$messages.css('height', scrollBlockHeight);
-      $('.messages.main-pad', self.$messages).css('min-height', scrollBlockHeight);
-      self.refreshUI(true);
-    } else {
-      self.refreshUI(scrollToBottom);
-    }
-  }
-  refreshUI() {
-    if (this.isComponentEventuallyVisible()) {
-      const room = this.props.chatRoom;
-      room.renderContactTree();
-      room.megaChat.refreshConversations();
-      room.trigger('RefreshUI');
-      if (room.scrolledToBottom) {
-        delay(`hp:reinit-scroll:${this.getUniqueId()}`, () => {
-          if (this.messagesListScrollable) {
-            this.messagesListScrollable.reinitialise(true, true);
-          }
-        }, 30);
-      }
-    }
-  }
-  isLoading() {
-    const {chatRoom} = this.props;
-    if (chatRoom.historyTimedOut) {
-      return false;
-    }
-    const mb = chatRoom.messagesBuff;
-    return this.scrollPullHistoryRetrieval === true || chatRoom.activeSearches || mb.messagesHistoryIsLoading() || mb.joined === false || mb.isDecrypting;
-  }
-  specShouldComponentUpdate() {
-    return !this.loadingShown && this.isComponentEventuallyVisible();
-  }
-  enableScrollbar() {
-    const ps = this.messagesListScrollable;
-    ps.enable();
-    this._reposOnUpdate = undefined;
-    this.lastScrollPosition = ps.__prevPosY | 0;
-  }
-  editMessage(messageId) {
-    const self = this;
-    self.setState({
-      'editing': messageId
-    });
-    self.props.chatRoom.scrolledToBottom = false;
-  }
-  onMessageEditDone(v, messageContents) {
-    const self = this;
-    const room = this.props.chatRoom;
-    room.scrolledToBottom = true;
-    self.editDomElement = null;
-    const currentContents = v.textContents;
-    v.edited = false;
-    if (messageContents === false || messageContents === currentContents) {
-      let _self$messagesListScr;
-      (_self$messagesListScr = self.messagesListScrollable) == null || _self$messagesListScr.scrollToBottom(true);
-    } else if (messageContents) {
-      let _self$messagesListScr2;
-      room.trigger('onMessageUpdating', v);
-      room.megaChat.plugins.chatdIntegration.updateMessage(room, v.internalId ? v.internalId : v.orderValue, messageContents);
-      if (v.getState && (v.getState() === Message.STATE.NOT_SENT || v.getState() === Message.STATE.SENT) && !v.requiresManualRetry) {
-        if (v.textContents) {
-          v.textContents = messageContents;
-        }
-        if (v.emoticonShortcutsProcessed) {
-          v.emoticonShortcutsProcessed = false;
-        }
-        if (v.emoticonsProcessed) {
-          v.emoticonsProcessed = false;
-        }
-        if (v.messageHtml) {
-          delete v.messageHtml;
-        }
-        v.trigger('onChange', [v, "textContents", "", messageContents]);
-        megaChat.plugins.richpreviewsFilter.processMessage({}, v, false, true);
-      }
-      (_self$messagesListScr2 = self.messagesListScrollable) == null || _self$messagesListScr2.scrollToBottom(true);
-    } else if (messageContents.length === 0) {
-      this.props.onDeleteClicked(v);
-    }
-    self.setState({
-      'editing': false
-    });
-    self.refreshUI();
-    Soon(() => {
-      $('.chat-textarea-block:visible textarea').focus();
-    }, 300);
-  }
-  render() {
-    const self = this;
-    const room = this.props.chatRoom;
-    if (!room || !room.roomId) {
-      return null;
-    }
-    const contacts = room.getParticipantsExceptMe();
-    let contactHandle;
-    let contact;
-    let avatarMeta;
-    let contactName = "";
-    if (contacts && contacts.length === 1) {
-      contactHandle = contacts[0];
-      contact = M.u[contactHandle];
-      avatarMeta = contact ? generateAvatarMeta(contact.u) : {};
-      contactName = avatarMeta.fullName;
-    } else if (contacts && contacts.length > 1) {
-      contactName = room.getRoomTitle();
-    }
-    let messagesList = [];
-    if (this.isLoading()) {
-      self.loadingShown = true;
-    } else {
-      const mb = room.messagesBuff;
-      if (this.scrollPullHistoryRetrieval < 0) {
-        this.scrollPullHistoryRetrieval = false;
-        self.enableScrollbar();
-      }
-      delete self.loadingShown;
-      if (room.historyTimedOut || mb.joined === true && !self.scrollPullHistoryRetrieval && mb.haveMoreHistory() === false) {
-        const $$WELCOME_MESSAGE = ({
-          heading,
-          title,
-          info,
-          className
-        }) => REaCt().createElement("div", {
-          className: `
-                            messages
-                            welcome-message
-                            ${className || ''}
-                        `
-        }, REaCt().createElement(utils.P9, {
-          tag: "h1",
-          content: heading
-        }), title && REaCt().createElement("span", null, title), info);
-        messagesList = [...messagesList, room.isNote ? $$WELCOME_MESSAGE({
-          heading: l.note_heading,
-          info: REaCt().createElement("p", null, REaCt().createElement("i", {
-            className: "sprite-fm-mono icon-file-text-thin-outline note-chat-icon"
-          }), l.note_description),
-          className: 'note-chat-info'
-        }) : $$WELCOME_MESSAGE({
-          heading: room.scheduledMeeting || !contactName ? megaChat.html(room.getRoomTitle()) : l[8002].replace('%s', `<span>${megaChat.html(contactName)}</span>`),
-          title: l[8080],
-          info: REaCt().createElement(REaCt().Fragment, null, REaCt().createElement("p", null, REaCt().createElement("i", {
-            className: "sprite-fm-mono icon-lock"
-          }), REaCt().createElement(utils.P9, {
-            content: l[8540].replace("[S]", "<strong>").replace("[/S]", "</strong>")
-          })), REaCt().createElement("p", null, REaCt().createElement("i", {
-            className: "sprite-fm-mono icon-accept"
-          }), REaCt().createElement(utils.P9, {
-            content: l[8539].replace("[S]", "<strong>").replace("[/S]", "</strong>")
-          })))
-        })];
-      }
-    }
-    let lastTimeMarker;
-    let lastMessageFrom = null;
-    let lastGroupedMessageTimeStamp = null;
-    let grouped = false;
-    for (let i = 0; i < room.messagesBuff.messages.length; i++) {
-      let v = room.messagesBuff.messages.getItem(i);
-      if (!v.protocol && v.revoked !== true) {
-        let shouldRender = true;
-        if (v.isManagement && v.isManagement() === true && v.isRenderableManagement() === false || v.deleted === true) {
-          shouldRender = false;
-        }
-        const timestamp = v.delay;
-        const curTimeMarker = getTimeMarker(timestamp);
-        if (shouldRender === true && curTimeMarker && lastTimeMarker !== curTimeMarker) {
-          lastTimeMarker = curTimeMarker;
-          messagesList.push(REaCt().createElement("div", {
-            className: "message date-divider selectable-txt",
-            key: `${v.messageId  }_marker`,
-            title: time2date(timestamp)
-          }, curTimeMarker));
-          grouped = false;
-          lastMessageFrom = null;
-          lastGroupedMessageTimeStamp = null;
-        }
-        if (shouldRender === true) {
-          let {userId} = v;
-          if (!userId && contact && contact.u) {
-            userId = contact.u;
-          }
-          if (v instanceof Message && v.dialogType !== "truncated") {
-            if (!lastMessageFrom || userId && lastMessageFrom === userId) {
-              if (timestamp - lastGroupedMessageTimeStamp < 300) {
-                grouped = true;
-              } else {
-                grouped = false;
-                lastMessageFrom = userId;
-                lastGroupedMessageTimeStamp = timestamp;
-              }
-            } else {
-              grouped = false;
-              lastMessageFrom = userId;
-              if (lastMessageFrom === userId) {
-                lastGroupedMessageTimeStamp = timestamp;
-              } else {
-                lastGroupedMessageTimeStamp = null;
-              }
-            }
-          } else {
-            grouped = false;
-            lastMessageFrom = null;
-            lastGroupedMessageTimeStamp = null;
-          }
-        }
-        if ((v.dialogType === "remoteCallEnded" || v.dialogType === "remoteCallStarted") && v && v.wrappedChatDialogMessage) {
-          v = v.wrappedChatDialogMessage;
-        }
-        if (v.dialogType) {
-          let messageInstance = null;
-          if (v.dialogType === 'alterParticipants') {
-            messageInstance = REaCt().createElement(AltPartsConvMessage, {
-              message: v,
-              key: v.messageId,
-              contact: Message.getContactForMessage(v),
-              grouped,
-              chatRoom: room
-            });
-          } else if (v.dialogType === 'truncated') {
-            messageInstance = REaCt().createElement(TruncatedMessage, {
-              message: v,
-              key: v.messageId,
-              contact: Message.getContactForMessage(v),
-              grouped,
-              chatRoom: room
-            });
-          } else if (v.dialogType === 'privilegeChange') {
-            messageInstance = REaCt().createElement(PrivilegeChange, {
-              message: v,
-              key: v.messageId,
-              contact: Message.getContactForMessage(v),
-              grouped,
-              chatRoom: room
-            });
-          } else if (v.dialogType === 'topicChange') {
-            messageInstance = REaCt().createElement(TopicChange, {
-              message: v,
-              key: v.messageId,
-              contact: Message.getContactForMessage(v),
-              grouped,
-              chatRoom: room
-            });
-          } else if (v.dialogType === 'openModeClosed') {
-            messageInstance = REaCt().createElement(CloseOpenModeMessage, {
-              message: v,
-              key: v.messageId,
-              contact: Message.getContactForMessage(v),
-              grouped,
-              chatRoom: room
-            });
-          } else if (v.dialogType === 'chatHandleUpdate') {
-            messageInstance = REaCt().createElement(ChatHandleMessage, {
-              message: v,
-              key: v.messageId,
-              contact: Message.getContactForMessage(v),
-              grouped,
-              chatRoom: room
-            });
-          } else if (v.dialogType === 'messageRetention') {
-            messageInstance = REaCt().createElement(RetentionChange, {
-              message: v,
-              key: v.messageId,
-              contact: Message.getContactForMessage(v)
-            });
-          } else if (v.dialogType === 'scheduleMeta') {
-            if (v.meta.onlyTitle) {
-              messageInstance = REaCt().createElement(TopicChange, {
-                message: v,
-                key: v.messageId,
-                contact: Message.getContactForMessage(v),
-                grouped,
-                chatRoom: v.chatRoom
-              });
-            } else {
-              if (v.meta.topicChange) {
-                messagesList.push(REaCt().createElement(TopicChange, {
-                  message: v,
-                  key: `${v.messageId}-topic`,
-                  contact: Message.getContactForMessage(v),
-                  grouped,
-                  chatRoom: v.chatRoom
-                }));
-              }
-              messageInstance = REaCt().createElement(scheduleMetaChange.A, {
-                message: v,
-                key: v.messageId,
-                mode: v.meta.mode,
-                chatRoom: room,
-                grouped,
-                link: v.chatRoom.publicLink,
-                contact: Message.getContactForMessage(v)
-              });
-            }
-          }
-          messagesList.push(messageInstance);
-        } else {
-          if (!v.chatRoom) {
-            v.chatRoom = room;
-          }
-          messagesList.push(REaCt().createElement(generic.A, {
-            message: v,
-            state: v.state,
-            key: v.messageId,
-            contact: Message.getContactForMessage(v),
-            grouped,
-            onUpdate: () => {
-              self.onResizeDoUpdate();
-            },
-            editing: self.state.editing === v.messageId || self.state.editing === v.pendingMessageId,
-            onEditStarted: ((v, $domElement) => {
-              self.editDomElement = $domElement;
-              self.setState({
-                'editing': v.messageId
-              });
-              self.forceUpdate();
-            }).bind(this, v),
-            chatRoom: room,
-            onEditDone: this.onMessageEditDone.bind(this, v),
-            onDeleteClicked: msg => {
-              if (this.props.onDeleteClicked) {
-                this.props.onDeleteClicked(msg);
-              }
-            },
-            onResized: () => {
-              this.handleWindowResize();
-            },
-            onEmojiBarChange: () => {
-              this.handleWindowResize();
-            }
-          }));
-        }
-      }
-    }
-    return REaCt().createElement("div", {
-      ref: this.domRef,
-      className: `
-                    messages
-                    scroll-area
-                    ${this.props.className || ''}
-                `
-    }, this.renderNotice(l[8883]), this.renderNotice(l[8884]), REaCt().createElement(perfectScrollbar.O, {
-      className: "js-messages-scroll-area perfectScrollbarContainer",
-      ref: ref => {
-        let _this$props$onMessage, _this$props;
-        this.messagesListScrollable = ref;
-        $(document).rebind(`keydown.keyboardScroll_${room.roomId}`, this.onKeyboardScroll);
-        (_this$props$onMessage = (_this$props = this.props).onMessagesListScrollableMount) == null || _this$props$onMessage.call(_this$props, ref);
-      },
-      chatRoom: room,
-      messagesBuff: room.messagesBuff,
-      editDomElement: this.state.editDomElement,
-      editingMessageId: this.state.editing,
-      confirmDeleteDialog: this.state.confirmDeleteDialog,
-      renderedMessagesCount: messagesList.length,
-      options: {
-        suppressScrollX: true
-      },
-      isLoading: room.messagesBuff.messagesHistoryIsLoading() || room.activeSearches > 0 || this.loadingShown,
-      onFirstInit: ps => {
-        ps.scrollToBottom(true);
-        room.scrolledToBottom = 1;
-      },
-      onUserScroll: this.onMessagesScrollUserScroll
-    }, REaCt().createElement("div", {
-      className: "messages main-pad"
-    }, REaCt().createElement("div", {
-      className: "messages content-area"
-    }, this.renderLoadingSpinner(), messagesList))), this.renderNavigationToast());
-  }
-}, (0,applyDecoratedDescriptor.A)(_class.prototype, "enableScrollbar", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "enableScrollbar"), _class.prototype), _class);
-
-
-},
-
-815:
-(_, EXP_, REQ_) => {
-
-"use strict";
-REQ_.d(EXP_, {
-Q: () => InviteParticipantsPanel
-});
-const react0__ = REQ_(594);
-const react0 = REQ_.n(react0__);
-const _meetings_call_jsx1__ = REQ_(3);
-const _ui_miniui_jsx2__ = REQ_(818);
-const _ui_buttons_jsx3__ = REQ_(994);
-const _ui_dropdowns_jsx4__ = REQ_(911);
-
-
-
-
-
-const NAMESPACE = 'invite-panel';
-class InviteParticipantsPanel extends react0().Component {
-  constructor(props) {
-    super(props);
-    this.domRef = react0().createRef();
-    this.state = {
-      link: '',
-      copied: false
-    };
-    this.retrieveChatLink();
-  }
-  retrieveChatLink(cim) {
-    const {
-      chatRoom
-    } = this.props;
-    if (!chatRoom.topic) {
-      return;
-    }
-    this.loading = chatRoom.updatePublicHandle(false, cim).always(() => {
-      delete this.loading;
-      if (this.domRef.current) {
-        if (chatRoom.publicLink) {
-          this.setState({
-            link: `${getBaseUrl()}/${chatRoom.publicLink}`
-          });
-        } else {
-          this.setState({
-            link: false
-          });
-        }
-      }
-    });
-  }
-  getInviteBody(encode) {
-    const {
-      chatRoom
-    } = this.props;
-    const {
-      link
-    } = this.state;
-    const {
-      scheduledMeeting
-    } = chatRoom;
-    let body = l.invite_body_text;
-    if (scheduledMeeting) {
-      const {
-        nextOccurrenceStart
-      } = chatRoom.scheduledMeeting;
-      body = l.invite_body_text_scheduled.replace('%4', time2date(nextOccurrenceStart / 1000, 20)).replace('%5', toLocaleTime(nextOccurrenceStart));
-    }
-    body = body.replace(/\[BR]/g, '\n').replace('%1', u_attr.name).replace('%2', chatRoom.getRoomTitle()).replace('%3', link);
-    return encode ? encodeURIComponent(body) : body;
-  }
-  render() {
-    const {
-      chatRoom,
-      disableLinkToggle,
-      onAddParticipants
-    } = this.props;
-    const {
-      link,
-      copied
-    } = this.state;
-    const inCall = _meetings_call_jsx1__.Ay.isExpanded();
-    if (this.loading) {
-      return react0().createElement("div", {
-        ref: this.domRef,
-        className: `
-                        ${NAMESPACE}
-                        ${inCall ? 'theme-dark-forced' : ''}
-                    `
-      }, react0().createElement("header", null), react0().createElement("section", {
-        className: "content"
-      }, react0().createElement("div", {
-        className: "content-block"
-      })));
-    }
-    const canInvite = !!(chatRoom.iAmOperator() || chatRoom.options[MCO_FLAGS.OPEN_INVITE]) && onAddParticipants;
-    const canToggleLink = !disableLinkToggle && chatRoom.iAmOperator() && (chatRoom.isMeeting || chatRoom.topic);
-    const mailto = `mailto:?to=&subject=${l.invite_subject_text}&body=${this.getInviteBody(true)}`;
-    const copyText = chatRoom.isMeeting ? l.copy_meeting_link : l[1394];
-    return react0().createElement("div", {
-      ref: this.domRef,
-      className: `
-                    ${NAMESPACE}
-                    ${inCall ? 'theme-dark-forced' : ''}
-                `
-    }, react0().createElement("header", null, react0().createElement("h3", null, l.invite_participants)), react0().createElement("section", {
-      className: "content"
-    }, canToggleLink && chatRoom.type !== 'group' && react0().createElement("div", {
-      className: "content-block link-block"
-    }, react0().createElement("div", {
-      className: "text-wrapper"
-    }, react0().createElement("span", {
-      className: "link-label"
-    }, l.invite_toggle_link_label), react0().createElement("div", {
-      className: `link-description ${inCall ? '' : 'hidden'}`
-    }, l.invite_toggle_link_desc)), react0().createElement(_ui_miniui_jsx2__.A.ToggleCheckbox, {
-      className: "meeting-link-toggle",
-      checked: !!link,
-      value: !!link,
-      onToggle: () => {
-        if (this.loading) {
-          return;
-        }
-        if (link) {
-          this.loading = chatRoom.updatePublicHandle(true).always(() => {
-            delete this.loading;
-            if (this.domRef.current) {
-              this.setState({
-                link: false
-              });
-            }
-          });
-        } else {
-          this.retrieveChatLink(true);
-        }
-      }
-    })), link && react0().createElement("div", {
-      className: "content-block"
-    }, react0().createElement(_ui_buttons_jsx3__.$, {
-      className: "flat-button",
-      icon: `sprite-fm-mono icon-${copied ? 'check' : 'link-thin-outline'}`,
-      label: copied ? l.copied : copyText,
-      onClick: () => {
-        if (copied) {
-          return;
-        }
-        delay('chat-event-inv-copylink', () => eventlog(99964));
-        copyToClipboard(link);
-        this.setState({
-          copied: true
-        }, () => {
-          tSleep(3).then(() => {
-            if (this.domRef.current) {
-              this.setState({
-                copied: false
-              });
-            }
-          });
-        });
-      }
-    })), link && react0().createElement("div", {
-      className: "content-block"
-    }, react0().createElement(_ui_buttons_jsx3__.$, {
-      className: "flat-button",
-      label: l.share_chat_link,
-      icon: "sprite-fm-mono icon-share-02-thin-outline"
-    }, react0().createElement(_ui_dropdowns_jsx4__.Dropdown, {
-      className: `
-                                    button-group-menu
-                                    invite-dropdown
-                                    ${inCall ? 'theme-dark-forced' : ''}
-                                `,
-      noArrow: true,
-      positionAt: "left bottom",
-      collision: "none",
-      horizOffset: 79,
-      vertOffset: 6,
-      ref: r => {
-        this.dropdownRef = r;
-      },
-      onBeforeActiveChange: e => {
-        if (e) {
-          delay('chat-event-inv-dropdown', () => eventlog(99965));
-          $(document.body).trigger('closeAllDropdownsExcept', this.dropdownRef);
-        }
-      }
-    }, react0().createElement(_ui_dropdowns_jsx4__.DropdownItem, {
-      key: "send-invite",
-      className: `
-                                        ${inCall ? 'theme-dark-forced' : ''}
-                                    `,
-      icon: "sprite-fm-mono icon-mail-thin-outline",
-      label: l.share_chat_link_invite,
-      onClick: () => {
-        delay('chat-event-inv-email', () => eventlog(99966));
-        window.open(mailto, '_self', 'noopener,noreferrer');
-      }
-    }), react0().createElement(_ui_dropdowns_jsx4__.DropdownItem, {
-      key: "copy-invite",
-      className: `
-                                        ${inCall ? 'theme-dark-forced' : ''}
-                                    `,
-      label: l.copy_chat_link_invite,
-      icon: "sprite-fm-mono icon-square-copy",
-      onClick: () => {
-        delay('chat-event-inv-copy', () => eventlog(99967));
-        copyToClipboard(this.getInviteBody(), l.invite_copied);
-      }
-    })))), canInvite && (link || canToggleLink) && chatRoom.type !== 'group' && react0().createElement("div", {
-      className: "content-block invite-panel-divider"
-    }, l.invite_dlg_divider), canInvite && react0().createElement("div", {
-      className: "content-block add-participant-block"
-    }, react0().createElement(_ui_buttons_jsx3__.$, {
-      className: "flat-button",
-      icon: "sprite-fm-mono icon-user-square-thin-outline",
-      label: l.add_participants,
-      onClick: () => {
-        delay('chat-event-inv-add-participant', () => eventlog(99968));
-        onAddParticipants();
-      }
-    }))));
-  }
-}
-
-},
-
-818:
-(_, EXP_, REQ_) => {
-
-"use strict";
-REQ_.d(EXP_, {
-A: () => __WEBPACK_DEFAULT_EXPORT__
-});
-const react0__ = REQ_(594);
-const react0 = REQ_.n(react0__);
-const _chat_mixins1__ = REQ_(137);
-
-
-class ToggleCheckbox extends _chat_mixins1__.w9 {
-  constructor(props) {
-    super(props);
-    this.domRef = react0().createRef();
-    this.onToggle = () => {
-      const newState = !this.state.value;
-      this.setState({
-        value: newState
-      });
-      if (this.props.onToggle) {
-        this.props.onToggle(newState);
-      }
-    };
-    this.state = {
-      value: this.props.value
-    };
-  }
-  render() {
-    return react0().createElement("div", {
-      ref: this.domRef,
-      className: `
-                    mega-switch
-                    ${this.props.className}
-                    ${this.state.value ? 'toggle-on' : ''}
-                `,
-      role: "switch",
-      "aria-checked": !!this.state.value,
-      onClick: this.onToggle
-    }, react0().createElement("div", {
-      className: `mega-feature-switch sprite-fm-mono-after
-                         ${this.state.value ? 'icon-check-after' : 'icon-minimise-after'}`
-    }));
-  }
-}
-const __WEBPACK_DEFAULT_EXPORT__ = {
-  ToggleCheckbox
-};
-
-},
-
-823:
+732:
 (_, EXP_, REQ_) => {
 
 "use strict";
@@ -28979,7 +26288,35 @@ class Invite extends mixins.w9 {
 Invite.NAMESPACE = 'meetings-invite';
 // EXTERNAL MODULE: ./js/chat/ui/meetings/schedule/helpers.jsx
 const helpers = REQ_(110);
+;// ./js/chat/ui/meetings/schedule/dateObserver.jsx
+
+
+const withDateObserver = Component => class extends REaCt().Component {
+  constructor(...args) {
+    super(...args);
+    this.listener = undefined;
+    this.state = {
+      timestamp: undefined
+    };
+  }
+  componentWillUnmount() {
+    mBroadcaster.removeListener(this.listener);
+  }
+  componentDidMount() {
+    this.listener = mBroadcaster.addListener(withDateObserver.NAMESPACE, timestamp => this.setState({
+      timestamp
+    }));
+  }
+  render() {
+    return REaCt().createElement(Component, (0,esm_extends.A)({}, this.props, {
+      timestamp: this.state.timestamp
+    }));
+  }
+};
+withDateObserver.NAMESPACE = 'meetings:onSelectDate';
 ;// ./js/chat/ui/meetings/schedule/datepicker.jsx
+
+
 
 class Datepicker extends REaCt().Component {
   constructor(props) {
@@ -29006,7 +26343,8 @@ class Datepicker extends REaCt().Component {
         const prevDate = new Date(+this.props.value);
         const nextDate = new Date(+dateText);
         nextDate.setHours(prevDate.getHours(), prevDate.getMinutes());
-        return this.props.onSelect(nextDate.getTime());
+        this.props.onSelect(nextDate.getTime());
+        mBroadcaster.sendMessage(withDateObserver.NAMESPACE, nextDate.getTime());
       }
     };
     this.domRef = REaCt().createRef();
@@ -29099,12 +26437,14 @@ class Datepicker extends REaCt().Component {
   }
 }
 Datepicker.NAMESPACE = 'meetings-datepicker';
+const datepicker = (0,mixins.Zz)(withDateObserver)(Datepicker);
 ;// ./js/chat/ui/meetings/schedule/select.jsx
 
 
 
 
-class Select extends mixins.w9 {
+
+class Select extends REaCt().Component {
   constructor(...args) {
     super(...args);
     this.domRef = REaCt().createRef();
@@ -29159,7 +26499,6 @@ class Select extends mixins.w9 {
     return minutes ? `(${totalHours}\u00a0h ${minutes}\u00a0m)` : `(${totalHours}\u00a0h)`;
   }
   componentWillUnmount() {
-    super.componentWillUnmount();
     document.removeEventListener('mousedown', this.handleMousedown);
     if (this.inputRef && this.inputRef.current) {
       $(this.inputRef.current).unbind(`keyup.${Select.NAMESPACE}`);
@@ -29167,7 +26506,6 @@ class Select extends mixins.w9 {
   }
   componentDidMount() {
     let _this$inputRef;
-    super.componentDidMount();
     document.addEventListener('mousedown', this.handleMousedown);
     const inputRef = (_this$inputRef = this.inputRef) == null ? void 0 : _this$inputRef.current;
     if (inputRef) {
@@ -29293,6 +26631,7 @@ class Select extends mixins.w9 {
   }
 }
 Select.NAMESPACE = 'meetings-select';
+const schedule_select = (0,mixins.Zz)(withDateObserver)(Select);
 ;// ./js/chat/ui/meetings/schedule/datetime.jsx
 
 
@@ -29350,12 +26689,12 @@ class DateTime extends REaCt().Component {
       onSelectTime,
       onBlur
     } = this.props;
-    return REaCt().createElement(REaCt().Fragment, null, label && REaCt().createElement("span", null, label), REaCt().createElement(Datepicker, {
-      name: `${Datepicker.NAMESPACE}-${name}`,
+    return REaCt().createElement(REaCt().Fragment, null, label && REaCt().createElement("span", null, label), REaCt().createElement(datepicker, {
+      name: `${datepicker.NAMESPACE}-${name}`,
       className: isLoading ? 'disabled' : '',
       isLoading,
       startDate,
-      altField: `${Select.NAMESPACE}-${altField}`,
+      altField: `${schedule_select.NAMESPACE}-${altField}`,
       value,
       minDate,
       onMount: datepickerRef => this.setState({
@@ -29373,8 +26712,8 @@ class DateTime extends REaCt().Component {
       },
       onChange: this.handleChange,
       onBlur: () => onBlur(this.state.manualDateInput)
-    }), REaCt().createElement(Select, {
-      name: `${Select.NAMESPACE}-${altField}`,
+    }), REaCt().createElement(schedule_select, {
+      name: `${schedule_select.NAMESPACE}-${altField}`,
       className: isLoading ? 'disabled' : '',
       isLoading,
       typeable: true,
@@ -29498,7 +26837,7 @@ class Recurring extends mixins.w9 {
         });
       }
       const posFirst = this.OFFSETS[posIdx][dayIdx].indexOf('[A]') < this.OFFSETS[posIdx][dayIdx].indexOf('[B]');
-      const pos = REaCt().createElement(Select, {
+      const pos = REaCt().createElement(schedule_select, {
         name: "recurring-offset-value",
         className: "inline",
         icon: true,
@@ -29515,7 +26854,7 @@ class Recurring extends mixins.w9 {
           }));
         }
       });
-      return REaCt().createElement(REaCt().Fragment, null, posFirst && pos, REaCt().createElement(Select, {
+      return REaCt().createElement(REaCt().Fragment, null, posFirst && pos, REaCt().createElement(schedule_select, {
         name: "recurring-offset-day",
         className: "inline",
         icon: true,
@@ -29540,7 +26879,7 @@ class Recurring extends mixins.w9 {
       } = this.state;
       return REaCt().createElement("div", {
         className: "mega-input inline recurring-interval"
-      }, REaCt().createElement(Select, {
+      }, REaCt().createElement(schedule_select, {
         name: `${Recurring.NAMESPACE}-interval`,
         value: interval > 0 ? interval : 1,
         icon: true,
@@ -29759,7 +27098,7 @@ class Recurring extends mixins.w9 {
       onClick: () => isLoading || end ? null : this.setState({
         end: prevEnd || this.initialEnd
       })
-    }, l.recurring_on), REaCt().createElement(Datepicker, {
+    }, l.recurring_on), REaCt().createElement(datepicker, {
       name: `${Recurring.NAMESPACE}-endDateTime`,
       position: "top left",
       startDate: end || this.initialEnd,
@@ -29835,7 +27174,7 @@ class Recurring extends mixins.w9 {
       })
     }, l.recurring_frequency_day), REaCt().createElement("div", {
       className: "mega-input inline recurring-day"
-    }, REaCt().createElement(Select, {
+    }, REaCt().createElement(schedule_select, {
       name: `${Recurring.NAMESPACE}-monthDay`,
       icon: true,
       value: monthDays[0],
@@ -33423,6 +30762,2697 @@ class ConversationsApp extends mixins.w9 {
 if (false) {}
 const conversations = {
   ConversationsApp
+};
+
+},
+
+757:
+(_, EXP_, REQ_) => {
+
+"use strict";
+REQ_.d(EXP_, {
+A: () => ScheduleMetaChange
+});
+const react0__ = REQ_(594);
+const react0 = REQ_.n(react0__);
+const _mixin_jsx1__ = REQ_(446);
+const _contacts_jsx2__ = REQ_(251);
+const _ui_utils_jsx3__ = REQ_(314);
+const _ui_buttons_jsx4__ = REQ_(994);
+
+
+
+
+
+class ScheduleMetaChange extends _mixin_jsx1__.M {
+  constructor(...args) {
+    super(...args);
+    this.state = {
+      link: ''
+    };
+  }
+  componentDidMount() {
+    super.componentDidMount();
+    if (this.props.mode === ScheduleMetaChange.MODE.CREATED) {
+      if (is_chatlink) {
+        this.setState({
+          link: `${getBaseUrl()}/chat/${is_chatlink.ph}#${is_chatlink.key}`
+        });
+      } else {
+        const {
+          chatRoom
+        } = this.props;
+        chatRoom.updatePublicHandle().then(() => {
+          if (this.isMounted() && !this.state.link && chatRoom.publicLink) {
+            this.setState({
+              link: `${getBaseUrl()}/${chatRoom.publicLink}`
+            });
+          }
+        }).catch(dump);
+      }
+    }
+    if (this.props.message.meta.ap) {
+      const {
+        meetingsManager
+      } = megaChat.plugins;
+      this.redrawListener = `${meetingsManager.EVENTS.OCCURRENCES_UPDATE}.redraw${this.getUniqueId()}`;
+      megaChat.rebind(this.redrawListener, () => {
+        onIdle(() => {
+          const {
+            meta
+          } = this.props.message;
+          if (!meta.ap) {
+            return;
+          }
+          this.props.message.meta = meetingsManager.noCsMeta(meta.handle, meta.ap, megaChat.chats[meta.cid]);
+          this.safeForceUpdate();
+        });
+        megaChat.off(this.redrawListener);
+        delete this.redrawListener;
+      });
+    }
+  }
+  componentWillUnmount() {
+    super.componentWillUnmount();
+    if (this.redrawListener) {
+      megaChat.off(this.redrawListener);
+    }
+  }
+  specShouldComponentUpdate(nextProps) {
+    if (this.props.mode === ScheduleMetaChange.MODE.CREATED && this.props.link !== nextProps.link) {
+      return true;
+    }
+    return null;
+  }
+  componentDidUpdate(prevProps) {
+    if (this.props.mode === ScheduleMetaChange.MODE.CREATED && prevProps.link !== this.props.link) {
+      this.setState({
+        link: this.props.link ? `${getBaseUrl()}/${this.props.link}` : ''
+      });
+    }
+  }
+  onAddToCalendar() {
+    const {
+      chatRoom
+    } = this.props;
+    const {
+      id,
+      title
+    } = chatRoom && chatRoom.scheduledMeeting || {};
+    if (id) {
+      delay(`fetchical${id}`, () => {
+        eventlog(500038);
+        asyncApiReq({
+          a: 'mcsmfical',
+          id
+        }).then(([, res]) => {
+          delay(`saveical${id}`, () => {
+            M.saveAs(base64urldecode(res), `${title.replace(/\W/g, '')}.ics`).then(nop).catch(() => {
+              msgDialog('error', '', l.calendar_add_failed, '');
+            });
+          }, 1000);
+        }).catch(() => {
+          msgDialog('error', '', l.calendar_add_failed, '');
+        });
+      }, 250);
+    }
+  }
+  static getTitleText(meta) {
+    const {
+      mode,
+      recurring,
+      occurrence,
+      converted,
+      prevTiming
+    } = meta;
+    const {
+      MODE
+    } = ScheduleMetaChange;
+    switch (mode) {
+      case MODE.CREATED:
+        {
+          return recurring ? l.schedule_mgmt_new_recur : l.schedule_mgmt_new;
+        }
+      case MODE.EDITED:
+        {
+          if (converted) {
+            return recurring ? l.schedule_mgmt_update_convert_recur : l.schedule_mgmt_update_convert;
+          }
+          if (occurrence) {
+            return l.schedule_mgmt_update_occur;
+          }
+          if (prevTiming) {
+            return recurring ? l.schedule_mgmt_update_recur : l.schedule_mgmt_update;
+          }
+          return l.schedule_mgmt_update_desc;
+        }
+      case MODE.CANCELLED:
+        {
+          if (recurring) {
+            return occurrence ? l.schedule_mgmt_cancel_occur : l.schedule_mgmt_cancel_recur;
+          }
+          return l.schedule_mgmt_cancel;
+        }
+    }
+    return '';
+  }
+  renderTimingBlock() {
+    const {
+      message,
+      mode
+    } = this.props;
+    const {
+      meta
+    } = message;
+    const {
+      MODE
+    } = ScheduleMetaChange;
+    if (mode === MODE.CANCELLED && !meta.occurrence) {
+      return null;
+    }
+    const [now, prev] = megaChat.plugins.meetingsManager.getOccurrenceStrings(meta);
+    return react0().createElement("div", {
+      className: "schedule-timing-block"
+    }, meta.prevTiming && react0().createElement("s", null, prev || ''), now);
+  }
+  checkAndFakeOccurrenceMeta(meta) {
+    const {
+      MODE
+    } = ScheduleMetaChange;
+    if (meta.occurrence && meta.mode === MODE.CANCELLED && !meta.calendar) {
+      const meeting = megaChat.plugins.meetingsManager.getMeetingOrOccurrenceParent(meta.handle);
+      if (meeting) {
+        const occurrences = meeting.getOccurrencesById(meta.handle);
+        if (occurrences) {
+          meta.calendar = {
+            date: new Date(occurrences[0].start).getDate(),
+            month: time2date(Math.floor(occurrences[0].start / 1000), 12)
+          };
+          meta.timeRules.startTime = Math.floor(occurrences[0].start / 1000);
+          meta.timeRules.endTime = Math.floor(occurrences[0].end / 1000);
+        }
+      }
+    }
+  }
+  render() {
+    const {
+      chatRoom,
+      message,
+      mode,
+      contact
+    } = this.props;
+    const {
+      meta,
+      messageId
+    } = message;
+    const {
+      scheduledMeeting
+    } = chatRoom;
+    const {
+      MODE
+    } = ScheduleMetaChange;
+    const {
+      link
+    } = this.state;
+    if (meta.gone) {
+      return null;
+    }
+    this.checkAndFakeOccurrenceMeta(meta);
+    return react0().createElement("div", null, react0().createElement("div", {
+      className: "message body",
+      "data-id": `id${messageId}`,
+      key: messageId
+    }, react0().createElement(_contacts_jsx2__.Avatar, {
+      contact: contact.u,
+      className: "message avatar-wrapper small-rounded-avatar",
+      chatRoom
+    }), react0().createElement("div", {
+      className: "message schedule-message content-area small-info-txt selectable-txt"
+    }, react0().createElement(_contacts_jsx2__.ContactButton, {
+      className: "message",
+      chatRoom,
+      contact,
+      label: react0().createElement(_ui_utils_jsx3__.zT, null, M.getNameByHandle(contact.u))
+    }), react0().createElement("div", {
+      className: "message date-time simpletip",
+      "data-simpletip": time2date(this.getTimestamp())
+    }, this.getTimestampAsString()), react0().createElement("div", {
+      className: "message text-block"
+    }, ScheduleMetaChange.getTitleText(meta), " ", !!d && meta.handle), react0().createElement("div", {
+      className: "message body-block"
+    }, (meta.prevTiming || meta.calendar || meta.topic && meta.onlyTitle || meta.recurring) && react0().createElement("div", {
+      className: "schedule-detail-block"
+    }, meta.calendar && scheduledMeeting && (meta.recurring && !scheduledMeeting.recurring || meta.occurrence && meta.mode === MODE.CANCELLED || !meta.recurring) && react0().createElement("div", {
+      className: "schedule-calendar-icon"
+    }, react0().createElement("div", {
+      className: "schedule-date"
+    }, meta.calendar.date), react0().createElement("div", {
+      className: "schedule-month"
+    }, meta.calendar.month)), react0().createElement("div", {
+      className: "schedule-detail-main"
+    }, react0().createElement("div", {
+      className: "schedule-meeting-title"
+    }, mode === MODE.CANCELLED ? react0().createElement("s", null, meta.topic || chatRoom.topic) : meta.topic || chatRoom.topic), this.renderTimingBlock()), chatRoom.iAmInRoom() && scheduledMeeting && mode !== MODE.CANCELLED && react0().createElement(_ui_buttons_jsx4__.$, {
+      className: "mega-button",
+      onClick: () => this.onAddToCalendar()
+    }, react0().createElement("span", null, mode === MODE.CREATED && !meta.occurrence ? l.schedule_add_calendar : l.schedule_update_calendar))), mode === MODE.CREATED && scheduledMeeting && scheduledMeeting.description && react0().createElement("div", {
+      className: "schedule-description"
+    }, react0().createElement(_ui_utils_jsx3__.P9, null, megaChat.html(scheduledMeeting.description).replace(/\n/g, '<br>'))), link && react0().createElement("div", null, react0().createElement("div", {
+      className: "schedule-link-instruction"
+    }, l.schedule_mgmt_link_instruct), react0().createElement("div", {
+      className: "schedule-meeting-link"
+    }, react0().createElement("span", null, link), react0().createElement(_ui_buttons_jsx4__.$, {
+      className: "mega-button positive",
+      onClick: () => {
+        copyToClipboard(link, l[7654]);
+        delay('chat-event-sm-copy-link', () => eventlog(500039));
+      }
+    }, react0().createElement("span", null, l[63]))), react0().createElement("span", null, l.schedule_link_note))))));
+  }
+}
+ScheduleMetaChange.MODE = {
+  CREATED: 1,
+  EDITED: 2,
+  CANCELLED: 3
+};
+window.ScheduleMetaChange = ScheduleMetaChange;
+
+},
+
+772:
+(_, EXP_, REQ_) => {
+
+"use strict";
+REQ_.d(EXP_, {
+Q: () => withMicObserver
+});
+const _extends3__ = REQ_(168);
+const react0__ = REQ_(594);
+const react0 = REQ_.n(react0__);
+const _mixins1__ = REQ_(137);
+const _button_jsx2__ = REQ_(959);
+
+
+
+
+const withMicObserver = Component => class extends _mixins1__.w9 {
+  constructor(props) {
+    super(props);
+    this.namespace = `SO-${Component.NAMESPACE}`;
+    this.inputObserver = `onNoMicInput.${this.namespace}`;
+    this.sendObserver = `onAudioSendDenied.${this.namespace}`;
+    this.state = {
+      signal: true,
+      blocked: false
+    };
+    this.renderSignalWarning = this.renderSignalWarning.bind(this);
+    this.renderBlockedWarning = this.renderBlockedWarning.bind(this);
+  }
+  bindObservers() {
+    this.props.chatRoom.rebind(this.inputObserver, () => this.setState({
+      signal: false
+    })).rebind(this.sendObserver, () => {
+      this.setState({
+        blocked: true
+      }, () => {
+        if (this.props.minimized) {
+          const toast = new ChatToast(l.max_speakers_toast, {
+            icon: 'sprite-fm-uni icon-hazard',
+            close: true
+          });
+          toast.dispatch();
+        }
+      });
+    });
+  }
+  renderSignalDialog() {
+    return msgDialog('warningb', null, l.no_mic_title, l.chat_mic_off_tooltip, null, 1);
+  }
+  renderSignalWarning() {
+    return react0().createElement("div", {
+      className: `
+                    ${this.namespace}
+                        meetings-signal-issue
+                        simpletip
+                    `,
+      "data-simpletip": l.show_info,
+      "data-simpletipposition": "top",
+      "data-simpletipoffset": "5",
+      "data-simpletip-class": "theme-dark-forced",
+      onClick: () => this.renderSignalDialog()
+    }, react0().createElement("i", {
+      className: "sprite-fm-mono icon-exclamation-filled"
+    }));
+  }
+  renderBlockedWarning() {
+    return react0().createElement("div", {
+      className: "stream-toast theme-dark-forced"
+    }, react0().createElement("div", {
+      className: "stream-toast-content"
+    }, react0().createElement("i", {
+      className: "stream-toast-icon sprite-fm-uni icon-warning"
+    }), react0().createElement("div", {
+      className: "stream-toast-message"
+    }, l.max_speakers_toast), react0().createElement(_button_jsx2__.A, {
+      className: "mega-button action stream-toast-close",
+      icon: "sprite-fm-mono icon-close-component",
+      onClick: () => this.setState({
+        blocked: false
+      })
+    })));
+  }
+  componentWillUnmount() {
+    super.componentWillUnmount();
+    this.props.chatRoom.unbind(this.inputObserver);
+  }
+  componentDidMount() {
+    super.componentDidMount();
+    this.bindObservers();
+  }
+  render() {
+    return react0().createElement(Component, (0,_extends3__.A)({}, this.props, {
+      signal: this.state.signal,
+      renderSignalWarning: this.renderSignalWarning,
+      blocked: this.state.blocked,
+      renderBlockedWarning: this.renderBlockedWarning
+    }));
+  }
+};
+
+},
+
+793:
+(__webpack_module__, EXP_, REQ_) => {
+
+"use strict";
+REQ_.d(EXP_, {
+A: () => _applyDecoratedDescriptor
+});
+function _applyDecoratedDescriptor(i, e, r, n, l) {
+  let a = {};
+  return Object.keys(n).forEach((i) => {
+    a[i] = n[i];
+  }), a.enumerable = !!a.enumerable, a.configurable = !!a.configurable, ("value" in a || a.initializer) && (a.writable = !0), a = r.slice().reverse().reduce((r, n) => {
+    return n(i, e, r) || r;
+  }, a), l && void 0 !== a.initializer && (a.value = a.initializer ? a.initializer.call(l) : void 0, a.initializer = void 0), void 0 === a.initializer ? (Object.defineProperty(i, e, a), null) : a;
+}
+
+
+},
+
+795:
+(_, EXP_, REQ_) => {
+
+"use strict";
+
+// EXPORTS
+REQ_.d(EXP_, {
+  T: () => TypingArea
+});
+
+// EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/esm/applyDecoratedDescriptor.js
+const applyDecoratedDescriptor = REQ_(793);
+// EXTERNAL MODULE: external "React"
+const React_ = REQ_(594);
+const REaCt = REQ_.n(React_);
+// EXTERNAL MODULE: ./js/ui/utils.jsx
+const utils = REQ_(314);
+// EXTERNAL MODULE: ./js/chat/mixins.js
+const mixins = REQ_(137);
+// EXTERNAL MODULE: ./js/ui/emojiDropdown.jsx
+const emojiDropdown = REQ_(844);
+// EXTERNAL MODULE: ./js/ui/buttons.jsx
+const ui_buttons = REQ_(994);
+;// ./js/chat/ui/emojiAutocomplete.jsx
+
+
+
+class EmojiAutocomplete extends mixins.w9 {
+  constructor(props) {
+    super(props);
+    this.domRef = REaCt().createRef();
+    this.state = {
+      'selected': 0
+    };
+    this.loading = false;
+    this.data_emojis = [];
+  }
+  preload_emojis() {
+    if (this.loading === false) {
+      this.loading = true;
+      megaChat.getEmojiDataSet('emojis').then(emojis => {
+        this.loading = 0;
+        this.data_emojis = emojis;
+        this.safeForceUpdate();
+      });
+    }
+  }
+  unbindKeyEvents() {
+    $(document).off(`keydown.emojiAutocomplete${  this.getUniqueId()}`);
+  }
+  bindKeyEvents() {
+    const self = this;
+    $(document).rebind(`keydown.emojiAutocomplete${  self.getUniqueId()}`, (e) => {
+      if (!self.props.emojiSearchQuery) {
+        self.unbindKeyEvents();
+        return;
+      }
+      let key = e.keyCode || e.which;
+      if (!$(e.target).is("textarea")) {
+        console.error("this should never happen.");
+        return;
+      }
+      if (e.altKey || e.metaKey) {
+        return;
+      }
+      let selected = $.isNumeric(self.state.selected) ? self.state.selected : 0;
+      if (document.body.classList.contains('rtl') && (key === 37 || key === 39)) {
+        key = key === 37 ? 39 : 37;
+      }
+      let handled = false;
+      if (!e.shiftKey && (key === 37 || key === 38)) {
+        selected = selected - 1;
+        selected = selected < 0 ? self.maxFound - 1 : selected;
+        if (self.found[selected] && self.state.selected !== selected) {
+          self.setState({
+            selected,
+            'prefilled': true
+          });
+          handled = true;
+          self.props.onPrefill(false, `:${  self.found[selected].n  }:`);
+        }
+      } else if (!e.shiftKey && (key === 39 || key === 40 || key === 9)) {
+        selected = selected + (key === 9 ? e.shiftKey ? -1 : 1 : 1);
+        selected = selected < 0 ? Object.keys(self.found).length - 1 : selected;
+        selected = selected >= self.props.maxEmojis || selected >= Object.keys(self.found).length ? 0 : selected;
+        if (self.found[selected] && (key === 9 || self.state.selected !== selected)) {
+          self.setState({
+            selected,
+            'prefilled': true
+          });
+          self.props.onPrefill(false, `:${  self.found[selected].n  }:`);
+          handled = true;
+        }
+      } else if (key === 13) {
+        self.unbindKeyEvents();
+        if (selected === -1) {
+          if (self.found.length > 0) {
+            for (let i = 0; i < self.found.length; i++) {
+              if (`:${  self.found[i].n  }:` === `${self.props.emojiSearchQuery  }:`) {
+                self.props.onSelect(false, `:${  self.found[0].n  }:`);
+                handled = true;
+              }
+            }
+          }
+          if (!handled && key === 13) {
+            self.props.onCancel();
+          }
+          return;
+        } else if (self.found.length > 0 && self.found[selected]) {
+          self.props.onSelect(false, `:${  self.found[selected].n  }:`);
+          handled = true;
+        } else {
+          self.props.onCancel();
+        }
+      } else if (key === 27) {
+        self.unbindKeyEvents();
+        self.props.onCancel();
+        handled = true;
+      }
+      if (handled) {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      } else {
+        if (self.isMounted()) {
+          self.setState({
+            'prefilled': false
+          });
+        }
+      }
+    });
+  }
+  componentDidUpdate() {
+    if (!this.props.emojiSearchQuery) {
+      this.unbindKeyEvents();
+    } else {
+      this.bindKeyEvents();
+    }
+  }
+  componentWillUnmount() {
+    super.componentWillUnmount();
+    this.unbindKeyEvents();
+  }
+  render() {
+    const self = this;
+    if (!self.props.emojiSearchQuery) {
+      return null;
+    }
+    self.preload_emojis();
+    if (self.loading) {
+      return REaCt().createElement("div", {
+        className: "textarea-autofill-bl"
+      }, REaCt().createElement("div", {
+        className: "textarea-autofill-info"
+      }, l[5533]));
+    }
+    const q = self.props.emojiSearchQuery.substr(1, self.props.emojiSearchQuery.length);
+    let exactMatch = [];
+    let partialMatch = [];
+    const emojis = self.data_emojis || [];
+    for (var i = 0; i < emojis.length; i++) {
+      const emoji = emojis[i];
+      const match = emoji.n.indexOf(q);
+      if (match !== -1) {
+        if (match === 0) {
+          exactMatch.push(emoji);
+        } else if (partialMatch.length < self.props.maxEmojis - exactMatch.length) {
+          partialMatch.push(emoji);
+        }
+      }
+      if (exactMatch.length >= self.props.maxEmojis) {
+        break;
+      }
+    }
+    exactMatch.sort((a, b) => {
+      if (a.n === q) {
+        return -1;
+      } else if (b.n === q) {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
+    const found = exactMatch.concat(partialMatch).slice(0, self.props.maxEmojis);
+    exactMatch = partialMatch = null;
+    this.maxFound = found.length;
+    this.found = found;
+    if (!found || found.length === 0) {
+      queueMicrotask(() => {
+        self.props.onCancel();
+      });
+      return null;
+    }
+    const emojisDomList = [];
+    for (var i = 0; i < found.length; i++) {
+      const meta = found[i];
+      const filename = twemoji.convert.toCodePoint(meta.u);
+      emojisDomList.push(REaCt().createElement("div", {
+        className: `emoji-preview shadow ${  this.state.selected === i ? "active" : ""}`,
+        key: `${meta.n  }_${  this.state.selected === i ? "selected" : "inselected"}`,
+        title: `:${  meta.n  }:`,
+        onClick (e) {
+          self.props.onSelect(e, e.target.title);
+          self.unbindKeyEvents();
+        }
+      }, REaCt().createElement("img", {
+        width: "20",
+        height: "20",
+        className: "emoji emoji-loading",
+        draggable: "false",
+        alt: meta.u,
+        onLoad: e => {
+          e.target.classList.remove('emoji-loading');
+        },
+        onError: e => {
+          e.target.classList.remove('emoji-loading');
+          e.target.classList.add('emoji-loading-error');
+        },
+        src: `${staticpath  }images/mega/twemojis/2_v2/72x72/${  filename  }.png`
+      }), REaCt().createElement("div", {
+        className: "emoji title"
+      }, `:${  meta.n  }:`)));
+    }
+    return REaCt().createElement("div", {
+      ref: this.domRef,
+      className: "textarea-autofill-bl"
+    }, REaCt().createElement(utils.P9, {
+      tag: "div",
+      className: "textarea-autofill-info"
+    }, l.emoji_suggestion_instruction), REaCt().createElement("div", {
+      className: "textarea-autofill-emoji"
+    }, emojisDomList));
+  }
+}
+EmojiAutocomplete.defaultProps = {
+  'requiresUpdateOnResize': true,
+  'emojiSearchQuery': false,
+  'disableCheckingVisibility': true,
+  'maxEmojis': 12
+};
+// EXTERNAL MODULE: ./js/chat/ui/gifPanel/gifPanel.jsx + 3 modules
+const gifPanel = REQ_(691);
+// EXTERNAL MODULE: ./js/ui/perfectScrollbar.jsx
+const perfectScrollbar = REQ_(486);
+;// ./js/chat/ui/typingArea.jsx
+
+let _dec, _class;
+
+
+
+
+
+
+
+
+const TypingArea = (_dec = (0,mixins.hG)(54, true), _class = class TypingArea extends mixins.w9 {
+  constructor(props) {
+    super(props);
+    this.domRef = REaCt().createRef();
+    this.state = {
+      emojiSearchQuery: false,
+      typedMessage: '',
+      textareaHeight: 20,
+      gifPanelActive: false
+    };
+    this.getTextareaMaxHeight = () => {
+      const {
+        containerRef
+      } = this.props;
+      if (containerRef && containerRef.current) {
+        return this.isMounted() ? containerRef.current.offsetHeight * 0.4 : 100;
+      }
+      return 100;
+    };
+    const {
+      chatRoom
+    } = props;
+    this.logger = d && MegaLogger.getLogger("TypingArea", {}, chatRoom && chatRoom.logger || megaChat.logger);
+    this.onEmojiClicked = this.onEmojiClicked.bind(this);
+    this.onTypeAreaKeyUp = this.onTypeAreaKeyUp.bind(this);
+    this.onTypeAreaKeyDown = this.onTypeAreaKeyDown.bind(this);
+    this.onTypeAreaBlur = this.onTypeAreaBlur.bind(this);
+    this.onTypeAreaChange = this.onTypeAreaChange.bind(this);
+    this.onCopyCapture = this.onCopyCapture.bind(this);
+    this.onPasteCapture = this.onPasteCapture.bind(this);
+    this.onCutCapture = this.onCutCapture.bind(this);
+    this.state.typedMessage = this.props.initialText || '';
+  }
+  onEmojiClicked(e, slug) {
+    if (this.props.disabled) {
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
+    slug = slug[0] === ':' || slug.substr(-1) === ':' ? slug : `:${slug}:`;
+    const textarea = $('.messages-textarea', this.domRef.current)[0];
+    const cursorPosition = this.getCursorPosition(textarea);
+    this.setState({
+      typedMessage: this.state.typedMessage.slice(0, cursorPosition) + slug + this.state.typedMessage.slice(cursorPosition)
+    }, () => {
+      textarea.selectionEnd = cursorPosition + slug.length;
+      this.onTypeAreaChange(e, this.state.typedMessage);
+    });
+  }
+  stoppedTyping() {
+    if (this.props.disabled || !this.props.chatRoom) {
+      return;
+    }
+    this.iAmTyping = false;
+    this.props.chatRoom.trigger('stoppedTyping');
+  }
+  typing() {
+    if (this.props.disabled || !this.props.chatRoom) {
+      return;
+    }
+    const self = this;
+    const now = Date.now();
+    delay(this.getReactId(), () => self.iAmTyping && self.stoppedTyping(), 4e3);
+    if (!self.iAmTyping || now - self.lastTypingStamp > 4e3) {
+      self.iAmTyping = true;
+      self.lastTypingStamp = now;
+      self.props.chatRoom.trigger('typing');
+    }
+  }
+  triggerOnUpdate(forced) {
+    const self = this;
+    if (!self.props.onUpdate || !self.isMounted()) {
+      return;
+    }
+    let shouldTriggerUpdate = forced ? forced : false;
+    if (!shouldTriggerUpdate && self.state.typedMessage !== self.lastTypedMessage) {
+      self.lastTypedMessage = self.state.typedMessage;
+      shouldTriggerUpdate = true;
+    }
+    if (!shouldTriggerUpdate) {
+      const $textarea = $('.chat-textarea:visible textarea:visible', self.domRef.current);
+      if (!self._lastTextareaHeight || self._lastTextareaHeight !== $textarea.height()) {
+        self._lastTextareaHeight = $textarea.height();
+        shouldTriggerUpdate = true;
+        if (self.props.onResized) {
+          self.props.onResized();
+        }
+      }
+    }
+    if (shouldTriggerUpdate) {
+      self.props.onUpdate();
+    }
+  }
+  onCancelClicked() {
+    const self = this;
+    self.setState({
+      typedMessage: ""
+    });
+    if (self.props.chatRoom && self.iAmTyping) {
+      self.stoppedTyping();
+    }
+    self.onConfirmTrigger(false);
+    self.triggerOnUpdate();
+  }
+  onSaveClicked() {
+    const self = this;
+    if (self.props.disabled || !self.isMounted()) {
+      return;
+    }
+    const val = $.trim($('.chat-textarea:visible textarea:visible', this.domRef.current).val());
+    if (self.onConfirmTrigger(val) !== true) {
+      self.setState({
+        typedMessage: ""
+      });
+    }
+    if (self.props.chatRoom && self.iAmTyping) {
+      self.stoppedTyping();
+    }
+    self.triggerOnUpdate();
+  }
+  onConfirmTrigger(val) {
+    const {
+      onConfirm,
+      persist,
+      chatRoom
+    } = this.props;
+    const result = onConfirm(val);
+    if (val !== false && result !== false) {
+      $('.textarea-scroll', this.domRef.current).scrollTop(0);
+    }
+    if (persist) {
+      const {
+        persistedTypeArea
+      } = chatRoom.megaChat.plugins;
+      if (persistedTypeArea) {
+        if (d > 2) {
+          this.logger.info('Removing persisted-typed value...');
+        }
+        persistedTypeArea.removePersistedTypedValue(chatRoom);
+      }
+    }
+    return result;
+  }
+  onTypeAreaKeyDown(e) {
+    if (this.props.disabled) {
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
+    const self = this;
+    const key = e.keyCode || e.which;
+    const element = e.target;
+    const val = $.trim(element.value);
+    if (self.state.emojiSearchQuery) {
+      return;
+    }
+    if (key === 13 && !e.shiftKey && !e.ctrlKey && !e.altKey) {
+      if (e.isPropagationStopped() || e.isDefaultPrevented()) {
+        return;
+      }
+      if (self.onConfirmTrigger(val) !== true) {
+        self.setState({
+          typedMessage: ""
+        });
+        $(document).trigger('closeDropdowns');
+      }
+      e.preventDefault();
+      e.stopPropagation();
+      if (self.props.chatRoom && self.iAmTyping) {
+        self.stoppedTyping();
+      }
+    }
+  }
+  onTypeAreaKeyUp(e) {
+    if (this.props.disabled) {
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
+    const self = this;
+    const key = e.keyCode || e.which;
+    const element = e.target;
+    const val = $.trim(element.value);
+    if (key === 13 && !e.shiftKey && !e.ctrlKey && !e.altKey) {
+      e.preventDefault();
+      e.stopPropagation();
+    } else if (key === 13) {
+      if (self.state.emojiSearchQuery) {
+        return;
+      }
+      if (e.altKey) {
+        let content = element.value;
+        const cursorPos = self.getCursorPosition(element);
+        content = `${content.substring(0, cursorPos)  }\n${  content.substring(cursorPos, content.length)}`;
+        self.setState({
+          typedMessage: content
+        });
+        self.onUpdateCursorPosition = cursorPos + 1;
+        e.preventDefault();
+      } else if ($.trim(val).length === 0) {
+        e.preventDefault();
+      }
+    } else if (key === 38) {
+      if (self.state.emojiSearchQuery) {
+        return;
+      }
+      if ($.trim(val).length === 0) {
+        if (self.props.onUpEditPressed && self.props.onUpEditPressed() === true) {
+          e.preventDefault();
+        }
+      }
+    } else if (key === 27) {
+      if (self.state.emojiSearchQuery) {
+        return;
+      }
+      if (self.props.showButtons === true) {
+        e.preventDefault();
+        self.onCancelClicked(e);
+      }
+    } else {
+      if (self.prefillMode && (key === 8 || key === 32 || key === 186 || key === 13)) {
+        self.prefillMode = false;
+      }
+      const currentContent = element.value;
+      const currentCursorPos = self.getCursorPosition(element) - 1;
+      if (self.prefillMode && (currentCursorPos > self.state.emojiEndPos || currentCursorPos < self.state.emojiStartPos)) {
+        self.prefillMode = false;
+        self.setState({
+          'emojiSearchQuery': false,
+          'emojiStartPos': false,
+          'emojiEndPos': false
+        });
+        return;
+      }
+      if (self.prefillMode) {
+        return;
+      }
+      const char = String.fromCharCode(key);
+      if (key === 16 || key === 17 || key === 18 || key === 91 || key === 8 || key === 37 || key === 39 || key === 40 || key === 38 || key === 9 || /[\w:-]/.test(char)) {
+        const parsedResult = mega.utils.emojiCodeParser(currentContent, currentCursorPos);
+        self.setState({
+          'emojiSearchQuery': parsedResult[0],
+          'emojiStartPos': parsedResult[1],
+          'emojiEndPos': parsedResult[2]
+        });
+        return;
+      }
+      if (self.state.emojiSearchQuery) {
+        self.setState({
+          'emojiSearchQuery': false
+        });
+      }
+    }
+  }
+  onTypeAreaBlur(e) {
+    if (this.props.disabled) {
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
+    const self = this;
+    if (self.state.emojiSearchQuery) {
+      setTimeout(() => {
+        if (self.isMounted()) {
+          self.setState({
+            'emojiSearchQuery': false,
+            'emojiStartPos': false,
+            'emojiEndPos': false
+          });
+        }
+      }, 300);
+    }
+  }
+  onTypeAreaChange(e, value) {
+    if (this.props.disabled) {
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
+    const self = this;
+    value = String(value || e.target.value || '').replace(/^\s+/, '');
+    if (self.state.typedMessage !== value) {
+      self.setState({
+        typedMessage: value
+      });
+      self.forceUpdate();
+    }
+    if (value.length) {
+      self.typing();
+    } else {
+      self.stoppedTyping();
+    }
+    if (this.props.persist) {
+      const {
+        chatRoom
+      } = this.props;
+      const {
+        megaChat
+      } = chatRoom;
+      const {
+        persistedTypeArea
+      } = megaChat.plugins;
+      if (persistedTypeArea) {
+        if (d > 2) {
+          this.logger.debug('%s persisted-typed value...', value.length ? 'Updating' : 'Removing');
+        }
+        if (value.length) {
+          persistedTypeArea.updatePersistedTypedValue(chatRoom, value);
+        } else {
+          persistedTypeArea.removePersistedTypedValue(chatRoom);
+        }
+      }
+    }
+    self.updateScroll();
+  }
+  focusTypeArea() {
+    if (this.props.disabled) {
+      return;
+    }
+    if ($('.chat-textarea:visible textarea:visible', this.domRef.current).length > 0 && !$('.chat-textarea:visible textarea:visible:first', this.domRef.current).is(":focus")) {
+      moveCursortoToEnd($('.chat-textarea:visible:first textarea', this.domRef.current)[0]);
+    }
+  }
+  componentDidMount() {
+    super.componentDidMount();
+    this._lastTextareaHeight = 20;
+    this.lastTypedMessage = this.props.initialText || this.lastTypedMessage;
+    chatGlobalEventManager.addEventListener('resize', `typingArea${this.getUniqueId()}`, () => this.handleWindowResize());
+    this.triggerOnUpdate(true);
+    this.updateScroll();
+    megaChat.rebind(`viewstateChange.gifpanel${this.getUniqueId()}`, e => {
+      const {
+        gifPanelActive
+      } = this.state;
+      const {
+        state
+      } = e.data;
+      if (state === 'active' && !gifPanelActive && this.gifResume) {
+        this.setState({
+          gifPanelActive: true
+        });
+        delete this.gifResume;
+      } else if (state !== 'active' && gifPanelActive && !this.gifResume) {
+        this.gifResume = true;
+        this.setState({
+          gifPanelActive: false
+        });
+      }
+    });
+  }
+  UNSAFE_componentWillMount() {
+    const {
+      chatRoom,
+      initialText,
+      persist
+    } = this.props;
+    const {
+      megaChat,
+      roomId
+    } = chatRoom;
+    const {
+      persistedTypeArea
+    } = megaChat.plugins;
+    if (persist && persistedTypeArea) {
+      if (!initialText) {
+        persistedTypeArea.getPersistedTypedValue(chatRoom).then(res => {
+          if (res && this.isMounted() && !this.state.typedMessage) {
+            this.setState({
+              'typedMessage': res
+            });
+          }
+        }).catch(ex => {
+          if (this.logger && ex !== undefined) {
+            this.logger.warn(`Failed to retrieve persistedTypeArea for ${roomId}: ${ex}`, [ex]);
+          }
+        });
+      }
+      persistedTypeArea.addChangeListener(this.getUniqueId(), (e, k, v) => {
+        if (roomId === k) {
+          this.setState({
+            'typedMessage': v || ''
+          });
+          this.triggerOnUpdate(true);
+        }
+      });
+    }
+  }
+  componentWillUnmount() {
+    super.componentWillUnmount();
+    const self = this;
+    self.triggerOnUpdate();
+    if (megaChat.plugins.persistedTypeArea) {
+      megaChat.plugins.persistedTypeArea.removeChangeListener(self.getUniqueId());
+    }
+    chatGlobalEventManager.removeEventListener('resize', `typingArea${  self.getUniqueId()}`);
+    megaChat.off(`viewstateChange.gifpanel${this.getUniqueId()}`);
+  }
+  componentDidUpdate() {
+    if (this.isComponentEventuallyVisible() && !window.getSelection().toString() && $('textarea:focus,select:focus,input:focus').filter(":visible").length === 0) {
+      this.focusTypeArea();
+    }
+    this.updateScroll();
+    if (this.onUpdateCursorPosition) {
+      const el = $('.chat-textarea:visible:first textarea:visible', this.domRef.current)[0];
+      el.selectionStart = el.selectionEnd = this.onUpdateCursorPosition;
+      this.onUpdateCursorPosition = false;
+    }
+  }
+  updateScroll() {
+    if (!this.isComponentEventuallyVisible() || !this.$node && !this.domRef && !this.domRef.current) {
+      return;
+    }
+    const $node = this.$node = this.$node || this.domRef.current;
+    const $textarea = this.$textarea = this.$textarea || $('textarea:first', $node);
+    const $scrollBlock = this.$scrollBlock = this.$scrollBlock || $textarea.closest('.textarea-scroll');
+    const $preview = $('.message-preview', $scrollBlock).safeHTML(`${megaChat.html($textarea.val()).replace(/\n/g, '<br />')} <br>`);
+    const textareaHeight = $preview.height();
+    $scrollBlock.height(Math.min(textareaHeight, this.getTextareaMaxHeight()));
+    if (textareaHeight !== this._lastTextareaHeight) {
+      this._lastTextareaHeight = textareaHeight;
+      this.setState({
+        textareaHeight
+      });
+      if (this.props.onResized) {
+        this.props.onResized();
+      }
+      $textarea.height(textareaHeight);
+    }
+    if (this.textareaScroll) {
+      this.textareaScroll.reinitialise();
+    }
+  }
+  getCursorPosition(el) {
+    let pos = 0;
+    if ('selectionStart' in el) {
+      pos = el.selectionStart;
+    } else if ('selection' in document) {
+      el.focus();
+      const sel = document.selection.createRange(),
+        selLength = document.selection.createRange().text.length;
+      sel.moveStart('character', -el.value.length);
+      pos = sel.text.length - selLength;
+    }
+    return pos;
+  }
+  customIsEventuallyVisible() {
+    return this.props.chatRoom.isCurrentlyActive;
+  }
+  handleWindowResize(e) {
+    if (!this.isComponentEventuallyVisible()) {
+      return;
+    }
+    if (e) {
+      this.updateScroll();
+    }
+    this.triggerOnUpdate();
+  }
+  isActive() {
+    return document.hasFocus() && this.$messages && this.$messages.is(":visible");
+  }
+  resetPrefillMode() {
+    this.prefillMode = false;
+  }
+  onCopyCapture() {
+    this.resetPrefillMode();
+  }
+  onCutCapture() {
+    this.resetPrefillMode();
+  }
+  onPasteCapture() {
+    this.resetPrefillMode();
+  }
+  render() {
+    const self = this;
+    const room = this.props.chatRoom;
+    let buttons = null;
+    if (self.props.showButtons === true) {
+      buttons = [REaCt().createElement(ui_buttons.$, {
+        key: "save",
+        className: `${"mega-button right"} positive`,
+        label: l[776],
+        onClick: self.onSaveClicked.bind(self)
+      }), REaCt().createElement(ui_buttons.$, {
+        key: "cancel",
+        className: "mega-button right",
+        label: l[1718],
+        onClick: self.onCancelClicked.bind(self)
+      })];
+    }
+    const textareaStyles = {
+      height: self.state.textareaHeight
+    };
+    const textareaScrollBlockStyles = {};
+    const newHeight = Math.min(self.state.textareaHeight, self.getTextareaMaxHeight());
+    if (newHeight > 0) {
+      textareaScrollBlockStyles.height = newHeight;
+    }
+    let emojiAutocomplete = null;
+    if (self.state.emojiSearchQuery) {
+      emojiAutocomplete = REaCt().createElement(EmojiAutocomplete, {
+        emojiSearchQuery: self.state.emojiSearchQuery,
+        emojiStartPos: self.state.emojiStartPos,
+        emojiEndPos: self.state.emojiEndPos,
+        typedMessage: self.state.typedMessage,
+        onPrefill (e, emojiAlias) {
+          if ($.isNumeric(self.state.emojiStartPos) && $.isNumeric(self.state.emojiEndPos)) {
+            const msg = self.state.typedMessage;
+            const pre = msg.substr(0, self.state.emojiStartPos);
+            let post = msg.substr(self.state.emojiEndPos + 1, msg.length);
+            const startPos = self.state.emojiStartPos;
+            const fwdPos = startPos + emojiAlias.length;
+            let endPos = fwdPos;
+            self.onUpdateCursorPosition = fwdPos;
+            self.prefillMode = true;
+            if (post.substr(0, 2) == "::" && emojiAlias.substr(-1) == ":") {
+              emojiAlias = emojiAlias.substr(0, emojiAlias.length - 1);
+              endPos -= 1;
+            } else {
+              post = post ? post.substr(0, 1) !== " " ? ` ${  post}` : post : " ";
+              self.onUpdateCursorPosition++;
+            }
+            self.setState({
+              'typedMessage': pre + emojiAlias + post,
+              'emojiEndPos': endPos
+            });
+          }
+        },
+        onSelect (e, emojiAlias, forceSend) {
+          if ($.isNumeric(self.state.emojiStartPos) && $.isNumeric(self.state.emojiEndPos)) {
+            const msg = self.state.typedMessage;
+            const pre = msg.substr(0, self.state.emojiStartPos);
+            let post = msg.substr(self.state.emojiEndPos + 1, msg.length);
+            if (post.substr(0, 2) == "::" && emojiAlias.substr(-1) == ":") {
+              emojiAlias = emojiAlias.substr(0, emojiAlias.length - 1);
+            } else {
+              post = post ? post.substr(0, 1) !== " " ? ` ${  post}` : post : " ";
+            }
+            const val = pre + emojiAlias + post;
+            self.prefillMode = false;
+            self.setState({
+              'typedMessage': val,
+              'emojiSearchQuery': false,
+              'emojiStartPos': false,
+              'emojiEndPos': false
+            });
+            if (forceSend) {
+              if (self.onConfirmTrigger($.trim(val)) !== true) {
+                self.setState({
+                  typedMessage: ""
+                });
+              }
+            }
+          }
+        },
+        onCancel () {
+          self.prefillMode = false;
+          self.setState({
+            'emojiSearchQuery': false,
+            'emojiStartPos': false,
+            'emojiEndPos': false
+          });
+        }
+      });
+    }
+    const disabledTextarea = !!(room.pubCu25519KeyIsMissing === true || this.props.disabled);
+    return REaCt().createElement("div", {
+      ref: this.domRef,
+      className: `
+                    typingarea-component
+                    ${this.props.className}
+                `
+    }, this.state.gifPanelActive && REaCt().createElement(gifPanel.Ay, {
+      chatRoom: this.props.chatRoom,
+      onToggle: () => {
+        this.setState({
+          gifPanelActive: false
+        });
+        delete this.gifResume;
+      }
+    }), REaCt().createElement("div", {
+      className: `
+                        chat-textarea
+                        ${this.props.className}
+                    `
+    }, emojiAutocomplete, self.props.children, self.props.editing ? null : REaCt().createElement(ui_buttons.$, {
+      className: `
+                                popup-button
+                                gif-button
+                                ${this.state.gifPanelActive ? 'active' : ''}
+                            `,
+      icon: "small-icon gif",
+      disabled: this.props.disabled,
+      onClick: () => this.setState(state => {
+        delete this.gifResume;
+        return {
+          gifPanelActive: !state.gifPanelActive
+        };
+      })
+    }), REaCt().createElement(ui_buttons.$, {
+      className: "popup-button emoji-button",
+      icon: "sprite-fm-theme icon-emoji",
+      iconHovered: "sprite-fm-theme icon-emoji-active",
+      disabled: this.props.disabled
+    }, REaCt().createElement(emojiDropdown.L, {
+      className: "popup emoji",
+      vertOffset: 17,
+      onClick: this.onEmojiClicked
+    })), REaCt().createElement("hr", null), REaCt().createElement(perfectScrollbar.O, {
+      chatRoom: self.props.chatRoom,
+      className: "chat-textarea-scroll textarea-scroll",
+      options: {
+        'suppressScrollX': true
+      },
+      style: textareaScrollBlockStyles,
+      ref: ref => {
+        self.textareaScroll = ref;
+      }
+    }, REaCt().createElement("div", {
+      className: "messages-textarea-placeholder"
+    }, self.state.typedMessage ? null : REaCt().createElement(utils.zT, null, (l[18763] || `Write message to \u201c%s\u201d\u2026`).replace('%s', room.getRoomTitle()))), REaCt().createElement("textarea", {
+      className: `
+                                ${"messages-textarea"}
+                                ${disabledTextarea ? 'disabled' : ''}
+                            `,
+      onKeyUp: this.onTypeAreaKeyUp,
+      onKeyDown: this.onTypeAreaKeyDown,
+      onBlur: this.onTypeAreaBlur,
+      onChange: this.onTypeAreaChange,
+      onCopyCapture: this.onCopyCapture,
+      onPasteCapture: this.onPasteCapture,
+      onCutCapture: this.onCutCapture,
+      value: self.state.typedMessage,
+      style: textareaStyles,
+      disabled: disabledTextarea,
+      readOnly: disabledTextarea
+    }), REaCt().createElement("div", {
+      className: "message-preview"
+    }))), buttons);
+  }
+}, (0,applyDecoratedDescriptor.A)(_class.prototype, "handleWindowResize", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "handleWindowResize"), _class.prototype), _class);
+
+},
+
+814:
+(_, EXP_, REQ_) => {
+
+"use strict";
+
+// EXPORTS
+REQ_.d(EXP_, {
+  A: () => HistoryPanel
+});
+
+// EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/esm/applyDecoratedDescriptor.js
+const applyDecoratedDescriptor = REQ_(793);
+// EXTERNAL MODULE: external "React"
+const React_ = REQ_(594);
+const REaCt = REQ_.n(React_);
+// EXTERNAL MODULE: ./js/chat/mixins.js
+const mixins = REQ_(137);
+// EXTERNAL MODULE: ./js/ui/utils.jsx
+const utils = REQ_(314);
+;// ./js/chat/ui/messages/alterParticipants.jsx
+const React = REQ_(594);
+const ContactsUI = REQ_(251);
+const ConversationMessageMixin = REQ_(446).M;
+
+class AltPartsConvMessage extends ConversationMessageMixin {
+  haveMoreContactListeners() {
+    if (!this.props.message || !this.props.message.meta) {
+      return false;
+    }
+    const {
+      included,
+      excluded
+    } = this.props.message.meta;
+    return array.unique([...included || [], ...excluded || []]);
+  }
+  render() {
+    const self = this;
+    const {message} = this.props;
+    const contact = self.getContact();
+    const timestampInt = self.getTimestamp();
+    const timestamp = self.getTimestampAsString();
+    const datetime = React.createElement("div", {
+      className: "message date-time simpletip",
+      "data-simpletip": time2date(timestampInt, 17)
+    }, timestamp);
+    let displayName;
+    if (contact) {
+      displayName = M.getNameByHandle(contact.u);
+    } else {
+      displayName = contact;
+    }
+    const messages = [];
+    message.meta.included.forEach((h) => {
+      const otherContact = M.u[h] ? M.u[h] : {
+        'u': h,
+        h,
+        'c': 0
+      };
+      const avatar = React.createElement(ContactsUI.Avatar, {
+        contact: otherContact,
+        chatRoom: self.props.chatRoom,
+        className: "message avatar-wrapper small-rounded-avatar"
+      });
+      const otherDisplayName = M.getNameByHandle(otherContact.u);
+      const isSelfJoin = h === contact.u;
+      let text = isSelfJoin ? l[23756] : l[8907];
+      if (self.props.chatRoom.isMeeting) {
+        text = isSelfJoin ? l.meeting_mgmt_user_joined : l.meeting_mgmt_user_added;
+      }
+      text = text.replace('%1', megaChat.html(otherDisplayName));
+      if (!isSelfJoin) {
+        text = text.replace('%2', `<strong>${megaChat.html(displayName)}</strong>`);
+      }
+      messages.push(React.createElement("div", {
+        className: "message body",
+        "data-id": `id${  message.messageId}`,
+        key: `${message.messageId  }_${  h}`
+      }, avatar, React.createElement("div", {
+        className: "message content-area small-info-txt selectable-txt"
+      }, React.createElement(ContactsUI.ContactButton, {
+        className: "message",
+        contact: otherContact,
+        chatRoom: self.props.chatRoom,
+        label: React.createElement(utils.zT, null, otherDisplayName)
+      }), datetime, React.createElement("div", {
+        className: "message text-block"
+      }, React.createElement(utils.P9, null, text)))));
+    });
+    message.meta.excluded.forEach((h) => {
+      const otherContact = M.u[h] ? M.u[h] : {
+        'u': h,
+        h,
+        'c': 0
+      };
+      const avatar = React.createElement(ContactsUI.Avatar, {
+        contact: otherContact,
+        chatRoom: self.props.chatRoom,
+        className: "message avatar-wrapper small-rounded-avatar"
+      });
+      const otherDisplayName = M.getNameByHandle(otherContact.u);
+      let text;
+      if (otherContact.u === contact.u) {
+        text = self.props.chatRoom.isMeeting ? l.meeting_mgmt_left : l[8908];
+      } else {
+        text = (self.props.chatRoom.isMeeting ? l.meeting_mgmt_kicked : l[8906]).replace("%s", `<strong>${megaChat.html(displayName)}</strong>`);
+      }
+      messages.push(React.createElement("div", {
+        className: "message body",
+        "data-id": `id${  message.messageId}`,
+        key: `${message.messageId  }_${  h}`
+      }, avatar, React.createElement("div", {
+        className: "message content-area small-info-txt selectable-txt"
+      }, React.createElement(ContactsUI.ContactButton, {
+        className: "message",
+        chatRoom: self.props.chatRoom,
+        contact: otherContact,
+        label: React.createElement(utils.zT, null, otherDisplayName)
+      }), datetime, React.createElement("div", {
+        className: "message text-block"
+      }, React.createElement(utils.P9, null, text)))));
+    });
+    return React.createElement("div", null, messages);
+  }
+}
+
+;// ./js/chat/ui/messages/truncated.jsx
+const truncated_React = REQ_(594);
+const truncated_ContactsUI = REQ_(251);
+const truncated_ConversationMessageMixin = REQ_(446).M;
+
+class TruncatedMessage extends truncated_ConversationMessageMixin {
+  render() {
+    const self = this;
+    let cssClasses = "message body";
+    const {message} = this.props;
+    const {chatRoom} = this.props.message;
+    const contact = self.getContact();
+    const timestampInt = self.getTimestamp();
+    const timestamp = self.getTimestampAsString();
+    let datetime = truncated_React.createElement("div", {
+      className: "message date-time simpletip",
+      "data-simpletip": time2date(timestampInt, 17)
+    }, timestamp);
+    let displayName;
+    if (contact) {
+      displayName = M.getNameByHandle(contact.u);
+    } else {
+      displayName = contact;
+    }
+    let avatar = null;
+    if (this.props.grouped) {
+      cssClasses += " grouped";
+    } else {
+      avatar = truncated_React.createElement(truncated_ContactsUI.Avatar, {
+        contact,
+        className: "message avatar-wrapper small-rounded-avatar",
+        chatRoom
+      });
+      datetime = truncated_React.createElement("div", {
+        className: "message date-time simpletip",
+        "data-simpletip": time2date(timestampInt, 17)
+      }, timestamp);
+    }
+    return truncated_React.createElement("div", {
+      className: cssClasses,
+      "data-id": `id${  message.messageId}`,
+      key: message.messageId
+    }, avatar, truncated_React.createElement("div", {
+      className: "message content-area small-info-txt selectable-txt"
+    }, truncated_React.createElement(truncated_ContactsUI.ContactButton, {
+      contact,
+      className: "message",
+      label: truncated_React.createElement(utils.zT, null, displayName),
+      chatRoom
+    }), datetime, truncated_React.createElement("div", {
+      className: "message text-block"
+    }, l[8905])));
+  }
+}
+
+;// ./js/chat/ui/messages/privilegeChange.jsx
+const privilegeChange_React = REQ_(594);
+const privilegeChange_ContactsUI = REQ_(251);
+const privilegeChange_ConversationMessageMixin = REQ_(446).M;
+
+class PrivilegeChange extends privilegeChange_ConversationMessageMixin {
+  haveMoreContactListeners() {
+    if (!this.props.message.meta || !this.props.message.meta.targetUserId) {
+      return false;
+    }
+    const uid = this.props.message.meta.targetUserId;
+    if (uid && M.u[uid]) {
+      return uid;
+    }
+    return false;
+  }
+  render() {
+    const self = this;
+    const {message} = this.props;
+    const {chatRoom} = this.props.message;
+    const contact = self.getContact();
+    const timestampInt = self.getTimestamp();
+    const timestamp = self.getTimestampAsString();
+    const datetime = privilegeChange_React.createElement("div", {
+      className: "message date-time simpletip",
+      "data-simpletip": time2date(timestampInt, 17)
+    }, timestamp);
+    let displayName;
+    if (contact) {
+      displayName = M.getNameByHandle(contact.u);
+    } else {
+      displayName = contact;
+    }
+    const messages = [];
+    const otherContact = M.u[message.meta.targetUserId] ? M.u[message.meta.targetUserId] : {
+      'u': message.meta.targetUserId,
+      'h': message.meta.targetUserId,
+      'c': 0
+    };
+    const avatar = privilegeChange_React.createElement(privilegeChange_ContactsUI.Avatar, {
+      contact: otherContact,
+      className: "message avatar-wrapper small-rounded-avatar",
+      chatRoom
+    });
+    const otherDisplayName = M.getNameByHandle(otherContact.u);
+    let newPrivilegeText = "";
+    if (message.meta.privilege === 3) {
+      newPrivilegeText = l.priv_change_to_op;
+    } else if (message.meta.privilege === 2) {
+      newPrivilegeText = l.priv_change_to_std;
+    } else if (message.meta.privilege === 0) {
+      newPrivilegeText = l.priv_change_to_ro;
+    }
+    const text = newPrivilegeText.replace('[S]', '<strong>').replace('[/S]', '</strong>').replace('%s', `<strong>${megaChat.html(displayName)}</strong>`);
+    messages.push(privilegeChange_React.createElement("div", {
+      className: "message body",
+      "data-id": `id${  message.messageId}`,
+      key: message.messageId
+    }, avatar, privilegeChange_React.createElement("div", {
+      className: "message content-area small-info-txt selectable-txt"
+    }, privilegeChange_React.createElement(privilegeChange_ContactsUI.ContactButton, {
+      className: "message",
+      chatRoom: self.props.chatRoom,
+      contact: otherContact,
+      label: privilegeChange_React.createElement(utils.zT, null, otherDisplayName)
+    }), datetime, privilegeChange_React.createElement("div", {
+      className: "message text-block"
+    }, privilegeChange_React.createElement(utils.P9, null, text)))));
+    return privilegeChange_React.createElement("div", null, messages);
+  }
+}
+
+;// ./js/chat/ui/messages/topicChange.jsx
+const topicChange_React = REQ_(594);
+const topicChange_ContactsUI = REQ_(251);
+const topicChange_ConversationMessageMixin = REQ_(446).M;
+
+class TopicChange extends topicChange_ConversationMessageMixin {
+  render() {
+    const self = this;
+    const {message} = this.props;
+    const {megaChat} = this.props.message.chatRoom;
+    const {chatRoom} = this.props.message;
+    if (message.meta.isScheduled) {
+      return null;
+    }
+    const contact = self.getContact();
+    const timestampInt = self.getTimestamp();
+    const timestamp = self.getTimestampAsString();
+    const datetime = topicChange_React.createElement("div", {
+      className: "message date-time simpletip",
+      "data-simpletip": time2date(timestampInt, 17)
+    }, timestamp);
+    let displayName;
+    if (contact) {
+      displayName = M.getNameByHandle(contact.u);
+    } else {
+      displayName = contact;
+    }
+    const messages = [];
+    const avatar = topicChange_React.createElement(topicChange_ContactsUI.Avatar, {
+      contact,
+      chatRoom,
+      className: "message avatar-wrapper small-rounded-avatar"
+    });
+    const topic = megaChat.html(message.meta.topic);
+    const oldTopic = megaChat.html(message.meta.oldTopic) || '';
+    messages.push(topicChange_React.createElement("div", {
+      className: "message body",
+      "data-id": `id${  message.messageId}`,
+      key: message.messageId
+    }, avatar, topicChange_React.createElement("div", {
+      className: "message content-area small-info-txt selectable-txt"
+    }, topicChange_React.createElement(topicChange_ContactsUI.ContactButton, {
+      className: "message",
+      chatRoom,
+      contact,
+      label: topicChange_React.createElement(utils.zT, null, displayName)
+    }), datetime, topicChange_React.createElement("div", {
+      className: "message text-block"
+    }, topicChange_React.createElement(utils.P9, null, (chatRoom.scheduledMeeting ? l.schedule_mgmt_title.replace('%1', `<strong>${oldTopic}</strong>`) : l[9081]).replace('%s', `<strong>${topic}</strong>`))))));
+    return topicChange_React.createElement("div", null, messages);
+  }
+}
+
+;// ./js/chat/ui/messages/closeOpenMode.jsx
+const closeOpenMode_React = REQ_(594);
+const closeOpenMode_ContactsUI = REQ_(251);
+const closeOpenMode_ConversationMessageMixin = REQ_(446).M;
+
+class CloseOpenModeMessage extends closeOpenMode_ConversationMessageMixin {
+  render() {
+    const self = this;
+    let cssClasses = "message body";
+    const {message} = this.props;
+    const contact = self.getContact();
+    const timestampInt = self.getTimestamp();
+    const timestamp = self.getTimestampAsString();
+    let datetime = closeOpenMode_React.createElement("div", {
+      className: "message date-time",
+      title: time2date(timestampInt)
+    }, timestamp);
+    let displayName;
+    if (contact) {
+      displayName = M.getNameByHandle(contact.u);
+    } else {
+      displayName = contact;
+    }
+    let avatar = null;
+    if (this.props.grouped) {
+      cssClasses += " grouped";
+    } else {
+      avatar = closeOpenMode_React.createElement(closeOpenMode_ContactsUI.Avatar, {
+        contact,
+        className: "message  avatar-wrapper small-rounded-avatar",
+        chatRoom: this.props.chatRoom
+      });
+      datetime = closeOpenMode_React.createElement("div", {
+        className: "message date-time",
+        title: time2date(timestampInt)
+      }, timestamp);
+    }
+    return closeOpenMode_React.createElement("div", {
+      className: cssClasses,
+      "data-id": `id${  message.messageId}`,
+      key: message.messageId
+    }, avatar, closeOpenMode_React.createElement("div", {
+      className: "message content-area small-info-txt selectable-txt"
+    }, closeOpenMode_React.createElement("div", {
+      className: "message user-card-name"
+    }, closeOpenMode_React.createElement(utils.zT, null, displayName)), datetime, closeOpenMode_React.createElement("div", {
+      className: "message text-block"
+    }, l[20569])));
+  }
+}
+
+;// ./js/chat/ui/messages/chatHandle.jsx
+const chatHandle_React = REQ_(594);
+const chatHandle_ContactsUI = REQ_(251);
+const chatHandle_ConversationMessageMixin = REQ_(446).M;
+
+class ChatHandleMessage extends chatHandle_ConversationMessageMixin {
+  render() {
+    const self = this;
+    let cssClasses = "message body";
+    const {message} = this.props;
+    const contact = self.getContact();
+    const timestampInt = self.getTimestamp();
+    const timestamp = self.getTimestampAsString();
+    let datetime = chatHandle_React.createElement("div", {
+      className: "message date-time",
+      title: time2date(timestampInt)
+    }, timestamp);
+    let displayName;
+    if (contact) {
+      displayName = M.getNameByHandle(contact.u);
+    } else {
+      displayName = contact;
+    }
+    let avatar = null;
+    if (this.props.grouped) {
+      cssClasses += " grouped";
+    } else {
+      avatar = chatHandle_React.createElement(chatHandle_ContactsUI.Avatar, {
+        contact,
+        className: "message  avatar-wrapper small-rounded-avatar",
+        chatRoom: this.props.chatRoom
+      });
+      datetime = chatHandle_React.createElement("div", {
+        className: "message date-time",
+        title: time2date(timestampInt)
+      }, timestamp);
+    }
+    return chatHandle_React.createElement("div", {
+      className: cssClasses,
+      "data-id": `id${  message.messageId}`,
+      key: message.messageId
+    }, avatar, chatHandle_React.createElement("div", {
+      className: "message content-area small-info-txt selectable-txt"
+    }, chatHandle_React.createElement("div", {
+      className: "message user-card-name"
+    }, chatHandle_React.createElement(utils.zT, null, displayName)), datetime, chatHandle_React.createElement("div", {
+      className: "message text-block"
+    }, message.meta.handleUpdate === 1 ? l[20570] : l[20571])));
+  }
+}
+
+// EXTERNAL MODULE: ./js/chat/ui/messages/generic.jsx + 14 modules
+const generic = REQ_(890);
+// EXTERNAL MODULE: ./js/ui/perfectScrollbar.jsx
+const perfectScrollbar = REQ_(486);
+// EXTERNAL MODULE: ./js/chat/ui/messages/mixin.jsx
+const mixin = REQ_(446);
+// EXTERNAL MODULE: ./js/chat/ui/contacts.jsx
+const contacts = REQ_(251);
+;// ./js/chat/ui/messages/retentionChange.jsx
+
+
+
+
+class RetentionChange extends mixin.M {
+  render() {
+    const {
+      message
+    } = this.props;
+    const contact = this.getContact();
+    return REaCt().createElement("div", {
+      className: "message body",
+      "data-id": `id${  message.messageId}`,
+      key: message.messageId
+    }, REaCt().createElement(contacts.Avatar, {
+      contact,
+      className: "message avatar-wrapper small-rounded-avatar"
+    }), REaCt().createElement("div", {
+      className: "message content-area small-info-txt selectable-txt"
+    }, REaCt().createElement(contacts.ContactButton, {
+      contact,
+      className: "message",
+      label: REaCt().createElement(utils.zT, null, M.getNameByHandle(contact.u))
+    }), REaCt().createElement("div", {
+      className: "message date-time simpletip",
+      "data-simpletip": time2date(this.getTimestamp(), 17)
+    }, this.getTimestampAsString()), REaCt().createElement("div", {
+      className: "message text-block"
+    }, message.getMessageRetentionSummary())));
+  }
+}
+// EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 11 modules
+const call = REQ_(3);
+// EXTERNAL MODULE: ./js/chat/ui/messages/scheduleMetaChange.jsx
+const scheduleMetaChange = REQ_(757);
+;// ./js/chat/ui/historyPanel.jsx
+
+let _dec, _class;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+const HistoryPanel = (_dec = (0,mixins.hG)(450, true), _class = class HistoryPanel extends mixins.w9 {
+  constructor(props) {
+    super(props);
+    this.$container = null;
+    this.$messages = null;
+    this.domRef = REaCt().createRef();
+    this.state = {
+      editing: false,
+      toast: false
+    };
+    this.renderNotice = label => REaCt().createElement("div", {
+      className: "dropdown body dropdown-arrow down-arrow tooltip not-sent-notification-cancel hidden"
+    }, REaCt().createElement("i", {
+      className: "dropdown-white-arrow"
+    }), REaCt().createElement("div", {
+      className: "dropdown notification-text"
+    }, REaCt().createElement("i", {
+      className: "small-icon conversations"
+    }), label));
+    this.renderLoadingSpinner = () => REaCt().createElement("div", {
+      style: {
+        top: '50%'
+      },
+      className: `
+                loading-spinner
+                js-messages-loading
+                light
+                manual-management
+                ${this.loadingShown ? '' : 'hidden'}
+            `
+    }, REaCt().createElement("div", {
+      className: "main-loader",
+      style: {
+        position: 'fixed',
+        top: '50%',
+        left: '50%'
+      }
+    }));
+    this.renderNavigationToast = () => {
+      const {
+        chatRoom
+      } = this.props;
+      const unreadCount = chatRoom.messagesBuff.getUnreadCount();
+      return REaCt().createElement("div", {
+        className: `
+                    theme-dark-forced
+                    messages-toast
+                    ${this.state.toast ? 'active' : ''}
+                `,
+        onClick: () => {
+          this.setState({
+            toast: false
+          }, () => {
+            this.messagesListScrollable.scrollToBottom();
+            chatRoom.scrolledToBottom = true;
+          });
+        }
+      }, REaCt().createElement("i", {
+        className: "sprite-fm-mono icon-down"
+      }), unreadCount > 0 && REaCt().createElement("span", null, unreadCount > 9 ? '9+' : unreadCount));
+    };
+    this.onKeyboardScroll = ({
+      keyCode
+    }) => {
+      let _scrollbar$domRef;
+      const scrollbar = this.messagesListScrollable;
+      const domNode = scrollbar == null || (_scrollbar$domRef = scrollbar.domRef) == null ? void 0 : _scrollbar$domRef.current;
+      if (domNode && this.isComponentEventuallyVisible() && !this.state.attachCloudDialog) {
+        const scrollPositionY = scrollbar.getScrollPositionY();
+        const offset = parseInt(domNode.style.height);
+        const PAGE = {
+          UP: 33,
+          DOWN: 34
+        };
+        switch (keyCode) {
+          case PAGE.UP:
+            scrollbar.scrollToY(scrollPositionY - offset, true);
+            this.onMessagesScrollUserScroll(scrollbar, 100);
+            break;
+          case PAGE.DOWN:
+            if (!scrollbar.isAtBottom()) {
+              scrollbar.scrollToY(scrollPositionY + offset, true);
+            }
+            break;
+        }
+      }
+    };
+    this.onMessagesScrollUserScroll = (ps, offset = 5) => {
+      const {
+        chatRoom
+      } = this.props;
+      const {
+        messagesBuff
+      } = chatRoom;
+      const scrollPositionY = ps.getScrollPositionY();
+      if (messagesBuff.messages.length === 0) {
+        chatRoom.scrolledToBottom = true;
+        return;
+      }
+      if (ps.isCloseToBottom(30) === true) {
+        if (!chatRoom.scrolledToBottom) {
+          messagesBuff.detachMessages();
+        }
+        chatRoom.scrolledToBottom = true;
+      } else {
+        chatRoom.scrolledToBottom = false;
+      }
+      if (!this.scrollPullHistoryRetrieval && !messagesBuff.isRetrievingHistory && (ps.isAtTop() || scrollPositionY < offset && ps.getScrollHeight() > 500) && messagesBuff.haveMoreHistory()) {
+        ps.disable();
+        this.scrollPullHistoryRetrieval = true;
+        this.lastScrollPosition = scrollPositionY;
+        let msgAppended = 0;
+        const scrYOffset = ps.getScrollHeight();
+        chatRoom.one('onMessagesBuffAppend.pull', () => {
+          msgAppended++;
+        });
+        chatRoom.off('onHistoryDecrypted.pull');
+        chatRoom.one('onHistoryDecrypted.pull', () => {
+          chatRoom.off('onMessagesBuffAppend.pull');
+          if (msgAppended > 0) {
+            this._reposOnUpdate = scrYOffset;
+          }
+          this.scrollPullHistoryRetrieval = -1;
+        });
+        messagesBuff.retrieveChatHistory();
+      }
+      if (this.lastScrollPosition !== scrollPositionY) {
+        this.lastScrollPosition = scrollPositionY;
+      }
+      delay('chat-toast', this.initToast, 200);
+    };
+    this.initToast = () => {
+      let _this$messagesListScr;
+      const {
+        chatRoom
+      } = this.props;
+      return this.isMounted() && this.setState({
+        toast: !chatRoom.scrolledToBottom && !((_this$messagesListScr = this.messagesListScrollable) != null && _this$messagesListScr.isCloseToBottom != null && _this$messagesListScr.isCloseToBottom(30))
+      }, () => this.state.toast ? null : chatRoom.trigger('onChatIsFocused'));
+    };
+    this.handleWindowResize = this._handleWindowResize.bind(this);
+  }
+  customIsEventuallyVisible() {
+    return this.props.chatRoom.isCurrentlyActive;
+  }
+  UNSAFE_componentWillMount() {
+    let _chatRoom$messagesBuf;
+    const {
+      chatRoom
+    } = this.props;
+    chatRoom.rebind('onHistoryDecrypted.cp', () => this.eventuallyUpdate());
+    this._messagesBuffChangeHandler = (_chatRoom$messagesBuf = chatRoom.messagesBuff) == null ? void 0 : _chatRoom$messagesBuf.addChangeListener(SoonFc(() => {
+      if (this.isComponentEventuallyVisible()) {
+        let _this$domRef;
+        $('.js-messages-scroll-area', (_this$domRef = this.domRef) == null ? void 0 : _this$domRef.current).trigger('forceResize', [true]);
+      }
+      this.refreshUI();
+    }));
+  }
+  componentDidMount() {
+    super.componentDidMount();
+    const {
+      chatRoom,
+      onMount
+    } = this.props;
+    window.addEventListener('resize', this.handleWindowResize);
+    window.addEventListener('keydown', this.handleKeyDown);
+    this.$container = $(`.conversation-panel[data-room-id="${chatRoom.chatId}"]`);
+    this.eventuallyInit();
+    chatRoom.trigger('onHistoryPanelComponentDidMount');
+    if (onMount) {
+      onMount(this);
+    }
+  }
+  componentWillUnmount() {
+    super.componentWillUnmount();
+    const {
+      chatRoom
+    } = this.props;
+    if (this._messagesBuffChangeHandler) {
+      let _chatRoom$messagesBuf2;
+      (_chatRoom$messagesBuf2 = chatRoom.messagesBuff) == null || _chatRoom$messagesBuf2.removeChangeListener(this._messagesBuffChangeHandler);
+      delete this._messagesBuffChangeHandler;
+    }
+    window.removeEventListener('resize', this.handleWindowResize);
+    window.removeEventListener('keydown', this.handleKeyDown);
+    $(document).off(`fullscreenchange.megaChat_${chatRoom.roomId}`);
+    $(document).off(`keydown.keyboardScroll_${chatRoom.roomId}`);
+  }
+  componentDidUpdate(prevProps, prevState) {
+    let _self$domRef;
+    const self = this;
+    self.eventuallyInit(false);
+    const domNode = (_self$domRef = self.domRef) == null ? void 0 : _self$domRef.current;
+    const jml = domNode && domNode.querySelector('.js-messages-loading');
+    if (jml) {
+      if (self.loadingShown) {
+        jml.classList.remove('hidden');
+      } else {
+        jml.classList.add('hidden');
+      }
+    }
+    self.handleWindowResize();
+    if (prevState.editing === false && self.state.editing !== false && self.messagesListScrollable) {
+      self.messagesListScrollable.reinitialise(false);
+      Soon(() => {
+        if (self.editDomElement && self.editDomElement.length === 1) {
+          self.messagesListScrollable.scrollToElement(self.editDomElement[0], false);
+        }
+      });
+    }
+    if (self._reposOnUpdate !== undefined) {
+      const ps = self.messagesListScrollable;
+      ps.__prevPosY = ps.getScrollHeight() - self._reposOnUpdate + self.lastScrollPosition;
+      ps.scrollToY(ps.__prevPosY, true);
+    }
+  }
+  eventuallyInit(doResize) {
+    let _this$domRef2;
+    if (this.initialised) {
+      return;
+    }
+    const domNode = (_this$domRef2 = this.domRef) == null ? void 0 : _this$domRef2.current;
+    if (domNode) {
+      this.initialised = true;
+    } else {
+      return;
+    }
+    this.$messages = $('.messages.scroll-area > .perfectScrollbarContainer', this.$container);
+    this.$messages.droppable({
+      tolerance: 'pointer',
+      drop(e, ui) {
+        $.doDD(e, ui, 'drop', 1);
+      },
+      over(e, ui) {
+        $.doDD(e, ui, 'over', 1);
+      },
+      out(e, ui) {
+        $.doDD(e, ui, 'out', 1);
+      }
+    });
+    this.lastScrollPosition = null;
+    this.props.chatRoom.scrolledToBottom = true;
+    if (doResize !== false) {
+      this.handleWindowResize();
+    }
+  }
+  _handleWindowResize(e, scrollToBottom) {
+    if (!M.chat) {
+      return;
+    }
+    if (!this.isMounted()) {
+      this.componentWillUnmount();
+      return;
+    }
+    if (!this.isComponentEventuallyVisible()) {
+      return;
+    }
+    const self = this;
+    self.eventuallyInit(false);
+    if (!self.$messages) {
+      return;
+    }
+    if (call.Ay.isExpanded()) {
+      const $container = $('.meetings-call');
+      const $messages = $('.js-messages-scroll-area', $container);
+      const $textarea = $('.chat-textarea-block', $container);
+      const $sidebar = $('.sidebar', $container);
+      const scrollBlockHeight = parseInt($sidebar.outerHeight(), 10) - parseInt($textarea.outerHeight(), 10) - 72;
+      if ($sidebar.hasClass('chat-opened') && scrollBlockHeight !== $messages.outerHeight()) {
+        $messages.css('height', scrollBlockHeight);
+        self.refreshUI(true);
+      }
+      return;
+    }
+    const scrollBlockHeight = $('.chat-content-block', self.$container).outerHeight() - ($('.chat-topic-block', self.$container).outerHeight() || 0) - (is_chatlink ? $('.join-chat-block', self.$container).outerHeight() : $('.messages-block .chat-textarea-block', self.$container).outerHeight());
+    if (scrollBlockHeight !== self.$messages.outerHeight()) {
+      self.$messages.css('height', scrollBlockHeight);
+      $('.messages.main-pad', self.$messages).css('min-height', scrollBlockHeight);
+      self.refreshUI(true);
+    } else {
+      self.refreshUI(scrollToBottom);
+    }
+  }
+  refreshUI() {
+    if (this.isComponentEventuallyVisible()) {
+      const room = this.props.chatRoom;
+      room.renderContactTree();
+      room.megaChat.refreshConversations();
+      room.trigger('RefreshUI');
+      if (room.scrolledToBottom) {
+        delay(`hp:reinit-scroll:${this.getUniqueId()}`, () => {
+          if (this.messagesListScrollable) {
+            this.messagesListScrollable.reinitialise(true, true);
+          }
+        }, 30);
+      }
+    }
+  }
+  isLoading() {
+    const {chatRoom} = this.props;
+    if (chatRoom.historyTimedOut) {
+      return false;
+    }
+    const mb = chatRoom.messagesBuff;
+    return this.scrollPullHistoryRetrieval === true || chatRoom.activeSearches || mb.messagesHistoryIsLoading() || mb.joined === false || mb.isDecrypting;
+  }
+  specShouldComponentUpdate() {
+    return !this.loadingShown && this.isComponentEventuallyVisible();
+  }
+  enableScrollbar() {
+    const ps = this.messagesListScrollable;
+    ps.enable();
+    this._reposOnUpdate = undefined;
+    this.lastScrollPosition = ps.__prevPosY | 0;
+  }
+  editMessage(messageId) {
+    const self = this;
+    self.setState({
+      'editing': messageId
+    });
+    self.props.chatRoom.scrolledToBottom = false;
+  }
+  onMessageEditDone(v, messageContents) {
+    const self = this;
+    const room = this.props.chatRoom;
+    room.scrolledToBottom = true;
+    self.editDomElement = null;
+    const currentContents = v.textContents;
+    v.edited = false;
+    if (messageContents === false || messageContents === currentContents) {
+      let _self$messagesListScr;
+      (_self$messagesListScr = self.messagesListScrollable) == null || _self$messagesListScr.scrollToBottom(true);
+    } else if (messageContents) {
+      let _self$messagesListScr2;
+      room.trigger('onMessageUpdating', v);
+      room.megaChat.plugins.chatdIntegration.updateMessage(room, v.internalId ? v.internalId : v.orderValue, messageContents);
+      if (v.getState && (v.getState() === Message.STATE.NOT_SENT || v.getState() === Message.STATE.SENT) && !v.requiresManualRetry) {
+        if (v.textContents) {
+          v.textContents = messageContents;
+        }
+        if (v.emoticonShortcutsProcessed) {
+          v.emoticonShortcutsProcessed = false;
+        }
+        if (v.emoticonsProcessed) {
+          v.emoticonsProcessed = false;
+        }
+        if (v.messageHtml) {
+          delete v.messageHtml;
+        }
+        v.trigger('onChange', [v, "textContents", "", messageContents]);
+        megaChat.plugins.richpreviewsFilter.processMessage({}, v, false, true);
+      }
+      (_self$messagesListScr2 = self.messagesListScrollable) == null || _self$messagesListScr2.scrollToBottom(true);
+    } else if (messageContents.length === 0) {
+      this.props.onDeleteClicked(v);
+    }
+    self.setState({
+      'editing': false
+    });
+    self.refreshUI();
+    Soon(() => {
+      $('.chat-textarea-block:visible textarea').focus();
+    }, 300);
+  }
+  render() {
+    const self = this;
+    const room = this.props.chatRoom;
+    if (!room || !room.roomId) {
+      return null;
+    }
+    const contacts = room.getParticipantsExceptMe();
+    let contactHandle;
+    let contact;
+    let avatarMeta;
+    let contactName = "";
+    if (contacts && contacts.length === 1) {
+      contactHandle = contacts[0];
+      contact = M.u[contactHandle];
+      avatarMeta = contact ? generateAvatarMeta(contact.u) : {};
+      contactName = avatarMeta.fullName;
+    } else if (contacts && contacts.length > 1) {
+      contactName = room.getRoomTitle();
+    }
+    let messagesList = [];
+    if (this.isLoading()) {
+      self.loadingShown = true;
+    } else {
+      const mb = room.messagesBuff;
+      if (this.scrollPullHistoryRetrieval < 0) {
+        this.scrollPullHistoryRetrieval = false;
+        self.enableScrollbar();
+      }
+      delete self.loadingShown;
+      if (room.historyTimedOut || mb.joined === true && !self.scrollPullHistoryRetrieval && mb.haveMoreHistory() === false) {
+        const $$WELCOME_MESSAGE = ({
+          heading,
+          title,
+          info,
+          className
+        }) => REaCt().createElement("div", {
+          className: `
+                            messages
+                            welcome-message
+                            ${className || ''}
+                        `
+        }, REaCt().createElement(utils.P9, {
+          tag: "h1",
+          content: heading
+        }), title && REaCt().createElement("span", null, title), info);
+        messagesList = [...messagesList, room.isNote ? $$WELCOME_MESSAGE({
+          heading: l.note_heading,
+          info: REaCt().createElement("p", null, REaCt().createElement("i", {
+            className: "sprite-fm-mono icon-file-text-thin-outline note-chat-icon"
+          }), l.note_description),
+          className: 'note-chat-info'
+        }) : $$WELCOME_MESSAGE({
+          heading: room.scheduledMeeting || !contactName ? megaChat.html(room.getRoomTitle()) : l[8002].replace('%s', `<span>${megaChat.html(contactName)}</span>`),
+          title: l[8080],
+          info: REaCt().createElement(REaCt().Fragment, null, REaCt().createElement("p", null, REaCt().createElement("i", {
+            className: "sprite-fm-mono icon-lock"
+          }), REaCt().createElement(utils.P9, {
+            content: l[8540].replace("[S]", "<strong>").replace("[/S]", "</strong>")
+          })), REaCt().createElement("p", null, REaCt().createElement("i", {
+            className: "sprite-fm-mono icon-accept"
+          }), REaCt().createElement(utils.P9, {
+            content: l[8539].replace("[S]", "<strong>").replace("[/S]", "</strong>")
+          })))
+        })];
+      }
+    }
+    let lastTimeMarker;
+    let lastMessageFrom = null;
+    let lastGroupedMessageTimeStamp = null;
+    let grouped = false;
+    for (let i = 0; i < room.messagesBuff.messages.length; i++) {
+      let v = room.messagesBuff.messages.getItem(i);
+      if (!v.protocol && v.revoked !== true) {
+        let shouldRender = true;
+        if (v.isManagement && v.isManagement() === true && v.isRenderableManagement() === false || v.deleted === true) {
+          shouldRender = false;
+        }
+        const timestamp = v.delay;
+        const curTimeMarker = getTimeMarker(timestamp);
+        if (shouldRender === true && curTimeMarker && lastTimeMarker !== curTimeMarker) {
+          lastTimeMarker = curTimeMarker;
+          messagesList.push(REaCt().createElement("div", {
+            className: "message date-divider selectable-txt",
+            key: `${v.messageId  }_marker`,
+            title: time2date(timestamp)
+          }, curTimeMarker));
+          grouped = false;
+          lastMessageFrom = null;
+          lastGroupedMessageTimeStamp = null;
+        }
+        if (shouldRender === true) {
+          let {userId} = v;
+          if (!userId && contact && contact.u) {
+            userId = contact.u;
+          }
+          if (v instanceof Message && v.dialogType !== "truncated") {
+            if (!lastMessageFrom || userId && lastMessageFrom === userId) {
+              if (timestamp - lastGroupedMessageTimeStamp < 300) {
+                grouped = true;
+              } else {
+                grouped = false;
+                lastMessageFrom = userId;
+                lastGroupedMessageTimeStamp = timestamp;
+              }
+            } else {
+              grouped = false;
+              lastMessageFrom = userId;
+              if (lastMessageFrom === userId) {
+                lastGroupedMessageTimeStamp = timestamp;
+              } else {
+                lastGroupedMessageTimeStamp = null;
+              }
+            }
+          } else {
+            grouped = false;
+            lastMessageFrom = null;
+            lastGroupedMessageTimeStamp = null;
+          }
+        }
+        if ((v.dialogType === "remoteCallEnded" || v.dialogType === "remoteCallStarted") && v && v.wrappedChatDialogMessage) {
+          v = v.wrappedChatDialogMessage;
+        }
+        if (v.dialogType) {
+          let messageInstance = null;
+          if (v.dialogType === 'alterParticipants') {
+            messageInstance = REaCt().createElement(AltPartsConvMessage, {
+              message: v,
+              key: v.messageId,
+              contact: Message.getContactForMessage(v),
+              grouped,
+              chatRoom: room
+            });
+          } else if (v.dialogType === 'truncated') {
+            messageInstance = REaCt().createElement(TruncatedMessage, {
+              message: v,
+              key: v.messageId,
+              contact: Message.getContactForMessage(v),
+              grouped,
+              chatRoom: room
+            });
+          } else if (v.dialogType === 'privilegeChange') {
+            messageInstance = REaCt().createElement(PrivilegeChange, {
+              message: v,
+              key: v.messageId,
+              contact: Message.getContactForMessage(v),
+              grouped,
+              chatRoom: room
+            });
+          } else if (v.dialogType === 'topicChange') {
+            messageInstance = REaCt().createElement(TopicChange, {
+              message: v,
+              key: v.messageId,
+              contact: Message.getContactForMessage(v),
+              grouped,
+              chatRoom: room
+            });
+          } else if (v.dialogType === 'openModeClosed') {
+            messageInstance = REaCt().createElement(CloseOpenModeMessage, {
+              message: v,
+              key: v.messageId,
+              contact: Message.getContactForMessage(v),
+              grouped,
+              chatRoom: room
+            });
+          } else if (v.dialogType === 'chatHandleUpdate') {
+            messageInstance = REaCt().createElement(ChatHandleMessage, {
+              message: v,
+              key: v.messageId,
+              contact: Message.getContactForMessage(v),
+              grouped,
+              chatRoom: room
+            });
+          } else if (v.dialogType === 'messageRetention') {
+            messageInstance = REaCt().createElement(RetentionChange, {
+              message: v,
+              key: v.messageId,
+              contact: Message.getContactForMessage(v)
+            });
+          } else if (v.dialogType === 'scheduleMeta') {
+            if (v.meta.onlyTitle) {
+              messageInstance = REaCt().createElement(TopicChange, {
+                message: v,
+                key: v.messageId,
+                contact: Message.getContactForMessage(v),
+                grouped,
+                chatRoom: v.chatRoom
+              });
+            } else {
+              if (v.meta.topicChange) {
+                messagesList.push(REaCt().createElement(TopicChange, {
+                  message: v,
+                  key: `${v.messageId}-topic`,
+                  contact: Message.getContactForMessage(v),
+                  grouped,
+                  chatRoom: v.chatRoom
+                }));
+              }
+              messageInstance = REaCt().createElement(scheduleMetaChange.A, {
+                message: v,
+                key: v.messageId,
+                mode: v.meta.mode,
+                chatRoom: room,
+                grouped,
+                link: v.chatRoom.publicLink,
+                contact: Message.getContactForMessage(v)
+              });
+            }
+          }
+          messagesList.push(messageInstance);
+        } else {
+          if (!v.chatRoom) {
+            v.chatRoom = room;
+          }
+          messagesList.push(REaCt().createElement(generic.A, {
+            message: v,
+            state: v.state,
+            key: v.messageId,
+            contact: Message.getContactForMessage(v),
+            grouped,
+            onUpdate: () => {
+              self.onResizeDoUpdate();
+            },
+            editing: self.state.editing === v.messageId || self.state.editing === v.pendingMessageId,
+            onEditStarted: ((v, $domElement) => {
+              self.editDomElement = $domElement;
+              self.setState({
+                'editing': v.messageId
+              });
+              self.forceUpdate();
+            }).bind(this, v),
+            chatRoom: room,
+            onEditDone: this.onMessageEditDone.bind(this, v),
+            onDeleteClicked: msg => {
+              if (this.props.onDeleteClicked) {
+                this.props.onDeleteClicked(msg);
+              }
+            },
+            onResized: () => {
+              this.handleWindowResize();
+            },
+            onEmojiBarChange: () => {
+              this.handleWindowResize();
+            }
+          }));
+        }
+      }
+    }
+    return REaCt().createElement("div", {
+      ref: this.domRef,
+      className: `
+                    messages
+                    scroll-area
+                    ${this.props.className || ''}
+                `
+    }, this.renderNotice(l[8883]), this.renderNotice(l[8884]), REaCt().createElement(perfectScrollbar.O, {
+      className: "js-messages-scroll-area perfectScrollbarContainer",
+      ref: ref => {
+        let _this$props$onMessage, _this$props;
+        this.messagesListScrollable = ref;
+        $(document).rebind(`keydown.keyboardScroll_${room.roomId}`, this.onKeyboardScroll);
+        (_this$props$onMessage = (_this$props = this.props).onMessagesListScrollableMount) == null || _this$props$onMessage.call(_this$props, ref);
+      },
+      chatRoom: room,
+      messagesBuff: room.messagesBuff,
+      editDomElement: this.state.editDomElement,
+      editingMessageId: this.state.editing,
+      confirmDeleteDialog: this.state.confirmDeleteDialog,
+      renderedMessagesCount: messagesList.length,
+      options: {
+        suppressScrollX: true
+      },
+      isLoading: room.messagesBuff.messagesHistoryIsLoading() || room.activeSearches > 0 || this.loadingShown,
+      onFirstInit: ps => {
+        ps.scrollToBottom(true);
+        room.scrolledToBottom = 1;
+      },
+      onUserScroll: this.onMessagesScrollUserScroll
+    }, REaCt().createElement("div", {
+      className: "messages main-pad"
+    }, REaCt().createElement("div", {
+      className: "messages content-area"
+    }, this.renderLoadingSpinner(), messagesList))), this.renderNavigationToast());
+  }
+}, (0,applyDecoratedDescriptor.A)(_class.prototype, "enableScrollbar", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "enableScrollbar"), _class.prototype), _class);
+
+
+},
+
+815:
+(_, EXP_, REQ_) => {
+
+"use strict";
+REQ_.d(EXP_, {
+Q: () => InviteParticipantsPanel
+});
+const react0__ = REQ_(594);
+const react0 = REQ_.n(react0__);
+const _meetings_call_jsx1__ = REQ_(3);
+const _ui_miniui_jsx2__ = REQ_(818);
+const _ui_buttons_jsx3__ = REQ_(994);
+const _ui_dropdowns_jsx4__ = REQ_(911);
+
+
+
+
+
+const NAMESPACE = 'invite-panel';
+class InviteParticipantsPanel extends react0().Component {
+  constructor(props) {
+    super(props);
+    this.domRef = react0().createRef();
+    this.state = {
+      link: '',
+      copied: false
+    };
+    this.retrieveChatLink();
+  }
+  retrieveChatLink(cim) {
+    const {
+      chatRoom
+    } = this.props;
+    if (!chatRoom.topic) {
+      return;
+    }
+    this.loading = chatRoom.updatePublicHandle(false, cim).always(() => {
+      delete this.loading;
+      if (this.domRef.current) {
+        if (chatRoom.publicLink) {
+          this.setState({
+            link: `${getBaseUrl()}/${chatRoom.publicLink}`
+          });
+        } else {
+          this.setState({
+            link: false
+          });
+        }
+      }
+    });
+  }
+  getInviteBody(encode) {
+    const {
+      chatRoom
+    } = this.props;
+    const {
+      link
+    } = this.state;
+    const {
+      scheduledMeeting
+    } = chatRoom;
+    let body = l.invite_body_text;
+    if (scheduledMeeting) {
+      const {
+        nextOccurrenceStart
+      } = chatRoom.scheduledMeeting;
+      body = l.invite_body_text_scheduled.replace('%4', time2date(nextOccurrenceStart / 1000, 20)).replace('%5', toLocaleTime(nextOccurrenceStart));
+    }
+    body = body.replace(/\[BR]/g, '\n').replace('%1', u_attr.name).replace('%2', chatRoom.getRoomTitle()).replace('%3', link);
+    return encode ? encodeURIComponent(body) : body;
+  }
+  render() {
+    const {
+      chatRoom,
+      disableLinkToggle,
+      onAddParticipants
+    } = this.props;
+    const {
+      link,
+      copied
+    } = this.state;
+    const inCall = _meetings_call_jsx1__.Ay.isExpanded();
+    if (this.loading) {
+      return react0().createElement("div", {
+        ref: this.domRef,
+        className: `
+                        ${NAMESPACE}
+                        ${inCall ? 'theme-dark-forced' : ''}
+                    `
+      }, react0().createElement("header", null), react0().createElement("section", {
+        className: "content"
+      }, react0().createElement("div", {
+        className: "content-block"
+      })));
+    }
+    const canInvite = !!(chatRoom.iAmOperator() || chatRoom.options[MCO_FLAGS.OPEN_INVITE]) && onAddParticipants;
+    const canToggleLink = !disableLinkToggle && chatRoom.iAmOperator() && (chatRoom.isMeeting || chatRoom.topic);
+    const mailto = `mailto:?to=&subject=${l.invite_subject_text}&body=${this.getInviteBody(true)}`;
+    const copyText = chatRoom.isMeeting ? l.copy_meeting_link : l[1394];
+    return react0().createElement("div", {
+      ref: this.domRef,
+      className: `
+                    ${NAMESPACE}
+                    ${inCall ? 'theme-dark-forced' : ''}
+                `
+    }, react0().createElement("header", null, react0().createElement("h3", null, l.invite_participants)), react0().createElement("section", {
+      className: "content"
+    }, canToggleLink && chatRoom.type !== 'group' && react0().createElement("div", {
+      className: "content-block link-block"
+    }, react0().createElement("div", {
+      className: "text-wrapper"
+    }, react0().createElement("span", {
+      className: "link-label"
+    }, l.invite_toggle_link_label), react0().createElement("div", {
+      className: `link-description ${inCall ? '' : 'hidden'}`
+    }, l.invite_toggle_link_desc)), react0().createElement(_ui_miniui_jsx2__.A.ToggleCheckbox, {
+      className: "meeting-link-toggle",
+      checked: !!link,
+      value: !!link,
+      onToggle: () => {
+        if (this.loading) {
+          return;
+        }
+        if (link) {
+          this.loading = chatRoom.updatePublicHandle(true).always(() => {
+            delete this.loading;
+            if (this.domRef.current) {
+              this.setState({
+                link: false
+              });
+            }
+          });
+        } else {
+          this.retrieveChatLink(true);
+        }
+      }
+    })), link && react0().createElement("div", {
+      className: "content-block"
+    }, react0().createElement(_ui_buttons_jsx3__.$, {
+      className: "flat-button",
+      icon: `sprite-fm-mono icon-${copied ? 'check' : 'link-thin-outline'}`,
+      label: copied ? l.copied : copyText,
+      onClick: () => {
+        if (copied) {
+          return;
+        }
+        delay('chat-event-inv-copylink', () => eventlog(99964));
+        copyToClipboard(link);
+        this.setState({
+          copied: true
+        }, () => {
+          tSleep(3).then(() => {
+            if (this.domRef.current) {
+              this.setState({
+                copied: false
+              });
+            }
+          });
+        });
+      }
+    })), link && react0().createElement("div", {
+      className: "content-block"
+    }, react0().createElement(_ui_buttons_jsx3__.$, {
+      className: "flat-button",
+      label: l.share_chat_link,
+      icon: "sprite-fm-mono icon-share-02-thin-outline"
+    }, react0().createElement(_ui_dropdowns_jsx4__.Dropdown, {
+      className: `
+                                    button-group-menu
+                                    invite-dropdown
+                                    ${inCall ? 'theme-dark-forced' : ''}
+                                `,
+      noArrow: true,
+      positionAt: "left bottom",
+      collision: "none",
+      horizOffset: 79,
+      vertOffset: 6,
+      ref: r => {
+        this.dropdownRef = r;
+      },
+      onBeforeActiveChange: e => {
+        if (e) {
+          delay('chat-event-inv-dropdown', () => eventlog(99965));
+          $(document.body).trigger('closeAllDropdownsExcept', this.dropdownRef);
+        }
+      }
+    }, react0().createElement(_ui_dropdowns_jsx4__.DropdownItem, {
+      key: "send-invite",
+      className: `
+                                        ${inCall ? 'theme-dark-forced' : ''}
+                                    `,
+      icon: "sprite-fm-mono icon-mail-thin-outline",
+      label: l.share_chat_link_invite,
+      onClick: () => {
+        delay('chat-event-inv-email', () => eventlog(99966));
+        window.open(mailto, '_self', 'noopener,noreferrer');
+      }
+    }), react0().createElement(_ui_dropdowns_jsx4__.DropdownItem, {
+      key: "copy-invite",
+      className: `
+                                        ${inCall ? 'theme-dark-forced' : ''}
+                                    `,
+      label: l.copy_chat_link_invite,
+      icon: "sprite-fm-mono icon-square-copy",
+      onClick: () => {
+        delay('chat-event-inv-copy', () => eventlog(99967));
+        copyToClipboard(this.getInviteBody(), l.invite_copied);
+      }
+    })))), canInvite && (link || canToggleLink) && chatRoom.type !== 'group' && react0().createElement("div", {
+      className: "content-block invite-panel-divider"
+    }, l.invite_dlg_divider), canInvite && react0().createElement("div", {
+      className: "content-block add-participant-block"
+    }, react0().createElement(_ui_buttons_jsx3__.$, {
+      className: "flat-button",
+      icon: "sprite-fm-mono icon-user-square-thin-outline",
+      label: l.add_participants,
+      onClick: () => {
+        delay('chat-event-inv-add-participant', () => eventlog(99968));
+        onAddParticipants();
+      }
+    }))));
+  }
+}
+
+},
+
+818:
+(_, EXP_, REQ_) => {
+
+"use strict";
+REQ_.d(EXP_, {
+A: () => __WEBPACK_DEFAULT_EXPORT__
+});
+const react0__ = REQ_(594);
+const react0 = REQ_.n(react0__);
+const _chat_mixins1__ = REQ_(137);
+
+
+class ToggleCheckbox extends _chat_mixins1__.w9 {
+  constructor(props) {
+    super(props);
+    this.domRef = react0().createRef();
+    this.onToggle = () => {
+      const newState = !this.state.value;
+      this.setState({
+        value: newState
+      });
+      if (this.props.onToggle) {
+        this.props.onToggle(newState);
+      }
+    };
+    this.state = {
+      value: this.props.value
+    };
+  }
+  render() {
+    return react0().createElement("div", {
+      ref: this.domRef,
+      className: `
+                    mega-switch
+                    ${this.props.className}
+                    ${this.state.value ? 'toggle-on' : ''}
+                `,
+      role: "switch",
+      "aria-checked": !!this.state.value,
+      onClick: this.onToggle
+    }, react0().createElement("div", {
+      className: `mega-feature-switch sprite-fm-mono-after
+                         ${this.state.value ? 'icon-check-after' : 'icon-minimise-after'}`
+    }));
+  }
+}
+const __WEBPACK_DEFAULT_EXPORT__ = {
+  ToggleCheckbox
 };
 
 },
@@ -37240,7 +37270,7 @@ class Button extends _chat_mixins_js1__.w9 {
 	// Load entry module and return exports
 	REQ_(326);
 	// This entry module is referenced by other modules so it can't be inlined
-	const EXP_ = REQ_(823);
+	const EXP_ = REQ_(732);
 	
 })()
 ;

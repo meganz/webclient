@@ -47,7 +47,7 @@ lazy(T.ui, 'msgDialog', () => {
                 content.classList.add(xid);
 
                 const ok = ev.currentTarget === confirmBtn;
-                const input = ok && confirmBtn.closest('.body').querySelector('.content input');
+                const input = ok && content.querySelector('input:checked, input');
                 const value = input ? input.dataset.value || input.value : true;
 
                 Promise.resolve(ok && typeof validate === 'function' && tryCatch(validate)(value, input))
@@ -102,6 +102,7 @@ lazy(T.ui, 'msgDialog', () => {
             title,
             submsg,
             onload,
+            inputValue = '',
             placeholders = [],
             value,
             type = 'warning',
@@ -125,6 +126,8 @@ lazy(T.ui, 'msgDialog', () => {
                 if (value) {
                     input.dataset.value = value;
                 }
+
+                input.value = inputValue;
 
                 T.ui.input.init(input);
 

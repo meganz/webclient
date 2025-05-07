@@ -1570,7 +1570,7 @@ function logExportEvt(evtId, data) {
                                 componentClassname: 'primary whitespace-nowrap font-600 slim theme-dark-forced',
                                 type: 'button'
                             }).on('click.pro', () => {
-                                M.openTransferItOverlay().catch(tell);
+                                M.openTransferItOverlay($.selected).catch(tell);
                             });
 
                             sheet.overlayNode.classList.add('has-it-banner');

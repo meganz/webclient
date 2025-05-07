@@ -53,7 +53,7 @@
     display: block;
     height: 32px;
     position: relative;
-    transition: var(--transition-bg-color);
+    transition: var(--transition-shadow), var(--transition-bg-color);
     width: 60px;
 }
 
@@ -103,8 +103,19 @@
 }
 
 
+/* Focused state */
+
+.it-toggle input:focus + .toggle-box {
+    box-shadow: var(--shadow-focused);
+}
+
+
 /* Disabled state */
 
 .it-toggle.disabled {
     opacity: .32;
+}
+
+.it-toggle.disabled input:focus + .toggle-box {
+    box-shadow: none;
 }

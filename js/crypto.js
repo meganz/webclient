@@ -298,7 +298,15 @@ function api_reqfailed(channel, error) {
         }
     }
     else if (self.is_transferit) {
-        console.error(`unhandled request-level error on #${c}...`, e);
+        if (e === ESID) {
+            u_logout(true);
+            onIdle(() => T.ui.pageHeader.init());
+            onIdle(() => showToast('clipboard', l[19]));
+            loadSubPage('start');
+        }
+        else {
+            console.error(`unhandled request-level error on #${c}...`, e);
+        }
         return e;
     }
     else if (self.is_iframed) {

@@ -417,9 +417,11 @@ lazy(T.ui, 'addFilesLayout', () => {
                 console.warn('Nothing (new) to add...', sel);
                 return false;
             }
+            const {SAFEPATH_SOP, SAFEPATH_SEP} = factory.require('mkdir');
+
             // const prom = api.req({a: 'if', n: [...nodes]});
+            // await api.yield();
             const prom = T.core.getImportedNodes(nodes);
-            await api.yield();
 
             for (let i = lst.length; i--;) {
                 const n = lst[i];
@@ -433,16 +435,20 @@ lazy(T.ui, 'addFilesLayout', () => {
                     }
                     h = n.p;
                 }
-                n.path = p.reverse().join('/');
+                n.path = `${SAFEPATH_SOP}${p.reverse().join(SAFEPATH_SEP)}`;
+
+                if (!(i % 1e4)) {
+                    await scheduler.yield();
+                }
             }
             this.appendAddedFiles(lst);
-            this.data.ko.push(...await prom);
+            this.data.ko = array.extend(this.data.ko, await prom, false);
 
-            this.renderUploadList();
+            return this.renderUploadList();
         },
 
         appendAddedFiles(lst) {
-            this.data.files.push(...lst);
+            this.data.files = array.extend(this.data.files, lst, 0);
             this.data.files.sort((a, b) => a.size < b.size ? -1 : 1);
         },
 
@@ -499,7 +505,7 @@ lazy(T.ui, 'addFilesLayout', () => {
             }
         },
 
-        renderUploadList() {
+        async renderUploadList() {
             let size = 0;
             let haveInvalid = false;
             const {files, ko = []} = this.data;
@@ -559,6 +565,10 @@ lazy(T.ui, 'addFilesLayout', () => {
 
                 size += ul.size;
                 haveInvalid = haveInvalid || nv;
+
+                if (!(i % 1e4)) {
+                    await scheduler.yield();
+                }
             }
 
             // If there are invalid files, show error and Clear invalid button

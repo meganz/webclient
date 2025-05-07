@@ -536,6 +536,37 @@ lazy(mega.devices, 'data', () => {
         }
     };
 
+    /**
+     * Returns a list of backup folders not included in "handlesExcluded" list
+     * @param {Array<String>} handlesExcluded - list of handles to exclude from result
+     * @returns {Array<Object>} backup folders data
+     */
+    const getStoppedBackups = (handlesExcluded) => {
+        const backups = [];
+        const deviceHandles = Object.keys(M.tree[M.BackupsId] || {});
+
+        for (let i = 0; i < deviceHandles.length; i++) {
+            const deviceNode = M.d[deviceHandles[i]] || {};
+            const deviceHandle = deviceNode.devid || deviceNode.drvid;
+
+            if (deviceHandle) {
+                const backupHandles = Object.keys(M.tree[deviceHandles[i]] || {});
+
+                for (let j = 0; j < backupHandles.length; j++) {
+                    if (!handlesExcluded.includes(backupHandles[j])) {
+                        backups.push({
+                            d: deviceHandle,
+                            h: backupHandles[j],
+                            t: mega.devices.models.syncType.backup
+                        });
+                    }
+                }
+            }
+        }
+
+        return backups;
+    };
+
     return freeze({
         /**
          * {Number} maxDaysNoActivity - maximum number of days a device with no activity is yet considered active
@@ -567,6 +598,12 @@ lazy(mega.devices, 'data', () => {
             ]);
 
             let res = {};
+
+            const stoppedBackups = getStoppedBackups(folders
+                .filter((f) => f.t === mega.devices.models.syncType.backup)
+                .map((f) => f.h));
+
+            folders = [...folders, ...stoppedBackups];
 
             if (deviceNames && folders) {
                 deviceNames = mega.attr.decodeObjectValues(deviceNames);

@@ -2789,6 +2789,19 @@ var addressDialog = {
                 failHandle(l[1679]);
                 return;
             }
+            if (event.data.startsWith('json^')) {
+                const eventData = JSON.parse(event.data.split('^')[1]);
+                if (eventData && (eventData.type === 'resize')) {
+                    // Resize the stripe iframe
+                    const $stripeDialog = addressDialog.getStripeDialog();
+                    const $stripeIframe = $('.iframe-container', $stripeDialog);
+                    if ($stripeIframe) {
+                        $stripeIframe.css('height', eventData.height + 'px');
+                    }
+                }
+                window.addEventListener('message', addressDialog.stripeFrameHandler, {once: true});
+                return;
+            }
             if (event.data.startsWith('eventlog^')) {
                 // Log events that come from the stripe iframe dialog
                 onIdle(() => eventlog(event.data.split('^')[1]));
@@ -2998,11 +3011,15 @@ var addressDialog = {
                 if (pro.propay.paymentButton) {
                     iframeSrc += `&pt=${pro.propay.paymentButton}`;
                 }
+                else if (pro.propay.currentGateway && pro.propay.currentGateway.gatewayName) {
+                    iframeSrc += `&pt=${pro.propay.currentGateway.gatewayName}`;
+                }
 
                 if (!utcResult.edit) {
 
                     iframeSrc += `&p=${this.proNum}`;
-                    if (this.extraDetails.recurring) {
+                    if (this.extraDetails.recurring &&
+                        (pro.propay.currentGateway && pro.propay.currentGateway.supportsRecurring)) {
                         iframeSrc += '&r=1';
                     }
 

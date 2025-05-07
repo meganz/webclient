@@ -41,7 +41,7 @@ mobile.propay = {
         const mobileEnabledGateways = new Set([
             'voucher', 'astropayVI', 'astropayMC', 'ecpVI', 'ecpMC', 'sabadellVI', 'sabadellMC',
             'directreseller', 'Stripe2', 'stripeVI', 'stripeMC', 'stripeDD', 'stripeUP', 'stripeJC', 'stripeAE',
-            'stripeAP', 'stripeGP'
+            'stripeAP', 'stripeGP', 'stripeID',
         ]);
 
         // Filter out anything else

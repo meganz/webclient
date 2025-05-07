@@ -364,9 +364,15 @@ lazy(mega.devices, 'ui', () => {
                         await this._handleSdsAttributes(node, id, config.sdsCodes.remove);
                     }
 
-                    // Backup/stopped backup folder
+                    // Backup/stopped backup folder - copy+remove if inshare, regular move otherwise
                     if (M.getNodeRoot(node.h) === M.InboxID) {
-                        return target ? M.moveNodes([h], target, 3) : M.safeRemoveNodes([h]);
+                        return target
+                            ? (sharer(target)
+                                ? M.copyNodes([h], target, true)
+                                : M.moveNodes([h], target, 3)
+                            ).catch(tell)
+                            // Removal - needed when we have stopped the backup, but the entry remains in DC
+                            : M.safeRemoveNodes([h]);
                     }
                 }
             };

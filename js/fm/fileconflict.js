@@ -41,12 +41,32 @@
             var breakOP = false;
             var foldersRepeatAction = null;
 
-            // this is special if for copying from chat
-            // 1- must be 1 item
-            // 2- must be to 1 target.
-            // --> no need to consider in all logical space of file/folder conflicts
-            if (M.d[target] && M.d[target].name === M.myChatFilesFolder.name) {
+            /**
+             * Special case 1: Copying from chat
+             *
+             * 1. must be 1 item
+             * 2. must be to 1 target.
+             * --> no need to consider in all logical space of file/folder conflicts
+             */
+            const copyingFromChat = M.d[target] && M.d[target].name === M.myChatFilesFolder.name;
+
+            /**
+             * Special case 2: "Moving" stopped backups to inshares requires a copy + remove
+             *
+             * The copy could prompt a fileconflict dialog, the resolution of which
+             * we keep consistent with that of the 'move stopped backup to CD' action
+             */
+            const copyingBackupToInshares =
+                files.length && M.getNodeRoot(files[0]) === M.InboxID && !!sharer(target)
+                && mega.devices.ui && typeof mega.devices.ui.getFolderInPath === 'function'
+                && mega.devices.ui.getFolderInPath(M.getPath(files[0])).h === files[0];
+
+            if (copyingFromChat || copyingBackupToInshares) {
                 defaultAction = ns.KEEPBOTH;
+
+                if (copyingBackupToInshares) {
+                    defaultActionFolders = ns.KEEPBOTH;
+                }
             }
 
             for (var i = files.length; i--;) {

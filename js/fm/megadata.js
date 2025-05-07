@@ -50,6 +50,9 @@
  * @property {Number} lastChatActivity
  *     UNIX epoch time stamp as an integer in seconds for the last chat
  *     activity.
+ * @property {Object} b
+ *     Business user only object. If the sub-property `m` === 1 user is the master user, otherwise sub user
+ *     undefined for non-business accounts and business accounts that are not part of the same business.
  */
 
 mBroadcaster.once('boot_done', function() {
@@ -57,6 +60,7 @@ mBroadcaster.once('boot_done', function() {
 
     const value = freeze({
         "u": undefined,
+        "b": undefined,
         "c": undefined,
         "m": undefined,
         // "m2": undefined,

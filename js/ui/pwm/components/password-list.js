@@ -67,7 +67,7 @@ class MegaPasswordList extends MegaView {
         super.show();
 
         // Required for the webclient layout
-        this.initLayout(true).catch(reportError);
+        return this.initLayout(true).catch(reportError);
     }
 
     /**
@@ -346,10 +346,14 @@ class MegaPasswordList extends MegaView {
                     }
                     this.selectedItem.active = false;
                 }
-                this.passwordItem.showDetail(elemId, noShowDetail);
-                this.selectedItem = item;
-                item.active = true;
-                mega.ui.pm.comm.saveLastSelected(elemId);
+                // @todo FIXME prevent concurrent invocations while the promise is running
+                this.passwordItem.showDetail(elemId, noShowDetail)
+                    .catch(tell)
+                    .finally(() => {
+                        this.selectedItem = item;
+                        item.active = true;
+                        mega.ui.pm.comm.saveLastSelected(elemId);
+                    });
             });
 
             const contextMenuBtn = new MegaInteractable({
@@ -463,16 +467,22 @@ class MegaPasswordList extends MegaView {
             this.selectedItem.active = true;
 
             onIdle(() => {
+                let promise;
                 this.selectedItem.domNode.scrollIntoView(false);
+
                 if (previousSelectedItem !== this.selectedItem.domNode.id) {
-                    this.passwordItem.showDetail(this.selectedItem.domNode.id, true);
+                    promise = this.passwordItem.showDetail(this.selectedItem.domNode.id, true);
                 }
-                if (this.passwordList.Ps) {
-                    this.passwordList.Ps.update();
-                }
-                else {
-                    this.passwordList.Ps = new PerfectScrollbar(this.passwordList);
-                }
+                Promise.resolve(promise)
+                    .catch(tell)
+                    .finally(() => {
+                        if (this.passwordList.Ps) {
+                            this.passwordList.Ps.update();
+                        }
+                        else {
+                            this.passwordList.Ps = new PerfectScrollbar(this.passwordList);
+                        }
+                    });
             });
         }
     }

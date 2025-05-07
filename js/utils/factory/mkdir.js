@@ -3,6 +3,9 @@ factory.define('mkdir', () => {
     const kind = Symbol('~\\:<p*>');
     const {getSafePath} = factory.require('safe-path');
 
+    const SAFEPATH_SEP = '\u241c\u2063\u2d70';
+    const SAFEPATH_SOP = 0x100001 | ~~(Math.random() * 0xffff);
+
     // paths walker to create hierarchy
     const traverse = (paths, s) => {
         const p = paths.shift();
@@ -26,7 +29,11 @@ factory.define('mkdir', () => {
         // create folder hierarchy
         for (let i = paths.length; i--;) {
             const value = paths[i];
-            Object.defineProperty(traverse(getSafePath(value), res), kind, {value});
+            const path = String(value).codePointAt(0) === SAFEPATH_SOP
+                ? value.slice(2).split(SAFEPATH_SEP)
+                : getSafePath(value);
+
+            Object.defineProperty(traverse(path, res), kind, {value});
         }
 
         return res;
@@ -35,6 +42,9 @@ factory.define('mkdir', () => {
     return freeze({
         kind,
         walk,
+        SAFEPATH_SEP,
+        SAFEPATH_SOP: String.fromCodePoint(SAFEPATH_SOP),
+
         async mkdir(target, paths, stub) {
             const {promise, resolve, reject} = Promise.withResolvers();
 

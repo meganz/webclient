@@ -33,6 +33,10 @@ mega.ui.pm = {
             pmlayout.querySelector('.js-fm-left-panel').classList.add('hidden');
         }
 
+        queueMicrotask(() => {
+            mBroadcaster.sendMessage('pwm-initialized');
+        });
+
         // Business and flexi user has read only access to password manager even it is expired
         if (!mega.pm.pwmFeature && !u_attr.b && !u_attr.pf) {
             return;
@@ -49,7 +53,20 @@ mega.ui.pm = {
                 this.comm.saveLastSelected(nodeID);
             }
 
-            this.list.show();
+            this.list.show().then(() => {
+                if (window.pwmredir) {
+                    const [action, target] = window.pwmredir;
+                    delete window.pwmredir;
+
+                    if (action === 'add') {
+                        mega.ui.topnav.domNode.componentSelector('.add-btn').trigger('click');
+                    }
+                    else if (action === 'edit' && M.d[target]) {
+                        this.comm.saveLastSelected(target);
+                        mega.ui.contextMenu.domNode.componentSelector('.edit-item').trigger('click');
+                    }
+                }
+            });
         }
 
         if (navigator.onLine) {

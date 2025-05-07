@@ -950,7 +950,7 @@ class MegaFlyoutMenu extends MegaComponent {
                     },
                     actions,
                 },
-                topControls: [
+                topControls: M.u[contactHandle].b ? undefined : [
                     {
                         type: 'icon',
                         icon: 'sprite-fm-mono icon-trash-thin-outline',

@@ -1287,7 +1287,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                                                 : l[8871] /* `Clear Chat History` */}
                                         </span>
                                     </Button>
-                                    {room.isNote ? null : retentionHistoryBtn}
+                                    {retentionHistoryBtn}
                                     {room.iAmOperator() && room.type === 'public' && !scheduledMeeting ?
                                         <div className="chat-enable-key-rotation-paragraph">
                                             {AVseperator}
@@ -2559,15 +2559,6 @@ export class ConversationPanel extends MegaRenderMixin {
                             onClose={() => this.setState({ chatLinkDialog: false })}
                         />
                     }
-
-                    <div className="dropdown body dropdown-arrow down-arrow tooltip not-sent-notification hidden">
-                        <i className="dropdown-white-arrow" />
-                        <div className="dropdown notification-text">
-                            <i className="small-icon conversations" />
-                            {l[8882] /* `Message not sent. Will keep retrying.` */}
-                        </div>
-                    </div>
-
 
                     <div
                         className={`

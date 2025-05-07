@@ -36,6 +36,46 @@ export default class Text extends AbstractGenericMessage {
     }
 
 
+    renderMessageIndicators() {
+        const { message, spinnerElement, isBeingEdited, onRetry, onCancelRetry } = this.props;
+
+        if (!message || spinnerElement || isBeingEdited()) {
+            return null;
+        }
+
+        const state = message.getState?.();
+        if (![Message.STATE.NOT_SENT, Message.STATE.NOT_SENT_EXPIRED].includes(state)) {
+            return null;
+        }
+
+        const props = { 'data-simpletipposition': 'top', 'data-simpletipoffset': 8 };
+        return (
+            message.requiresManualRetry ?
+                <div className="not-sent-indicator clickable">
+                    <span
+                        className="simpletip"
+                        {...props}
+                        data-simpletip={l[8883] /* `Message not sent. Click here if you want to resend it.` */}
+                        onClick={ev => onRetry(ev, message)}>
+                        <i className="small-icon refresh-circle"/>
+                    </span>
+                    <span
+                        className="simpletip"
+                        {...props}
+                        data-simpletip={l[8884] /* `Message not sent. Click here if you want to cancel it.` */}
+                        onClick={ev => onCancelRetry(ev, message)}>
+                        <i className="sprite-fm-mono icon-dialog-close"/>
+                    </span>
+                </div> :
+                <div
+                    className="not-sent-indicator simpletip"
+                    {...props}
+                    data-simpletip={l[8882] /* `Message not sent. Will keep retrying.` */}>
+                    <i className="small-icon yellow-triangle"/>
+                </div>
+        );
+    }
+
     getMessageActionButtons() {
         const { chatRoom, message, isBeingEdited } = this.props;
 
@@ -186,7 +226,6 @@ export default class Text extends AbstractGenericMessage {
     getContents() {
         const { message, chatRoom, onUpdate, isBeingEdited, spinnerElement } = this.props;
 
-        let messageNotSendIndicator;
         let textMessage = message.messageHtml;
 
         const IS_GEOLOCATION = this.isGeoLocation(message);
@@ -221,44 +260,6 @@ export default class Text extends AbstractGenericMessage {
                     ...subMessageComponent,
                     <MetaRichpreviewMegaLinks key="richprevml" message={message} chatRoom={chatRoom} />
                 ];
-            }
-        }
-
-        if (
-            message &&
-            message.getState &&
-            (message.getState() === Message.STATE.NOT_SENT || message.getState() === Message.STATE.NOT_SENT_EXPIRED)
-        ) {
-            if (!spinnerElement) {
-                if (message.requiresManualRetry) {
-                    if (isBeingEdited() !== true) {
-                        messageNotSendIndicator = (
-                            <div className="not-sent-indicator">
-                                <span
-                                    className="tooltip-trigger"
-                                    key="retry"
-                                    data-tooltip="not-sent-notification-manual"
-                                    onClick={(e) => this.props.onRetry(e, message)}>
-                                    <i className="small-icon refresh-circle" />
-                                </span>
-                                <span
-                                    className="tooltip-trigger"
-                                    key="cancel"
-                                    data-tooltip="not-sent-notification-cancel"
-                                    onClick={e => this.props.onCancelRetry(e, message)}>
-                                    <i className="sprite-fm-mono icon-dialog-close" />
-                                </span>
-                            </div>
-                        );
-                    }
-                }
-                else {
-                    messageNotSendIndicator = (
-                        <div className="not-sent-indicator tooltip-trigger" data-tooltip="not-sent-notification">
-                            <i className="small-icon yellow-triangle" />
-                        </div>
-                    );
-                }
             }
         }
 
@@ -319,7 +320,7 @@ export default class Text extends AbstractGenericMessage {
 
         return (
             <>
-                {messageNotSendIndicator}
+                {this.renderMessageIndicators()}
                 {IS_GEOLOCATION ? null : messageDisplayBlock}
                 {subMessageComponent}
                 {spinnerElement}

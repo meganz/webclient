@@ -170,7 +170,7 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
 
     // activity on a specific room (show, hidden, got new message, etc)
     self.rebind('onMessagesBuffAppend.lastActivity', function(e, msg) {
-        if (is_chatlink) {
+        if (is_chatlink || self.isNote) {
             return;
         }
 

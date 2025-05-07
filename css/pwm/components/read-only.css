@@ -46,6 +46,7 @@
 .mega-component.read-only-field .read-only-output .read-only-value {
     font: var(--mobile-font-input-regular);
     margin-right: 16px;
+    flex: 1;
 }
 
 .mega-component.read-only-field .read-only-output .read-only-value.password-colorized span {
@@ -61,12 +62,13 @@
 .mega-component.read-only-field .read-only-actions {
     display: flex;
     --icon-size: 20px;
+    align-items: center;
 }
 
 .mega-component.read-only-field .read-only-actions button.icon-only {
     background-color: transparent;
     width: auto;
-    height: auto;
+    height: 20px;
     padding: 0 !important;
     color: inherit;
     --icon-size: 20px;
@@ -78,7 +80,7 @@
 
 .mega-component.read-only-field .read-only-actions i {
     cursor: pointer;
-    padding: 4px;
+    font: var(--mobile-font-copy-regular);
 }
 
 .mega-component.read-only-field .read-only-help {
@@ -91,4 +93,8 @@
 .mega-component.read-only-field .read-only-help i {
     margin-top: 3px;
     margin-inline-end: 8px;
+}
+
+.mega-component.read-only-field .icon-copy-thin-outline {
+    color: var(--mobile-text-secondary);
 }

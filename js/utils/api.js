@@ -1651,7 +1651,7 @@ lazy(self, 'api', () => {
             for (let i = args.length; i--;) {
                 this.delete(args[i]);
             }
-            delay('api!sc<resume>', () => {
+            queueMicrotask(() => {
                 console.assert(this.size || !window.scinflight, 'Invalid SC-inflight state, API gave no ST?');
                 return !this.size && window.scinflight && queueMicrotask(execsc);
             });

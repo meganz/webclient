@@ -839,7 +839,6 @@ function fmtopUI() {
             if (M.currentdirid === M.currentrootid && mega.devices.ui.hasDevices && mega.devices.ui.isCustomRender()) {
                 primary = '.fm-add-backup';
                 secondary = '.fm-add-syncs';
-                mega.ui.secondaryNav.hideCard();
             }
             if (mega.devices.ui.isCustomRender()) {
                 mega.ui.secondaryNav.updateLayoutButton(true);

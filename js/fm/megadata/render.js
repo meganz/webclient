@@ -424,7 +424,6 @@ MegaData.prototype.renderChatIsLoading = function() {
     $('.fm-right-files-block, .fm-left-panel').addClass('hidden');
 
     mega.devices.ui.$gridWrapper.addClass('hidden');
-    mega.devices.ui.header.$el.addClass('hidden');
 
     $('.section.conversations').removeClass('hidden');
     $('.section.conversations .fm-chat-is-loading').removeClass('hidden');

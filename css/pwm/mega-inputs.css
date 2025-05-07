@@ -62,6 +62,9 @@
 .pm.mega-input.strengthChecker.title-ontop {
     margin-bottom: 30px;
 }
+.pm.mega-input.strengthChecker.title-ontop.checked {
+    margin-bottom: 50px;
+}
 .pm.mega-input input[type="number"] {
     appearance: textfield;
     text-align: center;
@@ -93,4 +96,8 @@
 /* Overridden component styles for webclient layout */
 .pm.mega-input .mega-banner i {
     --icon-size: 16px;
+}
+
+.pm.mega-input.info:not(.error) .mega-banner i {
+    --mask-color: var(--mobile-text-secondary);
 }

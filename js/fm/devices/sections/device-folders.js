@@ -61,6 +61,7 @@ lazy(mega.devices.sections, 'deviceFolders', () => {
          * @returns {void}
          */
         destroy() {
+            mega.ui.secondaryNav.hideCard();
             ui.notification.hide();
             ui.$gridWrapper.addClass('hidden');
             this.$grid.addClass('hidden');
@@ -149,15 +150,13 @@ lazy(mega.devices.sections, 'deviceFolders', () => {
                 {
                     text: l.add_backup_button,
                     onClick: () => {
-                        ui.desktopApp.backup.add();
-                        eventlog(500751);
+                        ui.desktopApp.backup.add(500751);
                     }
                 },
                 {
                     text: l.add_syncs_button,
                     onClick: () => {
-                        ui.desktopApp.sync.add();
-                        eventlog(500752);
+                        ui.desktopApp.sync.add(500752);
                     }
                 },
                 (ev) => {
@@ -226,11 +225,9 @@ lazy(mega.devices.sections, 'deviceFolders', () => {
 
             if (M.v.length) {
                 this.$empty.addClass('hidden');
-                ui.header.$el.removeClass('bottom-border');
             }
             else {
                 this.$empty.removeClass('hidden');
-                ui.header.$el.addClass('bottom-border');
             }
 
             const {n, d} = fmconfig.sortmodes[M.currentdirid] || {n: 'name', d: 1};

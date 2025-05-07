@@ -56,6 +56,7 @@ lazy(mega.devices.sections, 'folderChildren', () => {
          * @returns {void}
          */
         destroy() {
+            mega.ui.secondaryNav.hideCard();
             ui.notification.hide();
         }
 

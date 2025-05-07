@@ -21,7 +21,7 @@ factory.define('file-list', () => {
                 if (p[i] === file.name) {
                     p.splice(i, 1);
                 }
-                path = `${p.join('/')}/`;
+                path = `${p.join('/')}`;
             }
             if (file.path !== path) {
                 Object.defineProperty(file, 'path', {

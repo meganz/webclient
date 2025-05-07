@@ -50,6 +50,7 @@ lazy(mega.devices.sections, 'devices', () => {
          * @returns {void}
          */
         destroy() {
+            mega.ui.secondaryNav.hideCard();
             ui.notification.hide();
             ui.$gridWrapper.addClass('hidden');
             this.$grid.addClass('hidden');
@@ -61,15 +62,20 @@ lazy(mega.devices.sections, 'devices', () => {
          * @returns {void}
          */
         render(isRefresh) {
-            ui.header.hide();
-            if (Object.values(M.dcd).length) {
-                ui.noDevices = false;
+            for (let i = 0; i < $.selected.length; i++) {
+                const h = $.selected[i];
+                if (!M.dcd[h]) {
+                    selectionManager.remove_from_selection(h);
+                }
+            }
+
+            if (ui.hasDevices) {
+                ui.$emptyDevices.addClass('hidden');
                 ui.$gridWrapper.removeClass('hidden');
                 this.$grid.removeClass('hidden');
                 this._renderItems(isRefresh);
             }
             else {
-                ui.noDevices = true;
                 ui.showNoDevices();
             }
         }

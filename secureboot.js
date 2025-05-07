@@ -2123,7 +2123,6 @@ else if (!browserUpdate) {
         // minimal device centre resources
         jsl.push({f:'js/fm/devices/models.js', n: 'devices_models_js', j: 1, w: 1});
         jsl.push({f:'js/fm/devices/data.js', n: 'devices_data_js', j: 1, w: 1});
-        jsl.push({f:'js/fm/devices/ui-elems/header.js', n: 'devices_ui_elems_header_js', j: 1, w: 1});
         jsl.push({f:'js/fm/devices/ui-elems/shimmer.js', n: 'devices_ui_elems_shimmer_js', j: 1, w: 1});
         jsl.push({f:'js/fm/devices/ui-elems/notification.js', n: 'devices_ui_elems_notification_js', j: 1, w: 1});
         jsl.push({f:'js/fm/devices/ui.js', n: 'devices_ui_js', j: 1, w: 1});

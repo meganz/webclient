@@ -9,11 +9,6 @@ lazy(mega.devices, 'ui', () => {
     const {
         uiElems: {
             /**
-             * {Header} Header - Header UI element
-             */
-            Header,
-
-            /**
              * {Shimmer} Shimmer - Shimmer UI element
              */
             Shimmer,
@@ -266,10 +261,10 @@ lazy(mega.devices, 'ui', () => {
          * Triggers Desktop App dialog to add backup or sync folder
          * @returns {void}
          */
-        add() {
+        add(eventId) {
             megasync.isInstalled((err, is) => {
-                if (this.config.event.add) {
-                    eventlog(this.config.event.add);
+                if (eventId) {
+                    eventlog(eventId);
                 }
                 if (!err && is) {
                     if (typeof is === 'object' && is.v && M.vtol(is.v) < M.vtol(this.config.minVersion)) {
@@ -654,6 +649,11 @@ lazy(mega.devices, 'ui', () => {
              */
             this.updatedSharedNodeHandles = new Set();
 
+            /**
+             * {Set<String>} removedNodeHandles - set of handles related to nodes removed
+             */
+            this.removedNodeHandles = new Set();
+
             /*
              * {String} beforePageChangeListener - The ID identifying the event
              */
@@ -663,11 +663,6 @@ lazy(mega.devices, 'ui', () => {
              * {jQuery} $fmMain - jQuery object
              */
             this.$fmMain = $('.fm-right-files-block', '.fmholder');
-
-            /**
-             * {jQuery} $fmHeader - jQuery object
-             */
-            this.$fmHeaderButtons = $('.fm-header-buttons', this.$fmMain);
 
             /**
              * {jQuery} $gridWrapper - jQuery object
@@ -718,6 +713,7 @@ lazy(mega.devices, 'ui', () => {
              * {jQuery} $emptyAppDLButtons - jQuery object
              */
             this.$emptyAppDLButtons = $('.fm-app-links', this.$emptyDevices);
+
             /**
              * {Shimmer} shimmer - Shimmer instance
              */
@@ -727,11 +723,6 @@ lazy(mega.devices, 'ui', () => {
              * {Notification} notification - Notification instance
              */
             this.notification = new Notification(this.$fmMain);
-
-            /**
-             * {Header} header - Header instance
-             */
-            this.header = new Header(this.$fmMain);
 
             this.desktopApp = {
                 /**
@@ -747,9 +738,6 @@ lazy(mega.devices, 'ui', () => {
                     options: {
                         handleInvalidUser: true,
                     },
-                    event: {
-                        add: 500614
-                    },
                     appPromoPageNum: 1,
                 }),
                 /**
@@ -761,9 +749,6 @@ lazy(mega.devices, 'ui', () => {
                             a: 's',
                             u: u_handle,
                         },
-                    },
-                    event: {
-                        add: 500615
                     },
                     appPromoPageNum: 2,
                 }),
@@ -929,8 +914,6 @@ lazy(mega.devices, 'ui', () => {
                 toggleActiveFilter(preventReload) {
                     const {ui} = mega.devices;
                     const currSect = ui.getRenderSection();
-                    const {device} = ui.getCurrentDirData();
-                    let folderFilterOption;
                     switch (currSect) {
                         case renderSection.devices:
                             this.autoSelect('deviceactivity', 0, preventReload);
@@ -965,7 +948,6 @@ lazy(mega.devices, 'ui', () => {
         destroy() {
             this._unbindEvents();
             this.shimmer.hide();
-            this.header.hide();
             this.filterChipUtils.resetSelections();
             this.filterChipUtils.selectedFilters.manual = false;
         }
@@ -1025,7 +1007,7 @@ lazy(mega.devices, 'ui', () => {
                 });
             }
 
-            await mega.devices.main.render(isRefresh);
+            await mega.devices.main.render(M.megaRender ? isRefresh : false);
             this._postRender();
 
             delay(refreshEventName, () => this.render(id, {isRefresh: true}).catch(dump), refreshMillis);
@@ -1048,7 +1030,7 @@ lazy(mega.devices, 'ui', () => {
             }
 
             if (M.onDeviceCenter) {
-                mega.devices.ui.render(M.currentdirid, {isRefresh: true});
+                this.render(M.currentdirid, {isRefresh: true});
             }
         }
 
@@ -1394,6 +1376,7 @@ lazy(mega.devices, 'ui', () => {
         showNoDevices() {
             this.$gridWrapper.addClass('hidden');
             this.$emptyDevices.removeClass('hidden');
+            mega.ui.secondaryNav.hideActionButtons();
             megasync.isInstalled((err, is) => {
                 const appFound = !err || is;
                 const descText = appFound
@@ -1631,7 +1614,7 @@ lazy(mega.devices, 'ui', () => {
             }
 
             const node = M.d[handle];
-            if (!node) {
+            if (!node || !node.t) {
                 return;
             }
 
@@ -1641,7 +1624,7 @@ lazy(mega.devices, 'ui', () => {
                     this._updateDataAndUI(folders[j], node);
                 }
 
-                if (!isSkipRender) {
+                if (!isSkipRender && folders.length) {
                     this.render(M.currentdirid, {isRefresh: true}).catch(dump);
                 }
             }
@@ -1662,11 +1645,13 @@ lazy(mega.devices, 'ui', () => {
             }
 
             const node = M.d[handle];
-            if (!node) {
+            if (!node || !node.t) {
                 return;
             }
 
             if (M.onDeviceCenter) {
+                let hasToRender = false;
+
                 if (M.getNodeRights(node.h) < 2) {
                     const folders = this._findAllFolders(node.h);
                     for (let j = 0; j < folders.length; j++) {
@@ -1675,16 +1660,63 @@ lazy(mega.devices, 'ui', () => {
                             folder.syncState = 2;
                             folder.ss = 14;
                             this._updateDataAndUI(folder, node);
+                            hasToRender = true;
                         }
                     }
                 }
 
-                if (!isSkipRender) {
+                if (!isSkipRender && hasToRender) {
                     this.render(M.currentdirid, {isRefresh: true}).catch(dump);
                 }
             }
             else {
                 this.updatedSharedNodeHandles.add(handle);
+            }
+        }
+
+        /**
+         * Updates device centre data and UI when a node is removed
+         * @param {String} handle - node handle removed
+         * @param {Number} type - node type removed
+         * @param {Boolean} isSkipRender - whether to skip rendering
+         * @returns {void} void
+         */
+        onRemoveNode(handle, type, isSkipRender) {
+            if (!this.isReady) {
+                return;
+            }
+
+            if (!type) {
+                return;
+            }
+
+            if (M.onDeviceCenter) {
+                let hasToRender = false;
+
+                if (M.dcd && Object.keys(M.dcd).length) {
+                    for (const device of Object.values(M.dcd)) {
+                        const folder = device.folders[handle];
+                        if (folder) {
+                            delete device.folders[folder.h];
+                            if (!Object.keys(device.folders).length) {
+                                delete M.dcd[device.h];
+                            }
+
+                            if (M.megaRender) {
+                                M.megaRender.revokeDOMNode(handle, true);
+                            }
+
+                            hasToRender = true;
+                        }
+                    }
+                }
+
+                if (!isSkipRender && hasToRender) {
+                    this.render(M.currentdirid, {isRefresh: true}).catch(dump);
+                }
+            }
+            else {
+                this.removedNodeHandles.add(handle);
             }
         }
 
@@ -1702,6 +1734,11 @@ lazy(mega.devices, 'ui', () => {
                 this.onUpdateSharedNode(handle, true);
             }
             this.updatedSharedNodeHandles.clear();
+
+            for (const handle of this.removedNodeHandles) {
+                this.onRemoveNode(handle, 1, true);
+            }
+            this.removedNodeHandles.clear();
         }
 
         /**
@@ -1775,14 +1812,12 @@ lazy(mega.devices, 'ui', () => {
         _bindEvents() {
             if (this.$addBackup) {
                 this.$addBackup.rebind('click.dc.backup.add', () => {
-                    this.desktopApp.backup.add();
-                    eventlog(500749);
+                    this.desktopApp.backup.add(500749);
                 });
             }
             if (this.$addSyncs) {
                 this.$addSyncs.rebind('click.dc.syncs.add', () => {
-                    this.desktopApp.sync.add();
-                    eventlog(500750);
+                    this.desktopApp.sync.add(500750);
                 });
             }
             if (this.$emptyActiveDevices) {
@@ -1805,10 +1840,10 @@ lazy(mega.devices, 'ui', () => {
             }
             if (this.$emptyAddActions) {
                 $('.cta-add-backup', this.$emptyAddActions).rebind('click.dc.backup.add', () => {
-                    this.desktopApp.backup.add();
+                    this.desktopApp.backup.add(500614);
                 });
                 $('.cta-add-syncs', this.$emptyAddActions).rebind('click.dc.sync.add', () => {
-                    this.desktopApp.sync.add();
+                    this.desktopApp.sync.add(500615);
                 });
             }
         }

@@ -3129,7 +3129,6 @@ async function galleryUI(id) {
         id = !id || typeof id !== 'string' ? M.currentdirid : id;
         if (id.startsWith('device-centre/')) {
             id = id.split('/')[2];
-            mega.devices.ui.header.hide();
             mega.devices.ui.handleAddBtnVisibility();
         }
         $('.view-links', '.gallery-tabs-bl').removeClass('hidden');

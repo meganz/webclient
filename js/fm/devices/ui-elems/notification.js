@@ -17,7 +17,7 @@ lazy(mega.devices.uiElems, 'Notification', () => {
             this.$notification = $('.fm-notification-block.device-centre', $container);
 
             /**
-             * {jQuery} $header - jQuery object
+             * {jQuery} $text - jQuery object
              */
             this.$text = $('span', this.$notification);
         }

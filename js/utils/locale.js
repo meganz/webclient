@@ -1989,7 +1989,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[S]', '<span>').replace('[/S]', '</span>')
         .replace('[A]', '<a class="clickurl">').replace('[/A]', '</a>');
 
-    const otpHelpLink = 'https://help.mega.io/mega-pass-features/one-time-passwords';
+    const otpHelpLink = 'https://help.mega.io/pass/mega-pass-features/one-time-passwords';
     l.otp_learn_more = escapeHTML(l.otp_learn_more)
         .replace('[A]', `<a class="clickurl" href=${otpHelpLink}" target="_blank">`)
         .replace('[/A]', '</a>');

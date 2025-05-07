@@ -454,7 +454,20 @@ var pro = {
      *                   'displayName' which is the translated name for that provider (however
      *                   company names are not translated).
      */
-    getPaymentGatewayName: function(gatewayId, gatewayOpt) {
+    getPaymentGatewayName(givenId, gatewayOpt) {
+        'use strict';
+
+        let walletType;
+        let gatewayId;
+
+        if (Array.isArray(givenId)) {
+            gatewayId = givenId[0];
+            walletType = givenId[1];
+        }
+        else {
+            gatewayId = givenId;
+        }
+
 
         var gateways = {
             0: {
@@ -538,6 +551,21 @@ var pro = {
                 displayName: l[6198]    // Wire transfer
             }
         };
+
+        const wallets = {
+            'google_pay': {
+                name: 'google',
+                displayName: 'Google Pay',
+            },
+            'apple_pay': {
+                name: 'apple',
+                displayName: 'Apple Pay',
+            },
+        };
+
+        if (wallets[walletType]) {
+            return wallets[walletType];
+        }
 
         // If the gateway option information was provided we can improve the default naming in some cases
         if (typeof gatewayOpt !== 'undefined') {

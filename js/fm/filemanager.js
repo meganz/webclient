@@ -4605,6 +4605,12 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         else {
             $('.fm-right-header').removeClass('hidden');
             $('.fm-right-header-user-management').addClass('hidden');
+            if (id === mega.devices.rootId &&
+                mega.devices.ui &&
+                mega.devices.ui.isReady &&
+                !mega.devices.ui.hasDevices) {
+                mega.ui.secondaryNav.actionsHolder.classList.add('hidden');
+            }
         }
 
         $('.fm-chat-block').addClass('hidden');
@@ -4677,7 +4683,6 @@ FileManager.prototype.onSectionUIOpen = function(id) {
 
     if (id !== mega.devices.rootId) {
         mega.devices.ui.$gridWrapper.addClass('hidden');
-        mega.devices.ui.header.hide();
     }
 
     if (id !== "recents") {

@@ -177,7 +177,9 @@ function removeUInode(h, parent) {
                     else if (M.currentdirid === 'out-shares') {
                         $('.fm-empty-outgoing').removeClass('hidden');
                     }
-                    else if (M.currentdirid !== 'public-links' && M.currentdirid !== 'file-requests') {
+                    else if (M.currentdirid !== 'public-links' &&
+                        M.currentdirid !== 'file-requests' &&
+                        M.currentdirid !== mega.devices.rootId) {
 
                         // If they have removed all files from the search results screen, show empty search
                         if (M.search) {

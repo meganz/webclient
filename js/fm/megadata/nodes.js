@@ -92,6 +92,8 @@
             delay('fmLeftMenuUI', fmLeftMenuUI);
         }
 
+        const nodeType = this.d[h] && this.d[h].t;
+
         if (this.d[h] && !this.d[h].t && this.d[h].tvf) {
             const versions = fileversioning.getAllVersionsSync(h);
             for (let i = versions.length; i--;) {
@@ -123,6 +125,10 @@
                 fmdb.del('s', delInShareQ[i]);
             }
             delete delInShareQueue[h];
+        }
+
+        if (mega.devices.ui) {
+            mega.devices.ui.onRemoveNode(h, nodeType);
         }
 
         if (d) {

@@ -106,12 +106,14 @@ lazy(T.ui, 'navDialog', () => {
 
 mBroadcaster.once('boot_done', tryCatch(() => {
     'use strict';
-    const audio = new Audio();
-    audio.src = b64decode('aHR0cHM6Ly93d3cubXlpbnN0YW50cy5jb20vbWVkaWEvc291bmRzL2hhZG91a2VuLm1wMw');
-    audio.load();
-
+    let audio;
     mBroadcaster.addListener('it-key-combo', tryCatch((seq) => {
         if (seq === 'SDA') {
+            if (!audio) {
+                audio = new Audio();
+                audio.src = b64decode('aHR0cHM6Ly93d3cubXlpbnN0YW50cy5jb20vbWVkaWEvc291bmRzL2hhZG91a2VuLm1wMw');
+                audio.load();
+            }
             Promise.resolve(audio.play()).catch(dump);
             T.ui.navDialog.show();
             document.querySelector('.js-nav-dialog .version').classList.remove('hidden');

@@ -76,6 +76,7 @@
 }
 
 .subpage-box .faq-content .item .header {
+    align-items: center;
     cursor: pointer;
     display: flex;
     width: 100%; 

@@ -147,6 +147,15 @@
     white-space: nowrap;
 }
 
+.it-box.add-more-files-box .add-files .inv-input.disabled {
+    cursor: default;
+    opacity: .3;
+}
+
+.it-box.add-more-files-box .add-files .inv-input.disabled input {
+    display: none;
+}
+
 .it-box.add-more-files-box .add-files  .inv-input span {
     color: var(--main-neutral-primary);
     display: block;
@@ -159,6 +168,27 @@
 
 .it-box.add-more-files-box .items-wrap {
     border-top: 1px solid var(--main-borders-and-lines);
+}
+
+.it-box.add-more-files-box .loader-body {
+    align-items: center;
+    color: var(--main-neutral-primary);
+    display: none;
+    font: 700 var(--text-body-sm);
+    justify-content: center;
+    margin: 22px 12px;
+}
+
+.it-box.add-more-files-box .loader-body.active {
+    display: flex;
+}
+
+.it-box.add-more-files-box .loader-body.active + .files-info {
+    display: none;
+}
+
+.it-box.add-more-files-box .loader-body span {
+    margin-inline-start: 12px;
 }
 
 .it-box.add-more-files-box .files-info {

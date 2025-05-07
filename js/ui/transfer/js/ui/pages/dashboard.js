@@ -148,6 +148,10 @@ lazy(T.ui, 'dashboardLayout', () => {
                 if (n.a) {
                     crypto_procattr(n, base64_to_a32(n.k));
                 }
+                if (typeof n.t === 'string') {
+                    n.name = n.t && tryCatch(() => from8(base64urldecode(n.t)))() || n.name;
+                }
+                n.t = 1;
                 return flt(n);
             });
 
@@ -202,9 +206,6 @@ lazy(T.ui, 'dashboardLayout', () => {
                 if (aSearchBy) {
                     const data = [n.name];
 
-                    if (typeof n.t === 'string') {
-                        data.push(base64urldecode(n.t));
-                    }
                     if (n.xrf) {
                         data.push(n.xrf.map((o) => o.e).filter(Boolean).join('\t'));
                     }
@@ -256,7 +257,7 @@ lazy(T.ui, 'dashboardLayout', () => {
                 txt = l.transferit_empty_accessed;
             }
             else if (fl === 'sched') {
-                icon = 'icon-calendar-narrow';
+                icon = 'icon-schedule-narrow';
                 txt = l.transferit_empty_scheduled;
             }
             else if (fl === 'pw') {
@@ -289,10 +290,7 @@ lazy(T.ui, 'dashboardLayout', () => {
         },
 
         renderListitem(n, cn) {
-            if (n.a) {
-                crypto_procattr(n, base64_to_a32(n.k));
-            }
-            const {name, t, ac, ct, ts, e, xh, xrf, size: [bytes, files]} = n;
+            const {ac, ct, ts, e, xh, xrf, size: [bytes, files]} = n;
 
             const item = ce('div', cn, {
                 id: xh,
@@ -306,7 +304,7 @@ lazy(T.ui, 'dashboardLayout', () => {
 
             // Item name
             ce('div', wrap, {class: 'name js-name'})
-                .textContent = tryCatch(() => t && from8(base64urldecode(t)))() || name;
+                .textContent = n.name;
 
             // Itme info
             let node = ce('div', wrap, { class: 'info' });
@@ -384,8 +382,7 @@ lazy(T.ui, 'dashboardLayout', () => {
             const btn = item.querySelector('.js-context');
 
             const hide = (e) => {
-                if (e.key === 'Escape' || e.type !== 'keydown' && !btn.contains(e.target)) {
-                    this.data.selected = false;
+                if (e.key === 'Escape' || e.type !== 'keydown' && !e.target.closest('.js-context')) {
                     menu.classList.remove('visible');
                     document.removeEventListener('click', hide);
                     document.removeEventListener('keydown', hide);
@@ -435,7 +432,7 @@ lazy(T.ui, 'dashboardLayout', () => {
         },
 
         bindActionBtnEvts(cn) {
-            cn.querySelector('.js-tr-download').addEventListener('click', () => {
+            cn.querySelector('.js-tr-open').addEventListener('click', () => {
                 const {xh} = this.data.selected;
                 open(`${getBaseUrl()}/t/${xh}`, '_blank', 'noopener,noreferrer');
             });
@@ -445,11 +442,12 @@ lazy(T.ui, 'dashboardLayout', () => {
             });
 
             cn.querySelector('.js-tr-edit-link-title').addEventListener('click', () => {
-                const {xh} = this.data.selected;
+                const {xh, name} = this.data.selected;
                 const opt = {
                     title: l.transferit_edit_title,
                     buttons: [l[776], l[82]],
                     placeholders: [l.transferit_enter_title, l.file_request_title_heading],
+                    inputValue: name
                 };
                 T.ui.prompt(l.transferit_enter_new_title, opt)
                     .catch(echo)
@@ -533,12 +531,16 @@ lazy(T.ui, 'dashboardLayout', () => {
                     .then(() => this.init(true))
                     .catch(tell);
             });
+
+            for (const elm of cn.querySelectorAll('.js-tr-details')) {
+                elm.addEventListener('click', () => this.renderDetailsContent());
+            }
         },
 
         /*
          * Init Transfer details section.
         */
-        initDetalisContent() {
+        initDetailsContent() {
             const cn = this.detailsSection.cn = this.data.cn.querySelector('.js-details-content');
 
             // Back
@@ -554,15 +556,15 @@ lazy(T.ui, 'dashboardLayout', () => {
 
         renderDetailsContent() {
             if (!this.detailsSection.cn) {
-                this.initDetalisContent();
+                this.initDetailsContent();
             }
 
             let { cn } = this.detailsSection;
-            const {xh, name, t, ac, ct, ts, xrf = false, size: [bytes, files]} = this.data.selected;
+            const {xh, name, ac, ct, ts, xrf = false, size: [bytes, files]} = this.data.selected;
 
             this.showSubSection(cn);
 
-            cn.querySelector('.js-name').textContent = t && base64urldecode(t) || name;
+            cn.querySelector('.js-name').textContent = name;
             cn.querySelector('.js-total-views').textContent =
                 l.transferit_total_accesses.replace('%1', ac);
             cn.querySelector('.js-recipients-num').textContent =

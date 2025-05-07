@@ -2,9 +2,15 @@
 <div class="it-menu context js-dashboard-menu" tabindex="0">
     <div class="body">
         <div class="section">
-            <button class="it-menu-item js-tr-download">
-                <i class="sprite-it-x24-mono icon-arrow-small-down"></i>
-                <span>[$58]</span>
+            <button class="it-menu-item js-tr-details">
+                <i class="sprite-it-x24-mono icon-info"></i>
+                <span>[$19284]</span>
+            </button>
+        </div>
+        <div class="section">
+            <button class="it-menu-item js-tr-open">
+                <i class="sprite-it-x24-mono icon-arrow-up-right-square"></i>
+                <span>[$transferit_open_link]</span>
             </button>
             <button class="it-menu-item js-tr-copy-link">
                 <i class="sprite-it-x24-mono icon-chain"></i>
@@ -23,7 +29,7 @@
                 <span>[$transferit_change_exp_date]</span>
             </button>
             <button class="it-menu-item js-tr-change-schedule">
-                <i class="sprite-it-x24-mono icon-calendar"></i>
+                <i class="sprite-it-x24-mono icon-schedule"></i>
                 <span>[$transferit_change_schedule]</span>
             </button>
             <button class="it-menu-item js-tr-delete-transfer negative">
@@ -247,7 +253,7 @@
                         <span>[$transferit_share_uploaded_error]</span>
                     </div>
 
-                    <button class="it-button xl-size f-w js-get-link-button">
+                    <button class="it-button xl-size f-w js-get-link-button disabled">
                         <span>[$transferit_transfer_btn]</span>
                     </button>
 
@@ -283,6 +289,10 @@
                         <i class="sprite-it-x24-mono icon-laptop"></i>
                         <span>[$transferit_upload_from_local]</span>
                     </div>
+                </div>
+
+                <div class="loader-body js-loader">
+                    <div class="it-loading-spinner inline md-size simplified"></div>
                 </div>
 
                 <div class="files-info">
@@ -597,7 +607,7 @@
                             <span>[$transferit_all_accessed]</span>
                         </button>
                         <button class="it-tab js-transfers-tab" data-filter="sched" data-page="scheduled">
-                            <i class="sprite-it-x24-mono icon-calendar"></i>
+                            <i class="sprite-it-x24-mono icon-schedule"></i>
                             <span>[$transferit_all_scheduled]</span>
                         </button>
                         <button class="it-tab js-transfers-tab" data-filter="pw" data-page="protected">
@@ -685,9 +695,9 @@
                         </div>
                         <div class="section">
                             <div class="control-btns js-ctrl-btns">
-                                <button class="it-button ghost js-tr-download">
-                                    <i class="sprite-it-x24-mono icon-arrow-small-down"></i>
-                                    <span>[$58]</span>
+                                <button class="it-button ghost js-tr-open">
+                                    <i class="sprite-it-x24-mono icon-arrow-up-right-square"></i>
+                                    <span>[$transferit_open_link]</span>
                                 </button>
                                 <button class="it-button ghost js-tr-copy-link">
                                     <i class="sprite-it-x24-mono icon-chain"></i>
@@ -702,7 +712,7 @@
                                     <span>[$transferit_change_exp_date]</span>
                                 </button>
                                 <button class="it-button ghost js-tr-change-schedule">
-                                    <i class="sprite-it-x24-mono icon-calendar"></i>
+                                    <i class="sprite-it-x24-mono icon-schedule"></i>
                                     <span>[$transferit_change_schedule]</span>
                                 </button>
                                 <button class="it-button ghost js-tr-delete-transfer negative">

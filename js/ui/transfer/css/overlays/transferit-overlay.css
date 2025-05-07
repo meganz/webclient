@@ -8,9 +8,8 @@
 .global-transferit-container {
     background: no-repeat center / cover var(--wall-img1-url) var(--main-surface-primary);
     height: 100%;
-    overflow: auto;
+    overflow: hidden;
     position: fixed;
-    scrollbar-color: var(--scroll-bar-handle) var(--scroll-bar-background);
     top: 0;
     width: 100%;
     z-index: 1110;
@@ -18,26 +17,42 @@
 
 .global-transferit-container * {
     box-sizing: border-box;
+    scrollbar-color: var(--scroll-bar-handle) var(--scroll-bar-background);
+    scrollbar-width: thin;
 }
 
-.global-transferit-container ::-webkit-scrollbar {
-    height: 8px;
-    width: 8px;
-}
- 
-.global-transferit-container ::-webkit-scrollbar-track {
-    box-shadow: none; 
-    border-radius: 10px;
-}
- 
-.global-transferit-container ::-webkit-scrollbar-thumb {
-    border-radius: 10px;
-    background: var(--scroll-bar-handle); 
-    box-shadow: none; 
+.global-transferit-container .global-page-container {
+    overflow: auto;
 }
 
-.global-transferit-container ::-webkit-scrollbar-thumb:window-inactive {
-	background: var(--scroll-bar-handle-inactive); 
+
+@supports selector(::-webkit-scrollbar) {
+
+    .global-transferit-container * {
+        scrollbar-color: auto;
+        scrollbar-width: auto;
+    }
+
+    .global-transferit-container ::-webkit-scrollbar {
+        height: 8px;
+        width: 8px;
+    }
+
+    .global-transferit-container ::-webkit-scrollbar-track {
+        box-shadow: none; 
+        border-radius: 4px;
+    }
+
+    .global-transferit-container ::-webkit-scrollbar-thumb {
+        border-radius: 4px;
+        background: var(--scroll-bar-handle); 
+        box-shadow: none; 
+    }
+
+    .global-transferit-container ::-webkit-scrollbar-thumb:window-inactive {
+        background: var(--scroll-bar-handle-inactive); 
+    }
+
 }
 
 

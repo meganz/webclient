@@ -18,7 +18,6 @@ body {
     overflow: hidden;
     overflow-y: auto;
     padding: 0;
-    scrollbar-color: var(--scroll-bar-handle) var(--scroll-bar-background);
     transition: var(--transition-bg-color);
     -webkit-touch-callout: none;
     -webkit-user-select: none;
@@ -28,7 +27,6 @@ body {
 
 body * {
     box-sizing: border-box;
-    /* scrollbar-width: thin; */
 }
 
 #chromeclipboard,
@@ -76,22 +74,35 @@ body * {
     overflow-y: auto;
 }
 
-::-webkit-scrollbar {
-    height: 8px;
-    width: 8px;
-}
- 
-::-webkit-scrollbar-track {
-    box-shadow: none; 
-    border-radius: 10px;
-}
- 
-::-webkit-scrollbar-thumb {
-    border-radius: 10px;
-    background: var(--scroll-bar-handle); 
-    box-shadow: none; 
+* {
+    scrollbar-color: var(--scroll-bar-handle) var(--scroll-bar-background);
+    scrollbar-width: thin;
 }
 
-::-webkit-scrollbar-thumb:window-inactive {
-	background: var(--scroll-bar-handle-inactive); 
+
+@supports selector(::-webkit-scrollbar) {
+    * {
+        scrollbar-color: auto;
+        scrollbar-width: auto;
+    }
+
+    ::-webkit-scrollbar {
+        max-width: 8px;
+        max-height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+        box-shadow: none; 
+        border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        border-radius: 4px;
+        background-color: var(--scroll-bar-handle); 
+        box-shadow: none; 
+    }
+
+    ::-webkit-scrollbar-thumb:window-inactive {
+        background-color: var(--scroll-bar-handle-inactive); 
+    }
 }

@@ -255,6 +255,17 @@
     border-radius: 0;
     height: 100%;
     margin-inline-start: auto;
+    transform: translateX(100%);
+}
+
+.it-dialog-holder.side:not(.hidden) .it-dialog {
+    animation: rtl-slide .3s forwards;
+}
+
+@keyframes rtl-slide {
+    100% {
+        transform: translateX(0);
+    }
 }
 
 .it-dialog-holder.side .it-dialog > .body {

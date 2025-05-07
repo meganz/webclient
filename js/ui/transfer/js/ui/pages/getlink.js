@@ -309,6 +309,9 @@ lazy(T.ui, 'addFilesLayout', () => {
 
             // Show menu when clicking Upload from local
             mBtn.addEventListener('click', (e) => {
+                if (e.currentTarget.classList.contains('disabled')) {
+                    return false;
+                }
                 menu.classList.add('visible');
                 menu.querySelector('.section').classList.remove('hidden');
                 $(menu).position({
@@ -330,8 +333,9 @@ lazy(T.ui, 'addFilesLayout', () => {
             }
 
             // Init Upload from Cloud drive
-            cn.querySelector('.js-add-from-mega').addEventListener('click', () => {
-                if (!cn.classList.contains('ongoing-add')) {
+            cn.querySelector('.js-add-from-mega').addEventListener('click', (e) => {
+                if (!cn.classList.contains('ongoing-add')
+                    && !e.currentTarget.classList.contains('disabled')) {
                     cn.classList.add('ongoing-add');
 
                     this.tryTransferNodes(null)
@@ -364,7 +368,7 @@ lazy(T.ui, 'addFilesLayout', () => {
             const prev = new Set(this.data.files.map(n => n.h));
 
             let customFilterFn = (n) => {
-                if (n.s4 || n.fv) {
+                if (n.fv) {
                     return false;
                 }
                 if (self.xdNv) {
@@ -386,6 +390,9 @@ lazy(T.ui, 'addFilesLayout', () => {
             if (showSpinner) {
                 loadingDialog.show();
             }
+
+            // Show file info loader
+            this.toggleLoading();
 
             if (self.d) {
                 console.group('Adding files from cloud-drive...');
@@ -415,6 +422,7 @@ lazy(T.ui, 'addFilesLayout', () => {
             }
             if (!lst.length) {
                 console.warn('Nothing (new) to add...', sel);
+                this.toggleLoading(true);
                 return false;
             }
             const {SAFEPATH_SOP, SAFEPATH_SEP} = factory.require('mkdir');
@@ -452,6 +460,16 @@ lazy(T.ui, 'addFilesLayout', () => {
             this.data.files.sort((a, b) => a.size < b.size ? -1 : 1);
         },
 
+        toggleLoading(hide) {
+            const { cn } = this.addedFiles;
+            const ac = hide ? 'remove' : 'add';
+
+            cn.querySelector('.js-loader').classList[ac]('active');
+            for (const elm of cn.querySelectorAll('.inv-input')) {
+                elm.classList[ac]('disabled');
+            }
+        },
+
         /*
          * Render Added files section. Step 2.
         */
@@ -465,13 +483,13 @@ lazy(T.ui, 'addFilesLayout', () => {
             // Reset inputs
             email.value = ''; // Email input
             email.dispatchEvent(new Event('input'));
-            exp.value = ''; // Expiry date input
             msg.value = ''; // Message textarea
             pw.value = ''; // Password input
             sched.value = 'None'; // scheduled input
             tn.value = ''; // Title input
             T.ui.input.clear(rn); // Recipients input
             delete tn.dataset.customVal;
+            delete this.data.schedule;
 
             // Reset Get link button
             btn.classList.add('disabled');
@@ -603,17 +621,22 @@ lazy(T.ui, 'addFilesLayout', () => {
             cn.querySelector('.files-info .num').textContent =
                 mega.icu.format(l.file_count, files.length);
             cn.querySelector('.files-info .size').textContent = bytesToSize(size);
+
+            // Hide file info loader
+            this.toggleLoading(true);
         },
 
         updateGetLinkBtn() {
-            const { files } = this.data;
+            const {files, ko = []} = this.data;
             const { cn, btn, rn, tn, terms } = this.addedFiles;
             const sgm = cn.querySelector('input[name="glb-manage-sgm"]:checked');
             const recipients = isValidEmail(rn.value) || T.ui.input.getValue(rn).length;
 
             // Check files, email, recipients (if sending a link)
-            if (tn.value.trim() && files.length && terms.checked
+            if (terms.checked && tn.value.trim()
+                && files.length && files.length !== ko.length
                 && (sgm.value === '1' && recipients || sgm.value === '0')) {
+
                 btn.classList.remove('disabled');
             }
             else {

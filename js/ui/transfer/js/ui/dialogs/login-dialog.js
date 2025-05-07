@@ -152,6 +152,8 @@ lazy(T.ui, 'loginDialog', () => {
             return security.atomicSignIn(u, p, pin)
                 .then(() => location.reload())
                 .catch((ex) => {
+                    loadingDialog.hide();
+
                     // If there was a 2FA error, show a message that the PIN code was incorrect
                     if (ex === EFAILED) {
                         this.twoFAerror(true);
@@ -188,8 +190,7 @@ lazy(T.ui, 'loginDialog', () => {
                     if (ex !== undefined) {
                         T.ui.input.errorMsg(this.data.emailInput, l[16349]);
                     }
-                })
-                .finally(() => loadingDialog.hide());
+                });
         },
 
         showStep(step) {

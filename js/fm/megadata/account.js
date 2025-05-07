@@ -139,7 +139,7 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
 
     // Get (f)ull payment history
     // [[payment id, timestamp, price paid, currency, payment gateway id, payment plan id, num of months purchased]]
-    sendAPIRequest({a: 'utp', f: 3, v: 2}, true, (res) => {
+    sendAPIRequest({a: 'utp', f: 4, v: 2}, true, (res) => {
         if (!Array.isArray(res)) {
             res = [];
         }

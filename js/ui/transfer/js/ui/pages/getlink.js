@@ -443,7 +443,10 @@ lazy(T.ui, 'addFilesLayout', () => {
                     }
                     h = n.p;
                 }
-                n.path = `${SAFEPATH_SOP}${p.reverse().join(SAFEPATH_SEP)}`;
+
+                if (p.length) {
+                    n.path = `${SAFEPATH_SOP}${p.reverse().join(SAFEPATH_SEP)}`;
+                }
 
                 if (!(i % 1e4)) {
                     await scheduler.yield();

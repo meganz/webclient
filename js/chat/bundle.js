@@ -5645,6 +5645,7 @@ class ContactPickerWidget extends _mixins1__.w9 {
       selected: this.props.selected || [],
       publicLink: M.account && M.account.contactLink || undefined
     };
+    this.normalize = input => ChatSearch._normalize_str(String(input || '').toLowerCase());
     this.onSearchChange = ev => {
       this.setState({
         searchValue: ev.target.value
@@ -5789,11 +5790,19 @@ class ContactPickerWidget extends _mixins1__.w9 {
       return false;
     }
     if (self.state.searchValue && self.state.searchValue.length > 0) {
-      const norm = s => ChatSearch._normalize_str(String(s || '').toLowerCase());
-      const sv = norm(this.state.searchValue);
-      v.name = withSelfNote ? l.note_label : v.name;
-      const skip = !norm(v.name).includes(sv) && !norm(v.nickname).includes(sv) && !norm(v.fullname).includes(sv) && !norm(M.getNameByHandle(v.u)).includes(sv) && (this.props.notSearchInEmails || !norm(v.m).includes(sv));
-      if (skip) {
+      const searchValue = this.normalize(this.state.searchValue);
+      const {
+        name,
+        nickname,
+        fullname,
+        u,
+        m
+      } = {
+        ...v,
+        name: withSelfNote ? l.note_label : v.name
+      };
+      const matches = [name, nickname, fullname, M.getNameByHandle(u), !this.props.skipMailSearch && m].some(field => this.normalize(field).includes(searchValue));
+      if (!matches) {
         return false;
       }
     }
@@ -6104,7 +6113,7 @@ class ContactPickerWidget extends _mixins1__.w9 {
           className: "contacts-search-subsection"
         }, react0().createElement("div", {
           className: "contacts-list-header"
-        }, frequentContacts.length === 0 ? this.props.readOnly ? l[16217] : l[165] : l[165]), react0().createElement("div", {
+        }, frequentContacts && frequentContacts.length === 0 ? this.props.readOnly ? l[16217] : l[165] : l[165]), react0().createElement("div", {
           className: "contacts-search-list",
           style: innerDivStyles
         }, contacts)) : null));
@@ -6234,7 +6243,7 @@ ContactPickerWidget.defaultProps = {
   nothingSelectedButtonLabel: false,
   allowEmpty: false,
   disableFrequents: false,
-  notSearchInEmails: false,
+  skipMailSearch: false,
   autoFocusSearchField: true,
   selectCleanSearchRes: true,
   disableDoubleClick: false,
@@ -6981,10 +6990,10 @@ class ModalDialog extends mixins.w9 {
           })) : null));
         }
       });
-      if (buttons && buttons.length > 0 || extraFooterElements.length > 0) {
+      if (buttons && buttons.length > 0 || extraFooterElements && extraFooterElements.length > 0) {
         footer = modalDialogs_React.createElement("footer", null, buttons && buttons.length > 0 ? modalDialogs_React.createElement("div", {
           className: "footer-container"
-        }, buttons) : null, extraFooterElements.length > 0 ? modalDialogs_React.createElement("aside", null, extraFooterElements) : null);
+        }, buttons) : null, extraFooterElements && extraFooterElements.length > 0 ? modalDialogs_React.createElement("aside", null, extraFooterElements) : null);
       }
     }
     return modalDialogs_React.createElement(utils.Ay.RenderTo, {
@@ -28628,7 +28637,7 @@ class StartGroupChatWizard extends mixins.w9 {
       showMeAsSelected: self.state.step === 1,
       className: self.props.pickerClassName,
       disableFrequents: self.props.disableFrequents,
-      notSearchInEmails: self.props.notSearchInEmails,
+      skipMailSearch: self.props.skipMailSearch,
       autoFocusSearchField: self.props.autoFocusSearchField,
       selectCleanSearchRes: self.props.selectCleanSearchRes,
       disableDoubleClick: self.props.disableDoubleClick,
@@ -28650,7 +28659,7 @@ StartGroupChatWizard.defaultProps = {
   'pickerClassName': '',
   'showSelectedNum': false,
   'disableFrequents': false,
-  'notSearchInEmails': false,
+  'skipMailSearch': false,
   'autoFocusSearchField': true,
   'selectCleanSearchRes': true,
   'disableDoubleClick': false,
@@ -31806,7 +31815,7 @@ const TypingArea = (_dec = (0,mixins.hG)(54, true), _class = class TypingArea ex
     const $node = this.$node = this.$node || this.domRef.current;
     const $textarea = this.$textarea = this.$textarea || $('textarea:first', $node);
     const $scrollBlock = this.$scrollBlock = this.$scrollBlock || $textarea.closest('.textarea-scroll');
-    const $preview = $('.message-preview', $scrollBlock).safeHTML(`${megaChat.html($textarea.val()).replace(/\n/g, '<br />')} <br>`);
+    const $preview = $('.message-preview', $scrollBlock).safeHTML(`${escapeHTML($textarea.val()).replace(/\n/g, '<br />')} <br>`);
     const textareaHeight = $preview.height();
     $scrollBlock.height(Math.min(textareaHeight, this.getTextareaMaxHeight()));
     if (textareaHeight !== this._lastTextareaHeight) {
@@ -33224,7 +33233,10 @@ class InviteParticipantsPanel extends react0().Component {
       body = l.invite_body_text_scheduled.replace('%4', time2date(nextOccurrenceStart / 1000, 20)).replace('%5', toLocaleTime(nextOccurrenceStart));
     }
     body = body.replace(/\[BR]/g, '\n').replace('%1', u_attr.name).replace('%2', chatRoom.getRoomTitle()).replace('%3', link);
-    return encode ? encodeURIComponent(body) : body;
+    if (encode) {
+      return typeof body.toWellFormatted === 'function' ? body.toWellFormatted() : body.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, '').replace(/[\uD800-\uDBFF]/g, '\uFFFD').replace(/[\uDC00-\uDFFF]/g, '\uFFFD');
+    }
+    return body;
   }
   render() {
     const {
@@ -34613,7 +34625,7 @@ class Attachment extends AbstractGenericMessage {
               key: "preview-sep"
             })];
           }
-          return REaCt().createElement("div", null, previewButton, firstGroupOfButtons, firstGroupOfButtons.length > 0 ? REaCt().createElement("hr", null) : "", addToAlbumButton, addToAlbumButton ? REaCt().createElement("hr", null) : "", downloadButton, linkButtons, revokeButton && downloadButton ? REaCt().createElement("hr", null) : "", revokeButton);
+          return REaCt().createElement("div", null, previewButton, firstGroupOfButtons, firstGroupOfButtons && firstGroupOfButtons.length > 0 ? REaCt().createElement("hr", null) : "", addToAlbumButton, addToAlbumButton ? REaCt().createElement("hr", null) : "", downloadButton, linkButtons, revokeButton && downloadButton ? REaCt().createElement("hr", null) : "", revokeButton);
         }
       })) : REaCt().createElement(buttons.$, {
         ref: ref => {

@@ -525,7 +525,7 @@ export class TypingArea extends MegaRenderMixin {
         const $textarea = this.$textarea = this.$textarea || $('textarea:first', $node);
         const $scrollBlock = this.$scrollBlock = this.$scrollBlock || $textarea.closest('.textarea-scroll');
         const $preview = $('.message-preview', $scrollBlock)
-            .safeHTML(`${megaChat.html($textarea.val()).replace(/\n/g, '<br />')} <br>`);
+            .safeHTML(`${escapeHTML($textarea.val()).replace(/\n/g, '<br />')} <br>`);
         const textareaHeight = $preview.height();
 
         $scrollBlock.height(

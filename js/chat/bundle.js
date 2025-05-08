@@ -31815,7 +31815,7 @@ const TypingArea = (_dec = (0,mixins.hG)(54, true), _class = class TypingArea ex
     const $node = this.$node = this.$node || this.domRef.current;
     const $textarea = this.$textarea = this.$textarea || $('textarea:first', $node);
     const $scrollBlock = this.$scrollBlock = this.$scrollBlock || $textarea.closest('.textarea-scroll');
-    const $preview = $('.message-preview', $scrollBlock).safeHTML(`${megaChat.html($textarea.val()).replace(/\n/g, '<br />')} <br>`);
+    const $preview = $('.message-preview', $scrollBlock).safeHTML(`${escapeHTML($textarea.val()).replace(/\n/g, '<br />')} <br>`);
     const textareaHeight = $preview.height();
     $scrollBlock.height(Math.min(textareaHeight, this.getTextareaMaxHeight()));
     if (textareaHeight !== this._lastTextareaHeight) {

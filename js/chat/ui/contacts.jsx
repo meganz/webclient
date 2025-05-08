@@ -894,7 +894,7 @@ export class ContactPickerWidget extends MegaRenderMixin {
         nothingSelectedButtonLabel: false,
         allowEmpty: false,
         disableFrequents: false,
-        notSearchInEmails: false,
+        skipMailSearch: false,
         autoFocusSearchField: true,
         selectCleanSearchRes: true,
         disableDoubleClick: false,
@@ -908,6 +908,8 @@ export class ContactPickerWidget extends MegaRenderMixin {
         selected: this.props.selected || [],
         publicLink: M.account && M.account.contactLink || undefined
     };
+
+    normalize = input => ChatSearch._normalize_str(String(input || '').toLowerCase());
 
     onSearchChange = ev => {
         this.setState({ searchValue: ev.target.value });
@@ -1091,18 +1093,13 @@ export class ContactPickerWidget extends MegaRenderMixin {
         }
 
         if (self.state.searchValue && self.state.searchValue.length > 0) {
-            const norm = (s) => ChatSearch._normalize_str(String(s || '').toLowerCase());
-            const sv = norm(this.state.searchValue);
-            v.name = withSelfNote ? l.note_label : v.name;
-            const skip =
-                !norm(v.name).includes(sv) &&
-                !norm(v.nickname).includes(sv) &&
-                !norm(v.fullname).includes(sv) &&
-                !norm(M.getNameByHandle(v.u)).includes(sv) &&
-                (this.props.notSearchInEmails || !norm(v.m).includes(sv));
+            const searchValue = this.normalize(this.state.searchValue);
+            const { name, nickname, fullname, u, m } = { ...v, name: withSelfNote ? l.note_label : v.name };
+            const matches = [name, nickname, fullname, M.getNameByHandle(u), !this.props.skipMailSearch && m]
+                .some(field => this.normalize(field).includes(searchValue));
 
             // DON'T add to the contacts list if the contact's name or email does not match the search value
-            if (skip) {
+            if (!matches) {
                 return false;
             }
         }

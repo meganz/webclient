@@ -21,7 +21,7 @@ export class StartGroupChatWizard extends MegaRenderMixin {
         'pickerClassName': '',
         'showSelectedNum': false,
         'disableFrequents': false,
-        'notSearchInEmails': false,
+        'skipMailSearch': false,
         'autoFocusSearchField': true,
         'selectCleanSearchRes': true,
         'disableDoubleClick': false,
@@ -359,7 +359,7 @@ export class StartGroupChatWizard extends MegaRenderMixin {
                         showMeAsSelected={self.state.step === 1}
                         className={self.props.pickerClassName}
                         disableFrequents={self.props.disableFrequents}
-                        notSearchInEmails={self.props.notSearchInEmails}
+                        skipMailSearch={self.props.skipMailSearch}
                         autoFocusSearchField={self.props.autoFocusSearchField}
                         selectCleanSearchRes={self.props.selectCleanSearchRes}
                         disableDoubleClick={self.props.disableDoubleClick}

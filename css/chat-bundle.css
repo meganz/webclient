@@ -1863,6 +1863,7 @@ body.theme-dark .lhp-container .lhp-filter-tag {
 }
 .meetings-call .stream .stream-participants-block .participants-container .participants-grid .video-node .avatar-wrapper {
   width: 32px;
+  min-width: 16%;
   height: 32px;
   font: var(--text-body1);
 }

@@ -3313,7 +3313,7 @@
     "err_schedule_title_long": "Digite at\u00e9 30\u00a0caracteres",
     "err_session_closed": "O processo de sincroniza\u00e7\u00e3o ou de backup foi interrompido porque voc\u00ea fez logout ou fechou a sess\u00e3o. Para reativar, acesse as  Configura\u00e7\u00f5es do aplicativo para desktop, selecione a aba Sincroniza\u00e7\u00e3o ou Backup, e verifique a pasta correspondente.",
     "err_share_wo_access": "N\u00e3o \u00e9 poss\u00edvel sincronizar esta pasta porque \u00e9 uma pasta compartilhada sem acesso total.",
-    "err_sub_user_key_miss": "Valide as credenciais de administrador",
+    "err_sub_user_key_miss": "Valide as credenciais do administrador",
     "err_sub_user_key_miss_txt": "Voc\u00ea ainda n\u00e3o validou as credenciais do administrador da conta Business. Voc\u00ea precisa usar um navegador em um computador para validar as suas credenciais antes de continuar.",
     "err_sync_above_path": "N\u00e3o \u00e9 poss\u00edvel sincronizar esta pasta porque est\u00e1 dentro de uma pasta sincronizada.",
     "err_sync_below_path": "N\u00e3o \u00e9 poss\u00edvel sincronizar esta pasta porque ela cont\u00e9m pastas sincronizadas.",

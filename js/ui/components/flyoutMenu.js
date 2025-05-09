@@ -628,8 +628,13 @@ class MegaFlyoutMenu extends MegaComponent {
             if (!is_chatlink) {
                 mega.ui.header.update();
             }
-            if (mega.ui.onboarding && mega.ui.onboarding.currentSection) {
-                mega.ui.onboarding.currentSection.startNextOpenSteps();
+
+            const {currentSection} = mega.ui.onboarding || {};
+            const currentStep = currentSection && currentSection.currentStep;
+
+            if (currentSection && currentSection.map && currentSection.map.flag === OBV4_FLAGS.CLOUD_DRIVE_NEW_NAV &&
+                currentStep && currentStep.map && currentStep.map.flag === OBV4_FLAGS.CLOUD_DRIVE_NEW_NAV_CHAT) {
+                currentSection.startNextOpenSteps();
             }
         });
     }

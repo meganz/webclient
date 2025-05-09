@@ -1382,6 +1382,8 @@ mBroadcaster.addListener('fm:initialized', () => {
         showObPromoDialog: () => {
             "use strict";
 
+            const currSec = mega.ui.onboarding.currentSection;
+
             M.safeShowDialog('ob-promo-dialog', () => {
 
                 const $dialog = $('.ob-promo-dialog', '.mega-dialog-container');
@@ -1395,13 +1397,13 @@ mBroadcaster.addListener('fm:initialized', () => {
                 };
 
                 const _killOBEvent = () => {
-                    mega.ui.onboarding.currentSection.currentStepIndex = false;
-                    mega.ui.onboarding.currentSection.markSectionComplete();
+                    currSec.currentStepIndex = false;
+                    currSec.markSectionComplete();
                 };
 
                 $actionButton.rebind('click.ob-promo', () => {
                     closeDialog();
-                    mega.ui.onboarding.currentSection.startNextOpenSteps();
+                    currSec.startNextOpenSteps();
                     _offEvents();
                 });
 

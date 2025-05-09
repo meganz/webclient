@@ -133,9 +133,7 @@ lazy(s4, 'policies', () => {
         unbindEvents() {
             super.unbindEvents();
 
-            const dd = '.dropdown.body.context .dropdown-item';
             this.$tableData.unbind('contextmenu.s4klst');
-            $(`${dd}.s4-policy-copy-arn`).unbind('click.s4klst.ctxm.copypolicyarn');
             $('button.copy', this.$tableData).unbind('click.s4klst.copypolicyarn');
             $('.s4-grid-table tbody tr', '.s4-policies-management-scroll').unbind('dblclick.showDetails');
         }
@@ -143,13 +141,8 @@ lazy(s4, 'policies', () => {
         bindEvents() {
             super.bindEvents();
 
-            const dd = '.dropdown.body.context .dropdown-item';
             this.$tableData.rebind('contextmenu.s4klst', (e) => {
                 this.handleSelection(e, () => M.contextMenuUI(e, 8, '.s4-policy-copy-arn'));
-            });
-
-            $(`${dd}.s4-policy-copy-arn`).rebind('click.s4klst.ctxm.copypolicyarn', () => {
-                handlers.copyArn();
             });
 
             $('button.copy', this.$tableData).rebind('click.s4klst.copypolicyarn', e => {
@@ -161,6 +154,19 @@ lazy(s4, 'policies', () => {
                 this.selection.clear();
                 M.openFolder(`${this.handle}/${M.currentCustomView.subType}/${s4ItemNodeID}`);
                 return false;
+            });
+
+            mega.ui.contextMenu.addOption({
+                sectionId: 'share',
+                position: 'verify-credential',
+                buttonId: 's4-policy-copy-arn',
+                text: l.s4_copy_arn,
+                icon: 'sprite-fm-mono icon-copy-thin-outline',
+                onClick() {
+                    if (s4 && s4.policies) {
+                        s4.policies.handlers.copyArn();
+                    }
+                }
             });
         }
     }

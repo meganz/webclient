@@ -4454,7 +4454,6 @@ class ColumnSharedFolderButtons extends genericNodePropsComponent.B {
       onClick: (button, e) => {
         e.persist();
         $.selected = [handle];
-        $.gridLastSelected = handle;
         e.preventDefault();
         e.stopPropagation();
         e.delegateTarget = $(e.target).parents('td')[0];

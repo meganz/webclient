@@ -1970,7 +1970,7 @@ MegaData.prototype.nodeUpdated = function(n, ignoreDB) {
 
             // Update versioning dialog if it is open and the folder is its parent folder,
             // the purpose of the following code is to update permisions of historical files.
-            if ($.selected && $.selected.length && window.versiondialogid) {
+            if ($.selected && $.selected.length && window.fileversioning && fileversioning.isOpen) {
                 let parent = $.selected[0];
 
                 while ((parent = this.getNodeByHandle(parent).p)) {
@@ -2116,63 +2116,6 @@ MegaData.prototype.rename = async function(itemHandle, newItemName) {
         }
 
         return api.setNodeAttributes(n, prop);
-    }
-};
-
-/**
- * Colour Label context menu update
- *
- * @param {Array | string} handles Selected nodes handles
- */
-MegaData.prototype.colourLabelcmUpdate = function(handles) {
-
-    'use strict';
-
-    if (fminitialized && handles) {
-        if (!Array.isArray(handles)) {
-            handles = [handles];
-        }
-
-        const $items = $('.files-menu .dropdown-colour-item');
-        const values = [];
-        let hasLabelCnt = 0;
-
-        for (let i = handles.length; i--;) {
-            const node = M.d[handles[i]];
-            if (!node) {
-                if (d) {
-                    console.warn('Node not found.', handles[i]);
-                }
-                continue;
-            }
-
-            if (node.lbl) {
-                hasLabelCnt++;
-                if (!values.includes(node.lbl)) {
-                    values.push(node.lbl);
-                }
-            }
-        }
-
-        // Determine all nodes have the same label
-        const isUnifiedLabel = values.length === 1 && handles.length === hasLabelCnt;
-
-        // Reset label submenu
-        $items.removeClass('active update-to');
-
-        // Add active state label
-        if (values.length > 0) {
-            $items.addClass('update-to');
-
-            for (let j = values.length; j--;) {
-                $items.filter(`[data-label-id=${values[j]}]`).addClass('active');
-            }
-
-            if (isUnifiedLabel) {
-                // Remove the 'update-to' classname since all nodes have the same label
-                $items.filter(`[data-label-id=${values[0]}]`).removeClass('update-to');
-            }
-        }
     }
 };
 

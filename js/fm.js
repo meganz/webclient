@@ -2625,7 +2625,7 @@ function createFileDialog(close, action, params) {
                         // to redraw if element was out of viewport.
                         $($.selectddUIgrid + ' ' + $.selectddUIitem).removeClass('ui-selected');
                         $newElement.addClass('ui-selected');
-                        $.gridLastSelected = $newElement;
+                        $.gridLastSelected = $newElement[0];
                         selectionManager.clear_selection();
                         selectionManager.add_to_selection(nh);
 

@@ -884,6 +884,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             || (typeof nodeId !== 'number' && !M.d[nodeId])
             || (M.isGalleryPage() && mega.gallery.photos && mega.gallery.photos.mode !== 'a')
             || (M.isMediaDiscoveryPage() && mega.gallery.discovery && mega.gallery.discovery.mode !== 'a')
+            || M.isAlbumsPage(1)
         ) {
             return false;
         }
@@ -1461,5 +1462,9 @@ class SelectionManager2_React extends SelectionManager2Base {
         return this.itemsPerRowGetter() | 0;
     }
 }
+
+SelectionManager2Base.SUB_CLASSES = Object.create(null);
+SelectionManager2Base.SUB_CLASSES.SelectionManager2_DOM = SelectionManager2_DOM;
+SelectionManager2Base.SUB_CLASSES.SelectionManager2_React = SelectionManager2_React;
 
 var selectionManager;

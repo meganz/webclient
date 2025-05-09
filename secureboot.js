@@ -2320,6 +2320,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/fm/selectionManager2.js', n: 'fm_selectionmanager2_js', j:1, w:1});
         jsl.push({f:'js/fm.js', n: 'fm_js', j:1, w:12});
         jsl.push({f:'js/ui/components/meganz/fm-secondary-nav.js', n: 'fm_secondary_nav_js', j: 1, w: 1});
+        jsl.push({f:'js/ui/components/meganz/fm-context-menu.js', n: 'fm_context_menu_js', j: 1, w: 1});
         jsl.push({f:'js/fm/dashboard.js', n: 'fmdashboard_js', j:1, w:5});
         jsl.push({f:'js/fm/recents.js', n: 'fmrecents_js', j:1, w:5});
         jsl.push({f:'js/time_checker.js', n: 'time_checker_js', j:1});
@@ -2417,6 +2418,7 @@ else if (!browserUpdate) {
         jsl.push({f:'css/components/tabgroup.css', n: 'tabgroup_css', j:2,w:5});
         jsl.push({f:'js/ui/components/chatitem.js', n: 'chatitem_js', j: 1, w:1});
         jsl.push({f:'css/components/chatitem.css', n: 'chatitem_css', j:2,w:5});
+        jsl.push({f:'css/components/meganz/fm-context-menu.css', n: 'fm_context_menu_css', j:2,w:5});
     } // !is_mobile
 
     // do not change the order...

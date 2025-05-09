@@ -49,7 +49,9 @@ function msgDialog(type, title, msg, subMsg, callback, checkboxCallback) {
             'error': 'icon-x-circle-thin-outline error'
         };
 
-        icon = `sprite-mobile-fm-mono ${typeIconLookup[dialogType[0]]}`;
+        icon = dialogType[0] === 'error' ?
+            'sprite-fm-mono icon-x-circle-thin-outline error' :
+            `sprite-mobile-fm-mono ${typeIconLookup[dialogType[0]]}`;
     }
 
     // Support other button types if necessary (adapted from fm.js msgDialog function first if/else block):

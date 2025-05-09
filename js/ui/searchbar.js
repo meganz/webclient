@@ -941,7 +941,7 @@ lazy(mega.ui, 'searchbar', () => {
             }
             else if (is_text(n)) {
                 $.selected = [h];
-                $('.dropdown.body.context .dropdown-item.edit-file-item').trigger('click');
+                mega.fileTextEditor.openTextHandle(h);
             }
             else {
                 // Non previewable file should proceed to download

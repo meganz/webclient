@@ -25,277 +25,6 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
         }
     };
 
-    class AlbumItemContextMenu extends MMenuSelect {
-        constructor() {
-            super();
-
-            const selections = Object.keys(albums.grid.timeline.selections);
-            const albumId = scope.getAlbumIdFromPath();
-            const album = albums.store[albumId];
-            const { filterFn, at, eIds, nodes, id } = album;
-            const { featureEnabled } = mega.sensitives;
-            const options = [];
-            let selectionsPreviewable = false;
-            let toApplySensitive = 2; // 0 - Disable, 1 - Hide, 2 - Unhide
-
-            const isCoverChangeable = !filterFn
-                && selections.length === 1
-                && (!at.c || eIds[at.c] !== selections[0]);
-            const onlyPlayableVideosSelected = selections.every((h) => !!is_video(M.d[h]));
-
-            if (!mega.sensitives.isViewEnabled()
-                || selections.some((h) => !mega.sensitives.nodeCanBeSensitive(h))) {
-                toApplySensitive = 0;
-            }
-            else if (featureEnabled) {
-                let checksLeft = 2;
-
-                for (let i = 0; i < selections.length; i++) {
-                    if (!selectionsPreviewable && scope.isPreviewable(M.d[selections[i]])) {
-                        selectionsPreviewable = true;
-                        checksLeft--;
-                    }
-
-                    if (toApplySensitive !== 1 && !mega.sensitives.isSensitive(selections[i], false)) {
-                        toApplySensitive = 1;
-                    }
-
-                    // The rest of selections can be skipped, as all checks are passed
-                    if (checksLeft <= 0) {
-                        break;
-                    }
-                }
-            }
-            else {
-                toApplySensitive = 1;
-            }
-
-            if (onlyPlayableVideosSelected) {
-                options.push({
-                    label: l.album_play_video,
-                    icon: 'video-call-filled',
-                    click: () => {
-                        scope.playSlideshow(albumId, false, true);
-                    }
-                });
-            }
-            else if (scope.nodesAllowSlideshow(nodes)) {
-                options.push({
-                    label: l.album_play_slideshow,
-                    icon: 'play-square',
-                    click: () => {
-                        scope.playSlideshow(albumId, true);
-                    }
-                });
-            }
-
-            if (selectionsPreviewable) {
-                options.push(
-                    {
-                        label: l.album_item_preview_label,
-                        icon: 'preview-reveal',
-                        click: () => {
-                            scope.playSlideshow(albumId);
-                        }
-                    }
-                );
-            }
-
-            if (options.length) {
-                options.push({});
-            }
-
-            if (id === 'fav' && selections.every(h => M.d[h].fav)) {
-                options.push({
-                    label: l[5872],
-                    icon: 'favourite-removed',
-                    click: () => {
-                        M.favourite(selections, 0);
-                    }
-                });
-            }
-
-            options.push(
-                {
-                    label: l.album_download,
-                    icon: 'download-small',
-                    click: () => {
-                        if (M.currentdirid !== `albums/${albumId}`) {
-                            return;
-                        }
-
-                        const handles = scope.getAlbumsHandles([albumId]);
-
-                        if (!handles.length) {
-                            return;
-                        }
-
-                        scope.reportDownload();
-                        M.addDownload(handles);
-                    }
-                }
-            );
-
-            if (isCoverChangeable) {
-                options.push({
-                    label: l.set_as_album_cover,
-                    icon: 'images',
-                    click: () => {
-                        if (M.isInvalidUserStatus()) {
-                            return;
-                        }
-
-                        if (albums.grid.timeline.selCount === 1) {
-                            albums.updateAlbumCover(album, Object.keys(albums.grid.timeline.selections)[0]);
-                        }
-                    }
-                });
-            }
-
-            if (toApplySensitive) {
-                if (toApplySensitive === 1) {
-                    options.push({
-                        label: l.sen_hide,
-                        icon: 'eye-hidden',
-                        click: () => {
-                            if (M.isInvalidUserStatus()) {
-                                return;
-                            }
-
-                            mega.sensitives.toggleStatus(selections, true);
-                        },
-                        oncreate: (item) => {
-                            mega.sensitives.applyProBadge($(item.el));
-                        }
-                    });
-                }
-                else {
-                    options.push({
-                        label: l.sen_unhide,
-                        icon: 'eye-reveal',
-                        click: () => {
-                            mega.sensitives.toggleStatus(selections, false);
-                        },
-                        oncreate: (item) => {
-                            mega.sensitives.applyProBadge($(item.el));
-                        }
-                    });
-                }
-            }
-
-            if (!filterFn) {
-                options.push(
-                    {},
-                    {
-                        label: l.album_item_remove_label,
-                        icon: 'bin',
-                        click: () => {
-                            if (M.isInvalidUserStatus()) {
-                                return;
-                            }
-
-                            albums.requestAlbumElementsRemoval();
-                        },
-                        classes: ['red']
-                    }
-                );
-            }
-
-            this.options = options;
-        }
-    }
-
-    class PublicAlbumItemContextMenu extends MMenuSelect {
-        constructor() {
-            super();
-
-            const selections = Object.keys(albums.grid.timeline.selections);
-
-            const albumId = scope.getAlbumIdFromPath();
-            const { nodes } = albums.store[albumId];
-            const options = [];
-
-            const hasImageSelected = selections.some(h => !!scope.isImage(M.d[h]));
-            const onlyPlayableVideosSelected = selections.every((h) => !!is_video(M.d[h]));
-
-            if (hasImageSelected) {
-                options.push({
-                    label: l.album_item_preview_label,
-                    icon: 'preview-reveal',
-                    click: () => {
-                        scope.playSlideshow(albumId);
-                    }
-                });
-
-                if (scope.nodesAllowSlideshow(nodes)) {
-                    options.push({
-                        label: l.album_play_slideshow,
-                        icon: 'play-square',
-                        click: () => {
-                            scope.playSlideshow(albumId, true);
-                        }
-                    });
-                }
-            }
-
-            if (onlyPlayableVideosSelected) {
-                options.push({
-                    label: l.album_play_video,
-                    icon: 'video-call-filled',
-                    click: () => {
-                        scope.playSlideshow(albumId, false, true);
-                    }
-                });
-            }
-
-            options.push(
-                {},
-                {
-                    label: l.album_download,
-                    icon: 'download-small',
-                    click: () => {
-                        if (M.isInvalidUserStatus()) {
-                            return;
-                        }
-
-                        if (!M.isAlbumsPage()) {
-                            return;
-                        }
-
-                        eventlog(99954);
-                        M.addDownload(selections);
-                    }
-                },
-                {},
-                {
-                    label: l[6859],
-                    icon: 'info',
-                    click: () => {
-                        $.selected = selections;
-                        mega.ui.mInfoPanel.initInfoPanel();
-                    }
-                },
-                {},
-                {
-                    label: (u_type) ? l.context_menu_import : l.btn_imptomega,
-                    icon: (u_type) ? 'upload-to-cloud-drive' : 'mega-thin-outline',
-                    click: () => {
-                        if (M.isInvalidUserStatus()) {
-                            return;
-                        }
-
-                        assert(albums.isPublic, 'This import needs to happen in public album only...');
-
-                        eventlog(99832);
-                        M.importFolderLinkNodes(selections);
-                    }
-                }
-            );
-
-            this.options = options;
-        }
-    }
-
     class AlbumTimelineCell extends MComponent {
         /**
          * @param {Object.<String, any>} data Data for the cell
@@ -424,20 +153,99 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
                     'contextmenu',
                     (evt) => {
                         evt.preventDefault();
-                        const { pageX, pageY, target } = evt;
 
                         if (!this.isSelected) {
                             clickFn(this, evt);
                         }
 
-                        if (albums.isPublic) {
-                            const contextMenu = new PublicAlbumItemContextMenu(target);
-                            contextMenu.show(pageX, pageY);
+                        const selectedItems = [];
+                        const selections = Object.keys(albums.grid.timeline.selections);
+                        const albumId = scope.getAlbumIdFromPath();
+                        const { filterFn, at, eIds, nodes } = albums.store[albumId];
+                        let selectionsPreviewable = false;
+                        let onlyPlayableVideosSelected = true;
+                        for (let i = 0; i < selections.length; i++) {
+                            if (scope.isPreviewable(M.d[selections[i]])) {
+                                if (!is_video(M.d[selections[i]])) {
+                                    onlyPlayableVideosSelected = false;
+                                }
+                                selectionsPreviewable = true;
+                            }
+                        }
+
+                        if (selections.length === 1 && onlyPlayableVideosSelected) {
+                            selectedItems.push('.play-item');
+                        }
+                        if (window.useMegaSync === 2 || window.useMegaSync === 3) {
+                            selectedItems.push('.download-item');
                         }
                         else {
-                            const contextMenu = new AlbumItemContextMenu(target);
-                            contextMenu.show(pageX, pageY);
+                            selectedItems.push('.download-standart-item', '.zipdownload-item');
                         }
+
+                        if (albums.isPublic) {
+                            const hasImageSelected = selections.some(h => !!scope.isImage(M.d[h]));
+
+                            if (hasImageSelected && scope.nodesAllowSlideshow(nodes)) {
+                                selectedItems.push('.play-slideshow');
+                            }
+
+
+                            selectedItems.push('.properties-item', '.import-item');
+                        }
+                        else {
+                            let toApplySensitive = 2; // 0 - Disable, 1 - Hide, 2 - Unhide
+
+                            const isCoverChangeable = !filterFn
+                                && selections.length === 1
+                                && (!at.c || eIds[at.c] !== selections[0]);
+
+                            if (!mega.sensitives.isViewEnabled()
+                                || selections.some((h) => !mega.sensitives.nodeCanBeSensitive(h))) {
+                                toApplySensitive = 0;
+                            }
+                            else if (mega.sensitives.featureEnabled) {
+                                for (let i = 0; i < selections.length; i++) {
+                                    if (!mega.sensitives.isSensitive(selections[i], false)) {
+                                        toApplySensitive = 1;
+                                        break;
+                                    }
+                                }
+                            }
+                            else {
+                                toApplySensitive = 1;
+                            }
+
+                            if (!onlyPlayableVideosSelected && scope.nodesAllowSlideshow(nodes)) {
+                                selectedItems.push('.play-slideshow');
+                            }
+
+                            if (selections.length === 1 && !onlyPlayableVideosSelected && selectionsPreviewable) {
+                                selectedItems.push('.preview-item');
+                            }
+
+                            if (isCoverChangeable) {
+                                selectedItems.push('.set-thumbnail');
+                            }
+
+                            if (
+                                mega.gallery.canShowAddToAlbum() &&
+                                selections.every(h => mega.gallery.isGalleryNode(M.getNodeByHandle(h)))
+                            ) {
+                                selectedItems.push('.add-to-album');
+                            }
+
+                            if (toApplySensitive) {
+                                selectedItems.push('.add-sensitive-item');
+                            }
+
+                            if (!filterFn) {
+                                selectedItems.push('.remove-item');
+                            }
+                            selectedItems.push('.add-star-item');
+                        }
+
+                        M.contextMenuUI(evt, 8, selectedItems.join(','));
                     }
                 );
             }

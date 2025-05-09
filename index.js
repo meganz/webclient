@@ -3064,8 +3064,8 @@ function loadSubPage(tpage, event) {
         mega.textEditorUI.doClose();
     }
 
-    if (window.versiondialogid) {
-        fileversioning.closeFileVersioningDialog(window.versiondialogid);
+    if (window.fileversioning && fileversioning.isOpen) {
+        fileversioning.closeFileVersioningDialog();
     }
 
     if (event && Object(event.state).view) {

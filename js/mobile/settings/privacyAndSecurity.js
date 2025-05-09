@@ -20,7 +20,7 @@ mobile.settings.privacyAndSecurity = Object.create(mobile.settingsHelper, {
             const menuItems1 = [
                 {
                     text: l[8839],
-                    icon: 'sprite-mobile-fm-mono icon-key-02-thin-outline',
+                    icon: 'sprite-fm-mono icon-key-02-thin-outline',
                     href: 'fm/account/security/backup-key',
                     eventLog: 99838
                 },

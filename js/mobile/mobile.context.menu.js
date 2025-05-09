@@ -67,6 +67,10 @@ class MegaMobileContextMenu extends MegaComponentGroup {
 
         // add open in app menu
         items['.open-app'] = 1;
+        if (items['.download-standart-item']) {
+            delete items['.download-standart-item'];
+            items['.download-item'] = 1;
+        }
 
         if (nodeShare.down) {
             delete items['.open-app'];
@@ -413,7 +417,7 @@ mBroadcaster.once('boot_done', () => {
         },
         '.removelink-item': {
             text: l[6821],
-            icon: 'sprite-mobile-fm-mono icon-link-off-02-thin-outline',
+            icon: 'sprite-fm-mono icon-link-off-02-thin-outline',
             subMenu: false,
             classNames: '',
             onClick: async function(nodeHandle) {

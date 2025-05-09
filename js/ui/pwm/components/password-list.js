@@ -366,7 +366,7 @@ class MegaPasswordList extends MegaView {
             const _ = event => {
                 item.trigger('click', window.innerWidth < 1080);
                 mega.ui.pm.menu.hide();
-                mega.ui.contextMenu.show({
+                mega.ui.pm.contextMenu.show({
                     name: 'item-list-menu',
                     handle: passwordNode.h,
                     event,

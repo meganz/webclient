@@ -333,64 +333,6 @@ lazy(mega.ui, 'secondaryNav', () => {
         $.hasWebKitDirectorySupport = 'webkitdirectory' in document.createElement('input');
     }
 
-    const newMenu = document.createElement('div');
-    newMenu.className = 'fm-new-items-dropdown';
-    MegaButton.factory({
-        parentNode: newMenu,
-        type: 'fullwidth',
-        componentClassname: 'text-icon',
-        icon: 'sprite-fm-mono icon-file-upload-thin-outline',
-        text: l[99],
-        onClick: () => {
-            eventlog(500011);
-            $.doStraightUpload = true;
-            document.querySelector('#fileselect1').click();
-        }
-    });
-    MegaButton.factory({
-        parentNode: newMenu,
-        type: 'fullwidth',
-        componentClassname: `text-icon ${$.hasWebKitDirectorySupport ? '' : 'hidden'}`,
-        icon: 'sprite-fm-mono icon-folder-arrow-01-thin-outline',
-        text: l[98],
-        onClick: () => {
-            eventlog(500009);
-            $.doStraightUpload = true;
-            document.querySelector('#fileselect2').click();
-        }
-    });
-    newMenu.appendChild(document.createElement('hr'));
-    MegaButton.factory({
-        parentNode: newMenu,
-        type: 'fullwidth',
-        componentClassname: 'text-icon',
-        icon: 'sprite-fm-mono icon-folder-plus-thin-outline',
-        text: l[68],
-        onClick: () => {
-            if (M.isInvalidUserStatus()) {
-                return;
-            }
-
-            eventlog(500007);
-
-            createFolderDialog();
-        }
-    });
-    MegaButton.factory({
-        parentNode: newMenu,
-        type: 'fullwidth',
-        componentClassname: 'text-icon',
-        icon: 'sprite-fm-mono icon-file-plus-01-thin-outline',
-        text: l[23047],
-        onClick: () => {
-            if (M.isInvalidUserStatus()) {
-                return;
-            }
-            createFileDialog();
-            eventlog(500722);
-        }
-    });
-
     const downloadMenu = document.createElement('div');
     downloadMenu.className = 'fm-download-dropdown';
     const downloadStandard = new MegaButton({
@@ -561,7 +503,6 @@ lazy(mega.ui, 'secondaryNav', () => {
             return this.domNode.querySelector('.fm-filter-chips-wrapper');
         },
         openNewMenu(ev) {
-            const target = ev.currentTarget;
             if (
                 M.InboxID &&
                 (M.currentrootid === M.InboxID || M.getNodeRoot(M.currentdirid.split('/').pop()) === M.InboxID)
@@ -569,16 +510,7 @@ lazy(mega.ui, 'secondaryNav', () => {
                 return;
             }
 
-            mega.ui.menu.show({
-                name: 'fm-new-items',
-                classList: ['fm-new-items-menu', 'fm-thin-dropdown'],
-                event: ev,
-                eventTarget: target,
-                contents: [newMenu],
-                onClose: () => {
-                    target.removeClass('active');
-                }
-            });
+            M.contextMenuUI(ev, 8, ['.fileupload-item', '.folderupload-item', '.newfolder-item', '.newfile-item']);
             eventlog(500721);
         },
         openDownloadMenu(ev) {
@@ -619,7 +551,6 @@ lazy(mega.ui, 'secondaryNav', () => {
                     ev.currentTarget.domNode.classList.add('cloud-drive');
                 }
 
-                ev.originalEvent.delegateTarget = ev.currentTarget.domNode;
                 M.contextMenuUI(ev.originalEvent, 1);
                 ev.currentTarget.domNode.classList.add('active');
                 ev.currentTarget.domNode.classList.remove('cloud-drive');

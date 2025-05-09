@@ -1802,11 +1802,6 @@ lazy(mega, 'rewind', () => {
             }
         }
 
-        bindContextMenu() {
-            $('.dropdown-item.rewind-item', '.dropdown.body.context')
-                .rebind('click.rewind.contextMenu', () => this._startOnEvent(500469, true));
-        }
-
         /**
          * Handles start of rewind UI (sidebar) after an event is triggered
          * @param {Number} eventId - Event ID

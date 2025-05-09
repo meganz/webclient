@@ -456,3 +456,38 @@ button.nav-elem.pro-only:active {
     height: 28px;
     cursor: pointer;
 }
+
+.nav-elem .right-badge {
+    border: solid 1px var(--mobile-button-outline);
+    border-radius: 4px;
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-caption-large-regular);
+    line-height: 16px;
+    padding: 4px 6px;
+}
+.nav-elem .right-badge.small {
+    border-radius: 2px;
+    border: unset;
+    font: var(--mobile-font-caption-small-semibold);
+    padding: 2px 4px;
+}
+.nav-elem .right-badge.brand {
+    border-color: var(--mobile-text-brand);
+    color: var(--mobile-text-brand);
+}
+.nav-elem .right-badge.info {
+    border-color: var(--mobile-text-info);
+    color: var(--mobile-text-info);
+}
+.nav-elem .right-badge.success {
+    border-color: var(--mobile-text-success);
+    color: var(--mobile-text-success);
+}
+.nav-elem .right-badge.warning {
+    border-color: var(--mobile-text-warning);
+    color: var(--mobile-text-warning);
+}
+.nav-elem .right-badge.error {
+    border-color: var(--mobile-text-error);
+    color: var(--mobile-text-error);
+}

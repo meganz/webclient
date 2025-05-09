@@ -42,6 +42,10 @@ class MegaInteractable extends MegaComponent {
             }
         }
 
+        if (options.rightBadge) {
+            this.rightBadge = options.rightBadge;
+        }
+
         // Disable and enable the interactable
         this.disabled = options.disabled;
 
@@ -235,6 +239,34 @@ class MegaInteractable extends MegaComponent {
         }
 
         this.domNode.rightIcon.s = size;
+    }
+
+    get rightBadge() {
+        const elm = this.domNode.querySelector('.right-badge');
+        if (!elm) {
+            return false;
+        }
+        return {
+            badgeClass: elm.className.replace('right-badge', '').replace('right-icon', '').trim(),
+            text: elm.textContent
+        };
+    }
+
+    set rightBadge(options) {
+        let elm = this.domNode.querySelector('.right-badge');
+
+        if (!elm) {
+            elm = document.createElement('div');
+            this.domNode.appendChild(elm);
+        }
+
+        const { text, badgeClass } = options;
+        if (!text) {
+            elm.remove();
+            return;
+        }
+        elm.className = `${badgeClass} right-badge right-icon`;
+        elm.textContent = text;
     }
 
     get text() {

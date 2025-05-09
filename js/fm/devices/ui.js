@@ -1584,10 +1584,9 @@ lazy(mega.devices, 'ui', () => {
 
         /**
          * Show a context menu for the selected device
-         * @param {Event} e - contextMenu event
-         * @returns {void}
+         * @returns {Array} items to show
          */
-        contextMenu(e) {
+        contextMenu() {
             const items = ['.properties-item'];
             const {syncType} = mega.devices.models;
             if ($.selected.length === 1) {
@@ -1604,8 +1603,9 @@ lazy(mega.devices, 'ui', () => {
                         }
                     }
                 }
+                items.push('.open-item');
             }
-            M.contextMenuUI(e, 8, items.join(', '));
+            return items;
         }
 
         /**
@@ -1920,7 +1920,7 @@ lazy(mega.devices, 'ui', () => {
             // Inshare + Selective sync
             else if (folder.t === twoWay && isInShare) {
                 items['.copy-item'] = 1;
-                items['.download-item'] = 1;
+                items['.download-standart-item'] = 1;
                 items['.zipdownload-item'] = 1;
                 items['.open-in-location'] = 1;
                 items['.leaveshare-item'] = 1;
@@ -1942,7 +1942,7 @@ lazy(mega.devices, 'ui', () => {
             }
             // Backup
             else if (folder.t === backup) {
-                items['.download-item'] = 1;
+                items['.download-standart-item'] = 1;
                 items['.zipdownload-item'] = 1;
                 items['.stopbackup-item'] = 1;
                 items['.copy-item'] = 1;
@@ -1978,7 +1978,7 @@ lazy(mega.devices, 'ui', () => {
         _populateCommonCtxItems(node, items, isSharedFolder, hasSharedLink, multiple) {
 
             items['.send-to-contact-item'] = 1;
-            items['.download-item'] = 1;
+            items['.download-standart-item'] = 1;
             items['.zipdownload-item'] = 1;
             items['.copy-item'] = 1;
             items['.properties-item'] = 1;
@@ -2015,6 +2015,7 @@ lazy(mega.devices, 'ui', () => {
             }
             else if (is_video(node)) {
                 items['.play-item'] = 1;
+                items['.embedcode-item'] = 1;
             }
             else if (is_text(node)) {
                 items['.edit-file-item'] = 1;
@@ -2094,7 +2095,7 @@ lazy(mega.devices, 'ui', () => {
 
             if (isUndecrypted) {
                 delete items['.add-star-item'];
-                delete items['.download-item'];
+                delete items['.download-standart-item'];
                 delete items['.rename-item'];
                 delete items['.copy-item'];
                 delete items['.move-item'];
@@ -2115,7 +2116,7 @@ lazy(mega.devices, 'ui', () => {
                     delete items['.transferit-item'];
                     delete items['.add-star-item'];
                     delete items['.colour-label-items'];
-                    delete items['.download-item'];
+                    delete items['.download-standart-item'];
                     delete items['.play-item'];
                     delete items['.preview-item'];
                     delete items['.edit-file-item'];
@@ -2141,9 +2142,8 @@ lazy(mega.devices, 'ui', () => {
             if (handles.length > 1 && currentSection !== renderSection.cloudDrive) {
 
                 items['.properties-item'] = 1;
-                items['.download-item'] = 1;
+                items['.download-standart-item'] = 1;
                 items['.zipdownload-item'] = 1;
-                items['.send-to-contact-item'] = 1;
 
                 this._populateSensitiveCtxItems(handles, items);
                 this._filterRestrictedItems(handles, items);
@@ -2200,23 +2200,6 @@ lazy(mega.devices, 'ui', () => {
                 this._handlePauseCtxItems(folder, items);
             }
 
-            // Handle sensitive menu item styles
-            this._handleSenCtxItemStyling(items);
-
-            M.colourLabelcmUpdate(handles);
-
-            if (items['.add-star-item']) {
-                const $addStarItem = $('.add-star-item', '.files-menu');
-                if (M.isFavourite(h)) {
-                    $addStarItem
-                        .safeHTML('<i class="sprite-fm-mono icon-favourite-removed"></i>@@', l[5872]);
-                }
-                else {
-                    $addStarItem
-                        .safeHTML('<i class="sprite-fm-mono icon-favourite"></i>@@', l[5871]);
-                }
-            }
-
             this._filterRestrictedItems(handles, items);
             if (isHeaderContext) {
                 delete items['.open-item'];
@@ -2232,20 +2215,6 @@ lazy(mega.devices, 'ui', () => {
             }
 
             return items;
-        }
-
-        /**
-         * Internal function, handles show/hide (sensitive) context menu item styling
-         *
-         * @param {object.<string,number>} items The items to populate
-         *
-         * @returns {void} void
-         */
-        _handleSenCtxItemStyling(items) {
-            if (items['.add-sensitive-item']) {
-                const toHide = items['.add-sensitive-item'] === 1;
-                mega.sensitives.applyMenuItemStyle('.add-sensitive-item', toHide);
-            }
         }
 
         /**
@@ -2266,21 +2235,6 @@ lazy(mega.devices, 'ui', () => {
 
             if (folder && [twoWay, oneWayUp, oneWayDown, backup].includes(folder.t)) {
                 items[togglePauseSelector] = 1;
-                const $togglePauseOption = $(
-                    togglePauseSelector,'.dropdown.context');
-                const $icon = $('.sprite-fm-mono', $togglePauseOption);
-                const $label = $('span', $togglePauseOption);
-
-                if (folder.status.pausedSyncs) {
-                    $icon.removeClass('icon-pause-thin');
-                    $icon.addClass('icon-play-small-regular-outline');
-                    $label.text(l.dc_run);
-                }
-                else {
-                    $icon.removeClass('icon-play-small-regular-outline');
-                    $icon.addClass('icon-pause-thin');
-                    $label.text(l.dc_pause);
-                }
             }
         }
 

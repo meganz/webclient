@@ -22,7 +22,6 @@ export class ColumnSharedFolderButtons extends GenericNodePropsComponent {
                         onClick={(button, e) => {
                             e.persist();
                             $.selected = [handle];
-                            $.gridLastSelected = handle;
 
                             e.preventDefault();
                             e.stopPropagation(); // do not treat it as a regular click on the file

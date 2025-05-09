@@ -1541,86 +1541,6 @@ FileManager.prototype.initContextUI = function() {
         M.openFolder(M.currentdirid, true);
     });
 
-    // $('.submenu.labels .dropdown-colour-item').rebind('mouseover.clrSort', function() {
-    //     var labelTxt = this.dataset.labelTxt;
-    //     if ($(this).hasClass('update-to')) {
-    //         switch (labelTxt) {
-    //             case "Red":
-    //                 labelTxt = l.update_to_red;
-    //                 break;
-    //             case "Orange":
-    //                 labelTxt = l.update_to_orange;
-    //                 break;
-    //             case "Yellow":
-    //                 labelTxt = l.update_to_yellow;
-    //                 break;
-    //             case "Green":
-    //                 labelTxt = l.update_to_green;
-    //                 break;
-    //             case "Blue":
-    //                 labelTxt = l.update_to_blue;
-    //                 break;
-    //             case "Purple":
-    //                 labelTxt = l.update_to_purple;
-    //                 break;
-    //             case "Grey":
-    //                 labelTxt = l.update_to_grey;
-    //                 break;
-    //         }
-    //     }
-    //     else if ($(this).hasClass('active')) {
-    //         switch (labelTxt) {
-    //             case "Red":
-    //                 labelTxt = l[19569];
-    //                 break;
-    //             case "Orange":
-    //                 labelTxt = l[19573];
-    //                 break;
-    //             case "Yellow":
-    //                 labelTxt = l[19577];
-    //                 break;
-    //             case "Green":
-    //                 labelTxt = l[19581];
-    //                 break;
-    //             case "Blue":
-    //                 labelTxt = l[19585];
-    //                 break;
-    //             case "Purple":
-    //                 labelTxt = l[19589];
-    //                 break;
-    //             case "Grey":
-    //                 labelTxt = l[19593];
-    //                 break;
-    //         }
-    //     }
-    //     else {
-    //         switch (labelTxt) {
-    //             case "Red":
-    //                 labelTxt = l[19568];
-    //                 break;
-    //             case "Orange":
-    //                 labelTxt = l[19572];
-    //                 break;
-    //             case "Yellow":
-    //                 labelTxt = l[19576];
-    //                 break;
-    //             case "Green":
-    //                 labelTxt = l[19580];
-    //                 break;
-    //             case "Blue":
-    //                 labelTxt = l[19584];
-    //                 break;
-    //             case "Purple":
-    //                 labelTxt = l[19588];
-    //                 break;
-    //             case "Grey":
-    //                 labelTxt = l[19592];
-    //                 break;
-    //         }
-    //     }
-    //     $('.labels .dropdown-color-info').safeHTML(labelTxt).addClass('active');
-    // });
-
     $('.colour-sorting-menu .labels .dropdown-colour-item').rebind('mouseover.clrSort', function(e) {
         if (!$(this).parents('.labels').hasClass('disabled')){
             M.updateLabelInfo(e);
@@ -1674,38 +1594,6 @@ FileManager.prototype.initContextUI = function() {
         });
         $('.transfer-table tr.ui-selected').removeClass('ui-selected');
     });
-
-    // $(`${c}.add-to-album`).rebind('click.add-to-album', () => {
-    //     mega.gallery.albums.addToAlbum($.selected);
-    //
-    //     M.fmEventLog(500690);
-    // });
-    //
-    // $(`${c}.new-bucket-item`)
-    //     .rebind('click.createBucket', () => s4.ui.showDialog(s4.buckets.dialogs.create));
-    //
-    // $(`${c}.settings-item`)
-    //     .rebind('click.showSettings', () => s4.ui.showDialog(s4.buckets.dialogs.settings, M.d[$.selected[0]]));
-    //
-    // $(`${c}.managepuburl-item`)
-    //     .rebind('click.managePA', () => s4.ui.showDialog(s4.objects.dialogs.access, M.d[$.selected[0]]));
-    //
-    // $(c + '.transferit-item').rebind('click', () => mega.xferit &&  M.openTransferItOverlay($.selected).catch(tell));
-    //
-    // if (window.pfcol) {
-    //     $(`${c}.play-slideshow, ${c}.preview-item, ${c}.play-item`).rebind('click', function() {
-    //         if (M.isInvalidUserStatus()) {
-    //             return;
-    //         }
-    //
-    //         closeDialog();
-    //         mega.gallery.playSlideshow(
-    //             mega.gallery.getAlbumIdFromPath(),
-    //             this.classList.contains('play-slideshow'),
-    //             this.classList.contains('play-item')
-    //         );
-    //     });
-    // }
 
     if (mega.keyMgr.version) {
 

@@ -757,9 +757,7 @@ lazy(T.ui, 'addFilesLayout', () => {
 
                 const {xh, schedule} = this.data;
 
-                const p = [
-                    T.core.close(xh)
-                ];
+                const p = [];
                 if (sender || message || password || parseInt(expiry) > 0) {
                     const en = cn.querySelector('.exp-notif input').checked | 0;
                     p.push(T.core.setTransferAttributes(xh, {sender, message, password, expiry, en}));
@@ -771,10 +769,11 @@ lazy(T.ui, 'addFilesLayout', () => {
                     p.push(T.core.setMultiTransferRecipients(xh, bulk));
                 }
 
-                this.data.stashing = Promise.all(p);
+                this.data.stashing = Promise.all(p).then(() => T.core.close(xh));
             }
             return this.data.stashing;
         },
+
         /*
          * Render Transferring section. Step 3.
         */

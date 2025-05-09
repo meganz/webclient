@@ -26450,9 +26450,9 @@ class Select extends REaCt().Component {
     };
     this.handleToggle = ({
       target
-    }) => {
-      let _menuRef$domRef;
-      const menuRef = this.menuRef && this.menuRef.current;
+    } = {}) => {
+      let _this$menuRef, _menuRef$domRef;
+      const menuRef = (_this$menuRef = this.menuRef) == null ? void 0 : _this$menuRef.current;
       const menuElement = (_menuRef$domRef = menuRef.domRef) == null ? void 0 : _menuRef$domRef.current;
       if (target !== menuElement) {
         const {

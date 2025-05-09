@@ -1,8 +1,16 @@
-var versiondialogid;
 (function _fileversioning(global) {
     'use strict';
 
-    var current_sel_version = [];
+    const selections = Object.create(null);
+    function clearSelections() {
+        // Currently selected versions of the file (rows)
+        selections.versions = [];
+        // Currently selected file (header)
+        selections.file = '';
+        selections.handles = [];
+        selections.vtree = Object.create(null);
+    }
+    clearSelections();
     var ns = {
         /**
          * Get all the versions for given file handle in an async way.
@@ -14,6 +22,50 @@ var versiondialogid;
         async getAllVersions(h) {
             await dbfetch.tree([h], -1).catch(dump);
             return this.getAllVersionsSync(h);
+        },
+
+        async getSubVersions(h) {
+            const foldersVersions = Object.create(null);
+            foldersVersions[h] = M.d[h].tvf;
+
+            const getChildFolderWithVersion = (h) => {
+                if (!M.tree[h]) {
+                    return;
+                }
+                const fHandles = Object.keys(M.tree[h]);
+
+                for (let i = fHandles.length; i--;) {
+
+                    if (M.tree[h][fHandles[i]].tvf) {
+                        foldersVersions[fHandles[i]] = M.tree[h][fHandles[i]].tvf;
+                        foldersVersions[h] -= M.tree[h][fHandles[i]].tvf;
+                        getChildFolderWithVersion(fHandles[i]);
+                    }
+
+                    if (!foldersVersions[h]) {
+                        delete foldersVersions[h];
+                        break;
+                    }
+                }
+            };
+
+            getChildFolderWithVersion(h);
+
+            const fh = Object.keys(foldersVersions);
+            await dbfetch.geta(fh);
+
+            const out = [];
+            for (let i = fh.length; i--;) {
+                const handles = Object.keys(M.c[fh[i]]);
+                for (let j = handles.length; j--;) {
+                    const node = M.getNodeByHandle(handles[j]);
+                    if (!node.t && node.tvf) {
+                        out.push(handles[j]);
+                    }
+                }
+            }
+            selections.handles = out;
+            return Promise.allSettled(selections.handles.map(h => this.getAllVersions(h)));
         },
 
         /**
@@ -97,23 +149,30 @@ var versiondialogid;
 
         /**
          * Close file versioning dialog if it is open.
-         * @param {hanlde} del file hanle of the file to delete.
          */
-        closeFileVersioningDialog: function (del) {
-            if (!$('.fm-versioning').hasClass('hidden')) {
-                if (del && $.selected && ($.selected.length === 0 || del === $.selected[0])) {
-                    $('.fm-versioning').addClass('hidden');
-                    current_sel_version = [];
-                    versiondialogid = undefined;
-                    $(document).off('keydown.fileversioningKeydown');
-                    $(window).unbind('resize.fileversioning');
+        closeFileVersioningDialog() {
+            if (!fileversioning.isOpen) {
+                return;
+            }
 
-                    mBroadcaster.sendMessage('mega:close_fileversioning');
-                }
-                else {
-                    fileversioning.updateFileVersioningDialog();
+            $('.fm-versioning').addClass('hidden');
+            if (selectionManager) {
+                let cleared = false;
+                for (const handle of selections.handles) {
+                    const node = M.getNodeByHandle(handle);
+                    if (M.v.includes(node)) {
+                        if (!cleared) {
+                            selectionManager.clear_selection();
+                            cleared = true;
+                        }
+                        selectionManager.add_to_selection(handle);
+                    }
                 }
             }
+            clearSelections();
+            $(document).off('keydown.fileversioningKeydown');
+            $(window).unbind('resize.fileversioning');
+            mBroadcaster.sendMessage('mega:close_fileversioning');
         },
 
         /**
@@ -253,26 +312,27 @@ var versiondialogid;
 
         /**
          * Open file versioning dialog and render file history versions list.
-         * @param {hanlde} handle hanle of the file to render history versioning list.
-         *                 if handle is not set, then it will use the default one, $.selected[0].
+         * @param {Array|string|undefined} handles handles of the file(s) to render history versioning list.
+         *                 if handles is not set, then it will use the default $.selected
          */
-        fileVersioningDialog: function (handle) {
-            var pd = $('.fm-versioning');
-            var fh = (!handle) ? $.selected[0] : handle;
-            var f = M.d[fh];
-            if (!f) {
+        fileVersioningDialog(handles) {
+            if (!handles) {
+                handles = $.selected;
+            }
+            if (!Array.isArray(handles) && handles) {
+                handles = [handles];
+            }
+            if (!handles || !handles.length) {
                 return;
             }
-            versiondialogid = fh;
-            var nodeData = M.d[fh];
-            // are we in an inshare?
-            while (nodeData && !nodeData.su) {
-                nodeData = M.d[nodeData.p];
+            const $versioning = $('.fm-versioning');
+            const $versionOverlay = $versioning.filter('.overlay');
+            clearSelections();
+            selections.handles = handles.filter(h => M.d[h]);
+            if (!selections.handles.length) {
+                return;
             }
-
-            current_sel_version = current_sel_version.length ? current_sel_version : [fh];
-
-            var revertVersion = function(handle, current_node) {
+            const revertVersion = (handle, current_node) => {
                 if (M.isInvalidUserStatus()) {
                     return;
                 }
@@ -346,18 +406,35 @@ var versiondialogid;
                     })
                     .catch(dump);
             };
+            const checkNodeData = handle => {
+                let nodeData = M.d[handle];
+                // are we in an inshare?
+                while (nodeData && !nodeData.su) {
+                    nodeData = M.d[nodeData.p];
+                }
+                return nodeData && nodeData.r < 2;
+            };
 
-            var fillVersionList = function(versionList) {
+            const genActionHtml = (version, i, versionList) => {
+                if (i < versionList.length - 1 && version.name !== versionList[i + 1].name) {
+                    return l[17156].replace('%1', `<span>${versionList[i + 1].name}</span>`);
+                }
+                return version.u === u_handle ? l[16480]
+                    : l[16476].replace('%1', M.getNameByHandle(version.u) || l[7381]);
+            };
 
-                var html = '';
-                var lastDate = false;
+            const fillVersionList = (handle, versionList) => {
+
+                let html = '';
+                let lastDate = false;
                 let firstHeader = true;
-                for (var i = 0; i < versionList.length; i++) {
+                const noSharePerm = checkNodeData(handle);
+                for (let i = 0; i < versionList.length; i++) {
 
-                    var v = versionList[i];
-                    var curTimeMarker;
-                    var msgDate = new Date(v.ts * 1000 || 0);
-                    var iso = (msgDate.toISOString());
+                    const version = versionList[i];
+                    let curTimeMarker;
+                    const msgDate = new Date((version.ts | 0) * 1000);
+                    const iso = msgDate.toISOString();
                     const isCurrentVersion = i === 0;
 
                     if (todayOrYesterday(iso)) {
@@ -366,7 +443,7 @@ var versiondialogid;
                     }
                     else {
                         // if not in the last 2 days, use 1st June [Year]
-                        curTimeMarker = acc_time2date(v.ts, true);
+                        curTimeMarker = acc_time2date(version.ts, true);
                     }
                     //            <!-- Modification Date !-->
                     if (curTimeMarker !== lastDate) {
@@ -378,395 +455,417 @@ var versiondialogid;
                         }
                         html += '<div class="fm-versioning data">' + curTimeMarker + '</div><table class="data-table">';
                     }
-                    var actionHtml = (v.u === u_handle) ? l[16480]
-                        : l[16476].replace('%1', M.u[v.u] && M.u[v.u].m || l[7381]);
-                    if (i < versionList.length - 1) {
-                        if (v.name !== versionList[i + 1].name) {
-                            actionHtml = l[17156].replace(
-                                '%1',
-                                '<span>' + htmlentities(versionList[i + 1].name) + '</span>');
-                        }
-                    }
 
-                    var mostRecentHtml = isCurrentVersion ? '<span class="current">(' + l[17149] + ')</span>' : '';
-                    var activeClass  = current_sel_version.includes(v.h) ? 'active' : '';
-                    var downBtnHtml =
+                    const mostRecentHtml = isCurrentVersion ? '<span class="current">(' + l[17149] + ')</span>' : '';
+                    const activeClass  =
+                        selections.file === handle && selections.versions.includes(version.h) ? 'active' : '';
+                    const downBtnHtml =
                         `<div class="mega-button small action download-file simpletip"
                             data-simpletip="${l[58]}"
                             aria-label="${l[58]}"
-                            id="vdl_${v.h}">
+                            id="vdl_${version.h}">
                             <i class="sprite-fm-mono icon-download-small"></i>
                         </div>`;
-                    var viewBtnHtml =
+                    const viewBtnHtml =
                         `<div class="mega-button small action preview-file simpletip"
                             data-simpletip="${l.version_preview}"
                             aria-label="${l.version_preview}"
-                            id="vdl_${v.h}">
+                            id="vdl_${version.h}">
                             <i class="sprite-fm-mono icon-file-edit"></i>
                         </div>`;
-                    var revertBtnHtml =
-                        `<div class="mega-button small action revert-file simpletip"
+                    const isInbox = M.getNodeRoot(version.h) === M.InboxID;
+                    // if the user does not have full access of the shared folder.
+                    const revertDisabled = noSharePerm || isCurrentVersion ? 'disabled' : '';
+                    const revertBtnHtml = isInbox ?
+                        '' :
+                        `<div class="mega-button small action revert-file simpletip ${revertDisabled}"
                             data-simpletip="${l[16475]}"
                             aria-label="${l[16475]}"
-                            id="vrv_${v.h}">
-                            <i class="sprite-fm-mono icon-versions-previous"></i>
+                            id="vrv_${version.h}">
+                            <i class="sprite-fm-mono icon-versions-previous ${revertDisabled}"></i>
                         </div>`;
                     // if the user does not have full access of the shared folder.
-                    if (nodeData && nodeData.r < 2
-                            || i === 0
-                                && fileversioning.getTopNodeSync(current_sel_version[0]) === v.h
-                    ) {
-                        revertBtnHtml =
-                            `<div class="mega-button small action revert-file disabled nonclickable simpletip"
-                                data-simpletip="${l[16475]}"
-                                aria-label="${l[16475]}"
-                                id="vrv_${v.h}">
-                                <i class="sprite-fm-mono icon-versions-previous disabled nonclickable"></i>
-                            </div>`;
-                    }
-                    var deleteBtnHtml =
-                        `<div class="mega-button small action delete-file simpletip"
+                    const deleteDisabled = (noSharePerm || !M.d[handle].tvf) ? 'disabled' : '';
+                    const deleteBtnHtml = isInbox && isCurrentVersion ?
+                        '' :
+                        `<div class="mega-button small action delete-file simpletip ${deleteDisabled}"
                             data-simpletip="${l[1730]}"
                             aria-label="${l[1730]}"
-                            id="vde_${v.h}">
-                            <i class="sprite-fm-mono icon-bin"></i>
+                            id="vde_${version.h}">
+                            <i class="sprite-fm-mono icon-bin ${deleteDisabled}"></i>
                         </div>`;
-                    if ((nodeData && nodeData.r < 2) || !M.d[fh].tvf) {// if the user does not have full access of the shared folder.
-                        deleteBtnHtml =
-                            `<div class="mega-button small action delete-file disabled nonclickable"
-                                data-simpletip="${l[1730]}"
-                                aria-label="${l[1730]}"
-                                id="vde_${v.h}">
-                                <i class="sprite-fm-mono icon-bin disabled nonclickable"></i>
-                            </div>`;
-                    }
-
-                    // If from backup
-                    if (M.getNodeRoot(v.h) === M.InboxID) {
-                        revertBtnHtml = ``;
-                        if (isCurrentVersion) {
-                            deleteBtnHtml = ``;
-                        }
-                    }
 
                     html += // <!-- File Data Row !-->
-                            `<tr class="fm-versioning file-info-row ${activeClass}" id=v_${v.h}>
+                            `<tr class="fm-versioning file-info-row ${activeClass}" id=v_${version.h}>
                                 <td class="fm-versioning file-icon">
-                                    <div class="item-type-icon-90 icon-${fileIcon({name : v.name})}-90"></div>
+                                    <div class="item-type-icon-90 icon-${fileIcon({name : version.name})}-90"></div>
                                 </td>
                                 <td class="fm-versioning file-data">
                                     <div class="fm-versioning file-name">
-                                        <span>${htmlentities(v.name)}</span>
+                                        <span>${htmlentities(version.name)}</span>
                                     </div>
                                     <div class="fm-versioning file-info">
-                                        <span class="size">${bytesToSize(v.s)}</span>
+                                        <span class="size">${bytesToSize(version.s)}</span>
                                         <span>${mostRecentHtml}</span>
                                     </div>
                                 </td>
-                                ${/* Modification time */''}
                                 <td class="fm-versioning modified-time">
                                     <i class="sprite-fm-uni icon-history"></i>
                                     <span>
                                         ${msgDate.getHours()}:${addZeroIfLenLessThen(msgDate.getMinutes(), 2)}
                                     </span>
                                 </td>
-                                ${/* Modification info */''}
                                 <td class="fm-versioning modified-info">
-                                    ${/* Classnames: "earth", "refresh-arrows",
-                                    "mobile-device", "reverted-light-clock" */''}
                                     <span class="modified-info-txt">
-                                        ${actionHtml}
+                                        ${genActionHtml(version, i, versionList)}
                                     </span>
                                 </td>
                                 <td class="fm-versioning button-container">
-                                    ${/* Buttons */''}
                                     <div class="fm-versioning buttons">
                                         ${downBtnHtml}
                                         ${viewBtnHtml}
                                         ${revertBtnHtml}
                                         ${deleteBtnHtml}
                                     </div>
-                                    ${/* End of Buttons */''}
                                 </td>
                             </tr>`;
                     lastDate = curTimeMarker;
                 }
                 html += '</table>';
-                return html;
+                return `<div class="version-block" data-ph="${handle}">${html}</div>`;
             };
 
-            var a2 = M.getPath(M.d[fh].p);
-            var name;
-            var pathHtml = '';
-            for (var i in a2) {
-                let hasArrow = false;
-                name = '';
-                if (a2[i] === M.RootID) {
-                    if (M.d[M.RootID]) {
+            const genPathHtml = (h) => {
+                const path = M.getPath(M.d[h].p);
+                let name = '';
+                let pathHtml = '';
+                for (const handle of path) {
+                    let hasArrow = false;
+                    if (handle === M.RootID) {
                         name = l[164];
                     }
-                }
-                else if (a2[i] === 'contacts') {
-                    name = l[165];
-                }
-                else if (a2[i] === 'opc') {
-                    name = l[5862];
-                }
-                else if (a2[i] === 'ipc') {
-                    name = l[5863];
-                }
-                else if (a2[i] === 'shares') {
-                    name = l[5542];
-                }
-                else if (a2[i] === M.RubbishID) {
-                    name = l[167];
-                }
-                else if (a2[i] === 'messages') {
-                    name = l[166];
-                }
-                else {
-                    var n = M.d[a2[i]];
-                    if (n && n.name) {
-                        name = n.name;
-                        hasArrow = true;
+                    else if (handle === 'contacts') {
+                        name = l[165];
+                    }
+                    else if (handle === 'opc') {
+                        name = l[5862];
+                    }
+                    else if (handle === 'ipc') {
+                        name = l[5863];
+                    }
+                    else if (handle === 'shares') {
+                        name = l[5542];
+                    }
+                    else if (handle === M.RubbishID) {
+                        name = l[167];
+                    }
+                    else if (handle === 'messages') {
+                        name = l[166];
+                    }
+                    else {
+                        const n = M.d[handle];
+                        if (n && n.name) {
+                            name = n.name;
+                            hasArrow = true;
+                        }
+                    }
+
+                    if (name) {
+                        name = escapeHTML(name);
+                        pathHtml = `
+                            <span>
+                                ${hasArrow ? '<i class="sprite-fm-mono icon-arrow-right"></i>' : ''}
+                                <span class="simpletip" data-simpletip="${name}">${name}</span>
+                            </span>
+                            ${pathHtml}
+                        `;
                     }
                 }
+                return pathHtml;
+            };
 
-                if (name) {
-                    name = htmlentities(name);
-                    pathHtml =
-                        `<span>
-                            ${hasArrow ? '<i class="sprite-fm-mono icon-arrow-right"></i>' : ''}
-                            <span class="simpletip" data-simpletip="${name}">${name}</span>
-                        </span>` + pathHtml;
-                }
-            }
-
-            var refreshHeader = function(fileHandle) {
-
-                const headerSelect = '.fm-versioning .pad .top-column';
-                const $rvtBtn = $('button.js-revert', headerSelect);
-                const $delBtn = $('button.js-delete', headerSelect);
-                const $clrBtn = $('button.js-clear-previous', headerSelect);
+            const $header = $('.header', $versionOverlay);
+            const $headerColumn = $('.pad .top-column', $header);
+            const $rvtBtn = $('button.js-revert', $headerColumn);
+            const $delBtn = $('button.js-delete', $headerColumn);
+            const $clrBtn = $('button.js-clear-previous', $headerColumn);
+            const refreshHeader = () => {
+                const fileHandle = selections.file;
                 const topNodeHandle = fileversioning.getTopNodeSync(fileHandle);
-
-                if (current_sel_version.length > 1
-                    || current_sel_version[0] === topNodeHandle
-                    || nodeData && nodeData.r < 2
+                const node = M.d[fileHandle];
+                if (!node) {
+                    return;
+                }
+                const noSharePerm = checkNodeData(node.h);
+                if (
+                    selections.versions.length > 1
+                    || selections.versions[0] === topNodeHandle
+                    || noSharePerm
                 ) {
-
-                    $rvtBtn.addClass("disabled nonclickable");
+                    $rvtBtn.addClass('disabled');
                 }
                 else {
-                    $rvtBtn.removeClass("disabled nonclickable");
+                    $rvtBtn.removeClass('disabled');
                 }
 
-                if (nodeData && (nodeData.r < 2)) {
-                    $delBtn.addClass("disabled nonclickable");
-                    $clrBtn.addClass("disabled nonclickable");
+                if (noSharePerm) {
+                    $delBtn.addClass('disabled');
+                    $clrBtn.addClass('disabled');
                 }
                 else {
-                    if (!M.d[fh].tvf || current_sel_version.length === M.d[fh].tvf + 1) {
-                        $delBtn.addClass("disabled nonclickable");
+                    if (!M.d[fileHandle].tvf || selections.versions.length === M.d[fileHandle].tvf + 1) {
+                        $delBtn.addClass('disabled');
                     }
                     else {
-                        $delBtn.removeClass("disabled nonclickable");
+                        $delBtn.removeClass('disabled');
                     }
-                    if (M.d[fh].tvf) {
-                        $clrBtn.removeClass("disabled nonclickable");
+                    if (M.d[fileHandle].tvf) {
+                        $clrBtn.removeClass('disabled');
                     }
                     else {
-                        $clrBtn.addClass("disabled nonclickable");
+                        $clrBtn.addClass('disabled');
                     }
                 }
 
                 // If from backup
                 if (M.getNodeRoot(fileHandle) === M.InboxID) {
-                    $rvtBtn.addClass("disabled nonclickable");
-                    if (current_sel_version.includes(topNodeHandle)) {
-                        $delBtn.addClass("disabled nonclickable");
+                    $rvtBtn.addClass('disabled');
+                    if (selections.versions.includes(topNodeHandle)) {
+                        $delBtn.addClass('disabled');
                     }
                 }
 
-                var f = M.d[fileHandle];
-                var fnamehtml = '<span>' + htmlentities(f.name);
 
-                $('.fm-versioning .header .pad .top-column .file-data .file-name').html(fnamehtml);
-
-                $('.fm-versioning .header .pad .top-column .item-type-icon-90')
-                    .attr('class', `item-type-icon-90 icon-${fileIcon({'name':f.name})}-90`);
+                $('.file-data .file-name', $header).safeHTML(`<span>${htmlentities(node.name)}</span>`);
+                $('.file-data .file-path', $header).safeHTML(genPathHtml(fileHandle));
+                $('.item-type-icon-90', $header)
+                    .attr('class', `item-type-icon-90 icon-${fileIcon({name: node.name})}-90`);
 
             };
-            var fnamehtml = '<span>' + htmlentities(f.name);
 
-            $('.fm-versioning .header .pad .top-column .file-data .file-name').html(fnamehtml);
-            $('.fm-versioning .header .pad .top-column .file-data .file-path').html(pathHtml);
-            $('.fm-versioning .header .pad .top-column .item-type-icon-90')
-                .addClass(`icon-${fileIcon({'name':f.name})}-90`);
-
-            $('.fm-versioning .pad .top-column button.js-download').rebind('click', () => {
-                M.addDownload(current_sel_version);
+            $('button.js-download', $header).rebind('click', () => {
+                M.addDownload(selections.versions);
             });
 
-            $('.fm-versioning .pad .top-column button.js-delete')
-                .rebind('click', function() {
+            $('button.js-delete', $header)
+                .rebind('click', (ev) => {
                     if (M.isInvalidUserStatus()) {
                         return;
                     }
-                    $('.fm-versioning.overlay').addClass('arrange-to-back');
+                    $versionOverlay.addClass('arrange-to-back');
 
-                    if (!$(this).hasClass('disabled')) {
+                    if (!ev.currentTarget.classList.contains('disabled')) {
 
-                        const msg = mega.icu.format(l[13750], current_sel_version.length);
+                        const msg = mega.icu.format(l[13750], selections.versions.length);
 
                         msgDialog('remove', l[1003], msg, l[1007], e => {
                             if (e) {
-                                api.screq(current_sel_version.map((n) => ({n, a: 'd', v: 1}))).catch(dump);
-                                current_sel_version = [];
+                                api.screq(selections.versions.map((n) => ({n, a: 'd', v: 1}))).catch(dump);
+                                selections.versions = [];
                             }
-                            $('.fm-versioning.overlay').removeClass('arrange-to-back');
+                            $versionOverlay.removeClass('arrange-to-back');
                         });
                     }
-            });
+                });
 
-            $('.fm-versioning .pad .top-column button.js-revert').rebind('click', function() {
-                if (!$(this).hasClass('disabled')) {
-                    revertVersion(current_sel_version[0], fh);
+            $('button.js-revert', $header).rebind('click', (ev) => {
+                if (!ev.currentTarget.classList.contains('disabled')) {
+                    revertVersion(selections.versions[0], selections.file);
                 }
             });
 
-            $('.fm-versioning .button.close').rebind('click', function() {
-                fileversioning.closeFileVersioningDialog(window.versiondialogid);
+            $('.button.close', $header).rebind('click', () => {
+                fileversioning.closeFileVersioningDialog();
             });
 
-            $('.pad .top-column button.js-preview', '.fm-versioning').rebind('click.version', () => {
-                fileversioning.previewFile(current_sel_version[0]);
+            $('button.js-preview', $header).rebind('click.version', () => {
+                fileversioning.previewFile(selections.versions[0], selections.file, selections.handles);
             });
 
-            fileversioning.getAllVersions(fh)
-                .then((versions) => {
-                    var vh = fillVersionList(versions);
-                    const $scrollBlock = $('.fm-versioning.scroll-bl', '.fm-versioning .body');
+            $('button.js-clear-previous', $header)
+                .rebind('click', (ev) => {
+                    if (M.isInvalidUserStatus()) {
+                        return;
+                    }
 
-                    $('.fm-versioning .body .scroll-bl .content').html(vh);
-                    $('.fm-versioning .body .file-info-row').rebind('click', function(e) {
-                        if (!e.shiftKey) {
-                            $('.fm-versioning .body .file-info-row').removeClass('active');
-                            current_sel_version = [];
+                    if (!ev.currentTarget.classList.contains('disabled')) {
+                        msgDialog('remove', l[1003], mega.icu.format(l[17154], 1), l[1007], e => {
+                            if (e) {
+                                fileversioning.clearPreviousVersions(selections.file);
+                                selections.versions = [selections.file];
+                            }
+                        });
+                    }
+                });
+
+            const isFolder = selections.handles.length === 1 && M.d[selections.handles[0]].t;
+            const promises = isFolder ?
+                [fileversioning.getSubVersions(selections.handles[0])]
+                : selections.handles.map(h => fileversioning.getAllVersions(h));
+            Promise.allSettled(promises)
+                .then((res) => {
+                    const blocks = [];
+                    if (isFolder && res[0].status === 'fulfilled') {
+                        res = res[0].value;
+                    }
+                    selections.file = selections.handles[0];
+                    for (let i = 0; i < res.length; i++) {
+                        const result = res[i];
+                        if (result.status === 'fulfilled') {
+                            if (!selections.versions.length) {
+                                selections.versions.push(result.value[0].h);
+                            }
+                            selections.vtree[selections.handles[i]] = result.value.map(n => n.h);
+                            blocks.push(fillVersionList(selections.handles[i], result.value));
+                        }
+                    }
+                    const $body = $('.body', $versionOverlay);
+                    const $scrollBlock = $('.fm-versioning.scroll-bl', $body);
+
+                    const content = blocks.join('\n');
+                    if (!content) {
+                        fileversioning.closeFileVersioningDialog();
+                        return;
+                    }
+                    $('.content', $scrollBlock).safeHTML(blocks.join('\n'));
+                    $('.file-info-row', $scrollBlock).rebind('click', (ev) => {
+                        if (!ev.shiftKey) {
+                            $('.file-info-row', $body).removeClass('active');
+                            selections.versions = [];
                         }
 
-                        if (this.classList.contains('active')) {
-
-                            this.classList.remove('active');
-                            current_sel_version.splice(current_sel_version.indexOf(this.id.substring(2)), 1);
+                        const handle = ev.currentTarget.id.substring(2);
+                        const parent = ev.currentTarget.closest('.version-block');
+                        if (ev.shiftKey && parent.dataset.ph !== selections.file) {
+                            let dir = 'previousSibling';
+                            for (const row of parent.parentNode.children) {
+                                if (row === parent) {
+                                    dir = 'nextSibling';
+                                }
+                                if (row.dataset.ph === selections.file) {
+                                    break;
+                                }
+                            }
+                            $('.file-info-row', $body).removeClass('active');
+                            selections.versions = [];
+                            let sibling = ev.currentTarget[dir];
+                            while (sibling && sibling.classList.contains('file-info-row')) {
+                                sibling.classList.add('active');
+                                selections.versions.push(sibling.id.substring(2));
+                                sibling = sibling[dir];
+                            }
+                        }
+                        selections.file = parent.dataset.ph;
+                        if (ev.currentTarget.classList.contains('active')) {
+                            ev.currentTarget.classList.remove('active');
+                            selections.versions.splice(selections.versions.indexOf(handle), 1);
                         }
                         else {
-                            this.classList.add('active');
-                            current_sel_version.push(this.id.substring(2));
+                            ev.currentTarget.classList.add('active');
+                            selections.versions.push(handle);
                         }
-                        refreshHeader(this.id.substring(2));
+                        refreshHeader();
                     });
 
-                    $('.fm-versioning .body .file-info-row').rebind('dblclick.fileInfoRow', function(e) {
-
-                        if (!e.shiftKey) {
-                            $('.fm-versioning .body .file-info-row').removeClass('active');
-                            $(this).addClass('active');
-                            M.addDownload([this.id.substring(2)]);
-                            current_sel_version = [this.id.substring(2)];
-                            refreshHeader(this.id.substring(2));
-                        }
-                    });
-
-                    $('.fm-versioning .buttons .download-file').rebind('click', function(e) {
-
-                        if (e.shiftKey && current_sel_version.length > 0) {
-                            $('.fm-versioning .body .file-info-row').removeClass('active');
-                            this.closest('.file-info-row').classList.add('active');
-                        }
-                        M.addDownload([this.id.substring(4)]);
-                        current_sel_version = [this.id.substring(4)];
-                    });
-
-                    $('.fm-versioning .buttons .revert-file').rebind('click', function(e) {
-                        if (!$(this).hasClass('disabled')) {
-
-                            if (e.shiftKey && current_sel_version.length > 0) {
-                                $('.fm-versioning .body .file-info-row').removeClass('active');
-                                this.closest('.file-info-row').classList.add('active');
-                            }
-
-                            revertVersion(this.id.substring(4), fh);
-                            current_sel_version = [this.id.substring(4)];
+                    $('.file-info-row', $scrollBlock).rebind('dblclick.fileInfoRow', (ev) => {
+                        if (!ev.shiftKey) {
+                            $('.file-info-row', $scrollBlock).removeClass('active');
+                            ev.currentTarget.classList.add('active');
+                            const handle = ev.currentTarget.id.substring(2);
+                            selections.versions = [handle];
+                            M.addDownload(selections.versions);
+                            const parent = ev.currentTarget.closest('.version-block');
+                            selections.file = parent.dataset.ph;
+                            refreshHeader();
                         }
                     });
 
-                    $('.fm-versioning .buttons .delete-file').rebind('click', function(e) {
+                    $('.download-file', $scrollBlock).rebind('click', (ev) => {
+                        if (ev.shiftKey && selections.versions.length > 0) {
+                            $('.file-info-row', $scrollBlock).removeClass('active');
+                            ev.currentTarget.closest('.file-info-row').classList.add('active');
+                        }
+                        const handle = ev.currentTarget.id.substring(4);
+                        selections.versions = [handle];
+                        const parent = ev.currentTarget.closest('.version-block');
+                        selections.file = parent.dataset.ph;
+                        refreshHeader();
+                        M.addDownload(selections.versions);
+                    });
+
+                    $('.revert-file', $scrollBlock).rebind('click', (ev)=> {
+                        if (ev.currentTarget.classList.contains('disabled')) {
+                            return false;
+                        }
+                        if (ev.shiftKey && selections.versions.length > 0) {
+                            $('.file-info-row', $scrollBlock).removeClass('active');
+                            ev.currentTarget.closest('.file-info-row').classList.add('active');
+                        }
+                        const handle = ev.currentTarget.id.substring(4);
+                        const parent = ev.currentTarget.closest('.version-block');
+                        selections.versions = [handle];
+                        selections.file = parent.dataset.ph;
+                        refreshHeader();
+                        revertVersion(handle, selections.file);
+                    });
+
+                    $('.delete-file', $scrollBlock).rebind('click', (ev) => {
                         if (M.isInvalidUserStatus()) {
                             return;
                         }
-                        if (!$(this).hasClass('disabled')) {
-                            const n = this.id.substr(4);
-
-                            if (e.shiftKey && current_sel_version.length > 0) {
-                                $('.fm-versioning .body .file-info-row').removeClass('active');
-                                this.closest('.file-info-row').classList.add('active');
-                            }
-
-                            $('.fm-versioning.overlay').addClass('arrange-to-back');
-                            msgDialog('remove', l[1003], mega.icu.format(l[13750], 1), l[1007], e => {
-                                if (e) {
-                                    current_sel_version = [];
-                                    api.screq({a: 'd', n, v: 1}).catch(dump);
-                                }
-                                $('.fm-versioning.overlay').removeClass('arrange-to-back');
-                            });
+                        if (ev.currentTarget.classList.contains('disabled')) {
+                            return false;
                         }
-                    });
-
-                    $('.fm-versioning .pad .top-column button.js-clear-previous')
-                        .rebind('click', function() {
-                            if (M.isInvalidUserStatus()) {
-                                return;
+                        if (ev.shiftKey && selections.versions.length > 0) {
+                            $('.file-info-row', $scrollBlock).removeClass('active');
+                            ev.currentTarget.closest('.file-info-row').classList.add('active');
+                        }
+                        const handle = ev.currentTarget.id.substring(4);
+                        const parent = ev.currentTarget.closest('.version-block');
+                        selections.versions = [handle];
+                        selections.file = parent.dataset.ph;
+                        $versionOverlay.addClass('arrange-to-back');
+                        msgDialog('remove', l[1003], mega.icu.format(l[13750], 1), l[1007], e => {
+                            if (e) {
+                                selections.versions = [];
+                                api.screq({a: 'd', n: handle, v: 1}).catch(dump);
                             }
-
-                            if (!$(this).hasClass('disabled')) {
-                                msgDialog('remove', l[1003], mega.icu.format(l[17154], 1), l[1007], e => {
-                                    if (e) {
-                                        fileversioning.clearPreviousVersions(fh);
-                                        current_sel_version = [fh];
-                                    }
-                                });
-                            }
+                            $versionOverlay.removeClass('arrange-to-back');
                         });
-                    $('.buttons .preview-file', '.fm-versioning').rebind('click.version', function() {
-                        fileversioning.previewFile($(this).prop('id').substring(4));
                     });
-                    refreshHeader(fh);
-                    pd.removeClass('hidden');
+
+                    $('.preview-file', $scrollBlock).rebind('click.version', (ev) => {
+                        fileversioning.previewFile(
+                            ev.currentTarget.id.substring(4),
+                            selections.file,
+                            selections.handles
+                        );
+                    });
+                    refreshHeader();
+                    $versioning.removeClass('hidden');
                     // Init scrolling
                     initPerfectScrollbar($scrollBlock);
                     $(window).rebind('resize.fileversioning', SoonFc(() => {
                         initPerfectScrollbar($scrollBlock);
                     }));
                     if (
-                        !is_video(M.d[window.versiondialogid])
-                        && !is_image2(M.d[window.versiondialogid])
-                        && !is_text(M.d[window.versiondialogid])
+                        !is_video(M.d[selections.file])
+                        && !is_image2(M.d[selections.file])
+                        && !is_text(M.d[selections.file])
                     ) {
-                        $('.pad .top-column button.js-preview', '.fm-versioning').addClass('hidden');
-                        $('.action.preview-file', '.fm-versioning').addClass('hidden');
+                        $('button.js-preview', $header).addClass('hidden');
+                        $('.preview-file', $scrollBlock).addClass('hidden');
                     }
                 });
 
-            $(document).rebind('keydown.fileversioningKeydown', function(e) {
+            $(document).rebind('keydown.fileversioningKeydown', (e) => {
                 if (e.keyCode === 8) { // Backspace
                     e.stopPropagation();
-                    fileversioning.closeFileVersioningDialog(window.versiondialogid);
+                    fileversioning.closeFileVersioningDialog();
                 }
             });
-            $('.fm-versioning .header .button.settings').rebind('click', function() {
-                pd.addClass('hidden');
+            $('.button.settings', $header).rebind('click', () => {
+                $versionOverlay.addClass('hidden');
                 loadSubPage('fm/account/file-management');
             });
             pushHistoryState(page);
@@ -776,7 +875,7 @@ var versiondialogid;
          * Update file versioning dialog if it is open.
          *
          *
-         * @param {hanlde} fileHandle file hanle of the file to update,
+         * @param {String} [fileHandle] fileHandle file handle of the file to update,
          * it is null, just do refresh based on the currently selected file.
          *
          */
@@ -789,16 +888,31 @@ var versiondialogid;
                 // update node DOM.
                 M.versioningDomUpdate(p);
             }
-
-            if (!$('.fm-versioning').hasClass('hidden')) {
-                if ($.selected.length === 0 ||
-                    fileversioning.checkPreviousVersionSync(current_sel, $.selected[0]) ||
-                    fileversioning.checkPreviousVersionSync($.selected[0], current_sel)) {
-                    if (p) {
-                        fileversioning.fileVersioningDialog(p);
-                        $.selected[0] = p;
-                    }
+            if (
+                !p ||
+                !fileversioning.isOpen ||
+                $('.fm-versioning').hasClass('hidden')
+            ) {
+                return;
+            }
+            if ($.selected.length === 0) {
+                $.selected[0] = p;
+            }
+            let update = false;
+            for (const [h, versions] of Object.entries(selections.vtree)) {
+                if (fileversioning.checkPreviousVersionSync(p, h)) {
+                    selections.handles[selections.handles.indexOf(h)] = p;
+                    update = true;
+                    break;
                 }
+                if (p && versions.includes(current_sel)) {
+                    selections.handles[selections.handles.indexOf(h)] = p;
+                    update = true;
+                    break;
+                }
+            }
+            if (update) {
+                fileversioning.fileVersioningDialog(selections.handles);
             }
         },
 
@@ -806,21 +920,21 @@ var versiondialogid;
          * Open the text editor for the given version handle
          *
          * @param {string} previewHandle Node handle of the version to preview
+         * @param {string} fileHandle Handle for the node that has these versions.
+         * @param {array} handles Array of handles currently shown in the overlay.
          * @returns {none} none (ESLint requires)
          */
-        previewFile: function(previewHandle) {
+        previewFile(previewHandle, fileHandle, handles) {
             if (M.isInvalidUserStatus()) {
                 return;
             }
 
             loadingDialog.show('common', l[23130]);
-            const versionHandle = window.versiondialogid;
             const reopen = () => {
-                fileversioning.fileVersioningDialog(versionHandle);
-                $(`#v_${previewHandle}`).trigger('click');
+                fileversioning.fileVersioningDialog(handles);
             };
             if (is_text(M.d[previewHandle])) {
-                fileversioning.closeFileVersioningDialog(versionHandle);
+                fileversioning.closeFileVersioningDialog();
                 mBroadcaster.once('text-editor:close', () => {
                     onIdle(reopen);
                 });
@@ -833,8 +947,8 @@ var versiondialogid;
                     .fail(loadingDialog.hide);
             }
             else if (is_video(M.d[previewHandle]) || is_image2(M.d[previewHandle])) {
-                fileversioning.getAllVersions(versionHandle).then((res) => {
-                    fileversioning.closeFileVersioningDialog(versionHandle);
+                fileversioning.getAllVersions(fileHandle).then((res) => {
+                    fileversioning.closeFileVersioningDialog();
                     if (is_video(M.d[previewHandle])) {
                         $.autoplay = previewHandle;
                     }
@@ -846,6 +960,11 @@ var versiondialogid;
         },
     };
     ns.dvState = null;
+    Object.defineProperty(ns, 'isOpen', {
+        get: () => {
+            return selections && selections.handles && !!selections.handles.length;
+        }
+    });
     Object.defineProperty(global, 'fileversioning', {value: ns});
     ns = undefined;
 

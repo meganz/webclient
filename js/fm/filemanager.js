@@ -727,7 +727,8 @@ FileManager.prototype.initFileManagerUI = function() {
             'contact-details-user-name',
             'contact-details-email',
             'js-selectable-text',
-            'nw-conversations-name'
+            'nw-conversations-name',
+            'albums-grid',
         ];
         var ALLOWED_PARENTS =
             '#startholder, .fm-account-main, .export-link-item, .contact-fingerprint-txt, .fm-breadcrumbs, ' +
@@ -945,8 +946,14 @@ FileManager.prototype.initFileManagerUI = function() {
         a.find('.dropdown-item.contains-submenu.opened').removeClass('opened');
 
         // Cleanup for scrollable context menu
-        var cnt = $('#cm_scroll').contents();
-        $('#cm_scroll').replaceWith(cnt);// Remove .context-scrollable-block
+        const $scroll = $('#cm_scroll');
+        if ($scroll.hasClass('fm-context-body')) {
+            $scroll.attr('id', '');
+        }
+        else {
+            const cnt = $scroll.contents();
+            $scroll.replaceWith(cnt); // Remove .context-scrollable-block
+        }
         a.removeClass('mega-height');
         a.find('> .context-top-arrow').remove();
         a.find('> .context-bottom-arrow').remove();
@@ -963,16 +970,6 @@ FileManager.prototype.initFileManagerUI = function() {
             delete $.disabledContianer;
         }
 
-        const contextBtn = mega.ui.secondaryNav.actionsHolder.querySelector('.fm-context');
-        if (contextBtn) {
-            contextBtn.classList.remove('active');
-        }
-        if (mega.ui.secondaryNav.cardComponent) {
-            const contextIcon = mega.ui.secondaryNav.cardComponent.domNode.querySelector('.transparent-icon');
-            if (contextIcon) {
-                contextIcon.classList.remove('active');
-            }
-        }
         mBroadcaster.sendMessage('contextmenuclose');
     };
 
@@ -1506,686 +1503,6 @@ FileManager.prototype.initContextUI = function() {
 
     var c = '.dropdown.body.context .dropdown-item';
 
-    $('.dropdown-section').off('mouseover', '.dropdown-item');
-    $('.dropdown-section').on('mouseover', '.dropdown-item', function() {
-        var $this = $(this),
-            pos = $this.offset(),
-            menuPos,
-            currentId;
-
-        if ($this.hasClass('disabled') && $this.parents('#sm_move').length === 0) {
-            return false;
-        }
-
-        // Hide opened submenus
-        if (!$this.parent().parent().hasClass('submenu')) {
-            $('.dropdown-item').removeClass('opened');
-            $('.dropdown.body.submenu').removeClass('active');
-        }
-        else {
-            $this.parent().find('.dropdown-item').removeClass('opened');
-            $this.parent().find('.submenu').removeClass('active');
-        }
-
-        currentId = $this.attr('id');
-        if (currentId || $this.hasClass('move-item')) {
-            M.buildSubMenu(String(currentId).replace('fi_', ''));
-        }
-
-        // Show necessary submenu
-        if (!$this.hasClass('opened') && $this.hasClass('contains-submenu')) {
-            menuPos = M.reCalcMenuPosition($this, pos.left, pos.top, 'submenu');
-
-            $this.next('.submenu')
-                .css({'top': menuPos.top})
-                .removeClass('hidden')
-                .addClass('active');
-
-            $this.addClass('opened');
-        }
-
-        // If MEGA Lite mode and the selection contains a folder, hide the regular download option (only zip allowed),
-        // otherwise this throws an error about downloading an empty folder then downloads as a zip anyway.
-        if (mega.lite.inLiteMode && mega.lite.containsFolderInSelection($.selected)) {
-            $(c + '.download-standart-item').addClass('hidden');
-            return false;
-        }
-
-        // Make standard download option visible for files (and folders in regular mode)
-        $(c + '.download-standart-item').removeClass('hidden');
-    });
-
-    var safeMoveNodes = function() {
-        if (!$(this).hasClass('disabled')) {
-            $.hideContextMenu();
-            mLoadingSpinner.show('safeMoveNodes');
-            M.safeMoveNodes(String($(this).attr('id')).replace('fi_', '')).catch(dump)
-                .finally(() => mLoadingSpinner.hide('safeMoveNodes'));
-        }
-        return false;
-    };
-
-    $(c + '.cloud-item').rebind('click', safeMoveNodes);
-
-    $('.dropdown.body.files-menu').off('click', '.folder-item');
-    $('.dropdown.body.files-menu').on('click', '.folder-item', safeMoveNodes);
-    safeMoveNodes = undefined;
-
-    $(c + '.download-item').rebind('click', function() {
-        var c = this.className;
-
-        // If MEGA Lite mode and attempting to download a folder(s) by clicking on the Download item, disable the click
-        if (mega.lite.inLiteMode && mega.lite.containsFolderInSelection($.selected)) {
-            return false;
-        }
-
-        if (c && (c.indexOf('contains-submenu') > -1 || c.indexOf('msync-found') > -1)) {
-            M.addDownload($.selected);
-        }
-
-        M.fmEventLog(500677);
-    });
-
-    $(c + '.download-standart-item').rebind('click', function() {
-        if (folderlink) {
-            eventlog(99768);
-        }
-        M.addDownload($.selected);
-    });
-
-    $(c + '.zipdownload-item').rebind('click', function() {
-        if (folderlink) {
-            eventlog(99769);
-        }
-        M.addDownload($.selected, true);
-    });
-
-
-    $(c + '.syncmegasync-item').rebind('click', function () {
-        // check if this is a business expired account
-        if (M.isInvalidUserStatus()) {
-            return;
-        }
-
-        megasync.isInstalled(function (err, is) {
-            if (!err || is) {
-                if (megasync.currUser === u_handle) {
-                    // i know the selection is 1 item [otherwise option in menu wont be visible]
-                    megasync.syncFolder($.selected[0]);
-                }
-            }
-                // no need to do anything, something wierd happened, next time
-                // the option wont be visible.
-        });
-        $.hideContextMenu();
-    });
-
-    $(c + '.getlink-item, ' + c + '.embedcode-item, ' + c + '.cd-getlink-item').rebind('click', function(e) {
-
-        if (e.shiftKey && (e.ctrlKey || e.metaKey)) {
-            $.isCtrlShift = true;
-        }
-
-        M.getLinkAction.call(this);
-
-        if ($(e.currentTarget).hasClass('cd-getlink-item')) {
-            if ($(e.currentTarget).hasClass('manage-link')) {
-                // event log for manage link/s
-                eventlog(500030);
-            }
-            else {
-                // event log for share link
-                eventlog(500028);
-            }
-        }
-
-        M.fmEventLog(500679);
-    });
-
-    $(c + '.removelink-item, ' + c + '.cd-removelink-item').rebind('click', (e) => {
-        // check if this is a business expired account
-        if (M.isInvalidUserStatus()) {
-            return;
-        }
-
-        if (u_type === 0) {
-            ephemeralDialog(l[1005]);
-        }
-        else {
-            let media = false;
-            const handles = Array.isArray($.selected) && $.selected.concat();
-            const removeLink = () => {
-                const exportLink = new mega.Share.ExportLink({'updateUI': true, 'nodesToProcess': handles});
-                exportLink.removeExportLink();
-            };
-
-            for (let i = handles.length; i--;) {
-                if (is_video(M.d[handles[i]]) === 1) {
-                    media = true;
-                    break;
-                }
-            }
-
-            const mediaRemoveLink = () => {
-                mega.Dialog.ExportLink(l[17824], removeLink);
-            };
-
-            if (mega.config.get('nowarnpl')) {
-                if (media) {
-                    mediaRemoveLink();
-                }
-                else {
-                    removeLink(true);
-                }
-            }
-            else {
-                mega.Dialog.ExportLink.remove.show(handles, null, removeLink);
-            }
-        }
-
-        if ($(e.currentTarget).hasClass('cd-removelink-item')) {
-            eventlog(500031);
-        }
-
-        M.fmEventLog(500680);
-    });
-
-    $(c + '.dispute-item').rebind('click', function() {
-        // Find the first takendown node in the list. This is the item we will use to prefill with.
-        localStorage.removeItem('takedownDisputeNodeURL');
-        for (var i = 0; i < $.selected.length; i++) {
-            var node = M.getNodeByHandle($.selected[i]);
-            if (node.t & M.IS_TAKENDOWN || M.getNodeShare(node).down === 1) {
-                var disputeURL = mega.getPublicNodeExportLink(node);
-                if (disputeURL) {
-                    localStorage.setItem('takedownDisputeNodeURL', disputeURL);
-                }
-                break;
-            }
-        }
-        mega.redirect('mega.io', 'dispute', false, false, false);
-    });
-
-    $(c + '.rename-item').rebind('click', function() {
-        // check if this is a business expired account
-        if (M.isInvalidUserStatus()) {
-            return;
-        }
-        renameDialog();
-        M.fmEventLog(500689);
-    });
-
-    $(c + '.sh4r1ng-item').rebind('click', function() {
-        mega.ui.mShareDialog.init($.selected[0]);
-        eventlog(500029);
-        M.fmEventLog(500681);
-    });
-
-    $(`${c}.removeshare-item, ${c}.cd-removeshare-item`).rebind('click', (e) => {
-        if (M.isInvalidUserStatus()) {
-            return;
-        }
-
-        msgDialog(`remove:!^${l[23737]}!${l[82]}`, '', l.remove_share_title, l.remove_share_msg, res => {
-            if (res) {
-                new mega.Share().removeSharesFromSelected().dump('remove-share');
-            }
-        }, 1);
-
-        if ($(e.currentTarget).hasClass('cd-removeshare-item')) {
-            eventlog(500033);
-        }
-        M.fmEventLog(500682);
-    });
-
-    $(c + '.cd-sh4r1ng-item').rebind('click', (e) => {
-        mega.ui.mShareDialog.init($.selected[0]);
-
-        if ($(e.currentTarget).hasClass('manage-share')) {
-            // event log for manage folder
-            eventlog(500032);
-        }
-        else {
-            // event log for share folder
-            eventlog(500029);
-        }
-    });
-
-    // Move Dialog
-    $(c + '.advanced-item, ' + c + '.move-item').rebind('click', (e) => {
-        openMoveDialog(e);
-
-        M.fmEventLog(500691);
-    });
-
-    $(c + '.copy-item').rebind('click', (e) => {
-        openCopyDialog(e);
-
-        M.fmEventLog(500692);
-    });
-
-    $(c + '.revert-item').rebind('click', function() {
-        if (M.isInvalidUserStatus()) {
-            return;
-        }
-        mLoadingSpinner.show('restore-nodes');
-        M.revertRubbishNodes($.selected)
-            .catch((ex) => {
-                if (ex !== EBLOCKED) {
-                    // user canceled file-conflict dialog.
-                    tell(ex);
-                }
-            })
-            .finally(() => mLoadingSpinner.hide('restore-nodes'));
-    });
-
-    $(c + '.import-item').rebind('click', function() {
-        if (M.isInvalidUserStatus()) {
-            return;
-        }
-
-        if (pfcol) {
-            $.selected = Object.keys(mega.gallery.albums.grid.timeline.selections);
-        }
-
-        eventlog(pfcol ? 99832 : 99767);
-        ASSERT(folderlink, 'Import needs to be used in folder links.');
-
-        M.importFolderLinkNodes($.selected);
-    });
-
-    $(c + '.newfolder-item').rebind('click', function() {
-        if (M.isInvalidUserStatus()) {
-            return;
-        }
-        createFolderDialog();
-    });
-    // eslint-disable-next-line local-rules/jquery-scopes
-    $(c + '.newfile-item').rebind('click', function() {
-        if (M.isInvalidUserStatus()) {
-            return;
-        }
-        createFileDialog();
-    });
-
-    $(c + '.fileupload-item').rebind('click', function() {
-        if (M.isInvalidUserStatus()) {
-            return;
-        }
-        $('#fileselect3').click();
-    });
-
-    $(c + '.folderupload-item').rebind('click', function() {
-        if (M.isInvalidUserStatus()) {
-            return;
-        }
-        $('#fileselect4').click();
-    });
-
-    $(c + '.remove-item').rebind('click', function() {
-        if (M.isInvalidUserStatus()) {
-            return;
-        }
-        if ($(this).hasClass('disabled')) {
-            return false;
-        }
-        closeDialog();
-        fmremove();
-        M.fmEventLog(500694);
-    });
-
-    $(c + '.addcontact-item').rebind('click', function() {
-        if (M.isInvalidUserStatus()) {
-            return;
-        }
-        contactAddDialog();
-    });
-
-    $(c + '.startchat-item').rebind('click', function() {
-        if (M.isInvalidUserStatus()) {
-            return;
-        }
-        var $this = $(this);
-        var user_handle = $.selected;
-
-        if (user_handle.length === 1) {
-            if (!$this.is('.disabled') && user_handle[0]) {
-                loadSubPage('fm/chat/p/' + user_handle[0]);
-            }
-        }
-        else {
-            megaChat.createAndShowGroupRoomFor(user_handle, "", {keyRotation: true, createChatLink: false});
-        }
-    });
-
-    $(c + '.startaudio-item,' + c + '.startaudiovideo-item').rebind('click', function() {
-        if (M.isInvalidUserStatus()) {
-            return;
-        }
-        var $this = $(this);
-        var user_handle = $.selected && $.selected[0];
-
-        if (!$this.is('.disabled') && user_handle) {
-            megaChat.createAndShowPrivateRoom(user_handle)
-                .then(function(room) {
-                    room.setActive();
-                    room.startAudioCall();
-                });
-        }
-    });
-
-    $(c + '.startvideo-item').rebind('click', function() {
-        if (M.isInvalidUserStatus()) {
-            return;
-        }
-        var $this = $(this);
-        var user_handle = $.selected && $.selected[0];
-
-        if (!$this.is('.disabled') && user_handle) {
-            megaChat.createAndShowPrivateRoom(user_handle)
-                .then(function(room) {
-                    room.setActive();
-                    room.startVideoCall();
-                });
-        }
-    });
-
-    $(c + '.view-profile-item').rebind('click', function(e) {
-        var $this = $(this);
-        var user_handle = $.selected && $.selected[0];
-
-        if (!$this.is('.disabled') && user_handle) {
-            loadSubPage('fm/chat/contacts/' + user_handle);
-            // there seem to be some duplicated callbacks triggered by menus.js, but since I'm not sure what would the
-            // side effects of that can be, I'm stopping propagation here to reduce risk of those causing double
-            // loadSubPage calls (which breaks fm/$contact -> fm/chat/contacts/$contact redirects, because it triggers
-            // a race in openFolder)
-            e.stopPropagation();
-        }
-    });
-
-    $(c + '.send-files-item').rebind('click', function() {
-        if (M.isInvalidUserStatus()) {
-            return;
-        }
-        var $this = $(this);
-        var user_handle = $.selected && $.selected[0];
-
-        if (!$this.is('.disabled') && user_handle) {
-            megaChat.openChatAndSendFilesDialog(user_handle);
-        }
-    });
-
-    $(c + '.share-folder-item').rebind('click', function() {
-        if (M.isInvalidUserStatus()) {
-            return;
-        }
-        var $this = $(this);
-        var user_handle = $.selected && $.selected[0];
-
-        if (!$this.is('.disabled') && user_handle) {
-            openCopyShareDialog(user_handle);
-        }
-    });
-
-    $(`${c}.leaveshare-item`).rebind('click', () => {
-        if (M.isInvalidUserStatus()) {
-            return;
-        }
-        const errHandler = ex => {
-            if (ex === EMASTERONLY) {
-                msgDialog('warningb', '', l.err_bus_sub_leave_share_dlg_title, l.err_bus_sub_leave_share_dlg_text);
-            }
-        };
-
-        for (let i = 0; i < $.selected.length; i++) {
-            M.leaveShare($.selected[i]).catch(errHandler);
-        }
-    });
-
-    // Bind Set Nickname context menu button
-    $(c + '.set-nickname').rebind('click', function() {
-        if (M.isInvalidUserStatus()) {
-            return;
-        }
-        var userHandle = $.selected && $.selected[0];
-
-        $.hideContextMenu();
-        nicknames.setNicknameDialog.init(userHandle);
-    });
-
-    $(c + '.remove-contact').rebind('click', function() {
-        if (M.isInvalidUserStatus()) {
-            return;
-        }
-        if ($(this).hasClass('disabled')) {
-            return;
-        }
-        var user_handle = $.selected && $.selected[0];
-
-        fmremove(user_handle);
-    });
-
-    $(c + '.properties-item').rebind('click', function() {
-        mega.ui.mInfoPanel.initInfoPanel();
-
-        M.fmEventLog(500683);
-    });
-
-    $(c + '.device-rename-item').rebind('click', () => {
-        if (M.onDeviceCenter) {
-            mega.devices.ui.renameDevice();
-        }
-    });
-
-    if (pfid) {
-        $(`${c}.vhl-item`).rebind('click', () => {
-            for (let i = $.selected.length; i--;) {
-                let n = M.d[$.selected[i]];
-                if (n) {
-                    if ((n.vhl |= 1) > 3) {
-                        n.vhl = 0;
-                    }
-                    $(`#${n.h}`).removeClassWith('highlight').addClass(`highlight${++n.vhl}`);
-
-                    while ((n = M.d[n.p])) {
-                        if (!n.vhl) {
-                            n.vhl = 1;
-                        }
-                    }
-                }
-            }
-            M.clearSelectedNodes();
-        });
-    }
-
-    // eslint-disable-next-line local-rules/jquery-scopes
-    $(c + '.edit-file-item').rebind('click', function() {
-        if (M.isInvalidUserStatus()) {
-            return;
-        }
-        var nodeHandle = $.selected && $.selected[0];
-        if (!nodeHandle) {
-            return;
-        }
-
-        // Close properties dialog if context menu was triggered there
-        if ($.dialog === 'properties') {
-            propertiesDialog(true);
-        }
-
-        loadingDialog.show('common', l[23130]);
-
-        mega.fileTextEditor.getFile(nodeHandle)
-            .then((data) => {
-                mega.textEditorUI.setupEditor(M.getNameByHandle(nodeHandle), data, nodeHandle);
-            })
-            .catch(dump)
-            .finally(() => {
-                loadingDialog.hide();
-            });
-    });
-
-    $(c + '.properties-versions').rebind('click', function() {
-        fileversioning.fileVersioningDialog();
-
-        M.fmEventLog(500684);
-    });
-
-    $(c + '.clearprevious-versions').rebind('click', function() {
-
-        if (M.isInvalidUserStatus()) {
-            return;
-        }
-
-        if ($.selected && $.selected.length > 0) {
-
-            const fselected = M.getNodeByHandle($.selected[0]);
-
-            if ($.selected && $.selected.length === 1 && fselected.t && fselected.tvf) {
-
-                const sfWithVf = Object.create(null);
-
-                sfWithVf[$.selected[0]] = fselected.tvf;
-
-                const _getChildFolderWithVerion = function _(h) {
-
-                    if (!M.tree[h]) {
-                        return;
-                    }
-
-                    const fHandles = Object.keys(M.tree[h]);
-
-                    for (let i = fHandles.length; i--;) {
-
-                        if (M.tree[h][fHandles[i]].tvf) {
-
-                            sfWithVf[fHandles[i]] = M.tree[h][fHandles[i]].tvf;
-                            sfWithVf[h] -= M.tree[h][fHandles[i]].tvf;
-                            _(fHandles[i]);
-                        }
-
-                        if (!sfWithVf[h]) {
-
-                            delete sfWithVf[h];
-                            break;
-                        }
-                    }
-                };
-
-                msgDialog('remove', l[1003], l.clear_prev_version_folder, l[1007], async(e) => {
-
-                    if (e) {
-
-                        _getChildFolderWithVerion($.selected[0]);
-
-                        const fh = Object.keys(sfWithVf);
-                        await dbfetch.geta(fh);
-
-                        for (let i = fh.length; i--;) {
-
-                            const cfh = Object.keys(M.c[fh[i]]);
-
-                            for (let j = cfh.length; j--;) {
-
-                                const cfn = M.getNodeByHandle(cfh[j]);
-
-                                if (!cfn.t && cfn.tvf) {
-                                    fileversioning.clearPreviousVersions(cfh[j]);
-                                }
-                            }
-                        }
-                    }
-                });
-
-                return;
-            }
-
-            const fvNode = [];
-
-            for (let i = $.selected.length; i--;) {
-
-                const selected = M.getNodeByHandle($.selected[i]);
-
-                if (!selected.t && selected.tvf) {
-                    fvNode.push($.selected[i]);
-                }
-            }
-
-            msgDialog('remove', l[1003], mega.icu.format(l[17154], fvNode.length), l[1007], (e) => {
-
-                if (e) {
-                    for (let i = fvNode.length; i--;) {
-                        fileversioning.clearPreviousVersions(fvNode[i]);
-                    }
-                }
-            });
-        }
-
-        M.fmEventLog(500685);
-    });
-
-    $(c + '.findupes-item').rebind('click', M.findDupes);
-
-    $(c + '.add-star-item').rebind('click', function() {
-        if (M.isInvalidUserStatus()) {
-            return;
-        }
-
-        let newFavState;
-
-        if ($.selected.length > 1) {
-            // Determine the new fav state value from multiselection
-            newFavState = Number($('i', $(this)).hasClass('icon-favourite'));
-        }
-        else {
-            newFavState = Number(!M.isFavourite($.selected));
-        }
-
-        M.favourite($.selected, newFavState);
-
-        M.fmEventLog(500686);
-    });
-
-    $(`${c}.add-sensitive-item`).rebind('click.sensitive_toggle', function() {
-        if (M.isInvalidUserStatus()) {
-            return;
-        }
-
-        mega.sensitives.toggleStatus($.selected, !this.classList.contains('sensitive-added'));
-
-        M.fmEventLog(500688);
-    });
-
-    $(`${c}.send-to-contact-item, ${c}.cd-send-to-contact-item`).rebind('click', (ev) => {
-        openCopyDialog('conversations');
-
-        if ($(ev.currentTarget).hasClass('cd-send-to-contact-item')) {
-            // eveng log for send contact folder
-            eventlog(500027);
-        }
-
-        M.fmEventLog(500678);
-    });
-
-    $('.submenu.labels .dropdown-colour-item').rebind('click', function() {
-        if (M.isInvalidUserStatus()) {
-            return;
-        }
-
-        const classList = this.classList;
-        let labelId = parseInt(this.dataset.labelId);
-
-        // Remove the existing label from nodes
-        if (classList.contains('active') && !classList.contains('update-to')) {
-            labelId = 0;
-        }
-
-        M.labeling($.selected, labelId);
-
-        M.fmEventLog(500687);
-    });
-
     $('.colour-sorting-menu .filter-by .dropdown-colour-item').rebind('click', function(e) {
         if (d){
             console.log('label color selected');
@@ -2224,85 +1541,85 @@ FileManager.prototype.initContextUI = function() {
         M.openFolder(M.currentdirid, true);
     });
 
-    $('.submenu.labels .dropdown-colour-item').rebind('mouseover.clrSort', function() {
-        var labelTxt = this.dataset.labelTxt;
-        if ($(this).hasClass('update-to')) {
-            switch (labelTxt) {
-                case "Red":
-                    labelTxt = l.update_to_red;
-                    break;
-                case "Orange":
-                    labelTxt = l.update_to_orange;
-                    break;
-                case "Yellow":
-                    labelTxt = l.update_to_yellow;
-                    break;
-                case "Green":
-                    labelTxt = l.update_to_green;
-                    break;
-                case "Blue":
-                    labelTxt = l.update_to_blue;
-                    break;
-                case "Purple":
-                    labelTxt = l.update_to_purple;
-                    break;
-                case "Grey":
-                    labelTxt = l.update_to_grey;
-                    break;
-            }
-        }
-        else if ($(this).hasClass('active')) {
-            switch (labelTxt) {
-                case "Red":
-                    labelTxt = l[19569];
-                    break;
-                case "Orange":
-                    labelTxt = l[19573];
-                    break;
-                case "Yellow":
-                    labelTxt = l[19577];
-                    break;
-                case "Green":
-                    labelTxt = l[19581];
-                    break;
-                case "Blue":
-                    labelTxt = l[19585];
-                    break;
-                case "Purple":
-                    labelTxt = l[19589];
-                    break;
-                case "Grey":
-                    labelTxt = l[19593];
-                    break;
-            }
-        }
-        else {
-            switch (labelTxt) {
-                case "Red":
-                    labelTxt = l[19568];
-                    break;
-                case "Orange":
-                    labelTxt = l[19572];
-                    break;
-                case "Yellow":
-                    labelTxt = l[19576];
-                    break;
-                case "Green":
-                    labelTxt = l[19580];
-                    break;
-                case "Blue":
-                    labelTxt = l[19584];
-                    break;
-                case "Purple":
-                    labelTxt = l[19588];
-                    break;
-                case "Grey":
-                    labelTxt = l[19592];
-                    break;
-            }
-        }
-        $('.labels .dropdown-color-info').safeHTML(labelTxt).addClass('active');
-    });
+    // $('.submenu.labels .dropdown-colour-item').rebind('mouseover.clrSort', function() {
+    //     var labelTxt = this.dataset.labelTxt;
+    //     if ($(this).hasClass('update-to')) {
+    //         switch (labelTxt) {
+    //             case "Red":
+    //                 labelTxt = l.update_to_red;
+    //                 break;
+    //             case "Orange":
+    //                 labelTxt = l.update_to_orange;
+    //                 break;
+    //             case "Yellow":
+    //                 labelTxt = l.update_to_yellow;
+    //                 break;
+    //             case "Green":
+    //                 labelTxt = l.update_to_green;
+    //                 break;
+    //             case "Blue":
+    //                 labelTxt = l.update_to_blue;
+    //                 break;
+    //             case "Purple":
+    //                 labelTxt = l.update_to_purple;
+    //                 break;
+    //             case "Grey":
+    //                 labelTxt = l.update_to_grey;
+    //                 break;
+    //         }
+    //     }
+    //     else if ($(this).hasClass('active')) {
+    //         switch (labelTxt) {
+    //             case "Red":
+    //                 labelTxt = l[19569];
+    //                 break;
+    //             case "Orange":
+    //                 labelTxt = l[19573];
+    //                 break;
+    //             case "Yellow":
+    //                 labelTxt = l[19577];
+    //                 break;
+    //             case "Green":
+    //                 labelTxt = l[19581];
+    //                 break;
+    //             case "Blue":
+    //                 labelTxt = l[19585];
+    //                 break;
+    //             case "Purple":
+    //                 labelTxt = l[19589];
+    //                 break;
+    //             case "Grey":
+    //                 labelTxt = l[19593];
+    //                 break;
+    //         }
+    //     }
+    //     else {
+    //         switch (labelTxt) {
+    //             case "Red":
+    //                 labelTxt = l[19568];
+    //                 break;
+    //             case "Orange":
+    //                 labelTxt = l[19572];
+    //                 break;
+    //             case "Yellow":
+    //                 labelTxt = l[19576];
+    //                 break;
+    //             case "Green":
+    //                 labelTxt = l[19580];
+    //                 break;
+    //             case "Blue":
+    //                 labelTxt = l[19584];
+    //                 break;
+    //             case "Purple":
+    //                 labelTxt = l[19588];
+    //                 break;
+    //             case "Grey":
+    //                 labelTxt = l[19592];
+    //                 break;
+    //         }
+    //     }
+    //     $('.labels .dropdown-color-info').safeHTML(labelTxt).addClass('active');
+    // });
 
     $('.colour-sorting-menu .labels .dropdown-colour-item').rebind('mouseover.clrSort', function(e) {
         if (!$(this).parents('.labels').hasClass('disabled')){
@@ -2312,126 +1629,6 @@ FileManager.prototype.initContextUI = function() {
 
     $('.labels .dropdown-colour-item').rebind('mouseout', function() {
         $('.labels .dropdown-color-info').removeClass('active');
-    });
-
-    $(c + '.open-item').rebind('click', function() {
-        const originalTarget = $.selected[0];
-        let target = originalTarget;
-        let isInboxRoot = false;
-
-        if (
-            M.currentrootid === 'out-shares' ||
-            M.currentrootid === 'public-links' ||
-            M.currentrootid === 'file-requests'
-        ) {
-            target = M.currentrootid + '/' + target;
-        }
-        else if (M.onDeviceCenter) {
-            target = mega.devices.ui.getCurrentDirPath(target);
-        }
-        else if (M.dyh) {
-            target = M.dyh('folder-id', target);
-        }
-        else if (M.getNodeRoot(target) === M.InboxID) {
-            isInboxRoot = true;
-            target = mega.devices.ui.getNodeURLPathFromOuterView(M.d[target]);
-        }
-
-        Promise.resolve(target)
-            .then((target) => {
-                if (window.vw && isInboxRoot && target === mega.devices.rootId) {
-                    target = originalTarget;
-                }
-                return M.openFolder(target);
-            })
-            .then(() => {
-                M.fmEventLog(500675);
-            })
-            .catch(tell);
-    });
-
-    $(c + '.verify-credential').rebind('click', () => fingerprintDialog(M.d[$.selected[0]].su));
-
-    $(`${c}.open-gallery`).rebind('click', () => {
-        var target = $.selected[0];
-        M.openFolder(`discovery/${target}`);
-    });
-
-    $(`${c}.open-cloud-item, ${c}.open-in-location, ${c}.open-s4-item`).rebind('click.openItem', () => {
-
-        const node = M.d[$.selected[0]];
-
-        // Incoming Shares section if shared folder doestn't have parent
-        const target = node.su && (!node.p || !M.d[node.p])
-            ? 'shares'
-            : node.h === M.BackupsId ? node.h : node.p;
-
-        if (mega.gallery.sections[M.currentdirid]) {
-            M.fmTabState.gallery.prev = M.currentdirid;
-        }
-
-        M.openFolder(target).then(() => {
-            selectionManager.add_to_selection(node.h, true);
-        });
-    });
-
-    $(`${c}.get-more-quota`).rebind('click.getQuota', () => {
-
-        loadSubPage('pro');
-    });
-
-    $(`${c}.stopbackup-item`).rebind('click.stopBckp', () => {
-        if (M.onDeviceCenter) {
-            mega.devices.ui.desktopApp.common.remove();
-        }
-    });
-
-    $(`${c}.stopsync-item`).rebind('click.stopSync', () => {
-        if (M.onDeviceCenter) {
-            mega.devices.ui.desktopApp.common.remove();
-        }
-    });
-
-    $(`${c}${mega.devices.ui.desktopApp.common.pauseMenuItemSelector}`)
-        .rebind('click.togglePause', () => {
-
-            mega.devices.ui.desktopApp.common.togglePause();
-    });
-
-    $(c + '.preview-item').rebind('click', function() {
-        if (M.isInvalidUserStatus()) {
-            return;
-        }
-
-        // Close node Info panel as not needed immediately after opening Preview
-        mega.ui.mInfoPanel.closeIfOpen();
-
-        closeDialog();
-        slideshow($.selected[0]);
-
-        M.fmEventLog(500676);
-    });
-
-    $(c + '.play-item').rebind('click', function() {
-        if (M.isInvalidUserStatus()) {
-            return;
-        }
-        var n = $.selected[0];
-
-        // Close node Info panel as not needed immediately after opening Preview
-        mega.ui.mInfoPanel.closeIfOpen();
-
-        closeDialog();
-
-        $.autoplay = n;
-        slideshow(n);
-    });
-
-    $(c + '.clearbin-item').rebind('click', function() {
-        if (M.isInvalidUserStatus()) {
-            return;
-        }
-        doClearbin(true);
     });
 
     $(c + '.transfer-play, ' + c + '.transfer-pause').rebind('click', function() {
@@ -2478,37 +1675,37 @@ FileManager.prototype.initContextUI = function() {
         $('.transfer-table tr.ui-selected').removeClass('ui-selected');
     });
 
-    $(`${c}.add-to-album`).rebind('click.add-to-album', () => {
-        mega.gallery.albums.addToAlbum($.selected);
-
-        M.fmEventLog(500690);
-    });
-
-    $(`${c}.new-bucket-item`)
-        .rebind('click.createBucket', () => s4.ui.showDialog(s4.buckets.dialogs.create));
-
-    $(`${c}.settings-item`)
-        .rebind('click.showSettings', () => s4.ui.showDialog(s4.buckets.dialogs.settings, M.d[$.selected[0]]));
-
-    $(`${c}.managepuburl-item`)
-        .rebind('click.managePA', () => s4.ui.showDialog(s4.objects.dialogs.access, M.d[$.selected[0]]));
-
-    $(c + '.transferit-item').rebind('click', () => mega.xferit &&  M.openTransferItOverlay($.selected).catch(tell));
-
-    if (window.pfcol) {
-        $(`${c}.play-slideshow, ${c}.preview-item, ${c}.play-item`).rebind('click', function() {
-            if (M.isInvalidUserStatus()) {
-                return;
-            }
-
-            closeDialog();
-            mega.gallery.playSlideshow(
-                mega.gallery.getAlbumIdFromPath(),
-                this.classList.contains('play-slideshow'),
-                this.classList.contains('play-item')
-            );
-        });
-    }
+    // $(`${c}.add-to-album`).rebind('click.add-to-album', () => {
+    //     mega.gallery.albums.addToAlbum($.selected);
+    //
+    //     M.fmEventLog(500690);
+    // });
+    //
+    // $(`${c}.new-bucket-item`)
+    //     .rebind('click.createBucket', () => s4.ui.showDialog(s4.buckets.dialogs.create));
+    //
+    // $(`${c}.settings-item`)
+    //     .rebind('click.showSettings', () => s4.ui.showDialog(s4.buckets.dialogs.settings, M.d[$.selected[0]]));
+    //
+    // $(`${c}.managepuburl-item`)
+    //     .rebind('click.managePA', () => s4.ui.showDialog(s4.objects.dialogs.access, M.d[$.selected[0]]));
+    //
+    // $(c + '.transferit-item').rebind('click', () => mega.xferit &&  M.openTransferItOverlay($.selected).catch(tell));
+    //
+    // if (window.pfcol) {
+    //     $(`${c}.play-slideshow, ${c}.preview-item, ${c}.play-item`).rebind('click', function() {
+    //         if (M.isInvalidUserStatus()) {
+    //             return;
+    //         }
+    //
+    //         closeDialog();
+    //         mega.gallery.playSlideshow(
+    //             mega.gallery.getAlbumIdFromPath(),
+    //             this.classList.contains('play-slideshow'),
+    //             this.classList.contains('play-item')
+    //         );
+    //     });
+    // }
 
     if (mega.keyMgr.version) {
 
@@ -3496,21 +2693,6 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
         console.time('iconUI');
     }
 
-    // #file-request change column title for public link page
-    let dateLabel = l[17445];
-    switch (page) {
-        case 'fm/public-links':
-            dateLabel = l[20694];
-            break;
-        case 'fm/file-requests':
-            dateLabel = l.file_request_page_label_request_created;
-            break;
-    }
-
-    if (dateLabel) {
-        $('.files-menu.context .dropdown-item.sort-timeAd span').safeHTML(dateLabel);
-    }
-
     $('.shared-grid-view').addClass('hidden');
     $('.out-shared-grid-view').addClass('hidden');
     $('.files-grid-view.fm').addClass('hidden');
@@ -3565,68 +2747,6 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
             return !!M.contextMenuUI(e, 2);
         });
 
-    $('.files-menu.context .submenu.sorting .dropdown-item.sort-grid-item').rebind('click', function(e) {
-        var sortType;
-        var $me = $(this);
-
-        if ($me.hasClass('sort-size')) {
-            sortType = 'size';
-        }
-        else if ($me.hasClass('sort-name')) {
-            sortType = 'name';
-        }
-        else if ($me.hasClass('sort-label')) {
-            sortType = 'label';
-        }
-        else if ($me.hasClass('sort-type')) {
-            sortType = 'type';
-        }
-        else if ($me.hasClass('sort-timeAd')) {
-            sortType = 'ts';
-        }
-        else if ($me.hasClass('sort-timeMd')) {
-            sortType = 'mtime';
-        }
-        else if ($me.hasClass('sort-fav')) {
-            sortType = 'fav';
-        }
-        else if ($me.hasClass('sort-owner')) {
-            sortType = 'owner';
-        }
-        else if ($me.hasClass('sort-access')) {
-            sortType = 'access';
-        }
-        else if ($me.hasClass('sort-sharedwith')) {
-            sortType = 'sharedwith';
-        }
-        else if ($me.hasClass('sort-sharecreated')) {
-            sortType = 'date';
-        }
-        else if ($me.hasClass('sort-versions')) {
-            sortType = 'versions';
-        }
-        else if ($me.hasClass('sort-playtime')) {
-            sortType = 'playtime';
-        }
-
-        var classToAdd = 'selected';
-        var iconClassToAdd = 'icon-up';
-        var sortDir = 1;
-
-        if ($me.hasClass('selected') && !$me.hasClass('inverted') ) {
-            classToAdd += ' inverted';
-            iconClassToAdd = 'icon-down';
-            sortDir = -1;
-        }
-
-        $('.files-menu.context .submenu.sorting .dropdown-item.sort-grid-item').removeClass('selected inverted');
-        $('i.sprite-fm-mono', $me).removeClass('icon-up icon-down').addClass(iconClassToAdd);
-        $me.addClass(classToAdd);
-
-        M.doSort(sortType, sortDir);
-        M.renderMain();
-    });
-
     if (M.isGalleryPage()) {
         $.selectddUIgrid = '.gallery-view';
     }
@@ -3665,7 +2785,6 @@ FileManager.prototype.addGridUI = function(refresh) {
     if (dateLabel) {
         $('.fm .grid-table thead .ts').text(dateLabel);
         $('.fm .grid-table thead .date').text(dateLabel);
-        $('.dropdown.body.files-menu .dropdown-item.visible-col-select[megatype="timeAd"] span').text(dateLabel);
     }
 
     // $.gridDragging=false;
@@ -3840,7 +2959,8 @@ FileManager.prototype.addGridUI = function(refresh) {
     $('.grid-url-header').text('');
 
     $('.files-grid-view.fm .grid-scrolling-table,.files-grid-view.fm .file-block-scrolling,.fm-empty-cloud,' +
-        '.fm-empty-folder,.fm.shared-folder-content, .fm-empty-s4-bucket').rebind('contextmenu.fm', e => {
+        '.fm-empty-folder,.fm.shared-folder-content, .fm-empty-s4-bucket, .out-shared-grid-view')
+        .rebind('contextmenu.fm', e => {
         // Remove context menu option from filtered view and media discovery view
         if (page === "fm/links" && page === "fm/faves" || M.gallery) {
             return false;
@@ -4433,9 +3553,7 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
         }
         else if (is_text(n)) {
             $.selected = [h];
-            // there's no jquery parent for this container.
-            // eslint-disable-next-line local-rules/jquery-scopes
-            $('.dropdown.body.context .dropdown-item.edit-file-item').trigger('click');
+            mega.fileTextEditor.openTextHandle(h);
         }
         else if (M.getNodeRoot(n.h) === M.RubbishID) {
             propertiesDialog();
@@ -4760,7 +3878,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
 };
 
 
-FileManager.prototype.getLinkAction = function(selNodes) {
+FileManager.prototype.getLinkAction = function(selNodes, isEmbed) {
     'use strict';
 
     if (M.isInvalidUserStatus()) {
@@ -4775,7 +3893,6 @@ FileManager.prototype.getLinkAction = function(selNodes) {
         ephemeralDialog(l[1005]);
     }
     else {
-        var isEmbed = $(this).hasClass('embedcode-item');
         selNodes = Array.isArray(selNodes) ? selNodes : Array.isArray($.selected) ? $.selected.concat() : [];
         var showDialog = function() {
             mega.Share.initCopyrightsDialog(selNodes, isEmbed);

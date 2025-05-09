@@ -38,7 +38,7 @@ class MegaPasswordItemDetail {
 
         contextMenuBtn.on('click', event => {
             if (contextMenuBtn.toggleClass('active')) {
-                mega.ui.contextMenu.show({
+                mega.ui.pm.contextMenu.show({
                     name: 'item-detail-menu',
                     event,
                     eventTarget: contextMenuBtn

@@ -63,7 +63,7 @@ mega.ui.pm = {
                     }
                     else if (action === 'edit' && M.d[target]) {
                         this.comm.saveLastSelected(target);
-                        mega.ui.contextMenu.domNode.componentSelector('.edit-item').trigger('click');
+                        mega.ui.pm.contextMenu.domNode.componentSelector('.edit-item').trigger('click');
                     }
                 }
             });
@@ -402,5 +402,7 @@ mega.ui.pm = {
         componentClassname: 'menu-container context-menu',
         wrapperClassname: 'menu'
     }));
+
+    lazy(mega.ui.pm, 'contextMenu', () => new MegaContextMenu());
 
 })(window.mega);

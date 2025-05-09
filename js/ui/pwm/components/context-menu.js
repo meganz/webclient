@@ -81,8 +81,6 @@ class MegaContextMenu extends MegaComponentGroup {
 (mega => {
     "use strict";
 
-    lazy(mega.ui, 'contextMenu', () => new MegaContextMenu());
-
     lazy(MegaContextMenu, 'menuItems', () => {
         return {
             '.delete-item': {

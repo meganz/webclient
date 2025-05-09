@@ -633,7 +633,7 @@ class MegaMobileHeader extends MegaComponent {
             orderArrow = new MegaButton({
                 parentNode: orderArrowParent,
                 type: 'icon',
-                icon: `sprite-mobile-fm-mono icon-arrow-${d < 0 ? 'down' : 'up'}-thin-outline`,
+                icon: `sprite-fm-mono icon-arrow-${d < 0 ? 'down' : 'up'}-thin-outline`,
                 iconSize: 24,
                 componentClassname: 'text-icon sort-arrow no-active',
             });
@@ -642,7 +642,7 @@ class MegaMobileHeader extends MegaComponent {
 
             orderArrow.on('tap.sortDirection', function() {
                 this.value *= -1;
-                this.icon = `sprite-mobile-fm-mono icon-arrow-${this.value < 0 ? 'down' : 'up'}-thin-outline`;
+                this.icon = `sprite-fm-mono icon-arrow-${this.value < 0 ? 'down' : 'up'}-thin-outline`;
             });
 
             const applyButton = new MegaButton({

@@ -42,4 +42,13 @@ class MegaComponentGroup {
             return this.children.map(callback);
         }
     }
+
+    eachEntry(callback) {
+        if (typeof callback === 'function') {
+            const keys = Object.keys(this.childMap);
+            for (let i = keys.length; i--;) {
+                callback(keys[i], this.children[this.childMap[keys[i]]]);
+            }
+        }
+    }
 }

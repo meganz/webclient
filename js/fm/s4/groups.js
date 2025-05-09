@@ -541,12 +541,8 @@ lazy(s4, 'groups', () => {
         unbindEvents() {
             super.unbindEvents();
 
-            const dd = '.dropdown.body.context .dropdown-item';
             this.$tableData.unbind('click.s4klst');
             this.$tableData.unbind('contextmenu.s4klst');
-            $(`${dd}.s4-group-copy-arn`, '.fmholder').unbind('click.s4klst.ctxm.copyarn');
-            $(`${dd}.s4-group-rename`, '.fmholder').unbind('click.s4klst.ctxm.rename');
-            $(`${dd}.s4-group-delete`, '.fmholder').unbind('click.s4klst.ctxm.delete');
             $('.s4-grid-table tbody tr', '.s4-groups-management-scroll').unbind('dblclick.openInfoPage');
             $('button.copy', this.$tableData).unbind('click.s4klst.copykey');
         }
@@ -554,7 +550,6 @@ lazy(s4, 'groups', () => {
         bindEvents() {
             super.bindEvents();
 
-            const dd = '.dropdown.body.context .dropdown-item';
             this.$tableData.rebind('click.s4klst', (e) => {
                 this.handleSelection(e);
             });
@@ -572,18 +567,6 @@ lazy(s4, 'groups', () => {
                 });
             });
 
-            $(`${dd}.s4-group-copy-arn`, '.fmholder').rebind('click.s4klst.ctxm.copyarn', () => {
-                handlers.copyArn();
-            });
-
-            $(`${dd}.s4-group-rename`, '.fmholder').rebind('click.s4klst.ctxm.rename', () => {
-                handlers.rename();
-            });
-
-            $(`${dd}.s4-group-delete`, '.fmholder').rebind('click.s4klst.ctxm.delete', () => {
-                handlers.remove();
-            });
-
             $('.s4-grid-table tbody tr', '.s4-groups-management-scroll').rebind('dblclick.openInfoPage', (e) => {
                 const s4ItemNodeID = $(e.currentTarget).attr('id');
                 this.selection.clear();
@@ -593,6 +576,36 @@ lazy(s4, 'groups', () => {
 
             $('button.copy', this.$tableData).rebind('click.s4klst.copykey', e => {
                 handlers.copyArn(e);
+            });
+
+            mega.ui.contextMenu.addOption({
+                sectionId: 'share',
+                position: 'verify-credential',
+                buttonId: 's4-group-copy-arn',
+                text: l.s4_copy_arn,
+                icon: 'sprite-fm-mono icon-copy-thin-outline',
+                onClick() {
+                    handlers.copyArn();
+                }
+            });
+            mega.ui.contextMenu.addOption({
+                sectionId: 'inforename',
+                buttonId: 's4-group-rename',
+                text: l[61],
+                icon: 'sprite-fm-mono icon-edit-03-thin-outline',
+                onClick() {
+                    handlers.rename();
+                }
+            });
+            mega.ui.contextMenu.addOption({
+                sectionId: 'delete',
+                position: 'delete-album',
+                buttonId: 's4-group-delete',
+                text: l[1730],
+                icon: 'sprite-fm-mono icon-trash-thin-outline',
+                onClick() {
+                    handlers.remove();
+                }
             });
         }
     }

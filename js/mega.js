@@ -1545,12 +1545,7 @@ scparser.$add('d', function(a) {
     }
     if (!is_mobile) {
         if (fileDeletion && !a.v) {// this is a deletion of file.
-            if (M.d[topVersion]) {
-                fileversioning.updateFileVersioningDialog(topVersion);
-            }
-            else {
-                fileversioning.closeFileVersioningDialog(a.n);
-            }
+            fileversioning.updateFileVersioningDialog(M.d[topVersion] ? topVersion : a.n);
         }
     }
 

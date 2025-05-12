@@ -1416,7 +1416,7 @@ var ulmanager = {
 
 class UploadQueue extends Array {
     push(...args) {
-        if (!self.u_k_aes) {
+        if (!self.u_k_aes && !self.is_transferit) {
             if (!self.mkwarn) {
                 self.mkwarn = 1;
                 tell(l[8853]);
@@ -1578,7 +1578,7 @@ ChunkUpload.prototype.onXHRready = function(xhrEvent) {
                     mac[2] ^ mac[3]
                 ];
 
-                if (u_k_aes && this.gid && !ulmanager.ulCompletingPhase[this.gid]) {
+                if (this.gid && (window.u_k_aes || this.file.xput) && !ulmanager.ulCompletingPhase[this.gid]) {
                     var u8 = new Uint8Array(response);
 
                     this.file.filekey = filekey;

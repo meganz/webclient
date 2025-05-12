@@ -7,6 +7,7 @@ root=$(realpath "${path}/../../../")
 arcp="${root}/build/package"
 
 declare -a root_files=(
+  "cmaps"
   "aesasm.js"
   "worklet.js"
   "encrypter.js"
@@ -83,7 +84,10 @@ xid=$(sha384 "${arcp}/favicon.ico" | token)
 sed -i 's!favicon.ico"!favicon.ico?x='$xid'"!' "${arcp}/index.html"
 
 for i in "${root_files[@]}"; do
-  cp -p "${root}/$i" "${arcp}"
+  opt=-p
+  src=${root}/$i
+  [[ -d "$src" ]] && opt+=r
+  cp $opt "$src" "${arcp}"
 done
 
 # -----------------------------------------------------------------------------------

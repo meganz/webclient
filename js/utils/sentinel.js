@@ -63,8 +63,8 @@ mBroadcaster.once('boot_done', () => {
         return /userscript|user\.js|EvalError/.test(dump.m + data)
             || dump.m.includes('Permission denied to access property')
             || dump.m.includes('Cannot redefine property')
-            || dump.m.includes("evaluating 'ze(e,t)'")
             || dump.m.includes("evaluating 'r(a,c)'")
+            || dump.m.includes("evaluating 'ze(e,")
             || dump.m.includes("evaluating 'a.L")
             || dump.m.includes('Error: hookFull');
     };

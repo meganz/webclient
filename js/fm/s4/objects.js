@@ -78,8 +78,10 @@ lazy(s4, 'objects', () => {
                     .catch(tell);
             });
 
-            this.$copyButton.rebind('click.s4dlg', () => {
-                copyToClipboard($('input', this.$linkContainer).val(), l[1642]);
+            this.$copyButton.rebind('click.s4dlg', (e) => {
+                if (!e.currentTarget.classList.contains('disabled')) {
+                    copyToClipboard($('input', this.$linkContainer).val(), l[1642]);
+                }
             });
         }
 
@@ -90,9 +92,11 @@ lazy(s4, 'objects', () => {
                 if (this.bucketAccess === 2) {
                     this.$notification.safeHTML(l.s4_obj_access_denied_tip).removeClass('hidden');
                     this.$fileInfoContainer.addClass('inactive');
+                    this.$copyButton.addClass('disabled simpletip');
                 }
                 else {
                     this.$fileInfoContainer.removeClass('inactive');
+                    this.$copyButton.removeClass('disabled simpletip');
                 }
                 this.$switch.removeClass('toggle-off').addClass('toggle-on');
             }
@@ -100,9 +104,11 @@ lazy(s4, 'objects', () => {
                 if (this.bucketAccess === 1) {
                     this.$notification.safeHTML(l.s4_obj_access_granted_tip).removeClass('hidden');
                     this.$fileInfoContainer.removeClass('inactive');
+                    this.$copyButton.removeClass('disabled simpletip');
                 }
                 else {
                     this.$fileInfoContainer.addClass('inactive');
+                    this.$copyButton.addClass('disabled simpletip');
                 }
                 this.$switch.addClass('toggle-off').removeClass('toggle-on');
             }

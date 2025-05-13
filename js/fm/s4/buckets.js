@@ -262,6 +262,9 @@ lazy(s4, 'buckets', () => {
             this.$dialogCancel.rebind('click.s4dlg', () => {
                 this._cancelCheck();
             });
+
+            $('.bucket-policies .examples', this.$dialogContainer)
+                .rebind('click.s4dlg', () => eventlog(500812));
         }
 
         showError() {

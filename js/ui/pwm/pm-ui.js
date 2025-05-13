@@ -62,11 +62,17 @@ mega.ui.pm = {
                         mega.ui.topnav.domNode.componentSelector('.add-btn').trigger('click');
                     }
                     else if (action === 'edit' && M.d[target]) {
-                        this.comm.saveLastSelected(target);
-                        mega.ui.pm.contextMenu.domNode.componentSelector('.edit-item').trigger('click');
+                        const item = this.list.passwordList.componentSelector(`#${CSS.escape(target)}`);
+                        if (item) {
+                            return item.trigger('click.selectItem')
+                                .then(() => {
+                                    this.contextMenu.domNode.componentSelector('.edit-item').trigger('click');
+                                });
+                        }
                     }
                 }
-            });
+            })
+                .catch(tell);
         }
 
         if (navigator.onLine) {

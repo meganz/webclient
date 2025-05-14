@@ -1697,6 +1697,9 @@ pro.propay = {
                 if (this.currentGateway.gatewayId === 0) {
                     warning = this.usingBalance ? this.warningStrings.balance : this.warningStrings.voucher;
                 }
+                else if (this.currentGateway.gatewayId === 11) {
+                    warning = this.warningStrings.astropayOneOff.replace('%1', this.currentGateway.displayName);
+                }
                 else if (blockedByYearlyOnly) {
                     warning = this.warningStrings.yearlyOnly;
                 }
@@ -2010,12 +2013,12 @@ pro.propay = {
 
         if (option.svg) {
             const svg = document.createElement('i');
-            svg.className = `sprite-fm-mono ${option.svg} mr-4`;
+            svg.className = `sprite-fm-mono ${option.svg}`;
             optionContainer.prepend(svg);
         }
         else if (option.icon) {
             const icon = document.createElement('div');
-            icon.className = `provider-icon ${option.icon} mr-4`;
+            icon.className = `provider-icon ${option.icon}`;
             optionContainer.prepend(icon);
         }
 
@@ -2936,6 +2939,7 @@ pro.propay = {
                 .toggleClass('euro', this.planObj.currency === 'EUR')
                 .toggleClass('flexi', isFlexi)
                 .toggleClass('mobile-device', !!is_mobile)
+                .toggleClass('ar', mega.ipcc === 'AR')
                 .toggleClass('s4', !!(window.s4ac && isFlexi));
 
             this.trial = this.planObj.trial;
@@ -3488,5 +3492,6 @@ lazy(pro.propay, 'warningStrings', () => {
         voucher: l.voucher_only_one_off,
         monthlyOnly: l.payment_monthly_only,
         yearlyOnly: l.payment_yearly_only,
+        astropayOneOff: l.astropay_one_off,
     };
 });

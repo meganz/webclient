@@ -249,6 +249,9 @@ function sharedUInode(nodeHandle, force) {
     if (mega.devices.ui) {
         mega.devices.ui.onUpdateSharedNode(nodeHandle);
     }
+    if (mega.ui.secondaryNav) {
+        mega.ui.secondaryNav.updateCard(nodeHandle);
+    }
 }
 
 /**

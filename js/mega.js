@@ -2112,13 +2112,6 @@ function fm_updated(n) {
         if (M.megaRender) {
             M.megaRender.revokeDOMNode(n.h, true);
         }
-        if (
-            mega.ui.secondaryNav &&
-            mega.ui.secondaryNav.cardComponent &&
-            mega.ui.secondaryNav.cardComponent.handle === n.h
-        ) {
-            mega.ui.secondaryNav.cardComponent.update();
-        }
         M.updFileManagerUI().catch(dump);
     }
 }

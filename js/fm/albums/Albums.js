@@ -3833,6 +3833,9 @@ lazy(mega.gallery, 'albums', () => {
                             }
                         }, 100);
                     }
+                    else if (M.isAlbumsPage(2) && id === mega.ui.secondaryNav.cardComponent.handle) {
+                        mega.ui.secondaryNav.cardComponent.update();
+                    }
                 }),
                 mega.sets.subscribe('asr', 'albums', ({ id }) => {
                     this.removeAlbumFromGrid(id);

@@ -621,6 +621,22 @@ lazy(mega.ui, 'secondaryNav', () => {
                 // onContextMenu,
             });
         },
+        updateCard(handle) {
+            if (!this.cardComponent) {
+                return;
+            }
+            const { node, isSharedRoot } = this.cardComponent;
+            if (node.h === handle) {
+                this.cardComponent.update();
+                return;
+            }
+            if (handle.length === 11) {
+                if (!isSharedRoot || node.su !== handle) {
+                    return;
+                }
+                this.cardComponent.update();
+            }
+        },
         hideCard() {
             if (this.cardComponent) {
                 this.cardComponent.destroy();

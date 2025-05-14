@@ -1956,6 +1956,9 @@ MegaData.prototype.nodeUpdated = function(n, ignoreDB) {
             if (mega.devices.ui) {
                 mega.devices.ui.onUpdateNode(n.h);
             }
+            if (mega.ui.secondaryNav) {
+                mega.ui.secondaryNav.updateCard(n.h);
+            }
 
             // TODO: Improve the list rendering to only update each node if the action packet does not affect
             // list ordering.

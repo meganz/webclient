@@ -304,6 +304,9 @@ var useravatar = (function() {
         if (M.u[user]) {
             // .trackDataChange() will trigger some parts in the Chat UI to re-render.
             M.u[user].trackDataChange(M.u[user], "avatar");
+            if (M.currentrootid === 'shares' && mega.ui.secondaryNav) {
+                mega.ui.secondaryNav.updateCard(user);
+            }
         }
 
         var $avatar = null;

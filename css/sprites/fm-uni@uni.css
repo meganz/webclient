@@ -217,6 +217,9 @@
 .sprite-fm-uni.icon-home, .sprite-fm-uni-before.icon-home-before::before, .sprite-fm-uni-after.icon-home-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-home");
 }
+.sprite-fm-uni.icon-ideal, .sprite-fm-uni-before.icon-ideal-before::before, .sprite-fm-uni-after.icon-ideal-after::after {
+   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-ideal");
+}
 .sprite-fm-uni.icon-info, .sprite-fm-uni-before.icon-info-before::before, .sprite-fm-uni-after.icon-info-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-info");
 }

@@ -225,7 +225,6 @@
     color: var(--text-color-high);
 }
 #propay .left-block .option .provider-icon {
-    margin: 0;
     margin-inline-start: 2px;
     margin-inline-end: 10px;
 }

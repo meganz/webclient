@@ -2907,6 +2907,7 @@ pro.propay = {
         pro.propay.pageChangeHandler = mBroadcaster.addListener('pagechange', () => {
             if (!pro.propay.onPropayPage()) {
                 pro.propay.hideLoadingOverlay();
+                delete window.s4ac;
                 mBroadcaster.removeListener(pro.propay.pageChangeHandler);
                 delete pro.propay.pageChangeHandler;
             }

@@ -798,6 +798,7 @@ function fmtopUI() {
                         {
                             text: l.add_item_btn,
                             icon: 'sprite-fm-mono icon-plus-light-solid',
+                            id: `newctx_${nodeID}`,
                             onClick: (ev) => {
                                 mega.ui.secondaryNav.openNewMenu(ev);
                             }
@@ -3028,6 +3029,7 @@ function sharedFolderUI() {
         const newButton = {
             text: l.add_item_btn,
             icon: 'sprite-fm-mono icon-plus-light-solid',
+            id: `newctx_${nodeData.h}`,
             onClick(ev) {
                 mega.ui.secondaryNav.openNewMenu(ev);
             }

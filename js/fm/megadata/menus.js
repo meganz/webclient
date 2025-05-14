@@ -759,7 +759,11 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
 
     // function to recuring repositioning for sub menus.
     const findNewPosition = () => {
-        M.adjustContextMenuPosition(e, menuNode);
+        const res = M.adjustContextMenuPosition(e, menuNode);
+        if (!res) {
+            $.hideContextMenu();
+            return;
+        }
         const subMenus = menuNode.querySelectorAll('.context-submenu');
         for (const subMenu of subMenus) {
             subMenu.classList.add('hidden');
@@ -1257,22 +1261,23 @@ MegaData.prototype.adjustContextMenuPosition = function(ev, menuNode) {
     // We need to search for the new `delegateTarget` to calculate offsets
     // Currently only necessary for DC. Subject to change.
     const getLostDelegate = (ev) => {
-        let { currentTarget, delegateTarget, id } = ev;
+        let { currentTarget, delegateTarget } = ev;
         if (currentTarget instanceof MegaComponent) {
             currentTarget = currentTarget.domNode;
-            id = currentTarget.id;
         }
+        const { id } = currentTarget;
         if (id) {
             const selector =
                 `.${[...(delegateTarget || currentTarget).classList]
-                    .filter(c => c !== 'active')
+                    .filter(c => c !== 'active' && c !== 'ctx-source')
                     .join('.')}`;
-            let del = document.getElementById(id);
+            const del = document.getElementById(id);
             if (del) {
-                del = del.querySelector(selector);
-                if (del) {
-                    return del;
+                const sameSel = del.querySelector(selector);
+                if (sameSel) {
+                    return sameSel;
                 }
+                return del;
             }
             return false;
         }
@@ -1291,6 +1296,9 @@ MegaData.prototype.adjustContextMenuPosition = function(ev, menuNode) {
             if (delegate) {
                 ico.x = delegate.clientWidth;
                 ico.y = delegate.clientHeight;
+            }
+            else {
+                return false;
             }
         }
         delegate.classList.add('ctx-source', 'active');

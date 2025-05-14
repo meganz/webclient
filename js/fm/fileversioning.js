@@ -466,8 +466,9 @@
                             id="vdl_${version.h}">
                             <i class="sprite-fm-mono icon-download-small"></i>
                         </div>`;
+                    const notPreviewable = !is_video(version) && !is_image2(version) && !is_text(version);
                     const viewBtnHtml =
-                        `<div class="mega-button small action preview-file simpletip"
+                        `<div class="mega-button small action preview-file ${notPreviewable ? 'hidden' : ''} simpletip"
                             data-simpletip="${l.version_preview}"
                             aria-label="${l.version_preview}"
                             id="vdl_${version.h}">
@@ -641,6 +642,16 @@
                 $('.item-type-icon-90', $header)
                     .attr('class', `item-type-icon-90 icon-${fileIcon({name: node.name})}-90`);
 
+                if (
+                    !is_video(M.d[fileHandle])
+                    && !is_image2(M.d[fileHandle])
+                    && !is_text(M.d[fileHandle])
+                ) {
+                    $('button.js-preview', $header).addClass('hidden');
+                }
+                else {
+                    $('button.js-preview', $header).removeClass('hidden');
+                }
             };
 
             $('button.js-download', $header).rebind('click', () => {
@@ -848,14 +859,6 @@
                     $(window).rebind('resize.fileversioning', SoonFc(() => {
                         initPerfectScrollbar($scrollBlock);
                     }));
-                    if (
-                        !is_video(M.d[selections.file])
-                        && !is_image2(M.d[selections.file])
-                        && !is_text(M.d[selections.file])
-                    ) {
-                        $('button.js-preview', $header).addClass('hidden');
-                        $('.preview-file', $scrollBlock).addClass('hidden');
-                    }
                 });
 
             $(document).rebind('keydown.fileversioningKeydown', (e) => {
@@ -952,7 +955,7 @@
                     if (is_video(M.d[previewHandle])) {
                         $.autoplay = previewHandle;
                     }
-                    mBroadcaster.once('slideshow:close', reopen);
+                    mBroadcaster.once('slideshow:close', () => onIdle(reopen));
                     slideshow(previewHandle, 0, false, res);
                     loadingDialog.hide();
                 });

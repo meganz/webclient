@@ -2355,6 +2355,9 @@ pro.propay = {
                         else if (gateway.gatewayName === 'stripeAP') {
                             svg = ' icon-apple';
                         }
+                        else if (gateway.gatewayName === 'stripeID') {
+                            svg = ' sprite-fm-uni icon-ideal';
+                        }
                     }
 
 
@@ -2702,17 +2705,18 @@ pro.propay = {
 
         const sortValues = {
             'stripe': 1,
-            'ecp': 1.1,
-            'stripeAP': 2,
-            'stripeGP': 3,
-            'astropay': 4,
-            'voucher': 7,
-            'bitcoin': 8,
+            'ecp': 1.1,     // Stripe and ecp are mutually exclusive
+            'stripeID': 2,
+            'stripeAP': 3,
+            'stripeGP': 4,
+            'astropay': 5,
+            'voucher': 8,
+            'bitcoin': 9,
         };
 
         // TODO: Add VALUE for each gateway id
         const primaryGatewayIds = new Set([0, 4, 11, 16, 19]);
-        const primaryStripe = new Set(['stripe', 'stripeAP', 'stripeGP',]);
+        const primaryStripe = new Set(['stripe', 'stripeAP', 'stripeGP', 'stripeID',]);
 
         for (let i = 0; i < tempGatewayOptions.length; i++) {
             const gateway = tempGatewayOptions[i];

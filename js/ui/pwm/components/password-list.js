@@ -337,7 +337,7 @@ class MegaPasswordList extends MegaView {
             item.domNode.prepend(outer);
             mega.ui.pm.utils.generateFavicon(passwordName, pwmItem.url, outer);
 
-            item.on('click', ({currentTarget}, noShowDetail) => {
+            item.on('click.selectItem', ({currentTarget}, noShowDetail) => {
                 const elemId = currentTarget.domNode.id;
                 if (this.selectedItem) {
                     if (this.selectedItem.domNode.id === elemId
@@ -347,7 +347,7 @@ class MegaPasswordList extends MegaView {
                     this.selectedItem.active = false;
                 }
                 // @todo FIXME prevent concurrent invocations while the promise is running
-                this.passwordItem.showDetail(elemId, noShowDetail)
+                return this.passwordItem.showDetail(elemId, noShowDetail)
                     .catch(tell)
                     .finally(() => {
                         this.selectedItem = item;
@@ -366,7 +366,7 @@ class MegaPasswordList extends MegaView {
             const _ = event => {
                 item.trigger('click', window.innerWidth < 1080);
                 mega.ui.pm.menu.hide();
-                mega.ui.contextMenu.show({
+                mega.ui.pm.contextMenu.show({
                     name: 'item-list-menu',
                     handle: passwordNode.h,
                     event,

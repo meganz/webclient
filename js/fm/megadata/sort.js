@@ -576,20 +576,15 @@ MegaData.prototype.doSort = function(n, d) {
     "use strict";
     $('.grid-table thead .arrow').removeClass('asc desc');
     $('.dropdown-section.sort-by .sprite-fm-mono.sort-arrow').removeClass('icon-up icon-down');
-    $('.files-menu.context .submenu.sorting .dropdown-item.sort-grid-item').removeClass('selected');
 
     const sortIconClassPrefix = 'icon-';
 
-    let sortItemClasses = 'selected';
     let arrowDirection = 'desc';
     let sortIconAddClass = 'up';
-    let sortIconRemoveClass = 'down';
 
     if (d < 0) {
         arrowDirection = 'asc';
-        sortItemClasses += ' inverted';
         sortIconAddClass = 'down';
-        sortIconRemoveClass = 'up';
     }
 
     n = String(n).replace(/\W/g, '');
@@ -601,31 +596,6 @@ MegaData.prototype.doSort = function(n, d) {
     else if (n === "label") {
         $('#label-sort-arrow.sprite-fm-mono.sort-arrow').addClass(sortIconClassPrefix + sortIconAddClass);
     }
-
-    const sortItemPrefix = '.dropdown-item.sort-grid-item.sort-';
-    let subMenuSortClass = '';
-
-    if (n === 'ts') {
-        subMenuSortClass = sortItemPrefix + 'timeAd';
-    }
-    else if (n === 'mtime') {
-        subMenuSortClass = sortItemPrefix + 'timeMd';
-    }
-    else if (n === 'date') {
-        subMenuSortClass =  sortItemPrefix + 'sharecreated,'
-                            + sortItemPrefix + 'timeAd';
-    }
-    else {
-        subMenuSortClass = sortItemPrefix + n;
-    }
-
-    const $selectedSortItem = $(subMenuSortClass, '.files-menu.context .submenu.sorting');
-
-    $selectedSortItem.addClass(sortItemClasses);
-
-    $('i.sort-arrow', $selectedSortItem)
-        .addClass(sortIconClassPrefix + sortIconAddClass)
-        .removeClass(sortIconClassPrefix + sortIconRemoveClass);
 
     this.sortmode = {n: n, d: d};
 

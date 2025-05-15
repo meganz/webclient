@@ -162,7 +162,7 @@ class SelectionManager2Base {
         }
 
         // If info panel is open change its attributes by current selected node
-        mega.ui.mInfoPanel.reRenderIfVisible($.selected);
+        mega.ui.mInfoPanel.eventuallyUpdateSelected();
 
         return nodeId;
     }
@@ -314,7 +314,7 @@ class SelectionManager2Base {
                     }
 
                     // Rerender if info panel is visible when selecting node via shorcut
-                    mega.ui.mInfoPanel.reRenderIfVisible($.selected);
+                    mega.ui.mInfoPanel.eventuallyUpdateSelected();
                 }
             }
         }
@@ -623,7 +623,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
 
                     // Close node Info panel as nothing selected
                     if (this.selected_list.length === 0) {
-                        mega.ui.mInfoPanel.closeIfOpen();
+                        mega.ui.mInfoPanel.hide();
                     }
                 }
             });
@@ -644,7 +644,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
                     !e.target.classList.contains('ps__rail-y')) {
 
                     // Close node Info panel as nothing selected
-                    mega.ui.mInfoPanel.closeIfOpen();
+                    mega.ui.mInfoPanel.hide();
 
                     this.clear_selection();
                 }
@@ -865,7 +865,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             this.updateSelectionNotification();
         }
 
-        mega.ui.mInfoPanel.reRenderIfVisible($.selected);
+        mega.ui.mInfoPanel.eventuallyUpdateSelected();
 
         if (M.gallery && mega.gallery[M.currentdirid]) {
             mega.gallery[M.currentdirid].enableGroupChecks();
@@ -884,6 +884,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             || (typeof nodeId !== 'number' && !M.d[nodeId])
             || (M.isGalleryPage() && mega.gallery.photos && mega.gallery.photos.mode !== 'a')
             || (M.isMediaDiscoveryPage() && mega.gallery.discovery && mega.gallery.discovery.mode !== 'a')
+            || M.isAlbumsPage(1)
         ) {
             return false;
         }
@@ -1461,5 +1462,9 @@ class SelectionManager2_React extends SelectionManager2Base {
         return this.itemsPerRowGetter() | 0;
     }
 }
+
+SelectionManager2Base.SUB_CLASSES = Object.create(null);
+SelectionManager2Base.SUB_CLASSES.SelectionManager2_DOM = SelectionManager2_DOM;
+SelectionManager2Base.SUB_CLASSES.SelectionManager2_React = SelectionManager2_React;
 
 var selectionManager;

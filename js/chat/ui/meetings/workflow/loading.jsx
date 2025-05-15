@@ -24,7 +24,7 @@ export default class Loading extends React.Component {
         if ($.dialog) {
             closeDialog?.();
         }
-        mega.ui.mInfoPanel.closeIfOpen();
+        mega.ui.mInfoPanel.hide();
         notify?.closePopup();
         alarm?.hideAllWarningPopups();
         document.querySelectorAll('.js-dropdown-account').forEach(({ classList }) =>

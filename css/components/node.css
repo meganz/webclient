@@ -280,31 +280,37 @@ a.is-sensitive img {
     width: auto;
     border-radius: inherit;
 }
+.avatar {
+    --avatar-size: 48px;
+    --avatar-font-size: 24px;
+}
+.avatar.size-24 {
+    --avatar-size: 24px;
+    --avatar-font-size: 12px;
+}
+.avatar.size-16 {
+    --avatar-size: 16px;
+    --avatar-font-size: 8px;
+}
 .mega-node.user .avatar div {
-    width: 100%;
+    width: var(--avatar-size);
     text-align: center;
     border-radius: inherit;
+}
+.mega-node.user .avatar {
+    height: var(--avatar-size);
+    width: var(--avatar-size);
+    position: relative;
 }
 .mega-node.user .avatar div span {
     border-radius: inherit;
     font-family: var(--text-font-family);
     color: white;
-    font-size: 24px;
-    height: 48px;
-    line-height: 48px;
+    font-size: var(--avatar-font-size);
+    height: var(--avatar-size);
+    line-height: var(--avatar-size);
     margin: 0 auto;
     padding: 0;
-    width: 48px;
+    width: var(--avatar-size);
     display: block;
-}
-
-.mega-node.user .avatar.small {
-    height: 24px;
-    width: 24px;
-}
-.mega-node.user .avatar.small div span {
-    height: 24px;
-    width: 24px;
-    line-height: 24px;
-    font-size: 12px;
 }

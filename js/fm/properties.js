@@ -529,29 +529,6 @@
             $.hideContextMenu();
         };
 
-        $dialog.find('.file-settings-icon').rebind('click context', function(e) {
-            if (!$(this).hasClass('active')) {
-                e.preventDefault();
-                e.stopPropagation();
-                $(this).addClass('active');
-                // $('.mega-dialog').addClass('arrange-to-front');
-                // $('.properties-dialog').addClass('arrange-to-back');
-                $('.dropdown.body').addClass('arrange-to-front');
-                e.currentTarget = $('#' + n.h);
-                if (!e.currentTarget.length) {
-                    e.currentTarget = $('#treea_' + n.h);
-                }
-                e.calculatePosition = true;
-                $.selected = [n.h];
-                M.contextMenuUI(e, n.h.length === 11 ? 5 : 1);
-            }
-            else {
-                __fsi_close();
-            }
-
-            return false;
-        });
-
         $(document).rebind('MegaCloseDialog.Properties', __fsi_close);
 
         if ($dialog.hasClass('shared')) {

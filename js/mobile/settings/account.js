@@ -411,7 +411,14 @@ mobile.settings.account = Object.create(mobile.settingsHelper, {
 
                 // Check if we should show the Payment Card button (uq response)
                 if (payCardBtn && mobile.settings.account.paymentCard.validateUser(M.account)) {
-                    payCardBtn.show();
+                    api.req({a: 'cci', v: 2})
+                        .then(mobile.settings.account.paymentCard.validateCardResponse)
+                        .then((res) => {
+                            if (res) {
+                                payCardBtn.show();
+                            }
+                        })
+                        .catch(dump);
                 }
 
                 // Check for any subscriptions

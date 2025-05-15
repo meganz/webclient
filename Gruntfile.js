@@ -122,7 +122,7 @@ function date2version() {
     const doy = Math.floor((now - soy) / 864e5);
     const mod = now.getUTCHours() * 60 + now.getUTCMinutes();
 
-    return `${(year % 100) - 24}.${doy}.${mod}`;
+    return `${(year % 100) - 24}.${doy}.${1440 - mod}`;
 }
 
 lazy(FS, 'Secureboot', () => {
@@ -146,7 +146,16 @@ lazy(FS, 'Secureboot', () => {
 
             if (show) {
                 if (show < 0) {
-                    if (/^\s+}$/.test(ln)) {
+                    if (show === -9) {
+                        res = ln.includes(`var staticServerLoading`) ? (show = true) : false;
+                    }
+                    else if (show === -8) {
+                        res = false;
+                        if (ln === '}') {
+                            show = true;
+                        }
+                    }
+                    else if (/^\s+}$/.test(ln)) {
                         res = false;
                         show = true;
                     }
@@ -168,6 +177,14 @@ lazy(FS, 'Secureboot', () => {
                     else {
                         res = false;
                     }
+                }
+                else if (ln.includes(`// Cache location.search`)) {
+                    show = -9;
+                    res = false;
+                }
+                else if (/^if\s*\((?:is_mobile|is_ios|tmp)\)/.test(ln)) {
+                    show = -8;
+                    res = false;
                 }
             }
             else if (ln.includes(s0)) {
@@ -234,6 +251,8 @@ lazy(FS, 'Secureboot', () => {
         tmp = content.join('\n')
             .replace(p3, tmp.join('\n\n') + '\n\n\t' + p3)
             .replace(/buildVersion[^;]+/, `buildVersion = ${JSON.stringify(buildVersion)}`)
+            .replace(/var is_microsoft[^;]+/, 'var is_mobile = false')
+            .replace('else if (!browserUpdate', 'if (!browserUpdate')
             .replace(/js\/ui\/transfer\/images/g, 'images');
         content = tmp.split('\n');
     }

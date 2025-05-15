@@ -1,0 +1,130 @@
+.fm-context-menu,
+.fm-context-menu .context-submenu {
+    background: var(--mobile-page-background);
+    border: 1px solid var(--mobile-border-strong);
+    border-radius: 16px;
+    box-sizing: border-box;
+    box-shadow: var(--mobile-shadow-medium);
+    min-height: 32px;
+    padding: 10px 0;
+    position: absolute;
+    min-width: 280px;
+    z-index: 250;
+}
+.fm-context-menu .context-submenu {
+    left: 100%;
+    right: auto;
+    transition: all 200ms ease-in-out, right 200ms ease-in-out;
+    padding-bottom: 16px;
+    min-width: 280px;
+    width: auto;
+}
+.rtl .fm-context-menu {
+    direction: rtl;
+}
+.rtl .fm-context-menu .context-submenu {
+    left: auto;
+    right: 100%;
+}
+.fm-context-menu .context-section:not(.hidden),
+.fm-context-menu .context-label-section:not(.hidden) {
+    border-bottom: 1px solid var(--mobile-border-strong);
+    margin: 6px 0;
+    padding-bottom: 6px;
+}
+.fm-context-menu .context-section.last {
+    border-bottom: unset;
+    padding-bottom: 0;
+}
+
+.fm-context-menu .nav-elem.context-button {
+    align-items: center;
+    border-radius: 8px;
+    box-sizing: border-box;
+    cursor: pointer;
+    display: flex;
+    height: 32px;
+    overflow: hidden;
+    max-width: calc(100% - 32px);
+    margin: 8px 16px 0;
+    padding: 0 8px;
+    position: relative;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.fm-context-menu .nav-elem.context-button:hover {
+    background: var(--mobile-button-outline-background-hover);
+}
+.fm-context-menu .nav-elem.context-button:active {
+    text-decoration: none;
+}
+
+.fm-context-menu .context-label-section {
+    padding: 8px 16px;
+}
+.fm-context-menu .context-label-section .label-header {
+    align-items: center;
+    color: var(--mobile-text-primary);
+    display: flex;
+    justify-content: space-between;
+}
+.fm-context-menu .context-label-section .clear-labels {
+    cursor: pointer;
+    height: 16px;
+    padding: 0;
+}
+.fm-context-menu .clear-labels .primary-text {
+    color: var(--mobile-button-primary);
+    font: var(--mobile-font-caption-large-regular);
+    text-decoration: underline;
+}
+.fm-context-menu .context-label-section .label-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 8px;
+    box-sizing: border-box;
+    height: 36px;
+    margin-top: 8px;
+}
+.fm-context-menu .label-container .red-colour-label {
+    --context-label-colour: var(--label-red);
+}
+.fm-context-menu .label-container .orange-colour-label {
+    --context-label-colour: var(--label-orange);
+}
+.fm-context-menu .label-container .yellow-colour-label {
+    --context-label-colour: var(--label-yellow);
+}
+.fm-context-menu .label-container .green-colour-label {
+    --context-label-colour: var(--label-green);
+}
+.fm-context-menu .label-container .blue-colour-label {
+    --context-label-colour: var(--label-blue);
+}
+.fm-context-menu .label-container .purple-colour-label {
+    --context-label-colour: var(--label-purple);
+}
+.fm-context-menu .label-container .grey-colour-label {
+    --context-label-colour: var(--mobile-icon-disabled);
+}
+.fm-context-menu .label-container .colour-item {
+    background: var(--context-label-colour);
+    cursor: pointer;
+    border-radius: 100%;
+    margin: 0 8px;
+}
+.fm-context-menu .label-container .colour-item:hover {
+    background: var(--context-label-colour);
+}
+.fm-context-menu .label-container .colour-item.selected {
+    border: 4px solid var(--mobile-page-background);
+    outline: 2px solid var(--context-label-colour);
+}
+.fm-context-menu .label-container .colour-item:not(.selected):hover {
+    outline: 8px solid var(--mobile-surface-2);
+}
+.fm-context-menu .right-badge.transferit {
+    background: rgb(24, 117, 255);
+    color: var(--mobile-text-on-color);
+}

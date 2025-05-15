@@ -266,6 +266,9 @@
     background: rgb(255, 235, 0);
     background: linear-gradient(45deg, rgba(255, 235, 0, 1) 0%, rgba(255, 211, 0, 1) 100%);
 }
+.color-blank {
+    background: var(--mobile-surface-2);
+}
 .fm-account-avatar {
     width: 96px;
     height: 96px;

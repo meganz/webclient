@@ -224,6 +224,10 @@
     padding: 0 16px;
     color: var(--text-color-high);
 }
+#propay .left-block .option .provider-icon {
+    margin-inline-start: 2px;
+    margin-inline-end: 10px;
+}
 #propay .left-block .option .tick {
     display: none;
 }
@@ -322,12 +326,27 @@
 #propay .left-block .duration .duration-option .monthly-price {
     font: var(--font-copy-sm)
 }
-#propay .left-block .duration-note {
-    display: flex;
+#propay .left-block .duration-note,
+#propay .ar.warning {
     flex-direction: row;
     align-items: center;
     margin-top: 18px;
     font: var(--font-copy-sm);
+}
+#propay .ar.warning {
+    display: none;
+    margin-bottom: 24px;
+    align-items: flex-start;
+}
+#propay .ar.warning i{
+    margin-top: 3px;
+    margin-right: 8px;
+}
+#propay.ar .ar.warning {
+    display: flex;
+}
+#propay .left-block .duration-note {
+    display: flex;
 }
 #propay .left-block .duration-note i {
     align-self: flex-start;

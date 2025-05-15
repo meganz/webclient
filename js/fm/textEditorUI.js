@@ -336,7 +336,7 @@ mega.textEditorUI = new function TextEditorUI() {
             function getLinkFileMenuClick() {
                 selectionManager.clear_selection();
                 selectionManager.add_to_selection(versionHandle || fileHandle);
-                $('.dropdown.body.context .dropdown-item.getlink-item').trigger('click');
+                M.getLinkAction();
             }
         );
 
@@ -345,7 +345,7 @@ mega.textEditorUI = new function TextEditorUI() {
             function sendToContactMenuClick() {
                 selectionManager.clear_selection();
                 selectionManager.add_to_selection(versionHandle || fileHandle);
-                $('.dropdown.body.context .dropdown-item.send-to-contact-item').trigger('click');
+                openCopyDialog('conversations');
             }
         );
 

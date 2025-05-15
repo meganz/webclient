@@ -2008,6 +2008,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         'cannot_leave_share_content',
         'after_days_card_charged_m',
         's4_disable_feature_info',
+        'info_panel_tags_create_btn'
     ];
     for (let i = common.length; i--;) {
         var num = common[i];

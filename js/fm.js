@@ -249,6 +249,9 @@ function sharedUInode(nodeHandle, force) {
     if (mega.devices.ui) {
         mega.devices.ui.onUpdateSharedNode(nodeHandle);
     }
+    if (mega.ui.secondaryNav) {
+        mega.ui.secondaryNav.updateCard(nodeHandle);
+    }
 }
 
 /**
@@ -798,6 +801,7 @@ function fmtopUI() {
                         {
                             text: l.add_item_btn,
                             icon: 'sprite-fm-mono icon-plus-light-solid',
+                            id: `newctx_${nodeID}`,
                             onClick: (ev) => {
                                 mega.ui.secondaryNav.openNewMenu(ev);
                             }
@@ -2625,7 +2629,7 @@ function createFileDialog(close, action, params) {
                         // to redraw if element was out of viewport.
                         $($.selectddUIgrid + ' ' + $.selectddUIitem).removeClass('ui-selected');
                         $newElement.addClass('ui-selected');
-                        $.gridLastSelected = $newElement;
+                        $.gridLastSelected = $newElement[0];
                         selectionManager.clear_selection();
                         selectionManager.add_to_selection(nh);
 
@@ -3028,6 +3032,7 @@ function sharedFolderUI() {
         const newButton = {
             text: l.add_item_btn,
             icon: 'sprite-fm-mono icon-plus-light-solid',
+            id: `newctx_${nodeData.h}`,
             onClick(ev) {
                 mega.ui.secondaryNav.openNewMenu(ev);
             }

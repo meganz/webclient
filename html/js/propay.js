@@ -1697,6 +1697,9 @@ pro.propay = {
                 if (this.currentGateway.gatewayId === 0) {
                     warning = this.usingBalance ? this.warningStrings.balance : this.warningStrings.voucher;
                 }
+                else if (this.currentGateway.gatewayId === 11) {
+                    warning = this.warningStrings.astropayOneOff.replace('%1', this.currentGateway.displayName);
+                }
                 else if (blockedByYearlyOnly) {
                     warning = this.warningStrings.yearlyOnly;
                 }
@@ -2010,12 +2013,12 @@ pro.propay = {
 
         if (option.svg) {
             const svg = document.createElement('i');
-            svg.className = `sprite-fm-mono ${option.svg} mr-4`;
+            svg.className = `sprite-fm-mono ${option.svg}`;
             optionContainer.prepend(svg);
         }
         else if (option.icon) {
             const icon = document.createElement('div');
-            icon.className = `provider-icon ${option.icon} mr-4`;
+            icon.className = `provider-icon ${option.icon}`;
             optionContainer.prepend(icon);
         }
 
@@ -2351,6 +2354,9 @@ pro.propay = {
                         }
                         else if (gateway.gatewayName === 'stripeAP') {
                             svg = ' icon-apple';
+                        }
+                        else if (gateway.gatewayName === 'stripeID') {
+                            svg = ' sprite-fm-uni icon-ideal';
                         }
                     }
 
@@ -2699,17 +2705,18 @@ pro.propay = {
 
         const sortValues = {
             'stripe': 1,
-            'ecp': 1.1,
-            'stripeAP': 2,
-            'stripeGP': 3,
-            'astropay': 4,
-            'voucher': 7,
-            'bitcoin': 8,
+            'ecp': 1.1,     // Stripe and ecp are mutually exclusive
+            'stripeID': 2,
+            'stripeAP': 3,
+            'stripeGP': 4,
+            'astropay': 5,
+            'voucher': 8,
+            'bitcoin': 9,
         };
 
         // TODO: Add VALUE for each gateway id
         const primaryGatewayIds = new Set([0, 4, 11, 16, 19]);
-        const primaryStripe = new Set(['stripe', 'stripeAP', 'stripeGP',]);
+        const primaryStripe = new Set(['stripe', 'stripeAP', 'stripeGP', 'stripeID',]);
 
         for (let i = 0; i < tempGatewayOptions.length; i++) {
             const gateway = tempGatewayOptions[i];
@@ -2907,6 +2914,7 @@ pro.propay = {
         pro.propay.pageChangeHandler = mBroadcaster.addListener('pagechange', () => {
             if (!pro.propay.onPropayPage()) {
                 pro.propay.hideLoadingOverlay();
+                delete window.s4ac;
                 mBroadcaster.removeListener(pro.propay.pageChangeHandler);
                 delete pro.propay.pageChangeHandler;
             }
@@ -2935,6 +2943,7 @@ pro.propay = {
                 .toggleClass('euro', this.planObj.currency === 'EUR')
                 .toggleClass('flexi', isFlexi)
                 .toggleClass('mobile-device', !!is_mobile)
+                .toggleClass('ar', mega.ipcc === 'AR')
                 .toggleClass('s4', !!(window.s4ac && isFlexi));
 
             this.trial = this.planObj.trial;
@@ -3487,5 +3496,6 @@ lazy(pro.propay, 'warningStrings', () => {
         voucher: l.voucher_only_one_off,
         monthlyOnly: l.payment_monthly_only,
         yearlyOnly: l.payment_yearly_only,
+        astropayOneOff: l.astropay_one_off,
     };
 });

@@ -114,7 +114,7 @@
   left: 0;
   width: 100%;
   height: 64px;
-  transition: opacity 500ms ease-in-out, top 500ms ease-in-out;
+  transition: opacity 500ms ease-in-out, top 500ms ease-in-out, width 200ms ease-in-out;
   z-index: 13;
 }
 .stream-head-content {
@@ -1608,6 +1608,7 @@ body.theme-dark .lhp-container .lhp-filter-tag {
   height: 100%;
   background: #222;
   z-index: 120;
+  transition: width 200ms ease-in-out;
   /**
   * Sidebar controls
    */
@@ -1863,6 +1864,7 @@ body.theme-dark .lhp-container .lhp-filter-tag {
 }
 .meetings-call .stream .stream-participants-block .participants-container .participants-grid .video-node .avatar-wrapper {
   width: 32px;
+  min-width: 16%;
   height: 32px;
   font: var(--text-body1);
 }
@@ -2206,7 +2208,7 @@ body.theme-dark .lhp-container .lhp-filter-tag {
   padding: 22px 0 14px 0;
   width: 100%;
   text-align: center;
-  transition: opacity 500ms ease-in-out, bottom 500ms ease-in-out;
+  transition: opacity 500ms ease-in-out, bottom 500ms ease-in-out, width 200ms ease-in-out;
   background: #222;
   z-index: 12;
 }

@@ -62,11 +62,17 @@ mega.ui.pm = {
                         mega.ui.topnav.domNode.componentSelector('.add-btn').trigger('click');
                     }
                     else if (action === 'edit' && M.d[target]) {
-                        this.comm.saveLastSelected(target);
-                        mega.ui.contextMenu.domNode.componentSelector('.edit-item').trigger('click');
+                        const item = this.list.passwordList.componentSelector(`#${CSS.escape(target)}`);
+                        if (item) {
+                            return item.trigger('click.selectItem')
+                                .then(() => {
+                                    this.contextMenu.domNode.componentSelector('.edit-item').trigger('click');
+                                });
+                        }
                     }
                 }
-            });
+            })
+                .catch(tell);
         }
 
         if (navigator.onLine) {
@@ -96,7 +102,7 @@ mega.ui.pm = {
 
         // Check if the info panel exists and close it if it is open
         if (mega.ui.mInfoPanel) {
-            mega.ui.mInfoPanel.closeIfOpen();
+            mega.ui.mInfoPanel.hide();
         }
     },
 
@@ -402,5 +408,7 @@ mega.ui.pm = {
         componentClassname: 'menu-container context-menu',
         wrapperClassname: 'menu'
     }));
+
+    lazy(mega.ui.pm, 'contextMenu', () => new MegaContextMenu());
 
 })(window.mega);

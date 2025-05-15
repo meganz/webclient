@@ -234,19 +234,7 @@ class MegaNavCard extends MegaComponent {
         else if (this.isSync || this.isBackup) {
             const { status } = this.node;
             if (status.priority > 0 && status.priority <= mega.devices.utils.StatusUI.folderHandlers.length) {
-                const {error, disabled, updating, success} = mega.devices.utils.folderStatusPriority;
-                let statusName = {
-                    [error]: 'error',
-                    [disabled]: 'clear',
-                    [updating]: 'updating',
-                    [success]: 'success',
-                }[status.priority] || 'status-unknown';
-                if (statusName === 'clear' && status.disabledSyncs) {
-                    statusName = 'warning';
-                }
-                else if (statusName === 'error' && (status.stoppedSyncs || status.offlineSyncs)) {
-                    statusName = 'clear';
-                }
+                const statusName = mega.devices.utils.StatusUI.statusClass(status, this.isSync, this.isBackup);
                 const itemNode = this.domNode.querySelector('.fm-item-badge');
                 itemNode.textContent = '';
                 itemNode.classList.add('dc-badge-status', statusName);
@@ -262,13 +250,7 @@ class MegaNavCard extends MegaComponent {
         }
         else if (this.isDevice) {
             const { status } = this.node;
-            const {error, disabled, updating, success} = mega.devices.utils.folderStatusPriority;
-            let statusName = {
-                [error]: 'attention',
-                [disabled]: 'attention',
-                [updating]: 'updating',
-                [success]: 'success',
-            }[status.priority] || 'status-unknown';
+            const statusName = mega.devices.utils.StatusUI.statusClass(status, false, false, this.isDevice);
             const itemNode = this.domNode.querySelector('.fm-item-badge');
             itemNode.textContent = '';
             itemNode.classList.add('dc-badge-status', statusName);
@@ -332,64 +314,6 @@ lazy(mega.ui, 'secondaryNav', () => {
     if ($.hasWebKitDirectorySupport === undefined) {
         $.hasWebKitDirectorySupport = 'webkitdirectory' in document.createElement('input');
     }
-
-    const newMenu = document.createElement('div');
-    newMenu.className = 'fm-new-items-dropdown';
-    MegaButton.factory({
-        parentNode: newMenu,
-        type: 'fullwidth',
-        componentClassname: 'text-icon',
-        icon: 'sprite-fm-mono icon-file-upload-thin-outline',
-        text: l[99],
-        onClick: () => {
-            eventlog(500011);
-            $.doStraightUpload = true;
-            document.querySelector('#fileselect1').click();
-        }
-    });
-    MegaButton.factory({
-        parentNode: newMenu,
-        type: 'fullwidth',
-        componentClassname: `text-icon ${$.hasWebKitDirectorySupport ? '' : 'hidden'}`,
-        icon: 'sprite-fm-mono icon-folder-arrow-01-thin-outline',
-        text: l[98],
-        onClick: () => {
-            eventlog(500009);
-            $.doStraightUpload = true;
-            document.querySelector('#fileselect2').click();
-        }
-    });
-    newMenu.appendChild(document.createElement('hr'));
-    MegaButton.factory({
-        parentNode: newMenu,
-        type: 'fullwidth',
-        componentClassname: 'text-icon',
-        icon: 'sprite-fm-mono icon-folder-plus-thin-outline',
-        text: l[68],
-        onClick: () => {
-            if (M.isInvalidUserStatus()) {
-                return;
-            }
-
-            eventlog(500007);
-
-            createFolderDialog();
-        }
-    });
-    MegaButton.factory({
-        parentNode: newMenu,
-        type: 'fullwidth',
-        componentClassname: 'text-icon',
-        icon: 'sprite-fm-mono icon-file-plus-01-thin-outline',
-        text: l[23047],
-        onClick: () => {
-            if (M.isInvalidUserStatus()) {
-                return;
-            }
-            createFileDialog();
-            eventlog(500722);
-        }
-    });
 
     const downloadMenu = document.createElement('div');
     downloadMenu.className = 'fm-download-dropdown';
@@ -561,7 +485,6 @@ lazy(mega.ui, 'secondaryNav', () => {
             return this.domNode.querySelector('.fm-filter-chips-wrapper');
         },
         openNewMenu(ev) {
-            const target = ev.currentTarget;
             if (
                 M.InboxID &&
                 (M.currentrootid === M.InboxID || M.getNodeRoot(M.currentdirid.split('/').pop()) === M.InboxID)
@@ -569,16 +492,7 @@ lazy(mega.ui, 'secondaryNav', () => {
                 return;
             }
 
-            mega.ui.menu.show({
-                name: 'fm-new-items',
-                classList: ['fm-new-items-menu', 'fm-thin-dropdown'],
-                event: ev,
-                eventTarget: target,
-                contents: [newMenu],
-                onClose: () => {
-                    target.removeClass('active');
-                }
-            });
+            M.contextMenuUI(ev, 8, ['.fileupload-item', '.folderupload-item', '.newfolder-item', '.newfile-item']);
             eventlog(500721);
         },
         openDownloadMenu(ev) {
@@ -619,7 +533,6 @@ lazy(mega.ui, 'secondaryNav', () => {
                     ev.currentTarget.domNode.classList.add('cloud-drive');
                 }
 
-                ev.originalEvent.delegateTarget = ev.currentTarget.domNode;
                 M.contextMenuUI(ev.originalEvent, 1);
                 ev.currentTarget.domNode.classList.add('active');
                 ev.currentTarget.domNode.classList.remove('cloud-drive');
@@ -690,6 +603,22 @@ lazy(mega.ui, 'secondaryNav', () => {
                 // onContextMenu,
             });
         },
+        updateCard(handle) {
+            if (!this.cardComponent) {
+                return;
+            }
+            const { node, isSharedRoot } = this.cardComponent;
+            if (node.h === handle) {
+                this.cardComponent.update();
+                return;
+            }
+            if (handle.length === 11) {
+                if (!isSharedRoot || node.su !== handle) {
+                    return;
+                }
+                this.cardComponent.update();
+            }
+        },
         hideCard() {
             if (this.cardComponent) {
                 this.cardComponent.destroy();
@@ -710,19 +639,12 @@ lazy(mega.ui, 'secondaryNav', () => {
                     ev.stopPropagation();
                     $.hideContextMenu();
                     if (mega.ui.mInfoPanel.isOpen()) {
-                        mega.ui.mInfoPanel.closeIfOpen();
+                        mega.ui.mInfoPanel.hide();
                         eventlog(500727);
                         return;
                     }
-                    const id = M.currentdirid.split('/').pop();
-                    if (id) {
-                        $.selected = [id];
-                        mega.ui.mInfoPanel.initInfoPanel();
-                        if (window.selectionManager && selectionManager.selected_list.length) {
-                            $.selected = selectionManager.selected_list;
-                        }
-                        eventlog(500727);
-                    }
+                    mega.ui.mInfoPanel.show($.selected);
+                    eventlog(500727);
                 });
             }
             this.infoButton.classList[show ? 'remove' : 'add']('hidden');

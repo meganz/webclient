@@ -161,7 +161,6 @@ lazy(T.ui, 'viewFilesLayout', () => {
             if (!this.data.xi.pw) {
                 this.preload(xh).catch(dump);
             }
-            MediaInfoLib.getMediaCodecsList().catch(dump);
         },
 
         async pollZipDownload(xh, elm) {
@@ -216,6 +215,7 @@ lazy(T.ui, 'viewFilesLayout', () => {
         */
         async renderReadyToDownload(xh) {
             if (!this.readyToDownload.cn) {
+                MediaInfoLib.getMediaCodecsList().catch(dump);
                 await this.initReadyToDownload(xh);
             }
             const { cn } = this.readyToDownload;

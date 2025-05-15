@@ -381,13 +381,6 @@
                     $('input', $fileAndFolderUploadWrap).remove();
                     $fileAndFolderUploadWrap.safeAppend(html);
 
-                    $('input#fileselect3').remove();
-                    $('.files-menu .fileupload-item')
-                        .after('<input type="file" id="fileselect3" class="hidden" name="fileselect3" multiple="">');
-                    $('input#fileselect4').remove();
-                    $('.files-menu .folderupload-item').after('<input type="file" id="fileselect4"' +
-                        ' name="fileselect4" webkitdirectory="" multiple="" class="hidden">');
-
                     InitFileDrag();
                 }
             });

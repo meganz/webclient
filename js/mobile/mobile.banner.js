@@ -417,7 +417,7 @@ class MegaMobileBanner extends MegaComponent {
     set collapsed(collapse) {
         this._collapsed = collapse;
         this.xButton.icon =
-            `sprite-mobile-fm-mono ${collapse ? 'icon-arrow-down-thin-solid' : 'icon-arrow-up-thin-solid'}`;
+            `sprite-fm-mono ${collapse ? 'icon-arrow-down-thin-solid' : 'icon-arrow-up-thin-solid'}`;
         const textNode = this.domNode.querySelector('.message-text');
         if (collapse) {
             textNode.classList.add('hidden');

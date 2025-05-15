@@ -37,15 +37,7 @@ function startMega() {
 
     jsl = [];
     mBroadcaster.sendMessage('startMega');
-
-    if (is_mobile) {
-        mBroadcaster.sendMessage('startMega:mobile');
-        mBroadcaster.removeListeners('startMega:desktop');
-    }
-    else {
-        mBroadcaster.sendMessage('startMega:desktop');
-        mBroadcaster.removeListeners('startMega:mobile');
-    }
+    mBroadcaster.sendMessage('startMega:desktop');
 
     if (self.silent_loading) {
         queueMicrotask(silent_loading);
@@ -373,7 +365,7 @@ mBroadcaster.once('boot_done', () => {
     self.bytesToSize = (v) => {
         const u = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
         const c = Math.floor(Math.log(parseInt(v) || 0) / Math.log(1024));
-        return c < 1 ? `0 ${u[0]}` : `${(v / Math.pow(1024, Math.floor(c))).toFixed(2)} ${u[c]}`;
+        return c < 0 ? `0 ${u[0]}` : `${(v / Math.pow(1024, Math.floor(c))).toFixed(!!c && 2)} ${u[c]}`;
     };
     self.bytesToSpeed = (...a) => String(l[23062]).replace('[%s]', bytesToSize(...a));
 

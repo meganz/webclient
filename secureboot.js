@@ -2266,6 +2266,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/ui/components/sharednode.js', n: 'sharednode_js', j: 1, w:1});
     jsl.push({f:'js/ui/components/contactnode.js', n: 'contactnode_js', j: 1, w:1});
     jsl.push({f:'js/ui/components/megaInput.js', n: 'megainput_js', j: 1, w: 1});
+    jsl.push({f:'js/ui/components/textarea.js', n: 'textarea_js', j: 1, w: 1});
     jsl.push({f:'js/ui/components/menu.js', n: 'menu_js', j: 1, w:1});
     jsl.push({f:'js/ui/components/stepper.js', n: 'stepper_js', j: 1, w:1});
     jsl.push({f:'js/ui/components/onboarding-journey.js', n: 'onboarding_journey_js', j:1,w:1});
@@ -2320,6 +2321,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/fm/selectionManager2.js', n: 'fm_selectionmanager2_js', j:1, w:1});
         jsl.push({f:'js/fm.js', n: 'fm_js', j:1, w:12});
         jsl.push({f:'js/ui/components/meganz/fm-secondary-nav.js', n: 'fm_secondary_nav_js', j: 1, w: 1});
+        jsl.push({f:'js/ui/components/meganz/fm-context-menu.js', n: 'fm_context_menu_js', j: 1, w: 1});
         jsl.push({f:'js/fm/dashboard.js', n: 'fmdashboard_js', j:1, w:5});
         jsl.push({f:'js/fm/recents.js', n: 'fmrecents_js', j:1, w:5});
         jsl.push({f:'js/time_checker.js', n: 'time_checker_js', j:1});
@@ -2396,7 +2398,7 @@ else if (!browserUpdate) {
         jsl.push({f:'html/fm.html', n: 'fm', j:0, w:3});
         jsl.push({f:'html/top-login.html', n: 'top-login', j:0});
         jsl.push({f:'html/dialogs.html', n: 'dialogs', j:0,w:2});
-        jsl.push({f:'images/mega/contact-avatar.svg', n: 'contact_avatar', j:0});
+        jsl.push({f:'html/contact-avatar.svg', n: 'contact_avatar', j:0});
         jsl.push({f:'html/rewind.html', n: 'rewind', j:0});
         jsl.push({f:'html/device-centre-shimmer.html', n: 'device_centre_shimmer_html', j:0});
         jsl.push({f:'css/topbar.css', n: 'topbar_css', j:2,w:5});
@@ -2417,6 +2419,7 @@ else if (!browserUpdate) {
         jsl.push({f:'css/components/tabgroup.css', n: 'tabgroup_css', j:2,w:5});
         jsl.push({f:'js/ui/components/chatitem.js', n: 'chatitem_js', j: 1, w:1});
         jsl.push({f:'css/components/chatitem.css', n: 'chatitem_css', j:2,w:5});
+        jsl.push({f:'css/components/meganz/fm-context-menu.css', n: 'fm_context_menu_css', j:2,w:5});
     } // !is_mobile
 
     // do not change the order...
@@ -2476,6 +2479,7 @@ else if (!browserUpdate) {
     jsl.push({f:'css/components/onboarding-journey.css', n: 'onboarding_journey_css', j:2, w:30, c:1, d:1, cache:1});
     jsl.push({f:'css/components/card.css', n: 'card_css', j:2, w:30, c:1, d:1, cache:1});
     jsl.push({f:'css/components/radial.css', n: 'radial_css', j:2, w:30, c:1, d:1, cache:1});
+    jsl.push({f:'css/components/textarea.css', n: 'comp_textarea_css', j:2, w:1});
 
     // Load files common to all mobile pages
     if (is_mobile) {

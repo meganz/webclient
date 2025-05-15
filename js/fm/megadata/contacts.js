@@ -199,6 +199,9 @@ MegaData.prototype.syncUsersFullname = async function(userId, chatHandle) {
         }
         else if (M.currentrootid === 'shares') {
             $(`.shared-details-info-block .${userId} ~> .fm-chat-user`).text(`${userName} <${user.m}>`);
+            if (mega.ui.secondaryNav) {
+                mega.ui.secondaryNav.updateCard(userId);
+            }
         }
     }
 

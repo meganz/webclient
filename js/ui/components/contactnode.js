@@ -7,7 +7,7 @@ class MegaContactNode extends MegaNodeComponent {
         this.removeClass('folder', 'file');
 
         const avatar = document.createElement('div');
-        avatar.className = `avatar ${options.smallAvatar ? 'small' : ''}`;
+        avatar.className = `avatar ${options.smallAvatar ? 'size-24' : ''}`;
         this.iconNode.parentNode.replaceChild(avatar, this.iconNode);
         this.iconNode = avatar;
         MegaNodeComponent.mAvatarNode(this.handle, this.iconNode);

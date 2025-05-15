@@ -920,6 +920,7 @@ lazy(mega.gallery, 'albums', () => {
             }
         }
     }
+    SelectionManager2Base.SUB_CLASSES.AlbumsSelectionManager = AlbumsSelectionManager;
 
     class DownloadContextMenu extends MMenuSelect {
         constructor(albumId) {
@@ -2428,139 +2429,6 @@ lazy(mega.gallery, 'albums', () => {
         }
     }
 
-    class MultipleAlbumsContextMenu extends MMenuSelect {
-        constructor(domCells) {
-            super();
-
-            const options = [];
-            const albums = [];
-            let somePredefined = false;
-            let someContainNodes = false;
-            let sharedCount = 0;
-            let allShared = true;
-
-            for (let i = 0; i < domCells.length; i++) {
-                const { album } = domCells[i];
-
-                if (!somePredefined && album.filterFn) {
-                    somePredefined = true;
-                }
-
-                if (!someContainNodes && album.nodes.length > 0) {
-                    someContainNodes = true;
-                }
-
-                if (album.p) {
-                    sharedCount++;
-                }
-
-                if (allShared && !album.p) {
-                    allShared = false;
-                }
-
-                albums.push(album);
-            }
-
-            if (!somePredefined) {
-                if (allShared) {
-                    options.push(
-                        {
-                            label: l[17520],
-                            icon: 'link',
-                            click: () => {
-                                if (M.isInvalidUserStatus()) {
-                                    return;
-                                }
-
-                                const albumIds = [];
-
-                                for (let i = 0; i < albums.length; i++) {
-                                    const { p, id } = albums[i];
-
-                                    if (p) {
-                                        albumIds.push(id);
-                                    }
-                                }
-
-                                const dialog = new AlbumShareDialog(albumIds);
-                                dialog.show();
-                            }
-                        }
-                    );
-                }
-                else {
-                    options.push({
-                        label: mega.icu.format(l.album_share_link, albums.length),
-                        icon: 'link',
-                        click: () => {
-                            if (M.isInvalidUserStatus()) {
-                                return;
-                            }
-
-                            scope.albums.addShare(albums.map(({ id }) => id));
-                        }
-                    });
-                }
-
-                if (sharedCount) {
-                    options.push({
-                        label: (sharedCount > 1) ? l[8735] : l[6821],
-                        icon: 'link-remove',
-                        click: () => {
-                            if (M.isInvalidUserStatus()) {
-                                return;
-                            }
-
-                            const albumIds = [];
-
-                            for (let i = 0; i < albums.length; i++) {
-                                const { p, id } = albums[i];
-
-                                if (p) {
-                                    albumIds.push(id);
-                                }
-                            }
-
-                            if (albumIds.length) {
-                                removeShareWithConfirmation(albumIds);
-                            }
-                        }
-                    });
-                }
-
-                if (someContainNodes) {
-                    options.push({});
-                }
-            }
-
-            if (someContainNodes) {
-                options.push(generateDownloadMenuItem(albums.map(({ id }) => id)));
-            }
-
-            if (!somePredefined) {
-                options.push(
-                    {},
-                    {
-                        label: l.delete_album,
-                        click: () => {
-                            if (M.isInvalidUserStatus()) {
-                                return;
-                            }
-
-                            const dialog = new RemoveAlbumDialog(albums.map(({ id }) => id));
-                            dialog.show();
-                            this.hide();
-                        },
-                        icon: 'bin',
-                        classes: ['red']
-                    }
-                );
-            }
-
-            this.options = options;
-        }
-    }
-
     class AlbumOptionsContextMenu extends MMenuSelect {
         constructor(options, parentButton) {
             super();
@@ -2571,182 +2439,6 @@ lazy(mega.gallery, 'albums', () => {
         hide(hideSiblings) {
             super.hide(hideSiblings);
             this.parentButton.classList.remove('active');
-        }
-    }
-
-    class AlbumContextMenu extends MMenuSelect {
-        constructor(albumId) {
-            super();
-
-            const options = [];
-            const { nodes, p, filterFn } = scope.albums.store[albumId];
-            const isUserAlbum = !filterFn;
-
-            if (scope.nodesAllowSlideshow(nodes)) {
-                options.push({
-                    label: l.album_play_slideshow,
-                    icon: 'play-square',
-                    click: () => {
-                        if (M.isInvalidUserStatus()) {
-                            return;
-                        }
-
-                        if (scope.albums.grid && scope.albums.grid.timeline) {
-                            scope.albums.grid.timeline.clearSiblingSelections();
-                        }
-
-                        $.selected = [];
-                        scope.playSlideshow(albumId, true);
-                    }
-                });
-            }
-
-            if (M.currentdirid !== `albums/${albumId}`) {
-                options.push(
-                    {
-                        label: l.album_open,
-                        icon: 'preview-reveal',
-                        click: () => {
-                            M.openFolder(`albums/${albumId}`);
-                        }
-                    }
-                );
-            }
-
-            if (isUserAlbum) {
-                if (M.v.length) {
-                    options.push(
-                        {},
-                        {
-                            label: l.add_album_items,
-                            icon: 'add',
-                            click: () => {
-                                if (M.isInvalidUserStatus()) {
-                                    return;
-                                }
-
-                                const dialog = new AlbumItemsDialog(albumId);
-                                dialog.show();
-                            }
-                        },
-                        {}
-                    );
-                }
-
-                if (p) {
-                    options.push(
-                        {
-                            label: l[6909],
-                            icon: 'link',
-                            click: () => {
-                                if (M.isInvalidUserStatus()) {
-                                    return;
-                                }
-
-                                // The share has changed already, ignoring
-                                if (!scope.albums.store[albumId].p) {
-                                    return;
-                                }
-
-                                const dialog = new AlbumShareDialog([albumId]);
-                                dialog.show();
-                            }
-                        },
-                        {
-                            label: l[6821],
-                            icon: 'link-remove',
-                            click: () => {
-                                removeShareWithConfirmation([albumId]);
-                            }
-                        }
-                    );
-                }
-                else {
-                    options.push({
-                        label: mega.icu.format(l.album_share_link, 1),
-                        icon: 'link',
-                        click: () => {
-                            if (M.isInvalidUserStatus()) {
-                                return;
-                            }
-
-                            // The share has changed already, ignoring
-                            if (scope.albums.store[albumId].p) {
-                                return;
-                            }
-
-                            scope.albums.addShare([albumId]);
-                        }
-                    });
-                }
-
-                options.push({});
-
-                if (nodes.length) {
-                    options.push(
-                        generateDownloadMenuItem([albumId]),
-                        {
-                            label: l.set_album_cover,
-                            icon: 'images',
-                            click: () => {
-                                if (M.isInvalidUserStatus()) {
-                                    return;
-                                }
-
-                                const dialog = new AlbumCoverDialog(albumId);
-                                dialog.show();
-                            }
-                        }
-                    );
-                }
-
-                options.push(
-                    {
-                        label: l.rename_album,
-                        click: () => {
-                            if (M.isInvalidUserStatus()) {
-                                return;
-                            }
-
-                            const dialog = new AlbumNameDialog(albumId);
-                            dialog.show();
-                        },
-                        icon: 'rename'
-                    },
-                    {},
-                    {
-                        label: l.delete_album,
-                        click: () => {
-                            if (M.isInvalidUserStatus()) {
-                                return;
-                            }
-
-                            const dialog = new RemoveAlbumDialog([albumId]);
-                            dialog.show();
-                            this.hide();
-                        },
-                        icon: 'bin',
-                        classes: ['red']
-                    }
-                );
-            }
-            else {
-                options.push(
-                    {},
-                    generateDownloadMenuItem([albumId])
-                );
-            }
-
-            this.options = options;
-
-            this.unsubscribeFromShare = mega.sets.subscribe('ass', 'albumsShare', () => {
-                this.hide();
-            });
-        }
-
-        hide() {
-            this.unsubscribeFromShare();
-            super.hide();
         }
     }
 
@@ -2805,19 +2497,66 @@ lazy(mega.gallery, 'albums', () => {
 
             this.attachEvent(
                 'contextmenu',
-                ({ pageX, pageY }) => {
+                (ev) => {
                     if (!$.dialog) {
                         this.selectCell(!this.el.classList.contains('ui-selected'));
 
                         const selectedCells = this.el.parentNode.querySelectorAll('.ui-selected');
 
-                        const contextMenu = (selectedCells.length > 1)
-                            ? new MultipleAlbumsContextMenu(selectedCells)
-                            : new AlbumContextMenu(albumId);
+                        const selectedItems = [];
 
-                        if (contextMenu.options) {
-                            contextMenu.show(pageX, pageY);
+                        const downloadItems = () => {
+                            if (isMSync()) {
+                                selectedItems.push('.download-item');
+                            }
+                            else {
+                                selectedItems.push('.zipdownload-item', '.download-standart-item');
+                            }
+                        };
+                        if (selectedCells.length > 1) {
+                            let somePredefined = false;
+                            let someContainNodes = false;
+
+                            for (let i = 0; i < selectedCells.length; i++) {
+                                const { album } = selectedCells[i];
+
+                                somePredefined = somePredefined || !!album.filterFn;
+                                someContainNodes = someContainNodes || album.nodes.length > 0;
+                                if (somePredefined && someContainNodes) {
+                                    break;
+                                }
+                            }
+
+                            if (!somePredefined) {
+                                selectedItems.push('.getlink-item', '.delete-album');
+                            }
+
+                            if (someContainNodes) {
+                                downloadItems();
+                            }
                         }
+                        else {
+                            const { nodes, filterFn } = scope.albums.store[albumId];
+
+                            if (M.currentdirid !== `albums/${albumId}`) {
+                                selectedItems.push('.open-item');
+                            }
+                            if (filterFn) {
+                                downloadItems();
+                            }
+                            else {
+                                if (M.v.length) {
+                                    selectedItems.push('.album-add-items');
+                                }
+                                if (nodes.length) {
+                                    downloadItems();
+                                }
+                                selectedItems.push('.getlink-item', '.rename-item', '.delete-album');
+                            }
+                        }
+
+                        M.contextMenuUI(ev, 8, selectedItems.join(','));
+                        ev.stopPropagation();
                     }
                 }
             );
@@ -2916,11 +2655,14 @@ lazy(mega.gallery, 'albums', () => {
             if (clearSiblingSelections) {
                 AlbumCell.clearSiblingSelections(this.el);
             }
+            selectionManager.add_to_selection(this.el.album.id);
+            $.hideContextMenu();
         }
 
         deselectCell() {
             if (this.el.classList.contains('ui-selected')) {
                 this.el.classList.remove('ui-selected');
+                selectionManager.remove_from_selection(this.el.album.id);
             }
         }
 
@@ -3023,6 +2765,7 @@ lazy(mega.gallery, 'albums', () => {
             for (let i = 0; i < albums.length; i++) {
                 if (albums[i].cellEl && (!ignoreEl || albums[i].cellEl.el !== ignoreEl)) {
                     albums[i].cellEl.el.classList.remove('ui-selected');
+                    selectionManager.remove_from_selection(albums[i].id);
                 }
             }
         }
@@ -3309,6 +3052,13 @@ lazy(mega.gallery, 'albums', () => {
             mega.gallery.setTabs(1);
 
             parent.appendChild(this.el);
+            if (!this.ctxListener) {
+                this.ctxListener = ev => {
+                    M.contextMenuUI(ev, 2);
+                };
+                parent.addEventListener('contextmenu', this.ctxListener);
+            }
+
         }
 
         setPendingCell(label) {
@@ -3880,7 +3630,7 @@ lazy(mega.gallery, 'albums', () => {
             this.initLayout();
 
             // Close info panel when visiting album
-            mega.ui.mInfoPanel.closeIfOpen();
+            mega.ui.mInfoPanel.hide();
             $('#media-section-controls, #media-tabs', '.fm-right-files-block').removeClass('hidden');
             $('.gallery-tabs-bl', '.fm-right-files-block').addClass('hidden');
 
@@ -3916,6 +3666,10 @@ lazy(mega.gallery, 'albums', () => {
             if (timeline) {
                 timeline.clear();
                 delete this.timeline;
+            }
+            if (this.ctxListener) {
+                document.getElementById('albums-view').removeEventListener('contextmenu', this.ctxListener);
+                delete this.ctxListener;
             }
         }
 
@@ -4079,9 +3833,15 @@ lazy(mega.gallery, 'albums', () => {
                             }
                         }, 100);
                     }
+                    else if (M.isAlbumsPage(2) && id === mega.ui.secondaryNav.cardComponent.handle) {
+                        mega.ui.secondaryNav.cardComponent.update();
+                    }
                 }),
                 mega.sets.subscribe('asr', 'albums', ({ id }) => {
                     this.removeAlbumFromGrid(id);
+                    if (M.isAlbumsPage(1) && $.selected.includes(id)) {
+                        selectionManager.remove_from_selection(id);
+                    }
 
                     if (M.currentdirid === 'albums/' + id) {
                         if (this.grid.emptyBlock) {
@@ -5107,6 +4867,39 @@ lazy(mega.gallery, 'albums', () => {
 
             const dialog = new AddToAlbumDialog(handles, selections);
             dialog.show();
+        }
+
+        openDialog(className, ...args) {
+            let dialog;
+            switch (className) {
+                case 'AlbumNameDialog': {
+                    dialog = new AlbumNameDialog(...args);
+                    break;
+                }
+                case 'AlbumItemsDialog': {
+                    dialog = new AlbumItemsDialog(...args);
+                    break;
+                }
+                case 'RemoveAlbumDialog': {
+                    dialog = new RemoveAlbumDialog(...args);
+                    break;
+                }
+                case 'AlbumShareDialog': {
+                    dialog = new AlbumShareDialog(...args);
+                    break;
+                }
+                case 'RemoveShareDialog': {
+                    return removeShareWithConfirmation(...args);
+                }
+                default: {
+                    if (d) {
+                        console.warn('Unsupported dialog', className);
+                    }
+                }
+            }
+            if (dialog) {
+                dialog.show();
+            }
         }
     }
 

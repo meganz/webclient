@@ -543,14 +543,7 @@ lazy(s4, 'keys', () => {
         unbindEvents() {
             super.unbindEvents();
 
-            const dd = '.dropdown.body.context .dropdown-item';
             this.$tableData.unbind('contextmenu.s4klst');
-            $(`${dd}.s4-key-enable`).unbind('click.s4klst.ctxm.enable');
-            $(`${dd}.s4-key-disable`).unbind('click.s4klst.ctxm.disable');
-            $(`${dd}.s4-key-download`).unbind('click.s4klst.ctxm.download');
-            $(`${dd}.s4-key-copy-config`).unbind('click.s4klst.ctxm.copykeyconfig');
-            $(`${dd}.s4-key-rename`).unbind('click.s4klst.ctxm.rename');
-            $(`${dd}.s4-key-delete`).unbind('click.s4klst.ctxm.delete');
             $('button.copy', this.$tableData).unbind('click.s4klst.copykey');
             $('button.toggle-vis', this.$tableData).unbind('click.s4klst.reveal');
         }
@@ -558,7 +551,6 @@ lazy(s4, 'keys', () => {
         bindEvents() {
             super.bindEvents();
 
-            const dd = '.dropdown.body.context .dropdown-item';
             this.$tableData.rebind('contextmenu.s4klst', (e) => {
                 this.handleSelection(e, (key) => {
                     M.contextMenuUI(e, 8, [
@@ -571,36 +563,73 @@ lazy(s4, 'keys', () => {
                 });
             });
 
-            $(`${dd}.s4-key-enable`).rebind('click.s4klst.ctxm.enable', () => {
-                handlers.enable(true);
-            });
-
-            $(`${dd}.s4-key-disable`).rebind('click.s4klst.ctxm.disable', () => {
-                handlers.enable(false);
-            });
-
-            $(`${dd}.s4-key-download`).rebind('click.s4klst.ctxm.download', () => {
-                handlers.download();
-            });
-
-            $(`${dd}.s4-key-copy-config`).rebind('click.s4klst.ctxm.copykeyconfig', () => {
-                handlers.copyKeyConfig();
-            });
-
-            $(`${dd}.s4-key-rename`).rebind('click.s4klst.ctxm.rename', () => {
-                handlers.rename();
-            });
-
-            $(`${dd}.s4-key-delete`).rebind('click.s4klst.ctxm.delete', () => {
-                handlers.remove();
-            });
-
             $('button.copy', this.$tableData).rebind('click.s4klst.copykey', e => {
                 handlers.copyKey(e);
             });
 
             $('button.toggle-vis', this.$tableData).rebind('click.s4klst.reveal', e => {
                 handlers.toggleVis(e);
+            });
+
+            mega.ui.contextMenu.addOption({
+                sectionId: 'primary',
+                position: 'download-item',
+                buttonId: 's4-key-enable',
+                text: l.s4_key_enable,
+                icon: 'sprite-fm-mono icon-check-circle-thin-outline',
+                onClick() {
+                    handlers.enable(true);
+                }
+            });
+            mega.ui.contextMenu.addOption({
+                sectionId: 'primary',
+                position: 'download-item',
+                buttonId: 's4-key-disable',
+                text: l.s4_key_disable,
+                icon: 'sprite-fm-mono icon-minus-circle-thin-outline',
+                onClick() {
+                    handlers.enable(false);
+                }
+            });
+            mega.ui.contextMenu.addOption({
+                sectionId: 'primary',
+                submenuItem: 'download-item',
+                position: 'firstchild',
+                buttonId: 's4-key-download',
+                text: l[58],
+                icon: 'sprite-fm-mono icon-arrow-down-circle-thin-outline',
+                onClick() {
+                    handlers.download();
+                }
+            });
+            mega.ui.contextMenu.addOption({
+                sectionId: 'manipulate',
+                position: 'revert-item',
+                buttonId: 's4-key-copy-config',
+                text: l[63],
+                icon: 'sprite-fm-mono icon-copy-thin-outline',
+                onClick() {
+                    handlers.copyKeyConfig();
+                }
+            });
+            mega.ui.contextMenu.addOption({
+                sectionId: 'inforename',
+                buttonId: 's4-key-rename',
+                text: l[61],
+                icon: 'sprite-fm-mono icon-edit-03-thin-outline',
+                onClick() {
+                    handlers.rename();
+                }
+            });
+            mega.ui.contextMenu.addOption({
+                sectionId: 'delete',
+                position: 'delete-album',
+                buttonId: 's4-key-delete',
+                text: l[1730],
+                icon: 'sprite-fm-mono icon-trash-thin-outline',
+                onClick() {
+                    handlers.remove();
+                }
             });
         }
     }

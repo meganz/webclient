@@ -3620,18 +3620,22 @@ span.orange {
     left: 100%;
     right: auto;
 }
-.dropdown.body.submenu.left-position {
+.dropdown.body.submenu.left-position,
+.fm-context-menu .context-submenu.left-position {
     left: auto;
     right: 100%;
 }
-.rtl .dropdown.body.submenu.right-position {
+.rtl .dropdown.body.submenu.right-position,
+.rtl .fm-context-menu .context-submenu.right-position {
     left: 100%;
     right: auto;
 }
-.dropdown.body.submenu.overlap-right {
+.dropdown.body.submenu.overlap-right,
+.fm-context-menu .context-submenu.overlap-right {
     right: auto;
 }
-.dropdown.body.submenu.overlap-left {
+.dropdown.body.submenu.overlap-left,
+.fm-context-menu .context-submenu.overlap-left {
     left: auto;
 }
 .context-top-arrow, .context-bottom-arrow {
@@ -3670,7 +3674,8 @@ span.orange {
     display: block;
 }
 .dropdown.body.submenu.mega-height > .context-scrolling-block,
-.dropdown.files-menu.mega-height > .context-scrolling-block {
+.dropdown.files-menu.mega-height > .context-scrolling-block,
+.fm-context-menu.mega-height > .context-scrolling-block {
     height: 100%;
     overflow: hidden;
     margin: 0 -8px;

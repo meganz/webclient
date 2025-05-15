@@ -258,5 +258,22 @@ mega.fileTextEditor = new function FileTextEditor() {
             delete filesDataMap[handle];
         }
     };
+
+    this.openTextHandle = (nodeHandle) => {
+        if ($.dialog === 'properties') {
+            propertiesDialog(true);
+        }
+
+        loadingDialog.show('common', l[23130]);
+
+        this.getFile(nodeHandle)
+            .then((data) => {
+                return mega.textEditorUI.setupEditor(M.getNameByHandle(nodeHandle), data, nodeHandle);
+            })
+            .catch(tell)
+            .finally(() => {
+                loadingDialog.hide();
+            });
+    };
 };
 

@@ -46,9 +46,10 @@ class Select extends React.Component {
     handleMousedown = ({ target }) =>
         this.domRef?.current.contains(target) ? null : this.setState({ expanded: false });
 
-    handleToggle = ({ target }) => {
-        const menuRef = this.menuRef && this.menuRef.current;
+    handleToggle = ({ target } = {}) => {
+        const menuRef = this.menuRef?.current;
         const menuElement = menuRef.domRef?.current;
+
         if (target !== menuElement) {
             const { value } = this.props;
             this.setState(state => ({ expanded: !state.expanded }), () => {

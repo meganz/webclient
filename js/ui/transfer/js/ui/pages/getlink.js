@@ -403,6 +403,7 @@ lazy(T.ui, 'addFilesLayout', () => {
 
             await dbfetch.coll(sel); // @todo the coll() usage in getCopyNodes() is bogus?!..
             const lst = await M.getCopyNodes(sel);
+            const sn = !prev.size && sel.length === 1 && M.getNodeByHandle(sel[0]);
 
             for (let i = lst.length; i--;) {
                 const n = M.getNodeByHandle(lst[i].h);
@@ -438,7 +439,7 @@ lazy(T.ui, 'addFilesLayout', () => {
 
                 while (parents[h]) {
                     const n = M.getNodeByHandle(h);
-                    if (n.name) {
+                    if (n.name && (parents[n.p] || n.name !== sn.name)) {
                         p.push(n.name);
                     }
                     h = n.p;
@@ -454,6 +455,7 @@ lazy(T.ui, 'addFilesLayout', () => {
             }
             this.appendAddedFiles(lst);
             this.data.ko = array.extend(this.data.ko, await prom, false);
+            this.data.sn = sn;
 
             return this.renderUploadList();
         },
@@ -853,6 +855,10 @@ lazy(T.ui, 'addFilesLayout', () => {
             domSize.textContent = '';
             domUploaded.textContent = '';
             domTick.classList.add('hidden');
+
+            if (this.data.sn && (!name || name === l.transferit_multiple_files)) {
+                name = this.data.sn.name;
+            }
 
             T.core.upload(files, name)
                 .then((res) => {

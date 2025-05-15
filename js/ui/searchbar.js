@@ -323,7 +323,7 @@ lazy(mega.ui, 'searchbar', () => {
             e.preventDefault();
 
             // Close node Info panel as not applicable after searching
-            mega.ui.mInfoPanel.closeIfOpen();
+            mega.ui.mInfoPanel.hide();
 
             var val = $.trim($('.js-filesearcher', this).val());
 
@@ -941,7 +941,7 @@ lazy(mega.ui, 'searchbar', () => {
             }
             else if (is_text(n)) {
                 $.selected = [h];
-                $('.dropdown.body.context .dropdown-item.edit-file-item').trigger('click');
+                mega.fileTextEditor.openTextHandle(h);
             }
             else {
                 // Non previewable file should proceed to download

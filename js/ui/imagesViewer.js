@@ -1225,7 +1225,7 @@ var slideshowid;
                 }
                 history.back();
                 if (mega.ui.mInfoPanel) {
-                    mega.ui.mInfoPanel.closeIfOpen();
+                    mega.ui.mInfoPanel.hide();
                 }
                 return false;
             });
@@ -1244,8 +1244,7 @@ var slideshowid;
             $('.context-menu .info, .v-btn.info', $overlay).rebind('click.media-viewer', () => {
                 $document.fullScreen(false);
                 // Use original ID to render info from chats
-                $.selected = [id];
-                mega.ui.mInfoPanel.initInfoPanel();
+                mega.ui.mInfoPanel.show([id]);
                 return false;
             });
 

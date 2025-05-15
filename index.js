@@ -2686,7 +2686,7 @@ function topmenuUI() {
 
                 // Close node Info panel as not applicable after switching pages
                 if (mega.ui.mInfoPanel) {
-                    mega.ui.mInfoPanel.closeIfOpen();
+                    mega.ui.mInfoPanel.hide();
                 }
 
                 var subpage;
@@ -3064,8 +3064,8 @@ function loadSubPage(tpage, event) {
         mega.textEditorUI.doClose();
     }
 
-    if (window.versiondialogid) {
-        fileversioning.closeFileVersioningDialog(window.versiondialogid);
+    if (window.fileversioning && fileversioning.isOpen) {
+        fileversioning.closeFileVersioningDialog();
     }
 
     if (event && Object(event.state).view) {

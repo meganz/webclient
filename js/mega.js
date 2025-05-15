@@ -1545,12 +1545,7 @@ scparser.$add('d', function(a) {
     }
     if (!is_mobile) {
         if (fileDeletion && !a.v) {// this is a deletion of file.
-            if (M.d[topVersion]) {
-                fileversioning.updateFileVersioningDialog(topVersion);
-            }
-            else {
-                fileversioning.closeFileVersioningDialog(a.n);
-            }
+            fileversioning.updateFileVersioningDialog(M.d[topVersion] ? topVersion : a.n);
         }
     }
 
@@ -1941,7 +1936,7 @@ scparser.$finalize = async() => {
 
     // Update Info panel UI
     if (!is_mobile) {
-        delay('infoPanel', mega.ui.mInfoPanel.reRenderIfVisible.bind(mega.ui.mInfoPanel, $.selected));
+        mega.ui.mInfoPanel.smartEventuallyUpdate();
     }
 
     if (scsharesuiupd) {
@@ -2116,13 +2111,6 @@ function fm_updated(n) {
         newnodes.push(n);
         if (M.megaRender) {
             M.megaRender.revokeDOMNode(n.h, true);
-        }
-        if (
-            mega.ui.secondaryNav &&
-            mega.ui.secondaryNav.cardComponent &&
-            mega.ui.secondaryNav.cardComponent.handle === n.h
-        ) {
-            mega.ui.secondaryNav.cardComponent.update();
         }
         M.updFileManagerUI().catch(dump);
     }

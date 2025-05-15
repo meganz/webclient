@@ -360,12 +360,12 @@ body:not(.loading) #mainlayout {
     overflow-x: hidden;
     overflow-y: hidden;
 }
-#startholder {
+body:not(.mobile) #startholder {
     display: grid;
     grid-template-columns: auto 0;
     transition: 200ms linear;
 }
-#startholder.flyout-expanded {
+body:not(.mobile) #startholder.flyout-expanded {
     grid-template-columns: auto var(--flyout-width);
 }
 .fmholder .bottom-page.scroll-block {

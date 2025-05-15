@@ -1457,6 +1457,9 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
                 if (albums.grid) {
                     albums.grid.header.update(scope.getAlbumIdFromPath(), Object.keys(this.selections));
                 }
+                if (mega.ui.mInfoPanel) {
+                    mega.ui.mInfoPanel.reRenderIfVisible(Object.keys(this.selections));
+                }
             }, 100);
         }
 

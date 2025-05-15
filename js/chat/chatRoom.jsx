@@ -1364,6 +1364,10 @@ ChatRoom.prototype.show = function() {
         // do not wait for ConversationsListItem to set the active class..
         tmp.classList.add('active');
     }
+
+    if (mega.ui.mInfoPanel) {
+        mega.ui.mInfoPanel.hide();
+    }
 };
 
 ChatRoom.prototype.scrollToChat = function() {

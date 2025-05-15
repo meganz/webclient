@@ -24,7 +24,7 @@ class MegaChatItem extends MegaComponent {
         iconWrap.className = 'mobile fm-item-img';
         if (this.chatRoom.type === 'private') {
             this.iconNode = document.createElement('div');
-            this.iconNode.classList.add('avatar', 'small');
+            this.iconNode.classList.add('avatar', 'size-24');
             if (this.chatRoom.isNote) {
                 this.iconNode.classList.add('note-chat-signifier');
                 if (!this.chatRoom.hasMessages()) {

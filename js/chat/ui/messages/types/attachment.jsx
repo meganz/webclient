@@ -61,7 +61,7 @@ export default class Attachment extends AbstractGenericMessage {
                             disabled={mega.paywall}
                             onClick={(e) => {
                                 // Close node Info panel as not applicable after doing Preview
-                                mega.ui.mInfoPanel.closeIfOpen();
+                                mega.ui.mInfoPanel.hide();
 
                                 this.props.onPreviewStart(v, e);
                             }}
@@ -139,8 +139,7 @@ export default class Attachment extends AbstractGenericMessage {
                                         label={l[6859] /* `Info` */}
                                         key="infoDialog"
                                         onClick={() => {
-                                            $.selected = [v.ch];
-                                            mega.ui.mInfoPanel.initInfoPanel();
+                                            mega.ui.mInfoPanel.show([v.ch]);
                                         }}
                                     />
                                 );
@@ -259,7 +258,7 @@ export default class Attachment extends AbstractGenericMessage {
                         if (isPreviewable && !target.classList.contains('tiny-button')) {
 
                             // Close node Info panel as not applicable after doing Preview
-                            mega.ui.mInfoPanel.closeIfOpen();
+                            mega.ui.mInfoPanel.hide();
 
                             this.props.onPreviewStart(v);
                         }
@@ -279,7 +278,7 @@ export default class Attachment extends AbstractGenericMessage {
                     thumbClass += " image";
                     thumbOverlay = <div className="thumb-overlay" onClick={() => {
                         // Close node Info panel as it's not applicable when clicking to open Preview
-                        mega.ui.mInfoPanel.closeIfOpen();
+                        mega.ui.mInfoPanel.hide();
 
                         this.props.onPreviewStart(v);
                     }} />;
@@ -295,7 +294,7 @@ export default class Attachment extends AbstractGenericMessage {
                                 if (isPreviewable) {
 
                                     // Close node Info panel as it's not applicable when clicking to open Preview
-                                    mega.ui.mInfoPanel.closeIfOpen();
+                                    mega.ui.mInfoPanel.hide();
 
                                     this.props.onPreviewStart(v);
                                 }

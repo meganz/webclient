@@ -364,7 +364,37 @@ lazy(mega.devices, 'utils', () => {
                     : 'StatusUI: No status provided'
                 );
             };
-        }
+        },
+
+        statusClass(status, isSync, isBackup, isDevice) {
+            const {error, disabled, updating, success} = folderStatusPriority;
+            if (isSync || isBackup) {
+                if (status.priority > 0 && status.priority <= this.folderHandlers.length) {
+                    let statusName = {
+                        [error]: 'error',
+                        [disabled]: 'clear',
+                        [updating]: 'updating',
+                        [success]: 'success',
+                    }[status.priority] || 'status-unknown';
+                    if (statusName === 'clear' && status.disabledSyncs) {
+                        statusName = 'warning';
+                    }
+                    else if (statusName === 'error' && (status.stoppedSyncs || status.offlineSyncs)) {
+                        statusName = 'clear';
+                    }
+                    return statusName;
+                }
+            }
+            else if (isDevice) {
+                return {
+                    [error]: 'attention',
+                    [disabled]: 'attention',
+                    [updating]: 'updating',
+                    [success]: 'success',
+                }[status.priority] || 'status-unknown';
+            }
+            return 'hidden';
+        },
     };
 
     return freeze({

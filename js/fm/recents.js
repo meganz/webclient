@@ -934,7 +934,7 @@ RecentsRender.prototype._renderMedia = function($newRow, action, actionId) {
                 $.hideContextMenu();
 
                 // Close node Info panel as it's not applicable when opening Preview
-                mega.ui.mInfoPanel.closeIfOpen();
+                mega.ui.mInfoPanel.hide();
 
                 // mega.ui.searchbar.recentlyOpened.addFile(node.h, false);
                 slideshow(node.h);

@@ -190,6 +190,17 @@ class MegaComponent extends MegaDataEmitter {
         }
     }
 
+    getSubNode(className, type) {
+        let subNode = this.domNode.querySelector(`.${className}`);
+        if (subNode) {
+            return subNode;
+        }
+        subNode = document.createElement(type || 'div');
+        subNode.className = className;
+        this.domNode.appendChild(subNode);
+        return subNode;
+    }
+
     destroy() {
 
         if (typeof this[MegaDataEmitter.expando] === 'object') {

@@ -349,6 +349,11 @@ class MegaNodeComponent extends MegaComponent {
                 }
                 domNode.appendChild(presence);
             }
+
+            if (options.simpletip && avatarMeta.fullName) {
+                domNode.dataset.simpletip = avatarMeta.fullName;
+                domNode.classList.add('simpletip');
+            }
         });
     }
 

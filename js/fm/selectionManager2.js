@@ -162,7 +162,7 @@ class SelectionManager2Base {
         }
 
         // If info panel is open change its attributes by current selected node
-        mega.ui.mInfoPanel.reRenderIfVisible($.selected);
+        mega.ui.mInfoPanel.eventuallyUpdateSelected();
 
         return nodeId;
     }
@@ -314,7 +314,7 @@ class SelectionManager2Base {
                     }
 
                     // Rerender if info panel is visible when selecting node via shorcut
-                    mega.ui.mInfoPanel.reRenderIfVisible($.selected);
+                    mega.ui.mInfoPanel.eventuallyUpdateSelected();
                 }
             }
         }
@@ -623,7 +623,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
 
                     // Close node Info panel as nothing selected
                     if (this.selected_list.length === 0) {
-                        mega.ui.mInfoPanel.closeIfOpen();
+                        mega.ui.mInfoPanel.hide();
                     }
                 }
             });
@@ -644,7 +644,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
                     !e.target.classList.contains('ps__rail-y')) {
 
                     // Close node Info panel as nothing selected
-                    mega.ui.mInfoPanel.closeIfOpen();
+                    mega.ui.mInfoPanel.hide();
 
                     this.clear_selection();
                 }
@@ -865,7 +865,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             this.updateSelectionNotification();
         }
 
-        mega.ui.mInfoPanel.reRenderIfVisible($.selected);
+        mega.ui.mInfoPanel.eventuallyUpdateSelected();
 
         if (M.gallery && mega.gallery[M.currentdirid]) {
             mega.gallery[M.currentdirid].enableGroupChecks();

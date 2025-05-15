@@ -489,7 +489,7 @@
             }
 
             // Close node Info panel as not needed immediately after opening Preview
-            mega.ui.mInfoPanel.closeIfOpen();
+            mega.ui.mInfoPanel.hide();
             closeDialog();
             if (video) {
                 $.autoplay = mega.ui.contextMenu.selectedItems[0];
@@ -952,15 +952,7 @@
                 text: l[6859],
                 icon: 'sprite-fm-mono icon-info-thin-outline',
                 onClick() {
-                    if (!$.selected.length && mega.ui.contextMenu.selectedItems.length) {
-                        // Context menu detected selection not in $.selected. Apply temporarily
-                        $.selected = mega.ui.contextMenu.selectedItems;
-                    }
-                    mega.ui.mInfoPanel.initInfoPanel().finally(() => {
-                        if (selectionManager && selectionManager.selected_list !== $.selected) {
-                            $.selected = selectionManager.selected_list;
-                        }
-                    });
+                    mega.ui.mInfoPanel.show(mega.ui.contextMenu.selectedItems);
 
                     M.fmEventLog(500683);
                 }

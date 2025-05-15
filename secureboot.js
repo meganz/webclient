@@ -2266,6 +2266,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/ui/components/sharednode.js', n: 'sharednode_js', j: 1, w:1});
     jsl.push({f:'js/ui/components/contactnode.js', n: 'contactnode_js', j: 1, w:1});
     jsl.push({f:'js/ui/components/megaInput.js', n: 'megainput_js', j: 1, w: 1});
+    jsl.push({f:'js/ui/components/textarea.js', n: 'textarea_js', j: 1, w: 1});
     jsl.push({f:'js/ui/components/menu.js', n: 'menu_js', j: 1, w:1});
     jsl.push({f:'js/ui/components/stepper.js', n: 'stepper_js', j: 1, w:1});
     jsl.push({f:'js/ui/components/onboarding-journey.js', n: 'onboarding_journey_js', j:1,w:1});
@@ -2478,6 +2479,7 @@ else if (!browserUpdate) {
     jsl.push({f:'css/components/onboarding-journey.css', n: 'onboarding_journey_css', j:2, w:30, c:1, d:1, cache:1});
     jsl.push({f:'css/components/card.css', n: 'card_css', j:2, w:30, c:1, d:1, cache:1});
     jsl.push({f:'css/components/radial.css', n: 'radial_css', j:2, w:30, c:1, d:1, cache:1});
+    jsl.push({f:'css/components/textarea.css', n: 'comp_textarea_css', j:2, w:1});
 
     // Load files common to all mobile pages
     if (is_mobile) {

@@ -2345,24 +2345,81 @@ i.account-icon.menu {
     background-position: -136px -7008px;
 }
 
-/* Double icons with 2x 90 icon */
+/* Double files icon with 2x 90 new mime icon */
 body .item-type-icon-90.double {
     background-position: calc(var(--icon-size) / -14) calc(var(--icon-size) / 16);
     background-color: inherit;
     overflow: hidden;
 }
 body.rtl .item-type-icon-90.double {
-    background-position: calc(var(--icon-size) / 14) calc(var(--icon-size) / 16);
+    background-position-x: calc(var(--icon-size) / 14);
 }
 body .item-type-icon-90.double .item-type-icon-90 {
     background-color: inherit;
     background-position: calc(var(--icon-size) / -8) calc(var(--icon-size) / 12);
-    border-radius: calc(var(--icon-size) / 12);
+    border-radius: calc(var(--icon-size) / 11);
     left: calc(var(--icon-size) / 5);
     top: calc(var(--icon-size) / -6);
+    position: absolute;
 }
 body.rtl .item-type-icon-90.double .item-type-icon-90 {
     right: calc(var(--icon-size) / 5);
     left: auto;
-    background-position: calc(var(--icon-size) / 8) calc(var(--icon-size) / 12);
+    background-position-x: calc(var(--icon-size) / 8);
+}
+
+/* Triple files icon with 3x 90 new mime icon */
+body .item-type-icon-90.triple {
+    background-position: calc(var(--icon-size) / -12) calc(var(--icon-size) / 48 * 3.5);
+    background-color: inherit;
+    overflow: hidden;
+}
+body.rtl .item-type-icon-90.triple {
+    background-position: calc(var(--icon-size) / 12) calc(var(--icon-size) / 48 * 3.5);
+}
+body .item-type-icon-90.triple .item-type-icon-90 {
+    background-color: inherit;
+    background-position: calc(var(--icon-size) / -7.5) calc(var(--icon-size) / 48 * 4.5);
+    border-radius: calc(var(--icon-size) / 48 * 4.5);
+    position: absolute;
+}
+body.rtl .item-type-icon-90.triple .item-type-icon-90 {
+    background-position-x: calc(var(--icon-size) / 7.5);
+}
+body .item-type-icon-90.triple .item-type-icon-90.middle {
+    left: calc(var(--icon-size) / 48 * 6);
+    top: calc(var(--icon-size) / -48 * 4.5);
+}
+body.rtl .item-type-icon-90.triple .item-type-icon-90.middle {
+    left: auto;
+    right: calc(var(--icon-size) / 48 * 6);
+    z-index: 1;
+}
+body .item-type-icon-90.triple .item-type-icon-90.front {
+    left: calc(var(--icon-size) / 48 * 10);
+    top: calc(var(--icon-size) / -6);
+    z-index: 2;
+}
+body.rtl .item-type-icon-90.triple .item-type-icon-90.front {
+    left: auto;
+    right: calc(var(--icon-size) / 48 * 10);
+}
+
+/* Double folder icon with 2x 90 new mime icon */
+body .item-type-icon-90.icon-folder-90.double {
+    background-position: calc(var(--icon-size) / -16) calc(var(--icon-size) / 16);
+}
+body.rtl .item-type-icon-90.icon-folder-90.double {
+    background-position-x: calc(var(--icon-size) / 16);
+}
+body .item-type-icon-90.icon-folder-90.double .item-type-icon-90.icon-folder-90 {
+    background-position: calc(var(--icon-size) / -12) calc(var(--icon-size) / 8);
+    border-radius: calc(var(--icon-size) / 11);
+    left: calc(var(--icon-size) / 7);
+    top: calc(var(--icon-size) / -6);
+}
+body.rtl .item-type-icon-90.icon-folder-90.double .item-type-icon-90.icon-folder-90 {
+    right: calc(var(--icon-size) / 7);
+    left: auto;
+    background-position-x: calc(var(--icon-size) / 12);
 }

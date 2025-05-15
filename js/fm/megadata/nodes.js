@@ -1455,6 +1455,11 @@ MegaData.prototype.safeMoveNodes = async function safeMoveNodes(target, nodes) {
         }
     }
 
+    if (copy.length | move.length && target === this.RubbishID) {
+        // always revoke any sharing status recursively across the affected nodes
+        promises.push(this.revokeShares(nodes, -0xBEEF));
+    }
+
     if (copy.length) {
         console.debug('Performing %s copy+del operations...', copy.length);
         promises.push(M.copyNodes(copy, target, true));
@@ -1688,14 +1693,7 @@ MegaData.prototype.moveToRubbish = async function(handles) {
         console.time(`moveToRubbish.${tag}`);
     }
 
-    const pending = this.collectNodes(handles);
-    if (pending) {
-        await pending;
-    }
-    // @todo revoke + move in batched-mode.
-
-    // always revoke any sharing status recursively across the affected nodes
-    return Promise.all([this.revokeShares(handles), this.safeMoveNodes(this.RubbishID, handles)])
+    return this.safeMoveNodes(this.RubbishID, handles)
         .finally(() => {
             if (d) {
                 console.timeEnd(`moveToRubbish.${tag}`);
@@ -1707,9 +1705,10 @@ MegaData.prototype.moveToRubbish = async function(handles) {
 /**
  * Stop sharing nodes recursively across provided handles.
  * @param {String|Array} handles The root node handle(s) to stop sharing
+ * @param {*} [light] magic indicating nodes are already on memory.
  * @returns {Promise}
  */
-MegaData.prototype.revokeShares = async function(handles) {
+MegaData.prototype.revokeShares = async function(handles, light) {
     'use strict';
 
     if (M.isInvalidUserStatus()) {
@@ -1720,9 +1719,11 @@ MegaData.prototype.revokeShares = async function(handles) {
         console.group('revokeShares for %s nodes...', handles.length, handles);
     }
 
-    const pending = this.collectNodes(handles);
-    if (pending) {
-        await pending;
+    if (light !== -0xBEEF) {
+        const pending = this.collectNodes(handles);
+        if (pending) {
+            await pending;
+        }
     }
 
     const links = [];
@@ -2665,7 +2666,7 @@ MegaData.prototype.collectNodes = function(handles, targets, recurse) {
         const h = handles[i];
         const n = this.getNodeByHandle(h);
 
-        if (n && (!n.t || M.c[h])) {
+        if (n && !n.t) {
             handles.splice(i, 1);
         }
     }
@@ -2689,39 +2690,52 @@ MegaData.prototype.collectNodes = function(handles, targets, recurse) {
  * FIXME: return total number of nodes omitted because of decryption issues
  *
  * @param {Array}           handles Node handles
- * @param {Array|String}    [target] destination folder for the copy-operation.
+ * @param {Object|String}    [target] destination folder for the copy-operation, or an options object.
  * @param {Object|Function} [names] Object containing handle:name to perform renaming over these nodes,
  *                                  or a function returning a promise which will be fulfilled with them.
  * @returns {Promise}
  */
 MegaData.prototype.getCopyNodes = async function(handles, target, names) {
     'use strict';
-    await this.collectNodes(handles, target, target !== this.RubbishID);
-    const res = typeof names === 'function' ? await names(handles) : {handles, names};
+    const options = {handles, names};
+    if (typeof target === 'object') {
+        Object.assign(options, target);
+        target = null;
+    }
+    target = options.target || target;
 
-    return this.getCopyNodesSync(res.handles, res.names, res.parents);
+    await this.collectNodes(handles, target, target !== this.RubbishID);
+    Object.assign(options, typeof options.names === 'function' && await options.names(handles));
+
+    return this.getCopyNodesSync(options);
 };
 
 /**
  * Get all clean (decrypted) subtrees under cn
  * FIXME: return total number of nodes omitted because of decryption issues
  *
- * @param {Array} handles An array of node's handles
- * @param {Object} [names] Object containing handle:name to perform renaming over these nodes
- * @returns {Array}
+ * @param {Array} blk.handles An array of node's handles
+ * @param {Object} [blk.names] Object containing handle:name to perform renaming over these nodes
+ * @private
  */
-MegaData.prototype.getCopyNodesSync = function fm_getcopynodesync(handles, names, presevedParents) {
+MegaData.prototype.getCopyNodesSync = function(blk) {
+    'use strict';
     let tree = [];
     let opSize = 0;
     const res = [];
+    const pick = (n) => blk[n] || !1;
+    const names = pick('names');
+    const handles = pick('handles');
+    const parents = pick('parents');
+    const clearna = pick('clearna');
 
     // add all subtrees under handles[], including the roots
     for (let i = 0; i < handles.length; i++) {
         var tempR = this.getNodesSync(handles[i], true, true);
-        if (presevedParents && presevedParents[handles[i]]) {
+        if (parents[handles[i]]) {
             for (var kh = 0; kh < tempR.length; kh++) {
-                if (!presevedParents[tempR[kh]]) {
-                    presevedParents[tempR[kh]] = presevedParents[handles[i]];
+                if (!parents[tempR[kh]]) {
+                    parents[tempR[kh]] = parents[handles[i]];
                 }
             }
         }
@@ -2732,9 +2746,7 @@ MegaData.prototype.getCopyNodesSync = function fm_getcopynodesync(handles, names
         const n = {...this.getNodeByHandle(tree[i])};
 
         if (!n.h) {
-            if (d) {
-                console.warn('Node not found', tree[i]);
-            }
+            console.warn('Node not found', tree[i]);
             continue;
         }
 
@@ -2748,12 +2760,12 @@ MegaData.prototype.getCopyNodesSync = function fm_getcopynodesync(handles, names
         }
 
         // check if renaming should be done
-        if (names && names[n.h] && names[n.h] !== n.name) {
+        if (names[n.h] && names[n.h] !== n.name) {
             n.name = M.getSafeName(names[n.h]);
         }
 
         // check it need to clear node attribute
-        if ($.clearCopyNodeAttr) {
+        if (clearna) {
             delete n.s4;
             delete n.lbl;
             delete n.fav;
@@ -2776,8 +2788,8 @@ MegaData.prototype.getCopyNodesSync = function fm_getcopynodesync(handles, names
         nn.p = n.p;
         nn.t = n.t;
 
-        if (presevedParents && presevedParents[n.h]) {
-            nn.newTarget = presevedParents[n.h];
+        if (parents[n.h]) {
+            nn.newTarget = parents[n.h];
         }
 
         // remove parent unless child
@@ -4589,9 +4601,7 @@ MegaData.prototype.importFolderLinkNodes = function importFolderLinkNodes(nodes)
             })();
 
             // It is import so need to clear existing attribute for new node.
-            $.clearCopyNodeAttr = true;
-
-            return M.getCopyNodes(sel)
+            return M.getCopyNodes(sel, {clearna: true})
                 .then((nodes) => {
                     var data = [sel, nodes, nodes.opSize];
                     var fallback = function() {
@@ -4627,8 +4637,6 @@ MegaData.prototype.importFolderLinkNodes = function importFolderLinkNodes(nodes)
             if (ex) {
                 tell(ex);
             }
-        }).finally(() => {
-            delete $.clearCopyNodeAttr;
         });
     }
 };

@@ -562,6 +562,9 @@ lazy(mega.ui, 'mInfoPanel', () => {
                 root = mega.devices.rootId;
                 pathItems = path;
             }
+            else if (nr === 's4') {
+                pathItems.pop();
+            }
             pathItems.shift();
             if (
                 nr === 'shares' ||

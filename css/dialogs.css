@@ -2050,6 +2050,8 @@ body.de .mega-dialog.contact-picker-widget {
     }
     .mega-sheet.export-links-dialog .it-banner {
         bottom: calc(100% + 56px);
+        padding-top: 32px;
+        padding-bottom: 32px;
     }
     .mega-sheet.export-links-dialog .it-banner::after {
         content: "";
@@ -2061,6 +2063,11 @@ body.de .mega-dialog.contact-picker-widget {
         border-left: 11px solid transparent;
         border-right: 11px solid transparent;
         border-top: 14px solid var(--mobile-brand-it);
+    }
+    .mega-sheet.export-links-dialog .it-banner button.close {
+        position: absolute;
+        top: 6px;
+        right: 6px;
     }
     .export-links-settings-dialog input.set-date {
         cursor: pointer;

@@ -1542,7 +1542,7 @@ function logExportEvt(evtId, data) {
                                 : sheet.headerTitleNode
                         );
 
-                        if (mega.xferit) {
+                        if (mega.xferit && (fmconfig.noItBanner || 0) < Date.now()) {
                             const header = sheet.overlayNode.querySelector('.header');
                             const title = mCreateElement('div', { class: 'font-title-h3' });
                             const txt = mCreateElement('div', { class: 'font-body-1' });
@@ -1571,6 +1571,19 @@ function logExportEvt(evtId, data) {
                                 type: 'button'
                             }).on('click.pro', () => {
                                 M.openTransferItOverlay($.selected).catch(tell);
+                                sheet.trigger('close');
+                            });
+
+                            MegaButton.factory({
+                                parentNode: itBanner,
+                                icon: 'sprite-fm-mono icon-dialog-close icon-size-20',
+                                componentClassname: 'theme-dark-forced text-icon close',
+                                type: 'icon'
+                            }).on('click.close', () => {
+                                sheet.overlayNode.classList.remove('has-it-banner');
+                                itBanner.classList.add('hidden');
+                                // Show it again after a week
+                                mega.config.set('noItBanner', Date.now() + 1000 * 60 * 60 * 24 * 7);
                             });
 
                             sheet.overlayNode.classList.add('has-it-banner');

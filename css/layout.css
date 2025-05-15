@@ -36,12 +36,22 @@
 
 .pm-main {
     display: grid;
-    grid-template-columns: auto 1fr;
+    grid-template-columns: auto 1fr 0;
     grid-template-rows: auto auto 1fr auto;
     align-content: start;
     height: 100%;
     overflow-x: hidden;
     background-color: var(--mobile-page-background);
+    transition: 200ms linear;
+}
+.pm-main.flyout-expanded {
+    grid-template-columns: auto 1fr var(--flyout-width);
+}
+
+@media only screen and (max-width: 1200px) {
+    .pm-main.flyout-expanded {
+        grid-template-columns: auto 1fr 0;
+    }
 }
 
 .pm-main .banner-rack {
@@ -99,4 +109,11 @@ body.pwm-ui .pm-main .mega-header {
 body.rtl.pwm-ui .pm-main > :not(.password-wrapper),
 body.rtl.pwm-ui .pm-main > .password-wrapper > * {
    direction: rtl;
+}
+
+/* Handle flyout shown in floating view. */
+@media only screen and (max-width: 1200px) {
+    .pm-main > section {
+        grid-column: 2 / 4;
+    }
 }

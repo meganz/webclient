@@ -681,7 +681,7 @@ export default class Call extends MegaRenderMixin {
             window.toaster.main.hideAll();
         };
         // Close node info panel when open
-        mega.ui.mInfoPanel.closeIfOpen();
+        mega.ui.mInfoPanel.hide();
 
         return (
             peers.length > 0 || presenterStreams.has(u_handle) ?
@@ -711,7 +711,7 @@ export default class Call extends MegaRenderMixin {
 
     handleCallExpand = async() => {
         // Close node info panel when open
-        mega.ui.mInfoPanel.closeIfOpen();
+        mega.ui.mInfoPanel.hide();
 
         return new Promise((resolve) => {
             this.setState({ ...Call.STATE.PREVIOUS }, () => {
@@ -912,7 +912,7 @@ export default class Call extends MegaRenderMixin {
 
     handleCallEnd = () => {
         // Close node info panel when open
-        mega.ui.mInfoPanel.closeIfOpen();
+        mega.ui.mInfoPanel.hide();
         this.props.call?.destroy(SfuClient.TermCode.kUserHangup);
     };
 

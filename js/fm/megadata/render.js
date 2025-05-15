@@ -195,7 +195,7 @@ MegaData.prototype.rmSetupUI = function(u, refresh) {
                 }
                 else {
                     // Close Info panel as no longer applicable (they clicked on the parent folder context menu)
-                    mega.ui.mInfoPanel.closeIfOpen();
+                    mega.ui.mInfoPanel.hide();
                     $.hideContextMenu();
 
                     // Set selection to the parent share dir so the context menu can Download/Copy/Info on the parent

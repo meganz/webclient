@@ -1,0 +1,55 @@
+.mega-component.text-area-scroll {
+    align-items: center;
+    background: var(--mobile-page-background);
+    border: 1px solid var(--mobile-border-strong);
+    border-radius: var(--mobile-border-radius-medium);
+    box-sizing: border-box;
+    display: flex;
+    flex-wrap: wrap;
+    max-width: 100%;
+    min-height: 40px;
+    padding: 8px;
+    position: relative;
+    text-align: start;
+    vertical-align: top;
+    width: 100%;
+}
+.mega-component.text-area-scroll textarea:not(:placeholder-shown) {
+    color: var(--mobile-text-primary);
+}
+.mega-component.text-area-scroll.active {
+    border-color: var(--mobile-border-strong-selected);
+}
+.mega-component.text-area-scroll .text-area-height {
+    width: 100%;
+}
+.mega-component.text-area-scroll textarea,
+.mega-component.text-area-scroll .textarea-clone {
+    background: transparent;
+    border: 0;
+    box-sizing: border-box;
+    color: var(--mobile-text-placeholder);
+    display: block;
+    font: var(--mobile-font-input-regular);
+    height: 20px;
+    margin: 0;
+    min-height: 20px;
+    overflow: hidden;
+    padding: 0;
+    white-space: pre-wrap;
+    width: calc(100% - 14px);
+    word-wrap: break-word;
+}
+.mega-component.text-area-scroll textarea::placeholder {
+    font: var(--mobile-font-input-regular);
+    color: var(--mobile-text-placeholder);
+    -webkit-opacity: 1;
+}
+.mega-component.text-area-scroll .textarea-clone {
+    height: auto;
+    opacity: 0;
+    position: absolute;
+    top: 0;
+    visibility: hidden;
+    width: calc(100% - 30px);
+}

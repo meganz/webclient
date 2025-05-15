@@ -234,19 +234,7 @@ class MegaNavCard extends MegaComponent {
         else if (this.isSync || this.isBackup) {
             const { status } = this.node;
             if (status.priority > 0 && status.priority <= mega.devices.utils.StatusUI.folderHandlers.length) {
-                const {error, disabled, updating, success} = mega.devices.utils.folderStatusPriority;
-                let statusName = {
-                    [error]: 'error',
-                    [disabled]: 'clear',
-                    [updating]: 'updating',
-                    [success]: 'success',
-                }[status.priority] || 'status-unknown';
-                if (statusName === 'clear' && status.disabledSyncs) {
-                    statusName = 'warning';
-                }
-                else if (statusName === 'error' && (status.stoppedSyncs || status.offlineSyncs)) {
-                    statusName = 'clear';
-                }
+                const statusName = mega.devices.utils.StatusUI.statusClass(status, this.isSync, this.isBackup);
                 const itemNode = this.domNode.querySelector('.fm-item-badge');
                 itemNode.textContent = '';
                 itemNode.classList.add('dc-badge-status', statusName);
@@ -262,13 +250,7 @@ class MegaNavCard extends MegaComponent {
         }
         else if (this.isDevice) {
             const { status } = this.node;
-            const {error, disabled, updating, success} = mega.devices.utils.folderStatusPriority;
-            let statusName = {
-                [error]: 'attention',
-                [disabled]: 'attention',
-                [updating]: 'updating',
-                [success]: 'success',
-            }[status.priority] || 'status-unknown';
+            const statusName = mega.devices.utils.StatusUI.statusClass(status, false, false, this.isDevice);
             const itemNode = this.domNode.querySelector('.fm-item-badge');
             itemNode.textContent = '';
             itemNode.classList.add('dc-badge-status', statusName);
@@ -657,19 +639,12 @@ lazy(mega.ui, 'secondaryNav', () => {
                     ev.stopPropagation();
                     $.hideContextMenu();
                     if (mega.ui.mInfoPanel.isOpen()) {
-                        mega.ui.mInfoPanel.closeIfOpen();
+                        mega.ui.mInfoPanel.hide();
                         eventlog(500727);
                         return;
                     }
-                    const id = M.currentdirid.split('/').pop();
-                    if (id) {
-                        $.selected = [id];
-                        mega.ui.mInfoPanel.initInfoPanel();
-                        if (window.selectionManager && selectionManager.selected_list.length) {
-                            $.selected = selectionManager.selected_list;
-                        }
-                        eventlog(500727);
-                    }
+                    mega.ui.mInfoPanel.show($.selected);
+                    eventlog(500727);
                 });
             }
             this.infoButton.classList[show ? 'remove' : 'add']('hidden');

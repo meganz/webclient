@@ -5,13 +5,15 @@ class MegaInputComponent extends MegaComponent {
 
         this.input = document.createElement('input');
         this.input.className = 'form-element pmText no-title-top clearButton';
-        this.icon = 'sprite-fm-mono icon-search-light-outline left-icon';
-        this.placeholder = l[102];
+        this.icon = `${options.icon || ''} left-icon`;
+        this.placeholder = options.placeholder || '';
         this.disabled = false;
         this.domNode.append(this.input);
 
         this.megaInput = new mega.ui.MegaInputs($(this.input));
-        this.megaInput.$wrapper.addClass('search-bar');
+        if (options.wrapperClasses) {
+            this.megaInput.$wrapper.addClass(options.wrapperClasses);
+        }
         this.megaInput.$input.on('input', () => {
             this.trigger('input', this.megaInput.$input.val());
         });
@@ -39,5 +41,21 @@ class MegaInputComponent extends MegaComponent {
 
     set value(value) {
         this.megaInput.setValue(value);
+    }
+
+    set error(errorMessage) {
+        if (errorMessage) {
+            this.megaInput.showError(errorMessage);
+            return;
+        }
+        this.megaInput.hideError();
+    }
+
+    blur() {
+        this.input.blur();
+    }
+
+    focus() {
+        this.input.focus();
     }
 }

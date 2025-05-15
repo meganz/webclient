@@ -1637,6 +1637,7 @@ td.verification .contact-item {
 .profile-shared-folders table.grid-table th.name,
 .profile-shared-folders table.shared-with-me td.name {
     width: 39%;
+    max-width: 39%;
 }
 .profile-shared-folders table.grid-table th.access,
 .profile-shared-folders table.shared-with-me td.access {
@@ -1672,6 +1673,7 @@ td.verification .contact-item {
 .profile-shared-folders table.shared-with-me td.grid-url-header-nw {
     float: right;
     width: 100px;
+    max-width: 10%;
     margin-inline-end: 20px;
     text-align: end;
 }

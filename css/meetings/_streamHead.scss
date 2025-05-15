@@ -10,7 +10,7 @@
     left: 0;
     width: 100%;
     height: 64px;
-    transition: opacity 500ms ease-in-out, top 500ms ease-in-out;
+    transition: opacity 500ms ease-in-out, top 500ms ease-in-out, width 200ms ease-in-out;
     z-index: 13;
 
     &-content {

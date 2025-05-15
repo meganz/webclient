@@ -96,20 +96,25 @@ MegaData.prototype.buildSubMenu = function(id) {
     M.disableCircularTargets('#fi_');
 };
 
-MegaData.prototype.getSelectedSourceRoot = function(isSearch, isTree) {
+MegaData.prototype.getNodeSourceRoot = function(h, isSearch, isTree) {
     'use strict';
 
     let sourceRoot = isTree || isSearch || M.currentdirid === 'recents'
         || M.currentdirid === 'public-links' || M.currentdirid === 'out-shares'
         || M.onDeviceCenter
             && mega.devices.ui.getRenderSection() === 'cloud-drive'
-        ? M.getNodeRoot($.selected[0]) : M.currentrootid;
+        ? M.getNodeRoot(h) : M.currentrootid;
 
     if (sourceRoot === 'file-requests') {
         sourceRoot = M.RootID;
     }
 
     return sourceRoot;
+};
+MegaData.prototype.getSelectedSourceRoot = function(isSearch, isTree) {
+    'use strict';
+
+    return this.getNodeSourceRoot($.selected[0], isSearch, isTree);
 };
 
 MegaData.prototype.checkSendToChat = function(isSearch, sourceRoot) {

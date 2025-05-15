@@ -128,7 +128,7 @@ lazy(mega, 'rewind', () => {
             setTimeout(() => !finished && loadingDialog.show('rewind-sidebar'), 480);
 
             // Close the new Info panel if it's open as there's no room for 2 side panels
-            mega.ui.mInfoPanel.closeIfOpen();
+            mega.ui.mInfoPanel.hide();
 
             return this._openSidebarStub(...args)
                 .finally(() => {

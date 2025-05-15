@@ -102,7 +102,7 @@ mega.ui.pm = {
 
         // Check if the info panel exists and close it if it is open
         if (mega.ui.mInfoPanel) {
-            mega.ui.mInfoPanel.closeIfOpen();
+            mega.ui.mInfoPanel.hide();
         }
     },
 

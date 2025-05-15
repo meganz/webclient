@@ -314,6 +314,12 @@ Chat.prototype.init = promisify(function(resolve, reject) {
                 return;
             }
 
+            if (is_chatlink) {
+                const start = document.getElementById('startholder');
+                this.flyoutStartHolder = document.createElement('div');
+                this.flyoutStartHolder.className = 'flyout-holder';
+                start.appendChild(this.flyoutStartHolder);
+            }
             const selector = is_chatlink ? '.chat-links-preview > .chat-app-container' : '.section.conversations';
             const rootDOMNode = this.rootDOMNode = document.querySelector(selector);
             const $$root = this.$$root = createRoot(rootDOMNode);
@@ -914,6 +920,11 @@ Chat.prototype.destroy = function(isLogout) {
 
     if (this.minuteClockInterval) {
         clearInterval(this.minuteClockInterval);
+    }
+
+    if (megaChat.flyoutStartHolder && mega.ui.flyout) {
+        mega.ui.flyout.reinit(megaChat.flyoutStartHolder);
+        delete megaChat.flyoutStartHolder;
     }
 };
 

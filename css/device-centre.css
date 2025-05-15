@@ -388,10 +388,6 @@ table.device-centre .device-centre-item-modified {
     margin-left: 16px;
 }
 
-.info-panel-visible .device-centre-header-actions {
-    right: var(--info-panel-space);
-}
-
 .device-centre-header-icon{
     --icon-size: 96px;
 }
@@ -519,14 +515,14 @@ table.device-centre .device-centre-item-modified {
 .device-centre-header .device-centre-item-info .tip-icon,
 .device-centre-grid-view table.device-centre tbody .device-centre-item-info-block .device-centre-item-info .tip-icon,
 .device-centre-item-info .tip-icon {
-    --mask-color: var(--icon-inactive);
+    --mask-color: var(--mobile-icon-secondary);
     transition: var(--transition-color);
 }
 
 .device-centre-header .device-centre-item-info .tip-icon:hover,
 .device-centre-grid-view table.device-centre tbody .device-centre-item-info-block .device-centre-item-info .tip-icon:hover,
 .device-centre-item-info .tip-icon:hover {
-    --mask-color: var(--icon-rest);
+    --mask-color: var(--mobile-icon-primary);
 }
 
 .info-panel-visible.rtl .info-data .device-centre-item-info {

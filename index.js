@@ -2686,7 +2686,7 @@ function topmenuUI() {
 
                 // Close node Info panel as not applicable after switching pages
                 if (mega.ui.mInfoPanel) {
-                    mega.ui.mInfoPanel.closeIfOpen();
+                    mega.ui.mInfoPanel.hide();
                 }
 
                 var subpage;

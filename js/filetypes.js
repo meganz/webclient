@@ -16,7 +16,7 @@ var extensions = {
     'keynote': [['key'], 'Apple Keynote'],
     'mega': [['megaignore'], 'Mega Ignore'],
     'numbers': [['numbers'], 'Apple Numbers'],
-    'openoffice': [['sxw', 'stw', 'sxc', 'stc', 'sxi', 'sti', 'sxd', 'std', 'sxm'], 'OpenOffice'],
+    'open-office': [['sxw', 'stw', 'sxc', 'stc', 'sxi', 'sti', 'sxd', 'std', 'sxm'], 'OpenOffice'],
     'pages': [['pages'], 'Apple Pages'],
     'pdf': [['pdf'], 'PDF'],
     'photoshop': [['abr', 'psb', 'psd'], 'Adobe Photoshop'],

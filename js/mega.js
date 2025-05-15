@@ -1936,7 +1936,7 @@ scparser.$finalize = async() => {
 
     // Update Info panel UI
     if (!is_mobile) {
-        delay('infoPanel', mega.ui.mInfoPanel.reRenderIfVisible.bind(mega.ui.mInfoPanel, $.selected));
+        mega.ui.mInfoPanel.smartEventuallyUpdate();
     }
 
     if (scsharesuiupd) {

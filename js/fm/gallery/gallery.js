@@ -1452,7 +1452,7 @@ class MegaGallery {
                 }
 
                 // Close node Info panel as it's not applicable when opening Preview
-                mega.ui.mInfoPanel.closeIfOpen();
+                mega.ui.mInfoPanel.hide();
 
                 this.inPreview = true;
                 slideshow(h, false);

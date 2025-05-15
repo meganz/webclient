@@ -3630,7 +3630,7 @@ lazy(mega.gallery, 'albums', () => {
             this.initLayout();
 
             // Close info panel when visiting album
-            mega.ui.mInfoPanel.closeIfOpen();
+            mega.ui.mInfoPanel.hide();
             $('#media-section-controls, #media-tabs', '.fm-right-files-block').removeClass('hidden');
             $('.gallery-tabs-bl', '.fm-right-files-block').addClass('hidden');
 

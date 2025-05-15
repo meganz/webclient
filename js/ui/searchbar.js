@@ -323,7 +323,7 @@ lazy(mega.ui, 'searchbar', () => {
             e.preventDefault();
 
             // Close node Info panel as not applicable after searching
-            mega.ui.mInfoPanel.closeIfOpen();
+            mega.ui.mInfoPanel.hide();
 
             var val = $.trim($('.js-filesearcher', this).val());
 

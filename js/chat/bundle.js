@@ -1528,7 +1528,7 @@ class Call extends mixins.w9 {
         onCallMinimize();
         window.toaster.main.hideAll();
       };
-      mega.ui.mInfoPanel.closeIfOpen();
+      mega.ui.mInfoPanel.hide();
       return peers.length > 0 || presenterStreams.has(u_handle) ? this.setState({
         mode: MODE.MINI,
         sidebar: false
@@ -1543,7 +1543,7 @@ class Call extends mixins.w9 {
       })();
     };
     this.handleCallExpand = async () => {
-      mega.ui.mInfoPanel.closeIfOpen();
+      mega.ui.mInfoPanel.hide();
       return new Promise(resolve => {
         this.setState({
           ...Call.STATE.PREVIOUS
@@ -1656,7 +1656,7 @@ class Call extends mixins.w9 {
     };
     this.handleCallEnd = () => {
       let _this$props$call;
-      mega.ui.mInfoPanel.closeIfOpen();
+      mega.ui.mInfoPanel.hide();
       (_this$props$call = this.props.call) == null || _this$props$call.destroy(SfuClient.TermCode.kUserHangup);
     };
     this.handleEphemeralAdd = handle => handle && this.setState(state => ({
@@ -8841,6 +8841,12 @@ Chat.prototype.init = promisify(function (resolve, reject) {
     if (is_mobile) {
       return;
     }
+    if (is_chatlink) {
+      const start = document.getElementById('startholder');
+      this.flyoutStartHolder = document.createElement('div');
+      this.flyoutStartHolder.className = 'flyout-holder';
+      start.appendChild(this.flyoutStartHolder);
+    }
     const selector = is_chatlink ? '.chat-links-preview > .chat-app-container' : '.section.conversations';
     const rootDOMNode = this.rootDOMNode = document.querySelector(selector);
     const $$root = this.$$root = (0,ReactDOM_.createRoot)(rootDOMNode);
@@ -9279,6 +9285,10 @@ Chat.prototype.destroy = function (isLogout) {
   }
   if (this.minuteClockInterval) {
     clearInterval(this.minuteClockInterval);
+  }
+  if (megaChat.flyoutStartHolder && mega.ui.flyout) {
+    mega.ui.flyout.reinit(megaChat.flyoutStartHolder);
+    delete megaChat.flyoutStartHolder;
   }
 };
 Chat.prototype.getContacts = function () {
@@ -16095,7 +16105,7 @@ class Loading extends REaCt().Component {
     if ($.dialog) {
       closeDialog == null || closeDialog();
     }
-    mega.ui.mInfoPanel.closeIfOpen();
+    mega.ui.mInfoPanel.hide();
     (_notify = notify) == null || _notify.closePopup();
     (_alarm = alarm) == null || _alarm.hideAllWarningPopups();
     document.querySelectorAll('.js-dropdown-account').forEach(({
@@ -22507,6 +22517,9 @@ ChatRoom.prototype.show = function () {
   }
   if (tmp = document.getElementById(`conversation_${this.roomId}`)) {
     tmp.classList.add('active');
+  }
+  if (mega.ui.mInfoPanel) {
+    mega.ui.mInfoPanel.hide();
   }
 };
 ChatRoom.prototype.scrollToChat = function () {
@@ -34527,7 +34540,7 @@ class Attachment extends AbstractGenericMessage {
           icon: `sprite-fm-mono ${previewIcon}`,
           disabled: mega.paywall,
           onClick: e => {
-            mega.ui.mInfoPanel.closeIfOpen();
+            mega.ui.mInfoPanel.hide();
             this.props.onPreviewStart(v, e);
           }
         }));
@@ -34592,8 +34605,7 @@ class Attachment extends AbstractGenericMessage {
               label: l[6859],
               key: "infoDialog",
               onClick: () => {
-                $.selected = [v.ch];
-                mega.ui.mInfoPanel.initInfoPanel();
+                mega.ui.mInfoPanel.show([v.ch]);
               }
             }));
             this.props.onAddFavouriteButtons(v.h, firstGroupOfButtons);
@@ -34665,7 +34677,7 @@ class Attachment extends AbstractGenericMessage {
           target
         }) => {
           if (isPreviewable && !target.classList.contains('tiny-button')) {
-            mega.ui.mInfoPanel.closeIfOpen();
+            mega.ui.mInfoPanel.hide();
             this.props.onPreviewStart(v);
           }
         }
@@ -34683,7 +34695,7 @@ class Attachment extends AbstractGenericMessage {
           thumbOverlay = REaCt().createElement("div", {
             className: "thumb-overlay",
             onClick: () => {
-              mega.ui.mInfoPanel.closeIfOpen();
+              mega.ui.mInfoPanel.hide();
               this.props.onPreviewStart(v);
             }
           });
@@ -34693,7 +34705,7 @@ class Attachment extends AbstractGenericMessage {
             className: "thumb-overlay",
             onClick: () => {
               if (isPreviewable) {
-                mega.ui.mInfoPanel.closeIfOpen();
+                mega.ui.mInfoPanel.hide();
                 this.props.onPreviewStart(v);
               }
             }

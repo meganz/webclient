@@ -1308,6 +1308,9 @@ FileManager.prototype.initShortcutsAndSelection = function(container, aUpdate, r
                 }
             }
         ).reinitialize();
+        if (mega.ui.mInfoPanel) {
+            mega.ui.mInfoPanel.eventuallyUpdateSelected();
+        }
     }
 };
 
@@ -3346,7 +3349,7 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
             }
 
             // If the side Info panel is visible, update the information in it
-            mega.ui.mInfoPanel.reRenderIfVisible($.selected);
+            mega.ui.mInfoPanel.eventuallyUpdateSelected();
 
             return false;
         });
@@ -3435,7 +3438,7 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
             }
 
             // Close node Info panel as not needed immediately after opening Preview
-            mega.ui.mInfoPanel.closeIfOpen();
+            mega.ui.mInfoPanel.hide();
 
             slideshow(h);
         }
@@ -3488,7 +3491,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         || id === 'user-management' || id === 'transfers') {
 
         if (mega.ui.mInfoPanel) {
-            mega.ui.mInfoPanel.closeIfOpen();
+            mega.ui.mInfoPanel.hide();
         }
 
         // Hide top menus
@@ -3903,7 +3906,7 @@ FileManager.prototype.initStatusBarLinks = function() {
             openMoveDialog();
         }
         else if (this.classList.contains('info')) {
-            mega.ui.mInfoPanel.initInfoPanel();
+            mega.ui.mInfoPanel.show($.selected);
         }
         else if (this.classList.contains('restore')) {
             if (M.isInvalidUserStatus()) {

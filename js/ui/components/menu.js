@@ -70,7 +70,7 @@ class MegaMenu extends MegaOverlay {
             return;
         }
 
-        const leftMenuWidth = mega.ui.topmenu.domNode.offsetWidth;
+        const leftMenuWidth = is_chatlink ? 0 : mega.ui.topmenu.domNode.offsetWidth;
 
         const dialog = this.domNode;
         const dialogStyle = dialog.style;

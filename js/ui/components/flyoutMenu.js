@@ -86,17 +86,11 @@ class MegaFlyoutMenu extends MegaComponent {
         this.footer.className = 'flyout-footer hidden';
         this.domNode.append(this.footer);
 
-        this.inviteButton = new MegaButton({
+        this.footerInverseButton = new MegaButton({
             parentNode: this.footer,
             type: 'full-width',
-            componentClassname: 'invite-contact-button hidden',
-            icon: 'sprite-fm-mono icon-user-plus-thin-outline',
-            onClick: () => {
-                contactAddDialog();
-                eventlog(500668);
-            }
+            componentClassname: 'footer-inverse',
         });
-        this.inviteButton.text = l.invite_friend_btn;
 
         this.footerButton = new MegaButton({
             parentNode: this.footer,
@@ -149,28 +143,11 @@ class MegaFlyoutMenu extends MegaComponent {
             return;
         }
         const { itemComp } = options;
-        let ComponentClass = MegaButton;
-        if (itemComp === 'node') {
-            ComponentClass = MegaNodeComponent;
-        }
-        else if (itemComp === 'contactNode') {
-            ComponentClass = MegaContactNode;
-            options.smallAvatar = true;
-        }
-        else if (itemComp === 'chat') {
-            ComponentClass = MegaChatItem;
-        }
+        const ComponentClass = MegaFlyoutMenu.getComponentForType(itemComp);
         return new ComponentClass({
             parentNode: this.body,
             ...options
         });
-    }
-
-    _validateExistingNode(itemComp, exist) {
-        return (itemComp === 'button' && exist instanceof MegaButton) ||
-            (itemComp === 'node' && exist instanceof MegaNodeComponent) ||
-            (itemComp === 'contactNode' && exist instanceof MegaContactNode) ||
-            (itemComp === 'chat' && exist instanceof MegaChatItem);
     }
 
     set list(list) {
@@ -181,8 +158,8 @@ class MegaFlyoutMenu extends MegaComponent {
             const ident = id || nodeHandle || i;
             if (this._list.has(ident)) {
                 const exist = this._list.get(ident);
-                if (this._validateExistingNode(itemComp, exist)) {
-                    if (exist instanceof MegaNodeComponent || exist instanceof MegaChatItem) {
+                if (exist instanceof MegaFlyoutMenu.getComponentForType(itemComp)) {
+                    if (typeof exist.update === 'function') {
                         exist.update(listItem);
                     }
                     else {
@@ -217,8 +194,8 @@ class MegaFlyoutMenu extends MegaComponent {
         this.body.Ps.update();
     }
 
-    updateFooter(options, withInvite) {
-        const { label, icon, onClick } = options;
+    updateFooter(mainOptions, inverseOptions) {
+        const { label, icon, onClick } = mainOptions;
         this.footer.classList.remove('hidden');
         this.footerButton.rebind('click', (ev) => onClick(ev));
         this.footerButton.text = label;
@@ -228,7 +205,16 @@ class MegaFlyoutMenu extends MegaComponent {
             footerIcon.parentNode.removeChild(footerIcon);
             delete this.footerButton.domNode.rightIcon;
         }
-        this.inviteButton.domNode.classList[withInvite ? 'remove' : 'add']('hidden');
+        if (inverseOptions) {
+            const { label: iLabel, icon: iIcon, onClick: iOnClick } = inverseOptions;
+            this.footerInverseButton.rebind('click', (ev) => iOnClick(ev));
+            this.footerInverseButton.text = iLabel;
+            this.footerInverseButton.icon = iIcon;
+            this.footerInverseButton.show();
+        }
+        else {
+            this.footerInverseButton.hide();
+        }
     }
 
     resetUI() {
@@ -268,16 +254,22 @@ class MegaFlyoutMenu extends MegaComponent {
             footerIcon.parentNode.removeChild(footerIcon);
             delete this.footerButton.domNode.rightIcon;
         }
+        this.footerInverseButton.off('click');
+        this.footerInverseButton.text = '';
+        this.footerInverseButton.icon = '';
+        this.footerInverseButton.hide();
 
         this._list = new Map();
         this.name = '';
         this.listHeaders = false;
 
-        mega.ui.header.topBlockBottomBorder = false;
-        mega.ui.header.contactsButton.icon = 'sprite-fm-mono icon-user-square-thin-outline';
-        mega.ui.header.contactsButton.removeClass('active');
-        mega.ui.header.chatsButton.icon = 'sprite-fm-mono icon-message-chat-circle-thin';
-        mega.ui.header.chatsButton.removeClass('active');
+        if (!is_chatlink) {
+            mega.ui.header.topBlockBottomBorder = false;
+            mega.ui.header.contactsButton.icon = 'sprite-fm-mono icon-user-square-thin-outline';
+            mega.ui.header.contactsButton.removeClass('active');
+            mega.ui.header.chatsButton.icon = 'sprite-fm-mono icon-message-chat-circle-thin';
+            mega.ui.header.chatsButton.removeClass('active');
+        }
     }
 
     initTopSection(options) {
@@ -310,6 +302,9 @@ class MegaFlyoutMenu extends MegaComponent {
             const { placeholder, filter } = search;
             this.search = new MegaInputComponent({
                 parentNode: this.topSearch,
+                placeHolder: l[102],
+                icon: 'sprite-fm-mono icon-search-light-outline',
+                wrapperClasses: 'search-bar',
             });
             this.search.on('input', () => {
                 delay(`megasearch.flyout`, () => {
@@ -331,13 +326,18 @@ class MegaFlyoutMenu extends MegaComponent {
             console.error('Missing flyout configurations');
             return;
         }
+        if (this.hiding) {
+            this.hiding.abort();
+            delete this.hiding;
+        }
         if (this.name && this.name !== options.name) {
             this.trigger('onFlyoutChange');
         }
         this.resetUI();
         super.show();
-        mega.ui.mInfoPanel.closeIfOpen();
-        mega.ui.header.addClass(`active-flyout-${options.name}`);
+        if (!is_chatlink) {
+            mega.ui.header.addClass(`active-flyout-${options.name}`);
+        }
 
         this.name = options.name;
         if (options.topSection) {
@@ -359,6 +359,12 @@ class MegaFlyoutMenu extends MegaComponent {
             };
             this.openButton.addClass('simpletip');
         }
+        if (this.target) {
+            this.openButton.show();
+        }
+        else {
+            this.openButton.hide();
+        }
         if (options.topControls) {
             for (const control of options.topControls) {
                 MegaInteractable.factory({
@@ -374,29 +380,67 @@ class MegaFlyoutMenu extends MegaComponent {
         }
 
         this.domNode.parentNode.classList.add('flyout-shown');
-        requestAnimationFrame(() => {
-            this.domNode.parentNode.classList.add('ready');
-        });
+        document.getElementById(is_chatlink ? 'startholder' : 'pmlayout').classList.add('flyout-expanded');
 
-        mega.ui.header.topBlockBottomBorder = true;
-        if (this.name.startsWith('contact')) {
-            mega.ui.header.contactsButton.icon = 'sprite-fm-mono icon-user-square-thin-solid';
-            mega.ui.header.contactsButton.addClass('active');
-        }
-        else if (this.name === 'chat') {
-            mega.ui.header.chatsButton.icon = 'sprite-fm-mono icon-chat-filled';
-            mega.ui.header.chatsButton.addClass('active');
+        if (!is_chatlink) {
+            mega.ui.header.topBlockBottomBorder = true;
+            if (this.name.startsWith('contact')) {
+                mega.ui.header.contactsButton.icon = 'sprite-fm-mono icon-user-square-thin-solid';
+                mega.ui.header.contactsButton.addClass('active');
+            }
+            else if (this.name === 'chat') {
+                mega.ui.header.chatsButton.icon = 'sprite-fm-mono icon-chat-filled';
+                mega.ui.header.chatsButton.addClass('active');
+            }
         }
     }
 
-    hide() {
-        super.hide();
-        this.resetUI();
-        this.domNode.parentNode.classList.remove('ready');
-        tSleep(0.2).then(() => {
+    hide(instant) {
+        if (this.hiding && !instant) {
+            return;
+        }
+        document.getElementById(is_chatlink ? 'startholder' : 'pmlayout').classList.remove('flyout-expanded');
+        this.name = '';
+        const doHide = () => {
+            super.hide();
             this.domNode.parentNode.classList.remove('flyout-shown');
-        });
-        this.trigger('onHidden');
+            this.resetUI();
+            $.tresizer();
+            delete this.hiding;
+            this.trigger('onHidden');
+        };
+        if (instant) {
+            if (this.hiding) {
+                this.hiding.abort();
+            }
+            doHide();
+            return;
+        }
+        this.hiding = tSleep(0.2);
+        this.hiding.then(doHide);
+    }
+
+    static getComponentForType(type) {
+        switch (type) {
+            case 'node': {
+                return MegaNodeComponent;
+            }
+            case 'contactNode': {
+                return MegaContactNode;
+            }
+            case 'chat': {
+                return MegaChatItem;
+            }
+            case 'infoBlock': {
+                return mega.ui.mInfoPanel.MegaInfoBlock;
+            }
+            case 'infoInputBlock': {
+                return mega.ui.mInfoPanel.MegaInfoInputBlock;
+            }
+            default: {
+                return MegaButton;
+            }
+        }
     }
 }
 
@@ -639,16 +683,27 @@ class MegaFlyoutMenu extends MegaComponent {
         });
     }
 
+    let infoPanelPromise = false;
+
+    const flyoutMenu = () => new MegaFlyoutMenu({
+        parentNode: document.getElementsByClassName('flyout-holder')[0],
+        componentClassname: 'flyout-main',
+    });
     /**
      * @property {*} mega.ui.flyout
      */
     lazy(mega.ui, 'flyout', () => ({
         hasContacts: M.u.some(contact => contact.c === 1),
 
-        flyoutMenu: new MegaFlyoutMenu({
-            parentNode: document.getElementsByClassName('flyout-holder')[0],
-            componentClassname: 'flyout-main',
-        }),
+        flyoutMenu: flyoutMenu(),
+        reinit(prevElem) {
+            this.flyoutMenu.hide(true);
+            delete this.flyoutMenu;
+            if (prevElem) {
+                prevElem.remove();
+            }
+            lazy(this, 'flyoutMenu', flyoutMenu);
+        },
 
         get name() {
             return this.flyoutMenu.name;
@@ -704,6 +759,12 @@ class MegaFlyoutMenu extends MegaComponent {
             }
 
             return skeletonElm;
+        },
+
+        updateScroll(name) {
+            if (this.name === name) {
+                this.flyoutMenu.body.Ps.update();
+            }
         },
 
         showContactsFlyout() {
@@ -768,6 +829,7 @@ class MegaFlyoutMenu extends MegaComponent {
             list = list.sort((a, b) => sortFn(a, b, 1))
                 .map(n => ({
                     itemComp: 'contactNode',
+                    smallAvatar: true,
                     nodeHandle: n.h,
                     onClick() {
                         mega.ui.flyout.showContactFlyout(n.h);
@@ -849,7 +911,6 @@ class MegaFlyoutMenu extends MegaComponent {
 
         showContactFlyout(contactHandle) {
             flyoutState.clearListeners();
-            mega.ui.header.contactsButton.addClass('active');
             const name = `contact-${contactHandle}`;
             const uName = M.getNameByHandle(contactHandle);
             const actions = [
@@ -1115,7 +1176,14 @@ class MegaFlyoutMenu extends MegaComponent {
                     showStartGroupChatDialog();
                     eventlog(500664);
                 },
-            }, !this.hasContacts && chats.length === 1 && chats[0].isNote && chats[0].hasMessages());
+            }, !this.hasContacts && chats.length === 1 && chats[0].isNote && chats[0].hasMessages() && {
+                label: l.invite_friend_btn,
+                icon: 'sprite-fm-mono icon-user-plus-thin-outline',
+                onClick() {
+                    contactAddDialog();
+                    eventlog(500668);
+                }
+            });
             if (list.length) {
                 this.flyoutMenu.listHeaders = false;
                 const noteChat = megaChat.getNoteChat();
@@ -1384,6 +1452,82 @@ class MegaFlyoutMenu extends MegaComponent {
             }
         },
 
+        showInfoFlyout(handles) {
+            if (infoPanelPromise) {
+                return;
+            }
+            const name = mega.ui.mInfoPanel.flyoutName;
+            if (handles.length && name === this.name) {
+                // Check if elements can be refreshed.
+                const exist = this.flyoutMenu.domNode.componentSelector('.info-panel-block');
+                if (exist && exist.handles) {
+                    const { removed, added } = array.diff(exist.handles, handles);
+                    if (removed.length + added.length === 0) {
+                        // Same handles so refresh instead;
+                        return this.showInfoPanel(handles);
+                    }
+                }
+            }
+            flyoutState.clearListeners();
+            this.flyoutMenu.on('onHidden.infopanel', () => {
+                infoPanelPromise = false;
+                mega.ui.mInfoPanel.cleanup();
+                this.flyoutMenu.off('onHidden.infopanel');
+                this.flyoutMenu.off('onFlyoutChange.infopanel');
+            });
+            this.flyoutMenu.rebind('onFlyoutChange.infopanel', () => {
+                infoPanelPromise = false;
+                mega.ui.mInfoPanel.cleanup();
+                this.flyoutMenu.off('onHidden.infopanel');
+                this.flyoutMenu.off('onFlyoutChange.infopanel');
+            });
+            this.flyoutMenu.show({
+                name,
+                topSection: {
+                    label: l[6859],
+                },
+            });
+            if (!handles.length) {
+                this.emptyState({
+                    name,
+                    icon: 'search',
+                    subtitle: l.info_panel_empty,
+                });
+                return;
+            }
+            this.loadingState({ name, count: Math.min(handles.length, 5) });
+            this.showInfoPanel(handles);
+        },
+
+        showInfoPanel(handles) {
+            const name = mega.ui.mInfoPanel.flyoutName;
+            infoPanelPromise = mega.ui.mInfoPanel.getBlocks(handles)
+                .then(blocks => {
+                    infoPanelPromise = false;
+                    if (this.name !== name) {
+                        return;
+                    }
+                    if (!blocks || !blocks.length) {
+                        if (M.onDeviceCenter) {
+                            msgDialog('warninga', l[882], l[24196]);
+                        }
+                        this.emptyState({
+                            name,
+                            icon: 'search',
+                            subtitle: l.info_panel_empty,
+                        });
+                        return;
+                    }
+                    this.flyoutMenu.list = blocks;
+                    mega.ui.mInfoPanel.renderCb();
+                })
+                .catch((ex) => {
+                    if (d) {
+                        dump(ex);
+                    }
+                    infoPanelPromise = false;
+                });
+        }
     }));
 
 })(window.mega);

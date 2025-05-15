@@ -1,26 +1,37 @@
-#pmlayout .flyout-holder {
-    display: none;
+:root {
+    --flyout-width: 320px;
+}
+#pmlayout .flyout-holder,
+#startholder .flyout-holder {
+    display: block;
     background-color: var(--mobile-page-background);
+    grid-row: 3/4;
+    grid-column: 3/4;
     overflow: hidden;
-    width: 0;
+    width: var(--flyout-width);
     border-left: 1px solid var(--mobile-border-strong);
     padding: 16px 0;
     transition: 200ms linear;
     box-sizing: border-box;
 }
-
-#pmlayout .flyout-holder.flyout-shown {
-    display: block;
-    grid-row: 3/4;
-    grid-column: 3/4;
+#startholder .flyout-holder {
+    grid-row: 1/2;
+    grid-column: 2/3;
 }
-#pmlayout .flyout-holder.flyout-shown.ready {
-    width: 320px;
+.rtl #pmlayout .flyout-holder,
+.rtl #startholder .flyout-holder {
+    direction: rtl;
 }
-
+#pmlayout .flyout-holder.flyout-shown.info-panel-stretch  {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    z-index: 210;
+}
 
 @media only screen and (max-width: 1200px) {
-    #pmlayout .flyout-holder {
+    #pmlayout .flyout-holder.flyout-shown {
         position: absolute;
         right: 0;
         height: calc(100% - 55px);
@@ -135,7 +146,7 @@
 }
 
 .flyout-footer button.nav-elem.button.secondary,
-.flyout-footer button.nav-elem.button.invite-contact-button {
+.flyout-footer button.nav-elem.button.footer-inverse {
     cursor: pointer;
     font: var(--mobile-font-copy-semibold);
     white-space: nowrap;
@@ -143,7 +154,7 @@
     margin: 8px 0 0;
 }
 
-.flyout-footer button.nav-elem.button.invite-contact-button i {
+.flyout-footer button.nav-elem.button.footer-inverse i {
     --mask-color: var(--mobile-text-inverse);
 }
 

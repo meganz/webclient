@@ -249,7 +249,6 @@ accountUI.renderAccountPage = function(account) {
     accountUI.leftPane.init(sectionClass);
 
     mBroadcaster.sendMessage('settingPageReady');
-    fmLeftMenuUI();
 
     if (subSectionId) {
         $(`.settings-button.${sectionClass} .sub-title[data-scrollto='${subSectionId}']`).trigger('click');

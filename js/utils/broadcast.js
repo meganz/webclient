@@ -331,7 +331,9 @@
                     args = [{type: topic}];
                 }
 
-                // if (d) console.log('Broadcasting ' + topic, args);
+                if (self.d > 1) {
+                    console.warn(`\u{1F4FB} Broadcasting message '${topic}'`, args);
+                }
 
                 for (let i = 0; i < blk.length; ++i) {
                     const [id, obj] = blk[i];

@@ -929,40 +929,6 @@ function initTreeScroll() {
     }
 }
 
-function fmLeftMenuUI() {
-    "use strict";
-
-    // handle the Inbox section use cases
-    if (!self.vw && M.InboxID && M.currentdirid === M.InboxID) {
-        M.openFolder(M.RootID);
-    }
-
-    // handle the RubbishBin icon changes
-    var rubBtn = mega.ui.topmenu.rubbishBtn;
-
-    if (!rubBtn) {
-        return;
-    }
-
-    var rubNodes = Object.keys(M.c[M.RubbishID] || {});
-
-    if (rubNodes.length) {
-
-        if (!rubBtn.hasClass('filled')) {
-            rubBtn.addClass('filled');
-        }
-        else if (rubBtn.hasClass('glow')) {
-            rubBtn.removeClass('glow');
-        }
-        else {
-            rubBtn.addClass('glow');
-        }
-    }
-    else {
-        rubBtn.removeClass('filled', 'glow');
-    }
-}
-
 function doClearbin(all) {
     "use strict";
 

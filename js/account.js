@@ -1099,7 +1099,7 @@ function initMegaIoIframe(loginStatus, planNum) {
     };
 
     const setLastInteractionQueue = [];
-    const SET_LAST_INTERACTION_TIMER = 60; // seconds
+    const SET_LAST_INTERACTION_TIMER = 180; // seconds
 
     /**
      * Returns a promise which will be resolved with a string, formatted like this "$typeOfInteraction:$timestamp"
@@ -1264,28 +1264,14 @@ function initMegaIoIframe(loginStatus, planNum) {
             return MegaPromise.reject(EARGS);
         }
 
-        var isDone = false;
-        var $promise = createTimeoutPromise(
-            () => {
-                return isDone === true;
-            },
-            500,
-            10000,
-            false,
-            `SetLastInteraction(${u_h})`
-        );
-
-        $promise.always(function () {
-            isDone = true;
-        });
-
+        // @todo -- FIXME -- REVAMP..
+        const $promise = mega.promise;
 
         getLastInteractionWith(u_h, true)
             .done(function (timestamp) {
                 if (_compareLastInteractionStamp(v, timestamp) === false) {
                     // older timestamp found in `v`, resolve the promise with the latest timestamp
                     $promise.resolve(v);
-                    $promise.verify();
                 }
                 else {
                     _lastUserInteractionCache[u_h] = v;
@@ -1293,9 +1279,8 @@ function initMegaIoIframe(loginStatus, planNum) {
                     $promise.resolve(_lastUserInteractionCache[u_h]);
 
                     // TODO: check why `M.u[u_h]` might not be set...
+                    console.assert(u_h in M.u, `SetLastInteraction(${u_h})`);
                     Object(M.u[u_h]).ts = parseInt(v.split(":")[1], 10);
-
-                    $promise.verify();
 
                     mega.attr.setArrayAttribute(
                         'lstint',
@@ -1323,13 +1308,10 @@ function initMegaIoIframe(loginStatus, planNum) {
                         false,
                         true
                     );
-
-                    $promise.verify();
                 }
                 else {
                     $promise.reject(res);
-                    console.error("setLastInteraction failed, err: ", res);
-                    $promise.verify();
+                    console.error("setLastInteraction failed for", u_h, res);
                 }
             });
 

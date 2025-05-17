@@ -154,6 +154,7 @@ lazy(self, 'tSleep', function tSleep() {
 
     const pending = new Set();
     const symbol = Symbol('^^tSleep::scheduler~~');
+    const rnd = crypto.getRandomValues(new Uint32Array(768));
     const tbsp = Promise.resolve();
 
     let pid = 0;
@@ -162,16 +163,40 @@ lazy(self, 'tSleep', function tSleep() {
 
     const asap = async(ms) => {
         const xid = pid;
-        const now = Date.now();
+        const now = performance.now();
         ms |= 1;
-        // console.warn(`asap:${ms}`);
+        // console.warn(`asap#${xid}:${ms}`);
         do {
-            await navigator.locks.request(`<t-sleep:asap/trap/>`, () => tbsp);
-            if (xid !== pid) {
+            const tmp = await factory.require('pbkdf2').sha256(rnd, rnd.slice(-36), 2e6);
+            rnd.set(new Uint32Array(tmp));
+            await tbsp;
+
+            if (xid !== pid || performance.now() - now > ms) {
                 break;
             }
+            if (ms > 7e3) {
+                let prom;
+
+                if ('enotconn' in self && self.enotconn.size) {
+
+                    prom = mBroadcaster.when('enotconn:ack');
+                }
+                else {
+
+                    prom = fetch(`${self.apipath}to?${Math.min(60, ms / 1e3 >> 1)}`).catch(nop);
+                }
+
+                if (!tbsp.stateChange) {
+                    tbsp.stateChange = mBroadcaster.when('statechange')
+                        .finally(() => {
+                            tbsp.stateChange = null;
+                        });
+                }
+
+                await Promise.race([prom, tbsp.stateChange]);
+            }
         }
-        while (Date.now() - now < ms);
+        while (1);
     };
 
     const dequeue = () => {
@@ -203,7 +228,7 @@ lazy(self, 'tSleep', function tSleep() {
                 tid = -1;
                 const xid = ++pid;
                 const ready = self.tSleep === self.sleep ? asap(threshold) : sleep(threshold / 1e3);
-                return ready.finally(() => xid === pid && dequeue());
+                return ready.always(() => xid === pid && dequeue());
             }
             tid = gSetTimeout(dequeue, threshold);
         }
@@ -556,7 +581,6 @@ lazy(self, 'sleep', function sleep() {
             const now = performance.now();
 
             do {
-                (await mutex.lock(`mWorklet[trap]`))();
                 if (done) {
                     break;
                 }
@@ -673,7 +697,7 @@ mBroadcaster.once('boot_done', tryCatch(() => {
 
         if (!IDLE_PIPELINE.pid) {
             if (document.hidden) {
-                IDLE_PIPELINE.pid = tSleep.asap(IDLE_THRESHOLD >> 1).finally(idleCallbackHandler);
+                IDLE_PIPELINE.pid = tSleep.asap(IDLE_TIMEOUT.delay).always(idleCallbackHandler);
             }
             else if (lax > 1) {
                 IDLE_PIPELINE.pid = requestAnimationFrame(idleCallbackHandler);

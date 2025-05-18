@@ -840,6 +840,12 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
                     if ($.hasWebKitDirectorySupport) {
                         finalItems.push('.folderupload-item');
                     }
+
+                    if (nodeRoot !== 's4' && mega.rewind && mega.rewind.permittedRoots[M.currentrootid]
+                        && !M.onDeviceCenter
+                    ) {
+                        finalItems.push('.rewind-item');
+                    }
                 }
             }
         }

@@ -111,6 +111,7 @@ class MegaTopMenu extends MegaMobileTopMenu {
                 treeWrapClass: 'js-myfile-tree-panel',
                 name: 'cloud-drive',
                 typeClassname: 'drive',
+                onContextmenu: _openContext,
                 eventLog: 500631
             },
             {
@@ -141,6 +142,7 @@ class MegaTopMenu extends MegaMobileTopMenu {
                 href: '/fm/rubbish',
                 name: 'rubbish-bin',
                 typeClassname: 'drive',
+                onContextmenu: _openContext,
                 eventLog: 500635
             },
 

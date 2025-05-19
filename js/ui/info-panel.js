@@ -1447,7 +1447,7 @@ lazy(mega.ui, 'mInfoPanel', () => {
         },
 
         hide() {
-            if (mega.ui.flyout.name === this.flyoutName) {
+            if (this.isOpen()) {
                 mega.ui.flyout.hide();
             }
             activeStats = Object.create(null);
@@ -1513,7 +1513,7 @@ lazy(mega.ui, 'mInfoPanel', () => {
          * @returns {Boolean} is panel open
          */
         isOpen() {
-            return mega.ui.flyout.name === this.flyoutName;
+            return mega.ui.flyoutInit && mega.ui.flyout.name === this.flyoutName;
         },
 
         tagsDB: {

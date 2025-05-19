@@ -684,11 +684,15 @@ class MegaFlyoutMenu extends MegaComponent {
     }
 
     let infoPanelPromise = false;
+    mega.ui.flyoutInit = false;
 
-    const flyoutMenu = () => new MegaFlyoutMenu({
-        parentNode: document.getElementsByClassName('flyout-holder')[0],
-        componentClassname: 'flyout-main',
-    });
+    const flyoutMenu = () => {
+        mega.ui.flyoutInit = true;
+        return new MegaFlyoutMenu({
+            parentNode: document.getElementsByClassName('flyout-holder')[0],
+            componentClassname: 'flyout-main',
+        });
+    };
     /**
      * @property {*} mega.ui.flyout
      */
@@ -702,6 +706,7 @@ class MegaFlyoutMenu extends MegaComponent {
             if (prevElem) {
                 prevElem.remove();
             }
+            mega.ui.flyoutInit = false;
             lazy(this, 'flyoutMenu', flyoutMenu);
         },
 

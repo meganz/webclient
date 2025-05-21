@@ -1202,6 +1202,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                         clearTimeout(hideMobileVideoControls);
                         $videoControls.removeClass('invisible');
                     }
+                    $('.media-viewer', $wrapper).addClass('video-paused');
                 }
                 else {
                     $('i', $playpause).removeClass().addClass(`${SPRITE} icon-pause-small-regular-${style}`);
@@ -1220,6 +1221,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                         $('.audio-wrapper .playpause-wrapper').removeClass('hidden');
                         $('.audio-wrapper .play-video-button').addClass('hidden');
                     }
+                    $('.media-viewer', $wrapper).removeClass('video-paused');
                 }
             }
             // Mute button
@@ -1383,7 +1385,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
             $playVideoButton.removeClass('hidden');
         }
 
-        duration = options.playtime || MediaAttribute(node).data.playtime || 0;
+        duration = options.playtime || !options.vad && MediaAttribute(node).data.playtime || 0;
         setDuration(duration);
         onTimeUpdate(0, 1);
 
@@ -1505,7 +1507,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
             delay.cancel(MOUSE_IDLE_TID);
             $document.off('mousemove.idle');
 
-            if (streamer.ended) {
+            if (streamer.ended && !$wrapper.hasClass('vad')) {
                 delete sessionStorage.previewTime;
                 onIdle(() => progressBarElementStyle.setProperty('width', '100%'));
             }
@@ -2036,13 +2038,17 @@ FullScreenManager.prototype.enterFullscreen = function() {
         var vAdInstance = Object.create(null);
         var opt = {autoplay: options.autoplay};
         var $control = $('.viewer-vad-control', $wrapper).removeClass('skip');
-        var $thumb = $('.thumb', $control).removeClass('active');
         var $pendingBlock = $('.loader-grad', $wrapper);
+
+        const pra = JSON.parse(localStorage.pra || '{}');
+
         var nop = function(ev) {
             ev.preventDefault();
             ev.stopPropagation();
         };
         var dsp = function(ev) {
+            localStorage.pra = JSON.stringify(pra);
+
             nop(ev);
             if (vAdInstance) {
                 vAdInstance.skip();
@@ -2055,6 +2061,8 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
             if (this.parent) {
                 videoElement.classList.remove('hidden');
+                videoElement.pause();
+
                 _initVideoControls($wrapper, this.parent, node, options);
 
                 var error = this.parent.error;
@@ -2079,7 +2087,6 @@ FullScreenManager.prototype.enterFullscreen = function() {
             if (pan) {
                 $wrapper.removeClass('vad');
                 $control.addClass('hidden');
-                $thumb.removeClass('active');
                 pan.removeChild(vad);
                 pan = null;
             }
@@ -2104,7 +2111,9 @@ FullScreenManager.prototype.enterFullscreen = function() {
             return rc;
         };
 
-        if (options.vad === false || is_audio(node)) {
+        const { dlid, pfid, pfcol } = window;
+        const vadAllowed = !!(dlid || is_embed || (pfid && !pfcol));
+        if (!vadAllowed || options.vad === false || is_audio(node)) {
             pan = null;
             vAdInstance.disabled = true;
             return vAdInstance;
@@ -2115,7 +2124,6 @@ FullScreenManager.prototype.enterFullscreen = function() {
         var rs = {};
         var ts = 15807e5;
         var now = Date.now() / 1e3;
-        var pra = JSON.parse(localStorage.pra || '{}');
         var ids = Object.keys(pra);
         for (var i = ids.length; i--;) {
             var t = pra[ids[i]] + ts;
@@ -2146,16 +2154,10 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 return vAdInstance && vAdInstance.skip();
             }
             pra[res.id] = now - ts | 0;
-            localStorage.pra = JSON.stringify(pra);
-
-            getImage(node, 1)
-                .then((uri) => {
-                    $('img', $thumb.addClass('active')).attr('src', uri);
-                })
-                .catch(dump);
 
             pan = videoElement.parentNode;
             vad = videoElement.cloneNode();
+
             vad.id = '';
             vad.style.zIndex = 9;
             $wrapper.addClass('vad');
@@ -2169,34 +2171,86 @@ FullScreenManager.prototype.enterFullscreen = function() {
             vAdInstance.stream.on('playing', function() {
                 var count = parseInt(res.cds) | 0;
                 if (count < 1) {
-                    count = Math.min(this.duration | 0, 9);
+                    count = Math.min(this.duration | 0, 5);
                 }
-                var $counter = $('.counter', $control.removeClass('hidden')).text(count);
-                var timer = setInterval(function() {
-                    $counter.text(--count);
+
+                $control
+                    .removeClass('hidden')
+                    .text(l.ad_skip_count.replace('%1', count));
+
+                var timer = setInterval(() => {
+                    if (!this.file || !this.file.playing) {
+                        return;
+                    }
+
+                    count--;
+
                     if (count < 1) {
+                        $control.text(l[1379]);
+
+                        const icon = document.createElement('i');
+                        icon.classList.add(
+                            (is_embed) ? 'sprite-embed-mono' :  'sprite-fm-mono',
+                            'icon-skip-forward-small-regular-outline'
+                        );
+
+                        $control.append(icon);
                         clearInterval(timer);
+
                         $control.addClass('skip');
                         $control.rebind('click.ctl', function(ev) {
                             eventlog(99731);
                             return dsp(ev);
                         });
                     }
+                    else {
+                        $control.text(l.ad_skip_count.replace('%1', count));
+                    }
                 }, 1000);
 
                 if (res.aurl) {
-                    var onclick = function(ev) {
-                        nop(ev);
+                    const onclick = (e, eventId) => {
+                        nop(e);
                         open(res.aurl);
-                        eventlog(99732);
+                        vad.pause();
+                        eventlog(eventId);
+                        delay('prevent-control-hiding', () => clearTimeout(hideMobileVideoControls));
                     };
                     vad.style.cursor = 'pointer';
                     vad.removeEventListener('click', nop, true);
-                    vad.addEventListener('click', onclick, true);
+                    vad.addEventListener('click', (e) => {
+                        onclick(e, 99732);
+                    }, true);
+
+                    if (!is_mobile && !is_embed && res.text && res.title && res.icon) {
+                        const info = $('.viewer-vad-info', $wrapper);
+
+                        if (info.length) {
+                            info.removeClass('hidden');
+
+                            $('.vad-info-title i', info).attr('class', res.icon);
+                            $('.vad-info-title p', info).text(res.title);
+
+                            const txt = $('.vad-info-txt', info);
+                            txt.text(res.text);
+                            txt.attr('title', res.text);
+
+                            $('button', info).rebind('click.vad-more', (e) => {
+                                onclick(e, 500693);
+                            });
+                        }
+                    }
                 }
+
                 $pendingBlock.addClass('hidden');
 
                 eventlog(99730);
+            });
+
+            vAdInstance.stream.on('stalled', () => {
+                if (vAdInstance.stream.isOverQuota) {
+                    dlmanager.showOverQuotaDialog();
+                }
             });
 
             if (opt.autoplay) {
@@ -2204,7 +2258,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
             }
 
             vAdInstance.stream.abort = vAdInstance.abort;
-            _initVideoControls($wrapper, vAdInstance.stream, node, {vad: true});
+            _initVideoControls($wrapper, vAdInstance.stream, node, {...opt, vad: true});
         });
 
         if (options.autoplay) {
@@ -2249,7 +2303,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
             if (vAdInstance) {
                 rc = vAdInstance.start();
             }
-            if (!rc && vStream) {
+            if (!rc && vStream && options.autoplay) {
                 rc = 2;
                 vStream.play();
             }

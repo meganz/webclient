@@ -375,7 +375,8 @@
         .mouse-idle {
             cursor: none !important;
         }
-        .vad.mouse-idle .viewer-vad-control {
+        .vad.mouse-idle .viewer-vad-control,
+        .vad.mouse-idle .viewer-vad-info {
             bottom: 16px;
         }
 

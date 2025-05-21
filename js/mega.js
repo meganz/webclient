@@ -591,7 +591,7 @@ function startNodesFetching(scni) {
 
         if (scloadtnodes && scq[scni] && scq[scni][0] && sc_fqueuet(scni)) {
             // fetch required nodes from db
-            delay('scq:fetcher.dsp', sc_fetcher, 90);
+            queueMicrotask(sc_fetcher);
         }
         else {
             // resume processing, if appropriate and needed
@@ -645,7 +645,7 @@ function sc_packet(a) {
                 break;
         }
 
-        delay('scq:fetcher.dsp', sc_fetcher, 90);
+        queueMicrotask(sc_fetcher);
     }
 
     if ((a.a === 's' || a.a === 's2') && a.k && !self.secureKeyMgr) {
@@ -1499,7 +1499,7 @@ scparser.$add('u', function(a) {
 scparser.$add('d', function(a) {
     var fileDeletion = (M.d[a.n] && !M.d[a.n].t);
     var topVersion = null;
-    if (fileDeletion) {
+    if (fminitialized && fileDeletion) {
         topVersion = fileversioning.getTopNodeSync(a.n);
     }
 
@@ -1528,35 +1528,38 @@ scparser.$add('d', function(a) {
     // node deletion
     M.delNode(a.n, false, !!a.m);
 
-    // was selected, now clear the selected array.
-    if ($.selected) {
-        if (typeof selectionManager === 'undefined') {
-            const idx = $.selected.indexOf(a.n);
-            if (idx > -1) {
-                $.selected.splice(idx, 1);
-            }
-        }
-        else {
-            selectionManager.remove_from_selection(a.n);
-        }
-    }
     if (!pfid && a.ou) {
         scparser.$notify(a);
     }
-    if (!is_mobile) {
-        if (fileDeletion && !a.v) {// this is a deletion of file.
+
+    if (fminitialized) {
+
+        // was selected, now clear the selected array.
+        if ($.selected) {
+            if (typeof selectionManager === 'undefined') {
+                const idx = $.selected.indexOf(a.n);
+                if (idx > -1) {
+                    $.selected.splice(idx, 1);
+                }
+            }
+            else {
+                selectionManager.remove_from_selection(a.n);
+            }
+        }
+
+        if (fileDeletion && !a.v && !is_mobile) {
             fileversioning.updateFileVersioningDialog(M.d[topVersion] ? topVersion : a.n);
         }
-    }
 
-    // Remove all upload in queue that target deleted node
-    if (fminitialized && ul_queue.length > 0) {
-        ulmanager.ulClearTargetDeleted(a.n);
-    }
+        // Remove all upload in queue that target deleted node
+        if (ul_queue.length > 0) {
+            ulmanager.ulClearTargetDeleted(a.n);
+        }
 
-    if (!a.m && fminitialized && !pfid && !is_mobile) {
-        M.storageQuotaCache = null;
-        delay('checkStorageBlock', () => MegaStorageBlock.checkUpdate());
+        if (!a.m && !pfid && !is_mobile) {
+            M.storageQuotaCache = null;
+            delay('checkStorageBlock', () => MegaStorageBlock.checkUpdate());
+        }
     }
 });
 
@@ -2068,6 +2071,14 @@ function execsc() {
                         api.webLockSummary();
                         console.info(`Awaiting API response for SC command '${a.a}..${a.st}..${a.i}'`);
                     }
+                    if (!execsc.trk) {
+
+                        execsc.trk = scqtail;
+                    }
+                    else if (execsc.trk === scqtail && scqhead > scqtail << 3) {
+
+                        eventlog(99620, JSON.stringify([1, scqtail, scqhead, a.a, a.st]), true);
+                    }
                     return;
                 case 5:
                     a.i = requesti;
@@ -2097,7 +2108,7 @@ function execsc() {
     if (d) {
         console.log(`Processed ${tickcount} SC commands in the past 200 ms`);
     }
-    onIdle(execsc);
+    queueMicrotask(execsc);
 }
 
 // a node was updated significantly: write to DB and redraw
@@ -2112,7 +2123,13 @@ function fm_updated(n) {
         if (M.megaRender) {
             M.megaRender.revokeDOMNode(n.h, true);
         }
-        M.updFileManagerUI().catch(dump);
+        if (!fm_updated.tick) {
+            fm_updated.tick = 1;
+            queueMicrotask(() => {
+                M.updFileManagerUI().catch(dump);
+                fm_updated.tick = 0;
+            });
+        }
     }
 }
 

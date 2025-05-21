@@ -50,7 +50,7 @@ function resetSensitives() {
          * Disposable cache for sensitive status recursive check
          * @type {Object.<Boolean>}
          */
-        let sensitiveStatusCache = Object.create(null);
+        let sensitiveStatusCache = null;
 
         /**
          * @type {Boolean?}
@@ -256,18 +256,16 @@ function resetSensitives() {
                 return true;
             }
 
-            if (!sensitiveStatusCache.shares) {
+            // We need this cache only over the current event loop to avoid iterating same parents multiple times
+            if (!sensitiveStatusCache) {
+                sensitiveStatusCache = Object.create(null);
                 sensitiveStatusCache.shares = array.to.object(M.getTreeHandles('shares'), true);
-            }
-
-            if (!sensitiveStatusCache.backups) {
                 sensitiveStatusCache.backups = array.to.object(M.getTreeHandles(M.BackupsId), true);
-            }
 
-            delay('cache.clearTreeCache', () => {
-                sensitiveStatusCache.shares = null;
-                sensitiveStatusCache.backups = null;
-            }, 500);
+                onIdle(() => {
+                    sensitiveStatusCache = null;
+                });
+            }
 
             return sensitiveStatusCache.shares[n.p] || sensitiveStatusCache.shares[n.h]
                 || sensitiveStatusCache.backups[n.p] || sensitiveStatusCache.backups[n.h];
@@ -295,11 +293,6 @@ function resetSensitives() {
                 sensitiveStatusCache[n.p] = parent.sen === 1 || isSensitiveInherited(parent);
             }
 
-            // We need this cache only for the current check run to avoid iterating through same parents multiple times
-            delay('sensitives.dropCache', () => {
-                sensitiveStatusCache = Object.create(null);
-            }, 500);
-
             return sensitiveStatusCache[n.p];
         };
 
@@ -320,16 +313,18 @@ function resetSensitives() {
             if (typeof n === 'string') {
                 n = M.getNodeByHandle(n);
             }
+            if (n && n.p) {
+                if (n.sen === 1) {
+                    return 1;
+                }
 
-            if (!n || !n.p || isNormalNode(n)) {
-                return 0;
-            }
+                if (isNormalNode(n)) {
+                    return 0;
+                }
 
-            if (n.sen === 1) {
-                return 1;
-            }
-            else if (checkParent) {
-                return isSensitiveInherited(n) ? 2 : 0;
+                if (checkParent) {
+                    return isSensitiveInherited(n) ? 2 : 0;
+                }
             }
 
             return 0;

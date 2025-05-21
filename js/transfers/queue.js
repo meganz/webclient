@@ -351,7 +351,7 @@ MegaQueue.prototype.process = function(sp) {
                 }
             }
             if (this._queue) {
-                this._process(1600, sp);
+                delay(this.__identity, () => this.process(sp), 2600);
             }
             return false;
         }
@@ -422,8 +422,9 @@ MegaQueue.prototype.destroy = function() {
 
 MegaQueue.prototype._process = function(ms, sp) {
     'use strict';
-    if (!sp && d > 1) {
-        sp = new Error(this.qname + ' stack pointer');
+    if (document.hidden) {
+        // everything is already throttled...
+        return queueMicrotask(() => this.process(sp));
     }
     delay(this.__identity, () => this.process(sp), ms || 10);
 };

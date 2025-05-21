@@ -240,10 +240,6 @@ FileManager.prototype.initFileManager = async function() {
         }
     }
 
-    if (path) {
-        this.onFileManagerReady(fmLeftMenuUI);
-    }
-
     const res = await this.openFolder(path, true);
 
     if (megaChatIsReady) {

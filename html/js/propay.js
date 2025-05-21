@@ -599,6 +599,7 @@ pro.propay = {
                 if (!this.currentGateway.supportsRecurring) {
                     extra.recurring = false;
                 }
+                extra.pm = this.currentGateway.gatewayName;
             }
 
             return true;
@@ -1271,6 +1272,17 @@ pro.propay = {
             }
         }
 
+        if (!gate.supportsAnnualPayment && (this.planObj.months === 12)) {
+            if (!this.planObj.correlatedPlan) {
+                return false;
+            }
+        }
+        if (!gate.supportsMonthlyPayment && (this.planObj.months === 1)) {
+            if (!this.planObj.correlatedPlan) {
+                return false;
+            }
+        }
+
         // Gateway supports the current plan
         return gate;
     },
@@ -1905,7 +1917,10 @@ pro.propay = {
 
         $('.payment-loading-spinner', this.$page).removeClass('hidden');
 
-        $('iframe#stripe-widget', addressDialog.getStripeDialog()).addClass('hidden');
+        const $iframeContainer = $('.iframe-container', addressDialog.getStripeDialog());
+
+        $iframeContainer.css('height', 306 + 'px');
+        $('iframe#stripe-widget', $iframeContainer).addClass('hidden');
 
         const gatewayId = this.currentGateway.gatewayId;
 
@@ -2635,7 +2650,7 @@ pro.propay = {
         'use strict';
         const enableAllPaymentGateways = (localStorage.enableAllPaymentGateways) ? 1 : 0;
 
-        const {result: gatewayOptions} = await api.req({a: 'ufpqfull', t: 0, d: enableAllPaymentGateways, v: 4});
+        const {result: gatewayOptions} = await api.req({a: 'ufpqfull', t: 0, d: enableAllPaymentGateways, v: 5});
 
         // TODO: Check if still on propay page
 

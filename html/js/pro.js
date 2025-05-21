@@ -561,6 +561,10 @@ var pro = {
                 name: 'apple',
                 displayName: 'Apple Pay',
             },
+            'ideal': {
+                name: 'ideal',
+                displayName: 'iDEAL',
+            },
         };
 
         if (wallets[walletType]) {

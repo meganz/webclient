@@ -6,6 +6,10 @@ body.web-desktop .mega-sheet.on-boarding .sheet {
     border: 1px solid var(--mobile-border-subtle);
 }
 
+.mega-sheet.on-boarding .sheet .header {
+    display: none;
+}
+
 .mega-sheet.on-boarding .sheet .main,
 .mega-sheet.on-boarding .sheet .actions {
     width: 100%;
@@ -73,8 +77,7 @@ body.web-desktop .mega-sheet.on-boarding .sheet {
     color: var(--mobile-text-secondary);
     line-height: 18px;
     letter-spacing: 0.24px;
-    margin-top: 0;
-    margin-bottom: 16px;
+    margin: 0 0 16px;
 }
 
 .mega-on-boarding .main-content .custom-div,
@@ -90,8 +93,7 @@ body.web-desktop .mega-sheet.on-boarding .sheet {
     padding: 0 48px;
 }
 
-.mega-on-boarding .main-content .actions,
-.mega-sheet .sheet .actions {
+.mega-on-boarding .main-content .actions {
     margin-top: auto;
     display: flex;
     justify-content: flex-start;

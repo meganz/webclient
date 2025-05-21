@@ -530,6 +530,9 @@ lazy(self, 'enotconn', () => {
     });
 
     return freeze({
+        get size() {
+            return wm.size;
+        },
         unregister(cl) {
             if (self.d) {
                 logger.log('unregister', cl);
@@ -541,7 +544,19 @@ lazy(self, 'enotconn', () => {
                 logger.log('register', cl, val);
             }
             wm.set(cl, `${val}`);
-            delay(`enotconn<dsp>`, dsp, 2e3);
+
+            if (mBroadcaster.hasListener('ENOTCONN')) {
+
+                delay(`enotconn<dsp>`, dsp, 4e3 * (!!document.hidden + 1));
+            }
+
+            if (!dsp.ack) {
+                queueMicrotask(() => {
+                    dsp.ack = 0;
+                });
+                dsp.ack = 1;
+                mBroadcaster.sendMessage('enotconn:ack', val);
+            }
         }
     });
 });

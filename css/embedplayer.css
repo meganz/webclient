@@ -996,82 +996,11 @@ textarea {
 }
 
 /*Video Ad*/
-.viewer-vad-control {
-    position: absolute;
-    min-width: 120px;
-    height: 48px;
-    background-color: rgba(0, 0, 0, 0.6);
-    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5);
-    border-radius: 3px;
-    bottom: 66px;
-    right: 12px;
-    z-index: 10;
-    color: rgba(255, 255, 255, 0.8);
-    font-size: 18px;
-    line-height: 48px;
-    white-space: nowrap;
-    text-align: center;
-    text-transform: capitalize;
-    transition: all 200ms ease-in-out;
-    cursor: default;
-}
 .mouse-idle {
     cursor: none !important;
 }
 .mouse-idle .viewer-vad-control {
     bottom: 16px;
-}
-.viewer-vad-control.skip {
-    cursor: pointer;
-}
-.viewer-vad-control.skip:hover {
-    color: rgba(255, 255, 255, 1);
-    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.7);
-}
-.viewer-vad-control .thumb {
-    float: right;
-    width: 76px;
-    height: 48px;
-    line-height: 0;
-    display: none;
-    overflow: hidden;
-}
-.viewer-vad-control .thumb.active {
-    display: block;
-}
-.viewer-vad-control .thumb img,
-.video .download.video-block .viewer-vad-control .thumb img {
-    height: auto;
-    display: block;
-    min-width: 100%;
-    min-height: 100%;
-    max-width: 86px;
-    -webkit-transform: translate(-50%, -50%);
-    transform: translate(-50%, -50%);
-    position: relative;
-    left: 50%;
-    top: 50%;
-}
-.viewer-vad-control .counter {
-    padding: 0 10px;
-    display: inline-block;
-}
-.viewer-vad-control .label,
-.viewer-vad-control.skip .thumb.active,
-.viewer-vad-control.skip .counter {
-    display: none;
-}
-.viewer-vad-control.skip .label {
-    display: block;
-    padding: 0 14px;
-}
-.viewer-vad-control .label i {
-    margin: 14px -3px 0 11px;
-    opacity: 0.8;
-    transition: opacity 200ms ease-in-out;
-}
-.viewer-vad-control.skip:hover .label i {
-    opacity: 1;
 }
 .video-progress-bar.vad {
     transition: opacity 200ms ease-in-out, visibility 200ms ease-in-out;
@@ -1381,21 +1310,6 @@ textarea {
     .small-icon.icons-sprite {
         background-image: url(../images/mega/embed-sprite@2x.png);
         background-size: 144px auto;
-    }
-}
-
-@media only screen and (orientation:portrait) and (max-width: 640px) {
-    .viewer-vad-control {
-        min-width: 120px;
-        height: 38px;
-        font-size: 16px;
-        line-height: 38px;
-    }
-    .viewer-vad-control .thumb {
-        height: 38px;
-    }
-    .viewer-vad-control .label i {
-        margin-top: 9px;
     }
 }
 

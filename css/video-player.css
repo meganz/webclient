@@ -245,6 +245,9 @@
         background-repeat: no-repeat;
         background-position: center;
     }
+    .video.vad .media-viewer video {
+        background-position-x: 100vw;
+    }
     .video-theatre-mode .media-viewer video {
         height: 100%;
         width: 100%;
@@ -277,7 +280,7 @@
         border-radius: 100%;
         cursor: pointer;
         left: calc(50% - 35px);
-        position: fixed;
+        position: absolute;
         top: calc(50% - 35px);
         z-index: 10;
         padding: 20px;
@@ -288,7 +291,9 @@
         display: block;
     }
     .loader-grad:not(.hidden) ~ .play-video-button,
-    .loader-grad:not(.hidden) ~ .play-pause-video-button {
+    .loader-grad:not(.hidden) ~ .play-pause-video-button,
+    .video.vad .media-viewer .play-pause-video-button,
+    .media-viewer .viewer-vad-info {
         display: none;
     }
     .media-viewer .watch-again-button {
@@ -328,6 +333,9 @@
         z-index: 10;
         animation: rotate 1s linear infinite;
     }
+    .vad.stream-overquota .loader-grad {
+        display: none;
+    }
     .media-viewer .loader-grad i {
         --icon-size: 102px;
     }
@@ -341,7 +349,8 @@
         display: none;
     }
     .media-viewer .watch-again-button:not(.hidden) + .watch-again-button-overlay,
-    .media-viewer .loader-grad:not(.hidden) + .loader-grad-overlay {
+    .media-viewer .loader-grad:not(.hidden) + .loader-grad-overlay,
+    .video.vad .media-viewer .viewer-vad-info {
         display: block;
     }
 
@@ -458,9 +467,6 @@
         transform: translateX(50%);
         padding: 4px 8px;
     }
-    .media-viewer .video-progress-block:hover .video-progress-time {
-        display: block;
-    }
     .media-viewer li.timing > * {
         color: var(--text-color-high);
         font: var(--text-body2);
@@ -536,7 +542,8 @@
         padding: 8px 12px;
         gap: 10px;
     }
-    .media-viewer .wrapper .v-btn:hover ~ .tooltip {
+    .video:not(.vad) .media-viewer .wrapper .v-btn:hover ~ .tooltip,
+    .video:not(.vad) .media-viewer .video-progress-block:hover .video-progress-time {
         display: block;
     }
     .media-viewer .wrapper .v-btn:hover ~ .tooltip.no-sound {
@@ -554,74 +561,83 @@
     .media-viewer li:last-child .wrapper .tooltip {
         right: 20px;
     }
+    .video.vad .media-viewer .speed-wrapper,
+    .video.vad .media-viewer .vol-wrapper,
+    .video.vad .media-viewer .repeat-wrapper,
+    .video.vad .media-viewer .subtitles-wrapper,
+    .video.vad .media-viewer .settings-wrapper {
+        display: none;
+    }
 
 /* Video advertisement */
     .viewer-vad-control {
-        background: var(--surface-black-bar);
+        background: linear-gradient(180deg, rgb(250, 250, 250, 0.6) 0%, rgb(242, 242, 242, 0.6) 100%);
         border-radius: 4px;
-        bottom: 66px;
-        box-shadow: 0 0 0 2px var(--text-color-medium);
-        color: var(--text-color-medium);
+        color: rgb(51, 51, 51);
         cursor: default;
-        height: 48px;
-        margin: 0 0 16px;
-        min-width: 120px;
-        position: absolute;
+        height: 36px;
+        line-height: 36px;
+        min-width: 90px;
         right: 12px;
-        text-align: center;
+        white-space: nowrap;
+        bottom: 76px;
+        border: 2px solid rgb(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: space-evenly;
+        font-size: 16px;
+        --icon-size: 18px;
+    }
+    .viewer-vad-control,
+    .viewer-vad-info {
+        position: absolute;
         transition: var(--transition-all);
         z-index: 10;
-        white-space: nowrap;
+    }
+    .viewer-vad-info {
+        text-align: left;
+        background-color: white;
+        border-radius: 8px;
+        left: 12px;
+        bottom: 78px;
+        padding: 16px;
+        box-shadow: 0 0 3px var(--secondary-grey);
+    }
+    .rtl .viewer-vad-info,
+    .rtl .viewer-vad-control {
+        direction: rtl;
+    }
+    .rtl .viewer-vad-info button {
+        float: right;
+    }
+    .viewer-vad-info .vad-info-title {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        font: var(--text-h3-bold);
+        color: black;
+    }
+    .viewer-vad-info .vad-info-title p {
+        padding: 0 8px;
+        margin: 0;
+    }
+    .viewer-vad-info .vad-info-txt {
+        max-width: 314px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        line-clamp: 3;
+        overflow: hidden;
+        font: var(--text-body2);
+        margin: 8px 0 14px;
+        color: rgb(51, 51, 51);
     }
     .viewer-vad-control.skip {
         cursor: pointer;
+        background: linear-gradient(180deg, rgb(250, 250, 250) 0%, rgb(242, 242, 242) 100%);
     }
-    .viewer-vad-control.skip:hover {
-        color: var(--text-color-high);
-    }
-    .viewer-vad-control .thumb {
+    .media-viewer.video-paused .viewer-vad-control:not(.skip) {
         display: none;
-        float: right;
-        height: 48px;
-        line-height: 0;
-        overflow: hidden;
-        width: 76px;
-    }
-    .viewer-vad-control .thumb.active {
-        display: block;
-    }
-    .viewer-vad-control .thumb img,
-    .video .download.video-block .viewer-vad-control .thumb img {
-        display: block;
-        height: auto;
-        left: 50%;
-        max-width: 86px;
-        min-height: 100%;
-        min-width: 100%;
-        position: relative;
-        top: 50%;
-        transform: translate(-50%, -50%);
-    }
-    .viewer-vad-control .counter {
-        display: inline-block;
-        padding: 0 10px;
-    }
-    .viewer-vad-control .label,
-    .viewer-vad-control.skip .thumb.active,
-    .viewer-vad-control.skip .counter {
-        display: none;
-    }
-    .viewer-vad-control.skip .label {
-        display: block;
-        padding: 0 14px;
-    }
-    .viewer-vad-control .label i {
-        margin: 14px -3px 0 11px;
-        opacity: 0.8;
-        transition: var(--transition-all);
-    }
-    .viewer-vad-control.skip:hover .label i {
-        opacity: 1;
     }
     .video-progress-bar.vad {
         background: var(--surface-black-bar);

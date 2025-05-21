@@ -64,10 +64,23 @@ mega.ui.pm = {
                     else if (action === 'edit' && M.d[target]) {
                         const item = this.list.passwordList.componentSelector(`#${CSS.escape(target)}`);
                         if (item) {
-                            return item.trigger('click.selectItem')
-                                .then(() => {
-                                    this.contextMenu.domNode.componentSelector('.edit-item').trigger('click');
-                                });
+                            const result = item.trigger('click.selectItem');
+                            const triggerEdit = () => {
+                                this.contextMenu.domNode.componentSelector('.edit-item').trigger('click');
+                            };
+                            if (result instanceof Promise) {
+                                result.then(triggerEdit);
+                            }
+                            else if (
+                                result === true &&
+                                !(
+                                    mega.ui.pm.overlay.visible &&
+                                    mega.ui.passform &&
+                                    mega.ui.passform.formType === 'update'
+                                )
+                            ) {
+                                triggerEdit();
+                            }
                         }
                     }
                 }

@@ -1244,7 +1244,7 @@ class MEGAKeepAliveStream {
     }
 
     async fetch(options) {
-        this.schedule(36);
+        this.schedule(42);
         const {body, ok, status, statusText} = await this.fire(options);
 
         this.status = status;
@@ -1447,7 +1447,7 @@ lazy(self, 'api', () => {
     // Set globally-accessed last-seen sequence-tag
     const mSetLastSt = (st) => {
         if (st !== lastst) {
-            if (self.d > 1) {
+            if (self.d > 1 || 'rad' in mega) {
                 logger.warn('Updating last-st, %s -> %s', lastst, st);
             }
             lastst = typeof st === 'string' && st || lastst;
@@ -1898,7 +1898,9 @@ lazy(self, 'api', () => {
                     return 3;
                 }
 
-                // logger.warn('ack(%s)=%s/%s', pid, pr.st > currst, inflight.has(pr.st), currst, lastst, hold, [pr]);
+                if (self.d > 1 || 'rad' in mega) {
+                    logger.warn('push(%s)=%s/%s', pid, pr.st > currst, inflight.has(pr.st), currst, lastst, hold, [pr]);
+                }
 
                 pid = inflight.get(pr.st);
                 if (!pid) {

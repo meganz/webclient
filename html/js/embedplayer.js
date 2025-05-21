@@ -250,14 +250,11 @@ function add_layout() {
     $('body').safeHTML(translate(pages.index).replace(/{staticpath}/g, staticpath));
 
     var elm = document.querySelector('video');
-    var style = elm.style;
-    var fill = function() {
-        style.maxWidth = style.minWidth = window.innerWidth + 'px';
-        style.maxHeight = style.minHeight = window.innerHeight + 'px';
-    };
-    fill();
+    const { style } = elm;
+    style.maxWidth = style.minWidth = '100vw';
+    style.maxHeight = style.minHeight = '100vh';
+
     elm.controls = false;
-    window.addEventListener('resize', fill);
 
     topmenuUI();
 }

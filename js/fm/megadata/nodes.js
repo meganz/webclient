@@ -87,11 +87,6 @@
         }
         // console.time(`delNode.${h}`);
 
-        if (fminitialized) {
-            // Handle Inbox/RubbishBin UI changes
-            delay('fmLeftMenuUI', fmLeftMenuUI);
-        }
-
         const nodeType = this.d[h] && this.d[h].t;
 
         if (this.d[h] && !this.d[h].t && this.d[h].tvf) {
@@ -176,9 +171,6 @@ MegaData.prototype.addNode = function(n, ignoreDB) {
 
     if (fminitialized) {
         newnodes.push(n);
-
-        // Handle Inbox/RubbishBin UI changes
-        delay('fmLeftMenuUI', fmLeftMenuUI);
     }
 };
 
@@ -1335,7 +1327,6 @@ MegaData.prototype.moveNodes = async function(n, t, folderConflictResolution) {
                 })
                 .then((res) => {
                     $.tresizer();
-                    onIdle(fmLeftMenuUI);
 
                     cleanups();
 

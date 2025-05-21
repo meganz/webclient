@@ -611,7 +611,7 @@ function createTimeoutPromise(validateFunction, tick, timeout, waitForPromise, n
     let _res, _rej;
     let running = true;
     let state = 'pending';
-    const debug = window.d > 2;
+    const debug = window.d > 2 || 'rad' in mega;
     const tag = (m) => `[${name}] ${m}`;
     const log = (m, ...args) => console.warn(tag(m), ...args);
 
@@ -632,6 +632,15 @@ function createTimeoutPromise(validateFunction, tick, timeout, waitForPromise, n
         assert(tick > 100, tag(`at least 100ms are expected, ${tick} provided.`));
         assert(timeout > tick && timeout < 6e5, tag(`Invalid timeout value (${timeout})`));
         validateFunction = tryCatch(validateFunction);
+
+        if (document.hidden) {
+            const tmp = Math.min(tick + (timeout >> 3), 1e4);
+
+            if (debug) {
+                log('Background tab, changing %s interval to %s...', tick, tmp);
+            }
+            tick = tmp;
+        }
 
         Promise.resolve(waitForPromise)
             .then(async() => {

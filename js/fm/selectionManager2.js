@@ -224,12 +224,14 @@ class SelectionManager2Base {
      * @param {String} nodeId the id of the node
      */
     remove_from_selection(nodeId) {
+        let last = false;
         var foundIndex = this.selected_list.indexOf(nodeId);
 
         if (foundIndex > -1) {
             this.selected_list.splice(foundIndex, 1);
             if (this.last_selected === nodeId) {
                 this.last_selected = null;
+                last = true;
             }
             this.eventHandlers.onSelectedUpdated(this.selected_list);
             if (this.debugMode) {
@@ -244,6 +246,8 @@ class SelectionManager2Base {
         else if (this.debugMode) {
             console.error("can't remove:", nodeId, JSON.stringify(this.selected_list), JSON.stringify($.selected));
         }
+
+        return last;
     }
 
     /**
@@ -795,25 +799,29 @@ class SelectionManager2_DOM extends SelectionManager2Base {
     }
 
     remove_from_selection(nid, scrollTo) {
-
-        let old_last_selected = this.last_selected;
-        super.remove_from_selection(nid);
+        const last = super.remove_from_selection(nid);
 
         const e = M.megaRender ? M.megaRender.getDOMNode(nid) : document.getElementById(nid);
 
         if (e) {
             e.classList.remove(this.CLS_UI_SELECTED);
 
-            if (old_last_selected === nid) {
+            if (last) {
                 e.classList.remove('currently-selected');
             }
         }
 
-        delay('selManUpdNotif', () => {
+        if (this.rAFw) {
+            return;
+        }
+        this.rAFw = 1;
+
+        requestAnimationFrame(() => {
 
             if (!this.removing_list || !this.selected_list) {
                 return;
             }
+            this.rAFw = 0;
 
             const selListMap = array.to.object(this.selected_list);
 
@@ -840,7 +848,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             this.selectionNotification(nid, false, scrollTo);
             this.removing_list = [];
             this.removing_sizes = Object.create(null);
-        }, 50);
+        });
     }
 
     select_all() {

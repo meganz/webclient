@@ -621,6 +621,7 @@
 
 #propay .specific-payment-info .propay-inline-dialog.payment-stripe-dialog .iframe-container {
     height: 366px;
+    transition: all 200ms ease;
 }
 #propay .specific-payment-info .bitcoin-invoice-dialog .content {
     display: flex;

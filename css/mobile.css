@@ -5981,81 +5981,14 @@ textarea.mobile.support-text-field {
 }
 /*  Video Ad */
 .mobile  .viewer-vad-control {
-    position: absolute;
-    min-width: 120px;
-    height: 38px;
-    background-color: rgba(0,0,0,0.6);
-    box-shadow: 0 0 0 2px rgba(255,255,255,0.5);
-    border-radius: 3px;
-    bottom: 58px;
-    right: 12px;
+    bottom: 48px;
     z-index: 11;
-    color: rgba(255,255,255,0.8);
-    font-size: 16px;
-    line-height: 38px;
-    white-space: nowrap;
-    text-align: center;
-    text-transform: capitalize;
-    transition: all 200ms linear;
-    cursor: default;
 }
 .mobile .slides-bl .viewer-vad-control {
     bottom: 119px;
 }
 .mobile .slides-bl .viewer-vad-control.bottom {
     bottom: 77px;
-}
-.mobile .slideshow-header.hidden + .slides-bl .viewer-vad-control {
-    bottom: 58px;
-}
-.mobile .slideshow-header.hidden + .slides-bl .viewer-vad-control.bottom, .viewer-vad-control.bottom.bottom {
-    bottom: 16px;
-}
-
-.mobile .viewer-vad-control.skip {
-    cursor: pointer;
-}
-.mobile .viewer-vad-control .thumb {
-    float: right;
-    width: 76px;
-    height: 38px;
-    line-height: 0;
-    display: none;
-    overflow: hidden;
-}
-.mobile .viewer-vad-control .thumb.active {
-    display: block;
-}
-.mobile .viewer-vad-control .thumb img, .mobile.video .download.video-block  .viewer-vad-control img {
-    height: auto;
-    display: block;
-    min-width: 100%;
-    min-height: 100%;
-    max-width: 86px;
-    transform: translate(-50%, -50%);
-    position: relative;
-    left: 50%;
-    top: 50%;
-}
-.mobile .viewer-vad-control .counter {
-    padding: 0 10px;
-    display: inline-block;
-}
-.mobile .viewer-vad-control .label, .mobile .viewer-vad-control.skip .thumb.active, .mobile .viewer-vad-control.skip .counter {
-    display: none;
-}
-.mobile .viewer-vad-control.skip .label {
-    display: block;
-    padding: 0 14px;
-}
-.mobile .viewer-vad-control .label i {
-    margin: 9px -3px 0 11px;
-    opacity: 0.8;
-    display: inline-block;
-    vertical-align: top;
-}
-.mobile .viewer-vad-control.skip:hover .label i {
-     opacity: 1;
 }
 .mobile .video-progress-bar.vad {
     transition: opacity 200ms ease-in-out, visibility 200ms ease-in-out;

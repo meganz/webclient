@@ -44,6 +44,17 @@ function removeUInode(h, parent) {
         M.dynContentLoader[M.currentdirid].sync(n);
     }
 
+    delay('fmLeftMenuUIRub', () => {
+        if (mega.ui.topmenu && mega.ui.topmenu.rubbishBtn) {
+            const rubNodes = Object.keys(M.c[M.RubbishID] || {});
+            if (rubNodes.length) {
+                mega.ui.topmenu.rubbishBtn.addClass('filled');
+            }
+            else {
+                mega.ui.topmenu.rubbishBtn.removeClass('filled');
+            }
+        }
+    });
     var hasItems = !!M.v.length;
     const __markEmptied = () => {
 

@@ -2303,7 +2303,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
             if (vAdInstance) {
                 rc = vAdInstance.start();
             }
-            if (!rc && vStream && options.autoplay) {
+            if (!rc && vStream && (is_audio(node) || options.autoplay)) {
                 rc = 2;
                 vStream.play();
             }

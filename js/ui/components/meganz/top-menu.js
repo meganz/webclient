@@ -54,6 +54,15 @@ class MegaTopMenu extends MegaMobileTopMenu {
         if (this.rootBtnWrap) {
             this.rootBtnWrap.classList.toggle('contains-tree', !!M.tree[M.RootID]);
         }
+        if (this.rubbishBtn) {
+            const rubNodes = Object.keys(M.c[M.RubbishID] || {});
+            if (rubNodes.length) {
+                this.rubbishBtn.addClass('filled');
+            }
+            else {
+                this.rubbishBtn.removeClass('filled');
+            }
+        }
     }
 
     closeActiveOverlays() {

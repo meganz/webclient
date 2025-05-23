@@ -2080,6 +2080,8 @@ function execsc() {
                         eventlog(99620, JSON.stringify([1, scqtail, scqhead, a.a, a.st]), true);
                     }
                     return;
+                case 2:
+                    return;
                 case 5:
                     a.i = requesti;
                     break;

@@ -1904,6 +1904,7 @@ lazy(self, 'api', () => {
 
                 pid = inflight.get(pr.st);
                 if (!pid) {
+                    if (currst == '.') return 7;
                     return pr.st > currst ? 7 : 2;
                 }
             }

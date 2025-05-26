@@ -48,7 +48,9 @@ html .theme-light-forced {
     --mobile-text-accent: rgba(4, 16, 30, var(--mobile-text-alpha, 1));
     --mobile-text-brand: rgba(221, 20, 5, var(--mobile-text-alpha, 1));
     --mobile-text-placeholder: rgba(97, 99, 102, var(--mobile-text-alpha, 1));
+    --mobile-text-inverse: rgba(250, 250, 250, var(--mobile-text-alpha, 1));
     --mobile-text-inverse-accent: rgba(250, 250, 251, var(--mobile-text-alpha, 1));
+    --mobile-text-inverse-secondary: rgba(176, 177, 179, var(--mobile-text-alpha, 1));
     --mobile-text-on-color: rgba(250, 250, 250, var(--mobile-text-alpha, 1));
     --mobile-text-on-color-disabled: rgba(169, 171, 173, var(--mobile-text-alpha, 1));
     --mobile-text-error: rgba(227, 27, 87, var(--mobile-text-alpha, 1));
@@ -56,15 +58,15 @@ html .theme-light-forced {
     --mobile-text-info: rgba(0, 120, 164, var(--mobile-text-alpha, 1));
     --mobile-text-warning: rgba(181, 84, 7, var(--mobile-text-alpha, 1));
     --mobile-text-disabled: rgba(193, 194, 196, var(--mobile-text-alpha, 1));
-    --mobile-text-inverse: rgba(250, 250, 250, var(--mobile-text-alpha, 1));
     --mobile-icon-primary: rgba(48, 50, 51, var(--mobile-icon-alpha, 1));
     --mobile-icon-secondary: rgba(97, 99, 102, var(--mobile-icon-alpha, 1));
     --mobile-icon-accent: rgba(4, 16, 30, var(--mobile-icon-alpha, 1));
     --mobile-icon-brand: rgba(221, 20, 5, var(--mobile-icon-alpha, 1));
+    --mobile-icon-inverse: rgba(250, 250, 250, var(--mobile-icon-alpha, 1));
     --mobile-icon-inverse-accent: rgba(250, 250, 251, var(--mobile-icon-alpha, 1));
+    --mobile-icon-inverse-secondary: rgba(176, 177, 179, var(--mobile-icon-alpha, 1));
     --mobile-icon-on-color: rgba(250, 250, 250, var(--mobile-icon-alpha, 1));
     --mobile-icon-on-color-disabled: rgba(169, 171, 173, var(--mobile-icon-alpha, 1));
-    --mobile-icon-inverse: rgba(250, 250, 250, var(--mobile-icon-alpha, 1));
     --mobile-icon-disabled: rgba(193, 194, 196, var(--mobile-icon-alpha, 1));
     --mobile-support-success: rgba(0, 155, 72, var(--mobile-support-alpha, 1));
     --mobile-support-warning: rgba(247, 163, 8, var(--mobile-support-alpha, 1));
@@ -88,6 +90,14 @@ html .theme-light-forced {
     --mobile-link-inverse: rgba(105, 163, 251, var(--mobile-link-alpha, 1));
     --mobile-link-visited: rgba(35, 55, 131, var(--mobile-link-alpha, 1));
     --mobile-focus: rgba(189, 217, 255, var(--mobile-focus-alpha, 1));
+    --mobile-default: rgba(221, 20, 5, var(--mobile-default-alpha, 1));
+    --mobile-hover: rgba(182, 23, 20, var(--mobile-hover-alpha, 1));
+    --mobile-pressed: rgba(147, 23, 21, var(--mobile-pressed-alpha, 1));
+    --mobile-on-brand: rgba(247, 247, 247, var(--mobile-on-alpha, 1));
+    --mobile-container-default: rgba(252, 239, 239, var(--mobile-container-alpha, 1));
+    --mobile-container-hover: rgba(252, 224, 223, var(--mobile-container-alpha, 1));
+    --mobile-container-pressed: rgba(254, 199, 199, var(--mobile-container-alpha, 1));
+    --mobile-on-container: rgba(123, 33, 24, var(--mobile-on-alpha, 1));
 }
 /* dark theme */
 .theme-dark,
@@ -117,7 +127,7 @@ html .theme-dark-forced {
     --mobile-button-secondary: rgba(73, 74, 77, var(--mobile-button-alpha, 1));
     --mobile-button-primary-hover: rgba(163, 166, 173, var(--mobile-button-alpha, 1));
     --mobile-button-secondary-hover: rgba(97, 99, 102, var(--mobile-button-alpha, 1));
-    --mobile-border-brand: rgba(251, 99, 97, var(--mobile-border-alpha, 1));
+    --mobile-border-brand: rgba(242, 52, 51, var(--mobile-border-alpha, 1));
     --mobile-border-strong: rgba(97, 99, 102, var(--mobile-border-alpha, 1));
     --mobile-border-strong-selected: rgba(244, 244, 245, var(--mobile-border-alpha, 1));
     --mobile-border-subtle: rgba(48, 50, 51, var(--mobile-border-alpha, 1));
@@ -128,7 +138,9 @@ html .theme-dark-forced {
     --mobile-text-accent: rgba(250, 250, 251, var(--mobile-text-alpha, 1));
     --mobile-text-brand: rgba(242, 52, 51, var(--mobile-text-alpha, 1));
     --mobile-text-placeholder: rgba(193, 194, 196, var(--mobile-text-alpha, 1));
+    --mobile-text-inverse: rgba(48, 50, 51, var(--mobile-text-alpha, 1));
     --mobile-text-inverse-accent: rgba(4, 16, 30, var(--mobile-text-alpha, 1));
+    --mobile-text-inverse-secondary: rgba(97, 99, 102, var(--mobile-text-alpha, 1));
     --mobile-text-on-color: rgba(250, 250, 250, var(--mobile-text-alpha, 1));
     --mobile-text-on-color-disabled: rgba(145, 147, 151, var(--mobile-text-alpha, 1));
     --mobile-text-error: rgba(253, 111, 144, var(--mobile-text-alpha, 1));
@@ -136,22 +148,22 @@ html .theme-dark-forced {
     --mobile-text-info: rgba(5, 186, 241, var(--mobile-text-alpha, 1));
     --mobile-text-warning: rgba(247, 163, 8, var(--mobile-text-alpha, 1));
     --mobile-text-disabled: rgba(121, 124, 128, var(--mobile-text-alpha, 1));
-    --mobile-text-inverse: rgba(48, 50, 51, var(--mobile-text-alpha, 1));
     --mobile-icon-primary: rgba(243, 244, 244, var(--mobile-icon-alpha, 1));
     --mobile-icon-secondary: rgba(169, 171, 173, var(--mobile-icon-alpha, 1));
     --mobile-icon-accent: rgba(250, 250, 251, var(--mobile-icon-alpha, 1));
     --mobile-icon-brand: rgba(242, 52, 51, var(--mobile-icon-alpha, 1));
+    --mobile-icon-inverse: rgba(48, 50, 51, var(--mobile-icon-alpha, 1));
     --mobile-icon-inverse-accent: rgba(4, 16, 30, var(--mobile-icon-alpha, 1));
+    --mobile-icon-inverse-secondary: rgba(97, 99, 102, var(--mobile-icon-alpha, 1));
     --mobile-icon-on-color: rgba(250, 250, 250, var(--mobile-icon-alpha, 1));
     --mobile-icon-on-color-disabled: rgba(145, 147, 151, var(--mobile-icon-alpha, 1));
-    --mobile-icon-inverse: rgba(48, 50, 51, var(--mobile-icon-alpha, 1));
     --mobile-icon-disabled: rgba(121, 124, 128, var(--mobile-icon-alpha, 1));
     --mobile-support-success: rgba(9, 191, 91, var(--mobile-support-alpha, 1));
     --mobile-support-warning: rgba(247, 163, 8, var(--mobile-support-alpha, 1));
     --mobile-support-error: rgba(253, 111, 144, var(--mobile-support-alpha, 1));
     --mobile-support-info: rgba(0, 150, 201, var(--mobile-support-alpha, 1));
     --mobile-selection-control: rgba(244, 244, 245, var(--mobile-selection-alpha, 1));
-    --mobile-interactive: rgba(251, 99, 97, var(--mobile-interactive-alpha, 1));
+    --mobile-interactive: rgba(242, 52, 51, var(--mobile-interactive-alpha, 1));
     --mobile-toast-background: rgba(193, 194, 196, var(--mobile-toast-alpha, 1));
     --mobile-notification-success: rgba(1, 83, 43, var(--mobile-notification-alpha, 1));
     --mobile-notification-warning: rgba(148, 65, 11, var(--mobile-notification-alpha, 1));
@@ -168,4 +180,12 @@ html .theme-dark-forced {
     --mobile-link-inverse: rgba(44, 91, 235, var(--mobile-link-alpha, 1));
     --mobile-link-visited: rgba(217, 232, 255, var(--mobile-link-alpha, 1));
     --mobile-focus: rgba(38, 71, 208, var(--mobile-focus-alpha, 1));
+    --mobile-default: rgba(242, 52, 51, var(--mobile-default-alpha, 1));
+    --mobile-hover: rgba(251, 99, 97, var(--mobile-hover-alpha, 1));
+    --mobile-pressed: rgba(253, 153, 151, var(--mobile-pressed-alpha, 1));
+    --mobile-on-brand: rgba(247, 247, 247, var(--mobile-on-alpha, 1));
+    --mobile-container-default: rgba(123, 33, 24, var(--mobile-container-alpha, 1));
+    --mobile-container-hover: rgba(147, 23, 21, var(--mobile-container-alpha, 1));
+    --mobile-container-pressed: rgba(182, 23, 20, var(--mobile-container-alpha, 1));
+    --mobile-on-container: rgba(252, 239, 239, var(--mobile-on-alpha, 1));
 }

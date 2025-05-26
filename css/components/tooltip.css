@@ -1,0 +1,158 @@
+.mega-component.mega-tooltip .tooltip {
+    position: absolute;
+    box-sizing: border-box;
+    padding: 16px;
+    border-radius: var(--mobile-border-radius-medium);
+    background: var(--mobile-background-inverse);
+    color: var(--mobile-text-primary);
+    display: flex;
+    flex-direction: row;
+    min-width: 180px;
+    width: 280px;
+    height: auto;
+}
+  
+.mega-component.mega-tooltip .tooltip.simple {
+    min-width: auto;
+    width: auto;
+    max-width: 360px;
+    text-align: center;
+}
+  
+.mega-component.mega-tooltip .tooltip-content {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+  
+.mega-component.mega-tooltip .tooltip-title {
+    font: var(--mobile-font-copy-semibold);
+    color: var(--mobile-text-inverse);
+    margin: 0;
+}
+  
+.mega-component.mega-tooltip .tooltip-body {
+    font: var(--mobile-font-caption-large-regular);
+    color: var(--mobile-text-inverse-secondary);
+    margin-top: 8px;
+}
+  
+.mega-component.mega-tooltip .tooltip-body:empty {
+    display: none;
+}
+  
+.mega-component.mega-tooltip .tooltip-actions {
+    margin-top: 12px;
+    border-top: 1px solid var(--mobile-icon-secondary);
+    padding-top: 4px;
+    display: flex;
+    flex-direction: column;
+}
+  
+.mega-component.mega-tooltip .tooltip-actions .button {
+    width: 100%;
+    padding: 0;
+    background: none;
+    height: auto;
+    justify-content: flex-start;
+}
+  
+.mega-component.mega-tooltip .tooltip-actions .button.primary span {
+    font: var(--mobile-font-link-large-semibold);
+    color: var(--mobile-text-inverse);
+}
+  
+.mega-component.mega-tooltip .tooltip-actions .button.secondary span {
+    font: var(--mobile-font-link-small-semibold);
+    color: var(--mobile-text-inverse-secondary);
+}
+  
+.mega-component.mega-tooltip .tooltip-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+  
+.mega-component.mega-tooltip .close {
+    color: var(--mobile-icon-inverse-secondary);
+    padding: 0;
+    margin-left: 8px;
+}
+  
+.mega-component.mega-tooltip .tooltip-step {
+    margin-top: auto;
+    color: var(--mobile-icon-inverse-secondary);
+    font: var(--mobile-font-caption-small-regular);
+    margin-left: 8px;
+}
+
+.mega-component.mega-tooltip .tooltip-title:empty,
+.mega-component.mega-tooltip .tooltip-body:empty,
+.mega-component.mega-tooltip .tooltip-actions:empty,
+.mega-component.mega-tooltip .tooltip-controls:empty,
+.mega-component.mega-tooltip .tooltip-step:empty {
+    display: none;
+}
+
+/* Arrow via pseudo-element */
+.mega-component.mega-tooltip .tooltip::before {
+    content: "";
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-style: solid;
+}
+  
+/* Arrow directions */
+.mega-component.mega-tooltip .tooltip.position-top::before {
+    bottom: -8px;
+    border-width: 8px 8px 0;
+    border-color: var(--mobile-background-inverse) transparent transparent transparent;
+}
+  
+.mega-component.mega-tooltip .tooltip.position-bottom::before {
+    top: -8px;
+    border-width: 0 8px 8px;
+    border-color: transparent transparent var(--mobile-background-inverse) transparent;
+}
+
+.mega-component.mega-tooltip .tooltip.position-right::before {
+    left: -8px;
+    border-width: 8px 8px 8px 0;
+    border-color: transparent var(--mobile-background-inverse) transparent transparent;
+}
+  
+.mega-component.mega-tooltip .tooltip.position-left::before {
+    right: -8px;
+    border-width: 8px 0 8px 8px;
+    border-color: transparent transparent transparent var(--mobile-background-inverse);
+}
+  
+/* Horizontal alignment for top/bottom arrows */
+.mega-component.mega-tooltip .tooltip.position-top.align-start::before,
+.mega-component.mega-tooltip .tooltip.position-bottom.align-start::before {
+    left: 12px;
+}
+.mega-component.mega-tooltip .tooltip.position-top.align-center::before,
+.mega-component.mega-tooltip .tooltip.position-bottom.align-center::before {
+    left: calc(50% - 8px);
+}
+.mega-component.mega-tooltip .tooltip.position-top.align-end::before,
+.mega-component.mega-tooltip .tooltip.position-bottom.align-end::before {
+    right: 12px;
+}
+  
+/* Vertical alignment for left/right arrows */
+.mega-component.mega-tooltip .tooltip.position-left.align-start::before,
+.mega-component.mega-tooltip .tooltip.position-right.align-start::before {
+    top: 12px;
+}
+.mega-component.mega-tooltip .tooltip.position-left.align-center::before,
+.mega-component.mega-tooltip .tooltip.position-right.align-center::before {
+    top: calc(50% - 8px);
+}
+.mega-component.mega-tooltip .tooltip.position-left.align-end::before,
+.mega-component.mega-tooltip .tooltip.position-right.align-end::before {
+    bottom: 12px;
+}
+  

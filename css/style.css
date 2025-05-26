@@ -7497,6 +7497,11 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     -webkit-filter: blur(0.25em);
 }
 
+.overlayed-backdrop-dim .main-blur-block {
+    filter: brightness(0.8);
+    overflow: hidden;
+}
+
 
 /**
  * MegaDialog.js

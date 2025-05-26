@@ -314,10 +314,12 @@ lazy(s4, 'utils', () => {
             else {
                 cfgName = 'skips4tocd';
 
-                // Buckets to Cloud drive
+                // Move Buckets to Cloud drive
                 if (type === 'bucket') {
-                    title = l[`s4_title_${ action }_bucket_to_cd${ suffix }`];
-                    message = l[`s4_warn_copy_move_bucket_to_cd${ suffix }`];
+                    if (action === 'move') {
+                        title = l[`s4_title_${ action }_bucket_to_cd${ suffix }`];
+                        message = l[`s4_warn_copy_move_bucket_to_cd${ suffix }`];
+                    }
                 }
                 // Objects or sub-folders to Cloud drive
                 else if (type === 'object' || type === 'bucket-child' && s4Nodes.length === 1) {
@@ -408,7 +410,7 @@ lazy(s4, 'utils', () => {
             return path.slice(1).join('/');
         },
 
-        renderContainerTree(dialog) {
+        renderContainerTree(dialog, sSubMap) {
             const wrapperClass = typeof dialog === 'string' && dialog || 'js-s4-tree-panel';
             const treeWrap = document.querySelector(`.${wrapperClass}`);
             const cn = this.getContainersList();
@@ -453,7 +455,7 @@ lazy(s4, 'utils', () => {
 
                 if (cnNode) {
                     treeNode.appendChild(cnNode);
-                    M.buildtree({h: cn[i].h}, dialog, 's4');
+                    M.buildtree({h: cn[i].h}, dialog, 's4', sSubMap);
                     continue;
                 }
 
@@ -477,7 +479,7 @@ lazy(s4, 'utils', () => {
                     createItem(wrapNode, `${cn[i].h}_users`, l.s4_users, 'icon-user-thin-outline', true, 500640);
                 }
 
-                M.buildtree({h: cn[i].h}, dialog, 's4');
+                M.buildtree({h: cn[i].h}, dialog, 's4', sSubMap);
             }
         },
 

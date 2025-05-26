@@ -302,7 +302,8 @@ class MegaTopMenu extends MegaMobileTopMenu {
 
         if (!this.storageBlock) {
             this.storageBlock = new MegaStorageBlock({
-                parentNode: this.domNode
+                parentNode: this.domNode,
+                achievements: true,
             });
         }
 

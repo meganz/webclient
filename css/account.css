@@ -8,16 +8,19 @@
     width: 486px;
     padding:64px 0;
 }
-.account.register-form, .account.login-form {
+.account.form-body {
     width: 100%;
-    border: 1px solid rgba(0,0,0,0.05);
+    border: 1px solid rgba(0, 0, 0, 0.05);
     border-radius: 24px;
-    padding: 4px 48px 0;
+    padding: 4px 0 0;
     box-sizing: border-box;
     background-color: var(--surface-main);
-    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.1);
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
     text-align: center;
     overflow: hidden;
+}
+.account.form-body .form-content {
+    padding: 0 48px;
 }
 .account.register-form .pw-strength-wrap {
     margin-top: -15px;
@@ -47,8 +50,7 @@
     margin-left: 4px;
     color: #aaa;
 }
-.account.register-form .dialog-dark-bottom.login,
-.account.login-form .dialog-dark-bottom.register {
+.account.form-body .dialog-dark-bottom {
     align-items: center;
     color: var(--text-color-medium);
     background: var(--surface-grey-2);
@@ -56,16 +58,15 @@
     display: flex;
     font: var(--text-body1);
     justify-content: center;
-    margin: 0 -48px;
     min-height: 48px;
     padding: 12px 48px;
+    width: 100%;
 }
 .main-left-block.confirm .account.login-form .dialog-dark-bottom.register,
 .main-left-block.businessSubAc .account.register-form .dialog-dark-bottom.login  {
     display: none;
 }
-.account.register-form .dialog-dark-bottom.login a,
-.account.login-form .dialog-dark-bottom.register a {
+.account.form-body .dialog-dark-bottom a {
     font-size: 15px;
     color: var(--text-color-medium);
     font-family: var(--text-font-family);

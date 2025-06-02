@@ -798,8 +798,9 @@
         passwordReminderDialog.passwordReminderAttribute.masterKeyExported = 1;
     });
 
-    mBroadcaster.addListener('attr:passwordReminderDialog', function() {
+    // xxx: debounce, there may be too many 'ua' packets arriving each one triggering a ^!prd...
+    mBroadcaster.addListener('attr:passwordReminderDialog', SoonFc(2e3, () => {
         passwordReminderDialog.passwordReminderAttribute.attributeUpdatedViaAp();
-    });
+    }));
 
 })(window);

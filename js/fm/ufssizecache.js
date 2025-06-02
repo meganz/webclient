@@ -199,6 +199,10 @@ UFSSizeCache.prototype.addToDB = function(n) {
             fa: n.fa || '',
             d: n
         });
+
+        if (mega.infinity && self.currsn) {
+            delay('inf(fmdb:flush)', () => !self.pfid && setsn(self.currsn));
+        }
     }
 
     if (n.t) {

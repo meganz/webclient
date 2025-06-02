@@ -316,11 +316,11 @@ lazy(self, 'tSleep', function tSleep() {
      * Helper around Promise.race()
      * @param {Number} timeout in seconds, per {@link tSleep}
      * @param {Promise<[*]>} args promises to race against.
-     * @returns {Promise} eventual state of the first promise in the iterable to settle.
+     * @returns {Promise<*>} eventual state of the first promise in the iterable to settle.
      * @memberOf tSleep
      */
     tSleep.race = (timeout, ...args) => {
-        return Promise.race([tSleep(timeout), ...args]);
+        return Promise.race([tSleep(timeout, ETEMPUNAVAIL), ...args]);
     };
 
     /**
@@ -628,11 +628,8 @@ mBroadcaster.once('boot_done', tryCatch(() => {
         IDLE_PIPELINE.tasks.push(task);
 
         if (!IDLE_PIPELINE.pid) {
-            if (document.hidden) {
+            if (lax > 1 || document.hidden) {
                 IDLE_PIPELINE.pid = sleep(IDLE_TIMEOUT.delay / 1e3).always(idleCallbackHandler);
-            }
-            else if (lax > 1) {
-                IDLE_PIPELINE.pid = requestAnimationFrame(idleCallbackHandler);
             }
             else {
                 IDLE_PIPELINE.pid = scheduler.postTask(idleCallbackHandler, IDLE_TIMEOUT);

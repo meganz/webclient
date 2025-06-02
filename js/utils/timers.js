@@ -154,50 +154,10 @@ lazy(self, 'tSleep', function tSleep() {
 
     const pending = new Set();
     const symbol = Symbol('^^tSleep::scheduler~~');
-    const rnd = crypto.getRandomValues(new Uint32Array(768));
-    const tbsp = Promise.resolve();
 
     let pid = 0;
     let tid = null;
     let threshold = MAX_THRESHOLD;
-
-    const asap = async(ms) => {
-        const xid = pid;
-        const now = performance.now();
-        ms |= 1;
-        // console.warn(`asap#${xid}:${ms}`);
-        do {
-            const tmp = await factory.require('pbkdf2').sha256(rnd, rnd.slice(-36), 2e6);
-            rnd.set(new Uint32Array(tmp));
-            await tbsp;
-
-            if (xid !== pid || performance.now() - now > ms) {
-                break;
-            }
-            if (ms > 7e3) {
-                let prom;
-
-                if ('enotconn' in self && self.enotconn.size) {
-
-                    prom = mBroadcaster.when('enotconn:ack');
-                }
-                else {
-
-                    prom = fetch(`${self.apipath}to?${Math.min(60, ms / 1e3 >> 1)}`).catch(nop);
-                }
-
-                if (!tbsp.stateChange) {
-                    tbsp.stateChange = mBroadcaster.when('statechange')
-                        .finally(() => {
-                            tbsp.stateChange = null;
-                        });
-                }
-
-                await Promise.race([prom, tbsp.stateChange]);
-            }
-        }
-        while (1);
-    };
 
     const dequeue = () => {
         const tick = performance.now();
@@ -224,11 +184,10 @@ lazy(self, 'tSleep', function tSleep() {
             if (self.d > 2) {
                 console.warn(`tSleep rescheduled for ${threshold | 0}ms`, pending);
             }
-            if (document.hidden) {
+            if (document.hidden && self.tSleep !== self.sleep) {
                 tid = -1;
                 const xid = ++pid;
-                const ready = self.tSleep === self.sleep ? asap(threshold) : sleep(threshold / 1e3);
-                return ready.always(() => xid === pid && dequeue());
+                return sleep(threshold / 1e3).always(() => xid === pid && dequeue());
             }
             tid = gSetTimeout(dequeue, threshold);
         }
@@ -418,9 +377,6 @@ lazy(self, 'tSleep', function tSleep() {
         return obj.timer;
     };
 
-    // @private
-    tSleep.asap = asap;
-
     return freeze(tSleep);
 });
 
@@ -432,15 +388,16 @@ lazy(self, 'tSleep', function tSleep() {
  * @function window.sleep
  * @description This is a low-level high performance non-throttled helper whose use takes careful thought.
  */
-lazy(self, 'sleep', function sleep() {
-    'use strict';
-
-    if (!self.AudioWorkletNode || typeof Worklet === 'undefined' || !Worklet.prototype.addModule) {
-        if (d) {
-            console.warn('Weak sleep() implementation, using throttled-setTimeout()');
-        }
+Object.defineProperty(self, 'sleep', {
+    get() {
+        'use strict';
         return tSleep;
-    }
+    },
+    configurable: true
+});
+
+self.mCreateHighPrecisionSleep = (ctx) => {
+    'use strict';
 
     const MIN_THRESHOLD = 100;
     const MAX_THRESHOLD = 4e6;
@@ -453,11 +410,6 @@ lazy(self, 'sleep', function sleep() {
             super(ctx, 'mega-worklet-messenger');
             this.port.onmessage = (ev) => this.handleMessage(ev);
             this._connected = false;
-            this.attach().catch(dump);
-        }
-
-        get ready() {
-            return true;
         }
 
         async attach() {
@@ -508,104 +460,84 @@ lazy(self, 'sleep', function sleep() {
         }
     };
 
-    Promise.resolve().then(() => Promise.race([
-        mega.worklet, tSleep(11).then(() => {
-            if (!worklet.ready) {
-                throw new SecurityError('Timed out.');
-            }
-        })
-    ])).then((ctx) => {
-        // override as the only class instance.
-        worklet = new worklet(ctx);
-    }).catch(ex => {
-        if (d) {
-            console.warn('The audio worklet failed to start, falling back to low-precision sleep()...', ex);
-        }
+    // override as the only class instance.
+    worklet = new worklet(ctx);
 
-        delete window.sleep;
-        window[`sl${'e'}ep`] = tSleep;
+    assert(ctx.state === 'running', `Invalid audio-context state, ${ctx.state}`);
+    ctx = null;
 
-        const t = performance.now();
-        for (const res of pending) {
-            const {data, now, ts} = res;
-            const e = t - now;
-            if (e + MIN_THRESHOLD > ts) {
-                res(data);
-            }
-            else {
-                tSleep((ts - e) / 1e3, data).then(res);
-            }
-        }
-        pending.clear();
-    }).finally(() => {
-        delete mega.worklet;
-    });
+    Object.defineProperty(self, 'sleep', {
+        value: (ts, data) => new Promise(resolve => {
+            ts = ts * 1e3 | 0;
 
-    return (ts, data) => new Promise(resolve => {
-        ts = ts * 1e3 | 0;
+            resolve.ts = ts;
+            resolve.data = data;
+            resolve.now = performance.now();
+            pending.add(resolve);
 
-        resolve.ts = ts;
-        resolve.data = data;
-        resolve.now = performance.now();
-        pending.add(resolve);
+            // resist-fingerprint-aware..
+            threshold = Math.max(MIN_THRESHOLD, Math.min(ts, threshold));
 
-        // resist-fingerprint-aware..
-        threshold = Math.max(MIN_THRESHOLD, Math.min(ts, threshold));
-
-        if (worklet.ready) {
             queueMicrotask(() => worklet.attach().catch(dump));
-        }
+        })
     });
-});
+
+    delete self.mCreateHighPrecisionSleep;
+};
 
 (() => {
     'use strict';
 
-    let ctx;
+    if (!self.AudioWorkletNode || typeof Worklet === 'undefined' || !Worklet.prototype.addModule) {
+        if (self.d) {
+            console.warn('Weak sleep() implementation, using throttled-setTimeout()');
+        }
+        return;
+    }
+
+    let done;
+    const sleep = async(v) => {
+        const now = performance.now();
+
+        do {
+            if (done) {
+                break;
+            }
+            await fetch(`${self.apipath}to?${v >> 1}`).catch(nop);
+        }
+        while (performance.now() - now < v * 1e3);
+    };
+    const setupAudioWorklet = async(ctx) => {
+        if (ctx.state !== 'running') {
+            if (self.d) {
+                console.warn('[AudioWorklet] context state is %s...', ctx.state);
+            }
+            await Promise.race([sleep(4), ctx.resume()]).catch(dump);
+            done = 1;
+
+            if (ctx.state !== 'running') {
+                throw new SecurityError(`The AudioContext was not allowed to start (${ctx.state})`);
+            }
+        }
+        return ctx.audioWorklet.addModule(`${is_extension ? '' : '/'}worklet.js?v=1`);
+    };
+
     const onClick = tryCatch((ev) => {
         window.removeEventListener('click', onClick, true);
 
-        tryCatch(() => {
-            ctx = ctx || new AudioContext();
-            Promise.resolve(ctx.resume()).catch(dump);
-        }, false)();
+        const ctx = new AudioContext();
+        setupAudioWorklet(ctx)
+            .then((res) => {
+                if (self.d) {
+                    console.warn('[AudioWorklet] module created...', res);
+                }
+                return self.mCreateHighPrecisionSleep(ctx);
+            })
+            .catch(dump);
 
         return ev.defaultPrevented;
     });
     window.addEventListener('click', onClick, true);
-
-    /** @property mega.worklet */
-    lazy(mega, 'worklet', function worklet() {
-        let done = 0;
-        const sleep = async(v) => {
-            const now = performance.now();
-
-            do {
-                if (done) {
-                    break;
-                }
-                await fetch(`${self.apipath}to?${v >> 1}`).catch(nop);
-            }
-            while (performance.now() - now < v * 1e3);
-        };
-        return Promise.resolve((async() => {
-            ctx = ctx || new AudioContext();
-
-            if (ctx.state !== 'running') {
-                if (d) {
-                    console.warn('[AudioWorklet] context state is %s...', ctx.state);
-                }
-                await Promise.race([sleep(4), ctx.resume()]).catch(dump);
-                done = 1;
-
-                if (ctx.state !== 'running') {
-                    throw new SecurityError(`The AudioContext was not allowed to start (${ctx.state})`);
-                }
-            }
-            await ctx.audioWorklet.addModule(`${is_extension ? '' : '/'}worklet.js?v=1`);
-            return ctx;
-        })());
-    });
 })();
 
 tryCatch(() => {
@@ -697,7 +629,7 @@ mBroadcaster.once('boot_done', tryCatch(() => {
 
         if (!IDLE_PIPELINE.pid) {
             if (document.hidden) {
-                IDLE_PIPELINE.pid = tSleep.asap(IDLE_TIMEOUT.delay).always(idleCallbackHandler);
+                IDLE_PIPELINE.pid = sleep(IDLE_TIMEOUT.delay / 1e3).always(idleCallbackHandler);
             }
             else if (lax > 1) {
                 IDLE_PIPELINE.pid = requestAnimationFrame(idleCallbackHandler);

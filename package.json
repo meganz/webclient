@@ -31,7 +31,7 @@
   "browserslist": [
     "Chrome >= 69",
     "Firefox >= 78",
-    "Safari >= 14.0",
+    "Safari >= 14.1",
     "Opera >= 56",
     "Edge > 78"
   ],

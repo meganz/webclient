@@ -44,7 +44,7 @@
             return false;
         }
 
-        if (M.isFileDragPage(page) || straight || M.currentdirid) {
+        if (M.isFileDragPage(page) || straight) {
             M.addUpload(files, false, emptyFolders);
 
             start_upload();
@@ -366,6 +366,9 @@
         };
         factory.require('file-list').getFileList(e, filter)
             .then((files) => {
+                if (!e.dataTransfer) {
+                    $.doStraightUpload = true;
+                }
                 addUpload(files, files.empty);
             })
             .catch(tell)

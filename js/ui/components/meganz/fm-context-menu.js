@@ -368,8 +368,6 @@
                 icon: 'sprite-fm-mono icon-file-upload-thin-outline',
                 onClick() {
                     eventlog(500011);
-                    const source = mega.ui.contextMenu.contextSource;
-                    $.doStraightUpload = source && source.classList.contains('fm-new-menu');
                     document.getElementById('fileselect1').click();
                 }
             },
@@ -379,8 +377,6 @@
                 icon: 'sprite-fm-mono icon-folder-arrow-01-thin-outline',
                 onClick() {
                     eventlog(500009);
-                    const source = mega.ui.contextMenu.contextSource;
-                    $.doStraightUpload = source && source.classList.contains('fm-new-menu');
                     document.getElementById('fileselect2').click();
                 }
             },

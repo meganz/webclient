@@ -3198,6 +3198,9 @@ lazy(mega.gallery, 'albums', () => {
                     if (scope.albums.grid && scope.albums.grid.timeline) {
                         const selHandles = scope.albums.grid.timeline.selections;
                         scope.albums.grid.timeline._selCount = Object.keys(selHandles).length;
+                        scope.albums.grid.timeline._selSize = Object.keys(selHandles).reduce((a, b) => {
+                            return a + (M.d[b] && M.d[b].s || 0);
+                        }, 0);
                         scope.albums.grid.timeline.onSelectToggle();
                     }
 

@@ -746,7 +746,12 @@
                 text: l.verify_credentials,
                 icon: 'sprite-fm-mono icon-key-02-thin-outline',
                 onClick() {
-                    return fingerprintDialog(mega.ui.contextMenu.firstNode.su);
+                    const su = mega.ui.contextMenu.selectedItems
+                        .map(h => M.getNodeByHandle(h).su).filter(Boolean);
+                    if (!su.length) {
+                        return;
+                    }
+                    return fingerprintDialog(su[0]);
                 }
             },
             {

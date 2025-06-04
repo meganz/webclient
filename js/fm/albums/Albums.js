@@ -1959,7 +1959,7 @@ lazy(mega.gallery, 'albums', () => {
                                 });
                             }
                             else {
-                                if (scope.albums.grid) {
+                                if (M.isAlbumsPage(1)) {
                                     scope.albums.grid.setPendingCell(value);
                                 }
                                 pendingName = value;

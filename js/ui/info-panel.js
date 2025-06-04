@@ -1470,7 +1470,8 @@ lazy(mega.ui, 'mInfoPanel', () => {
                 if (!this.isOpen()) {
                     return;
                 }
-                this.show($.selected);
+                const id = String(M.currentdirid || '').split('/').pop();
+                this.show($.selected.length ? $.selected : id ? [id] : []);
             });
         },
 

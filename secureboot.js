@@ -1232,6 +1232,7 @@ var languages = {
     'ro': [['ro', 'ro-'], 'Romanian', 'Română'],
     'ru': [['ru', 'ru-mo'], 'Russian', 'Pусский'],
     'th': [['||', 'th'], 'Thai', 'ไทย'],
+    'tr': [['tr', 'tr-'], 'Turkish', 'Türkçe'],
     'vi': [['vn', 'vi'], 'Vietnamese', 'Tiếng Việt']
 };
 
@@ -2274,6 +2275,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/ui/components/card-group.js', n: 'card_select_js', j: 1, w:1});
     jsl.push({f:'js/ui/components/checkbox-group.js', n: 'checkbox_select_js', j: 1, w:1});
     jsl.push({f:'js/ui/components/radial.js', n: 'radial_js', j: 1, w:1});
+    jsl.push({f:'js/ui/components/tooltip.js', n: 'tooltip_js', j: 1, w:1});
 
     // Mobile component for inheriting
     jsl.push({f:'js/mobile/mobile.header.js', n: 'mobile_header_js', j: 1, w: 1});
@@ -2480,6 +2482,7 @@ else if (!browserUpdate) {
     jsl.push({f:'css/components/card.css', n: 'card_css', j:2, w:30, c:1, d:1, cache:1});
     jsl.push({f:'css/components/radial.css', n: 'radial_css', j:2, w:30, c:1, d:1, cache:1});
     jsl.push({f:'css/components/textarea.css', n: 'comp_textarea_css', j:2, w:1});
+    jsl.push({f:'css/components/tooltip.css', n: 'tooltip_css', j:2, w:30, c:1, d:1, cache:1});
 
     // Load files common to all mobile pages
     if (is_mobile) {

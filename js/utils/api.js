@@ -1899,13 +1899,13 @@ lazy(self, 'api', () => {
                 }
 
                 if (self.d > 1 || 'rad' in mega) {
-                    logger.warn('push(%s)=%s/%s', pid, pr.st > currst, inflight.has(pr.st), currst, lastst, hold, [pr]);
+                    const a1 = currst && this.stcmp(pr.st, currst);
+                    logger.warn('push(%s)=%s/%s', pid, a1, inflight.has(pr.st), currst, lastst, hold, [pr]);
                 }
 
                 pid = inflight.get(pr.st);
                 if (!pid) {
-                    if (currst == '.') return 7;
-                    return pr.st > currst ? 7 : 2;
+                    return currst && this.stcmp(pr.st, currst) > 0 ? 7 : 2;
                 }
             }
 
@@ -2473,6 +2473,30 @@ lazy(self, 'api', () => {
         },
 
         /**
+         * Compare sequence tags
+         * @param {String} st1 left seqtag
+         * @param {String} st2 right seqtag
+         * @returns {Number} 1 if left newer, -1 if right newer, 0 if both are equal, NaN if invalid data passed.
+         */
+        stcmp(st1, st2) {
+            if (typeof st1 !== 'string' || typeof st2 !== 'string') {
+
+                if (self.d) {
+                    logger.warn(`[stcmp] Ignoring invalid data passed...`, st1, st2);
+                }
+
+                return NaN;
+            }
+
+            if (st1.length === st2.length) {
+
+                return st1 > st2 ? 1 : st1 < st2 ? -1 : 0;
+            }
+
+            return st1.length > st2.length ? 1 : -1;
+        },
+
+        /**
          * Catch up (await) sequence-tag.
          * @param {String|Object} pkt to expect
          * @param {*} [ft] fast-track mode - speed up packet retrieval, no cross-tab await
@@ -2507,7 +2531,7 @@ lazy(self, 'api', () => {
                     for (const pending of catchup) {
                         const {st, resolve} = pending;
 
-                        if (pkt.st >= st) {
+                        if (this.stcmp(pkt.st, st) >= 0) {
                             fire(resolve, pkt.st);
                             catchup.delete(pending);
                             break;
@@ -2518,7 +2542,7 @@ lazy(self, 'api', () => {
             }
 
             return new Promise((resolve) => {
-                if (lastst >= pkt || !isScRunning()) {
+                if (this.stcmp(lastst, pkt) >= 0 || !isScRunning()) {
                     return fire(resolve, pkt);
                 }
                 catchup.add({st: pkt, resolve});

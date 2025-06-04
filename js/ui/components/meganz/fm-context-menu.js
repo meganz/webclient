@@ -368,8 +368,6 @@
                 icon: 'sprite-fm-mono icon-file-upload-thin-outline',
                 onClick() {
                     eventlog(500011);
-                    const source = mega.ui.contextMenu.contextSource;
-                    $.doStraightUpload = source && source.classList.contains('fm-new-menu');
                     document.getElementById('fileselect1').click();
                 }
             },
@@ -379,8 +377,6 @@
                 icon: 'sprite-fm-mono icon-folder-arrow-01-thin-outline',
                 onClick() {
                     eventlog(500009);
-                    const source = mega.ui.contextMenu.contextSource;
-                    $.doStraightUpload = source && source.classList.contains('fm-new-menu');
                     document.getElementById('fileselect2').click();
                 }
             },
@@ -746,7 +742,12 @@
                 text: l.verify_credentials,
                 icon: 'sprite-fm-mono icon-key-02-thin-outline',
                 onClick() {
-                    return fingerprintDialog(mega.ui.contextMenu.firstNode.su);
+                    const su = mega.ui.contextMenu.selectedItems
+                        .map(h => M.getNodeByHandle(h).su).filter(Boolean);
+                    if (!su.length) {
+                        return;
+                    }
+                    return fingerprintDialog(su[0]);
                 }
             },
             {

@@ -256,6 +256,9 @@ function init_login() {
     $button.rebind('click.initlogin', function() {
         pagelogin();
         eventlog(99796);
+        if (confirmok) {
+            eventlog(500813);
+        }
     });
 
     if (self.InitFileDrag) {

@@ -6412,7 +6412,7 @@ class Incoming extends react0().Component {
       }, react0().createElement("span", null, video ? l[22894] : l[22893])));
     };
     this.state.unsupported = !megaChat.hasSupportForCalls;
-    this.state.hideOverlay = document.body.classList.contains('overlayed');
+    this.state.hideOverlay = document.body.classList.contains('overlayed') && !$.msgDialog;
   }
   componentDidMount() {
     this._old$dialog = $.dialog;
@@ -10658,7 +10658,8 @@ Chat.prototype.fetchSoundBuffer = async function (sound) {
   return res.target.response;
 };
 window.Chat = Chat;
-if (false) {}
+if (false) // removed by dead control flow
+{}
 const chat = {
   Chat
 };
@@ -30756,7 +30757,8 @@ class ConversationsApp extends mixins.w9 {
     }), rightPane);
   }
 }
-if (false) {}
+if (false) // removed by dead control flow
+{}
 const conversations = {
   ConversationsApp
 };

@@ -256,10 +256,12 @@ class MobileSelectionRender extends MobileMegaRender {
 
             window.addEventListener('popstate', this._popStateHandler);
 
-            mega.ui.header.closeButton.rebind('tap.close', () => {
-                this.trigger('closeBtnClick');
-                this.hide();
-            });
+            if (mega.ui.header.closeButton) {
+                mega.ui.header.closeButton.rebind('tap.close', () => {
+                    this.trigger('closeBtnClick');
+                    this.hide();
+                });
+            }
 
             M.openFolder(start, true).then(() => {
 

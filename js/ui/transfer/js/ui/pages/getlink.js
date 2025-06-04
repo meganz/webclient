@@ -401,8 +401,7 @@ lazy(T.ui, 'addFilesLayout', () => {
             const nodes = new Set();
             const parents = Object.create(null);
 
-            await dbfetch.coll(sel); // @todo the coll() usage in getCopyNodes() is bogus?!..
-            const lst = await M.getCopyNodes(sel);
+            const lst = await M.getCopyNodes(sel, {clearna: true});
             const sn = !prev.size && sel.length === 1 && M.getNodeByHandle(sel[0]);
 
             for (let i = lst.length; i--;) {

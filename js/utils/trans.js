@@ -26,6 +26,7 @@ mega.utils.trans.listFormatMeta.conjunctions = {
     "ro": "\u0219i",
     "ru": "\u0438",
     "th": "\u0E41\u0E25\u0E30",
+    "tr": "ve",
     "vi": "v\u00e0"
 };
 

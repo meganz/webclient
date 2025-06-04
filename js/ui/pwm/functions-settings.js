@@ -38,7 +38,7 @@ lazy(mega.ui.pm.settings, 'utils', () => {
          */
         parseCSV(text, type) {
 
-            const result = [];
+            const result = [[], {}];
             const headers = this.getHeaders(type);
 
             let inQuotes = false;
@@ -56,14 +56,16 @@ lazy(mega.ui.pm.settings, 'utils', () => {
 
                 // check header and line has same column length
                 if (Object.keys(line).length !== headers.length) {
-                    return false;
+                    const keys = Object.keys(line);
+                    // if line is empty, ignore it
+                    return keys.length === 1 && line[keys[0]] === '' ? undefined : false;
                 }
 
                 if (type === 'nordpass' || type === 'proton') {
                     const allowedType = type === 'nordpass' ? 'password' : 'login';
 
                     if (line.type.trim() !== allowedType) {
-                        return false;
+                        return;
                     }
                 }
 
@@ -96,12 +98,18 @@ lazy(mega.ui.pm.settings, 'utils', () => {
                     // if this is new line, increment the line number
                     if (char !== ',') {
 
-                        if (!_validateLine(currentLine)) {
+                        const valid = _validateLine(currentLine);
+
+                        if (valid === undefined) {
+                            console.warn(`non_supporting_type_found: ln: ${lineNum}, type: ${currentLine.type}`);
+                            result[1][lineNum] = currentLine;
+                        }
+                        else if (!valid) {
                             tell(`invalid_csv_file: ln: ${lineNum}`);
                             return false;
                         }
                         else if (lineNum !== 1) {
-                            result.push(currentLine);
+                            result[0].push(currentLine);
                         }
 
                         lineNum++;
@@ -128,24 +136,26 @@ lazy(mega.ui.pm.settings, 'utils', () => {
                     return false;
                 }
                 else if (lineNum !== 1) {
-                    result.push(currentLine);
+                    result[0].push(currentLine);
                 }
             }
 
             return result;
         },
 
-        async saveData(data, type) {
+        saveData(data, type) {
 
-            data = data.map(entry => this.getPasswordData(entry, type));
+            data = data[0].map(entry => this.getPasswordData(entry, type));
+
+            const res = [];
 
             const {pm, pwmh} = mega;
             for (const entry of data) {
                 const name = this.getDeduplicateName(entry.name);
-                await pm.createItem(entry, name, pwmh);
+                res.push(pm.createItem(entry, name, pwmh));
             }
 
-            return true;
+            return Promise.allSettled(res);
         },
 
         getHeaders(type) {
@@ -258,7 +268,7 @@ lazy(mega.ui.pm.settings, 'utils', () => {
                 reader.onload = function(e) {
                     const text = e.target.result;
                     const data = mega.ui.pm.settings.utils.parseCSV(text, mega.ui.pm.settings.importSelected);
-                    if (data.length > 0) {
+                    if (data && data[0].length > 0) {
                         resolve(data);
                     }
                     else {
@@ -291,14 +301,25 @@ lazy(mega.ui.pm.settings, 'utils', () => {
         importFile(file, importBtn, errorMessage, chooseFileBtn, importBtnText, fileInput) {
             this.processFile(file, importBtn, errorMessage)
                 .then(data => this.saveImportedData(data))
-                .then(() => {
-                    mega.ui.toast.show(l.import_success_toast);
+                .then(res => {
+
+                    if (res[0] === res[1]) {
+                        mega.ui.toast.show(l.import_success_toast);
+                    }
+                    else {
+                        const msg = mega.icu.format(l.pwm_settings_import_partial, res[1]);
+                        errorMessage.textContent = escapeHTML(msg).replace('%1', res[0]);
+                        errorMessage.classList.remove('hidden');
+                        errorMessage.classList.add('warning');
+                    }
+
                     importBtn.disabled = true;
                     importBtnText.textContent = l.import_passwords_label;
                     fileInput.value = '';
                     mega.ui.pm.settings.file = null;
                 })
                 .catch(() => {
+                    errorMessage.textContent = l.import_fail_message;
                     errorMessage.classList.remove('hidden');
                     importBtn.disabled = false;
                     importBtn.domNode.blur();
@@ -327,12 +348,13 @@ lazy(mega.ui.pm.settings, 'utils', () => {
             mega.ui.pm.settings.importInFlight = true;
             mega.ui.pm.settings.saveDataCalled = true;
 
+            const totalCount = data[0].length + Object.keys(data[1]).length;
+
             return mega.ui.pm.settings.utils.saveData(data, mega.ui.pm.settings.importSelected)
-                .then(() => {
+                .then((res) => {
                     eventlog(this.getImportEventId(mega.ui.pm.settings.importSelected));
-                })
-                .catch(ex => {
-                    throw ex;
+                    const successCount = res.filter(item => item.status === 'fulfilled').length;
+                    return [successCount, totalCount];
                 })
                 .finally(() => {
                     mega.ui.pm.settings.importInFlight = false;
@@ -389,7 +411,8 @@ lazy(mega.ui.pm.settings, 'utils', () => {
 
         handleErrorOnImportInFlight(importBtn, errorMessage, infoMessage = null, chooseFileBtn = null) {
             if (mega.ui.pm.settings.importInFlight) {
-                errorMessage.classList.remove('hidden');
+                errorMessage.textContent = l.import_fail_message;
+                errorMessage.classList.remove('hidden', 'warning');
                 importBtn.loading = false;
                 importBtn.disabled = false;
 
@@ -406,6 +429,7 @@ lazy(mega.ui.pm.settings, 'utils', () => {
         handleResumeOnImportInFlight(importBtn, errorMessage, infoMessage = null) {
             if (mega.ui.pm.settings.importInFlight) {
                 errorMessage.classList.add('hidden');
+                errorMessage.classList.remove('warning');
                 importBtn.loading = true;
 
                 if (infoMessage) {

@@ -643,7 +643,8 @@ lazy(mega.ui, 'secondaryNav', () => {
                         eventlog(500727);
                         return;
                     }
-                    mega.ui.mInfoPanel.show($.selected);
+                    const id = String(M.currentdirid || '').split('/').pop();
+                    mega.ui.mInfoPanel.show($.selected.length ? $.selected : id ? [id] : []);
                     eventlog(500727);
                 });
             }

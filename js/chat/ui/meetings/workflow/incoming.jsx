@@ -18,7 +18,7 @@ export default class Incoming extends React.Component {
     constructor(props) {
         super(props);
         this.state.unsupported = !megaChat.hasSupportForCalls;
-        this.state.hideOverlay = document.body.classList.contains('overlayed');
+        this.state.hideOverlay = document.body.classList.contains('overlayed') && !$.msgDialog;
     }
 
     componentDidMount() {

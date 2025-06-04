@@ -78,6 +78,9 @@ var ChatNotifications = function(megaChat, options) {
                 notification.forceStopSound(notificationSound);
                 callManager.off(`onRingingStopped${evtId}`);
                 callManager.off(`onRoomDisconnected${evtId}`);
+                if ($.msgDialog) {
+                    fm_showoverlay();
+                }
             }
         };
 

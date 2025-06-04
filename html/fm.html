@@ -2743,30 +2743,34 @@
                             </div>
                         </div>
 
-                        <div class="data-analysis-container hidden">
-                            <div class="storage-analysis-container section-container">
-                                <div class="view-title">[$bsn_stge_anal]</div>
-                                <div class="analysis-summary-container lb-nb-info custom-alpha">
-                                    <div class="one-column">
-                                        <div class="transfer-usage">
-                                            <span class="label">[$bsn_lbstge] </span><span class="usage-value"></span>
-                                        </div>
+                        <div class="data-analysis-container section-container hidden">
+                            <div class="tabs-container">
+                                <button class="tab active" data-value="storage">
+                                    <span>[$bsn_stge_anal]</span>
+                                </button>
+                                <button class="tab" data-value="transfer">
+                                    <span>[$19224]</span>
+                                </button>
+                            </div>
+                            <div class="analysis-container storage">
+                                <div class="analysis-summary-container lb-nb-info">
+                                    <div class="usage last">
+                                        <span class="label">[$bsn_lbstge] </span><span class="usage-value"></span>
                                     </div>
-                                    <div class="two-column">
-                                        <div class="transfer-usage">
-                                            <span class="label">[$bsn_nbstge]* </span><span class="usage-value"></span>
+                                    <div class="usage next">
+                                        <span class="label">[$bsn_nbstge]* </span><span class="usage-value"></span>
+                                    </div>
+                                    <div class="next-bill-ratio down hidden">
+                                        <div class="diff-value">
+                                            <i class="sprite-fm-mono icon-arrow-down-thin-outline"></i><span class="ratio-value"></span>
                                         </div>
-                                        <div class="next-bill-ratio down hidden">
-                                            <div class="diff-value">
-                                                <i class="sprite-fm-mono icon-down"></i><span class="ratio-value"></span>
-                                            </div>
-                                            <div class="diff-perc">
-                                                <span>[$bsn_last_renew_diff_ratio]</span>
-                                            </div>
+                                        <div class="diff-perc">
+                                            <span>[$bsn_last_renew_diff_ratio]</span>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="daily-storage-container">
+                                <div class="analysis-body daily-storage-container">
+                                    <div class="legend-buttons"></div>
                                     <div class="chart-month-container">
                                         <div class="daily-title">[$bsn_dly_stge]**</div>
                                         <div class="mega-input dropdown-input text-style inline chart-month-selector storage">
@@ -2778,40 +2782,43 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="chart-container" id="stge-bar-chart-container">
-                                        <canvas id="stge-bar-chart" class="daily-storage-flow-container"></canvas>
+                                    <div>
+                                        <div class="chart-container" id="stge-bar-chart-container">
+                                            <canvas id="stge-bar-chart" class="daily-storage-flow-container"></canvas>
+                                        </div>
+                                        <div class="chart-info">
+                                            <div class="info-wrap">
+                                                <div class="legend-body"></div>
+                                                <span class="units" id="stge-bar-chart-unit"></span>
+                                            </div>
+                                            <div>[$20936]</div>
+                                        </div>
                                     </div>
-                                    <span>[$20936]</span>
-                                    <span id="stge-bar-chart-unit"></span>
                                     <div class="analysis-remarks-container">
                                         <div class="forecast-remarks">* <span>[$bsn_stge_fcst_msg]</span></div>
                                         <div class="daily-value-remarks">** <span>[$bsn_stge_calc_msg]</span></div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="transfer-analysis-container section-container">
-                                <div class="view-title">[$19224]</div>
-                                <div class="analysis-summary-container lb-nb-info custom-alpha">
-                                    <div class="one-column">
-                                        <div class="transfer-usage">
-                                            <span class="label">[$bsn_lbtrf] </span><span class="usage-value"></span>
-                                        </div>
+                            <div class="analysis-container transfer">
+                                <div class="analysis-summary-container lb-nb-info">
+                                    <div class="usage last">
+                                        <span class="label">[$bsn_lbtrf] </span><span class="usage-value"></span>
                                     </div>
-                                    <div class="two-column">
-                                        <div class="transfer-usage">
-                                            <span class="label">[$bsn_nbtrf]* </span><span class="usage-value"></span>
+                                    <div class="usage next">
+                                        <span class="label">[$bsn_nbtrf]* </span><span class="usage-value"></span>
+                                    </div>
+                                    <div class="next-bill-ratio up hidden">
+                                        <div class="diff-value">
+                                            <i class="sprite-fm-mono icon-arrow-up-thin-outline"></i><span class="ratio-value"></span>
                                         </div>
-                                        <div class="next-bill-ratio up hidden">
-                                            <div class="diff-value">
-                                                <i class="sprite-fm-mono icon-up"></i><span class="ratio-value"></span>
-                                            </div>
-                                            <div class="diff-perc">
-                                                <span>[$bsn_last_renew_diff_ratio]</span>
-                                            </div>
+                                        <div class="diff-perc">
+                                            <span>[$bsn_last_renew_diff_ratio]</span>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="daily-transfer-container">
+                                <div class="analysis-body daily-transfer-container">
+                                    <div class="legend-buttons"></div>
                                     <div class="chart-month-container">
                                         <div class="daily-title">[$19226]**</div>
                                         <div class="mega-input dropdown-input text-style inline chart-month-selector transfer">
@@ -2823,11 +2830,18 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="chart-container" id="trf-bar-chart-container">
-                                        <canvas id="trf-bar-chart" class="daily-transfer-flow-container"></canvas>
+                                    <div>
+                                        <div class="chart-container" id="trf-bar-chart-container">
+                                            <canvas id="trf-bar-chart" class="daily-transfer-flow-container"></canvas>
+                                        </div>
+                                        <div class="chart-info">
+                                            <div class="info-wrap">
+                                                <div class="legend-body"></div>
+                                                <span class="units" id="trf-bar-chart-unit"></span>
+                                            </div>
+                                            <div>[$20936]</div>
+                                        </div>
                                     </div>
-                                    <span>[$20936]</span>
-                                    <span id="trf-bar-chart-unit"></span>
                                     <div class="analysis-remarks-container">
                                         <div class="forecast-remarks">* <span>[$bsn_trf_fcst_msg]</span></div>
                                         <div class="daily-value-remarks">** <span>[$bsn_trf_calc_msg]</span></div>
@@ -2838,7 +2852,7 @@
 
                         <div class="storage-analysis-pie-container section-container hidden">
                             <div class="view-title">[$19222]</div>
-                            <div class="storage-summary custom-alpha">
+                            <div class="storage-summary">
                                 <span class="total-storage-title">[$bsn_curr_stge_usage]:</span>
                                 <span class="total-storage-number"> </span>
                             </div>

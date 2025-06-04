@@ -5,6 +5,7 @@
     ],
     "ignoreFiles": ["css/chat-bundle.css"],
     "rules": {
+        "color-function-alias-notation": null,
         "declaration-no-important": null,
         "rule-empty-line-before": null,
         "no-descending-specificity": null,

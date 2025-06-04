@@ -1411,8 +1411,12 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
     const $nbPriceContainer = $('.overall-next-bill-wrapper', $businessDashboard);
     const $storageAnalysisPie = $('.storage-analysis-pie-container', $businessDashboard);
     const $stgeTrfAnalysisContainer = $('.data-analysis-container', $businessDashboard);
-    const $stgeAnalysisContainer = $('.storage-analysis-container', $stgeTrfAnalysisContainer);
-    const $trfAnalysisContainer = $('.transfer-analysis-container', $stgeTrfAnalysisContainer);
+    const $stgeAnalysisContainer = $('.analysis-container.storage', $stgeTrfAnalysisContainer);
+    const $trfAnalysisContainer = $('.analysis-container.transfer', $stgeTrfAnalysisContainer);
+    const filters = {
+        dl: false,
+        st: false
+    };
 
     // Private function to populate the pie chart and data into the storage usage dashboard
     const populateStoragePieAndData = function(st, quotas) {
@@ -1714,8 +1718,10 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
     // Private function to populate the transfer and storage analytics bar chart and data
     const populateBarChart = function(success, res, isTrfGraph, targetDate) {
         M.require('charts_js').done(() => {
-            const chartContainerID = isTrfGraph ? '#trf-bar-chart-container' : '#stge-bar-chart-container';
-            const $chartContainer = $(chartContainerID, $stgeTrfAnalysisContainer);
+            const $container = isTrfGraph ? $trfAnalysisContainer : $stgeAnalysisContainer;
+            const $chartContainer = $('.chart-container', $container);
+            const $legendBody = $('.legend-body', $container);
+            const $legendBtns = $('.legend-buttons', $container);
 
             $chartContainer.empty();
             $chartContainer.safeHTML(
@@ -1723,48 +1729,75 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
                     '<canvas id="trf-bar-chart" class="daily-transfer-flow-container"></canvas>' :
                     '<canvas id="stge-bar-chart" class="daily-storage-flow-container"></canvas>'
             );
+            $legendBody.empty();
+            $legendBtns.empty();
 
             const $chartCanvas = $(isTrfGraph ? '#trf-bar-chart' : '#stge-bar-chart', $chartContainer);
             const style = getComputedStyle(document.body);
 
-            var availableLabels = Object.keys(res);
+            const availableLabels = Object.keys(res);
             availableLabels.sort();
 
-            if (!isTrfGraph) {
-                const lastDay = availableLabels[availableLabels.length - 1];
-                if (res[lastDay] && res[lastDay].dts !== undefined) {
-                    // Use the daily storage value instead of the current storage value for today
-                    res[lastDay].ts = res[lastDay].dts;
-                }
-            }
-
             // Build bars data and total storage data
-            var chartBaseData = [];
-            var chartExtraData = [];
-            var chartDatasets = [];
-            var chartLabels = [];
-            var chartTooltips = {};
+            const chartBaseData = [];
+            const chartExtraData = [];
+            const chartLabels = [];
             const divider = setBarChartScaleUnit(res, isTrfGraph);
             const isTBGraph = divider === 1024 * 1024 * 1024 * 1024;
+            const extraColor = u_attr.s4 ? 'blue' : 'yellow';
+            const ftr = isTrfGraph ? 'dl' : 'st';
 
-            const tooltipBarLabeling = function(tooltipItem, data) {
+            const tooltipBarLabeling = (tooltipItem, data) => {
                 const storageValue = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
                 const storageInfo = numOfBytes(storageValue * divider);
-                const dataLabel = data.datasets[tooltipItem.datasetIndex].label;
-                let labellingMsg = `${storageInfo.size} ${storageInfo.unit}`;
+                const { helperLabel } = data.datasets[tooltipItem.datasetIndex];
 
-                if (dataLabel !== '') {
-                    labellingMsg = dataLabel === 'base' ? l.base_quota_v : l.extra_quota;
-                    labellingMsg = labellingMsg.replace('[X]', `${storageInfo.size} ${storageInfo.unit}`);
+                if (helperLabel) {
+                    return helperLabel.replace('[X]', `${storageInfo.size} ${storageInfo.unit}`);
                 }
-
-                return labellingMsg;
+                return `${storageInfo.size} ${storageInfo.unit}`;
             };
 
-            const tooltipBarTitling = function(tooltipItem) {
+            const tooltipBarTitling = (tooltipItem) => {
                 const storageDate = new Date(targetDate.getFullYear(), targetDate.getMonth(), 1);
                 storageDate.setDate(tooltipItem[0].xLabel || 0);
                 return acc_time2date(storageDate.getTime() / 1000, true);
+            };
+
+            const updateData = (name) => {
+                filters[ftr] = name;
+                populateBarChart(success, res, isTrfGraph, targetDate);
+            };
+
+            // Render legend boxes and filtering buttons
+            const renderLegend = (ds = []) => {
+                if (!u_attr.s4) {
+                    return;
+                }
+                for (let i = -1; i < ds.length; ++i) {
+                    const data = ds[i] || {};
+                    const {
+                        name,
+                        hoverBorderColor: color,
+                        label = isTrfGraph ? l.all_transfer_lbl : l.all_storage_lbl,
+                    } = data;
+
+                    const btn = mCreateElement('button', {
+                        class: `legend-btn${filters[ftr] === name || i === -1 && !filters[ftr] ? ' active' : ''}`
+                    }, $legendBtns[0]);
+
+                    btn.textContent = label;
+                    btn.addEventListener('click', () => updateData(name));
+
+                    if (i === -1) {
+                        mCreateElement('hr', null, $legendBtns[0]);
+                        continue;
+                    }
+
+                    const legend = mCreateElement('div', { 'class': 'legend' }, $legendBody[0]);
+                    mCreateElement('i', null, legend).style.background = color;
+                    mCreateElement('span', null, legend).textContent = label;
+                }
             };
 
             targetDate  = targetDate || new Date();
@@ -1775,79 +1808,78 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
                 chartLabels.push(d + 1);
             }
 
-            if (isTrfGraph) {
-                for (let t = 0; t < availableLabels.length; t++) {
-                    const index = parseInt(availableLabels[t].substr(6, 2), 10);
-                    const dayConsume = res[availableLabels[t]].tdl || 0;
-                    chartBaseData[index - 1] = dayConsume / divider;
+            for (let i = 0; i < availableLabels.length; i++) {
+                const elm = availableLabels[i];
+                const index = parseInt(elm.substr(6, 2), 10);
+                const total = isTrfGraph ? res[elm].tdl : res[elm].ts || 0;
+
+                if (u_attr.s4) {
+                    let s4 = 0;
+                    for (const v of Object.values(res[elm].u)) {
+                        s4 += isTrfGraph ? v.s4dl : v.s4 && v.s4[0] || 0;
+                    }
+                    chartBaseData[index - 1] = (total - s4) / divider;
+                    chartExtraData[index - 1] =  s4 / divider;
                 }
-
-                chartDatasets = [{
-                    label: '',
-                    data: chartBaseData,
-                    backgroundColor: style.getPropertyValue('--label-blue-hover').trim(),
-                    hoverBackgroundColor: style.getPropertyValue('--label-blue-hover').trim(),
-                    hoverBorderColor: style.getPropertyValue('--label-blue').trim(),
-                    borderWidth: 0,
-                    hoverBorderWidth: 2
-                }];
-
-                chartTooltips = {
-                    callbacks: {
-                        label: tooltipBarLabeling,
-                        title: tooltipBarTitling
-                    },
-                    displayColors: false
-                };
+                else if (!isTrfGraph && isTBGraph & total > 3 * divider) {
+                    chartBaseData[index - 1] = 3;
+                    chartExtraData[index - 1] = total / divider - 3;
+                }
+                else {
+                    chartBaseData[index - 1] = total / divider;
+                    if (isTrfGraph) {
+                        chartExtraData.length = 0;
+                    }
+                }
             }
-            else {
-                for (let s = 0; s < availableLabels.length; s++) {
-                    const index = parseInt(availableLabels[s].substr(6, 2), 10);
-                    const dayConsume = res[availableLabels[s]].ts || 0;
-                    if (isTBGraph & dayConsume > 3 * divider) {
-                        chartBaseData[index - 1] = 3;
-                        chartExtraData[index - 1] = dayConsume / divider - 3;
-                    }
-                    else {
-                        chartBaseData[index - 1] = dayConsume / divider;
-                    }
-                }
 
-                chartDatasets = [{
-                    label: 'base',
-                    data: chartBaseData,
-                    backgroundColor: style.getPropertyValue('--label-blue-hover').trim(),
-                    hoverBackgroundColor: style.getPropertyValue('--label-blue-hover').trim(),
-                    hoverBorderColor: style.getPropertyValue('--label-blue').trim(),
+            const datasets = [
+                {
+                    name: 'base',
+                    label: l[18051],
+                    helperLabel: u_attr.s4 ? l.cloud_drive_x : l.base_quota_v,
+                    backgroundColor: style.getPropertyValue('--label-red-hover').trim(),
                     borderWidth: 0,
-                    hoverBorderWidth: 2
-                }, {
-                    label: 'extra',
+                    data: chartBaseData,
+                    hoverBackgroundColor: style.getPropertyValue('--label-red-hover').trim(),
+                    hoverBorderColor: style.getPropertyValue('--label-red').trim(),
+                    hoverBorderWidth: 1
+                },
+                {
+                    name: 'extra',
+                    label: u_attr.s4 ? l.obj_storage : l.extra_quota,
+                    helperLabel: u_attr.s4 ? l.object_storage_x : l.extra_quota,
                     data: chartExtraData,
-                    backgroundColor: style.getPropertyValue('--label-yellow-hover').trim(),
-                    hoverBackgroundColor: style.getPropertyValue('--label-yellow-hover').trim(),
-                    hoverBorderColor: style.getPropertyValue('--label-yellow').trim(),
+                    backgroundColor: style.getPropertyValue(`--label-${extraColor}-hover`).trim(),
+                    hoverBackgroundColor: style.getPropertyValue(`--label-${extraColor}-hover`).trim(),
+                    hoverBorderColor: style.getPropertyValue(`--label-${extraColor}`).trim(),
                     borderWidth: 0,
-                    hoverBorderWidth: 2
-                }];
+                    hoverBorderWidth: 1
+                }
+            ];
 
-                chartTooltips = {
-                    mode: 'label',
-                    callbacks: {
-                        label: tooltipBarLabeling,
-                        title: tooltipBarTitling
-                    },
-                    displayColors: true
-                };
-            }
+            const filteredDatasets = datasets.filter(
+                (elm) => !u_attr.s4 || !filters[ftr] || filters[ftr] === elm.name
+            );
+            renderLegend(datasets);
+
+            const chartTooltips = {
+                mode: 'label',
+                callbacks: {
+                    label: tooltipBarLabeling,
+                    title: tooltipBarTitling
+                },
+                displayColors: filteredDatasets.length > 1
+            };
 
             const theBarChart = new Chart($chartCanvas, {
                 type: 'bar',
                 data: {
                     labels: chartLabels,
-                    datasets: chartDatasets,
+                    datasets: filteredDatasets,
                 },
                 options: {
+                    maintainAspectRatio: false,
                     scales: {
                         yAxes: [{
                             stacked: true,
@@ -1859,35 +1891,40 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
                             gridLines: {
                                 display: true,
                                 drawTicks: false,
-                                color: style.getPropertyValue('--divider-color').trim(),
-                                zeroLineColor: style.getPropertyValue('--divider-color').trim(),
+                                color: style.getPropertyValue('--mobile-border-subtle').trim(),
+                                zeroLineColor: style.getPropertyValue('--mobile-border-subtle').trim(),
                                 drawBorder: false,
                                 tickMarkLength: 0
-                            }
+                            },
                         }],
                         xAxes: [{
                             stacked: true,
                             ticks: {
-                                fontColor: style.getPropertyValue('--text-color-medium').trim(),
+                                fontColor: style.getPropertyValue('--mobile-text-primary').trim(),
                                 autoSkip: true,
                                 maxTicksLimit: 4,
                                 maxRotation: 0
                             },
                             gridLines: {
                                 display: false
-                            }
+                            },
                         }]
                     },
                     legend: {
-                        display: false
+                        color: style.getPropertyValue('--mobile-text-primary').trim(),
+                        display: false,
+                        font: style.getPropertyValue('--mobile-font-caption-small-regular').trim(),
+                        generateLabels: tooltipBarLabeling,
+                        onClick: false,
+                        position: 'bottom',
                     },
                     tooltips: chartTooltips,
                     layout: {
                         padding: {
-                            left: 24,
-                            right: 24,
-                            bottom: 32,
-                            top: 16
+                            left: 16,
+                            right: 16,
+                            bottom: 16,
+                            top: 0
                         }
                     }
                 }
@@ -1962,10 +1999,11 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
         const billData = M.account.b;
 
         const $targetContainer = isTrfField ? $trfAnalysisContainer : $stgeAnalysisContainer;
-        const $lbRow = $('.one-column', $targetContainer).removeClass('hidden');
-        const $nbRow = $('.two-column', $targetContainer);
-        const $billDiff = $('.next-bill-ratio', $nbRow).addClass('hidden').removeClass('up down');
-        const $billDiffArrow = $('.sprite-fm-mono', $billDiff).removeClass('icon-up icon-down');
+        const $lbRow = $('.usage.last', $targetContainer).removeClass('hidden');
+        const $nbRow = $('.usage.next', $targetContainer);
+        const $billDiff = $('.next-bill-ratio', $targetContainer).addClass('hidden').removeClass('up down');
+        const $billDiffArrow = $('.sprite-fm-mono', $billDiff)
+            .removeClass('icon-arrow-up-thin-outline icon-arrow-down-thin-outline');
 
         var noLastBillItem;
         var lastBillItem;
@@ -1995,7 +2033,9 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
                 const valDiffPerc = formatPercentage(valDiffSize / lastBillItem);
 
                 $billDiff.addClass(valDiff > 0 ? 'up' : 'down').removeClass('hidden');
-                $billDiffArrow.addClass(valDiff > 0 ? 'icon-up' : 'icon-down');
+                $billDiffArrow.addClass(
+                    valDiff > 0 ? 'icon-arrow-up-thin-outline' : 'icon-arrow-down-thin-outline'
+                );
                 $('.ratio-value', $billDiff).text(valDiffSize);
                 $('.diff-perc span', $billDiff).text(
                     l.bsn_last_renew_diff_ratio.replace('[X]', `(${valDiffPerc})`)
@@ -2088,6 +2128,16 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
         $('.lb-nb-info', $stgeTrfAnalysisContainer).addClass('hidden');
         $('.forecast-remarks', $stgeTrfAnalysisContainer).addClass('hidden');
     }
+
+    // Init storage/transfer analytics tabs
+    $('.tab', $stgeTrfAnalysisContainer).rebind('click.dashTabSwicth', (e) => {
+        $('.analysis-container', $stgeTrfAnalysisContainer).addClass('vo-hidden');
+        $('.tab.active', $stgeTrfAnalysisContainer).removeClass('active');
+        $(`.analysis-container.${e.currentTarget.dataset.value}`, $stgeTrfAnalysisContainer)
+            .removeClass('vo-hidden');
+        $(e.currentTarget).addClass('active');
+    });
+    $('.tab:first-child', $stgeTrfAnalysisContainer).click();
 
     // Populate the month dropdown list for the transfer analytics graph
     populateMonthDropDownList($trfAnalysisContainer);

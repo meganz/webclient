@@ -152,7 +152,6 @@ mega.ui.pm.settings = {
         importButtonItem.append(importButtonLine);
         const errorMessage = document.createElement('span');
         errorMessage.className = 'mega-item-list-title-small import-error-message hidden';
-        errorMessage.textContent = l.import_fail_message;
         errorMessage.prepend(parseHTML('<i class="sprite-pm-mono icon-alert-triangle-thin-outline"></i>'));
         const importBtn = new MegaButton({
             parentNode: importButtonLine,
@@ -174,6 +173,7 @@ mega.ui.pm.settings = {
                 importBtnText.textContent = l.import_passwords_label_selected.replace('%1', this.file.name);
                 importBtn.disabled = false;
                 errorMessage.classList.add('hidden');
+                errorMessage.classList.remove('warning');
             }
         });
 

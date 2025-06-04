@@ -101,7 +101,7 @@ class MegaImportPassDataHandler {
         this.errorMessage.classList.add('hidden');
         this.infoMessage.classList.remove('hidden');
 
-        return mega.ui.pm.settings.utils.saveImportedData(matchingData)
+        return mega.ui.pm.settings.utils.saveImportedData([matchingData, {}])
             .then(() => {
                 mega.ui.toast.show(mega.icu.format(l.import_success_toast_count, matchingData.length));
                 return true;

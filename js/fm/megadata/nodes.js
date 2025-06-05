@@ -1470,14 +1470,12 @@ MegaData.prototype.safeMoveNodes = async function safeMoveNodes(target, nodes) {
     }
     M.clearSelectedNodes();
 
-    if (promises.length) {
-
-        await Promise.all(promises);
-    }
+    const res = await Promise.all(promises);
 
     if (c) {
         console.groupEnd();
     }
+    return res;
 };
 
 /**

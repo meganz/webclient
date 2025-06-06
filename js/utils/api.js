@@ -1437,7 +1437,10 @@ lazy(self, 'api', () => {
     // Set globally-accessed current sequence-tag
     const mSetSt = (st) => {
         if (isScRunning()) {
-            currst = st || null;
+            if (self.d && !st) {
+                logger.warn('zero seqtag...', typeof st, st);
+            }
+            currst = st || currst;
         }
         else if (d) {
             logger[st === '.' ? 'info' : 'warn']('SC connection is not ready, per st=%s', st || null);
@@ -1894,13 +1897,14 @@ lazy(self, 'api', () => {
          */
         ack(pr, pid, hold) {
             if (!inflight.has(pid)) {
-                if (!inflight.size) {
-                    return 3;
+                if (self.d || 'rad' in mega) {
+                    const a1 = currst && this.stcmp(pr.st, currst);
+                    const a2 = inflight.size ? inflight.has(pr.st) : -1;
+                    logger.warn('push(%s)=%s/%s', pid, a1, a2, currst, lastst, hold, [pr]);
                 }
 
-                if (self.d > 1 || 'rad' in mega) {
-                    const a1 = currst && this.stcmp(pr.st, currst);
-                    logger.warn('push(%s)=%s/%s', pid, a1, inflight.has(pr.st), currst, lastst, hold, [pr]);
+                if (!inflight.size) {
+                    return 3;
                 }
 
                 pid = inflight.get(pr.st);

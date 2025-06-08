@@ -414,20 +414,28 @@
                 });
             }
             else {
-                if (chathandle) {
-                    api_req(
-                        {'a': 'mcuga', "ph": chathandle, 'u': userhandle, 'ua': attribute, 'v': 1},
-                        myCtx,
-                        ATTR_REQ_CHANNEL[attribute]
-                    );
-                }
-                else {
+                if (window.is_karma) {
                     api_req(
                         {'a': 'uga', 'u': userhandle, 'ua': attribute, 'v': 1},
                         myCtx,
                         ATTR_REQ_CHANNEL[attribute]
                     );
+                    return;
                 }
+                const payload = {a: 'uga', u: userhandle, ua: attribute, v: 1};
+
+                if (chathandle) {
+                    payload.a = 'mcuga';
+                    payload.ph = chathandle;
+                }
+                api.req(payload, ATTR_REQ_CHANNEL[attribute])
+                    .then(({result}) => settleFunction(result))
+                    .catch((ex) => {
+                        if (ex !== ENOENT) {
+                            logger.warn(attribute, ex);
+                        }
+                        settleFunction(ex);
+                    });
             }
         };
 

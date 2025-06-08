@@ -2071,13 +2071,13 @@ function execsc() {
                         api.webLockSummary();
                         console.info(`Awaiting API response for SC command '${a.a}..${a.st}..${a.i}'`);
                     }
-                    if (!execsc.trk) {
+                    if (execsc.trk !== scqtail) {
 
                         execsc.trk = scqtail;
                     }
-                    else if (execsc.trk === scqtail && scqhead > scqtail << 3) {
+                    else if (scqhead > scqtail << 3) {
 
-                        eventlog(99620, JSON.stringify([1, scqtail, scqhead, a.a, a.st]), true);
+                        eventlog(99620, JSON.stringify([2, buildVersion.website, scqtail, scqhead, a.a, a.st]), true);
                     }
                     return;
                 case 5:

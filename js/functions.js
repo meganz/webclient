@@ -1989,11 +1989,11 @@ if (typeof sjcl !== 'undefined') {
      *
      * Add verified email addresses to folder shares.
      */
-    Share.prototype.addContactToFolderShare = function addContactToFolderShare() {
+    Share.prototype.addContactToFolderShare = function addContactToFolderShare(selectedNode) {
         let promise;
 
         const targets = [];
-        const [selectedNode] = $.selected;
+        selectedNode = selectedNode || $.selected[0];
 
         // Is there a new contacts planned for addition to share
         if (Object.keys($.addContactsToShare).length > 0) {
@@ -2016,7 +2016,7 @@ if (typeof sjcl !== 'undefined') {
         return promise || Promise.resolve();
     };
 
-    Share.prototype.updateNodeShares = function() {
+    Share.prototype.updateNodeShares = function(target) {
 
         loadingDialog.show();
         return this.removeContactFromShare()
@@ -2024,9 +2024,9 @@ if (typeof sjcl !== 'undefined') {
                 const promises = [];
 
                 if (Object.keys($.changedPermissions).length > 0) {
-                    promises.push(doShare($.selected[0], Object.values($.changedPermissions), true));
+                    promises.push(doShare(target, Object.values($.changedPermissions), true));
                 }
-                promises.push(this.addContactToFolderShare());
+                promises.push(this.addContactToFolderShare(target));
 
                 $('.export-links-warning').addClass('hidden');
 
@@ -2100,10 +2100,10 @@ if (typeof sjcl !== 'undefined') {
      *
      * @returns {Promise} promise to remove contacts from share
      */
-    Share.prototype.removeSharesFromSelected = function() {
+    Share.prototype.removeSharesFromSelected = function(target) {
         'use strict';
         $.removedContactsFromShare = {};
-        const nodeHandle = String($.selected[0]);
+        const nodeHandle = target || String($.selected[0]);
         let userHandles = M.getNodeShareUsers(nodeHandle, 'EXP');
 
         if (M.ps[nodeHandle]) {

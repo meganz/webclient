@@ -1054,6 +1054,16 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
                         delete items['.embedcode-item'];
                         delete items['.colour-label-items'];
                         delete items['.send-to-contact-item'];
+                        delete items['.transferit-item'];
+                        delete items['.add-sensitive-item'];
+                        delete items['.sh4r1ng-item'];
+                        delete items['.removeshare-item'];
+                        delete items['.file-request-create'];
+                        delete items['.file-request-manage'];
+                        delete items['.file-request-copy-link'];
+                        delete items['.file-request-remove'];
+                        delete items['.import-item'];
+                        delete items['.edit-file-item'];
                     }
                     else if (takedownCount) {
                         delete items['.zipdownload-item'];

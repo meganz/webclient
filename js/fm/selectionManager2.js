@@ -1151,6 +1151,15 @@ class SelectionManager2_DOM extends SelectionManager2Base {
                 }
             }
 
+            let mkfound;
+
+            for (let i = 0; i < $.selected.length; i++) {
+                if (missingkeys[$.selected[i]]) {
+                    mkfound = true;
+                    break;
+                }
+            }
+
             if ((sourceRoot === M.RootID || sourceRoot === 's4' || sourceRoot === 'out-shares' ||
                 M.isDynPage(sourceRoot) || sourceRoot === mega.devices.rootId) && !folderlink) {
 
@@ -1164,7 +1173,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
                 }
 
                 // If any of selected items is taken down we do not need to proceed futher
-                if (cl.isTakenDown($.selected)) {
+                if (cl.isTakenDown($.selected) || mkfound) {
                     if (!restrictedFolders) {
                         __showBtn('delete');
                     }
@@ -1187,12 +1196,12 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             }
 
             // Temporarily hide download button for now in MEGA Lite mode (still accessible via zip in context menu)
-            if (selNode.h !== M.RootID && M.getNodeRoot(M.currentdirid) !== M.RubbishID &&
+            if (selNode.h !== M.RootID && M.getNodeRoot(M.currentdirid) !== M.RubbishID && !mkfound &&
                 (!mega.lite.inLiteMode || !mega.lite.containsFolderInSelection($.selected))) {
                 __showBtn('download');
             }
 
-            if (showGetLink || folderlink) {
+            if ((showGetLink || folderlink) && !mkfound) {
                 __showBtn('link');
             }
 

@@ -2871,7 +2871,7 @@ FileManager.prototype.addGridUI = function(refresh) {
             var newFavState = Number(!M.isFavourite(id));
 
             // Handling favourites is allowed for full permissions shares only
-            if (M.getNodeRights(id) > 1) {
+            if (M.getNodeRights(id) > 1 && !missingkeys[id]) {
                 M.favourite(id, newFavState);
                 return false;
             }

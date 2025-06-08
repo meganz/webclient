@@ -1695,7 +1695,6 @@ FileManager.prototype.createFolderUI = function() {
         const node = M.getNodeByHandle(M.currentdirid.split('/').pop());
         if (node && M.getNodeRights(node.h) > 1) {
             $.hideContextMenu();
-            $.selected = [node.h];
             mega.ui.mShareDialog.init(node.h);
             eventlog(500034);
             return false;

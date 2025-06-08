@@ -243,7 +243,7 @@ lazy(mega.ui, 'mShareDialog', () => {
 
             // Do the adding of contacts & outgoing pending contacts to the share
             const share = new mega.Share();
-            share.updateNodeShares()
+            share.updateNodeShares(target)
                 .then(() => {
 
                     // Reset Invite area to clear the fields
@@ -1783,7 +1783,7 @@ lazy(mega.ui, 'mShareDialog', () => {
                     || Object.keys($.removedContactsFromShare).length) {
                     var share = new mega.Share();
 
-                    share.updateNodeShares().finally(() => {
+                    share.updateNodeShares(target).finally(() => {
                         // Close the dialog
                         closeDialog();
 
@@ -1805,7 +1805,7 @@ lazy(mega.ui, 'mShareDialog', () => {
                 msgDialog(`remove:!^${l[23737]}!${l[82]}`, '', l.remove_share_title, l.remove_share_msg, res => {
                     if (res) {
                         loadingDialog.show();
-                        new mega.Share().removeSharesFromSelected().always(() => {
+                        new mega.Share().removeSharesFromSelected(target).always(() => {
                             loadingDialog.hide();
                             closeDialog();
                         });

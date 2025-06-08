@@ -204,23 +204,27 @@ class MegaChatItem extends MegaComponent {
             const { messagesBuff } = this.chatRoom;
             const lastMessage = messagesBuff.getLatestTextMessage();
             if (lastMessage) {
+                let parsed;
                 if (
                     lastMessage.textContents &&
                     lastMessage.textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.VOICE_CLIP &&
                     lastMessage.getAttachmentMeta()[0]
                 ) {
-                    const playTime = secondsToTimeShort(lastMessage.getAttachmentMeta()[0].playtime);
-                    this.details = `<i class="sprite-fm-mono icon-audio-filled voice-message-icon"> ${playTime}`;
-                }
-                else if (lastMessage.metaType && lastMessage.metaType === Message.MESSAGE_META_TYPE.GEOLOCATION) {
-                    this.details = `<i class="sprite-fm-mono icon-location geolocation-icon> ${l[20789]}`;
-                }
-                else {
-                    this.detailsSpan.textContent = '';
-                    this.detailsSpan.appendChild(
-                        parseHTML(`<span>${messagesBuff.getRenderableSummary(lastMessage)}</span>`)
+                    const playTime = escapeHTML(secondsToTimeShort(lastMessage.getAttachmentMeta()[0].playtime));
+                    parsed = parseHTML(
+                        `<i class="sprite-fm-mono icon-audio-filled voice-message-icon"></i> ${playTime}`
                     );
                 }
+                else if (lastMessage.metaType && lastMessage.metaType === Message.MESSAGE_META_TYPE.GEOLOCATION) {
+                    parsed = parseHTML(
+                        `<i class="sprite-fm-mono icon-location geolocation-icon"></i> ${escapeHTML(l[20789])}`
+                    );
+                }
+                else {
+                    parsed = parseHTML(`<span>${messagesBuff.getRenderableSummary(lastMessage)}</span>`);
+                }
+                this.detailsSpan.textContent = '';
+                this.detailsSpan.appendChild(parsed);
             }
             else {
                 this.details =

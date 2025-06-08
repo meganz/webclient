@@ -1007,8 +1007,17 @@ class MegaFlyoutMenu extends MegaComponent {
                                 currentTarget.disabled = true;
                                 return;
                             }
-                            mega.ui.flyout.flyoutMenu.hide();
-                            megaChat.openChatAndSendFilesDialog(contactHandle);
+                            M.initFileAndFolderSelectDialog({
+                                allowAttachFolders: true,
+                                className: '',
+                                folderSelectable: undefined,
+                                selectLabel: undefined,
+                            }).then(
+                                handles =>
+                                    handles &&
+                                    handles.length &&
+                                    megaChat.openChatAndAttachNodes(contactHandle, handles)
+                            );
                         });
                     }
                 }

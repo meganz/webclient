@@ -1839,9 +1839,11 @@ lazy(mega.devices, 'ui', () => {
             if (this.$emptyAppDLButtons) {
                 $('.mega-app-desktop', this.$emptyAppDLButtons).rebind('click.dc.download', () => {
                     window.open('https://mega.io/desktop', '_blank', 'noopener,noreferrer');
+                    eventlog(500843);
                 });
                 $('.mega-app-mobile', this.$emptyAppDLButtons).rebind('click.dc.download', () => {
                     window.open('https://mega.io/mobile', '_blank', 'noopener,noreferrer');
+                    eventlog(500844);
                 });
             }
             if (this.$emptyAddActions) {

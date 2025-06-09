@@ -801,7 +801,7 @@ lazy(T.ui, 'addFilesLayout', () => {
             confirmBtn.classList.add('hidden');
             resumeBtn.classList.add('hidden');
             copyBtn.classList.remove('hidden');
-            cancelBtn.classList.remove('hidden');
+            cancelBtn.classList.remove('hidden', 'disabled');
             domTransfer.classList.add('hidden');
             domTime.classList.add('hidden');
             leftNode.removeAttribute('style');
@@ -873,8 +873,12 @@ lazy(T.ui, 'addFilesLayout', () => {
 
                     header.textContent = l.transferit_completed;
                     box.classList.add('completed');
+                    box.classList.remove('cancel');
                     cancelBtn.classList.add('disabled');
-                    copyBtn.classList.remove('disabled');
+                    cancelBtn.classList.remove('hidden');
+                    copyBtn.classList.remove('disabled', 'hidden');
+                    confirmBtn.classList.add('hidden');
+                    resumeBtn.classList.add('hidden');
                     domTick.classList.remove('hidden');
                     domTransfer.classList.add('hidden');
                     domTime.classList.add('hidden');

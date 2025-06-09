@@ -790,9 +790,15 @@ mBroadcaster.once('boot_done', () => {
                     return false;
                 }
 
-                mobile.rubbishBin.removeItem(nodeHandle);
-
-                M.fmEventLog(500706);
+                const delog = M.currentrootid !== M.RubbishID;
+                fmremove([nodeHandle])
+                    .then(() => {
+                        if (delog) {
+                            eventlog(99638);
+                        }
+                        M.fmEventLog(500706);
+                    })
+                    .catch(tell);
             }
         }
     };

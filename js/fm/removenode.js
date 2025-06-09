@@ -277,7 +277,7 @@ async function fmremove(selectedNodes, skipDelWarning) {
     let s4Containercnt = 0;
 
     // If on mobile we will bypass the warning dialog prompts
-    skipDelWarning = skipDelWarning || is_mobile ? 1 : mega.config.get('skipDelWarning');
+    skipDelWarning = skipDelWarning ? 1 : mega.config.get('skipDelWarning');
 
     for (i = 0; i < selectedNodes.length; i++) {
         var n = M.d[selectedNodes[i]];

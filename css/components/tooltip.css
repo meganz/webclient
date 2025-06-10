@@ -1,3 +1,6 @@
+.mega-component.mega-tooltip {
+    z-index: 1;
+}
 .mega-component.mega-tooltip .tooltip {
     position: absolute;
     box-sizing: border-box;
@@ -10,6 +13,9 @@
     min-width: 180px;
     width: 280px;
     height: auto;
+}
+.mega-component.mega-tooltip.active {
+    transition: none;
 }
   
 .mega-component.mega-tooltip .tooltip.simple {
@@ -33,6 +39,7 @@
   
 .mega-component.mega-tooltip .tooltip-body {
     font: var(--mobile-font-caption-large-regular);
+    line-height: var(--mobile-font-line-height-heading);
     color: var(--mobile-text-inverse-secondary);
     margin-top: 8px;
 }
@@ -44,7 +51,7 @@
 .mega-component.mega-tooltip .tooltip-actions {
     margin-top: 12px;
     border-top: 1px solid var(--mobile-icon-secondary);
-    padding-top: 4px;
+    padding-top: 12px;
     display: flex;
     flex-direction: column;
 }
@@ -56,10 +63,22 @@
     height: auto;
     justify-content: flex-start;
 }
+
+.mega-component.mega-tooltip .tooltip-actions .button:not(:last-child) {
+    margin-bottom: 8px;
+}
+
+.mega-component.mega-tooltip .tooltip-actions .button.primary {
+    height: 19px;
+}
   
 .mega-component.mega-tooltip .tooltip-actions .button.primary span {
     font: var(--mobile-font-link-large-semibold);
     color: var(--mobile-text-inverse);
+}
+
+.mega-component.mega-tooltip .tooltip-actions .button.secondary {
+    height: 17px;
 }
   
 .mega-component.mega-tooltip .tooltip-actions .button.secondary span {
@@ -111,7 +130,7 @@
 }
   
 .mega-component.mega-tooltip .tooltip.position-bottom::before {
-    top: -8px;
+    top: -7px;
     border-width: 0 8px 8px;
     border-color: transparent transparent var(--mobile-background-inverse) transparent;
 }
@@ -123,7 +142,7 @@
 }
   
 .mega-component.mega-tooltip .tooltip.position-left::before {
-    right: -8px;
+    right: -7px;
     border-width: 8px 0 8px 8px;
     border-color: transparent transparent transparent var(--mobile-background-inverse);
 }
@@ -155,4 +174,3 @@
 .mega-component.mega-tooltip .tooltip.position-right.align-end::before {
     bottom: 12px;
 }
-  

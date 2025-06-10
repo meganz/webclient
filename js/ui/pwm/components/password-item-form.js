@@ -174,7 +174,7 @@ class PasswordItemForm extends MegaForm {
         this.megaTitleInput.$wrapper[0].appendChild(this.outer);
         this.megaTitleInput.$wrapper.addClass('has-favicon');
 
-        this.megaPwdInput.$wrapper[0].appendChild(mega.ui.pm.overlay.contentNode.querySelector('.generate-password'));
+        this.megaPwdInput.$wrapper[0].appendChild(this.domNode.querySelector('.generate-password'));
         this.megaPwdInput.$wrapper.addClass('has-favicon');
     }
 
@@ -223,7 +223,9 @@ class PasswordItemForm extends MegaForm {
 
         // delay for the overlay transition to happen and set focus
         delay('password-item-title-focus', () => {
-            this.megaTitleInput.$input.focus();
+            if (!options.disableAutoFocus) {
+                this.megaTitleInput.$input.focus();
+            }
 
             const infoIcon = '<i class="sprite-fm-mono icon-help-circle-thin-outline"></i>';
             this.megaTOTPInput.showInfoMessage(`${infoIcon} ${l.otp_field_instructions}`);
@@ -232,28 +234,33 @@ class PasswordItemForm extends MegaForm {
             const link = wrapper.querySelector('div.message-container.mega-banner a');
             if (link) {
                 link.addEventListener('click', () => {
+                    const prompt = document.createElement('p');
+                    prompt.append(l.otp_tutorial_prompt);
+                    prompt.append(document.createElement('br'));
+                    prompt.append(parseHTML(l.otp_learn_more));
                     this.showInfoSheet({
                         name: 'totp-info',
                         title: l.otp_info_title,
                         contents: [
                             l.otp_info_description,
-                            l.otp_tutorial_prompt,
-                            parseHTML(l.otp_learn_more)
+                            prompt
                         ],
                         actions: [
-                            {
-                                type: 'normal',
-                                text: l.otp_start_tutorial,
-                                className: 'secondary invisible',
-                                onClick: () => {
-                                    // TODO: Implement tutorial link
-                                }
-                            },
                             {
                                 type: 'normal',
                                 text: l.ok_button,
                                 className: 'primary',
                                 onClick: () => mega.ui.sheet.hide()
+                            },
+                            {
+                                type: 'normal',
+                                text: l.otp_start_tutorial,
+                                className: 'secondary',
+                                onClick: () => {
+                                    mega.ui.sheet.hide();
+                                    const tutorialOTP = new TutorialOTP();
+                                    tutorialOTP.start();
+                                }
                             }
                         ]
                     });
@@ -419,19 +426,45 @@ class PasswordItemForm extends MegaForm {
             }
         }
 
+        const footerElements = [
+            mCreateElement('div', { class: 'flex flex-row' }),
+            mCreateElement('div', { class: 'flex flex-row-reverse' })
+        ];
+
+        const buttons = actions.length > 0 ? actions : [{
+            type: 'normal',
+            text: l.ok_button,
+            onClick: () => mega.ui.sheet.hide()
+        }];
+
+        for (let i = 0; i < buttons.length; i++) {
+            const action = buttons[i];
+
+            const className = [
+                'font-600',
+                'slim',
+                i !== 0 && 'mx-2',
+                action.className
+            ].filter(Boolean).join(' ');
+
+            MegaButton.factory({
+                parentNode: footerElements[1],
+                type: action.type || 'normal',
+                componentClassname: className,
+                text: action.text || '',
+            }).on('click.sheetAction', action.onClick);
+        }
+
         mega.ui.sheet.show({
             name,
             showClose: true,
+            type: 'normal',
             preventBgClosing: true,
             title,
             contents: [targetNode],
-            actions: actions.length > 0 ? actions : [
-                {
-                    type: 'normal',
-                    text: l.ok_button,
-                    onClick: () => mega.ui.sheet.hide()
-                }
-            ]
+            footer: {
+                slot: footerElements
+            }
         });
     }
 }

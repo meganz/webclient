@@ -68,6 +68,8 @@ class MegaTooltip extends MegaComponent {
      * @param {Object} options
      * @param {HTMLElement} [options.targetNode=null]
      *          The element this tooltip is anchored to.
+     * @param {number|string} [options.width=null]
+     *          Optional fixed width for the tooltip (e.g. 300 or '300px').
      * @param {string} [options.title='']
      *          Heading text shown in the tooltip.
      * @param {string} [options.body='']
@@ -88,6 +90,7 @@ class MegaTooltip extends MegaComponent {
             this.clear();
             const {
                 targetNode = null,
+                width = null,
                 title = '',
                 body = '',
                 position = 'top',
@@ -97,7 +100,7 @@ class MegaTooltip extends MegaComponent {
                 step = false
             } = options;
 
-            Object.assign(this, {targetNode, title, body, position, align, actions, close, step});
+            Object.assign(this, {targetNode, width, title, body, position, align, actions, close, step});
             this.interactive = actions.length > 0 || close || step;
 
             this.tooltip.className = [
@@ -110,6 +113,20 @@ class MegaTooltip extends MegaComponent {
             // Auto-hide for non-interactive tooltips
             if (!this.interactive) {
                 this._autoHideId = setTimeout(() => this.hide(), 6000);
+            }
+
+            const _bindEvent = (onAction, target, event) => {
+
+                if (target && event && typeof onAction === 'function') {
+                    target.on(event, onAction);
+                }
+            };
+
+            if (this.width) {
+                this.tooltip.style.width = typeof width === 'number' ? `${width}px` : width;
+            }
+            else {
+                this.tooltip.style.width = '';
             }
 
             this.showClose = this.close;
@@ -127,6 +144,7 @@ class MegaTooltip extends MegaComponent {
                 this.addStep(this.step.current, this.step.total);
             }
 
+            _bindEvent(options.onClose, this, 'close.tooltip');
             this.updatePosition();
 
             window.removeEventListener('resize', this._onWindowResize);
@@ -144,13 +162,16 @@ class MegaTooltip extends MegaComponent {
         window.removeEventListener('resize', this._onWindowResize);
         document.documentElement.classList.remove('overlayed-backdrop-dim');
         this.removeClass('active');
+        this.trigger('close.tooltip');
     }
 
     clear() {
+        this.tooltip.style.width = '';
         this.clearTitle();
         this.clearBody();
         this.clearActions();
         this.clearStep();
+        this.clearUserEvents();
     }
 
     get showClose() {
@@ -210,6 +231,10 @@ class MegaTooltip extends MegaComponent {
         this.stepNode.textContent = '';
     }
 
+    clearUserEvents() {
+        this.off('close.tooltip');
+    }
+
     updatePosition() {
         if (!this.targetNode) {
             return;
@@ -243,8 +268,8 @@ class MegaTooltip extends MegaComponent {
 
         const {style} = this.tooltip;
         Object.assign(style, {
-            left: `${Math.round(x)}px`,
-            top: `${Math.round(y)}px`
+            left: `${x}px`,
+            top: `${y}px`
         });
     }
 }

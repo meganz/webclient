@@ -3117,6 +3117,7 @@ else if (!browserUpdate) {
         'folder': ['folderlink_css'],
         'collection': ['folderlink_css'],
         'discountpromo': ['discountpromo_js'],
+        'discount': ['discountpromo_js'],
         's': ['discountpromo_js'], // Short URL for 'sale' e.g. /s/blackfriday
         'disputenotice': ['disputenotice', 'copyright_js'],
         'support': ['support_js', 'support'],

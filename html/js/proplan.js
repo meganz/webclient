@@ -1065,7 +1065,7 @@ pro.proplan = {
         }
         loadingDialog.show();
         delete mega.discountInfo;
-        api.req({a: 'dci', dc: mega.discountCode}).then(({result: res}) => {
+        api.req({a: 'dci', dc: mega.discountCode, extra: true}).then(({result: res}) => {
             loadingDialog.hide();
             if (res && res.al && res.pd) {
                 DiscountPromo.storeDiscountInfo(res);

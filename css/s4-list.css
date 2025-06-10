@@ -49,6 +49,7 @@
     font: var(--text-body2);
     white-space: nowrap;
     padding-bottom: 0;
+    height: 34px;
 }
 
 .s4-grid-view .s4-grid-table tr td:first-child::before {
@@ -103,6 +104,7 @@
     width: 16px;
     position: absolute;
     right: 0;
+    top: 9px;
 }
 .rtl .s4-grid-view .s4-grid-table thead .grid-view-resize {
     right: auto;

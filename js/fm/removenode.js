@@ -63,6 +63,10 @@ function removeUInode(h, parent) {
         if (fmRightFileBlock) {
             fmRightFileBlock.classList.add('emptied');
         }
+
+        delay('removeNodeExtraToggle', () => {
+            mega.ui.secondaryNav.toggleGridExtraButtons(M.v.length === 0);
+        }, 100);
     };
 
     switch (M.currentdirid) {

@@ -22,7 +22,12 @@ class MegaMenu extends MegaOverlay {
             this.addedClasses = options.classList;
         }
 
+        if (options.container) {
+            this.container = options.container;
+        }
+
         this.event = options.event;
+        this.pos = options.pos || 'left';
         this.calcPosition();
 
         // This is opened by click event.
@@ -70,8 +75,7 @@ class MegaMenu extends MegaOverlay {
             return;
         }
 
-        const leftMenuWidth = is_chatlink ? 0 : mega.ui.topmenu.domNode.offsetWidth;
-
+        const containerPos = (this.container || document.body).getBoundingClientRect();
         const dialog = this.domNode;
         const dialogStyle = dialog.style;
         dialogStyle.height = null;
@@ -84,13 +88,23 @@ class MegaMenu extends MegaOverlay {
         // calculate the max width & height available for the context menu dialog
         const maxHeight = window.innerHeight;
 
-        if (this.event.type === 'contextmenu') {
-            posLeft = this.event.originalEvent.clientX;
-            posTop = this.event.originalEvent.clientY;
+        if (this.event.type === 'contextmenu' || this.pos === 'bottomRight') {
+
+            if (this.pos === 'bottomRight') {
+
+                const {bottom, left} = this.event.currentTarget.domNode.getBoundingClientRect();
+
+                posLeft = left;
+                posTop = bottom + 12;
+            }
+            else {
+                posLeft = this.event.originalEvent.clientX;
+                posTop = this.event.originalEvent.clientY;
+            }
 
             // if the left side of the popup is out of the window, move it to fit the right side of the window
-            if (posLeft + menuWidth > leftMenuWidth) {
-                posLeft = leftMenuWidth - menuWidth;
+            if (posLeft + menuWidth > containerPos.right) {
+                posLeft = containerPos.right - menuWidth;
             }
             // if the bottom side of the popup is out of the window, move it to fit the bottom side of the window
             if (posTop + menuHeight > maxHeight) {
@@ -111,8 +125,8 @@ class MegaMenu extends MegaOverlay {
             }
 
             // show the dialog taking into account the position of the left menu to avoid overlapping it
-            if (posLeft < leftMenuWidth) {
-                posLeft = leftMenuWidth;
+            if (posLeft < containerPos.left) {
+                posLeft = containerPos.left + 12;
             }
 
             const maxPosHeight = posTop + menuHeight;
@@ -132,15 +146,20 @@ class MegaMenu extends MegaOverlay {
 mBroadcaster.once('startMega', () => {
     'use strict';
 
-    document.body.addEventListener('click', event => {
-        if (mega.ui.menu.eventTarget && (event.target === mega.ui.menu.eventTarget.domNode ||
-            mega.ui.menu.eventTarget.domNode.contains(event.target))) {
+    const closeHandler = (event) => {
+
+        const {domNode} = mega.ui.menu.eventTarget || {};
+        const {target} = event || {};
+
+        if (domNode && target && (target === domNode || domNode.contains(target))) {
             return;
         }
 
         mega.ui.menu.hide();
         mega.ui.menu.trigger('close');
-    }, true);
+    };
+
+    mBroadcaster.addListener('contextmenuclose', closeHandler);
 });
 
 (mega => {

@@ -114,7 +114,7 @@ lazy(self, 'mLoadingSpinner', () => {
                     timeout: 0,
                     content: title,
                     classes: ['loading-toast'],
-                    icons: ['sprite-fm-theme icon-loading-spinner rotating-animation']
+                    icons: ['sprite-fm-theme icon-loading-spinner rotating-animation step-12']
                 });
             }
             callers.set(id, store);
@@ -4295,15 +4295,8 @@ function fmviewmode(id, e)
     if (typeof fmconfig.viewmodes !== 'undefined')
         viewmodes = fmconfig.viewmodes;
 
-    id = getSafeViewModeId(id);
+    viewmodes[id] = e | 0;
 
-    if (e === 2) {
-        viewmodes[id] = 2;
-    }
-    else if (e)
-        viewmodes[id] = 1;
-    else
-        viewmodes[id] = 0;
     mega.config.set('viewmodes', viewmodes);
 }
 
@@ -4314,22 +4307,21 @@ function fmviewmode(id, e)
  */
 function getFmViewMode(id) {
     'use strict';
-    return self.fmconfig && fmconfig.viewmodes && fmconfig.viewmodes[getSafeViewModeId(id)];
-}
 
-/**
- * Returns a safe id for viewmode config
- * In case id length > 63, only the last 63 characters are considered
- * This is because config shrink.views function adds wide chars at the beginning of the id
- *  when id.length > 63, what makes asmcrypto "string_to_bytes" function to throw
- *  an Error: "Wide characters are not allowed"
- * @param {String} id - id of the viewmode
- * @returns {String} safe id for viewmode config
- */
-function getSafeViewModeId(id) {
-    'use strict';
-    return id && id.length > 63 ? id.slice(-63) : id;
+    if (self.fmconfig && fmconfig.uiviewmode | 0) {
+        return fmconfig.viewmode;
+    }
+
+    if (getFmViewMode.lv[M.currentdirid] || getFmViewMode.lv[M.currentCustomView.subType]) {
+        M.overrideViewMode = 0;
+        return 0;
+    }
+
+    return self.fmconfig && fmconfig.viewmodes && fmconfig.viewmodes[id];
 }
+Object.defineProperty(getFmViewMode, 'lv', {
+    value: freeze({'shares': 1, 'out-shares': 1, 'file-requests': 1, 'container': 1})
+});
 
 /** @property window.thumbnails */
 lazy(self, 'thumbnails', () => {
@@ -4363,7 +4355,7 @@ function fm_thumbnails(mode, nodeList, callback)
     const treq = [];
 
     const onTheFly =
-        !is_mobile && M.viewmode && mode !== 'standalone' && !exclude
+        !is_mobile && M.onIconView && mode !== 'standalone' && !exclude
         && !mega.config.get('noflytn') ? Object.create(null) : false;
 
     // check if the node is rendered within/near the view-port.

@@ -3355,8 +3355,7 @@ function logExportEvt(evtId, data) {
                 titleTooltip += '\n' + M.getUndecryptedLabel(M.d[nodeId]);
             }
 
-            $('.grid-table.fm #' + nodeId).attr('title', titleTooltip);
-            $('#' + nodeId + '.data-block-view').attr('title', titleTooltip);
+            $('#' + nodeId).attr('title', titleTooltip);
         }
         else {// Item is file
 
@@ -3367,8 +3366,7 @@ function logExportEvt(evtId, data) {
                 titleTooltip += '\n' + M.getUndecryptedLabel(M.d[nodeId]);
             }
 
-            $('.grid-table.fm #' + nodeId).attr('title', titleTooltip);
-            $('#' + nodeId + '.data-block-view').attr('title', titleTooltip);
+            $('#' + nodeId).attr('title', titleTooltip);
         }
     };
 
@@ -3401,6 +3399,9 @@ function logExportEvt(evtId, data) {
         // Remove title, mouse popup
         $('.grid-table.fm #' + nodeId).attr('title', '');
         $('#' + nodeId + '.data-block-view').attr('title', '');
+
+        // Update node component
+        MegaNodeComponent.getNodeComponentByHandle(nodeId).update();
     };
 
     // export

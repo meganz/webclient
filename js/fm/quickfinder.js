@@ -210,7 +210,7 @@ var QuickFinder = function(searchable_elements, containers) {
         else if (charCode >= 33 && charCode <= 36)
         {
             var elem = '.files-grid-view.fm';
-            if (M.viewmode == 1) {
+            if (M.onIconView) {
                 elem = '.fm-blocks-view.fm';
             }
 

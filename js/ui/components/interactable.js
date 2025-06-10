@@ -68,6 +68,10 @@ class MegaInteractable extends MegaComponent {
         if (options.simpletip) {
             this.dataset.simpletip = options.simpletip;
             this.addClass('simpletip');
+
+            if (options.simpletipPos) {
+                this.dataset.simpletipposition = options.simpletipPos;
+            }
         }
 
         if (options.eventLog) {
@@ -181,7 +185,7 @@ class MegaInteractable extends MegaComponent {
     }
 
     get rightIcon() {
-        return this.domNode.rightIcon.c;
+        return this.domNode.rightIcon && this.domNode.rightIcon.c;
     }
 
     set rightIcon(iconClass) {

@@ -2085,6 +2085,10 @@ else if (!browserUpdate) {
     jsl.push({f:'js/ui/megaInputs-textArea.js', n: 'megainputs_textarea_js', j:1,w:1});
     jsl.push({f:'js/ui/megaInputs-currencyField.js', n: 'megainputs_currencyfield_js', j:1, w:1});
     jsl.push({f:'js/ui/megaInputs-pmText.js', n: 'megaInputs_pmText_js', j: 1, w:1});
+    jsl.push({f:'js/ui/components/component.js', n: 'component_js', j: 1, w: 1});
+    jsl.push({f:'js/ui/components/node.js', n: 'node_js', j: 1, w:1});
+    jsl.push({f:'js/ui/components/sharednode.js', n: 'sharednode_js', j: 1, w:1});
+    jsl.push({f:'js/ui/components/contactnode.js', n: 'contactnode_js', j: 1, w:1});
     jsl.push({f:'html/registerb.html', n: 'registerb',j:0});
     jsl.push({f:'html/repay.html', n: 'repay', j:0 });
     jsl.push({f:'html/js/repay.js', n: 'repay_js', j:1 });
@@ -2251,7 +2255,6 @@ else if (!browserUpdate) {
     jsl.push({f:'js/ui/elementSwitcher.js', n: 'elementSwitcher_js', j: 1});
 
     // Shared components
-    jsl.push({f:'js/ui/components/component.js', n: 'component_js', j: 1, w:1});
     jsl.push({f:'js/ui/components/group.js', n: 'group_js', j: 1, w:1});
     jsl.push({f:'js/ui/components/interactable.js', n: 'interactable_js', j: 1, w:1});
     jsl.push({f:'js/ui/components/link.js', n: 'link_js', j: 1, w:1});
@@ -2263,9 +2266,6 @@ else if (!browserUpdate) {
     jsl.push({f:'js/ui/components/toast.js', n: 'components_toast_js', j: 1, w:1});
     jsl.push({f:'js/ui/components/overlay.js', n: 'overlay_js', j: 1, w:1});
     jsl.push({f:'js/ui/components/sheet.js', n: 'sheet_js', j: 1, w:1});
-    jsl.push({f:'js/ui/components/node.js', n: 'node_js', j: 1, w:1});
-    jsl.push({f:'js/ui/components/sharednode.js', n: 'sharednode_js', j: 1, w:1});
-    jsl.push({f:'js/ui/components/contactnode.js', n: 'contactnode_js', j: 1, w:1});
     jsl.push({f:'js/ui/components/megaInput.js', n: 'megainput_js', j: 1, w: 1});
     jsl.push({f:'js/ui/components/textarea.js', n: 'textarea_js', j: 1, w: 1});
     jsl.push({f:'js/ui/components/menu.js', n: 'menu_js', j: 1, w:1});

@@ -581,6 +581,7 @@ MegaData.prototype.doSort = function(n, d) {
 
     let arrowDirection = 'desc';
     let sortIconAddClass = 'up';
+    let skipsave = false;
 
     if (d < 0) {
         arrowDirection = 'asc';
@@ -588,6 +589,18 @@ MegaData.prototype.doSort = function(n, d) {
     }
 
     n = String(n).replace(/\W/g, '');
+
+    // if folder link is opened, and action packet try sort by versions or label, ignore it.
+    if (this.fmsorting && folderlink && (n === 'versions' || n === 'label')) {
+
+        // if this sort is due to action packet and force fallback, do not save it.
+        skipsave = true;
+        n = 'name';
+    }
+    // Sort by fav is now deprecated
+    else if (n === 'fav') {
+        n = 'name';
+    }
 
     $('.arrow.' + n + ':not(.is-chat)').addClass(arrowDirection);
     if (n === "name") {
@@ -602,6 +615,10 @@ MegaData.prototype.doSort = function(n, d) {
     if (typeof this.sortRules[n] === 'function') {
         this.skipSortByTypeAsDefault = mega.devices.ui.isCustomRender();
         this.sortRules[n](d);
+
+        if (skipsave) {
+            return;
+        }
 
         if (this.fmsorting) {
             mega.config.set('sorting', this.sortmode);

@@ -1,15 +1,12 @@
 .files-grid-view.active-rewind,
 .fm-empty-section.active-rewind,
-.fm-blocks-view.active-rewind,
-.out-shared-grid-view,
-.out-shared-blocks-view {
+.fm-blocks-view.active-rewind {
     display: flex;
+    border-top: 1px solid var(--mobile-border-strong);
 }
 
 .fm-blocks-view.active-rewind .file-block-scrolling,
 .files-grid-view.active-rewind .grid-scrolling-table,
-.out-shared-grid-view.active-rewind .grid-scrolling-table,
-.out-shared-blocks-view.active-rewind .out-shared-blocks-scrolling,
 .fm-empty-section.active-rewind .fm-empty-pad {
     min-width: 0;
     width: 100%;
@@ -21,7 +18,6 @@
 }
 
 .fm-blocks-view.active-rewind .file-block-scrolling,
-.out-shared-blocks-view.active-rewind .out-shared-blocks-scrolling,
 .fm-empty-section.active-rewind .fm-empty-pad {
     min-width: 456px;
 }

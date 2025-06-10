@@ -315,6 +315,12 @@ lazy(mega.ui, 'secondaryNav', () => {
         $.hasWebKitDirectorySupport = 'webkitdirectory' in document.createElement('input');
     }
 
+    const viewModeIcons = [
+        'icon-view-small-list-thin',
+        'icon-grid-4-thin-outline',
+        'icon-image-04-thin-outline',
+        'icon-view-medium-list-thin'
+    ];
     const downloadMenu = document.createElement('div');
     downloadMenu.className = 'fm-download-dropdown';
     const downloadStandard = new MegaButton({
@@ -343,6 +349,7 @@ lazy(mega.ui, 'secondaryNav', () => {
             }
             M.addDownload([mega.ui.secondaryNav.dlId], true);
             delete mega.ui.secondaryNav.dlId;
+            $.hideContextMenu();
         }
     });
     const downloadMegaSync = new MegaButton({
@@ -366,6 +373,7 @@ lazy(mega.ui, 'secondaryNav', () => {
                 }
 
                 delete mega.ui.secondaryNav.dlId;
+                $.hideContextMenu();
             });
         }
     });
@@ -385,6 +393,7 @@ lazy(mega.ui, 'secondaryNav', () => {
 
         if (folderlink && String(M.currentdirid).startsWith('search')) {
             M.viewmode = viewValue;
+            $.hideContextMenu();
             M.renderMain();
         }
         else {
@@ -399,60 +408,401 @@ lazy(mega.ui, 'secondaryNav', () => {
             button.classList.remove('active');
             const icon = button.querySelector('i');
             if (icon) {
-                icon.classList.remove(
-                    'icon-view-small-list-thin', 'icon-grid-4-thin-outline', 'icon-image-04-thin-outline'
-                );
-                icon.classList.add(
-                    viewValue === 0 ? 'icon-view-small-list-thin' :
-                        viewValue === 1 ? 'icon-grid-4-thin-outline' : 'icon-image-04-thin-outline'
-                );
+                icon.classList.remove(...viewModeIcons);
+                icon.classList.add(viewModeIcons[viewValue]);
+            }
+        }
+
+        if (viewValue === 0) {
+            eventlog(500724, true);
+        }
+        else if (viewValue === 1) {
+            eventlog(500725, true);
+        }
+        else if (viewValue === 2) {
+            eventlog(500726, true);
+        }
+        else if (viewValue === 3) {
+            eventlog(500757, true);
+        }
+    };
+
+    const _btnOptsTemplate = {
+        parentNode: layoutMenu,
+        type: 'fullwidth',
+        componentClassname: 'text-icon',
+        onClick(ev) {
+            if (!ev.currentTarget.rightIcon) {
+                viewChangeHandler(this.attr('viewmode') | 0);
             }
         }
     };
-    const layoutList = new MegaButton({
-        parentNode: layoutMenu,
-        type: 'fullwidth',
-        componentClassname: 'text-icon',
-        icon: 'sprite-fm-mono icon-view-small-list-thin',
-        text: l.filter_view_list,
-        onClick(ev) {
-            if (!ev.currentTarget.rightIcon) {
-                viewChangeHandler(0);
-                eventlog(500724);
+
+    const layoutButtons = [
+        new MegaButton({
+            ..._btnOptsTemplate,
+            icon: 'sprite-fm-mono icon-view-small-list-thin',
+            text: l.compact_list_view,
+            attr: {viewmode: 0}
+        }),
+        new MegaButton({
+            ..._btnOptsTemplate,
+            icon: 'sprite-fm-mono icon-view-medium-list-thin',
+            text: l.filter_view_list,
+            attr: {viewmode: 3}
+        }),
+        new MegaButton({
+            ..._btnOptsTemplate,
+            icon: 'sprite-fm-mono icon-grid-4-thin-outline',
+            text: l.grid_view,
+            attr: {viewmode: 1}
+        }),
+        new MegaButton({
+            ..._btnOptsTemplate,
+            icon: 'sprite-fm-mono icon-image-04-thin-outline',
+            text: l.md_view,
+            attr: {viewmode: 2}
+        })
+    ];
+
+    /**
+     * Grid view only elements from here
+     */
+
+    // Grid view extra buttons
+    const extraBtnWrapper = document.querySelector('.fm-header-grid-extra');
+    const selectAllGrid = extraBtnWrapper.querySelector('.select-all-checkbox');
+    const selectAllList = document.querySelectorAll('.grid-table .select-all-checkbox');
+
+    // Sorting menu for grid view
+    const columnMenu = document.createElement('div');
+    columnMenu.className = 'fm-col-dropdown';
+    columnMenu.appendChild(parseHTML(`<span class="layout-label">${escapeHTML(l[6170])}</span>`));
+
+    const gridSortDirBtn = new MegaButton({
+        parentNode: extraBtnWrapper,
+        onClick: () => {
+            if (M.sortmode) {
+                M.doSort(M.sortmode.n || 'name', -M.sortmode.d || 1);
+                M.previousdirid = M.currentdirid; // fix for avoid deselection on sort
+                M.renderMain();
+            }
+        },
+        componentClassname: 'sort-direction-button asc text-icon',
+        icon: 'sprite-fm-mono icon-up',
+        text: 'test',
+        iconSize: 16
+    });
+
+    _btnOptsTemplate.parentNode = columnMenu;
+    _btnOptsTemplate.onClick = function(ev) {
+
+        let colkey = this.attr('colkey');
+        if (columnMenu.classList.contains('sort') && !ev.currentTarget.active) {
+            M.doSort(colkey, M.sortmode.d);
+            M.previousdirid = M.currentdirid; // fix for avoid deselection on sort
+            M.renderMain();
+        }
+        else if (columnMenu.classList.contains('column')) {
+
+            if (colkey === 'name') {
+                colkey = 'fname';
+            }
+
+            if (colkey === 'date') {
+                colkey = 'timeAd';
+            }
+
+            if (colkey === 'mtime') {
+                colkey = 'timeMd';
+            }
+
+            M.columnsWidth.cloud[colkey].viewed = !ev.currentTarget.active;
+
+            M.columnsWidth.cloud.fname.lastOffsetWidth = null;
+            M.columnsWidth.updateColumnStyle();
+
+            var columnPreferences = mega.config.get('fmColPrefs');
+            if (columnPreferences === undefined) {
+                columnPreferences = 108; // default
+            }
+            var colConfigNb = getNumberColPrefs(colkey);
+            if (colConfigNb) {
+                if (M.columnsWidth.cloud[colkey].viewed) {
+                    columnPreferences |= colConfigNb;
+                }
+                else {
+                    columnPreferences &= ~colConfigNb;
+                }
+            }
+            mega.config.set('fmColPrefs', columnPreferences);
+
+            if (M.megaRender && M.megaRender.megaList) {
+                if (M.megaRender.megaList._scrollIsInitialized) {
+                    M.megaRender.megaList.scrollUpdate();
+                }
+                else {
+                    M.megaRender.megaList.resized();
+                }
             }
         }
-    });
-    const layoutGrid = new MegaButton({
-        parentNode: layoutMenu,
-        type: 'fullwidth',
-        componentClassname: 'text-icon',
-        icon: 'sprite-fm-mono icon-grid-4-thin-outline',
-        text: l.grid_view,
-        onClick(ev) {
-            if (!ev.currentTarget.rightIcon) {
-                viewChangeHandler(1);
-                eventlog(500725);
+        if (typeof $.hideContextMenu === 'function') {
+            $.hideContextMenu();
+        }
+    };
+    _btnOptsTemplate.rightIcon =
+        `sprite-fm-mono icon-check-thin-outline ${MegaInteractable.iconSizesClass[24]}`;
+
+    const colBtnsText = {
+        'name': l[86],
+        'label': l[17398],
+        'date': l[17445],
+        'mtime': l[94],
+        'type': l[93],
+        'size': l[87],
+        'versions': l[17150],
+        'playtime': l.duration
+    };
+
+    const colBtnTextkeys = Object.keys(colBtnsText);
+    let timeAdBtn;
+
+    for (let i = 0; i < colBtnTextkeys.length; i++) {
+        const btn = new MegaButton({
+            ..._btnOptsTemplate,
+            text: colBtnsText[colBtnTextkeys[i]]
+        });
+        btn.attr('colkey', colBtnTextkeys[i]);
+        if (colBtnTextkeys[i] === 'date') {
+            timeAdBtn = btn;
+        }
+    }
+
+    const _allAction = ev => {
+        if (selectionManager) {
+
+            const {container} = M.megaRender || {};
+
+            if (container) {
+                container.classList.add('animate-select');
+            }
+
+            if (ev.target.classList.contains('all-selected') || ev.target.classList.contains('some-selected')) {
+                selectionManager.clear_selection();
+                ev.target.classList.remove('all-selected', 'some-selected');
+            }
+            else {
+                selectionManager.select_all();
+                ev.target.classList.add('all-selected');
             }
         }
+    };
+
+    const updateColBtnText = () => {
+
+        if (page === 'fm/public-links') {
+            timeAdBtn.text = l[20694];
+            colBtnsText.date = l[20694];
+        }
+        else if (page === 'fm/file-requests') {
+            timeAdBtn.text = l.file_request_page_label_request_created;
+            colBtnsText.date = l.file_request_page_label_request_created;
+        }
+        else {
+            timeAdBtn.text = l[17445];
+            colBtnsText.date = l[17445];
+        }
+    };
+
+    selectAllGrid.addEventListener('click', _allAction);
+    selectAllList.forEach(chbx => {
+        chbx.addEventListener('click', _allAction);
     });
-    const layoutGallery = new MegaButton({
-        parentNode: layoutMenu,
-        type: 'fullwidth',
-        componentClassname: 'text-icon hidden',
-        icon: 'sprite-fm-mono icon-image-04-thin-outline',
-        text: l.md_view,
-        onClick(ev) {
-            if (!ev.currentTarget.rightIcon) {
-                viewChangeHandler(2);
-                eventlog(500726);
+
+    const _filterColumns = () => {
+        const columnKeys = Object.keys(colBtnsText);
+
+        // if it is on icon view, we need to update grid header value for filtering dropdown
+        if (M.onIconView && typeof $.gridHeader === 'function') {
+            $.gridHeader();
+        }
+
+        for (let i = 0; i < columnKeys.length; i++) {
+
+            const colBtn = columnMenu.componentSelector(`[colkey="${columnKeys[i]}"]`);
+            let colkey = columnKeys[i];
+            let forceHide = false;
+
+            if (colBtn) {
+
+                if (colkey === 'name') {
+                    colkey = 'fname';
+                }
+
+                if (colkey === 'date') {
+                    colkey = 'timeAd';
+                }
+
+                if (colkey === 'mtime') {
+                    colkey = 'timeMd';
+                }
+
+                if ((colkey === 'versions' || colkey === 'size') && mega.lite.inLiteMode) {
+                    forceHide = true;
+                }
+
+                const colValue = M.columnsWidth.cloud[colkey];
+
+                colBtn.toggleClass('active', colValue.viewed);
+                colBtn.toggleClass('hidden', forceHide || !!colValue.disabled);
             }
         }
+    };
+
+    const gridSortByBtn = new MegaButton({
+        parentNode: extraBtnWrapper,
+        onClick: ev => {
+
+            $.hideContextMenu();
+
+            if (ev.currentTarget.active) {
+                ev.currentTarget.removeClass('active');
+                return;
+            }
+
+            _filterColumns();
+
+            ev.currentTarget.addClass('active');
+
+            if (M.sortmode) {
+
+                const prevActiveButtons = columnMenu.componentSelectorAll('.active');
+                const activeButton = columnMenu.componentSelector(`[colkey="${M.sortmode.n}"]`);
+
+                for (let i = 0; i < prevActiveButtons.length; i++) {
+                    prevActiveButtons[i].removeClass('active');
+                }
+
+                if (activeButton) {
+                    activeButton.addClass('active');
+                }
+                else if (M.sortmode.n === 'ts') {
+                    timeAdBtn.addClass('active');
+                }
+            }
+
+            columnMenu.className = 'fm-col-dropdown sort';
+            columnMenu.querySelector('.layout-label').textContent = l[6170];
+
+            updateColBtnText();
+
+            mega.ui.menu.show({
+                name: 'fm-sort-menu',
+                classList: ['fm-sort-menu'],
+                event: ev,
+                eventTarget: ev.currentTarget,
+                contents: [columnMenu],
+                resizeHandler: true,
+                onClose: () => {
+                    gridSortByBtn.removeClass('active');
+                },
+                pos: 'bottomRight'
+            });
+            return false;
+        },
+        componentClassname: 'sort-by-button text-icon',
+        type: 'icon',
+        icon: 'sprite-fm-mono icon-chevron-up-down',
+        iconSize: 16,
+        simpletip: l[6170],
+        simpletipPos: 'top'
     });
+
+    const showColumnSelectionMenu = (ev) => {
+
+        ev.currentTarget.domNode = ev.currentTarget.querySelector('i');
+
+        columnMenu.className = 'fm-col-dropdown column';
+        columnMenu.querySelector('.layout-label').textContent = l.column_selection_title;
+
+        _filterColumns();
+
+        updateColBtnText();
+
+        mega.ui.menu.show({
+            name: 'fm-col-select-menu',
+            classList: ['fm-col-select-menu'],
+            event: ev,
+            eventTarget: ev.currentTarget,
+            contents: [columnMenu],
+            resizeHandler: true,
+            onClose: () => {
+                ev.target.classList.remove('active');
+            }
+        });
+    };
+
+    const handleNodeSelection = (container) => {
+        let selectAllCheckbox;
+        let isSkipOnDeviceCentre = false;
+        const itemsNum = $.selected.length;
+        const $container = $(container);
+
+        if (M.onDeviceCenter) {
+            const {device, folder} = mega.devices.ui.getCurrentDirData();
+            isSkipOnDeviceCentre = !device || (!folder && M.currentCustomView.nodeID.length > 8);
+        }
+
+        // delay for selection check box flicker when controlled by keyboard
+        delay('animate-select', () => {
+            $container.toggleClass('selection-on', !!itemsNum);
+
+            // Remove animation class after 300ms
+            delay('animate-select-remove', () => {
+                $container.removeClass('animate-select');
+            }, 301);
+        }, 50);
+
+        // if it is device centre or empty, which make container undefined we do not need below
+        if (!isSkipOnDeviceCentre && container) {
+
+            if (M.onIconView) {
+                selectAllCheckbox = document.querySelector('.fm-header-grid-extra > .select-all-checkbox');
+            }
+            else {
+                let table = container;
+
+                if (table.nodeName !== 'TABLE') {
+                    table = table.closest('table');
+                }
+
+                if (table) {
+                    selectAllCheckbox = table.querySelector('.select-all-checkbox');
+                }
+            }
+
+            if (selectAllCheckbox) {
+
+                selectAllCheckbox.classList.remove('all-selected', 'some-selected');
+
+                if (itemsNum) {
+                    selectAllCheckbox.classList.add(M.v.length === itemsNum ? 'all-selected' : 'some-selected');
+                }
+            }
+        }
+    };
+
     let filterChipShown = false;
     let dcChipShown = false;
 
+    const toggleGridExtraButtons = hide => extraBtnWrapper.classList.toggle('hidden', hide);
+
     return {
         domNode: document.querySelector('.fm-right-header'),
+        gridSortDirBtn,
+        showColumnSelectionMenu,
+        handleNodeSelection,
+        toggleGridExtraButtons,
         get bannerHolder() {
             return this.domNode.querySelector('.fm-banner-holder');
         },
@@ -652,15 +1002,23 @@ lazy(mega.ui, 'secondaryNav', () => {
         },
         updateGalleryLayout(hide) {
             if (hide) {
-                layoutGallery.hide();
+                layoutButtons[3].hide();
             }
             else {
-                layoutGallery.show();
+                layoutButtons[3].show();
             }
         },
         updateLayoutButton(hide) {
             if (!layoutButtonBound) {
                 this.layoutButton.addEventListener('click', (ev) => {
+                    ev.stopPropagation();
+
+                    if (this.layoutButton.classList.contains('active')) {
+                        this.layoutButton.classList.remove('active');
+                        mega.ui.menu.hide();
+                        return;
+                    }
+
                     const event = new MegaDataEvent(ev);
                     event.currentTarget = ev.currentTarget;
                     this.showLayoutDropdown(event);
@@ -671,24 +1029,32 @@ lazy(mega.ui, 'secondaryNav', () => {
             const icon = this.layoutButton.querySelector('i');
             const viewValue = M.gallery ? 2 : M.viewmode;
             if (icon) {
-                icon.classList.remove(
-                    'icon-view-small-list-thin', 'icon-grid-4-thin-outline', 'icon-image-04-thin-outline'
-                );
-                icon.classList.add(
-                    viewValue === 0 ? 'icon-view-small-list-thin' :
-                        viewValue === 1 ? 'icon-grid-4-thin-outline' : 'icon-image-04-thin-outline'
-                );
+                icon.classList.remove(...viewModeIcons);
+                icon.classList.add(viewModeIcons[viewValue]);
             }
             const checkedIcon = `sprite-fm-mono icon-check-thin-outline ${MegaInteractable.iconSizesClass[24]}`;
-            layoutList.rightIcon = viewValue === 0 ? checkedIcon : '';
-            layoutGrid.rightIcon = viewValue === 1 ? checkedIcon : '';
-            layoutGallery.rightIcon = viewValue === 2 ? checkedIcon : '';
-            if (hide) {
-                this.layoutButton.classList.add('hidden');
+
+            for (let i = 0; i < layoutButtons.length; i++) {
+                layoutButtons[i].rightIcon = viewValue === +layoutButtons[i].attr('viewmode') ? checkedIcon : '';
             }
-            else {
-                this.layoutButton.classList.remove('hidden');
-            }
+
+            delay('updateLayoutButton', () => {
+                if (hide) {
+                    this.layoutButton.classList.add('hidden');
+                }
+                else {
+                    this.layoutButton.classList.remove('hidden');
+                }
+            }, 100);
+
+            updateColBtnText();
+
+            const hideExtraMenu = M.gallery || M.albums || !M.onIconView || !M.v.length;
+
+            toggleGridExtraButtons(hideExtraMenu);
+
+            this.gridSortDirBtn.icon = `sprite-fm-mono icon-${M.sortmode && M.sortmode.d === 1 ? 'up' : 'down'}`;
+            this.gridSortDirBtn.text = M.sortmode && colBtnsText[M.sortmode.n === 'ts' ? 'date' : M.sortmode.n];
         },
         showLayoutDropdown(ev) {
             $.hideContextMenu();

@@ -4395,9 +4395,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                     // M.nodeUpdated(n);
 
                     if (res.playtime && M.viewmode && n.p === M.currentdirid) {
-                        $('#' + n.h)
-                            .find('.data-block-bg').addClass('video')
-                            .find('.video-thumb-details span').text(secondsToTimeShort(res.playtime));
+                        $('span.duration', `#${n.h}`).text(secondsToTimeShort(res.playtime));
                     }
                 }
                 self.fa = fa;

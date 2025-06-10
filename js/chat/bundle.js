@@ -25439,7 +25439,7 @@ class BrowserEntries extends mixins.w9 {
       listAdapterOpts,
       entries: this.props.entries,
       itemHeight: this.props.megaListItemHeight,
-      headerHeight: viewMode ? 0 : 36,
+      headerHeight: viewMode ? 0 : 56,
       header: !viewMode && REaCt().createElement(GenericTableHeader, {
         columns: listAdapterOpts.columns,
         sortBy: this.state.sortBy,

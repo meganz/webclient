@@ -4,6 +4,7 @@ class MegaNodeComponent extends MegaComponent {
 
         options.componentClassname = `mega-node ${options.componentClassname || ''}`;
         options.nodeType = 'a';
+        const mobileClass = is_mobile ? 'mobile' : '';
 
         super(options);
 
@@ -52,13 +53,23 @@ class MegaNodeComponent extends MegaComponent {
 
             this.undecryptable = true;
             classNames.push('undecryptable');
+            this.inv411d = true;
         }
 
         this.domNode.id = this.domNode.dataset.handle = this.node.h;
         this.linked = M.getNodeShare(this.node.h);
 
-        let subNode = document.createElement('div');
-        subNode.className = 'mobile fm-item-img';
+        let subNode;
+
+        if (!options.noSelectionCheck) {
+            subNode = document.createElement('i');
+            subNode.className = 'sprite-fm-mono icon-check selected';
+
+            this.domNode.appendChild(subNode);
+        }
+
+        subNode = document.createElement('div');
+        subNode.className = `${mobileClass} fm-item-img`.trim();
         this.iconNode = document.createElement('i');
         this.iconNode.className = this.icon;
 
@@ -68,20 +79,47 @@ class MegaNodeComponent extends MegaComponent {
             this.thumbNode = document.createElement('img');
             subNode.appendChild(this.thumbNode);
             this.thumbNode.classList.add('theme-dark-forced');
+
+            if (this.node.fa.includes(':8*')) {
+                this.media = MediaAttribute(this.node).data;
+                if (this.media) {
+                    this.media.codecs = MediaAttribute.getCodecStrings(this.node);
+                }
+            }
         }
 
         this.domNode.appendChild(subNode);
 
         subNode = document.createElement('div');
-        subNode.className = 'mobile fm-item-name';
+        subNode.className = `${mobileClass} fm-item-name`.trim();
         subNode.textContent = this.name;
 
         this.domNode.appendChild(subNode);
 
         const props = document.createElement('div');
-        props.className = 'mobile props';
+        props.className = `${mobileClass} props`.trim();
 
         this.domNode.appendChild(props);
+
+        let propsBottomLeft;
+        let propsBottomRight;
+
+        if (!is_mobile) {
+
+            if (!options.noLeftProps) {
+                propsBottomLeft = document.createElement('div');
+                propsBottomLeft.className = `${mobileClass} props-bottom-left`.trim();
+
+                this.domNode.appendChild(propsBottomLeft);
+            }
+
+            if (!options.noRightProps) {
+                propsBottomRight = document.createElement('div');
+                propsBottomRight.className = `${mobileClass} props-bottom-right`.trim();
+
+                this.domNode.appendChild(propsBottomRight);
+            }
+        }
 
         let numDetails = document.createElement('span');
 
@@ -96,41 +134,56 @@ class MegaNodeComponent extends MegaComponent {
             props.appendChild(numDetails);
         }
         else if (this.node.t === 1) {
-            numDetails.className = 'mobile num-files';
+            numDetails.className = `${mobileClass} num-files`.trim();
             numDetails.textContent = this.subNodeCount;
             props.appendChild(numDetails);
         }
         else if (this.node.t === 0) {
             numDetails = document.createElement('span');
-            numDetails.className = 'mobile file-size';
+            numDetails.className = `${mobileClass} file-size`.trim();
             numDetails.textContent = `${this.size}, ${this.time}`;
             props.appendChild(numDetails);
         }
 
         // label
         subNode = document.createElement('i');
-        subNode.className = `mobile colour-label ${this.lbl}`;
-        props.appendChild(subNode);
-
-        // takedown-link
-        subNode = document.createElement('i');
-        subNode.className = 'mobile icon-takedown sprite-fm-mono icon-alert-triangle-thin-solid';
-        props.appendChild(subNode);
-
-        // link
-        subNode = document.createElement('i');
-        subNode.className = 'mobile icon-link sprite-fm-mono icon-link-thin-outline icon';
-        props.appendChild(subNode);
+        subNode.className = `${mobileClass} colour-label ${this.lbl}`.trim();
+        (propsBottomLeft || props).appendChild(subNode);
 
         // show correct link icon
         MegaNodeComponent.updateLinkIcon(this);
 
+        // Duration
+        if (this.media && this.media.playtime) {
+            this.updatePlayTime();
+        }
+
         // fav - show fav only if the file/folder is not taken down
         if (!this.takedown && M.currentrootid !== 'shares') {
-            subNode = document.createElement('i');
 
-            subNode.className = 'mobile icon-favourite sprite-fm-mono icon-heart-thin-solid icon';
+            subNode = document.createElement('i');
+            subNode.className = `${mobileClass} icon-favourite sprite-fm-mono icon-heart-thin-solid icon`.trim();
             props.appendChild(subNode);
+
+            // Making icon interactable
+            if (!is_mobile) {
+                subNode.classList.add('simpletip');
+                subNode.dataset.simpletip = l[5872];
+                subNode.dataset.simpletipposition = 'top';
+
+                subNode.addEventListener('click', e => {
+                    $.hideContextMenu();
+                    if (M.isInvalidUserStatus()) {
+                        return;
+                    }
+
+                    // Handling favourites is allowed for full permissions shares only
+                    if (M.getNodeRights(this.handle) > 1) {
+                        e.stopPropagation();
+                        M.favourite(this.handle, 0);
+                    }
+                });
+            }
 
             if (this.fav) {
                 this.domNode.classList.add('favourited');
@@ -141,25 +194,105 @@ class MegaNodeComponent extends MegaComponent {
             }
         }
 
-        this.domNode.classList.add('mobile', 'fm-item', ...classNames);
+        // Versioned
+        subNode = document.createElement('i');
+        subNode.className = `${mobileClass} icon-version sprite-fm-mono icon-clock-rotate icon`.trim();
+        props.appendChild(subNode);
 
-        const btnNode = new MegaButton({
-            type: 'icon',
-            parentNode: this.domNode,
-            icon: 'sprite-fm-mono icon-more-horizontal-thin-outline',
-            iconSize: 24,
-            componentClassname: 'context-btn open-context-menu text-icon'
-        });
+        if (!is_mobile) {
 
-        if (is_mobile) {
-            btnNode.on('click', () => {
-                mega.ui.contextMenu.show(this.handle);
+            subNode.classList.add('simpletip');
+            subNode.dataset.simpletip = l[16474];
+            subNode.dataset.simpletipposition = 'top';
+
+            subNode.addEventListener('click', () => {
+                selectionManager.clear_selection();
+                selectionManager.add_to_selection(this.handle);
+                fileversioning.fileVersioningDialog();
+            });
+        }
+
+        // link
+        subNode = document.createElement('i');
+        subNode.className = `${mobileClass} icon-link sprite-fm-mono icon-link-thin-outline icon`.trim();
+        props.appendChild(subNode);
+
+        if (!is_mobile) {
+
+            subNode.classList.add('simpletip');
+            subNode.dataset.simpletip = l[6909];
+            subNode.dataset.simpletipposition = 'top';
+
+            subNode.addEventListener('click', () => {
+                selectionManager.clear_selection();
+                selectionManager.add_to_selection(this.handle);
+                M.getLinkAction();
+            });
+        }
+
+        this.addClass(mobileClass, 'fm-item', ...classNames);
+
+        this.attr('title', this.title);
+
+        if (!options.noContextBtn) {
+            const btnNode = new MegaButton({
+                type: 'icon',
+                parentNode: propsBottomRight || this.domNode,
+                icon: `sprite-fm-mono icon-more-${is_mobile ? 'horizontal' : 'vertical'}-thin-outline`,
+                iconSize: 24,
+                componentClassname: 'context-btn open-context-menu text-icon'
+            });
+
+            btnNode.on('click', ev => {
+                if (is_mobile) {
+                    mega.ui.contextMenu.show(this.handle);
+                }
+                else {
+                    selectionManager.clear_selection();
+                    selectionManager.add_to_selection(this.handle);
+                    $.gridLastSelected = this.domNode;
+
+                    ev.currentTarget = this.domNode;
+                    ev.delegateTarget = btnNode.domNode;
+
+                    M.contextMenuUI(ev, 1);
+                }
 
                 return false;
             });
         }
-        else {
-            btnNode.hide();
+
+        const _open = () => {
+
+            if (!is_mobile) {
+                M.isInvalidUserStatus();
+                return false;
+            }
+            if (!validateUserAction()) {
+                return false;
+            }
+
+            // Get the node handle and node
+            var isVideo = is_video(this.node);
+
+            if (!this.node || this.linked.down) {
+                if (this.node) {
+                    mega.ui.contextMenu.show(this.handle);
+                }
+                return false;
+            }
+
+            // If this is an previewable but not text, load the preview slideshow
+            if (this.previewable && this.previewable !== 'text') {
+                if (isVideo) {
+                    $.autoplay = this.handle;
+                }
+                slideshow(this.handle);
+            }
+            else {
+                // Non Pre-viewable file
+                mega.ui.viewerOverlay.show(this.handle);
+            }
         }
 
         this.on('click', () => {
@@ -173,46 +306,21 @@ class MegaNodeComponent extends MegaComponent {
             else if (typeof options.onClick === 'function') {
                 options.onClick(this.node);
             }
-            else if (!this.contact && this.node.t === 1) {
-                const target = !options.ignoreCustomRoute && M.currentCustomView ?
-                    `${M.currentrootid}/${this.handle}` : this.handle;
-                M.openFolder(target);
-            }
-            else {
-                // @todo full desktop support of previews, context menu, etc...
-                if (!is_mobile) {
-                    M.isInvalidUserStatus();
-                    return false;
-                }
-                if (!validateUserAction()) {
-                    return false;
-                }
-
-                // Get the node handle and node
-                var isVideo = is_video(this.node);
-
-                if (!this.node || this.linked.down) {
-                    if (this.node) {
-                        mega.ui.contextMenu.show(this.handle);
-                    }
-                    return false;
-                }
-
-                // If this is an previewable but not text, load the preview slideshow
-                if (this.previewable && this.previewable !== 'text') {
-                    if (isVideo) {
-                        $.autoplay = this.handle;
-                    }
-                    slideshow(this.handle);
+            else if (is_mobile) {
+                if (!this.contact && this.node.t === 1) {
+                    const target = !options.ignoreCustomRoute && M.currentCustomView ?
+                        `${M.currentrootid}/${this.handle}` : this.handle;
+                    M.openFolder(target);
                 }
                 else {
-                    // Non Pre-viewable file
-                    mega.ui.viewerOverlay.show(this.handle);
+                    _open();
                 }
-            }
 
-            return false;
+                return false;
+            }
         });
+
+        // Double click is currently handling on filemanager.js
     }
 
     // Previewable states cannot really change normally, hence using lazy
@@ -232,6 +340,22 @@ class MegaNodeComponent extends MegaComponent {
 
             return false;
         });
+    }
+
+    updatePlayTime(fa) {
+
+        if (fa) {
+            const {width, height, fps, playtime, shortformat} = fa;
+            this.media = {width, height, fps, playtime, shortformat};
+            this.media.codecs = MediaAttribute.getCodecStrings(fa);
+        }
+
+        const playtimeNode = document.createElement('span');
+        playtimeNode.className = `${is_mobile ? 'mobile' : ''} duration`.trim();
+        playtimeNode.textContent = secondsToTimeShort(this.media.playtime);
+        this.domNode.querySelector('.props').appendChild(playtimeNode);
+
+        this.attr('title', this.title);
     }
 
     get size() {
@@ -254,10 +378,36 @@ class MegaNodeComponent extends MegaComponent {
     }
 
     get icon() {
-        const iconSize = M.viewmode ? 90 : 24;
-        const iconSpriteClass = `item-type-icon${M.viewmode ? '-90' : ''}`;
+        const iconSize = M.onIconView ? 90 : 24;
+        const iconSpriteClass = `item-type-icon${M.onIconView ? '-90' : ''}`;
 
         return `${iconSpriteClass} icon-${fileIcon(this.node)}-${iconSize}`;
+    }
+
+    get title() {
+        const title = [];
+
+        if (!this.inv411d && (M.onIconView || String(this.name).length > 78 || this.playtime !== undefined)) {
+
+            if (this.media) {
+
+                if (this.media.width) {
+
+                    title.push(this.media.width + 'x' + this.media.height + ' @' + this.media.fps + 'fps');
+                }
+                if (this.media.codecs) {
+                    title.push(this.media.codecs);
+                }
+            }
+            if (this.size) {
+                title.push(this.size);
+            }
+            if (this.name) {
+                title.push(this.name);
+            }
+        }
+
+        return title.join(' ');
     }
 
     get fileType() {
@@ -304,6 +454,11 @@ class MegaNodeComponent extends MegaComponent {
 
         if (classname) {
             domNode.classList.add(classname);
+        }
+
+        if (classname === 'taken-down') {
+            component.inv411d = true;
+            component.iconNode.className = 'sprite-fm-mime icon-takedown-24';
         }
     }
 
@@ -388,7 +543,7 @@ class MegaNodeComponent extends MegaComponent {
         }
 
         if (_shouldUpdate('lbl')) {
-            this.domNode.classList.remove('colour-label', ...Object.keys(M.megaRender.labelsColors));
+            this.removeClass('colour-label', ...Object.keys(M.megaRender.labelsColors));
 
             const lbl = this.lbl;
             const lblElm = this.domNode.querySelector('.colour-label');
@@ -397,6 +552,9 @@ class MegaNodeComponent extends MegaComponent {
                 lblElm.classList.remove(...Object.keys(M.megaRender.labelsColors));
 
                 if (lbl) {
+                    if (!is_mobile) {
+                        this.addClass('colour-label', lbl);
+                    }
                     lblElm.classList.add(lbl);
                 }
             }

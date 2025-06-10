@@ -10,48 +10,6 @@ mobile.rubbishBin = {
     retryCount: 0,
 
     /**
-     * Move the selected node to the rubbish bin or delete it permanently
-     * @param {String} nodeHandle
-     * @returns {void}
-     */
-    async removeItem(nodeHandle) {
-        'use strict';
-
-        loadingDialog.show();
-
-        const node = M.getNodeByHandle(nodeHandle);
-
-        // rubbish bin page
-        if (M.currentrootid === M.RubbishID) {
-            $.selected = [nodeHandle];
-            await M.clearRubbish(false).catch(dump);
-
-            mega.ui.sheet.hide();
-            mega.ui.toast.show(node.t ? l.deleted_folder_permanently.replace('[X]', node.name) :
-                l.deleted_file_permanently.replace('[X]', node.name), 4);
-        }
-        else {
-            // Delete the file
-            const result =  await fmremove([nodeHandle]);
-            let links = 0;
-
-            // Count the number of deleted public links
-            if (typeof result[0] === 'object') {
-                for (const res of result[0]) {
-                    if (res && res.status === 'fulfilled' && res.value) {
-                        links = res.value.length;
-                        break;
-                    }
-                }
-            }
-
-            mobile.rubbishBin.showCompleteMessage(node, links);
-        }
-
-        loadingDialog.hide();
-    },
-
-    /**
      * Restore the selected node from the rubbish bin
      * @param {String} nodeHandle
      * @returns Returns the restored node
@@ -111,27 +69,4 @@ mobile.rubbishBin = {
             })
             .finally(() => loadingDialog.hide());
     },
-
-    /**
-     * Complete the process of moving the folder/file to rubbish bin
-     *
-     * @param {String} node Removed folder/file node
-     * @return {void}
-     */
-    showCompleteMessage(node, removedCount) {
-        'use strict';
-
-        // Store a log for statistics
-        eventlog(99638, 'Deleted a node on the mobile webclient');
-
-        mega.ui.sheet.hide();
-        loadingDialog.hide();
-        if (removedCount) {
-            // TODO: this string currently do not cover the case there is file request auto termination, need update.
-            mobile.showToast(mega.icu.format(l.link_removed, removedCount), 4);
-        }
-
-        mega.ui.toast.show(node.t ? l.moved_folder_to_rubbish_bin.replace('[X]', node.name) :
-            l.moved_file_to_rubbish_bin.replace('[X]', node.name), 4);
-    }
 };

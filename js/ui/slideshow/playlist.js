@@ -1,9 +1,6 @@
 lazy(mega.slideshow, 'playlist', () => {
     'use strict';
 
-    // playlist max items allowed
-    const maxItems = 1000;
-
     return new class SlideshowPlaylist {
         /**
          * Slideshow playlist handler holding MegaNode references to play on slideshow.
@@ -32,6 +29,10 @@ lazy(mega.slideshow, 'playlist', () => {
             this.items = [];
 
             Object.freeze(this);
+        }
+
+        get maxItems() {
+            return M.v.length;
         }
 
         /**
@@ -73,7 +74,7 @@ lazy(mega.slideshow, 'playlist', () => {
             }
 
             if (this.isFull()) {
-                this.items.splice(maxItems);
+                this.items.splice(this.maxItems);
             }
         }
 
@@ -93,7 +94,7 @@ lazy(mega.slideshow, 'playlist', () => {
                 }
 
                 const items = [];
-                const maxItemsAllowed = maxItems - this.items.length;
+                const maxItemsAllowed = this.maxItems - this.items.length;
 
                 if (addNodes.length > maxItemsAllowed) {
                     if (addNodes.length > 1) {
@@ -116,7 +117,7 @@ lazy(mega.slideshow, 'playlist', () => {
 
                 if (this.isFull()) {
                     file.abort();
-                    this.items.splice(maxItems);
+                    this.items.splice(this.maxItems);
                 }
             }
         }
@@ -160,7 +161,7 @@ lazy(mega.slideshow, 'playlist', () => {
          * @returns {Boolean} wheter playlist is full
          */
         isFull() {
-            return mega.slideshow.manager.state.isPlayMode && this.items.length >= maxItems;
+            return mega.slideshow.manager.state.isPlayMode && this.items.length >= this.maxItems;
         }
     };
 });

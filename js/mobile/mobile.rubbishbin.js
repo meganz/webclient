@@ -19,7 +19,7 @@ mobile.rubbishBin = {
 
         mobile.rubbishBin.isRestoring = true;
 
-        const node = await M.revertRubbishNodes(nodeHandle).catch(tell);
+        const node = await M.revertRubbishNodes(nodeHandle).catch((ex) => ex !== EBLOCKED && tell(ex));
 
         mobile.rubbishBin.isRestoring = false;
 

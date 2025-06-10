@@ -130,8 +130,8 @@
 .mega-top-menu .nw-fm-tree-item.selected .nw-fm-tree-iconwrap {
     background: var(--surface-tree-iconwrap-active);
 }
-.mega-top-menu .menu .nav-elem.full-width:not(.active):hover::after,
-.mega-top-menu .nw-fm-tree-item:not(.selected):hover .nw-fm-tree-iconwrap {
+.mega-top-menu .menu .nav-elem.full-width:not(.active):not(:active):hover::after,
+.mega-top-menu .nw-fm-tree-item:not(.selected):not(:active):hover .nw-fm-tree-iconwrap {
     background: var(--surface-tree-iconwrap-hover);
 }
 .rtl .mega-top-menu .menu .nav-elem.full-width::after,

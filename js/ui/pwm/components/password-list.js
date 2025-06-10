@@ -370,7 +370,8 @@ class MegaPasswordList extends MegaView {
                     name: 'item-list-menu',
                     handle: passwordNode.h,
                     event,
-                    eventTarget: contextMenuBtn
+                    eventTarget: contextMenuBtn,
+                    container: mega.ui.topmenu.domNode
                 });
 
                 return false;

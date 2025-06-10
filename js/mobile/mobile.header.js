@@ -237,7 +237,7 @@ class MegaMobileHeader extends MegaComponent {
 
         mBroadcaster.addListener('mega:openfolder', _throttledUpdate);
         mBroadcaster.addListener('pagechange', _throttledUpdate);
-        window.addEventListener('resize', this.resetBottomBlock.bind(this));
+        window.addEventListener('resize', () => this.resetBottomBlock());
     }
 
     // Options: setter
@@ -480,13 +480,13 @@ class MegaMobileHeader extends MegaComponent {
                         parentNode: targetNode,
                         label: l.filter_view_list,
                         value: 'list',
-                        checked: M.viewmode === 0
+                        checked: !M.onIconView // temporary fallback for cover album and compact list view
                     },
                     {
                         parentNode: targetNode,
                         label: l.filter_view_grid,
                         value: 'grid',
-                        checked: M.viewmode === 1
+                        checked: M.onIconView
                     },
                 ];
 
@@ -657,10 +657,10 @@ class MegaMobileHeader extends MegaComponent {
                 const fileManagerBlock = document.querySelector('.mobile.file-manager-block');
 
                 // skip if only the sorting or ordering is changed
-                if (viewGroup && viewGroup.value === 'grid' && M.viewmode !== 1) {
+                if (viewGroup && viewGroup.value === 'grid' && !M.onIconView) {
                     mobile.cloud.enableGridView(fileManagerBlock);
                 }
-                else if (viewGroup && viewGroup.value === 'list' && M.viewmode !== 0) {
+                else if (viewGroup && viewGroup.value === 'list' && !M.onListView) {
                     mobile.cloud.enableListView(fileManagerBlock);
                 }
 

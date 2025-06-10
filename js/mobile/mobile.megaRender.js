@@ -26,7 +26,7 @@ class MobileMegaRender {
         if (this.container) {
             // grid view is not available for shared items page
             this.container.classList[M.currentdirid === 'shares' || M.currentdirid === 'out-shares'
-                || M.currentdirid === 'public-links' || !viewmode ? 'remove' : 'add']('grid-view');
+                || M.currentdirid === 'public-links' || viewmode !== 1 ? 'remove' : 'add']('grid-view');
         }
 
         if (d) {
@@ -171,9 +171,12 @@ class MobileMegaRender {
     getDOMNode(h, n) {
 
         if (!this.nodeMap[h] && (n || M.getNodeByHandle(h))) {
+
+            const fragment = document.createDocumentFragment();
+
             this.nodeMap[h] = M.currentdirid === 'shares' ?
-                new MegaSharedNode({parentNode: this.container, nodeHandle: h}).domNode :
-                new MegaNodeComponent({parentNode: this.container, nodeHandle: h}).domNode;
+                new MegaSharedNode({parentNode: fragment, nodeHandle: h}).domNode :
+                new MegaNodeComponent({parentNode: fragment, nodeHandle: h}).domNode;
         }
 
         return this.nodeMap[h];
@@ -225,7 +228,7 @@ class MobileMegaRender {
             batchPages: 0,
             appendOnly: false,
             onContentUpdated: function() {
-                if (M.viewmode) {
+                if (M.onIconView) {
                     delay('thumbnails', fm_thumbnails, 2);
                 }
             },
@@ -233,7 +236,7 @@ class MobileMegaRender {
         };
 
         if (!(M.currentdirid === 'shares' || M.currentdirid === 'out-shares'
-            || M.currentdirid === 'public-links') && M.viewmode) {
+            || M.currentdirid === 'public-links') && M.onIconView) {
             // Item width and height are dom node base size + margin
             if (this.container.offsetWidth <= 700) {
                 options.itemWidth = 124 + 24;

@@ -146,6 +146,10 @@ class MegaFlyoutMenu extends MegaComponent {
         const ComponentClass = MegaFlyoutMenu.getComponentForType(itemComp);
         return new ComponentClass({
             parentNode: this.body,
+            noLeftProps: true,
+            noRightProps: true,
+            noContextBtn: true,
+            noSelectionCheck: true,
             ...options
         });
     }
@@ -283,6 +287,10 @@ class MegaFlyoutMenu extends MegaComponent {
                 const ComponentClass = label.nodeHandle.length === 11 ? MegaContactNode : MegaNodeComponent;
                 this.labelNode = new ComponentClass({
                     parentNode: this.topLabel,
+                    noLeftProps: true,
+                    noRightProps: true,
+                    noContextBtn: true,
+                    noSelectionCheck: true,
                     ...label
                 });
             }

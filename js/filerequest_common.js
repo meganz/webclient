@@ -66,8 +66,8 @@ lazy(mega, 'fileRequestCommon', () => {
                 return false;
             }
 
-            const viewModeClass = M.viewmode ? 'span.item-type-icon-90' : 'span.item-type-icon';
-            const folderClass = M.viewmode ? 'icon-folder-public-90' : 'icon-folder-public-24';
+            const viewModeClass = M.onIconView ? 'i.item-type-icon-90' : 'span.item-type-icon';
+            const folderClass = M.onIconView ? 'icon-folder-public-90' : 'icon-folder-public-24';
 
             $(viewModeClass, $nodeId).addClass(folderClass);
 
@@ -99,9 +99,9 @@ lazy(mega, 'fileRequestCommon', () => {
             if (node && M.megaRender && M.megaRender.hasDOMNode(nodeId)) {
                 node = M.megaRender.getDOMNode(nodeId);
 
-                const viewModeClass = M.viewmode ? 'span.item-type-icon-90' : 'span.item-type-icon';
+                const viewModeClass = M.onIconView ? 'i.item-type-icon-90' : 'span.item-type-icon';
                 $(viewModeClass, node).removeClass('icon-folder-public-24 icon-folder-public-90')
-                    .addClass(M.viewmode ? 'icon-folder-90' : 'icon-folder-24');
+                    .addClass(M.onIconView ? 'icon-folder-90' : 'icon-folder-24');
             }
 
             $(`#treea_${nodeId} span.nw-fm-tree-folder`)

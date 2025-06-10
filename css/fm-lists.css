@@ -2,7 +2,7 @@
     Mega-list
 \* ============================ */
 .megaList-content > * {
-    position: absolute;
+    position: relative;
 }
 
 .megaListContainer tr {

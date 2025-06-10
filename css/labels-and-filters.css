@@ -1,7 +1,5 @@
 .colour-label-ind,
-.colour-label .file-block-title::after,
-.colour-label .tranfer-filetype-txt::after,
-.colour-label .shared-folder-info-block::after {
+.colour-label td.label::before {
     content: '';
     display: block;
     background-color: var(--label-grey);
@@ -9,62 +7,38 @@
     width: 8px;
     height: 8px;
 }
-.colour-label .file-block-title::after,
-.colour-label .tranfer-filetype-txt::after,
-.colour-label .shared-folder-info-block::after {
-    position: absolute;
-    right: 6px;
-    top: 9px;
+.colour-label td.label::before {
+    display: inline-block;
+    margin: 4px 6px 6px;
+    vertical-align: middle;
 }
 .colour-label-ind.red,
-.colour-label.red .file-block-title::after,
-.colour-label.red .tranfer-filetype-txt::after,
-.colour-label.red .shared-folder-info-block::after {
+.colour-label.red td.label::before {
     background-color: var(--label-red);
 }
 .colour-label-ind.orange,
-.colour-label.orange .file-block-title::after,
-.colour-label.orange .tranfer-filetype-txt::after,
-.colour-label.orange .shared-folder-info-block::after {
+.colour-label.orange td.label::before {
     background-color: var(--label-orange);
 }
 .colour-label-ind.yellow,
-.colour-label.yellow .file-block-title::after,
-.colour-label.yellow .tranfer-filetype-txt::after,
-.colour-label.yellow .shared-folder-info-block::after {
+.colour-label.yellow td.label::before {
     background-color: var(--label-yellow);
 }
 .colour-label-ind.green,
-.colour-label.green .file-block-title::after,
-.colour-label.green .tranfer-filetype-txt::after,
-.colour-label.green .shared-folder-info-block::after {
+.colour-label.green td.label::before {
     background-color: var(--label-green);
 }
 .colour-label-ind.blue,
-.colour-label.blue .file-block-title::after,
-.colour-label.blue .tranfer-filetype-txt::after,
-.colour-label.blue .shared-folder-info-block::after {
+.colour-label.blue td.label::before {
     background-color: var(--label-blue);
 }
 .colour-label-ind.purple,
-.colour-label.purple .file-block-title::after,
-.colour-label.purple .tranfer-filetype-txt::after,
-.colour-label.purple .shared-folder-info-block::after {
+.colour-label.purple td.label::before {
     background-color: var(--label-purple);
 }
 .active-folder-link .colour-label-ind,
-.active-folder-link .colour-label .file-block-title::after,
-.active-folder-link .colour-label .tranfer-filetype-txt::after,
-.active-folder-link .colour-label .shared-folder-info-block::after {
+.active-folder-link .colour-label td.label::before {
     display: none;
-}
-.colour-label .shared-folder-info-block::after {
-    right: 2px;
-    top: 15px;
-}
-.rtl .colour-label .shared-folder-info-block::after {
-    left: 2px;
-    right: auto;
 }
 .nw-fm-tree-item .colour-label-ind {
     display: inline-block;
@@ -94,7 +68,6 @@
 }
 .colour-label .shared-folder-info-block {
     padding-inline-end: 12px;
-    padding-right: 12px;
     position: relative;
 }
 .data-block-view.colour-label .shared-folder-info-block {
@@ -115,11 +88,11 @@
 .data-block-view.colour-label .tranfer-filetype-txt {
     padding-inline-end: 12px;
 }
-.colour-label .tranfer-filetype-txt::after {
+.colour-label td.label::after {
     right: 12px;
     top: 12px;
 }
-.rtl .colour-label .tranfer-filetype-txt::after {
+.rtl .colour-label td.label::after {
     left: 12px;
     right: auto;
 }

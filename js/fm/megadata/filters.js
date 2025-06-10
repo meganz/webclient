@@ -138,7 +138,7 @@ MegaData.prototype.filterBySearch = function (str) {
 
             // Wait for this.openFolder to finish and set colors to matching hashes
             this.onRenderFinished = function() {
-                var find = M.viewmode ? 'a' : 'tr';
+                var find = M.onIconView ? 'a' : 'tr';
                 $(M.fsViewSel).find(find).each(function() {
                     var $this = $(this);
                     var node = M.d[$this.attr('id')];
@@ -146,7 +146,7 @@ MegaData.prototype.filterBySearch = function (str) {
                     if (node) {
                         var color = crc32(asmCrypto.SHA256.hex(node.hash)) >>> 8;
 
-                        if (M.viewmode) {
+                        if (M.onIconView) {
                             var r = (color >> 16) & 0xff;
                             var g = (color >> 8) & 0xff;
                             var b = color & 0xff;

@@ -1552,8 +1552,7 @@ label.iPhoneCheckLabelOff span {
     box-sizing: border-box;
     border-radius: 100%;
 }
-.shared-grid-view .nw-contact-status,
-.shared-blocks-view .nw-contact-status {
+.shared-grid-view .nw-contact-status {
     border: 0;
     margin: 21px 2px 0 12px;
     float: none;
@@ -2329,10 +2328,6 @@ body.loading .light-overlay {
 
 /* Out Shares */
 
-.out-shared-blocks-view .shared-folder-info-block {
-    z-index: 1;
-}
-.out-shared-blocks-view .shared-folder-info,
 .shared-contact-info {
     display: inline-block;
 }
@@ -2551,59 +2546,6 @@ body.loading .light-overlay {
     z-index: -1;
     margin-left: -14px;
     margin-right: -14px;
-}
-
-.colour-label .file-block-title {
-    padding-right: 18px;
-}
-.colour-label .file-block-title::after, .colour-label .tranfer-filetype-txt::after, .colour-label .shared-folder-info-block::after {
-    content: '';
-    display: block;
-    position: absolute;
-    right: 6px;
-    top: 11px;
-    background-color: #a4a4a7;
-    border-radius: 100%;
-    width: 8px;
-    height: 8px;
-}
-.colour-label.red .file-block-title::after, .colour-label.red .tranfer-filetype-txt::after, .colour-label.red .shared-folder-info-block::after {
-    background-color: #FF625C;
-}
-.colour-label.orange .file-block-title::after, .colour-label.orange .tranfer-filetype-txt::after, .colour-label.orange .shared-folder-info-block::after {
-    background-color: #F9A646;
-}
-.colour-label.yellow .file-block-title::after, .colour-label.yellow .tranfer-filetype-txt::after, .colour-label.yellow .shared-folder-info-block::after {
-    background-color: #F4CE4A;
-}
-.colour-label.green .file-block-title::after, .colour-label.green .tranfer-filetype-txt::after, .colour-label.green .shared-folder-info-block::after {
-    background-color: #6DCC50;
-}
-.colour-label.blue .file-block-title::after, .colour-label.blue .tranfer-filetype-txt::after, .colour-label.blue .shared-folder-info-block::after {
-    background-color: #4BB8F3;
-}
-.colour-label.purple .file-block-title::after, .colour-label.purple .tranfer-filetype-txt::after, .colour-label.purple .shared-folder-info-block::after {
-    background-color: #D088E1;
-}
-.colour-label .shared-folder-info-block {
-    padding-right: 12px;
-}
-.colour-label .shared-folder-info-block::after {
-    right: 2px;
-    top: 13px;
-}
-.data-block-view.colour-label .shared-folder-info-block {
-    padding-right: 18px;
-}
-.data-block-view.colour-label .shared-folder-info-block::after {
-    right: 6px;
-    top: 24px;
-}
-.colour-label .tranfer-filetype-txt {
-    padding-right: 12px;
-}
-.data-block-view.colour-label .tranfer-filetype-txt {
-    padding-right: 12px;
 }
 .grid-url-arrow,
 .file-settings-icon,
@@ -3681,22 +3623,6 @@ span.orange {
     overflow: hidden;
     margin: 0 -8px;
     padding: 0 8px;
-}
-.dropdown-item.sort-grid-item i {
-    background-position: 100px 100px;
-    background-repeat: no-repeat;
-}
-.dropdown-item.sort-grid-item.selected i {
-    background-position: -7px -1991px;
-}
-.dropdown-item.sort-grid-item.selected.inverted i {
-    background-position: -45px -1991px;
-}
-.dropdown-item.sort-grid-item.selected:hover i {
-    background-position: -26px -1991px;
-}
-.dropdown-item.sort-grid-item.selected.inverted:hover i {
-    background-position: -62px -1991px;
 }
 .sorting-menu-item {
     display: block;
@@ -6359,41 +6285,6 @@ div.new-bottom-pages li, div.new-bottom-pages p {
     color: white;
 }
 
-/* TODO: Remove these "::before" tweaks and use normal icons */
-.arrow:not(.grid-header-star) {
-    --icon-size: 24px;
-     --mask-color: var(--icon-rest);
-    cursor: pointer;
-    display: block;
-    float: left;
-    width: 100%;
-}
-.arrow.sprite-fm-mono::before {
-    display: none;
-    height: 24px;
-    margin: -3px 12px;
-    position: absolute;
-    right: 0;
-    width: 24px;
-}
-.rtl .arrow.sprite-fm-mono::before {
-    left: 0;
-    right: auto;
-}
-.rtl .arrow.sprite-fm-mono::before {
-    left: 10px;
-    right: auto;
-}
-.arrow.sprite-fm-mono.desc::before {
-    display: inline-block;
-    transform: rotate(180deg);
-}
-.arrow.sprite-fm-mono.asc::before {
-    display: inline-block;
-}
-.arrow.label:not(.asc):not(.desc) {
-    background-image: none;
-}
 .search-bottom-wrapper {
     background-color: var(--stroke-grey-2);
     border-left: 2px solid var(--stroke-main);

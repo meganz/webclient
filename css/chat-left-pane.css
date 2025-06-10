@@ -1552,8 +1552,8 @@ td.verification .contact-item {
 .profile-shared-folders .shared-with-me tbody tr {
     display: block;
     position: relative;
-    border-top: 3px solid var(--stroke-main);
-    border-bottom: 4px solid var(--stroke-main);
+    border-top: 3px solid var(--mobile-page-background);
+    border-bottom: 4px solid var(--mobile-page-background);
     box-shadow: 0 -1px 0 0 var(--stroke-grey-2);
 }
 .profile-shared-folders .shared-with-me tbody tr:nth-last-child(2) {
@@ -1599,7 +1599,7 @@ td.verification .contact-item {
     position: -webkit-sticky;
     top: 0;
     z-index: 2;
-    background: var(--surface-main);
+    background: var(--mobile-page-background);
 }
 .profile-shared-folders table.grid-table thead tr {
     display: block;

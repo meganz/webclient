@@ -39,7 +39,7 @@ MegaData.prototype.renderMain = function(aUpdate) {
     // if there weren't new rendered nodes (Ie, they were cached)
     if (numRenderedNodes) {
         if (!aUpdate) {
-            if (this.viewmode) {
+            if (this.onIconView) {
                 thumbnails.cleanup();
             }
         }
@@ -79,12 +79,13 @@ MegaData.prototype.rmSetupUI = function(u, refresh) {
         return;
     }
 
-    if (this.viewmode === 1) {
+    if (this.onIconView) {
         M.addIconUI(u, refresh);
     }
     else {
         M.addGridUIDelayed(refresh);
     }
+
     if (!u) {
         fm_thumbnails();
     }
@@ -100,10 +101,10 @@ MegaData.prototype.rmSetupUI = function(u, refresh) {
         const postEventHandler = options && options.post || null;
 
         $.hideContextMenu(ev);
-        var target = listView ? $(this).closest('tr') : $(this).parents('.data-block-view');
+        var target = $(this).closest(elm);
 
         if (!target.hasClass('ui-selected')) {
-            target.parent().find(elm).removeClass('ui-selected');
+            target.removeClass('ui-selected');
             selectionManager.clear_selection();
         }
         target.addClass('ui-selected');
@@ -125,7 +126,7 @@ MegaData.prototype.rmSetupUI = function(u, refresh) {
             }
         }
 
-        if (postEventHandler) {
+        if (postEventHandler && !target.hasClass('taken-down') && !M.isInvalidUserStatus()) {
             postEventHandler.call(this, target.attr('id'));
         }
 
@@ -146,18 +147,28 @@ MegaData.prototype.rmSetupUI = function(u, refresh) {
         return fingerprintDialog(M.d[$.selected[0]].su);
     };
 
-    $('.grid-scrolling-table .grid-url-arrow').rebind('click', function(ev) {
+    const $gridTable = $('.grid-scrolling-table');
+    const $tableItem = $('.fm-item');
+
+    $('.grid-url-arrow', $gridTable).rebind('click', function(ev) {
         return cmIconHandler.call(this, true, 'tr', ev);
     });
-    $('.data-block-view .file-settings-icon').rebind('click', function(ev) {
+    $('.open-context-menu', $tableItem).rebind('click', function(ev) {
         return cmIconHandler.call(this, false, 'a', ev);
     });
-    $('.grid-scrolling-table .fm-user-verification span').rebind('click.sharesui', function(ev) {
-        var target = $(this).closest('tr');
-        return cvHandler(ev, target);
+    // Prevent context menu button to trigger open folder with double click
+    $('.grid-url-arrow', $gridTable).add('.open-context-menu', $tableItem).rebind('dblclick', () => false);
+    $('.icon-link-thin-outline', $gridTable).rebind('click', function(ev) {
+        return cmIconHandler.call(this, true, 'tr', ev, {post: h => M.getLinkAction([h])});
     });
-    $('.shared-blocks-view .fm-user-verification span').rebind('click.sharesui', function(ev) {
-        var target = $(this).closest('a');
+    $('.icon-link', $tableItem).rebind('click', function(ev) {
+        return cmIconHandler.call(this, false, 'a', ev, {post: h => M.getLinkAction([h])});
+    });
+    $('.icon-favourite', $tableItem).rebind('click', function(ev) {
+        return cmIconHandler.call(this, false, 'a', ev, {post: h => M.favourite(h, 0)});
+    });
+    $('.fm-user-verification span', $gridTable).rebind('click.sharesui', function(ev) {
+        var target = $(this).closest('tr');
         return cvHandler(ev, target);
     });
     if (M.currentrootid === 'file-requests') {
@@ -410,7 +421,7 @@ MegaData.prototype.megaListRenderNode = function(aHandle) {
  * accessed.
  */
 MegaData.prototype.renderChatIsLoading = function() {
-    'use strict';
+    "use strict";
     M.onSectionUIOpen('conversations');
 
     M.hideEmptyGrids();
@@ -428,3 +439,30 @@ MegaData.prototype.renderChatIsLoading = function() {
     $('.section.conversations').removeClass('hidden');
     $('.section.conversations .fm-chat-is-loading').removeClass('hidden');
 };
+
+Object.defineProperties(MegaData.prototype, {
+    onListView: {
+        get() {
+            "use strict";
+            return this.viewmode === 0;
+        }
+    },
+    onIconView: {
+        get() {
+            "use strict";
+            return this.viewmode === 1;
+        }
+    },
+    onMediaView: {
+        get() {
+            "use strict";
+            return this.viewmode === 2;
+        }
+    },
+    onFatListView: {
+        get() {
+            "use strict";
+            return this.viewmode === 3;
+        }
+    }
+});

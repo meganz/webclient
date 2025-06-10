@@ -173,7 +173,7 @@ function reselect(n) {
         let $el;
         let $scrollBlock;
 
-        if (M.viewmode) {
+        if (M.onIconView) {
             $scrollBlock = $('.file-block-scrolling.ps:not(.hidden, .megaList)');
             $el = $('a.ui-selected');
         }

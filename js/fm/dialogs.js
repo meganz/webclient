@@ -468,8 +468,8 @@
                 '<input id="f-name-input" class="summary-ff-name" type="text" value="' + escapeHTML($.nodeSaveAs.name)
                 + '" placeholder="' + l[17506] + '" autocomplete="off"/> &nbsp; '
                 + '</div>'
-                + '<div class="whitespaces-input-warning"> <div class="arrow"></div> <span></span></div>'
-                + '<div class="duplicated-input-warning"> <div class="arrow"></div> <span>'
+                + '<div class="whitespaces-input-warning"></div> <span></span></div>'
+                + '<div class="duplicated-input-warning"></div> <span>'
                 + l[17578] + '</span> </div>';
 
             $div.safeHTML(rowHtml);

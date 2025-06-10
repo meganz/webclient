@@ -146,8 +146,8 @@ function sharedUInode(nodeHandle, force) {
     var UiExportLink = new mega.UI.Share.ExportLink();
     var share = new mega.Share();
     var target;
-    const iconSize = M.viewmode ? 90 : 24;
-    const iconSpriteClass = `item-type-icon${M.viewmode ? '-90' : ''}`;
+    const iconSize = M.onIconView ? 90 : 24;
+    const iconSpriteClass = `item-type-icon${M.onIconView ? '-90' : ''}`;
 
     // Is there a full share or pending share available
     if ((M.d[nodeHandle] && M.d[nodeHandle].shares) || M.ps[nodeHandle]) {
@@ -189,7 +189,6 @@ function sharedUInode(nodeHandle, force) {
         target = document.getElementById(nodeHandle);
 
         if (target) {
-
             // Update right panel selected node with appropriate icon
             target = target.querySelector(`.${iconSpriteClass}`);
 
@@ -212,7 +211,6 @@ function sharedUInode(nodeHandle, force) {
         target = document.getElementById(nodeHandle);
 
         if (target) {
-
             // Right panel
             target = target.querySelector(`.${iconSpriteClass}`);
 
@@ -2872,7 +2870,7 @@ function fm_resize_handler(force) {
     else if (M.currentdirid === 'out-shares') {
         initPerfectScrollbar($('.grid-scrolling-table', '.out-shared-grid-view'));
     }
-    else if (M.onDeviceCenter && !M.viewmode && mega.devices.ui.isCustomRender()) {
+    else if (M.onDeviceCenter && M.onListView && mega.devices.ui.isCustomRender()) {
         initPerfectScrollbar($('.grid-scrolling-table', mega.devices.ui.gridWrapperSelector));
     }
     else if (M.currentdirid === 'transfers') {
@@ -2912,12 +2910,10 @@ function fm_resize_handler(force) {
         if (M.currentdirid && M.currentdirid.includes('search/')) {
             delay('render:search_breadcrumbs', () => M.renderSearchBreadcrumbs());
         }
-        if (M.viewmode) {
-
+        if (M.onIconView) {
             initPerfectScrollbar($('.file-block-scrolling:visible'));
         }
         else {
-
             initPerfectScrollbar($('.grid-scrolling-table:visible'));
             if ($.gridHeader) {
                 $.gridHeader();
@@ -2979,9 +2975,7 @@ function sharedFolderUI() {
 
         var rightPanelView = '.files-grid-view.fm';
 
-        $('.shared-blocks-view', '.fm-right-files-block').addClass('hidden');
-
-        if (M.viewmode === 1) {
+        if (M.onIconView) {
             rightPanelView = '.fm-blocks-view.fm';
         }
 

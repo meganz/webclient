@@ -508,10 +508,6 @@ body.de .mega-dialog.contact-picker-widget {
     --icon-size: 18px;
     --mask-color: var(--icon-rest);
 }
-.fm-dialog-table.grid-table tr:hover td:first-child::before,
-.fm-dialog-table.grid-table tr.ui-selected td:first-child::before {
-    left: -7px;
-}
 .fm-dialog-table.grid-table tr:hover td:last-child::before,
 .fm-dialog-table.grid-table tr.ui-selected td:last-child::before {
     right: -7px;

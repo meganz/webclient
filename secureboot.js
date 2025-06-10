@@ -3093,6 +3093,8 @@ else if (!browserUpdate) {
             'pwm:pass_import_selector_js': {f:'js/ui/pwm/components/pass-import-selector.js', n: 'pm_pass_import_selector_js', j: 1, w:1},
             'pwm:pass_import_data_handler_js': {f:'js/ui/pwm/components/pass-import-data-handler.js', n: 'pm_pass_import_data_handler_js', j: 1, w:1},
             'pwm:pass_extension_selector_js': {f:'js/ui/pwm/components/pass-extension-selector.js', n: 'pm_pass_extension_selector_js', j: 1, w:1},
+            'pwm:tutorial_password_item_form_js': {f:'js/ui/pwm/components/tutorial-password-item-form.js', n: 'pm_tutorial_password_item_form_js', j: 1, w:1},
+            'pwm:tutorial_otp_js': {f:'js/ui/pwm/components/tutorial-otp.js', n: 'pm_tutorial_otp_js', j: 1, w:1},
             'pwm:megaPassList_js': {f:'js/ui/pwm/components/settings/megaPassList.js', n: 'pm_megaPassList_js', j: 1, w:1},
             'pwm:megaPassListItem_js': {f:'js/ui/pwm/components/settings/megaPassListItem.js', n: 'pm_megaPassListItem_js', j: 1, w:1},
             'pwm:megaInputs_pmTextArea_js': {f:'js/ui/pwm/utils/megaInputs-pmTextArea.js', n: 'pm_megaInputs_pmTextArea_js', j: 1, w:1},

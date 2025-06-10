@@ -398,6 +398,16 @@ button-type elements.
     color: var(--mobile-text-inverse);
 }
 
+/* Style for highlighted nav buttons */
+.pwm-ui .nav-elem.normal.button.highlighted {
+    background: var(--mobile-button-secondary);
+}
+
+.pwm-ui .nav-elem.normal.button.highlighted span {
+    color: var(--mobile-text-primary);
+    font: var(--font-button-label);
+}
+
 /* Overridden component styles for webclient layout */
 
 .password-wrapper button.nav-elem,

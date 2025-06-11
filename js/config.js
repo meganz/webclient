@@ -110,7 +110,7 @@
         v04: ['rvonbrddl', 'rvonbrdfd', 'rvonbrdas'],
         xb1: [
             // do NOT change the order, add new entries at the tail UP TO 31, and 8 per row.
-            'cws', 'ctt', 'viewmode', 'dbDropOnLogout', 'dlThroughMEGAsync', 'sdss', 'tpp', 'ulddd',
+            'cws', 'ctt', 'rsv0', 'dbDropOnLogout', 'dlThroughMEGAsync', 'sdss', 'tpp', 'ulddd',
             'cbvm', 'mgvm', 'uiviewmode', 'uisorting', 'uidateformat', 'skipsmsbanner', 'skipDelWarning', 'rsv0',
             'nowarnpl', 'zip64n', 'callemptytout', 'callinout', 'showHideChat', 'showRecents', 'nocallsup', 'cslrem',
             'showSen', 'noSubfolderMd', 'rwReinstate', 'rsv2', 'rsv3', 'dcPause', 'skiptritwarn'

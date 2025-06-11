@@ -4308,13 +4308,13 @@ function fmviewmode(id, e)
 function getFmViewMode(id) {
     'use strict';
 
-    if (self.fmconfig && fmconfig.uiviewmode | 0) {
-        return fmconfig.viewmode;
-    }
-
     if (getFmViewMode.lv[M.currentdirid] || getFmViewMode.lv[M.currentCustomView.subType]) {
         M.overrideViewMode = 0;
         return 0;
+    }
+
+    if (self.fmconfig && fmconfig.uiviewmode | 0) {
+        return fmconfig.viewmode;
     }
 
     return self.fmconfig && fmconfig.viewmodes && fmconfig.viewmodes[id];

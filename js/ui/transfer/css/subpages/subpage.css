@@ -288,6 +288,10 @@ body.subpage {
     margin: 16px 0 0;
 }
 
+.subpage-box .text-content li > ul {
+    padding-top: 16px;
+}
+
 .subpage-box .text-content ul.icon-type {
     padding: 24px 0 0;
 }

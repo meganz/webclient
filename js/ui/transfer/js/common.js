@@ -181,27 +181,14 @@ mBroadcaster.once('boot_done', function populate_lx() {
         .replace('[S]', '<span>').replace('[/S]', '</span>');
     l.transferit_ready_to_use_info = escapeHTML(l.transferit_ready_to_use_info)
         .replace('[S]', '<span>').replace('[/S]', '</span>');
-    l.transferit_faq_q1_info2 = escapeHTML(l.transferit_faq_q1_info2)
-        .replace(/\[S]/g, '<span>').replace(/\[\/S]/g, '</span>')
+    l.transferit_faq_upd_q1_info2 = escapeHTML(l.transferit_faq_upd_q1_info2)
         .replace(/\[UL]/g, '<ul>').replace(/\[\/UL]/g, '</ul>')
         .replace(/\[LI]/g, '<li>').replace(/\[\/LI]/g, '</li>');
-    l.transferit_faq_q1_info3 = escapeHTML(l.transferit_faq_q1_info3)
-        .replace(/\[S]/g, '<span>').replace(/\[\/S]/g, '</span>')
+    l.transferit_faq_upd_q1_info3 = escapeHTML(l.transferit_faq_upd_q1_info3)
         .replace(/\[UL]/g, '<ul>').replace(/\[\/UL]/g, '</ul>')
         .replace(/\[LI]/g, '<li>').replace(/\[\/LI]/g, '</li>');
-    l.transferit_faq_q6_info6 = escapeHTML(l.transferit_faq_q6_info6).replace(
-        '[A]',
-        '<a href="https://mega.nz/SecurityWhitepaper.pdf" class="link clickurl" target="_blank">'
-    ).replace('[/A]', '</a>');
-    l.transferit_faq_q7_info3 = escapeHTML(l.transferit_faq_q7_info3)
-        .replace(/\[UL]/g, '<ul>').replace(/\[\/UL]/g, '</ul>')
-        .replace(/\[LI]/g, '<li>').replace(/\[\/LI]/g, '</li>');
-    l.transferit_faq_q7_info5 = escapeHTML(l.transferit_faq_q7_info5)
-        .replace(/\[UL]/g, '<ul>').replace(/\[\/UL]/g, '</ul>')
-        .replace(/\[LI]/g, '<li>').replace(/\[\/LI]/g, '</li>');
-    l.transferit_cnt_copy_info2 = escapeHTML(l.transferit_cnt_copy_info2)
-        .replace('[A1]', '<a href="https://mega.io/takedown" target="_blank" class="clickurl link">')
-        .replace('[/A1]', '</a>')
-        .replace('[A2]', '<a href="mailto:copyright@transfer.it" target="_blank" class="clickurl link">')
-        .replace('[/A2]', '</a>');
+    l.transferit_faq_upd_q4_info1 = escapeHTML(l.transferit_faq_upd_q4_info1)
+        .replace('[A]', '<a href="https://mega.nz/register" class="link clickurl" target="_blank">')
+        .replace('[/A]', '</a>')
+        .replace('[BR]', '<br>');
 });

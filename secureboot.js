@@ -2125,6 +2125,10 @@ else if (!browserUpdate) {
         jsl.push({f:'js/ui/top-tooltip-login.js', n: 'top-tooltip-login', j:1});
         jsl.push({f:'js/fm/transfer-progress-widget.js', n: 'tpw_js', j:1});
 
+        // S4 activation page in FM
+        jsl.push({f:'js/fm/s4/main.js', n: 'fm_s4_main_js', j: 1, w: 1});
+        jsl.push({f:'css/s4-fm-activate.css', n: 's4_fm_activate_css', j:2, w:30, c:1, d:1, cache:1});
+
         // minimal device centre resources
         jsl.push({f:'js/fm/devices/models.js', n: 'devices_models_js', j: 1, w: 1});
         jsl.push({f:'js/fm/devices/data.js', n: 'devices_data_js', j: 1, w: 1});

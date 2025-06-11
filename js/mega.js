@@ -1650,6 +1650,10 @@ scparser.$add('sqac', (a) => {
                             mega.pm.hideSubsDialog();
                         }
 
+                        if (page === 'fm/s4') {
+                            s4.main.render(true);
+                        }
+
                         mega.sensitives.onPlanUpgrade();
                     });
                 }

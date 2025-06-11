@@ -91,7 +91,7 @@ class ActivateS4Page {
                     .then((res) => {
                         if (res === 0) {
 
-                            loadSubPage('fm');
+                            loadSubPage('fm/s4');
                             location.reload();
                             return;
                         }

@@ -28,7 +28,7 @@ class MegaInteractable extends MegaComponent {
             }
         }
 
-        if (options.rightIcon && options.type === 'fullwidth') {
+        if (options.rightIcon) {
 
             this.rightIcon = options.rightIcon;
 

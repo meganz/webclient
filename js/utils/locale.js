@@ -1816,6 +1816,14 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[B]', '<b>')
         .replace('[/B]', '</b>');
 
+    l.s4_activation_terms = escapeHTML(l.s4_activation_terms)
+        .replace('[A1]', '<a href="https://mega.io/terms#S4" target="_blank" class="clickurl">')
+        .replace('[/A1]', '</a>')
+        .replace('[A2]', '<a href="https://mega.io/terms" target="_blank" class="clickurl">')
+        .replace('[/A2]', '</a>')
+        .replace('[A3]', '<a href="https://mega.io/privacy" target="_blank" class="clickurl">')
+        .replace('[/A3]', '</a>');
+
     l.content_removed = escapeHTML(l.content_removed)
         .replace('[A]', '<a class="clickurl" href="https://mega.io/takedown" target="_blank">')
         .replace('[/A]', '</a>');
@@ -2008,6 +2016,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         'cannot_leave_share_content',
         'after_days_card_charged_m',
         's4_disable_feature_info',
+        's4_activation_tools_info',
         'info_panel_tags_create_btn'
     ];
     for (let i = common.length; i--;) {

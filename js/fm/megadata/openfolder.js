@@ -280,6 +280,9 @@
             dashboard() {
                 dashboardUI();
             },
+            s4() {
+                s4.main.render();
+            },
             'device-centre'(id) {
                 mega.devices.ui.render(id);
             },
@@ -367,7 +370,7 @@
         if (this.currentrootid === this.RootID) {
             this.lastSeenCloudFolder = this.currentdirid;
         }
-        else if (this.currentrootid === 's4') {
+        else if (this.currentrootid === 's4' && id !== 's4') {
             let target = id;
 
             if (!('kernel' in s4 && (target = s4.utils.validateS4Url(id)))) {

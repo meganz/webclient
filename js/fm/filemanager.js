@@ -285,7 +285,6 @@ FileManager.prototype.initS4FileManager = mutex('s4-object-storage.lock', functi
         })
         .then((h) => {
             this.buildtree({h: 's4'});
-            $('.js-s4-tree-panel').removeClass('hidden');
 
             if (h) {
                 const st = api.lastst;
@@ -297,7 +296,8 @@ FileManager.prototype.initS4FileManager = mutex('s4-object-storage.lock', functi
             }
         })
         .then(resolve)
-        .catch(reject);
+        .catch(reject)
+        .finally(() => mBroadcaster.sendMessage('fm:s4InitDone'));
 });
 
 /**
@@ -3575,7 +3575,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         }
     }
 
-    if (id !== 'conversations') {
+    if (id !== 'conversations' && M.currentdirid !== 's4') {
         if (id === 'user-management') {
             $('.fm-right-header').addClass('hidden');
             $('.fm-right-header-user-management').removeClass('hidden');

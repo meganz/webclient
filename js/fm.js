@@ -785,7 +785,7 @@ function fmtopUI() {
                 $(`.gallery-tab-lnk-${mega.gallery[M.currentdirid].mode}`, $galleryTabBlock).addClass('active');
             }
         }
-        else if (M.currentrootid === 's4') {
+        else if (M.currentrootid === 's4' && M.currentCustomView) {
             const {subType, original, nodeID, containerID} = M.currentCustomView;
             mega.ui.secondaryNav.updateLayoutButton(!subType.startsWith('bucket'));
             if (subType === 'container') {
@@ -836,6 +836,7 @@ function fmtopUI() {
                     primary = '.fm-s4-new-group';
                 }
             }
+            $('.fm-right-files-block').addClass('visible-notification');
         }
         else if (M.onDeviceCenter) {
             if (M.currentdirid === M.currentrootid && mega.devices.ui.hasDevices && mega.devices.ui.isCustomRender()) {

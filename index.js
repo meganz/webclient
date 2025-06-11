@@ -1666,7 +1666,7 @@ function init_page() {
         let id = false;
         if (page.substr(0, 2) === 'fm') {
             id = page.replace('fm/', '');
-            if (id.length < 5 && id !== 'chat' && id !== 'pwm') {
+            if (id.length < 5 && id !== 'chat' && id !== 'pwm' && id !== 's4') {
                 id = false;
             }
         }

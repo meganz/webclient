@@ -194,9 +194,11 @@ lazy(s4, 'ui', () => {
         renderRoot() {
             const cn = s4.utils.getContainersList();
 
-            if (cn.length === 1) {
-                M.openFolder(cn[0].h, true);
+            if (cn.length) {
+                return M.openFolder(cn[0].h, true);
             }
+
+            loadSubPage('fm');
         }
 
         /**

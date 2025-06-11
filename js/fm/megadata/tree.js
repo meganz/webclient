@@ -129,7 +129,7 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sSubMap) {
     //     stype = "rubbish-bin";
     // }
     else if (n.h === 's4' && 'utils' in s4) {
-        s4.utils.renderContainerTree(dialog);
+        s4.utils.renderContainerTree(dialog, sSubMap);
         stype = 's4';
     }
     /* eslint-enable local-rules/jquery-replacements */

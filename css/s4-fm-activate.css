@@ -1,0 +1,211 @@
+/* S4 activation page in FM */
+
+.s4.fm-activate-section .body {
+    box-sizing: border-box;
+    color: var(--mobile-text-primary);
+    margin: 0 auto;
+    max-width: 1020px;
+    padding: 40px;
+    text-align: start;
+    width: 100%;
+}
+
+
+/* Typo */
+
+.s4.fm-activate-section h1 {
+    font: var(--mobile-font-heading-h1);
+    margin: 0;
+    padding: 0;
+    text-align: start;
+}
+
+.s4.fm-activate-section h3 {
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-heading-h3);
+    margin: 0;
+    padding: 40px 0 0;
+    text-align: start;
+}
+
+.s4.fm-activate-section p {
+    color: var(--mobile-text-secondary);
+    font: var(--mobile-font-caption-large-regular);
+    margin: 0;
+    padding: 8px 0 0;
+}
+
+.s4.fm-activate-section p.text-md-size {
+    font: var(--mobile-font-link-large-regular);
+}
+
+.s4.fm-activate-section b.text-md-size {
+    font: var(--mobile-font-link-large-bold);
+}
+
+.s4.fm-activate-section a.primary-link span,
+.s4.fm-activate-section .terms a {
+    color: var(--mobile-link-primary);
+    text-decoration: underline;
+}
+
+
+/* Icons */
+
+.s4.fm-activate-section i.rotate-180 {
+    transform: rotate(180deg);
+}
+
+.s4.fm-activate-section i.s4-icon {
+    background-position: center;
+    background-repeat: no-repeat;
+    display: block;
+}
+
+.s4.fm-activate-section i.icon-glass {
+    background-image: url('../images/mega/icons-3d/icon-glass-objects.png');
+    background-size: 152px auto;
+    height: 200px;
+    width: 268px;
+}
+
+.s4.fm-activate-section i.icon-cyberduck {
+    background-image: url('../images/mega/icons/logos/cyberduck-logo.png');
+    background-size: auto 44px;
+}
+
+.s4.fm-activate-section i.icon-rclone {
+    background-image: url('../images/mega/icons/logos/rclone-logo.png');
+    background-size: auto 37px;
+}
+
+.s4.fm-activate-section i.icon-s3browser {
+    background-image: url('../images/mega/icons/logos/s3-browser-logo.png');
+    background-size: auto 43px;
+}
+
+.theme-dark .s4.fm-activate-section i.icon-cyberduck {
+    background-image: url('../images/mega/icons/logos/cyberduck-logo-dark.png');
+}
+
+.theme-dark .s4.fm-activate-section i.icon-rclone {
+    background-image: url('../images/mega/icons/logos/rclone-logo-dark.png');
+}
+
+.theme-dark .s4.fm-activate-section i.icon-s3browser {
+    background-image: url('../images/mega/icons/logos/s3-browser-logo-dark.png');
+}
+
+
+/* Grids */
+
+.s4.fm-activate-section .grid {
+    box-sizing: border-box;
+    display: grid;
+    grid-auto-columns: minmax(0, 1fr);
+    grid-auto-flow: column;
+    grid-gap: 24px;
+    margin: 24px 0 0;
+    width: 100%;
+}
+
+/* Grey info blocks */
+
+.s4.fm-activate-section .grid.bg .col {
+    background: var(--mobile-surface-1);
+    border-radius: 8px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+    height: 100%;
+}
+
+.s4.fm-activate-section .grid.bg b {
+    color: var(--mobile-text-primary);
+}
+
+.s4.fm-activate-section .grid.bg p {
+    flex: 1 1 auto;
+}
+
+.s4.fm-activate-section .grid.bg a.link {
+    margin: 16px 0 0;
+    padding: 0;
+}
+
+.s4.fm-activate-section .grid.bg a.link span {
+    font: var(--mobile-font-link-small-semibold);
+}
+
+/* Logos */
+
+.s4.fm-activate-section .logos {
+    grid-auto-flow: initial;
+    grid-template-columns: repeat(auto-fit, minmax(208px, 1fr));
+}
+
+.s4.fm-activate-section .logos .col {
+    border: 1px solid var(--mobile-border-strong);
+    border-radius: 8px;
+    box-sizing: border-box;
+    height: 72px;
+    min-width: 190px;
+}
+
+.s4.fm-activate-section .logos .col:hover {
+    background: var(--mobile-surface-1);
+}
+
+.s4.fm-activate-section .logos .col i {
+    height: 100px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+/* Banner */
+
+.s4.fm-activate-section .banner {
+    align-items: center;
+    background: radial-gradient(29.19% 92.62% at 84.28% 46.59%, rgba(150, 25, 27, 1) 0%, rgba(92, 0, 1, 1) 100%);
+    border-radius: 8px;
+    box-sizing: border-box;
+    grid-template-columns: 1fr auto;
+    padding: 32px;
+}
+
+.s4.fm-activate-section .banner h3 {
+    color: var(--mobile-text-on-color);
+    padding: 0;
+}
+
+.s4.fm-activate-section .banner p {
+    color: var(--mobile-text-on-color);
+    padding: 12px 0 0;
+}
+
+.s4.fm-activate-section .banner button {
+    cursor: pointer;
+    height: 48px;
+    margin: 32px 0 0;
+}
+
+.s4.fm-activate-section .banner button:hover {
+    background: var(--mobile-button-primary);
+}
+
+.s4.fm-activate-section .banner b {
+    display: block;
+}
+
+.s4.fm-activate-section .terms {
+    padding: 12px 0 0;
+}
+
+
+/* Footer */
+
+.s4.fm-activate-section .footer {
+    padding: 24px 0 0;
+    text-align: center;
+}

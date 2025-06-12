@@ -931,7 +931,7 @@ lazy(mega.ui, 'searchbar', () => {
                     .catch(tell);
             }
             else if (M.getNodeRoot(n.h) === M.RubbishID) {
-                propertiesDialog();
+                mega.ui.mInfoPanel.show($.selected);
             }
             else if (is_image2(n) || is_video(n)) {
                 if (is_video(n)) {

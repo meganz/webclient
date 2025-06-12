@@ -97,7 +97,7 @@ mBroadcaster.addListener('fm:initialized', () => {
                             dialogDesc: l.onboard_v4_manage_file_dialog_desc,
                             targetElmClass: '.megaListItem:first',
                             get targetElmPosition() {
-                                return M.viewmode ? 'right' : 'bottom';
+                                return M.onIconView ? 'right' : 'bottom';
                             },
                             markComplete: true,
                             nextActionTrigger: 'contextmenu',

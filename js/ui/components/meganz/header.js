@@ -860,6 +860,25 @@ class MegaHeader extends MegaMobileHeader {
             });
 
             _buildInteractable({
+                componentClassname: 'achievements hidden',
+                text: l[16117],
+                onClick() {
+                    mega.achievem.achievementsListDialog();
+                    eventlog(500809);
+                }
+            });
+
+            if (mega.achievem) {
+                mega.achievem.enabled()
+                    .then(() => {
+                        this.domNode.componentSelector('.achievements').show();
+                    })
+                    .catch(() => {
+                        this.domNode.componentSelector('.achievements').hide();
+                    });
+            }
+
+            _buildInteractable({
                 type: 'normal',
                 componentClassname: 'logout secondary',
                 text: l.log_out,

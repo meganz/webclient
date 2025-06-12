@@ -821,7 +821,7 @@ var mobile = {
     onFolderSizeChangeUIUpdate(node) {
         'use strict';
 
-        var p = this.viewmode === 0 && this.currentdirid || false;
+        var p = this.onListView && this.currentdirid || false;
         if (p && String(p).slice(-8) === node.p || M.currentCustomView) {
             mobile.cloud.countAndUpdateSubFolderTotals(node);
         }

@@ -46,7 +46,9 @@ function msgDialog(type, title, msg, subMsg, callback, checkboxCallback) {
             'warningb': 'icon-alert-triangle-thin-outline warning',
             'confirmation': 'icon-check-circle-thin-outline success',
             'info': 'icon-info-thin-outline info',
-            'error': 'icon-x-circle-thin-outline error'
+            'error': 'icon-x-circle-thin-outline error',
+            'clear-bin': 'icon-alert-triangle-thin-outline warning',
+            'remove': 'icon-alert-triangle-thin-outline warning',
         };
 
         icon = dialogType[0] === 'error' ?
@@ -75,6 +77,9 @@ function msgDialog(type, title, msg, subMsg, callback, checkboxCallback) {
                 buttonsArray[0] = buttons.substr(0, pos++);
                 buttonsArray[1] = buttons.substr(pos);
             }
+        }
+        else if (type === 'clear-bin') {
+            buttonsArray = [l[1730], l[82]];
         }
     }
 

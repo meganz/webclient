@@ -24,12 +24,10 @@
             <i class="sprite-fm-mono icon-folder-filled"></i>
         </div>
         <div class="whitespaces-input-warning">
-            <div class="arrow"></div>
             <span>[$whitespaces_on_filename]</span>
         </div>
         <div class="duplicated-input-warning">
-            <div class="arrow"></div>
-            <span>[$23219]</span><!--  -->
+            <span>[$23219]</span>
         </div>
     </div>
     <div class="fm-notifications-bottom">
@@ -1166,46 +1164,6 @@
     </div>
 </div>
 
-<!-- Sort and filter dialog for File Manager -->
-<div class="dropdown body colour-sorting-menu hidden">
-    <div class="dropdown-section sort-by">
-        <span class="dropdown-color-txt">[$7331]</span>
-        <a data-by="name" class="dropdown-item asc active">
-            <i class="sprite-fm-mono icon-name"></i>
-            <span>[$86]</span>
-            <i id="name-sort-arrow" class="sprite-fm-mono sort-arrow icon-up"></i>
-        </a>
-        <a data-by="label" class="dropdown-item dropdown-item-label disabled static">
-            <i class="sprite-fm-mono icon-label"></i>
-            <span>[$17398]</span>
-            <i id="label-sort-arrow" class="sprite-fm-mono sort-arrow icon-up"></i>
-        </a>
-        <hr>
-    </div>
-    <div class="dropdown-section filter-by">
-        <span class="no-tips">
-            <span>
-                <span class="dropdown-color-txt">[$17791]</span>
-                <div class="labels small">
-                    <span class="dropdown-item static">
-                        <i class="sprite-fm-mono icon-label"></i>
-                        <span>[$17398]</span>
-                    </span>
-                    <span class="dropdown-colour-item red-colour-label" data-label-id="1" data-label-txt="Red"></span>
-                    <span class="dropdown-colour-item orange-colour-label" data-label-id="2" data-label-txt="Orange"></span>
-                    <span class="dropdown-colour-item yellow-colour-label" data-label-id="3" data-label-txt="Yellow"></span>
-                    <span class="dropdown-colour-item green-colour-label" data-label-id="4" data-label-txt="Green"></span>
-                    <span class="dropdown-colour-item blue-colour-label" data-label-id="5" data-label-txt="Blue"></span>
-                    <span class="dropdown-colour-item purple-colour-label" data-label-id="6" data-label-txt="Purple"></span>
-                    <span class="dropdown-colour-item grey-colour-label" data-label-id="7" data-label-txt="Grey"></span>
-                    <span class="clear"></span>
-                    <span class="dropdown-color-info"></span>
-                </div>
-            </span>
-        </span>
-    </div>
-</div>
-
 <!-- Select Authenticator App tooltip launched on the Setup 2FA dialog -->
 <div class="mobile auth-app-select-tooltip hidden">
     <i class="dropdown-white-arrow"></i>
@@ -1475,11 +1433,9 @@
                     <input name="dialog-new-folder" type="text" value="" placeholder="[$157]" autofocus />
                 </div>
                 <div class="whitespaces-input-warning">
-                    <div class="arrow"></div>
                     <span>[$whitespaces_on_filename]</span>
                 </div>
                 <div class="duplicated-input-warning">
-                    <div class="arrow"></div>
                     <span>[$23219]</span>
                 </div>
             </div>
@@ -1518,11 +1474,9 @@
                     <input name="dialog-new-file" type="text" value="" placeholder="[$17506]" autofocus />
                 </div>
                 <div class="whitespaces-input-warning">
-                    <div class="arrow"></div>
                     <span>[$whitespaces_on_filename]</span>
                 </div>
                 <div class="duplicated-input-warning">
-                    <div class="arrow"></div>
                     <span>[$17578]</span>
                 </div>
             </div>
@@ -1769,11 +1723,9 @@
                     <input name="dialog-rename" type="text" value="[$157]" />
                 </div>
                 <div class="whitespaces-input-warning">
-                    <div class="arrow"></div>
                     <span>[$whitespaces_on_filename]</span>
                 </div>
                 <div class="duplicated-input-warning">
-                    <div class="arrow"></div>
                     <span>[$17578]</span>
                 </div>
             </div>
@@ -1839,7 +1791,6 @@
                                 <input class="summary-ff-name hidden" type="text" value="" placeholder="[$17506]" />
                             </div>
                             <div class="duplicated-input-warning">
-                                <div class="arrow"></div>
                                 <span>[$17578]</span>
                             </div>
                         </div>
@@ -4106,7 +4057,7 @@
                                         </div>
                                     </div>
                                     <div class="achievement-dialog expires-txt"></div>
-                                    <button class="mega-button positive">
+                                    <button class="mega-button positive" data-event-id="500794">
                                         <span>[$16295]</span>
                                     </button>
                                 </div>
@@ -4129,7 +4080,7 @@
                                         </div>
                                     </div>
                                     <div class="achievement-dialog expires-txt"></div>
-                                    <button class="mega-button positive">
+                                    <button class="mega-button positive" data-event-id="500795">
                                         <span>[$16295]</span>
                                     </button>
                                 </div>
@@ -4152,7 +4103,7 @@
                                         </div>
                                     </div>
                                     <div class="achievement-dialog expires-txt"></div>
-                                    <button class="mega-button positive">
+                                    <button class="mega-button positive" data-event-id="500796">
                                         <span>[$8726]</span>
                                     </button>
                                 </div>
@@ -4182,6 +4133,51 @@
                             </div>
                         </div>
 
+                        <!-- Add class "achieved", "one-reward" !-->
+                        <div class="achievements-cell ach-vpn-trial">
+                            <div class="achievement-details">
+                                <div class="image-container">
+                                    <i class="achievement-icon"></i>
+                                </div>
+                                <div class="achievement-full info">
+                                    <div>
+                                        <div class="subtitle-txt">
+                                            [$ach_vpn_trial_title]
+                                        </div>
+                                        <div class="achi-content-txt">
+                                            [$ach_vpn_trial_blurb]
+                                        </div>
+                                    </div>
+                                    <div class="achievement-dialog expires-txt"></div>
+                                    <button class="mega-button positive" data-event-id="500810">
+                                        <span>[$start_free_trial]</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Add class "achieved", "one-reward" !-->
+                        <div class="achievements-cell ach-pwm-trial">
+                            <div class="achievement-details">
+                                <div class="image-container">
+                                    <i class="achievement-icon"></i>
+                                </div>
+                                <div class="achievement-full info">
+                                    <div>
+                                        <div class="subtitle-txt">
+                                            [$ach_pwm_trial_title]
+                                        </div>
+                                        <div class="achi-content-txt">
+                                            [$ach_pwm_trial_blurb]
+                                        </div>
+                                    </div>
+                                    <div class="achievement-dialog expires-txt"></div>
+                                    <button class="mega-button positive" data-event-id="500811">
+                                        <span>[$start_free_trial]</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -7698,7 +7694,6 @@
                     <input name="dialog-device-rename" type="text" value="[$157]" />
                 </div>
                 <div class="duplicated-input-warning">
-                    <div class="arrow"></div>
                     <span>[$17578]</span>
                 </div>
             </div>
@@ -7717,4 +7712,3 @@
     </div>
 
 </section>
-

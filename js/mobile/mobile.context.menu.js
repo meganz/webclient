@@ -722,7 +722,7 @@ mBroadcaster.once('boot_done', () => {
                 const node = M.getNodeByHandle(nodeHandle);
                 const restored = await mobile.rubbishBin.restore(nodeHandle).catch(dump);
                 const target_keys = restored && typeof restored === 'object' && Object.keys(restored);
-                const target = target_keys.length ? target_keys[0] : false;
+                const target = target_keys && target_keys.length ? target_keys[0] : false;
 
                 if (!mobile.cloud.nodeInView(nodeHandle) || target && sharer(target)) {
                     const restoredToCloud = node.t ? l.restored_folder_to_cloud : l.restored_file_to_cloud;
@@ -790,9 +790,15 @@ mBroadcaster.once('boot_done', () => {
                     return false;
                 }
 
-                mobile.rubbishBin.removeItem(nodeHandle);
-
-                M.fmEventLog(500706);
+                const delog = M.currentrootid !== M.RubbishID;
+                fmremove([nodeHandle])
+                    .then(() => {
+                        if (delog) {
+                            eventlog(99638);
+                        }
+                        M.fmEventLog(500706);
+                    })
+                    .catch(tell);
             }
         }
     };

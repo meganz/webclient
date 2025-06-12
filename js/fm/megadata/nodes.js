@@ -1470,12 +1470,14 @@ MegaData.prototype.safeMoveNodes = async function safeMoveNodes(target, nodes) {
     }
     M.clearSelectedNodes();
 
-    const res = await Promise.all(promises);
+    if (promises.length) {
+
+        await Promise.all(promises);
+    }
 
     if (c) {
         console.groupEnd();
     }
-    return res;
 };
 
 /**
@@ -1994,7 +1996,7 @@ MegaData.prototype.nodeUpdated = function(n, ignoreDB) {
  */
 MegaData.prototype.onFolderSizeChangeUIUpdate = function(node) {
     "use strict";
-    var p = this.viewmode === 0 && this.currentdirid || false;
+    var p = this.onListView && this.currentdirid || false;
     if (p && String(p).slice(-8) === node.p || M.currentCustomView || p === 'shares') {
         var elm = document.getElementById(node.h);
 
@@ -2134,15 +2136,15 @@ MegaData.prototype.labelDomUpdate = function(handle, value) {
         const n = M.d[handle] || false;
 
         var labelId = parseInt(value);
-        var removeClasses = 'colour-label red orange yellow blue green grey purple';
+        var removeClasses = 'red orange yellow blue green grey purple';
         var color = '<div class="colour-label-ind %1"></div>';
         var prefixTree = M.currentCustomView.prefixTree || '';
         var $treeElements = $(`#treea_${handle}`).add(`#treea_os_${handle}`).add(`#treea_pl_${handle}`);
 
         // Remove all colour label classes
         var $item = $(M.megaRender && M.megaRender.nodeMap[handle] || `#${handle}`);
-        $item.removeClass(removeClasses);
-        $('a', $item).removeClass(removeClasses);
+        $item.removeClass(`colour-label ${removeClasses}`);
+        const $lbl = $('i.colour-label', $item).removeClass(removeClasses);
         $('.label', $item).text('');
         $treeElements.removeClass('labeled');
         $('.colour-label-ind', $treeElements).remove();
@@ -2153,23 +2155,12 @@ MegaData.prototype.labelDomUpdate = function(handle, value) {
             var colourClass = `colour-label ${lblColor}`;
 
             $item.addClass(colourClass);
-            $('a', $item).addClass(colourClass);
+            $lbl.addClass(colourClass);
             // $('.nw-fm-tree-iconwrap', $treeElements)
             //     .safePrepend(color.replace('%1', M.getLabelClassFromId(labelId))).addClass('labeled');
             if (M.megaRender) {
                 $('.label', $item).text(M.megaRender.labelsColors[lblColor]);
             }
-        }
-
-        // make filter enable/disable depending on filter availabilty.
-        $('.dropdown-section .dropdown-item-label')
-            .add('.dropdown-section.filter-by .labels')
-            .addClass('disabled static');
-
-        if (M.isLabelExistNodeList(M.v)) {
-            $('.dropdown-section .dropdown-item-label')
-                .add('.dropdown-section.filter-by .labels')
-                .removeClass('disabled static');
         }
 
         const {n: dir} = M.sortmode || {};
@@ -2194,7 +2185,6 @@ MegaData.prototype.labeling = function(handles, newLabelState) {
     'use strict';
 
     if (fminitialized && handles) {
-        onIdle(() => this.initLabelFilter(this.v));
 
         if (!Array.isArray(handles)) {
             handles = [handles];
@@ -2211,43 +2201,6 @@ MegaData.prototype.labeling = function(handles, newLabelState) {
 
                 return api.setNodeAttributes(n, {lbl: newLabelState}).catch(tell);
             });
-    }
-};
-
-MegaData.prototype.labelFilterBlockUI = function() {
-    "use strict";
-
-    var type = M.currentLabelType;
-    // Hide all filter DOM elements
-    $('.fm-right-header.fm .filter-block.body').addClass('hidden');
-    $('.files-grid-view.fm .filter-block.body').addClass('hidden');
-
-    if (M.currentLabelFilter) {
-
-        if (M.viewmode) {// Block view
-            if (type === 'shares') {
-                $(`.fm-right-header.fm .filter-block.${type}.body`).removeClass('hidden');
-            }
-            else if (type === 'contact') {
-                $('.filter-block.body').addClass('hidden');
-                $('.fm-right-header.fm .filter-block.body').addClass('hidden');
-            }
-            else {
-                $(`.filter-block.${type}.body`).addClass('hidden');
-                $(`.fm-right-header.fm .filter-block.${type}.body`).removeClass('hidden');
-            }
-        }
-        else if (type === 'shares') {
-            $(`.fm-right-header.fm .filter-block.${type}.body`).removeClass('hidden');
-        }
-        else if (type === 'contact') {
-            $('.filter-block.body').addClass('hidden');
-            $('.fm-right-header.fm .filter-block.body').addClass('hidden');
-        }
-        else {
-            $(`.fm-right-header.fm .filter-block.${type}.body`).addClass('hidden');
-            $(`.filter-block.${type}.body`).removeClass('hidden');
-        }
     }
 };
 
@@ -2305,54 +2258,6 @@ MegaData.prototype.updateLabelInfo = function(e) {
 };
 
 /*
- * filter fm and shared with me by tag colour
- *
- * @param {Object} e  event triggered to excuting this.
- */
-MegaData.prototype.applyLabelFilter = function(e) {
-    "use strict";
-
-    var $t = $(e.target);
-    var labelId = parseInt($t.data('label-id'));
-    var type = M.currentLabelType;
-    var $menuItems = $('.colour-sorting-menu .dropdown-colour-item');
-    var $filterBlock = $(`.filter-block.${type}.body`);
-    var fltIndicator = '<div class="colour-label-ind %1"></div>';
-    var obj = M.filterLabel[type];// Global var holding colour tag filter information for fm and shares
-
-    obj[labelId] = !obj[labelId];
-
-    if (obj[labelId]) {
-        $menuItems.filter(`[data-label-id=${labelId}]`).addClass('active');
-        $filterBlock.find('.content').append(fltIndicator.replace('%1', M.getLabelClassFromId(labelId)));
-
-        if (M.viewmode) {// Block view
-            $(`.fm-right-header.fm .filter-block.${type}.body`).removeClass('hidden');
-        }
-        else if (M.currentrootid === M.RootID || M.currentrootid === M.RubbishID) {
-            $(`.filter-block.${type}.body`).removeClass('hidden');
-        }
-        else {
-            $(`.fm-right-header.fm .filter-block.${type}.body`).removeClass('hidden');
-        }
-    }
-    else {
-        delete obj[labelId];
-
-        $menuItems.filter(`[data-label-id=${labelId}]`).removeClass('active');
-        $(`.colour-label-ind.${M.getLabelClassFromId(labelId)}`, $filterBlock).remove();
-        if (!Object.keys(obj).length) {
-            delete M.filterLabel[type];
-            $filterBlock.addClass('hidden');
-            $.hideContextMenu();
-        }
-    }
-
-    M.updateLabelInfo(e);
-    M.openFolder(M.currentdirid, true);
-};
-
-/*
  * Check nodelist contains label
  *
  * @param {Object} nodelist     array of nodes
@@ -2370,36 +2275,6 @@ MegaData.prototype.isLabelExistNodeList = function(nodelist) {
         }
     }
     return false;
-};
-
-/*
- * init label filter and sort if node item has label.
- *
- * @param {Object} nodelist     array of nodes
- */
-
-MegaData.prototype.initLabelFilter = function(nodelist) {
-    "use strict";
-
-    if (d){
-        console.log('checking label is existing');
-    }
-
-    var $fmMenu = $('.colour-sorting-menu .dropdown-section .dropdown-item-label')
-        .add('.colour-sorting-menu .dropdown-section.filter-by .labels');
-
-    if (this.isLabelExistNodeList(nodelist)){
-        $fmMenu.removeClass('disabled static');
-        if (d){
-            console.log('label exist on node list, label filter is ON');
-        }
-    }
-    else {
-        $fmMenu.addClass('disabled static');
-        if (d){
-            console.log('no label exist on node list, label filter is OFF');
-        }
-    }
 };
 
 /**
@@ -2426,13 +2301,25 @@ MegaData.prototype.favouriteDomUpdate = function(node, favState) {
 
                 if (favState) {
                     // Add favourite
-                    $gridView.removeClass('icon-dot').addClass('icon-favourite-filled');
-                    $blockView.addClass('icon-favourite-filled');
+                    $gridView.removeClass('icon-heart-thin-outline').addClass('icon-heart-thin-solid');
+                    domListNode.classList.add('favourited');
+                    $gridView.attr('data-simpletip', l[5872]);
+
+                    // Recent is still using old style
+                    if (M.currentdirid === 'recents') {
+                        $blockView.addClass('icon-favourite-filled');
+                    }
                 }
                 else {
                     // Remove from favourites
-                    $gridView.removeClass('icon-favourite-filled').addClass('icon-dot');
-                    $blockView.removeClass('icon-favourite-filled');
+                    $gridView.removeClass('icon-heart-thin-solid').addClass('icon-heart-thin-outline');
+                    domListNode.classList.remove('favourited');
+                    $gridView.attr('data-simpletip', l[5871]);
+
+                    // Recent is still using old style
+                    if (M.currentdirid === 'recents') {
+                        $blockView.removeClass('icon-favourite-filled');
+                    }
                 }
             }
 
@@ -4746,14 +4633,13 @@ lazy(MegaData.prototype, 'myChatFilesFolder', () => {
 
         if (handle) {
             const treeItem = document.querySelector(`[id="treea_${handle}"] .nw-fm-tree-folder`);
-            const fmItem = document.querySelector(`[id="${handle}"] .folder`);
+            const fmItem = document.querySelector(`[id="${handle}"] .fm-item-img i`);
 
             if (treeItem) {
                 treeItem.classList.add('chat-folder');
             }
 
             if (fmItem) {
-
                 const postfix = M.viewmode ? '90' : '24';
                 fmItem.classList.remove(`icon-folder-${postfix}`);
                 fmItem.classList.add('folder-chat', `icon-folder-chat-${postfix}`);

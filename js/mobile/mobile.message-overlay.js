@@ -177,7 +177,7 @@ var megaMsgDialog = (() => {
                 targetSheet = mega.ui.sheet;
 
                 targetSheet.clear();
-                targetSheet.type = 'modal';
+                targetSheet.type = options.sheetType || 'modal';
                 targetSheet.showClose = closeButton || false;
                 targetSheet.preventBgClosing = typeof closeButton === 'boolean' ? !closeButton : true;
 
@@ -222,6 +222,11 @@ var megaMsgDialog = (() => {
                 if (options) {
                     renderIcon(options.icon);
                     generateAdditionalButtons(options.buttons, options.confirmButtonClass);
+                    if (options.footer) {
+                        targetSheet.addFooter(options.footer);
+                        confirmButton = options.footer.confirmButton === undefined ? confirmButton :
+                            options.footer.confirmButton;
+                    }
                 }
 
                 // Bind to the sheet actions

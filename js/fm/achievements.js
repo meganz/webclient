@@ -21,10 +21,13 @@ Object.defineProperty(mega, 'achievem', {
         bind: {
             value: function bind(action) {
                 this.rebind('click', function() {
+                    if (this.dataset.eventId) {
+                        eventlog(parseInt(this.dataset.eventId));
+                    }
+
                     if (action) {
                         switch (action[0]) {
                             case '!':
-                                eventlog(500794);
                                 var pf = navigator.platform.toUpperCase();
                                 if (pf.indexOf('WIN') !== -1) {
                                     open('https://mega.nz/MEGAsyncSetup.exe');
@@ -38,7 +41,6 @@ Object.defineProperty(mega, 'achievem', {
                                 mega.redirect('mega.io', 'desktop', false, false, false);
                                 break;
                             case '/':
-                                eventlog(500795);
                                 if (action === '/mobile') {
                                     mega.redirect('mega.io', 'mobile', false, false, false);
                                     break;
@@ -47,7 +49,6 @@ Object.defineProperty(mega, 'achievem', {
                                 break;
 
                             case '~':
-                                eventlog(500796);
                                 var fn = action.substr(1);
                                 if (typeof mega.achievem[fn] === 'function') {
                                     if (fn.toLowerCase().indexOf('dialog') > 0) {
@@ -125,7 +126,7 @@ Object.defineProperty(mega, 'achievem', {
                     var ts = ach.ts * 1000;
 
                     ach.date = new Date(ts);
-                    ach.left = Math.round((ach.e * 1000 - Date.now()) / 86400000);
+                    ach.left = 'e' in ach ? Math.round((ach.e * 1000 - Date.now()) / 86400000) : 0;
 
                     if (data[ach.a].rwds) {
                         data[ach.a].rwds.push(ach);
@@ -145,8 +146,7 @@ Object.defineProperty(mega, 'achievem', {
                         var rwds = ach.rwds || [ach.rwd];
                         for (var i = rwds.length; i--;) {
                             var rwd = rwds[i];
-
-                            if (rwd && rwd.left > 0) {
+                            if (rwd && rwd.left >= 0) {
                                 base++;
                                 if (ach[1]) {
                                     quota.transfer.current += mafr[rwd.r][1];
@@ -187,7 +187,9 @@ Object.defineProperty(mega, 'achievem', {
         /*  6 */ 'VERIFYE164'  : 'ach-verify-number',
         /*  7 */ 'GROUPCHAT'   : 'ach-group-chat:/fm/chat',
         /*  8 */ 'FOLDERSHARE' : 'ach-share-folder:/fm/contacts',
-        /*  9 */ 'SMSVERIFY'   : 'ach-sms-verification:~smsVerifyDialog'
+        /*  9 */ 'SMSVERIFY'   : 'ach-sms-verification:~smsVerifyDialog',
+        /* 10 */ 'PWMTRIAL'    : 'ach-pwm-trial:/propay_pwm',
+        /* 11 */ 'VPNTRIAL'    : 'ach-vpn-trial:/propay_vpn',
     };
     var mapToAction = Object.create(null);
     var mapToElement = Object.create(null);
@@ -335,10 +337,11 @@ mega.achievem.bindStorageDataToView = function bindStorageDataToView($viewContex
     const calculateAndBindRewardData = function calculateAndBindRewardData(data, idx) {
 
         if (data.rwds) {
+            console.error(data.rwds);
             for (var i = data.rwds.length - 1; i >= 0; i--) {
                 // totalStorage += data.rwds[i].left > 0 ? data[0] : 0;
                 // totalTransfer += data.rwds[i].left > 0 ? data[1] : 0;
-                totalInviteeCount += data.rwds[i].left > 0 ? 1 : 0;
+                totalInviteeCount += data.rwds[i].left >= 0 ? 1 : 0;
             }
         }
         else if (data.rwd) {
@@ -347,9 +350,9 @@ mega.achievem.bindStorageDataToView = function bindStorageDataToView($viewContex
             // totalStorage += data[0];
             // totalTransfer += data[1];
 
-            if (!data.rwd.e) {
+            if (!data.rwd.expiry || !data.rwd.expiry.value) {
                 // this reward do not expires
-                locFmt = '&nbsp;';
+                locFmt = l.ach_bonus_applied;
             }
             else if (data.rwd.left < 1) {
                 // show "Expired"
@@ -363,7 +366,7 @@ mega.achievem.bindStorageDataToView = function bindStorageDataToView($viewContex
             if (idx !== ach.ACH_INVITE) {
                 $cell.addClass('achieved');
 
-                if (data.rwd.expiry.unit === "d" && data.rwd.left > 0){
+                if (data.rwd.expiry.unit === "d" && data.rwd.left >= 0){
                     locFmt = mega.icu.format(l.ach_expires_days, data.rwd.left)
                         .replace('[S]', '<span>').replace('[/S]', '</span>');
                     $('.expires-txt', $cell).safeHTML(locFmt);
@@ -373,13 +376,6 @@ mega.achievem.bindStorageDataToView = function bindStorageDataToView($viewContex
                 }
                 if (!$('.expires-txt', $cell).hasClass('error')) {
                     $('.expires-txt', $cell).addClass('info');
-                }
-
-                locFmt = '';
-                switch (idx) {
-                    case ach.ACH_WELCOME:     locFmt = l[16395]; break;
-                    case ach.ACH_SYNCINSTALL: locFmt = l[16396]; break;
-                    case ach.ACH_APPINSTALL:  locFmt = l[16397]; break;
                 }
             }
         }
@@ -403,6 +399,21 @@ mega.achievem.bindStorageDataToView = function bindStorageDataToView($viewContex
 
                 if (idx !== 3 && (data.rwd || data.rwds)) {
                     $cell.addClass('one-reward');
+                }
+
+                if (idx === ach.ACH_VPNTRIAL) {
+                    $('.achi-content-txt', $cell).safeHTML(data.expiry && data.expiry.value
+                        ? l.ach_vpn_trial_blurb_expires
+                            .replace('%1', bytesToSize(data[0], 0))
+                            .replace('%2', data.expiry.value).replace('%3', data.expiry.utxt)
+                        : l.ach_vpn_trial_blurb.replace('%1', bytesToSize(data[0], 0)));
+                }
+                else if (idx === ach.ACH_PWMTRIAL) {
+                    $('.achi-content-txt', $cell).safeHTML(data.expiry && data.expiry.value
+                        ? l.ach_pwm_trial_blurb_expires
+                            .replace('%1', bytesToSize(data[0], 0))
+                            .replace('%2', data.expiry.value).replace('%3', data.expiry.utxt)
+                        : l.ach_pwm_trial_blurb.replace('%1', bytesToSize(data[0], 0)));
                 }
 
                 if (!$cell.hasClass('localized')) {
@@ -992,7 +1003,7 @@ mega.achievem.parseAccountAchievements = function parseAccountAchievements() {
                 var base = 0;
                 var rwds = data.rwds || [data.rwd];
                 for (i = rwds.length; i--;) {
-                    if (rwds[i] && rwds[i].left > 0) {
+                    if (rwds[i] && rwds[i].left >= 0) {
                         base++;
                     }
                 }
@@ -1002,7 +1013,7 @@ mega.achievem.parseAccountAchievements = function parseAccountAchievements() {
                     var transferValue = (data[1] * base);
                     transferMaxValue += transferValue;
 
-                    if (data.rwd && data.rwd.left > 0) {
+                    if (data.rwd && data.rwd.left >= 0) {
                         transferCurrentValue += transferValue;
                     }
                 }
@@ -1013,7 +1024,7 @@ mega.achievem.parseAccountAchievements = function parseAccountAchievements() {
                     }
                 }
                 // Achieved
-                else if (data.rwd && data.rwd.left > 0) {
+                else if (data.rwd && data.rwd.left >= 0) {
                     storageCurrentValue += storageValue;
                 }
             }

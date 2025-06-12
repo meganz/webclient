@@ -483,7 +483,7 @@
                             data-simpletip="${l[16475]}"
                             aria-label="${l[16475]}"
                             id="vrv_${version.h}">
-                            <i class="sprite-fm-mono icon-versions-previous ${revertDisabled}"></i>
+                            <i class="sprite-fm-mono icon-clock-rotate ${revertDisabled}"></i>
                         </div>`;
                     // if the user does not have full access of the shared folder.
                     const deleteDisabled = (noSharePerm || !M.d[handle].tvf) ? 'disabled' : '';

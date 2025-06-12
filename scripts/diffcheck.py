@@ -279,11 +279,13 @@ def reduce_stylelint(file_line_mapping, **extra):
     result = ['\nStyleLint output:\n=================\n']
     cmdout_expression = re.compile(r'(.+): line (\d+), col \d+, .+')
     warning_result = []
-    warning_rules = r'"(?:css-logical-props|css-overflow)"'
+    warning_rules = r'"(?:css-logical-props|css-overflow|css-math-functions)"'
 
     def is_warn_content(filename, lineno, error):
         if error.find('"css-overflow"') > 0:
             return 0 if read_file(filename)[lineno - 1].find('clip') > 0 else 2
+        elif error.find('"css-math-functions"') > 0:
+            return 2 if read_file(filename)[lineno - 1].find('minmax') > 0 else 0
 
         return 1
 

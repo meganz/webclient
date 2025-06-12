@@ -1552,7 +1552,8 @@
 
             const megaList = this.megaList;
             assert(megaList.$content, 'megaList.$content is not ready.');
-            megaList.content.style.height = megaList._calculated['contentHeight'] + "px";
+            megaList.content.style.height = megaList._calculated['contentHeight'] -
+                megaList.options.headerHeight - megaList.options.bottomSpacing + "px";
             if(!this.options.usingNativeScroll) {
                 Ps.update(this.megaList.listContainer);
             }

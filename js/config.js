@@ -95,10 +95,7 @@
             delete cfg.treenodes;
         }
 
-        if (cfg.viewmodes) {
-            cfg.xvm = shrink.views(cfg.viewmodes);
-            delete cfg.viewmodes;
-        }
+        shrink.views(cfg);
         shrink.sorta(cfg);
         shrink.cleanup(cfg);
 
@@ -113,7 +110,7 @@
         v04: ['rvonbrddl', 'rvonbrdfd', 'rvonbrdas'],
         xb1: [
             // do NOT change the order, add new entries at the tail UP TO 31, and 8 per row.
-            'cws', 'ctt', 'viewmode', 'dbDropOnLogout', 'dlThroughMEGAsync', 'sdss', 'tpp', 'ulddd',
+            'cws', 'ctt', 'rsv0', 'dbDropOnLogout', 'dlThroughMEGAsync', 'sdss', 'tpp', 'ulddd',
             'cbvm', 'mgvm', 'uiviewmode', 'uisorting', 'uidateformat', 'skipsmsbanner', 'skipDelWarning', 'rsv0',
             'nowarnpl', 'zip64n', 'callemptytout', 'callinout', 'showHideChat', 'showRecents', 'nocallsup', 'cslrem',
             'showSen', 'noSubfolderMd', 'rwReinstate', 'rsv2', 'rsv3', 'dcPause', 'skiptritwarn'
@@ -147,20 +144,24 @@
         return v;
     };
 
-    shrink.views = (nodes) => {
-        let r = '';
-        const v = parse(nodes);
+    shrink.views = (config) => {
+        let r = String.fromCharCode(config.viewmode | 0);
+        const v = parse(config.viewmodes);
         const s = Object.keys(v || {});
 
         for (let i = 0; i < s.length; ++i) {
             const h = s[i];
-            const n = (h.length === 8 || h.length === 11) | 0;
+            const n = (h.length === 8 || h.length === 11 || h.length > 0x1f) | 0;
             const j = n ? base64urldecode(h) : h;
 
-            r += String.fromCharCode(j.length << 2 | (v[h] & 1) << 1 | n) + j;
+            if (j.length && j.length < 0xff) {
+                r += String.fromCharCode((v[h] & 7) << 1 | n) + String.fromCharCode(j.length) + j;
+            }
         }
 
-        return r;
+        config.xvm2 = r;
+        delete config.viewmode;
+        delete config.viewmodes;
     };
 
     shrink.sorta = (config) => {
@@ -245,6 +246,11 @@
             delete config.xvm;
         }
 
+        if (config.xvm2) {
+            config.viewmodes = {...config.viewmodes, ...stretch.views2(config)};
+            delete config.xvm2;
+        }
+
         if (config.xsm) {
             stretch.sorta(config);
         }
@@ -278,6 +284,23 @@
             i += ++l;
         }
         return v;
+    };
+
+    stretch.views2 = (config) => {
+        const v = config.xvm2;
+        const r = Object.create(null);
+
+        for (let i = 1; i < v.length;) {
+            const b = v.charCodeAt(i);
+            const l = v.charCodeAt(++i);
+            const h = v.substr(++i, l);
+
+            r[b & 1 ? base64urlencode(h) : h] = b >> 1 & 7;
+
+            i += l;
+        }
+        config.viewmode = v.charCodeAt(0);
+        return r;
     };
 
     stretch.sorta = (config) => {

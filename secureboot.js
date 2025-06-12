@@ -2085,6 +2085,10 @@ else if (!browserUpdate) {
     jsl.push({f:'js/ui/megaInputs-textArea.js', n: 'megainputs_textarea_js', j:1,w:1});
     jsl.push({f:'js/ui/megaInputs-currencyField.js', n: 'megainputs_currencyfield_js', j:1, w:1});
     jsl.push({f:'js/ui/megaInputs-pmText.js', n: 'megaInputs_pmText_js', j: 1, w:1});
+    jsl.push({f:'js/ui/components/component.js', n: 'component_js', j: 1, w: 1});
+    jsl.push({f:'js/ui/components/node.js', n: 'node_js', j: 1, w:1});
+    jsl.push({f:'js/ui/components/sharednode.js', n: 'sharednode_js', j: 1, w:1});
+    jsl.push({f:'js/ui/components/contactnode.js', n: 'contactnode_js', j: 1, w:1});
     jsl.push({f:'html/registerb.html', n: 'registerb',j:0});
     jsl.push({f:'html/repay.html', n: 'repay', j:0 });
     jsl.push({f:'html/js/repay.js', n: 'repay_js', j:1 });
@@ -2120,6 +2124,10 @@ else if (!browserUpdate) {
         jsl.push({f:'js/ui/toast.js', n: 'toast_js', j:1,w:1});
         jsl.push({f:'js/ui/top-tooltip-login.js', n: 'top-tooltip-login', j:1});
         jsl.push({f:'js/fm/transfer-progress-widget.js', n: 'tpw_js', j:1});
+
+        // S4 activation page in FM
+        jsl.push({f:'js/fm/s4/main.js', n: 'fm_s4_main_js', j: 1, w: 1});
+        jsl.push({f:'css/s4-fm-activate.css', n: 's4_fm_activate_css', j:2, w:30, c:1, d:1, cache:1});
 
         // minimal device centre resources
         jsl.push({f:'js/fm/devices/models.js', n: 'devices_models_js', j: 1, w: 1});
@@ -2251,7 +2259,6 @@ else if (!browserUpdate) {
     jsl.push({f:'js/ui/elementSwitcher.js', n: 'elementSwitcher_js', j: 1});
 
     // Shared components
-    jsl.push({f:'js/ui/components/component.js', n: 'component_js', j: 1, w:1});
     jsl.push({f:'js/ui/components/group.js', n: 'group_js', j: 1, w:1});
     jsl.push({f:'js/ui/components/interactable.js', n: 'interactable_js', j: 1, w:1});
     jsl.push({f:'js/ui/components/link.js', n: 'link_js', j: 1, w:1});
@@ -2263,9 +2270,6 @@ else if (!browserUpdate) {
     jsl.push({f:'js/ui/components/toast.js', n: 'components_toast_js', j: 1, w:1});
     jsl.push({f:'js/ui/components/overlay.js', n: 'overlay_js', j: 1, w:1});
     jsl.push({f:'js/ui/components/sheet.js', n: 'sheet_js', j: 1, w:1});
-    jsl.push({f:'js/ui/components/node.js', n: 'node_js', j: 1, w:1});
-    jsl.push({f:'js/ui/components/sharednode.js', n: 'sharednode_js', j: 1, w:1});
-    jsl.push({f:'js/ui/components/contactnode.js', n: 'contactnode_js', j: 1, w:1});
     jsl.push({f:'js/ui/components/megaInput.js', n: 'megainput_js', j: 1, w: 1});
     jsl.push({f:'js/ui/components/textarea.js', n: 'textarea_js', j: 1, w: 1});
     jsl.push({f:'js/ui/components/menu.js', n: 'menu_js', j: 1, w:1});
@@ -3093,6 +3097,8 @@ else if (!browserUpdate) {
             'pwm:pass_import_selector_js': {f:'js/ui/pwm/components/pass-import-selector.js', n: 'pm_pass_import_selector_js', j: 1, w:1},
             'pwm:pass_import_data_handler_js': {f:'js/ui/pwm/components/pass-import-data-handler.js', n: 'pm_pass_import_data_handler_js', j: 1, w:1},
             'pwm:pass_extension_selector_js': {f:'js/ui/pwm/components/pass-extension-selector.js', n: 'pm_pass_extension_selector_js', j: 1, w:1},
+            'pwm:tutorial_password_item_form_js': {f:'js/ui/pwm/components/tutorial-password-item-form.js', n: 'pm_tutorial_password_item_form_js', j: 1, w:1},
+            'pwm:tutorial_otp_js': {f:'js/ui/pwm/components/tutorial-otp.js', n: 'pm_tutorial_otp_js', j: 1, w:1},
             'pwm:megaPassList_js': {f:'js/ui/pwm/components/settings/megaPassList.js', n: 'pm_megaPassList_js', j: 1, w:1},
             'pwm:megaPassListItem_js': {f:'js/ui/pwm/components/settings/megaPassListItem.js', n: 'pm_megaPassListItem_js', j: 1, w:1},
             'pwm:megaInputs_pmTextArea_js': {f:'js/ui/pwm/utils/megaInputs-pmTextArea.js', n: 'pm_megaInputs_pmTextArea_js', j: 1, w:1},
@@ -3117,6 +3123,7 @@ else if (!browserUpdate) {
         'folder': ['folderlink_css'],
         'collection': ['folderlink_css'],
         'discountpromo': ['discountpromo_js'],
+        'discount': ['discountpromo_js'],
         's': ['discountpromo_js'], // Short URL for 'sale' e.g. /s/blackfriday
         'disputenotice': ['disputenotice', 'copyright_js'],
         'support': ['support_js', 'support'],

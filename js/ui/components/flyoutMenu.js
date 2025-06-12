@@ -146,6 +146,10 @@ class MegaFlyoutMenu extends MegaComponent {
         const ComponentClass = MegaFlyoutMenu.getComponentForType(itemComp);
         return new ComponentClass({
             parentNode: this.body,
+            noLeftProps: true,
+            noRightProps: true,
+            noContextBtn: true,
+            noSelectionCheck: true,
             ...options
         });
     }
@@ -283,6 +287,10 @@ class MegaFlyoutMenu extends MegaComponent {
                 const ComponentClass = label.nodeHandle.length === 11 ? MegaContactNode : MegaNodeComponent;
                 this.labelNode = new ComponentClass({
                     parentNode: this.topLabel,
+                    noLeftProps: true,
+                    noRightProps: true,
+                    noContextBtn: true,
+                    noSelectionCheck: true,
                     ...label
                 });
             }
@@ -1007,8 +1015,17 @@ class MegaFlyoutMenu extends MegaComponent {
                                 currentTarget.disabled = true;
                                 return;
                             }
-                            mega.ui.flyout.flyoutMenu.hide();
-                            megaChat.openChatAndSendFilesDialog(contactHandle);
+                            M.initFileAndFolderSelectDialog({
+                                allowAttachFolders: true,
+                                className: '',
+                                folderSelectable: undefined,
+                                selectLabel: undefined,
+                            }).then(
+                                handles =>
+                                    handles &&
+                                    handles.length &&
+                                    megaChat.openChatAndAttachNodes(contactHandle, handles)
+                            );
                         });
                     }
                 }

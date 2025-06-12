@@ -157,11 +157,6 @@
 .shared-data .user-card-verified {
     display: none;
 }
-.shared-blocks-view .avatar-wrapper,
-.out-shared-blocks-view .avatar-wrapper {
-    margin: 10px 0 10px 8px;
-    z-index: 2;
-}
 #mobile-ui-contact-card .mobile.semi-big-avatar, #mobile-ui-contact-card .avatar-wrapper {
     display: block;
     width: 96px;

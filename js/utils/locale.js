@@ -1050,13 +1050,14 @@ mBroadcaster.once('boot_done', function populate_l() {
         'pricing': "https://mega.io/pricing",
         'vpn': "https://mega.io/vpn",
         'vpn#dow': "https://mega.io/vpn#downloadapps",
+        'pass': "https://mega.io/pass",
         'pass#dow': "https://mega.io/pass#downloadapps",
     };
 
     const mega_io_hyperlinks = Object.create(null);
 
     for (const key in mega_io_links) {
-        mega_io_hyperlinks[key] = `<a href="${mega_io_links[key]}" target="_blank" rel="noopener noreferrer">`;
+        mega_io_hyperlinks[key] = `<a href="${mega_io_links[key]}" target="_blank" rel="noopener">`;
     }
 
     // MEGA static hosts
@@ -1816,6 +1817,14 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[B]', '<b>')
         .replace('[/B]', '</b>');
 
+    l.s4_activation_terms = escapeHTML(l.s4_activation_terms)
+        .replace('[A1]', '<a href="https://mega.io/terms#S4" target="_blank" class="clickurl">')
+        .replace('[/A1]', '</a>')
+        .replace('[A2]', '<a href="https://mega.io/terms" target="_blank" class="clickurl">')
+        .replace('[/A2]', '</a>')
+        .replace('[A3]', '<a href="https://mega.io/privacy" target="_blank" class="clickurl">')
+        .replace('[/A3]', '</a>');
+
     l.content_removed = escapeHTML(l.content_removed)
         .replace('[A]', '<a class="clickurl" href="https://mega.io/takedown" target="_blank">')
         .replace('[/A]', '</a>');
@@ -1994,6 +2003,15 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[A]', `<a class="clickurl" href=${otpHelpLink}" target="_blank">`)
         .replace('[/A]', '</a>');
 
+    l.ach_vpn_trial_blurb = escapeHTML(l.ach_vpn_trial_blurb)
+        .replace('[A]', mega_io_hyperlinks.vpn).replace('[/A]', '</a>');
+    l.ach_vpn_trial_blurb_expires = escapeHTML(l.ach_vpn_trial_blurb_expires)
+        .replace('[A]', mega_io_hyperlinks.vpn).replace('[/A]', '</a>');
+    l.ach_pwm_trial_blurb = escapeHTML(l.ach_pwm_trial_blurb)
+        .replace('[A]', mega_io_hyperlinks.pass).replace('[/A]', '</a>');
+    l.ach_pwm_trial_blurb_expires = escapeHTML(l.ach_pwm_trial_blurb_expires)
+        .replace('[A]', mega_io_hyperlinks.pass).replace('[/A]', '</a>');
+
     const common = [
         15536, 16119, 16120, 16313, 16316, 16360, 18228, 18268, 18282,
         18284, 18285, 18286, 18287, 18289, 18290, 18291, 18294, 18295, 18296, 18297, 18298, 18302, 18303, 18304,
@@ -2008,6 +2026,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         'cannot_leave_share_content',
         'after_days_card_charged_m',
         's4_disable_feature_info',
+        's4_activation_tools_info',
         'info_panel_tags_create_btn'
     ];
     for (let i = common.length; i--;) {

@@ -211,24 +211,20 @@ class MegaTopMenu extends MegaMobileTopMenu {
             });
         }
 
-        if (u_attr && u_attr.s4) {
-
-            // push below object to loggedInCD 2nd place
-            loggedInCD.splice(1, 0, {
+        if (!u_attr.b) {
+            loggedInCD.splice(mega.lite.inLiteMode ? 1 : 4, 0, {
                 text: l.obj_storage,
                 icon: 'sprite-fm-mono icon-bucket-triangle-thin-outline',
-                binding() {
-                    M.require('s4').then(() => {
-                        if (!(M.dyh && M.dyh('is-section', 'container') || s4.utils.getContainersList().length > 1)){
-                            s4.ui.renderRoot();
-                        }
-                    });
-                },
-                hasTree: 's4',
+                href: 'fm/s4',
+                hasTree: u_attr.s4 ? 's4' : null,
                 treeWrapClass: 'js-s4-tree-panel',
                 name: 's4',
                 typeClassname: 'drive',
-                eventLog: 500636
+                eventLog: 500636,
+                rightBadge: u_attr.s4 ? null : {
+                    badgeClass: 'brand-filled',
+                    text: l[19976]
+                }
             });
         }
 
@@ -279,7 +275,8 @@ class MegaTopMenu extends MegaMobileTopMenu {
             else if (_isMedia()) {
                 selected = items.media;
             }
-            else if (M.currentrootid === 's4' && M.currentCustomView.subType === 'container') {
+            else if (M.currentrootid === 's4'
+                && (!M.currentCustomView || M.currentCustomView.subType === 'container')) {
                 selected = items.s4;
             }
             else if (M.currentdirid === 'transfers') {
@@ -302,7 +299,8 @@ class MegaTopMenu extends MegaMobileTopMenu {
 
         if (!this.storageBlock) {
             this.storageBlock = new MegaStorageBlock({
-                parentNode: this.domNode
+                parentNode: this.domNode,
+                achievements: true,
             });
         }
 

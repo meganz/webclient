@@ -49,6 +49,12 @@ class MegaComponent extends MegaDataEmitter {
         if (options.name) {
             this.domNode.name = options.name;
         }
+
+        if (options.attr) {
+            for (const key in options.attr) {
+                this.attr(key, options.attr[key]);
+            }
+        }
     }
 
     // Extended on for bind it with dom event
@@ -128,12 +134,12 @@ class MegaComponent extends MegaDataEmitter {
     // Util methods
 
     addClass(...classes) {
-        this.domNode.classList.add(...classes);
+        this.domNode.classList.add(...classes.filter(Boolean));
         return this;
     }
 
     removeClass(...classes) {
-        this.domNode.classList.remove(...classes);
+        this.domNode.classList.remove(...classes.filter(Boolean));
         return this;
     }
 
@@ -159,6 +165,13 @@ class MegaComponent extends MegaDataEmitter {
         }
 
         return this;
+    }
+
+    attr(attrName, attrValue) {
+        if (attrValue === undefined) {
+            return this.domNode.getAttribute(attrName);
+        }
+        this.domNode.setAttribute(attrName, attrValue);
     }
 
     get visible() {

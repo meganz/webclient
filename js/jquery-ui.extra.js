@@ -472,7 +472,7 @@ $.widget.extend($.ui.selectable.prototype, {
             if (selecteeOffset.top === 0 || selecteeOffset.left === 0) {
                 const ipr = mlist._calculated.itemsPerRow;
                 const ipos = this.mlistMap ? this.mlistMap[n.id] - 1 : mlist.items.indexOf(n.id);
-                const marginSpace = M.megaRender.viewmode ? [24, 24] : [0, 26];
+                const marginSpace = M.onIconView ? [24, 24] : [0, 26];
 
                 selecteeOffset.top = ih * Math.floor(ipos / ipr) + marginSpace[0];
                 selecteeOffset.left = ipos % ipr * iw + marginSpace[1];

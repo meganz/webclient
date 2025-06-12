@@ -141,7 +141,7 @@ RecentsRender.prototype.render = function(limit, until, forceInit) {
     if (!this._rendered) {
         loadingDialog.show();
     }
-    M.initShortcutsAndSelection(this.$container);
+    M.initShortcutsAndSelection(this.container);
 
     M.getRecentActionsList(this.currentLimit, this.currentUntil).then(function(actions) {
         self.getMaxFitOnScreen(true);

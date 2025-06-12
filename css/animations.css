@@ -20,6 +20,10 @@
 .rotating-animation {
     animation: rotate 0.8s infinite linear;
 }
+.rotating-animation.step-12 {
+    animation: rotate 0.8s steps(12) infinite;
+    animation-timing-function: linear;
+}
 /* End of Rotation animations */
 
 .no-trans, .no-trans::before, .no-trans::after, .no-trans-init, .no-trans-init::before, .no-trans-init::after {

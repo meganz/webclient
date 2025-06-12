@@ -2,6 +2,39 @@
 lazy(mega, 'requestStatusMonitor', () => {
     'use strict';
 
+    const o2d = freeze({
+        p: 'file or folder creation'
+    });
+    const unk = 'UNKNOWN operation';
+
+    const getDescription = (u8, buffer, offset, users, ops) => {
+        let description = `User ${ab_to_base64(buffer.slice(2, 10))}`;
+
+        if (users > 1) {
+            description += ', affecting ';
+
+            for (let i = 1; i < users; i++) {
+                description += `${ab_to_base64(buffer.slice(2 + 8 * i, 10 + 8 * i))},`;
+            }
+        }
+        description += ' is executing a ';
+
+        const ob = [];
+        const oo = Object.create(null);
+
+        for (let i = 0; i < ops; i++) {
+            const d = o2d[String.fromCharCode(u8[offset + 2 + i])] || unk;
+
+            oo[d] = (oo[d] || 0) + 1;
+        }
+
+        for (const k in oo) {
+            ob.push(`${k}(${oo[k]})`);
+        }
+
+        return description + ob.join('/');
+    };
+
     return new class RequestStatusMonitor extends MEGAKeepAliveStream {
 
         constructor() {
@@ -119,30 +152,7 @@ lazy(mega, 'requestStatusMonitor', () => {
                 return 0;
             }
 
-            let description = `User ${ab_to_base64(buffer.slice(2, 10))}`;
-
-            if (users > 1) {
-                description += ', affecting ';
-
-                for (let i = 1; i < users; i++) {
-                    description += `${ab_to_base64(buffer.slice(2 + 8 * i, 10 + 8 * i))},`;
-                }
-            }
-
-            description += ' is executing a ';
-
-            for (let i = 0; i < ops; i++) {
-                if (i) {
-                    description += '/';
-                }
-
-                if (String.fromCharCode(u8[offset + 2 + i]) === 'p') {
-                    description += 'file or folder creation';
-                }
-                else {
-                    description += 'UNKNOWN operation';
-                }
-            }
+            let description = self.d && getDescription(u8, buffer, offset, users, ops) || '';
 
             offset += 2 + ops;
 

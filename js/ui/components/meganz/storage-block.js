@@ -37,6 +37,25 @@ class MegaStorageBlock extends MegaComponent {
 
         // Upgrade button
         MegaTopMenu.renderUpgradeButton(infoBlock, eventid);
+        if (options.achievements && u_attr && (!u_attr.p || u_attr.p >= pro.ACCOUNT_LEVEL_FEATURE) && !u_attr.b) {
+            const achieveWrap = document.createElement('div');
+            achieveWrap.className = 'achieve-link hidden';
+            MegaButton.factory({
+                parentNode: achieveWrap,
+                text: l.unlock_achievement_btn,
+                icon: 'sprite-fm-mono icon-rocket-thin-outline',
+                onClick() {
+                    mega.achievem.achievementsListDialog();
+                    eventlog(500808);
+                }
+            });
+            infoBlock.appendChild(achieveWrap);
+            if (mega.achievem) {
+                mega.achievem.enabled().then(() => {
+                    achieveWrap.classList.remove('hidden');
+                });
+            }
+        }
 
         M.onFileManagerReady(() => this.checkUpdate());
     }
@@ -137,6 +156,11 @@ class MegaStorageBlock extends MegaComponent {
 
         this.hideLoading();
 
+        const ach = this.domNode.querySelector('.achieve-link');
+        if (ach && !(!u_attr.p || u_attr.p >= pro.ACCOUNT_LEVEL_FEATURE) && !u_attr.b) {
+            ach.classList.add('hidden');
+        }
+
         if (!isFlexPlan() && (!u_attr.tq || !this.storageBlock.classList.contains('caption-running'))) {
             this.storageBlock.classList.add('caption-running');
             return this.createLeftStorageBlockCaption(this.storageBlock, space);
@@ -224,6 +248,13 @@ class MegaStorageBlock extends MegaComponent {
                     $popup.addClass('hovered');
                 }
             }, 1e3);
+        });
+        $('.achieve-link', this.domNode).rebind('mouseenter.storage-usage', () => {
+            delay.cancel('storage-information-popup-mouseenter');
+            delay.cancel('storage-information-popup-mouseleave');
+            $popup.removeClass('hovered');
+            $storageLimitPopup.removeClass('hovered');
+            return false;
         });
     }
 

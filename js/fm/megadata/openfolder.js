@@ -280,6 +280,9 @@
             dashboard() {
                 dashboardUI();
             },
+            s4() {
+                s4.main.render();
+            },
             'device-centre'(id) {
                 mega.devices.ui.render(id);
             },
@@ -334,10 +337,10 @@
         this.currentrootid = this.chat ? "chat" : this.getNodeRoot(id);
         this.currentLabelType = M.labelType();
         this.currentLabelFilter = M.filterLabel[this.currentLabelType];
-        this.fmsorting = id === 'shares' || id === 'out-shares' || id === 'public-links' ?
-            0 : fmconfig.uisorting | 0;
         this.currentCustomView = this.isCustomView(id);
         this.onDeviceCenter = this.currentCustomView.type === mega.devices.rootId && this.currentCustomView.nodeID;
+        this.fmsorting = id === 'shares' || id === 'out-shares' || id === 'public-links' ||
+            (this.onDeviceCenter && this.onDeviceCenter.length > 8) ? 0 : fmconfig.uisorting | 0;
 
         const fmViewMode = getFmViewMode(id);
         const fmViewModeCustomView = getFmViewMode(this.currentCustomView.original);
@@ -367,7 +370,7 @@
         if (this.currentrootid === this.RootID) {
             this.lastSeenCloudFolder = this.currentdirid;
         }
-        else if (this.currentrootid === 's4') {
+        else if (this.currentrootid === 's4' && id !== 's4') {
             let target = id;
 
             if (!('kernel' in s4 && (target = s4.utils.validateS4Url(id)))) {
@@ -535,11 +538,6 @@
                 this.filterByParent(this.currentdirid);
             }
 
-            if (id.substr(0, 9) !== 'transfers') {
-                this.labelFilterBlockUI();
-            }
-
-
             var viewmode = 0;// 0 is list view, 1 block view
             if (this.overrideViewMode !== undefined) {
                 viewmode = this.overrideViewMode;
@@ -569,13 +567,8 @@
             this.viewmode = viewmode;
 
             // Default to Thumbnail View When Media Discovery View Not Available
-            if (this.viewmode === 2) {
+            if (this.onMediaView) {
                 this.viewmode = 1;
-            }
-
-            if (is_mobile) {
-                // Ignore sort modes set in desktop until that is supported in mobile...
-                // this.overrideSortMode = this.overrideSortMode || ['name', 1];
             }
 
             if (this.overrideSortMode) {
@@ -669,8 +662,6 @@
             $('#media-section-controls, #media-tabs, #media-section-right-controls', $fmRightFilesBlock)
                 .addClass('hidden');
         }
-
-        M.initLabelFilter(this.v);
     };
 
     // ------------------------------------------------------------------------

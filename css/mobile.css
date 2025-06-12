@@ -1002,15 +1002,6 @@ ul, li {
     line-height: 18px;
     padding: 12px 0 12px 20px;
 }
-.mobile.fm-floating-header .mobile.sort-grid-item-main {
-    position: absolute;
-    right: 10px;
-    cursor: pointer;
-}
-.mobile.sort-grid-item-main i {
-    --icon-size: 24px;
-    opacity: 0.5;
-}
 .mobile.sort .context-menu-item {
     display: flex;
     align-items: center;

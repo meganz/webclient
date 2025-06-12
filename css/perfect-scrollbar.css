@@ -36,6 +36,10 @@
     margin: 2px 0;
     right: 2px;
 }
+.rtl .ps:not(.ps__rtl) > .ps__rail-y {
+    right: auto;
+    left: 2px;
+}
 .ps.ps--active-x > .ps__rail-x,
 .ps.ps--active-y > .ps__rail-y {
     background-color: var(--scroll-bar-background);

@@ -3,7 +3,7 @@ class MegaContactNode extends MegaNodeComponent {
     constructor(options) {
         super(options);
 
-        this.addClass('user');
+        this.addClass('user', 'mobile');
         this.removeClass('folder', 'file');
 
         const avatar = document.createElement('div');
@@ -17,7 +17,7 @@ class MegaContactNode extends MegaNodeComponent {
             email.className = 'email';
             email.textContent = this.node.m;
 
-            const propsNode = this.domNode.querySelector('.mobile.props');
+            const propsNode = this.domNode.querySelector('.props');
             propsNode.textContent = '';
             propsNode.appendChild(email);
         }

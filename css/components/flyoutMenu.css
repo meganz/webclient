@@ -166,6 +166,9 @@
 .flyout-body a.mega-node {
     padding-inline-start: 24px;
 }
+.flyout-body a.mega-node.fm-item:hover {
+    background: var(--mobile-surface-1);
+}
 .flyout-body a.mega-node.fm-item.folder:active {
     background: var(--mobile-surface-2);
 }

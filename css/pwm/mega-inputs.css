@@ -92,6 +92,9 @@
     border: none;
     border-radius: var(--mobile-border-radius-medium);
 }
+.pm.mega-input.highlighted .mega-input-title {
+    visibility: hidden;
+}
 
 /* Overridden component styles for webclient layout */
 .pm.mega-input .mega-banner i {

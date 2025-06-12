@@ -41,7 +41,6 @@
 .selection-status-bar .spacer:empty {
     margin: 0;
 }
-
 .selection-status-bar .selection-bar-col .sel-notif-size-total {
     display: inline-block;
     color: var(--stroke-main-inverted);

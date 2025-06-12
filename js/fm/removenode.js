@@ -63,6 +63,10 @@ function removeUInode(h, parent) {
         if (fmRightFileBlock) {
             fmRightFileBlock.classList.add('emptied');
         }
+
+        delay('removeNodeExtraToggle', () => {
+            mega.ui.secondaryNav.toggleGridExtraButtons(M.v.length === 0);
+        }, 100);
     };
 
     switch (M.currentdirid) {
@@ -190,6 +194,7 @@ function removeUInode(h, parent) {
                     }
                     else if (M.currentdirid !== 'public-links' &&
                         M.currentdirid !== 'file-requests' &&
+                        M.currentdirid !== 's4' &&
                         M.currentdirid !== mega.devices.rootId) {
 
                         // If they have removed all files from the search results screen, show empty search
@@ -277,7 +282,7 @@ async function fmremove(selectedNodes, skipDelWarning) {
     let s4Containercnt = 0;
 
     // If on mobile we will bypass the warning dialog prompts
-    skipDelWarning = skipDelWarning || is_mobile ? 1 : mega.config.get('skipDelWarning');
+    skipDelWarning = skipDelWarning ? 1 : mega.config.get('skipDelWarning');
 
     for (i = 0; i < selectedNodes.length; i++) {
         var n = M.d[selectedNodes[i]];

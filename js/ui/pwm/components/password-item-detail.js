@@ -189,7 +189,7 @@ class MegaPasswordItemDetail {
      * @param {*} [noShow] no...show?
      * @returns {Promise<*>}
      */
-    async showDetail(pH, noShow = false) {
+    async showDetail(pH, noShow = false, overrides = null) {
         this.item = M.getNodeByHandle(pH);
 
         if (!this.item) {
@@ -197,7 +197,19 @@ class MegaPasswordItemDetail {
         }
 
         let otp = null;
-        const {u, pwd, n, url, totp: otpData} = this.item.pwm;
+        let {name} = this.item;
+        let {u, pwd, n, url, totp: otpData} = this.item.pwm;
+
+        if (overrides) {
+            ({
+                u = '',
+                pwd = '',
+                n = '',
+                url = '',
+                totp: otpData = '',
+                name = ''
+            } = overrides);
+        }
 
         if (otpData) {
             otp = await this.generateOtpValue(otpData).catch(dump);
@@ -253,9 +265,9 @@ class MegaPasswordItemDetail {
         this.passwordField.isPasswordVisible = false;
         this.passwordField.setActions(this.passwordField.actions);
 
-        this.subHeaderTitle.textContent = this.item.name || url;
+        this.subHeaderTitle.textContent = name || url;
         this.subHeaderTitle.classList.add('simpletip');
-        this.subHeaderTitle.dataset.simpletip = this.item.name || url;
+        this.subHeaderTitle.dataset.simpletip = name || url;
         this.subHeaderTitle.dataset.simpletipposition = 'top';
         this.subHeaderTitle.dataset.simpletipoffset = '2';
 
@@ -264,7 +276,7 @@ class MegaPasswordItemDetail {
         const span = document.createElement('span');
         outer.append(span);
 
-        mega.ui.pm.utils.generateFavicon(this.item.name, url, outer);
+        mega.ui.pm.utils.generateFavicon(name, url, outer);
 
         // const newFavicon = mega.ui.pm.utils.generateFavicon(name, url);
         this.nameSubHeader.replaceChild(outer, this.subHeaderIcon);

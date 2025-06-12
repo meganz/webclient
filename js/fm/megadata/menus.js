@@ -870,23 +870,6 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
             finalItems.push('.new-album-item');
         }
 
-        if (M.viewmode === 1 && !M.isAlbumsPage()) {
-            finalItems.push(
-                '.sort-grid-item-main',
-                '.sort-name',
-                '.sort-type',
-                '.sort-timeAd',
-                '.sort-timeMd',
-                '.sort-size',
-                '.sort-versions'
-            );
-            if (!folderlink) {
-                finalItems.push('.sort-label');
-                if (M.currentrootid !== M.RubbishID) {
-                    finalItems.push('.sort-fav');
-                }
-            }
-        }
         if (M.currentCustomView && M.currentCustomView.type === 's4' && M.currentCustomView.subType === 'container') {
             finalItems.push('.s4-accsetting-item', '.new-bucket-item');
         }
@@ -952,7 +935,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
         // This event is context on node itself
         else {
             id = $currentTarget.attr('id');
-            currNodeClass = e.currentTarget.classList;
+            currNodeClass = $currentTarget.prop('classList');
         }
 
         if (id) {
@@ -1032,8 +1015,8 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
             $.selected = selections;
         }
         else if (currNodeClass
-            && (currNodeClass.contains('data-block-view') || currNodeClass.contains('folder'))
-            || String(id).length === 8) {
+            && (currNodeClass.contains('data-block-view') || currNodeClass.contains('folder') ||
+                currNodeClass.contains('mega-node')) || String(id).length === 8) {
 
             asyncShow = true;
             M.menuItems(e, isTree)
@@ -1054,6 +1037,16 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
                         delete items['.embedcode-item'];
                         delete items['.colour-label-items'];
                         delete items['.send-to-contact-item'];
+                        delete items['.transferit-item'];
+                        delete items['.add-sensitive-item'];
+                        delete items['.sh4r1ng-item'];
+                        delete items['.removeshare-item'];
+                        delete items['.file-request-create'];
+                        delete items['.file-request-manage'];
+                        delete items['.file-request-copy-link'];
+                        delete items['.file-request-remove'];
+                        delete items['.import-item'];
+                        delete items['.edit-file-item'];
                     }
                     else if (takedownCount) {
                         delete items['.zipdownload-item'];
@@ -1655,118 +1648,6 @@ MegaData.prototype.scrollMegaSubMenu = function(ev) {
         }
         pNode.scrollTop = py * (pNode.scrollHeight - h);
     }
-};
-
-MegaData.prototype.labelSortMenuUI = function(event, rightClick) {
-    "use strict";
-
-    var $menu = $('.colour-sorting-menu');
-    var $menuItems = $('.colour-sorting-menu .dropdown-colour-item');
-    var x = 0;
-    var y = 0;
-    var $sortMenuItems = $('.dropdown-item', $menu).removeClass('active');
-    var $selectedItem;
-    var type = this.currentLabelType;
-    var sorting = M.sortmode || {n: 'name', d: 1};
-
-    var dirClass = sorting.d > 0 ? 'icon-up' : 'icon-down';
-
-    // Close label filtering sorting menu on second Name column click
-    if ($menu.is(':visible') && !rightClick) {
-        $menu.addClass('hidden');
-        $(window).off('resize.lblsortmenu');
-        return false;
-    }
-
-    $('.colour-sorting-menu .dropdown-colour-item').removeClass('active');
-    if (M.filterLabel[type]) {
-        for (var key in M.filterLabel[type]) {
-            if (key) {
-                $menuItems.filter('[data-label-id=' + key + ']').addClass('active');
-            }
-        }
-    }
-
-    $selectedItem = $sortMenuItems
-        .filter('*[data-by=' + sorting.n + ']')
-        .addClass('active');
-
-    const headerNode = event.target;
-    let xRelativeOffset  = false;
-    let yRelativeOffset = false;
-    var tmpFn = function() {
-        const { top, left, width, height } = headerNode.getBoundingClientRect();
-        const { offsetX, offsetY } = event;
-        if (xRelativeOffset === false) {
-            xRelativeOffset = offsetX / width;
-            yRelativeOffset = offsetY / height;
-        }
-
-        let xAbsoluteOffset = xRelativeOffset * width + left;
-        const yAbsoluteOffset = yRelativeOffset * height + top;
-
-        if (document.body.classList.contains('rtl')) {
-            const { width } = $menu[0].getBoundingClientRect();
-            xAbsoluteOffset -= width;
-        }
-        $menu.css('left', `${xAbsoluteOffset}px`);
-        $menu.css('top', `${yAbsoluteOffset}px`);
-    };
-
-    $.hideTopMenu();
-    $.hideContextMenu();
-    $menu.removeClass('hidden');
-
-    if (rightClick) {// FM right mouse click on node
-        M.adjustContextMenuPosition(event, $menu);
-    }
-    else {
-        tmpFn();
-        $(window).rebind('resize.lblsortmenu', tmpFn);
-    }
-
-    $('.colour-sorting-menu').off('click', '.dropdown-item');
-    $('.colour-sorting-menu').on('click', '.dropdown-item', function() {
-        // dont to any if it is static
-        if ($(this).hasClass('static')){
-            return false;
-        }
-
-        if (d){
-            console.log('fm sorting start');
-        }
-
-        var data = $(this).data();
-        var dir = 1;
-
-        if ($(this).hasClass('active')) {// Change sort direction
-            dir = sorting.d * -1;
-        }
-
-        $('.colour-sorting-menu').addClass('hidden');
-
-        var lbl = function(el) {
-            return el.lbl;
-        };
-        if (data.by === 'label' && !M.v.some(lbl)) {
-            return false;
-        }
-
-        M.doSort(data.by, dir);
-        M.renderMain();
-        M.fmEventLog(data.by);
-
-        return false;
-    });
-
-    return false;
-};
-
-MegaData.prototype.resetLabelSortMenuUI = function() {
-    "use strict";
-
-    $('.colour-sorting-menu .dropdown-item').removeClass('active asc desc');
-    return false;
 };
 
 MegaData.prototype.getSelectedRemoveLabel = (handlesArr) => {

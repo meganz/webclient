@@ -2012,8 +2012,9 @@ function fm_tfsupdate() {
         }
         else if (M.pendingTransfers) {
             // Move completed transfers to the bottom
-            while (completedLen--) {
-                parent.appendChild(domCompleted[completedLen]);
+            let i = 0;
+            while (i < completedLen) {
+                parent.appendChild(domCompleted[i++]);
             }
         }
     }

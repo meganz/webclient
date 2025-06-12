@@ -196,3 +196,10 @@
 .overlay-wrap.modal-dialog .main a {
     color: var(--mobile-link-primary);
 }
+
+.overlay-wrap.pm-overlay.tutorial-overlay .pm.mega-input .account.password-status.checked {
+    display: none;
+}
+.overlay-wrap.pm-overlay.tutorial-overlay .pm.mega-input.strengthChecker.title-ontop.checked {
+    margin-bottom: 30px;
+}

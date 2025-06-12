@@ -77,6 +77,8 @@ class SelectionManager2Base {
         this.eventHandlers.onSelectedUpdated(this.selected_list);
         delete this.shiftFirst;
 
+        mega.ui.mInfoPanel.eventuallyUpdateSelected();
+
         return res;
     }
 
@@ -544,7 +546,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
 
     get items_per_row() {
         return Math.floor(
-            $('.data-block-view:visible').parent().outerWidth() / $('.data-block-view:visible:first').outerWidth(true)
+            $('.mega-node:visible').parent().outerWidth() / $('.mega-node:visible:first').outerWidth(true)
         );
     }
 
@@ -856,8 +858,9 @@ class SelectionManager2_DOM extends SelectionManager2Base {
 
         var container = this._get_selectable_container().get(0);
         var nodeList = container && container.querySelectorAll('.megaListItem') || false;
-        const currentNode = M.d[this.currentdirid]
-            || M.currentrootid === 's4' && M.d[this.currentdirid.split('/').pop()];
+        const currentNode = M.d[this.currentdirid] || M.search
+            || ['shares', 'out-shares', 'public-links', 'file-requests', 'faves'].includes(M.currentrootid)
+            || M.currentrootid === 's4' && M.d[this.currentdirid.split('/').pop()] || folderlink;
 
         if (nodeList.length) {
             for (var i = nodeList.length; i--;) {
@@ -917,12 +920,9 @@ class SelectionManager2_DOM extends SelectionManager2Base {
 
             this.showSelectionBar(
                 mega.icu.format(l.selected_count, itemsNum),
-                bytesToSize(this.selected_totalSize || 0)
+                bytesToSize(this.selected_totalSize || 0),
+                scrollTo
             );
-
-            if (scrollTo) {
-                this.scrollToElementProxyMethod(this.last_selected);
-            }
         }
     }
 
@@ -958,7 +958,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
      * @param {string} itemsTotalSize Formatted string of the selected item total size
      * @returns {void} void
      */
-    showSelectionBar(itemSelected, itemsTotalSize) {
+    showSelectionBar(itemSelected, itemsTotalSize, scrollTo = true) {
         if (this.currentdirid.substr(0, 7) === 'search/') {
             M.renderSearchBreadcrumbs();
         }
@@ -972,15 +972,17 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             selCountElm.textContent = itemSelected;
         }
         if (selSizeElm) {
-            selSizeElm.textContent = isMegaList ? itemsTotalSize : '';
+            selSizeElm.textContent = isMegaList && !mega.lite.inLiteMode ? itemsTotalSize : '';
         }
         if (spacerElm) {
-            spacerElm.textContent = isMegaList ? '\u00B7' : '';
+            spacerElm.textContent = isMegaList && !mega.lite.inLiteMode ? '\u00B7' : '';
         }
 
         mega.ui.secondaryNav.showSelectionBar();
         this.updateScrollBar();
-        this.scrollToElementProxyMethod(this.last_selected);
+        if (scrollTo) {
+            this.scrollToElementProxyMethod(this.last_selected);
+        }
 
 
         this.showRequiredLinks();
@@ -1151,6 +1153,15 @@ class SelectionManager2_DOM extends SelectionManager2Base {
                 }
             }
 
+            let mkfound;
+
+            for (let i = 0; i < $.selected.length; i++) {
+                if (missingkeys[$.selected[i]]) {
+                    mkfound = true;
+                    break;
+                }
+            }
+
             if ((sourceRoot === M.RootID || sourceRoot === 's4' || sourceRoot === 'out-shares' ||
                 M.isDynPage(sourceRoot) || sourceRoot === mega.devices.rootId) && !folderlink) {
 
@@ -1164,7 +1175,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
                 }
 
                 // If any of selected items is taken down we do not need to proceed futher
-                if (cl.isTakenDown($.selected)) {
+                if (cl.isTakenDown($.selected) || mkfound) {
                     if (!restrictedFolders) {
                         __showBtn('delete');
                     }
@@ -1187,12 +1198,12 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             }
 
             // Temporarily hide download button for now in MEGA Lite mode (still accessible via zip in context menu)
-            if (selNode.h !== M.RootID && M.getNodeRoot(M.currentdirid) !== M.RubbishID &&
+            if (selNode.h !== M.RootID && M.getNodeRoot(M.currentdirid) !== M.RubbishID && !mkfound &&
                 (!mega.lite.inLiteMode || !mega.lite.containsFolderInSelection($.selected))) {
                 __showBtn('download');
             }
 
-            if (showGetLink || folderlink) {
+            if ((showGetLink || folderlink) && !mkfound) {
                 __showBtn('link');
             }
 

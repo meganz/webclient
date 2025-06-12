@@ -662,7 +662,11 @@ lazy(mega.ui, 'mInfoPanel', () => {
             let mime = '';
             let count = 1;
             if (!hide && this.handles.length === 1) {
-                if (activeStats.deviceFolders[this.node.h]) {
+
+                if (activeStats.takedownCount === 1) {
+                    mime = 'item-type-icon-90 icon-takedown-90';
+                }
+                else if (activeStats.deviceFolders[this.node.h]) {
                     const folder = activeStats.deviceFolders[this.node.h];
                     const icon = fileIcon(folder);
                     mime = M.dcd[folder.h] ? `sprite-fm-theme icon-${icon}-filled` :

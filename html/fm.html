@@ -12,46 +12,6 @@
 <div class="fm-context-menu hidden"></div>
 <div class="dropdown body files-menu context hidden">
     <div class="dropdown-section">
-        <!--<a class="dropdown-item notactive visible-col-select" megatype="fname">
-            <i class="small-icon"></i>[$86]</a>-->
-        <a class="dropdown-item visible-col-select" megatype="type">
-            <i class="sprite-fm-mono icon-add"></i>
-            <span>[$93]</span>
-        </a>
-        <a class="dropdown-item visible-col-select" megatype="timeAd">
-            <i class="sprite-fm-mono icon-add"></i>
-            <span>[$17445]</span>
-        </a>
-        <a class="dropdown-item visible-col-select" megatype="timeMd">
-            <i class="sprite-fm-mono icon-add"></i>
-            <span>[$94]</span>
-        </a>
-        <a class="dropdown-item visible-col-select" megatype="size">
-            <i class="sprite-fm-mono icon-add"></i>
-            <span>[$87]</span>
-        </a>
-        <a class="dropdown-item visible-col-select" megatype="fav">
-            <i class="sprite-fm-mono icon-add"></i>
-            <span>[$5871]</span>
-        </a>
-        <a class="dropdown-item visible-col-select" megatype="versions">
-            <i class="sprite-fm-mono icon-add"></i>
-            <span>[$17150]</span>
-        </a>
-        <a class="dropdown-item visible-col-select" megatype="playtime">
-            <i class="sprite-fm-mono icon-add"></i>
-            <span>[$duration]</span>
-        </a>
-        <a class="dropdown-item visible-col-select" megatype="label">
-            <i class="sprite-fm-mono icon-add"></i>
-            <span>[$17398]</span>
-        </a>
-        <a class="dropdown-item visible-col-select" megatype="accessCtrl">
-            <i class="sprite-fm-mono icon-add"></i>
-            <span>[$s4_public_url]</span>
-        </a>
-    </div>
-    <div class="dropdown-section">
        <a class="dropdown-item view-in-bc-item">
             <i class="sprite-fm-mono icon-search-cloud"></i>
             <span>[$view_in_dc]</span>
@@ -617,9 +577,6 @@
                 </div>
             </div>
             <div class="fm-banner-holder">
-                <div class="s4-info-header-blocks hidden">
-                    <div class="fm-notification-block bucket-access-warning"></div>
-                </div>
                 <div class="fm-notification-block mega-lite-mode-warning">
                     <i class="notification-block-icon sprite-fm-mono icon-lock"></i>
                     <span>[$in_mega_lite_mode_banner]</span>
@@ -632,9 +589,7 @@
                     <i class="notification-block-icon sprite-fm-mono icon-offline"></i>
                     <span>[$22667]</span>
                 </div>
-                <div class="fm-notification-block expired-business">
-
-                </div>
+                <div class="fm-notification-block expired-business"></div>
                 <div class="fm-notification-block almost-full">
                     <i class="notification-block-icon sprite-fm-mono icon-offline"></i>
                     <span>[$16316]</span>
@@ -667,6 +622,9 @@
                 <div class="fm-notification-block device-centre">
                     <i class="notification-block-icon sprite-fm-mono icon-offline"></i>
                     <span></span>
+                </div>
+                <div class="s4-info-header-blocks hidden">
+                    <div class="fm-notification-block bucket-access-warning"></div>
                 </div>
             </div>
             <div class="onboarding-control-panel hidden">
@@ -864,7 +822,6 @@
                         <i class="sprite-fm-mono icon-close-component small-cross"></i>
                     </div>
                 </div>
-
                 <div class="fm-header-chips-and-view-buttons">
                     <div class="fm-filter-chips-wrapper hidden">
                         <i class="sprite-fm-mono icon-check selected-mark selected-mark-template hidden"></i>
@@ -1023,6 +980,10 @@
                                 </button>
                             </div>
                         </div>
+                    </div>
+
+                    <div class="fm-header-grid-extra">
+                        <i class="sprite-fm-mono icon-check sprite-fm-mono-after icon-minimise-after select-all-checkbox"></i>
                     </div>
                 </div>
             </div>
@@ -1376,56 +1337,57 @@
             </div>
             <div class="files-grid-view fm hidden">
                 <div class="column-settings overlap">
-                    <i class="sprite-fm-theme icon-settings"></i>
+                    <i class="sprite-fm-mono icon-column simpletip" data-simpletipposition="top" data-simpletip="[$column_selection_title]"></i>
                 </div>
                 <div class="grid-scrolling-table megaListContainer">
                     <div class="grid-wrapper">
                         <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table table-hover fm">
                             <thead>
                                 <tr>
-                                    <th></th>
-                                    <th megatype="fav" class="grid-first-th">
-                                        <span class="grid-header-star fav"><i
-                                                class="sprite-fm-mono icon-favourite-filled"></i></span>
+                                    <th>
+                                        <i class="sprite-fm-mono icon-check sprite-fm-mono-after icon-minimise-after select-all-checkbox"></i>
                                     </th>
                                     <th megatype="fname">
-                                        <div class="arrow name label asc sprite-fm-mono icon-dropdown">[$86]</div>
+                                        <div class="arrow name asc sprite-fm-mono icon-arrow-left-thin-solid">[$86]</div>
                                         <div class="grid-view-resize">&nbsp;</div>
+                                    </th>
+                                    <th megatype="fav" class="grid-first-th">
+                                        <span class="grid-header-star fav"></span>
                                     </th>
                                     <th megatype="label">
-                                        <div class="arrow label sprite-fm-mono icon-dropdown">[$17398]</div>
-                                        <div class="grid-view-resize">&nbsp;</div>
-                                    </th>
-                                    <th megatype="size">
-                                        <div class="arrow size sprite-fm-mono icon-dropdown">[$87]</div>
-                                        <div class="grid-view-resize">&nbsp;</div>
-                                    </th>
-                                    <th megatype="type">
-                                        <div class="arrow type sprite-fm-mono icon-dropdown">[$93]</div>
-                                        <div class="grid-view-resize">&nbsp;</div>
-                                    </th>
-                                    <th megatype="accessCtrl">
-                                        <div class="arrow accessCtrl sprite-fm-mono icon-dropdown">[$s4_public_url]</div>
+                                        <div class="arrow label sprite-fm-mono icon-arrow-left-thin-solid">[$17398]</div>
                                         <div class="grid-view-resize">&nbsp;</div>
                                     </th>
                                     <th megatype="timeAd">
-                                        <div class="arrow date sprite-fm-mono icon-dropdown">[$17445]</div>
+                                        <div class="arrow date sprite-fm-mono icon-arrow-left-thin-solid">[$17445]</div>
                                         <div class="grid-view-resize">&nbsp;</div>
                                     </th>
                                     <th megatype="timeMd">
-                                        <div class="arrow mtime sprite-fm-mono icon-dropdown">[$94]</div>
+                                        <div class="arrow mtime sprite-fm-mono icon-arrow-left-thin-solid">[$94]</div>
+                                        <div class="grid-view-resize">&nbsp;</div>
+                                    </th>
+                                    <th megatype="type">
+                                        <div class="arrow type sprite-fm-mono icon-arrow-left-thin-solid">[$93]</div>
+                                        <div class="grid-view-resize">&nbsp;</div>
+                                    </th>
+                                    <th megatype="accessCtrl">
+                                        <div class="arrow accessCtrl sprite-fm-mono icon-arrow-left-thin-solid">[$s4_public_url]</div>
+                                        <div class="grid-view-resize">&nbsp;</div>
+                                    </th>
+                                    <th megatype="size">
+                                        <div class="arrow size sprite-fm-mono icon-arrow-left-thin-solid">[$87]</div>
                                         <div class="grid-view-resize">&nbsp;</div>
                                     </th>
                                     <th megatype="versions">
-                                        <div class="arrow versions sprite-fm-mono icon-dropdown">[$17150]</div>
+                                        <div class="arrow versions sprite-fm-mono icon-arrow-left-thin-solid">[$17150]</div>
                                         <div class="grid-view-resize">&nbsp;</div>
                                     </th>
                                     <th megatype="playtime">
-                                        <div class="arrow playtime sprite-fm-mono icon-dropdown">[$duration]</div>
+                                        <div class="arrow playtime sprite-fm-mono icon-arrow-left-thin-solid">[$duration]</div>
                                         <div class="grid-view-resize">&nbsp;</div>
                                     </th>
                                     <th megatype="fileLoc">
-                                        <div class="arrow fileLoc sprite-fm-mono icon-dropdown">[$file_location_label]</div>
+                                        <div class="arrow fileLoc sprite-fm-mono icon-arrow-left-thin-solid">[$file_location_label]</div>
                                         <div class="grid-view-resize">&nbsp;</div>
                                     </th>
                                     <!--<th megatype="extras">
@@ -1437,11 +1399,10 @@
                                 </tr>
                             </thead>
                             <tr class="clone-of-header">
-                                <th class="grid-first-th">
-                                    <span class="grid-header-star fav"><i
-                                            class="sprite-fm-mono icon-favourite-filled"></i></span>
-                                </th>
                                 <th></th>
+                                <th class="grid-first-th">
+                                    <span class="grid-header-star fav"></span>
+                                </th>
                                 <th></th>
                                 <th></th>
                                 <th></th>
@@ -2093,21 +2054,27 @@
                             class="grid-table shared-with-me table-hover">
                             <thead>
                                 <tr>
-                                    <th></th>
-                                    <th class="full-width-col" data-minwidth="250">
-                                        <div class="arrow name label desc sprite-fm-mono icon-dropdown">[$86]</div>
+                                    <th>
+                                        <i class="sprite-fm-mono icon-check sprite-fm-mono-after icon-minimise-after select-all-checkbox"></i>
+                                    </th>
+                                    <th class="full-width-col" data-minwidth="250" megatype="fname">
+                                        <div class="arrow name desc sprite-fm-mono icon-arrow-left-thin-solid">[$86]</div>
+                                        <div class="grid-view-resize">&nbsp;</div>
+                                    </th>
+                                    <th width="98" data-minwidth="98">
+                                        <div class="arrow label sprite-fm-mono icon-arrow-left-thin-solid">[$17398]</div>
                                         <div class="grid-view-resize">&nbsp;</div>
                                     </th>
                                     <th width="258" data-minwidth="180">
-                                        <div class="arrow owner sprite-fm-mono icon-dropdown">[$5905]</div>
+                                        <div class="arrow owner sprite-fm-mono icon-arrow-left-thin-solid">[$5905]</div>
                                         <div class="grid-view-resize">&nbsp;</div>
                                     </th>
-                                    <th width="118" data-minwidth="75">
-                                        <div class="arrow size sprite-fm-mono icon-dropdown">[$87]</div>
+                                    <th width="118" data-minwidth="75" class="size-col">
+                                        <div class="arrow size sprite-fm-mono icon-arrow-left-thin-solid">[$87]</div>
                                         <div class="grid-view-resize">&nbsp;</div>
                                     </th>
                                     <th width="218" data-minwidth="165">
-                                        <div class="arrow access sprite-fm-mono icon-dropdown">[$5906]</div>
+                                        <div class="arrow access sprite-fm-mono icon-arrow-left-thin-solid">[$5906]</div>
                                         <div class="grid-view-resize">&nbsp;</div>
                                     </th>
                                     <th class="grid-url-header-nw" width="60"></th>
@@ -2119,37 +2086,41 @@
                     </div>
                 </div>
             </div>
-
             <div class="shared-blocks-view hidden">
                 <div class="shared-blocks-scrolling">
                 </div>
                 <div class="blocks-view-data"></div>
             </div>
-
             <div class="out-shared-grid-view hidden">
                 <div class="grid-scrolling-table">
                     <div class="grid-wrapper">
                         <table width="50%" border="0" cellspacing="0" cellpadding="0" class="grid-table out-shares table-hover">
                             <thead>
                                 <tr>
-                                    <th width="45">
-                                        <span class="grid-header-star fav"><i
-                                                class="sprite-fm-mono icon-favourite-filled"></i></span>
+                                    <th>
+                                        <i class="sprite-fm-mono icon-check sprite-fm-mono-after icon-minimise-after select-all-checkbox"></i>
                                     </th>
-                                    <th class="full-width-col" data-minwidth="250">
-                                        <div class="arrow name label desc sprite-fm-mono icon-dropdown">[$86]</div>
+                                    <th class="full-width-col" data-minwidth="250" megatype="fname">
+                                        <div class="arrow name desc sprite-fm-mono icon-arrow-left-thin-solid">[$86]</div>
+                                        <div class="grid-view-resize">&nbsp;</div>
+                                    </th>
+                                    <th width="45" class="no-pointer">
+                                        <span class="grid-header-star fav"></span>
+                                    </th>
+                                    <th width="98" data-minwidth="98">
+                                        <div class="arrow label sprite-fm-mono icon-arrow-left-thin-solid">[$17398]</div>
                                         <div class="grid-view-resize">&nbsp;</div>
                                     </th>
                                     <th width="258" data-minwidth="180">
-                                        <div class="arrow sharedwith sprite-fm-mono icon-dropdown">[$1036]</div>
+                                        <div class="arrow sharedwith sprite-fm-mono icon-arrow-left-thin-solid">[$1036]</div>
                                         <div class="grid-view-resize">&nbsp;</div>
                                     </th>
-                                    <th width="118" data-minwidth="75">
-                                        <div class="arrow size sprite-fm-mono icon-dropdown">[$87]</div>
+                                    <th width="118" data-minwidth="75" class="size-col">
+                                        <div class="arrow size sprite-fm-mono icon-arrow-left-thin-solid">[$87]</div>
                                         <div class="grid-view-resize">&nbsp;</div>
                                     </th>
                                     <th width="218" data-minwidth="165">
-                                        <div class="arrow date sprite-fm-mono icon-dropdown">[$20670]</div>
+                                        <div class="arrow date sprite-fm-mono icon-arrow-left-thin-solid">[$20670]</div>
                                         <div class="grid-view-resize">&nbsp;</div>
                                     </th>
                                     <th class="grid-url-header-nw" width="60"></th>
@@ -2161,13 +2132,11 @@
                     </div>
                 </div>
             </div>
-
             <div class="out-shared-blocks-view hidden">
                 <div class="out-shared-blocks-scrolling">
                 </div>
                 <div class="blocks-view-data"></div>
             </div>
-
             <div class="gallery-view hidden" id="gallery-view">
                 <div class="gallery-view-scrolling"></div>
 
@@ -2197,15 +2166,15 @@
                                 <tr>
                                     <th></th>
                                     <th megatype="fname" class="full-width-col" data-minwidth="250">
-                                        <div class="arrow name label desc sprite-fm-mono icon-dropdown">[$86]</div>
+                                        <div class="arrow name desc sprite-fm-mono icon-arrow-left-thin-solid">[$86]</div>
                                         <div class="grid-view-resize">&nbsp;</div>
                                     </th>
                                     <th megatype="numFolders" width="258" data-minwidth="180">
-                                        <div class="arrow numFolders sprite-fm-mono icon-dropdown">[$device_centre_contain]</div>
+                                        <div class="arrow numFolders sprite-fm-mono icon-arrow-left-thin-solid">[$device_centre_contain]</div>
                                         <div class="grid-view-resize">&nbsp;</div>
                                     </th>
                                     <th megatype="size" width="118" data-minwidth="75">
-                                        <div class="arrow size sprite-fm-mono icon-dropdown">[$87]</div>
+                                        <div class="arrow size sprite-fm-mono icon-arrow-left-thin-solid">[$87]</div>
                                         <div class="grid-view-resize">&nbsp;</div>
                                     </th>
                                     <th class="grid-url-header-nw" width="60"></th>
@@ -2223,26 +2192,26 @@
                                 <tr>
                                     <th></th>
                                     <th megatype="fname" class="full-width-col" data-minwidth="250">
-                                        <div class="arrow name label desc sprite-fm-mono icon-dropdown">[$86]</div>
+                                        <div class="arrow name desc sprite-fm-mono icon-arrow-left-thin-solid">[$86]</div>
                                         <div class="grid-view-resize">&nbsp;</div>
                                     </th>
                                     <th megatype="type" width="258" data-minwidth="180">
-                                        <div class="arrow type sprite-fm-mono icon-dropdown">[$93]</div>
+                                        <div class="arrow type sprite-fm-mono icon-arrow-left-thin-solid">[$93]</div>
                                         <div class="grid-view-resize">&nbsp;</div>
                                     </th>
                                     <th megatype="size" width="118" data-minwidth="75">
-                                        <div class="arrow size sprite-fm-mono icon-dropdown">[$87]</div>
+                                        <div class="arrow size sprite-fm-mono icon-arrow-left-thin-solid">[$87]</div>
                                         <div class="grid-view-resize">&nbsp;</div>
                                     </th>
                                     <th megatype="timeAd" width="118" data-minwidth="75">
-                                        <div class="arrow date sprite-fm-mono icon-dropdown">[$17445]</div>
+                                        <div class="arrow date sprite-fm-mono icon-arrow-left-thin-solid">[$17445]</div>
                                         <div class="grid-view-resize">&nbsp;</div>
                                     </th>
                                     <th megatype="hbtime" width="118" data-minwidth="75">
-                                        <div class="arrow hbtime sprite-fm-mono icon-dropdown">[$last_updated_label]</div>
+                                        <div class="arrow hbtime sprite-fm-mono icon-arrow-left-thin-solid">[$last_updated_label]</div>
                                         <div class="grid-view-resize">&nbsp;</div>
                                     </th>
-                                    <th class="grid-url-header-nw" width="60"></th>
+                                    <th class="grid-url-header-nw" width="93"></th>
                                     <th class="grid-empty-spacer"></th>
                                 </tr>
                             </thead>
@@ -2266,11 +2235,11 @@
                         <thead>
                             <tr>
                                 <th s4sort="n" class="key-name">
-                                    <div class="arrow sprite-fm-mono icon-dropdown">[$86]</div>
+                                    <div class="arrow sprite-fm-mono icon-arrow-left-thin-solid">[$86]</div>
                                     <div class="grid-view-resize">&nbsp;</div>
                                 </th>
                                 <th s4sort="ak" class="access-key">
-                                    <div class="arrow sprite-fm-mono icon-dropdown">[$s4_key_access_title]</div>
+                                    <div class="arrow sprite-fm-mono icon-arrow-left-thin-solid">[$s4_key_access_title]</div>
                                     <div class="grid-view-resize">&nbsp;</div>
                                 </th>
                                 <th class="secret-key no-sortable">
@@ -2278,7 +2247,7 @@
                                     <div class="grid-view-resize">&nbsp;</div>
                                 </th>
                                 <th s4sort="en" class="status">
-                                    <div class="arrow sprite-fm-mono icon-dropdown">[$89]</div>
+                                    <div class="arrow sprite-fm-mono icon-arrow-left-thin-solid">[$89]</div>
                                     <div class="grid-view-resize">&nbsp;</div>
                                 </th>
                             </tr>
@@ -2292,15 +2261,15 @@
                         <thead>
                             <tr>
                                 <th s4sort="policyName" class="policy-name">
-                                    <div class="arrow sprite-fm-mono icon-dropdown">[$86]</div>
+                                    <div class="arrow sprite-fm-mono icon-arrow-left-thin-solid">[$86]</div>
                                     <div class="grid-view-resize">&nbsp;</div>
                                 </th>
                                 <th s4sort="attachmentCount" class="policy-attach">
-                                    <div class="arrow sprite-fm-mono icon-dropdown">[$s4_policy_arn_assigned_num]</div>
+                                    <div class="arrow sprite-fm-mono icon-arrow-left-thin-solid">[$s4_policy_arn_assigned_num]</div>
                                     <div class="grid-view-resize">&nbsp;</div>
                                 </th>
                                 <th s4sort="arn" class="policy-arn">
-                                    <div class="arrow sprite-fm-mono icon-dropdown">[$s4_policy_arn]</div>
+                                    <div class="arrow sprite-fm-mono icon-arrow-left-thin-solid">[$s4_policy_arn]</div>
                                     <div class="grid-view-resize">&nbsp;</div>
                                 </th>
                             </tr>
@@ -2314,15 +2283,15 @@
                         <thead>
                             <tr>
                                 <th s4sort="name" class="s4-user-name">
-                                    <div class="arrow sprite-fm-mono icon-dropdown">[$86]</div>
+                                    <div class="arrow sprite-fm-mono icon-arrow-left-thin-solid">[$86]</div>
                                     <div class="grid-view-resize">&nbsp;</div>
                                 </th>
                                 <th class="s4-groups no-sortable">
-                                    <div class="arrow sprite-fm-mono icon-dropdown">[$s4_groups]</div>
+                                    <div class="arrow sprite-fm-mono icon-arrow-left-thin-solid">[$s4_groups]</div>
                                     <div class="grid-view-resize">&nbsp;</div>
                                 </th>
                                 <th class="s4-user-arn no-sortable">
-                                    <div class="arrow sprite-fm-mono icon-dropdown">[$s4_policy_arn]</div>
+                                    <div class="arrow sprite-fm-mono icon-arrow-left-thin-solid">[$s4_policy_arn]</div>
                                     <div class="grid-view-resize">&nbsp;</div>
                                 </th>
                             </tr>
@@ -2336,19 +2305,19 @@
                         <thead>
                             <tr>
                                 <th s4sort="name" class="s4-group-name">
-                                    <div class="arrow sprite-fm-mono icon-dropdown">[$86]</div>
+                                    <div class="arrow sprite-fm-mono icon-arrow-left-thin-solid">[$86]</div>
                                     <div class="grid-view-resize">&nbsp;</div>
                                 </th>
                                 <th class="s4-user-amount no-sortable">
-                                    <div class="arrow sprite-fm-mono icon-dropdown">[$19087]</div>
+                                    <div class="arrow sprite-fm-mono icon-arrow-left-thin-solid">[$19087]</div>
                                     <div class="grid-view-resize">&nbsp;</div>
                                 </th>
                                 <th class="s4-att-policies no-sortable">
-                                    <div class="arrow sprite-fm-mono icon-dropdown">[$s4_assigned_policies]</div>
+                                    <div class="arrow sprite-fm-mono icon-arrow-left-thin-solid">[$s4_assigned_policies]</div>
                                     <div class="grid-view-resize">&nbsp;</div>
                                 </th>
                                 <th class="s4-group-arn no-sortable">
-                                    <div class="arrow sprite-fm-mono icon-dropdown">[$s4_policy_arn]</div>
+                                    <div class="arrow sprite-fm-mono icon-arrow-left-thin-solid">[$s4_policy_arn]</div>
                                     <div class="grid-view-resize">&nbsp;</div>
                                 </th>
                             </tr>
@@ -2412,7 +2381,7 @@
                                 <thead>
                                     <tr>
                                         <th s4sort="name" class="s4-group-name">
-                                            <div class="arrow sprite-fm-mono icon-dropdown">[$86]</div>
+                                            <div class="arrow sprite-fm-mono icon-arrow-left-thin-solid">[$86]</div>
                                             <div class="grid-view-resize">&nbsp;</div>
                                         </th>
                                         <th class="actions-btn no-sortable">
@@ -2440,7 +2409,7 @@
                                 <thead>
                                     <tr>
                                         <th s4sort="name" class="s4-user-name">
-                                            <div class="arrow sprite-fm-mono icon-dropdown">[$86]</div>
+                                            <div class="arrow sprite-fm-mono icon-arrow-left-thin-solid">[$86]</div>
                                             <div class="grid-view-resize">&nbsp;</div>
                                         </th>
                                         <th class="actions-btn no-sortable">
@@ -3395,24 +3364,26 @@
                         <div class="transfer-progress-txt">[$20808]</div>
                     </div>
                 </div>
-                <button class="mega-button action transfer-clear-all-icon right disabled">
-                    <div>
-                        <i class="sprite-fm-mono icon-close-component"></i>
-                    </div>
-                    <span class="red">[$6991]</span>
-                </button>
-                <button class="mega-button action transfer-clear-completed right disabled">
-                    <div>
-                        <i class="sprite-fm-mono icon-clear-transfer"></i>
-                    </div>
-                    <span>[$clear_completed_transfers]</span>
-                </button>
-                <button class="mega-button action transfer-pause-icon right disabled">
-                    <div>
-                        <i class="sprite-fm-mono icon-pause"></i>
-                    </div>
-                    <span>[$6993]</span>
-                </button>
+                <div class="transfer-panel-actions">
+                    <button class="mega-button action transfer-clear-all-icon right disabled">
+                        <div>
+                            <i class="sprite-fm-mono icon-close-component"></i>
+                        </div>
+                        <span class="red">[$6991]</span>
+                    </button>
+                    <button class="mega-button action transfer-clear-completed right disabled">
+                        <div>
+                            <i class="sprite-fm-mono icon-clear-transfer"></i>
+                        </div>
+                        <span>[$clear_completed_transfers]</span>
+                    </button>
+                    <button class="mega-button action transfer-pause-icon right disabled">
+                        <div>
+                            <i class="sprite-fm-mono icon-pause"></i>
+                        </div>
+                        <span>[$6993]</span>
+                    </button>
+                </div>
                 <div class="clear"></div>
             </div>
             <div class="transfer-table-wrapper">
@@ -3430,7 +3401,7 @@
                                 <tr>
                                     <th width="60"></th>
                                     <th>[$86]</th>
-                                    <th width="288">[$93]</th>
+                                    <th width="192">[$93]</th>
                                     <th width="96">[$87]</th>
                                     <th width="96">[$19134]</th>
                                     <th width="192">[$12441]</th>

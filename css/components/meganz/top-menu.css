@@ -113,6 +113,10 @@
 .mega-top-menu button {
     cursor: pointer;
 }
+.mega-top-menu .menu .nav-elem.full-width {
+    min-width: 100%;
+    width: auto;
+}
 .mega-top-menu .menu .nav-elem.full-width::after,
 .mega-top-menu .nw-fm-tree-item .nw-fm-tree-iconwrap {
     content: '';
@@ -126,19 +130,30 @@
     padding-inline-end: 4px;
     height: 24px;
 }
+.mega-top-menu .menu .nav-elem.full-width::after {
+    position: absolute;
+    right: 0;
+}
+.mega-top-menu .menu .nav-elem.full-width:hover::after,
+.mega-top-menu .nw-fm-tree-item:hover .nw-fm-tree-iconwrap {
+    background: var(--surface-tree-iconwrap-hover);
+}
+.mega-top-menu .menu .nav-elem.full-width:active::after,
+.mega-top-menu .nw-fm-tree-item .nw-fm-tree-iconwrap:active {
+    background: var(--surface-tree-iconwrap);
+}
 .mega-top-menu .menu .nav-elem.active.full-width::after,
 .mega-top-menu .nw-fm-tree-item.selected .nw-fm-tree-iconwrap {
     background: var(--surface-tree-iconwrap-active);
-}
-.mega-top-menu .menu .nav-elem.full-width:not(.active):hover::after,
-.mega-top-menu .nw-fm-tree-item:not(.selected):hover .nw-fm-tree-iconwrap {
-    background: var(--surface-tree-iconwrap-hover);
 }
 .rtl .mega-top-menu .menu .nav-elem.full-width::after,
 .rtl .mega-top-menu .nw-fm-tree-item .nw-fm-tree-iconwrap {
     left: -1px;
     right: auto;
     background: var(--surface-tree-iconwrap-rtl);
+}
+.rtl .mega-top-menu .menu .nav-elem.full-width::after {
+    left: 0;
 }
 .rtl .mega-top-menu .menu .nav-elem.active.full-width::after,
 .rtl .mega-top-menu .nw-fm-tree-item.selected .nw-fm-tree-iconwrap {

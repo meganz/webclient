@@ -296,8 +296,8 @@ FileManager.prototype.initS4FileManager = mutex('s4-object-storage.lock', functi
             }
         })
         .then(resolve)
-        .catch(reject)
-        .finally(() => mBroadcaster.sendMessage('fm:s4InitDone'));
+        .then(() => mBroadcaster.sendMessage('s4-init(C)'))
+        .catch(reject);
 });
 
 /**
@@ -334,6 +334,7 @@ FileManager.prototype.initFileManager = async function() {
                     if (self.d) {
                         console.error('Failed to initialize S4 (?!)', [ex]);
                     }
+                    document.querySelector('.js-s4-tree-panel').classList.add('hidden');
                     onIdle(() => this.openFolder('fm'));
                 });
             }

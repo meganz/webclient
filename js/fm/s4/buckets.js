@@ -31,6 +31,9 @@ lazy(s4, 'buckets', () => {
 
         bindEvents() {
             this.megaInput.$input.rebind('input.s4dlg keydown.s4dlg', (e) => {
+                if (this.progress) {
+                    return;
+                }
 
                 this.megaInput.hideError();
                 if (e.currentTarget.value) {
@@ -65,7 +68,8 @@ lazy(s4, 'buckets', () => {
                 if (errorMsg) {
                     return this.megaInput.showError(errorMsg);
                 }
-                mLoadingSpinner.show('s4-create-bucket');
+                mLoadingSpinner.show('s4-loading-toast', l.s4_creating_bucket);
+                this.$dialogProgress.addClass('disabled');
                 this.progress = true;
                 Promise.resolve(M.d[this.containerId] || dbfetch.get(this.containerId))
                     .then(() => s4.kernel.bucket.create(this.containerId, name))
@@ -78,9 +82,10 @@ lazy(s4, 'buckets', () => {
                     })
                     .catch(tell)
                     .finally(() => {
-                        this.hide();
-                        mLoadingSpinner.hide('s4-create-bucket');
-                        delete this.progress;
+                        if (this.progress) {
+                            mLoadingSpinner.hide('s4-loading-toast');
+                            this.hide();
+                        }
                     });
             });
         }
@@ -92,11 +97,13 @@ lazy(s4, 'buckets', () => {
             this.megaInput.$input.val('');
             this.megaInput.hideError();
             this.$dialogProgress.addClass('disabled');
+            mLoadingSpinner.hide('s4-loading-toast');
         }
 
         show(containerId, callback) {
             super.show();
 
+            this.reset();
             this.containerId = containerId || M.currentdirid;
             this.callback = callback;
         }

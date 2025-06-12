@@ -25,21 +25,23 @@ lazy(s4, 'main', () => {
         // Top banner
         let wrapNode = ce('div', bodyNode, { class: 'grid banner' });
         let node = ce('div', wrapNode);
+        const canEnable = u_attr.p && !pro.filter.simple.miniPlans.has(u_attr.p) || u_attr.pf;
 
         // Banner info for Pro/Free plans
-        ce('h3', node).textContent =  u_attr.p || u_attr.pf ?
+        ce('h3', node).textContent = canEnable ?
             l.s4_activation_enable : l.s4_activation_banner_header;
         node = ce('p', node, { class: 'text-md-size' });
         ce('span', node).textContent = l.s4_activation_banner_info;
-        ce('b', node).textContent =  u_attr.p || u_attr.pf ?
+        ce('b', node).textContent = canEnable ?
             l.s4_activation_included_info : l.s4_activation_upgrade_info;
 
         node = new MegaButton({
             parentNode: node,
-            text: u_attr.p || u_attr.pf ? l.s4_activation_enable : l.explore_now_btn,
+            text: canEnable ?
+                l.s4_activation_enable : l.explore_now_btn,
             componentClassname: 'primary semibold theme-dark-forced',
             onClick: () => {
-                if (!u_attr.p && !u_attr.pf) {
+                if (!canEnable) {
                     rd('mega.io', 'objectstorage', 500858);
                     return false;
                 }
@@ -56,7 +58,7 @@ lazy(s4, 'main', () => {
         ce('i', node, { class: 's4-icon icon-glass' });
 
         // Terms
-        if (u_attr.p || u_attr.pf) {
+        if (canEnable) {
             node = ce('p', bodyNode, { class: 'terms' }).append(parseHTML(l.s4_activation_terms));
         }
 

@@ -6227,6 +6227,20 @@ body.de .mega-dialog.contact-picker-widget {
     .mega-dialog.achievements-list-dialog .ach-create-account .achievement-icon {
         height: 88px;
     }
+    .mega-dialog.achievements-list-dialog .ach-vpn-trial .achievement-icon {
+        height: 100px;
+        background-image: url('../images/mega/achievements/achievements-icon-vpn.png');
+        background-position: center;
+        background-size: contain;
+        background-repeat: no-repeat;
+    }
+    .mega-dialog.achievements-list-dialog .ach-pwm-trial .achievement-icon {
+        height: 100%;
+        background-image: url('../images/mega/achievements/achievements-icon-pwm.png');
+        background-position: center;
+        background-size: contain;
+        background-repeat: no-repeat;
+    }
     .mega-dialog.achievements-list-dialog .achievement-full.info {
         padding: 0 24px;
         position: relative;

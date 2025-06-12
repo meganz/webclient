@@ -1050,13 +1050,14 @@ mBroadcaster.once('boot_done', function populate_l() {
         'pricing': "https://mega.io/pricing",
         'vpn': "https://mega.io/vpn",
         'vpn#dow': "https://mega.io/vpn#downloadapps",
+        'pass': "https://mega.io/pass",
         'pass#dow': "https://mega.io/pass#downloadapps",
     };
 
     const mega_io_hyperlinks = Object.create(null);
 
     for (const key in mega_io_links) {
-        mega_io_hyperlinks[key] = `<a href="${mega_io_links[key]}" target="_blank" rel="noopener noreferrer">`;
+        mega_io_hyperlinks[key] = `<a href="${mega_io_links[key]}" target="_blank" rel="noopener">`;
     }
 
     // MEGA static hosts
@@ -2001,6 +2002,15 @@ mBroadcaster.once('boot_done', function populate_l() {
     l.otp_learn_more = escapeHTML(l.otp_learn_more)
         .replace('[A]', `<a class="clickurl" href=${otpHelpLink}" target="_blank">`)
         .replace('[/A]', '</a>');
+
+    l.ach_vpn_trial_blurb = escapeHTML(l.ach_vpn_trial_blurb)
+        .replace('[A]', mega_io_hyperlinks.vpn).replace('[/A]', '</a>');
+    l.ach_vpn_trial_blurb_expires = escapeHTML(l.ach_vpn_trial_blurb_expires)
+        .replace('[A]', mega_io_hyperlinks.vpn).replace('[/A]', '</a>');
+    l.ach_pwm_trial_blurb = escapeHTML(l.ach_pwm_trial_blurb)
+        .replace('[A]', mega_io_hyperlinks.pass).replace('[/A]', '</a>');
+    l.ach_pwm_trial_blurb_expires = escapeHTML(l.ach_pwm_trial_blurb_expires)
+        .replace('[A]', mega_io_hyperlinks.pass).replace('[/A]', '</a>');
 
     const common = [
         15536, 16119, 16120, 16313, 16316, 16360, 18228, 18268, 18282,

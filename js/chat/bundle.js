@@ -14706,7 +14706,7 @@ class CloudBrowserDialog extends modalDialogs.A.SafeShowDialogController {
         }
       } : null);
     }
-    if (!folderIsHighlighted || this.props.folderSelectable) {
+    if (!folderIsHighlighted || this.props.folderSelectable && (!this.props.noShareFolderAttach || !(isIncomingShare && folderIsHighlighted))) {
       buttons.push({
         "label": this.props.selectLabel,
         "key": "select",

@@ -2645,7 +2645,7 @@ lazy(MegaUtils, 'classifyPMPassword', () => {
             return false;
         }
 
-        const passwordLength = password.length;
+        const passwordLength = password && password.length || 0;
         if (passwordLength === 0) {
             return false;
         }

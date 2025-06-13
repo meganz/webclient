@@ -1446,6 +1446,11 @@
             '.open-cloud-item': (items) => {
                 array.remove(items, '.open-cloud-item');
                 items.push('.open-in-location');
+            },
+            '.properties-item': (items, { selectedItems: sel }) => {
+                if (pfcol && sel.length === 1 && M.d[sel[0]].t === 2) {
+                    array.remove(items, '.properties-item');
+                }
             }
         };
         const manipulateItems = (items) => {

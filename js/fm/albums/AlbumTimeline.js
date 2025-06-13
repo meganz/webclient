@@ -162,6 +162,9 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
                         const selections = Object.keys(albums.grid.timeline.selections);
                         const albumId = scope.getAlbumIdFromPath();
                         const { filterFn, at, eIds, nodes } = albums.store[albumId];
+
+                        $.selected = [...selections];
+
                         let selectionsPreviewable = false;
                         let onlyPlayableVideosSelected = true;
                         for (let i = 0; i < selections.length; i++) {

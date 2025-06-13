@@ -154,6 +154,7 @@ lazy(mega.gallery, 'albums', () => {
             previewMvLength = M.v.length;
 
             slideshow(firstNode, false);
+            mega.ui.mInfoPanel.reRenderIfVisible([firstNode]);
 
             scope.albums.removeKeyboardListener();
 

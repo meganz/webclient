@@ -280,6 +280,7 @@ class MegaMobileViewOverlay extends MegaComponent {
         textBlock.classList.add('hidden');
 
         if (isPreviewable && isPreviewable !== 'text') {
+            this.domNode.querySelector('.context-btn').classList.remove('hidden');
             this.domNode.querySelector('.media-viewer-container .content').classList.remove('hidden');
             this.domNode.querySelector('.media-viewer-container .content-info').classList.add('hidden');
         }

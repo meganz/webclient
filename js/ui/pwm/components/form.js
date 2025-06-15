@@ -52,34 +52,40 @@ class MegaForm extends MegaComponent {
     }
 
     addInput(options) {
-        const {nodeType, megaInputOptions = {}, ...rest} = options;
+        const {nodeType, type, required, id, name, title, classNames, autocomplete} = options;
         const input = document.createElement(nodeType);
-        input.className = rest.classNames || '';
+        input.type = type;
+        input.className = classNames;
 
-        const propMap = ['type', 'id', 'name', 'title', 'placeholder', 'required', 'pattern', 'autocomplete'];
+        if (autocomplete) {
+            input.autocomplete = autocomplete;
+        }
 
-        for (const prop of propMap) {
-            if (rest[prop] !== undefined) {
-                input[prop] = rest[prop];
-            }
+        if (required) {
+            input.required = true;
+        }
+
+        if (id) {
+            input.id = id;
+        }
+
+        if (name) {
+            input.name = name;
+        }
+
+        if (title) {
+            input.title = title;
         }
 
         this.targetNode.append(input);
+        const megaInputOptions = options.megaInputOptions || {};
 
         if (megaInputOptions) {
-            let {name, event, on} = megaInputOptions;
+            const {name, event, on} = megaInputOptions;
             this[name] = new mega.ui.MegaInputs($(input));
 
-            if (event) {
-                event = typeof event === 'string' ? [{event, on}] : event;
-
-                for (let i = event.length; i--;) {
-                    const {event: type, on} = event[i];
-
-                    if (typeof on === 'function') {
-                        this[name].$input.on(type, on);
-                    }
-                }
+            if (typeof on === 'function') {
+                this[name].$input.on(event, on);
             }
 
             this.inputs.push(this[name]);
@@ -165,67 +171,26 @@ class MegaForm extends MegaComponent {
         }
     }
 
-    discard(isFormChanged, formType) {
+    discard(isFormChanged) {
         return new Promise(resolve => {
             if (!isFormChanged) {
                 resolve(true);
                 return;
             }
 
-            let title = l.discard_changes;
-            let content = l.discard_changes_msg;
-            const sheetClass = 'discard-dialog';
-
-            if (formType === 'create') {
-                title = l.add_item_discard_changes_title;
-                content = l.add_item_discard_changes_msg;
-            }
-
-            const footerElements = mCreateElement('div', { class: 'flex flex-row-reverse' });
-
-            MegaButton.factory({
-                parentNode: footerElements,
-                text: l.discard,
-                componentClassname: 'slim font-600',
-                type: 'normal'
-            }).on('click', () => {
-                resolve(true);
-                mega.ui.sheet.removeClass(sheetClass);
-                mega.ui.sheet.hide();
-            });
-
-            MegaButton.factory({
-                parentNode: footerElements,
-                text: l.schedule_discard_cancel,
-                componentClassname: 'slim font-600 mx-2 secondary',
-                type: 'normal'
-            }).on('click', () => {
-                mega.ui.sheet.removeClass(sheetClass);
-                mega.ui.sheet.hide();
-            });
-
             megaMsgDialog.render(
-                title,
-                content,
+                l.discard_changes,
+                l.discard_changes_msg,
                 '',
                 {
-                    onInteraction: res => {
-                        resolve(res);
-                        mega.ui.sheet.removeClass(sheetClass);
-                    }
+                    onInteraction: res => resolve(res)
                 },
                 {
-                    sheetType: 'normal',
-                    footer: {
-                        slot: [footerElements],
-                        confirmButton: false
-                    }
+                    buttons: [l.discard, l.schedule_discard_cancel]
                 },
                 false,
                 true
             );
-
-            mega.ui.sheet.addClass(sheetClass);
         });
     }
 }

@@ -154,7 +154,7 @@ class PasswordItemForm extends MegaForm {
                     classname: 'secondary',
                     typeAttr: 'button',
                     onClick: async() => {
-                        const res = await this.discard(this.isFormChanged, this.formType);
+                        const res = await this.discard(this.isFormChanged);
 
                         if (res) {
                             mega.ui.pm.overlay.hide();
@@ -215,10 +215,10 @@ class PasswordItemForm extends MegaForm {
 
         mega.ui.pm.overlay.show({
             name: 'new-password-item-overlay',
-            title: this.formType === 'create' ? l.add_item : l.edit_password,
+            title: this.formType === 'create' ? l.add_item : l.edit_item,
             contents: [this.domNode],
             showClose: true,
-            confirmClose: () => this.discard(this.isFormChanged, this.formType)
+            confirmClose: () => this.discard(this.isFormChanged)
         });
 
         // delay for the overlay transition to happen and set focus
@@ -303,8 +303,10 @@ class PasswordItemForm extends MegaForm {
                 totp: totp ? {shse: totp, nd: '6', t: '30', alg: 'sha1'} : undefined
             }
         };
+        const name = title;
+        const target = pwmh;
 
-        const res = await mega.ui.pm.comm.createItem(n, title, pwmh);
+        const res = await mega.ui.pm.comm.createItem(n, name, target);
 
         mega.ui.toast.show(l.item_created);
         mega.ui.pm.comm.saveLastSelected(res);

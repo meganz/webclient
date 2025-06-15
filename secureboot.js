@@ -3086,7 +3086,6 @@ else if (!browserUpdate) {
             'pwm:view_js': {f:'js/ui/pwm/components/view.js', n: 'pm_view_js', j: 1, w:1},
             'pwm:form_js': {f:'js/ui/pwm/components/form.js', n: 'pm_form_js', j: 1, w:1},
             'pwm:password_item_form_js': {f:'js/ui/pwm/components/password-item-form.js', n: 'pm_password_item_form_js', j: 1, w:1},
-            'pwm:credit_card_item_form_js': {f:'js/ui/pwm/components/credit-card-item-form.js', n: 'pm_credit_card_item_form_js', j: 1, w:1},
             'pwm:password_list_js': {f:'js/ui/pwm/components/password-list.js', n: 'pm_password_list_js', j: 1, w:1},
             'pwm:password_item_detail_js': {f:'js/ui/pwm/components/password-item-detail.js', n: 'pm_password_item_detail_js', j: 1, w:1},
             'pwm:dropdown_items_js': {f:'js/ui/pwm/components/dropdown-items.js', n: 'pm_dropdown_items_js', j: 1, w:1},

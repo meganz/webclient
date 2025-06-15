@@ -57,55 +57,16 @@ class MegaTopNav extends MegaComponent {
             componentClassname: 'add-btn',
             iconSize: 24
         });
+        addItemBtn.on('click', () => {
+            if (!mega.ui.passform) {
+                mega.ui.passform = new PasswordItemForm();
+            }
 
-        addItemBtn.on('click', ev => {
-            const newMenu = document.createElement('div');
-            newMenu.className = 'pm-add-item-dropdown';
-            MegaButton.factory({
-                parentNode: newMenu,
-                type: 'fullwidth',
-                componentClassname: 'text-icon',
-                icon: 'sprite-fm-mono icon-password-thin-outline',
-                text: l.password_btn,
-                onClick: () => {
-                    if (!mega.ui.passform) {
-                        mega.ui.passform = new PasswordItemForm();
-                    }
-
-                    mega.ui.passform.show({
-                        type: 'create'
-                    });
-
-                    eventlog(500535);
-                }
+            mega.ui.passform.show({
+                type: 'create'
             });
 
-            MegaButton.factory({
-                parentNode: newMenu,
-                type: 'fullwidth',
-                componentClassname: 'text-icon',
-                icon: 'sprite-fm-mono icon-creditcard-thin-outline',
-                text: l[6952],
-                onClick: () => {
-                    if (!mega.ui.creditcardform) {
-                        mega.ui.creditcardform = new CreditCardItemForm();
-                    }
-
-                    mega.ui.creditcardform.show({
-                        type: 'create'
-                    });
-                }
-            });
-
-            mega.ui.menu.show({
-                name: 'pm-new-items',
-                classList: ['pm-new-items-menu'],
-                event: ev,
-                eventTarget: ev.currentTarget,
-                contents: [newMenu],
-                resizeHandler: true,
-                onClose: () => ev.currentTarget.removeClass('active')
-            });
+            eventlog(500535);
         });
     }
 

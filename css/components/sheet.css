@@ -155,7 +155,6 @@ body.web-desktop .mega-sheet.export-links-settings-dialog .sheet,
 body.web-desktop .mega-sheet.link-embed-dialog .sheet,
 body.web-desktop .mega-sheet.remove-link-dialog .sheet,
 body.web-desktop .mega-sheet.link-settings-discard-dialog .sheet,
-body.web-desktop .mega-sheet.discard-dialog .sheet,
 body.web-desktop.pwm-ui .mega-sheet.normal.with-footer .sheet  {
     max-width: 640px;
 }

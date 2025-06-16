@@ -1244,7 +1244,7 @@ var slideshowid;
             $('.context-menu .info, .v-btn.info', $overlay).rebind('click.media-viewer', () => {
                 $document.fullScreen(false);
                 // Use original ID to render info from chats
-                mega.ui.mInfoPanel.show([id]);
+                mega.ui.mInfoPanel.show([slideshowid]);
                 return false;
             });
 

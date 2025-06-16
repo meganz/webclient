@@ -597,8 +597,8 @@ MegaData.prototype.doSort = function(n, d) {
         skipsave = true;
         n = 'name';
     }
-    // Sort by fav is now deprecated
-    else if (n === 'fav') {
+    // Sort by fav is not available in rubbish bin, folderlink, and favourite list.
+    else if (n === 'fav' && (M.currentdirid === M.RubbishID || folderlink || M.currentdirid === 'faves')) {
         n = 'name';
     }
 

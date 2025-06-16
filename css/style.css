@@ -2291,23 +2291,6 @@ body.loading .light-overlay {
     -khtml-opacity: 1;
     opacity: 1;
 }
-.arrow.desc.grid-header-star,
-.arrow.asc.grid-header-star,
-.grid-status-icon.star {
-    height: 24px;
-    width: 30px;
-    display: block;
-    background-image: url(../images/mega/fm-main-sprite.png);
-    background-repeat: no-repeat;
-    background-position: -8px -4790px;
-}
-.arrow.grid-header-star {
-    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
-    -moz-opacity: 0.5;
-    -khtml-opacity: 0.5;
-    opacity: 0.5;
-    margin-top: -1px;
-}
 .grid-sixth-th {
     width: 45px;
 }

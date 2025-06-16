@@ -14,8 +14,6 @@
     const setThemeClass = function(theme) {
         const themeClass = `theme-${theme}`;
 
-        document.body.classList.remove('theme-dark', 'theme-light');
-
         if (!document.documentElement.classList.contains(themeClass)) {
             document.documentElement.classList.remove('theme-dark', 'theme-light');
             document.documentElement.classList.add(`theme-${theme}`);

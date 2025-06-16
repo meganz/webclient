@@ -1,6 +1,6 @@
 /*!
- * perfect-scrollbar v1.5.7 - mega.nz build.
- * Copyright 2024 Hyunje Jun, MDBootstrap and Contributors
+ * perfect-scrollbar v1.6.0 - mega.nz build.
+ * Copyright 2025 Hyunje Jun, MDBootstrap and Contributors
  * Licensed under MIT
  */
 
@@ -203,7 +203,7 @@
         ev.stopPropagation();
       }
       if (!EventElement.eventListenerOptions.passive) {
-        ev.preventDefault();
+        return ev.cancelable && ev.preventDefault();
       }
     }
   }
@@ -338,8 +338,8 @@
     const roundedScrollTop = Math.floor(element.scrollTop);
     const rect = element.getBoundingClientRect();
 
-    i.containerWidth = Math.round(rect.width);
-    i.containerHeight = Math.round(rect.height);
+    i.containerWidth = Math.floor(rect.width);
+    i.containerHeight = Math.floor(rect.height);
 
     i.contentWidth = element.scrollWidth;
     i.contentHeight = element.scrollHeight;
@@ -681,7 +681,7 @@
       const _getActiveElement = tryCatch(function (node, tryDoc) {
         const docAE =
           tryDoc !== false && tryCatch(() => document.activeElement)();
-        return (tryDoc && docAE) || (node && node.activeElement) || docAE || !1;
+        return (tryDoc && docAE) || (node && node.activeElement) || docAE || false;
       });
 
       var activeElement = _getActiveElement(i.ownerDocument, true);
@@ -692,7 +692,7 @@
           // go deeper if element is a webcomponent
           while (activeElement.shadowRoot) {
             activeElement =
-              _getActiveElement(activeElement.shadowRoot, false) || !1;
+              _getActiveElement(activeElement.shadowRoot, false) || false;
           }
         }
         if (activeElement && isEditable(activeElement)) {
@@ -981,7 +981,7 @@
     let startOffset = {};
     let startTime = 0;
     let speed = {};
-    let easingLoop = null;
+    let easingLoop = 0;
 
     function getTouch(e) {
       if (e.targetTouches) {
@@ -1022,11 +1022,9 @@
       startOffset.pageX = touch.pageX;
       startOffset.pageY = touch.pageY;
 
-      startTime = new Date().getTime();
+      startTime = performance.now();
 
-      if (easingLoop !== null) {
-        clearInterval(easingLoop);
-      }
+      easingLoop++;
     }
 
     function shouldBeConsumedByChild(target, deltaX, deltaY) {
@@ -1090,7 +1088,7 @@
         applyTouchMove(differenceX, differenceY);
         startOffset = currentOffset;
 
-        const currentTime = new Date().getTime();
+        const currentTime = performance.now();
 
         const timeGap = currentTime - startTime;
         if (timeGap > 0) {
@@ -1106,25 +1104,26 @@
     }
     function touchEnd() {
       if (i.settings.swipeEasing) {
-        clearInterval(easingLoop);
-        easingLoop = setInterval(function () {
+        const pid = ++easingLoop;
+        requestAnimationFrame(function raf() {
+          if (pid !== easingLoop) {
+            return;
+          }
+          requestAnimationFrame(raf);
+
           if (i.isInitialized) {
-            clearInterval(easingLoop);
             return;
           }
 
           if (!speed.x && !speed.y) {
-            clearInterval(easingLoop);
             return;
           }
 
           if (Math.abs(speed.x) < 0.01 && Math.abs(speed.y) < 0.01) {
-            clearInterval(easingLoop);
             return;
           }
 
           if (!i.element) {
-            clearInterval(easingLoop);
             return;
           }
 
@@ -1132,7 +1131,7 @@
 
           speed.x *= 0.8;
           speed.y *= 0.8;
-        }, 10);
+        });
       }
     }
 

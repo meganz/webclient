@@ -155,6 +155,12 @@ lazy(FS, 'Secureboot', () => {
                             show = true;
                         }
                     }
+                    else if (show === -7) {
+                        res = false;
+                        if (ln.startsWith('function getSitePath')) {
+                            show = res = true;
+                        }
+                    }
                     else if (/^\s+}$/.test(ln)) {
                         res = false;
                         show = true;
@@ -182,8 +188,12 @@ lazy(FS, 'Secureboot', () => {
                     show = -9;
                     res = false;
                 }
-                else if (/^if\s*\((?:is_mobile|is_ios|tmp)\)/.test(ln)) {
+                else if (/^if\s*\((?:is_mobile|is_ios|tmp|[^)]+is_extension)\)/.test(ln)) {
                     show = -8;
+                    res = false;
+                }
+                else if (ln.startsWith('tmp = document.location.href')) {
+                    show = -7;
                     res = false;
                 }
             }
@@ -248,10 +258,25 @@ lazy(FS, 'Secureboot', () => {
             timestamp: ~~(Date.now() / 1e3),
             dateTime: new Date().toISOString()
         };
+        const is_sep = `function getSitePath`;
+        const is_block = `
+            var is_drop = false;
+            var is_embed = false;
+            var is_karma = false;
+            var is_mobile = false;
+            var is_iframed = false;
+            var is_livesite = false;
+            var is_megadrop = false;
+            var is_chatlink = false;
+            var is_extension = false;
+            var is_transferit = true;
+            var is_webcache = location.host === 'webcache.googleusercontent.com';
+
+            ${is_sep}`;
         tmp = content.join('\n')
             .replace(p3, tmp.join('\n\n') + '\n\n\t' + p3)
             .replace(/buildVersion[^;]+/, `buildVersion = ${JSON.stringify(buildVersion)}`)
-            .replace(/var is_microsoft[^;]+/, 'var is_mobile = false')
+            .replace(is_sep, is_block.split('\n').map((ln) => ln.trim()).join('\n'))
             .replace('else if (!browserUpdate', 'if (!browserUpdate')
             .replace(/js\/ui\/transfer\/images/g, 'images');
         content = tmp.split('\n');

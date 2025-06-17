@@ -187,7 +187,7 @@ var security = {
         'use strict';
 
         // If Web Crypto method supported, use that as it's nearly as fast as native
-        if (window.crypto && window.crypto.subtle && !is_microsoft) {
+        if (window.crypto && window.crypto.subtle && !window.is_microsoft) {
             return security.deriveKeyWithWebCrypto(saltBytes, passwordBytes, iterations, derivedKeyLength);
         }
 

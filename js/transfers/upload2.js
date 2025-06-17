@@ -1954,7 +1954,7 @@ var ulQueue = new TransferQueue(function _workerUploader(task, done) {
         ulQueue.logger.info('worker_uploader', task, done);
     }
     task.run(done);
-}, is_ios && isMediaSourceSupported() ? 1 : ulmanager.ulDefConcurrency, 'uploader');
+}, self.is_ios && isMediaSourceSupported() ? 1 : ulmanager.ulDefConcurrency, 'uploader');
 
 ulQueue.poke = function(file, meth) {
     'use strict';

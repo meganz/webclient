@@ -1040,7 +1040,7 @@ var bootstaticpath = staticpath;
 var urlrootfile = '';
 
 // Disable hash checking for search engines to speed the site load up
-if (is_bot) {
+if (window.is_bot) {
     nocontentcheck = true;
 }
 else if (is_karma) {
@@ -3486,7 +3486,7 @@ else if (!browserUpdate) {
                 xhr_stack[xhri].timeout = xhr_timeout;
             }
 
-            if (is_firefox_web_ext) {
+            if (window.is_firefox_web_ext) {
                 xhr_stack[xhri].overrideMimeType('text/plain');
             }
             xhr_stack[xhri].send(null);
@@ -3702,7 +3702,7 @@ else if (!browserUpdate) {
     var istaticpath = '/';
 
     // The loading-sprite images are embedded inside the extensions
-    if (is_chrome_web_ext || is_firefox_web_ext) {
+    if (window.is_extension) {
         istaticpath = '../images/mega/';
     }
 

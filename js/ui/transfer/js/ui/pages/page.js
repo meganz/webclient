@@ -4,6 +4,8 @@ lazy(T.ui, 'page', () => {
 
     document.title = 'Transfer.it';
     document.documentElement.classList.add('transferit-vars');
+    document.body.classList.remove('theme-dark', 'theme-light', 'theme-dark-forced');
+    document.body.removeAttribute('style');
     document.body.textContent = '';
 
     if (({'fa': 1,'ar': 1,'he': 1})[lang]) {

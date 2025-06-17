@@ -207,6 +207,8 @@ lazy(T.ui, 'addFilesLayout', () => {
             settingsBtn.addEventListener('click', (e) => {
                 if (e.currentTarget.classList.contains('active-icon')) {
                     inputsWrap.scrollTo({ top: 0, behavior: 'smooth' });
+                    inputsWrap.classList.remove('visible-settings');
+                    settingsBtn.classList.remove('active-icon');
                 }
                 else {
                     const dn = cn.querySelector('.js-default-inputs');
@@ -216,12 +218,6 @@ lazy(T.ui, 'addFilesLayout', () => {
                         top: dn.getBoundingClientRect().height + 38,
                         behavior: 'smooth'
                     });
-                }
-            });
-            inputsWrap.addEventListener('scroll', (e) => {
-                if (e.currentTarget.scrollTop === 0) {
-                    settingsBtn.classList.remove('active-icon');
-                    e.currentTarget.classList.remove('visible-settings');
                 }
             });
 

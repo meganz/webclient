@@ -112,10 +112,10 @@ lazy(T.ui, 'viewFilesLayout', () => {
             if (!crypto_keyok(n)) {
                 return null;
             }
-            if (String(n.fa).includes(':0*') || is_image2(n)) {
-                return 1;
+            if (is_video(n) || MediaInfoLib.isFileSupported(n)) {
+                return 2;
             }
-            return is_video(n) || MediaInfoLib.isFileSupported(n) ? 2 : false;
+            return String(n.fa).includes(':0*') || is_image2(n) ? 1 : false;
         },
 
         async preload(xh) {

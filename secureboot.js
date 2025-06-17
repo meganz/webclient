@@ -244,7 +244,7 @@ var is_bot = !is_extension && /bot|crawl/i.test(ua);
 var is_webcache = location.host === 'webcache.googleusercontent.com';
 var is_livesite = location.host === 'mega.nz' || location.host === 'mega.io'
     || location.host === 'smoketest.mega.nz' || is_extension;
-var is_transferit = !is_livesite && (localStorage.it || /^(?:[\w-]*it|testbed)\.dev|transfer\.it$/.test(location.host));
+var is_transferit = !is_livesite && (/transfer\.it$/.test(location.host) || localStorage.it);
 
 function getMobileStoreLink() {
     'use strict';

@@ -44,7 +44,7 @@ mobile.keyDecryption = {
 
             const subNode = document.createElement('div');
             subNode.className = 'decryption-msg';
-            subNode.textContent = removeHTML((pfcol) ? l.album_decr_key_descr : `${l[7945]} ${l[7972]}`);
+            subNode.textContent = l[7945];
 
             this.domNode.append(title, subNode, dKey);
 
@@ -75,7 +75,7 @@ mobile.keyDecryption = {
 
                     if (getSitePath() === path) {
                         decryptionKeyInput.showError(`<i class="alert sprite-mobile-fm-mono
-                            icon-alert-triangle-thin-outline"></i>${escapeHTML(l[16471])} ${escapeHTML(l[16472])}`);
+                            icon-alert-triangle-thin-outline"></i>${l[9048]}`);
                     }
                     else {
                         loadSubPage(path);
@@ -112,7 +112,7 @@ mobile.keyDecryption = {
         // If the previous folder key was incorrect, show an error message for them to try again
         if (previousKeyIncorrect) {
             decryptionKeyInput.showError(`<i class="alert sprite-mobile-fm-mono
-                icon-alert-triangle-thin-outline"></i>${escapeHTML(l[16471])} ${escapeHTML(l[16472])}`);
+                icon-alert-triangle-thin-outline"></i>${l[9048]}`);
         }
     },
 

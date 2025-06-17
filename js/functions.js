@@ -972,8 +972,7 @@ async function mKeyDialog(ph, fl, keyr, selector) {
 
         $('.fm-dialog-new-folder-input', dialog).addClass('contains-error');
         $('.dlkey-err', dialog).removeClass('hidden');
-        $('.instruction-message', dialog)
-            .text((pfcol) ? l.album_decr_key_descr : l[9048]);
+        $('.instruction-message', dialog).text(l[7945]);
 
         if (pfcol) {
             $('.dlkey-err', $dialog)[0].style.textAlign = 'center';
@@ -984,8 +983,7 @@ async function mKeyDialog(ph, fl, keyr, selector) {
         }
     }
     else if (pfcol) {
-        $('.mega-dialog.dlkey-dialog .instruction-message')
-            .safeHTML(l.album_decr_key_descr);
+        $('.mega-dialog.dlkey-dialog .instruction-message').safeHTML(l[7945]);
         $input[0].placeholder = '';
         if (document.body.classList.contains('theme-dark')) {
             $('.fm-dialog-new-folder-input', $dialog)[0].style.background = "black";
@@ -993,8 +991,7 @@ async function mKeyDialog(ph, fl, keyr, selector) {
     }
     else {
         $('.mega-dialog.dlkey-dialog input').val('');
-        $('.mega-dialog.dlkey-dialog .instruction-message')
-            .safeHTML(l[7945] + '<br/>' + l[7972]);
+        $('.mega-dialog.dlkey-dialog .instruction-message').text(l[7945]);
     }
 
     if (mega.gallery.albums) {

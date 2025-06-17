@@ -92,6 +92,10 @@ class MegaMobileContextMenu extends MegaComponentGroup {
             }
         }
 
+        if (pfcol) {
+            delete items['.getlink-item'];
+        }
+
         // Hide context menu items not needed for undecrypted nodes
         if (missingkeys[this.handle]) {
             delete items['.add-star-item'];
@@ -108,6 +112,10 @@ class MegaMobileContextMenu extends MegaComponentGroup {
             delete items['.copy-item'];
             delete items['.move-item'];
             delete items['.send-to-contact-item'];
+        }
+
+        if (is_image3(node) && M.v.filter(is_image3).length > 1) {
+            items['.play-slideshow'] = 1;
         }
 
         // Phase 2
@@ -549,6 +557,15 @@ mBroadcaster.once('boot_done', () => {
                 goToMobileApp(MegaMobileViewOverlay.getAppLink(nodeHandle));
 
                 M.fmEventLog(500698);
+            }
+        },
+        '.play-slideshow': {
+            text: l.album_play_slideshow,
+            icon: 'sprite-fm-mono icon-play-square-thin-outline',
+            subMenu: false,
+            classNames: '',
+            onClick: () => {
+                $('.media-viewer-container footer .v-btn.slideshow').trigger('click');
             }
         },
         '.move-item': {

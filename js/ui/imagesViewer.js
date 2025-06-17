@@ -460,7 +460,7 @@ var slideshowid;
         const $divider = $addToAlbumButton.closest('li').prev('.divider');
 
         if (M.getNodeRoot(n.h) === M.RootID && mega.gallery
-            && mega.gallery.canShowAddToAlbum() && mega.gallery.isGalleryNode(n)) {
+            && mega.gallery.canShowAddToAlbum() && M.isGalleryNode(n)) {
             $addToAlbumButton.removeClass('hidden');
             $divider.removeClass('hidden');
 
@@ -634,7 +634,7 @@ var slideshowid;
             }
 
             if (is_mobile) {
-                eventlog(99835);
+                eventlog(pfcol ? 500841 : 99835);
                 if (is_ios) {
                     // Due to the handling of the onload event with the previous image in iOS,
                     // force the call to img position
@@ -1489,7 +1489,7 @@ var slideshowid;
             }
 
             if (self.pfcol) {
-                tryCatch(() => eventlog(mega.gallery.isVideo(n) ? 99972 : 99973))();
+                tryCatch(() => eventlog(M.isGalleryVideo(n) ? 99972 : 99973))();
             }
 
             // TODO: adapt the above code to work on the downloads page if we need to download the original

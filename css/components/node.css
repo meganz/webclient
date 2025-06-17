@@ -430,6 +430,38 @@
     display: none;
 }
 
+/* Album view */
+.album-content-list .mega-node {
+    margin: 1px;
+    width: var(--cell-size);
+    height: var(--cell-size);
+}
+.album-content-list .album-item .context-btn,
+.album-content-list .album-item .fm-item-name,
+.album-content-list .album-item .props {
+    display: none;
+}
+.album-content-list .row-has-date::before {
+    content: attr(data-month) " " attr(data-year);
+    position: absolute;
+    font-weight: bold;
+    top: -30px;
+    left: 0;
+    color: var(--mobile-text-primary);
+    padding: 0 1.5rem;
+}
+.album-content-list .mega-node.show-video-duration::after {
+    position: absolute;
+    content: attr(data-video-duration);
+    bottom: 8px;
+    right: 8px;
+    border-radius: 4px;
+    background: var(--switch-handle-fill);
+    color: black;
+    padding: 2px 4px;
+    font-size: 12px;
+}
+
 /* Sensitive */
 a.is-sensitive .fm-item-img,
 a.is-sensitive .fm-item-name,

@@ -140,7 +140,7 @@ class MegaNavCard extends MegaComponent {
             const { nodes } = this.node;
             let i = nodes.length;
             while (--i >= 0) {
-                if (mega.gallery.isVideo(nodes[i])) {
+                if (M.isGalleryVideo(nodes[i])) {
                     vid++;
                 }
                 else {

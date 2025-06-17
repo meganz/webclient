@@ -49,8 +49,8 @@
             return false;
         }
 
-        // Name
-        const namehtml = is_mobile ? '' : '<div class="properties-name-container">'
+        // Name and path
+        let namePathHtml = (is_mobile && !pfcol) ? '' : '<div class="properties-name-container">'
             + '<div class="properties-small-gray">' + p.t1 + '</div>'
             + '<div class="properties-name-block"><div class="propreties-dark-txt">' + p.t2 + '</div>'
             + '</div></div>';
@@ -87,19 +87,32 @@
             : '<div class="properties-float-bl"><div class="properties-small-gray t10">' + p.t10 + '</div>'
             + '<div class="propreties-dark-txt t11">' + p.t11 + '</div></div></div>';
 
-        return namehtml
-            + `<div class="properties-breadcrumb"><div class="properties-small-gray path">${l.path_lbl}</div>`
-            + '<div class="fm-breadcrumbs-wrapper info">'
-            +                    '<div class="crumb-overflow-link dropdown">'
-            +                       '<a class="breadcrumb-dropdown-link info-dlg">'
-            +                            '<i class="menu-icon sprite-fm-mono icon-options icon24"></i>'
-            +                        '</a>'
-            +                        '<i class="sprite-fm-mono icon-arrow-right icon16"></i>'
-            +                    '</div>'
-            +                    `<div class="fm-breadcrumbs-block info${is_mobile ? ' location' : ''}"></div>`
-            +                    '<div class="breadcrumb-dropdown"></div>'
-            +                '</div>'
-            + '</div>'
+        if (pfcol) {
+            const {name} = M.getNodeByHandle(p.n.p);
+
+            namePathHtml +=
+                `<div class="properties-float-bl">
+                    <div class="properties-small-gray">${l.path_lbl}</div>
+                    <div class="propreties-dark-txt t7">${escapeHTML(name || '')}</div>
+                </div>`;
+        }
+        else {
+            namePathHtml += '<div class="properties-breadcrumb">'
+                +     `<div class="properties-small-gray path">${l.path_lbl}</div>`
+                +     '<div class="fm-breadcrumbs-wrapper info">'
+                +         '<div class="crumb-overflow-link dropdown">'
+                +             '<a class="breadcrumb-dropdown-link info-dlg">'
+                +                 '<i class="menu-icon sprite-fm-mono icon-options icon24"></i>'
+                +             '</a>'
+                +             '<i class="sprite-fm-mono icon-arrow-right icon16"></i>'
+                +         '</div>'
+                +         `<div class="fm-breadcrumbs-block info${is_mobile ? ' location' : ''}"></div>`
+                +         '<div class="breadcrumb-dropdown"></div>'
+                +     '</div>'
+                + '</div>';
+        }
+
+        return namePathHtml
             + '<div class="properties-items"><div class="properties-float-bl properties-total-size">'
             + '<span class="properties-small-gray">' + p.t3 + '</span>'
             + '<span class="propreties-dark-txt">' + p.t4 + '</span></div>'

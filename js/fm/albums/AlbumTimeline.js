@@ -38,7 +38,7 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
 
             this.el.ref = {
                 node,
-                isVideo: !!scope.isVideo(node),
+                isVideo: !!M.isGalleryVideo(node),
                 setThumb: (dataUrl) => {
                     this.setThumb(dataUrl);
                 }
@@ -187,7 +187,7 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
                         }
 
                         if (albums.isPublic) {
-                            const hasImageSelected = selections.some(h => !!scope.isImage(M.d[h]));
+                            const hasImageSelected = selections.some(h => !!M.isGalleryImage(M.d[h]));
 
                             if (hasImageSelected && scope.nodesAllowSlideshow(nodes)) {
                                 selectedItems.push('.play-slideshow');
@@ -233,7 +233,7 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
 
                             if (
                                 mega.gallery.canShowAddToAlbum() &&
-                                selections.every(h => mega.gallery.isGalleryNode(M.getNodeByHandle(h)))
+                                selections.every(h => M.isGalleryNode(M.getNodeByHandle(h)))
                             ) {
                                 selectedItems.push('.add-to-album');
                             }

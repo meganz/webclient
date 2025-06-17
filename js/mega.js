@@ -4348,7 +4348,7 @@ function fm_thumbnails(mode, nodeList, callback)
 
     const pwd = M.currentdirid;
     const exclude = fm_thumbnails.exclude[pwd];
-    if ((M.gallery || M.chat || M.albums) && mode !== 'standalone' || exclude > 6) {
+    if ((M.gallery || M.chat || (M.albums && !pfid)) && mode !== 'standalone' || exclude > 6) {
         return;
     }
     nodeList = (mode === 'standalone' ? nodeList : false) || M.v;

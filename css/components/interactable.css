@@ -486,7 +486,6 @@ button.nav-elem.pro-only:active {
     border: 0;
     color: var(--mobile-text-on-color);
     font-weight: 600;
-    position: relative;
 }
 .nav-elem .right-badge.info {
     border-color: var(--mobile-text-info);

@@ -115,54 +115,80 @@
 }
 .mega-top-menu .menu .nav-elem.full-width {
     min-width: 100%;
+    padding-inline-end: 0;
     width: auto;
 }
 .mega-top-menu .menu .nav-elem.full-width::after,
+.mega-top-menu .menu .nav-elem.full-width .right-badge::before,
 .mega-top-menu .nw-fm-tree-item .nw-fm-tree-iconwrap {
+    background: var(--surface-tree-iconwrap);
     content: '';
     display: inline-block;
-    vertical-align: middle;
+    height: 24px;
+    padding-inline-start: 28px;
     position: sticky;
     position: -webkit-sticky;
+    margin-inline-start: -4px;
     right: -1px;
-    background: var(--surface-tree-iconwrap);
-    padding-inline-start: 24px;
-    padding-inline-end: 4px;
-    height: 24px;
+    vertical-align: middle;
 }
-.mega-top-menu .menu .nav-elem.full-width::after {
-    position: absolute;
-    right: 0;
+.mega-top-menu .nw-fm-tree-item .nw-fm-tree-iconwrap > * {
+    display: none;
 }
 .mega-top-menu .menu .nav-elem.full-width:hover::after,
+.mega-top-menu .menu .nav-elem.full-width:hover .right-badge::before,
 .mega-top-menu .nw-fm-tree-item:hover .nw-fm-tree-iconwrap {
     background: var(--surface-tree-iconwrap-hover);
 }
 .mega-top-menu .menu .nav-elem.full-width:active::after,
+.mega-top-menu .menu .nav-elem.full-width:active .right-badge::before,
 .mega-top-menu .nw-fm-tree-item .nw-fm-tree-iconwrap:active {
     background: var(--surface-tree-iconwrap);
 }
 .mega-top-menu .menu .nav-elem.active.full-width::after,
+.mega-top-menu .menu .nav-elem.full-width.active .right-badge::before,
 .mega-top-menu .nw-fm-tree-item.selected .nw-fm-tree-iconwrap {
     background: var(--surface-tree-iconwrap-active);
 }
 .rtl .mega-top-menu .menu .nav-elem.full-width::after,
+.rtl .mega-top-menu .menu .nav-elem.full-width .right-badge::before,
 .rtl .mega-top-menu .nw-fm-tree-item .nw-fm-tree-iconwrap {
     left: -1px;
     right: auto;
     background: var(--surface-tree-iconwrap-rtl);
 }
-.rtl .mega-top-menu .menu .nav-elem.full-width::after {
-    left: 0;
+.rtl .mega-top-menu .menu .nav-elem.full-width:hover::after,
+.rtl .mega-top-menu .menu .nav-elem.full-width:hover .right-badge::before,
+.rtl .mega-top-menu .nw-fm-tree-item:hover .nw-fm-tree-iconwrap {
+    background: var(--surface-tree-iconwrap-hover-rtl);
+}
+.rtl .mega-top-menu .menu .nav-elem.full-width:active::after,
+.rtl .mega-top-menu .menu .nav-elem.full-width:active .right-badge::before,
+.rtl .mega-top-menu .nw-fm-tree-item .nw-fm-tree-iconwrap:active {
+    background: var(--surface-tree-iconwrap-rtl);
 }
 .rtl .mega-top-menu .menu .nav-elem.active.full-width::after,
+.rtl .mega-top-menu .menu .nav-elem.active.full-width .right-badge::before,
 .rtl .mega-top-menu .nw-fm-tree-item.selected .nw-fm-tree-iconwrap {
     background: var(--surface-tree-iconwrap-active-rtl);
 }
-.rtl .mega-top-menu .menu .nav-elem.full-width:not(.active):hover::after,
-.rtl .mega-top-menu .nw-fm-tree-item:not(.selected):hover .nw-fm-tree-iconwrap {
-    background: var(--surface-tree-iconwrap-hover-rtl);
+.mega-top-menu .menu .nav-elem.full-width .right-badge {
+    order: 0;
+    position: sticky;
+    right: 16px;
+    z-index: 1;
 }
-.mega-top-menu .nw-fm-tree-item .nw-fm-tree-iconwrap > * {
-    display: none;
+.mega-top-menu .menu .nav-elem.full-width .right-badge::before {
+    padding-inline-start: 24px;
+    position: absolute;
+    right: 100%;
+    top: 0;
+}
+.rtl .mega-top-menu .menu .nav-elem.full-width .right-badge {
+    left: 16px;
+    right: auto;
+}
+.rtl .mega-top-menu .menu .nav-elem.full-width .right-badge::before {
+    left: 100%;
+    right: auto;
 }

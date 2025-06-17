@@ -2281,6 +2281,8 @@ else if (!browserUpdate) {
     jsl.push({f:'js/ui/components/radial.js', n: 'radial_js', j: 1, w:1});
     jsl.push({f:'js/ui/components/tooltip.js', n: 'tooltip_js', j: 1, w:1});
 
+    jsl.push({f:'js/vendor/megaDynamicList.js', n: 'mega_dynamic_list_js', j:1, w:5});
+
     // Mobile component for inheriting
     jsl.push({f:'js/mobile/mobile.header.js', n: 'mobile_header_js', j: 1, w: 1});
     jsl.push({f:'js/mobile/mobile.top.menu.js', n: 'mobile_top_menu_js', j: 1, w: 1});
@@ -2322,7 +2324,6 @@ else if (!browserUpdate) {
         jsl.push({f:'css/notification.css', n: 'notification_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'css/search.css', n: 'search_css', j:2, w:30, c:1, d:1, cache:1});
 
-        jsl.push({f:'js/vendor/megaDynamicList.js', n: 'mega_dynamic_list_js', j:1, w:5});
         jsl.push({f:'js/fm/quickfinder.js', n: 'fm_quickfinder_js', j:1, w:1});
         jsl.push({f:'js/fm/selectionManager2.js', n: 'fm_selectionmanager2_js', j:1, w:1});
         jsl.push({f:'js/fm.js', n: 'fm_js', j:1, w:12});
@@ -2617,6 +2618,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/mobile.appbanner.js', n: 'mobile_app_banner_js', j: 1, w: 1});
         jsl.push({f:'js/chat/strongvelope.js', n: 'strongvelope_js', j: 1, w: 3});
         jsl.push({f:'js/mobile/mobile.promo.banner.js', n: 'mobile_promo_banner_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.albums.js', n: 'mobile_albums_js', j: 1, w:1});
 
         jsl.push({f:'js/ui/components/meganz/MDialogMobile.js', n: 'mobile_m_dialog_mobile_js', j:1});
     }

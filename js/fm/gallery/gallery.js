@@ -19,7 +19,7 @@ class GalleryNodeBlock {
         this.el.nodeBlock = this;
         this.isRendered = false;
 
-        this.isVideo = mega.gallery.isVideo(this.node);
+        this.isVideo = M.isGalleryVideo(this.node);
     }
 
     setThumb(dataUrl) {
@@ -2273,7 +2273,7 @@ class MegaTargetGallery extends MegaGallery {
                 && !rubTree[h]
                 && !rubTree[n.p]
                 && !n.fv
-                && mega.gallery.isGalleryNode(n)
+                && M.isGalleryNode(n)
                 && mega.sensitives.shouldShowNode(n);
         }).sort(this.sortByMtime.bind(this));
 
@@ -2290,7 +2290,7 @@ class MegaTargetGallery extends MegaGallery {
     }
 
     checkGalleryUpdate(n) {
-        if (!mega.gallery.isGalleryNode(n)) {
+        if (!M.isGalleryNode(n)) {
             return;
         }
 
@@ -2458,7 +2458,6 @@ mega.gallery.emptyBlock = null;
 mega.gallery.lastModeSelected = 'a';
 mega.gallery.pendingFaBlocks = {};
 mega.gallery.pendingThumbBlocks = {};
-mega.gallery.disallowedExtensions = { 'PSD': true, 'SVG': true };
 
 /**
  * @TODO: Remove this check once we bump all browsers up to support this feature
@@ -2530,19 +2529,6 @@ mega.gallery.handleNodeRemoval = tryCatch((n) => {
 });
 
 /**
- * Checking if the file is even available for the gallery
- * @param {String|MegaNode|Object} n An ufs-node, or filename
- * @param {String} [ext] Optional filename extension
- * @returns {Number|String|Function|Boolean}
- */
-mega.gallery.isGalleryNode = (n, ext) => {
-    'use strict';
-
-    ext = ext || fileext(n && n.name || n, true, true);
-    return n.fa && (mega.gallery.isImage(n, ext) || mega.gallery.isVideo(n));
-};
-
-/**
  * Checking if we want to see add to album option in the current viewing page
  * @returns {Boolean}
  */
@@ -2607,42 +2593,6 @@ mega.gallery.unsetShimmering = (el) => {
 mega.gallery.isPreviewable = (n, ext) => {
     'use strict';
     return is_image3(n, ext) || is_video(n);
-};
-
-/**
- * Same as is_image3(), additionally checking whether the node meet requirements for photo/media gallery.
- * @param {String|MegaNode|Object} n An ufs-node, or filename
- * @param {String} [ext] Optional filename extension
- * @returns {Boolean}
- */
-mega.gallery.isImage = (n, ext) => {
-    'use strict';
-
-    ext = ext || fileext(n && n.name || n, true, true);
-    return !mega.gallery.disallowedExtensions[ext] && is_image3(n, ext);
-};
-
-/**
- * Checks whether the node is a video, plus checks if thumbnail is available
- * @param {Object} n ufs node
- * @returns {Object.<String, Number>|Boolean}
- */
-mega.gallery.isVideo = (n) => {
-    'use strict';
-
-    if (!n || !n.fa || !n.fa.includes(':8*')) {
-        return false;
-    }
-
-    const p = M.getMediaProperties(n);
-
-    if (!p.showThumbnail || p.icon !== 'video') {
-        return false;
-    }
-
-    const props = MediaAttribute.prototype.fromAttributeString(n.fa, n.k);
-
-    return props && props.width && props.height ? p : false;
 };
 
 mega.gallery.checkEveryGalleryUpdate = n => {
@@ -3530,42 +3480,42 @@ lazy(mega.gallery, 'sections', () => {
             path: 'images',
             icon: 'images',
             root: 'images',
-            filterFn: n => mega.gallery.isImage(n),
+            filterFn: n => M.isGalleryImage(n),
             title: l.gallery_all_locations
         },
         [mega.gallery.secKeys.cuimages]: {
             path: mega.gallery.secKeys.cuimages,
             icon: 'images',
             root: 'images',
-            filterFn: (n, cameraTree) => cameraTree && cameraTree.includes(n.p) && mega.gallery.isImage(n),
+            filterFn: (n, cameraTree) => cameraTree && cameraTree.includes(n.p) && M.isGalleryImage(n),
             title: l.gallery_camera_uploads
         },
         [mega.gallery.secKeys.cdimages]: {
             path: mega.gallery.secKeys.cdimages,
             icon: 'images',
             root: 'images',
-            filterFn: (n, cameraTree) => (!cameraTree || !cameraTree.includes(n.p)) && mega.gallery.isImage(n),
+            filterFn: (n, cameraTree) => (!cameraTree || !cameraTree.includes(n.p)) && M.isGalleryImage(n),
             title: l.gallery_from_cloud_drive
         },
         videos: {
             path: 'videos',
             icon: 'videos',
             root: 'videos',
-            filterFn: n => mega.gallery.isVideo(n),
+            filterFn: n => M.isGalleryVideo(n),
             title: l.gallery_all_locations
         },
         [mega.gallery.secKeys.cuvideos]: {
             path: mega.gallery.secKeys.cuvideos,
             icon: 'videos',
             root: 'videos',
-            filterFn: (n, cameraTree) => cameraTree && cameraTree.includes(n.p) && mega.gallery.isVideo(n),
+            filterFn: (n, cameraTree) => cameraTree && cameraTree.includes(n.p) && M.isGalleryVideo(n),
             title: l.gallery_camera_uploads
         },
         [mega.gallery.secKeys.cdvideos]: {
             path: mega.gallery.secKeys.cdvideos,
             icon: 'videos',
             root: 'videos',
-            filterFn: (n, cameraTree) => (!cameraTree || !cameraTree.includes(n.p)) && mega.gallery.isVideo(n),
+            filterFn: (n, cameraTree) => (!cameraTree || !cameraTree.includes(n.p)) && M.isGalleryVideo(n),
             title: l.gallery_from_cloud_drive
         }
     };
@@ -3862,7 +3812,7 @@ lazy(mega.gallery, 'initialiseMediaNodes', () => {
             && !disallowedFolders[n.p]
             && !n.fv
             && n.s
-            && mega.gallery.isGalleryNode(n)
+            && M.isGalleryNode(n)
             && mega.sensitives.shouldShowNode(n)
             && (!filterFn || filterFn(n, cameraTree));
 

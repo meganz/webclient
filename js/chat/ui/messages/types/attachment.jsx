@@ -159,7 +159,7 @@ export default class Attachment extends AbstractGenericMessage {
                                     />
                                 );
 
-                                if (mega.gallery.isGalleryNode(v)) {
+                                if (M.isGalleryNode(v)) {
                                     addToAlbumButton = <DropdownItem
                                         icon="sprite-fm-mono rectangle-stack-plus-small-regular-outline"
                                         label={l.add_to_album /* `Add to album` */}

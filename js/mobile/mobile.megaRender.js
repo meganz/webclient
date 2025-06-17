@@ -171,12 +171,17 @@ class MobileMegaRender {
     getDOMNode(h, n) {
 
         if (!this.nodeMap[h] && (n || M.getNodeByHandle(h))) {
-
             const fragment = document.createDocumentFragment();
 
-            this.nodeMap[h] = M.currentdirid === 'shares' ?
-                new MegaSharedNode({parentNode: fragment, nodeHandle: h}).domNode :
-                new MegaNodeComponent({parentNode: fragment, nodeHandle: h}).domNode;
+            if (M.currentdirid === 'shares') {
+                this.nodeMap[h] = new MegaSharedNode({parentNode: fragment, nodeHandle: h}).domNode;
+            }
+            else if (M.albums) {
+                this.nodeMap[h] = new mega.gallery.MegaAlbumNode({parentNode: fragment, nodeHandle: h}).domNode;
+            }
+            else {
+                this.nodeMap[h] = new MegaNodeComponent({parentNode: fragment, nodeHandle: h}).domNode;
+            }
         }
 
         return this.nodeMap[h];

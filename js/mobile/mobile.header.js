@@ -271,7 +271,12 @@ class MegaMobileHeader extends MegaComponent {
                     }
 
                     if (element === this.bottomBlock) {
-                        this.resetBottomBlock();
+                        if (pfcol && M.v.length) {
+                            element.classList.add('hidden');
+                        }
+                        else {
+                            this.resetBottomBlock();
+                        }
                     }
                 }
             }

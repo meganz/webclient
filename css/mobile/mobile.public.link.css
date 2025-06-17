@@ -24,18 +24,21 @@
     align-self: stretch;
 }
 
-.file-folder-view .no-content.folder-file,
-.pcol-cover-container {
+.file-folder-view .no-content.folder-file {
     text-align: center;
 }
 
-.pcol-cover-container {
-    padding-top: 12px;
+.pfcol-cover {
+    height: 175px;
+}
+
+.mobile.fm-content .album-title {
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-heading-h1);
 }
 
 .file-folder-view .no-access,
-.pcol-cover-container i.empty-album-img,
-.pcol-cover-container i.loading-album-img {
+.empty-states .no-access {
     height: 96px;
     width: 96px;
     background-size: contain;
@@ -47,13 +50,7 @@
     text-decoration: underline;
 }
 
-.pcol-cover-container i.loading-album-img.cover-loading {
-    filter: grayscale(100%);
-    opacity: 0.3;
-}
-
-.file-folder-view .no-access.no-access-folder,
-.pcol-cover-container i.empty-album-img {
+.file-folder-view .no-access.no-access-folder {
     background-image: url("../../images/mobile/folder.png");
 }
 
@@ -61,7 +58,8 @@
     background-image: url("../../images/mobile/file.png");
 }
 
-.file-folder-view .no-access.no-access-album {
+.file-folder-view .no-access.no-access-album,
+.empty-states .no-access.no-access-album {
     background-image: url("../../images/mobile/album.png");
 }
 

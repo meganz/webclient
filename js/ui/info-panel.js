@@ -1349,7 +1349,7 @@ lazy(mega.ui, 'mInfoPanel', () => {
     function hasThumbnail(node) {
         const nodeIcon = fileIcon(node);
         return ['image', 'video', 'raw', 'photoshop', 'vector'].includes(nodeIcon) &&
-            (is_image3(node) || nodeIcon === 'video' && mega.gallery.isVideo(node));
+            (is_image3(node) || nodeIcon === 'video' && M.isGalleryVideo(node));
     }
 
     function singleSelectBlocks(blockSet, node, isTakenDown) {
@@ -1389,7 +1389,7 @@ lazy(mega.ui, 'mInfoPanel', () => {
         if (node.t === 1 || deviceFolder) {
             blockSet.add(TYPES.NODE_SIZE);
         }
-        if (mega.gallery.isVideo(node)) {
+        if (M.isGalleryVideo(node)) {
             blockSet.add(TYPES.DURATION);
         }
         if (activeStats.heartbeat) {

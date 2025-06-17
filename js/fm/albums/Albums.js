@@ -127,11 +127,11 @@ lazy(mega.gallery, 'albums', () => {
                 : [];
             let firstNode = null;
 
-            const canBePlayed = n => scope.isPreviewable(n) && !scope.isVideo(n);
+            const canBePlayed = n => scope.isPreviewable(n) && !M.isGalleryVideo(n);
 
             if (asVideo) {
                 $.autoplay = true;
-                firstNode = album.nodes.find(n => scope.albums.grid.timeline.selections[n.h] && scope.isVideo(n));
+                firstNode = album.nodes.find(n => scope.albums.grid.timeline.selections[n.h] && M.isGalleryVideo(n));
             }
             else if (selHandles.length) {
                 firstNode = album.nodes.find(n => scope.albums.grid.timeline.selections[n.h] && canBePlayed(n));
@@ -231,7 +231,7 @@ lazy(mega.gallery, 'albums', () => {
         let imgCount = 0;
 
         for (let i = 0; i < nodes.length; i++) {
-            if (scope.isImage(nodes[i])) {
+            if (M.isGalleryImage(nodes[i])) {
                 imgCount++;
 
                 if (imgCount > 1) {
@@ -1410,7 +1410,7 @@ lazy(mega.gallery, 'albums', () => {
                                 for (let i = 0; i < nodes.length; i++) {
                                     existingHandles[nodes[i].h] = true;
 
-                                    if (scope.isVideo(nodes[i])) {
+                                    if (M.isGalleryVideo(nodes[i])) {
                                         this.currentVideosCount++;
                                     }
                                     else {
@@ -1425,7 +1425,7 @@ lazy(mega.gallery, 'albums', () => {
                                         addedCount++;
                                         handlesToAdd.push({ h, o: (nodes.length + handlesToAdd.length + 1) * 1000 });
 
-                                        if (M.d[h] && scope.isVideo(M.d[h])) {
+                                        if (M.d[h] && M.isGalleryVideo(M.d[h])) {
                                             this.videosCount++;
                                         }
                                         else {
@@ -3206,7 +3206,7 @@ lazy(mega.gallery, 'albums', () => {
                     }
 
                     delay('render:in_album_node_preview', () => {
-                        const isVideo = scope.isVideo(cell.el.ref.node);
+                        const isVideo = M.isGalleryVideo(cell.el.ref.node);
 
                         if (isVideo && !isVideo.isVideo) {
                             scope.reportDownload();
@@ -3755,7 +3755,7 @@ lazy(mega.gallery, 'albums', () => {
                     label: l.gallery_favourites,
                     filterFn: n => n.fa
                         && n.fav
-                        && scope.isGalleryNode(n)
+                        && M.isGalleryNode(n)
                 }
             };
 
@@ -3905,7 +3905,7 @@ lazy(mega.gallery, 'albums', () => {
                 const ignoreHandles = unwantedHandles() || false;
 
                 for (let i = 0; i < fmNodes.length; i++) {
-                    if (!scope.isGalleryNode(fmNodes[i])) {
+                    if (!M.isGalleryNode(fmNodes[i])) {
                         continue;
                     }
 
@@ -4368,7 +4368,7 @@ lazy(mega.gallery, 'albums', () => {
                 return;
             }
 
-            if (!scope.isGalleryNode(node)) {
+            if (!M.isGalleryNode(node)) {
                 return;
             }
 
@@ -4429,7 +4429,7 @@ lazy(mega.gallery, 'albums', () => {
                 return;
             }
 
-            if (!scope.isGalleryNode(node)) {
+            if (!M.isGalleryNode(node)) {
                 return;
             }
 
@@ -4652,7 +4652,7 @@ lazy(mega.gallery, 'albums', () => {
             for (let i = 0; i < album.nodes.length; i++) {
                 statsObj[
                     (handlesCache[album.nodes[i].h] ? 'del' : 'left')
-                    + (scope.isVideo(album.nodes[i]) ? 'Vid' : 'Img')
+                    + (M.isGalleryVideo(album.nodes[i]) ? 'Vid' : 'Img')
                 ]++;
             }
 

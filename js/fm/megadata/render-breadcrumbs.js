@@ -311,6 +311,17 @@
 
         $('.fm-breadcrumbs', scope).rebind('contextmenu.breadcrumb', () => {
             return false;
+        }).droppable({
+            tolerance: 'pointer',
+            drop: (e, ui) => {
+                $.doDD(e, ui, 'drop', 2);
+            },
+            over: (e, ui) => {
+                $.doDD(e, ui, 'over', 2);
+            },
+            out: (e, ui) => {
+                $.doDD(e, ui, 'out', 2);
+            }
         });
     }
 

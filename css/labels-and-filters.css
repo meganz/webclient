@@ -88,14 +88,6 @@
 .data-block-view.colour-label .tranfer-filetype-txt {
     padding-inline-end: 12px;
 }
-.colour-label td.label::after {
-    right: 12px;
-    top: 12px;
-}
-.rtl .colour-label td.label::after {
-    left: 12px;
-    right: auto;
-}
 /* Filters */
 .filter-block.body,
 .filter-block.tree {

@@ -275,6 +275,9 @@ table.device-centre .device-centre-item-modified {
     width: 0;
     padding: 0 13px;
 }
+.device-centre-grid-view .grid-table td:first-child {
+    pointer-events: none;
+}
 
 .device-centre-grid-view .grid-table th:last-child,
 .device-centre-grid-view .grid-table td:last-child {

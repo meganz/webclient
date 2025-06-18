@@ -46,6 +46,10 @@
 .out-shared-grid-view .grid-table td:first-child {
     width: 66px;
 }
+.shared-grid-view .grid-table td:first-child,
+.out-shared-grid-view .grid-table td:first-child {
+    pointer-events: none;
+}
 
 .shared-grid-view .grid-table th:last-child,
 .shared-grid-view .grid-table td:last-child,
@@ -114,7 +118,6 @@ table.grid-table .inbound-share.unverified-share .sprite-fm-uni-after.icon-warni
     display: inline-block;
     vertical-align: top; /* do not remove this is for prevent mysterious spacing from inline-block */
 }
-
 .grid-scrolling-table:not(.subtitles-grid-table),
 .transfer-scrolling-table {
     height: 100%;
@@ -149,10 +152,8 @@ table tr td:last-child::after {
 /* ======================================== *\
    table-hover
 \* ======================================== */
-.table-hover tr:hover td:not(.label)::before,
-.table-hover tr.ui-selected td:not(.label)::before,
-.table-hover tr:hover td.label::after,
-.table-hover tr.ui-selected td.label::after {
+.table-hover tr td:not(.label)::before,
+.table-hover tr td.label::after {
     content: '';
     position: absolute;
     top: 0;
@@ -192,6 +193,20 @@ table tr td:last-child::after {
     vertical-align: middle;
     margin-bottom: 1px;
     padding: 2px;
+    pointer-events: all;
+    position: relative;
+}
+.table-hover tr i.selected::after {
+    content: '';
+    position: absolute;
+    top: -7px;
+    left: -3px;
+    right: -3px;
+    bottom: -6px;
+}
+.table-hover.fat tr i.selected::after {
+    top: -15px;
+    bottom: -14px;
 }
 .table-hover tbody.animate-select tr i.selected {
     transition: opacity 300ms;
@@ -201,6 +216,7 @@ table tr td:last-child::after {
     background: var(--mobile-selection-control);
     color: var(--mobile-icon-inverse);
     outline: none;
+    pointer-events: all;
 }
 .table-hover .selection-on tr:not(.ui-selected) i.selected,
 .table-hover tr:not(.ui-selected):hover i.selected {
@@ -364,6 +380,7 @@ table tr.ui-selected .grid-file-request-manage {
 }
 .grid-table.fm td.space-maintainer-start {
     z-index: 1;
+    pointer-events: none;
 }
 .mega-lite-mode .grid-table.fm.v-size [megatype="size"],
 .mega-lite-mode .grid-table.fm.v-versions [megatype="versions"],
@@ -389,6 +406,14 @@ table tr.ui-selected .grid-file-request-manage {
     padding-bottom: 6px;
     box-sizing: border-box;
     transition: 200ms linear;
+}
+.files-grid-view .grid-scrolling-table::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 30px;
 }
 
 .files-grid-view.fm .column-settings {
@@ -584,6 +609,13 @@ table.grid-table td[megatype="extras"] {
     right: 0;
     overflow: visible;
 }
+table.grid-table td[megatype="extras"] {
+    pointer-events: none;
+}
+table.grid-table td[megatype="extras"] > i,
+table.grid-table td[megatype="extras"] > a {
+    pointer-events: all;
+}
 .rtl table.grid-table th[megatype="extras"],
 .rtl table.grid-table td[megatype="extras"] {
     left: 0;
@@ -594,7 +626,7 @@ table.grid-table tr.linked td[megatype="extras"] {
 }
 /* table.grid-table th[megatype="extras"]::before, */
 .files-grid-view.fm .column-settings.overlap::before,
-table.grid-table tr.linked td[megatype="extras"]::before {
+table.grid-table tr td[megatype="extras"]::before {
     content: '';
     left: -30px;
     position: absolute;
@@ -609,7 +641,7 @@ table.grid-table tr.linked td[megatype="extras"]::before {
     direction: rtl;
 }
 .rtl .files-grid-view.fm .column-settings.overlap::before,
-.rtl table.grid-table:not(.fm-dialog-table) tr.linked td[megatype="extras"]::before {
+.rtl table.grid-table:not(.fm-dialog-table) td[megatype="extras"]::before {
     left: 0;
     right: -30px;
     background: linear-gradient(270deg, transparent, var(--mobile-page-background) 25px, var(--mobile-page-background)); 
@@ -674,6 +706,7 @@ table.grid-table .grid-url-header-nw .grid-url-arrow {
     top: 17px;
     left: auto;
     right: 14px;
+    pointer-events: all;
 }
 .rtl table.grid-table .grid-url-header-nw .grid-url-arrow {
     left: 14px;
@@ -1056,6 +1089,9 @@ table.shared-with-me td {
     height: 56px;
     font: var(--text-body2);
 }
+table.shared-with-me td.grid-url-header-nw {
+    pointer-events: none;
+}
 
 table.shared-with-me .avatar-wrapper {
     position: absolute;
@@ -1159,7 +1195,9 @@ table.out-shares td {
     z-index: 0;
     height: 56px;
 }
-
+table.out-shares td.grid-url-header-nw {
+    pointer-events: none;
+}
 table.out-shares .item-type-icon-90 {
     --icon-size: 48px;
     left: 0;

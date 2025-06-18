@@ -246,6 +246,7 @@
     justify-self: start;
     grid-column-end: 3;
     font-weight: 400;
+    direction: ltr;
 }
 .fm-blocks-view .colour-label .fm-item-name {
     grid-column-start: 2;
@@ -555,8 +556,7 @@ a.is-sensitive img {
     right: 12px;
 }
 .fm-blocks-view .file-block-scrolling .mega-node.ui-selected i.selected,
-.fm-blocks-view .file-block-scrolling .mega-node.ui-selecting i.selected,
-.fm-blocks-view .file-block-scrolling .mega-node.dragover i.selected {
+.fm-blocks-view .file-block-scrolling .mega-node.ui-selecting i.selected {
     opacity: 1;
     background: var(--mobile-selection-control);
     color: var(--mobile-icon-inverse);

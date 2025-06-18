@@ -19,7 +19,7 @@ class TutorialPasswordItemForm extends PasswordItemForm {
 
         if (!this.overlay) {
             this.overlay = new MegaOverlay({
-                parentNode: document.querySelector('.password-list-page'),
+                parentNode: pmlayout,
                 componentClassname: 'mega-overlay pm-overlay tutorial-overlay',
                 wrapperClassname: 'overlay',
                 scrollOverlay: true,

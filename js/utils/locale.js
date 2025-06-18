@@ -1993,14 +1993,25 @@ mBroadcaster.once('boot_done', function populate_l() {
     l.you_have_selected_pass_trial = escapeHTML(l.you_have_selected_pass_trial)
         .replace('[S]', '<span>').replace('[/S]', '</span>');
 
+    const otpHelpLink = 'https://help.mega.io/pass/mega-pass-features/one-time-passwords';
+
+    l.otp_promo_dialog_content = escapeHTML(l.otp_promo_dialog_content)
+        .replace(/\[BR]/g, '<br>')
+        .replace('[A]', `<a href=${otpHelpLink} target="_blank">`)
+        .replace('[/A]', '</a>');
+
     l.otp_field_instructions = escapeHTML(l.otp_field_instructions)
         .replace('[S]', '<span>').replace('[/S]', '</span>')
         .replace('[A]', '<a class="clickurl">').replace('[/A]', '</a>');
 
-    const otpHelpLink = 'https://help.mega.io/pass/mega-pass-features/one-time-passwords';
     l.otp_learn_more = escapeHTML(l.otp_learn_more)
         .replace('[A]', `<a class="clickurl" href=${otpHelpLink}" target="_blank">`)
         .replace('[/A]', '</a>');
+
+    l.otp_content_non_pwd_users = escapeHTML(l.otp_content_non_pwd_users)
+        .replace('[A]', `<a href="${otpHelpLink}" target="_blank">`)
+        .replace('[/A]', '</a>')
+        .replace('[BR]', '<br>');
 
     l.ach_vpn_trial_blurb = escapeHTML(l.ach_vpn_trial_blurb)
         .replace('[A]', mega_io_hyperlinks.vpn).replace('[/A]', '</a>');

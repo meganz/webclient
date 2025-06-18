@@ -99,6 +99,7 @@ class MegaOverlay extends MegaComponent {
 
             if (options.classList) {
                 this.addClass(...options.classList);
+                this.addedClasses = options.classList;
             }
 
             if (!options.name && d) {
@@ -208,6 +209,11 @@ class MegaOverlay extends MegaComponent {
     hide(name) {
         if (this.visible && (!name || name === this.name)) {
             this.removeClass('active', 'pm-dialog');
+
+            if (this.addedClasses) {
+                this.removeClass(...this.addedClasses);
+                delete this.addedClasses;
+            }
 
             mainlayout.classList.remove('fm-overlay', 'pm-dialog');
             document.documentElement.classList.remove('overlayed');

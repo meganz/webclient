@@ -117,6 +117,7 @@ class MegaSheet extends MegaOverlay {
                 this.type = options.type || 'normal';
                 this.height = options.sheetHeight || 'auto';
                 this.preventBgClosing = options.preventBgClosing || false;
+                document.documentElement.classList.add('overlayed');
             });
         }
         else {
@@ -129,6 +130,7 @@ class MegaSheet extends MegaOverlay {
             this.preventBgClosing = this.preventBgClosing || false;
 
             super.show();
+            document.documentElement.classList.add('overlayed');
         }
 
         if (mega.ui.overlay.visible) {
@@ -136,7 +138,6 @@ class MegaSheet extends MegaOverlay {
         }
 
         mainlayout.classList.add('fm-overlay');
-        document.documentElement.classList.add('overlayed');
         tryCatch(() => document.activeElement.blur())();
     }
 

@@ -533,6 +533,10 @@ a.is-sensitive img {
     width: var(--avatar-size);
     display: block;
 }
+.avatar.sk-loading i.sk-elm {
+    height: var(--avatar-size);
+    width: var(--avatar-size);
+}
 
 /* Selected states */
 .fm-blocks-view .mega-node i.selected {

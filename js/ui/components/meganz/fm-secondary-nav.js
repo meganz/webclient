@@ -125,9 +125,7 @@ class MegaNavCard extends MegaComponent {
             const { su } = this.node;
             return `
                 <div class="fm-item-badge">
-                    <div class="fm-share-avatar">
-                        <div class="avatar"></div>
-                    </div>
+                    <div class="fm-share-avatar"></div>
                     <div class="fm-share-user">${escapeHTML(M.getNameByHandle(su))}</div>
                     <span class="dot">.</span>
                     <div class="fm-share-email">${escapeHTML(M.u[su].m)}</div>
@@ -276,7 +274,11 @@ class MegaNavCard extends MegaComponent {
         }
         this.labelBadge = this.labelBadgeHtml;
         if (this.isSharedRoot) {
-            MegaNodeComponent.mAvatarNode(this.node.su, this.domNode.querySelector('.fm-share-avatar .avatar'));
+            this.avatar = this.avatar || new MegaAvatarComponent({
+                parentNode: this.domNode.querySelector('.fm-share-avatar'),
+                userHandle: this.node.su,
+            });
+            this.avatar.update();
             let iconClass = `fm-icon item-type-icon icon-${fileIcon(this.node)}-24`;
             if (mega.keyMgr.getWarningValue('cv') === '1') {
                 const ed = authring.getContactAuthenticated(this.node.su, 'Ed25519');

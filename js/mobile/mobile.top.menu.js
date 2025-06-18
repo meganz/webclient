@@ -188,7 +188,7 @@ class MegaMobileTopMenu extends MegaComponent {
             if (item.avatar) {
                 menuItem.addClass('account-tablet');
 
-                useravatar.loadAvatar(u_handle).finally(() => {
+                useravatar.loadAvatar(u_handle).catch(dump).finally(() => {
 
                     const avatarMeta = generateAvatarMeta(u_handle);
                     const shortNameEl = mCreateElement('span');

@@ -369,7 +369,7 @@ class MegaMobileHeader extends MegaComponent {
             componentClassname: 'avatar'
         });
 
-        useravatar.loadAvatar(u_handle).finally(() => {
+        useravatar.loadAvatar(u_handle).catch(dump).finally(() => {
 
             const avatarMeta = generateAvatarMeta(u_handle);
 

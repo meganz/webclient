@@ -555,6 +555,7 @@ lazy(mega.ui, 'secondaryNav', () => {
 
     const colBtnsText = {
         'name': l[86],
+        'fav': l[5871],
         'label': l[17398],
         'date': l[17445],
         'mtime': l[94],
@@ -647,7 +648,8 @@ lazy(mega.ui, 'secondaryNav', () => {
                     colkey = 'timeMd';
                 }
 
-                if ((colkey === 'versions' || colkey === 'size') && mega.lite.inLiteMode) {
+                if ((colkey === 'versions' || colkey === 'size') && mega.lite.inLiteMode ||
+                    M.currentdirid === 'faves' && colkey === 'fav') {
                     forceHide = true;
                 }
 
@@ -727,6 +729,7 @@ lazy(mega.ui, 'secondaryNav', () => {
 
         _filterColumns();
 
+        columnMenu.componentSelector('[colkey="fav"]').addClass('hidden');
         updateColBtnText();
 
         mega.ui.menu.show({

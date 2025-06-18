@@ -323,18 +323,6 @@ table tr.ui-selected .grid-file-request-manage {
     right: auto;
     left: 7px;
 }
-
-.grid-table th.grid-first-th {
-    width: 75px;
-    padding: 0;
-    padding-inline-start: 12px;
-    padding-inline-end: 14px;
-    cursor: pointer;
-}
-
-.grid-table.fm th.grid-first-th {
-    cursor: pointer;
-}
 .grid-table.fm th:first-child {
     padding: 0;
 }
@@ -374,11 +362,6 @@ table tr.ui-selected .grid-file-request-manage {
 .grid-table th:last-child::after {
     display: none;
 }
-.grid-table th span.grid-header-star {
-    height: 16px;
-    line-height: 16px;
-}
-.grid-table th span.grid-header-star i,
 .grid-table th.grid-first-th i {
     --icon-size: 16px;
     --mask-color: var(--mobile-icon-primary);
@@ -792,9 +775,6 @@ table.fm.fat td {
 table.fm [megatype="fav"] {
     text-align: center;
     text-overflow: initial;
-}
-table.fm th[megatype="fav"] {
-    pointer-events: none;
 }
 table.fm td[megatype="fname"] {
     min-width: 180px;

@@ -630,13 +630,18 @@ lazy(mega.ui, 'mInfoPanel', () => {
                 usersNode.textContent = '';
                 const MAX_AVATARS = 12;
                 for (let i = 0; i < userHandles.length; i++) {
-                    const wrap = document.createElement('div');
-                    wrap.className = `avatar size-${size || 24}`;
-                    usersNode.appendChild(wrap);
                     if (i < MAX_AVATARS) {
-                        MegaNodeComponent.mAvatarNode(userHandles[i], wrap, { simpletip: true });
+                        MegaAvatarComponent.factory({
+                            parentNode: usersNode,
+                            userHandle: userHandles[i],
+                            size: size || 24,
+                            simpletip: true,
+                        });
                     }
                     else {
+                        const wrap = document.createElement('div');
+                        wrap.className = `avatar size-${size || 24}`;
+                        usersNode.appendChild(wrap);
                         wrap.classList.add('users-count');
                         usersNode.classList.add('overlap');
                         wrap.appendChild(parseHTML(

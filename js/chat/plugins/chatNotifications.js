@@ -184,11 +184,6 @@ var ChatNotifications = function(megaChat, options) {
                     fromContact = message.authorContact;
                 }
 
-                let {avatarUrl, fullName} = fromContact ? generateAvatarMeta(fromContact.u) : {};
-                if (!fullName && fromContact) {
-                    fullName = await megaChat.plugins.userHelper.getUserName(fromContact.u).catch(dump);
-                }
-
                 let n;
 
                 // halt if already seen.
@@ -198,6 +193,11 @@ var ChatNotifications = function(megaChat, options) {
                     message.revoked === true
                 ) {
                     return;
+                }
+
+                let {avatarUrl, fullName} = fromContact ? generateAvatarMeta(fromContact.u) : {};
+                if (!fullName && fromContact) {
+                    fullName = await megaChat.plugins.userHelper.getUserName(fromContact.u).catch(dump);
                 }
 
                 if (message.userId !== u_handle) {

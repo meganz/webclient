@@ -1025,7 +1025,7 @@ class MegaFlyoutMenu extends MegaComponent {
                                     handles &&
                                     handles.length &&
                                     megaChat.openChatAndAttachNodes(contactHandle, handles)
-                            );
+                            ).catch(dump);
                         });
                     }
                 }

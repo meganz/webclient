@@ -645,7 +645,7 @@ class MegaHeader extends MegaMobileHeader {
         }
 
         // Avatar Menu
-        useravatar.loadAvatar(u_handle).finally(() => {
+        useravatar.loadAvatar(u_handle).catch(dump).finally(() => {
 
             const avatarMeta = generateAvatarMeta(u_handle);
             const shortNameEl = mCreateElement('span', {}, [document.createTextNode(avatarMeta.shortName)]);

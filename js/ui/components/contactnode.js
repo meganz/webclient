@@ -6,11 +6,14 @@ class MegaContactNode extends MegaNodeComponent {
         this.addClass('user', 'mobile');
         this.removeClass('folder', 'file');
 
-        const avatar = document.createElement('div');
-        avatar.className = `avatar ${options.smallAvatar ? 'size-24' : ''}`;
-        this.iconNode.parentNode.replaceChild(avatar, this.iconNode);
+        const tmp = document.createElement('div');
+        const avatar = new MegaAvatarComponent({
+            parentNode: tmp,
+            userHandle: this.handle,
+            size: options.smallAvatar ? 24 : 48,
+        });
+        this.iconNode.replaceWith(avatar.domNode, this.iconNode);
         this.iconNode = avatar;
-        MegaNodeComponent.mAvatarNode(this.handle, this.iconNode);
 
         if (this.node.m) {
             const email = document.createElement('span');
@@ -81,7 +84,7 @@ class MegaContactNode extends MegaNodeComponent {
             super.update('name');
         }
         if (_shouldUpdate('icon')) {
-            MegaNodeComponent.mAvatarNode(this.handle, this.iconNode);
+            this.iconNode.doRender().catch(reportError);
         }
     }
 }

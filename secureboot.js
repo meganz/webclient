@@ -2260,6 +2260,7 @@ else if (!browserUpdate) {
 
     // Shared components
     jsl.push({f:'js/ui/components/group.js', n: 'group_js', j: 1, w:1});
+    jsl.push({f:'js/ui/components/lazyrender.js', n: 'lazyrender_js', j: 1, w: 1});
     jsl.push({f:'js/ui/components/interactable.js', n: 'interactable_js', j: 1, w:1});
     jsl.push({f:'js/ui/components/link.js', n: 'link_js', j: 1, w:1});
     jsl.push({f:'js/ui/components/button.js', n: 'button_js', j: 1, w:1});
@@ -2270,6 +2271,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/ui/components/toast.js', n: 'components_toast_js', j: 1, w:1});
     jsl.push({f:'js/ui/components/overlay.js', n: 'overlay_js', j: 1, w:1});
     jsl.push({f:'js/ui/components/sheet.js', n: 'sheet_js', j: 1, w:1});
+    jsl.push({f:'js/ui/components/avatar.js', n: 'avatarcomp_js', j: 1, w: 1});
     jsl.push({f:'js/ui/components/megaInput.js', n: 'megainput_js', j: 1, w: 1});
     jsl.push({f:'js/ui/components/textarea.js', n: 'textarea_js', j: 1, w: 1});
     jsl.push({f:'js/ui/components/menu.js', n: 'menu_js', j: 1, w:1});

@@ -462,56 +462,6 @@ class MegaNodeComponent extends MegaComponent {
         }
     }
 
-    static mAvatarNode(userHandle, domNode, options) {
-        if (!userHandle || !(userHandle in M.u) || !domNode) {
-            return;
-        }
-
-        options = options || {};
-        useravatar.loadAvatar(userHandle).always(() => {
-            const avatarMeta = generateAvatarMeta(userHandle);
-
-            const shortNameEl = mCreateElement('span');
-            shortNameEl.textContent = avatarMeta.shortName;
-
-            const avatar = avatarMeta.avatarUrl
-                ? mCreateElement('img', {src: avatarMeta.avatarUrl})
-                : mCreateElement('div', {class: `color${avatarMeta.color}`},[shortNameEl]);
-
-            domNode.textContent = '';
-            domNode.appendChild(avatar);
-            if (options.presence) {
-                const presence = document.createElement('i');
-                const p = M.u[userHandle].presence;
-                /**
-                 * Presence values without requiring megaChat/presence to be loaded.
-                 * @see UserPresence.PRESENCE
-                 * */
-                if (p === 1) {
-                    presence.className = 'activity-status online';
-                }
-                else if (p === 2) {
-                    presence.className = 'activity-status away';
-                }
-                else if (p === 3) {
-                    presence.className = 'activity-status online';
-                }
-                else if (p === 4) {
-                    presence.className = 'activity-status busy';
-                }
-                else {
-                    presence.className = 'activity-status black';
-                }
-                domNode.appendChild(presence);
-            }
-
-            if (options.simpletip && avatarMeta.fullName) {
-                domNode.dataset.simpletip = avatarMeta.fullName;
-                domNode.classList.add('simpletip');
-            }
-        });
-    }
-
     update(type) {
         const _shouldUpdate = key => !type || type === key;
 

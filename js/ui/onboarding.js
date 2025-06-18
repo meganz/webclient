@@ -31,7 +31,9 @@ window.OBV4_FLAGS = {
     CLOUD_DRIVE_DC: 'obcddc',
     CLOUD_DRIVE_DC_BUBBLE: 'obcddcb',
     PASS: 'obmp',
-    PASS_INIT: 'obmpi'
+    PASS_INIT: 'obmpi',
+    CLOUD_DRIVE_PASS_OTP: 'obcdmpotp',
+    CLOUD_DRIVE_PASS_OTP_START: 'obcdmpotps'
     // New onboarding flags to be added at the end of this object. Don't change the order!!!!
     // UNUSED_X flags can be repurposed.
 };
@@ -39,8 +41,8 @@ window.OBV4_FLAGS = {
 mBroadcaster.addListener('fm:initialized', () => {
     'use strict';
 
-    // TODO Set the right DC release date timestamp
-    const DEVICE_CENTRE_RELEASE_DATE = 1734519600;
+    // 28th February 2025
+    const DEVICE_CENTRE_RELEASE_DATE = 1740697200;
 
     // If user is visiting folderlink, or not complete registration do not show Onboarding V4.
     if (folderlink || u_type < 3) {
@@ -441,43 +443,39 @@ mBroadcaster.addListener('fm:initialized', () => {
 
     const _obv4DeviceCentre = () => {
         if (mega.ui.onboarding) {
-            if (u_attr.since < DEVICE_CENTRE_RELEASE_DATE) {
-                // users must be registered before DC release to see DC tooltip
-
-                const _obMap = obMap || {};
-                _obMap['cloud-drive'] = {
-                    title: l.mega_device_centre,
-                    flag: OBV4_FLAGS.CLOUD_DRIVE_DC,
-                    noCP: true,
-                    steps: [
-                        {
-                            name: l.mega_device_centre,
-                            flag: OBV4_FLAGS.CLOUD_DRIVE_DC_BUBBLE,
-                            get prerequisiteCondition() {
-                                return $.MPNotOpened === undefined;
-                            },
-                            actions: [
-                                {
-                                    type: 'showDialog',
-                                    dialogClass: 'mcob dc',
-                                    dialogTitle: l.dc_promo_onboarding_title,
-                                    dialogDesc: l.dc_promo_onboarding_content,
-                                    dialogNext: l.ok_button,
-                                    skipHidden: true,
-                                    targetElmClass: '.js-myfiles-panel .device-centre span',
-                                    targetElmPosition: 'left',
-                                    targetElmPosTuning: {
-                                        top: 5,
-                                        left: 15,
-                                    },
-                                    markComplete: true,
-                                }
-                            ]
-                        }
-                    ],
-                };
-                mega.ui.onboarding.map = _obMap;
-            }
+            const _obMap = obMap || {};
+            _obMap['cloud-drive'] = {
+                title: l.mega_device_centre,
+                flag: OBV4_FLAGS.CLOUD_DRIVE_DC,
+                noCP: true,
+                steps: [
+                    {
+                        name: l.mega_device_centre,
+                        flag: OBV4_FLAGS.CLOUD_DRIVE_DC_BUBBLE,
+                        get prerequisiteCondition() {
+                            return $.MPNotOpened === undefined;
+                        },
+                        actions: [
+                            {
+                                type: 'showDialog',
+                                dialogClass: 'mcob dc',
+                                dialogTitle: l.dc_promo_onboarding_title,
+                                dialogDesc: l.dc_promo_onboarding_content,
+                                dialogNext: l.ok_button,
+                                skipHidden: true,
+                                targetElmClass: '.js-myfiles-panel .device-centre span',
+                                targetElmPosition: 'left',
+                                targetElmPosTuning: {
+                                    top: 5,
+                                    left: 15,
+                                },
+                                markComplete: true,
+                            }
+                        ]
+                    }
+                ],
+            };
+            mega.ui.onboarding.map = _obMap;
             mBroadcaster.addListener('pagechange', () => {
                 // Hide the control panel while the page change is finishing up.
                 $('.onboarding-control-panel', '.fm-right-files-block').addClass('hidden');
@@ -490,6 +488,38 @@ mBroadcaster.addListener('fm:initialized', () => {
             if (currentSection.map.flag === OBV4_FLAGS.CLOUD_DRIVE_DC && M.currentrootid === M.RootID) {
                 currentSection.startNextOpenSteps();
             }
+        }
+    };
+
+    const _obv4MegaPassOTP = () => {
+        if (mega.ui.onboarding) {
+            const {currentSectionName} = mega.ui.onboarding;
+
+            if (currentSectionName !== 'cloud-drive' && currentSectionName !== 'pwm') {
+                return;
+            }
+
+            const _obMap = obMap || {};
+            _obMap[currentSectionName] = {
+                title: l.mega_pwm,
+                flag: OBV4_FLAGS.CLOUD_DRIVE_PASS_OTP,
+                noCP: true,
+                steps: [
+                    {
+                        name: 'MEGA Pass: New stronger security, same zero hassle experience',
+                        flag: OBV4_FLAGS.CLOUD_DRIVE_PASS_OTP_START,
+                        actions: [
+                            {
+                                type: 'showExtDialog',
+                                dialogInitFunc: mega.ui.onboarding.extDlg.showPassOTPPromoDialog,
+                                markComplete: true
+                            }
+                        ]
+                    }
+                ]
+            };
+
+            mega.ui.onboarding.map = _obMap;
         }
     };
 
@@ -512,8 +542,25 @@ mBroadcaster.addListener('fm:initialized', () => {
             localStorage.obv4testnn) {
             _obv4NewNav();
         }
-        else if (!flagMap.getSync(OBV4_FLAGS.CLOUD_DRIVE_DC)) {
+        else if (!flagMap.getSync(OBV4_FLAGS.CLOUD_DRIVE_DC) && u_attr.since < DEVICE_CENTRE_RELEASE_DATE) {
+            // users must be registered before DC release to see DC tooltip
             _obv4DeviceCentre();
+        }
+
+        // 1. Free accounts will see the Promo dialog with Free or subscribe button only in CD and is not dependant on
+        // MEGA Pass onboarding dialog completion.
+        // 2. Pro accounts & MEGA Pass feature enabled accounts will see the Promo dialog with 'Show me' button to
+        // start tutorial flow
+        // 3. Deactivated Business & Proflexi accounts will not see the dialog.
+        // 4. Accounts created after 31-01-2025 will see the dialog regardless of completion of CD new nav flow.
+        // 5. In '/pwm' page, the Promo dialog will be shown only if the user has completed the MEGA Pass onboarding.
+        if ((M.currentdirid === M.RootID &&
+            (flagMap.getSync(OBV4_FLAGS.CLOUD_DRIVE_NEW_NAV) || u_attr.since >= 1738279000) ||
+            (flagMap.getSync(OBV4_FLAGS.PASS) && M.currentdirid === 'pwm'))
+            && ((!u_attr.b && !u_attr.pf) ||
+            (u_attr.b && u_attr.b.s !== pro.ACCOUNT_STATUS_EXPIRED) ||
+            (u_attr.pf && u_attr.pf.s !== pro.ACCOUNT_STATUS_EXPIRED))) {
+            _obv4MegaPassOTP();
         }
 
         const _handleMegaPassSteps = () => {
@@ -525,9 +572,15 @@ mBroadcaster.addListener('fm:initialized', () => {
                 return;
             }
             const pwmFeature = u_attr.features && u_attr.features.find(elem => elem[1] === 'pwm');
-            if (!pwmFeature || pwmFeature[0] <= Date.now() / 1000) {
+            if (!pwmFeature || pwmFeature[0] <= Date.now() / 1000 || M.currentdirid !== 'pwm') {
                 return;
             }
+
+            if (flagMap.getSync(OBV4_FLAGS.PASS)) {
+                // If the user has completed the MEGA Pass onboarding, init the OTP promo dialog.
+                _obv4MegaPassOTP();
+            }
+
             const {onboarding} = mega.ui;
 
             if (onboarding && onboarding.currentSection) {
@@ -536,15 +589,16 @@ mBroadcaster.addListener('fm:initialized', () => {
                 // Check if the current section is relevant and execute open steps
                 if (
                     currentSection.map &&
-                    currentSection.map.flag === OBV4_FLAGS.PASS &&
-                    M.currentdirid === 'pwm'
+                    currentSection.map.flag === OBV4_FLAGS.PASS
                 ) {
                     currentSection.startNextOpenSteps();
                 }
             }
         };
 
-        const isOverridden = obMap && obMap['cloud-drive'].flag === OBV4_FLAGS.CLOUD_DRIVE_NEW_NAV;
+        const isOverridden = obMap && obMap['cloud-drive'].flag === OBV4_FLAGS.CLOUD_DRIVE_NEW_NAV ||
+                                    obMap['cloud-drive'].flag === OBV4_FLAGS.CLOUD_DRIVE_PASS_OTP;
+
         const _delayStart = () => {
             delay('delayKickstartOB', () => {
 
@@ -567,7 +621,8 @@ mBroadcaster.addListener('fm:initialized', () => {
                 mega.ui.onboarding.start();
 
                 // this onboarding requires kickstarting manually as it does not have control panel
-                if (isOverridden && M.currentrootid === M.RootID) {
+                if (isOverridden && M.currentrootid === M.RootID ||
+                    flagMap.getSync(OBV4_FLAGS.PASS) && M.currentrootid === 'pwm') {
                     mega.ui.onboarding.currentSection.startNextOpenSteps();
                 }
 
@@ -1419,6 +1474,105 @@ mBroadcaster.addListener('fm:initialized', () => {
                 });
 
                 return $dialog;
+            });
+        },
+
+        async showPassOTPPromoDialog() {
+            let actionText = l[7224];
+            let title = l.otp_promo_dialog_title;
+            let msg = l.otp_promo_dialog_content;
+            let plan = false;
+
+            if (!u_attr.b && !u_attr.pf) {
+                const pwmFeature = pro.proplan2.getUserFeature('pwm');
+
+                if (!pwmFeature || pwmFeature[0] <= Date.now() / 1e3) {
+                    // if the Feature PWM is not available then get plans, check the free trial/feature plan eligibility
+                    const {result} = await api.req({a: 'utqa', nf: 2, ft: 1}).catch(dump) || {};
+
+                    if (result) {
+                        for (let i = result.length; i--;) {
+                            if (result[i].f && result[i].f.pwm === 1) {
+                                plan = result[i];
+                                break;
+                            }
+                        }
+                    }
+
+                    if (plan) {
+                        actionText = plan.trial ? l.try_free : l.subscribe_mega_pass;
+                        title = l.otp_promo_title_non_pwd_users;
+                        msg = l.otp_content_non_pwd_users;
+                    }
+                }
+            }
+
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'promo-dialog-content';
+            contentDiv.append(parseHTML(msg));
+
+            const footerElements = [
+                mCreateElement('div', { class: 'flex flex-row' }),
+                mCreateElement('div', { class: 'flex flex-row-reverse' })
+            ];
+
+            MegaButton.factory({
+                parentNode: footerElements[1],
+                text: actionText,
+                componentClassname: 'slim font-600',
+                type: 'normal'
+            }).on('click', () => {
+                mega.ui.sheet.hide();
+
+                // if the user eligible for free trial or needs to subscribe then redirect to pricing page
+                if (plan) {
+                    mega.redirect('mega.io', 'pricing#pass', false, false);
+                }
+                else {
+                    const _handleMegaPassOTPTutorial = () => {
+                        if (!mega.ui.pm) {
+                            if (!_handleMegaPassOTPTutorial.onceAwait) {
+                                _handleMegaPassOTPTutorial.onceAwait = true;
+                                mBroadcaster.once('pwm-initialized', _handleMegaPassOTPTutorial);
+                            }
+                            return;
+                        }
+                        const tutorialOTP = new TutorialOTP();
+                        tutorialOTP.start();
+                    };
+                    if (M.currentdirid === 'pwm') {
+                        _handleMegaPassOTPTutorial();
+                    }
+                    else {
+                        M.openFolder('pwm')
+                            .then(() => {
+                                _handleMegaPassOTPTutorial();
+                            })
+                            .catch(dump);
+                    }
+                }
+            });
+
+            MegaButton.factory({
+                parentNode: footerElements[1],
+                text: l.ok_button,
+                componentClassname: 'slim font-600 mx-2 secondary',
+                type: 'normal'
+            }).on('click', () => mega.ui.sheet.hide());
+
+            mega.ui.sheet.show({
+                name: 'mega-pass-otp-promo-dialog',
+                type: 'normal',
+                title,
+                classList: ['promo-dialog'],
+                contents: [contentDiv],
+                showClose: true,
+                preventBgClosing: true,
+                navImage: 'three-locks',
+                centered: false,
+                footer: {
+                    slot: footerElements
+                }
             });
         }
     }

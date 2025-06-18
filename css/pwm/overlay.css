@@ -197,6 +197,9 @@
     color: var(--mobile-link-primary);
 }
 
+.overlay-wrap.pm-overlay.tutorial-overlay {
+    position: relative;
+}
 .overlay-wrap.pm-overlay.tutorial-overlay .pm.mega-input .account.password-status.checked {
     display: none;
 }

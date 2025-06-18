@@ -634,6 +634,16 @@ FileManager.prototype.initFileManagerUI = function() {
                 }
             }
         }
+        else if (type === 2) {
+            // Breadcrumbs dropped
+            c = $(e.target).attr('class');
+            if (c && c.includes('folder')) {
+                t = $(e.target).data('id');
+            }
+            else if (c && c.includes('cloud-drive')) {
+                t = M.RootID;
+            }
+        }
         else {
             // grid dropped:
             c = $(e.target).attr('class');
@@ -725,9 +735,8 @@ FileManager.prototype.initFileManagerUI = function() {
             $('body').addClass($.draggingClass);
 
             $(e.target).addClass('dragover');
-            $($.selectddUIgrid + ' ' + $.selectddUIitem).removeClass('ui-selected');
             if ($(e.target).hasClass('folder')) {
-                $(e.target).addClass('ui-selected').find('.file-settings-icon, .grid-url-arrow').addClass('hide-settings-icon');
+                $('.file-settings-icon, .grid-url-arrow', e.target).addClass('hide-settings-icon');
             }
         }
         // if (d) console.log('!a:'+a, dd, $(e.target).attr('id'), (M.d[$(e.target).attr('id').split('_').pop()]||{}).name, $(e.target).attr('class'), $(ui.draggable.context).attr('class'));
@@ -774,10 +783,6 @@ FileManager.prototype.initFileManagerUI = function() {
                                 }
                             })
                             .finally(() => loadingDialog.phide());
-
-                        if (window.selectionManager) {
-                            selectionManager.resetTo($.movet);
-                        }
                     }
                 }, 50);
             }
@@ -3121,11 +3126,10 @@ FileManager.prototype.getDDhelper = function getDDhelper() {
     $(id).append(
         '<div class="dragger-block drag" id="draghelper">' +
         '<div class="dragger-content"></div>' +
-        '<div class="dragger-files-number">1</div>' +
+        '<div class="dragger-files-number hidden">1</div>' +
         '</div>'
     );
     $('.dragger-block').show();
-    $('.dragger-files-number').hide();
     return $('.dragger-block')[0];
 };
 
@@ -3143,99 +3147,101 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
 
     var mainSel = $.selectddUIgrid + ' ' + $.selectddUIitem;
     var dropSel = $.selectddUIgrid + ' ' + $.selectddUIitem + '.folder';
-
-    $(dropSel).droppable({
-        tolerance: 'pointer',
-        drop: function(e, ui) {
-            $.doDD(e, ui, 'drop', 0);
-        },
-        over: function(e, ui) {
-            $.doDD(e, ui, 'over', 0);
-        },
-        out: function(e, ui) {
-            $.doDD(e, ui, 'out', 0);
-        }
-    });
-
-    if ($.gridDragging) {
-        $('body').addClass('dragging ' + ($.draggingClass || ''));
-    }
-
     var $ddUIitem = $(mainSel);
     var $ddUIgrid = $($.selectddUIgrid);
-    $ddUIitem.draggable({
-        start: function(e, u) {
-            if (d) {
-                console.log('draggable.start');
+
+    if (!folderlink) {
+        $(dropSel).droppable({
+            tolerance: 'pointer',
+            drop(e, ui) {
+                $.doDD(e, ui, 'drop', 0);
+            },
+            over(e, ui) {
+                $.doDD(e, ui, 'over', 0);
+            },
+            out(e, ui) {
+                $.doDD(e, ui, 'out', 0);
             }
-            $.hideContextMenu(e);
-            $.gridDragging = true;
-            $('body').addClass('dragging');
-            if (!$(this).hasClass('ui-selected')) {
-                selectionManager.resetTo($(this).attr('id'));
-            }
-            var max = ($(window).height() - 96) / 24;
-            var html = [];
-            $.selected.forEach(function(id, i) {
-                var n = M.d[id];
-                if (n) {
-                    if (max > i) {
+        });
+
+        if ($.gridDragging) {
+            $('body').addClass('dragging ' + ($.draggingClass || ''));
+        }
+
+        $ddUIitem.draggable({
+            start(e) {
+                if (d) {
+                    console.log('draggable.start');
+                }
+                $.hideContextMenu(e);
+                $.gridDragging = true;
+                $('body').addClass('dragging');
+                if (!$(this).hasClass('ui-selected')) {
+                    selectionManager.resetTo($(this).attr('id'));
+                }
+                var max = ($(window).height() - 96) / 24;
+                var html = [];
+                $.selected.forEach((id, i) => {
+                    var n = M.d[id];
+                    if (n && max > i) {
                         html.push(
                             '<div class="item-type-icon icon-' + fileIcon(n) + '-24"></div>' +
                             '<div class="tranfer-filetype-txt dragger-entry">' +
                             escapeHTML(n.name) + '</div>'
                         );
                     }
+                });
+                // TODO: This count feature currently not really in used we may need to get back to this.
+                if ($.selected.length > max) {
+                    $('.dragger-files-number').text($.selected.length);
+                    $('.dragger-files-number').removeClass('hidden');
                 }
-            });
-            if ($.selected.length > max) {
-                $('.dragger-files-number').text($.selected.length);
-                $('.dragger-files-number').show();
-            }
-            $('#draghelper .dragger-content').html(html.join(""));
-            $.draggerHeight = $('#draghelper .dragger-content').outerHeight();
-            $.draggerWidth = $('#draghelper .dragger-content').outerWidth();
-            $.draggerOrigin = M.currentdirid;
-            $.dragSelected = clone($.selected);
-        },
-        drag: function(e, ui) {
-            if (ui.position.top + $.draggerHeight - 28 > $(window).height()) {
-                ui.position.top = $(window).height() - $.draggerHeight + 26;
-            }
-            if (ui.position.left + $.draggerWidth - 58 > $(window).width()) {
-                ui.position.left = $(window).width() - $.draggerWidth + 56;
-            }
-        },
-        refreshPositions: true,
-        containment: 'document',
-        scroll: false,
-        distance: 10,
-        revertDuration: 200,
-        revert: true,
-        cursorAt: {right: 90, bottom: 56},
-        cancel: 'input, textarea, button:not(.open-context-menu), select, option',
-        helper: function(e, ui) {
-            $(this).draggable("option", "containment", [72, 42, $(window).width(), $(window).height()]);
-            return M.getDDhelper();
-        },
-        stop: function(event) {
-            if (d) {
-                console.log('draggable.stop');
-            }
-            $.gridDragging = $.draggingClass = false;
+                // eslint-disable-next-line local-rules/jquery-replacements
+                $('#draghelper .dragger-content').html(html.join(""));
+                $.draggerHeight = $('#draghelper .dragger-content').outerHeight();
+                $.draggerWidth = $('#draghelper .dragger-content').outerWidth();
+                $.draggerOrigin = M.currentdirid;
+                $.dragSelected = clone($.selected);
+            },
+            drag(e, ui) {
+                if (ui.position.top + $.draggerHeight - 28 > $(window).height()) {
+                    ui.position.top = $(window).height() - $.draggerHeight + 26;
+                }
+                if (ui.position.left + $.draggerWidth - 58 > $(window).width()) {
+                    ui.position.left = $(window).width() - $.draggerWidth + 56;
+                }
+            },
+            refreshPositions: true,
+            containment: 'document',
+            scroll: false,
+            distance: 10,
+            revertDuration: 200,
+            revert: true,
+            cursorAt: {right: 90, bottom: 56},
+            cancel: 'input, textarea, button:not(.open-context-menu), select, option',
+            helper() {
+                $(this).draggable("option", "containment", [72, 42, $(window).width(), $(window).height()]);
+                return M.getDDhelper();
+            },
+            stop() {
+                if (d) {
+                    console.log('draggable.stop');
+                }
+                $.gridDragging = $.draggingClass = false;
 
-            $('body').removeClass('dragging').removeClassWith("dndc-");
-            var origin = $.draggerOrigin;
-            setTimeout(function __onDragStop() {
-                M.onTreeUIOpen(M.currentdirid, false, true);
-            }, 200);
-            delete $.dragSelected;
-        }
-    });
+                $('body').removeClass('dragging').removeClassWith("dndc-");
+
+                setTimeout(function __onDragStop() {
+                    M.onTreeUIOpen(M.currentdirid, false, true);
+                }, 200);
+                delete $.dragSelected;
+            }
+        });
+    }
 
     $ddUIgrid.selectable({
         filter: $.selectddUIitem,
-        cancel: '.ps__rail-y, .ps__rail-x, thead',
+        cancel: `.ps__rail-y, .ps__rail-x, thead, ${$.selectddUIitem}`,
         start: e => {
             $.hideContextMenu(e);
             $.hideTopMenu();

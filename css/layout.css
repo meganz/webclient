@@ -80,6 +80,7 @@ body.pwm-ui .pm-main .mega-header {
 }
 
 .pm-main .password-list-page,
+.pm-main .pm-overlay.tutorial-overlay,
 .pm-main .settings-wrap,
 .pm-main > section, 
 .section.conversations,

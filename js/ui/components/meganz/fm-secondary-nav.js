@@ -125,9 +125,7 @@ class MegaNavCard extends MegaComponent {
             const { su } = this.node;
             return `
                 <div class="fm-item-badge">
-                    <div class="fm-share-avatar">
-                        <div class="avatar"></div>
-                    </div>
+                    <div class="fm-share-avatar"></div>
                     <div class="fm-share-user">${escapeHTML(M.getNameByHandle(su))}</div>
                     <span class="dot">.</span>
                     <div class="fm-share-email">${escapeHTML(M.u[su].m)}</div>
@@ -140,7 +138,7 @@ class MegaNavCard extends MegaComponent {
             const { nodes } = this.node;
             let i = nodes.length;
             while (--i >= 0) {
-                if (mega.gallery.isVideo(nodes[i])) {
+                if (M.isGalleryVideo(nodes[i])) {
                     vid++;
                 }
                 else {
@@ -276,7 +274,11 @@ class MegaNavCard extends MegaComponent {
         }
         this.labelBadge = this.labelBadgeHtml;
         if (this.isSharedRoot) {
-            MegaNodeComponent.mAvatarNode(this.node.su, this.domNode.querySelector('.fm-share-avatar .avatar'));
+            this.avatar = this.avatar || new MegaAvatarComponent({
+                parentNode: this.domNode.querySelector('.fm-share-avatar'),
+                userHandle: this.node.su,
+            });
+            this.avatar.update();
             let iconClass = `fm-icon item-type-icon icon-${fileIcon(this.node)}-24`;
             if (mega.keyMgr.getWarningValue('cv') === '1') {
                 const ed = authring.getContactAuthenticated(this.node.su, 'Ed25519');
@@ -555,6 +557,7 @@ lazy(mega.ui, 'secondaryNav', () => {
 
     const colBtnsText = {
         'name': l[86],
+        'fav': l[5871],
         'label': l[17398],
         'date': l[17445],
         'mtime': l[94],
@@ -647,7 +650,8 @@ lazy(mega.ui, 'secondaryNav', () => {
                     colkey = 'timeMd';
                 }
 
-                if ((colkey === 'versions' || colkey === 'size') && mega.lite.inLiteMode) {
+                if ((colkey === 'versions' || colkey === 'size') && mega.lite.inLiteMode ||
+                    M.currentdirid === 'faves' && colkey === 'fav') {
                     forceHide = true;
                 }
 
@@ -727,6 +731,7 @@ lazy(mega.ui, 'secondaryNav', () => {
 
         _filterColumns();
 
+        columnMenu.componentSelector('[colkey="fav"]').addClass('hidden');
         updateColBtnText();
 
         mega.ui.menu.show({

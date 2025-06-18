@@ -419,3 +419,42 @@
 }
 
 /* v4 onboarding end */
+
+/* MEGA Pass otp promo dialog */
+.mega-sheet.promo-dialog .icon {
+    display: block;
+}
+.mega-sheet.promo-dialog .header .icon.three-locks {
+    width: 120px;
+    height: 120px;
+    background: url('../images/pm/three-locks.png');
+    background-size: contain;
+}
+.mega-sheet.promo-dialog .header > * {
+    margin-bottom: 0;
+}
+.mega-sheet.promo-dialog .header {
+    padding: 24px 24px 16px;
+    box-sizing: border-box;
+    align-items: start;
+}
+.mega-sheet.promo-dialog .promo-dialog-content {
+    text-align: start;
+    font: var(--mobile-font-copy-regular);
+}
+.mega-sheet.promo-dialog .promo-dialog-content a {
+    text-decoration: none;
+    color: var(--mobile-link-primary);
+}
+.mega-sheet.overlay-wrap.promo-dialog .actions button:last-child:nth-child(even) {
+    margin-inline-start: 8px;
+    margin-inline-end: 0;
+}
+.mega-sheet.overlay-wrap.promo-dialog .sheet .actions {
+    flex-direction: row;
+    justify-content: end;
+}
+.mega-sheet.overlay-wrap.promo-dialog .actions .button {
+    width: auto;
+    margin: inherit;
+}

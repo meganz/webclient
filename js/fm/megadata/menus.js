@@ -426,7 +426,7 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
     }
     items['.refresh-item'] = 1;
 
-    if (mega.gallery.canShowAddToAlbum() && $.selected.every(h => mega.gallery.isGalleryNode(M.getNodeByHandle(h)))) {
+    if (mega.gallery.canShowAddToAlbum() && $.selected.every(h => M.isGalleryNode(M.getNodeByHandle(h)))) {
         items['.add-to-album'] = 1;
     }
 
@@ -995,8 +995,8 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
         else if (pfcol) {
             const albums = mega.gallery.albums;
             const selections = Object.keys(albums.grid.timeline.selections);
-            const oneImageSelected = selections.length === 1 && !!mega.gallery.isImage(M.d[selections[0]]);
-            const hasImageSelected = selections.some((h) => !!mega.gallery.isImage(M.d[h]));
+            const oneImageSelected = selections.length === 1 && !!M.isGalleryImage(M.d[selections[0]]);
+            const hasImageSelected = selections.some((h) => !!M.isGalleryImage(M.d[h]));
             const onlyPlayableVideosSelected = selections.every((h) => !!is_video(M.d[h]));
             const allowSlideshow = oneImageSelected
                 && mega.gallery.nodesAllowSlideshow(mega.gallery.albums.store[M.d[pfid].id].nodes);

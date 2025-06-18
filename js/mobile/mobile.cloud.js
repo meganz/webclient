@@ -22,7 +22,7 @@ mobile.cloud = {
 
         // If a public folder link
         if (pfid) {
-            if (M.v.length || pfcol) {
+            if (M.v.length) {
                 this.initFolderLinkBottomBar();
             }
 
@@ -377,26 +377,15 @@ mobile.cloud = {
 
         const node = M.getNodeByHandle(M.currentdirid);
         const downloadSupport = await MegaMobileViewOverlay.checkSupport(node);
-        let actions = [];
-
-        if (pfcol) {
-            actions = ['openapp-button', l.view_file_open_in_app,() => {
-                eventlog(99912);
-                goToMobileApp(MegaMobileViewOverlay.getAppLink(node.h));
-            }];
-        }
-        else if (downloadSupport) {
-            actions = ['download-button', l[864], () => {
-                eventlog(99913);
+        const actions = (downloadSupport)
+            ? ['download-button', l[864], () => {
+                eventlog(pfcol ? 500842 : 99913);
                 mobile.downloadOverlay.startDownload(node.h);
-            }];
-        }
-        else {
-            actions = ['openapp-button', l.view_file_open_in_app, () => {
+            }]
+            : ['openapp-button', l.view_file_open_in_app, () => {
                 eventlog(99912);
                 goToMobileApp(MegaMobileViewOverlay.getAppLink(node.h));
             }];
-        }
 
         if (this.bottomBar) {
             this.bottomBar.destroy();

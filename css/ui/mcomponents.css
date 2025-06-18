@@ -41,6 +41,9 @@ i.rot-90::before,
 span.rot-90::before {
     transform: rotate(90deg);
 }
+.scale-75 {
+    scale: 0.75;
+}
 .ml-auto {
     margin-left: auto;
 }
@@ -76,6 +79,9 @@ span.rot-90::before {
 }
 .mt-16 {
     margin-top: 4rem;
+}
+.mt-24 {
+    margin-top: 6rem;
 }
 .mb-0 {
     margin-bottom: 0;
@@ -148,6 +154,9 @@ span.rot-90::before {
 .pt-4 {
     padding-top: 1rem;
 }
+.pt-6 {
+    padding-top: 1.5rem;
+}
 .pt-8 {
     padding-top: 2rem;
 }
@@ -162,6 +171,9 @@ span.rot-90::before {
 }
 .pb-16 {
     padding-bottom: 4rem;
+}
+.pb-20 {
+    padding-bottom: 5rem;
 }
 .pr-4 {
     padding-right: 1rem;
@@ -183,6 +195,9 @@ span.rot-90::before {
 }
 .pl-4 {
     padding-left: 1rem;
+}
+.pl-6 {
+    padding-left: 1.5rem;
 }
 .px-1 {
     padding-left: 0.25rem;
@@ -406,6 +421,13 @@ body.rtl .flex-row-reverse {
     white-space: nowrap;
     overflow: hidden;
 }
+.text-ellipsis-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 .text-center {
     text-align: center;
 }
@@ -500,6 +522,9 @@ body.rtl .mega-dialog.m-dialog.with-icon {
 }
 .grid {
     display: grid;
+}
+.grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 .m-context-menu .m-dropdown-item.red i {
     --mask-color: var(--secondary-red);
@@ -736,5 +761,11 @@ i.green-check-circle {
     }
     to {
         opacity: 1;
+    }
+}
+
+@media screen and (max-width: 565px) {
+    .grid.grid-sm-col {
+        grid-template-columns: none;
     }
 }

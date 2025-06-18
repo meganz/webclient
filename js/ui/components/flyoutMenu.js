@@ -1025,7 +1025,7 @@ class MegaFlyoutMenu extends MegaComponent {
                                     handles &&
                                     handles.length &&
                                     megaChat.openChatAndAttachNodes(contactHandle, handles)
-                            );
+                            ).catch(dump);
                         });
                     }
                 }
@@ -1530,9 +1530,6 @@ class MegaFlyoutMenu extends MegaComponent {
                         return;
                     }
                     if (!blocks || !blocks.length) {
-                        if (M.onDeviceCenter) {
-                            msgDialog('warninga', l[882], l[24196]);
-                        }
                         this.emptyState({
                             name,
                             icon: 'search',

@@ -404,7 +404,7 @@ var useravatar = (function() {
          * Load the avatar associated with an user handle
          * @param {String} handle The user handle
          * @param {String} chathandle The chat handle
-         * @return {MegaPromise}
+         * @return {Promise}
          */
         ns.loadAvatar = function(handle, chathandle) {
             // Ensure this is a sane call...
@@ -412,14 +412,14 @@ var useravatar = (function() {
                 if (DEBUG) {
                     logger.error('Unable to retrieve user-avatar, invalid handle!', handle);
                 }
-                return MegaPromise.reject(EARGS);
+                return Promise.reject(EARGS);
             }
             if (missingAvatars[handle]) {
                 // If the retrieval already failed for the current session
                 if (DEBUG) {
                     logger.warn('User-avatar retrieval for "%s" had failed...', handle, missingAvatars[handle]);
                 }
-                return MegaPromise.reject(missingAvatars[handle]);
+                return Promise.reject(missingAvatars[handle]);
             }
             if (pendingGetters[handle]) {
                 // It's already pending, return associated promise
@@ -432,10 +432,10 @@ var useravatar = (function() {
                 if (DEBUG) {
                     logger.warn('User-avatar for "%s" is already loaded...', handle, avatars[handle]);
                 }
-                return MegaPromise.resolve(EEXIST);
+                return Promise.resolve(EEXIST);
             }
 
-            var promise = new MegaPromise();
+            const { promise } = mega;
             pendingGetters[handle] = promise;
 
             var reject = function(error) {

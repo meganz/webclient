@@ -244,7 +244,7 @@ var is_bot = !is_extension && /bot|crawl/i.test(ua);
 var is_webcache = location.host === 'webcache.googleusercontent.com';
 var is_livesite = location.host === 'mega.nz' || location.host === 'mega.io'
     || location.host === 'smoketest.mega.nz' || is_extension;
-var is_transferit = !is_livesite && (localStorage.it || /^(?:[\w-]*it|testbed)\.dev|transfer\.it$/.test(location.host));
+var is_transferit = !is_livesite && (/transfer\.it$/.test(location.host) || localStorage.it);
 
 function getMobileStoreLink() {
     'use strict';
@@ -1040,7 +1040,7 @@ var bootstaticpath = staticpath;
 var urlrootfile = '';
 
 // Disable hash checking for search engines to speed the site load up
-if (is_bot) {
+if (window.is_bot) {
     nocontentcheck = true;
 }
 else if (is_karma) {
@@ -2260,6 +2260,7 @@ else if (!browserUpdate) {
 
     // Shared components
     jsl.push({f:'js/ui/components/group.js', n: 'group_js', j: 1, w:1});
+    jsl.push({f:'js/ui/components/lazyrender.js', n: 'lazyrender_js', j: 1, w: 1});
     jsl.push({f:'js/ui/components/interactable.js', n: 'interactable_js', j: 1, w:1});
     jsl.push({f:'js/ui/components/link.js', n: 'link_js', j: 1, w:1});
     jsl.push({f:'js/ui/components/button.js', n: 'button_js', j: 1, w:1});
@@ -2270,6 +2271,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/ui/components/toast.js', n: 'components_toast_js', j: 1, w:1});
     jsl.push({f:'js/ui/components/overlay.js', n: 'overlay_js', j: 1, w:1});
     jsl.push({f:'js/ui/components/sheet.js', n: 'sheet_js', j: 1, w:1});
+    jsl.push({f:'js/ui/components/avatar.js', n: 'avatarcomp_js', j: 1, w: 1});
     jsl.push({f:'js/ui/components/megaInput.js', n: 'megainput_js', j: 1, w: 1});
     jsl.push({f:'js/ui/components/textarea.js', n: 'textarea_js', j: 1, w: 1});
     jsl.push({f:'js/ui/components/menu.js', n: 'menu_js', j: 1, w:1});
@@ -2280,6 +2282,8 @@ else if (!browserUpdate) {
     jsl.push({f:'js/ui/components/checkbox-group.js', n: 'checkbox_select_js', j: 1, w:1});
     jsl.push({f:'js/ui/components/radial.js', n: 'radial_js', j: 1, w:1});
     jsl.push({f:'js/ui/components/tooltip.js', n: 'tooltip_js', j: 1, w:1});
+
+    jsl.push({f:'js/vendor/megaDynamicList.js', n: 'mega_dynamic_list_js', j:1, w:5});
 
     // Mobile component for inheriting
     jsl.push({f:'js/mobile/mobile.header.js', n: 'mobile_header_js', j: 1, w: 1});
@@ -2322,7 +2326,6 @@ else if (!browserUpdate) {
         jsl.push({f:'css/notification.css', n: 'notification_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'css/search.css', n: 'search_css', j:2, w:30, c:1, d:1, cache:1});
 
-        jsl.push({f:'js/vendor/megaDynamicList.js', n: 'mega_dynamic_list_js', j:1, w:5});
         jsl.push({f:'js/fm/quickfinder.js', n: 'fm_quickfinder_js', j:1, w:1});
         jsl.push({f:'js/fm/selectionManager2.js', n: 'fm_selectionmanager2_js', j:1, w:1});
         jsl.push({f:'js/fm.js', n: 'fm_js', j:1, w:12});
@@ -2617,6 +2620,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/mobile.appbanner.js', n: 'mobile_app_banner_js', j: 1, w: 1});
         jsl.push({f:'js/chat/strongvelope.js', n: 'strongvelope_js', j: 1, w: 3});
         jsl.push({f:'js/mobile/mobile.promo.banner.js', n: 'mobile_promo_banner_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.albums.js', n: 'mobile_albums_js', j: 1, w:1});
 
         jsl.push({f:'js/ui/components/meganz/MDialogMobile.js', n: 'mobile_m_dialog_mobile_js', j:1});
     }
@@ -3486,7 +3490,7 @@ else if (!browserUpdate) {
                 xhr_stack[xhri].timeout = xhr_timeout;
             }
 
-            if (is_firefox_web_ext) {
+            if (window.is_firefox_web_ext) {
                 xhr_stack[xhri].overrideMimeType('text/plain');
             }
             xhr_stack[xhri].send(null);
@@ -3702,7 +3706,7 @@ else if (!browserUpdate) {
     var istaticpath = '/';
 
     // The loading-sprite images are embedded inside the extensions
-    if (is_chrome_web_ext || is_firefox_web_ext) {
+    if (window.is_extension) {
         istaticpath = '../images/mega/';
     }
 

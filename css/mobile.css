@@ -11017,10 +11017,6 @@ body.rtl .overlay-wrap {
     margin-bottom: 1rem;
 }
 
-.mobile .pcol-cover-container p.album-count-txt {
-    color: var(--text-color-high);
-}
-
 .mobile .fm-list .pcol-cover-container > i {
     margin: 0 auto;
 }

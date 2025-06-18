@@ -34621,7 +34621,7 @@ class Attachment extends AbstractGenericMessage {
                 openCopyDialog('conversations');
               }
             }));
-            if (mega.gallery.isGalleryNode(v)) {
+            if (M.isGalleryNode(v)) {
               addToAlbumButton = REaCt().createElement(dropdowns.DropdownItem, {
                 icon: "sprite-fm-mono rectangle-stack-plus-small-regular-outline",
                 label: l.add_to_album,

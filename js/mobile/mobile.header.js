@@ -271,7 +271,12 @@ class MegaMobileHeader extends MegaComponent {
                     }
 
                     if (element === this.bottomBlock) {
-                        this.resetBottomBlock();
+                        if (pfcol && M.v.length) {
+                            element.classList.add('hidden');
+                        }
+                        else {
+                            this.resetBottomBlock();
+                        }
                     }
                 }
             }
@@ -364,7 +369,7 @@ class MegaMobileHeader extends MegaComponent {
             componentClassname: 'avatar'
         });
 
-        useravatar.loadAvatar(u_handle).finally(() => {
+        useravatar.loadAvatar(u_handle).catch(dump).finally(() => {
 
             const avatarMeta = generateAvatarMeta(u_handle);
 

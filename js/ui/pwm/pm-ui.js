@@ -410,7 +410,7 @@ mega.ui.pm = {
     "use strict";
 
     lazy(mega.ui.pm, 'overlay', () => new MegaOverlay({
-        parentNode: document.querySelector('.password-list-page'),
+        parentNode: mega.ui.pm.list.domNode,
         componentClassname: 'mega-overlay pm-overlay',
         wrapperClassname: 'overlay',
         scrollOverlay: true,

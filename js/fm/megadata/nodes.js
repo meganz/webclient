@@ -4731,3 +4731,58 @@ MegaData.prototype.setNodeTag = async function(handles, newItemTag, isRemove) {
 
     return Promise.all(promises);
 };
+
+/**
+ * Same as is_image3(), additionally checking whether the node meet requirements for photo/media gallery.
+ * @param {String|MegaNode|Object} n An ufs-node, or filename
+ * @param {String} [ext] Optional filename extension
+ * @returns {Boolean}
+ */
+MegaData.prototype.isGalleryImage = function(n, ext) {
+    'use strict';
+
+    ext = ext || fileext(n && n.name || n, true, true);
+    return ext !== 'PSD' && ext !== 'SVG' && is_image3(n, ext);
+};
+
+/**
+ * Checks whether the node is a video, plus checks if thumbnail is available
+ * @param {Object} n ufs node
+ * @returns {Object.<String, Number>|Boolean}
+ */
+MegaData.prototype.isGalleryVideo = function(n) {
+    'use strict';
+
+    if (!n || !n.fa || !n.fa.includes(':8*')) {
+        return false;
+    }
+
+    const p = this.getMediaProperties(n);
+
+    if (!p.showThumbnail || p.icon !== 'video') {
+        return false;
+    }
+
+    const props = MediaAttribute.prototype.fromAttributeString(n.fa, n.k);
+
+    return props && props.width && props.height ? p : false;
+};
+
+/**
+ * Checking if the file is even available for the gallery
+ * @param {String|MegaNode|Object} n An ufs-node, or filename
+ * @param {String} [ext] Optional filename extension
+ * @returns {Number|String|Function|Boolean}
+ */
+MegaData.prototype.isGalleryNode = function(n, ext) {
+    'use strict';
+
+    if (!(n && n.fa)) {
+        return false;
+    }
+    if (this.isGalleryVideo(n)) {
+        return true;
+    }
+    ext = ext || fileext(n && n.name || n, true, true);
+    return this.isGalleryImage(n, ext);
+};

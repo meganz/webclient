@@ -23,13 +23,21 @@ class MegaChatItem extends MegaComponent {
         const iconWrap = document.createElement('div');
         iconWrap.className = 'mobile fm-item-img';
         if (this.chatRoom.type === 'private') {
-            this.iconNode = document.createElement('div');
-            this.iconNode.classList.add('avatar', 'size-24');
             if (this.chatRoom.isNote) {
+                this.iconNode = document.createElement('div');
+                this.iconNode.classList.add('avatar', 'size-24');
                 this.iconNode.classList.add('note-chat-signifier');
                 if (!this.chatRoom.hasMessages()) {
                     this.iconNode.classList.add('note-chat-empty');
                 }
+            }
+            else {
+                this.iconNode = new MegaAvatarComponent({
+                    parentNode: iconWrap,
+                    userHandle: this.chatRoom.getParticipantsExceptMe()[0],
+                    presence: true,
+                    size: 24,
+                });
             }
             classNames.push('user');
         }
@@ -40,7 +48,9 @@ class MegaChatItem extends MegaComponent {
         if (iconClasses) {
             this.iconNode.classList.add(...iconClasses.split(' '));
         }
-        iconWrap.appendChild(this.iconNode);
+        if (!(this.iconNode instanceof MegaComponent)) {
+            iconWrap.appendChild(this.iconNode);
+        }
         this.domNode.appendChild(iconWrap);
 
         this.labelNode = document.createElement('div');
@@ -165,8 +175,6 @@ class MegaChatItem extends MegaComponent {
             return 'sprite-fm-mono icon-file-text-thin-outline note-chat-icon';
         }
         if (this.chatRoom.type === 'private') {
-            const handle = this.chatRoom.getParticipantsExceptMe()[0];
-            MegaNodeComponent.mAvatarNode(handle, this.iconNode, { presence: true });
             return '';
         }
         return 'sprite-fm-uni icon-chat-group';

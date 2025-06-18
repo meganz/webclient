@@ -280,7 +280,7 @@ MegaData.prototype.filterByLocation = function(nodes, filter) {
             !n // Undefined node
             || n.fv // Versioned file
             || (n.s4 && n.p === M.RootID && this.getS4NodeType(n) === 'container') // S4 node
-            || (this.gallery && !mega.gallery.isGalleryNode(n)) // Non-media file in Gallery
+            || (this.gallery && !this.isGalleryNode(n)) // Non-media file in Gallery
             || (this.currentLabelFilter && !this.filterByLabel(n)) // Filter label applies here
             || (hasNodeFilter && !mega.ui.mNodeFilter.match(n))
             || (filter && !filter(n))

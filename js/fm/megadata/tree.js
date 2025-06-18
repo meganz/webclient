@@ -805,77 +805,79 @@ MegaData.prototype.addTreeUI = function() {
     var $treePanel = $('.fm-tree-panel');
     var $treeItem = $('.nw-fm-tree-item', $treePanel);
 
-    $treeItem.draggable(
-        {
-            revert: true,
-            containment: 'document',
-            revertDuration: 200,
-            distance: 10,
-            scroll: false,
-            cursorAt: {right: 88, bottom: 58},
-            helper: function(e, ui) {
-                $(this).draggable("option", "containment", [72, 42, $(window).width(), $(window).height()]);
-                return M.getDDhelper();
+    if (!folderlink) {
+        $treeItem.draggable(
+            {
+                revert: true,
+                containment: 'document',
+                revertDuration: 200,
+                distance: 10,
+                scroll: false,
+                cursorAt: {right: 88, bottom: 58},
+                helper() {
+                    $(this).draggable("option", "containment", [72, 42, $(window).width(), $(window).height()]);
+                    return M.getDDhelper();
+                },
+                start(e) {
+                    $.treeDragging = true;
+                    $.hideContextMenu(e);
+                    var html = '';
+                    var id = $(e.target).attr('id');
+                    if (id) {
+                        id = id.replace(/treea_+|(os_|pl_)/g, '');
+                    }
+                    if (id && M.d[id]) {
+                        html = ('<div class="tree-item-dragger nw-fm-tree-item">' +
+                                '<span class="nw-fm-tree-folder ' + fileIcon(M.d[id]) + '"></span>' +
+                                '<span class="item-name">' +
+                                    escapeHTML(M.d[id].name) + '</span>' +
+                                '</div>'
+                        );
+                    }
+                    $('#draghelper .dragger-icon').remove();
+
+                    // eslint-disable-next-line local-rules/jquery-replacements
+                    $('#draghelper .dragger-content').html(html);
+                    $('body').addClass('dragging');
+                    $.draggerHeight = $('#draghelper .dragger-content').outerHeight();
+                    $.draggerWidth = $('#draghelper .dragger-content').outerWidth();
+                },
+                drag(e, ui) {
+                    if (ui.position.top + $.draggerHeight - 28 > $(window).height()) {
+                        ui.position.top = $(window).height() - $.draggerHeight + 26;
+                    }
+                    if (ui.position.left + $.draggerWidth - 58 > $(window).width()) {
+                        ui.position.left = $(window).width() - $.draggerWidth + 56;
+                    }
+                },
+                stop() {
+                    $.treeDragging = false;
+                    $('body').removeClass('dragging').removeClassWith("dndc-");
+                }
+            });
+
+        $(
+            '.fm-tree-panel .nw-fm-tree-item,' +
+            '.js-myfile-tree-panel > a[name="cloud-drive"],' +
+            '.mega-top-menu button[name="s4"],' +
+            '.mega-top-menu a[name="rubbish-bin"],' +
+            '.shared-with-me tr,' +
+            '.nw-conversations-item,' +
+            'ul.conversations-pane > li,' +
+            '.messages-block'
+        ).filter(":visible").droppable({
+            tolerance: 'pointer',
+            drop(e, ui) {
+                $.doDD(e, ui, 'drop', 1);
             },
-            start: function(e, ui) {
-                $.treeDragging = true;
-                $.hideContextMenu(e);
-                var html = '';
-                var id = $(e.target).attr('id');
-                if (id) {
-                    id = id.replace(/treea_+|(os_|pl_)/g, '');
-                }
-                if (id && M.d[id]) {
-                    html = ('<div class="tree-item-dragger nw-fm-tree-item">' +
-                            '<span class="nw-fm-tree-folder ' + fileIcon(M.d[id]) + '"></span>' +
-                            '<span class="item-name">' +
-                                escapeHTML(M.d[id].name) + '</span>' +
-                            '</div>'
-                    );
-                }
-                $('#draghelper .dragger-icon').remove();
-                $('#draghelper .dragger-content').html(html);
-                $('body').addClass('dragging');
-                $.draggerHeight = $('#draghelper .dragger-content').outerHeight();
-                $.draggerWidth = $('#draghelper .dragger-content').outerWidth();
+            over(e, ui) {
+                $.doDD(e, ui, 'over', 1);
             },
-            drag: function(e, ui) {
-                //console.log('tree dragging',e);
-                if (ui.position.top + $.draggerHeight - 28 > $(window).height()) {
-                    ui.position.top = $(window).height() - $.draggerHeight + 26;
-                }
-                if (ui.position.left + $.draggerWidth - 58 > $(window).width()) {
-                    ui.position.left = $(window).width() - $.draggerWidth + 56;
-                }
-            },
-            stop: function(e, u) {
-                $.treeDragging = false;
-                $('body').removeClass('dragging').removeClassWith("dndc-");
+            out(e, ui) {
+                $.doDD(e, ui, 'out', 1);
             }
         });
-
-    $(
-        '.fm-tree-panel .nw-fm-tree-item,' +
-        '.js-myfile-tree-panel > a[name="cloud-drive"],' +
-        '.mega-top-menu button[name="s4"],' +
-        '.mega-top-menu a[name="rubbish-bin"],' +
-        '.fm-breadcrumbs,' +
-        '.shared-with-me tr,' +
-        '.nw-conversations-item,' +
-        'ul.conversations-pane > li,' +
-        '.messages-block'
-    ).filter(":visible").droppable({
-        tolerance: 'pointer',
-        drop: function(e, ui) {
-            $.doDD(e, ui, 'drop', 1);
-        },
-        over: function(e, ui) {
-            $.doDD(e, ui, 'over', 1);
-        },
-        out: function(e, ui) {
-            $.doDD(e, ui, 'out', 1);
-        }
-    });
+    }
 
     $treeItem.rebind('click.treeUI contextmenu.treeUI', function(e) {
 

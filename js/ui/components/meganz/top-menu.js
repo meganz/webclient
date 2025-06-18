@@ -7,6 +7,7 @@ class MegaTopMenu extends MegaMobileTopMenu {
         this.megaLink.interactableType = 'normal';
         this.megaLink.icon = 'sprite-fm-uni icon-mega-logo';
 
+        // @todo: Wrap menu items in a div to fix stretching bug when scrolling horizontally
         this.menuNode.Ps = new PerfectScrollbar(this.menuNode);
         mBroadcaster.addListener('pagechange', () => this.menuNode.Ps.update());
         this.on('click.topmenuClicked', () => {

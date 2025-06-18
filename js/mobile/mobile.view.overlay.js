@@ -280,6 +280,7 @@ class MegaMobileViewOverlay extends MegaComponent {
         textBlock.classList.add('hidden');
 
         if (isPreviewable && isPreviewable !== 'text') {
+            this.domNode.querySelector('.context-btn').classList.remove('hidden');
             this.domNode.querySelector('.media-viewer-container .content').classList.remove('hidden');
             this.domNode.querySelector('.media-viewer-container .content-info').classList.add('hidden');
         }
@@ -317,7 +318,7 @@ class MegaMobileViewOverlay extends MegaComponent {
             // Set selected item data
             mCreateElement('i', {'class': this.nodeComponent.icon}, iconNode);
             this.domNode.querySelector('.media-viewer-container .file-name').textContent =
-                props.t2 || this.nodeComponent.name;
+                (pfcol && l[6859]) || props.t2 || this.nodeComponent.name;
 
             // Show "Too large file" or "Non-viewable" warnings
             if (!downloadSupport || !this.isInfo) {
@@ -339,7 +340,7 @@ class MegaMobileViewOverlay extends MegaComponent {
                 if (page === 'download') {
                     this.domNode.querySelector('.properties-breadcrumb').classList.add('hidden');
                 }
-                else {
+                else if (!pfcol) {
                     M.renderPathBreadcrumbs(
                         nodeHandle,
                         document.querySelector('.properties-breadcrumb .fm-breadcrumbs-wrapper')
@@ -456,7 +457,7 @@ class MegaMobileViewOverlay extends MegaComponent {
                 goToMobileApp(MegaMobileViewOverlay.getAppLink(this.nodeComponent.handle));
             }],
 
-            'downloadButton': ['download-button', 'icon-download-thin', () => {
+            'downloadButton': ['download-button', pfcol ? l[58] : 'icon-download-thin', () => {
                 if (!validateUserAction() || !this.nodeComponent) {
                     return false;
                 }
@@ -488,6 +489,15 @@ class MegaMobileViewOverlay extends MegaComponent {
 
         const shareBtn = M.currentrootid !== 'shares' && [buttons.sharelinkButton];
 
+        if (pfcol) {
+            const arr = [[buttons.downloadButton]];
+
+            if (is_image3(M.d[this.nodeComponent.handle])) {
+                arr.push([buttons.slideshowButton]);
+            }
+
+            return arr;
+        }
         if (!downloadSupport) {
             return [[buttons.openappButton]];
         }
@@ -556,7 +566,11 @@ class MegaMobileViewOverlay extends MegaComponent {
 
             // If it is a public collection/set
             if (pfcol) {
-                return `collection/${pfid}#${pfkey}`;
+                const handle_suffix = nodeHandle !== undefined && nodeHandle !== pfid
+                    ? `!${nodeHandle}`
+                    : '';
+
+                return `collection/${pfid}#${pfkey}${handle_suffix}`;
             }
             // If subfolder or file is specified, add it to the base folder handle and key
             else if (nodeHandle === undefined || pfid === nodeHandle) {

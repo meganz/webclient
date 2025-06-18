@@ -630,13 +630,18 @@ lazy(mega.ui, 'mInfoPanel', () => {
                 usersNode.textContent = '';
                 const MAX_AVATARS = 12;
                 for (let i = 0; i < userHandles.length; i++) {
-                    const wrap = document.createElement('div');
-                    wrap.className = `avatar size-${size || 24}`;
-                    usersNode.appendChild(wrap);
                     if (i < MAX_AVATARS) {
-                        MegaNodeComponent.mAvatarNode(userHandles[i], wrap, { simpletip: true });
+                        MegaAvatarComponent.factory({
+                            parentNode: usersNode,
+                            userHandle: userHandles[i],
+                            size: size || 24,
+                            simpletip: true,
+                        });
                     }
                     else {
+                        const wrap = document.createElement('div');
+                        wrap.className = `avatar size-${size || 24}`;
+                        usersNode.appendChild(wrap);
                         wrap.classList.add('users-count');
                         usersNode.classList.add('overlap');
                         wrap.appendChild(parseHTML(
@@ -1349,7 +1354,7 @@ lazy(mega.ui, 'mInfoPanel', () => {
     function hasThumbnail(node) {
         const nodeIcon = fileIcon(node);
         return ['image', 'video', 'raw', 'photoshop', 'vector'].includes(nodeIcon) &&
-            (is_image3(node) || nodeIcon === 'video' && mega.gallery.isVideo(node));
+            (is_image3(node) || nodeIcon === 'video' && M.isGalleryVideo(node));
     }
 
     function singleSelectBlocks(blockSet, node, isTakenDown) {
@@ -1389,7 +1394,7 @@ lazy(mega.ui, 'mInfoPanel', () => {
         if (node.t === 1 || deviceFolder) {
             blockSet.add(TYPES.NODE_SIZE);
         }
-        if (mega.gallery.isVideo(node)) {
+        if (M.isGalleryVideo(node)) {
             blockSet.add(TYPES.DURATION);
         }
         if (activeStats.heartbeat) {

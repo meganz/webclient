@@ -191,4 +191,9 @@ mBroadcaster.once('boot_done', function populate_lx() {
         .replace('[A]', '<a href="https://mega.nz/register" class="link clickurl" target="_blank">')
         .replace('[/A]', '</a>')
         .replace('[BR]', '<br>');
+    l.transferit_cnt_copy_info2 = escapeHTML(l.transferit_cnt_copy_info2)
+        .replace('[A1]', '<a href="https://mega.io/takedown" target="_blank" class="clickurl link">')
+        .replace('[/A1]', '</a>')
+        .replace('[A2]', '<a href="mailto:copyright@transfer.it" target="_blank" class="clickurl link">')
+        .replace('[/A2]', '</a>');
 });

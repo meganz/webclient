@@ -1,5 +1,5 @@
 /*!
- * perfect-scrollbar v1.6.0 - mega.nz build.
+ * perfect-scrollbar v1.6.1 - mega.nz build.
  * Copyright 2025 Hyunje Jun, MDBootstrap and Contributors
  * Licensed under MIT
  */
@@ -338,8 +338,8 @@
     const roundedScrollTop = Math.floor(element.scrollTop);
     const rect = element.getBoundingClientRect();
 
-    i.containerWidth = Math.ceil(rect.width);
-    i.containerHeight = Math.ceil(rect.height);
+    i.containerWidth = Math.round(rect.width);
+    i.containerHeight = Math.round(rect.height);
 
     i.contentWidth = element.scrollWidth;
     i.contentHeight = element.scrollHeight;
@@ -1109,7 +1109,6 @@
           if (pid !== easingLoop) {
             return;
           }
-          requestAnimationFrame(raf);
 
           if (i.isInitialized) {
             return;
@@ -1126,6 +1125,7 @@
           if (!i.element) {
             return;
           }
+          requestAnimationFrame(raf);
 
           applyTouchMove(speed.x * 30, speed.y * 30);
 

@@ -1370,8 +1370,6 @@ lazy(mega.devices, 'ui', () => {
                         this.$emptyFolder.removeClass('hidden');
                     }
                 }
-
-                mega.ui.mInfoPanel.reRenderIfVisible(selectionManager.get_selected());
             }
         }
 

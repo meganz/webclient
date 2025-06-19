@@ -968,11 +968,11 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
                 finalItems.push('.import-item');
                 if (M.v.length) {
                     finalItems.push('.zipdownload-item', '.download-standart-item');
+                    if (pfcol) {
+                        finalItems.push('.play-slideshow');
+                    }
                 }
-                if (pfcol) {
-                    finalItems.push('.play-slideshow');
-                }
-                else {
+                if (!pfcol) {
                     finalItems.push('.getlink-item');
                 }
             }

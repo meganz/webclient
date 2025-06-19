@@ -1118,9 +1118,10 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             let showGetLink;
             let restrictedFolders = false;
 
+            const hasShare = M.ps[selNode.h] || M.getNodeShareUsers(selNode, 'EXP').length;
             // Set default "Share folder" / "Share bucket" string
             if (sourceRoot === 's4' && M.getS4NodeType(selNode) === 'bucket') {
-                shareButton.dataset.simpletip = M.getNodeShareUsers(selNode, 'EXP').length ?
+                shareButton.dataset.simpletip = hasShare ?
                     l.manage_share : l.s4_share_bucket;
                 const icon = shareButton.querySelector('i');
                 if (icon) {
@@ -1129,7 +1130,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
                 }
             }
             else {
-                shareButton.dataset.simpletip = M.getNodeShareUsers(selNode, 'EXP').length ?
+                shareButton.dataset.simpletip = hasShare ?
                     l.manage_share : l[5631];
                 const icon = shareButton.querySelector('i');
                 if (icon) {

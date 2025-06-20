@@ -1,11 +1,11 @@
 /* Important general classnames */
 
-.pm-main .password-list-page .favicon {
+.pm-main .password-wrapper .favicon {
     width: 24px;
     height: 24px;
 }
 
-.pm-main .password-list-page .manual-favicon {
+.pm-main .password-wrapper .manual-favicon {
     color: var(--favicon-text-color);
     border-radius: var(--mobile-border-radius-medium);
     display: flex;
@@ -15,41 +15,41 @@
     background-color: var(--mobile-surface-3);
 }
 
-.pm-main .password-list-page .manual-favicon.color0 {
+.pm-main .password-wrapper .manual-favicon.color0 {
     background-color: var(--mobile-indicator-yellow);
 }
 
-.pm-main .password-list-page .manual-favicon.color1 {
+.pm-main .password-wrapper .manual-favicon.color1 {
     background-color: var(--mobile-indicator-blue);
 }
 
-.pm-main .password-list-page .manual-favicon.color2 {
+.pm-main .password-wrapper .manual-favicon.color2 {
     background-color: var(--mobile-indicator-green);
 }
 
-.pm-main .password-list-page .favicon .favicon-brand img {
+.pm-main .password-wrapper .favicon .favicon-brand img {
     width: 24px;
     height: 24px;
 }
 
-.pm-main .password-list-page h1 {
+.pm-main .password-wrapper h1 {
     font: var(--mobile-font-heading-h1);
 }
 
-.pm-main .password-list-page h2 {
+.pm-main .password-wrapper h2 {
     font: var(--mobile-font-heading-h2);
 }
 
-.pm-main .password-list-page h3 {
+.pm-main .password-wrapper h3 {
     font: var(--mobile-font-heading-h3);
 }
 
-.pm-main .password-list-page span,
-.pm-main .password-list-page p {
+.pm-main .password-wrapper span,
+.pm-main .password-wrapper p {
     font: var(--mobile-font-caption-large-regular);
 }
 
-.pm-main .password-list-page a,
+.pm-main .password-wrapper a,
 .pm-main .settings-wrap a.clickurl {
     font: var(--mobile-font-link-large-regular);
     color: var(--mobile-link-primary);
@@ -60,20 +60,20 @@
     color: var(--mobile-link-primary);
 }
 
-.pm-main .password-list-page label {
+.pm-main .password-wrapper label {
     font: var(--font-label-semibold);
 }
 
-.pm-main .password-list-page textarea {
+.pm-main .password-wrapper textarea {
     resize: none;
     outline: none;
 }
 
-.pm-main .password-list-page input::placeholder {
+.pm-main .password-wrapper input::placeholder {
     color: var(--mobile-text-placeholder);
 }
 
-.pm-main .password-list-page fieldset.fieldset {
+.pm-main .password-wrapper fieldset.fieldset {
     border: none;
     padding: 0;
 }

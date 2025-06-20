@@ -23,7 +23,7 @@
     margin-top: 12px;
 }
 
-.mega-component.read-only-field.grouped:not(.hidden) + .read-only-field:not(.grouped) {
+.mega-component.read-only-field.grouped:not(.hidden) + .read-only-field {
     border-top-left-radius: 0;
     border-top-right-radius: 0;
 }

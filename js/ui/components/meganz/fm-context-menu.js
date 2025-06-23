@@ -1,6 +1,8 @@
 (mega => {
     'use strict';
 
+    let _holdSubmenu = null;
+
     class MegaContextBase extends MegaComponentGroup {
         constructor(parentNode) {
             super();
@@ -43,20 +45,65 @@
                     else if (typeof options.onClick === 'function') {
                         options.onClick(ev);
                     }
+                    else {
+                        const childmenu = this.getChild('childMenu');
+
+                        if (_holdSubmenu) {
+                            _holdSubmenu.classList.add('hidden');
+                            if (_holdSubmenu === childmenu) {
+                                _holdSubmenu = null;
+                                return false;
+                            }
+                            _holdSubmenu = null;
+                        }
+
+                        _holdSubmenu = childmenu;
+                        _holdSubmenu.classList.remove('hidden');
+
+                        return false;
+                    }
                 }
             });
+
+            let _childMenuHideTimer = null;
+
             this.domNode.addEventListener('mouseenter', () => {
-                if (this.filtered.length > 1) {
+
+                if (_holdSubmenu && _holdSubmenu !== this.getChild('childMenu') && this.filtered.length > 1) {
+                    _holdSubmenu = null;
+                }
+
+                if (_childMenuHideTimer) {
+                    clearTimeout(_childMenuHideTimer);
+                    _childMenuHideTimer = null;
+                }
+                if (this.filtered.length > 1 && !_holdSubmenu) {
+                    // Close all other open submenus before opening this one
+                    const allSubmenus = document.querySelectorAll('.context-submenu:not(.hidden)');
+                    for (const submenu of allSubmenus) {
+                        if (submenu !== this.getChild('childMenu')) {
+                            submenu.classList.add('hidden');
+                        }
+                    }
                     const childMenu = this.getChild('childMenu');
                     childMenu.classList.remove('hidden');
-                    const { x, y } = getHtmlElemPos(parent.domNode);
+                    const {x, y} = getHtmlElemPos(parent.domNode);
                     const menuPos = M.reCalcMenuPosition(parent.domNode, x, y, 'submenu');
                     childMenu.style.top = menuPos.top;
                 }
             });
+
             this.domNode.addEventListener('mouseleave', () => {
                 if (this.filtered.length > 1) {
-                    this.getChild('childMenu').classList.add('hidden');
+                    if (_childMenuHideTimer) {
+                        clearTimeout(_childMenuHideTimer);
+                    }
+                    _childMenuHideTimer = setTimeout(() => {
+                        if (!_holdSubmenu) {
+                            this.getChild('childMenu').classList.add('hidden');
+                            _childMenuHideTimer = null;
+                        }
+                    }, 150);
                 }
             });
             this.addChild('parent', parent);
@@ -1603,6 +1650,10 @@
                 const ctxSources = document.querySelectorAll('.ctx-source');
                 for (const source of ctxSources) {
                     source.classList.remove('ctx-source', 'active');
+                }
+
+                if (_holdSubmenu) {
+                    _holdSubmenu = null;
                 }
             },
             addOption(options) {

@@ -1651,7 +1651,7 @@ scparser.$add('sqac', (a) => {
                         }
 
                         if (page === 'fm/s4') {
-                            s4.main.render(true);
+                            s4.main.render().catch(reportError);
                         }
 
                         mega.sensitives.onPlanUpgrade();

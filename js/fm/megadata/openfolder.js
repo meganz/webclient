@@ -281,7 +281,7 @@
                 dashboardUI();
             },
             s4() {
-                s4.main.render();
+                s4.main.render().catch(tell);
             },
             'device-centre'(id) {
                 mega.devices.ui.render(id);

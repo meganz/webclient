@@ -932,6 +932,11 @@ lazy(mega.ui, 'mInfoPanel', () => {
                     l.info_panel_text_count.replace('%1', val.length).replace('%2', this.input.maxLength);
                 this.subtext.classList.remove('read-only');
             }
+            if (isExpired()) {
+                delete options.optional;
+                this.input.disabled = true;
+                this.input.placeholder = l.info_panel_description_empty;
+            }
         }
 
         updateTypeTags(options) {
@@ -971,9 +976,11 @@ lazy(mega.ui, 'mInfoPanel', () => {
             if (this.readOnly) {
                 if (expiredAcc) {
                     this.input.show();
+                    this.input.disabled = true;
                 }
                 else {
                     this.input.hide();
+                    this.input.disabled = false;
                 }
                 if (!this.tags.length) {
                     subtext = l.info_panel_tags_empty;

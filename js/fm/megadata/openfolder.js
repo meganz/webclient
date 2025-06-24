@@ -280,14 +280,19 @@
             dashboard() {
                 dashboardUI();
             },
-            s4() {
-                s4.main.render().catch(tell);
-            },
             'device-centre'(id) {
                 mega.devices.ui.render(id);
             },
             recents() {
                 openRecents();
+            },
+            s4() {
+                if ('main' in s4) {
+                    s4.main.render();
+                }
+                else {
+                    M.openFolder('fm');
+                }
             },
             transfers() {
                 console.assert(M.v && M.v.length === 0, 'view list must be empty');
@@ -300,19 +305,7 @@
         },
 
         has(id) {
-            if (this.sink[id]) {
-                return this.sink[id];
-            }
-
-            const p = Object.keys(this.sink);
-
-            for (let i = p.length; i--;) {
-
-                if (id.startsWith(p[i])) {
-
-                    return this.sink[p[i]];
-                }
-            }
+            return this.sink[String(id || '').split('/')[0]];
         }
     });
 
@@ -869,14 +862,13 @@
         else if (cv.type === 'gallery' && !pfcol) {
             this.gallery = 1;
         }
-        else if (cv.type === 's4') {
-
-            id = cv.nodeID;
-            fetchDBNodes = ['container', 'bucket'].includes(cv.subType) && id.length === 8;
-        }
         else if (cv.type === 'pwm') {
             fetchDBNodes = true;
             id = mega.pwmh;
+        }
+        else if (cv.type === 's4') {
+            id = cv.nodeID;
+            fetchDBNodes = ['container', 'bucket'].includes(cv.subType) && id.length === 8;
         }
         else if (
             id &&

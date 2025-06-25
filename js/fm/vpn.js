@@ -202,12 +202,21 @@ class VpnPage {
         const sortedOptions = Object.fromEntries(Object.entries(options)
             .sort((code, location) => code[1].localeCompare(location[1])));
 
+        // Any server location with a matching CC is sufficient for preselection...
+        const localLocationId = Object.keys(locations).find(key => locations[key].cc === u_attr.ipcc);
+        const selectedOption = localLocationId
+            ? Object.entries(sortedOptions).find(([key]) => key === localLocationId)
+            : Object.entries(sortedOptions)[0];
+
         createDropdown(this.$locationDropdown, {
-            placeholder: options[0],
+            placeholder: selectedOption[1],
             items: sortedOptions,
-            selected: locations[0],
+            selected: localLocationId,
         });
         bindDropdownEvents(this.$locationDropdown);
+
+        this.createCredBtn.classList.toggle('disabled', !getDropdownValue(this.$locationDropdown));
+        this.createCredBtn.disabled = !getDropdownValue(this.$locationDropdown);
 
         this.$locationDropdown.rebind('change.vpn', () => {
             this.reset();
@@ -256,6 +265,11 @@ class VpnPage {
     }
 
     async createCred() {
+        const locationId = getDropdownValue(this.$locationDropdown);
+        if (!locationId) {
+            return;
+        }
+
         this.reset();
 
         loadingDialog.show('vpn-create');
@@ -285,7 +299,7 @@ class VpnPage {
             return; // TODO
         }
         this._onCredCreated();
-        this.showStep2(cred);
+        this.showStep2(cred, locationId);
     }
 
     async removeCred(credNum) {
@@ -303,8 +317,7 @@ class VpnPage {
         );
     }
 
-    showStep2(cred) {
-        const locationId = getDropdownValue(this.$locationDropdown);
+    showStep2(cred, locationId) {
         const config = VpnCredsManager.generateIniConfig(cred, locationId);
 
         this.downloadConfigBtn.dataset.credNum = cred.credNum;
@@ -335,6 +348,8 @@ class VpnPage {
         delete this.downloadConfigBtn.dataset.credNum;
         this.configDiv.classList.add('hidden');
         this.configText.textContent = '';
+        this.createCredBtn.classList.toggle('disabled', !getDropdownValue(this.$locationDropdown));
+        this.createCredBtn.disabled = !getDropdownValue(this.$locationDropdown);
     }
 
     _addSlotElement() {

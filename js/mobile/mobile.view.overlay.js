@@ -492,7 +492,7 @@ class MegaMobileViewOverlay extends MegaComponent {
         if (pfcol) {
             const arr = [[buttons.downloadButton]];
 
-            if (is_image3(M.d[this.nodeComponent.handle])) {
+            if (!this.isInfo && is_image3(M.d[this.nodeComponent.handle])) {
                 arr.push([buttons.slideshowButton]);
             }
 

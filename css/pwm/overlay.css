@@ -206,3 +206,6 @@
 .overlay-wrap.pm-overlay.tutorial-overlay .pm.mega-input.strengthChecker.title-ontop.checked {
     margin-bottom: 30px;
 }
+.overlay-wrap.pm-overlay.tutorial-overlay .pm.mega-input .clear-input.icon {
+    display: none;
+}

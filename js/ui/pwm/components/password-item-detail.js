@@ -189,8 +189,9 @@ class MegaPasswordItemDetail {
      * @param {*} [noShow] no...show?
      * @returns {Promise<*>}
      */
-    async showDetail(pH, noShow = false, overrides = null) {
-        this.item = M.getNodeByHandle(pH);
+    async showDetail(pH, noShow = false) {
+        this.item = M.getNodeByHandle(pH) ||
+            mega.ui.pm.list.vaultPasswords.find(node => node.h === pH);
 
         if (!this.item) {
             return;
@@ -199,17 +200,6 @@ class MegaPasswordItemDetail {
         let otp = null;
         let {name} = this.item;
         let {u, pwd, n, url, totp: otpData} = this.item.pwm;
-
-        if (overrides) {
-            ({
-                u = '',
-                pwd = '',
-                n = '',
-                url = '',
-                totp: otpData = '',
-                name = ''
-            } = overrides);
-        }
 
         if (otpData) {
             otp = await this.generateOtpValue(otpData).catch(dump);

@@ -20,15 +20,9 @@ class TutorialPasswordItemForm extends PasswordItemForm {
         if (!this.overlay) {
             this.overlay = new MegaOverlay({
                 parentNode: pmlayout,
-                componentClassname: 'mega-overlay pm-overlay tutorial-overlay',
+                componentClassname: 'mega-overlay pm-overlay tutorial-overlay password-wrapper',
                 wrapperClassname: 'overlay',
                 scrollOverlay: true,
-            });
-
-            // Cleanup when overlay is closed
-            this.overlay.on('close', () => {
-                this.overlay.hide();
-                this.destroyTutorialOverlay();
             });
         }
 
@@ -47,7 +41,10 @@ class TutorialPasswordItemForm extends PasswordItemForm {
             this.megaTitleInput.setValue(defaults.title);
             this.megaUnameInput.setValue(defaults.uname);
             this.setPass(defaults.pwd);
+            this.megaTOTPInput.setValue(defaults.totp);
         }
+        this.megaWebsiteInput.$wrapper.addClass('hidden');
+        this.megaNotesInput.$wrapper.addClass('hidden');
 
         // Show tutorial overlay with form content
         this.overlay.show({
@@ -59,6 +56,11 @@ class TutorialPasswordItemForm extends PasswordItemForm {
         });
     }
 
+    hide() {
+        this.overlay.hide();
+        this.destroyTutorialOverlay();
+    }
+
     /**
      * Cleans up overlay instance so it can be recreated fresh.
      *
@@ -66,7 +68,7 @@ class TutorialPasswordItemForm extends PasswordItemForm {
      */
     destroyTutorialOverlay() {
         if (this.overlay) {
-            this.overlay.off();
+            this.overlay.destroy();
             this.overlay = null;
         }
     }

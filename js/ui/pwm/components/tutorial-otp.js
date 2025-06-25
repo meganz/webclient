@@ -11,6 +11,7 @@ class TutorialOTP {
             const totpWrapper = this.form.megaTOTPInput.$wrapper[0];
             this.showTooltip({
                 targetNode: totpWrapper,
+                align: 'start',
                 title: l.otp_tutorial_step1_title,
                 body: l.otp_tutorial_step1_body,
                 actions: [
@@ -33,7 +34,8 @@ class TutorialOTP {
             tutorialDefaults: {
                 title: l.otp_tutorial_default_title,
                 uname: l.otp_tutorial_default_username,
-                pwd: '5gM9CpugR&sk)WYx'
+                pwd: '5gM9CpugR&sk)WYx',
+                totp: '1JKU 98F7 OL90 DDFD'
             },
             disableAutoFocus: true
         });
@@ -67,22 +69,26 @@ class TutorialOTP {
      * @returns {void}
      */
     showFinalTooltip() {
-        return mega.ui.pm.list.passwordItem.showDetail(
-            mega.ui.pm.list.passwordItem.item.h,
-            true,
-            {
-                name: l.otp_tutorial_default_title,
-                u: l.otp_tutorial_default_username,
-                pwd: '5gM9CpugR&sk)WYx',
-                totp: {shse: l.otp_tutorial_default_totp, nd: '6', t: '30', alg: 'sha1'}
-            }
-        )
-            .catch(tell)
-            .finally(() => {
+        const tutorialEntry = {
+            h: 'tutorial',
+            name: l.otp_tutorial_default_title,
+            u: l.otp_tutorial_default_username,
+            pwd: '5gM9CpugR&sk)WYx',
+            totp: {shse: l.otp_tutorial_default_totp, nd: '6', t: '30', alg: 'sha1'}
+        };
+        mega.ui.pm.list.loadList(tutorialEntry)
+            .then(() => {
+                const item = mega.ui.pm.list.passwordList.componentSelector(`#${tutorialEntry.h}`);
+                if (!item) {
+                    throw new Error('Tutorial item not found');
+                }
+                return item.trigger('click.selectItem');
+            })
+            .then(() => {
                 mega.ui.pm.list.passwordItem.domNode.classList.add('tutorial');
 
                 this.hideTooltip();
-                this.form.overlay.hide();
+                this.form.hide();
 
                 const pmOverlayWasVisible = mega.ui.pm.overlay.visible;
                 if (pmOverlayWasVisible) {
@@ -106,15 +112,14 @@ class TutorialOTP {
                                 if (pmOverlayWasVisible) {
                                     mega.ui.pm.overlay.addClass('active');
                                 }
-                                mega.ui.pm.list.passwordItem.showDetail(
-                                    mega.ui.pm.list.passwordItem.item.h
-                                );
+                                mega.ui.pm.list.loadList().catch(tell);
                                 mega.ui.pm.list.passwordItem.domNode.classList.remove('tutorial');
                             }
                         }
                     ]
                 });
-            });
+            })
+            .catch(tell);
     }
 
     /**
@@ -124,7 +129,7 @@ class TutorialOTP {
     async exitHandler() {
         if (await this.confirmExit()) {
             this.hideTooltip();
-            this.form.overlay.hide();
+            this.form.hide();
         }
     }
 

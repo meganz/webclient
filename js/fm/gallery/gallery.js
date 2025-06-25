@@ -1511,6 +1511,9 @@ class MegaGallery {
                 return false;
             }
 
+            selectionManager.clear_selection();
+            this.clearSelections();
+
             this.setMode(e.currentTarget.attributes['data-folder'].value, 1, true);
             this.render(false);
         });

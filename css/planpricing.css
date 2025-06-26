@@ -202,22 +202,29 @@
     padding-right: 24px;
  }
 .pricing-plan-card .pricing-plan-recommend {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    padding: 4px;
     background: var(--color-secondary-cobalt-900);
     color: var(--color-grey-50);
-    font: var(--text-caption-bold-pricing);
     visibility: hidden;
+}
+.pricing-plan-card .pricing-plan-recommend,
+.pricing-plan-card .pricing-plan-subheading2 {
+    padding: 4px;
+    font: var(--text-caption-bold-pricing);
+    text-align: center;
     white-space: nowrap;
 }
+.pricing-plan-card .pricing-plan-subheading2 {
+    background: var(--color-secondary-cobalt-50);
+}
 .pricing-plan-card .pricing-plan-title {
-    margin-top: 24px;
     font: var(--text-h5-pricing);
+    margin-top: 52px;
+}
+.pricing-plan-card .pricing-plan-recommend ~ .pricing-plan-title,
+.pricing-plan-card .pricing-plan-subheading2 ~ .pricing-plan-title {
+    margin-top: 24px;
 }
 .pricing-plan-card .pricing-plan-only {
-    margin-top: 32px;
     font: var(--text-caption-regular-pricing);
     color: var(--color-copy-secondary);
 }
@@ -253,6 +260,10 @@
     padding-top: 32px;
     padding-bottom: 56px;
     font: var(--text-copy-medium-pricing);
+}
+.pricing-plan-card .pricing-plan-features:empty {
+    padding-top: 24px;
+    padding-bottom: 0;
 }
 .pricing-plan-card .pricing-plan-features > * {
     display: flex;
@@ -316,16 +327,14 @@
     border-color: var(--color-secondary-cobalt-900);
 }
 .pricing-plan-card.popular .pricing-plan-btn,
-.pricing-flexi-block-card-contianer .pricing-plan-btn,
-.pricing-feature-plan-container .pricing-plan-btn {
+.pricing-flexi-block-card-contianer .pricing-plan-btn {
     background-color: var(--color-primary-red-500);
     color: var(--color-grey-50);
     border: unset;
     padding: 12px 24px;
 }
 .pricing-plan-card.popular .pricing-plan-btn:hover,
-.pricing-flexi-block-card-contianer .pricing-plan-btn:hover,
-.pricing-feature-plan-container .pricing-plan-btn:hover {
+.pricing-flexi-block-card-contianer .pricing-plan-btn:hover {
     background-color: var(--color-primary-red-600);
 }
 .pricing-pg .exclusive-plans-container .plans-cards-container{
@@ -401,7 +410,8 @@ i.minus-icon {
     align-items: baseline;
     margin-bottom: 12px;
 }
-.pricing-get-free-banner-price .pricing-get-free-banner-price-val {
+.pricing-get-free-banner-price .pricing-get-free-banner-price-val,
+.pricing-feature-plan-container .features-grid-title {
     font: var(--text-h2-pricing);
 }
 .pricing-get-free-banner-price .pricing-get-free-banner-note {
@@ -450,13 +460,17 @@ i.chevron-down-icon.inv {
     grid-template-columns: 1fr 1fr 1fr;
     gap: 32px;
 }
-.pricing-why-store-with-us .pricing-why-store-with-us-block i {
+.pricing-why-store-with-us .pricing-why-store-with-us-block i,
+.subcard-features i {
     width: 48px;
     height: 48px;
     background-repeat: no-repeat;
     background-position: center;
     --icon-size: 48px;
     color: var(--color-primary-red-500);
+}
+.subcard-features p.feature-label {
+    font: var(--text-h6-pricing);
 }
 i.cloud-with-lock-icon {
     background-image: url("../images/mega/cloud-with-lock-icon.svg");
@@ -1071,11 +1085,13 @@ i.pricing-i-icon {
 }
 .pricing-pg .pricing-pg.pricing-feature-plan-container .plans-cards-container .pricing-plan-card-wrapper {
     width: 100%;
-    max-width: 392px;
     margin-top: 24px;
 }
+.pricing-pg.pricing-feature-plan-container.pwm .pricing-plan-card {
+    width: 100%;
+    max-width: 392px;
+}
 .pricing-pg .pricing-pg.pricing-feature-plan-container .pricing-flexi-block-card-note {
-    padding-top: 1rem;
     font: var(--text-caption-regular-pricing);
     color: var(--color-copy-secondary);
 }
@@ -1111,7 +1127,12 @@ i.pricing-i-icon {
 }
 .feature-alternating .feature-block .text-pane p,
 .ft-simple-cards .ft-card-txt,
-.feature-glance-body p {
+.feature-glance-body p,
+.promo-txt p {
+    color: var(--color-copy-primary);
+    font: var(--text-copy-medium-pricing);
+}
+p.promo-txt {
     color: var(--color-copy-primary);
     font: var(--text-copy-medium-pricing);
 }
@@ -1175,7 +1196,6 @@ i.pricing-i-icon {
     padding-left: 16px;
     padding-right: 16px;
 }
-
 /* Responsiveness */
     /* The range from Medium (M) 768px ---> to Large (L) 1080px */
     @media screen and (min-width: 767px) and (max-width: 1079px) {
@@ -1349,6 +1369,9 @@ i.pricing-i-icon {
         .ft-simple-cards {
             grid-template-columns: 1fr 1fr;
             grid-template-rows: auto;
+        }
+        .pricing-pg .pricing-pg.pricing-feature-plan-container .pricing-plan-card {
+            max-width: 33.3333%;
         }
     }
     /* The range from Small (S) 0 ---> to Medium (M) 768px */
@@ -1650,6 +1673,15 @@ i.pricing-i-icon {
         .pricing-plan-storage.long-text,
         .pricing-plan-trasfer.long-text {
             font-size: 11px;
+        }
+    }
+
+    @media screen and (max-width: 565px) {
+        .pricing-pg.pricing-feature-plan-container.vpn .pricing-plan-card.popular {
+            order: -1;
+        }
+        .pricing-pg.pricing-feature-plan-container.vpn .pricing-plan-card.monthly {
+            order: 999;
         }
     }
     /* End Responsiveness */

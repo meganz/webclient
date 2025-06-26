@@ -307,6 +307,7 @@ pro.propay = {
                     + (((this.planObj.currency === 'EUR') || this.isVoucherBalance()) ? '' : '*')
                     + ' '
                     + this.planObj.currency);
+            $('span.plan-months', $trialInfo).text(this.getRecurringDurationWording(this.planObj.months));
             $('span.plan-name', $trialInfo).text(this.planObj.name);
         }
         else {
@@ -1223,8 +1224,16 @@ pro.propay = {
     checkGateway(gate) {
         'use strict';
 
+        const {
+            level,
+            maxCorrPriceEuro,
+            trial,
+            months,
+            durationOptions
+        } = this.planObj;
+
         // If plan is flexi and the gateway doesn't support business(and flexi)
-        if (this.planObj.level === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
+        if (level === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
             if (gate.supportsBusinessPlans !== 1) {
                 return false;
             }
@@ -1240,7 +1249,7 @@ pro.propay = {
         }
 
         // If the gateway has a required price, and it is more than the plans max price
-        if (gate.minimumEURAmountSupported > this.planObj.maxCorrPriceEuro) {
+        if (gate.minimumEURAmountSupported > maxCorrPriceEuro) {
             return false;
         }
 
@@ -1252,7 +1261,7 @@ pro.propay = {
         if (gate.gatewayId === 19) {
 
             if (gate.gatewayName === 'stripeAP') {
-                if (this.planObj.trial) {
+                if (trial) {
                     return false;
                 }
                 delete gate.supportsTrial;
@@ -1272,15 +1281,11 @@ pro.propay = {
             }
         }
 
-        if (!gate.supportsAnnualPayment && (this.planObj.months === 12)) {
-            if (!this.planObj.correlatedPlan) {
-                return false;
-            }
-        }
-        if (!gate.supportsMonthlyPayment && (this.planObj.months === 1)) {
-            if (!this.planObj.correlatedPlan) {
-                return false;
-            }
+        if (
+            (months === 1 && !gate.supportsMonthlyPayment && !durationOptions.some(([,,,,m]) => m >= 12))
+            || (months >= 12 && !gate.supportsAnnualPayment && !durationOptions.some(([,,,,m]) => m === 1))
+        ) {
+            return false;
         }
 
         // Gateway supports the current plan
@@ -1446,12 +1451,9 @@ pro.propay = {
 
 
         const isRecurring = !this.currentGateway || !!this.currentGateway.supportsRecurring;
-        const durationText = isRecurring
-            ? this.planObj.months === 12 ? l.yearly_unit : l.recurring_monthly
-            : this.getNumOfMonthsWording(this.planObj.months, this.discountInfo);
 
         $('.pricing-element .duration-type', $planCard)
-            .text(durationText);
+            .text(this.getNumOfMonthsWording(this.planObj.months, this.discountInfo));
 
         $('.pricing-element .price', $planCard).safeHTML(priceText);
 
@@ -1538,14 +1540,13 @@ pro.propay = {
 
     /**
      *
-     * @param {Object} plan - Plan to get the text string for
-     * @param {1 | 12} months - Number of months to get the string for
-     * @returns {string} - The formatted string
+     * @param {Object} plan Plan to get the text string for
+     * @param {1 | 12} months Number of months to get the string for
+     * @param {String} givenString Predefined string to work with
+     * @returns {string} The formatted string
      */
     getTxtString(plan, months, givenString) {
-        'use strict';
-
-        givenString = givenString || l[(months === 12 ? 'per_year' : 'per_month')];
+        givenString = givenString || mega.icu.format(l.charged_per_months, months);
 
         const isBalance = this.isVoucherBalance();
 
@@ -1562,22 +1563,16 @@ pro.propay = {
         const $containedRadioTemplate = mega.templates
             .getTemplate('propay-contained-radio', false, this.pageInfo.$templates);
 
-        const monthlyPlan = this.planObj.months === 1 ? this.planObj : this.planObj.correlatedPlan;
-        const yearlyPlan = this.planObj.months === 12 ? this.planObj : this.planObj.correlatedPlan;
-
         const isRecurring = !this.currentGateway || !!this.currentGateway.supportsRecurring;
-
-        let $yearlyRadio;
-        let $monthlyRadio;
 
         this.pageInfo.$durationOptionsWrapper.empty();
 
         let discountMonths;
         let discountRenewalDuration;
 
-        let blockedByMinAmount = false;
-        let blockedByYearlyOnly = false;
-        let blockedByMonthlyOnly = false;
+        delete this.blockedByMinAmount;
+        delete this.blockedByYearlyOnly;
+        delete this.blockedByMonthlyOnly;
 
         let warning;
 
@@ -1603,129 +1598,173 @@ pro.propay = {
             $('.promo-info-txt', $promoEndsInfo).text(text);
         }
 
-        $promoEndsInfo.toggleClass('hidden', !discountMonths || !isRecurring);
+        /**
+         * Indicating the best option to save money on
+         */
+        const biggestSaveOption = [0, 0];
+        const { durationOptions } = this.planObj;
 
-        if (monthlyPlan && yearlyPlan && !discountRenewalDuration) {
-            if (discountRenewalDuration !== 1 && discountMonths !== 0) {
-
-                $monthlyRadio = $containedRadioTemplate.clone()
-                    .removeClass('hidden template')
-                    .addClass('duration-option monthly')
-                    .attr('duration', 1);
-                $('.duration-head .duration-type', $monthlyRadio).text(isRecurring
-                    ? l.recurring_monthly
-                    : this.getNumOfMonthsWording(1));
-
-                $('.monthly-price', $monthlyRadio)
-                    .text(pro.propay.getTxtString(monthlyPlan, 1, isRecurring ? false : '%1')).removeClass('hidden');
-
-                let updatePlan = false;
-
-                if (this.currentGateway && this.currentGateway.minimumEURAmountSupported > monthlyPlan.priceEuro) {
-                    updatePlan = true;
-                    $monthlyRadio.addClass('disabled');
-                    blockedByMinAmount = true;
-                }
-                else if (this.currentGateway && !this.currentGateway.supportsMonthlyPayment) {
-                    updatePlan = true;
-                    $monthlyRadio.addClass('disabled');
-                    blockedByYearlyOnly = true;
-                }
-                else if (discountRenewalDuration === 12) {
-                    $monthlyRadio.addClass('disabled hidden');
-                }
-
-                if (updatePlan) {
-                    this.planObj = yearlyPlan;
-                    this.selectedPeriod = this.planObj.months;
-                }
-
-                this.pageInfo.$durationOptionsWrapper.safeAppend($monthlyRadio.prop('outerHTML'));
+        const appendDurationOption = ([,al,,,months]) => {
+            if (discountMonths === months) {
+                return; // No need to render, it's taken care of in Discount section
             }
 
-            if ((discountRenewalDuration !== 12) && (discountMonths !== 0)) {
+            const perMonth = months === 1;
+            const plan = pro.getPlanObj(al, months);
 
-                $yearlyRadio = $containedRadioTemplate.clone()
-                    .removeClass('hidden template')
-                    .addClass('duration-option yearly')
-                    .attr('duration', 12);
+            const $radio = $containedRadioTemplate.clone()
+                .removeClass('hidden template')
+                .addClass('duration-option')
+                .attr('duration', months);
 
-                $('.duration-head .duration-type', $yearlyRadio)
-                    .text(isRecurring
-                        ? l.yearly_unit
-                        : this.getNumOfMonthsWording(12));
+            $('.duration-head .duration-type', $radio)
+                .text(isRecurring
+                    ? this.getRecurringDurationWording(months)
+                    : this.getNumOfMonthsWording(months));
 
-                let savingsAmount = l.redemption_save_16_percent;
-                let price;
+            if (!perMonth && isRecurring) {
+                $('.monthly-price', $radio).text(pro.propay.getTxtString(plan, 1, l.per_month)).removeClass('hidden');
+            }
 
-                if (!isRecurring) {
-                    if (this.isVoucherBalance()) {
-                        price = (monthlyPlan.priceEuro * 12) - yearlyPlan.priceEuro;
-                        savingsAmount = l.save_amount.replace('%1', formatCurrency(price, 'EUR'));
+            if (discountRenewalDuration) {
+                $radio.addClass('disabled');
+            }
+            else if (months === this.selectedPeriod) {
+                $('.radio-item', $radio).removeClass('radioOff').addClass('radioOn');
+                $radio.addClass('selected');
+            }
+
+            if (!perMonth && !this.blockedByMonthlyOnly) {
+                const getSavings = () => {
+                    let amount;
+                    let label;
+
+                    if (isRecurring) {
+                        if (plan.saveUpTo > 0) {
+                            amount = plan.saveUpTo;
+                            label = l.yearly_plan_saving.replace('%1', amount);
+                        }
+                    }
+                    else if (this.isVoucherBalance()) {
+                        amount = pro.getPlanObj(plan.level, 1).priceEuro * months - plan.priceEuro;
+                        label = l[16649]
+                            .replace('10.00', formatCurrency(amount, 'EUR'));
                     }
                     else {
-                        price = (monthlyPlan.price * 12) - yearlyPlan.price;
-                        savingsAmount = l.save_amount.replace('%1', formatCurrency(price, this.planObj.currency));
+                        amount = pro.getPlanObj(plan.level, 1).price * months - plan.price;
+                        label = l[16649]
+                            .replace('10.00', formatCurrency(amount, plan.currency));
                     }
+
+                    if (amount > biggestSaveOption[0]) {
+                        biggestSaveOption[0] = amount;
+                        biggestSaveOption[1] = months;
+                    }
+
+                    return label;
                 }
 
-                const $durationSavings = $('.duration-head .duration-savings', $yearlyRadio)
-                    .text(savingsAmount)
-                    .removeClass('hidden');
+                const savingsAmount = getSavings();
 
-
-                $('.yearly-price', $yearlyRadio)
-                    .text(pro.propay.getTxtString(yearlyPlan, 12, isRecurring ? false : '%1'))
-                    .removeClass('hidden');
-
-                $('.monthly-price', $yearlyRadio)
-                    .text(pro.propay.getTxtString(yearlyPlan, 1))
-                    .toggleClass('hidden', !isRecurring);
-
-                let updatePlan = false;
-
-                if (discountRenewalDuration === 1) {
-                    updatePlan = true;
-                    $yearlyRadio.addClass('disabled hidden');
+                if (savingsAmount) {
+                    $('.duration-head .duration-savings', $radio)
+                        .safeAppend(savingsAmount)
+                        .removeClass('hidden');
                 }
-                if (this.currentGateway && !this.currentGateway.supportsAnnualPayment) {
-                    updatePlan = true;
-                    $yearlyRadio.addClass('disabled');
-                    $durationSavings.addClass('hidden');
-                    blockedByMonthlyOnly = true;
-                }
-
-                if (updatePlan) {
-                    this.planObj = monthlyPlan;
-                    this.selectedPeriod = this.planObj.months;
-                }
-
-                this.pageInfo.$durationOptionsWrapper.safeAppend($yearlyRadio.prop('outerHTML'));
             }
-            $('.duration', this.pageInfo.$leftBlock).removeClass('hidden');
+
+            $('.yearly-price', $radio)
+                .text(pro.propay.getTxtString(plan, months, isRecurring ? false : '%1'))
+                .removeClass('hidden');
 
             if (this.currentGateway) {
+                let newDuration;
 
+                const runDurationChecks = () => {
+                    if (this.currentGateway.minimumEURAmountSupported > plan.priceEuro) {
+                        $radio.addClass('disabled');
+                        this.blockedByMinAmount = true;
+
+                        if (!this.newDuration) {
+                            newDuration = durationOptions.find(
+                                ([,,,,,euroPrice]) => euroPrice >= this.currentGateway.minimumEURAmountSupported
+                            )[pro.UTQA_RES_INDEX_MONTHS];
+                        }
+                    }
+                    else if (perMonth && !this.currentGateway.supportsMonthlyPayment) {
+                        this.blockedByYearlyOnly = true;
+                        $radio.addClass('disabled');
+
+                        if (!this.newDuration) {
+                            newDuration = durationOptions.find(([,,,,m]) => m >= 12)[pro.UTQA_RES_INDEX_MONTHS];
+                        }
+                    }
+                    else if (!perMonth && !this.currentGateway.supportsAnnualPayment) {
+                        this.blockedByMonthlyOnly = true;
+                        $radio.addClass('disabled');
+
+                        if (!this.newDuration) {
+                            newDuration = 1;
+                        }
+                    }
+                };
+
+                runDurationChecks();
+
+                if (newDuration) {
+                    this.planObj = pro.getPlanObj(al, newDuration);
+                    this.selectedPeriod = this.newDuration = newDuration;
+
+                    this.renderPlanInfo();
+                    this.updatePayment();
+                    return false;
+                }
+            }
+
+            this.pageInfo.$durationOptionsWrapper.safeAppend($radio.prop('outerHTML'));
+            return true;
+        };
+
+        $promoEndsInfo.toggleClass('hidden', !discountMonths || !isRecurring);
+
+        if (durationOptions.length > 1 && !discountRenewalDuration) {
+            let i = -1;
+
+            while (++i < durationOptions.length) {
+                if (!appendDurationOption(durationOptions[i])) {
+                    return; // No need to render further, it's going to be re-rendered with new conditions
+                }
+            }
+
+            delete this.newDuration;
+
+            if (biggestSaveOption[0] > 0) {
+                $(`[duration="${biggestSaveOption[1]}"] .duration-head .duration-savings`,
+                  this.pageInfo.$durationOptionsWrapper).addClass('popular');
+            }
+
+            if (this.currentGateway) {
                 if (this.currentGateway.gatewayId === 0) {
                     warning = this.usingBalance ? this.warningStrings.balance : this.warningStrings.voucher;
                 }
                 else if (this.currentGateway.gatewayId === 11) {
                     warning = this.warningStrings.astropayOneOff.replace('%1', this.currentGateway.displayName);
                 }
-                else if (blockedByYearlyOnly) {
+                else if (this.blockedByYearlyOnly) {
                     warning = this.warningStrings.yearlyOnly;
                 }
-                else if (blockedByMonthlyOnly) {
+                else if (this.blockedByMonthlyOnly) {
                     warning = this.warningStrings.monthlyOnly;
                 }
-                else if (blockedByMinAmount) {
+                else if (this.blockedByMinAmount) {
                     warning = this.warningStrings.minAmount;
                 }
             }
+
+            $('.duration', this.pageInfo.$leftBlock).removeClass('hidden');
         }
-        else if (!discountMonths || discountRenewalDuration) {
+        else {
             $('.duration', this.pageInfo.$leftBlock).addClass('hidden');
-            return;
         }
 
         const $warning = $('.one-off-payment-info', this.pageInfo.$leftBlock).toggleClass('hidden', !warning);
@@ -1733,51 +1772,27 @@ pro.propay = {
             $('.warning-txt', $warning).text(warning);
         }
 
-        $('.duration-option', this.pageInfo.$durationOptionsWrapper).rebind('click', (e) => {
-            const $this = $(e.currentTarget);
-            const duration = +$this.attr('duration');
+        if (!discountRenewalDuration) {
+            $('.duration-option', this.pageInfo.$durationOptionsWrapper).rebind('click.durationOption', (e) => {
+                const $this = $(e.currentTarget);
+                const duration = +$this.attr('duration');
 
-            if ((this.selectedPeriod === duration) || $this.hasClass('disabled')) {
-                return;
-            }
+                if ((this.selectedPeriod === duration) || $this.hasClass('disabled')) {
+                    return;
+                }
 
-            $('.duration-option.monthly, .duration-option.yearly', this.pageInfo.$durationOptionsWrapper)
-                .removeClass('selected');
+                this.selectedPeriod = duration;
+                sessionStorage['pro.period'] = this.selectedPeriod;
+                this.planObj = pro.getPlanObj(this.planNum, this.selectedPeriod);
 
-            $this.addClass('selected');
+                if (this.currentGateway && this.currentGateway.gatewayId === 0) {
+                    this.usingBalance = this.usingBalance && pro.propay.useBalance();
+                }
 
-            $('.duration-option.monthly .radio-item', this.pageInfo.$durationOptionsWrapper)
-                .toggleClass('radioOn', duration === 1)
-                .toggleClass('radioOff', duration !== 1);
-
-            $('.duration-option.yearly .radio-item', this.pageInfo.$durationOptionsWrapper)
-                .toggleClass('radioOn', duration === 12)
-                .toggleClass('radioOff', duration !== 12);
-
-            this.selectedPeriod = duration;
-            sessionStorage['pro.period'] = this.selectedPeriod;
-            this.planObj = pro.getPlanObj(this.planNum, this.selectedPeriod);
-
-            eventlog(duration === 1 ? 500369 : 500370, this.planObj.name);
-
-            if (this.currentGateway && this.currentGateway.gatewayId === 0) {
-                this.usingBalance = this.usingBalance && pro.propay.useBalance();
-            }
-
-            this.renderPlanInfo();
-            this.updatePayment();
-        });
-
-        $('.duration-option.monthly', this.pageInfo.$durationOptionsWrapper)
-            .toggleClass('selected', this.selectedPeriod === 1);
-        $('.duration-option.yearly', this.pageInfo.$durationOptionsWrapper)
-            .toggleClass('selected', this.selectedPeriod === 12);
-
-        $(`.duration-option.${this.selectedPeriod === 1
-            ? 'monthly'
-            : 'yearly'} .radio-item`, this.pageInfo.$durationOptionsWrapper)
-            .addClass('radioOn')
-            .removeClass('radioOff');
+                this.renderPlanInfo();
+                this.updatePayment();
+            });
+        }
     },
 
     getPaymentType(gateway) {
@@ -3128,16 +3143,26 @@ pro.propay = {
     getNumOfMonthsWording(numOfMonths, forceMonths) {
         'use strict';
 
-        let monthsWording;
-        // Change wording depending on number of months
-        if (!forceMonths && (numOfMonths === 12)) {
-            monthsWording = l[923];     // 1 year
-        }
-        else {
-            monthsWording = mega.icu.format(l[922], numOfMonths); // 1 month
+        if (!forceMonths && numOfMonths === 12) {
+            return l[923];     // 1 year
         }
 
-        return monthsWording;
+        return mega.icu.format(l[922], numOfMonths); // xx month(s)
+    },
+
+    /**
+     * Renders the string for recurring plan based on number of months available
+     * @param {Number} months The number of months
+     * @returns {String}
+     */
+    getRecurringDurationWording(months) {
+        'use strict';
+
+        switch (months) {
+            case 12: return l.recurring_yearly;
+            case 24: return l.recurring_2_yearly;
+            default: return l.recurring_monthly;
+        }
     },
 
     getPlan(returnArr) {
@@ -3190,7 +3215,11 @@ pro.propay = {
         const $template = mega.templates.getTemplate('free-trial-card-temp')
             .addClass(information.type + information.classList);
 
-        const priceText = mega.icu.format(l.days_free_then_price_m, information.days)
+        const { months: m } = this.planObj;
+        const durationText = m === 12 && l.days_free_then_price_y
+            || m === 24 && l.days_free_then_price_2y
+            || l.days_free_then_price_m;
+        const priceText = mega.icu.format(durationText, information.days)
             .replace('%1', formattedPrice + (curr === 'EUR' ? '' : '*'))
             .replace('%2', curr);
 

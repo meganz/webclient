@@ -68,7 +68,7 @@ class DiscountPromo {
         loadingDialog.show();
         delete mega.discountInfo;
 
-        api.req({a: 'dci', v: 2, dc: mega.discountCode, su: mega.shortUrl, extra: true}).then(({result: res}) => {
+        api.req({a: 'dci', dc: mega.discountCode, su: mega.shortUrl, extra: true}).then(({result: res}) => {
 
             loadingDialog.hide();
 
@@ -106,9 +106,6 @@ class DiscountPromo {
     }
 
     static storeDiscountInfo(res) {
-        if (res.al === pro.ACCOUNT_LEVEL_FEATURE) {
-            res.al += pro.getStandaloneBits(res.f);
-        }
 
         mega.discountInfo = res;
         mega.discountCode = mega.discountCode || res.dc;

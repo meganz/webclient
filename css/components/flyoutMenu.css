@@ -8,11 +8,16 @@
     grid-row: 3/4;
     grid-column: 3/4;
     overflow: hidden;
-    width: var(--flyout-width);
-    border-left: 1px solid var(--mobile-border-strong);
+    width: 0;
+    min-width: 0;
     padding: 16px 0;
     transition: 200ms linear;
     box-sizing: border-box;
+}
+#pmlayout .flyout-holder.flyout-shown,
+#startholder .flyout-holder.flyout-shown {
+    width: var(--flyout-width);
+    border-left: 1px solid var(--mobile-border-strong);
 }
 #startholder .flyout-holder {
     grid-row: 1/2;

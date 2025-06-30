@@ -742,19 +742,15 @@ mBroadcaster.once('boot_done', () => {
                 const target = target_keys && target_keys.length ? target_keys[0] : false;
 
                 if (!mobile.cloud.nodeInView(nodeHandle) || target && sharer(target)) {
-                    const restoredToCloud = node.t ? l.restored_folder_to_cloud : l.restored_file_to_cloud;
-                    const restoredToFolder = node.t ? l.restored_folder_to_folder : l.restored_file_to_folder;
-                    const nodeParent = node.rr || node.p;
+                    const msg = mega.icu.format(
+                        l[`mobile_${node.t ? 'folder' : 'file'}_restored_from_bin`], 1
+                    );
 
-                    const msg = nodeParent === M.RootID ?
-                        restoredToCloud.replace('[X]', node.name) :
-                        restoredToFolder
-                            .replace('%1', node.name)
-                            .replace('%2', M.getNodeByHandle(nodeParent).name);
+                    const nodeParent = node.rr || node.p;
 
                     // toast message
                     mega.ui.toast.show(
-                        msg, 4, l.show, {
+                        msg, 4, l[16797], {
                             actionButtonCallback: () => {
                                 M.openFolder(nodeParent)
                                     .finally(() => {

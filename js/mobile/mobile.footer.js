@@ -95,10 +95,7 @@ class MegaMobileFooter extends MegaComponent {
 
                         if (nh) {
 
-                            const msg = escapeHTML(
-                                M.currentdirid === M.RootID ? l.mobile_save_as_toast_cloud : l.mobile_save_as_toast
-                            ).replace('%1', nn).replace('%2', M.d[M.currentdirid].name);
-
+                            const msg = escapeHTML(l.new_text_file_created);
                             mega.ui.viewerOverlay.show(nh);
                             mega.ui.toast.show(msg, 4);
                         }

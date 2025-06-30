@@ -1798,23 +1798,25 @@ pro.propay = {
             }
 
             if (!perMonth && !this.blockedByMonthlyOnly) {
+                const monthPlan = pro.getPlanObj(plan.level, 1);
+
                 const getSavings = () => {
                     let amount;
                     let label;
 
                     if (isRecurring) {
-                        if (plan.saveUpTo > 0) {
+                        if (plan.saveUpTo > 0 && monthPlan.price * 12 > plan.price) {
                             amount = plan.saveUpTo;
                             label = l.yearly_plan_saving.replace('%1', amount);
                         }
                     }
                     else if (this.isVoucherBalance()) {
-                        amount = pro.getPlanObj(plan.level, 1).priceEuro * months - plan.priceEuro;
+                        amount = monthPlan.priceEuro * months - plan.priceEuro;
                         label = l[16649]
                             .replace('10.00', formatCurrency(amount, 'EUR'));
                     }
                     else {
-                        amount = pro.getPlanObj(plan.level, 1).price * months - plan.price;
+                        amount = monthPlan.price * months - plan.price;
                         label = l[16649]
                             .replace('10.00', formatCurrency(amount, plan.currency));
                     }
@@ -1954,6 +1956,8 @@ pro.propay = {
 
                 this.renderPlanInfo();
                 this.updatePayment();
+
+                eventlog(500937, JSON.stringify({ a: this.planNum, m: duration, t: this.shouldShowTrial() | 0 }));
             });
         }
     },
@@ -3386,21 +3390,30 @@ pro.propay = {
 
     createFreeTrialSection(formattedPrice, curr, information) {
         'use strict';
-        information = information || Object.create(null);
+
         if (!formattedPrice || !curr) {
             return false;
         }
 
+        information = information || Object.create(null);
+        information.days = information.days || 7;
+        information.id = information.id || makeid(10);
+        information.startDate = information.startDate
+            || time2date((Date.now() / 1000) + information.days * 24 * 60 * 60, 2);
+
+        const vpnWarnDays = 2;
+        const pwmWarnDays = 4;
+
         const steps = {
             1: {    // VPN Feature (bits)
                 0: l.unlock_secure_browsing,
-                5: l.email_before_trial_end,
-                7: l.sub_start_day,
+                [information.days - vpnWarnDays]: l.email_before_trial_end,
+                [information.days]: l.sub_start_day
             },
             2: {    // PWM Feature (bits)
                 0: l.fast_login_secure_passwords,
-                10: l.email_before_trial_end,
-                14: l.sub_start_day,
+                [information.days - pwmWarnDays]: l.email_before_trial_end,
+                [information.days]: l.sub_start_day
             }
         };
 
@@ -3408,11 +3421,6 @@ pro.propay = {
         if (information.id) {
             $('#' + information.id).remove();
         }
-
-        information.days = information.days || 7;
-        information.id = information.id || makeid(10);
-        information.startDate = information.startDate
-            || time2date((Date.now() / 1000) + information.days * 24 * 60 * 60, 2);
 
         const $template = mega.templates.getTemplate('free-trial-card-temp')
             .addClass(information.type + information.classList);

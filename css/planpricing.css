@@ -237,6 +237,7 @@
     font: var(--text-h5-pricing);
     margin-top: 52px;
 }
+.plans-cards-container:not(.has-deals) .pricing-plan-title,
 .pricing-plan-card .pricing-plan-recommend ~ .pricing-plan-title,
 .pricing-plan-card .pricing-plan-subheading2 ~ .pricing-plan-title {
     margin-top: 24px;
@@ -336,6 +337,7 @@
     font: var(--text-button-pricing);
     cursor: pointer;
     background-color: var(--color-bg-page);
+    color: var(--color-heading);
 }
 .disabled .pricing-plan-btn-container .pricing-plan-btn {
     opacity: 0.2;
@@ -1112,10 +1114,6 @@ i.pricing-i-icon {
     width: 100%;
     margin-top: 24px;
 }
-.pricing-pg.pricing-feature-plan-container.pwm .pricing-plan-card {
-    width: 100%;
-    max-width: 392px;
-}
 .pricing-pg .pricing-pg.pricing-feature-plan-container .pricing-flexi-block-card-note {
     font: var(--text-caption-regular-pricing);
     color: var(--color-copy-secondary);
@@ -1702,10 +1700,13 @@ p.promo-txt {
     }
 
     @media screen and (max-width: 565px) {
-        .pricing-pg.pricing-feature-plan-container.vpn .pricing-plan-card.popular {
+        .pricing-pg.pricing-feature-plan-container .pricing-plan-card {
+            margin-bottom: 1.5rem;
+        }
+        .pricing-pg.pricing-feature-plan-container .pricing-plan-card.popular {
             order: -1;
         }
-        .pricing-pg.pricing-feature-plan-container.vpn .pricing-plan-card.monthly {
+        .pricing-pg.pricing-feature-plan-container .pricing-plan-card.monthly {
             order: 999;
         }
     }

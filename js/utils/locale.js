@@ -1929,17 +1929,22 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[A]', '<a href="mailto:support@mega.nz">')
         .replace('[/A]', '</a>');
 
-    l.item_updated = escapeHTML(l.item_updated)
-        .replace('[S]', '"<span class="long-title-truncate">')
-        .replace('[/S]', '</span>"');
+    for (const key of [
+        'file_renamed_to',
+        'folder_renamed_to',
+        'mobile_file_move_to_folder',
+        'mobile_file_copy_to_folder',
+        'mobile_folder_move_to_folder',
+        'mobile_folder_copy_to_folder',
+        'item_updated',
+        'delete_confirmation_title',
+        'item_deleted',
+    ]) {
 
-    l.delete_confirmation_title = escapeHTML(l.delete_confirmation_title)
-        .replace('[S]', '<span class="long-title-truncate">"')
-        .replace('[/S]', '</span>"');
-
-    l.item_deleted = escapeHTML(l.item_deleted)
-        .replace('[S]', '"<span class="long-title-truncate">')
-        .replace('[/S]', '</span>"');
+        l[key] = escapeHTML(l[key])
+            .replaceAll('[S]', '"<span class="long-title-truncate">')
+            .replaceAll('[/S]', '</span>"');
+    }
 
     l.request_failed = escapeHTML(l.request_failed)
         .replace('[A]', '<a href="mailto:support@mega.nz">')

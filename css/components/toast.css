@@ -41,6 +41,7 @@
     box-shadow: var(--mobile-shadow-strong);
     box-sizing: border-box;
     padding: 11px 24px;
+    overflow: hidden;
 }
 
 .toast-notification > button {
@@ -51,7 +52,6 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    display: flex;
 }
 
 .toast-notification .action-link span {

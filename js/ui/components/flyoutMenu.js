@@ -403,21 +403,26 @@ class MegaFlyoutMenu extends MegaComponent {
         }
     }
 
-    hide(instant) {
-        if (this.hiding && !instant) {
+    hide(destroying) {
+        if (this.hiding && !destroying) {
             return;
         }
-        document.getElementById(is_chatlink ? 'startholder' : 'pmlayout').classList.remove('flyout-expanded');
+        const parent = document.getElementById(is_chatlink ? 'startholder' : 'pmlayout');
+        if (parent) {
+            parent.classList.remove('flyout-expanded');
+        }
         this.name = '';
         const doHide = () => {
             super.hide();
             this.domNode.parentNode.classList.remove('flyout-shown');
-            this.resetUI();
+            if (!destroying) {
+                this.resetUI();
+            }
             $.tresizer();
             delete this.hiding;
             this.trigger('onHidden');
         };
-        if (instant) {
+        if (destroying) {
             if (this.hiding) {
                 this.hiding.abort();
             }

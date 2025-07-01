@@ -50,7 +50,6 @@ class TutorialOTP {
 
         const saveBtn = this.form.domNode.querySelector('.submit');
         this.form.overlay.scrollTo(saveBtn);
-        this.form.megaTOTPInput.setValue(l.otp_tutorial_default_totp);
 
         this.showTooltip({
             targetNode: saveBtn,

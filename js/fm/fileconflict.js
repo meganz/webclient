@@ -569,17 +569,18 @@
                 .parent()
                 .removeClass('checkboxOn').addClass('checkboxOff');
 
-            var $aside = $('aside', $dialog).addClass('hidden');
+            let $node = $('aside', $dialog).addClass('hidden');
 
             if (remaining) {
                 var remainingConflictText = remaining > 1 ?
                     escapeHTML(l[16494]).replace('%1', '<span>' + remaining + '</span>') :
                     l[23294];
-                $aside.removeClass('hidden');
-                $('label', $aside).safeHTML(remainingConflictText);
+                $node.removeClass('hidden');
+                $('label', $node).safeHTML(remainingConflictText);
                 this.customRemaining($dialog);
             }
 
+            $node = new PerfectScrollbar($('.content', $dialog)[0]);
             loadingDialog.phide();
             uiCheckboxes($dialog);
             this.showDialog($dialog);

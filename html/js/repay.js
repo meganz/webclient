@@ -317,25 +317,40 @@ RepayPage.prototype.initPage = function() {
             }
             // end of Debug
 
-            let futureAmount = res.et && `${intl.format(res.et)} \u20ac`;
+            const taxInfo = {
+                name: res.txn,
+                percentage: (res.tx !== undefined) && +res.tx,
+                variant: res.txva,
+                taxAmount: res.ltax || res.tax,
+                totalPrice: res.lt || res.t
+            };
+            const {name, percentage, variant, taxAmount, totalPrice} = taxInfo;
+
+            const showTaxInfo = !!(!res.exc
+                && name
+                && (percentage !== false)
+                && (variant !== undefined)
+                && taxAmount && totalPrice);
+
+            let futureAmount = res.et && `${intl.format(res.etn || res.et)} \u20ac`;
             let totalAmount = res.t && `${intl.format(res.t)} \u20ac`;
-            let dueAmount = res.inv[0].tot && `${intl.format(res.inv[0].tot)} \u20ac`;
+            let dueAmount = res.inv[0].tot && `${intl.format(res.inv[0].totn || res.inv[0].tot)} \u20ac`;
 
             const $rightBlock = $('.main-right-block', $repaySection);
 
             // check if we have V1 (new version) of bills
-            if (typeof res.nbdu !== 'undefined' && res.inv[0].v) {
+            if (res.inv[0].v) {
                 let localPrice = false;
                 if (res.let) {
-                    futureAmount = applyFormat(intl.format(res.let));
+                    futureAmount = applyFormat(intl.format(res.letn || res.let));
                     localPrice = true;
                 }
                 if (res.lt) {
                     totalAmount = applyFormat(intl.format(res.lt));
                     localPrice = true;
                 }
-                if (res.inv && res.inv[0] && res.inv[0].lp) {
-                    dueAmount = applyFormat(intl.format(res.inv[0].lp));
+                if (res.inv && res.inv[0] && res.inv[0].ltot) {
+                    dueAmount = applyFormat(intl.format(res.inv[0].ltotn || res.inv[0].ltot));
                     localPrice = true;
                 }
                 if (localPrice) {
@@ -455,6 +470,17 @@ RepayPage.prototype.initPage = function() {
             }
 
             $('.repay-td-total', $rightBlock).text(totalAmount);
+
+            const $taxInfo = $('.repay-breakdown-tb-tax', $rightBlock).addClass('hidden');
+
+            if (showTaxInfo) {
+                $('.repay-td-tax-name', $taxInfo).text(l.tax_name_percentage
+                    .replace('%1', taxInfo.name)
+                    .replace('%2', formatPercentage(+taxInfo.percentage / 100)));
+                $('.repay-td-tax-amount', $taxInfo).text(applyFormat(intl.format(taxInfo.taxAmount)));
+
+                $taxInfo.removeClass('hidden');
+            }
 
             // If Pro Flexi, don't show the Account information section, also hide billing description row header
             if (u_attr.pf) {

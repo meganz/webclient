@@ -68,6 +68,25 @@ lazy(pro.proplan2, 'feature', () => {
             card.appendChild(price);
             card.appendChild(createEl(['pricing-plan-price-unit'], `${priceCurrency} / ${l[931]}`));
 
+            const planTaxInfo = pro.getStandardisedTaxInfo(plan);
+
+            if (planTaxInfo) {
+                const taxInfoCard = card.appendChild(createEl(['pricing-plan-tax']));
+                if (pro.taxInfo.variant === 1) {
+                    taxInfoCard
+                        .appendChild(createEl(['tax-info'], l.t_may_appy.replace('%1', pro.taxInfo.taxName), 'span'));
+                }
+                else {
+                    taxInfoCard.appendChild(createEl(['tax-info'], l.before_tax + ' ', 'span'));
+                    taxInfoCard.appendChild(createEl(
+                        ['tax-price'],
+                        l.p_with_tax
+                            .replace('%1', formatCurrency((planTaxInfo.taxedPrice), priceCurrency, 'narrowSymbol')
+                                + (priceCurrency === 'EUR' ? ' ' : '* ') + priceCurrency)
+                        , 'span'));
+                }
+            }
+
             const features = createEl(['pricing-plan-features']);
 
             for (let k = 0; k < cardFeatures.length; k++) {

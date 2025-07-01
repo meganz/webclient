@@ -504,7 +504,11 @@ i.pricing-sprite,
     border-top: 1px solid var(--surface-grey-2);
     padding-top: 24px;
 }
-.payment-page:not(.euro) .free-trial-card .secondary-title.price {
+.payment-page .free-trial-card .secondary-title.tax-info {
+    margin-top: 6px;
+    font: var(--text-body2);
+}
+.payment-page:not(.euro) .free-trial-card:last-child {
     margin-bottom: -8px;
 }
 .payment-page .free-trial-card i {

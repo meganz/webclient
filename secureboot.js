@@ -978,6 +978,11 @@ lazy(mega, 'viewID', function() {
     return (Date.now() / 1e3 >>> 0).toString(16).slice(-8) + makeUUID().slice(-8);
 });
 
+lazy(mega, 'utqav', function() {
+    'use strict';
+    return (mega.flags.utqav || localStorage.utqa_nf || 3);
+});
+
 (function(chrome) {
     'use strict';
     delete mega.chrome;

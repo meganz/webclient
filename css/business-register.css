@@ -606,7 +606,7 @@
     position: relative;
     display: block;
 }
-.bus-reg-plan.repay .repay-breakdown-tb tr:not(:last-child)::before {
+.bus-reg-plan.repay .repay-breakdown-tb tr:not(:last-child):not(.repay-breakdown-tb-tax)::before {
     content: "";
     position: absolute;
     display: block;
@@ -687,7 +687,7 @@
 }
 .bus-reg-plan.repay .repay-breakdown-tb tr:last-child td {
     color: var(--text-color-high);
-    font: var(--text-h2);
+    font: var(--text-h3);
     font-family: var(--text-font-family);
     font-weight: bold;
     text-align: start;
@@ -695,10 +695,27 @@
     height: 50px;
     opacity: unset;
 }
+.bus-reg-plan.repay .repay-breakdown-tb tr.repay-breakdown-tb-tax td {
+    color: var(--text-color-high);
+    font: var(--text-body-1);
+    font-family: var(--text-font-family);
+    font-weight: bold;
+    text-align: start;
+    width: 110px;
+    height: 40px;
+    opacity: unset;
+}
+.bus-reg-plan.repay .repay-breakdown-tb tr.repay-breakdown-tb-tax td:last-child,
 .bus-reg-plan.repay .repay-breakdown-tb tr:last-child td:last-child {
     padding-inline-end: 12px;
     width: 210px;
     text-align: end;
+}
+.bus-reg-plan.repay .repay-breakdown-tb tr.repay-breakdown-tb-tax td {
+    width: 130px;
+}
+.bus-reg-plan.repay .repay-breakdown-tb tr.repay-breakdown-tb-tax td:last-child {
+    width: 190px;
 }
 .bus-reg-plan.repay .repay-extra-details {
     background-color: var(--surface-grey-1);

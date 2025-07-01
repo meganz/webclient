@@ -8,7 +8,7 @@
     min-height: 100vh;
     --left-panel-width: 58%;
     --right-panel-width: 42%;
-    --plan-card-left-gap: 64px;
+    --plan-card-left-gap: 88px;
     --color-warning-orange: rgba(181, 84, 7, 1);
     --text-color-secondary: rgba(97, 99, 102, 1);
 }
@@ -423,7 +423,7 @@
 }
 #propay .right-block .plan-card.fixed {
     position: fixed;
-    top: 75px;
+    top: 88px;
     left: calc(var(--left-panel-width) + var(--plan-card-left-gap));
 }
 .rtl #propay .right-block .plan-card.fixed {
@@ -439,7 +439,7 @@
     left: initial;
 }
 #propay .right-block .plan-card .content {
-    padding: 48px 24px 0;
+    padding: 32px 24px 0;
 }
 #propay .right-block .plan-card .free-trial-card .content {
     padding: 0 0 24px;
@@ -473,12 +473,12 @@
 #propay .right-block .plan-card .plan-info {
     display: flex;
     flex-direction: column;
-    margin-top: 32px;
-    font: var(--text-copy-medium-bold-pricing);
+    margin-top: 24px;
+    font: var(--text-inter-600-14);
     transition: 600ms ease-in-out;
 }
 #propay .right-block .plan-card .plan-info > *:not(:last-child) {
-    margin-bottom: 8px;
+    margin-bottom: 12px;
 }
 #propay .right-block .plan-card .available {
     font: var(--text-body1);
@@ -486,16 +486,16 @@
 }
 #propay .right-block .plan-card .includes {
     margin-top: 24px;
-    font: var(--text-copy-card-pricing-medium-bold)
+    font: var(--text-inter-600-14);
+    color: var(--text-color-secondary);
 }
 #propay .right-block .plan-card .includes .includes-content {
     display: flex;
     flex-direction: column;
-    margin-top: 16px;
-    font: var(--text-copy-medium-pricing);
+    font: var(--text-inter-400-14);
 }
 #propay .right-block .plan-card .includes .includes-content > *:not(:last-child) {
-    margin-bottom: 16px;
+    margin-bottom: 12px;
 }
 #propay .right-block .plan-card .includes .includes-content > * {
     display: flex;
@@ -503,32 +503,36 @@
     align-items: center;
 }
 #propay .right-block .plan-card .includes .includes-content i {
-    --icon-size: 20px;
+    --icon-size: 16px;
     font: var(--text-body1-bold);
-    color: var(--color-primary-red-500);
     margin-inline-end: 8px;
 }
 #propay .right-block .plan-card .pricing,
-#propay .right-block .plan-card .estimated-price {
+#propay .right-block .plan-card .plan-card-footnote {
     display: flex;
     flex-direction: column;
-    gap: 32px;
-    margin-top: 32px;
-    padding-top: 24px;
+    gap: 12px;
+    margin-top: 20px;
+    padding-top: 16px;
     border-top: 1px solid var(--surface-grey-2);
-    font: var(--text-copy-large-pricing);
+    font: var(--text-inter-400-14);
     color: var(--color-copy-secondary);
 }
-#propay .right-block .plan-card .estimated-price {
-    font: var(--text-copy-small-pricing);
+#propay .right-block .plan-card .plan-card-footnote {
+    font: var(--text-inter-400-12);
     text-align: left;
-    margin: 32px 24px 0;
+    margin: 20px 24px 0;
 }
 #propay .right-block .plan-card .pricing .pricing-element {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
+}
+#propay .right-block .plan-card .pricing .pricing-element .due-now {
+    font: var(--text-inter-600-16);
+    color: var(--text-color-high);
+    align-self: flex-end;
 }
 #propay:not(.discount) .right-block .plan-card .pricing .pricing-element.discount {
     display: none;
@@ -537,25 +541,29 @@
     justify-content: flex-end;
     text-decoration: line-through;
     font-style: italic;
-    margin-top: -25px;
+    margin-top: -12px;
     color: var(--text-color-low);
 }
-#propay .right-block .plan-card .pricing .pricing-element .price {
-    font: var(--text-quotation-pricing);
+#propay .right-block .plan-card .pricing .pricing-element.duration {
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--surface-grey-2);
 }
-#propay .right-block .plan-card .pricing .pricing-element .price span {
-    font: var(--text-copy-medium-pricing);
+#propay .right-block .plan-card .pricing .pricing-element .price {
+    font: var(--text-poppins-600-24);
+    color: var(--text-color-high);
+    display: flex;
+}
+#propay .right-block .plan-card .pricing .pricing-element .price span.currency {
+    font: var(--text-inter-400-14);
+    color: var(--text-color-secondary);
+    padding-bottom: 2px;
+    align-self: flex-end;
+    margin-inline-start: 4px;
 }
 #propay.flexi .right-block .plan-card .pricing .extra-info {
     display: flex;
     flex-direction: column;
-    font: var(--text-copy-small-pricing);
-}
-#propay.flexi .right-block .plan-card .pricing .extra-info > *:not(:last-child) {
-    margin-bottom: 8px;
-}
-#propay .right-block .plan-card .pricing .extra-info .additional-title {
-    font: var(--text-copy-card-pricing-medium-bold);
+    font: var(--text-inter-400-12);
 }
 
 #propay button.continue {

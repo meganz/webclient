@@ -737,7 +737,7 @@ pro.proplan = {
             var $planName = $('.pricing-page.plan-title', $currentBox);
             var $planButton = $('.pricing-page.plan-button', $currentBox);
             var basePrice;
-            var baseCurrency;
+            let baseCurrency = 'EUR';
             $currentBox.removeClass('hidden');
 
             if (currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE]) {
@@ -786,6 +786,26 @@ pro.proplan = {
             $price.text(formatCurrency(basePrice, baseCurrency, 'narrowSymbol'));
 
             if (pageType === 'D') {
+
+                const planTaxInfo = pro.taxInfo
+                    && pro.getStandardisedTaxInfo(currentPlan[pro.UTQA_RES_INDEX_EXTRAS].taxInfo);
+
+                const $taxInfo = $('.pricing-plan-tax', $currentBox);
+                if (planTaxInfo) {
+                    if (pro.taxInfo.variant === 0) {
+                        $('.tax-info', $taxInfo).text(l.before_tax);
+                        $('.tax-price', $taxInfo).text(l.p_with_tax
+                            .replace('%1', formatCurrency(planTaxInfo.taxedPrice, baseCurrency, 'narrowSymbol')
+                            + (baseCurrency === 'EUR' ? ' ' : '* ') + baseCurrency))
+                            .removeClass('hidden');
+                    }
+                    else if (pro.taxInfo.variant === 1) {
+                        $('.tax-info', $taxInfo).text(l.t_may_appy.replace('%1', pro.taxInfo.taxName));
+                    }
+
+                    $taxInfo.removeClass('hidden');
+                }
+
                 const $onlySection = $('.pricing-page.plan-only', $currentBox);
                 const $currencyAndPeriod = $('.pricing-page.currency-and-period', $currentBox);
                 const periodIsYearly = months === 12;

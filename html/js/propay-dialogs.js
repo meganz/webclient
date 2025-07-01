@@ -2611,8 +2611,13 @@ var addressDialog = {
                     const planPrice = plan[pro.UTQA_RES_INDEX_LOCALPRICE] || plan[pro.UTQA_RES_INDEX_PRICE];
                     const planCurrency = plan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY] || 'EUR';
                     const planNumber = parseInt(pro.propay.planNum);
+                    const planTaxInfo = pro.getStandardisedTaxInfo(pro.getPlan(pro.propay.planNum, 1));
 
-                    const startDateTxt = l.m_sub_will_start
+                    const baseString = planTaxInfo
+                        ? l.m_sub_will_start_tma.replace('%3', pro.taxInfo.taxName)
+                        : l.m_sub_will_start;
+
+                    const startDateTxt = baseString
                         .replace('%1', formatCurrency(planPrice, planCurrency, 'narrowSymbol')
                             + (planCurrency === 'EUR' ? '' : '*'))
                         .replace('%2', time2date((Date.now() / 1000) + pro.propay.trial.days * 86400, 2));

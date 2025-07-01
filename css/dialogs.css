@@ -5850,11 +5850,15 @@ body.de .mega-dialog.contact-picker-widget {
         font-family: var(--text-font-family);
         font-weight: bold;
     }
+    .mega-dialog.limited-bandwidth-dialog .cost .pricing-page.currency-and-period,
+    .mega-dialog.limited-bandwidth-dialog .cost .pricing-page.pricing-plan-tax {
+        font-size: 14px;
+        text-wrap: auto;
+    }
     .mega-dialog.limited-bandwidth-dialog .pricing-page.plan-feature.storage {
         padding: 32px 0 8px;
     }
-    .mega-dialog.limited-bandwidth-dialog .plan-header-container,
-    .mega-dialog.limited-bandwidth-dialog .pricing-page.plan-feature.transfer {
+    .mega-dialog.limited-bandwidth-dialog .plan-header-container {
         padding-bottom: 40px;
     }
     .mega-dialog.limited-bandwidth-dialog.pro-mini .plan.starter .pricing-page.plan-feature.transfer {
@@ -5877,7 +5881,7 @@ body.de .mega-dialog.contact-picker-widget {
         border: 1px solid #00BFA5;
     }
     .mega-dialog.limited-bandwidth-dialog section {
-        padding: 40px 76.5px 30px;
+        padding: 40px 30px 30px;
     }
     .mega-dialog.limited-bandwidth-dialog.pro.exceeded section {
         padding-bottom: 24px;
@@ -5903,7 +5907,8 @@ body.de .mega-dialog.contact-picker-widget {
     .mega-dialog.limited-bandwidth-dialog .pricing-page.currency-and-period,
     .mega-dialog.limited-bandwidth-dialog .pricing-page.monthly-price,
     .mega-dialog.limited-bandwidth-dialog.pro-mini .pricing-page.period-subtitle,
-    .mega-dialog.limited-bandwidth-dialog .pricing-page.plan-feature {
+    .mega-dialog.limited-bandwidth-dialog .pricing-page.plan-feature,
+    .mega-dialog.limited-bandwidth-dialog .pricing-page.pricing-plan-tax {
         font-size: 16px;
         line-height: 24px;
     }

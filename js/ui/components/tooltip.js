@@ -240,6 +240,13 @@ class MegaTooltip extends MegaComponent {
             return;
         }
         const r = this.targetNode.getBoundingClientRect();
+        const targetNodeStyle = window.getComputedStyle(this.targetNode);
+        const margins = {
+            top: parseFloat(targetNodeStyle.marginTop) || 0,
+            bottom: parseFloat(targetNodeStyle.marginBottom) || 0,
+            left: parseFloat(targetNodeStyle.marginLeft) || 0,
+            right: parseFloat(targetNodeStyle.marginRight) || 0
+        };
         const {offsetWidth: w, offsetHeight: h} = this.tooltip;
         const gap = 4;
         const arrow = 8;
@@ -247,22 +254,22 @@ class MegaTooltip extends MegaComponent {
 
         if (this.position === 'top' || this.position === 'bottom') {
             y = this.position === 'top' ?
-                r.top - h - arrow - gap
-                : r.bottom + arrow + gap;
+                r.top - margins.top - h - arrow - gap
+                : r.bottom + margins.bottom + arrow + gap;
             x = this.align === 'start' ?
-                r.left
+                r.left - margins.left
                 : this.align === 'end' ?
-                    r.right - w
+                    r.right + margins.right - w
                     : r.left + (r.width - w) / 2;
         }
         else {
             x = this.position === 'left' ?
-                r.left - w - arrow - gap
-                : r.right + arrow + gap;
+                r.left - margins.left - w - arrow - gap
+                : r.right + margins.right + arrow + gap;
             y = this.align === 'start' ?
-                r.top
+                r.top - margins.top
                 : this.align === 'end' ?
-                    r.bottom - h
+                    r.bottom + margins.bottom - h
                     : r.top + (r.height - h) / 2;
         }
 

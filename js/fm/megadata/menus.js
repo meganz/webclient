@@ -968,11 +968,11 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
                 finalItems.push('.import-item');
                 if (M.v.length) {
                     finalItems.push('.zipdownload-item', '.download-standart-item');
+                    if (pfcol) {
+                        finalItems.push('.play-slideshow');
+                    }
                 }
-                if (pfcol) {
-                    finalItems.push('.play-slideshow');
-                }
-                else {
+                if (!pfcol) {
                     finalItems.push('.getlink-item');
                 }
             }
@@ -1321,6 +1321,22 @@ MegaData.prototype.adjustContextMenuPosition = function(ev, menuNode) {
     return true;
 };
 
+/** * Finalise submenu calculations for context menu positioning
+ * @param {Element} menuNode The parent menu node, which hover to show submenu
+ * @param {Element} subMenuNode The submenu node to position
+ * @param {Object} options The options object containing positioning data
+ * @param {Number} options.maxX The maximum X coordinate for the submenu, usually right edge of window
+ * @param {Number} options.maxY The maximum Y coordinate for the submenu, usually bottom edge of window
+ * @param {Number} options.wMax coordinate of context menu right edge
+ * @param {Number} options.nmW The width of the submenu
+ * @param {Number} options.nmH The height of the submenu
+ * @param {Number} options.minX The minimum X coordinate for the submenu
+ * @param {Number} options.x The X coordinate of the parent menu
+ * @param {Number} options.y The Y coordinate of the parent menu
+ * @param {Number} options.wW The width of the window
+ * @param {Number} options.SIDE_MARGIN The side margin for the submenu
+ * @returns {Object|boolean} Returns an object with the final position or true if the submenu overlaps the parent menu
+ */
 MegaData.prototype.finaliseSubmenuCalcs = function(menuNode, subMenuNode, options) {
     'use strict';
 
@@ -1331,14 +1347,18 @@ MegaData.prototype.finaliseSubmenuCalcs = function(menuNode, subMenuNode, option
     const style = window.getComputedStyle(subMenuNode);
     const nTop = parseInt(style.getPropertyValue('padding-top'), 10);
     const tB = parseInt(style.getPropertyValue('border-top-width'), 10);
-    const b = y + nmH - (nTop - tB); // bottom of submenu
+    const pScrollTop = (subMenuNode.closest('#cm_scroll') || {}).scrollTop || 0;
+    const b = y - pScrollTop + nmH - nTop - tB; // bottom of submenu
 
-    let difference = 0;
+    let difference = 8;
 
     if (b > maxY) {
-        difference = b - maxY;
+        difference += b - maxY + pScrollTop - 12;
     }
-    const top = `${menuNode.offsetTop - tB - difference}px`;
+    else {
+        difference += pScrollTop;
+    }
+    const top = `${menuNode.offsetTop - tB - nTop - difference}px`;
 
     const overlapParentMenu = (nextNode) => {
         const tre = wW - wMax; // to right edge
@@ -1555,7 +1575,6 @@ MegaData.prototype.reCalcMenuPosition = function(menuNode, x, y, ico) {
                 nextNode.style.height = `${nmH}px`;
             }
         }
-
 
         return this.finaliseSubmenuCalcs(
             menuNode,

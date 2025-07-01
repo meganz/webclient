@@ -215,9 +215,22 @@ class MegaPasswordList extends MegaView {
      *
      * @returns {Promise<*>}
      */
-    async loadList() {
+    async loadList(customEntry = null) {
         this.vaultPasswords = [];
         const result = await mega.ui.pm.comm.loadVault().catch(echo);
+
+        if (customEntry) {
+            const nodeData = {
+                h: customEntry.h,
+                name: customEntry.name,
+                pwm: {
+                    u: customEntry.u,
+                    pwd: customEntry.pwd,
+                    totp: customEntry.totp
+                }
+            };
+            result.push(new MegaNode(nodeData));
+        }
 
         if (Array.isArray(result)) {
             this.vaultPasswords = result;

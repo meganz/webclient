@@ -63,18 +63,18 @@ class MobileSelectionRender extends MobileMegaRender {
         const _getCompleteString = (sn, th, type) => {
             /**
              * List of possible string key combinations:
-             * l.mobile_move_folder_to_cloud_toast_complete
-             * l.mobile_move_folder_toast_complete
-             * l.mobile_move_to_cloud_toast_complete
-             * l.mobile_move_toast_complete
-             * l.mobile_copy_folder_to_cloud_toast_complete
-             * l.mobile_copy_folder_toast_complete
-             * l.mobile_copy_to_cloud_toast_complete
-             * l.mobile_copy_toast_complete
+             *
+             * l.mobile_file_move_to_folder
+             * l.mobile_file_copy_to_folder
+             * l.mobile_folder_move_to_folder
+             * l.mobile_folder_copy_to_folder
              */
-            return l[`mobile_${type}${sn.t ? '_folder' : ''}${th === M.RootID ? '_to_cloud' : ''}_toast_complete`]
-                .replace('%1', mobile.nodeSelector[`${type}Renamed${sn.h}`] || sn.name || '')
-                .replace('%2', M.getNameByHandle(th));
+            return parseHTML(
+                mega.icu.format(
+                    l[`mobile_${sn.t ? 'folder' : 'file'}_${type}_to_folder`], 1
+                )
+                    .replace('%1', M.getNameByHandle(th))
+            );
         };
 
         return {

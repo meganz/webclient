@@ -44,6 +44,32 @@
         }
     };
 
+    const decode = (h, max, tag) => {
+        const res = [];
+        if (h.length === 8 || h.length === 11) {
+            res.push(1, base64urldecode(h));
+        }
+        else if (h.length > 0x1f) {
+            const v = base64urldecode(h);
+            if (base64urlencode(v) === h) {
+                res.push(1, v);
+            }
+            else if (self.d && h.length < max) {
+                logger.info(`Storing unexpectedly long ${tag}-value as-is...`, h);
+            }
+        }
+        if (!res.length) {
+            res.push(0, h);
+        }
+        if (!(res[1].length && res[1].length < max)) {
+            if (self.d) {
+                logger.warn(`Ignoring unexpected ${tag}-value...`, h);
+            }
+            res[1] = false;
+        }
+        return res;
+    };
+
     // shrink suitable fmconfig settings
     const shrink = (cfg) => {
         if (d) {
@@ -151,10 +177,9 @@
 
         for (let i = 0; i < s.length; ++i) {
             const h = s[i];
-            const n = (h.length === 8 || h.length === 11 || h.length > 0x1f) | 0;
-            const j = n ? base64urldecode(h) : h;
+            const [n, j] = decode(h, 0xff, 'vm');
 
-            if (j.length && j.length < 0xff) {
+            if (j.length) {
                 r += String.fromCharCode((v[h] & 7) << 1 | n) + String.fromCharCode(j.length) + j;
             }
         }
@@ -177,15 +202,16 @@
             // eslint-disable-next-line guard-for-in
             for (let h in sm) {
                 const v = sm[h];
-                const n = (h.length === 8 || h.length === 11) | 0;
-                const p = n ? base64urldecode(h) : h;
 
                 if (!rules.includes(v.n)) {
                     logger.warn(`Invalid sort-mode for ${h} %o`, v);
                     continue;
                 }
+                const [n, p] = decode(h, 0x80, 'sm');
 
-                res += store(shift(v)) + store(p.length << 1 | n) + p;
+                if (p.length) {
+                    res += store(shift(v)) + store(p.length << 1 | n) + p;
+                }
             }
         }
 

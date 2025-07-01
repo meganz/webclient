@@ -638,11 +638,27 @@ lazy(pro, 'proplan2', () => {
         let totalPrice;
         let currency = 'EUR';
 
+        const getNetOrTotal = (obj, cond, local) => {
+            if (!obj) {
+                return;
+            }
+            if (cond === undefined) {
+                cond = true;
+            }
+            if (local) {
+                return cond ? (obj.lpn || obj.lp) : obj.lp;
+            }
+            return cond ? (obj.pn || obj.p) : obj.p;
+        };
+
         if (pro.proplan.businessPlanData.isLocalInfoValid) {
             currency = pro.proplan.businessPlanData.l.lc;
-            const totalUsersCost = pro.proplan.businessPlanData.bd.us.lp * users;
-            const totalStorageCost = pro.proplan.businessPlanData.bd.sto.lp * extraStorage;
-            const totalTransferCost = pro.proplan.businessPlanData.bd.trns.lp * extraTransfer;
+            const totalUsersCost = getNetOrTotal(pro.proplan.businessPlanData.bd.us, pro.taxInfo, 1)
+                * users;
+            const totalStorageCost = getNetOrTotal(pro.proplan.businessPlanData.bd.sto, pro.taxInfo, 1)
+                * extraStorage;
+            const totalTransferCost = getNetOrTotal(pro.proplan.businessPlanData.bd.trns, pro.taxInfo, 1)
+                * extraTransfer;
 
             totalPrice = formatCurrency(
                 totalUsersCost + totalStorageCost + totalTransferCost,
@@ -651,9 +667,12 @@ lazy(pro, 'proplan2', () => {
             );
         }
         else {
-            const totalUsersCost = pro.proplan.businessPlanData.bd.us.p * users;
-            const totalStorageCost = pro.proplan.businessPlanData.bd.sto.p * extraStorage;
-            const totalTransferCost = pro.proplan.businessPlanData.bd.trns.p * extraTransfer;
+            const totalUsersCost = getNetOrTotal(pro.proplan.businessPlanData.bd.us, pro.taxInfo, 0)
+                * users;
+            const totalStorageCost = getNetOrTotal(pro.proplan.businessPlanData.bd.sto, pro.taxInfo, 0)
+                * extraStorage;
+            const totalTransferCost = getNetOrTotal(pro.proplan.businessPlanData.bd.trns, pro.taxInfo, 0)
+                * extraTransfer;
 
             totalPrice = formatCurrency(totalUsersCost + totalStorageCost + totalTransferCost);
         }
@@ -1104,6 +1123,22 @@ lazy(pro, 'proplan2', () => {
         $('.pricing-plan-price span.vl', $proFlexCard).text(formatCurrency(flexiPrice, flexiCurrency, 'narrowSymbol'));
         $('.pricing-plan-price-unit', $proFlexCard).text(`${flexiCurrency} / ${l[931]}`);
 
+        const planTaxInfo = pro.taxInfo && pro.getStandardisedTaxInfo(ProFlexiFound[pro.UTQA_RES_INDEX_EXTRAS].taxInfo);
+        const $taxInfo = $('.pricing-plan-tax', $proFlexCard).toggleClass('hidden', !planTaxInfo);
+
+        if (planTaxInfo) {
+            if (pro.taxInfo.variant === 1) {
+                $('.tax-info', $taxInfo).text(l.t_may_appy.replace('%1', pro.taxInfo.taxName));
+            }
+            else {
+                $('.tax-info', $taxInfo).text(l.before_tax);
+                $('.tax-price', $taxInfo).text(l.p_with_tax
+                    .replace('%1', formatCurrency((planTaxInfo.taxedPrice), flexiCurrency, 'narrowSymbol')
+                            + (flexiCurrency === 'EUR' ? ' ' : '* ') + flexiCurrency))
+                    .removeClass('hidden');
+            }
+        }
+
         const baseStorage = ProFlexiFound[pro.UTQA_RES_INDEX_STORAGE] / 1024;
 
         $('.pricing-plan-storage', $proFlexCard)
@@ -1257,6 +1292,26 @@ lazy(pro, 'proplan2', () => {
             $('.pricing-plan-price span.vl', $planCard).text(priceText);
             $('.pricing-plan-price-unit', $planCard).text(billingFrequencyText);
 
+
+
+            const planTaxInfo = pro.taxInfo
+                && pro.getStandardisedTaxInfo(currentPlan[pro.UTQA_RES_INDEX_EXTRAS].taxInfo);
+            const $taxInfo = $('.pricing-plan-tax', $planCard).toggleClass('hidden', !planTaxInfo);
+            if (planTaxInfo) {
+                if (pro.taxInfo.variant === 1) {
+                    $('.tax-info', $taxInfo).text(l.t_may_appy.replace('%1', pro.taxInfo.taxName));
+                }
+                else {
+                    $('.tax-info', $taxInfo).text(l.before_tax);
+                    $('.tax-price', $taxInfo).text(l.p_with_tax
+                        .replace('%1', formatCurrency(
+                            planTaxInfo.taxedPrice / ((showYearlyPerMonth && 12) || 1),
+                            priceCurrency, 'narrowSymbol') + (priceCurrency === 'EUR' ? ' ' : '* ')
+                            + priceCurrency))
+                        .removeClass('hidden');
+                }
+            }
+
             if (priceText) {
                 $planCard.toggleClass('long-currency1', priceText.length >= 9 && priceText.length <= 12);
                 $planCard.toggleClass('long-currency2', priceText.length >= 13 && priceText.length <= 16);
@@ -1363,27 +1418,49 @@ lazy(pro, 'proplan2', () => {
         let pricePerUser = pro.proplan.businessPlanData.bd && pro.proplan.businessPlanData.bd.us
             && pro.proplan.businessPlanData.bd.us.p;
         let priceCurrency;
-        let storagePrice;
         let hasLocalPrice = false;
 
         const minStorageValue = pro.proplan.businessPlanData.bd.ba.s / 1024;
+
+        const storageLocalPrice = pro.proplan.businessPlanData.bd.sto.lpn || pro.proplan.businessPlanData.bd.sto.lp;
+        let storagePrice = !storageLocalPrice
+            && (pro.proplan.businessPlanData.bd.sto.pn || pro.proplan.businessPlanData.bd.sto.p);
 
         if (pro.proplan.businessPlanData.isLocalInfoValid) {
 
             priceCurrency = pro.proplan.businessPlanData.l.lc;
 
             pricePerUser = formatCurrency(pro.proplan.businessPlanData.bd.us.lp * 3, priceCurrency, 'narrowSymbol');
-            storagePrice = formatCurrency(pro.proplan.businessPlanData.bd.sto.lp, priceCurrency, 'narrowSymbol');
+            storagePrice = formatCurrency(storageLocalPrice, priceCurrency, 'narrowSymbol');
             hasLocalPrice = true;
         }
         else {
             priceCurrency = 'EUR';
             pricePerUser = formatCurrency(pricePerUser * 3);
-            storagePrice = formatCurrency(pro.proplan.businessPlanData.bd.sto.p);
+            storagePrice = formatCurrency(storagePrice);
         }
 
-        $('.pricing-plan-price .vl', $businessCard).text(pricePerUser);
+        const businessPlanObj = pro.planObjects.createBusinessPlanObject(pro.proplan.businessPlanData);
+        $('.pricing-plan-price .vl', $businessCard).text(businessPlanObj.getFormattedPrice('narrowSymbol'));
         $('.pricing-plan-price-unit', $businessCard).text(`${priceCurrency} / ${l[931]}`);
+
+        const planTaxInfo = businessPlanObj.taxInfo;
+        const $taxInfo = $('.pricing-plan-tax', $businessCard).toggleClass('hidden', !planTaxInfo);
+
+        if (planTaxInfo) {
+            if (pro.taxInfo.variant === 1) {
+                $('.tax-info', $taxInfo).text(l.t_may_appy.replace('%1', pro.taxInfo.taxName));
+            }
+            else {
+                $('.tax-info', $taxInfo).text(l.before_tax);
+                $('.tax-price', $taxInfo).text(l.p_with_tax
+                    .replace('%1', formatCurrency(
+                        planTaxInfo.taxedPrice, priceCurrency, 'narrowSymbol')
+                        + (priceCurrency === 'EUR' ? ' ' : '* ') + priceCurrency))
+                    .removeClass('hidden');
+            }
+        }
+
         $('.pricing-plan-storage .business-base', $businessCard)
             .text(l.bsn_base_stg_trs.replace('%1', minStorageValue));
         $('.pricing-plan-trasfer', $businessCard)

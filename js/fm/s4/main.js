@@ -8,11 +8,10 @@ lazy(s4, 'main', () => {
         eventlog(e);
     };
     const fmNode = document.querySelector('.pm-main > .fm-right-files-block');
-    let domNode = null;
 
-    // Create Activation page
-    const initActivation = () => {
-        domNode = fmNode.querySelector('.fm-activate-section') || ce(
+    const renderActivation = () => {
+        const canEnable = u_attr.p && !pro.filter.simple.miniPlans.has(u_attr.p) || u_attr.pf;
+        const domNode = fmNode.querySelector('.fm-activate-section') || ce(
             'div', fmNode, { class: 'fm-empty-section s4 fm-activate-section hidden' }
         );
         domNode.textContent = '';
@@ -25,20 +24,18 @@ lazy(s4, 'main', () => {
         // Top banner
         let wrapNode = ce('div', bodyNode, { class: 'grid banner' });
         let node = ce('div', wrapNode);
-        const canEnable = u_attr.p && !pro.filter.simple.miniPlans.has(u_attr.p) || u_attr.pf;
 
         // Banner info for Pro/Free plans
         ce('h3', node).textContent = canEnable ?
             l.s4_activation_enable : l.s4_activation_banner_header;
         node = ce('p', node, { class: 'text-md-size' });
         ce('span', node).textContent = l.s4_activation_banner_info;
-        ce('b', node).textContent = canEnable ?
+        ce('b', node).textContent =  canEnable ?
             l.s4_activation_included_info : l.s4_activation_upgrade_info;
 
         node = new MegaButton({
             parentNode: node,
-            text: canEnable ?
-                l.s4_activation_enable : l.explore_now_btn,
+            text: canEnable ? l.s4_activation_enable : l.explore_now_btn,
             componentClassname: 'primary semibold theme-dark-forced',
             onClick: () => {
                 if (!canEnable) {
@@ -148,43 +145,35 @@ lazy(s4, 'main', () => {
 
         node = new PerfectScrollbar(domNode);
         clickURLs();
-    };
-
-    // Show activation page
-    const renderActivation = (upd) => {
         if (mega.ui.mInfoPanel) {
             mega.ui.mInfoPanel.hide();
-        }
-        if (upd || !domNode) {
-            initActivation();
         }
         domNode.classList.remove('hidden');
         domNode.scrollTop = 0;
     };
 
     return freeze({
-        render(upd) {
+        /**
+         * Render S4 section...
+         * @memberOf s4.main
+         */
+        async render() {
             if (u_attr.s4) {
-                if ('kernel' in s4) {
-                    s4.ui.renderRoot();
+                if (!('kernel' in s4)) {
+                    loadingDialog.show('s4-init(C)');
+                    await mBroadcaster.when('s4-init(C)')
+                        .finally(() => loadingDialog.hide('s4-init(C)'));
                 }
-                else {
-                    loadingDialog.show('loads4');
-                    mBroadcaster.once('fm:s4InitDone', () => {
-                        s4.ui.renderRoot();
-                        loadingDialog.hide('loads4');
-                    });
-                }
-                return;
+                return s4.ui.renderRoot();
             }
 
             if (!u_attr.b) {
-                renderActivation(upd);
+                renderActivation();
                 eventlog(500854);
                 return;
             }
 
-            loadSubPage('fm');
+            return loadSubPage('fm');
         },
     });
 });

@@ -14,7 +14,6 @@
 .fm-context-menu .context-submenu {
     left: 100%;
     right: auto;
-    transition: all 200ms ease-in-out, right 200ms ease-in-out;
     padding-bottom: 16px;
     min-width: 280px;
     width: auto;

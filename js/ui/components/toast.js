@@ -97,6 +97,10 @@ class MegaToast extends MegaComponent {
 
         if (typeof value === 'string') {
             value = document.createTextNode(value);
+            this.bodyNode.style.display = 'block';
+        }
+        else {
+            this.bodyNode.style.display = 'flex';
         }
 
         this.bodyNode.append(value);

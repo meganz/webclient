@@ -1171,7 +1171,7 @@ BusinessAccount.prototype.getBusinessPlanInfo = async function(forceUpdate, flex
 
     const request = {
         a: 'utqa',  // get a list of plans
-        nf: 2,      // extended format
+        nf: +mega.utqav,      // extended format
         b: 1        // also show business plans
     };
 
@@ -1183,18 +1183,23 @@ BusinessAccount.prototype.getBusinessPlanInfo = async function(forceUpdate, flex
     return api.req(request)
         .then(({result}) => {
 
+            const {txn, tx, txva} = result[0];
+
+            pro.taxInfo = !!(txn && tx) && (txva !== undefined) && {
+                taxName: txn,
+                taxPercent: tx / 100,
+                variant: txva,
+            };
+
             for (let h = 0; h < result.length; h++) {
                 const {it, al} = result[h];
                 const match = flexI ? al === pro.ACCOUNT_LEVEL_PRO_FLEXI : !!it;
 
                 if (match) {
                     const plan = result[h];
-                    plan.bd.us.lp /= 100;
-                    plan.bd.us.p /= 100;
-                    plan.bd.trns.lp /= 100;
-                    plan.bd.trns.p /= 100;
-                    plan.bd.sto.lp /= 100;
-                    plan.bd.sto.p /= 100;
+                    pro.divideAllBy100(plan.bd.us);
+                    pro.divideAllBy100(plan.bd.trns);
+                    pro.divideAllBy100(plan.bd.sto);
                     plan.l = result[0].l;
                     plan.c = result[0].l.c;
                     plan.timestamp = Date.now();

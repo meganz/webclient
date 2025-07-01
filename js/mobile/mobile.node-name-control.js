@@ -248,7 +248,7 @@ mBroadcaster.once('fm:initialized', () => {
                                 M.openFolder(h);
                             }
                         };
-                        mega.ui.toast.show(escapeHTML(l.created_folder).replace('%1', newName), 4, escapeHTML(l[16797]),
+                        mega.ui.toast.show(escapeHTML(l.new_folder_created), 4, escapeHTML(l[16797]),
                                            callbacks);
 
                         // Add a server log
@@ -286,10 +286,10 @@ mBroadcaster.once('fm:initialized', () => {
                         }
 
                         // Show message 'Renamed <old name> to <new name>'
-                        mega.ui.toast.show((nodeType === 1
-                            ? escapeHTML(l.renamed_folder_to)
-                            : escapeHTML(l.renamed_file_to))
-                            .replace('%1', nodeName).replace('%2', newName));
+                        mega.ui.toast.show(parseHTML((nodeType === 1
+                            ? l.folder_renamed_to
+                            : l.file_renamed_to)
+                            .replace('%1', escapeHTML(newName))));
                     })
                     .catch(tell)
                     .finally(() => {

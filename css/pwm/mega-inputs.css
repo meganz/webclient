@@ -92,7 +92,8 @@
     border: none;
     border-radius: var(--mobile-border-radius-medium);
 }
-.pm.mega-input.highlighted .mega-input-title {
+.pm.mega-input.highlighted .mega-input-title,
+.pm.mega-input.highlighted .clear-input.icon {
     visibility: hidden;
 }
 

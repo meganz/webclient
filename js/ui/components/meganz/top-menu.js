@@ -224,7 +224,7 @@ class MegaTopMenu extends MegaMobileTopMenu {
                 eventLog: 500636,
                 rightBadge: u_attr.s4 ? null : {
                     badgeClass: 'brand-filled',
-                    text: l[19976]
+                    text: l[24648]
                 }
             });
         }

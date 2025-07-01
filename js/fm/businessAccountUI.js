@@ -1952,6 +1952,17 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
                 .text(formatCurrency(billData.price_eur.amount));
         }
 
+        const $noTaxEstPrice = $('.second-message.no-tax', $nbPriceContainer).addClass('hidden');
+        const $inclTaxEstPrice = $('.second-message.inc-tax', $nbPriceContainer).addClass('hidden');
+        if (pro.taxInfo) {
+            $inclTaxEstPrice
+                .text(l.est_price_tma.replace('%1', pro.taxInfo.taxName))
+                .removeClass('hidden');
+        }
+        else {
+            $noTaxEstPrice.removeClass('hidden');
+        }
+
         // If Pro Flexi
         if (u_attr.pf) {
 
@@ -2114,7 +2125,7 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
     if (u_attr.pf || typeof M.account.b.v === 'undefined' || M.account.b.v === 0) {
 
         // Populate the next billing info into the overall usage section
-        populateNextBillInfo();
+        pro.loadMembershipPlans(populateNextBillInfo);
 
         // Fill the last/next bill transfer data into the analytics section
         fillStgeTrfBillInfo(true);

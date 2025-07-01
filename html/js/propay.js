@@ -485,7 +485,7 @@ pro.propay = {
         // TODO: Show inline loading dialog for stripe and bitcoin
 
         const apiId = this.planObj.id;
-        const price = this.planObj.priceEuro;
+        const price = (this.planObj.taxInfo || Object.create(null)).taxedPriceEuro || this.planObj.priceEuro;
         const currency = 'EUR';
         const itemNum = this.planObj.itemNum;
 
@@ -1319,7 +1319,7 @@ pro.propay = {
     renderPlanInfo() {
         'use strict';
 
-        const isEuro = this.planObj.currency === 'EUR';
+        const isEuro = (this.planObj.currency === 'EUR') || this.isVoucherBalance();
 
         const planCardInitialized = this.pageInfo.$planCard && this.pageInfo.$planCard.length;
         const isFlexi = this.planObj.level === pro.ACCOUNT_LEVEL_PRO_FLEXI;
@@ -1440,9 +1440,10 @@ pro.propay = {
             $includesContent.addClass('hidden');
         }
 
-        const priceText = `${this.planObj.getFormattedPrice('narrowSymbol', this.isVoucherBalance())}
-        <span class="currency"> ${this.isVoucherBalance() ? 'EUR' : this.planObj.currency}</span>
-        <span class="local">${isEuro ? '' : '*'}<span>`;
+        const priceText = this.planObj
+            .getFormattedPrice('narrowSymbol', isEuro, false, false, {includeTax: true})
+                + `<span class="local">${isEuro ? '' : '*'}</span>
+                <span class="currency"> ${isEuro ? 'EUR' : this.planObj.currency}</span>`;
 
 
         const isRecurring = !this.currentGateway || !!this.currentGateway.supportsRecurring;
@@ -1454,6 +1455,50 @@ pro.propay = {
             .text(durationText);
 
         $('.pricing-element .price', $planCard).safeHTML(priceText);
+
+        const $taxInfo = $('.tax-info', $planCard);
+
+        if (this.planObj.taxInfo) {
+            const forceEuro = this.isVoucherBalance();
+
+            const getCurrencyText = (curr, ast) => {
+                curr = curr || 'EUR';
+                if (curr === 'EUR') {
+                    return ` EUR`;
+                }
+                return `${ast ? '*' : ''} ${curr}`;
+            };
+
+            let localNet;
+            let localTotal;
+            let localTaxAmount;
+
+            if (this.discountInfo) {
+                const {ltpn, etpn, ltp, etp} = this.discountInfo;
+                localNet = (!forceEuro && ltpn) || etpn;
+                localTotal = (!forceEuro && ltp) || etp;
+                localTaxAmount = localTotal - localNet;
+            }
+
+            const preTaxPriceText = localNet
+                ? formatCurrency(localNet, forceEuro ? 'EUR' : this.planObj.currency, 'narrowSymbol')
+                : this.planObj.getFormattedPrice('narrowSymbol', forceEuro);
+
+            const taxAmountText = localTaxAmount
+                ? formatCurrency(localTaxAmount, forceEuro ? 'EUR' : this.planObj.currency, 'narrowSymbol')
+                : this.planObj.getFormattedPrice('narrowSymbol', forceEuro, false, false, {useTaxAmount: 1});
+
+            $('.pre-tax-value', $taxInfo).text(preTaxPriceText + getCurrencyText(!forceEuro && this.planObj.currency));
+
+            $('.tax-amount-descr', $taxInfo)
+                .text(l.tax_name_percentage
+                    .replace('%1', pro.taxInfo.taxName)
+                    .replace('%2', formatPercentage(pro.taxInfo.taxPercent)));
+
+            $('.tax-amount-value', $taxInfo).text(taxAmountText + getCurrencyText(!forceEuro && this.planObj.currency));
+
+            $taxInfo.removeClass('hidden');
+        }
 
 
         const discountInfo = this.getDiscount();
@@ -1475,15 +1520,32 @@ pro.propay = {
 
             const createPriceHTML = (price, noAsterisk) => {
                 return `${price}
-                <span class="currency"> ${this.planObj.currency}</span>
-                <span class="local">${(isEuro || noAsterisk) ? '' : '*'}<span>`;
+                <span class="local">${(isEuro || noAsterisk) ? '' : '*'}<span>
+                <span class="currency"> ${this.planObj.currency}</span>`;
             };
 
             $('.pricing-element .price', $planCard).safeHTML(priceText);
 
-            if (discountInfo.ltp || discountInfo.etp) {
+            const {txva, tx, txn, edtpn, etpn, etp, edtp} = discountInfo;
+            let {ltpn, ltp, ldtp, ldtpn} = discountInfo;
+
+            ltp = (!isEuro && ltp) || etp;
+            ldtp = (!isEuro && ldtp) || edtp;
+            ldtpn = (!isEuro && ldtpn) || edtpn;
+            ltpn = (!isEuro && ltpn) || etpn;
+
+            const showTaxInfo = (txva !== undefined) && tx && txn && ltpn && ldtpn && ltp;
+
+            if (!showTaxInfo) {
+                ldtpn = ldtp;
+                ltpn = ltp;
+            }
+
+            const price = ltp;
+
+            if (price) {
                 oldPrice = createPriceHTML(
-                    formatCurrency(discountInfo.ltp || discountInfo.etp, this.planObj.currency, 'narrowSymbol'),
+                    formatCurrency(price, this.planObj.currency, 'narrowSymbol'),
                     true
                 );
             }
@@ -1492,9 +1554,7 @@ pro.propay = {
                     .getFormattedPrice('narrowSymbol', this.isVoucherBalance(), false, discountDuration), true);
             }
 
-            const newPrice = createPriceHTML(formatCurrency(isEuro
-                ? discountInfo.edtp
-                : discountInfo.ldtp, this.planObj.currency, 'narrowSymbol'));
+            const newPrice = createPriceHTML(formatCurrency(ldtp, this.planObj.currency, 'narrowSymbol'));
 
             const $discountHeader = $('.discount-header', $planCard);
             $discountHeader.text(l.special_deal_perc_off
@@ -1589,16 +1649,20 @@ pro.propay = {
             const date = new Date();
             date.setMonth(date.getMonth() + discountMonths);
 
+            const planTaxInfo = this.planObj.taxInfo;
+            const stringSelectorAddition = planTaxInfo ? '_tma' : '';
+
             const text = (discountRenewalDuration === 12
-                ? l.discounted_price_years
-                : l.discounted_price_months)
+                ? l['discounted_price_years' + stringSelectorAddition]
+                : l['discounted_price_months' + stringSelectorAddition])
                 .replace('%1', date.toLocaleDateString(undefined, {
                     year: 'numeric',
                     month: 'long',
                     day: 'numeric'
                 }))
                 .replace('%2', pro.getPlanObj(this.discountInfo.al, discountRenewalDuration)
-                    .getFormattedPrice('narrowSymbol', this.isVoucherBalance(), false));
+                    .getFormattedPrice('narrowSymbol', this.isVoucherBalance(), false))
+                .replace('%3', (pro.taxInfo || Object.create(null)).taxName);
 
             $('.promo-info-txt', $promoEndsInfo).text(text);
         }
@@ -3207,6 +3271,13 @@ pro.propay = {
         }
 
         $('.price', $template).text(priceText);
+        const $taxInfo = $('.tax-info', $template);
+        if (this.planObj.taxInfo) {
+            $taxInfo.text(l.t_may_appy.replace('%1', pro.taxInfo.taxName)).removeClass('hidden');
+        }
+        else {
+            $taxInfo.addClass('hidden');
+        }
 
         return $template;
     },

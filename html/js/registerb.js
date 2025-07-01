@@ -260,47 +260,64 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
         const $breakdown = $('.business-plan-breakdown', $pageContainer);
         const $usersRow = $('.bus-plan-nb-users.bus-breakdown-row', $breakdown);
         const $quotaRow = $('.bus-plan-ex-quota.bus-breakdown-row', $breakdown).addClass('hidden');
+        const $taxRow = $('.bus-plan-tax.bus-breakdown-row', $breakdown).addClass('hidden');
 
         let totalUsr;
         let totalQuota = -1;
         let total = 0;
 
+        const localUserPrice = mySelf.planInfo.bd.us.lpn || mySelf.planInfo.bd.us.lp;
+        const euroUserPrice = (mySelf.planInfo.bd && (mySelf.planInfo.bd.us.pn || mySelf.planInfo.bd.us.p))
+            || (mySelf.planInfo.pn || mySelf.planInfo.p);
+
+        const localQuotaPrice = quotaFare || mySelf.planInfo.bd.sto.lpn || mySelf.planInfo.bd.sto.lp;
+        const euroQuotaPrice = quotaFare || mySelf.planInfo.bd.sto.pn || mySelf.planInfo.bd.sto.p;
+
         if (mySelf.localPricesMode) {
             usrFare = usrFare || mySelf.planInfo.bd.us.lp;
-            totalUsr = formatCurrency(total = usrFare * users, mySelf.planInfo.l.lc);
+            totalUsr = localUserPrice * users;
+            total += usrFare * users;
 
             if (quota && !Number.isNaN(quota)) {
-                quotaFare = quotaFare || mySelf.planInfo.bd.sto.lp;
-                const temp = quotaFare * quota;
-                total += temp;
-                totalQuota = formatCurrency(temp, mySelf.planInfo.l.lc);
+                const temp = euroQuotaPrice * quota;
+                total += mySelf.planInfo.bd.sto.lp * quota;
+                totalQuota = temp;
             }
-            total = `${formatCurrency(total, mySelf.planInfo.l.lc)}*`;
         }
         else {
             usrFare = usrFare || mySelf.planInfo.bd && mySelf.planInfo.bd.us.p || mySelf.planInfo.p;
-            totalUsr = formatCurrency(total = usrFare * users);
+            totalUsr = euroUserPrice * users;
+            total += usrFare * users;
             if (quota && !Number.isNaN(quota)) {
-                quotaFare = quotaFare || mySelf.planInfo.bd.sto.p;
-                const temp = quotaFare * quota;
-                total += temp;
-                totalQuota = formatCurrency(temp);
+                const temp = localQuotaPrice * quota;
+                total += mySelf.planInfo.bd.sto.p * quota;
+                totalQuota = temp;
             }
-            total = formatCurrency(total);
             $('.bus-price-footer-note', $pageContainer).addClass('hidden');
         }
 
         $('.nb-users-val', $usersRow).text(mega.icu.format(l.users_unit, users));
-        $('.nb-users-fare', $usersRow).text(totalUsr);
+        $('.nb-users-fare', $usersRow).text(formatCurrency(totalUsr, mySelf.planObj.currency));
 
         if (totalQuota !== -1) {
             $('.ex-quota-val', $quotaRow).text(l.additional_storage.replace('%1', quota));
-            $('.ex-quota-fare', $quotaRow).text(totalQuota);
+            $('.ex-quota-fare', $quotaRow).text(formatCurrency(totalQuota, mySelf.planObj.currency));
             $quotaRow.removeClass('hidden');
         }
 
-        $('.business-plan-total .bus-total-val', $pageContainer).text(total);
+        const {taxInfo} = mySelf.planObj;
 
+        if (taxInfo) {
+            $('.plan-tax-val', $taxRow).text(l.tax_name_percentage
+                .replace('%1', pro.taxInfo.taxName)
+                .replace('%2', formatPercentage(pro.taxInfo.taxPercent)));
+            $('.plan-tax-amount', $taxRow).text(
+                formatCurrency(pro.taxInfo.taxPercent * (totalUsr + Math.max(totalQuota, 0)), mySelf.planInfo.l.lc));
+            $taxRow.removeClass('hidden');
+        }
+
+        $('.business-plan-total .bus-total-val', $pageContainer).text(formatCurrency(total, mySelf.planObj.currency)
+            + (mySelf.planObj.currency === 'EUR' ? '' : '*'));
     };
 
     const updatePriceGadget = function(users, quota) {
@@ -328,8 +345,19 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
         localPricesMode = localPricesMode && isLocalInfoValid();
 
         const userFare = localPricesMode && mySelf.planInfo.bd.us.lp || mySelf.planInfo.bd.us.p;
-        extraFares.storageFare = localPricesMode && mySelf.planInfo.bd.sto.lp || mySelf.planInfo.bd.sto.p;
-        extraFares.transFare = localPricesMode && mySelf.planInfo.bd.trns.lp || mySelf.planInfo.bd.trns.p;
+
+        const netUserFare = localPricesMode
+            && (mySelf.planInfo.bd.us.lpn || mySelf.planInfo.bd.us.lp)
+            || (mySelf.planInfo.bd.us.pn || mySelf.planInfo.bd.us.p);
+
+        extraFares.storageFare = localPricesMode
+            && (mySelf.planInfo.bd.sto.lpn || mySelf.planInfo.bd.sto.lp)
+            || (mySelf.planInfo.bd.sto.pn || mySelf.planInfo.bd.sto.p);
+
+        extraFares.transFare = localPricesMode
+            && (mySelf.planInfo.bd.trns.lpn || mySelf.planInfo.bd.trns.lp)
+            || (mySelf.planInfo.bd.trns.pn || mySelf.planInfo.bd.trns.p);
+
         extraFares.storageBase = mySelf.planInfo.bd.ba.s;
         extraFares.transBase = mySelf.planInfo.bd.ba.t;
         quotaInfoPresent = isUsageCharges();
@@ -344,17 +372,15 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
         const $euroPriceBl = $('.bus-user-price-euro', $gadget).addClass('hidden');
         const $baseQuotaNote = $('.business-plan-quota-note', $gadget).addClass('hidden');
 
-        const euroPriceText = formatCurrency(mySelf.planInfo.bd.us.p);
+        const euroPriceText = formatCurrency(mySelf.planInfo.bd.us.pn || mySelf.planInfo.bd.us.p);
         let priceText = euroPriceText;
         let currncyAbbrv = '';
 
         if (localPricesMode) {
-
-            priceText = formatCurrency(userFare, mySelf.planInfo.l.lc, 'narrowSymbol');
+            priceText = formatCurrency(netUserFare, mySelf.planInfo.l.lc, 'narrowSymbol');
             currncyAbbrv = mySelf.planInfo.l.lc;
 
             $euroPriceBl.removeClass('hidden');
-
         }
 
         $('.bus-user-price-val', $perUser).text(priceText);
@@ -365,7 +391,7 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
             $('.bus-user-price-val', $perUse).text(l[5816].replace('[X]', extraFares.storageBase / 1024));
             $('.bus-quota-note-body', $baseQuotaNote)
                 .text(l.base_stroage_note_desc.replace('%1', extraFares.storageBase / 1024)
-                    .replace('%2', intl.format(mySelf.planInfo.bd.sto.p)));
+                    .replace('%2', intl.format(mySelf.planInfo.bd.sto.pn || mySelf.planInfo.bd.sto.p)));
 
             const neededQuota = mySelf.usedGB - extraFares.storageBase;
             if (neededQuota > 0) {
@@ -592,6 +618,7 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
         business.getBusinessPlanInfo(false).then((info) => {
             mySelf.planPrice = Number.parseFloat(info.p);
             mySelf.planInfo = info;
+            mySelf.planObj = pro.planObjects.createBusinessPlanObject(info);
             mySelf.minUsers = info.minu || 3;
             updatePriceGadget($nbUsersInput.val() || mySelf.minUsers);
         });

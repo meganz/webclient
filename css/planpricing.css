@@ -69,6 +69,23 @@
     --text-label-xl-pricing: normal 400 18px/24px var(--font-noto-sb-pricing);
     --text-button-pricing: normal 400 var(--font-copy-medium) var(--font-noto-sb-pricing);
     /* End Fonts */
+
+    /* Unnamed fonts */
+    --font-poppins: "Poppins", sans-serif;
+    --font-inter: "Inter", sans-serif;
+
+    --font-size-12: 12px/14px;
+
+    --text-poppins-600-24: 600 var(--font-size-h5) var(--font-poppins);
+
+    --text-inter-600-16: 600 var(--font-copy-medium) var(--font-inter);
+    --text-inter-600-14: 600 var(--font-copy-small) var(--font-inter);
+
+    --text-inter-400-16: 400 var(--font-copy-medium) var(--font-inter);
+    --text-inter-400-14: 400 var(--font-copy-small) var(--font-inter);
+    --text-inter-400-12: 400 var(--font-size-12) var(--font-inter);
+    /* End unnamed fonts */
+
     /* Colors*/
     --color-disabled: #D5D5D5;
     --selected-tab-border: rgba(221, 20, 5, 1);
@@ -230,6 +247,14 @@
     margin-top: 8px;
     font: var(--text-caption-regular-pricing);
     color: var(--color-copy-secondary);
+}
+.pricing-plan-card .pricing-plan-tax {
+    font: var(--text-caption-regular-pricing);
+    color: var(--color-copy-secondary);
+    margin-top: 8px;
+}
+.pricing-plan-card .pricing-plan-tax .tax-price {
+    font: var(--text-inter-600-14);
 }
 .pricing-plan-card .pricing-plan-storage,
 .pricing-plan-card .pricing-plan-trasfer {

@@ -580,7 +580,10 @@
                 this.customRemaining($dialog);
             }
 
-            $node = new PerfectScrollbar($('.content', $dialog)[0]);
+            const content = $('.content', $dialog)[0];
+            if (content) {
+                $node = new PerfectScrollbar(content);
+            }
             loadingDialog.phide();
             uiCheckboxes($dialog);
             this.showDialog($dialog);

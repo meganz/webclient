@@ -878,12 +878,8 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
             return false;
         }
     }
-    else if (ll === 3) {// we want just the download menu
-        menuNode = document.querySelector('.dropdown.body.download');
-        const opts = menuNode.querySelectorAll('.dropdown-item');
-        for (const opt of opts) {
-            opt.classList.remove('hidden');
-        }
+    else if (ll === 3) {
+        finalItems.push('.download-standart-item', '.zipdownload-item');
     }
     else if (ll === 7) { // Columns selection menu
         if (M && M.columnsWidth && M.columnsWidth.cloud) {

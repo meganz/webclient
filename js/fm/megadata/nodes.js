@@ -4397,6 +4397,9 @@ MegaData.prototype.nodeRemovalUIRefresh = function(handle, parent) {
     }
 
     delay(`refresh-dialog-content:${handle}`, () => {
+        if (self.selectionManager) {
+            selectionManager.remove_from_selection(handle);
+        }
         if ($.dialog === 'move' || $.dialog === 'copy') {
             refreshDialogContent();
         }

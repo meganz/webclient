@@ -116,6 +116,9 @@ lazy(mega.ui, 'mNodeFilter', () => {
             selection: false,
             eid: 99953,
             match(n) {
+                if (n.t) {
+                    return false;
+                }
                 const nodeMtime = (n.mtime || n.ts) * 1000;
 
                 // Date range

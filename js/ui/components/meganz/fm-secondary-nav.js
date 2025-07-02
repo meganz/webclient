@@ -274,11 +274,14 @@ class MegaNavCard extends MegaComponent {
         }
         this.labelBadge = this.labelBadgeHtml;
         if (this.isSharedRoot) {
-            this.avatar = this.avatar || new MegaAvatarComponent({
-                parentNode: this.domNode.querySelector('.fm-share-avatar'),
-                userHandle: this.node.su,
-            });
-            this.avatar.update();
+            const parentNode = this.domNode.querySelector('.fm-share-avatar');
+            if (parentNode) {
+                this.avatar = this.avatar || new MegaAvatarComponent({
+                    parentNode,
+                    userHandle: this.node.su,
+                });
+                this.avatar.update();
+            }
             let iconClass = `fm-icon item-type-icon icon-${fileIcon(this.node)}-24`;
             if (mega.keyMgr.getWarningValue('cv') === '1') {
                 const ed = authring.getContactAuthenticated(this.node.su, 'Ed25519');

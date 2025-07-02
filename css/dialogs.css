@@ -1627,15 +1627,21 @@ body.de .mega-dialog.contact-picker-widget {
     --mask-color: var(--icon-rest);
     display: inline-block;
 }
-.dialog-empty-header {
-    color: var(--text-color-high);
-    font: var(--text-h2);
-    margin-top: 8px;
-}
 .dialog-empty-pad i {
     --icon-size: 96px;
     --mask-color: var(--secondary-grey);
     text-align: center;
+}
+.dialog-empty-header {
+    align-items: center;
+    color: var(--text-color-high);
+    display: flex;
+    font: var(--text-h2);
+    margin-top: 8px;
+}
+.dialog-empty-header i {
+    --icon-size: 24px;
+    margin-inline-start: 8px;
 }
 .dialog-empty-txt {
     font-size: 13px;
@@ -6379,7 +6385,11 @@ body.de .mega-dialog.contact-picker-widget {
 /* duplicate-conflict dialog */
 
     .mega-dialog.duplicate-conflict {
+        max-height: calc(100% - 24px);
         width: 564px;
+    }
+    .mega-dialog.duplicate-conflict .content {
+        flex: 1 1 auto;
     }
     .mega-dialog.duplicate-conflict .radio-txt {
         padding: 0;

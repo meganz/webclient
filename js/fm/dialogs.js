@@ -976,6 +976,15 @@
         else if (section === 's4') {
             M.buildtree({h: 's4'}, 'fm-picker-dialog');
             showDialogContent('s4', 'ul');
+
+            if (!('kernel' in s4) && !mBroadcaster.hasListener('s4-init(C)')) {
+                mBroadcaster.once('s4-init(C)', () => {
+                    if (section === 's4'
+                        && ($.copyDialog || $.moveDialog || $.selectFolderDialog && !$.fileRequestNew)) {
+                        $('.fm-picker-dialog-button.s4', $dialog).click();
+                    }
+                });
+            }
         }
 
         if (!treesearch) {
@@ -1079,7 +1088,7 @@
             $sharedMe.removeClass('hidden');
         }
 
-        if ('kernel' in s4 && ($.copyDialog || $.moveDialog || $.selectFolderDialog && !$.fileRequestNew)) {
+        if (self.u_attr && u_attr.s4 && ($.copyDialog || $.moveDialog || $.selectFolderDialog && !$.fileRequestNew)) {
             $s4.removeClass('hidden');
         }
         else {
@@ -1704,8 +1713,11 @@
             const target = $.mcselected || (section === 'cloud-drive' ? M.RootID : M.RubbishID);
             const node = M.getNodeByHandle(target);
 
-            if ('kernel' in s4 && node.s4 && s4.kernel.getS4NodeType(node) === 'container') {
-                return s4.ui.showDialog(s4.buckets.dialogs.create, target, callback);
+            if (M.getS4NodeType(node) === 'container') {
+                if ('ui' in s4) {
+                    s4.ui.showDialog(s4.buckets.dialogs.create, target, callback);
+                }
+                return;
             }
 
             $.cftarget = target;

@@ -197,27 +197,12 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
                             selectedItems.push('.properties-item', '.import-item');
                         }
                         else {
-                            let toApplySensitive = 2; // 0 - Disable, 1 - Hide, 2 - Unhide
+                            // 0 - Disable, 1 - Hide, 2 - Unhide
+                            const toApplySensitive = mega.sensitives.getSensitivityStatus(selections, evt);
 
                             const isCoverChangeable = !filterFn
                                 && selections.length === 1
                                 && (!at.c || eIds[at.c] !== selections[0]);
-
-                            if (!mega.sensitives.isViewEnabled()
-                                || selections.some((h) => !mega.sensitives.nodeCanBeSensitive(h))) {
-                                toApplySensitive = 0;
-                            }
-                            else if (mega.sensitives.featureEnabled) {
-                                for (let i = 0; i < selections.length; i++) {
-                                    if (!mega.sensitives.isSensitive(selections[i], false)) {
-                                        toApplySensitive = 1;
-                                        break;
-                                    }
-                                }
-                            }
-                            else {
-                                toApplySensitive = 1;
-                            }
 
                             if (!onlyPlayableVideosSelected && scope.nodesAllowSlideshow(nodes)) {
                                 selectedItems.push('.play-slideshow');

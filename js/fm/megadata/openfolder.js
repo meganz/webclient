@@ -398,8 +398,9 @@
             || this.onDeviceCenter && !mega.devices.ui.isCustomRender()) {
 
             this.gallery = 0;
-            if (fmconfig.uiviewmode | 0 && fmconfig.viewmode === 2 || fmViewMode === 2) {
+            if (!is_mobile && (fmconfig.uiviewmode | 0 && fmconfig.viewmode === 2 || fmViewMode === 2)) {
                 this.gallery = 1;
+                this.viewmode = 2;
             }
             if (mega.ui.secondaryNav) {
                 mega.ui.secondaryNav.updateGalleryLayout(false);

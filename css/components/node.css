@@ -189,7 +189,7 @@
 .fm-blocks-view .mega-node.fm-item,
 .grid-view .mega-node.fm-item {
     padding: 0;
-    height: 130px;
+    height: 156px;
     margin: 12px;
     width: 124px;
     flex: 1 1 124px;
@@ -198,9 +198,9 @@
     border-radius: 6px;
 }
 .fm-blocks-view .mega-node.fm-item {
-    width: 208px;
-    height: 186px;
-    flex-basis: 208px;
+    width: 188px;
+    height: 220px;
+    flex-basis: 188px;
     margin: 24px 0 0 24px;
     flex-grow: 0;
     padding: 4px;
@@ -216,7 +216,7 @@
 }
 .fm-blocks-view.bigger-node .mega-node.fm-item,
 .grid-view.bigger-node .mega-node.fm-item {
-    height: 150px;
+    height: 187px;
     width: 155px;
     flex-basis: 155px;
     overflow: hidden;

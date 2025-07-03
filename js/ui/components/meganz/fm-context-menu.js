@@ -492,7 +492,13 @@
                         ephemeralDialog(l[1005]);
                     }
                     else {
-                        M.initFileAndFolderSelectDialog('create-new-link');
+                        M.initFileAndFolderSelectDialog('create-new-link')
+                            .then((nodes) => {
+                                if (nodes.length) {
+                                    return M.getLinkAction(nodes);
+                                }
+                            })
+                            .catch(tell);
                     }
                 }
             }

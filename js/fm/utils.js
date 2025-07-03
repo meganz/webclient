@@ -2627,7 +2627,11 @@ MegaUtils.prototype.fmEventLog = function(eid) {
             'playtime': 500715,
             'settings': 500716
         };
-        eventlog(map[eid] || eid, true);
+
+        eid = (map[eid] || eid) | 0;
+        if (eid > 0) {
+            eventlog(eid, true);
+        }
     }
 };
 

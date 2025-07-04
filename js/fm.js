@@ -619,7 +619,6 @@ function ephemeralDialog(msg) {
 }
 
 function fmtopUI() {
-
     "use strict";
 
     var $sharesTabBlock = $('.shares-tabs-bl');
@@ -663,6 +662,7 @@ function fmtopUI() {
     mega.ui.secondaryNav.showBreadcrumb();
     $('.fm-right-files-block').removeClass('visible-notification rubbish-bin');
 
+    const isSearchResult = String(M.currentdirid).substring(0, 6) === 'search';
     if (M.currentrootid === M.RubbishID) {
         if (M.v.length) {
             primary = '.fm-clearbin-button';
@@ -872,7 +872,7 @@ function fmtopUI() {
             primary = '.fm-import-to-cloudrive';
             secondary = '.fm-download';
         }
-        else if (String(M.currentdirid).substring(0, 6) === 'search') {
+        else if (isSearchResult) {
             mega.ui.secondaryNav.hideBreadcrumb();
         }
     }
@@ -890,6 +890,10 @@ function fmtopUI() {
     }
     $.tresizer();
 
+    if (isSearchResult) {
+        return;
+    }
+    // do not call when isSearchResult
     mega.ui.secondaryNav.showActionButtons(primary, secondary, contextMenuItem);
 }
 

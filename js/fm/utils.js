@@ -1132,6 +1132,7 @@ MegaUtils.prototype.fmSearchNodes = function(searchTerm) {
                 M.renderMain();
                 M.onSectionUIOpen('cloud-drive');
                 $('.fm-right-header .fm-breadcrumbs-wrapper').addClass('hidden');
+                mega.ui.secondaryNav.hideActionButtons();
                 onIdle(resolve);
                 // mBroadcaster.sendMessage('!sitesearch', searchTerm, 'folder-link', M.v.length);
             }
@@ -1336,10 +1337,10 @@ MegaUtils.prototype.transferFromMegaCoNz = function(data) {
                 }
             }
             else if (toPage.startsWith('pwmredir')) {
-                const [, target, value] = toPage.split('!');
+                const [, type, target, value] = toPage.split('!');
 
                 if (target === 'add' || target === 'edit') {
-                    window.pwmredir = [target, value];
+                    window.pwmredir = [type, target, value];
                     toPage = 'fm/pwm';
                 }
                 else {
@@ -2626,7 +2627,11 @@ MegaUtils.prototype.fmEventLog = function(eid) {
             'playtime': 500715,
             'settings': 500716
         };
-        eventlog(map[eid] || eid, true);
+
+        eid = (map[eid] || eid) | 0;
+        if (eid > 0) {
+            eventlog(eid, true);
+        }
     }
 };
 
@@ -2645,7 +2650,7 @@ lazy(MegaUtils, 'classifyPMPassword', () => {
             return false;
         }
 
-        const passwordLength = password.length;
+        const passwordLength = password && password.length || 0;
         if (passwordLength === 0) {
             return false;
         }
@@ -2689,5 +2694,35 @@ lazy(MegaUtils, 'classifyPMPassword', () => {
             icon: 'strength-icon sprite-fm-mono icon-alert-triangle-thin-outline'
         };
 
+    };
+});
+
+lazy(MegaUtils, 'isCardExpired', () => {
+    'use strict';
+
+    return (expiry) => {
+        if (typeof expiry !== 'string') {
+            return false;
+        }
+
+        const normalized = expiry.replace(/\s+/g, '');
+        const match = /^(\d{2})\/(\d{2})$/.exec(normalized);
+        if (!match) {
+            return false;
+        }
+
+        const [ , mm, yy ] = match;
+        const month = parseInt(mm, 10);
+        const year = parseInt(yy, 10);
+
+        if (month < 1 || month > 12) {
+            return false;
+        }
+
+        // We pass month as entered by the user (1-12). The Date constructor expects 0-based months (0-11),
+        // but by passing day = 0 and month = X, Date gives us the last day of month X-1.
+        // This way, we get the last second of the expiry month as intended (23:59:59).
+        const expiryDate = new Date(2000 + year, month, 0, 23, 59, 59);
+        return Date.now() > expiryDate.getTime();
     };
 });

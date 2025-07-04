@@ -67,6 +67,55 @@ lazy(mega.ui.pm, 'utils', () => {
             }
         },
 
+        /**
+         * Generate credit card favicon based on card number (BIN).
+         * If type is not recognized, a generic icon is shown but treated as manual.
+         *
+         * @param {string} cardNumber - The credit card number.
+         * @param {HTMLElement} elem - Element where the favicon will be rendered.
+         * @returns {void}
+         */
+        generateCardFavicon(cardNumber, elem) {
+            const cleaned = cardNumber.replace(/\s+/g, '');
+
+            const brandMap = [
+                { regex: /^(636368|438935|504175|5067\d{2})/, icon: 'icon-elo' },
+                { regex: /^4/, icon: 'icon-visa-new' },
+                { regex: /^5[1-5]/, icon: 'icon-mastercard-new' },
+                { regex: /^2(2[2-9]|[3-6]\d|7[01]|720)/, icon: 'icon-mastercard-new' },
+                { regex: /^(50|56|57|58|63|67)/, icon: 'icon-maestro' },
+                { regex: /^3[47]/, icon: 'icon-amex-new' },
+                { regex: /^62/, icon: 'icon-unionpay' },
+                { regex: /^(6011|64[4-9]|65)/, icon: 'icon-discover-new' },
+                { regex: /^35[2-8]/, icon: 'icon-jcb-new' },
+                { regex: /^(60|65|81|82|508|353|356)/, icon: 'icon-rupay' }
+            ];
+
+            const match = brandMap.find(({ regex }) => regex.test(cleaned));
+            const brand = match ? match.icon : null;
+
+            const inner = elem.getElementsByTagName('span')[0];
+            inner.textContent = '';
+            inner.className = '';
+            elem.classList.remove('manual-favicon', 'brand-favicon');
+
+            if (brand) {
+                elem.classList.add('brand-favicon');
+                inner.className = 'favicon-brand';
+
+                const iconElement = document.createElement('i');
+                iconElement.className = `sprite-fm-uni ${brand}`;
+                inner.append(iconElement);
+            }
+            else {
+                elem.classList.add('manual-favicon');
+
+                const iconElement = document.createElement('i');
+                iconElement.className = 'sprite-fm-mono icon-credit-card';
+                inner.append(iconElement);
+            }
+        },
+
         getHostname(url) {
 
             if (typeof url === 'undefined' || url === '') {

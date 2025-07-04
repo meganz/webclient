@@ -185,7 +185,7 @@
 .overlay-wrap.modal-dialog .main .title {
     max-width: 100%;
 }
-.overlay-wrap.modal-dialog .main .title h2.text-container {
+.overlay-wrap .main .title h2.text-container {
     position: relative;
     display: flex;
     width: 100%;

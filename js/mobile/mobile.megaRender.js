@@ -245,12 +245,12 @@ class MobileMegaRender {
             // Item width and height are dom node base size + margin
             if (this.container.offsetWidth <= 700) {
                 options.itemWidth = 124 + 24;
-                options.itemHeight = 130 + 24;
+                options.itemHeight = 156 + 24;
                 this.container.classList.remove('bigger-node');
             }
             else {
                 options.itemWidth = 155 + 24;
-                options.itemHeight = 150 + 24;
+                options.itemHeight = 187 + 24;
                 this.container.classList.add('bigger-node');
             }
             options.renderAdapter = new MegaList.RENDER_ADAPTERS.Grid({usingNativeScroll: true});

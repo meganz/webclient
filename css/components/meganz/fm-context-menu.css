@@ -5,8 +5,8 @@
     border-radius: 16px;
     box-sizing: border-box;
     box-shadow: var(--mobile-shadow-medium);
-    min-height: 32px;
-    padding: 10px 0;
+    min-height: 36px;
+    padding: 4px 0;
     position: absolute;
     min-width: 280px;
     z-index: 250;
@@ -14,8 +14,8 @@
 .fm-context-menu .context-submenu {
     left: 100%;
     right: auto;
-    padding-bottom: 16px;
     min-width: 280px;
+    padding: 8px 0;
     width: auto;
 }
 .rtl .fm-context-menu {
@@ -28,8 +28,8 @@
 .fm-context-menu .context-section:not(.hidden),
 .fm-context-menu .context-label-section:not(.hidden) {
     border-bottom: 1px solid var(--mobile-border-strong);
-    margin: 6px 0;
-    padding-bottom: 6px;
+    margin: 4px 0;
+    padding-bottom: 4px;
 }
 .fm-context-menu .context-section.last {
     border-bottom: unset;
@@ -42,10 +42,10 @@
     box-sizing: border-box;
     cursor: pointer;
     display: flex;
-    height: 32px;
+    height: 36px;
     overflow: hidden;
-    max-width: calc(100% - 32px);
-    margin: 8px 16px 0;
+    max-width: calc(100% - 16px);
+    margin: 0 8px;
     padding: 0 8px;
     position: relative;
     text-overflow: ellipsis;
@@ -57,7 +57,9 @@
 .fm-context-menu .nav-elem.context-button:active {
     text-decoration: none;
 }
-
+.fm-context-menu .nav-elem.context-button .primary-text {
+    font: var(--mobile-font-caption-large-regular);
+}
 .fm-context-menu .context-label-section {
     padding: 8px 16px;
 }

@@ -115,7 +115,7 @@ mega.ui.MegaInputs.prototype.pmText._bindEvent = function() {
         if ($(this).hasClass('clearButton')) {
             const $clearBtn = $('.clear-input', $(this).parent());
             // show clear button only if input is not empty or spacebar is clicked at the start
-            $clearBtn[$(this).val() ? 'removeClass' : 'addClass']('hidden');
+            $clearBtn[$(this).val() && $(this).is(':focus') ? 'removeClass' : 'addClass']('hidden');
         }
 
         if (this.type === 'password') {
@@ -171,14 +171,22 @@ mega.ui.MegaInputs.prototype.pmText._bindEvent = function() {
         });
     }
 
-    // Hide error upon input changes
+    // On input change, hide any warning or error styles/messages,
+    // and restore info message if present
     if (!$input.hasClass('strengthChecker')) {
         $input.rebind('input.pmText', () => {
+            let cleaned = false;
+            if (this.$wrapper.hasClass('warning')) {
+                this.hideMessage();
+                this.$wrapper.removeClass('warning');
+                cleaned = true;
+            }
             if (this.$wrapper.hasClass('error')) {
                 this.hideError();
-                if (this.$wrapper.hasClass('info')) {
-                    this.showInfoMessage();
-                }
+                cleaned = true;
+            }
+            if (cleaned && this.$wrapper.hasClass('info')) {
+                this.showInfoMessage();
             }
         });
     }

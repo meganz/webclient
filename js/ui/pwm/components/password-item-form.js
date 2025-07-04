@@ -128,7 +128,6 @@ class PasswordItemForm extends MegaForm {
 
                             if (!this.validateForm(this.formType)) {
                                 this.setLoading(false);
-                                this.megaTitleInput.$input.focus();
                                 return;
                             }
 
@@ -154,7 +153,7 @@ class PasswordItemForm extends MegaForm {
                     classname: 'secondary',
                     typeAttr: 'button',
                     onClick: async() => {
-                        const res = await this.discard(this.isFormChanged);
+                        const res = await this.discard(this.isFormChanged, this.formType);
 
                         if (res) {
                             mega.ui.pm.overlay.hide();
@@ -215,10 +214,10 @@ class PasswordItemForm extends MegaForm {
 
         mega.ui.pm.overlay.show({
             name: 'new-password-item-overlay',
-            title: this.formType === 'create' ? l.add_item : l.edit_item,
+            title: this.formType === 'create' ? l.add_item : l.edit_password,
             contents: [this.domNode],
             showClose: true,
-            confirmClose: () => this.discard(this.isFormChanged)
+            confirmClose: () => this.discard(this.isFormChanged, this.formType)
         });
 
         // delay for the overlay transition to happen and set focus
@@ -303,10 +302,8 @@ class PasswordItemForm extends MegaForm {
                 totp: totp ? {shse: totp, nd: '6', t: '30', alg: 'sha1'} : undefined
             }
         };
-        const name = title;
-        const target = pwmh;
 
-        const res = await mega.ui.pm.comm.createItem(n, name, target);
+        const res = await mega.ui.pm.comm.createItem(n, title, pwmh);
 
         mega.ui.toast.show(l.item_created);
         mega.ui.pm.comm.saveLastSelected(res);
@@ -379,25 +376,30 @@ class PasswordItemForm extends MegaForm {
         const pwd = this.megaPwdInput.$input.val();
         const otp = this.megaTOTPInput.$input.val();
         let success = true;
+        let firstInvalidInput = null;
+
+        const showError = (input, message) => {
+            input.megaInputsShowError(`${alertIcon} ${message}`);
+            if (!firstInvalidInput) {
+                firstInvalidInput = input;
+            }
+            success = false;
+        };
 
         if (!title) {
-            this.megaTitleInput.$input.megaInputsShowError(`${alertIcon} ${l.title_value}`);
-            success = false;
+            showError(this.megaTitleInput.$input, l.title_value);
         }
 
         if (!pwd) {
-            this.megaPwdInput.$input.megaInputsShowError(`${alertIcon} ${l.err_no_pass}`);
-            success = false;
+            showError(this.megaPwdInput.$input, l.err_no_pass);
         }
 
         if (url && !mega.ui.pm.utils.isURL(url)) {
-            this.megaWebsiteInput.$input.megaInputsShowError(`${alertIcon} ${l.url_value}`);
-            success = false;
+            showError(this.megaWebsiteInput.$input, l.url_value);
         }
 
         if (otp && !mega.pm.otp.base32ToUint8Array(otp)) {
-            this.megaTOTPInput.$input.megaInputsShowError(`${alertIcon} ${l.otp_key_error}`);
-            success = false;
+            showError(this.megaTOTPInput.$input, l.otp_key_error);
         }
 
         if (title) {
@@ -405,9 +407,12 @@ class PasswordItemForm extends MegaForm {
 
             // allows editing of the other fields w/ or w/o the title
             if (node && (formType === 'create' || node.h !== mega.ui.pm.list.passwordItem.item.h)) {
-                this.megaTitleInput.$input.megaInputsShowError(`${alertIcon} ${l.title_exist.replace('%1', title)}`);
-                success = false;
+                showError(this.megaTitleInput.$input, l.title_exist.replace('%1', title));
             }
+        }
+
+        if (!success && firstInvalidInput) {
+            firstInvalidInput.focus();
         }
 
         return success;

@@ -222,6 +222,7 @@ var megaMsgDialog = (() => {
                 if (options) {
                     renderIcon(options.icon);
                     generateAdditionalButtons(options.buttons, options.confirmButtonClass);
+
                     if (options.footer) {
                         targetSheet.addFooter(options.footer);
                         confirmButton = options.footer.confirmButton === undefined ? confirmButton :

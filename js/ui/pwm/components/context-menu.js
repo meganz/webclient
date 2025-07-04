@@ -44,13 +44,31 @@ class MegaContextMenu extends MegaComponentGroup {
             menuItems['.delete-item'] = 1;
         }
         else if (this.name === 'item-list-menu') {
-            menuItems['.copy-password'] = 1;
             const node = M.getNodeByHandle(this.handle);
-            if (node && node.pwm.u) {
-                menuItems['.copy-username'] = 1;
-            }
-            if (node && node.pwm.url) {
-                menuItems['.launch-website'] = 1;
+            const pwm = node && node.pwm;
+
+            if (pwm) {
+                if (pwm.t === 'c') {
+                    menuItems['.copy-card-number'] = 1;
+                    if (pwm.u) {
+                        menuItems['.copy-cardholder-name'] = 1;
+                    }
+                    if (pwm.exp) {
+                        menuItems['.copy-expiration-date'] = 1;
+                    }
+                    if (pwm.cvv) {
+                        menuItems['.copy-security-code'] = 1;
+                    }
+                }
+                else {
+                    menuItems['.copy-password'] = 1;
+                    if (pwm.u) {
+                        menuItems['.copy-username'] = 1;
+                    }
+                    if (pwm.url) {
+                        menuItems['.launch-website'] = 1;
+                    }
+                }
             }
             menuItems['.edit-item'] = 1;
             menuItems['.delete-item'] = 1;
@@ -86,10 +104,17 @@ class MegaContextMenu extends MegaComponentGroup {
             '.delete-item': {
                 text: l.delete_item,
                 icon: 'sprite-pm-mono icon-trash-thin-outline',
-                onClick: () => {
+                onClick: (nodeHandle) => {
                     if (mega.pm.validateUserStatus()) {
+                        const node = M.getNodeByHandle(nodeHandle);
+                        let eventlogId = 500545;
+
+                        if (node && node.pwm && node.pwm.t === 'c') {
+                            eventlogId = 500849;
+                        }
+
                         mega.ui.pm.delete.showConfirm();
-                        eventlog(500545);
+                        eventlog(eventlogId);
                     }
                 }
             },
@@ -97,14 +122,25 @@ class MegaContextMenu extends MegaComponentGroup {
                 text: l.edit_item,
                 icon: 'sprite-pm-mono icon-edit-thin-outline',
                 onClick: () => {
-                    if (!mega.ui.passform) {
-                        mega.ui.passform = new PasswordItemForm();
+                    const node = M.getNodeByHandle(mega.ui.pm.list.selectedItem.domNode.id);
+                    const {pwm} = node;
+                    let prop = 'passform';
+                    let itemClass = PasswordItemForm;
+                    let eventlogId = 500546;
+
+                    // credit card item
+                    if (pwm.t === 'c') {
+                        prop = 'creditcardform';
+                        itemClass = CreditCardItemForm;
+                        eventlogId = 500861;
                     }
 
-                    mega.ui.passform.show({
-                        type: 'update'
-                    });
-                    eventlog(500544);
+                    if (!mega.ui[prop]) {
+                        mega.ui[prop] = new itemClass();
+                    }
+
+                    mega.ui[prop].show({ type: 'update' });
+                    eventlog(eventlogId);
                 }
             },
             '.launch-website': {
@@ -119,7 +155,7 @@ class MegaContextMenu extends MegaComponentGroup {
             },
             '.copy-username': {
                 text: l.copy_username,
-                icon: 'sprite-pm-mono icon-copy-user-thin-outline',
+                icon: 'sprite-pm-mono icon-copy-thin-outline',
                 onClick: (nodeHandle) => {
                     const node = M.getNodeByHandle(nodeHandle);
                     mega.ui.pm.utils.copyPMToClipboard(node.pwm.u, l.username_copied);
@@ -128,11 +164,43 @@ class MegaContextMenu extends MegaComponentGroup {
             },
             '.copy-password': {
                 text: l[19601],
-                icon: 'sprite-pm-mono icon-copy-password-thin-outline',
+                icon: 'sprite-pm-mono icon-copy-thin-outline',
                 onClick: (nodeHandle) => {
                     const node = M.getNodeByHandle(nodeHandle);
                     mega.ui.pm.utils.copyPMToClipboard(node.pwm.pwd, l[19602]);
                     eventlog(500541);
+                }
+            },
+            '.copy-security-code': {
+                text: l.copy_security_code,
+                icon: 'sprite-pm-mono icon-copy-thin-outline',
+                onClick: (nodeHandle) => {
+                    const node = M.getNodeByHandle(nodeHandle);
+                    mega.ui.pm.utils.copyPMToClipboard(node.pwm.cvv.replace(/\s+/g, ''), l.security_code_copied);
+                }
+            },
+            '.copy-expiration-date': {
+                text: l.copy_exp_date,
+                icon: 'sprite-pm-mono icon-copy-thin-outline',
+                onClick: (nodeHandle) => {
+                    const node = M.getNodeByHandle(nodeHandle);
+                    mega.ui.pm.utils.copyPMToClipboard(node.pwm.exp.replace(/\s+/g, ''), l.exp_date_copied);
+                }
+            },
+            '.copy-card-number': {
+                text: l.copy_card_number,
+                icon: 'sprite-pm-mono icon-copy-thin-outline',
+                onClick: (nodeHandle) => {
+                    const node = M.getNodeByHandle(nodeHandle);
+                    mega.ui.pm.utils.copyPMToClipboard(node.pwm.nu.replace(/\s+/g, ''), l.card_number_copied);
+                }
+            },
+            '.copy-cardholder-name': {
+                text: l.copy_cardholder_name,
+                icon: 'sprite-pm-mono icon-copy-thin-outline',
+                onClick: (nodeHandle) => {
+                    const node = M.getNodeByHandle(nodeHandle);
+                    mega.ui.pm.utils.copyPMToClipboard(node.pwm.u, l.cardholder_name_copied);
                 }
             }
         };

@@ -69,18 +69,27 @@ class MegaTopMenu extends MegaMobileTopMenu {
     closeActiveOverlays() {
 
         if (mega.ui.pm && (mega.pm.pwmFeature || u_attr.b || u_attr.pf) && mega.ui.pm.overlay.visible) {
-            return mega.ui.passform.discard(mega.ui.passform.isFormChanged)
-                .then(res => {
-                    if (res) {
-                        mega.ui.pm.overlay.hide();
-                        mega.ui.passform.clear();
-                    }
-                    return res;
-                })
-                .catch((ex) => {
-                    tell(ex);
-                    return false;
-                });
+            let activeForm = null;
+            if (mega.ui.passform && mega.ui.passform.visible) {
+                activeForm = mega.ui.passform;
+            }
+            else if (mega.ui.creditcardform && mega.ui.creditcardform.visible) {
+                activeForm = mega.ui.creditcardform;
+            }
+            if (activeForm) {
+                return activeForm.discard(activeForm.isFormChanged)
+                    .then(res => {
+                        if (res) {
+                            mega.ui.pm.overlay.hide();
+                            activeForm.clear();
+                        }
+                        return res;
+                    })
+                    .catch((ex) => {
+                        tell(ex);
+                        return false;
+                    });
+            }
         }
         return true;
     }

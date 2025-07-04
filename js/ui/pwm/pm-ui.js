@@ -55,11 +55,20 @@ mega.ui.pm = {
 
             this.list.show().then(() => {
                 if (window.pwmredir) {
-                    const [action, target] = window.pwmredir;
+                    const [type, action, target] = window.pwmredir;
                     delete window.pwmredir;
 
                     if (action === 'add') {
                         mega.ui.topnav.domNode.componentSelector('.add-btn').trigger('click');
+
+                        if (type === 'pwd') {
+                            eventlog(500874);
+                            this.menu.domNode.componentSelector('.pwd-item').trigger('click');
+                        }
+                        else if (type === 'cc') {
+                            eventlog(500875);
+                            this.menu.domNode.componentSelector('.cc-item').trigger('click');
+                        }
                     }
                     else if (action === 'edit' && M.d[target]) {
                         const item = this.list.passwordList.componentSelector(`#${CSS.escape(target)}`);
@@ -80,6 +89,13 @@ mega.ui.pm = {
                                 )
                             ) {
                                 triggerEdit();
+                            }
+
+                            if (type === 'pwd') {
+                                eventlog(500876);
+                            }
+                            else if (type === 'cc') {
+                                eventlog(500877);
                             }
                         }
                     }

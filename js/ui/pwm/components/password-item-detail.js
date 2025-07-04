@@ -2,7 +2,11 @@ class MegaPasswordItemDetail {
     constructor() {
         this.domNode = document.createElement('div');
         this.domNode.classList.add('detail-panel', 'hidden');
+        this.initHeader();
+        this.initFormFields();
+    }
 
+    initHeader() {
         const navHeader = document.createElement('div');
         navHeader.classList.add('nav-header');
 
@@ -12,9 +16,7 @@ class MegaPasswordItemDetail {
             icon: 'sprite-pm-mono icon-arrow-left-regular-solid'
         });
 
-        backBtn.on('click', () => {
-            this.domNode.classList.remove('active');
-        });
+        backBtn.on('click', () => this.domNode.classList.remove('active'));
 
         this.domNode.append(navHeader);
 
@@ -26,8 +28,7 @@ class MegaPasswordItemDetail {
         this.nameSubHeader = document.createElement('div');
         this.nameSubHeader.className = 'name-sub-header';
 
-        this.nameSubHeader.append(this.subHeaderIcon);
-        this.nameSubHeader.append(this.subHeaderTitle);
+        this.nameSubHeader.append(this.subHeaderIcon, this.subHeaderTitle);
         subHeader.append(this.nameSubHeader);
 
         const contextMenuBtn = new MegaInteractable({
@@ -40,6 +41,7 @@ class MegaPasswordItemDetail {
             if (contextMenuBtn.toggleClass('active')) {
                 mega.ui.pm.contextMenu.show({
                     name: 'item-detail-menu',
+                    handle: this.item.h,
                     event,
                     eventTarget: contextMenuBtn
                 });
@@ -49,137 +51,139 @@ class MegaPasswordItemDetail {
             }
         });
 
-        mega.ui.pm.menu.on('close.menu', () => {
-            contextMenuBtn.domNode.classList.remove('active');
-        });
+        mega.ui.pm.menu.on('close.menu', () => contextMenuBtn.domNode.classList.remove('active'));
 
         this.domNode.append(subHeader);
+    }
 
+    initFormFields() {
         const detailForm = document.createElement('div');
         detailForm.classList.add('detail-form');
 
         this.domNode.append(detailForm);
 
-        this.usernameField = new MegaReadOnlyField({
+        this.usernameField = this.createField({
             parentNode: detailForm,
             id: 'username',
             grouped: true,
-            actions: [{
-                icon: 'sprite-pm-mono icon-copy-thin-outline',
-                onClick() {
-                    mega.ui.pm.utils.copyPMToClipboard(this.inputValue, l.username_copied);
-                    eventlog(500546);
-                    return false;
-                },
-                hint: l.copy_username
-            }],
             label: l.username_label,
-            onClick() {
-                mega.ui.pm.utils.copyPMToClipboard(this.inputValue, l.username_copied);
-                return false;
-            }
+            copyLabel: l.username_copied,
+            copyHint: l.copy_username,
+            eventId: 500546
         });
 
-        this.passwordField = new MegaReadOnlyField({
+        this.passwordField = this.createField({
             parentNode: detailForm,
             id: 'password',
             grouped: true,
-            actions: [
-                {
-                    icon: 'sprite-pm-mono icon-eye-thin-outline',
-                    onClick(e) {
-                        this.isPasswordVisible = !this.isPasswordVisible;
-                        const {domNode} = e.currentTarget;
-                        e.currentTarget.icon = this.isPasswordVisible ?
-                            'sprite-pm-mono icon-eye-off-thin-outline simpletip' :
-                            'sprite-pm-mono icon-eye-thin-outline simpletip';
-                        domNode.dataset.simpletip = this.isPasswordVisible ? l.hide_password : l.show_password;
-                        $(domNode).trigger('simpletipUpdated');
-                        eventlog(500547);
-                        return false;
-                    },
-                    hint: l.show_password
-                },
-                {
-                    icon: 'sprite-pm-mono icon-copy-thin-outline',
-                    onClick() {
-                        mega.ui.pm.utils.copyPMToClipboard(this.inputValue, l[19602]);
-                        eventlog(500548);
-                        return false;
-                    },
-                    hint: l[19601]
-                }
-            ],
             label: l[909],
+            copyLabel: l[19602],
+            copyHint: l[19601],
+            eventId: 500548,
             isPassword: true,
-            onClick() {
-                mega.ui.pm.utils.copyPMToClipboard(this.inputValue, l[19602]);
-                return false;
-            }
+            showLabel: l.show_password,
+            hideLabel: l.hide_password
         });
 
-        this.otpField = new MegaReadOnlyField({
+        this.otpField = this.createField({
             parentNode: detailForm,
             id: 'otp',
             label: l.otp_info_title,
-            actions: [{
-                icon: 'sprite-pm-mono icon-copy-thin-outline',
-                onClick() {
-                    mega.ui.pm.utils.copyPMToClipboard(this.inputValue.replace(/\s/, ''), l.otp_copied);
-                    return false;
-                },
-                hint: l.copy_otp
-            }],
-            onClick() {
-                mega.ui.pm.utils.copyPMToClipboard(this.inputValue.replace(/\s/, ''), l.otp_copied);
-                return false;
-            }
+            copyLabel: l.otp_copied,
+            copyHint: l.copy_otp
         });
 
-        this.websiteField = new MegaReadOnlyField({
+        this.websiteField = this.createField({
             parentNode: detailForm,
             id: 'website',
             label: l.website_label,
-            isLink: true,
-            actions: [{
-                icon: 'sprite-pm-mono icon-copy-thin-outline',
-                onClick() {
-                    mega.ui.pm.utils.copyPMToClipboard(this.inputValue, l.website_copied);
-                    return false;
-                },
-                hint: l.copy_website
-            }],
+            copyLabel: l.website_copied,
+            copyHint: l.copy_website,
+            isLink: true
         });
 
         this.websiteField.on('click', () => {
             eventlog(500549);
         });
 
-        this.notesField = new MegaReadOnlyField({
+        this.cardholderNameField = this.createField({
+            parentNode: detailForm,
+            id: 'cardholder-name',
+            grouped: true,
+            label: l.cardholder_name_label,
+            copyLabel: l.cardholder_name_copied,
+            copyHint: l.copy_cardholder_name,
+            eventId: 500845
+        });
+
+        this.cardNumberField = this.createField({
+            parentNode: detailForm,
+            id: 'card-number',
+            grouped: true,
+            label: l.card_number_label,
+            copyLabel: l.card_number_copied,
+            copyHint: l.copy_card_number,
+            eventId: 500846,
+            isCard: true,
+            showLabel: l.show_card_number,
+            hideLabel: l.hide_card_number
+        });
+
+        this.cardExpiryField = this.createField({
+            parentNode: detailForm,
+            id: 'card-expiry',
+            grouped: true,
+            label: l.exp_date_label,
+            copyLabel: l.exp_date_copied,
+            copyHint: l.copy_exp_date,
+            eventId: 500847,
+            help: {
+                text: l.card_expired_warning,
+                className: 'warning',
+                iconClass: 'sprite-pm-mono icon-alert-triangle-thin-outline'
+            }
+        });
+
+        this.cardCvvField = this.createField({
+            parentNode: detailForm,
+            id: 'card-cvv',
+            label: l.security_code_label,
+            copyLabel: l.security_code_copied,
+            copyHint: l.copy_security_code,
+            eventId: 500848,
+            isCvv: true,
+            showLabel: l.show_security_code,
+            hideLabel: l.hide_security_code
+        });
+
+        this.notesField = this.createField({
             parentNode: detailForm,
             id: 'notes',
-            actions: [
-                {
-                    icon: 'sprite-pm-mono icon-copy-thin-outline',
-                    onClick() {
-                        mega.ui.pm.utils.copyPMToClipboard(this.inputValue, l.notes_copied);
-                        eventlog(500550);
-                        return false;
-                    },
-                    hint: l.copy_notes
-                }
-            ],
             label: l.notes_label,
-            onClick() {
-                mega.ui.pm.utils.copyPMToClipboard(this.inputValue, l.notes_copied);
-                return false;
-            }
+            copyLabel: l.notes_copied,
+            copyHint: l.copy_notes,
+            eventId: 500550
         });
 
         this.dateAdded = document.createElement('p');
         this.dateAdded.className = 'text-detail';
 
         detailForm.append(this.dateAdded);
+    }
+
+    hideFieldsByType(type) {
+        if (type === 'c') {
+            this.usernameField.addClass('hidden');
+            this.passwordField.addClass('hidden');
+            this.otpField.addClass('hidden');
+            this.websiteField.addClass('hidden');
+        }
+        else {
+            this.cardholderNameField.addClass('hidden');
+            this.cardNumberField.addClass('hidden');
+            this.cardExpiryField.addClass('hidden');
+            this.cardCvvField.addClass('hidden');
+        }
     }
 
     /**
@@ -197,9 +201,62 @@ class MegaPasswordItemDetail {
             return;
         }
 
-        let otp = null;
         let {name} = this.item;
-        let {u, pwd, n, url, totp: otpData} = this.item.pwm;
+        const pwm = this.item.pwm || {};
+
+        this.hideFieldsByType(pwm.t);
+
+        if (pwm.t === 'c') {
+            this.renderCreditCardDetail(pwm);
+        }
+        else {
+            await this.renderPasswordDetail(pwm);
+        }
+
+        this.subHeaderTitle.textContent = name || this.url;
+        this.subHeaderTitle.classList.add('simpletip');
+        this.subHeaderTitle.dataset.simpletip = name || this.url;
+        this.subHeaderTitle.dataset.simpletipposition = 'top';
+        this.subHeaderTitle.dataset.simpletipoffset = '2';
+
+        const outer = document.createElement('div');
+        outer.className = 'favicon';
+        const span = document.createElement('span');
+        outer.append(span);
+
+        if (pwm.t === 'c') {
+            mega.ui.pm.utils.generateCardFavicon(pwm.nu, outer);
+        }
+        else {
+            mega.ui.pm.utils.generateFavicon(name, this.url, outer);
+        }
+
+        // const newFavicon = mega.ui.pm.utils.generateFavicon(name, this.url);
+        this.nameSubHeader.replaceChild(outer, this.subHeaderIcon);
+        this.subHeaderIcon = outer;
+
+        this.dateAdded.textContent = '';
+        this.dateAdded.append(parseHTML(l.date_added.replace('%1', time2date(this.item.ts))));
+
+        this.domNode.classList.remove('hidden');
+
+        if (!noShow) {
+            this.domNode.classList.add('active');
+        }
+
+        onIdle(() => {
+            if (this.domNode.Ps) {
+                this.domNode.Ps.update();
+            }
+            else {
+                this.domNode.Ps = new PerfectScrollbar(this.domNode);
+            }
+        });
+    }
+
+    async renderPasswordDetail({u, pwd, n, url, totp: otpData}) {
+        this.url = url;
+        let otp = null;
 
         if (otpData) {
             otp = await this.generateOtpValue(otpData).catch(dump);
@@ -247,49 +304,38 @@ class MegaPasswordItemDetail {
         this.websiteField.inputValue = url;
         this.notesField.inputValue = n;
         this.otpField.inputValue = otp || '';
-        this.otpField[otp ? 'removeClass' : 'addClass']('hidden');
-        this.passwordField[otp ? 'addClass' : 'removeClass']('grouped');
-        this.usernameField[u ? 'removeClass' : 'addClass']('hidden');
-        this.websiteField[url ? 'removeClass' : 'addClass']('hidden');
-        this.notesField[n ? 'removeClass' : 'addClass']('hidden');
-        this.passwordField.isPasswordVisible = false;
+
+        this.otpField.toggleClass('hidden', !otp);
+        this.passwordField.toggleClass('hidden', !pwd);
+        this.passwordField.toggleClass('grouped', !!otp);
+        this.usernameField.toggleClass('hidden', !u);
+        this.websiteField.toggleClass('hidden', !url);
+        this.notesField.toggleClass('hidden', !n);
+
+        this.passwordField.visible = false;
         this.passwordField.setActions(this.passwordField.actions);
-
-        this.subHeaderTitle.textContent = name || url;
-        this.subHeaderTitle.classList.add('simpletip');
-        this.subHeaderTitle.dataset.simpletip = name || url;
-        this.subHeaderTitle.dataset.simpletipposition = 'top';
-        this.subHeaderTitle.dataset.simpletipoffset = '2';
-
-        const outer = document.createElement('div');
-        outer.className = 'favicon';
-        const span = document.createElement('span');
-        outer.append(span);
-
-        mega.ui.pm.utils.generateFavicon(name, url, outer);
-
-        // const newFavicon = mega.ui.pm.utils.generateFavicon(name, url);
-        this.nameSubHeader.replaceChild(outer, this.subHeaderIcon);
-        this.subHeaderIcon = outer;
-
-        this.dateAdded.textContent = '';
-        this.dateAdded.append(parseHTML(l.date_added.replace('%1', time2date(this.item.ts))));
-
-        this.domNode.classList.remove('hidden');
-
-        if (!noShow) {
-            this.domNode.classList.add('active');
-        }
-
-        onIdle(() => {
-            if (this.domNode.Ps) {
-                this.domNode.Ps.update();
-            }
-            else {
-                this.domNode.Ps = new PerfectScrollbar(this.domNode);
-            }
-        });
     }
+
+    renderCreditCardDetail({u, nu, exp, cvv, n}) {
+        this.url = '';
+        this.cardholderNameField.inputValue = u;
+        this.cardNumberField.inputValue = nu;
+        this.cardExpiryField.inputValue = exp;
+        this.cardCvvField.inputValue = cvv;
+        this.notesField.inputValue = n;
+
+        this.cardholderNameField.toggleClass('hidden', !u);
+        this.cardNumberField.toggleClass('hidden', !nu);
+        this.cardExpiryField.toggleClass('hidden', !exp);
+        this.cardCvvField.toggleClass('hidden', !cvv);
+        this.notesField.toggleClass('hidden', !n);
+
+        this.cardNumberField.visible = false;
+        this.cardNumberField.setActions(this.cardNumberField.actions);
+        this.cardCvvField.visible = false;
+        this.cardCvvField.setActions(this.cardCvvField.actions);
+    }
+
 
     async generateOtpValue(otpData) {
         const otp = await mega.pm.otp.generateOtp(otpData);
@@ -299,5 +345,81 @@ class MegaPasswordItemDetail {
         const count = Math.floor(len / 2) + Number(isOdd);
 
         return `${otp.slice(0, count)} ${otp.slice(count)}`;
+    }
+
+    createField(options = {}) {
+        const {
+            id,
+            label,
+            parentNode,
+            grouped,
+            copyLabel,
+            copyHint,
+            eventId,
+            isPassword,
+            isCard,
+            isCvv,
+            isLink,
+            help,
+            showLabel,
+            hideLabel
+        } = options;
+
+        const actions = [];
+
+        const handleCopy = function() {
+            let value = this.inputValue;
+            if (['otp', 'card-number', 'card-expiry', 'card-cvv'].includes(id)) {
+                value = value.replace(/\s+/g, '');
+            }
+            mega.ui.pm.utils.copyPMToClipboard(value, copyLabel);
+            if (eventId) {
+                eventlog(eventId);
+            }
+            return false;
+        };
+
+        // Add eye toggle action if applicable
+        if (showLabel && hideLabel) {
+            actions.push({
+                icon: 'sprite-pm-mono icon-eye-thin-outline',
+                onClick(e) {
+                    this.visible = !this.visible;
+                    const { domNode } = e.currentTarget;
+                    e.currentTarget.icon = this.visible
+                        ? 'sprite-pm-mono icon-eye-off-thin-outline simpletip'
+                        : 'sprite-pm-mono icon-eye-thin-outline simpletip';
+                    domNode.dataset.simpletip = this.visible ? hideLabel : showLabel;
+                    $(domNode).trigger('simpletipUpdated');
+                    if (eventId) {
+                        eventlog(eventId);
+                    }
+                    return false;
+                },
+                hint: showLabel
+            });
+        }
+
+        // Add copy action
+        actions.push({
+            icon: 'sprite-pm-mono icon-copy-thin-outline',
+            onClick: handleCopy,
+            hint: copyHint
+        });
+
+        // Create field
+        return new MegaReadOnlyField({
+            parentNode,
+            id,
+            label,
+            grouped,
+            isPassword,
+            isCard,
+            isCvv,
+            isLink,
+            help,
+            actions,
+            onClick: handleCopy
+        });
     }
 }

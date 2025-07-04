@@ -1350,7 +1350,7 @@ MegaData.prototype.finaliseSubmenuCalcs = function(menuNode, subMenuNode, option
     const pScrollTop = (subMenuNode.closest('#cm_scroll') || {}).scrollTop || 0;
     const b = y - pScrollTop + nmH - nTop - tB; // bottom of submenu
 
-    let difference = 8;
+    let difference = 0;
 
     if (b > maxY) {
         difference += b - maxY + pScrollTop - 12;

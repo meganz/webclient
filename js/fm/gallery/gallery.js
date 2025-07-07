@@ -1707,7 +1707,7 @@ class MegaGallery {
 
                 if (newVal) {
                     for (let i = 0; i < nodes.length; i++) {
-                        selectionManager.add_to_selection(nodes[i], true);
+                        selectionManager.add_to_selection(nodes[i]);
                     }
                 }
                 else {

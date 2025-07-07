@@ -769,6 +769,9 @@ Chat.prototype.getRoomFromUrlHash = function(urlHash) {
 
 
 Chat.prototype.updateSectionUnreadCount = SoonFc(function() {
+    if (!this.is_initialized) {
+        return;
+    }
     // update the "global" conversation header unread counter
     let unreadCount = 0;
     const notificationsCount = {

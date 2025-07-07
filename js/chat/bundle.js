@@ -9181,6 +9181,9 @@ Chat.prototype.getRoomFromUrlHash = function (urlHash) {
   }
 };
 Chat.prototype.updateSectionUnreadCount = SoonFc(function () {
+  if (!this.is_initialized) {
+    return;
+  }
   let unreadCount = 0;
   const notificationsCount = {
     unreadChats: 0,

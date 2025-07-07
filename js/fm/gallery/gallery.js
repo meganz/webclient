@@ -1691,12 +1691,14 @@ class MegaGallery {
             }
         }
 
+        const checkDiv = checkbox.el.querySelector('.checkdiv');
+
         if (allSelected) {
             checkbox.checked = true;
         }
         else if (someSelected) {
             checkbox.checked = true;
-            checkbox.el.querySelector('.checkdiv').classList.add('checkboxMinimize');
+            checkDiv.classList.add('checkboxMinimize');
         }
 
         checkbox.el.classList.add('flex', 'flex-row', 'items-center');
@@ -1716,7 +1718,7 @@ class MegaGallery {
                     }
                 }
 
-                checkbox.el.classList.remove('checkboxMinimize');
+                checkDiv.classList.remove('checkboxMinimize');
             };
         });
 

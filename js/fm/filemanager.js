@@ -2085,7 +2085,9 @@ FileManager.prototype.initUIKeyEvents = function() {
                 tempSel = $('.grid-table tr.ui-selected');
             }
 
-            s = tempSel.attrs('id');
+            if (tempSel) {
+                s = tempSel.attrs('id');
+            }
         }
 
 

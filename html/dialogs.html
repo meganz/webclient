@@ -2595,8 +2595,17 @@
                     </button>
 
                     <div class="error-message"></div>
-
-                    <textarea id="share-dialog-invite-note" placeholder="[$share_add_note_placeholder]" rows="1" class="megaInputs invite-note hidden" maxlength="800"></textarea>
+                    <div class="mega-textarea invite-note">
+                        <div class="textarea-scroll">
+                            <textarea
+                                id="share-dialog-invite-note"
+                                placeholder="[$share_add_note_placeholder]"
+                                maxlength="800"
+                                rows="1"
+                                class="invite-note-textarea"
+                            ></textarea>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="share-dialog-bottom-body">
@@ -7666,7 +7675,6 @@
                     <div class="description"></div>
                 </div>
             </div>
-
         </section>
 
         <footer>

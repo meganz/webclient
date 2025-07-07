@@ -3,23 +3,64 @@ lazy(mega.ui, 'mShareDialog', () => {
 
     'use strict';
 
+    const selectorContactSearchInput = '.contact-search-input';
     // DOM caches
+    // these collections do not change dynamically, so we can cache them
     const $dialog = $('.mega-dialog.share-dialog', 'body');
+    const $inviteNote = $('.invite-note-textarea', $dialog);
+    const $inviteNoteWrapper = $('.invite-note', $dialog);
+    const $selectedContactsContainer = $('.selected-contacts-container', $dialog);
+    const $contactDropdownWrapper = $('.contact-dropdown-container-wrapper', $dialog);
+    const $contactSearchInput = $(selectorContactSearchInput, $selectedContactsContainer);
+
+    const initInviteNoteScrolling = (nodes) => {
+        const $inviteNoteClone = $('.invite-note .textarea-clone', $dialog);
+        if ($inviteNoteClone.length > 0) {
+            $inviteNoteClone.remove();
+        }
+        Ps.destroy(nodes[0]);
+        initTextareaScrolling(nodes);
+    };
+    const resetInviteNote = () => {
+        $inviteNoteWrapper.addClass('hidden');
+        $inviteNote.val('');
+        $inviteNote.css('height', 'initial');
+        initInviteNoteScrolling($inviteNote);
+    };
+    const resetSelectedContacts = () => {
+        const $selectedContacts = $('.contact-selected-item', $dialog);
+        $selectedContacts.remove();
+        Ps.destroy($selectedContactsContainer[0]);
+        initPerfectScrollbar($selectedContactsContainer);
+    };
+    const nonContactEmailInSelect = () => $('.contact-item.email-only', $contactDropdownWrapper).length > 0;
+    const contactsDropdownChildrenCount = () => {
+        const psScrollbarClasses = ['ps__rail-x', 'ps__rail-y'];
+        const unselectedContactsLength = $contactDropdownWrapper.children().not('.selected').length;
+        const elementsWithPsClasses = $contactDropdownWrapper.children()
+            .filter((_, el) => psScrollbarClasses.some(cls => el.classList.contains(cls)));
+
+        return unselectedContactsLength - elementsWithPsClasses.length;
+    };
+    const isContactsDropdownEmpty = () => contactsDropdownChildrenCount() === 0;
+    const resetContactsDropdownPS = () => {
+        Ps.destroy($contactDropdownWrapper[0]);
+        $contactDropdownWrapper.scrollTop(0);
+        $contactDropdownWrapper.scrollLeft(0);
+        initPerfectScrollbar($contactDropdownWrapper);
+    };
 
     // Other constants
     let target = null;
     let hasError = false;
 
-
     // --- TOP SECTION (SEARCH AND ADD) -----------------------------------------
-
 
     /**
      * Reset the elements of the Invite contacts area back to default clear state
      * @returns {undefined}
      */
     function resetInviteAreaState() {
-
         const $inviteContainer = $('.share-dialog-invite-container', $dialog);
         const $inviteContactButton = $('.invite-contact-button', $dialog);
         const $permissionsButton = $('.permissions-dropdown-button', $inviteContainer);
@@ -29,9 +70,6 @@ lazy(mega.ui, 'mShareDialog', () => {
         const $permissionsContainer = $('.permissions-dropdown-container', $inviteContainer);
         const $permissionsDropdownOptions = $('.dropdown-option', $permissionsContainer);
         const $readWriteOption = $('.dropdown-option[data-attr-permission="read-and-write"]', $permissionsContainer);
-        const $selectedContacts = $('.selected-contacts-container .contact-selected-item', $dialog);
-        const $searchInput = $('.contact-search-input', $dialog);
-        const $inviteNote = $('.invite-note', $dialog);
         const $shareDialogInviteBG = $('.share-dialog-invite-background', $dialog);
         const $errorMessageBox = $('.error-message', $dialog);
 
@@ -43,14 +81,12 @@ lazy(mega.ui, 'mShareDialog', () => {
         $permissionsButtons.removeClass('selected');
         $permissionsButtonReadWrite.addClass('selected');
         $permissionsDropdownOptions.removeClass('selected');
-        $searchInput.attr('placeholder', l.share_add_contact_placeholder);
-        $searchInput.removeClass('active');
-        $inviteNote.addClass('hidden');
-        $inviteNote.val('');
-        $inviteNote.css('height', 'initial');
+        $contactSearchInput.attr('placeholder', l.share_add_contact_placeholder);
+        $contactSearchInput.removeClass('active');
+        resetInviteNote();
+        resetSelectedContacts();
         $readWriteOption.addClass('selected');
-        $selectedContacts.remove();
-        $searchInput.val('');
+        $contactSearchInput.val('');
         $shareDialogInviteBG.removeClass('overflow dropdown-visible');
         $errorMessageBox.text('');
 
@@ -364,12 +400,10 @@ lazy(mega.ui, 'mShareDialog', () => {
      * @returns {undefined}
      */
     function enableOrDisableInviteButton() {
-
-        const $selectedContacts = $('.selected-contacts-container', $dialog);
         const $inviteButton = $('.invite-contact-button', $dialog);
 
         // Count how many contacts (or emails) are added and enable if at least 1, otherwise disable
-        if ($('.contact-selected-item', $selectedContacts).length > 0 && !hasError) {
+        if ($('.contact-selected-item', $selectedContactsContainer).length > 0 && !hasError) {
             $inviteButton.removeClass('disabled');
         }
         else {
@@ -385,33 +419,28 @@ lazy(mega.ui, 'mShareDialog', () => {
      * @returns {undefined}
      */
     function onContactChange() {
-
         // Get the emails to be invited/added to the share
-        const $contactSearchInput = $('.contact-search-input', $dialog);
-        const $selectedContactsContainer = $('.selected-contacts-container', $dialog);
         const $contactSearchBlock = $('.contact-search-block', $dialog);
-        const $inviteNote = $('.invite-note', $dialog);
         const $shareDialogInviteBG = $('.share-dialog-invite-background', $dialog);
 
         // Check if user select/add emails
         if ($selectedContactsContainer.children('.contact-selected-item').length) {
             $contactSearchInput.attr('placeholder', '');
             $contactSearchBlock.removeClass('empty');
-            $inviteNote.removeClass('hidden');
+            $inviteNoteWrapper.removeClass('hidden');
         }
         else {
             $contactSearchInput.attr('placeholder', l.share_add_contact_placeholder);
             $contactSearchBlock.addClass('empty');
 
             // Hide and clear the Note field
-            $inviteNote.addClass('hidden');
-            $inviteNote.val('');
-            $inviteNote.css('height', 'initial');
+            resetInviteNote();
         }
 
         // Hide background when selected contacts overflow
         if ($shareDialogInviteBG.innerHeight() > 45) {
             $shareDialogInviteBG.addClass('overflow');
+            initPerfectScrollbar($selectedContactsContainer);
         }
         else {
             $shareDialogInviteBG.removeClass('overflow');
@@ -420,6 +449,8 @@ lazy(mega.ui, 'mShareDialog', () => {
                 Ps.destroy($selectedContactsContainer[0]);
             }
         }
+
+        onIdle(resetContactsDropdownPS);
     }
 
     /**
@@ -427,12 +458,10 @@ lazy(mega.ui, 'mShareDialog', () => {
      * @returns {undefined}
      */
     function initRemoveContactClickHandler() {
-
         const $removeContactButtons = $('.remove-contact-button', $dialog);
 
         // Add click handler
         $removeContactButtons.rebind('click.removecontact', function(event) {
-
             const $clickedContact = $(this);
             const $clickedContactContainer = $clickedContact.parent();
             const clickedContactHandle = $clickedContactContainer.attr('data-contact-handle');
@@ -501,10 +530,8 @@ lazy(mega.ui, 'mShareDialog', () => {
      * @returns {undefined}
      */
     function makeEmailPendingContact(email) {
-
         // Selectors
         const $selectedContactTemplate = $('.contact-selected-template', $dialog);
-        const $searchInput = $('.contact-search-input', $dialog);
 
         const opc = M.findOutgoingPendingContactIdByEmail(email);
         const user = M.getUserByEmail(email);
@@ -555,7 +582,7 @@ lazy(mega.ui, 'mShareDialog', () => {
         onContactChange();
 
         // Reset the text input to empty after adding
-        $searchInput.focus().val('');
+        $contactSearchInput.focus().val('');
 
         // Make sure the remove contact buttons work
         initRemoveContactClickHandler();
@@ -607,7 +634,6 @@ lazy(mega.ui, 'mShareDialog', () => {
      * @returns {false|undefined}
      */
     function makeRegularContactForInviting(contactHandle) {
-
         const contactData = M.u[contactHandle]; // M.getUserByHandle(contactHandle);
         const contactName = contactData.name.toString();
         const contactEmail = contactData.m.toString();
@@ -617,10 +643,7 @@ lazy(mega.ui, 'mShareDialog', () => {
 
         // Selectors
         const $shareDialogInviteBG = $('.share-dialog-invite-background', $dialog);
-        const $contactDropdownWrapper = $('.contact-dropdown-container-wrapper', $dialog);
-        const $selectedContactsContainer = $('.selected-contacts-container', $dialog);
         const $selectedContactTemplate = $('.contact-selected-template', $dialog);
-        const $contactSearchInput = $('.contact-search-input', $selectedContactsContainer);
 
         // If they entered their own email, show an error
         if (contactEmail === M.u[u_handle].m) {
@@ -683,9 +706,7 @@ lazy(mega.ui, 'mShareDialog', () => {
      * @returns {undefined}
      */
     function renderEmailContactInDropdown(currentEmailString) {
-
         const $contactItemTemplate = $('.contact-item-template', $dialog);
-        const $contactDropdownWrapper = $('.contact-dropdown-container-wrapper', $dialog);
         const $shareDialogInviteBG = $('.share-dialog-invite-background', $dialog);
 
         // Copy template HTML
@@ -718,9 +739,15 @@ lazy(mega.ui, 'mShareDialog', () => {
             if (user && user.c) {
                 makeRegularContactForInviting(user.h);
             }
-            else {
-                // Make the styled box for the email to be invited
+            else if (isValidEmail(contactEmail)) {
+                // If it's a valid email, make the styled box for the email to be invited
                 makeEmailPendingContact(contactEmail);
+                $shareDialogInviteBG.removeClass('dropdown-visible');
+            }
+            else {
+                showErrorMessage(l[2465]);
+                $contactSearchInput.focus();
+                $shareDialogInviteBG.removeClass('dropdown-visible');
             }
 
             // Hide dropdown
@@ -829,28 +856,10 @@ lazy(mega.ui, 'mShareDialog', () => {
     }
 
     /**
-     * Automatically grow/shrink the invite comment textarea vertically when typing
-     * @returns {undefined}
-     */
-    function autoAdjustInviteTextArea() {
-
-        const textArea = document.getElementById('share-dialog-invite-note');
-        const heightLimit = 100;
-
-        textArea.oninput = () => {
-            textArea.style.height = '';
-            textArea.style.height = Math.min(textArea.scrollHeight, heightLimit) + 'px';
-        };
-    }
-
-    /**
      * Initialise the dropdown click handler on the contact items
      * @returns {undefined}
      */
     function initContactClickHandler() {
-
-        const $contactDropdownWrapper = $('.contact-dropdown-container-wrapper', $dialog);
-
         // Add click handler for each contact
         $('.contact-item', $contactDropdownWrapper).rebind('click.addcontact', function() {
 
@@ -869,9 +878,7 @@ lazy(mega.ui, 'mShareDialog', () => {
      * @returns {undefined}
      */
     function renderContactsIntoDropdown(listOfContacts, searchString) {
-
         const $contactItemTemplate = $('.contact-item-template', $dialog);
-        const $contactDropdownWrapper = $('.contact-dropdown-container-wrapper', $dialog);
         const dropdownWrapper = document.querySelector('.share-dialog .contact-dropdown-container-wrapper');
 
         // Get all the current active and pending contacts
@@ -884,7 +891,6 @@ lazy(mega.ui, 'mShareDialog', () => {
 
         // Loop through contacts
         for (let i = 0; i < listOfContacts.length; i++) {
-
             const userHandle = listOfContacts[i].handle;
 
             // Get more details about the contact
@@ -920,19 +926,23 @@ lazy(mega.ui, 'mShareDialog', () => {
             dropdownWrapper.append(contactItem);
 
             // Increment count
-            contactRendered++;
+            contactRendered += 1;
         }
 
         // Update dropdown HTML with contacts
         if (contactRendered) {
-
             // Add click handler for each contact in the dropdown
             initContactClickHandler();
+        }
+        else if (searchString && isValidEmail(searchString)) {
+            renderEmailContactInDropdown(searchString);
         }
         else {
             // Clear the dropdown element of anything
             $contactDropdownWrapper.empty();
         }
+
+        onIdle(resetContactsDropdownPS);
     }
 
 
@@ -1682,7 +1692,7 @@ lazy(mega.ui, 'mShareDialog', () => {
             }
 
             // Close the contact list dropdown if it is visible and clicking outside it
-            if (!$target.is('.contact-search-input') && !$target.closest('.contact-dropdown-container').length) {
+            if (!$target.is(selectorContactSearchInput) && !$target.closest('.contact-dropdown-container').length) {
                 $inviteAreaBackground.removeClass('dropdown-visible');
             }
 
@@ -1865,9 +1875,6 @@ lazy(mega.ui, 'mShareDialog', () => {
         // Render the content of the Access list in the Share dialog
         renderAccessList();
 
-        const $contactSearchInput = $('.contact-search-input', $dialog);
-        const $contactDropdownWrapper = $('.contact-dropdown-container-wrapper', $dialog);
-        const $selectedContactsContainer = $('.selected-contacts-container', $dialog);
         const $shareDialogInviteBG = $('.share-dialog-invite-background', $dialog);
         const $shareDialogTitle = $('#share-dialog-title', $dialog);
 
@@ -1899,16 +1906,14 @@ lazy(mega.ui, 'mShareDialog', () => {
 
         // Add click handler for showing the list of contacts to choose from
         $contactSearchInput.rebind('click.searchcontact', (event) => {
-
             const searchInputVal = $contactSearchInput.val();
 
             // Update the list of contacts in the dropdown
             renderContactsIntoDropdown(listOfContacts, searchInputVal);
 
             // Hide the dropdown if there are no contacts to be rendered
-            if (checkIfAllContactsSelected(listOfContacts) ||
-                $contactDropdownWrapper.children().not('.selected').length === 0) {
-
+            if ((checkIfAllContactsSelected(listOfContacts) || isContactsDropdownEmpty()) &&
+                !nonContactEmailInSelect()) {
                 $shareDialogInviteBG.removeClass('dropdown-visible');
             }
             else {
@@ -1917,6 +1922,7 @@ lazy(mega.ui, 'mShareDialog', () => {
 
                 // Scroll to the top of the list on each open (and after re-opening)
                 $contactDropdownWrapper.scrollTop(0);
+                onIdle(resetContactsDropdownPS);
             }
 
             // Make sure click is not propgated to the dialog close dropdown click handler so the user has time to look
@@ -1925,7 +1931,6 @@ lazy(mega.ui, 'mShareDialog', () => {
 
         // Add keyup handler for searching/filtering the contacts
         $contactSearchInput.rebind('keyup.searchcontact', function(event) {
-
             const currentSearchString = $(this).val();
             const keyCode = event.key;
 
@@ -1939,12 +1944,11 @@ lazy(mega.ui, 'mShareDialog', () => {
             renderContactsIntoDropdown(listOfContacts, currentSearchString);
 
             // Hide list when nothing to show
-            if (checkIfAllContactsSelected(listOfContacts) ||
-                $contactDropdownWrapper.children().not('.selected').length === 0) {
-
+            if ((checkIfAllContactsSelected(listOfContacts) || isContactsDropdownEmpty()) &&
+                !nonContactEmailInSelect()) {
                 // Hide the dropdown
                 $shareDialogInviteBG.removeClass('dropdown-visible');
-                $(this).closest('.selected-contacts-container').addClass('empty');
+                $selectedContactsContainer.addClass('empty');
 
                 // If there are no matching contacts, but the email is valid one
                 if (isValidEmail(currentSearchString)) {
@@ -1954,18 +1958,17 @@ lazy(mega.ui, 'mShareDialog', () => {
 
                     // Show the dropdown and email inside it
                     $shareDialogInviteBG.addClass('dropdown-visible');
-                    $(this).closest('.selected-contacts-container').removeClass('empty');
+                    $selectedContactsContainer.removeClass('empty');
                 }
             }
             else {
                 // Show the dropdown and contacts
                 $shareDialogInviteBG.addClass('dropdown-visible');
-                $(this).closest('.selected-contacts-container').removeClass('empty');
+                $selectedContactsContainer.removeClass('empty');
             }
 
             // If they are manually entering an email and indicate they are finished typing by pressing the Enter key
             if (keyCode === 'Enter') {
-
                 const user = currentSearchString ? M.getUserByEmail(currentSearchString) : false;
 
                 // If existing contact, add using that method
@@ -1974,23 +1977,26 @@ lazy(mega.ui, 'mShareDialog', () => {
                     $shareDialogInviteBG.removeClass('dropdown-visible');
                 }
                 else if (isValidEmail(currentSearchString)) {
-
                     // If it's a valid email, make the styled box for the email to be invited
                     makeEmailPendingContact(currentSearchString);
                     $shareDialogInviteBG.removeClass('dropdown-visible');
                 }
-                else if ($contactDropdownWrapper.children().not('.selected').length > 0 &&
-                    currentSearchString.length > 0) {
-
+                else if (currentSearchString.length > 0 && !isContactsDropdownEmpty()) {
                     const handle = $contactDropdownWrapper
                         .children(':not(.selected):first')
                         .attr('data-contact-handle');
 
-                    makeRegularContactForInviting(handle);
+                    if (handle) {
+                        makeRegularContactForInviting(handle);
+                    }
+                    else {
+                        showErrorMessage(l[2465]);
+                        $contactSearchInput.focus();
+                    }
+
                     $shareDialogInviteBG.removeClass('dropdown-visible');
                 }
                 else if (currentSearchString.length !== 0) {
-
                     // Show Invalid Email error if input has value
                     showErrorMessage(l[2465]);
                     $contactSearchInput.focus();
@@ -2012,7 +2018,6 @@ lazy(mega.ui, 'mShareDialog', () => {
 
         // Add keydown handler for removing selected contact
         $contactSearchInput.rebind('keydown.searchcontact', function(event) {
-
             const currentSearchString = $(this).val();
             const keyCode = event.key;
 
@@ -2031,7 +2036,6 @@ lazy(mega.ui, 'mShareDialog', () => {
 
         // Add click handler for showing the list of contacts to choose from
         $selectedContactsContainer.rebind('click.clicksearchcontact', (event) => {
-
             // Do nothing when all contacts is selected
             if (checkIfAllContactsSelected(listOfContacts) || $contactDropdownWrapper.children().length === 0) {
                 $shareDialogInviteBG.removeClass('dropdown-visible');
@@ -2047,9 +2051,6 @@ lazy(mega.ui, 'mShareDialog', () => {
 
         // Initialise the permissions dropdown for inviting new contacts
         initPermissionsDropdown();
-
-        // Auto adjust the invite comment text area size when typing
-        autoAdjustInviteTextArea();
 
         // Initialise the Invite button
         initInviteButton();

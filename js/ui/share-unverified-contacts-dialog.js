@@ -6,6 +6,7 @@ lazy(mega.ui, 'mShareUnverifiedsDialog', () => {
     // DOM caches
     const $shareDialog = $('.mega-dialog.share-dialog', 'body');
     const $unverifiedContactsDialog = $('.mega-dialog.share-with-unverified-contacts', 'body');
+    const $contactItemsWrapper = $('.contact-items', $unverifiedContactsDialog);
 
     /**
      * Initialises and renders the Share With Unverified Contacts warning dialog
@@ -16,19 +17,17 @@ lazy(mega.ui, 'mShareUnverifiedsDialog', () => {
      * @returns {undefined}
      */
     function init(unverifiedContacts, nonContactEmails, emails, inviteNote) {
-
         const $unverifiedContactsDialog = $('.mega-dialog.share-with-unverified-contacts', 'body');
         const $contactItemTemplate = $('.contact-item-template', $unverifiedContactsDialog);
-        const $contactItemsWrapper = $('.contact-items', $unverifiedContactsDialog);
 
         let contactItemHtml = '';
 
         // Clear if re-rendering
         $contactItemsWrapper.empty();
+        removeScrollbar();
 
         // Loop through contacts
         for (let i = 0; i < unverifiedContacts.length; i++) {
-
             // Get more details about the contact
             const userHandle = unverifiedContacts[i].h;
             const name = unverifiedContacts[i].name;
@@ -62,6 +61,7 @@ lazy(mega.ui, 'mShareUnverifiedsDialog', () => {
             $contactItemsWrapper.addClass('visible-dividers');
         }
         else {
+            removeScrollbar();
             $contactItemsWrapper.removeClass('visible-dividers');
         }
 
@@ -73,7 +73,8 @@ lazy(mega.ui, 'mShareUnverifiedsDialog', () => {
 
         // Set dialog name - used in overall closeDialog() logic
         $.shareWithUnverifiedDialog = 'share-with-unverified-contacts';
-
+        onIdle(() => initPerfectScrollbar($('.contact-items.visible-dividers',
+                                            $unverifiedContactsDialog)));
         // Put the Share dialog to the back and open this dialog
         M.safeShowDialog('share-with-unverified-contacts', $unverifiedContactsDialog);
     }
@@ -86,8 +87,6 @@ lazy(mega.ui, 'mShareUnverifiedsDialog', () => {
      * @returns {undefined}
      */
     function initVerifyCredentialsButton(nonContactEmails, emails, inviteNote) {
-
-        const $contactItemsWrapper = $('.contact-items', $unverifiedContactsDialog);
         const $contactItem = $('.contact-item', $contactItemsWrapper);
         const $verifyCredentialsButton = $('.verify-credentials-button', $contactItem);
         const $shareToAllWithoutVerifyBtn = $('.share-all-without-verifying-button', $unverifiedContactsDialog);
@@ -138,6 +137,7 @@ lazy(mega.ui, 'mShareUnverifiedsDialog', () => {
 
                     // If there are 6 contacts or less, hide the dividers (no longer needed)
                     if (totalUnverifiedContacts <= 6) {
+                        removeScrollbar();
                         $contactItemsWrapper.removeClass('visible-dividers');
                     }
 
@@ -165,8 +165,6 @@ lazy(mega.ui, 'mShareUnverifiedsDialog', () => {
      * @returns {undefined}
      */
     function initShareWithoutVerifyingBtn(nonContactEmails, emails, inviteNote) {
-
-        const $contactItemsWrapper = $('.contact-items', $unverifiedContactsDialog);
         const $contactItem = $('.contact-item', $contactItemsWrapper);
         const $shareWithoutVerifyingButton = $('.share-without-verifying-button', $contactItem);
         const $shareToAllWithoutVerifyBtn = $('.share-all-without-verifying-button', $unverifiedContactsDialog);
@@ -195,6 +193,7 @@ lazy(mega.ui, 'mShareUnverifiedsDialog', () => {
 
             // If there are 6 contacts or less, hide the dividers (no longer needed)
             if (totalUnverifiedContacts <= 6) {
+                removeScrollbar();
                 $contactItemsWrapper.removeClass('visible-dividers');
             }
 
@@ -213,9 +212,7 @@ lazy(mega.ui, 'mShareUnverifiedsDialog', () => {
      * @returns {undefined}
      */
     function initShareToAllBtn(nonContactEmails, emails, inviteNote) {
-
         const $shareToAllWithoutVerifyBtn = $('.share-all-without-verifying-button', $unverifiedContactsDialog);
-        const $contactItemsWrapper = $('.contact-items', $unverifiedContactsDialog);
 
         $shareToAllWithoutVerifyBtn.rebind('click.shareToAllWithoutVerifying', () => {
 
@@ -251,14 +248,13 @@ lazy(mega.ui, 'mShareUnverifiedsDialog', () => {
      * @returns {undefined}
      */
     function close() {
-
+        removeScrollbar();
         // Update avatars in the contact search area of the Share dialog in case they were recently verified
         const $selectedContactsContainer = $('.selected-contacts-container', $shareDialog);
         const $selectedContacts = $('.contact-selected-item', $selectedContactsContainer);
 
         // Loop through the contacts in the input area
         $selectedContacts.toArray().forEach((contact) => {
-
             const $selectedContact = $(contact);
             const handleOrEmail = $selectedContact.attr('data-contact-handle');
 
@@ -281,6 +277,15 @@ lazy(mega.ui, 'mShareUnverifiedsDialog', () => {
             // Show the updated avatar (if it had changed)
             $avatarContainer.safeHTML(newAvatar);
         });
+    }
+
+    /**
+     * Remove the scrollbar from the contact items wrapper
+     *
+     * @returns {undefined}
+     */
+    function removeScrollbar() {
+        Ps.destroy($contactItemsWrapper[0]);
     }
 
     // Public API

@@ -23,7 +23,8 @@
     margin-top: 12px;
 }
 
-.mega-component.read-only-field.grouped:not(.hidden) + .read-only-field {
+.mega-component.read-only-field.grouped:not(.hidden) + .read-only-field,
+.mega-component.read-only-field.grouped:not(.hidden) + .mega-component.read-only-field.grouped.hidden + .read-only-field {
     border-top-left-radius: 0;
     border-top-right-radius: 0;
 }

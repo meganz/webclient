@@ -81,7 +81,6 @@ class MegaReadOnlyField extends MegaComponent {
             this.strengthCheck = document.createElement('div');
             this.strengthCheck.className = 'read-only-help';
             this.strenghtText = document.createElement('span');
-            this.strenghtText.textContent = 'test';
             this.strengthCheck.appendChild(this.strenghtText);
             this.strenghtIcon = document.createElement('i');
             this.strenghtIcon.className = 'sprite-pm-mono';

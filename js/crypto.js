@@ -2848,7 +2848,7 @@ function crypto_setsharekey(h, k, ignoreDB, fromKeyMgr) {
     assert(crypto_setsharekey2(h, k), 'Invalid setShareKey() invocation...');
 
     if (!fromKeyMgr && !pfid) {
-        mega.keyMgr.createShare(h, k, true).catch(dump);
+        mega.keyMgr.createShare(h, true).catch(reportError);
     }
 
     if (sharemissing[h]) {

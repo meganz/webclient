@@ -1942,8 +1942,8 @@ mBroadcaster.once('boot_done', function populate_l() {
     ]) {
 
         l[key] = escapeHTML(l[key])
-            .replaceAll('[S]', '"<span class="long-title-truncate">')
-            .replaceAll('[/S]', '</span>"');
+            .replace(/\[S]/g, '"<span class="long-title-truncate">')
+            .replace(/\[\/S]/g, '</span>"');
     }
 
     l.request_failed = escapeHTML(l.request_failed)

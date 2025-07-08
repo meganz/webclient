@@ -2,7 +2,20 @@
  * Authentication dialogs
 */
 
+.it-dialog.auth-dialog {
+    max-width: 50%;
+    width: 100%;
+}
+
 /* Content */
+
+.it-dialog.auth-dialog .icon-size-32 {
+    --icon-size: 32px;
+}
+
+.it-dialog.auth-dialog > .body > .content {
+    justify-content: center;
+}
 
 .it-dialog.auth-dialog  .scroll-area > .content-body {
     align-items: center;
@@ -15,19 +28,11 @@
     padding: 0 24px;
 }
 
-.it-dialog.auth-dialog .illustration-body.auth {
-    max-width: 1200px;
-}
-
 .it-dialog.auth-dialog .it-logo {
     background-size: auto 64px; 
     height: 64px;
     width: 64px;
     margin: 0 0 48px;
-}
-
-.it-dialog.auth-dialog .img1 {
-    content: var(--url-login-img);
 }
 
 .it-dialog.auth-dialog p {
@@ -37,7 +42,7 @@
 }
 
 .it-dialog.auth-dialog .scroll-area {
-    margin: 48px 0;
+    margin: 24px 0;
 }
  
 .it-dialog.auth-dialog form {
@@ -114,7 +119,11 @@
 /* Adaptive layout */
 
 @media only screen and (max-width: 960px) {
-    
+
+    .it-dialog.auth-dialog {
+        max-width: 500px;
+    }
+
     .it-dialog.auth-dialog > .body {
         padding: 24px 6px;
     }

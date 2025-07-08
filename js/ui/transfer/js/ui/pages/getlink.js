@@ -747,6 +747,7 @@ lazy(T.ui, 'addFilesLayout', () => {
 
                 const emails = T.ui.input.getValue(rn);
 
+                const {value: title} = document.getElementById('glb-title-input');
                 const {value: sender} = document.getElementById('glb-email-input');
                 const {value: message} = document.getElementById('glb-msg-area');
                 const {value: password} = document.getElementById('glb-password-input');
@@ -757,7 +758,7 @@ lazy(T.ui, 'addFilesLayout', () => {
                 const p = [];
                 if (sender || message || password || parseInt(expiry) > 0) {
                     const en = cn.querySelector('.exp-notif input').checked | 0;
-                    p.push(T.core.setTransferAttributes(xh, {sender, message, password, expiry, en}));
+                    p.push(T.core.setTransferAttributes(xh, {title, sender, message, password, expiry, en}));
                 }
 
                 if (emails.length) {

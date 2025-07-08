@@ -18,6 +18,10 @@
     max-width: 400px;
 }
 
+.en .subpage-box .cmpr-head p {
+    max-width: 330px;
+}
+
 .subpage-box .cmpr-head-media {
     position: absolute;
     left: 50%;

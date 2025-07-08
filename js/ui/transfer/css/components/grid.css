@@ -380,12 +380,20 @@
     font: var(--text-body-sm);
 }
 
+.it-grid-info.md-size {
+    font: var(--text-caption-lg);
+}
+
 .it-grid-info.bold {
     font-weight: 700;
 }
 
 .it-grid-info .num {
     color: var(--main-neutral-primary);
+}
+
+.it-grid-info .num.secondary {
+    color: var(--main-neutral-secondary);
 }
 
 .it-grid-info .num::after {

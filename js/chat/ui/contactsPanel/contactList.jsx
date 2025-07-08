@@ -92,6 +92,7 @@ class ContactList extends MegaRenderMixin {
      */
 
     handleContextMenu(ev, handle) {
+        ev.preventDefault();
         ev.persist();
         if (this.state.selected.length > 1) {
             // Do not show the context menu if select multiple contacts

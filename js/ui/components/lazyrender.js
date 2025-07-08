@@ -37,7 +37,9 @@ lazy(MegaLazyRenderComponent, 'observer', () => {
                 const isVisible = !(entry.intersectionRatio < 0.2 && !entry.isIntersecting);
                 if (isVisible && component._toRender) {
                     MegaLazyRenderComponent.observer.unobserve(entry.target);
-                    component.doRender().catch(reportError);
+                    component.doRender().then(() => {
+                        component.skLoading = false;
+                    }).catch(reportError);
                     delete component._toRender;
                 }
             }

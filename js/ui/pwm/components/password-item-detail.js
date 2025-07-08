@@ -326,7 +326,9 @@ class MegaPasswordItemDetail {
 
         this.cardholderNameField.toggleClass('hidden', !u);
         this.cardNumberField.toggleClass('hidden', !nu);
+        this.cardNumberField.toggleClass('grouped', !!exp || !!cvv);
         this.cardExpiryField.toggleClass('hidden', !exp);
+        this.cardExpiryField.toggleClass('grouped', !!cvv);
         this.cardCvvField.toggleClass('hidden', !cvv);
         this.notesField.toggleClass('hidden', !n);
 

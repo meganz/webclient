@@ -521,6 +521,9 @@ a.is-sensitive img {
     width: var(--avatar-size);
     position: relative;
 }
+.mega-node.user .avatar.sk-loading {
+    padding: 0;
+}
 .mega-node.user .avatar div span {
     border-radius: inherit;
     font-family: var(--text-font-family);

@@ -8867,6 +8867,27 @@ div.camera-bottom-txt {
 .user-management-tree-panel-header.active i {
     transform: rotate(90deg);
 }
+.content-panel.account .settings-back {
+    background: transparent;
+    border-radius: 4px;
+    color: var(--mobile-icon-primary);
+    cursor: pointer;
+    height: 36px;
+    margin-inline-end: 4px;
+    padding: 6px;
+    width: 36px;
+    --icon-size: 24px;
+}
+.content-panel.account .nav-elem.settings-back:hover i,
+.content-panel.account .nav-elem.settings-back:active i {
+    opacity: 1;
+}
+.content-panel.account .nav-elem.settings-back:hover {
+    background: var(--mobile-button-outline-background-hover);
+}
+.content-panel.account .nav-elem.settings-back:active {
+    background: var(--mobile-button-disabled);
+}
 
 .content-panel.user-management {
     box-sizing: border-box;

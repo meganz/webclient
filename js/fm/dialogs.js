@@ -1417,7 +1417,6 @@
     global.openNewSharedFolderDialog = async function openNewSharedFolderDialog() {
         const target = await selectFolderDialog().catch(dump);
         if (target) {
-            M.addSelectedNodes(target);
             return mega.ui.mShareDialog.init(target);
         }
     };

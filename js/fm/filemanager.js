@@ -3367,7 +3367,7 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
             return false;
         }
         let h = $(e.currentTarget).attr('id');
-        const n = M.getNodeByHandle(h);
+        const n = !missingkeys[h] && M.getNodeByHandle(h);
 
         if (!n) {
             return false;

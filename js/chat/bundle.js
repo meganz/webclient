@@ -599,7 +599,9 @@ class Sidebar extends mixins.w9 {
     this.renderChatView = () => {
       const {
         chatRoom,
-        onDeleteMessage
+        typingAreaText,
+        onDeleteMessage,
+        onTypingAreaChanged
       } = this.props;
       return REaCt().createElement(REaCt().Fragment, null, this.renderHead({
         title: l.chats
@@ -613,7 +615,9 @@ class Sidebar extends mixins.w9 {
       }), REaCt().createElement(composedTextArea.A, {
         chatRoom,
         parent: this,
-        containerRef: this.domRef
+        containerRef: this.domRef,
+        typingAreaText,
+        onTypingAreaChanged
       }));
     };
   }
@@ -2018,7 +2022,9 @@ class Call extends mixins.w9 {
       call,
       chatRoom,
       parent,
-      onDeleteMessage
+      typingAreaText,
+      onDeleteMessage,
+      onTypingAreaChanged
     } = this.props;
     const {
       mode,
@@ -2103,6 +2109,7 @@ class Call extends mixins.w9 {
     })), sidebar && REaCt().createElement(Sidebar, (0,esm_extends.A)({}, STREAM_PROPS, {
       guest,
       initialCallRinging,
+      typingAreaText,
       onGuestClose: () => this.setState({
         guest: false
       }),
@@ -2111,7 +2118,8 @@ class Call extends mixins.w9 {
       }),
       onDeleteMessage,
       onCallMinimize: this.handleCallMinimize,
-      onInviteToggle: () => this.handleInviteOrAdd()
+      onInviteToggle: () => this.handleInviteOrAdd(),
+      onTypingAreaChanged
     })), minimized ? null : REaCt().createElement(REaCt().Fragment, null, this.renderRecordingControl(), REaCt().createElement(streamControls.Ay, {
       call,
       minimized,
@@ -2414,7 +2422,9 @@ const dropdowns = REQ_(911);
 const ComposedTextArea = ({
   chatRoom,
   parent,
-  containerRef
+  containerRef,
+  typingAreaText,
+  onTypingAreaChanged
 }) => REaCt().createElement("div", {
   className: "chat-textarea-block"
 }, REaCt().createElement(WhosTyping, {
@@ -2425,6 +2435,8 @@ const ComposedTextArea = ({
   containerRef,
   disabled: chatRoom.isReadOnly(),
   persist: true,
+  text: typingAreaText,
+  onValueChanged: onTypingAreaChanged,
   onUpEditPressed: () => {
     const keys = chatRoom.messagesBuff.messages.keys();
     for (let i = keys.length; i--;) {
@@ -18057,7 +18069,8 @@ const ConversationPanel = (conversationpanel_dec = utils.Ay.SoonFcWrap(360), _de
       callUserLimit: false,
       historyTimeOutBanner: DISMISS_TRANSITIONS.NOT_SHOWN,
       renameDialog: false,
-      renameDialogValue: undefined
+      renameDialogValue: undefined,
+      typingAreaText: ''
     };
     this.RenameDialog = () => {
       const {
@@ -18200,6 +18213,11 @@ const ConversationPanel = (conversationpanel_dec = utils.Ay.SoonFcWrap(360), _de
           ...state,
           pushSettingsValue
         }, () => pushNotificationSettings.setDnd(chatRoom.chatId, pushSettingsValue === Infinity ? 0 : unixtime() + pushSettingsValue * 60))
+      });
+    };
+    this.updateTypingAreaText = value => {
+      this.setState({
+        typingAreaText: value
       });
     };
     const {
@@ -18822,6 +18840,7 @@ const ConversationPanel = (conversationpanel_dec = utils.Ay.SoonFcWrap(360), _de
       peers: room.call.peers,
       call: room.call,
       minimized: this.state.callMinimized,
+      typingAreaText: this.state.typingAreaText,
       onCallMinimize: () => {
         return this.state.callMinimized ? null : this.setState({
           callMinimized: true
@@ -18854,6 +18873,7 @@ const ConversationPanel = (conversationpanel_dec = utils.Ay.SoonFcWrap(360), _de
       }, () => minimised ? null : this.toggleExpandedFlag()),
       onCallEnd: () => this.safeForceUpdate(),
       onDeleteMessage: msg => this.handleDeleteDialog(msg),
+      onTypingAreaChanged: this.updateTypingAreaText,
       parent: this
     }), megaChat.initialPubChatHandle && room.publicChatHandle === megaChat.initialPubChatHandle && !room.call && room.isMeeting && !room.call && room.activeCallIds.length > 0 && REaCt().createElement(Join, {
       initialView: u_type || is_eplusplus ? Join.VIEW.ACCOUNT : Join.VIEW.INITIAL,
@@ -19087,7 +19107,9 @@ const ConversationPanel = (conversationpanel_dec = utils.Ay.SoonFcWrap(360), _de
     }, l[20597])) : REaCt().createElement(composedTextArea.A, {
       chatRoom: room,
       parent: this,
-      containerRef: this.messagesBlockRef
+      containerRef: this.messagesBlockRef,
+      typingAreaText: this.state.typingAreaText,
+      onTypingAreaChanged: this.updateTypingAreaText
     }))));
   }
 }, (0,applyDecoratedDescriptor.A)(conversationpanel_class.prototype, "onMouseMove", [conversationpanel_dec], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "onMouseMove"), conversationpanel_class.prototype), (0,applyDecoratedDescriptor.A)(conversationpanel_class.prototype, "render", [_dec2], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "render"), conversationpanel_class.prototype), conversationpanel_class);
@@ -31424,7 +31446,6 @@ const TypingArea = (_dec = (0,mixins.hG)(54, true), _class = class TypingArea ex
     this.domRef = REaCt().createRef();
     this.state = {
       emojiSearchQuery: false,
-      typedMessage: '',
       textareaHeight: 20,
       gifPanelActive: false
     };
@@ -31460,12 +31481,14 @@ const TypingArea = (_dec = (0,mixins.hG)(54, true), _class = class TypingArea ex
     slug = slug[0] === ':' || slug.substr(-1) === ':' ? slug : `:${slug}:`;
     const textarea = $('.messages-textarea', this.domRef.current)[0];
     const cursorPosition = this.getCursorPosition(textarea);
-    this.setState({
-      typedMessage: this.state.typedMessage.slice(0, cursorPosition) + slug + this.state.typedMessage.slice(cursorPosition)
-    }, () => {
-      textarea.selectionEnd = cursorPosition + slug.length;
-      this.onTypeAreaChange(e, this.state.typedMessage);
-    });
+    const {
+      text,
+      onValueChanged
+    } = this.props;
+    const val = text.slice(0, cursorPosition) + slug + text.slice(cursorPosition);
+    onValueChanged(val);
+    textarea.selectionEnd = cursorPosition + slug.length;
+    this.onTypeAreaChange(e, val);
   }
   stoppedTyping() {
     if (this.props.disabled || !this.props.chatRoom) {
@@ -31493,8 +31516,8 @@ const TypingArea = (_dec = (0,mixins.hG)(54, true), _class = class TypingArea ex
       return;
     }
     let shouldTriggerUpdate = forced ? forced : false;
-    if (!shouldTriggerUpdate && self.state.typedMessage !== self.lastTypedMessage) {
-      self.lastTypedMessage = self.state.typedMessage;
+    if (!shouldTriggerUpdate && self.props.text !== self.lastTypedMessage) {
+      self.lastTypedMessage = self.props.text;
       shouldTriggerUpdate = true;
     }
     if (!shouldTriggerUpdate) {
@@ -31513,9 +31536,7 @@ const TypingArea = (_dec = (0,mixins.hG)(54, true), _class = class TypingArea ex
   }
   onCancelClicked() {
     const self = this;
-    self.setState({
-      typedMessage: ""
-    });
+    self.props.onValueChanged('');
     if (self.props.chatRoom && self.iAmTyping) {
       self.stoppedTyping();
     }
@@ -31529,9 +31550,7 @@ const TypingArea = (_dec = (0,mixins.hG)(54, true), _class = class TypingArea ex
     }
     const val = $.trim($('.chat-textarea:visible textarea:visible', this.domRef.current).val());
     if (self.onConfirmTrigger(val) !== true) {
-      self.setState({
-        typedMessage: ""
-      });
+      self.props.onValueChanged('');
     }
     if (self.props.chatRoom && self.iAmTyping) {
       self.stoppedTyping();
@@ -31579,9 +31598,7 @@ const TypingArea = (_dec = (0,mixins.hG)(54, true), _class = class TypingArea ex
         return;
       }
       if (self.onConfirmTrigger(val) !== true) {
-        self.setState({
-          typedMessage: ""
-        });
+        self.props.onValueChanged('');
         $(document).trigger('closeDropdowns');
       }
       e.preventDefault();
@@ -31612,9 +31629,7 @@ const TypingArea = (_dec = (0,mixins.hG)(54, true), _class = class TypingArea ex
         let content = element.value;
         const cursorPos = self.getCursorPosition(element);
         content = `${content.substring(0, cursorPos)  }\n${  content.substring(cursorPos, content.length)}`;
-        self.setState({
-          typedMessage: content
-        });
+        self.props.onValueChanged(content);
         self.onUpdateCursorPosition = cursorPos + 1;
         e.preventDefault();
       } else if ($.trim(val).length === 0) {
@@ -31699,10 +31714,8 @@ const TypingArea = (_dec = (0,mixins.hG)(54, true), _class = class TypingArea ex
     }
     const self = this;
     value = String(value || e.target.value || '').replace(/^\s+/, '');
-    if (self.state.typedMessage !== value) {
-      self.setState({
-        typedMessage: value
-      });
+    if (self.props.text !== value) {
+      self.props.onValueChanged(value);
       self.forceUpdate();
     }
     if (value.length) {
@@ -31772,7 +31785,8 @@ const TypingArea = (_dec = (0,mixins.hG)(54, true), _class = class TypingArea ex
     const {
       chatRoom,
       initialText,
-      persist
+      persist,
+      onValueChanged
     } = this.props;
     const {
       megaChat,
@@ -31784,10 +31798,8 @@ const TypingArea = (_dec = (0,mixins.hG)(54, true), _class = class TypingArea ex
     if (persist && persistedTypeArea) {
       if (!initialText) {
         persistedTypeArea.getPersistedTypedValue(chatRoom).then(res => {
-          if (res && this.isMounted() && !this.state.typedMessage) {
-            this.setState({
-              'typedMessage': res
-            });
+          if (res && this.isMounted() && !this.props.text) {
+            onValueChanged(res);
           }
         }).catch(ex => {
           if (this.logger && ex !== undefined) {
@@ -31797,9 +31809,7 @@ const TypingArea = (_dec = (0,mixins.hG)(54, true), _class = class TypingArea ex
       }
       persistedTypeArea.addChangeListener(this.getUniqueId(), (e, k, v) => {
         if (roomId === k) {
-          this.setState({
-            'typedMessage': v || ''
-          });
+          onValueChanged(v || '');
           this.triggerOnUpdate(true);
         }
       });
@@ -31833,7 +31843,7 @@ const TypingArea = (_dec = (0,mixins.hG)(54, true), _class = class TypingArea ex
     const $node = this.$node = this.$node || this.domRef.current;
     const $textarea = this.$textarea = this.$textarea || $('textarea:first', $node);
     const $scrollBlock = this.$scrollBlock = this.$scrollBlock || $textarea.closest('.textarea-scroll');
-    const $preview = $('.message-preview', $scrollBlock).safeHTML(`${escapeHTML($textarea.val()).replace(/\n/g, '<br />')} <br>`);
+    const $preview = $('.message-preview', $scrollBlock).safeHTML(`${escapeHTML(this.props.text).replace(/\n/g, '<br />')} <br>`);
     const textareaHeight = $preview.height();
     $scrollBlock.height(Math.min(textareaHeight, this.getTextareaMaxHeight()));
     if (textareaHeight !== this._lastTextareaHeight) {
@@ -31921,10 +31931,10 @@ const TypingArea = (_dec = (0,mixins.hG)(54, true), _class = class TypingArea ex
         emojiSearchQuery: self.state.emojiSearchQuery,
         emojiStartPos: self.state.emojiStartPos,
         emojiEndPos: self.state.emojiEndPos,
-        typedMessage: self.state.typedMessage,
+        typedMessage: self.props.text,
         onPrefill (e, emojiAlias) {
           if ($.isNumeric(self.state.emojiStartPos) && $.isNumeric(self.state.emojiEndPos)) {
-            const msg = self.state.typedMessage;
+            const msg = self.props.text;
             const pre = msg.substr(0, self.state.emojiStartPos);
             let post = msg.substr(self.state.emojiEndPos + 1, msg.length);
             const startPos = self.state.emojiStartPos;
@@ -31940,14 +31950,14 @@ const TypingArea = (_dec = (0,mixins.hG)(54, true), _class = class TypingArea ex
               self.onUpdateCursorPosition++;
             }
             self.setState({
-              'typedMessage': pre + emojiAlias + post,
               'emojiEndPos': endPos
             });
+            self.props.onValueChanged(pre + emojiAlias + post);
           }
         },
         onSelect (e, emojiAlias, forceSend) {
           if ($.isNumeric(self.state.emojiStartPos) && $.isNumeric(self.state.emojiEndPos)) {
-            const msg = self.state.typedMessage;
+            const msg = self.props.text;
             const pre = msg.substr(0, self.state.emojiStartPos);
             let post = msg.substr(self.state.emojiEndPos + 1, msg.length);
             if (post.substr(0, 2) == "::" && emojiAlias.substr(-1) == ":") {
@@ -31958,16 +31968,14 @@ const TypingArea = (_dec = (0,mixins.hG)(54, true), _class = class TypingArea ex
             const val = pre + emojiAlias + post;
             self.prefillMode = false;
             self.setState({
-              'typedMessage': val,
               'emojiSearchQuery': false,
               'emojiStartPos': false,
               'emojiEndPos': false
             });
+            self.props.onValueChanged(val);
             if (forceSend) {
               if (self.onConfirmTrigger($.trim(val)) !== true) {
-                self.setState({
-                  typedMessage: ""
-                });
+                self.props.onValueChanged('');
               }
             }
           }
@@ -32037,7 +32045,7 @@ const TypingArea = (_dec = (0,mixins.hG)(54, true), _class = class TypingArea ex
       }
     }, REaCt().createElement("div", {
       className: "messages-textarea-placeholder"
-    }, self.state.typedMessage ? null : REaCt().createElement(utils.zT, null, (l[18763] || `Write message to \u201c%s\u201d\u2026`).replace('%s', room.getRoomTitle()))), REaCt().createElement("textarea", {
+    }, self.props.text ? null : REaCt().createElement(utils.zT, null, (l[18763] || `Write message to \u201c%s\u201d\u2026`).replace('%s', room.getRoomTitle()))), REaCt().createElement("textarea", {
       className: `
                                 ${"messages-textarea"}
                                 ${disabledTextarea ? 'disabled' : ''}
@@ -32049,7 +32057,7 @@ const TypingArea = (_dec = (0,mixins.hG)(54, true), _class = class TypingArea ex
       onCopyCapture: this.onCopyCapture,
       onPasteCapture: this.onPasteCapture,
       onCutCapture: this.onCutCapture,
-      value: self.state.typedMessage,
+      value: self.props.text,
       style: textareaStyles,
       disabled: disabledTextarea,
       readOnly: disabledTextarea
@@ -35455,6 +35463,12 @@ const perfectScrollbar = REQ_(486);
 
 
 class Text extends AbstractGenericMessage {
+  constructor(props) {
+    super(props);
+    this.state = {
+      editText: ''
+    };
+  }
   isRichPreview(message) {
     return message.metaType === Message.MESSAGE_META_TYPE.RICH_PREVIEW;
   }
@@ -35672,6 +35686,7 @@ class Text extends AbstractGenericMessage {
       messageDisplayBlock = REaCt().createElement(typingArea.T, {
         iconClass: "small-icon writing-pen textarea-icon",
         initialText: msgContents,
+        text: this.state.editText || msgContents,
         chatRoom,
         showButtons: true,
         editing: true,
@@ -35693,7 +35708,12 @@ class Text extends AbstractGenericMessage {
           }
           return true;
         },
-        onResized: this.props.onResized ? this.props.onResized : false
+        onResized: this.props.onResized ? this.props.onResized : false,
+        onValueChanged: val => {
+          this.setState({
+            editText: val
+          });
+        }
       });
     } else {
       if (message.updated > 0 && !message.metaType) {

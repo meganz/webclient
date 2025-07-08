@@ -68,7 +68,7 @@ export default class Sidebar extends MegaRenderMixin {
     };
 
     renderChatView = () => {
-        const { chatRoom, onDeleteMessage } = this.props;
+        const { chatRoom, typingAreaText, onDeleteMessage, onTypingAreaChanged } = this.props;
 
         return (
             <>
@@ -81,7 +81,13 @@ export default class Sidebar extends MegaRenderMixin {
                     className="in-call"
                     onDeleteClicked={onDeleteMessage}
                 />
-                <ComposedTextArea chatRoom={chatRoom} parent={this} containerRef={this.domRef} />
+                <ComposedTextArea
+                    chatRoom={chatRoom}
+                    parent={this}
+                    containerRef={this.domRef}
+                    typingAreaText={typingAreaText}
+                    onTypingAreaChanged={onTypingAreaChanged}
+                />
             </>
         );
     };

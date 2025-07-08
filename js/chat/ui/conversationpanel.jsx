@@ -1449,7 +1449,8 @@ export class ConversationPanel extends MegaRenderMixin {
         callUserLimit: false,
         historyTimeOutBanner: DISMISS_TRANSITIONS.NOT_SHOWN,
         renameDialog: false,
-        renameDialogValue: undefined
+        renameDialogValue: undefined,
+        typingAreaText: '',
     };
 
     constructor(props) {
@@ -1880,6 +1881,10 @@ export class ConversationPanel extends MegaRenderMixin {
     isActive() {
         return document.hasFocus() && this.$messages && this.$messages.is(":visible");
     }
+
+    updateTypingAreaText = (value) => {
+        this.setState({typingAreaText: value});
+    };
 
     @timing(0.7, 9)
     render() {
@@ -2358,6 +2363,7 @@ export class ConversationPanel extends MegaRenderMixin {
                         peers={room.call.peers}
                         call={room.call}
                         minimized={this.state.callMinimized}
+                        typingAreaText={this.state.typingAreaText}
                         onCallMinimize={() => {
                             return this.state.callMinimized ?
                                 null :
@@ -2391,6 +2397,7 @@ export class ConversationPanel extends MegaRenderMixin {
                         }
                         onCallEnd={() => this.safeForceUpdate()}
                         onDeleteMessage={msg => this.handleDeleteDialog(msg)}
+                        onTypingAreaChanged={this.updateTypingAreaText}
                         parent={this}
                     />
                 )}
@@ -2776,7 +2783,13 @@ export class ConversationPanel extends MegaRenderMixin {
                                     {l[20597] /* `Join Group` */}
                                 </div>
                             </div> :
-                            <ComposedTextArea chatRoom={room} parent={this} containerRef={this.messagesBlockRef}/>
+                            <ComposedTextArea
+                                chatRoom={room}
+                                parent={this}
+                                containerRef={this.messagesBlockRef}
+                                typingAreaText={this.state.typingAreaText}
+                                onTypingAreaChanged={this.updateTypingAreaText}
+                            />
                         }
                     </div>
                 </div>

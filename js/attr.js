@@ -431,10 +431,12 @@
                 api.req(payload, ATTR_REQ_CHANNEL[attribute])
                     .then(({result}) => settleFunction(result))
                     .catch((ex) => {
-                        if (ex !== ENOENT) {
+                        const ec = Number(ex);
+
+                        if (ec !== ENOENT) {
                             logger.warn(attribute, ex);
                         }
-                        settleFunction(ex);
+                        settleFunction(ec || ex);
                     });
             }
         };

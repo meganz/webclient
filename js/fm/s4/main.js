@@ -37,13 +37,17 @@ lazy(s4, 'main', () => {
         ce('b', node).textContent =  canEnable ?
             l.s4_activation_included_info : l.s4_activation_upgrade_info;
 
+        // Buttons wrap
+        const subNode = ce('div', node);
+
         node = new MegaButton({
-            parentNode: node,
-            text: canEnable ? l.s4_activation_enable : l.explore_now_btn,
+            parentNode: subNode,
+            text: canEnable ? l.s4_activation_enable : l[129],
             componentClassname: 'primary semibold theme-dark-forced',
             onClick: () => {
                 if (!canEnable) {
-                    rd('mega.io', 'objectstorage', 500858);
+                    eventlog(500887);
+                    loadSubPage('pro');
                     return false;
                 }
                 eventlog(500857);
@@ -55,12 +59,23 @@ lazy(s4, 'main', () => {
             }
         });
 
+        if (!canEnable) {
+            node = new MegaButton({
+                parentNode: subNode,
+                text: l.explore_more_btn,
+                componentClassname: 'outline no-active semibold theme-dark-forced',
+                onClick: () => rd('mega.io', 'objectstorage', 500858)
+            });
+        }
+
         node = ce('div', wrapNode);
         ce('i', node, { class: 's4-icon icon-glass' });
 
         // Terms
         if (canEnable) {
-            node = ce('p', bodyNode, { class: 'terms' }).append(parseHTML(l.s4_activation_terms));
+            node = ce('p', bodyNode, { class: 'terms' });
+            ce('b', node).textContent = l.s4_encryption_details;
+            node.append(parseHTML(` ${l.s4_activation_terms}`));
         }
 
         // Learn more sub-section
@@ -78,7 +93,10 @@ lazy(s4, 'main', () => {
             rightIcon: 'sprite-fm-mono icon-arrow-left-thin-solid rotate-180 primary-color',
             rightIconSize: 24,
             text: l.read_guide_btn,
-            onClick: () => rd('github.com', 'meganz/s4-specs', 500855)
+            onClick: () => {
+                eventlog(500855);
+                window.open('https://github.com/meganz/s4-specs', '_blank', 'noopener,noreferrer');
+            }
         });
 
         node = ce('div', wrapNode, { class: 'col' });

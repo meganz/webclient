@@ -2281,6 +2281,7 @@ function closeDialog(ev) {
         delete $.saveAsDialog;
         delete $.nodeSaveAs;
         delete $.shareDialog;
+        delete $.fileRequestNew;
 
         /* copy/move dialog - save to */
         delete $.saveToDialogCb;

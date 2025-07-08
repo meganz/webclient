@@ -840,6 +840,9 @@ MegaData.prototype.copyNodes = async function(cn, t, del, tree) {
                 // 2. check for conflicts
                 if (t !== M.RubbishID) {
                     const files = await fileconflict.check(cn, t, 'copy');
+                    if (!files || !files.length) {
+                        throw EBLOCKED;
+                    }
 
                     handles.length = 0;
                     for (let i = files.length; i--;) {

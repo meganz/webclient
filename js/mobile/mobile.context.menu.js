@@ -731,34 +731,36 @@ mBroadcaster.once('boot_done', () => {
             icon: 'sprite-mobile-fm-mono icon-rotate-cw-thin-outline',
             subMenu: false,
             classNames: '',
-            onClick: async(nodeHandle) => {
+            onClick: (nodeHandle) => {
                 if (!validateUserAction()) {
                     return false;
                 }
 
                 const node = M.getNodeByHandle(nodeHandle);
-                const restored = await mobile.rubbishBin.restore(nodeHandle).catch(dump);
-                const target_keys = restored && typeof restored === 'object' && Object.keys(restored);
-                const target = target_keys && target_keys.length ? target_keys[0] : false;
+                M.revertRubbishNodes(nodeHandle)
+                    .then((restored) => {
+                        const target_keys = restored && typeof restored === 'object' && Object.keys(restored);
+                        const target = target_keys && target_keys.length ? target_keys[0] : false;
+                        if (!mobile.cloud.nodeInView(nodeHandle) || target && sharer(target)) {
+                            const msg = mega.icu.format(
+                                l[`mobile_${node.t ? 'folder' : 'file'}_restored_from_bin`], 1
+                            );
 
-                if (!mobile.cloud.nodeInView(nodeHandle) || target && sharer(target)) {
-                    const msg = mega.icu.format(
-                        l[`mobile_${node.t ? 'folder' : 'file'}_restored_from_bin`], 1
-                    );
+                            const nodeParent = node.rr || node.p;
 
-                    const nodeParent = node.rr || node.p;
-
-                    // toast message
-                    mega.ui.toast.show(
-                        msg, 4, l[16797], {
-                            actionButtonCallback: () => {
-                                M.openFolder(nodeParent)
-                                    .finally(() => {
-                                        $.selected = [nodeHandle];
-                                    });
-                                return false;
-                            }});
-                }
+                            // toast message
+                            mega.ui.toast.show(
+                                msg, 4, l[16797], {
+                                    actionButtonCallback: () => {
+                                        M.openFolder(nodeParent)
+                                            .finally(() => {
+                                                $.selected = [nodeHandle];
+                                            });
+                                        return false;
+                                    }});
+                        }
+                    })
+                    .catch((ex) => ex !== EBLOCKED && tell(ex));
             }
         },
         '.leaveshare-item': {

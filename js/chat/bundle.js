@@ -3981,6 +3981,7 @@ class ContactList extends mixins.w9 {
     });
   }
   handleContextMenu(ev, handle) {
+    ev.preventDefault();
     ev.persist();
     if (this.state.selected.length > 1) {
       return null;

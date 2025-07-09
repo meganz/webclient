@@ -1524,11 +1524,7 @@ var addressDialog = {
             $('.payment-plan-price', this.$dialog).toggleClass('hidden', !!trial);
 
             if (trial) {
-                const trailText = l.after_trial_card_charged_m
-                    .replace('%1', trial.days)
-                    .replace('%2', formatCurrency(selectedPackage[pro.UTQA_RES_INDEX_PRICE]));
-
-                $freeTrial.filter('.free-trial-info').text(trailText);
+                $freeTrial.filter('.free-trial-info').text(l.after_trial_card_charged_m);
             }
 
 

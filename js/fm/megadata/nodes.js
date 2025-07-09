@@ -2707,7 +2707,7 @@ MegaData.prototype.getCopyNodesSync = function(blk) {
  */
 MegaData.prototype.getShareNodes = async function(h, root, findShareKeys) {
     'use strict';
-    if (!this.d[h]) {
+    if (!this.d[h] || this.d[h].t && !this.c[h]) {
         await dbfetch.acquire(h);
     }
     const out = root || {};

@@ -1453,7 +1453,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
 }
 
 SelectionManager2_DOM.selectionContextItemMap = freeze({
-    'download': '.download-item',
+    'download': ['.download-item', '.download-standart-item', '.zipdownload-item'],
     'link': '.getlink-item',
     'share': '.sh4r1ng-item',
     'manage-file-request': '.file-request-manage.file-request-page',

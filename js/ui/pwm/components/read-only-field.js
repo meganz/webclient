@@ -174,6 +174,7 @@ class MegaReadOnlyField extends MegaComponent {
 
             // Visible state
             if (this._visible) {
+                this.valueSpan.classList.remove('monospace-mask');
                 if (this.maskType === 'password') {
                     const frag = mega.ui.pm.utils.colorizedPassword(this._originalValue);
                     this.valueSpan.appendChild(frag);
@@ -189,6 +190,7 @@ class MegaReadOnlyField extends MegaComponent {
                 }
             }
             else {
+                this.valueSpan.classList.add('monospace-mask');
                 let masked;
                 if (this.maskType === 'password') {
                     masked = '\u2022'.repeat(16);

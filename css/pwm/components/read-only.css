@@ -48,7 +48,10 @@
     font: var(--mobile-font-input-regular);
     margin-right: 16px;
     flex: 1;
-    letter-spacing: 0.001em;
+}
+
+.read-only-field .read-only-output .read-only-value.monospace-mask {
+    font-family: monospace;
 }
 
 .mega-component.read-only-field .read-only-output .read-only-value.password-colorized span {

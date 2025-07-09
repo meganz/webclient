@@ -421,7 +421,7 @@ class MegaPasswordItemDetail {
             isLink,
             help,
             actions,
-            onClick: handleCopy
+            ...(isLink ? {} : {onClick: handleCopy})
         });
     }
 }

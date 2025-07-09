@@ -62,6 +62,8 @@ lazy(pro, 'proplan2', () => {
     let VpnPlanFound = false;
     let PwmPlanFound = false;
 
+    const allowedPeriods = new Set([1, 12]);
+
     /**
      * @type {PricingPageInformation}
      */
@@ -404,7 +406,10 @@ lazy(pro, 'proplan2', () => {
             }
             else if (tab === 3 && tabAvailable('vpn')) {
                 if (!tabsInfo.vpn.initialized) {
-                    tabsInfo.vpn.$planCards = pro.proplan2.vpn.renderPricingPage(VpnPlanFound, $page, moveToBuyStep);
+                    tabsInfo.vpn.$planCards = pro.proplan2.vpn.renderPricingPage(VpnPlanFound, $page, (months, al) => {
+                        sessionStorage.setItem('pro.period', String(months));
+                        moveToBuyStep(al);
+                    });
                     tabsInfo.vpn.initialized = true;
                     tabsInfo.vpn.updateTabVisibility();
                     tabsInfo.vpn.requiresUpdate = true;
@@ -413,7 +418,10 @@ lazy(pro, 'proplan2', () => {
             }
             else if (tab === 4 && tabAvailable('pwm')) {
                 if (!tabsInfo.pwm.initialized) {
-                    tabsInfo.pwm.$planCards = pro.proplan2.pwm.renderPricingPage(PwmPlanFound, $page, moveToBuyStep);
+                    tabsInfo.pwm.$planCards = pro.proplan2.pwm.renderPricingPage(PwmPlanFound, $page, (months, al) => {
+                        sessionStorage.setItem('pro.period', String(months));
+                        moveToBuyStep(al);
+                    });
                     tabsInfo.pwm.initialized = true;
                     tabsInfo.pwm.updateTabVisibility();
                     tabsInfo.pwm.requiresUpdate = true;
@@ -1196,7 +1204,9 @@ lazy(pro, 'proplan2', () => {
             return;
         }
 
-        period = period || 12;
+        if (!allowedPeriods.has(period)) {
+            period = 12; // Default is yearly
+        }
 
         if (!pro.membershipPlans.length) {
             console.error('Plans couldnt be loaded.');
@@ -1523,7 +1533,11 @@ lazy(pro, 'proplan2', () => {
         const $strgFlexInput = $('#esti-storage', $proflexiBlock);
         const $transFlexInput = $('#esti-trans', $proflexiBlock);
 
-        const preSelectedPeriod = (sessionStorage.getItem('pro.period') | 0) || 12;
+        let preSelectedPeriod = (sessionStorage.getItem('pro.period') | 0);
+
+        if (!allowedPeriods.has(preSelectedPeriod)) {
+            preSelectedPeriod = 12;
+        }
 
         if (preSelectedPeriod === 12) {
             $radioOptions.removeClass('selected');

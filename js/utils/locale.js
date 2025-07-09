@@ -1877,13 +1877,6 @@ mBroadcaster.once('boot_done', function populate_l() {
     l.then_price_m_after_n_days = escapeHTML(l.then_price_m_after_n_days)
         .replace(/\[S]/g, '<span class="asterisk">')
         .replace(/\[\/S]/g, '</span>');
-    l.after_trial_card_charged_m = escapeHTML(l.after_trial_card_charged_m);
-    l.trial_details_visit_tos = escapeHTML(l.trial_details_visit_tos)
-        .replace('[A1]', mega_io_hyperlinks['terms#recPaiSub'])
-        .replace('[A2]', mega_io_hyperlinks['terms#ref'])
-        .replace('[A3]', mega_io_hyperlinks['p-s/p-b/c-s'])
-        .replace('[A4]', mega_io_hyperlinks.terms)
-        .replace(/\[\/A\d*]/g, '</a>');
     l.vpn_is_attached_text = escapeHTML(l.vpn_is_attached_text)
         .replace('[A1]', mega_io_hyperlinks['vpn#dow'])
         .replace('[A2]', mega_io_hyperlinks.pricing)
@@ -1986,9 +1979,6 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[S1]', '<span class="plan-name">').replace('[/S1]', '</span>')
         .replace('[S2]', '<span class="plan-duration">').replace('[/S2]', '</span>')
         .replace('[S3]', '<span class="plan-duration">').replace('[/S3]', '</span>');
-    l.after_trial_card_charged_m = escapeHTML(l.after_trial_card_charged_m)
-        .replace('[S1]', '<span class="plan-name">').replace('[/S1]', '</span>')
-        .replace('[S2]', '<span class="plan-price">').replace('[/S2]', '</span>');
     l.you_have_selected_vpn = escapeHTML(l.you_have_selected_vpn)
         .replace('[S]', '<span>').replace('[/S]', '</span>');
     l.you_have_selected_pass = escapeHTML(l.you_have_selected_pass)

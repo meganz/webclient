@@ -319,9 +319,13 @@
 #propay .left-block .duration .duration-head .duration-savings {
     padding: 2px 6px;
     border-radius: 4px;
-    background-color: var(--banner-borderless-background-info);
-    color: var(--banner-borderless-text-info);
+    color: var(--secondary-red);
     font: var(--text-copy-small-pricing);
+    border: 1px solid var(--secondary-red);
+}
+#propay .left-block .duration .duration-head .duration-savings.popular {
+    background-color: var(--secondary-red);
+    color: var(--secondary-white);
 }
 #propay .left-block .duration .duration-option .monthly-price {
     font: var(--font-copy-sm)
@@ -904,6 +908,12 @@
     .bottom-page.propay .top-head.floating,
     .rtl .bottom-page.propay .top-head.floating {
         background: var(--surface-main);
+    }
+    #propay .subscription-info .trial,
+    #propay .subscription-info .one-time,
+    #propay .subscription-info .recurring {
+        max-width: 621px;
+        margin: 0 auto 2rem;
     }
 }
 

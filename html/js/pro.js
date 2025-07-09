@@ -160,7 +160,6 @@ var pro = {
 
             return api.req(payload)
                 .then(({result: results}) => {
-
                     pro.resetCaching();
 
                     // The rest of the webclient expects this data in an array format
@@ -799,9 +798,10 @@ var pro = {
             lazy(pro.planObjects.planKeys, key, () => {
 
                 const thisPlan = {
-                    key,        // Plan key
+                    key,                    // Plan key
                     _saveUpTo: null,        // Stores the saveUpTo percentage of the plan, in case given by another plan
-                    _correlatedPlan: null,       // Stores the correlated plan, in case given by another plan
+                    _correlatedPlan: null,  // Stores the correlated plan, in case given by another plan
+                    _durationOptions: null,     // Stores the duration options available in the plan
                     _maxCorrPriceEur: null,
                     planArray: plan,
                     features: plan[pro.UTQA_RES_INDEX_EXTRAS].f,
@@ -854,6 +854,25 @@ var pro = {
                     return thisPlan._correlatedPlan;
                 });
 
+                lazy(thisPlan, 'durationOptions', () => {
+                    if (thisPlan._durationOptions === null) {
+                        const { membershipPlans: plans, UTQA_RES_INDEX_ACCOUNTLEVEL } = pro;
+                        thisPlan._durationOptions = [];
+                        let i = plans.length;
+
+                        while (--i >= 0) {
+                            if (plans[i][UTQA_RES_INDEX_ACCOUNTLEVEL] === thisPlan.level) {
+                                thisPlan._durationOptions.push(plans[i]);
+                            }
+                        }
+
+                        // Sorting by UTQA_RES_INDEX_MONTHS
+                        thisPlan._durationOptions.sort(([,,,,a], [,,,,b]) => a - b);
+                    }
+
+                    return thisPlan._durationOptions;
+                });
+
                 lazy(thisPlan, 'saveUpTo', () => {
                     if (thisPlan._saveUpTo === null) {
                         let saveUpTo = false;
@@ -870,13 +889,14 @@ var pro = {
 
                 lazy(thisPlan, 'maxCorrPriceEuro', () => {
                     if (thisPlan._maxCorrPriceEur === null) {
-                        let maxCorrPriceEuro = thisPlan.priceEuro;
+                        // map by UTQA_RES_INDEX_PRICE
+                        thisPlan._maxCorrPriceEur = Math.max(...thisPlan.durationOptions.map(([,,,,,p]) => p));
+
                         if (thisPlan.correlatedPlan) {
-                            maxCorrPriceEuro = Math.max(thisPlan.priceEuro, thisPlan.correlatedPlan.priceEuro);
-                            thisPlan.correlatedPlan._maxCorrPriceEur = maxCorrPriceEuro;
+                            thisPlan.correlatedPlan._maxCorrPriceEur = thisPlan._maxCorrPriceEur;
                         }
-                        thisPlan._maxCorrPriceEur = maxCorrPriceEuro;
                     }
+
                     return thisPlan._maxCorrPriceEur;
                 });
 
@@ -908,45 +928,7 @@ var pro = {
                     return pro.filter.simple[filter].has(thisPlan.level);
                 };
 
-                /**
-                 * Returns the price of the plan formatted as a string
-                 * @param {string} display - The display type of the price
-                 * @param {Boolean} returnEuro - If the price should be returned in Euro
-                 * @param {boolean} noDecimals - If the price should be returned without decimals
-                 * @param {number} months - The number of months to return the price for
-                 * @param {object} options - Extra options to format what price is shown and how
-                 * @returns {string} - The formatted price
-                 */
-                thisPlan.getFormattedPrice = (display, returnEuro, noDecimals, months, options) => {
-
-                    options = options || Object.create(null);
-
-                    const monthMultiplier = +(months || thisPlan.months) / thisPlan.months;
-
-                    let localPrice = returnEuro ? thisPlan.priceEuro : thisPlan.price;
-
-                    if (options.includeTax && thisPlan.taxInfo) {
-                        const {taxedPriceEuro, taxedPrice} = thisPlan.taxInfo;
-                        localPrice = (thisPlan.taxInfo && (returnEuro ? taxedPriceEuro : taxedPrice))
-                            || localPrice;
-                    }
-                    else if (options.useTaxAmount) {
-                        const {taxAmount, taxAmountEuro} = thisPlan.taxInfo;
-                        localPrice = thisPlan.taxInfo && (returnEuro ? taxAmountEuro : taxAmount);
-                        if (typeof localPrice !== 'number') {
-                            localPrice = returnEuro ? thisPlan.priceEuro : thisPlan.price;
-                        }
-                    }
-
-                    const price = localPrice * monthMultiplier;
-
-                    return formatCurrency(
-                        price,
-                        returnEuro ? thisPlan.currencyEuro : thisPlan.currency,
-                        display,
-                        noDecimals
-                    );
-                };
+                thisPlan.getFormattedPrice = pro.getFormattedPrice.bind(null, thisPlan);
 
                 return thisPlan;
             });
@@ -994,6 +976,45 @@ var pro = {
 
             return pro.getPlanObj(false, false, key);
         },
+    },
+
+    /**
+     * Returns the price of the plan formatted as a string
+     * @param {string} display - The display type of the price
+     * @param {Boolean} returnEuro - If the price should be returned in Euro
+     * @param {boolean} noDecimals - If the price should be returned without decimals
+     * @param {number} months - The number of months to return the price for
+     * @param {object} options - Extra options to format what price is shown and how
+     * @returns {string} - The formatted price
+     */
+    getFormattedPrice: (plan, display, returnEuro, noDecimals, months, options) => {
+        'use strict';
+
+        options = options || Object.create(null);
+
+        const monthMultiplier = +(months || plan.months) / plan.months;
+
+        let localPrice = returnEuro ? plan.priceEuro : plan.price;
+
+        if (options.includeTax && plan.taxInfo) {
+            const {taxedPriceEuro, taxedPrice} = plan.taxInfo;
+            localPrice = (plan.taxInfo && (returnEuro ? taxedPriceEuro : taxedPrice))
+                || localPrice;
+        }
+        else if (options.useTaxAmount) {
+            const {taxAmount, taxAmountEuro} = plan.taxInfo;
+            localPrice = plan.taxInfo && (returnEuro ? taxAmountEuro : taxAmount);
+            if (typeof localPrice !== 'number') {
+                localPrice = returnEuro ? plan.priceEuro : plan.price;
+            }
+        }
+
+        return formatCurrency(
+            localPrice * monthMultiplier,
+            returnEuro ? plan.currencyEuro : plan.currency,
+            display,
+            noDecimals
+        );
     },
 
     initFilteredPlans() {

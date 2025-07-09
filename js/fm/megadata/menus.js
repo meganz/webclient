@@ -270,6 +270,7 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
             // This is just to make sure the source root is on the cloud drive
             if (mega.rewind && sourceRoot === M.RootID
                 && !M.onDeviceCenter
+                && !folderlink
             ) {
                 items['.rewind-item'] = 1;
             }

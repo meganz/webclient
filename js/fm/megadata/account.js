@@ -848,6 +848,7 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
         if (quota === -1) {
             quota = { percent: 100 };
             quota.isFull = quota.isAlmostFull = true;
+            quota.cstrg = M.storageQuotaCache ? M.storageQuotaCache.cstrg : '';
             options = { custom: 1 };
         }
 

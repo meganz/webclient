@@ -11,6 +11,7 @@ lazy(T.ui, 'page', () => {
     if (({'fa': 1,'ar': 1,'he': 1})[lang]) {
         document.body.classList.add('rtl');
     }
+    document.body.classList.add(lang);
 
     const stop = (ev) => {
         ev.preventDefault();

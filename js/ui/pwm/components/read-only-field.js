@@ -18,6 +18,8 @@ class MegaReadOnlyField extends MegaComponent {
      * @param {string} [options.actions.hint] - The text to show on hover of the action
      * @param {boolean} [options.grouped=false] - If true, the field will be grouped with a divider.
      * @param {boolean} [options.isPassword=false] - If true, the value will be masked as a password.
+     * @param {boolean} [options.isCard=false] - If true, masks as card number.
+     * @param {boolean} [options.isCvv=false] - If true, masks as CVV.
      * @param {Function} [options.onClick=null] - If provided, this function will be called when the field is clicked.
      *
      * @example
@@ -42,9 +44,13 @@ class MegaReadOnlyField extends MegaComponent {
         super(options);
         this.domNode.classList.add('read-only-field');
         this.isLink = options.isLink || false;
-        this.isPassword = options.isPassword || false;
+        this.maskType = options.isPassword ? 'password'
+            : options.isCard    ? 'card'
+                : options.isCvv     ? 'cvv'
+                    : null;
+        this._visible = false;
+
         this._originalValue = options.inputValue || '';  // Store the original value
-        this._isPasswordVisible = false;  // Track whether the password is visible
         this.id = options.id;
 
         // Create Label
@@ -71,11 +77,10 @@ class MegaReadOnlyField extends MegaComponent {
         }
         this.domNode.append(this.output);
 
-        if (this.isPassword) {
+        if (this.maskType === 'password') {
             this.strengthCheck = document.createElement('div');
             this.strengthCheck.className = 'read-only-help';
             this.strenghtText = document.createElement('span');
-            this.strenghtText.textContent = 'test';
             this.strengthCheck.appendChild(this.strenghtText);
             this.strenghtIcon = document.createElement('i');
             this.strenghtIcon.className = 'sprite-pm-mono';
@@ -83,21 +88,26 @@ class MegaReadOnlyField extends MegaComponent {
             this.domNode.append(this.strengthCheck);
         }
 
-        // Update the displayed value based on the initial settings
-        this.updateValue();
-
         // Create Help Text if provided
-        if (options.helpText) {
+        if (options.help && options.help.text) {
             this.helpText = document.createElement('div');
             this.helpText.className = 'read-only-help';
+            if (options.help.className) {
+                this.helpText.classList.add(options.help.className);
+            }
+
             const textContainer = document.createElement('span');
-            textContainer.textContent = options.helpText;
+            textContainer.textContent = options.help.text;
             this.helpText.appendChild(textContainer);
             const icon = document.createElement('i');
-            icon.className = 'sprite-pm-mono icon-help-circle-thin-outline';
+            icon.className = options.help.iconClass || 'sprite-pm-mono icon-help-circle-thin-outline';
+
             this.helpText.prepend(icon);
             this.domNode.append(this.helpText);
         }
+
+        // Update the displayed value based on the initial settings
+        this.updateValue();
 
         // Create Action Buttons if provided
         if (options.actions && options.actions.length > 0) {
@@ -120,7 +130,7 @@ class MegaReadOnlyField extends MegaComponent {
     }
 
     /**
-     * Updates the displayed value based on whether it's a password and its visibility state.
+     * Updates display based on type and visibility.
      * @returns {void}
      */
     updateValue() {
@@ -141,26 +151,67 @@ class MegaReadOnlyField extends MegaComponent {
 
         this.valueSpan.textContent = '';
 
-        if (this.isPassword) {
-            if (typeof zxcvbn === 'undefined') {
-                M.require('zxcvbn_js').done(this.passwordStrength.bind(this));
+        if (this.id === 'card-expiry') {
+            if (MegaUtils.isCardExpired(this._originalValue)) {
+                this.helpText.classList.remove('hidden');
             }
             else {
-                this.passwordStrength();
-            }
-
-            if (this._isPasswordVisible) {
-                const fragment = mega.ui.pm.utils.colorizedPassword(this._originalValue);
-                this.valueSpan.appendChild(fragment);
-                this.valueSpan.classList.add('password-colorized');
-                return;
+                this.helpText.classList.add('hidden');
             }
         }
 
-        this.valueSpan.classList.remove('password-colorized');
-        this.valueSpan.textContent = this.isPassword && !this._isPasswordVisible ?
-            '\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022' :
-            this._originalValue;
+        // Maskable types
+        if (this.maskType) {
+            // Password strength
+            if (this.maskType === 'password') {
+                if (typeof zxcvbn === 'undefined') {
+                    M.require('zxcvbn_js').done(this.passwordStrength.bind(this));
+                }
+                else {
+                    this.passwordStrength();
+                }
+            }
+
+            // Visible state
+            if (this._visible) {
+                this.valueSpan.classList.remove('monospace-mask');
+                if (this.maskType === 'password') {
+                    const frag = mega.ui.pm.utils.colorizedPassword(this._originalValue);
+                    this.valueSpan.appendChild(frag);
+                    this.valueSpan.classList.add('password-colorized');
+                }
+                else if (this.maskType === 'card') {
+                    const cleaned = this._originalValue.replace(/\s+/g, '');
+                    const formatted = cleaned.match(/.{1,4}/g).join(' ');
+                    this.valueSpan.textContent = formatted;
+                }
+                else {
+                    this.valueSpan.textContent = this._originalValue;
+                }
+            }
+            else {
+                this.valueSpan.classList.add('monospace-mask');
+                let masked;
+                if (this.maskType === 'password') {
+                    masked = '\u2022'.repeat(16);
+                }
+                else if (this.maskType === 'card') {
+                    const digits = this._originalValue.replace(/\D/g, '');
+                    const lastDigits = digits.slice(-4);
+                    const maskGroup = '\u2022'.repeat(4);
+                    const suffix = lastDigits ? ` ${lastDigits}` : '';
+                    masked = `${maskGroup} ${maskGroup} ${maskGroup}${suffix}`;
+                }
+                else { // cvv
+                    masked = '\u2022'.repeat(4);
+                }
+                this.valueSpan.textContent = masked;
+            }
+            return;
+        }
+
+        // Plain text
+        this.valueSpan.textContent = this._originalValue;
     }
 
     /**
@@ -223,19 +274,19 @@ class MegaReadOnlyField extends MegaComponent {
     }
 
     /**
-     * Sets the visibility of the password.
-     * @param {boolean} isVisible - True to show the password, false to mask it.
+     * Sets the visibility of the value.
+     * @param {boolean} isVisible - True to show the value, false to mask it.
      */
-    set isPasswordVisible(isVisible) {
-        this._isPasswordVisible = isVisible;
+    set visible(isVisible) {
+        this._visible = isVisible;
         this.updateValue();
     }
 
     /**
-     * Gets the visibility state of the password.
-     * @return {boolean} True if the password is visible, false if it is masked.
+     * Gets the visibility state of the value.
+     * @return {boolean} True if the value is visible, false if it is masked.
      */
-    get isPasswordVisible() {
-        return this._isPasswordVisible;
+    get visible() {
+        return this._visible;
     }
 }

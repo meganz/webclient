@@ -116,6 +116,7 @@ lazy(mega.devices, 'main', () => {
 
             const handler = this._getSectionHandlerInstance();
 
+            mega.ui.secondaryNav.hideCard();
             const {err, id} = await handler.render(isRefresh) || {};
             if (err) {
                 M.openFolder(id);

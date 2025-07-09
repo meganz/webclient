@@ -270,6 +270,7 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
             // This is just to make sure the source root is on the cloud drive
             if (mega.rewind && sourceRoot === M.RootID
                 && !M.onDeviceCenter
+                && !folderlink
             ) {
                 items['.rewind-item'] = 1;
             }
@@ -878,12 +879,8 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
             return false;
         }
     }
-    else if (ll === 3) {// we want just the download menu
-        menuNode = document.querySelector('.dropdown.body.download');
-        const opts = menuNode.querySelectorAll('.dropdown-item');
-        for (const opt of opts) {
-            opt.classList.remove('hidden');
-        }
+    else if (ll === 3) {
+        finalItems.push('.download-standart-item', '.zipdownload-item');
     }
     else if (ll === 7) { // Columns selection menu
         if (M && M.columnsWidth && M.columnsWidth.cloud) {
@@ -1092,10 +1089,11 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
                     // Hide items for selection Bar Options button
                     if (!$currentTarget.attr('id')) {
                         const shownItems = mega.ui.secondaryNav && mega.ui.secondaryNav.selectionBarItems ?
-                            [...mega.ui.secondaryNav.selectionBarItems] :
+                            mega.ui.secondaryNav.selectionBarItems.flat() :
                             ['.download-item', '.sh4r1ng-item', '.getlink-item', '.remove-item'];
                         if ($.menuForcedItems && $.menuForcedItems.length) {
-                            for (const menuItem of $.menuForcedItems) {
+                            const flat = $.menuForcedItems.flat();
+                            for (const menuItem of flat) {
                                 const idx = shownItems.indexOf(menuItem);
                                 if (idx > -1) {
                                     shownItems.splice(idx, 1);
@@ -1350,7 +1348,7 @@ MegaData.prototype.finaliseSubmenuCalcs = function(menuNode, subMenuNode, option
     const pScrollTop = (subMenuNode.closest('#cm_scroll') || {}).scrollTop || 0;
     const b = y - pScrollTop + nmH - nTop - tB; // bottom of submenu
 
-    let difference = 8;
+    let difference = 0;
 
     if (b > maxY) {
         difference += b - maxY + pScrollTop - 12;

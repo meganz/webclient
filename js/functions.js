@@ -1197,8 +1197,8 @@ function percentageDiff(initial, final, format) {
 
     let change = (difference / changeFrom) * 100;
 
-    if (format & 2) { // Round down
-        change = Math.floor(change);
+    if (format & 2) {
+        change = Math.round(change);
     }
     return change;
 }

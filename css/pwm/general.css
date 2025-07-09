@@ -32,6 +32,15 @@
     height: 24px;
 }
 
+.pm-main .password-wrapper .manual-favicon i {
+    --icon-size: 16px;
+    color: var(--mobile-icon-primary);
+}
+
+.pm-main .password-wrapper .favicon .favicon-brand i {
+    --icon-size: 24px;
+}
+
 .pm-main .password-wrapper h1 {
     font: var(--mobile-font-heading-h1);
 }

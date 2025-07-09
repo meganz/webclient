@@ -17,6 +17,7 @@ lazy(T.ui, 'loginDialog', () => {
             this.data.emailInput = cn.querySelector('#login-dlg-email-input');
             this.data.passInput = cn.querySelector('#login-dlg-password-input');
             this.data.pinInputs = this.data.twoFaCn.querySelectorAll('input');
+            this.data.backBtn = cn.querySelector('.js-back');
 
             T.ui.input.init(cn.querySelectorAll('.it-input input'));
 
@@ -28,7 +29,7 @@ lazy(T.ui, 'loginDialog', () => {
             cn.querySelector('.js-close').addEventListener('click', () => this.hide());
 
             // Back button
-            cn.querySelector('.js-back').addEventListener('click', () => this.showStep());
+            this.data.backBtn.addEventListener('click', () => this.showStep());
 
             // Submit 2FA button
             cn.querySelector('.js-submit-2fa').addEventListener('click', (e) => this.verifyTwoFA(e));
@@ -89,8 +90,8 @@ lazy(T.ui, 'loginDialog', () => {
             this.reset();
             T.ui.dialog.show(this.data.cn);
 
-            // Focus Email input
-            this.data.emailInput.focus();
+            // Focus Email input after dialog animation
+            setTimeout(() => this.data.emailInput.focus(), 300);
         },
 
         hide() {
@@ -194,14 +195,16 @@ lazy(T.ui, 'loginDialog', () => {
         },
 
         showStep(step) {
-            const { loginCn, twoFaCn, emailInput, pinInputs } = this.data;
+            const { loginCn, twoFaCn, emailInput, pinInputs, backBtn } = this.data;
 
             if (step) {
+                backBtn.classList.remove('hidden');
                 loginCn.classList.add('hidden');
                 twoFaCn.classList.remove('hidden');
                 pinInputs[0].focus();
             }
             else {
+                backBtn.classList.add('hidden');
                 loginCn.classList.remove('hidden');
                 twoFaCn.classList.add('hidden');
                 emailInput.focus();

@@ -1274,7 +1274,10 @@ export default class Call extends MegaRenderMixin {
     }
 
     render() {
-        const { minimized, peers, call, chatRoom, parent, onDeleteMessage } = this.props;
+        const {
+            minimized, peers, call, chatRoom, parent, typingAreaText,
+            onDeleteMessage, onTypingAreaChanged
+        } = this.props;
         const {
             mode, view, sidebar, hovered, forcedLocal, invite, ephemeral, ephemeralAccounts, guest,
             offline, onboardingUI, onboardingRecording, onboardingRaise, everHadPeers, initialCallRinging,
@@ -1338,11 +1341,13 @@ export default class Call extends MegaRenderMixin {
                         {...STREAM_PROPS}
                         guest={guest}
                         initialCallRinging={initialCallRinging}
+                        typingAreaText={typingAreaText}
                         onGuestClose={() => this.setState({ guest: false })}
                         onSidebarClose={() => this.setState({ ...Call.STATE.DEFAULT })}
                         onDeleteMessage={onDeleteMessage}
                         onCallMinimize={this.handleCallMinimize}
                         onInviteToggle={() => this.handleInviteOrAdd()}
+                        onTypingAreaChanged={onTypingAreaChanged}
                     />
                 }
 

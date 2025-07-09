@@ -1628,8 +1628,8 @@ mBroadcaster.once('boot_done', () => {
                         var megaListContainer;
 
                         if (this.viewmode) {
-                            megaListOptions.itemWidth = 208 + 4 + 4 + 16 /* 16 = margin-left */;
-                            megaListOptions.itemHeight = 186 + 4 + 4 + 16 /* 16 = margin-top */;
+                            megaListOptions.itemWidth = 180 + 4 + 4 + 24 /* 24 = margin-left */;
+                            megaListOptions.itemHeight = 212 + 4 + 4 + 24 /* 24 = margin-top */;
                             megaListContainer = this.container;
                             megaListOptions.bottomSpacing = 24;
                             megaListOptions.renderAdapter = new MegaList.RENDER_ADAPTERS.Grid();

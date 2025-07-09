@@ -2085,7 +2085,9 @@ FileManager.prototype.initUIKeyEvents = function() {
                 tempSel = $('.grid-table tr.ui-selected');
             }
 
-            s = tempSel.attrs('id');
+            if (tempSel) {
+                s = tempSel.attrs('id');
+            }
         }
 
 
@@ -3365,7 +3367,7 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
             return false;
         }
         let h = $(e.currentTarget).attr('id');
-        const n = M.getNodeByHandle(h);
+        const n = !missingkeys[h] && M.getNodeByHandle(h);
 
         if (!n) {
             return false;

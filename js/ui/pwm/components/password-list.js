@@ -348,7 +348,12 @@ class MegaPasswordList extends MegaView {
             outer.append(span);
 
             item.domNode.prepend(outer);
-            mega.ui.pm.utils.generateFavicon(passwordName, pwmItem.url, outer);
+            if (pwmItem.t === 'c') {
+                mega.ui.pm.utils.generateCardFavicon(pwmItem.nu, outer);
+            }
+            else {
+                mega.ui.pm.utils.generateFavicon(passwordName, pwmItem.url, outer);
+            }
 
             item.on('click.selectItem', ({currentTarget}, noShowDetail) => {
                 const elemId = currentTarget.domNode.id;

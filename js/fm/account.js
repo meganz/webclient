@@ -53,6 +53,16 @@ function accountUI() {
         // the previous logic to work.
         delay('settings:scrollbarinit', accountUI.initAccountScroll, 300);
     }, 1);
+    accountUI.prev = M.previousdirid === 'account' ? accountUI.prev : M.previousdirid;
+    mBroadcaster.addListener('pagechange', () => {
+        if (!String(page).startsWith('fm/account')) {
+            delete accountUI.prev;
+            return 0xDEAD;
+        }
+    });
+    $('.settings-back', $settingsMenu).rebind('click.accui', () => {
+        loadSubPage(accountUI.prev || 'start');
+    });
 }
 
 accountUI.initAccountScroll = function() {

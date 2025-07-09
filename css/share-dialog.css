@@ -189,7 +189,6 @@
     padding: 0;
 }
 
-
 .mega-dialog.share-dialog .contact-selected-item-input {
     background: transparent;
     flex-grow: 1;
@@ -371,6 +370,7 @@
     width: 100%;
     z-index: 11;
     max-height: 320px;
+    padding-inline-end: 0;
 }
 
 .mega-dialog.share-dialog .contact-dropdown-container .contact-dropdown-container-wrapper {
@@ -425,7 +425,7 @@
     background: var(--button-hover);
 }
 
-.mega-dialog.share-dialog .contact-dropdown-container-wrapper.ps .contact-item:hover {
+.mega-dialog.share-dialog .contact-dropdown-container-wrapper.ps .contact-item {
     width: 96%;
 }
 
@@ -456,6 +456,11 @@
 .mega-dialog.share-dialog .contact-dropdown-container .contact-email {
     grid-row: 2 / 3;
     margin-inline-start: 8px;
+    margin-inline-end: 16px;
+}
+
+.mega-dialog.share-dialog .contact-dropdown-container-wrapper.ps div.contact-item.email-only {
+    margin-bottom: 0;
 }
 
 .mega-dialog.share-dialog .share-dialog-invite-container .invite-note {
@@ -1064,7 +1069,6 @@
     }
 }
 
-
 /* Dialog to alert the user they are sharing with unverified contacts after clicking the Share dialog Invite button */
 .mega-dialog.share-with-unverified-contacts .contact-items {
     margin-top: 16px;
@@ -1140,4 +1144,25 @@ body.rtl .mega-dialog.share-with-unverified-contacts .contact-items.visible-divi
 }
 .mega-dialog.share-access-contacts-dialog section {
     padding: 0 18px;
+}
+.mega-dialog.share-dialog .share-dialog-invite-container .mega-textarea.invite-note {
+    padding-inline-end: 0;
+}
+.mega-textarea.invite-note .textarea-scroll {
+    margin: 0;
+    padding-inline-end: 14px;
+}
+.mega-textarea.invite-note textarea.invite-note-textarea {
+    background: var(--surface-grey-2);
+    min-height: 20px;
+    padding: 0;
+}
+.mega-textarea.invite-note .textarea-clone {
+    min-height: 20px;
+}
+.mega-dialog.share-dialog .ps.ps__rtl.ps--active-y .ps__rail-y {
+    margin-right: 8px;
+}
+.mega-dialog.share-with-unverified-contacts .ps.ps__rtl.ps--active-y .ps__rail-y {
+    margin-right: 10px;
 }

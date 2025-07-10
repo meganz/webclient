@@ -845,8 +845,19 @@ var notify = {
             M.openFolder(folderId)
                 .then(() => {
                     const {allDataItems, data: {f}} = notify.notifications.find(elem => elem.id === notificationID);
-
-                    M.addSelectedNodes(allDataItems || f && f.map((n) => n.h) || [], true);
+                    const allAvailable = M.c[folderId] || M.v.reduce((acc, n) => {
+                        acc[n.h] = 1;
+                        return acc;
+                    }, Object.create(null));
+                    const toSelect = (allDataItems || f || [])
+                        .reduce((set, n) => {
+                            const h = n.h || n;
+                            if (allAvailable[h]) {
+                                set.add(h);
+                            }
+                            return set;
+                        }, new Set());
+                    M.addSelectedNodes([...toSelect], true);
                 })
                 .catch(dump);
 

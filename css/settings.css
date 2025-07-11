@@ -867,16 +867,12 @@
     margin-inline-start: 21px;
 }
 
-.fm-account-sections.fm-account-s4 li span {
+.fm-account-sections.fm-account-s4 span.code {
     background-color: var(--stroke-grey-3);
     border: 1px solid var(--stroke-grey-2);
     border-radius: 4px;
     display: inline-block;
     padding: 0 4px;
-}
-
-.fm-account-sections.fm-account-s4 a.settings-lnk {
-    cursor: default;
 }
 
 /* Settings top banners */

@@ -9622,18 +9622,13 @@ body.de .mega-dialog.contact-picker-widget {
     margin-inline-start: 18px;
 }
 
-.mega-dialog.s4-setup-dialog li span.code {
+.mega-dialog.s4-setup-dialog span.code {
     background: var(--surface-grey-1);
     border: 1px solid var(--stroke-grey-2);
     border-radius: 4px;
     color: var(--text-color-high);
     display: inline-block;
     padding: 0 4px;
-}
-
-.mega-dialog.s4-setup-dialog li b {
-    color: var(--text-color-higher);
-    font: var(--text-body1-bold);
 }
 
 .mega-dialog.s4-setup-dialog .steps {
@@ -9670,7 +9665,7 @@ body.de .mega-dialog.contact-picker-widget {
 .mega-dialog.s4-setup-dialog .secondary-table td {
     color: var(--text-color-medium);
     font: var(--text-body2);
-    padding: 12px 16px;
+    padding: 6px 12px;
     text-align: start;
 }
 

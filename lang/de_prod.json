@@ -3749,7 +3749,7 @@
     "lost_auth_device": "Authentifizierungsger\u00e4t verloren",
     "lost_two_fa_device_info": "Sie k\u00f6nnen sich derzeit nicht einloggen, Ihre E-Mail-Adresse oder Ihr Passwort \u00e4ndern oder 2FA deaktivieren.",
     "m_change_email_same": "Sie haben Ihre derzeitige E-Mail-Adresse eingegeben",
-    "m_sub_will_start": "Ihr Monatsabonnement f\u00fcr %1 beginnt am %2.",
+    "m_sub_will_start": "Your subscription for %1 will start on %2.",
     "m_sub_will_start_tma": "Your subscription for %1 will start on %2. %3 may apply.",
     "main_view": "Hauptansicht",
     "make_moderator": "Zu Gastgeber ernennen",

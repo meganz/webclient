@@ -3749,7 +3749,7 @@
     "lost_auth_device": "Perangkat otentikator hilang",
     "lost_two_fa_device_info": "Anda tidak akan dapat masuk, mengubah alamat email atau kata sandi anda, atau menonaktifkan 2FA.",
     "m_change_email_same": "Anda telah memasukkan alamat email anda saat ini",
-    "m_sub_will_start": "Langganan bulanan anda untuk %1 akan mulai pada %2.",
+    "m_sub_will_start": "Your subscription for %1 will start on %2.",
     "m_sub_will_start_tma": "Your subscription for %1 will start on %2. %3 may apply.",
     "main_view": "Tampilan utama",
     "make_moderator": "Jadikan tuan rumah",

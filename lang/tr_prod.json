@@ -3749,7 +3749,7 @@
     "lost_auth_device": "Kimlik do\u011frulama cihaz\u0131 kayboldu",
     "lost_two_fa_device_info": "Giri\u015f yapamayacak, e-posta adresinizi veya \u015fifrenizi de\u011fi\u015ftiremeyecek veya 2FA'y\u0131 devre d\u0131\u015f\u0131 b\u0131rakamayacaks\u0131n\u0131z.",
     "m_change_email_same": "Ge\u00e7erli e-posta adresinizi girdiniz",
-    "m_sub_will_start": "Ayl\u0131k aboneli\u011finiz %1 ba\u015flayacak %2.",
+    "m_sub_will_start": "Your subscription for %1 will start on %2.",
     "m_sub_will_start_tma": "Your subscription for %1 will start on %2. %3 may apply.",
     "main_view": "Ana g\u00f6r\u00fcn\u00fcm",
     "make_moderator": "Ev sahibi yap",

@@ -326,17 +326,49 @@ FileManager.prototype.initFileManager = async function() {
     if (!pfid && !is_mobile && u_type > 0) {
 
         if (u_attr.s4) {
-            const s4load = this.initS4FileManager();
+            const onS4Section = (page) => this.getNodeByHandle(String(page || this.currentdirid).slice(0, 8)).s4;
 
-            if (this.getNodeByHandle(path.slice(0, 8)).s4) {
-                // We're (re)loading over a s4-page, hold it up.
-                await s4load.catch((ex) => {
+            mega.s4c = 1;
+            const s4load = this.initS4FileManager()
+                .catch((ex) => {
                     if (self.d) {
                         console.error('Failed to initialize S4 (?!)', [ex]);
                     }
-                    document.querySelector('.js-s4-tree-panel').classList.add('hidden');
-                    onIdle(() => this.openFolder('fm'));
+                    this.onFileManagerReady(() => {
+                        onIdle(() => {
+                            msgDialog('warningb', l.ri_s4_tab, l.s4_cnt_exists_error, ex < 0 ? api_strerror(ex) : ex);
+
+                            const t = document.querySelector('.js-s4-tree-panel');
+                            if (t) {
+                                t.classList.add('hidden');
+                            }
+
+                            const {owner, actors} = mBroadcaster.crossTab;
+                            eventlog(
+                                99622,
+                                JSON.stringify([
+                                    1,
+                                    buildVersion.website,
+                                    !!owner | 0,
+                                    Object(actors).length | 0,
+                                    ex && ex.message || ex
+                                ])
+                            );
+                        });
+
+                        if (onS4Section() || M.currentdirid === 's4') {
+
+                            return this.openFolder('fm', true);
+                        }
+                    });
+                })
+                .finally(() => {
+                    delete mega.s4c;
                 });
+
+            if (onS4Section(path)) {
+                // We're (re)loading over a s4-page, hold it up.
+                await s4load;
             }
         }
 

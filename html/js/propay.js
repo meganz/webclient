@@ -1454,7 +1454,7 @@ pro.propay = {
         const isRecurring = !this.currentGateway || !!this.currentGateway.supportsRecurring;
 
         $('.pricing-element .duration-type', $planCard)
-            .text(this.getNumOfMonthsWording(this.planObj.months, this.discountInfo));
+            .text(this.getNumOfMonthsWording(this.planObj.months, true));
 
         $('.pricing-element .price', $planCard).safeHTML(priceText);
 

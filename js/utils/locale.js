@@ -1788,11 +1788,11 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[P]', '<h3 class="sub-header">')
         .replace('[/P]', '</h3>');
 
-    l.s4_s3_prefix_example = escapeHTML(l.s4_s3_prefix_example)
+    l.s4_iam_prefix_usage = escapeHTML(l.s4_iam_prefix_usage)
         .replace(/\[S]/g, '<span class="code">')
         .replace(/\[\/S]/g, '</span>');
 
-    l.s4_iam_prefix_example = escapeHTML(l.s4_iam_prefix_example)
+    l.s4_s3_endpoint_prefix_tip = escapeHTML(l.s4_s3_endpoint_prefix_tip)
         .replace(/\[S]/g, '<span class="code">')
         .replace(/\[\/S]/g, '</span>');
 
@@ -1823,6 +1823,10 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[/A2]', '</a>')
         .replace('[A3]', '<a href="https://mega.io/privacy" target="_blank" class="clickurl">')
         .replace('[/A3]', '</a>');
+
+    l.s4_cnt_exists_error = escapeHTML(l.s4_cnt_exists_error)
+        .replace('[A]', '<a href="mailto:support@mega.nz">')
+        .replace('[/A]', '</a>');
 
     l.content_removed = escapeHTML(l.content_removed)
         .replace('[A]', '<a class="clickurl" href="https://mega.io/takedown" target="_blank">')
@@ -2032,6 +2036,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         'after_days_card_charged_m',
         's4_disable_feature_info',
         's4_activation_tools_info',
+        's4_s3_prefix_usage',
         'info_panel_tags_create_btn'
     ];
     for (let i = common.length; i--;) {

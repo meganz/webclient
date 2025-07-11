@@ -537,27 +537,25 @@ lazy(s4, 'utils', () => {
                 let subNode = null;
 
                 // Create table header
-                rowNode = mCreateElement('tr', undefined, tableNode);
-                subNode = mCreateElement('td', undefined, rowNode);
-                mCreateElement('a', { class: 'settings-lnk' }, subNode).textContent = item[0];
-                mCreateElement('td', undefined, rowNode).textContent = item[1];
-                subNode = mCreateElement('td', undefined, rowNode);
+                rowNode = mCreateElement('tr', null, tableNode);
+                subNode = mCreateElement('td', null, rowNode);
+                mCreateElement('span', null, subNode).textContent = `s3.${item[0]}`;
+                mCreateElement('td', null, rowNode).textContent = item[1];
+                subNode = mCreateElement('td', null, rowNode);
 
                 // Create copy to clipboard button
                 subNode = mCreateElement('button', {
                     'class': 'mega-button small action copy',
-                    'data-url': item[0],
+                    'data-url': `s3.${item[0]}`,
                     'data-location': item[2]
                 }, subNode);
                 mCreateElement('i', { class: 'sprite-fm-mono icon-copy' }, subNode);
             }
 
             // Fill URL exapmles in the tips
+            mCreateElement('li', undefined, tipsNode).append(parseHTML(l.s4_s3_prefix_usage));
             mCreateElement('li', undefined, tipsNode).append(parseHTML(
-                l.s4_s3_prefix_example.replace('%1', `s3.${endpoints[0][0]}`)
-            ));
-            mCreateElement('li', undefined, tipsNode).append(parseHTML(
-                l.s4_iam_prefix_example.replace('%1', `iam.${endpoints[0][0]}`)
+                l.s4_iam_prefix_usage.replace('%1', `iam.${endpoints[0][0]}`)
             ));
 
             // Copy to clipboard buttons

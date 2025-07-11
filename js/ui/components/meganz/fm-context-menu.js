@@ -710,7 +710,9 @@
                 M.fmTabState.gallery.prev = M.currentdirid;
             }
             M.openFolder(target).then(() => {
-                selectionManager.add_to_selection(node.h, true);
+                if (node.h !== M.RootID) {
+                    selectionManager.add_to_selection(node.h, true);
+                }
             });
         };
         const doImport = () => {

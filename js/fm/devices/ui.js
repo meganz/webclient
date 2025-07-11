@@ -2190,7 +2190,7 @@ lazy(mega.devices, 'ui', () => {
                 this._populateCommonCtxItems(
                     selNode, items, isSharedFolder, hasSharedLink, mult
                 );
-                if (this.isFullSyncRelated(h)) {
+                if (!mult && this.isFullSyncRelated(h)) {
                     items['.open-cloud-item'] = 1;
                 }
             }

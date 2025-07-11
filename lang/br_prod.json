@@ -3749,7 +3749,7 @@
     "lost_auth_device": "Dispositivo de autentica\u00e7\u00e3o perdido",
     "lost_two_fa_device_info": "Voc\u00ea n\u00e3o poder\u00e1 fazer login, nem alterar o seu email ou a sua senha, nem desativar a 2FA.",
     "m_change_email_same": "Voc\u00ea digitou o seu email atual",
-    "m_sub_will_start": "A sua assinatura mensal por %1 come\u00e7ar\u00e1 no dia %2.",
+    "m_sub_will_start": "Your subscription for %1 will start on %2.",
     "m_sub_will_start_tma": "Your subscription for %1 will start on %2. %3 may apply.",
     "main_view": "Vista principal",
     "make_moderator": "Converter em anfitri\u00e3o",

@@ -3749,7 +3749,7 @@
     "lost_auth_device": "Authenticatie apparaat verloren",
     "lost_two_fa_device_info": "U bent niet in staat om in te loggen, email te wijzigen, wachtwoord te wijzigen of 2FA uit te schakelen.",
     "m_change_email_same": "U heeft uw huidige e-mailadres ingevoerd",
-    "m_sub_will_start": "Uw maandelijkse abonnement voor %1 zal beginnen op %2.",
+    "m_sub_will_start": "Your subscription for %1 will start on %2.",
     "m_sub_will_start_tma": "Your subscription for %1 will start on %2. %3 may apply.",
     "main_view": "Hoofdweergave",
     "make_moderator": "Gastheer/gastvrouw maken",

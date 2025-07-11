@@ -3749,7 +3749,7 @@
     "lost_auth_device": "\u907a\u5931\u9a57\u8b49\u5668\u88dd\u7f6e",
     "lost_two_fa_device_info": "\u60a8\u5c07\u7121\u6cd5\u767b\u5165\u3001\u66f4\u6539\u96fb\u5b50\u90f5\u4ef6\u5730\u5740\u6216\u5bc6\u78bc\uff0c\u6216\u505c\u7528\u96d9\u91cd\u9a57\u8b49\u3002",
     "m_change_email_same": "\u60a8\u8f38\u5165\u7684\u96fb\u5b50\u90f5\u4ef6\u5730\u5740\u8207\u76ee\u524d\u7684\u76f8\u540c",
-    "m_sub_will_start": "\u60a8\u7684\u6bcf\u6708\u8a02\u95b1\u8cbb\u7528\u70ba%1\uff0c\u5c07\u65bc%2\u65e5\u958b\u59cb\u3002",
+    "m_sub_will_start": "Your subscription for %1 will start on %2.",
     "m_sub_will_start_tma": "Your subscription for %1 will start on %2. %3 may apply.",
     "main_view": "\u4e3b\u8996\u5716\u6aa2\u8996",
     "make_moderator": "\u8a2d\u70ba\u4e3b\u6301\u4eba",

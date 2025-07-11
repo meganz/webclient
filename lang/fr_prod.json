@@ -3749,7 +3749,7 @@
     "lost_auth_device": "Perte de l\u2019appareil d\u2019authentification",
     "lost_two_fa_device_info": "Vous ne pourrez ni vous connecter, ni changer votre adresse courriel, ni votre mot de passe, ni d\u00e9sactiver l\u2019A2F.",
     "m_change_email_same": "Vous avez saisi votre adresse courriel actuelle",
-    "m_sub_will_start": "Votre abonnement mensuel pour %1 d\u00e9butera le %2.",
+    "m_sub_will_start": "Your subscription for %1 will start on %2.",
     "m_sub_will_start_tma": "Your subscription for %1 will start on %2. %3 may apply.",
     "main_view": "Vue principale",
     "make_moderator": "D\u00e9signer comme h\u00f4te",

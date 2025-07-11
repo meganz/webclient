@@ -129,6 +129,8 @@ body.ru .avatar-menu .storage-usage .lp-storage-information-popup::after {
 .storage-usage-panel .info a.upgrade {
     width: 100%;
     justify-content: center;
+    height: auto;
+    min-height: 40px;
 }
 .storage-usage-panel .info a.upgrade span {
     font-weight: var(--mobile-font-weight-semibold);

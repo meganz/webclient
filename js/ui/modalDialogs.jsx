@@ -28,6 +28,13 @@ class SafeShowDialogController extends MegaRenderMixin {
         };
     }
 
+    shouldComponentUpdate(nextProps, nextState) {
+        if (!this.dialogBecameVisible) {
+            return false;
+        }
+        return super.shouldComponentUpdate(nextProps, nextState);
+    }
+
     componentDidMount() {
         super.componentDidMount();
         M.safeShowDialog(this.dialogName, () => {

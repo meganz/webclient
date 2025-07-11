@@ -6823,6 +6823,12 @@ class SafeShowDialogController extends mixins.w9 {
       return null;
     };
   }
+  shouldComponentUpdate(nextProps, nextState) {
+    if (!this.dialogBecameVisible) {
+      return false;
+    }
+    return super.shouldComponentUpdate(nextProps, nextState);
+  }
   componentDidMount() {
     super.componentDidMount();
     M.safeShowDialog(this.dialogName, () => {

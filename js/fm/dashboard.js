@@ -309,7 +309,7 @@ function dashboardUI(updProcess) {
             ];
             for (let i = 0; i < percents.length; i++) {
                 const $percBlock = $('.storage .account.progress-perc.pr' + i);
-                $percBlock.safeHTML(`<span class="value">${Math.round(percents[i])}</span><span class="unit">%</span>`);
+                $percBlock.safeHTML(`<span class="value">${Math.floor(percents[i])}</span><span class="unit">%</span>`);
                 const $percBar = $('.storage .account.progress-bar-section.pr' + i);
                 $percBar.css('width', percents[i] + '%');
             }

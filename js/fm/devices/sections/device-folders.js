@@ -88,10 +88,21 @@ lazy(mega.devices.sections, 'deviceFolders', () => {
         /**
          * Update the Node properties passed for UI renderisation
          * @param {Object} props - node renderisation properties
-         * @param {DeviceCentreFolder} folder - folder to render
+         * @param {DeviceCentreFolder|MegaNode} folder - folder to render
          * @returns {void}
          */
+
         updateProps(props, folder) {
+            if (!folder) {
+                return;
+            }
+
+            if (!folder.isDeviceFolder && M.dcd[M.currentCustomView.nodeID]) {
+                folder = M.dcd[M.currentCustomView.nodeID].folders[folder.h];
+                if (!folder) {
+                    return;
+                }
+            }
             props.time = time2date(folder.ts);
             props.icon = folder.icon;
             props.type = folder.typeText;

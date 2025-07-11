@@ -3207,8 +3207,16 @@ window.addEventListener('popstate', function(event) {
     passive: true,
 });
 
-window.addEventListener('beforeunload', () => {
+window.addEventListener('beforeunload', (ev) => {
     'use strict';
+    const confirm = (msg, quiet) => {
+        ev.preventDefault();
+        if (quiet) {
+            return null;
+        }
+        ev.returnValue = '';
+        return msg || l[761];
+    };
 
     if ('rad' in mega) {
         mega.rad.flush().dump('rad.flush');
@@ -3216,18 +3224,22 @@ window.addEventListener('beforeunload', () => {
 
     if (megaChatIsReady && megaChat.activeCall) {
         megaChat.playSound(megaChat.SOUNDS.ALERT);
-        return false;
+        return confirm();
     }
 
     if (window.dlmanager && (dlmanager.isDownloading || ulmanager.isUploading)) {
-        return $.memIOSaveAttempt ? null : l[377];
+        return confirm(l[377], $.memIOSaveAttempt);
     }
 
     if (window.fmdb && window.currsn && fminitialized
         && Object(fmdb.pending).length && Object.keys(fmdb.pending[0] || {}).length) {
 
         setsn(currsn);
-        return l[16168];
+        return confirm(l[16168]);
+    }
+
+    if (mega.s4c) {
+        return confirm();
     }
 
     if (window.doUnloadLogOut) {

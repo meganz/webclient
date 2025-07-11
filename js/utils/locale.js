@@ -1824,6 +1824,10 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[A3]', '<a href="https://mega.io/privacy" target="_blank" class="clickurl">')
         .replace('[/A3]', '</a>');
 
+    l.s4_cnt_exists_error = escapeHTML(l.s4_cnt_exists_error)
+        .replace('[A]', '<a href="mailto:support@mega.nz">')
+        .replace('[/A]', '</a>');
+
     l.content_removed = escapeHTML(l.content_removed)
         .replace('[A]', '<a class="clickurl" href="https://mega.io/takedown" target="_blank">')
         .replace('[/A]', '</a>');

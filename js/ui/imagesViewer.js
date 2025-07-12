@@ -2041,7 +2041,9 @@ var slideshowid;
                     p.appendChild(newPdfIframe);
                 }
             }
-
+            if (!newPdfIframe.contentWindow) {
+                throw EINCOMPLETE;
+            }
             var doc = newPdfIframe.contentWindow.document;
             doc.open();
             doc.write(myPage);

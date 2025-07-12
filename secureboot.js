@@ -4257,9 +4257,20 @@ tryCatch(function(x) {
     var psy = tryCatch(function(f) {
         return String(f).indexOf('Synchronizetion') > 0;
     });
+    var seal = tryCatch(function(p, f) {
+        var v = p[f];
+        if (v !== undefined) {
+            delete p[f];
+            return Object.defineProperty(p, f, {value: v, writable: false, configurable: true});
+        }
+    });
     x.addEventListener = function(t, f) {
+        if (t === 'antifor-fC') {
+            window.onerror = nop;
+            throw t;
+        }
         if (t === 'contextmenu' && psy(f)) {
-            window.onerror = null;
+            window.onerror = nop;
             return;
         }
         return ael.apply(x, arguments);
@@ -4267,6 +4278,13 @@ tryCatch(function(x) {
     mBroadcaster.once('startMega', tryCatch(function() {
         x.addEventListener = ael;
     }));
+    [[window, 'fetch'], [window, 'WebSocket'], [XMLHttpRequest.prototype, 'open']]
+        .forEach(function(m) {
+            var v = m[0][m[1]];
+            if (seal(m[0], m[1]) !== m[0]) {
+                m[0][m[1]] = v;
+            }
+        });
 })(window);
 
 var dump = nop;

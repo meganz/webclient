@@ -10,6 +10,7 @@ mBroadcaster.once('boot_done', () => {
 
     if (!eid
         || self.buildOlderThan10Days
+        || self.onerror === self.nop
         || storage.mSentinelOptOut) {
 
         self.onerror = null;
@@ -60,7 +61,7 @@ mBroadcaster.once('boot_done', () => {
     };
 
     const thirdPartyScript = (dump, data) => {
-        return /userscript|user\.js|EvalError/.test(dump.m + data)
+        return /userscript|user\.js|inject\.js|EvalError/.test(dump.m + data)
             || dump.m.includes('Permission denied to access property')
             || dump.m.includes('Cannot redefine property')
             || dump.m.includes("evaluating 'r(a,c)'")

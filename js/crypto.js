@@ -1647,15 +1647,12 @@ function api_storefileattr(id, type, key, data, ctx, ph) {
             type: type,
             data: data,
             handle: handle,
-            callback: api_fareq,
             startTime: Date.now()
         };
     }
 
     var req = {
-        a: 'ufa',
         s: ctx.data.byteLength,
-        ssl: use_ssl
     };
 
     if (M.d[ctx.handle] && M.getNodeRights(ctx.handle) > 1) {
@@ -1665,12 +1662,7 @@ function api_storefileattr(id, type, key, data, ctx, ph) {
         req.ph = ctx.ph;
     }
 
-    return api.req(req, self.pfid ? 1 : 0)
-        .catch(echo)
-        .then((res) => {
-            const result = Number(res.result || res) | 0;
-            ctx.callback(result < 0 ? result : res.result, ctx, {q: !1});
-        });
+    return api_fareq.fire(req, ctx, self.pfid ? 1 : 0).catch(reportError);
 }
 
 async function api_getfileattr(fa, type, procfa, errfa) {
@@ -1721,10 +1713,8 @@ async function api_getfileattr(fa, type, procfa, errfa) {
         }
     }
 
-    // eslint-disable-next-line guard-for-in
-    for (const n in p) {
+    const ufa = (n) => {
         const ctx = {
-            callback: api_fareq,
             type: type,
             p: p[n],
             h: h,
@@ -1739,15 +1729,17 @@ async function api_getfileattr(fa, type, procfa, errfa) {
                 return procfa(ctx, h, buf);
             },
             errfa: errfa,
-            startTime: Date.now(),
             plaintext: plain[n]
         };
-        api_req({
-            a: 'ufa',
+        const payload = {
             fah: base64urlencode(ctx.p.substr(0, 8)),
-            ssl: use_ssl,
             r: +fa_handler.chunked
-        }, ctx);
+        };
+        api_fareq.fire(payload, ctx).catch(reportError);
+    };
+    // eslint-disable-next-line guard-for-in
+    for (const n in p) {
+        ufa(n);
     }
 }
 
@@ -2144,14 +2136,8 @@ function api_faretry(ctx, error, host) {
                      ctx.faRetryI);
 
         return setTimeout(function () {
-            ctx.startTime = Date.now();
             if (ctx.p) {
-                api_req({
-                    a: 'ufa',
-                    fah: base64urlencode(ctx.p.substr(0, 8)),
-                    ssl: use_ssl,
-                    r: +fa_handler.chunked
-                }, ctx);
+                api_fareq.fire(ctx.payload, ctx).catch(reportError);
             }
             else {
                 api_storefileattr(null, null, null, null, ctx);
@@ -2186,9 +2172,28 @@ function api_faerrlauncher(ctx, host) {
     return r;
 }
 
+Object.defineProperty(api_fareq, 'fire', {
+    async value(payload, ctx, channel) {
+        'use strict';
+        payload.a = 'ufa';
+        payload.ssl = self.use_ssl;
+
+        ctx.payload = {...payload};
+        ctx.startTime = Date.now();
+
+        return api.req(payload, channel)
+            .catch(echo)
+            .then((res) => {
+                const result = Number(res.result || res) | 0;
+                return api_fareq(result < 0 ? result : res.result, ctx, {q: !1});
+            });
+    }
+});
+
 function api_fareq(res, ctx, xhr) {
     var logger = d > 1 && MegaLogger.getLogger('crypt');
-    var error = typeof res === 'number' && res || '';
+    const error = typeof res !== 'object' || !res
+        ? typeof res === 'number' ? res : EINCOMPLETE : false;
 
     if (ctx.startTime && logger) {
         logger.debug('Reply in %dms for %s', (Date.now() - ctx.startTime), xhr.q.url);

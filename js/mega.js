@@ -1113,12 +1113,18 @@ scparser.$add('t', function(a, scnodes) {
         const targetid = rootNode.p;
         const pnodes = [];
 
+        let ver = false;
         for (i = 0; i < scnodes.length; i++) {
-            if (scnodes[i] && scnodes[i].p === targetid) {
-                pnodes.push({
-                    h: scnodes[i].h,
-                    t: scnodes[i].t
-                });
+            if (scnodes[i]) {
+                if (!ver && rootNode.t === 0 && scnodes[i].p === rootNode.h) {
+                    ver = true;
+                }
+                if (scnodes[i].p === targetid) {
+                    pnodes.push({
+                        h: scnodes[i].h,
+                        t: scnodes[i].t
+                    });
+                }
             }
         }
 
@@ -1126,7 +1132,8 @@ scparser.$add('t', function(a, scnodes) {
             a: a.ou ? 'put' : 'puu',
             n: targetid,
             u: a.ou,
-            f: pnodes
+            f: pnodes,
+            ver
         });
     }
 

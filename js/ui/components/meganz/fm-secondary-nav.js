@@ -605,19 +605,8 @@ lazy(mega.ui, 'secondaryNav', () => {
     };
 
     const updateColBtnText = () => {
-
-        if (page === 'fm/public-links') {
-            timeAdBtn.text = l[20694];
-            colBtnsText.date = l[20694];
-        }
-        else if (page === 'fm/file-requests') {
-            timeAdBtn.text = l.file_request_page_label_request_created;
-            colBtnsText.date = l.file_request_page_label_request_created;
-        }
-        else {
-            timeAdBtn.text = l[17445];
-            colBtnsText.date = l[17445];
-        }
+        timeAdBtn.text = l[17445];
+        colBtnsText.date = l[17445];
     };
 
     selectAllGrid.addEventListener('click', _allAction);

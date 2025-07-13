@@ -2793,14 +2793,6 @@ FileManager.prototype.addGridUI = function(refresh) {
 
     // Change title for Public link page
     let dateLabel = l[17445];
-    switch (page) {
-        case 'fm/public-links':
-            dateLabel = l[20694];
-            break;
-        case 'fm/file-requests':
-            dateLabel = l.file_request_page_label_request_created;
-            break;
-    }
 
     if (dateLabel) {
         $('.fm .grid-table thead .date').text(dateLabel);

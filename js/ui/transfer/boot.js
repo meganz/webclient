@@ -220,7 +220,6 @@ mBroadcaster.once('boot_done', () => {
                 ul_queue = new UploadQueue();
                 ulmanager.isUploading = false;
                 ulQueue._pending = [];
-                ulQueue.setSize(fmconfig.ul_maxSlots);
 
                 clearTransferXHRs();
                 delete $.transferprogress;

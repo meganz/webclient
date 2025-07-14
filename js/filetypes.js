@@ -628,7 +628,7 @@ function filetype(n, getFullType, ik) {
         return ext[fext][1];
     }
 
-    if (n && n.typeText && M.onDeviceCenter) {
+    if (n && n.typeText) {
         return n.typeText;
     }
 
@@ -673,6 +673,11 @@ function deviceIcon(name, type) {
 function folderIcon(node, root) {
     'use strict';
 
+    // Device of device folder
+    if (M.onDeviceCenter && (M.dcd[node.h] || node.isDeviceFolder)) {
+        return node.icon;
+    }
+
     let folderIcon = '';
     root = root || M.getNodeRoot(node.h);
 
@@ -709,9 +714,10 @@ function folderIcon(node, root) {
         return `${folderIcon}folder-public`;
     }
 
-    // Device of device folder
-    if (M.dcd[node.h] || node.isDeviceFolder) {
-        return node.icon;
+    // Backup folder
+    const parent = M.d[node.p];
+    if (parent && parent.devid) {
+        return 'folder-backup';
     }
 
     return `${folderIcon}folder`;

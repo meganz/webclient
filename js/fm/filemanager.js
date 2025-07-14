@@ -169,21 +169,20 @@ function FileManager() {
                 }
             }
 
-            const isBackup = M.currentrootid === mega.devices.rootId
-                && M.getNodeRoot(M.currentCustomView.nodeID) === M.InboxID;
-
             if (
                 M.currentrootid === M.RubbishID
                 || M.currentrootid === 'shares'
-                || isBackup
             ) {
                 M.columnsWidth.cloud.fav.disabled = true;
                 M.columnsWidth.cloud.fav.viewed = false;
             }
 
-            if (isBackup) {
-                M.columnsWidth.cloud.label.disabled = true;
-                M.columnsWidth.cloud.label.viewed = false;
+            if (M.onDeviceCenter) {
+                const path = M.currentdirid.split('/');
+                if (path.length === 3 && sharer(path[2])) {
+                    M.columnsWidth.cloud.fav.disabled = true;
+                    M.columnsWidth.cloud.fav.viewed = false;
+                }
             }
 
             if (M.currentrootid === 's4' && M.d[M.currentdirid.split('/').pop()]) {

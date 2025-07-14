@@ -12,6 +12,13 @@
     margin: 4px 6px 6px;
     vertical-align: middle;
 }
+
+.colour-label .device-centre-item-info-block::after {
+    position: absolute;
+    right: 0;
+    top: 16px;
+}
+
 .colour-label-ind.red,
 .colour-label.red td.label::before {
     background-color: var(--label-red);

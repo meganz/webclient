@@ -1927,6 +1927,7 @@ lazy(mega.devices, 'ui', () => {
                 if (M.getNodeRights(folder.h) > 1) {
                     items['.stopsync-item'] = 1;
                     items['.rename-item'] = 1;
+                    items['.colour-label-items'] = 1;
                     if (node.tvf) {
                         items['.clearprevious-versions'] = 1;
                     }
@@ -1948,6 +1949,8 @@ lazy(mega.devices, 'ui', () => {
                 items['.copy-item'] = 1;
                 items['.getlink-item'] = 1;
                 items['.sh4r1ng-item'] = 1;
+                items['.add-star-item'] = 1;
+                items['.colour-label-items'] = 1;
                 items['.transferit-item'] = 1;
                 items['.send-to-contact-item'] = 1;
                 if (isSharedFolder) {
@@ -1971,11 +1974,11 @@ lazy(mega.devices, 'ui', () => {
          * @param {object.<string,number>} items The items to populate
          * @param {Boolean} isSharedFolder Whether this folder is shared
          * @param {Boolean} hasSharedLink Whether this folder has a public link
-         * @param {Boolean} multiple Whether multiple nodes have been selected
+         * @param {Array<String>} handles The list of handles in case multiple selection
          *
          * @returns {void} void
          */
-        _populateCommonCtxItems(node, items, isSharedFolder, hasSharedLink, multiple) {
+        _populateCommonCtxItems(node, items, isSharedFolder, hasSharedLink, handles) {
 
             items['.send-to-contact-item'] = 1;
             items['.download-standart-item'] = 1;
@@ -1984,18 +1987,26 @@ lazy(mega.devices, 'ui', () => {
             items['.properties-item'] = 1;
             items['.getlink-item'] = 1;
 
-            if (multiple) {
+            if (handles && handles.length > 1) {
+                this._populateCommonCtxItemsMult(handles, items);
                 return;
             }
 
-            const isWritable = M.getNodeRights(node.h) > 1 && !this.isBackupRelated(node.h);
+            const isBackupRelated = this.isBackupRelated(node.h);
+            const isWritable = M.getNodeRights(node.h) > 1 && !isBackupRelated;
 
-            if (isWritable && node.h !== M.RootID) {
-                items['.move-item'] = 1;
-                items['.remove-item'] = 1;
-                items['.rename-item'] = 1;
-                items['.add-star-item'] = 1;
-                items['.colour-label-items'] = 1;
+            if (node.h !== M.RootID) {
+                if (isBackupRelated) {
+                    items['.add-star-item'] = 1;
+                    items['.colour-label-items'] = 1;
+                }
+                else if (isWritable) {
+                    items['.move-item'] = 1;
+                    items['.remove-item'] = 1;
+                    items['.rename-item'] = 1;
+                    items['.add-star-item'] = 1;
+                    items['.colour-label-items'] = 1;
+                }
             }
             if (node.t) {
                 items['.open-item'] = 1;
@@ -2029,6 +2040,40 @@ lazy(mega.devices, 'ui', () => {
             }
 
             this._populateSensitiveCtxItems([node.h], items);
+        }
+
+        /**
+         * Internal function, populates common context menu items in case multiple selection
+         * Returns whether parent execution should be stopped or not
+         *
+         * @param {Array<String>} handles The list of handles in case multiple selection
+         * @param {object.<string,number>} items The items to populate
+         *
+         * @returns {void}
+         */
+        _populateCommonCtxItemsMult(handles, items) {
+            let isAnyInShare = false;
+            for (let i = 0; i < handles.length; i++) {
+                const handle = handles[i];
+                if (handle === M.RootID) {
+                    return;
+                }
+
+                const isBackupRelated = this.isBackupRelated(handle);
+                const isWritable = M.getNodeRights(handle) > 1 && !isBackupRelated;
+                if (!isBackupRelated && !isWritable) {
+                    return;
+                }
+
+                if (!isAnyInShare && sharer(handle)) {
+                    isAnyInShare = true;
+                }
+            }
+
+            items['.colour-label-items'] = 1;
+            if (!isAnyInShare) {
+                items['.add-star-item'] = 1;
+            }
         }
 
         _populateSensitiveCtxItems(handles, items) {
@@ -2146,6 +2191,7 @@ lazy(mega.devices, 'ui', () => {
                 items['.zipdownload-item'] = 1;
 
                 this._populateSensitiveCtxItems(handles, items);
+                this._populateCommonCtxItemsMult(handles, items);
                 this._filterRestrictedItems(handles, items);
 
                 return items;
@@ -2158,12 +2204,9 @@ lazy(mega.devices, 'ui', () => {
 
                 this._populateSensitiveCtxItems(handles, items);
                 items['.move-item'] = 1;
-                items['.add-star-item'] = 1;
-                items['.colour-label-items'] = 1;
                 items['.remove-item'] = 1;
             }
 
-            const mult = handles.length > 1;
             const h = handles[0];
 
             // If its a device, we take care of it under `ui.contextMenu()`
@@ -2188,9 +2231,9 @@ lazy(mega.devices, 'ui', () => {
             // Inside a device folder
             else if (currentSection === renderSection.cloudDrive) {
                 this._populateCommonCtxItems(
-                    selNode, items, isSharedFolder, hasSharedLink, mult
+                    selNode, items, isSharedFolder, hasSharedLink, handles
                 );
-                if (!mult && this.isFullSyncRelated(h)) {
+                if (handles.length === 1 && this.isFullSyncRelated(h)) {
                     items['.open-cloud-item'] = 1;
                 }
             }

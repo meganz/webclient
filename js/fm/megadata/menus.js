@@ -199,7 +199,7 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
     const selNode = M.getNodeByHandle($.selected[0]);
     const sourceRoot = M.getSelectedSourceRoot(isSearch, isTree);
     let restrictedFolders = false;
-    const isInShare = M.currentrootid === 'shares';
+    const isInShare = M.currentrootid === 'shares' || M.onDeviceCenter && !!sharer(selNode.h);
 
     if (selNode && selNode.su && !M.d[selNode.p]) {
         items['.leaveshare-item'] = 1;
@@ -215,7 +215,7 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
                 items['.open-item'] = 1;
             }
 
-            if ((sourceRoot === M.RootID || sourceRoot === 's4'
+            if ((sourceRoot === M.RootID || sourceRoot === M.InboxID || sourceRoot === 's4'
                 || M.isDynPage(M.currentrootid)) && !folderlink) {
 
                 let exp = false;
@@ -325,9 +325,7 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
             items['.rename-item'] = 1;
             items['.colour-label-items'] = 1;
 
-            const isInshareRelated = isInShare
-                || M.onDeviceCenter && sharer(selNode.h);
-
+            const isInshareRelated = isInShare || M.onDeviceCenter && sharer(selNode.h);
             if (!isInshareRelated) {
                 items['.add-star-item'] = 1;
 
@@ -493,7 +491,7 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
             delete items['.revert-item'];
         }
     };
-    if ((sourceRoot === M.RootID || sourceRoot === 'out-shares'
+    if ((sourceRoot === M.RootID || sourceRoot === M.InboxID || sourceRoot === 'out-shares'
          || sourceRoot === 's4' || M.isDynPage(M.currentrootid)) && !folderlink) {
 
         items['.move-item'] = 1;
@@ -634,8 +632,7 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
         delete items['.togglepausesync-item'];
     }
 
-    if (restrictedFolders || $.selected.length === 1
-        && sourceRoot === M.InboxID) {
+    if (restrictedFolders) {
 
         delete items['.transferit-item'];
         delete items['.open-cloud-item'];
@@ -734,6 +731,16 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
                 delete items['.transferit-item'];
             }
         }
+    }
+
+    const node = $.selected.length && M.d[$.selected[0]];
+    const parent = node && M.d[node.p];
+
+    if (parent && parent.devid || sourceRoot === M.InboxID || M.getNodeRoot($.selected[0]) === M.InboxID) {
+        delete items['.open-cloud-item'];
+        delete items['.move-item'];
+        delete items['.rename-item'];
+        delete items['.remove-item'];
     }
 
     if (!mega.xferit) {

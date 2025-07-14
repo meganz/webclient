@@ -178,6 +178,7 @@ table.device-centre .device-centre-item-info-block .device-centre-item-name {
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
+    padding-right: 22px;
 }
 
 table.device-centre .taken-down td div,

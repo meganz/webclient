@@ -1355,6 +1355,14 @@ class SelectionManager2_DOM extends SelectionManager2Base {
                 __hideButton('move');
             }
 
+            if (!M.onDeviceCenter) {
+                const parent = selNode && M.d[selNode.p];
+                if (parent && parent.devid || M.getNodeRoot(selNode.h) === M.InboxID) {
+                    __hideButton('rename');
+                    __hideButton('move');
+                    __hideButton('delete');
+                }
+            }
         }
         else {
             M.dyh('required-links')
@@ -1371,6 +1379,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
                     }
                 });
         }
+
         finalise();
 
         M.initStatusBarLinks();

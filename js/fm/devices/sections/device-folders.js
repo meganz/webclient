@@ -112,6 +112,7 @@ lazy(mega.devices.sections, 'deviceFolders', () => {
         updateTemplate(aNode, aProperties, aTemplate) {
             const elIcon = aTemplate.querySelector('.device-centre-item-icon');
             const elName = aTemplate.querySelector('.device-centre-item-name');
+            const elLabel = aTemplate.querySelector('.label');
             const elInfo = aTemplate.querySelector('.device-centre-item-info');
             const elType = aTemplate.querySelector('.device-centre-item-type');
             const elSize = aTemplate.querySelector('.device-centre-item-size');
@@ -122,9 +123,10 @@ lazy(mega.devices.sections, 'deviceFolders', () => {
                 aTemplate.classList.add('is-sensitive');
             }
 
-            if (elIcon && elName && elInfo && elType && elSize && elAdded && elModified) {
+            if (elIcon && elName && elLabel && elInfo && elType && elSize && elAdded && elModified) {
                 elIcon.classList.add(`icon-${aProperties.icon}-90`);
                 elName.textContent = aProperties.name || l[164];
+                elLabel.textContent = aProperties.labelC || '';
 
                 StatusUI.get(aProperties.status)({
                     status: aProperties.status,
@@ -221,7 +223,12 @@ lazy(mega.devices.sections, 'deviceFolders', () => {
                 M.viewmode = 0;
             }
 
-            M.v = Object.values(device.folders).filter(n => mega.sensitives.shouldShowNode(n.h));
+            M.v = Object.values(device.folders).filter(n => {
+                if (M.currentLabelFilter && !M.filterByLabel(n)) {
+                    return false;
+                }
+                return mega.sensitives.shouldShowNode(n.h);
+            });
 
             if (M.v.length) {
                 this.$empty.addClass('hidden');

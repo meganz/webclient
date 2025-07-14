@@ -451,6 +451,7 @@
     grid-row: 1 / 2;
     height: 17px;
     margin-inline-start: 8px;
+    line-height: 17px;
 }
 
 .mega-dialog.share-dialog .contact-dropdown-container .contact-email {

@@ -923,6 +923,23 @@ MegaData.prototype.copyNodes = async function(cn, t, del, tree) {
                 throw ex;
             });
     }
+    if (tree.isImporting) {
+        tree = await fileconflict.checkImport(tree, t);
+        if (!tree || !tree.length) {
+            throw EBLOCKED;
+        }
+    }
+    if (tree._importPart) {
+        for (let i = tree.length; i--;) {
+            if (tree[i]._replaces && !fileversioning.dvState) {
+                tree[i].ov = tree[i]._replaces;
+            }
+            else if (tree[i]._replaces) {
+                todel.push(tree[i]._replaces);
+            }
+            delete tree[i]._replaces;
+        }
+    }
     const createAttribute = tryCatch((n, nn) => ab_to_base64(crypto_makeattr(n, nn)));
 
     const addRestoreAttribute = (t) => {

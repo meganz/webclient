@@ -2412,7 +2412,7 @@ function createFolderDialog(close) {
 
     var doCreateFolder = function(v) {
         var errorMsg = '';
-        if (v.trim() === '' || v.trim() === l[157]) {
+        if (v.trim() === '') {
             errorMsg = l.EmptyName;
         }
         else if (v.length > 250) {

@@ -259,4 +259,36 @@ class MegaForm extends MegaComponent {
             mega.ui.sheet.addClass(sheetClass);
         });
     }
+
+    showOfflineDialog(type) {
+        const footerElements = mCreateElement('div', { class: 'flex flex-row-reverse' });
+
+        const titleMap = {
+            create: l.unable_to_add,
+            update: l.unable_to_edit,
+            save: l.unable_to_save
+        };
+
+        megaMsgDialog.render(
+            titleMap[type] || l.unable_to_edit,
+            l.check_connection,
+            '',
+            '',
+            {
+                icon: 'sprite-pm-mono icon-alert-triangle-thin-outline warning',
+                sheetType: 'normal',
+                footer: {
+                    slot: [footerElements],
+                    confirmButton: {
+                        parentNode: footerElements,
+                        type: 'normal',
+                        componentClassname: 'slim font-600',
+                        text: l.ok_button
+                    }
+                }
+            },
+            false,
+            true
+        );
+    }
 }

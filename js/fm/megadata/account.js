@@ -1253,7 +1253,13 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
     $('button.skip', $strgdlg).toggleClass('hidden', upgradeTo === 'min');
 
     $('.fm-notification-block .fm-notification-close')
-        .rebind('click', function() {
+        .rebind('click', (ev) => {
+            const $dupe = $(ev.currentTarget).parent('.duplicated-items-found');
+            if ($dupe.length) {
+                $dupe.removeClass('visible');
+                $.tresizer();
+                return;
+            }
             $('.pm-main').removeClass('fm-notification almost-full full');
             $.tresizer();
         });

@@ -463,11 +463,11 @@ mBroadcaster.addListener('fm:initialized', () => {
                                 dialogDesc: l.dc_promo_onboarding_content,
                                 dialogNext: l.ok_button,
                                 skipHidden: true,
-                                targetElmClass: '.js-myfiles-panel .device-centre span',
+                                targetElmClass: '.mega-top-menu .device-centre',
                                 targetElmPosition: 'left',
                                 targetElmPosTuning: {
-                                    top: 5,
-                                    left: 15,
+                                    top: 4,
+                                    left: -12,
                                 },
                                 markComplete: true,
                             }

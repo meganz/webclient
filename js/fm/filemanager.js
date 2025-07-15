@@ -3181,8 +3181,8 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
 
     var mainSel = $.selectddUIgrid + ' ' + $.selectddUIitem;
     var dropSel = $.selectddUIgrid + ' ' + $.selectddUIitem + '.folder';
-    var $ddUIitem = $(mainSel);
-    var $ddUIgrid = $($.selectddUIgrid);
+    var $ddUIitem = $(mainSel, '.fmholder');
+    var $ddUIgrid = $($.selectddUIgrid, '.fmholder');
 
     if (!folderlink) {
         $(dropSel).droppable({

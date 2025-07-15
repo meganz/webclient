@@ -1073,6 +1073,10 @@ FullScreenManager.prototype.enterFullscreen = function() {
         const $expectTimeBar = $('.video-expected-time-bar', $videoControls);
         const $progressTimeBar = $('.video-progress-time', $videoControls);
 
+        const storeCurrentTime = tryCatch((v) => {
+            sessionStorage.previewTime = v;
+        });
+
         // set idle state, i.e. hide controls
         var setIdle = function(value) {
             if (setIdle.value !== value) {
@@ -1103,7 +1107,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
                 if (offset % 2) {
                     // Store the current time in session storage such that we can restore on reload.
-                    sessionStorage.previewTime = offset;
+                    storeCurrentTime(offset);
                 }
 
                 if (subtitlesManager) {

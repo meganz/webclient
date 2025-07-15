@@ -415,7 +415,14 @@ lazy(s4, 'utils', () => {
             const treeWrap = document.querySelector(`.${wrapperClass}`);
             const cn = this.getContainersList();
             const prefix = dialog ? 'mc' : '';
-            let treeNode = treeWrap.querySelector('.s4 .tree');
+            let treeNode = treeWrap && treeWrap.querySelector('.s4 .tree');
+
+            if (!treeNode) {
+                if (self.d) {
+                    console.warn(`Cannot render S4 Container tree, ${wrapperClass} missing.`);
+                }
+                return false;
+            }
 
             const createItem = (node, id, name, icon, staticItem, eventId) => {
                 const itemWrap = mCreateElement('li', {

@@ -325,7 +325,10 @@ FileManager.prototype.initFileManager = async function() {
     if (!pfid && !is_mobile && u_type > 0) {
 
         if (u_attr.s4) {
-            const onS4Section = (page) => this.getNodeByHandle(String(page || this.currentdirid).slice(0, 8)).s4;
+            const onS4Section = (page) => {
+                page = String(page || this.currentdirid);
+                return page === 's4' || this.getNodeByHandle(page.slice(0, 8)).s4;
+            };
 
             mega.s4c = 1;
             const s4load = this.initS4FileManager()
@@ -355,7 +358,7 @@ FileManager.prototype.initFileManager = async function() {
                             );
                         });
 
-                        if (onS4Section() || M.currentdirid === 's4') {
+                        if (onS4Section()) {
 
                             return this.openFolder('fm', true);
                         }

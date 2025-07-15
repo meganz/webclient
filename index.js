@@ -937,7 +937,7 @@ function init_page() {
     /**
      * Activate S4 Auth Code for Pro Flexi accounts
      */
-    else if (page === 'activate-s4') {
+    else if (page.substr(0, 11) === 'activate-s4') {
         ActivateS4Page.load();
     }
     else if (page === 'confirm') {

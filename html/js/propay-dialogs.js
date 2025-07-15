@@ -2602,8 +2602,7 @@ var addressDialog = {
                     const $stripeDialog = this.getStripeDialog();
                     const $stripeIframe = $('iframe#stripe-widget', $stripeDialog);
 
-                    // Assume all trials are monthly plans at the moment
-                    const plan = pro.getPlan(pro.propay.planNum, 1);
+                    const plan = pro.getPlan(pro.propay.planNum, pro.propay.selectedPeriod);
                     const planPrice = plan[pro.UTQA_RES_INDEX_LOCALPRICE] || plan[pro.UTQA_RES_INDEX_PRICE];
                     const planCurrency = plan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY] || 'EUR';
                     const planNumber = parseInt(pro.propay.planNum);

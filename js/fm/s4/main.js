@@ -10,6 +10,10 @@ lazy(s4, 'main', () => {
     const fmNode = document.querySelector('.pm-main > .fm-right-files-block');
 
     const renderActivation = () => {
+        if (!fmNode) {
+            return loadSubPage('fm');
+        }
+
         const canEnable = u_attr.p && !pro.filter.simple.miniPlans.has(u_attr.p) || u_attr.pf;
         const domNode = fmNode.querySelector('.fm-activate-section') || ce(
             'div', fmNode, { class: 'fm-empty-section s4 fm-activate-section hidden' }

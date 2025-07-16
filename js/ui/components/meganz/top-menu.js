@@ -221,6 +221,8 @@ class MegaTopMenu extends MegaMobileTopMenu {
             });
         }
 
+        // @todo: Show button for business account with activated S4 when ready
+        // if (!(u_attr.b && !u_attr.s4)) {
         if (!u_attr.b) {
             loggedInCD.splice(mega.lite.inLiteMode ? 1 : 4, 0, {
                 text: l.obj_storage,

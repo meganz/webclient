@@ -228,7 +228,7 @@ pro.propay = {
     async getSavedCard() {
         'use strict';
 
-        this.savedCard = await api.req({a: 'cci', v: 2}).then(res => {
+        this.savedCard = await api.req({a: 'cci', v: 3}).then(res => {
             return typeof res.result === 'object'
                 ? !!res.result.reuse && res.result
                 : false;
@@ -1918,7 +1918,7 @@ pro.propay = {
                 selected: true,
             },
             {
-                text: 'Add credit or debit card',
+                text: l.add_credit_debit_card,
                 icon: 'sprite-fm-mono icon-add',
                 value: 'new',
             }
@@ -2516,6 +2516,7 @@ pro.propay = {
                         addressDialog.processUtcResult(this.sca.utcResult, this.sca.saleId);
                     }
                     else if (this.useSavedCard) {
+                        pro.propay.showLoadingOverlay('processing');
                         addressDialog.validateAndPay(pro.propay.initBillingInfo, false, true);
 
                     }
@@ -2696,6 +2697,7 @@ pro.propay = {
         this.currentGateway = null;
         this.currentGatewayName = null;
         this.savedCardInitiated = false;
+        this.useSavedCard = null;
         this.paymentButton = null;
 
         this.showErrors(true);

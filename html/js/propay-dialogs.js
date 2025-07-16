@@ -3062,8 +3062,10 @@ var addressDialog = {
                 $stripeIframe.src = iframeSrc;
                 $stripeIframe.id = 'stripe-widget';
 
-                pro.propay.hideLoadingOverlay();
-                loadingDialog.hide();
+                if (!pro.propay.useSavedCard) {
+                    pro.propay.hideLoadingOverlay();
+                    loadingDialog.hide();
+                }
 
                 // $('.content', $stripeDialog).toggleClass('hidden', pro.propay.useSavedCard);
 

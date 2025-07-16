@@ -80,6 +80,10 @@
 #propay .radio-txt {
     font: var(--text-copy-medium-pricing);
 }
+#propay .radio-txt .card-brand {
+    font: var(--text-copy-medium-bold-pricing);
+    text-transform: capitalize;
+}
 /* Dropdown */
 #propay .dropdown-wrapper-primary .mega-input-dropdown {
     border-radius: 0;

@@ -2021,6 +2021,14 @@ mBroadcaster.once('boot_done', function populate_l() {
     l.ach_pwm_trial_blurb_expires = escapeHTML(l.ach_pwm_trial_blurb_expires)
         .replace('[A]', mega_io_hyperlinks.pass).replace('[/A]', '</a>');
 
+    const ssExceedUrl = 'https://help.mega.io/plans-storage/space-storage/storage-exceeded';
+    l.plan_exp_banner_text_oq = escapeHTML(l.plan_exp_banner_text_oq)
+        .replace('[A]', `<a class="clickurl" data-eventid="500870" href="${ssExceedUrl}" target="_blank">`)
+        .replace('[/A]', '</a>');
+    l.payment_failed_banner_text_oq = escapeHTML(l.payment_failed_banner_text_oq)
+        .replace('[A]', `<a class="clickurl" data-eventid="500871" href="${ssExceedUrl}" target="_blank">`)
+        .replace('[/A]', '</a>');
+
     const common = [
         15536, 16119, 16120, 16313, 16316, 16360, 18228, 18268, 18282,
         18284, 18285, 18286, 18287, 18289, 18290, 18291, 18294, 18295, 18296, 18297, 18298, 18302, 18303, 18304,

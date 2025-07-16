@@ -2870,6 +2870,10 @@ var addressDialog = {
                             mega.ui.toast.show(l.payment_card_update_desc, 6);
                             loadSubPage('fm/account');
                         }
+                        const banner = document.componentSelector('.payment-banner');
+                        if (banner) {
+                            banner.hide();
+                        }
                     }
                     else {
                         msgDialog('info', '', l.payment_card_update, l.payment_card_update_desc, () => {
@@ -2877,6 +2881,10 @@ var addressDialog = {
                                 accountUI.plan.init(M.account);
                             }
                         });
+                        const banner = mega.ui.secondaryNav.bannerHolder.querySelector('.new-banner');
+                        if (banner) {
+                            banner.classList.add('hidden');
+                        }
                     }
                 }
                 else {

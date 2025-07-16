@@ -124,6 +124,22 @@ class MegaImportPassSelector {
             .finally(() => {
                 mega.ui.pm.settings.importInFlight = false;
                 primaryButton.loading = false;
+
+                const importEventCodes = {
+                    '1password': 500890,
+                    'bitwarden': 500891,
+                    'google': 500892,
+                    'dashlane': 500893,
+                    'keepass': 500894,
+                    'lastpass': 500895,
+                    'nordpass': 500896,
+                    'proton': 500897,
+                    'other': 500898
+                };
+                const selected = mega.ui.pm.settings.importSelected;
+                if (importEventCodes[selected]) {
+                    eventlog(importEventCodes[selected]);
+                }
             });
     }
 }

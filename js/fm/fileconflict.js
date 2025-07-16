@@ -220,7 +220,10 @@
                                 }
                             }
                             else {
-                                self.prompt(op, file, node, a.length, node.p || target)
+                                const remaining = file.t === 1 ?
+                                    a.filter(n => n[1].t === 1).length :
+                                    a.filter(n => n[1].t === 0).length;
+                                self.prompt(op, file, node, remaining, node.p || target)
                                     .always(function(file, name, action, checked) {
                                         if (file === -0xBADF) {
                                             result = [];

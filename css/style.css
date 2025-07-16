@@ -11455,3 +11455,107 @@ a.underline-offset-4 {
 }
 
 /* End of Tablet devices */
+
+/* Temporary banner classes */
+
+/* @todo migrate banner component and remove these styles. */
+
+.fm-banner-holder .banner-rack {
+    width: 100%;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    box-sizing: border-box;
+    z-index: 0;
+}
+.fm-banner-holder .banner-rack .rack-slot {
+    max-height: 310px;
+    width: 100%;
+}
+.fm-banner-holder .banner-rack .rack-slot .slot-inner {
+    position: relative;
+    pointer-events: auto;
+    transition: opacity 1s ease-in;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.fm-banner-holder .mega-component.banner {
+    border: 0;
+    display: flex;
+    flex-flow: row nowrap;
+    align-content: center;
+    align-items: center;
+    justify-content: space-between;
+    box-sizing: border-box;
+    padding: 20px 24px;
+    position: static;
+    top: 0;
+    overflow: hidden;
+    font: var(--mobile-font-caption-large-regular);
+    width: 100%;
+    color: var(--mobile-text-primary);
+}
+.fm-banner-holder .mega-component.banner.warning {
+    background: var(--mobile-notification-warning);
+    --icon-color: var(--mobile-support-warning);
+}
+.fm-banner-holder .mega-component.banner.error {
+    background: var(--mobile-notification-error);
+    --icon-color: var(--mobile-support-error);
+}
+.fm-banner-holder .mega-component.banner .banner.left-icon {
+    align-self: flex-start;
+    --icon-size: 24px;
+    color: var(--icon-color);
+    order: 1;
+}
+.fm-banner-holder .mega-component.banner .content-box {
+    align-items: flex-start;
+    display: flex;
+    flex-flow: column nowrap;
+    flex: 1 1 auto;
+    order: 5;
+    padding: 0 8px;
+}
+.fm-banner-holder .mega-component.banner .title-text {
+    font: var(--mobile-font-copy-semibold);
+    color: var(--mobile-text-primary);
+}
+.fm-banner-holder .mega-component.banner .content-box > * {
+    margin-top: 8px;
+}
+.fm-banner-holder .mega-component.banner .content-box > *:first-child {
+    margin-top: 0;
+}
+.fm-banner-holder .mega-component.banner .message-text {
+    font: var(--mobile-font-caption-large-regular);
+    color: var(--mobile-text-primary);
+}
+.fm-banner-holder .mega-component.banner .message-text a {
+    text-decoration: underline;
+    color: var(--mobile-link-primary);
+    font: var(--mobile-font-caption-large-regular);
+}
+.fm-banner-holder .mega-component.banner .message-text b {
+     font: var(--mobile-font-caption-large-bold);
+ }
+.fm-banner-holder .mega-component.banner .nav-elem.action-link .primary-text {
+    font: var(--mobile-font-copy-semibold);
+    text-decoration: underline;
+    color: var(--mobile-link-primary);
+    white-space: nowrap;
+}
+.fm-banner-holder .mega-component.banner .end-box {
+    display: flex;
+    align-items: center;
+    order: 10;
+}
+.fm-banner-holder .mega-component.banner .end-box > * {
+    margin-inline-start: 24px;
+}
+.fm-banner-holder .mega-component.banner .icon-only {
+    cursor: pointer;
+}
+
+/* End temporary banner classes */

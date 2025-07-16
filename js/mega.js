@@ -1589,6 +1589,8 @@ scparser.$bulkAdd(['psts', 'psts_v2'], function(a) {
     if (fminitialized && !pfid) {
         pro.processPaymentReceived(a);
     }
+    M.delPersistentData('payfail-last').catch(nop);
+    M.delPersistentData('planexp-last').catch(nop);
 
     this.sqac(a);
 });
@@ -1677,6 +1679,7 @@ scparser.$add('pses', function(a) {
     'use strict';
     if (!folderlink) {
         notify.notifyFromActionPacket(a).catch(dump);
+        M.showPlanExpiringBanner({ expiry: a.ts }).catch(dump);
     }
 });
 

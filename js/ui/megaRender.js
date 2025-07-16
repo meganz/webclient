@@ -127,6 +127,7 @@ mBroadcaster.once('boot_done', () => {
                             '<div class="device-centre-item-info"></div>' +
                         '</div>' +
                     '</td>' +
+                    '<td megatype="label" class="label"></td>' +
                     '<td megatype="type">' +
                         '<div class="device-centre-item-type"></div>' +
                     '</td>' +
@@ -1134,7 +1135,7 @@ mBroadcaster.once('boot_done', () => {
                 return props;
             },
             'device-centre-folders'(aNode, aHandle) {
-                const props = this.nodeProperties['*'].call(this, aNode, aHandle, false);
+                const props = this.nodeProperties['*'].call(this, aNode, aHandle, true);
                 if (mega.devices.main) {
                     mega.devices.main.run('updateProps', props, aNode);
                 }

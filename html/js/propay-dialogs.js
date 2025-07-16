@@ -2602,8 +2602,7 @@ var addressDialog = {
                     const $stripeDialog = this.getStripeDialog();
                     const $stripeIframe = $('iframe#stripe-widget', $stripeDialog);
 
-                    // Assume all trials are monthly plans at the moment
-                    const plan = pro.getPlan(pro.propay.planNum, 1);
+                    const plan = pro.getPlan(pro.propay.planNum, pro.propay.selectedPeriod);
                     const planPrice = plan[pro.UTQA_RES_INDEX_LOCALPRICE] || plan[pro.UTQA_RES_INDEX_PRICE];
                     const planCurrency = plan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY] || 'EUR';
                     const planNumber = parseInt(pro.propay.planNum);
@@ -2870,6 +2869,10 @@ var addressDialog = {
                             mega.ui.toast.show(l.payment_card_update_desc, 6);
                             loadSubPage('fm/account');
                         }
+                        const banner = document.componentSelector('.payment-banner');
+                        if (banner) {
+                            banner.hide();
+                        }
                     }
                     else {
                         msgDialog('info', '', l.payment_card_update, l.payment_card_update_desc, () => {
@@ -2877,6 +2880,10 @@ var addressDialog = {
                                 accountUI.plan.init(M.account);
                             }
                         });
+                        const banner = mega.ui.secondaryNav.bannerHolder.querySelector('.new-banner');
+                        if (banner) {
+                            banner.classList.add('hidden');
+                        }
                     }
                 }
                 else {
@@ -3063,8 +3070,10 @@ var addressDialog = {
                 $stripeIframe.src = iframeSrc;
                 $stripeIframe.id = 'stripe-widget';
 
-                pro.propay.hideLoadingOverlay();
-                loadingDialog.hide();
+                if (!pro.propay.useSavedCard) {
+                    pro.propay.hideLoadingOverlay();
+                    loadingDialog.hide();
+                }
 
                 // $('.content', $stripeDialog).toggleClass('hidden', pro.propay.useSavedCard);
 

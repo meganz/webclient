@@ -203,12 +203,10 @@ var redeem = {
      */
     showErrorDialog: function(message) {
         'use strict';
-        if (message < 0) {
-            message = message === ETOOMANY ? l.redeem_etoomany : `${api_strerror(message)} (${message})`;
-        }
+        message = message === ETOOMANY ? l.redeem_etoomany : '';
         // Show 'Oops, that does not seem to be a valid voucher code.' if none given
         // With buttons, 'Contact Support' & 'Cloud Drive'
-        this.showDialog(l[20416], l[473], String(message || ''), [l[18148], l[19266]], true)
+        this.showDialog(l[20416], l[473], message, [l[18148], l[19266]], true)
             .then(function() {
                 redeem.goToCloud();
             })

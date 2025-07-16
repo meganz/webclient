@@ -2582,9 +2582,18 @@ MegaUtils.prototype.noSleep = async function(stop, title) {
     }
 };
 
-MegaUtils.prototype.updatePaymentCardState = () => {
+MegaUtils.prototype.updatePaymentCardState = async function() {
     'use strict';
-    return api.req({a: 'cci'}).then((res) => {
+    if (!M.account) {
+        await new Promise(resolve => {
+            M.accountData(resolve);
+        });
+    }
+    if (M.account.stype !== 'O') {
+        // Only check for one-off subscriptions.
+        return;
+    }
+    return api.req({a: 'cci', v: 2}).then((res) => {
         const date = new Date();
         const cardM = res.result.exp_month;
         const cardY = res.result.exp_year;

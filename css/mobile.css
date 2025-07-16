@@ -11124,3 +11124,14 @@ body.rtl .overlay-wrap {
         height: 100%;
     }
 }
+
+.mega-component.banner.payment-banner .title-text {
+    font: var(--mobile-font-copy-semibold);
+}
+.mega-component.banner.payment-banner .message-text,
+.mega-component.banner.payment-banner .message-text a {
+    font: var(--mobile-font-caption-large-regular);
+}
+.mega-component.banner.payment-banner .message-text b {
+    font: var(--mobile-font-caption-large-bold);
+}

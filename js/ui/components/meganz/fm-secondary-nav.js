@@ -605,19 +605,8 @@ lazy(mega.ui, 'secondaryNav', () => {
     };
 
     const updateColBtnText = () => {
-
-        if (page === 'fm/public-links') {
-            timeAdBtn.text = l[20694];
-            colBtnsText.date = l[20694];
-        }
-        else if (page === 'fm/file-requests') {
-            timeAdBtn.text = l.file_request_page_label_request_created;
-            colBtnsText.date = l.file_request_page_label_request_created;
-        }
-        else {
-            timeAdBtn.text = l[17445];
-            colBtnsText.date = l[17445];
-        }
+        timeAdBtn.text = l[17445];
+        colBtnsText.date = l[17445];
     };
 
     selectAllGrid.addEventListener('click', _allAction);
@@ -812,7 +801,7 @@ lazy(mega.ui, 'secondaryNav', () => {
         handleNodeSelection,
         toggleGridExtraButtons,
         get bannerHolder() {
-            return this.domNode.querySelector('.fm-banner-holder');
+            return document.querySelector('.fm-banner-holder');
         },
         get actionsHolder() {
             return this.domNode.querySelector('.fm-header-buttons');
@@ -1134,5 +1123,61 @@ lazy(mega.ui, 'secondaryNav', () => {
                 selectionManager.selected_list = [];
             }
         },
+        showBanner(options) {
+            // @todo migrate the banner component to be available here
+            const banner = this.bannerHolder.querySelector('.new-banner');
+            const icon = banner.querySelector('.banner.left-icon');
+            icon.classList.remove('icon-alert-triangle-thin-outline', 'icon-alert-circle-thin-outline');
+            if (options.type === 'error') {
+                icon.classList.add('icon-alert-triangle-thin-outline');
+            }
+            else if (options.type === 'warning') {
+                icon.classList.add('icon-alert-circle-thin-outline');
+            }
+
+            const titleText = banner.querySelector('.banner.title-text');
+            const messageText = banner.querySelector('.banner.message-text');
+            const endBox = banner.querySelector('.end-box');
+            const cta = endBox.componentSelector('.action-link') || new MegaLink({
+                parentNode: endBox,
+                componentClassname: 'action-link',
+                type: 'normal',
+            });
+            const dismiss = endBox.componentSelector('button.icon-only') || new MegaButton({
+                parentNode: endBox,
+                type: 'icon',
+                icon: 'sprite-fm-mono icon-dialog-close',
+                iconSize: 24,
+                componentClassname: 'text-icon',
+            });
+            const alert = banner.querySelector('.mega-component.alert');
+
+            const { title, type, msgText, msgHtml, ctaHref, ctaText, ctaEvent, closeEvent } = options;
+
+            alert.classList.remove('warning', 'error');
+            alert.classList.add(type);
+            titleText.textContent = title;
+            if (msgHtml) {
+                messageText.textContent = '';
+                messageText.appendChild(parseHTML(msgHtml));
+            }
+            else {
+                messageText.textContent = msgText;
+            }
+            cta.href = ctaHref;
+            cta.text = ctaText;
+            cta.rebind('click.eventLog', () => eventlog(ctaEvent));
+
+            dismiss.rebind('click', () => {
+                banner.classList.add('hidden');
+                if (typeof closeEvent === 'number') {
+                    eventlog(closeEvent);
+                }
+            });
+
+            banner.classList.remove('warning', 'error', 'hidden');
+            banner.classList.add(type);
+            clickURLs();
+        }
     };
 });

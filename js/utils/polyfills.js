@@ -202,6 +202,19 @@ if (Object.hasOwn === undefined) {
             }
         });
     }
+
+    if (!Blob.prototype.arrayBuffer) {
+        Object.defineProperty(Blob.prototype, 'arrayBuffer', {
+            value() {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onerror = reject;
+                    reader.onload = (ev) => resolve(ev.target.result);
+                    reader.readAsArrayBuffer(this);
+                });
+            }
+        });
+    }
 })();
 
 mBroadcaster.once('boot_done', tryCatch(() => {

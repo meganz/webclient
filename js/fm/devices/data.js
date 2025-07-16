@@ -456,10 +456,9 @@ lazy(mega.devices, 'data', () => {
          */
         buildDeviceFolder(apiFolder, node) {
             const {id, d, syncState, ss, t, hb} = apiFolder;
-            const {h, name, ts, tb, td, tf} = node;
 
-            const folder = new DeviceCentreFolder(d, h);
-            folder.props = {name, ts, tb, td, tf, id, syncState, ss, t, hb};
+            const folder = new DeviceCentreFolder(d, node.h);
+            folder.props = {...node, id, syncState, ss, t, hb};
 
             const props = {};
             if (t === syncType.cameraUpload ||

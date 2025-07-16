@@ -947,6 +947,17 @@ accountUI.plan = {
                     const rewindTxt = mega.icu.format(l.pr_up_to_days, pro.filter.simple.ninetyDayRewind
                         .has(plan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL]) ? 90 : 180);
 
+                    const banner = $cancelDialog[0].querySelector('.over-storage-banner');
+                    if (M.account.cstrg > mega.bstrg) {
+                        banner.classList.remove('hidden');
+                        banner.querySelector('span').textContent = l.cancel_sub_oq_banner
+                            .replace('%1', bytesToSize(M.account.cstrg))
+                            .replace('%2', freeStorage);
+                    }
+                    else {
+                        banner.classList.add('hidden');
+                    }
+
                     $('.pro-storage', $cancelDialog).text(proStorage);
                     $('.free-storage', $cancelDialog).text(freeStorage);
                     $('.pro-transfer', $cancelDialog).text(proTransfer);

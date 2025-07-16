@@ -458,6 +458,18 @@ var pro = {
 
             // Don't show the plan expiry dialog anymore for this session
             alarm.planExpired.lastPayment = null;
+            if (is_mobile) {
+                const banner = document.componentSelector('.payment-banner');
+                if (banner) {
+                    banner.hide();
+                }
+            }
+            else {
+                const banner = mega.ui.secondaryNav.bannerHolder.querySelector('.new-banner');
+                if (banner) {
+                    banner.classList.add('hidden');
+                }
+            }
 
             // If last payment was Bitcoin, we need to redirect to the account page
             if (pro.lastPaymentProviderId === bitcoinDialog.gatewayId) {

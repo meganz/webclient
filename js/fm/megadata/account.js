@@ -711,6 +711,228 @@ MegaData.prototype.showContactVerificationDialog = function() {
     });
 };
 
+MegaData.prototype.showPlanExpiringBanner = async function(data) {
+    'use strict';
+
+    if (!fminitialized) {
+        return;
+    }
+    if (!M.account) {
+        await new Promise(resolve => {
+            M.accountData(resolve);
+        });
+    }
+    if (
+        M.account.stype !== 'O' ||
+        u_attr && (u_attr.b || u_attr.pf) ||
+        M.account.slevel === pro.ACCOUNT_LEVEL_BUSINESS ||
+        M.account.slevel === pro.ACCOUNT_LEVEL_PRO_FLEXI
+    ) {
+        return;
+    }
+
+    const curr = await M.getPersistentData('planexp-last').catch(nop) || {
+        expiry: data && data.expiry || M.account.expiry,
+        slevel: M.account.slevel,
+        shown: 0,
+        h: u_handle,
+    };
+    const { expiry, slevel, shown, h } = curr;
+    if (u_handle !== h) {
+        await M.delPersistentData('planexp-last').catch(nop);
+        return M.showPlanExpiringBanner(data);
+    }
+    const today = new Date();
+    if (today.getTime() > expiry * 1000) {
+        M.delPersistentData('planexp-last').catch(nop);
+        data.slevel = data.slevel || slevel || M.account.slevel;
+        return M.showPlanExpiredBanner(data);
+    }
+    if (today.getTime() < (expiry - 4 * 86400) * 1000) {
+        return;
+    }
+    today.setHours(0, 0, 0, 0);
+    if (shown > today.getTime()) {
+        return;
+    }
+
+    curr.shown = today.setDate(today.getDate() + 1);
+    M.setPersistentData('planexp-last', curr).catch(dump);
+
+    const planName = pro.getProPlanName(slevel);
+    const options = {
+        title: l.plan_exp_banner_title.replace('%s', planName),
+        type: 'warning',
+        ctaText: l.resubscribe,
+        ctaHref: `/propay_${slevel}`,
+        ctaEvent: 500863,
+        closeEvent: 500862,
+    };
+
+    if (mega.bstrg < M.account.cstrg) {
+        options.msgHtml = l.plan_exp_banner_text_oq
+            .replace('%1', bytesToSize(M.account.cstrg))
+            .replace('%2', bytesToSize(mega.bstrg, 0));
+    }
+    else {
+        options.msgText = l.plan_exp_banner_text.replace('%s', planName);
+    }
+
+    if (is_mobile) {
+        const banner = mobile.banner.show(
+            options.title,
+            options.msgHtml ? parseHTML(options.msgHtml) : options.msgText,
+            options.ctaText,
+            options.type,
+            true
+        );
+        banner.on('cta', () => {
+            loadSubPage(options.ctaHref);
+            eventlog(options.ctaEvent);
+        });
+        banner.on('close', () => eventlog(options.closeEvent));
+        banner.addClass('payment-banner');
+        return;
+    }
+    mega.ui.secondaryNav.showBanner(options);
+};
+
+MegaData.prototype.showPaymentFailedBanner = async function() {
+    'use strict';
+
+    if (!M.account) {
+        await new Promise(resolve => {
+            M.accountData(resolve);
+        });
+    }
+
+    const { subs = [], expiry, cstrg } = M.account;
+    const today = new Date();
+
+    const lastShow = await M.getPersistentData('payfail-last').catch(nop) ||
+        { shown: 0, last: 0, id: false, al: false, h: u_handle };
+    if (u_handle !== lastShow.h) {
+        await M.delPersistentData('payfail-last').catch(nop);
+        return M.showPaymentFailedBanner();
+    }
+    if (
+        u_attr && (u_attr.b || u_attr.pf) ||
+        lastShow.al === pro.ACCOUNT_LEVEL_BUSINESS ||
+        lastShow.al === pro.ACCOUNT_LEVEL_PRO_FLEXI
+    ) {
+        return;
+    }
+    let renewPassed = false;
+    let isCancelled = true;
+    for (let i = subs.length; i--;) {
+        if (subs[i].next * 1000 < today.getTime()) {
+            renewPassed = subs[i];
+            if (isCancelled && !lastShow.id) {
+                isCancelled = false;
+            }
+        }
+        if (lastShow.id && subs[i].id === lastShow.id) {
+            isCancelled = false;
+        }
+        if (renewPassed && !isCancelled) {
+            break;
+        }
+    }
+    if (!renewPassed && !lastShow.id) {
+        return;
+    }
+    today.setHours(0, 0, 0, 0);
+
+    if (!isCancelled && (lastShow.shown > 4 || lastShow.last > today.getTime())) {
+        return;
+    }
+    lastShow.shown = isCancelled ? 0 : lastShow.shown + 1;
+    lastShow.last = today.setDate(today.getDate() + 1);
+    lastShow.id = lastShow.id || renewPassed.id;
+    lastShow.al = lastShow.al || renewPassed.al;
+    M.setPersistentData('payfail-last', lastShow).catch(dump);
+
+    const options = {
+        type: 'error',
+    };
+    const planName = pro.getProPlanName(lastShow.al);
+    if (isCancelled) {
+        options.title = l.payment_cancel_banner_title;
+        options.msgText = l.payment_cancel_banner_text.replace('%s', planName);
+        options.ctaText = l.upgrade_now;
+        options.ctaHref = `/propay_${lastShow.al}`;
+        options.ctaEvent = 500865;
+        options.closeEvent = 500864;
+    }
+    else if (expiry) {
+        options.title = l[25049];
+        options.ctaText = l.update_card;
+        options.ctaHref = is_mobile ? '/fm/account/paymentcard' : '/fm/account/plan/account-card-info';
+        options.ctaEvent = 500867;
+        options.closeEvent = 500866;
+        options.msgHtml = (
+            mega.bstrg < cstrg ?
+                l.payment_failed_banner_text_oq :
+                escapeHTML(l.payment_failed_banner_text)
+        )
+            .replace('%1', planName)
+            .replace('%2', `<b>${time2date(expiry, 1)}</b>`)
+            .replace('%3', bytesToSize(cstrg));
+    }
+    else {
+        return;
+    }
+
+    if (is_mobile) {
+        const banner = mobile.banner.show(
+            options.title,
+            options.msgHtml ? parseHTML(options.msgHtml) : options.msgText,
+            options.ctaText,
+            options.type,
+            true
+        );
+        banner.on('cta', () => {
+            loadSubPage(options.ctaHref);
+            eventlog(options.ctaEvent);
+        });
+        banner.on('close', () => eventlog(options.closeEvent));
+        banner.addClass('payment-banner');
+    }
+    else {
+        mega.ui.secondaryNav.showBanner(options);
+    }
+};
+
+MegaData.prototype.showPlanExpiredBanner = async function(data) {
+    'use strict';
+
+    const { slevel } = data;
+    if (is_mobile) {
+        const banner = mobile.banner.show(
+            l.plan_ended_banner_title.replace('%s', pro.getProPlanName(slevel)),
+            l.plan_ended_banner_text,
+            l.upgrade_now,
+            'error',
+            true
+        );
+        banner.on('cta', () => {
+            loadSubPage(`propay_${slevel}`);
+            eventlog(500869);
+        });
+        banner.on('close', () => eventlog(500868));
+        banner.addClass('payment-banner');
+        return;
+    }
+    mega.ui.secondaryNav.showBanner({
+        type: 'error',
+        title: l.plan_ended_banner_title.replace('%s', pro.getProPlanName(slevel)),
+        msgText: l.plan_ended_banner_text,
+        ctaHref: `/propay_${slevel}`,
+        ctaText: l.upgrade_now,
+        ctaEvent: 500869,
+        closeEvent: 500868,
+    });
+};
 
 MegaData.prototype.showPaymentCardBanner = function(status) {
     'use strict';
@@ -1092,12 +1314,10 @@ mBroadcaster.once('fm:initialized', () => {
     'use strict';
 
     if (u_attr && (u_attr.p || u_attr.b)) {
-
-        if (M.account && M.account.cce) {
-            M.showPaymentCardBanner(M.account.cce);
-        }
-        else {
-            M.updatePaymentCardState().catch(dump);
-        }
+        M.updatePaymentCardState().catch(dump);
+    }
+    if (u_type === 3) {
+        M.showPlanExpiringBanner().catch(dump);
+        M.showPaymentFailedBanner().catch(dump);
     }
 });

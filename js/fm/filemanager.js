@@ -169,21 +169,20 @@ function FileManager() {
                 }
             }
 
-            const isBackup = M.currentrootid === mega.devices.rootId
-                && M.getNodeRoot(M.currentCustomView.nodeID) === M.InboxID;
-
             if (
                 M.currentrootid === M.RubbishID
                 || M.currentrootid === 'shares'
-                || isBackup
             ) {
                 M.columnsWidth.cloud.fav.disabled = true;
                 M.columnsWidth.cloud.fav.viewed = false;
             }
 
-            if (isBackup) {
-                M.columnsWidth.cloud.label.disabled = true;
-                M.columnsWidth.cloud.label.viewed = false;
+            if (M.onDeviceCenter) {
+                const path = M.currentdirid.split('/');
+                if (path.length === 3 && sharer(path[2])) {
+                    M.columnsWidth.cloud.fav.disabled = true;
+                    M.columnsWidth.cloud.fav.viewed = false;
+                }
             }
 
             if (M.currentrootid === 's4' && M.d[M.currentdirid.split('/').pop()]) {
@@ -326,7 +325,10 @@ FileManager.prototype.initFileManager = async function() {
     if (!pfid && !is_mobile && u_type > 0) {
 
         if (u_attr.s4) {
-            const onS4Section = (page) => this.getNodeByHandle(String(page || this.currentdirid).slice(0, 8)).s4;
+            const onS4Section = (page) => {
+                page = String(page || this.currentdirid);
+                return page === 's4' || this.getNodeByHandle(page.slice(0, 8)).s4;
+            };
 
             mega.s4c = 1;
             const s4load = this.initS4FileManager()
@@ -356,7 +358,7 @@ FileManager.prototype.initFileManager = async function() {
                             );
                         });
 
-                        if (onS4Section() || M.currentdirid === 's4') {
+                        if (onS4Section()) {
 
                             return this.openFolder('fm', true);
                         }
@@ -2793,14 +2795,6 @@ FileManager.prototype.addGridUI = function(refresh) {
 
     // Change title for Public link page
     let dateLabel = l[17445];
-    switch (page) {
-        case 'fm/public-links':
-            dateLabel = l[20694];
-            break;
-        case 'fm/file-requests':
-            dateLabel = l.file_request_page_label_request_created;
-            break;
-    }
 
     if (dateLabel) {
         $('.fm .grid-table thead .date').text(dateLabel);

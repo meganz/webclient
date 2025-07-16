@@ -1032,6 +1032,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
         var $document = $(document);
         var filters = Object.create(null);
         let duration, playevent;
+        const fadeTiming = 300;
         const MOUSE_IDLE_TID = 'auto-hide-media-controls';
         const SPRITE = is_embed ? 'sprite-embed-mono' : 'sprite-fm-mono';
         const $playPauseButton = $('.play-pause-video-button', $wrapper);
@@ -1073,6 +1074,10 @@ FullScreenManager.prototype.enterFullscreen = function() {
         const $expectTimeBar = $('.video-expected-time-bar', $videoControls);
         const $progressTimeBar = $('.video-progress-time', $videoControls);
 
+        const storeCurrentTime = tryCatch((v) => {
+            sessionStorage.previewTime = v;
+        });
+
         // set idle state, i.e. hide controls
         var setIdle = function(value) {
             if (setIdle.value !== value) {
@@ -1103,7 +1108,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
                 if (offset % 2) {
                     // Store the current time in session storage such that we can restore on reload.
-                    sessionStorage.previewTime = offset;
+                    storeCurrentTime(offset);
                 }
 
                 if (subtitlesManager) {
@@ -1160,6 +1165,18 @@ FullScreenManager.prototype.enterFullscreen = function() {
             }
         };
 
+        const showPauseBtn = () => {
+            $playPauseButton.css('display', 'none');
+            $playPauseButton.removeClass('hidden');
+            $playPauseButton.fadeIn(fadeTiming);
+        };
+
+        const hidePauseBtn = delay.bind(null, 'hide-pause-btn', () => {
+            $playPauseButton.fadeOut(fadeTiming, () => {
+                $playPauseButton.addClass('hidden');
+            });
+        }, 1000);
+
         // Changes the button state of certain button's so the correct visuals can be displayed with CSS
         var changeButtonState = function(type) {
 
@@ -1192,11 +1209,11 @@ FullScreenManager.prototype.enterFullscreen = function() {
                     $('.playpause-wrapper .tooltip', $wrapper).text(l.video_player_play);
                     $pendingBlock.addClass('hidden');
                     $watchAgainButton.addClass('hidden');
-                    $playPauseButton.removeClass('hidden');
+                    showPauseBtn();
                     videoElement.style.filter = videoElement.style.filter.replace('blur(6px)', '');
                     $('i', $playPauseButton).removeClass('icon-play-small-regular-solid')
                         .addClass('icon-pause-small-regular-solid');
-                    tSleep(2.5).then(() => $playPauseButton.addClass('hidden'));
+                    hidePauseBtn();
 
                     if (is_mobile && playevent) {
                         clearTimeout(hideMobileVideoControls);
@@ -1211,10 +1228,10 @@ FullScreenManager.prototype.enterFullscreen = function() {
                     $watchAgainButton.addClass('hidden');
                     videoElement.style.filter = videoElement.style.filter.replace('blur(6px)', '');
                     if ($('i', $playPauseButton).hasClass('icon-pause-small-regular-solid')) {
-                        $playPauseButton.removeClass('hidden');
+                        showPauseBtn();
                         $('i', $playPauseButton).addClass('icon-play-small-regular-solid')
                             .removeClass('icon-pause-small-regular-solid');
-                        tSleep(2.5).then(() => $playPauseButton.addClass('hidden'));
+                        hidePauseBtn();
                     }
 
                     if (is_embed === 2) {

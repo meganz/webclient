@@ -1557,6 +1557,9 @@ function mLogout(aCallback, force) {
             return proceed;
         })
         .then((logout) => {
+            if (logout && mega.ui.flyout && mega.ui.flyout.name) {
+                mega.ui.flyout.hide();
+            }
             return logout && M.logout();
         })
         .catch((ex) => {
@@ -1565,7 +1568,7 @@ function mLogout(aCallback, force) {
                 getsc(true);
             }
             if (ex) {
-                dump(ex);
+                reportError(ex);
             }
         });
 }

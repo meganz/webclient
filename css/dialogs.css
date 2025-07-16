@@ -4564,6 +4564,20 @@ body.de .mega-dialog.contact-picker-widget {
     .mega-dialog.cancel-subscription-benefits .cancel-subscription-info {
         margin-bottom: 20px;
     }
+    .mega-dialog.cancel-subscription-benefits .over-storage-banner {
+        display: flex;
+        align-items: center;
+        padding: 4px 8px;
+        background: var(--progress-bar-fill3);
+        border-radius: 8px;
+        color: var(--text-color-high-inverted);
+        margin-bottom: 20px;
+    }
+    .mega-dialog.cancel-subscription-benefits .over-storage-banner a {
+        margin: auto 8px;
+        white-space: nowrap;
+        color: var(--text-color-high-inverted);
+    }
     .mega-dialog.cancel-subscription-benefits .cancel-subscription-benefits-content {
         margin: 0 24px;
     }

@@ -98,8 +98,9 @@
         }
 
         if (value === undefined) {
-            value = (window.u_attr && u_attr['^!webtheme'] || fmconfig.webtheme) | 0;
-            if (u_type === false) {
+            const {u_attr, fmconfig} = window;
+            value = (u_attr && u_attr['^!webtheme'] || fmconfig && fmconfig.webtheme) | 0;
+            if (!value && u_type === false) {
                 value = self.darkloader ? 2 : 1;
             }
         }

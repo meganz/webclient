@@ -945,7 +945,7 @@ function processEmailChangeActionPacket(ap) {
  * Contains a list of permitted landing pages.
  * @var {array} allowedLandingPages
  */
-var allowedLandingPages = ['fm', 'recents', 'chat'];
+var allowedLandingPages = ['fm', 'recents', 'chat', 's4'];
 
 /**
  * Fetch the landing page.

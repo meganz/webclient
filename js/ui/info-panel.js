@@ -15,6 +15,7 @@ lazy(mega.ui, 'mInfoPanel', () => {
         activeStats.outShareCount = 0;
         activeStats.inShareCount = 0;
         activeStats.takedownCount = 0;
+        activeStats.fileRequestCount = 0;
         activeStats.bytes = 0;
         activeStats.subDirs = 0;
         activeStats.subFiles = 0;
@@ -36,6 +37,9 @@ lazy(mega.ui, 'mInfoPanel', () => {
         }
         else if (node.t & M.IS_SHARED || M.ps[node.h] || M.getNodeShareUsers(node, 'EXP').length) {
             activeStats.outShareCount++;
+        }
+        else if (mega.fileRequest && mega.fileRequest.publicFolderExists(node.h)) {
+            activeStats.fileRequestCount++;
         }
         else if (node.t) {
             activeStats.basicFolderCount++;
@@ -145,22 +149,21 @@ lazy(mega.ui, 'mInfoPanel', () => {
     function getIconForMultipleNodes(selectedHandles) {
 
         const totalNodeCount = selectedHandles.length;
-        const { deviceCount, basicFolderCount, outShareCount, inShareCount } = activeStats;
-        const isFolders = inShareCount + outShareCount + basicFolderCount;
+        const { deviceCount, basicFolderCount, outShareCount, inShareCount, fileRequestCount } = activeStats;
+        const isFolders = inShareCount + outShareCount + basicFolderCount + fileRequestCount;
 
         // If all selected nodes are devices, show the generic device icon
         if (deviceCount === totalNodeCount) {
             return { icon: 'pc' };
         }
 
-        // If all selected nodes are incoming shares, show the incoming share icon
-        if (inShareCount === totalNodeCount) {
-            return { icon: 'folder-incoming' };
+        // If all selected nodes are shares, show the share icon
+        if (inShareCount === totalNodeCount || outShareCount === totalNodeCount) {
+            return { icon: 'folder-users' };
         }
 
-        // If all selected nodes are incoming shares, show the incoming share icon
-        if (outShareCount === totalNodeCount) {
-            return { icon: 'folder-outgoing' };
+        if (fileRequestCount === totalNodeCount) {
+            return { icon: 'folder-public' };
         }
 
         // If all selected nodes are folders, show the folder icon

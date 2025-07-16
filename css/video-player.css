@@ -284,7 +284,7 @@
         top: calc(50% - 35px);
         z-index: 10;
         padding: 20px;
-        animation: top-fade-in 1s;
+        opacity: 0.8;
     }
     .media-viewer .play-pause-video-button i {
         --icon-size: 32px;

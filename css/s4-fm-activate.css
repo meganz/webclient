@@ -190,8 +190,16 @@
     margin: 32px 0 0;
 }
 
-.s4.fm-activate-section .banner button:hover {
+.s4.fm-activate-section .banner button ~ * {
+    margin-inline-start: 10px;
+}
+
+.s4.fm-activate-section .banner button.primary:hover {
     background: var(--mobile-button-primary);
+}
+
+.s4.fm-activate-section .banner button.outline:hover {
+    border: solid 2px var(--mobile-button-outline);
 }
 
 .s4.fm-activate-section .banner b {

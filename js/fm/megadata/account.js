@@ -1313,9 +1313,6 @@ function voucherData(arr) {
 mBroadcaster.once('fm:initialized', () => {
     'use strict';
 
-    if (u_attr && (u_attr.p || u_attr.b)) {
-        M.updatePaymentCardState().catch(dump);
-    }
     if (u_type === 3) {
         M.showPlanExpiringBanner().catch(dump);
         M.showPaymentFailedBanner().catch(dump);

@@ -1557,7 +1557,7 @@ function mLogout(aCallback, force) {
             return proceed;
         })
         .then((logout) => {
-            if (logout && mega.ui.flyout && mega.ui.flyout.name) {
+            if (logout && mega.ui.flyoutInit && mega.ui.flyout.name) {
                 mega.ui.flyout.hide();
             }
             return logout && M.logout();

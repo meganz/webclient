@@ -1683,19 +1683,6 @@ scparser.$add('pses', function(a) {
     }
 });
 
-// Payment card status
-scparser.$add('cce', () => {
-    'use strict';
-
-    // assuming that this AP will come only to PRO/Business accounts.
-    if (fminitialized && !folderlink) {
-
-        delay('cce-action-packet', () => {
-            M.updatePaymentCardState().catch(dump);
-        }, 2000);
-    }
-});
-
 scparser.mcsmp = a => {
     'use strict';
     if (folderlink) {

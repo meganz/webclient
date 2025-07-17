@@ -2582,44 +2582,6 @@ MegaUtils.prototype.noSleep = async function(stop, title) {
     }
 };
 
-MegaUtils.prototype.updatePaymentCardState = async function() {
-    'use strict';
-    if (!M.account) {
-        await new Promise(resolve => {
-            M.accountData(resolve);
-        });
-    }
-    if (M.account.stype !== 'O') {
-        // Only check for one-off subscriptions.
-        return;
-    }
-    return api.req({a: 'cci', v: 2}).then((res) => {
-        const date = new Date();
-        const cardM = res.result.exp_month;
-        const cardY = res.result.exp_year;
-        const currentM = date.getMonth() + 1;
-        const currentY = date.getFullYear();
-        const currentD = date.getDate();
-        const isCurrentYear = currentY === cardY;
-        let state;
-        // Expired
-        if (currentY > cardY || ((currentM > cardM) && isCurrentYear)) {
-            state = 'exp';
-        }
-        // Expires this month
-        else if ((currentM === cardM) && isCurrentYear) {
-            state = 'expThisM';
-        }
-        // Expires next month (only show on/after the 15th of the current month)
-        else if ((((currentM + 1) === cardM) && (currentD >= 15)) && isCurrentYear) {
-            state = 'expNextM';
-        }
-        M.showPaymentCardBanner(state);
-        if (M.account && state) {
-            M.account.cce = state;
-        }
-    });
-};
 
 MegaUtils.prototype.fmEventLog = function(eid) {
     'use strict';

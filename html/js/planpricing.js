@@ -578,7 +578,7 @@ lazy(pro, 'proplan2', () => {
                         delay('pricing.plan-mobile', eventlog.bind(null, 99869 + planId));
                     }
                     delay('pricing.plan', eventlog.bind(null, 99779 + planId));
-
+                    eventlog(pro.taxInfo ? 500911 : 500910);
                     if (mega.flags.ff_npabm) {
                         eventlog(500591, sessionStorage['pro.period']);
                     }
@@ -1937,7 +1937,10 @@ lazy(pro, 'proplan2', () => {
             $exclusivePlans = $('.exclusive-plans-container', $page);
             $periodPicker = $('.pick-period-container', $page);
 
-            delay('pricingpage.init', eventlog.bind(null, is_mobile ? 99936 : 99935));
+            delay('pricingpage.init', () =>{
+                eventlog(is_mobile ? 99936 : 99935);
+                eventlog(pro.taxInfo ? 500909 : 500908);
+            });
 
             // Check the user is allowed to see the low tier version of the pro page
             // (i.e. if the lowest plan returned is a mini plan)

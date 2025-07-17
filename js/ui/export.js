@@ -2880,6 +2880,15 @@ function logExportEvt(evtId, data) {
         }
 
         return Promise.all(promises)
+            .catch((ex) => {
+
+                while ($.getExportLinkInProgress) {
+                    $.getExportLinkInProgress = 'ongoing';
+
+                    broadcast(null);
+                }
+                throw ex;
+            })
             .finally(() => {
 
                 return d && console.groupEnd();
@@ -3138,7 +3147,7 @@ function logExportEvt(evtId, data) {
                 nodesToProcess.length === 1 ? l.generating_link : l.generating_links
             );
 
-            exportLink.getExportLink().finally(() => {
+            exportLink.getExportLink().catch(tell).finally(() => {
                 mLoadingSpinner.hide('get-link-loading-toast');
             });
         });

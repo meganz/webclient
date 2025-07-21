@@ -393,6 +393,11 @@ var notify = {
             return false;
         }
 
+        if (previousNotification.data.ver !== currentNotification.data.ver) {
+            notify.notifications.unshift(currentNotification);
+            return false;
+        }
+
         // Get details about the current notification
         var currentNotificationParentHandle = currentNotification.data.n;
         var currentNotificationNodes = currentNotification.data.f;
@@ -1478,7 +1483,11 @@ var notify = {
         const fileText = mega.icu.format(l.file_count, fileCount);
 
         // Set wording of the title
-        if (folderCount >= 1 && fileCount >= 1) {
+        if (notification.data.ver && folderCount === 0 && fileCount > 0) {
+            title = email ? mega.icu.format(l.user_file_updated_count, fileCount).replace('[X]', email)
+                : mega.icu.format(l.file_updated_count, fileCount);
+        }
+        else if (folderCount >= 1 && fileCount >= 1) {
             title = email ? mega.icu.format(l.user_item_added_count, folderCount + fileCount).replace('[X]', email) :
                 mega.icu.format(l.item_added_count, folderCount + fileCount);
         }

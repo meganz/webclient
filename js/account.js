@@ -476,6 +476,7 @@ function u_logout(logout) {
         localStorage.removeItem('registeremail');
         localStorage.removeItem('mInfinity');
         localStorage.removeItem('megaLiteMode');
+        delete sessionStorage.buextra;
 
         fminitialized = false;
         if ($.leftPaneResizable) {

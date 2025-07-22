@@ -2598,11 +2598,11 @@ u9: () => ContactAwareComponent,
 w9: () => MegaRenderMixin
 });
 
-const _applyDecoratedDescriptor2__ = REQ_(793);
-const react_dom0__ = REQ_(206);
-const react_dom0 = REQ_.n(react_dom0__);
-const react1__ = REQ_(594);
-const react1 = REQ_.n(react1__);
+const _applyDecoratedDescriptor0__ = REQ_(793);
+const react_dom1__ = REQ_(206);
+const react_dom1 = REQ_.n(react_dom1__);
+const react2__ = REQ_(594);
+const react2 = REQ_.n(react2__);
 
 let _dec, _dec2, _dec3, _dec4, _dec5, _class;
 
@@ -2761,7 +2761,7 @@ const rAFWrap = () => {
 };
 const trycatcher = () => (t, p, d) => (d.value = tryCatch(d.value)) && d;
 const getUniqueId = () => makeUUID().slice(-12);
-const MegaRenderMixin = (_dec = logcall(), _dec2 = SoonFcWrap(50, true), _dec3 = logcall(), _dec4 = SoonFcWrap(80, true), _dec5 = SoonFcWrap(350, true), _class = class MegaRenderMixin extends react1().Component {
+const MegaRenderMixin = (_dec = logcall(), _dec2 = SoonFcWrap(50, true), _dec3 = logcall(), _dec4 = SoonFcWrap(80, true), _dec5 = SoonFcWrap(350, true), _class = class MegaRenderMixin extends react2().Component {
   constructor(props) {
     super(props);
     lazy(this, '__internalReactID', function () {
@@ -3270,7 +3270,7 @@ const MegaRenderMixin = (_dec = logcall(), _dec2 = SoonFcWrap(50, true), _dec3 =
     const id = obj.addChangeListener((obj, data, k) => properties[k] && this.onPropOrStateUpdated());
     this._dataStructListeners.push(['dsprops', id, obj]);
   }
-}, (0,_applyDecoratedDescriptor2__.A)(_class.prototype, "componentWillUnmount", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "componentWillUnmount"), _class.prototype), (0,_applyDecoratedDescriptor2__.A)(_class.prototype, "debouncedForceUpdate", [_dec2], Object.getOwnPropertyDescriptor(_class.prototype, "debouncedForceUpdate"), _class.prototype), (0,_applyDecoratedDescriptor2__.A)(_class.prototype, "componentDidMount", [_dec3], Object.getOwnPropertyDescriptor(_class.prototype, "componentDidMount"), _class.prototype), (0,_applyDecoratedDescriptor2__.A)(_class.prototype, "eventuallyUpdate", [_dec4], Object.getOwnPropertyDescriptor(_class.prototype, "eventuallyUpdate"), _class.prototype), (0,_applyDecoratedDescriptor2__.A)(_class.prototype, "onResizeDoUpdate", [_dec5], Object.getOwnPropertyDescriptor(_class.prototype, "onResizeDoUpdate"), _class.prototype), _class);
+}, (0,_applyDecoratedDescriptor0__.A)(_class.prototype, "componentWillUnmount", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "componentWillUnmount"), _class.prototype), (0,_applyDecoratedDescriptor0__.A)(_class.prototype, "debouncedForceUpdate", [_dec2], Object.getOwnPropertyDescriptor(_class.prototype, "debouncedForceUpdate"), _class.prototype), (0,_applyDecoratedDescriptor0__.A)(_class.prototype, "componentDidMount", [_dec3], Object.getOwnPropertyDescriptor(_class.prototype, "componentDidMount"), _class.prototype), (0,_applyDecoratedDescriptor0__.A)(_class.prototype, "eventuallyUpdate", [_dec4], Object.getOwnPropertyDescriptor(_class.prototype, "eventuallyUpdate"), _class.prototype), (0,_applyDecoratedDescriptor0__.A)(_class.prototype, "onResizeDoUpdate", [_dec5], Object.getOwnPropertyDescriptor(_class.prototype, "onResizeDoUpdate"), _class.prototype), _class);
 class ContactAwareComponent extends MegaRenderMixin {
   constructor(props) {
     super(props);
@@ -4904,18 +4904,18 @@ LastActivity: () => LastActivity,
 MAX_FREQUENTS: () => MAX_FREQUENTS,
 MembersAmount: () => MembersAmount
 });
-const _extends6__ = REQ_(168);
-const react0__ = REQ_(594);
-const react0 = REQ_.n(react0__);
-const _mixins1__ = REQ_(137);
-const _ui_utils_jsx5__ = REQ_(314);
-const _ui_perfectScrollbar_jsx7__ = REQ_(486);
-const _ui_buttons_jsx3__ = REQ_(994);
-const _ui_dropdowns_jsx2__ = REQ_(911);
-const _contactsPanel_contactsPanel_jsx9__ = REQ_(173);
-const _ui_modalDialogs10__ = REQ_(318);
-const _link_jsx8__ = REQ_(280);
-const _updateObserver_jsx4__ = REQ_(501);
+const _extends0__ = REQ_(168);
+const react1__ = REQ_(594);
+const react1 = REQ_.n(react1__);
+const _mixins2__ = REQ_(137);
+const _ui_utils_jsx3__ = REQ_(314);
+const _ui_perfectScrollbar_jsx4__ = REQ_(486);
+const _ui_buttons_jsx5__ = REQ_(994);
+const _ui_dropdowns_jsx6__ = REQ_(911);
+const _contactsPanel_contactsPanel_jsx7__ = REQ_(173);
+const _ui_modalDialogs8__ = REQ_(318);
+const _link_jsx9__ = REQ_(280);
+const _updateObserver_jsx10__ = REQ_(501);
 
 
 
@@ -4932,7 +4932,7 @@ const MAX_FREQUENTS = 3;
 const closeDropdowns = () => {
   document.dispatchEvent(new Event('closeDropdowns'));
 };
-class ContactButton extends _mixins1__.u9 {
+class ContactButton extends _mixins2__.u9 {
   constructor(props) {
     super(props);
     this.dropdownItemGenerator = this.dropdownItemGenerator.bind(this);
@@ -4952,7 +4952,7 @@ class ContactButton extends _mixins1__.u9 {
     } = this.props;
     dropdowns = dropdowns ? dropdowns : [];
     const moreDropdowns = [];
-    moreDropdowns.push(react0().createElement("div", {
+    moreDropdowns.push(react1().createElement("div", {
       className: "dropdown-avatar rounded",
       key: "mainContactInfo",
       onClick: () => {
@@ -4963,36 +4963,36 @@ class ContactButton extends _mixins1__.u9 {
           loadSubPage(`fm/chat/contacts/${  contact.u}`);
         }
       }
-    }, react0().createElement(Avatar, {
+    }, react1().createElement(Avatar, {
       className: "avatar-wrapper context-avatar",
       chatRoom,
       contact,
       hideVerifiedBadge: "true"
-    }), react0().createElement("div", {
+    }), react1().createElement("div", {
       className: "dropdown-user-name"
-    }, react0().createElement("div", {
+    }, react1().createElement("div", {
       className: "name"
-    }, react0().createElement(ContactAwareName, {
+    }, react1().createElement(ContactAwareName, {
       overflow: true,
       contact
-    }), react0().createElement(ContactPresence, {
+    }), react1().createElement(ContactPresence, {
       className: "small",
       contact
-    })), contact && (megaChat.FORCE_EMAIL_LOADING || contact.c === 1 || contact.c === 2) && react0().createElement("span", {
+    })), contact && (megaChat.FORCE_EMAIL_LOADING || contact.c === 1 || contact.c === 2) && react1().createElement("span", {
       className: "email"
     }, contact.m))));
-    moreDropdowns.push(react0().createElement(ContactFingerprint, {
+    moreDropdowns.push(react1().createElement(ContactFingerprint, {
       key: "fingerprint",
       contact
     }));
     if (dropdowns.length && contact.c !== 2) {
       moreDropdowns.push(dropdowns);
-      moreDropdowns.push(react0().createElement("hr", {
+      moreDropdowns.push(react1().createElement("hr", {
         key: "top-separator"
       }));
     }
     if (contact.u === u_handle) {
-      moreDropdowns.push(react0().createElement(_ui_dropdowns_jsx2__.DropdownItem, {
+      moreDropdowns.push(react1().createElement(_ui_dropdowns_jsx6__.DropdownItem, {
         key: "view0",
         icon: "sprite-fm-mono icon-user-filled",
         label: l[187],
@@ -5007,28 +5007,28 @@ class ContactButton extends _mixins1__.u9 {
         });
       };
       if (megaChat.currentlyOpenedChat && megaChat.currentlyOpenedChat === contact.u) {
-        moreDropdowns.push(react0().createElement("div", {
+        moreDropdowns.push(react1().createElement("div", {
           key: "startAudioVideoCall",
           "data-simpletipposition": "top",
           className: "simpletip",
           "data-simpletip": !megaChat.hasSupportForCalls ? l.call_not_suported : ''
-        }, react0().createElement(_ui_dropdowns_jsx2__.DropdownItem, {
+        }, react1().createElement(_ui_dropdowns_jsx6__.DropdownItem, {
           disabled: !megaChat.hasSupportForCalls,
           key: "startCall",
           className: "sprite-fm-mono-before icon-arrow-right-before",
           icon: "sprite-fm-mono icon-phone",
           submenu: megaChat.hasSupportForCalls,
           label: l[19125]
-        }), react0().createElement("div", {
+        }), react1().createElement("div", {
           className: "dropdown body submenu",
           key: "dropdownGroup"
-        }, react0().createElement("div", null, react0().createElement(_ui_dropdowns_jsx2__.DropdownItem, {
+        }, react1().createElement("div", null, react1().createElement(_ui_dropdowns_jsx6__.DropdownItem, {
           key: "startAudio",
           icon: "sprite-fm-mono icon-phone",
           disabled: !megaChat.hasSupportForCalls,
           label: l[1565],
           onClick: startAudioCall
-        })), react0().createElement("div", null, react0().createElement(_ui_dropdowns_jsx2__.DropdownItem, {
+        })), react1().createElement("div", null, react1().createElement(_ui_dropdowns_jsx6__.DropdownItem, {
           key: "startVideo",
           icon: "sprite-fm-mono icon-video-call-filled",
           disabled: !megaChat.hasSupportForCalls,
@@ -5041,7 +5041,7 @@ class ContactButton extends _mixins1__.u9 {
           }
         })))));
       } else {
-        moreDropdowns.push(react0().createElement(_ui_dropdowns_jsx2__.DropdownItem, {
+        moreDropdowns.push(react1().createElement(_ui_dropdowns_jsx6__.DropdownItem, {
           key: "startChat",
           icon: "sprite-fm-mono icon-chat",
           label: l[5885],
@@ -5050,10 +5050,10 @@ class ContactButton extends _mixins1__.u9 {
           }
         }));
       }
-      moreDropdowns.push(react0().createElement("hr", {
+      moreDropdowns.push(react1().createElement("hr", {
         key: "files-separator"
       }));
-      moreDropdowns.push(react0().createElement(_ui_dropdowns_jsx2__.DropdownItem, {
+      moreDropdowns.push(react1().createElement(_ui_dropdowns_jsx6__.DropdownItem, {
         key: "send-files-item",
         icon: "sprite-fm-mono icon-send-files",
         label: l[6834],
@@ -5062,7 +5062,7 @@ class ContactButton extends _mixins1__.u9 {
           megaChat.openChatAndSendFilesDialog(contact.u);
         }
       }));
-      moreDropdowns.push(react0().createElement(_ui_dropdowns_jsx2__.DropdownItem, {
+      moreDropdowns.push(react1().createElement(_ui_dropdowns_jsx6__.DropdownItem, {
         key: "share-item",
         icon: "sprite-fm-mono icon-folder-outgoing-share",
         label: l[6775],
@@ -5071,7 +5071,7 @@ class ContactButton extends _mixins1__.u9 {
         }
       }));
     } else if (!is_chatlink && !is_eplusplus && (!contact.c || contact.c === 2 && contact.u !== u_handle)) {
-      moreDropdowns.push(react0().createElement(_ui_dropdowns_jsx2__.DropdownItem, {
+      moreDropdowns.push(react1().createElement(_ui_dropdowns_jsx6__.DropdownItem, {
         key: "view2",
         icon: "sprite-fm-mono icon-add",
         label: l[101],
@@ -5118,11 +5118,11 @@ class ContactButton extends _mixins1__.u9 {
     }
     if (u_attr && contact.u !== u_handle) {
       if (moreDropdowns.length > 0 && !(moreDropdowns.length === 2 && moreDropdowns[1] && moreDropdowns[1].key === "fingerprint")) {
-        moreDropdowns.push(react0().createElement("hr", {
+        moreDropdowns.push(react1().createElement("hr", {
           key: "nicknames-separator"
         }));
       }
-      moreDropdowns.push(react0().createElement(_ui_dropdowns_jsx2__.DropdownItem, {
+      moreDropdowns.push(react1().createElement(_ui_dropdowns_jsx6__.DropdownItem, {
         key: "set-nickname",
         icon: "sprite-fm-mono icon-rename",
         label: contact.nickname === '' ? l.set_nickname_label : l.edit_nickname_label,
@@ -5130,7 +5130,7 @@ class ContactButton extends _mixins1__.u9 {
       }));
     }
     if (dropdownRemoveButton && dropdownRemoveButton.length) {
-      moreDropdowns.push(react0().createElement("hr", {
+      moreDropdowns.push(react1().createElement("hr", {
         key: "remove-separator"
       }));
       moreDropdowns.push(dropdownRemoveButton);
@@ -5165,19 +5165,19 @@ class ContactButton extends _mixins1__.u9 {
       vertOffset = verticalOffset;
     }
     if (!contact.name && !contact.m && !noLoading && this.isLoadingContactInfo()) {
-      label = react0().createElement("em", {
+      label = react1().createElement("em", {
         className: "contact-name-loading"
       });
       className = `contact-button-loading ${className}`;
     }
-    return noContextMenu ? react0().createElement("div", {
+    return noContextMenu ? react1().createElement("div", {
       className: "user-card-name light selectable-txt"
-    }, label) : react0().createElement(_ui_buttons_jsx3__.$, {
+    }, label) : react1().createElement(_ui_buttons_jsx5__.$, {
       className,
       icon: dropdownIconClasses,
       disabled: dropdownDisabled,
       label
-    }, react0().createElement(_ui_dropdowns_jsx2__.Dropdown, {
+    }, react1().createElement(_ui_dropdowns_jsx6__.Dropdown, {
       className: "context contact-card-dropdown",
       positionMy: dropdownPosition,
       positionAt: dropdownPosition,
@@ -5192,7 +5192,7 @@ ContactButton.defaultProps = {
   'manualDataChangeTracking': true,
   'skipQueuedUpdatesOnResize': true
 };
-class ContactVerified extends _mixins1__.w9 {
+class ContactVerified extends _mixins2__.w9 {
   attachRerenderCallbacks() {
     this.addDataStructListenerForProperties(this.props.contact, ['fingerprint']);
   }
@@ -5207,7 +5207,7 @@ class ContactVerified extends _mixins1__.w9 {
     if (u_authring && u_authring.Ed25519) {
       const verifyState = u_authring.Ed25519[contact.u] || {};
       if (verifyState.method >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON) {
-        return react0().createElement("div", {
+        return react1().createElement("div", {
           className: `
                             user-card-verified
                             ${this.props.className || ''}
@@ -5228,10 +5228,10 @@ ContactVerified.defaultProps = {
   'manualDataChangeTracking': true,
   'skipQueuedUpdatesOnResize': true
 };
-class ContactPresence extends _mixins1__.w9 {
+class ContactPresence extends _mixins2__.w9 {
   constructor(...args) {
     super(...args);
-    this.domRef = react0().createRef();
+    this.domRef = react1().createRef();
   }
   attachRerenderCallbacks() {
     this.addDataStructListenerForProperties(this.props.contact, ['presence']);
@@ -5244,7 +5244,7 @@ class ContactPresence extends _mixins1__.w9 {
     if (!contact || !contact.c) {
       return null;
     }
-    return react0().createElement("div", {
+    return react1().createElement("div", {
       ref: this.domRef,
       className: `
                     user-card-presence
@@ -5258,7 +5258,7 @@ ContactPresence.defaultProps = {
   manualDataChangeTracking: true,
   skipQueuedUpdatesOnResize: true
 };
-const LastActivity = (0,_mixins1__.Zz)(_updateObserver_jsx4__.Y)((() => class LastActivity extends _mixins1__.u9 {
+const LastActivity = (0,_mixins2__.Zz)(_updateObserver_jsx10__.Y)((() => class LastActivity extends _mixins2__.u9 {
   attachRerenderCallbacks() {
     this._attachRerenderCbContacts(['ats', 'lastGreen', 'presence']);
   }
@@ -5277,10 +5277,10 @@ const LastActivity = (0,_mixins1__.Zz)(_updateObserver_jsx4__.Y)((() => class La
     const SECONDS = Date.now() / 1000 - lastActivity;
     const timeToLast = SECONDS > 3888000 ? l[20673] : time2last(lastActivity, true);
     const hasActivityStatus = showLastGreen && contact.presence <= 2 && lastActivity;
-    return react0().createElement("span", null, hasActivityStatus ? (l[19994] || 'Last seen %s').replace('%s', timeToLast) : M.onlineStatusClass(contact.presence)[0]);
+    return react1().createElement("span", null, hasActivityStatus ? (l[19994] || 'Last seen %s').replace('%s', timeToLast) : M.onlineStatusClass(contact.presence)[0]);
   }
 })());
-class ContactAwareName extends _mixins1__.u9 {
+class ContactAwareName extends _mixins2__.u9 {
   render() {
     const {
       contact,
@@ -5292,24 +5292,24 @@ class ContactAwareName extends _mixins1__.u9 {
     }
     const name = M.getNameByHandle(contact.u || contact.h);
     if (emoji || overflow) {
-      const EmojiComponent = overflow ? _ui_utils_jsx5__.sp : _ui_utils_jsx5__.zT;
-      return react0().createElement(EmojiComponent, this.props, name);
+      const EmojiComponent = overflow ? _ui_utils_jsx3__.sp : _ui_utils_jsx3__.zT;
+      return react1().createElement(EmojiComponent, this.props, name);
     }
-    return react0().createElement("span", null, name);
+    return react1().createElement("span", null, name);
   }
 }
-class MembersAmount extends _mixins1__.u9 {
+class MembersAmount extends _mixins2__.u9 {
   render() {
     const {
       chatRoom
     } = this.props;
-    return react0().createElement("span", null, mega.icu.format(l[20233], Object.keys(chatRoom.members).length));
+    return react1().createElement("span", null, mega.icu.format(l[20233], Object.keys(chatRoom.members).length));
   }
 }
-class ContactFingerprint extends _mixins1__.w9 {
+class ContactFingerprint extends _mixins2__.w9 {
   constructor(...args) {
     super(...args);
-    this.domRef = react0().createRef();
+    this.domRef = react1().createRef();
   }
   attachRerenderCallbacks() {
     this.addDataStructListenerForProperties(this.props.contact, ['fingerprint']);
@@ -5325,7 +5325,7 @@ class ContactFingerprint extends _mixins1__.w9 {
     const infoBlocks = [];
     userFingerprint(contact.u, (fingerprints) => {
       fingerprints.forEach((v, k) => {
-        infoBlocks.push(react0().createElement("span", {
+        infoBlocks.push(react1().createElement("span", {
           key: `fingerprint-${  k}`
         }, v));
       });
@@ -5334,7 +5334,7 @@ class ContactFingerprint extends _mixins1__.w9 {
     if (contact.c === 1 && u_authring && u_authring.Ed25519) {
       const verifyState = u_authring.Ed25519[contact.u] || {};
       if (typeof verifyState.method === "undefined" || verifyState.method < authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON) {
-        verifyButton = react0().createElement(_ui_buttons_jsx3__.$, {
+        verifyButton = react1().createElement(_ui_buttons_jsx5__.$, {
           className: "dropdown-verify active",
           label: l.verify_credentials,
           icon: "sprite-fm-mono icon-key",
@@ -5345,15 +5345,15 @@ class ContactFingerprint extends _mixins1__.w9 {
         });
       }
     }
-    return infoBlocks.length ? react0().createElement("div", {
+    return infoBlocks.length ? react1().createElement("div", {
       ref: this.domRef,
       className: `
                         dropdown-fingerprint
                         ${className || ''}
                     `
-    }, react0().createElement("div", {
+    }, react1().createElement("div", {
       className: "contact-fingerprint-title"
-    }, react0().createElement("span", null, l[6872])), react0().createElement("div", {
+    }, react1().createElement("span", null, l[6872])), react1().createElement("div", {
       className: "contact-fingerprint-txt selectable-txt"
     }, infoBlocks), verifyButton) : null;
   }
@@ -5362,7 +5362,7 @@ ContactFingerprint.defaultProps = {
   'manualDataChangeTracking': true,
   'skipQueuedUpdatesOnResize': true
 };
-class Avatar extends _mixins1__.u9 {
+class Avatar extends _mixins2__.u9 {
   render() {
     const self = this;
     const {contact} = this.props;
@@ -5378,7 +5378,7 @@ class Avatar extends _mixins1__.u9 {
     let displayedAvatar;
     let verifiedElement = null;
     if (!this.props.hideVerifiedBadge && !is_chatlink) {
-      verifiedElement = react0().createElement(ContactVerified, {
+      verifiedElement = react1().createElement(ContactVerified, {
         contact: this.props.contact,
         className: this.props.verifiedClassName
       });
@@ -5405,7 +5405,7 @@ class Avatar extends _mixins1__.u9 {
       }
     }
     if (avatarMeta.type === "image") {
-      displayedAvatar = react0().createElement("div", (0,_extends6__.A)({
+      displayedAvatar = react1().createElement("div", (0,_extends0__.A)({
         className: classes,
         style: this.props.style
       }, extraProps, {
@@ -5413,7 +5413,7 @@ class Avatar extends _mixins1__.u9 {
           closeDropdowns();
           self.props.onClick(e);
         } : self.onClick
-      }), verifiedElement, react0().createElement("img", {
+      }), verifiedElement, react1().createElement("img", {
         src: avatarMeta.avatar,
         style: this.props.imgStyles
       }));
@@ -5423,7 +5423,7 @@ class Avatar extends _mixins1__.u9 {
       if (isLoading) {
         classes += " default-bg";
       }
-      displayedAvatar = react0().createElement("div", (0,_extends6__.A)({
+      displayedAvatar = react1().createElement("div", (0,_extends0__.A)({
         className: classes,
         style: this.props.style
       }, extraProps, {
@@ -5431,7 +5431,7 @@ class Avatar extends _mixins1__.u9 {
           closeDropdowns();
           self.props.onClick(e);
         } : self.onClick
-      }), verifiedElement, react0().createElement("span", null, isLoading ? "" : avatarMeta.avatar.letters));
+      }), verifiedElement, react1().createElement("span", null, isLoading ? "" : avatarMeta.avatar.letters));
     }
     return displayedAvatar;
   }
@@ -5440,7 +5440,7 @@ Avatar.defaultProps = {
   'manualDataChangeTracking': true,
   'skipQueuedUpdatesOnResize': true
 };
-class ContactCard extends _mixins1__.u9 {
+class ContactCard extends _mixins2__.u9 {
   attachRerenderCallbacks() {
     this._attachRerenderCbContacts(['presence']);
   }
@@ -5479,7 +5479,7 @@ class ContactCard extends _mixins1__.u9 {
     if (contact.u === u_handle) {
       username += ` (${escapeHTML(l[8885])})`;
     }
-    let escapedUsername = react0().createElement(_ui_utils_jsx5__.sp, null, username);
+    let escapedUsername = react1().createElement(_ui_utils_jsx3__.sp, null, username);
     const dropdowns = this.props.dropdowns || [];
     const noContextMenu = this.props.noContextMenu || '';
     const noContextButton = this.props.noContextButton || '';
@@ -5489,7 +5489,7 @@ class ContactCard extends _mixins1__.u9 {
     const searchValue = this.props.searchValue || "";
     let usernameBlock;
     if (!noContextMenu) {
-      usernameBlock = react0().createElement(ContactButton, {
+      usernameBlock = react1().createElement(ContactButton, {
         key: "lnk",
         dropdowns,
         noContextMenu,
@@ -5512,43 +5512,43 @@ class ContactCard extends _mixins1__.u9 {
           });
         }
         if (matches.length > 0) {
-          escapedUsername = react0().createElement(_ui_utils_jsx5__.P9, null, megaChat.highlight(megaChat.html(username), matches, true));
+          escapedUsername = react1().createElement(_ui_utils_jsx3__.P9, null, megaChat.highlight(megaChat.html(username), matches, true));
         }
       }
-      usernameBlock = emailTooltips ? react0().createElement("div", {
+      usernameBlock = emailTooltips ? react1().createElement("div", {
         className: "user-card-name light simpletip selectable-txt",
         "data-simpletip": contact.m,
         "data-simpletipposition": "top"
-      }, escapedUsername) : react0().createElement("div", {
+      }, escapedUsername) : react1().createElement("div", {
         className: "user-card-name light selectable-txt"
       }, escapedUsername);
     }
     let userCard = null;
     const className = this.props.className || '';
-    userCard = className.includes('short') ? react0().createElement("div", {
+    userCard = className.includes('short') ? react1().createElement("div", {
       className: "user-card-data"
-    }, usernameBlock, react0().createElement("div", {
+    }, usernameBlock, react1().createElement("div", {
       className: "user-card-status"
-    }, this.props.isInCall ? react0().createElement("div", {
+    }, this.props.isInCall ? react1().createElement("div", {
       className: "audio-call"
-    }, react0().createElement("i", {
+    }, react1().createElement("i", {
       className: "sprite-fm-mono icon-phone"
-    })) : null, react0().createElement(LastActivity, {
+    })) : null, react1().createElement(LastActivity, {
       contact,
       showLastGreen: this.props.showLastGreen
-    }))) : react0().createElement("div", {
+    }))) : react1().createElement("div", {
       className: "user-card-data"
-    }, usernameBlock, react0().createElement(ContactPresence, {
+    }, usernameBlock, react1().createElement(ContactPresence, {
       contact,
       className: this.props.presenceClassName
-    }), this.props.isInCall ? react0().createElement("div", {
+    }), this.props.isInCall ? react1().createElement("div", {
       className: "audio-call"
-    }, react0().createElement("i", {
+    }, react1().createElement("i", {
       className: "sprite-fm-mono icon-phone"
-    })) : null, react0().createElement("div", {
+    })) : null, react1().createElement("div", {
       className: "user-card-email selectable-txt"
     }, contact.m));
-    return react0().createElement("div", {
+    return react1().createElement("div", {
       className: `
                     contacts-info body
                     ${pres === 'offline' ? 'offline' : ''}
@@ -5563,18 +5563,18 @@ class ContactCard extends _mixins1__.u9 {
         let _this$props$onDoubleC, _this$props2;
         return (_this$props$onDoubleC = (_this$props2 = this.props).onDoubleClick) == null ? void 0 : _this$props$onDoubleC.call(_this$props2, contact, ev);
       }
-    }, this.props.withSelfNote ? react0().createElement("div", {
+    }, this.props.withSelfNote ? react1().createElement("div", {
       className: `
                             note-chat-signifier
                             ${(_this$props$chatRoom = this.props.chatRoom) != null && _this$props$chatRoom.hasMessages() ? '' : 'note-chat-empty'}
                         `
-    }, react0().createElement("i", {
+    }, react1().createElement("i", {
       className: "sprite-fm-mono icon-file-text-thin-outline note-chat-icon"
-    })) : react0().createElement(Avatar, {
+    })) : react1().createElement(Avatar, {
       className: "avatar-wrapper small-rounded-avatar",
       contact,
       chatRoom: this.props.chatRoom
-    }), is_chatlink || noContextButton ? null : react0().createElement(ContactButton, {
+    }), is_chatlink || noContextButton ? null : react1().createElement(ContactButton, {
       key: "button",
       dropdowns,
       dropdownIconClasses: this.props.dropdownIconClasses || '',
@@ -5586,15 +5586,15 @@ class ContactCard extends _mixins1__.u9 {
       noLoading: this.props.noLoading,
       chatRoom: this.props.chatRoom,
       verticalOffset: 0
-    }), this.props.selectable ? react0().createElement("div", {
+    }), this.props.selectable ? react1().createElement("div", {
       className: "user-card-tick-wrap"
-    }, react0().createElement("i", {
+    }, react1().createElement("i", {
       className: "sprite-fm-mono icon-check"
-    })) : null, megaChat.WITH_SELF_NOTE && this.props.withSelfNote ? react0().createElement("div", {
+    })) : null, megaChat.WITH_SELF_NOTE && this.props.withSelfNote ? react1().createElement("div", {
       className: "user-card-data"
-    }, react0().createElement("div", {
+    }, react1().createElement("div", {
       className: "user-card-name light selectable-txt note-chat-label"
-    }, l.note_label), react0().createElement("div", {
+    }, l.note_label), react1().createElement("div", {
       className: "user-card-status"
     })) : userCard);
   }
@@ -5606,7 +5606,7 @@ ContactCard.defaultProps = {
   manualDataChangeTracking: true,
   skipQueuedUpdatesOnResize: true
 };
-class ContactItem extends _mixins1__.u9 {
+class ContactItem extends _mixins2__.u9 {
   render() {
     const self = this;
     const {contact} = this.props;
@@ -5614,31 +5614,31 @@ class ContactItem extends _mixins1__.u9 {
       return null;
     }
     const username = this.props.namePrefix ? this.props.namePrefix : `${  M.getNameByHandle(contact.u)}`;
-    return react0().createElement("div", {
+    return react1().createElement("div", {
       className: "selected-contact-card short"
-    }, react0().createElement("div", {
+    }, react1().createElement("div", {
       className: "remove-contact-bttn",
       onClick: e => {
         if (self.props.onClick) {
           self.props.onClick(contact, e);
         }
       }
-    }, react0().createElement("i", {
+    }, react1().createElement("i", {
       className: "tiny-icon small-cross"
-    })), react0().createElement(Avatar, {
+    })), react1().createElement(Avatar, {
       contact,
       className: "avatar-wrapper small-rounded-avatar",
       hideVerifiedBadge: true,
       chatRoom: this.props.chatRoom
-    }), react0().createElement("div", {
+    }), react1().createElement("div", {
       className: "user-card-data simpletip",
       "data-simpletip": username || megaChat.plugins.userHelper.SIMPLETIP_USER_LOADER,
       "data-simpletipposition": "top"
-    }, react0().createElement(ContactButton, {
+    }, react1().createElement(ContactButton, {
       noContextMenu: this.props.noContextMenu,
       contact,
       className: "light",
-      label: react0().createElement(_ui_utils_jsx5__.zT, null, username),
+      label: react1().createElement(_ui_utils_jsx3__.zT, null, username),
       chatRoom: this.props.chatRoom
     })));
   }
@@ -5647,11 +5647,11 @@ ContactItem.defaultProps = {
   'manualDataChangeTracking': true,
   'skipQueuedUpdatesOnResize': true
 };
-class ContactPickerWidget extends _mixins1__.w9 {
+class ContactPickerWidget extends _mixins2__.w9 {
   constructor(...args) {
     super(...args);
     this.contactLinkListener = null;
-    this.domRef = react0().createRef();
+    this.domRef = react1().createRef();
     this.state = {
       searchValue: '',
       selected: this.props.selected || [],
@@ -5674,7 +5674,7 @@ class ContactPickerWidget extends _mixins1__.w9 {
       } = this.state;
       const $$list = contacts.map(handle => {
         const added = selected.includes(handle);
-        return react0().createElement(ContactCard, {
+        return react1().createElement(ContactCard, {
           key: handle,
           className: `
                             contacts-search short
@@ -5692,15 +5692,15 @@ class ContactPickerWidget extends _mixins1__.w9 {
           }
         });
       });
-      return react0().createElement(_ui_perfectScrollbar_jsx7__.O, {
+      return react1().createElement(_ui_perfectScrollbar_jsx4__.O, {
         className: "contacts-search-scroll",
         selected,
         contacts
-      }, react0().createElement("div", {
+      }, react1().createElement("div", {
         className: "contacts-search-subsection"
-      }, react0().createElement("div", {
+      }, react1().createElement("div", {
         className: "contacts-list-header"
-      }, megaChat.activeCall ? l.call_participants : l[16217]), react0().createElement("div", {
+      }, megaChat.activeCall ? l.call_participants : l[16217]), react1().createElement("div", {
         className: "contacts-search-list"
       }, $$list)));
     };
@@ -5715,9 +5715,9 @@ class ContactPickerWidget extends _mixins1__.w9 {
     if (!activeCall || activeCall.chatRoom.chatId !== chatRoom.chatId || !activeCall.sfuClient.callLimits || !activeCall.sfuClient.callLimits.usr || chatRoom.getCallParticipants().length < activeCall.sfuClient.callLimits.usr) {
       return null;
     }
-    return react0().createElement("div", {
+    return react1().createElement("div", {
       className: "picker-user-limit-banner"
-    }, activeCall.organiser === u_handle ? (0,_ui_utils_jsx5__.lI)(l.invite_limit_banner_organiser, '[A]', _link_jsx8__.A, {
+    }, activeCall.organiser === u_handle ? (0,_ui_utils_jsx3__.lI)(l.invite_limit_banner_organiser, '[A]', _link_jsx9__.A, {
       onClick() {
         window.open(`${getBaseUrl()}/pro`, '_blank', 'noopener,noreferrer');
         eventlog(500263);
@@ -5822,7 +5822,7 @@ class ContactPickerWidget extends _mixins1__.w9 {
     if (self.state.selected && self.state.selected.indexOf(v.u) !== -1) {
       selectedClass = "selected";
     }
-    contacts.push(react0().createElement(ContactCard, {
+    contacts.push(react1().createElement(ContactCard, {
       withSelfNote,
       disabled: isDisabled,
       contact: v,
@@ -5909,7 +5909,7 @@ class ContactPickerWidget extends _mixins1__.w9 {
       const sel = self.state.selected || [];
       for (let i = 0; i < sel.length; i++) {
         const v = sel[i];
-        contactsSelected.push(react0().createElement(ContactItem, {
+        contactsSelected.push(react1().createElement(ContactItem, {
           contact: M.u[v],
           key: v,
           chatRoom: self.props.chatRoom
@@ -5970,9 +5970,9 @@ class ContactPickerWidget extends _mixins1__.w9 {
       if (!self.state.selected || self.state.selected.length === 0) {
         selectedContacts = false;
         const emptySelectionMsg = self.props.emptySelectionMsg || l[8889];
-        multipleContacts = react0().createElement("div", {
+        multipleContacts = react1().createElement("div", {
           className: "horizontal-contacts-list"
-        }, react0().createElement("div", {
+        }, react1().createElement("div", {
           className: "contacts-list-empty-txt"
         }, self.props.nothingSelectedButtonLabel ? self.props.nothingSelectedButtonLabel : emptySelectionMsg));
       } else {
@@ -5981,7 +5981,7 @@ class ContactPickerWidget extends _mixins1__.w9 {
         const sel2 = self.state.selected || [];
         for (let i2 = 0; i2 < sel2.length; i2++) {
           const v2 = sel2[i2];
-          contactsSelected.push(react0().createElement(ContactItem, {
+          contactsSelected.push(react1().createElement(ContactItem, {
             key: v2,
             chatRoom: self.props.chatRoom || false,
             contact: M.u[v2],
@@ -5989,15 +5989,15 @@ class ContactPickerWidget extends _mixins1__.w9 {
             onClick: onContactSelectDoneCb
           }));
         }
-        multipleContacts = react0().createElement("div", {
+        multipleContacts = react1().createElement("div", {
           className: "horizontal-contacts-list"
-        }, react0().createElement(_ui_perfectScrollbar_jsx7__.O, {
+        }, react1().createElement(_ui_perfectScrollbar_jsx4__.O, {
           className: "perfectScrollbarContainer selected-contact-block horizontal-only",
           selected: this.state.selected,
           ref (psSelected) {
             self.psSelected = psSelected;
           }
-        }, react0().createElement("div", {
+        }, react1().createElement("div", {
           className: "select-contact-centre",
           style: {
             width: selectedWidth
@@ -6005,19 +6005,19 @@ class ContactPickerWidget extends _mixins1__.w9 {
         }, contactsSelected)));
       }
       if (self.props.selectFooter) {
-        selectFooter = react0().createElement("footer", null, react0().createElement("button", {
+        selectFooter = react1().createElement("footer", null, react1().createElement("button", {
           className: "mega-button",
           onClick: onAddContact.bind(self)
-        }, react0().createElement("span", null, l[71])), react0().createElement("div", {
+        }, react1().createElement("span", null, l[71])), react1().createElement("div", {
           className: "footer-spacing"
-        }), react0().createElement("button", {
+        }), react1().createElement("button", {
           className: `mega-button ${selectedContacts ? '' : 'disabled'}`,
           onClick (e) {
             if (self.state.selected.length > 0) {
               onSelectDoneCb(e);
             }
           }
-        }, react0().createElement("span", null, this.props.multipleSelectedButtonLabel ? this.props.multipleSelectedButtonLabel : l[8890])));
+        }, react1().createElement("span", null, this.props.multipleSelectedButtonLabel ? this.props.multipleSelectedButtonLabel : l[8890])));
       }
     }
     const alreadyAdded = {};
@@ -6059,7 +6059,7 @@ class ContactPickerWidget extends _mixins1__.w9 {
       self._eventuallyAddContact(M.u[u_handle], contacts, selectableContacts, true);
     }
     let noOtherContacts = false;
-    if (contacts.length === 0 || !_contactsPanel_contactsPanel_jsx9__.A.hasContacts() && this.props.step !== 1) {
+    if (contacts.length === 0 || !_contactsPanel_contactsPanel_jsx7__.A.hasContacts() && this.props.step !== 1) {
       noOtherContacts = true;
       let noContactsMsg = "";
       if (M.u.length < 2) {
@@ -6068,7 +6068,7 @@ class ContactPickerWidget extends _mixins1__.w9 {
         noContactsMsg = l[8878];
       }
       if (hideFrequents) {
-        contacts = react0().createElement("em", null, noContactsMsg);
+        contacts = react1().createElement("em", null, noContactsMsg);
       }
     }
     const haveContacts = isSearching || frequentContacts.length !== 0 || !noOtherContacts;
@@ -6076,30 +6076,30 @@ class ContactPickerWidget extends _mixins1__.w9 {
     if (haveContacts) {
       if (frequentContacts.length === 0 && noOtherContacts) {
         if (self.props.newEmptySearchResult) {
-          contactsList = react0().createElement("div", {
+          contactsList = react1().createElement("div", {
             className: "chat-contactspicker-no-contacts flex flex-column flex-center searching mt-2"
-          }, react0().createElement("div", {
+          }, react1().createElement("div", {
             className: "section-icon sprite-fm-mono icon-contacts"
-          }), react0().createElement("div", {
+          }), react1().createElement("div", {
             className: "fm-empty-cloud-txt small"
           }, l[8674]));
         } else {
-          contactsList = react0().createElement("div", {
+          contactsList = react1().createElement("div", {
             className: "chat-contactspicker-no-contacts flex flex-column mt-2"
-          }, react0().createElement("div", {
+          }, react1().createElement("div", {
             className: "contacts-list-header"
-          }, l[165]), react0().createElement("div", {
+          }, l[165]), react1().createElement("div", {
             className: "flex flex-1 flex-column flex-center"
-          }, react0().createElement("div", {
+          }, react1().createElement("div", {
             className: "section-icon sprite-fm-mono icon-contacts"
-          }), react0().createElement("div", {
+          }), react1().createElement("div", {
             className: "fm-empty-cloud-txt small"
-          }, l[784]), react0().createElement("div", {
+          }, l[784]), react1().createElement("div", {
             className: "fm-empty-description small"
           }, l[19115])));
         }
       } else {
-        contactsList = react0().createElement(_ui_perfectScrollbar_jsx7__.O, {
+        contactsList = react1().createElement(_ui_perfectScrollbar_jsx4__.O, {
           ref: ref => {
             self.searchContactsScroll = ref;
           },
@@ -6109,73 +6109,73 @@ class ContactPickerWidget extends _mixins1__.w9 {
           contacts,
           frequentContacts,
           searchValue: this.state.searchValue
-        }, react0().createElement(react0().Fragment, null, react0().createElement("div", {
+        }, react1().createElement(react1().Fragment, null, react1().createElement("div", {
           className: "contacts-search-subsection",
           style: {
             display: hideFrequents ? 'none' : ''
           }
-        }, react0().createElement("div", {
+        }, react1().createElement("div", {
           className: "contacts-list-header"
-        }, l[20141]), frequentsLoading ? react0().createElement("div", {
+        }, l[20141]), frequentsLoading ? react1().createElement("div", {
           className: "loading-spinner"
-        }, "...") : react0().createElement("div", {
+        }, "...") : react1().createElement("div", {
           className: "contacts-search-list",
           style: innerDivStyles
-        }, frequentContacts)), contacts.length > 0 ? react0().createElement("div", {
+        }, frequentContacts)), contacts.length > 0 ? react1().createElement("div", {
           className: "contacts-search-subsection"
-        }, react0().createElement("div", {
+        }, react1().createElement("div", {
           className: "contacts-list-header"
-        }, frequentContacts && frequentContacts.length === 0 ? this.props.readOnly ? l[16217] : l[165] : l[165]), react0().createElement("div", {
+        }, frequentContacts && frequentContacts.length === 0 ? this.props.readOnly ? l[16217] : l[165] : l[165]), react1().createElement("div", {
           className: "contacts-search-list",
           style: innerDivStyles
         }, contacts)) : null));
       }
     } else if (self.props.newNoContact) {
       multipleContacts = "";
-      contactsList = react0().createElement("div", {
+      contactsList = react1().createElement("div", {
         className: "chat-contactspicker-no-contacts flex flex-column flex-center mt-2"
-      }, react0().createElement("div", {
+      }, react1().createElement("div", {
         className: "section-icon sprite-fm-mono icon-contacts"
-      }), react0().createElement("div", {
+      }), react1().createElement("div", {
         className: "fm-empty-cloud-txt small"
-      }, l[784]), react0().createElement("div", {
+      }, l[784]), react1().createElement("div", {
         className: "fm-empty-description small"
       }, l[19115]));
       extraClasses += " no-contacts";
     } else {
-      contactsList = react0().createElement("div", {
+      contactsList = react1().createElement("div", {
         className: "chat-contactspicker-no-contacts flex flex-column flex-center mt-16"
-      }, react0().createElement("div", {
+      }, react1().createElement("div", {
         className: "section-icon sprite-fm-mono icon-contacts"
-      }), react0().createElement("div", {
+      }), react1().createElement("div", {
         className: "fm-empty-cloud-txt small"
-      }, l[784]), react0().createElement("div", {
+      }, l[784]), react1().createElement("div", {
         className: "fm-empty-description small"
-      }, l[19115]), react0().createElement("button", {
+      }, l[19115]), react1().createElement("button", {
         className: "mega-button positive large fm-empty-button",
         onClick: () => {
           contactAddDialog();
           self.props.onClose == null || self.props.onClose();
         }
-      }, react0().createElement("span", null, l[101])), react0().createElement("div", {
+      }, react1().createElement("span", null, l[101])), react1().createElement("div", {
         className: `
                             ${this.state.publicLink ? '' : 'loading'}
                             empty-share-public
                         `
-      }, react0().createElement("i", {
+      }, react1().createElement("i", {
         className: "sprite-fm-mono icon-link-circle"
-      }), react0().createElement(_ui_utils_jsx5__.P9, null, l[19111])));
+      }), react1().createElement(_ui_utils_jsx3__.P9, null, l[19111])));
       extraClasses += " no-contacts";
     }
     const totalContactsNum = contacts.length + frequentContacts.length;
     const searchPlaceholderMsg = mega.icu.format(l.search_contact_placeholder, totalContactsNum);
-    return react0().createElement("div", {
+    return react1().createElement("div", {
       ref: this.domRef,
       className: `
                     ${this.props.className || ''}
                     ${extraClasses}
                 `
-    }, this.props.topButtons && react0().createElement("div", {
+    }, this.props.topButtons && react1().createElement("div", {
       className: "contacts-search-buttons"
     }, this.props.topButtons.map(button => {
       const {
@@ -6185,14 +6185,14 @@ class ContactPickerWidget extends _mixins1__.w9 {
         title,
         onClick
       } = button || {};
-      return react0().createElement("div", {
+      return react1().createElement("div", {
         key,
         className: "button-wrapper",
         onClick: e => {
           closeDropdowns();
           onClick(e);
         }
-      }, react0().createElement(_ui_buttons_jsx3__.$, {
+      }, react1().createElement(_ui_buttons_jsx5__.$, {
         className: `
                                             ${className || ''}
                                             ${key === 'newChatLink' ? 'branded-blue' : ''}
@@ -6201,14 +6201,14 @@ class ContactPickerWidget extends _mixins1__.w9 {
         icon,
         label: title
       }));
-    })), multipleContacts, !this.props.readOnly && haveContacts && !this.props.hideSearch && react0().createElement(react0().Fragment, null, react0().createElement("div", {
+    })), multipleContacts, !this.props.readOnly && haveContacts && !this.props.hideSearch && react1().createElement(react1().Fragment, null, react1().createElement("div", {
       className: `
                                 contacts-search-header
                                 ${this.props.headerClasses}
                             `
-    }, react0().createElement("i", {
+    }, react1().createElement("i", {
       className: "sprite-fm-mono icon-preview-reveal"
-    }), react0().createElement("input", {
+    }), react1().createElement("input", {
       autoFocus: true,
       type: "search",
       placeholder: searchPlaceholderMsg,
@@ -6217,7 +6217,7 @@ class ContactPickerWidget extends _mixins1__.w9 {
       },
       onChange: this.onSearchChange,
       value: this.state.searchValue
-    }), react0().createElement("div", {
+    }), react1().createElement("div", {
       className: `
                                     search-result-clear
                                     ${this.state.searchValue && this.state.searchValue.length > 0 ? '' : 'hidden'}
@@ -6230,13 +6230,13 @@ class ContactPickerWidget extends _mixins1__.w9 {
           return (_this$contactSearchFi = this.contactSearchField) == null ? void 0 : _this$contactSearchFi.focus();
         });
       }
-    }, react0().createElement("i", {
+    }, react1().createElement("i", {
       className: "sprite-fm-mono icon-close-component"
-    })))), this.props.inviteWarningLabel && this.props.chatRoom && this.renderInviteWarning(), !this.props.readOnly && haveContacts && !this.props.hideSearch && react0().createElement("div", {
+    })))), this.props.inviteWarningLabel && this.props.chatRoom && this.renderInviteWarning(), !this.props.readOnly && haveContacts && !this.props.hideSearch && react1().createElement("div", {
       className: "contacts-search-header-separator"
-    }), this.props.participantsList ? this.renderParticipantsList() : contactsList, selectFooter, this.props.showAddContact && _contactsPanel_contactsPanel_jsx9__.A.hasContacts() ? react0().createElement("div", {
+    }), this.props.participantsList ? this.renderParticipantsList() : contactsList, selectFooter, this.props.showAddContact && _contactsPanel_contactsPanel_jsx7__.A.hasContacts() ? react1().createElement("div", {
       className: "contacts-search-bottom"
-    }, react0().createElement(_ui_buttons_jsx3__.$, {
+    }, react1().createElement(_ui_buttons_jsx5__.$, {
       className: "mega-button action positive",
       icon: "sprite-fm-mono icon-add-circle",
       label: l[71],
@@ -6263,7 +6263,7 @@ ContactPickerWidget.defaultProps = {
   newNoContact: false,
   emailTooltips: false
 };
-class ContactPickerDialog extends _mixins1__.w9 {
+class ContactPickerDialog extends _mixins2__.w9 {
   constructor(...args) {
     super(...args);
     this.dialogName = 'contact-picker-dialog';
@@ -6296,7 +6296,7 @@ class ContactPickerDialog extends _mixins1__.w9 {
       onClose,
       onSelectDone
     } = this.props;
-    return react0().createElement(_ui_modalDialogs10__.A.ModalDialog, {
+    return react1().createElement(_ui_modalDialogs8__.A.ModalDialog, {
       name,
       className: `
                     ${className}
@@ -6304,7 +6304,7 @@ class ContactPickerDialog extends _mixins1__.w9 {
                     contacts-search
                 `,
       onClose
-    }, react0().createElement(ContactPickerWidget, {
+    }, react1().createElement(ContactPickerWidget, {
       active,
       allowEmpty,
       className: "popup contacts-search small-footer",
@@ -6334,14 +6334,14 @@ REQ_.r(EXP_);
 REQ_.d(EXP_, {
 "default": () => Incoming
 });
-const _extends3__ = REQ_(168);
-const react0__ = REQ_(594);
-const react0 = REQ_.n(react0__);
-const _contacts_jsx4__ = REQ_(251);
-const _ui_modalDialogs_jsx2__ = REQ_(318);
-const _button_jsx1__ = REQ_(959);
-const _call_jsx6__ = REQ_(3);
-const _ui_utils_jsx5__ = REQ_(314);
+const _extends0__ = REQ_(168);
+const react1__ = REQ_(594);
+const react1 = REQ_.n(react1__);
+const _contacts_jsx2__ = REQ_(251);
+const _ui_modalDialogs_jsx3__ = REQ_(318);
+const _button_jsx4__ = REQ_(959);
+const _call_jsx5__ = REQ_(3);
+const _ui_utils_jsx6__ = REQ_(314);
 
 
 
@@ -6349,7 +6349,7 @@ const _ui_utils_jsx5__ = REQ_(314);
 
 
 
-class Incoming extends react0().Component {
+class Incoming extends react1().Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -6363,9 +6363,9 @@ class Incoming extends react0().Component {
       const toggleHover = () => this.setState(state => ({
         hoveredSwitch: !state.hoveredSwitch
       }));
-      return react0().createElement("div", {
+      return react1().createElement("div", {
         className: "switch-button"
-      }, react0().createElement("div", {
+      }, react1().createElement("div", {
         className: "switch-button-container simpletip",
         "data-simpletip": l.end_and_answer,
         "data-simpletipposition": "top",
@@ -6375,10 +6375,10 @@ class Incoming extends react0().Component {
           ev.stopPropagation();
           this.props.onSwitch();
         }
-      }, react0().createElement(_button_jsx1__.A, {
+      }, react1().createElement(_button_jsx4__.A, {
         className: `${className} negative`,
         icon: "icon-end-call"
-      }), react0().createElement(_button_jsx1__.A, {
+      }), react1().createElement(_button_jsx4__.A, {
         className: `${className} positive`,
         icon: "icon-phone"
       })));
@@ -6392,7 +6392,7 @@ class Incoming extends react0().Component {
         onAnswer,
         onToggleVideo
       } = this.props;
-      return react0().createElement(react0().Fragment, null, react0().createElement(_button_jsx1__.A, {
+      return react1().createElement(react1().Fragment, null, react1().createElement(_button_jsx4__.A, {
         className: `
                         mega-button
                         positive
@@ -6405,7 +6405,7 @@ class Incoming extends react0().Component {
           label: l[7205]
         },
         onClick: unsupported ? null : onAnswer
-      }, react0().createElement("span", null, l[7205])), react0().createElement(_button_jsx1__.A, {
+      }, react1().createElement("span", null, l[7205])), react1().createElement(_button_jsx4__.A, {
         className: `
                         mega-button
                         large
@@ -6422,7 +6422,7 @@ class Incoming extends react0().Component {
         onClick: () => unsupported ? null : this.setState({
           video: !video
         }, () => onToggleVideo(video))
-      }, react0().createElement("span", null, video ? l[22894] : l[22893])));
+      }, react1().createElement("span", null, video ? l[22894] : l[22893])));
     };
     this.state.unsupported = !megaChat.hasSupportForCalls;
     this.state.hideOverlay = document.body.classList.contains('overlayed') && !$.msgDialog;
@@ -6453,25 +6453,25 @@ class Incoming extends react0().Component {
       const CALL_IN_PROGRESS = window.sfuClient;
       const isPrivateRoom = chatRoom.type === 'private';
       const rejectLabel = isPrivateRoom ? l[20981] : l[82];
-      return react0().createElement(_ui_modalDialogs_jsx2__.A.ModalDialog, (0,_extends3__.A)({}, this.state, {
+      return react1().createElement(_ui_modalDialogs_jsx3__.A.ModalDialog, (0,_extends0__.A)({}, this.state, {
         name: NAMESPACE,
         className: NAMESPACE,
         roomName: chatRoom.getRoomTitle(),
         onClose: () => onClose()
-      }), react0().createElement("div", {
+      }), react1().createElement("div", {
         className: "fm-dialog-body"
-      }, react0().createElement("div", {
+      }, react1().createElement("div", {
         className: `${NAMESPACE}-avatar`
-      }, react0().createElement(_contacts_jsx4__.Avatar, {
+      }, react1().createElement(_contacts_jsx2__.Avatar, {
         contact: M.u[callerId]
-      })), react0().createElement("div", {
+      })), react1().createElement("div", {
         className: `${NAMESPACE}-info`
-      }, react0().createElement("h1", null, react0().createElement(_ui_utils_jsx5__.zT, null, chatRoom.getRoomTitle())), react0().createElement("span", null, isPrivateRoom ? l[17878] : l[19995])), react0().createElement("div", {
+      }, react1().createElement("h1", null, react1().createElement(_ui_utils_jsx6__.zT, null, chatRoom.getRoomTitle())), react1().createElement("span", null, isPrivateRoom ? l[17878] : l[19995])), react1().createElement("div", {
         className: `
                                 ${NAMESPACE}-controls
                                 ${CALL_IN_PROGRESS ? 'call-in-progress' : ''}
                             `
-      }, react0().createElement(_button_jsx1__.A, {
+      }, react1().createElement(_button_jsx4__.A, {
         className: `
                                     mega-button
                                     large
@@ -6484,11 +6484,11 @@ class Incoming extends react0().Component {
           label: rejectLabel
         },
         onClick: onReject
-      }, react0().createElement("span", null, rejectLabel)), CALL_IN_PROGRESS ? this.renderSwitchControls() : this.renderAnswerControls()), unsupported && react0().createElement("div", {
+      }, react1().createElement("span", null, rejectLabel)), CALL_IN_PROGRESS ? this.renderSwitchControls() : this.renderAnswerControls()), unsupported && react1().createElement("div", {
         className: `${NAMESPACE}-unsupported`
-      }, react0().createElement("div", {
+      }, react1().createElement("div", {
         className: "unsupported-message"
-      }, _call_jsx6__.Ay.getUnsupportedBrowserMessage()))));
+      }, _call_jsx5__.Ay.getUnsupportedBrowserMessage()))));
     }
     console.error('Incoming dialog received missing chatRoom prop.');
     return null;
@@ -10660,14 +10660,14 @@ Chat.prototype.fetchSoundBuffer = async function (sound) {
     return this.SOUNDS.buffers[sound].slice();
   }
   let res = await M.xhr({
-    url: `${staticpath}sounds/${sound}.mp3`,
+    url: `${staticpath}media/${sound}.mp3`,
     type: 'arraybuffer'
   }).catch(() => {
     console.warn('Failed to fetch sound .mp3 file', sound);
   });
   if (!res) {
     res = await M.xhr({
-      url: `${staticpath}sounds/${sound}.ogg`,
+      url: `${staticpath}media/${sound}.ogg`,
       type: 'arraybuffer'
     }).catch(() => {
       console.error('Failed to fetch sound .ogg file', sound);
@@ -10706,8 +10706,8 @@ const react0__ = REQ_(594);
 const react0 = REQ_.n(react0__);
 const _mixins1__ = REQ_(137);
 const _contacts_jsx2__ = REQ_(251);
-const _call_jsx4__ = REQ_(3);
-const _ui_utils3__ = REQ_(314);
+const _call_jsx3__ = REQ_(3);
+const _ui_utils4__ = REQ_(314);
 
 
 
@@ -10900,7 +10900,7 @@ class VideoNode extends _mixins1__.w9 {
     }, children);
     const name = react0().createElement("div", {
       className: "video-status-name"
-    }, isPresenterNode ? react0().createElement(_ui_utils3__.zT, null, l.presenter_nail.replace('%s', M.getNameByHandle(userHandle))) : react0().createElement(_contacts_jsx2__.ContactAwareName, {
+    }, isPresenterNode ? react0().createElement(_ui_utils4__.zT, null, l.presenter_nail.replace('%s', M.getNameByHandle(userHandle))) : react0().createElement(_contacts_jsx2__.ContactAwareName, {
       contact: M.u[userHandle],
       emoji: true
     }));
@@ -10943,7 +10943,7 @@ class VideoNode extends _mixins1__.w9 {
                     ${className || ''}
                     ${isLocal && !isLocalScreen ? ' local-stream-mirrored' : ''}
                     ${simpletip ? 'simpletip' : ''}
-                    ${isActiveSpeaker && mode === _call_jsx4__.g.THUMBNAIL ? 'active-speaker' : ''}
+                    ${isActiveSpeaker && mode === _call_jsx3__.g.THUMBNAIL ? 'active-speaker' : ''}
                 `,
       "data-simpletip": simpletip == null ? void 0 : simpletip.label,
       "data-simpletipposition": simpletip == null ? void 0 : simpletip.position,
@@ -19800,10 +19800,10 @@ A: () => __WEBPACK_DEFAULT_EXPORT__
 });
 const react0__ = REQ_(594);
 const react0 = REQ_.n(react0__);
-const _mixins_js4__ = REQ_(137);
+const _mixins_js1__ = REQ_(137);
 const _contacts_jsx2__ = REQ_(251);
-const _call_jsx1__ = REQ_(3);
-const _button_jsx3__ = REQ_(959);
+const _call_jsx3__ = REQ_(3);
+const _button_jsx4__ = REQ_(959);
 const _permissionsObserver_jsx5__ = REQ_(542);
 
 
@@ -19876,7 +19876,7 @@ class Preview extends react0().Component {
       (_this$props$resetErro = (_this$props = this.props).resetError) == null || _this$props$resetErro.call(_this$props, type === Preview.STREAMS.AUDIO ? Av.Audio : Av.Camera);
     };
     this.renderAvatar = () => {
-      if ((0,_call_jsx1__.P)()) {
+      if ((0,_call_jsx3__.P)()) {
         return react0().createElement("div", {
           className: "avatar-guest"
         }, react0().createElement("i", {
@@ -19955,7 +19955,7 @@ class Preview extends react0().Component {
       className: `${NAMESPACE}-controls`
     }, react0().createElement("div", {
       className: "preview-control-wrapper"
-    }, react0().createElement(_button_jsx3__.A, {
+    }, react0().createElement(_button_jsx4__.A, {
       simpletip: {
         ...SIMPLETIP_PROPS,
         label: audio ? l[16214] : l[16708]
@@ -19973,7 +19973,7 @@ class Preview extends react0().Component {
       }
     }), react0().createElement("span", null, l.mic_button), hasToRenderPermissionsWarning(Av.Audio) ? renderPermissionsWarning(Av.Audio) : null), react0().createElement("div", {
       className: "preview-control-wrapper"
-    }, react0().createElement(_button_jsx3__.A, {
+    }, react0().createElement(_button_jsx4__.A, {
       simpletip: {
         ...SIMPLETIP_PROPS,
         label: video ? l[22894] : l[22893]
@@ -19995,7 +19995,7 @@ Preview.STREAMS = {
   AUDIO: 1,
   VIDEO: 2
 };
-const __WEBPACK_DEFAULT_EXPORT__ = (0,_mixins_js4__.Zz)(_permissionsObserver_jsx5__.$)(Preview);
+const __WEBPACK_DEFAULT_EXPORT__ = (0,_mixins_js1__.Zz)(_permissionsObserver_jsx5__.$)(Preview);
 
 },
 
@@ -20006,13 +20006,13 @@ const __WEBPACK_DEFAULT_EXPORT__ = (0,_mixins_js4__.Zz)(_permissionsObserver_jsx
 REQ_.d(EXP_, {
 O: () => PerfectScrollbar
 });
-const _applyDecoratedDescriptor1__ = REQ_(793);
-const _chat_mixins0__ = REQ_(137);
+const _applyDecoratedDescriptor0__ = REQ_(793);
+const _chat_mixins1__ = REQ_(137);
 
 let _dec, _dec2, _class, _PerfectScrollbar;
 const React = REQ_(594);
 
-const PerfectScrollbar = (_dec = (0,_chat_mixins0__.hG)(30, true), _dec2 = (0,_chat_mixins0__.hG)(30, true), _class = (_PerfectScrollbar = class PerfectScrollbar extends _chat_mixins0__.w9 {
+const PerfectScrollbar = (_dec = (0,_chat_mixins1__.hG)(30, true), _dec2 = (0,_chat_mixins1__.hG)(30, true), _class = (_PerfectScrollbar = class PerfectScrollbar extends _chat_mixins1__.w9 {
   constructor(props) {
     super(props);
     this.domRef = React.createRef();
@@ -20306,7 +20306,7 @@ const PerfectScrollbar = (_dec = (0,_chat_mixins0__.hG)(30, true), _dec2 = (0,_c
 }, _PerfectScrollbar.defaultProps = {
   className: "perfectScrollbarContainer",
   requiresUpdateOnResize: true
-}, _PerfectScrollbar), (0,_applyDecoratedDescriptor1__.A)(_class.prototype, "eventuallyReinitialise", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "eventuallyReinitialise"), _class.prototype), (0,_applyDecoratedDescriptor1__.A)(_class.prototype, "onResize", [_dec2], Object.getOwnPropertyDescriptor(_class.prototype, "onResize"), _class.prototype), _class);
+}, _PerfectScrollbar), (0,_applyDecoratedDescriptor0__.A)(_class.prototype, "eventuallyReinitialise", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "eventuallyReinitialise"), _class.prototype), (0,_applyDecoratedDescriptor0__.A)(_class.prototype, "onResize", [_dec2], Object.getOwnPropertyDescriptor(_class.prototype, "onResize"), _class.prototype), _class);
 
 },
 
@@ -20319,18 +20319,18 @@ Ay: () => __WEBPACK_DEFAULT_EXPORT__,
 _F: () => renderEndConfirm,
 sX: () => renderLeaveConfirm
 });
-const _extends5__ = REQ_(168);
-const react0__ = REQ_(594);
-const react0 = REQ_.n(react0__);
-const _mixins1__ = REQ_(137);
+const _extends0__ = REQ_(168);
+const react1__ = REQ_(594);
+const react1 = REQ_.n(react1__);
+const _mixins2__ = REQ_(137);
 const _button_jsx3__ = REQ_(959);
 const _stream_jsx4__ = REQ_(415);
-const _micObserver_jsx9__ = REQ_(772);
-const _permissionsObserver_jsx10__ = REQ_(542);
-const _call_jsx6__ = REQ_(3);
-const _hostsObserver_jsx2__ = REQ_(972);
-const _ui_dropdowns_jsx8__ = REQ_(911);
-const _ui_utils_jsx7__ = REQ_(314);
+const _micObserver_jsx5__ = REQ_(772);
+const _permissionsObserver_jsx6__ = REQ_(542);
+const _call_jsx7__ = REQ_(3);
+const _hostsObserver_jsx8__ = REQ_(972);
+const _ui_dropdowns_jsx9__ = REQ_(911);
+const _ui_utils_jsx10__ = REQ_(314);
 
 
 
@@ -20354,12 +20354,12 @@ const renderEndConfirm = (onConfirm, onRecordingToggle) => msgDialog(`confirmati
     onConfirm();
   }
 }, 1);
-class StreamControls extends _mixins1__.w9 {
+class StreamControls extends _mixins2__.w9 {
   constructor(...args) {
     super(...args);
-    this.domRef = react0().createRef();
-    this.endContainerRef = react0().createRef();
-    this.endButtonRef = react0().createRef();
+    this.domRef = react1().createRef();
+    this.endContainerRef = react1().createRef();
+    this.endButtonRef = react1().createRef();
     this.SIMPLETIP = {
       position: 'top',
       offset: 8,
@@ -20374,7 +20374,7 @@ class StreamControls extends _mixins1__.w9 {
       loading: false,
       muteSpeak: false
     };
-    this.LeaveButton = (0,_hostsObserver_jsx2__.C)(({
+    this.LeaveButton = (0,_hostsObserver_jsx8__.C)(({
       hasHost,
       chatRoom,
       confirmLeave,
@@ -20386,7 +20386,7 @@ class StreamControls extends _mixins1__.w9 {
         cta: l.assign_host_button,
         altCta: l.leave_anyway
       });
-      return react0().createElement(_button_jsx3__.A, {
+      return react1().createElement(_button_jsx3__.A, {
         className: "mega-button",
         onClick: () => {
           const {
@@ -20396,7 +20396,7 @@ class StreamControls extends _mixins1__.w9 {
           } = this.props;
           return recorderCid && recorderCid === call.sfuClient.cid ? renderLeaveConfirm(doLeave, onRecordingToggle) : doLeave();
         }
-      }, react0().createElement("span", null, l.leave));
+      }, react1().createElement("span", null, l.leave));
     });
     this.setActiveElement = forced => this.props.setActiveElement(forced || this.state.audioSelectDropdown || this.state.videoSelectDropdown || this.state.endCallOptions);
     this.handleMousedown = ({
@@ -20419,7 +20419,7 @@ class StreamControls extends _mixins1__.w9 {
       }
     };
     this.renderDebug = () => {
-      return react0().createElement("div", {
+      return react1().createElement("div", {
         className: "stream-debug",
         style: {
           position: 'absolute',
@@ -20429,21 +20429,21 @@ class StreamControls extends _mixins1__.w9 {
           alignItems: 'center',
           color: 'tomato'
         }
-      }, react0().createElement(_button_jsx3__.A, {
+      }, react1().createElement(_button_jsx3__.A, {
         className: "mega-button round small theme-dark-forced positive",
         simpletip: {
           ...this.SIMPLETIP,
           label: 'Add Stream'
         },
         onClick: () => this.props.onStreamToggle(_stream_jsx4__.hK.ADD)
-      }, react0().createElement("span", null, l.add)), react0().createElement(_button_jsx3__.A, {
+      }, react1().createElement("span", null, l.add)), react1().createElement(_button_jsx3__.A, {
         className: "mega-button round small theme-dark-forced negative",
         simpletip: {
           ...this.SIMPLETIP,
           label: 'Remove Stream'
         },
         onClick: () => this.props.peers.length > 1 && this.props.onStreamToggle(_stream_jsx4__.hK.REMOVE)
-      }, react0().createElement("span", null, l[83])), react0().createElement("span", null, this.props.peers.length + 1));
+      }, react1().createElement("span", null, l[83])), react1().createElement("span", null, this.props.peers.length + 1));
     };
     this.renderEndCallOptions = () => {
       let _this$endContainerRef;
@@ -20462,7 +20462,7 @@ class StreamControls extends _mixins1__.w9 {
         endCallPending: true
       }, () => chatRoom.endCallForAll());
       const endContainerRef = (_this$endContainerRef = this.endContainerRef) == null ? void 0 : _this$endContainerRef.current;
-      return react0().createElement("div", (0,_extends5__.A)({}, endCallOptions && {
+      return react1().createElement("div", (0,_extends0__.A)({}, endCallOptions && {
         style: (({
           left,
           top
@@ -20476,15 +20476,15 @@ class StreamControls extends _mixins1__.w9 {
                     theme-dark-forced
                     ${endCallOptions ? '' : 'hidden'}
                 `
-      }), react0().createElement("div", {
+      }), react1().createElement("div", {
         className: "meetings-end-options-content"
-      }, react0().createElement(this.LeaveButton, {
+      }, react1().createElement(this.LeaveButton, {
         chatRoom,
         recorderCid,
         participants: chatRoom.getCallParticipants(),
         onLeave: onCallEnd,
         onConfirmDenied: onCallEnd
-      }), react0().createElement(_button_jsx3__.A, {
+      }), react1().createElement(_button_jsx3__.A, {
         className: `
                             mega-button
                             positive
@@ -20496,7 +20496,7 @@ class StreamControls extends _mixins1__.w9 {
           }
           return doEnd();
         }
-      }, react0().createElement("span", null, l.end_for_all))));
+      }, react1().createElement("span", null, l.end_for_all))));
     };
     this.renderEndCall = () => {
       const {
@@ -20507,11 +20507,11 @@ class StreamControls extends _mixins1__.w9 {
         onRecordingToggle,
         onCallEnd
       } = this.props;
-      return react0().createElement("div", {
+      return react1().createElement("div", {
         ref: this.endContainerRef,
         className: "end-call-container",
         onClick: () => {
-          if (chatRoom.type !== 'private' && peers.length && _call_jsx6__.Ay.isModerator(chatRoom, u_handle)) {
+          if (chatRoom.type !== 'private' && peers.length && _call_jsx7__.Ay.isModerator(chatRoom, u_handle)) {
             return this.setState(state => ({
               endCallOptions: !state.endCallOptions
             }), () => {
@@ -20526,9 +20526,9 @@ class StreamControls extends _mixins1__.w9 {
           }
           return onCallEnd();
         }
-      }, react0().createElement(_ui_utils_jsx7__.Ay.RenderTo, {
+      }, react1().createElement(_ui_utils_jsx10__.Ay.RenderTo, {
         element: document.body
-      }, this.renderEndCallOptions()), react0().createElement(_button_jsx3__.A, {
+      }, this.renderEndCallOptions()), react1().createElement(_button_jsx3__.A, {
         simpletip: {
           ...this.SIMPLETIP,
           label: l[5884]
@@ -20538,13 +20538,13 @@ class StreamControls extends _mixins1__.w9 {
         didMount: button => {
           this.endButtonRef = button.buttonRef;
         }
-      }), react0().createElement("span", null, l.end_button));
+      }), react1().createElement("span", null, l.end_button));
     };
     this.renderSourceOpener = ({
       type,
       eventId
     }) => {
-      return react0().createElement("div", {
+      return react1().createElement("div", {
         className: `
                     input-source-opener
                     button
@@ -20573,7 +20573,7 @@ class StreamControls extends _mixins1__.w9 {
             });
           });
         }
-      }, react0().createElement("i", {
+      }, react1().createElement("i", {
         className: "sprite-fm-mono icon-arrow-up"
       }));
     };
@@ -20611,27 +20611,27 @@ class StreamControls extends _mixins1__.w9 {
         chatRoom,
         onOnboardingRaiseDismiss
       } = this.props;
-      return react0().createElement("div", {
+      return react1().createElement("div", {
         className: "meetings-call-onboarding"
-      }, react0().createElement("div", {
+      }, react1().createElement("div", {
         className: "mega-dialog mega-onboarding-dialog dialog-template-message onboarding-raise",
         id: "ob-dialog",
         role: "dialog",
         "aria-labelledby": "ob-dialog-title",
         "aria-modal": "true"
-      }, react0().createElement("i", {
+      }, react1().createElement("i", {
         className: "sprite-fm-mono icon-tooltip-arrow tooltip-arrow bottom",
         id: "ob-dialog-arrow"
-      }), react0().createElement("header", null, react0().createElement("div", null, react0().createElement("h2", {
+      }), react1().createElement("header", null, react1().createElement("div", null, react1().createElement("h2", {
         id: "ob-dialog-title"
-      }, l.raise_onboarding_title), react0().createElement("p", {
+      }, l.raise_onboarding_title), react1().createElement("p", {
         id: "ob-dialog-text"
-      }, chatRoom.isMeeting ? l.raise_onboarding_body : l.raise_onboarding_group_body))), react0().createElement("footer", null, react0().createElement("div", {
+      }, chatRoom.isMeeting ? l.raise_onboarding_body : l.raise_onboarding_group_body))), react1().createElement("footer", null, react1().createElement("div", {
         className: "footer-container"
-      }, react0().createElement("button", {
+      }, react1().createElement("button", {
         className: "mega-button js-next small theme-light-forced",
         onClick: onOnboardingRaiseDismiss
-      }, react0().createElement("span", null, l.ok_button))))));
+      }, react1().createElement("span", null, l.ok_button))))));
     };
     this.renderRaiseButton = () => {
       const {
@@ -20641,9 +20641,9 @@ class StreamControls extends _mixins1__.w9 {
       } = this.props;
       const isOnHold = call.av & Av.onHold;
       const hasRaisedHand = raisedHandPeers.includes(u_handle);
-      return react0().createElement("li", {
+      return react1().createElement("li", {
         className: isOnHold ? 'disabled' : ''
-      }, onboardingRaise && this.renderOnboardingRaise(), react0().createElement(_button_jsx3__.A, {
+      }, onboardingRaise && this.renderOnboardingRaise(), react1().createElement(_button_jsx3__.A, {
         className: `
                         mega-button
                         theme-light-forced
@@ -20662,7 +20662,7 @@ class StreamControls extends _mixins1__.w9 {
           call.sfuClient.raiseHand();
           eventlog(500249);
         }
-      }), react0().createElement("span", null, l.raise_button));
+      }), react1().createElement("span", null, l.raise_button));
     };
   }
   renderSoundDropdown() {
@@ -20711,7 +20711,7 @@ class StreamControls extends _mixins1__.w9 {
       selectedOut = 'default';
     }
     const mics = Object.entries(audioIn).map(([id, name]) => {
-      return react0().createElement(_ui_dropdowns_jsx8__.DropdownItem, {
+      return react1().createElement(_ui_dropdowns_jsx9__.DropdownItem, {
         key: id,
         onClick: () => {
           call.sfuClient.setMicDevice(id === 'default' ? null : id);
@@ -20719,14 +20719,14 @@ class StreamControls extends _mixins1__.w9 {
             audioSelectDropdown: false
           }, this.setActiveElement);
         }
-      }, react0().createElement(react0().Fragment, null, react0().createElement("div", {
+      }, react1().createElement(react1().Fragment, null, react1().createElement("div", {
         className: "av-device-name"
-      }, name), selectedIn === id && react0().createElement("i", {
+      }, name), selectedIn === id && react1().createElement("i", {
         className: "sprite-fm-mono icon-check-small-regular-outline"
       })));
     });
     const speakers = Object.entries(audioOut).map(([id, name]) => {
-      return react0().createElement(_ui_dropdowns_jsx8__.DropdownItem, {
+      return react1().createElement(_ui_dropdowns_jsx9__.DropdownItem, {
         key: id,
         onClick: () => {
           Promise.resolve(call.sfuClient.setAudioOutDevice(id === 'default' ? null : id)).catch(dump);
@@ -20734,13 +20734,13 @@ class StreamControls extends _mixins1__.w9 {
             audioSelectDropdown: false
           }, this.setActiveElement);
         }
-      }, react0().createElement(react0().Fragment, null, react0().createElement("div", {
+      }, react1().createElement(react1().Fragment, null, react1().createElement("div", {
         className: "av-device-name"
-      }, name), selectedOut === id && react0().createElement("i", {
+      }, name), selectedOut === id && react1().createElement("i", {
         className: "sprite-fm-mono icon-check-small-regular-outline"
       })));
     });
-    return react0().createElement(_ui_dropdowns_jsx8__.Dropdown, {
+    return react1().createElement(_ui_dropdowns_jsx9__.Dropdown, {
       className: "input-sources audio-sources theme-dark-forced",
       active: true,
       noArrow: true,
@@ -20751,15 +20751,15 @@ class StreamControls extends _mixins1__.w9 {
       closeDropdown: () => this.setState({
         audioSelectDropdown: false
       }, this.setActiveElement)
-    }, react0().createElement("div", {
+    }, react1().createElement("div", {
       className: "source-label"
-    }, l.microphone), mics.length ? mics : react0().createElement(_ui_dropdowns_jsx8__.DropdownItem, {
+    }, l.microphone), mics.length ? mics : react1().createElement(_ui_dropdowns_jsx9__.DropdownItem, {
       label: l.no_mics
-    }), react0().createElement("hr", null), react0().createElement("div", {
+    }), react1().createElement("hr", null), react1().createElement("div", {
       className: "source-label"
-    }, l.speaker), speakers.length ? speakers : react0().createElement(_ui_dropdowns_jsx8__.DropdownItem, {
+    }, l.speaker), speakers.length ? speakers : react1().createElement(_ui_dropdowns_jsx9__.DropdownItem, {
       label: l.no_speakers
-    }), react0().createElement("hr", null), react0().createElement(_ui_dropdowns_jsx8__.DropdownItem, {
+    }), react1().createElement("hr", null), react1().createElement(_ui_dropdowns_jsx9__.DropdownItem, {
       icon: "sprite-fm-mono icon-volume-max-small-regular-outline",
       label: l.test_speaker,
       disabled: speakers.length === 0,
@@ -20794,7 +20794,7 @@ class StreamControls extends _mixins1__.w9 {
       selectedCam = 'default';
     }
     const cameras = Object.entries(videoIn).map(([id, name]) => {
-      return react0().createElement(_ui_dropdowns_jsx8__.DropdownItem, {
+      return react1().createElement(_ui_dropdowns_jsx9__.DropdownItem, {
         key: id,
         onClick: () => {
           call.sfuClient.setCameraDevice(id === 'default' ? null : id);
@@ -20802,13 +20802,13 @@ class StreamControls extends _mixins1__.w9 {
             videoSelectDropdown: false
           }, this.setActiveElement);
         }
-      }, react0().createElement(react0().Fragment, null, react0().createElement("div", {
+      }, react1().createElement(react1().Fragment, null, react1().createElement("div", {
         className: "av-device-name"
-      }, name), selectedCam === id && react0().createElement("i", {
+      }, name), selectedCam === id && react1().createElement("i", {
         className: "sprite-fm-mono icon-check-small-regular-outline"
       })));
     });
-    return react0().createElement(_ui_dropdowns_jsx8__.Dropdown, {
+    return react1().createElement(_ui_dropdowns_jsx9__.Dropdown, {
       className: "input-sources video-sources theme-dark-forced",
       active: true,
       noArrow: true,
@@ -20819,9 +20819,9 @@ class StreamControls extends _mixins1__.w9 {
       closeDropdown: () => this.setState({
         videoSelectDropdown: false
       }, this.setActiveElement)
-    }, react0().createElement("div", {
+    }, react1().createElement("div", {
       className: "source-label"
-    }, l.camera_button), cameras.length ? cameras : react0().createElement(_ui_dropdowns_jsx8__.DropdownItem, {
+    }, l.camera_button), cameras.length ? cameras : react1().createElement(_ui_dropdowns_jsx9__.DropdownItem, {
       label: l.no_cameras
     }));
   }
@@ -20908,10 +20908,10 @@ class StreamControls extends _mixins1__.w9 {
     } = this.state;
     const avFlags = call.av;
     const isOnHold = avFlags & Av.onHold;
-    return react0().createElement(react0().Fragment, null, blocked && renderBlockedWarning(), react0().createElement("div", {
+    return react1().createElement(react1().Fragment, null, blocked && renderBlockedWarning(), react1().createElement("div", {
       ref: this.domRef,
       className: StreamControls.NAMESPACE
-    }, d && localStorage.callDebug ? this.renderDebug() : '', react0().createElement("ul", null, react0().createElement("li", {
+    }, d && localStorage.callDebug ? this.renderDebug() : '', react1().createElement("ul", null, react1().createElement("li", {
       className: `
                                 ${isOnHold ? 'disabled' : ''}
                                 with-input-selector
@@ -20922,10 +20922,10 @@ class StreamControls extends _mixins1__.w9 {
         resetError(Av.Audio);
         onAudioClick();
       })
-    }, muteSpeak && react0().createElement("div", {
+    }, muteSpeak && react1().createElement("div", {
       className: "mic-muted-tip theme-light-forced",
       onClick: ev => ev.stopPropagation()
-    }, react0().createElement("span", null, l.mic_still_muted), react0().createElement(_button_jsx3__.A, {
+    }, react1().createElement("span", null, l.mic_still_muted), react1().createElement(_button_jsx3__.A, {
       className: "mic-muted-tip-btn",
       onClick: () => {
         this.setState({
@@ -20935,9 +20935,9 @@ class StreamControls extends _mixins1__.w9 {
           eventlog(500509);
         });
       }
-    }, l[148]), react0().createElement("i", {
+    }, l[148]), react1().createElement("i", {
       className: "sprite-fm-mono icon-tooltip-arrow tooltip-arrow bottom"
-    })), react0().createElement(_button_jsx3__.A, {
+    })), react1().createElement(_button_jsx3__.A, {
       className: `
                                     mega-button
                                     theme-light-forced
@@ -20947,12 +20947,12 @@ class StreamControls extends _mixins1__.w9 {
                                     ${avFlags & Av.Audio || isOnHold ? '' : 'with-fill'}
                                 `,
       icon: avFlags & Av.Audio ? 'icon-mic-thin-outline' : 'icon-mic-off-thin-outline'
-    }), react0().createElement("span", null, l.mic_button), signal ? null : renderSignalWarning(), hasToRenderPermissionsWarning(Av.Audio) ? renderPermissionsWarning(Av.Audio) : null, this.renderSourceOpener({
+    }), react1().createElement("span", null, l.mic_button), signal ? null : renderSignalWarning(), hasToRenderPermissionsWarning(Av.Audio) ? renderPermissionsWarning(Av.Audio) : null, this.renderSourceOpener({
       type: 'audioSelectDropdown',
       eventId: chatRoom.isMeeting ? 500299 : 500300
-    })), audioSelectDropdown && react0().createElement("div", {
+    })), audioSelectDropdown && react1().createElement("div", {
       ref: this.audioDropdownRef
-    }, this.renderSoundDropdown()), react0().createElement("li", {
+    }, this.renderSoundDropdown()), react1().createElement("li", {
       className: `
                                 ${isOnHold ? 'disabled' : ''}
                                 with-input-selector
@@ -20964,7 +20964,7 @@ class StreamControls extends _mixins1__.w9 {
         resetError(Av.Camera);
         onVideoClick();
       }
-    }, react0().createElement(_button_jsx3__.A, {
+    }, react1().createElement(_button_jsx3__.A, {
       className: `
                                     mega-button
                                     theme-light-forced
@@ -20974,12 +20974,12 @@ class StreamControls extends _mixins1__.w9 {
                                     ${avFlags & Av.Camera || isOnHold ? '' : 'with-fill'}
                                 `,
       icon: avFlags & Av.Camera ? 'icon-video-thin-outline' : 'icon-video-off-thin-outline'
-    }), react0().createElement("span", null, l.camera_button), hasToRenderPermissionsWarning(Av.Camera) ? renderPermissionsWarning(Av.Camera) : null, this.renderSourceOpener({
+    }), react1().createElement("span", null, l.camera_button), hasToRenderPermissionsWarning(Av.Camera) ? renderPermissionsWarning(Av.Camera) : null, this.renderSourceOpener({
       type: 'videoSelectDropdown',
       eventId: chatRoom.isMeeting ? 500301 : 500302
-    })), videoSelectDropdown && react0().createElement("div", {
+    })), videoSelectDropdown && react1().createElement("div", {
       ref: this.videoDropdownRef
-    }, this.renderVideoDropdown()), react0().createElement("li", {
+    }, this.renderVideoDropdown()), react1().createElement("li", {
       className: isOnHold ? 'disabled' : '',
       onClick: () => {
         if (isOnHold) {
@@ -20993,7 +20993,7 @@ class StreamControls extends _mixins1__.w9 {
           eventlog(500304);
         }
       }
-    }, react0().createElement(_button_jsx3__.A, {
+    }, react1().createElement(_button_jsx3__.A, {
       className: `
                                     mega-button
                                     theme-light-forced
@@ -21003,9 +21003,9 @@ class StreamControls extends _mixins1__.w9 {
                                     ${avFlags & Av.Screen ? 'with-fill' : ''}
                                 `,
       icon: avFlags & Av.Screen ? 'icon-monitor-off' : 'icon-monitor'
-    }), react0().createElement("span", null, avFlags & Av.Screen ? l.screenshare_stop_button : l.screenshare_button), hasToRenderPermissionsWarning(Av.Screen) ? renderPermissionsWarning(Av.Screen, this) : null), chatRoom.type === 'private' ? null : this.renderRaiseButton(), react0().createElement("li", {
+    }), react1().createElement("span", null, avFlags & Av.Screen ? l.screenshare_stop_button : l.screenshare_button), hasToRenderPermissionsWarning(Av.Screen) ? renderPermissionsWarning(Av.Screen, this) : null), chatRoom.type === 'private' ? null : this.renderRaiseButton(), react1().createElement("li", {
       onClick: onHoldClick
-    }, react0().createElement(_button_jsx3__.A, {
+    }, react1().createElement(_button_jsx3__.A, {
       className: `
                                     mega-button
                                     theme-light-forced
@@ -21014,11 +21014,11 @@ class StreamControls extends _mixins1__.w9 {
                                     ${isOnHold ? 'with-fill' : ''}
                                 `,
       icon: isOnHold ? 'icon-play-small-regular-outline' : 'icon-pause-small-regular-outline'
-    }), react0().createElement("span", null, isOnHold ? l.resume_call_button : l.hold_button)), react0().createElement("li", null, this.renderEndCall()))));
+    }), react1().createElement("span", null, isOnHold ? l.resume_call_button : l.hold_button)), react1().createElement("li", null, this.renderEndCall()))));
   }
 }
 StreamControls.NAMESPACE = 'stream-controls';
-const __WEBPACK_DEFAULT_EXPORT__ = (0,_mixins1__.Zz)(_micObserver_jsx9__.Q, _permissionsObserver_jsx10__.$)(StreamControls);
+const __WEBPACK_DEFAULT_EXPORT__ = (0,_mixins2__.Zz)(_micObserver_jsx5__.Q, _permissionsObserver_jsx6__.$)(StreamControls);
 
 },
 
@@ -21029,18 +21029,18 @@ const __WEBPACK_DEFAULT_EXPORT__ = (0,_mixins1__.Zz)(_micObserver_jsx9__.Q, _per
 REQ_.d(EXP_, {
 Y: () => withUpdateObserver
 });
-const _extends2__ = REQ_(168);
-const react0__ = REQ_(594);
-const react0 = REQ_.n(react0__);
-const _mixins_js1__ = REQ_(137);
+const _extends0__ = REQ_(168);
+const react1__ = REQ_(594);
+const react1 = REQ_.n(react1__);
+const _mixins_js2__ = REQ_(137);
 
 
 
-const withUpdateObserver = Component => class extends _mixins_js1__.w9 {
+const withUpdateObserver = Component => class extends _mixins_js2__.w9 {
   constructor(...args) {
     super(...args);
     this.updateInterval = 600000;
-    this.instanceRef = react0().createRef();
+    this.instanceRef = react1().createRef();
     this.intervalRef = undefined;
     this.state = {
       updated: 0
@@ -21062,7 +21062,7 @@ const withUpdateObserver = Component => class extends _mixins_js1__.w9 {
     this.intervalRef = setInterval(this.instanceRef.current[Component.updateListener] || this.updateListener, Component.updateInterval || this.updateInterval);
   }
   render() {
-    return react0().createElement(Component, (0,_extends2__.A)({
+    return react1().createElement(Component, (0,_extends0__.A)({
       ref: this.instanceRef
     }, this.state, this.props));
   }
@@ -21081,9 +21081,9 @@ yU: () => Pin
 });
 const react0__ = REQ_(594);
 const react0 = REQ_.n(react0__);
-const _mixins3__ = REQ_(137);
-const _button_jsx1__ = REQ_(959);
-const _call_jsx2__ = REQ_(3);
+const _mixins1__ = REQ_(137);
+const _button_jsx2__ = REQ_(959);
+const _call_jsx3__ = REQ_(3);
 
 
 
@@ -21104,7 +21104,7 @@ const Privilege = ({
     } = ChatRoom.MembersSet.PRIVILEGE_STATE;
     const currentUserModerator = chatRoom.members[u_handle] === OPERATOR;
     const targetUserModerator = chatRoom.members[userHandle] === OPERATOR;
-    return currentUserModerator && react0().createElement(_button_jsx1__.A, {
+    return currentUserModerator && react0().createElement(_button_jsx2__.A, {
       targetUserModerator,
       icon: "sprite-fm-mono icon-admin-outline",
       onClick: () => {
@@ -21122,10 +21122,10 @@ const Contact = ({
   const {
     userHandle
   } = stream;
-  const IS_GUEST = (0,_call_jsx2__.P)() || ephemeralAccounts && ephemeralAccounts.includes(userHandle);
+  const IS_GUEST = (0,_call_jsx3__.P)() || ephemeralAccounts && ephemeralAccounts.includes(userHandle);
   const HAS_RELATIONSHIP = M.u[userHandle].c === 1;
   if (HAS_RELATIONSHIP) {
-    return react0().createElement(_button_jsx1__.A, {
+    return react0().createElement(_button_jsx2__.A, {
       icon: "sprite-fm-mono icon-chat",
       onClick: () => {
         onCallMinimize();
@@ -21133,7 +21133,7 @@ const Contact = ({
       }
     }, react0().createElement("span", null, l[7997]));
   }
-  return react0().createElement(_button_jsx1__.A, {
+  return react0().createElement(_button_jsx2__.A, {
     className: IS_GUEST ? 'disabled' : '',
     icon: "sprite-fm-mono icon-add",
     onClick: () => {
@@ -21154,12 +21154,12 @@ const Pin = ({
   onSpeakerChange,
   onModeChange
 }) => {
-  return react0().createElement(_button_jsx1__.A, {
+  return react0().createElement(_button_jsx2__.A, {
     icon: "sprite-fm-mono grid-main",
-    onClick: () => mode === _call_jsx2__.g.THUMBNAIL ? onSpeakerChange == null ? void 0 : onSpeakerChange(stream) : onModeChange == null ? void 0 : onModeChange(_call_jsx2__.g.THUMBNAIL)
-  }, react0().createElement("span", null, mode === _call_jsx2__.g.THUMBNAIL ? l.display_in_main_view : l.switch_to_thumb_view));
+    onClick: () => mode === _call_jsx3__.g.THUMBNAIL ? onSpeakerChange == null ? void 0 : onSpeakerChange(stream) : onModeChange == null ? void 0 : onModeChange(_call_jsx3__.g.THUMBNAIL)
+  }, react0().createElement("span", null, mode === _call_jsx3__.g.THUMBNAIL ? l.display_in_main_view : l.switch_to_thumb_view));
 };
-class VideoNodeMenu extends _mixins3__.w9 {
+class VideoNodeMenu extends _mixins1__.w9 {
   constructor(...args) {
     super(...args);
     this.domRef = react0().createRef();
@@ -21170,13 +21170,13 @@ class VideoNodeMenu extends _mixins3__.w9 {
       if (!videoNode) {
         return null;
       }
-      return videoNode.isVideoCropped() ? react0().createElement(_button_jsx1__.A, {
+      return videoNode.isVideoCropped() ? react0().createElement(_button_jsx2__.A, {
         icon: "sprite-fm-mono grid-main",
         onClick: () => {
           videoNode.uncropVideo();
           this.forceUpdate();
         }
-      }, react0().createElement("span", null, "Uncrop video")) : react0().createElement(_button_jsx1__.A, {
+      }, react0().createElement("span", null, "Uncrop video")) : react0().createElement(_button_jsx2__.A, {
         icon: "sprite-fm-mono grid-main",
         onClick: () => {
           videoNode.cropVideo();
@@ -21206,13 +21206,13 @@ class VideoNodeMenu extends _mixins3__.w9 {
         className: `
                         ${NAMESPACE}
                         theme-dark-forced
-                        ${mode === _call_jsx2__.g.THUMBNAIL ? '' : 'presenter'}
+                        ${mode === _call_jsx3__.g.THUMBNAIL ? '' : 'presenter'}
                     `
       }, react0().createElement("div", {
         className: `${NAMESPACE}-toggle`
       }, react0().createElement("i", {
-        className: `sprite-fm-mono call-node-pin icon-pin${mode === _call_jsx2__.g.MAIN ? '-off' : ''}`,
-        onClick: () => mode === _call_jsx2__.g.THUMBNAIL ? onSpeakerChange == null ? void 0 : onSpeakerChange(stream) : onModeChange == null ? void 0 : onModeChange(_call_jsx2__.g.THUMBNAIL)
+        className: `sprite-fm-mono call-node-pin icon-pin${mode === _call_jsx3__.g.MAIN ? '-off' : ''}`,
+        onClick: () => mode === _call_jsx3__.g.THUMBNAIL ? onSpeakerChange == null ? void 0 : onSpeakerChange(stream) : onModeChange == null ? void 0 : onModeChange(_call_jsx3__.g.THUMBNAIL)
       })));
     }
     if (userHandle !== u_handle) {
@@ -21251,12 +21251,12 @@ VideoNodeMenu.NAMESPACE = 'node-menu';
 REQ_.d(EXP_, {
 $: () => withPermissionsObserver
 });
-const _extends4__ = REQ_(168);
-const react0__ = REQ_(594);
-const react0 = REQ_.n(react0__);
-const _mixins_js1__ = REQ_(137);
-const _ui_modalDialogs_jsx2__ = REQ_(318);
-const _ui_utils_jsx3__ = REQ_(314);
+const _extends0__ = REQ_(168);
+const react1__ = REQ_(594);
+const react1 = REQ_.n(react1__);
+const _mixins_js2__ = REQ_(137);
+const _ui_modalDialogs_jsx3__ = REQ_(318);
+const _ui_utils_jsx4__ = REQ_(314);
 
 
 
@@ -21275,7 +21275,7 @@ const isUserActionError = error => {
   return error && error === errors.browser;
 };
 const withPermissionsObserver = Component => {
-  return class extends _mixins_js1__.w9 {
+  return class extends _mixins_js2__.w9 {
     constructor(props) {
       super(props);
       this.namespace = `PO-${Component.NAMESPACE}`;
@@ -21492,7 +21492,7 @@ const withPermissionsObserver = Component => {
         buttons,
         cover
       } = content[av] || {};
-      return react0().createElement(_ui_modalDialogs_jsx2__.A.ModalDialog, {
+      return react1().createElement(_ui_modalDialogs_jsx3__.A.ModalDialog, {
         dialogName: `${this.namespace}-permissions-${av}`,
         className: `
                         meetings-permissions-dialog
@@ -21507,19 +21507,19 @@ const withPermissionsObserver = Component => {
             [`dialog-${av}`]: false
           }, () => child && child.safeForceUpdate());
         }
-      }, react0().createElement("header", null, cover ? null : react0().createElement("div", {
+      }, react1().createElement("header", null, cover ? null : react1().createElement("div", {
         className: "graphic"
-      }, react0().createElement("i", {
+      }, react1().createElement("i", {
         className: "warning sprite-fm-uni icon-warning"
-      })), react0().createElement("div", {
+      })), react1().createElement("div", {
         className: "info-container"
-      }, react0().createElement("h3", {
+      }, react1().createElement("h3", {
         id: "msgDialog-title"
-      }, title || l[47]), cover && react0().createElement("div", {
+      }, title || l[47]), cover && react1().createElement("div", {
         className: "permissions-warning-cover"
-      }, react0().createElement("span", {
+      }, react1().createElement("span", {
         className: cover
-      })), react0().createElement(_ui_utils_jsx3__.P9, {
+      })), react1().createElement(_ui_utils_jsx4__.P9, {
         tag: "p",
         className: "permissions-warning-info",
         content: info
@@ -21531,7 +21531,7 @@ const withPermissionsObserver = Component => {
         errCamera
       } = this.state;
       const dismissed = errMic === errors.dismissed || errCamera === errors.dismissed;
-      return react0().createElement("div", {
+      return react1().createElement("div", {
         className: `
                         ${this.namespace}
                         meetings-signal-issue
@@ -21549,9 +21549,9 @@ const withPermissionsObserver = Component => {
             this.childRef = child;
           }
         })
-      }, react0().createElement("span", {
+      }, react1().createElement("span", {
         className: "signal-issue-background"
-      }), react0().createElement("i", {
+      }), react1().createElement("i", {
         className: "sprite-fm-mono icon-exclamation-filled"
       }), this.state[`dialog-${av}`] && this.renderPermissionsDialog(av, child));
     }
@@ -21580,7 +21580,7 @@ const withPermissionsObserver = Component => {
       });
     }
     render() {
-      return react0().createElement(Component, (0,_extends4__.A)({}, this.props, this.state, {
+      return react1().createElement(Component, (0,_extends0__.A)({}, this.props, this.state, {
         errMic: this.state.errMic,
         errCamera: this.state.errCamera,
         errScreen: this.state.errScreen,
@@ -31077,16 +31077,16 @@ window.ScheduleMetaChange = ScheduleMetaChange;
 REQ_.d(EXP_, {
 Q: () => withMicObserver
 });
-const _extends3__ = REQ_(168);
-const react0__ = REQ_(594);
-const react0 = REQ_.n(react0__);
-const _mixins1__ = REQ_(137);
-const _button_jsx2__ = REQ_(959);
+const _extends0__ = REQ_(168);
+const react1__ = REQ_(594);
+const react1 = REQ_.n(react1__);
+const _mixins2__ = REQ_(137);
+const _button_jsx3__ = REQ_(959);
 
 
 
 
-const withMicObserver = Component => class extends _mixins1__.w9 {
+const withMicObserver = Component => class extends _mixins2__.w9 {
   constructor(props) {
     super(props);
     this.namespace = `SO-${Component.NAMESPACE}`;
@@ -31120,7 +31120,7 @@ const withMicObserver = Component => class extends _mixins1__.w9 {
     return msgDialog('warningb', null, l.no_mic_title, l.chat_mic_off_tooltip, null, 1);
   }
   renderSignalWarning() {
-    return react0().createElement("div", {
+    return react1().createElement("div", {
       className: `
                     ${this.namespace}
                         meetings-signal-issue
@@ -31131,20 +31131,20 @@ const withMicObserver = Component => class extends _mixins1__.w9 {
       "data-simpletipoffset": "5",
       "data-simpletip-class": "theme-dark-forced",
       onClick: () => this.renderSignalDialog()
-    }, react0().createElement("i", {
+    }, react1().createElement("i", {
       className: "sprite-fm-mono icon-exclamation-filled"
     }));
   }
   renderBlockedWarning() {
-    return react0().createElement("div", {
+    return react1().createElement("div", {
       className: "stream-toast theme-dark-forced"
-    }, react0().createElement("div", {
+    }, react1().createElement("div", {
       className: "stream-toast-content"
-    }, react0().createElement("i", {
+    }, react1().createElement("i", {
       className: "stream-toast-icon sprite-fm-uni icon-warning"
-    }), react0().createElement("div", {
+    }), react1().createElement("div", {
       className: "stream-toast-message"
-    }, l.max_speakers_toast), react0().createElement(_button_jsx2__.A, {
+    }, l.max_speakers_toast), react1().createElement(_button_jsx3__.A, {
       className: "mega-button action stream-toast-close",
       icon: "sprite-fm-mono icon-close-component",
       onClick: () => this.setState({
@@ -31161,7 +31161,7 @@ const withMicObserver = Component => class extends _mixins1__.w9 {
     this.bindObservers();
   }
   render() {
-    return react0().createElement(Component, (0,_extends3__.A)({}, this.props, {
+    return react1().createElement(Component, (0,_extends0__.A)({}, this.props, {
       signal: this.state.signal,
       renderSignalWarning: this.renderSignalWarning,
       blocked: this.state.blocked,
@@ -33484,14 +33484,14 @@ const __WEBPACK_DEFAULT_EXPORT__ = {
 REQ_.d(EXP_, {
 L: () => DropdownEmojiSelector
 });
-const _extends1__ = REQ_(168);
-const _chat_mixins0__ = REQ_(137);
+const _extends0__ = REQ_(168);
+const _chat_mixins1__ = REQ_(137);
 
 const React = REQ_(594);
 
 const DropdownsUI = REQ_(911);
 const PerfectScrollbar = REQ_(486).O;
-class DropdownEmojiSelector extends _chat_mixins0__.w9 {
+class DropdownEmojiSelector extends _chat_mixins1__.w9 {
   constructor(props) {
     super(props);
     this.domRef = React.createRef();
@@ -33880,7 +33880,7 @@ class DropdownEmojiSelector extends _chat_mixins0__.w9 {
     } else {
       popupContents = null;
     }
-    return React.createElement(DropdownsUI.Dropdown, (0,_extends1__.A)({
+    return React.createElement(DropdownsUI.Dropdown, (0,_extends0__.A)({
       className: "popup emoji"
     }, self.props, {
       isLoading: self.state.isLoading,
@@ -36204,14 +36204,14 @@ Dropdown: () => Dropdown,
 DropdownContactsSelector: () => DropdownContactsSelector,
 DropdownItem: () => DropdownItem
 });
-const _utils_jsx1__ = REQ_(314);
-const _chat_mixins0__ = REQ_(137);
+const _utils_jsx0__ = REQ_(314);
+const _chat_mixins1__ = REQ_(137);
 const _chat_ui_contacts_jsx2__ = REQ_(251);
 const React = REQ_(594);
 
 
 
-class Dropdown extends _chat_mixins0__.w9 {
+class Dropdown extends _chat_mixins1__.w9 {
   constructor(props) {
     super(props);
     this.domRef = React.createRef();
@@ -36379,7 +36379,7 @@ class Dropdown extends _chat_mixins0__.w9 {
       }
       return null;
     }
-    return React.createElement(_utils_jsx1__.Ay.RenderTo, {
+    return React.createElement(_utils_jsx0__.Ay.RenderTo, {
       element: document.body,
       className: `
                     dropdown
@@ -36412,7 +36412,7 @@ class Dropdown extends _chat_mixins0__.w9 {
 Dropdown.defaultProps = {
   'requiresUpdateOnResize': true
 };
-class DropdownContactsSelector extends _chat_mixins0__.w9 {
+class DropdownContactsSelector extends _chat_mixins1__.w9 {
   constructor(props) {
     super(props);
     this.state = {
@@ -36492,7 +36492,7 @@ class DropdownContactsSelector extends _chat_mixins0__.w9 {
 DropdownContactsSelector.defaultProps = {
   requiresUpdateOnResize: true
 };
-class DropdownItem extends _chat_mixins0__.w9 {
+class DropdownItem extends _chat_mixins1__.w9 {
   constructor(props) {
     super(props);
     this.domRef = React.createRef();
@@ -36717,11 +36717,11 @@ const __WEBPACK_DEFAULT_EXPORT__ = Button;
 REQ_.d(EXP_, {
 C: () => withHostsObserver
 });
-const _extends3__ = REQ_(168);
-const react0__ = REQ_(594);
-const react0 = REQ_.n(react0__);
-const _mixins_js1__ = REQ_(137);
-const _ui_modalDialogs_jsx2__ = REQ_(318);
+const _extends0__ = REQ_(168);
+const react1__ = REQ_(594);
+const react1 = REQ_.n(react1__);
+const _mixins_js2__ = REQ_(137);
+const _ui_modalDialogs_jsx3__ = REQ_(318);
 const _contacts_jsx4__ = REQ_(251);
 const _ui_buttons_jsx5__ = REQ_(994);
 
@@ -36731,7 +36731,7 @@ const _ui_buttons_jsx5__ = REQ_(994);
 
 
 const withHostsObserver = Component => {
-  return class extends _mixins_js1__.w9 {
+  return class extends _mixins_js2__.w9 {
     constructor(...args) {
       super(...args);
       this.state = {
@@ -36750,16 +36750,16 @@ const withHostsObserver = Component => {
         const {
           selected
         } = this.state;
-        return react0().createElement(_ui_modalDialogs_jsx2__.A.ModalDialog, (0,_extends3__.A)({}, this.state, {
+        return react1().createElement(_ui_modalDialogs_jsx3__.A.ModalDialog, (0,_extends0__.A)({}, this.state, {
           className: "assign-host contact-picker-widget",
           dialogName: "assign-host-dialog",
           dialogType: "tool",
           onClose: () => this.setState({
             dialog: false
           }, () => this.safeForceUpdate())
-        }), react0().createElement("header", null, react0().createElement("h2", null, l.assign_host_title)), react0().createElement("div", {
+        }), react1().createElement("header", null, react1().createElement("h2", null, l.assign_host_title)), react1().createElement("div", {
           className: "content-block"
-        }, react0().createElement(_contacts_jsx4__.ContactPickerWidget, {
+        }, react1().createElement(_contacts_jsx4__.ContactPickerWidget, {
           className: "popup contacts-search small-footer",
           contacts: (_this$props$participa = this.props.participants) == null ? void 0 : _this$props$participa.filter(h => h !== u_handle),
           multiple: true,
@@ -36775,13 +36775,13 @@ const withHostsObserver = Component => {
           onSelected: selected => this.setState({
             selected
           }, () => this.safeForceUpdate())
-        })), react0().createElement("footer", null, react0().createElement("div", {
+        })), react1().createElement("footer", null, react1().createElement("div", {
           className: "footer-container"
-        }, react0().createElement(_ui_buttons_jsx5__.$, {
+        }, react1().createElement(_ui_buttons_jsx5__.$, {
           label: l[82],
           className: "mega-button",
           onClick: this.toggleDialog
-        }), react0().createElement(_ui_buttons_jsx5__.$, {
+        }), react1().createElement(_ui_buttons_jsx5__.$, {
           label: l.assign_and_leave,
           className: `
                                         mega-button
@@ -36823,7 +36823,7 @@ const withHostsObserver = Component => {
       };
     }
     render() {
-      return react0().createElement(react0().Fragment, null, react0().createElement(Component, (0,_extends3__.A)({}, this.props, {
+      return react1().createElement(react1().Fragment, null, react1().createElement(Component, (0,_extends0__.A)({}, this.props, {
         confirmLeave: this.confirmLeave,
         hasHost: this.hasHost
       })), this.state.dialog && this.renderDialog());
@@ -37066,18 +37066,18 @@ class GenericNodePropsComponent extends mixins.w9 {
 REQ_.d(EXP_, {
 $: () => Button
 });
-const _extends2__ = REQ_(168);
-const react0__ = REQ_(594);
-const react0 = REQ_.n(react0__);
-const _chat_mixins_js1__ = REQ_(137);
+const _extends0__ = REQ_(168);
+const react1__ = REQ_(594);
+const react1 = REQ_.n(react1__);
+const _chat_mixins_js2__ = REQ_(137);
 
 
 
 const BLURRABLE_CLASSES = '.conversationsApp, .join-meeting, .main-blur-block';
-class Button extends _chat_mixins_js1__.w9 {
+class Button extends _chat_mixins_js2__.w9 {
   constructor(props) {
     super(props);
-    this.domRef = react0().createRef();
+    this.domRef = react1().createRef();
     this.buttonClass = `.button`;
     this.state = {
       focused: false,
@@ -37116,7 +37116,7 @@ class Button extends _chat_mixins_js1__.w9 {
       if (this.state.focused === false) {
         if (this.props.onClick) {
           this.props.onClick(this, e);
-        } else if (react0().Children.count(this.props.children) > 0) {
+        } else if (react1().Children.count(this.props.children) > 0) {
           this.setState({
             focused: true
           }, () => this.safeForceUpdate());
@@ -37151,7 +37151,7 @@ class Button extends _chat_mixins_js1__.w9 {
     this.unbindEvents();
   }
   renderChildren() {
-    return this.props.children && react0().Children.map(this.props.children, child => child && (typeof child.type === 'string' || child.type === undefined ? child : react0().cloneElement(child, {
+    return this.props.children && react1().Children.map(this.props.children, child => child && (typeof child.type === 'string' || child.type === undefined ? child : react1().cloneElement(child, {
       active: this.state.focused,
       closeDropdown: () => this.setState({
         focused: false
@@ -37194,7 +37194,7 @@ class Button extends _chat_mixins_js1__.w9 {
     } = this.props;
     const isMegaButton = className && className.indexOf('mega-button') > -1;
     const TagName = isMegaButton ? 'button' : 'div';
-    return react0().createElement(TagName, (0,_extends2__.A)({
+    return react1().createElement(TagName, (0,_extends0__.A)({
       ref: this.domRef,
       className: `
                     button
@@ -37210,13 +37210,13 @@ class Button extends _chat_mixins_js1__.w9 {
       onMouseLeave: () => iconHovered && this.setState({
         hovered: false
       })
-    }, attrs), icon && !isMegaButton && react0().createElement("div", null, react0().createElement("i", {
+    }, attrs), icon && !isMegaButton && react1().createElement("div", null, react1().createElement("i", {
       className: this.state.hovered ? this.state.iconHovered : icon
-    })), icon && isMegaButton && react0().createElement("div", null, react0().createElement("i", {
+    })), icon && isMegaButton && react1().createElement("div", null, react1().createElement("i", {
       className: this.state.hovered ? this.state.iconHovered : icon
-    })), label && react0().createElement("span", null, label), secondLabel && react0().createElement("span", {
+    })), label && react1().createElement("span", null, label), secondLabel && react1().createElement("span", {
       className: secondLabelClass ? secondLabelClass : ''
-    }, secondLabel), toggle && react0().createElement("div", {
+    }, secondLabel), toggle && react1().createElement("div", {
       className: `
                             mega-switch
                             ${toggle.className ? toggle.className : ''}
@@ -37230,7 +37230,7 @@ class Button extends _chat_mixins_js1__.w9 {
           this.props.toggle.onClick();
         }
       }
-    }, react0().createElement("div", {
+    }, react1().createElement("div", {
       className: `mega-feature-switch sprite-fm-mono-after
                                 ${toggle.enabled ? 'icon-check-after' : 'icon-minimise-after'}`
     })), this.renderChildren());

@@ -2032,6 +2032,12 @@ mBroadcaster.once('boot_done', function populate_l() {
     l.payment_failed_banner_text_oq = escapeHTML(l.payment_failed_banner_text_oq)
         .replace('[A]', `<a class="clickurl" data-eventid="500871" href="${ssExceedUrl}" target="_blank">`)
         .replace('[/A]', '</a>');
+    l.recovery_key_page_para2 = escapeHTML(l.recovery_key_page_para2)
+        .replace(
+            '[A]',
+            `<a href="${recoveryKeyLink}" class="clickurl" data-eventid="500915" target="_blank" rel="noopener">`
+        )
+        .replace('[/A]', '</a>');
 
     const common = [
         15536, 16119, 16120, 16313, 16316, 16360, 18228, 18268, 18282,

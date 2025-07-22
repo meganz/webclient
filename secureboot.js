@@ -2640,6 +2640,7 @@ else if (!browserUpdate) {
     // Shared dialog/sheet styles
     jsl.push({f:'css/dialogs/recovery-logout-dialog.css', n: 'recovery_logout_css', j: 2, w: 1});
     jsl.push({f:'css/dialogs/backup-recovery-dialog.css', n: 'backup_recovery_css', j: 2, w: 1});
+    jsl.push({f:'css/key.css', n: 'key_css', j:2, w:1});
 
     if (is_megadrop) {
         // @todo FIXME: we *should* load required resources only!

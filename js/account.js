@@ -651,11 +651,7 @@ function u_setrsa(rsakey) {
 
                         watchdog.notify('setrsa', [u_type, u_sid]);
 
-                        // Recovery Key Onboarding improvements
-                        // Show newly registered user the download recovery key dialog.
                         M.onFileManagerReady(function() {
-                            M.showRecoveryKeyDialog(1);
-
                             if ('csp' in window) {
                                 const storage = localStorage;
                                 const value = storage[`csp.${u_handle}`];

@@ -322,7 +322,10 @@ class MegaTopMenu extends MegaMobileTopMenu {
 
         if (selected) {
             this.removeClass('hidden');
-            if (selected !== true) {
+            if (selected === true) {
+                this.activeItem = M.currentdirid;
+            }
+            else {
                 selected.classList.add('active');
                 selected.component.icon = selected.component.icon.replace('outline', 'solid');
                 this.activeItem = selected;

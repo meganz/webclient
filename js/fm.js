@@ -2866,7 +2866,10 @@ function fm_resize_handler(force) {
     }
 
     // Only for old left pane pages
-    if (!mega.ui.topmenu.activeItem) {
+    if (mega.ui.topmenu.activeItem) {
+        mega.ui.topmenu.menuNode.Ps.update();
+    }
+    else {
         initTreeScroll();
     }
 

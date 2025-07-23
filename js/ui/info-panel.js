@@ -1396,7 +1396,7 @@ lazy(mega.ui, 'mInfoPanel', () => {
         if (node.ts) {
             blockSet.add(TYPES.TIME_ADDED);
         }
-        if (node.tvf && !mega.inLiteMode) {
+        if (node.tvf && !mega.lite.inLiteMode) {
             blockSet.add(TYPES.VERSION_COUNT);
             blockSet.add(TYPES.VERSION_CUR_SIZE);
             blockSet.add(TYPES.VERSION_PRE_SIZE);
@@ -1620,6 +1620,10 @@ lazy(mega.ui, 'mInfoPanel', () => {
                     blockSet.add(TYPES.NODE_SIZE);
                 }
                 blockSet.add(TYPES.MIME);
+            }
+            if (mega.lite.inLiteMode && activeStats.folderCount) {
+                blockSet.delete(TYPES.BYTE_SIZE);
+                blockSet.delete(TYPES.NODE_SIZE);
             }
             if (isTakenDown) {
                 blockSet.add(TYPES.TAKEDOWN);

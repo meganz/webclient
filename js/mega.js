@@ -4035,6 +4035,13 @@ function loadfm_done(mDBload) {
 
         // load/initialise the authentication system
         authring.initAuthenticationSystem();
+
+        tryCatch(() => {
+            // Initialise the Back to MEGA button (only shown if in MEGA Lite mode)
+            if (mega.lite.inLiteMode) {
+                mega.lite.initBackToMegaButton();
+            }
+        })();
     }
 
     // This function is invoked once the M.openFolder()'s promise (through renderfm()) is fulfilled.

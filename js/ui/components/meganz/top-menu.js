@@ -227,16 +227,12 @@ class MegaTopMenu extends MegaMobileTopMenu {
             loggedInCD.splice(mega.lite.inLiteMode ? 1 : 4, 0, {
                 text: l.obj_storage,
                 icon: 'sprite-fm-mono icon-bucket-triangle-thin-outline',
-                href: 'fm/s4',
+                href: '/fm/s4',
                 hasTree: u_attr.s4 ? 's4' : null,
                 treeWrapClass: 'js-s4-tree-panel',
                 name: 's4',
                 typeClassname: 'drive',
-                eventLog: 500636,
-                rightBadge: u_attr.s4 ? null : {
-                    badgeClass: 'brand-filled',
-                    text: l[24648]
-                }
+                eventLog: 500636
             });
         }
 

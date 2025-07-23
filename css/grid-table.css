@@ -370,7 +370,6 @@ table tr.ui-selected .grid-file-request-manage {
     z-index: 1;
     pointer-events: none;
 }
-.mega-lite-mode .grid-table.fm.v-size [megatype="size"],
 .mega-lite-mode .grid-table.fm.v-versions [megatype="versions"],
 .mega-lite-mode .grid-table.shared-with-me .size-col,
 .mega-lite-mode .grid-table.out-shares .size-col {

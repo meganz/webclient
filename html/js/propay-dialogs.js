@@ -2525,7 +2525,7 @@ var addressDialog = {
                 l.pwm_purchase_success_txt.replace('%1', u_attr.email || ''),
                 l.goto_mega_pass,
                 () => {
-                    mega.redirect('mega.io', 'pass#downloadapps', false, false);
+                    mega.redirect('mega.io', 'pass#downloadapp', false, false);
                 }
             );
 
@@ -2642,7 +2642,7 @@ var addressDialog = {
                             l.goto_mega_pass,
                             () => {
                                 onIdle(() => eventlog(500564));
-                                mega.redirect('mega.io', 'pass#downloadapps', false, false);
+                                mega.redirect('mega.io', 'pass#downloadapp', false, false);
                             },
                             planCurrency
                         );

@@ -147,6 +147,9 @@
     padding: 18px 0 0;
     width: 100%;
 }
+.user-interface .settings-sub-section .radio-buttons {
+    flex-direction: column;
+}
 .settings-sub-section .radio-txt {
     color: var(--text-color-medium);
     cursor: pointer;

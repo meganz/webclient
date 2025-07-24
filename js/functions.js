@@ -2413,6 +2413,34 @@ function getLastDayofTheMonth(dateObj) {
 }
 
 /**
+ * Function to format start and end dates of the month
+ *
+ * @param {Date} leadingDate The start date of the required month
+ * @returns {Object} {{fromDate: string, toDate: string}} The format of dates in YYYYMMDD
+ */
+function getReportDates(leadingDate) {
+    "use strict";
+
+    const today = leadingDate || new Date();
+    const todayMonth = today.getMonth() + 1;
+    let currMonth = String(todayMonth);
+    if (currMonth.length < 2) {
+        currMonth = `0${currMonth}`;
+    }
+    const currYear = String(today.getFullYear());
+
+    const startDate = `${currYear}${currMonth}01`;
+
+    const endDate = getLastDayofTheMonth(today);
+    if (!endDate) {
+        return;
+    }
+    const endDateStr = String(endDate.getFullYear()) + currMonth + String(endDate.getDate());
+
+    return { fromDate: startDate, toDate: endDateStr };
+}
+
+/**
  * Block Chrome Password manager for password field with attribute `autocomplete="new-password"`
  */
 function blockChromePasswordManager() {

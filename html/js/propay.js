@@ -57,6 +57,8 @@ pro.propay = {
     googlePayBrowsers: new Set(['Chrome', 'Edgium', 'Opera', 'Safari']),
     applePayBrowsers: new Set(['Safari']),
 
+    fixedContinue: false,
+
 
     isVoucherBalance() {
         'use strict';
@@ -148,7 +150,8 @@ pro.propay = {
 
         if (reasons.s4TosNeeded) {
             this.errors = true;
-            $('.s4-tos', this.$page).addClass('error');
+            const locationSelector = $('body').innerWidth() >= 1080 ? 'footer.desktop' : 'footer.mobile';
+            $(`${locationSelector} .s4-tos`, this.$page).addClass('error');
         }
 
         if (this.errors) {
@@ -1311,6 +1314,7 @@ pro.propay = {
 
         this.pageInfo.$leftBlock = $('.left-block', this.$page);
         this.pageInfo.$rightBlock = $('.right-block-card-wrapper', this.$page);
+        this.pageInfo.$fixedContinue = $('.fixed-continue-btn', this.$page);
 
         this.pageInfo.$durationOptionsWrapper = $('.duration .options-wrapper', this.pageInfo.$leftBlock);
 
@@ -1321,8 +1325,57 @@ pro.propay = {
         return this.pageInfo;
     },
 
+    /**
+     *
+     * @param {number | object} price - the number to format, or a plan object to format the price for
+     * @param {string | undefined} currency - The currency to show
+     * @param {boolean | undefined} showCurrency - If false, no currency will be shown at the end of the string
+     * @param {boolean | undefined} isEuro - Force the display to be euros
+     * @returns {string | undefined} - The formatted string for a price note, or undefined if no price given
+     */
+    getFormattedPriceNote(price, currency, showCurrency) {
+        'use strict';
+
+        price = price || this.planObj;
+
+        if (!price) {
+            return;
+        }
+
+        if (this.isVoucherBalance()) {
+            currency = 'EUR';
+        }
+
+        let isEuro = currency === 'EUR';
+
+        if (typeof price === 'object') {
+            currency = currency || (price && price.currency);
+            isEuro = typeof isEuro === 'boolean'
+                ? isEuro
+                : currency === 'EUR';
+
+            if ((this.planObj.currency !== 'EUR') && isEuro) {
+                price = price.priceEuro;
+            }
+            else {
+                price = price.price;
+            }
+        }
+
+        if (!currency) {
+            currency = this.planObj && this.planObj.currency;
+        }
+
+        return formatCurrency(price, isEuro ? 'EUR' : currency, 'narrowSymbol')
+            + (isEuro ? '' : '*')
+            + (showCurrency === false ? '' : ` ${currency}`);
+    },
+
     renderPlanInfo() {
         'use strict';
+
+        this.pageInfo.$fixedPriceNote = is_mobile &&
+            (this.pageInfo.$fixedPriceNote || $('.pricing-note-fixed-txt', this.pageInfo.$fixedContinue));
 
         const isEuro = (this.planObj.currency === 'EUR') || this.isVoucherBalance();
 
@@ -1335,6 +1388,8 @@ pro.propay = {
             || mega.templates.getTemplate('propay-page-plan-card-tmplt', false, this.pageInfo.$templates);
 
         this.pageInfo.$planCard.toggleClass('flexi', isFlexi);
+
+        let formattedPlanPrice;
 
         if (isFlexi) {
             $('.additional-content', this.pageInfo.$planCard)
@@ -1350,6 +1405,10 @@ pro.propay = {
                 type: this.planObj.featureBits,
                 days: this.planObj.trial.days
             };
+
+            formattedPlanPrice = is_mobile && mega.icu.format(l.days_free_then_price_m, information.days)
+                .replace('%1', this.getFormattedPriceNote(undefined, undefined, false))
+                .replace('%2', this.planObj.currency);
 
             $trialSection = this
                 .createFreeTrialSection(
@@ -1514,11 +1573,18 @@ pro.propay = {
             $('.plan-info .transfer', $planCard)
                 .text(bytesToSize(this.planObj.baseTransfer * discountInfo.m, 3, 4) + ' transfer');
         }
+        else if (is_mobile && !formattedPlanPrice) {
+            formattedPlanPrice = this.getFormattedPriceNote();
+        }
 
         // TODO: Clean this up
         if (discountInfo && discountInfo.md && discountInfo.pd && discountInfo.al === pro.propay.planNum) {
 
             let oldPrice;
+
+            if (is_mobile && !formattedPlanPrice) {
+                formattedPlanPrice = this.getFormattedPriceNote(discountInfo.ldtp || discountInfo.edtp);
+            }
 
             const createPriceHTML = (price, noAsterisk) => {
                 return `${price}
@@ -1588,6 +1654,13 @@ pro.propay = {
         }
         else {
             $('.discount', $planCard).addClass('hidden');
+        }
+
+        if (is_mobile && this.pageInfo.$fixedPriceNote) {
+            this.pageInfo.$fixedPriceNote.safeHTML(
+                this.shouldShowTrial()
+                    ? formattedPlanPrice
+                    : `<span class="due-now">${'Due now:'} </span>${formattedPlanPrice}`);
         }
 
         if (!planCardInitialized) {

@@ -182,7 +182,7 @@ mega.pm = {
 
         if (!this.plan || typeof this.plan === 'object') {
             return this.plan !== undefined && (this.plan.trial
-                ? mega.ui.pm.subscription.freeTrial()
+                ? mega.ui.pm.subscription.freeTrial(this.plan.trial.days)
                 : mega.ui.pm.subscription.featurePlan());
         }
 

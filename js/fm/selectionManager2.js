@@ -788,6 +788,17 @@ class SelectionManager2_DOM extends SelectionManager2Base {
                     e.classList.add(this.CLS_UI_SELECTED);
                 }
             }
+            if (M.onMediaView && this.selected_list.length === this.items.length) {
+                const checks = document.querySelectorAll('.timeline-date-title .checkdiv');
+                for (let i = checks.length; i--;) {
+                    checks[i].classList.add('checkboxOn');
+                    checks[i].classList.remove('checkboxOff', 'checkboxMinimize');
+                    const { mComponent } = checks[i].parentNode;
+                    if (mComponent) {
+                        mComponent.checked = true;
+                    }
+                }
+            }
 
             if (selectionSize === false) {
                 this.hideSelectionBar();

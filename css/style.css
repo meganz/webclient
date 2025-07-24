@@ -3910,6 +3910,7 @@ span.orange {
 }
 
 /* Dashboard section */
+
 .rtl .content-panel.dashboard {
     direction: rtl;
 }
@@ -3931,6 +3932,11 @@ span.orange {
 .widgets.content-block .data-table tr:nth-child(2) td::after {
     display: block;
 }
+
+.dashboard .quota-banner .account.chart.body::after {
+    background: var(--surface-main);
+}
+
 .dashboard .account.user-data-block {
     padding: 60px 20px 0 20px;
 }
@@ -4055,8 +4061,7 @@ span.orange {
 .account.widget.body.min-height {
     min-height: 218px;
 }
-.non-business-dashboard button.upload-file,
-.business-dashboard button.upload-file {
+.dashboard-section button.upload-file {
     --mask-color: var(--secondary-green);
     margin-inline-start: auto;
 }
@@ -4118,7 +4123,7 @@ span.orange {
     font: var(--text-h2);
     margin-top: 16px;
 }
-.business-dashboard .account.referral-block {
+.dashboard-section .account.referral-block {
     width: auto;
 }
 .account.achievements button.more-bonuses,
@@ -9438,16 +9443,16 @@ div.camera-bottom-txt {
     display: flex;
     align-items: center;
 }
-.business-dashboard .user-management-storage,
-.business-dashboard .user-management-transfer {
+.dashboard-section .user-management-storage,
+.dashboard-section .user-management-transfer {
     flex-grow: 1;
     padding-inline-end: 48px;
 }
 .user-management-storage {
     padding-inline-end: 120px;
 }
-.low-width .business-dashboard .user-management-storage,
-.low-width .business-dashboard .user-management-transfer {
+.low-width .dashboard-section .user-management-storage,
+.low-width .dashboard-section .user-management-transfer {
     display: flex;
     justify-content: center;
     padding: 0 0 24px;
@@ -9468,12 +9473,12 @@ div.camera-bottom-txt {
     height: 100%;
 }
 
-.business-dashboard .storage-img {
+.dashboard-section .storage-img {
     margin-left: 24px;
 }
 
 .user-management-view-data .user-management-view-overall-usage .view-info,
-.business-dashboard .view-info {
+.dashboard-section .view-info {
     position: relative;
     padding-inline-start: 20px;
     display: inline-block;
@@ -9486,36 +9491,36 @@ div.camera-bottom-txt {
    margin-bottom: 8px;
 }
 
-.business-dashboard .view-info .storage-transfer-text {
+.dashboard-section .view-info .storage-transfer-text {
     font: var(--text-body1);
     color: var(--text-color-medium);
 }
 
-.business-dashboard .view-info .storage-transfer-current {
+.dashboard-section .view-info .storage-transfer-current {
     font: var(--text-h3-bold);
     color: var(--text-color-high);
 }
 
-.business-dashboard .view-info .storage-transfer-data-details {
+.dashboard-section .view-info .storage-transfer-data-details {
     display: flex;
     margin-top: 8px;
 }
 
-.business-dashboard .admin .view-info .storage-transfer-data-details {
+.dashboard-section .admin .view-info .storage-transfer-data-details {
     margin-top: 16px;
     gap: 20px;
 }
 
-.business-dashboard .view-info .storage-transfer-data-details-base {
+.dashboard-section .view-info .storage-transfer-data-details-base {
     width: 80px;
 }
 
-.business-dashboard .view-info .storage-transfer-data-base-head,
-.business-dashboard .view-info .storage-transfer-data-base-ext {
+.dashboard-section .view-info .storage-transfer-data-base-head,
+.dashboard-section .view-info .storage-transfer-data-base-ext {
     color: var(--text-color-medium);
 }
 
-.business-dashboard .view-info .storage-transfer-data-base-ext {
+.dashboard-section .view-info .storage-transfer-data-base-ext {
     white-space: nowrap;
 }
 
@@ -9524,19 +9529,19 @@ div.camera-bottom-txt {
    color: var(--text-color-high);
 }
 
-.business-dashboard .view-info .storage-transfer-data {
+.dashboard-section .view-info .storage-transfer-data {
    font: var(--text-h3-bold);
    color: var(--text-color-high);
 }
 
-.business-dashboard .user-management-storage .img,
-.business-dashboard .user-management-transfer .img {
+.dashboard-section .user-management-storage .img,
+.dashboard-section .user-management-transfer .img {
     width: 60px;
     height: 60px;
 }
 
-.business-dashboard .admin .user-management-storage .img,
-.business-dashboard .admin .user-management-transfer .img {
+.dashboard-section .admin .user-management-storage .img,
+.dashboard-section .admin .user-management-transfer .img {
     width: 48px;
     height: 48px;
     align-self: start;
@@ -9660,7 +9665,7 @@ div.camera-bottom-txt {
 }
 
 .user-management-view .view-title,
-.business-dashboard .view-title {
+.dashboard-section .view-title {
     font: var(--text-h2);
     color: var(--text-color-high);
     display: block;
@@ -9669,7 +9674,7 @@ div.camera-bottom-txt {
     box-sizing: border-box;
 }
 
-.business-dashboard .view-title {
+.dashboard-section .view-title {
     display: flex;
     text-align: start;
     padding-bottom: 16px;
@@ -9686,7 +9691,7 @@ div.camera-bottom-txt {
     margin-bottom: 32px;
 }
 
-.business-dashboard .overall-usage-container .view-title::after {
+.dashboard-section .overall-usage-container .view-title::after {
     content: '';
     position: absolute;
     width: calc(100% + 48px);
@@ -9742,7 +9747,7 @@ div.camera-bottom-txt {
     color: var(--secondary-green);
 }
 
-.business-dashboard .storage-analysis-pie-container {
+.dashboard-section .storage-analysis-pie-container {
     box-sizing: border-box;
 }
 
@@ -9878,16 +9883,24 @@ div.camera-bottom-txt {
     background-color: var(--mobile-surface-1);
     border-radius: 12px;
     display: grid;
+    font: var(--mobile-font-caption-large-regular);
     gap: 16px;
     grid-template-columns: auto 1fr;
     padding: 16px 24px;
+}
+
+.analysis-summary-container.lg-size {
+    font: var(--mobile-font-link-large-regular);
+}
+
+.analysis-summary-container .link {
+    margin-inline-start: auto;
 }
 
 .analysis-summary-container .usage {
     align-items: center;
     color: var(--mobile-text-secondary);
     display: flex;
-    font: var(--mobile-font-caption-large-regular);
     grid-column: 1 / 2;
 }
 
@@ -9899,6 +9912,10 @@ div.camera-bottom-txt {
     margin-inline-start: 8px;
     text-align: end;
     white-space: nowrap;
+}
+
+.analysis-summary-container .usage-value b {
+     color: var(--text-color-success);
 }
 
 .analysis-summary-container .next-bill-ratio {
@@ -9934,7 +9951,7 @@ div.camera-bottom-txt {
 
 /* Dashboard - Analysis Summary End */
 
-.business-dashboard .tabs-container {
+.dashboard-section .tabs-container {
     border-bottom: 1px solid var(--mobile-border-strong);
     display: grid;
     grid-auto-columns: max-content;
@@ -9942,7 +9959,7 @@ div.camera-bottom-txt {
     padding: 24px 24px 0;
 }
 
-.business-dashboard .tabs-container .tab {
+.dashboard-section .tabs-container .tab {
     background: none;
     border: 0;
     border-bottom: 3px solid transparent;
@@ -9957,26 +9974,37 @@ div.camera-bottom-txt {
     transition: var(--transition-color), var(--transition-border);
 }
 
-.business-dashboard .tabs-container .tab.active {
+.dashboard-section .tabs-container .tab.active {
     border-color: var(--mobile-border-brand);
     font-weight: var(--mobile-font-weight-bold);
 }
 
-.business-dashboard .analysis-container {
+.dashboard-section .analysis-container {
     display: grid;
     gap: 24px;
     padding: 24px;
 }
 
-.business-dashboard .analysis-container.vo-hidden {
+.dashboard-section .widget .analysis-container {
+    padding: 0;
+}
+
+.dashboard-section .analysis-container.vo-hidden {
     position: absolute;
 }
 
-.business-dashboard .analysis-container canvas {
+.dashboard-section .analysis-container .chart-container {
     height: 250px;
+    position: relative;
 }
 
-.business-dashboard .analysis-container .chart-month-container {
+.dashboard-section .analysis-container canvas {
+    height: 250px;
+    position: absolute;
+    width: 100%;
+}
+
+.dashboard-section .analysis-container .chart-month-container {
     align-items: center;
     display: flex;
     flex-wrap: nowrap;
@@ -9984,19 +10012,19 @@ div.camera-bottom-txt {
     padding: 0 16px;
 }
 
-.business-dashboard .analysis-container .daily-title {
+.dashboard-section .analysis-container .daily-title {
     color: var(--mobile-text-secondary);
     font: var(--mobile-font-caption-small-regular);
 }
 
-.business-dashboard .analysis-body {
+.dashboard-section .analysis-body {
     display: grid;
     gap: 24px;
-    padding: 16px 0;
+    overflow: hidden;
 }
 
-.business-dashboard .analysis-body .legend-body,
-.business-dashboard .analysis-body .legend-buttons {
+.dashboard-section .analysis-body .legend-body,
+.dashboard-section .analysis-body .legend-buttons {
     align-items: center;
     display: grid;
     gap: 12px;
@@ -10004,18 +10032,19 @@ div.camera-bottom-txt {
     grid-auto-flow: column;
 }
 
-.business-dashboard .analysis-body .legend-body .legend {
+.dashboard-section .analysis-body .legend-body .legend {
     align-items: center;
     color: var(--mobile-text-primary);
     display: flex;
     font: var(--mobile-font-caption-small-regular);
 }
 
-.business-dashboard .analysis-body .legend-buttons {
+.dashboard-section .analysis-body .legend-buttons {
     gap: 8px;
+    padding: 16px 0 0;
 }
 
-.business-dashboard .analysis-body .legend-buttons hr {
+.dashboard-section .analysis-body .legend-buttons hr {
     background-color: var(--mobile-border-strong);
     border: 0;
     height: 16px;
@@ -10024,7 +10053,7 @@ div.camera-bottom-txt {
     width: 1px;
 }
 
-.business-dashboard .analysis-body .legend-buttons button {
+.dashboard-section .analysis-body .legend-buttons button {
     background-color: var(--mobile-button-secondary);
     border: 0;
     border-radius: var(--mobile-border-radius-large);
@@ -10037,12 +10066,12 @@ div.camera-bottom-txt {
     margin: 4px 0;
 }
 
-.business-dashboard .analysis-body .legend-buttons button.active {
+.dashboard-section .analysis-body .legend-buttons button.active {
     background-color: var(--mobile-color-container-default);
     color: var(--mobile-color-on-container);
 }
 
-.business-dashboard .analysis-body .legend-body i {
+.dashboard-section .analysis-body .legend-body i {
     background-color: var(--label-red);
     display: block;
     height: 12px;
@@ -10050,7 +10079,7 @@ div.camera-bottom-txt {
     width: 12px;
 }
 
-.business-dashboard  .analysis-body .chart-info {
+.dashboard-section  .analysis-body .chart-info {
     color: var(--mobile-text-secondary);
     display: grid;
     font: var(--mobile-font-caption-small-regular);
@@ -10058,17 +10087,17 @@ div.camera-bottom-txt {
     padding: 0 16px;
 }
 
-.business-dashboard  .analysis-body .chart-info .info-wrap {
+.dashboard-section  .analysis-body .chart-info .info-wrap {
     display: flex;
     width: 100%;
 }
 
-.business-dashboard .analysis-body .chart-info .units {
+.dashboard-section .analysis-body .chart-info .units {
     color: var(--mobile-icon-on-color-disabled);
     margin-inline-start: auto;
 }
 
-.business-dashboard  .analysis-body .analysis-remarks-container {
+.dashboard-section  .analysis-body .analysis-remarks-container {
     font: var(--mobile-font-caption-small-regular);
     color: var(--mobile-icon-on-color-disabled);
     padding: 0 16px;
@@ -11093,12 +11122,22 @@ div.camera-bottom-txt {
 
 /*  Business dashboard */
 
-.business-dashboard {
-    padding:0;
+.dashboard-section {
+    padding: 0;
     overflow: hidden;
 }
 
-.business-dashboard .business-dashboard-container {
+.dashboard-section a.link,
+.dashboard-section a.link:visited{
+    color: var(--mobile-link-primary);
+    text-decoration: underline;
+}
+
+.dashboard-section a.link:hover {
+    text-decoration: none;
+}
+
+.dashboard-section .business-dashboard-container {
     width: 100%;
     margin: 0 auto;
     max-width: 1064px;
@@ -11110,51 +11149,57 @@ div.camera-bottom-txt {
     background-clip: padding-box;
 }
 
-.business-dashboard .section-container {
-    position: relative;
-    margin-top: 12px;
+.dashboard-section .section-container,
+.dashboard-section .account.widget.body,
+.dashboard-section .settings-banner {
+    background: none;
     border: 1px solid var(--mobile-border-strong);
-    color: var(--text-color-high);
     border-radius: 12px;
+    box-sizing: border-box;
+    color: var(--text-color-high);
+    margin-top: 24px;
+    max-width: 100%;
+    position: relative;
+    width: 100%;
 }
 
-.business-dashboard .overall-usage-container {
+.dashboard-section .overall-usage-container {
     margin-bottom: 12px;
     padding: 24px 24px 0;
     box-sizing: border-box;
     align-items: center;
 }
 
-.business-dashboard .overall-usage-container .data {
+.dashboard-section .overall-usage-container .data {
     align-items: center;
     display: flex;
     flex-wrap: nowrap;
     padding: 48px 0;
 }
-.business-dashboard .overall-usage-container.admin .data {
+.dashboard-section .overall-usage-container.admin .data {
     gap: 48px;
 }
-.low-width .business-dashboard .overall-usage-container .data {
+.low-width .dashboard-section .overall-usage-container .data {
     justify-content: center;
     padding: 24px 0;
 }
-.ru .low-width .business-dashboard .overall-usage-container .data {
+.ru .low-width .dashboard-section .overall-usage-container .data {
     flex-direction: column;
 }
 
 /* Business dashboard - Overall usage next bill block Begin */
 
-.business-dashboard .overall-usage-container .overall-next-bill-wrapper {
+.dashboard-section .overall-usage-container .overall-next-bill-wrapper {
     border-radius: 0 0 12px 12px;
     height: auto;
     margin: 0 -24px;
     display: none;
     --surface-alpha: 0.4;
 }
-.business-dashboard .overall-usage-container .overall-next-bill-wrapper.pro-iv {
+.dashboard-section .overall-usage-container .overall-next-bill-wrapper.pro-iv {
     position: relative;
 }
-.business-dashboard .overall-usage-container .overall-next-bill-wrapper.pro-iv::before {
+.dashboard-section .overall-usage-container .overall-next-bill-wrapper.pro-iv::before {
     content: "";
     position: absolute;
     width: calc(100% + 48px);
@@ -11165,31 +11210,31 @@ div.camera-bottom-txt {
     left: 0;
 }
 
-.business-dashboard .overall-usage-container.admin .overall-next-bill-wrapper {
+.dashboard-section .overall-usage-container.admin .overall-next-bill-wrapper {
     display: block;
 }
 
-.business-dashboard .overall-usage-container .overall-next-bill-container {
+.dashboard-section .overall-usage-container .overall-next-bill-container {
     padding: 24px;
     position: relative;
 }
 
-.business-dashboard .overall-usage-container .overall-next-bill-container .title {
+.dashboard-section .overall-usage-container .overall-next-bill-container .title {
     font: var(--text-body1);
     font-family: var(--text-font-family);
     font-weight: 600;
 }
-.business-dashboard .overall-usage-container .overall-next-bill-container span.asterisk {
+.dashboard-section .overall-usage-container .overall-next-bill-container span.asterisk {
     font: var(--text-h2);
     margin-inline-start: -4px;
 }
-.business-dashboard .overall-usage-container .next-bill-value.local {
+.dashboard-section .overall-usage-container .next-bill-value.local {
     color: var(--secondary-green);
     font: var(--text-h2);
     display: inline-block;
 }
-.business-dashboard .referrals.widget .account.referral-value.euro,
-.business-dashboard .overall-usage-container .next-bill-value.euro {
+.dashboard-section .referrals.widget .account.referral-value.euro,
+.dashboard-section .overall-usage-container .next-bill-value.euro {
     font: var(--text-body1);
     color: var(--text-color-medium);
     border: 1px solid var(--stroke-grey-2);
@@ -11200,25 +11245,25 @@ div.camera-bottom-txt {
     display: inline-block;
     vertical-align: text-bottom;
 }
-.business-dashboard .overall-usage-container .next-bill-message {
+.dashboard-section .overall-usage-container .next-bill-message {
     color: var(--text-color-medium);
     font: var(--text-body2);
     margin-top: 12px;
     position: relative;
 }
-.business-dashboard .overall-usage-container .next-bill-message span {
+.dashboard-section .overall-usage-container .next-bill-message span {
     margin-inline-start: 12px;
 }
-.business-dashboard .overall-usage-container .next-bill-message .first-message::before {
+.dashboard-section .overall-usage-container .next-bill-message .first-message::before {
     content: "*";
     position: absolute;
 }
-.business-dashboard .overall-usage-container .mega-button.invoices-button {
+.dashboard-section .overall-usage-container .mega-button.invoices-button {
     position: absolute;
     top: 24px;
     right: 24px;
 }
-.rtl .business-dashboard .overall-usage-container .mega-button.invoices-button {
+.rtl .dashboard-section .overall-usage-container .mega-button.invoices-button {
     left: 24px;
     right: initial;
 }
@@ -11226,20 +11271,20 @@ div.camera-bottom-txt {
 
 /* Business dashboard - Overall usage next bill block End */
 
-.business-dashboard .subaccount-view-used-data {
+.dashboard-section .subaccount-view-used-data {
     padding: 24px;
     box-sizing: border-box;
 }
 
-.content-panel.business-dashboard .intro-info.active, .content-panel.dashboard .intro-info.active{
+.content-panel.dashboard-section .intro-info.active, .content-panel.dashboard .intro-info.active{
     color:#00BFA5;
 }
 
-.content-panel.business-dashboard .intro-info.pending, .content-panel.dashboard .intro-info.pending{
+.content-panel.dashboard-section .intro-info.pending, .content-panel.dashboard .intro-info.pending{
     color:#F5A623;
 }
 
-.content-panel.business-dashboard .intro-info.disabled, .content-panel.dashboard .intro-info.disabled{
+.content-panel.dashboard-section .intro-info.disabled, .content-panel.dashboard .intro-info.disabled{
     color:#666;
 }
 

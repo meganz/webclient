@@ -126,10 +126,16 @@ MegaData.prototype.sortByModTimeFn = function() {
     "use strict";
 
     return (a, b, d) => {
+        if (!a.mtime && !b.mtime) {
+            return this.doFallbackSortWithName(a, b, d);
+        }
 
-        // folder not having mtime, so sort by Name.
-        if (!a.mtime || !b.mtime) {
-            return M.doFallbackSortWithName(a, b, d);
+        if (!a.mtime) {
+            return -d;
+        }
+
+        if (!b.mtime) {
+            return d;
         }
 
         var time1 = a.mtime;

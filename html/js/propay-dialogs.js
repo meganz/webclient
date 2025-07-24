@@ -2499,7 +2499,13 @@ var addressDialog = {
             return $('.payment-stripe-dialog:not(.stripe-button):not(.business)');
         }
 
-        return $(`footer.${$('body').innerWidth() >= 1080 ? 'desktop' : 'mobile'} .stripe-button`, pro.propay.$page);
+        const isWide = $('body').innerWidth() >= 1080;
+
+        if (is_mobile && !isWide) {
+            return $('#propay .fixed-continue-btn .stripe-button');
+        }
+
+        return $(`footer.${isWide ? 'desktop' : 'mobile'} .stripe-button`, pro.propay.$page);
     },
 
     showPaymentSuccess() {

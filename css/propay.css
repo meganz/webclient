@@ -11,6 +11,10 @@
     --plan-card-left-gap: 88px;
     --color-warning-orange: rgba(181, 84, 7, 1);
     --text-color-secondary: rgba(97, 99, 102, 1);
+
+    --font-inter-r: "Inter", sans-serif;
+    --font-i-14-600: normal 600 var(--font-copy-medium) var(--font-inter-r);
+    --font-i-16-400: normal 400 var(--font-copy-small) var(--font-inter-r);
 }
 #propay.mobile-device {
     margin: 0 auto;
@@ -597,6 +601,7 @@
     position: absolute;
     width: 100%;
     height: 90px;
+    min-width: 300px;
 }
 #propay .stripe-button.payment-stripe-dialog .loader i {
     margin-top: 16px;
@@ -750,7 +755,7 @@
 #propay footer .subscription-info > * {
     margin-bottom: 16px;
 }
-#propay footer .subscription-info a {
+#propay a {
     color: var(--text-color-info);
 }
 #propay footer .balance {
@@ -854,6 +859,9 @@
 #propay .mega-dialog > section {
     min-height: initial;
 }
+#propay .fixed-continue-btn {
+    display: none;
+}
 
 @media only screen and (max-width: 1320px) {
     #propay {
@@ -869,6 +877,7 @@
     #propay {
         flex-direction: column;
         margin-top: 50px;
+        background-color: var(--surface-main);
     }
     #propay .mobile {
         display: flex;
@@ -908,6 +917,56 @@
         max-width: 621px;
         margin-right: auto;
         margin-left: auto;
+    }
+    #propay.mobile-device .stripe-button.payment-stripe-dialog {
+        margin-top: -15px;
+        margin-bottom: -15px;
+    }
+    #propay.mobile-device .fixed-continue-btn {
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 16px 24px;
+        background: var(--surface-main);
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    #propay.mobile-device .fixed-continue-btn .pricing-note-fixed-txt {
+        font: var(--font-i-16-400);
+        display: flex;
+        width: 100%;
+        max-width: 621px;
+        margin: 0 auto 16px;
+        white-space: pre;
+    }
+    #propay.mobile-device .fixed-continue-btn .pricing-note-fixed-txt .due-now{
+        font: var(--font-i-14-600);
+    }
+    #propay.mobile-device .fixed-continue-btn:not(.spacer) {
+        position: fixed;
+        border-top: 1px solid var(--surface-grey-2);
+    }
+    #propay.mobile-device .fixed-continue-btn.spacer {
+        position: relative;
+        z-index: 0;
+    }
+    #propay.mobile-device .fixed-continue-btn.spacer .spacer-cover{
+        width: 100%;
+        height: 100%;
+        background-color: var(--surface-main);
+        z-index: 1;
+        position: absolute;
+    }
+     #propay.mobile-device .fixed-continue-btn .s4-tos {
+        margin-bottom: 16px;
+    }
+    #propay.mobile-device .non-fixed-continue {
+        display: none;
+    }
+    #propay.mobile-device footer.mobile {
+        padding-bottom: 0;
     }
     .bottom-page.propay .top-head.floating,
     .rtl .bottom-page.propay .top-head.floating {

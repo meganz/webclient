@@ -346,15 +346,7 @@ function u_checklogin3a(res, ctx) {
                 // in normal users there's no problem, however in business the user will be disabled
                 // till they pay. therefore, if the importing didnt finish before 'upb' then the importing
                 // will fail.
-                if (r > 2 && !is_iframed) {
-                    const {handle} = mBroadcaster.crossTab;
-
-                    console.assert(!handle, 'FIXME: cross-tab already initialized.', handle, u_handle);
-                    console.assert(!handle || handle === u_handle, 'Unmatched cross-tab handle', handle, u_handle);
-
-                    return mBroadcaster.crossTab.initialize();
-                }
-                else if ($.createanonuser === u_attr.u) {
+                if ($.createanonuser === u_attr.u) {
                     delete $.createanonuser;
 
                     if (self.pfid) {
@@ -476,6 +468,7 @@ function u_logout(logout) {
         localStorage.removeItem('registeremail');
         localStorage.removeItem('mInfinity');
         localStorage.removeItem('megaLiteMode');
+        delete sessionStorage.buextra;
 
         fminitialized = false;
         if ($.leftPaneResizable) {
@@ -539,8 +532,11 @@ function u_reset() {
     api.setSID(window.u_sid);
 
     // close fmdb
-    if (typeof mDBcls === 'function') {
-        mDBcls();
+    if (self.fmdb) {
+        if (fmdb.db) {
+            fmdb.db.close();
+        }
+        fmdb = false;
     }
 
     if (window.M && M.reset) {

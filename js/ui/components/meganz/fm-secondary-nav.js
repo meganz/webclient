@@ -642,7 +642,7 @@ lazy(mega.ui, 'secondaryNav', () => {
                     colkey = 'timeMd';
                 }
 
-                if ((colkey === 'versions' || colkey === 'size') && mega.lite.inLiteMode ||
+                if (colkey === 'versions' && mega.lite.inLiteMode ||
                     M.currentdirid === 'faves' && colkey === 'fav') {
                     forceHide = true;
                 }

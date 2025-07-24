@@ -4114,7 +4114,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                     elm.ondurationchange = null;
                     tSleep.race(6, MediaAttribute.estimateVideoFrameRate(elm))
                         .then((data) => {
-                            if (data) {
+                            if (data && data !== ETEMPUNAVAIL) {
                                 const p = 'fps,width,height'.split(',');
                                 for (let i = p.length; i--;) {
                                     const k = p[i];

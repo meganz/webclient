@@ -231,10 +231,12 @@ async function setupSingleDownloadPage(res) {
                     if (dlResumeInfo.byteLength === fdl_filesize) {
                         $('.js-save-download').removeClass('hidden');
                         $('.js-resume-download').addClass('hidden');
+                        $('.js-cancel-download').addClass('hidden');
                     }
                     else if (dlResumeInfo.byteLength === dlResumeInfo.byteOffset) {
                         $('.js-save-download').addClass('hidden');
                         $('.js-resume-download').removeClass('hidden');
+                        $('.js-cancel-download').removeClass('hidden');
                     }
                     else {
                         $('.js-download').removeClass('hidden');
@@ -242,7 +244,7 @@ async function setupSingleDownloadPage(res) {
                 }
                 else {
                     $('.js-download').removeClass('hidden');
-                    $('.js-resume-download, .js-save-download').addClass('hidden');
+                    $('.js-resume-download, .js-save-download, .js-cancel-download').addClass('hidden');
                 }
             };
 
@@ -436,6 +438,37 @@ async function setupSingleDownloadPage(res) {
                     }
                     return false;
                 });
+
+            $('.js-cancel-download').rebind('click.dlpage', () => {
+                if (!dlResumeInfo) {
+                    return;
+                }
+
+                M.delPersistentData(dlmanager.getResumeInfoTag({ ph: dlpage_ph }))
+                    .always(() => {
+                        dlResumeInfo = false;
+                        if (fdl_filesize > maxDownloadSize) {
+                            setMegaSyncDownloadOptions();
+                        }
+                        else if (is_mobile) {
+                            setStandardDownloadOptions();
+                        }
+                        else {
+                            megasync.isInstalled((err, is) => {
+                                if (!err && is) {
+                                    setMegaSyncDownloadOptions();
+                                }
+                                else {
+                                    setStandardDownloadOptions();
+                                }
+                            });
+                        }
+                        $pageScrollBlock.removeClass('resumable');
+                        $('.download.state-text.resume').addClass('hidden');
+                        const $sizeBlock = $('.js-file-info .download.info-txt.small-txt');
+                        $sizeBlock.empty().safeHTML(`<span class="fs">${fileSize}</span>`);
+                    });
+            });
 
             $('.mid-button.to-clouddrive, button.to-clouddrive').rebind('click', start_import);
 

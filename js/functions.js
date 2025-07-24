@@ -1784,20 +1784,6 @@ mBroadcaster.addListener('crossTab:owner', function _setup() {
     };
 });
 
-// Update account UI on other tabs when cancelling subscription
-mBroadcaster.addListener('crossTab:cancelSub', () => {
-    'use strict';
-
-    // Fetch new account data
-    if (M.account) {
-        M.account.lastupdate = 0;
-    }
-
-    if (page.indexOf('fm/account') === 0) {
-        accountUI();
-    }
-});
-
 /**
  * Simple alias that will return a random number in the range of: a < b
  *
@@ -2410,6 +2396,34 @@ function getLastDayofTheMonth(dateObj) {
         day = 30;
     }
     return new Date(year, month, day);
+}
+
+/**
+ * Function to format start and end dates of the month
+ *
+ * @param {Date} leadingDate The start date of the required month
+ * @returns {Object} {{fromDate: string, toDate: string}} The format of dates in YYYYMMDD
+ */
+function getReportDates(leadingDate) {
+    "use strict";
+
+    const today = leadingDate || new Date();
+    const todayMonth = today.getMonth() + 1;
+    let currMonth = String(todayMonth);
+    if (currMonth.length < 2) {
+        currMonth = `0${currMonth}`;
+    }
+    const currYear = String(today.getFullYear());
+
+    const startDate = `${currYear}${currMonth}01`;
+
+    const endDate = getLastDayofTheMonth(today);
+    if (!endDate) {
+        return;
+    }
+    const endDateStr = String(endDate.getFullYear()) + currMonth + String(endDate.getDate());
+
+    return { fromDate: startDate, toDate: endDateStr };
 }
 
 /**

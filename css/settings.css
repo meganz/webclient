@@ -147,6 +147,9 @@
     padding: 18px 0 0;
     width: 100%;
 }
+.user-interface .settings-sub-section .radio-buttons {
+    flex-direction: column;
+}
 .settings-sub-section .radio-txt {
     color: var(--text-color-medium);
     cursor: pointer;
@@ -908,11 +911,6 @@
     flex: initial;
     text-align: center;
     width: auto;
-}
-.dashboard .settings-banner {
-    background: var(--mobile-surface-1);
-    max-width: 100%;
-    width: 100%;
 }
 
 /* Settings quota banner - low width */

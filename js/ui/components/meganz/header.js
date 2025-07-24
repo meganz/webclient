@@ -120,6 +120,8 @@ class MegaHeader extends MegaMobileHeader {
         wrapper = mCreateElement('div', {class: 'menu-wrapper bento-wrapper bento'}, navActions);
         navActions.prepend(wrapper);
 
+        const hasVpn = this.hasVpn();
+
         this.bentoButton = new MegaButton({
             parentNode: wrapper,
             type: 'icon',
@@ -162,8 +164,8 @@ class MegaHeader extends MegaMobileHeader {
             vpn: {
                 componentClassname: 'vpn extlink',
                 text: l.vpn,
-                href: 'https://mega.io/vpn',
-                target: '_blank',
+                href: hasVpn ? '/fm/account/vpn' : 'https://mega.io/vpn',
+                target: hasVpn ? '' : '_blank',
                 icon: 'sprite-fm-mono icon-zap-thin-outline',
                 iconSize: 24,
                 eventLog: 500629
@@ -1121,6 +1123,11 @@ class MegaHeader extends MegaMobileHeader {
             'mega-pass-secure-passwor/hjdopmdfeekbcakjbbienpbkdldkalfe' :
             browser === 'Firefox' ? 'https://addons.mozilla.org/en-US/firefox/addon/mega-password-manager/' :
                 'https://chromewebstore.google.com/detail/mega-pass/deelhmmhejpicaaelihagchjjafjapjc';
+    }
+
+    hasVpn() {
+        return u_attr && u_attr.p && u_attr.p > 0 ||
+            pro && pro.proplan2 && pro.proplan2.getUserFeature('vpn');
     }
 }
 

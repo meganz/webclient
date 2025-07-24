@@ -1032,12 +1032,16 @@ mBroadcaster.once('boot_done', () => {
                 else if (aNode.s4 && M.getS4NodeType(aNode) === 'bucket') {
                     props.type = l.s4_bucket_type;
                     props.classNames.push('folder');
-                    props.size = bytesToSize(aNode.tb || 0);
+                    if (!mega.lite.inLiteMode) {
+                        props.size = bytesToSize(aNode.tb || 0);
+                    }
                 }
                 else if (aNode.t) {
                     props.type = l[1049];
                     props.classNames.push('folder');
-                    props.size = bytesToSize(aNode.tb || 0);
+                    if (!mega.lite.inLiteMode) {
+                        props.size = bytesToSize(aNode.tb || 0);
+                    }
                 }
                 else {
                     props.classNames.push('file');

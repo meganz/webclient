@@ -5,6 +5,8 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
     const { albums } = scope;
     const defZoomStep = 2;
 
+    let clickedItemId = '';
+
     /**
      * Getting the month label for the node
      * @param {MegaNode} node Node to fetch the label from
@@ -134,17 +136,32 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
 
         attachEvents(clickFn, dbclickFn, useMenu) {
             if (clickFn) {
-                this.attachEvent('mouseup', (evt) => {
-                    if (evt.which === 3) {
+                let startX = 0;
+                let startY = 0;
+
+                this.attachEvent('pointerdown', ({ clientX, clientY }) => {
+                    startX = clientX;
+                    startY = clientY;
+                });
+
+                this.attachEvent('pointerup', (e) => {
+                    if (e.which !== 1 || Math.abs(e.clientX - startX) > 15 || Math.abs(e.clientY - startY) > 15) {
                         return false;
                     }
 
-                    if (!evt.detail || evt.detail === 1) {
-                        clickFn(this, evt);
+                    const { id } = e.target.closest('.album-timeline-cell');
+
+                    if (clickedItemId === id) {
+                        dbclickFn(this, e);
                     }
-                    else if (evt.detail === 2) {
-                        dbclickFn(this, evt);
+                    else {
+                        clickFn(this, e);
+                        clickedItemId = id;
                     }
+
+                    delay('albums:clear-clicks', () => {
+                        clickedItemId = '';
+                    }, 300);
                 });
             }
 

@@ -10,7 +10,7 @@ mega.ui.pm = {
             mBroadcaster.addListener('pagechange', page => {
                 if (page === 'fm/pwm' && !mega.pm.pwmFeature && !u_attr.b && !u_attr.pf) {
                     if (mega.pm.plan && mega.pm.plan.trial) {
-                        this.subscription.freeTrial();
+                        this.subscription.freeTrial(mega.pm.plan.trial.days);
                     }
                     else {
                         this.subscription.featurePlan();
@@ -230,14 +230,13 @@ mega.ui.pm = {
     ]),
     subscription: {
         freeTrialFlag: 0,
-        daysLeft: 14,
         freeTrialContainer: null,
         featurePlanContainer: null,
-        freeTrial() {
+        freeTrial(daysLeft) {
             'use strict';
 
             if (!this.freeTrialContainer) {
-                const startDate = time2date(Date.now() / 1000 + this.daysLeft * 24 * 60 * 60, 2);
+                const startDate = time2date(Date.now() / 1000 + daysLeft * 24 * 60 * 60, 2);
 
                 const timelineData = [
                     {
@@ -247,12 +246,12 @@ mega.ui.pm = {
                     },
                     {
                         icon: 'sprite-fm-mono icon-bell-thin-outline',
-                        day: mega.icu.format(l.on_day_n, 10),
+                        day: mega.icu.format(l.on_day_n, daysLeft - 4),
                         description: l.email_before_trial_end
                     },
                     {
                         icon: 'sprite-fm-mono icon-star-thin-outline',
-                        day: mega.icu.format(l.on_day_n, 14),
+                        day: mega.icu.format(l.on_day_n, daysLeft),
                         description: l.free_trial_end_desc.replace('%1', startDate)
                     }
                 ];
@@ -302,7 +301,7 @@ mega.ui.pm = {
             }
 
             this.freeTrialFlag = 1;
-            this.initDialog(this.freeTrialContainer);
+            this.initDialog(this.freeTrialContainer, daysLeft);
         },
 
         featurePlan() {
@@ -351,7 +350,7 @@ mega.ui.pm = {
             this.initDialog(this.featurePlanContainer);
         },
 
-        initDialog(content) {
+        initDialog(content, daysLeft) {
             'use strict';
 
             let name = 'feature-plan-dialog';
@@ -362,7 +361,7 @@ mega.ui.pm = {
 
             if (this.freeTrialFlag) {
                 name = 'free-trial-dialog';
-                title = l.try_mega_pass;
+                title = escapeHTML(l.try_mega_pass).replace('%1', daysLeft);
                 classList = ['free-trial'];
                 ctaText = l.start_free_trial;
                 eventId = 500564;

@@ -320,7 +320,7 @@ class MegaTopMenu extends MegaMobileTopMenu {
         if (selected) {
             this.removeClass('hidden');
             if (selected === true) {
-                this.activeItem = M.currentdirid;
+                this.activeItem = document.getElementById(`treea_${M.currentdirid}`);
             }
             else {
                 selected.classList.add('active');

@@ -39,6 +39,51 @@ Object.defineProperties(window, {
     }
 });
 
+// @see {@link fm_fullreload}
+Object.defineProperty(mega, 'halt', {
+    async value(reason) {
+        'use strict';
+
+        if (self.fminitialized) {
+
+            if (window.loadingDialog) {
+                // 1141: 'Please be patient.'
+                loadingInitDialog.hide('force');
+                loadingDialog.show(reason, l[1141]);
+                loadingDialog.show = loadingDialog.hide = nop;
+            }
+
+            mBroadcaster.crossTab.leave();
+            watchdog.notify(`halt(${reason})`);
+
+            // stop further SC processing
+            window.execsc = nop;
+
+            // and error reporting, if any
+            window.onerror = null;
+
+            // nuke w/sc connection
+            getsc.stop(-1, reason);
+
+            window.getsc = nop;
+            window.waitsc = nop;
+
+            getsc.stop = nop;
+            getsc.validate = nop;
+
+            // shutdown chat..
+            if (self.megaChatIsReady) {
+                megaChat.destroy(true);
+            }
+
+            // abort any scheduled task
+            if (self.delay) {
+                delay.abort();
+            }
+        }
+    }
+});
+
 /** @property mega.shouldApplyNetworkBackPressure */
 lazy(mega, 'shouldApplyNetworkBackPressure', () => {
     'use strict';
@@ -1799,7 +1844,7 @@ scparser.$add('_sn', function(a) {
     if (d) {
         console.info(` --- New SN: ${a.sn}`);
     }
-    onIdle(() => setsn(a.sn));
+    setsn(a.sn);
 
     // rewrite accumulated RSA keys to AES to save CPU & bandwidth & space
     crypto_node_rsa2aes();
@@ -2200,29 +2245,10 @@ async function fm_fullreload(light, logMsg) {
             localStorage.force = 1;
             delete sessionStorage.lightTreeReload;
         }
-
     }
-
-    if (window.loadingDialog) {
-        // 1141: 'Please be patient.'
-        loadingInitDialog.hide('force');
-        loadingDialog.show('full-reload', l[1141]);
-        loadingDialog.show = loadingDialog.hide = nop;
-    }
-
-    // stop further SC processing
-    window.execsc = nop;
-
-    // and error reporting, if any
-    window.onerror = null;
-
-    // nuke w/sc connection
-    getsc.stop(-1, 'full-reload');
-    window.getsc = nop;
-    getsc.stop = nop;
-    getsc.validate = nop;
 
     return Promise.allSettled([
+        mega.halt('full-reload'),
         fmdb && fmdb.invalidate(),
         logMsg && eventlog(99624, logMsg)
     ]).then(() => location.reload(true));
@@ -2451,7 +2477,7 @@ function worker_procmsg(ev) {
             // Additionally, in case we're under Infinity and incrementally loading nodes in the background,
             // don't emplace anything into memory otherwise crawling nodes back to root won't work properly.
             // @todo way to expunge nodes from memory, we've an overhead having to decrypt nodes out of FMDB next.
-            const inc = mega.infinity && !ufsc.cache;
+            const inc = mega.infinity && !ufsc.cache && ok;
 
             const emplace = !inc
                 && (mega.nobp || !ok || fminitialized || fmdb && fmdb.memoize || M.isInRoot(ev.data, true));
@@ -2598,11 +2624,15 @@ function loadfm(force) {
                     // channel 1: non-transactional (maintained by IndexedDBKVStorage)
                 }, {});
 
+                const ident = `get-tree(f:db)`;
                 if (d) {
-                    console.time(`get-tree(f:db)`);
+                    console.time(ident);
                 }
+                api.webLockSummary();
 
-                fmdb.init(localStorage.force)
+                // Initialize FMDB and/or retrieve account data ('f' cmd) behind a mutex,
+                // thus effectively preventing multiple tabs from concurrently doing so.
+                mutex.lock(ident).then((unlock) => fmdb.init(localStorage.force)
                     .catch(dump)
                     .then(fetchfm)
                     .catch((ex) => {
@@ -2612,9 +2642,10 @@ function loadfm(force) {
                     .finally(() => {
                         if (d) {
                             api.webLockSummary();
-                            console.timeEnd(`get-tree(f:db)`);
+                            console.timeEnd(ident);
                         }
-                    });
+                        unlock();
+                    }));
             }
         }
     }
@@ -2622,6 +2653,10 @@ function loadfm(force) {
 
 async function fetchfm(sn) {
     "use strict";
+
+    if (self.d > 0) {
+        console.log(`[${new Date().toISOString()}] begin fetchfm()...`, sn, pfid);
+    }
 
     // we always intially fetch historical actionpactions
     // before showing the filemanager
@@ -3833,27 +3868,13 @@ function loadfm_callback(res) {
         // this is a legacy cached tree without an ok0 element
         process_ok(res.ok);
     }
-    /**
-    if (res.u) {
-        process_u(res.u);
-    }
-    if (res.opc) {
-        processOPC(res.opc);
-    }
-    /**/
+
     if (res.suba) {
         if (!is_mobile) {
             process_suba(res.suba);
         }
     }
-    /**
-    if (res.ipc) {
-        processIPC(res.ipc);
-    }
-    if (res.ps) {
-        processPS(res.ps);
-    }
-    /**/
+
     if (res.mcf) {
         // save the response to be processed later once chat files were loaded
         loadfm.chatmcf = res.mcf.c || res.mcf;

@@ -257,6 +257,7 @@ lazy(s4, 'kernel', () => {
         return key;
     };
 
+    let vcc = false;
     const s4nt = freeze({container: 'li', bucket: 'pao', object: 'pa'});
     const s4rt = freeze(entries(s4nt, ([k, v]) => [v, k]));
 
@@ -270,6 +271,15 @@ lazy(s4, 'kernel', () => {
     const aEqUserID = (ui) => (o) => parseInt(o.ui) === ui;
 
     const validateS4Container = (n) => {
+        if (!vcc) {
+            onIdle(() => {
+                vcc = false;
+            });
+            vcc = Object.create(null);
+        }
+        else if (n && vcc[n.h || n] !== undefined) {
+            return vcc[n.h || n];
+        }
         if (typeof n === 'string') {
             n = M.getNodeByHandle(n);
         }
@@ -291,7 +301,8 @@ lazy(s4, 'kernel', () => {
                     }
                 }
 
-                return v === 1;
+                vcc[n.h] = v === 1;
+                return vcc[n.h];
             }
 
             logger.warn('container lacking an exported writable link...', n.h, share, [n]);
@@ -385,7 +396,9 @@ lazy(s4, 'kernel', () => {
             const {s4, h} = n;
 
             if (!s4 || s4.c !== b.p) {
-                logger.warn(`Establishing container linkage on object ${h}`, n);
+                if (self.d > 1) {
+                    logger.warn(`Establishing container linkage on object ${h}`, n);
+                }
                 n.s4 = {...s4, c: b.p};
             }
         }

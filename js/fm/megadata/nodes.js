@@ -3005,11 +3005,22 @@ MegaData.prototype.getNodeRoot = function(id) {
     if (id === 'recents') {
         return id;
     }
+    if (!this.nrc) {
+        // @todo rather, check the whole codebase and replace uses in loops for the exact same parents..
+        this.nrc = Object.create(null);
+        queueMicrotask(() => {
+            this.nrc = false;
+        });
+    }
     if (typeof id === 'string') {
         id = id.replace('chat/', '');
     }
-    var p = this.getPath(id);
-    return p[p.length - 1];
+    const idx = this.d[id] && this.d[id].p || id;
+    if (!this.nrc[idx]) {
+        const p = this.getPath(id);
+        this.nrc[idx] = p[p.length - 1];
+    }
+    return this.nrc[idx];
 };
 
 /**
@@ -4601,7 +4612,17 @@ MegaData.prototype.getS4NodeType = function(n) {
     if (n && crypto_keyok(n)) {
 
         if ('kernel' in s4) {
-            return s4.kernel.getS4NodeType(n);
+            if (!this.s4nt) {
+                onIdle(() => {
+                    // @todo what actual lifetime should this have?..
+                    this.s4nt = false;
+                });
+                this.s4nt = Object.create(null);
+            }
+            if (!this.s4nt[n.h]) {
+                this.s4nt[n.h] = s4.kernel.getS4NodeType(n);
+            }
+            return this.s4nt[n.h];
         }
         const isc = (n) => {
             if (n.s4 && n.p === this.RootID && "li" in n.s4) {

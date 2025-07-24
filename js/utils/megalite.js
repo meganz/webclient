@@ -122,6 +122,13 @@ lazy(mega, 'lite', () => {
      */
     function initBackToMegaButton(topbarSelector) {
 
+        document.body.classList.add('mega-lite-mode');
+
+        if (mega.flags.inf > 1 && !sessionStorage.allowbtom) {
+            $('.js-back-to-mega-button', topbarSelector).addClass('hidden');
+            return;
+        }
+
         $('.js-back-to-mega-button', topbarSelector).rebind('click.backtomega', () => {
 
             // Remove the local storage variable which triggers MEGA Lite mode to load

@@ -317,8 +317,6 @@ class MegaMobileViewOverlay extends MegaComponent {
 
             // Set selected item data
             mCreateElement('i', {'class': this.nodeComponent.icon}, iconNode);
-            this.domNode.querySelector('.media-viewer-container .file-name').textContent =
-                (pfcol && l[6859]) || props.t2 || this.nodeComponent.name;
 
             // Show "Too large file" or "Non-viewable" warnings
             if (!downloadSupport || !this.isInfo) {
@@ -418,7 +416,8 @@ class MegaMobileViewOverlay extends MegaComponent {
         this.nodeComponent = MegaNodeComponent.getNodeComponentByHandle(nodeHandle) ||
             new MegaNodeComponent({parentNode: document.createElement('div'), nodeHandle});
 
-        this.domNode.querySelector('.media-viewer-container .file-name').textContent = this.nodeComponent.name;
+        this.domNode.querySelector('.media-viewer-container .file-name').textContent =
+            pfcol ? l[6859] : this.nodeComponent.name;
 
         if (is_video(this.nodeComponent.node)) {
 

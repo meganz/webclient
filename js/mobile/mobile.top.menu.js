@@ -244,7 +244,7 @@ class MegaMobileTopMenu extends MegaComponent {
                 });
 
                 menuItem.on(item.href ? 'beforeRedirect.treeExpand' : 'click.treeExpand', () => {
-                    if (menuItem.active) {
+                    if (menuItem.active || item.autoExpand && !tree.classList.contains('active')) {
                         expandArrow.trigger('click.treeExpand');
                     }
                 });

@@ -1688,7 +1688,9 @@ FMDB.prototype.getbykey = async function fmdb_getbykey(table, index, anyof, wher
                     }
                 }
 
-                r.push(...res);
+                while (res.length) {
+                    r.push(...res.splice(0, 0xffff));
+                }
             }
         }
 

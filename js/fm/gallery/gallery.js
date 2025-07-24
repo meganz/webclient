@@ -1434,12 +1434,23 @@ class MegaGallery {
             return false;
         });
 
-        $galleryBlock.rebind('dblclick.galleryView', 'a.data-block-view', e => {
+        let tappedItemId = '';
 
+        $galleryBlock.rebind('dblclick.galleryView touchend.tabletGalleryView', 'a.data-block-view', e => {
             const $eTarget = $(e.currentTarget);
+            const h = $eTarget.attr('id');
+
+            if (e.type === 'touchend' && tappedItemId !== h) {
+                tappedItemId = h;
+
+                delay('galleryView:touchend', () => {
+                    tappedItemId = '';
+                }, 300);
+
+                return false;
+            }
 
             if (this.mode === 'a') {
-                const h = $eTarget.attr('id');
                 const isVideo = e.currentTarget.nodeBlock.isVideo;
 
                 if (isVideo) {

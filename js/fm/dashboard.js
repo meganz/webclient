@@ -21,8 +21,12 @@ function dashboardUI(updProcess) {
         loadingDialog.show('loadDashboard');
     }
 
+    const $dashboardCn = $('.fm-right-block.dashboard');
+    const $bsnDashboard = $('.business-dashboard', $dashboardCn);
+    const $freeProDashboard = $('.non-business-dashboard', $dashboardCn);
+
     $('.fm-right-files-block, .section.conversations, .fm-right-account-block').addClass('hidden');
-    $('.fm-right-block.dashboard').removeClass('hidden');
+    $dashboardCn.removeClass('hidden');
 
     // Hide backup widget is user already saved recovery key before
     if (localStorage.recoverykey) {
@@ -37,8 +41,8 @@ function dashboardUI(updProcess) {
     // If Business or Pro Flexi, show the Business dashboard
     if (u_attr && (u_attr.b || u_attr.pf)) {
 
-        $('.fm-right-block.dashboard .non-business-dashboard').addClass('hidden');
-        const $bsnDashboard = $('.fm-right-block.dashboard .business-dashboard').removeClass('hidden');
+        $freeProDashboard.addClass('hidden');
+        $bsnDashboard.removeClass('hidden');
 
         // If Business master account and not expired
         if (u_attr.b && u_attr.b.m && u_attr.b.s !== pro.ACCOUNT_STATUS_EXPIRED) {
@@ -65,8 +69,8 @@ function dashboardUI(updProcess) {
     }
     else {
         // Show regular dashboard
-        $('.fm-right-block.dashboard .non-business-dashboard').removeClass('hidden');
-        $('.fm-right-block.dashboard .business-dashboard').addClass('hidden');
+        $freeProDashboard.removeClass('hidden');
+        $bsnDashboard.addClass('hidden');
     }
 
     // Avatar dialog
@@ -75,7 +79,7 @@ function dashboardUI(updProcess) {
     });
 
     // Data plus, upload file
-    $('.non-business-dashboard button.upload-file, .business-dashboard button.upload-file').rebind('click', function() {
+    $('button.upload-file, button.upload-file', $dashboardCn).rebind('click', () => {
         $('.fm-file-upload input').trigger('click');
         return false;
     });
@@ -146,7 +150,7 @@ function dashboardUI(updProcess) {
 
         // Achievements Widget
         if (account.maf && !u_attr.b) {
-            $('.fm-right-block.dashboard').addClass('active-achievements');
+            $dashboardCn.addClass('active-achievements');
             var $achWidget = $('.account.widget.achievements');
             var maf = M.maf;
             var $storage = $('.account.bonuses-size.storage', $achWidget);
@@ -163,7 +167,7 @@ function dashboardUI(updProcess) {
             });
         }
         else {
-            $('.fm-right-block.dashboard').removeClass('active-achievements');
+            $dashboardCn.removeClass('active-achievements');
         }
 
         const accountStatus = (u_attr.b && u_attr.b.s) || (u_attr.pf && u_attr.pf.s);
@@ -266,16 +270,16 @@ function dashboardUI(updProcess) {
                     $('.left-pane.big-txt.plan-date-val', '.dashboard').addClass('hidden');
                 }
 
-                var $businessDashboard = $('.fm-right-block.dashboard .business-dashboard').removeClass('hidden');
-                $('.fm-right-block.dashboard .non-business-dashboard').addClass('hidden');
+                $bsnDashboard.removeClass('hidden');
+                $freeProDashboard.addClass('hidden');
             }
         }
         else {
             // resetting things might be changed in business account
-            $('.fm-right-block.dashboard .business-dashboard').addClass('hidden');
+            $bsnDashboard.addClass('hidden');
             $('.account.left-pane.info-block.business-users').addClass('hidden');
             $('.account.left-pane.reg-date-info, .account.left-pane.reg-date-val').removeClass('hidden').show();
-            $('.fm-right-block.dashboard .non-business-dashboard').removeClass('hidden');
+            $freeProDashboard.removeClass('hidden');
         }
 
         /* Registration date, bandwidth notification link */
@@ -309,7 +313,7 @@ function dashboardUI(updProcess) {
             ];
             for (let i = 0; i < percents.length; i++) {
                 const $percBlock = $('.storage .account.progress-perc.pr' + i);
-                $percBlock.safeHTML(`<span class="value">${Math.round(percents[i])}</span><span class="unit">%</span>`);
+                $percBlock.safeHTML(`<span class="value">${Math.floor(percents[i])}</span><span class="unit">%</span>`);
                 const $percBar = $('.storage .account.progress-bar-section.pr' + i);
                 $percBar.css('width', percents[i] + '%');
             }
@@ -325,10 +329,10 @@ function dashboardUI(updProcess) {
 
             if (mBackupsNode) {
                 $('.account.progress-size.backups').text(`(${bytesToSize(mBackupsNode.tb)})`);
-                $('.js-backups-el', '.non-business-dashboard').removeClass('hidden');
+                $('.js-backups-el', $freeProDashboard).removeClass('hidden');
             }
             else {
-                $('.js-backups-el', '.non-business-dashboard').addClass('hidden');
+                $('.js-backups-el', $freeProDashboard).addClass('hidden');
             }
 
             // Available
@@ -405,6 +409,122 @@ function dashboardUI(updProcess) {
 
             // Fill Cloud data widget
             dashboardUI.updateCloudDataWidget();
+
+            // S4 Egress widget
+            const $s4Egress = $('.s4-egress', $freeProDashboard);
+            const $s4DataItem =  $('.account.data-table .data-item.s4', $freeProDashboard);
+
+            if (u_attr.p && u_attr.s4) {
+                $s4Egress.removeClass('hidden');
+
+                const egrData = { s4dl: Object.create(null) };
+                const { ts: s4StrgVal = 0 } = 'utils' in s4 && s4.utils.getStorageData() || {};
+                const egrQuota = bytesToSize(account.space * 5, 0);
+                const $egrCn = $('.chart-container', $s4Egress);
+
+                const populateBarChart = async(targetDate = new Date()) => {
+                    const style = getComputedStyle(document.body);
+                    const date = new Date(targetDate.getFullYear(), targetDate.getMonth(), 1, 0, 0, 0, 0);
+                    const ts = date.getTime();
+
+                    if (!egrData.s4dl[ts]) {
+                        loadingDialog.show('getS4EgressData');
+                        const res = await M.getS4Egress(date, egrData.used === undefined)
+                            .catch(dump);
+                        egrData.s4dl[ts] = res && res.s4dl;
+
+                        // Fill overall S4 usage
+                        if (res && res.used !== undefined) {
+                            $('.usage .label', $s4Egress).safeHTML(
+                                l.s4_ergess_used.replace(
+                                    '%1',
+                                    `<span class="usage-value"><b>${bytesToSize(res.used)}</b>` +
+                                    ` / ${ egrQuota }</span>`
+                                )
+                            );
+                            egrData.used = res.used;
+                        }
+                        loadingDialog.hide('getS4EgressData');
+                    }
+
+                    const s4dl = egrData.s4dl[ts] || {};
+                    const days = Object.keys(s4dl);
+                    const divider = dashboardUI.getBarChartScale(Object.values(s4dl));
+                    const chartBaseData = [];
+                    const chartLabels = [];
+                    const daysOfThisMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0)
+                        .getDate();
+
+                    // Fill month days and zero data values
+                    for (let d = 0; d < daysOfThisMonth; d++) {
+                        chartBaseData.push(0);
+                        chartLabels.push(d + 1);
+                    }
+
+                    // Format and set existing data value
+                    for (let i = 0; i < days.length; i++) {
+                        const index = parseInt(days[i].substr(6, 2), 10) - 1;
+                        chartBaseData[index] = s4dl[days[i]] / divider;
+                    }
+
+                    // Fill egress dataset for chart bar
+                    const datasets = [
+                        {
+                            name: 'base',
+                            label: l[18051],
+                            backgroundColor: style.getPropertyValue('--label-blue-hover').trim(),
+                            borderWidth: 0,
+                            data: chartBaseData,
+                            hoverBackgroundColor: style.getPropertyValue('--label-blue-hover').trim(),
+                            hoverBorderColor: style.getPropertyValue('--label-blue').trim(),
+                            hoverBorderWidth: 1
+                        }
+                    ];
+
+                    // Render chart
+                    dashboardUI.renderAnalyticsChart({
+                        $cn: $egrCn, datasets, divider, chartLabels, date
+                    });
+                };
+
+                // Fill S4 egress dropdown
+                dashboardUI.populateAnalyticsDropdown($('.s4-egress', $freeProDashboard));
+
+                // Init egress month selector
+                $('.chart-month-selector .option', $s4Egress).rebind('click.changeDate', (e) => {
+                    const selectedDate = new Date(Number.parseFloat(e.currentTarget.dataset.value));
+                    populateBarChart(selectedDate).catch(tell);
+                });
+
+                // Init Learn more about egress
+                $('.l-more', $s4Egress).rebind('click.learnMore', () => {
+                    mega.redirect(
+                        'help.mega.io',
+                        'megas4/s4-clouddrive/transfer-quota-egress-traffic', false, false, false
+                    );
+                    eventlog(500912);
+                });
+
+                // Populate S4 egress chart
+                populateBarChart().catch(tell);
+
+                // Fill and show S4 storage info
+                $('.value', $s4DataItem).text(bytesToSize(s4StrgVal));
+                $s4DataItem.removeClass('hidden');
+
+                $('.s4-dashboard', $s4DataItem).rebind('click.openS4', () => {
+                    // @todo: replace with fm/s4 once redirection is fixed
+                    const cn = 'utils' in s4 && s4.utils.getContainersList();
+                    loadSubPage(cn.length ? `fm/${cn[0].h}` : 'fm/s4');
+                });
+
+                // Update a tags
+                clickURLs();
+            }
+            else {
+                $s4Egress.addClass('hidden');
+                $s4DataItem.addClass('hidden');
+            }
         }
         else {
             // Business or Pro Flexi
@@ -419,8 +539,8 @@ function dashboardUI(updProcess) {
             }
             // END Debug code
 
-            const $storageBlk = $('.business-dashboard .user-management-storage');
-            const $transferBlk = $('.business-dashboard .user-management-transfer');
+            const $storageBlk = $('.user-management-storage', $bsnDashboard);
+            const $transferBlk = $('.user-management-transfer', $bsnDashboard);
             const $storageBaseBlk = $('.storage-transfer-data-details-base', $storageBlk);
             const $transferBaseBlk = $('.storage-transfer-data-details-base', $transferBlk);
             const $storageExtBlk = $('.storage-transfer-data-details-ext', $storageBlk);
@@ -460,7 +580,7 @@ function dashboardUI(updProcess) {
                 }
             }
 
-            var $dataStats = $('.business-dashboard .subaccount-view-used-data');
+            const $dataStats = $('.subaccount-view-used-data', $bsnDashboard);
 
             var ffNumText = function(value, type) {
                 var counter = value || 0;
@@ -516,7 +636,7 @@ function dashboardUI(updProcess) {
             }
 
             if (mBackupsNode) {
-                $('.js-backups-el', '.business-dashboard').removeClass('hidden');
+                $('.js-backups-el', $bsnDashboard).removeClass('hidden');
 
                 fileNumText = ffNumText(mBackupsNode.tf | 0, 'file');
                 folderNumText = ffNumText(mBackupsNode.td | 0, 'folder');
@@ -525,7 +645,7 @@ function dashboardUI(updProcess) {
                 $('.ba-backups .file-number', $dataStats).text(fileNumText);
             }
             else {
-                $('.js-backups-el', '.business-dashboard').addClass('hidden');
+                $('.js-backups-el', $bsnDashboard).addClass('hidden');
             }
 
             if (rubbishSize > 0) {
@@ -552,11 +672,11 @@ function dashboardUI(updProcess) {
                 loadSubPage('fm/account/file-management');
             });
 
-            $('.used-storage-info.ba-pub-links .links-s', '.business-dashboard').rebind('click.suba', () => {
+            $('.used-storage-info.ba-pub-links .links-s', $bsnDashboard).rebind('click.suba', () => {
                 loadSubPage('fm/links');
             });
 
-            $('.used-storage-info.ba-s4 .object-storage', '.business-dashboard').rebind('click.openS4', () => {
+            $('.used-storage-info.ba-s4 .object-storage', $bsnDashboard).rebind('click.openS4', () => {
                 const cn = 'utils' in s4 && s4.utils.getContainersList();
                 loadSubPage(cn.length ? `fm/${cn[0].h}` : 'fm');
             });
@@ -588,11 +708,16 @@ function dashboardUI(updProcess) {
 }
 
 dashboardUI.updateCloudDataWidget = function() {
+    "use strict";
+
     const files = l.file_count;
     const folders = l.folder_count;
     const data = M.getDashboardData();
     const locale = [files, folders, files, folders, folders, folders];
     const map = ['files', 'folders', 'rubbish', 'ishares', 'oshares', 'links', 'versions'];
+    const $itemNodes = $(
+        '.data-item:not(.used-storage-info):not(.dynamic)', '.account.data-table.data'
+    );
 
     $('.data-item .links-s').rebind('click', function() {
         loadSubPage('fm/public-links');
@@ -618,30 +743,227 @@ dashboardUI.updateCloudDataWidget = function() {
         loadSubPage('fm/account/file-management');
     });
 
-    $('.data-item:not(.used-storage-info)', '.account.data-table.data')
-        .each(function(idx, elm) {
-            const props = data[map[idx]];
-            let {cnt, xfiles, size} = props;
+    for (let idx = 0; idx < $itemNodes.length; idx++) {
+        const elm = $itemNodes[idx];
+        const props = data[map[idx]];
+        const { cnt, xfiles, size } = props;
 
-            let str = idx < 6 ? mega.icu.format(locale[idx], cnt, true) : cnt;
+        let str = idx < 6 ? mega.icu.format(locale[idx], cnt, true) : cnt;
 
-            if (props.xfiles > 0) {
-                str += `, ${mega.icu.format(files, xfiles, true)}`;
+        if (props.xfiles > 0) {
+            str += `, ${mega.icu.format(files, xfiles, true)}`;
+        }
+
+        elm.children[1].textContent = str;
+        if (props.cnt > 0) {
+            elm.children[2].textContent = bytesToSize(size);
+            $(elm).removeClass('empty');
+            $('.account.data-item .versioning-settings').removeClass('hidden');
+        }
+        else {
+            elm.children[2].textContent = '-';
+            $(elm).addClass('empty');
+            $('.account.data-item .versioning-settings').addClass('hidden');
+        }
+    }
+};
+
+dashboardUI.populateAnalyticsDropdown = function($targetContainer) {
+    "use strict";
+
+    const adminCreationDate = new Date(u_attr.since * 1000);
+    const nowDate = new Date();
+    nowDate.setDate(1);
+    const monthLimit = 12; // 1 year back max
+    const $monthDropdown = $('.chart-month-selector', $targetContainer);
+    const $dropdownScroll = $('.dropdown-scroll', $monthDropdown);
+    const $dropdownLabel = $('> span', $monthDropdown);
+    $dropdownScroll.empty();
+    $dropdownLabel.text('');
+
+    for (var m = 0; m < monthLimit; m++) {
+        const nowTime = nowDate.getTime();
+        const label = time2date(nowTime / 1000, 3);
+        var itemNode;
+
+        itemNode = mCreateElement('div', {
+            'class': 'option',
+            'data-state': m === 0 ? 'active' : '',
+            'data-value': nowTime
+        }, $dropdownScroll[0]);
+        mCreateElement('span', undefined, itemNode).textContent = label;
+
+        if (m === 0) {
+            $dropdownLabel.text(label);
+        }
+
+        nowDate.setMonth(nowDate.getMonth() - 1);
+
+        if (nowDate < adminCreationDate && nowDate.getMonth() !== adminCreationDate.getMonth()) {
+            break;
+        }
+    }
+    bindDropdownEvents($monthDropdown, undefined, undefined, { wheelPropagation: false });
+};
+
+dashboardUI.getBarChartScale = function(data, $node) {
+    "use strict";
+
+    // Determine the scale
+    const scaleKB = 1024;
+    const scaleMB = 1024 * scaleKB;
+    const scaleGB = 1024 * scaleMB;
+    const scaleTB = 1024 * scaleGB;
+    let divider = 1;
+    let is_KB = false;
+    let is_MB = false;
+    let is_GB = false;
+    let is_TB = false;
+    let unit = l[20034];
+
+    for (const d of data) {
+        if (d > scaleTB) {
+            is_TB = true;
+            break;
+        }
+        else if (d > scaleGB) {
+            is_GB = true;
+        }
+        else if (d > scaleMB) {
+            is_MB = true;
+        }
+        else if (d > scaleKB) {
+            is_KB = true;
+        }
+    }
+
+    if (is_TB) {
+        divider = scaleTB;
+        unit = l.data_size_unit_tb;
+    }
+    else if (is_GB) {
+        divider = scaleGB;
+        unit = l[20031];
+    }
+    else if (is_MB) {
+        divider = scaleMB;
+        unit = l[20032];
+    }
+    else if (is_KB) {
+        divider = scaleKB;
+        unit = l[20033];
+    }
+
+    if ($node) {
+        $node.text(unit);
+    }
+
+    return divider;
+};
+
+dashboardUI.renderAnalyticsChart = function(opts) {
+    "use strict";
+
+    M.require('charts_js').done(() => {
+        const {
+            $cn,
+            datasets = [],
+            divider = 1024 * 1024 * 1024 * 1024,
+            chartLabels = [],
+            date = new Date()
+        } = opts || {};
+        const style = getComputedStyle(document.body);
+
+        const tooltipBarLabeling = (tooltipItem, data) => {
+            const storageValue = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+            const storageInfo = numOfBytes(storageValue * divider);
+            const { helperLabel } = data.datasets[tooltipItem.datasetIndex];
+
+            if (helperLabel) {
+                return helperLabel.replace('[X]', `${storageInfo.size} ${storageInfo.unit}`);
             }
+            return `${storageInfo.size} ${storageInfo.unit}`;
+        };
 
-            elm.children[1].textContent = str;
-            if (props.cnt > 0) {
-                elm.children[2].textContent = bytesToSize(size);
-                $(elm).removeClass('empty');
-                $('.account.data-item .versioning-settings').show();
-            }
-            else {
-                elm.children[2].textContent = '-';
-                $(elm).addClass('empty');
-                $('.account.data-item .versioning-settings').hide();
+        const tooltipBarTitling = (tooltipItem) => {
+            const storageDate = new Date(date.getFullYear(), date.getMonth(), 1);
+            storageDate.setDate(tooltipItem[0].xLabel || 0);
+            return acc_time2date(storageDate.getTime() / 1000, true);
+        };
+
+        const chartTooltips = {
+            mode: 'label',
+            callbacks: {
+                label: tooltipBarLabeling,
+                title: tooltipBarTitling
+            },
+            displayColors: datasets.length > 1
+        };
+
+        $cn.text('');
+        const canvas = mCreateElement('canvas', null, $cn[0]);
+
+        // eslint-disable-next-line no-unused-vars
+        const theBarChart = new Chart($(canvas), {
+            type: 'bar',
+            data: {
+                labels: chartLabels,
+                datasets,
+            },
+            options: {
+                maintainAspectRatio: false,
+                scales: {
+                    yAxes: [{
+                        stacked: true,
+                        ticks: {
+                            beginAtZero: true,
+                            fontColor: style.getPropertyValue('--text-color-medium').trim(),
+                            padding: 8
+                        },
+                        gridLines: {
+                            display: true,
+                            drawTicks: false,
+                            color: style.getPropertyValue('--mobile-border-subtle').trim(),
+                            zeroLineColor: style.getPropertyValue('--mobile-border-subtle').trim(),
+                            drawBorder: false,
+                            tickMarkLength: 0
+                        },
+                    }],
+                    xAxes: [{
+                        stacked: true,
+                        ticks: {
+                            fontColor: style.getPropertyValue('--mobile-text-primary').trim(),
+                            autoSkip: true,
+                            maxTicksLimit: 4,
+                            maxRotation: 0
+                        },
+                        gridLines: {
+                            display: false
+                        },
+                    }]
+                },
+                legend: {
+                    color: style.getPropertyValue('--mobile-text-primary').trim(),
+                    display: false,
+                    font: style.getPropertyValue('--mobile-font-caption-small-regular').trim(),
+                    generateLabels: tooltipBarLabeling,
+                    onClick: false,
+                    position: 'bottom',
+                },
+                tooltips: chartTooltips,
+                layout: {
+                    padding: {
+                        left: 16,
+                        right: 16,
+                        bottom: 16,
+                        top: 0
+                    }
+                }
             }
         });
+    });
 };
+
 dashboardUI.prototype = undefined;
 Object.freeze(dashboardUI);
 

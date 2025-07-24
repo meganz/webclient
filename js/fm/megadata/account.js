@@ -155,7 +155,6 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
         account.sessions = res;
     });
 
-
     /**
      * DO NOT place any sendAPIRequest() call AFTER, this 'ug' MUST BE the LAST one!
      */
@@ -479,6 +478,28 @@ MegaData.prototype.refreshSessionList = function(callback) {
     }
 };
 
+/**
+ * Function to get S4 Transfer usage (Egress) Report between two dates.
+ * @param {String} date The start date of the required month
+ * @param {Boolean} used Overall egress usage (Optional)
+ * @returns {Promise<Array>} user get result
+ */
+MegaData.prototype.getS4Egress = function(date, used) {
+    "use strict";
+
+    if (!(window.u_attr && u_attr.s4 && u_attr.p)) {
+        return false;
+    }
+
+    const dates = getReportDates(date);
+    const req = { a: 's4pqu', fd: dates.fromDate, td: dates.toDate };
+
+    if (used) {
+        req.ou = 1;
+    }
+
+    return api.send(req);
+};
 
 /**
  * Retrieve general user information once a session has been established.

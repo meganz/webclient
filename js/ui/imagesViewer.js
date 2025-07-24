@@ -757,6 +757,9 @@ var slideshowid;
                     slider: !(is_mobile && self.is_transferit) // only for mega desktop
                 });
             }
+            else if (!(is_mobile && self.is_transferit)) {
+                zoomPan.setSliderValue();
+            }
         }
 
         $img.css({

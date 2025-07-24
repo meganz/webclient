@@ -568,6 +568,9 @@ var security = {
      */
     showVerifyEmailDialog: function(aStep) {
         'use strict';
+        if (is_mobile && !document.body.classList.contains('mobile')) {
+            document.body.classList.add('mobile');
+        }
         var name = 'verify-email' + (aStep ? '-' + aStep : '');
 
         if ($.hideTopMenu) {

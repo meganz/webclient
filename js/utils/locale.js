@@ -1484,6 +1484,10 @@ mBroadcaster.once('boot_done', function populate_l() {
             `<a class="clickurl" target="_blank" href="${l.mega_help_host}`
             + `/megas4/s4-buckets/change-bucket-object-url-access">`
         ).replace('[/A]', '</a>');
+    l.s4_pro_egress_info = escapeHTML(l.s4_pro_egress_info)
+        .replace(
+            '[A]', '<a class="link clickurl" target="_blank" href="https://mega.io/terms#S4">'
+        ).replace('[/A]', '</a>');
     l.pro_flexi_expired_banner = escapeHTML(l.pro_flexi_expired_banner)
         .replace('[A]', '<a href="/repay" class="clickurl">').replace('[/A]', '</a>')
         .replace('[S]', '<span>').replace('[/S]', '</span>');

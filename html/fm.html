@@ -2665,7 +2665,7 @@
             <div class="widgets content-block">
 
                 <!-- for business dashboard -->
-                <div class="business-dashboard hidden">
+                <div class="dashboard-section business-dashboard hidden">
                     <div class="business-dashboard-container">
                         <div class="welcome-message-banner hidden">
                             <i class="sprite-fm-uni icon-sun"></i>
@@ -2993,7 +2993,7 @@
                     </div>
                 </div>
 
-                <div class="non-business-dashboard">
+                <div class="dashboard-section non-business-dashboard">
                     <div class="welcome-message-banner hidden">
                         <i class="sprite-fm-uni icon-sun"></i>
                         <span class="message"></span>
@@ -3127,6 +3127,46 @@
                     </div>
 
                     <div class="account quota-alert-banner hidden"></div>
+                    
+                    <div class="account widget body s4-egress hidden">
+                        <div class="account widget content">
+                            <div class="account widget title">
+                                <span>[$s4_ergess_analytics]</span>
+                            </div>
+                            <div class="analysis-container">
+                                <div class="analysis-summary-container lg-size">
+                                    <div class="usage last">
+                                        <span class="label"></span>
+                                    </div>
+                                    <a href="https://help.mega.io/megas4/s4-clouddrive/transfer-quota-egress-traffic" class="link l-more">[$s4_more_about_egress]</a>
+                                </div>
+                                <div class="analysis-body">
+                                    <div class="chart-month-container">
+                                        <div class="daily-title">[$s4_dailty_ergess_vol]</div>
+                                        <div class="mega-input dropdown-input text-style inline chart-month-selector">
+                                            <div class="mega-input-title"></div>
+                                            <span>[$996]</span>
+                                            <i class="sprite-fm-mono icon-dropdown"></i>
+                                            <div class="mega-input-dropdown hidden">
+                                                <div class="dropdown-scroll"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="chart-container">
+                                            <canvas class="daily-transfer-chart"></canvas>
+                                        </div>
+                                    </div>
+                                    <div class="analysis-remarks-container">
+                                        [$20936]
+                                    </div>
+                                    <div class="analysis-remarks-container">
+                                        [$s4_pro_egress_info]
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
                     <div class="account responsive-widget-block">
                         <div class="account widget body achievements">
@@ -3192,6 +3232,16 @@
                                         0 folders
                                     </td>
                                     <td class="account right-textalign">
+                                        0 MB
+                                    </td>
+                                </tr>
+                                <tr class="account data-item s4 dynamic hidden">
+                                    <td class="account">
+                                        <i class="sprite-fm-mono icon-bucket-outline"></i>
+                                        <span class="s4-dashboard pointer-c">[$obj_storage]</span>
+                                    </td>
+                                    <td class="account"></td>
+                                    <td class="account right-textalign value">
                                         0 MB
                                     </td>
                                 </tr>

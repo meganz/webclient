@@ -225,6 +225,7 @@ class MegaTopMenu extends MegaMobileTopMenu {
         // if (!(u_attr.b && !u_attr.s4)) {
         if (!u_attr.b) {
             loggedInCD.splice(mega.lite.inLiteMode ? 1 : 4, 0, {
+                autoExpand: true,
                 text: l.obj_storage,
                 icon: 'sprite-fm-mono icon-bucket-triangle-thin-outline',
                 href: '/fm/s4',

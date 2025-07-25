@@ -128,9 +128,7 @@ class MegaNodeComponent extends MegaComponent {
 
             // Creating the public link for an item doesn't share it with a specific person,
             // so exclude that key from the "shared with" count
-            const sharedWith = M.getNodeShareUsers(this.handle, 'EXP');
-
-            numDetails.textContent = mega.icu.format(l.shared_with, sharedWith.length);
+            numDetails.textContent = mega.icu.format(l.shared_with, M.getOutSharesCount(this.handle, 'EXP'));
             props.appendChild(numDetails);
         }
         else if (this.node.t === 1) {
@@ -367,7 +365,8 @@ class MegaNodeComponent extends MegaComponent {
     }
 
     get shared() {
-        return this.node.shares;
+        // @todo check/revamp how/where is this used..
+        return M.getOutShares(this.handle);
     }
 
     get name() {

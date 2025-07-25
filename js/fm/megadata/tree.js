@@ -780,27 +780,28 @@ MegaData.prototype.getOutShareTree = function() {
 
 /**
  * Get t value of custom view trees
- * @return {MegaNode} An ufs-node
+ * @return {Number} bitwise
  */
 MegaData.prototype.getTreeValue = function(n) {
-
     'use strict';
 
-    var t = n.t;
+    let t = +n.t | 0;
     if (n.fav) {
         t |= M.IS_FAV;
     }
     if (n.sen) {
         t |= M.IS_SEN;
     }
-    if (M.su.EXP && M.su.EXP[n.h]) {
+
+    const s = this.getNodeShare(n);
+    if (s) {
+        if (s.down) {
+            t |= M.IS_TAKENDOWN;
+        }
         t |= M.IS_LINKED;
     }
-    if (M.getNodeShareUsers(n, 'EXP').length || M.ps[n.h]) {
+    if (this.isOutShare(n, 'EXP')) {
         t |= M.IS_SHARED;
-    }
-    if (M.getNodeShare(n).down === 1) {
-        t |= M.IS_TAKENDOWN;
     }
     return t;
 };

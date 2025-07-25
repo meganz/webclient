@@ -1531,7 +1531,7 @@
             },
             '.sh4r1ng-item': (items, { node }) => {
                 const isS4Bucket = node.s4 && 'kernel' in s4 && s4.kernel.getS4NodeType(node) === 'bucket';
-                const hasShares = M.getNodeShareUsers(node, 'EXP').length || M.ps[node];
+                const hasShares = M.isOutShare(node, 'EXP');
                 let removed = false;
                 if (isS4Bucket) {
                     array.remove(items, '.sh4r1ng-item');

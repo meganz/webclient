@@ -184,40 +184,33 @@ MegaData.prototype.sortByDateTime = function(d) {
 };
 
 MegaData.prototype.getSortByDateTimeFn = function(type) {
+    'use strict';
 
-    var sortfn;
-
-    sortfn = function(a, b, d) {
-        var getMaxShared = function _getMaxShared(shares) {
-            var max = 0;
-            for (var i in shares) {
-                if (i !== 'EXP') {
-                    max = Math.max(max, shares[i].ts);
-                }
+    const getMaxShared = (n) => {
+        let max = 0;
+        const shares = this.getOutShares(n);
+        for (var i in shares) {
+            if (i !== 'EXP') {
+                max = Math.max(max, shares[i].ts);
             }
-            return max;
-        };
+        }
+        return max;
+    };
+
+    return (a, b, d) => {
 
         var time1 = a.ts;
         var time2 = b.ts;
 
-        if (M.currentdirid === 'out-shares' || type === 'out-shares') {
-            time1 = M.ps[a.h] ? getMaxShared(M.ps[a.h]) : getMaxShared(a.shares);
-            time2 = M.ps[b.h] ? getMaxShared(M.ps[b.h]) : getMaxShared(b.shares);
+        if (this.currentdirid === 'out-shares' || type === 'out-shares') {
+
+            time1 = getMaxShared(a);
+            time2 = getMaxShared(b);
         }
+        else if (this.currentdirid === 'public-links' && !$.dialog || type === 'public-links') {
 
-        if ((M.currentdirid === 'public-links' && !$.dialog) || type === 'public-links') {
-            var largeNum = 99999999999 * d;
-
-            if (a.shares === undefined && M.su.EXP[a.h]) {
-                a = M.d[a.h];
-            }
-            if (b.shares === undefined && M.su.EXP[b.h]) {
-                b = M.d[b.h];
-            }
-
-            time1 = (a.shares && a.shares.EXP) ? a.shares.EXP.ts : largeNum;
-            time2 = (b.shares && b.shares.EXP) ? b.shares.EXP.ts : largeNum;
+            time1 = this.getNodeShare(a.h).ts || this.getNodeByHandle(a.h).ts;
+            time2 = this.getNodeShare(b.h).ts || this.getNodeByHandle(b.h).ts;
         }
 
         if (time1 !== time2) {
@@ -226,8 +219,6 @@ MegaData.prototype.getSortByDateTimeFn = function(type) {
 
         return M.doFallbackSortWithName(a, b, d);
     };
-
-    return sortfn;
 };
 
 MegaData.prototype.sortByRts = function(d) {
@@ -724,25 +715,14 @@ MegaData.prototype.doFallbackSortWithFolder = function(a, b) {
 MegaData.prototype.getSortBySharedWithFn = function() {
     'use strict';
 
-    return function(a, b, d) {
+    const peers = (n) => {
+        return [...this.su[n.h] || []].map((u) => this.getNameByHandle(u)).filter(String).sort().join();
+    };
 
-        var aShareNames = [];
-        var bShareNames = [];
+    return (a, b, d) => {
 
-        for (var i in a.shares) {
-            const aShareName = M.getNameByHandle(i); // 'EXP' could get an empty name as returned
-            if (a.shares[i] && aShareName) {
-                aShareNames.push(aShareName);
-            }
-        }
-        for (var j in b.shares) {
-            const bShareName = M.getNameByHandle(j); // 'EXP' could get an empty name as returned
-            if (b.shares[j] && bShareName) {
-                bShareNames.push(bShareName);
-            }
-        }
-        aShareNames = aShareNames.sort().join();
-        bShareNames = bShareNames.sort().join();
+        const aShareNames = peers(a);
+        const bShareNames = peers(b);
 
         if (aShareNames !== bShareNames) {
             return M.compareStrings(aShareNames, bShareNames, d);

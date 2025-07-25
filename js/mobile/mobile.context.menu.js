@@ -118,12 +118,6 @@ class MegaMobileContextMenu extends MegaComponentGroup {
             items['.play-slideshow'] = 1;
         }
 
-        // Phase 2
-        // if (items['.sh4r1ng-item']) {
-        //     // show Manage share or share folder text depending on the status
-        //     onIdle(() => M.setContextMenuShareText());
-        // }
-
         if (items['.getlink-item']) {
             // Show the Manage link text if it already has a public link
             onIdle(() => M.setContextMenuGetLinkText());

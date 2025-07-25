@@ -224,7 +224,7 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
                 for (let i = shares.length; i--;) {
                     if (shares[i] === 'EXP') {
                         shares.splice(i, 1);
-                        exp = selNode.shares.EXP;
+                        exp = true;
                     }
                 }
 
@@ -498,14 +498,11 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
         items['.getlink-item'] = 1;
         items['.transferit-item'] = 1;
 
-        var cl = new mega.Share();
-        var hasExportLink = cl.hasExportLink($.selected);
-
-        if (hasExportLink) {
+        if ($.selected.some((h) => M.getNodeShare(h))) {
             items['.removelink-item'] = true;
         }
 
-        cl = new mega.Share.ExportLink();
+        const cl = new mega.Share.ExportLink();
         var isTakenDown = cl.isTakenDown($.selected);
 
         // If any of selected items is taken down remove actions from context menu
@@ -654,9 +651,7 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
             return items;
         }
 
-        cl = new mega.Share();
-
-        if (cl.hasExportLink($.selected)) {
+        if ($.selected.some((h) => M.getNodeShare(h))) {
             items['.removelink-item'] = 1;
         }
 
@@ -665,7 +660,7 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
         if ($.selected.length === 1 && selNode.t) {
             items['.sh4r1ng-item'] = 1;
 
-            if (M.getNodeShareUsers(selNode, 'EXP').length || M.ps[selNode]) {
+            if (M.isOutShare(selNode, 'EXP')) {
                 items['.removeshare-item'] = 1;
             }
         }
@@ -711,7 +706,7 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
         if (sourceRoot === 's4') {
             delete items['.settings-item'];
         }
-        if (sourceRoot === 'out-shares' && selNode && this.getNodeShareUsers(selNode, 'EXP').length) {
+        if (sourceRoot === 'out-shares' && this.isOutShare(selNode, 'EXP')) {
             items['.removeshare-item'] = 1;
         }
         if (M.currentrootid === 'file-requests' && mega.fileRequest.publicFolderExists(selNode.h)) {
@@ -1193,67 +1188,6 @@ MegaData.prototype.setContextMenuGetLinkText = function() {
         document.querySelector('.dropdown.body .removelink-item span').textContent = removeLinkText;
         document.querySelector('.dropdown.body .cd-getlink-item span').textContent = getLinkText;
         document.querySelector('.dropdown.body .cd-removelink-item span').textContent = removeLinkText;
-    }
-};
-
-/**
- * Sets the text in the context menu for the sharing option.
- * If the folder is shared or has pending shares then the text will be set to 'Manage share',
- * else the text will be set to 'Share folder'.
- */
-MegaData.prototype.setContextMenuShareText = function() {
-    'use strict';
-
-    const n = M.d[$.selected[0]] || false;
-    const isS4Bucket = n.s4 && 'kernel' in s4 && s4.kernel.getS4NodeType(n) === 'bucket';
-    let getLinkText = M.currentrootid === M.InboxID
-        || M.getNodeRoot($.selected[0]) === M.InboxID ? l.read_only_share : l[5631];
-    let getLinkIcon = 'sprite-mobile-fm-mono icon-share-thin-outline';
-    let manageIcon = 'icon-folder-outgoing-share';
-    let removeIcon = 'icon-folder-remove-share';
-    const cdShareItem = document.querySelector('.dropdown.body .cd-sh4r1ng-item');
-
-    if (isS4Bucket) {
-        getLinkText = l.s4_share_bucket;
-        manageIcon = 'icon-bucket-outgoing-share';
-        removeIcon = 'icon-bucket-remove-share';
-    }
-
-    // Toggle manage share class for a/b testing purposes
-    const cdShareToggle = (func) => {
-        if (cdShareItem && !is_mobile) {
-            cdShareItem.classList[func]('manage-share');
-        }
-    };
-
-    // If the node has shares or pending shares, set to 'Manage share', else, 'Share folder'
-    if (n && M.getNodeShareUsers(n, 'EXP').length || M.ps[n]) {
-        getLinkText = l.manage_share;
-        getLinkIcon = 'sprite-fm-mono icon-settings-thin-outline';
-        cdShareToggle('add');
-    }
-    else {
-        cdShareToggle('remove');
-    }
-
-    if (is_mobile) {
-
-        const shareBtn = mega.ui.contextMenu.getChild('.sh4r1ng-item');
-        shareBtn.text = getLinkText;
-        shareBtn.icon = getLinkIcon;
-    }
-    else {
-
-        const shareItem = document.querySelector('.dropdown.body .sh4r1ng-item');
-        const removeItem = document.querySelector('.dropdown.body .removeshare-item');
-        const cdRemoveItem = document.querySelector('.dropdown.body .cd-removeshare-item');
-
-        cdShareItem.querySelector('span').textContent = getLinkText;
-        cdShareItem.querySelector('i').className = `sprite-fm-mono ${manageIcon}`;
-        shareItem.querySelector('span').textContent = getLinkText;
-        shareItem.querySelector('i').className = `sprite-fm-mono ${manageIcon}`;
-        removeItem.querySelector('i').className = `sprite-fm-mono ${removeIcon}`;
-        cdRemoveItem.querySelector('i').className = `sprite-fm-mono ${removeIcon}`;
     }
 };
 

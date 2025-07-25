@@ -35,7 +35,7 @@ lazy(mega.ui, 'mInfoPanel', () => {
         else if (typeof node.r === 'number') {
             activeStats.inShareCount++;
         }
-        else if (node.t & M.IS_SHARED || M.ps[node.h] || M.getNodeShareUsers(node, 'EXP').length) {
+        else if (M.isOutShare(node, 'EXP')) {
             activeStats.outShareCount++;
         }
         else if (mega.fileRequest && mega.fileRequest.publicFolderExists(node.h)) {
@@ -450,7 +450,7 @@ lazy(mega.ui, 'mInfoPanel', () => {
                     this.text = l.type_inshare;
                     return;
                 }
-                if (M.getNodeShareUsers(this.node, 'EXP').length) {
+                if (M.isOutShare(this.node, 'EXP')) {
                     this.text = l.type_outshare;
                     return;
                 }
@@ -1387,7 +1387,7 @@ lazy(mega.ui, 'mInfoPanel', () => {
             blockSet.add(TYPES.PERMISSION);
             blockSet.add(TYPES.SHARE_OWNER);
         }
-        else if (M.getNodeShareUsers(node, 'EXP').length) {
+        else if (M.isOutShare(node, 'EXP')) {
             blockSet.add(TYPES.SHARE_USERS);
         }
         if (node.h !== M.RootID && node.h !== M.RubbishID) {

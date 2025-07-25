@@ -136,3 +136,9 @@
     text-align: start;
     --icon-size: 24px;
 }
+.dropdown-search-results-item-file-icon.thumb .item-type-icon.no-background {
+    background: none;
+}
+.dropdown-recently-opened-item-file-icon.thumb .item-type-icon.no-background {
+    background: none;
+}

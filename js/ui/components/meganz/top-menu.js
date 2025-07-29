@@ -228,12 +228,12 @@ class MegaTopMenu extends MegaMobileTopMenu {
                 autoExpand: true,
                 text: l.obj_storage,
                 icon: 'sprite-fm-mono icon-bucket-triangle-thin-outline',
-                href: '/fm/s4',
                 hasTree: u_attr.s4 ? 's4' : null,
                 treeWrapClass: 'js-s4-tree-panel',
                 name: 's4',
                 typeClassname: 'drive',
-                eventLog: 500636
+                eventLog: 500636,
+                binding: () => s4.main.render()
             });
         }
 
@@ -323,6 +323,10 @@ class MegaTopMenu extends MegaMobileTopMenu {
                 this.activeItem = document.getElementById(`treea_${M.currentdirid}`);
             }
             else {
+                // Auto expand when rendering items or selected item is not active 
+                if ((!active || active.domNode !== selected) && selected.dataset.expandEvt) {
+                    selected.component.trigger(selected.dataset.expandEvt);
+                }
                 selected.classList.add('active');
                 selected.component.icon = selected.component.icon.replace('outline', 'solid');
                 this.activeItem = selected;

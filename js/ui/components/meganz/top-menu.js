@@ -324,7 +324,7 @@ class MegaTopMenu extends MegaMobileTopMenu {
             }
             else {
                 // Auto expand when rendering items or selected item is not active
-                if ((!active || active.domNode !== selected) && selected.dataset.expandEvt) {
+                if (!(active && active.domNode === selected) && selected.dataset.expandEvt) {
                     selected.component.trigger(selected.dataset.expandEvt);
                 }
                 selected.classList.add('active');

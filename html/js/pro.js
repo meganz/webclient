@@ -132,14 +132,14 @@ var pro = {
      * Load pricing plan information from the API. The data will be loaded into 'pro.membershipPlans'.
      * @param {Function} loadedCallback The function to call when the data is loaded
      */
-    loadMembershipPlans: async function(loadedCallback) {
+    loadMembershipPlans: async function(loadedCallback, force) {
         "use strict";
 
         // Set default
         loadedCallback = loadedCallback || function() { };
 
         // If this data has already been fetched, re-use it and run the callback function
-        if (pro.membershipPlans.length > 0 && !(!pro.lastLoginStatus && u_type > 0)) {
+        if (!force && pro.membershipPlans.length > 0 && !(!pro.lastLoginStatus && u_type > 0)) {
             loadedCallback();
         }
         else {

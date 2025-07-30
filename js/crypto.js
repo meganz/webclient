@@ -1383,9 +1383,10 @@ async function api_setshare(node, targets, sharenodes) {
                 }
             }
         }
+        const ec = Number(res && res.result || res);
 
-        if (!--maxretry || res === EARGS) {
-            throw new MEGAException(`Share operation failed for ${node}: ${api.strerror(res)}`, res);
+        if (!--maxretry || ec === EARGS || ec === EACCESS) {
+            throw new MEGAException(`Share operation failed for ${node}: ${api.strerror(ec || res)}`, res);
         }
 
         await tSleep(Math.min(2e4, backoff <<= 1) / 1e3);

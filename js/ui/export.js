@@ -1546,6 +1546,11 @@ function logExportEvt(evtId, data) {
                             const header = sheet.overlayNode.querySelector('.header');
                             const title = mCreateElement('div', { class: 'font-title-h3' });
                             const txt = mCreateElement('div', { class: 'font-body-1' });
+
+                            if ((itBanner = header.querySelector('.it-banner'))) {
+                                itBanner.remove();
+                            }
+
                             itBanner = mCreateElement(
                                 'div',
                                 {

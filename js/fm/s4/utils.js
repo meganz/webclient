@@ -507,7 +507,7 @@ lazy(s4, 'utils', () => {
                 ],
                 [
                     'eu-central-2.s4.mega.io',
-                    l.location_bettembourg,
+                    l[18922],
                     'Bettembourg'
                 ],
                 [

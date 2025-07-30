@@ -512,11 +512,7 @@ function dashboardUI(updProcess) {
                 $('.value', $s4DataItem).text(bytesToSize(s4StrgVal));
                 $s4DataItem.removeClass('hidden');
 
-                $('.s4-dashboard', $s4DataItem).rebind('click.openS4', () => {
-                    // @todo: replace with fm/s4 once redirection is fixed
-                    const cn = 'utils' in s4 && s4.utils.getContainersList();
-                    loadSubPage(cn.length ? `fm/${cn[0].h}` : 'fm/s4');
-                });
+                $('.s4-dashboard', $s4DataItem).rebind('click.openS4', () => s4.main.render());
 
                 // Update a tags
                 clickURLs();
@@ -676,10 +672,8 @@ function dashboardUI(updProcess) {
                 loadSubPage('fm/links');
             });
 
-            $('.used-storage-info.ba-s4 .object-storage', $bsnDashboard).rebind('click.openS4', () => {
-                const cn = 'utils' in s4 && s4.utils.getContainersList();
-                loadSubPage(cn.length ? `fm/${cn[0].h}` : 'fm');
-            });
+            $('.used-storage-info.ba-s4 .object-storage', $bsnDashboard)
+                .rebind('click.openS4', () => s4.main.render());
 
             fileNumText = ffNumText(verFiles, 'file');
             $('.ba-version .ff-occupy', $dataStats).text(bytesToSize(verBytes));

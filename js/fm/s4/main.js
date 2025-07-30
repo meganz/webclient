@@ -190,6 +190,10 @@ lazy(s4, 'main', () => {
             }
 
             if (!u_attr.b) {
+                if (page !== 'fm/s4') {
+                    return loadSubPage('fm/s4');
+                }
+
                 renderActivation();
                 eventlog(500854);
                 return;

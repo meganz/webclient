@@ -243,7 +243,13 @@ class MegaMobileTopMenu extends MegaComponent {
                     M.addTreeUIDelayed();
                 });
 
-                menuItem.on(item.href ? 'beforeRedirect.treeExpand' : 'click.treeExpand', () => {
+                const evt = item.href ? 'beforeRedirect.treeExpand' : 'click.treeExpand';
+
+                if (item.autoExpand) {
+                    menuItem.domNode.dataset.expandEvt = evt;
+                }
+
+                menuItem.on(evt, () => {
                     if (menuItem.active || item.autoExpand && !tree.classList.contains('active')) {
                         expandArrow.trigger('click.treeExpand');
                     }

@@ -789,7 +789,7 @@ var mega = {
     redirect: function(to, page, kv, urlQs, st) {
         'use strict';
         var storage = localStorage;
-        var toMegaIo = to === 'mega.io';
+        var toMegaIo = ['mega.io', 'blog.mega.io', 'help.mega.io'].includes(to);
         var getCount = 0;
         st = typeof st === 'undefined' || st;
 

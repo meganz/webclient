@@ -29,6 +29,9 @@
         display: inline-flex;
         position: relative;
     }
+    .media-viewer .video-block {
+        width: 100%;
+    }
     .media-viewer button {
         --mask-color: var(--icon-rest);
         appearance: none;

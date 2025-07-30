@@ -784,9 +784,11 @@ pro.propay = {
     shouldShowTrialBlocker: (blockerText, blockerTitle) => {
         'use strict';
 
+        const trialExpected = !sessionStorage[`noTrial${pro.propay.planNum}`];
+
         return !pro.propay.ignoreTrial
             && !pro.filter.simple.validPurchases.has(pro.propay.planNum)
-            && !pro.propay.trial
+            && (!pro.propay.trial && trialExpected)
             && !blockerText
             && !blockerTitle;
     },

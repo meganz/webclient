@@ -509,7 +509,7 @@ lazy(mega.devices, 'data', () => {
             for (const {h: device, folders} of Object.values(currentData)) {
                 for (const {h: folder} of Object.values(folders)) {
                     if (!foldersAddedSet.has(`${device}:${folder}`)) {
-                        outdated.push({device, folder});
+                        outdated.push({device, folder, isDeleted: true});
                     }
                 }
             }

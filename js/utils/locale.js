@@ -1051,7 +1051,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         'vpn': "https://mega.io/vpn",
         'vpn#dow': "https://mega.io/vpn#downloadapps",
         'pass': "https://mega.io/pass",
-        'pass#dow': "https://mega.io/pass#downloadapps",
+        'pass#dow': "https://mega.io/pass#downloadapp",
     };
 
     const mega_io_hyperlinks = Object.create(null);
@@ -2031,6 +2031,12 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[/A]', '</a>');
     l.payment_failed_banner_text_oq = escapeHTML(l.payment_failed_banner_text_oq)
         .replace('[A]', `<a class="clickurl" data-eventid="500871" href="${ssExceedUrl}" target="_blank">`)
+        .replace('[/A]', '</a>');
+    l.recovery_key_page_para2 = escapeHTML(l.recovery_key_page_para2)
+        .replace(
+            '[A]',
+            `<a href="${recoveryKeyLink}" class="clickurl" data-eventid="500915" target="_blank" rel="noopener">`
+        )
         .replace('[/A]', '</a>');
 
     const common = [

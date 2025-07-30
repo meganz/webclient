@@ -1546,6 +1546,11 @@ function logExportEvt(evtId, data) {
                             const header = sheet.overlayNode.querySelector('.header');
                             const title = mCreateElement('div', { class: 'font-title-h3' });
                             const txt = mCreateElement('div', { class: 'font-body-1' });
+
+                            if ((itBanner = header.querySelector('.it-banner'))) {
+                                itBanner.remove();
+                            }
+
                             itBanner = mCreateElement(
                                 'div',
                                 {
@@ -2880,6 +2885,15 @@ function logExportEvt(evtId, data) {
         }
 
         return Promise.all(promises)
+            .catch((ex) => {
+
+                while ($.getExportLinkInProgress) {
+                    $.getExportLinkInProgress = 'ongoing';
+
+                    broadcast(null);
+                }
+                throw ex;
+            })
             .finally(() => {
 
                 return d && console.groupEnd();
@@ -3138,7 +3152,7 @@ function logExportEvt(evtId, data) {
                 nodesToProcess.length === 1 ? l.generating_link : l.generating_links
             );
 
-            exportLink.getExportLink().finally(() => {
+            exportLink.getExportLink().catch(tell).finally(() => {
                 mLoadingSpinner.hide('get-link-loading-toast');
             });
         });

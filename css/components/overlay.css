@@ -212,6 +212,12 @@ body.mobile .overlay-wrap .image i.password {
     width: 100%;
 }
 
+.overlay-wrap .header-title .overlay-video {
+    height: 160px;
+    margin: 0 auto;
+    width: 160px;
+}
+
 .overlay-wrap .overlay-footer {
     display: flex;
     flex-direction: column;

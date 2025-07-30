@@ -789,7 +789,7 @@ var mega = {
     redirect: function(to, page, kv, urlQs, st) {
         'use strict';
         var storage = localStorage;
-        var toMegaIo = to === 'mega.io';
+        var toMegaIo = ['mega.io', 'blog.mega.io', 'help.mega.io'].includes(to);
         var getCount = 0;
         st = typeof st === 'undefined' || st;
 
@@ -2640,6 +2640,7 @@ else if (!browserUpdate) {
     // Shared dialog/sheet styles
     jsl.push({f:'css/dialogs/recovery-logout-dialog.css', n: 'recovery_logout_css', j: 2, w: 1});
     jsl.push({f:'css/dialogs/backup-recovery-dialog.css', n: 'backup_recovery_css', j: 2, w: 1});
+    jsl.push({f:'css/key.css', n: 'key_css', j:2, w:1});
 
     if (is_megadrop) {
         // @todo FIXME: we *should* load required resources only!

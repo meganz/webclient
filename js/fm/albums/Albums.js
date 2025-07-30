@@ -2306,7 +2306,8 @@ lazy(mega.gallery, 'albums', () => {
         async onMDialogShown() {
             await scope.albums.setUserAlbumsInStore();
 
-            this.keys = Object.keys(scope.albums.store).filter(k => k.length !== predefinedKeyLength);
+            this.keys = Object.keys(scope.albums.store).filter(k => k.length !== predefinedKeyLength)
+                .sort((a, b) => scope.albums.store[b].ts - scope.albums.store[a].ts);
 
             this.updateSelectedCount();
 

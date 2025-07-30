@@ -1,0 +1,268 @@
+.registration-generating-keys {
+    background: var(--mobile-surface-1);
+}
+.registration-generating-keys .mobile.fm-block {
+    display: flex;
+}
+.registration-generating-keys > .content {
+    align-items: center;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    height: 100%;
+    justify-content: center;
+    padding: 32px 40px;
+}
+.registration-generating-keys .widget-holder {
+    margin: auto;
+}
+body.mobile .registration-generating-keys .widget-holder.recovery {
+    height: 100%;
+}
+.registration-generating-keys .widget-holder .overlay-wrap {
+    border-radius: 24px;
+    display: flex;
+    overflow: hidden;
+    position: relative;
+    width: 640px;
+}
+body.mobile .registration-generating-keys .widget-holder .overlay-wrap {
+    width: 100%;
+}
+body.web-desktop .mega-sheet.recovery-key .sheet {
+    border: 1px solid var(--mobile-border-subtle);
+    max-width: 640px;
+    width: 640px;
+}
+.registration-generating-keys .widget-holder .overlay {
+    transform: translateY(0%);
+}
+body.mobile .registration-generating-keys .widget-holder .overlay {
+    padding: 56px 0 0;
+}
+.registration-generating-keys .overlay-wrap.key-gen .title {
+    margin: 0 auto;
+}
+body.mobile .registration-generating-keys .overlay-wrap.key-gen .title {
+    text-align: center;
+}
+.registration-generating-keys .overlay-wrap.recovery-key .header {
+    padding: 0 40px;
+}
+.registration-generating-keys .overlay-wrap.key-gen .header i.key-lock-fb {
+    background-image: url("../images/mega/recovery_key_fb.png");
+    background-size: cover;
+    height: 160px;
+    margin: 0 auto;
+    width: 160px;
+}
+body.mobile .registration-generating-keys .overlay-wrap.recovery-key .header {
+    padding: 0 24px;
+}
+body.mobile .registration-generating-keys .overlay-wrap.recovery-key .header h2 {
+    font: var(--mobile-font-heading-h1);
+}
+body.mobile .mega-sheet.recovery-key .sheet .header {
+    padding-top: 32px;
+}
+body.mobile .mega-sheet.recovery-key .sheet .header h2 {
+    text-align: center;
+}
+.registration-generating-keys .key-gen .content,
+.overlay-wrap.recovery-key .content {
+    align-items: center;
+    box-sizing: border-box;
+    display: flex;
+    padding: 32px 40px 0;
+    width: 100%;
+}
+.registration-generating-keys .key-gen .content {
+    flex-wrap: wrap;
+}
+.overlay-wrap.recovery-key .content {
+    flex-direction: column;
+}
+body.mobile .registration-generating-keys .key-gen .content {
+    padding: 32px 24px 0;
+}
+.overlay-wrap.recovery-key .sheet .content {
+    padding: 0;
+}
+body.mobile .overlay-wrap.recovery-key .sheet .content {
+    padding: 0 24px;
+}
+body.mobile .overlay-wrap.recovery-key .sheet .content div:first-child {
+    text-align: center;
+    width: 100%;
+}
+.registration-generating-keys .key-gen .content > div {
+    display: flex;
+    margin: 0 auto;
+}
+body.mobile .registration-generating-keys .key-gen .content .spinner-text {
+    flex-wrap: wrap;
+    justify-content: center;
+    text-align: center;
+}
+body.mobile .registration-generating-keys .key-gen .content .spinner-text i {
+    margin-bottom: 8px;
+    width: 100%;
+}
+.registration-generating-keys .key-gen .content .spinner-text span {
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-copy-regular);
+    margin-inline-start: 8px;
+}
+body.mobile .registration-generating-keys .key-gen .content .spinner-text span {
+    margin-inline-start: 0;
+}
+.registration-generating-keys .key-gen .content .trivia {
+    align-items: center;
+    background: var(--mobile-surface-1);
+    border-radius: 20px;
+    box-sizing: border-box;
+    flex-wrap: wrap;
+    margin-top: 32px;
+    padding: 20px 24px;
+    width: 100%;
+}
+.registration-generating-keys .key-gen .content .trivia span {
+    color: var(--mobile-text-secondary);
+    font: var(--mobile-font-caption-large-semibold);
+    text-align: center;
+    width: 100%;
+}
+.registration-generating-keys .key-gen .content .trivia span.trivia-info {
+    font: var(--mobile-font-caption-large-regular);
+    margin-top: 8px;
+}
+body.mobile .registration-generating-keys .recovery-key .content {
+    padding: 32px 24px 0;
+}
+.overlay-wrap.recovery-key .later-reminder {
+    align-items: center;
+    display: flex;
+    font: var(--mobile-font-copy-semibold);
+    margin-top: 24px;
+    width: 100%;
+    --icon-size: 24px;
+}
+body.mobile .overlay-wrap.recovery-key .later-reminder {
+    font: var(--mobile-font-caption-large-semibold);
+    margin-top: 16px;
+    justify-content: center;
+}
+.overlay-wrap.recovery-key .later-reminder i {
+    align-self: flex-start;
+    margin-inline-end: 8px;
+}
+.registration-generating-keys .spinner-text i.loading::after {
+    animation-duration: 1000ms;
+    animation-iteration-count: infinite;
+    animation-name: rotate;
+    animation-timing-function: steps(8, end);
+    display: block;
+    margin: auto;
+    --icon-size: 24px;
+}
+.registration-generating-keys .overlay-wrap .header-title h2 {
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-heading-h2);
+}
+.registration-generating-keys .overlay-wrap .image {
+    aspect-ratio: 2.8;
+    background: var(--mobile-surface-1);
+    border-radius: 16px 16px 0 0;
+    box-sizing: border-box;
+    margin: 8px 40px 0;
+    padding: 28px 24px 0;
+    width: calc(100% - 80px);
+}
+body.mobile .registration-generating-keys .overlay-wrap .image {
+    margin: 8px 24px 0;
+    width: calc(100% - 48px);
+}
+.registration-generating-keys .overlay-wrap .image i {
+    background-repeat: no-repeat;
+    background-size: cover;
+    height: 100%;
+    margin-bottom: -5px;
+    width: 100%;
+}
+.theme-light .registration-generating-keys .overlay-wrap .image i {
+    background-image: url("../images/mega/recovery_key_light.png");
+}
+.theme-dark .registration-generating-keys .overlay-wrap .image i {
+    background-image: url("../images/mega/recovery_key_dark.png");
+}
+.registration-generating-keys .overlay-wrap .content .recovery-para {
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-copy-regular);
+    margin-bottom: 16px;
+}
+.registration-generating-keys .overlay-wrap .content .recovery-para a {
+    color: var(--mobile-link-primary);
+    text-decoration: underline;
+}
+.overlay-wrap.recovery-key .footer-buttons {
+    align-self: flex-end;
+    margin-top: 8px;
+}
+.overlay-wrap.recovery-key .footer-buttons button {
+    cursor: pointer;
+    height: 48px;
+    margin-inline-start: 16px;
+}
+.overlay-wrap.recovery-key .footer-buttons button.thin {
+    height: 36px;
+    margin-inline-start: 8px;
+}
+.overlay-wrap.recovery-key .footer-buttons button .primary-text {
+    font: var(--mobile-font-link-large-semibold);
+}
+.overlay-wrap.recovery-key .sheet .footer-buttons button .primary-text {
+    font: var(--mobile-font-link-small-semibold);
+}
+.registration-generating-keys .overlay-wrap.recovery-key .actions {
+    border-top: 1px solid var(--mobile-border-strong);
+    padding: 16px 24px;
+}
+body.mobile .overlay-wrap.recovery-key .sheet .main {
+    margin-bottom: 8px;
+}
+.registration-generating-keys .key-page-bottom {
+    align-items: center;
+    align-self: flex-end;
+    display: flex;
+    height: 40px;
+    width: 100%;
+}
+.registration-generating-keys .key-page-bottom .copyright {
+    color: var(--mobile-text-secondary);
+    font: var(--mobile-font-caption-small-regular);
+    margin-inline-end: auto;
+}
+.registration-generating-keys .key-page-bottom .links a {
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-caption-small-regular);
+    margin-inline-start: 24px;
+}
+.registration-generating-keys .key-page-bottom .nav-elem.change-language {
+    background: transparent;
+    color: var(--mobile-text-primary);
+    cursor: pointer;
+    margin-inline-start: 16px;
+}
+.registration-generating-keys .key-page-bottom .nav-elem.change-language .primary-text {
+    font: var(--mobile-font-link-large-semibold);
+    text-decoration: underline;
+}
+
+@media screen and (orientation: landscape) {
+    body.mobile .registration-generating-keys .overlay-wrap .image {
+        max-height: 50%;
+        max-width: 30%;
+        padding: 8px 8px 0;
+    }
+}

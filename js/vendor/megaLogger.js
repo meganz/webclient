@@ -315,7 +315,7 @@
             const logPath = this.getLoggerPath();
             const levelName = _intToLevel[level] || "\u{1F9E9}";
 
-            if (options.printDate !== false) {
+            if (options.printDate !== false && level < 0xff80) {
                 const logDate = options.dateFormatter(new Date());
                 if (logDate) {
                     logLine.push(logDate, logSeparator);

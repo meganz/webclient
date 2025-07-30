@@ -385,9 +385,7 @@ lazy(mega.devices, 'ui', () => {
                 }
 
                 if (M.currentrootid === rootId) {
-                    if (M.megaRender) {
-                        M.megaRender.revokeDOMNode(handle, true);
-                    }
+                    ui.safeRevokeDOMNode(handle, true);
                     ui.render(M.currentdirid, {isRefresh: true});
                 }
             };
@@ -1031,9 +1029,7 @@ lazy(mega.devices, 'ui', () => {
                 device.name = data[device.h];
             }
 
-            if (M.megaRender) {
-                M.megaRender.revokeDOMNode(handle, true);
-            }
+            this.safeRevokeDOMNode(handle);
 
             if (M.onDeviceCenter) {
                 this.render(M.currentdirid, {isRefresh: true});
@@ -1706,9 +1702,7 @@ lazy(mega.devices, 'ui', () => {
                                 delete M.dcd[device.h];
                             }
 
-                            if (M.megaRender) {
-                                M.megaRender.revokeDOMNode(handle, true);
-                            }
+                            this.safeRevokeDOMNode(handle, true);
 
                             hasToRender = true;
                         }
@@ -1721,6 +1715,26 @@ lazy(mega.devices, 'ui', () => {
             }
             else {
                 this.removedNodeHandles.add(handle);
+            }
+        }
+
+        /**
+         * Removes node from UI and add it to selection (if not skipped)
+         * @param {String} handle - node handle
+         * @param {Boolean} skipSelection - whether to add node to selection or not
+         * @returns {void}
+         */
+        safeRevokeDOMNode(handle, skipSelection) {
+            if (M.megaRender) {
+                if (selectionManager) {
+                    if (skipSelection) {
+                        selectionManager.remove_from_selection(handle);
+                    }
+                    else if (selectionManager.get_selected().includes(handle)) {
+                        selectionManager.add_to_selection(handle);
+                    }
+                }
+                M.megaRender.revokeDOMNode(handle, true);
             }
         }
 
@@ -1754,10 +1768,7 @@ lazy(mega.devices, 'ui', () => {
         _updateDataAndUI(folder, node) {
             const newFolder = mega.devices.data.Parser.buildDeviceFolder(folder, node);
             M.dcd[newFolder.d].folders[newFolder.h] = newFolder;
-
-            if (M.megaRender) {
-                M.megaRender.revokeDOMNode(newFolder.h, true);
-            }
+            this.safeRevokeDOMNode(newFolder.h);
         }
 
         /**
@@ -2323,11 +2334,12 @@ lazy(mega.devices, 'ui', () => {
                     const {device, folder} = this.getCurrentDirData();
 
                     for (let i = 0; i < outdated.length; i++) {
-                        if (M.currentdirid === rootId || !device && outdated[i].device) {
-                            M.megaRender.revokeDOMNode(outdated[i].device, true);
+                        const outdatedItem = outdated[i];
+                        if (M.currentdirid === rootId || !device && outdatedItem.device) {
+                            this.safeRevokeDOMNode(outdatedItem.device, outdatedItem.isDeleted);
                         }
-                        else if (!folder && device.h === outdated[i].device) {
-                            M.megaRender.revokeDOMNode(outdated[i].folder, true);
+                        else if (!folder && device.h === outdatedItem.device) {
+                            this.safeRevokeDOMNode(outdatedItem.folder, outdatedItem.isDeleted);
                         }
                     }
                 }

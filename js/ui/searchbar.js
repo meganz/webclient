@@ -304,6 +304,33 @@ lazy(mega.ui, 'searchbar', () => {
     };
 
     /**
+     * Callback function to handle the rendering of a search item thumbnail.
+     *
+     * @param {Object} d - The mega node.
+     * @param {HTMLElement} resultBodyContainer - The container element where the search results are displayed.
+     * @param {string} fileIconSelector - The CSS selector for the file icon element within the search result item.
+     * @returns {undefined}
+     *
+     * This function:
+     * - Locates the search result item in the DOM using its `data-id` attribute.
+     * - Retrieves the thumbnail URI for the file using thumbnails map node's fa property.
+     * - Updates the file icon element with the thumbnail image if available.
+     * - Adds appropriate classes to style the file icon and container.
+     */
+    function searchItemThumbnailCb(d, resultBodyContainer, fileIconSelector) {
+        const $item = $(`[data-id="${d.h}"]`, resultBodyContainer);
+        const thumbUri = thumbnails.get(d.fa);
+        if (thumbUri) {
+            const $fileIconContainer = $(fileIconSelector, $item);
+            const $fileIcon = $('.item-type-icon', $fileIconContainer);
+            const $imgNode = $('img', $fileIcon);
+            $imgNode.attr('src', thumbUri);
+            $fileIcon.addClass('no-background');
+            $fileIconContainer.addClass('thumb');
+        }
+    }
+
+    /**
      * Initialises the top searchbars and events attached to them
      *
      * @param {string} [currentPage] - the current page/location/URL
@@ -872,11 +899,10 @@ lazy(mega.ui, 'searchbar', () => {
             }
 
             $item.removeClass('dropdown-search-results-item-template hidden');
-            $item.attr('id', node.h);
+            $item.attr('data-id', node.h);
             $match.text(match);
             $suffix.text(suffix);
             $dir.text(dir);
-            $fileIcon.addClass(`icon-${fileIcon(node)}-24`);
 
             if (mega.sensitives.isSensitive(node)) {
                 $item.addClass('is-sensitive');
@@ -885,7 +911,11 @@ lazy(mega.ui, 'searchbar', () => {
             if (thumbUri) {
                 const $imgNode = $('img', $fileIcon);
                 $imgNode.attr('src', thumbUri);
+                $fileIcon.addClass('no-background');
                 $fileIconContainer.addClass('thumb');
+            }
+            else {
+                $fileIcon.addClass(`icon-${fileIcon(node)}-24`);
             }
 
             return $item.prop('outerHTML');
@@ -901,8 +931,18 @@ lazy(mega.ui, 'searchbar', () => {
             $resultSearchBody.safeAppend(item);
         }
 
+        fm_thumbnails(
+            'standalone',
+            nodes,
+            d => searchItemThumbnailCb(
+                d,
+                $resultSearchBody,
+                '.dropdown-search-results-item-file-icon'
+            )
+        );
+
         $('.dropdown-search-results-item', $dropdownResults).rebind('click.searchbar', (e) => {
-            let h = $(e.currentTarget).attr('id');
+            let h = $(e.currentTarget).attr('data-id');
             const n = M.getNodeByHandle(h);
 
             hideDropdown();
@@ -976,10 +1016,9 @@ lazy(mega.ui, 'searchbar', () => {
 
         $dropdownRecentlyOpened.removeClass('hidden');
 
-        const makeRecentlyOpenedFileItem = ({h: handle, e: editable}) => {
+        const makeRecentlyOpenedFileItem = ({h: handle, e: editable}, node) => {
 
             // TODO: FIX SHARED LOGIC + ASYNC CONVERT
-            const node = M.getNodeByHandle(handle);
             const parentNode = M.getNodeByHandle(node.p);
             const parentName = parentNode.h === M.RootID
                 ? l[1687]
@@ -1020,16 +1059,28 @@ lazy(mega.ui, 'searchbar', () => {
         $recentlyOpenedBody.empty();
 
         const recentlyOpenedArr = [...recentlyOpened.files.values()];
+        // do not change the order of this array
+        const recentlyOpenedNodesArr = recentlyOpenedArr.map(({h}) => M.getNodeByHandle(h));
 
-        for (let i = recentlyOpenedArr.length - 1, nb = 0;
+        for (let i = recentlyOpenedNodesArr.length - 1, nb = 0;
             i >= 0 && nb < recentlyOpened.numFilesInView;
             i--, nb++) {
-            const n = M.getNodeByHandle(recentlyOpenedArr[i].h);
+            const n = recentlyOpenedNodesArr[i];
             if (n && (mega.sensitives.showGlobally || !mega.sensitives.isSensitive(n))) {
-                const item = makeRecentlyOpenedFileItem(recentlyOpenedArr[i]);
+                const item = makeRecentlyOpenedFileItem(recentlyOpenedArr[i], n);
                 $recentlyOpenedBody.safeAppend(item);
             }
         }
+
+        fm_thumbnails(
+            'standalone',
+            recentlyOpenedNodesArr,
+            d => searchItemThumbnailCb(
+                d,
+                $recentlyOpenedBody,
+                '.dropdown-recently-opened-item-file-icon'
+            )
+        );
 
         $fileSearch = $fileSearch || $('.js-filesearcher', $topbar);
 

@@ -1270,6 +1270,8 @@ class MegaGallery {
             this.setMode(mega.gallery.lastModeSelected, 2);
         }
 
+        this.clearSelections();
+
         const rfBlock = $('.fm-right-files-block:not(.in-chat)', '.fmholder');
         const galleryHeader = $('#media-section-controls', rfBlock).add('#media-section-right-controls', rfBlock);
 

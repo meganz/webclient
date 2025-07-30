@@ -1051,7 +1051,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         'vpn': "https://mega.io/vpn",
         'vpn#dow': "https://mega.io/vpn#downloadapps",
         'pass': "https://mega.io/pass",
-        'pass#dow': "https://mega.io/pass#downloadapps",
+        'pass#dow': "https://mega.io/pass#downloadapp",
     };
 
     const mega_io_hyperlinks = Object.create(null);

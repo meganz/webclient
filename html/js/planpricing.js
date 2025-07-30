@@ -406,10 +406,12 @@ lazy(pro, 'proplan2', () => {
             }
             else if (tab === 3 && tabAvailable('vpn')) {
                 if (!tabsInfo.vpn.initialized) {
-                    tabsInfo.vpn.$planCards = pro.proplan2.vpn.renderPricingPage(VpnPlanFound, $page, (months, al) => {
-                        sessionStorage.setItem('pro.period', String(months));
-                        moveToBuyStep(al);
-                    });
+                    tabsInfo.vpn.$planCards = pro.proplan2.vpn
+                        .renderPricingPage(VpnPlanFound, $page, (months, al, trial) => {
+                            sessionStorage.setItem('pro.period', String(months));
+                            sessionStorage[`noTrial${al}`] = !trial;
+                            moveToBuyStep(al);
+                        });
                     tabsInfo.vpn.initialized = true;
                     tabsInfo.vpn.updateTabVisibility();
                     tabsInfo.vpn.requiresUpdate = true;
@@ -418,10 +420,12 @@ lazy(pro, 'proplan2', () => {
             }
             else if (tab === 4 && tabAvailable('pwm')) {
                 if (!tabsInfo.pwm.initialized) {
-                    tabsInfo.pwm.$planCards = pro.proplan2.pwm.renderPricingPage(PwmPlanFound, $page, (months, al) => {
-                        sessionStorage.setItem('pro.period', String(months));
-                        moveToBuyStep(al);
-                    });
+                    tabsInfo.pwm.$planCards = pro.proplan2.pwm
+                        .renderPricingPage(PwmPlanFound, $page, (months, al, trial) => {
+                            sessionStorage.setItem('pro.period', String(months));
+                            sessionStorage[`noTrial${al}`] = !trial;
+                            moveToBuyStep(al);
+                        });
                     tabsInfo.pwm.initialized = true;
                     tabsInfo.pwm.updateTabVisibility();
                     tabsInfo.pwm.requiresUpdate = true;

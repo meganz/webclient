@@ -271,7 +271,7 @@ lazy(pro.proplan2, 'vpn', () => {
                     const feature = {
                         btnText: trial
                             ? mega.icu.format(l.try_free_for_days, trial.days)
-                            : l.buy_plan.replace('%1', l.mega_vpn),
+                            : l.pr_buy_vpn,
                         clickName: 'vpnPricing',
                         title: pro.propay.getRecurringDurationWording(months),
                         classes,
@@ -281,7 +281,7 @@ lazy(pro.proplan2, 'vpn', () => {
                         taxedPrice: taxInfo
                             ? taxInfo.taxedPrice / months
                             : priceMonthly,
-                        onclick: callback.bind(null, months, level)
+                        onclick: callback.bind(null, months, level, trial)
                     };
 
                     const dealHeader = months === 24 && 'subheading1'
@@ -389,7 +389,7 @@ lazy(pro.proplan2, 'pwm', () => {
                     const feature = {
                         btnText: trial
                             ? mega.icu.format(l.try_free_for_days, trial.days)
-                            : l.buy_plan.replace('%1', l.mega_pwm),
+                            : l.pr_buy_pass,
                         clickName: 'pwmPricing',
                         title: pro.propay.getRecurringDurationWording(months),
                         classes,
@@ -399,7 +399,7 @@ lazy(pro.proplan2, 'pwm', () => {
                         taxedPrice: taxInfo
                             ? taxInfo.taxedPrice / months
                             : priceMonthly,
-                        onclick: callback.bind(null, months, level)
+                        onclick: callback.bind(null, months, level, trial)
                     };
 
                     const dealHeader = months === 24 && 'subheading1'

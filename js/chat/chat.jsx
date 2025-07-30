@@ -2983,11 +2983,11 @@ Chat.prototype.fetchSoundBuffer = async function(sound) {
     if (this.SOUNDS.buffers[sound]) {
         return this.SOUNDS.buffers[sound].slice();
     }
-    let res = await M.xhr({url: `${staticpath}sounds/${sound}.mp3`, type: 'arraybuffer'}).catch(() => {
+    let res = await M.xhr({url: `${staticpath}media/${sound}.mp3`, type: 'arraybuffer'}).catch(() => {
         console.warn('Failed to fetch sound .mp3 file', sound);
     });
     if (!res) {
-        res = await M.xhr({ url: `${staticpath}sounds/${sound}.ogg`, type: 'arraybuffer' }).catch(() => {
+        res = await M.xhr({url: `${staticpath}media/${sound}.ogg`, type: 'arraybuffer'}).catch(() => {
             console.error('Failed to fetch sound .ogg file', sound);
         });
     }

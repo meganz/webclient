@@ -101,7 +101,7 @@
         textMessages: {
         },
         sounds: [],
-        soundsPath: staticpath + "sounds/",
+        soundsPath: `${staticpath}media/`,
         soundsPreload: true,
         soundsVolume: 0.07,
         showFaviconCounter: false,

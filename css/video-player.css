@@ -29,9 +29,6 @@
         display: inline-flex;
         position: relative;
     }
-    .media-viewer .video-block {
-        width: 100%;
-    }
     .media-viewer button {
         --mask-color: var(--icon-rest);
         appearance: none;
@@ -39,6 +36,9 @@
         border: 0;
         cursor: pointer;
         outline: none;
+    }
+    .media-viewer-container .video .video-block {
+        width: 100%;
     }
     .media-viewer button:hover,
     .media-viewer button.active {

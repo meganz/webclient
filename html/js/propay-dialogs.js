@@ -2405,7 +2405,12 @@ var addressDialog = {
     redirectToSite: function(utcResult) {
 
         var url = utcResult.EUR['url'];
-        window.location = url + '?lang=' + lang;
+        if (pro.propay.currentGateway && pro.propay.currentGateway.gatewayId === 16) {
+            window.location = url;
+        }
+        else {
+            window.location = url + '?lang=' + lang;
+        }
     },
 
     /**

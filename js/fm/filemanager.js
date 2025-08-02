@@ -177,15 +177,15 @@ function FileManager() {
                 M.columnsWidth.cloud.fav.viewed = false;
             }
 
+            const path = String(M.currentdirid).split('/');
             if (M.onDeviceCenter) {
-                const path = M.currentdirid.split('/');
                 if (path.length === 3 && sharer(path[2])) {
                     M.columnsWidth.cloud.fav.disabled = true;
                     M.columnsWidth.cloud.fav.viewed = false;
                 }
             }
 
-            if (M.currentrootid === 's4' && M.d[M.currentdirid.split('/').pop()]) {
+            if (M.currentrootid === 's4' && M.d[path.pop()]) {
                 M.columnsWidth.cloud.accessCtrl.viewed = true;
                 M.columnsWidth.cloud.accessCtrl.disabled = false;
             }

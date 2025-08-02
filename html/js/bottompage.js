@@ -279,7 +279,9 @@ var bottompage = {
         var $body = $('body');
 
         $('#startholder').rebind('scroll.bottompage', function() {
-            sessionStorage.setItem('scrpos' + MurmurHash3(page).toString(16), $(this).scrollTop() | 0);
+            tryCatch(() => {
+                sessionStorage.setItem(`scrpos${MurmurHash3(page).toString(16)}`, $(this).scrollTop() | 0);
+            })();
             if (page === 'download') {
                 $(window).unbind('resize.download-bar');
             }

@@ -1601,15 +1601,34 @@ var notify = {
 
                 const newPlan = pro.getProPlanName(newPlanLevel);
                 const currentPlan = pro.getProPlanName(u_attr.p);
-                const plansEndingAfterPurchase = getPlansEndingAfterPurchase();
-                const bodyText = plansEndingAfterPurchase < 2
-                    ? l.welcome_dialog_active_until
-                    : l.welcome_dialog_active_check;
+
+                let bodyText = l.welcome_dialog_active_check;
+                if (getPlansEndingAfterPurchase() < 2) {
+                    bodyText = l.welcome_dialog_active_until;
+
+                    if (!purchaseEndTime) {
+                        console.assert(account.stype === 'S' || !account.srenew);
+
+                        if (account.srenew) {
+                            purchaseEndTime = account.srenew[0];
+                        }
+                        else {
+                            const data = pro.proplan.planData;
+                            if (data) {
+                                purchaseEndTime = data.nextplan ? data.nextplan.t : data.suntil;
+                            }
+                        }
+                    }
+                    purchaseEndTime = purchaseEndTime && time2date(purchaseEndTime, 1);
+
+                    console.assert(purchaseEndTime);
+                    bodyText = bodyText.replace('%3', purchaseEndTime || '');
+                }
+
                 msgDialog('warninga', '',
                           l.welcome_dialog_thanks_for_sub.replace('%1', newPlan),
                           bodyText
                               .replace('%1', currentPlan)
-                              .replace('%3', time2date(purchaseEndTime || account.srenew[0], 1))
                               .replace('%2', newPlan));
                 return;
             }

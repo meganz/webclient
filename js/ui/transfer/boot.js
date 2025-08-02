@@ -205,6 +205,9 @@ mBroadcaster.once('boot_done', () => {
             promise.tryCatch = promise.then;
             return promise;
         },
+        safeShowDialog(name) {
+            msgDialog('warninga', l[16], l[20858], `Ref: ${name}`);
+        },
         getNodeShare: dummy,
         getS4NodeType: dummy,
         importWelcomePDF: dummy,

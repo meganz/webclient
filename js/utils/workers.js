@@ -60,7 +60,7 @@ function CreateWorkers(url, message, size) {
     };
 
     const reportError = tryCatch((ex, loc) => {
-        if (sessionStorage.wrkex) {
+        if (sessionStorage.wrkex || !(buildVersion.timestamp * 1000 + 3e8 > Date.now())) {
             return;
         }
         sessionStorage.wrkex = 1;

@@ -196,4 +196,16 @@ mBroadcaster.once('boot_done', function populate_lx() {
         .replace('[/A1]', '</a>')
         .replace('[A2]', '<a href="mailto:copyright@transfer.it" target="_blank" class="clickurl link">')
         .replace('[/A2]', '</a>');
+
+    if (self.is_transferit) {
+        for (const k in self.l) {
+            if (typeof self.l[k] === 'string') {
+                if (self.l[k].includes('@mega.')) {
+
+                    self.l[k] = self.l[k].replace(/@mega[\w.]+/, '@transfer.it');
+                }
+                self.l[k] = self.l[k].replace(/\[\/?\w+]/g, '');
+            }
+        }
+    }
 });

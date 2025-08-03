@@ -333,7 +333,7 @@ mBroadcaster.once('startMega', tryCatch(() => {
     const {mecmatst} = sessionStorage;
     const {buildOlderThan10Days, eventlog = nop, is_karma, is_extension} = window;
 
-    if (is_karma || is_extension !== false) {
+    if (is_karma || is_extension !== false || self.is_transferit) {
         return;
     }
     scriptTest(

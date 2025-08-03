@@ -41,7 +41,7 @@
         const scope = wrapperNode
             || document.querySelector('.fm-right-files-block .fm-right-header .fm-breadcrumbs-wrapper');
 
-        if (typeof scope !== 'object') {
+        if (!(scope && scope.parentNode)) {
             console.assert(false, 'invalid scope');
             return;
         }

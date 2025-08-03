@@ -937,6 +937,14 @@
         setup(cfg);
     });
 
+    Object.defineProperty(window, 'fmconfig', {
+        get() {
+            console.error('fmconfig is not initialized...');
+            return Object.create(null);
+        },
+        configurable: true
+    });
+
     if (is_karma) {
         mega.config = ns;
     }

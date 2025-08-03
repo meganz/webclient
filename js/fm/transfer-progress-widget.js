@@ -312,6 +312,7 @@ mega.tpw = new function TransferProgressWidget() {
         if (!initUI()) {
             return;
         }
+        const page = String(self.page || '');
 
         // pages to hide always
         if (page.indexOf('transfers') !== -1 || page.indexOf('register') !== -1 || page.indexOf('download') !== -1) {

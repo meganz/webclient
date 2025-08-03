@@ -2096,7 +2096,9 @@ var slideshowid;
                     p.appendChild(newIframe);
                 }
             }
-
+            if (!newIframe.contentWindow) {
+                throw EINCOMPLETE;
+            }
             const doc = newIframe.contentWindow.document;
             // eslint-disable-next-line local-rules/open
             doc.open();

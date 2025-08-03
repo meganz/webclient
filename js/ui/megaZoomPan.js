@@ -96,7 +96,7 @@ class MegaZoomPan {
 
         // Set percents value in DOM node
         const setVal = (val) => {
-            const tip = this.slider.querySelector('.ui-slider-handle .mv-zoom-slider');
+            const tip = this.slider && this.slider.querySelector('.ui-slider-handle .mv-zoom-slider');
 
             if (tip) {
                 tip.textContent = formatPercentage(

@@ -219,7 +219,15 @@ var notify = {
         }
 
         switch (notification.a || notification.t) {
-            case 'put':
+            case 'put': {
+                if (
+                    !mega.notif.has('cloud_enabled') ||
+                    u_attr.s4 && notification.n && M.getNodeRoot(notification.n) === 's4'
+                ) {
+                    return true;
+                }
+                break;
+            }
             case 'share':
             case 'dshare':
                 if (!mega.notif.has('cloud_enabled')) {
@@ -283,7 +291,10 @@ var notify = {
                 break;
 
             case 'puu':
-                if (mega.notif.has('cloud_upload')) {
+                if (
+                    mega.notif.has('cloud_upload') ||
+                    u_attr.s4 && notification.n && M.getNodeRoot(notification.n) === 's4'
+                ) {
                     return true;
                 }
                 break;

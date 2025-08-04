@@ -46,6 +46,13 @@ MegaData.prototype.renderMain = function(aUpdate) {
         this.rmSetupUI(aUpdate, aUpdate ? !!$.dbOpenHandle : false);
     }
 
+    if (mega.ui.secondaryNav && M.v.length && mega.ui.mNodeFilter.viewEnabled) {
+        mega.ui.secondaryNav.extShowFilterChip();
+    }
+    else if (mega.ui.secondaryNav) {
+        mega.ui.secondaryNav.extHideFilterChip();
+    }
+
     this.initShortcutsAndSelection(container, aUpdate);
 
     if (!container || typeof container === 'string') {

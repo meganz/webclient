@@ -136,12 +136,24 @@ class MegaTopMenu extends MegaMobileTopMenu {
             {
                 text: l.shared_items,
                 icon: 'sprite-fm-mono icon-folder-users-thin-outline',
-                href: '/fm/shares',
                 hasTree: 'shared-with-me', // hidden tree for copy dialog
                 treeWrapClass: 'hidden-tree',
                 name: 'shares',
                 typeClassname: 'drive',
-                eventLog: 500641
+                eventLog: 500641,
+                binding: () => {
+                    console.assert(self.fminitialized);
+                    loadSubPage(localStorage.sihp || 'fm/shares');
+                }
+            },
+            {
+                text: l.device_centre,
+                icon: 'sprite-fm-mono icon-devices-thin-outline',
+                href: '/fm/device-centre',
+                treeWrapClass: 'js-device-centre-tree-panel',
+                name: 'device-centre',
+                typeClassname: 'drive',
+                eventLog: 500613
             },
             {
                 type: 'spacer',
@@ -194,16 +206,6 @@ class MegaTopMenu extends MegaMobileTopMenu {
                 eventLog: 500447
             });
 
-            loggedInCD.splice(3, 0, {
-                text: l.device_centre,
-                icon: 'sprite-fm-mono icon-devices-thin-outline',
-                href: '/fm/device-centre',
-                treeWrapClass: 'js-device-centre-tree-panel',
-                name: 'device-centre',
-                typeClassname: 'drive',
-                eventLog: 500613
-            });
-
             loggedInCD.splice(5, 0, {
                 text: l[20141],
                 icon: 'sprite-fm-mono icon-clock-thin-outline',
@@ -224,7 +226,7 @@ class MegaTopMenu extends MegaMobileTopMenu {
         // @todo: Show button for business account with activated S4 when ready
         // if (!(u_attr.b && !u_attr.s4)) {
         if (!u_attr.b) {
-            loggedInCD.splice(mega.lite.inLiteMode ? 1 : 4, 0, {
+            loggedInCD.splice(mega.lite.inLiteMode ? 3 : 4, 0, {
                 autoExpand: true,
                 text: l.obj_storage,
                 icon: 'sprite-fm-mono icon-bucket-triangle-thin-outline',

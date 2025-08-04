@@ -696,6 +696,17 @@
             mega.ui.secondaryNav.updateGalleryLayout(pfid);
             mega.ui.secondaryNav.updateLayoutButton();
         }
+
+        // In MEGA Lite mode, remove this temporary class
+        if (mega.lite.inLiteMode) {
+            $('.files-grid-view.fm').removeClass('mega-lite-hidden');
+
+            // Redirect disabled sections
+            if (mega.lite.disabledSections[id]) {
+                cv = false;
+                id = this.RootID;
+            }
+        }
         $('.fm-right-account-block, .fm-right-block, .fm-filter-chips-wrapper').addClass('hidden');
 
         this.chat = false;
@@ -1015,11 +1026,6 @@
                 });
                 M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
             }
-        }
-
-        // In MEGA Lite mode, remove this temporary class
-        if (mega.lite.inLiteMode) {
-            $('.files-grid-view.fm').removeClass('mega-lite-hidden');
         }
 
         _openFolderCompletion.call(this, id = cv.original || id, isFirstOpen);

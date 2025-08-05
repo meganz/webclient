@@ -2172,6 +2172,11 @@ function closeDialog(ev) {
         $('.mega-dialog.create-folder-dialog, .mega-dialog.s4-create-bucket-dialog').addClass('hidden');
         $('.mega-dialog.create-folder-dialog .create-folder-size-icon').removeClass('hidden');
     }
+    else if ($.dialog === 'start-group-chat' && ($.copyDialog || $.sendToChatDialog)) {
+        $('.mega-dialog.fm-picker-dialog').removeClass('arrange-to-back');
+        fm_showoverlay();
+        delete $.dialog;
+    }
     else if (($.dialog === 'slideshow') && $.copyrightsDialog) {
         $('.copyrights-dialog').addClass('hidden');
 
@@ -2288,6 +2293,8 @@ function closeDialog(ev) {
         delete $.saveToDialogNode;
         delete $.saveToDialog;
         delete $.chatAttachmentShare;
+        delete $.sendToChatDialog;
+        delete $.dialogSelChats;
 
         if ($.saveToDialogPromise) {
             if (typeof $.saveToDialogPromise === 'function') {
@@ -2319,6 +2326,12 @@ function closeDialog(ev) {
                 mega.ui.onboarding.$hotSpotNode.removeClass('onboarding-hotspot-animation-rect');
             }
         }
+
+        if ($.cpdGroupChat && megaChat) {
+            megaChat.off('onNewGroupChatRequest.cpd');
+            megaChat.off('onRoomInitialized.cpd');
+        }
+        delete $.cpdGroupChat;
     }
     $('.mega-dialog, .overlay.arrange-to-back, .mega-dialog-container.common-container').removeClass('arrange-to-back');
     // $('.mega-dialog .dialog-sorting-menu').remove();
@@ -2355,10 +2368,10 @@ function closeDialog(ev) {
         $.dialog = $.propertiesDialog;
     }
 
-    if ($.copyDialog || $.moveDialog || $.selectFolderDialog || $.saveAsDialog) {
-        // the createfolder dialog was closed
+    if ($.copyDialog || $.moveDialog || $.selectFolderDialog || $.saveAsDialog || $.sendToChatDialog) {
+        // the createfolder/create group chat dialog was closed
         // eslint-disable-next-line local-rules/hints
-        $.dialog = $.copyDialog || $.moveDialog || $.selectFolderDialog || $.saveAsDialog;
+        $.dialog = $.copyDialog || $.moveDialog || $.selectFolderDialog || $.saveAsDialog || $.sendToChatDialog;
     }
 
     if ($.fingerprintDialog && $.shareCollaboratorsDialog && $.shareDialog) {

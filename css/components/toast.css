@@ -71,6 +71,7 @@
 
 .nav-elem.action-link.toast {
     color: var(--mobile-link-inverse);
+    cursor: pointer;
 }
 .nav-elem.action-link.toast span {
     font: var(--mobile-font-copy-semibold);

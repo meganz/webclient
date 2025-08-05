@@ -387,7 +387,7 @@
             containerWidth = Infinity;
         }
 
-        if (M.dyh && M.dyh('is-breadcrumb-root', items)) {
+        if (M.dyh && M.dyh('is-breadcrumb-root', items) && !container.closest('.fm-picker-dialog')) {
             isDyhRoot = true;
             containerWidth = Infinity;
         }

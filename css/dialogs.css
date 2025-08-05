@@ -1687,56 +1687,61 @@ body.de .mega-dialog.contact-picker-widget {
 .dialog-content-block {
     min-width: 100%;
 }
-.mega-dialog .fm-picker-dialog-tree-panel ul .nw-fm-tree-item {
+.mega-dialog.fm-picker-dialog .dialog-tree-panel-scroll ul .nw-fm-tree-item {
+    padding: 4px 0;
     padding-inline-start: 5px;
-    padding-inline-end: 5px;
-    margin-inline-end: 15px;
+    padding-inline-end: 40px;
     margin-top: 1px;
     margin-bottom: 1px;
+    border-left: transparent 4px solid;
 }
-.mega-dialog .fm-picker-dialog-tree-panel ul ul .nw-fm-tree-item {
+.rtl .mega-dialog.fm-picker-dialog .dialog-tree-panel-scroll ul .nw-fm-tree-item {
+    border-left: unset;
+    border-right: transparent 4px solid;
+}
+.mega-dialog.fm-picker-dialog .dialog-tree-panel-scroll ul ul .nw-fm-tree-item {
     padding-inline-start: 28px;
 }
-.mega-dialog .fm-picker-dialog-tree-panel ul ul ul .nw-fm-tree-item {
+.mega-dialog.fm-picker-dialog .dialog-tree-panel-scroll ul ul ul .nw-fm-tree-item {
     padding-inline-start: 52px;
 }
-.mega-dialog .fm-picker-dialog-tree-panel ul ul ul ul .nw-fm-tree-item {
+.mega-dialog.fm-picker-dialog .dialog-tree-panel-scroll ul ul ul ul .nw-fm-tree-item {
     padding-inline-start: 76px;
 }
-.mega-dialog .fm-picker-dialog-tree-panel ul ul ul ul ul .nw-fm-tree-item {
+.mega-dialog.fm-picker-dialog .dialog-tree-panel-scroll ul ul ul ul ul .nw-fm-tree-item {
     padding-inline-start: 100px;
 }
-.mega-dialog .fm-picker-dialog-tree-panel ul ul ul ul ul ul .nw-fm-tree-item {
+.mega-dialog.fm-picker-dialog .dialog-tree-panel-scroll ul ul ul ul ul ul .nw-fm-tree-item {
     padding-inline-start: 124px;
 }
-.mega-dialog .fm-picker-dialog-tree-panel ul ul ul ul ul ul ul .nw-fm-tree-item {
+.mega-dialog.fm-picker-dialog .dialog-tree-panel-scroll ul ul ul ul ul ul ul .nw-fm-tree-item {
     padding-inline-start: 148px;
 }
-.mega-dialog .fm-picker-dialog-tree-panel ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+.mega-dialog.fm-picker-dialog .dialog-tree-panel-scroll ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     padding-inline-start: 172px;
 }
-.mega-dialog .fm-picker-dialog-tree-panel ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+.mega-dialog.fm-picker-dialog .dialog-tree-panel-scroll ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     padding-inline-start: 196px;
 }
-.mega-dialog .fm-picker-dialog-tree-panel ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+.mega-dialog.fm-picker-dialog .dialog-tree-panel-scroll ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     padding-inline-start: 220px;
 }
-.mega-dialog .fm-picker-dialog-tree-panel ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+.mega-dialog.fm-picker-dialog .dialog-tree-panel-scroll ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     padding-inline-start: 244px;
 }
-.mega-dialog .fm-picker-dialog-tree-panel ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+.mega-dialog.fm-picker-dialog .dialog-tree-panel-scroll ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     padding-inline-start: 268px;
 }
-.mega-dialog .fm-picker-dialog-tree-panel ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+.mega-dialog.fm-picker-dialog .dialog-tree-panel-scroll ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     padding-inline-start: 292px;
 }
-.mega-dialog .fm-picker-dialog-tree-panel ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+.mega-dialog.fm-picker-dialog .dialog-tree-panel-scroll ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     padding-inline-start: 316px;
 }
-.mega-dialog .fm-picker-dialog-tree-panel ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+.mega-dialog.fm-picker-dialog .dialog-tree-panel-scroll ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     padding-inline-start: 340px;
 }
-.mega-dialog .fm-picker-dialog-tree-panel ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+.mega-dialog.fm-picker-dialog .dialog-tree-panel-scroll ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     padding-inline-start: 364px;
 }
 /* end of File/folder picker dialog */
@@ -2243,205 +2248,89 @@ body.de .mega-dialog.contact-picker-widget {
 
 /* fm-picker-dialog */
 
-    .mega-dialog.fm-picker-dialog {
-        width: 670px;
-    }
-    .mega-dialog.fm-picker-dialog .folder-container {
-        box-sizing: border-box;
-        display: flex;
-        height: 205px;
-        padding: 0;
-    }
-    .mega-dialog.fm-picker-dialog .fm-picker-dialog-list {
-        padding: 15px 0;
-    }
     .mega-dialog.fm-picker-dialog.arrange-to-back {
         z-index: 500;
     }
     .mega-dialog.fm-picker-dialog .fm-picker-breadcrumbs {
         white-space: nowrap;
+        width: 100%;
         max-width: 100%;
         overflow: hidden;
-        height: 32px;
+        height: 24px;
         display: flex;
         align-items: center;
-        --mask-color: var(--icon-rest);
+        --mask-color: var(--mobile-icon-primary);
+    }
+    .mega-dialog.fm-picker-dialog .fm-breadcrumbs-block {
+        transition: unset;
     }
     .mega-dialog.fm-picker-dialog .breadcrumb-dropdown.active {
         left: 4px;
+        border: 1px solid var(--mobile-border-strong);
+        border-radius: 16px;
+        min-width: 280px;
+        padding: 16px;
+    }
+    .mega-dialog.fm-picker-dialog .breadcrumb-dropdown.active a {
+        color: var(--mobile-text-primary);
+        cursor: default;
+        font: var(--mobile-font-copy-regular);
+        height: 40px;
+        opacity: 1;
+    }
+    .mega-dialog.fm-picker-dialog .breadcrumb-dropdown.active a:hover,
+    .mega-dialog.fm-picker-dialog .breadcrumb-dropdown.active a:active {
+        background: transparent;
     }
     .rtl .mega-dialog.fm-picker-dialog .breadcrumb-dropdown.active {
         left: auto;
         right: 4px;
     }
-    .mega-dialog.fm-picker-dialog .icon {
-        background-image: url(../images/mega/fm-main-sprite.png);
-        background-size: 48px auto;
-        background-repeat: no-repeat;
-        width: 24px;
-        height: 24px;
-    }
-    .mega-dialog.fm-picker-dialog .summary-container {
-        width: 100%;
-        height: auto;
-        position: relative;
-    }
-    .mega-dialog.fm-picker-dialog .summary-row {
-        margin: 24px;
-        position: relative;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-    }
-    .mega-dialog.fm-picker-dialog.whitespaces.duplicate .summary-row.summary-selected {
-        height: 100px;
-    }
-    .mega-dialog.fm-picker-dialog.whitespaces:not(.duplicate) .summary-row.summary-selected {
-        height: 80px;
-    }
-    .mega-dialog.fm-picker-dialog.duplicate:not(.whitespaces) .summary-row.summary-selected {
-        height: 50px;
-    }
-    .mega-dialog.fm-picker-dialog .summary-row.unfold {
-        align-items: flex-start;
-    }
-    .mega-dialog.fm-picker-dialog .summary-row .summary-title {
-        font: var(--text-body1);
-        color: var(--text-color-high);
-        padding-inline-end: 12px;
-        box-sizing: border-box;
-        width: 30%;
-        position: relative;
-        text-align: start;
-        vertical-align: top;
-    }
-    .mega-dialog.fm-picker-dialog .summary-row.unfold .summary-title {
-        top: 6px;
-    }
-    .mega-dialog.fm-picker-dialog .summary-row .summary-input {
-        width: 70%;
-        height: 32px;
-        max-height: 130px;
-        border-radius: 3px;
-        box-sizing: border-box;
-        padding: 0;
-        font: var(--text-body1);
-        position: relative;
-        vertical-align: middle;
-        transition: 0.1s;
-    }
-    .mega-dialog.fm-picker-dialog .summary-row .summary-input.unfold {
-        height: auto;
-    }
-    .mega-dialog.fm-picker-dialog .summary-input .item-row {
-        width: 100%;
-        position: relative;
-        transition: 0.1s;
-        box-sizing: border-box;
-        left: 0;
-        height: 30px;
-        line-height: 30px;
-        white-space: nowrap;
-        vertical-align: middle;
-        overflow: hidden;
-        bottom: 0;
-    }
-    .rtl .mega-dialog.fm-picker-dialog .summary-input .item-row {
-        left: auto;
-        right: 0;
-    }
-    .mega-dialog.fm-picker-dialog .summary-input .item-row:hover {
-        border: var(--stroke-grey-1);
-        border-radius: 3px;
-    }
-    .mega-dialog.fm-picker-dialog .summary-input .summary-ff-name,
-    .mega-dialog.fm-picker-dialog .summary-input .summary-ff-name-ellipsis {
-        height: 30px;
-        max-width: 280px;
-        line-height: 30px;
-        margin-inline-start: 36px;
-        position: relative;
-        display: inline-block;
-        white-space: nowrap;
-        vertical-align: top;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    .mega-dialog.fm-picker-dialog .folder-container {
-        width: 100%;
-        height: 280px;
-        position: relative;
-    }
-    .mega-dialog.fm-picker-dialog .user-card-email.small.note {
-        background: var(--surface-grey-1);
-        border-radius: 0 0 12px 12px;
-        color: var(--text-color-high);
-        font: var(--text-body2);
-        padding: 8px 16px;
-        position: relative;
-        text-align: center;
-        z-index: 123;
-    }
-    .mega-dialog.fm-picker-dialog .dropdown.contact-preview,
-    .mega-dialog.fm-picker-dialog .dropdown.contact-preview .contacts-info.body,
-    .mega-dialog.fm-picker-dialog .dropdown.contact-preview .user-card-data {
-        padding: 0;
-    }
-    .mega-dialog.fm-picker-dialog .dropdown.contact-preview .user-card-wrap {
-        padding: 12px;
-    }
-    .mega-dialog.fm-picker-dialog .dropdown.contact-preview .avatar-wrapper {
-        margin: 1px 0;
-        margin-inline-end: 8px;
-    }
-    .mega-dialog.fm-picker-dialog .summary-items.multi {
-        cursor: pointer;
-    }
     .mega-dialog.fm-picker-dialog .fm-breadcrumbs {
-        cursor: pointer;
+        cursor: default;
         height: 32px;
-        text-decoration: none !important;
-        color: var(--text-color-medium);
+        text-decoration: none;
+        color: var(--mobile-text-primary);
+        font: var(--mobile-font-caption-large-regular);
         min-width: 42px;
     }
-    .mega-dialog.fm-picker-dialog .summary-input.high-light .fm-picker-breadcrumbs {
-        display: none;
-    }
-    .mega-dialog.fm-picker-dialog .item-row .summary-status {
-        height: 32px;
-        line-height: 31px;
+    .mega-dialog.fm-picker-dialog .fm-picker-breadcrumbs .crumb-overflow-link {
+        color: var(--mobile-text-primary);
+        font: var(--mobile-font-caption-large-regular);
+        background: transparent;
         padding: 0;
-        padding-inline-end: 10px;
-        padding-inline-start: 36px;
-        position: relative;
-        display: block;
-        white-space: nowrap;
-        vertical-align: top;
+    }
+    .mega-dialog.fm-picker-dialog .fm-picker-breadcrumbs .crumb-overflow-link .breadcrumb-dropdown-link {
+        display: flex;
+        align-items: center;
+    }
+    .mega-dialog.fm-picker-dialog .fm-picker-breadcrumbs .crumb-overflow-link i {
+        margin: 0;
+        --mask-color: var(--mobile-icon-primary);
+    }
+    .mega-dialog.fm-picker-dialog .fm-picker-breadcrumbs .right-arrow-bg {
+        font: var(--mobile-text-primary);
         overflow: hidden;
         text-overflow: ellipsis;
+        padding: 0;
     }
-    .mega-dialog.fm-picker-dialog .summary-input .item-row:first-child .summary-ff-name {
-        max-width: 250px;
+    .mega-dialog.fm-picker-dialog .fm-picker-breadcrumbs i.icon-chevron-right-thin-outline {
+        margin: 0 4px;
+        --mask-color: var(--mobile-icon-primary);
     }
-    .mega-dialog.fm-picker-dialog .summary-input .item-row:first-child .summary-ff-name-ellipsis {
-        max-width: 210px;
-        text-overflow: ellipsis;
-    }
-    .mega-dialog.fm-picker-dialog .summary-input .item-row .delete-item {
-        position: absolute;
-        right: 8px;
-        top: 4px;
-        display: none;
-        --mask-color: var(--icon-rest);
-        --icon-size: 24px;
+    .mega-dialog.fm-picker-dialog .fm-picker-breadcrumbs button.crumb-clear-sel {
+        background: transparent;
+        border-radius: 4px;
         cursor: pointer;
+        padding: 4px;
+        --icon-size: 16px;
+        --mask-color: var(--mobile-icon-primary);
     }
-    .rtl .mega-dialog.fm-picker-dialog .summary-input .item-row .delete-item {
-        right: auto;
-        left: 8px;
+    .mega-dialog.fm-picker-dialog .fm-picker-breadcrumbs button.crumb-clear-sel:hover {
+        background: var(--mobile-button-secondary-hover);
     }
-    .mega-dialog.fm-picker-dialog .summary-input .item-row .delete-item:hover {
-        --mask-color: var(--icon-active);
+    .mega-dialog.fm-picker-dialog .fm-picker-breadcrumbs button.crumb-clear-sel:active {
+        background: var(--mobile-button-secondary-pressed);
     }
     .mega-dialog.fm-picker-dialog .summary-input .item-row span {
         left: 0;
@@ -2468,394 +2357,132 @@ body.de .mega-dialog.contact-picker-widget {
         left: auto;
         right: 0;
     }
-    .mega-dialog.fm-picker-dialog .summary-row .summary-input .icon {
-        display: inline-block;
-        vertical-align: top;
-        margin: 4px 0 0 0;
-        margin-inline-end: 4px;
-        margin-inline-start: 8px;
-    }
-    .mega-dialog.fm-picker-dialog .summary-input .ff-name {
-        display: inline-block;
-        vertical-align: top;
-        line-height: 32px;
-        max-width: 90px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    .mega-dialog.fm-picker-dialog .summary-row > .icon {
-        position: absolute;
-        right: 0;
-        border-radius: 4px;
-        border: var(--stroke-grey-2);
+    .mega-dialog.fm-picker-dialog .folder-container .dialog-tree-panel-scroll {
         box-sizing: border-box;
-        background: var(--surface-main);
-        cursor: pointer;
-        opacity: 0.6;
-    }
-    .rtl .mega-dialog.fm-picker-dialog .summary-row > .icon {
-        right: auto;
-        left: 0;
-    }
-    .mega-dialog.fm-picker-dialog .summary-row > .icon:hover {
-        opacity: 0.8;
-    }
-    .mega-dialog.fm-picker-dialog .summary-row .drop-down {
-        top: 4px;
-    }
-    .mega-dialog.fm-picker-dialog .summary-row .drop-up {
-        bottom: 4px;
-    }
-    .mega-dialog.fm-picker-dialog .summary-row .add-more-img.icon {
-        bottom: 4px;
-    }
-    .mega-dialog.fm-picker-dialog .side-pane {
-        position: relative;
-        width: 56px;
-        height: 280px;
-        box-sizing: border-box;
-        display: inline-block;
-        border-right: 1px solid var(--stroke-grey-2);
-        flex-grow: 0;
-        flex-shrink: 0;
-    }
-    .rtl .mega-dialog.fm-picker-dialog .side-pane {
-        border-right: none;
-        border-left: 1px solid var(--stroke-grey-2);
-    }
-    .mega-dialog.fm-picker-dialog .fm-picker-dialog-panel-header {
-        height: 40px;
-        width: 100%;
-        position: relative;
-    }
-    .mega-dialog.fm-picker-dialog .fm-picker-dialog-panel-header span {
-        font-size: 14px;
-        line-height: 40px;
-        color: var(--text-color-high);
-        padding-inline-start: 24px;
-        -o-text-overflow: ellipsis;
-        text-overflow: ellipsis;
         overflow: hidden;
-        white-space: nowrap;
-        display: inline-block;
-        vertical-align: top;
         position: relative;
     }
-    .mega-dialog.fm-picker-dialog .fm-picker-dialog-panel-header .dropdown-color-txt {
-        color: var(--text-color-high);
-        padding-inline-start: 0;
-        line-height: 18px;
-    }
-    .mega-dialog.fm-picker-dialog .fm-picker-dialog-panel-header .fm-picker-dialog-panel-arrows:not(.hidden) {
-        position: relative;
-        top: 8px;
-        left: 8px;
-        display: inline-block;
-        vertical-align: top;
-        --icon-size: 24px;
-        --mask-color: var(--icon-rest);
-        cursor: pointer;
-    }
-    .mega-dialog.fm-picker-dialog .fm-picker-dialog-panel-header .fm-picker-dialog-panel-arrows:not(.hidden):hover {
-        --mask-color: var(--icon-active);
-    }
-    .rtl .mega-dialog.fm-picker-dialog .fm-picker-dialog-panel-header .fm-picker-dialog-panel-arrows:not(.hidden) {
-        left: auto;
-        right: 8px;
-    }
-    .mega-dialog.fm-picker-dialog .dialog-sorting-menu {
-        padding: 8px;
-        left: 130px;
-        top: -40px;
-        width: 200px;
-    }
-    .mega-dialog.fm-picker-dialog .dialog-sorting-menu .dropdown-item {
-        text-decoration: none;
-    }
-    .mega-dialog.fm-picker-dialog .dialog-sorting-menu .dropdown-item span {
-        padding-left: 0;
-    }
-    .rtl .mega-dialog.fm-picker-dialog .dialog-sorting-menu {
-        left: auto;
-        right: 130px;
-    }
-    .mega-dialog.fm-picker-dialog .search-bar {
-        width: 190px;
-        position: absolute;
-        right: 24px;
-        top: 4px;
-        border-radius: 16px;
-        height: 32px;
-        padding: 0 8px;
-        overflow: hidden;
-        box-sizing: border-box;
-    }
-    .rtl .mega-dialog.fm-picker-dialog .search-bar {
-        right: auto;
-        left: 24px;
-    }
-    .mega-dialog.fm-picker-dialog .search-bar input {
-        background-color: transparent;
-        border: 0;
-        padding: 0;
-        margin: 0;
-        width: 100%;
-        color: var(--text-color-high);
-        font: var(--text-body1);
-        line-height: 32px;
-    }
-    .mega-dialog.fm-picker-dialog .search-bar input::placeholder {
-        color: var(--text-color-low);
-    }
-    .mega-dialog.fm-picker-dialog .search-bar .icon {
-        position: absolute;
-        right: 0;
-        top: 0;
-        transition: 0.1s;
-        cursor: pointer;
-    }
-    .rtl .mega-dialog.fm-picker-dialog .search-bar .icon {
-        right: auto;
-        left: 0;
-    }
-    .mega-dialog.fm-picker-dialog .search-bar .icon:hover {
-        opacity: 0.7;
-    }
-    .mega-dialog.fm-picker-dialog .right-pane .dialog-tree-panel-scroll {
-        box-sizing: border-box;
-        margin: 8px 0 0;
-        overflow: hidden;
-        padding: 0 8px;
-        position: relative;
-    }
-    .mega-dialog.fm-picker-dialog .right-pane .dialog-tree-panel-scroll span {
-        font: var(--text-body2);
-        color: var(--text-color-high);
+    .mega-dialog.fm-picker-dialog .folder-container .dialog-tree-panel-scroll span:not(.avatar-txt) {
+        font: var(--mobile-font-caption-large-regular);
+        color: var(--mobile-text-primary);
         line-height: 24px;
         overflow: hidden;
         text-overflow: ellipsis;
     }
-    .mega-dialog.fm-picker-dialog .right-pane .dialog-tree-panel-scroll ul {
+    .mega-dialog.fm-picker-dialog .folder-container .shared-with-me .user-card-name {
+        margin-inline-start: 12px;
+    }
+    .mega-dialog.fm-picker-dialog .folder-container .shared-with-me .disabled .avatar {
+        opacity: 0.5;
+    }
+    .mega-dialog.fm-picker-dialog .folder-container .shared-with-me .mega-node.user {
+        display: flex;
+        overflow: hidden;
+        width: 224px;
+    }
+    .mega-dialog.fm-picker-dialog .folder-container .shared-with-me .avatar span {
+        color: white;
+    }
+    .mega-dialog.fm-picker-dialog .folder-container .dialog-tree-panel-scroll ul {
         padding: 0;
     }
-    .mega-dialog.fm-picker-dialog .right-pane .dialog-tree-panel-scroll li > span {
-        border-radius: 4px;
-        --mask-color: var(--icon-rest);
+    .mega-dialog.fm-picker-dialog .folder-container .dialog-tree-panel-scroll li {
+        border-top: var(--mobile-border-subtle) 1px solid;
     }
-    .mega-dialog.fm-picker-dialog .right-pane .dialog-tree-panel-scroll li > span:hover {
-        --mask-color: var(--icon-active);
+    .mega-dialog.fm-picker-dialog .folder-container .dialog-tree-panel-scroll.conversations li {
+        border-top: none;
+        border-bottom: var(--mobile-border-subtle) 1px solid;
     }
-    .mega-dialog.fm-picker-dialog .right-pane .dialog-tree-panel-scroll li > span.nw-fm-tree-item {
+    .mega-dialog.fm-picker-dialog .folder-container .dialog-tree-panel-scroll li > span {
+        --mask-color: var(--mobile-icon-primary);
+    }
+    .mega-dialog.fm-picker-dialog .folder-container .dialog-tree-panel-scroll li > span.nw-fm-tree-item {
         position: relative;
         display: flex;
         align-items: center;
-        height: 24px;
+        height: 32px;
+        border-radius: 0;
     }
-    .mega-dialog.fm-picker-dialog .right-pane .dialog-tree-panel-scroll .nw-fm-tree-item.contains-folders.expanded .sprite-fm-mono.icon-arrow-right {
-        transform: rotate(90deg);
-        background-image: none;
+    .mega-dialog.fm-picker-dialog .folder-container .dialog-tree-panel-scroll .nw-fm-tree-item.contains-folders.expanded .nw-fm-tree-arrow {
+        transform: unset;
     }
     .mega-dialog.fm-picker-dialog .nw-fm-tree-folder,
     .mega-dialog.fm-picker-dialog .nw-fm-tree-icon-wrap {
-        padding-inline-start: 30px;
-        max-width: calc(100% - 40px);
-        margin-inline-start: 24px;
+        padding-inline-start: 36px;
+        flex: 1;
+        margin-inline-start: 20px;
+        margin-inline-end: 12px;
+        width: 100%;
     }
     .mega-dialog.fm-picker-dialog .nw-fm-tree-item .nw-fm-tree-arrow {
-        margin-inline-start: 6px;
-        top: 4px;
+        display: block;
+        margin-inline-start: 20px;
+        position: static;
+        opacity: 0;
+    }
+    .mega-dialog.fm-picker-dialog.no-left .nw-fm-tree-item .nw-fm-tree-arrow {
+        margin-inline-start: 36px;
+    }
+    .mega-dialog.fm-picker-dialog .nw-fm-tree-item.contains-folders .nw-fm-tree-arrow {
+        opacity: 1;
+        --mask-color: var(--mobile-icon-primary);
+    }
+    .mega-dialog.fm-picker-dialog .nw-fm-tree-item.disabled .nw-fm-tree-arrow,
+    .mega-dialog.fm-picker-dialog .nw-fm-tree-item.expandable .nw-fm-tree-arrow {
+        --mask-color: var(--mobile-icon-disabled);
     }
     .mega-dialog.fm-picker-dialog .nw-fm-tree-item:hover,
     .mega-dialog.fm-picker-dialog .nw-fm-tree-item.dragover,
     .mega-dialog.fm-picker-dialog .nw-contact-item:hover {
-        background: var(--surface-grey-4);
+        background: var(--mobile-surface-1);
     }
     .mega-dialog.fm-picker-dialog .nw-fm-tree-item.selected,
     .mega-dialog.fm-picker-dialog .nw-contact-item.selected {
-        background: var(--surface-grey-6);
-        --mask-color: var(--icon-active);
+        background: var(--mobile-surface-2);
     }
-    .mega-dialog.fm-picker-dialog .nw-fm-tree-item.selected::before,
-    .mega-dialog.fm-picker-dialog .nw-contact-item.selected::before {
-        content: '';
-        width: 2px;
-        border-radius: 1px;
-        height: calc(100% - 8px);
-        top: 4px;
-        left: 4px;
-        position: absolute;
-        background: var(--secondary-blue);
+    .mega-dialog.fm-picker-dialog .dialog-tree-panel-scroll ul .nw-fm-tree-item.selected,
+    .mega-dialog.fm-picker-dialog .dialog-tree-panel-scroll ul .nw-contact-item.selected,
+    .mega-dialog.fm-picker-dialog .dialog-empty-block ul .note-chat-item .nw-contact-item.selected {
+        border-left: var(--mobile-border-brand) 4px solid;
     }
-    .rtl .mega-dialog.fm-picker-dialog .nw-fm-tree-item.selected::before,
-    .rtl .mega-dialog.fm-picker-dialog .nw-contact-item.selected::before {
-        right: 4px;
-        left: auto;
+    .rtl .mega-dialog.fm-picker-dialog .dialog-tree-panel-scroll ul .nw-fm-tree-item.selected,
+    .rtl .mega-dialog.fm-picker-dialog .dialog-tree-panel-scroll ul .nw-contact-item.selected,
+    .rtl .mega-dialog.fm-picker-dialog .dialog-empty-block ul .note-chat-item .nw-contact-item.selected {
+        border-left: transparent;
+        border-right: var(--mobile-border-brand) 4px solid;
     }
-    .mega-dialog.fm-picker-dialog .nw-fm-tree-item.disabled {
+    .mega-dialog.fm-picker-dialog .nw-fm-tree-item.disabled .nw-fm-tree-folder,
+    .mega-dialog.fm-picker-dialog .nw-fm-tree-item.expandable .nw-fm-tree-folder {
         opacity: 0.5;
-        background-position: 0 -12376px;
     }
     .mega-dialog.fm-picker-dialog .nw-fm-tree-item.linked {
         position: relative;
     }
     .mega-dialog.fm-picker-dialog .nw-fm-tree-item .colour-label-ind {
-        right: 32px;
-        top: 8px;
+        margin: 0 4px;
     }
-    .rtl .mega-dialog.fm-picker-dialog .nw-fm-tree-item .colour-label-ind {
-        right: auto;
-        left: 32px;
+    .mega-dialog.fm-picker-dialog .nw-fm-tree-item.linked .colour-label-ind {
+        margin-inline-end: 8px;
     }
-    .mega-dialog.fm-picker-dialog .nw-fm-tree-item.linked .file-status-ico {
-        top: 0;
-    }
-    .mega-dialog.fm-picker-dialog .my-chat-list {
-        width: 308px;
-        height: 310px;
-        box-sizing: border-box;
-        position: relative;
-        display: inline-block;
-    }
-    .mega-dialog.fm-picker-dialog .selected-list {
-        width: 308px;
-        height: 310px;
-        box-sizing: border-box;
-        position: absolute;
-        right: 0;
-        top: 0;
-        display: inline-block;
-    }
-    .rtl .mega-dialog.fm-picker-dialog .selected-list {
-        right: auto;
-        left: 0;
-    }
-    .mega-dialog.fm-picker-dialog .my-chat-list::after {
-        content: "";
-        width: 1px;
-        height: 100%;
-        background-color: rgba(0,0,0,0.1);
-        position: absolute;
-        display: block;
-        top: 0;
-        right: 0;
-    }
-    .rtl .mega-dialog.fm-picker-dialog .my-chat-list::after {
-        right: auto;
-        left: 0;
-    }
-    .mega-dialog.fm-picker-dialog .dialog-tree-panel-scroll .delete-img.icon {
-        position: absolute;
-        right: 24px;
-        top: 0;
-    }
-    .rtl .mega-dialog.fm-picker-dialog .dialog-tree-panel-scroll .delete-img.icon {
-        right: auto;
-        left: 24px;
-    }
-    .mega-dialog.fm-picker-dialog .delete-img {
-        background-position: 0 -12400px;
-        opacity: 0.3;
-        cursor: pointer;
-    }
-    .mega-dialog.fm-picker-dialog .delete-img:hover {
-        opacity: 0.9;
-    }
-    .mega-dialog.fm-picker-dialog .add-more-img {
-        background-position: 0 -12376px;
-    }
-    .mega-dialog.fm-picker-dialog .dialog-subtitle {
-        width: 380px;
-        left: 50%;
-        margin-inline-start: 190px;
-        margin-bottom: 24px;
-        height: auto;
-        display: block;
-    }
-    .rtl .mega-dialog.fm-picker-dialog .dialog-subtitle {
-        left: auto;
-        right: 50%;
-    }
-    .mega-dialog.fm-picker-dialog .summary-container .item-type-icon,
-    .mega-dialog.fm-picker-dialog .summary-container .target-icon {
-        margin: 3px 0;
-        margin-inline-start: 7px;
-        --icon-size: 24px;
-        position: absolute;
-        --mask-color: var(--icon-rest);
-    }
-    .mega-dialog.fm-picker-dialog .dialog-button-container {
-        height: 56px;
-        width: 100%;
-        display: block;
-        position: relative;
-    }
-    .mega-dialog.fm-picker-dialog .dialog-button-container::before {
-        content: "";
-        width: 100%;
-        height: 1px;
-        background-color: var(--stroke-grey-1);
-        position: absolute;
-        display: block;
-        top: 0;
-    }
-    .mega-dialog.fm-picker-dialog .dialog-button-container button {
-        position: relative;
-        margin: 12px 0;
-        padding: 0 24px;
-    }
-    .mega-dialog.fm-picker-dialog .summary-input.placeholder {
-        background: var(--surface-grey-4);
-        color: var(--text-color-low);
+    .mega-dialog.fm-picker-dialog .nw-fm-tree-item .nw-fm-tree-iconwrap {
         display: flex;
         align-items: center;
     }
-    .mega-dialog.fm-picker-dialog .search-bar.placeholder i {
-        --mask-color: var(--icon-inactive);
-        --icon-size: 24px;
-        margin-inline-end: 8px;
+    .mega-dialog.fm-picker-dialog .nw-fm-tree-item .file-status-ico {
+        opacity: 0;
+        --icon-size: 16px;
+        --mask-color: var(--mobile-icon-primary);
     }
-    .mega-dialog.fm-picker-dialog .search-bar.placeholder .search-icon-reset {
-        margin-inline-end: 0;
-        cursor: pointer;
-        --mask-color: var(--icon-rest);
+    .mega-dialog.fm-picker-dialog .nw-fm-tree-item.disabled .file-status-ico,
+    .mega-dialog.fm-picker-dialog .nw-fm-tree-item.expandable .file-status-ico{
+        --mask-color: var(--mobile-icon-disabled);
     }
-    .mega-dialog.fm-picker-dialog .summary-input.focus {
-        border: 1px solid var(--stroke-grey-2);
-        color: var(--text-color-low);
+    .mega-dialog.fm-picker-dialog .nw-fm-tree-item.linked .file-status-ico {
+        opacity: 1;
     }
-    .mega-dialog.fm-picker-dialog .summary-input.active {
-        background: var(--surface-main);
-        border: 1px solid var(--stroke-grey-2);
-        color: var(--text-color-high);
-    }
-    .mega-dialog.fm-picker-dialog .summary-input.correct-input {
-        background: var(--surface-main);
-        border: 1px solid var(--stroke-grey-2);
-        color: var(--text-color-medium);
-        vertical-align: top;
-    }
-    .mega-dialog.fm-picker-dialog .summary-input.correct-input .choose-target {
-        display: none;
-    }
-    .mega-dialog.fm-picker-dialog .summary-input.error {
-        box-shadow: 0 0 0 1px var(--banner-border-error);
-        background: var(--banner-background-error);
-        color: var(--banner-text-error);
-    }
-    .mega-dialog.fm-picker-dialog .summary-input.disable {
-        background: var(--surface-grey-1);
-        border: 1px solid var(--stroke-grey-2);
-        opacity: 0.3;
-        color: var(--text-color-low);
-    }
-    .mega-dialog.fm-picker-dialog .summary-input.error-message {
-        color: var(--text-color-high);
-    }
-    .mega-dialog.fm-picker-dialog .summary-input.high-light {
-        background: var(--surface-grey-6);
-        box-shadow: 0 0 0 1px var(--stroke-grey-6);
-        color: var(--text-color-low);
+    .mega-dialog.fm-picker-dialog .nw-fm-tree-item .file-status-ico::before {
+        font-size: 16px;
+        --icon-size: 16px;
     }
     .mega-dialog.fm-picker-dialog .summary-input #f-name-input {
         border: none;
@@ -2868,143 +2495,68 @@ body.de .mega-dialog.contact-picker-widget {
         margin: 0;
         background-color: transparent;
     }
-    .mega-dialog.fm-picker-dialog .nw-contact-item .encrypted-spacer {
-        width: 16px;
+    .mega-dialog.fm-picker-dialog .dialog-tree-panel-scroll .chat-separator {
+        align-items: center;
+        display: flex;
+        height: 48px;
+        padding: 0 24px;
     }
-    .mega-dialog.fm-picker-dialog .nw-contact-item .group-chat-icon {
-        margin-inline-start: 8px;
+    .mega-dialog.fm-picker-dialog .nw-contact-item {
+        display: flex;
+        align-items: center;
+        height: 48px;
+        border-radius: 0;
+        padding: 4px 0;
+        padding-inline-start: 20px;
+        padding-inline-end: 36px;
+        margin-top: 1px;
+        margin-bottom: 1px;
+        border-left: transparent 4px solid;
+        --icon-size: 16px;
     }
-    .mega-dialog.fm-picker-dialog .summary-input.unfold .item-row:first-child .summary-ff-name,
-    .mega-dialog.fm-picker-dialog .summary-input.unfold .item-row:first-child .summary-ff-name-ellipsis {
-        max-width: 280px;
+    .rtl .mega-dialog.fm-picker-dialog .nw-contact-item {
+        border-left: unset;
+        border-right: transparent 4px solid;
     }
-    .mega-dialog.fm-picker-dialog .summary-input.unfold .item-row:hover .delete-item {
-        display: inline-block;
+    .mega-dialog.fm-picker-dialog .nw-contact-item .overlapped-avatar {
+        padding-inline: 6px;
     }
-    .mega-dialog.fm-picker-dialog .summary-row .summary-input .item-row-group {
-        width: 100%;
-        max-height: 130px;
-        position: relative;
-        overflow: hidden;
-        padding: 0;
+    .mega-dialog.fm-picker-dialog .nw-contact-item .overlapped-avatar.multi {
+        padding-inline: 0;
     }
-    .mega-dialog.fm-picker-dialog .fm-breadcrumbs .right-arrow-bg {
-        font: var(--text-body1);
-        cursor: pointer;
-        overflow: hidden;
-        text-overflow: ellipsis;
+    .mega-dialog.fm-picker-dialog .nw-contact-item .overlapped-avatar.multi > div:first-of-type {
+        height: 12px;
+        overflow: visible;
+        width: 18px;
     }
-    .mega-dialog.fm-picker-dialog .fm-breadcrumbs.has-next-button .sprite-fm-mono.icon-arrow-right {
-        top: 3px;
+    .mega-dialog.fm-picker-dialog .nw-contact-item .overlapped-avatar.multi > div:last-of-type {
+        margin-inline-start: 12px;
     }
-    .mega-dialog.fm-picker-dialog .fm-picker-dialog-button {
-        width: 100%;
-        height: 64px;
-        position: relative;
-        cursor: pointer;
+    .mega-dialog.fm-picker-dialog .nw-contact-item .meeting-icon {
+        background: linear-gradient(225deg, #00BDB2 0%, #00897B 100%);
+        border-radius: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 24px;
+        width: 24px;
+        --mask-color: var(--mobile-text-inverse);
     }
-    .mega-dialog.fm-picker-dialog .fm-picker-dialog-button i {
-        --icon-size: 32px;
-        position: absolute;
-        top: 14px;
-        left: 12px;
-        transition: 0.1s;
-        --mask-color: var(--icon-rest);
+    .mega-dialog.fm-picker-dialog .nw-contact-item .nw-contact-name {
+        margin-inline: 12px;
     }
-    .rtl .mega-dialog.fm-picker-dialog .fm-picker-dialog-button i {
-        left: auto;
-        right: 12px;
+    .mega-dialog.fm-picker-dialog .nw-contact-item .nw-contact-group {
+        width: 280px;
     }
-    .mega-dialog.fm-picker-dialog .fm-picker-dialog-button.active i,
-    .mega-dialog.fm-picker-dialog .fm-picker-dialog-button:hover i {
-        --mask-color: var(--icon-active);
+    .mega-dialog.fm-picker-dialog .dialog-tree-panel-scroll .note-chat-item span.note-chat-label {
+        font: var(--mobile-font-caption-large-bold);
     }
-    .mega-dialog.fm-picker-dialog .side-pane .fm-picker-dialog-button .tooltip {
-        height: 20px;
-        padding: 0 8px;
-        background-color: var(--stroke-main-inverted);
-        color: var(--text-color-high-inverted);
-        font: var(--text-body2);
-        line-height: 20px;
-        position: absolute;
-        margin: 2px;
-        border-radius: 4px;
-        white-space: nowrap;
-        left: 44px;
-        bottom: 22px;
-        transition: left 0.5s ease-in, visibility 5s, opacity 0.3s ease-in;
-        opacity: 0;
-        z-index: 1129;
-        visibility: hidden;
-        pointer-events: none;
+    .mega-dialog.fm-picker-dialog .note-chat-item .nw-note-signifier i {
+        --icon-size: 24px;
     }
-    .rtl .mega-dialog.fm-picker-dialog .side-pane .fm-picker-dialog-button .tooltip {
-        left: auto;
-        right: 44px;
-    }
-    .mega-dialog.fm-picker-dialog .side-pane .fm-picker-dialog-button:hover .tooltip {
-        visibility: visible;
-        opacity: 1;
-        left: 50px;
-    }
-    .rtl .mega-dialog.fm-picker-dialog .side-pane .fm-picker-dialog-button:hover .tooltip {
-        left: auto;
-        right: 50px;
-    }
-    .mega-dialog.fm-picker-dialog .fm-picker-dialog-button .left-border {
-        width: 3px;
-        height: 64px;
-        top: 0;
-        left: 0;
-        position: absolute;
-        transition: all 200ms ease-in-out;
-    }
-    .rtl .mega-dialog.fm-picker-dialog .fm-picker-dialog-button .left-border {
-        left: auto;
-        right: 0;
-    }
-    .mega-dialog.fm-picker-dialog .side-pane .fm-picker-dialog-button.active {
-        cursor: default;
-    }
-    .mega-dialog.fm-picker-dialog .side-pane .fm-picker-dialog-button.active i  {
-        opacity: 1;
-    }
-    .mega-dialog.fm-picker-dialog .fm-picker-dialog-button.active .left-border {
-        background: var(--stroke-info);
-    }
-    .mega-dialog.fm-picker-dialog .fm-picker-dialog-tree-panel {
-        display: none;
-        height: 280px;
-        width: calc(100% - 56px);
-    }
-    .mega-dialog.fm-picker-dialog .fm-picker-dialog-panel-arrows {
-        right: 11px;
-        top: 11px;
-    }
-    .rtl .mega-dialog.fm-picker-dialog .fm-picker-dialog-panel-arrows {
-        right: auto;
-        left: 11px;
-    }
-    .mega-dialog.fm-picker-dialog .fm-picker-dialog-txt {
-        display: none;
-    }
-    .mega-dialog.fm-picker-dialog .fm-picker-dialog-txt.cloud-drive {
-        color: #DF0000;
-    }
-    .mega-dialog.fm-picker-dialog .fm-picker-dialog-txt.shared-with-me {
-        color: #FFA600;
-    }
-    .mega-dialog.fm-picker-dialog .fm-picker-dialog-txt.conversations {
-        color: #1FA5DF;
-    }
-    .mega-dialog.fm-picker-dialog .fm-picker-dialog-txt.rubbish-bin {
-        color: #26B700;
-    }
-    .mega-dialog.fm-picker-dialog .fm-picker-dialog-txt.active {
-        display: inline;
-    }
-    .mega-dialog.fm-picker-dialog .fm-picker-dialog-tree-panel.active {
-        display: block;
+    .mega-dialog.fm-picker-dialog .nw-contact-item .group-chat-icon i {
+        border-radius: 100%;
+        --icon-size: 24px;
     }
     .mega-dialog.fm-picker-dialog .share-dialog-permissions {
         padding: 0 12px;
@@ -3033,29 +2585,562 @@ body.de .mega-dialog.contact-picker-widget {
         margin-inline-start: 8px;
         margin-inline-end: 0;
     }
-    .mega-dialog.fm-picker-dialog .footer-container {
-        position: relative;
+
+.mega-dialog.fm-picker-dialog {
+    background: var(--mobile-page-background);
+    height: 720px;
+    width: 900px;
+    max-width: 900px;
+    display: grid;
+    grid-template-columns: 248px auto;
+    transition: 200ms ease-in-out;
+    --mask-color: var(--mobile-icon-primary);
+}
+.mega-dialog.fm-picker-dialog.no-left {
+    grid-template-columns: 100%;
+}
+.mega-dialog.fm-picker-dialog.no-left section.left-panel {
+    display: none;
+}
+.mega-dialog.fm-picker-dialog section {
+    background: var(--mobile-page-background);
+}
+.mega-dialog.fm-picker-dialog section.content {
+    border-radius: 0 16px 16px 0;
+    max-width: 652px;
+}
+.mega-dialog.fm-picker-dialog.no-left section.content {
+    max-width: 100%;
+    border-radius: 16px;
+}
+.rtl .mega-dialog.fm-picker-dialog section.content {
+    border-radius: 16px 0 0 16px;
+}
+.mega-dialog.fm-picker-dialog .content-block {
+    background: var(--mobile-page-background);
+}
+.mega-dialog.fm-picker-dialog .left-panel {
+    background: var(--mobile-surface-2);
+    padding-top: 40px;
+    width: 248px;
+    border-radius: 16px 0 0 16px;
+}
+.rtl .mega-dialog.fm-picker-dialog .left-panel {
+    border-radius: 0 16px 16px 0;
+}
+.mega-dialog.fm-picker-dialog .left-panel .fm-picker-dialog-tree-panel {
+    box-sizing: border-box;
+    min-width: 100%;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+.mega-dialog.fm-picker-dialog .left-panel .menu-item {
+    padding: 16px 24px;
+    color: var(--mobile-text-primary);
+    cursor: pointer;
+}
+.mega-dialog.fm-picker-dialog .left-panel .menu-item.active {
+    border-inline-start: 4px solid var(--mobile-border-brand);
+    padding-inline-start: 20px;
+    background: var(--mobile-page-background);
+}
+.mega-dialog.fm-picker-dialog .left-panel .menu-item:not(.active):hover {
+    background: var(--mobile-surface-1);
+}
+.mega-dialog.fm-picker-dialog .left-panel .text-box-wrapper {
+    overflow: hidden;
+    transition: 200ms ease-in-out;
+    width: 100%;
+    text-align: start;
+    white-space: nowrap;
+}
+.mega-dialog.fm-picker-dialog .left-panel .text-box-wrapper span.primary-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+}
+.mega-dialog.fm-picker-dialog .left-panel .fm-picker-notagain {
+    margin-top: auto;
+    padding: 24px;
+}
+.mega-dialog.fm-picker-dialog .fm-picker-notagain .checkbox-wrapper {
+    margin-inline-end: 8px;
+    height: 20px;
+    width: 20px;
+    --icon-size: 18px;
+    --mask-color: var(--mobile-text-inverse);
+}
+.mega-dialog.fm-picker-dialog .content .fm-picker-notagain {
+    display: none;
+    border-top: 1px solid var(--mobile-border-subtle);
+    margin-top: -16px;
+    padding: 12px 24px;
+    width: 100%;
+}
+.dark-direct-tooltip.simpletip-tooltip.picker-dialog-simpletip {
+    display: none;
+}
+.picker-dialog-simpletip i {
+    display: none;
+}
+
+.fm-picker-dialog .content-block.header {
+    padding: 40px 0 12px;
+    padding-inline: 24px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 1;
+    border-radius: 0 16px 0 0;
+}
+.rtl .fm-picker-dialog .content-block.header {
+    border-radius: 16px 0 0;
+}
+.fm-picker-dialog.no-left .content-block.header,
+.rtl .fm-picker-dialog.no-left .content-block.header {
+    border-radius: 16px 16px 0 0;
+}
+.fm-picker-dialog.no-left .content-block.header {
+    padding: 40px 40px 12px;
+}
+.fm-picker-dialog .content-block.header h2 {
+    color: var(--mobile-text-primary);
+    flex: 1;
+    font: var(--mobile-font-heading-h2);
+    margin-inline-end: 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.fm-picker-dialog .content-block.header .search-bar,
+.fm-picker-dialog .content-block.sort .search-collapse-bar {
+    height: 40px;
+    flex: 0 0 248px;
+}
+.fm-picker-dialog .content-block.header .search-bar input,
+.fm-picker-dialog .content-block.sort .search-collapse-bar input {
+    height: 38px;
+}
+.fm-picker-dialog .content-block.header .search-bar input:focus::placeholder {
+    color: transparent;
+}
+.fm-picker-dialog .content-block.header .search-bar.save-input {
+    flex-wrap: wrap;
+    flex: 1;
+}
+.fm-picker-dialog .content-block.header h2.save-as {
+    flex: 0;
+    min-width: fit-content;
+    margin-inline-end: 24px;
+}
+.fm-picker-dialog .content-block.header .save-input-error,
+.fm-picker-dialog .summary-container .summary-error {
+    display: flex;
+    align-items: center;
+    color: var(--mobile-text-error);
+    width: 100%;
+    --mask-color: var(--mobile-text-error);
+}
+.fm-picker-dialog .summary-container .summary-error {
+    margin-top: 8px;
+}
+.fm-picker-dialog .content-block.header .save-input-error .error-text,
+.fm-picker-dialog .summary-container .error-text {
+    margin-inline-start: 8px;
+}
+.fm-picker-dialog .content-block.sort .search-collapse-bar {
+    margin-inline: auto 24px;
+    transition: width 200ms ease-in-out, max-width 200ms ease-in-out;
+    width: 248px;
+}
+.fm-picker-dialog .content-block.sort .search-collapse-bar i {
+    cursor: pointer;
+}
+.fm-picker-dialog .content-block.sort .search-collapse-bar.collapsed {
+    border: none;
+    max-width: 24px;
+    width: 24px;
+    min-width: 24px;
+}
+.fm-picker-dialog .content-block.sort .search-collapse-bar.collapsed input {
+    padding: 0;
+    margin: 0;
+    max-width: 0;
+    width: 0;
+}
+.fm-picker-dialog .content-block.sort .search-collapse-bar.collapsed .search-icon-collapse {
+    display: none;
+}
+.fm-picker-dialog .content-block.sort {
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+}
+.fm-picker-dialog.no-left .content-block.sort {
+    padding: 0 40px;
+}
+.fm-picker-dialog .content-block.sort .sort-height {
+    align-items: center;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    padding: 20px 8px;
+}
+.fm-picker-dialog .content-block.sort .fm-picker-dialog-panel-arrows {
+    cursor: pointer;
+    height: 16px;
+    width: 16px;
+    margin-inline-end: 8px;
+    --icon-size: 16px;
+    --mask-color: var(--mobile-icon-secondary);
+}
+.fm-picker-dialog .content-block.sort .item-names {
+    cursor: pointer;
+    color: var(--mobile-text-secondary);
+    font: var(--mobile-font-caption-small-regular);
+}
+.fm-picker-dialog .content-block.sort .sort-height:hover {
+    background: var(--mobile-button-outline-background-hover);
+}
+.fm-picker-dialog .content-block.sort .sort-height:hover .item-names {
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-caption-small-bold);
+}
+.fm-picker-dialog .content-block.sort .sort-height:hover .fm-picker-dialog-panel-arrows {
+    --mask-color: var(--mobile-icon-primary);
+}
+
+.fm-picker-dialog .content-block.folder-container {
+    padding: 0;
+    flex: 1;
+    overflow: hidden;
+    border-bottom: var(--mobile-border-subtle) 1px solid;
+}
+.fm-picker-dialog .content-block.folder-container .dialog-empty-block {
+    height: 100%;
+}
+.fm-picker-dialog .content-block.folder-container .dialog-empty-block.conversations {
+    flex-wrap: wrap;
+}
+.fm-picker-dialog .content-block.folder-container .dialog-empty-block.conversations ul {
+    align-self: flex-start;
+    border-top: var(--mobile-border-subtle) 1px solid;
+    border-bottom: var(--mobile-border-subtle) 1px solid;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+.fm-picker-dialog .content-block.folder-container .dialog-empty-block.conversations li {
+    list-style-type: none;
+}
+.fm-picker-dialog .content-block.folder-container .dialog-empty-block.conversations .nw-contact-item {
+    padding-inline-start: 14px;
+}
+.fm-picker-dialog .content-block.folder-container .dialog-empty-block.conversations .nw-note-name {
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-caption-large-bold);
+    text-align: start;
+}
+.fm-picker-dialog .content-block.folder-container .dialog-empty-block.conversations .note-chat-icon {
+    --mask-color: var(--mobile-text-primary);
+}
+.fm-picker-dialog .content-block.folder-container .dialog-empty-block .image {
+    height: 120px;
+    margin-inline: auto;
+    width: 120px;
+}
+.fm-picker-dialog .content-block.folder-container .dialog-empty-block .image i {
+    background-size: contain;
+    width: 120px;
+    height: 120px;
+}
+.fm-picker-dialog .content-block.folder-container .dialog-empty-block.cloud-drive i.glass-cloud-circle {
+    background-image: url("../images/mega/glass/glass-cloud-circle.png");
+}
+.fm-picker-dialog .content-block.folder-container .dialog-empty-block.shared-with-me i.glass-shared-folder {
+    background-image: url("../images/mega/glass/glass-folder-share.png");
+}
+.fm-picker-dialog .content-block.folder-container .dialog-empty-block.s4 i.glass-object-bucket {
+    background-image: url("../images/mega/glass/glass-bucket-objects.png");
+}
+.fm-picker-dialog .content-block.folder-container .dialog-empty-block.search i.glass-details {
+    background-image: url("../images/mega/glass/glass-details.png");
+}
+.fm-picker-dialog .content-block.folder-container .dialog-empty-block.conversations i.glass-contact {
+    background-image: url("../images/mega/glass/glass-contacts.png");
+}
+.fm-picker-dialog .content-block.folder-container .dialog-empty-block.send-to-meeting i.glass-meetings {
+    background-image: url("../images/mega/glass/glass-video.png");
+}
+.fm-picker-dialog .content-block.folder-container .dialog-empty-block .title {
+    margin: 24px 0 8px;
+    padding: 4px 0;
+}
+.fm-picker-dialog .content-block.folder-container .dialog-empty-block h1 {
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-heading-h1);
+    margin: 0;
+}
+.fm-picker-dialog .content-block.folder-container .dialog-empty-block .subtitle {
+    color: var(--mobile-text-secondary);
+    font: var(--mobile-font-copy-regular);
+    max-width: 434px;
+}
+.fm-picker-dialog .content-block.folder-container .dialog-tree-panel-scroll {
+    height: 100%;
+    min-width: 100%;
+}
+
+.fm-picker-dialog .content-block.summary-container {
+    margin: 24px 0 16px;
+    margin-inline: 24px 40px;
+    padding: 0;
+}
+.fm-picker-dialog.no-left .content-block.summary-container {
+    margin-inline: 40px;
+}
+.fm-picker-dialog .content-block.summary-container .summary-row {
+    background: var(--mobile-surface-1);
+    border-radius: 8px;
+    padding: 12px;
+}
+.fm-picker-dialog .content-block.summary-container .summary-item {
+    color: var(--mobile-text-primary);
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+.fm-picker-dialog .content-block.summary-container .summary-title {
+    font: var(--mobile-font-caption-large-bold);
+}
+.fm-picker-dialog .content-block.summary-container .summary-input {
+    position: relative;
+    margin-top: 8px;
+}
+.fm-picker-dialog .content-block.summary-container .summary-instructions {
+    margin-top: 8px;
+}
+.fm-picker-dialog .content-block.summary-container .summary-instructions * {
+    color: var(--mobile-text-secondary);
+    font: var(--mobile-font-caption-small-regular);
+}
+.fm-picker-dialog .content-block.summary-container .summary-instructions i {
+    margin-inline-end: 8px;
+}
+.fm-picker-dialog .content-block.summary-container .summary-conversations .summary-row {
+    padding: 7px 12px;
+}
+.fm-picker-dialog .content-block.summary-container .summary-conversations .summary-instructions {
+    margin: 0;
+}
+.fm-picker-dialog .content-block.summary-container .summary-conversations .summary-input {
+    overflow: hidden;
+}
+.fm-picker-dialog .content-block.summary-container .chat-chip {
+    display: flex;
+    align-items: center;
+    height: 28px;
+    padding-inline: 12px;
+    margin-inline-end: 12px;
+    border-radius: 16px;
+    background: var(--mobile-button-secondary);
+    color: var(--mobile-text-primary);
+    border: none;
+    outline: none;
+    white-space: nowrap;
+    max-width: 100%;
+    overflow: hidden;
+}
+.fm-picker-dialog .content-block.summary-container .chat-chip:hover {
+    background: var(--mobile-button-secondary-hover);
+}
+.fm-picker-dialog .content-block.summary-container .chat-chip .chat-icon-wrap:not(.avatar-wrap) {
+    height: 16px;
+    width: 16px;
+    --icon-size: 16px;
+}
+.fm-picker-dialog .content-block.summary-container .chat-chip .chat-icon-wrap .meeting-icon {
+    background: linear-gradient(225deg, #00BDB2 0%, #00897B 100%);
+    border-radius: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 16px;
+    width: 16px;
+    --mask-color: var(--mobile-text-inverse);
+    --icon-size: 12px;
+}
+.fm-picker-dialog .content-block.summary-container .chat-chip .chat-icon-wrap .group-chat-icon i {
+    border-radius: 100%;
+}
+.fm-picker-dialog .content-block.summary-container .chat-chip .chat-name {
+    align-items: center;
+    margin: 0 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.fm-picker-dialog .content-block.summary-container .chat-chip .action {
+    cursor: pointer;
+}
+.mega-component.menu-container.picker-dropdown {
+    z-index: 1300;
+}
+.mega-component.menu-container.picker-chat-items .content.fm-scrolling {
+    max-height: 280px;
+    overflow-y: visible;
+}
+.picker-dropdown .picker-list-wrap {
+    display: flex;
+    flex-direction: column;
+    padding: 4px 16px;
+    max-width: 280px;
+}
+.picker-dropdown .picker-list-wrap .chat-item-row,
+.picker-dropdown .picker-list-wrap .option {
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    padding: 8px 0;
+    height: 40px;
+    width: 100%;
+}
+.picker-chat-items .picker-list-wrap .chat-item-row .chat-icon-wrap .meeting-icon {
+    background: linear-gradient(225deg, #00BDB2 0%, #00897B 100%);
+    border-radius: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 24px;
+    width: 24px;
+    --mask-color: var(--mobile-text-inverse);
+    --icon-size: 20px;
+}
+.picker-chat-items .picker-list-wrap .chat-item-row .chat-icon-wrap .group-chat-icon i {
+    border-radius: 100%;
+    --icon-size: 24px;
+}
+.picker-chat-items .picker-list-wrap .chat-item-row .chat-name {
+    margin: 0 16px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.picker-chat-items .picker-list-wrap .chat-item-row button {
+    background: transparent;
+    color: var(--mobile-icon-primary);
+    cursor: pointer;
+    height: 24px;
+    margin-inline-start: auto;
+    padding: 4px;
+    width: 24px;
+    --icon-size: 16px;
+}
+.picker-chat-items .picker-list-wrap .chat-item-row button:hover,
+.picker-chat-items .picker-list-wrap .chat-item-row button:active {
+    background: var(--mobile-button-disabled);
+}
+.picker-dropdown .picker-list-wrap .option {
+    cursor: pointer;
+    padding: 8px;
+}
+.picker-dropdown .picker-list-wrap .option:hover {
+    background: var(--mobile-surface-1);
+    border-radius: 8px;
+}
+.picker-list-wrap .option i {
+    --icon-size: 24px;
+}
+.picker-list-wrap .option span {
+    margin-inline: 8px auto;
+}
+.picker-list-wrap .option i.checked {
+    --mask-color: var(--mobile-icon-secondary);
+}
+
+.fm-picker-dialog .content-block.footer-container {
+    display: flex;
+    align-items: center;
+    padding: 0;
+    margin-bottom: 40px;
+    margin-inline: 24px 40px;
+}
+.fm-picker-dialog.no-left .content-block.footer-container {
+    margin-inline: 40px;
+}
+.fm-picker-dialog .content-block.footer-container button {
+    cursor: pointer;
+}
+.fm-picker-dialog .content-block.footer-container .select-wrapper {
+    justify-self: flex-start;
+    margin-inline-end: auto;
+}
+.fm-picker-dialog .content-block.footer-container .dialog-newfolder-button,
+.fm-picker-dialog .content-block.footer-container .dialog-newgroup-button {
+    padding: 0;
+}
+.fm-picker-dialog .content-block.footer-container .dialog-newfolder-button .primary-text,
+.fm-picker-dialog .content-block.footer-container .dialog-newgroup-button .primary-text {
+    font: var(--mobile-font-link-small-semibold);
+    text-decoration: underline;
+}
+.fm-picker-dialog .content-block.summary-container.hidden + .footer-container {
+    margin-top: 24px;
+}
+.fm-picker-dialog .content-block.footer-container .secondary {
+    margin-inline: 12px;
+}
+.fm-picker-dialog .content-block.footer-container .permissions {
+    border: var(--mobile-border-strong) 1px solid;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    padding: 10px 12px;
+}
+.fm-picker-dialog .content-block.footer-container .permissions span {
+    color: var(--mobile-text-primary);
+    margin: 0 8px;
+    min-width: 96px;
+}
+.fm-picker-dialog .content-block.footer-container .permissions i {
+    --icon-size: 20px;
+    --mask-color: var(--mobile-icon-secondary);
+}
+.fm-picker-dialog .content-block.footer-container .permissions i.face-up {
+    transform: rotate(180deg);
+}
+
+@media screen and (max-width: 920px) {
+    .mega-dialog.fm-picker-dialog {
+        width: 600px;
+        grid-template-columns: 72px auto;
     }
-    .rtl .mega-dialog.fm-picker-dialog .fm-breadcrumbs .sprite-fm-mono.icon-arrow-right {
-        transform: rotate(180deg);
+    .mega-dialog.fm-picker-dialog section.content {
+        max-width: 528px;
     }
-    .mega-dialog.fm-picker-dialog .summary-items-drop-icon {
-        position: absolute;
-        --icon-size: 24px;
-        --mask-color: var(--icon-rest);
-        border: 1px solid var(--stroke-grey-2);
-        right: -34px;
-        cursor: pointer;
-        border-radius: 4px;
-        box-sizing: content-box;
+    .mega-dialog.fm-picker-dialog.no-left section.content {
+        max-width: 600px;
     }
-    .rtl .mega-dialog.fm-picker-dialog .summary-items-drop-icon {
-        right: auto;
-        left: -34px;
+    .mega-dialog.fm-picker-dialog.no-left {
+        grid-template-columns: auto;
     }
-    .mega-dialog.fm-picker-dialog .summary-items-drop-icon:hover {
-        --mask-color: var(--icon-active);
+    .mega-dialog.fm-picker-dialog .left-panel {
+        width: 72px;
     }
+    .mega-dialog.fm-picker-dialog .left-panel .text-box-wrapper {
+        width: 0;
+    }
+    .dark-direct-tooltip.simpletip-tooltip.picker-dialog-simpletip {
+        display: block;
+    }
+    .mega-dialog.fm-picker-dialog .fm-picker-notagain {
+        display: none;
+    }
+    .mega-dialog.fm-picker-dialog .content .fm-picker-notagain {
+        display: flex;
+    }
+}
 
 /* end fm-picker-dialog */
 

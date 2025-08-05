@@ -911,7 +911,7 @@ var slideshowid;
             video.pause();
         }
         $.noOpenChatFromPreview = true;
-        openCopyDialog('conversations');
+        openSendToChatDialog();
 
         mBroadcaster.sendMessage('trk:event', 'preview', 'send-chat');
     }

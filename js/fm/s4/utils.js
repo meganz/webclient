@@ -198,7 +198,12 @@ lazy(s4, 'utils', () => {
                     message,
                     null,
                     cfgName
-                );
+                ).then(res => {
+                    if (res) {
+                        return res;
+                    }
+                    throw EBLOCKED;
+                });
             }
 
             // Confirm action other actions

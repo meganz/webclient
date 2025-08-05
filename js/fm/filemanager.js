@@ -2041,7 +2041,7 @@ FileManager.prototype.initFileAndFolderSelectDialog = async function(type) {
     return promise;
 };
 
-FileManager.prototype.initNewChatlinkDialog = function() {
+FileManager.prototype.initNewChatlinkDialog = function(flowType, cb) {
     'use strict';
 
     // If chat is not ready.
@@ -2063,11 +2063,16 @@ FileManager.prototype.initNewChatlinkDialog = function() {
 
     var dialog = React.createElement(StartGroupChatDialogUI.StartGroupChatWizard, {
         name: "start-group-chat",
-        flowType: 2,
+        flowType: flowType || 2,
         onClose() {
             ReactDOM.unmountComponentAtNode(dialogPlacer);
             dialogPlacer.remove();
-            closeDialog();
+            if (typeof cb === 'function') {
+                tryCatch(cb)();
+            }
+            else {
+                closeDialog();
+            }
         }
     });
 
@@ -4027,7 +4032,7 @@ FileManager.prototype.cameraUploadUI = function() {
     var diagInheritance = {
         'recovery-key-dialog': ['recovery-key-info'],
         properties: ['links', 'rename', 'copyrights', 'copy', 'move', 'share', 'saveAs'],
-        copy: ['createfolder'],
+        copy: ['createfolder', 'start-group-chat'],
         move: ['createfolder'],
         register: ['terms'],
         selectFolder: ['createfolder'],
@@ -4037,7 +4042,8 @@ FileManager.prototype.cameraUploadUI = function() {
         ],
         'share-with-unverified-contacts': ['fingerprint-dialog'],
         'share-access-contacts-dialog': ['fingerprint-dialog'],
-        'stripe-pay': ['stripe-pay-success', 'stripe-pay-failure']
+        'stripe-pay': ['stripe-pay-success', 'stripe-pay-failure'],
+        'sendToChat': ['start-group-chat'],
     };
 
     var _openDialog = function(name, dsp) {

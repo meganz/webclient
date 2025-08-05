@@ -154,7 +154,7 @@ export default class Attachment extends AbstractGenericMessage {
                                         disabled={mega.paywall}
                                         onClick={() => {
                                             $.selected = [v.h];
-                                            openCopyDialog('conversations');
+                                            openSendToChatDialog();
                                         }}
                                     />
                                 );

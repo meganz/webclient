@@ -258,6 +258,7 @@ button.nav-elem.no-active:active,
     color: var(--mobile-text-disabled);
     text-decoration: underline var(--mobile-text-disabled);
 }
+.nav-elem.text-icon:hover,
 .nav-elem.text-icon:active {
     color: var(--mobile-button-primary-pressed);
     text-decoration: underline var(--mobile-button-primary-pressed);
@@ -502,4 +503,9 @@ button.nav-elem.pro-only:active {
 .nav-elem .right-badge.error {
     border-color: var(--mobile-text-error);
     color: var(--mobile-text-error);
+}
+
+.nav-elem.text-only span.primary-text:hover,
+.nav-elem.text-only span.primary-text:active {
+    color: var(--mobile-button-primary-pressed);
 }

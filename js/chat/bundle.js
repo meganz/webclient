@@ -10281,10 +10281,28 @@ Chat.prototype.openChatAndAttachNodes = async function (targets, nodes, silent) 
     promises.push(attachNodes(targets[i]));
   }
   const result = (await Promise.allSettled(promises)).map(e => e.value).filter(Boolean);
+  let folderCount = 0;
+  let fileCount = 0;
+  for (let i = nodes.length; i--;) {
+    const {
+      t
+    } = M.getNodeByHandle(nodes[i]) || {};
+    if (t === 1) {
+      folderCount++;
+    } else {
+      fileCount++;
+    }
+  }
+  let message = mega.icu.format(l.toast_send_chat_items, nodes.length);
+  if (fileCount === 0 && folderCount) {
+    message = mega.icu.format(l.toast_send_chat_folders, folderCount);
+  } else if (folderCount === 0 && fileCount) {
+    message = mega.icu.format(l.toast_send_chat_files, fileCount);
+  }
   for (let i = result.length; i--;) {
     if (result[i] instanceof ChatRoom) {
       const room = result[i];
-      showToast('send-chat', nodes.length > 1 ? l[17767] : l[17766]);
+      mega.ui.toast.show(message);
       if (!silent) {
         await M.openFolder(room.getRoomUrl().replace('fm/', '')).catch(dump);
       }
@@ -10412,6 +10430,78 @@ Chat.prototype.getFrequentContacts = function () {
     }).then(resolve).catch(reject);
   });
   return Chat._frequentsCache;
+};
+Chat.prototype.lastRoomContacts = async function (chatRoom) {
+  let timeout;
+  let loaded = false;
+  let loadMore = false;
+  const {
+    promise
+  } = mega;
+  const proc = () => {
+    if (timeout) {
+      timeout.abort();
+    }
+    const {
+      messages
+    } = chatRoom.messagesBuff;
+    const arr = messages.slice(Math.max(0, messages.length - 32));
+    let first = '';
+    let second = '';
+    for (let i = arr.length; i--;) {
+      const message = arr[i];
+      const h = message.userId === mega.BID && message.meta ? message.meta.userId : message.userId;
+      if (h !== mega.BID && h !== strongvelope.COMMANDER && h !== u_handle && h in M.u && M.u[h].c === 1) {
+        if (first && first !== h) {
+          second = h;
+          break;
+        }
+        first = h;
+      }
+    }
+    if (second) {
+      promise.resolve([first, second]);
+    } else if (first) {
+      promise.resolve([first]);
+    } else {
+      promise.resolve([]);
+    }
+    chatRoom.messagesBuff.detachMessages();
+  };
+  const next = () => {
+    if (!loadMore && chatRoom.messagesBuff.messages.length < 32 && chatRoom.messagesBuff.haveMoreHistory()) {
+      if (timeout) {
+        timeout.restart();
+      }
+      loadMore = true;
+      chatRoom.messagesBuff.retrieveChatHistory(false);
+    } else {
+      chatRoom.off('onHistoryDecrypted.lrc');
+      proc();
+    }
+  };
+  if (chatRoom.isLoading()) {
+    loaded = false;
+    chatRoom.rebind('onHistoryDecrypted.lrc', next);
+    timeout = tSleep(10);
+  } else if (chatRoom.messagesBuff.messages.length < 32 && chatRoom.messagesBuff.haveMoreHistory()) {
+    loaded = false;
+    loadMore = true;
+    chatRoom.rebind('onHistoryDecrypted.lrc', next);
+    chatRoom.messagesBuff.retrieveChatHistory(false);
+    timeout = tSleep(10);
+  } else {
+    proc();
+  }
+  if (timeout) {
+    timeout.then(() => {
+      if (!loaded) {
+        chatRoom.off('onHistoryDecrypted.lrc');
+        promise.resolve([]);
+      }
+    });
+  }
+  return promise;
 };
 Chat.prototype.eventuallyAddDldTicketToReq = function (req) {
   if (!u_handle) {
@@ -34636,7 +34726,7 @@ class Attachment extends AbstractGenericMessage {
               disabled: mega.paywall,
               onClick: () => {
                 $.selected = [v.h];
-                openCopyDialog('conversations');
+                openSendToChatDialog();
               }
             }));
             if (M.isGalleryNode(v)) {

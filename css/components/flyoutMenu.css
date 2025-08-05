@@ -254,16 +254,16 @@
     background-image: url("../../images/mega/contacts-book.png");
 }
 .flyout-overlay i.search {
-    background-image: url("../../images/mega/glass-details.png");
+    background-image: url("../../images/mega/glass/glass-details.png");
 }
 .flyout-overlay i.folder {
-    background-image: url("../../images/mega/glass-folder.png");
+    background-image: url("../../images/mega/glass/glass-folder.png");
 }
 .flyout-overlay i.chats {
-    background-image: url("../../images/mega/glass-message-call.png");
+    background-image: url("../../images/mega/glass/glass-message-call.png");
 }
 .flyout-overlay i.meetings {
-    background-image: url("../../images/mega/glass-video.png");
+    background-image: url("../../images/mega/glass/glass-video.png");
 }
 .flyout-overlay .meeting-dropdown-button i.right-icon {
     --icon-size: 24px;

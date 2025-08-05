@@ -924,7 +924,7 @@
                             text: l[17764],
                             icon: 'sprite-fm-mono icon-send-to-chat-thin-outline',
                             onClick() {
-                                openCopyDialog('conversations');
+                                openSendToChatDialog();
                                 M.fmEventLog(500678);
                             }
                         },

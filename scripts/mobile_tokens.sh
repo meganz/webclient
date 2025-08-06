@@ -1,5 +1,14 @@
 #!/usr/bin/env bash
 
+# --- Dependency Check: Ensure required commands are available ---
+for cmd in jq git awk tar; do
+  if ! command -v "$cmd" &> /dev/null; then
+    echo "fatal: command '$cmd' not found. Please install it (e.g. brew install $cmd)." >&2
+    exit 128
+  fi
+done
+# --------------------------------------------------------------
+
 print_help() {
     printf "This script automates the conversion of Design Tokens to CSS variables on Mobile.\n"
     printf "Usage: %s <webclient-dir>\n" "$0"
@@ -64,23 +73,93 @@ get_core_tokens() {
     return 0
 }
 
+# ------------------------------------------------------------------------------
+# Function: get_theme_tokens
+#
+# Description:
+#   Generates CSS theme tokens based on semantic token definitions and a core
+#   color map. It processes a JSON input containing color references in the form
+#   {Colors.X.Y} or rgba({Colors.X.Y}, alpha), resolves them against a core color
+#   map (/tmp/colors.json), and emits final rgba CSS variables into an output file.
+#
+# Inputs:
+#   $1 - theme:        Name of the theme (used for CSS class naming).
+#   $2 - input_json:   JSON string with semantic tokens organized under a root key.
+#   $3 - root:         Key under which theme tokens are located in the input JSON.
+#   $4 - output_css:   Path to the output CSS file to append the generated rules.
+#
+# Notes:
+#   - Uses `jq` to parse and sanitize tokens.
+#   - Matches token values against the core color definitions.
+#   - Converts tokens into final `rgba(...)` CSS syntax, applying alpha transparency.
+#   - Handles custom alpha values via CSS variables (e.g., var(--token-alpha, 0.8)).
+#   - Supports fallback handling when tokens cannot be resolved.
+#   - Expected color format in /tmp/colors.json: list of { key, value }.
+#   - Tokens marked as `NEEDS_RGBA` are custom-handled in awk to interpolate alpha.
+#
+# Errors:
+#   - Fails with a fatal message if `jq` or `awk` commands fail.
+#
+# Maintenance Tip:
+#   - Be cautious with changes to the parsing logic in `jq` or color formatting in `awk`,
+#     especially around the regex replacements and alpha blending logic.
+# ------------------------------------------------------------------------------
+
 get_theme_tokens() {
     theme=$1
     input_json=$2
     root=$3
     output_css=$4
 
-    theme_tokens=$(jq -r --arg keyvar "$root" '.[$keyvar] | .[] | map_values(."value") | to_entries | map({key: .key, value: (.value | sub("^{Colors\\.|}"; ""; "g")) }) | .[]' <<< "$input_json")
-    [[ $? -ne 0 ]] && fatal "jq failed."
-    # Cross data with core colors tokens to obtain hex/rgba values
-    jq -r --slurpfile colors /tmp/colors.json '($colors | map({key: .key, value: .value}) | from_entries) as $c | . | [.key, $c[.value]] | @sh' <<< "$theme_tokens" |
-    awk -v theme=$theme '
+    # Extract and sanitize the theme tokens from the input JSON.
+    # It flattens the structure and removes color token wrappers like {Colors.X.Y}
+    theme_tokens=$(jq --arg keyvar "$root" '
+        .[$keyvar]
+        | to_entries
+        | map(.value | to_entries)
+        | add
+        | map({
+            key: .key,
+            value: (
+                .value.value
+                | gsub("(?<!\\{)\\s+(?![^\\{]*\\})"; "")   # remove spaces outside of {}
+                | gsub("\\{?\\s*Colors\\."; "")            # remove optional '{', spaces, and 'Colors.'
+                | gsub("\\}"; "")                          # remove closing '}'
+            )
+            })
+        ' <<< "$input_json")
+
+    [[ $? -ne 0 ]] && fatal "jq token parse failed."
+
+    # Merge tokens with core color values from /tmp/colors.json
+    # If the token is a synthetic rgba (e.g., rgba({Colors.X.Y}, 0.4)), it generates a marker string
+    # for awk to interpret and resolve it with transparency applied.
+    jq -r --slurpfile colors /tmp/colors.json '
+        ($colors | map({key: .key, value: .value}) | from_entries) as $c
+        | .[]
+        | .key as $k
+        | if (.value | test("^rgba\\(")) then
+            .value
+            | capture("rgba\\((?<color>[^,]+),(?<alpha>[^\\)]+)\\)")
+            | [$k, "NEEDS_RGBA(\($c[.color] // "null"),\(.alpha))"]
+           else
+            [$k, ($c[.value] // "null")]
+           end
+        | @sh
+        ' <<< "$theme_tokens" |
+
+    # Process each key-value pair and write the final CSS tokens
+    awk -v theme="$theme" '
         function isHex(color) {
             return match(color, /^#?[0-9a-fA-F]+$/)
         }
+
+        # Converts a hexadecimal color string into decimal (0–255)
         function hexToDec(s){
             return index("0123456789abcdef", tolower(substr(s,length(s)))) - 1 + (sub(/.$/,"",s) ? 16*hexToDec(s) : 0)
         }
+
+        # Build rgba() string from hex + alpha, using CSS variables for alpha
         function convertHexToRgba(token, color) {
             hexStr = substr(color, 2)
             split("", rgba)
@@ -91,40 +170,72 @@ get_theme_tokens() {
             rgba[4] = buildAlpha(token, rgba[4]/255)
             return buildRgba(rgba)
         }
+
+        # Extracts and adjusts rgba() components from rgba(...) input
         function parseRgba(token, color) {
             gsub(/rgba|rgb|\x28|\x29/, "", color)
             split(color, rgba, ",")
             rgba[4] = buildAlpha(token, rgba[4])
             return buildRgba(rgba)
         }
+
+        # Parses marker format NEEDS_RGBA(#rrggbb, alpha) and converts it
+        function convertMarkedRgba(token, str) {
+            gsub(/^NEEDS_RGBA\(|\)$/, "", str)
+            split(str, parts, ",")
+            hex = substr(parts[1], 2)
+            alpha = parts[2]
+            r = hexToDec(substr(hex, 1, 2))
+            g = hexToDec(substr(hex, 3, 2))
+            b = hexToDec(substr(hex, 5, 2))
+            a = buildAlpha(token, alpha)
+            return sprintf("rgba(%d, %d, %d, %s)", r, g, b, a)
+        }
+
+        # Formats rgba() string
         function buildRgba(rgba) {
             return sprintf("rgba(%d, %d, %d, %s)", rgba[1], rgba[2], rgba[3], rgba[4])
         }
+
+        # Applies a CSS variable for alpha, fallback to actual value
         function buildAlpha(token, opacity) {
             match(token, /^--mobile-[a-z]+/)
             token = substr(token, RSTART, RLENGTH)
             return sprintf("var(%s-alpha, %.3g)", token, (opacity ? opacity : 1))
         }
+
         BEGIN {
-                printf "/* %s theme */\n", theme
-                printf ".theme-%s,\n", theme
-                printf ".theme-%s .custom-alpha,\n", theme
-                printf "html .theme-%s-forced {\n", theme
+            # CSS block preamble
+            printf "/* %s theme */\n", theme
+            printf ".theme-%s,\n", theme
+            printf ".theme-%s .custom-alpha,\n", theme
+            printf "html .theme-%s-forced {\n", theme
+        }
+
+        {
+            # Normalize token name
+            sub(/color/, "mobile")
+            gsub(/\x27/, "")  # remove single quotes
+
+            # Decide how to convert value
+            if ($2 ~ /^NEEDS_RGBA\(/) {
+                rgbaValue = convertMarkedRgba($1, $2)
+            } else if (isHex($2)) {
+                rgbaValue = convertHexToRgba($1, $2)
+            } else {
+                rgbaValue = parseRgba($1, $2)
             }
-            {
-                sub(/color/, "mobile")
-                gsub(/\x27/, "")
-                if (isHex($2)) {
-                    rgbaValue = convertHexToRgba($1, $2)
-                } else {
-                    rgbaValue = parseRgba($1, $2)
-                }
-                printf "    %s: %s;\n", $1, rgbaValue
-            }
+
+            # Emit final CSS rule
+            printf "    %s: %s;\n", $1, rgbaValue
+        }
+
         END {
-                print "}"
-            }
+            print "}"
+        }
     ' >> $output_css
+
+    # Capture exit codes from both jq and awk
     PS=("${PIPESTATUS[@]}")
     [[ ${PS[1]} -ne 0 ]] && fatal "awk failed."
     [[ ${PS[0]} -ne 0 ]] && fatal "jq failed."

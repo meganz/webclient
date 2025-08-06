@@ -732,29 +732,44 @@ MegaData.prototype.showContactVerificationDialog = function() {
     });
 };
 
+MegaData.prototype.paymentBannerData = async function() {
+    'use strict';
+    const { result: account } = await api.req({ a: 'uq', pro: 1, strg: 1, v: 2 });
+    if (Array.isArray(account.plans)) {
+        account.subs = Array.isArray(account.subs) && account.subs || [];
+        if (account.plans.length) {
+            const activePlan = account.plans.find(({ al }) => al === u_attr.p) || account.plans[0];
+            if (activePlan && activePlan.al !== pro.ACCOUNT_LEVEL_FEATURE) {
+                const sub = account.subs.find(({ id }) => id === activePlan.subid);
+                const hasSub = !!sub;
+
+                account.slevel = activePlan.al;
+                account.stype = hasSub && sub.type || 'O';
+                account.expiry = hasSub && sub.next || activePlan.expires || 0;
+            }
+        }
+    }
+    return account;
+};
+
 MegaData.prototype.showPlanExpiringBanner = async function(data) {
     'use strict';
 
-    if (!fminitialized) {
+    if (!fminitialized || u_attr && (u_attr.b || u_attr.pf || !u_attr.p)) {
         return;
     }
-    if (!M.account) {
-        await new Promise(resolve => {
-            M.accountData(resolve);
-        });
-    }
+    const account = await M.paymentBannerData();
     if (
-        M.account.stype !== 'O' ||
-        u_attr && (u_attr.b || u_attr.pf || !u_attr.p) ||
-        M.account.slevel === pro.ACCOUNT_LEVEL_BUSINESS ||
-        M.account.slevel === pro.ACCOUNT_LEVEL_PRO_FLEXI
+        account.stype !== 'O' ||
+        account.slevel === pro.ACCOUNT_LEVEL_BUSINESS ||
+        account.slevel === pro.ACCOUNT_LEVEL_PRO_FLEXI
     ) {
         return;
     }
 
     const curr = await M.getPersistentData('planexp-last').catch(nop) || {
-        expiry: data && data.expiry || M.account.expiry,
-        slevel: M.account.slevel,
+        expiry: data && data.expiry || account.expiry,
+        slevel: account.slevel,
         shown: 0,
         h: u_handle,
     };
@@ -766,7 +781,7 @@ MegaData.prototype.showPlanExpiringBanner = async function(data) {
     const today = new Date();
     if (today.getTime() > expiry * 1000) {
         M.delPersistentData('planexp-last').catch(nop);
-        data.slevel = data.slevel || slevel || M.account.slevel;
+        data.slevel = data.slevel || slevel || account.slevel;
         return M.showPlanExpiredBanner(data);
     }
     if (today.getTime() < (expiry - 4 * 86400) * 1000) {
@@ -790,9 +805,9 @@ MegaData.prototype.showPlanExpiringBanner = async function(data) {
         closeEvent: 500862,
     };
 
-    if (mega.bstrg < M.account.cstrg) {
+    if (mega.bstrg < account.cstrg) {
         options.msgHtml = l.plan_exp_banner_text_oq
-            .replace('%1', bytesToSize(M.account.cstrg))
+            .replace('%1', bytesToSize(account.cstrg))
             .replace('%2', bytesToSize(mega.bstrg, 0));
     }
     else {
@@ -820,14 +835,12 @@ MegaData.prototype.showPlanExpiringBanner = async function(data) {
 
 MegaData.prototype.showPaymentFailedBanner = async function() {
     'use strict';
-
-    if (!M.account) {
-        await new Promise(resolve => {
-            M.accountData(resolve);
-        });
+    if (u_attr && (u_attr.b || u_attr.p)) {
+        return;
     }
 
-    const { subs = [], expiry, cstrg } = M.account;
+    const account = await M.paymentBannerData();
+    const { subs = [], expiry, cstrg } = account;
     const today = new Date();
 
     const lastShow = await M.getPersistentData('payfail-last').catch(nop) ||
@@ -837,7 +850,6 @@ MegaData.prototype.showPaymentFailedBanner = async function() {
         return M.showPaymentFailedBanner();
     }
     if (
-        u_attr && (u_attr.b || u_attr.p) ||
         lastShow.al === pro.ACCOUNT_LEVEL_BUSINESS ||
         lastShow.al === pro.ACCOUNT_LEVEL_PRO_FLEXI
     ) {
@@ -1341,15 +1353,17 @@ mBroadcaster.once('fm:initialized', () => {
     'use strict';
 
     if (u_type === 3) {
-        M.accountData(() => {
-            if (u_attr && u_attr.p && M.account.stype === 'O') {
-                // Try showing this banner for users with a one off plan/sub and are still pro.
-                M.showPlanExpiringBanner().catch(dump);
-            }
-            else if (u_attr && !u_attr.p) {
-                // Try showing this banner only for users who are no longer pro.
-                M.showPaymentFailedBanner().catch(dump);
-            }
-        });
+        if (u_attr && u_attr.p) {
+            api.req({a: 'uq', pro: 1}).then(({result}) => {
+                if (result.stype === 'O') {
+                    // Try showing this banner for users with a one off plan/sub and are still pro.
+                    return M.showPlanExpiringBanner();
+                }
+            }).catch(dump);
+        }
+        else if (u_attr) {
+            // Try showing this banner only for users who are no longer pro.
+            M.showPaymentFailedBanner().catch(dump);
+        }
     }
 });

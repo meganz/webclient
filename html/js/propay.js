@@ -3252,12 +3252,18 @@ pro.propay = {
 
         pro.lastPaymentProviderId = addressDialog.gatewayId_stripe;
 
+        const extra = Object.assign({}, addressDialog.extraDetails);
+
+        if (this.useSavedCard && this.savedCard.id && !this.paymentButton) {
+            extra.pmid = this.savedCard.id;
+        }
+
         const rftRequest = {
             a: 'rft',
             it: pro.propay.selectedProPackage[pro.UTQA_RES_INDEX_ITEMNUM],
             id: pro.propay.selectedProPackage[pro.UTQA_RES_INDEX_ID],
             gw: addressDialog.gatewayId_stripe,
-            extra: addressDialog.extraDetails,
+            extra,
         };
 
         return api.screq(rftRequest).then(({result}) => {

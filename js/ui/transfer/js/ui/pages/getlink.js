@@ -202,22 +202,34 @@ lazy(T.ui, 'addFilesLayout', () => {
                 }
             });
 
-            // Init settings button
+            // Init settings events
             const settingsBtn = cn.querySelector('.js-link-settings');
-            settingsBtn.addEventListener('click', (e) => {
-                if (e.currentTarget.classList.contains('active-icon')) {
-                    inputsWrap.scrollTo({ top: 0, behavior: 'smooth' });
-                    inputsWrap.classList.remove('visible-settings');
+            const settingsBody = cn.querySelector('.js-settings-body');
+            const defaultInputs = cn.querySelector('.js-default-inputs');
+
+            settingsBtn.addEventListener('click', () => {
+                if (settingsBtn.classList.contains('active-icon')) {
+                    if (inputsWrap.scrollTop === 0) {
+                        settingsBody.classList.add('hidden');
+                    }
                     settingsBtn.classList.remove('active-icon');
+                    inputsWrap.scrollTo({ top: 0, behavior: 'smooth' });
                 }
                 else {
-                    const dn = cn.querySelector('.js-default-inputs');
-                    e.currentTarget.classList.add('active-icon');
-                    inputsWrap.classList.add('visible-settings');
+                    for (const elm of settingsBody.querySelectorAll('.section.hidden')) {
+                        elm.classList.remove('hidden');
+                    }
+                    settingsBtn.classList.add('active-icon');
+                    settingsBody.classList.remove('hidden');
                     inputsWrap.scrollTo({
-                        top: dn.getBoundingClientRect().height + 38,
+                        top: defaultInputs.getBoundingClientRect().height + 38,
                         behavior: 'smooth'
                     });
+                }
+            });
+            inputsWrap.addEventListener('scroll', () => {
+                if (inputsWrap.scrollTop === 0 && !settingsBtn.classList.contains('active-icon')) {
+                    settingsBody.classList.add('hidden');
                 }
             });
 

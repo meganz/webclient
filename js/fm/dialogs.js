@@ -1840,6 +1840,15 @@
                 chatSel.push(sel[i].id.replace('cpy-dlg-chat-itm-spn-', ''));
             }
         }
+        if (!treesearch) {
+            const $search = $($.saveAsDialog ? '.search-collapse-bar input' : '.search-bar input', $dialog);
+            if ($search.val()) {
+                $search.val('').blur();
+                if (!$.saveAsDialog) {
+                    $('.search-icon-reset', $dialog).addClass('hidden');
+                }
+            }
+        }
 
         handleDialogTabContent(tab, 'ul', b);
         buildDialogTree();
@@ -2308,6 +2317,8 @@
             $.cftarget = $.mcselected || (section === 'cloud-drive' ? M.RootID : M.RubbishID);
 
             const callback = (h) => {
+                // Force clear search since closeDialog will but s4 won't do that in the same order.
+                treesearch = false;
                 // Auto-select the created folder.
                 const p = Object(M.d[h]).p || $.cftarget;
 

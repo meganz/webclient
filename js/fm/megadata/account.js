@@ -745,7 +745,7 @@ MegaData.prototype.showPlanExpiringBanner = async function(data) {
     }
     if (
         M.account.stype !== 'O' ||
-        u_attr && (u_attr.b || u_attr.pf) ||
+        u_attr && (u_attr.b || u_attr.pf || !u_attr.p) ||
         M.account.slevel === pro.ACCOUNT_LEVEL_BUSINESS ||
         M.account.slevel === pro.ACCOUNT_LEVEL_PRO_FLEXI
     ) {
@@ -837,7 +837,7 @@ MegaData.prototype.showPaymentFailedBanner = async function() {
         return M.showPaymentFailedBanner();
     }
     if (
-        u_attr && (u_attr.b || u_attr.pf) ||
+        u_attr && (u_attr.b || u_attr.p) ||
         lastShow.al === pro.ACCOUNT_LEVEL_BUSINESS ||
         lastShow.al === pro.ACCOUNT_LEVEL_PRO_FLEXI
     ) {
@@ -1341,7 +1341,15 @@ mBroadcaster.once('fm:initialized', () => {
     'use strict';
 
     if (u_type === 3) {
-        M.showPlanExpiringBanner().catch(dump);
-        M.showPaymentFailedBanner().catch(dump);
+        M.accountData(() => {
+            if (u_attr && u_attr.p && M.account.stype === 'O') {
+                // Try showing this banner for users with a one off plan/sub and are still pro.
+                M.showPlanExpiringBanner().catch(dump);
+            }
+            else if (u_attr && !u_attr.p) {
+                // Try showing this banner only for users who are no longer pro.
+                M.showPaymentFailedBanner().catch(dump);
+            }
+        });
     }
 });

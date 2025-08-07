@@ -371,6 +371,85 @@
         }
     }
 
+    class MegaAppDlHintSection extends MegaComponent {
+        constructor(options) {
+            super(options);
+            this.addClass('context-section', 'context-app-dl-section');
+
+            const dlTxt = mCreateElement('div', { class: 'pt-1 ps-6' });
+            dlTxt.textContent = l.download_desktop_app_hint;
+
+            const dlLink = mCreateElement('div');
+
+            MegaLink.factory({
+                componentClassname: 'text-icon font-bold slim',
+                parentNode: dlLink,
+                text: l.download_app,
+                onClick: megasync.downloadApp.bind(null, 500918)
+            });
+
+            const closeHint = mCreateElement('div');
+
+            const wrapper = mCreateElement(
+                'div',
+                { class: 'flex flex-row pe-6 pt-2 pb-2 max-w-80' },
+                [
+                    mCreateElement('div', null, [dlTxt, dlLink]),
+                    closeHint
+                ]
+            );
+
+            MegaButton.factory({
+                parentNode: closeHint,
+                type: 'icon',
+                icon: 'sprite-fm-mono icon-dialog-close-thin',
+                iconSize: 24,
+                componentClassname: 'text-icon cursor-pointer',
+                onClick: (e) => {
+                    mega.config.set('dadlh', Date.now() / 1000 >>> 0);
+
+                    e.stopPropagation();
+
+                    if (this.domNode.classList.contains('last')) {
+                        this.domNode.classList.remove('last');
+
+                        let prev = this.domNode.previousElementSibling;
+
+                        while (prev) {
+                            if (!prev.classList.contains('hidden')) {
+                                prev.classList.add('last');
+                                break;
+                            }
+
+                            prev = prev.previousElementSibling;
+                        }
+                    }
+
+                    super.hide();
+                    $(window).trigger('resize.ccmui');
+                }
+            });
+
+            this.domNode.appendChild(wrapper);
+            this.selected = false;
+        }
+
+        show(ids) {
+            if (ids.includes('app-dl-hint')) {
+                const timeout = 120 * 24 * 60 * 60; // 120 days
+                const refused = mega.config.get('dadlh') | 0;
+                const isAppDl = mega.config.get('dlThroughMEGAsync') | 0;
+
+                if (!isAppDl && !refused || (refused + timeout) * 1000 < Date.now()) {
+                    super.show();
+                    return true;
+                }
+            }
+            super.hide();
+            return false;
+        }
+    }
+
     /**
      * @property {*} mega.ui.contextMenu Context UI.
      */
@@ -1135,6 +1214,7 @@
         ]));
 
         sections.addChild('label', new MegaLabelSection({ parentNode: menu }));
+        sections.addChild('appDl', new MegaAppDlHintSection({ parentNode: menu }));
         const doFavourite = (add) => {
             if (M.isInvalidUserStatus()) {
                 return;

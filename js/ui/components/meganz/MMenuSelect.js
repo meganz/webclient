@@ -94,6 +94,24 @@ class MMenuSelect extends MContextMenu {
         }
     }
 
+    /**
+     * @param {HTMLElement} node DOM node to insert
+     */
+    set footer(node) {
+        if (node) {
+            this._footer = node;
+            this.el.appendChild(node);
+        }
+        else if (this._footer) {
+            this.el.removeChild(this._footer);
+            delete this._footer;
+        }
+    }
+
+    get footer() {
+        return this._footer;
+    }
+
     resetOptions() {
         MComponent.resetSubElements(this, '_options');
     }

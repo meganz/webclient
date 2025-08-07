@@ -2686,8 +2686,7 @@ body.de .mega-dialog.contact-picker-widget {
 }
 
 .fm-picker-dialog .content-block.header {
-    padding: 40px 0 12px;
-    padding-inline: 24px 40px;
+    padding: 40px 40px 12px 24px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -2696,6 +2695,7 @@ body.de .mega-dialog.contact-picker-widget {
 }
 .rtl .fm-picker-dialog .content-block.header {
     border-radius: 16px 0 0;
+    padding: 40px 24px 12px 40px;
 }
 .fm-picker-dialog.no-left .content-block.header,
 .rtl .fm-picker-dialog.no-left .content-block.header {
@@ -2893,9 +2893,11 @@ body.de .mega-dialog.contact-picker-widget {
 }
 
 .fm-picker-dialog .content-block.summary-container {
-    margin: 24px 0 16px;
-    margin-inline: 24px 40px;
+    margin: 24px 40px 16px 24px;
     padding: 0;
+}
+.rtl .fm-picker-dialog .content-block.summary-container {
+    margin: 24px 24px 16px 40px;
 }
 .fm-picker-dialog.no-left .content-block.summary-container {
     margin-inline: 40px;

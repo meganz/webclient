@@ -584,7 +584,7 @@ ChatdIntegration.prototype.openChat = promisify(function(resolve, reject, chatIn
         // try to find the chat room again, it may had been opened while waiting for the mcurl api call...
         chatRoom = self.megaChat.getChatById(chatId);
         if (!chatRoom) {
-            var setAsActive = megaChat._chatsAwaitingAps[chatInfo.i] && !$.cpdGroupChat;
+            var setAsActive = !$.cpdGroupChat && megaChat._chatsAwaitingAps[chatInfo.i];
             delete megaChat._chatsAwaitingAps[chatInfo.i];
             const mcoFlags = {};
             for (const flag of Object.values(MCO_FLAGS)) {

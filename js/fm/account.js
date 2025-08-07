@@ -309,20 +309,8 @@ accountUI.general = {
             }
         });
 
-        $('.download-sync', accountUI.$contentBlock).rebind('click', function() {
-
-            eventlog(500489);
-
-            var pf = navigator.platform.toUpperCase();
-
-            // If this is Linux send them to desktop page to select linux type
-            if (pf.indexOf('LINUX') > -1) {
-                mega.redirect('mega.io', 'desktop', false, false, false);
-            }
-            // else directly give link of the file.
-            else {
-                window.location = megasync.getMegaSyncUrl();
-            }
+        $('.download-sync', accountUI.$contentBlock).rebind('click.download', () => {
+            megasync.downloadApp(500489);
         });
     },
 
@@ -3965,4 +3953,37 @@ accountUI.vpn = {
         this.vpnPage = this.vpnPage || new VpnPage();
         this.vpnPage.show();
     }
+};
+
+accountUI.hasMobileSessions = async() => {
+    'use strict';
+
+    if (typeof M.isMobileInUse === 'boolean') {
+        return M.isMobileInUse;
+    }
+
+    if (!(M.isMobileInUse instanceof Promise)) {
+        M.isMobileInUse = new Promise((resolve) => {
+            api.req({a: 'usl', x: 1}).then(({ result: sessions }) => {
+                if (sessions && sessions.length) {
+                    for (let i = sessions.length; i--;) {
+                        const useragent = String(sessions[i][2]).toLowerCase();
+
+                        if (useragent.startsWith('megaandroid/') || useragent.startsWith('megaios/') === 0) {
+                            M.isMobileInUse = true;
+                            break;
+                        }
+                    }
+                }
+
+                M.isMobileInUse = M.isMobileInUse === true;
+
+                resolve(M.isMobileInUse);
+            });
+        });
+    }
+
+    await M.isMobileInUse;
+
+    return M.isMobileInUse;
 };

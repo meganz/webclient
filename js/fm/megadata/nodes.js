@@ -879,7 +879,13 @@ MegaData.prototype.copyNodes = async function(cn, t, del, tree) {
     }
 
     // Display confirmation dialog when copying to/from object storage
-    if ('utils' in s4 && await s4.utils.confirmAction(cn, t).catch(dump) === false) {
+    if ('utils' in s4 && await s4.utils.confirmAction(cn, t).catch(ex => {
+        if (ex === EBLOCKED) {
+            // User cancelled.
+            throw EBLOCKED;
+        }
+        dump(ex);
+    }) === false) {
         return;
     }
 
@@ -1158,7 +1164,13 @@ MegaData.prototype.moveNodes = async function(n, t, folderConflictResolution) {
     }
 
     // Display confirmation dialog when moving to/from object storage
-    if ('utils' in s4 && await s4.utils.confirmAction(n, t, true).catch(dump) === false) {
+    if ('utils' in s4 && await s4.utils.confirmAction(n, t, true).catch(ex => {
+        if (ex === EBLOCKED) {
+            // User cancelled.
+            throw EBLOCKED;
+        }
+        dump(ex);
+    }) === false) {
         return;
     }
 
@@ -4380,6 +4392,13 @@ MegaData.prototype.importFileLink = function importFileLink(ph, key, attr, srcNo
 
             api.screq(req)
                 .then(resolve)
+                .then(() => {
+                    if (srcNode) {
+                        mega.ui.toast.show(
+                            mega.icu.format(l.toast_import_file, 1).replace('%s', M.getNameByHandle(target))
+                        );
+                    }
+                })
                 .catch((ex) => {
                     M.ulerror(null, ex);
                     reject(ex);

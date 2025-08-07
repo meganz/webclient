@@ -278,6 +278,8 @@ lazy(pro, 'proplan2', () => {
         },
     };
 
+    const setSItem = tryCatch((k, v) => sessionStorage.setItem(k, `${v}`));
+
     const getCurrentTab = () => (tabsInfo[window.mProTab] && tabsInfo[window.mProTab].tabID)
         || sessionStorage['pro.pricingTab']
         || tabsInfo.pro.tabID;
@@ -408,8 +410,8 @@ lazy(pro, 'proplan2', () => {
                 if (!tabsInfo.vpn.initialized) {
                     tabsInfo.vpn.$planCards = pro.proplan2.vpn
                         .renderPricingPage(VpnPlanFound, $page, (months, al, trial) => {
-                            sessionStorage.setItem('pro.period', String(months));
-                            sessionStorage[`noTrial${al}`] = !trial;
+                            setSItem('pro.period', months);
+                            setSItem(`noTrial${al}`, +!trial);
                             moveToBuyStep(al);
                         });
                     tabsInfo.vpn.initialized = true;
@@ -422,8 +424,8 @@ lazy(pro, 'proplan2', () => {
                 if (!tabsInfo.pwm.initialized) {
                     tabsInfo.pwm.$planCards = pro.proplan2.pwm
                         .renderPricingPage(PwmPlanFound, $page, (months, al, trial) => {
-                            sessionStorage.setItem('pro.period', String(months));
-                            sessionStorage[`noTrial${al}`] = !trial;
+                            setSItem('pro.period', months);
+                            setSItem(`noTrial${al}`, +!trial);
                             moveToBuyStep(al);
                         });
                     tabsInfo.pwm.initialized = true;
@@ -462,7 +464,7 @@ lazy(pro, 'proplan2', () => {
             changeIndividualTeamTab(this);
 
             currentTab = this.id;
-            sessionStorage['pro.pricingTab'] = this.id;
+            setSItem('pro.pricingTab', currentTab);
 
             switch (this.id) {
                 case 'pr-individual-tab':
@@ -514,7 +516,7 @@ lazy(pro, 'proplan2', () => {
         eventlog(500337, currentTab);
 
         // Update the savedTab so that it will be set correctly when visited via /pro?tab=XXX
-        sessionStorage['pro.pricingTab'] = currentTab;
+        setSItem('pro.pricingTab', currentTab);
     };
 
     const initPlansTabs = () => {
@@ -1562,7 +1564,7 @@ lazy(pro, 'proplan2', () => {
                 delay('pricing.plan', eventlog.bind(null, is_mobile ? 99869 : 99868));
             }
 
-            sessionStorage.setItem('pro.period', this.dataset.period);
+            setSItem('pro.period', this.dataset.period);
             fillPlansInfo({
                 duration: this.dataset.period | 0,
                 tab: pageInformation.currentTab.key || 'pro',

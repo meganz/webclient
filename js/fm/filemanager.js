@@ -177,15 +177,15 @@ function FileManager() {
                 M.columnsWidth.cloud.fav.viewed = false;
             }
 
+            const path = String(M.currentdirid).split('/');
             if (M.onDeviceCenter) {
-                const path = M.currentdirid.split('/');
                 if (path.length === 3 && sharer(path[2])) {
                     M.columnsWidth.cloud.fav.disabled = true;
                     M.columnsWidth.cloud.fav.viewed = false;
                 }
             }
 
-            if (M.currentrootid === 's4' && M.d[M.currentdirid.split('/').pop()]) {
+            if (M.currentrootid === 's4' && M.d[path.pop()]) {
                 M.columnsWidth.cloud.accessCtrl.viewed = true;
                 M.columnsWidth.cloud.accessCtrl.disabled = false;
             }
@@ -2041,7 +2041,7 @@ FileManager.prototype.initFileAndFolderSelectDialog = async function(type) {
     return promise;
 };
 
-FileManager.prototype.initNewChatlinkDialog = function() {
+FileManager.prototype.initNewChatlinkDialog = function(flowType, cb) {
     'use strict';
 
     // If chat is not ready.
@@ -2063,11 +2063,16 @@ FileManager.prototype.initNewChatlinkDialog = function() {
 
     var dialog = React.createElement(StartGroupChatDialogUI.StartGroupChatWizard, {
         name: "start-group-chat",
-        flowType: 2,
+        flowType: flowType || 2,
         onClose() {
             ReactDOM.unmountComponentAtNode(dialogPlacer);
             dialogPlacer.remove();
-            closeDialog();
+            if (typeof cb === 'function') {
+                tryCatch(cb)();
+            }
+            else {
+                closeDialog();
+            }
         }
     });
 
@@ -2859,7 +2864,7 @@ FileManager.prototype.addGridUI = function(refresh) {
     $('.grid-url-header').text('');
 
     $('.files-grid-view.fm .grid-scrolling-table,.files-grid-view.fm .file-block-scrolling, .fm-empty-cloud,' +
-        '.fm-empty-folder, .fm.shared-folder-content, .fm-empty-s4-bucket, .out-shared-grid-view')
+        '.fm-empty-folder, .fm.shared-folder-content, .fm-empty-s4-bucket, .out-shared-grid-view, .empty-state')
         .rebind('contextmenu.fm', e => {
             // Remove context menu option from filtered view and media discovery view
             if (page === "fm/links" && page === "fm/faves" || M.gallery) {
@@ -3176,8 +3181,8 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
 
     var mainSel = $.selectddUIgrid + ' ' + $.selectddUIitem;
     var dropSel = $.selectddUIgrid + ' ' + $.selectddUIitem + '.folder';
-    var $ddUIitem = $(mainSel);
-    var $ddUIgrid = $($.selectddUIgrid);
+    var $ddUIitem = $(mainSel, '.fmholder');
+    var $ddUIgrid = $($.selectddUIgrid, '.fmholder');
 
     if (!folderlink) {
         $(dropSel).droppable({
@@ -4027,7 +4032,7 @@ FileManager.prototype.cameraUploadUI = function() {
     var diagInheritance = {
         'recovery-key-dialog': ['recovery-key-info'],
         properties: ['links', 'rename', 'copyrights', 'copy', 'move', 'share', 'saveAs'],
-        copy: ['createfolder'],
+        copy: ['createfolder', 'start-group-chat'],
         move: ['createfolder'],
         register: ['terms'],
         selectFolder: ['createfolder'],
@@ -4037,7 +4042,8 @@ FileManager.prototype.cameraUploadUI = function() {
         ],
         'share-with-unverified-contacts': ['fingerprint-dialog'],
         'share-access-contacts-dialog': ['fingerprint-dialog'],
-        'stripe-pay': ['stripe-pay-success', 'stripe-pay-failure']
+        'stripe-pay': ['stripe-pay-success', 'stripe-pay-failure'],
+        'sendToChat': ['start-group-chat'],
     };
 
     var _openDialog = function(name, dsp) {

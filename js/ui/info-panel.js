@@ -1561,6 +1561,10 @@ lazy(mega.ui, 'mInfoPanel', () => {
              * @returns {undefined}
              */
             set(tag, handles, isRemove) {
+                if (!this.t) {
+                    console.error('tagsDB is not yet initialized...', tag, handles, isRemove);
+                    return false;
+                }
                 if (isRemove) {
                     const tagSet = this.t.get(tag);
                     if (handles && tagSet) {

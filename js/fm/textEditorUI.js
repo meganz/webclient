@@ -345,7 +345,7 @@ mega.textEditorUI = new function TextEditorUI() {
             function sendToContactMenuClick() {
                 selectionManager.clear_selection();
                 selectionManager.add_to_selection(versionHandle || fileHandle);
-                openCopyDialog('conversations');
+                openSendToChatDialog();
             }
         );
 

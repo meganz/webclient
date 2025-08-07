@@ -589,6 +589,23 @@ var megasync = (function() {
     ns.megaSyncRequest = megaSyncRequest;
     ns.megaSyncIsNotResponding = megaSyncIsNotResponding;
 
+    ns.downloadApp = (eventId) => {
+        if (eventId) {
+            eventlog(eventId);
+        }
+
+        var pf = navigator.platform.toUpperCase();
+
+        // If this is Linux send them to desktop page to select linux type
+        if (pf.includes('LINUX')) {
+            mega.redirect('mega.io', 'desktop', false, false, false);
+        }
+        // else directly give link of the file.
+        else {
+            window.open(megasync.getMegaSyncUrl(), '_blank', 'noopener,noreferrer');
+        }
+    };
+
     var periodicCheckTimeout;
 
     ns.periodicCheck = function() {

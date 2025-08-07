@@ -378,6 +378,18 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sSubMap) {
                     node.classList.add('chat-folder');
                 }
                 node.textContent = name;
+                if (dialog === 'fm-picker-dialog') {
+                    node.previousElementSibling.classList.add(
+                        'sprite-fm-mono',
+                        buildnode ? 'icon-chevron-down-thin-outline' : 'icon-chevron-right-thin-outline'
+                    );
+                    if (folders[idx].t & M.IS_LINKED) {
+                        const icon = node.nextElementSibling.querySelector('.file-status-ico');
+                        if (icon) {
+                            icon.classList.add('sprite-fm-mono', 'icon-link-thin-outline');
+                        }
+                    }
+                }
                 html = node.parentNode.parentNode;
 
                 if (folders[idx - 1] && !(folders[idx - 1].t & M.IS_S4CRT)

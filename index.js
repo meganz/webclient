@@ -417,6 +417,13 @@ function init_page() {
         return false;
     }
 
+    // This is a redirect page for primary mobile devices
+    if (is_mobile && page === 'go') {
+        window.location.replace(getMobileStoreLink());
+        eventlog(500921);
+        return false;
+    }
+
     if (page === "fm/contacts") {
         // force replace of page history, so that back won't cause the user to go back to an empty fm/contacts
         loadSubPage("/fm/chat/contacts");

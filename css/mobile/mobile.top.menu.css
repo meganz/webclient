@@ -79,6 +79,7 @@
     color: var(--mobile-text-primary);
 }
 
+.mega-top-menu .nav-elem.text-icon:hover,
 .mega-top-menu .nav-elem.text-icon:active {
     text-decoration: none;
 }

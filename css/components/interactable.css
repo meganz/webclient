@@ -253,11 +253,15 @@ button.nav-elem.no-active:active,
 .nav-elem.text-only:hover {
     color: var(--mobile-button-primary-pressed);
 }
+.nav-elem.text-only.info-link {
+    color: var(--mobile-link-primary);
+}
 .nav-elem.text-icon.disabled,
 .nav-elem.text-icon.disabled:active {
     color: var(--mobile-text-disabled);
     text-decoration: underline var(--mobile-text-disabled);
 }
+.nav-elem.text-icon:hover,
 .nav-elem.text-icon:active {
     color: var(--mobile-button-primary-pressed);
     text-decoration: underline var(--mobile-button-primary-pressed);
@@ -322,6 +326,9 @@ button.nav-elem.no-active:active,
 }
 .nav-elem.slim span {
     font: var(--mobile-font-link-small-regular);
+}
+.nav-elem.slim.font-bold span {
+    font: var(--mobile-font-link-small-semibold);
 }
 .nav-elem.underline span,
 .nav-elem.underline-offset-4 span {
@@ -502,4 +509,9 @@ button.nav-elem.pro-only:active {
 .nav-elem .right-badge.error {
     border-color: var(--mobile-text-error);
     color: var(--mobile-text-error);
+}
+
+.nav-elem.text-only span.primary-text:hover,
+.nav-elem.text-only span.primary-text:active {
+    color: var(--mobile-button-primary-pressed);
 }

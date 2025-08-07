@@ -175,6 +175,9 @@ span.rot-90::before {
 .pb-20 {
     padding-bottom: 5rem;
 }
+.pr-2 {
+    padding-right: 0.5rem;
+}
 .pr-4 {
     padding-right: 1rem;
 }
@@ -196,8 +199,11 @@ span.rot-90::before {
 .pl-4 {
     padding-left: 1rem;
 }
-.pl-6 {
-    padding-left: 1.5rem;
+.ps-6 {
+    padding-inline-start: 1.5rem;
+}
+.pe-6 {
+    padding-inline-end: 1.5rem;
 }
 .px-1 {
     padding-left: 0.25rem;
@@ -266,8 +272,20 @@ span.rot-90::before {
 .w-80 {
     width: 20rem;
 }
+.w-80 {
+    width: 20rem;
+}
 .h-10 {
     height: 2.5rem;
+}
+.h-12 {
+    height: 3rem;
+}
+.h-18 {
+    height: 4.5rem;
+}
+.h-20 {
+    height: 5rem;
 }
 .h-24 {
     height: 6rem;
@@ -277,6 +295,9 @@ span.rot-90::before {
 }
 .h-32 {
     height: 8rem;
+}
+.h-48 {
+    height: 12rem;
 }
 .h-60 {
     height: 15rem;
@@ -293,6 +314,9 @@ span.rot-90::before {
 }
 .max-h-0 {
     max-height: 0;
+}
+.max-h-48 {
+    max-height: 12rem;
 }
 .max-h-100 {
     max-height: 25rem;
@@ -458,6 +482,9 @@ body.rtl .text-left {
 .font-body-2 {
     font: var(--text-body2);
 }
+.font-title-h2-bold {
+    font: var(--text-h2-bold);
+}
 .font-title-h3 {
     font: var(--text-h3);
 }
@@ -579,6 +606,15 @@ i.green-check-circle {
 .bg-inherit {
     background: inherit;
 }
+.bg-no-repeat {
+    background-repeat: no-repeat;
+}
+.bg-center {
+    background-position: center;
+}
+.bg-contain {
+    background-size: contain;
+}
 .text-color-medium {
     color: var(--text-color-medium);
 }
@@ -598,7 +634,7 @@ i.green-check-circle {
     border-radius: 4px;
 }
 .border-radius-2 {
-    border-radius: 8px;
+    border-radius: var(--mobile-border-radius-medium);
 }
 .border-1 {
     border: 1px solid var(--mobile-border-strong);
@@ -615,6 +651,14 @@ i.green-check-circle {
 .border-x-none {
     border-left: none;
     border-right: none;
+}
+.border-drop {
+    background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' opacity='0.2' rx='8' ry='8' stroke='%23333' stroke-width='4' stroke-dasharray='1%2c 9' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e");
+    border-radius: 8px;
+}
+.theme-dark .border-drop {
+    background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' opacity='0.2' rx='8' ry='8' stroke='%23999' stroke-width='4' stroke-dasharray='1%2c 9' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e");
+    border-radius: 8px;
 }
 .white-space-nowrap {
     white-space: nowrap;

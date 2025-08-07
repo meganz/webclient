@@ -41,7 +41,7 @@
         const scope = wrapperNode
             || document.querySelector('.fm-right-files-block .fm-right-header .fm-breadcrumbs-wrapper');
 
-        if (typeof scope !== 'object') {
+        if (!(scope && scope.parentNode)) {
             console.assert(false, 'invalid scope');
             return;
         }
@@ -387,7 +387,7 @@
             containerWidth = Infinity;
         }
 
-        if (M.dyh && M.dyh('is-breadcrumb-root', items)) {
+        if (M.dyh && M.dyh('is-breadcrumb-root', items) && !container.closest('.fm-picker-dialog')) {
             isDyhRoot = true;
             containerWidth = Infinity;
         }

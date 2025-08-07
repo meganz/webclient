@@ -215,7 +215,10 @@ lazy(T.ui, 'viewFilesLayout', () => {
         */
         async renderReadyToDownload(xh) {
             if (!this.readyToDownload.cn) {
-                MediaInfoLib.getMediaCodecsList().catch(dump);
+                MediaInfoLib.getMediaCodecsList()
+                    .catch((ex) => {
+                        self.reportError(new Error(`Failed to load media-codecs list, ${ex}`));
+                    });
                 await this.initReadyToDownload(xh);
             }
             const { cn } = this.readyToDownload;

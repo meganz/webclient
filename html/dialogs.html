@@ -1748,240 +1748,255 @@
          aria-labelledby="fm-picker-dialog-title"
          aria-modal="true">
 
-        <button class="close js-close hidden" aria-label="[$148]">
-            <i class="sprite-fm-mono icon-dialog-close"></i>
-        </button>
-
-        <header>
-            <h2 id="fm-picker-dialog-title">[$63]</h2>
-            <div class="fm-picker-dialog-desc hidden">
-                <p></p>
+        <section class="left-panel">
+            <!-- Tab Sections -->
+            <div class="right-pane fm-picker-dialog-tree-panel cloud-drive">
+                <button
+                    class="mega-component fm-picker-dialog-button text-icon menu-item nav-elem full-width active simpletip"
+                    data-section="cloud-drive"
+                    data-simpletip="[$1687]"
+                    data-simpletipposition="right"
+                    data-simpletip-class="picker-dialog-simpletip"
+                    data-simpletipoffset="-12"
+                >
+                    <i class="sprite-fm-mono icon-cloud-thin-outline left-icon icon-size-24"></i>
+                    <div class="text-box-wrapper sk-elm">
+                        <span class="primary-text">[$1687]</span>
+                    </div>
+                </button>
             </div>
-        </header>
+            <div class="right-pane fm-picker-dialog-tree-panel s4">
+                <button
+                    class="mega-component fm-picker-dialog-button text-icon menu-item nav-elem full-width simpletip"
+                    data-section="s4"
+                    data-simpletip="[$obj_storage]"
+                    data-simpletipposition="right"
+                    data-simpletip-class="picker-dialog-simpletip"
+                    data-simpletipoffset="-12"
+                >
+                    <i class="sprite-fm-mono icon-bucket-triangle-thin-outline left-icon icon-size-24"></i>
+                    <div class="text-box-wrapper sk-elm">
+                        <span class="primary-text">[$obj_storage]</span>
+                    </div>
+                </button>
+            </div>
+            <div class="right-pane fm-picker-dialog-tree-panel shared-with-me">
+                <button
+                    class="mega-component fm-picker-dialog-button text-icon menu-item nav-elem full-width simpletip"
+                    data-section="shared-with-me"
+                    data-simpletip="[$5542]"
+                    data-simpletipposition="right"
+                    data-simpletip-class="picker-dialog-simpletip"
+                    data-simpletipoffset="-12"
+                >
+                    <i class="sprite-fm-mono icon-folder-users-thin-outline left-icon icon-size-24"></i>
+                    <div class="text-box-wrapper sk-elm">
+                        <span class="primary-text">[$5542]</span>
+                    </div>
+                </button>
+            </div>
+            <div class="right-pane fm-picker-dialog-tree-panel conversations">
+                <button
+                    class="mega-component fm-picker-dialog-button text-icon menu-item nav-elem full-width simpletip"
+                    data-section="conversations"
+                    data-simpletip="[$7997]"
+                    data-simpletipposition="right"
+                    data-simpletip-class="picker-dialog-simpletip"
+                    data-simpletipoffset="-12"
+                >
+                    <i class="sprite-fm-mono icon-message-chat-circle-thin left-icon icon-size-24"></i>
+                    <div class="text-box-wrapper sk-elm">
+                        <span class="primary-text">[$7997]</span>
+                    </div>
+                </button>
+            </div>
 
+            <div class="fm-picker-notagain mega-component mega-checkbox hidden">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" id="fm-picker-notagain" class="notagain" />
+                </div>
+                <label for="fm-picker-notagain" class="checkbox-action">[$229]</label>
+            </div>
+            <!-- END Tab Sections -->
+        </section>
         <section class="content">
+            <!-- Header container -->
+            <div class="content-block header">
+                <h2 id="fm-picker-dialog-title">[$63]</h2>
+                <div class="search-bar summary-input placeholder mega-input pm box-style with-icon">
+                    <i class="sprite-fm-mono icon-search-light-outline left-icon"></i>
+                    <input class="form-element pmText no-title-top clearButton megaInputs" type="text" placeholder="[$dlg_search_cd]">
+                    <i class="sprite-fm-mono icon-dialog-close-thin clear-input search-icon-reset hidden"></i>
+                    <div class="save-input-error hidden">
+                        <i class="sprite-fm-mono icon-alert-triangle-thin-outline"></i>
+                        <div class="error-text"></div>
+                    </div>
+                </div>
+            </div>
+            <!-- END header container -->
 
             <!--Summary container-->
-            <div class="content-block">
-                <!-- Templates -->
-                <div class="fm-picker-dialog-panel-header">
-                    <span class="item-names">[$5916]</span>
+            <div class="content-block sort">
+                <div class="sort-height">
                     <div class="fm-picker-dialog-panel-arrows">
-                        <i class="sprite-fm-mono icon-queue-down"></i>
+                        <i class="sprite-fm-mono icon-arrow-up-thin-outline"></i>
                     </div>
-                    <div class="search-bar summary-input placeholder">
-                        <i class="sprite-fm-mono icon-preview-reveal"></i>
-                        <input type="text" placeholder="[$102]">
-                        <i class="sprite-fm-mono icon-close-component search-icon-reset hidden"></i>
-                    </div>
+                    <span class="item-names">[$86]</span>
                 </div>
-                <!-- END Templates -->
+                <div class="search-collapse-bar summary-input mega-input pm box-style with-icon collapsed hidden">
+                    <i class="sprite-fm-mono icon-search-light-outline left-icon search-icon-expand"></i>
+                    <input class="form-element pmText no-title-top clearButton megaInputs" type="text">
+                    <i class="sprite-fm-mono icon-dialog-close-thin clear-input search-icon-collapse hidden"></i>
+                </div>
             </div>
 
-            <div class="content-block summary-container alt-background">
-                <div class="summary-row summary-selected unfold">
-                    <div class="summary-title summary-selected-title">[$19180]</div>
-                    <div class="summary-input summary-items correct-input scroll-auto unfold">
-                        <div class="item-row-group">
-                            <div class="item-row">
-                                <div class="item-type-icon icon-generic-24"></div>
-                                <div class="summary-ff-name">[$5533]</div>
-                                <div class="delete-img icon"></div>
-                                <input class="summary-ff-name hidden" type="text" value="" placeholder="[$17506]" />
-                            </div>
-                            <div class="duplicated-input-warning">
-                                <span>[$17578]</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="summary-items-drop-icon drop-down sprite-fm-mono icon-arrow-down"></div>
-                </div>
-                <div class="summary-row">
-                    <div class="summary-title summary-target-title">[$19181]</div>
-                    <div class="summary-input placeholder">
-                        <div class="choose-target">
-                            <i class="target-icon"></i>
-                            <div class="summary-ff-name">[$19182]</div>
-                        </div>
-                        <div class="fm-picker-breadcrumbs link-row">
-                            <div class="crumb-overflow-link dropdown">
-                                <a class="breadcrumb-dropdown-link">
-                                    <i class="menu-icon sprite-fm-mono icon-options icon16"></i>
-                                </a>
-                                <i class="sprite-fm-mono icon-arrow-right icon16"></i>
-                            </div>
-                            <div class="fm-breadcrumbs-block"></div>
-                            <div class="breadcrumb-dropdown"></div>
-                        </div>
-                    </div>
-                </div>
-            </div><!--END summary-->
             <!--Folder container-->
             <div class="content-block folder-container">
-                <div class="dropdown body dropdown-arrow down-arrow contact-preview hidden">
-                    <i class="dropdown-white-arrow"></i>
-                    <div class="contacts-info body">
-                    </div>
+                <div class="dialog-tree-panel-scroll">
+                    <div class="dialog-content-block"></div>
                 </div>
-                <div class="side-pane">
-                    <!-- Please add "active" classname to necessary "fm-picker-dialog-button" block !-->
-                    <div class="fm-picker-dialog-button cloud-drive" data-section="cloud-drive">
-                        <div class="left-border"></div>
-                        <div class="tooltip">[$1687]</div>
-                        <i class="sprite-fm-mono icon-cloud-drive"></i>
-                    </div>
-                    <div class="fm-picker-dialog-button s4" data-section="s4">
-                        <div class="left-border"></div>
-                        <div class="tooltip">[$obj_storage]</div>
-                        <i class="sprite-fm-mono icon-object-storage"></i>
-                    </div>
-                    <div class="fm-picker-dialog-button shared-with-me" data-section="shared-with-me">
-                        <div class="left-border"></div>
-                        <div class="tooltip">[$5589]</div>
-                        <i class="sprite-fm-mono icon-folder-incoming-share-filled"></i>
-                    </div>
-                    <div class="fm-picker-dialog-button conversations" data-section="conversations">
-                        <div class="left-border"></div>
-                        <div class="tooltip">[$17764]</div>
-                        <i class="sprite-fm-mono icon-chat-filled"></i>
-                    </div>
-                    <div class="fm-picker-dialog-button rubbish-bin" data-section="rubbish-bin">
-                        <div class="left-border"></div>
-                        <div class="tooltip">[$167]</div>
-                        <i class="sprite-fm-mono icon-bin-filled"></i>
-                    </div>
-                </div>
-
-                <!-- Tab Sections -->
-                <div class="right-pane fm-picker-dialog-tree-panel cloud-drive">
-                    <!--div class="fm-picker-dialog-panel-header"></div-->
-                    <div class="dialog-tree-panel-scroll">
-                        <div class="dialog-content-block"></div>
-                    </div>
-                </div>
-                <div class="right-pane fm-picker-dialog-tree-panel s4">
-                    <!--div class="fm-picker-dialog-panel-header"></div-->
-                    <div class="dialog-tree-panel-scroll">
-                        <div class="dialog-content-block"></div>
-                    </div>
-                </div>
-                <div class="right-pane fm-picker-dialog-tree-panel shared-with-me">
-                    <!--div class="fm-picker-dialog-panel-header"></div-->
-                    <div class="dialog-tree-panel-scroll">
-                        <div class="dialog-content-block"></div>
-                    </div>
-                </div>
-                <div class="right-pane fm-picker-dialog-tree-panel conversations">
-                    <!--div class="fm-picker-dialog-panel-header"></div-->
-                    <div class="dialog-tree-panel-scroll">
-                        <div class="dialog-content-block"></div>
-                    </div>
-                </div>
-                <div class="right-pane fm-picker-dialog-tree-panel rubbish-bin">
-                    <!--div class="fm-picker-dialog-panel-header"></div-->
-                    <div class="dialog-tree-panel-scroll">
-                        <div class="dialog-content-block"></div>
-                    </div>
-                </div>
-                <!-- END Tab Sections -->
-                <!-- Please add "active" classname to necessary "fm-picker-dialog-empty" block !-->
                 <div class="dialog-empty-block cloud-drive">
                     <div class="dialog-empty-pad">
-                        <i class="sprite-fm-mono icon-cloud-drive"></i>
-                        <div class="dialog-empty-header">
-                            [$20461]
+                        <div class="image mob-px-6">
+                            <i class="glass-cloud-circle"></i>
+                        </div>
+                        <div class="title mob-px-6">
+                            <h1>[$20461]</h1>
+                        </div>
+                        <div class="subtitle">
+                            <span>[$move_dlg_empty_cd]</span>
                         </div>
                     </div>
                 </div>
                 <div class="dialog-empty-block s4">
                     <div class="dialog-empty-pad">
-                        <i class="sprite-fm-mono icon-object-storage"></i>
-                        <div class="dialog-empty-header">
-                            <span>[$obj_storage]</span>
-                            <i class="sprite-fm-mono icon-loader-grad-small-regular-outline rotating-animation"></i>
+                        <div class="image mob-px-6">
+                            <i class="glass-object-bucket"></i>
+                        </div>
+                        <div class="title mob-px-6">
+                            <h1>[$dlg_empty_title_s4]</h1>
+                        </div>
+                        <div class="subtitle">
+                            <span>[$move_dlg_empty_s4]</span>
                         </div>
                     </div>
                 </div>
                 <div class="dialog-empty-block shared-with-me">
                     <div class="dialog-empty-pad">
-                        <i class="sprite-fm-mono icon-folder-incoming-share-filled"></i>
-                        <div class="dialog-empty-header">
-                            [$6871]
+                        <div class="image mob-px-6">
+                            <i class="glass-shared-folder"></i>
+                        </div>
+                        <div class="title mob-px-6">
+                            <h1>[$6871]</h1>
+                        </div>
+                        <div class="subtitle">
+                            <span>[$dlg_empty_text_share]</span>
                         </div>
                     </div>
                 </div>
                 <div class="dialog-empty-block conversations">
                     <div class="dialog-empty-pad">
-                        <i class="sprite-fm-mono icon-chat-filled"></i>
-                        <div class="dialog-empty-header">
-                            [$8000]
+                        <div class="image mob-px-6">
+                            <i class="glass-contact"></i>
                         </div>
+                        <div class="title mob-px-6">
+                            <h1>[$5737]</h1>
+                        </div>
+                        <div class="subtitle hidden"><span></span></div>
                     </div>
                 </div>
-                <div class="dialog-empty-block rubbish-bin">
+                <div class="dialog-empty-block search">
                     <div class="dialog-empty-pad">
-                        <i class="sprite-fm-mono icon-bin-filled"></i>
-                        <div class="dialog-empty-header">
-                            [$7740]
+                        <div class="image mob-px-6">
+                            <i class="glass-details"></i>
+                        </div>
+                        <div class="title mob-px-6">
+                            <h1>[$no_search_results]</h1>
+                        </div>
+                        <div class="subtitle">
+                            <span>[$search_again]</span>
                         </div>
                     </div>
                 </div>
-
             </div><!--END folder container-->
-            <hr/>
-        </section>
 
-        <footer>
-            <div class="footer-container space-between">
-                <div class="select-wrapper">
-                    <div class="permissions mega-input dropdown-input box-style inline hidden">
-                        <i class="permission sprite-fm-mono icon-read-only"></i>
-                        <span>[$7534]</span>
-                        <i class="sprite-fm-mono icon-dropdown"></i>
-                        <div class="mega-input-dropdown hidden">
-                            <div class="option active" data-icon="icon-read-only" data-access="read-only">
-                                <i class="sprite-fm-mono icon-read-only"></i>
-                                <span>[$7534]</span>
-                                <i class="sprite-fm-uni icon-check"></i>
+            <div class="content-block summary-container">
+                <div class="summary-row">
+                    <div class="summary-item summary-title summary-target-title">[$item_target]</div>
+                    <div class="summary-item summary-input placeholder">
+                        <div class="fm-picker-breadcrumbs link-row">
+                            <div class="crumb-overflow-link dropdown">
+                                <a class="breadcrumb-dropdown-link">
+                                    <i class="menu-icon sprite-fm-mono icon-more-horizontal-thin-outline icon16"></i>
+                                </a>
+                                <i class="sprite-fm-mono icon-chevron-right-thin-outline icon16"></i>
                             </div>
-                            <div class="option" data-icon="icon-permissions-write" data-access="read-and-write">
-                                <i class="sprite-fm-mono icon-permissions-write"></i>
-                                <span>[$56]</span>
-                                <i class="sprite-fm-uni icon-check"></i>
-                            </div>
-                            <div class="option" data-icon="icon-star" data-access="full-access">
-                                <i class="sprite-fm-mono icon-star"></i>
-                                <span>[$57]</span>
-                                <i class="sprite-fm-uni icon-check"></i>
-                            </div>
+                            <div class="fm-breadcrumbs-block"></div>
+                            <div class="breadcrumb-dropdown"></div>
+                            <button class="mega-component nav-elem icon-only crumb-clear-sel hidden">
+                                <i class="sprite-fm-mono icon-dialog-close-thin left-icon"></i>
+                            </button>
                         </div>
                     </div>
-                    <button class="mega-button dialog-newfolder-button">
-                        <span>[$68]</span>
+                    <div class="summary-item summary-instructions">
+                        <i class="sprite-fm-mono icon-help-circle-thin-outline"></i>
+                        <div class="instruction"></div>
+                    </div>
+                </div>
+                <div class="summary-error hidden">
+                    <i class="sprite-fm-mono icon-alert-triangle-thin-outline"></i>
+                    <div class="error-text"></div>
+                </div>
+                <div class="summary-conversations hidden">
+                    <div class="summary-item summary-title summary-target-title">[$chat_target]</div>
+                    <div class="summary-item summary-input placeholder"></div>
+                    <div class="summary-row">
+                        <div class="summary-item summary-instructions">
+                            <div class="instruction">[$send_dlg_instruction_chat]</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-block footer-container">
+                <div class="select-wrapper">
+                    <div class="permissions hidden">
+                        <i class="permission sprite-fm-mono icon-eye-reveal1"></i>
+                        <span>[$7534]</span>
+                        <i class="sprite-fm-mono icon-chevron-down-thin-outline select-arrow"></i>
+                    </div>
+                    <button class="mega-component nav-elem text-only dialog-newfolder-button">
+                        <div class="text-box-wrapper sk-elm">
+                            <span class="primary-text">[$create_folder]</span>
+                        </div>
                     </button>
-                    <button class="mega-button dialog-newcontact-button">
-                        <span>[$71]</span>
+                    <button class="mega-component nav-elem text-only dialog-newgroup-button">
+                        <div class="text-box-wrapper sk-elm">
+                            <span class="primary-text">[$19483]</span>
+                        </div>
                     </button>
                 </div>
                 <div>
-                    <button class="mega-button dialog-cancel-button">
-                        <span>[$82]</span>
+                    <button class="mega-component nav-elem normal button action secondary dialog-cancel-button">
+                        <div class="text-box-wrapper sk-elm">
+                            <span class="primary-text">[$82]</span>
+                        </div>
                     </button>
-                    <button class="mega-button positive dialog-picker-button">
-                        <span>[$16176]</span>
+                    <button class="mega-component nav-elem normal button action dialog-picker-button">
+                        <div class="text-box-wrapper sk-elm">
+                            <span class="primary-text">[$16176]</span>
+                        </div>
                     </button>
                 </div>
             </div>
 
-            <aside class="fm-picker-notagain hidden align-start">
-                <div class="checkbox-block">
-                    <div class="checkdiv checkboxOff">
-                        <input type="checkbox" id="fm-picker-notagain" class="notagain" />
-                    </div>
-                    <label for="fm-picker-notagain" class="radio-txt">[$229]</label>
+            <div class="fm-picker-notagain mega-component mega-checkbox hidden">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" id="fm-picker-notagain1" class="notagain" />
                 </div>
-            </aside>
-        </footer>
+                <label for="fm-picker-notagain1" class="checkbox-action">[$229]</label>
+            </div>
+        </section>
     </div><!--END fm-picker-dialog-->
 
     <!-- Dialog: msgDialog -->

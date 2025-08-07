@@ -693,7 +693,7 @@ pro.proplan = {
         }
 
         // Save selected payment period
-        sessionStorage.setItem('pro.period', period);
+        tryCatch(() => sessionStorage.setItem('pro.period', period))();
 
         // If no period is given, we are showing all mini plans regardless of duration
         const multipleDurations = !period;

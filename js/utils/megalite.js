@@ -20,6 +20,13 @@ lazy(mega, 'lite', () => {
     /** Timer to count how long the load is taking */
     let liteModeTimeoutId;
 
+    /** Disabled sections for MEGA Lite*/
+    const disabledSections = freeze({
+        faves: 1,
+        photos: 1,
+        recents: 1
+    });
+
     /**
      * Recommend MEGA Lite mode (if applicable). For the dialog to be shown, they must be a PRO user
      * AND they have over x nodes AND also their load time takes over x minutes
@@ -154,7 +161,7 @@ lazy(mega, 'lite', () => {
                 const handle = selectedNodes[i];
 
                 // If type is folder, return true
-                if (M.d[handle].t === 1) {
+                if (M.getNodeByHandle(handle).t === 1) {
                     return true;
                 }
             }
@@ -169,6 +176,7 @@ lazy(mega, 'lite', () => {
         recommendLiteMode,
         initBackToMegaButton,
         containsFolderInSelection,
+        disabledSections,
         abort() {
             clearTimeout(liteModeTimeoutId);
         }

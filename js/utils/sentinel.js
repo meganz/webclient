@@ -8,6 +8,7 @@ mBroadcaster.once('boot_done', () => {
     });
     const eid = self.is_extension ? 99702 : domain2event[location.host];
 
+    /**/
     if (!eid
         || self.buildOlderThan10Days
         || self.onerror === self.nop
@@ -16,6 +17,7 @@ mBroadcaster.once('boot_done', () => {
         self.onerror = null;
         return false;
     }
+    /**/
 
     const disable = (...a) => {
         self.onerror = null;
@@ -61,8 +63,9 @@ mBroadcaster.once('boot_done', () => {
     };
 
     const thirdPartyScript = (dump, data) => {
-        return /userscript|user\.js|inject\.js|EvalError/.test(dump.m + data)
+        return /userscript|(?:user|inpage|inject)\.js|EvalError/.test(dump.m + data)
             || dump.m.includes('Permission denied to access property')
+            || dump.m.includes('Object Not Found Matching')
             || dump.m.includes('Cannot redefine property')
             || dump.m.includes("evaluating 'r(a,c)'")
             || dump.m.includes("evaluating 'ze(e,")
@@ -75,7 +78,7 @@ mBroadcaster.once('boot_done', () => {
             || data.includes('Function code:')
             || data.includes('(eval code:')
             || data.includes('(unknown source)')
-            || /<anonymous>:\d+:/.test(data);
+            || /<anonymous[^>]*>:\d+:/.test(data);
     };
 
     const getCallStack = tryCatch((msg, stack) => {
@@ -213,6 +216,25 @@ mBroadcaster.once('boot_done', () => {
         return !/Access to (?:the script at )?'.*(?:' from script|'?is) denied|origin 'null'/.test(dump.m);
     };
 
+    const getCustomErrorMessage = (msg, ex) => {
+
+        if (ex && String(msg).includes('Object')) {
+
+            if (typeof MEGAException !== 'undefined' && ex instanceof MEGAException) {
+
+                msg = `${ex} :boom:`;
+            }
+            else if (ex.name) {
+                msg = `Uncaught ${ex.name}: ${ex.message || ':bee:'}`;
+            }
+            else {
+                msg = ex.message || msg;
+            }
+        }
+
+        return msg;
+    };
+
     // ----------------------------------------------------------------------------------------
 
     const gExceptionHandler = tryCatch((msg, url, ln, cn, errobj) => {
@@ -221,6 +243,7 @@ mBroadcaster.once('boot_done', () => {
             console.debug([errobj || msg]);
             return;
         }
+        msg = getCustomErrorMessage(msg, errobj);
 
         const dump = {
             l: ln,

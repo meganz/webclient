@@ -12,7 +12,8 @@
     width: 100%;
 }
 
-.fm-empty-section.active-rewind {
+.fm-empty-section.active-rewind,
+.empty-state.active-rewind {
     flex-direction: row;
     min-height: 0;
 }

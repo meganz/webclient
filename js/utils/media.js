@@ -4033,7 +4033,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
             }
         }
 
-        if (mc) {
+        if (mc && mc.container) {
             var container = mc.container.byIdx[a.container];
             var videocodec = mc.video.byIdx[a.videocodec];
             var audiocodec = mc.audio.byIdx[a.audiocodec];
@@ -4063,6 +4063,9 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
             mc.push(container, videocodec, audiocodec);
             return mc;
+        }
+        else if (mc instanceof Promise) {
+            console.error('media-codecs list loading is ongoing or failed...', mc);
         }
 
         delay('mc:missing', console.warn.bind(console, 'Media codecs list not loaded.'));

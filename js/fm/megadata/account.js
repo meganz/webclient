@@ -1349,10 +1349,10 @@ function voucherData(arr) {
     return vouchers;
 }
 
-mBroadcaster.once('fm:initialized', () => {
+mBroadcaster.addListener('fm:initialized', () => {
     'use strict';
 
-    if (u_type === 3) {
+    if (u_type === 3 && !pfid) {
         if (u_attr && u_attr.p) {
             api.req({a: 'uq', pro: 1}).then(({result}) => {
                 if (result.stype === 'O') {
@@ -1365,5 +1365,6 @@ mBroadcaster.once('fm:initialized', () => {
             // Try showing this banner only for users who are no longer pro.
             M.showPaymentFailedBanner().catch(dump);
         }
+        return 0xDEAD;
     }
 });

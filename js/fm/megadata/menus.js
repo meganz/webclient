@@ -925,6 +925,11 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
             })
             .catch(dump);
     }
+    else if (ll === 9) {
+        asyncShow = true;
+        finalItems = ['.fileupload-item', '.folderupload-item', '.app-dl-hint'];
+        onIdle(showContextMenu);
+    }
     else if (ll) {// Click on item
         let id;
         let currNodeClass;

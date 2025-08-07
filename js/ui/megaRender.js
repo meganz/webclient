@@ -590,10 +590,14 @@ mBroadcaster.once('boot_done', () => {
                         $('.fm-empty-filter').removeClass('hidden');
                     }
                     else if (M.currentdirid === M.RootID) {
-                        $('.fm-empty-cloud').removeClass('hidden');
+                        mega.ui.empty.root();
                     }
                     else if (M.currentrootid) {
-                        $('.fm-empty-folder').removeClass('hidden');
+                        onIdle(() => {
+                            if (!M.v.length) {
+                                mega.ui.empty.folder();
+                            }
+                        });
                     }
                 }
                 else if (M.currentrootid === 'out-shares') {

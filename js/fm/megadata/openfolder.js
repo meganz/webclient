@@ -652,7 +652,7 @@
             loadSubPage(path);
         }
 
-        if (!this.gallery && !this.albums) {
+        if (!M.isGalleryPage() && !this.albums) {
             $('#media-section-controls, #media-tabs, #media-section-right-controls', $fmRightFilesBlock)
                 .addClass('hidden');
         }

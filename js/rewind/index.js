@@ -1334,10 +1334,10 @@ lazy(mega, 'rewind', () => {
                             emptyFolderName = '.fm-empty-folder';
                             break;
                         }
-                        emptyFolderName = '.fm-empty-cloud';
+                        emptyFolderName = '.empty-state';
                         break;
                     default:
-                        emptyFolderName = '.fm-empty-folder';
+                        emptyFolderName = '.empty-state';
                         break;
                 }
 

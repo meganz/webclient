@@ -2356,6 +2356,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/vendor/favico.js', n: 'favico_js', j:1});
         jsl.push({f:'js/vendor/avatar.js', n: 'avatar_js', j:1, w:3});
         jsl.push({f:'js/fm/vpn.js', n: 'fmvpn_js', j: 1});
+        jsl.push({f:'js/ui/empty.js', n: 'js_ui_empty_js', j: 1});
 
         jsl.push({f:'css/gallery.css', n: 'gallery_css', j:2,w:5});
         jsl.push({f:'js/fm/gallery/gallery.js', n: 'fm_gallery_js', j:1});
@@ -2364,6 +2365,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/fm/gallery/helpers/GalleryTitleControl.js', n: 'fm_gallery_title_control_js', j:1});
         jsl.push({f:'js/fm/gallery/helpers/GalleryTypeControl.js', n: 'fm_gallery_type_control_js', j:1});
         jsl.push({f:'js/fm/gallery/helpers/GalleryEmptyBlock.js', n: 'fm_gallery_empty_block_js', j:1});
+        jsl.push({f:'js/fm/gallery/helpers/GalleryEmpty.js', n: 'fm_gallery_empty_js', j:1});
         jsl.push({f:'js/fm/gallery/helpers/GalleryEmptyPhotos.js', n: 'fm_gallery_empty_photos_js', j:1});
         jsl.push({f:'js/fm/gallery/helpers/GalleryEmptyImages.js', n: 'fm_gallery_empty_images_js', j:1});
         jsl.push({f:'js/fm/gallery/helpers/GalleryEmptyVideos.js', n: 'fm_gallery_empty_videos_js', j:1});

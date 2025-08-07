@@ -2864,7 +2864,7 @@ FileManager.prototype.addGridUI = function(refresh) {
     $('.grid-url-header').text('');
 
     $('.files-grid-view.fm .grid-scrolling-table,.files-grid-view.fm .file-block-scrolling, .fm-empty-cloud,' +
-        '.fm-empty-folder, .fm.shared-folder-content, .fm-empty-s4-bucket, .out-shared-grid-view')
+        '.fm-empty-folder, .fm.shared-folder-content, .fm-empty-s4-bucket, .out-shared-grid-view, .empty-state')
         .rebind('contextmenu.fm', e => {
             // Remove context menu option from filtered view and media discovery view
             if (page === "fm/links" && page === "fm/faves" || M.gallery) {

@@ -1275,7 +1275,6 @@ class MegaGallery {
         const rfBlock = $('.fm-right-files-block:not(.in-chat)', '.fmholder');
         const galleryHeader = $('#media-section-controls', rfBlock).add('#media-section-right-controls', rfBlock);
 
-        galleryHeader.removeClass('hidden');
         $('#media-tabs', rfBlock).removeClass('hidden');
         $('.gallery-tabs-bl', galleryHeader).removeClass('hidden');
         $('.gallery-section-tabs', galleryHeader).toggleClass('hidden', M.currentdirid === 'favourites');
@@ -1304,10 +1303,16 @@ class MegaGallery {
             this.dynamicList.batchAdd(keys);
             this.dynamicList.initialRender();
             this.dynamicList.scrollToYPosition(this.scrollPosCache[this.mode].a);
+
+            galleryHeader.removeClass('hidden');
         }
-        else {
-            mega.gallery.showEmpty(M.currentdirid);
-            this.galleryBlock.classList.add('hidden');
+        else if (M.viewmode !== 2 || pfid) {
+            onIdle(() => {
+                if (!M.v.length) {
+                    mega.gallery.showEmpty(M.currentdirid);
+                    this.galleryBlock.classList.add('hidden');
+                }
+            });
         }
 
         tryCatch(() => {
@@ -2312,9 +2317,8 @@ class MegaTargetGallery extends MegaGallery {
             return;
         }
 
-        if (M.currentdirid === n.p && !M.v.length) {
-            $(`.fm-empty-folder, .fm-empty-folder-link, .fm-empty-${M.currentdirid}`, '.fm-right-files-block')
-                .addClass('hidden');
+        if (!M.v.length && n.p === M.currentdirid) {
+            mega.ui.empty.clear();
         }
 
         if (pfid) {
@@ -2730,8 +2734,8 @@ mega.gallery.showEmpty = (type, noMoreFiles) => {
 
     if (noMoreFiles || M.currentrootid === M.RootID &&
         (!M.c[M.currentdirid] || !Object.values(M.c[M.currentdirid]).length)) {
-        $('.fm-empty-folder', rfBlock).removeClass('hidden');
         $(`.fm-empty-${M.currentdirid}`, rfBlock).addClass('hidden');
+        mega.ui.empty.folder();
         return;
     }
 
@@ -3189,6 +3193,10 @@ async function galleryUI(id) {
         if (self.d) {
             console.timeEnd('gallery-ui');
             console.groupEnd();
+        }
+
+        if (M.v.length) {
+            mega.ui.empty.clear();
         }
 
         mega.gallery.resetMediaCounts(M.v);
@@ -3764,9 +3772,10 @@ lazy(mega.gallery, 'setTabs', () => {
 
         if (!tabs) {
             const tabClasses = 'py-3 px-6';
+            const container = document.querySelector('#media-tabs');
             tabs = new MTabs();
 
-            document.querySelector('#media-tabs').prepend(tabs.el);
+            container.prepend(tabs.el);
 
             tabs.el.classList.add('media-tabs', 'px-6', 'justify-start');
             tabs.tabs = [
@@ -3781,6 +3790,7 @@ lazy(mega.gallery, 'setTabs', () => {
                         }
 
                         loadSubPage(`fm/${loc}`);
+                        mega.gallery.appendAppBanner(container);
                     },
                     classes: tabClasses
                 },
@@ -3788,12 +3798,21 @@ lazy(mega.gallery, 'setTabs', () => {
                     label: l.albums,
                     click: () => {
                         loadSubPage('fm/albums');
+
+                        const banner = document.getElementById('media-banner');
+                        if (banner) {
+                            banner.parentNode.removeChild(banner);
+                        }
                     },
                     classes: tabClasses
                 }
             ];
 
             mega.gallery.mediaControl = tabs;
+
+            if (!section) {
+                mega.gallery.appendAppBanner(container);
+            }
         }
 
         tabs.activeTab = section;
@@ -3848,3 +3867,159 @@ lazy(mega.gallery, 'initialiseMediaNodes', () => {
         return Object.values(M.d).filter(allowedInMedia);
     };
 });
+
+mega.gallery.appendAppBanner = async(target) => {
+    if (pfid || M.CameraId) {
+        return;
+    }
+
+    const timeout = 120 * 24 * 60 * 60; // 120 days
+    const banner = target.querySelector('#media-banner');
+
+    if (banner) {
+        banner.parentNode.removeChild(banner);
+    }
+
+    /**
+     * @param {HTMLElement} target DOM node to attach to
+     * @param {*} configKey Config key to use for refusal storage
+     * @param {*} title Banner title
+     * @param {*} txt Banner text
+     * @param {*} btnTxt Banner action btn text
+     * @param {*} onClick Banner action
+     * @returns {void}
+     */
+    const renderBanner = (target, configKey, title, txt, btnTxt, onClick) => {
+        const refused = mega.config.get(configKey) | 0;
+
+        if (refused && (refused + timeout) * 1000 > Date.now()) {
+            return;
+        }
+
+        const banner = mCreateElement(
+            'div',
+            {
+                class: 'flex flex-row items-center transition-max-h max-h-0 overflow-y-hidden bg-mobile-surface-grey-1',
+                id: 'media-banner'
+            }
+        );
+
+        target.append(banner);
+
+        const titleEl = mCreateElement('div', { class: 'font-title-h3-bold text-color-high' });
+        titleEl.textContent = title;
+
+        const txtEl = mCreateElement('div');
+        txtEl.textContent = txt;
+
+        banner.appendChild(mCreateElement('div', { class: 'px-6 py-4 flex-1' }, [titleEl, txtEl]));
+
+        MegaButton.factory({
+            parentNode: banner,
+            text: btnTxt,
+            type: 'text',
+            componentClassname: 'slim white-space-nowrap font-bold info-link underline cursor-pointer',
+            onClick
+        });
+
+        MegaInteractable.factory({
+            parentNode: banner,
+            type: 'icon',
+            icon: 'sprite-fm-mono icon-dialog-close cursor-pointer',
+            componentClassname: 'mx-4',
+            onClick: () => {
+                mega.config.set(configKey, Date.now() / 1000 >>> 0);
+                banner.classList.remove('max-h-100');
+            }
+        });
+
+        banner.classList.add('max-h-100');
+    };
+
+    if (await accountUI.hasMobileSessions()) {
+        renderBanner(target, 'cudlh', l.cu_banner_title, l.cu_banner_txt, l.cu_banner_more, () => {
+            const dialogContents = () => {
+                const classes = 'py-3 px-6';
+                const activeClasses = 'font-600';
+                const container = mCreateElement('div');
+                const tabs = new MTabs();
+                tabs.el.classList.add('border-b');
+
+                const renderList = () => {
+                    let ol = container.querySelector('ol');
+
+                    if (ol) {
+                        ol.textContent = '';
+                    }
+                    else {
+                        ol = mCreateElement('ol');
+                        container.appendChild(ol);
+                    }
+
+                    const prefix = (tabs.activeTab) ? 'cu_how_ios_p' : 'cu_how_andr_p';
+                    const list = Array.from({ length: 5 }, (_,i) => l[prefix + (i + 1)]);
+
+                    for (let i = list.length; i--;) {
+                        const txt = escapeHTML(list[i]).replace('[B]', '<b>').replace('[/B]', '</b>');
+                        const li = mCreateElement('li', null, [parseHTML(txt)]);
+                        ol.prepend(li);
+                    }
+                };
+
+                container.prepend(tabs.el);
+
+                tabs.tabs = [
+                    {
+                        label: l.android,
+                        click: () => {
+                            tabs.activeTab = 0;
+                            renderList();
+                        },
+                        classes,
+                        activeClasses
+                    },
+                    {
+                        label: l.ios,
+                        click: () => {
+                            tabs.activeTab = 1;
+                            renderList();
+                        },
+                        classes,
+                        activeClasses
+                    }
+                ];
+
+                tabs.activeTab = 0;
+                renderList();
+
+                return container;
+            };
+
+            const footer = mCreateElement('div', { class: 'flex flex-row-reverse' });
+
+            MegaButton.factory({
+                parentNode: footer,
+                text: l.ok_button,
+                componentClassname: 'normal'
+            }).on('click.remove', () => {
+                mega.ui.sheet.hide();
+            });
+
+            const options = {
+                name: 'how-to-cu',
+                title: l.cu_how_title,
+                contents: [dialogContents()],
+                showClose: true,
+                footer: {
+                    slot: [footer]
+                }
+            };
+            mega.ui.sheet.show(options);
+        });
+    }
+    else if (M.v.length) {
+        renderBanner(target, 'appdlh', l.cu_banner_title, l.cu_banner_txt1, l.download_now, () => {
+            window.open('https://mega.io/mobile', '_blank', 'noopener,noreferrer');
+        });
+    }
+};

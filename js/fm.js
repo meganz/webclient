@@ -1422,8 +1422,11 @@ function renameDialog() {
             .text(n.t ? s4Folder ? l.s4_bucket_rename : l[425] : l[426]);
         $input.val(n.name);
 
-        $('.input-icon', $dialog)
-            .attr('class', `input-icon item-type-icon icon-${fileIcon(n)}-24`);
+        MegaNodeComponent.label.set(
+            n,
+            $('.input-icon', $dialog)
+                .attr('class', `input-icon item-type-icon icon-${fileIcon(n)}-24`)
+        );
 
         if (!n.t && ext.length > 0) {
             $input[0].selectionStart = 0;

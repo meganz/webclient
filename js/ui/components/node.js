@@ -146,6 +146,9 @@ class MegaNodeComponent extends MegaComponent {
         // label
         subNode = document.createElement('i');
         subNode.className = `${mobileClass} colour-label ${this.lbl}`.trim();
+        if (this.lbl) {
+            this.addClass(this.lbl);
+        }
         (propsBottomLeft || props).appendChild(subNode);
 
         // show correct link icon
@@ -374,8 +377,9 @@ class MegaNodeComponent extends MegaComponent {
     get icon() {
         const iconSize = M.onIconView ? 90 : 24;
         const iconSpriteClass = `item-type-icon${M.onIconView ? '-90' : ''}`;
+        const labelClass = !folderlink && this.node.t && MegaNodeComponent.label[this.node.lbl | 0] || '';
 
-        return `${iconSpriteClass} icon-${fileIcon(this.node)}-${iconSize}`;
+        return `${iconSpriteClass} icon-${fileIcon(this.node)}-${iconSize} ${labelClass}`;
     }
 
     get title() {
@@ -496,9 +500,7 @@ class MegaNodeComponent extends MegaComponent {
                 lblElm.classList.remove(...Object.keys(M.megaRender.labelsColors));
 
                 if (lbl) {
-                    if (!is_mobile) {
-                        this.addClass('colour-label', lbl);
-                    }
+                    this.addClass(lbl);
                     lblElm.classList.add(lbl);
                 }
             }
@@ -531,3 +533,49 @@ MegaNodeComponent.getNodeComponentByHandle = h => {
 
     return M.megaRender && M.megaRender.nodeMap[h] && M.megaRender.nodeMap[h].component;
 };
+
+/**
+ * Helper to apply label classes to DOM elements for the given node.
+ * Also contains properties with the classes if set is not usable e.g: `MegaNodeComponent.label[M.d[$.selected].lbl];`
+ * @property MegaNodeComponent.label
+ */
+lazy(MegaNodeComponent, 'label', () => {
+    'use strict';
+    const classes = [];
+    const obj = {
+        /**
+         * @memberOf MegaNodeComponent.label
+         * @param {MegaNode} n Node that may have a label
+         * @param {HTMLElement|Array<HTMLElement>|jQuery} elems DOM element(s) to apply to
+         * @returns {void} void
+         */
+        set(n, elems) {
+            if (!elems || !n || !n.t || folderlink || fmconfig.colourFolder) {
+                return;
+            }
+            if (elems instanceof jQuery) {
+                elems = elems.toArray();
+            }
+            if (!Array.isArray(elems)) {
+                elems = [elems];
+            }
+            if (!elems.length) {
+                return;
+            }
+
+            for (let i = elems.length; i--;) {
+                elems[i].classList.remove(...classes);
+                if (n.lbl) {
+                    elems[i].classList.add(this[n.lbl]);
+                }
+            }
+        },
+    };
+    // Currently supported labels: 1-7
+    for (let i = 1; i < 8; i++) {
+        const name = `icon-lbl-${i}`;
+        classes.push(name);
+        Object.defineProperty(obj, i, { value: name, writable: false });
+    }
+    return freeze(obj);
+});

@@ -2232,17 +2232,35 @@ MegaData.prototype.labeling = function(handles, newLabelState) {
             handles = [handles];
         }
         newLabelState |= 0;
+        let fileCount = 0;
+        let folderCount = 0;
 
-        handles.map(h => this.getNodeRights(h) > 1 && this.getNodeByHandle(h))
+        const promises = handles.map(h => this.getNodeRights(h) > 1 && this.getNodeByHandle(h))
             .filter(Boolean)
             .map(n => {
 
                 if (n.tvf) {
                     fileversioning.labelVersions(n.h, newLabelState);
                 }
+                if (n.t) {
+                    folderCount++;
+                }
+                else {
+                    fileCount++;
+                }
 
-                return api.setNodeAttributes(n, {lbl: newLabelState}).catch(tell);
+                return api.setNodeAttributes(n, {lbl: newLabelState});
             });
+        return Promise.all(promises)
+            .then(() => {
+                if (folderCount) {
+                    eventlog(newLabelState ? 500930 : 500932, folderCount);
+                }
+                if (fileCount) {
+                    eventlog(newLabelState ? 500931 : 500933, fileCount);
+                }
+            })
+            .catch(tell);
     }
 };
 

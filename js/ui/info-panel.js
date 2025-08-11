@@ -669,6 +669,7 @@ lazy(mega.ui, 'mInfoPanel', () => {
         showMime(hide) {
             let mime = '';
             let count = 1;
+            let labelClass = '';
             if (!hide && this.handles.length === 1) {
 
                 if (activeStats.takedownCount === 1) {
@@ -685,6 +686,9 @@ lazy(mega.ui, 'mInfoPanel', () => {
                 }
                 else {
                     mime = `item-type-icon-90 icon-${fileIcon(this.node)}-90`;
+                    if (activeStats.basicFolderCount && this.node.lbl && !folderlink) {
+                        labelClass = MegaNodeComponent.label[this.node.lbl];
+                    }
                 }
             }
             else if (!hide) {
@@ -715,6 +719,9 @@ lazy(mega.ui, 'mInfoPanel', () => {
                     icon.classList.add(stackClass);
                 }
                 mimeNode.appendChild(icon);
+                if (labelClass) {
+                    icon.classList.add(labelClass);
+                }
             }
             else {
                 mimeNode.remove();

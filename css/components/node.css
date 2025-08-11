@@ -574,3 +574,52 @@ a.is-sensitive img {
     opacity: 1;
     transition-delay: 50ms;
 }
+
+/* Folder icon label filters */
+body:not(.no-lbl-colour) .folder.red .item-type-icon-90,
+body:not(.no-lbl-colour) .folder.red .item-type-icon,
+body:not(.no-lbl-colour) .icon-lbl-1 {
+    filter: saturate(62%) hue-rotate(-62deg) brightness(69%) contrast(200%);
+}
+body:not(.no-lbl-colour) .folder.orange .item-type-icon-90,
+body:not(.no-lbl-colour) .folder.orange .item-type-icon,
+body:not(.no-lbl-colour) .icon-lbl-2 {
+    filter: saturate(135%) hue-rotate(-34deg) brightness(85%) contrast(128%);
+}
+body:not(.no-lbl-colour) .folder.yellow .item-type-icon-90,
+body:not(.no-lbl-colour) .folder.yellow .item-type-icon,
+body:not(.no-lbl-colour) .icon-lbl-3 {
+    filter: saturate(60%) hue-rotate(6deg) brightness(105%) contrast(115%);
+}
+body:not(.no-lbl-colour) .folder.green .item-type-icon-90,
+body:not(.no-lbl-colour) .folder.green .item-type-icon,
+body:not(.no-lbl-colour) .icon-lbl-4 {
+    filter: saturate(210%) hue-rotate(100deg) brightness(96%) contrast(80%);
+}
+body:not(.no-lbl-colour) .folder.blue .item-type-icon-90,
+body:not(.no-lbl-colour) .folder.blue .item-type-icon,
+body:not(.no-lbl-colour) .icon-lbl-5 {
+    filter: saturate(100%) hue-rotate(147deg) brightness(82%) contrast(145%);
+}
+body:not(.no-lbl-colour) .folder.purple .item-type-icon-90,
+body:not(.no-lbl-colour) .folder.purple .item-type-icon,
+body:not(.no-lbl-colour) .icon-lbl-6 {
+    filter: saturate(65%) hue-rotate(-101deg) brightness(70%) contrast(155%);
+}
+body:not(.no-lbl-colour) .folder.grey .item-type-icon-90,
+body:not(.no-lbl-colour) .folder.grey .item-type-icon,
+body:not(.no-lbl-colour) .icon-lbl-7 {
+    filter: saturate(10%) hue-rotate(178deg) brightness(69%) contrast(115%);
+}
+
+/* Only for plain folder icon currently. May be extended in future */
+body:not(.no-lbl-colour) .folder .item-type-icon-90:not(.icon-folder-90),
+body:not(.no-lbl-colour) .folder .item-type-icon:not(.icon-folder-24) {
+    filter: unset;
+}
+
+/* Reset/overwrite for rubbish handling  */
+body:not(.no-lbl-colour) .folder .item-type-icon-90.icon-rubbish-folder-90,
+body:not(.no-lbl-colour) .folder .item-type-icon.icon-rubbish-folder-24 {
+    filter: grayscale(1) brightness(0.85);
+}

@@ -933,17 +933,6 @@
         flex-direction: column;
         align-items: flex-start;
     }
-    #propay.mobile-device .fixed-continue-btn .pricing-note-fixed-txt {
-        font: var(--font-i-16-400);
-        display: flex;
-        width: 100%;
-        max-width: 621px;
-        margin: 0 auto 16px;
-        white-space: pre;
-    }
-    #propay.mobile-device .fixed-continue-btn .pricing-note-fixed-txt .due-now{
-        font: var(--font-i-14-600);
-    }
     #propay.mobile-device .fixed-continue-btn:not(.spacer) {
         position: fixed;
         border-top: 1px solid var(--surface-grey-2);

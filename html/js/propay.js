@@ -1376,9 +1376,6 @@ pro.propay = {
     renderPlanInfo() {
         'use strict';
 
-        this.pageInfo.$fixedPriceNote = is_mobile &&
-            (this.pageInfo.$fixedPriceNote || $('.pricing-note-fixed-txt', this.pageInfo.$fixedContinue));
-
         const isEuro = (this.planObj.currency === 'EUR') || this.isVoucherBalance();
 
         const planCardInitialized = this.pageInfo.$planCard && this.pageInfo.$planCard.length;
@@ -1656,13 +1653,6 @@ pro.propay = {
         }
         else {
             $('.discount', $planCard).addClass('hidden');
-        }
-
-        if (is_mobile && this.pageInfo.$fixedPriceNote) {
-            this.pageInfo.$fixedPriceNote.safeHTML(
-                this.shouldShowTrial()
-                    ? formattedPlanPrice
-                    : `<span class="due-now">${'Due now:'} </span>${formattedPlanPrice}`);
         }
 
         if (!planCardInitialized) {

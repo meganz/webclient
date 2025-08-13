@@ -204,6 +204,27 @@ mega.ui.sheet = new MegaSheet({
     wrapperClassname: 'sheet'
 });
 
+MegaSheet.getRectFromParent = (parent, target) => {
+
+    'use strict';
+
+    if (!parent || !target) {
+        return false;
+    }
+
+    const parentRect = parent.getBoundingClientRect();
+    const targetRect = target.getBoundingClientRect();
+
+    return {
+        left: targetRect.left - parentRect.left,
+        top: targetRect.top - parentRect.top,
+        width: targetRect.width,
+        height: targetRect.height,
+        bottom: targetRect.bottom - parentRect.top,
+        right: targetRect.right - parentRect.left
+    };
+};
+
 window.addEventListener('popstate', () => {
 
     'use strict';

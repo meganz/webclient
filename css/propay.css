@@ -433,15 +433,6 @@
     border-radius: 16px;
     padding-bottom: 24px;
 }
-#propay .right-block .plan-card.fixed {
-    position: fixed;
-    top: 88px;
-    left: calc(var(--left-panel-width) + var(--plan-card-left-gap));
-}
-.rtl #propay .right-block .plan-card.fixed {
-    left: initial;
-    right: calc(var(--left-panel-width) + var(--plan-card-left-gap));
-}
 #propay .right-block .plan-card.relative {
     position: relative;
     top: 0;
@@ -657,6 +648,11 @@
 #propay .specific-payment-info .bitcoin-invoice-dialog .content .grey {
     color: var(--color-copy-secondary);
 }
+#propay .specific-payment-info .bitcoin-invoice-dialog .content .bitcoin-qr-code {
+    height: 91px;
+    min-width: 86px;
+    width: max-content;
+}
 #propay .specific-payment-info .bitcoin-invoice-dialog .content .price-info {
     display: flex;
     flex-direction: column;
@@ -863,12 +859,112 @@
     display: none;
 }
 
+/* Skeleton loading */
+#propay .sk-loading-pro i.sk-elm-pro {
+    position: absolute;
+    overflow: hidden;
+    background-image: linear-gradient(90deg, var(--mobile-surface-2) 50px, var(--mobile-surface-1) 150px, var(--mobile-surface-2) 250px);
+    background-size: 1000px 100%;
+    animation: loading-shimmer 2s infinite linear;
+    width: 100%;
+    height: 100%;
+}
+#propay .sk-active.sk-pro,
+#propay .sk-active .sk-pro {
+    position: relative;
+    border: 0;
+    overflow: hidden;
+    cursor: pointer;
+    min-height: 32px;
+    color: transparent;
+    background-color: transparent;
+}
+#propay h1.sk-pro,
+#propay h2.sk-pro,
+#propay span.sk-pro,
+#propay p.sk-pro,
+#propay .dropdown-wrapper-primary.sk-pro {
+    width: max-content;
+    max-width: 100%;
+}
+#propay .sk-active .sk-pro.sk-single-line {
+    height: 32px;
+}
+#propay .sk-stripe-loading {
+    position: absolute;
+    width: 100%;
+    background: var(--surface-main);
+}
+#propay .sk-stripe-loading div.sk-pro {
+    min-height: 48px;
+}
+#propay .sk-stripe-loading div.no-sk {
+    justify-content: space-between;
+    padding: 12px 0;
+}
+#propay .sk-stripe-loading div.no-sk div.sk-pro {
+    width: calc(50% - 12px);
+}
+#propay .right-block .sk-card-loading {
+    min-height: 431px;
+    min-width: 371px;
+}
+#propay .sk-active.sk-pro::after,
+#propay .sk-active .sk-pro::after {
+    position: absolute;
+    overflow: hidden;
+    background-image: linear-gradient(90deg, var(--mobile-surface-2) 50px, var(--mobile-surface-1) 150px, var(--mobile-surface-2) 250px);
+    background-size: 1000px 100%;
+    animation: loading-shimmer 2s infinite linear;
+    width: 100%;
+    height: 100%;
+    content: "";
+    transform: translate(-50%, -50%);
+    left: 50%;
+    top: 50%;
+    border-radius: 8px;
+    cursor: default;
+}
+
+/* Skeleton Loading Content - All items here will be overlayed, and are for spacing only */
+#propay .sk-active .invoice-date-time::before {
+    content: "Monday, 01 Jan 2000 at 00:00 AAAA";
+    color: transparent;
+}
+#propay .sk-active .bitcoin-address::before {
+    content: "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+    color: transparent;
+}
+#propay .sk-active .bitcoin-price::before {
+    content: "0.00000000";
+    color: transparent;
+}
+#propay .sk-stripe-loading h1::before {
+    content: "Please enter your card details below";
+    color: transparent;
+}
+
+/* Skeleton Loading End */
+
 @media only screen and (max-width: 1320px) {
     #propay {
         --plan-card-left-gap: 40px;
     }
     #propay .left-block {
         padding: 64px 40px ;
+    }
+}
+
+/* Desktop */
+@media only screen and (min-width: 1080px) {
+    #propay .right-block .plan-card.fixed {
+        position: fixed;
+        top: 88px;
+        left: calc(var(--left-panel-width) + var(--plan-card-left-gap));
+    }
+    .rtl #propay .right-block .plan-card.fixed {
+        left: initial;
+        right: calc(var(--left-panel-width) + var(--plan-card-left-gap));
     }
 }
 
@@ -891,7 +987,7 @@
         width: auto;
     }
     #propay .left-block {
-        width: 100%;
+        width: calc(100% - 48px);
         margin: auto;
         padding: 24px;
     }

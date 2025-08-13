@@ -496,7 +496,8 @@ var astroPayDialog = {
      * Process the result from the API User Transaction Complete call
      * @param {Object} utcResult The results from the UTC call
      */
-    processUtcResult: function (utcResult) {
+    processUtcResult(utcResult) {
+        'use strict';
 
         // If successful AstroPay result, redirect
         if (utcResult.EUR.url) {
@@ -1411,8 +1412,6 @@ var addressDialog = {
             delete this.businessRegPage;
         }
 
-        loadingDialog.show();
-
         this.fetchBillingInfo().always(function (billingInfo) {
             billingInfo = billingInfo || Object.create(null);
 
@@ -1424,7 +1423,6 @@ var addressDialog = {
             self.initStateDropDown(selectedState, billingInfo.country);
             self.initCountryDropDown(billingInfo.country);
 
-            loadingDialog.hide();
             self.initCountryDropdownChangeHandler();
             self.initBuyNowButton();
             self.initCloseButton();
@@ -2811,6 +2809,10 @@ var addressDialog = {
                         $stripeIframe.css('height', eventData.height + 'px');
                     }
                 }
+                if (eventData && (eventData.type === 'loading') && (eventData.action === 'end')) {
+                    $('.sk-stripe-loading', addressDialog.getStripeDialog()).addClass('hidden');
+                    pro.propay.skItems.continueBtn.endLoad();
+                }
                 window.addEventListener('message', addressDialog.stripeFrameHandler, {once: true});
                 return;
             }
@@ -2955,6 +2957,7 @@ var addressDialog = {
         if (utcResult.EUR === 0) {
 
             this.showPaymentSuccess();
+            pro.propay.skItems.continueBtn.endLoad();
             return;
         }
 
@@ -3562,7 +3565,8 @@ var cardDialog = {
      * Process the result from the API User Transaction Complete call
      * @param {Object} utcResult The results from the UTC call
      */
-    processUtcResult: function(utcResult) {
+    processUtcResult(utcResult) {
+        'use strict';
 
         // Hide the loading animation
         pro.propay.hideLoadingOverlay();
@@ -3812,6 +3816,7 @@ var bitcoinDialog = {
         // Make background overlay darker and show the dialog
         // $dialogBackgroundOverlay.addClass('bitcoin-invoice-dialog-overlay').removeClass('hidden');
         $bitcoinDialog.removeClass('hidden');
+        pro.propay.skItems.bitcoin.endLoad();
     },
 
     /**
@@ -3886,7 +3891,8 @@ var bitcoinDialog = {
      * Process the result from the API User Transaction Complete call
      * @param {Object} utcResult The results from the UTC call
      */
-    processUtcResult: function(utcResult) {
+    processUtcResult(utcResult) {
+        'use strict';
 
         // Hide the loading animation
         // pro.propay.hideLoadingOverlay();

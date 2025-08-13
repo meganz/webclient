@@ -59,6 +59,31 @@ pro.propay = {
 
     fixedContinue: false,
 
+    skItems: {},
+
+    gatewayElmsByName: {
+        'stripe': '.payment-stripe-dialog',
+        'bitcoin': '.bitcoin-invoice-dialog',
+        'astropay': '.astropay-dialog',
+    },
+
+    getGatewayElement(currentGatewayName) {
+        'use strict';
+        currentGatewayName = currentGatewayName || (this.currentGateway && this.currentGateway.gatewayName);
+
+        if (!currentGatewayName) {
+            return '';
+        }
+
+        if (['stripeID', 'stripe', 'stripeAP'].includes(currentGatewayName)) {
+            return this.gatewayElmsByName.stripe;
+        }
+        else if (currentGatewayName.includes('astropay')) {
+            return this.gatewayElmsByName.astropay;
+        }
+
+        return this.gatewayElmsByName[currentGatewayName] || '';
+    },
 
     isVoucherBalance() {
         'use strict';
@@ -486,6 +511,8 @@ pro.propay = {
             return;
         }
 
+        this.skItems.continueBtn.startLoad();
+
         // TODO: Show inline loading dialog for stripe and bitcoin
 
         const apiId = this.planObj.id;
@@ -669,7 +696,18 @@ pro.propay = {
                         return;
                     }
                     this.setCachedUtcRequest(result);
-                    this.processUtcResults(result, saleId);
+                    this.processUtcResults(result, saleId).then(() => {
+                        const shouldEndLoading = [
+                            bitcoinDialog.gatewayId,
+                            cardDialog.gatewayId,
+                            astroPayDialog.gatewayId,
+                            addressDialog.gatewayId,
+                        ];
+
+                        if (shouldEndLoading.includes(pro.lastPaymentProviderId)) {
+                            this.skItems.continueBtn.endLoad();
+                        }
+                    });
                 });
             })
             .catch((ex) => {
@@ -706,6 +744,8 @@ pro.propay = {
                 eventlog(500717, String(ex));
 
                 tell(errorMessage);
+
+                this.skItems.continueBtn.endLoad();
             });
     },
 
@@ -842,7 +882,6 @@ pro.propay = {
                 }
             });
 
-            loadingDialog.hide('propayReady');
             dialog.show();
         });
     },
@@ -1039,8 +1078,6 @@ pro.propay = {
                     loadSubPage('pro');
                     return;
                 }
-
-                loadingDialog.show('propayReady');
             }
             else if (planHasFeature) {
 
@@ -1166,9 +1203,6 @@ pro.propay = {
             if (status === 2 || !strings.canContinue) {
                 loadSubPage('pro');
                 return;
-            }
-            else if ((status === 1)) {
-                loadingDialog.show('propayReady');
             }
             // User left propay page
             else if (status === -1) {
@@ -2058,13 +2092,17 @@ pro.propay = {
             return;
         }
 
-
-        $('.payment-loading-spinner', this.$page).removeClass('hidden');
+        $('.propay-inline-dialog', this.$leftBlock).addClass('hidden');
+        const currentGatewayElementStr = this.getGatewayElement();
+        if (currentGatewayElementStr) {
+            $(`${currentGatewayElementStr}.propay-inline-dialog`, this.$leftBlock).removeClass('hidden');
+        }
 
         const $iframeContainer = $('.iframe-container', addressDialog.getStripeDialog());
 
         $iframeContainer.css('height', 306 + 'px');
         $('iframe#stripe-widget', $iframeContainer).addClass('hidden');
+        $('.sk-stripe-loading', addressDialog.getStripeDialog()).removeClass('hidden');
 
         const gatewayId = this.currentGateway.gatewayId;
 
@@ -2105,7 +2143,6 @@ pro.propay = {
 
         this.proPaymentMethod = this.currentGateway.gatewayName;
 
-        $('.propay-inline-dialog', this.$page).addClass('hidden');
 
         // check all required fields are filled
 
@@ -2151,6 +2188,9 @@ pro.propay = {
         }
         else if ((paymentType === 'other')
             && (this.currentGateway.gatewayName === 'bitcoin')) {
+            if (this.skItems.bitcoin) {
+                this.skItems.bitcoin.startLoad();
+            }
             this.sendPurchaseToApi(this.currentGateway.gatewayId);
         }
     },
@@ -2611,7 +2651,6 @@ pro.propay = {
             if (u_type === false) {
 
                 u_storage = init_storage(localStorage);
-                loadingDialog.show();
 
                 u_checklogin({
                     checkloginresult() {
@@ -2979,9 +3018,39 @@ pro.propay = {
         $('.continue', this.$page).toggleClass('disabled', !!(window.s4ac && this.blockFlow()));
     },
 
+    initSkItems() {
+        'use strict';
+        const page = document.getElementById('propay');
+        const footerItems = page.querySelectorAll('footer, .footer-item');
+        this.skItems.footers = this.sk.initSk(footerItems);
+
+
+        this.skItems.stripeTemplate = this.sk.initSk(page.querySelector('.sk-stripe-loading'));
+        this.skItems.stripeTemplate.startLoad();
+
+        this.skItems.leftBlock = this.sk.initSk(page.querySelector('.left-block'), 4);
+        this.skItems.leftBlock.startLoad();
+        this.skItems.rightBlock = this.sk.initSk(page.querySelector('.right-block'));
+
+        lazy(this.skItems, 'bitcoin', () => {
+            const bitcoinElement = page
+                .querySelector(".left-block-wrapper .specific-payment-info .bitcoin-invoice-dialog");
+            return pro.propay.sk.initSk(bitcoinElement, 4);
+        });
+
+        lazy(this.skItems, 'continueBtn', () => {
+            const continueButtons = page.querySelectorAll('.continue');
+            return pro.propay.sk.initSk(continueButtons);
+        });
+    },
 
     init() {
         'use strict';
+
+        this.initSkItems();
+        this.$page = $('#propay');
+        this.skItems.footers.startLoad();
+        this.skItems.rightBlock.startLoad();
 
         const userBusInfo = u_attr && u_attr.b;
         const userIsBusMasterAcc = userBusInfo && u_attr.b.m;
@@ -3054,13 +3123,10 @@ pro.propay = {
         }
         this.discountInfo = discountInfo;
 
-
-        loadingDialog.show('propayReady');
         this.loadingPage = true;
 
         // If the user is not logged in, show the login / register dialog
         if (u_type === false) {
-            loadingDialog.hide('propayReady');
             pro.propay.showAccountRequiredDialog();
 
             // login / register action while on /propay_x will recall init()
@@ -3132,11 +3198,10 @@ pro.propay = {
                     this.handleS4();
                 }
 
-                // updateOnClicks();
-
-                loadingDialog.hide('propayReady');
-
                 const propayPageVisitEventId = pro.propay.getPropayPageEventId(pro.propay.planNum);
+
+                this.sk.endLoadAll();
+
                 eventlog(propayPageVisitEventId);
             });
         }).catch((ex) => {
@@ -3655,6 +3720,133 @@ pro.propay = {
             }
         }
     },
+
+    sk: {
+        startedLoading: [],
+
+        initSk(root, maxDepth, reset, depth) {
+            'use strict';
+            maxDepth = maxDepth || 2;
+            depth |= 0;
+            if (!root) {
+                console.warn('No root for sk-pro');
+                return;
+            }
+
+            // Normalize input into an array of elements
+            const roots = (typeof root.length === 'number' && root.item)
+                ? Array.from(root)
+                : Array.isArray(root)
+                    ? root
+                    : [root];
+
+            // Apply skeleton setup to all
+            for (const el of roots) {
+                this.apply(el, maxDepth, reset, depth);
+            }
+
+            return {
+                unset: () => {
+                    for (const el of roots) {
+                        this.unset(el);
+                    }
+                },
+                startLoad: () => {
+                    for (const el of roots) {
+                        this.startLoad(el);
+                    }
+                },
+                endLoad: () => {
+                    for (const el of roots) {
+                        this.endLoad(el);
+                    }
+                },
+                element: root,
+            };
+        },
+
+        clickHandler(e) {
+            'use strict';
+            const root = e.currentTarget.closest('.sk-setup');
+            if (root && root.classList.contains('sk-active')) {
+                e.stopPropagation();
+            }
+        },
+
+        apply(root, maxDepth, reset, depth) {
+            'use strict';
+            maxDepth = maxDepth || 2;
+            depth |= 0;
+            if (!root || depth > maxDepth) {
+                return;
+            }
+
+            if (reset && depth === 0) {
+                this.unset(root);
+            }
+
+            if (root.classList.contains('no-sk') || depth === 0) {
+                if (depth === 0) {
+                    root.classList.add('sk-setup');
+                }
+                for (const child of root.children) {
+                    this.apply(child, maxDepth, reset, depth + 1);
+                }
+                return;
+            }
+
+            if (!root.classList.contains('sk-setup')) {
+                root.classList.add('sk-pro');
+                root.addEventListener('click', this.clickHandler, true);
+            }
+        },
+
+        unset(root) {
+            'use strict';
+            if (!root) {
+                return;
+            }
+
+            root.classList.remove('sk-pro', 'sk-setup');
+            const all = root.querySelectorAll('.sk-pro');
+            for (const el of all) {
+                el.classList.remove('sk-pro');
+                el.removeEventListener('click', this.clickHandler, true);
+            }
+        },
+
+        startLoad(root) {
+            'use strict';
+            this.apply(root);
+            if (root) {
+                root.classList.add('sk-active');
+                if (!this.startedLoading.includes(root) && !root.classList.contains('sk-stripe-loading')) {
+                    this.startedLoading.push(root);
+                }
+            }
+        },
+
+        endLoad(root) {
+            'use strict';
+            if (!root) {
+                return;
+            }
+            root.classList.remove('sk-active');
+
+            const i = this.startedLoading.indexOf(root);
+            if (i !== -1) {
+                this.startedLoading.splice(i, 1);
+            }
+        },
+
+        endLoadAll() {
+            'use strict';
+            for (let i = 0; i < this.startedLoading.length; i++) {
+                this.startedLoading[i].classList.remove('sk-active');
+            }
+            this.startedLoading = [];
+        }
+    }
 };
 
 // mBroadcaster.once('login2', () => {

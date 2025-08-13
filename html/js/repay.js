@@ -273,6 +273,12 @@ RepayPage.prototype.initPage = function() {
             const sep = mIntl.decimalSeparator;
 
             const applyFormat = (val) => {
+
+                // Default to Euros
+                if (!res.l) {
+                    return `${intl.format(val)} \u20ac`;
+                }
+
                 if (sep !== res.l.sp[0]) {
                     const reg1 = new RegExp(`\\${sep}`, 'g');
                     const reg2 = new RegExp(`\\${res.l.sp[1]}`, 'g');

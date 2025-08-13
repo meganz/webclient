@@ -160,3 +160,13 @@ body.web-desktop.pwm-ui .mega-sheet.normal.with-footer .sheet,
 body.web-desktop .mega-sheet.promo-dialog .sheet {
     max-width: 640px;
 }
+
+body.mobile .mega-sheet .sheet .content .qrcode {
+    padding: 16px;
+    background-color: rgb(255, 255, 255, 1);
+    border-radius: 8px;
+    align-self: center;
+}
+body.mobile .mega-sheet .sheet .content .qrcode canvas {
+    display: block;
+}

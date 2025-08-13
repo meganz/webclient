@@ -693,50 +693,6 @@ function sc_packet(a) {
         queueMicrotask(sc_fetcher);
     }
 
-    if ((a.a === 's' || a.a === 's2') && a.k && !self.secureKeyMgr) {
-        /**
-         * There are two occasions where `crypto_process_sharekey()` must not be called:
-         *
-         * 1. `a.k` is symmetric (AES), `a.u` is set and `a.u != u_handle`
-         *    (because the resulting sharekey would be rubbish)
-         *
-         * 2. `a.k` is asymmetric (RSA), `a.u` is set and `a.u != u_handle`
-         *    (because we either get a rubbish sharekey or an RSA exception from asmcrypto)
-         */
-        let prockey = false;
-
-        if (a.k.length > 43) {
-            if (!a.u || a.u === u_handle) {
-                // RSA-keyed share command targeted to u_handle: run through worker
-                prockey = !a.o || a.o !== u_handle;
-
-                if (prockey) {
-                    rsasharekeys[a.n] = true;
-                }
-            }
-        }
-        else {
-            prockey = (!a.o || a.o === u_handle);
-        }
-
-        if (prockey) {
-            if (decWorkerPool.ok && rsasharekeys[a.n]) {
-                decWorkerPool.postPacket(a, scqhead++);
-                return;
-            }
-
-            const k = crypto_process_sharekey(a.n, a.k);
-
-            if (k === false) {
-                console.warn(`Failed to decrypt RSA share key for ${a.n}: ${a.k}`);
-            }
-            else {
-                a.k = k;
-                crypto_setsharekey(a.n, k, true);
-            }
-        }
-    }
-
     if (a.a === 't') {
         startNodesFetching(scqhead);
     }
@@ -782,7 +738,6 @@ var scpubliclinksuiupd;
 var scContactsSharesUIUpdate;
 var loadavatars = [];
 var scinshare = Object.create(null);
-var sckeyrequest = Object.create(null);
 
 // sc packet parser
 var scparser = Object.create(null);
@@ -1461,24 +1416,6 @@ scparser.$add('fa', function(a) {
     }
 });
 
-scparser.$add('k', function(a) {
-    // key request
-    if (a.sr) {
-        crypto_procsr(a.sr);
-    }
-    if (a.cr) {
-        crypto_proccr(a.cr);
-    }
-    else if (!pfid && a.n) {
-        if (!sckeyrequest[a.h]) {
-            sckeyrequest[a.h] = [];
-        }
-        sckeyrequest[a.h].push(...a.n);
-    }
-
-    scsharesuiupd = true;
-});
-
 scparser.$add('u', function(a) {
     // update node attributes
     const n = M.d[a.n];
@@ -1862,8 +1799,6 @@ scparser.$add('_sn', function(a) {
 
 scparser.$add('_fm', function() {
     // completed initial processing, enable UI
-    crypto_fixmissingkeys(missingkeys);
-    delay('reqmissingkeys', crypto_reqmissingkeys, 4e3);
     loadfm_done();
 });
 
@@ -2026,26 +1961,6 @@ scparser.$finalize = async() => {
         });
 
         scpubliclinksuiupd = false;
-    }
-
-    if (!pfid && $.len(sckeyrequest)) {
-        const keyof = (h) => crypto_keyok(M.d[h]);
-
-        if (d) {
-            console.debug('Supplying requested keys...', sckeyrequest);
-        }
-
-        // eslint-disable-next-line guard-for-in
-        for (const h in sckeyrequest) {
-            const n = sckeyrequest[h].filter(keyof);
-            const cr = crypto_makecr(n, [h], true);
-
-            if (cr[2].length) {
-                api_req({a: 'k', cr, i: requesti});
-            }
-        }
-
-        sckeyrequest = Object.create(null);
     }
 
     if (`chat/contacts/${scContactsSharesUIUpdate}` === M.currentdirid) {

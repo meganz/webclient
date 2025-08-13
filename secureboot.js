@@ -3751,8 +3751,11 @@ else if (!browserUpdate) {
             tmp = 1 + (document.cookie | 0);
 
             document.body.textContent = '';
-            document.body.style.background = is_drop ? '#fff' : '#000';
-            document.body.className = is_drop ? 'theme-light' : 'theme-dark-forced';
+
+            if (!is_drop && !is_megadrop) {
+                document.body.style.background = '#000';
+                document.body.className = 'theme-dark-forced';
+            }
 
             jsl_progress = function() {};
         }

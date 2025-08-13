@@ -66,6 +66,7 @@ function removeUInode(h, parent) {
 
         delay('removeNodeExtraToggle', () => {
             mega.ui.secondaryNav.toggleGridExtraButtons(M.v.length === 0);
+            mega.ui.secondaryNav.extHideFilterChip();
         }, 100);
     };
 

@@ -206,6 +206,7 @@ body.mobile .overlay-wrap .image i.password {
 
 .rtl .overlay-wrap .header .close {
     left: 1rem;
+    right: auto;
 }
 
 .overlay-wrap .header-title {

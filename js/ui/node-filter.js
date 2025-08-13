@@ -567,14 +567,7 @@ lazy(mega.ui, 'mNodeFilter', () => {
                 }
             }
 
-            const hidden = M.gallery || M.chat || M.albums
-                || M.currentrootid === M.RubbishID
-                || hiddenSections.has(M.currentdirid)
-                || M.currentrootid === 's4' && M.currentCustomView.subType !== 'bucket'
-                || String(M.currentdirid).startsWith('user-management')
-                || folderlink
-                || mega.devices.ui.getRenderSection() === 'device-centre-devices'
-                || mega.devices.ui.getRenderSection() === 'device-centre-folders';
+            const hidden = !this.viewEnabled;
 
             if (hidden) {
                 $fmFilterChipsWrapper =
@@ -587,6 +580,16 @@ lazy(mega.ui, 'mNodeFilter', () => {
         },
         get selectedFilters() {
             return selectedFilters;
+        },
+        get viewEnabled() {
+            return !(M.gallery || M.chat || M.albums
+                || M.currentrootid === M.RubbishID
+                || hiddenSections.has(M.currentdirid)
+                || M.currentrootid === 's4' && M.currentCustomView.subType !== 'bucket'
+                || String(M.currentdirid).startsWith('user-management')
+                || folderlink
+                || mega.devices.ui.getRenderSection() === 'device-centre-devices'
+                || mega.devices.ui.getRenderSection() === 'device-centre-folders');
         }
     });
 });

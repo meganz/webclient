@@ -2223,6 +2223,68 @@ body.de .mega-dialog.contact-picker-widget {
         cursor: pointer;
         position: relative;
     }
+    body.web-desktop .mega-sheet.export-links-dialog footer.overlay-footer {
+        margin-top: 0;
+    }
+
+    /* QR code popup */
+
+    body.web-desktop .mega-sheet.export-links-dialog .node-link-block button.copy-field,
+    .mega-sheet.export-links-dialog .qrcode-container {
+        margin-inline-start: 4px;
+    }
+    .mega-sheet.export-links-dialog .qrcode-container button.active {
+        background-color: var(--mobile-button-secondary-pressed);
+    }
+    .mega-sheet.export-links-dialog .qrcode-popup {
+        position: fixed;
+        z-index: 1001;
+        background: var(--mobile-surface-2);
+        padding: 12px;
+        border-radius: 8px;
+        font: var(--mobile-font-caption-large-bold);
+    }
+    .rtl .mega-sheet.export-links-dialog .qrcode-popup {
+        transform: translateX(-100%);
+    }
+    .mega-sheet.export-links-dialog .qrcode-popup::after {
+        content: "";
+        position: absolute;
+        top: 29px;
+        left: -11px;
+        width: 0;
+        height: 0;
+        border-top: 9px solid transparent;
+        border-bottom: 9px solid transparent;
+        border-right: 11px solid var(--mobile-surface-2);
+    }
+    .rtl .mega-sheet.export-links-dialog .qrcode-popup::after {
+        left: auto;
+        right: -11px;
+        border-left: 11px solid var(--mobile-surface-2);
+        border-right: 0;
+    }
+    .mega-sheet.export-links-dialog .qrcode-popup .close-qrcode {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        padding: 0;
+    }
+    .rtl .mega-sheet.export-links-dialog .qrcode-popup .close-qrcode {
+        left: 12px;
+        right: auto;
+    }
+    .mega-sheet.export-links-dialog .qrcode-popup .qrcode-popup-content-body {
+        padding: 16px;
+        background-color: rgb(255, 255, 255, 1);
+        border-radius: 8px;
+        margin-top: 12px;
+    }
+    .mega-sheet.export-links-dialog .qrcode-popup .qrcode-popup-content-body > canvas {
+        display: block;
+    }
+
+    /* end QR code popup */
 
 /* end export-links-dialog */
 

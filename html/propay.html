@@ -104,7 +104,7 @@
                 <div class="left-block-wrapper">
 
                     <div class="left-block">
-                        <h1 class="plan-name title"></h1>
+                        <h1 class="plan-name title sk-pro">[$you_have_selected_pass]</h1>
                         <div class="s4-wrapper s4 hidden">
                             <h2 class="title">[$enhance_flexi]</h2>
 
@@ -122,11 +122,11 @@
                                 </button>
                             </div>
                         </div>
-                        <div class="method-duration-wrapper">
-                            <div class="payment-method">
+                        <div class="method-duration-wrapper no-sk">
+                            <div class="payment-method no-sk">
                                 <h2 class="title">[$478]</h2>
                                 <div class="dropdown-wrapper-primary">
-                                    <div class="mega-input dropdown-input payment-options" id="propay-payment-dropdown-pri">
+                                    <div class="mega-input dropdown-input payment-options sk-pro" id="propay-payment-dropdown-pri">
                                         <span>[$select_payment_method]</span>
                                         <i class="sprite-fm-mono icon-dropdown"></i>
                                         <div class="mega-input-dropdown hidden">
@@ -179,57 +179,65 @@
                                                                 </div>
                                                             </section>
                                                         </div>
-                            <div class="duration">
-                                <h2 class="title recurring hidden">[$how_often_want_to_pay]</h2>
+                            <div class="duration hidden">
                                 <h2 class="title trial hidden">[$how_often_want_to_pay]</h2>
                                 <h2 class="title one-time hidden">[$7994]</h2>
-                                <div class="options-wrapper"></div>
+                                <div class="options-wrapper no-sk"></div>
                                 <div class="duration-note one-off-payment-info hidden">
                                     <i class="sprite-fm-mono icon-message-alert"></i>
                                     <div class="warning-txt"></div>
                                 </div>
                             </div>
                         </div>
-                        <div class="billing-address">
+                        <div class="billing-address hidden">
                             <h2 class="title">[$my_billing_address]</h2>
                             <div class="wrapper"></div>
                         </div>
                         <div class="specific-payment-info hidden">
-                            <div class="payment-loading-spinner active">
-                                <div class="payment-main-loader"></div>
-                            </div>
                             <div class="propay-inline-dialog dialog-template-tool payment-stripe-dialog hidden" role="dialog" aria-modal="true">
 
                                 <div class="my-card">
-                                    <div class="saved-card">Debit (ANZ) **** 0000</div>
+                                    <div class="saved-card"></div>
                                 </div>
 
                                 <section class="content">
+                                    <!-- Skeleton loading overlay -->
+                                    <div class="sk-stripe-loading flex flex-column gap-6">
+                                        <h1></h1>
+                                        <div></div>
+                                        <div class="no-sk flex flex-row">
+                                            <div></div>
+                                            <div></div>
+                                        </div>
+                                        <div></div>
+                                    </div>
                                     <div class="content-block iframe-container">
                                         <!-- iframe will be inserted here -->
                                     </div>
                                 </section>
                             </div>
-                            <div class="propay-inline-dialog bitcoin-invoice-dialog hidden" role="dialog" aria-labelledby="bitcoin-invoice-dialog-title"
+                            <div class="propay-inline-dialog bitcoin-invoice-dialog" role="dialog" aria-labelledby="bitcoin-invoice-dialog-title"
                                 aria-modal="true">
 
-                                <section class="content">
+                                <section class="content no-sk">
                                         <h1>[$bitcoin_scan_qr_code]</h1>
                                         <div id="bitcoin-invoice-dialog-title" class="scan-code-instruction">
                                             [$scan_bitcoin_info]
                                         </div>
                                         <div class="bitcoin-qr-code"></div>
-                                        <div class="bitcoin-address selectable-txt grey"></div>
-                                        <div class="price-info">
-                                            <div class="bitcoin-price">
-                                                <div class="plan-price-bitcoins selectable"></div>
-                                                <div class="plan-price-bitcoins-btc">[$6813]</div>
-                                            </div>
-                                            <div class="helper-explanation grey mt-2">[$7231]</div>
+                                        <p class="bitcoin-address selectable-txt grey"></p>
+                                        <div class="price-info no-sk">
+                                            <h1 class="bitcoin-price">
+                                                <span class="plan-price-bitcoins selectable"></span>
+                                                <span class="plan-price-bitcoins-btc">[$6813]</span>
+                                            </h1>
+                                            <p class="helper-explanation grey mt-2">[$7231]</p>
                                         </div>
-                                        <div class="time-info">
-                                            <div class="invoice-date-time grey"></div>
-                                            <div class="time-to-expire"></div>
+                                        <div class="time-info no-sk">
+                                            <p class="invoice-date-time grey"></p>
+                                            <p class="time-to-expire">
+                                                [$6814] 00:00
+                                            </p>
                                         </div>
                                         <!-- <div class="expiry-instruction"><span class="clock-icon"></span>[$6814]</div> -->
                                 </section>
@@ -283,7 +291,7 @@
                                 <i class="sprite-fm-mono icon-info"></i>
                                 <div class="warning-txt">[$23132]</div>
                             </div>
-                            <div class="subscription-info">
+                            <div class="subscription-info sk-pro">
                                 <div class="additional-tos s4-tos s4 hidden">
                                     <div class="tos flex items-center">
                                         <div class="checkbox checkbox-item checkboxOff">
@@ -321,7 +329,7 @@
                             <div class="balance hidden">
                                 <span class="balance-amount">0.00</span>
                             </div>
-                            <button class="continue"></button>
+                            <button class="continue sk-pro"></button>
                             <div class="stripe-button payment-stripe-dialog hidden">
                                 <div class="loader sk-loading hidden">
                                     <i class="sk-elm"></i>
@@ -337,7 +345,9 @@
                 </div>
 
                 <div class="right-block">
-                    <div class="right-block-card-wrapper"></div>
+                    <div class="right-block-card-wrapper">
+                        <div class="plan-card fixed sk-card-loading sk-pro"></div>
+                    </div>
                 </div>
                 <footer class="mobile">
                     <div class="ar warning">
@@ -382,7 +392,7 @@
                     <div class="balance hidden">
                         <span class="balance-amount">0.00</span>
                     </div>
-                    <button class="continue non-fixed-continue"></button>
+                    <button class="continue non-fixed-continue sk-pro"></button>
                     <div class="stripe-button payment-stripe-dialog hidden">
                         <div class="loader sk-loading hidden">
                             <i class="sk-elm"></i>
@@ -501,7 +511,7 @@
                         </aside>
                     </footer>
                 </div>
-                <div class="fixed-continue-btn">
+                <div class="fixed-continue-btn footer-item">
                     <span class="pricing-note-fixed-txt"></span>
                     <button class="continue"></button>
                     <div class="stripe-button payment-stripe-dialog hidden">
@@ -515,7 +525,7 @@
                         </section>
                     </div>
                 </div>
-                <div class="fixed-continue-btn spacer">
+                <div class="fixed-continue-btn spacer footer-item">
                     <span class="pricing-note-fixed-txt"></span>
                     <button class="continue"></button>
                     <div class="spacer-cover"></div>

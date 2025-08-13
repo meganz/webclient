@@ -143,7 +143,7 @@ class MegaTopMenu extends MegaMobileTopMenu {
                 eventLog: 500641,
                 binding: () => {
                     console.assert(self.fminitialized);
-                    loadSubPage(localStorage.sihp || 'fm/shares');
+                    return M.openFolder(localStorage.sihp || 'shares');
                 }
             },
             {

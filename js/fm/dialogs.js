@@ -1348,7 +1348,7 @@
      * @private
      */
     var buildDialogTree = function() {
-        const key = $.dialog[0].toUpperCase() + $.dialog.substr(1) + section;
+        const key = String($.dialog)[0].toUpperCase() + String($.dialog).substr(1) + section;
         const sortDir = M.sortTreePanel[key] && M.sortTreePanel[key].dir || 1;
         const $arrow = $('.fm-picker-dialog-panel-arrows i', $dialog);
         if (sortDir > 0) {
@@ -1820,7 +1820,8 @@
     global.refreshDialogContent = function refreshDialogContent() {
         var tab = $.cfsection || 'cloud-drive';
 
-        var b = $('.content-panel.' + tab).html();
+        // eslint-disable-next-line local-rules/jquery-replacements
+        const b = tab !== 'conversations' && $('.content-panel.' + tab).html();
 
         // Before refresh content remember what is opened.
         var $openedNodes = $('ul.opened[id^="mctreesub_"]', $dialog);
@@ -1837,6 +1838,15 @@
             const sel = $dialog[0].querySelectorAll('.nw-contact-item.selected');
             for (let i = sel.length; i--;) {
                 chatSel.push(sel[i].id.replace('cpy-dlg-chat-itm-spn-', ''));
+            }
+        }
+        if (!treesearch) {
+            const $search = $($.saveAsDialog ? '.search-collapse-bar input' : '.search-bar input', $dialog);
+            if ($search.val()) {
+                $search.val('').blur();
+                if (!$.saveAsDialog) {
+                    $('.search-icon-reset', $dialog).addClass('hidden');
+                }
             }
         }
 
@@ -2134,7 +2144,10 @@
         });
 
         $('.sort-height', $dialog).rebind('click.pickerdlg', () => {
-            const key = $.dialog[0].toUpperCase() + $.dialog.substr(1) + section;
+            const key = String($.dialog)[0].toUpperCase() + String($.dialog).substr(1) + section;
+            if (!M.sortTreePanel[key]) {
+                return;
+            }
 
             M.sortTreePanel[key].by = 'name';
             M.sortTreePanel[key].dir *= -1;
@@ -2304,6 +2317,8 @@
             $.cftarget = $.mcselected || (section === 'cloud-drive' ? M.RootID : M.RubbishID);
 
             const callback = (h) => {
+                // Force clear search since closeDialog will but s4 won't do that in the same order.
+                treesearch = false;
                 // Auto-select the created folder.
                 const p = Object(M.d[h]).p || $.cftarget;
 
@@ -2338,6 +2353,7 @@
 
         $('.dialog-newgroup-button', $dialog).rebind('click', () => {
             $dialog.addClass('arrange-to-back');
+            $.cfsection = section;
             const requestEvent = 'onNewGroupChatRequest.cpd';
             const initEvent = 'onRoomInitialized.cpd';
             let triggered = false;

@@ -1208,6 +1208,84 @@ function logExportEvt(evtId, data) {
                     logExportEvt(copyEvtId);
                 });
 
+                // Decryption key row doesn't need a QR code button
+                if (klass === 'decr-key-value') {
+                    return row;
+                }
+
+                const qrContainer = mCreateElement('div', {class: 'qrcode-container'}, row);
+                let qrPopup;
+
+                const _closeAllActiveQR = () => mega.ui.sheet.overlayNode.componentSelectorAll('.show-qrcode.active')
+                    .forEach(c => c.trigger('click.qrcode'));
+
+                MegaButton.factory({
+                    parentNode: qrContainer,
+                    icon: 'sprite-fm-mono icon-qr-thin-outline icon-size-20',
+                    componentClassname: 'transparent-icon text-icon show-qrcode simpletip secondary',
+                    type: 'icon',
+                    dataset: {simpletip: l[17754]}
+                }).on('click.qrcode', function() {
+
+                    if (this.active) {
+                        qrPopup.classList.add('hidden');
+                        this.active = false;
+                        return;
+                    }
+
+                    let qrCode;
+                    let qrBody;
+
+                    if (!qrPopup) {
+                        qrPopup = mCreateElement('div', {class: 'qrcode-popup'}, [
+                            qrBody = mCreateElement('div', {class: 'qrcode-popup-content'}, [
+                                mCreateElement('div', {class: 'qrcode-popup-content-header'}, [
+                                    document.createTextNode(l[17754])
+                                ]),
+                                qrCode = mCreateElement('div', {class: 'qrcode-popup-content-body'})
+                            ])
+                        ], qrContainer);
+
+                        MegaButton.factory({
+                            parentNode: qrBody,
+                            icon: 'sprite-fm-mono icon-dialog-close icon-size-20',
+                            componentClassname: 'text-icon close-qrcode',
+                            type: 'icon'
+                        }).on('click.close', () => {
+                            qrPopup.classList.add('hidden');
+                            this.active = false;
+                        });
+                    }
+
+                    $(qrCode).empty().qrcode({
+                        width: 168,
+                        height: 168,
+                        correctLevel: QRErrorCorrectLevel.H,
+                        background: 'rgba(255, 255, 255, 1)',
+                        foreground: 'rgba(0, 0, 0, 1)',
+                        text
+                    });
+
+                    _closeAllActiveQR();
+
+                    this.active = true;
+
+                    qrPopup.classList.remove('hidden');
+
+                    this.rebind('recalcQRCodePos', () => {
+                        const rect = MegaSheet.getRectFromParent(mega.ui.sheet.overlayNode, qrContainer);
+                        const x = lang === 'ar' ? rect.left - 26 : rect.right + 26;
+                        const y = rect.top - 24;
+                        qrPopup.style = `top: ${y}px; left: ${x}px`;
+                    });
+
+                    this.trigger('recalcQRCodePos');
+
+                    $(mega.ui.sheet.overlayNode.Ps.element).rebind('scroll.closePopup', _closeAllActiveQR);
+
+                    eventlog(500907);
+                });
+
                 return row;
             };
 
@@ -1521,6 +1599,13 @@ function logExportEvt(evtId, data) {
                         tSleep(3).then(() => {
                             banner.classList.remove('max-h-100');
                             banner.classList.add('max-h-0');
+                            tSleep(0.3).then(() => {
+                                const activeQR = document.componentSelector('.show-qrcode.active');
+
+                                if (activeQR) {
+                                    activeQR.trigger('recalcQRCodePos');
+                                }
+                            });
                         });
                     }
 

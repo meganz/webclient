@@ -1178,6 +1178,20 @@ lazy(mega.ui, 'secondaryNav', () => {
             banner.classList.remove('warning', 'error', 'hidden');
             banner.classList.add(type);
             clickURLs();
+        },
+        extHideFilterChip() {
+            if (mega.ui.mNodeFilter.selectedFilters.value) {
+                return;
+            }
+            this.filterChipsHolder.classList.add('hidden');
+            filterChipShown = false;
+        },
+        extShowFilterChip() {
+            if ($.selected && $.selected.length) {
+                return;
+            }
+            this.filterChipsHolder.classList.remove('hidden');
+            filterChipShown = false;
         }
     };
 });

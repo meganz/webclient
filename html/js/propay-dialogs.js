@@ -2811,7 +2811,9 @@ var addressDialog = {
                 }
                 if (eventData && (eventData.type === 'loading') && (eventData.action === 'end')) {
                     $('.sk-stripe-loading', addressDialog.getStripeDialog()).addClass('hidden');
-                    pro.propay.skItems.continueBtn.endLoad();
+                    if (pro.propay.skItems.continueBtn) {
+                        pro.propay.skItems.continueBtn.endLoad();
+                    }
                 }
                 window.addEventListener('message', addressDialog.stripeFrameHandler, {once: true});
                 return;
@@ -2957,7 +2959,9 @@ var addressDialog = {
         if (utcResult.EUR === 0) {
 
             this.showPaymentSuccess();
-            pro.propay.skItems.continueBtn.endLoad();
+            if (pro.propay.skItems.continueBtn) {
+                pro.propay.skItems.continueBtn.endLoad();
+            }
             return;
         }
 
@@ -3816,7 +3820,9 @@ var bitcoinDialog = {
         // Make background overlay darker and show the dialog
         // $dialogBackgroundOverlay.addClass('bitcoin-invoice-dialog-overlay').removeClass('hidden');
         $bitcoinDialog.removeClass('hidden');
-        pro.propay.skItems.bitcoin.endLoad();
+        if (pro.propay.skItems.bitcoin) {
+            pro.propay.skItems.bitcoin.endLoad();
+        }
     },
 
     /**

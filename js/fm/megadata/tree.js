@@ -1171,17 +1171,13 @@ MegaData.prototype.onTreeUIOpen = function(id, event, ignoreScroll) {
             const b = t + ps.offsetHeight;
             let et = scrollTo.offsetTop;
 
-            if (!mega.ui.topmenu.activeItem) {
+            if (mega.ui.topmenu.activeItem && mega.ui.topmenu.activeItem.classList.contains('nw-fm-tree-item')) {
 
-                let p = scrollTo.parentElement;
+                let p = scrollTo.offsetParent;
 
-                while (p && !p.classList.contains('fm-tree-panel')) {
-
-                    if (p.tagName === 'LI') {
-                        et += p.offsetTop;
-                    }
-
-                    p = p.parentElement;
+                while (p && !p.classList.contains('ps')) {
+                    et += p.offsetTop;
+                    p = p.offsetParent;
                 }
             }
 

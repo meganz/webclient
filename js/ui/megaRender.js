@@ -1031,6 +1031,7 @@ mBroadcaster.once('boot_done', () => {
                     props.classNames.push('device-item');
                 }
                 else if (aNode.isDeviceFolder) {
+                    props.classNames.push('device-folder-item');
                     props.size = bytesToSize(aNode.tb || 0);
                 }
                 else if (aNode.s4 && M.getS4NodeType(aNode) === 'bucket') {

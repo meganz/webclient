@@ -1129,7 +1129,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             let showGetLink;
             let restrictedFolders = false;
 
-            const hasShare = M.ps[selNode.h] || M.getNodeShareUsers(selNode, 'EXP').length;
+            const hasShare = M.isOutShare(selNode, 'EXP');
             // Set default "Share folder" / "Share bucket" string
             if (sourceRoot === 's4' && M.getS4NodeType(selNode) === 'bucket') {
                 shareButton.dataset.simpletip = hasShare ?

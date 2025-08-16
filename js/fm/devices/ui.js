@@ -2108,17 +2108,7 @@ lazy(mega.devices, 'ui', () => {
                 return;
             }
 
-            let exp = false;
-            const shares = M.getNodeShareUsers(node);
-
-            for (let i = shares.length; i--;) {
-                if (shares[i] === 'EXP') {
-                    shares.splice(i, 1);
-                    exp = node.shares.EXP;
-                }
-            }
-
-            if (!exp && !shared.is(node.h)) {
+            if (!M.getNodeShare(node) && !shared.is(node.h)) {
                 if (mega.fileRequest.publicFolderExists(node.h)) {
                     let pageClass = '';
                     if (!is_mobile) {
@@ -2227,8 +2217,8 @@ lazy(mega.devices, 'ui', () => {
 
             const selNode = M.getNodeByHandle(h);
             const isInShare = !!sharer(selNode.h);
-            const isSharedFolder = M.getNodeShareUsers(selNode, 'EXP').length || M.ps[h];
-            const hasSharedLink = new mega.Share().hasExportLink(h);
+            const hasSharedLink = !!M.getNodeShare(h);
+            const isSharedFolder = !!M.isOutShare(selNode, 'EXP');
             const isRejectedNode = isInShare && M.getNodeRights(h) < 2;
 
             const {device} = this.getCurrentDirData();

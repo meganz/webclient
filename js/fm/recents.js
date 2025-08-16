@@ -964,7 +964,7 @@ RecentsRender.prototype._renderMedia = function($newRow, action, actionId) {
         if (M.d[node.h]) {
             M.d[node.h].seen = true;
 
-            if (M.d[node.h].shares && M.d[node.h].shares.EXP) {
+            if (M.getNodeShare(node)) {
                 $newThumb.addClass('linked');
             }
         }

@@ -1023,7 +1023,7 @@ lazy(mega, 'fileRequest', () => {
             }
 
             if (list.length) {
-                const isShared = await shared(target) || new mega.Share({}).isShareExist([target], false, true);
+                const isShared = await shared(target);
 
                 if (isShared) {
                     await this.showRemoveWarning(list);

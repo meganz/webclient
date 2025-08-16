@@ -1175,9 +1175,10 @@ lazy(mega, 'keyMgr', () => {
 
         // try decrypting inshares based on the current key situation
         async decryptInShares(pz) {
+            const lite = u_attr.s4 || mega.infinity;
 
-            if (pz !== -0xFEED && u_attr.s4) {
-                // Let's make S4 users life easier,
+            if (pz !== -0xFEED && lite) {
+                // Let's make S4/Lite users life easier...
                 // only do this whenever actually entering into the in-shares section,
                 // not on the background right after entering the site.
                 // @todo 'this.gotHereFromAFolderLink' (?)..
@@ -1187,13 +1188,13 @@ lazy(mega, 'keyMgr', () => {
             if (!pkPull.dsLock) {
                 pkPull.dsLock = mega.promise;
 
-                let shares = (u_attr.s4 || mega.infinity) && array.unique((await fmdb.get('s')).map(n => n.t || n.h));
+                let shares = lite && Object.keys(M.c.shares || {});
 
                 onIdle(() => {
                     const {resolve} = pkPull.dsLock;
 
                     const promises = [];
-                    if (!shares.length) {
+                    if (!shares) {
                         shares = Object.keys(u_sharekeys);
                     }
 
@@ -1925,7 +1926,7 @@ lazy(mega, 'keyMgr', () => {
             while (n && n.p) {
                 if (u_sharekeys[n.h]) {
 
-                    if (all || n.su || n.shares || M.ps[n.h]) {
+                    if (all || n.su || M.isOutShare(n)) {
 
                         sh.push(n.h);
                     }

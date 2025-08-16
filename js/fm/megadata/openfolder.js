@@ -848,11 +848,13 @@
         else if (id === 'shares') {
             id = 'shares';
         }
-        else if (id === 'out-shares') {
-            id = 'out-shares';
-        }
-        else if (id === 'public-links') {
-            id = 'public-links';
+        else if (id === 'out-shares' || id === 'public-links') {
+            if (mega.infinity) {
+                const p = this.loadNodeShares(id);
+                if (p) {
+                    await p;
+                }
+            }
         }
         else if (id === 'file-requests') {
             id = 'file-requests';
@@ -1007,10 +1009,6 @@
             }
 
             if (handles.length) {
-                if ((mega.infinity || u_attr.s4) && !$.inSharesRebuild) {
-                    // @todo validate which nodes are legit to query here
-                    loadingDialog.show();
-                }
                 await dbfetch.geta(handles).catch(dump);
             }
 

@@ -182,7 +182,7 @@ async function setupSingleDownloadPage(res) {
             var filenameLength = filename.length;
             var fileExtPos = filename.lastIndexOf('.') > 0 ? filename.lastIndexOf('.') : filenameLength;
             var fileTitle = filename.substring(0, fileExtPos);
-            var fileExt = filename.substring(fileExtPos).toLowerCase();
+            var fileExt = filename.substring(fileExtPos);
             var isVideo = is_video(filename);
             var prevBut = isVideo;
             onIdle(initDownloadScroll);

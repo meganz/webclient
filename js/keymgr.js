@@ -1177,7 +1177,7 @@ lazy(mega, 'keyMgr', () => {
         async decryptInShares(pz) {
             const lite = u_attr.s4 || mega.infinity;
 
-            if (pz !== -0xFEED && lite) {
+            if (pz !== -0xFEED && lite || !(self.fmdb && !fmdb.crashed)) {
                 // Let's make S4/Lite users life easier...
                 // only do this whenever actually entering into the in-shares section,
                 // not on the background right after entering the site.

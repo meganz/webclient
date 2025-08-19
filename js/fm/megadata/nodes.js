@@ -3641,6 +3641,7 @@ lazy(MegaData.prototype, 'nodeShare', () => {
             n.shares = Object.create(null);
         }
         n.shares[s.u] = s;
+        M.setNodeShare(s, ignoreDB);
 
         // Restore Public link handle, we may do lose it from a move operation (d->t)
         if (s.u === 'EXP' && s.ph && (!n.ph || s.ph !== n.ph)) {
@@ -3667,7 +3668,6 @@ lazy(MegaData.prototype, 'nodeShare', () => {
         if (updnode) {
             M.nodeUpdated(n);
         }
-        M.setNodeShare(s, ignoreDB);
 
         if (fminitialized) {
             sharedUInode(h);

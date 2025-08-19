@@ -145,7 +145,11 @@ MegaUtils.prototype.xhr = megaUtilsXHR;
  */
 MegaUtils.prototype.getStack = function megaUtilsGetStack() {
     'use strict';
-    return String(new Error('trace').stack);
+    return String(new Error('trace').stack)
+        .split('\n')
+        .slice(1 + !!window.chrome)
+        .filter((ln) => ln && !/trycatch|transport|megalog/i.test(ln))
+        .join('\n');
 };
 
 /**

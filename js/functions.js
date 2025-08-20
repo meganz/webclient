@@ -850,7 +850,7 @@ function srvlog(msg, data, silent) {
 
 // log failures through event id 99666
 function srvlog2(type /*, ...*/) {
-    if (d || window.exTimeLeft) {
+    if (!self.buildOlderThan10Days || !self.is_livesite) {
         var args    = toArray.apply(null, arguments);
         var version = buildVersion.website;
 

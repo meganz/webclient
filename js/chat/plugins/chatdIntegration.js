@@ -566,7 +566,7 @@ ChatdIntegration.prototype.openChat = promisify(function(resolve, reject, chatIn
             chatRoom = newChatRoom;
         }
 
-        if (d) {
+        if (d > 1) {
             console.group('chatdint:openchat:finish:' + chatId);
             console.time('chatdint:openchat:finish:' + chatId);
         }
@@ -827,7 +827,7 @@ ChatdIntegration.prototype.openChat = promisify(function(resolve, reject, chatIn
         }
         self.decryptTopic(chatRoom).catch(dump);
 
-        if (d) {
+        if (d > 1) {
             console.timeEnd('chatdint:openchat:finish:' + chatId);
             console.groupEnd();
         }

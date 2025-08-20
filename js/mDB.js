@@ -476,6 +476,17 @@ FMDB.prototype._transactionErrorHandled = function(ch, ex) {
     return res;
 };
 
+Object.defineProperty(FMDB.prototype, 'lipid', {
+    get() {
+        'use strict';
+        const s = new Set([
+            self.M && M.currentdirid || '',
+            String(self.page || '').replace('fm/', '')
+        ]);
+        return [...s, Math.random().toString(28).slice(-7)].join('!');
+    }
+});
+
 Object.defineProperty(FMDB.prototype, 'iStateDump', {
     get() {
         'use strict';
@@ -1328,7 +1339,7 @@ FMDB.prototype.getbykey = async function fmdb_getbykey(table, index, anyof, wher
     let p = false;
     const ch = this.channelmap[table] || 0;
     const writing = this.writing || this.head[ch] !== this.tail[ch];
-    const debug = d && (x => (m, ...a) => this.logger.warn(`[${x}] ${m}`, ...a))(Math.random().toString(28).slice(-7));
+    const debug = d && (x => (m, ...a) => this.logger.warn(`[${x}] ${m}`, ...a))(this.lipid);
 
     if (debug) {
         debug(`Fetching table ${table}...${writing ? '\u26a1' : ''}`, options, where || anyof && anyof.flat());

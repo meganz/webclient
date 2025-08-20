@@ -419,17 +419,22 @@ function dashboardUI(updProcess) {
 
                 const egrData = { s4dl: Object.create(null) };
                 const { ts: s4StrgVal = 0 } = 'utils' in s4 && s4.utils.getStorageData() || {};
-                const egrQuota = bytesToSize(account.space * 5, 0);
+                const egrQuota = bytesToSize(account.tfsq.max * 5, undefined, 4);
                 const $egrCn = $('.chart-container', $s4Egress);
 
                 const populateBarChart = async(targetDate = new Date()) => {
                     const style = getComputedStyle(document.body);
+                    const now = new Date();
                     const date = new Date(targetDate.getFullYear(), targetDate.getMonth(), 1, 0, 0, 0, 0);
                     const ts = date.getTime();
+                    let isCurrMonth = false;
 
-                    if (!egrData.s4dl[ts]) {
+                    // Do not cache current month data
+                    if (!egrData.s4dl[ts] || (isCurrMonth = date.getMonth() === now.getMonth()
+                        && date.getFullYear() === now.getFullYear())) {
+
                         loadingDialog.show('getS4EgressData');
-                        const res = await M.getS4Egress(date, egrData.used === undefined)
+                        const res = await M.getS4Egress(date, egrData.used === undefined || isCurrMonth)
                             .catch(dump);
                         egrData.s4dl[ts] = res && res.s4dl;
 
@@ -438,7 +443,7 @@ function dashboardUI(updProcess) {
                             $('.usage .label', $s4Egress).safeHTML(
                                 l.s4_ergess_used.replace(
                                     '%1',
-                                    `<span class="usage-value"><b>${bytesToSize(res.used)}</b>` +
+                                    `<span class="usage-value"><b>${bytesToSize(res.used, undefined, 4)}</b>` +
                                     ` / ${ egrQuota }</span>`
                                 )
                             );

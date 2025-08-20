@@ -2,7 +2,7 @@
     "use strict";
     var Call = window.CallManager2.Call;
 
-    Call.VIDEO_DEBUG_MODE = d;
+    Call.VIDEO_DEBUG_MODE = window.d > 1 || !!localStorage.getItem("calls.hudStats");
 
     /* Used for v0 clients, to be removed soon */
     function loadPubCu25519ForPeer(peerHandle) {

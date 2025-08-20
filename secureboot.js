@@ -1678,7 +1678,6 @@ mCreateElement('meta', {
 // Determine whether to show the legacy mobile page for these links so that they redirect back to the app
 tmp = is_mobile && (
     page.substr(0, 9) === 'newsignup'
-    || page.substr(0, 7) === 'account'
     || is_old_windows_phone && page.substr(0, 7) === 'confirm'
 );
 

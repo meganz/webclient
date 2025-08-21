@@ -293,6 +293,7 @@ lazy(mega, 'fileRequestUpload', () => {
             }
 
             this.$wrapper = $('.file-request-upload-page', document.body);
+            this.$wrapper.parent().addClass('page-file-request-upload');
             this.$uploadButton = new mega.fileRequestUI.ButtonComponent(
                 $('.upload-btn, .upload-more', this.$wrapper), {
                     namespace: 'frup'
@@ -383,7 +384,16 @@ lazy(mega, 'fileRequestUpload', () => {
             $('.page-footer', this.$wrapper).outerHeight(true);
             const bodyHeight = $('body').outerHeight(true);
 
-            const newCaptionTop = `${bodyHeight - footerCaptionHeight}px`;
+            const $psa = $('.psa-holder:visible .mega-component.banner.anouncement');
+            const psaHeight = $psa.length ? $psa.outerHeight(true) : 0;
+            if (psaHeight) {
+                const newCaptionTop = `${Math.ceil(bodyHeight - footerCaptionHeight - psaHeight - 60)}px`;
+                $pageCaption.css('top', newCaptionTop);
+
+                return;
+            }
+
+            const newCaptionTop = `${bodyHeight - footerCaptionHeight - 40}px`;
             $pageCaption.css('top', newCaptionTop);
         }
 

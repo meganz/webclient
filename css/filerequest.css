@@ -387,7 +387,6 @@ body.file-request-drag .file-request-upload-page .page-main .page-content .block
     position: sticky;
     text-align: center;
     top: calc(100vh - 210px);
-    margin-bottom: 40px;
 }
 
 .file-request-upload-page .page-caption .page-caption-wrapper {

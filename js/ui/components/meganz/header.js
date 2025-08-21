@@ -204,27 +204,6 @@ class MegaHeader extends MegaMobileHeader {
             }
         });
 
-        if (mega.lite.inLiteMode) {
-            const backtomega = new MegaLink({
-                parentNode: navActions,
-                text: l.back_to_mega,
-                type: "normal",
-                componentClassname: "outline",
-                prepend: true
-            });
-
-            backtomega.on('click.backtomega', () => {
-
-                // Remove the local storage variable which triggers MEGA Lite mode to load
-                delete localStorage.megaLiteMode;
-
-                // Store a log for statistics (User decided to go back to regular MEGA - Back to MEGA button)
-                // Then reload the account back into regular MEGA
-                loadingDialog.show();
-                Promise.resolve(eventlog(99897)).finally(() => location.reload());
-            });
-        }
-
         if (!u_type) {
 
             const loginBtn = navActions.componentSelector('.login-button');

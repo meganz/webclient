@@ -850,7 +850,7 @@ function srvlog(msg, data, silent) {
 
 // log failures through event id 99666
 function srvlog2(type /*, ...*/) {
-    if (d || window.exTimeLeft) {
+    if (!self.buildOlderThan10Days || !self.is_livesite) {
         var args    = toArray.apply(null, arguments);
         var version = buildVersion.website;
 
@@ -1863,114 +1863,6 @@ if (typeof sjcl !== 'undefined') {
         self.options = $.extend(true, {}, defaultOptions, opts);    };
 
     /**
-     * isShareExists
-     *
-     * Checking if there's available shares for selected nodes.
-     * @param {Array} nodes Holds array of ids from selected folders/files (nodes).
-     * @param {Boolean} fullShare Do we need info about full share.
-     * @param {Boolean} pendingShare Do we need info about pending share .
-     * @param {Boolean} linkShare Do we need info about link share 'EXP'.
-     * @returns {Boolean} result.
-     */
-    Share.prototype.isShareExist = function(nodes, fullShare, pendingShare, linkShare) {
-
-        var self = this;
-
-        var shares = {}, length;
-
-        for (var i in nodes) {
-            if (nodes.hasOwnProperty(i)) {
-
-                // Look for full share
-                if (fullShare) {
-                    shares = M.d[nodes[i]] && M.d[nodes[i]].shares;
-
-                    // Look for link share
-                    if (linkShare) {
-                        if (shares && Object.keys(shares).length) {
-                            return true;
-                        }
-                    }
-                    else { // Exclude folder/file links,
-                        if (shares) {
-                            length = self.getFullSharesNumber(shares);
-                            if (length) {
-                                return true;
-                            }
-                        }
-                    }
-                }
-
-                // Look for pending share
-                if (pendingShare) {
-                    shares = M.ps[nodes[i]];
-
-                    if (shares && Object.keys(shares).length) {
-                        return true;
-                    }
-                }
-            }
-        }
-
-        return false;
-    };
-
-    /**
-     * hasExportLink, check if at least one selected item have public link.
-     *
-     * @param {String|Array} nodes Node id or array of nodes string
-     * @returns {Boolean}
-     */
-    Share.prototype.hasExportLink = function(nodes) {
-
-        if (typeof nodes === 'string') {
-            nodes = [nodes];
-        }
-
-        // Loop through all selected items
-        for (var i in nodes) {
-            var node = M.d[nodes[i]];
-
-            if (node && Object(node.shares).EXP) {
-                return true;
-            }
-        }
-
-        return false;
-    };
-
-    /**
-     * getFullSharesNumber
-     *
-     * Loops through all shares and return number of full shares excluding
-     * ex. full contacts. Why ex. full contact, in the past when client removes
-     * full contact from the list, share related to client remains active on
-     * owners side. That behaviour is changed/updated on API side, so now after
-     * full contact relationship is removed, related shares are also removed.
-     *
-     * @param {Object} shares
-     * @returns {Integer} result Number of shares
-     */
-    Share.prototype.getFullSharesNumber = function(shares) {
-
-        var result = 0;
-        var contactKeys = [];
-
-        if (shares) {
-            contactKeys = Object.keys(shares);
-            $.each(contactKeys, function(ind, key) {
-
-                // Count only full contacts
-                if (M.u[key] && M.u[key].c) {
-                    result++;
-                }
-            });
-        }
-
-        return result;
-    };
-
-    /**
      * addContactToFolderShare
      *
      * Add verified email addresses to folder shares.
@@ -2090,15 +1982,12 @@ if (typeof sjcl !== 'undefined') {
         'use strict';
         $.removedContactsFromShare = {};
         const nodeHandle = target || String($.selected[0]);
-        let userHandles = M.getNodeShareUsers(nodeHandle, 'EXP');
+        const shares = M.getOutShares(nodeHandle);
 
-        if (M.ps[nodeHandle]) {
-            const pendingShares = Object(M.ps[nodeHandle]);
-            userHandles = [...userHandles, ...Object.keys(pendingShares)];
-        }
-
-        for (let i = 0; i < userHandles.length; i++) {
-            const userHandle = userHandles[i];
+        for (const userHandle in shares) {
+            if (userHandle === 'EXP') {
+                continue;
+            }
             const userEmailOrHandle = Object(M.opc[userHandle]).m || userHandle;
 
             $.removedContactsFromShare[userHandle] = {

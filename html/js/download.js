@@ -200,7 +200,7 @@ async function setupSingleDownloadPage(res) {
 
             M.v = [dl_node];
             M.d[dlpage_ph] = dl_node;
-            dl_node.shares = {EXP: Object.assign({u: "EXP", r: 0}, dl_node)};
+            M.setNodeShare(Object.assign({u: "EXP", r: 0}, dl_node));
 
             mediaCollectFn = function() {
                 MediaAttribute.setAttribute(dl_node)

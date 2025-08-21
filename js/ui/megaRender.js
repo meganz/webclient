@@ -1031,6 +1031,7 @@ mBroadcaster.once('boot_done', () => {
                     props.classNames.push('device-item');
                 }
                 else if (aNode.isDeviceFolder) {
+                    props.classNames.push('device-folder-item');
                     props.size = bytesToSize(aNode.tb || 0);
                 }
                 else if (aNode.s4 && M.getS4NodeType(aNode) === 'bucket') {
@@ -1099,8 +1100,8 @@ mBroadcaster.once('boot_done', () => {
                     }
 
                     if (!this.viewmode) {
-                        if (M.currentCustomView.type === 'public-links' && aNode.shares && aNode.shares.EXP) {
-                            props.time = aNode.shares.EXP.ts ? time2date(aNode.shares.EXP.ts) : '';
+                        if (share && M.currentCustomView.type === 'public-links') {
+                            props.time = share.ts ? time2date(share.ts) : '';
                             props.mTime = aNode.mtime ? time2date(aNode.mtime) : '';
                         }
                         else {
@@ -1209,20 +1210,13 @@ mBroadcaster.once('boot_done', () => {
                 props.userHandles = [];
                 props.avatars = [];
 
-                for (var i in aNode.shares) {
-                    if (i !== 'EXP') {
-                        props.lastSharedAt = Math.max(props.lastSharedAt, aNode.shares[i].ts);
-                        props.userNames.push(M.getNameByHandle(i));
-                        props.userHandles.push(aNode.shares[i].u);
-                    }
-                }
+                const shares = M.getOutShares(aNode);
 
-                // Adding pending shares data
-                for (var suh in M.ps[aNode.h]) {
-                    if (M.ps[aNode.h] && M.opc[suh]) {
-                        props.lastSharedAt = Math.max(props.lastSharedAt, M.ps[aNode.h][suh].ts);
-                        props.userNames.push(M.opc[suh].m);
-                        props.userHandles.push(suh);
+                for (const u in shares) {
+                    if (u !== 'EXP') {
+                        props.lastSharedAt = Math.max(props.lastSharedAt, shares[u].ts);
+                        props.userNames.push(M.getNameByHandle(u));
+                        props.userHandles.push(u);
                     }
                 }
 

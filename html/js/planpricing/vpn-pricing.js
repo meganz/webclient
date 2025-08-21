@@ -41,20 +41,28 @@ lazy(pro.proplan2, 'feature', () => {
             let card;
 
             const addHeaders = (card, { cardId, subheading1, subheading2, title }) => {
+                let dealApplied = false;
+
                 if (cardId) {
                     card.id = cardId;
                 }
 
                 if (subheading1) {
                     card.appendChild(createEl(['pricing-plan-recommend'], subheading1));
+                    dealApplied = true;
                 }
 
                 if (subheading2) {
                     card.appendChild(createEl(['pricing-plan-subheading2'], subheading2));
+                    dealApplied = true;
                 }
 
                 card.appendChild(createEl(['pricing-plan-title', 'pb-6'], title));
                 card.appendChild(createEl(['pricing-plan-only', 'mt-4'], l.pr_only));
+
+                if (dealApplied) {
+                    cardsContainer.classList.add('has-deals');
+                }
             };
 
             while (++i < extras.length) {
@@ -199,9 +207,11 @@ lazy(pro.proplan2, 'feature', () => {
 
                 const { label, sublabel, icon, class: klass } = promoBlocks.list[i];
 
-                const block = mCreateElement('div', { class: `flex-1 w-0 pb-6 px-4 w-full ${klass || ''}` }, [
-                    mCreateElement('i', { class: icon })
-                ]);
+                const block = mCreateElement(
+                    'div',
+                    { class: `flex-1 w-0 pb-6 px-4 w-full box-border ${klass || ''}` },
+                    [mCreateElement('i', { class: icon })]
+                );
 
                 const labelEl = mCreateElement('p', { class: 'feature-label' }, block);
                 labelEl.textContent = label;
@@ -289,7 +299,11 @@ lazy(pro.proplan2, 'vpn', () => {
                         || '';
 
                     if (dealHeader) {
-                        feature[dealHeader] = l.yearly_plan_saving.replace('%1', saveUpTo);
+                        const { price: monthlyBasePrice } = pro.getPlanObj(opt[pro.UTQA_RES_INDEX_ACCOUNTLEVEL], 1);
+
+                        if (priceMonthly < monthlyBasePrice) {
+                            feature[dealHeader] = l.yearly_plan_saving.replace('%1', saveUpTo);
+                        }
                     }
 
                     return feature;
@@ -407,7 +421,11 @@ lazy(pro.proplan2, 'pwm', () => {
                         || '';
 
                     if (dealHeader) {
-                        feature[dealHeader] = l.yearly_plan_saving.replace('%1', saveUpTo);
+                        const { price: monthlyBasePrice } = pro.getPlanObj(opt[pro.UTQA_RES_INDEX_ACCOUNTLEVEL], 1);
+
+                        if (priceMonthly < monthlyBasePrice) {
+                            feature[dealHeader] = l.yearly_plan_saving.replace('%1', saveUpTo);
+                        }
                     }
 
                     return feature;

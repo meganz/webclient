@@ -849,7 +849,7 @@ scparser.$add('s', {
                 M.delNodeShare(a.n, a.u);
 
                 if (a.p) {
-                    M.deletePendingShare(a.n, a.p);
+                    M.delPS(a.p, a.n);
                 }
                 else if (!pfid && fminitialized && a.u in M.u) {
                     setLastInteractionWith(a.u, `0:${unixtime()}`);
@@ -860,7 +860,6 @@ scparser.$add('s', {
                 }
             }
             else {
-                const shares = Object(M.d[a.n]).shares || {};
 
                 if (self.secureKeyMgr) {
 
@@ -874,7 +873,7 @@ scparser.$add('s', {
                         console.assert(a.a === 's2', `INVALID SHARE, missing user-handle for ${a.n}`, a);
                     }
                 }
-                else if (a.u in shares || a.ha === crypto_handleauth(a.n)) {
+                else if (M.su[a.n] && M.su[a.n].has(a.u) || a.ha === crypto_handleauth(a.n)) {
 
                     // I updated or created my share
                     const k = decrypt_key(u_k_aes, base64_to_a32(a.ok));
@@ -1497,6 +1496,8 @@ scparser.$add('d', function(a) {
         if (d) {
             console.time(`sc:d.${a.n}`);
         }
+
+        // @todo as we're "deprecating" MegaNode.shares, we can ditch this?..
         $.moveNodeShares = $.moveNodeShares || Object.create(null);
         (function _checkMoveNodeShare(h) {
             const n = M.d[h];
@@ -2806,9 +2807,13 @@ function dbfetchfm(residual) {
                         crypto_setsharekey(r[i].t, base64_to_a32(r[i].sk), true);
                     }
                 }
-                else {
+                // XXX: if we ever have writable folder-links outside the RootID, re-consider this...
+                else if (!mega.infinity || r[i].w) {
                     // this is an outbound share
                     promises.push(M.nodeShare(r[i].h, r[i], true));
+                }
+                else {
+                    M.setNodeShare(r[i], true);
                 }
             }
             loadReport('pn4');
@@ -2895,7 +2900,7 @@ shared.is = function(h) {
     'use strict';
 
     while (M.d[h]) {
-        if (M.ps[h] || M.d[h].shares) {
+        if (M.isOutShare(h)) {
             return h;
         }
         h = M.d[h].p;
@@ -3222,12 +3227,15 @@ function processOPC(a, ignoreDB) {
 }
 
 /**
- * processPH
- *
  * Process export link (public handle) action packet and 'f' tree response.
+ * (The set of eligible keys for ph during f is: {h, ph, ts, etd, down, w})
+ *
  * @param {Object} publicHandles The Public Handles action packet i.e. a: 'ph'.
+ * @param {Boolean} [tree] whether we're parsing the get-tree 'f' response
+ * @param {Boolean} [inf] whether we shall process in infinity/lite-mode.
+ * @returns {Promise<*>} settle
  */
-function processPH(publicHandles) {
+function processPH(publicHandles, tree, inf) {
     'use strict';
     const promises = [];
     var UiExportLink = fminitialized && !is_mobile && new mega.UI.Share.ExportLink();
@@ -3247,14 +3255,12 @@ function processPH(publicHandles) {
 
         // remove exported link, down: 1
         if (d) {
+            console.assert(!tree);
             promises.push(M.delNodeShare(h, 'EXP'));
 
             if (fminitialized && M.currentdirid === 'public-links') {
-                removeUInode(h, p);
 
-                if (typeof selectionManager !== 'undefined') {
-                    selectionManager.remove_from_selection(h);
-                }
+                removeUInode(h, p);
             }
 
             if (UiExportLink) {
@@ -3270,23 +3276,31 @@ function processPH(publicHandles) {
             share.u = 'EXP';
             share.r = 0;
 
-            promises.push(M.nodeShare(h, share));
+            if (inf && !share.w) {
+                console.assert(tree);
+                M.setNodeShare(share);
+            }
+            else {
+                promises.push(M.nodeShare(h, share));
+            }
 
             if (UiExportLink) {
                 UiExportLink.addExportLinkIcon(h);
             }
         }
 
-        if (is_mobile) {
-            mobile.cloud.updateLinkIcon(h);
-        }
+        if (fminitialized) {
+            if (is_mobile) {
+                mobile.cloud.updateLinkIcon(h);
+            }
 
-        if (UiExportLink && down !== undefined) {
-            UiExportLink.updateTakenDownItem(h, down);
-        }
+            if (UiExportLink && down !== undefined) {
+                UiExportLink.updateTakenDownItem(h, down);
+            }
 
-        if (fminitialized && M.recentsRender) {
-            M.recentsRender.nodeChanged(h);
+            if (M.recentsRender) {
+                M.recentsRender.nodeChanged(h);
+            }
         }
     }
 
@@ -3883,13 +3897,18 @@ function loadfm_callback(res) {
                     console.info(`[f.s(${res.s.length})] %s`, res.s.map(n => `${n.h}*${n.u}`).sort());
                 }
                 for (let i = res.s.length; i--;) {
-                    pending.push(M.nodeShare(res.s[i].h, res.s[i]));
+                    if (mega.infinity) {
+                        M.setNodeShare(res.s[i]);
+                    }
+                    else {
+                        pending.push(M.nodeShare(res.s[i].h, res.s[i]));
+                    }
                 }
             }
 
             // Handle public/export links. Why here? Make sure that M.d already exists
             if (res.ph) {
-                pending.push(processPH(res.ph));
+                pending.push(processPH(res.ph, true, !!mega.infinity));
             }
 
             // This package is sent on hard refresh if owner have enabled or disabled PUF

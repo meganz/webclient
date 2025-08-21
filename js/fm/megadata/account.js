@@ -331,7 +331,7 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
                 }
                 // stats[target].nodes.push(handle);
 
-                if (exp[handle] && !M.getNodeShareUsers(handle, 'EXP').length) {
+                if (exp[handle] && !M.isOutShare(handle, 'EXP')) {
                     continue;
                 }
 
@@ -373,7 +373,7 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
                         }
                     }
                     else {
-                        if (d) {
+                        if (d && !mega.infinity) {
                             console.error(`Not found public node ${h}`);
                         }
                         links.files++;

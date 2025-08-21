@@ -685,7 +685,7 @@ function folderIcon(node, root) {
         folderIcon = 'rubbish-';
     }
 
-    if (node.t & M.IS_SHARED || M.ps[node.h] || M.getNodeShareUsers(node, 'EXP').length) {
+    if (node.t & M.IS_SHARED || M.isOutShare(node, 'EXP')) {
 
         if (M.getS4NodeType(node) === 'bucket') {
             return `${folderIcon}bucket-share`;

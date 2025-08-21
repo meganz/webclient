@@ -504,7 +504,7 @@ mBroadcaster.once('boot_done', function radSetup() {
         }
     };
 
-    const handlers = {
+    const handlers = freeze({
         table(name, args) {
             log(name, [jsonp(args[0], null, 4)]);
         },
@@ -519,6 +519,15 @@ mBroadcaster.once('boot_done', function radSetup() {
         groupEnd() {
             --indent;
         },
+        trace() {
+            const stack = String(new Error('x').stack)
+                .split('\n')
+                .slice(2 + !!self.chrome)
+                .filter((ln) => ln && !/trycatch|transport|megalog/i.test(ln))
+                .join('\n')
+                .replace(/blob:[^\s:]+/g, '');
+            return stack && log('trace', ['\n', stack.slice(1)]);
+        },
         assert(name, args) {
             if (!args[0]) {
                 if (args.length < 2) {
@@ -527,9 +536,15 @@ mBroadcaster.once('boot_done', function radSetup() {
                 log(name, args.slice(1));
             }
         }
-    };
+    });
 
-    'debug,error,info,log,warn,table,group,groupCollapsed,groupEnd,assert'
+    const trace = freeze({
+        'warn': 1,
+        'error': 1,
+        'group': 1
+    });
+
+    'debug,error,info,log,warn,table,trace,group,groupCollapsed,groupEnd,assert'
         .split(',')
         .map(tryCatch((fn) => {
             const gConsoleMethod = console[fn];
@@ -537,6 +552,9 @@ mBroadcaster.once('boot_done', function radSetup() {
 
             console[fn] = tryCatch((...args) => {
                 mConsoleWrapper(fn, args);
+                if (trace[fn]) {
+                    handlers.trace();
+                }
                 return gConsoleMethod.apply(console, args);
             }, false);
         }));

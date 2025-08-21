@@ -438,9 +438,9 @@
             if (ids.includes('app-dl-hint')) {
                 const timeout = 120 * 24 * 60 * 60; // 120 days
                 const refused = mega.config.get('dadlh') | 0;
-                const isAppDl = mega.config.get('dlThroughMEGAsync') | 0;
+                const isAppDl = window.useMegaSync === 2 || window.useMegaSync === 3;
 
-                if (!isAppDl && !refused || (refused + timeout) * 1000 < Date.now()) {
+                if (!isAppDl && (!refused || (refused + timeout) * 1000 < Date.now())) {
                     super.show();
                     return true;
                 }
@@ -1531,7 +1531,7 @@
             },
             '.sh4r1ng-item': (items, { node }) => {
                 const isS4Bucket = node.s4 && 'kernel' in s4 && s4.kernel.getS4NodeType(node) === 'bucket';
-                const hasShares = M.getNodeShareUsers(node, 'EXP').length || M.ps[node];
+                const hasShares = M.isOutShare(node, 'EXP');
                 let removed = false;
                 if (isS4Bucket) {
                     array.remove(items, '.sh4r1ng-item');

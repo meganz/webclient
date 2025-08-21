@@ -3438,7 +3438,7 @@ MegaGallery.handleResize = SoonFc(200, (entries) => {
 MegaGallery.dbAction = async(p) => {
     'use strict';
 
-    if (fmdb && fmdb.db !== null && fmdb.crashed !== 666) {
+    if (fmdb && fmdb.db && !fmdb.crashed) {
         const res = [];
         const parents = Object.create(null);
 
@@ -3453,12 +3453,12 @@ MegaGallery.dbAction = async(p) => {
                     parents[n.p] = 1 + (M.getNodeRoot(n.p) === p);
                 }
                 if (parents[n.p] > 1) {
-                    res.push(n);
+                    res.push(n.h);
                 }
             }
         });
 
-        return res;
+        return dbfetch.geta(res);
     }
 
     throw new Error('FMDB Unavailable.');
@@ -3845,7 +3845,7 @@ lazy(mega.gallery, 'initialiseMediaNodes', () => {
             ...M.getTreeHandles('s4')
         ], true);
 
-        const allowedInMedia = n => n && !n.t
+        const allowedInMedia = n => n && n.fa
             && !disallowedFolders[n.p]
             && !n.fv
             && n.s
@@ -3854,14 +3854,8 @@ lazy(mega.gallery, 'initialiseMediaNodes', () => {
             && (!filterFn || filterFn(n, cameraTree));
 
         if (!MegaGallery.dbActionPassed) {
-            const dbNodes = await MegaGallery.dbAction()
-                .catch(() => { // Fetching all available nodes in case of DB failure
-                    console.warn('Local DB failed. Fetching existing FM nodes.');
-                    return Object.values(M.d);
-                });
-
-            await dbfetch.geta(dbNodes.map(({ h }) => h)).catch(nop);
             MegaGallery.dbActionPassed = true;
+            await MegaGallery.dbAction().catch(dump);
         }
 
         return Object.values(M.d).filter(allowedInMedia);

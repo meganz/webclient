@@ -322,7 +322,9 @@ class MegaTopMenu extends MegaMobileTopMenu {
         if (selected) {
             this.removeClass('hidden');
             if (selected === true) {
-                this.activeItem = document.getElementById(`treea_${M.currentdirid}`);
+                const currNode = M.currentCustomView ? M.currentCustomView.nodeID : M.currentdirid;
+
+                this.activeItem = document.getElementById(`treea_${currNode}`);
             }
             else {
                 // Auto expand when rendering items or selected item is not active

@@ -196,6 +196,14 @@ lazy(s4, 'keys', () => {
             $('.icon-eye-hidden', this.$steps[2]).addClass('icon-eye-reveal').removeClass('icon-eye-hidden');
         }
 
+        show() {
+            this.key = Object.create(null);
+            this.$steps[1].addClass('hidden');
+            this.$steps[2].addClass('hidden');
+
+            super.show();
+        }
+
         unbindEvents() {
             super.unbindEvents();
 

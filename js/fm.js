@@ -140,28 +140,24 @@ function sharedUInode(nodeHandle, force) {
         return delay(`sharedUInode:${nodeHandle}`, () => sharedUInode(nodeHandle, true), 666);
     }
 
-    var oShares;
     var bExportLink = false;
     var bAvailShares = false;
     var UiExportLink = new mega.UI.Share.ExportLink();
-    var share = new mega.Share();
     var target;
     const iconSize = M.onIconView ? 90 : 24;
     const iconSpriteClass = `item-type-icon${M.onIconView ? '-90' : ''}`;
 
     // Is there a full share or pending share available
-    if ((M.d[nodeHandle] && M.d[nodeHandle].shares) || M.ps[nodeHandle]) {
-
-        // Contains full shares and/or export link
-        oShares = M.d[nodeHandle] && M.d[nodeHandle].shares;
+    if (M.isOutShare(nodeHandle)) {
+        const exp = M.getNodeShare(nodeHandle);
 
         // Do we have export link for selected node?
-        if (oShares && oShares.EXP) {
+        if (exp) {
 
             UiExportLink.addExportLinkIcon(nodeHandle);
 
             // Item is taken down, make sure that user is informed
-            if (oShares.EXP.down === 1) {
+            if (exp.down) {
                 UiExportLink.addTakenDownIcon(nodeHandle);
             }
 
@@ -170,7 +166,7 @@ function sharedUInode(nodeHandle, force) {
 
         // Add share icon in left panel for selected node only if we have full or pending share
         // Don't show share icon when we have export link only
-        if (share.isShareExist([nodeHandle], true, true, false)) {
+        if (M.isOutShare(nodeHandle, 'EXP')) {
 
             // Left panel
             target = document.querySelector('#treea_' + nodeHandle + ' .nw-fm-tree-folder');
@@ -727,7 +723,7 @@ function fmtopUI() {
                 primary = '.fm-new-shared-folder';
                 mega.ui.secondaryNav.hideBreadcrumb();
             }
-            else if (M.getNodeShareUsers(M.d[M.currentdirid.replace('out-shares/', '')], 'EXP').length) {
+            else if (M.isOutShare(String(M.currentdirid).split('/').pop(), 'EXP')) {
                 primary = '.fm-new-menu';
                 secondary = '.fm-manage-share-folder';
                 contextMenuItem = contextMenuItem || id;

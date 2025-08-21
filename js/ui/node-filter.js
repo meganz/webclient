@@ -261,7 +261,7 @@ lazy(mega.ui, 'mNodeFilter', () => {
                    (this.selection.includes('favourites') && n.fav) ||
                    (this.selection.includes('rubbish') && root === M.RubbishID) ||
                    (this.selection.includes('incoming') && root === 'shares') ||
-                   (this.selection.includes('outgoing') && n.shares)) {
+                    this.selection.includes('outgoing') && this.su[n.h]) {
 
                     return true;
                 }

@@ -221,8 +221,7 @@ lazy(T.ui, 'addFilesLayout', () => {
                     }
                     settingsBtn.classList.add('active-icon');
                     settingsBody.classList.remove('hidden');
-                    inputsWrap.scrollTo({
-                        top: defaultInputs.getBoundingClientRect().height + 38,
+                    settingsBody.scrollIntoView({
                         behavior: 'smooth'
                     });
                 }

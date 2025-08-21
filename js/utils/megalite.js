@@ -128,15 +128,23 @@ lazy(mega, 'lite', () => {
      * @returns {undefined}
      */
     function initBackToMegaButton(topbarSelector) {
+        assert(inLiteMode);
 
         document.body.classList.add('mega-lite-mode');
 
-        if (mega.flags.inf > 1 && !sessionStorage.allowbtom) {
-            $('.js-back-to-mega-button', topbarSelector).addClass('hidden');
+        if (mega.flags.inf > 1) {
             return;
         }
 
-        $('.js-back-to-mega-button', topbarSelector).rebind('click.backtomega', () => {
+        const {domNode} = new MegaLink({
+            prepend: true,
+            type: "normal",
+            text: l.back_to_mega,
+            componentClassname: "outline",
+            parentNode: document.querySelector(topbarSelector || '.top-block .nav-actions')
+        });
+
+        $(domNode).rebind('click.backtomega', () => {
 
             // Remove the local storage variable which triggers MEGA Lite mode to load
             delete localStorage.megaLiteMode;

@@ -12,6 +12,18 @@
         }
         if (this.su.EXP && h in this.su.EXP) {
             delete this.su.EXP[h];
+
+            if (!Object.keys(this.su.EXP).length) {
+                delete this.su.EXP;
+            }
+
+            if (this.su[h] instanceof Set) {
+                this.su[h].delete('EXP');
+
+                if (!this.su[h].size) {
+                    delete this.su[h];
+                }
+            }
         }
     };
     const delNodeVersions = function(p, h) {
@@ -898,7 +910,7 @@ MegaData.prototype.copyNodes = async function(cn, t, del, tree) {
 
                     console.assert(n, 'Node not found... (%s)', tree[i].h);
 
-                    if (n.shares || M.ps[n.h]) {
+                    if (this.isOutShare(n)) {
                         shared.push(n.h);
                     }
                 }
@@ -1785,9 +1797,10 @@ MegaData.prototype.revokeShares = async function(handles, light) {
 
         for (let i = tree.length; i--;) {
             const h = tree[i];
+            const su = [...this.su[h] || []];
 
-            for (const share in Object(this.d[h]).shares) {
-                const user = this.d[h].shares[share].u;
+            for (let i = su.length; i--;) {
+                const user = su[i];
 
                 if (user === 'EXP') {
                     links.push(h);
@@ -2394,12 +2407,10 @@ MegaData.prototype.favourite = function(handles, newFavState) {
     'use strict';
 
     if (fminitialized) {
-        const exportLink = new mega.Share.ExportLink({});
-
         if (!Array.isArray(handles)) {
             handles = [handles];
         }
-        const nodes = handles.map(h => this.getNodeByHandle(h)).filter(n => n && !exportLink.isTakenDown(n));
+        const nodes = handles.map(h => this.getNodeByHandle(h)).filter(n => n && !this.getNodeShare(n).down);
 
         for (let i = nodes.length; i--;) {
             const n = nodes[i];
@@ -3358,16 +3369,161 @@ MegaData.prototype.getNodeShare = function(node, user) {
     "use strict";
 
     user = user || 'EXP';
+    return this.su[user] && this.su[user][node && node.h || node] || false;
+};
 
-    if (typeof node !== 'object') {
-        node = this.getNodeByHandle(node);
+/**
+ * Persist node-share, mem + FMDB.
+ * @param {Object} share node-share
+ * @param {*} [ignoreDB] ignore..fmdb
+ */
+MegaData.prototype.setNodeShare = function(share, ignoreDB) {
+    'use strict';
+    const {h, u} = share;
+
+    // Maintain special outgoing shares index by user
+    if (!this.su[u]) {
+        this.su[u] = Object.create(null);
+    }
+    this.su[u][h] = freeze({...share});
+
+    // ...and, by node-handle
+    if (this.su[h]) {
+        this.su[h].add(u);
+    }
+    else {
+        this.su[h] = new Set([u]);
     }
 
-    if (node && node.shares && user in node.shares) {
-        return node.shares[user];
+    if (fmdb && !ignoreDB && !pfkey) {
+        fmdb.add('s', {o_t: `${h}*${u}`, d: share});
+
+        if (u_sharekeys[h]) {
+            fmdb.add('ok', {
+                h,
+                d: {
+                    ha: crypto_handleauth(h),
+                    k: a32_to_base64(encrypt_key(u_k_aes, u_sharekeys[h][0]))
+                }
+            });
+        }
+        else if (self.d && !this.getNodeShare(h)) {
+            console.warn(`No share key for node ${h}`, M.d[h]);
+        }
+    }
+};
+
+/**
+ * [Infinity/Lite] emplace node-shares into memory.
+ * @param {String} id type, e.g. out-shares or public-links
+ * @returns {Promise|void} null
+ */
+MegaData.prototype.loadNodeShares = function(id) {
+    'use strict';
+    const p = [];
+    const load = (h, s) => {
+        if (!(this.d[h] && this.d[h].shares)) {
+            if (s && s.h === h) {
+                p.push(this.nodeShare(h, s, true));
+            }
+            else {
+                if (self.d) {
+                    console.warn(`No share seem to exist for ${h}, loading into memory normally...`, s);
+                }
+                p.push(dbfetch.acquire(h));
+            }
+        }
+    };
+    const stub = (u) => {
+        for (const h in this.su[u]) {
+            load(h, this.su[u][h]);
+        }
+    };
+    if (String(id).startsWith('out-shares')) {
+        for (const u in this.su) {
+            if (u.length === 11) {
+                stub(u);
+            }
+        }
+    }
+    else if (String(id).startsWith('public-links')) {
+        stub('EXP');
+    }
+    else if (this.su[id] instanceof Set) {
+        for (const u of this.su[id]) {
+            load(id, this.su[u][id]);
+        }
     }
 
-    return false;
+    if (p.length) {
+        return Promise.allSettled(p);
+    }
+};
+
+/**
+ * Get outgoing shares for a node, formerly {@link MegaNode.shares}
+ * @param {MegaNode|String|*} [n] ufs-node, or their handle
+ * @param {*} [wp] include pending out-shares (true by default)
+ * @return {Object|*}
+ * @details DO NOT WRITE INTO THE RETURNED OBJECT OR YOU'LL BE FIRED
+ */
+MegaData.prototype.getOutShares = function(n, wp) {
+    'use strict';
+    let res = false;
+    const h = n && n.h || n;
+
+    if (this.su[h]) {
+        const su = [...this.su[h]];
+
+        res = Object.create(null);
+        for (let i = su.length; i--;) {
+            const u = su[i];
+            res[u] = this.su[u][h];
+        }
+    }
+    if (wp !== false && this.ps[h]) {
+        res = Object.assign(res || Object.create(null), this.ps[h]);
+    }
+    return res;
+};
+
+/**
+ * Retrieve count of outgoing shares
+ * @param {String|Object|MegaNode} h node-handle
+ * @param {Array|String} [exc] user exclusion
+ * @return {Number} count.
+ */
+MegaData.prototype.getOutSharesCount = function(h, exc) {
+    'use strict';
+    return Object.keys(this.getOutShares(h) || {})
+        .filter(exc ? (u) => u && u !== exc : Boolean)
+        .length;
+};
+
+/**
+ * Check whether a node is a root out-share
+ * (to check against ancestors as well, do use {@link shared})
+ * @param {String|Object|MegaNode} h node-handle
+ * @param {Array|String} [exc] user exclusion
+ * @returns {Object|Number|Set}
+ */
+MegaData.prototype.isOutShare = function(h, exc) {
+    'use strict';
+
+    h = h && h.h || h;
+    return this.ps[h] || (exc ? this.getNodeShareUsers(h, exc).length : this.su[h]);
+};
+
+/**
+ * Check whether a node is a root in-share
+ * (to check against ancestors as well, do use {@link sharer})
+ * @param {String|MegaNode} n node(-handle)
+ * @returns {Boolean|*}
+ */
+MegaData.prototype.isInShare = function(n) {
+    'use strict';
+
+    return this.c.shares[n.h || n] || n.su || this.getNodeByHandle(n).su;
 };
 
 /**
@@ -3381,24 +3537,30 @@ MegaData.prototype.getNodeShareUsers = function(node, exclude) {
 
     var result = [];
 
-    if (typeof node !== 'object') {
-        node = this.getNodeByHandle(node);
+    if (typeof node !== 'string') {
+        node = node && node.h;
     }
 
-    if (node && node.shares) {
-        var users = Object.keys(node.shares);
+    if (this.su[node]) {
+        result = [...this.su[node]];
 
         if (exclude) {
-            if (!Array.isArray(exclude)) {
-                exclude = [exclude];
+            if (Array.isArray(exclude)) {
+
+                for (let i = exclude.length; i--;) {
+                    const p = result.indexOf(exclude[i]);
+                    if (p !== -1) {
+                        result.splice(p, 1);
+                    }
+                }
             }
-
-            users = users.filter((user) => {
-                return !exclude.includes(user);
-            });
+            else {
+                const p = result.indexOf(exclude);
+                if (p !== -1) {
+                    result.splice(p, 1);
+                }
+            }
         }
-
-        result = users;
     }
 
     return result;
@@ -3428,7 +3590,7 @@ MegaData.prototype.getSharingUsers = function(nodes, userobj) {
         }
 
         // outbound shares
-        if (node.shares) {
+        if (this.su[node.h]) {
             users = users.concat(this.getNodeShareUsers(node, 'EXP'));
         }
 
@@ -3473,16 +3635,13 @@ lazy(MegaData.prototype, 'nodeShare', () => {
         let updnode = false;
         debug(`Establishing node-share for ${h}`, s, [n]);
 
+        // @todo ditch MegaNode.shares use completely, maintain M.su only, adapt MegaNode.ph uses(?)
+
         if (typeof n.shares === 'undefined') {
             n.shares = Object.create(null);
         }
         n.shares[s.u] = s;
-
-        // Maintain special outgoing shares index by user
-        if (!M.su[s.u]) {
-            M.su[s.u] = Object.create(null);
-        }
-        M.su[s.u][h] = 1;
+        M.setNodeShare(s, ignoreDB);
 
         // Restore Public link handle, we may do lose it from a move operation (d->t)
         if (s.u === 'EXP' && s.ph && (!n.ph || s.ph !== n.ph)) {
@@ -3508,23 +3667,6 @@ lazy(MegaData.prototype, 'nodeShare', () => {
 
         if (updnode) {
             M.nodeUpdated(n);
-        }
-
-        if (fmdb && !ignoreDB && !pfkey) {
-            fmdb.add('s', {o_t: `${h}*${s.u}`, d: s});
-
-            if (u_sharekeys[h]) {
-                fmdb.add('ok', {
-                    h: h,
-                    d: {
-                        k: a32_to_base64(encrypt_key(u_k_aes, u_sharekeys[h][0])),
-                        ha: crypto_handleauth(h)
-                    }
-                });
-            }
-            else if (d && !M.getNodeShare(h)) {
-                console.warn(`No share key for node ${h}`, n);
-            }
         }
 
         if (fminitialized) {
@@ -3583,17 +3725,31 @@ lazy(MegaData.prototype, 'nodeShare', () => {
 MegaData.prototype.delNodeShare = async function(h, u) {
     "use strict";
 
-    if (!this.d[h]) {
+    // @todo ditch MegaNode.shares use completely, maintain M.su only, adapt MegaNode.ph uses(?)
+
+    if (!(this.d[h] && this.d[h].shares)) {
         console.assert(mega.infinity, 'just saying...');
 
-        await dbfetch.acquire(h);
+        await this.loadNodeShares(h);
     }
+    console.assert(this.d[h] || !this.su[u]);
 
-    if (this.d[h] && typeof this.d[h].shares !== 'undefined') {
+    if (this.d[h]) {
         var updnode;
 
         if (this.su[u]) {
             delete this.su[u][h];
+
+            if (!Object.keys(this.su[u]).length) {
+                delete this.su[u];
+            }
+        }
+        if (this.su[h]) {
+            this.su[h].delete(u);
+
+            if (!this.su[h].size) {
+                delete this.su[h];
+            }
         }
 
         if (fmdb) {
@@ -3601,16 +3757,18 @@ MegaData.prototype.delNodeShare = async function(h, u) {
         }
 
         api_updfkey(h);
-        delete this.d[h].shares[u];
+        if (this.d[h].shares) {
+            delete this.d[h].shares[u];
+        }
 
-        if (u === 'EXP' && this.d[h].ph) {
+        if (u === 'EXP') {
+            updnode = updnode || !!this.d[h].ph;
             delete this.d[h].ph;
 
             if (fmdb) {
                 fmdb.del('ph', h);
             }
 
-            updnode = true;
         }
 
         var a;
@@ -3628,8 +3786,8 @@ MegaData.prototype.delNodeShare = async function(h, u) {
         }
 
         if (!a) {
+            updnode = updnode || !!this.d[h].shares;
             delete this.d[h].shares;
-            updnode = true;
 
             if (!M.ps[h]) {
                 // out-share revoked, clear bit from trusted-share-keys
@@ -4025,32 +4183,6 @@ MegaData.prototype.isFileNode = function(n) {
     return crypto_keyok(n) && !n.t;
 };
 
-/**
- * called when user try to remove pending contact from shared dialog
- * should be changed case M.ps structure is changed, take a look at processPS()
- *
- * @param {string} nodeHandle
- * @param {string} pendingContactId
- *
- *
- */
-MegaData.prototype.deletePendingShare = function(nodeHandle, pendingContactId) {
-    "use strict";
-
-    if (this.d[nodeHandle]) {
-
-        if (this.ps[nodeHandle] && this.ps[nodeHandle][pendingContactId]) {
-            this.delPS(pendingContactId, nodeHandle);
-
-            if (this.ps[nodeHandle] === undefined &&
-                (this.d[nodeHandle].shares === undefined ||
-                    'EXP' in this.d[nodeHandle].shares && Object.keys(this.d[nodeHandle].shares).length === 1)) {
-                this.nodeUpdated(M.d[nodeHandle]);
-            }
-        }
-    }
-};
-
 MegaData.prototype.emptySharefolderUI = tryCatch(function(lSel) {
     "use strict";
 
@@ -4180,7 +4312,7 @@ MegaData.prototype.getFileLinkNode = async function(ph, key) {
         crypto_procattr(n, key);
         if (n.name) {
             n = new MegaNode({...n, t: 0, ph, h: ph, k: key});
-            n.shares = {EXP: {u: "EXP", r: 0, ...n}};
+            this.setNodeShare({u: "EXP", r: 0, ...n}, true);
         }
     }
     assert(n && n.name, api_strerror(EKEY));

@@ -839,10 +839,6 @@ MegaData.prototype.showPaymentFailedBanner = async function() {
         return;
     }
 
-    const account = await M.paymentBannerData();
-    const { subs = [], expiry, cstrg } = account;
-    const today = new Date();
-
     const lastShow = await M.getPersistentData('payfail-last').catch(nop) ||
         { shown: 0, last: 0, id: false, al: false, h: u_handle };
     if (u_handle !== lastShow.h) {
@@ -855,6 +851,11 @@ MegaData.prototype.showPaymentFailedBanner = async function() {
     ) {
         return;
     }
+
+    const account = await M.paymentBannerData();
+    const {subs = [], expiry, cstrg} = account;
+    const today = new Date();
+
     let renewPassed = false;
     let isCancelled = true;
     for (let i = subs.length; i--;) {
@@ -1026,24 +1027,11 @@ MegaData.prototype.showPaymentCardBanner = function(status) {
  * @param {*} quota Storage quota data, as returned from M.getStorageQuota()
  * @param {Object} [options] Additional options
  */
-MegaData.prototype.showOverStorageQuota = function(quota, options) {
+MegaData.prototype.showOverStorageQuota = async function(quota, options) {
     'use strict';
 
     if (quota === undefined && options === undefined) {
         return Promise.reject(EARGS);
-    }
-
-    if (!pro.membershipPlans || !pro.membershipPlans.length) {
-        return new Promise((resolve, reject) => {
-            pro.loadMembershipPlans(() => {
-                if (!pro.membershipPlans || !pro.membershipPlans.length) {
-                    reject(EINCOMPLETE);
-                }
-                else {
-                    M.showOverStorageQuota(quota, options).then(resolve).catch(reject);
-                }
-            });
-        });
     }
     const {promise} = mega;
 
@@ -1099,12 +1087,17 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
             `<i class="notification-block-icon sprite-fm-mono icon-offline"></i>
             <span>${dlgTexts.fmBannerText}</span>`);
     }
-    else {
+    else if (quota === -1 || quota && (quota.isFull || quota.isAlmostFull) || options && options.custom) {
         if (quota === -1) {
             quota = { percent: 100 };
             quota.isFull = quota.isAlmostFull = true;
             quota.cstrg = M.storageQuotaCache ? M.storageQuotaCache.cstrg : '';
             options = { custom: 1 };
+        }
+        // @todo revamp, we're meant to do the below whenever the dialog is opened, and only when the data is required
+        await pro.loadMembershipPlans();
+        if (!pro.membershipPlans.length) {
+            throw EINCOMPLETE;
         }
 
         const lowestRequiredPlan = pro.filter.lowestRequired(quota.cstrg || '', 'storageTransferDialogs');
@@ -1205,12 +1198,7 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
 
         }
         else {
-            if ($strgdlg.is(':visible')) {
-                window.closeDialog();
-            }
-            $('.pm-main').removeClass('fm-notification almost-full full');
-
-            return Promise.reject();
+            console.error('Huh?');
         }
 
         $('.fm-notification-block.full')
@@ -1223,7 +1211,15 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
                 `<i class="notification-block-icon sprite-fm-mono icon-offline"></i>
                 <span>${l[22668].replace('%1', maxStorage)}</span>
                 <i class="fm-notification-close sprite-fm-mono icon-close-component"></i>`);
+    }
+    else {
+        if ($strgdlg.is(':visible')) {
+            window.closeDialog();
+        }
+        $('.pm-main').removeClass('fm-notification almost-full full');
 
+        promise.reject();
+        return promise;
     }
 
     var closeDialog = function() {
@@ -1353,18 +1349,11 @@ mBroadcaster.addListener('fm:initialized', () => {
     'use strict';
 
     if (u_type === 3 && !pfid) {
-        if (u_attr && u_attr.p) {
-            api.req({a: 'uq', pro: 1}).then(({result}) => {
-                if (result.stype === 'O') {
-                    // Try showing this banner for users with a one off plan/sub and are still pro.
-                    return M.showPlanExpiringBanner();
-                }
-            }).catch(dump);
-        }
-        else if (u_attr) {
-            // Try showing this banner only for users who are no longer pro.
-            M.showPaymentFailedBanner().catch(dump);
-        }
+        // Try showing this banner for users with a one-off plan/sub and are still pro, or that are no longer pro.
+        tSleep(4 + Math.random())
+            .then(() => u_attr.p ? M.showPlanExpiringBanner() : M.showPaymentFailedBanner())
+            .catch(dump);
+
         return 0xDEAD;
     }
 });

@@ -3845,8 +3845,7 @@ MegaData.prototype.delNodeShare = async function(h, u) {
  */
 MegaData.prototype.getUserByHandle = function(handle) {
     "use strict";
-
-    var user = false;
+    let user;
 
     if (Object(this.u).hasOwnProperty(handle)) {
         user = this.u[handle];
@@ -3866,7 +3865,7 @@ MegaData.prototype.getUserByHandle = function(handle) {
         user = u_attr;
     }
 
-    return user;
+    return user || false;
 };
 
 /**

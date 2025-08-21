@@ -1,3 +1,6 @@
+mBroadcaster.once('fm:initialized', () => {
+    'use strict';
+
 class ForcedUpgradeProDialog {
 
     /**
@@ -226,7 +229,7 @@ class ForcedUpgradeProDialog {
     /**
      * Set the next time when the user can see the dialog based on their activity levels
      *
-     * @returns {void}
+     * @returns {Promise}
      */
     async setNextDialogShowTime() {
         let nextDialogShowTime;
@@ -273,7 +276,10 @@ class ForcedUpgradeProDialog {
             nextDialogShowTime = nextDialogShowDate.getTime();
         }
 
-        mega.attr.set('fudnxt', String(nextDialogShowTime), -2, true);
+            return Promise.allSettled([
+                M.setPersistentData(`fudnxt${u_handle}`, nextDialogShowTime),
+                mega.attr.set('fudnxt', String(nextDialogShowTime), -2, true)
+            ]);
     }
 
     /**
@@ -314,7 +320,7 @@ class ForcedUpgradeProDialog {
      */
     async showForcedUpgradeDialog() {
         const canShowDialog = await this.canShowDialog();
-        this.setNextDialogShowTime();
+            this.setNextDialogShowTime().dump(`fudnxt${u_handle}`);
 
         if (canShowDialog) {
             pro.loadMembershipPlans(() => {
@@ -334,9 +340,6 @@ class ForcedUpgradeProDialog {
     }
 }
 
-mBroadcaster.once('fm:initialized', () => {
-    'use strict';
-
     // Do not show on the below pages
     const isInvalidDialogPage = M.currentdirid === 'transfers'
         || String(M.currentdirid).includes('account')
@@ -347,7 +350,10 @@ mBroadcaster.once('fm:initialized', () => {
         return;
     }
 
-    onIdle(() => {
+    tSleep(4 + Math.random()).then(() => M.getPersistentData(`fudnxt${u_handle}`).catch(nop)).then((v) => {
+        if (v - 4e6 > Date.now()) {
+            return;
+        }
         M.getStorageQuota().then((storage) => {
             const forcedUpgradeProDialog = new ForcedUpgradeProDialog(storage);
             forcedUpgradeProDialog.showForcedUpgradeDialog();

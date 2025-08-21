@@ -3433,7 +3433,7 @@ mBroadcaster.addListener('fm:initialized', () => {
         return;
     }
 
-    onIdle(() => {
+    tSleep(4 + Math.random()).then(() => {
         // Add the dynamic notifications
         if (typeof notify.addDynamicNotifications !== 'undefined') {
             notify.addDynamicNotifications().catch(dump);

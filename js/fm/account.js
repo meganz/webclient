@@ -3982,32 +3982,24 @@ accountUI.vpn = {
 accountUI.hasMobileSessions = async() => {
     'use strict';
 
-    if (typeof M.isMobileInUse === 'boolean') {
-        return M.isMobileInUse;
+    if (await M.getPersistentData(`${u_handle}!mapp`).catch(nop)) {
+        return true;
     }
 
-    if (!(M.isMobileInUse instanceof Promise)) {
-        M.isMobileInUse = new Promise((resolve) => {
-            api.req({a: 'usl', x: 1}).then(({ result: sessions }) => {
-                if (sessions && sessions.length) {
-                    for (let i = sessions.length; i--;) {
-                        const useragent = String(sessions[i][2]).toLowerCase();
+    if (!accountUI.hasMobileSessions.res) {
+        accountUI.hasMobileSessions.res = api.req({a: 'usl', x: 1})
+            .then(({result: sessions}) => {
+                for (let i = sessions && sessions.length; i--;) {
+                    const useragent = String(sessions[i][2]).toLowerCase();
 
-                        if (useragent.startsWith('megaandroid/') || useragent.startsWith('megaios/') === 0) {
-                            M.isMobileInUse = true;
-                            break;
-                        }
+                    if (useragent.startsWith('megaandroid/') || useragent.startsWith('megaios/')) {
+                        M.setPersistentData(`${u_handle}!mapp`, 1).catch(dump);
+                        return true;
                     }
                 }
-
-                M.isMobileInUse = M.isMobileInUse === true;
-
-                resolve(M.isMobileInUse);
-            });
-        });
+            })
+            .catch(dump);
     }
 
-    await M.isMobileInUse;
-
-    return M.isMobileInUse;
+    return accountUI.hasMobileSessions.res;
 };

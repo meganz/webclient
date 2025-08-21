@@ -1311,6 +1311,7 @@ MegaUtils.prototype.transferFromMegaCoNz = function(data) {
 
     // Get site transfer data from after the hash in the URL
     var urlParts = /sitetransfer!(.*)/.exec(data || window.location);
+    eventlog(500938)
 
     if (urlParts) {
 
@@ -1320,6 +1321,7 @@ MegaUtils.prototype.transferFromMegaCoNz = function(data) {
         }
         catch (ex) {
             console.error(ex);
+            eventlog(500939, String(ex));
             loadSubPage('login');
             return false;
         }
@@ -1329,6 +1331,10 @@ MegaUtils.prototype.transferFromMegaCoNz = function(data) {
             api_req({a: 'log', e: 99804, m: 'User tries to transfer a session from mega.co.nz.'});
 
             var toPage = String(urlParts[2] || 'fm').replace('#', '');
+
+            if (toPage.includes('uao=MEGAsync')) {
+                eventlog(500940);
+            }
 
             if (toPage.includes('?')) {
                 const pageParts = toPage.split('?');
@@ -1447,6 +1453,7 @@ MegaUtils.prototype.transferFromMegaCoNz = function(data) {
             return false;
         }
     }
+    eventlog(500939, 'No URL parts found');
 };
 
 MegaUtils.prototype.setTabAndScroll = function(target) {

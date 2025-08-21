@@ -61,7 +61,7 @@ function accountUI() {
         }
     });
     $('.settings-back', $settingsMenu).rebind('click.accui', () => {
-        loadSubPage(accountUI.prev || 'start');
+        M.openFolder(accountUI.prev || 'fm');
     });
 }
 

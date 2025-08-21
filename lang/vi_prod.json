@@ -3134,7 +3134,7 @@
     "day_last_count": "{count, plural, other {# ng\u00e0y tr\u01b0\u1edbc}}",
     "days_chat_history_plural": "{count, plural, other {# ng\u00e0y}}",
     "days_free_then_price_2y": "{count, plural, other {# ng\u00e0y d\u00f9ng mi\u1ec5n\u00a0ph\u00ed, sau \u0111\u00f3 l\u00e0 %1 %2/m\u1ed7i 2 n\u0103m}}",
-    "days_free_then_price_m": "{count, plural, one {# day free, then %1 %2 /month} other {# days free, then %1 %2 /month}}",
+    "days_free_then_price_m": "{count, plural, other {# ng\u00e0y d\u00f9ng mi\u1ec5n\u00a0ph\u00ed, sau \u0111\u00f3 l\u00e0 %1 %2/th\u00e1ng}}",
     "days_free_then_price_y": "{count, plural, other {# ng\u00e0y d\u00f9ng mi\u1ec5n\u00a0ph\u00ed, sau \u0111\u00f3 l\u00e0 %1 %2/n\u0103m}}",
     "dc_app_promo_backup_desc": "Sao l\u01b0u c\u00e1c t\u00e0i\u00a0li\u1ec7u v\u00e0 t\u1ec7p\u00a0tin quan\u00a0tr\u1ecdng v\u1edbi \u1ee9ng\u00a0d\u1ee5ng MEGA cho [A]M\u00e1y\u00a0T\u00ednh[/A], gi\u00fap b\u1ea1n ho\u00e0n\u00a0to\u00e0n y\u00ean\u00a0t\u00e2m.",
     "dc_app_promo_backup_title": "Sao l\u01b0u v\u00e0 kh\u00f4i ph\u1ee5c c\u00e1c t\u1ec7p tin quan tr\u1ecdng",

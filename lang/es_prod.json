@@ -3134,7 +3134,7 @@
     "day_last_count": "{count, plural, one {hace # d\u00eda} many {hace # d\u00edas} other {hace # d\u00edas}}",
     "days_chat_history_plural": "{count, plural, one {# d\u00eda} many {# d\u00edas} other {# d\u00edas}}",
     "days_free_then_price_2y": "{count, plural, one {# d\u00eda gratis, luego %1 %2 cada 2 a\u00f1os} many {# d\u00edas gratis, luego %1 %2 cada 2 a\u00f1os} other {# d\u00edas gratis, luego %1 %2 cada 2 a\u00f1os}}",
-    "days_free_then_price_m": "{count, plural, one {# day free, then %1 %2 /month} other {# days free, then %1 %2 /month}}",
+    "days_free_then_price_m": "{count, plural, one {# d\u00eda gratis, luego %1 %2 al mes} many {# d\u00edas gratis, luego %1 %2 al mes} other {# d\u00edas gratis, luego %1 %2 al mes}}",
     "days_free_then_price_y": "{count, plural, one {# d\u00eda gratis, luego %1 %2 al a\u00f1o} many {# d\u00edas gratis, luego %1 %2 al a\u00f1o} other {# d\u00edas gratis, luego %1 %2 al a\u00f1o}}",
     "dc_app_promo_backup_desc": "Haz un backup de documentos y archivos importantes con la app de [A]escritorio[/A], para total tranquilidad.",
     "dc_app_promo_backup_title": "Backups y recuperaci\u00f3n de archivos ",

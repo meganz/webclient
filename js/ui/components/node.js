@@ -364,11 +364,6 @@ class MegaNodeComponent extends MegaComponent {
         return fm_contains(this.node.tf, this.node.td);
     }
 
-    get shared() {
-        // @todo check/revamp how/where is this used..
-        return M.getOutShares(this.handle);
-    }
-
     get name() {
         if (this.undecryptable) {
             return this.node.t ? l[8686] : l[8687];

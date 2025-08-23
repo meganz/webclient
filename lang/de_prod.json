@@ -1239,7 +1239,7 @@
     "17154": "{count, plural, one {Die Versionshistorie dieser Datei wird gel\u00f6scht. Bitte beachten Sie: Die aktuelle Version bleibt erhalten. Fortfahren?} other {Sie l\u00f6schen die Versionshistorie von # Dateien. Bitte beachten Sie: Die aktuelle Version jeder Datei bleibt erhalten. Fortfahren?}}",
     "17156": "Von %1 umbenannt",
     "17386": "Schl\u00fcssel kopieren",
-    "17398": "Label",
+    "17398": "Markierung",
     "17403": "Hiermit brechen Sie die eingerichtete Dateianfrage f\u00fcr den Ordner %1 ab",
     "17407": "HTML-Code zum Einf\u00fcgen",
     "17408": "Code kopieren",

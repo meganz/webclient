@@ -1357,7 +1357,7 @@ MegaUtils.prototype.transferFromMegaCoNz = function(data) {
                     toPage = 'fm/pwm';
                 }
                 else {
-                    toPage = value || target;
+                    toPage = value || target || type;
                 }
             }
 

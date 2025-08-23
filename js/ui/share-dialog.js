@@ -2084,7 +2084,12 @@ lazy(mega.ui, 'mShareDialog', () => {
                 .then(() => mega.keyMgr.setShareSnapshot(target))
                 .then(() => !M.getSharingUsers(target).length && mega.sensitives.passShareCheck(target))
                 .then(() => M.safeShowDialog('share', showShareDlg))
-                .catch(reportError);
+                .catch((ex) => {
+                    if (ex !== EBLOCKED) {
+                        // if it isn't a user-cancel from showRemoveWarning()
+                        reportError(ex);
+                    }
+                });
         },
 
         /**

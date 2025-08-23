@@ -152,7 +152,7 @@ function CreateWorkers(url, message, size) {
             tryCatch(() => worker[i].terminate())();
             worker[i] = instances[i] = null;
 
-            if (ex.message) {
+            if (ex.message && !String(ex.message).includes('NetworkError')) {
                 reportError(ex.message, `${ex.filename}:${ex.lineno}`.split('://')[1]);
             }
 

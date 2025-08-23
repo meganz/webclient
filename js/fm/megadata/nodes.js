@@ -3463,22 +3463,36 @@ MegaData.prototype.loadNodeShares = function(id) {
 /**
  * Get outgoing shares for a node, formerly {@link MegaNode.shares}
  * @param {MegaNode|String|*} [n] ufs-node, or their handle
+ * @param {Array|String} [exc] user(s) to exclude
  * @param {*} [wp] include pending out-shares (true by default)
  * @return {Object|*}
  * @details DO NOT WRITE INTO THE RETURNED OBJECT OR YOU'LL BE FIRED
  */
-MegaData.prototype.getOutShares = function(n, wp) {
+MegaData.prototype.getOutShares = function(n, exc, wp) {
     'use strict';
     let res = false;
     const h = n && n.h || n;
 
-    if (this.su[h]) {
+    console.assert(!this.su[h] || this.su[h] instanceof Set, `Invalid su[] instance for ${h} ?!`, this.su[h]);
+
+    if (this.su[h] instanceof Set) {
         const su = [...this.su[h]];
+
+        if (exc && !Array.isArray(exc)) {
+            exc = [exc];
+        }
 
         res = Object.create(null);
         for (let i = su.length; i--;) {
             const u = su[i];
-            res[u] = this.su[u][h];
+
+            if (!exc || !exc.includes(u)) {
+                res[u] = this.su[u][h];
+            }
+        }
+
+        if (exc && !Object.keys(res).length) {
+            res = false;
         }
     }
     if (wp !== false && this.ps[h]) {

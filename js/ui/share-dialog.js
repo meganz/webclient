@@ -506,7 +506,7 @@ lazy(mega.ui, 'mShareDialog', () => {
      */
     function getActiveShareContacts() {
 
-        return M.getOutShares(target);
+        return M.getOutShares(target, 'EXP');
     }
 
     /**
@@ -2042,8 +2042,8 @@ lazy(mega.ui, 'mShareDialog', () => {
 
         $.hideContextMenu();
 
-        // eslint-disable-next-line no-use-before-define
-        fillShareDlg(target).catch(dump);
+        fillShareDlg(target)
+            .catch(reportError);
 
         // Show the Share dialog
         return $dialog;
@@ -2084,7 +2084,7 @@ lazy(mega.ui, 'mShareDialog', () => {
                 .then(() => mega.keyMgr.setShareSnapshot(target))
                 .then(() => !M.getSharingUsers(target).length && mega.sensitives.passShareCheck(target))
                 .then(() => M.safeShowDialog('share', showShareDlg))
-                .catch(dump);
+                .catch(reportError);
         },
 
         /**

@@ -295,6 +295,7 @@ mBroadcaster.once('boot_done', () => {
                 }
             }
         },
+        isOutShare: () => false,
         getNodeRights: () => false,
         isInvalidUserStatus: () => false,
         getNodeByHandle: (h) => M.d[M.xh[h]] || M.d[h] || false,

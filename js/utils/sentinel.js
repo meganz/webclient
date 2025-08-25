@@ -4,12 +4,14 @@ mBroadcaster.once('boot_done', () => {
     const domain2event = freeze({
         'mega.nz': 99702,
         'transfer.it': 99623,
-        'smoketest.transfer.it': 99623
+        'smoketest.transfer.it': 99623,
+        'bigefpfhnfcobdlfbedofhhaibnlghod': 99702,
+        'jemjknhgpjaacbghpdhgchbgccbpkkgf': 99702
     });
-    const eid = self.is_extension ? 99702 : domain2event[location.host];
+    const eid = domain2event[location.host];
 
     /**/
-    if (!eid
+    if (!eid && !self.is_extension
         || self.buildOlderThan10Days
         || self.onerror === self.nop
         || storage.mSentinelOptOut) {
@@ -320,4 +322,11 @@ mBroadcaster.once('boot_done', () => {
         })();
     }
     self.onerror = gExceptionHandler;
+
+    if (!eid) {
+        const msg = `unk:${location.host}`;
+
+        queueMicrotask(() => optOut(msg));
+        eventlog(99702, JSON.stringify([Object(self.buildVersion).website, 999, msg]), true);
+    }
 });

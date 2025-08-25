@@ -1165,18 +1165,19 @@ function FMShortcuts() {
             !M.gallery &&
             !M.albums
         ) {
-            if (!current_operation || (M.getNodeRights(M.currentdirid || '') | 0) < 1) {
+            const nodeId = M.currentCustomView ? M.currentCustomView.nodeID : M.currentdirid;
+            if (!current_operation || (M.getNodeRights(nodeId || '') | 0) < 1) {
                 return false; // stop prop.
             }
 
             let {src: handles, op, dir} = current_operation;
-            op = op === 'cut' && dir === M.currentdirid ? 'copy' : op;
+            op = op === 'cut' && dir === nodeId ? 'copy' : op;
 
             if (op === "copy") {
-                M.copyNodes(handles, M.currentdirid).catch((ex) => ex !== EBLOCKED && tell(ex));
+                M.copyNodes(handles, nodeId).catch((ex) => ex !== EBLOCKED && tell(ex));
             }
             else if (op === "cut") {
-                M.moveNodes(handles, M.currentdirid).catch(tell);
+                M.moveNodes(handles, nodeId).catch(tell);
                 current_operation = null;
             }
 

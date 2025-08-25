@@ -122,7 +122,7 @@ GalleryNodeBlock.revokeThumb = (h) => {
     for (let i = 0; i < keys.length; i++) {
         const key = keys[i];
 
-        if (M.d[h] && M.d[h].fa && key.startsWith(M.d[h].fa)) {
+        if (mega.gallery.tmpFa[h] && mega.gallery.tmpFa[h].fa && key.startsWith(mega.gallery.tmpFa[h].fa)) {
             URL.revokeObjectURL(GalleryNodeBlock.thumbCache[key]);
             delete GalleryNodeBlock.thumbCache[key];
         }
@@ -165,7 +165,7 @@ class MegaGallery {
     }
 
     mainViewNodeMapper(h) {
-        const n = M.d[h] || this.updNode[h] || false;
+        const n = mega.gallery.tmpFa[h] || this.updNode[h] || false;
 
         console.assert(!!n, `Node ${h} not found...`);
         return n;
@@ -439,7 +439,7 @@ class MegaGallery {
 
             // Falling back to names sorting, if times are the same
             if (!timeDiff) {
-                const sortedArr = [n, M.d[group.n[0]]];
+                const sortedArr = [n, mega.gallery.tmpFa[group.n[0]]];
                 sortedArr.sort(this.sortByMtime.bind(this));
 
                 if (sortedArr[0].h !== group.n[0]) {
@@ -470,7 +470,7 @@ class MegaGallery {
                     let timeDiff = this.nodes[n.h] - this.nodes[stsGroup.n[1]];
 
                     if (!timeDiff) {
-                        const sortedArr = [n, M.d[stsGroup.n[1]]];
+                        const sortedArr = [n, mega.gallery.tmpFa[stsGroup.n[1]]];
                         sortedArr.sort(this.sortByMtime.bind(this));
 
                         if (sortedArr[0].h !== stsGroup.n[0]) {
@@ -587,7 +587,7 @@ class MegaGallery {
         const {start, end} = calculateCalendar('d', ts);
         const keys = Object.keys(this.nodes);
         for (const h of keys) {
-            const n = M.d[h];
+            const n = mega.gallery.tmpFa[h];
 
             if (!n) {
                 continue;
@@ -606,7 +606,7 @@ class MegaGallery {
         const {start, end} = calculateCalendar('m', ts);
         const keys = Object.keys(this.nodes);
         for (const h of keys) {
-            const n = M.d[h];
+            const n = mega.gallery.tmpFa[h];
 
             if (!n) {
                 continue;
@@ -721,7 +721,8 @@ class MegaGallery {
                 let timeDiff = this.nodes[n.h] > this.nodes[sameDayNode];
 
                 if (!timeDiff) {
-                    const sortedArr = [n, M.d[sameDayNode]];
+                    const sortedArr = [n, mega.gallery.tmpFa[sameDayNode]];
+
                     sortedArr.sort(this.sortByMtime.bind(this));
 
                     if (sortedArr[0].h !== group.n[0]) {
@@ -1077,7 +1078,7 @@ class MegaGallery {
     }
 
     removeFromAllGroup(h, ts) {
-        if (M.d[h] && M.d[h].fa) {
+        if (mega.gallery.tmpFa[h] && mega.gallery.tmpFa[h].fa) {
             GalleryNodeBlock.revokeThumb(h);
         }
 
@@ -1129,14 +1130,11 @@ class MegaGallery {
         }
 
         this.updNode[n.h] = n;
+        mega.gallery.tmpFa[n.h] = n;
 
         const updatedGroup = this.getGroup(n);
 
         this.nodes[n.h] = updatedGroup[0];
-
-        if (!M.d[n.h]) {
-            await dbfetch.get(n.h);
-        }
 
         if (!this.dynamicList && this.onpage) {
             this.initDynamicList();
@@ -1169,6 +1167,7 @@ class MegaGallery {
         const updatedGroup = this.getGroup(n);
 
         delete this.nodes[n.h];
+        delete mega.gallery.tmpFa[n.h];
 
         // Do not change order, some function here is rely on result from another
         // This order should be keep this way in order to process data in order.
@@ -1197,8 +1196,8 @@ class MegaGallery {
             return;
         }
 
-        if (M.d[h]) {
-            this.removeNodeFromGroups(M.d[h]);
+        if (mega.gallery.tmpFa[h]) {
+            this.removeNodeFromGroups(mega.gallery.tmpFa[h]);
         }
         else {
             this.removeNodeFromGroups({ h, mtime: this.nodes[h] });
@@ -1427,7 +1426,7 @@ class MegaGallery {
 
             const { currentTarget: el } = e;
 
-            if (el && M.d[el.id] && !$.selected.includes(el.id)) {
+            if (el && mega.gallery.tmpFa[el.id] && !$.selected.includes(el.id)) {
                 selectionManager.clear_selection();
                 this.clearSelections();
                 selectionManager.add_to_selection(el.id);
@@ -1669,9 +1668,8 @@ class MegaGallery {
     }
 
     sortByMtime(ah, bh) {
-
-        const a = M.d[ah] || this.updNode[ah];
-        const b = M.d[bh] || this.updNode[bh];
+        const a = typeof ah === 'string' ? mega.gallery.tmpFa[ah] || this.updNode[ah] : ah;
+        const b = typeof bh === 'string' ? mega.gallery.tmpFa[bh] || this.updNode[bh] : bh;
 
         return M.sortByModTimeFn2()(a, b, -1);
     }
@@ -1909,7 +1907,7 @@ class MegaGallery {
     }
 
     renderNode(h) {
-        const node = M.d[h] || new MegaNode(this.updNode[h]);
+        const node = mega.gallery.tmpFa[h] || new MegaNode(this.updNode[h]);
 
         if (!node) {
             return;
@@ -2293,7 +2291,7 @@ class MegaTargetGallery extends MegaGallery {
 
         for (let i = handles.length; i--;) {
             if (!M.c[handles[i]]) {
-                if (self.d && !M.d[handles[i]]) {
+                if (self.d && !mega.gallery.tmpFa[handles[i]]) {
                     console.error(`Gallery cannot find handle ${handles[i]}`);
                 }
                 continue;
@@ -2305,7 +2303,7 @@ class MegaTargetGallery extends MegaGallery {
         const rubTree = array.to.object(M.getTreeHandles(M.RubbishID), true);
 
         subs = subs.filter(h => {
-            const n = M.d[h];
+            const n = mega.gallery.tmpFa[h];
             return !n.t
                 && !this.nodes[n.h]
                 && !rubTree[h]
@@ -2316,7 +2314,7 @@ class MegaTargetGallery extends MegaGallery {
         }).sort(this.sortByMtime.bind(this));
 
         for (const h of subs) {
-            const n = M.d[h];
+            const n = mega.gallery.tmpFa[h];
             this.nodes[n.h] = this.setGroup(n)[0];
             M.v.push(n);
         }
@@ -2486,7 +2484,6 @@ class MegaMediaTypeGallery extends MegaGallery {
 }
 
 mega.gallery = Object.create(null);
-mega.gallery.nodeUpdated = false;
 mega.gallery.albumsRendered = false;
 mega.gallery.publicSet = Object.create(null);
 mega.gallery.titleControl = null;
@@ -2519,6 +2516,22 @@ Object.defineProperty(mega.gallery, 'albumsRendered', {
         }
 
         this._albumsRendered = value;
+    }
+});
+
+Object.defineProperty(mega.gallery, 'nodeUpdated', {
+    get() {
+        'use strict';
+        return this._nodeUpdated || false;
+    },
+    set(value) {
+        'use strict';
+
+        if (value) {
+            delete mega.gallery.tmpFa;
+        }
+
+        this._nodeUpdated = value;
     }
 });
 
@@ -2650,7 +2663,7 @@ mega.gallery.checkEveryGalleryUpdate = n => {
         const childHandles = Object.keys(M.c[n.h]);
 
         for (let i = childHandles.length; i--;) {
-            mega.gallery.checkEveryGalleryUpdate(M.d[childHandles[i]]);
+            mega.gallery.checkEveryGalleryUpdate(mega.gallery.tmpFa[childHandles[i]]);
         }
 
         return;
@@ -2931,7 +2944,7 @@ mega.gallery.generateSizedThumbnails = async(keys, onLoad, onErr) => {
 
         if (abIsEmpty && type === 1) { // Preview fetch is not successful
             api_getfileattr(
-                { [key]: M.d[faData[key].handle] },
+                { [key]: mega.gallery.tmpFa[faData[key].handle] },
                 0,
                 (ctx1, key1, thumbAB1) => {
                     processUint8(ctx1, key1, thumbAB1, 0);
@@ -3000,7 +3013,7 @@ mega.gallery.generateSizedThumbnails = async(keys, onLoad, onErr) => {
                     console.warn(`Could not receive preview image for ${key}, reverting back to thumbnail...`);
 
                     api_getfileattr(
-                        { [key]: M.d[faData[key].handle] },
+                        { [key]: mega.gallery.tmpFa[faData[key].handle] },
                         0,
                         (ctx1, key1, thumbAB1) => {
                             processUint8(ctx1, key1, thumbAB1, 0);
@@ -3017,7 +3030,6 @@ mega.gallery.generateSizedThumbnails = async(keys, onLoad, onErr) => {
  */
 mega.gallery.removeDbActionCache = () => {
     'use strict';
-    MegaGallery.dbActionPassed = false;
     mega.gallery.resetAll();
 };
 
@@ -3144,7 +3156,7 @@ async function galleryUI(id) {
             return loadingDialog.hide('MegaGallery');
         }
 
-        mega.gallery.titleControl.title = M.d[id].name;
+        mega.gallery.titleControl.title = mega.gallery.tmpFa[id].name;
         mega.gallery.titleControl.icon = 'images';
         mega.gallery.titleControl.isClickable = false;
         mega.gallery.titleControl.addTooltipToTitle();
@@ -3292,7 +3304,7 @@ MegaGallery.addThumbnails = (nodeBlocks) => {
     if (thumbHandles.length) {
         fm_thumbnails(
             'standalone',
-            thumbHandles.map(h => M.d[h]),
+            thumbHandles.map(h => mega.gallery.tmpFa[h]),
             ({ h, fa }) => {
                 for (let i = 0; i < thumbBlocks[h].length; i++) {
                     thumbBlocks[h][i].setThumb(thumbnails.get(fa), fa);
@@ -3440,35 +3452,6 @@ MegaGallery.handleResize = SoonFc(200, (entries) => {
         MegaGallery.addThumbnails(toFetchAttributes);
     }
 });
-
-MegaGallery.dbAction = async(p) => {
-    'use strict';
-
-    if (fmdb && fmdb.db && !fmdb.crashed) {
-        const res = [];
-        const parents = Object.create(null);
-
-        await dbfetch.geta(M.getTreeHandles(M.RootID)).catch(nop);
-
-        p = p || M.RootID;
-        await dbfetch.media(9e3, (r) => {
-            for (let i = r.length; i--;) {
-                const n = r[i];
-
-                if (!parents[n.p]) {
-                    parents[n.p] = 1 + (M.getNodeRoot(n.p) === p);
-                }
-                if (parents[n.p] > 1) {
-                    res.push(n.h);
-                }
-            }
-        });
-
-        return dbfetch.geta(res);
-    }
-
-    throw new Error('FMDB Unavailable.');
-};
 
 lazy(mega.gallery, 'dbLoading', () => {
     'use strict';
@@ -3839,34 +3822,51 @@ lazy(mega.gallery, 'resetMediaCounts', () => {
     };
 });
 
-lazy(mega.gallery, 'initialiseMediaNodes', () => {
+/**
+ * @param {Function} [filterFn] Filter funtion to run against the nodes
+ * @returns {MegaNode[]}
+ */
+mega.gallery.initialiseMediaNodes = async(filterFn) => {
     'use strict';
 
-    return async(filterFn) => {
-        const cameraTree = MegaGallery.getCameraHandles();
-        const disallowedFolders = array.to.object([
-            ...M.getTreeHandles(M.RubbishID),
-            ...M.getTreeHandles('shares'),
-            ...(M.BackupsId ? M.getTreeHandles(M.BackupsId) : []),
-            ...M.getTreeHandles('s4')
-        ], true);
+    const cameraTree = MegaGallery.getCameraHandles();
+    const cdTree = Object.freeze(array.to.object(M.getTreeHandles(M.RootID), true));
 
-        const allowedInMedia = n => n && n.fa
-            && !disallowedFolders[n.p]
-            && !n.fv
-            && n.s
-            && M.isGalleryNode(n)
-            && mega.sensitives.shouldShowNode(n)
-            && (!filterFn || filterFn(n, cameraTree));
+    const allowedInMedia = n => cdTree[n.p]
+        && M.isGalleryNode(n)
+        && mega.sensitives.shouldShowNode(n)
+        && (!filterFn || filterFn(n, cameraTree));
 
-        if (!MegaGallery.dbActionPassed) {
-            MegaGallery.dbActionPassed = true;
-            await MegaGallery.dbAction().catch(dump);
-        }
+    if (!mega.gallery.tmpFa) {
+        const nodesToObject = async() => {
+            const res = Object.create(null);
 
-        return Object.values(M.d).filter(allowedInMedia);
-    };
-});
+            const assignNodes = (r) => {
+                for (let i = r.length; i--;) {
+                    const n = r[i];
+
+                    if (n.fa && !n.fv && n.s) {
+                        res[n.h] = n;
+                    }
+                }
+            };
+
+            if (fmdb && fmdb.db && !fmdb.crashed) {
+                await fmdb.get('f', assignNodes.bind(null));
+            }
+            else {
+                console.warn('Cannot build nodes list from the local database...');
+                assignNodes(Object.values(M.d));
+            }
+
+            return res;
+        };
+
+        mega.gallery.tmpFa = await nodesToObject();
+    }
+
+    return Object.values(mega.gallery.tmpFa).filter(allowedInMedia);
+};
 
 mega.gallery.appendAppBanner = async(target) => {
     if (pfid || M.CameraId) {

@@ -316,6 +316,10 @@ lazy(mega.gallery, 'GalleryTitleControl', () => {
                 this._menu.hide();
             }
         }
+
+        getSelectedIndex() {
+            return this._menu ? this._menu.selectedIndex : -1;
+        }
     }
 
     return GalleryTitleControl;

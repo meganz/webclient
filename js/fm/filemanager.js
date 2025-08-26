@@ -3218,8 +3218,9 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
                 $.selected.forEach((id, i) => {
                     var n = M.d[id];
                     if (n && max > i) {
+                        const lblClass = MegaNodeComponent.label[n.lbl | 0] || '';
                         html.push(
-                            '<div class="item-type-icon icon-' + fileIcon(n) + '-24"></div>' +
+                            `<div class="item-type-icon icon-${fileIcon(n)}-24 ${lblClass}"></div>` +
                             '<div class="tranfer-filetype-txt dragger-entry">' +
                             escapeHTML(n.name) + '</div>'
                         );

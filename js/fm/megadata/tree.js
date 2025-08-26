@@ -377,6 +377,9 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sSubMap) {
                 else if (curItemHandle === M.cf.h) {
                     node.classList.add('chat-folder');
                 }
+                else if (folders[idx].lbl) {
+                    node.classList.add(MegaNodeComponent.label[folders[idx].lbl]);
+                }
                 node.textContent = name;
                 if (dialog === 'fm-picker-dialog') {
                     node.previousElementSibling.classList.add(
@@ -840,8 +843,10 @@ MegaData.prototype.addTreeUI = function() {
                         id = id.replace(/treea_+|(os_|pl_)/g, '');
                     }
                     if (id && M.d[id]) {
+                        const icon = fileIcon(M.d[id]);
+                        const labelClass = icon === 'folder' && MegaNodeComponent.label[M.d[id].lbl | 0] || '';
                         html = ('<div class="tree-item-dragger nw-fm-tree-item">' +
-                                '<span class="nw-fm-tree-folder ' + fileIcon(M.d[id]) + '"></span>' +
+                                `<span class="nw-fm-tree-folder ${icon} ${labelClass}"></span>` +
                                 '<span class="item-name">' +
                                     escapeHTML(M.d[id].name) + '</span>' +
                                 '</div>'

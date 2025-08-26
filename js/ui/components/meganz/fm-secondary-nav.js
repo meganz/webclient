@@ -304,6 +304,10 @@ class MegaNavCard extends MegaComponent {
         else if (this.isBackup) {
             this.icon = 'fm-icon item-type-icon icon-folder-backup-24';
         }
+        else if (!folderlink && this.node.t && this.node.lbl) {
+            const lbl = MegaNodeComponent.label[this.node.lbl | 0] || '';
+            this.icon = `fm-icon item-type-icon icon-${fileIcon(this.node)}-24 ${lbl}`;
+        }
         else {
             this.icon = `fm-icon item-type-icon icon-${fileIcon(this.node)}-24`;
         }

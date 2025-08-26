@@ -2443,6 +2443,9 @@ accountUI.fileManagement = {
         // Show sensitive nodes
         this.showSen.render();
 
+        // Show label colours on folders
+        this.colourFolder.render();
+
         // Drag and Drop
         this.dragAndDrop.render();
 
@@ -2787,6 +2790,28 @@ accountUI.fileManagement = {
             else {
                 $('#show-hidden', accountUI.$contentBlock).parent().addClass('hidden');
             }
+        }
+    },
+
+    colourFolder: {
+        render() {
+            'use strict';
+
+            accountUI.inputs.switch.init(
+                '#colour-folder',
+                $('#colour-folder', accountUI.$contentBlock).parent(),
+                !mega.config.get('colourFolder'),
+                (val) => {
+                    mega.config.setn('colourFolder', val ? undefined : 1);
+                    if (val) {
+                        document.body.classList.remove('no-lbl-colour');
+                        eventlog(500935);
+                    }
+                    else {
+                        document.body.classList.add('no-lbl-colour');
+                        eventlog(500934);
+                    }
+                });
         }
     },
 

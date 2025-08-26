@@ -1292,6 +1292,7 @@ function logExportEvt(evtId, data) {
             const header = mCreateElement('div', { class: 'flex flex-row items-center mt-4 mb-2 block-naming' }, [
                 mCreateElement('i', {class: `item-type-icon icon-${fileIcon(item)}-24 icon-size-8`})
             ]);
+            MegaNodeComponent.label.set(item, header.querySelector('i'));
             const nameRow = mCreateElement(
                 'span',
                 { class: 'text-ellipsis px-2 select-text' },

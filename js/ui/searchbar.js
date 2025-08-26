@@ -915,7 +915,7 @@ lazy(mega.ui, 'searchbar', () => {
                 $fileIconContainer.addClass('thumb');
             }
             else {
-                $fileIcon.addClass(`icon-${fileIcon(node)}-24`);
+                MegaNodeComponent.label.set(node, $fileIcon.addClass(`icon-${fileIcon(node)}-24`));
             }
 
             return $item.prop('outerHTML');

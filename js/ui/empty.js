@@ -34,7 +34,9 @@ lazy(mega.ui, 'empty', () => {
         clear(target);
 
         if (pfid || M.currentrootid === M.RubbishID) {
-            $('.fm-empty-folder').removeClass('hidden');
+            if (!M.onMediaView) {
+                $('.fm-empty-folder').removeClass('hidden');
+            }
             return;
         }
 

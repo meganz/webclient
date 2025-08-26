@@ -595,6 +595,10 @@ mBroadcaster.once('boot_done', () => {
                     else if (M.currentrootid) {
                         onIdle(() => {
                             if (!M.v.length) {
+                                if (M.onMediaView) {
+                                    $('.gallery-view', '.fm-right-files-block').addClass('hidden');
+                                }
+
                                 mega.ui.empty.folder();
                             }
                         });
@@ -632,12 +636,6 @@ mBroadcaster.once('boot_done', () => {
                     else {
                         M.emptySharefolderUI(aListSelector);
                     }
-                }
-                else if (M.isGalleryPage()) {
-                    const pagetype = M.currentdirid === M.currentCustomView.nodeID ? M.currentdirid : 'discovery';
-
-                    $(`.fm-empty-${pagetype}`).removeClass('hidden');
-                    $('.gallery-view').addClass('hidden');
                 }
                 else if (M.isDynPage(M.currentdirid)) {
                     if (d > 2) {

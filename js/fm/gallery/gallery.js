@@ -2727,17 +2727,8 @@ mega.gallery.resetAll = () => {
     mega.gallery.nodeUpdated = false;
 };
 
-mega.gallery.showEmpty = (type, noMoreFiles) => {
+mega.gallery.showEmpty = (type) => {
     'use strict';
-
-    const rfBlock = $('.fm-right-files-block', '.fmholder');
-
-    if (noMoreFiles || M.currentrootid === M.RootID &&
-        (!M.c[M.currentdirid] || !Object.values(M.c[M.currentdirid]).length)) {
-        $(`.fm-empty-${M.currentdirid}`, rfBlock).addClass('hidden');
-        mega.ui.empty.folder();
-        return;
-    }
 
     if (!mega.gallery.emptyBlock) {
         mega.gallery.emptyBlock = new GalleryEmptyBlock('.pm-main > .fm-right-files-block');

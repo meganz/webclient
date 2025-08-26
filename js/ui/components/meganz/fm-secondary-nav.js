@@ -1071,10 +1071,6 @@ lazy(mega.ui, 'secondaryNav', () => {
             return false;
         },
         showSelectionBar() {
-            if (!this.selectionBar.classList.contains('hidden')) {
-                return;
-            }
-            this.selectionBar.classList.remove('hidden');
             if (this.filterChipsHolder.classList.contains('hidden')) {
                 filterChipShown = false;
             }
@@ -1082,6 +1078,10 @@ lazy(mega.ui, 'secondaryNav', () => {
                 this.filterChipsHolder.classList.add('hidden');
                 filterChipShown = true;
             }
+            if (!this.selectionBar.classList.contains('hidden')) {
+                return;
+            }
+            this.selectionBar.classList.remove('hidden');
             if (M.gallery) {
                 this.selectionBar.classList.add('gallery-pad');
                 const media = document.getElementById('media-section-controls');

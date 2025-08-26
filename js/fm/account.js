@@ -3670,10 +3670,9 @@ accountUI.reseller = {
                 $.voucherlimit = 10;
             }
 
-            var email = 'resellers@mega.nz';
+            var email = 'resellers@mega.io';
 
-            $('.resellerbuy').attr('href', 'mailto:' + email)
-                .find('span').text(l[9106].replace('%1', email));
+            $('.resellerbuy').attr('href', 'mailto:' + email).text(l[9106].replace('%1', email));
 
             // Use 'All' or 'Last 10/100/250' for the dropdown text
             const buttonText = $.voucherlimit === 'all' ? l[7557] : mega.icu.format(l[466], $.voucherlimit);

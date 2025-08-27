@@ -2191,6 +2191,7 @@ MegaData.prototype.labelDomUpdate = function(handle, value) {
         $treeElements.removeClass('labeled');
         $('.colour-label-ind', $treeElements).remove();
 
+        MegaNodeComponent.label.set(n, $('.nw-fm-tree-folder', $treeElements));
         if (labelId) {
             // Add colour label classes.
             var lblColor = M.getLabelClassFromId(labelId);

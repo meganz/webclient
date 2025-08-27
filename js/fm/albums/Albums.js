@@ -2817,6 +2817,7 @@ lazy(mega.gallery, 'albums', () => {
                     albumId,
                     {
                         text: l.context_menu_import,
+                        icon: 'sprite-fm-mono icon-cloud-upload-thin-outline',
                         onClick: () => {
                             eventlog(99831);
                             M.importFolderLinkNodes([M.RootID]);
@@ -2825,6 +2826,7 @@ lazy(mega.gallery, 'albums', () => {
                     nodesAvailable ?
                         {
                             text: l.album_download,
+                            icon: 'sprite-fm-mono icon-arrow-down-circle-thin-outline',
                             onClick: () => {
                                 onDownload();
                                 eventlog(500742);
@@ -2832,24 +2834,20 @@ lazy(mega.gallery, 'albums', () => {
                         } :
                         hidden,
                     needSlideshow && ((ev) => {
-                        const parent = ev.currentTarget.domNode;
-                        const contextMenu = new AlbumOptionsContextMenu([{
-                            label: l.album_play_slideshow,
-                            icon: 'play-square',
-                            click: () => {
-                                scope.playSlideshow(albumId, true);
-                            },
-                            parent
-                        }], parent);
-
-                        const { x, y, right, bottom } = parent.getBoundingClientRect();
-                        contextMenu.show(x, bottom + MContextMenu.offsetVert, right, y + MContextMenu.offsetVert);
+                        if (ev.currentTarget.hasClass('active')) {
+                            $.hideContextMenu();
+                            ev.stopPropagation();
+                            ev.currentTarget.removeClass('active');
+                            return false;
+                        }
+                        M.contextMenuUI(ev, 8, '.play-slideshow', [albumId]);
                     })
                 );
             }
             else if (filterFn) {
                 const slideshow = needSlideshow ? {
                     text: l.album_play_slideshow,
+                    icon: 'sprite-fm-mono icon-play-square-thin-outline',
                     onClick: () => {
                         scope.playSlideshow(albumId, true);
                         eventlog(500730);
@@ -2857,6 +2855,7 @@ lazy(mega.gallery, 'albums', () => {
                 } : hidden;
                 const download = nodesAvailable ? {
                     text: l.album_download,
+                    icon: 'sprite-fm-mono icon-arrow-down-circle-thin-outline',
                     onClick: (ev) => {
                         const { x, bottom } = ev.currentTarget.domNode.getBoundingClientRect();
                         const menu = new DownloadContextMenu(albumId);
@@ -2873,69 +2872,20 @@ lazy(mega.gallery, 'albums', () => {
             }
             else {
                 if (needSlideshow) {
-                    buttons.push({
-                        label: l.album_play_slideshow,
-                        icon: 'play-square',
-                        click: () => {
-                            scope.playSlideshow(albumId, true);
-                        },
-                    });
+                    buttons.push('.play-slideshow');
                 }
 
                 if (nodesAvailable) {
-                    buttons.push({
-                        label: l.album_download,
-                        icon: 'download',
-                        click: onDownload,
-                        isDisabled: false,
-                        children: isMSync() ? undefined : generateDownloadOptions([albumId])
-                    });
+                    buttons.push('.download-item');
                 }
 
-                if (p) {
-                    buttons.push({
-                        label: l[6821],
-                        icon: 'link-remove',
-                        click: () => {
-                            removeShareWithConfirmation([albumId]);
-                        },
-                    });
-                }
-
-                buttons.push(
-                    {
-                        label: l.rename_album,
-                        icon: 'rename',
-                        click: () => {
-                            if (M.isInvalidUserStatus()) {
-                                return;
-                            }
-
-                            const dialog = new AlbumNameDialog(albumId);
-                            dialog.show();
-                        },
-                    },
-                    {
-                        label: l.delete_album,
-                        icon: 'bin',
-                        click: () => {
-                            if (M.isInvalidUserStatus()) {
-                                return;
-                            }
-
-                            const dialog = new RemoveAlbumDialog([albumId]);
-                            dialog.show();
-                        },
-                        isDisabled: false,
-                        children: undefined,
-                        classes: ['red']
-                    }
-                );
+                buttons.push('.rename-item', '.delete-album');
 
                 mega.ui.secondaryNav.showCard(
                     albumId,
                     {
                         text: l.add_album_items,
+                        icon: 'sprite-fm-mono icon-plus-light-solid',
                         onClick: () => {
                             if (M.isInvalidUserStatus()) {
                                 return;
@@ -2948,6 +2898,7 @@ lazy(mega.gallery, 'albums', () => {
                     },
                     {
                         text: p ? l[6909] : mega.icu.format(l.album_share_link, 1),
+                        icon: 'sprite-fm-mono icon-link-thin-outline',
                         onClick: () => {
                             if (M.isInvalidUserStatus()) {
                                 return;
@@ -2971,11 +2922,13 @@ lazy(mega.gallery, 'albums', () => {
                         }
                     },
                     (ev) => {
-                        const parent = ev.currentTarget.domNode;
-                        const contextMenu = new AlbumOptionsContextMenu(buttons, parent);
-
-                        const { x, y, right, bottom } = parent.getBoundingClientRect();
-                        contextMenu.show(x, bottom + MContextMenu.offsetVert, right, y + MContextMenu.offsetVert);
+                        if (ev.currentTarget.hasClass('active')) {
+                            $.hideContextMenu();
+                            ev.stopPropagation();
+                            ev.currentTarget.removeClass('active');
+                            return false;
+                        }
+                        M.contextMenuUI(ev, 8, buttons.join(','), [albumId]);
                     }
                 );
             }
@@ -2988,6 +2941,7 @@ lazy(mega.gallery, 'albums', () => {
             }
             mega.ui.secondaryNav.addActionButton({
                 componentClassname: 'fm-new-album',
+                icon: 'sprite-fm-mono icon-rectangle-stack-plus-thin-outline',
                 text: l.new_album,
                 onClick: () => {
                     if (M.isInvalidUserStatus()) {
@@ -3000,6 +2954,7 @@ lazy(mega.gallery, 'albums', () => {
                 }
             });
             mega.ui.secondaryNav.showActionButtons('.fm-new-album');
+            mega.ui.secondaryNav.updateInfoChipsAndViews(true);
         }
 
         update(albumId) {
@@ -3395,6 +3350,14 @@ lazy(mega.gallery, 'albums', () => {
 
             delay('render:albums_grid', () => {
                 applyPs(this.el, !albumsCount);
+                if (mega.ui.secondaryNav) {
+                    // Bind scroll event for albums view since it has action buttons.
+                    const noScroll = mega.ui.secondaryNav.bindScrollEvents(this.el);
+                    if (noScroll && !mega.ui.secondaryNav.actionsHolder) {
+                        mega.ui.secondaryNav.domNode.querySelector('.fm-card-holder')
+                            .before(mega.ui.header.domNode.querySelector('.fm-header-buttons'));
+                    }
+                }
 
                 MegaGallery.addThumbnails(thumbBlocks);
 

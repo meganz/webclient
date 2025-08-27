@@ -57,7 +57,10 @@ MegaData.prototype.filterByParent = function(id) {
         for (i = inshares.length; i--;) {
             node = this.d[inshares[i]] || false;
             // filter label applies here.
-            if (node.su && !this.d[node.p] && (!M.currentLabelFilter || M.filterByLabel(node))) {
+            if (
+                node.su && !this.d[node.p] && (!M.currentLabelFilter || M.filterByLabel(node)) &&
+                (!mega.ui.mNodeFilter || !mega.ui.mNodeFilter.selectedFilters.value || mega.ui.mNodeFilter.match(node))
+            ) {
                 this.v.push(node);
             }
         }
@@ -222,7 +225,7 @@ MegaData.prototype.getFilterBySearchFn = function(searchTerm) {
         catch (ex) {}
     }
 
-    if (mega.ui.mNodeFilter.selectedFilters.value) {
+    if (!folderlink && mega.ui.mNodeFilter.selectedFilters.value) {
         if (regex) {
             return (n) => n.name && regex.test(n.name) && mega.ui.mNodeFilter.match(n);
         }

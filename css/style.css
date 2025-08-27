@@ -6805,7 +6805,7 @@ div.new-bottom-pages li, div.new-bottom-pages p {
     display: none;
 }
 .shared-details-block .files-grid-view.shared-folder-content {
-    padding-top: 14px;
+    padding-top: 4px;
 }
 .emptied .shared-details-block .files-grid-view.shared-folder-content {
     padding-top: 0;

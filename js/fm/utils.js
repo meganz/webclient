@@ -1128,7 +1128,10 @@ MegaUtils.prototype.fmSearchNodes = function(searchTerm) {
             if (folderlink) {
                 M.v = [];
                 for (h in M.nn) {
-                    if (filter({name: M.nn[h]}) && h !== M.currentrootid) {
+                    if (
+                        filter({name: M.nn[h]}) && h !== M.currentrootid &&
+                        (!mega.ui.mNodeFilter.selectedFilters.value || mega.ui.mNodeFilter.match(M.d[h]))
+                    ) {
                         M.v.push(M.d[h]);
                     }
                 }
@@ -1140,6 +1143,12 @@ MegaUtils.prototype.fmSearchNodes = function(searchTerm) {
                 M.onSectionUIOpen('cloud-drive');
                 $('.fm-right-header .fm-breadcrumbs-wrapper').addClass('hidden');
                 mega.ui.secondaryNav.hideActionButtons();
+                if (M.v.length) {
+                    mega.ui.secondaryNav.extShowFilterChip();
+                }
+                else {
+                    mega.ui.secondaryNav.extHideFilterChip();
+                }
                 onIdle(resolve);
                 // mBroadcaster.sendMessage('!sitesearch', searchTerm, 'folder-link', M.v.length);
             }

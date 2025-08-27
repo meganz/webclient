@@ -993,12 +993,26 @@ FileManager.prototype.initFileManagerUI = function() {
             $('#fileselect1').click();
         }
     });
+    if (!mega.ui.secondaryNav.actionsHolder && mega.ui.header.domNode.querySelector('.fm-header-buttons')) {
+        mega.ui.secondaryNav.domNode.querySelector('.fm-card-holder')
+            .before(mega.ui.header.domNode.querySelector('.fm-header-buttons'));
+    }
 
+    mega.ui.secondaryNav.addActionButton({
+        componentClassname: 'fm-new-folder hidden',
+        prepend: true,
+        icon: 'sprite-fm-mono icon-folder-plus-thin-outline',
+        text: l[68],
+        onClick: () => {
+            eventlog(500007);
+            createFolderDialog();
+        }
+    });
     mega.ui.secondaryNav.addActionButton({
         componentClassname: 'fm-new-menu hidden',
         prepend: true,
-        icon: 'sprite-fm-mono icon-plus-light-solid',
-        text: l.add_item_btn,
+        icon: 'sprite-fm-mono icon-arrow-up-thin-outline',
+        text: l[372],
         onClick(ev) {
             if (this.active) {
                 return;
@@ -1010,6 +1024,7 @@ FileManager.prototype.initFileManagerUI = function() {
     });
     mega.ui.secondaryNav.addActionButton({
         componentClassname: 'fm-manage-link hidden',
+        icon: 'sprite-fm-mono icon-link-thin-outline',
         text: l[6909],
         onClick: () => {
             const id = M.currentdirid.split('/').pop();
@@ -1024,6 +1039,7 @@ FileManager.prototype.initFileManagerUI = function() {
     });
     mega.ui.secondaryNav.addActionButton({
         componentClassname: 'fm-manage-file-request hidden',
+        icon: 'sprite-fm-mono icon-folder-arrow-02-thin-outline',
         text: l.file_request_dropdown_manage,
         onClick: () => {
             const h = M.currentdirid.split('/').pop();
@@ -1032,15 +1048,6 @@ FileManager.prototype.initFileManagerUI = function() {
             }
             mega.fileRequest.dialogs.manageDialog.init({ h });
             eventlog(500739);
-            return false;
-        }
-    });
-    mega.ui.secondaryNav.addActionButton({
-        componentClassname: 'fm-context transparent-icon fm-header-context hidden',
-        type: 'icon',
-        icon: 'sprite-fm-mono icon-side-menu',
-        onClick: (ev) => {
-            mega.ui.secondaryNav.openContextMenu(ev);
             return false;
         }
     });
@@ -1826,17 +1833,24 @@ FileManager.prototype.createFolderUI = function() {
         }
     });
 
-    $('.fm-share-folder').rebind('click', () => {
+    $('.fm-share-folder').rebind('click', (ev) => {
+        if (ev.currentTarget.classList.contains('active')) {
+            return;
+        }
         const node = M.getNodeByHandle(M.currentdirid.split('/').pop());
         if (node && M.getNodeRights(node.h) > 1) {
-            $.hideContextMenu();
-            mega.ui.mShareDialog.init(node.h);
+            M.contextMenuUI(ev, 4);
             eventlog(500034);
             return false;
         }
     });
 
     $('.fm-download').rebind('click', (ev) => {
+        if (ev.currentTarget.classList.contains('active')) {
+            $.hideContextMenu();
+            return;
+        }
+        ev.currentTarget.classList.add('active');
         ev.currentTarget.domNode = ev.currentTarget;
         mega.ui.secondaryNav.openDownloadMenu(ev);
         if (folderlink) {
@@ -2736,7 +2750,6 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
         const viewModeClass = (M.onIconView ? '.fm-blocks-view' : '.files-grid-view') + '.fm.shared-folder-content';
 
         $(viewModeClass).removeClass('hidden');
-        initPerfectScrollbar($(viewModeClass));
     }
     else if (M.onDeviceCenter && mega.devices.ui.isCustomRender()) {
         mega.devices.ui.$gridWrapper.removeClass('hidden');
@@ -2821,13 +2834,14 @@ FileManager.prototype.addGridUI = function(refresh) {
     }
     else if (this.currentdirid === 'out-shares') {
         $('.out-shared-grid-view').removeClass('hidden');
-        initPerfectScrollbar($('.grid-scrolling-table', '.out-shared-grid-view'));
+        const $ps = $('.grid-scrolling-table', '.out-shared-grid-view');
+        initPerfectScrollbar($ps);
+        mega.ui.secondaryNav.bindScrollEvents($ps[0]);
     }
     else if (this.currentrootid === 'shares' && !this.v.length) {
         const viewModeClass = (M.onIconView ? '.fm-blocks-view' : '.files-grid-view') + '.fm.shared-folder-content';
 
         $(viewModeClass).removeClass('hidden');
-        initPerfectScrollbar($(viewModeClass, '.shared-details-block'));
     }
     else if (M.onDeviceCenter && mega.devices.ui.isCustomRender()) {
         mega.devices.ui.$gridWrapper.removeClass('hidden');
@@ -3586,6 +3600,8 @@ FileManager.prototype.onSectionUIOpen = function(id) {
     $('#search-fake-form-2', $fmholder).rebind('submit', function() {
         return false;
     });
+    const headerButtons = id !== 'conversations' && (mega.ui.secondaryNav.actionsHolder ||
+        mega.ui.header.domNode.querySelector('.nav-secondary-actions .fm-header-buttons'));
 
     if (folderlink) {
         // XXX: isValidShareLink won't work properly when navigating from/to a folderlink
@@ -3607,7 +3623,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
 
             // Remove import and download buttons from the search result.
             if (!String(M.currentdirid).startsWith('search')) {
-                $('.fm-import-to-cloudrive', mega.ui.secondaryNav.actionsHolder).rebind('click', () => {
+                $('.fm-import-to-cloudrive', headerButtons).rebind('click', () => {
                     eventlog(99765);
                     // Import the current folder, could be the root or sub folder
                     M.importFolderLinkNodes([M.RootID]);
@@ -3626,7 +3642,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
             mega.ui.secondaryNav.domNode.classList.remove('hidden');
             if (M.isGalleryPage(id)) {
                 mega.ui.secondaryNav.hideCard();
-                mega.ui.secondaryNav.actionsHolder.classList.add('hidden');
+                headerButtons.classList.add('hidden');
                 mega.ui.secondaryNav.updateLayoutButton(true);
                 mega.ui.secondaryNav.updateInfoPanelButton();
             }
@@ -3641,7 +3657,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
                 !mega.devices.ui.hasDevices ||
                 id === 'shared-with-me' && M.currentdirid !== 'shares' ||
                 id === 's4' && M.currentCustomView.subType === 'bucket') {
-                mega.ui.secondaryNav.actionsHolder.classList.add('hidden');
+                headerButtons.classList.add('hidden');
             }
         }
 

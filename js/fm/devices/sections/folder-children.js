@@ -94,6 +94,7 @@ lazy(mega.devices.sections, 'folderChildren', () => {
                 const isBackup = ui.isBackupRelated(h);
                 mega.ui.secondaryNav.updateGalleryLayout();
                 if (hasToRenderHeader) {
+                    mega.ui.secondaryNav.updateInfoChipsAndViews();
                     const { isDeviceFolder, t, status } = folder;
                     const isShareLimitedNode = sharer(h) && M.getNodeRights(h) < 2;
                     const hideButtons = !(isDeviceFolder && t !== syncType.cameraUpload) ||
@@ -104,6 +105,10 @@ lazy(mega.devices.sections, 'folderChildren', () => {
                         {
                             componentClassname: `outline ${hideButtons ? 'hidden' : ''}`,
                             text: status.pausedSyncs ? l.dc_run : l.dc_pause,
+                            icon: `sprite-fm-mono ${
+                                status.pausedSyncs ?
+                                    'icon-play-circle-thin-outline' : 'icon-pause-medium-regular-outline'
+                            }`,
                             onClick: () => {
                                 $.selected = [h];
                                 ui.desktopApp.common.togglePause();
@@ -113,26 +118,11 @@ lazy(mega.devices.sections, 'folderChildren', () => {
                         {
                             componentClassname: `destructive ${hideButtons ? 'hidden' : ''}`,
                             text: isBackup ? l.stop_backup_button : l.stop_syncing_button,
+                            icon: 'sprite-fm-mono icon-dialog-close',
                             onClick: () => {
                                 $.selected = [h];
                                 ui.desktopApp.common.remove();
                                 eventlog(isBackup ? 500753 : 500754);
-                            }
-                        },
-                        (ev) => {
-                            ev.preventDefault();
-                            const path = M.currentdirid.split('/');
-                            if (path.length > 1) {
-                                $.hideContextMenu();
-
-                                selectionManager.resetTo(path.pop());
-
-                                ev.originalEvent.delegateTarget = ev.currentTarget.domNode;
-                                M.contextMenuUI(ev.originalEvent, 1);
-
-                                delay('deviceFolders:hide:selectionBar', () => {
-                                    selectionManager.hideSelectionBar();
-                                }, 80);
                             }
                         }
                     );

@@ -713,7 +713,7 @@
                                 ) {
                                     return false;
                                 }
-                                if (M.isAlbumsPage(1)) {
+                                if (M.isAlbumsPage(1) || mega.ui.contextMenu.firstAlbum) {
                                     dlHandles = mega.gallery.getAlbumsHandles(dlHandles);
                                 }
 
@@ -837,6 +837,10 @@
             },
         ]));
         const openShare = () => {
+            // @todo support share operations by passing handles to mShareDialog
+            if ($.selected[0] !== mega.ui.contextMenu.selectedItems[0]) {
+                $.selected = mega.ui.contextMenu.selectedItems;
+            }
             mega.ui.mShareDialog.init(mega.ui.contextMenu.selectedItems[0]);
             eventlog(500029);
             M.fmEventLog(500681);
@@ -1103,6 +1107,10 @@
                     if (mega.ui.contextMenu.firstAlbum) {
                         return mega.gallery.albums.openDialog('AlbumNameDialog', mega.ui.contextMenu.firstAlbum.id);
                     }
+                    // @todo support passing handle to renameDialog
+                    if ($.selected[0] !== mega.ui.contextMenu.selectedItems[0]) {
+                        $.selected = mega.ui.contextMenu.selectedItems;
+                    }
                     renameDialog();
                     M.fmEventLog(500689);
                 }
@@ -1179,6 +1187,10 @@
                 text: l[63],
                 icon: 'sprite-fm-mono icon-copy-thin-outline',
                 onClick(ev) {
+                    // @todo support passing handles directly to the copyDialog.
+                    if ($.selected[0] !== mega.ui.contextMenu.selectedItems[0]) {
+                        $.selected = mega.ui.contextMenu.selectedItems;
+                    }
                     openCopyDialog(ev.originalEvent);
                     M.fmEventLog(500692);
                 }
@@ -1469,6 +1481,75 @@
             }
         ]));
 
+        sections.addChild('share-nosub', new MegaContextSection(menu, [
+            {
+                buttonId: 'getlink-nosub',
+                text: l[5622],
+                icon: 'sprite-fm-mono icon-link-thin-outline',
+                onClick() {
+                    M.getLinkAction(mega.ui.contextMenu.selectedItems);
+                }
+            },
+            {
+                buttonId: 'managelink-nosub',
+                text: l[6909],
+                icon: 'sprite-fm-mono icon-link-thin-outline',
+                onClick() {
+                    M.getLinkAction(mega.ui.contextMenu.selectedItems);
+                }
+            },
+            {
+                buttonId: 'share-nosub',
+                text: l[5631],
+                icon: 'sprite-fm-mono icon-folder-users-thin-outline',
+                onClick() {
+                    openShare();
+                }
+            },
+            {
+                buttonId: 'manageshare-nosub',
+                text: l.manage_share,
+                icon: 'sprite-fm-mono icon-folder-users-thin-outline',
+                onClick() {
+                    openShare();
+                }
+            },
+            {
+                buttonId: 'sendchat-nosub',
+                text: l[17764],
+                icon: 'sprite-fm-mono icon-send-to-chat-thin-outline',
+                onClick() {
+                    $.selected = mega.ui.contextMenu.selectedItems;
+                    // @todo support passing handles directly to the copyDialog.
+                    openCopyDialog('conversations');
+                }
+            },
+            {
+                buttonId: 'filerequestcreate-nosub',
+                text: l.file_request_dropdown_create,
+                icon: 'sprite-fm-mono icon-folder-arrow-02-thin-outline',
+                onClick() {
+                    if (M.isInvalidUserStatus()) {
+                        return;
+                    }
+
+                    mega.fileRequest.dialogs.createDialog.init(mega.ui.contextMenu.selectedItems[0]);
+                }
+            },
+            {
+                buttonId: 'filerequestmanage-nosub',
+                text: l.file_request_dropdown_manage,
+                icon: 'sprite-fm-mono icon-folder-arrow-02-thin-outline',
+                onClick() {
+                    if (M.isInvalidUserStatus()) {
+                        return;
+                    }
+
+                    mega.fileRequest.dialogs.manageDialog.init({ h: mega.ui.contextMenu.selectedItems[0] });
+                }
+            },
+        ]));
+
         const manipulations = {
             '.import-item': (items) => {
                 if (!u_type) {
@@ -1586,7 +1667,29 @@
                 if (pfcol && sel.length === 1 && M.d[sel[0]].t === 2) {
                     array.remove(items, '.properties-item');
                 }
-            }
+            },
+            '.getlink-nosub': (items, { stats }) => {
+                // Currently supports single folder selection
+                const component = sections.getChild('share-nosub');
+                const { numOfExistingLinks } = stats;
+                if (numOfExistingLinks) {
+                    array.remove(items, '.getlink-nosub');
+                    items.push('.managelink-nosub');
+                    component.getChild('managelink-nosub').text = l[6909];
+                }
+                else {
+                    component.getChild('getlink-nosub').text = mega.icu.format(l.share_link, 1);
+                }
+            },
+            '.share-nosub': (items, { node }) => {
+                const hasShares = M.getNodeShareUsers(node, 'EXP').length || M.ps[node];
+                if (hasShares) {
+                    array.remove(items, '.share-nosub');
+                    items.push('.manageshare-nosub');
+                }
+                sections.getChild('share-nosub').getChild('share-nosub').text =
+                    M.currentrootid === M.InboxID || M.getNodeRoot(node.h) === M.InboxID ? l.read_only_share : l[5631];
+            },
         };
         const manipulateItems = (items) => {
             const { firstNode: node, selectedItems } = mega.ui.contextMenu;
@@ -1680,7 +1783,7 @@
                     this.ready = true;
                 }
             },
-            show(itemOptions) {
+            show(itemOptions, forcedSelection) {
                 this.init();
                 if (!this.ready) {
                     return false;
@@ -1688,7 +1791,10 @@
                 if (!itemOptions.length) {
                     return prepareOldMenu();
                 }
-                if ($.selected.length) {
+                if (Array.isArray(forcedSelection) && forcedSelection.length) {
+                    this.selectedItems = [...forcedSelection];
+                }
+                else if ($.selected.length) {
                     this.selectedItems = [...$.selected];
                 }
                 else if (

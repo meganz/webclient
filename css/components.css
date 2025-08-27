@@ -4,16 +4,11 @@
 .selection-status-bar {
     height: 32px;
     padding-inline: 24px;
-    padding-bottom: 8px;
     transition: 200ms linear;
     display: flex;
     align-items: center;
-    margin-top: 8px;
     flex: 1;
     overflow: hidden;
-}
-.selection-status-bar.gallery-pad {
-    padding-top: 8px;
 }
 
 .selection-status-bar .items-center {

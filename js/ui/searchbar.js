@@ -361,7 +361,7 @@ lazy(mega.ui, 'searchbar', () => {
             }
             else if (val.length >= 2 || !asciionly(val)) {
                 M.fmSearchNodes(val).then(() => {
-                    if (!M.search) {
+                    if (!M.search && !(folderlink && String(M.currentdirid).startsWith('search/'))) {
                         mega.ui.mNodeFilter.resetFilterSelections();
                     }
                     delay.cancel('searchbar.renderSuggestSearchedItems');

@@ -19,9 +19,10 @@
         const block = scope.querySelector('.fm-breadcrumbs-block');
         const $block = $(block);
         const dropdown = scope.querySelector('.breadcrumb-dropdown');
+        const hasContext = !!block.querySelector('.ctx-source');
         $block.empty();
 
-        const extraItems = prepareBreadcrumbItems(items, dictionary, block);
+        const extraItems = prepareBreadcrumbItems(items, dictionary, block, hasContext);
 
         removeSimpleTip($('.fm-breadcrumbs', $block));
         showHideBreadcrumbDropdown(extraItems, scope, dropdown);
@@ -131,6 +132,7 @@
                     const {name: deviceName} = this.dcd[handle] || {};
                     if (deviceName) {
                         name = deviceName;
+                        typeClass = 'folder device-item';
                     }
                 }
 
@@ -145,7 +147,7 @@
                 else if (folderlink) {
                     typeClass = 'folder-link';
                 }
-                else {
+                else if (!typeClass) {
                     typeClass = 'folder';
                 }
 
@@ -292,6 +294,7 @@
                     else {
                         Ps.initialize(dropdown);
                     }
+                    $.hideContextMenu();
                 }
                 return false;
             });
@@ -307,6 +310,11 @@
             if (id) {
                 clickAction(id);
             }
+        });
+
+        $('.fm-header-context', scope).rebind('click.breadcrumb', ev => {
+            mega.ui.secondaryNav.openContextMenu(ev);
+            return false;
         });
 
         $('.fm-breadcrumbs', scope).rebind('contextmenu.breadcrumb', () => {
@@ -325,7 +333,8 @@
         });
     }
 
-    function updateBreadcrumbNode(sizingNode, typeClass, name, isRoot, isDyhRoot, isLastItem) {
+    function updateBreadcrumbNode(options) {
+        const {sizingNode, typeClass, name, isRoot, isDyhRoot, isLastItem, withContext, count} = options;
         sizingNode.className = `fm-breadcrumbs ${typeClass} ${isRoot || isDyhRoot ? 'root' : ''} ui-droppable`;
         sizingNode.textContent = '';
         const span = document.createElement('span');
@@ -348,6 +357,38 @@
             iconNode.className = `next-arrow ${mega.ui.sprites.mono} icon-chevron-right-thin-outline icon16`;
             sizingNode.appendChild(iconNode);
         }
+        else if (withContext && !isRoot) {
+            const contextIcon = document.createElement('i');
+            contextIcon.className = `next-arrow ${mega.ui.sprites.mono} icon-chevron-down-thin-outline icon-16`;
+            sizingNode.appendChild(contextIcon);
+            sizingNode.classList.add('fm-header-context');
+        }
+        if (isLastItem && (count === 1 || !withContext)) {
+            sizingNode.classList.add('no-hover');
+        }
+    }
+
+    function prepareContextFilters(noCtx, container, items) {
+        if (window.s4 && s4.utils) {
+            noCtx.add('keys').add('policies').add('groups').add('users');
+            if (items.some(h => noCtx.has(h))) {
+                // Skip context for children of the policies, groups, and users
+                noCtx.add(items[0]);
+            }
+            const containers = s4.utils.getContainersList();
+            for (let i = containers.length; i--;) {
+                noCtx.add(containers[i].h);
+            }
+        }
+        if (M.currentrootid === M.RubbishID) {
+            const cl = new mega.Share.ExportLink();
+            for (let i = items.length; i--;) {
+                if (cl.isTakenDown(items[i])) {
+                    noCtx.add(items[i]);
+                }
+            }
+        }
+        return mega.ui.secondaryNav && mega.ui.secondaryNav.breadcrumbHolder.contains(container);
     }
 
     /**
@@ -356,9 +397,10 @@
      * @param {Array} items - the items in the path
      * @param {function} dictionary - a function which will convert the item id into a full breadcrumb datum
      * @param {HTMLElement} container - the HTMLElement that contains the breadcrumbs
+     * @param {boolean} hasContext - When re-rendering if the context menu was opened in the breadcrumbs
      * @return {object} - the HTML for the breadcrumbs and the list of parent folders not in the breadcrumbs
      */
-    function prepareBreadcrumbItems(items, dictionary, container) {
+    function prepareBreadcrumbItems(items, dictionary, container, hasContext) {
         let containerWidth = container.clientWidth;
         let totalWidth = 0;
         let remainItems = 4;
@@ -369,6 +411,8 @@
         let isSimpletip = false;
         let isDyhRoot = false;
         let lastPos = 0;
+        let withContext = false;
+        const noCtx = new Set();
 
         if (container.parentNode.parentNode.classList.contains('simpletip-tooltip')) {
             isSimpletip = true;
@@ -385,6 +429,9 @@
             // Mobile doesn't support extraItems well so force all crumbs into the container.
             remainItems = Infinity;
             containerWidth = Infinity;
+        }
+        else {
+            withContext = prepareContextFilters(noCtx, container, items);
         }
 
         if (M.dyh && M.dyh('is-breadcrumb-root', items) && !container.closest('.fm-picker-dialog')) {
@@ -405,13 +452,25 @@
             if (name !== '') {
                 const isLastItem = isSimpletip ? i === lastPos + 1 : i === lastPos;
                 const isRoot = i === items.length - 1;
-                updateBreadcrumbNode(sizingNode, typeClass, name, isRoot, isDyhRoot, isLastItem);
+                updateBreadcrumbNode({
+                    sizingNode,
+                    typeClass,
+                    name,
+                    isRoot,
+                    isDyhRoot,
+                    isLastItem,
+                    withContext: withContext && !noCtx.has(id),
+                    count: items.length
+                });
 
                 const nodeWidth = sizingNode.clientWidth;
                 const prepareRealNode = (node) => {
                     node = node.cloneNode(true);
                     node.dataset.id = id;
                     node.id = `pathbc-${items[i]}`;
+                    if (hasContext && isLastItem) {
+                        node.classList.add('ctx-source', 'active');
+                    }
                     return node;
                 };
                 if (!remainItems || totalWidth + nodeWidth > containerWidth) {

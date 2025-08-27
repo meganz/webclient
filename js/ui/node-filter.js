@@ -14,7 +14,7 @@ lazy(mega.ui, 'mNodeFilter', () => {
 
     // static sections where we don't show filtering capabilities
     const hiddenSections = new Set([
-        'shares', 'out-shares', 'file-requests', 'faves', 'recents'
+        'recents'
     ]);
 
     const selectedFilters = {
@@ -28,6 +28,12 @@ lazy(mega.ui, 'mNodeFilter', () => {
             title: l.filter_chip_type,
             selection: false,
             eid: 99941,
+            shouldShow() {
+                if (M.onDeviceCenter && mega.devices.ui.getRenderSection() === 'device-centre-folders') {
+                    return false;
+                }
+                return !['shares', 'out-shares', 'file-requests'].includes(M.currentdirid);
+            },
             match(n) {
                 if (n.t) {
                     return this.selection.includes('folder');
@@ -115,6 +121,12 @@ lazy(mega.ui, 'mNodeFilter', () => {
             title: l.filter_chip_mdate,
             selection: false,
             eid: 99953,
+            shouldShow() {
+                if (M.onDeviceCenter && mega.devices.ui.getRenderSection() === 'device-centre-folders') {
+                    return false;
+                }
+                return !['shares', 'out-shares', 'file-requests'].includes(M.currentdirid);
+            },
             match(n) {
                 if (n.t) {
                     return false;
@@ -248,7 +260,7 @@ lazy(mega.ui, 'mNodeFilter', () => {
             selection: false,
             eid: 99979,
             shouldShow() {
-                return !!M.search;
+                return !!M.search && !['shares', 'out-shares', 'file-requests'].includes(M.currentdirid);
             },
             match(n) {
 
@@ -406,6 +418,7 @@ lazy(mega.ui, 'mNodeFilter', () => {
             }
 
             this.$resetFilterChips.rebind(`click.resetFilterBy${name}`, () => this.resetToDefault());
+            this.resetToDefault();
         }
 
         /**
@@ -465,7 +478,12 @@ lazy(mega.ui, 'mNodeFilter', () => {
 
             if (index === this.selectedIndex) {
                 this.resetToDefault();
-                M.openFolder(M.currentdirid, true);
+                if (folderlink && String(M.currentdirid).startsWith('search/')) {
+                    M.fmSearchNodes(M.currentdirid.replace('search/', ''));
+                }
+                else {
+                    M.openFolder(M.currentdirid, true);
+                }
                 if (this.autoDismiss) {
                     this.hide(true);
                 }
@@ -501,6 +519,10 @@ lazy(mega.ui, 'mNodeFilter', () => {
 
             // @todo instead of going all through openFolder() we may want to filterBy(search|parent) + renderMain()
             if (!preventReload) {
+                if (folderlink && String(M.currentdirid).startsWith('search/')) {
+                    M.fmSearchNodes(M.currentdirid.replace('search/', ''));
+                    return;
+                }
                 M.openFolder(M.currentdirid, true);
             }
         }
@@ -583,13 +605,11 @@ lazy(mega.ui, 'mNodeFilter', () => {
         },
         get viewEnabled() {
             return !(M.gallery || M.chat || M.albums
-                || M.currentrootid === M.RubbishID
                 || hiddenSections.has(M.currentdirid)
                 || M.currentrootid === 's4' && M.currentCustomView.subType !== 'bucket'
                 || String(M.currentdirid).startsWith('user-management')
-                || folderlink
-                || mega.devices.ui.getRenderSection() === 'device-centre-devices'
-                || mega.devices.ui.getRenderSection() === 'device-centre-folders');
+                || pfcol
+                || mega.devices.ui.getRenderSection() === 'device-centre-devices');
         }
     });
 });

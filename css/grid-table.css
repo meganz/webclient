@@ -26,6 +26,7 @@
     height: 100%;
     overflow: hidden;
     position: relative;
+    margin-top: 20px;
 }
 
 .shared-grid-view .grid-table {
@@ -78,6 +79,7 @@ table.grid-table .inbound-share.unverified-share .sprite-fm-uni-after.icon-warni
     height: 100%;
     overflow: hidden;
     position: relative;
+    margin-top: 20px;
 }
 .out-shared-grid-view .grid-table {
     table-layout: fixed;
@@ -412,7 +414,7 @@ table tr.ui-selected .grid-file-request-manage {
     transition: 200ms linear;
 }
 .shared-details-block .files-grid-view.fm .column-settings {
-    top: 14px;
+    top: 4px;
 }
 .rtl .files-grid-view.fm .column-settings {
     right: auto;
@@ -1468,6 +1470,10 @@ table.out-shares .fm-chat-users {
 /* ======================================== *\
    grid-table file-requests
 \* ======================================== */
+
+.file-requests-view {
+    margin-top: 20px;
+}
 .file-requests-view .grid-table tr:not(.ui-selected):not(:hover) .grid-file-request-manage {
     opacity: 0;
 }

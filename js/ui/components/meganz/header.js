@@ -379,6 +379,9 @@ class MegaHeader extends MegaMobileHeader {
         this.domNode.querySelector('.bottom-block .nav-navigation').textContent = '';
         this.domNode.querySelector('.bottom-block .nav-actions').textContent = '';
 
+        const secondaryButtons = mCreateElement('div', { class: 'nav-secondary-actions hidden' });
+        this.topBlock.prepend(secondaryButtons);
+
         this.resetBottomBlock = nop;
     }
 

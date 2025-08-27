@@ -564,14 +564,14 @@ mBroadcaster.once('boot_done', () => {
                     fmRightFileBlock.classList.add('emptied');
                 }
 
-                if (M.RubbishID && M.currentdirid === M.RubbishID) {
-                    $('.fm-empty-trashbin').removeClass('hidden');
-                    mega.ui.secondaryNav.hideActionButtons();
-                }
-                else if (String(M.currentdirid).substr(0, 7) === 'search/'
+                if (String(M.currentdirid).substr(0, 7) === 'search/'
                         || mega.ui.mNodeFilter.selectedFilters.value
                         && M.currentrootid !== 'shares') {
                     $('.fm-empty-search').removeClass('hidden');
+                }
+                else if (M.RubbishID && M.currentdirid === M.RubbishID) {
+                    $('.fm-empty-trashbin').removeClass('hidden');
+                    mega.ui.secondaryNav.hideActionButtons();
                 }
                 else if (M.currentdirid === M.RootID && folderlink) {
                     // FIXME: implement

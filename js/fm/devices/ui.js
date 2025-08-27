@@ -1362,7 +1362,10 @@ lazy(mega.devices, 'ui', () => {
                 }
                 else {
                     const {main: {section}, models: {syncSection}} = mega.devices;
-                    if (!M.v.length && section === syncSection.deviceFolders) {
+                    if (
+                        !M.v.length && section === syncSection.deviceFolders &&
+                        !mega.ui.mNodeFilter.selectedFilters.value
+                    ) {
                         this.$emptyFolder.removeClass('hidden');
                     }
                 }
@@ -1377,6 +1380,7 @@ lazy(mega.devices, 'ui', () => {
             this.$gridWrapper.addClass('hidden');
             this.$emptyDevices.removeClass('hidden');
             mega.ui.secondaryNav.hideActionButtons();
+            mega.ui.secondaryNav.hideCard();
             megasync.isInstalled((err, is) => {
                 const appFound = !err || is;
                 const descText = appFound

@@ -18,10 +18,12 @@
                     return false;
                 }
 
+                const hasNodeFilter = mega.ui.mNodeFilter && mega.ui.mNodeFilter.selectedFilters.value;
                 const root = M.getNodeRoot(n.h);
                 return root !== M.RubbishID
                     && root !== 'shares'
-                    && mega.sensitives.shouldShowNode(n);
+                    && mega.sensitives.shouldShowNode(n)
+                    && (!hasNodeFilter || hasNodeFilter && mega.ui.mNodeFilter.match(n));
             },
             /**
              * Internal properties, populated as options.
@@ -195,6 +197,9 @@
             }
 
             if (!M.v.length) {
+                if (mega.ui.mNodeFilter && mega.ui.mNodeFilter.selectedFilters.value) {
+                    return;
+                }
                 this.setEmptyPage().catch(dump);
             }
         }
@@ -655,6 +660,14 @@
         if (!M.isGalleryPage() && !this.albums) {
             $('#media-section-controls, #media-tabs, #media-section-right-controls', $fmRightFilesBlock)
                 .addClass('hidden');
+        }
+
+        if (mega.ui.secondaryNav) {
+            const noScroll = mega.ui.secondaryNav.bindScrollEvents();
+            if (noScroll && !mega.ui.secondaryNav.actionsHolder) {
+                mega.ui.secondaryNav.domNode.querySelector('.fm-card-holder')
+                    .before(mega.ui.header.domNode.querySelector('.fm-header-buttons'));
+            }
         }
     };
 

@@ -1282,6 +1282,7 @@ class MegaGallery {
         $('.files-grid-view.fm, .fm-blocks-view.fm, .fm-empty-section', rfBlock).addClass('hidden');
         mega.ui.secondaryNav.updateGalleryLayout();
         mega.ui.secondaryNav.hideBreadcrumb();
+        mega.ui.secondaryNav.updateInfoChipsAndViews();
 
         if (pfid && !M.v) {
             $('.fm-empty-section', rfBlock).removeClass('hidden');
@@ -1358,6 +1359,15 @@ class MegaGallery {
 
             if (uiGrid.selectable('instance')) {
                 uiGrid.selectable('destroy');
+            }
+        }
+
+        if (M.onMediaView && !M.isGalleryPage() && mega.ui.secondaryNav) {
+            // Bind scroll event for media discovery view since it has action buttons.
+            const noScroll = mega.ui.secondaryNav.bindScrollEvents();
+            if (noScroll && !mega.ui.secondaryNav.actionsHolder) {
+                mega.ui.secondaryNav.domNode.querySelector('.fm-card-holder')
+                    .before(mega.ui.header.domNode.querySelector('.fm-header-buttons'));
             }
         }
     }

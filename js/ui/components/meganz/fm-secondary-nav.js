@@ -793,7 +793,6 @@ lazy(mega.ui, 'secondaryNav', () => {
         }
     };
 
-    let filterChipShown = false;
     let dcChipShown = false;
 
     const toggleGridExtraButtons = hide => extraBtnWrapper.classList.toggle('hidden', hide);
@@ -1075,12 +1074,8 @@ lazy(mega.ui, 'secondaryNav', () => {
             return false;
         },
         showSelectionBar() {
-            if (this.filterChipsHolder.classList.contains('hidden')) {
-                filterChipShown = false;
-            }
-            else {
+            if (!this.filterChipsHolder.classList.contains('hidden')) {
                 this.filterChipsHolder.classList.add('hidden');
-                filterChipShown = true;
             }
             if (!this.selectionBar.classList.contains('hidden')) {
                 return;
@@ -1106,13 +1101,12 @@ lazy(mega.ui, 'secondaryNav', () => {
             this.selectionBar.classList.add('hidden');
             this.selectionBar.classList.remove('gallery-pad');
             if (M.gallery) {
-                filterChipShown = false;
                 const media = document.getElementById('media-section-controls');
                 if (media) {
                     media.classList.remove('hidden');
                 }
             }
-            if (filterChipShown) {
+            if (mega.ui.mNodeFilter.viewEnabled) {
                 this.filterChipsHolder.classList.remove('hidden');
             }
             if (M.onDeviceCenter && dcChipShown) {
@@ -1120,7 +1114,6 @@ lazy(mega.ui, 'secondaryNav', () => {
             }
         },
         onPageChange() {
-            filterChipShown = false;
             dcChipShown = false;
             if (window.selectionManager) {
                 // selectionManager should eventually reset but this needs to be empty now for some context menu updates
@@ -1188,14 +1181,12 @@ lazy(mega.ui, 'secondaryNav', () => {
                 return;
             }
             this.filterChipsHolder.classList.add('hidden');
-            filterChipShown = false;
         },
         extShowFilterChip() {
             if ($.selected && $.selected.length) {
                 return;
             }
             this.filterChipsHolder.classList.remove('hidden');
-            filterChipShown = false;
         }
     };
 });

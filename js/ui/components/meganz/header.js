@@ -10,7 +10,6 @@ class MegaHeader extends MegaMobileHeader {
 
         const navNavigation = this.domNode.querySelector('.top-block .nav-navigation');
         const navActions = this.domNode.querySelector('.top-block .nav-actions');
-        let wrapper;
 
         navNavigation.querySelector('.home').classList.add('.hidden');
 
@@ -27,42 +26,42 @@ class MegaHeader extends MegaMobileHeader {
             this.searchInput.classList.add('search');
             this.searchInput.classList.remove('hidden');
             navNavigation.prepend(this.searchInput);
-
-            // Notification
-            wrapper = mCreateElement(
-                'div',
-                {class: 'menu-wrapper notif-wrapper notification js-dropdown-notification'},
-                navActions
-            );
-            navActions.prepend(wrapper);
-
-            this.notifButton = new MegaButton({
-                parentNode: wrapper,
-                type: 'icon',
-                componentClassname: 'text-icon alarm',
-                icon: 'sprite-fm-mono icon-bell-thin-outline',
-                iconSize: 24,
-                simpletip: l[862]
-            });
-
-            this.notifMenu = options.parentNode.querySelector('.notification-popup');
-
-            wrapper.append(this.notifMenu);
-
-            this.notifButton.on('click.list', e => {
-                $.hideContextMenu();
-                if (this.notifButton.toggleClass('active')) {
-                    this.showNotifMenu();
-                }
-                else {
-                    this.closeNotifMenu(e);
-                }
-
-                return false;
-            });
-
-            this.notifButton.domNode.prepend(mCreateElement('span', {class: 'js-notification-num icon-badge hidden'}));
         }
+
+        // Notification
+        let wrapper = mCreateElement(
+            'div',
+            {class: 'menu-wrapper notif-wrapper notification js-dropdown-notification'},
+            navActions
+        );
+        navActions.prepend(wrapper);
+
+        this.notifButton = new MegaButton({
+            parentNode: wrapper,
+            type: 'icon',
+            componentClassname: 'text-icon alarm',
+            icon: 'sprite-fm-mono icon-bell-thin-outline',
+            iconSize: 24,
+            simpletip: l[862]
+        });
+
+        this.notifMenu = options.parentNode.querySelector('.notification-popup');
+
+        wrapper.append(this.notifMenu);
+
+        this.notifButton.on('click.list', e => {
+            $.hideContextMenu();
+            if (this.notifButton.toggleClass('active')) {
+                this.showNotifMenu();
+            }
+            else {
+                this.closeNotifMenu(e);
+            }
+
+            return false;
+        });
+
+        this.notifButton.domNode.prepend(mCreateElement('span', {class: 'js-notification-num icon-badge hidden'}));
 
         // Contacts menu
         wrapper = mCreateElement('div', {class: 'menu-wrapper contacts-wrapper top-contacts'}, navActions);
@@ -379,6 +378,9 @@ class MegaHeader extends MegaMobileHeader {
 
         this.domNode.querySelector('.bottom-block .nav-navigation').textContent = '';
         this.domNode.querySelector('.bottom-block .nav-actions').textContent = '';
+
+        const secondaryButtons = mCreateElement('div', { class: 'nav-secondary-actions hidden' });
+        this.topBlock.prepend(secondaryButtons);
 
         this.resetBottomBlock = nop;
     }

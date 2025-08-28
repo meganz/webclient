@@ -9,6 +9,7 @@
     border-top: 1px solid var(--surface-grey-2);
     background: no-repeat center 33px linear-gradient(90deg, var(--stroke-grey-2), var(--stroke-grey-2));
     background-size: 100% 1px;
+    margin-top: 16px;
 }
 
 .s4-grid-view .sticky-header-table-container {

@@ -1813,6 +1813,7 @@ lazy(mega.ui, 'mShareDialog', () => {
         }
         else {
             $('.remove-share', $dialog).addClass('disabled');
+            MegaNodeComponent.label.set(node, $('.item-type-icon-90', $dialog));
         }
 
         // Fill the shared folder's name

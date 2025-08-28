@@ -2511,7 +2511,7 @@ function loadfm(force) {
                 fetchfm(false).catch(tell);
             }
             else if (!u_k_aes) {
-                console.error('No master key found... please contact support@mega.nz');
+                console.error('No master key found... please contact support@mega.io');
             }
             else {
                 const f_table_schema = '&h, p, s, c, t, fa';

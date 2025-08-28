@@ -11027,6 +11027,10 @@ body.rtl .overlay-wrap {
     position: static;
 }
 
+body .no-tablet-layout #startholder.page-file-request-upload {
+    position: relative;
+}
+
 /* General css items */
 .free-trial-text-icon {
     display: flex;

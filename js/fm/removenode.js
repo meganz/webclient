@@ -183,6 +183,9 @@ function removeUInode(h, parent) {
                     else if (M.currentdirid === 'out-shares') {
                         $('.fm-empty-outgoing').removeClass('hidden');
                     }
+                    else if (M.currentrootid === 'out-shares') {
+                        $('.fm-empty-folder', '.fm-right-files-block').removeClass('hidden');
+                    }
                     else if (M.currentdirid !== 'public-links' &&
                         M.currentdirid !== 'file-requests' &&
                         M.currentdirid !== 's4' &&
@@ -193,6 +196,9 @@ function removeUInode(h, parent) {
                             $('.fm-search-count').text(mega.icu.format(l.search_results_count, 0));
                             $('.fm-empty-search').removeClass('hidden');
                             $('.fm-right-files-block:not(.in-chat) .search-bottom-wrapper').addClass('hidden');
+                        }
+                        else if (M.currentrootid === 'file-requests' || M.currentrootid === 'public-links') {
+                            $('.fm-empty-folder', '.fm-right-files-block').removeClass('hidden');
                         }
                         else {
                             mega.ui.empty.folder();

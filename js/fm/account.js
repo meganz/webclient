@@ -2443,6 +2443,9 @@ accountUI.fileManagement = {
         // Show sensitive nodes
         this.showSen.render();
 
+        // Show label colours on folders
+        this.colourFolder.render();
+
         // Drag and Drop
         this.dragAndDrop.render();
 
@@ -2787,6 +2790,28 @@ accountUI.fileManagement = {
             else {
                 $('#show-hidden', accountUI.$contentBlock).parent().addClass('hidden');
             }
+        }
+    },
+
+    colourFolder: {
+        render() {
+            'use strict';
+
+            accountUI.inputs.switch.init(
+                '#colour-folder',
+                $('#colour-folder', accountUI.$contentBlock).parent(),
+                !mega.config.get('colourFolder'),
+                (val) => {
+                    mega.config.setn('colourFolder', val ? undefined : 1);
+                    if (val) {
+                        document.body.classList.remove('no-lbl-colour');
+                        eventlog(500935);
+                    }
+                    else {
+                        document.body.classList.add('no-lbl-colour');
+                        eventlog(500934);
+                    }
+                });
         }
     },
 
@@ -3670,10 +3695,9 @@ accountUI.reseller = {
                 $.voucherlimit = 10;
             }
 
-            var email = 'resellers@mega.nz';
+            var email = 'resellers@mega.io';
 
-            $('.resellerbuy').attr('href', 'mailto:' + email)
-                .find('span').text(l[9106].replace('%1', email));
+            $('.resellerbuy').attr('href', 'mailto:' + email).text(l[9106].replace('%1', email));
 
             // Use 'All' or 'Last 10/100/250' for the dropdown text
             const buttonText = $.voucherlimit === 'all' ? l[7557] : mega.icu.format(l[466], $.voucherlimit);
@@ -3958,32 +3982,24 @@ accountUI.vpn = {
 accountUI.hasMobileSessions = async() => {
     'use strict';
 
-    if (typeof M.isMobileInUse === 'boolean') {
-        return M.isMobileInUse;
+    if (await M.getPersistentData(`${u_handle}!mapp`).catch(nop)) {
+        return true;
     }
 
-    if (!(M.isMobileInUse instanceof Promise)) {
-        M.isMobileInUse = new Promise((resolve) => {
-            api.req({a: 'usl', x: 1}).then(({ result: sessions }) => {
-                if (sessions && sessions.length) {
-                    for (let i = sessions.length; i--;) {
-                        const useragent = String(sessions[i][2]).toLowerCase();
+    if (!accountUI.hasMobileSessions.res) {
+        accountUI.hasMobileSessions.res = api.req({a: 'usl', x: 1})
+            .then(({result: sessions}) => {
+                for (let i = sessions && sessions.length; i--;) {
+                    const useragent = String(sessions[i][2]).toLowerCase();
 
-                        if (useragent.startsWith('megaandroid/') || useragent.startsWith('megaios/') === 0) {
-                            M.isMobileInUse = true;
-                            break;
-                        }
+                    if (useragent.startsWith('megaandroid/') || useragent.startsWith('megaios/')) {
+                        M.setPersistentData(`${u_handle}!mapp`, 1).catch(dump);
+                        return true;
                     }
                 }
-
-                M.isMobileInUse = M.isMobileInUse === true;
-
-                resolve(M.isMobileInUse);
-            });
-        });
+            })
+            .catch(dump);
     }
 
-    await M.isMobileInUse;
-
-    return M.isMobileInUse;
+    return accountUI.hasMobileSessions.res;
 };

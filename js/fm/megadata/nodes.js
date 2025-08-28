@@ -2191,6 +2191,7 @@ MegaData.prototype.labelDomUpdate = function(handle, value) {
         $treeElements.removeClass('labeled');
         $('.colour-label-ind', $treeElements).remove();
 
+        MegaNodeComponent.label.set(n, $('.nw-fm-tree-folder', $treeElements));
         if (labelId) {
             // Add colour label classes.
             var lblColor = M.getLabelClassFromId(labelId);
@@ -2232,17 +2233,35 @@ MegaData.prototype.labeling = function(handles, newLabelState) {
             handles = [handles];
         }
         newLabelState |= 0;
+        let fileCount = 0;
+        let folderCount = 0;
 
-        handles.map(h => this.getNodeRights(h) > 1 && this.getNodeByHandle(h))
+        const promises = handles.map(h => this.getNodeRights(h) > 1 && this.getNodeByHandle(h))
             .filter(Boolean)
             .map(n => {
 
                 if (n.tvf) {
                     fileversioning.labelVersions(n.h, newLabelState);
                 }
+                if (n.t) {
+                    folderCount++;
+                }
+                else {
+                    fileCount++;
+                }
 
-                return api.setNodeAttributes(n, {lbl: newLabelState}).catch(tell);
+                return api.setNodeAttributes(n, {lbl: newLabelState});
             });
+        return Promise.all(promises)
+            .then(() => {
+                if (folderCount) {
+                    eventlog(newLabelState ? 500930 : 500932, folderCount);
+                }
+                if (fileCount) {
+                    eventlog(newLabelState ? 500931 : 500933, fileCount);
+                }
+            })
+            .catch(tell);
     }
 };
 
@@ -3827,8 +3846,7 @@ MegaData.prototype.delNodeShare = async function(h, u) {
  */
 MegaData.prototype.getUserByHandle = function(handle) {
     "use strict";
-
-    var user = false;
+    let user;
 
     if (Object(this.u).hasOwnProperty(handle)) {
         user = this.u[handle];
@@ -3848,7 +3866,7 @@ MegaData.prototype.getUserByHandle = function(handle) {
         user = u_attr;
     }
 
-    return user;
+    return user || false;
 };
 
 /**

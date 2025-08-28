@@ -79,6 +79,12 @@ lazy(mega.devices.sections, 'deviceFolders', () => {
                 return {err: true, id: rootId};
             }
 
+            const chip = document.querySelector('.fm-filter-chip-type');
+            if (!selectionManager || !selectionManager.selected_list.length) {
+                mega.ui.mNodeFilter.resetFilterSelections(
+                    M.previousdirid === M.currentdirid && !(chip && !chip.classList.contains('hidden'))
+                );
+            }
             ui.$gridWrapper.removeClass('hidden');
             this.$grid.removeClass('hidden');
             this._renderHeader(device);
@@ -158,34 +164,21 @@ lazy(mega.devices.sections, 'deviceFolders', () => {
          * @returns {void}
          */
         _renderHeader(device) {
+            mega.ui.secondaryNav.updateInfoChipsAndViews();
             mega.ui.secondaryNav.showCard(
                 device.h,
                 {
                     text: l.add_backup_button,
+                    icon: 'sprite-fm-mono icon-database-plus-thin-outline',
                     onClick: () => {
                         ui.desktopApp.backup.add(500751);
                     }
                 },
                 {
                     text: l.add_syncs_button,
+                    icon: 'sprite-fm-mono icon-sync-thin-outline',
                     onClick: () => {
                         ui.desktopApp.sync.add(500752);
-                    }
-                },
-                (ev) => {
-                    ev.preventDefault();
-                    const path = M.currentdirid.split('/');
-                    if (path.length > 1) {
-                        $.hideContextMenu();
-
-                        selectionManager.resetTo(path.pop());
-
-                        ev.originalEvent.delegateTarget = ev.currentTarget.domNode;
-                        ui.contextMenu(ev.originalEvent);
-
-                        delay('deviceFolders:hide:selectionBar', () => {
-                            selectionManager.hideSelectionBar();
-                        }, 80);
                     }
                 }
             );
@@ -238,13 +231,16 @@ lazy(mega.devices.sections, 'deviceFolders', () => {
                 if (M.currentLabelFilter && !M.filterByLabel(n)) {
                     return false;
                 }
+                if (mega.ui.mNodeFilter.selectedFilters.value && !mega.ui.mNodeFilter.match(n)) {
+                    return false;
+                }
                 return mega.sensitives.shouldShowNode(n.h);
             });
 
             if (M.v.length) {
                 this.$empty.addClass('hidden');
             }
-            else {
+            else if (!mega.ui.mNodeFilter.selectedFilters.value) {
                 this.$empty.removeClass('hidden');
             }
 

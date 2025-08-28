@@ -624,16 +624,9 @@ function fmtopUI() {
 
     let primary = false;
     let secondary = false;
-    let contextMenuItem = false;
+    let tertiary = false;
 
     const id = String(M.currentdirid || '').split('/').pop();
-    if (mega.rewind
-        && M.getSelectedSourceRoot() === M.RootID
-        && M.currentrootid === M.RootID
-        && !pfid && M.onDeviceCenter !== M.RootID
-    ) {
-        contextMenuItem = id;
-    }
 
     const $rewindNotifBanner =
         $('.fm-notification-block.new-feature-rewind-notification', '.fm-right-files-block');
@@ -655,7 +648,11 @@ function fmtopUI() {
         M.currentdirid === 'file-requests'
     );
     mega.ui.secondaryNav.updateInfoPanelButton(id && M.d[id] && M.d[id].t);
-    mega.ui.secondaryNav.showBreadcrumb();
+    if (M.currentdirid !== 'shares') {
+        mega.ui.secondaryNav.showBreadcrumb();
+    }
+    mega.ui.secondaryNav.updateInfoChipsAndViews();
+    mega.ui.secondaryNav.breadcrumbHolder.classList.remove('top-spacer');
     $('.fm-right-files-block').removeClass('visible-notification rubbish-bin');
 
     const isSearchResult = String(M.currentdirid).substring(0, 6) === 'search';
@@ -683,6 +680,7 @@ function fmtopUI() {
         $('.fm-right-files-block').addClass('rubbish-bin visible-notification');
     }
     else {
+        const cl = new mega.Share.ExportLink();
         if (M.currentrootid === M.InboxID) {
             if (d) {
                 console.log('Inbox');
@@ -701,12 +699,12 @@ function fmtopUI() {
             if (M.currentdirid !== 'shares' && !M.d[M.currentdirid].su) {
                 if (M.getNodeRights(M.currentdirid) > 0) {
                     primary = '.fm-new-menu';
-                    secondary = '.fm-download';
+                    secondary = '.fm-new-folder';
+                    tertiary = '.fm-download';
                 }
                 else {
                     primary = '.fm-download';
                 }
-                contextMenuItem = contextMenuItem || M.currentdirid;
             }
             else if (M.currentdirid !== 'shares') {
                 mega.ui.secondaryNav.hideBreadcrumb();
@@ -723,14 +721,14 @@ function fmtopUI() {
                 primary = '.fm-new-shared-folder';
                 mega.ui.secondaryNav.hideBreadcrumb();
             }
-            else if (M.isOutShare(String(M.currentdirid).split('/').pop(), 'EXP')) {
+            else if (M.isOutShare(id, 'EXP')) {
                 primary = '.fm-new-menu';
-                secondary = '.fm-manage-share-folder';
-                contextMenuItem = contextMenuItem || id;
+                secondary = '.fm-new-folder';
+                tertiary = cl.isTakenDown(id) ? false : '.fm-share-folder';
             }
             else {
                 primary = '.fm-new-menu';
-                contextMenuItem = contextMenuItem || id;
+                secondary = '.fm-new-folder';
             }
         }
         else if (M.currentrootid === 'public-links') {
@@ -744,10 +742,14 @@ function fmtopUI() {
                 primary = '.fm-new-link';
                 mega.ui.secondaryNav.hideBreadcrumb();
             }
+            else if (M.getNodeShare(M.d[id])) {
+                primary = '.fm-new-menu';
+                secondary = '.fm-new-folder';
+                tertiary = cl.isTakenDown(id) ? false : '.fm-share-folder';
+            }
             else {
                 primary = '.fm-new-menu';
-                secondary = '.fm-manage-link';
-                contextMenuItem = contextMenuItem || id;
+                secondary = '.fm-new-folder';
             }
         }
         else if (M.currentrootid === 'file-requests') {
@@ -762,8 +764,8 @@ function fmtopUI() {
             }
             else {
                 primary = '.fm-new-menu';
-                secondary = mega.fileRequest.storage.getPuHandleByNodeHandle(id) ? '.fm-manage-file-request' : false;
-                contextMenuItem = contextMenuItem || id;
+                secondary = '.fm-new-folder';
+                tertiary = mega.fileRequest.storage.getPuHandleByNodeHandle(id) ? '.fm-manage-file-request' : false;
             }
         }
         else if (M.isGalleryPage()) {
@@ -783,7 +785,9 @@ function fmtopUI() {
         }
         else if (M.currentrootid === 's4' && M.currentCustomView) {
             const {subType, original, nodeID, containerID} = M.currentCustomView;
-            mega.ui.secondaryNav.updateLayoutButton(!subType.startsWith('bucket'));
+            const hideElems = !subType.startsWith('bucket') && !$.selected.length;
+            mega.ui.secondaryNav.updateLayoutButton(hideElems || subType === 'container');
+            mega.ui.secondaryNav.updateInfoChipsAndViews(subType !== 'container' && hideElems);
             if (subType === 'container') {
                 primary = '.fm-s4-new-bucket';
                 secondary = '.fm-s4-settings';
@@ -793,43 +797,53 @@ function fmtopUI() {
                     mega.ui.secondaryNav.showCard(
                         nodeID,
                         {
-                            text: l.add_item_btn,
+                            text: l.create_and_upload,
                             icon: 'sprite-fm-mono icon-plus-light-solid',
                             id: `newctx_${nodeID}`,
                             onClick: (ev) => {
+                                if (ev.currentTarget.active) {
+                                    return;
+                                }
+                                ev.currentTarget.active = true;
                                 mega.ui.secondaryNav.openNewMenu(ev);
                             }
                         },
                         {
                             text: l.s4_bkt_settings,
+                            icon: 'sprite-fm-mono icon-settings-thin-outline',
                             onClick: () => {
                                 s4.ui.showDialog(s4.buckets.dialogs.settings, s4.ui.bucket);
                                 eventlog(500745);
                             }
-                        },
-                        (ev) => {
-                            mega.ui.secondaryNav.openContextMenu(ev);
                         }
                     );
                 }
                 else {
                     primary = '.fm-new-menu';
-                    contextMenuItem = contextMenuItem || nodeID;
+                    secondary = '.fm-new-folder';
+                    tertiary = cl.isTakenDown(nodeID) ? false : '.fm-share-folder';
                 }
             }
             else if (subType === 'keys') {
                 primary = '.fm-s4-new-key';
             }
             else if (subType === 'policies') {
+                mega.ui.secondaryNav.breadcrumbHolder.classList.add('top-spacer');
             }
             else if (subType === 'users') {
                 if (original.endsWith('users')) {
                     primary = '.fm-s4-new-user';
                 }
+                else {
+                    mega.ui.secondaryNav.breadcrumbHolder.classList.add('top-spacer');
+                }
             }
             else if (subType === 'groups') {
                 if (original.endsWith('groups')) {
                     primary = '.fm-s4-new-group';
+                }
+                else {
+                    mega.ui.secondaryNav.breadcrumbHolder.classList.add('top-spacer');
                 }
             }
             $('.fm-right-files-block').addClass('visible-notification');
@@ -848,8 +862,13 @@ function fmtopUI() {
                 const isBackup = mega.devices.ui.isBackupRelated(h);
                 if (device && !device.folders[h]) {
                     primary = isBackup ? '.fm-share-folder' : '.fm-new-menu';
-                    secondary = isBackup ? false : '.fm-share-folder';
-                    contextMenuItem = contextMenuItem || h;
+                    secondary = isBackup ? false : '.fm-new-folder';
+                    tertiary = isBackup ? false : '.fm-share-folder';
+                    if (cl.isTakenDown(h)) {
+                        primary = isBackup ? false : '.fm-new-menu';
+                        secondary = isBackup ? false : '.fm-new-folder';
+                        tertiary = false;
+                    }
                 }
             }
 
@@ -861,8 +880,8 @@ function fmtopUI() {
 
             $('.fm-right-files-block').addClass('visible-notification');
             primary = '.fm-new-menu';
-            secondary = M.currentdirid === M.RootID ? false : '.fm-share-folder';
-            contextMenuItem = contextMenuItem || id;
+            secondary = '.fm-new-folder';
+            tertiary = M.currentdirid === M.RootID || cl.isTakenDown(id) ? false : '.fm-share-folder';
         }
         else if (folderlink) {
             primary = '.fm-import-to-cloudrive';
@@ -889,8 +908,7 @@ function fmtopUI() {
     if (isSearchResult) {
         return;
     }
-    // do not call when isSearchResult
-    mega.ui.secondaryNav.showActionButtons(primary, secondary, contextMenuItem);
+    mega.ui.secondaryNav.showActionButtons(primary, secondary, tertiary);
 }
 
 /**
@@ -1165,18 +1183,19 @@ function FMShortcuts() {
             !M.gallery &&
             !M.albums
         ) {
-            if (!current_operation || (M.getNodeRights(M.currentdirid || '') | 0) < 1) {
+            const nodeId = M.currentCustomView ? M.currentCustomView.nodeID : M.currentdirid;
+            if (!current_operation || (M.getNodeRights(nodeId || '') | 0) < 1) {
                 return false; // stop prop.
             }
 
             let {src: handles, op, dir} = current_operation;
-            op = op === 'cut' && dir === M.currentdirid ? 'copy' : op;
+            op = op === 'cut' && dir === nodeId ? 'copy' : op;
 
             if (op === "copy") {
-                M.copyNodes(handles, M.currentdirid).catch((ex) => ex !== EBLOCKED && tell(ex));
+                M.copyNodes(handles, nodeId).catch((ex) => ex !== EBLOCKED && tell(ex));
             }
             else if (op === "cut") {
-                M.moveNodes(handles, M.currentdirid).catch(tell);
+                M.moveNodes(handles, nodeId).catch(tell);
                 current_operation = null;
             }
 
@@ -1421,8 +1440,11 @@ function renameDialog() {
             .text(n.t ? s4Folder ? l.s4_bucket_rename : l[425] : l[426]);
         $input.val(n.name);
 
-        $('.input-icon', $dialog)
-            .attr('class', `input-icon item-type-icon icon-${fileIcon(n)}-24`);
+        MegaNodeComponent.label.set(
+            n,
+            $('.input-icon', $dialog)
+                .attr('class', `input-icon item-type-icon icon-${fileIcon(n)}-24`)
+        );
 
         if (!n.t && ext.length > 0) {
             $input[0].selectionStart = 0;
@@ -2984,6 +3006,9 @@ function sharedFolderUI() {
     // are we in an inshare?
     if (M.currentrootid === 'shares' || M.currentrootid === 'out-shares') {
         mega.ui.secondaryNav.hideCard();
+        if (!nodeData && M.currentdirid === M.currentrootid) {
+            mega.ui.secondaryNav.hideBreadcrumb();
+        }
     }
     while (nodeData && !nodeData.su) {
         nodeData = M.d[nodeData.p];
@@ -2999,26 +3024,51 @@ function sharedFolderUI() {
 
         $(rightPanelView).wrap('<div class="shared-details-block"></div>');
 
-        const { r } = nodeData;
+        const { r, h, p, su } = nodeData;
         const downloadButton = {
-            text: l[58],
+            text: l.transferit_download_all,
+            icon: 'sprite-fm-mono icon-arrow-down-circle-thin-outline',
             onClick(ev) {
+                if (ev.currentTarget.active) {
+                    $.hideContextMenu();
+                    ev.currentTarget.active = false;
+                    return;
+                }
+                ev.currentTarget.active = true;
                 mega.ui.secondaryNav.openDownloadMenu(ev);
                 eventlog(500733);
             }
         };
         const newButton = {
-            text: l.add_item_btn,
+            text: l.create_and_upload,
             icon: 'sprite-fm-mono icon-plus-light-solid',
             id: `newctx_${nodeData.h}`,
             onClick(ev) {
+                if (ev.currentTarget.active) {
+                    return;
+                }
+                ev.currentTarget.active = true;
                 mega.ui.secondaryNav.openNewMenu(ev);
             }
         };
         const onContextMenu = (ev) => {
-            mega.ui.secondaryNav.openContextMenu(ev);
+            if (ev.currentTarget.hasClass('active')) {
+                $.hideContextMenu();
+                ev.stopPropagation();
+                ev.currentTarget.removeClass('active');
+                return false;
+            }
+            const buttons = ['.properties-item', '.copy-item'];
+            const ed = authring.getContactAuthenticated(su, 'Ed25519');
+            if (!(ed && ed.method >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON)) {
+                buttons.push('.verify-credential');
+            }
+            if (r === 2) {
+                buttons.push('.rename-item');
+            }
+            M.contextMenuUI(ev, 8, buttons.join(','), [h]);
         };
-        if (nodeData.h === M.currentdirid) {
+        if (h === M.currentdirid) {
             mega.ui.secondaryNav.hideBreadcrumb();
             if (r === 1 || r === 2) {
                 mega.ui.secondaryNav.showCard(M.currentdirid, newButton, downloadButton, onContextMenu);
@@ -3038,7 +3088,7 @@ function sharedFolderUI() {
 
         $(rightPanelView).addClass('shared-folder-content');
 
-        if (M.d[M.currentdirid] !== nodeData || M.d[nodeData.p]) {
+        if (M.d[M.currentdirid] !== nodeData || M.d[p]) {
             // hide leave-share under non-root shares
             $('.fm-leave-share').addClass('hidden');
         }

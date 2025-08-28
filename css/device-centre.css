@@ -229,6 +229,7 @@ table.device-centre .device-centre-item-modified {
     overflow: hidden;
     position: relative;
     border-top: 1px solid var(--surface-grey-2);
+    margin-top: 20px;
 }
 
 .fm-right-files-block.emptied .device-centre-grid-view {
@@ -537,18 +538,12 @@ table.device-centre .device-centre-item-modified {
 
 /* For the wrapper and filter chips */
 .dc-filter-chips-wrapper {
-    margin-left: 12px;
-    margin-right: 12px;
-    min-height: 36px;
+    height: 32px;
+    padding-inline: 24px 88px;
+    transition: 200ms linear;
     display: flex;
-
-    /* 
-    REMOVE min-height
-
-    height: fit-content;
-    padding-top: 6px;
-    padding-bottom: 12px;
-    */
+    align-items: center;
+    margin-inline-end: auto;
 }
 .rtl .dc-filter-chips-wrapper {
     flex-direction: row-reverse;
@@ -556,7 +551,6 @@ table.device-centre .device-centre-item-modified {
 .dc-filter-chips-wrapper .dc-filter-chips {
     width: fit-content;
     display: flex;
-    margin-left: 4px;
 }
 .rtl .dc-filter-chips-wrapper .dc-filter-chips {
     flex-direction: row-reverse;
@@ -573,10 +567,8 @@ table.device-centre .device-centre-item-modified {
     align-items: center;
     justify-content: center;
     height: 24px;
-    margin-left: 4px;
-    margin-right: 4px;
-    padding-left: 12px;
-    padding-right: 12px;
+    margin-inline-end: 4px;
+    padding-inline: 12px;
     border-radius: 12px;
     background: var(--surface-grey-2);
     cursor: pointer;

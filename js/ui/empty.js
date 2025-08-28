@@ -34,11 +34,13 @@ lazy(mega.ui, 'empty', () => {
         clear(target);
 
         if (pfid || M.currentrootid === M.RubbishID) {
-            $('.fm-empty-folder').removeClass('hidden');
+            if (!M.onMediaView) {
+                $('.fm-empty-folder').removeClass('hidden');
+            }
             return;
         }
 
-        const imgDiv = mCreateElement('div', { class: 'bg-no-repeat bg-center bg-contain h-full w-full max-h-48' });
+        const imgDiv = mCreateElement('div', { class: 'bg-no-repeat bg-center bg-contain h-full w-full' });
         imgDiv.style.backgroundImage = `url(${img})`;
 
         const titleEl = mCreateElement('h3', { class: 'pt-6 font-title-h2-bold text-color-high my-0' });
@@ -51,9 +53,9 @@ lazy(mega.ui, 'empty', () => {
 
         const dropArea = mCreateElement(
             'div',
-            { class: 'drop-area flex-1 flex flex-column text-center border-drop pt-6' },
+            { class: 'drop-area flex-1 flex flex-column text-center border-drop pt-6 justify-center' },
             [
-                mCreateElement('div', { class: 'flex-1 flex flex-row items-center' }, [imgDiv]),
+                mCreateElement('div', { class: 'flex-1 max-h-48' }, [imgDiv]),
                 titleEl,
                 hint,
                 btnRow

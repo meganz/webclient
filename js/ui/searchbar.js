@@ -361,7 +361,7 @@ lazy(mega.ui, 'searchbar', () => {
             }
             else if (val.length >= 2 || !asciionly(val)) {
                 M.fmSearchNodes(val).then(() => {
-                    if (!M.search) {
+                    if (!M.search && !(folderlink && String(M.currentdirid).startsWith('search/'))) {
                         mega.ui.mNodeFilter.resetFilterSelections();
                     }
                     delay.cancel('searchbar.renderSuggestSearchedItems');
@@ -915,7 +915,7 @@ lazy(mega.ui, 'searchbar', () => {
                 $fileIconContainer.addClass('thumb');
             }
             else {
-                $fileIcon.addClass(`icon-${fileIcon(node)}-24`);
+                MegaNodeComponent.label.set(node, $fileIcon.addClass(`icon-${fileIcon(node)}-24`));
             }
 
             return $item.prop('outerHTML');

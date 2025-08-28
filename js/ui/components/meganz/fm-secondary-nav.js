@@ -32,7 +32,22 @@ class MegaNavCard extends MegaComponent {
 
         subNode = document.createElement('div');
         subNode.className = 'fm-item-name';
-        labelWrapper.appendChild(subNode);
+        if (typeof options.onContextMenu === 'function') {
+            const contextName = new MegaComponent({
+                nodeType: 'button',
+                parentNode: labelWrapper,
+                componentClassname: 'fm-context-name',
+                id: `cardctx_${this.handle}`,
+            });
+            contextName.domNode.appendChild(subNode);
+            const icon = document.createElement('i');
+            icon.className = 'sprite-fm-mono icon-chevron-down-thin-outline';
+            contextName.domNode.appendChild(icon);
+            contextName.on('click', options.onContextMenu);
+        }
+        else {
+            labelWrapper.appendChild(subNode);
+        }
 
         subNode = document.createElement('div');
         subNode.className = 'fm-label-badge';
@@ -59,18 +74,6 @@ class MegaNavCard extends MegaComponent {
         });
         if (this.isSync || this.isBackup) {
             secondaryBtn.removeClass('outline');
-        }
-        if (typeof options.onContextMenu === 'function') {
-            MegaButton.factory({
-                parentNode: wrapper,
-                type: 'icon',
-                icon: 'sprite-fm-mono icon-side-menu',
-                componentClassname: 'transparent-icon fm-header-context',
-                id: `fmhead_${this.handle}`,
-                onClick: (ev) => {
-                    options.onContextMenu(ev);
-                }
-            });
         }
 
         this.domNode.appendChild(wrapper);
@@ -185,7 +188,7 @@ class MegaNavCard extends MegaComponent {
         else if (this.isDevice || this.isBackup || this.isSync) {
             return `
                 <div class="fm-label-badge">
-                    <i class="sprite-fm-mono icon-info-thin-outline dc-badge-info-icon simpletip"></i>
+                    <i class="sprite-fm-mono icon-question-filled dc-badge-info-icon simpletip"></i>
                 </div>
             `;
         }
@@ -304,6 +307,10 @@ class MegaNavCard extends MegaComponent {
         else if (this.isBackup) {
             this.icon = 'fm-icon item-type-icon icon-folder-backup-24';
         }
+        else if (!folderlink && this.node.t && this.node.lbl) {
+            const lbl = MegaNodeComponent.label[this.node.lbl | 0] || '';
+            this.icon = `fm-icon item-type-icon icon-${fileIcon(this.node)}-24 ${lbl}`;
+        }
         else {
             this.icon = `fm-icon item-type-icon icon-${fileIcon(this.node)}-24`;
         }
@@ -335,6 +342,7 @@ lazy(mega.ui, 'secondaryNav', () => {
         icon: 'sprite-fm-mono icon-download-standard',
         text: l[5928],
         onClick: () => {
+            $.hideContextMenu();
             if (!mega.ui.secondaryNav.dlId) {
                 return;
             }
@@ -349,12 +357,12 @@ lazy(mega.ui, 'secondaryNav', () => {
         icon: 'sprite-fm-mono icon-download-zip',
         text: l[864],
         onClick: () => {
+            $.hideContextMenu();
             if (!mega.ui.secondaryNav.dlId) {
                 return;
             }
             M.addDownload([mega.ui.secondaryNav.dlId], true);
             delete mega.ui.secondaryNav.dlId;
-            $.hideContextMenu();
         }
     });
     const downloadMegaSync = new MegaButton({
@@ -364,6 +372,7 @@ lazy(mega.ui, 'secondaryNav', () => {
         icon: 'sprite-fm-mono icon-session-history',
         text: l.btn_dlwitdeskapp,
         onClick: () => {
+            $.hideContextMenu();
             if (!mega.ui.secondaryNav.dlId) {
                 return;
             }
@@ -789,8 +798,11 @@ lazy(mega.ui, 'secondaryNav', () => {
         }
     };
 
-    let filterChipShown = false;
     let dcChipShown = false;
+    let startedScrolling = false;
+    let scrollHandler = false;
+    let chipsViewWrapShown = false;
+    let moveUpTimer = false;
 
     const toggleGridExtraButtons = hide => extraBtnWrapper.classList.toggle('hidden', hide);
 
@@ -831,6 +843,9 @@ lazy(mega.ui, 'secondaryNav', () => {
         get filterChipsHolder() {
             return this.domNode.querySelector('.fm-filter-chips-wrapper');
         },
+        get chipsViewsWrapper() {
+            return this.domNode.querySelector('.fm-header-chips-and-view-buttons');
+        },
         openNewMenu(ev) {
             if (
                 M.InboxID &&
@@ -839,7 +854,13 @@ lazy(mega.ui, 'secondaryNav', () => {
                 return;
             }
 
-            M.contextMenuUI(ev, 8, ['.fileupload-item', '.folderupload-item', '.newfolder-item', '.newfile-item']);
+            const items = ['.fileupload-item', '.folderupload-item'];
+            const target = ev.currentTarget instanceof MegaComponent ? ev.currentTarget.domNode : ev.currentTarget;
+            if (this.cardComponent && this.cardComponent.domNode.contains(target)) {
+                items.push('.newfolder-item', '.newfile-item');
+            }
+            M.contextMenuUI(ev, 8, items);
+
             eventlog(500721);
         },
         openDownloadMenu(ev) {
@@ -863,6 +884,7 @@ lazy(mega.ui, 'secondaryNav', () => {
                     event: ev,
                     eventTarget: target,
                     contents: [downloadMenu],
+                    resizeHandler: true,
                     onClose: () => {
                         target.domNode.classList.remove('active');
                     }
@@ -870,19 +892,24 @@ lazy(mega.ui, 'secondaryNav', () => {
             }
         },
         openContextMenu(ev) {
-            let { id } = ev.currentTarget.domNode;
+            let { id, classList } = ev.currentTarget;
+            if (classList.contains('active')) {
+                ev.stopPropagation();
+                $.hideContextMenu();
+                classList.remove('active');
+                return false;
+            }
             if (id) {
-                if (id.startsWith('fmhead_')) {
-                    id = id.replace('fmhead_', '');
+                if (id.startsWith('pathbc-')) {
+                    id = id.replace('pathbc-', '');
                 }
                 $.selected = [id];
                 if (id === M.RootID) {
-                    ev.currentTarget.domNode.classList.add('cloud-drive');
+                    ev.currentTarget.classList.add('cloud-drive');
                 }
 
-                M.contextMenuUI(ev.originalEvent, 1);
-                ev.currentTarget.domNode.classList.add('active');
-                ev.currentTarget.domNode.classList.remove('cloud-drive');
+                M.contextMenuUI(ev, 1);
+                ev.currentTarget.classList.remove('cloud-drive');
             }
         },
         addActionButton(options) {
@@ -905,40 +932,53 @@ lazy(mega.ui, 'secondaryNav', () => {
                 componentClassname: `${options.componentClassname} hidden`,
             });
         },
-        showActionButtons(primarySelector, secondarySelector, contextMenuItem) {
+        showActionButtons(...selectors) {
+            const holder = this.actionsHolder || mega.ui.header.domNode.querySelector('.fm-header-buttons');
+            if (!holder) {
+                return;
+            }
             this.hideActionButtons();
-            if (primarySelector) {
-                const primary = this.actionsHolder.querySelector(primarySelector);
-                if (primary) {
-                    primary.classList.remove('hidden');
-                    primary.classList.add('primary');
+            let shown = false;
+            for (let i = 0; i < selectors.length; i++) {
+                const selector = selectors[i];
+                const elem = holder.querySelector(selector);
+                if (elem) {
+                    if (shown) {
+                        elem.classList.add('secondary');
+                    }
+                    else {
+                        elem.classList.add('primary');
+                    }
+                    elem.classList.remove('hidden');
+                    shown = true;
                 }
             }
-            if (secondarySelector) {
-                const secondary = this.actionsHolder.querySelector(secondarySelector);
-                if (secondary) {
-                    secondary.classList.remove('hidden');
-                    secondary.classList.add('secondary');
-                }
-            }
-            contextMenuItem = false;
-            // if (contextMenuItem) {
-            //     const context = this.actionsHolder.querySelector('.fm-context');
-            //     context.id = `fmhead_${contextMenuItem}`;
-            //     context.classList.remove('hidden');
-            // }
-            if (primarySelector || secondarySelector || contextMenuItem) {
-                this.actionsHolder.classList.remove('hidden');
+            if (shown) {
+                holder.classList.remove('hidden');
             }
         },
         hideActionButtons() {
-            const children = this.actionsHolder.children;
-            for (const child of children) {
+            let holder = this.actionsHolder;
+            if (!holder) {
+                const ps = document.querySelector('.fm-right-files-block .ps:not(.breadcrumb-dropdown)');
+                holder = mega.ui.header.domNode.querySelector('.fm-header-buttons');
+                if (ps && !(ps.scrollTop !== 0 && !M.search)) {
+                    // Scrolled back up. Place back and hide.
+                    holder.parentNode.classList.add('contract');
+                    holder.parentNode.classList.remove('expand');
+                    this.domNode.querySelector('.fm-card-holder').before(holder);
+                    holder = this.actionsHolder;
+                    holder.classList.add('open');
+                    holder.classList.remove('collapse');
+                    startedScrolling = false;
+                }
+            }
+            for (const child of holder.children) {
                 child.classList.add('hidden');
                 child.classList.remove('primary', 'secondary');
                 child.id = '';
             }
-            this.actionsHolder.classList.add('hidden');
+            holder.classList.add('hidden');
         },
         showCard(nodeHandle, primaryButton, secondaryButton, onContextMenu) {
             this.hideCard();
@@ -947,7 +987,7 @@ lazy(mega.ui, 'secondaryNav', () => {
                 nodeHandle,
                 primaryButton,
                 secondaryButton,
-                // onContextMenu,
+                onContextMenu,
             });
         },
         updateCard(handle) {
@@ -1071,16 +1111,19 @@ lazy(mega.ui, 'secondaryNav', () => {
             return false;
         },
         showSelectionBar() {
+            if (!this.filterChipsHolder.classList.contains('hidden')) {
+                this.filterChipsHolder.classList.add('hidden');
+            }
             if (!this.selectionBar.classList.contains('hidden')) {
                 return;
             }
             this.selectionBar.classList.remove('hidden');
-            if (this.filterChipsHolder.classList.contains('hidden')) {
-                filterChipShown = false;
+            if (this.chipsViewsWrapper.classList.contains('hidden')) {
+                this.chipsViewsWrapper.classList.remove('hidden');
+                chipsViewWrapShown = false;
             }
             else {
-                this.filterChipsHolder.classList.add('hidden');
-                filterChipShown = true;
+                chipsViewWrapShown = true;
             }
             if (M.gallery) {
                 this.selectionBar.classList.add('gallery-pad');
@@ -1102,26 +1145,149 @@ lazy(mega.ui, 'secondaryNav', () => {
             this.selectionBar.classList.add('hidden');
             this.selectionBar.classList.remove('gallery-pad');
             if (M.gallery) {
-                filterChipShown = false;
                 const media = document.getElementById('media-section-controls');
                 if (media) {
                     media.classList.remove('hidden');
                 }
             }
-            if (filterChipShown) {
+            if (mega.ui.mNodeFilter.viewEnabled) {
                 this.filterChipsHolder.classList.remove('hidden');
             }
+            if (!chipsViewWrapShown) {
+                this.chipsViewsWrapper.classList.add('hidden');
+            }
+            this.chipsViewsWrapper.classList.remove('top-spacer');
             if (M.onDeviceCenter && dcChipShown) {
                 mega.devices.ui.filterChipUtils.resetSelections(true);
             }
         },
         onPageChange() {
-            filterChipShown = false;
             dcChipShown = false;
+            chipsViewWrapShown = true;
             if (window.selectionManager) {
                 // selectionManager should eventually reset but this needs to be empty now for some context menu updates
                 selectionManager.selected_list = [];
             }
+            if (scrollHandler) {
+                scrollHandler.target.removeEventListener('scroll', scrollHandler.handler);
+                scrollHandler = false;
+            }
+            if (!this.actionsHolder) {
+                const buttons = mega.ui.header.domNode.querySelector('.fm-header-buttons');
+                buttons.parentNode.classList.remove('expand');
+                this.domNode.querySelector('.fm-card-holder')
+                    .before(buttons);
+                this.actionsHolder.classList.add('open', 'hidden');
+                this.actionsHolder.classList.remove('collapse');
+            }
+            if (moveUpTimer) {
+                moveUpTimer.abort();
+                moveUpTimer = false;
+            }
+        },
+        bindScrollEvents(ps) {
+            ps = ps || document.querySelector('.fm-right-files-block .ps:not(.breadcrumb-dropdown)');
+            startedScrolling = false;
+            if (!ps) {
+                return true;
+            }
+            if (scrollHandler) {
+                scrollHandler.target.removeEventListener('scroll', scrollHandler.handler);
+            }
+            scrollHandler = {
+                handler: (e) => {
+                    if (!e.isTrusted) {
+                        return;
+                    }
+                    const { offsetHeight, scrollHeight } = ps;
+                    if (
+                        !startedScrolling &&
+                        scrollHeight - offsetHeight <= this.actionsHolder.getBoundingClientRect().height
+                    ) {
+                        // Don't animate if it might just bounce back up again with the new space.
+                        return;
+                    }
+                    if (e.target.scrollTop === 0) {
+                        // Scroll up animation
+                        // 1) Swap expand for contract in the header
+                        // 2) Move DOM node to secondary nav
+                        // 3) Ensure open over collapse on secondary nav
+                        if (moveUpTimer) {
+                            moveUpTimer.abort();
+                            moveUpTimer = false;
+                            this.actionsHolder.classList.remove('collapse');
+                            this.actionsHolder.classList.add('open');
+                            return;
+                        }
+                        if (!this.actionsHolder) {
+                            const buttons = mega.ui.header.domNode.querySelector('.fm-header-buttons');
+                            buttons.parentNode.classList.add('contract');
+                            buttons.parentNode.classList.remove('expand');
+                        }
+                        requestAnimationFrame(() => {
+                            if (!this.actionsHolder) {
+                                this.domNode.querySelector('.fm-card-holder')
+                                    .before(mega.ui.header.domNode.querySelector('.fm-header-buttons'));
+                            }
+                            this.actionsHolder.classList.add('open');
+                            this.actionsHolder.classList.remove('collapse');
+                            // Force reposition since resize may not always trigger correctly
+                            $.tresizer();
+                            if (mega.ui.menu.name && mega.ui.menu.onResize) {
+                                mega.ui.menu.onResize();
+                            }
+                            startedScrolling = false;
+                        });
+                        return;
+                    }
+                    if (!startedScrolling) {
+                        // Scroll down animation.
+                        // 1) Swap open for collapse in secondary nav
+                        // 2) Move DOM node to header
+                        // 3) Remove collapse and add expand in the header.
+                        this.actionsHolder.classList.add('collapse');
+                        this.actionsHolder.classList.remove('open');
+                        startedScrolling = true;
+                        moveUpTimer = tSleep(0.1);
+                        moveUpTimer.then(() => {
+                            moveUpTimer = false;
+                            const actions = mega.ui.header.domNode.querySelector('.nav-secondary-actions');
+                            actions.appendChild(this.actionsHolder);
+                            actions.classList.remove('hidden');
+                            actions.firstElementChild.classList.remove('collapse');
+                            actions.classList.add('expand');
+                            actions.classList.remove('contract');
+                            // Force reposition since resize may not always trigger correctly
+                            $.tresizer();
+                            if (mega.ui.menu.name && mega.ui.menu.onResize) {
+                                mega.ui.menu.onResize();
+                            }
+                        });
+                    }
+                },
+                target: ps,
+            };
+            ps.addEventListener('scroll', scrollHandler.handler);
+            if (ps.scrollTop === 0) {
+                return true;
+            }
+            if (this.actionsHolder) {
+                this.actionsHolder.classList.remove('open');
+                const actions = mega.ui.header.domNode.querySelector('.nav-secondary-actions');
+                actions.appendChild(this.actionsHolder);
+                actions.classList.remove('hidden');
+                actions.classList.add('expand');
+                actions.classList.remove('contract');
+            }
+            startedScrolling = true;
+            return false;
+        },
+        updateInfoChipsAndViews(hide) {
+            if (hide) {
+                this.chipsViewsWrapper.classList.add('hidden');
+                return;
+            }
+            this.chipsViewsWrapper.classList.remove('hidden');
         },
         showBanner(options) {
             // @todo migrate the banner component to be available here
@@ -1184,14 +1350,12 @@ lazy(mega.ui, 'secondaryNav', () => {
                 return;
             }
             this.filterChipsHolder.classList.add('hidden');
-            filterChipShown = false;
         },
         extShowFilterChip() {
             if ($.selected && $.selected.length) {
                 return;
             }
             this.filterChipsHolder.classList.remove('hidden');
-            filterChipShown = false;
         }
     };
 });

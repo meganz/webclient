@@ -564,14 +564,14 @@ mBroadcaster.once('boot_done', () => {
                     fmRightFileBlock.classList.add('emptied');
                 }
 
-                if (M.RubbishID && M.currentdirid === M.RubbishID) {
-                    $('.fm-empty-trashbin').removeClass('hidden');
-                    mega.ui.secondaryNav.hideActionButtons();
-                }
-                else if (String(M.currentdirid).substr(0, 7) === 'search/'
+                if (String(M.currentdirid).substr(0, 7) === 'search/'
                         || mega.ui.mNodeFilter.selectedFilters.value
                         && M.currentrootid !== 'shares') {
                     $('.fm-empty-search').removeClass('hidden');
+                }
+                else if (M.RubbishID && M.currentdirid === M.RubbishID) {
+                    $('.fm-empty-trashbin').removeClass('hidden');
+                    mega.ui.secondaryNav.hideActionButtons();
                 }
                 else if (M.currentdirid === M.RootID && folderlink) {
                     // FIXME: implement
@@ -595,6 +595,10 @@ mBroadcaster.once('boot_done', () => {
                     else if (M.currentrootid) {
                         onIdle(() => {
                             if (!M.v.length) {
+                                if (M.onMediaView) {
+                                    $('.gallery-view', '.fm-right-files-block').addClass('hidden');
+                                }
+
                                 mega.ui.empty.folder();
                             }
                         });
@@ -632,12 +636,6 @@ mBroadcaster.once('boot_done', () => {
                     else {
                         M.emptySharefolderUI(aListSelector);
                     }
-                }
-                else if (M.isGalleryPage()) {
-                    const pagetype = M.currentdirid === M.currentCustomView.nodeID ? M.currentdirid : 'discovery';
-
-                    $(`.fm-empty-${pagetype}`).removeClass('hidden');
-                    $('.gallery-view').addClass('hidden');
                 }
                 else if (M.isDynPage(M.currentdirid)) {
                     if (d > 2) {

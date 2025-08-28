@@ -100,7 +100,9 @@ MegaData.prototype.getNodeSourceRoot = function(h, isSearch, isTree) {
     'use strict';
 
     let sourceRoot = isTree || isSearch || M.currentdirid === 'recents'
-        || M.currentdirid === 'public-links' || M.currentdirid === 'out-shares'
+        || M.currentdirid === 'public-links' ||
+        M.currentrootid === 'public-links' && h && M.su[h] && M.su[h].has('EXP') ||
+        M.currentdirid === 'out-shares' || M.currentrootid === 'out-shares' && h && M.su[h] && M.isOutShare(h, 'EXP')
         || M.onDeviceCenter
             && mega.devices.ui.getRenderSection() === 'cloud-drive'
         ? M.getNodeRoot(h) : M.currentrootid;
@@ -111,22 +113,23 @@ MegaData.prototype.getNodeSourceRoot = function(h, isSearch, isTree) {
 
     return sourceRoot;
 };
+
 MegaData.prototype.getSelectedSourceRoot = function(isSearch, isTree) {
     'use strict';
 
     return this.getNodeSourceRoot($.selected[0], isSearch, isTree);
 };
-
-MegaData.prototype.checkSendToChat = function(isSearch, sourceRoot) {
+MegaData.prototype.checkSendToChat = function(isSearch, sourceRoot, nodes) {
     'use strict';
 
+    nodes = Array.isArray(nodes) ? nodes : $.selected;
     // view send to chat if all selected items are files
-    if (!folderlink && window.megaChatIsReady && $.selected.length) {
+    if (!folderlink && window.megaChatIsReady && nodes.length) {
 
-        for (let i = $.selected.length; i--;) {
+        for (let i = nodes.length; i--;) {
 
-            let n = M.d[$.selected[i]];
-            const nRoot = isSearch ? n && n.u === u_handle && M.getNodeRoot($.selected[i]) : sourceRoot;
+            const n = M.d[nodes[i]];
+            const nRoot = isSearch ? n && n.u === u_handle && M.getNodeRoot(nodes[i]) : sourceRoot;
 
             if (!n || n.h === M.RootID || n.t && (nRoot !== M.RootID && nRoot !== M.InboxID &&
                 nRoot !== 's4' && nRoot !== mega.devices.rootId && !M.isDynPage(nRoot) && nRoot !== 'out-shares') ||
@@ -250,9 +253,7 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
                                     : ':not(.file-request-page)';
                         }
 
-                        if (!isHeaderContext) {
-                            items[`.file-request-manage${fileRequestPageClass}`] = 1;
-                        }
+                        items[`.file-request-manage${fileRequestPageClass}`] = 1;
                         items[`.file-request-copy-link${fileRequestPageClass}`] = 1;
                         items[`.file-request-remove${fileRequestPageClass}`] = 1;
                     }
@@ -698,19 +699,7 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
 
     if (isHeaderContext) {
         delete items['.open-item'];
-        if (sourceRoot === 'shares') {
-            delete items['.download-item'];
-            delete items['.download-standart-item'];
-            delete items['.zipdownload-item'];
-        }
-        if (sourceRoot === 's4') {
-            delete items['.settings-item'];
-        }
-        if (sourceRoot === 'out-shares' && this.isOutShare(selNode, 'EXP')) {
-            items['.removeshare-item'] = 1;
-        }
         if (M.currentrootid === 'file-requests' && mega.fileRequest.publicFolderExists(selNode.h)) {
-            delete items['.move-item'];
             delete items['.copy-item'];
             delete items['.getlink-item'];
             delete items['.embedcode-item'];
@@ -725,6 +714,13 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
                 delete items['.sh4r1ng-item'];
                 delete items['.transferit-item'];
             }
+        }
+        if (selNode && selNode.t) {
+            // Remove some items that may move the node we are currently in
+            delete items['.move-item'];
+            delete items['.remove-item'];
+            delete items['.revert-item'];
+            delete items['.leaveshare-item'];
         }
     }
 
@@ -750,10 +746,11 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
  * @param {Event} e The event being dispatched
  * @param {Number} ll The type of context menu.
  * @param {String} items Requested items classes, i.e '.properties-item, ...'
+ * @param {Array} [forcedSelection] List of node handles to force as the selection.
  * @returns {boolean|void} For callers to consider event propagation or not
  */
 // eslint-disable-next-line complexity, sonarjs/cognitive-complexity
-MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
+MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items, forcedSelection) {
     "use strict";
 
     let asyncShow = false;
@@ -780,7 +777,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
     let finalItems = [];
 
     const showContextMenu = () => {
-        menuNode = menuNode || mega.ui.contextMenu.show(finalItems);
+        menuNode = menuNode || mega.ui.contextMenu.show(finalItems, forcedSelection);
         // This part of code is also executed when ll == 'undefined'
 
         M.adjustContextMenuPosition(e, menuNode);
@@ -884,6 +881,67 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
     else if (ll === 3) {
         finalItems.push('.download-standart-item', '.zipdownload-item');
     }
+    else if (ll === 4) {
+        forcedSelection = [String(M.currentdirid || '').split('/').pop()];
+        const node = M.getNodeByHandle(forcedSelection[0]);
+        const noSubItems = Object.create(null);
+        const root = M.getNodeSourceRoot(forcedSelection[0]);
+        const cl = new mega.Share.ExportLink();
+        const takenDown = cl.isTakenDown(forcedSelection);
+        if (
+            !folderlink &&
+            (
+                root === M.RootID ||
+                root === 'out-shares' ||
+                root === 'public-links' ||
+                root === 's4' ||
+                M.isDynPage(M.currentrootid) ||
+                root === M.InboxID
+            )
+        ) {
+            noSubItems['.getlink-nosub'] = 1;
+            noSubItems['.share-nosub'] = 1;
+            if (!M.getNodeShareUsers(node).length && !M.ps[node.h]) {
+                const exp = M.getNodeShare(node);
+                if (!exp && !shared.is(node.h)) {
+                    if (mega.fileRequest.publicFolderExists(node.h)) {
+                        noSubItems['.filerequestmanage-nosub'] = 1;
+                    }
+                    else {
+                        noSubItems['.filerequestcreate-nosub'] = 1;
+                    }
+                }
+            }
+        }
+        if (
+            root === 'public-links' && M.checkSendToChat(false, M.getNodeRoot(node.h), forcedSelection) ||
+            M.checkSendToChat(false, root, forcedSelection)
+        ) {
+            noSubItems['.sendchat-nosub'] = 1;
+        }
+
+        if (takenDown) {
+            delete noSubItems['.getlink-nosub'];
+            delete noSubItems['.share-nosub'];
+            delete noSubItems['.sendchat-nosub'];
+        }
+        if (mega.lite.inLiteMode && (M.currentrootid === 'shares' || M.currentrootid === 'out-shares')) {
+            delete noSubItems['.share-nosub'];
+        }
+        if (M.onDeviceCenter) {
+            const { ui } = mega.devices;
+            if (ui.isBackupRelated(forcedSelection)) {
+                delete noSubItems['.filerequestcreate-nosub'];
+                delete noSubItems['.filerequestmanage-nosub'];
+            }
+        }
+        finalItems = Object.keys(noSubItems);
+        if (!finalItems.length) {
+            finalItems.push(takenDown ? '.dispute-item' : '.properties-item');
+        }
+        asyncShow = true;
+        onIdle(showContextMenu);
+    }
     else if (ll === 7) { // Columns selection menu
         if (M && M.columnsWidth && M.columnsWidth.cloud) {
             // Please be aware that have to hide all hyperlink dropdown items that are options in context menu,
@@ -964,6 +1022,10 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
         // In case that id belongs to devices tree
         if (currNodeClass && currNodeClass.contains('device-item')) {
             finalItems = mega.devices.ui.contextMenu();
+            const idx = currNodeClass.contains('fm-header-context') ? finalItems.indexOf('.open-item') : -1;
+            if (idx > -1) {
+                finalItems.splice(idx, 1);
+            }
         }
         else if (currNodeClass && (currNodeClass.contains('cloud-drive') || currNodeClass.contains('folder-link'))) {
             finalItems.push('.properties-item');
@@ -983,7 +1045,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
             else if (mega.rewind) {
                 finalItems.push('.rewind-item');
             }
-            $.selected = [M.RootID];
+            $.selected = currNodeClass.contains('fm-header-context') ? $.selected : [M.RootID];
         }
         else if (currNodeClass && $(e.currentTarget).hasClass('inbox')) {
             $.selected = [M.InboxID];

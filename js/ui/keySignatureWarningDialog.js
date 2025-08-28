@@ -81,15 +81,12 @@
         infoFirstLine = infoFirstLine.replace('%2', '<span class="emailAddress">'
                       + contactEmail + '</span>');
 
-        $dialog = $('.key-signature-warning-dialog');
+        const $dialog = $('.key-signature-warning-dialog');
         $dialog.find('.information .firstLine').html(infoFirstLine);
 
-        var description = l[8436];
-        description = description.replace('%1', '<span class="emailAddress">'
-                      + contactEmail + '</span>');
-        description = description.replace('[A]', '<a href="mailto:support@mega.nz">');
-        description = description.replace('[/A]', '</a>');
-        $dialog.find('.information .description').html(description);
+        $('.information .description', $dialog).safeHTML(
+            l[8436].replace('%1', `<span class="emailAddress">${contactEmail}</span>`)
+        );
 
         // If the avatar exists, show it
         if (typeof avatars[KeySignatureWarningDialog.contactHandle] !== 'undefined') {

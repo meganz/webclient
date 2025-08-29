@@ -1076,8 +1076,12 @@ lazy(mega, 'rewind', () => {
 
             for (let i = 0; i < sortedNodes.length; i++) {
                 const node = mega.rewind.nodeDictionary[sortedNodes[i]];
+
                 if (node) {
-                    if (!timestampInSeconds || node.ts <= timestampInSeconds) {
+                    if (
+                        (!timestampInSeconds || node.ts <= timestampInSeconds)
+                        && (!node.sen || mega.sensitives.showGlobally)
+                    ) {
                         if (node.t && this.isTreeOpen(node.h)) {
                             const result = this.getChildNodes({
                                 selectedHandle: node.h,

@@ -1678,7 +1678,7 @@ function msgDialog(type, title, msg, submsg, callback, checkboxSetting) {
             $('#msgDialog').addClass('error');
         }
     }
-    else if (type === 'confirmationa' || type === 'confirmation' || type === 'remove') {
+    else if (type.startsWith('confirmation') || type === 'remove') {
         if (doneButton === l.ok_button) {
             doneButton = false;
         }
@@ -1729,6 +1729,9 @@ function msgDialog(type, title, msg, submsg, callback, checkboxSetting) {
         else if (type === 'confirmationa') {
             $('#msgDialog').addClass('info');
         }
+        else if (type === 'confirmationb') {
+            $('#msgDialog').addClass('warning');
+        }
         else {
             $('#msgDialog').addClass('confirmation');
         }
@@ -1742,6 +1745,7 @@ function msgDialog(type, title, msg, submsg, callback, checkboxSetting) {
                 || checkboxSetting === 'skipcdtos4'
                 || checkboxSetting === 'skips4tocd'
                 || checkboxSetting === 'skips4tos4'
+                || checkboxSetting === 'skipSenToS4'
                 || checkboxSetting === 'rwReinstate'
                 || checkboxSetting === 'dcPause', checkboxSetting);
 

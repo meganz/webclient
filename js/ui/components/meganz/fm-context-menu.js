@@ -1307,6 +1307,7 @@
                             rightBadge: proOnlyBadge,
                             onClick() {
                                 doSensitive(true);
+                                eventlog(500923, JSON.stringify({ c: $.selected.length }));
                             }
                         },
                         {
@@ -1315,6 +1316,7 @@
                             icon: 'sprite-fm-mono icon-eye-reveal1',
                             onClick() {
                                 doSensitive(false);
+                                eventlog(500924, JSON.stringify({ c: $.selected.length }));
                             }
                         },
                         {

@@ -1334,7 +1334,10 @@ lazy(mega, 'rewindUi', () => {
                 for (const property in childrenNodes) {
                     let node = childrenNodes[property];
 
-                    if (!this.isSameOrAncestor(nodeDictionary, property, selectedHandle)) {
+                    if (
+                        !this.isSameOrAncestor(nodeDictionary, property, selectedHandle)
+                        || (node.sen && !mega.sensitives.showGlobally)
+                    ) {
                         continue;
                     }
 
@@ -2422,6 +2425,10 @@ lazy(mega, 'rewindUi', () => {
             MegaNodeComponent.label.set(node, iconElement);
             template.dataset.id = node.h;
 
+            if (mega.sensitives.isSensitive(node)) {
+                template.classList.add('is-sensitive');
+            }
+
             // SAT-1023
             /*
             const selectStatus = this.selectedNodes[node.h];
@@ -2625,6 +2632,10 @@ lazy(mega, 'rewindUi', () => {
             nameElement.textContent = node.name;
             iconElement.classList.add(`icon-${fileIcon(node)}-24`);
             template.dataset.id = node.h;
+
+            if (mega.sensitives.isSensitive(node)) {
+                template.classList.add('is-sensitive');
+            }
 
             // SAT-1023
             /*

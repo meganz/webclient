@@ -37,8 +37,11 @@
     font: var(--mobile-font-caption-small-semibold);
     color: var(--mobile-text-primary);
     margin-bottom: 0;
-    max-height: 14px;
     overflow: hidden;
+}
+
+.nav-elem.card i {
+    margin-inline-end: 0;
 }
 
 .nav-elem.card .sub-text {

@@ -1832,7 +1832,7 @@ ChatRoom.prototype._copyNodesToAttach = async function(copy, nmap) {
     let res = [];
     if (copy.length) {
 
-        res = await M.copyNodes(copy, target);
+        res = await M.copyNodes(copy, target, false, false, {targetChatId: this.chatId});
     }
     else if (d) {
 

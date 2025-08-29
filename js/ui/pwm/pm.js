@@ -7,6 +7,8 @@ mega.pm = {
             return;
         }
 
+        n.pitagFrom = 'P';
+
         return M.createFolder(target, name, n);
     },
 

@@ -775,6 +775,96 @@ lazy(MegaData.prototype, 'confirmNodesAtLocation', () => {
     };
 });
 
+/**
+ * Set the Pitag for put request
+ * @param {Object} req - The request object
+ * @param {String} purpose - The purpose of the request
+ * @param {String|Array} [extra] - Extra information for the request,
+ *                                 Import is using it to figure out which type of link it is from,
+ *                                 Upload file using it to pass uploaded file information
+ *                                 Create folder triggered by upload is using for determine how upload triggered
+ *                                 Copy from chat is using it to track which chatroom is copied files from
+ **/
+MegaData.prototype.setPitag = function(req, purpose, extra) {
+
+    "use strict";
+
+    if (req.a !== 'p') {
+        console.error('Invalid request type for setting Pitag, only p is allowed:', req.a);
+        return;
+    }
+
+    let trigger = '.';
+    let pick = '.';
+    let targetTag = M.getNodeRoot(req.t) === 'shares' ? 'i' : 'D';
+    let source = '.';
+
+    const _chatType = cid => {
+
+        if (Array.isArray(cid)) {
+            cid = cid[0];
+        }
+
+        if (cid.length > 11) {
+            cid = cid.split('/')[2];
+        }
+
+        if (cid === u_handle) {
+            return 's';
+        }
+        else if (megaChat) {
+            const chatRoom = megaChat.getChatById(cid);
+            return chatRoom.type === 'private' ? 'c' : 'C';
+        }
+    };
+
+    if (purpose === 'U') {
+
+        if (typeof extra === 'object') {
+            // Upload to Chat
+            if (extra.chatid) {
+                targetTag = _chatType(extra.chatid);
+            }
+
+            trigger = extra.pitagTrigger || 'p';
+            pick = extra.webkitRelativePath || extra.path ? 'F' : 'f';
+        }
+        else { // Folder created by upload
+            pick = 'F';
+            trigger = extra || 'p';
+        }
+    }
+    else if (purpose === 'C') {
+
+        // For copy, we do not track pick and trigger, but only source
+        source = 'D';
+
+        // Copy from Chat is always only single file, so let's just track first item
+        const {h} = req.n[0];
+        const {p} = M.getNodeByHandle(h);
+
+        if (p && p.length === 11) {
+            source = _chatType(p);
+        }
+        else if (M.getNodeRoot(h) === 'shares') {
+            source = 'i';
+        }
+
+        if (extra && extra.targetChatId) {
+            targetTag = _chatType(extra.targetChatId);
+        }
+    }
+    else if (purpose === 'P') {
+        targetTag = '.';
+    }
+    else if (purpose === 'I') {
+        source = extra || 'f';
+    }
+
+    req.p = `${purpose}${trigger}${pick}${targetTag}${source}`;
+};
+
+
 // This function has a special hacky purpose, don't use it if you don't know what it does, use M.copyNodes instead.
 MegaData.prototype.injectNodes = function(nodes, target, callback) {
     'use strict';
@@ -819,9 +909,10 @@ MegaData.prototype.injectNodes = function(nodes, target, callback) {
  * @param {String}      t             Destination node handle
  * @param {Boolean}     [del]         Should we delete the node after copying? (Like a move operation)
  * @param {Array}       [tree]        optional tree from M.getCopyNodes
+ * @param {String|Array} [extra]      Extra information for pitag
  * @returns {Promise} array of node-handles copied.
  */
-MegaData.prototype.copyNodes = async function(cn, t, del, tree) {
+MegaData.prototype.copyNodes = async function(cn, t, del, tree, extra) {
     'use strict';
     const todel = [];
     const contact = String(t).length === 11;
@@ -1003,6 +1094,15 @@ MegaData.prototype.copyNodes = async function(cn, t, del, tree) {
 
         for (const t in targets) {
             const req = {a: 'p', sm: 1, v: 3, t, n: targets[t]};
+
+            let purpose = 'C';
+
+            if (tree._importPart || $.albumImport) {
+                purpose = 'I';
+                extra = $.albumImport ? 'A' : 'F';
+            }
+
+            M.setPitag(req, purpose, extra);
 
             const sn = this.getShareNodesSync(t, null, true);
             if (sn.length) {
@@ -3184,6 +3284,18 @@ MegaData.prototype.createFolder = promisify(function(resolve, reject, target, na
     "use strict";
     var self = this;
     var inflight = self.cfInflightR;
+    const pitag = {};
+
+    if (attrs) {
+        if (attrs.pitagFrom) {
+            pitag.pitagFrom = attrs.pitagFrom;
+            delete attrs.pitagFrom;
+        }
+        if (attrs.pitagTrigger) {
+            pitag.pitagTrigger = attrs.pitagTrigger;
+            delete attrs.pitagTrigger;
+        }
+    }
 
     target = String(target || M.RootID);
 
@@ -3198,7 +3310,7 @@ MegaData.prototype.createFolder = promisify(function(resolve, reject, target, na
         if (name.length) {
             // Iterate through the array of folder names, creating one at a time
             (function next(target, folderName) {
-                self.createFolder(target, folderName)
+                self.createFolder(target, folderName, pitag)
                     .then((folderHandle) => {
                         if (name.length) {
                             next(folderHandle, name.shift());
@@ -3267,6 +3379,9 @@ MegaData.prototype.createFolder = promisify(function(resolve, reject, target, na
         var attr = ab_to_base64(crypto_makeattr(n));
         var key = a32_to_base64(encrypt_key(u_k_aes, n.k));
         var req = {a: 'p', t: target, n: [{h: 'xxxxxxxx', t: 1, a: attr, k: key}], i: requesti};
+
+        M.setPitag(req, pitag.pitagFrom || 'F', pitag.pitagTrigger);
+
         var sn = M.getShareNodesSync(target, null, true);
 
         if (sn.length) {
@@ -3314,11 +3429,11 @@ MegaData.prototype.createFolder = promisify(function(resolve, reject, target, na
  * @param {String} target Node handle where the paths will be created
  * @return {Promise}
  */
-MegaData.prototype.createFolders = promisify(function(resolve, reject, paths, target) {
+MegaData.prototype.createFolders = promisify(function(resolve, reject, paths, target, attrs) {
     'use strict';
     const {mkdir} = factory.require('mkdir');
 
-    return mkdir(target, paths, (t, name) => this.createFolder(t, name)).then(resolve).catch(reject);
+    return mkdir(target, paths, (t, name) => this.createFolder(t, name, attrs)).then(resolve).catch(reject);
 });
 
 // leave incoming share h
@@ -4508,6 +4623,8 @@ MegaData.prototype.bulkFileLinkImport = async function(data, target, verify) {
     }
     req.t = target = target || M.currentdirid;
 
+    M.setPitag(req, 'I');
+
     // eslint-disable-next-line guard-for-in
     for (const ph in links) {
         const n = links[ph];
@@ -4554,6 +4671,8 @@ MegaData.prototype.importFileLink = function importFileLink(ph, key, attr, srcNo
         var _import = function(target) {
             req.n = [n];
             req.t = target;
+
+            M.setPitag(req, 'I');
 
             api.screq(req)
                 .then(resolve)

@@ -165,6 +165,9 @@ lazy(mega.devices.sections, 'folderChildren', () => {
                     this._renderItems(h);
                 }
             }
+            else if (!M.v.length) {
+                this.$empty.removeClass('hidden');
+            }
         }
 
         /**

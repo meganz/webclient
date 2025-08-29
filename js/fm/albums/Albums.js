@@ -444,9 +444,8 @@ lazy(mega.gallery, 'albums', () => {
 
                 if (coverUpdated) {
                     album.cellEl.updateCoverImage();
+                    album.cellEl.hasSensitiveCover = !!mega.sensitives.isSensitive(album.node);
                 }
-
-                album.cellEl.hasSensitiveCover = !!mega.sensitives.isSensitive(album.node);
             }
         });
     };
@@ -843,52 +842,6 @@ lazy(mega.gallery, 'albums', () => {
         }
 
         return prev;
-    };
-
-    /**
-     * Filter album nodes by sensitive attribute
-     * @param {String} albumId Album ID
-     * @returns {void}
-     */
-    const filterSensitiveNodes = (albumId) => {
-        const album = scope.albums.store[albumId];
-        const nodes = [];
-        let coverNode;
-        const ignoreHandles = unwantedHandles();
-        const nodeIsCorrect = n => !!n && !n.fv && !ignoreHandles[n.p];
-
-        if (album.filterFn) {
-            const nodeCandidates = Object.values(M.d);
-
-            for (let i = 0; i < nodeCandidates.length; i++) {
-                const n = nodeCandidates[i];
-
-                if (nodeIsCorrect(n) && album.filterFn(n) && mega.sensitives.shouldShowNode(n)) {
-                    nodes.push(n);
-                }
-            }
-        }
-        else {
-            const eHandles = Object.keys(album.eHandles);
-            const coverHandle = album.at.c ? album.eIds[album.at.c] : false;
-
-            for (let i = 0; i < eHandles.length; i++) {
-                const n = M.d[eHandles[i]];
-
-                if (nodeIsCorrect(n) && mega.sensitives.shouldShowNode(n)) {
-                    nodes.push(n);
-
-                    if (!coverNode && coverHandle && n.h === coverHandle) {
-                        coverNode = n;
-                    }
-                }
-            }
-        }
-
-        album.nodes = nodes;
-        sortInAlbumNodes(album.nodes);
-
-        album.node = coverNode || nodes[0];
     };
 
     class AlbumsSelectionManager extends SelectionManager2_DOM {
@@ -2886,6 +2839,7 @@ lazy(mega.gallery, 'albums', () => {
                     {
                         text: l.add_album_items,
                         icon: 'sprite-fm-mono icon-plus-light-solid',
+                        componentClassname: 'add-album-items',
                         onClick: () => {
                             if (M.isInvalidUserStatus()) {
                                 return;
@@ -3089,6 +3043,14 @@ lazy(mega.gallery, 'albums', () => {
             else {
                 this.updateGridState(0, false);
                 this.addEmptyBlock(new NoMediaForAlbums());
+
+                onIdle(() => {
+                    const addBtn = document.querySelector('.fm-item-actions-block button.add-album-items');
+
+                    if (addBtn) {
+                        addBtn.classList.add('hidden');
+                    }
+                });
             }
         }
 
@@ -3680,13 +3642,6 @@ lazy(mega.gallery, 'albums', () => {
             this.el.removeChild(album.cellEl.el);
         }
 
-        resetCoverOnSensitiveChange(albumId) {
-            filterSensitiveNodes(albumId);
-            const { nodes, node } = scope.albums.store[albumId];
-
-            debouncedAlbumCellUpdate(albumId, false, node || nodes[0]);
-        }
-
         updateInAlbumSensitives() {
             const albumId = mega.gallery.getAlbumIdFromPath();
             delay(`album:update_items_sensitive:${albumId}`, () => {
@@ -3968,6 +3923,8 @@ lazy(mega.gallery, 'albums', () => {
             if (!isAlbums) {
                 return;
             }
+
+            loadingDialog.show('MegaGallery');
 
             pendingName = '';
             const availableNodes = await mega.gallery.initialiseMediaNodes();
@@ -4563,20 +4520,20 @@ lazy(mega.gallery, 'albums', () => {
                 return;
             }
 
-            let nodes = [];
-
-            if ($.timelineDialog instanceof AlbumItemsDialog) {
-                const galleryNodes = $.timelineDialog.updateGalleryNodes();
-                const activeTab = $.timelineDialog.nav ? $.timelineDialog.nav.activeTab : 0;
-                const list = activeTab === 1 ? galleryNodes.cd
-                    : activeTab === 2 ? galleryNodes.cu : galleryNodes.all;
-                nodes = list.filter(mega.sensitives.shouldShowNode);
-            }
-            else if ($.timelineDialog instanceof AlbumCoverDialog) {
-                nodes = scope.albums.store[$.timelineDialog.albumId].nodes;
-            }
-
             delay('timeline_dialog:update_items', () => {
+                let nodes = [];
+
+                if ($.timelineDialog instanceof AlbumItemsDialog) {
+                    const galleryNodes = $.timelineDialog.updateGalleryNodes();
+                    const activeTab = $.timelineDialog.nav ? $.timelineDialog.nav.activeTab : 0;
+                    const list = activeTab === 1 ? galleryNodes.cd
+                        : activeTab === 2 ? galleryNodes.cu : galleryNodes.all;
+                    nodes = list.filter(mega.sensitives.shouldShowNode);
+                }
+                else if ($.timelineDialog instanceof AlbumCoverDialog) {
+                    nodes = scope.albums.store[$.timelineDialog.albumId].nodes;
+                }
+
                 timeline.nodes = nodes;
             });
         }

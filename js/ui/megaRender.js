@@ -1264,7 +1264,7 @@ mBroadcaster.once('boot_done', () => {
                         elm.dataset.simpletip = l[5872];
                     }
                 }
-                if (mega.sensitives.shouldBlurNode(aNode)) {
+                if (!folderlink && mega.sensitives.shouldBlurNode(aNode)) {
                     aTemplate.classList.add('is-sensitive');
                 }
 

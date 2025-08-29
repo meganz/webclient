@@ -121,7 +121,7 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
 
             this._sensitive = status;
 
-            if (status) {
+            if (status && !folderlink) {
                 this.el.classList.add('is-sensitive');
             }
             else {
@@ -1228,7 +1228,8 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
          */
         getCachedCell(node) {
             if (this.cellCache[node.h]) {
-                this.cellCache[node.h].isSensitive = !!mega.sensitives.isSensitive(node);
+                this.cellCache[node.h].isSensitive = this.cellCache[node.h].isSensitive
+                    || !!mega.sensitives.isSensitive(node);
             }
             else {
                 this.cellCache[node.h] = new AlbumTimelineCell({

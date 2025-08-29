@@ -2916,6 +2916,15 @@
                                         }
                                     }).catch(dump);
                                 };
+
+                                const toUnhide = section === 's4' && mega.sensitives.featureEnabled
+                                    ? res.filter(h => M.d[h].sen)
+                                    : [];
+
+                                if (toUnhide.length) {
+                                    mega.sensitives.toggleStatus(toUnhide, false);
+                                }
+
                                 showToast();
                             }
                         })

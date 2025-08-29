@@ -2785,6 +2785,10 @@ accountUI.fileManagement = {
 
                         mega.config.setn('showSen', val);
                         mega.sensitives.onConfigChange(val);
+
+                        eventlog(500928, JSON.stringify([val | 0]));
+
+                        M.renderTree();
                     });
             }
             else {

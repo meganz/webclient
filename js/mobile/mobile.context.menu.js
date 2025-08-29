@@ -45,7 +45,7 @@ class MegaMobileContextMenu extends MegaComponentGroup {
 
             tappableListItem.on('tap', (megaDataEvent, touchEvent) => {
                 this.sheet.hide();
-                item.onClick(this.handle, touchEvent);
+                item.onClick(this.handle, touchEvent || megaDataEvent);
 
                 return false;
             });

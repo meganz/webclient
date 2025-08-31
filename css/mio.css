@@ -47,6 +47,11 @@
     --color-secondary-cobalt-900: #00174C;
 
     --color-system-error: #E40046;
+
+    --color-discount-primary-bg: #FCE8E6;
+    --color-discount-primary-text: #DD1405;
+    --color-discount-secondary-bg: #F5F9FF;
+    --color-discount-secondary-text: #303233;
 }
 
 /* dark theme */
@@ -81,6 +86,12 @@
     --color-secondary-cobalt-900: #D9E1F5;
 
     --color-system-error: #F5828B;
+
+    --color-discount-primary-bg: #B72C1C;
+    --color-discount-primary-text: #F8F8F9;
+    --color-discount-secondary-bg: #00174C;
+    --color-discount-secondary-text: #F8F8F9;
+
 }
 
 /* endregion */

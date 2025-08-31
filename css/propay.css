@@ -461,7 +461,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 40px;
+    min-height: 22px;
+    padding: 8px;
     font: var(--text-copy-medium-bold-pricing);
     background-color: var(--color-primary-red-500);
     color: var(--text-color-white-high);
@@ -469,6 +470,10 @@
     border-start-end-radius: 16px;
     border-end-start-radius: 0;
     border-end-end-radius: 0;
+}
+#propay .right-block .plan-card .discount-header.annual-discount {
+    background-color: #E4E4E5;
+    color: var(--color-discount-secondary-text);
 }
 #propay .right-block .plan-card .plan-name {
     font: var(--text-h5-pricing);

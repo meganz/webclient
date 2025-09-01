@@ -848,6 +848,19 @@ lazy(mega.ui, 'secondaryNav', () => {
         get chipsViewsWrapper() {
             return this.domNode.querySelector('.fm-header-chips-and-view-buttons');
         },
+        get ps() {
+            if (M.onDeviceCenter) {
+                const config = {
+                    'device-centre-devices': 'devices',
+                    'device-centre-folders': 'folders'
+                };
+                const renderSection = mega.devices.ui.getRenderSection();
+                if (config[renderSection]) {
+                    return document.querySelector(`.fm-right-files-block .ps.${config[renderSection]}`);
+                }
+            }
+            return document.querySelector('.fm-right-files-block .ps:not(.breadcrumb-dropdown)');
+        },
         openNewMenu(ev) {
             if (
                 M.InboxID &&
@@ -965,7 +978,7 @@ lazy(mega.ui, 'secondaryNav', () => {
         hideActionButtons() {
             let holder = this.actionsHolder;
             if (!holder) {
-                const ps = document.querySelector('.fm-right-files-block .ps:not(.breadcrumb-dropdown)');
+                const {ps} = this;
                 holder = mega.ui.header.domNode.querySelector('.fm-header-buttons');
                 if (ps && !(ps.scrollTop !== 0 && !M.search)) {
                     // Scrolled back up. Place back and hide.
@@ -1191,7 +1204,7 @@ lazy(mega.ui, 'secondaryNav', () => {
             }
         },
         bindScrollEvents(ps) {
-            ps = ps || document.querySelector('.fm-right-files-block .ps:not(.breadcrumb-dropdown)');
+            ps = ps || this.ps;
             startedScrolling = false;
             if (!ps) {
                 return true;

@@ -359,16 +359,14 @@ lazy(s4, 'utils', () => {
                     message = l[`s4_warn_${ action }_items_to_bucket${ suffix }`];
                 }
             }
-            // From Object storage to Cloud drive
-            else {
+            // Move From Object storage to Cloud drive
+            else if (action === 'move') {
                 cfgName = 'skips4tocd';
 
                 // Move Buckets to Cloud drive
                 if (type === 'bucket') {
-                    if (action === 'move') {
-                        title = l[`s4_title_${ action }_bucket_to_cd${ suffix }`];
-                        message = l[`s4_warn_copy_move_bucket_to_cd${ suffix }`];
-                    }
+                    title = l[`s4_title_${ action }_bucket_to_cd${ suffix }`];
+                    message = l[`s4_warn_copy_move_bucket_to_cd${ suffix }`];
                 }
                 // Objects or sub-folders to Cloud drive
                 else if ((type === 'object' || type === 'bucket-child') && s4Nodes.length === 1) {

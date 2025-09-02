@@ -928,11 +928,14 @@ lazy(mega.ui, 'secondaryNav', () => {
                 }
                 return;
             }
-            MegaButton.factory({
+            const button = new MegaButton({
                 parentNode: this.actionsHolder,
                 ...options,
                 componentClassname: `${options.componentClassname} hidden`,
             });
+            if (options.title) {
+                button.domNode.title = options.title;
+            }
         },
         showActionButtons(...selectors) {
             const holder = this.actionsHolder || mega.ui.header.domNode.querySelector('.fm-header-buttons');

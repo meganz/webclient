@@ -1003,6 +1003,7 @@ FileManager.prototype.initFileManagerUI = function() {
         prepend: true,
         icon: 'sprite-fm-mono icon-folder-plus-thin-outline',
         text: l[68],
+        title: l[68],
         onClick: () => {
             eventlog(500007);
             createFolderDialog();
@@ -1013,6 +1014,7 @@ FileManager.prototype.initFileManagerUI = function() {
         prepend: true,
         icon: 'sprite-fm-mono icon-arrow-up-thin-outline',
         text: l[372],
+        title: l[372],
         onClick(ev) {
             if (this.active) {
                 return;
@@ -1026,6 +1028,7 @@ FileManager.prototype.initFileManagerUI = function() {
         componentClassname: 'fm-manage-link hidden',
         icon: 'sprite-fm-mono icon-link-thin-outline',
         text: l[6909],
+        title: l[6909],
         onClick: () => {
             const id = M.currentdirid.split('/').pop();
             if (!id) {
@@ -1041,6 +1044,7 @@ FileManager.prototype.initFileManagerUI = function() {
         componentClassname: 'fm-manage-file-request hidden',
         icon: 'sprite-fm-mono icon-folder-arrow-02-thin-outline',
         text: l.file_request_dropdown_manage,
+        title: l.file_request_dropdown_manage,
         onClick: () => {
             const h = M.currentdirid.split('/').pop();
             if (M.isInvalidUserStatus() || !h) {

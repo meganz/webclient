@@ -2839,7 +2839,7 @@ lazy(mega.gallery, 'albums', () => {
                     {
                         text: l.add_album_items,
                         icon: 'sprite-fm-mono icon-plus-light-solid',
-                        componentClassname: 'add-album-items',
+                        componentClassname: `add-album-items${(M.v.length ? '' : ' hidden')}`,
                         onClick: () => {
                             if (M.isInvalidUserStatus()) {
                                 return;
@@ -3043,14 +3043,6 @@ lazy(mega.gallery, 'albums', () => {
             else {
                 this.updateGridState(0, false);
                 this.addEmptyBlock(new NoMediaForAlbums());
-
-                onIdle(() => {
-                    const addBtn = document.querySelector('.fm-item-actions-block button.add-album-items');
-
-                    if (addBtn) {
-                        addBtn.classList.add('hidden');
-                    }
-                });
             }
         }
 

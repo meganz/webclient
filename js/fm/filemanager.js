@@ -1518,6 +1518,10 @@ FileManager.prototype.updFileManagerUI = async function() {
         delay(`updFileManagerUI:buildtree:${n.h}`, () => {
             this.buildtree(n, this.buildtree.FORCE_REBUILD);
             this.addTreeUIDelayed();
+
+            if ($.dialog === 'copy' || $.dialog === 'move') {
+                refreshDialogContent();
+            }
         }, 2600);
     };
 

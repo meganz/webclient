@@ -4099,6 +4099,12 @@ MegaData.prototype.nodeRemovalUIRefresh = function(handle, parent) {
             delay('redraw-tree', () => promise.then(() => this.redrawTree()));
         }, 90);
     }
+
+    delay(`refresh-dialog-content:${handle}`, () => {
+        if ($.dialog === 'move' || $.dialog === 'copy') {
+            refreshDialogContent();
+        }
+    }, 90);
 };
 
 /**

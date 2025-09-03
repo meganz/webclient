@@ -803,6 +803,7 @@ MegaData.prototype.showPlanExpiringBanner = async function(data) {
         ctaHref: `/propay_${slevel}`,
         ctaEvent: 500863,
         closeEvent: 500862,
+        closeBtn: true
     };
 
     if (mega.bstrg < account.cstrg) {
@@ -815,13 +816,7 @@ MegaData.prototype.showPlanExpiringBanner = async function(data) {
     }
 
     if (is_mobile) {
-        const banner = mobile.banner.show(
-            options.title,
-            options.msgHtml ? parseHTML(options.msgHtml) : options.msgText,
-            options.ctaText,
-            options.type,
-            true
-        );
+        const banner = mobile.banner.show(options);
         banner.on('cta', () => {
             loadSubPage(options.ctaHref);
             eventlog(options.ctaEvent);
@@ -888,6 +883,7 @@ MegaData.prototype.showPaymentFailedBanner = async function() {
 
     const options = {
         type: 'error',
+        closeBtn: true
     };
     const planName = pro.getProPlanName(lastShow.al);
     if (isCancelled) {
@@ -918,13 +914,7 @@ MegaData.prototype.showPaymentFailedBanner = async function() {
     }
 
     if (is_mobile) {
-        const banner = mobile.banner.show(
-            options.title,
-            options.msgHtml ? parseHTML(options.msgHtml) : options.msgText,
-            options.ctaText,
-            options.type,
-            true
-        );
+        const banner = mobile.banner.show(options);
         banner.on('cta', () => {
             loadSubPage(options.ctaHref);
             eventlog(options.ctaEvent);
@@ -941,14 +931,19 @@ MegaData.prototype.showPlanExpiredBanner = async function(data) {
     'use strict';
 
     const { slevel } = data;
+    const options = {
+        type: 'error',
+        title: l.plan_ended_banner_title.replace('%s', pro.getProPlanName(slevel)),
+        msgText: l.plan_ended_banner_text,
+        ctaHref: `/propay_${slevel}`,
+        ctaText: l.upgrade_now,
+        ctaEvent: 500869,
+        closeEvent: 500868,
+        closeBtn: true
+    };
+
     if (is_mobile) {
-        const banner = mobile.banner.show(
-            l.plan_ended_banner_title.replace('%s', pro.getProPlanName(slevel)),
-            l.plan_ended_banner_text,
-            l.upgrade_now,
-            'error',
-            true
-        );
+        const banner = mobile.banner.show(options);
         banner.on('cta', () => {
             loadSubPage(`propay_${slevel}`);
             eventlog(500869);
@@ -957,27 +952,21 @@ MegaData.prototype.showPlanExpiredBanner = async function(data) {
         banner.addClass('payment-banner');
         return;
     }
-    mega.ui.secondaryNav.showBanner({
-        type: 'error',
-        title: l.plan_ended_banner_title.replace('%s', pro.getProPlanName(slevel)),
-        msgText: l.plan_ended_banner_text,
-        ctaHref: `/propay_${slevel}`,
-        ctaText: l.upgrade_now,
-        ctaEvent: 500869,
-        closeEvent: 500868,
-    });
+    mega.ui.secondaryNav.showBanner(options);
 };
 
 MegaData.prototype.showPaymentCardBanner = function(status) {
     'use strict';
 
-    const $banner = $('.fm-notification-block.payment-card-status')
-        .removeClass('payment-card-almost-expired payment-card-expired visible');
+    const $banner = $('.fm-notification-block.payment-card-status').removeClass('visible');
+    const $cmp = $('.mega-component.banner', $banner).removeClass('warning error');
+
     if (!status) {
         return;
     }
 
-    $('.notification-block-icon', $banner)
+    $cmp.addClass(status === 'exp' ? 'error' : 'warning');
+    $('.mega-component.banner > i', $banner)
         .removeClass('icon-alert-triangle-thin-outline icon-alert-circle-thin-outline')
         .addClass(`icon-alert-${status === 'exp' ? 'triangle' : 'circle'}-thin-outline`);
 
@@ -1016,11 +1005,99 @@ MegaData.prototype.showPaymentCardBanner = function(status) {
 
     $('a', $banner).rebind('click', loadSubPage.bind(null, 'fm/account/plan/account-card-info'));
 
-    $banner.addClass(`visible ${isExpiredClassName}`);
-    $('.banner-title', $banner).text(bannerTitle);
-    $('.banner-txt', $banner).text(bannerDialog);
+    // @todo: Use mega.ui.secondaryNav.showBanner instead
+    $banner.addClass('visible');
+    $('.title-text', $banner).text(bannerTitle);
+    $('.message-text', $banner).text(bannerDialog);
 };
 
+/**
+ * Show/hide Converted to free account banner
+ * @param {Boolean} hide Hide banner if true
+ * @returns {void} void
+ */
+MegaData.prototype.convertedToFreeBanner = function(hide) {
+    'use strict';
+
+    const pl = self.u_attr && (u_attr.p || u_attr.b || u_attr.pf);
+    const st = sessionStorage.cnv2free;
+    let cfg = fmconfig.cnv2free;
+
+    // Hide banner, remove config, sessionStorage data
+    if (hide || pl || st === '3' || !st && cfg === undefined) {
+        mega.config.remove('cnv2free');
+        delete sessionStorage.cnv2free;
+
+        // Hide
+        if (is_mobile && mobile.banner) {
+            mobile.banner.hide('cnv2freeBanner');
+            return false;
+        }
+        mega.ui.secondaryNav.hideBanner('cnv2freeBanner');
+        return false;
+    }
+
+    // Save config if successfully converted
+    if (st) {
+        cfg = parseInt(st) || 0;
+        mega.config.set('cnv2free', cfg);
+        delete sessionStorage.cnv2free;
+    }
+
+    const options = {
+        name: 'cnv2freeBanner',
+        title: l.bn_reverted_pf_title,
+        msgText: cfg === 1 ? l.bn_reverted_pf_s4_text : l.bn_reverted_pf_text,
+        type: 'success',
+        ctaText: l[433],
+        ctaHref: `/pro`,
+        onClose: () => {
+            mega.config.remove('cnv2free');
+            sessionStorage.cnv2free = 3;
+        }
+    };
+
+    if (is_mobile) {
+        if (!mobile.banner) {
+            MegaMobileBanner.init();
+        }
+        const banner = mobile.banner.show(options);
+        banner.on('cta', () => loadSubPage(options.ctaHref));
+        banner.on('close', options.onClose);
+        return;
+    }
+    mega.ui.secondaryNav.showBanner(options);
+};
+
+/**
+ * Show/hide Rubbish schedule banner
+ * @returns {void} void
+ */
+MegaData.prototype.rubbishScheduleBanner = function() {
+    'use strict';
+
+    const $banner = $('.fm-notification-block.rubbish-schedule', '.fmholder')
+        .removeClass('visible');
+
+    if (this.currentrootid === this.RubbishID && u_attr && u_attr.flags.ssrs > 0) {
+
+        if (!this.account) {
+            return this.accountData(() => {
+                if (!this.account) {
+                    return false;
+                }
+                this.rubbishScheduleBanner();
+            });
+        }
+
+        if (this.account.ssrs) {
+            $('.message-text', $banner).text(
+                mega.icu.format(l.bn_rubbish_schedule_text, this.account.ssrs)
+            );
+            $banner.addClass('visible');
+        }
+    }
+};
 
 /**
  * Show storage overquota dialog
@@ -1044,13 +1121,16 @@ MegaData.prototype.showOverStorageQuota = async function(quota, options) {
     var $strgdlgBodyFull = $('.fm-dialog-body.storage-dialog.full', $strgdlg).removeClass('odq');
     var $strgdlgBodyAFull = $('.fm-dialog-body.storage-dialog.almost-full', $strgdlg);
 
-    var prevState = $('.pm-main').is('.almost-full, .full');
+    const $pmMain = $('.pm-main', '.main-layout');
+    const prevState = $pmMain.is('.almost-full, .full');
     $('.pm-main').removeClass('fm-notification almost-full full');
     var $odqWarn = $('.odq-warning', $strgdlgBodyFull).addClass('hidden');
     var $upgradeBtn = $('.choose-plan span', $strgdlg).text(l[8696]);
     const $headerFull = $('header h2.full', $strgdlg);
     const $estimatedPriceText = $('.estimated-price-text', $strgdlg);
     const $rubbishBinText = $('.rubbish-text', $strgdlg).toggleClass('hidden', quota === EPAYWALL);
+    const $fBanner = $('.fm-notification-block.full', $pmMain).removeClass('visible');
+    const $afBanner = $('.fm-notification-block.almost-full', $pmMain).removeClass('visible');
 
     let upgradeTo;
     let isEuro;
@@ -1068,7 +1148,7 @@ MegaData.prototype.showOverStorageQuota = async function(quota, options) {
                 });
             });
         }
-        $('.pm-main').addClass('fm-notification full');
+        $pmMain.addClass('fm-notification full');
 
         $strgdlg.addClass('full');
         $('.body-header', $strgdlgBodyFull).text(l[23519]);
@@ -1083,9 +1163,10 @@ MegaData.prototype.showOverStorageQuota = async function(quota, options) {
 
         $('.storage-dialog.body-p', $odqWarn).safeHTML(dlgTexts.dlgFooterText);
 
-        $('.fm-notification-block.full').safeHTML(
-            `<i class="notification-block-icon sprite-fm-mono icon-offline"></i>
-            <span>${dlgTexts.fmBannerText}</span>`);
+        // @todo: Use mega.ui.secondaryNav.showBanner instead
+        $('.title-text', $fBanner).text(l.bn_full_storage_title);
+        $('.message-text', $fBanner).safeHTML(dlgTexts.fmBannerText);
+        $fBanner.addClass('visible');
     }
     else if (quota === -1 || quota && (quota.isFull || quota.isAlmostFull) || options && options.custom) {
         if (quota === -1) {
@@ -1152,13 +1233,15 @@ MegaData.prototype.showOverStorageQuota = async function(quota, options) {
         if (quota.isFull) {
             $strgdlg.addClass('full');
             $('.pm-main').addClass('fm-notification full');
+            $fBanner.addClass('visible');
             $('header h2', $strgdlgBodyFull).text(myOptions.title || l[16302]);
             $('.body-header', $strgdlgBodyFull).safeHTML(myOptions.body || l[16360]);
             $headerFull.text(l.cloud_strg_100_percent_full);
         }
         else if (quota.isAlmostFull || myOptions.custom) {
             if (quota.isAlmostFull) {
-                $('.pm-main').addClass('fm-notification almost-full');
+                $pmMain.addClass('fm-notification almost-full');
+                $afBanner.addClass('visible');
                 if (mega.tpw.initialized && mega.tpw.isWidgetVisibile()) {
                     mega.tpw.showAlmostOverquota();
                 }
@@ -1195,28 +1278,22 @@ MegaData.prototype.showOverStorageQuota = async function(quota, options) {
             $('.chart.data .pecents-txt', $strgdlg).text(strQuotaLimit[0]);
             $('.chart.data .gb-txt', $strgdlg).text(strQuotaLimit[1]);
             $('.chart.body .perc-txt', $strgdlg).text(quota.percent + '%');
-
         }
         else {
             console.error('Huh?');
         }
 
-        $('.fm-notification-block.full')
-            .safeHTML(
-                `<i class="notification-block-icon sprite-fm-mono icon-offline"></i>
-                <span>${l[22667].replace('%1', maxStorage)}</span>`);
-
-        $('.fm-notification-block.almost-full')
-            .safeHTML(
-                `<i class="notification-block-icon sprite-fm-mono icon-offline"></i>
-                <span>${l[22668].replace('%1', maxStorage)}</span>
-                <i class="fm-notification-close sprite-fm-mono icon-close-component"></i>`);
+        // @todo: Use mega.ui.secondaryNav.showBanner instead
+        $('.title-text', $fBanner).text(l.storage_full);
+        $('.message-text', $fBanner).text(l.bn_full_storage_text);
     }
     else {
         if ($strgdlg.is(':visible')) {
             window.closeDialog();
         }
-        $('.pm-main').removeClass('fm-notification almost-full full');
+        $pmMain.removeClass('fm-notification almost-full full');
+        $fBanner.removeClass('visible');
+        $afBanner.removeClass('visible');
 
         promise.reject();
         return promise;
@@ -1260,17 +1337,13 @@ MegaData.prototype.showOverStorageQuota = async function(quota, options) {
 
     $('button.skip', $strgdlg).toggleClass('hidden', upgradeTo === 'min');
 
-    $('.fm-notification-block .fm-notification-close')
-        .rebind('click', (ev) => {
-            const $dupe = $(ev.currentTarget).parent('.duplicated-items-found');
-            if ($dupe.length) {
-                $dupe.removeClass('visible');
-                $.tresizer();
-                return;
-            }
-            $('.pm-main').removeClass('fm-notification almost-full full');
-            $.tresizer();
-        });
+    // @todo: Use mega.ui.secondaryNav.showBanner instead
+    $('.fm-notification-block .end-box button').rebind('click.closeBanners', (ev) => {
+        const $banner = $(ev.currentTarget).closest('.fm-notification-block');
+        $('.pm-main').removeClass($banner.attr('class'));
+        $banner.removeClass('visible');
+        $.tresizer();
+    });
 
     clickURLs();
 
@@ -1353,6 +1426,11 @@ mBroadcaster.addListener('fm:initialized', () => {
         tSleep(4 + Math.random())
             .then(() => u_attr.p ? M.showPlanExpiringBanner() : M.showPaymentFailedBanner())
             .catch(dump);
+
+        // Try showing converted Pro Flexi to Free account
+        if (sessionStorage.cnv2free || fmconfig.cnv2free !== undefined) {
+            queueMicrotask(() => M.convertedToFreeBanner());
+        }
 
         return 0xDEAD;
     }

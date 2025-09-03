@@ -469,6 +469,7 @@ function u_logout(logout) {
         localStorage.removeItem('mInfinity');
         localStorage.removeItem('megaLiteMode');
         delete sessionStorage.buextra;
+        delete sessionStorage.cnv2free;
 
         fminitialized = false;
         if ($.leftPaneResizable) {

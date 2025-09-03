@@ -2384,7 +2384,7 @@ function odqPaywallDialogTexts(user_attr, accountData) {
 
     var dialogText = mega.icu.format(l[23525], totalFiles);
     var dlgFooterText = l[23524];
-    var fmBannerText = l[23534];
+    var fmBannerText = l.bn_odq_text;
 
     if (user_attr.uspw) {
         if (user_attr.uspw.dl) {
@@ -2397,12 +2397,16 @@ function odqPaywallDialogTexts(user_attr, accountData) {
                 return escapeHTML(string)
                     .replace(/\[S]/g, '<span>')
                     .replace(/\[\/S]/g, '</span>')
+                    .replace(/\[B]/g, '<b>')
+                    .replace(/\[\/B]/g, '</b>')
                     .replace(/\[A]/g, '<a href="/pro" class="clickurl">')
                     .replace(/\[\/A]/g, '</a>');
             };
             if (remainDays > 0) {
                 dlgFooterText = sanitiseString(mega.icu.format(l.dialog_exceed_storage_quota, remainDays));
-                fmBannerText = sanitiseString(mega.icu.format(l.fm_banner_exceed_storage_quota, remainDays));
+                fmBannerText = sanitiseString(mega.icu.format(
+                    l.bn_odq_with_count_text, remainDays
+                ));
             }
             else if (remainDays === 0 && remainHours > 0) {
                 dlgFooterText = sanitiseString(mega.icu.format(l.dialog_exceed_storage_quota_hours, remainHours));

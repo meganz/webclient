@@ -2314,110 +2314,9 @@ body.loading .light-overlay {
 .shared-contact-info {
     display: inline-block;
 }
+
 /* End of Out Shares */
 
-/* FM notification */
-.fm-notification-block {
-    align-items: center;
-    background-color: var(--label-red);
-    border-radius: 8px;
-    color: var(--text-color-white-high);
-    display: none;
-    flex-shrink: 0;
-    font: var(--text-body1);
-    overflow: hidden;
-    padding: 4px 8px;
-    position: relative;
-    text-align: start;
-    white-space: normal;
-    transition: 200ms linear;
-    margin-bottom: 4px;
-}
-.fm-notification-block.visible,
-.mega-lite-mode .fm-notification-block.mega-lite-mode-warning {
-    display: flex;
-}
-.fm-notification-block.grace-business {
-    background-color: var(--label-red);
-}
-.fm-notification-block.almost-full,
-.fm-notification-block.payment-card-almost-expired,
-.fm-notification-block.unverified-share,
-.fm-notification-block.mega-lite-mode-warning {
-    background-color: var(--label-orange);
-}
-.fm-notification-block.business-next-tier,
-.fm-notification-block.new-feature-rewind-notification {
-    background-color: var(--label-blue);
-}
-.fm-notification-block.grace-business.visible span span,
-.fm-notification-block.grace-business.visible span a,
-.fm-notification-block.expired-business.visible span span,
-.fm-notification-block.expired-business.visible span a {
-    font-family: var(--text-font-family);
-    font-weight: bold;
-}
-.fm-notification-block .notification-block-icon {
-    --icon-size: 24px;
-    --mask-color: var(--text-color-white-high);
-    margin-inline-end: 12px;
-}
-.fm-notification-block a {
-    color: var(--text-color-white-high);
-    text-decoration: underline;
-    cursor: pointer;
-}
-.fm-notification-block a:hover {
-    text-decoration: none;
-}
-.fm-notification-block:not(.payment-card-status) > a {
-    margin-inline-start: auto;
-}
-.fm-notification-block .fm-notification-close {
-    --icon-size: 24px;
-    --mask-color: var(--text-color-white-high);
-    cursor: pointer;
-    margin-inline-start: auto;
-    z-index: 1;
-}
-.fm-notification-block a + .fm-notification-close {
-    margin-inline-start: 16px;
-}
-.fm-notification.full .visible-notification .fm-notification-block.full,
-.fm-notification.almost-full .visible-notification .fm-notification-block.almost-full {
-    display: flex;
-}
- .fm-notification-block.payment-card-status .payment-banner-content-wrapper{
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-}
-.fm-notification-block.payment-card-status .banner-title{
-    font: var(--text-body1-bold);
-}
-
-.rubbish-bin.visible-notification .fm-notification-block.new-feature-rewind-notification {
-    display: flex;
-}
-
-.rtl .new-feature-rewind-notification {
-    direction: rtl;
-}
-
-.new-feature-rewind-notification {
-    justify-content: space-between;
-    align-items: center;
-}
-
-.new-feature-rewind-notification .learn-more {
-    display: flex;
-    align-items: center;
-}
-
-.new-feature-rewind-notification .learn-more span {
-    margin: 0 8px;
-}
-/* End of FM notification */
 
 /* Ct changes for copy to conversations */
 .mega-dialog .nw-contact-name {
@@ -11480,106 +11379,26 @@ a.underline-offset-4 {
 
 /* End of Tablet devices */
 
+
 /* Temporary banner classes */
+/* @todo: migrate banner component and remove these styles. */
+/* @todo: Use mega.ui.secondaryNav.showBanner instead
+ */
 
-/* @todo migrate banner component and remove these styles. */
+.fm-notification-block,
+.fm-notification.almost-full .fm-notification-block.almost-full,
+.fm-notification.full .fm-notification-block.full {
+    display: none;
+}
 
-.fm-banner-holder .banner-rack {
-    width: 100%;
-    position: relative;
+.fm-notification-block ~ .fm-notification-block {
+    margin-top: 2px;
+}
+
+.fm-notification-block.visible,
+.fm-notification.almost-full .visible-notification .fm-notification-block.almost-full,
+.fm-notification.full .visible-notification .fm-notification-block.full {
     display: flex;
-    justify-content: center;
-    box-sizing: border-box;
-    z-index: 0;
-}
-.fm-banner-holder .banner-rack .rack-slot {
-    max-height: 310px;
-    width: 100%;
-}
-.fm-banner-holder .banner-rack .rack-slot .slot-inner {
-    position: relative;
-    pointer-events: auto;
-    transition: opacity 1s ease-in;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-.fm-banner-holder .mega-component.banner {
-    border: 0;
-    display: flex;
-    flex-flow: row nowrap;
-    align-content: center;
-    align-items: center;
-    justify-content: space-between;
-    box-sizing: border-box;
-    padding: 20px 24px;
-    position: static;
-    top: 0;
-    overflow: hidden;
-    font: var(--mobile-font-caption-large-regular);
-    width: 100%;
-    color: var(--mobile-text-primary);
-}
-.fm-banner-holder .mega-component.banner.warning {
-    background: var(--mobile-notification-warning);
-    --icon-color: var(--mobile-support-warning);
-}
-.fm-banner-holder .mega-component.banner.error {
-    background: var(--mobile-notification-error);
-    --icon-color: var(--mobile-support-error);
-}
-.fm-banner-holder .mega-component.banner .banner.left-icon {
-    align-self: flex-start;
-    --icon-size: 24px;
-    color: var(--icon-color);
-    order: 1;
-}
-.fm-banner-holder .mega-component.banner .content-box {
-    align-items: flex-start;
-    display: flex;
-    flex-flow: column nowrap;
-    flex: 1 1 auto;
-    order: 5;
-    padding: 0 8px;
-}
-.fm-banner-holder .mega-component.banner .title-text {
-    font: var(--mobile-font-copy-semibold);
-    color: var(--mobile-text-primary);
-}
-.fm-banner-holder .mega-component.banner .content-box > * {
-    margin-top: 8px;
-}
-.fm-banner-holder .mega-component.banner .content-box > *:first-child {
-    margin-top: 0;
-}
-.fm-banner-holder .mega-component.banner .message-text {
-    font: var(--mobile-font-caption-large-regular);
-    color: var(--mobile-text-primary);
-}
-.fm-banner-holder .mega-component.banner .message-text a {
-    text-decoration: underline;
-    color: var(--mobile-link-primary);
-    font: var(--mobile-font-caption-large-regular);
-}
-.fm-banner-holder .mega-component.banner .message-text b {
-     font: var(--mobile-font-caption-large-bold);
- }
-.fm-banner-holder .mega-component.banner .nav-elem.action-link .primary-text {
-    font: var(--mobile-font-copy-semibold);
-    text-decoration: underline;
-    color: var(--mobile-link-primary);
-    white-space: nowrap;
-}
-.fm-banner-holder .mega-component.banner .end-box {
-    display: flex;
-    align-items: center;
-    order: 10;
-}
-.fm-banner-holder .mega-component.banner .end-box > * {
-    margin-inline-start: 24px;
-}
-.fm-banner-holder .mega-component.banner .icon-only {
-    cursor: pointer;
 }
 
 /* End temporary banner classes */

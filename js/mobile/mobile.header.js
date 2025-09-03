@@ -212,6 +212,7 @@ class MegaMobileHeader extends MegaComponent {
         title.className = 'heading';
         targetNode.appendChild(title);
 
+
         if (!pfcol) {
             const filterButton = new MegaButton({
                 parentNode: subNode,
@@ -232,6 +233,11 @@ class MegaMobileHeader extends MegaComponent {
                 iconSize: 24
             });
         }
+
+        targetNode = this.domNode;
+        this.secondaryBannerHolder = document.createElement('div');
+        this.secondaryBannerHolder.className = 'block banner-block secondary-banners';
+        targetNode.appendChild(this.secondaryBannerHolder);
 
         const _throttledUpdate = SoonFc(100, this.update.bind(this));
 

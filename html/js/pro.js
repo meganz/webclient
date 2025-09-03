@@ -456,6 +456,9 @@ var pro = {
                 M.account.lastupdate = 0;
             }
 
+            // Hide Converted2Free banner
+            M.convertedToFreeBanner(1);
+
             // Don't show the plan expiry dialog anymore for this session
             alarm.planExpired.lastPayment = null;
             if (is_mobile) {

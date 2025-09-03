@@ -812,9 +812,11 @@ lazy(mega.ui, 'secondaryNav', () => {
         showColumnSelectionMenu,
         handleNodeSelection,
         toggleGridExtraButtons,
+
         get bannerHolder() {
             return document.querySelector('.fm-banner-holder');
         },
+
         get actionsHolder() {
             return this.domNode.querySelector('.fm-header-buttons');
         },
@@ -1289,23 +1291,36 @@ lazy(mega.ui, 'secondaryNav', () => {
             }
             this.chipsViewsWrapper.classList.remove('hidden');
         },
-        showBanner(options) {
+        showBanner(opts) {
             // @todo migrate the banner component to be available here
             const banner = this.bannerHolder.querySelector('.new-banner');
             const icon = banner.querySelector('.banner.left-icon');
-            icon.classList.remove('icon-alert-triangle-thin-outline', 'icon-alert-circle-thin-outline');
-            if (options.type === 'error') {
+            const {
+                name, title, type, msgText, msgHtml, ctaHref, ctaText,
+                ctaEvent, onCtaClick, onClose
+            } = opts;
+
+            this.bannerOpts = { ...opts, banner };
+
+            icon.classList.remove(
+                'icon-alert-triangle-thin-outline', 'icon-alert-circle-thin-outline', 'icon-check-circle-thin-outline'
+            );
+            if (type === 'error') {
                 icon.classList.add('icon-alert-triangle-thin-outline');
             }
-            else if (options.type === 'warning') {
+            else if (type === 'warning') {
                 icon.classList.add('icon-alert-circle-thin-outline');
+            }
+            else if (type === 'success') {
+                icon.classList.add('icon-check-circle-thin-outline');
             }
 
             const titleText = banner.querySelector('.banner.title-text');
             const messageText = banner.querySelector('.banner.message-text');
+            const contentBox = banner.querySelector('.content-box');
             const endBox = banner.querySelector('.end-box');
-            const cta = endBox.componentSelector('.action-link') || new MegaLink({
-                parentNode: endBox,
+            const cta = contentBox.componentSelector('.action-link') || new MegaLink({
+                parentNode: contentBox,
                 componentClassname: 'action-link',
                 type: 'normal',
             });
@@ -1318,9 +1333,7 @@ lazy(mega.ui, 'secondaryNav', () => {
             });
             const alert = banner.querySelector('.mega-component.alert');
 
-            const { title, type, msgText, msgHtml, ctaHref, ctaText, ctaEvent, closeEvent } = options;
-
-            alert.classList.remove('warning', 'error');
+            alert.classList.remove('warning', 'error', 'success');
             alert.classList.add(type);
             titleText.textContent = title;
             if (msgHtml) {
@@ -1332,18 +1345,44 @@ lazy(mega.ui, 'secondaryNav', () => {
             }
             cta.href = ctaHref;
             cta.text = ctaText;
-            cta.rebind('click.eventLog', () => eventlog(ctaEvent));
+            cta.rebind('click.eventLog', () => {
+                if (ctaEvent) {
+                    eventlog(ctaEvent);
+                }
+                if (typeof onCtaClick === 'function') {
+                    onCtaClick();
+                }
+            });
 
             dismiss.rebind('click', () => {
-                banner.classList.add('hidden');
-                if (typeof closeEvent === 'number') {
-                    eventlog(closeEvent);
+                if (typeof onClose === 'function') {
+                    onClose();
                 }
+                this.hideBanner(name);
             });
 
             banner.classList.remove('warning', 'error', 'hidden');
             banner.classList.add(type);
             clickURLs();
+        },
+        hideBanner(id) {
+            if (!this.bannerOpts) {
+                return false;
+            }
+
+            const { name, banner, closeEvent, onClose } = this.bannerOpts;
+
+            if (id && id !== name) {
+                return false;
+            }
+
+            banner.classList.add('hidden');
+            if (typeof closeEvent === 'number') {
+                eventlog(closeEvent);
+            }
+            if (typeof onClose === 'function') {
+                onClose();
+            }
         },
         extHideFilterChip() {
             if (mega.ui.mNodeFilter.selectedFilters.value) {

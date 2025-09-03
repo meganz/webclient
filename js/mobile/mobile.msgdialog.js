@@ -44,7 +44,7 @@ function msgDialog(type, title, msg, subMsg, callback, checkboxCallback) {
         const typeIconLookup = {
             'warninga': 'icon-alert-triangle-thin-outline warning',
             'warningb': 'icon-alert-triangle-thin-outline warning',
-            'confirmation': 'icon-check-circle-thin-outline success',
+            'confirmation': 'icon-question-circle-thin-outline info',
             'info': 'icon-info-thin-outline info',
             'error': 'icon-x-circle-thin-outline error',
             'clear-bin': 'icon-alert-triangle-thin-outline warning',

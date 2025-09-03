@@ -628,15 +628,14 @@ function fmtopUI() {
 
     const id = String(M.currentdirid || '').split('/').pop();
 
-    const $rewindNotifBanner =
-        $('.fm-notification-block.new-feature-rewind-notification', '.fm-right-files-block');
-    $rewindNotifBanner.addClass('hidden');
-
     $('.shares-tab-lnk.active', $sharesTabBlock).removeClass('active');
     $('.gallery-tab-lnk.active', $galleryTabBlock).removeClass('active');
 
     $('.fm-s4-settings, .fm-s4-new-bucket, .fm-s4-new-key, .fm-s4-new-user, .fm-s4-new-group', $header)
         .addClass('hidden');
+
+    // Show/hide Rubbish bin schedule banner
+    M.rubbishScheduleBanner();
 
     if (M.currentrootid !== 'shares' && !M.onDeviceCenter) {
         mega.ui.secondaryNav.hideCard();
@@ -661,23 +660,7 @@ function fmtopUI() {
             primary = '.fm-clearbin-button';
         }
 
-        if (mega.config.get('dsmRubRwd')) {
-            $rewindNotifBanner.addClass('hidden');
-        }
-        else {
-            $rewindNotifBanner.removeClass('hidden');
-            delay('rubbish-bin:rewind-prom', () => eventlog(500530, true), 4e3);
-
-            $('.fm-notification-close', $rewindNotifBanner).rebind('click.rewindnotifbanner', () => {
-                eventlog(500529);
-                mega.config.set('dsmRubRwd', 1);
-                $rewindNotifBanner.addClass('hidden');
-            });
-
-            $('.learn-more a', $rewindNotifBanner).rebind('click.rnb-lm', () => eventlog(500528));
-        }
-
-        $('.fm-right-files-block').addClass('rubbish-bin visible-notification');
+        $('.fm-right-files-block').addClass('visible-notification rubbish-bin');
     }
     else {
         const cl = new mega.Share.ExportLink();

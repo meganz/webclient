@@ -19,7 +19,7 @@ lazy(mega.devices.uiElems, 'Notification', () => {
             /**
              * {jQuery} $text - jQuery object
              */
-            this.$text = $('span', this.$notification);
+            this.$text = $('.message-text', this.$notification);
         }
 
         show(message) {

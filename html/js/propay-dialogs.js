@@ -2516,6 +2516,15 @@ var addressDialog = {
         const $stripeDialog = this.getStripeDialog();
         const $stripeIframe = $('iframe#stripe-widget', $stripeDialog);
 
+        // Hide Expired/Grace banners
+        if (is_mobile && mobile.banner) {
+            mobile.banner.hide('grace-business');
+        }
+        else {
+            // @todo: Use mega.ui.secondaryNav.showBanner instead
+            $('.grace-business', '.fm-banner-holder').removeClass('visible');
+        }
+
         if (parseInt(pro.propay.planNum) === pro.ACCOUNT_LEVEL_FEATURE_VPN) {
             this.showSuccessCloak(
                 l[6961],

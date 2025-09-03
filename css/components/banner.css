@@ -1,0 +1,298 @@
+/* Banner rack */
+
+.rack.banner-rack {
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+    flex-flow: column-reverse nowrap;
+    grid-row: 2/ 3;
+}
+
+
+/* Banner inner content */
+
+.mega-component.banner {
+    border: 0;
+    display: flex;
+    flex-flow: row nowrap;
+    align-content: center;
+    justify-content: space-between;
+    box-sizing: border-box;
+    padding: 12px 24px;
+    position: static;
+    top: 0;
+    overflow: hidden;
+    transition: top 1s ease-in;
+    font: var(--mobile-font-caption-regular);
+    width: 100%;
+    color: var(--mobile-text-primary);
+}
+
+
+/* Banner overarching types */
+
+.mega-component.banner,
+.mega-component.banner.alert {
+    border-radius: 0;
+}
+.mega-component.banner.inline {
+    border-radius: var(--mobile-border-radius-medium);
+    overflow: initial;
+}
+
+.mega-component.banner .content-box {
+    align-items: center;
+    color: var(--mobile-text-primary);
+    display: grid;
+    flex: 1 1 auto;
+    font: var(--mobile-font-caption-large-regular);
+    grid-template-columns: 1fr auto;
+    order: 5;
+}
+
+.mega-component.banner > * + * {
+    padding-inline-start: 8px;
+}
+
+.mega-component.advertisement > * + *,
+.mega-component.anouncement > * + * {
+    padding-inline-start: 16px;
+}
+
+.mega-component.banner .end-box {
+    display: flex;
+    flex-flow: column nowrap;
+    align-content: center;
+    align-items: flex-end;
+    justify-content: center;
+    order: 10;
+    padding: 4px 0;
+}
+
+
+/* Gap for all content child elems */
+
+.mega-component.banner .content-box > * {
+    padding: 4px 0;
+}
+
+.mega-component.banner .content-box > *:empty,
+.mega-component.banner .end-box:empty {
+    display: none;
+}
+
+.mega-component.banner .end-box > *:first-child {
+    margin-inline-start: 24px;
+}
+
+
+/* Custom button styles */
+
+.mega-component.banner .icon-only {
+    cursor: pointer;
+    margin-inline-start: auto;
+    padding: 0;
+    justify-self: flex-end;
+    align-self: flex-start;
+    order: 1;
+}
+
+.mega-component.banner a.action-link,
+.mega-component.banner .action-link .primary-text,
+.mega-component.banner .message-text a {
+    font: var(--mobile-font-caption-large-semibold);
+    text-decoration: underline;
+    color: var(--mobile-link-primary);
+}
+
+.mega-component.banner .message-text a {
+    font: var(--mobile-font-caption-large-regular);
+}
+
+
+/* Component attribute styles */
+
+.mega-component.banner .title-text {    
+    font: var(--mobile-font-copy-semibold);
+}
+
+.mega-component.banner .message-text {
+    font: var(--mobile-font-caption-large-regular);
+    grid-row: 2 / 3;
+}
+
+.mega-component.banner .title-text:empty ~ * {
+    grid-row: 1 / 3;
+}
+
+.mega-component.banner .title-text:empty ~ .message-text {
+    margin: 2px 0;
+}
+
+.mega-component.banner .content-box > .action-link {
+    grid-column: 2 / 3;
+    grid-row: 1 / 3;
+    margin-inline-start: 8px;
+}
+
+.mega-component.banner .message-text b {
+     font: var(--mobile-font-caption-large-semibold);
+ }
+
+.mega-component.banner .banner.left-icon {
+    --icon-size: 18px;
+    color: var(--icon-color);
+    order: 1;
+    margin: 7px 0;
+}
+
+.mega-component.banner .banner.left-icon.icon-size-24 {
+    --icon-size: 24px;
+    margin: 4px 0;
+}
+
+.mega-component.banner .banner.left-icon.icon-size-48 {
+    --icon-size: 48px;
+    margin: 0;
+}
+
+.mega-component.banner .banner.right-icon {
+    --icon-size: 96px;
+    grid-area: right-icon;
+    justify-self: flex-end;
+    align-self: center;
+    order: 10;
+}
+
+.mega-component.banner img {
+    height: 48px;
+    width: 48px;
+}
+
+
+/* Banner right icons */
+
+.mega-component.banner .banner.right-icon.chat {
+    content: url("../../images/mobile/chat.png");
+    width: 60px;
+}
+
+
+/* Component styles, default info */
+
+.mega-component.banner,
+.mega-component.banner.info {
+    background: var(--mobile-notification-info);
+    --icon-color: var(--mobile-support-info);
+}
+
+.mega-component.banner.success {
+    background: var(--mobile-notification-success);
+    --icon-color: var(--mobile-support-success);
+}
+
+.mega-component.banner.warning {
+    background: var(--mobile-notification-warning);
+    --icon-color: var(--mobile-support-warning);
+}
+
+.mega-component.banner.error {
+    background: var(--mobile-notification-error);
+    --icon-color: var(--mobile-support-error);
+}
+
+.mega-component.banner.info {
+    background: var(--mobile-notification-info);
+    --icon-color: var(--mobile-support-info);
+}
+
+.mega-component.banner.advertisement,
+.mega-component.banner.anouncement {
+    background: var(--mobile-surface-2);
+    --icon-color: var(--mobile-support-info);
+}
+
+
+/* Desktop banners component */
+
+.fm-banner-holder {
+    display: grid;
+    gap: 2px;
+    width: 100%;
+}
+
+.rtl .fm-banner-holder {
+    direction: rtl;
+}
+
+.fm-banner-holder.secondary-banners {
+    margin-inline-end: -32px;
+    width: calc(100% + 32px);
+}
+
+.fm-banner-holder.secondary-banners > *:first-child {
+    margin-top: 16px;
+}
+
+.fm-banner-holder .banner-rack {
+    box-sizing: border-box;
+    display: flex;
+    grid-column: initial;
+    grid-row: inherit;
+    position: relative;
+    width: 100%;
+    z-index: 0;
+}
+
+.fm-banner-holder .banner-rack .rack-slot {
+    max-height: 310px;
+    width: 100%;
+}
+
+.fm-banner-holder .banner-rack .rack-slot .slot-inner {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    position: relative;
+    pointer-events: auto;
+    transition: opacity 1s ease-in;
+}
+
+@media (hover: hover) {
+
+    .mega-component.banner .action-link:hover .primary-text,
+    .mega-component.banner .message-text a:hover {
+        text-decoration: underline;
+    }
+
+}
+
+
+/* Responsive layout */
+
+@media only screen and (max-width: 768px) {
+
+    .mega-component.banner {
+        padding: 16px 24px;
+    }
+
+    .mega-component.banner .content-box > .action-link {
+        margin: 0;
+    }
+
+    .mega-component.banner .action-link,
+    .mega-component.banner .action-link .primary-text {
+        font: var(--mobile-font-copy-semibold);
+    }
+
+    .mega-component.banner {
+        align-items: flex-start;
+    }
+
+    .mega-component.banner .content-box {
+        align-items: start;
+        display: flex;
+        flex-direction: column;
+    }
+
+}

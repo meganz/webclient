@@ -72,6 +72,7 @@ class MegaRack extends MegaComponent {
      */
     hideSlots() {
         let i = this.slotList.length;
+
         while (i--) {
             this.slotList[i].hide();
         }

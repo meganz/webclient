@@ -75,6 +75,7 @@ class MegaMobileBanner extends MegaComponent {
         this.text = options.text || '';
         this.title = options.title || '';
         this.icon = options.icon || '';
+        this.name = options.name || '';
 
         if (options.icon && options.iconSize) {
             this.iconSize = options.iconSize || 24;
@@ -99,6 +100,7 @@ class MegaMobileBanner extends MegaComponent {
 
         this.title = '';
         this.text = '';
+        this.name = '';
         this.collapsed = false;
         this.icon = '';
         this.iconSize = '24';
@@ -263,7 +265,7 @@ class MegaMobileBanner extends MegaComponent {
     set closeButton(visible) {
 
         if (visible) {
-
+            this.xButton.icon = 'sprite-mobile-fm-mono icon-dialog-close';
             this.xButton.domNode.classList.remove('hidden');
             return;
 
@@ -280,7 +282,13 @@ class MegaMobileBanner extends MegaComponent {
      * @returns {undefined}
      */
     set actionButtonText(message) {
-        this.actionButton.text = message || '';
+        if (message) {
+            this.actionButton.domNode.classList.remove('hidden');
+            this.actionButton.text = message;
+        }
+        else {
+            this.actionButton.domNode.classList.add('hidden');
+        }
     }
 
     /**
@@ -374,7 +382,7 @@ class MegaMobileBanner extends MegaComponent {
      *
      * @returns {undefined}
      */
-    set text(text) {
+    set text(text = '') {
         const textNode = this.domNode.querySelector('.message-text');
 
         if (typeof text === 'string') {
@@ -450,6 +458,17 @@ class MegaMobileBanner extends MegaComponent {
             }
         });
 
+        // Secondary alerts instant object
+        mega.ui.secondaryAlerts = new MegaRack({
+            parentNode: mega.ui.header.secondaryBannerHolder,
+            componentClassname: 'banner-rack flow-up top',
+            prependRack: true,
+            childComponent: MegaMobileBanner,
+            instanceOptions: {
+                componentClassname: 'alert'
+            }
+        });
+
         // Create helpers for creating inline ads and alerts.
         mobile.inline = Object.create(null);
         mobile.inline.ads = Object.create(null);
@@ -474,28 +493,48 @@ class MegaMobileBanner extends MegaComponent {
                 info: 'sprite-mobile-fm-mono icon-alert-circle-thin-outline',
                 warning: 'sprite-mobile-fm-mono icon-alert-circle-thin-outline',
                 error: 'sprite-mobile-fm-mono icon-alert-triangle-thin-outline',
+                success: 'sprite-mobile-fm-mono icon-check-circle-thin-outline',
                 advertisement: 'sprite-mobile-fm-uni icon-mega-logo-rounded-square'
             },
-            show: function(title, message, ctaText, type, closeBtn, systemWide, clear) {
+            show: (opts = {}) => {
+                const {
+                    name, title, msgText, msgHtml, ctaText,
+                    secondary, type, closeBtn, systemWide, clear
+                } = opts;
 
                 if (clear) {
                     mega.ui.alerts.hideSlots();
                 }
 
-                return mega.ui.alerts.show(function() {
+                return mega.ui[secondary ? 'secondaryAlerts' : 'alerts'].show(function() {
+                    this.name = name;
                     this.title = title;
-                    this.text = message;
+                    this.text = msgHtml ? parseHTML(msgHtml) : msgText;
                     this.actionButtonText = ctaText;
                     this.displayType = type;
                     this.icon = mobile.banner.icon[type];
                     this.iconSize = type === 'advertisement' ? '48' : '24';
                     this.closeButton = typeof closeBtn === 'undefined' ? true : closeBtn;
                     this.isSystemWide = typeof systemWide === 'undefined' ? true : systemWide;
+                    this.domNode.classList.remove('hidden');
+                    this.wrapperNode.classList.remove('hidden');
                     if (closeBtn === false) {
-                        this.closeButton = true;
+                        this.closeButton = false;
                         this.collapsed = false;
                     }
                 });
+            },
+            hide: (n, toSleep) => {
+                const slots = [...mega.ui.alerts.slotList, ...mega.ui.secondaryAlerts.slotList];
+                let i = slots.length;
+
+                n = typeof n === 'string' ? [n] : n;
+                while (i--) {
+                    if (!n || n.includes(slots[i].name)) {
+                        slots[i].trigger('close');
+                        slots[i].hide(toSleep);
+                    }
+                }
             }
         };
 
@@ -509,138 +548,11 @@ class MegaMobileBanner extends MegaComponent {
             }
         });
 
-        if (u_attr) {
-            // Business and Pro user account validity check
-            if (u_attr.b) {
-                if (u_attr.b.s === -1) {
-                    mega.ui.sheet.hide();
-
-                    if (u_attr.b.m) {
-                        const banner = mobile.banner.show(
-                            l[20401], l.payment_failed_and_not_resolved, l.pay_and_reactivate, 'error', false);
-                        banner.on('cta', () => loadSubPage('repay'));
-
-                        mega.ui.sheet.show({
-                            name: 'bmaster-user-expired',
-                            type: 'modal',
-                            showClose: true,
-                            icon: 'sprite-mobile-fm-mono icon-alert-triangle-thin-outline icon error',
-                            title: l[20401],
-                            contents: [parseHTML(l[20402])],
-                            actions: [
-                                {
-                                    type: 'normal',
-                                    text: l[20403],
-                                    className: 'primary',
-                                    onClick: () => {
-                                        mega.ui.sheet.hide();
-                                        loadSubPage('repay');
-                                    }
-                                }
-                            ]
-                        });
-                    }
-                    else {
-                        // sub user
-                        if (u_attr.b.s === -1) { // expired
-                            mobile.banner.show(
-                                l.bsub_user_account_exp_title,
-                                l.bsub_user_account_exp_msg,
-                                '',
-                                'error',
-                                false
-                            );
-                        }
-
-                        // sheet
-                        mega.ui.sheet.show({
-                            name: 'bsub-user-expired',
-                            type: 'modal',
-                            showClose: true,
-                            icon: 'sprite-mobile-fm-mono icon-alert-triangle-thin-outline icon error',
-                            title: l.bsub_user_account_exp_title,
-                            contents: [l.bsub_user_account_exp_msg],
-                            actions: [
-                                {
-                                    type: 'normal',
-                                    text: l[81],
-                                    className: 'primary',
-                                    onClick: () => {
-                                        mega.ui.sheet.hide();
-                                    }
-                                }
-                            ]
-                        });
-                    }
-
-                    return false;
-                }
-
-                if (u_attr.b.m) {
-                    if (u_attr.b.s === 2) {
-                        // grace
-                        const banner = mobile.banner.show(
-                            l.payment_not_processed_title, l.payment_not_processed_msg, l.update_card, 'error', false);
-                        banner.on('cta', () => loadSubPage('fm/account/paymentcard'));
-                    }
-
-                    // storage and transfer quota exceed the base quota
-                    if (!u_attr['^buextra'] || sessionStorage.buextra) {
-                        if (sessionStorage.buextra) {
-                            const banner = mobile.banner.show(
-                                l.additional_storage_usage_title, l.additional_storage_usage_msg, l.read_more, 'info');
-                            banner.on('cta', () => {
-                                location.href = 'https://help.mega.io/plans-storage/space-storage/pay-as-you-go';
-                            });
-                        }
-                        else {
-                            M.accountData((account) => {
-                                if (account.space_bus_ext || account.tfsq_bus_ext) {
-                                    sessionStorage.buextra = 1;
-                                    mega.attr.set('buextra', 1, -2, 0);
-                                }
-                            });
-                        }
-                    }
-                }
-            }
-
-            // If Pro Flexi
-            if (u_attr.pf) {
-                // If expired, show red banner
-                if (u_attr.pf.s === -1) {
-                    const banner = mobile.banner.show(
-                        l.pf_account_deactivated_title, l.pf_account_deactivated_msg, l.reactivate_account, 'error');
-                    banner.on('cta', () => loadSubPage('repay'));
-
-                    // sheet
-                    mega.ui.sheet.show({
-                        name: 'pf-account-expired',
-                        type: 'modal',
-                        showClose: true,
-                        icon: 'sprite-mobile-fm-mono icon-alert-triangle-thin-outline icon error',
-                        title: l.pf_account_deactivated_title,
-                        contents: [parseHTML(l.pro_flexi_account_suspended_description)],
-                        actions: [
-                            {
-                                type: 'normal',
-                                text: l[20403],
-                                className: 'primary',
-                                onClick: () => {
-                                    mega.ui.sheet.hide();
-                                    loadSubPage('repay');
-                                }
-                            }
-                        ]
-                    });
-                }
-                else if (u_attr.pf.s === 2) {
-                    // grace period
-                    const banner = mobile.banner.show(
-                        l.payment_not_processed_title, l.payment_not_processed_msg, l.update_card, 'error');
-                    banner.on('cta', () => loadSubPage('fm/account/paymentcard'));
-                }
-            }
+        if (u_attr && (u_attr.b || u_attr.pf)) {
+            M.require('businessAcc_js', 'businessAccUI_js').done(() => {
+                const busUI = new BusinessAccountUI();
+                busUI.showExp_GraceUIElements();
+            });
         }
     }
 }

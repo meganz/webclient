@@ -4036,7 +4036,7 @@ FileManager.prototype.cameraUploadUI = function() {
         const fmItem = document.querySelector(`[id="${M.CameraId}"] .folder`);
 
         if (treeItem) {
-            treeItem.classList.add('camera-folder');
+            treeItem.className = 'nw-fm-tree-folder camera-folder';
         }
 
         if (fmItem) {

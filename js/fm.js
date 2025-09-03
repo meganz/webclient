@@ -173,6 +173,10 @@ function sharedUInode(nodeHandle, force) {
 
             if (target) {
                 target.classList.add('shared-folder');
+                const {lbl} = M.getNodeByHandle(nodeHandle);
+                if (lbl) {
+                    target.classList.remove(MegaNodeComponent.label[lbl]);
+                }
             }
 
             bAvailShares = true;
@@ -202,6 +206,7 @@ function sharedUInode(nodeHandle, force) {
 
         if (target) {
             target.classList.remove('shared-folder');
+            MegaNodeComponent.label.set(M.d[nodeHandle], target);
         }
 
         target = document.getElementById(nodeHandle);
@@ -1423,11 +1428,11 @@ function renameDialog() {
             .text(n.t ? s4Folder ? l.s4_bucket_rename : l[425] : l[426]);
         $input.val(n.name);
 
-        MegaNodeComponent.label.set(
-            n,
-            $('.input-icon', $dialog)
-                .attr('class', `input-icon item-type-icon icon-${fileIcon(n)}-24`)
-        );
+        const icon = fileIcon(n);
+        const $icon = $('.input-icon', $dialog).attr('class', `input-icon item-type-icon icon-${icon}-24`);
+        if (icon === 'folder') {
+            MegaNodeComponent.label.set(n, $icon);
+        }
 
         if (!n.t && ext.length > 0) {
             $input[0].selectionStart = 0;

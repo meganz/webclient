@@ -261,6 +261,7 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sSubMap) {
 
         const tn = fmconfig.treenodes || Object.create(null);
         const dn = $.openedDialogNodes || Object.create(null);
+        const isInShare = stype === 'shared-with-me';
 
         for (var idx = 0; idx < folders.length; idx++) {
             buildnode = false;
@@ -329,7 +330,9 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sSubMap) {
                     node.classList.add('linked');
                 }
 
-                M.applySensitiveStatus(node, folders[idx]);
+                if (!isInShare) {
+                    M.applySensitiveStatus(node, folders[idx]);
+                }
 
                 var titleTooltip = [];
                 if (folders[idx].t & M.IS_TAKENDOWN) {

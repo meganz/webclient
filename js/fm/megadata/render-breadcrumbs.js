@@ -369,7 +369,7 @@
     }
 
     function prepareContextFilters(noCtx, container, items) {
-        if (window.s4 && s4.utils) {
+        if ('kernel' in s4 && M.currentrootid === 's4') {
             noCtx.add('keys').add('policies').add('groups').add('users');
             if (items.some(h => noCtx.has(h))) {
                 // Skip context for children of the policies, groups, and users
@@ -381,9 +381,8 @@
             }
         }
         if (M.currentrootid === M.RubbishID) {
-            const cl = new mega.Share.ExportLink();
             for (let i = items.length; i--;) {
-                if (cl.isTakenDown(items[i])) {
+                if (M.getNodeShare(items[i]).down) {
                     noCtx.add(items[i]);
                 }
             }

@@ -83,6 +83,8 @@ var mobile = {
                     data.isFull = data.isAlmostFull = data.EPAYWALL = true;
                 }
 
+                mobile.banner.hide('full-storage', 0);
+
                 if (data.isAlmostFull) {
                     ulmanager.ulOverStorageQuota = true;
 
@@ -97,12 +99,16 @@ var mobile = {
                             }
 
                             var overlayTexts = odqPaywallDialogTexts(u_attr || {}, M.account);
-                            const bannerMsg = overlayTexts.fmBannerText
-                                .replace('<a href="/pro" class="clickurl">', '<strong>').replace('</a>', '</strong>')
-                                .replace('<span>', '').replace('</span>', '');
+                            const bannerMsg = overlayTexts.fmBannerText;
 
-                            const banner = mobile.banner.show('', parseHTML(bannerMsg), '', 'error',
-                                                              false, undefined, true);
+                            const banner = mobile.banner.show({
+                                title: l.bn_full_storage_title,
+                                msgText: parseHTML(bannerMsg),
+                                type: 'error',
+                                name: 'full-storage',
+                                ctaText: l.upgrade_now,
+                                closeBtn: false
+                            });
                             banner.on('cta', () => loadSubPage('pro'));
 
                             mega.ui.sheet.hide();
@@ -142,8 +148,14 @@ var mobile = {
                             }
                             else {
                                 ulmanager.ulOverStorageQuota = false;
-                                const banner = mobile.banner.show(
-                                    l.storage_almost_full, l.storage_almost_full_msg, l.upgrade_now, 'warning', true);
+                                const banner = mobile.banner.show({
+                                    title: l.storage_almost_full,
+                                    msgText: l.bn_almost_full_text,
+                                    ctaText: l.upgrade_now,
+                                    type: 'warning',
+                                    closeBtn: true,
+                                    name: 'full-storage'
+                                });
                                 banner.on('cta', () => {
                                     mega.ui.sheet.hide();
                                     loadSubPage('pro');
@@ -340,12 +352,13 @@ var mobile = {
                     bannerDialog = u_attr && u_attr.b ? l.payment_card_at_risk_b : l.payment_card_at_risk;
                 }
 
-                const banner = mobile.banner.show(
-                    bannerTitle,
-                    bannerDialog,
-                    l.update_card,
-                    status === 'exp' ? 'error' : 'warning',
-                    false);
+                const banner = mobile.banner.show({
+                    title: bannerTitle,
+                    msgText: bannerDialog,
+                    ctaText: l.update_card,
+                    type: status === 'exp' ? 'error' : 'warning',
+                    closeBtn: false
+                });
                 banner.on('cta', () => loadSubPage('fm/account/paymentcard'));
             }
         });

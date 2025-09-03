@@ -1029,8 +1029,8 @@
                                     nodeToRemove.splice(newestIndex, 1);
                                     M.moveToRubbish(nodeToRemove).catch(dump);
                                 }
-                                // hide bar
-                                $('.fm-notification-block.duplicated-items-found').removeClass('visible');
+                                // Hide duplicated items banner
+                                M.duplicatedItemsBanner();
                             }
                             else {
                                 // merge
@@ -1051,10 +1051,8 @@
                                         M.moveNodes([olderNode], M.RubbishID)
                                             .then(() => M.moveNodes([olderNode], originalParent, fileconflict.REPLACE))
                                             .then(() => {
-                                                // no need to updateUI,
-                                                // for optimization we will only hide the bar
-                                                $('.fm-notification-block.duplicated-items-found')
-                                                    .removeClass('visible');
+                                                // Hide duplicated items banner
+                                                M.duplicatedItemsBanner();
 
                                                 const ata = checked ? action : null;
                                                 resolveDup(duplicateEntries, keys, ++kIndex, type, ata);

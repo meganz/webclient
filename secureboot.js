@@ -2496,6 +2496,7 @@ else if (!browserUpdate) {
     jsl.push({f:'css/components/radial.css', n: 'radial_css', j:2, w:30, c:1, d:1, cache:1});
     jsl.push({f:'css/components/textarea.css', n: 'comp_textarea_css', j:2, w:1});
     jsl.push({f:'css/components/tooltip.css', n: 'tooltip_css', j:2, w:30, c:1, d:1, cache:1});
+    jsl.push({f:'css/components/banner.css', n: 'banner_css', j:2, w:30, c:1, d:1, cache:1});
 
     // Load files common to all mobile pages
     if (is_mobile) {
@@ -2507,7 +2508,6 @@ else if (!browserUpdate) {
         jsl.push({f:'css/mobile/mobile.footer.css', n: 'mobile_footer_css', j:2,w:5});
         jsl.push({f:'css/mobile/mobile.msgdialog.css', n: 'mobile_msgdialog_css', j:2,w:5});
         jsl.push({f:'css/mobile/mobile.rubbish-bin.css', n: 'mobile_rubbish_bin_css', j:2,w:5});
-        jsl.push({f:'css/mobile/mobile.banner.css', n: 'mobile_banner_css', j:2,w:5});
         jsl.push({f:'css/mobile/mobile.node-selector.css', n: 'mobile_node_selector_css', j:2, w:5});
         jsl.push({f:'css/mobile/mobile.empty.state.css', n: 'mobile_empty_state_css', j:2, w:1});
         jsl.push({f:'css/mobile/mobile.transfer.block.css', n: 'mobile_transfer_block_css', j:2,w:5});

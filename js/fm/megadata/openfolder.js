@@ -396,8 +396,10 @@
         const $resultsCount = $('.fm-search-count', $fmRightHeader).addClass('hidden');
 
         $('.nw-fm-tree-item.opened').removeClass('opened');
-        $('.fm-notification-block.duplicated-items-found').removeClass('visible');
         $('.fm-breadcrumbs-wrapper, .column-settings.overlap', $fmRightFilesBlock).removeClass('hidden');
+
+        // Hide duplicated items banner
+        M.duplicatedItemsBanner();
 
         if (folderlink && !pfcol || id !== this.RootID && this.currentrootid === this.RootID
             || this.onDeviceCenter && !mega.devices.ui.isCustomRender()) {

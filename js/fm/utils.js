@@ -1274,21 +1274,58 @@ MegaUtils.prototype.checkForDuplication = function(id) {
     }
 };
 
+/** Show/hide Duplicated items banner
+ * @param {Object} dups Duplicated items
+ * @param {String} id Handle of the current view's parent
+ * @returns {void} void
+*/
+MegaUtils.prototype.duplicatedItemsBanner = function(dups, id) {
+    'use strict';
+
+    if (is_mobile && mobile.banner) {
+        if (!dups || !id) {
+            mobile.banner.hide('duplicatedItemsBanner');
+            return false;
+        }
+
+        const banner = mobile.banner.show({
+            name: 'duplicatedItemsBanner',
+            msgText: l.bn_duplicates_text,
+            type: 'warning',
+            ctaText: l.bn_duplicates_lnk,
+            secondary: true
+        });
+        banner.on('cta', () => fileconflict.resolveExistedDuplication(dups, id));
+        return;
+    }
+
+    // @todo: Use mega.ui.secondaryNav.showBanner instead
+    const $banner = $('.fm-notification-block.duplicated-items-found', '.main-layout');
+
+    if (!dups || !id) {
+        $banner.removeClass('visible');
+        return false;
+    }
+
+    $banner.addClass('visible');
+
+    $('.content-box > a', $banner).rebind('click.df', () => {
+        fileconflict.resolveExistedDuplication(dups, id);
+    });
+    $('.end-box button', $banner).rebind('click.df', () => {
+        $banner.removeClass('visible');
+    });
+};
+
+
 mBroadcaster.addListener('mega:openfolder', SoonFc(300, function(id) {
     'use strict';
 
     let dups = false;
 
     // Show desktop notification
-    if (!is_mobile && (dups = M.checkForDuplication(id)) && (dups.files || dups.folders)) {
-        const $bar = $('.fm-notification-block.duplicated-items-found').addClass('visible');
-
-        $('.fix-me-btn', $bar).rebind('click.df', function() {
-            fileconflict.resolveExistedDuplication(dups, id);
-        });
-        $('.fix-me-close', $bar).rebind('click.df', function() {
-            $bar.removeClass('visible');
-        });
+    if ((dups = M.checkForDuplication(id)) && (dups.files || dups.folders)) {
+        M.duplicatedItemsBanner(dups, id);
         reselect(1);
     }
 }));

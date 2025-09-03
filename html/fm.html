@@ -584,7 +584,7 @@
                     <div class="rack-slot">
                         <div class="slot-inner">
                             <div class="mega-component alert banner warning">
-                                <i class="banner left-icon sprite-fm-mono icon-alert-circle-thin-outline icon-size-24"></i>
+                                <i class="banner left-icon sprite-fm-mono icon-alert-circle-thin-outline"></i>
                                 <div class="content-box">
                                     <span class="banner title-text"></span>
                                     <span class="banner message-text"></span>
@@ -594,54 +594,112 @@
                         </div>
                     </div>
                 </div>
-                <div class="fm-notification-block mega-lite-mode-warning">
-                    <i class="notification-block-icon sprite-fm-mono icon-lock"></i>
-                    <span>[$in_mega_lite_mode_banner]</span>
-                </div>
-                <div class="fm-notification-block unverified-share">
-                    <i class="notification-block-icon sprite-fm-mono icon-info"></i>
-                    <span></span>
+                <!-- @todo: Use mega.ui.secondaryNav.showBanner instead !-->
+                <div class="fm-notification-block mega-lite-mode">
+                    <div class="mega-component alert banner info">
+                        <i class="banner left-icon sprite-fm-mono icon-alert-circle-thin-outline"></i>
+                        <div class="content-box">
+                            <span class="banner title-text"></span>
+                            <span class="banner message-text">[$in_mega_lite_mode_banner]</span>
+                        </div>
+                        <div class="banner end-box">
+                            <button class="mega-component text-icon nav-elem icon-only button">
+                                <i class="sprite-fm-mono icon-dialog-close-thin left-icon icon-size-24"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
                 <div class="fm-notification-block full">
-                    <i class="notification-block-icon sprite-fm-mono icon-offline"></i>
-                    <span>[$22667]</span>
+                    <div class="mega-component alert banner error">
+                        <i class="banner left-icon sprite-fm-mono icon-alert-triangle-thin-outline"></i>
+                        <div class="content-box">
+                            <span class="banner title-text"></span>
+                            <span class="banner message-text"></span>
+                            <a href="/pro" class="clickurl action-link">[$upgrade_now]</a>
+                        </div>
+                    </div>
                 </div>
-                <div class="fm-notification-block expired-business"></div>
+                <div class="fm-notification-block expired-business">
+                    <div class="mega-component alert banner error">
+                        <i class="banner left-icon sprite-fm-mono icon-alert-triangle-thin-outline"></i>
+                        <div class="content-box">
+                            <span class="banner title-text"></span>
+                            <span class="banner message-text"></span>
+                            <a href="/repay" class="clickurl action-link"></a>
+                        </div>
+                    </div>
+                </div>
                 <div class="fm-notification-block almost-full">
-                    <i class="notification-block-icon sprite-fm-mono icon-offline"></i>
-                    <span>[$16316]</span>
-                    <i class="fm-notification-close sprite-fm-mono icon-close-component"></i>
+                    <div class="mega-component alert banner warning">
+                        <i class="banner left-icon sprite-fm-mono icon-alert-circle-thin-outline"></i>
+                        <div class="content-box">
+                            <span class="banner title-text">[$storage_almost_full]</span>
+                            <span class="banner message-text">[$bn_almost_full_text]</span>
+                            <a href="/pro" class="clickurl action-link">[$upgrade_now]</a>
+                        </div>
+                        <div class="banner end-box">
+                            <button class="mega-component text-icon nav-elem icon-only button">
+                                <i class="sprite-fm-mono icon-dialog-close-thin left-icon icon-size-24"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
                 <div class="fm-notification-block grace-business">
-                    <span>[$16316]</span>
+                    <div class="mega-component alert banner error">
+                        <i class="banner left-icon sprite-fm-mono icon-alert-triangle-thin-outline"></i>
+                        <div class="content-box">
+                            <span class="banner title-text"></span>
+                            <span class="banner message-text"></span>
+                            <a href="/repay" class="clickurl action-link"></a>
+                        </div>
+                    </div>
                 </div>
-                <div class="fm-notification-block business-next-tier"></div>
-                <div class="fm-notification-block duplicated-items-found">
-                    <span>[$22101]</span>
-                    <a class="fix-me-btn">[$22102]</a>
-                    <div class="fm-notification-close fix-me-close sprite-fm-mono icon-close-component"></div>
+                <div class="fm-notification-block business-next-tier">
+                    <div class="mega-component alert banner info">
+                        <i class="banner left-icon sprite-fm-mono icon-alert-circle-thin-outline"></i>
+                        <div class="content-box">
+                            <span class="banner title-text"></span>
+                            <span class="banner message-text"></span>
+                            <a href="" class="action-link"></a>
+                        </div>
+                        <div class="banner end-box">
+                            <button class="mega-component text-icon nav-elem icon-only button">
+                                <i class="sprite-fm-mono icon-dialog-close-thin left-icon"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
                 <div class="fm-notification-block payment-card-status">
-                    <i class="notification-block-icon sprite-fm-mono icon-alert-circle-thin-outline"></i>
-                    <span class="payment-banner-content-wrapper">
-                            <span class="banner-title"></span>
-                            <span class="banner-txt"></span>
-                            <a>[$update_card]</a>
-                        </span>
-                </div>
-                <div class="fm-notification-block new-feature-rewind-notification">
-                    <span>[$new_feature_rewind_message]</span>
-                    <div class="learn-more">
-                        <span>[$new_feature_rewind_learn_more]</span>
-                        <i class="fm-notification-close sprite-fm-mono icon-close-component"></i>
+                    <div class="mega-component alert banner">
+                        <i class="banner left-icon sprite-fm-mono"></i>
+                        <div class="content-box">
+                            <span class="banner title-text"></span>
+                            <span class="banner message-text"></span>
+                            <a href="" class="action-link">[$update_card]</a>
+                        </div>
                     </div>
                 </div>
                 <div class="fm-notification-block device-centre">
-                    <i class="notification-block-icon sprite-fm-mono icon-offline"></i>
-                    <span></span>
+                    <div class="mega-component alert banner error">
+                        <i class="banner left-icon sprite-fm-mono icon-alert-triangle-thin-outline"></i>
+                        <div class="content-box">
+                            <span class="banner title-text"></span>
+                            <span class="banner message-text"></span>
+                        </div>
+                    </div>
                 </div>
                 <div class="s4-info-header-blocks hidden">
-                    <div class="fm-notification-block bucket-access-warning"></div>
+                    <div class="fm-notification-block bucket-access-warning">
+                        <div class="mega-component alert banner info">
+                            <i class="banner left-icon sprite-fm-mono icon-alert-circle-thin-outline"></i>
+                            <div class="content-box">
+                                <span class="banner title-text"></span>
+                                <span class="banner message-text"></span>
+                                <a href="http://help.mega.io/megas4/s4-buckets/change-bucket-object-url-access"
+                                   target="_blank" class="clickurl action-link" rel="noopener noreferrer">[$8742]</a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="onboarding-control-panel hidden">
@@ -1023,6 +1081,38 @@
                                     </div>
                                     <span>[$gallery_exit_discovery]</span>
                                 </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Secondary banners holder !-->
+                    <div class="fm-banner-holder secondary-banners">
+                        <!-- Duplicated items !-->
+                        <div class="fm-notification-block duplicated-items-found">
+                            <div class="mega-component alert banner warning">
+                                <i class="banner left-icon sprite-fm-mono icon-alert-circle-thin-outline"></i>
+                                <div class="content-box">
+                                    <span class="banner title-text"></span>
+                                    <span class="banner message-text">[$bn_duplicates_text]</span>
+                                    <a href="" class="action-link">[$bn_duplicates_lnk]</a>
+                                </div>
+                                <div class="banner end-box">
+                                    <button class="mega-component text-icon nav-elem icon-only button">
+                                        <i class="sprite-fm-mono icon-dialog-close-thin left-icon"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Rubbish bin schedule !-->
+                        <div class="fm-notification-block rubbish-schedule">
+                            <div class="mega-component alert banner info">
+                                <i class="banner left-icon sprite-fm-mono icon-alert-circle-thin-outline"></i>
+                                <div class="content-box">
+                                    <span class="banner title-text"></span>
+                                    <span class="banner message-text"></span>
+                                    <a href="/fm/account/file-management/rubbish-cleaning" class="clickurl action-link">[$1776]</a>
+                                </div>
                             </div>
                         </div>
                     </div>

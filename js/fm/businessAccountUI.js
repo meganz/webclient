@@ -1993,14 +1993,100 @@ BusinessAccountUI.prototype.showExp_GraceUIElements = function() {
         return;
     }
 
-    if (u_attr.b && u_attr.b.m && (!u_attr["^buextra"] || sessionStorage.buextra)) {
+    let otps = null;
+    const showBanner = (opts = {}) => {
+        const { name, msgText, ctaText, title, type, closeBtn, onClick, onClose } = opts;
+        const stop = (ev) => {
+            ev.preventDefault();
+            ev.stopPropagation();
+        };
+        const convert = (ev) => {
+            stop(ev);
+            const repayPage = new RepayPage();
+            repayPage.convertToFree();
+        };
+        const sanitiseString = (string) => {
+            return escapeHTML(string)
+                .replace(/\[B]/g, '<b>').replace(/\[\/B]/g, '</b>')
+                .replace('[A]', `<a href="" class="convert">`).replace('[/A]', '</a>');
+        };
+
+        if (is_mobile) {
+            const bn = mobile.banner.show({
+                name,
+                title,
+                msgText: parseHTML(sanitiseString(msgText)),
+                ctaText,
+                type,
+                closeBtn
+            });
+            bn.on('cta', () => onClick());
+            bn.on('close', () => {
+                if (typeof onClose === 'function') {
+                    onClose();
+                }
+            });
+
+            $('a.convert', bn.domNode).rebind('click.resetToFree', convert);
+            return;
+        }
+
+        // @todo: Use mega.ui.secondaryNav.showBanner instead
+        const $banner = $(`.fm-notification-block.${name}`, '.pm-main');
+        const $cta = $('.content-box > a', $banner);
+
+        $('.title-text', $banner).text(title);
+        $('.message-text', $banner).safeHTML(sanitiseString(msgText));
+
+        if (ctaText) {
+            $cta.text(ctaText).removeClass('hidden');
+        }
+        else {
+            $cta.addClass('hidden');
+        }
+
+        $('a.convert', $banner).rebind('click.resetToFree', convert);
+
+        $('.action-link', $banner).rebind('click.openLink', ev => {
+            stop(ev);
+            onClick();
+        });
+
+        $('.end-box button', $banner).rebind('click.closeBanner', () => {
+            if (typeof onClose === 'function') {
+                onClose();
+            }
+            $banner.removeClass('visible');
+            $.tresizer();
+        });
+
+        $banner.addClass('visible');
+    };
+
+    if ((u_attr.b && u_attr.b.m || u_attr.pf) && (!u_attr["^buextra"] || sessionStorage.buextra)) {
+        otps = {
+            name: 'business-next-tier',
+            ctaText: u_attr.pf ? l.read_more : '',
+            msgText: l.additional_storage_usage_msg,
+            title: l.additional_storage_usage_title,
+            type: 'info',
+            onClick: () => mega.redirect(
+                'help.mega.io', 'plans-storage/payments-billing/custom-plan', false, false, false
+            ),
+            onClose: () => {
+                if (u_attr["^buextra"]) {
+                    delete sessionStorage.buextra;
+                }
+            }
+        };
+
         if (sessionStorage.buextra) {
-            $('.fm-notification-block.business-next-tier').text(l.business_pass_base).addClass('visible');
+            showBanner(otps);
         }
         else {
             M.accountData((account) => {
                 if (account.space_bus_ext || account.tfsq_bus_ext) {
-                    $('.fm-notification-block.business-next-tier').text(l.business_pass_base).addClass('visible');
+                    showBanner(otps);
                     sessionStorage.buextra = 1;
                     mega.attr.set('buextra', 1, -2, 0);
                 }
@@ -2017,38 +2103,57 @@ BusinessAccountUI.prototype.showExp_GraceUIElements = function() {
         return false;
     }
 
-    var msg = '';
+    otps = {
+        name: 'grace-business',
+        closeBtn: false,
+        ctaText: l.reactivate_account,
+        type: 'error',
+        onClick: () => loadSubPage('repay')
+    };
+
     if ((u_attr.b && u_attr.b.s === pro.ACCOUNT_STATUS_EXPIRED) ||
         (u_attr.pf && u_attr.pf.s === pro.ACCOUNT_STATUS_EXPIRED)) {
 
         // If Business master account or Pro Flexi
         if (u_attr.b && u_attr.b.m) {
-            msg = l[24431];
+            otps.title = l.bn_deactivated_b_a_title;
+            otps.msgText = l.bn_deactivated_b_a_text;
         }
         else if (u_attr.pf) {
-            msg = l.pro_flexi_expired_banner;
+            otps.title = l.bn_deactivated_pf_a_title;
+            otps.msgText = l.bn_deactivated_pf_a_text;
         }
         else {
             // Otherwise Business sub-user
-            msg = l[20462];
+            otps.msgText = l.bn_deactivated_b_s_text;
+            otps.title = l.bn_deactivated_b_s_title;
+            otps.ctaText = '';
         }
-        $('.fm-notification-block.expired-business').safeHTML(`<span>${msg}</span>`).addClass('visible');
-        clickURLs();
 
         const isMaster = (u_attr.b && u_attr.b.m) || u_attr.pf;
         this.showExpiredDialog(isMaster);
+        showBanner(otps);
     }
     else if ((u_attr.b && u_attr.b.s === pro.ACCOUNT_STATUS_GRACE_PERIOD && u_attr.b.m) ||
         (u_attr.pf && u_attr.pf.s === pro.ACCOUNT_STATUS_GRACE_PERIOD)) {
 
-        if (u_attr.pf) {
-            msg = l.pro_flexi_grace_period_banner;
+        otps.name = 'grace-business';
+        otps.title = l.bn_grace_period_title;
+        otps.ctaText = l.bn_grace_period_lnk;
+
+        const currDate = new Date();
+        const sts = u_attr[u_attr.pf ? 'pf' : 'b'].sts;
+        const deadline = new Date(sts && sts[0].ts * 1e3);
+        const remainDays = Math.floor((deadline - currDate) / 864e5);
+
+        if (remainDays > 0) {
+            otps.msgText = mega.icu.format(l.bn_pf_grace_period_count_text, remainDays);
         }
         else {
-            msg = l[20650];
+            otps.msgText = l.bn_pf_grace_period_text;
         }
-        $('.fm-notification-block.grace-business').safeHTML(`<span>${msg}</span>`).addClass('visible');
-        clickURLs();
+
+        showBanner(otps);
     }
 };
 

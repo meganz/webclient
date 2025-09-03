@@ -19,9 +19,14 @@ mobile.appBanner = {
 
         this.handle = nodeHandle;
 
-        this.banner = mobile.banner.show(
-            '', l.mobile_app_banner_blurb, l.open_in_app, 'advertisement', true, true, false
-        );
+        this.banner = mobile.banner.show({
+            title: l.mobile_app_banner_blurb,
+            ctaText: l.open_in_app,
+            type: 'advertisement',
+            closeBtn: true,
+            systemWide: true,
+            clear: false
+        });
 
         this.banner
             .on('cta', () => {

@@ -130,7 +130,9 @@ lazy(mega, 'lite', () => {
     function initBackToMegaButton(topbarSelector) {
         assert(inLiteMode);
 
-        document.body.classList.add('mega-lite-mode');
+        // @todo: Use mega.ui.secondaryNav.showBanner instead
+        const $banner = $('.fm-notification-block.mega-lite-mode', '.pm-main')
+            .addClass('visible');
 
         if (mega.flags.inf > 1) {
             return;
@@ -153,6 +155,11 @@ lazy(mega, 'lite', () => {
             // Then reload the account back into regular MEGA
             loadingDialog.show();
             Promise.resolve(eventlog(99897)).finally(() => location.reload());
+        });
+
+        $('.end-box button', $banner).rebind('click.closeBanner', () => {
+            $banner.removeClass('visible');
+            $.tresizer();
         });
     }
 

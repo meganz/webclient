@@ -677,6 +677,7 @@ BusinessRegister.prototype.doRegister = function(nbusers, cname, fname, lname, t
                 }
                 else {
                     msgDialog('warninga', l[1578], l[19508], res < 0 ? api_strerror(res) : res, () => {
+                        parsepage(pages.registerb);
                         loadingDialog.hide();
                         mySelf.initPage(nbusers, cname, tel, fname, lname, email);
                     });

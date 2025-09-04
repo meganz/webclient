@@ -635,6 +635,23 @@ function resetSensitives() {
                         history.back();
                     }
 
+                    if (!showSen && ($.selected || []).length) {
+                        const sel = [];
+
+                        for (let i = $.selected.length; i--;) {
+                            const h = $.selected[i];
+
+                            if (mega.sensitives.isSensitive(h)) {
+                                selectionManager.remove_from_selection(sel[i]);
+                            }
+                            else {
+                                sel.push(h);
+                            }
+                        }
+
+                        $.selected = sel;
+                    }
+
                     return true;
                 },
                 /**

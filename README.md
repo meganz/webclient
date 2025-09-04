@@ -19,7 +19,7 @@ and verifies its authenticity by checking the cryptographic hash.
   (``file_X.js``/``file_X.html``) as needed based on this repository
   before prior to updating the live site.
 
-During development it's essential that your set the following
+During development it's essential that you set the following
 ``localStorage`` parameters:
 
 ```

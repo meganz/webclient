@@ -1150,7 +1150,7 @@ lazy(mega.ui, 'secondaryNav', () => {
                     media.classList.remove('hidden');
                 }
             }
-            if (mega.ui.mNodeFilter.viewEnabled) {
+            if (mega.ui.mNodeFilter.viewEnabled && M.v.length > 0) {
                 this.filterChipsHolder.classList.remove('hidden');
             }
             if (!chipsViewWrapShown) {

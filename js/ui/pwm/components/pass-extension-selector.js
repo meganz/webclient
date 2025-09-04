@@ -35,5 +35,15 @@ class MegaExtensionPassSelector {
     installExtension() {
         const url = mega.ui.header.getPwmExtensionUrl(this.cardGroup.value);
         window.open(url, '_blank', 'noopener,noreferrer');
+
+        const extensionInstallEvents = {
+            'Google': 500902,
+            'Edgium': 500903,
+            'Firefox': 500904
+        };
+        const selectedBrowser = this.cardGroup.value;
+        if (extensionInstallEvents[selectedBrowser]) {
+            eventlog(extensionInstallEvents[selectedBrowser]);
+        }
     }
 }

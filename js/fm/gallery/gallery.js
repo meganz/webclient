@@ -1273,7 +1273,8 @@ class MegaGallery {
         this.clearSelections();
 
         const rfBlock = $('.fm-right-files-block:not(.in-chat)', '.fmholder');
-        const galleryHeader = $('#media-section-controls', rfBlock).add('#media-section-right-controls', rfBlock);
+        const rightSectionControls = $('#media-section-right-controls', rfBlock);
+        const galleryHeader = $('#media-section-controls', rfBlock).add(rightSectionControls);
 
         $('#media-tabs', rfBlock).removeClass('hidden');
         $('.gallery-tabs-bl', galleryHeader).removeClass('hidden');
@@ -1317,7 +1318,11 @@ class MegaGallery {
         }
 
         tryCatch(() => {
+            rightSectionControls.toggleClass('invisible', !M.v.length &&
+                (this.id === 'photos' || this.id === 'images' || this.id === 'videos'));
             galleryHeader.toggleClass('invisible', !M.v.length &&
+                mega.gallery.typeControl.getSelectedIndex() === -1 &&
+                mega.gallery.titleControl.getSelectedIndex() === 1 &&
                 (this.id === 'photos' || this.id === 'images' || this.id === 'videos'));
         })();
 

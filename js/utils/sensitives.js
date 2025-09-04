@@ -66,7 +66,12 @@ function resetSensitives() {
         /**
          * @returns {Boolean}
          */
-        const checkAccountPermission = () => !!(window.u_attr && (u_attr.p || u_attr.b));
+        const checkAccountPermission = () => !!(window.u_attr
+            && (
+                (u_attr.b && u_attr.b.s !== pro.ACCOUNT_STATUS_EXPIRED)
+                || (u_attr.p && (!u_attr.pf || u_attr.pf.s !== pro.ACCOUNT_STATUS_EXPIRED))
+            )
+        );
 
         /**
          * Whether the user is allowed to use sensitives feature
@@ -139,6 +144,7 @@ function resetSensitives() {
 
                         if (passOnboarding === true) {
                             toggleOnboarded(true);
+                            eventlog(500927);
                         }
 
                         resolve(1);
@@ -177,7 +183,7 @@ function resetSensitives() {
                         const txtLine = document.createElement('p');
                         const icon = document.createElement('i');
 
-                        div.className = 'flex flex-row items-center py-2';
+                        div.className = 'flex flex-row items-center py-2 text-left';
                         icon.className = `sprite-fm-mono icon-size-6 mx-4 ${ic}`;
                         titleLine.className = 'font-title-h3-bold text-color-high my-1';
                         txtLine.className = 'sensitive-onboarding-txt my-0';
@@ -232,13 +238,15 @@ function resetSensitives() {
                 showOnboardingDialog(
                     l[433],
                     () => {
+                        eventlog(500926);
                         loadSubPage('pro');
                     }
                 );
+                eventlog(500925);
                 return 0;
             }
 
-            if (await getOnboardedStatus() || await showOnboardingDialog(l.ok_button, nop, true)) {
+            if (await getOnboardedStatus() || await showOnboardingDialog(l[507], nop, true)) {
                 return 1;
             }
 
@@ -368,7 +376,7 @@ function resetSensitives() {
              * Get sensitivity for a selection of nodes.
              * @param {Array} nodes ufs-node handles.
              * @param {Object|*} [event] jQuery/DOM event triggering the action, if any.
-             * @returns {Number} 0 - Disable, 1 - Hide, 2 - Unhide
+             * @returns {Number} 0 - Disabled, 1 - Hide, 2 - Unhide
              */
             getSensitivityStatus(nodes, event) {
                 if (
@@ -456,9 +464,6 @@ function resetSensitives() {
 
                 return !!n
                     && !!n.p
-                    && n.h !== M.cf.h
-                    && n.h !== M.CameraId
-                    && n.h !== M.SecondCameraId
                     && !n.su // No need for recursive check for inbound shares atm
                     && !isNormalNode(n)
                     && !isSensitiveInherited(n);
@@ -590,9 +595,23 @@ function resetSensitives() {
                  * @returns {void}
                  */
                 updateDom(n, status) {
-                    delay(`sensitives.updateDomNode${n.h}`, () => {
-                        sensitives.updateDomNode(n, status);
-                    });
+                    if (status && n.t && n.h === M.currentdirid) {
+                        if (sensitives.showGlobally) {
+                            const treeItem = document.getElementById(`treea_${n.h}`);
+
+                            if (treeItem) {
+                                treeItem.classList.add('is-sensitive');
+                            }
+                        }
+                        else {
+                            M.openFolder(n.p);
+                        }
+                    }
+                    else {
+                        delay(`sensitives.updateDomNode${n.h}`, () => {
+                            sensitives.updateDomNode(n, status);
+                        });
+                    }
                 },
                 /** @todo this method can be removed from public space */
                 toggleOnboarded,

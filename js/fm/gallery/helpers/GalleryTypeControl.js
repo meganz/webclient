@@ -131,6 +131,10 @@ lazy(mega.gallery, 'GalleryTypeControl', () => {
                 delete this.onResize;
             }
         }
+
+        getSelectedIndex() {
+            return this._menu ? this._menu.selectedIndex : -1;
+        }
     }
 
     return GalleryTypeControl;

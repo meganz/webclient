@@ -175,27 +175,38 @@ mBroadcaster.addListener('fm:initialized', () => {
                                         title: l.mega_pass_onboarding,
                                         description: l.mega_pass_onboarding_desc,
                                         imageClass: 'pwm-image',
-                                        nextText: l[556],
-                                        skipText: l.mega_pass_onboarding_skip,
-                                        onNext: 2
+                                        next: {
+                                            text: l[556],
+                                            action: 2,
+                                            event: 500888
+                                        },
+                                        skip: {
+                                            text: l.mega_pass_onboarding_skip,
+                                            event: 500889
+                                        }
                                     },
                                     {
                                         label: l.import_password,
                                         subtitle: l.import_password_subtitle,
-                                        nextText: l[99],
-                                        skipText: l.import_password_skip,
-                                        onNext: () => {
-                                            mega.ui.onboarding.selector.uploadFile()
-                                                .then((data) => {
-                                                    if (data && data[0].length) {
-                                                        mega.ui.onboarding.dataHandler =
-                                                            new MegaImportPassDataHandler(data[0]);
-                                                        mega.ui.onboarding.sheet.goToStep(2.1, true);
-                                                    }
-                                                });
+                                        next: {
+                                            text: l[99],
+                                            disabled: true,
+                                            action: () => {
+                                                mega.ui.onboarding.selector.uploadFile()
+                                                    .then((data) => {
+                                                        if (data && data[0].length) {
+                                                            mega.ui.onboarding.dataHandler =
+                                                                new MegaImportPassDataHandler(data[0]);
+                                                            mega.ui.onboarding.sheet.goToStep(2.1, true);
+                                                        }
+                                                    });
+                                            }
                                         },
-                                        onSkip: 3,
-                                        nextDisabled: true,
+                                        skip: {
+                                            text: l.import_password_skip,
+                                            action: 3,
+                                            event: 500899
+                                        },
                                         customContent: () => {
                                             mega.ui.onboarding.selector = new MegaImportPassSelector();
                                             return mega.ui.onboarding.selector.container;
@@ -203,18 +214,24 @@ mBroadcaster.addListener('fm:initialized', () => {
                                         secondaryStep: {
                                             label: l.manage_password,
                                             subtitle: l.manage_password_subtitle,
-                                            nextText: l.import_selected_items,
-                                            skipText: l[822],
-                                            onNext: () => {
-                                                mega.ui.onboarding.dataHandler.saveData()
-                                                    .then((result) => {
-                                                        if (result) {
-                                                            mega.ui.onboarding.sheet.goToStep(3);
-                                                        }
-                                                    });
+                                            next: {
+                                                text: l.import_selected_items,
+                                                action: () => {
+                                                    mega.ui.onboarding.dataHandler.saveData()
+                                                        .then((result) => {
+                                                            if (result) {
+                                                                mega.ui.onboarding.sheet.goToStep(3);
+                                                            }
+                                                        });
+                                                },
+                                                event: 500900
                                             },
-                                            onSkip: () => {
-                                                mega.ui.onboarding.sheet.goToStep(2, true);
+                                            skip: {
+                                                text: l[822],
+                                                action: () => {
+                                                    mega.ui.onboarding.sheet.goToStep(2, true);
+                                                },
+                                                event: 500901
                                             },
                                             customContent: () => mega.ui.onboarding.dataHandler.container
                                         }
@@ -223,26 +240,34 @@ mBroadcaster.addListener('fm:initialized', () => {
                                         label: l.install_extension,
                                         title: l.install_extension_title,
                                         subtitle: l.install_extension_subtitle,
-                                        nextText: l.install_extension,
-                                        skipText: l[18682],
-                                        onNext: () => {
-                                            mega.ui.onboarding.extension.installExtension();
-                                            mega.ui.onboarding.sheet.nextStep();
+                                        next: {
+                                            text: l.install_extension,
+                                            disabled: true,
+                                            action: () => {
+                                                mega.ui.onboarding.extension.installExtension();
+                                                mega.ui.onboarding.sheet.nextStep();
+                                            }
                                         },
-                                        onSkip: () => {
-                                            mega.ui.onboarding.sheet.nextStep();
+                                        skip: {
+                                            text: l[18682],
+                                            action: () => {
+                                                mega.ui.onboarding.sheet.nextStep();
+                                            },
+                                            event: 500905
                                         },
-                                        nextDisabled: true,
                                         customContent: () => {
                                             mega.ui.onboarding.extension = new MegaExtensionPassSelector();
                                             return mega.ui.onboarding.extension.container;
-                                        },
+                                        }
                                     },
                                     {
                                         title: l.mega_pass_onboarding_finish_title,
                                         description: l.mega_pass_onboarding_finish_subtitle,
                                         imageClass: 'green-check',
-                                        nextText: l.mega_pass_onboarding_finish_button
+                                        next: {
+                                            text: l.mega_pass_onboarding_finish_button,
+                                            event: 500906
+                                        }
                                     }
                                 ]
                             },

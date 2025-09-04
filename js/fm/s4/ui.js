@@ -389,18 +389,20 @@ lazy(s4, 'ui', () => {
 
             $('.files-grid-view.fm, .fm-blocks-view.fm', this.$fmBlock).addClass('active-header');
             this.$infoHeaderBlocks.removeClass('hidden');
+
+            // @todo: Use mega.ui.secondaryNav.showBanner instead
             const $notification = $('.bucket-access-warning', this.$infoHeaderBlocks)
                 .removeClass('hidden');
             const publicAccess = s4.kernel.getPublicAccessLevel(this.bucket);
 
             if (publicAccess === 1) {
-                $notification.safeHTML(l.s4_bkt_access_granted_tip);
+                $('.message-text', $notification).safeHTML(l.s4_bkt_access_granted_tip);
             }
             else if (publicAccess === 2) {
-                $notification.safeHTML(l.s4_bkt_access_denied_tip);
+                $('.message-text', $notification).safeHTML(l.s4_bkt_access_denied_tip);
             }
             else {
-                $notification.safeHTML(l.s4_bkt_access_origin_tip);
+                $('.message-text', $notification).safeHTML(l.s4_bkt_access_origin_tip);
             }
 
             $('a', $notification).rebind('click.openHelpCenter', () => {

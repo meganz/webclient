@@ -185,18 +185,39 @@ lazy(s4, 'utils', () => {
             }
 
             // Get confirmation message data
-            const { title, message, cfgName } = this.getConfirmationMessage({
+            const confirmation = await this.getConfirmationMessage({
                 action: toMove ? 'move' : 'copy', n, s4Nodes, type, tNode, tType
             });
 
-            // Show confiormation dialog
+            if (!confirmation) {
+                throw EBLOCKED;
+            }
+
+            const { title, message, cfgName, sensitives } = confirmation;
+
+            /**
+             * Cleaning up the sensitives before moving to the bucket
+             * @param {Boolean} yes Result from the confirmation dialog
+             * @returns {Promise<true>}
+             */
+            const nodesCleanup = async(yes) => {
+                if (yes && sensitives.length) {
+                    loadingDialog.show('dropSenToS4');
+                    await mega.sensitives.toggleStatus(sensitives.map(({ h }) => h), false)
+                        .finally(loadingDialog.hide.bind(loadingDialog, 'dropSenToS4'));
+                }
+
+                return yes;
+            };
+
+            // Show confirmation dialog
             if (title && message && !mega.config.get(cfgName)) {
                 return asyncMsgDialog(
                     `confirmation:!^${toMove ? l[62] : l[63]}!${l[82]}`,
                     null,
                     title,
                     message,
-                    null,
+                    nodesCleanup,
                     cfgName
                 ).then(res => {
                     if (res) {
@@ -205,6 +226,8 @@ lazy(s4, 'utils', () => {
                     throw EBLOCKED;
                 });
             }
+
+            await nodesCleanup(true);
 
             // Confirm action other actions
             return true;
@@ -259,10 +282,10 @@ lazy(s4, 'utils', () => {
         /**
          * Getting message for confirmation dialog when copying/moving from/to s4
          * @param {Object} data Nodes, S4 nodes, types, action name
-         * @returns {Object} title, message, cfgName
+         * @returns {Object?} title, message, cfgName
          * @memberOf s4
          */
-        getConfirmationMessage(data = {}) {
+        async getConfirmationMessage(data = {}) {
             const { action, n, type, s4Nodes, tNode, tType } = data;
 
             let helpUrl = `${l.mega_help_host}/megas4/s4-buckets/move-bucket`;
@@ -270,10 +293,31 @@ lazy(s4, 'utils', () => {
             let message = '';
             let cfgName = '';
             let suffix = '';
+            let sensitives = [];
 
             // Get number of S4 nodes only
             if (s4Nodes.length > 1) {
                 suffix =  '_plural';
+            }
+
+            // Check if there are hidden nodes on move action
+            if (action === 'move') {
+                sensitives = n.filter(mega.sensitives.isSensitive);
+
+                const hiddenAcknowledged = () => (sensitives.length && !mega.config.get('skipSenToS4'))
+                    ? asyncMsgDialog(
+                        `confirmationb:!^${l[507]}!${l[82]}`,
+                        null,
+                        l.sen_s4_warn_title,
+                        l.sen_s4_warn_txt,
+                        null,
+                        'skipSenToS4'
+                    )
+                    : Promise.resolve(true);
+
+                if (!(await hiddenAcknowledged().catch(nop))) {
+                    return null;
+                }
             }
 
             // Files and folders to a container
@@ -315,19 +359,17 @@ lazy(s4, 'utils', () => {
                     message = l[`s4_warn_${ action }_items_to_bucket${ suffix }`];
                 }
             }
-            // From Object storage to Cloud drive
-            else {
+            // Move From Object storage to Cloud drive
+            else if (action === 'move') {
                 cfgName = 'skips4tocd';
 
                 // Move Buckets to Cloud drive
                 if (type === 'bucket') {
-                    if (action === 'move') {
-                        title = l[`s4_title_${ action }_bucket_to_cd${ suffix }`];
-                        message = l[`s4_warn_copy_move_bucket_to_cd${ suffix }`];
-                    }
+                    title = l[`s4_title_${ action }_bucket_to_cd${ suffix }`];
+                    message = l[`s4_warn_copy_move_bucket_to_cd${ suffix }`];
                 }
                 // Objects or sub-folders to Cloud drive
-                else if (type === 'object' || type === 'bucket-child' && s4Nodes.length === 1) {
+                else if ((type === 'object' || type === 'bucket-child') && s4Nodes.length === 1) {
                     title = l[`s4_title_${ action }_object_to_cd${ suffix }`];
                     message = l.s4_warn_copy_move_items_to_cd;
                 }
@@ -344,7 +386,7 @@ lazy(s4, 'utils', () => {
                 .replace('[/A]', '</a>')
                 .replace('%1', n[0].name).replace('%2', tNode.name);
 
-            return { title, message, cfgName };
+            return { title, message, cfgName, sensitives };
         },
 
         /**

@@ -27,11 +27,8 @@ class MegaOnboardingJourney {
                 subtitle: step.subtitle || '',
                 description: step.description || '',
                 imageClass: step.imageClass || '',
-                nextText: step.nextText || l[556],
-                skipText: step.skipText || l.mega_pass_onboarding_skip,
-                nextDisabled: step.nextDisabled || false,
-                onNext: step.onNext,
-                onSkip: step.onSkip,
+                next: step.next,
+                skip: step.skip,
                 customContent: step.customContent
             };
 
@@ -39,18 +36,16 @@ class MegaOnboardingJourney {
 
             // If there's a secondary step, add it as well
             if (step.secondaryStep) {
+                const {secondaryStep} = step;
                 const secondaryStepConfig = {
                     id: `${stepIndex}.1`,
-                    title: step.secondaryStep.label,
-                    subtitle: step.secondaryStep.subtitle || '',
-                    description: step.secondaryStep.description || '',
-                    imageClass: step.secondaryStep.imageClass || '',
-                    nextText: step.secondaryStep.nextText || l[556],
-                    skipText: step.secondaryStep.skipText || l.mega_pass_onboarding_skip,
-                    nextDisabled: step.secondaryStep.nextDisabled || false,
-                    onNext: step.secondaryStep.onNext,
-                    onSkip: step.secondaryStep.onSkip,
-                    customContent: step.secondaryStep.customContent
+                    title: secondaryStep.title || secondaryStep.label,
+                    subtitle: secondaryStep.subtitle || '',
+                    description: secondaryStep.description || '',
+                    imageClass: secondaryStep.imageClass || '',
+                    customContent: secondaryStep.customContent,
+                    next: secondaryStep.next,
+                    skip: secondaryStep.skip
                 };
 
                 stepConfigs.push(secondaryStepConfig);
@@ -159,9 +154,18 @@ class MegaOnboardingJourney {
         const actions = document.createElement('div');
         actions.className = 'actions';
 
-        const nextText = this.stepConfigs[0] && this.stepConfigs[0].nextText || l[556];
-        const skipText = this.stepConfigs[0] && this.stepConfigs[0].skipText || l.mega_pass_onboarding_skip;
-        const nextDisabled = this.stepConfigs[0] && this.stepConfigs[0].nextDisabled || false;
+        const nextText =
+            this.stepConfigs[0] &&
+            this.stepConfigs[0].next &&
+            this.stepConfigs[0].next.text || l[556];
+        const skipText =
+            this.stepConfigs[0] &&
+            this.stepConfigs[0].skip &&
+            this.stepConfigs[0].skip.text || l.mega_pass_onboarding_skip;
+        const nextDisabled =
+            this.stepConfigs[0] &&
+            this.stepConfigs[0].next &&
+            this.stepConfigs[0].next.disabled || false;
 
         this.next = new MegaButton({
             parentNode: actions,
@@ -198,9 +202,10 @@ class MegaOnboardingJourney {
         const currentConfig = this.stepConfigs[this.currentStepIndex];
 
         if (currentConfig) {
-            this.next.text = currentConfig.nextText || l[556];
-            this.skip.text = currentConfig.skipText || l.mega_pass_onboarding_skip;
-            this.next.disabled = currentConfig.nextDisabled || false;
+            this.next.text = currentConfig.next && currentConfig.next.text || l[556];
+            this.skip.text = currentConfig.skip && currentConfig.skip.text || l.mega_pass_onboarding_skip;
+            this.next.disabled = currentConfig.next && currentConfig.next.disabled || false;
+
             if (this.currentStepIndex === this.stepConfigs.length - 1) {
                 this.skip.hide();
             }
@@ -251,17 +256,21 @@ class MegaOnboardingJourney {
     handleNext() {
         const currentConfig = this.stepConfigs[this.currentStepIndex];
 
-        if (currentConfig) {
-            const {onNext} = currentConfig;
+        if (currentConfig && currentConfig.next) {
+            const {action, event} = currentConfig.next;
 
-            if (typeof onNext === 'function') {
-                onNext();
+            if (typeof action === 'function') {
+                action();
             }
-            else if (typeof onNext === 'number') {
-                this.goToStep(Number(onNext));
+            else if (typeof action === 'number') {
+                this.goToStep(Number(action));
             }
             else {
                 this.hide();
+            }
+
+            if (event) {
+                eventlog(event);
             }
         }
     }
@@ -269,17 +278,21 @@ class MegaOnboardingJourney {
     handleSkip() {
         const currentConfig = this.stepConfigs[this.currentStepIndex];
 
-        if (currentConfig) {
-            const {onSkip} = currentConfig;
+        if (currentConfig && currentConfig.skip) {
+            const {action, event} = currentConfig.skip;
 
-            if (typeof onSkip === 'function') {
-                onSkip();
+            if (typeof action === 'function') {
+                action();
             }
-            else if (typeof onSkip === 'number') {
-                this.goToStep(onSkip);
+            else if (typeof action === 'number') {
+                this.goToStep(action);
             }
             else {
                 this.hide();
+            }
+
+            if (event) {
+                eventlog(event);
             }
         }
     }

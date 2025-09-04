@@ -97,13 +97,15 @@ lazy(mega.devices.sections, 'folderChildren', () => {
                     mega.ui.secondaryNav.updateInfoChipsAndViews();
                     const { isDeviceFolder, t, status } = folder;
                     const isShareLimitedNode = sharer(h) && M.getNodeRights(h) < 2;
-                    const hideButtons = !(isDeviceFolder && t !== syncType.cameraUpload) ||
-                        isShareLimitedNode ||
-                        status.errorState === 14;
+                    const isHiddenSync = !isDeviceFolder || isShareLimitedNode || status.errorState === 14;
+                    const isHiddenPauseResume = isHiddenSync
+                        || t === syncType.cameraUpload
+                        || t === syncType.mediaUpload;
+
                     mega.ui.secondaryNav.showCard(
                         h,
                         {
-                            componentClassname: `outline ${hideButtons ? 'hidden' : ''}`,
+                            componentClassname: `outline ${isHiddenPauseResume ? 'hidden' : ''}`,
                             text: status.pausedSyncs ? l.dc_run : l.dc_pause,
                             icon: `sprite-fm-mono ${
                                 status.pausedSyncs ?
@@ -116,7 +118,7 @@ lazy(mega.devices.sections, 'folderChildren', () => {
                             }
                         },
                         {
-                            componentClassname: `destructive ${hideButtons ? 'hidden' : ''}`,
+                            componentClassname: `destructive ${isHiddenSync ? 'hidden' : ''}`,
                             text: isBackup ? l.stop_backup_button : l.stop_syncing_button,
                             icon: 'sprite-fm-mono icon-dialog-close',
                             onClick: () => {
@@ -164,6 +166,9 @@ lazy(mega.devices.sections, 'folderChildren', () => {
                     // items already managed by mega render system, no need to re-render on refresh
                     this._renderItems(h);
                 }
+            }
+            else if (!M.v.length) {
+                this.$empty.removeClass('hidden');
             }
         }
 

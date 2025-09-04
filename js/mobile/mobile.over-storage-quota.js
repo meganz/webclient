@@ -18,8 +18,17 @@ mobile.overStorageQuota = {
         mega.ui.sheet.hide();
 
         if (!this.isVisible) {
-            const banner = mobile.banner.show(
-                l.storage_full, l.storage_full_msg, l.upgrade_now, 'error', false);
+            // Hide almost full if needed
+            mobile.banner.hide('full-storage', 0);
+
+            const banner = mobile.banner.show({
+                title: l.storage_full,
+                msgText: l.bn_full_storage_text,
+                ctaText: l.upgrade_now,
+                type: 'error',
+                closeBtn: false,
+                name: 'full-storage'
+            });
             banner.on('cta', () => {
                 loadSubPage('pro');
             });
@@ -150,11 +159,14 @@ mobile.overStorageQuota = {
 
         // Add touchend event to span tag as a workaround to load fm/rubbish without
         // a page reload
-        rubbishDiv.querySelector('span.gotorub').addEventListener('touchend', () => {
-            mega.ui.sheet.hide();
-            mega.ui.overlay.hide();
-            loadSubPage('fm/rubbish');
-        });
+        const gotoDiv = rubbishDiv.querySelector('span.gotorub');
+        if (gotoDiv) {
+            gotoDiv.addEventListener('touchend', () => {
+                mega.ui.sheet.hide();
+                mega.ui.overlay.hide();
+                loadSubPage('fm/rubbish');
+            });
+        }
 
         contentsDiv.append(upgradeDiv);
         contentsDiv.append(rubbishDiv);

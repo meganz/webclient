@@ -1979,6 +1979,7 @@ lazy(mega.devices, 'ui', () => {
                 this._populateCommonCtxItems(node, items, isSharedFolder, hasSharedLink);
                 items['.rename-item'] = 1;
                 items['.open-cloud-item'] = 1;
+                items['.stopsync-item'] = 1;
             }
         }
 

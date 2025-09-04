@@ -1810,6 +1810,60 @@
         return $dialog && !M.isInvalidUserStatus();
     };
 
+    const _memoriseTreeState = () => {
+        const expanded = $dialog[0].querySelectorAll('span.expanded');
+        const ids = [];
+
+        for (let i = expanded.length; i--;) {
+            const elem = expanded[i];
+            if (
+                !elem.parentNode.classList.contains('tree-item-on-search-hidden') &&
+                !elem.parentNode.classList.contains('hidden')
+            ) {
+                ids.push(elem.id);
+            }
+        }
+
+        const sel = $.mcselected;
+        const scrollPos = $dialog[0].querySelector('.dialog-tree-panel-scroll').scrollTop;
+
+        return [ids, sel, scrollPos];
+    };
+
+    const _reapplyTreeState = ([ids, sel, scrollPos]) => {
+        for (let i = ids.length; i--;) {
+
+            const el = $dialog[0].querySelector(`#${ids[i]}`);
+
+            if (el && el.classList.contains('contains-folders') && !el.classList.contains('expanded')) {
+
+                const arrow = el.querySelector('.nw-fm-tree-arrow');
+                const sub = $dialog[0].querySelector(ids[i].replace('mctreea_', '#mctreesub_'));
+
+                el.classList.add('expanded');
+                arrow.classList.remove('icon-chevron-right-thin-outline');
+                arrow.classList.add('icon-chevron-down-thin-outline');
+                sub.classList.add('opened');
+            }
+        }
+        if (sel) {
+            const el = $dialog[0].querySelector(`#mctreea_${sel}`);
+            if (el) {
+                el.click();
+            }
+            else { // selected item is deleted, reset UI
+                setDialogBreadcrumb();
+                setDialogButtonState($('.dialog-picker-button', $dialog));
+            }
+        }
+        if (typeof scrollPos === 'number') {
+            const el = $dialog[0].querySelector('.dialog-tree-panel-scroll');
+            if (el) {
+                el.scrollTop = scrollPos;
+            }
+        }
+    };
+
     // ------------------------------------------------------------------------
     // ---- Public Functions --------------------------------------------------
 
@@ -1818,7 +1872,7 @@
      * @global
      */
     global.refreshDialogContent = function refreshDialogContent() {
-        var tab = $.cfsection || 'cloud-drive';
+        var tab = $.cfsection || section || 'cloud-drive';
 
         // eslint-disable-next-line local-rules/jquery-replacements
         const b = tab !== 'conversations' && $('.content-panel.' + tab).html();
@@ -1850,8 +1904,13 @@
             }
         }
 
+        // Remember current tree state, include selection and expand states
+        const memory = _memoriseTreeState();
+
         handleDialogTabContent(tab, 'ul', b);
         buildDialogTree();
+
+        _reapplyTreeState(memory);
 
         delete $.cfsection; // safe deleting
         delete $.openedDialogNodes;
@@ -2151,32 +2210,10 @@
 
             M.sortTreePanel[key].by = 'name';
             M.sortTreePanel[key].dir *= -1;
-            const expanded = $dialog[0].querySelectorAll('span.expanded');
-            const ids = [];
 
-            for (let i = expanded.length; i--;) {
-                const elem = expanded[i];
-                if (
-                    !elem.parentNode.classList.contains('tree-item-on-search-hidden') &&
-                    !elem.parentNode.classList.contains('hidden')
-                ) {
-                    ids.push(elem.id);
-                }
-            }
-            const sel = $.mcselected;
+            const memory = _memoriseTreeState();
             buildDialogTree();
-            for (let i = ids.length; i--;) {
-                const el = $dialog[0].querySelector(`#${ids[i]} .nw-fm-tree-arrow`);
-                if (el) {
-                    el.click();
-                }
-            }
-            if (sel) {
-                const el = $dialog[0].querySelector(`#mctreea_${sel}`);
-                if (el) {
-                    el.click();
-                }
-            }
+            _reapplyTreeState(memory);
         });
 
         const $saveErr = $('.save-input-error', $dialog);
@@ -2916,6 +2953,15 @@
                                         }
                                     }).catch(dump);
                                 };
+
+                                const toUnhide = section === 's4' && mega.sensitives.featureEnabled
+                                    ? res.filter(h => M.d[h].sen)
+                                    : [];
+
+                                if (toUnhide.length) {
+                                    mega.sensitives.toggleStatus(toUnhide, false);
+                                }
+
                                 showToast();
                             }
                         })

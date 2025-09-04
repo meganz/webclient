@@ -1432,23 +1432,11 @@ mBroadcaster.once('boot_done', function populate_l() {
             + `/megas4/s4-buckets/bucket-naming-conventions">`
         ).replace('[/A]', '</a>');
     l.s4_bkt_access_granted_tip = escapeHTML(l.s4_bkt_access_granted_tip)
-        .replace(
-            '[A]',
-            `<a class="clickurl" target="_blank" href="${l.mega_help_host}`
-            + `/megas4/s4-buckets/change-bucket-object-url-access">`
-        ).replace('[/A]', '</a>');
+        .replace(/\[A][\S\s]*?\[\/A]/g, '');
     l.s4_bkt_access_denied_tip = escapeHTML(l.s4_bkt_access_denied_tip)
-        .replace(
-            '[A]',
-            `<a class="clickurl" target="_blank" href="${l.mega_help_host}`
-            + `/megas4/s4-buckets/change-bucket-object-url-access">`
-        ).replace('[/A]', '</a>');
+        .replace(/\[A][\S\s]*?\[\/A]/g, '');
     l.s4_bkt_access_origin_tip = escapeHTML(l.s4_bkt_access_origin_tip)
-        .replace(
-            '[A]',
-            `<a class="clickurl" target="_blank" href="${l.mega_help_host}`
-            + `/megas4/s4-buckets/change-bucket-object-url-access">`
-        ).replace('[/A]', '</a>');
+        .replace(/\[A][\S\s]*?\[\/A]/g, '');
     l.s4_obj_access_granted_tip = escapeHTML(l.s4_obj_access_granted_tip)
         .replace(
             '[A]',
@@ -2024,7 +2012,8 @@ mBroadcaster.once('boot_done', function populate_l() {
         's4_disable_feature_info',
         's4_activation_tools_info',
         's4_s3_prefix_usage',
-        'info_panel_tags_create_btn'
+        'info_panel_tags_create_btn',
+        'bn_odq_text'
     ];
     for (let i = common.length; i--;) {
         var num = common[i];

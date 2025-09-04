@@ -193,33 +193,49 @@ export default class GenericConversationMessage extends ConversationMessageMixin
         if ($.dialog === 'onboardingDialog') {
             closeDialog();
         }
+        if (openSendToChat) {
+            openSendToChatDialog();
+            return;
+        }
         openSaveToDialog(v, function(node, target) {
-            if (Array.isArray(target)) {
-
-                megaChat.openChatAndAttachNodes(target, node.ch || node.h).catch(tell);
-            }
-            else {
-                // is a save/copy to
-                target = target || M.RootID;
-                M.injectNodes(node, target, function(res) {
-                    if (!Array.isArray(res) || !res.length) {
-                        if (d) {
-                            console.warn('Unable to inject nodes... no longer existing?', res);
+            // is a save/copy to
+            target = target || M.RootID;
+            M.injectNodes(node, target, (res) => {
+                if (!Array.isArray(res) || !res.length) {
+                    if (d) {
+                        console.warn('Unable to inject nodes... no longer existing?', res);
+                    }
+                }
+                else {
+                    mega.ui.toast.show(
+                        mega.icu.format(l.toast_import_file, res.length).replace('%s', M.getNameByHandle(target)),
+                        4,
+                        l[16797],
+                        {
+                            actionButtonCallback() {
+                                M.openFolder(target).then(() => {
+                                    if (window.selectionManager) {
+                                        let reset = false;
+                                        for (let i = res.length; i--;) {
+                                            const n = M.getNodeByHandle(res[i]);
+                                            if (n.p === target) {
+                                                if (reset) {
+                                                    selectionManager.add_to_selection(n.h);
+                                                }
+                                                else {
+                                                    selectionManager.resetTo(n.h);
+                                                    reset = true;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }).catch(dump);
+                            }
                         }
-                    }
-                    else {
-                        msgDialog(
-                            'info',
-                            l[8005],
-                            // Confirmation message based on the selected location.
-                            // a) `Attachment added to Cloud Drive.` for the root directory or none selected (default)
-                            // b) `Attachment added to %s.`
-                            target === M.RootID ? l[8006] : l[22903].replace('%s', escapeHTML(M.d[target].name))
-                        );
-                    }
-                });
-            }
-        }, openSendToChat ? "conversations" : false);
+                    );
+                }
+            });
+        }, false);
     }
 
     _getLink(h, e) {

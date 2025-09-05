@@ -417,8 +417,17 @@ lazy(mega.ui, 'mNodeFilter', () => {
                 }));
             }
 
-            this.$resetFilterChips.rebind(`click.resetFilterBy${name}`, () => this.resetToDefault());
-            this.resetToDefault();
+            const handleResetBy = tryCatch(() => {
+                this.resetToDefault();
+                if (M.search) {
+                    pushHistoryState(true, {
+                        ...history.state,
+                        searchFilters: null
+                    });
+                }
+            });
+            this.$resetFilterChips.rebind(`click.resetFilterBy${name}`, handleResetBy);
+            handleResetBy();
         }
 
         /**
@@ -478,6 +487,27 @@ lazy(mega.ui, 'mNodeFilter', () => {
 
             if (index === this.selectedIndex) {
                 this.resetToDefault();
+                if (M.search) {
+                    const {state} = history;
+                    tryCatch(() => {
+                        if (state.searchFilters && state.searchFilters[this.name]) {
+                            const newState = {
+                                ...state,
+                                searchFilters: {
+                                    ...state.searchFilters,
+                                    [this.name]: null,
+                                    value: selectedFilters.value
+                                }
+                            };
+
+                            if (Object.keys(newState.searchFilters).length === 0) {
+                                delete newState.searchFilters;
+                            }
+
+                            pushHistoryState(true, newState);
+                        }
+                    })();
+                }
                 if (folderlink && String(M.currentdirid).startsWith('search/')) {
                     M.fmSearchNodes(M.currentdirid.replace('search/', ''));
                 }
@@ -490,13 +520,17 @@ lazy(mega.ui, 'mNodeFilter', () => {
                 return;
             }
 
-            item.el.classList.add('selected');
+            if (item) {
+                item.el.classList.add('selected');
 
-            for (let i = 0; i < this._options.length; i++) {
-                if (item.el !== this._options[i].el) {
-                    this._options[i].deselectItem();
-                    this._options[i].el.classList.remove('selected');
+                for (let i = 0; i < this._options.length; i++) {
+                    if (item.el !== this._options[i].el) {
+                        this._options[i].deselectItem();
+                        this._options[i].el.classList.remove('selected');
+                    }
                 }
+
+                this.$text.text(item.el.innerText);
             }
 
             this.selectedIndex = index;
@@ -516,6 +550,21 @@ lazy(mega.ui, 'mNodeFilter', () => {
             this.$text.text(item.el.innerText);
             this.$element.addClass('selected');
             this.$resetFilterChips.removeClass('hidden');
+            tryCatch(() => {
+                if (history.state.searchString) {
+                    const baseSearchFilters = history.state.searchFilters || Object.create(null);
+                    pushHistoryState(true, {
+                        ...history.state,
+                        searchFilters: {
+                            ...baseSearchFilters,
+                            [this.name]: {
+                                data: freeze({ index, }),
+                            },
+                            value: this.selectedFilters.value
+                        }
+                    });
+                }
+            })();
 
             // @todo instead of going all through openFolder() we may want to filterBy(search|parent) + renderMain()
             if (!preventReload) {
@@ -536,10 +585,12 @@ lazy(mega.ui, 'mNodeFilter', () => {
         FilterChipComponent: FilterChip,
         /**
          * Sets up the chips, checking the current page and initializing the type filter chip if applicable.
+         * @param {Object} overloadedFilters An optional object containing filters to overload the default selections.
          *
          * @returns {undefined}
          */
-        initSearchFilter() {
+        initSearchFilter(overloadedFilters) {
+            overloadedFilters = overloadedFilters || Object.create(null);
             $fmFilterChipsWrapper = $('.fm-filter-chips-wrapper', '.fm-right-files-block');
             $resetFilterChips = $('.fm-filter-reset', $fmFilterChipsWrapper);
 
@@ -549,9 +600,38 @@ lazy(mega.ui, 'mNodeFilter', () => {
                 const ctx = filters[name];
 
                 if (!ctx.component) {
-                    ctx.component = new FilterChip(name, 'fm', $fmFilterChipsWrapper, filters, selectedFilters);
+                    const selectedFiltersToUse = overloadedFilters[name] || selectedFilters;
+                    ctx.component = new FilterChip(name, 'fm', $fmFilterChipsWrapper, filters, selectedFiltersToUse);
+                }
+                else if (overloadedFilters[name]) {
+                    ctx.component.show(-1000, -1000); // render offscreen. will get hidden by the click
+                    const {index} = overloadedFilters[name].data;
+                    const i = ctx.component._options[index];
+                    ctx.component.onItemSelect(index, i, null, true);
                 }
             }
+
+            tryCatch(() => {
+                if (Object.keys(overloadedFilters).length !== 0) {
+                    const toSet = Object.keys(overloadedFilters)
+                        .reduce((acc, c) => {
+                            if (c === 'value') {
+                                acc.value = overloadedFilters[c];
+                                return acc;
+                            }
+                            if (overloadedFilters[c]) {
+                                acc.data = { name: c, ...overloadedFilters[c].data };
+                            }
+                            return acc;
+                        }, { data: null, value: 0 });
+                    mega.ui.mNodeFilter.selectedFilters.value = toSet.value;
+                    mega.ui.mNodeFilter.selectedFilters.data = toSet.data;
+                    pushHistoryState(true, {
+                        ...history.state,
+                        searchFilters: overloadedFilters
+                    });
+                }
+            })();
 
             $resetFilterChips.rebind('click.resetFilters', () => {
 
@@ -599,6 +679,10 @@ lazy(mega.ui, 'mNodeFilter', () => {
             else {
                 this.initSearchFilter();
             }
+
+            if (M.search && !stash && history.state.searchFilters) {
+                this.reapplyFilterSelections(history.state.searchFilters);
+            }
         },
         get selectedFilters() {
             return selectedFilters;
@@ -610,6 +694,9 @@ lazy(mega.ui, 'mNodeFilter', () => {
                 || String(M.currentdirid).startsWith('user-management')
                 || pfcol
                 || mega.devices.ui.getRenderSection() === 'device-centre-devices');
-        }
+        },
+        reapplyFilterSelections(filterSelections) {
+            this.initSearchFilter(filterSelections);
+        },
     });
 });

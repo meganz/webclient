@@ -1394,9 +1394,6 @@ lazy(mega.ui, 'secondaryNav', () => {
             this.filterChipsHolder.classList.add('hidden');
         },
         extShowFilterChip() {
-            if ($.selected && $.selected.length) {
-                return;
-            }
             this.filterChipsHolder.classList.remove('hidden');
         }
     };

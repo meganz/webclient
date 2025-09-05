@@ -124,14 +124,25 @@ class MegaNavCard extends MegaComponent {
     }
 
     get badgeHtml() {
+        if (this._lastShareName && !this.isSharedRoot) {
+            delete this._lastShareName;
+        }
         if (this.isSharedRoot) {
             const { su } = this.node;
+            const data = {
+                n: M.getNameByHandle(su),
+                m: M.u[su].m
+            };
+            if (this._lastShareName && data.n === this._lastShareName.n && data.m === this._lastShareName.m) {
+                return '';
+            }
+            this._lastShareName = data;
             return `
                 <div class="fm-item-badge">
                     <div class="fm-share-avatar"></div>
-                    <div class="fm-share-user">${escapeHTML(M.getNameByHandle(su))}</div>
+                    <div class="fm-share-user">${escapeHTML(data.n)}</div>
                     <span class="dot">.</span>
-                    <div class="fm-share-email">${escapeHTML(M.u[su].m)}</div>
+                    <div class="fm-share-email">${escapeHTML(data.m)}</div>
                 </div>
             `;
         }
@@ -230,7 +241,7 @@ class MegaNavCard extends MegaComponent {
         if (!this.isDevice && !this.isSync && !this.isBackup) {
             const html = this.badgeHtml;
             this.badge = html;
-            didRender = !!html;
+            didRender = !!html || this.isSharedRoot;
         }
         else if (this.isSync || this.isBackup) {
             const { status } = this.node;
@@ -279,10 +290,11 @@ class MegaNavCard extends MegaComponent {
         if (this.isSharedRoot) {
             const parentNode = this.domNode.querySelector('.fm-share-avatar');
             if (parentNode) {
-                this.avatar = this.avatar || new MegaAvatarComponent({
-                    parentNode,
-                    userHandle: this.node.su,
-                });
+                this.avatar = this.avatar && this.avatar.parentNode === parentNode ? this.avatar :
+                    new MegaAvatarComponent({
+                        parentNode,
+                        userHandle: this.node.su,
+                    });
                 this.avatar.update();
             }
             let iconClass = `fm-icon item-type-icon icon-${fileIcon(this.node)}-24`;

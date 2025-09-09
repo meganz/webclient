@@ -1308,7 +1308,7 @@ class MegaGallery {
 
             galleryHeader.removeClass('hidden');
         }
-        else if (M.viewmode !== 2 || pfid) {
+        else {
             onIdle(() => {
                 if (!M.v.length) {
                     mega.gallery.showEmpty(M.currentdirid);

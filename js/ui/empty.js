@@ -33,10 +33,13 @@ lazy(mega.ui, 'empty', () => {
     const showEmptyCloud = (title, img, target = document.querySelector(defaultTarget)) => {
         clear(target);
 
+        if (M.onMediaView) {
+            // Empty state handled from Gallery
+            return;
+        }
         if (pfid || M.currentrootid === M.RubbishID) {
-            if (!M.onMediaView) {
-                $('.fm-empty-folder').removeClass('hidden');
-            }
+            // Keeping old empty states for folderlinks and Rubbish folders
+            $('.fm-empty-folder', '.fm-right-files-block').removeClass('hidden');
             return;
         }
 

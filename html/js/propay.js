@@ -3051,6 +3051,14 @@ pro.propay = {
     init() {
         'use strict';
 
+        if (is_mobile) {
+            document.body.classList.remove('psa-notification');
+            const bannerNode = document.querySelector('.psa-holder .banner');
+            if (bannerNode) {
+                bannerNode.classList.add('hidden');
+            }
+        }
+
         this.initSkItems();
         this.$page = $('#propay');
         this.skItems.footers.startLoad();

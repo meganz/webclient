@@ -206,6 +206,11 @@ var psa = {
 
         'use strict';
 
+        // skip psa where not needed
+        if (is_mobile && page.indexOf('propay_') === 0) {
+            return;
+        }
+
         var bannerNode = document.querySelector('.psa-holder .banner');
 
         if (!bannerNode) {

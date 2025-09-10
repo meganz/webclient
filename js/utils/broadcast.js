@@ -109,6 +109,7 @@
             if (!(self.d > 2)) {
                 Object.defineProperty(this, 'debug', {value: false});
             }
+            this.__closed = false;
             this.onmessageerror = reportError;
 
             this.dispatchEvent = tryCatch(this.dispatchEvent, reportError);
@@ -154,6 +155,8 @@
             if (this.debug) {
                 this.debug(`\u{1F4EF} Sending message ${message}...`, data);
             }
+            assert(!this.__closed, `Cannot dispatch message, channel is closed...`);
+
             super.postMessage({message, data, origin: this.origin});
         }
 
@@ -163,6 +166,13 @@
 
         removeEventListener() {
             assert(0);
+        }
+
+        close() {
+            if (!this.__closed) {
+                this.__closed = true;
+                super.close();
+            }
         }
 
         debug(msg, ...args) {
@@ -181,33 +191,34 @@
     const channels = new Map();
 
     const getBroadcastChannel = (name = 'gbl') => {
-        if (!channels.has(name)) {
+        if (!channels.has(name) || channels.get(name).__closed) {
             channels.set(name, new MEGABroadcastChannel(name));
         }
         return channels.get(name);
     };
-    const crossTab = lazy(Object.create(null), 'channel', () => {
-
-        Object.defineProperties(crossTab, {
-            actors: {
-                value: []
-            },
-            primary: {
-                value: false,
-                writable: true
-            },
-            handle: {
-                value: false,
-                writable: true
-            },
-            logger: {
-                get() {
-                    return this.channel.logger;
-                }
+    const crossTab = Object.create(null);
+    Object.defineProperties(crossTab, {
+        actors: {
+            value: []
+        },
+        primary: {
+            value: false,
+            writable: true
+        },
+        handle: {
+            value: false,
+            writable: true
+        },
+        channel: {
+            get() {
+                return getBroadcastChannel('crosstab');
             }
-        });
-        /** @class crossTab.channel */
-        return getBroadcastChannel('crosstab');
+        },
+        logger: {
+            get() {
+                return this.channel.logger;
+            }
+        }
     });
     const str = (s) => !!s && ` ${s}`.slice(1);
     const hasOwn = (o, p) => Object.hasOwnProperty.call(o || !1, p);

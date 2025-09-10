@@ -2191,12 +2191,14 @@ MegaData.prototype.labelDomUpdate = function(handle, value) {
         $treeElements.removeClass('labeled');
         $('.colour-label-ind', $treeElements).remove();
 
-        const treeFolders = $treeElements[0].querySelectorAll('.nw-fm-tree-folder');
-        const exclude = ['inbound-share', 'shared-folder', 'file-request-folder', 'camera-folder', 'chat-folder'];
-        for (let i = treeFolders.length; i--;) {
-            // Limit to plain folders only
-            if (![...treeFolders[i].classList].some(c => exclude.includes(c))) {
-                MegaNodeComponent.label.set(n, treeFolders[i]);
+        if ($treeElements.length) {
+            const treeFolders = $treeElements[0].querySelectorAll('.nw-fm-tree-folder');
+            const exclude = ['inbound-share', 'shared-folder', 'file-request-folder', 'camera-folder', 'chat-folder'];
+            for (let i = treeFolders.length; i--;) {
+                // Limit to plain folders only
+                if (![...treeFolders[i].classList].some(c => exclude.includes(c))) {
+                    MegaNodeComponent.label.set(n, treeFolders[i]);
+                }
             }
         }
         if (labelId) {

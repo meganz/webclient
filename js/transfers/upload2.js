@@ -940,6 +940,7 @@ var ulmanager = {
         if (d) {
             ulmanager.logger.info("ul_completepending2", res, ctx);
         }
+        const ulid = 'ul_' + ctx.file.id;
 
         if (typeof res === 'object' && 'st' in res) {
             const h = res.handle;
@@ -1013,7 +1014,7 @@ var ulmanager = {
                 console.warn(`Unexpected upload completion server response (${res} @ ${hostname(ctx.file.posturl)})`);
             }
         }
-        delete ulmanager.ulCompletingPhase['ul_' + ctx.file.id];
+        delete ulmanager.ulCompletingPhase[ulid];
 
         if (ctx.file.owner) {
             ctx.file.owner.destroy();

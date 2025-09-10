@@ -202,7 +202,9 @@ MegaUtils.prototype.resetUploadDownload = function megaUtilsResetUploadDownload(
         clearTransferXHRs();
 
         $('.transfer-pause-icon').addClass('disabled');
-        $('.transfer-clear-all-icon').addClass('disabled');
+        if ($('tr.transfer-error', M.getTransferElements.domTable).length === 0) {
+            $('.transfer-clear-all-icon').addClass('disabled');
+        }
         $('.nw-fm-left-icon.transfers').removeClass('transfering');
         $('.transfers .nw-fm-percentage li p').css('transform', 'rotate(0deg)');
         M.tfsdomqueue = Object.create(null);

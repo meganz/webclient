@@ -27,7 +27,8 @@ var extensions = {
     'torrent': [['torrent'], 'Torrent'],
     'text': [['txt', 'ans', 'ascii', 'log', 'wpd', 'json', 'md', 'org'], 'Text', 'pages'],
     'vector': [['svgz', 'svg', 'cdr', 'eps'], 'Vector'],
-    'video': [['mkv', 'webm', 'avi', 'mp4', 'm4v', 'mpg', 'mpeg', 'mov', '3g2', '3gp', 'asf', 'wmv', 'vob'], 'Video'],
+    'video': [[
+        'mkv', 'webm', 'avi', 'mp4', 'm4v', 'mpg', 'mpeg', 'mov', '3g2', '3gp', 'asf', 'wmv', 'vob', 'ts'], 'Video'],
     'web-data': [['html', 'xml', 'shtml', 'dhtml', 'js', 'css', 'jar', 'java', 'class'], 'Web Client Code'],
     'web-lang': [[
         'php', 'php3', 'php4', 'php5', 'phtml', 'inc', 'asp', 'pl', 'cgi', 'py', 'sql', 'accdb', 'db', 'dbf', 'mdb',
@@ -251,6 +252,7 @@ var extmime = {
     "tif": "image/tiff",
     "tiff": "image/tiff",
     "torrent": "application/x-bittorrent",
+    "ts": "video/mp2t",
     "tsv": "text/tab-separated-values",
     "ttl": "text/turtle",
     "txt": "text/plain",
@@ -483,6 +485,7 @@ mBroadcaster.once('boot_done', () => {
         'mov': l[20309],
         'mp3': l[20310],
         'mpeg': l[20311],
+        'ts': l[20311],
         'mpg': l[20311],
         'mrw': l[20266],
         'msi': l[20312],

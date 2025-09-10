@@ -653,7 +653,9 @@ class MegaHeader extends MegaMobileHeader {
 
             this.avatarMenu.Ps = new PerfectScrollbar(this.avatarMenu);
 
-            window.addEventListener('resize', SoonFc(90, this.avatarMenu.Ps.update));
+            const _resizeHandler = SoonFc(90, this.avatarMenu.Ps.update);
+            window.addEventListener('resize', _resizeHandler);
+            this.on('destroy', () => window.removeEventListener('resize', _resizeHandler));
 
             this.activityStatus = mCreateElement('div', {'class': 'activity-status-block js-activity-status hidden'}, [
                 mCreateElement('div', {'class': 'loading-animation'}),

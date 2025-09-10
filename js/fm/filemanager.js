@@ -456,9 +456,35 @@ FileManager.prototype.initFileManagerUI = function() {
 
     // May better deprecate lazy instead
     if (mega.ui.header) {
+
+        // Header is exist but not available on dom, so lets re-init it.
+        if (!fmholder.contains(mega.ui.header.domNode)) {
+
+            mega.ui.header.destroy();
+            delete mega.ui.header;
+            mega.ui.header = new MegaHeader({
+                parentNode: pmlayout,
+                componentClassname: 'mega-header',
+                prepend: true
+            });
+        }
+
         mega.ui.header.show();
     }
     if (mega.ui.topmenu) {
+
+        // Top menu is exist but not available on dom, so lets re-init it.
+        if (!fmholder.contains(mega.ui.topmenu.domNode)) {
+
+            mega.ui.topmenu.destroy();
+            delete mega.ui.topmenu;
+            mega.ui.topmenu = new MegaTopMenu({
+                parentNode: pmlayout,
+                componentClassname: 'mega-top-menu',
+                prepend: true
+            });
+        }
+
         mega.ui.topmenu.removeClass('hidden');
         mega.ui.topmenu.renderMenuItems();
         mega.gallery.updateMediaPath();

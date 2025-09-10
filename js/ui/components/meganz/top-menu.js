@@ -9,7 +9,7 @@ class MegaTopMenu extends MegaMobileTopMenu {
 
         // @todo: Wrap menu items in a div to fix stretching bug when scrolling horizontally
         this.menuNode.Ps = new PerfectScrollbar(this.menuNode);
-        mBroadcaster.addListener('pagechange', () => this.menuNode.Ps.update());
+        this.addBroadcasterListener('pagechange', () => this.menuNode.Ps.update());
         this.on('click.topmenuClicked', () => {
 
             // Adding this classname if it is required to make CSS applies first so Ps can position scrollbar correctly
@@ -24,7 +24,9 @@ class MegaTopMenu extends MegaMobileTopMenu {
             this.menuNode.Ps.update();
         });
 
-        window.addEventListener('resize', SoonFc(90, this.menuNode.Ps.update));
+        const _resizeHandler = SoonFc(90, this.menuNode.Ps.update);
+        window.addEventListener('resize', _resizeHandler);
+        this.on('destroy', () => window.removeEventListener('resize', _resizeHandler));
 
         this.domNode.prepend(mCreateElement('div', {'class': 'left-pane-drag-handle'}));
 
@@ -38,7 +40,7 @@ class MegaTopMenu extends MegaMobileTopMenu {
             });
         });
 
-        mBroadcaster.addListener('updFileManagerUI', () => {
+        this.addBroadcasterListener('updFileManagerUI', () => {
             this.rootBtnWrap.classList.toggle('contains-tree', !!M.tree[M.RootID]);
         });
     }

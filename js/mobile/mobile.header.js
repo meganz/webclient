@@ -241,9 +241,11 @@ class MegaMobileHeader extends MegaComponent {
 
         const _throttledUpdate = SoonFc(100, this.update.bind(this));
 
-        mBroadcaster.addListener('mega:openfolder', _throttledUpdate);
-        mBroadcaster.addListener('pagechange', _throttledUpdate);
-        window.addEventListener('resize', () => this.resetBottomBlock());
+        this.addBroadcasterListener('mega:openfolder', _throttledUpdate);
+        this.addBroadcasterListener('pagechange', _throttledUpdate);
+        const _resizeHandler = () => this.resetBottomBlock();
+        window.addEventListener('resize', _resizeHandler);
+        this.on('destroy', () => window.removeEventListener('resize', _resizeHandler));
     }
 
     // Options: setter

@@ -1031,7 +1031,8 @@
                 $.inSharesRebuild = Date.now();
 
                 queueMicrotask(() => {
-                    mega.keyMgr.decryptInShares(-0xFEED)
+                    // @todo add a button to let users do this on-demand
+                    mega.keyMgr.decryptInShares(!mega.infinity && -0xFEED)
                         .then(() => {
                             return this.showContactVerificationDialog();
                         })

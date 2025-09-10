@@ -2,7 +2,7 @@
  * CSS for the Public Service Announcement for desktop and mobile
  */
 
-/* Desktop */
+/* All clients */
 
 .psa-holder .mega-component.anouncement {
     --icon-size: 24px;
@@ -80,9 +80,9 @@
     padding: 0;
 }
 
-/* end of Desktop */
+/* end of common */
 
-/* Mobile */
+/* Mobile overrides */
 
 .mobile .psa-holder {
     grid-row: 5 / 6;
@@ -123,6 +123,12 @@
 .mobile .psa-holder .mega-component.banner .content-box > * {
     margin-top: 4px;
 }
+
+.mobile .psa-holder .mega-component.anouncement {
+    position: static;
+    z-index: auto;
+}
+
 .mobile .psa-holder .mega-component.anouncement .banner.title-text {
     font: var(--mobile-font-copy-bold);
 }
@@ -131,6 +137,7 @@
     height: 64px;
     width: 64px;
 }
+
 /* Queue advertisement banners if PSA is visible */
 
 .psa-notification .mega-component.banner.advertisement {

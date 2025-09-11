@@ -48,9 +48,6 @@
 .fm-right-header .fm-header-buttons.collapse {
     animation: collapse-actions 0.1s ease forwards;
 }
-.fm-right-header .fm-header-buttons.open {
-    animation: open-actions 0.1s ease forwards;
-}
 
 @keyframes collapse-actions {
     from {
@@ -62,19 +59,6 @@
         opacity: 0;
         height: 0;
         padding: 0 24px;
-    }
-}
-
-@keyframes open-actions {
-    from {
-        opacity: 0;
-        height: 0;
-        padding: 0 24px;
-    }
-    to {
-        opacity: 1;
-        height: auto;
-        padding: 12px 24px;
     }
 }
 

@@ -456,9 +456,35 @@ FileManager.prototype.initFileManagerUI = function() {
 
     // May better deprecate lazy instead
     if (mega.ui.header) {
+
+        // Header is exist but not available on dom, so lets re-init it.
+        if (!fmholder.contains(mega.ui.header.domNode)) {
+
+            mega.ui.header.destroy();
+            delete mega.ui.header;
+            mega.ui.header = new MegaHeader({
+                parentNode: pmlayout,
+                componentClassname: 'mega-header',
+                prepend: true
+            });
+        }
+
         mega.ui.header.show();
     }
     if (mega.ui.topmenu) {
+
+        // Top menu is exist but not available on dom, so lets re-init it.
+        if (!fmholder.contains(mega.ui.topmenu.domNode)) {
+
+            mega.ui.topmenu.destroy();
+            delete mega.ui.topmenu;
+            mega.ui.topmenu = new MegaTopMenu({
+                parentNode: pmlayout,
+                componentClassname: 'mega-top-menu',
+                prepend: true
+            });
+        }
+
         mega.ui.topmenu.removeClass('hidden');
         mega.ui.topmenu.renderMenuItems();
         mega.gallery.updateMediaPath();
@@ -1003,6 +1029,7 @@ FileManager.prototype.initFileManagerUI = function() {
         prepend: true,
         icon: 'sprite-fm-mono icon-folder-plus-thin-outline',
         text: l[68],
+        title: l[68],
         onClick: () => {
             eventlog(500007);
             createFolderDialog();
@@ -1013,6 +1040,7 @@ FileManager.prototype.initFileManagerUI = function() {
         prepend: true,
         icon: 'sprite-fm-mono icon-arrow-up-thin-outline',
         text: l[372],
+        title: l[372],
         onClick(ev) {
             if (this.active) {
                 return;
@@ -1026,6 +1054,7 @@ FileManager.prototype.initFileManagerUI = function() {
         componentClassname: 'fm-manage-link hidden',
         icon: 'sprite-fm-mono icon-link-thin-outline',
         text: l[6909],
+        title: l[6909],
         onClick: () => {
             const id = M.currentdirid.split('/').pop();
             if (!id) {
@@ -1041,6 +1070,7 @@ FileManager.prototype.initFileManagerUI = function() {
         componentClassname: 'fm-manage-file-request hidden',
         icon: 'sprite-fm-mono icon-folder-arrow-02-thin-outline',
         text: l.file_request_dropdown_manage,
+        title: l.file_request_dropdown_manage,
         onClick: () => {
             const h = M.currentdirid.split('/').pop();
             if (M.isInvalidUserStatus() || !h) {
@@ -4032,7 +4062,7 @@ FileManager.prototype.cameraUploadUI = function() {
         const fmItem = document.querySelector(`[id="${M.CameraId}"] .folder`);
 
         if (treeItem) {
-            treeItem.classList.add('camera-folder');
+            treeItem.className = 'nw-fm-tree-folder camera-folder';
         }
 
         if (fmItem) {

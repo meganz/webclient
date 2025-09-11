@@ -216,6 +216,8 @@ class MegaComponent extends MegaDataEmitter {
 
     destroy() {
 
+        this.trigger('destroy');
+
         if (typeof this[MegaDataEmitter.expando] === 'object') {
 
             // Kill all emittor events
@@ -228,6 +230,12 @@ class MegaComponent extends MegaDataEmitter {
 
         // Remove dom node
         this.domNode.remove();
+
+        // Remove broadcaster listeners
+        if (this._mbls) {
+            this._mbls.forEach(token => mBroadcaster.removeListener(token));
+            this._mbls = null;
+        }
     }
 
     // Helper getter for debugging to give all binded events for the component and show where listener locates
@@ -258,6 +266,20 @@ class MegaComponent extends MegaDataEmitter {
 
     static factory(options) {
         return new this(options);
+    }
+
+    addBroadcasterListener(event, handler) {
+        if (!this._mbls) {
+            this._mbls = [];
+        }
+        this._mbls.push(mBroadcaster.addListener(event, handler));
+    }
+
+    removeBroadcasterListener(token) {
+        if (this._mbls) {
+            mBroadcaster.removeListener(token);
+            array.remove(this._mbls, token);
+        }
     }
 }
 

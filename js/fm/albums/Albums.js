@@ -2897,6 +2897,7 @@ lazy(mega.gallery, 'albums', () => {
                 componentClassname: 'fm-new-album',
                 icon: 'sprite-fm-mono icon-rectangle-stack-plus-thin-outline',
                 text: l.new_album,
+                title: l.new_album,
                 onClick: () => {
                     if (M.isInvalidUserStatus()) {
                         return;

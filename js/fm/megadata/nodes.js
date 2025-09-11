@@ -2191,7 +2191,16 @@ MegaData.prototype.labelDomUpdate = function(handle, value) {
         $treeElements.removeClass('labeled');
         $('.colour-label-ind', $treeElements).remove();
 
-        MegaNodeComponent.label.set(n, $('.nw-fm-tree-folder', $treeElements));
+        if ($treeElements.length) {
+            const treeFolders = $treeElements[0].querySelectorAll('.nw-fm-tree-folder');
+            const exclude = ['inbound-share', 'shared-folder', 'file-request-folder', 'camera-folder', 'chat-folder'];
+            for (let i = treeFolders.length; i--;) {
+                // Limit to plain folders only
+                if (![...treeFolders[i].classList].some(c => exclude.includes(c))) {
+                    MegaNodeComponent.label.set(n, treeFolders[i]);
+                }
+            }
+        }
         if (labelId) {
             // Add colour label classes.
             var lblColor = M.getLabelClassFromId(labelId);
@@ -4863,7 +4872,7 @@ lazy(MegaData.prototype, 'myChatFilesFolder', () => {
             const fmItem = document.querySelector(`[id="${handle}"] .fm-item-img i`);
 
             if (treeItem) {
-                treeItem.classList.add('chat-folder');
+                treeItem.className = 'nw-fm-tree-folder chat-folder';
             }
 
             if (fmItem) {

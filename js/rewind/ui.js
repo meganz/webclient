@@ -678,7 +678,9 @@ lazy(mega, 'rewindUi', () => {
             this.currentIcon = icon;
             if (folderIcon) {
                 folderIcon.classList.add(`icon-${icon}-24`);
-                MegaNodeComponent.label.set(this.currentNode, folderIcon);
+                if (icon === 'folder') {
+                    MegaNodeComponent.label.set(this.currentNode, folderIcon);
+                }
             }
             const folderNameElement = this.sidebar.querySelector('.folder-info .folder-name');
             folderNameElement.innerText = this.getNodeNameInfo(this.currentNode)[0];
@@ -2421,8 +2423,11 @@ lazy(mega, 'rewindUi', () => {
             */
 
             nameElement.textContent = this.getNodeNameInfo(node)[0];
-            iconElement.classList.add(`icon-${fileIcon(node)}-24`);
-            MegaNodeComponent.label.set(node, iconElement);
+            const icon = fileIcon(node);
+            iconElement.classList.add(`icon-${icon}-24`);
+            if (icon === 'folder') {
+                MegaNodeComponent.label.set(node, iconElement);
+            }
             template.dataset.id = node.h;
 
             if (mega.sensitives.isSensitive(node)) {

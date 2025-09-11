@@ -928,11 +928,14 @@ lazy(mega.ui, 'secondaryNav', () => {
                 }
                 return;
             }
-            MegaButton.factory({
+            const button = new MegaButton({
                 parentNode: this.actionsHolder,
                 ...options,
                 componentClassname: `${options.componentClassname} hidden`,
             });
+            if (options.title) {
+                button.domNode.title = options.title;
+            }
         },
         showActionButtons(...selectors) {
             const holder = this.actionsHolder || mega.ui.header.domNode.querySelector('.fm-header-buttons');
@@ -1152,7 +1155,7 @@ lazy(mega.ui, 'secondaryNav', () => {
                     media.classList.remove('hidden');
                 }
             }
-            if (mega.ui.mNodeFilter.viewEnabled) {
+            if (mega.ui.mNodeFilter.viewEnabled && M.v.length > 0) {
                 this.filterChipsHolder.classList.remove('hidden');
             }
             if (!chipsViewWrapShown) {
@@ -1391,9 +1394,6 @@ lazy(mega.ui, 'secondaryNav', () => {
             this.filterChipsHolder.classList.add('hidden');
         },
         extShowFilterChip() {
-            if ($.selected && $.selected.length) {
-                return;
-            }
             this.filterChipsHolder.classList.remove('hidden');
         }
     };

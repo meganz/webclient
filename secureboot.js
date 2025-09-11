@@ -4087,6 +4087,9 @@ function pushHistoryState(page, state) {
 
         if (page.substr(0, 9) === 'fm/search') {
             state.searchString = page.substr(9) || state.searchString;
+            if (state.searchFilters !== null) {
+                state.searchFilters = state.searchFilters || history.state.searchFilters;
+            }
             page = state.subpage = 'fm/search';
         }
 

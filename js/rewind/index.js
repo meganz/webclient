@@ -872,7 +872,8 @@ lazy(mega, 'rewind', () => {
 
             for (let i = 0; i < nodes.length; i++) {
                 const node = nodes[i];
-                this.prepareNode(node, dateData[actionDateString].modified, false, true);
+                this.prepareNode({...node, ts: actionPacketTimestamp},
+                                 dateData[actionDateString].modified, false, true);
                 dateData[actionDateString].type[node.h] = TYPE_MODIFIED;
 
                 // Cleanup previous records (might be at top of hierarchy)
@@ -909,7 +910,8 @@ lazy(mega, 'rewind', () => {
                 }
 
                 if (node.fv || actionPacketFiles.length > 1) {
-                    this.prepareNode(node, dateData[actionDateString].modified, false, true);
+                    this.prepareNode({...node, ts: actionPacketTimestamp},
+                                     dateData[actionDateString].modified, false, true);
                     dateData[actionDateString].type[node.h] = TYPE_MODIFIED;
 
                     // Cleanup previous records (might be at top of hierarchy)

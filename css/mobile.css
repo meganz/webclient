@@ -10962,6 +10962,8 @@ code, c {
     background-color: var(--mobile-page-background);
     height: auto;
     grid-row: 4/5;
+    display: flex;
+    flex-direction: column;
 }
 
 .mega-header {

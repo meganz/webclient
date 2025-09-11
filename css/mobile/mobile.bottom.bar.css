@@ -10,6 +10,15 @@
     border-top: 1px solid var(--mobile-border-strong);
     background: var(--mobile-page-background);
     margin-top: auto;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+}
+.psa-notification .mega-bottom-bar {
+    position: static;
+}
+.psa-notification .mega-overlay + .mega-bottom-bar {
+    position: absolute;
 }
 
 .mega-bottom-bar .text-actions,

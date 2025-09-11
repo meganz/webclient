@@ -155,7 +155,13 @@
             if (this.debug) {
                 this.debug(`\u{1F4EF} Sending message ${message}...`, data);
             }
-            assert(!this.__closed, `Cannot dispatch message, channel is closed...`);
+
+            if (typeof assert === 'function') {
+                assert(!this.__closed, `Cannot dispatch message, channel is closed...`);
+            }
+            else if (this.__closed) {
+                throw new MEGAException(`Cannot dispatch message, channel is closed...`);
+            }
 
             super.postMessage({message, data, origin: this.origin});
         }

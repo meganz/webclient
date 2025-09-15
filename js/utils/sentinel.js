@@ -203,7 +203,7 @@ mBroadcaster.once('boot_done', () => {
             if (errobj.stack) {
                 dump.s = getCallStack(msg, errobj.stack);
 
-                if (unknownScriptSource(dump.s)) {
+                if (unknownScriptSource(dump.m + dump.s)) {
 
                     return optOut('Got uncaught exception from unknown resource...', msg, [errobj], url, ln);
                 }

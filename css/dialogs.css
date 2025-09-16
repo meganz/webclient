@@ -2033,7 +2033,7 @@ body.de .mega-dialog.contact-picker-widget {
     .mega-sheet.link-embed-dialog,
     .mega-sheet.link-settings-discard-dialog,
     .mega-sheet.remove-link-dialog {
-        z-index: 1001;
+        z-index: 1111;
     }
 
     .mega-sheet.export-links-dialog .link-access-text {

@@ -340,6 +340,11 @@ mBroadcaster.once('startMega', tryCatch(() => {
         'megaecmastest = window.foo?.bar ?? -1',
         (error) => {
             if (error || window.megaecmastest !== -1) {
+
+                if (!mecmatst && window.u_attr && u_attr.p) {
+                    eventlog(500953, JSON.stringify([1, 1]));
+                }
+
                 return mecmatst || eventlog(99777, JSON.stringify([1, 1]));
             }
 

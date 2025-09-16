@@ -142,6 +142,10 @@ MegaData.prototype.addDownloadSync = function(n, z, preview) {
         }
     }
 
+    if (fmconfig.dlThroughMEGAsync && window.useMegaSync && useMegaSync === 1) {
+        return webdl();
+    }
+
     dlmanager.isMEGAsyncRunning(0x02010100)
         .done(function (sync) {
             var dlAuth = M.RootID;

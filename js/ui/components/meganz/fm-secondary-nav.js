@@ -350,7 +350,7 @@ lazy(mega.ui, 'secondaryNav', () => {
             delete mega.ui.secondaryNav.dlId;
         }
     });
-    MegaButton.factory({
+    const downloadZip = new MegaButton({
         parentNode: downloadMenu,
         type: 'fullwidth',
         componentClassname: 'text-icon',
@@ -871,12 +871,21 @@ lazy(mega.ui, 'secondaryNav', () => {
             if (id) {
                 const classList =  ['fm-download-menu', 'fm-thin-dropdown'];
                 if (folderlink) {
-                    downloadMegaSync.show();
-                    downloadStandard.hide();
+                    if (window.useMegaSync && (useMegaSync === 2 || useMegaSync === 3)) {
+                        downloadMegaSync.show();
+                        downloadStandard.hide();
+                        downloadZip.hide();
+                    }
+                    else {
+                        downloadMegaSync.hide();
+                        downloadStandard.show();
+                        downloadZip.show();
+                    }
                     classList.push('fl-download');
                 }
                 else {
                     downloadStandard.show();
+                    downloadZip.show();
                     downloadMegaSync.hide();
                 }
                 this.dlId = id;

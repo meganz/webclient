@@ -135,8 +135,9 @@ function removeUInode(h, parent) {
                 $('.files-grid-view').addClass('hidden');
                 $('.grid-table.fm tbody tr').remove();
 
+                mega.ui.empty.root();
+
                 if (!folderlink) {
-                    mega.ui.empty.root();
                     if (u_type !== 3) {
                         $('.fm-not-logged-description').safeHTML(l[8762].replace('%s', bytesToSize(mega.bstrg, 0)));
                     }

@@ -613,13 +613,17 @@ var megasync = (function() {
             clearTimeout(periodicCheckTimeout);
         }
         ns.isInstalled(function(err, is, off) {
+            // relevant useMegaSync states for downloads
+            // 1 = Is installed, No user logged in         (Downloads disabled)
+            // 2 = Is installed, Same user logged in       (Downloads enabled)
+            // 3 = Is installed, Different user logged in  (Downloads enabled)
             if (!err || is) {
                 if (megasync.currUser === u_handle) {
                     window.useMegaSync = 2;
                     periodicCheckTimeout = setTimeout(ns.periodicCheck, defaultStatusThreshold);
                 }
                 else {
-                    window.useMegaSync = 3;
+                    window.useMegaSync = megasync.currUser ? 3 : 1;
                     periodicCheckTimeout = setTimeout(ns.periodicCheck, statusThresholdWhenDifferentUsr);
                 }
             }

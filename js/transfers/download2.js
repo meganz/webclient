@@ -1591,7 +1591,7 @@ var dlmanager = {
             }
 
             if ($(this).hasClass('plan-button')) {
-                sessionStorage.fromOverquotaPeriod = $(this).parent().data('period');
+                sessionStorage.fromOverquotaPeriod = $(this).parent().data('period') || pro.proplan.period;
                 open(getAppBaseUrl() + '#propay_' + $(this).closest('.plan').data('payment'));
             }
             else {

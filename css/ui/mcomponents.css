@@ -771,6 +771,9 @@ i.green-check-circle {
     text-decoration-line: underline;
     text-underline-offset: 4px;
 }
+.line-through {
+    text-decoration: line-through;
+}
 .hoverable:hover {
     background-color: var(--mobile-button-secondary);
 }

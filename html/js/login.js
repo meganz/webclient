@@ -201,6 +201,14 @@ function init_login() {
     var $inputs = $('#login-name2, #login-password2, .login-button', $formWrapper);
     var $button = $('button.login-button', $formWrapper);
     var $forgotPassLink = $('.top-login-forgot-pass', $formWrapper);
+    const $badge = $('.megalite-badge', $formWrapper);
+
+    if (localStorage.megaLiteMode) {
+        $badge.removeClass('hidden');
+    }
+    else {
+        $badge.addClass('hidden');
+    }
 
     if (is_extension) {
         $('.extension-advise').addClass('hidden');

@@ -2522,7 +2522,7 @@ Object.defineProperty(mega.gallery, 'albumsRendered', {
 Object.defineProperty(mega.gallery, 'nodeUpdated', {
     get() {
         'use strict';
-        return this._nodeUpdated !== undefined ? this._nodeUpdated : -0xFEEDFACE;
+        return this._nodeUpdated === undefined ? -0xFEEDFACE : this._nodeUpdated;
     },
     set(value) {
         'use strict';

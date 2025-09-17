@@ -45,6 +45,7 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
         }
         console.assert(mRootID, 'I told you...');
     }
+    console.assert(String(self.page).includes('fm/account'), 'accountData() invoked out of place.');
 
     if (blockui) {
         loadingDialog.show();
@@ -1067,36 +1068,6 @@ MegaData.prototype.convertedToFreeBanner = function(hide) {
         return;
     }
     mega.ui.secondaryNav.showBanner(options);
-};
-
-/**
- * Show/hide Rubbish schedule banner
- * @returns {void} void
- */
-MegaData.prototype.rubbishScheduleBanner = function() {
-    'use strict';
-
-    const $banner = $('.fm-notification-block.rubbish-schedule', '.fmholder')
-        .removeClass('visible');
-
-    if (this.currentrootid === this.RubbishID && u_attr && u_attr.flags.ssrs > 0) {
-
-        if (!this.account) {
-            return this.accountData(() => {
-                if (!this.account) {
-                    return false;
-                }
-                this.rubbishScheduleBanner();
-            });
-        }
-
-        if (this.account.ssrs) {
-            $('.message-text', $banner).text(
-                mega.icu.format(l.bn_rubbish_schedule_text, this.account.ssrs)
-            );
-            $banner.addClass('visible');
-        }
-    }
 };
 
 /**

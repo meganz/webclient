@@ -11387,7 +11387,8 @@ a.underline-offset-4 {
 
 .fm-notification-block,
 .fm-notification.almost-full .fm-notification-block.almost-full,
-.fm-notification.full .fm-notification-block.full {
+.fm-notification.full .fm-notification-block.full,
+.fm-notification-block.rubbish-schedule.visible {
     display: none;
 }
 
@@ -11397,7 +11398,8 @@ a.underline-offset-4 {
 
 .fm-notification-block.visible,
 .fm-notification.almost-full .visible-notification .fm-notification-block.almost-full,
-.fm-notification.full .visible-notification .fm-notification-block.full {
+.fm-notification.full .visible-notification .fm-notification-block.full,
+.rubbish-bin .fm-notification-block.rubbish-schedule.visible {
     display: flex;
 }
 

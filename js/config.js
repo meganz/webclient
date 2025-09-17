@@ -828,7 +828,9 @@
 
                 if (M.account.ssrs !== value) {
                     M.account.ssrs = value;
-                    mega.attr.set('rubbishtime', String(value), -2, 1);
+                    mega.attr.set2(null, 'rubbishtime', String(value), -2, 1)
+                        .then(() => mega.attr.uaPacketParser('^!rubbishtime', u_handle, 1, 0))
+                        .catch(dump);
                     toast = true;
                 }
             }

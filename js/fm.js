@@ -639,9 +639,6 @@ function fmtopUI() {
     $('.fm-s4-settings, .fm-s4-new-bucket, .fm-s4-new-key, .fm-s4-new-user, .fm-s4-new-group', $header)
         .addClass('hidden');
 
-    // Show/hide Rubbish bin schedule banner
-    M.rubbishScheduleBanner();
-
     if (M.currentrootid !== 'shares' && !M.onDeviceCenter) {
         mega.ui.secondaryNav.hideCard();
         mega.ui.secondaryNav.hideActionButtons();

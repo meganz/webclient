@@ -2522,7 +2522,7 @@ Object.defineProperty(mega.gallery, 'albumsRendered', {
 Object.defineProperty(mega.gallery, 'nodeUpdated', {
     get() {
         'use strict';
-        return this._nodeUpdated || false;
+        return this._nodeUpdated !== undefined ? this._nodeUpdated : -0xFEEDFACE;
     },
     set(value) {
         'use strict';
@@ -3852,7 +3852,7 @@ mega.gallery.initialiseMediaNodes = async(filterFn) => {
             };
 
             if (fmdb && fmdb.db && !fmdb.crashed) {
-                await fmdb.get('f', assignNodes.bind(null));
+                await fmdb.get('f', assignNodes);
             }
             else {
                 console.warn('Cannot build nodes list from the local database...');

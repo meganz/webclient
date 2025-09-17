@@ -2757,23 +2757,22 @@ MessagesBuff.prototype.decryptReaction = promisify(function(resolve, reject, msg
  * @param {Object} meta
  * @private
  */
-MessagesBuff.prototype._userReaction = function(op, msgId, slug, meta) {
+MessagesBuff.prototype._userReaction = async function(op, msgId, slug, meta) {
     "use strict";
-    var self = this;
-    return self.encryptReaction(msgId, meta)
-        .then(function(r) {
-            Reactions.sendAndQueueOperation(
-                op,
-                self.chatRoom,
-                self.getMessageById(msgId),
-                msgId,
-                slug,
-                meta,
-                r
-            );
-        })
-        .catch(dump);
-
+    const msg = this.getMessageById(msgId);
+    if (msg.userId && msg.userId !== u_handle) {
+        await ChatdIntegration._ensureKeysAreLoaded([this.getMessageById(msgId)]);
+    }
+    const r = await this.encryptReaction(msgId, meta);
+    Reactions.sendAndQueueOperation(
+        op,
+        this.chatRoom,
+        this.getMessageById(msgId),
+        msgId,
+        slug,
+        meta,
+        r
+    );
 };
 
 /**
@@ -2785,7 +2784,7 @@ MessagesBuff.prototype._userReaction = function(op, msgId, slug, meta) {
  */
 MessagesBuff.prototype.userAddReaction = function(msgId, slug, meta) {
     "use strict";
-    return this._userReaction(Reactions.OPERATIONS.ADD, msgId, slug, meta);
+    return this._userReaction(Reactions.OPERATIONS.ADD, msgId, slug, meta).catch(dump);
 };
 
 /**
@@ -2797,7 +2796,7 @@ MessagesBuff.prototype.userAddReaction = function(msgId, slug, meta) {
  */
 MessagesBuff.prototype.userDelReaction = function(msgId, slug, meta) {
     "use strict";
-    return this._userReaction(Reactions.OPERATIONS.REMOVE, msgId, slug, meta);
+    return this._userReaction(Reactions.OPERATIONS.REMOVE, msgId, slug, meta).catch(dump);
 };
 
 /**
@@ -2849,6 +2848,7 @@ MessagesBuff.prototype._onReactionEvent = async function(eventName, eventData) {
     "use strict";
     const {msgId, emoji, userId} = eventData;
     assert(eventName === 'addReaction' || eventName === 'delReaction');
+    await ChatdIntegration._ensureKeysAreLoaded([this.getMessageById(msgId)]);
 
     return this.decryptReaction(msgId, emoji)
         .then(({msg, res}) => {

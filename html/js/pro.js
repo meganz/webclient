@@ -68,6 +68,8 @@ var pro = {
 
     taxInfo: null,
 
+    anyDiscount: false,
+
     /**
      * Determines if a Business or Pro Flexi account is expired or in grace period
      * @param {Number} accountStatus The account status e.g. from u_attr.b.s (Business) or u_attr.pf.s (Pro Flexi)
@@ -112,6 +114,7 @@ var pro = {
         'use strict';
         pro.singleDurationPlans = Object.create(null);
         pro.planSearch.reset();
+        pro.anyDiscount = false;
     },
 
     divideAllBy100(obj, excl) {
@@ -144,7 +147,7 @@ var pro = {
         }
         else {
             // Get the membership plans.
-            const payload = {a: 'utqa', nf: +mega.utqav, p: 1, ft: 1};
+            const payload = {a: 'utqa', nf: (d && localStorage.utqav) || +mega.utqav, p: 1, ft: 1};
 
             await api.req({a: 'uq', pro: 1, gc: 1})
                 .then(({result: {balance}}) => {
@@ -199,6 +202,9 @@ var pro = {
                         results[i].trial = results[i].trial || false;
 
                         if (results[i].al === pro.ACCOUNT_LEVEL_FEATURE) {
+                            if (results[i].insdis) {
+                                results[i].insdis = false;
+                            }
                             if (!results[i].f) {
                                 console.error('Feature level plan without features given from API', results[i]);
                                 continue;
@@ -222,7 +228,15 @@ var pro = {
 
                         results[i].featureStrings = featureStrings || false;
                         results[i].trialStrings = trialStrings || false;
+                        results[i].insdis = results[i].insdis || false;
 
+                        // Api may return a discount that does not match, for now ignore non matching discounts
+                        if (results[i].insdis.dm !== results[i].m) {
+                            results[i].insdis = false;
+                            eventlog(500941);
+                        }
+
+                        pro.anyDiscount |= !!results[i].insdis;
 
                         // If this is Pro Flexi, the data is structured similarly to business, so set that manually
                         if (results[i].al === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
@@ -274,6 +288,7 @@ var pro = {
                                     featureStrings: results[i].featureStrings,
                                     taxInfo: !!(taxInfo && p && pn)
                                         && {p, pn, lp, lpn},
+                                    insdis: results[i].insdis,
                                 },
                             ]);
                         }
@@ -306,23 +321,27 @@ var pro = {
                                     trialStrings: results[i].trialStrings,
                                     featureStrings: results[i].featureStrings,
                                     taxInfo: !!(taxInfo && p && pn && mbp && mbpn)
-                                            && {p, pn, mbp, mbpn, lp, lpn},
+                                        && {p, pn, mbp, mbpn, lp, lpn},
+                                    insdis: results[i].insdis,
                                 },
                             ]);
                         }
                         if (!pro.blockPlans || !pro.blockPlans.has(results[i].al)) {
-                            pro.planObjects.createPlanObject(plans[plans.length - 1], results[i]);
-                            pro.planSearch.addPlanToSearch(plans[plans.length - 1]);
+                            const currentPlan = plans[plans.length - 1];
+                            pro.planObjects.createPlanObject(currentPlan, results[i]);
+                            pro.planSearch.addPlanToSearch(currentPlan);
                             if (results[i].m === 1 && results[i].it !== 1) {
                                 if (!maxPlan || maxPlan[2] < results[i].s) {
-                                    maxPlan = plans[plans.length - 1];
+                                    maxPlan = currentPlan;
                                 }
                                 if (!minPlan || minPlan[2] > results[i].s) {
-                                    minPlan = plans[plans.length - 1];
+                                    minPlan = currentPlan;
                                 }
                             }
                         }
                     }
+
+                    pro.instantDiscounts.checkSharedDiscounts();
 
                     // Store globally
                     pro.membershipPlans = plans;
@@ -353,6 +372,113 @@ var pro = {
                     loadedCallback();
                 });
         }
+    },
+
+    instantDiscounts: {
+        shared: false,
+
+        checkSharedDiscounts() {
+            'use strict';
+
+            delete pro.instantDiscounts.shared;
+            lazy(pro.instantDiscounts, 'shared', () => {
+
+                if (!pro.membershipPlans.length) {
+                    console.assert(!d, 'No plans to check shared discounts');
+                    return false;
+                }
+
+                let anyDiscount1 = false;
+                let anyDiscount12 = false;
+                let matchingDiscount1 = null;
+                let matchingDiscount12 = null;
+
+                // For now only support instant discounts on the pro tab
+                for (const plan of pro.plansInSet('proTab')) {
+                    const duration = plan[pro.UTQA_RES_INDEX_MONTHS];
+                    if (!plan[pro.UTQA_RES_INDEX_EXTRAS].insdis) {
+                        if (duration === 1) {
+                            matchingDiscount1 = false;
+                        }
+                        else {
+                            matchingDiscount12 = false;
+                        }
+                        continue;
+                    }
+
+                    if (duration === 1) {
+                        anyDiscount1 = true;
+                        if (matchingDiscount1 === null) {
+                            matchingDiscount1 = plan[pro.UTQA_RES_INDEX_EXTRAS].insdis;
+                        }
+                        else if (matchingDiscount1
+                            && (matchingDiscount1.dg !== plan[pro.UTQA_RES_INDEX_EXTRAS].insdis.dg)
+                            || (matchingDiscount1.dp !== plan[pro.UTQA_RES_INDEX_EXTRAS].insdis.dp)) {
+                            matchingDiscount1 = false;
+                        }
+                    }
+                    else {
+                        anyDiscount12 = true;
+                        if (matchingDiscount12 === null) {
+                            matchingDiscount12 = plan[pro.UTQA_RES_INDEX_EXTRAS].insdis;
+                        }
+                        else if (matchingDiscount12
+                            && (matchingDiscount12.dg !== plan[pro.UTQA_RES_INDEX_EXTRAS].insdis.dg)
+                            || (matchingDiscount12.dp !== plan[pro.UTQA_RES_INDEX_EXTRAS].insdis.dp)) {
+                            matchingDiscount12 = false;
+                        }
+                    }
+                }
+
+                return {
+                    anyDiscount1,
+                    anyDiscount12,
+                    matchingDiscount1: matchingDiscount1 || false,
+                    matchingDiscount12: matchingDiscount12 || false,
+                };
+            });
+        },
+    },
+
+    /**
+     * Calculate the savings of a given percentage savings
+     * @param {Array} percentageSavings An array of percentages
+     * @param {?Boolean} asMult Whether to return the multiplier or the savings percentage
+     * @param {?Boolean} roundDown Whether to round the calculated savings percentage down
+     * @param {?Boolean} givenDecimals Whether the percentages are given in decimals or not
+     * @returns {Number} The savings percentage. Returned as a decimal
+     */
+    calculateSavings(percentageSavings, asMult, roundDown, givenDecimals) {
+        'use strict';
+
+        if (roundDown === undefined) {
+            roundDown = true;
+        }
+
+        let multiplier = percentageSavings.reduce((acc, curr) => {
+            return acc * (1 - (curr ? curr / (givenDecimals ? 1 : 100) : 0));
+        }, 1) * 100;
+
+        // The amount is inverted, so ceil will round the final result down
+        if (roundDown) {
+            multiplier = Math.ceil(multiplier);
+        }
+
+        return (asMult ? multiplier : 100 - multiplier) / 100;
+    },
+
+    /**
+     * Get the discount information for a given plan
+     * @param {Array} plan The plan array
+     * @returns {Object | false} The discount information or false if no discount is available
+     */
+    getDiscount(plan) {
+        'use strict';
+        if (!plan || !plan[pro.UTQA_RES_INDEX_EXTRAS] || !plan[pro.UTQA_RES_INDEX_EXTRAS].insdis) {
+            return false;
+        }
+
+        return plan[pro.UTQA_RES_INDEX_EXTRAS].insdis;
     },
 
     /**
@@ -815,6 +941,7 @@ var pro = {
                 const thisPlan = {
                     key,                    // Plan key
                     _saveUpTo: null,        // Stores the saveUpTo percentage of the plan, in case given by another plan
+                    _saveUpToPrecise: null, // Stores the saveUpTo percentage with decimal places
                     _correlatedPlan: null,  // Stores the correlated plan, in case given by another plan
                     _durationOptions: null,     // Stores the duration options available in the plan
                     _maxCorrPriceEur: null,
@@ -827,7 +954,8 @@ var pro = {
                             * pro.BYTES_PER_GB),
                     transferCost: type1info
                         && ((pro.taxInfo && (type1info.trns.lpn || type1info.trns.pn))
-                            || (type1info.trns.lp || type1info.trns.p))
+                            || (type1info.trns.lp || type1info.trns.p)),
+                    isPlanObj: true,
                 };
 
                 lazy(thisPlan, 'id', () => plan[pro.UTQA_RES_INDEX_ID]);
@@ -843,13 +971,23 @@ var pro = {
                 });
                 lazy(thisPlan, 'priceEuro', () => plan[pro.UTQA_RES_INDEX_PRICE]);
                 lazy(thisPlan, 'currencyEuro', () => plan[pro.UTQA_RES_INDEX_CURRENCY]);
-                lazy(thisPlan, 'save', () => plan[pro.UTQA_RES_INDEX_LOCALPRICESAVE] || false);
+                lazy(thisPlan, 'save', () => plan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCYSAVE] || false);
                 lazy(thisPlan, 'monthlyBasePrice', () => plan[pro.UTQA_RES_INDEX_MONTHLYBASEPRICE] || false);
                 lazy(thisPlan, 'hasLocal', () => !!plan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY]);
                 lazy(thisPlan, 'trialStrings', () => thisPlan.trial && pro.featureInfo[thisPlan.level + '-trial']);
                 lazy(thisPlan, 'featureBits', () => thisPlan.features && pro.getStandaloneBits(thisPlan.features));
                 lazy(thisPlan, 'taxInfo', () => {
                     return pro.getStandardisedTaxInfo(taxInfo, thisPlan.level === pro.ACCOUNT_LEVEL_BUSINESS);
+                });
+                lazy(thisPlan, 'instantDiscount', () => {
+                    const planDiscountInfo = plan[pro.UTQA_RES_INDEX_EXTRAS].insdis;
+
+                    return planDiscountInfo && {
+                        code: planDiscountInfo.dc,
+                        name: planDiscountInfo.dn,
+                        percentage: +planDiscountInfo.dp,
+                        group: planDiscountInfo.dg,
+                    } || false;
                 });
 
                 lazy(thisPlan, 'correlatedPlan', () => {
@@ -888,18 +1026,30 @@ var pro = {
                     return thisPlan._durationOptions;
                 });
 
-                lazy(thisPlan, 'saveUpTo', () => {
-                    if (thisPlan._saveUpTo === null) {
-                        let saveUpTo = false;
-                        if (thisPlan.correlatedPlan) {
-                            const thisMonthlyPrice = thisPlan.price / thisPlan.months;
-                            const corrMonthlyPrice = thisPlan.correlatedPlan.price / thisPlan.correlatedPlan.months;
-                            saveUpTo = percentageDiff(thisMonthlyPrice, corrMonthlyPrice, 3);
-                            thisPlan.correlatedPlan._saveUpTo = saveUpTo;
-                        }
-                        thisPlan._saveUpTo = saveUpTo;
+                lazy(thisPlan, 'monthlyPlan', () => {
+                    if (thisPlan.months === 1) {
+                        return thisPlan;
                     }
-                    return thisPlan._saveUpTo;
+                    return pro.getPlanObj(thisPlan.level, 1);
+                });
+
+                lazy(thisPlan, 'saveUpToPrecise', () => {
+                    if (thisPlan._saveUpToPrecise === null) {
+                        let saveUpToPrecise = false;
+                        if (thisPlan.correlatedPlan) {
+                            const thisMonthlyPrice = thisPlan.priceEuro / thisPlan.months;
+                            const corrMonthlyPrice = thisPlan.correlatedPlan.priceEuro / thisPlan.correlatedPlan.months;
+                            saveUpToPrecise = percentageDiff(thisMonthlyPrice, corrMonthlyPrice, 1);
+                            thisPlan.correlatedPlan._saveUpToPrecise = saveUpToPrecise;
+                        }
+                        thisPlan._saveUpToPrecise = saveUpToPrecise;
+                    }
+                    return thisPlan._saveUpToPrecise;
+                });
+
+                lazy(thisPlan, 'saveUpTo', () => {
+                    // Round to within 0.05 then find the floor.
+                    return Math.floor(Math.round(thisPlan.saveUpToPrecise * 10) / 10);
                 });
 
                 lazy(thisPlan, 'maxCorrPriceEuro', () => {
@@ -928,6 +1078,93 @@ var pro = {
                     return (baseYearly * 100 - thisPlan.price * 100) / 100;
                 });
 
+                lazy(thisPlan, 'yearlyDiscountInfo', () => {
+                    if (thisPlan.months !== 12) {
+                        return false;
+                    }
+                    const monthlyPlan = thisPlan.monthlyPlan;
+
+                    if (!monthlyPlan) {
+                        return false;
+                    }
+                    let mPrice;
+                    let yPrice;
+                    let mPriceEuro;
+                    let yPriceEuro;
+
+                    const mPriceN = monthlyPlan.price;
+                    const yPriceN = thisPlan.price;
+                    const mPriceEuroN = monthlyPlan.priceEuro;
+                    const yPriceEuroN = thisPlan.priceEuro;
+
+                    if (thisPlan.taxInfo && monthlyPlan.taxInfo) {
+                        mPrice = monthlyPlan.taxInfo.taxedPrice;
+                        yPrice = thisPlan.taxInfo.taxedPrice;
+                        mPriceEuro = monthlyPlan.taxInfo.taxedPriceEuro;
+                        yPriceEuro = thisPlan.taxInfo.taxedPriceEuro;
+                    }
+                    else {
+                        mPrice = monthlyPlan.price;
+                        yPrice = thisPlan.price;
+                        mPriceEuro = monthlyPlan.priceEuro;
+                        yPriceEuro = thisPlan.priceEuro;
+                    }
+
+                    return {
+                        pd: thisPlan.saveUpTo,
+                        m: thisPlan.months,
+                        al: thisPlan.level,
+                        md: true,
+                        ltp: mPrice * 12,
+                        ltpn: mPriceN * 12,
+                        etp: mPriceEuro * 12,
+                        etpn: mPriceEuroN * 12,
+                        txva: pro.taxInfo.variant,
+                        txn: pro.taxInfo.taxName,
+                        tx: pro.taxInfo.taxAmount,
+                        ldtp: yPrice,
+                        ldtpn: yPriceN,
+                        edtp: yPriceEuro,
+                        edtpn: yPriceEuroN,
+                        lda: mPrice * 12 - yPrice,
+                        eda: mPriceEuro * 12 - yPriceEuro,
+                        ldan: mPriceN * 12 - yPriceN,
+                        edan: mPriceEuroN * 12 - yPriceEuroN,
+                    };
+                });
+
+                thisPlan.getInstantDiscountInfo = async() => {
+                    if (thisPlan.fullDiscountInfo !== undefined) {
+                        return thisPlan.fullDiscountInfo;
+                    }
+
+                    if (!thisPlan.instantDiscount) {
+                        thisPlan.fullDiscountInfo = false;
+                        return false;
+                    }
+
+                    const discountInfo = thisPlan.instantDiscount;
+
+                    const result = await api.req({a: 'dci', dc: discountInfo.code, extra: true, v: 2}).catch(dump);
+
+                    if (!result || (result < 0)) {
+                        return false;
+                    }
+
+                    const res = result.result;
+
+                    if (res.al === pro.ACCOUNT_LEVEL_FEATURE) {
+                        res.al += pro.getStandaloneBits(res.f);
+                    }
+
+                    if (res && res.al && res.pd) {
+                        thisPlan.fullDiscountInfo = res;
+                        return res;
+                    }
+
+                    thisPlan.fullDiscountInfo = false;
+                    return false;
+                };
 
                 /**
                  * Checks if the plan is in a filter, returns boolean or level of the plan in the filter.
@@ -1182,6 +1419,17 @@ var pro = {
         return pro.planObjects.planKeys[key] || false;
     },
 
+    /**
+     * Rounds the number down to the nearest whole number, unless it is within 0.05 of the nearest whole number in which
+     * case it rounds up
+     * @param {number} number - The number to round down
+     * @returns {number} - The rounded number
+     */
+    softFloor(number) {
+        'use strict';
+        return Math.floor(Math.round(number * 10) / 10);
+    },
+
     getStandardisedTaxInfo(planTaxInfo, type) {
         'use strict';
 
@@ -1335,6 +1583,21 @@ var pro = {
         return pro.planSearch.searchedPlans[searchKey] || false;
     },
 };
+
+lazy(pro, 'yearlyDiscountPercentage', () => {
+    'use strict';
+    if (!pro.membershipPlans.length) {
+        console.error('yearlyDiscountPercentage called before membershipPlans were loaded.');
+        return 0;
+    }
+
+    const minYearlyDiscount = Math.min(...pro.filter.plans.proTabY.map(p => pro.getPlanObj(p).saveUpToPrecise));
+    console.assert(
+        minYearlyDiscount >= 16 && minYearlyDiscount <= 17,
+        `Yearly discount percentage is expected to be 16. Got ${minYearlyDiscount}`
+    );
+    return minYearlyDiscount;
+});
 
 /**
  * Contains the filtering functions, filter types, and plans
@@ -1657,4 +1920,29 @@ lazy(pro, 'bfStandalone', () => {
     'use strict';
     // do not change the order, add new entries at the tail.
     return freeze(makeEnum(['VPN', 'PWM']));
+});
+
+lazy(pro, 'yearlyDiscount', () => {
+    'use strict';
+
+    let maxYearlyDiscount = 0;
+    let minYearlyDiscount = Number.MAX_SAFE_INTEGER;
+
+    for (const plan of pro.filter.plans.proTabY) {
+        const yearlyDiscount = pro.calculateSavings([
+            plan[pro.UTQA_RES_INDEX_EXTRAS].insdis.dp,
+            pro.yearlyDiscountPercentage
+        ]);
+        maxYearlyDiscount = Math.max(maxYearlyDiscount, yearlyDiscount);
+        minYearlyDiscount = Math.min(minYearlyDiscount, yearlyDiscount);
+    }
+
+    // Sanity check the discount values in case of unexpected issues
+    minYearlyDiscount = minYearlyDiscount >= 1 ? pro.yearlyDiscountPercentage / 100 : minYearlyDiscount;
+    maxYearlyDiscount = maxYearlyDiscount <= 0 ? pro.yearlyDiscountPercentage / 100 : maxYearlyDiscount;
+
+    return {
+        maxYearlyDiscount,
+        minYearlyDiscount
+    };
 });

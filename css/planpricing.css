@@ -193,11 +193,31 @@
     border-radius: 10px;
     border: 2px solid var(--color-heading);
 }
+.pricing-pg .pricing-pg.pick-period-container.yearly .period-note-txt.monthly-only {
+    opacity: 0;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
 .pricing-pg .pricing-pg.period-note-container .period-note-txt {
     padding: 10px;
     background: var(--color-secondary-cobalt-50);
     border-radius: 27px;
     margin-top: 8px;
+}
+.pricing-pg .pricing-pg.pro-plans-cards-container .all-plans-promotional-info {
+    color: var(--color-primary-red-500);
+    background: rgba(252, 232, 230, 1);
+    height: 36px;
+    font: var(--text-inter-600-14);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: calc(100% - var(--right-padding) - var(--left-padding) + 2px);
+    margin: 32px auto 0;
+}
+.pricing-pg .pricing-pg.pro-plans-cards-container:not(.promo) .all-plans-promotional-info {
+    display: none;
 }
 .pricing-pg .pricing-pg.plans-cards-container {
     padding: var(--right-padding);
@@ -230,6 +250,21 @@
     text-align: center;
     white-space: nowrap;
 }
+.pricing-plan-card.save .pricing-plan-recommend,
+.pricing-plan-card.sale .pricing-plan-recommend {
+    color: var(--color-discount-primary-text);
+    background: var(--color-discount-primary-bg);
+    visibility: unset;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.pricing-plan-card.save .pricing-plan-recommend {
+    background: var(--color-discount-secondary-bg);
+    color: var(--color-discount-secondary-text);
+}
 .pricing-plan-card .pricing-plan-subheading2 {
     background: var(--color-secondary-cobalt-50);
 }
@@ -245,6 +280,7 @@
 .pricing-plan-card .pricing-plan-only {
     font: var(--text-caption-regular-pricing);
     color: var(--color-copy-secondary);
+    margin-top: 32px;
 }
 .pricing-plan-card .pricing-plan-price {
     margin-top: 8px;
@@ -261,8 +297,9 @@
     color: var(--color-copy-secondary);
     margin-top: 8px;
 }
-.pricing-plan-card .pricing-plan-tax .tax-price {
+.pricing-plan-card .pricing-plan-tax .tax-price .bold {
     font: var(--text-inter-600-14);
+    color: var(--color-copy-primary);
 }
 .pricing-plan-card .pricing-plan-storage,
 .pricing-plan-card .pricing-plan-trasfer {
@@ -353,7 +390,14 @@
 .pricing-pg .pricing-pg.plans-cards-container .pricing-plan-card.popular {
     border-color: var(--color-secondary-cobalt-900);
 }
+.pricing-pg .pricing-pg.pro-plans-cards-container:not(.promo-all) .pricing-plan-card.sale {
+    border-color: var(--color-primary-red-500);
+}
+.pricing-pg .pricing-pg.pro-plans-cards-container.promo-all .pricing-plan-recommend {
+    display: none;
+}
 .pricing-plan-card.popular .pricing-plan-btn,
+.pro-plans-cards-container:not(.promo-all) .pricing-plan-card.sale .pricing-plan-btn,
 .pricing-flexi-block-card-contianer .pricing-plan-btn {
     background-color: var(--color-primary-red-500);
     color: var(--color-grey-50);
@@ -1396,6 +1440,9 @@ p.promo-txt {
         .pricing-pg .pricing-pg.pricing-feature-plan-container .pricing-plan-card {
             max-width: 33.3333%;
         }
+        .pricing-pg .pricing-pg.pro-plans-cards-container.promo.promo-all .pricing-pg.plans-cards-container {
+            padding-top: 0;
+        }
     }
     /* The range from Small (S) 0 ---> to Medium (M) 768px */
     @media screen and (min-width: 0) and (max-width: 767px) {
@@ -1442,6 +1489,14 @@ p.promo-txt {
             gap: 24px;
             padding-top: 32px;
             padding-bottom: 28px;
+            grid-auto-flow: row;
+            max-width: calc(100vw - (var(--left-padding) + var(--right-padding)));
+        }
+        .pricing-pg .pricing-pg.pro-plans-cards-container.promo-all .all-plans-promotional-info {
+            display: none;
+        }
+        .pricing-pg .pricing-pg.pro-plans-cards-container.promo-all .pricing-plan-recommend {
+            display: flex;
         }
         .pricing-pg .pricing-pg.plans-cards-container .pricing-plan-card {
             padding-bottom: 28px;

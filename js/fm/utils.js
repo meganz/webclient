@@ -1328,6 +1328,22 @@ mBroadcaster.addListener('mega:openfolder', SoonFc(300, function(id) {
         M.duplicatedItemsBanner(dups, id);
         reselect(1);
     }
+
+    if (!is_mobile && M.RubbishID && M.currentrootid === M.RubbishID
+        && mega.flags.ssrs > 0) {
+
+        // @todo: Use mega.ui.secondaryNav.showBanner instead
+        // @todo: Move banner creation out of SoonFc once component is implemnted
+        const $banner = $('.fm-notification-block.rubbish-schedule', '.fmholder')
+            .removeClass('visible');
+
+        if (u_attr['^!rubbishtime'] | 0) {
+            $('.message-text', $banner).text(
+                mega.icu.format(l.bn_rubbish_schedule_text, u_attr['^!rubbishtime'])
+            );
+            $banner.addClass('visible');
+        }
+    }
 }));
 
 /**

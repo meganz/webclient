@@ -1,12 +1,27 @@
 .sign .main-pad-block {
     background-color: var(--surface-grey-1);
 }
+.bottom-page.sign .megalite-badge {
+    background-color: var(--mobile-indicator-indigo);
+    border-radius: 4px;
+    color: var(--text-color-white-higher);
+    font: var(--mobile-font-caption-large-regular);
+    margin: 24px;
+    padding: 4px 8px;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+.rtl .bottom-page.sign .megalite-badge {
+    left: 0;
+    right: auto;
+}
 .bottom-page.sign .register-st2-txt-block {
     padding-top: 94px;
 }
 .bottom-page.sign .main-left-block {
     width: 486px;
-    padding:64px 0;
+    padding: 64px 0;
 }
 .account.form-body {
     width: 100%;
@@ -18,6 +33,7 @@
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
     text-align: center;
     overflow: hidden;
+    position: relative;
 }
 .account.form-body .form-content {
     padding: 0 48px;

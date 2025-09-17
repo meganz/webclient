@@ -126,7 +126,7 @@ var ulmanager = {
             $('.header-before-icon.exceeded', $dialog).text(l[19135]);
             $('.pricing-page.plan .plan-button', $dialog).rebind('click', function() {
                 eventlog(99700, true);
-                sessionStorage.fromOverquotaPeriod = $(this).parent().data('period');
+                sessionStorage.fromOverquotaPeriod = $(this).parent().data('period') || pro.proplan.period;
                 open(getAppBaseUrl() + '#propay_' + $(this).closest('.plan').data('payment'));
                 return false;
             });

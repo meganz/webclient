@@ -1011,6 +1011,7 @@ lazy(mega.devices, 'ui', () => {
                 });
             }
 
+            this._preRender();
             await mega.devices.main.render(M.megaRender ? isRefresh : false);
             this._postRender();
 
@@ -1345,10 +1346,58 @@ lazy(mega.devices, 'ui', () => {
         }
 
         /**
+         * Show action buttons in UI
+         * @returns {void} void
+         */
+        _showActionButtons() {
+            let primary = false;
+            let secondary = false;
+            let tertiary = false;
+
+            if (this.getRenderSection() === renderSection.devices && this.hasDevices) {
+                primary = '.fm-add-backup';
+                secondary = '.fm-add-syncs';
+            }
+            if (this.isCustomRender()) {
+                mega.ui.secondaryNav.updateLayoutButton(true);
+            }
+            else {
+                const h = M.currentCustomView.nodeID;
+                const {device} = this.getCurrentDirData();
+                const isBackup = this.isBackupRelated(h);
+
+                if (device && !device.folders[h]) {
+                    primary = isBackup ? '.fm-share-folder' : '.fm-new-menu';
+                    secondary = isBackup ? false : '.fm-new-folder';
+                    tertiary = isBackup ? false : '.fm-share-folder';
+
+                    if (new mega.Share.ExportLink().isTakenDown(h)) {
+                        primary = isBackup ? false : '.fm-new-menu';
+                        secondary = isBackup ? false : '.fm-new-folder';
+                        tertiary = false;
+                    }
+                }
+            }
+
+            this.handleAddBtnVisibility();
+            mega.ui.secondaryNav.bindScrollEvents();
+            mega.ui.secondaryNav.showActionButtons(primary, secondary, tertiary);
+        }
+
+        /**
+         * Executes tasks before rendering UI
+         * @returns {void} void
+         */
+        _preRender() {
+            mega.ui.secondaryNav.hideCard();
+        }
+
+        /**
          * Executes tasks after rendering UI
          * @returns {void} void
          */
         _postRender() {
+            this._showActionButtons();
             this._bindEvents();
 
             if (this.hasDevices) {

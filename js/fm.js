@@ -639,9 +639,6 @@ function fmtopUI() {
     $('.fm-s4-settings, .fm-s4-new-bucket, .fm-s4-new-key, .fm-s4-new-user, .fm-s4-new-group', $header)
         .addClass('hidden');
 
-    // Show/hide Rubbish bin schedule banner
-    M.rubbishScheduleBanner();
-
     if (M.currentrootid !== 'shares' && !M.onDeviceCenter) {
         mega.ui.secondaryNav.hideCard();
         mega.ui.secondaryNav.hideActionButtons();
@@ -837,31 +834,10 @@ function fmtopUI() {
             $('.fm-right-files-block').addClass('visible-notification');
         }
         else if (M.onDeviceCenter) {
-            if (M.currentdirid === M.currentrootid && mega.devices.ui.hasDevices && mega.devices.ui.isCustomRender()) {
-                primary = '.fm-add-backup';
-                secondary = '.fm-add-syncs';
-            }
             if (mega.devices.ui.isCustomRender()) {
                 mega.ui.secondaryNav.updateLayoutButton(true);
             }
-            else {
-                const h = M.currentCustomView.nodeID;
-                const { device } = mega.devices.ui.getCurrentDirData();
-                const isBackup = mega.devices.ui.isBackupRelated(h);
-                if (device && !device.folders[h]) {
-                    primary = isBackup ? '.fm-share-folder' : '.fm-new-menu';
-                    secondary = isBackup ? false : '.fm-new-folder';
-                    tertiary = isBackup ? false : '.fm-share-folder';
-                    if (cl.isTakenDown(h)) {
-                        primary = isBackup ? false : '.fm-new-menu';
-                        secondary = isBackup ? false : '.fm-new-folder';
-                        tertiary = false;
-                    }
-                }
-            }
-
             $('.fm-right-files-block', document).addClass('visible-notification');
-            mega.devices.ui.handleAddBtnVisibility();
         }
         else if (String(M.currentdirid).length === 8
             && M.getNodeRights(M.currentdirid) > 0) {
@@ -893,7 +869,7 @@ function fmtopUI() {
     }
     $.tresizer();
 
-    if (isSearchResult) {
+    if (isSearchResult || M.onDeviceCenter) {
         return;
     }
     mega.ui.secondaryNav.showActionButtons(primary, secondary, tertiary);

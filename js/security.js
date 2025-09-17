@@ -1059,6 +1059,7 @@ security.register = {
         delete registerData.password;
 
         localStorage.awaitingConfirmationAccount = JSON.stringify(registerData);
+        localStorage.removeItem('megaLiteMode');
 
         if (localStorage.voucher) {
             const data = [localStorage.voucher, localStorage[localStorage.voucher] || -1];

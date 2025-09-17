@@ -1033,7 +1033,12 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items, forcedSe
             if (folderlink) {
                 finalItems.push('.import-item');
                 if (M.v.length) {
-                    finalItems.push('.zipdownload-item', '.download-standart-item');
+                    if (window.useMegaSync && (useMegaSync === 2 || useMegaSync === 3)) {
+                        finalItems.push('.download-item');
+                    }
+                    else {
+                        finalItems.push('.zipdownload-item', '.download-standart-item');
+                    }
                     if (pfcol) {
                         finalItems.push('.play-slideshow');
                     }

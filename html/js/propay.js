@@ -274,7 +274,7 @@ pro.propay = {
         let selectedPeriod;
 
         if (sessionStorage.fromOverquotaPeriod) {
-            selectedPeriod = sessionStorage.fromOverquotaPeriod;
+            selectedPeriod = parseInt(sessionStorage.fromOverquotaPeriod) || parseInt(pro.proplan.period);
             delete sessionStorage.fromOverquotaPeriod;
         }
         else {
@@ -1552,22 +1552,30 @@ pro.propay = {
 
         const $taxInfo = $('.tax-info', $planCard);
 
-        if (this.planObj.taxInfo) {
-            const forceEuro = this.isVoucherBalance();
+        const forceEuro = this.isVoucherBalance();
 
-            const getCurrencyText = (curr, ast) => {
-                curr = curr || 'EUR';
-                if (curr === 'EUR') {
-                    return ` EUR`;
-                }
-                return `${ast ? '*' : ''} ${curr}`;
-            };
+        const getCurrencyText = (curr, ast) => {
+            curr = curr || 'EUR';
+            if (curr === 'EUR') {
+                return ` EUR`;
+            }
+            return `${ast ? '*' : ''} ${curr}`;
+        };
+
+        if (this.planObj.taxInfo) {
 
             let localNet;
             let localTotal;
             let localTaxAmount;
 
-            if (this.discountInfo) {
+            if (this.anyPlanOfLevelDiscounted) {
+                const months = this.planObj.months;
+                const monthlyPlan = months === 1 ? this.planObj : pro.getPlanObj(this.planObj.level, 1);
+                const {taxAmount, taxAmountEur} = monthlyPlan.taxInfo;
+                localNet = ((!forceEuro && monthlyPlan.price) || monthlyPlan.priceEur) * months;
+                localTaxAmount = ((!forceEuro && taxAmount) || taxAmountEur) * months;
+            }
+            else if (this.discountInfo) {
                 const {ltpn, etpn, ltp, etp} = this.discountInfo;
                 localNet = (!forceEuro && ltpn) || etpn;
                 localTotal = (!forceEuro && ltp) || etp;
@@ -1594,24 +1602,86 @@ pro.propay = {
             $taxInfo.removeClass('hidden');
         }
 
+        const $preDiscount = $('.pre-discount', $planCard).addClass('hidden');
 
-        const discountInfo = this.getDiscount();
+        let discountInfo = this.getDiscount();
+        this.discountInfo = discountInfo;
+
+        if (!discountInfo && this.anyPlanOfLevelDiscounted) {
+            discountInfo = this.planObj.yearlyDiscountInfo;
+        }
+
         const discountDuration = discountInfo
             && (discountInfo.m || discountInfo.md || this.planObj.months);
 
         if (discountInfo) {
+
+            let {lda, eda} = discountInfo;
+            if (this.instantDiscount) {
+                const months = this.planObj.months;
+                const monthlyPlan = months === 1 ? this.planObj : pro.getPlanObj(this.planObj.level, 1);
+                const {ldtp, edtp} = discountInfo;
+                if (monthlyPlan.taxInfo) {
+                    lda = monthlyPlan.taxInfo.taxedPrice * months - ldtp;
+                    eda = monthlyPlan.taxInfo.taxedPriceEuro * months - edtp;
+                }
+                else {
+                    lda = monthlyPlan.price * months - ldtp;
+                    eda = monthlyPlan.priceEuro * months - edtp;
+                }
+            }
+
             $('.pricing-element .duration-type', $planCard)
                 .text(this.getNumOfMonthsWording(discountDuration, true));
 
             $('.plan-info .transfer', $planCard)
                 .text(bytesToSize(this.planObj.baseTransfer * discountInfo.m, 3, 4) + ' transfer');
+
+            const localDiscountAmount = (!forceEuro && lda) || eda;
+
+            const $discountAmount = $('.discount-amount', $planCard).toggleClass('hidden', !localDiscountAmount);
+            if (localDiscountAmount) {
+                $('.discount-amount-descr', $discountAmount)
+                    .text(l.discount_save_amount.replace('%1', formatPercentage(pro.calculateSavings([
+                        discountInfo.pd,
+                        this.planObj.months === 12 && this.instantDiscount ? pro.yearlyDiscountPercentage : 0
+                    ]))));
+
+                $('.discount-amount-value', $discountAmount)
+                    .text(formatCurrency(-localDiscountAmount, this.planObj.currency, 'narrowSymbol')
+                        + getCurrencyText(!forceEuro && this.planObj.currency));
+            }
+
+            if (!this.planObj.taxInfo) {
+                $preDiscount.removeClass('hidden');
+
+
+                let preTaxPrice;
+                if (this.anyPlanOfLevelDiscounted) {
+                    const months = this.planObj.months;
+                    const monthlyPlan = months === 1 ? this.planObj : pro.getPlanObj(this.planObj.level, 1);
+                    preTaxPrice = monthlyPlan.getFormattedPrice('narrowSymbol', forceEuro, false, months);
+                }
+                else {
+                    preTaxPrice = this.planObj
+                        .getFormattedPrice('narrowSymbol', forceEuro, this.isVoucherBalance(), discountDuration);
+                }
+
+                $('.pre-discount-value', $preDiscount)
+                    .text(preTaxPrice
+                        + getCurrencyText(!forceEuro && this.planObj.currency));
+            }
         }
         else if (is_mobile && !formattedPlanPrice) {
             formattedPlanPrice = this.getFormattedPriceNote();
         }
 
+        const currentDiscount = this.instantDiscount ? this.planObj.instantDiscount : discountInfo;
+
+        const $discountHeader = $('.discount-header', $planCard).addClass('hidden').removeClass('annual-discount');
+
         // TODO: Clean this up
-        if (discountInfo && discountInfo.md && discountInfo.pd && discountInfo.al === pro.propay.planNum) {
+        if (currentDiscount && discountInfo.md && discountInfo.pd && discountInfo.al === pro.propay.planNum) {
 
             let oldPrice;
 
@@ -1657,17 +1727,45 @@ pro.propay = {
 
             const newPrice = createPriceHTML(formatCurrency(ldtp, this.planObj.currency, 'narrowSymbol'));
 
+            let discountHeaderText = l.special_deal_perc_off;
+            let addNumMonths = false;
+
+            if (this.instantDiscount) {
+                discountHeaderText = discountHeaderText
+                    .replace('%1', formatPercentage(pro.calculateSavings([
+                        this.planObj.instantDiscount.percentage,
+                        this.planObj.months === 12 ? pro.yearlyDiscountPercentage : 0
+                    ])));
+                addNumMonths = true;
+            }
+            else if (this.anyPlanOfLevelDiscounted && this.planObj.months === 12) {
+                discountHeaderText = l.save_amount_and_unit
+                    .replace('%1', formatPercentage(this.planObj.saveUpTo / 100))
+                    .replace('%2', isRecurring ? l.yearly_unit : this.getNumOfMonthsWording(12, true));
+            }
+            else {
+                discountHeaderText = discountHeaderText
+                    .replace('%1', formatPercentage(discountInfo.pd / 100));
+                addNumMonths = true;
+            }
+
             const $discountHeader = $('.discount-header', $planCard);
-            $discountHeader.text(l.special_deal_perc_off
-                .replace('%1', formatPercentage(discountInfo.pd / 100))
-                + ` (${this.getNumOfMonthsWording(discountDuration, true)})`
-            ).removeClass('hidden');
+
+            if (this.anyPlanOfLevelDiscounted && !this.instantDiscount && this.planObj.months === 12) {
+                $discountHeader.addClass('annual-discount');
+            }
+
+            if (addNumMonths) {
+                discountHeaderText += ` (${this.getNumOfMonthsWording(discountDuration, true)})`;
+            }
+
+            $discountHeader.text(discountHeaderText).removeClass('hidden');
 
             $('.price', $planCard).safeHTML(newPrice);
             $('.pre-discount-price', $planCard).safeHTML(oldPrice);
             $('.discount', $planCard).removeClass('hidden');
         }
-        else if (discountInfo && discountInfo.al && discountInfo.pd && discountInfo.al === pro.propay.planNum) {
+        else if (currentDiscount && discountInfo.al && discountInfo.pd && discountInfo.al === pro.propay.planNum) {
 
             const duration = this.planObj.months;
             const oldPrice = this.planObj.getFormattedPrice('narrowSymbol', this.isVoucherBalance());
@@ -1676,7 +1774,6 @@ pro.propay = {
                 : discountInfo.lyp;
 
 
-            const $discountHeader = $('.discount-header', $planCard);
             $discountHeader.text(l.special_deal_perc_off
                 .replace('%1', formatPercentage(discountInfo.pd / 100))
             ).removeClass('hidden');
@@ -1746,6 +1843,8 @@ pro.propay = {
             const planTaxInfo = this.planObj.taxInfo;
             const stringSelectorAddition = planTaxInfo ? '_tma' : '';
 
+            const showEuro = this.planObj.currency === 'EUR' || this.isVoucherBalance();
+
             const text = (discountRenewalDuration === 12
                 ? l['discounted_price_years' + stringSelectorAddition]
                 : l['discounted_price_months' + stringSelectorAddition])
@@ -1755,7 +1854,7 @@ pro.propay = {
                     day: 'numeric'
                 }))
                 .replace('%2', pro.getPlanObj(this.discountInfo.al, discountRenewalDuration)
-                    .getFormattedPrice('narrowSymbol', this.isVoucherBalance(), false))
+                    .getFormattedPrice('narrowSymbol', showEuro, false) + (showEuro ? '' : '*'))
                 .replace('%3', (pro.taxInfo || Object.create(null)).taxName);
 
             $('.promo-info-txt', $promoEndsInfo).text(text);
@@ -1892,7 +1991,7 @@ pro.propay = {
 
         $promoEndsInfo.toggleClass('hidden', !discountMonths || !isRecurring);
 
-        if (durationOptions.length > 1 && !discountRenewalDuration) {
+        if (durationOptions.length > 1 && !discountRenewalDuration && !this.anyPlanOfLevelDiscounted) {
             let i = -1;
 
             while (++i < durationOptions.length) {
@@ -2849,6 +2948,12 @@ pro.propay = {
             return false;
         }
 
+        return gatewayOptions;
+    },
+
+    filterGatewayOptions(gatewayOptions) {
+        'use strict';
+
         this.trialSupported = false;
 
         this.browser = String((ua.details || false).browser || '');
@@ -2874,6 +2979,10 @@ pro.propay = {
             const discountPriceEuro = discountInfo.edtp;
 
             tempGatewayOptions = tempGatewayOptions.filter(gate => {
+                if ((gate.gatewayId === this.BITCOIN_GATE_ID)
+                    && (!d || !localStorage.allowBitcoinForDiscounts)) {
+                    return false;
+                }
                 if (gate.minimumEURAmountSupported > discountPriceEuro) {
                     return false;
                 }
@@ -2884,7 +2993,7 @@ pro.propay = {
                 if (gate.supportsMultiDiscountCodes && gate.supportsMultiDiscountCodes === 1) {
                     return true;
                 }
-                return testGateway ;
+                return testGateway;
             });
         }
 
@@ -3127,6 +3236,10 @@ pro.propay = {
 
         this.preloadAnimation();
 
+        delete pro.propay.discountInfo;
+        delete pro.propay.instantDiscount;
+        delete pro.propay.planObj;
+
         let discountInfo = pro.propay.getDiscount();
         if (discountInfo && discountInfo.used) {
             delete mega.discountCode;
@@ -3166,9 +3279,10 @@ pro.propay = {
                 return false;
             }
 
-            if (discountInfo) {
+            if (discountInfo && !this.instantDiscount) {
                 mega.discountInfo.used = true;
                 pro.propay.discountInfo = discountInfo;
+                this.fromURL = true;
             }
 
             if (is_mobile) {
@@ -3189,11 +3303,27 @@ pro.propay = {
 
             clickURLs();
 
-            Promise.all([this.loadPaymentGatewayOptions(), this.getSavedCard()]).then(() => {
+            const promises = [
+                this.loadPaymentGatewayOptions(),
+                this.getSavedCard(),
+                this.planObj.getInstantDiscountInfo(),
+            ];
+
+            this.anyPlanOfLevelDiscounted = !this.fromURL
+                && this.planObj.durationOptions.some(p => p[pro.UTQA_RES_INDEX_EXTRAS].insdis);
+
+            Promise.all(promises).then(([gatewayOptions, , discountInfo]) => {
 
                 if (!pro.propay.onPropayPage()) {
                     return;
                 }
+
+                if (discountInfo) {
+                    this.discountInfo = discountInfo;
+                    this.instantDiscount = true;
+                }
+
+                this.filterGatewayOptions(gatewayOptions);
 
                 this.pageInfo.initialized = false;
 
@@ -3294,6 +3424,8 @@ pro.propay = {
     getDiscount() {
         'use strict';
 
+        this.instantDiscount = false;
+
         if (mega.discountInfo) {
             if (d && localStorage.discountDuration) {
                 mega.discountInfo.m = parseInt(localStorage.discountDuration);
@@ -3305,6 +3437,12 @@ pro.propay = {
         if (mega.discountInfo && mega.discountInfo.pd && mega.discountInfo.al === pro.propay.planNum) {
             return mega.discountInfo;
         }
+
+        if (this.planObj && this.planObj.fullDiscountInfo) {
+            this.instantDiscount = true;
+            return this.planObj.fullDiscountInfo;
+        }
+
         return false;
     },
 

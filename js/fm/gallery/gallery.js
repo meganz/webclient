@@ -1134,10 +1134,6 @@ class MegaGallery {
 
         this.nodes[n.h] = updatedGroup[0];
 
-        if (!M.d[n.h]) {
-            await dbfetch.get(n.h);
-        }
-
         if (!this.dynamicList && this.onpage) {
             this.initDynamicList();
             this.dynamicList.initialRender();
@@ -1308,7 +1304,7 @@ class MegaGallery {
 
             galleryHeader.removeClass('hidden');
         }
-        else if (M.viewmode !== 2 || pfid) {
+        else {
             onIdle(() => {
                 if (!M.v.length) {
                     mega.gallery.showEmpty(M.currentdirid);
@@ -2486,7 +2482,7 @@ class MegaMediaTypeGallery extends MegaGallery {
 }
 
 mega.gallery = Object.create(null);
-mega.gallery.nodeUpdated = false;
+mega.gallery.nodeUpdated = -0xFEEDFACE;
 mega.gallery.albumsRendered = false;
 mega.gallery.publicSet = Object.create(null);
 mega.gallery.titleControl = null;
@@ -2690,22 +2686,22 @@ mega.gallery.checkEveryGalleryDelete = h => {
     }
 };
 
-mega.gallery.handleNodeUpdate = (n) => {
+mega.gallery.handleNodeUpdate = tryCatch((n) => {
     'use strict';
 
     if (M.gallery) {
-        tryCatch(() => mega.gallery.checkEveryGalleryUpdate(n))();
+        mega.gallery.checkEveryGalleryUpdate(n);
         mega.gallery.albumsRendered = false;
     }
     else if (M.albums) {
-        tryCatch(() => mega.gallery.albums.onCDNodeUpdate(n))();
+        mega.gallery.albums.onCDNodeUpdate(n);
         mega.gallery.nodeUpdated = true;
     }
     else {
         mega.gallery.nodeUpdated = true;
         mega.gallery.albumsRendered = false;
     }
-};
+});
 
 mega.gallery.clearMdView = () => {
     'use strict';

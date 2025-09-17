@@ -62,6 +62,8 @@ lazy(pro, 'proplan2', () => {
     let VpnPlanFound = false;
     let PwmPlanFound = false;
 
+    let resizeHandler = false;
+
     const allowedPeriods = new Set([1, 12]);
 
     /**
@@ -1142,10 +1144,11 @@ lazy(pro, 'proplan2', () => {
 
         if (planTaxInfo) {
             if (pro.taxInfo.variant === 1) {
-                $('.tax-info', $taxInfo).text(l.t_may_appy.replace('%1', pro.taxInfo.taxName));
+                $('.tax-info', $taxInfo).removeClass('hidden')
+                    .text(l.t_may_appy.replace('%1', pro.taxInfo.taxName));
             }
             else {
-                $('.tax-info', $taxInfo).text(l.before_tax);
+                $('.tax-info', $taxInfo).addClass('hidden');
                 $('.tax-price', $taxInfo).text(l.p_with_tax
                     .replace('%1', formatCurrency((planTaxInfo.taxedPrice), flexiCurrency, 'narrowSymbol')
                             + (flexiCurrency === 'EUR' ? ' ' : '* ') + flexiCurrency))
@@ -1190,6 +1193,85 @@ lazy(pro, 'proplan2', () => {
 
     };
 
+    const setUpDiscounts = () => {
+
+        const $periodNote = $('.period-note-txt', $page);
+
+        const {maxYearlyDiscount, minYearlyDiscount} = pro.yearlyDiscount;
+
+        const anyYearlyDiscount = pro.instantDiscounts.shared.anyDiscount12;
+
+        $periodNote.toggleClass('monthly-only', !!anyYearlyDiscount);
+        if (anyYearlyDiscount) {
+            $periodNote.text(l.pr_save_up_to.replace('%1', pro.softFloor(maxYearlyDiscount * 100)));
+        }
+        else {
+            $periodNote.text(l.pr_save_from
+                .replace('%1', formatPercentage(pro.softFloor(minYearlyDiscount * 100) / 100)));
+        }
+    };
+
+    const initResizeHandler = () => {
+
+        const previousSizes = [];
+
+        const resizeRecommendSection = (force) => {
+            const recommends = [];
+            let maxRecommendHeight = 0;
+
+            for (let i = 0; i < $planCards.length; i++) {
+                const planCard = $planCards[i];
+                const width = planCard && planCard.offsetWidth;
+
+                if (!(force === true) && (width && previousSizes[i] === width)) {
+                    continue;
+                }
+                previousSizes[i] = width;
+
+                const recommend = planCard.querySelector('.pricing-plan-recommend, .pricing-plan-recommend');
+                if (recommend) {
+                    recommend.style.height = 'max-content';
+                    recommends.push(recommend);
+                    maxRecommendHeight = Math.max(maxRecommendHeight, recommend.offsetHeight - 8);
+                }
+            }
+
+            for (const recommend of recommends) {
+                if (recommend.classList.contains('spacer')) {
+                    recommend.style.height = maxRecommendHeight + 'px';
+                }
+            }
+        };
+
+        resizeRecommendSection();
+
+        $(window).rebind('resize.pricing-page', SoonFc(100, resizeRecommendSection));
+
+        mBroadcaster.once('pagechange', () => {
+            $(window).off('resize.pricing-page');
+        });
+
+        return {
+            resizeRecommendSection,
+        };
+    };
+
+    const setCardClassTxt = (id, cls, txt) => {
+        if (txt === false) {
+            const $card = $(`#pro${id}`, $page).removeClass(cls);
+            $('.pricing-plan-recommend', $card).removeClass(cls);
+            return;
+        }
+
+        const $card = $(`#pro${id}`, $page).addClass(cls);
+        if (txt) {
+            const $recommend = $('.pricing-plan-recommend', $card).addClass(cls);
+            if (txt !== true) {
+                $recommend.text(txt);
+            }
+        }
+    };
+
     const fillPlansInfo = (period) => {
 
         let tab = 'pro';
@@ -1221,8 +1303,10 @@ lazy(pro, 'proplan2', () => {
 
         let periodText = period === 12 ? l[932] : l[931];
 
+        const $planCardsContainer = $('.pricing-pg.pro-plans-cards-container', $page);
+
         if (!tabsInfo.pro.initialized) {
-            $planCards = $('.pricing-pg.pro-plans-cards-container .pricing-plan-card', $page);
+            $planCards = $('.pricing-plan-card', $planCardsContainer);
             tabsInfo.pro.$planCards = $planCards;
             tabsInfo.pro.initialized = true;
         }
@@ -1239,6 +1323,17 @@ lazy(pro, 'proplan2', () => {
         ProFlexiFound = false;
 
         let showYearlyPerMonth = mega.flags.ff_npabm && (period === 12);
+
+        let minStorage = Number.MAX_SAFE_INTEGER;
+        let recommendedPlan = false;
+
+        const userPlanLevel = (u_attr && u_attr.p) ? (u_attr.p <= 3 ? u_attr.p : 0) : -1;
+
+        const matchingDiscount = pro.instantDiscounts.shared[`matchingDiscount${period}`];
+        const anyDiscount = pro.instantDiscounts.shared[`anyDiscount${period}`];
+
+        $planCardsContainer.toggleClass('promo', !!anyDiscount);
+        $planCardsContainer.toggleClass('promo-all', !!matchingDiscount);
 
         for (const currentPlan of pro.membershipPlans) {
 
@@ -1293,6 +1388,38 @@ lazy(pro, 'proplan2', () => {
                 }
             }
 
+            const yearlyDifference = pro.getPlanObj(currentPlan).saveUpToPrecise;
+            $('.pricing-plan-only', $planCard).text(l.pr_only).removeClass('line-through');
+
+            setCardClassTxt(currentPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL], 'sale popular save spacer', false);
+
+            if (currentPlan[pro.UTQA_RES_INDEX_EXTRAS].insdis) {
+                planPrice = currentPlan[pro.UTQA_RES_INDEX_EXTRAS].insdis.dp
+                    ? planPrice * (1 - (currentPlan[pro.UTQA_RES_INDEX_EXTRAS].insdis.dp / 100))
+                    : planPrice;
+
+                const discountName = l.discount_save
+                    .replace('%1', currentPlan[pro.UTQA_RES_INDEX_EXTRAS].insdis.dn)
+                    .replace('%2', formatPercentage(pro.calculateSavings(
+                        [currentPlan[pro.UTQA_RES_INDEX_EXTRAS].insdis.dp, period === 12 ? yearlyDifference : 0])));
+
+
+                setCardClassTxt(currentPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL], 'sale spacer', discountName);
+
+                let basePricePlan = pro.getPlanObj(currentPlan);
+                basePricePlan = basePricePlan.months === 12 ? basePricePlan.correlatedPlan : basePricePlan;
+
+                $('.pricing-plan-only', $planCard).addClass('line-through')
+                    .text(basePricePlan.getFormattedPrice('narrowSymbol', false, false, 1));
+            }
+            else if (pro.instantDiscounts.shared.anyDiscount12 && months === 12) {
+                setCardClassTxt(currentPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL], 'save spacer', l.yearly_plan_saving
+                    .replace('%1', Math.floor(yearlyDifference)));
+            }
+            else if (pro.instantDiscounts.shared.anyDiscount1 && months === 1) {
+                setCardClassTxt(currentPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL], 'spacer', true);
+            }
+
             let billingFrequencyText;
             let priceText;
             if (showYearlyPerMonth) {
@@ -1315,15 +1442,24 @@ lazy(pro, 'proplan2', () => {
             const $taxInfo = $('.pricing-plan-tax', $planCard).toggleClass('hidden', !planTaxInfo);
             if (planTaxInfo) {
                 if (pro.taxInfo.variant === 1) {
-                    $('.tax-info', $taxInfo).text(l.t_may_appy.replace('%1', pro.taxInfo.taxName));
+                    $('.tax-info', $taxInfo).removeClass('hidden')
+                        .text(l.t_may_appy.replace('%1', pro.taxInfo.taxName));
                 }
                 else {
-                    $('.tax-info', $taxInfo).text(l.before_tax);
-                    $('.tax-price', $taxInfo).text(l.p_with_tax
-                        .replace('%1', formatCurrency(
-                            planTaxInfo.taxedPrice / ((showYearlyPerMonth && 12) || 1),
-                            priceCurrency, 'narrowSymbol') + (priceCurrency === 'EUR' ? ' ' : '* ')
-                            + priceCurrency))
+                    const discount = pro.getDiscount(currentPlan);
+                    const discountMult = pro.calculateSavings([discount && discount.dp], true);
+
+                    const priceHTML = '<span class="bold">'
+                        + formatCurrency(
+                            (discountMult * planTaxInfo.taxedPrice) / ((showYearlyPerMonth && 12) || 1),
+                            priceCurrency, 'narrowSymbol')
+                        + (priceCurrency === 'EUR' ? ' ' : '* ')
+                        + '</span>'
+                        + priceCurrency;
+
+                    $('.tax-info', $taxInfo).addClass('hidden');
+                    $('.tax-price', $taxInfo).safeHTML(l.p_with_tax
+                        .replace('%1', priceHTML))
                         .removeClass('hidden');
                 }
             }
@@ -1371,6 +1507,38 @@ lazy(pro, 'proplan2', () => {
                 $('.meeting-limits span', $featuresBox).text(l.pr_no_meet_time_limits);
                 $('.meeting-participants span', $featuresBox).text(l.pr_unlimited_participants);
             }
+
+            const planObj = pro.getPlanObj(currentPlan);
+            const usedSpaceGB = pro.proplan2.storageData && (pro.proplan2.storageData.used / 1073741824) || 0;
+
+            if (pro.filter.simple.excPlans.has(planObj.level)) {
+                setCardClassTxt(planObj.level, 'exclusive-offer', l.pr_exclusive_offer);
+            }
+
+            const currPlanLevel = planObj.isIn('recommend', 'asLevel');
+
+            // if the plan offers less space than used OR same user's plan --> disable
+            if (currentPlan[pro.UTQA_RES_INDEX_STORAGE] < usedSpaceGB) {
+                $planCard.addClass('disabled');
+            }
+
+            // if the plan is suitable, let's see the smallest plan to recommend to the user
+            // that is bigger than their current purchased plan.
+            else if (currPlanLevel > userPlanLevel && currentPlan[pro.UTQA_RES_INDEX_STORAGE] < minStorage) {
+                minStorage = currentPlan[pro.UTQA_RES_INDEX_STORAGE];
+                recommendedPlan = currentPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL];
+            }
+        }
+
+        if (matchingDiscount) {
+            const text = l.discount_save
+                .replace('%1', matchingDiscount.dn)
+                .replace('%2', formatPercentage(pro.calculateSavings([matchingDiscount.dp, period === 12
+                    ? pro.yearlyDiscountPercentage : 0])));
+            $('.all-plans-promotional-info', $page).text(text).removeClass('hidden');
+        }
+        if (recommendedPlan && !pro.anyDiscount) {
+            setCardClassTxt(recommendedPlan, 'popular', l[23948]);
         }
 
         if (showYearlyPerMonth) {
@@ -1411,6 +1579,10 @@ lazy(pro, 'proplan2', () => {
         // TODO: Add better handling for different price estimation notes
         $('.pricing-pg.pricing-estimation-note-container, .pricing-pg.pricing-estimation-note-container-exc', $page)
             .toggleClass('eu', localPriceInfo === 'EUR');
+
+        if (resizeHandler) {
+            resizeHandler.resizeRecommendSection();
+        }
     };
 
     const populateBusinessPlanData = () => {
@@ -1535,7 +1707,8 @@ lazy(pro, 'proplan2', () => {
     };
 
     const initPeriodPickHandler = () => {
-        const $radioOptions = $('.pricing-pg.pick-period-container.individual .pricing-radio-option', $page);
+        const $periodContainer = $('.pricing-pg.pick-period-container.individual', $page);
+        const $radioOptions = $('.pricing-radio-option', $periodContainer);
         const $strgFlexInput = $('#esti-storage', $proflexiBlock);
         const $transFlexInput = $('#esti-trans', $proflexiBlock);
 
@@ -1550,8 +1723,11 @@ lazy(pro, 'proplan2', () => {
             $radioOptions.filter('[data-period="12"]').addClass('selected');
         }
 
+        $periodContainer.toggleClass('yearly', preSelectedPeriod === 12);
+
         $radioOptions.rebind('click.pricing', function() {
             const $optionWrapper = $(this).closest('.pick-period-container');
+            $optionWrapper.toggleClass('yearly', this.dataset.period === '12');
 
             $('.pricing-radio-option', $optionWrapper).removeClass('selected');
 
@@ -1571,6 +1747,10 @@ lazy(pro, 'proplan2', () => {
             });
 
             estimateFlexiPrice($strgFlexInput.val(), $transFlexInput.val());
+
+            if (resizeHandler) {
+                resizeHandler.resizeRecommendSection(true);
+            }
 
             return false;
         });
@@ -1678,7 +1858,6 @@ lazy(pro, 'proplan2', () => {
             tabsInfo[tab].initialized = true;
         }
 
-
         if (singleDurations) {
             // If there is mixed duration plans in the tab, this needs fixing ASAP. This is a bug.
             console.assert(singleDurations === durationsChecked.size, `Mixed durations found in tab: ${tab}`);
@@ -1763,15 +1942,14 @@ lazy(pro, 'proplan2', () => {
                     const planObj = pro.getPlanObj(plan);
 
                     if (pro.filter.simple.excPlans.has(planObj.level)) {
-                        setCardClassTxt(planObj.level, 'exclusive-offer', 'Exclusive Offer');
+                        setCardClassTxt(planObj.level, 'exclusive-offer', l.pr_exclusive_offer);
                     }
 
                     const currPlanLevel = planObj.isIn('recommend', 'asLevel');
 
                     // if the plan offers less space than used OR same user's plan --> disable
                     if (plan[pro.UTQA_RES_INDEX_STORAGE] < usedSpaceGB) {
-
-                        $planCards.filter(`#pro${plan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL]}`).addClass('disabled');
+                        $(`#pro${planObj.level}`, $page).addClass('disabled');
                     }
 
                     // if the plan is suitable, let's see the smallest plan to recommend to the user
@@ -1782,20 +1960,15 @@ lazy(pro, 'proplan2', () => {
                     }
                 }
 
-                // if we found recommendation, let's recommend
-                if (recomendedPlan) {
-                    setCardClassTxt(recomendedPlan, 'popular', l[23948]);
-                }
-
             }
             // we couldn't get the info.
             // if it's not a free user
             // we will reset to default
-            else if (u_attr.p) {
+            else if (u_attr.p && !pro.anyDiscount) {
                 setCardClassTxt(pro.ACCOUNT_LEVEL_PRO_I, 'popular', l.pr_popular);
             }
             // it's a free user
-            else {
+            else if (!pro.anyDiscount) {
                 setCardClassTxt(pro.ACCOUNT_LEVEL_PRO_LITE, 'popular', l[23948]);
             }
 
@@ -1980,6 +2153,8 @@ lazy(pro, 'proplan2', () => {
             initCompare();
             initFeatureTable();
             initScrollObserver();
+            setUpDiscounts();
+            resizeHandler = initResizeHandler();
 
             loadingDialog.hide('pricingReady');
 

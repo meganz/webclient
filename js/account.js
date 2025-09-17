@@ -467,7 +467,6 @@ function u_logout(logout) {
         localStorage.removeItem('signupcode');
         localStorage.removeItem('registeremail');
         localStorage.removeItem('mInfinity');
-        localStorage.removeItem('megaLiteMode');
         delete sessionStorage.buextra;
         delete sessionStorage.cnv2free;
 

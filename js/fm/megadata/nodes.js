@@ -1986,7 +1986,6 @@ MegaData.prototype.nodeUpdated = function(n, ignoreDB) {
                 mega.fileTextEditor.clearCachedFileData(n.h);
             }
 
-            mega.gallery.handleNodeUpdate(n);
             if (mega.devices.ui) {
                 mega.devices.ui.onUpdateNode(n.h);
             }
@@ -2024,6 +2023,11 @@ MegaData.prototype.nodeUpdated = function(n, ignoreDB) {
                         mega.ui.flyout.showContactFlyout(n.su);
                     }
                 });
+            }
+
+            if (mega.gallery.nodeUpdated !== -0xFEEDFACE) {
+                // @todo 'n' references a node that may NOT be in M.d[] YET, fix gallery-related code.
+                delay(`gallery:node-update(${n.h})`, () => mega.gallery.handleNodeUpdate(n));
             }
 
             mBroadcaster.sendMessage(`nodeUpdated:${n.h}`);

@@ -3781,8 +3781,10 @@ var bitcoinDialog = {
         var expiryTime = new Date(apiResponse.expiry);
 
         const discountInfo = pro.propay.getDiscount();
-        if (discountInfo && ((numOfMonths === 1 && discountInfo.emp) || (numOfMonths === 12 && discountInfo.eyp))) {
-            priceEuros = numOfMonths === 1 ? mega.intl.number.format(discountInfo.emp)
+        if (discountInfo && ((pro.propay.planObj.months === 1 && discountInfo.emp)
+            || (pro.propay.planObj.months === 12 && discountInfo.eyp))) {
+
+            priceEuros = pro.propay.planObj.months === 1 ? mega.intl.number.format(discountInfo.emp)
                 : mega.intl.number.format(discountInfo.eyp);
         }
 

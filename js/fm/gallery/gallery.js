@@ -2703,22 +2703,22 @@ mega.gallery.checkEveryGalleryDelete = h => {
     }
 };
 
-mega.gallery.handleNodeUpdate = (n) => {
+mega.gallery.handleNodeUpdate = tryCatch((n) => {
     'use strict';
 
     if (M.gallery) {
-        tryCatch(() => mega.gallery.checkEveryGalleryUpdate(n))();
+        mega.gallery.checkEveryGalleryUpdate(n);
         mega.gallery.albumsRendered = false;
     }
     else if (M.albums) {
-        tryCatch(() => mega.gallery.albums.onCDNodeUpdate(n))();
+        mega.gallery.albums.onCDNodeUpdate(n);
         mega.gallery.nodeUpdated = true;
     }
     else {
         mega.gallery.nodeUpdated = true;
         mega.gallery.albumsRendered = false;
     }
-};
+});
 
 mega.gallery.clearMdView = () => {
     'use strict';

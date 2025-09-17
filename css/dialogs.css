@@ -5965,11 +5965,52 @@ body.de .mega-dialog.contact-picker-widget {
         border-bottom: 1px solid var(--surface-mid-grey);
         border-left: 1px solid var(--surface-mid-grey);
     }
+    .mega-dialog.limited-bandwidth-dialog .offer-single,
+    .mega-dialog.limited-bandwidth-dialog .offer-all {
+        justify-content: center;
+        align-items: center;
+        padding: 4px;
+        font-size: 14px;
+        line-height: 20px;
+        color: var(--color-discount-primary-text);
+        font-weight: 600;
+        background-color: var(--color-discount-primary-bg);
+    }
+    .mega-dialog.limited-bandwidth-dialog .plans-row .plan .offer {
+        display: none;
+    }
+    .mega-dialog.limited-bandwidth-dialog.offer .plans-row .plan.offer .offer.offer-single {
+        margin-inline-start: -24px;
+        width: calc(100% + 48px);
+        margin-bottom: 4px;
+        color: var(--color-discount-primary-text);
+        font: var(--text-body2);
+        font-weight: 600;
+        height: max-content;
+        display: flex;
+        text-wrap: auto;
+        text-align: center;
+        flex-shrink: 0;
+    }
+    .mega-dialog.limited-bandwidth-dialog.offer .plans-row .plan.offer.save-yearly-offer .offer.offer-single {
+        background-color: var(--color-discount-secondary-bg);
+        color: var(--color-discount-secondary-text);
+    }
+    .mega-dialog.limited-bandwidth-dialog .offer-all {
+        margin-bottom: 16px;
+        border-radius: 8px;
+    }
+    .mega-dialog.limited-bandwidth-dialog.offer .offer {
+        display: flex;
+    }
+    .mega-dialog.limited-bandwidth-dialog.offer .pricing-page.plans-row > .offer {
+        padding-top: 0;
+    }
     .mega-dialog.limited-bandwidth-dialog .pricing-page.plans-row > * {
         display: flex;
         flex-direction: column;
         text-align: unset;
-        padding: 24px;
+        padding: 32px 24px;
         height: 396px;
     }
     .mega-dialog.limited-bandwidth-dialog.pro-mini .pricing-page.plans-row > *:not(.starter) {
@@ -6044,6 +6085,8 @@ body.de .mega-dialog.contact-picker-widget {
         height: 0;
         width: fit-content;
         border: none;
+        border-radius: 4px;
+        transition: none;
     }
     .mega-dialog.limited-bandwidth-dialog .plan .mega-button.positive {
         color: var(--text-green);
@@ -6085,6 +6128,28 @@ body.de .mega-dialog.contact-picker-widget {
     .mega-dialog.limited-bandwidth-dialog section .content-block .messages > * {
         font-size: 14px;
         line-height: 20px;
+    }
+    .mega-dialog.limited-bandwidth-dialog.offer:not(.offer-all) .pricing-page.plan:not(.offer) .mega-button,
+    .mega-dialog.limited-bandwidth-dialog.offer:not(.offer-all) .pricing-page.plan.offer-hidden .mega-button,
+    .mega-dialog.limited-bandwidth-dialog.offer:not(.offer-all) .pricing-page.plan.save-yearly-offer .mega-button {
+        background: var(--surface-grey-2);
+        color: var(--text-color-high);
+        outline: none;
+        border: 1px solid var(--stroke-grey-2);
+    }
+    .mega-dialog.limited-bandwidth-dialog.offer .pricing-page.plan:not(.offer) .mega-button:hover,
+    .mega-dialog.limited-bandwidth-dialog.offer .pricing-page.plan.offer-hidden .mega-button:hover,
+    .mega-dialog.limited-bandwidth-dialog.offer .pricing-page.plan.save-yearly-offer .mega-button:hover {
+        background-color: var(--neutral-hover);
+    }
+    .mega-dialog.limited-bandwidth-dialog.offer:not(.offer-all) .pricing-page.plan.offer.outlined::before {
+        content: "";
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        outline: 1px solid red;
+        top: 0;
+        left: 0;
     }
     .mega-dialog.limited-bandwidth-dialog .pricing-page.plan-only,
     .mega-dialog.limited-bandwidth-dialog .pricing-page.currency-and-period > * {

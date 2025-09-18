@@ -122,7 +122,7 @@ GalleryNodeBlock.revokeThumb = (h) => {
     for (let i = 0; i < keys.length; i++) {
         const key = keys[i];
 
-        if (mega.gallery.tmpFa[h] && mega.gallery.tmpFa[h].fa && key.startsWith(mega.gallery.tmpFa[h].fa)) {
+        if (mega.gallery.tmpFa[h] && key.startsWith(mega.gallery.tmpFa[h].fa)) {
             URL.revokeObjectURL(GalleryNodeBlock.thumbCache[key]);
             delete GalleryNodeBlock.thumbCache[key];
         }
@@ -165,7 +165,7 @@ class MegaGallery {
     }
 
     mainViewNodeMapper(h) {
-        const n = mega.gallery.tmpFa[h] || this.updNode[h] || false;
+        const n = M.d[h] || (mega.gallery.tmpFa && mega.gallery.tmpFa[h]) || this.updNode[h] || false;
 
         console.assert(!!n, `Node ${h} not found...`);
         return n;
@@ -1078,7 +1078,7 @@ class MegaGallery {
     }
 
     removeFromAllGroup(h, ts) {
-        if (mega.gallery.tmpFa[h] && mega.gallery.tmpFa[h].fa) {
+        if (mega.gallery.tmpFa[h]) {
             GalleryNodeBlock.revokeThumb(h);
         }
 
@@ -1668,8 +1668,14 @@ class MegaGallery {
     }
 
     sortByMtime(ah, bh) {
-        const a = typeof ah === 'string' ? mega.gallery.tmpFa[ah] || this.updNode[ah] : ah;
-        const b = typeof bh === 'string' ? mega.gallery.tmpFa[bh] || this.updNode[bh] : bh;
+        const { tmpFa } = mega.gallery;
+
+        const a = typeof ah === 'string'
+            ? M.d[ah] || (tmpFa && tmpFa[ah]) || this.updNode[ah]
+            : ah;
+        const b = typeof bh === 'string'
+            ? M.d[bh] || (tmpFa && tmpFa[bh]) || this.updNode[bh]
+            : bh;
 
         return M.sortByModTimeFn2()(a, b, -1);
     }
@@ -1907,7 +1913,7 @@ class MegaGallery {
     }
 
     renderNode(h) {
-        const node = mega.gallery.tmpFa[h] || new MegaNode(this.updNode[h]);
+        const node = M.d[h] || (mega.gallery.tmpFa && mega.gallery.tmpFa[h]) || new MegaNode(this.updNode[h]);
 
         if (!node) {
             return;
@@ -2023,7 +2029,6 @@ class MegaGallery {
         this.subfolderMd = !mega.config.get('noSubfolderMd');
 
         if (this.nodes && this.subfolderMd === tempSubfolderMd) {
-
             mega.gallery.fillMainView(this);
             MegaGallery.sortViewNodes();
 
@@ -2290,21 +2295,25 @@ class MegaTargetGallery extends MegaGallery {
         }
 
         for (let i = handles.length; i--;) {
-            if (!M.c[handles[i]]) {
-                if (self.d && !mega.gallery.tmpFa[handles[i]]) {
-                    console.error(`Gallery cannot find handle ${handles[i]}`);
+            const h = handles[i];
+
+            if (!M.c[h]) {
+                if (self.d && !M.d[h]) {
+                    console.error(`Gallery cannot find handle ${h}`);
                 }
                 continue;
             }
 
-            subs = subs.concat(Object.keys(M.c[handles[i]]));
+            subs.push(...Object.keys(M.c[h]));
         }
 
         const rubTree = array.to.object(M.getTreeHandles(M.RubbishID), true);
 
         subs = subs.filter(h => {
-            const n = mega.gallery.tmpFa[h];
-            return !n.t
+            const n = M.d[h];
+
+            return n
+                && !n.t
                 && !this.nodes[n.h]
                 && !rubTree[h]
                 && !rubTree[n.p]
@@ -2314,7 +2323,7 @@ class MegaTargetGallery extends MegaGallery {
         }).sort(this.sortByMtime.bind(this));
 
         for (const h of subs) {
-            const n = mega.gallery.tmpFa[h];
+            const n = M.d[h];
             this.nodes[n.h] = this.setGroup(n)[0];
             M.v.push(n);
         }
@@ -3156,7 +3165,7 @@ async function galleryUI(id) {
             return loadingDialog.hide('MegaGallery');
         }
 
-        mega.gallery.titleControl.title = mega.gallery.tmpFa[id].name;
+        mega.gallery.titleControl.title = M.d[id].name;
         mega.gallery.titleControl.icon = 'images';
         mega.gallery.titleControl.isClickable = false;
         mega.gallery.titleControl.addTooltipToTitle();
@@ -3238,6 +3247,7 @@ MegaGallery.addThumbnails = (nodeBlocks) => {
 
     const keys = [];
     const thumbBlocks = {};
+    const { pendingFaBlocks, pendingThumbBlocks, tmpFa } = mega.gallery;
 
     for (let i = 0; i < nodeBlocks.length; i++) {
         if (!nodeBlocks[i].node) { // No node is associated with the block
@@ -3254,11 +3264,11 @@ MegaGallery.addThumbnails = (nodeBlocks) => {
 
         // In case fa is not arrived yet, placing the node to the buffer
         if (!fa) {
-            if (!mega.gallery.pendingFaBlocks[h]) {
-                mega.gallery.pendingFaBlocks[h] = Object.create(null);
+            if (!pendingFaBlocks[h]) {
+                pendingFaBlocks[h] = Object.create(null);
             }
 
-            mega.gallery.pendingFaBlocks[h][width] = nodeBlocks[i];
+            pendingFaBlocks[h][width] = nodeBlocks[i];
             continue;
         }
         else if (width <= MEGAImageElement.THUMBNAIL_SIZE) {
@@ -3285,11 +3295,11 @@ MegaGallery.addThumbnails = (nodeBlocks) => {
             keys.push(key);
         }
 
-        if (mega.gallery.pendingThumbBlocks[key]) {
-            mega.gallery.pendingThumbBlocks[key].push(nodeBlocks[i]);
+        if (pendingThumbBlocks[key]) {
+            pendingThumbBlocks[key].push(nodeBlocks[i]);
         }
         else {
-            mega.gallery.pendingThumbBlocks[key] = [nodeBlocks[i]];
+            pendingThumbBlocks[key] = [nodeBlocks[i]];
         }
 
         // Stretch the image when loading
@@ -3304,7 +3314,7 @@ MegaGallery.addThumbnails = (nodeBlocks) => {
     if (thumbHandles.length) {
         fm_thumbnails(
             'standalone',
-            thumbHandles.map(h => mega.gallery.tmpFa[h]),
+            thumbHandles.map(h => M.d[h] || (tmpFa && tmpFa[h])),
             ({ h, fa }) => {
                 for (let i = 0; i < thumbBlocks[h].length; i++) {
                     thumbBlocks[h][i].setThumb(thumbnails.get(fa), fa);
@@ -3321,10 +3331,8 @@ MegaGallery.addThumbnails = (nodeBlocks) => {
     mega.gallery.generateSizedThumbnails(
         keys,
         (key, arrayBuffer) => {
-            const blocks = mega.gallery.pendingThumbBlocks;
-
             // The image has been applied already
-            if (!blocks[key]) {
+            if (!pendingThumbBlocks[key]) {
                 return;
             }
             const weAreOnGallery = pfid || M.isGalleryPage() || M.isAlbumsPage() || M.gallery;
@@ -3334,23 +3342,24 @@ MegaGallery.addThumbnails = (nodeBlocks) => {
             }
 
             if (GalleryNodeBlock.thumbCache[key]) {
-                for (let i = 0; i < blocks[key].length; i++) {
-                    blocks[key][i].setThumb(GalleryNodeBlock.thumbCache[key], blocks[key][i].node.fa);
+                for (let i = 0; i < pendingThumbBlocks[key].length; i++) {
+                    pendingThumbBlocks[key][i]
+                        .setThumb(GalleryNodeBlock.thumbCache[key], pendingThumbBlocks[key][i].node.fa);
                 }
 
-                delete blocks[key];
+                delete pendingThumbBlocks[key];
                 return;
             }
 
             if (weAreOnGallery) {
                 const url = mObjectURL([arrayBuffer], arrayBuffer.type || 'image/jpeg');
 
-                if (blocks[key]) {
-                    for (let i = 0; i < blocks[key].length; i++) {
-                        blocks[key][i].setThumb(url, blocks[key][i].node.fa);
+                if (pendingThumbBlocks[key]) {
+                    for (let i = 0; i < pendingThumbBlocks[key].length; i++) {
+                        pendingThumbBlocks[key][i].setThumb(url, pendingThumbBlocks[key][i].node.fa);
                     }
 
-                    delete blocks[key];
+                    delete pendingThumbBlocks[key];
                 }
 
                 if (!GalleryNodeBlock.thumbCache[key]) {
@@ -3364,7 +3373,7 @@ MegaGallery.addThumbnails = (nodeBlocks) => {
                 }
             }
             else {
-                delete blocks[key];
+                delete pendingThumbBlocks[key];
             }
         },
         (err) => {

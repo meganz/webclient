@@ -2165,6 +2165,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/transfers/meths.js', n: 'dl_meths', j: 1, w: 3});
     jsl.push({f:'js/transfers/upload2.js', n: 'upload_js', j:1,w:2});
     jsl.push({f:'js/transfers/reader.js', n: 'upload_reader_js', j: 1, w: 2});
+    jsl.push({f:'js/transfers/wsu.js', n: 'upload_wsu_js', j: 1, w: 2});
     jsl.push({f:'js/transfers/zip64.js', n: 'zip_js', j: 1});
     jsl.push({f:'js/transfers/cloudraid.js', n: 'cloudraid_js', j: 1});
 
@@ -2751,6 +2752,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/transfers/upload2.js', n: 'upload_js', j:1,w:2});
         jsl.push({f:'js/transfers/downloader.js', n: 'dl_downloader', j: 1, w: 3});
         jsl.push({f:'js/transfers/reader.js', n: 'upload_reader_js', j: 1, w: 2});
+        jsl.push({f:'js/transfers/wsu.js', n: 'upload_wsu_js', j: 1, w: 2});
 
         jsl.push({f:'js/utils/factory/file-list.js', n: 'factory:filelist_js', j:1});
         jsl.push({f:'js/utils/factory/pbkdf2.js', n: 'factory:pbkdf2_js', j: 1});

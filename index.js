@@ -1903,7 +1903,7 @@ function topbarUI(holderId) {
     if (!topbar) {
         return;
     }
-    onIdle(() => mega.ui.searchbar.refresh());
+    onIdle(() => mega.ui.searchbar.refresh(null, !M.previousdirid));
 
     topbarUITogglePresence(topbar);
 
@@ -2084,7 +2084,6 @@ function topmenuUI() {
     var $headerActivityBlock = $('.activity-status-block .activity-status,.activity-status-block', $topHeader);
     var $headerIndividual = $('.individual', $topHeader);
     var $headerIndividualSpan = $('.individual span', $topHeader);
-    var $headerSearch = $('.mini-search', $topHeader);
     var $headerButtons = $('.top-buttons', $topHeader);
     var $loginButton = $('.top-login-button', $headerButtons);
     var $headerRegisterBotton = $('.create-account-button', $headerButtons);
@@ -2126,10 +2125,6 @@ function topmenuUI() {
     }
     else {
         $headerIndividual.removeClass('hidden');
-    }
-
-    if (!fminitialized) {
-        $headerSearch.addClass('hidden');
     }
 
     if (page === 'download') {
@@ -3167,6 +3162,11 @@ function loadSubPage(tpage, event) {
     }
 
     if (event && event.type === 'popstate' || event === 'override') {
+        if (event.state && event.state.subpage === 'fm/search') {
+            // We need to preload the searchbar before opening/searching closed nodes
+            MegaHeader.updateSearchForm(event.state.searchLocation);
+        }
+
         // In case we navigated to a location.hash, clean it up replacing the current history entry.
         pushHistoryState(true, page);
     }

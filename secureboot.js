@@ -4089,6 +4089,10 @@ function pushHistoryState(page, state) {
 
         if (page.substr(0, 9) === 'fm/search') {
             state.searchString = page.substr(9) || state.searchString;
+
+            var chipBtn = document.querySelector('button.search-chip');
+            state.searchLocation = chipBtn && chipBtn.dataset.location || false;
+
             if (state.searchFilters !== null) {
                 state.searchFilters = state.searchFilters || history.state.searchFilters;
             }

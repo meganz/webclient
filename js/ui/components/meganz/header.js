@@ -11,7 +11,7 @@ class MegaHeader extends MegaMobileHeader {
         const navNavigation = this.domNode.querySelector('.top-block .nav-navigation');
         const navActions = this.domNode.querySelector('.top-block .nav-actions');
 
-        navNavigation.querySelector('.home').classList.add('.hidden');
+        navNavigation.querySelector('.home').classList.add('hidden');
 
         // Remove mobile kebab menu
         const kebab = navActions.querySelector('.menu');
@@ -568,9 +568,14 @@ class MegaHeader extends MegaMobileHeader {
     }
 
     update() {
+        const types = MegaHeader.getType();
 
-        this.headerOptions = MegaHeader.getType();
+        this.headerOptions = types;
         mega.ui.topmenu.megaLink.text = MegaHeader.getHeading();
+
+        if (types.search) {
+            MegaHeader.updateSearchForm(false, this.domNode);
+        }
 
         if (u_type || window.is_eplusplus) {
             this.bentoMenu.items.chat[0].show();
@@ -1090,6 +1095,129 @@ class MegaHeader extends MegaMobileHeader {
         const iType = u_attr ? 0 : 1;
 
         return this.types(iType);
+    }
+
+    /**
+     * Updating the placeholder for the search input
+     * @param {String} [dirId] Predefined location
+     * @param {HTMLElement} [header] Parent block
+     * @returns {void}
+     */
+    static updateSearchForm(dirId = false, header = pmlayout) {
+        if (!header || (!dirId && M.currentdirid && M.currentdirid.startsWith('search/'))) {
+            return;
+        }
+
+        let loc = '';
+        let chip = '';
+        let chipIcon = '';
+        let placeholder = l.search_all;
+        const input = header.querySelector('input.js-filesearcher');
+
+        if (!input) {
+            return;
+        }
+
+        dirId = dirId || M.currentdirid;
+        const isRootFolder = dirId === M.RootID;
+
+        const adjustDetails = () => {
+            if (M.getNodeRoot(dirId) === M.RootID) {
+                const setInputDetails = (h, i) => {
+                    loc = h;
+                    chip = M.getNameByHandle(loc);
+                    chipIcon = i;
+                    placeholder = l.search_loc.replace('%s', chip);
+                };
+
+                if (isRootFolder) {
+                    if (pfid) {
+                        placeholder = l.search_loc.replace('%s', M.getNameByHandle(M.RootID));
+                    }
+                    else {
+                        setInputDetails(M.RootID, 'sprite-fm-mono icon-cloud-thin-outline');
+                    }
+                }
+                else {
+                    setInputDetails(dirId, 'sprite-fm-mono icon-folder-thin-outline');
+                }
+            }
+            else if (dirId === 'photos' || (M.gallery && M.isGalleryPage()) || M.albums) {
+                loc = 'photos';
+                chip = l.media;
+                chipIcon = 'sprite-fm-mono icon-image-01-thin-outline';
+                placeholder = l.search_media;
+            }
+        };
+
+        adjustDetails();
+
+        input.placeholder = placeholder;
+        let chipBtn = input.previousElementSibling || Object.create(null);
+
+        if (loc) {
+            let txt;
+            let icon;
+
+            const btnClasses = 'search-chip h-7 grid grid-flow-col gap-2 items-center whitespace-nowrap p-0 ms-2'
+                + ' border-none outline-none border-radius-3'
+                + ' text-color-high bg-btn-secondary';
+            const txtClasses = 'expand-on-focus text-ellipsis w-min-content max-w-24';
+            const iconClasses = `${chipIcon} ms-3`;
+
+            if (chipBtn.tagName === 'BUTTON') {
+                txt = chipBtn.querySelector('span');
+                icon = chipBtn.querySelector('i');
+            }
+            else {
+                txt = mCreateElement('span');
+                icon = mCreateElement('i', { class: iconClasses });
+                chipBtn = mCreateElement(
+                    'button',
+                    { tabindex: '-1', type: 'button' },
+                    [
+                        icon,
+                        txt,
+                        mCreateElement(
+                            'i',
+                            { class: 'sprite-fm-mono icon-dialog-close-thin icon-size-4 p-1 me-2 close-icon' }
+                        )
+                    ]
+                );
+
+                chipBtn.addEventListener('click', ({ target }) => {
+                    input.focus();
+
+                    if (target && !target.classList.contains('close-icon')) {
+                        return;
+                    }
+
+                    chipBtn.parentNode.removeChild(chipBtn);
+                    input.placeholder = (pfid) ? l.search_loc.replace('%s', M.getNameByHandle(M.RootID)) : l.search_all;
+
+                    mega.ui.searchbar.clearLastSearches();
+                    mega.ui.mNodeFilter.resetFilterSelections();
+
+                    eventlog(500936);
+                });
+
+                chipBtn.addEventListener('pointerdown', (e) => {
+                    e.preventDefault();
+                });
+
+                input.parentNode.insertBefore(chipBtn, input);
+            }
+
+            chipBtn.className = btnClasses;
+            chipBtn.dataset.location = loc;
+
+            txt.textContent = chip;
+            txt.className = txtClasses;
+            icon.className = iconClasses;
+        }
+        else if (!M.search && !loc && chipBtn.tagName === 'BUTTON') {
+            chipBtn.parentNode.removeChild(chipBtn);
+        }
     }
 
     set topBlockBottomBorder(show) {

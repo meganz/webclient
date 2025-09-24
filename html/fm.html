@@ -180,6 +180,7 @@
             <div class="topbar-searcher js-topbar-searcher">
                 <!-- This div contains three dropdown sections -->
                 <div class="dropdown-search hidden">
+
                     <!-- EMPTY STATE - Show when recents are disabled/no recents exist -->
                     <div class="dropdown-no-recents dropdown-section hidden">
                         <i class="dropdown-no-recents-icon sprite-fm-mono icon-clock-rotate"></i>
@@ -192,52 +193,18 @@
                             </div>
                         </div>
                     </div>
-                    <div class="search-loader hidden"></div>
-                    <!-- Search Results section -->
-                    <div class="dropdown-results dropdown-section hidden">
-                        <div class="dropdown-search-results dropdown-section-item">
-                            <!-- Every section has a header -->
-                            <div class="dropdown-section-header">
-                                <div class="dropdown-section-header-contents">
-                                    <div class="dropdown-section-header-text">
-                                        [$searchbar_result_label]
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- Every section has a body -->
-                            <div class="dropdown-section-body">
-                                <!-- Suggestion search result - dynamically populated -->
-                            </div>
-                            <!-- Template for search result item -->
-                            <a
-                                class="dropdown-search-results-item dropdown-section-body-item dropdown-search-results-item-template hidden">
-                                <div class="dropdown-item-file dropdown-search-results-file">
-                                    <div class="dropdown-search-results-item-file-icon">
-                                        <span class="item-type-icon">
-                                            <img>
-                                        </span>
-                                    </div>
-                                    <div class="dropdown-search-results-item-filename">
-                                        <span class="prefix"></span>
-                                        <span class="txt-bold"></span>
-                                        <span class="suffix"></span>
-                                    </div>
-                                </div>
-                                <div class="dropdown-search-results-item-location dropdown-item-text-medium"></div>
-                            </a>
-                        </div>
-                    </div>
+
                     <div class="dropdown-recents dropdown-section">
                         <!-- Recently Searched section -->
                         <div class="dropdown-section dropdown-recently-searched-wrapper">
-                            <div class="dropdown-recently-searched dropdown-section-item">
+                            <div class="dropdown-recently-searched dropdown-section-item my-1">
                                 <!-- Every section has a header -->
                                 <div class="dropdown-section-header">
-                                    <div class="dropdown-section-header-contents">
-                                        <div class="dropdown-section-header-text">
+                                    <div class="dropdown-section-header-contents px-6 py-2">
+                                        <div class="dropdown-section-header-text font-bold text-color-high">
                                             [$recently_searched]
                                         </div>
-                                        <a class="dropdown-section-clear js-dropdownClearRecentlySearched">
+                                        <a class="dropdown-section-clear js-dropdownClearRecentlySearched underline font-bold text-color-high">
                                             [$clear_all]
                                         </a>
                                     </div>
@@ -249,49 +216,57 @@
                                 <!-- Dummy template for each item in body -->
                                 <a
                                     class="dropdown-recently-searched-item dropdown-section-body-item dropdown-recently-searched-template hidden">
-                                    <div class="dropdown-recently-searched-item-text"></div>
+                                    <div class="dropdown-recently-searched-item-text flex-1 pr-2">
+                                        <div class="dropdown-tag-results-item"></div>
+                                    </div>
                                     <i class="sprite-fm-mono icon-dialog-close dropdown-recent-item-delete-icon"></i>
                                 </a>
                             </div>
                         </div>
-                        <!-- Recently Opened section -->
-                        <div class="dropdown-section dropdown-recently-opened-wrapper hidden">
-                            <div class="dropdown-recently-opened dropdown-section-item">
-                                <!-- Every section has a header -->
-                                <div class="dropdown-section-header">
-                                    <div class="dropdown-section-header-contents">
-                                        <div class="dropdown-section-header-text">
-                                            [$recently_opened_files]
-                                        </div>
+                    </div>
+
+                    <!-- Search Results section -->
+                    <div class="dropdown-results dropdown-section hidden">
+                        <div class="dropdown-search-results dropdown-section-item my-1">
+                            <!-- Every section has a header -->
+                            <div class="dropdown-section-header">
+                                <div class="dropdown-section-header-contents px-6 py-2">
+                                    <div class="dropdown-section-header-text font-bold text-color-high">
+                                        [$searchbar_result_label]
                                     </div>
                                 </div>
-                                <!-- Every section has a body -->
-                                <div class="dropdown-section-body">
-                                    <!-- Recently Opened Files - dynamically populated -->
-                                </div>
-                                <!-- Dummy template for each item in body -->
-                                <a
-                                    class="dropdown-recently-opened-item dropdown-section-body-item dropdown-recently-opened-template hidden">
-                                    <div class="dropdown-item-file dropdown-recently-opened-file">
-                                        <div class="dropdown-recently-opened-item-file-icon">
-                                            <span class="item-type-icon file">
-                                                <img>
-                                            </span>
-                                        </div>
-                                        <div class="dropdown-recently-opened-item-filename"></div>
-                                    </div>
-                                    <div class="dropdown-recently-opened-item-location dropdown-item-text-medium"></div>
-                                    <div class="dropdown-recently-opened-item-time dropdown-item-text-medium"></div>
-                                </a>
                             </div>
+                            <!-- Every section has a body -->
+                            <div class="dropdown-section-body">
+                                <!-- Suggestion search result - dynamically populated -->
+                            </div>
+                            <!-- Template for search result item -->
+                            <a
+                                class="dropdown-search-results-item dropdown-section-body-item dropdown-search-results-item-template hidden gap-1">
+                                <div class="dropdown-search-results-item-file-icon">
+                                    <span class="item-type-icon">
+                                        <img>
+                                    </span>
+                                </div>
+                                <div class="flex-1 text-ellipsis">
+                                    <div class="dropdown-search-results-item-filename flex flex-row">
+                                        <span class="prefix"></span>
+                                        <span class="middle-txt"></span>
+                                        <span class="suffix flex-1 text-ellipsis"></span>
+                                    </div>
+                                </div>
+                                <div class="dropdown-search-results-item-location dropdown-item-text-medium flex-1 text-right"></div>
+                            </a>
                         </div>
                     </div>
+
+                    <div class="search-loader hidden"></div>
                 </div>
-                <form autocomplete="disabled" id="main-search-fake-form">
-                    <i class="search-icon sprite-fm-mono icon-preview-reveal"></i>
-                    <input type="text" placeholder="[$102]" autocomplete="disabled" class="js-filesearcher"
+                <form autocomplete="disabled" id="main-search-fake-form" class="flex flex-row items-center border-1 border-radius-2">
+                    <i class="search-icon sprite-fm-mono icon-search-light-outline"></i>
+                    <input type="text" placeholder="[$102]" autocomplete="disabled" class="js-filesearcher text-ellipsis"
                         spellcheck="false" />
-                    <button class="js-btnclearSearch" type="button"><i class="sprite-fm-mono icon-dialog-close"></i></button>
+                    <button class="js-btnclearSearch" type="button"><i class="sprite-fm-mono icon-dialog-close-thin"></i></button>
                 </form>
             </div>
         </div>
@@ -626,21 +601,6 @@
                             <span class="banner title-text"></span>
                             <span class="banner message-text"></span>
                             <a href="/repay" class="clickurl action-link"></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="fm-notification-block inactive-account">
-                    <div class="mega-component alert banner error">
-                        <i class="banner left-icon sprite-fm-mono icon-alert-triangle-thin-outline"></i>
-                        <div class="content-box">
-                            <span class="banner title-text"></span>
-                            <span class="banner message-text"></span>
-                            <a href="" class="action-link"></a>
-                        </div>
-                        <div class="banner end-box">
-                            <button class="mega-component text-icon nav-elem icon-only button">
-                                <i class="sprite-fm-mono icon-dialog-close-thin left-icon icon-size-24"></i>
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -2768,6 +2728,7 @@
                     </div>
                 </div>
             </div>
+
             <div class="search-bottom-wrapper hidden">
                 <div class="crumb-overflow-link dropdown">
                     <a class="breadcrumb-dropdown-link">
@@ -5280,4 +5241,3 @@
         <ul></ul>
     </li>
 </ul>
-

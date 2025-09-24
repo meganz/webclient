@@ -1379,7 +1379,7 @@ BusinessAccount.prototype.setMasterUserAttributes =
                                     if (d) {
                                         console.warn('upb/uc2 combo error', ex);
                                     }
-                                    operationPromise.reject(0, ex, 'API returned error');
+                                    operationPromise.reject(0, ex && ex.result || ex, 'API returned error');
                                 });
                         });
                 })

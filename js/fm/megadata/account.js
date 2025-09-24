@@ -1389,6 +1389,69 @@ function voucherData(arr) {
     return vouchers;
 }
 
+/**
+ * Notify users that their data has been deleted due to inactivity
+ * @returns {void} void
+ */
+mBroadcaster.once('fm:initialized', tryCatch(() => {
+    'use strict';
+
+    const lp = self.u_attr && u_attr.lastpurge || [];
+    let banner = null;
+
+    if (pfid || !lp.length || lp[0] === fmconfig.lastpurge || lp[1] !== 4) {
+        return false;
+    }
+
+    const options = {
+        name: 'inactive-account',
+        title: l.bn_inactive_acc_title,
+        msgText: l.bn_inactive_acc_text.replace('%1', 9),
+        type: 'error',
+        ctaText: l[8742],
+        onCtaClick: () => {
+            mega.redirect(
+                'help.mega.io',
+                'files-folders/restore-delete/data-deleted-by-mega', false, false, false
+            );
+        },
+        onClose: () => {
+            mega.config.set('lastpurge', lp[0]);
+
+            if (banner.length) {
+                banner.removeClass('visible');
+            }
+        },
+        closeBtn: true
+    };
+
+    if (is_mobile) {
+        if (!mobile.banner) {
+            MegaMobileBanner.init();
+        }
+        banner = mobile.banner.show(options);
+        banner.on('cta', options.onCtaClick);
+        banner.on('close', options.onClose);
+        return;
+    }
+
+    // @todo: Use mega.ui.secondaryNav.showBanner instead
+    banner = $(`.fm-notification-block.${options.name}`, '.fmholder');
+    const $cta = $('a', banner);
+
+    $('.title-text', banner).text(options.title);
+    $('.message-text', banner).text(options.msgText);
+    $cta.text(options.ctaText);
+    $cta.rebind('click.showHelp', (ev) => {
+        ev.preventDefault();
+        ev.stopPropagation();
+        options.onCtaClick();
+    });
+    $('.end-box button', banner).rebind('click.hideBanner', options.onClose);
+    banner.addClass('visible');
+}));
+
+
 mBroadcaster.addListener('fm:initialized', () => {
     'use strict';
 

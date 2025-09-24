@@ -497,6 +497,7 @@ function sc_residue(sc) {
     }
 
     if (sc.sn) {
+        decWorkerPool.expedite(true);
         const didLoadFromAPI = mega.loadReport.mode === 2;
 
         // enqueue new sn

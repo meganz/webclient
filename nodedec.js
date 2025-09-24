@@ -18,7 +18,22 @@ Object.defineProperty(self, 'u_k', {
 if (typeof importScripts !== 'undefined') {
     importScripts('sjcl.js', 'rsaasm.js');
 
+    const queue = [];
+    queue.bulkpm = true;
     self.postMessage = self.webkitPostMessage || self.postMessage;
+    const dsp = () => {
+        'use strict';
+        if (queue.length) {
+            self.postMessage(queue);
+            queue.length = 0;
+        }
+    };
+    self.queueMessage = (msg) => {
+        'use strict';
+        if (queue.push(msg) > 10000) {
+            dsp();
+        }
+    };
 
     /* eslint-disable no-use-before-define,no-empty-function,no-empty,strict */
     const nop = self.lazy = () => {};
@@ -60,9 +75,15 @@ if (typeof importScripts !== 'undefined') {
 
     init();
 
-    self.onmessage = function(e) {
+    self.onmessage = function _msgproc(e) {
         'use strict';
         const req = e.data;
+        if (Array.isArray(req) && req.bulkpm) {
+            while (req.length) {
+                _msgproc({data: req.shift()});
+            }
+            return;
+        }
         jobs++;
 
         if (req.scqi >= 0) {
@@ -82,7 +103,7 @@ if (typeof importScripts !== 'undefined') {
         else if (req.t >= 0) {
             // node
             crypto_decryptnode(req);
-            self.postMessage(req);
+            self.queueMessage(req);
         }
         else if (req.sk) {
             // existing sharekey
@@ -130,6 +151,9 @@ if (typeof importScripts !== 'undefined') {
                 log('dec.worker: assign request.', JSON.stringify(req));
             }
         }
+        else if (req.flush) {
+            dsp();
+        }
         else {
             // unfortunately, we have to discard the SJCL AES cipher
             // because it does not fit in a worker message
@@ -143,6 +167,7 @@ if (typeof importScripts !== 'undefined') {
                 log(`worker signaling completion, ${jobs}.`);
             }
 
+            dsp();
             // done - post state back to main thread
             self.postMessage({done: 1, jobs, sharekeys});
             init(self);
@@ -1046,7 +1071,7 @@ lazy(self, 'decWorkerPool', function decWorkerPool() {
     /** @class decWorkerPool */
     return new class extends Array {
         get url() {
-            const WORKER_VERSION = 11;
+            const WORKER_VERSION = 12;
             return `${window.is_extension || window.is_karma ? '' : '/'}nodedec.js?v=${WORKER_VERSION}`;
         }
 
@@ -1126,9 +1151,12 @@ lazy(self, 'decWorkerPool', function decWorkerPool() {
             };
 
             let messageHandler = (ev) => {
-                const {scqi, t} = ev.data;
+                const {scqi, t, bulkpm} = ev.data;
                 if (scqi || t >= 0) {
                     tail++;
+                }
+                if (bulkpm) {
+                    tail += ev.data.length;
                 }
                 return handler(ev);
             };
@@ -1142,6 +1170,8 @@ lazy(self, 'decWorkerPool', function decWorkerPool() {
                 if (state) {
                     w.postMessage(state);
                 }
+                w.queue = [];
+                w.queue.bulkpm = true;
                 return this.push(w);
             });
 
@@ -1225,6 +1255,19 @@ lazy(self, 'decWorkerPool', function decWorkerPool() {
             }
         }
 
+        /** dispatch any remaining queued messages to workers */
+        expedite(flush) {
+            for (let i = this.length; i--;) {
+                if (this[i].queue.length) {
+                    this[i].postMessage(this[i].queue);
+                    this[i].queue.length = 0;
+                }
+                if (flush) {
+                    this[i].postMessage({ flush: 1 });
+                }
+            }
+        }
+
         /** post a node to a worker for decryption */
         postNode(n, slot) {
             slot = this.getShareIndex(n, slot);
@@ -1245,7 +1288,11 @@ lazy(self, 'decWorkerPool', function decWorkerPool() {
             if (n.t >= 0) {
                 ++head;
             }
-            this[slot].postMessage(n);
+            const worker = this[slot];
+            if (worker.queue.push(n) > 10000) {
+                worker.postMessage(worker.queue);
+                worker.queue.length = 0;
+            }
 
             if (n.sk || n.ha) {
                 parentWorker.set(n.h, slot);

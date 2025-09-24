@@ -2328,6 +2328,7 @@ function tree_residue(data) {
     // request an "I am done" confirmation ({}) from all workers
     if (decWorkerPool.ok) {
         dumpsremaining = decWorkerPool.length;
+        decWorkerPool.expedite();
         decWorkerPool.signal({});
     }
     else {
@@ -2340,6 +2341,12 @@ function tree_residue(data) {
 function worker_procmsg(ev) {
     "use strict";
 
+    if (Array.isArray(ev.data) && ev.data.bulkpm) {
+        while (ev.data.length) {
+            worker_procmsg({ data: ev.data.shift() });
+        }
+        return;
+    }
     if (ev.data.scqi >= 0) {
         // enqueue processed actionpacket
         if (scq[ev.data.scqi]) scq[ev.data.scqi][0] = ev.data;

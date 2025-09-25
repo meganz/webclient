@@ -1618,7 +1618,8 @@ scparser.$add('sqac', (a) => {
     }
 
     // If a user is on FM, update the account status with this packet.
-    if (fminitialized) {
+    // If the user is making a payment, do not refresh. The user will only have 1 option, to reload
+    if (fminitialized && !addressDialog.paymentInProcess) {
 
         delay('sqac:ui-update', () => {
 
@@ -1809,7 +1810,7 @@ scparser.$add('ssc', process_businessAccountSubUsers_SC);
 // business account change which requires reload (such as payment against expired account)
 scparser.$add('ub', function() {
     "use strict";
-    if (!folderlink) {
+    if (!folderlink && !addressDialog.paymentInProcess) {
         fm_fullreload(null, 'ub-business').catch(dump);
     }
 });

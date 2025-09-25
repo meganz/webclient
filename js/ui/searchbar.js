@@ -276,9 +276,6 @@ lazy(mega.ui, 'searchbar', () => {
 
                 M.fmSearchNodes(val, location)
                     .then(() => {
-                        if (!M.search && !(folderlink && String(M.currentdirid).startsWith('search/'))) {
-                            mega.ui.mNodeFilter.resetFilterSelections();
-                        }
                         delay.cancel('searchbar.renderSuggestSearchedItems');
                         if (!pfid) {
                             recentlySearched.justSearched = true;
@@ -298,10 +295,16 @@ lazy(mega.ui, 'searchbar', () => {
                                 loadSubPage(`fm/${searchPage}`);
                             }
 
+                            mega.ui.mNodeFilter.resetFilterSelections();
+
                             hideDropdown();
                             addDropdownEventListeners();
                             $fileSearch.trigger('blur');
                             showEmptyState = true;
+
+                            if (!M.v.length) {
+                                mega.ui.secondaryNav.filterChipsHolder.classList.add('hidden');
+                            }
                         }
                         onIdle(() => {
                             // get topbars again for switching between static and fm pages

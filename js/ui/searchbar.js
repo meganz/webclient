@@ -174,12 +174,12 @@ lazy(mega.ui, 'searchbar', () => {
      * @returns {Function|false}
      */
     const locationFn = (location) => {
-        if (folderlink) {
-            location = M.RootID;
-        }
-
+        
         if (!location) {
-            return false;
+            if (!folderlink) {
+                return false;
+            }
+            location = M.RootID;
         }
 
         if (location === 'photos') {

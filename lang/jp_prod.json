@@ -5200,7 +5200,7 @@
     "screenshare_failed_notif": "\u753b\u9762\u306e\u5171\u6709\u3092\u505c\u6b62\u3057\u307e\u3057\u305f",
     "screenshare_stop_button": "\u5171\u6709\u3092\u505c\u6b62\u3059\u308b",
     "search_again": "\u30b9\u30da\u30eb\u3092\u78ba\u8a8d\u3057\u3066\u3082\u3046\u4e00\u5ea6\u304a\u8a66\u3057\u304f\u3060\u3055\u3044",
-    "search_all": "Search everything",
+    "search_all": "\u306a\u3093\u3067\u3082\u691c\u7d22",
     "search_contact_placeholder": "{count, plural, other {#\u4ef6\u306e\u9023\u7d61\u5148\u3092\u691c\u7d22\u2026}}",
     "search_loc": "%s\u3092\u691c\u7d22",
     "search_media": "\u30e1\u30c7\u30a3\u30a2\u3092\u691c\u7d22",

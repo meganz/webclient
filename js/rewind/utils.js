@@ -88,7 +88,14 @@ lazy(mega, 'rewindUtils', () => {
         }
 
         dispatch(data) {
-            const {token, error} = data;
+            const {token, error, bulkpm} = data;
+            if (bulkpm && Array.isArray(data)) {
+                while (data.length) {
+                    this.dispatch(data.shift());
+                }
+                this.broadcast('flush', {flush: 1});
+                return;
+            }
 
             // Since we pasted the token on the payload
             // We shall retrieve it and use it for mapping
@@ -129,9 +136,14 @@ lazy(mega, 'rewindUtils', () => {
             const promiseArray = [];
 
             for (const worker of this) {
-                promiseArray.push(new Promise((resolve, reject) => {
-                    this.post(worker, {resolve, reject, command, payload});
-                }));
+                if (command === 'flush') {
+                    worker.postMessage({flush: 1});
+                }
+                else {
+                    promiseArray.push(new Promise((resolve, reject) => {
+                        this.post(worker, {resolve, reject, command, payload});
+                    }));
+                }
             }
 
             return Promise.allSettled(promiseArray);
@@ -235,6 +247,7 @@ lazy(mega, 'rewindUtils', () => {
             // The context for this function is MEGAPIRequest
             const apiId = this.__ident_1;
 
+            rewindWorker.broadcast('flush', {flush: true});
             // This is for request tracking that is still in progress
             // and be terminated once the nodes are processed already
             if (!mega.rewindUtils.inflight[apiId]) {
@@ -377,6 +390,7 @@ lazy(mega, 'rewindUtils', () => {
         handleResidue(response) {
             const apiId = this.__ident_1;
 
+            rewindWorker.broadcast('flush', {flush: true});
             if (response.ts && response.ts.length) {
                 mega.rewindUtils.packet.handleTimestamp(response.ts);
             }

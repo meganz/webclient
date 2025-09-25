@@ -715,7 +715,6 @@ lazy(mega.ui, 'mNodeFilter', () => {
             return !(M.gallery
                 || M.chat
                 || M.albums
-                || (M.search && !M.v.length)
                 || hiddenSections.has(M.currentdirid)
                 || M.currentrootid === 's4' && M.currentCustomView.subType !== 'bucket'
                 || String(M.currentdirid).startsWith('user-management')

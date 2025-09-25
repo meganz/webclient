@@ -740,6 +740,7 @@ mBroadcaster.once('boot_done', () => {
             }
 
             this.container.classList.toggle('fat', this.fat);
+            this.container.classList.toggle('search-page', !!M.search);
 
             if (this.container.nodeName === 'TABLE') {
                 var tbody = this.container.querySelector('tbody');
@@ -1342,6 +1343,34 @@ mBroadcaster.once('boot_done', () => {
                     tmp = aTemplate.querySelector('.tranfer-filetype-txt');
                     tmp.textContent = aProperties.name;
 
+                    const term = M.search ? M.currentdirid.replace('search/', '').trim().toLowerCase() : '';
+
+                    if (M.search && term) {
+                        const termArr = term.toLowerCase().split(' ');
+                        const hasTerm = str => !!str && str.length >= term.length
+                            && ((str = str.toLowerCase()).includes(term) || termArr.every(str.includes.bind(str)));
+
+                        if (hasTerm(aProperties.name)) {
+                            const {
+                                prefix,
+                                match,
+                                suffix
+                            } = mega.ui.searchbar.findMatchWithSearchTerm(aProperties.name, term);
+
+                            const els = [
+                                mCreateElement('span', { class: 'prefix' }),
+                                mCreateElement('span', { class: 'middle-txt' }),
+                                mCreateElement('span', { class: 'suffix' })
+                            ];
+
+                            els[0].textContent = prefix;
+                            els[1].textContent = match;
+                            els[2].textContent = suffix;
+
+                            tmp.replaceChildren(mCreateElement('div', { class: 'search-results-item-filename' }, els));
+                        }
+                    }
+
                     tmp = aTemplate.querySelector('.item-type-icon');
 
                     // Public URL Access for S4 Bucket or Object
@@ -1638,7 +1667,9 @@ mBroadcaster.once('boot_done', () => {
                         else {
                             megaListOptions.extraRows = 4;
                             megaListOptions.itemWidth = false;
-                            megaListOptions.itemHeight = this.fat ? 48 : 32;
+                            megaListOptions.itemHeight = M.search
+                                ? (this.fat ? 81 : 73)
+                                : (this.fat ? 48 : 32);
                             megaListOptions.headerHeight = 56;
                             megaListOptions.bottomSpacing = 6;
                             megaListOptions.appendTo = 'tbody';

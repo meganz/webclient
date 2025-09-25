@@ -4111,7 +4111,6 @@ BusinessAccountUI.prototype.URLchanger = function (subLocation) {
     "use strict";
     var newSubPage = subLocation ? 'fm/user-management/' + subLocation : 'fm/user-management';
     if (page !== newSubPage) {
-        window.mega.ui.searchbar.closeMiniSearch();
         pushHistoryState(newSubPage);
         page = newSubPage;
 

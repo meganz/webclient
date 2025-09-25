@@ -2569,9 +2569,9 @@ var addressDialog = {
                 planNum = pro.ACCOUNT_LEVEL_PRO_FLEXI;
             }
 
+            const isEphemeralAccount = isEphemeral();
             if (page === 'registerb') {
                 mainTxt = mainTxt.replace('%2', pro.getProPlanName(pro.ACCOUNT_LEVEL_BUSINESS));
-                const isEphemeralAccount = isEphemeral();
                 if (isEphemeralAccount) {
                     mainTxt.push(l.if_new_account_verify);
                     btnTxt = false;
@@ -2588,6 +2588,10 @@ var addressDialog = {
                 () => {
                     if (pro.propay.planObj && (pro.propay.planObj.level === pro.ACCOUNT_LEVEL_PRO_FLEXI)) {
                         delete addressDialog.paymentInProcess;
+                        if (isEphemeralAccount) {
+                            pro.redirectToSite();
+                            return;
+                        }
                         fm_fullreload(null, 'upf-proflexi').catch(dump);
                     }
                     else if (addressDialog.businessPurchase) {

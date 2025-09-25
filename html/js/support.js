@@ -85,6 +85,7 @@ var support = (function() {
             5: l[8640],     // Contact/Sharing Issue
             6: l[8641],     // MEGAsync Issue
             7: l[8642],     // Missing / Invisible Data
+            11: l.option_drop_down_support_mega_s4
         };
 
         extraData = '';
@@ -115,8 +116,6 @@ var support = (function() {
             window.onsupport($textarea.parents('.support'));
             window.onsupport = null;
         }
-
-
 
         resizeHandler();
     };

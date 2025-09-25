@@ -175,7 +175,6 @@ MegaUtils.prototype.resetUploadDownload = function megaUtilsResetUploadDownload(
         ulmanager.isUploading = false;
         ASSERT(ulQueue._running === 0, 'ulQueue._running inconsistency on completion');
         ulQueue._pending = [];
-        ulQueue.setSize((fmconfig.ul_maxSlots | 0) || ulmanager.ulDefConcurrency || 4);
 
         if (is_megadrop) {
             mega.fileRequestUpload.onUploadCompletion();
@@ -203,7 +202,9 @@ MegaUtils.prototype.resetUploadDownload = function megaUtilsResetUploadDownload(
         clearTransferXHRs();
 
         $('.transfer-pause-icon').addClass('disabled');
-        $('.transfer-clear-all-icon').addClass('disabled');
+        if ($('tr.transfer-error', M.getTransferElements.domTable).length === 0) {
+            $('.transfer-clear-all-icon').addClass('disabled');
+        }
         $('.nw-fm-left-icon.transfers').removeClass('transfering');
         $('.transfers .nw-fm-percentage li p').css('transform', 'rotate(0deg)');
         M.tfsdomqueue = Object.create(null);
@@ -1023,9 +1024,10 @@ MegaUtils.prototype.findDupes = function() {
 /**
  * Search for nodes
  * @param {String} searchTerm The search term to look for.
+ * @param {Function|false} customFn Optional function to call in addition to others
  * @returns {Promise}
  */
-MegaUtils.prototype.fmSearchNodes = function(searchTerm) {
+MegaUtils.prototype.fmSearchNodes = function(searchTerm, customFn) {
     'use strict';
 
     if (String(searchTerm).startsWith('--')) {
@@ -1049,7 +1051,18 @@ MegaUtils.prototype.fmSearchNodes = function(searchTerm) {
                     r = 1;
                 }
                 else if (!n.fv) {
-                    M.nn[n.h] = n.name;
+                    M.nn[n.h] = {
+                        name: n.name,
+                        p: n.p,
+                        s4: n.s4,
+                        pwm: n.pwm,
+                        sen: n.sen,
+                        fa: n.fa,
+                        k: n.k,
+                        t: n.t,
+                        des: n.des,
+                        tags: n.tags
+                    };
                 }
             }
 
@@ -1122,19 +1135,27 @@ MegaUtils.prototype.fmSearchNodes = function(searchTerm) {
         }
 
         promise.then(function() {
+
             var h;
-            var filter = M.getFilterBySearchFn(searchTerm);
+            var filter = M.getFilterBySearchFn(searchTerm, customFn);
 
             if (folderlink) {
                 M.v = [];
+
+                const chipBtn = $('button.search-chip', '.searcher-wrapper');
+                const location = mega.ui.searchbar.locationFn(chipBtn.length && chipBtn.attr('data-location'));
+
                 for (h in M.nn) {
                     if (
-                        filter({name: M.nn[h]}) && h !== M.currentrootid &&
-                        (!mega.ui.mNodeFilter.selectedFilters.value || mega.ui.mNodeFilter.match(M.d[h]))
+                        filter(M.nn[h])
+                        && h !== M.currentrootid
+                        && (!location || location(M.nn[h]))
+                        && (!mega.ui.mNodeFilter.selectedFilters.value || mega.ui.mNodeFilter.match(M.d[h]))
                     ) {
                         M.v.push(M.d[h]);
                     }
                 }
+
                 M.currentdirid = 'search/' + searchTerm;
                 if (mega.gallery) {
                     mega.gallery.clearMdView();
@@ -1156,7 +1177,7 @@ MegaUtils.prototype.fmSearchNodes = function(searchTerm) {
                 var handles = [];
 
                 for (h in M.nn) {
-                    if (!M.d[h] && filter({name: M.nn[h]}) && handles.push(h) > 4e3) {
+                    if (!M.d[h] && filter(M.nn[h]) && handles.push(h) > 4e3) {
                         break;
                     }
                 }

@@ -1394,6 +1394,8 @@ var addressDialog = {
     validInputs: null,
     billingInfoFilled: null,
 
+    businessPurchase: false,
+
     /**
      * Open and setup the dialog
      */
@@ -2474,12 +2476,14 @@ var addressDialog = {
 
         mainContentDiv.appendChild(textItems);
 
-        const button = document.createElement('button');
-        button.textContent = btnTxt;
-        button.className = 'mega-button large positive';
-        button.addEventListener('click', callback);
+        if (btnTxt !== false) {
+            const button = document.createElement('button');
+            button.textContent = btnTxt;
+            button.className = 'mega-button large positive';
+            button.addEventListener('click', callback);
+            mainContentDiv.appendChild(button);
+        }
 
-        mainContentDiv.appendChild(button);
         div.appendChild(spacerDiv);
         div.appendChild(mainContentDiv);
         div.appendChild(estimatedPriceDiv);
@@ -2513,6 +2517,7 @@ var addressDialog = {
 
     showPaymentSuccess() {
         'use strict';
+
         const $stripeDialog = this.getStripeDialog();
         const $stripeIframe = $('iframe#stripe-widget', $stripeDialog);
 
@@ -2549,17 +2554,44 @@ var addressDialog = {
 
             pro.propay.hideLoadingOverlay();
         }
-        else if (pro.propay.onPropayPage() && pro.propay.paymentButton) {
+        else if (pro.propay.onPropayPage() || (page === 'registerb') || (page === 'repay')) {
+
+            let mainTxt = l.upgraded_account
+                .replace('%1', u_attr.email || '');
+            let btnTxt = l['6826'];
+
+            let planNum = pro.propay.planNum;
+
+            if (addressDialog.businessPurchase) {
+                planNum = pro.ACCOUNT_LEVEL_BUSINESS;
+            }
+            else if (u_attr && u_attr.pf) {
+                planNum = pro.ACCOUNT_LEVEL_PRO_FLEXI;
+            }
+
+            if (page === 'registerb') {
+                mainTxt = mainTxt.replace('%2', pro.getProPlanName(pro.ACCOUNT_LEVEL_BUSINESS));
+                const isEphemeralAccount = isEphemeral();
+                if (isEphemeralAccount) {
+                    mainTxt.push(l.if_new_account_verify);
+                    btnTxt = false;
+                }
+            }
+            else {
+                mainTxt = mainTxt.replace('%2', pro.getProPlanName(planNum));
+            }
+
             this.showSuccessCloak(
                 l['6961'],
-                l.upgraded_account
-                    .replace('%1', u_attr.email || '')
-                    .replace('%2', pro.getProPlanName(pro.propay.planNum)),
-                l['6826'],
+                mainTxt,
+                btnTxt,
                 () => {
                     if (pro.propay.planObj && (pro.propay.planObj.level === pro.ACCOUNT_LEVEL_PRO_FLEXI)) {
                         delete addressDialog.paymentInProcess;
                         fm_fullreload(null, 'upf-proflexi').catch(dump);
+                    }
+                    else if (addressDialog.businessPurchase) {
+                        fm_fullreload(null, 'ub-business').catch(dump);
                     }
                     else {
                         pro.redirectToSite();
@@ -2567,6 +2599,7 @@ var addressDialog = {
                 });
 
             pro.propay.hideLoadingOverlay();
+            addressDialog.closeDialog();
         }
         else {
             const $stripeSuccessDialog = $('.payment-stripe-success-dialog'
@@ -2742,13 +2775,13 @@ var addressDialog = {
         clearTimeout(pro.propay.paymentStatusChecker);
         clearTimeout(pro.propay.listenRemover);
 
-        const failHandle = (error) => {
+        const failHandle = (error, failReason) => {
             const $stripeDialog = addressDialog.getStripeDialog();
             const $stripeFailureDialog = $('.payment-stripe-failure-dialog');
             const $stripeIframe = $('iframe#stripe-widget', $stripeDialog);
+            pro.propay.hideLoadingOverlay();
 
-            $('button.js-close, .btn-close-dialog', $stripeFailureDialog).rebind('click.stripeDlg', () => {
-
+            const failFunc = () => {
                 closeDialog();
                 // if we are coming from business plan, we need to reset registration
                 if (addressDialog.businessPlan && addressDialog.userInfo) {
@@ -2761,18 +2794,41 @@ var addressDialog = {
                         loadSubPage('repay');
                     }
                 }
-            });
+            };
 
-            $('.stripe-error', $stripeFailureDialog).safeHTML(error || '');
+            if (pro.propay.onPropayPage()) {
+                pro.propay.hideLoadingOverlay();
+                pro.propay.updatePayment();
 
-            if (addressDialog.stripeSaleId === 'EDIT') {
-                $((is_mobile ? '.fail-head' : '.payment-stripe-failure-dialog-title'), $stripeFailureDialog)
-                    .text(l.payment_gw_update_fail);
+                pro.dialog.show(
+                    failReason === 'incorrect_cvc'
+                        ? l.incorrect_cvc_warn_header
+                        : l['25049'],
+                    parseHTML(error || ''),
+                    {
+                        onClick: () => {
+                            failFunc();
+                            pro.dialog.hide();
+                        },
+                        text: l.ok_button
+                    }
+                );
+            }
+            else {
+                $('button.js-close, .btn-close-dialog', $stripeFailureDialog).rebind('click.stripeDlg', failFunc);
+
+                $('.stripe-error', $stripeFailureDialog).safeHTML(error || '');
+
+                if (addressDialog.stripeSaleId === 'EDIT') {
+                    $((is_mobile ? '.fail-head' : '.payment-stripe-failure-dialog-title'), $stripeFailureDialog)
+                        .text(l.payment_gw_update_fail);
+                }
+
+                $stripeIframe.remove();
+                closeStripeDialog();
+                M.safeShowDialog('stripe-pay-failure', $stripeFailureDialog);
             }
 
-            $stripeIframe.remove();
-            closeStripeDialog();
-            M.safeShowDialog('stripe-pay-failure', $stripeFailureDialog);
         };
 
         const getErrorText = (failData) => {
@@ -2804,7 +2860,7 @@ var addressDialog = {
             if (typeof event.data !== 'string') {
                 tryCatch(() => {
                     api_req({a: 'log', e: 99741, m: JSON.stringify(event.data)});
-                });
+                })();
                 failHandle(l[1679]);
                 return;
             }
@@ -2868,7 +2924,9 @@ var addressDialog = {
                     pro.propay.updatePayment();
                 }
                 else if (event.data === 'validInput') {
-                    pro.propay.showLoadingOverlay('transferring');
+                    pro.propay.showLoadingOverlay(pro.propay.proPaymentMethod === 'stripe'
+                        ? 'processing'
+                        : 'transferring');
                 }
                 else {
                     $('.stripe-button .loader').addClass('hidden');
@@ -2882,7 +2940,8 @@ var addressDialog = {
             }
 
             if (event.data.startsWith('payfail^')) {
-                failHandle(getErrorText(event.data.split('^')));
+                const failInfo = event.data.split('^');
+                failHandle(getErrorText(failInfo), failInfo[3]);
             }
             else if (event.data === 'paysuccess') {
 
@@ -3040,8 +3099,13 @@ var addressDialog = {
 
                 this.stripeSaleId = 'EDIT';
 
-                if (pro.propay.onPropayPage()) {
-                    iframeSrc += `&v=2`;
+                if (pro.propay.onPropayPage() || (page === 'registerb') || (page === 'repay')) {
+                    // v (version)
+                    // rtc (returnToClient): Have client handle stripe success/failure
+                    if (pro.propay.onPropayPage()) {
+                        iframeSrc += `&v=2`;
+                    }
+                    iframeSrc += `&rtc=${(d && localStorage.rtc) || 1}`;
                 }
 
                 if (pro.propay.paymentButton) {
@@ -3955,4 +4019,66 @@ var insertEmailToPayResult = function($overlay) {
         $overlay.find('.payment-result-txt .user-email').text(acc.email);
     }
 };
+
+/**
+ * Generic dialog handler using the MegaSheet component
+ */
+pro.dialog = {
+    sheet: null,
+
+    /**
+     * Shows a generic dialog
+     * @param {string} title - The title text for the dialog
+     * @param {string|HTMLElement|Array} contents - The content to display in the dialog body.
+     * @param {string|Object} [button] - Button configuration. Can be a string for default behaviour
+     * @param {Object} [options] - Additional options for the dialog
+     * @param {string} [options.className] - CSS class name for the button
+     * @param {Function} [options.onShow] - Callback function called when dialog is shown
+     * @param {Function} [options.onClose] - Callback function called when dialog is closed
+     * @returns {MegaSheet} Returns the MegaSheet instance
+     */
+    show(title, contents, button, options) {
+        'use strict';
+
+        options = options || Object.create(null);
+
+        let actions;
+
+        if (button) {
+            actions = [{
+                type: 'normal',
+                text: typeof button === 'string' ? button : button.text,
+                className: options.className || 'primary',
+                onClick: button.onClick
+            }];
+        }
+
+        contents = Array.isArray(contents) ? contents : [contents];
+
+        mega.ui.sheet.show({
+            title,
+            contents,
+            actions,
+            name: 'propay-generic-dialog',
+            type: 'modal',
+            icon: 'sprite-fm-mono icon-x-circle-thin-outline error',
+            showClose: true,
+            preventBgClosing: false,
+            onShow: options.onShow,
+            onClose: options.onClose
+        });
+
+        return this.sheet;
+    },
+
+    /**
+     * Hides the currently displayed propay dialog
+     */
+    hide() {
+        'use strict';
+
+        mega.ui.sheet.hide('propay-generic-dialog');
+    }
+};
+
 

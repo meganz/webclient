@@ -811,6 +811,11 @@ lazy(mega.ui, 'mInfoPanel', () => {
     class MegaInfoInputBlock extends MegaComponent {
         constructor(options) {
             super({ ...options, id: undefined });
+
+            if (pfid) {
+                return; // No need to render meta info on folderlinks
+            }
+
             if (
                 !options.id ||
                 options.id !== MegaInfoBlock.TYPES.DESCRIPTION && options.id !== MegaInfoBlock.TYPES.TAGS
@@ -1591,7 +1596,7 @@ lazy(mega.ui, 'mInfoPanel', () => {
             },
             async init() {
                 if (!this.t) {
-                    this.t = new MapSet();
+                    this.t = new MapSet(10e3);
                     return fmdb.get('f')
                         .then(nodes => {
                             for (let i = nodes.length; i--;) {

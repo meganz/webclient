@@ -150,10 +150,6 @@
                                     }
                                 }
                             }
-
-                            if (mega.ui.searchbar && mega.ui.searchbar.recentlyOpened) {
-                                mega.ui.searchbar.recentlyOpened.files.delete(file._replaces);
-                            }
                         }
                         if (isAddNode) {
                             result.push(file);

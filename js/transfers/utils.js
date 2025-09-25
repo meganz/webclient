@@ -145,7 +145,7 @@ Speedometer.prototype.progress = function(p) {
 
     for (t in this.h) {
         if (t < min) {
-            delete this.h.bt;
+            delete this.h[t];
         }
         else {
             if (t < oldest) {

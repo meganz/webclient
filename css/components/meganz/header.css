@@ -109,9 +109,6 @@ body.pwm-ui .mega-header .top-block {
     padding: 0;
     border-radius: 4px;
 }
-.mega-header .fm-header-buttons .nav-elem.primary {
-    margin-inline-start: 12px;
-}
 .mega-header .fm-header-buttons .nav-elem i {
     margin-inline-end: 0;
     --icon-size: 22px;

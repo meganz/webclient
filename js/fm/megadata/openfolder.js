@@ -523,7 +523,10 @@
                 })([id]);
             }
             else if (id.substr(0, 6) === 'search') {
-                this.filterBySearch(this.currentdirid);
+                const chipBtn = $('button.search-chip', $('.mega-header'));
+                this.filterBySearch(
+                    this.currentdirid, mega.ui.searchbar.locationFn(chipBtn.length && chipBtn.attr('data-location'))
+                );
                 $('.fm-breadcrumbs-wrapper', $fmRightHeader).addClass('hidden');
                 $('.column-settings.overlap').addClass('hidden');
                 $resultsCount.removeClass('hidden');

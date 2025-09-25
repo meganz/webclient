@@ -67,7 +67,7 @@
     cursor: pointer;
 }
 .fm-header-buttons button.nav-elem {
-    margin-inline-end: 12px;
+    margin-inline-start: 12px;
 }
 .fm-header-buttons button.nav-elem span.primary-text,
 .fm-card-holder button.nav-elem span.primary-text {

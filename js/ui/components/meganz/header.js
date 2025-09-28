@@ -1104,7 +1104,7 @@ class MegaHeader extends MegaMobileHeader {
      * @returns {void}
      */
     static updateSearchForm(dirId = false, header = pmlayout) {
-        if (!header || (!dirId && M.currentdirid && M.currentdirid.startsWith('search/'))) {
+        if (!header || (!dirId && String(M.currentdirid).startsWith('search/'))) {
             return;
         }
 

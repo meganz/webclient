@@ -643,7 +643,7 @@ lazy(mega.ui, 'mNodeFilter', () => {
             })();
 
             $resetFilterChips.rebind('click.resetFilters', () => {
-                if (M.currentdirid.startsWith('search/')) {
+                if (String(M.currentdirid).startsWith('search/')) {
                     const search = $('.topbar-searcher', $(pmlayout));
                     const chipBtn = $('button.search-chip', search);
                     const location = mega.ui.searchbar.locationFn(chipBtn.length && chipBtn.attr('data-location'));

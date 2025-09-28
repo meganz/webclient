@@ -111,7 +111,7 @@ function FileManager() {
             M.columnsWidth.cloud.accessCtrl.viewed = false;
             M.columnsWidth.cloud.accessCtrl.disabled = true;
 
-            if (M.currentdirid.startsWith('search/')) {
+            if (String(M.currentdirid).startsWith('search/')) {
                 M.columnsWidth.cloud.fileLoc.viewed = true;
                 M.columnsWidth.cloud.fileLoc.disabled = false;
             }

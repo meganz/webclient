@@ -121,8 +121,9 @@ GalleryNodeBlock.revokeThumb = (h) => {
 
     for (let i = 0; i < keys.length; i++) {
         const key = keys[i];
+        const n = mega.gallery.getNodeCache(h);
 
-        if (mega.gallery.tmpFa[h] && key.startsWith(mega.gallery.tmpFa[h].fa)) {
+        if (n && key.startsWith(n.fa)) {
             URL.revokeObjectURL(GalleryNodeBlock.thumbCache[key]);
             delete GalleryNodeBlock.thumbCache[key];
         }
@@ -165,7 +166,7 @@ class MegaGallery {
     }
 
     mainViewNodeMapper(h) {
-        const n = M.d[h] || (mega.gallery.tmpFa && mega.gallery.tmpFa[h]) || this.updNode[h] || false;
+        const n = mega.gallery.getNodeCache(h) || this.updNode[h] || false;
 
         console.assert(!!n, `Node ${h} not found...`);
         return n;
@@ -434,15 +435,16 @@ class MegaGallery {
         // This is existing year in view, nice.
         if (group) {
             group.c[0]++;
+            const h0 = group.n[0];
 
-            let timeDiff = this.nodes[n.h] - this.nodes[group.n[0]];
+            let timeDiff = this.nodes[n.h] - this.nodes[h0];
 
             // Falling back to names sorting, if times are the same
             if (!timeDiff) {
-                const sortedArr = [n, mega.gallery.tmpFa[group.n[0]]];
+                const sortedArr = [n, mega.gallery.getNodeCache(h0)];
                 sortedArr.sort(this.sortByMtime.bind(this));
 
-                if (sortedArr[0].h !== group.n[0]) {
+                if (sortedArr[0].h !== h0) {
                     timeDiff = 1;
                 }
             }
@@ -467,10 +469,11 @@ class MegaGallery {
                 if (stsGroup.sy === sts) {
                     stsGroup.c[1]++;
 
-                    let timeDiff = this.nodes[n.h] - this.nodes[stsGroup.n[1]];
+                    const h1 = stsGroup.n[1];
+                    let timeDiff = this.nodes[n.h] - this.nodes[h1];
 
                     if (!timeDiff) {
-                        const sortedArr = [n, mega.gallery.tmpFa[stsGroup.n[1]]];
+                        const sortedArr = [n, mega.gallery.getNodeCache(h1)];
                         sortedArr.sort(this.sortByMtime.bind(this));
 
                         if (sortedArr[0].h !== stsGroup.n[0]) {
@@ -587,7 +590,7 @@ class MegaGallery {
         const {start, end} = calculateCalendar('d', ts);
         const keys = Object.keys(this.nodes);
         for (const h of keys) {
-            const n = mega.gallery.tmpFa[h];
+            const n = mega.gallery.getNodeCache(h);
 
             if (!n) {
                 continue;
@@ -606,7 +609,7 @@ class MegaGallery {
         const {start, end} = calculateCalendar('m', ts);
         const keys = Object.keys(this.nodes);
         for (const h of keys) {
-            const n = mega.gallery.tmpFa[h];
+            const n = mega.gallery.getNodeCache(h);
 
             if (!n) {
                 continue;
@@ -721,7 +724,8 @@ class MegaGallery {
                 let timeDiff = this.nodes[n.h] > this.nodes[sameDayNode];
 
                 if (!timeDiff) {
-                    const sortedArr = [n, mega.gallery.tmpFa[sameDayNode]];
+                    const n = M.d;
+                    const sortedArr = [n, mega.gallery.getNodeCache(sameDayNode)];
 
                     sortedArr.sort(this.sortByMtime.bind(this));
 
@@ -1078,7 +1082,7 @@ class MegaGallery {
     }
 
     removeFromAllGroup(h, ts) {
-        if (mega.gallery.tmpFa[h]) {
+        if (mega.gallery.getNodeCache(h)) {
             GalleryNodeBlock.revokeThumb(h);
         }
 
@@ -1130,7 +1134,10 @@ class MegaGallery {
         }
 
         this.updNode[n.h] = n;
-        mega.gallery.tmpFa[n.h] = n;
+
+        if (mega.gallery.tmpFa) {
+            mega.gallery.tmpFa[n.h] = n;
+        }
 
         const updatedGroup = this.getGroup(n);
 
@@ -1167,7 +1174,10 @@ class MegaGallery {
         const updatedGroup = this.getGroup(n);
 
         delete this.nodes[n.h];
-        delete mega.gallery.tmpFa[n.h];
+
+        if (mega.gallery.tmpFa) {
+            delete mega.gallery.tmpFa[n.h];
+        }
 
         // Do not change order, some function here is rely on result from another
         // This order should be keep this way in order to process data in order.
@@ -1196,8 +1206,10 @@ class MegaGallery {
             return;
         }
 
-        if (mega.gallery.tmpFa[h]) {
-            this.removeNodeFromGroups(mega.gallery.tmpFa[h]);
+        const n = mega.gallery.getNodeCache(h);
+
+        if (n) {
+            this.removeNodeFromGroups(n);
         }
         else {
             this.removeNodeFromGroups({ h, mtime: this.nodes[h] });
@@ -1432,7 +1444,7 @@ class MegaGallery {
 
             const { currentTarget: el } = e;
 
-            if (el && mega.gallery.tmpFa[el.id] && !$.selected.includes(el.id)) {
+            if (el && (mega.gallery.getNodeCache(el.id)) && !$.selected.includes(el.id)) {
                 selectionManager.clear_selection();
                 this.clearSelections();
                 selectionManager.add_to_selection(el.id);
@@ -1919,7 +1931,7 @@ class MegaGallery {
     }
 
     renderNode(h) {
-        const node = M.d[h] || (mega.gallery.tmpFa && mega.gallery.tmpFa[h]) || new MegaNode(this.updNode[h]);
+        const node = mega.gallery.getNodeCache(h) || new MegaNode(this.updNode[h]);
 
         if (!node) {
             return;
@@ -2576,6 +2588,11 @@ mega.gallery.fillMainView = (list, mapper) => {
     console.assert(M.v.length === length, 'check this... filtered invalid entries.');
 };
 
+mega.gallery.getNodeCache = h => {
+    'use strict';
+    return M.d[h] || (mega.gallery.tmpFa && mega.gallery.tmpFa[h]) || undefined;
+};
+
 mega.gallery.handleNodeRemoval = tryCatch((n) => {
     'use strict';
 
@@ -2678,7 +2695,11 @@ mega.gallery.checkEveryGalleryUpdate = n => {
         const childHandles = Object.keys(M.c[n.h]);
 
         for (let i = childHandles.length; i--;) {
-            mega.gallery.checkEveryGalleryUpdate(mega.gallery.tmpFa[childHandles[i]]);
+            const n = mega.gallery.getNodeCache(childHandles[i]);
+
+            if (n) {
+                mega.gallery.checkEveryGalleryUpdate(n);
+            }
         }
 
         return;
@@ -2959,7 +2980,7 @@ mega.gallery.generateSizedThumbnails = async(keys, onLoad, onErr) => {
 
         if (abIsEmpty && type === 1) { // Preview fetch is not successful
             api_getfileattr(
-                { [key]: mega.gallery.tmpFa[faData[key].handle] },
+                { [key]: mega.gallery.getNodeCache(faData[key].handle) },
                 0,
                 (ctx1, key1, thumbAB1) => {
                     processUint8(ctx1, key1, thumbAB1, 0);
@@ -3028,7 +3049,7 @@ mega.gallery.generateSizedThumbnails = async(keys, onLoad, onErr) => {
                     console.warn(`Could not receive preview image for ${key}, reverting back to thumbnail...`);
 
                     api_getfileattr(
-                        { [key]: mega.gallery.tmpFa[faData[key].handle] },
+                        { [key]: mega.gallery.getNodeCache(faData[key].handle) },
                         0,
                         (ctx1, key1, thumbAB1) => {
                             processUint8(ctx1, key1, thumbAB1, 0);
@@ -3195,6 +3216,7 @@ async function galleryUI(id) {
         }
 
         if (id) {
+            delete mega.gallery.tmpFa; // MD gets nodes from the current folder, tmpCache should not overlap
             gallery = mega.gallery.discovery = new MegaTargetGallery(id);
         }
         else if (section) {

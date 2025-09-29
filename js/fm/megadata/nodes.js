@@ -2163,6 +2163,12 @@ MegaData.prototype.nodeUpdated = function(n, ignoreDB) {
                 delay(`gallery:node-update(${n.h})`, () => mega.gallery.handleNodeUpdate(n));
             }
 
+            if (M.recentsRender && M.currentdirid !== 'recents') {
+                delay('recents.nodeUpdateReset', () => {
+                    M.recentsRender.reset();
+                });
+            }
+
             mBroadcaster.sendMessage(`nodeUpdated:${n.h}`);
         }
     }
@@ -2357,6 +2363,10 @@ MegaData.prototype.labelDomUpdate = function(n, value) {
             const domNode = $item[0];
 
             this.updateDomNodePosition(n, domNode);
+        }
+
+        if (M.recentsRender) {
+            M.recentsRender.nodeChanged(n.h);
         }
     }
 };
@@ -3042,7 +3052,12 @@ MegaData.prototype.getRecentNodes = function(limit, until) {
 MegaData.prototype.getRecentActionsList = function(limit, until) {
     'use strict';
 
-    var tree = Object.assign.apply(null, [{}].concat(Object.values(M.tree)));
+    const tree = Object.assign.apply(null, [{}].concat(Object.values(M.tree)));
+    let s4ContainerHandles = Object.create(null);
+
+    if (u_attr.s4 && s4.utils) {
+        s4ContainerHandles = array.to.object(s4.utils.getContainersList().map(({ h }) => h), true);
+    }
 
     // Get date from timestamp with Today & Yesterday titles.
     var getDate = function(ts) {
@@ -3083,10 +3098,15 @@ MegaData.prototype.getRecentActionsList = function(limit, until) {
         while (tree[p]) {
             var t = tree[p];
             p = t.p;
+
             b.path.push({
                 name: t.h === M.RootID ? l[164] : t.name || t.h,
                 h: t.h,
-                pathPart: true
+                p,
+                pathPart: true,
+                lbl: t.lbl,
+                s4Root: s4ContainerHandles[t.h],
+                sen: (t.t & M.IS_SEN) && 1
             });
             if (t.t & M.IS_SHARED) {
                 b.outshare = true;
@@ -3110,24 +3130,24 @@ MegaData.prototype.getRecentActionsList = function(limit, until) {
             nodes.sort(byTimeDesc);
 
             // Index is used for finding correct bucket for node.
-            var index = {};
+            const index = {};
 
             // Action list to return to caller.
-            var recentActions = [];
+            const recentActions = [];
             recentActions.nodeCount = nodes.length;
 
             // Radix sort nodes into buckets.
             for (var i = 0; i < nodes.length; i++) {
-                var n = new MegaNode(nodes[i]);
-                var actionType = n.tvf ? "updated" : "added";
-                var blockType = is_image2(n) || is_video(n) === 1 ? 'media' : 'files';
+                const n = new MegaNode(nodes[i]);
+                const actionType = n.tvf ? "updated" : "added";
+                const blockType = 'files';
                 index[n.u] = index[n.u] || Object.create(null);
                 index[n.u][n.p] = index[n.u][n.p] || Object.create(null);
                 index[n.u][n.p][actionType] = index[n.u][n.p][actionType] || Object.create(null);
                 index[n.u][n.p][actionType][blockType] = index[n.u][n.p][actionType][blockType] || { endts: 0 };
 
                 // Split nodes into groups based on time separation.
-                var bucket = index[n.u][n.p][actionType][blockType];
+                const bucket = index[n.u][n.p][actionType][blockType];
                 if (bucket.endts === 0 || n.ts < bucket.endts) {
                     bucket.endts = n.ts - 21600; // 6 Hours
                     bucket.group = newActionBucket(n, actionType, blockType);
@@ -3181,7 +3201,7 @@ MegaData.prototype.getNodeRights = function(id) {
     }
 
     if (folderlink || !id || id.length !== 8 || id === 'policies') {
-        return false;
+        return id === 'recents';
     }
 
     if (this.getS4NodeType(id) === 'container') {

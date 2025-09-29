@@ -47,8 +47,10 @@ class MMenuSelect extends MContextMenu {
                 iconRight,
                 classes,
                 children,
-                oncreate
+                oncreate,
+                checkFn
             } = list[i];
+
             const isClickable = typeof click === 'function';
 
             // Creating a new section here
@@ -81,7 +83,8 @@ class MMenuSelect extends MContextMenu {
                 rightIcon: iconRight,
                 additionalClasses: itemClasses,
                 children,
-                oncreate
+                oncreate,
+                checkFn
             });
 
             this._options.push(item);

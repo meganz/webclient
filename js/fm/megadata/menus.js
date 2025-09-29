@@ -985,6 +985,11 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items, forcedSe
         finalItems = ['.fileupload-item', '.folderupload-item', '.app-dl-hint'];
         onIdle(showContextMenu);
     }
+    else if (ll === 10) {
+        asyncShow = true;
+        finalItems = ['.open-in-location'];
+        onIdle(showContextMenu);
+    }
     else if (ll) {// Click on item
         let id;
         let currNodeClass;

@@ -372,6 +372,9 @@ table tr.ui-selected .grid-file-request-manage {
     z-index: 1;
     pointer-events: none;
 }
+.grid-table .space-maintainer-end {
+    background-color: var(--mobile-page-background);
+}
 .mega-lite-mode .grid-table.fm.v-versions [megatype="versions"],
 .mega-lite-mode .grid-table.shared-with-me .size-col,
 .mega-lite-mode .grid-table.out-shares .size-col {
@@ -520,7 +523,6 @@ table.grid-table.fat .item-type-icon {
 
 table.grid-table .tranfer-filetype-txt {
     left: 0;
-    line-height: inherit;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -662,18 +664,19 @@ table.grid-table .grid-url-arrow {
     /* transition: all 50ms ease-in-out; */
     position: absolute;
     background-color: transparent;
-    top: 0;
+    top: 50%;
+    transform: translateY(-50%);
     left: 35px;
     border-radius: 4px;
     opacity: 0;
     padding: 0 2px;
 }
-table.grid-table.fat .grid-url-arrow {
-    top: 8px;
-}
 .rtl table.grid-table .grid-url-arrow {
     left: auto;
     right: 35px;
+}
+.grid-wrapper table.grid-table tbody td.grid-url-field a.grid-url-arrow i {
+    vertical-align: unset;
 }
 
 table.grid-table .grid-url-arrow i {
@@ -805,6 +808,12 @@ table.fm td {
 }
 table.fm.fat td {
     height: 48px;
+}
+table.fm.search-page:not(.fat) td {
+    height: 73px;
+}
+table.fm.search-page.fat td {
+    height: 81px;
 }
 table.fm [megatype="fav"] {
     text-align: center;

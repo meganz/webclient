@@ -405,13 +405,19 @@ lazy(mega.ui, 'secondaryNav', () => {
             fmviewmode(M.currentdirid, viewValue);
         }
 
-        if (folderlink && String(M.currentdirid).startsWith('search')) {
+        const isSearch = String(M.currentdirid).startsWith('search/');
+
+        if (folderlink && isSearch) {
             M.viewmode = viewValue;
             $.hideContextMenu();
             M.renderMain();
         }
         else {
             M.openFolder(M.currentdirid, true).then(reselect.bind(null, 1));
+        }
+
+        if (isSearch) {
+            mega.ui.searchbar.reinitiateSearchTerm();
         }
 
         if (viewValue === 2 && mega.ui.mNodeFilter) {

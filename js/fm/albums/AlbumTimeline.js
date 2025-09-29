@@ -180,7 +180,10 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
                         const albumId = scope.getAlbumIdFromPath();
                         const { filterFn, at, eIds, nodes } = albums.store[albumId];
 
-                        $.selected = [...selections];
+                        for (let i = selections.length; i--;) {
+                            selectionManager.add_to_selection(selections[i]);
+                            $.selected.push(selections[i]);
+                        }
 
                         let selectionsPreviewable = false;
                         let onlyPlayableVideosSelected = true;

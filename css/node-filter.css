@@ -103,11 +103,8 @@ tr.is-sensitive span.transfer-filetype-icon:not(.image),
 span.is-sensitive.dropdown,
 span.is-sensitive.dropdown-item,
 a.is-sensitive.fm-breadcrumbs,
-a.is-sensitive .dropdown-recently-opened-item-filename,
 a.is-sensitive .dropdown-search-results-item-location span,
 a.is-sensitive .dropdown-search-results-item-location,
-a.is-sensitive .dropdown-recently-opened-item-location,
-a.is-sensitive .dropdown-recently-opened-item-time,
 .rewind-sidebar .is-sensitive {
     opacity: 0.5;
 }
@@ -118,8 +115,7 @@ div.is-sensitive img {
 .is-sensitive .dropdown-search-results-item-file-icon img {
     filter: blur(2px);
 }
-tr.is-sensitive img,
-a.dropdown-recently-opened-item.is-sensitive img {
+tr.is-sensitive img {
     filter: blur(0.25rem);
 }
 tr.is-sensitive td.size,

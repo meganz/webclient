@@ -18,10 +18,10 @@ lazy(mega, 'keyMgr', () => {
     };
     let sNodeUsers = Object.create(null);
 
-    const decryptShareKeys = async(h) => {
+    const decryptShareKeys = async(h, mem) => {
         let n;
         const debug = d > 0 && [];
-        const nodes = await M.getNodes(h, true);
+        const nodes = mem ? M.getNodesSync(h, true) : await M.getNodes(h, true);
 
         for (let i = nodes.length; i--;) {
             n = M.getNodeByHandle(nodes[i]);
@@ -1175,7 +1175,7 @@ lazy(mega, 'keyMgr', () => {
 
         // try decrypting inshares based on the current key situation
         async decryptInShares(pz) {
-            const lite = u_attr.s4 || mega.infinity;
+            const lite = u_attr.s4 || mega.infinity || this.didLoadFromAPI;
 
             if (pz !== -0xFEED && lite || !(self.fmdb && !fmdb.crashed)) {
                 // Let's make S4/Lite users life easier...
@@ -1204,7 +1204,7 @@ lazy(mega, 'keyMgr', () => {
 
                     for (let i = shares.length; i--;) {
 
-                        promises.push(decryptShareKeys(shares[i]));
+                        promises.push(decryptShareKeys(shares[i], pz === -0xFEED || this.didLoadFromAPI));
                     }
 
                     Promise.allSettled(promises)

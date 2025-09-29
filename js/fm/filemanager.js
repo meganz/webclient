@@ -110,6 +110,15 @@ function FileManager() {
             M.columnsWidth.cloud.label.disabled = true;
             M.columnsWidth.cloud.accessCtrl.viewed = false;
             M.columnsWidth.cloud.accessCtrl.disabled = true;
+
+            if (String(M.currentdirid).startsWith('search/')) {
+                M.columnsWidth.cloud.fileLoc.viewed = true;
+                M.columnsWidth.cloud.fileLoc.disabled = false;
+            }
+            else {
+                M.columnsWidth.cloud.fileLoc.viewed = false;
+                M.columnsWidth.cloud.fileLoc.disabled = true;
+            }
         }
         else {
             if (M.columnsWidth.cloud.fav.disabled) {
@@ -1082,6 +1091,11 @@ FileManager.prototype.initFileManagerUI = function() {
         }
     });
 
+    $.getActiveSearch = () => {
+        const { activeElement: i } = document;
+        return i && i.tagName === 'INPUT' && i.classList.contains('js-filesearcher') ? i : null;
+    };
+
     $.hideContextMenu = function(event) {
 
         var a, b, currentNodeClass;
@@ -1105,14 +1119,8 @@ FileManager.prototype.initFileManagerUI = function() {
                 $('.breadcrumb-dropdown, .fm-breadcrumbs-wrapper .breadcrumb-dropdown-link').removeClass('active');
             }
 
-            const $dropdownSearch = $('.dropdown-search', '#startholder .js-topbar, #fmholder .mega-header');
-            const persistDropdownSearch = $dropdownSearch.length && currentNodeClass
-                                            && (
-                                                currentNodeClass.contains('js-filesearcher')
-                                                || $.contains($dropdownSearch.get(0), event.target)
-                                            );
-
-            if (!persistDropdownSearch) {
+            if (!$.getActiveSearch()) {
+                // Preserving search dropdown when search input is focused
                 $('.dropdown-search', '.js-topbar-searcher').addClass('hidden');
             }
         }
@@ -3326,6 +3334,12 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
         filter: $.selectddUIitem,
         cancel: `.ps__rail-y, .ps__rail-x, thead, ${$.selectddUIitem}`,
         start: e => {
+            const activeSearch = $.getActiveSearch();
+
+            if (activeSearch) {
+                activeSearch.blur();
+            }
+
             $.hideContextMenu(e);
             $.hideTopMenu();
             $.selecting = true;

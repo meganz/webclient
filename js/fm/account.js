@@ -2989,10 +2989,11 @@ accountUI.transfers = {
             const template = wrap.firstElementChild.cloneNode(true);
 
             wrap.textContent = '';
-            for (let i = 0; i < sliderOptions.max;) {
+            for (let i = sliderOptions.min - 1; i < sliderOptions.max;) {
                 const elm = template.cloneNode(true);
                 wrap.appendChild(elm);
-                elm.querySelector('span').textContent = ++i;
+                elm.classList.add(`n${++i}`);
+                elm.querySelector('span').textContent = i % sliderOptions.cap ? '' : i;
             }
 
             const $slider = $(sliderSelector, $container).slider(sliderOptions);
@@ -3090,17 +3091,16 @@ accountUI.transfers = {
                 var $uploadSettings = $('.upload-settings', accountUI.$contentBlock);
 
                 accountUI.transfers.uploadAndDownload.setSlider($uploadSettings, '#slider-range-max', {
-                    min: 1, max: 8, range: "min", value: fmconfig.ul_maxSlots || ulmanager.ulDefConcurrency || 4,
+                    min: 4, max: 32, cap: 2, range: "min",
+                    value: fmconfig.ul_maxSlots || ulmanager.ulDefConcurrency || 4,
                     change: function(e, ui) {
                         if (M.currentdirid === 'account/transfers' && ui.value !== fmconfig.ul_maxSlots) {
                             mega.config.setn('ul_maxSlots', ui.value);
-                            ulQueue.setSize(fmconfig.ul_maxSlots);
                         }
                     },
                     slide: function(e, ui) {
                         $('.numbers.active', $uploadSettings).removeClass('active');
-                        $('.numbers:nth-child(' + ui.value + ')', $uploadSettings)
-                            .addClass('active');
+                        $(`.numbers.n${ui.value}`, $uploadSettings).addClass('active');
                     }
                 });
             },

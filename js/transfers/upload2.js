@@ -1,6 +1,6 @@
 /* ***************** BEGIN MEGA LIMITED CODE REVIEW LICENCE *****************
  *
- * Copyright (c) 2016 by Mega Limited, Auckland, New Zealand
+ * Copyright (c) 2025 by Mega Limited, Auckland, New Zealand
  * All rights reserved.
  *
  * This licence grants you the rights, and only the rights, set out below,
@@ -42,22 +42,16 @@ var uldl_hold = false;
 
 var ulmanager = {
     ulFaId: 0,
-    ulSize: 0,
     ulXferPut: null,
     ulDefConcurrency: 8,
     ulIDToNode: Object.create(null),
     ulEventData: Object.create(null),
     isUploading: false,
     ulSetupQueue: false,
-    ulStartingPhase: false,
     ulCompletingPhase: Object.create(null),
     ulOverStorageQuota: false,
     ulOverStorageQueue: [],
     ulFinalizeQueue: [],
-    ulBlockSize: 131072,
-    ulBlockExtraSize: 1048576,
-    ulMaxFastTrackSize: 1048576 * 3,
-    ulMaxConcurrentSize: 1048576 * 10,
     logger: MegaLogger.getLogger('ulmanager'),
 
     // Errors megad might return while uploading
@@ -761,123 +755,16 @@ var ulmanager = {
         }
     },
 
-    ulGetPostURL: function UM_ul_get_posturl(File) {
-        'use strict';
-        return function(res, ctx) {
-
-            // If cancelled
-            if (!File.ul) {
-                return;
-            }
-
-            if (!ul_queue[ctx.reqindex] || Object.isFrozen(ul_queue[ctx.reqindex])) {
-                ulmanager.logger.warn(`Upload at ${ctx.reqindex} seems cancelled, but 'ul' did exist.`, res, ctx, File);
-                return;
-            }
-
-            // If the response is that the user is over quota
-            if (res === EOVERQUOTA || res === EGOINGOVERQUOTA) {
-
-                // Show a warning popup
-                ulmanager.ulShowOverStorageQuotaDialog(File, res);
-
-                // Return early so it does not retry automatically and spam the API server with requests
-                return false;
-            }
-
-            // If the response is that the business account is suspended
-            if (res === EBUSINESSPASTDUE && page.substr(0, 11) === 'filerequest') {
-                mBroadcaster.sendMessage('upload:error', File.ul.id, res);
-                return false;
-            }
-
-            if (res === ESUBUSERKEYMISSING) {
-                M.ulerror(ul_queue[ctx.reqindex], res);
-                return false;
-            }
-
-            // Reset in case of a retry
-            delete ul_queue[ctx.reqindex].posturl;
-
-            if (typeof res === 'object') {
-                if (typeof res.p === "string" && res.p.length > 0) {
-                    ul_queue[ctx.reqindex].posturl = res.p;
-
-                    if (ul_queue[ctx.reqindex].readyToStart) {
-                        if (ctx.reqindex !== File.ul.pos) {
-                            ulmanager.ulUpload(ul_queue[ctx.reqindex].readyToStart);
-                        }
-                        delete ul_queue[ctx.reqindex].readyToStart;
-                    }
-                }
-            }
-
-            if (ctx.reqindex === File.ul.pos) {
-                if (ul_queue[ctx.reqindex].posturl) {
-                    ulmanager.ulUpload(File);
-                }
-                else {
-                    // Retry
-                    ulmanager.ulStart(File);
-                }
-            }
-        };
-    },
-
+    // FIXME: do we have by-fingerprint deduplication for identical files in batch uploads
+    //        upload only once, complete to all target locations?
     ulStart: function UM_ul_start(File) {
         'use strict';
 
         if (!File.file) {
             return false;
         }
-        if (File.file.posturl) {
-            return ulmanager.ulUpload(File);
-        }
-        var maxpf = 128 * 1048576;
-        var next = ulmanager.ulGetPostURL(File);
-        var total = 0;
-        var len = ul_queue.length;
-        var max = File.file.pos + Math.max(21, ulQueue.maxActiveTransfers >> 1);
 
-        const ms = fmconfig.ul_maxSpeed | 0;
-        const fire = (reqindex, payload) => {
-            // @todo proper revamp..
-            api.req(payload, {dedup: false})
-                .always((res) => next(res.result || res, {reqindex}))
-                .catch(reportError);
-        };
-
-        for (var i = File.file.pos; i < len && i < max && maxpf > 0; i++) {
-            var cfile = ul_queue[i];
-            if (!isQueueActive(cfile)) {
-                continue;
-            }
-            if (cfile.uReqFired) {
-                if (i === File.file.pos) {
-                    cfile.readyToStart = File;
-                }
-                continue;
-            }
-            cfile.uReqFired = Date.now();
-            var req = {
-                a: 'u',
-                v: 2,
-                ssl: use_ssl,
-                ms,
-                s: cfile.size,
-                r: cfile.retries,
-                e: cfile.ul_lastreason,
-            };
-            if (File.file.ownerId) {
-                req.t = File.file.ownerId;
-            }
-            fire(i, req);
-            maxpf -= cfile.size;
-            total++;
-        }
-        if (d) {
-            ulmanager.logger.info('request urls for ', total, ' files');
-        }
+        return ulmanager.ulUpload(File);
     },
 
     ulUpload: function UM_ul_upload(File) {
@@ -904,64 +791,12 @@ var ulmanager = {
             }
         }
 
-        file.ul_offsets = [];
         file.ul_lastProgressUpdate = 0;
         file.ul_macs = Object.create(null);
         file.ul_keyNonce = JSON.stringify(file.ul_key);
         file.ul_aes = new sjcl.cipher.aes([
             file.ul_key[0], file.ul_key[1], file.ul_key[2], file.ul_key[3]
         ]);
-
-        if (file.size) {
-            var pp;
-            var p = 0;
-            var tasks = Object.create(null);
-            var ulBlockExtraSize = ulmanager.ulBlockExtraSize;
-            //var boost = !mega.chrome || parseInt(ua.details.version) < 68;
-			var boost = false;
-
-            if (file.size > 0x1880000 && boost) {
-                tasks[p] = new ChunkUpload(file, p, 0x480000);
-                p += 0x480000;
-
-                for (i = 2; i < 4; i++) {
-                    tasks[p] = new ChunkUpload(file, p, i * 0x400000);
-                    pp = p;
-                    p += i * 0x400000;
-                }
-
-                ulBlockExtraSize = 16 * 1048576;
-            }
-            else {
-                for (i = 1; i <= 8 && p < file.size - i * ulmanager.ulBlockSize; i++) {
-                    tasks[p] = new ChunkUpload(file, p, i * ulmanager.ulBlockSize);
-                    pp = p;
-                    p += i * ulmanager.ulBlockSize;
-                }
-            }
-
-            while (p < file.size) {
-                tasks[p] = new ChunkUpload(file, p, ulBlockExtraSize);
-                pp = p;
-                p += ulBlockExtraSize;
-            }
-
-            if (file.size - pp > 0) {
-                tasks[pp] = new ChunkUpload(file, pp, file.size - pp);
-            }
-
-            // if (d) ulmanager.logger.info('ulTasks', tasks);
-            Object.keys(tasks).reverse().forEach(function(k) {
-                file.ul_offsets.push({
-                    byteOffset: parseInt(k),
-                    byteLength: tasks[k].end
-                });
-                ulQueue.pushFirst(tasks[k]);
-            });
-        }
-        else {
-            ulQueue.pushFirst(new ChunkUpload(file, 0, 0));
-        }
 
         if (!file.faid && !window.omitthumb) {
             var img = is_image(file.name);
@@ -998,6 +833,8 @@ var ulmanager = {
         if (file.done_starting) {
             file.done_starting();
         }
+
+        mega.wsuploadmgr.upload(file);
     },
 
     ulComplete(payload, ctx) {
@@ -1103,6 +940,7 @@ var ulmanager = {
         if (d) {
             ulmanager.logger.info("ul_completepending2", res, ctx);
         }
+        const ulid = 'ul_' + ctx.file.id;
 
         if (typeof res === 'object' && 'st' in res) {
             const h = res.handle;
@@ -1176,7 +1014,7 @@ var ulmanager = {
                 console.warn(`Unexpected upload completion server response (${res} @ ${hostname(ctx.file.posturl)})`);
             }
         }
-        delete ulmanager.ulCompletingPhase['ul_' + ctx.file.id];
+        delete ulmanager.ulCompletingPhase[ulid];
 
         if (ctx.file.owner) {
             ctx.file.owner.destroy();
@@ -1433,361 +1271,9 @@ class UploadQueue extends Array {
     }
 }
 
-
 function ChunkUpload(file, start, end, altport) {
-    this.file = file;
-    this.ul = file;
-    this.start = start;
-    this.end = end;
-    this.gid = file.owner.gid;
-    this.xid = this.gid + '_' + start + '-' + end;
-    this.jid = (Math.random() * Date.now()).toString(36);
-    this.altport = altport;
-    this.logger = new MegaLogger(String(this), {}, ulmanager.logger);
-    this[this.gid] = !0;
-    // if (d) ulmanager.logger.info('Creating ' + this);
+    console.error('@deprecated');
 }
-
-ChunkUpload.prototype.toString = function() {
-    return "[ChunkUpload " + this.xid + "$" + this.jid + "]";
-};
-
-ChunkUpload.prototype.destroy = function() {
-    // if (d) ulmanager.logger.info('Destroying ' + this);
-    this.abort();
-    oDestroy(this);
-};
-
-ChunkUpload.prototype.updateprogress = function() {
-    if (this.file.paused || this.file.complete || uldl_hold) {
-        return;
-    }
-
-    var p = this.file.progress;
-    var tp = this.file.sent || 0;
-    for (var i in p) {
-        tp += p[i];
-    }
-
-    // only start measuring progress once the TCP buffers are filled
-    // (assumes a modern TCP stack with a large intial window)
-    if (!this.file.speedometer && this.file.progressevents > 5) {
-        this.file.speedometer = Speedometer(tp);
-    }
-    this.file.progressevents = (this.file.progressevents || 0) + 1;
-    p = GlobalProgress[this.gid].speed = this.file.speedometer ? this.file.speedometer.progress(tp) : 0;
-
-    if (!this.file.ulSilent) {
-        M.ulprogress(this.file, Math.floor(tp / this.file.size * 100), tp, this.file.size, p);
-    }
-
-    if (tp === this.file.size) {
-        this.file.complete = true;
-    }
-};
-
-ChunkUpload.prototype.abort = function() {
-    if (d > 1 && this.logger) {
-        this.logger.info('Aborting', this.oet, Boolean(this.xhr));
-    }
-
-    if (this.oet) {
-        clearTimeout(this.oet);
-    }
-    if (this.xhr) {
-        this.xhr.abort(this.xhr.ABORT_CLEANUP);
-    }
-    if (GlobalProgress[this.gid]) {
-        array.remove(GlobalProgress[this.gid].working, this, 1);
-    }
-    else if (d && this.logger) {
-        this.logger.error('This should not be reached twice or after FileUpload destroy...', this);
-    }
-    delete this.xhr;
-};
-
-ChunkUpload.prototype.onXHRprogress = function(xhrEvent) {
-    if (!this.file || !this.file.progress || this.file.abort) {
-        return this.done && this.done();
-    }
-    var now = Date.now();
-    if ((now - this.file.ul_lastProgressUpdate) > 200) {
-        this.file.ul_lastProgressUpdate = now;
-        this.file.progress[this.start] = xhrEvent.loaded;
-        this.updateprogress();
-    }
-};
-
-ChunkUpload.prototype.onXHRerror = function(args, xhr, reason) {
-    if (this.file && !this.file.abort && this.file.progress) {
-        this.file.progress[this.start] = 0;
-        this.updateprogress();
-
-        if (!xhr) {
-            xhr = this.xhr;
-        }
-        if (args === "$FATAL") {
-            ulmanager.restart(this.file, reason, xhr);
-        }
-        else {
-            ulmanager.retry(this.file, this, "xhr failed: " + reason, xhr);
-        }
-    }
-    this.done();
-}
-
-ChunkUpload.prototype.onXHRready = function(xhrEvent) {
-    if (!this.file || !this.file.progress) {
-        if (d) {
-            this.logger.error('Upload aborted...', this);
-        }
-        return Soon(this.done.bind(this));
-    }
-    var self = this;
-    var xhr = xhrEvent.target;
-    var response = xhr.response;
-    var isValidType = (response instanceof ArrayBuffer);
-    xhrEvent = undefined;
-
-    if (isValidType && xhr.status === 200 && xhr.statusText === 'OK') {
-
-        if (!response.byteLength || response.byteLength === 36) {
-            this.file.sent += this.bytes.buffer.length || this.bytes.length;
-            delete this.file.progress[this.start];
-            this.updateprogress();
-
-            if (response.byteLength === 36) {
-                var ul_key = this.file.ul_key;
-                var t = Object.keys(this.file.ul_macs).map(Number);
-                t.sort(function(a, b) {
-                    return a - b;
-                });
-                for (var i = 0; i < t.length; i++) {
-                    t[i] = this.file.ul_macs[t[i]];
-                }
-                var mac = condenseMacs(t, this.file.ul_key);
-
-                var filekey = [
-                    ul_key[0] ^ ul_key[4],
-                    ul_key[1] ^ ul_key[5],
-                    ul_key[2] ^ mac[0] ^ mac[1],
-                    ul_key[3] ^ mac[2] ^ mac[3],
-                    ul_key[4],
-                    ul_key[5],
-                    mac[0] ^ mac[1],
-                    mac[2] ^ mac[3]
-                ];
-
-                if (this.gid && (window.u_k_aes || this.file.xput) && !ulmanager.ulCompletingPhase[this.gid]) {
-                    var u8 = new Uint8Array(response);
-
-                    this.file.filekey = filekey;
-                    this.file.response = (u8[35] === 1)
-                        ? ab_to_base64(response)
-                        : ab_to_str(response);
-                    ulmanager.ulFinalize(this.file);
-                    u8 = undefined;
-                }
-                else {
-                    const cl = this.logger ? this : ulmanager;
-                    const cmpl = ulmanager.ulCompletingPhase[this.gid];
-                    const m = cmpl
-                        ? 'Unexpected upload completion flow on %s!'
-                        : 'Unrecoverable upload error for %s';
-                    cl.logger.warn(m, this.gid, this.xid, cmpl, [this]);
-
-                    if (!cmpl) {
-                        cl.logger.error('starting over...', [this]);
-                        return this.onXHRerror("$FATAL", null, l[16]);
-                    }
-                }
-            }
-
-            this.bytes = null;
-
-            this.file.retries = 0; /* reset error flag */
-
-            return this.done();
-        }
-        else {
-            var resp = ab_to_str(response);
-            var estr = ulmanager.ulStrError(resp);
-            this.logger.error("Invalid upload response: ", resp, estr);
-            if (estr !== "EKEY") {
-                return this.onXHRerror("$FATAL", null,
-                    (estr ? (estr + " error")
-                    : "IUR[" + String(resp).trim().substr(0, 5) + "]"));
-            }
-        }
-    }
-
-    this.srverr = xhr.status + 1;
-
-    var errstr = 'BRFS [l:Unk]';
-    if (isValidType) {
-        if (response.byteLength && response.byteLength < 5) {
-            errstr = 'BRFS [s:' + ab_to_str(response) + ']';
-        }
-        else if (xhr.status >= 400) {
-            errstr = 'BRFS [-]';
-        }
-        else {
-            errstr = 'BRFS [l:' + response.byteLength + ']';
-        }
-    }
-
-    this.oet = setTimeout(function() {
-        if (!oIsFrozen(self)) {
-            self.onXHRerror(null, xhr, errstr);
-        }
-        self = undefined;
-    }, 1950 + Math.floor(Math.random() * 2e3));
-
-    if (d) {
-        this.logger.warn("Bad response from server, status(%s:%s)",
-            xhr.status,
-            xhr.statusText,
-            isValidType,
-            this.file.name
-        );
-    }
-
-    response = undefined;
-}
-
-ChunkUpload.prototype.upload = function() {
-    'use strict';
-
-    var url, xhr;
-    var self = this;
-    var logger = self.logger || ulmanager.logger;
-
-    if (!this.file) {
-        if (d) {
-            logger.error('This upload was cancelled while the Encrypter was working,'
-                + ' prevent this aborting it beforehand');
-        }
-        return;
-    }
-
-    if (!GlobalProgress[this.gid]) {
-        return this.logger.error('No upload associated with gid ' + this.gid);
-    }
-    if (GlobalProgress[this.gid].paused) {
-        return this.logger.info('Encrypter finished, but the upload was paused meanwhile.');
-    }
-
-    if (!this.file.posturl) {
-        onUploadError(this.file, 'Internal error (0xBADF001)');
-        if (!this.file.abort) {
-            ASSERT(0, 'No PostURL! ' + (typeof this.file.posturl));
-        }
-        return;
-    }
-
-    xhr = getTransferXHR(this);
-    url = dlmanager.uChangePort(this.file.posturl + this.suffix, this.altport ? 8080 : 0);
-    xhr._murl = url;
-
-    if (d > 1) {
-        this.logger.info("pushing", url);
-    }
-
-    tryCatch(function() {
-        xhr.open('POST', url);
-        xhr.responseType = 'arraybuffer';
-        xhr.send(self.bytes.buffer);
-        self.xhr = xhr;
-    }, function(ex) {
-        if (self.file) {
-            logger.warn('fatal upload error, attempting to restart...', String(ex.message || ex), [self, ex]);
-            ulmanager.restart(self.file, ex.message || ex);
-        }
-        else {
-            logger.debug('fatal upload error, holding while restarting...', String(ex.message || ex), [self, ex]);
-        }
-    })();
-};
-
-ChunkUpload.prototype.io_ready = function(res) {
-    'use strict';
-
-    if (res < 0 || !this.file || !this.file.ul_keyNonce) {
-        if (this.file && !oIsFrozen(this.file)) {
-            if (d) {
-                this.logger.error('UL IO Error', res);
-            }
-
-            if (this.file.done_starting) {
-                this.file.done_starting();
-            }
-            ulmanager.retry(this.file, this, "IO failed: " + res);
-        }
-        else {
-            if (d && this.logger) {
-                this.logger.error('The FileReader finished, but this upload was cancelled...');
-            }
-        }
-    }
-    else {
-        this.bytes = res.bytes;
-        this.suffix = res.suffix;
-        Object.assign(this.file.ul_macs, res.file.ul_macs);
-        this.upload();
-    }
-};
-
-ChunkUpload.prototype.done = function(ee) {
-    if (d > 1 && this.logger) {
-        this.logger.info('.done');
-    }
-
-    if (this._done) {
-        /* release worker */
-        this._done();
-
-        /* clean up references */
-        this.destroy();
-    }
-};
-
-ChunkUpload.prototype.run = function(done) {
-    this._done = done;
-    if (this.bytes && this.suffix) {
-        this.logger.info('.run', 'Reusing previously encrypted data.');
-        this.upload();
-    }
-    else if (this.file.size === 0) {
-        this.logger.info('.run', 'Uploading 0-bytes file...');
-        this.bytes = new Uint8Array(0);
-        this.suffix = '/0?c=AAAAAAAAAAAAAAAA';
-        this.upload();
-    }
-    else if (!this.start && localStorage.ulFailTest) {
-        this.logger.warn('Intentionally blocking the first chunk.');
-    }
-    else {
-        if (d > 1) {
-            this.logger.info('.run');
-        }
-        if (!this.file.ul_reader) {
-            this.file.ul_reader = new FileUploadReader(this.file);
-
-            if (d > 1) {
-                if (!window.ul_reader) {
-                    window.ul_reader = [];
-                }
-                window.ul_reader.push(this.file.ul_reader);
-            }
-        }
-        var self = this;
-        this.file.ul_reader.getChunk(this.start, function(res) {
-            self.io_ready(res);
-        });
-    }
-    array.remove(GlobalProgress[this.gid].working, this, 1);
-    GlobalProgress[this.gid].working.push(this);
-};
 
 function FileUpload(file) {
     this.file = file;
@@ -1805,14 +1291,12 @@ FileUpload.prototype.toString = function() {
 
 FileUpload.prototype.destroy = function(mul) {
     'use strict';
+
     if (d) {
         ulmanager.logger.info('Destroying ' + this);
     }
     if (!this.file) {
         return;
-    }
-    if (Object(GlobalProgress[this.gid]).started) {
-        ulmanager.ulSize -= this.file.size;
     }
 
     // Hmm, looks like there are more ChunkUploads than what we really upload (!?)
@@ -1825,6 +1309,10 @@ FileUpload.prototype.destroy = function(mul) {
         this.file.done_starting();
     }
     delete GlobalProgress[this.gid];
+
+    if (this.file.wsfu) {
+        this.file.wsfu.destroy();
+    }
     oDestroy(this.file);
     oDestroy(this);
 };
@@ -1863,9 +1351,6 @@ FileUpload.prototype.run = function(done) {
         ulmanager.logger.info(file.name, "starting upload", file.id);
     }
 
-    ulmanager.ulSize += file.size;
-    // ulmanager.ulStartingPhase = true;
-
     var started = false;
     file.done_starting = function() {
         if (started) {
@@ -1874,21 +1359,6 @@ FileUpload.prototype.run = function(done) {
         started = true;
         ulmanager.ulStartingPhase = false;
         delete file.done_starting;
-
-        if (ulmanager.ulSize < ulmanager.ulMaxConcurrentSize) {
-
-            if (file.size < ulmanager.ulMaxFastTrackSize) {
-                var size = ulQueue.getSize();
-                var max  = ulQueue.maxActiveTransfers;
-
-                if (size < max && ulQueue.canExpand(max)) {
-                    ulQueue.setSize(size + 1);
-                }
-            }
-        }
-        else {
-            ulQueue.setSize((fmconfig.ul_maxSlots | 0) || ulmanager.ulDefConcurrency || 4);
-        }
 
         file = self = false;
         done();
@@ -1954,7 +1424,7 @@ var ulQueue = new TransferQueue(function _workerUploader(task, done) {
         ulQueue.logger.info('worker_uploader', task, done);
     }
     task.run(done);
-}, self.is_ios && isMediaSourceSupported() ? 1 : ulmanager.ulDefConcurrency, 'uploader');
+}, 2, 'uploader');
 
 ulQueue.poke = function(file, meth) {
     'use strict';
@@ -1990,9 +1460,9 @@ ulQueue.poke = function(file, meth) {
                 ulQueue.resume();
             }
         }
-        if (file.ul_reader) {
-            file.ul_reader.destroy();
-            file.ul_reader = null;
+        if (file.wsfu) {
+            file.wsfu.destroy();
+            file.wsfu = null;
         }
         if (!meth) {
             meth = 'pushFirst';
@@ -2015,20 +1485,10 @@ ulQueue.poke = function(file, meth) {
 };
 
 ulQueue.validateTask = function(pzTask) {
-    // XXX: pzTask.file *must* be valid, it doesn't sometimes which indicates
-    // a problem somewhere with the entry not getting removed from ulQueue._queue
-    if (pzTask instanceof ChunkUpload && pzTask.file && (!pzTask.file.paused || pzTask.__retry)) {
-        return true;
-    }
+    'use strict';
 
-    if (pzTask instanceof FileUpload
-        && !ulmanager.ulStartingPhase
-        && (pzTask.file.xput || pzTask.file.ulSilent || document.getElementById(`ul_${pzTask.file.id}`))) {
-
-        return true;
-    }
-
-    return false;
+    return pzTask instanceof FileUpload
+        && (pzTask.file.xput || pzTask.file.ulSilent || document.getElementById(`ul_${pzTask.file.id}`));
 };
 
 ulQueue.canExpand = function(max) {
@@ -2048,34 +1508,21 @@ Object.defineProperty(ulQueue, 'maxActiveTransfers', {
 mBroadcaster.once('startMega', function _setupEncrypter() {
     'use strict';
     var encrypter = CreateWorkers('encrypter.js', function(context, e, done) {
-        var file = context.file;
-        if (!file || !file.ul_macs) {
-            // TODO: This upload was cancelled, we should terminate the worker rather than waiting
-            if (d) {
-                encrypter.logger.error('This upload was cancelled, should terminate the worker rather than waiting');
-            }
-            return typeof e.data === 'string' || done();
-        }
+        const {macs} = context;
 
         // target byteOffset as defined at CreateWorkers()
         var offset = e.target.byteOffset;// || context.start;
 
         if (typeof e.data === 'string') {
             if (e.data[0] === '[') {
-                file.ul_macs[offset] = JSON.parse(e.data);
+                macs[offset] = JSON.parse(e.data);
             }
             else {
                 encrypter.logger.info('WORKER:', e.data);
             }
         }
         else {
-            if (context.appendMode) {
-                context.bytes.set(new Uint8Array(e.data.buffer || e.data), offset);
-            }
-            else {
-                context.bytes = new Uint8Array(e.data.buffer || e.data);
-            }
-            context.suffix = '/' + context.start + '?c=' + base64urlencode(chksum(context.bytes.buffer));
+            context.bytes = new Uint8Array(e.data.buffer || e.data);
             done();
         }
     });

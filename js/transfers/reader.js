@@ -1,6 +1,6 @@
 /* ***************** BEGIN MEGA LIMITED CODE REVIEW LICENCE *****************
  *
- * Copyright (c) 2018 by Mega Limited, Auckland, New Zealand
+ * Copyright (c) 2025 by Mega Limited, Auckland, New Zealand
  * All rights reserved.
  *
  * This licence grants you the rights, and only the rights, set out below,
@@ -42,215 +42,153 @@
  * @param {File} file The file instance
  * @constructor
  */
-function FileUploadReader(file) {
-    'use strict';
-
-    this.index = 0;
-    this.cached = 0;
-    this.reading = 0;
-    this.inflight = 0;
-
-    this.file = file;
-    this.offsets = file.ul_offsets.reverse();
-
-    this.queue = Object.create(null);
-    this.cache = Object.create(null);
-
-    this.fs = new FileReader();
-}
-
-FileUploadReader.prototype = Object.create(null);
-
-Object.defineProperty(FileUploadReader.prototype, 'constructor', {
-    value: FileUploadReader
-});
-
-/**
- * Get an encrypted chunk from disk
- * @param {Number} offset The byte offset
- * @param {Function} callback
- */
-FileUploadReader.prototype.getChunk = function(offset, callback) {
-    'use strict';
-
-    this.queue[offset] = callback;
-    this._drain(offset);
-};
-
-// @private
-FileUploadReader.prototype._drain = function(offset) {
-    'use strict';
-
-    if (this.cache[offset]) {
-        var callback = this.queue[offset];
-
-        if (callback) {
-            var data = this.cache[offset];
-
-            onIdle(function() {
-                callback(data);
-            });
-            delete this.cache[offset];
-            delete this.queue[offset];
-            this.cached--;
-        }
-    }
-    this._read();
-};
-
-// @private
-FileUploadReader.prototype._dispatch = function(chunk, data) {
-    'use strict';
-
-    if (this.cache) {
-        var offset = chunk.byteOffset;
-
-        this.inflight++;
-        this.reading--;
-        this._read();
-
-        if (data) {
-            this._encrypt(chunk, data).then(this._setCacheItem.bind(this, offset)).catch(console.error.bind(console));
-        }
-        else {
-            this._setCacheItem(offset, EFAILED);
-        }
-    }
-};
-
-// @private
-FileUploadReader.prototype._setCacheItem = function(offset, data) {
-    'use strict';
-
-    if (this.cache) {
-        this.cached++;
-        this.inflight--;
-        this.cache[offset] = data;
-        this._drain(offset);
-    }
-};
-
-// @private
-FileUploadReader.prototype._read = function() {
-    'use strict';
-
-    if (this.cached + this.inflight > 31 || this.reading) {
-        return;
-    }
-    this.reading++;
-
-    var self = this;
-    var chunk = this.offsets[this.index++];
-
-    if (!chunk) {
-        this.finished = Date.now();
-        return;
+class FileUploadReader {
+    constructor(file) {
+        this.file = file;
+        this.readpos = 0;
+        this.cache = new Map();
+        this.debug = self.d > -1;
+        this.verbose = this.debug && !self.is_livesite;
+        this.name = `FUR(${file.name.slice(this.verbose ? -56 : -4)}.${file.size})`;
+        this.logger = new MegaLogger(this.name, false, self.ulmanager && ulmanager.logger);
     }
 
-    this._getArrayBuffer(chunk.byteOffset, chunk.byteLength)
-        .then(function(data) {
-            self._dispatch(chunk, data);
-        })
-        .catch(function(ex) {
-            if (d) {
-                console.warn('FileUploadReader(%s)', chunk.byteOffset, chunk, ex);
-            }
-            self.index--;
+    // return chunk from cache
+    getChunk(pos) {
+        return this.cache.get(pos);
+    }
 
-            // TODO: check how reliably is this weak error handling...
-            setTimeout(function() {
-                self._dispatch(chunk);
-            }, 2000);
-        });
-};
+    // delete chunk from cache
+    deleteChunk(pos) {
+        return this.cache.delete(pos);
+    }
 
-// @private
-FileUploadReader.prototype._encrypt = function(chunk, data) {
-    'use strict';
+    // read chunks into the cache
+    // returns the maximum total number of chunks held _after_ the readahead completes
+    readahead(cachelimit) {
+        const {cache, file = false, readpos, debug, logger} = this;
 
-    var ctx = {
-        file: {ul_macs: {}},
-        start: chunk.byteOffset
-    };
-    var nonce = this.file.ul_keyNonce;
-
-    return new Promise(function(resolve) {
-        var chunks = 1;
-        var ack = function() {
-            if (!--chunks) {
-                resolve(ctx);
-            }
-        };
-
-        if (chunk.byteOffset === 0 && data.byteLength === 0x480000) {
-            // split to chunk boundaries
-            var offset = 0;
-            var blockSize = ulmanager.ulBlockSize;
-
-            chunks = 8;
-            for (var i = 1; i <= 8; i++) {
-                Encrypter.push([ctx, nonce, offset / 16, data.slice(offset, offset + (i * blockSize))], ack);
-                offset += i * blockSize;
-            }
-
-            ctx.bytes = data;
-            ctx.appendMode = true;
+        // don't read from aborted files, don't read past EOF, don't exceed cachelimit
+        if (!file.wsfu || readpos >= file.size || cache.size >= cachelimit) {
+            return cache.size;
         }
-        else {
-            Encrypter.push([ctx, nonce, chunk.byteOffset / 16, data], ack);
+
+        if (debug) {
+            logger.log(`readahead(): ${cache.size} chunks in the cache, limit: ${cachelimit}`);
         }
-    });
-};
 
-// @private
-FileUploadReader.prototype._getArrayBuffer = function(offset, length) {
-    'use strict';
+        // after the first eight individual chunks, we read in 8 MB increments
+        const len = Math.min(file.size - readpos, FileUploadReader.chunkmap[readpos] || 8 * 0x100000);
 
-    var fs = this.fs;
-    var file = this.file;
-    return new Promise(function(resolve, reject) {
-        var blob;
+        this.readpos += len;
 
-        fs.onloadend = function(ev) {
-            var error = true;
-            var target = ev.target;
+        this._read(readpos, len)
+            .then((chunk) => {
+                if (!file.wsfu) {
+                    // aborted
+                    return;
+                }
+                assert('byteLength' in chunk);
 
-            if (target.readyState === FileReader.DONE) {
-                if (target.result instanceof ArrayBuffer) {
-                    try {
-                        return resolve(new Uint8Array(target.result));
-                    }
-                    catch (e) {
-                        error = e;
+                if (len > 0x100000) {
+                    // split
+                    let chunksize = len & 0xfffff || 0x100000;
+
+                    for (let i = len; (i -= chunksize) >= 0; chunksize = 0x100000) {
+                        cache.set(readpos + i, new Uint8Array(chunk.buffer, i, chunksize));
+                        file.ul_macs[readpos + i] = file.ul_macs[readpos].slice(i >> 18, (i >> 18) + 4);
                     }
                 }
+                else {
+                    cache.set(readpos, chunk);
+                }
+
+                return this.readahead(cachelimit);
+            })
+            .catch((ex) => {
+                logger.error(`Read at ${readpos} failed`, ex, file.wsfu);
+                if (file.wsfu) {
+                    this.error = ex;
+                }
+            });
+
+        // anticipate the arrival of the pending read
+        return cache.size + (len > 0x100000 ? 8 : 1);
+    }
+
+    advanceHead() {
+        let eof = false;
+        const pos = this.headpos || 0;
+
+        if (pos < this.file.size) {
+            // advance headpos by one chunk
+            this.headpos = pos + (FileUploadReader.chunkmap[pos] || 1048576);
+        }
+
+        if (this.headpos > this.file.size || !this.file.size) {
+            this.headpos = this.file.size;
+            eof = true;	// eof is set by a short final chunk, so we don't need an extra empty chunk
+        }
+
+        let len = FileUploadReader.chunkmap[pos] || 1048576;
+
+        if (pos + len > this.file.size) {
+            len = this.file.size - pos;
+        }
+
+        if (!len) {
+            // an extra (empty) chunk sets the file size if the file ends on a chunk boundary
+            eof = true;
+        }
+
+        return {pos, len, eof};
+    }
+
+    // @private Get an encrypted chunk from disk
+    async _read(offset, length) {
+        const data = await this._getArrayBuffer(offset, length);
+
+        return this._encrypt(offset, data);
+    }
+
+    // @private
+    _encrypt(offset, data) {
+        return new Promise((resolve) => {
+            if (!this.file) {
+                throw EBLOCKED;
             }
+            const ctx = {
+                start: offset,
+                macs: this.file.ul_macs
+            };
+            Encrypter.push([ctx, this.file.ul_keyNonce, ctx.start / 16, data], () => resolve(ctx.bytes));
+        });
+    }
 
-            reject(error);
-        };
-        fs.onerror = reject;
+    // @private
+    _getArrayBuffer(offset, length) {
 
-        if (file.slice) {
-            blob = file.slice(offset, offset + length);
+        return this.file.slice(offset, offset + length).arrayBuffer();
+    }
+
+    destroy() {
+        if (this.file) {
+            this.file = null;
+            this.cache.clear();
+            oDestroy(this);
         }
-        else if (file.mozSlice) {
-            blob = file.mozSlice(offset, offset + length);
-        }
-        else {
-            blob = file.webkitSlice(offset, offset + length);
-        }
+    }
+}
 
-        fs.readAsArrayBuffer(blob);
-        file = blob = fs = undefined;
-    });
-};
-
-FileUploadReader.prototype.destroy = function() {
+/** @property FileUploadReader.chunkmap */
+lazy(FileUploadReader, 'chunkmap', () => {
     'use strict';
+    // pre-compute sizes of the first file chunks
+    const res = Object.create(null);
 
-    this.fs = null;
-    this.file = null;
-    this.queue = null;
-    this.cache = null;
-    this.offsets = null;
-};
+    for (let p = 0, dp = 0; dp < 1048576; p += dp) {
+        dp += 131072;
+        res[p] = dp;
+    }
+    return res;
+});

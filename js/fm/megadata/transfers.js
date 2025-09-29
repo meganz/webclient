@@ -1500,6 +1500,7 @@ MegaData.prototype.ulprogress = function(ul, perc, bl, bt, bps) {
         return false;
     }
 
+    perc = Math.min(100, perc);
     $.transferprogress['ul_' + id] = [bl, bt, bps];
     delay('percent_megatitle', percent_megatitle, 50);
 

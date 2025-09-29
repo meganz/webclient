@@ -260,7 +260,9 @@ lazy(mega.ui, 'mNodeFilter', () => {
             selection: false,
             eid: 99979,
             shouldShow() {
-                return !!M.search && !['shares', 'out-shares', 'file-requests'].includes(M.currentdirid);
+                return !!M.search
+                    && !$('button.search-chip', '.searcher-wrapper').length
+                    && !['shares', 'out-shares', 'file-requests'].includes(M.currentdirid);
             },
             match(n) {
 
@@ -273,7 +275,7 @@ lazy(mega.ui, 'mNodeFilter', () => {
                    (this.selection.includes('favourites') && n.fav) ||
                    (this.selection.includes('rubbish') && root === M.RubbishID) ||
                    (this.selection.includes('incoming') && root === 'shares') ||
-                    this.selection.includes('outgoing') && this.su[n.h]) {
+                    this.selection.includes('outgoing') && M.su[n.h]) {
 
                     return true;
                 }
@@ -568,11 +570,18 @@ lazy(mega.ui, 'mNodeFilter', () => {
 
             // @todo instead of going all through openFolder() we may want to filterBy(search|parent) + renderMain()
             if (!preventReload) {
-                if (folderlink && String(M.currentdirid).startsWith('search/')) {
+                const isSearch = String(M.currentdirid).startsWith('search/');
+
+                if (folderlink && isSearch) {
                     M.fmSearchNodes(M.currentdirid.replace('search/', ''));
-                    return;
                 }
-                M.openFolder(M.currentdirid, true);
+                else {
+                    M.openFolder(M.currentdirid, true);
+                }
+
+                if (isSearch) {
+                    mega.ui.searchbar.reinitiateSearchTerm();
+                }
             }
         }
     }
@@ -634,8 +643,23 @@ lazy(mega.ui, 'mNodeFilter', () => {
             })();
 
             $resetFilterChips.rebind('click.resetFilters', () => {
+                if (String(M.currentdirid).startsWith('search/')) {
+                    const search = $('.topbar-searcher', $(pmlayout));
+                    const chipBtn = $('button.search-chip', search);
+                    const location = mega.ui.searchbar.locationFn(chipBtn.length && chipBtn.attr('data-location'));
 
-                M.openFolder(M.currentdirid, true);
+                    M.v = M.getFilterBy(M.getFilterBySearchFn($.trim($('.js-filesearcher', search).val()), location));
+                    M.renderMain();
+
+                    mega.ui.searchbar.reinitiateSearchTerm();
+
+                    const $resultsCount = $('.fm-search-count', '.fm-right-files-block .fm-right-header');
+                    $resultsCount.removeClass('hidden');
+                    $resultsCount.text(mega.icu.format(l.search_results_count, M.v.length));
+                }
+                else {
+                    M.openFolder(M.currentdirid, true);
+                }
             });
         },
         match(n) {
@@ -688,7 +712,9 @@ lazy(mega.ui, 'mNodeFilter', () => {
             return selectedFilters;
         },
         get viewEnabled() {
-            return !(M.gallery || M.chat || M.albums
+            return !(M.gallery
+                || M.chat
+                || M.albums
                 || hiddenSections.has(M.currentdirid)
                 || M.currentrootid === 's4' && M.currentCustomView.subType !== 'bucket'
                 || String(M.currentdirid).startsWith('user-management')

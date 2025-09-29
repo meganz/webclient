@@ -1333,6 +1333,12 @@ class MegaGallery {
                 filter: $.selectddUIitem,
                 cancel: '.ps__rail-y, .ps__rail-x, a, .checkdiv input',
                 start: (e) => {
+                    const activeSearch = $.getActiveSearch();
+
+                    if (activeSearch) {
+                        activeSearch.blur();
+                    }
+
                     $.hideContextMenu(e);
                     $.hideTopMenu();
                     $.selecting = true;

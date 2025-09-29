@@ -103,10 +103,7 @@
         delete cfg.leftPaneWidth;
         delete cfg.obVer;
 
-        let s = cfg.ul_maxSpeed;
-        s = s / 1024 << 1 | (s < 0 ? 1 : 0);
-        cfg.xs2 = stringify((s & 0xfffff) << 8 | (cfg.ul_maxSlots & 15) << 4 | cfg.dl_maxSlots & 15);
-        delete cfg.ul_maxSpeed;
+        cfg.xs2 = stringify((cfg.ul_maxSlots & 127) << 4 | cfg.dl_maxSlots & 15);
         delete cfg.ul_maxSlots;
         delete cfg.dl_maxSlots;
 
@@ -248,10 +245,8 @@
         }
 
         if (config.xs2) {
-            let s = config.xs2 >> 8;
             config.dl_maxSlots = config.xs2 & 15;
-            config.ul_maxSlots = config.xs2 >> 4 & 15;
-            config.ul_maxSpeed = s & 1 ? -1 : (s >> 1) * 1024;
+            config.ul_maxSlots = config.xs2 >> 4 & 127;
         }
 
         if (config.xs3) {
@@ -573,10 +568,6 @@
             refresh.ui();
         }
 
-        if (fmconfig.ul_maxSlots) {
-            ulQueue.setSize(fmconfig.ul_maxSlots);
-        }
-
         if (fmconfig.dl_maxSlots) {
             dlQueue.setSize(fmconfig.dl_maxSlots);
         }
@@ -828,7 +819,9 @@
 
                 if (M.account.ssrs !== value) {
                     M.account.ssrs = value;
-                    mega.attr.set('rubbishtime', String(value), -2, 1);
+                    mega.attr.set2(null, 'rubbishtime', String(value), -2, 1)
+                        .then(() => mega.attr.uaPacketParser('^!rubbishtime', u_handle, 1, 0))
+                        .catch(dump);
                     toast = true;
                 }
             }

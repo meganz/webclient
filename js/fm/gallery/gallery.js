@@ -724,7 +724,6 @@ class MegaGallery {
                 let timeDiff = this.nodes[n.h] > this.nodes[sameDayNode];
 
                 if (!timeDiff) {
-                    const n = M.d;
                     const sortedArr = [n, mega.gallery.getNodeCache(sameDayNode)];
 
                     sortedArr.sort(this.sortByMtime.bind(this));

@@ -1486,7 +1486,9 @@ FileManager.prototype.initShortcutsAndSelection = function(container, aUpdate, r
     }
 
     if (!aUpdate) {
+        let last = [];
         if (window.selectionManager) {
+            last = selectionManager.selected_list;
             window.selectionManager.destroy();
         }
 
@@ -1501,6 +1503,10 @@ FileManager.prototype.initShortcutsAndSelection = function(container, aUpdate, r
                     $.selected.splice(i, 1);
                 }
             }
+        }
+        // Same page but selection arrays were split
+        else if (!M.gallery && M.previousdirid === M.currentdirid && $.selected !== last) {
+            $.selected = last;
         }
 
         /**

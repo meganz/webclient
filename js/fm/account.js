@@ -3746,7 +3746,7 @@ accountUI.reseller = {
                     status = l[492] + ' ' + time2date(el.cancelled);
                 }
 
-                var voucherLink = 'https://mega.nz/#voucher' + htmlentities(el.code);
+                var voucherLink = `${getBaseUrl()}/#voucher${htmlentities(el.code)}`;
 
                 html += '<tr><td><span>' + time2date(el.date) + '</span></td>'
                     + '<td class="selectable"><span class="break-word">' + voucherLink + '</span></td>'

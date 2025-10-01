@@ -152,7 +152,7 @@
             }
         }
 
-        set({apipath: 'staging', link: data.link, d: 1, minLogLevel: '0', jj: location.host !== 'mega.nz'});
+        set({apipath: 'staging', link: data.link, d: 1, minLogLevel: '0', jj: !is_livesite});
     };
 
     patchAccountData = function(data) {

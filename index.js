@@ -1455,8 +1455,11 @@ function init_page() {
     }
     else if (page === 'cookie') {
         if (mega.flags.ab_adse) {
+            if (mega.tld !== 'nz') {
+                pages.cookiepolicy = pages.cookiepolicy.replace(/\.nz/g, `.${mega.tld}`);
+            }
             parsepage(pages.cookiepolicy);
-            $cookiePolicyPage = $('body #mainlayout #startholder .bottom-page.cookie-policy');
+            const $cookiePolicyPage = $('body #mainlayout #startholder .bottom-page.cookie-policy');
             $('.cookie-policy .cookiesdialog', $cookiePolicyPage).rebind('click', () => {
                 csp.trigger().dump('csp.trigger');
             });

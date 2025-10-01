@@ -2301,7 +2301,8 @@ var notify = {
 
             const link = document.querySelector('link[rel="icon"]');
             if (link) {
-                link.href = `${location.hostname === 'mega.nz' ? 'https://mega.nz/' : bootstaticpath}favicon.ico`;
+                link.href = (location.hostname === 'mega.nz' || location.hostname === 'mega.app' ?
+                    `https://mega.${mega.tld}/` : bootstaticpath) + 'favicon.ico';
             }
 
             this.favico = new Favico({

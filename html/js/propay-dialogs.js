@@ -816,7 +816,8 @@ var voucherDialog = {
                 voucherDialog.$dialog.find('#voucher-code-input input').val('');
 
                 // Remove link information to get just the code
-                voucherCode = voucherCode.replace('https://mega.nz/#voucher', '');
+                voucherCode = voucherCode.replace('https://mega.nz/#voucher', '')
+                    .replace('https://mega.app/#voucher', '');
 
                 // Add the voucher
                 voucherDialog.addVoucher(voucherCode);

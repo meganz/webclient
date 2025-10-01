@@ -388,7 +388,7 @@ MegaUtils.prototype.reload = function megaUtilsReload(force) {
             localStorage.d = 1;
             localStorage.minLogLevel = 0;
 
-            if (location.host !== 'mega.nz') {
+            if (!is_livesite) {
                 localStorage.dd = true;
                 if (!is_extension && jj) {
                     localStorage.jj = jj;

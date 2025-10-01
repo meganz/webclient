@@ -242,7 +242,7 @@ var is_karma = !is_iframed && /^localhost:987[6-9]/.test(window.top.location.hos
 var is_microsoft = /msie|edge|trident/i.test(ua);
 var is_bot = !is_extension && /bot|crawl/i.test(ua);
 var is_webcache = location.host === 'webcache.googleusercontent.com';
-var is_livesite = location.host === 'mega.nz' || location.host === 'mega.io'
+var is_livesite = location.host === 'mega.nz' || location.host === 'mega.app'
     || location.host === 'smoketest.mega.nz' || is_extension;
 var is_transferit = !is_livesite && (/transfer\.it$/.test(location.host) || localStorage.it);
 
@@ -323,7 +323,7 @@ function getSitePath() {
     'use strict';
 
     if (is_webcache) {
-        var m = String(location.href).match(/mega\.nz\/([\w-]+)/);
+        var m = String(location.href).match(/mega\.(nz|app)\/([\w-]+)/);
         if (m) {
             return '/' + m[1];
         }
@@ -983,6 +983,11 @@ lazy(mega, 'utqav', function() {
     return (mega.flags.utqav || localStorage.utqa_nf || 3);
 });
 
+lazy(mega, 'tld', function() {
+    'use strict';
+    return mega.flags && mega.flags.ff_site ? 'app' : 'nz';
+});
+
 (function(chrome) {
     'use strict';
     delete mega.chrome;
@@ -1556,7 +1561,7 @@ function siteLoadError(error, filename) {
     message.push('Please click OK to refresh and try again.');
     message.push("If the problem persists, please try disabling all third-party browser extensions " +
         "and ensure your browser is up to date. " +
-        "If that does not help, contact support@" + (self.is_extension ? 'mega.nz' : location.host));
+        "If that does not help, contact support@" + (self.is_livesite ? 'mega.io' : location.host));
 
     message.push('BrowserID: ' + self.ua + '\n' +
                  'Static server: ' + staticpath + '\n' +
@@ -3913,7 +3918,7 @@ else if (!browserUpdate) {
 
         // Redirect static pages to mega.io if there isn't a stored session ID (regardless of its validity),
         // since without a session-id it's not possible to access any internal page.
-        if (location.host === 'mega.nz' && !u_storage.sid && !is_iframed && isStaticPage(page) && !location.hash) {
+        if (is_livesite && !u_storage.sid && !is_iframed && isStaticPage(page) && !location.hash) {
             return mega.redirect('mega.io', page, false, locationSearchParams);
         }
 

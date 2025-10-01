@@ -12,7 +12,7 @@ copyright.validateEmail = function(email) {
     return isValidEmail(email);
 };
 
-copyright.ourDomains = {'mega.co.nz': 1, 'mega.nz': 1, 'mega.io': 1};
+copyright.ourDomains = {'mega.co.nz': 1, 'mega.nz': 1, 'mega.io': 1, 'mega.app': 1};
 
 /**
  * Validate that the user has entered a link that is, or can be easily turned into, a valid MEGA link

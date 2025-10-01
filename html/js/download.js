@@ -971,7 +971,7 @@ function dlcomplete(dl) {
 function sync_switchOS(os) {
     'use strict';
     const l1158 = String(l[1158] || 'for Windows');
-    let syncurl = 'https://mega.nz/MEGAsyncSetup.exe';
+    let syncurl = `https://mega.${mega.tld}/MEGAsyncSetup.exe`;
 
     if (os === 'windows') {
         $('.sync-button-txt.small').text(l1158);
@@ -979,7 +979,7 @@ function sync_switchOS(os) {
         $('.sync-button').removeClass('mac linux').attr('href', syncurl);
     }
     else if (os === 'mac') {
-        syncurl = 'https://mega.nz/MEGAsyncSetup.dmg';
+        syncurl = `https://mega.${mega.tld}/MEGAsyncSetup.dmg`;
         let ostxt = 'For Mac';
         if (l1158.includes('Windows')) {
             ostxt = l1158.replace('Windows', 'Mac');

@@ -1105,6 +1105,12 @@ lazy(mega, 'fileRequestUpload', () => {
 
         parsePage() {
             parsepage(pages.filerequest);
+            if (mega.tld !== 'nz') {
+                const url = document.querySelector('.file-request-upload-page a.nz-url');
+                if (url) {
+                    url.href = url.href.replace('nz', mega.tld);
+                }
+            }
         }
 
         parseParameters(pagePath) {

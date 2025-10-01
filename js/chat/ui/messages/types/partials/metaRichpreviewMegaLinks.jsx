@@ -136,7 +136,7 @@ class MetaRichpreviewMegaLinks extends ConversationMessageMixin {
                         <div className="message richpreview desc">{desc}</div>
                         <div className="message richpreview url-container">
                             <span className="message richpreview url-favicon">
-                                <img src="https://mega.nz/favicon.ico?v=3&c=1" width={16} height={16}
+                                <img src={`https://mega.${mega.tld}/favicon.ico?v=3&c=1`} width={16} height={16}
                                     onError={(e) => {
                                         if (e && e.target && e.target.parentNode) {
                                             e.target.parentNode.removeChild(e.target);

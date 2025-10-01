@@ -878,7 +878,7 @@ var authring = (function () {
         if (!is_karma && (typeof u_attr !== 'object' || u_attr.u !== window.u_handle || u_attr.keyring)) {
             logger.error('Doh! Tampering attempt...', u_handle, [u_attr]);
 
-            if (location.host === 'mega.nz' || is_extension) {
+            if (is_livesite) {
                 return masterPromise.reject(EACCESS);
             }
 

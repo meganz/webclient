@@ -229,7 +229,10 @@ table.device-centre .device-centre-item-modified {
     overflow: hidden;
     position: relative;
     border-top: 1px solid var(--surface-grey-2);
-    margin-top: 20px;
+    margin-top: 12px;
+}
+.small-nav .device-centre-grid-view {
+    margin-top: 0;
 }
 
 .fm-right-files-block.emptied .device-centre-grid-view {

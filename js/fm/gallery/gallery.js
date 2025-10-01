@@ -1294,6 +1294,7 @@ class MegaGallery {
         mega.ui.secondaryNav.updateGalleryLayout();
         mega.ui.secondaryNav.hideBreadcrumb();
         mega.ui.secondaryNav.updateInfoChipsAndViews();
+        mega.ui.secondaryNav.updateSmallNavButton(!M.isGalleryPage() && !M.isAlbumsPage());
 
         if (pfid && !M.v) {
             $('.fm-empty-section', rfBlock).removeClass('hidden');
@@ -1386,7 +1387,8 @@ class MegaGallery {
         if (M.onMediaView && !M.isGalleryPage() && mega.ui.secondaryNav) {
             // Bind scroll event for media discovery view since it has action buttons.
             const noScroll = mega.ui.secondaryNav.bindScrollEvents();
-            if (noScroll && !mega.ui.secondaryNav.actionsHolder) {
+            if (noScroll && !mega.ui.secondaryNav.actionsHolder && !mega.ui.secondaryNav.isSmall) {
+                mega.ui.secondaryNav.domNode.classList.remove('buttons-up');
                 mega.ui.secondaryNav.domNode.querySelector('.fm-card-holder')
                     .before(mega.ui.header.domNode.querySelector('.fm-header-buttons'));
             }

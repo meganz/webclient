@@ -654,9 +654,23 @@ function fmtopUI() {
     }
     mega.ui.secondaryNav.updateInfoChipsAndViews();
     mega.ui.secondaryNav.breadcrumbHolder.classList.remove('top-spacer');
+    mega.ui.secondaryNav.chipsViewsWrapper.classList.remove('no-crumb', 'grid-spacer');
+    mega.ui.secondaryNav.domNode.classList.remove('no-small-content', 'crumb-info', 's4-spacer', 'search-link');
+    mega.ui.secondaryNav.updateSmallNavButton(
+        !(
+            M.onDeviceCenter ||
+            M.currentdirid === 'shares' ||
+            M.currentdirid === M.RubbishID ||
+            M.currentdirid === 'faves' ||
+            M.currentdirid === 'recents'
+        ) || M.v.length
+    );
     $('.fm-right-files-block').removeClass('visible-notification rubbish-bin');
 
     const isSearchResult = String(M.currentdirid).substring(0, 6) === 'search';
+    if (isSearchResult && pfid) {
+        mega.ui.secondaryNav.domNode.classList.add('search-link');
+    }
     if (M.currentrootid === M.RubbishID) {
         if (M.v.length) {
             primary = '.fm-clearbin-button';
@@ -693,6 +707,10 @@ function fmtopUI() {
             }
             else if (M.currentdirid !== 'shares') {
                 mega.ui.secondaryNav.hideBreadcrumb();
+                mega.ui.secondaryNav.chipsViewsWrapper.classList.add('no-crumb');
+            }
+            else if (M.currentdirid === 'shares') {
+                mega.ui.secondaryNav.domNode.classList.add('no-small-content');
             }
         }
         else if (M.currentrootid === 'out-shares') {
@@ -705,6 +723,7 @@ function fmtopUI() {
             if (M.currentdirid === M.currentrootid) {
                 primary = '.fm-new-shared-folder';
                 mega.ui.secondaryNav.hideBreadcrumb();
+                mega.ui.secondaryNav.domNode.classList.add('no-small-content');
             }
             else if (M.isOutShare(id, 'EXP')) {
                 primary = '.fm-new-menu';
@@ -726,6 +745,10 @@ function fmtopUI() {
             if (M.currentdirid === M.currentrootid) {
                 primary = '.fm-new-link';
                 mega.ui.secondaryNav.hideBreadcrumb();
+                mega.ui.secondaryNav.domNode.classList.add('no-small-content');
+                if (M.onIconView) {
+                    mega.ui.secondaryNav.chipsViewsWrapper.classList.add('grid-spacer');
+                }
             }
             else if (M.getNodeShare(M.d[id])) {
                 primary = '.fm-new-menu';
@@ -746,6 +769,7 @@ function fmtopUI() {
             if (M.currentdirid === M.currentrootid) {
                 primary = '.fm-new-file-request';
                 mega.ui.secondaryNav.hideBreadcrumb();
+                mega.ui.secondaryNav.domNode.classList.add('no-small-content');
             }
             else {
                 primary = '.fm-new-menu';
@@ -772,10 +796,11 @@ function fmtopUI() {
             const {subType, original, nodeID, containerID} = M.currentCustomView;
             const hideElems = !subType.startsWith('bucket') && !$.selected.length;
             mega.ui.secondaryNav.updateLayoutButton(hideElems || subType === 'container');
-            mega.ui.secondaryNav.updateInfoChipsAndViews(subType !== 'container' && hideElems);
+            let hideChipsViews = false;
             if (subType === 'container') {
                 primary = '.fm-s4-new-bucket';
                 secondary = '.fm-s4-settings';
+                mega.ui.secondaryNav.domNode.classList.add('crumb-info', 's4-spacer');
             }
             else if (subType === 'bucket') {
                 if (M.d[nodeID].p === containerID) {
@@ -808,29 +833,39 @@ function fmtopUI() {
                     secondary = '.fm-new-folder';
                     tertiary = cl.isTakenDown(nodeID) ? false : '.fm-share-folder';
                 }
+                mega.ui.secondaryNav.domNode.classList.add('s4-spacer');
             }
             else if (subType === 'keys') {
                 primary = '.fm-s4-new-key';
+                mega.ui.secondaryNav.domNode.classList.add('crumb-info', 's4-spacer');
             }
             else if (subType === 'policies') {
                 mega.ui.secondaryNav.breadcrumbHolder.classList.add('top-spacer');
+                mega.ui.secondaryNav.updateSmallNavButton();
+                mega.ui.secondaryNav.domNode.classList.add('s4-spacer');
+                hideChipsViews = true;
             }
             else if (subType === 'users') {
                 if (original.endsWith('users')) {
                     primary = '.fm-s4-new-user';
+                    mega.ui.secondaryNav.domNode.classList.add('crumb-info', 's4-spacer');
                 }
                 else {
                     mega.ui.secondaryNav.breadcrumbHolder.classList.add('top-spacer');
+                    hideChipsViews = true;
                 }
             }
             else if (subType === 'groups') {
                 if (original.endsWith('groups')) {
                     primary = '.fm-s4-new-group';
+                    mega.ui.secondaryNav.domNode.classList.add('crumb-info', 's4-spacer');
                 }
                 else {
                     mega.ui.secondaryNav.breadcrumbHolder.classList.add('top-spacer');
+                    hideChipsViews = true;
                 }
             }
+            mega.ui.secondaryNav.updateInfoChipsAndViews(hideChipsViews);
             $('.fm-right-files-block').addClass('visible-notification');
         }
         else if (M.onDeviceCenter) {
@@ -873,6 +908,9 @@ function fmtopUI() {
         return;
     }
     mega.ui.secondaryNav.showActionButtons(primary, secondary, tertiary);
+    if (fmconfig.smallNav) {
+        mega.ui.secondaryNav.collapse();
+    }
 }
 
 /**
@@ -3364,7 +3402,9 @@ function FMResizablePane(element, opts) {
         'maxWidth': 400,
         'minHeight': undefined,
         'minWidth': undefined,
-        'handle': '.transfer-drag-handle'
+        'handle': '.transfer-drag-handle',
+        shrinkBelow: false,
+        onShrinkBelow: undefined,
     };
 
     var size_attr = 'height';
@@ -3372,6 +3412,11 @@ function FMResizablePane(element, opts) {
     opts = $.extend(true, {}, defaults, opts);
 
     self.options = opts; //expose as public
+
+    if (opts.shrinkBelow && opts.shrinkBelow <= opts.minWidth) {
+        opts.shrinkBelow = false;
+        delete opts.onShrinkBelow;
+    }
 
     console.assert(opts.multiple || $element.length === 1, 'FMResizablePane: Invalid number of elements.');
 
@@ -3445,6 +3490,13 @@ function FMResizablePane(element, opts) {
             }
         }
 
+        if (opts.shrinkBelow && value < opts.shrinkBelow) {
+            $element.addClass('small-resize-pane');
+        }
+        else if (opts.shrinkBelow) {
+            $element.removeClass('small-resize-pane');
+        }
+
         if (value > 0) {
             $element.width(value);
         }
@@ -3504,10 +3556,17 @@ function FMResizablePane(element, opts) {
                 } else {
                     css_attrs[size_attr] = ui.size[size_attr];
                     $element.css(css_attrs);
-                    if (opts.persistanceKey) {
+                    if (opts.persistanceKey && !opts.shrinkBelow) {
                         mega.config.set(opts.persistanceKey, ui.size[size_attr]);
                     }
                     self["current_" + size_attr] = ui.size[size_attr];
+                    // Only supported for width currently
+                    if (opts.shrinkBelow && size_attr === 'width' && ui.size.width < opts.shrinkBelow) {
+                        $element[0].classList.add('small-resize-pane');
+                    }
+                    else if (opts.shrinkBelow) {
+                        $element[0].classList.remove('small-resize-pane');
+                    }
                 }
 
                 delay('fm-resizable-pane:refresh', () => self.refresh(e, ui));
@@ -3515,6 +3574,21 @@ function FMResizablePane(element, opts) {
             'stop': function(e, ui) {
                 $.tresizer();
                 $(self.element).removeClass('resizable-pane-active');
+                if (opts.shrinkBelow) {
+                    if (ui.size.width < opts.shrinkBelow) {
+                        self.setWidth(opts.minWidth);
+                        if (typeof opts.onShrinkBelow === 'function') {
+                            opts.onShrinkBelow(true);
+                        }
+                    }
+                    else if (typeof opts.onShrinkBelow === 'function') {
+                        opts.onShrinkBelow();
+                    }
+                    // State isn't persisted yet. If not shrunk update it. If shrunk then keep the previous value.
+                    if (opts.persistanceKey && opts.shrinkBelow < ui.size.width) {
+                        mega.config.set(opts.persistanceKey, ui.size.width);
+                    }
+                }
                 $self.trigger('resizestop', [e, ui]);
             }
         };
@@ -3540,7 +3614,7 @@ Object.defineProperty(FMResizablePane, 'refresh', {
             // @todo revamp if we ever use other than '.fm-left-panel' for these
             const cl = $('.fm-left-panel:visible, .mega-top-menu.ui-resizable:not(.hidden)').data('fmresizable');
 
-            if (cl) {
+            if (cl && !(cl.options.shrinkBelow && fmconfig.smallLhp)) {
 
                 cl.setOption('maxWidth', M.fmTabPages['cloud-drive'][M.currentrootid] ? null : 400);
             }

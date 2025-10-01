@@ -135,6 +135,9 @@ body.ru .avatar-menu .storage-usage .lp-storage-information-popup::after {
 .storage-usage-panel .info a.upgrade span {
     font-weight: var(--mobile-font-weight-semibold);
 }
+.storage-usage-panel .info a.upgrade i {
+    display: none;
+}
 .storage-usage-panel .loader.loading {
     animation: rotate 2.5s infinite linear;
     opacity: 1;

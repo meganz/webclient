@@ -1382,6 +1382,13 @@ lazy(mega.devices, 'ui', () => {
             this.handleAddBtnVisibility();
             mega.ui.secondaryNav.bindScrollEvents();
             mega.ui.secondaryNav.showActionButtons(primary, secondary, tertiary);
+            if (mega.ui.secondaryNav.isSmall && mega.ui.secondaryNav.cardComponent) {
+                const btns = mega.ui.header.domNode.componentSelectorAll('.card-copy');
+                for (let i = btns.length; i--;) {
+                    btns[i].destroy();
+                }
+                mega.ui.secondaryNav.collapse();
+            }
         }
 
         /**

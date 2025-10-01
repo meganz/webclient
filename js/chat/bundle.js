@@ -30319,7 +30319,8 @@ class LeftPanel extends mixins.w9 {
       contactRequests: Object.keys(M.ipc).length
     }));
     $.leftPaneResizableChat = new FMResizablePane(this.domRef.current, {
-      ...(_$$leftPaneResizable = $.leftPaneResizable) == null ? void 0 : _$$leftPaneResizable.options
+      ...(_$$leftPaneResizable = $.leftPaneResizable) == null ? void 0 : _$$leftPaneResizable.options,
+      minWidth: mega.flags.ab_ads ? 260 : 200
     });
     this.fmConfigLeftPaneListener = mBroadcaster.addListener('fmconfig:leftPaneWidth', value => this.setState(state => ({
       leftPaneWidth: value || state.leftPaneWidth

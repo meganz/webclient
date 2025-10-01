@@ -1688,10 +1688,10 @@ class MegaGallery {
         const { tmpFa } = mega.gallery;
 
         const a = typeof ah === 'string'
-            ? M.d[ah] || (tmpFa && tmpFa[ah]) || this.updNode[ah]
+            ? mega.gallery.getNodeCache(ah) || this.updNode[ah]
             : ah;
         const b = typeof bh === 'string'
-            ? M.d[bh] || (tmpFa && tmpFa[bh]) || this.updNode[bh]
+            ? mega.gallery.getNodeCache(bh) || this.updNode[bh]
             : bh;
 
         return M.sortByModTimeFn2()(a, b, -1);
@@ -3215,7 +3215,6 @@ async function galleryUI(id) {
         }
 
         if (id) {
-            delete mega.gallery.tmpFa; // MD gets nodes from the current folder, tmpCache should not overlap
             gallery = mega.gallery.discovery = new MegaTargetGallery(id);
         }
         else if (section) {
@@ -3341,7 +3340,7 @@ MegaGallery.addThumbnails = (nodeBlocks) => {
     if (thumbHandles.length) {
         fm_thumbnails(
             'standalone',
-            thumbHandles.map(h => M.d[h] || (tmpFa && tmpFa[h])),
+            thumbHandles.map(mega.gallery.getNodeCache),
             ({ h, fa }) => {
                 for (let i = 0; i < thumbBlocks[h].length; i++) {
                     thumbBlocks[h][i].setThumb(thumbnails.get(fa), fa);

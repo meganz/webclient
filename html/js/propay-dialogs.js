@@ -2571,14 +2571,14 @@ var addressDialog = {
 
             const isEphemeralAccount = isEphemeral();
             if (page === 'registerb') {
-                mainTxt = mainTxt.replace('%2', pro.getProPlanName(pro.ACCOUNT_LEVEL_BUSINESS));
+                mainTxt = [mainTxt.replace('%2', pro.getProPlanName(pro.ACCOUNT_LEVEL_BUSINESS))];
                 if (isEphemeralAccount) {
                     mainTxt.push(l.if_new_account_verify);
                     btnTxt = false;
                 }
             }
             else {
-                mainTxt = mainTxt.replace('%2', pro.getProPlanName(planNum));
+                mainTxt = [mainTxt.replace('%2', pro.getProPlanName(planNum))];
             }
 
             this.showSuccessCloak(

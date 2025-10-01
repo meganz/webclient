@@ -25,10 +25,10 @@ var megasync = (function() {
     }
     var retryTimer;
     var clients = {
-        windows: 'https://mega.nz/MEGAsyncSetup64.exe',
-        windows_x32: 'https://mega.nz/MEGAsyncSetup32.exe',
-        mac: 'https://mega.nz/MEGAsyncSetup.dmg',
-        mac_silicon: 'https://mega.nz/MEGAsyncSetupArm64.dmg',
+        windows: `https://mega.${mega.tld}/MEGAsyncSetup64.exe`,
+        windows_x32: `https://mega.${mega.tld}/MEGAsyncSetup32.exe`,
+        mac: `https://mega.${mega.tld}/MEGAsyncSetup.dmg`,
+        mac_silicon: `https://mega.${mega.tld}/MEGAsyncSetupArm64.dmg`,
         linux: "https://mega.io/desktop"
     };
     var usemsync = localStorage.usemsync;

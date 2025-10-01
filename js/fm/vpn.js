@@ -174,6 +174,12 @@ class VpnPage {
             correctLevel: QRErrorCorrectLevel.H,
             text: 'https://apps.apple.com/app/mega-vpn-privacy-online/id6456784858',
         });
+        if (mega.tld !== 'nz') {
+            const url = this.page.querySelector('.nz-url');
+            if (url) {
+                url.href = url.href.replace('nz', mega.tld);
+            }
+        }
     }
 
     async _initLocationDropdown() {

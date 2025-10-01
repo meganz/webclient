@@ -28,10 +28,10 @@ lazy(LinkInfoHelper, 'MEGA_LINKS_REGEXP_COMPILED', () => {
     'use strict';
     const res = [];
     const MEGA_LINKS_REGEXP = [
-        "\\b(?:mega\\.co\\.nz|mega\\.nz)/(C!)([\\w#-]+)",
-        "\\b(?:mega\\.co\\.nz|mega\\.nz)/#(!|F!)([\\w!-]+)",
-        "\\b(?:mega\\.co\\.nz|mega\\.nz)/(chat)/([\\w#-]+)",
-        "\\b(?:mega\\.co\\.nz|mega\\.nz)/(file|folder)/([\\w#-]+)",
+        "\\b(?:mega\\.co\\.nz|mega\\.nz|mega\\.app)/(C!)([\\w#-]+)",
+        "\\b(?:mega\\.co\\.nz|mega\\.nz|mega\\.app)/#(!|F!)([\\w!-]+)",
+        "\\b(?:mega\\.co\\.nz|mega\\.nz|mega\\.app)/(chat)/([\\w#-]+)",
+        "\\b(?:mega\\.co\\.nz|mega\\.nz|mega\\.app)/(file|folder)/([\\w#-]+)",
     ];
 
     for (let i = 0; i < MEGA_LINKS_REGEXP.length; ++i) {

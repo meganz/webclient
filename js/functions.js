@@ -1284,7 +1284,7 @@ function getHtmlElemPos(elem, n) {
  * @returns {String}
  */
 function getBaseUrl() {
-    return 'https://' + (((location.protocol === 'https:') && location.host) || 'mega.nz');
+    return 'https://' + (((location.protocol === 'https:') && location.host) || `mega.${mega.tld}`);
 }
 
 /**

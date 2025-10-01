@@ -1128,7 +1128,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace(/\[\/A\d]/g, '</a>');
 
     l[10634] = escapeHTML(l[10634])
-        .replace('[A]', `<a href="https://mega.nz/support" ${propayLinksAttr} data-eventid="500460">`)
+        .replace('[A]', `<a href="https://mega.${mega.tld}/support" ${propayLinksAttr} data-eventid="500460">`)
         .replace('[/A]', '</a>');
 
     l[10635] = escapeHTML(l[10635]).replace('[B]', '<b>').replace('[/B]', '</b>');
@@ -1995,6 +1995,8 @@ mBroadcaster.once('boot_done', function populate_l() {
             `<a href="${recoveryKeyLink}" class="clickurl" data-eventid="500915" target="_blank" rel="noopener">`
         )
         .replace('[/A]', '</a>');
+    l[19146] = escapeHTML(l[19146]).replace('%s', `${getBaseUrl()}/support`);
+    l[19511] = escapeHTML(l[19511]).replace('%s', `${getBaseUrl()}/support`);
 
     const common = [
         15536, 16119, 16120, 16313, 16316, 16360, 18228, 18268, 18282,

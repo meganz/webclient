@@ -3,6 +3,7 @@ mBroadcaster.once('boot_done', () => {
     const storage = localStorage;
     const domain2event = freeze({
         'mega.nz': 99702,
+        'mega.app': 99702,
         'transfer.it': 99623,
         'smoketest.transfer.it': 99623,
         'bigefpfhnfcobdlfbedofhhaibnlghod': 99702,

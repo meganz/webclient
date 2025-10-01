@@ -450,14 +450,14 @@ function setContactLink($container) {
     // Check data exists in M.account
     if (account.contactLink && account.contactLink.length) {
         contactPrefix =  M.account.contactLink.match('^C!') ? '' : 'C!';
-        $publicLink.attr('data-lnk', 'https://mega.nz/' + contactPrefix + M.account.contactLink);
+        $publicLink.attr('data-lnk', `${getBaseUrl()}/${contactPrefix}${M.account.contactLink}`);
     }
     else {
         api.send('clc')
             .then((res) => {
                 if (typeof res === 'string') {
                     contactPrefix = res.match('^C!') ? '' : 'C!';
-                    res = 'https://mega.nz/' + contactPrefix + res;
+                    res = `${getBaseUrl()}/${contactPrefix}${res}`;
                     $publicLink.attr('data-lnk', res);
                     mBroadcaster.sendMessage('contact:setContactLink', res);
                 }

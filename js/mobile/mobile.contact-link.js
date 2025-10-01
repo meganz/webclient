@@ -29,6 +29,9 @@ MobileContactLink.prototype.showContactLinkInfo = function _showContactLinkInfo(
         }
         $mobileContactInfoDlg = $('#mobile-ui-contact-card');
     }
+    if (mega.tld !== 'nz') {
+        $mobileContactInfoDlg[0].querySelector('a.logo').href = `https://mega.${mega.tld}`;
+    }
 
     var fillContactInfo = function _fillContactInfo(name, email,avatar,handle,ct) {
         $('.mobile.contactname', $mobileContactInfoDlg).text(name);

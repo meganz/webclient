@@ -973,7 +973,7 @@ function initMegaIoIframe(loginStatus, planNum) {
 
     // Set constants for URLs (easier to change for local testing)
     const megapagesUrl = 'https://mega.io';
-    const parentUrl = 'https://mega.nz';
+    const parentUrl = location.host === 'mega.app' ? 'https://mega.app' : 'https://mega.nz';
 
     const megapagesPromise = mega.promise;
 

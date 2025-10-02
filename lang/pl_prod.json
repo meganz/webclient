@@ -4721,7 +4721,7 @@
     "rewind_upg_header": "Cofnij si\u0119 w czasie",
     "rewind_upgrade_dialog_desc": "Aby cofn\u0105\u0107 si\u0119, musisz by\u0107 na p\u0142atnym planie. Dzi\u0119ki p\u0142atnemu planowi mo\u017cesz przewija\u0107 dane z ostatnich 30 dni. Zaczynamy r\u00f3wnie\u017c zapisywa\u0107 kopie Twoich danych na d\u0142u\u017cej, aby\u015b m\u00f3g\u0142 przewin\u0105\u0107 jeszcze dalej, w zale\u017cno\u015bci od planu.",
     "rewind_upgrade_dialog_title": "Przejd\u017a do p\u0142atnego planu, aby przewin\u0105\u0107 wstecz",
-    "rewind_upgrade_info_text": "Aby przywr\u00f3\u0107 katalog do wersji sprzed 180 dni, [A1]uaktualnij sw\u00f3j plan.[/A1] [A2]Dowiedz si\u0119 wi\u0119cej o przewijaniu.[/A2]",
+    "rewind_upgrade_info_text": "Aby przywr\u00f3\u0107 katalog do wersji sprzed 60 dni, [A1]uaktualnij sw\u00f3j plan.[/A1] [A2]Dowiedz si\u0119 wi\u0119cej o przewijaniu.[/A2]",
     "rewind_upgrade_to_restore": "Uaktualnij any przewija\u0107",
     "ri_s4_tab": "Przechowywanie Obiektu MEGA S4",
     "rubbish_bin_empty": "Tutaj pojawi\u0105 si\u0119 elementy usuni\u0119te z Dysku w chmurze.",

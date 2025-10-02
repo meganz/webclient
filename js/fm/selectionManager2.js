@@ -241,8 +241,9 @@ class SelectionManager2Base {
             }
 
             this.removing_list.push(nodeId);
-            if (M.d[nodeId]) {
-                this.removing_sizes[nodeId] = M.d[nodeId].t ? M.d[nodeId].tb : M.d[nodeId].s;
+            const node = M.d[nodeId] || (M.gallery || M.albums) && mega.gallery.getNodeCache(nodeId);
+            if (node) {
+                this.removing_sizes[nodeId] = node.t ? node.tb : node.s;
             }
         }
         else if (this.debugMode) {
@@ -773,9 +774,9 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             for (let i = this.selected_list.length; i--;) {
                 let n = this.selected_list[i];
                 const e = M.megaRender ? M.megaRender.getDOMNode(n) : document.getElementById(n);
-                if (M.d[n]) {
-                    n = M.d[n];
-                    selectionSize += n.t ? n.tb : n.s;
+                const node = M.d[n] || (M.gallery || M.albums) && mega.gallery.getNodeCache(n);
+                if (node) {
+                    selectionSize += node.t ? node.tb : node.s;
                 }
                 else if (M.dcd[n]) {
                     n = M.dcd[n];
@@ -848,14 +849,18 @@ class SelectionManager2_DOM extends SelectionManager2Base {
 
             if (this.selected_list.length !== 0 && this.removing_list.length > 1) {
 
-                const cb = (pv, c) => pv + (M.d[c] ?
-                    M.d[c].tb === undefined ? M.d[c].s : M.d[c].tb :
-                    this.removing_sizes[c] || 0);
+                const cb = (pv, c) => {
+                    const node = M.d[c] || (M.gallery || M.albums) && mega.gallery.getNodeCache(c);
+                    return pv + (node ?
+                        node.tb === undefined ? node.s : node.tb :
+                        this.removing_sizes[c] || 0);
+                };
                 const removingSize = this.removing_list.reduce(cb, 0);
                 nid = this.selected_totalSize - removingSize;
             }
 
-            if (typeof nid !== 'number' && !M.d[nid]) {
+            const node = M.d[nid] || (M.gallery || M.albums) && mega.gallery.getNodeCache(nid);
+            if (typeof nid !== 'number' && !node) {
                 nid = this.selected_totalSize - (this.removing_sizes[nid] || 0);
             }
             this.selectionNotification(nid, false, scrollTo);
@@ -903,7 +908,8 @@ class SelectionManager2_DOM extends SelectionManager2Base {
     selectionNotification(nodeId, isAddToSelection, scrollTo = true) {
         if (
             M.chat
-            || (typeof nodeId !== 'number' && !M.d[nodeId])
+            || (typeof nodeId !== 'number' &&
+                !(M.d[nodeId] || (M.gallery || M.albums) && mega.gallery.getNodeCache(nodeId)))
             || (M.isGalleryPage() && mega.gallery.photos && mega.gallery.photos.mode !== 'a')
             || (M.isMediaDiscoveryPage() && mega.gallery.discovery && mega.gallery.discovery.mode !== 'a')
             || M.isAlbumsPage(1)
@@ -917,7 +923,10 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             this.hideSelectionBar();
         }
         else {
-            const _getNodeSize = () => M.d[nodeId].t ? M.d[nodeId].tb : M.d[nodeId].s;
+            const _getNodeSize = () => {
+                const node = M.d[nodeId] || (M.gallery || M.albums) && mega.gallery.getNodeCache(nodeId);
+                return node.t ? node.tb : node.s;
+            };
 
             if (typeof nodeId === 'number') {
                 this.selected_totalSize = nodeId;
@@ -950,10 +959,11 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             }
             else {
                 this.selected_totalSize = this.selected_list.reduce((s, h) => {
-                    if (!M.d[h]) {
+                    const node = M.d[h] || (M.gallery || M.albums) && mega.gallery.getNodeCache(h);
+                    if (!node) {
                         return s + 0;
                     }
-                    return s + (M.d[h].t ? M.d[h].tb : M.d[h].s);
+                    return s + (node.t ? node.tb : node.s);
                 }, 0);
                 this.showSelectionBar(
                     mega.icu.format(l.selected_count, itemsNum),

@@ -2796,6 +2796,7 @@ lazy(mega.gallery, 'albums', () => {
                         M.contextMenuUI(ev, 8, '.play-slideshow', [albumId]);
                     })
                 );
+                mega.ui.secondaryNav.updateSmallNavButton();
             }
             else if (filterFn) {
                 const slideshow = needSlideshow ? {
@@ -2910,6 +2911,7 @@ lazy(mega.gallery, 'albums', () => {
             });
             mega.ui.secondaryNav.showActionButtons('.fm-new-album');
             mega.ui.secondaryNav.updateInfoChipsAndViews(true);
+            mega.ui.secondaryNav.expand();
         }
 
         update(albumId) {
@@ -3308,7 +3310,8 @@ lazy(mega.gallery, 'albums', () => {
                 if (mega.ui.secondaryNav) {
                     // Bind scroll event for albums view since it has action buttons.
                     const noScroll = mega.ui.secondaryNav.bindScrollEvents(this.el);
-                    if (noScroll && !mega.ui.secondaryNav.actionsHolder) {
+                    if (noScroll && !mega.ui.secondaryNav.actionsHolder && !mega.ui.secondaryNav.isSmall) {
+                        mega.ui.secondaryNav.domNode.classList.remove('buttons-up');
                         mega.ui.secondaryNav.domNode.querySelector('.fm-card-holder')
                             .before(mega.ui.header.domNode.querySelector('.fm-header-buttons'));
                     }

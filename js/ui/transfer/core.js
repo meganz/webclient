@@ -592,8 +592,9 @@ lazy(self.T, 'core', () => {
 
         transfer() {
             const target = freeze({
+                'https://mega.app': 'https://transfer.it',
                 'https://mega.nz': 'https://transfer.it',
-                'https://transfer.it': 'https://mega.nz'
+                'https://transfer.it': `https://mega.${mega.tld}`
             })[location.origin];
 
             if (target) {

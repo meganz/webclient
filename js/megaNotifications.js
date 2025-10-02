@@ -52,8 +52,10 @@
             assert(Favico, 'Favico.js is missing.');
 
 
-            $('link[rel="icon"]').attr('href',
-                (location.hostname === 'mega.nz' ? 'https://mega.nz/' : bootstaticpath) + 'favicon.ico'
+            $('link[rel="icon"]').attr(
+                'href',
+                (location.hostname === 'mega.nz' || location.hostname === 'mega.app' ?
+                    `https://mega.${mega.tld}/` : bootstaticpath) + 'favicon.ico'
             );
 
             self.favico = new Favico({

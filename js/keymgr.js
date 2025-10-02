@@ -10,6 +10,7 @@ lazy(mega, 'keyMgr', () => {
     });
     const logger = MegaLogger.getLogger('KeyMgr');
     const dump = logger.warn.bind(logger, 'Caught Promise Rejection');
+    const deepShareScan = tryCatch(() => !!localStorage.deepss)() || mega.flags.dss === 7;
 
     const pkPull = {
         lock: null,
@@ -21,7 +22,7 @@ lazy(mega, 'keyMgr', () => {
     const decryptShareKeys = async(h, mem) => {
         let n;
         const debug = d > 0 && [];
-        const nodes = mem ? M.getNodesSync(h, true) : await M.getNodes(h, true);
+        const nodes = !deepShareScan || mem ? M.getNodesSync(h, true) : await M.getNodes(h, true);
 
         for (let i = nodes.length; i--;) {
             n = M.getNodeByHandle(nodes[i]);
@@ -1175,7 +1176,7 @@ lazy(mega, 'keyMgr', () => {
 
         // try decrypting inshares based on the current key situation
         async decryptInShares(pz) {
-            const lite = u_attr.s4 || mega.infinity || this.didLoadFromAPI;
+            const lite = u_attr.s4 || mega.infinity || this.didLoadFromAPI || !deepShareScan;
 
             if (pz !== -0xFEED && lite || !(self.fmdb && !fmdb.crashed)) {
                 // Let's make S4/Lite users life easier...

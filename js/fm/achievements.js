@@ -30,12 +30,12 @@ Object.defineProperty(mega, 'achievem', {
                             case '!':
                                 var pf = navigator.platform.toUpperCase();
                                 if (pf.indexOf('WIN') !== -1) {
-                                    open('https://mega.nz/MEGAsyncSetup.exe');
+                                    open(`https://mega.${mega.tld}/MEGAsyncSetup.exe`, '', 'noopener,noreferrer');
                                     break;
                                 }
 
                                 if (pf.indexOf('MAC') !== -1) {
-                                    open('https://mega.nz/MEGAsyncSetup.dmg');
+                                    open(`https://mega.${mega.tld}/MEGAsyncSetup.dmg`, '', 'noopener,noreferrer');
                                     break;
                                 }
                                 mega.redirect('mega.io', 'desktop', false, false, false);

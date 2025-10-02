@@ -111,7 +111,7 @@ function FileManager() {
             M.columnsWidth.cloud.accessCtrl.viewed = false;
             M.columnsWidth.cloud.accessCtrl.disabled = true;
 
-            if (M.currentdirid.startsWith('search/')) {
+            if (String(M.currentdirid).startsWith('search/')) {
                 M.columnsWidth.cloud.fileLoc.viewed = true;
                 M.columnsWidth.cloud.fileLoc.disabled = false;
             }
@@ -394,6 +394,7 @@ FileManager.prototype.initFileManager = async function() {
                     if (fmconfig.rwdPromoDiag) {
                         mega.config.remove('rwdPromoDiag');
                     }
+                    mega.rewind.init();
                 })
                 .catch((ex) => {
                     reportError(ex);
@@ -1486,7 +1487,9 @@ FileManager.prototype.initShortcutsAndSelection = function(container, aUpdate, r
     }
 
     if (!aUpdate) {
+        let last = [];
         if (window.selectionManager) {
+            last = selectionManager.selected_list;
             window.selectionManager.destroy();
         }
 
@@ -1501,6 +1504,10 @@ FileManager.prototype.initShortcutsAndSelection = function(container, aUpdate, r
                     $.selected.splice(i, 1);
                 }
             }
+        }
+        // Same page but selection arrays were split
+        else if (!M.gallery && M.previousdirid === M.currentdirid && $.selected !== last) {
+            $.selected = last;
         }
 
         /**

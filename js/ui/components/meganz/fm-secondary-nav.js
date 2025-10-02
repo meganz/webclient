@@ -62,19 +62,21 @@ class MegaNavCard extends MegaComponent {
 
         wrapper = document.createElement('div');
         wrapper.className = 'fm-item-actions-block';
-        MegaButton.factory({
+        this.primaryOptions = {
             parentNode: wrapper,
             ...options.primaryButton,
             componentClassname: `primary ${options.primaryButton.componentClassname || ''}`,
-        });
-        const secondaryBtn = new MegaButton({
+        };
+        MegaButton.factory(this.primaryOptions);
+        this.secondaryOptions = {
             parentNode: wrapper,
             ...options.secondaryButton,
             componentClassname: `secondary outline ${options.secondaryButton.componentClassname || ''}`
-        });
+        };
         if (this.isSync || this.isBackup) {
-            secondaryBtn.removeClass('outline');
+            this.secondaryOptions.componentClassname = this.secondaryOptions.componentClassname.replace(' outline', '');
         }
+        MegaButton.factory(this.secondaryOptions);
 
         this.domNode.appendChild(wrapper);
         this.update();
@@ -124,14 +126,25 @@ class MegaNavCard extends MegaComponent {
     }
 
     get badgeHtml() {
+        if (this._lastShareName && !this.isSharedRoot) {
+            delete this._lastShareName;
+        }
         if (this.isSharedRoot) {
             const { su } = this.node;
+            const data = {
+                n: M.getNameByHandle(su),
+                m: M.u[su].m
+            };
+            if (this._lastShareName && data.n === this._lastShareName.n && data.m === this._lastShareName.m) {
+                return '';
+            }
+            this._lastShareName = data;
             return `
                 <div class="fm-item-badge">
                     <div class="fm-share-avatar"></div>
-                    <div class="fm-share-user">${escapeHTML(M.getNameByHandle(su))}</div>
+                    <div class="fm-share-user">${escapeHTML(data.n)}</div>
                     <span class="dot">.</span>
-                    <div class="fm-share-email">${escapeHTML(M.u[su].m)}</div>
+                    <div class="fm-share-email">${escapeHTML(data.m)}</div>
                 </div>
             `;
         }
@@ -230,7 +243,7 @@ class MegaNavCard extends MegaComponent {
         if (!this.isDevice && !this.isSync && !this.isBackup) {
             const html = this.badgeHtml;
             this.badge = html;
-            didRender = !!html;
+            didRender = !!html || this.isSharedRoot;
         }
         else if (this.isSync || this.isBackup) {
             const { status } = this.node;
@@ -279,10 +292,11 @@ class MegaNavCard extends MegaComponent {
         if (this.isSharedRoot) {
             const parentNode = this.domNode.querySelector('.fm-share-avatar');
             if (parentNode) {
-                this.avatar = this.avatar || new MegaAvatarComponent({
-                    parentNode,
-                    userHandle: this.node.su,
-                });
+                this.avatar = this.avatar && this.avatar.parentNode === parentNode ? this.avatar :
+                    new MegaAvatarComponent({
+                        parentNode,
+                        userHandle: this.node.su,
+                    });
                 this.avatar.update();
             }
             let iconClass = `fm-icon item-type-icon icon-${fileIcon(this.node)}-24`;
@@ -394,6 +408,7 @@ lazy(mega.ui, 'secondaryNav', () => {
 
     let infoButtonBound = false;
     let layoutButtonBound = false;
+    let smallButtonBound = false;
     const layoutMenu = document.createElement('div');
     layoutMenu.className = 'fm-layout-dropdown';
     layoutMenu.appendChild(parseHTML(`<span class="layout-label">${escapeHTML(l.layout_menu)}</span>`));
@@ -809,6 +824,7 @@ lazy(mega.ui, 'secondaryNav', () => {
     let scrollHandler = false;
     let chipsViewWrapShown = false;
     let moveUpTimer = false;
+    let showBreadcrumbs = false;
 
     const toggleGridExtraButtons = hide => extraBtnWrapper.classList.toggle('hidden', hide);
 
@@ -867,6 +883,12 @@ lazy(mega.ui, 'secondaryNav', () => {
             }
             return document.querySelector('.fm-right-files-block .ps:not(.breadcrumb-dropdown)');
         },
+        get smallNavButton() {
+            return this.domNode.querySelector('.fm-small-nav');
+        },
+        get isSmall() {
+            return document.body.classList.contains('small-nav');
+        },
         openNewMenu(ev) {
             if (
                 M.InboxID &&
@@ -877,7 +899,7 @@ lazy(mega.ui, 'secondaryNav', () => {
 
             const items = ['.fileupload-item', '.folderupload-item'];
             const target = ev.currentTarget instanceof MegaComponent ? ev.currentTarget.domNode : ev.currentTarget;
-            if (this.cardComponent && this.cardComponent.domNode.contains(target)) {
+            if (this.cardComponent && (this.cardComponent.domNode.contains(target) || this.isSmall)) {
                 items.push('.newfolder-item', '.newfile-item');
             }
             M.contextMenuUI(ev, 8, items);
@@ -950,14 +972,15 @@ lazy(mega.ui, 'secondaryNav', () => {
                 return;
             }
             const sel = `.${options.componentClassname.split(' ').filter(c => c.startsWith('fm-')).join('.')}`;
-            if (sel === '.' || this.actionsHolder.querySelector(sel)) {
+            const holder = this.actionsHolder || mega.ui.header.domNode.querySelector('.fm-header-buttons');
+            if (sel === '.' || holder.querySelector(sel)) {
                 if (d && sel === '.') {
                     console.warn('No fm- prefixed class found', options.componentClassname);
                 }
                 return;
             }
             const button = new MegaButton({
-                parentNode: this.actionsHolder,
+                parentNode: holder,
                 ...options,
                 componentClassname: `${options.componentClassname} hidden`,
             });
@@ -995,7 +1018,7 @@ lazy(mega.ui, 'secondaryNav', () => {
             if (!holder) {
                 const {ps} = this;
                 holder = mega.ui.header.domNode.querySelector('.fm-header-buttons');
-                if (ps && !(ps.scrollTop !== 0 && !M.search)) {
+                if (!this.isSmall && ps && !(ps.scrollTop !== 0 && !M.search)) {
                     // Scrolled back up. Place back and hide.
                     holder.parentNode.classList.add('contract');
                     holder.parentNode.classList.remove('expand');
@@ -1022,6 +1045,10 @@ lazy(mega.ui, 'secondaryNav', () => {
                 secondaryButton,
                 onContextMenu,
             });
+            if (M.onDeviceCenter && this.isSmall) {
+                // Device centre re-render will replace the card. Reinit the buttons.
+                this.collapse();
+            }
         },
         updateCard(handle) {
             if (!this.cardComponent) {
@@ -1044,13 +1071,28 @@ lazy(mega.ui, 'secondaryNav', () => {
                 this.cardComponent.destroy();
             }
             this.cardHolder.textContent = '';
+            if (this.isSmall) {
+                const buttons = mega.ui.header.domNode.componentSelectorAll('.fm-header-buttons .card-copy');
+                for (let i = buttons.length; i--;) {
+                    buttons[i].destroy();
+                }
+            }
             delete this.cardComponent;
         },
         showBreadcrumb() {
             this.breadcrumbHolder.classList.remove('hidden');
+            showBreadcrumbs = true;
         },
         hideBreadcrumb() {
             this.breadcrumbHolder.classList.add('hidden');
+            showBreadcrumbs = false;
+            if (this.isSmall) {
+                delay('navchecksmallcrumb', () => {
+                    if (this.isSmall && this.cardComponent) {
+                        this.breadcrumbHolder.classList.remove('hidden');
+                    }
+                });
+            }
         },
         updateInfoPanelButton(show) {
             if (!infoButtonBound) {
@@ -1205,7 +1247,11 @@ lazy(mega.ui, 'secondaryNav', () => {
                 scrollHandler.target.removeEventListener('scroll', scrollHandler.handler);
                 scrollHandler = false;
             }
+            if (this.isSmall) {
+                return;
+            }
             if (!this.actionsHolder) {
+                this.domNode.classList.remove('buttons-up');
                 const buttons = mega.ui.header.domNode.querySelector('.fm-header-buttons');
                 buttons.parentNode.classList.remove('expand');
                 this.domNode.querySelector('.fm-card-holder')
@@ -1229,73 +1275,24 @@ lazy(mega.ui, 'secondaryNav', () => {
             }
             scrollHandler = {
                 handler: (e) => {
-                    if (!e.isTrusted) {
+                    if (!e.isTrusted || this.isSmall) {
                         return;
                     }
                     const { offsetHeight, scrollHeight } = ps;
                     if (
                         !startedScrolling &&
+                        this.actionsHolder &&
                         scrollHeight - offsetHeight <= this.actionsHolder.getBoundingClientRect().height
                     ) {
                         // Don't animate if it might just bounce back up again with the new space.
                         return;
                     }
                     if (e.target.scrollTop === 0) {
-                        // Scroll up animation
-                        // 1) Swap expand for contract in the header
-                        // 2) Move DOM node to secondary nav
-                        // 3) Ensure open over collapse on secondary nav
-                        if (moveUpTimer) {
-                            moveUpTimer.abort();
-                            moveUpTimer = false;
-                            this.actionsHolder.classList.remove('collapse');
-                            this.actionsHolder.classList.add('open');
-                            return;
-                        }
-                        if (!this.actionsHolder) {
-                            const buttons = mega.ui.header.domNode.querySelector('.fm-header-buttons');
-                            buttons.parentNode.classList.add('contract');
-                            buttons.parentNode.classList.remove('expand');
-                        }
-                        requestAnimationFrame(() => {
-                            if (!this.actionsHolder) {
-                                this.domNode.querySelector('.fm-card-holder')
-                                    .before(mega.ui.header.domNode.querySelector('.fm-header-buttons'));
-                            }
-                            this.actionsHolder.classList.add('open');
-                            this.actionsHolder.classList.remove('collapse');
-                            // Force reposition since resize may not always trigger correctly
-                            $.tresizer();
-                            if (mega.ui.menu.name && mega.ui.menu.onResize) {
-                                mega.ui.menu.onResize();
-                            }
-                            startedScrolling = false;
-                        });
+                        this.moveButtonsDown();
                         return;
                     }
                     if (!startedScrolling) {
-                        // Scroll down animation.
-                        // 1) Swap open for collapse in secondary nav
-                        // 2) Move DOM node to header
-                        // 3) Remove collapse and add expand in the header.
-                        this.actionsHolder.classList.add('collapse');
-                        this.actionsHolder.classList.remove('open');
-                        startedScrolling = true;
-                        moveUpTimer = tSleep(0.1);
-                        moveUpTimer.then(() => {
-                            moveUpTimer = false;
-                            const actions = mega.ui.header.domNode.querySelector('.nav-secondary-actions');
-                            actions.appendChild(this.actionsHolder);
-                            actions.classList.remove('hidden');
-                            actions.firstElementChild.classList.remove('collapse');
-                            actions.classList.add('expand');
-                            actions.classList.remove('contract');
-                            // Force reposition since resize may not always trigger correctly
-                            $.tresizer();
-                            if (mega.ui.menu.name && mega.ui.menu.onResize) {
-                                mega.ui.menu.onResize();
-                            }
-                        });
+                        this.moveButtonsUp();
                     }
                 },
                 target: ps,
@@ -1314,6 +1311,74 @@ lazy(mega.ui, 'secondaryNav', () => {
             }
             startedScrolling = true;
             return false;
+        },
+        moveButtonsUp(expedite) {
+            if (!this.actionsHolder) {
+                return;
+            }
+            // Scroll down animation.
+            // 1) Swap open for collapse in secondary nav
+            // 2) Move DOM node to header
+            // 3) Remove collapse and add expand in the header.
+            this.domNode.classList.add('buttons-up');
+            this.actionsHolder.classList.add('collapse');
+            this.actionsHolder.classList.remove('open');
+            startedScrolling = true;
+            const doMove = () => {
+                moveUpTimer = false;
+                const actions = mega.ui.header.domNode.querySelector('.nav-secondary-actions');
+                actions.appendChild(this.actionsHolder);
+                actions.classList.remove('hidden');
+                actions.firstElementChild.classList.remove('collapse');
+                actions.classList.add('expand');
+                actions.classList.remove('contract');
+                // Force reposition since resize may not always trigger correctly
+                $.tresizer();
+                if (mega.ui.menu.name && mega.ui.menu.onResize) {
+                    mega.ui.menu.onResize();
+                }
+            };
+            if (expedite) {
+                return doMove();
+            }
+            moveUpTimer = tSleep(0.1);
+            moveUpTimer.then(doMove);
+        },
+        moveButtonsDown() {
+            if (this.isSmall) {
+                return;
+            }
+            // Scroll up animation
+            // 1) Swap expand for contract in the header
+            // 2) Move DOM node to secondary nav
+            // 3) Ensure open over collapse on secondary nav
+            if (moveUpTimer) {
+                moveUpTimer.abort();
+                moveUpTimer = false;
+                this.actionsHolder.classList.remove('collapse');
+                this.actionsHolder.classList.add('open');
+                return;
+            }
+            if (!this.actionsHolder) {
+                this.domNode.classList.remove('buttons-up');
+                const buttons = mega.ui.header.domNode.querySelector('.fm-header-buttons');
+                buttons.parentNode.classList.add('contract');
+                buttons.parentNode.classList.remove('expand');
+            }
+            requestAnimationFrame(() => {
+                if (!this.actionsHolder) {
+                    this.domNode.querySelector('.fm-card-holder')
+                        .before(mega.ui.header.domNode.querySelector('.fm-header-buttons'));
+                }
+                this.actionsHolder.classList.add('open');
+                this.actionsHolder.classList.remove('collapse');
+                // Force reposition since resize may not always trigger correctly
+                $.tresizer();
+                if (mega.ui.menu.name && mega.ui.menu.onResize) {
+                    mega.ui.menu.onResize();
+                }
+                startedScrolling = false;
+            });
         },
         updateInfoChipsAndViews(hide) {
             if (hide) {
@@ -1423,6 +1488,75 @@ lazy(mega.ui, 'secondaryNav', () => {
         },
         extShowFilterChip() {
             this.filterChipsHolder.classList.remove('hidden');
+        },
+        updateSmallNavButton(show) {
+            if (!smallButtonBound) {
+                smallButtonBound = true;
+                this.smallNavButton.addEventListener('click', (ev) => {
+                    ev.stopPropagation();
+                    $.hideContextMenu();
+                    if (this.isSmall) {
+                        this.expand();
+                        fmconfig.smallNav = 0;
+                        eventlog(500957);
+                    }
+                    else {
+                        this.collapse();
+                        fmconfig.smallNav = 1;
+                        eventlog(500956);
+                    }
+                });
+            }
+            this.smallNavButton.classList[show ? 'remove' : 'add']('hidden');
+        },
+        collapse() {
+            document.body.classList.add('small-nav');
+            const icon = this.smallNavButton.querySelector('i');
+            icon.classList.add('icon-chevrons-down-thin-outline');
+            icon.classList.remove('icon-chevrons-up-thin-outline');
+            this.smallNavButton.dataset.simpletip = l.show_options;
+            if (!showBreadcrumbs) {
+                this.showBreadcrumb();
+                showBreadcrumbs = false;
+            }
+            this.moveButtonsUp(true);
+            if (this.cardComponent) {
+                const { primaryOptions, secondaryOptions } = this.cardComponent;
+                const parentNode = mega.ui.header.domNode.querySelector('.fm-header-buttons');
+                parentNode.classList.remove('hidden');
+                let button = new MegaButton({
+                    ...primaryOptions,
+                    parentNode,
+                    componentClassname: `${primaryOptions.componentClassname} card-copy`,
+                });
+                button.domNode.title = primaryOptions.text;
+                button = new MegaButton({
+                    ...secondaryOptions,
+                    parentNode,
+                    componentClassname: `${secondaryOptions.componentClassname} card-copy`,
+                });
+                button.domNode.title = secondaryOptions.text;
+            }
+        },
+        expand() {
+            document.body.classList.remove('small-nav');
+            const icon = this.smallNavButton.querySelector('i');
+            icon.classList.add('icon-chevrons-up-thin-outline');
+            icon.classList.remove('icon-chevrons-down-thin-outline');
+            this.smallNavButton.dataset.simpletip = l.hide_options;
+            if (!showBreadcrumbs) {
+                this.hideBreadcrumb();
+            }
+            if (this.cardComponent) {
+                const buttons = mega.ui.header.domNode.componentSelectorAll('.fm-header-buttons .card-copy');
+                for (let i = buttons.length; i--;) {
+                    buttons[i].parentNode.classList.add('hidden');
+                    buttons[i].destroy();
+                }
+            }
+            if (!scrollHandler || !scrollHandler.target || scrollHandler.target.scrollTop === 0) {
+                this.moveButtonsDown();
+            }
         }
     };
 });

@@ -433,7 +433,7 @@ MegaLogger.getLogger = function(n, o) {
 function getBaseUrl() {
     'use strict';
 
-    return 'https://' + (((location.protocol === 'https:') && location.host) || 'mega.nz');
+    return 'https://' + (((location.protocol === 'https:') && location.host) || `mega.${mega.tld}`);
 }
 function getAppBaseUrl() {
     'use strict';
@@ -450,7 +450,8 @@ function under(page) {
     'use strict';
 
     try {
-        return (top !== self && top.location.host === 'mega.nz' || d) && top.getCleanSitePath() === page;
+        return (top !== self && (top.location.host === 'mega.nz' || top.location.host === 'mega.app') || d) &&
+            top.getCleanSitePath() === page;
     }
     catch (ex) {}
 

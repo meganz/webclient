@@ -269,7 +269,7 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
             }
 
             // This is just to make sure the source root is on the cloud drive
-            if (mega.rewind && sourceRoot === M.RootID
+            if (mega.rewind && mega.rewind.enabled && sourceRoot === M.RootID
                 && !M.onDeviceCenter
                 && !folderlink
             ) {
@@ -841,7 +841,8 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items, forcedSe
                         finalItems.push('.folderupload-item');
                     }
 
-                    if (nodeRoot !== 's4' && mega.rewind && mega.rewind.permittedRoots[M.currentrootid]
+                    if (nodeRoot !== 's4' && mega.rewind
+                        && mega.rewind.enabled && mega.rewind.permittedRoots[M.currentrootid]
                         && !M.onDeviceCenter
                     ) {
                         finalItems.push('.rewind-item');
@@ -1047,7 +1048,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items, forcedSe
                     finalItems.push('.getlink-item');
                 }
             }
-            else if (mega.rewind) {
+            else if (mega.rewind && mega.rewind.enabled) {
                 finalItems.push('.rewind-item');
             }
             $.selected = currNodeClass.contains('fm-header-context') ? $.selected : [M.RootID];

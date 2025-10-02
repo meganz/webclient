@@ -30319,7 +30319,8 @@ class LeftPanel extends mixins.w9 {
       contactRequests: Object.keys(M.ipc).length
     }));
     $.leftPaneResizableChat = new FMResizablePane(this.domRef.current, {
-      ...(_$$leftPaneResizable = $.leftPaneResizable) == null ? void 0 : _$$leftPaneResizable.options
+      ...(_$$leftPaneResizable = $.leftPaneResizable) == null ? void 0 : _$$leftPaneResizable.options,
+      minWidth: mega.flags.ab_ads ? 260 : 200
     });
     this.fmConfigLeftPaneListener = mBroadcaster.addListener('fmconfig:leftPaneWidth', value => this.setState(state => ({
       leftPaneWidth: value || state.leftPaneWidth
@@ -35502,7 +35503,7 @@ class MetaRichpreviewMegaLinks extends mixin.M {
         }, REaCt().createElement("span", {
           className: "message richpreview url-favicon"
         }, REaCt().createElement("img", {
-          src: "https://mega.nz/favicon.ico?v=3&c=1",
+          src: `https://mega.${mega.tld}/favicon.ico?v=3&c=1`,
           width: 16,
           height: 16,
           onError: e => {

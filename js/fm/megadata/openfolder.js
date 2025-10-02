@@ -669,7 +669,8 @@
 
         if (mega.ui.secondaryNav) {
             const noScroll = mega.ui.secondaryNav.bindScrollEvents();
-            if (noScroll && !mega.ui.secondaryNav.actionsHolder) {
+            if (!mega.ui.secondaryNav.isSmall && noScroll && !mega.ui.secondaryNav.actionsHolder) {
+                mega.ui.secondaryNav.domNode.classList.remove('buttons-up');
                 mega.ui.secondaryNav.domNode.querySelector('.fm-card-holder')
                     .before(mega.ui.header.domNode.querySelector('.fm-header-buttons'));
             }
@@ -713,6 +714,7 @@
         if (mega.ui.secondaryNav) {
             mega.ui.secondaryNav.updateGalleryLayout(pfid);
             mega.ui.secondaryNav.updateLayoutButton();
+            mega.ui.secondaryNav.hideActionButtons();
         }
 
         // In MEGA Lite mode, remove this temporary class

@@ -4012,7 +4012,7 @@ function loadfm_done(mDBload) {
 
         window.loadingInitDialog.step3(100);
 
-        if ((location.host === 'mega.nz' || !megaChatIsDisabled) && !is_mobile) {
+        if ((is_livesite || !megaChatIsDisabled) && !is_mobile) {
 
             if (!pfid && !loadfm.chatloading && (u_type === 3 || is_eplusplus)) {
                 loadfm.chatloading = true;

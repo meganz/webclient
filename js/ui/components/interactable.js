@@ -72,6 +72,15 @@ class MegaInteractable extends MegaComponent {
             if (options.simpletipPos) {
                 this.dataset.simpletipposition = options.simpletipPos;
             }
+            if (options.simpletipOffset) {
+                this.dataset.simpletipoffset = options.simpletipOffset;
+            }
+            if (options.simpletipClass) {
+                this.dataset.simpletipClass = options.simpletipClass;
+            }
+            if (options.simpletipWrapper) {
+                this.dataset.simpletipwrapper = options.simpletipWrapper;
+            }
         }
 
         if (options.eventLog) {

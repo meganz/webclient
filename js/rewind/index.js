@@ -66,6 +66,7 @@ lazy(mega, 'rewind', () => {
             this.lastRewindableMonth = null;
             this.lastRewindableYear = null;
             this.folderRedirect = null;
+            this.enabled = false;
 
             // Now adding 'public-links', 'out-shares' to the following object will work as expected
             this.permittedRoots = freeze({
@@ -111,8 +112,124 @@ lazy(mega, 'rewind', () => {
                 }
             };
 
+            const rewindSettings = () => {
+                const user = {
+                    isPro: u_attr.p,
+                    isLegacy: mega.flags.lrw,
+                    get isLowPro() {
+                        return u_attr.p === pro.ACCOUNT_LEVEL_STARTER ||
+                            u_attr.p === pro.ACCOUNT_LEVEL_BASIC ||
+                            u_attr.p === pro.ACCOUNT_LEVEL_ESSENTIAL ||
+                            u_attr.p === pro.ACCOUNT_LEVEL_PRO_LITE;
+                    },
+                };
+
+                const gracePeriod = {
+                    start: 1759449600000, // Fri Oct 03 2025 00:00:00 GMT+0000
+                    get end() {
+                        return this.start + 30 * 24 * 60 * 60 * 1000;
+                    },
+                    get isActive() {
+                        const now = Date.now();
+                        return now >= this.start && now < this.end;
+                    },
+                    get isEnd() {
+                        const now = Date.now();
+                        return now >= this.end;
+                    }
+                };
+
+                const retentionDays = {
+                    _attr: 'rewinddays',
+                    get default() {
+                        if (user.isPro && user.isLegacy && !gracePeriod.isEnd) {
+                            return user.isLowPro ? '90' : '180';
+                        }
+                        return '30';
+                    },
+                    get max() {
+                        if (user.isPro) {
+                            if (user.isLegacy) {
+                                return user.isLowPro ? '90' : '180';
+                            }
+                            return '60';
+                        }
+                        return '30';
+                    },
+                    isValid(val) {
+                        const config = user.isLegacy ?
+                            user.isLowPro ?
+                                {'0': 1, '30': 1, '60': 1, '90': 1} :
+                                {'0': 1, '30': 1, '60': 1, '90': 1, '180': 1} :
+                            {'0': 1, '30': 1, '60': 1};
+
+                        return config[val];
+                    },
+                    async fetch() {
+                        const val = Object.values(
+                            await Promise.resolve(mega.attr.get(u_handle, this._attr, -1, false))
+                                .catch(() => [])).join('');
+                        const bVal = base64urldecode(val);
+                        return this.isValid(bVal) ? bVal : false;
+                    },
+                    async save(val) {
+                        if (this.isValid(val)) {
+                            val = String(val);
+                            mega.attr.set(this._attr, base64urlencode(val), -1, false);
+                            mega.rewind.enabled = val !== '0';
+                            return true;
+                        }
+                        return false;
+                    }
+                };
+
+                const reductionBanner = {
+                    async init($notif, id) {
+                        if (user.isPro && user.isLegacy && gracePeriod.isActive) {
+                            if (await retentionDays.fetch()) {
+                                $notif.removeClass('visible');
+                                return;
+                            }
+
+                            const config = {
+                                'main': 'dsmRewRed1',
+                                'inline': 'dsmRewRed2',
+                            };
+
+                            if (config[id] && !mega.config.get(config[id])) {
+                                clickURLs();
+                                $('.message-text',$notif).safeHTML(
+                                    l.bf_rewind_rd_notif_msg
+                                        .replace('%1', 30)
+                                        .replace('%d', time2date(gracePeriod.end / 1000, 2)));
+
+                                $notif.addClass('visible');
+                                $('button', $notif).rebind('click.bfrRwRetBanner.close', () => {
+                                    mega.config.set(config[id], 1);
+                                    $notif.removeClass('visible');
+                                });
+                            }
+                        }
+                    }
+                };
+
+                return {
+                    user,
+                    gracePeriod,
+                    retentionDays,
+                    reductionBanner
+                };
+            };
+
+            lazy(this, 'settings', () => rewindSettings());
+
             mBroadcaster.addListener('rewind:accountUpgraded', () => openSidebarListener(true));
             mBroadcaster.addListener('mega:openfolder', () => openSidebarListener());
+        }
+
+        async init() {
+            this.enabled = await this.settings.retentionDays.fetch() !== '0';
+            onIdle(fmtopUI);
         }
 
         async removeNodeListener() {
@@ -198,7 +315,7 @@ lazy(mega, 'rewind', () => {
 
         isAccountProType() {
             this.accountType = this.accountType || this.getAccountType();
-            return this.accountType !== ACCOUNT_TYPE_PRO_LITE && this.accountType !== ACCOUNT_TYPE_FREE;
+            return this.accountType !== ACCOUNT_TYPE_FREE;
         }
 
         async loadTreeCacheList() {
@@ -387,55 +504,9 @@ lazy(mega, 'rewind', () => {
             return currentDate;
         }
 
-        getRewindDescriptionData() {
-            let hasUpgrade = true;
-            const title = l.rewind_upg_header;
-            let description = l.rewind_select_date_free;
-
-            switch (this.accountType) {
-                case ACCOUNT_TYPE_PRO_LITE:
-                    // description = l.rewind_upg_content_pro_lite;
-                    description = l.rewind_select_date_pro_lite;
-                    break;
-                case ACCOUNT_TYPE_PRO:
-                case ACCOUNT_TYPE_PRO_FLEXI:
-                case ACCOUNT_TYPE_BUSINESS:
-                    description = l.rewind_select_date_pro;
-                    hasUpgrade = false;
-                    break;
-            }
-
-            return {
-                hasUpgrade,
-                title,
-                description
-            };
-        }
-
-        getUpgradeSectionData() {
-            let upgradeInfoText = l.rewind_upgrade_info_text;
-            switch (this.accountType) {
-                case ACCOUNT_TYPE_PRO:
-                case ACCOUNT_TYPE_PRO_FLEXI:
-                case ACCOUNT_TYPE_BUSINESS:
-                    upgradeInfoText = false;
-                    break;
-            }
-            return upgradeInfoText;
-        }
-
-        getDatepickerOverlayContent(type) {
-            let description = null;
-            switch (this.accountType) {
-                case ACCOUNT_TYPE_FREE:
-                    description = l.rewind_datepicker_overlay_free_days;
-                    break;
-                case ACCOUNT_TYPE_PRO_LITE:
-                    description = l.rewind_datepicker_overlay_pro_lite_days;
-                    break;
-            }
-
-            return description;
+        getDatepickerOverlayContent() {
+            return this.accountType === ACCOUNT_TYPE_FREE ?
+                l.rewind_datepicker_overlay_free_days : null;
         }
 
         sortTreeCacheList() {

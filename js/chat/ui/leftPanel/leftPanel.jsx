@@ -93,7 +93,10 @@ class LeftPanel extends MegaRenderMixin {
             () => this.setState({ contactRequests: Object.keys(M.ipc).length })
         );
 
-        $.leftPaneResizableChat = new FMResizablePane(this.domRef.current, { ...$.leftPaneResizable?.options });
+        $.leftPaneResizableChat = new FMResizablePane(this.domRef.current, {
+            ...$.leftPaneResizable?.options,
+            minWidth: mega.flags.ab_ads ? 260 : 200,
+        });
 
         this.fmConfigLeftPaneListener = mBroadcaster.addListener(
             'fmconfig:leftPaneWidth',

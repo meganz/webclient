@@ -394,6 +394,7 @@ FileManager.prototype.initFileManager = async function() {
                     if (fmconfig.rwdPromoDiag) {
                         mega.config.remove('rwdPromoDiag');
                     }
+                    mega.rewind.init();
                 })
                 .catch((ex) => {
                     reportError(ex);

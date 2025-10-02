@@ -1699,6 +1699,11 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[A]', `<a ${rewindLinkAttr} href="${rewindHelpLink}">`)
         .replace('[/A]', '</a>');
 
+    const rewindSettingsLinkAttr = 'target="_blank" class="clickurl" rel="noopener noreferrer"';
+    l.rewind_stgs_content = escapeHTML(l.rewind_stgs_content)
+        .replace('[A]', `<a ${rewindSettingsLinkAttr} href="${rewindHelpLink}" data-eventid="500965">`)
+        .replace('[/A]', '</a>');
+
     l.two_fa_download_app = escapeHTML(l.two_fa_download_app)
         .replace('[A]', '<a href="">')
         .replace('[/A]', '</a>');
@@ -1814,8 +1819,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[S3]', '<span class="users-worldwide">')
         .replace(/\[\/S\d]/g, '</span>');
 
-    l.rewind_select_date_pro = escapeHTML(l.rewind_select_date_pro)
-        .replace('[BR]', '<br />')
+    l.rewind_select_date = escapeHTML(l.rewind_select_date)
         .replace('[A]', `<a ${rewindLinkAttr} href="${rewindHelpLink}">`)
         .replace('[/A]', '</a>');
 

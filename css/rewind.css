@@ -195,6 +195,41 @@ body.theme-dark .active-rewind .rewind-sidebar {
     --icon-size: 24px;
 }
 
+.rtl .rewind-sidebar .reduction-notification {
+    direction: rtl;
+}
+
+.rewind-sidebar .reduction-notification {
+    display: none;
+}
+
+.rewind-sidebar .reduction-notification.visible {
+    display: block;
+}
+
+.rewind-sidebar .reduction-notification .content {
+    display: grid;
+    order: 5;
+}
+
+.rewind-sidebar .reduction-notification .content > * {
+    padding: 4px 0;
+}
+
+.rewind-sidebar .reduction-notification .date,
+.fm-notification-block.rewind-reduction .date {
+    font-weight: bold;
+}
+
+.rewind-sidebar .reduction-notification .action {
+    grid-row: 3;
+}
+
+.rewind-sidebar .reduction-notification .close {
+    display: flex;
+    order: 10;
+    padding: 4px 0;
+}
 
 .rewind-datepicker-calendar {
     position: absolute;
@@ -490,6 +525,11 @@ body.theme-dark .rewind-datepicker-calendar .datepicker--cell.-current- {
     font: var(--text-body2);
     margin-bottom: 18px;
     width: 304px;
+}
+
+.sidebar .sidebar-container .sidebar-content .content-upgrade .rewind-description a {
+    display: block;
+    padding: 12px 0;
 }
 
 .sidebar .sidebar-container .sidebar-content .content-upgrade .upgrade-description {

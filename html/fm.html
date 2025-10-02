@@ -430,6 +430,7 @@
                             </div>
                             <div class="sub-menu slide-item">
                                 <div class="sub-title" data-scrollto="file-version">[$19475]</div>
+                                <div class="sub-title" data-scrollto="rewind">[$rewind]</div>
                                 <div class="sub-title" data-scrollto="rubbish-cleaning">[$20229]</div>
                                 <div class="sub-title" data-scrollto="user-interface">[$16158]</div>
                                 <div class="sub-title" data-scrollto="dialog-options">[$20169]</div>
@@ -611,6 +612,21 @@
                             <span class="banner title-text">[$storage_almost_full]</span>
                             <span class="banner message-text">[$bn_almost_full_text]</span>
                             <a href="/pro" class="clickurl action-link">[$upgrade_now]</a>
+                        </div>
+                        <div class="banner end-box">
+                            <button class="mega-component text-icon nav-elem icon-only button">
+                                <i class="sprite-fm-mono icon-dialog-close-thin left-icon icon-size-24"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                 <div class="fm-notification-block rewind-reduction">
+                    <div class="mega-component alert banner warning">
+                        <i class="banner left-icon sprite-fm-mono icon-alert-circle-thin-outline"></i>
+                        <div class="content-box">
+                            <span class="banner title-text">[$bf_rewind_rd_notif_title]</span>
+                            <span class="banner message-text">[$bf_rewind_rd_notif_msg]</span>
+                            <a href="/fm/account/file-management/rewind" class="clickurl action-link" data-eventid="500958">[$bf_rewind_rd_notif_action]</a>
                         </div>
                         <div class="banner end-box">
                             <button class="mega-component text-icon nav-elem icon-only button">
@@ -4434,6 +4450,55 @@
                                     </div>
                                 </div>
                                 <div class="content-txt">[$17600]</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="account data-block rewind">
+                        <div class="settings-left-block">
+                            <div class="title-txt">[$rewind]</div>
+                        </div>
+                        <div class="settings-right-block slide-in-out closed">
+                            <div class="settings-sub-section">
+                                <div class="subtitle-txt">[$rewind_stgs_title]</div>
+                                <div class="mega-switch hidden" id="rewind-enabled">
+                                    <div class="mega-feature-switch"></div>
+                                </div>
+                                <div class="pro-badge">[$8695]</div>
+                                <div class="content-txt">[$rewind_stgs_content]</div>
+                                <div class="container-rewind-upgrade">
+                                    <div class="mega-banner body with-btn">
+                                        <div class="mega-banner cell">
+                                            <div class="settings-info-icon">
+                                                <i class="sprite-fm-mono icon-info-filled"></i>
+                                            </div>
+                                        </div>
+                                        <div class="mega-banner cell text-cell">
+                                            <div class="versioning-body-text">
+                                                [$rewind_stgs_upgrade_to_pro]
+                                            </div>
+                                        </div>
+                                        <div class="mega-banner cell btn-cell">
+                                            <button class="mega-button positive upgrade-to-pro rewind-upgrade">
+                                                <span>[$129]</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="settings-sub-section slide-item container-rewind-retention hidden">
+                                <div class="subtitle-txt">[$rewind_stgs_retention_title]</div>
+                                <div class="container-rewind-retention-selector">
+                                    <form autocomplete="disabled">
+                                        <div class="mega-input dropdown-input rewind-retention-selector"
+                                        id="rewind-retention-days">
+                                            <span></span>
+                                            <i class="sprite-fm-mono icon-dropdown"></i>
+                                            <div class="mega-input-dropdown hidden">
+                                                <div class="dropdown-scroll"></div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                     </div>

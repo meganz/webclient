@@ -944,8 +944,8 @@ accountUI.plan = {
                     const proStorage = bytesToSize(plan[pro.UTQA_RES_INDEX_STORAGE] * 1073741824, 0);
                     const freeTransfer = l['1149'];
                     const proTransfer = bytesToSize(plan[pro.UTQA_RES_INDEX_TRANSFER] * 1073741824, 0);
-                    const rewindTxt = mega.icu.format(l.pr_up_to_days, pro.filter.simple.ninetyDayRewind
-                        .has(plan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL]) ? 90 : 180);
+                    const rewindTxt = mega.icu.format(l.pr_up_to_days, mega.rewind ?
+                        mega.rewind.settings.retentionDays.max : 60);
 
                     const banner = $cancelDialog[0].querySelector('.over-storage-banner');
                     if (M.account.cstrg > mega.bstrg) {

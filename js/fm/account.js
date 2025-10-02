@@ -297,6 +297,9 @@ accountUI.general = {
                 if ($clickedButton.hasClass('bandwidth-upgrade')) {
                     eventlog(500488);
                 }
+                else if ($clickedButton.hasClass('rewind-upgrade')) {
+                    eventlog(500968);
+                }
                 else if ($clickedButton.hasClass('rubbish-upgrade')) {
                     eventlog(500487);
                 }
@@ -701,9 +704,9 @@ accountUI.inputs = {
                 const val = $switch.hasClass('toggle-on');
 
                 if (typeof onClickCb === 'function') {
-                    onClickCb(val).done(function() {
+                    onClickCb(val).then(() => {
                         self.toggle(identifier, $container, onChangeCb);
-                    });
+                    }).catch(nop);
                 }
                 else {
                     self.toggle(identifier, $container, onChangeCb);
@@ -1578,26 +1581,17 @@ accountUI.account = {
                         });
                     }
                 },
-                function(val) {
-
-                    var promise = new MegaPromise();
-
-                    // If it is toggle off, warn user.
+                async(val) => {
                     if (val) {
-                        msgDialog('confirmation', l[19990], l[20128], l[18229], function (answer) {
-                            if (answer) {
-                                promise.resolve();
+                        return asyncMsgDialog(
+                            'confirmation', l[19990], l[20128], l[18229],
+                            async(yes) => {
+                                if (!yes) {
+                                    throw EBLOCKED;
+                                }
                             }
-                            else {
-                                promise.reject();
-                            }
-                        });
+                        );
                     }
-                    else {
-                        // It is toggle on, just proceed;
-                        promise.resolve();
-                    }
-                    return promise;
                 });
 
             // Automatic accept section
@@ -2427,6 +2421,9 @@ accountUI.fileManagement = {
         this.versioning.render();
         this.versioning.bindEvents();
 
+        // Rewind retention
+        this.rewind.retention.render(account);
+
         // Rubbish cleaning schedule
         this.rubsched.render(account);
         this.rubsched.bindEvents(account);
@@ -2499,25 +2496,17 @@ accountUI.fileManagement = {
                 $('#versioning-status', accountUI.$contentBlock).parent(),
                 !fileversioning.dvState,
                 setVersioningAttr,
-                function(val) {
-
-                    var promise = new MegaPromise();
-
+                async(val) => {
                     if (val) {
-                        msgDialog('confirmation', l[882], l[17595], false, function(e) {
-
-                            if (e) {
-                                promise.resolve();
+                        return asyncMsgDialog(
+                            'confirmation', l[882], l[17595], false,
+                            async(yes) => {
+                                if (!yes) {
+                                    throw EBLOCKED;
+                                }
                             }
-                            else {
-                                promise.reject();
-                            }
-                        });
+                        );
                     }
-                    else {
-                        promise.resolve();
-                    }
-                    return promise;
                 });
         },
 
@@ -2940,7 +2929,152 @@ accountUI.fileManagement = {
                 !mega.config.get('rwReinstate'),
                 val => mega.config.setn('rwReinstate', val ^ 1)
             );
-        }
+        },
+        retention: {
+            _rewindEnabledId: '#rewind-enabled',
+            _retentionDays: {
+                _events: {
+                    '30': 500960,
+                    '60': 500961,
+                    '90': 500962,
+                    '180': 500963
+                },
+                set(val, isRegisterEvent, isSkipToast) {
+                    'use strict';
+
+                    const {retentionDays} = mega.rewind.settings;
+
+                    if (retentionDays.save(val)) {
+                        if (isRegisterEvent && val !== '0') {
+                            eventlog(this._events[val]);
+                        }
+                        if (!isSkipToast) {
+                            showToast('settings', l[16168]);
+                        }
+                    }
+                }
+            },
+            _renderEnableSwitch(initialRetentionDays, $switch, onEnable) {
+                'use strict';
+
+                const {_rewindEnabledId} = this;
+                const {retentionDays} = mega.rewind.settings;
+                const defaultRetentionDays = retentionDays.default;
+
+                accountUI.inputs.switch.init(
+                    _rewindEnabledId,
+                    $switch.parent(),
+                    initialRetentionDays === '0' ? 0 : 1,
+                    (val) => {
+                        if (val) {
+                            eventlog(500959);
+                            this._retentionDays.set(defaultRetentionDays);
+                            $switch.closest('.slide-in-out').removeClass('closed');
+                            if (typeof onEnable === 'function') {
+                                onEnable();
+                            }
+                        }
+                        else {
+                            eventlog(500964);
+                            this._retentionDays.set('0');
+                            $switch.closest('.slide-in-out').addClass('closed');
+                        }
+                    },
+                    async(val) => {
+                        if (val) {
+                            return asyncMsgDialog(
+                                `confirmationa:!^${l.rewind_stgs_disbl_dlg_ok}!${l[82]}`,
+                                null,
+                                l.rewind_stgs_disbl_dlg_title,
+                                l.rewind_stgs_disbl_dlg_msg,
+                                async(yes) => {
+                                    if (yes) {
+                                        eventlog(500967);
+                                    }
+                                    else {
+                                        eventlog(500966);
+                                        throw EBLOCKED;
+                                    }
+                                }
+                            );
+                        }
+                    });
+            },
+            _renderDaysSelector(initialRetentionDays, $selector) {
+                'use strict';
+
+                const {user, retentionDays} = mega.rewind.settings;
+                let items;
+
+                if (user.isLegacy) {
+                    items = {'90': l.rewind_stgs_retention_days_op.replace('%d', 90)};
+                    if (!user.isLowPro) {
+                        items = {'180': l.rewind_stgs_retention_days_op.replace('%d', 180), ...items};
+                    }
+                }
+
+                createDropdown($selector, {
+                    items: {
+                        '30': l.rewind_stgs_retention_days_op.replace('%d', 30),
+                        '60': l.rewind_stgs_retention_days_op.replace('%d', 60),
+                        ...items},
+                    selected: String(initialRetentionDays),
+                });
+
+                bindDropdownEvents($selector, 1);
+
+                const defaultRetentionDays = retentionDays.default;
+                $('.option', $selector).rebind('click.rwRetDays.save', () => {
+                    var $selectedOption = $('.option[data-state="active"]', $selector);
+                    this._retentionDays.set($selectedOption.attr('data-value') || defaultRetentionDays, true);
+                });
+            },
+            async render() {
+                'use strict';
+
+                const {_rewindEnabledId} = this;
+                const $menu = $('[data-scrollto="rewind"]', '.content-panel.account');
+                const $container = $('.account.data-block.rewind', accountUI.$contentBlock);
+                const $free = $('.pro-badge, .container-rewind-upgrade', $container);
+                const $paid = $(`${_rewindEnabledId}, .container-rewind-retention`, $container);
+
+                if (mega.rewind) {
+                    if (u_attr.p) {
+                        const {retentionDays} = mega.rewind.settings;
+                        const defaultRetentionDays = retentionDays.default;
+                        let initialRetentionDays = await retentionDays.fetch();
+                        if (!initialRetentionDays) {
+                            this._retentionDays.set(defaultRetentionDays, false, true);
+                            initialRetentionDays = defaultRetentionDays;
+                        }
+                        const $switchRewind = $(_rewindEnabledId, accountUI.$contentBlock);
+                        const $selectorRetention = $('#rewind-retention-days', accountUI.$contentBlock);
+
+                        $free.addClass('hidden');
+                        $paid.removeClass('hidden');
+                        if (initialRetentionDays !== '0') {
+                            $switchRewind.closest('.slide-in-out').removeClass('closed');
+                        }
+
+                        this._renderEnableSwitch(initialRetentionDays, $switchRewind, () => {
+                            setDropdownValue($selectorRetention, defaultRetentionDays);
+                        });
+                        this._renderDaysSelector(initialRetentionDays, $selectorRetention);
+                    }
+                    else {
+                        $paid.addClass('hidden');
+                        $free.removeClass('hidden');
+                    }
+
+                    $menu.removeClass('hidden');
+                    $container.removeClass('hidden');
+                }
+                else {
+                    $menu.addClass('hidden');
+                    $container.addClass('hidden');
+                }
+            },
+        },
     },
 
     deviceCentrePause: {

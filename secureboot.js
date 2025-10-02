@@ -2405,6 +2405,7 @@ else if (!browserUpdate) {
         jsl.push({f:'css/recents.css', n: 'recents_css', j:2, w:30});
         jsl.push({f:'css/vpn.css', n: 'vpn_css', j:2, w:30});
         jsl.push({f:'css/transfer-widget.css', n: 'transfer_widget_css', j:2, w:30});
+        jsl.push({f:'css/rewind-settings.css', n: 'rewind_settings_css', j:2, w:30});
 
         // CSS Revamp changes
         jsl.push({f:'css/components/meganz/fm-left-pane.css', n: 'fm_left_pane_css', j:2, w:30, c:1, d:1, cache:1});

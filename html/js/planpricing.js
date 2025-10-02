@@ -946,7 +946,7 @@ lazy(pro, 'proplan2', () => {
             $('span', $excPlansHeader).text(l.pr_table_mini_plan.replace('%1', planName));
             $('#table-strg-mini', $tableContainer).text(excStorage);
             $('#table-trans-mini', $tableContainer).text(excTransfer);
-            $('#table-days-mini', $tableContainer).text(mega.icu.format(l.pr_up_to_days, 90));
+            $('#table-days-mini', $tableContainer).text(mega.icu.format(l.pr_up_to_days, 60));
 
             // Set button link and text for mini plan button
             $('button.pro-exc-offer', $tableContainer)

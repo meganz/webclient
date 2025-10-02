@@ -1,0 +1,32 @@
+.account.data-block.rewind a {
+	color: var(--secondary-blue);
+    text-decoration: underline;
+}
+
+.account.data-block.rewind .pro-badge {
+	border: solid 1px var(--mobile-text-error);
+	border-radius: 4px;
+	color: var(--mobile-text-error);
+	font: var(--mobile-font-caption-large-regular);
+	line-height: 16px;
+	padding: 4px 6px;
+}
+
+.account.data-block.rewind .container-rewind-retention {
+	align-items: baseline;
+	display: block;
+}
+
+.account.data-block.rewind .container-rewind-retention .subtitle-txt { 
+	display: inline-block;
+}
+
+.account.data-block.rewind .container-rewind-retention .container-rewind-retention-selector { 
+	display: inline-block;
+    padding-left: 20px;
+}
+
+.rtl .account.data-block.rewind .container-rewind-retention .container-rewind-retention-selector {
+    padding-left: 0;
+	padding-right: 20px;
+}

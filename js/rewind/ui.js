@@ -194,6 +194,8 @@ lazy(mega, 'rewindUi', () => {
             this.$contentFolder.addClass('hidden');
             this.$contentLoading.addClass('hidden');
 
+            mega.rewind.settings.reductionBanner.init($('.reduction-notification', this.sidebar), 'inline');
+
             this.updateNodeDisplay();
             await M.require('datepicker_js');
 
@@ -235,9 +237,10 @@ lazy(mega, 'rewindUi', () => {
                     const isBeforeActivationDate = date < REWIND_ACTIVATION_DATE;
 
                     if (isBeforeActivationDate || mega.rewind.isAccountProType()) {
-                        const tooltip = isBeforeActivationDate
-                            ? l.rewind_datepicker_cell_tooltip_before_activation
-                            : l.rewind_datepicker_cell_tooltip_disabled_pro;
+                        const tooltip = isBeforeActivationDate ?
+                            l.rewind_datepicker_cell_tooltip_before_activation :
+                            l.rewind_datepicker_cell_tooltip_disabled_pro
+                                .replace('%d', mega.rewind.rewindableDays);
 
                         disabledCellContent = `<span 
                             class="cell-value simpletip"
@@ -404,27 +407,14 @@ lazy(mega, 'rewindUi', () => {
             this.$datepicker.val('');
             this.initializeDatepicker();
 
-            const rewindDescriptionData = mega.rewind.getRewindDescriptionData();
-            const upgradeSectionData = mega.rewind.getUpgradeSectionData();
-
             this.$contentUpgradeTitle = $('.upgrade-title', this.$contentUpgrade);
             this.$contentRewindDescription = $('.rewind-description', this.$contentUpgrade);
             this.$contentUpgradeDescription = $('.upgrade-description', this.$contentUpgrade);
-            this.$contentUpgradePurchaseButton = $('.upgrade-purchase-button', this.$contentUpgrade);
 
-            this.$contentUpgradeTitle.text(rewindDescriptionData.title);
-            this.$contentRewindDescription.safeHTML(rewindDescriptionData.description);
-            if (upgradeSectionData) {
-                this.$contentUpgradeDescription.safeHTML(upgradeSectionData);
-            }
-            else {
-                this.$contentUpgradeDescription.addClass('hidden');
-            }
-            this.$contentUpgradePurchaseButton.addClass('hidden');
+            this.$contentUpgradeTitle.text(l.rewind_upg_header);
 
-            if (rewindDescriptionData.hasUpgrade) {
-                this.$contentUpgradePurchaseButton.removeClass('hidden');
-            }
+            this.$contentRewindDescription.safeHTML(
+                l.rewind_select_date.replace('%d', mega.rewind.rewindableDays));
 
             this.$contentUpgrade.removeClass('hidden');
             this.$upgradeLink = $('.rewind-sidebar-upgrade-action', this.sidebar);
@@ -506,7 +496,7 @@ lazy(mega, 'rewindUi', () => {
             let overlayAdded = false;
             let overlayHeight = overlayCount * (CELL_HEIGHT + 5);
             let $overlay = null;
-            let overlayCaption = mega.rewind.getDatepickerOverlayContent(type);
+            let overlayCaption = mega.rewind.getDatepickerOverlayContent();
             let hasOverlayIncrease = false;
 
             if (overlayCaption) {

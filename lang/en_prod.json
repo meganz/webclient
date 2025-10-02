@@ -4721,7 +4721,7 @@
     "rewind_upg_header": "Go back in time",
     "rewind_upgrade_dialog_desc": "In order to rewind, you need to be on a paid plan. With a paid plan, you can rewind your data from the last 30 days. We also start saving copies of your data for longer so that you can rewind even further, depending on your plan.",
     "rewind_upgrade_dialog_title": "Upgrade to a paid plan to rewind",
-    "rewind_upgrade_info_text": "To restore folders to a version from up to 180 days ago, [A1]upgrade your plan.[/A1] [A2]Learn more about Rewind.[/A2]",
+    "rewind_upgrade_info_text": "To restore folders to a version from up to 60 days ago, [A1]upgrade your plan.[/A1] [A2]Learn more about Rewind.[/A2]",
     "rewind_upgrade_to_restore": "Upgrade to rewind",
     "ri_s4_tab": "MEGA S4 object storage",
     "rubbish_bin_empty": "Items you remove from your Cloud drive will appear here.",

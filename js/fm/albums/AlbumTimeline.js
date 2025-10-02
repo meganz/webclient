@@ -188,8 +188,9 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
                         let selectionsPreviewable = false;
                         let onlyPlayableVideosSelected = true;
                         for (let i = 0; i < selections.length; i++) {
-                            if (scope.isPreviewable(M.d[selections[i]])) {
-                                if (!is_video(M.d[selections[i]])) {
+                            const n = mega.gallery.getNodeCache(selections[i]);
+                            if (scope.isPreviewable(n)) {
+                                if (!is_video(n)) {
                                     onlyPlayableVideosSelected = false;
                                 }
                                 selectionsPreviewable = true;
@@ -207,7 +208,9 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
                         }
 
                         if (albums.isPublic) {
-                            const hasImageSelected = selections.some(h => !!M.isGalleryImage(M.d[h]));
+                            const hasImageSelected = selections.some(
+                                h => !!M.isGalleryImage(mega.gallery.getNodeCache(h))
+                            );
 
                             if (hasImageSelected && scope.nodesAllowSlideshow(nodes)) {
                                 selectedItems.push('.play-slideshow');
@@ -238,7 +241,7 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
 
                             if (
                                 mega.gallery.canShowAddToAlbum() &&
-                                selections.every(h => M.isGalleryNode(M.getNodeByHandle(h)))
+                                selections.every(h => M.isGalleryNode(mega.gallery.getNodeCache(h)))
                             ) {
                                 selectedItems.push('.add-to-album');
                             }
@@ -540,7 +543,7 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
 
             for (let i = 0; i < handles.length; i++) {
                 if (handles[i] !== ignoreHandle) {
-                    this.deselectNode(M.d[handles[i]]);
+                    this.deselectNode(mega.gallery.getNodeCache(handles[i]));
                 }
             }
         }
@@ -728,7 +731,7 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
                 const selections = Object.keys(this.selections);
 
                 if (selections.length) {
-                    this.lastNavNode = M.d[selections[selections.length - 1]];
+                    this.lastNavNode = mega.gallery.getNodeCache(selections[selections.length - 1]);
                 }
             }
 
@@ -1313,12 +1316,12 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
 
                 if (newVal) {
                     for (let i = 0; i < nodes.length; i++) {
-                        this.selectNode(M.d[nodes[i]], true);
+                        this.selectNode(mega.gallery.getNodeCache(nodes[i]), true);
                     }
                 }
                 else {
                     for (let i = 0; i < nodes.length; i++) {
-                        this.deselectNode(M.d[nodes[i]], true);
+                        this.deselectNode(mega.gallery.getNodeCache(nodes[i]), true);
                     }
                 }
 

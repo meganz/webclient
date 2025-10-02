@@ -4721,7 +4721,7 @@
     "rewind_upg_header": "Drehen Sie die Zeit zur\u00fcck",
     "rewind_upgrade_dialog_desc": "Um Rewind nutzen zu k\u00f6nnen, ben\u00f6tigen Sie ein kostenpflichtiges Paket. Mit einem kostenpflichtigen Paket k\u00f6nnen Sie Daten aus den letzten 30 Tagen wiederherstellen. Wir beginnen auch, Kopien Ihrer Daten l\u00e4nger zu speichern, damit Sie je nach Paket noch weiter zur\u00fcckgehen k\u00f6nnen.",
     "rewind_upgrade_dialog_title": "Rewind ben\u00f6tigt ein Upgrade auf ein kostenpflichtiges Paket",
-    "rewind_upgrade_info_text": "Um Ordner auf eine Version zur\u00fcckzusetzen, die bis zu 180 Tage zur\u00fcckliegt, [A1]upgraden Sie Ihr Paket.[/A1] [A2]Weitere Informationen zu Rewind.[/A2]",
+    "rewind_upgrade_info_text": "Um Ordner auf eine Version zur\u00fcckzusetzen, die bis zu 60 Tage zur\u00fcckliegt, [A1]upgraden Sie Ihr Paket.[/A1] [A2]Weitere Informationen zu Rewind.[/A2]",
     "rewind_upgrade_to_restore": "F\u00fcr Rewind upgraden",
     "ri_s4_tab": "MEGA S4 Objektspeicher",
     "rubbish_bin_empty": "Inhalte, die Sie aus Ihrem Cloud Drive l\u00f6schen, werden hier angezeigt.",

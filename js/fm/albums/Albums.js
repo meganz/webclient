@@ -726,7 +726,7 @@ lazy(mega.gallery, 'albums', () => {
             else if (albumId === scope.getAlbumIdFromPath()) {
                 if (grid.timeline) {
                     if (grid.timeline.selections[handle]) {
-                        grid.timeline.deselectNode(M.d[handle]);
+                        grid.timeline.deselectNode(scope.getNodeCache(handle));
                     }
 
                     if (grid.timeline.selCount > 0) {
@@ -1377,8 +1377,9 @@ lazy(mega.gallery, 'albums', () => {
                                     if (!existingHandles[h]) {
                                         addedCount++;
                                         handlesToAdd.push({ h, o: (nodes.length + handlesToAdd.length + 1) * 1000 });
+                                        const n = scope.getNodeCache(h);
 
-                                        if (M.d[h] && M.isGalleryVideo(M.d[h])) {
+                                        if (n && M.isGalleryVideo(n)) {
                                             this.videosCount++;
                                         }
                                         else {
@@ -1706,9 +1707,11 @@ lazy(mega.gallery, 'albums', () => {
             const { nodes, eIds, at: { c } } = scope.albums.store[this.albumId];
 
             if (nodes && nodes.length) {
+                const n = eIds[c] && scope.getNodeCache(eIds[c]);
+
                 this.timeline.selectNode(
-                    (c && eIds[c] && M.d[eIds[c]] && M.getNodeRoot(M.d[eIds[c]].p) !== M.RubbishID)
-                        ? M.d[eIds[c]]
+                    (c && n && M.getNodeRoot(n.p) !== M.RubbishID)
+                        ? n
                         : nodes[0]
                 );
             }
@@ -1740,7 +1743,7 @@ lazy(mega.gallery, 'albums', () => {
         }
 
         if ($.timelineDialog instanceof AlbumItemsDialog && timeline.selections[handle]) {
-            timeline.deselectNode(M.d[handle]);
+            timeline.deselectNode(scope.getNodeCache(handle));
             $.timelineDialog.updateSelectedCount(timeline.selCount);
         }
 
@@ -3113,7 +3116,8 @@ lazy(mega.gallery, 'albums', () => {
                         const selHandles = scope.albums.grid.timeline.selections;
                         scope.albums.grid.timeline._selCount = Object.keys(selHandles).length;
                         scope.albums.grid.timeline._selSize = Object.keys(selHandles).reduce((a, b) => {
-                            return a + (M.d[b] && M.d[b].s || 0);
+                            const nb = scope.getNodeCache(b);
+                            return a + (nb && nb.s || 0);
                         }, 0);
                         scope.albums.grid.timeline.onSelectToggle();
                     }
@@ -3808,7 +3812,7 @@ lazy(mega.gallery, 'albums', () => {
 
             if (Array.isArray(handles)) {
                 for (let i = 0; i < handles.length; i++) {
-                    const n = M.d[handles[i]];
+                    const n = scope.getNodeCache(handles[i]);
                     console.assert(n, `node ${handles[i]} not in memory...`);
                     if (n) {
                         nodes.push(n);
@@ -4087,18 +4091,19 @@ lazy(mega.gallery, 'albums', () => {
 
                 for (let i = 0; i < elements.length; i++) {
                     const { h, id } = elements[i];
+                    const n = scope.getNodeCache(h);
 
                     if (
-                        M.d[h]
-                        && !ignoreHandles[M.d[h].p]
+                        n
+                        && !ignoreHandles[n.p]
                         && !eHandles[h]
-                        && !M.d[h].fv
-                        && mega.sensitives.shouldShowNode(M.d[h])
+                        && !n.fv
+                        && mega.sensitives.shouldShowNode(n)
                     ) {
-                        nodes.push(M.d[h]);
+                        nodes.push(n);
 
                         if (id === coverHandle) {
-                            node = M.d[h];
+                            node = n;
                         }
                     }
 
@@ -4408,7 +4413,7 @@ lazy(mega.gallery, 'albums', () => {
 
             if (M.currentdirid === 'albums/' + s) {
                 if (this.grid.timeline && this.grid.timeline.selections[delHandle]) {
-                    this.grid.timeline.deselectNode(M.d[delHandle]);
+                    this.grid.timeline.deselectNode(scope.getNodeCache(delHandle));
                 }
 
                 if (album.nodes.length) {

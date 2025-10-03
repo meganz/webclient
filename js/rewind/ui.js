@@ -412,6 +412,12 @@ lazy(mega, 'rewindUi', () => {
             this.$contentRewindDescription.safeHTML(
                 l.rewind_select_date.replace('%d', mega.rewind.rewindableDays));
 
+            const upgradeSectionData = mega.rewind.getUpgradeSectionData();
+            if (upgradeSectionData) {
+                $('a', this.$contentRewindDescription).addClass('hidden');
+                this.$contentUpgradeDescription.safeHTML(upgradeSectionData);
+            }
+
             this.$contentUpgrade.removeClass('hidden');
             this.$upgradeLink = $('.rewind-sidebar-upgrade-action', this.sidebar);
 

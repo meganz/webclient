@@ -524,6 +524,10 @@ lazy(mega, 'rewind', () => {
             return currentDate;
         }
 
+        getUpgradeSectionData() {
+            return this.accountType === ACCOUNT_TYPE_FREE ? l.rewind_upgrade_info_text : null;
+        }
+
         getDatepickerOverlayContent() {
             return this.accountType === ACCOUNT_TYPE_FREE ?
                 l.rewind_datepicker_overlay_free_days : null;

@@ -6,7 +6,9 @@ mobile.settings.account.paymentCard = new function() {
     'use strict';
     let $page;
 
-    const render = (cardInfo) => {
+    const render = (cardInfo, purchaseDetails) => {
+
+        const validSubscription = mobile.settings.account.paymentCard.validateUser(purchaseDetails);
 
         if (cardInfo) {
 
@@ -60,6 +62,30 @@ mobile.settings.account.paymentCard = new function() {
                     .finally(() => loadingDialog.hide());
             });
 
+            const canDelete = !validSubscription && cardInfo.dcc;
+            const $deleteCard = $('.payment-card-bottom a.payment-card-delete', $page)
+                .toggleClass('hidden', !canDelete);
+
+            if (canDelete) {
+
+                $deleteCard.rebind('tap', () => {
+                    loadingDialog.show();
+
+                    api.req({a: 'gw19_dcc', id: cardInfo.id})
+                        .then(({result}) => {
+                            assert(result === 0, result);
+                            loadSubPage('fm/account');
+                        })
+                        .catch((ex) => {
+                            if (ex !== ENOENT) {
+                                eventlog(500970, ex);
+                                msgDialog('warninga', '', l.delete_card_error.replace('%1', ex), l.edit_card_error_des);
+                            }
+                        })
+                        .finally(() => loadingDialog.hide());
+                });
+            }
+
             // Show the account page content
             $page.removeClass('hidden');
         }
@@ -86,12 +112,13 @@ mobile.settings.account.paymentCard = new function() {
 
         loadingDialog.show();
 
-        api_req({ a: 'cci', v: 2 }, {
+        api_req({ a: 'cci', v: 4 }, {
             callback: (res) => {
 
                 loadingDialog.hide();
                 if (typeof res === 'object' && mobile.settings.account.paymentCard.validateCardResponse(res)) {
-                    return render(res);
+                    return api.req({a: 'uq', pro: 1, v: 2})
+                        .then(({result}) => render(res, result));
                 }
 
                 $page.addClass('hidden');

@@ -1175,6 +1175,10 @@
     height: 61px;
     background-color: #03A892;
     direction: ltr;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
 }
 .account.account-card-info.visa .payment-card-top {
     background-color: #4BB8F3;
@@ -1226,13 +1230,14 @@
     font: var(--text-body1);
     margin-left: 1px;
 }
-.account.account-card-info .payment-card-edit {
+.account.account-card-info .payment-card-edit,
+.account.account-card-info .payment-card-delete {
     display: inline-block;
     color: var(--text-color-white-higher);
     font: var(--text-body1);
-    margin-left: 26px;
-    margin-top: 26px;
+    margin: 0 26px;
     text-decoration: underline;
+    padding: 15px 0;
 }
 
 /* Contacts & Chats > Chat Settings */

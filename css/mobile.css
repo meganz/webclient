@@ -10530,7 +10530,11 @@ code, c {
 .mobile.payment-card-page .card-info.payment-card .payment-card-bottom {
     width: 285.96px;
     height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     background-color: #03A892;
+    flex-wrap: wrap;
 }
 .mobile.payment-card-page .card-info.payment-card.mc .payment-card-bottom {
     background-color: #E58D27;
@@ -10567,13 +10571,14 @@ code, c {
     color: var(--text-color-white-higher);
     font: var(--text-caption);
 }
-.mobile.payment-card-page .card-info.payment-card .payment-card-edit {
+.mobile.payment-card-page .card-info.payment-card .payment-card-edit,
+.mobile.payment-card-page .card-info.payment-card .payment-card-delete {
     display: inline-block;
     color: var(--text-color-white-higher);
-    margin-top: 16px;
-    margin-left: 17px;
+    margin: 0 17px;
     font: var(--text-caption);
     text-decoration: underline;
+    padding: 15px 0;
 }
 
 /*

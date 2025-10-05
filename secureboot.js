@@ -3919,7 +3919,7 @@ else if (!browserUpdate) {
 
         // Redirect static pages to mega.io if there isn't a stored session ID (regardless of its validity),
         // since without a session-id it's not possible to access any internal page.
-        if (is_livesite && !u_storage.sid && !is_iframed && isStaticPage(page) && !location.hash) {
+        if ((location.host === 'mega.nz' || location.host === 'mega.app') && !u_storage.sid && !is_iframed && isStaticPage(page) && !location.hash) {
             return mega.redirect('mega.io', page, false, locationSearchParams);
         }
 

@@ -889,11 +889,12 @@ function fmtopUI() {
         else if (isSearchResult) {
             mega.ui.secondaryNav.hideBreadcrumb();
         }
-
-        if (mega.rewind) {
-            mega.rewind.settings.reductionBanner.init($('.rewind-reduction', '.fmholder'), 'main');
-        }
     }
+
+    if (mega.rewind) {
+        mega.rewind.settings.reductionBanner.init($('.rewind-reduction', '.fmholder'), 'main');
+    }
+
     $('.fm-clearbin-button').rebind('click', function() {
         if (M.isInvalidUserStatus()) {
             return;

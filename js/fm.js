@@ -2168,9 +2168,8 @@ function closeDialog(ev) {
         MegaLogger.getLogger('closeDialog').debug($.dialog);
     }
 
-    if (!$('.mega-dialog.registration-page-success').hasClass('hidden')) {
-        fm_hideoverlay();
-        $('.mega-dialog.registration-page-success').addClass('hidden').removeClass('special');
+    if (mega.onCloseDialogDispatcher) {
+        tryCatch(mega.onCloseDialogDispatcher)();
     }
 
     if ($('.mega-dialog.incoming-call-dialog').is(':visible') === true || $.dialog === 'download-pre-warning') {
@@ -2371,10 +2370,12 @@ function closeDialog(ev) {
     }
 
     if ($.dialog === 'createfolder') {
+        $('.mega-dialog').trigger('dialog-closed::create-folder');
         if ($.cfpromise) {
             $.cfpromise.reject();
             delete $.cfpromise;
         }
+        delete $.cftarget;
     }
     else if ($.dialog !== 'terms') {
         delete $.mcImport;
@@ -2443,9 +2444,6 @@ function createFolderDialog(close) {
     const ltWSpaceWarning = InputFloatWarning($dialog).hide();
 
     if (close) {
-        if ($.cftarget) {
-            delete $.cftarget;
-        }
         if ($.dialog === 'createfolder') {
             closeDialog();
         }

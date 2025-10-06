@@ -2031,6 +2031,11 @@ lazy(mega.ui, 'mShareDialog', () => {
      */
     function showShareDlg() {
 
+        $.addContactsToShare = {};       // GLOBAL VARIABLE, add contacts to a share
+        $.changedPermissions = {};       // GLOBAL VARIABLE, changed permissions shared dialog
+        $.removedContactsFromShare = {}; // GLOBAL VARIABLE, removed contacts from a share
+        $.shareDialog = 'share';
+
         $dialog.rebind('dialog-closed.share', () => {
 
             $dialog.off('dialog-closed.share');
@@ -2070,11 +2075,6 @@ lazy(mega.ui, 'mShareDialog', () => {
             if (u_type === 0) {
                 return ephemeralDialog(l[1006]); // Sharing folders is only for logged-in users
             }
-
-            $.addContactsToShare = {};       // GLOBAL VARIABLE, add contacts to a share
-            $.changedPermissions = {};       // GLOBAL VARIABLE, changed permissions shared dialog
-            $.removedContactsFromShare = {}; // GLOBAL VARIABLE, removed contacts from a share
-            $.shareDialog = 'share';
 
             Promise.resolve(mega.fileRequestCommon.storage.isDropExist(target))
                 .then((res) => {

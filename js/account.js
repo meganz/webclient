@@ -342,22 +342,6 @@ function u_checklogin3a(res, ctx) {
                     });
             })
             .then(() => {
-                // there was a race condition between importing and business accounts creation.
-                // in normal users there's no problem, however in business the user will be disabled
-                // till they pay. therefore, if the importing didnt finish before 'upb' then the importing
-                // will fail.
-                if ($.createanonuser === u_attr.u) {
-                    delete $.createanonuser;
-
-                    if (self.pfid) {
-                        M.importWelcomePDF().catch(dump);
-                    }
-                    else {
-                        return M.importWelcomePDF().catch(dump);
-                    }
-                }
-            })
-            .then(() => {
                 ctx.checkloginresult(ctx, r);
             })
             .catch((ex) => {
@@ -601,7 +585,6 @@ function u_setrsa(rsakey) {
                             crypt.getPubKeyAttribute(u_attr.b.bu, 'RSA')
                                 .then(function(res) {
                                     window.businessSubAc = {bu: u_attr.b.bu, bpubk: res};
-                                    mBroadcaster.once('fm:initialized', () => M.importWelcomePDF().catch(dump));
                                     $promise.linkDoneAndFailTo(u_setrsa(rsakey));
                                 })
                                 .catch(onError.bind(null, l[22897]));

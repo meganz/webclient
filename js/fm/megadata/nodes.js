@@ -4330,24 +4330,6 @@ MegaData.prototype.disableDescendantFolders = function(id, pref) {
 };
 
 /**
- * Import welcome pdf into the current account.
- * @returns {Promise}
- */
-MegaData.prototype.importWelcomePDF = async function() {
-    'use strict';
-
-    const {result: {ph, k}} = await api.req({a: 'wpdf'});
-    const {result: {at}} = await api.req({a: 'g', p: ph});
-
-    if (d) {
-        console.info('Importing Welcome PDF (%s)', ph, at);
-    }
-
-    assert(typeof at === 'string');
-    return this.importFileLink(ph, k, at);
-};
-
-/**
  * Retrieve public-link node.
  * @param {String} ph public-handle
  * @param {String} key decryption key

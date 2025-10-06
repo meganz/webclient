@@ -247,8 +247,6 @@ mobile.register = {
                                 mobile.signin.old.startLogin,
                                 mobile.signin.new.startLogin);
 
-                            // I need this event handler to be triggered only once after successful sub-user login
-                            mBroadcaster.once('fm:initialized', () => M.importWelcomePDF().catch(dump));
                             delete localStorage.businessSubAc;
                         }
                     },

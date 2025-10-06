@@ -894,13 +894,8 @@ lazy(s4, 'ui', () => {
 
         show() {
             M.safeShowDialog(this.getDialogName(), () => {
-                $('.fm-dialog-overlay').rebind('click.s4', () => {
-                    // TODO it would be easy to control here if the dialog should be closed or not
-                    // depending on this.tainted or if cancel confirmation dialog is open
-                    this.destroy();
-                });
-                this.$dialogContainer.rebind('dialog-closed.s4dlg', () => {
-                    this.$dialogContainer.off('dialog-closed.s4dlg');
+                this.$dialogContainer.rebind('dialog-closed::create-folder.s4dlg', () => {
+                    this.$dialogContainer.unbind('dialog-closed::create-folder.s4dlg');
                     this.destroy();
                 });
                 $('button.js-close', this.$dialogContainer).rebind('click.s4dlg', () => {

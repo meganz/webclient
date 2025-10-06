@@ -3621,6 +3621,9 @@ Object.defineProperty(FMResizablePane, 'refresh', {
 
                 cl.setOption('maxWidth', M.fmTabPages['cloud-drive'][M.currentrootid] ? null : 400);
             }
+            else if (cl) {
+                cl.refresh();
+            }
 
             return cl;
         }

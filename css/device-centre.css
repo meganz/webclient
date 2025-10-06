@@ -277,8 +277,7 @@ table.device-centre .device-centre-item-modified {
 
 .device-centre-grid-view .grid-table th:first-child,
 .device-centre-grid-view .grid-table td:first-child {
-    width: 0;
-    padding: 0 13px;
+    width: 13px;
 }
 .device-centre-grid-view .grid-table td:first-child {
     pointer-events: none;

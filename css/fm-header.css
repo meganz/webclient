@@ -759,7 +759,7 @@ body.es .mega-component.menu-container.overlay-wrap.fm-sort-menu {
 .small-nav .fm-right-header .fm-card-holder,
 .small-nav .fm-right-header .fm-filter-chips-wrapper,
 .small-nav .fm-right-header .dc-filter-chips-wrapper,
-.small-nav .fm-right-header .selection-status-bar,
+.small-nav .fm-right-header .selection-status-bar:not(.gallery-pad),
 .small-nav.not-logged .fm-right-header.folder-link .fm-files-view-icon {
     display: none;
 }

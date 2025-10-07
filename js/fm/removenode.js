@@ -67,6 +67,20 @@ function removeUInode(h, parent) {
         delay('removeNodeExtraToggle', () => {
             if (!M.v.length) {
                 mega.ui.secondaryNav.toggleGridExtraButtons(true);
+                if (mega.ui.mNodeFilter && mega.ui.mNodeFilter.selectedFilters.value) {
+                    let childCount;
+                    if (M.search) {
+                        // @todo - need to calculate the search result count and use that as childCount
+                    }
+                    else {
+                        const tgt = M.c[M.currentCustomView.nodeID || M.currentdirid];
+                        childCount = tgt && Object.keys(tgt).length;
+                    }
+                    if (childCount === 0 || childCount === undefined) {
+                        mega.ui.mNodeFilter.resetFilterSelections(false);
+                    }
+                }
+                M.clearSelectedNodes();
                 mega.ui.secondaryNav.extHideFilterChip();
             }
         }, 100);

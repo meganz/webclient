@@ -1526,7 +1526,7 @@
                 onClick() {
                     $.selected = mega.ui.contextMenu.selectedItems;
                     // @todo support passing handles directly to the copyDialog.
-                    openCopyDialog('conversations');
+                    openSendToChatDialog();
                 }
             },
             {

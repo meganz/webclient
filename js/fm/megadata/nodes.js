@@ -86,6 +86,9 @@
             if (!level) {
                 this.delIndex(n.p, h);
             }
+            if (n.t) {
+                mega.quickAccessLocations.remove(n.h);
+            }
             this.delHash(n);
             delete sd[h];
         }

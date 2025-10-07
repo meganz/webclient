@@ -210,7 +210,6 @@ mBroadcaster.once('boot_done', () => {
         },
         getNodeShare: dummy,
         getS4NodeType: dummy,
-        importWelcomePDF: dummy,
         getNodeShareUsers: dummy,
         getShareNodesSync: dummy,
         shouldCreateThumbnail: () => true,

@@ -20,6 +20,9 @@ lazy(mega, 'lite', () => {
     /** Timer to count how long the load is taking */
     let liteModeTimeoutId;
 
+    /** whether the current folder view have partial contents only */
+    let lPatialContents;
+
     /** Disabled sections for MEGA Lite*/
     const disabledSections = freeze({
         faves: 1,
@@ -187,6 +190,9 @@ lazy(mega, 'lite', () => {
 
     // Make public the following:
     return freeze({
+        get partial() {
+            return lPatialContents;
+        },
         inLiteMode,
         recommendLiteMode,
         initBackToMegaButton,

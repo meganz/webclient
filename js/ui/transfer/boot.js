@@ -301,6 +301,10 @@ mBroadcaster.once('boot_done', () => {
         getNodeRights: () => false,
         isInvalidUserStatus: () => false,
         getNodeByHandle: (h) => M.d[M.xh[h]] || M.d[h] || false,
+        getChildren(h, each) {
+            console.assert(!each);
+            return M.c[h] || false;
+        },
         getNameByHandle(h) {
             if (h && h.length === 11) {
                 const {name, fullname, email} = this.getUserByHandle(h);

@@ -2461,9 +2461,9 @@ FileManager.prototype.initUIKeyEvents = function() {
             !is_transfers_or_accounts &&
             (e.keyCode === 113 /* F2 */) &&
             (s.length > 0) &&
-            !$.dialog && M.getNodeRights(M.d[s[0]] && M.d[s[0]].h) > 1 &&
+            !$.dialog && M.getNodeRights(s[0]) > 1 &&
             M.currentrootid !== M.InboxID &&
-            M.getNodeRoot(M.d[s[0]].h) !== M.InboxID
+            M.getNodeRoot(s[0]) !== M.InboxID
         ) {
             renameDialog();
         }

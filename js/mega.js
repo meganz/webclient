@@ -1138,10 +1138,14 @@ scparser.$add('t', function(a, scnodes) {
 
     const mns = $.moveNodeShares;
     for (i = 0; i < scnodes.length; i++) {
-        if (scnodes[i]) {
+        const n = scnodes[i];
+
+        if (n && (!mega.infinity || M.c[n.p] || M.tnc[n.p])) {
 
             M.addNode(scnodes[i]);
-            ufsc.feednode(scnodes[i]);
+            if (!M.tnc[n.p]) {
+                ufsc.feednode(n);
+            }
 
             if (mns) {
                 const {h} = scnodes[i];
@@ -1417,7 +1421,7 @@ scparser.$add('fa', function(a) {
 
 scparser.$add('u', function(a) {
     // update node attributes
-    const n = M.d[a.n];
+    const n = M.getNodeByHandle(a.n);
     if (n) {
         let oldattr;
 
@@ -1459,7 +1463,7 @@ scparser.$add('u', function(a) {
             // success - check what changed and redraw
             if (a.at && fminitialized) {
                 if (oldattr.lbl !== n.lbl) {
-                    M.labelDomUpdate(n.h, n.lbl);
+                    M.labelDomUpdate(n, n.lbl);
                 }
                 if (oldattr.fav !== n.fav) {
                     M.favouriteDomUpdate(n, n.fav);
@@ -1479,7 +1483,7 @@ scparser.$add('u', function(a) {
             }
 
             // save modified node
-            M.nodeUpdated(n);
+            M.nodeUpdated(n, !M.d[n.h]);
         }
     }
 });
@@ -2078,7 +2082,7 @@ function execsc() {
 function fm_updated(n) {
     "use strict";
 
-    M.nodeUpdated(n);
+    M.nodeUpdated(n, !M.d[n.h]);
 
     if (fminitialized) {
         removeUInode(n.h);
@@ -2223,18 +2227,31 @@ function emplacenode(node, noc) {
             }
             M.c[node.su][node.h] = node.t + 1;
         }
-        if (!noc) {
-            if (!M.c[node.p]) {
-                M.c[node.p] = Object.create(null);
-            }
-            M.c[node.p][node.h] = node.t + 1;
-        }
 
         if (node.hash) {
             if (!M.h[node.hash]) {
                 M.h[node.hash] = new Set();
             }
             M.h[node.hash].add(node.h);
+        }
+
+        if (M.tnc[node.p]) {
+            const n = M.tnd[node.h] = M.tnc[node.p][node.h] = Object.setPrototypeOf(node, MegaNode.prototype);
+            Object.defineProperty(n, 'transient', {value: true});
+            if (n.t) {
+                M.tnc[n.h] = Object.create(null);
+            }
+            if (self.d) {
+                console.warn(`newly established transient node with handle '${n.h}' (${n.t})...`);
+            }
+            return;
+        }
+
+        if (!noc) {
+            if (!M.c[node.p]) {
+                M.c[node.p] = Object.create(null);
+            }
+            M.c[node.p][node.h] = node.t + 1;
         }
     }
     else if (node.t > 1 && node.t < 5) {
@@ -2706,7 +2723,7 @@ function dbfetchfm(residual) {
             if (r.length) {
                 processPS(r, true);
                 // processPS may invokes nodeShare(), that uses acquire.
-                return dbfetch.acquire(r.map(n => n.h));
+                return dbfetch.acquired(r.map(n => n.h));
             }
         },
         puf: function _(r) {
@@ -2868,7 +2885,8 @@ function treetype(h) {
     "use strict";
 
     for (;;) {
-        if (!M.d[h]) {
+        const n = M.getNodeByHandle(h);
+        if (!n) {
             return h;
         }
 
@@ -2877,20 +2895,20 @@ function treetype(h) {
         }
 
         // root node reached?
-        if (M.d[h].t > 1) {
+        if (n.t > 1) {
             return 'cloud';
         }
 
         // incoming share reached? (does not need to be the outermost one)
-        if (M.d[h].su) {
+        if (n.su) {
             return 'shares';
         }
 
-        if ('contacts shares messages opc ipc '.indexOf(M.d[h].p + ' ') >= 0) {
-            return M.d[h].p;
+        if ('contacts shares messages opc ipc '.includes(`${n.p} `)) {
+            return n.p;
         }
 
-        h = M.d[h].p;
+        h = n.p;
     }
 }
 
@@ -2898,7 +2916,7 @@ function treetype(h) {
 async function shared(h) {
     "use strict";
 
-    if (!M.d[h]) {
+    if (!M.getNodeByHandle(h)) {
         await dbfetch.acquire(h);
     }
     return shared.is(h);
@@ -2907,11 +2925,12 @@ async function shared(h) {
 shared.is = function(h) {
     'use strict';
 
-    while (M.d[h]) {
-        if (M.isOutShare(h)) {
-            return h;
+    let n = M.getNodeByHandle(h);
+    while (n.p) {
+        if (M.isOutShare(n.h)) {
+            return n.h;
         }
-        h = M.d[h].p;
+        n = M.getNodeByHandle(n.p);
     }
     return false;
 };
@@ -2920,12 +2939,13 @@ shared.is = function(h) {
 function sharer(h) {
     "use strict";
 
-    while (h && M.d[h]) {
-        if (M.d[h].su) {
-            return M.d[h].su;
+    let n = M.getNodeByHandle(h);
+    while (n) {
+        if (n.su) {
+            return n.su;
         }
 
-        h = M.d[h].p;
+        n = M.getNodeByHandle(n.p);
     }
 
     return false;
@@ -2944,7 +2964,10 @@ function ddtype(ids, toid, alt) {
     for (var i = ids.length; i--; ) {
         var fromid = ids[i];
 
-        if (fromid === toid || !M.d[fromid]) return false;
+        if (fromid === toid || !M.getNodeByHandle(fromid)) {
+
+            return false;
+        }
 
         var fromtype = treetype(fromid);
 
@@ -3998,13 +4021,6 @@ function loadfm_done(mDBload) {
 
         // load/initialise the authentication system
         authring.initAuthenticationSystem();
-
-        tryCatch(() => {
-            // Initialise the Back to MEGA button (only shown if in MEGA Lite mode)
-            if (mega.lite.inLiteMode) {
-                mega.lite.initBackToMegaButton();
-            }
-        })();
     }
 
     // This function is invoked once the M.openFolder()'s promise (through renderfm()) is fulfilled.

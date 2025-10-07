@@ -1369,7 +1369,8 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
             // On ephemeral was undefined
             target = M.RootID;
         }
-        dbfetch.get(String(target)).finally(() => {
+        target = `${target || ''}`;
+        Promise.resolve(!target || M.getChildren(target) || dbfetch.get(target)).finally(() => {
             makeDirProc();
             // M.checkGoingOverStorageQuota(ulOpSize).done(makeDirProc);
         });
@@ -1397,10 +1398,10 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
             targets[file.target] = 1;
         }
 
-        return dbfetch.geta(Object.keys(targets)).then((r) => {
+        return dbfetch.geta(Object.keys(targets).filter(h => !M.getChildren(h))).then((r) => {
             // loadingDialog.hide();
 
-            if (!M.c[target] && String(target).length !== 11 && !toChat) {
+            if (!toChat && !M.getChildren(target) && String(target).length !== 11) {
                 if (d) {
                     ulmanager.logger.warn("Error dbfetch'ing target %s", target, r);
                 }

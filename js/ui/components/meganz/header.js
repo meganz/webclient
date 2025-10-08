@@ -441,8 +441,8 @@ class MegaHeader extends MegaMobileHeader {
         mega.ui.header.handleMenu('notif');
         mega.ui.header.notifButton.icon = mega.ui.header.notifButton.icon.replace('thin-outline', 'regular-filled');
         if (document.body.classList.contains('rtl')) {
-            this.notifMenu.style.right = fmconfig.leftPaneWidth <= 270 ?
-                `-${8 + (270 - fmconfig.leftPaneWidth)}px` : '-8px';
+            const width = document.body.classList.contains('small-lhp') ? 72 : fmconfig.leftPaneWidth;
+            this.notifMenu.style.right = width <= 270 ? `-${8 + (270 - width)}px` : '-8px';
         }
         eventlog(500322);
     }

@@ -1724,7 +1724,15 @@ function init_page() {
             }
         }
         else if ((!pfid || flhashchange) && (id && id !== M.currentdirid || page === 'start' || page === 'fm/pwm')) {
-            M.openFolder(id, true);
+
+            M.openFolder(id, true)
+                .then(() => {
+
+                    if (localStorage.dlimp) {
+                        return M.fireFMDependantActions();
+                    }
+                })
+                .catch(reportError);
         }
         else {
             if (ul_queue.length > 0) {
@@ -2531,7 +2539,7 @@ function topmenuUI() {
             elements = document.getElementsByClassName('js-dropdown-rewind-progress');
 
             for (i = elements.length; i--;) {
-                if (!elements[i].classList.contains('active') || e && e.target.closest('.topbar-links, .mega-header')) {
+                if (!elements[i].classList.contains('active')) {
                     elements[i].classList.remove('show');
                 }
             }
@@ -3427,30 +3435,6 @@ mBroadcaster.once('boot_done', () => {
             setTimeout(performMeasurement, interval);
         })();
     }
-});
-
-mBroadcaster.addListener('fm:initialized', () => {
-    'use strict';
-
-    if (folderlink) {
-        return;
-    }
-
-    tSleep(4 + Math.random()).then(() => {
-        // Add the dynamic notifications
-        if (typeof notify.addDynamicNotifications !== 'undefined') {
-            notify.addDynamicNotifications().catch(dump);
-        }
-
-        if (u_attr['^!welpdf'] === '0') {
-            Promise.all([
-                M.importWelcomePDF(),
-                mega.attr.set2(null, 'welpdf', '1', -2, true)
-            ]).dump('welpdf');
-        }
-    });
-
-    return 0xDEAD;
 });
 
 // After open folder call, check if we should restore any previously opened preview node.

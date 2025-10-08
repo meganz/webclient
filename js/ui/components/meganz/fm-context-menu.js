@@ -1759,7 +1759,8 @@
         return {
             selectedItems: [],
             get firstNode() {
-                return M.d[this.selectedItems[0]];
+                return M.d[this.selectedItems[0]] ||
+                    (M.gallery || M.albums) && mega.gallery.getNodeCache(this.selectedItems[0]);
             },
             get firstAlbum() {
                 if (!mega.gallery || !mega.gallery.albums) {

@@ -2089,6 +2089,9 @@
                     handleOpenDialog(0, target || M.RootID, mode);
 
                     $.selectFolderCallback = (target) => {
+                        if ($.dialog !== dialogName) {
+                            return;
+                        }
                         $dialog.off('dialog-closed.sfd');
                         delete $.selectFolderCallback;
 
@@ -2379,6 +2382,7 @@
             }
 
             $.cftarget = target;
+            console.assert(!$.cfpromise, 'We already have a pending folder creation request...');
             ($.cfpromise = mega.promise)
                 .then((h) => callback(h))
                 .catch(nop);
@@ -2725,10 +2729,12 @@
                 else {
                     return;
                 }
-                string = (unclearResult ? string : mega.icu.format(string, count)).replace('%s', targetName);
+
+                string = (unclearResult ? string : mega.icu.format(string, count))
+                    .replace(/%s/g, `<span class="long-title-truncate">${targetName}</span>`);
                 if (typeof viewCb === 'function') {
                     mega.ui.toast.show(
-                        string,
+                        parseHTML(string),
                         4,
                         l[16797],
                         { actionButtonCallback: viewCb }
@@ -2773,7 +2779,6 @@
 
             if ($.selectFolderCallback) {
                 tryCatch(() => $.selectFolderCallback($.mcselected))();
-                delete $.selectFolderCallback;
                 closeDialog();
                 return false;
             }

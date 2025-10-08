@@ -776,13 +776,6 @@ function closedlpopup()
     document.getElementById('download_popup').style.left = '-500px';
 }
 
-function importFile() {
-    'use strict';
-    M.importFileLink(dl_import[0], dl_import[1], dl_attr, dl_import[2]).always(function() {
-        mBroadcaster.sendMessage('fm:importFileLinkDone');
-    });
-}
-
 function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
 {
     var now = Date.now();
@@ -887,7 +880,14 @@ function dlstart(id,name,filesize)
 function start_import() {
     'use strict';
 
-    dl_import = [dlpage_ph, dlkey, dl_node];
+    if (!self.dl_node) {
+        return;
+    }
+    dl_import = [dlpage_ph, dlkey, dl_node, dl_attr];
+
+    tryCatch(() => {
+        localStorage.dlimp = JSON.stringify(dl_import);
+    })();
 
     if (u_type) {
         loadSubPage('fm');
@@ -921,17 +921,18 @@ function start_import() {
     };
 
     msgDialog(dialogType, l[1193], dialogHeader, dialogTxt, function(e) {
-        if (e === 'login') {
+        if (e === 0) {
             buttonEventLogin();
         }
-        else if (e === 'register') {
+        else if (e === 1) {
             buttonEventRegister();
         }
-        else if (e === 'ephemeral') {
+        else if (e === -2) {
             start_anoimport();
         }
         else {
             dl_import = false;
+            delete localStorage.dlimp;
         }
     });
 }

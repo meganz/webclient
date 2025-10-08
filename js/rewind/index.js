@@ -132,21 +132,12 @@ lazy(mega, 'rewind', () => {
                     get isActive() {
                         const now = Date.now();
                         return now >= this.start && now < this.end;
-                    },
-                    get isEnd() {
-                        const now = Date.now();
-                        return now >= this.end;
                     }
                 };
 
                 const retentionDays = {
                     _attr: 'rewinddays',
-                    get default() {
-                        if (user.isPro && user.isLegacy && !gracePeriod.isEnd) {
-                            return user.isLowPro ? '90' : '180';
-                        }
-                        return '30';
-                    },
+                    default: '30',
                     get max() {
                         if (user.isPro) {
                             if (user.isLegacy) {
@@ -184,29 +175,56 @@ lazy(mega, 'rewind', () => {
                 };
 
                 const reductionBanner = {
-                    async init($notif, id) {
+                    config: {
+                        main: {
+                            id: 'dsmRewRed1',
+                            event: {
+                                _isSent: false,
+                                loaded: () => {
+                                    if (!this._isSent) {
+                                        eventlog(500981);
+                                        this._isSent = true;
+                                    }
+                                },
+                                dismissed: 500983
+                            }
+                        },
+                        inline: {
+                            id: 'dsmRewRed2',
+                            event: {
+                                loaded: 500982,
+                                dismissed: 500984
+                            }
+                        }
+                    },
+                    async init($notif, configName) {
                         if (user.isPro && user.isLegacy && gracePeriod.isActive) {
                             if (await retentionDays.fetch()) {
                                 $notif.removeClass('visible');
                                 return;
                             }
 
-                            const config = {
-                                'main': 'dsmRewRed1',
-                                'inline': 'dsmRewRed2',
-                            };
+                            const {id: configId, event} = this.config[configName] || {};
 
-                            if (config[id] && !mega.config.get(config[id])) {
-                                clickURLs();
+                            if (configId && !mega.config.get(configId)) {
                                 $('.message-text',$notif).safeHTML(
                                     l.bf_rewind_rd_notif_msg
                                         .replace('%1', 30)
                                         .replace('%d', time2date(gracePeriod.end / 1000, 2)));
 
                                 $notif.addClass('visible');
+
+                                if (typeof event.loaded === 'function') {
+                                    event.loaded();
+                                }
+                                else {
+                                    eventlog(event.loaded);
+                                }
+
                                 $('button', $notif).rebind('click.bfrRwRetBanner.close', () => {
-                                    mega.config.set(config[id], 1);
+                                    mega.config.set(configId, 1);
                                     $notif.removeClass('visible');
+                                    eventlog(event.dismissed);
                                 });
                             }
                         }
@@ -283,6 +301,8 @@ lazy(mega, 'rewind', () => {
             });
 
             await mega.rewindUi.sidebar.init(listContainer, selectedHandle, isOpenFolder || isAccUpgraded);
+            await this.settings.reductionBanner.init(
+                $('.reduction-notification', mega.rewindUi.sidebar.sidebar), 'inline');
 
             onIdle(clickURLs);
             logger.info('Rewind.openSidebar - Sidebar opened..');
@@ -832,6 +852,8 @@ lazy(mega, 'rewind', () => {
                 const promiseSet = new Set();
                 let batchPromise = null;
 
+                logger.info(`Rewind.loadActionPacket - Processing ${packets.length} packets`);
+                console.time('rewind:index:getRecords:packet:process');
                 for (let i = 0; i < packets.length; i++) {
                     const packet = packets[i];
                     if (!packet) {
@@ -886,6 +908,7 @@ lazy(mega, 'rewind', () => {
 
                     order++;
                 }
+                console.timeEnd('rewind:index:getRecords:packet:process');
 
                 if ((sn && lastSn && lastSn !== sn) || (sn && !lastSn) || !treeCacheState.lastSn) {
                     // We fill in necessary details for
@@ -924,14 +947,18 @@ lazy(mega, 'rewind', () => {
         handleUpdatePacket(
             dateData, actionPacket, actionPacketFiles, actionDateString, actionPacketTimestamp
         ) {
-            const nodes = actionPacketFiles.map((file) => {
-                const node = this.nodeDictionary[file.h];
-                if (node) {
-                    file.p = node.p;
-                    file.t = node.t;
+            const nodes = [];
+            for (let i = 0; i < actionPacketFiles.length; i++) {
+                const node = actionPacketFiles[i];
+                const nodeInDict = this.nodeDictionary[node.h];
+                if (nodeInDict) {
+                    node.p = nodeInDict.p;
+                    node.t = nodeInDict.t;
                 }
-                return file;
-            }).filter((file) => file.t !== undefined);
+                if (node.t !== undefined) {
+                    nodes.push(node);
+                }
+            }
 
             dateData[actionDateString].actions.push({
                 d: {
@@ -980,7 +1007,7 @@ lazy(mega, 'rewind', () => {
                     this.prepareNode(node, this.nodeDictionary, this.nodeChildrenDictionary);
                 }
 
-                if (node.fv || actionPacketFiles.length > 1) {
+                if (node.fv) {
                     this.prepareNode({...node, ts: actionPacketTimestamp},
                                      dateData[actionDateString].modified, false, true);
                     dateData[actionDateString].type[node.h] = TYPE_MODIFIED;

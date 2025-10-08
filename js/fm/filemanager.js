@@ -97,6 +97,8 @@ function FileManager() {
         }
     };
 
+    this.emptyStates = '.fm-blocks-view, .fm-empty-cloud, .fm-empty-folder, .fm-empty-s4-bucket';
+
     // Grid header config update function, this also used to update filter options in icon view.
     // eslint-disable-next-line complexity
     $.gridHeader = function() {
@@ -309,6 +311,33 @@ FileManager.prototype.initS4FileManager = mutex('s4-object-storage.lock', functi
 });
 
 /**
+ * @param {jQuery?} selected jQuery element(s) to de-select
+ * @param {jQuery.Event} e jQuery event to work with
+ * @returns {void}
+ */
+FileManager.prototype.onContextMenu = function(selected, e) {
+    'use strict';
+
+    // Remove context menu option from filtered view and media discovery view
+    if (page === 'fm/links' || M.gallery) {
+        return false;
+    }
+
+    if (selected) {
+        selected.removeClass('ui-selected');
+    }
+
+    if (selectionManager) {
+        selectionManager.clear_selection();
+    }
+
+    $.selected = [];
+    $.hideTopMenu();
+
+    return !!M.contextMenuUI(e, 2);
+};
+
+/**
  * Initialize the rendering of the cloud/file-manager
  * @details Former renderfm()
  * @returns {MegaPromise}
@@ -409,11 +438,60 @@ FileManager.prototype.initFileManager = async function() {
         megaChat.renderMyStatus();
     }
 
+    this.fireFMDependantActions();
+
     if (d) {
         console.timeEnd('renderfm');
     }
 
     return res;
+};
+
+/**
+ * Actions for both mobile and desktop upon first entering the FM.
+ */
+FileManager.prototype.fireFMDependantActions = function() {
+    'use strict';
+
+    if (folderlink) {
+        return;
+    }
+
+    // Update top menu
+    onIdle(topmenuUI);
+
+    // Add the dynamic notifications
+    tSleep(4 + Math.random()).then(() => {
+        if (notify.addDynamicNotifications !== undefined) {
+            notify.addDynamicNotifications().catch(dump);
+        }
+    });
+
+    // Fire KeyMgr dependant actions
+    if (mega.keyMgr.version) {
+
+        queueMicrotask(() => {
+
+            M.fireKeyMgrDependantActions().catch(dump);
+        });
+    }
+
+    // Fire file importing
+    return tSleep(1 + Math.random()).then(() => {
+        const {dlimp} = localStorage;
+
+        if (dlimp) {
+            if (!self.dl_import) {
+                self.dl_import = tryCatch(() => JSON.parse(dlimp))();
+            }
+            delete localStorage.dlimp;
+        }
+
+        if (self.dl_import) {
+            M.importFileLink(dl_import[0], dl_import[1], dl_import[3], dl_import[2]).catch(dump);
+            self.dl_import = false;
+        }
+    });
 };
 
 /**
@@ -904,7 +982,6 @@ FileManager.prototype.initFileManagerUI = function() {
     M.initContextUI();
     M.addTransferPanelUI();
     M.initUIKeyEvents();
-    M.onFileManagerReady(topmenuUI);
     M.initMegaSwitchUI();
 
     // disabling right click, default contextmenu.
@@ -1209,10 +1286,6 @@ FileManager.prototype.initFileManagerUI = function() {
     }
 
     folderlink = folderlink || 0;
-
-    if ((typeof dl_import !== 'undefined') && dl_import) {
-        M.onFileManagerReady(importFile);
-    }
 
     $('.dropdown.body.context').rebind('contextmenu.dropdown', function(e) {
         if (!localStorage.contextmenu) {
@@ -1784,20 +1857,13 @@ FileManager.prototype.initContextUI = function() {
         });
         $('.transfer-table tr.ui-selected').removeClass('ui-selected');
     });
-
-    if (mega.keyMgr.version) {
-
-        queueMicrotask(() => {
-
-            this.fireKeyMgrDependantActions().catch(dump);
-        });
-    }
 };
 
 FileManager.prototype.fireKeyMgrDependantActions = async function() {
     'use strict';
 
-    if (sessionStorage.folderLinkImport || ($.onImportCopyNodes && !$.onImportCopyNodes.opSize)) {
+    // Fire folder importing
+    if (localStorage.folderLinkImport || ($.onImportCopyNodes && !$.onImportCopyNodes.opSize)) {
 
         await M.importFolderLinkNodes(false);
     }
@@ -2366,20 +2432,12 @@ FileManager.prototype.initUIKeyEvents = function() {
             $selectBlock.removeClass('active');
         }
         else if (e.keyCode == 27 && $.msgDialog) {
-            closeMsg();
-            if ($.warningCallback) {
-                $.warningCallback(false);
-                $.warningCallback = null;
-            }
+            closeMsg(false);
         }
         else if (e.keyCode === 13 && ($.msgDialog === 'confirmation' || $.msgDialog === 'remove' ||
             (($.msgDialog === 'warninga' || $.msgDialog === 'warningb' || $.msgDialog === 'info' ||
             $.msgDialog === 'error') && $('#msgDialog .mega-button').length === 1))) {
-            closeMsg();
-            if ($.warningCallback) {
-                $.warningCallback(true);
-                $.warningCallback = null;
-            }
+            closeMsg(true);
         }
         else if (
             !is_transfers_or_accounts &&
@@ -2820,21 +2878,7 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
         }
     }
 
-    $('.fm-blocks-view, .fm-empty-cloud, .fm-empty-folder, .fm-empty-s4-bucket')
-        .rebind('contextmenu.fm', function(e) {
-            // Remove context menu option from filtered view and media discovery view
-            if (page === "fm/links" || M.gallery) {
-                return false;
-            }
-            $('.data-block-view', this).removeClass('ui-selected');
-            // is this required? don't we have a support for a multi-selection context menu?
-            if (selectionManager) {
-                selectionManager.clear_selection();
-            }
-            $.selected = [];
-            $.hideTopMenu();
-            return !!M.contextMenuUI(e, 2);
-        });
+    $(this.emptyStates).rebind('contextmenu.fm', this.onContextMenu.bind(this, null));
 
     if (M.isGalleryPage()) {
         $.selectddUIgrid = '.gallery-view';
@@ -2926,21 +2970,9 @@ FileManager.prototype.addGridUI = function(refresh) {
     $('.grid-url-arrow').show();
     $('.grid-url-header').text('');
 
-    $('.files-grid-view.fm .grid-scrolling-table,.files-grid-view.fm .file-block-scrolling, .fm-empty-cloud,' +
-        '.fm-empty-folder, .fm.shared-folder-content, .fm-empty-s4-bucket, .out-shared-grid-view, .empty-state')
-        .rebind('contextmenu.fm', e => {
-            // Remove context menu option from filtered view and media discovery view
-            if (page === "fm/links" && page === "fm/faves" || M.gallery) {
-                return false;
-            }
-            $('.fm-blocks-view .ui-selected').removeClass('ui-selected');
-            if (selectionManager) {
-                selectionManager.clear_selection();
-            }
-            $.selected = [];
-            $.hideTopMenu();
-            return !!M.contextMenuUI(e, 2);
-        });
+    $('.files-grid-view.fm .grid-scrolling-table,.files-grid-view.fm .file-block-scrolling,'
+        + ' .fm.shared-folder-content, .out-shared-grid-view'
+        + this.emptyStates).rebind('contextmenu.fm', (e) => this.onContextMenu($('.fm-blocks-view .ui-selected'), e));
 
     // enable add star on first column click (make favorite)
     $('.grid-table tr td[megatype="fav"]').rebind('click', function(e) {

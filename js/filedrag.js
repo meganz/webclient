@@ -58,7 +58,7 @@
     }
 
     function start_upload() {
-        if (u_type && u_attr) { // logged in user landing on start-page
+        if (u_type !== false) { // existing user (incl ephemeral/e++) send to fm if not initialised
             if (!self.fminitialized) {
                 loadSubPage('fm');
             }

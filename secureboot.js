@@ -2442,6 +2442,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/ui/components/chatitem.js', n: 'chatitem_js', j: 1, w:1});
         jsl.push({f:'css/components/chatitem.css', n: 'chatitem_css', j:2,w:5});
         jsl.push({f:'css/components/meganz/fm-context-menu.css', n: 'fm_context_menu_css', j:2,w:5});
+        jsl.push({f:'css/message-dialog.css', n: 'message_dialog_css', j:2,w:5});
     } // !is_mobile
 
     // do not change the order...
@@ -2467,7 +2468,8 @@ else if (!browserUpdate) {
     jsl.push({f:'js/ui/share-dialog.js', n: 'fm_share_js', j: 1});
     jsl.push({f:'js/ui/share-unverified-contacts-dialog.js', n: 'fm_share_unverified_contacts_js', j: 1});
     jsl.push({f:'js/ui/share-collaborators-dialog.js', n: 'fm_share_collaborators_js', j: 1});
-
+    jsl.push({f:'js/fm/message-dialog.js', n: 'fm_message-dialog_js', j: 1, w: 1});
+    jsl.push({f:'js/fm/message-overlay.js', n: 'fm_message_overlay_js', j: 1, w: 1});
 
     if (localStorage.makeCache) {
         jsl.push({f:'makecache.js', n: 'makecache', j:1});
@@ -2563,7 +2565,6 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/mobile.language-menu.js', n: 'mobile_language_menu_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.link-management.js', n: 'mobile_link_management_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.file-request-management.js', n: 'mobile_file_request_management_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.message-overlay.js', n: 'mobile_message_overlay_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.not-found.js', n: 'mobile_not_found_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.pro-signup-prompt.js', n: 'mobile_pro_signup_prompt_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.propay.js', n: 'mobile_propay_js', j: 1, w: 1});
@@ -2621,7 +2622,6 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/settings/notifications.js', n: 'mobile_account_notifications_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/settings/termsPolicies.js', n: 'mobile_terms_policies_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/settings/twofactorSettings.js', n: 'mobile_twofactor_settings_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.msgdialog.js', n: 'mobile_msgdialog_js', j: 1, w:1});
         jsl.push({f:'js/mobile/mobile.banner.js', n: 'mobile_banner_js', j: 1, w:1});
         jsl.push({f:'js/mobile/mobile.datepicker.js', n: 'mobile_datepicker_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.tab.js', n: 'mobile_tab_js', j: 1, w:1});
@@ -3094,7 +3094,6 @@ else if (!browserUpdate) {
             'pwm:settings_list_css': {f:'css/pwm/settings/list.css', n: 'pm_settings_list_css', j:2, w:1},
 
             'pwm:read_only_field_js': {f:'js/ui/pwm/components/read-only-field.js', n: 'pm_read_only_field_js', j: 1, w:1},
-            'pwm:mobile_message_overlay_js': {f:'js/mobile/mobile.message-overlay.js', n: 'mobile_message_overlay_js', j: 1, w:1},
             'pwm:mobile_banner_js': {f:'js/mobile/mobile.banner.js', n: 'mobile_banner_js', j: 1, w:1},
             'pwm:pm_js': {f:'js/ui/pwm/pm.js', n: 'pm_js', j: 1, w:1},
             'pwm:pm_ui_js': {f:'js/ui/pwm/pm-ui.js', n: 'pm_ui_js', j: 1, w:1},
@@ -3919,7 +3918,7 @@ else if (!browserUpdate) {
 
         // Redirect static pages to mega.io if there isn't a stored session ID (regardless of its validity),
         // since without a session-id it's not possible to access any internal page.
-        if (is_livesite && !u_storage.sid && !is_iframed && isStaticPage(page) && !location.hash) {
+        if ((location.host === 'mega.nz' || location.host === 'mega.app') && !u_storage.sid && !is_iframed && isStaticPage(page) && !location.hash) {
             return mega.redirect('mega.io', page, false, locationSearchParams);
         }
 

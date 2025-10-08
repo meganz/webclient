@@ -79,12 +79,18 @@ lazy(mega.ui, 'empty', () => {
             }
         });
 
-        target.appendChild(
-            mCreateElement('div', { class: 'empty-state flex-1 flex flex-column' }, [
-                dropContainer,
-                importArea
-            ])
-        );
+        const container = mCreateElement('div', { class: 'empty-state flex-1 flex flex-column' }, [
+            dropContainer,
+            importArea
+        ]);
+
+        $(container).rebind('contextmenu.fm', (e) => {
+            onIdle(() => {
+                M.contextMenuUI(e, 2);
+            });
+        });
+
+        target.appendChild(container);
     };
 
     const path = `${staticpath}images/mega/empty/`;

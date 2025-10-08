@@ -81,6 +81,7 @@ class MegaMobileContextMenu extends MegaComponentGroup {
 
             if (node.link) {
                 items = Object.create(null);
+                items['.save-to-mega'] = 1;
                 items['.open-app'] = 1;
                 items['.download-item'] = 1;
             }
@@ -542,6 +543,16 @@ mBroadcaster.once('boot_done', () => {
                 return false;
             }
         },
+        '.save-to-mega': {
+            text: l.btn_imptomega,
+            icon: 'sprite-mobile-fm-mono icon-cloud-download-thin-outline',
+            subMenu: false,
+            classNames: '',
+            onClick: () => {
+                eventlog(500969, 1);
+                start_import();
+            }
+        },
         '.open-app': {
             text: l.open_in_app,
             icon: 'sprite-mobile-fm-mono icon-mega-thin-outline',
@@ -576,7 +587,7 @@ mBroadcaster.once('boot_done', () => {
 
                 mobile.nodeSelector.registerPreviousViewNode();
                 mega.ui.viewerOverlay.hide();
-                mobile.nodeSelector.show('move', nodeHandle);
+                mobile.nodeSelector.show({ type: 'move', original: nodeHandle });
 
                 M.fmEventLog(500699);
             }
@@ -593,7 +604,7 @@ mBroadcaster.once('boot_done', () => {
 
                 mobile.nodeSelector.registerPreviousViewNode();
                 mega.ui.viewerOverlay.hide();
-                mobile.nodeSelector.show('copy', nodeHandle);
+                mobile.nodeSelector.show({ type: 'copy', original: nodeHandle });
 
                 M.fmEventLog(500700);
             }

@@ -4079,10 +4079,10 @@ function loadfm_done(mDBload) {
             fm_resize_handler(true);
 
             // Securing previously generated public album data to use later in the importing procedure
-            if (sessionStorage.albumLinkImport) {
+            if (localStorage.albumLinkImport) {
                 $.albumImport = Object.values(mega.gallery.albums.store)
-                    .find(({ p }) => !!p && p.ph === sessionStorage.albumLinkImport);
-                delete sessionStorage.albumLinkImport;
+                    .find(({p}) => !!p && p.ph === localStorage.albumLinkImport);
+                delete localStorage.albumLinkImport;
             }
         });
 

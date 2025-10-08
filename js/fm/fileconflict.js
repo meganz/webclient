@@ -975,6 +975,7 @@
                     var newestTS = -1;
                     var newestIndex = -1;
                     var pauseRecusrion = false;
+                    let newName;
 
                     if (duplicateEntries[type][name].length == 2) {
                         olderNode = duplicateEntries[type][name][0];
@@ -995,18 +996,20 @@
                         case ns.REPLACE:
                             // rename old files
 
-                            var newName;
                             if (olderNode) {
                                 newName = fileconflict.findNewName(name, target);
                                 M.rename(olderNode, newName).catch(dump);
                             }
                             else {
-                                for (var h = 0; h < duplicateEntries[type][name].length; h++) {
+                                const dupEntriesOfGivenTypeAndName = duplicateEntries[type][name];
+                                const duplicateCount = dupEntriesOfGivenTypeAndName.length;
+                                for (let h = 0; h < duplicateCount; h++) {
                                     if (h === newestIndex) {
                                         continue;
                                     }
                                     newName = fileconflict.findNewName(name, target);
-                                    M.rename(duplicateEntries[type][name][h], newName).catch(dump);
+                                    saveKeepBothState(target, M.d[dupEntriesOfGivenTypeAndName[h]], newName);
+                                    M.rename(dupEntriesOfGivenTypeAndName[h], newName).catch(dump);
                                 }
                             }
                             break;

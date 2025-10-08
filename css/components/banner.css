@@ -121,12 +121,17 @@
     grid-row: 2 / 3;
 }
 
-.mega-component.banner .title-text:empty ~ * {
+.mega-component.banner .title-text:empty ~ *,
+.mega-component.banner .message-text:empty ~ * {
     grid-row: 1 / 3;
 }
 
 .mega-component.banner .title-text:empty ~ .message-text {
     margin: 2px 0;
+}
+
+.mega-component.banner .message-text:empty + .action-link {
+    grid-row: 1 / 2;
 }
 
 .mega-component.banner .content-box > .action-link {

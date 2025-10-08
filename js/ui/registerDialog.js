@@ -429,6 +429,12 @@
         const $changeEmailLink = $('.reg-success-change-email-btn', $dialog);
         const $resendEmailButton = $('.resend-email-button', $dialog);
 
+        mega.onCloseDialogDispatcher = () => {
+            fm_hideoverlay();
+            $dialog.addClass('hidden').removeClass('special');
+            delete mega.onCloseDialogDispatcher;
+        };
+
         if (page && page.indexOf("chat/") > -1  || page === "chat") {
             $dialog.addClass('chatlink');
             $('.reg-success-icon-chat', $dialog).removeClass('hidden');

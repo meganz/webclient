@@ -626,7 +626,6 @@
                         <div class="content-box">
                             <span class="banner title-text">[$bf_rewind_rd_notif_title]</span>
                             <span class="banner message-text">[$bf_rewind_rd_notif_msg]</span>
-                            <a href="/fm/account/file-management/rewind" class="clickurl action-link" data-eventid="500958">[$bf_rewind_rd_notif_action]</a>
                         </div>
                         <div class="banner end-box">
                             <button class="mega-component text-icon nav-elem icon-only button">
@@ -1097,7 +1096,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <!-- Rubbish bin schedule !-->
                         <div class="fm-notification-block rubbish-schedule">
                             <div class="mega-component alert banner info">
@@ -1448,7 +1447,12 @@
                 <div class="content">
                     <div class="image"></div>
                     <div class="title"></div>
-                    <div class="message"></div>
+                    <div class="rw-steps">
+                        <div class="rw-progress-step rw-progress-step-template hidden">
+                            <i class="rw-progress-spinner sprite-fm-mono icon-loader-grad-small-regular-outline icon24"></i>
+                            <i class="rw-progress-done sprite-fm-mono icon-check-thin-outline icon24"></i>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="files-grid-view fm hidden">
@@ -4061,6 +4065,7 @@
                                 </div>
                                 <div class="payment-card-bottom">
                                     <a class="payment-card-edit">[$edit_card]</a>
+                                    <a class="payment-card-delete hidden">[$delete_card]</a>
                                 </div>
                             </div>
                         </div>

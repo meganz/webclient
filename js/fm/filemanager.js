@@ -97,6 +97,8 @@ function FileManager() {
         }
     };
 
+    this.emptyStates = '.fm-blocks-view, .fm-empty-cloud, .fm-empty-folder, .fm-empty-s4-bucket';
+
     // Grid header config update function, this also used to update filter options in icon view.
     // eslint-disable-next-line complexity
     $.gridHeader = function() {
@@ -307,6 +309,33 @@ FileManager.prototype.initS4FileManager = mutex('s4-object-storage.lock', functi
         .then(() => mBroadcaster.sendMessage('s4-init(C)'))
         .catch(reject);
 });
+
+/**
+ * @param {jQuery?} selected jQuery element(s) to de-select
+ * @param {jQuery.Event} e jQuery event to work with
+ * @returns {void}
+ */
+FileManager.prototype.onContextMenu = function(selected, e) {
+    'use strict';
+
+    // Remove context menu option from filtered view and media discovery view
+    if (page === 'fm/links' || M.gallery) {
+        return false;
+    }
+
+    if (selected) {
+        selected.removeClass('ui-selected');
+    }
+
+    if (selectionManager) {
+        selectionManager.clear_selection();
+    }
+
+    $.selected = [];
+    $.hideTopMenu();
+
+    return !!M.contextMenuUI(e, 2);
+};
 
 /**
  * Initialize the rendering of the cloud/file-manager
@@ -2849,21 +2878,7 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
         }
     }
 
-    $('.fm-blocks-view, .fm-empty-cloud, .fm-empty-folder, .fm-empty-s4-bucket')
-        .rebind('contextmenu.fm', function(e) {
-            // Remove context menu option from filtered view and media discovery view
-            if (page === "fm/links" || M.gallery) {
-                return false;
-            }
-            $('.data-block-view', this).removeClass('ui-selected');
-            // is this required? don't we have a support for a multi-selection context menu?
-            if (selectionManager) {
-                selectionManager.clear_selection();
-            }
-            $.selected = [];
-            $.hideTopMenu();
-            return !!M.contextMenuUI(e, 2);
-        });
+    $(this.emptyStates).rebind('contextmenu.fm', this.onContextMenu.bind(this, null));
 
     if (M.isGalleryPage()) {
         $.selectddUIgrid = '.gallery-view';
@@ -2955,21 +2970,9 @@ FileManager.prototype.addGridUI = function(refresh) {
     $('.grid-url-arrow').show();
     $('.grid-url-header').text('');
 
-    $('.files-grid-view.fm .grid-scrolling-table,.files-grid-view.fm .file-block-scrolling, .fm-empty-cloud,' +
-        '.fm-empty-folder, .fm.shared-folder-content, .fm-empty-s4-bucket, .out-shared-grid-view, .empty-state')
-        .rebind('contextmenu.fm', e => {
-            // Remove context menu option from filtered view and media discovery view
-            if (page === "fm/links" && page === "fm/faves" || M.gallery) {
-                return false;
-            }
-            $('.fm-blocks-view .ui-selected').removeClass('ui-selected');
-            if (selectionManager) {
-                selectionManager.clear_selection();
-            }
-            $.selected = [];
-            $.hideTopMenu();
-            return !!M.contextMenuUI(e, 2);
-        });
+    $('.files-grid-view.fm .grid-scrolling-table,.files-grid-view.fm .file-block-scrolling,'
+        + ' .fm.shared-folder-content, .out-shared-grid-view'
+        + this.emptyStates).rebind('contextmenu.fm', (e) => this.onContextMenu($('.fm-blocks-view .ui-selected'), e));
 
     // enable add star on first column click (make favorite)
     $('.grid-table tr td[megatype="fav"]').rebind('click', function(e) {

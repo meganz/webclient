@@ -3,7 +3,7 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    padding: 16px 24px;
+    padding: 12px 20px;
     width: 100%;
     box-sizing: border-box;
     z-index: 100;
@@ -25,12 +25,12 @@
 .mega-bottom-bar .icon-actions {
     display: flex;
     align-items: flex-start;
+    flex-wrap: wrap;
 }
 
-.mega-bottom-bar > *:not(:first-child),
-.mega-bottom-bar .text-actions > *:not(:first-child),
-.mega-bottom-bar .icon-actions > *:not(:first-child) {
-    margin-inline-start: 8px;
+.mega-bottom-bar .text-actions > *,
+.mega-bottom-bar .icon-actions > * {
+    margin: 4px;
 }
 
 .mega-bottom-bar .icon-actions:empty {

@@ -2729,10 +2729,12 @@
                 else {
                     return;
                 }
-                string = (unclearResult ? string : mega.icu.format(string, count)).replace('%s', targetName);
+
+                string = (unclearResult ? string : mega.icu.format(string, count))
+                    .replace(/%s/g, `<span class="long-title-truncate">${targetName}</span>`);
                 if (typeof viewCb === 'function') {
                     mega.ui.toast.show(
-                        string,
+                        parseHTML(string),
                         4,
                         l[16797],
                         { actionButtonCallback: viewCb }

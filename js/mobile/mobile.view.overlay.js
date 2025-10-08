@@ -17,8 +17,11 @@ class MegaMobileViewOverlay extends MegaComponent {
         overlay.append(document.getElementById('view-file-template').content.cloneNode(true));
 
         // Build header
+        const menu = overlay.querySelector('.media-viewer-menu');
+
+        // Back Link
         const backLink = new MegaLink({
-            parentNode: overlay.querySelector('.media-viewer-menu'),
+            parentNode: menu,
             type: 'icon',
             componentClassname: 'text-icon back',
             icon: 'sprite-mobile-fm-mono icon-arrow-left-thin-outline',
@@ -39,11 +42,34 @@ class MegaMobileViewOverlay extends MegaComponent {
             }
 
             this.hide();
+            return false;
         });
 
+        // Right-side buttons wrap
+        const wrapNode = mCreateElement('div', { class: 'side-btns' }, menu);
+
+        // Secondary Open in app link
+        const openInAppLink = new MegaLink({
+            type: 'text',
+            parentNode: wrapNode,
+            text: l.view_file_open_in_app,
+            componentClassname: 'open-in-app-lnk hidden'
+        });
+        openInAppLink.on('tap', () => {
+            if (!this.nodeComponent) {
+                return false;
+            }
+            eventlog(99912);
+
+            this.trigger('pauseStreamer');
+            goToMobileApp(MegaMobileViewOverlay.getAppLink(this.nodeComponent.handle));
+            return false;
+        });
+
+        // Context menu button
         const contextMenuButton = new MegaButton({
             type: 'icon',
-            parentNode: overlay.querySelector('.media-viewer-menu'),
+            parentNode: wrapNode,
             icon: 'sprite-mobile-fm-mono icon-more-horizontal-thin-outline',
             iconSize: 24,
             componentClassname: 'context-btn open-context-menu text-icon'
@@ -279,6 +305,15 @@ class MegaMobileViewOverlay extends MegaComponent {
         const textBlock = this.domNode.querySelector('.media-viewer-container .text-editor-container');
         textBlock.classList.add('hidden');
 
+        // Show/hide secondary Open in app link
+        const openInAppLnk = this.domNode.querySelector('.open-in-app-lnk');
+        if (isLink && downloadSupport) {
+            openInAppLnk.classList.remove('hidden');
+        }
+        else {
+            openInAppLnk.classList.add('hidden');
+        }
+
         if (isPreviewable && isPreviewable !== 'text') {
             this.domNode.querySelector('.context-btn').classList.remove('hidden');
             this.domNode.querySelector('.media-viewer-container .content').classList.remove('hidden');
@@ -446,6 +481,16 @@ class MegaMobileViewOverlay extends MegaComponent {
     getActionsArray(downloadSupport, isLink, isPreviewable, isInfo) {
 
         const buttons = {
+            'saveToMegaButton' : ['import-button', l.btn_imptomega, () => {
+                if (!this.nodeComponent) {
+                    return false;
+                }
+                eventlog(500969, 0);
+
+                this.trigger('pauseStreamer');
+                start_import();
+            }],
+
             'openappButton' : ['openapp-button', l.view_file_open_in_app, () => {
                 if (!this.nodeComponent) {
                     return false;
@@ -497,11 +542,14 @@ class MegaMobileViewOverlay extends MegaComponent {
 
             return arr;
         }
+        if (isLink) {
+            if (downloadSupport) {
+                return [[buttons.saveToMegaButton], [buttons.downloadButton]];
+            }
+            return [[buttons.openappButton, buttons.saveToMegaButton]];
+        }
         if (!downloadSupport) {
             return [[buttons.openappButton]];
-        }
-        if (isLink) {
-            return [[buttons.openappButton], [buttons.downloadButton]];
         }
         if (isInfo) {
             return shareBtn && [shareBtn];

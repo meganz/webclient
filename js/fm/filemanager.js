@@ -409,11 +409,60 @@ FileManager.prototype.initFileManager = async function() {
         megaChat.renderMyStatus();
     }
 
+    this.fireFMDependantActions();
+
     if (d) {
         console.timeEnd('renderfm');
     }
 
     return res;
+};
+
+/**
+ * Actions for both mobile and desktop upon first entering the FM.
+ */
+FileManager.prototype.fireFMDependantActions = function() {
+    'use strict';
+
+    if (folderlink) {
+        return;
+    }
+
+    // Update top menu
+    onIdle(topmenuUI);
+
+    // Add the dynamic notifications
+    tSleep(4 + Math.random()).then(() => {
+        if (notify.addDynamicNotifications !== undefined) {
+            notify.addDynamicNotifications().catch(dump);
+        }
+    });
+
+    // Fire KeyMgr dependant actions
+    if (mega.keyMgr.version) {
+
+        queueMicrotask(() => {
+
+            M.fireKeyMgrDependantActions().catch(dump);
+        });
+    }
+
+    // Fire file importing
+    return tSleep(1 + Math.random()).then(() => {
+        const {dlimp} = localStorage;
+
+        if (dlimp) {
+            if (!self.dl_import) {
+                self.dl_import = tryCatch(() => JSON.parse(dlimp))();
+            }
+            delete localStorage.dlimp;
+        }
+
+        if (self.dl_import) {
+            M.importFileLink(dl_import[0], dl_import[1], dl_import[3], dl_import[2]).catch(dump);
+            self.dl_import = false;
+        }
+    });
 };
 
 /**
@@ -904,7 +953,6 @@ FileManager.prototype.initFileManagerUI = function() {
     M.initContextUI();
     M.addTransferPanelUI();
     M.initUIKeyEvents();
-    M.onFileManagerReady(topmenuUI);
     M.initMegaSwitchUI();
 
     // disabling right click, default contextmenu.
@@ -1209,10 +1257,6 @@ FileManager.prototype.initFileManagerUI = function() {
     }
 
     folderlink = folderlink || 0;
-
-    if ((typeof dl_import !== 'undefined') && dl_import) {
-        M.onFileManagerReady(importFile);
-    }
 
     $('.dropdown.body.context').rebind('contextmenu.dropdown', function(e) {
         if (!localStorage.contextmenu) {
@@ -1784,20 +1828,13 @@ FileManager.prototype.initContextUI = function() {
         });
         $('.transfer-table tr.ui-selected').removeClass('ui-selected');
     });
-
-    if (mega.keyMgr.version) {
-
-        queueMicrotask(() => {
-
-            this.fireKeyMgrDependantActions().catch(dump);
-        });
-    }
 };
 
 FileManager.prototype.fireKeyMgrDependantActions = async function() {
     'use strict';
 
-    if (sessionStorage.folderLinkImport || ($.onImportCopyNodes && !$.onImportCopyNodes.opSize)) {
+    // Fire folder importing
+    if (localStorage.folderLinkImport || ($.onImportCopyNodes && !$.onImportCopyNodes.opSize)) {
 
         await M.importFolderLinkNodes(false);
     }

@@ -169,7 +169,7 @@ var megasync = (function() {
         if (lastCheckStatus && lastCheckTime) {
             api_req({ a: 'log', e: 99800, m: 'MEGASync is not responding' });
             msgDialog(
-                'confirmation',
+                'megasync-reconnect',
                 'MEGA Desktop App is not responding',
                 l[17795],
                 l[17796],

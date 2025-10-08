@@ -921,13 +921,13 @@ function start_import() {
     };
 
     msgDialog(dialogType, l[1193], dialogHeader, dialogTxt, function(e) {
-        if (e === 'login') {
+        if (e === 0) {
             buttonEventLogin();
         }
-        else if (e === 'register') {
+        else if (e === 1) {
             buttonEventRegister();
         }
-        else if (e === 'ephemeral') {
+        else if (e === -2) {
             start_anoimport();
         }
         else {

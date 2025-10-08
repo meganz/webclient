@@ -43,6 +43,10 @@ class MegaSheet extends MegaOverlay {
                     : document.body.offsetHeight / 4;
             });
         }
+
+        // Aria updates
+        this.domNode.ariaModal = "true";
+        this.domNode.role = "dialog";
     }
 
     set type(key) {

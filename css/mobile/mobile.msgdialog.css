@@ -1,13 +1,13 @@
-.sheet .sub-message {
+.msg-dialog .sheet .sub-message {
     color: var(--mobile-text-secondary);
     font-size: 14px;
     word-break: break-word;
     margin-top: 8px;
 }
-.mega-sheet.modal-dialog .main .primary-message {
+.msg-dialog .main .primary-message {
     word-wrap: break-word;
 }
-.rtl .sheet .sub-message,
-.rtl .mega-sheet.modal-dialog .main .primary-message {
+.rtl .msg-dialog .sheet .sub-message,
+.rtl .msg-dialog .main .primary-message {
     line-height: 1.8;
 }

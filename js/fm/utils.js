@@ -446,7 +446,7 @@ MegaUtils.prototype.reload = function megaUtilsReload(force) {
     }
 
     // Show message that this operation will destroy the browser cache and reload the data stored by MEGA
-    msgDialog('confirmation', l[761], l[7713], l[6994], (doIt) => {
+    msgDialog('reload-account', l.reload_account_btn, l[7713], false, (doIt) => {
         if (!doIt) {
             return;
         }

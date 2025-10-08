@@ -19,12 +19,12 @@ class MegaOverlay extends MegaComponent {
         targetNode = overlay;
 
         subNode = document.createElement('div');
-        subNode.className = 'header mb-4 relative';
+        subNode.className = 'header relative';
         targetNode.appendChild(subNode);
         targetNode = subNode;
 
         this.headerTitleNode = subNode = document.createElement('div');
-        subNode.className = 'header-title flex flex-row items-center';
+        subNode.className = 'header-title flex flex-row items-center mb-4';
         targetNode.appendChild(subNode);
 
         this.closeButton = new MegaButton({
@@ -242,6 +242,7 @@ class MegaOverlay extends MegaComponent {
         this.clearUserEvents();
 
         this.removeClass('action-button-bottom');
+        this.trigger('clear');
     }
 
     // Methods for each of its elements

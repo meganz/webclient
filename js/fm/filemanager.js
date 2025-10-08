@@ -2403,20 +2403,12 @@ FileManager.prototype.initUIKeyEvents = function() {
             $selectBlock.removeClass('active');
         }
         else if (e.keyCode == 27 && $.msgDialog) {
-            closeMsg();
-            if ($.warningCallback) {
-                $.warningCallback(false);
-                $.warningCallback = null;
-            }
+            closeMsg(false);
         }
         else if (e.keyCode === 13 && ($.msgDialog === 'confirmation' || $.msgDialog === 'remove' ||
             (($.msgDialog === 'warninga' || $.msgDialog === 'warningb' || $.msgDialog === 'info' ||
             $.msgDialog === 'error') && $('#msgDialog .mega-button').length === 1))) {
-            closeMsg();
-            if ($.warningCallback) {
-                $.warningCallback(true);
-                $.warningCallback = null;
-            }
+            closeMsg(true);
         }
         else if (
             !is_transfers_or_accounts &&

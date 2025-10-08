@@ -838,7 +838,9 @@ var mobile = {
         if (p && String(p).slice(-8) === node.p || M.currentCustomView) {
             mobile.cloud.countAndUpdateSubFolderTotals(node);
         }
-    }
+    },
+
+    messageOverlay: megaMsgDialog
 };
 
 mBroadcaster.once('startMega:mobile', function() {
@@ -1108,19 +1110,6 @@ function closeDialog() {
 
     delete $.dialog;
     mBroadcaster.sendMessage('closedialog');
-}
-
-/** slimmed down version adapted from fm.js's (desktop) closeMsg() */
-function closeMsg() {
-    'use strict';
-
-    if ($.dialog && !(M.chat && $.dialog === 'onboardingDialog')) {
-        $('.mega-dialog').removeClass('arrange-to-back');
-        $('.mega-dialog-container.common-container').removeClass('arrange-to-back');
-    }
-
-    delete $.msgDialog;
-    mBroadcaster.sendMessage('msgdialog-closed');
 }
 
 self.openCopyDialog = (onBeforeShown) => {

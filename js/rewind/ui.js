@@ -192,8 +192,6 @@ lazy(mega, 'rewindUi', () => {
             this.$contentFolder.addClass('hidden');
             this.$contentLoading.addClass('hidden');
 
-            mega.rewind.settings.reductionBanner.init($('.reduction-notification', this.sidebar), 'inline');
-
             this.updateNodeDisplay();
             await M.require('datepicker_js');
 

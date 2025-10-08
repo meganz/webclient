@@ -832,6 +832,8 @@ lazy(mega, 'rewind', () => {
                 const promiseSet = new Set();
                 let batchPromise = null;
 
+                logger.info(`Rewind.loadActionPacket - Processing ${packets.length} packets`);
+                console.time('rewind:index:getRecords:packet:process');
                 for (let i = 0; i < packets.length; i++) {
                     const packet = packets[i];
                     if (!packet) {
@@ -886,6 +888,7 @@ lazy(mega, 'rewind', () => {
 
                     order++;
                 }
+                console.timeEnd('rewind:index:getRecords:packet:process');
 
                 if ((sn && lastSn && lastSn !== sn) || (sn && !lastSn) || !treeCacheState.lastSn) {
                     // We fill in necessary details for
@@ -924,14 +927,18 @@ lazy(mega, 'rewind', () => {
         handleUpdatePacket(
             dateData, actionPacket, actionPacketFiles, actionDateString, actionPacketTimestamp
         ) {
-            const nodes = actionPacketFiles.map((file) => {
-                const node = this.nodeDictionary[file.h];
-                if (node) {
-                    file.p = node.p;
-                    file.t = node.t;
+            const nodes = [];
+            for (let i = 0; i < actionPacketFiles.length; i++) {
+                const node = actionPacketFiles[i];
+                const nodeInDict = this.nodeDictionary[node.h];
+                if (nodeInDict) {
+                    node.p = nodeInDict.p;
+                    node.t = nodeInDict.t;
                 }
-                return file;
-            }).filter((file) => file.t !== undefined);
+                if (node.t !== undefined) {
+                    nodes.push(node);
+                }
+            }
 
             dateData[actionDateString].actions.push({
                 d: {
@@ -980,7 +987,7 @@ lazy(mega, 'rewind', () => {
                     this.prepareNode(node, this.nodeDictionary, this.nodeChildrenDictionary);
                 }
 
-                if (node.fv || actionPacketFiles.length > 1) {
+                if (node.fv) {
                     this.prepareNode({...node, ts: actionPacketTimestamp},
                                      dateData[actionDateString].modified, false, true);
                     dateData[actionDateString].type[node.h] = TYPE_MODIFIED;

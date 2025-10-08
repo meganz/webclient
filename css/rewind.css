@@ -23,8 +23,7 @@
     min-width: 456px;
 }
 
-
-.active-rewind.files-grid-view.fm .column-settings {
+body:not(.rtl) .active-rewind.files-grid-view.fm .column-settings {
     order: 2;
 }
 

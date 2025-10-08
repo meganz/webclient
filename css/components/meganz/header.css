@@ -188,6 +188,10 @@ body.pwm-ui .mega-header .top-block {
     border-radius: var(--mobile-border-radius-large);
     z-index: 2000;
 }
+.rtl .mega-header div.header-dropdown-menu {
+    left: -8px;
+    right: auto;
+}
 .mega-header div.header-dropdown-menu {
     max-height: calc(100vh - 74px);
 }

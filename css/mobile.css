@@ -900,8 +900,11 @@ ul, li {
 .mobile.bus-pw-confirm-block .mobile.fm-block {
     background-color: var(--stroke-grey-1);
 }
-.mobile.registration-confirm-email{
+.mobile.registration-confirm-email {
     background-color: var(--stroke-grey-1);
+    position: fixed;
+    top: 0;
+    z-index: 95;
 }
 .mobile.registration-confirm-email .mobile.fm-block {
     padding-bottom: 24px;

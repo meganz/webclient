@@ -60,6 +60,21 @@
     box-sizing: border-box;
 }
 
+.media-viewer .media-viewer-menu .side-btns {
+    display: flex;
+}
+
+.media-viewer .media-viewer-menu .nav-elem {
+    height: auto;
+    padding: 0;
+    margin: 0;
+    margin-inline-start: 16px;
+}
+
+.media-viewer .media-viewer-menu .nav-elem:first-child {
+    margin: 0;
+}
+
 .media-viewer .file-info {
     text-align: start;
 }

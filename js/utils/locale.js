@@ -1908,8 +1908,8 @@ mBroadcaster.once('boot_done', function populate_l() {
     ]) {
 
         l[key] = escapeHTML(l[key])
-            .replace(/\[S]/g, '"<span class="long-title-truncate">')
-            .replace(/\[\/S]/g, '</span>"');
+            .replace(/\[S]/g, '<span class="long-title-truncate">')
+            .replace(/\[\/S]/g, '</span>');
     }
 
     l.recovery_key_subtitle = escapeHTML(l.recovery_key_subtitle)

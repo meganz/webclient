@@ -1123,12 +1123,34 @@ function closeMsg() {
     mBroadcaster.sendMessage('msgdialog-closed');
 }
 
-function openSaveAsDialog(node, content, cb) {
+self.openCopyDialog = (onBeforeShown) => {
+    'use strict';
+
+    if (typeof onBeforeShown === 'function') {
+        onBeforeShown();
+    }
+
+    mobile.nodeSelector.registerPreviousViewNode();
+    mega.ui.viewerOverlay.hide();
+    mobile.nodeSelector.show(
+        { type: $.mcImport ? 'import' : 'copy', original: $.selected && $.selected[0] }
+    );
+};
+
+self.openSaveToDialog = (node, cb) => {
     'use strict';
 
     mobile.nodeSelector.registerPreviousViewNode();
     mega.ui.viewerOverlay.hide();
-    mobile.nodeSelector.show('saveTextTo', node);
+    mobile.nodeSelector.show({type: 'import', data: node, cb});
+};
+
+self.openSaveAsDialog = (node, content, cb) => {
+    'use strict';
+
+    mobile.nodeSelector.registerPreviousViewNode();
+    mega.ui.viewerOverlay.hide();
+    mobile.nodeSelector.show({ type: 'saveTextTo', original: node });
 
     if (!mega.ui.saveTextAs) {
         mega.ui.saveTextAs = new MobileNodeNameControl({type: 'saveTextAs'});
@@ -1166,11 +1188,21 @@ function openSaveAsDialog(node, content, cb) {
 
         loadingDialog.hide('saveTextAs');
     };
-}
+};
 
 window['selectFolder' + 'Dialog'] = () => Promise.resolve(M.RootID);
 
 mega.ui['showReg' + 'isterDialog'] = nop;
+
+mega.ui.showLoginRequiredDialog = async function() {
+    'use strict';
+
+    if (u_type === false) {
+
+        loadSubPage('login');
+        return mBroadcaster.when('login');
+    }
+};
 
 /**
  * Shim for sendSignupLinkDialog, likely called from showOverQuotaRegisterDialog

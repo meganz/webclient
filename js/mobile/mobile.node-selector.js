@@ -55,7 +55,8 @@ class MobileSelectionRender extends MobileMegaRender {
 
     static getType() {
 
-        const key = mobile.nodeSelector.type;
+        const { type } = mobile.nodeSelector;
+        const key = type === 'import' ? 'copy' : type;
         const moveCopyTabOpts = [
             {name: l[164], key: 'cloud', active: M.currentrootid === M.RootID, type: 'link', href: 'fm'},
             {name: l[16770], key: 'shares', active: M.currentrootid === 'shares', type: 'link', href: 'fm/shares'}
@@ -68,24 +69,33 @@ class MobileSelectionRender extends MobileMegaRender {
              * l.mobile_file_copy_to_folder
              * l.mobile_folder_move_to_folder
              * l.mobile_folder_copy_to_folder
+             * l.toast_import_file
+             * l.toast_import_folder
              */
             return parseHTML(
                 mega.icu.format(
-                    l[`mobile_${sn.t ? 'folder' : 'file'}_${type}_to_folder`], 1
+                    type === 'import' ? l[`toast_import_${sn.t ? 'folder' : 'file'}`] :
+                        l[`mobile_${sn.t ? 'folder' : 'file'}_${type}_to_folder`], 1
                 )
                     .replace('%1', M.getNameByHandle(th))
+                    .replace('%s', `<span class="long-title-truncate">${M.getNameByHandle(th)}</span>`)
             );
         };
 
         return {
             'copy': {
                 mode: 'folder',
-                submitText: l[63],
+                submitText: type === 'import' ? l[776] : l[63],
                 onSubmit: (h, button) => {
+                    const {selected, data, callback} = mobile.nodeSelector;
+
+                    if (callback) {
+                        mobile.nodeSelector.hide();
+                        onIdle(() => tryCatch(callback)(data, h));
+                        return false;
+                    }
 
                     button.loading = true;
-
-                    const {selected} = mobile.nodeSelector;
                     mobile.nodeSelector[`copyRenamed${selected}`] = null;
 
                     // selection action
@@ -95,7 +105,7 @@ class MobileSelectionRender extends MobileMegaRender {
                             if (res && res.length) {
                                 const sn = M.getNodeByHandle(res[0]);
                                 mega.ui.toast.show(
-                                    _getCompleteString(sn, h, 'copy'),
+                                    _getCompleteString(sn, h, type),
                                     undefined,
                                     l[16797],
                                     {actionButtonCallback: () => M.openFolder(h)}
@@ -235,16 +245,31 @@ class MobileSelectionRender extends MobileMegaRender {
             }
         },
 
-        show(type, original, start) {
+        show(opts = {}) {
 
+            const {type, original, data, cb} = opts;
+            let { start } = opts;
             this.active = true;
             this.origin = this.origin || M.currentdirid;
             this.type = type;
             this.step = 0;
             this.selected = original;
             this.selectedTree = M.getTreeHandles(this.selected);
+            this.data = data;
+            this.callback = cb;
 
+            if (mega.ui.header.closeButton) {
+                mega.ui.header.closeButton.rebind('tap.close', () => {
+                    this.trigger('closeBtnClick');
+                    this.hide();
+                });
+            }
             start = start || M.RootID;
+
+            queueMicrotask(() => {
+                M.openFolder(start, true).then(() => page === `fm/${start}` && mega.ui.header.update());
+            });
+
 
             this.originalPHS = window.pushHistoryState;
 
@@ -255,21 +280,6 @@ class MobileSelectionRender extends MobileMegaRender {
             }
 
             window.addEventListener('popstate', this._popStateHandler);
-
-            if (mega.ui.header.closeButton) {
-                mega.ui.header.closeButton.rebind('tap.close', () => {
-                    this.trigger('closeBtnClick');
-                    this.hide();
-                });
-            }
-
-            M.openFolder(start, true).then(() => {
-
-                // When start page is same as current page, manually call update as loadSubpage will not trigger update.
-                if (page === `fm/${start}`) {
-                    mega.ui.header.update();
-                }
-            });
         },
 
         hide(next, popstates) {
@@ -282,6 +292,17 @@ class MobileSelectionRender extends MobileMegaRender {
 
                 return;
             }
+            this.active = false;
+            next = next || this.origin || M.RootID;
+
+            delete this.origin;
+            delete this.type;
+            delete this.selected;
+            delete this.selectedTree;
+            delete this.data;
+            delete this.callback;
+
+            this.off('closeBtnClick');
 
             window.removeEventListener('popstate', this._popStateHandler);
             window.pushHistoryState = this.originalPHS;
@@ -291,13 +312,6 @@ class MobileSelectionRender extends MobileMegaRender {
                 history.go(this.step * -1);
                 this.step = 0;
             }
-            this.active = false;
-            next = next || this.origin || M.RootID;
-
-            delete this.origin;
-            delete this.type;
-            delete this.selected;
-            delete this.selectedTree;
 
             onIdle(() => {
 
@@ -310,8 +324,6 @@ class MobileSelectionRender extends MobileMegaRender {
                     }
                 });
             });
-
-            this.off('closeBtnClick');
         },
 
         // Register previous node for the case user cancel and need to go back.

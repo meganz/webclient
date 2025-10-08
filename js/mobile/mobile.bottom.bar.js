@@ -19,24 +19,28 @@ class MegaMobileBottomBar extends MegaComponent {
             const buttonAction = new MegaButton(options);
 
             if (typeof options.binding === 'function') {
-                buttonAction.on('tap', options.binding);
+                buttonAction.on('tap', () => {
+                    options.binding();
+                    return false;
+                });
             }
 
             this.actions.push(buttonAction);
         };
 
         let subNode = document.createElement('div');
-        subNode.className = 'text-actions';
+        const actions = options.actions && options.actions[0];
+        subNode.className = `text-actions${ actions.length > 1 ? ' multiple' : ''}`;
         bottomNode.appendChild(subNode);
 
-        if (options.actions && options.actions[0]) {
-
-            for (const action of options.actions[0]) {
+        if (actions) {
+            for (let i = 0; i < actions.length; i++) {
+                const action = actions[i];
 
                 const textOptions = {
                     parentNode: subNode,
                     type: 'normal',
-                    componentClassname: `primary block ${action[0]}`,
+                    componentClassname: `${i === 0 ? 'primary' : 'secondary'} block ${action[0]}`,
                     text : action[1],
                     binding: action[2],
                     disabled: !!action[3]

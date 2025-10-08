@@ -4560,7 +4560,12 @@ MegaData.prototype.importFileLink = function importFileLink(ph, key, attr, srcNo
                 .then(() => {
                     if (srcNode) {
                         mega.ui.toast.show(
-                            mega.icu.format(l.toast_import_file, 1).replace('%s', M.getNameByHandle(target))
+                            parseHTML(
+                                mega.icu.format(l.toast_import_file, 1).replace('%s', M.getNameByHandle(target))
+                            ),
+                            null,
+                            l[16797],
+                            {actionButtonCallback: () => M.openFolder(target)}
                         );
                     }
                 })
@@ -4606,7 +4611,6 @@ MegaData.prototype.importFileLink = function importFileLink(ph, key, attr, srcNo
                             }
 
                             _import(target);
-                            M.openFolder(target);
                         }
                         else {
                             reject(EBLOCKED);
@@ -4651,34 +4655,34 @@ MegaData.prototype.importFolderLinkNodes = function importFolderLinkNodes(nodes)
         });
     };
 
-    if (($.onImportCopyNodes || sessionStorage.folderLinkImport) && !folderlink) {
+    if (($.onImportCopyNodes || localStorage.folderLinkImport) && !folderlink) {
         loadingDialog.show('import');
         if ($.onImportCopyNodes) {
             _import($.onImportCopyNodes);
         }
         else {
-            var kv = MegaDexie.create(u_handle);
-            var key = `import.${sessionStorage.folderLinkImport}`;
+            const key = `import.${localStorage.folderLinkImport}`;
 
-            kv.get(key)
+            M.getPersistentData(key)
                 .then((data) => {
                     _import(data);
-                    kv.remove(key, true).dump(key);
                 })
                 .catch((ex) => {
                     if (ex && d) {
                         console.error(ex);
                     }
                     loadingDialog.hide('import');
-                    kv.remove(key, true).dump(key);
 
                     if (ex) {
                         tell(`${l[2507]}: ${ex}`);
                     }
+                })
+                .finally(() => {
+                    M.delPersistentData(key).dump(key);
                 });
         }
         nodes = null;
-        delete sessionStorage.folderLinkImport;
+        delete localStorage.folderLinkImport;
     }
 
     var sel = [].concat(nodes || []);
@@ -4686,55 +4690,59 @@ MegaData.prototype.importFolderLinkNodes = function importFolderLinkNodes(nodes)
     if (sel.length) {
         var FLRootID = M.RootID;
 
-        mega.ui.showLoginRequiredDialog({
-            title: l.login_signup_dlg_title,
-            textContent: l.login_signup_dlg_msg,
-            showRegister: true
-        }).then(() => {
-            loadingDialog.show();
+        let pending = true;
+        tSleep(0.3).then(() => pending && loadingDialog.show());
 
-            tryCatch(() => {
-                sessionStorage.folderLinkImport = FLRootID;
-            })();
+        tryCatch(() => {
+            localStorage.folderLinkImport = FLRootID;
+        })();
 
-            // It is import so need to clear existing attribute for new node.
-            return M.getCopyNodes(sel, {clearna: true})
-                .then((nodes) => {
-                    var data = [sel, nodes, nodes.opSize];
-                    var fallback = function() {
-                        $.onImportCopyNodes = data;
+        // It is import so need to clear existing attribute for new node.
+        M.getCopyNodes(sel, {clearna: true})
+            .then((nodes) => {
+                var data = [sel, nodes, nodes.opSize];
+                const ack = () => {
+                    pending = false;
+                    loadingDialog.hide();
+                    return mega.ui.showLoginRequiredDialog({
+                        title: l.login_signup_dlg_title,
+                        textContent: l.login_signup_dlg_msg,
+                        showRegister: true
+                    }).then(() => {
+                        resetSensitives();
                         loadSubPage('fm');
-                    };
+                    });
+                };
+                var fallback = function() {
+                    $.onImportCopyNodes = data;
+                    return ack();
+                };
 
-                    if (pfcol) {
-                        this.preparePublicSetImport(pfid, data);
-                        sessionStorage.albumLinkImport = pfid;
-                    }
+                if (pfcol) {
+                    this.preparePublicSetImport(pfid, data);
+                    localStorage.albumLinkImport = pfid;
+                }
 
-                    if (!sessionStorage.folderLinkImport || nodes.length > 6000) {
-                        fallback();
-                    }
-                    else {
-                        MegaDexie.create(u_handle)
-                            .set(`import.${FLRootID}`, data)
-                            .then(() => {
-                                resetSensitives();
-                                loadSubPage('fm');
-                            })
-                            .catch((ex) => {
-                                if (d) {
-                                    console.warn('Cannot import using indexedDB...', ex);
-                                }
-                                fallback();
-                            });
-                    }
-                });
-        }).catch((ex) => {
-            // If no ex, it was canceled
-            if (ex) {
-                tell(ex);
-            }
-        });
+                if (!localStorage.folderLinkImport || nodes.length > 6000) {
+
+                    return fallback();
+                }
+
+                return M.setPersistentData(`import.${FLRootID}`, data)
+                    .then(ack)
+                    .catch((ex) => {
+                        if (d) {
+                            console.warn('Cannot import using indexedDB...', ex);
+                        }
+                        return fallback();
+                    });
+            })
+            .catch((ex) => {
+                // If no ex, it was canceled
+                if (ex) {
+                    tell(ex);
+                }
+            });
     }
 };
 

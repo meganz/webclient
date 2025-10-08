@@ -522,8 +522,14 @@ mobile.linkManagement = {
 
         const itemComponent = MegaNodeComponent.getNodeComponentByHandle(this.handle);
         let itemNode = itemComponent && itemComponent.domNode;
-        if (!itemNode && mega.ui.viewerOverlay.visible) {
-            itemNode = mega.ui.viewerOverlay.nodeComponent.domNode;
+        if (!itemNode) {
+            if (mega.ui.viewerOverlay.visible) {
+                itemNode = mega.ui.viewerOverlay.nodeComponent.domNode;
+            }
+            // @todo: check why nodeComponent is missing in crosstab case
+            else {
+                itemNode = document.getElementById(this.handle);
+            }
         }
         const itemName = itemNode.querySelector('.fm-item-name');
         const itemImage = itemNode.querySelector('.fm-item-img');

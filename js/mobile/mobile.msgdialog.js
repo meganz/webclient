@@ -49,6 +49,7 @@ function msgDialog(type, title, msg, subMsg, callback, checkboxCallback) {
             'error': 'icon-x-circle-thin-outline error',
             'clear-bin': 'icon-alert-triangle-thin-outline warning',
             'remove': 'icon-alert-triangle-thin-outline warning',
+            'import_login_or_register': 'icon-question-circle-thin-outline info',
         };
 
         icon = dialogType[0] === 'error' ?
@@ -63,6 +64,13 @@ function msgDialog(type, title, msg, subMsg, callback, checkboxCallback) {
 
     if (dialogType[0] === 'confirmation' || dialogType[1] === `!^${l[78]}!${l[79]}`) {
         buttonsArray = [l[78], l[79]]; // [Yes, No]
+    }
+    else if (dialogType[0] === 'import_login_or_register' && typeof callback === 'function') {
+        buttonsArray = [l[171], l[209]];
+
+        // @todo: Remove once msgDialog and ephemeral session UI are ready
+        callback('login');
+        return false;
     }
     else if (dialogType.length > 1) {
         type = dialogType.shift();

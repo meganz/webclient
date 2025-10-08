@@ -1304,8 +1304,8 @@ MegaUtils.prototype.duplicatedItemsBanner = function(dups, id) {
     'use strict';
 
     if (is_mobile && mobile.banner) {
-        if (!dups || !id) {
-            mobile.banner.hide('duplicatedItemsBanner');
+        if (!dups || !id || mobile.nodeSelector.type) {
+            mobile.banner.hide('duplicatedItemsBanner', 0);
             return false;
         }
 

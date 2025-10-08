@@ -1724,7 +1724,15 @@ function init_page() {
             }
         }
         else if ((!pfid || flhashchange) && (id && id !== M.currentdirid || page === 'start' || page === 'fm/pwm')) {
-            M.openFolder(id, true);
+
+            M.openFolder(id, true)
+                .then(() => {
+
+                    if (localStorage.dlimp) {
+                        return M.fireFMDependantActions();
+                    }
+                })
+                .catch(reportError);
         }
         else {
             if (ul_queue.length > 0) {
@@ -3427,23 +3435,6 @@ mBroadcaster.once('boot_done', () => {
             setTimeout(performMeasurement, interval);
         })();
     }
-});
-
-mBroadcaster.addListener('fm:initialized', () => {
-    'use strict';
-
-    if (folderlink) {
-        return;
-    }
-
-    tSleep(4 + Math.random()).then(() => {
-        // Add the dynamic notifications
-        if (typeof notify.addDynamicNotifications !== 'undefined') {
-            notify.addDynamicNotifications().catch(dump);
-        }
-    });
-
-    return 0xDEAD;
 });
 
 // After open folder call, check if we should restore any previously opened preview node.

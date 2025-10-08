@@ -1329,21 +1329,24 @@ accountUI.plan = {
             };
 
             // check if we should show the section (uq response)
-            if (this.validateUser(account)) {
-                api.req({ a: 'cci', v: 2 }).then(({ result: res }) => {
-                    if (typeof res === 'object' && this.validateCardResponse(res)) {
-                        return this.render(res);
-                    }
+            const validSubscription = this.validateUser(account);
 
-                    hideCardSection();
-                });
-            }
-            else {
+            api.req({ a: 'cci', v: 4 }).then(({ result: res }) => {
+                if (typeof res === 'object' && this.validateCardResponse(res)) {
+                    return this.render(res, validSubscription);
+                }
+
                 hideCardSection();
-            }
+            }).catch((ex) => {
+                if (ex === ENOENT) {
+                    hideCardSection();
+                    return;
+                }
+                tell(ex);
+            });
         },
 
-        render(cardInfo) {
+        render(cardInfo, validSubscription) {
             'use strict';
 
             if (cardInfo && this.$paymentSection) {
@@ -1384,6 +1387,25 @@ accountUI.plan = {
                         })
                         .finally(() => loadingDialog.hide());
                 });
+
+                const canDelete = !validSubscription && cardInfo.dcc;
+                const $deleteCard = $('.payment-card-bottom a.payment-card-delete', this.$paymentSection)
+                    .toggleClass('hidden', !canDelete);
+
+                if (canDelete) {
+                    $deleteCard.rebind('click', () => {
+                        loadingDialog.show();
+                        api.req({a: 'gw19_dcc', id: cardInfo.id}).then(({result}) => {
+                            assert(result === 0, result);
+                            // @todo Hmm...
+                            M.account.lastupdate = 0;
+                            return accountUI();
+                        }).catch((ex) => {
+                            eventlog(500970, ex);
+                            msgDialog('warninga', '', l.delete_card_error.replace('%1', ex), l.edit_card_error_des);
+                        }).finally(() => loadingDialog.hide());
+                    });
+                }
 
                 this.$paymentSection.removeClass('hidden');
             }

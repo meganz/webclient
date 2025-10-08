@@ -2539,7 +2539,7 @@ function topmenuUI() {
             elements = document.getElementsByClassName('js-dropdown-rewind-progress');
 
             for (i = elements.length; i--;) {
-                if (!elements[i].classList.contains('active') || e && e.target.closest('.topbar-links, .mega-header')) {
+                if (!elements[i].classList.contains('active')) {
                     elements[i].classList.remove('show');
                 }
             }

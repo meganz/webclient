@@ -1783,7 +1783,7 @@ function init_page() {
                                 onIdle(() => closeDialog());
                             }
                         );
-                        return $('#msgDialog');
+                        return $(mega.ui.sheet.domNode);
                     });
 
                 }

@@ -4214,7 +4214,8 @@ FileManager.prototype.cameraUploadUI = function() {
                 if ($dialog) {
                     if (!$dialog.hasClass('mega-dialog') &&
                         !$dialog.hasClass('fm-dialog-mobile') &&
-                        !$dialog.hasClass('fm-dialog')) {
+                        !$dialog.hasClass('fm-dialog') &&
+                        !$dialog.hasClass('msg-dialog')) {
 
                         throw new Error(`Unexpected dialog(${name}) type...`);
                     }

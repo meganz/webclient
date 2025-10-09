@@ -134,7 +134,6 @@ body.mobile .mega-sheet.normal .sheet .main {
 
 body.web-desktop .mega-sheet {
     justify-content: center;
-    z-index: 1201;
 }
 
 body.web-desktop .mega-sheet .sheet {
@@ -150,6 +149,7 @@ body.web-desktop .mega-sheet .sheet.ps {
     margin: auto;
 }
 
+body.web-desktop .mega-sheet .sheet .title a,
 body.web-desktop .mega-sheet .sheet .content a {
     color: var(--mobile-link-primary);
 }
@@ -178,7 +178,6 @@ body.web-desktop .mega-sheet.overlay-wrap .title h1,
 body.web-desktop .mega-sheet.overlay-wrap .title h2 {
     overflow-wrap: anywhere;
     word-break: normal;
-
 }
 
 body.mobile .mega-sheet .sheet .content .qrcode {

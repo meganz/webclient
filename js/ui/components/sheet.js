@@ -179,7 +179,7 @@ class MegaSheet extends MegaOverlay {
 
         if (typeof subNode === 'string') {
             subNode = document.createElement('h2');
-            subNode.textContent = title;
+            subNode.append(parseHTML(title));
 
             if (className) {
                 subNode.className = className;

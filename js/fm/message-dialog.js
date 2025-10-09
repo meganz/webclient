@@ -329,7 +329,7 @@ function closeMsg(value) {
     }
 
     if ($.dialog && !(M.chat && $.dialog === 'onboardingDialog')) {
-        $('.mega-dialog').removeClass('arrange-to   -back');
+        $('.mega-dialog').removeClass('arrange-to-back');
         $('.mega-dialog-container.common-container').removeClass('arrange-to-back');
     }
 
@@ -339,4 +339,8 @@ function closeMsg(value) {
     if (mega.ui.sheet.visible) {
         mega.ui.sheet.hide();
     }
+
+    mega.ui.sheet.off('close.megaSheet');
+    mega.ui.sheet.off('close.msgDialog');
+    mega.ui.sheet.clear();
 }

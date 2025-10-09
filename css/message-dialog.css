@@ -1,3 +1,6 @@
+.web-desktop .mega-sheet.msg-dialog {
+    z-index: 1201;
+}
 .web-desktop .mega-sheet.msg-dialog .sheet {
     max-width: 640px;
 }

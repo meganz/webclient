@@ -1052,49 +1052,51 @@ BusinessAccount.prototype.getSubUserTree = async function(subUserHandle) {
  * @returns {Promise}                   resolve if the operation succeeded
  */
 BusinessAccount.prototype.getInvoiceDetails = function (invoiceID, forceUpdate) {
-    "use strict";
-    var operationPromise = new MegaPromise();
-    if (!forceUpdate) {
-        if (mega.buinsessAccount && mega.buinsessAccount.invoicesDetailsList
-            && mega.buinsessAccount.invoicesDetailsList[invoiceID]) {
-            var currTime = new Date().getTime();
-            var cachedTime = mega.buinsessAccount.invoicesDetailsList[invoiceID].timestamp;
+    'use strict';
+
+    return new Promise((resolve, reject) => {
+        if (
+            !forceUpdate
+            && mega.buinsessAccount && mega.buinsessAccount.invoicesDetailsList
+            && mega.buinsessAccount.invoicesDetailsList[invoiceID]
+        ) {
+            const currTime = Date.now();
+            const cachedTime = mega.buinsessAccount.invoicesDetailsList[invoiceID].timestamp;
             if (cachedTime && (currTime - cachedTime) < this.invoiceListUpdateFreq) {
-                return operationPromise.resolve(1, mega.buinsessAccount.invoicesDetailsList[invoiceID]);
-            }
-        }
-    }
-
-    var request = {
-        'a': 'id', // get invoice details
-        'n': invoiceID,   // invoice number
-        'extax': 1
-    };
-
-    api_req(request, {
-        callback: function (res) {
-            if ($.isNumeric(res)) {
-                operationPromise.reject(0, res, 'API returned error');
-            }
-            else if (typeof res === 'object') {
-                var currTime = new Date().getTime();
-                mega.buinsessAccount = mega.buinsessAccount || Object.create(null);
-                mega.buinsessAccount.invoicesDetailsList = mega.buinsessAccount.invoicesDetailsList
-                    || Object.create(null);
-                res.timestamp = currTime;
-
-                mega.buinsessAccount.invoicesDetailsList[invoiceID] = res;
-                operationPromise.resolve(1, res); // invoice detail
-            }
-            else {
-                operationPromise.reject(0, 4, 'API returned error, ret=' + res);
+                return resolve({ st: 1, invoiceDetail: mega.buinsessAccount.invoicesDetailsList[invoiceID] });
             }
         }
 
+        const req = { a: 'id', n: invoiceID };
+
+        if (mega.flags.ff_ivd2) {
+            req.v = 2;
+        }
+        else {
+            req.extax = 1;
+        }
+
+        api.req(req)
+            .then(({ result: res }) => {
+                if (typeof res === 'object') {
+                    const currTime = Date.now();
+                    mega.buinsessAccount = mega.buinsessAccount || Object.create(null);
+                    mega.buinsessAccount.invoicesDetailsList = mega.buinsessAccount.invoicesDetailsList
+                        || Object.create(null);
+                    res.timestamp = currTime;
+
+                    mega.buinsessAccount.invoicesDetailsList[invoiceID] = res;
+                    resolve({ st: 1, invoiceDetail: res }); // invoice detail
+                }
+                else {
+                    reject({ st: 0, invoiceDetail: 4 });
+                }
+            })
+            .catch((ex) => {
+                reject({ st: 0, invoiceDetail: ex });
+            });
     });
-    return operationPromise;
 };
-
 
 /**
  * a function to get a list of payment gateways for business accounts

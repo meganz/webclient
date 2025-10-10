@@ -2035,6 +2035,7 @@ var slideshowid;
                     p.appendChild(newPdfIframe);
                 }
             }
+
             if (!newPdfIframe.contentWindow) {
                 throw EINCOMPLETE;
             }
@@ -2453,6 +2454,7 @@ var slideshowid;
      * @global
      */
     global.slideshow = slideshow;
+    global.slideshow.prepareAndViewPdfViewer = prepareAndViewPdfViewer;
     global.slideshow_next = slideshow_next;
     global.slideshow_prev = slideshow_prev;
     global.slideshow_handle = slideshow_handle;

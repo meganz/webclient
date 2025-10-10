@@ -2861,6 +2861,68 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
         return true;
     };
 
+    /**
+     * This is a method to work with V2 invoices
+     * @param {Number} st Status
+     * @param {Number|Object.<'n'|'d', String>} invoiceDetail API code or details
+     * @returns {void}
+     */
+    const fillInvoiceDetailPageWithBlob = (st, invoiceDetail) => {
+        let errTxt = '';
+
+        if (!st && invoiceDetail === ETEMPUNAVAIL) {
+            errTxt = l.invoice_in_progress; // Invoice is still being generated
+        }
+        else if (st !== 1 || typeof invoiceDetail.d !== 'string' && typeof invoiceDetail.n !== 'string') {
+            errTxt = l[19302];  // API error or invalid data
+        }
+
+        if (errTxt) {
+            msgDialog('warningb', '', errTxt);
+            loadingDialog.phide();
+            mySelf.viewBusinessInvoicesPage();
+            return;
+        }
+
+        const viewer = $('.media-viewer-container', 'body').addClass('pdf').removeClass('hidden');
+
+        const closeViewer = () => {
+            viewer.addClass('hidden').removeClass('pdf');
+        };
+
+        const buffer = base64_to_ab(invoiceDetail.d);
+        const toHide = [
+            '.media-viewer video',
+            '.img-wrap',
+            '.gallery-btn',
+            '.viewer-bars li button:not(.download):not(.close)',
+            '.viewer-bars .counter'
+        ];
+        $(toHide.join(','), viewer).addClass('hidden');
+        $('.viewer-bars .file-name', viewer).removeClass('hidden').text(invoiceDetail.n);
+
+        $('.viewer-bars li button.download', viewer).removeClass('hidden').rebind('click.media-viewer', () => {
+            const blob = new Blob([buffer], { type: 'application/pdf' });
+
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = invoiceDetail.n;
+            a.click();
+
+            URL.revokeObjectURL(a.href);
+        });
+        $('.viewer-bars li button.close', viewer).removeClass('hidden').rebind('click.close', () => {
+            mySelf.viewBusinessInvoicesPage();
+            closeViewer();
+        });
+
+        slideshow.prepareAndViewPdfViewer({ buffer });
+
+        loadingDialog.phide();
+
+        mBroadcaster.once('pagechange', closeViewer);
+    };
+
     var fillInvoiceDetailPage = function(st, invoiceDetail) {
 
 
@@ -3130,8 +3192,15 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
 
     mySelf.initBreadcrumbClickHandlers($pageHeader);
 
-    var gettingInvoiceDetailPromise = this.business.getInvoiceDetails(invoiceID, false);
-    gettingInvoiceDetailPromise.always(fillInvoiceDetailPage);
+    this.business.getInvoiceDetails(invoiceID, false)
+        .always(({ st, invoiceDetail }) => {
+            if (mega.flags.ff_ivd2) {
+                fillInvoiceDetailPageWithBlob(st, invoiceDetail);
+            }
+            else {
+                fillInvoiceDetailPage(st, invoiceDetail);
+            }
+        });
 };
 
 

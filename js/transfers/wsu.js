@@ -305,6 +305,11 @@ lazy(mega, 'wsuploadmgr', () => {
             const {pos, len, eof} = ulfile.reader.advanceHead();
             if (eof) {
                 ulfile.eofset = true;
+
+                if (!len) {
+                    // the server will confirm the empty size-setting chunk
+                    ulfile.needsizeconfirmation = true;
+                }
             }
 
             return [pos, len, fileno];
@@ -591,6 +596,8 @@ lazy(mega, 'wsuploadmgr', () => {
             this.abort = false;
             this.fileno = fileno;
             this.bytesuploaded = 0;
+            this.needsizeconfirmation = false;
+            this.havelastchunkconfirmation = false;
             this.reader = new FileUploadReader(file);
 
             // start the Speedometer the first activity
@@ -760,13 +767,49 @@ lazy(mega, 'wsuploadmgr', () => {
 
         finalise(chunk, type, fu) {
             if (!fu.abort && chunk) {
-                fu.bytesuploaded += chunk[1];
 
-                if (type < 2 && fu.bytesuploaded >= fu.reader.file.size) {
-                    // server confirmed last chunk (or more) rather than completing upload:
+                // empty chunk only allowed to confirm size
+                if (chunk[1]) {
+                    fu.bytesuploaded += chunk[1];
+                }
+                else {
+                    if (!fu.needsizeconfirmation) {
+                        if (self.d) {
+                            this.logger.error('Unexpected file size confirmation; starting over...', [fu]);
+                        }
+                        this.uploadfailed(fu, -2);
+                        return;
+                    }
+                    fu.needsizeconfirmation = false;
+                }
+
+                if (type === 7) {
+                    if (fu.reader.readpos < fu.reader.file.size) {
+                        if (self.d) {
+                            this.logger.error('Premature end-of-file ack; starting over...', [fu]);
+                        }
+                        this.uploadfailed(fu, -13);
+                        return;
+                    }
+                    if (fu.havelastchunkconfirmation) {
+                        if (self.d) {
+                            this.logger.error('Duplicate end-of-file ack; starting over...', [fu]);
+                        }
+                        this.uploadfailed(fu, -12);
+                        return;
+                    }
+                    fu.havelastchunkconfirmation = true;
+                }
+
+                if (fu.bytesuploaded >= fu.reader.file.size
+                    && !fu.needsizeconfirmation && !fu.havelastchunkconfirmation) {
+
+                    // the file has been fully uploaded, but
+                    // the server is telling us that it thinks it will send more confirmations
                     // this means that the server has lost its state
                     if (self.d) {
-                        this.logger.warn('The server has lost the plot; starting over...', [fu]);
+                        const s = `${chunk[2]} type ${type} ${chunk[1]}, ${fu.bytesuploaded} >= ${fu.reader.file.size}`;
+                        this.logger.warn(`The server has lost the plot (file ${s}); starting over...`, [fu]);
                     }
                     this.uploadfailed(fu, -8);
                 }

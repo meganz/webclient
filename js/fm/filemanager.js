@@ -3987,13 +3987,22 @@ FileManager.prototype.initStatusBarLinks = function() {
     const linkCount = $.selected.reduce((a, b) => {
         return a + (M.getNodeShare(b) ? 1 : 0);
     }, 0);
-    const linkButton = mega.ui.secondaryNav.selectionBar.querySelector('.link');
+    const { selectionBar } = mega.ui.secondaryNav;
+    const linkButton = selectionBar.querySelector('.link');
     if (linkButton) {
         linkButton.dataset.simpletip = linkCount === 0 ?
             mega.icu.format(l.share_link, $.selected.length) :
             linkCount === 1 ? l[6909] : l[17520];
     }
-    const $selectionStatusBar = $('.selection-status-bar');
+    const copyLinkButton = selectionBar.querySelector('.copy-link');
+    if (copyLinkButton) {
+        copyLinkButton.dataset.simpletip = linkCount === 1 ? l.copy_link : l.copy_links;
+    }
+    const removeLinkButton = selectionBar.querySelector('.remove-link');
+    if (removeLinkButton) {
+        removeLinkButton.dataset.simpletip = linkCount === 1 ? l[6821] : l[8735];
+    }
+    const $selectionStatusBar = $(selectionBar);
 
     $('.js-statusbarbtn', $selectionStatusBar).rebind('click', function(e) {
         if ($.selected !== selectionManager.selected_list) {
@@ -4019,6 +4028,36 @@ FileManager.prototype.initStatusBarLinks = function() {
         }
         else if (this.classList.contains('link')) {
             M.getLinkAction();
+        }
+        else if (this.classList.contains('copy-link')) {
+            const links = [];
+            for (let i = $.selected.length; i--;) {
+                const node = M.getNodeByHandle($.selected[i]);
+                if (node && node.ph) {
+                    let key = node.t ? u_sharekeys[node.h] && u_sharekeys[node.h][0] : node.k;
+                    if (key) {
+                        key = `#${a32_to_base64(key)}`;
+                    }
+                    links.push(
+                        `${getBaseUrl()}${node.t ? '/folder/' : '/file/'}${htmlentities(node.ph)}${key || ''}`
+                    );
+                }
+            }
+            copyToClipboard(links.join('\n'));
+            mega.ui.toast.show(links.length > 1 ? l.links_copied : l[1642]);
+        }
+        else if (this.classList.contains('remove-link')) {
+            const doRemove = () => {
+                const exportLink = new mega.Share.ExportLink({ updateUI: true, nodesToProcess: $.selected });
+                exportLink.removeExportLink(true);
+                selectionManager.clear_selection();
+            };
+            if (mega.config.get('nowarnpl')) {
+                doRemove();
+            }
+            else {
+                mega.Dialog.ExportLink.remove.show($.selected, null, doRemove);
+            }
         }
         else if (this.classList.contains('delete')) {
 

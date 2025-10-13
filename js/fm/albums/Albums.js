@@ -2976,6 +2976,10 @@ lazy(mega.gallery, 'albums', () => {
                 parent.addEventListener('contextmenu', this.ctxListener);
             }
 
+            if (!this.resizeListener) {
+                this.resizeListener = SoonFc(200, applyPs.bind(null, this.el, false));
+                window.addEventListener('resize', this.resizeListener);
+            }
         }
 
         setPendingCell(label) {
@@ -3601,6 +3605,10 @@ lazy(mega.gallery, 'albums', () => {
                 document.getElementById('albums-view').removeEventListener('contextmenu', this.ctxListener);
                 delete this.ctxListener;
             }
+            if (this.resizeListener) {
+                window.removeEventListener('resize', this.resizeListener);
+                delete this.resizeListener;
+            }
         }
 
         removeHeader() {
@@ -3734,7 +3742,7 @@ lazy(mega.gallery, 'albums', () => {
 
                     sortStore();
 
-                    if (M.isAlbumsPage(1)) {
+                    if (M.isAlbumsPage(1) && this.grid) {
                         if (isExisting) {
                             this.grid.removeAlbum(album);
 

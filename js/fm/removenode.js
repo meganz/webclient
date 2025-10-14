@@ -362,7 +362,7 @@ async function fmremove(selectedNodes, skipDelWarning) {
             }
 
             return Promise.allSettled(promises).then(() => {
-                if (c === 1) {
+                if (c === 1 && promises.length) {
                     mega.ui.toast.show(l.contact_removed);
                 }
             }).dump('delete-contact');

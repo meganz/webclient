@@ -891,9 +891,6 @@ function start_import() {
 
     if (u_type) {
         loadSubPage('fm');
-        if (fminitialized) {
-            importFile();
-        }
         return;
     }
 
@@ -921,7 +918,7 @@ function start_import() {
     };
 
     msgDialog(dialogType, l[1193], dialogHeader, dialogTxt, function(e) {
-        if (e === 0) {
+        if (e < 1) {
             buttonEventLogin();
         }
         else if (e === 1) {

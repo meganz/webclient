@@ -1292,7 +1292,6 @@ class MegaGallery {
         rfBlock.removeClass('hidden');
         $('.files-grid-view.fm, .fm-blocks-view.fm, .fm-empty-section', rfBlock).addClass('hidden');
         mega.ui.secondaryNav.updateGalleryLayout();
-        mega.ui.secondaryNav.hideBreadcrumb();
         mega.ui.secondaryNav.updateInfoChipsAndViews();
         mega.ui.secondaryNav.updateSmallNavButton(!M.isGalleryPage() && !M.isAlbumsPage());
 
@@ -3124,6 +3123,7 @@ async function galleryUI(id) {
     $('.fm-notification-block.new-feature-rewind-notification', '.fm-right-files-block').addClass('hidden');
     $('.gallery-close-discovery', $headerBlock).addClass('hidden');
 
+    mega.ui.secondaryNav.hideBreadcrumb();
     mega.gallery.setTabs();
 
     if (!mega.gallery.typeControl) {

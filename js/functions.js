@@ -2448,7 +2448,7 @@ function odqPaywallDialogTexts(user_attr, accountData) {
 
     // In here, it's guaranteed that we have pro.membershipPlans,
     // but we will check for error free logic in case of changes
-    let neededPro = 4;
+    let neededPro = 1;
     const minPlan = pro.filter.lowestRequired(accountData.space_used, 'storageTransferDialogs');
 
     if (minPlan) {

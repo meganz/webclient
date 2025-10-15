@@ -288,16 +288,15 @@
 .transfer-progress-widget-body {
     position: relative;
     background: var(--surface-main);
-    border-radius: 0 0 16px 16px;
     overflow: hidden;
     z-index: 40;
-    padding-bottom: 8px;
-}
-.transfer-progress.tpw .widget-body-container {
     max-height: 248px;
 }
-.transfer-progress.tpw .widget-body-container .y-rail-offset {
-    margin-bottom: 5px;
+.transfer-progress.tpw .widget-body-container {
+    min-height: 56px;
+    max-height: 248px;
+    overflow: hidden;
+    position: relative;
 }
 .transfer-task-row {
     width: 100%;
@@ -305,7 +304,7 @@
     padding: 12px 16px 12px 24px;
     position: relative;
     box-sizing: border-box;
-    display: none;
+    display: flex;
     align-items: center;
 }
 .transfer-task-row:hover::after {
@@ -327,12 +326,6 @@
     width: 16px;
     height: 16px;
     display: block;
-}
-.transfer-progress-widget .widget-body-container.active .transfer-task-row:not(.complete) {
-    display: flex;
-}
-.transfer-progress-widget .widget-body-container.completed .transfer-task-row.complete {
-    display: flex;
 }
 .transfer-task-row .item-type-icon {
     margin: 0 12px;

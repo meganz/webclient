@@ -931,7 +931,7 @@
         });
 
         lazy(calculated, 'contentWidth', function() {
-            var contentWidth = self.$listContainer.children(":first").outerWidth();
+            var contentWidth = self.listContainer.children[0].offsetWidth;
             if (contentWidth) {
                 return contentWidth;
             }

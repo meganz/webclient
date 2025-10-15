@@ -2612,19 +2612,49 @@ FileManager.prototype.addTransferPanelUI = function() {
             }
         });
 
-        var $tmp = $('.grid-url-arrow, .clear-transfer-icon, .link-transfer-status', domTable);
-        $tmp.rebind('click', function(e) {
-            var target = $(this).closest('tr');
+        if ($.transferHeader.doBind) {
+            $.transferHeader.doBind(domTable);
+        }
+
+        delay('tfs-ps-update', () => {
+            // XXX: This update will fire ps-y-reach-end, set a flag to ignore it...
+
+            $.isTfsPsUpdate = true;
+            Ps.update(domScrollingTable);
+
+            onIdle(() => {
+                $.isTfsPsUpdate = false;
+            });
+        });
+    };
+
+    $.transferHeader.doBind = (domTable) => {
+        // Bind proxy handlers only once
+        delete $.transferHeader.doBind;
+
+        domTable.addEventListener('click', e => {
+            let $this;
+            if (e.target.closest('.grid-url-arrow')) {
+                $this = $(e.target.closest('.grid-url-arrow'));
+            }
+            else if (e.target.closest('.clear-transfer-icon')) {
+                $this = $(e.target.closest('.clear-transfer-icon'));
+            }
+            else if (e.target.closest('.link-transfer-status')) {
+                $this = $(e.target.closest('.link-transfer-status'));
+            }
+            else {
+                return;
+            }
+            var target = $this.closest('tr');
             e.preventDefault();
             e.stopPropagation(); // do not treat it as a regular click on the file
             $('tr', domTable).removeClass('ui-selected');
 
-            if ($(this).hasClass('link-transfer-status')) {
+            if ($this.hasClass('link-transfer-status')) {
 
-                var $trs = $(this).closest('tr');
-
-                if ($(this).hasClass('transfer-play')) {
-                    if ($trs.filter('.transfer-upload').length && ulmanager.ulOverStorageQuota) {
+                if ($this.hasClass('transfer-play')) {
+                    if ($this.hasClass('transfer-upload') && ulmanager.ulOverStorageQuota) {
                         ulmanager.ulShowOverStorageQuotaDialog();
                         return;
                     }
@@ -2634,24 +2664,21 @@ FileManager.prototype.addTransferPanelUI = function() {
                         return;
                     }
                 }
-
-                var ids = $trs.attrs('id');
-
-                if ($(this).hasClass('transfer-play')) {
-                    ids.map(fm_tfsresume);
+                if ($this.hasClass('transfer-play')) {
+                    fm_tfsresume(target[0].id);
                 }
-                else {
-                    ids.filter(id => !String(id).startsWith('LOCKed_')).map(fm_tfspause);
+                else if (!String(target[0].id).startsWith('LOCKed_')) {
+                    fm_tfspause(target[0].id);
                 }
             }
             else {
-                if (!target.hasClass('.transfer-completed')) {
+                if (!target.hasClass('transfer-completed')) {
                     var toabort = target.attr('id');
                     dlmanager.abort(toabort);
                     ulmanager.abort(toabort);
                 }
                 target.fadeOut(function() {
-                    $(this).remove();
+                    target.remove();
                     tfsheadupdate({c: target.attr('id')});
                     mega.tpw.removeRow(target.attr('id'));
                     $.clearTransferPanel();
@@ -2661,10 +2688,14 @@ FileManager.prototype.addTransferPanelUI = function() {
             return false;
         });
 
-        $tmp = $('tr', domTable);
-        $tmp.rebind('dblclick', function() {
-            if ($(this).hasClass('transfer-completed')) {
-                var id = String($(this).attr('id'));
+        domTable.addEventListener('dblclick.transferhead', (ev) => {
+            if (!ev.target.closest('tr')) {
+                return;
+            }
+            ev.stopPropagation();
+            ev.preventDefault();
+            let { classList, id } = ev.target.closest('tr');
+            if (classList.contains('transfer-completed')) {
                 if (id[0] === 'd') {
                     id = id.split('_').pop();
                 }
@@ -2683,12 +2714,18 @@ FileManager.prototype.addTransferPanelUI = function() {
             return false;
         });
 
-        $tmp.rebind('click contextmenu', function(e) {
+        const clickContextFn = (e) => {
+            if (!e.target.closest('tr')) {
+                return;
+            }
+            e.stopPropagation();
+            e.preventDefault();
+            const $this = $(e.target.closest('tr'));
             if (e.type === 'contextmenu') {
                 if (!e.ctrlKey && !e.metaKey && !e.shiftKey) {
                     $('.ui-selected', domTable).removeClass('ui-selected');
                 }
-                $(this).addClass('ui-selected dragover');
+                $this.addClass('ui-selected dragover');
                 transferPanelContextMenu(null);
                 return !!M.contextMenuUI(e);
             }
@@ -2697,13 +2734,13 @@ FileManager.prototype.addTransferPanelUI = function() {
                 $.hideContextMenu();
                 if (e.shiftKey && domNode) {
                     var start = domNode;
-                    var end = this;
+                    var end = $this[0];
                     if ($.TgridLastSelected && $($.TgridLastSelected).hasClass('ui-selected')) {
                         start = $.TgridLastSelected;
                     }
                     if ($(start).index() > $(end).index()) {
                         end = start;
-                        start = this;
+                        start = $this[0];
                     }
                     $('.ui-selected', domTable).removeClass('ui-selected');
                     $([start, end]).addClass('ui-selected');
@@ -2713,34 +2750,24 @@ FileManager.prototype.addTransferPanelUI = function() {
                 }
                 else if (!e.ctrlKey && !e.metaKey) {
                     $('.ui-selected', domTable).removeClass('ui-selected');
-                    $(this).addClass('ui-selected');
-                    $.TgridLastSelected = this;
+                    $this.addClass('ui-selected');
+                    $.TgridLastSelected = $this[0];
                 }
                 else {
-                    if ($(this).hasClass("ui-selected")) {
-                        $(this).removeClass("ui-selected");
+                    if ($this.hasClass("ui-selected")) {
+                        $this.removeClass("ui-selected");
                     }
                     else {
-                        $(this).addClass("ui-selected");
-                        $.TgridLastSelected = this;
+                        $this.addClass("ui-selected");
+                        $.TgridLastSelected = $this[0];
                     }
                 }
             }
 
             return false;
-        });
-        $tmp = undefined;
-
-        delay('tfs-ps-update', function() {
-            // XXX: This update will fire ps-y-reach-end, set a flag to ignore it...
-
-            $.isTfsPsUpdate = true;
-            Ps.update(domScrollingTable);
-
-            onIdle(function() {
-                $.isTfsPsUpdate = false;
-            });
-        });
+        };
+        domTable.addEventListener('click', clickContextFn);
+        domTable.addEventListener('contextmenu', clickContextFn);
     };
 
     $.transferClose = function() {

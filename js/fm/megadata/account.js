@@ -1124,6 +1124,7 @@ MegaData.prototype.showOverStorageQuota = async function(quota, options) {
         $strgdlg.addClass('full');
         $('.body-header', $strgdlgBodyFull).text(l[23519]);
 
+        await pro.loadMembershipPlans();
         var dlgTexts = odqPaywallDialogTexts(u_attr || {}, M.account);
         $('.body-p.long', $strgdlgBodyFull).safeHTML(dlgTexts.dialogText);
 

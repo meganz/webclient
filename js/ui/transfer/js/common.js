@@ -188,7 +188,7 @@ mBroadcaster.once('boot_done', function populate_lx() {
         .replace(/\[UL]/g, '<ul>').replace(/\[\/UL]/g, '</ul>')
         .replace(/\[LI]/g, '<li>').replace(/\[\/LI]/g, '</li>');
     l.transferit_faq_upd_q4_info1 = escapeHTML(l.transferit_faq_upd_q4_info1)
-        .replace('[A]', '<a href="https://mega.nz/register" class="link clickurl" target="_blank">')
+        .replace('[A]', `<a href="https://mega.${mega.tld}/register" class="link clickurl" target="_blank">`)
         .replace('[/A]', '</a>')
         .replace('[BR]', '<br>');
     l.transferit_cnt_copy_info2 = escapeHTML(l.transferit_cnt_copy_info2)
@@ -196,4 +196,16 @@ mBroadcaster.once('boot_done', function populate_lx() {
         .replace('[/A1]', '</a>')
         .replace('[A2]', '<a href="mailto:copyright@transfer.it" target="_blank" class="clickurl link">')
         .replace('[/A2]', '</a>');
+
+    if (self.is_transferit) {
+        for (const k in self.l) {
+            if (typeof self.l[k] === 'string') {
+                if (self.l[k].includes('@mega.')) {
+
+                    self.l[k] = self.l[k].replace(/@mega[\w.]+/, '@transfer.it');
+                }
+                self.l[k] = self.l[k].replace(/\[\/?\w+]/g, '');
+            }
+        }
+    }
 });

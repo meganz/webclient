@@ -185,21 +185,49 @@ lazy(s4, 'utils', () => {
             }
 
             // Get confirmation message data
-            const { title, message, cfgName } = this.getConfirmationMessage({
+            const confirmation = await this.getConfirmationMessage({
                 action: toMove ? 'move' : 'copy', n, s4Nodes, type, tNode, tType
             });
 
-            // Show confiormation dialog
+            if (!confirmation) {
+                throw EBLOCKED;
+            }
+
+            const { title, message, cfgName, sensitives } = confirmation;
+
+            /**
+             * Cleaning up the sensitives before moving to the bucket
+             * @param {Boolean} yes Result from the confirmation dialog
+             * @returns {Promise<true>}
+             */
+            const nodesCleanup = async(yes) => {
+                if (yes && sensitives.length) {
+                    loadingDialog.show('dropSenToS4');
+                    await mega.sensitives.toggleStatus(sensitives.map(({ h }) => h), false)
+                        .finally(loadingDialog.hide.bind(loadingDialog, 'dropSenToS4'));
+                }
+
+                return yes;
+            };
+
+            // Show confirmation dialog
             if (title && message && !mega.config.get(cfgName)) {
                 return asyncMsgDialog(
                     `confirmation:!^${toMove ? l[62] : l[63]}!${l[82]}`,
                     null,
                     title,
                     message,
-                    null,
+                    nodesCleanup,
                     cfgName
-                );
+                ).then(res => {
+                    if (res) {
+                        return res;
+                    }
+                    throw EBLOCKED;
+                });
             }
+
+            await nodesCleanup(true);
 
             // Confirm action other actions
             return true;
@@ -254,10 +282,10 @@ lazy(s4, 'utils', () => {
         /**
          * Getting message for confirmation dialog when copying/moving from/to s4
          * @param {Object} data Nodes, S4 nodes, types, action name
-         * @returns {Object} title, message, cfgName
+         * @returns {Object?} title, message, cfgName
          * @memberOf s4
          */
-        getConfirmationMessage(data = {}) {
+        async getConfirmationMessage(data = {}) {
             const { action, n, type, s4Nodes, tNode, tType } = data;
 
             let helpUrl = `${l.mega_help_host}/megas4/s4-buckets/move-bucket`;
@@ -265,10 +293,31 @@ lazy(s4, 'utils', () => {
             let message = '';
             let cfgName = '';
             let suffix = '';
+            let sensitives = [];
 
             // Get number of S4 nodes only
             if (s4Nodes.length > 1) {
                 suffix =  '_plural';
+            }
+
+            // Check if there are hidden nodes on move action
+            if (action === 'move') {
+                sensitives = n.filter(mega.sensitives.isSensitive);
+
+                const hiddenAcknowledged = () => (sensitives.length && !mega.config.get('skipSenToS4'))
+                    ? asyncMsgDialog(
+                        `confirmationb:!^${l[507]}!${l[82]}`,
+                        null,
+                        l.sen_s4_warn_title,
+                        l.sen_s4_warn_txt,
+                        null,
+                        'skipSenToS4'
+                    )
+                    : Promise.resolve(true);
+
+                if (!(await hiddenAcknowledged().catch(nop))) {
+                    return null;
+                }
             }
 
             // Files and folders to a container
@@ -310,19 +359,17 @@ lazy(s4, 'utils', () => {
                     message = l[`s4_warn_${ action }_items_to_bucket${ suffix }`];
                 }
             }
-            // From Object storage to Cloud drive
-            else {
+            // Move From Object storage to Cloud drive
+            else if (action === 'move') {
                 cfgName = 'skips4tocd';
 
                 // Move Buckets to Cloud drive
                 if (type === 'bucket') {
-                    if (action === 'move') {
-                        title = l[`s4_title_${ action }_bucket_to_cd${ suffix }`];
-                        message = l[`s4_warn_copy_move_bucket_to_cd${ suffix }`];
-                    }
+                    title = l[`s4_title_${ action }_bucket_to_cd${ suffix }`];
+                    message = l[`s4_warn_copy_move_bucket_to_cd${ suffix }`];
                 }
                 // Objects or sub-folders to Cloud drive
-                else if (type === 'object' || type === 'bucket-child' && s4Nodes.length === 1) {
+                else if ((type === 'object' || type === 'bucket-child') && s4Nodes.length === 1) {
                     title = l[`s4_title_${ action }_object_to_cd${ suffix }`];
                     message = l.s4_warn_copy_move_items_to_cd;
                 }
@@ -339,7 +386,7 @@ lazy(s4, 'utils', () => {
                 .replace('[/A]', '</a>')
                 .replace('%1', n[0].name).replace('%2', tNode.name);
 
-            return { title, message, cfgName };
+            return { title, message, cfgName, sensitives };
         },
 
         /**
@@ -415,7 +462,14 @@ lazy(s4, 'utils', () => {
             const treeWrap = document.querySelector(`.${wrapperClass}`);
             const cn = this.getContainersList();
             const prefix = dialog ? 'mc' : '';
-            let treeNode = treeWrap.querySelector('.s4 .tree');
+            let treeNode = treeWrap && treeWrap.querySelector('.s4 .tree');
+
+            if (!treeNode) {
+                if (self.d) {
+                    console.warn(`Cannot render S4 Container tree, ${wrapperClass} missing.`);
+                }
+                return false;
+            }
 
             const createItem = (node, id, name, icon, staticItem, eventId) => {
                 const itemWrap = mCreateElement('li', {
@@ -500,7 +554,7 @@ lazy(s4, 'utils', () => {
                 ],
                 [
                     'eu-central-2.s4.mega.io',
-                    l.location_bettembourg,
+                    l[18922],
                     'Bettembourg'
                 ],
                 [
@@ -517,6 +571,7 @@ lazy(s4, 'utils', () => {
 
             const tableNode = parentNode.querySelector('.js-endpoints-table');
             const tipsNode = parentNode.querySelector('.js-endpoints-desc');
+            const s4TipNode = parentNode.querySelector('.js-endpoints-s4');
             let rowNode = null;
 
             if (!tableNode || !tipsNode) {
@@ -537,28 +592,34 @@ lazy(s4, 'utils', () => {
                 let subNode = null;
 
                 // Create table header
-                rowNode = mCreateElement('tr', undefined, tableNode);
-                subNode = mCreateElement('td', undefined, rowNode);
-                mCreateElement('a', { class: 'settings-lnk' }, subNode).textContent = item[0];
-                mCreateElement('td', undefined, rowNode).textContent = item[1];
-                subNode = mCreateElement('td', undefined, rowNode);
+                rowNode = mCreateElement('tr', null, tableNode);
+                subNode = mCreateElement('td', null, rowNode);
+                mCreateElement('span', null, subNode).textContent = `s3.${item[0]}`;
+                mCreateElement('td', null, rowNode).textContent = item[1];
+                subNode = mCreateElement('td', null, rowNode);
 
                 // Create copy to clipboard button
                 subNode = mCreateElement('button', {
                     'class': 'mega-button small action copy',
-                    'data-url': item[0],
+                    'data-url': `s3.${item[0]}`,
                     'data-location': item[2]
                 }, subNode);
                 mCreateElement('i', { class: 'sprite-fm-mono icon-copy' }, subNode);
             }
 
             // Fill URL exapmles in the tips
+            mCreateElement('li', undefined, tipsNode).append(parseHTML(l.s4_s3_prefix_usage));
             mCreateElement('li', undefined, tipsNode).append(parseHTML(
-                l.s4_s3_prefix_example.replace('%1', `s3.${endpoints[0][0]}`)
+                l.s4_iam_prefix_usage.replace('%1', `iam.${endpoints[0][0]}`)
             ));
-            mCreateElement('li', undefined, tipsNode).append(parseHTML(
-                l.s4_iam_prefix_example.replace('%1', `iam.${endpoints[0][0]}`)
-            ));
+
+            if (s4TipNode) {
+                $(s4TipNode).safeHTML(
+                    l.s4_s3_g_endpoint_tip
+                        .replace('%1', `<span class="code">s3.g.s4.mega.io</span>`)
+                        .replace('%2', `<span class="code">s3.eu-central-1.s4.mega.io</span>`)
+                );
+            }
 
             // Copy to clipboard buttons
             $('.mega-button.copy', parentNode).rebind('click.copyUrl', (e) => {

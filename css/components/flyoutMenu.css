@@ -8,11 +8,15 @@
     grid-row: 3/4;
     grid-column: 3/4;
     overflow: hidden;
+    width: 0;
+    min-width: 0;
+    padding: 16px 0;
+    box-sizing: border-box;
+}
+#pmlayout .flyout-holder.flyout-shown,
+#startholder .flyout-holder.flyout-shown {
     width: var(--flyout-width);
     border-left: 1px solid var(--mobile-border-strong);
-    padding: 16px 0;
-    transition: 200ms linear;
-    box-sizing: border-box;
 }
 #startholder .flyout-holder {
     grid-row: 1/2;
@@ -250,16 +254,16 @@
     background-image: url("../../images/mega/contacts-book.png");
 }
 .flyout-overlay i.search {
-    background-image: url("../../images/mega/glass-details.png");
+    background-image: url("../../images/mega/glass/glass-details.png");
 }
 .flyout-overlay i.folder {
-    background-image: url("../../images/mega/glass-folder.png");
+    background-image: url("../../images/mega/glass/glass-folder.png");
 }
 .flyout-overlay i.chats {
-    background-image: url("../../images/mega/glass-message-call.png");
+    background-image: url("../../images/mega/glass/glass-message-call.png");
 }
 .flyout-overlay i.meetings {
-    background-image: url("../../images/mega/glass-video.png");
+    background-image: url("../../images/mega/glass/glass-video.png");
 }
 .flyout-overlay .meeting-dropdown-button i.right-icon {
     --icon-size: 24px;

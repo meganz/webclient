@@ -14,7 +14,7 @@ lazy(mega.ui, 'mNodeFilter', () => {
 
     // static sections where we don't show filtering capabilities
     const hiddenSections = new Set([
-        'shares', 'out-shares', 'file-requests', 'faves', 'recents'
+        'recents'
     ]);
 
     const selectedFilters = {
@@ -28,6 +28,12 @@ lazy(mega.ui, 'mNodeFilter', () => {
             title: l.filter_chip_type,
             selection: false,
             eid: 99941,
+            shouldShow() {
+                if (M.onDeviceCenter && mega.devices.ui.getRenderSection() === 'device-centre-folders') {
+                    return false;
+                }
+                return !['shares', 'out-shares', 'file-requests'].includes(M.currentdirid);
+            },
             match(n) {
                 if (n.t) {
                     return this.selection.includes('folder');
@@ -115,6 +121,12 @@ lazy(mega.ui, 'mNodeFilter', () => {
             title: l.filter_chip_mdate,
             selection: false,
             eid: 99953,
+            shouldShow() {
+                if (M.onDeviceCenter && mega.devices.ui.getRenderSection() === 'device-centre-folders') {
+                    return false;
+                }
+                return !['shares', 'out-shares', 'file-requests'].includes(M.currentdirid);
+            },
             match(n) {
                 if (n.t) {
                     return false;
@@ -248,7 +260,9 @@ lazy(mega.ui, 'mNodeFilter', () => {
             selection: false,
             eid: 99979,
             shouldShow() {
-                return !!M.search;
+                return !!M.search
+                    && !$('button.search-chip', '.searcher-wrapper').length
+                    && !['shares', 'out-shares', 'file-requests'].includes(M.currentdirid);
             },
             match(n) {
 
@@ -261,7 +275,7 @@ lazy(mega.ui, 'mNodeFilter', () => {
                    (this.selection.includes('favourites') && n.fav) ||
                    (this.selection.includes('rubbish') && root === M.RubbishID) ||
                    (this.selection.includes('incoming') && root === 'shares') ||
-                   (this.selection.includes('outgoing') && n.shares)) {
+                    this.selection.includes('outgoing') && M.su[n.h]) {
 
                     return true;
                 }
@@ -405,7 +419,17 @@ lazy(mega.ui, 'mNodeFilter', () => {
                 }));
             }
 
-            this.$resetFilterChips.rebind(`click.resetFilterBy${name}`, () => this.resetToDefault());
+            const handleResetBy = tryCatch(() => {
+                this.resetToDefault();
+                if (M.search) {
+                    pushHistoryState(true, {
+                        ...history.state,
+                        searchFilters: null
+                    });
+                }
+            });
+            this.$resetFilterChips.rebind(`click.resetFilterBy${name}`, handleResetBy);
+            handleResetBy();
         }
 
         /**
@@ -465,20 +489,50 @@ lazy(mega.ui, 'mNodeFilter', () => {
 
             if (index === this.selectedIndex) {
                 this.resetToDefault();
-                M.openFolder(M.currentdirid, true);
+                if (M.search) {
+                    const {state} = history;
+                    tryCatch(() => {
+                        if (state.searchFilters && state.searchFilters[this.name]) {
+                            const newState = {
+                                ...state,
+                                searchFilters: {
+                                    ...state.searchFilters,
+                                    [this.name]: null,
+                                    value: selectedFilters.value
+                                }
+                            };
+
+                            if (Object.keys(newState.searchFilters).length === 0) {
+                                delete newState.searchFilters;
+                            }
+
+                            pushHistoryState(true, newState);
+                        }
+                    })();
+                }
+                if (folderlink && String(M.currentdirid).startsWith('search/')) {
+                    M.fmSearchNodes(M.currentdirid.replace('search/', ''));
+                }
+                else {
+                    M.openFolder(M.currentdirid, true);
+                }
                 if (this.autoDismiss) {
                     this.hide(true);
                 }
                 return;
             }
 
-            item.el.classList.add('selected');
+            if (item) {
+                item.el.classList.add('selected');
 
-            for (let i = 0; i < this._options.length; i++) {
-                if (item.el !== this._options[i].el) {
-                    this._options[i].deselectItem();
-                    this._options[i].el.classList.remove('selected');
+                for (let i = 0; i < this._options.length; i++) {
+                    if (item.el !== this._options[i].el) {
+                        this._options[i].deselectItem();
+                        this._options[i].el.classList.remove('selected');
+                    }
                 }
+
+                this.$text.text(item.el.innerText);
             }
 
             this.selectedIndex = index;
@@ -498,10 +552,36 @@ lazy(mega.ui, 'mNodeFilter', () => {
             this.$text.text(item.el.innerText);
             this.$element.addClass('selected');
             this.$resetFilterChips.removeClass('hidden');
+            tryCatch(() => {
+                if (history.state.searchString) {
+                    const baseSearchFilters = history.state.searchFilters || Object.create(null);
+                    pushHistoryState(true, {
+                        ...history.state,
+                        searchFilters: {
+                            ...baseSearchFilters,
+                            [this.name]: {
+                                data: freeze({ index, }),
+                            },
+                            value: this.selectedFilters.value
+                        }
+                    });
+                }
+            })();
 
             // @todo instead of going all through openFolder() we may want to filterBy(search|parent) + renderMain()
             if (!preventReload) {
-                M.openFolder(M.currentdirid, true);
+                const isSearch = String(M.currentdirid).startsWith('search/');
+
+                if (folderlink && isSearch) {
+                    M.fmSearchNodes(M.currentdirid.replace('search/', ''));
+                }
+                else {
+                    M.openFolder(M.currentdirid, true);
+                }
+
+                if (isSearch) {
+                    mega.ui.searchbar.reinitiateSearchTerm();
+                }
             }
         }
     }
@@ -514,10 +594,12 @@ lazy(mega.ui, 'mNodeFilter', () => {
         FilterChipComponent: FilterChip,
         /**
          * Sets up the chips, checking the current page and initializing the type filter chip if applicable.
+         * @param {Object} overloadedFilters An optional object containing filters to overload the default selections.
          *
          * @returns {undefined}
          */
-        initSearchFilter() {
+        initSearchFilter(overloadedFilters) {
+            overloadedFilters = overloadedFilters || Object.create(null);
             $fmFilterChipsWrapper = $('.fm-filter-chips-wrapper', '.fm-right-files-block');
             $resetFilterChips = $('.fm-filter-reset', $fmFilterChipsWrapper);
 
@@ -527,13 +609,57 @@ lazy(mega.ui, 'mNodeFilter', () => {
                 const ctx = filters[name];
 
                 if (!ctx.component) {
-                    ctx.component = new FilterChip(name, 'fm', $fmFilterChipsWrapper, filters, selectedFilters);
+                    const selectedFiltersToUse = overloadedFilters[name] || selectedFilters;
+                    ctx.component = new FilterChip(name, 'fm', $fmFilterChipsWrapper, filters, selectedFiltersToUse);
+                }
+                else if (overloadedFilters[name]) {
+                    ctx.component.show(-1000, -1000); // render offscreen. will get hidden by the click
+                    const {index} = overloadedFilters[name].data;
+                    const i = ctx.component._options[index];
+                    ctx.component.onItemSelect(index, i, null, true);
                 }
             }
 
-            $resetFilterChips.rebind('click.resetFilters', () => {
+            tryCatch(() => {
+                if (Object.keys(overloadedFilters).length !== 0) {
+                    const toSet = Object.keys(overloadedFilters)
+                        .reduce((acc, c) => {
+                            if (c === 'value') {
+                                acc.value = overloadedFilters[c];
+                                return acc;
+                            }
+                            if (overloadedFilters[c]) {
+                                acc.data = { name: c, ...overloadedFilters[c].data };
+                            }
+                            return acc;
+                        }, { data: null, value: 0 });
+                    mega.ui.mNodeFilter.selectedFilters.value = toSet.value;
+                    mega.ui.mNodeFilter.selectedFilters.data = toSet.data;
+                    pushHistoryState(true, {
+                        ...history.state,
+                        searchFilters: overloadedFilters
+                    });
+                }
+            })();
 
-                M.openFolder(M.currentdirid, true);
+            $resetFilterChips.rebind('click.resetFilters', () => {
+                if (String(M.currentdirid).startsWith('search/')) {
+                    const search = $('.topbar-searcher', $(pmlayout));
+                    const chipBtn = $('button.search-chip', search);
+                    const location = mega.ui.searchbar.locationFn(chipBtn.length && chipBtn.attr('data-location'));
+
+                    M.v = M.getFilterBy(M.getFilterBySearchFn($.trim($('.js-filesearcher', search).val()), location));
+                    M.renderMain();
+
+                    mega.ui.searchbar.reinitiateSearchTerm();
+
+                    const $resultsCount = $('.fm-search-count', '.fm-right-files-block .fm-right-header');
+                    $resultsCount.removeClass('hidden');
+                    $resultsCount.text(mega.icu.format(l.search_results_count, M.v.length));
+                }
+                else {
+                    M.openFolder(M.currentdirid, true);
+                }
             });
         },
         match(n) {
@@ -567,14 +693,7 @@ lazy(mega.ui, 'mNodeFilter', () => {
                 }
             }
 
-            const hidden = M.gallery || M.chat || M.albums
-                || M.currentrootid === M.RubbishID
-                || hiddenSections.has(M.currentdirid)
-                || M.currentrootid === 's4' && M.currentCustomView.subType !== 'bucket'
-                || String(M.currentdirid).startsWith('user-management')
-                || folderlink
-                || mega.devices.ui.getRenderSection() === 'device-centre-devices'
-                || mega.devices.ui.getRenderSection() === 'device-centre-folders';
+            const hidden = !this.viewEnabled;
 
             if (hidden) {
                 $fmFilterChipsWrapper =
@@ -584,9 +703,26 @@ lazy(mega.ui, 'mNodeFilter', () => {
             else {
                 this.initSearchFilter();
             }
+
+            if (M.search && !stash && history.state.searchFilters) {
+                this.reapplyFilterSelections(history.state.searchFilters);
+            }
         },
         get selectedFilters() {
             return selectedFilters;
-        }
+        },
+        get viewEnabled() {
+            return !(M.gallery
+                || M.chat
+                || M.albums
+                || hiddenSections.has(M.currentdirid)
+                || M.currentrootid === 's4' && M.currentCustomView.subType !== 'bucket'
+                || String(M.currentdirid).startsWith('user-management')
+                || pfcol
+                || mega.devices.ui.getRenderSection() === 'device-centre-devices');
+        },
+        reapplyFilterSelections(filterSelections) {
+            this.initSearchFilter(filterSelections);
+        },
     });
 });

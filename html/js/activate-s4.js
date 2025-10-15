@@ -105,6 +105,12 @@ class ActivateS4Page {
     }
 
     static load() {
+        if (page.endsWith('force')) {
+            localStorage.s4pf = 1;
+            loadSubPage('fm');
+            return false;
+        }
+
         if (u_attr && u_attr.pf && !u_attr.s4 && !pro.isExpiredOrInGracePeriod(u_attr.pf.s)) {
             parsepage(pages.activates4);
             return new ActivateS4Page();

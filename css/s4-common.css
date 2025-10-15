@@ -125,16 +125,7 @@
     margin-top: 24px;
 }
 .bucket-access-warning.fm-notification-block {
-    color: var(--mobile-text-primary);
-    background-color: var(--mobile-notification-info);
-    border-radius: 0;
     display: block;
-    padding: 12px 24px;
-}
-.bucket-access-warning.fm-notification-block a,
-.bucket-access-warning.fm-notification-block a:link,
-.bucket-access-warning.fm-notification-block a:visited {
-    color: var(--mobile-text-primary);
 }
 .dark-direct-tooltip.simpletip-tooltip.bucket-settings {
     max-width: 240px;

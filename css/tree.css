@@ -29,7 +29,7 @@
     display: block;
     padding: 0;
 }
-.mega-dialog .fm-picker-dialog-tree-panel ul,
+.mega-dialog .dialog-tree-panel-scroll ul,
 .share-add-dialog-bottom-bo.share-add-dialog-bottom-body ul {
     margin: 0;
     list-style: none;
@@ -40,11 +40,11 @@
     padding-inline-start: 0;
 }
 .fm-tree-panel ul ul,
-.mega-dialog .fm-picker-dialog-tree-panel ul ul {
+.mega-dialog .dialog-tree-panel-scroll ul ul {
     display: none;
 }
 .fm-tree-panel ul ul.opened,
-.mega-dialog .fm-picker-dialog-tree-panel ul ul.opened {
+.mega-dialog .dialog-tree-panel-scroll ul ul.opened {
     display: block;
 }
 ul ul .nw-fm-tree-item {
@@ -107,14 +107,15 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 }
 .nw-fm-tree-item.disabled,
 .dropdown-item.disabled,
-.nw-conversations-item.disabled {
+.nw-conversations-item.disabled,
+.nw-fm-tree-item.expandable {
     filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     -moz-opacity: 0.5;
     -khtml-opacity: 0.5;
     opacity: 0.5;
 }
 .fm-tree-panel li,
-.mega-dialog .fm-picker-dialog-tree-panel li,
+.mega-dialog .dialog-tree-panel-scroll li,
 .share-add-dialog-bottom-body li {
     display: block;
     list-style: none;

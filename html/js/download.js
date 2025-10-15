@@ -182,7 +182,7 @@ async function setupSingleDownloadPage(res) {
             var filenameLength = filename.length;
             var fileExtPos = filename.lastIndexOf('.') > 0 ? filename.lastIndexOf('.') : filenameLength;
             var fileTitle = filename.substring(0, fileExtPos);
-            var fileExt = filename.substring(fileExtPos).toLowerCase();
+            var fileExt = filename.substring(fileExtPos);
             var isVideo = is_video(filename);
             var prevBut = isVideo;
             onIdle(initDownloadScroll);
@@ -200,7 +200,7 @@ async function setupSingleDownloadPage(res) {
 
             M.v = [dl_node];
             M.d[dlpage_ph] = dl_node;
-            dl_node.shares = {EXP: Object.assign({u: "EXP", r: 0}, dl_node)};
+            M.setNodeShare(Object.assign({u: "EXP", r: 0}, dl_node));
 
             mediaCollectFn = function() {
                 MediaAttribute.setAttribute(dl_node)
@@ -231,10 +231,12 @@ async function setupSingleDownloadPage(res) {
                     if (dlResumeInfo.byteLength === fdl_filesize) {
                         $('.js-save-download').removeClass('hidden');
                         $('.js-resume-download').addClass('hidden');
+                        $('.js-cancel-download').addClass('hidden');
                     }
                     else if (dlResumeInfo.byteLength === dlResumeInfo.byteOffset) {
                         $('.js-save-download').addClass('hidden');
                         $('.js-resume-download').removeClass('hidden');
+                        $('.js-cancel-download').removeClass('hidden');
                     }
                     else {
                         $('.js-download').removeClass('hidden');
@@ -242,7 +244,7 @@ async function setupSingleDownloadPage(res) {
                 }
                 else {
                     $('.js-download').removeClass('hidden');
-                    $('.js-resume-download, .js-save-download').addClass('hidden');
+                    $('.js-resume-download, .js-save-download, .js-cancel-download').addClass('hidden');
                 }
             };
 
@@ -436,6 +438,37 @@ async function setupSingleDownloadPage(res) {
                     }
                     return false;
                 });
+
+            $('.js-cancel-download').rebind('click.dlpage', () => {
+                if (!dlResumeInfo) {
+                    return;
+                }
+
+                M.delPersistentData(dlmanager.getResumeInfoTag({ ph: dlpage_ph }))
+                    .always(() => {
+                        dlResumeInfo = false;
+                        if (fdl_filesize > maxDownloadSize) {
+                            setMegaSyncDownloadOptions();
+                        }
+                        else if (is_mobile) {
+                            setStandardDownloadOptions();
+                        }
+                        else {
+                            megasync.isInstalled((err, is) => {
+                                if (!err && is) {
+                                    setMegaSyncDownloadOptions();
+                                }
+                                else {
+                                    setStandardDownloadOptions();
+                                }
+                            });
+                        }
+                        $pageScrollBlock.removeClass('resumable');
+                        $('.download.state-text.resume').addClass('hidden');
+                        const $sizeBlock = $('.js-file-info .download.info-txt.small-txt');
+                        $sizeBlock.empty().safeHTML(`<span class="fs">${fileSize}</span>`);
+                    });
+            });
 
             $('.mid-button.to-clouddrive, button.to-clouddrive').rebind('click', start_import);
 
@@ -743,13 +776,6 @@ function closedlpopup()
     document.getElementById('download_popup').style.left = '-500px';
 }
 
-function importFile() {
-    'use strict';
-    M.importFileLink(dl_import[0], dl_import[1], dl_attr, dl_import[2]).always(function() {
-        mBroadcaster.sendMessage('fm:importFileLinkDone');
-    });
-}
-
 function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
 {
     var now = Date.now();
@@ -854,13 +880,17 @@ function dlstart(id,name,filesize)
 function start_import() {
     'use strict';
 
-    dl_import = [dlpage_ph, dlkey, dl_node];
+    if (!self.dl_node) {
+        return;
+    }
+    dl_import = [dlpage_ph, dlkey, dl_node, dl_attr];
+
+    tryCatch(() => {
+        localStorage.dlimp = JSON.stringify(dl_import);
+    })();
 
     if (u_type) {
         loadSubPage('fm');
-        if (fminitialized) {
-            importFile();
-        }
         return;
     }
 
@@ -888,17 +918,18 @@ function start_import() {
     };
 
     msgDialog(dialogType, l[1193], dialogHeader, dialogTxt, function(e) {
-        if (e === 'login') {
+        if (e < 1) {
             buttonEventLogin();
         }
-        else if (e === 'register') {
+        else if (e === 1) {
             buttonEventRegister();
         }
-        else if (e === 'ephemeral') {
+        else if (e === -2) {
             start_anoimport();
         }
         else {
             dl_import = false;
+            delete localStorage.dlimp;
         }
     });
 }
@@ -938,7 +969,7 @@ function dlcomplete(dl) {
 function sync_switchOS(os) {
     'use strict';
     const l1158 = String(l[1158] || 'for Windows');
-    let syncurl = 'https://mega.nz/MEGAsyncSetup.exe';
+    let syncurl = `https://mega.${mega.tld}/MEGAsyncSetup.exe`;
 
     if (os === 'windows') {
         $('.sync-button-txt.small').text(l1158);
@@ -946,7 +977,7 @@ function sync_switchOS(os) {
         $('.sync-button').removeClass('mac linux').attr('href', syncurl);
     }
     else if (os === 'mac') {
-        syncurl = 'https://mega.nz/MEGAsyncSetup.dmg';
+        syncurl = `https://mega.${mega.tld}/MEGAsyncSetup.dmg`;
         let ostxt = 'For Mac';
         if (l1158.includes('Windows')) {
             ostxt = l1158.replace('Windows', 'Mac');
@@ -1012,9 +1043,8 @@ function dlPageCleanup() {
         delete window.mediaConIsDl;
     }
     if (!is_mobile && typeof fdl_queue_var !== 'undefined') {
-        const $tpwRows = $('.transfer-task-row.complete', '.transfer-progress-widget-body');
-        if (mega.tpw && $tpwRows.length) {
-            mega.tpw.removeRow($tpwRows.toArray().map(a => String(a.id).replace('tpw_', '')), false);
+        if (mega.tpw && mega.tpw.completeRowsLength) {
+            mega.tpw.clearRows(mega.tpw.DONE);
         }
     }
 }

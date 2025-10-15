@@ -37,6 +37,9 @@
         cursor: pointer;
         outline: none;
     }
+    .media-viewer-container .video .video-block {
+        width: 100%;
+    }
     .media-viewer button:hover,
     .media-viewer button.active {
         --mask-color: var(--icon-active);
@@ -284,7 +287,7 @@
         top: calc(50% - 35px);
         z-index: 10;
         padding: 20px;
-        animation: top-fade-in 1s;
+        opacity: 0.8;
     }
     .media-viewer .play-pause-video-button i {
         --icon-size: 32px;

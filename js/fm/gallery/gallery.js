@@ -121,8 +121,9 @@ GalleryNodeBlock.revokeThumb = (h) => {
 
     for (let i = 0; i < keys.length; i++) {
         const key = keys[i];
+        const n = mega.gallery.getNodeCache(h);
 
-        if (M.d[h] && M.d[h].fa && key.startsWith(M.d[h].fa)) {
+        if (n && key.startsWith(n.fa)) {
             URL.revokeObjectURL(GalleryNodeBlock.thumbCache[key]);
             delete GalleryNodeBlock.thumbCache[key];
         }
@@ -165,7 +166,7 @@ class MegaGallery {
     }
 
     mainViewNodeMapper(h) {
-        const n = M.d[h] || this.updNode[h] || false;
+        const n = mega.gallery.getNodeCache(h) || this.updNode[h] || false;
 
         console.assert(!!n, `Node ${h} not found...`);
         return n;
@@ -434,15 +435,16 @@ class MegaGallery {
         // This is existing year in view, nice.
         if (group) {
             group.c[0]++;
+            const h0 = group.n[0];
 
-            let timeDiff = this.nodes[n.h] - this.nodes[group.n[0]];
+            let timeDiff = this.nodes[n.h] - this.nodes[h0];
 
             // Falling back to names sorting, if times are the same
             if (!timeDiff) {
-                const sortedArr = [n, M.d[group.n[0]]];
+                const sortedArr = [n, mega.gallery.getNodeCache(h0)];
                 sortedArr.sort(this.sortByMtime.bind(this));
 
-                if (sortedArr[0].h !== group.n[0]) {
+                if (sortedArr[0].h !== h0) {
                     timeDiff = 1;
                 }
             }
@@ -467,10 +469,11 @@ class MegaGallery {
                 if (stsGroup.sy === sts) {
                     stsGroup.c[1]++;
 
-                    let timeDiff = this.nodes[n.h] - this.nodes[stsGroup.n[1]];
+                    const h1 = stsGroup.n[1];
+                    let timeDiff = this.nodes[n.h] - this.nodes[h1];
 
                     if (!timeDiff) {
-                        const sortedArr = [n, M.d[stsGroup.n[1]]];
+                        const sortedArr = [n, mega.gallery.getNodeCache(h1)];
                         sortedArr.sort(this.sortByMtime.bind(this));
 
                         if (sortedArr[0].h !== stsGroup.n[0]) {
@@ -587,7 +590,7 @@ class MegaGallery {
         const {start, end} = calculateCalendar('d', ts);
         const keys = Object.keys(this.nodes);
         for (const h of keys) {
-            const n = M.d[h];
+            const n = mega.gallery.getNodeCache(h);
 
             if (!n) {
                 continue;
@@ -606,7 +609,7 @@ class MegaGallery {
         const {start, end} = calculateCalendar('m', ts);
         const keys = Object.keys(this.nodes);
         for (const h of keys) {
-            const n = M.d[h];
+            const n = mega.gallery.getNodeCache(h);
 
             if (!n) {
                 continue;
@@ -721,7 +724,8 @@ class MegaGallery {
                 let timeDiff = this.nodes[n.h] > this.nodes[sameDayNode];
 
                 if (!timeDiff) {
-                    const sortedArr = [n, M.d[sameDayNode]];
+                    const sortedArr = [n, mega.gallery.getNodeCache(sameDayNode)];
+
                     sortedArr.sort(this.sortByMtime.bind(this));
 
                     if (sortedArr[0].h !== group.n[0]) {
@@ -1077,7 +1081,7 @@ class MegaGallery {
     }
 
     removeFromAllGroup(h, ts) {
-        if (M.d[h] && M.d[h].fa) {
+        if (mega.gallery.getNodeCache(h)) {
             GalleryNodeBlock.revokeThumb(h);
         }
 
@@ -1130,13 +1134,13 @@ class MegaGallery {
 
         this.updNode[n.h] = n;
 
+        if (mega.gallery.tmpFa) {
+            mega.gallery.tmpFa[n.h] = n;
+        }
+
         const updatedGroup = this.getGroup(n);
 
         this.nodes[n.h] = updatedGroup[0];
-
-        if (!M.d[n.h]) {
-            await dbfetch.get(n.h);
-        }
 
         if (!this.dynamicList && this.onpage) {
             this.initDynamicList();
@@ -1170,6 +1174,10 @@ class MegaGallery {
 
         delete this.nodes[n.h];
 
+        if (mega.gallery.tmpFa) {
+            delete mega.gallery.tmpFa[n.h];
+        }
+
         // Do not change order, some function here is rely on result from another
         // This order should be keep this way in order to process data in order.
         this.removeFromAllGroup(n.h, updatedGroup[2]);
@@ -1197,8 +1205,10 @@ class MegaGallery {
             return;
         }
 
-        if (M.d[h]) {
-            this.removeNodeFromGroups(M.d[h]);
+        const n = mega.gallery.getNodeCache(h);
+
+        if (n) {
+            this.removeNodeFromGroups(n);
         }
         else {
             this.removeNodeFromGroups({ h, mtime: this.nodes[h] });
@@ -1270,17 +1280,20 @@ class MegaGallery {
             this.setMode(mega.gallery.lastModeSelected, 2);
         }
 
-        const rfBlock = $('.fm-right-files-block:not(.in-chat)', '.fmholder');
-        const galleryHeader = $('#media-section-controls', rfBlock).add('#media-section-right-controls', rfBlock);
+        this.clearSelections();
 
-        galleryHeader.removeClass('hidden');
+        const rfBlock = $('.fm-right-files-block:not(.in-chat)', '.fmholder');
+        const rightSectionControls = $('#media-section-right-controls', rfBlock);
+        const galleryHeader = $('#media-section-controls', rfBlock).add(rightSectionControls);
+
         $('#media-tabs', rfBlock).removeClass('hidden');
         $('.gallery-tabs-bl', galleryHeader).removeClass('hidden');
         $('.gallery-section-tabs', galleryHeader).toggleClass('hidden', M.currentdirid === 'favourites');
         rfBlock.removeClass('hidden');
         $('.files-grid-view.fm, .fm-blocks-view.fm, .fm-empty-section', rfBlock).addClass('hidden');
         mega.ui.secondaryNav.updateGalleryLayout();
-        mega.ui.secondaryNav.hideBreadcrumb();
+        mega.ui.secondaryNav.updateInfoChipsAndViews();
+        mega.ui.secondaryNav.updateSmallNavButton(!M.isGalleryPage() && !M.isAlbumsPage());
 
         if (pfid && !M.v) {
             $('.fm-empty-section', rfBlock).removeClass('hidden');
@@ -1302,14 +1315,24 @@ class MegaGallery {
             this.dynamicList.batchAdd(keys);
             this.dynamicList.initialRender();
             this.dynamicList.scrollToYPosition(this.scrollPosCache[this.mode].a);
+
+            galleryHeader.removeClass('hidden');
         }
         else {
-            mega.gallery.showEmpty(M.currentdirid);
-            this.galleryBlock.classList.add('hidden');
+            onIdle(() => {
+                if (!M.v.length) {
+                    mega.gallery.showEmpty(M.currentdirid);
+                    this.galleryBlock.classList.add('hidden');
+                }
+            });
         }
 
         tryCatch(() => {
+            rightSectionControls.toggleClass('invisible', !M.v.length &&
+                (this.id === 'photos' || this.id === 'images' || this.id === 'videos'));
             galleryHeader.toggleClass('invisible', !M.v.length &&
+                mega.gallery.typeControl.getSelectedIndex() === -1 &&
+                mega.gallery.titleControl.getSelectedIndex() === 1 &&
                 (this.id === 'photos' || this.id === 'images' || this.id === 'videos'));
         })();
 
@@ -1321,6 +1344,12 @@ class MegaGallery {
                 filter: $.selectddUIitem,
                 cancel: '.ps__rail-y, .ps__rail-x, a, .checkdiv input',
                 start: (e) => {
+                    const activeSearch = $.getActiveSearch();
+
+                    if (activeSearch) {
+                        activeSearch.blur();
+                    }
+
                     $.hideContextMenu(e);
                     $.hideTopMenu();
                     $.selecting = true;
@@ -1351,6 +1380,16 @@ class MegaGallery {
 
             if (uiGrid.selectable('instance')) {
                 uiGrid.selectable('destroy');
+            }
+        }
+
+        if (M.onMediaView && !M.isGalleryPage() && mega.ui.secondaryNav) {
+            // Bind scroll event for media discovery view since it has action buttons.
+            const noScroll = mega.ui.secondaryNav.bindScrollEvents();
+            if (noScroll && !mega.ui.secondaryNav.actionsHolder && !mega.ui.secondaryNav.isSmall) {
+                mega.ui.secondaryNav.domNode.classList.remove('buttons-up');
+                mega.ui.secondaryNav.domNode.querySelector('.fm-card-holder')
+                    .before(mega.ui.header.domNode.querySelector('.fm-header-buttons'));
             }
         }
     }
@@ -1405,7 +1444,7 @@ class MegaGallery {
 
             const { currentTarget: el } = e;
 
-            if (el && M.d[el.id] && !$.selected.includes(el.id)) {
+            if (el && (mega.gallery.getNodeCache(el.id)) && !$.selected.includes(el.id)) {
                 selectionManager.clear_selection();
                 this.clearSelections();
                 selectionManager.add_to_selection(el.id);
@@ -1434,12 +1473,23 @@ class MegaGallery {
             return false;
         });
 
-        $galleryBlock.rebind('dblclick.galleryView', 'a.data-block-view', e => {
+        let tappedItemId = '';
 
+        $galleryBlock.rebind('dblclick.galleryView touchend.tabletGalleryView', 'a.data-block-view', e => {
             const $eTarget = $(e.currentTarget);
+            const h = $eTarget.attr('id');
+
+            if (e.type === 'touchend' && tappedItemId !== h) {
+                tappedItemId = h;
+
+                delay('galleryView:touchend', () => {
+                    tappedItemId = '';
+                }, 300);
+
+                return false;
+            }
 
             if (this.mode === 'a') {
-                const h = $eTarget.attr('id');
                 const isVideo = e.currentTarget.nodeBlock.isVideo;
 
                 if (isVideo) {
@@ -1636,9 +1686,14 @@ class MegaGallery {
     }
 
     sortByMtime(ah, bh) {
+        const { tmpFa } = mega.gallery;
 
-        const a = M.d[ah] || this.updNode[ah];
-        const b = M.d[bh] || this.updNode[bh];
+        const a = typeof ah === 'string'
+            ? mega.gallery.getNodeCache(ah) || this.updNode[ah]
+            : ah;
+        const b = typeof bh === 'string'
+            ? mega.gallery.getNodeCache(bh) || this.updNode[bh]
+            : bh;
 
         return M.sortByModTimeFn2()(a, b, -1);
     }
@@ -1876,7 +1931,7 @@ class MegaGallery {
     }
 
     renderNode(h) {
-        const node = M.d[h] || new MegaNode(this.updNode[h]);
+        const node = mega.gallery.getNodeCache(h) || new MegaNode(this.updNode[h]);
 
         if (!node) {
             return;
@@ -1992,7 +2047,6 @@ class MegaGallery {
         this.subfolderMd = !mega.config.get('noSubfolderMd');
 
         if (this.nodes && this.subfolderMd === tempSubfolderMd) {
-
             mega.gallery.fillMainView(this);
             MegaGallery.sortViewNodes();
 
@@ -2259,21 +2313,25 @@ class MegaTargetGallery extends MegaGallery {
         }
 
         for (let i = handles.length; i--;) {
-            if (!M.c[handles[i]]) {
-                if (self.d && !M.d[handles[i]]) {
-                    console.error(`Gallery cannot find handle ${handles[i]}`);
+            const h = handles[i];
+
+            if (!M.c[h]) {
+                if (self.d && !M.d[h]) {
+                    console.error(`Gallery cannot find handle ${h}`);
                 }
                 continue;
             }
 
-            subs = subs.concat(Object.keys(M.c[handles[i]]));
+            subs.push(...Object.keys(M.c[h]));
         }
 
         const rubTree = array.to.object(M.getTreeHandles(M.RubbishID), true);
 
         subs = subs.filter(h => {
             const n = M.d[h];
-            return !n.t
+
+            return n
+                && !n.t
                 && !this.nodes[n.h]
                 && !rubTree[h]
                 && !rubTree[n.p]
@@ -2299,9 +2357,8 @@ class MegaTargetGallery extends MegaGallery {
             return;
         }
 
-        if (M.currentdirid === n.p && !M.v.length) {
-            $(`.fm-empty-folder, .fm-empty-folder-link, .fm-empty-${M.currentdirid}`, '.fm-right-files-block')
-                .addClass('hidden');
+        if (!M.v.length && n.p === M.currentdirid) {
+            mega.ui.empty.clear();
         }
 
         if (pfid) {
@@ -2454,7 +2511,6 @@ class MegaMediaTypeGallery extends MegaGallery {
 }
 
 mega.gallery = Object.create(null);
-mega.gallery.nodeUpdated = false;
 mega.gallery.albumsRendered = false;
 mega.gallery.publicSet = Object.create(null);
 mega.gallery.titleControl = null;
@@ -2490,6 +2546,22 @@ Object.defineProperty(mega.gallery, 'albumsRendered', {
     }
 });
 
+Object.defineProperty(mega.gallery, 'nodeUpdated', {
+    get() {
+        'use strict';
+        return this._nodeUpdated === undefined ? -0xFEEDFACE : this._nodeUpdated;
+    },
+    set(value) {
+        'use strict';
+
+        if (value) {
+            delete mega.gallery.tmpFa;
+        }
+
+        this._nodeUpdated = value;
+    }
+});
+
 mega.gallery.secKeys = {
     cuphotos: 'camera-uploads-photos',
     cdphotos: 'cloud-drive-photos',
@@ -2514,6 +2586,11 @@ mega.gallery.fillMainView = (list, mapper) => {
     M.v = list.filter(Boolean);
 
     console.assert(M.v.length === length, 'check this... filtered invalid entries.');
+};
+
+mega.gallery.getNodeCache = h => {
+    'use strict';
+    return M.d[h] || (mega.gallery.tmpFa && mega.gallery.tmpFa[h]) || undefined;
 };
 
 mega.gallery.handleNodeRemoval = tryCatch((n) => {
@@ -2618,7 +2695,11 @@ mega.gallery.checkEveryGalleryUpdate = n => {
         const childHandles = Object.keys(M.c[n.h]);
 
         for (let i = childHandles.length; i--;) {
-            mega.gallery.checkEveryGalleryUpdate(M.d[childHandles[i]]);
+            const n = mega.gallery.getNodeCache(childHandles[i]);
+
+            if (n) {
+                mega.gallery.checkEveryGalleryUpdate(n);
+            }
         }
 
         return;
@@ -2658,22 +2739,22 @@ mega.gallery.checkEveryGalleryDelete = h => {
     }
 };
 
-mega.gallery.handleNodeUpdate = (n) => {
+mega.gallery.handleNodeUpdate = tryCatch((n) => {
     'use strict';
 
     if (M.gallery) {
-        tryCatch(() => mega.gallery.checkEveryGalleryUpdate(n))();
+        mega.gallery.checkEveryGalleryUpdate(n);
         mega.gallery.albumsRendered = false;
     }
     else if (M.albums) {
-        tryCatch(() => mega.gallery.albums.onCDNodeUpdate(n))();
+        mega.gallery.albums.onCDNodeUpdate(n);
         mega.gallery.nodeUpdated = true;
     }
     else {
         mega.gallery.nodeUpdated = true;
         mega.gallery.albumsRendered = false;
     }
-};
+});
 
 mega.gallery.clearMdView = () => {
     'use strict';
@@ -2710,17 +2791,8 @@ mega.gallery.resetAll = () => {
     mega.gallery.nodeUpdated = false;
 };
 
-mega.gallery.showEmpty = (type, noMoreFiles) => {
+mega.gallery.showEmpty = (type) => {
     'use strict';
-
-    const rfBlock = $('.fm-right-files-block', '.fmholder');
-
-    if (noMoreFiles || M.currentrootid === M.RootID &&
-        (!M.c[M.currentdirid] || !Object.values(M.c[M.currentdirid]).length)) {
-        $('.fm-empty-folder', rfBlock).removeClass('hidden');
-        $(`.fm-empty-${M.currentdirid}`, rfBlock).addClass('hidden');
-        return;
-    }
 
     if (!mega.gallery.emptyBlock) {
         mega.gallery.emptyBlock = new GalleryEmptyBlock('.pm-main > .fm-right-files-block');
@@ -2908,7 +2980,7 @@ mega.gallery.generateSizedThumbnails = async(keys, onLoad, onErr) => {
 
         if (abIsEmpty && type === 1) { // Preview fetch is not successful
             api_getfileattr(
-                { [key]: M.d[faData[key].handle] },
+                { [key]: mega.gallery.getNodeCache(faData[key].handle) },
                 0,
                 (ctx1, key1, thumbAB1) => {
                     processUint8(ctx1, key1, thumbAB1, 0);
@@ -2977,7 +3049,7 @@ mega.gallery.generateSizedThumbnails = async(keys, onLoad, onErr) => {
                     console.warn(`Could not receive preview image for ${key}, reverting back to thumbnail...`);
 
                     api_getfileattr(
-                        { [key]: M.d[faData[key].handle] },
+                        { [key]: mega.gallery.getNodeCache(faData[key].handle) },
                         0,
                         (ctx1, key1, thumbAB1) => {
                             processUint8(ctx1, key1, thumbAB1, 0);
@@ -2994,7 +3066,6 @@ mega.gallery.generateSizedThumbnails = async(keys, onLoad, onErr) => {
  */
 mega.gallery.removeDbActionCache = () => {
     'use strict';
-    MegaGallery.dbActionPassed = false;
     mega.gallery.resetAll();
 };
 
@@ -3052,6 +3123,7 @@ async function galleryUI(id) {
     $('.fm-notification-block.new-feature-rewind-notification', '.fm-right-files-block').addClass('hidden');
     $('.gallery-close-discovery', $headerBlock).addClass('hidden');
 
+    mega.ui.secondaryNav.hideBreadcrumb();
     mega.gallery.setTabs();
 
     if (!mega.gallery.typeControl) {
@@ -3178,6 +3250,10 @@ async function galleryUI(id) {
             console.groupEnd();
         }
 
+        if (M.v.length) {
+            mega.ui.empty.clear();
+        }
+
         mega.gallery.resetMediaCounts(M.v);
 
         if (id) {
@@ -3199,6 +3275,7 @@ MegaGallery.addThumbnails = (nodeBlocks) => {
 
     const keys = [];
     const thumbBlocks = {};
+    const { pendingFaBlocks, pendingThumbBlocks, tmpFa } = mega.gallery;
 
     for (let i = 0; i < nodeBlocks.length; i++) {
         if (!nodeBlocks[i].node) { // No node is associated with the block
@@ -3215,11 +3292,11 @@ MegaGallery.addThumbnails = (nodeBlocks) => {
 
         // In case fa is not arrived yet, placing the node to the buffer
         if (!fa) {
-            if (!mega.gallery.pendingFaBlocks[h]) {
-                mega.gallery.pendingFaBlocks[h] = Object.create(null);
+            if (!pendingFaBlocks[h]) {
+                pendingFaBlocks[h] = Object.create(null);
             }
 
-            mega.gallery.pendingFaBlocks[h][width] = nodeBlocks[i];
+            pendingFaBlocks[h][width] = nodeBlocks[i];
             continue;
         }
         else if (width <= MEGAImageElement.THUMBNAIL_SIZE) {
@@ -3246,11 +3323,11 @@ MegaGallery.addThumbnails = (nodeBlocks) => {
             keys.push(key);
         }
 
-        if (mega.gallery.pendingThumbBlocks[key]) {
-            mega.gallery.pendingThumbBlocks[key].push(nodeBlocks[i]);
+        if (pendingThumbBlocks[key]) {
+            pendingThumbBlocks[key].push(nodeBlocks[i]);
         }
         else {
-            mega.gallery.pendingThumbBlocks[key] = [nodeBlocks[i]];
+            pendingThumbBlocks[key] = [nodeBlocks[i]];
         }
 
         // Stretch the image when loading
@@ -3265,7 +3342,7 @@ MegaGallery.addThumbnails = (nodeBlocks) => {
     if (thumbHandles.length) {
         fm_thumbnails(
             'standalone',
-            thumbHandles.map(h => M.d[h]),
+            thumbHandles.map(mega.gallery.getNodeCache),
             ({ h, fa }) => {
                 for (let i = 0; i < thumbBlocks[h].length; i++) {
                     thumbBlocks[h][i].setThumb(thumbnails.get(fa), fa);
@@ -3282,10 +3359,8 @@ MegaGallery.addThumbnails = (nodeBlocks) => {
     mega.gallery.generateSizedThumbnails(
         keys,
         (key, arrayBuffer) => {
-            const blocks = mega.gallery.pendingThumbBlocks;
-
             // The image has been applied already
-            if (!blocks[key]) {
+            if (!pendingThumbBlocks[key]) {
                 return;
             }
             const weAreOnGallery = pfid || M.isGalleryPage() || M.isAlbumsPage() || M.gallery;
@@ -3295,23 +3370,24 @@ MegaGallery.addThumbnails = (nodeBlocks) => {
             }
 
             if (GalleryNodeBlock.thumbCache[key]) {
-                for (let i = 0; i < blocks[key].length; i++) {
-                    blocks[key][i].setThumb(GalleryNodeBlock.thumbCache[key], blocks[key][i].node.fa);
+                for (let i = 0; i < pendingThumbBlocks[key].length; i++) {
+                    pendingThumbBlocks[key][i]
+                        .setThumb(GalleryNodeBlock.thumbCache[key], pendingThumbBlocks[key][i].node.fa);
                 }
 
-                delete blocks[key];
+                delete pendingThumbBlocks[key];
                 return;
             }
 
             if (weAreOnGallery) {
                 const url = mObjectURL([arrayBuffer], arrayBuffer.type || 'image/jpeg');
 
-                if (blocks[key]) {
-                    for (let i = 0; i < blocks[key].length; i++) {
-                        blocks[key][i].setThumb(url, blocks[key][i].node.fa);
+                if (pendingThumbBlocks[key]) {
+                    for (let i = 0; i < pendingThumbBlocks[key].length; i++) {
+                        pendingThumbBlocks[key][i].setThumb(url, pendingThumbBlocks[key][i].node.fa);
                     }
 
-                    delete blocks[key];
+                    delete pendingThumbBlocks[key];
                 }
 
                 if (!GalleryNodeBlock.thumbCache[key]) {
@@ -3325,7 +3401,7 @@ MegaGallery.addThumbnails = (nodeBlocks) => {
                 }
             }
             else {
-                delete blocks[key];
+                delete pendingThumbBlocks[key];
             }
         },
         (err) => {
@@ -3413,35 +3489,6 @@ MegaGallery.handleResize = SoonFc(200, (entries) => {
         MegaGallery.addThumbnails(toFetchAttributes);
     }
 });
-
-MegaGallery.dbAction = async(p) => {
-    'use strict';
-
-    if (fmdb && fmdb.db !== null && fmdb.crashed !== 666) {
-        const res = [];
-        const parents = Object.create(null);
-
-        await dbfetch.geta(M.getTreeHandles(M.RootID)).catch(nop);
-
-        p = p || M.RootID;
-        await dbfetch.media(9e3, (r) => {
-            for (let i = r.length; i--;) {
-                const n = r[i];
-
-                if (!parents[n.p]) {
-                    parents[n.p] = 1 + (M.getNodeRoot(n.p) === p);
-                }
-                if (parents[n.p] > 1) {
-                    res.push(n);
-                }
-            }
-        });
-
-        return res;
-    }
-
-    throw new Error('FMDB Unavailable.');
-};
 
 lazy(mega.gallery, 'dbLoading', () => {
     'use strict';
@@ -3751,9 +3798,10 @@ lazy(mega.gallery, 'setTabs', () => {
 
         if (!tabs) {
             const tabClasses = 'py-3 px-6';
+            const container = document.querySelector('#media-tabs');
             tabs = new MTabs();
 
-            document.querySelector('#media-tabs').prepend(tabs.el);
+            container.prepend(tabs.el);
 
             tabs.el.classList.add('media-tabs', 'px-6', 'justify-start');
             tabs.tabs = [
@@ -3768,6 +3816,7 @@ lazy(mega.gallery, 'setTabs', () => {
                         }
 
                         loadSubPage(`fm/${loc}`);
+                        mega.gallery.appendAppBanner(container);
                     },
                     classes: tabClasses
                 },
@@ -3775,12 +3824,21 @@ lazy(mega.gallery, 'setTabs', () => {
                     label: l.albums,
                     click: () => {
                         loadSubPage('fm/albums');
+
+                        const banner = document.getElementById('media-banner');
+                        if (banner) {
+                            banner.parentNode.removeChild(banner);
+                        }
                     },
                     classes: tabClasses
                 }
             ];
 
             mega.gallery.mediaControl = tabs;
+
+            if (!section) {
+                mega.gallery.appendAppBanner(container);
+            }
         }
 
         tabs.activeTab = section;
@@ -3801,37 +3859,204 @@ lazy(mega.gallery, 'resetMediaCounts', () => {
     };
 });
 
-lazy(mega.gallery, 'initialiseMediaNodes', () => {
+/**
+ * @param {Function} [filterFn] Filter funtion to run against the nodes
+ * @returns {MegaNode[]}
+ */
+mega.gallery.initialiseMediaNodes = async(filterFn) => {
     'use strict';
 
-    return async(filterFn) => {
-        const cameraTree = MegaGallery.getCameraHandles();
-        const disallowedFolders = array.to.object([
-            ...M.getTreeHandles(M.RubbishID),
-            ...M.getTreeHandles('shares'),
-            ...(M.BackupsId ? M.getTreeHandles(M.BackupsId) : []),
-            ...M.getTreeHandles('s4')
-        ], true);
+    const cameraTree = MegaGallery.getCameraHandles();
+    const cdTree = Object.freeze(array.to.object(M.getTreeHandles(M.RootID), true));
 
-        const allowedInMedia = n => n && !n.t
-            && !disallowedFolders[n.p]
-            && !n.fv
-            && n.s
-            && M.isGalleryNode(n)
-            && mega.sensitives.shouldShowNode(n)
-            && (!filterFn || filterFn(n, cameraTree));
+    const allowedInMedia = n => cdTree[n.p]
+        && M.isGalleryNode(n)
+        && mega.sensitives.shouldShowNode(n)
+        && (!filterFn || filterFn(n, cameraTree));
 
-        if (!MegaGallery.dbActionPassed) {
-            const dbNodes = await MegaGallery.dbAction()
-                .catch(() => { // Fetching all available nodes in case of DB failure
-                    console.warn('Local DB failed. Fetching existing FM nodes.');
-                    return Object.values(M.d);
-                });
+    if (!mega.gallery.tmpFa) {
+        const nodesToObject = async() => {
+            const res = Object.create(null);
 
-            await dbfetch.geta(dbNodes.map(({ h }) => h)).catch(nop);
-            MegaGallery.dbActionPassed = true;
+            const assignNodes = (r) => {
+                for (let i = r.length; i--;) {
+                    const n = r[i];
+
+                    if (n.fa && !n.fv && n.s) {
+                        res[n.h] = n;
+                    }
+                }
+            };
+
+            if (fmdb && fmdb.db && !fmdb.crashed) {
+                await fmdb.get('f', assignNodes);
+            }
+            else {
+                console.warn('Cannot build nodes list from the local database...');
+                assignNodes(Object.values(M.d));
+            }
+
+            return res;
+        };
+
+        mega.gallery.tmpFa = await nodesToObject();
+    }
+
+    return Object.values(mega.gallery.tmpFa).filter(allowedInMedia);
+};
+
+mega.gallery.appendAppBanner = async(target) => {
+    if (pfid || M.CameraId) {
+        return;
+    }
+
+    const timeout = 120 * 24 * 60 * 60; // 120 days
+    const banner = target.querySelector('#media-banner');
+
+    if (banner) {
+        banner.parentNode.removeChild(banner);
+    }
+
+    /**
+     * @param {HTMLElement} target DOM node to attach to
+     * @param {*} configKey Config key to use for refusal storage
+     * @param {*} title Banner title
+     * @param {*} txt Banner text
+     * @param {*} btnTxt Banner action btn text
+     * @param {*} onClick Banner action
+     * @returns {void}
+     */
+    const renderBanner = (target, configKey, title, txt, btnTxt, onClick) => {
+        const refused = mega.config.get(configKey) | 0;
+
+        if (refused && (refused + timeout) * 1000 > Date.now()) {
+            return;
         }
 
-        return Object.values(M.d).filter(allowedInMedia);
+        const banner = mCreateElement(
+            'div',
+            {
+                class: 'flex flex-row items-center transition-max-h max-h-0 overflow-y-hidden bg-mobile-surface-grey-1',
+                id: 'media-banner'
+            }
+        );
+
+        target.append(banner);
+
+        const titleEl = mCreateElement('div', { class: 'font-title-h3-bold text-color-high' });
+        titleEl.textContent = title;
+
+        const txtEl = mCreateElement('div');
+        txtEl.textContent = txt;
+
+        banner.appendChild(mCreateElement('div', { class: 'px-6 py-4 flex-1' }, [titleEl, txtEl]));
+
+        MegaButton.factory({
+            parentNode: banner,
+            text: btnTxt,
+            type: 'text',
+            componentClassname: 'slim white-space-nowrap font-bold info-link underline cursor-pointer',
+            onClick
+        });
+
+        MegaInteractable.factory({
+            parentNode: banner,
+            type: 'icon',
+            icon: 'sprite-fm-mono icon-dialog-close cursor-pointer',
+            componentClassname: 'mx-4',
+            onClick: () => {
+                mega.config.set(configKey, Date.now() / 1000 >>> 0);
+                banner.classList.remove('max-h-100');
+            }
+        });
+
+        banner.classList.add('max-h-100');
     };
-});
+
+    if (await accountUI.hasMobileSessions()) {
+        renderBanner(target, 'cudlh', l.cu_banner_title, l.cu_banner_txt, l.cu_banner_more, () => {
+            const dialogContents = () => {
+                const classes = 'py-3 px-6';
+                const activeClasses = 'font-600';
+                const container = mCreateElement('div');
+                const tabs = new MTabs();
+                tabs.el.classList.add('border-b');
+
+                const renderList = () => {
+                    let ol = container.querySelector('ol');
+
+                    if (ol) {
+                        ol.textContent = '';
+                    }
+                    else {
+                        ol = mCreateElement('ol');
+                        container.appendChild(ol);
+                    }
+
+                    const prefix = (tabs.activeTab) ? 'cu_how_ios_p' : 'cu_how_andr_p';
+                    const list = Array.from({ length: 5 }, (_,i) => l[prefix + (i + 1)]);
+
+                    for (let i = list.length; i--;) {
+                        const txt = escapeHTML(list[i]).replace('[B]', '<b>').replace('[/B]', '</b>');
+                        const li = mCreateElement('li', null, [parseHTML(txt)]);
+                        ol.prepend(li);
+                    }
+                };
+
+                container.prepend(tabs.el);
+
+                tabs.tabs = [
+                    {
+                        label: l.android,
+                        click: () => {
+                            tabs.activeTab = 0;
+                            renderList();
+                        },
+                        classes,
+                        activeClasses
+                    },
+                    {
+                        label: l.ios,
+                        click: () => {
+                            tabs.activeTab = 1;
+                            renderList();
+                        },
+                        classes,
+                        activeClasses
+                    }
+                ];
+
+                tabs.activeTab = 0;
+                renderList();
+
+                return container;
+            };
+
+            const footer = mCreateElement('div', { class: 'flex flex-row-reverse' });
+
+            MegaButton.factory({
+                parentNode: footer,
+                text: l.ok_button,
+                componentClassname: 'normal'
+            }).on('click.remove', () => {
+                mega.ui.sheet.hide();
+            });
+
+            const options = {
+                name: 'how-to-cu',
+                title: l.cu_how_title,
+                contents: [dialogContents()],
+                showClose: true,
+                footer: {
+                    slot: [footer]
+                }
+            };
+            mega.ui.sheet.show(options);
+        });
+    }
+    else if (M.v.length) {
+        renderBanner(target, 'appdlh', l.cu_banner_title, l.cu_banner_txt1, l.download_now, () => {
+            window.open('https://mega.io/mobile', '_blank', 'noopener,noreferrer');
+        });
+    }
+};

@@ -49,7 +49,7 @@ class MegaMobileTopMenu extends MegaComponent {
         this.domNode.append(this.menuNode);
 
         // TODO: This is for support old page we should deprecate once new page is delivered
-        mBroadcaster.addListener('beforepagechange', () => {
+        this.addBroadcasterListener('beforepagechange', () => {
             $('.mobile.main-block').addClass('hidden');
         });
 
@@ -65,10 +65,10 @@ class MegaMobileTopMenu extends MegaComponent {
         this.renderMenuItems();
 
         this.toggleActive();
-        mBroadcaster.addListener('pagechange', () => this.toggleActive());
+        this.addBroadcasterListener('pagechange', () => this.toggleActive());
 
         // TODO: This is for support old page we should deprecate once new page is delivered
-        mBroadcaster.addListener('beforepagechange', () => {
+        this.addBroadcasterListener('beforepagechange', () => {
             $('.mobile.main-block, .mobile.old-page').addClass('hidden');
         });
 
@@ -109,6 +109,7 @@ class MegaMobileTopMenu extends MegaComponent {
             _gestureHandler();
 
             window.addEventListener('resize', _gestureHandler);
+            this.on('destroy', () => window.removeEventListener('resize', _gestureHandler));
         }
     }
 
@@ -243,8 +244,14 @@ class MegaMobileTopMenu extends MegaComponent {
                     M.addTreeUIDelayed();
                 });
 
-                menuItem.on(item.href ? 'beforeRedirect.treeExpand' : 'click.treeExpand', () => {
-                    if (menuItem.active) {
+                const evt = item.href ? 'beforeRedirect.treeExpand' : 'click.treeExpand';
+
+                if (item.autoExpand) {
+                    menuItem.domNode.dataset.expandEvt = evt;
+                }
+
+                menuItem.on(evt, () => {
+                    if (menuItem.active || item.autoExpand && !tree.classList.contains('active')) {
                         expandArrow.trigger('click.treeExpand');
                     }
                 });

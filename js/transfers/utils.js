@@ -145,7 +145,7 @@ Speedometer.prototype.progress = function(p) {
 
     for (t in this.h) {
         if (t < min) {
-            delete this.h.bt;
+            delete this.h[t];
         }
         else {
             if (t < oldest) {
@@ -491,7 +491,7 @@ function bindTransfersMassEvents(context) {
                     ids = [...Object.keys(M.tfsdomqueue), ...$trs.attrs('id')];
                 }
                 else {
-                    ids = $('.transfer-progress-widget .transfer-task-row:not(.completed)', '.fmholder').attrs('id');
+                    ids = mega.tpw.getIncompleteIds();
                     ids = ids.map((attr) => {
                         return attr.substr(4);
                     });

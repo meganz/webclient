@@ -25,10 +25,10 @@ var megasync = (function() {
     }
     var retryTimer;
     var clients = {
-        windows: 'https://mega.nz/MEGAsyncSetup64.exe',
-        windows_x32: 'https://mega.nz/MEGAsyncSetup32.exe',
-        mac: 'https://mega.nz/MEGAsyncSetup.dmg',
-        mac_silicon: 'https://mega.nz/MEGAsyncSetupArm64.dmg',
+        windows: `https://mega.${mega.tld}/MEGAsyncSetup64.exe`,
+        windows_x32: `https://mega.${mega.tld}/MEGAsyncSetup32.exe`,
+        mac: `https://mega.${mega.tld}/MEGAsyncSetup.dmg`,
+        mac_silicon: `https://mega.${mega.tld}/MEGAsyncSetupArm64.dmg`,
         linux: "https://mega.io/desktop"
     };
     var usemsync = localStorage.usemsync;
@@ -169,7 +169,7 @@ var megasync = (function() {
         if (lastCheckStatus && lastCheckTime) {
             api_req({ a: 'log', e: 99800, m: 'MEGASync is not responding' });
             msgDialog(
-                'confirmation',
+                'megasync-reconnect',
                 'MEGA Desktop App is not responding',
                 l[17795],
                 l[17796],
@@ -589,6 +589,23 @@ var megasync = (function() {
     ns.megaSyncRequest = megaSyncRequest;
     ns.megaSyncIsNotResponding = megaSyncIsNotResponding;
 
+    ns.downloadApp = (eventId) => {
+        if (eventId) {
+            eventlog(eventId);
+        }
+
+        var pf = navigator.platform.toUpperCase();
+
+        // If this is Linux send them to desktop page to select linux type
+        if (pf.includes('LINUX')) {
+            mega.redirect('mega.io', 'desktop', false, false, false);
+        }
+        // else directly give link of the file.
+        else {
+            window.open(megasync.getMegaSyncUrl(), '_blank', 'noopener,noreferrer');
+        }
+    };
+
     var periodicCheckTimeout;
 
     ns.periodicCheck = function() {
@@ -596,13 +613,17 @@ var megasync = (function() {
             clearTimeout(periodicCheckTimeout);
         }
         ns.isInstalled(function(err, is, off) {
+            // relevant useMegaSync states for downloads
+            // 1 = Is installed, No user logged in         (Downloads disabled)
+            // 2 = Is installed, Same user logged in       (Downloads enabled)
+            // 3 = Is installed, Different user logged in  (Downloads enabled)
             if (!err || is) {
                 if (megasync.currUser === u_handle) {
                     window.useMegaSync = 2;
                     periodicCheckTimeout = setTimeout(ns.periodicCheck, defaultStatusThreshold);
                 }
                 else {
-                    window.useMegaSync = 3;
+                    window.useMegaSync = megasync.currUser ? 3 : 1;
                     periodicCheckTimeout = setTimeout(ns.periodicCheck, statusThresholdWhenDifferentUsr);
                 }
             }

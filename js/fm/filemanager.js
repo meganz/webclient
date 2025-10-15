@@ -97,6 +97,8 @@ function FileManager() {
         }
     };
 
+    this.emptyStates = '.fm-blocks-view, .fm-empty-cloud, .fm-empty-folder, .fm-empty-s4-bucket';
+
     // Grid header config update function, this also used to update filter options in icon view.
     // eslint-disable-next-line complexity
     $.gridHeader = function() {
@@ -110,6 +112,15 @@ function FileManager() {
             M.columnsWidth.cloud.label.disabled = true;
             M.columnsWidth.cloud.accessCtrl.viewed = false;
             M.columnsWidth.cloud.accessCtrl.disabled = true;
+
+            if (String(M.currentdirid).startsWith('search/')) {
+                M.columnsWidth.cloud.fileLoc.viewed = true;
+                M.columnsWidth.cloud.fileLoc.disabled = false;
+            }
+            else {
+                M.columnsWidth.cloud.fileLoc.viewed = false;
+                M.columnsWidth.cloud.fileLoc.disabled = true;
+            }
         }
         else {
             if (M.columnsWidth.cloud.fav.disabled) {
@@ -169,24 +180,23 @@ function FileManager() {
                 }
             }
 
-            const isBackup = M.currentrootid === mega.devices.rootId
-                && M.getNodeRoot(M.currentCustomView.nodeID) === M.InboxID;
-
             if (
                 M.currentrootid === M.RubbishID
                 || M.currentrootid === 'shares'
-                || isBackup
             ) {
                 M.columnsWidth.cloud.fav.disabled = true;
                 M.columnsWidth.cloud.fav.viewed = false;
             }
 
-            if (isBackup) {
-                M.columnsWidth.cloud.label.disabled = true;
-                M.columnsWidth.cloud.label.viewed = false;
+            const path = String(M.currentdirid).split('/');
+            if (M.onDeviceCenter) {
+                if (path.length === 3 && sharer(path[2])) {
+                    M.columnsWidth.cloud.fav.disabled = true;
+                    M.columnsWidth.cloud.fav.viewed = false;
+                }
             }
 
-            if (M.currentrootid === 's4' && M.d[M.currentdirid.split('/').pop()]) {
+            if (M.currentrootid === 's4' && M.d[path.pop()]) {
                 M.columnsWidth.cloud.accessCtrl.viewed = true;
                 M.columnsWidth.cloud.accessCtrl.disabled = false;
             }
@@ -301,6 +311,33 @@ FileManager.prototype.initS4FileManager = mutex('s4-object-storage.lock', functi
 });
 
 /**
+ * @param {jQuery?} selected jQuery element(s) to de-select
+ * @param {jQuery.Event} e jQuery event to work with
+ * @returns {void}
+ */
+FileManager.prototype.onContextMenu = function(selected, e) {
+    'use strict';
+
+    // Remove context menu option from filtered view and media discovery view
+    if (page === 'fm/links' || M.gallery) {
+        return false;
+    }
+
+    if (selected) {
+        selected.removeClass('ui-selected');
+    }
+
+    if (selectionManager) {
+        selectionManager.clear_selection();
+    }
+
+    $.selected = [];
+    $.hideTopMenu();
+
+    return !!M.contextMenuUI(e, 2);
+};
+
+/**
  * Initialize the rendering of the cloud/file-manager
  * @details Former renderfm()
  * @returns {MegaPromise}
@@ -326,17 +363,52 @@ FileManager.prototype.initFileManager = async function() {
     if (!pfid && !is_mobile && u_type > 0) {
 
         if (u_attr.s4) {
-            const s4load = this.initS4FileManager();
+            const onS4Section = (page) => {
+                page = String(page || this.currentdirid);
+                return page === 's4' || this.getNodeByHandle(page.slice(0, 8)).s4;
+            };
 
-            if (this.getNodeByHandle(path.slice(0, 8)).s4) {
-                // We're (re)loading over a s4-page, hold it up.
-                await s4load.catch((ex) => {
+            mega.s4c = 1;
+            const s4load = this.initS4FileManager()
+                .catch((ex) => {
                     if (self.d) {
                         console.error('Failed to initialize S4 (?!)', [ex]);
                     }
-                    document.querySelector('.js-s4-tree-panel').classList.add('hidden');
-                    onIdle(() => this.openFolder('fm'));
+                    this.onFileManagerReady(() => {
+                        onIdle(() => {
+                            msgDialog('warningb', l.ri_s4_tab, l.s4_cnt_exists_error, ex < 0 ? api_strerror(ex) : ex);
+
+                            const t = document.querySelector('.js-s4-tree-panel');
+                            if (t) {
+                                t.classList.add('hidden');
+                            }
+
+                            const {owner, actors} = mBroadcaster.crossTab;
+                            eventlog(
+                                99622,
+                                JSON.stringify([
+                                    1,
+                                    buildVersion.website,
+                                    !!owner | 0,
+                                    Object(actors).length | 0,
+                                    ex && ex.message || ex
+                                ])
+                            );
+                        });
+
+                        if (onS4Section()) {
+
+                            return this.openFolder('fm', true);
+                        }
+                    });
+                })
+                .finally(() => {
+                    delete mega.s4c;
                 });
+
+            if (onS4Section(path)) {
+                // We're (re)loading over a s4-page, hold it up.
+                await s4load;
             }
         }
 
@@ -351,6 +423,7 @@ FileManager.prototype.initFileManager = async function() {
                     if (fmconfig.rwdPromoDiag) {
                         mega.config.remove('rwdPromoDiag');
                     }
+                    mega.rewind.init();
                 })
                 .catch((ex) => {
                     reportError(ex);
@@ -365,11 +438,60 @@ FileManager.prototype.initFileManager = async function() {
         megaChat.renderMyStatus();
     }
 
+    this.fireFMDependantActions();
+
     if (d) {
         console.timeEnd('renderfm');
     }
 
     return res;
+};
+
+/**
+ * Actions for both mobile and desktop upon first entering the FM.
+ */
+FileManager.prototype.fireFMDependantActions = function() {
+    'use strict';
+
+    if (folderlink) {
+        return;
+    }
+
+    // Update top menu
+    onIdle(topmenuUI);
+
+    // Add the dynamic notifications
+    tSleep(4 + Math.random()).then(() => {
+        if (notify.addDynamicNotifications !== undefined) {
+            notify.addDynamicNotifications().catch(dump);
+        }
+    });
+
+    // Fire KeyMgr dependant actions
+    if (mega.keyMgr.version) {
+
+        queueMicrotask(() => {
+
+            M.fireKeyMgrDependantActions().catch(dump);
+        });
+    }
+
+    // Fire file importing
+    return tSleep(1 + Math.random()).then(() => {
+        const {dlimp} = localStorage;
+
+        if (dlimp) {
+            if (!self.dl_import) {
+                self.dl_import = tryCatch(() => JSON.parse(dlimp))();
+            }
+            delete localStorage.dlimp;
+        }
+
+        if (self.dl_import) {
+            M.importFileLink(dl_import[0], dl_import[1], dl_import[3], dl_import[2]).catch(dump);
+            self.dl_import = false;
+        }
+    });
 };
 
 /**
@@ -422,9 +544,35 @@ FileManager.prototype.initFileManagerUI = function() {
 
     // May better deprecate lazy instead
     if (mega.ui.header) {
+
+        // Header is exist but not available on dom, so lets re-init it.
+        if (!fmholder.contains(mega.ui.header.domNode)) {
+
+            mega.ui.header.destroy();
+            delete mega.ui.header;
+            mega.ui.header = new MegaHeader({
+                parentNode: pmlayout,
+                componentClassname: 'mega-header',
+                prepend: true
+            });
+        }
+
         mega.ui.header.show();
     }
     if (mega.ui.topmenu) {
+
+        // Top menu is exist but not available on dom, so lets re-init it.
+        if (!fmholder.contains(mega.ui.topmenu.domNode)) {
+
+            mega.ui.topmenu.destroy();
+            delete mega.ui.topmenu;
+            mega.ui.topmenu = new MegaTopMenu({
+                parentNode: pmlayout,
+                componentClassname: 'mega-top-menu',
+                prepend: true
+            });
+        }
+
         mega.ui.topmenu.removeClass('hidden');
         mega.ui.topmenu.renderMenuItems();
         mega.gallery.updateMediaPath();
@@ -834,7 +982,6 @@ FileManager.prototype.initFileManagerUI = function() {
     M.initContextUI();
     M.addTransferPanelUI();
     M.initUIKeyEvents();
-    M.onFileManagerReady(topmenuUI);
     M.initMegaSwitchUI();
 
     // disabling right click, default contextmenu.
@@ -959,12 +1106,28 @@ FileManager.prototype.initFileManagerUI = function() {
             $('#fileselect1').click();
         }
     });
+    if (!mega.ui.secondaryNav.actionsHolder && mega.ui.header.domNode.querySelector('.fm-header-buttons')) {
+        mega.ui.secondaryNav.domNode.querySelector('.fm-card-holder')
+            .before(mega.ui.header.domNode.querySelector('.fm-header-buttons'));
+    }
 
+    mega.ui.secondaryNav.addActionButton({
+        componentClassname: 'fm-new-folder hidden',
+        prepend: true,
+        icon: 'sprite-fm-mono icon-folder-plus-thin-outline',
+        text: l[68],
+        title: l[68],
+        onClick: () => {
+            eventlog(500007);
+            createFolderDialog();
+        }
+    });
     mega.ui.secondaryNav.addActionButton({
         componentClassname: 'fm-new-menu hidden',
         prepend: true,
-        icon: 'sprite-fm-mono icon-plus-light-solid',
-        text: l.add_item_btn,
+        icon: 'sprite-fm-mono icon-arrow-up-thin-outline',
+        text: l[372],
+        title: l[372],
         onClick(ev) {
             if (this.active) {
                 return;
@@ -976,7 +1139,9 @@ FileManager.prototype.initFileManagerUI = function() {
     });
     mega.ui.secondaryNav.addActionButton({
         componentClassname: 'fm-manage-link hidden',
+        icon: 'sprite-fm-mono icon-link-thin-outline',
         text: l[6909],
+        title: l[6909],
         onClick: () => {
             const id = M.currentdirid.split('/').pop();
             if (!id) {
@@ -990,7 +1155,9 @@ FileManager.prototype.initFileManagerUI = function() {
     });
     mega.ui.secondaryNav.addActionButton({
         componentClassname: 'fm-manage-file-request hidden',
+        icon: 'sprite-fm-mono icon-folder-arrow-02-thin-outline',
         text: l.file_request_dropdown_manage,
+        title: l.file_request_dropdown_manage,
         onClick: () => {
             const h = M.currentdirid.split('/').pop();
             if (M.isInvalidUserStatus() || !h) {
@@ -1001,15 +1168,11 @@ FileManager.prototype.initFileManagerUI = function() {
             return false;
         }
     });
-    mega.ui.secondaryNav.addActionButton({
-        componentClassname: 'fm-context transparent-icon fm-header-context hidden',
-        type: 'icon',
-        icon: 'sprite-fm-mono icon-side-menu',
-        onClick: (ev) => {
-            mega.ui.secondaryNav.openContextMenu(ev);
-            return false;
-        }
-    });
+
+    $.getActiveSearch = () => {
+        const { activeElement: i } = document;
+        return i && i.tagName === 'INPUT' && i.classList.contains('js-filesearcher') ? i : null;
+    };
 
     $.hideContextMenu = function(event) {
 
@@ -1034,14 +1197,8 @@ FileManager.prototype.initFileManagerUI = function() {
                 $('.breadcrumb-dropdown, .fm-breadcrumbs-wrapper .breadcrumb-dropdown-link').removeClass('active');
             }
 
-            const $dropdownSearch = $('.dropdown-search', '#startholder .js-topbar, #fmholder .mega-header');
-            const persistDropdownSearch = $dropdownSearch.length && currentNodeClass
-                                            && (
-                                                currentNodeClass.contains('js-filesearcher')
-                                                || $.contains($dropdownSearch.get(0), event.target)
-                                            );
-
-            if (!persistDropdownSearch) {
+            if (!$.getActiveSearch()) {
+                // Preserving search dropdown when search input is focused
                 $('.dropdown-search', '.js-topbar-searcher').addClass('hidden');
             }
         }
@@ -1129,10 +1286,6 @@ FileManager.prototype.initFileManagerUI = function() {
     }
 
     folderlink = folderlink || 0;
-
-    if ((typeof dl_import !== 'undefined') && dl_import) {
-        M.onFileManagerReady(importFile);
-    }
 
     $('.dropdown.body.context').rebind('contextmenu.dropdown', function(e) {
         if (!localStorage.contextmenu) {
@@ -1407,7 +1560,9 @@ FileManager.prototype.initShortcutsAndSelection = function(container, aUpdate, r
     }
 
     if (!aUpdate) {
+        let last = [];
         if (window.selectionManager) {
+            last = selectionManager.selected_list;
             window.selectionManager.destroy();
         }
 
@@ -1422,6 +1577,10 @@ FileManager.prototype.initShortcutsAndSelection = function(container, aUpdate, r
                     $.selected.splice(i, 1);
                 }
             }
+        }
+        // Same page but selection arrays were split
+        else if (!M.gallery && M.previousdirid === M.currentdirid && $.selected !== last) {
+            $.selected = last;
         }
 
         /**
@@ -1477,6 +1636,10 @@ FileManager.prototype.updFileManagerUI = async function() {
         delay(`updFileManagerUI:buildtree:${n.h}`, () => {
             this.buildtree(n, this.buildtree.FORCE_REBUILD);
             this.addTreeUIDelayed();
+
+            if ($.dialog === 'copy' || $.dialog === 'move') {
+                refreshDialogContent();
+            }
         }, 2600);
     };
 
@@ -1694,20 +1857,13 @@ FileManager.prototype.initContextUI = function() {
         });
         $('.transfer-table tr.ui-selected').removeClass('ui-selected');
     });
-
-    if (mega.keyMgr.version) {
-
-        queueMicrotask(() => {
-
-            this.fireKeyMgrDependantActions().catch(dump);
-        });
-    }
 };
 
 FileManager.prototype.fireKeyMgrDependantActions = async function() {
     'use strict';
 
-    if (sessionStorage.folderLinkImport || ($.onImportCopyNodes && !$.onImportCopyNodes.opSize)) {
+    // Fire folder importing
+    if (localStorage.folderLinkImport || ($.onImportCopyNodes && !$.onImportCopyNodes.opSize)) {
 
         await M.importFolderLinkNodes(false);
     }
@@ -1792,17 +1948,24 @@ FileManager.prototype.createFolderUI = function() {
         }
     });
 
-    $('.fm-share-folder').rebind('click', () => {
+    $('.fm-share-folder').rebind('click', (ev) => {
+        if (ev.currentTarget.classList.contains('active')) {
+            return;
+        }
         const node = M.getNodeByHandle(M.currentdirid.split('/').pop());
         if (node && M.getNodeRights(node.h) > 1) {
-            $.hideContextMenu();
-            mega.ui.mShareDialog.init(node.h);
+            M.contextMenuUI(ev, 4);
             eventlog(500034);
             return false;
         }
     });
 
     $('.fm-download').rebind('click', (ev) => {
+        if (ev.currentTarget.classList.contains('active')) {
+            $.hideContextMenu();
+            return;
+        }
+        ev.currentTarget.classList.add('active');
         ev.currentTarget.domNode = ev.currentTarget;
         mega.ui.secondaryNav.openDownloadMenu(ev);
         if (folderlink) {
@@ -2007,7 +2170,7 @@ FileManager.prototype.initFileAndFolderSelectDialog = async function(type) {
     return promise;
 };
 
-FileManager.prototype.initNewChatlinkDialog = function() {
+FileManager.prototype.initNewChatlinkDialog = function(flowType, cb) {
     'use strict';
 
     // If chat is not ready.
@@ -2029,11 +2192,16 @@ FileManager.prototype.initNewChatlinkDialog = function() {
 
     var dialog = React.createElement(StartGroupChatDialogUI.StartGroupChatWizard, {
         name: "start-group-chat",
-        flowType: 2,
+        flowType: flowType || 2,
         onClose() {
             ReactDOM.unmountComponentAtNode(dialogPlacer);
             dialogPlacer.remove();
-            closeDialog();
+            if (typeof cb === 'function') {
+                tryCatch(cb)();
+            }
+            else {
+                closeDialog();
+            }
         }
     });
 
@@ -2264,20 +2432,12 @@ FileManager.prototype.initUIKeyEvents = function() {
             $selectBlock.removeClass('active');
         }
         else if (e.keyCode == 27 && $.msgDialog) {
-            closeMsg();
-            if ($.warningCallback) {
-                $.warningCallback(false);
-                $.warningCallback = null;
-            }
+            closeMsg(false);
         }
         else if (e.keyCode === 13 && ($.msgDialog === 'confirmation' || $.msgDialog === 'remove' ||
             (($.msgDialog === 'warninga' || $.msgDialog === 'warningb' || $.msgDialog === 'info' ||
             $.msgDialog === 'error') && $('#msgDialog .mega-button').length === 1))) {
-            closeMsg();
-            if ($.warningCallback) {
-                $.warningCallback(true);
-                $.warningCallback = null;
-            }
+            closeMsg(true);
         }
         else if (
             !is_transfers_or_accounts &&
@@ -2452,19 +2612,49 @@ FileManager.prototype.addTransferPanelUI = function() {
             }
         });
 
-        var $tmp = $('.grid-url-arrow, .clear-transfer-icon, .link-transfer-status', domTable);
-        $tmp.rebind('click', function(e) {
-            var target = $(this).closest('tr');
+        if ($.transferHeader.doBind) {
+            $.transferHeader.doBind(domTable);
+        }
+
+        delay('tfs-ps-update', () => {
+            // XXX: This update will fire ps-y-reach-end, set a flag to ignore it...
+
+            $.isTfsPsUpdate = true;
+            Ps.update(domScrollingTable);
+
+            onIdle(() => {
+                $.isTfsPsUpdate = false;
+            });
+        });
+    };
+
+    $.transferHeader.doBind = (domTable) => {
+        // Bind proxy handlers only once
+        delete $.transferHeader.doBind;
+
+        domTable.addEventListener('click', e => {
+            let $this;
+            if (e.target.closest('.grid-url-arrow')) {
+                $this = $(e.target.closest('.grid-url-arrow'));
+            }
+            else if (e.target.closest('.clear-transfer-icon')) {
+                $this = $(e.target.closest('.clear-transfer-icon'));
+            }
+            else if (e.target.closest('.link-transfer-status')) {
+                $this = $(e.target.closest('.link-transfer-status'));
+            }
+            else {
+                return;
+            }
+            var target = $this.closest('tr');
             e.preventDefault();
             e.stopPropagation(); // do not treat it as a regular click on the file
             $('tr', domTable).removeClass('ui-selected');
 
-            if ($(this).hasClass('link-transfer-status')) {
+            if ($this.hasClass('link-transfer-status')) {
 
-                var $trs = $(this).closest('tr');
-
-                if ($(this).hasClass('transfer-play')) {
-                    if ($trs.filter('.transfer-upload').length && ulmanager.ulOverStorageQuota) {
+                if ($this.hasClass('transfer-play')) {
+                    if ($this.hasClass('transfer-upload') && ulmanager.ulOverStorageQuota) {
                         ulmanager.ulShowOverStorageQuotaDialog();
                         return;
                     }
@@ -2474,24 +2664,21 @@ FileManager.prototype.addTransferPanelUI = function() {
                         return;
                     }
                 }
-
-                var ids = $trs.attrs('id');
-
-                if ($(this).hasClass('transfer-play')) {
-                    ids.map(fm_tfsresume);
+                if ($this.hasClass('transfer-play')) {
+                    fm_tfsresume(target[0].id);
                 }
-                else {
-                    ids.filter(id => !String(id).startsWith('LOCKed_')).map(fm_tfspause);
+                else if (!String(target[0].id).startsWith('LOCKed_')) {
+                    fm_tfspause(target[0].id);
                 }
             }
             else {
-                if (!target.hasClass('.transfer-completed')) {
+                if (!target.hasClass('transfer-completed')) {
                     var toabort = target.attr('id');
                     dlmanager.abort(toabort);
                     ulmanager.abort(toabort);
                 }
                 target.fadeOut(function() {
-                    $(this).remove();
+                    target.remove();
                     tfsheadupdate({c: target.attr('id')});
                     mega.tpw.removeRow(target.attr('id'));
                     $.clearTransferPanel();
@@ -2501,10 +2688,14 @@ FileManager.prototype.addTransferPanelUI = function() {
             return false;
         });
 
-        $tmp = $('tr', domTable);
-        $tmp.rebind('dblclick', function() {
-            if ($(this).hasClass('transfer-completed')) {
-                var id = String($(this).attr('id'));
+        domTable.addEventListener('dblclick.transferhead', (ev) => {
+            if (!ev.target.closest('tr')) {
+                return;
+            }
+            ev.stopPropagation();
+            ev.preventDefault();
+            let { classList, id } = ev.target.closest('tr');
+            if (classList.contains('transfer-completed')) {
                 if (id[0] === 'd') {
                     id = id.split('_').pop();
                 }
@@ -2523,12 +2714,18 @@ FileManager.prototype.addTransferPanelUI = function() {
             return false;
         });
 
-        $tmp.rebind('click contextmenu', function(e) {
+        const clickContextFn = (e) => {
+            if (!e.target.closest('tr')) {
+                return;
+            }
+            e.stopPropagation();
+            e.preventDefault();
+            const $this = $(e.target.closest('tr'));
             if (e.type === 'contextmenu') {
                 if (!e.ctrlKey && !e.metaKey && !e.shiftKey) {
                     $('.ui-selected', domTable).removeClass('ui-selected');
                 }
-                $(this).addClass('ui-selected dragover');
+                $this.addClass('ui-selected dragover');
                 transferPanelContextMenu(null);
                 return !!M.contextMenuUI(e);
             }
@@ -2537,13 +2734,13 @@ FileManager.prototype.addTransferPanelUI = function() {
                 $.hideContextMenu();
                 if (e.shiftKey && domNode) {
                     var start = domNode;
-                    var end = this;
+                    var end = $this[0];
                     if ($.TgridLastSelected && $($.TgridLastSelected).hasClass('ui-selected')) {
                         start = $.TgridLastSelected;
                     }
                     if ($(start).index() > $(end).index()) {
                         end = start;
-                        start = this;
+                        start = $this[0];
                     }
                     $('.ui-selected', domTable).removeClass('ui-selected');
                     $([start, end]).addClass('ui-selected');
@@ -2553,34 +2750,24 @@ FileManager.prototype.addTransferPanelUI = function() {
                 }
                 else if (!e.ctrlKey && !e.metaKey) {
                     $('.ui-selected', domTable).removeClass('ui-selected');
-                    $(this).addClass('ui-selected');
-                    $.TgridLastSelected = this;
+                    $this.addClass('ui-selected');
+                    $.TgridLastSelected = $this[0];
                 }
                 else {
-                    if ($(this).hasClass("ui-selected")) {
-                        $(this).removeClass("ui-selected");
+                    if ($this.hasClass("ui-selected")) {
+                        $this.removeClass("ui-selected");
                     }
                     else {
-                        $(this).addClass("ui-selected");
-                        $.TgridLastSelected = this;
+                        $this.addClass("ui-selected");
+                        $.TgridLastSelected = $this[0];
                     }
                 }
             }
 
             return false;
-        });
-        $tmp = undefined;
-
-        delay('tfs-ps-update', function() {
-            // XXX: This update will fire ps-y-reach-end, set a flag to ignore it...
-
-            $.isTfsPsUpdate = true;
-            Ps.update(domScrollingTable);
-
-            onIdle(function() {
-                $.isTfsPsUpdate = false;
-            });
-        });
+        };
+        domTable.addEventListener('click', clickContextFn);
+        domTable.addEventListener('contextmenu', clickContextFn);
     };
 
     $.transferClose = function() {
@@ -2697,7 +2884,6 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
         const viewModeClass = (M.onIconView ? '.fm-blocks-view' : '.files-grid-view') + '.fm.shared-folder-content';
 
         $(viewModeClass).removeClass('hidden');
-        initPerfectScrollbar($(viewModeClass));
     }
     else if (M.onDeviceCenter && mega.devices.ui.isCustomRender()) {
         mega.devices.ui.$gridWrapper.removeClass('hidden');
@@ -2719,21 +2905,7 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
         }
     }
 
-    $('.fm-blocks-view, .fm-empty-cloud, .fm-empty-folder, .fm-empty-s4-bucket')
-        .rebind('contextmenu.fm', function(e) {
-            // Remove context menu option from filtered view and media discovery view
-            if (page === "fm/links" || M.gallery) {
-                return false;
-            }
-            $('.data-block-view', this).removeClass('ui-selected');
-            // is this required? don't we have a support for a multi-selection context menu?
-            if (selectionManager) {
-                selectionManager.clear_selection();
-            }
-            $.selected = [];
-            $.hideTopMenu();
-            return !!M.contextMenuUI(e, 2);
-        });
+    $(this.emptyStates).rebind('contextmenu.fm', this.onContextMenu.bind(this, null));
 
     if (M.isGalleryPage()) {
         $.selectddUIgrid = '.gallery-view';
@@ -2761,14 +2933,6 @@ FileManager.prototype.addGridUI = function(refresh) {
 
     // Change title for Public link page
     let dateLabel = l[17445];
-    switch (page) {
-        case 'fm/public-links':
-            dateLabel = l[20694];
-            break;
-        case 'fm/file-requests':
-            dateLabel = l.file_request_page_label_request_created;
-            break;
-    }
 
     if (dateLabel) {
         $('.fm .grid-table thead .date').text(dateLabel);
@@ -2790,13 +2954,14 @@ FileManager.prototype.addGridUI = function(refresh) {
     }
     else if (this.currentdirid === 'out-shares') {
         $('.out-shared-grid-view').removeClass('hidden');
-        initPerfectScrollbar($('.grid-scrolling-table', '.out-shared-grid-view'));
+        const $ps = $('.grid-scrolling-table', '.out-shared-grid-view');
+        initPerfectScrollbar($ps);
+        mega.ui.secondaryNav.bindScrollEvents($ps[0]);
     }
     else if (this.currentrootid === 'shares' && !this.v.length) {
         const viewModeClass = (M.onIconView ? '.fm-blocks-view' : '.files-grid-view') + '.fm.shared-folder-content';
 
         $(viewModeClass).removeClass('hidden');
-        initPerfectScrollbar($(viewModeClass, '.shared-details-block'));
     }
     else if (M.onDeviceCenter && mega.devices.ui.isCustomRender()) {
         mega.devices.ui.$gridWrapper.removeClass('hidden');
@@ -2832,21 +2997,9 @@ FileManager.prototype.addGridUI = function(refresh) {
     $('.grid-url-arrow').show();
     $('.grid-url-header').text('');
 
-    $('.files-grid-view.fm .grid-scrolling-table,.files-grid-view.fm .file-block-scrolling, .fm-empty-cloud,' +
-        '.fm-empty-folder, .fm.shared-folder-content, .fm-empty-s4-bucket, .out-shared-grid-view')
-        .rebind('contextmenu.fm', e => {
-            // Remove context menu option from filtered view and media discovery view
-            if (page === "fm/links" && page === "fm/faves" || M.gallery) {
-                return false;
-            }
-            $('.fm-blocks-view .ui-selected').removeClass('ui-selected');
-            if (selectionManager) {
-                selectionManager.clear_selection();
-            }
-            $.selected = [];
-            $.hideTopMenu();
-            return !!M.contextMenuUI(e, 2);
-        });
+    $('.files-grid-view.fm .grid-scrolling-table,.files-grid-view.fm .file-block-scrolling,'
+        + ' .fm.shared-folder-content, .out-shared-grid-view'
+        + this.emptyStates).rebind('contextmenu.fm', (e) => this.onContextMenu($('.fm-blocks-view .ui-selected'), e));
 
     // enable add star on first column click (make favorite)
     $('.grid-table tr td[megatype="fav"]').rebind('click', function(e) {
@@ -3150,8 +3303,8 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
 
     var mainSel = $.selectddUIgrid + ' ' + $.selectddUIitem;
     var dropSel = $.selectddUIgrid + ' ' + $.selectddUIitem + '.folder';
-    var $ddUIitem = $(mainSel);
-    var $ddUIgrid = $($.selectddUIgrid);
+    var $ddUIitem = $(mainSel, '.fmholder');
+    var $ddUIgrid = $($.selectddUIgrid, '.fmholder');
 
     if (!folderlink) {
         $(dropSel).droppable({
@@ -3187,8 +3340,9 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
                 $.selected.forEach((id, i) => {
                     var n = M.d[id];
                     if (n && max > i) {
+                        const lblClass = MegaNodeComponent.label[n.lbl | 0] || '';
                         html.push(
-                            '<div class="item-type-icon icon-' + fileIcon(n) + '-24"></div>' +
+                            `<div class="item-type-icon icon-${fileIcon(n)}-24 ${lblClass}"></div>` +
                             '<div class="tranfer-filetype-txt dragger-entry">' +
                             escapeHTML(n.name) + '</div>'
                         );
@@ -3246,6 +3400,12 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
         filter: $.selectddUIitem,
         cancel: `.ps__rail-y, .ps__rail-x, thead, ${$.selectddUIitem}`,
         start: e => {
+            const activeSearch = $.getActiveSearch();
+
+            if (activeSearch) {
+                activeSearch.blur();
+            }
+
             $.hideContextMenu(e);
             $.hideTopMenu();
             $.selecting = true;
@@ -3367,7 +3527,7 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
             return false;
         }
         let h = $(e.currentTarget).attr('id');
-        const n = M.getNodeByHandle(h);
+        const n = !missingkeys[h] && M.getNodeByHandle(h);
 
         if (!n) {
             return false;
@@ -3554,6 +3714,8 @@ FileManager.prototype.onSectionUIOpen = function(id) {
     $('#search-fake-form-2', $fmholder).rebind('submit', function() {
         return false;
     });
+    const headerButtons = id !== 'conversations' && (mega.ui.secondaryNav.actionsHolder ||
+        mega.ui.header.domNode.querySelector('.nav-secondary-actions .fm-header-buttons'));
 
     if (folderlink) {
         // XXX: isValidShareLink won't work properly when navigating from/to a folderlink
@@ -3575,7 +3737,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
 
             // Remove import and download buttons from the search result.
             if (!String(M.currentdirid).startsWith('search')) {
-                $('.fm-import-to-cloudrive', mega.ui.secondaryNav.actionsHolder).rebind('click', () => {
+                $('.fm-import-to-cloudrive', headerButtons).rebind('click', () => {
                     eventlog(99765);
                     // Import the current folder, could be the root or sub folder
                     M.importFolderLinkNodes([M.RootID]);
@@ -3594,7 +3756,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
             mega.ui.secondaryNav.domNode.classList.remove('hidden');
             if (M.isGalleryPage(id)) {
                 mega.ui.secondaryNav.hideCard();
-                mega.ui.secondaryNav.actionsHolder.classList.add('hidden');
+                headerButtons.classList.add('hidden');
                 mega.ui.secondaryNav.updateLayoutButton(true);
                 mega.ui.secondaryNav.updateInfoPanelButton();
             }
@@ -3607,9 +3769,11 @@ FileManager.prototype.onSectionUIOpen = function(id) {
                 mega.devices.ui &&
                 mega.devices.ui.isReady &&
                 !mega.devices.ui.hasDevices ||
-                id === 'shared-with-me' && M.currentdirid !== 'shares' ||
-                id === 's4' && M.currentCustomView.subType === 'bucket') {
-                mega.ui.secondaryNav.actionsHolder.classList.add('hidden');
+                !M.v.length && (
+                    id === 'shared-with-me' && M.currentdirid !== 'shares' ||
+                    id === 's4' && M.currentCustomView.subType === 'bucket'
+                )) {
+                headerButtons.classList.add('hidden');
             }
         }
 
@@ -3980,7 +4144,7 @@ FileManager.prototype.cameraUploadUI = function() {
         const fmItem = document.querySelector(`[id="${M.CameraId}"] .folder`);
 
         if (treeItem) {
-            treeItem.classList.add('camera-folder');
+            treeItem.className = 'nw-fm-tree-folder camera-folder';
         }
 
         if (fmItem) {
@@ -4001,7 +4165,7 @@ FileManager.prototype.cameraUploadUI = function() {
     var diagInheritance = {
         'recovery-key-dialog': ['recovery-key-info'],
         properties: ['links', 'rename', 'copyrights', 'copy', 'move', 'share', 'saveAs'],
-        copy: ['createfolder'],
+        copy: ['createfolder', 'start-group-chat'],
         move: ['createfolder'],
         register: ['terms'],
         selectFolder: ['createfolder'],
@@ -4011,7 +4175,8 @@ FileManager.prototype.cameraUploadUI = function() {
         ],
         'share-with-unverified-contacts': ['fingerprint-dialog'],
         'share-access-contacts-dialog': ['fingerprint-dialog'],
-        'stripe-pay': ['stripe-pay-success', 'stripe-pay-failure']
+        'stripe-pay': ['stripe-pay-success', 'stripe-pay-failure'],
+        'sendToChat': ['start-group-chat'],
     };
 
     var _openDialog = function(name, dsp) {
@@ -4076,7 +4241,8 @@ FileManager.prototype.cameraUploadUI = function() {
                 if ($dialog) {
                     if (!$dialog.hasClass('mega-dialog') &&
                         !$dialog.hasClass('fm-dialog-mobile') &&
-                        !$dialog.hasClass('fm-dialog')) {
+                        !$dialog.hasClass('fm-dialog') &&
+                        !$dialog.hasClass('msg-dialog')) {
 
                         throw new Error(`Unexpected dialog(${name}) type...`);
                     }

@@ -11,7 +11,7 @@ class MContextMenu extends MComponent {
 
     buildElement() {
         this.el = document.createElement('div');
-        this.el.className = 'dropdown body context m-context-menu tooltip-popin';
+        this.el.className = 'dropdown body context m-context-menu tooltip-popin max-w-80';
     }
 
     /**
@@ -66,6 +66,7 @@ class MContextMenu extends MComponent {
         });
 
         this.toggleScrolls(false);
+        this.toggleListeners(true);
     }
 
     hide(hideSiblings) {
@@ -102,6 +103,7 @@ class MContextMenu extends MComponent {
         }
 
         this.toggleScrolls(true);
+        this.toggleListeners(false);
 
         if (typeof this.onHide === 'function') {
             this.onHide();
@@ -120,6 +122,23 @@ class MContextMenu extends MComponent {
             for (let i = 0; i < scrollablePointers.length; i++) {
                 scrollablePointers[i].classList[method]('ps-disabled');
             }
+        }
+    }
+
+    /**
+     * @param {Boolean} status Whether to enable or disable listeners for the menu
+     * @returns {void}
+     */
+    toggleListeners(status) {
+        if (this.controller) {
+            this.controller.abort();
+        }
+        else {
+            this.controller = new AbortController();
+        }
+
+        if (status) {
+            window.addEventListener('resize', this.hide.bind(this, true), { signal: this.controller.signal });
         }
     }
 

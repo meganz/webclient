@@ -59,6 +59,19 @@ function CreateWorkers(url, message, size) {
         }
     };
 
+    const reportError = tryCatch((ex, loc) => {
+        if (sessionStorage.wrkex || !(buildVersion.timestamp * 1000 + 3e8 > Date.now())) {
+            return;
+        }
+        sessionStorage.wrkex = 1;
+        if (ex) {
+            const msg = `${ex.message || ex}`;
+            const stack = ex.stack && String(ex.stack).replace(msg, '');
+            ex = `${msg} ${stack || ''}`;
+        }
+        self.reportError(new Error(`Worker exception :imp: ${ex} ${loc || 'unk'}`));
+    });
+
     var workerLoadFailure = function(ex) {
         if (d) {
             console.error(wid, ex);
@@ -114,7 +127,6 @@ function CreateWorkers(url, message, size) {
 
     return new MegaQueue(function _(task, done) {
         var i = size;
-        var self = this;
 
         while (i--) {
             if (!worker[i] && !(worker[i] = create(i))) {
@@ -140,12 +152,16 @@ function CreateWorkers(url, message, size) {
             tryCatch(() => worker[i].terminate())();
             worker[i] = instances[i] = null;
 
+            if (ex.message && !String(ex.message).includes('NetworkError')) {
+                reportError(ex.message, `${ex.filename}:${ex.lineno}`.split('://')[1]);
+            }
+
             if ((backoff | 0) < 100) {
                 backoff = 200;
             }
             tSleep(Math.min(8e3, backoff <<= 1) / 1e3)
                 .then(() => _(task, done))
-                .catch(dump);
+                .catch(reportError);
         };
 
         if (d > 1) {
@@ -175,9 +191,7 @@ function CreateWorkers(url, message, size) {
                     else {
                         console.error(' --- FATAL UNRECOVERABLE ERROR --- ', ex);
 
-                        onIdle(function() {
-                            throw ex;
-                        });
+                        reportError(ex, ':shit:');
                     }
                 }
             }

@@ -115,7 +115,6 @@ lazy(mega.devices, 'main', () => {
             this._setupListeners();
 
             const handler = this._getSectionHandlerInstance();
-
             const {err, id} = await handler.render(isRefresh) || {};
             if (err) {
                 M.openFolder(id);

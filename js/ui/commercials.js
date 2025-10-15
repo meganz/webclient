@@ -564,6 +564,9 @@ lazy(mega, 'commercials', () => {
                 else if (location.host === 'mega.nz') {
                     googletag.pubads().set('page_url', `https://mega.nz/`);
                 }
+                else if (location.host === 'mega.app') {
+                    googletag.pubads().set('page_url', 'https://mega.app');
+                }
                 handleCookies();
                 googletag.enableServices();
                 googletag.display(slotWrapper.id);

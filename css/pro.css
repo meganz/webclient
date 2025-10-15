@@ -2214,6 +2214,7 @@ body.mobile .redeem-promo-page .mega-input.title-ontop {
     z-index: 201;
     padding: 0 17px;
     text-align: center;
+    color: var(--text-color-black-medium)
 }
 .payment-success-cloak i {
     --icon-size: 86px;

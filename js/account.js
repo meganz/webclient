@@ -342,30 +342,6 @@ function u_checklogin3a(res, ctx) {
                     });
             })
             .then(() => {
-                // there was a race condition between importing and business accounts creation.
-                // in normal users there's no problem, however in business the user will be disabled
-                // till they pay. therefore, if the importing didnt finish before 'upb' then the importing
-                // will fail.
-                if (r > 2 && !is_iframed) {
-                    const {handle} = mBroadcaster.crossTab;
-
-                    console.assert(!handle, 'FIXME: cross-tab already initialized.', handle, u_handle);
-                    console.assert(!handle || handle === u_handle, 'Unmatched cross-tab handle', handle, u_handle);
-
-                    return mBroadcaster.crossTab.initialize();
-                }
-                else if ($.createanonuser === u_attr.u) {
-                    delete $.createanonuser;
-
-                    if (self.pfid) {
-                        M.importWelcomePDF().catch(dump);
-                    }
-                    else {
-                        return M.importWelcomePDF().catch(dump);
-                    }
-                }
-            })
-            .then(() => {
                 ctx.checkloginresult(ctx, r);
             })
             .catch((ex) => {
@@ -475,7 +451,8 @@ function u_logout(logout) {
         localStorage.removeItem('signupcode');
         localStorage.removeItem('registeremail');
         localStorage.removeItem('mInfinity');
-        localStorage.removeItem('megaLiteMode');
+        delete sessionStorage.buextra;
+        delete sessionStorage.cnv2free;
 
         fminitialized = false;
         if ($.leftPaneResizable) {
@@ -539,8 +516,11 @@ function u_reset() {
     api.setSID(window.u_sid);
 
     // close fmdb
-    if (typeof mDBcls === 'function') {
-        mDBcls();
+    if (self.fmdb) {
+        if (fmdb.db) {
+            fmdb.db.close();
+        }
+        fmdb = false;
     }
 
     if (window.M && M.reset) {
@@ -605,7 +585,6 @@ function u_setrsa(rsakey) {
                             crypt.getPubKeyAttribute(u_attr.b.bu, 'RSA')
                                 .then(function(res) {
                                     window.businessSubAc = {bu: u_attr.b.bu, bpubk: res};
-                                    mBroadcaster.once('fm:initialized', () => M.importWelcomePDF().catch(dump));
                                     $promise.linkDoneAndFailTo(u_setrsa(rsakey));
                                 })
                                 .catch(onError.bind(null, l[22897]));
@@ -655,11 +634,7 @@ function u_setrsa(rsakey) {
 
                         watchdog.notify('setrsa', [u_type, u_sid]);
 
-                        // Recovery Key Onboarding improvements
-                        // Show newly registered user the download recovery key dialog.
                         M.onFileManagerReady(function() {
-                            M.showRecoveryKeyDialog(1);
-
                             if ('csp' in window) {
                                 const storage = localStorage;
                                 const value = storage[`csp.${u_handle}`];
@@ -945,7 +920,7 @@ function processEmailChangeActionPacket(ap) {
  * Contains a list of permitted landing pages.
  * @var {array} allowedLandingPages
  */
-var allowedLandingPages = ['fm', 'recents', 'chat'];
+var allowedLandingPages = ['fm', 'recents', 'chat', 's4'];
 
 /**
  * Fetch the landing page.
@@ -981,7 +956,7 @@ function initMegaIoIframe(loginStatus, planNum) {
 
     // Set constants for URLs (easier to change for local testing)
     const megapagesUrl = 'https://mega.io';
-    const parentUrl = 'https://mega.nz';
+    const parentUrl = location.host === 'mega.app' ? 'https://mega.app' : 'https://mega.nz';
 
     const megapagesPromise = mega.promise;
 

@@ -17,6 +17,9 @@
     overflow: hidden;
     position: relative;
 }
+.small-nav .files-grid-view.public-links-view {
+    margin-top: 12px;
+}
 
 /* ============================ *\
     shared-grid-view - Wrapper
@@ -26,6 +29,7 @@
     height: 100%;
     overflow: hidden;
     position: relative;
+    margin-top: 12px;
 }
 
 .shared-grid-view .grid-table {
@@ -78,6 +82,7 @@ table.grid-table .inbound-share.unverified-share .sprite-fm-uni-after.icon-warni
     height: 100%;
     overflow: hidden;
     position: relative;
+    margin-top: 12px;
 }
 .out-shared-grid-view .grid-table {
     table-layout: fixed;
@@ -289,6 +294,9 @@ table tr.ui-selected .grid-file-request-manage {
     z-index: 201;
     border-bottom: 1px solid var(--mobile-border-subtle);
 }
+.small-nav .grid-table th {
+    height: 32px;
+}
 
 .grid-table th:hover {
     color: var(--mobile-text-primary);
@@ -370,7 +378,9 @@ table tr.ui-selected .grid-file-request-manage {
     z-index: 1;
     pointer-events: none;
 }
-.mega-lite-mode .grid-table.fm.v-size [megatype="size"],
+.grid-table .space-maintainer-end {
+    background-color: var(--mobile-page-background);
+}
 .mega-lite-mode .grid-table.fm.v-versions [megatype="versions"],
 .mega-lite-mode .grid-table.shared-with-me .size-col,
 .mega-lite-mode .grid-table.out-shares .size-col {
@@ -413,7 +423,7 @@ table tr.ui-selected .grid-file-request-manage {
     transition: 200ms linear;
 }
 .shared-details-block .files-grid-view.fm .column-settings {
-    top: 14px;
+    top: 4px;
 }
 .rtl .files-grid-view.fm .column-settings {
     right: auto;
@@ -444,6 +454,10 @@ table tr.ui-selected .grid-file-request-manage {
     padding-bottom: 15px;
     background-color: var(--mobile-page-background);
     text-align: start;
+}
+.small-nav .files-grid-view.fm .column-settings.overlap {
+    padding-top: 4px;
+    padding-bottom: 4px;
 }
 
 .rtl .files-grid-view.fm .column-settings.overlap {
@@ -519,7 +533,6 @@ table.grid-table.fat .item-type-icon {
 
 table.grid-table .tranfer-filetype-txt {
     left: 0;
-    line-height: inherit;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -661,18 +674,19 @@ table.grid-table .grid-url-arrow {
     /* transition: all 50ms ease-in-out; */
     position: absolute;
     background-color: transparent;
-    top: 0;
+    top: 50%;
+    transform: translateY(-50%);
     left: 35px;
     border-radius: 4px;
     opacity: 0;
     padding: 0 2px;
 }
-table.grid-table.fat .grid-url-arrow {
-    top: 8px;
-}
 .rtl table.grid-table .grid-url-arrow {
     left: auto;
     right: 35px;
+}
+.grid-wrapper table.grid-table tbody td.grid-url-field a.grid-url-arrow i {
+    vertical-align: unset;
 }
 
 table.grid-table .grid-url-arrow i {
@@ -804,6 +818,12 @@ table.fm td {
 }
 table.fm.fat td {
     height: 48px;
+}
+table.fm.search-page:not(.fat) td {
+    height: 73px;
+}
+table.fm.search-page.fat td {
+    height: 81px;
 }
 table.fm [megatype="fav"] {
     text-align: center;
@@ -1469,6 +1489,10 @@ table.out-shares .fm-chat-users {
 /* ======================================== *\
    grid-table file-requests
 \* ======================================== */
+
+.file-requests-view {
+    margin-top: 12px;
+}
 .file-requests-view .grid-table tr:not(.ui-selected):not(:hover) .grid-file-request-manage {
     opacity: 0;
 }
@@ -1485,6 +1509,9 @@ table.out-shares .fm-chat-users {
     padding: 20px 0 12px;
     text-align: start;
     height: 24px;
+}
+.small-nav .arrow:not(.grid-header-star) {
+    padding: 6px 0 2px;
 }
 .s4-grid-view .arrow:not(.grid-header-star) {
     padding: 0;

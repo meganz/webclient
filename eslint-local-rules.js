@@ -92,7 +92,7 @@ module.exports = {
                                 a0 = a0.value;
                             }
 
-                            if (!/^(?:GET|POST|https:\/\/mega\.(?:nz|io)|get(?:App)?BaseUrl)\b/.test(a0)) {
+                            if (!/^(?:GET|POST|https:\/\/mega\.(?:nz|io|app)|get(?:App)?BaseUrl)\b/.test(a0)) {
 
                                 context.report(node,
                                     'If this is a window.open() call, it must be explicitly invoked with noopener|noreferrer.'

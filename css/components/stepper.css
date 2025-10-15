@@ -37,9 +37,9 @@
 .mega-component.stepper .step .step-number {
     font: var(--mobile-font-caption-small-bold);
     position: absolute;
-    top: 5px;
+    top: 50%;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translateX(-50%) translateY(-50%);
 }
 
 .mega-component.stepper .step .step-icon {

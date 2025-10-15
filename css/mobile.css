@@ -900,8 +900,11 @@ ul, li {
 .mobile.bus-pw-confirm-block .mobile.fm-block {
     background-color: var(--stroke-grey-1);
 }
-.mobile.registration-confirm-email{
+.mobile.registration-confirm-email {
     background-color: var(--stroke-grey-1);
+    position: fixed;
+    top: 0;
+    z-index: 95;
 }
 .mobile.registration-confirm-email .mobile.fm-block {
     padding-bottom: 24px;
@@ -10530,7 +10533,11 @@ code, c {
 .mobile.payment-card-page .card-info.payment-card .payment-card-bottom {
     width: 285.96px;
     height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     background-color: #03A892;
+    flex-wrap: wrap;
 }
 .mobile.payment-card-page .card-info.payment-card.mc .payment-card-bottom {
     background-color: #E58D27;
@@ -10567,13 +10574,14 @@ code, c {
     color: var(--text-color-white-higher);
     font: var(--text-caption);
 }
-.mobile.payment-card-page .card-info.payment-card .payment-card-edit {
+.mobile.payment-card-page .card-info.payment-card .payment-card-edit,
+.mobile.payment-card-page .card-info.payment-card .payment-card-delete {
     display: inline-block;
     color: var(--text-color-white-higher);
-    margin-top: 16px;
-    margin-left: 17px;
+    margin: 0 17px;
     font: var(--text-caption);
     text-decoration: underline;
+    padding: 15px 0;
 }
 
 /*
@@ -10962,6 +10970,8 @@ code, c {
     background-color: var(--mobile-page-background);
     height: auto;
     grid-row: 4/5;
+    display: flex;
+    flex-direction: column;
 }
 
 .mega-header {
@@ -11025,6 +11035,10 @@ body.rtl .overlay-wrap {
     grid-row: -1/-2;
     overflow-y: scroll;
     position: static;
+}
+
+body .no-tablet-layout #startholder.page-file-request-upload {
+    position: relative;
 }
 
 /* General css items */
@@ -11123,4 +11137,15 @@ body.rtl .overlay-wrap {
     #fmholder.fmholder .fm-block.file-manager-block.cd-commercials {
         height: 100%;
     }
+}
+
+.mega-component.banner.payment-banner .title-text {
+    font: var(--mobile-font-copy-semibold);
+}
+.mega-component.banner.payment-banner .message-text,
+.mega-component.banner.payment-banner .message-text a {
+    font: var(--mobile-font-caption-large-regular);
+}
+.mega-component.banner.payment-banner .message-text b {
+    font: var(--mobile-font-caption-large-bold);
 }

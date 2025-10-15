@@ -481,6 +481,8 @@ MegaData.prototype.delIPC = function(id) {
  *
  */
 MegaData.prototype.addPS = function(ps, ignoreDB) {
+    'use strict';
+
     if (!this.ps[ps.h]) {
         this.ps[ps.h] = Object.create(null);
     }
@@ -494,7 +496,10 @@ MegaData.prototype.addPS = function(ps, ignoreDB) {
     if (!this.su[ps.p]) {
         this.su[ps.p] = Object.create(null);
     }
-    this.su[ps.p][ps.h] = 2;
+    this.su[ps.p][ps.h] = ps;
+
+    // uhm, setNodeShare(ps, true) so that we maintain this.su[ps.h] too(?)
+    // ^ if so, replace M.getOutShares() usages by [...this.su[h]]...
 };
 
 /**
@@ -506,6 +511,7 @@ MegaData.prototype.addPS = function(ps, ignoreDB) {
  *
  */
 MegaData.prototype.delPS = function(pcrId, nodeId) {
+    'use strict';
 
     // Delete the pending share
     if (this.ps[nodeId]) {
@@ -520,8 +526,12 @@ MegaData.prototype.delPS = function(pcrId, nodeId) {
     }
 
     // clear pending share history from M.su
-    if (M.su[pcrId] && M.su[pcrId][nodeId] === 2) {
+    if (this.su[pcrId] && this.su[pcrId][nodeId]) {
         delete M.su[pcrId][nodeId];
+
+        if (!Object.keys(this.su[pcrId]).length) {
+            delete this.su[pcrId];
+        }
     }
 
     if (fmdb && !pfkey) {

@@ -1049,6 +1049,9 @@ body.rtl .gallery-view.gallery-type-m .gallery-date-block i::before {
 .media-tabs.hidden + .gallery-tabs-bl  {
     border-top: 1px solid var(--mobile-border-strong);
 }
+#media-tabs .m-tabs.hidden ~ div {
+    display: none;
+}
 @-moz-document url-prefix() {
     .btn-galleries .w-full {
         width: calc(100% - 33px);

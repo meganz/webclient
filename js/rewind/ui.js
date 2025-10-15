@@ -180,8 +180,6 @@ lazy(mega, 'rewindUi', () => {
 
 
             this.beforePageChangeListener = null;
-            this.$rewindProgressSection = $('.fm-rewind-progress-section', '.fm-right-files-block');
-            this.$rewindProgressTopBar = $('.js-dropdown-rewind-progress', '.topbar-links, .mega-header');
             this.$onboardingControlPanel = $('.onboarding-control-panel', '.fm-right-files-block.visible-notification');
             if (this.$onboardingControlPanel.hasClass('hidden')) {
                 this.$onboardingControlPanel = false;
@@ -235,9 +233,10 @@ lazy(mega, 'rewindUi', () => {
                     const isBeforeActivationDate = date < REWIND_ACTIVATION_DATE;
 
                     if (isBeforeActivationDate || mega.rewind.isAccountProType()) {
-                        const tooltip = isBeforeActivationDate
-                            ? l.rewind_datepicker_cell_tooltip_before_activation
-                            : l.rewind_datepicker_cell_tooltip_disabled_pro;
+                        const tooltip = isBeforeActivationDate ?
+                            l.rewind_datepicker_cell_tooltip_before_activation :
+                            l.rewind_datepicker_cell_tooltip_disabled_pro
+                                .replace('%d', mega.rewind.rewindableDays);
 
                         disabledCellContent = `<span 
                             class="cell-value simpletip"
@@ -404,26 +403,19 @@ lazy(mega, 'rewindUi', () => {
             this.$datepicker.val('');
             this.initializeDatepicker();
 
-            const rewindDescriptionData = mega.rewind.getRewindDescriptionData();
-            const upgradeSectionData = mega.rewind.getUpgradeSectionData();
-
             this.$contentUpgradeTitle = $('.upgrade-title', this.$contentUpgrade);
             this.$contentRewindDescription = $('.rewind-description', this.$contentUpgrade);
             this.$contentUpgradeDescription = $('.upgrade-description', this.$contentUpgrade);
-            this.$contentUpgradePurchaseButton = $('.upgrade-purchase-button', this.$contentUpgrade);
 
-            this.$contentUpgradeTitle.text(rewindDescriptionData.title);
-            this.$contentRewindDescription.safeHTML(rewindDescriptionData.description);
+            this.$contentUpgradeTitle.text(l.rewind_upg_header);
+
+            this.$contentRewindDescription.safeHTML(
+                l.rewind_select_date.replace('%d', mega.rewind.rewindableDays));
+
+            const upgradeSectionData = mega.rewind.getUpgradeSectionData();
             if (upgradeSectionData) {
+                $('a', this.$contentRewindDescription).addClass('hidden');
                 this.$contentUpgradeDescription.safeHTML(upgradeSectionData);
-            }
-            else {
-                this.$contentUpgradeDescription.addClass('hidden');
-            }
-            this.$contentUpgradePurchaseButton.addClass('hidden');
-
-            if (rewindDescriptionData.hasUpgrade) {
-                this.$contentUpgradePurchaseButton.removeClass('hidden');
             }
 
             this.$contentUpgrade.removeClass('hidden');
@@ -506,7 +498,7 @@ lazy(mega, 'rewindUi', () => {
             let overlayAdded = false;
             let overlayHeight = overlayCount * (CELL_HEIGHT + 5);
             let $overlay = null;
-            let overlayCaption = mega.rewind.getDatepickerOverlayContent(type);
+            let overlayCaption = mega.rewind.getDatepickerOverlayContent();
             let hasOverlayIncrease = false;
 
             if (overlayCaption) {
@@ -678,6 +670,9 @@ lazy(mega, 'rewindUi', () => {
             this.currentIcon = icon;
             if (folderIcon) {
                 folderIcon.classList.add(`icon-${icon}-24`);
+                if (icon === 'folder') {
+                    MegaNodeComponent.label.set(this.currentNode, folderIcon);
+                }
             }
             const folderNameElement = this.sidebar.querySelector('.folder-info .folder-name');
             folderNameElement.innerText = this.getNodeNameInfo(this.currentNode)[0];
@@ -1333,7 +1328,10 @@ lazy(mega, 'rewindUi', () => {
                 for (const property in childrenNodes) {
                     let node = childrenNodes[property];
 
-                    if (!this.isSameOrAncestor(nodeDictionary, property, selectedHandle)) {
+                    if (
+                        !this.isSameOrAncestor(nodeDictionary, property, selectedHandle)
+                        || (node.sen && !mega.sensitives.showGlobally)
+                    ) {
                         continue;
                     }
 
@@ -1936,26 +1934,26 @@ lazy(mega, 'rewindUi', () => {
          */
         showRestoreProgress() {
             if (M.getPath(M.currentdirid).includes(mega.rewind.persist.selectedHandle)) {
-                if (this.$rewindProgressSection) {
-                    this.$rewindProgressSection.removeClass('hidden');
-                }
                 if (this.$fmHeaderButtons) {
                     this.$fmHeaderButtons.addClass('hidden');
                 }
                 if (this.$onboardingControlPanel) {
                     this.$onboardingControlPanel.addClass('hidden');
                 }
+                mLoadingSpinner.hide('rewind-restore', true);
+                mega.rewindUi.progress.hideWidget();
+                mega.rewindUi.progress.showSection();
             }
             else {
-                if (this.$rewindProgressSection) {
-                    this.$rewindProgressSection.addClass('hidden');
-                }
                 if (this.$fmHeaderButtons) {
                     this.$fmHeaderButtons.removeClass('hidden');
                 }
                 if (this.$onboardingControlPanel) {
                     this.$onboardingControlPanel.removeClass('hidden');
                 }
+                mLoadingSpinner.show('rewind-restore');
+                mega.rewindUi.progress.showWidget();
+                mega.rewindUi.progress.hideSection();
             }
         }
 
@@ -1964,12 +1962,9 @@ lazy(mega, 'rewindUi', () => {
          * @returns {void}
          */
         hideRestoreProgress() {
-            if (this.$rewindProgressSection) {
-                this.$rewindProgressSection.addClass('hidden');
-            }
-            if (this.$rewindProgressTopBar) {
-                this.$rewindProgressTopBar.removeClass('show');
-            }
+            mega.rewindUi.progress.hideSection();
+            mLoadingSpinner.hide('rewind-restore', true);
+
             if (this.$fmHeaderButtons) {
                 this.$fmHeaderButtons.removeClass('hidden');
             }
@@ -1991,100 +1986,14 @@ lazy(mega, 'rewindUi', () => {
             }
         }
 
-        /**
-         * Shows restore progress dialog in case rewind in progress and
-         * last visited page is the current folder being rewound
-         * @returns {void}
-         */
-        updateRestoreDialogProgress() {
-            if (mega.rewindUtils.reinstate.inProgress
-                && window.page === `fm/${mega.rewind.persist.selectedHandle}`) {
-
-                this.$rewindProgressTopBar.removeClass('hidden');
-                this.$rewindProgressTopBar.addClass('show active');
-            }
-            else {
-                this.$rewindProgressTopBar.addClass('hidden');
-                this.$rewindProgressTopBar.removeClass('show active');
-            }
-        }
-
-        addDialogProgEventListeners() {
-            this.$loader = $(mega.ui.header.loader);
-            this.$loader.addClass('pointer-c');
-            this.$loader.rebind('click.rewind', () => {
-                this.$rewindProgressTopBar.removeClass('hidden');
-                this.$rewindProgressTopBar.toggleClass('show active');
+        setupLoader() {
+            this.$loader.addClass('pointer-c').rebind('click.rewind', () => {
+                mega.rewindUi.progress.toggleWidget();
             });
         }
 
-        /**
-         * Handles "restore" process progress UI
-         * Passed as parameter in mega.rewindUtils.restoreNodes
-         * @param {number} progress - decimal number between 0 and 1 representing the progress of the process
-         * @returns {void}
-         */
-        handleRestoreProgress(progress) {
-            if (!progress) {
-                mLoadingSpinner.show('rewind-restore');
-
-                if (!this.beforePageChangeListener) {
-                    this.beforePageChangeListener = mBroadcaster.addListener(
-                        'beforepagechange',
-                        this.updateRestoreDialogProgress.bind(this)
-                    );
-                }
-
-                $('.title', this.$rewindProgressSection).safeHTML(
-                    mega.rewindUi.progressTranslations.section.title(0)
-                );
-
-                $('.message', this.$rewindProgressSection).safeHTML(
-                    mega.rewindUi.progressTranslations.section.message(this.selectedDate)
-                );
-
-                const {h, name} = mega.rewindUi.sidebar.currentNode;
-                const nodeName = h === M.RootID ? l[164] : name;
-
-                $('.title', this.$rewindProgressTopBar).safeHTML(
-                    mega.rewindUi.progressTranslations.topBar.title(nodeName)
-                );
-
-                $('.message', this.$rewindProgressTopBar).safeHTML(
-                    mega.rewindUi.progressTranslations.topBar.message(0)
-                );
-
-                this.addDialogProgEventListeners();
-
-                this.showRestoreProgress();
-            }
-            else if (progress === 1) {
-                mLoadingSpinner.hide('rewind-restore');
-                this.$loader.off('click.rewind');
-                this.$loader.removeClass('pointer-c');
-
-                if (this.beforePageChangeListener) {
-                    mBroadcaster.removeListener(this.beforePageChangeListener);
-                }
-
-                this.hideRestoreProgress();
-            }
-            else {
-                this.showRestoreProgress();
-                let percentage = Math.round(progress * 100);
-
-                if (percentage > 100) {
-                    delay('rewind:reinstate-percent-over-100', eventlog.bind(null, 500524));
-                    percentage = 100;
-                }
-
-                $('.title', this.$rewindProgressSection).safeHTML(
-                    mega.rewindUi.progressTranslations.section.title(percentage)
-                );
-                $('.message', this.$rewindProgressTopBar).safeHTML(
-                    mega.rewindUi.progressTranslations.topBar.message(percentage)
-                );
-            }
+        teardownLoader() {
+            this.$loader.removeClass('pointer-c').off('click.rewind');
         }
 
         onClickRestore() {
@@ -2124,39 +2033,31 @@ lazy(mega, 'rewindUi', () => {
                 console.time('rewind:index:restore');
                 this.$restoreButton.addClass('disabled');
 
-                this.handleRestoreProgress(0);
-
                 this.openFolderListener = mBroadcaster.addListener('beforepagechange', () => {
                     if (mega.rewindUi && mega.rewindUi.sidebar) {
                         mega.rewindUi.sidebar.updateRestoreProgress();
-                        mega.rewindUi.sidebar.addDialogProgEventListeners();
+                        mega.rewindUi.sidebar.setupLoader();
                     }
                 });
 
-                mega.rewindUtils.reinstate.restoreNodes(mega.rewind.persist.nodesToRestore,
-                                                        this.handleRestoreProgress.bind(this))
+                mega.rewindUtils.reinstate.restoreNodes(
+                    mega.rewind.persist.selectedHandle,
+                    mega.rewindUi.progress,
+                    this.rewindOptions)
                     .then((res) => {
-
-                        logger.info('Successfully restored.', res, mega.rewind.persist.nodesToRestore);
-                        toaster.main.show({
-                            icons: ['sprite-fm-uni icon-check-circle'],
-                            content: l.rewind_success_message
-                                .replace('%1', this.rewindOptions.folderName)
-                                .replace('%2', this.rewindOptions.restoreDate)
-                        });
-
-                        // Reset persisting values if rewind is successful
+                        logger.info('Successfully restored.', res, mega.rewind.persist.selectedHandle);
                         this.resetPersist();
-
-                        // Cleanup
                         this.rewindOptions = Object.create(null);
                     })
                     .catch((ex) => {
-                        logger.error('Failed to restore!', ex, mega.rewind.persist.nodesToRestore);
+                        logger.error('Failed to restore!', ex, mega.rewind.persist.selectedHandle);
                         let dlg;
                         // When `length` is 2, we one node to restore,
                         // as rewind root is also part of the `toBeRestored` list
-                        const multiple = mega.rewindUtils.reinstate.toBeRestored.length > 2;
+                        const multiple = Object.keys(
+                            mega.rewind.persist.nodeChildrenDictionary[
+                                mega.rewind.persist.selectedHandle
+                            ]) > 1;
 
                         // Rewind-specific error messages
                         switch (ex) {
@@ -2223,10 +2124,12 @@ lazy(mega, 'rewindUi', () => {
                         }
                     })
                     .finally(() => {
-                        this.handleRestoreProgress(1);
+                        mega.rewindUtils.reinstate.finalise();
                         mBroadcaster.removeListener(this.openFolderListener);
-                        console.timeEnd('rewind:index:restore');
+                        mega.rewindUi.sidebar.teardownLoader();
+                        mega.rewindUi.sidebar.updateRestoreProgress();
                         this.$restoreButton.removeClass('disabled');
+                        console.timeEnd('rewind:index:restore');
                     });
                 return false;
             };
@@ -2417,8 +2320,16 @@ lazy(mega, 'rewindUi', () => {
             */
 
             nameElement.textContent = this.getNodeNameInfo(node)[0];
-            iconElement.classList.add(`icon-${fileIcon(node)}-24`);
+            const icon = fileIcon(node);
+            iconElement.classList.add(`icon-${icon}-24`);
+            if (icon === 'folder') {
+                MegaNodeComponent.label.set(node, iconElement);
+            }
             template.dataset.id = node.h;
+
+            if (mega.sensitives.isSensitive(node)) {
+                template.classList.add('is-sensitive');
+            }
 
             // SAT-1023
             /*
@@ -2588,7 +2499,6 @@ lazy(mega, 'rewindUi', () => {
             */
 
             const nodeDateData = mega.rewind.dateData &&
-                mega.rewind.dateData[this.selectedDateString] &&
                 mega.rewind.dateData[this.selectedDateString] || null;
 
             let type = TYPE_NONE;
@@ -2597,6 +2507,17 @@ lazy(mega, 'rewindUi', () => {
 
             if (nodeDateData) {
                 type = nodeDateData.type[node.h] || TYPE_NONE;
+
+                // in case node is a file having children => versioned file
+                // this node is the current version file having as parent the previous version file
+                // "type" for current node must be its parent (previous version) type
+                if (!node.t) {
+                    const children = mega.rewind.nodeChildrenDictionary[node.h];
+                    if (children) {
+                        const parent = Object.keys(children)[0];
+                        type = nodeDateData.type[parent] || TYPE_NONE;
+                    }
+                }
 
                 switch (type) {
                     case TYPE_MODIFIED:
@@ -2623,6 +2544,10 @@ lazy(mega, 'rewindUi', () => {
             nameElement.textContent = node.name;
             iconElement.classList.add(`icon-${fileIcon(node)}-24`);
             template.dataset.id = node.h;
+
+            if (mega.sensitives.isSensitive(node)) {
+                template.classList.add('is-sensitive');
+            }
 
             // SAT-1023
             /*
@@ -2780,6 +2705,114 @@ lazy(mega, 'rewindUi', () => {
         }
     }
 
+    class RewindProgress {
+        constructor() {
+            this.$main = $('.fm-rewind-progress-section', '.pm-main');
+            this.$widget = $('.dropdown.js-dropdown-rewind-progress', '.pm-main');
+            this.$title = $('.title', this.$main);
+            this.$stepsContainer = $('.rw-steps', this.$main);
+            this.$stepTemplate = $('.rw-progress-step-template', this.$stepsContainer);
+            this.stepElSelector = '.rw-progress-step:not(.rw-progress-step-template)';
+
+            this.labels = {
+                nodecheck: l.rewind_restore_checking_folders,
+                restore: l.rewind_restore_rewinding_folder,
+            };
+            this.steps = Object.keys(this.labels);
+            this.currentStepId = -1;
+            this.options = {};
+        }
+
+        createSteps() {
+            this.currentStepId = -1;
+            $(this.stepElSelector, this.$stepsContainer).remove();
+            const steps = Object.keys(this.labels);
+
+            for (let i = 0; i < steps.length; i++) {
+                const $stepEl = this.$stepTemplate.clone();
+                $stepEl.safeAppend(this.labels[steps[i]]);
+                $stepEl.addClass(`rw-step-${steps[i]}`);
+                $stepEl.removeClass('rw-progress-step-template hidden');
+                this.$stepsContainer.safeAppend($stepEl.prop('outerHTML'));
+            }
+        }
+
+        showSection() {
+            const {folder, date} = this.options;
+
+            this.$title.safeHTML(escapeHTML(l.rewind_restore_progress_title)
+                .replaceAll('[STEXT]', '<span class="medium-color">')
+                .replaceAll('[/STEXT]', '</span>')
+                .replace('[SFOLDER/]', `<span class="folder">${folder}</span>`)
+                .replace('[SDATE/]', `<span class="date">${date}</span>`));
+
+            this.$main.removeClass('hidden');
+        }
+
+        hideSection() {
+            this.$main.addClass('hidden');
+            this.$title.empty();
+        }
+
+        showToaster() {
+            const {folder, date} = this.options;
+            toaster.main.show({
+                icons: ['sprite-fm-uni icon-check-circle'],
+                content: l.rewind_success_message
+                    .replace('%1', folder)
+                    .replace('%2', date)
+            });
+        }
+
+        showWidget() {
+            this.$widget.removeClass('hidden').addClass('show active');
+        }
+
+        hideWidget() {
+            this.$widget.addClass('hidden').removeClass('show active');
+        }
+
+        toggleWidget() {
+            this.$widget.removeClass('hidden').toggleClass('show active');
+        }
+
+        load(step) {
+            if (!this.labels[step]) {
+                return;
+            }
+            $(`.rw-step-${step}`, this.$stepsContainer).removeClass('loaded').addClass('loading');
+            $('.message', this.$widget).text(this.labels[step]);
+        }
+
+        complete(step) {
+            if (!this.labels[step]) {
+                return;
+            }
+            $(`.rw-step-${step}`, this.$stepsContainer).addClass('loaded').removeClass('loading');
+        }
+
+        init(folder, date) {
+            this.createSteps();
+            this.currentStepId = -1;
+            this.options = {folder, date};
+        }
+
+        next() {
+            // Does nothing if (this.currentStepId > this.steps.length)
+            if (this.currentStepId === -1) {
+                this.load(this.steps[++this.currentStepId]);
+            }
+            else if (this.currentStepId === this.steps.length - 1) {
+                this.complete(this.steps[this.currentStepId++]);
+                $('.message', this.$widget).empty();
+                this.$widget.addClass('hidden');
+            }
+            else {
+                this.complete(this.steps[this.currentStepId++]);
+                this.load(this.steps[this.currentStepId]);
+            }
+        }
+    }
     return new class RewindUI {
         constructor() {
             this.init();
@@ -2787,47 +2820,8 @@ lazy(mega, 'rewindUi', () => {
 
         init() {
             lazy(this, 'sidebar', () => new RewindSidebar);
+            lazy(this, 'progress', () => new RewindProgress);
             lazy(this, 'DATEPICKER_VIEW_TYPE_DAYS', () => DATEPICKER_VIEW_TYPE_DAYS);
-            lazy(this, 'progressTranslations', () => {
-
-                const progPercentage = escapeHTML(l.rewind_restore_progress_percentage)
-                    .replace('[STEXT]', '<span>')
-                    .replace('[/STEXT]', '</span>')
-                    .replace('[SPERCENTAGE]', '<span class="percentage">')
-                    .replace('[/SPERCENTAGE]', '</span>');
-
-                const progDate = escapeHTML(l.rewind_restore_progress_date)
-                    .replace('[STEXT]', '<span class="medium-color">')
-                    .replace('[/STEXT]', '</span>');
-
-                const dialogProgPercentage = escapeHTML(l.rewind_restore_dialog_progress_percentage)
-                    .replace('[STEXT]', '<span>')
-                    .replace('[/STEXT]', '</span>')
-                    .replace('[SPERCENTAGE]', '<span class="percentage">')
-                    .replace('[/SPERCENTAGE]', '</span>');
-
-                return {
-                    section: {
-                        title: (progress) => {
-                            return progPercentage.replace('%1', progress);
-                        },
-                        message: (date) => {
-                            return progDate.replace(
-                                '[SDATE/]',
-                                `<span class="date">${time2date(date.getTime() / 1000, 2)}</span>`
-                            );
-                        }
-                    },
-                    topBar: {
-                        title: (nodeName) => {
-                            return `<span>${nodeName}</span>`;
-                        },
-                        message: (progress) => {
-                            return dialogProgPercentage.replace('%1', progress);
-                        }
-                    }
-                };
-            });
         }
     };
 });

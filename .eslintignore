@@ -8,9 +8,8 @@ css/**
 lang/*
 test/*
 fonts/*
-audio/*
+media/*
 images/*
-sounds/*
 contrib/*
 scripts/*
 rsaasm.js

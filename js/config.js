@@ -103,10 +103,7 @@
         delete cfg.leftPaneWidth;
         delete cfg.obVer;
 
-        let s = cfg.ul_maxSpeed;
-        s = s / 1024 << 1 | (s < 0 ? 1 : 0);
-        cfg.xs2 = stringify((s & 0xfffff) << 8 | (cfg.ul_maxSlots & 15) << 4 | cfg.dl_maxSlots & 15);
-        delete cfg.ul_maxSpeed;
+        cfg.xs2 = stringify((cfg.ul_maxSlots & 127) << 4 | cfg.dl_maxSlots & 15);
         delete cfg.ul_maxSlots;
         delete cfg.dl_maxSlots;
 
@@ -132,14 +129,14 @@
     };
 
     shrink.bitdef = freeze({
-        s4a: ['s4thumbs', 'skipcdtos4', 'skips4tocd', 'skips4tos4', 's4onboarded'],
+        s4a: ['s4thumbs', 'skipcdtos4', 'skips4tocd', 'skips4tos4', 's4onboarded', 'skipSenToS4'],
         v04: ['rvonbrddl', 'rvonbrdfd', 'rvonbrdas'],
         xb1: [
             // do NOT change the order, add new entries at the tail UP TO 31, and 8 per row.
             'cws', 'ctt', 'rsv0', 'dbDropOnLogout', 'dlThroughMEGAsync', 'sdss', 'tpp', 'ulddd',
-            'cbvm', 'mgvm', 'uiviewmode', 'uisorting', 'uidateformat', 'skipsmsbanner', 'skipDelWarning', 'rsv0',
+            'cbvm', 'mgvm', 'uiviewmode', 'uisorting', 'uidateformat', 'skipsmsbanner', 'skipDelWarning', 'smallLhp',
             'nowarnpl', 'zip64n', 'callemptytout', 'callinout', 'showHideChat', 'showRecents', 'nocallsup', 'cslrem',
-            'showSen', 'noSubfolderMd', 'rwReinstate', 'rsv2', 'rsv3', 'dcPause', 'skiptritwarn'
+            'showSen', 'noSubfolderMd', 'rwReinstate', 'colourFolder', 'smallNav', 'dcPause', 'skiptritwarn'
         ]
     });
     shrink.zero = new Set([...Object.keys(shrink.bitdef), 'xs1', 'xs2', 'xs3', 'xs4', 'xs5']);
@@ -248,10 +245,8 @@
         }
 
         if (config.xs2) {
-            let s = config.xs2 >> 8;
             config.dl_maxSlots = config.xs2 & 15;
-            config.ul_maxSlots = config.xs2 >> 4 & 15;
-            config.ul_maxSpeed = s & 1 ? -1 : (s >> 1) * 1024;
+            config.ul_maxSlots = config.xs2 >> 4 & 127;
         }
 
         if (config.xs3) {
@@ -573,10 +568,6 @@
             refresh.ui();
         }
 
-        if (fmconfig.ul_maxSlots) {
-            ulQueue.setSize(fmconfig.ul_maxSlots);
-        }
-
         if (fmconfig.dl_maxSlots) {
             dlQueue.setSize(fmconfig.dl_maxSlots);
         }
@@ -598,6 +589,12 @@
                 M.columnsWidth.cloud.fav.disabled = true;
                 M.columnsWidth.cloud.fav.viewed = false;
             }
+        }
+        if (fmconfig.colourFolder) {
+            document.body.classList.add('no-lbl-colour');
+        }
+        else {
+            document.body.classList.remove('no-lbl-colour');
         }
     };
 
@@ -822,7 +819,9 @@
 
                 if (M.account.ssrs !== value) {
                     M.account.ssrs = value;
-                    mega.attr.set('rubbishtime', String(value), -2, 1);
+                    mega.attr.set2(null, 'rubbishtime', String(value), -2, 1)
+                        .then(() => mega.attr.uaPacketParser('^!rubbishtime', u_handle, 1, 0))
+                        .catch(dump);
                     toast = true;
                 }
             }
@@ -935,6 +934,14 @@
         })();
 
         setup(cfg);
+    });
+
+    Object.defineProperty(window, 'fmconfig', {
+        get() {
+            console.error('fmconfig is not initialized...');
+            return Object.create(null);
+        },
+        configurable: true
     });
 
     if (is_karma) {

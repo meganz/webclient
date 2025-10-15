@@ -385,9 +385,7 @@ lazy(mega.devices, 'ui', () => {
                 }
 
                 if (M.currentrootid === rootId) {
-                    if (M.megaRender) {
-                        M.megaRender.revokeDOMNode(handle, true);
-                    }
+                    ui.safeRevokeDOMNode(handle, true);
                     ui.render(M.currentdirid, {isRefresh: true});
                 }
             };
@@ -1013,6 +1011,7 @@ lazy(mega.devices, 'ui', () => {
                 });
             }
 
+            this._preRender();
             await mega.devices.main.render(M.megaRender ? isRefresh : false);
             this._postRender();
 
@@ -1031,9 +1030,7 @@ lazy(mega.devices, 'ui', () => {
                 device.name = data[device.h];
             }
 
-            if (M.megaRender) {
-                M.megaRender.revokeDOMNode(handle, true);
-            }
+            this.safeRevokeDOMNode(handle);
 
             if (M.onDeviceCenter) {
                 this.render(M.currentdirid, {isRefresh: true});
@@ -1349,10 +1346,65 @@ lazy(mega.devices, 'ui', () => {
         }
 
         /**
+         * Show action buttons in UI
+         * @returns {void} void
+         */
+        _showActionButtons() {
+            let primary = false;
+            let secondary = false;
+            let tertiary = false;
+
+            if (this.getRenderSection() === renderSection.devices && this.hasDevices) {
+                primary = '.fm-add-backup';
+                secondary = '.fm-add-syncs';
+            }
+            if (this.isCustomRender()) {
+                mega.ui.secondaryNav.updateLayoutButton(true);
+            }
+            else {
+                const h = M.currentCustomView.nodeID;
+                const {device} = this.getCurrentDirData();
+                const isBackup = this.isBackupRelated(h);
+
+                if (device && !device.folders[h]) {
+                    primary = isBackup ? '.fm-share-folder' : '.fm-new-menu';
+                    secondary = isBackup ? false : '.fm-new-folder';
+                    tertiary = isBackup ? false : '.fm-share-folder';
+
+                    if (new mega.Share.ExportLink().isTakenDown(h)) {
+                        primary = isBackup ? false : '.fm-new-menu';
+                        secondary = isBackup ? false : '.fm-new-folder';
+                        tertiary = false;
+                    }
+                }
+            }
+
+            this.handleAddBtnVisibility();
+            mega.ui.secondaryNav.bindScrollEvents();
+            mega.ui.secondaryNav.showActionButtons(primary, secondary, tertiary);
+            if (mega.ui.secondaryNav.isSmall && mega.ui.secondaryNav.cardComponent) {
+                const btns = mega.ui.header.domNode.componentSelectorAll('.card-copy');
+                for (let i = btns.length; i--;) {
+                    btns[i].destroy();
+                }
+                mega.ui.secondaryNav.collapse();
+            }
+        }
+
+        /**
+         * Executes tasks before rendering UI
+         * @returns {void} void
+         */
+        _preRender() {
+            mega.ui.secondaryNav.hideCard();
+        }
+
+        /**
          * Executes tasks after rendering UI
          * @returns {void} void
          */
         _postRender() {
+            this._showActionButtons();
             this._bindEvents();
 
             if (this.hasDevices) {
@@ -1366,7 +1418,10 @@ lazy(mega.devices, 'ui', () => {
                 }
                 else {
                     const {main: {section}, models: {syncSection}} = mega.devices;
-                    if (!M.v.length && section === syncSection.deviceFolders) {
+                    if (
+                        !M.v.length && section === syncSection.deviceFolders &&
+                        !mega.ui.mNodeFilter.selectedFilters.value
+                    ) {
                         this.$emptyFolder.removeClass('hidden');
                     }
                 }
@@ -1381,6 +1436,7 @@ lazy(mega.devices, 'ui', () => {
             this.$gridWrapper.addClass('hidden');
             this.$emptyDevices.removeClass('hidden');
             mega.ui.secondaryNav.hideActionButtons();
+            mega.ui.secondaryNav.hideCard();
             megasync.isInstalled((err, is) => {
                 const appFound = !err || is;
                 const descText = appFound
@@ -1706,9 +1762,7 @@ lazy(mega.devices, 'ui', () => {
                                 delete M.dcd[device.h];
                             }
 
-                            if (M.megaRender) {
-                                M.megaRender.revokeDOMNode(handle, true);
-                            }
+                            this.safeRevokeDOMNode(handle, true);
 
                             hasToRender = true;
                         }
@@ -1721,6 +1775,26 @@ lazy(mega.devices, 'ui', () => {
             }
             else {
                 this.removedNodeHandles.add(handle);
+            }
+        }
+
+        /**
+         * Removes node from UI and add it to selection (if not skipped)
+         * @param {String} handle - node handle
+         * @param {Boolean} skipSelection - whether to add node to selection or not
+         * @returns {void}
+         */
+        safeRevokeDOMNode(handle, skipSelection) {
+            if (M.megaRender) {
+                if (selectionManager) {
+                    if (skipSelection) {
+                        selectionManager.remove_from_selection(handle);
+                    }
+                    else if (selectionManager.get_selected().includes(handle)) {
+                        selectionManager.add_to_selection(handle);
+                    }
+                }
+                M.megaRender.revokeDOMNode(handle, true);
             }
         }
 
@@ -1754,10 +1828,7 @@ lazy(mega.devices, 'ui', () => {
         _updateDataAndUI(folder, node) {
             const newFolder = mega.devices.data.Parser.buildDeviceFolder(folder, node);
             M.dcd[newFolder.d].folders[newFolder.h] = newFolder;
-
-            if (M.megaRender) {
-                M.megaRender.revokeDOMNode(newFolder.h, true);
-            }
+            this.safeRevokeDOMNode(newFolder.h);
         }
 
         /**
@@ -1927,6 +1998,7 @@ lazy(mega.devices, 'ui', () => {
                 if (M.getNodeRights(folder.h) > 1) {
                     items['.stopsync-item'] = 1;
                     items['.rename-item'] = 1;
+                    items['.colour-label-items'] = 1;
                     if (node.tvf) {
                         items['.clearprevious-versions'] = 1;
                     }
@@ -1948,6 +2020,8 @@ lazy(mega.devices, 'ui', () => {
                 items['.copy-item'] = 1;
                 items['.getlink-item'] = 1;
                 items['.sh4r1ng-item'] = 1;
+                items['.add-star-item'] = 1;
+                items['.colour-label-items'] = 1;
                 items['.transferit-item'] = 1;
                 items['.send-to-contact-item'] = 1;
                 if (isSharedFolder) {
@@ -1961,6 +2035,7 @@ lazy(mega.devices, 'ui', () => {
                 this._populateCommonCtxItems(node, items, isSharedFolder, hasSharedLink);
                 items['.rename-item'] = 1;
                 items['.open-cloud-item'] = 1;
+                items['.stopsync-item'] = 1;
             }
         }
 
@@ -1971,11 +2046,11 @@ lazy(mega.devices, 'ui', () => {
          * @param {object.<string,number>} items The items to populate
          * @param {Boolean} isSharedFolder Whether this folder is shared
          * @param {Boolean} hasSharedLink Whether this folder has a public link
-         * @param {Boolean} multiple Whether multiple nodes have been selected
+         * @param {Array<String>} handles The list of handles in case multiple selection
          *
          * @returns {void} void
          */
-        _populateCommonCtxItems(node, items, isSharedFolder, hasSharedLink, multiple) {
+        _populateCommonCtxItems(node, items, isSharedFolder, hasSharedLink, handles) {
 
             items['.send-to-contact-item'] = 1;
             items['.download-standart-item'] = 1;
@@ -1984,18 +2059,26 @@ lazy(mega.devices, 'ui', () => {
             items['.properties-item'] = 1;
             items['.getlink-item'] = 1;
 
-            if (multiple) {
+            if (handles && handles.length > 1) {
+                this._populateCommonCtxItemsMult(handles, items);
                 return;
             }
 
-            const isWritable = M.getNodeRights(node.h) > 1 && !this.isBackupRelated(node.h);
+            const isBackupRelated = this.isBackupRelated(node.h);
+            const isWritable = M.getNodeRights(node.h) > 1 && !isBackupRelated;
 
-            if (isWritable && node.h !== M.RootID) {
-                items['.move-item'] = 1;
-                items['.remove-item'] = 1;
-                items['.rename-item'] = 1;
-                items['.add-star-item'] = 1;
-                items['.colour-label-items'] = 1;
+            if (node.h !== M.RootID) {
+                if (isBackupRelated) {
+                    items['.add-star-item'] = 1;
+                    items['.colour-label-items'] = 1;
+                }
+                else if (isWritable) {
+                    items['.move-item'] = 1;
+                    items['.remove-item'] = 1;
+                    items['.rename-item'] = 1;
+                    items['.add-star-item'] = 1;
+                    items['.colour-label-items'] = 1;
+                }
             }
             if (node.t) {
                 items['.open-item'] = 1;
@@ -2031,6 +2114,40 @@ lazy(mega.devices, 'ui', () => {
             this._populateSensitiveCtxItems([node.h], items);
         }
 
+        /**
+         * Internal function, populates common context menu items in case multiple selection
+         * Returns whether parent execution should be stopped or not
+         *
+         * @param {Array<String>} handles The list of handles in case multiple selection
+         * @param {object.<string,number>} items The items to populate
+         *
+         * @returns {void}
+         */
+        _populateCommonCtxItemsMult(handles, items) {
+            let isAnyInShare = false;
+            for (let i = 0; i < handles.length; i++) {
+                const handle = handles[i];
+                if (handle === M.RootID) {
+                    return;
+                }
+
+                const isBackupRelated = this.isBackupRelated(handle);
+                const isWritable = M.getNodeRights(handle) > 1 && !isBackupRelated;
+                if (!isBackupRelated && !isWritable) {
+                    return;
+                }
+
+                if (!isAnyInShare && sharer(handle)) {
+                    isAnyInShare = true;
+                }
+            }
+
+            items['.colour-label-items'] = 1;
+            if (!isAnyInShare) {
+                items['.add-star-item'] = 1;
+            }
+        }
+
         _populateSensitiveCtxItems(handles, items) {
             const sen = mega.sensitives.getSensitivityStatus(handles);
             if (sen) {
@@ -2052,17 +2169,7 @@ lazy(mega.devices, 'ui', () => {
                 return;
             }
 
-            let exp = false;
-            const shares = M.getNodeShareUsers(node);
-
-            for (let i = shares.length; i--;) {
-                if (shares[i] === 'EXP') {
-                    shares.splice(i, 1);
-                    exp = node.shares.EXP;
-                }
-            }
-
-            if (!exp && !shared.is(node.h)) {
+            if (!M.getNodeShare(node) && !shared.is(node.h)) {
                 if (mega.fileRequest.publicFolderExists(node.h)) {
                     let pageClass = '';
                     if (!is_mobile) {
@@ -2146,6 +2253,7 @@ lazy(mega.devices, 'ui', () => {
                 items['.zipdownload-item'] = 1;
 
                 this._populateSensitiveCtxItems(handles, items);
+                this._populateCommonCtxItemsMult(handles, items);
                 this._filterRestrictedItems(handles, items);
 
                 return items;
@@ -2158,12 +2266,9 @@ lazy(mega.devices, 'ui', () => {
 
                 this._populateSensitiveCtxItems(handles, items);
                 items['.move-item'] = 1;
-                items['.add-star-item'] = 1;
-                items['.colour-label-items'] = 1;
                 items['.remove-item'] = 1;
             }
 
-            const mult = handles.length > 1;
             const h = handles[0];
 
             // If its a device, we take care of it under `ui.contextMenu()`
@@ -2173,8 +2278,8 @@ lazy(mega.devices, 'ui', () => {
 
             const selNode = M.getNodeByHandle(h);
             const isInShare = !!sharer(selNode.h);
-            const isSharedFolder = M.getNodeShareUsers(selNode, 'EXP').length || M.ps[h];
-            const hasSharedLink = new mega.Share().hasExportLink(h);
+            const hasSharedLink = !!M.getNodeShare(h);
+            const isSharedFolder = !!M.isOutShare(selNode, 'EXP');
             const isRejectedNode = isInShare && M.getNodeRights(h) < 2;
 
             const {device} = this.getCurrentDirData();
@@ -2188,9 +2293,9 @@ lazy(mega.devices, 'ui', () => {
             // Inside a device folder
             else if (currentSection === renderSection.cloudDrive) {
                 this._populateCommonCtxItems(
-                    selNode, items, isSharedFolder, hasSharedLink, mult
+                    selNode, items, isSharedFolder, hasSharedLink, handles
                 );
-                if (this.isFullSyncRelated(h)) {
+                if (handles.length === 1 && this.isFullSyncRelated(h)) {
                     items['.open-cloud-item'] = 1;
                 }
             }
@@ -2280,11 +2385,12 @@ lazy(mega.devices, 'ui', () => {
                     const {device, folder} = this.getCurrentDirData();
 
                     for (let i = 0; i < outdated.length; i++) {
-                        if (M.currentdirid === rootId || !device && outdated[i].device) {
-                            M.megaRender.revokeDOMNode(outdated[i].device, true);
+                        const outdatedItem = outdated[i];
+                        if (M.currentdirid === rootId || !device && outdatedItem.device) {
+                            this.safeRevokeDOMNode(outdatedItem.device, outdatedItem.isDeleted);
                         }
-                        else if (!folder && device.h === outdated[i].device) {
-                            M.megaRender.revokeDOMNode(outdated[i].folder, true);
+                        else if (!folder && device.h === outdatedItem.device) {
+                            this.safeRevokeDOMNode(outdatedItem.folder, outdatedItem.isDeleted);
                         }
                     }
                 }

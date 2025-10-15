@@ -944,8 +944,19 @@ accountUI.plan = {
                     const proStorage = bytesToSize(plan[pro.UTQA_RES_INDEX_STORAGE] * 1073741824, 0);
                     const freeTransfer = l['1149'];
                     const proTransfer = bytesToSize(plan[pro.UTQA_RES_INDEX_TRANSFER] * 1073741824, 0);
-                    const rewindTxt = mega.icu.format(l.pr_up_to_days, pro.filter.simple.ninetyDayRewind
-                        .has(plan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL]) ? 90 : 180);
+                    const rewindTxt = mega.icu.format(l.pr_up_to_days, mega.rewind ?
+                        mega.rewind.settings.retentionDays.max : 60);
+
+                    const banner = $cancelDialog[0].querySelector('.over-storage-banner');
+                    if (M.account.cstrg > mega.bstrg) {
+                        banner.classList.remove('hidden');
+                        banner.querySelector('span').textContent = l.cancel_sub_oq_banner
+                            .replace('%1', bytesToSize(M.account.cstrg))
+                            .replace('%2', freeStorage);
+                    }
+                    else {
+                        banner.classList.add('hidden');
+                    }
 
                     $('.pro-storage', $cancelDialog).text(proStorage);
                     $('.free-storage', $cancelDialog).text(freeStorage);
@@ -1283,7 +1294,7 @@ accountUI.plan = {
                         accountUI();
 
                         // Notify any other open tabs of the cancelled subscription
-                        mBroadcaster.crossTab.notify('cancelSub', 1);
+                        watchdog.notify('refresh-account-ui');
                     }, 1e3);
                 });
             }
@@ -1318,21 +1329,24 @@ accountUI.plan = {
             };
 
             // check if we should show the section (uq response)
-            if (this.validateUser(account)) {
-                api.req({ a: 'cci', v: 2 }).then(({ result: res }) => {
-                    if (typeof res === 'object' && this.validateCardResponse(res)) {
-                        return this.render(res);
-                    }
+            const validSubscription = this.validateUser(account);
 
-                    hideCardSection();
-                });
-            }
-            else {
+            api.req({ a: 'cci', v: 4 }).then(({ result: res }) => {
+                if (typeof res === 'object' && this.validateCardResponse(res)) {
+                    return this.render(res, validSubscription);
+                }
+
                 hideCardSection();
-            }
+            }).catch((ex) => {
+                if (ex === ENOENT) {
+                    hideCardSection();
+                    return;
+                }
+                tell(ex);
+            });
         },
 
-        render(cardInfo) {
+        render(cardInfo, validSubscription) {
             'use strict';
 
             if (cardInfo && this.$paymentSection) {
@@ -1373,6 +1387,25 @@ accountUI.plan = {
                         })
                         .finally(() => loadingDialog.hide());
                 });
+
+                const canDelete = !validSubscription && cardInfo.dcc;
+                const $deleteCard = $('.payment-card-bottom a.payment-card-delete', this.$paymentSection)
+                    .toggleClass('hidden', !canDelete);
+
+                if (canDelete) {
+                    $deleteCard.rebind('click', () => {
+                        loadingDialog.show();
+                        api.req({a: 'gw19_dcc', id: cardInfo.id}).then(({result}) => {
+                            assert(result === 0, result);
+                            // @todo Hmm...
+                            M.account.lastupdate = 0;
+                            return accountUI();
+                        }).catch((ex) => {
+                            eventlog(500970, ex);
+                            msgDialog('warninga', '', l.delete_card_error.replace('%1', ex), l.edit_card_error_des);
+                        }).finally(() => loadingDialog.hide());
+                    });
+                }
 
                 this.$paymentSection.removeClass('hidden');
             }

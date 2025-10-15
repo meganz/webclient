@@ -108,6 +108,32 @@ mobile.linkManagement = {
                         }
                     }
                 }]
+            ],
+            [
+                ['qrcode-button', 'icon-qr-thin-outline', () => {
+
+                    const link = this.pwdProtectedLink || this.formatLink();
+                    const qrCode = mCreateElement('div', {class: 'qrcode'});
+
+                    $(qrCode).empty().qrcode({
+                        width: 168,
+                        height: 168,
+                        correctLevel: QRErrorCorrectLevel.H,
+                        background: 'rgba(255, 255, 255, 1)',
+                        foreground: 'rgba(0, 0, 0, 1)',
+                        text: link
+                    });
+
+                    eventlog(500907);
+
+                    mega.ui.sheet.show({
+                        name: 'qrcode',
+                        type: 'modal',
+                        showClose: true,
+                        title: l[17754],
+                        contents: [qrCode]
+                    });
+                }]
             ]
         ];
 
@@ -496,8 +522,14 @@ mobile.linkManagement = {
 
         const itemComponent = MegaNodeComponent.getNodeComponentByHandle(this.handle);
         let itemNode = itemComponent && itemComponent.domNode;
-        if (!itemNode && mega.ui.viewerOverlay.visible) {
-            itemNode = mega.ui.viewerOverlay.nodeComponent.domNode;
+        if (!itemNode) {
+            if (mega.ui.viewerOverlay.visible) {
+                itemNode = mega.ui.viewerOverlay.nodeComponent.domNode;
+            }
+            // @todo: check why nodeComponent is missing in crosstab case
+            else {
+                itemNode = document.getElementById(this.handle);
+            }
         }
         const itemName = itemNode.querySelector('.fm-item-name');
         const itemImage = itemNode.querySelector('.fm-item-img');

@@ -11,6 +11,13 @@ lazy(T.ui, 'dialog', () => {
         }
     });
 
+    if (mega.tld !== 'nz') {
+        const nzurls = content.querySelectorAll('a.nz-url');
+        for (let i = nzurls.length; i--;) {
+            nzurls[i].href = nzurls[i].href.replace('nz', mega.tld);
+        }
+    }
+
     return freeze({
         dialogs: [],
 

@@ -257,6 +257,7 @@ lazy(s4, 'kernel', () => {
         return key;
     };
 
+    let vcc = false;
     const s4nt = freeze({container: 'li', bucket: 'pao', object: 'pa'});
     const s4rt = freeze(entries(s4nt, ([k, v]) => [v, k]));
 
@@ -270,6 +271,15 @@ lazy(s4, 'kernel', () => {
     const aEqUserID = (ui) => (o) => parseInt(o.ui) === ui;
 
     const validateS4Container = (n) => {
+        if (!vcc) {
+            onIdle(() => {
+                vcc = false;
+            });
+            vcc = Object.create(null);
+        }
+        else if (n && vcc[n.h || n] !== undefined) {
+            return vcc[n.h || n];
+        }
         if (typeof n === 'string') {
             n = M.getNodeByHandle(n);
         }
@@ -291,7 +301,8 @@ lazy(s4, 'kernel', () => {
                     }
                 }
 
-                return v === 1;
+                vcc[n.h] = v === 1;
+                return vcc[n.h];
             }
 
             logger.warn('container lacking an exported writable link...', n.h, share, [n]);
@@ -385,7 +396,9 @@ lazy(s4, 'kernel', () => {
             const {s4, h} = n;
 
             if (!s4 || s4.c !== b.p) {
-                logger.warn(`Establishing container linkage on object ${h}`, n);
+                if (self.d > 1) {
+                    logger.warn(`Establishing container linkage on object ${h}`, n);
+                }
                 n.s4 = {...s4, c: b.p};
             }
         }
@@ -411,7 +424,9 @@ lazy(s4, 'kernel', () => {
             for (const k in s4rt) {
                 if (k in n.s4) {
                     if (s4rt[k] !== 'container') {
-                        logger.warn(`Unexpected s4-attr on node ${n.h}`, [n]);
+                        if (self.d > 1) {
+                            logger.warn(`Unexpected s4-attr on node ${n.h}`, [n]);
+                        }
                         return false;
                     }
                     return validateS4Container(n) > 0 && s4rt[k];
@@ -885,7 +900,7 @@ lazy(s4, 'kernel', () => {
             return name;
         }
 
-        create(name, attrs) {
+        create(name, attrs, stub) {
             api.webLockSummary();
 
             return lock(`s4-kernel.tl-create:${this.target}!${name}`, () => {
@@ -894,7 +909,10 @@ lazy(s4, 'kernel', () => {
                 if (self.d) {
                     logger.info('Creating folder on target %s, with name "%s"', this.target, name, [attrs]);
                 }
-                return M.createFolder(this.target, name, attrs).finally(() => this.unlock());
+                if (stub === undefined) {
+                    stub = (...a) => M.createFolder(...a);
+                }
+                return stub(this.target, name, attrs).finally(() => this.unlock());
             });
         }
     }
@@ -1103,17 +1121,39 @@ lazy(s4, 'kernel', () => {
                 logger.assert(!tree.filter('s4', (n) => getS4NodeByHandle(n.h, true) && !n.s4.sh).length);
                 name = 'S4 Object storage';
             }
-            const ek = token(22);
+            const ek = [...crypto.getRandomValues(new Int32Array(4))];
             const s4 = {u: {}, g: {}, k: {}, p: {}, sh: 1, li: 0x100, s4ses: S4SES};
-            const h = await tree.create(name, {s4});
+            const h = await tree.create(name, {s4}, async(t, n, p) => {
+                n = {name: n, ...p};
+                p = ab_to_base64(crypto_makeattr(n));
 
-            await api_setshare(h, [{u: 'EXP', r: 0, w: ek}]);
+                const f = +!!localStorage.s4pf;
+                const sk = [...crypto.getRandomValues(new Int32Array(4))];
+                const res = await api.screq({
+                    a: 's4p',
+                    f,
+                    t,
+                    p,
+                    k: a32_to_base64(encrypt_key(u_k_aes, n.k)),
+                    sk: a32_to_base64(encrypt_key(new sjcl.cipher.aes(ek), sk)),
+                    crk: a32_to_base64(encrypt_key(new sjcl.cipher.aes(sk), n.k)),
+                    skek: a32_to_base64(ek)
+                }, 7);
+                const {st, handle, packet: {w, ph, h, st: pst}} = res;
+
+                logger.assert(ph && w && handle === h && pst === st, `Invalid s4p response...`, res);
+
+                if (f) {
+                    delete localStorage.s4pf;
+                }
+                return mega.keyMgr.createShare(h, false, sk).then(() => h);
+            });
             const n = M.getNodeByHandle(h);
 
             logger.assert(n.ph);
             if (managed) {
                 delete n.s4.sh;
-                await keys.create(h, null, S4PTR, true, ek);
+                await keys.create(h, null, S4PTR, true, a32_to_base64(ek));
             }
 
             delete n.s4.s4ses;

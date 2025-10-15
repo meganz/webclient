@@ -13,13 +13,20 @@ const CallFeedback = function(megaChat, options) {
 
     options = options || {};
     options.parentLogger = megaChat.logger;
+    Object.defineProperty(this, 'nextTime', {
+        get() {
+            return fmconfig.callfb * 1e3 + 175e10 || 0;
+        }
+    });
 
     megaChat
         .rebind('onRoomInitialized.CallFeedback', (e, megaRoom) => {
             megaRoom
                 .rebind('onCallLeft.CallFeedback', (e, { callId, chatId, showCallFeedback }) => {
                     // do append this after a while, so that the remote call ended would be shown first.
+                    showCallFeedback = showCallFeedback && Date.now() > this.nextTime;
                     if (showCallFeedback) {
+                        fmconfig.callfb = (Date.now() + 864e5 * (Math.random() * 60 + 30) - 175e10) / 1e3 | 0;
                         delay('callFeedbackDelay', () => {
                             const msgId = `call-feedback ${unixtime()}`;
                             megaRoom.appendMessage(

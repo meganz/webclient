@@ -444,9 +444,8 @@ lazy(mega.gallery, 'albums', () => {
 
                 if (coverUpdated) {
                     album.cellEl.updateCoverImage();
+                    album.cellEl.hasSensitiveCover = !!mega.sensitives.isSensitive(album.node);
                 }
-
-                album.cellEl.hasSensitiveCover = !!mega.sensitives.isSensitive(album.node);
             }
         });
     };
@@ -727,7 +726,7 @@ lazy(mega.gallery, 'albums', () => {
             else if (albumId === scope.getAlbumIdFromPath()) {
                 if (grid.timeline) {
                     if (grid.timeline.selections[handle]) {
-                        grid.timeline.deselectNode(M.d[handle]);
+                        grid.timeline.deselectNode(scope.getNodeCache(handle));
                     }
 
                     if (grid.timeline.selCount > 0) {
@@ -843,52 +842,6 @@ lazy(mega.gallery, 'albums', () => {
         }
 
         return prev;
-    };
-
-    /**
-     * Filter album nodes by sensitive attribute
-     * @param {String} albumId Album ID
-     * @returns {void}
-     */
-    const filterSensitiveNodes = (albumId) => {
-        const album = scope.albums.store[albumId];
-        const nodes = [];
-        let coverNode;
-        const ignoreHandles = unwantedHandles();
-        const nodeIsCorrect = n => !!n && !n.fv && !ignoreHandles[n.p];
-
-        if (album.filterFn) {
-            const nodeCandidates = Object.values(M.d);
-
-            for (let i = 0; i < nodeCandidates.length; i++) {
-                const n = nodeCandidates[i];
-
-                if (nodeIsCorrect(n) && album.filterFn(n) && mega.sensitives.shouldShowNode(n)) {
-                    nodes.push(n);
-                }
-            }
-        }
-        else {
-            const eHandles = Object.keys(album.eHandles);
-            const coverHandle = album.at.c ? album.eIds[album.at.c] : false;
-
-            for (let i = 0; i < eHandles.length; i++) {
-                const n = M.d[eHandles[i]];
-
-                if (nodeIsCorrect(n) && mega.sensitives.shouldShowNode(n)) {
-                    nodes.push(n);
-
-                    if (!coverNode && coverHandle && n.h === coverHandle) {
-                        coverNode = n;
-                    }
-                }
-            }
-        }
-
-        album.nodes = nodes;
-        sortInAlbumNodes(album.nodes);
-
-        album.node = coverNode || nodes[0];
     };
 
     class AlbumsSelectionManager extends SelectionManager2_DOM {
@@ -1424,8 +1377,9 @@ lazy(mega.gallery, 'albums', () => {
                                     if (!existingHandles[h]) {
                                         addedCount++;
                                         handlesToAdd.push({ h, o: (nodes.length + handlesToAdd.length + 1) * 1000 });
+                                        const n = scope.getNodeCache(h);
 
-                                        if (M.d[h] && M.isGalleryVideo(M.d[h])) {
+                                        if (n && M.isGalleryVideo(n)) {
                                             this.videosCount++;
                                         }
                                         else {
@@ -1753,9 +1707,11 @@ lazy(mega.gallery, 'albums', () => {
             const { nodes, eIds, at: { c } } = scope.albums.store[this.albumId];
 
             if (nodes && nodes.length) {
+                const n = eIds[c] && scope.getNodeCache(eIds[c]);
+
                 this.timeline.selectNode(
-                    (c && eIds[c] && M.d[eIds[c]] && M.getNodeRoot(M.d[eIds[c]].p) !== M.RubbishID)
-                        ? M.d[eIds[c]]
+                    (c && n && M.getNodeRoot(n.p) !== M.RubbishID)
+                        ? n
                         : nodes[0]
                 );
             }
@@ -1787,7 +1743,7 @@ lazy(mega.gallery, 'albums', () => {
         }
 
         if ($.timelineDialog instanceof AlbumItemsDialog && timeline.selections[handle]) {
-            timeline.deselectNode(M.d[handle]);
+            timeline.deselectNode(scope.getNodeCache(handle));
             $.timelineDialog.updateSelectedCount(timeline.selCount);
         }
 
@@ -2306,7 +2262,8 @@ lazy(mega.gallery, 'albums', () => {
         async onMDialogShown() {
             await scope.albums.setUserAlbumsInStore();
 
-            this.keys = Object.keys(scope.albums.store).filter(k => k.length !== predefinedKeyLength);
+            this.keys = Object.keys(scope.albums.store).filter(k => k.length !== predefinedKeyLength)
+                .sort((a, b) => scope.albums.store[b].ts - scope.albums.store[a].ts);
 
             this.updateSelectedCount();
 
@@ -2816,6 +2773,7 @@ lazy(mega.gallery, 'albums', () => {
                     albumId,
                     {
                         text: l.context_menu_import,
+                        icon: 'sprite-fm-mono icon-cloud-upload-thin-outline',
                         onClick: () => {
                             eventlog(99831);
                             M.importFolderLinkNodes([M.RootID]);
@@ -2824,6 +2782,7 @@ lazy(mega.gallery, 'albums', () => {
                     nodesAvailable ?
                         {
                             text: l.album_download,
+                            icon: 'sprite-fm-mono icon-arrow-down-circle-thin-outline',
                             onClick: () => {
                                 onDownload();
                                 eventlog(500742);
@@ -2831,24 +2790,21 @@ lazy(mega.gallery, 'albums', () => {
                         } :
                         hidden,
                     needSlideshow && ((ev) => {
-                        const parent = ev.currentTarget.domNode;
-                        const contextMenu = new AlbumOptionsContextMenu([{
-                            label: l.album_play_slideshow,
-                            icon: 'play-square',
-                            click: () => {
-                                scope.playSlideshow(albumId, true);
-                            },
-                            parent
-                        }], parent);
-
-                        const { x, y, right, bottom } = parent.getBoundingClientRect();
-                        contextMenu.show(x, bottom + MContextMenu.offsetVert, right, y + MContextMenu.offsetVert);
+                        if (ev.currentTarget.hasClass('active')) {
+                            $.hideContextMenu();
+                            ev.stopPropagation();
+                            ev.currentTarget.removeClass('active');
+                            return false;
+                        }
+                        M.contextMenuUI(ev, 8, '.play-slideshow', [albumId]);
                     })
                 );
+                mega.ui.secondaryNav.updateSmallNavButton();
             }
             else if (filterFn) {
                 const slideshow = needSlideshow ? {
                     text: l.album_play_slideshow,
+                    icon: 'sprite-fm-mono icon-play-square-thin-outline',
                     onClick: () => {
                         scope.playSlideshow(albumId, true);
                         eventlog(500730);
@@ -2856,6 +2812,7 @@ lazy(mega.gallery, 'albums', () => {
                 } : hidden;
                 const download = nodesAvailable ? {
                     text: l.album_download,
+                    icon: 'sprite-fm-mono icon-arrow-down-circle-thin-outline',
                     onClick: (ev) => {
                         const { x, bottom } = ev.currentTarget.domNode.getBoundingClientRect();
                         const menu = new DownloadContextMenu(albumId);
@@ -2872,69 +2829,21 @@ lazy(mega.gallery, 'albums', () => {
             }
             else {
                 if (needSlideshow) {
-                    buttons.push({
-                        label: l.album_play_slideshow,
-                        icon: 'play-square',
-                        click: () => {
-                            scope.playSlideshow(albumId, true);
-                        },
-                    });
+                    buttons.push('.play-slideshow');
                 }
 
                 if (nodesAvailable) {
-                    buttons.push({
-                        label: l.album_download,
-                        icon: 'download',
-                        click: onDownload,
-                        isDisabled: false,
-                        children: isMSync() ? undefined : generateDownloadOptions([albumId])
-                    });
+                    buttons.push('.download-item');
                 }
 
-                if (p) {
-                    buttons.push({
-                        label: l[6821],
-                        icon: 'link-remove',
-                        click: () => {
-                            removeShareWithConfirmation([albumId]);
-                        },
-                    });
-                }
-
-                buttons.push(
-                    {
-                        label: l.rename_album,
-                        icon: 'rename',
-                        click: () => {
-                            if (M.isInvalidUserStatus()) {
-                                return;
-                            }
-
-                            const dialog = new AlbumNameDialog(albumId);
-                            dialog.show();
-                        },
-                    },
-                    {
-                        label: l.delete_album,
-                        icon: 'bin',
-                        click: () => {
-                            if (M.isInvalidUserStatus()) {
-                                return;
-                            }
-
-                            const dialog = new RemoveAlbumDialog([albumId]);
-                            dialog.show();
-                        },
-                        isDisabled: false,
-                        children: undefined,
-                        classes: ['red']
-                    }
-                );
+                buttons.push('.rename-item', '.delete-album');
 
                 mega.ui.secondaryNav.showCard(
                     albumId,
                     {
                         text: l.add_album_items,
+                        icon: 'sprite-fm-mono icon-plus-light-solid',
+                        componentClassname: `add-album-items${(M.v.length ? '' : ' hidden')}`,
                         onClick: () => {
                             if (M.isInvalidUserStatus()) {
                                 return;
@@ -2947,6 +2856,7 @@ lazy(mega.gallery, 'albums', () => {
                     },
                     {
                         text: p ? l[6909] : mega.icu.format(l.album_share_link, 1),
+                        icon: 'sprite-fm-mono icon-link-thin-outline',
                         onClick: () => {
                             if (M.isInvalidUserStatus()) {
                                 return;
@@ -2970,11 +2880,13 @@ lazy(mega.gallery, 'albums', () => {
                         }
                     },
                     (ev) => {
-                        const parent = ev.currentTarget.domNode;
-                        const contextMenu = new AlbumOptionsContextMenu(buttons, parent);
-
-                        const { x, y, right, bottom } = parent.getBoundingClientRect();
-                        contextMenu.show(x, bottom + MContextMenu.offsetVert, right, y + MContextMenu.offsetVert);
+                        if (ev.currentTarget.hasClass('active')) {
+                            $.hideContextMenu();
+                            ev.stopPropagation();
+                            ev.currentTarget.removeClass('active');
+                            return false;
+                        }
+                        M.contextMenuUI(ev, 8, buttons.join(','), [albumId]);
                     }
                 );
             }
@@ -2987,7 +2899,9 @@ lazy(mega.gallery, 'albums', () => {
             }
             mega.ui.secondaryNav.addActionButton({
                 componentClassname: 'fm-new-album',
+                icon: 'sprite-fm-mono icon-rectangle-stack-plus-thin-outline',
                 text: l.new_album,
+                title: l.new_album,
                 onClick: () => {
                     if (M.isInvalidUserStatus()) {
                         return;
@@ -2999,6 +2913,8 @@ lazy(mega.gallery, 'albums', () => {
                 }
             });
             mega.ui.secondaryNav.showActionButtons('.fm-new-album');
+            mega.ui.secondaryNav.updateInfoChipsAndViews(true);
+            mega.ui.secondaryNav.expand();
         }
 
         update(albumId) {
@@ -3200,7 +3116,8 @@ lazy(mega.gallery, 'albums', () => {
                         const selHandles = scope.albums.grid.timeline.selections;
                         scope.albums.grid.timeline._selCount = Object.keys(selHandles).length;
                         scope.albums.grid.timeline._selSize = Object.keys(selHandles).reduce((a, b) => {
-                            return a + (M.d[b] && M.d[b].s || 0);
+                            const nb = scope.getNodeCache(b);
+                            return a + (nb && nb.s || 0);
                         }, 0);
                         scope.albums.grid.timeline.onSelectToggle();
                     }
@@ -3394,6 +3311,15 @@ lazy(mega.gallery, 'albums', () => {
 
             delay('render:albums_grid', () => {
                 applyPs(this.el, !albumsCount);
+                if (mega.ui.secondaryNav) {
+                    // Bind scroll event for albums view since it has action buttons.
+                    const noScroll = mega.ui.secondaryNav.bindScrollEvents(this.el);
+                    if (noScroll && !mega.ui.secondaryNav.actionsHolder && !mega.ui.secondaryNav.isSmall) {
+                        mega.ui.secondaryNav.domNode.classList.remove('buttons-up');
+                        mega.ui.secondaryNav.domNode.querySelector('.fm-card-holder')
+                            .before(mega.ui.header.domNode.querySelector('.fm-header-buttons'));
+                    }
+                }
 
                 MegaGallery.addThumbnails(thumbBlocks);
 
@@ -3716,13 +3642,6 @@ lazy(mega.gallery, 'albums', () => {
             this.el.removeChild(album.cellEl.el);
         }
 
-        resetCoverOnSensitiveChange(albumId) {
-            filterSensitiveNodes(albumId);
-            const { nodes, node } = scope.albums.store[albumId];
-
-            debouncedAlbumCellUpdate(albumId, false, node || nodes[0]);
-        }
-
         updateInAlbumSensitives() {
             const albumId = mega.gallery.getAlbumIdFromPath();
             delay(`album:update_items_sensitive:${albumId}`, () => {
@@ -3893,7 +3812,7 @@ lazy(mega.gallery, 'albums', () => {
 
             if (Array.isArray(handles)) {
                 for (let i = 0; i < handles.length; i++) {
-                    const n = M.d[handles[i]];
+                    const n = scope.getNodeCache(handles[i]);
                     console.assert(n, `node ${handles[i]} not in memory...`);
                     if (n) {
                         nodes.push(n);
@@ -4004,6 +3923,8 @@ lazy(mega.gallery, 'albums', () => {
             if (!isAlbums) {
                 return;
             }
+
+            loadingDialog.show('MegaGallery');
 
             pendingName = '';
             const availableNodes = await mega.gallery.initialiseMediaNodes();
@@ -4170,18 +4091,19 @@ lazy(mega.gallery, 'albums', () => {
 
                 for (let i = 0; i < elements.length; i++) {
                     const { h, id } = elements[i];
+                    const n = scope.getNodeCache(h);
 
                     if (
-                        M.d[h]
-                        && !ignoreHandles[M.d[h].p]
+                        n
+                        && !ignoreHandles[n.p]
                         && !eHandles[h]
-                        && !M.d[h].fv
-                        && mega.sensitives.shouldShowNode(M.d[h])
+                        && !n.fv
+                        && mega.sensitives.shouldShowNode(n)
                     ) {
-                        nodes.push(M.d[h]);
+                        nodes.push(n);
 
                         if (id === coverHandle) {
-                            node = M.d[h];
+                            node = n;
                         }
                     }
 
@@ -4491,7 +4413,7 @@ lazy(mega.gallery, 'albums', () => {
 
             if (M.currentdirid === 'albums/' + s) {
                 if (this.grid.timeline && this.grid.timeline.selections[delHandle]) {
-                    this.grid.timeline.deselectNode(M.d[delHandle]);
+                    this.grid.timeline.deselectNode(scope.getNodeCache(delHandle));
                 }
 
                 if (album.nodes.length) {
@@ -4599,20 +4521,20 @@ lazy(mega.gallery, 'albums', () => {
                 return;
             }
 
-            let nodes = [];
-
-            if ($.timelineDialog instanceof AlbumItemsDialog) {
-                const galleryNodes = $.timelineDialog.updateGalleryNodes();
-                const activeTab = $.timelineDialog.nav ? $.timelineDialog.nav.activeTab : 0;
-                const list = activeTab === 1 ? galleryNodes.cd
-                    : activeTab === 2 ? galleryNodes.cu : galleryNodes.all;
-                nodes = list.filter(mega.sensitives.shouldShowNode);
-            }
-            else if ($.timelineDialog instanceof AlbumCoverDialog) {
-                nodes = scope.albums.store[$.timelineDialog.albumId].nodes;
-            }
-
             delay('timeline_dialog:update_items', () => {
+                let nodes = [];
+
+                if ($.timelineDialog instanceof AlbumItemsDialog) {
+                    const galleryNodes = $.timelineDialog.updateGalleryNodes();
+                    const activeTab = $.timelineDialog.nav ? $.timelineDialog.nav.activeTab : 0;
+                    const list = activeTab === 1 ? galleryNodes.cd
+                        : activeTab === 2 ? galleryNodes.cu : galleryNodes.all;
+                    nodes = list.filter(mega.sensitives.shouldShowNode);
+                }
+                else if ($.timelineDialog instanceof AlbumCoverDialog) {
+                    nodes = scope.albums.store[$.timelineDialog.albumId].nodes;
+                }
+
                 timeline.nodes = nodes;
             });
         }

@@ -2243,7 +2243,8 @@ lazy(self, 'faceDetector', () => Promise.resolve((async() => {
     'use strict';
     let waiter = false;
     const stats = [[]];
-    const debug = self.d > 0 ? self.d : self.is_karma || self.location.host !== 'mega.nz';
+    const debug = self.d > 0 ? self.d : self.is_karma ||
+        (self.location.host !== 'mega.nz' &&  self.location.host !== 'mega.app');
 
     const dump = (() => {
         if (!self.isWorkerScope) {

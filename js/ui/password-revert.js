@@ -42,18 +42,18 @@ var passwordRevert = {
                 // The API can't inform us if the code is expired as it deletes used codes after use. So this does a
                 // check to see if the code length is right, if it is then the code is expired, otherwise it's invalid
                 if (result === ENOENT || result === EEXPIRED) {
-                    var failureMessage = l[20857] + ' ' + l[20858];    // Your link is invalid. Please contact support
+                    var failureMessage = l[20857];    // Your link is invalid. Please contact support
 
                     if (self.revertPasswordCode.length === 24) {
-                        failureMessage = l[20856] + ' ' + l[20858];    // Your link has expired. Please contact support
+                        failureMessage = l[20856];    // Your link has expired. Please contact support
                     }
 
-                    msgDialog('warningb', l[135], failureMessage, '', self.cancelRevertPassword);
+                    msgDialog('warningb', l[135], failureMessage, l[20858], self.cancelRevertPassword);
                 }
                 else if (result < 0) {
 
-                    // Oops, something went wrong. Please contact support@mega.nz for assistance.
-                    msgDialog('warningb', l[200], l[200] + ' ' + l[20858], '', self.cancelRevertPassword);
+                    // Oops, something went wrong. Please contact support@mega.io for assistance.
+                    msgDialog('warningb', l[200], l[200], l[20858], self.cancelRevertPassword);
                 }
                 else {
                     // If the code is valid, get the email for the account to be reset
@@ -103,7 +103,7 @@ var passwordRevert = {
 
                 // Show generic error
                 if (result < 0) {
-                    msgDialog('warningb', l[200], l[200] + ' ' + l[20858], '', passwordRevert.cancelRevertPassword);
+                    msgDialog('warningb', l[200], l[200], l[20858], passwordRevert.cancelRevertPassword);
                 }
                 else {
                     // If it successfully reverted, show a success message and go back to the login page

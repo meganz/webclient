@@ -43,14 +43,14 @@
 }
 
 .it-box.get-link-box .desktop-scroll-area {
-    max-height: 288px;
+    height: 296px;
     padding-bottom: 12px;
     padding-top: 12px;
     position: relative;
 }
 
 .it-box.get-link-box .desktop-scroll-area.ext {
-    max-height: 364px;
+    height: 364px;
 }
 
 .it-box.get-link-box .form-header .it-button {
@@ -72,19 +72,16 @@
 /*Link settings */
 
 .it-box.get-link-box .form-header .it-button i {
-    transition: transform 400ms  ease-in-out;
+    transition: transform 400ms ease-in-out, var(--transition-color);
 }
 
 .it-box.get-link-box .form-header .it-button.active-icon i {
+    --mask-color: var(--main-primary);
     transform: rotate(180deg);
 }
 
 .it-box.get-link-box .settings-body {
-    display: none;
-}
-
-.it-box.get-link-box .visible-settings .settings-body {
-    display: block;
+    padding-bottom: 8px;
 }
 
 .it-box.get-link-box .settings-body .section {
@@ -112,11 +109,15 @@
     align-items: start;
     color: var(--main-neutral-primary);
     font: var(--text-body-sm);
-    margin: -12px 0 12px;
+    margin: -4px 0 12px;
 }
 
 .it-box.get-link-box .it-checkbox-label a.link {
     color: var(--main-primary);
+}
+
+.it-box.get-link-box .it-checkbox-label + .box-error-msg {
+    margin-top: -12px;
 }
 
 
@@ -129,7 +130,9 @@
 }
 
 .it-box.add-more-files-box .it-menu.context {
+    left: 0;
     min-width: 212px;
+    top: 0;
 }
 
 .it-box.add-more-files-box .add-files .inv-input {
@@ -519,21 +522,77 @@
 
 /* Ready to download box */
 
-.it-box.ready-to-download-box .data-ready-img {
-    content: var(--url-ready-to-dl-img);
-    width: 240px;
+.it-box.ready-to-download-box .h-icon {
+    --icon-size: 64px;
+    --mask-color: var(--main-primary);
+}
+
+.it-box.ready-to-download-box > .body > .content > * {
+    margin: 24px 0 0;
+}
+
+.it-box.ready-to-download-box > .body > .content > hr {
+    border: 0;
+    border-top: 1px solid var(--main-borders-and-lines);
+    display: none;
+    margin: 16px 0 0;
+    padding: 0;
+    width: 100%;
+}
+
+.it-box.ready-to-download-box .link-info {
+    display: grid;
+    grid-gap: 12px;
 }
 
 .it-box.ready-to-download-box .it-grid-info {
-    margin: 12px 0 0;
+    margin: 0 auto;
 }
+
+.it-box.ready-to-download-box .title {
+    color: var(--main-neutral-primary);
+    font: var(--text-btn-lg);
+    overflow: hidden;
+    text-align: center;
+    word-wrap: break-word;
+}
+
+.it-box.ready-to-download-box .msg-area {
+    background: var(--main-surface-secondary);
+    border-radius: var(--radius-i-md);
+    padding: 6px;
+    width: 100%;
+}
+.it-box.ready-to-download-box .msg-area span {
+    background: transparent;
+    border: 0;
+    color: var(--main-neutral-primary);
+    display: block;
+    font: var(--text-caption-lg);
+    max-height: 84px;
+    overflow: hidden;
+    overflow-y: auto;
+    padding: 6px;
+    white-space: pre-line;
+    width: 100%;
+}
+
+.it-box.ready-to-download-box .msg-area.hidden + hr {
+    display: block;
+}
+
+.it-box.ready-to-download-box > .body > footer,
+.it-box.ready-to-download-box > .body > footer > button + button {
+    margin: 16px 0 0;
+}
+
 
 /* Adaptive layout */
 
 @media only screen and (max-width: 960px), only screen and (max-height: 400px) {
 
     .page-content .it-box-holder .it-box.get-link-box .desktop-scroll-area {
-        max-height: none;
+        height: auto;
         padding-bottom: 12px;
         padding-top: 12px;
     }

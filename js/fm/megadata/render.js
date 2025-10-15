@@ -46,6 +46,13 @@ MegaData.prototype.renderMain = function(aUpdate) {
         this.rmSetupUI(aUpdate, aUpdate ? !!$.dbOpenHandle : false);
     }
 
+    if (mega.ui.secondaryNav && M.v.length && mega.ui.mNodeFilter.viewEnabled) {
+        mega.ui.secondaryNav.extShowFilterChip();
+    }
+    else if (mega.ui.secondaryNav) {
+        mega.ui.secondaryNav.extHideFilterChip();
+    }
+
     this.initShortcutsAndSelection(container, aUpdate);
 
     if (!container || typeof container === 'string') {
@@ -329,6 +336,9 @@ MegaData.prototype.hideEmptyGrids = function hideEmptyGrids() {
     const excluded = ['.transfer-panel-empty-txt', '.fm-recents', '.fm-empty-contacts'];
     $(`.fm-empty-section:not(${excluded.join(',')})`).addClass('hidden');
     $('.fm-empty-section.fm-empty-sharef').remove();
+    if (mega.ui.empty) {
+        mega.ui.empty.clear();
+    }
 };
 
 /**

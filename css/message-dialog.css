@@ -1,0 +1,20 @@
+.web-desktop .mega-sheet.msg-dialog {
+    z-index: 1201;
+}
+.web-desktop .mega-sheet.msg-dialog .sheet {
+    max-width: 640px;
+}
+.web-desktop .mega-sheet.msg-dialog .image {
+    height: 100%;
+}
+.web-desktop .mega-sheet.msg-dialog .image > .icon {
+    --icon-size: 40px;
+    margin-inline-end: 16px;
+}
+.web-desktop .mega-sheet.msg-dialog .nav-elem.text-only {
+    margin-inline-end: auto;
+    padding: 0;
+}
+.web-desktop .mega-sheet.msg-dialog .nav-elem.text-only span {
+    text-decoration: underline;
+}

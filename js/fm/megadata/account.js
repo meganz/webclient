@@ -45,6 +45,7 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
         }
         console.assert(mRootID, 'I told you...');
     }
+    console.assert(String(self.page).includes('fm/account'), 'accountData() invoked out of place.');
 
     if (blockui) {
         loadingDialog.show();
@@ -154,7 +155,6 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
         }
         account.sessions = res;
     });
-
 
     /**
      * DO NOT place any sendAPIRequest() call AFTER, this 'ug' MUST BE the LAST one!
@@ -332,7 +332,7 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
                 }
                 // stats[target].nodes.push(handle);
 
-                if (exp[handle] && !M.getNodeShareUsers(handle, 'EXP').length) {
+                if (exp[handle] && !M.isOutShare(handle, 'EXP')) {
                     continue;
                 }
 
@@ -374,7 +374,7 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
                         }
                     }
                     else {
-                        if (d) {
+                        if (d && !mega.infinity) {
                             console.error(`Not found public node ${h}`);
                         }
                         links.files++;
@@ -479,6 +479,28 @@ MegaData.prototype.refreshSessionList = function(callback) {
     }
 };
 
+/**
+ * Function to get S4 Transfer usage (Egress) Report between two dates.
+ * @param {String} date The start date of the required month
+ * @param {Boolean} used Overall egress usage (Optional)
+ * @returns {Promise<Array>} user get result
+ */
+MegaData.prototype.getS4Egress = function(date, used) {
+    "use strict";
+
+    if (!(window.u_attr && u_attr.s4 && u_attr.p)) {
+        return false;
+    }
+
+    const dates = getReportDates(date);
+    const req = { a: 's4pqu', fd: dates.fromDate, td: dates.toDate };
+
+    if (used) {
+        req.ou = 1;
+    }
+
+    return api.send(req);
+};
 
 /**
  * Retrieve general user information once a session has been established.
@@ -711,17 +733,241 @@ MegaData.prototype.showContactVerificationDialog = function() {
     });
 };
 
+MegaData.prototype.paymentBannerData = async function() {
+    'use strict';
+    const { result: account } = await api.req({ a: 'uq', pro: 1, strg: 1, v: 2 });
+    if (Array.isArray(account.plans)) {
+        account.subs = Array.isArray(account.subs) && account.subs || [];
+        if (account.plans.length) {
+            const activePlan = account.plans.find(({ al }) => al === u_attr.p) || account.plans[0];
+            if (activePlan && activePlan.al !== pro.ACCOUNT_LEVEL_FEATURE) {
+                const sub = account.subs.find(({ id }) => id === activePlan.subid);
+                const hasSub = !!sub;
+
+                account.slevel = activePlan.al;
+                account.stype = hasSub && sub.type || 'O';
+                account.expiry = hasSub && sub.next || activePlan.expires || 0;
+            }
+        }
+    }
+    return account;
+};
+
+MegaData.prototype.showPlanExpiringBanner = async function(data) {
+    'use strict';
+
+    if (!fminitialized || u_attr && (u_attr.b || u_attr.pf || !u_attr.p)) {
+        return;
+    }
+    const account = await M.paymentBannerData();
+    if (
+        account.stype !== 'O' ||
+        account.slevel === pro.ACCOUNT_LEVEL_BUSINESS ||
+        account.slevel === pro.ACCOUNT_LEVEL_PRO_FLEXI
+    ) {
+        return;
+    }
+
+    const curr = await M.getPersistentData('planexp-last').catch(nop) || {
+        expiry: data && data.expiry || account.expiry,
+        slevel: account.slevel,
+        shown: 0,
+        h: u_handle,
+    };
+    const { expiry, slevel, shown, h } = curr;
+    if (u_handle !== h) {
+        await M.delPersistentData('planexp-last').catch(nop);
+        return M.showPlanExpiringBanner(data);
+    }
+    const today = new Date();
+    if (today.getTime() > expiry * 1000) {
+        M.delPersistentData('planexp-last').catch(nop);
+        data.slevel = data.slevel || slevel || account.slevel;
+        return M.showPlanExpiredBanner(data);
+    }
+    if (today.getTime() < (expiry - 4 * 86400) * 1000) {
+        return;
+    }
+    today.setHours(0, 0, 0, 0);
+    if (shown > today.getTime()) {
+        return;
+    }
+
+    curr.shown = today.setDate(today.getDate() + 1);
+    M.setPersistentData('planexp-last', curr).catch(dump);
+
+    const planName = pro.getProPlanName(slevel);
+    const options = {
+        title: l.plan_exp_banner_title.replace('%s', planName),
+        type: 'warning',
+        ctaText: l.resubscribe,
+        ctaHref: `/propay_${slevel}`,
+        ctaEvent: 500863,
+        closeEvent: 500862,
+        closeBtn: true
+    };
+
+    if (mega.bstrg < account.cstrg) {
+        options.msgHtml = l.plan_exp_banner_text_oq
+            .replace('%1', bytesToSize(account.cstrg))
+            .replace('%2', bytesToSize(mega.bstrg, 0));
+    }
+    else {
+        options.msgText = l.plan_exp_banner_text.replace('%s', planName);
+    }
+
+    if (is_mobile) {
+        const banner = mobile.banner.show(options);
+        banner.on('cta', () => {
+            loadSubPage(options.ctaHref);
+            eventlog(options.ctaEvent);
+        });
+        banner.on('close', () => eventlog(options.closeEvent));
+        banner.addClass('payment-banner');
+        return;
+    }
+    mega.ui.secondaryNav.showBanner(options);
+};
+
+MegaData.prototype.showPaymentFailedBanner = async function() {
+    'use strict';
+    if (u_attr && (u_attr.b || u_attr.p)) {
+        return;
+    }
+
+    const lastShow = await M.getPersistentData('payfail-last').catch(nop) ||
+        { shown: 0, last: 0, id: false, al: false, h: u_handle };
+    if (u_handle !== lastShow.h) {
+        await M.delPersistentData('payfail-last').catch(nop);
+        return M.showPaymentFailedBanner();
+    }
+    if (
+        lastShow.al === pro.ACCOUNT_LEVEL_BUSINESS ||
+        lastShow.al === pro.ACCOUNT_LEVEL_PRO_FLEXI
+    ) {
+        return;
+    }
+
+    const account = await M.paymentBannerData();
+    const {subs = [], expiry, cstrg} = account;
+    const today = new Date();
+
+    let renewPassed = false;
+    let isCancelled = true;
+    for (let i = subs.length; i--;) {
+        if (subs[i].next * 1000 < today.getTime()) {
+            renewPassed = subs[i];
+            if (isCancelled && !lastShow.id) {
+                isCancelled = false;
+            }
+        }
+        if (lastShow.id && subs[i].id === lastShow.id) {
+            isCancelled = false;
+        }
+        if (renewPassed && !isCancelled) {
+            break;
+        }
+    }
+    if (!renewPassed && !lastShow.id) {
+        return;
+    }
+    today.setHours(0, 0, 0, 0);
+
+    if (!isCancelled && (lastShow.shown > 4 || lastShow.last > today.getTime())) {
+        return;
+    }
+    lastShow.shown = isCancelled ? 0 : lastShow.shown + 1;
+    lastShow.last = today.setDate(today.getDate() + 1);
+    lastShow.id = lastShow.id || renewPassed.id;
+    lastShow.al = lastShow.al || renewPassed.al;
+    M.setPersistentData('payfail-last', lastShow).catch(dump);
+
+    const options = {
+        type: 'error',
+        closeBtn: true
+    };
+    const planName = pro.getProPlanName(lastShow.al);
+    if (isCancelled) {
+        options.title = l.payment_cancel_banner_title;
+        options.msgText = l.payment_cancel_banner_text.replace('%s', planName);
+        options.ctaText = l.upgrade_now;
+        options.ctaHref = `/propay_${lastShow.al}`;
+        options.ctaEvent = 500865;
+        options.closeEvent = 500864;
+    }
+    else if (expiry) {
+        options.title = l[25049];
+        options.ctaText = l.update_card;
+        options.ctaHref = is_mobile ? '/fm/account/paymentcard' : '/fm/account/plan/account-card-info';
+        options.ctaEvent = 500867;
+        options.closeEvent = 500866;
+        options.msgHtml = (
+            mega.bstrg < cstrg ?
+                l.payment_failed_banner_text_oq :
+                escapeHTML(l.payment_failed_banner_text)
+        )
+            .replace('%1', planName)
+            .replace('%2', `<b>${time2date(expiry, 1)}</b>`)
+            .replace('%3', bytesToSize(cstrg));
+    }
+    else {
+        return;
+    }
+
+    if (is_mobile) {
+        const banner = mobile.banner.show(options);
+        banner.on('cta', () => {
+            loadSubPage(options.ctaHref);
+            eventlog(options.ctaEvent);
+        });
+        banner.on('close', () => eventlog(options.closeEvent));
+        banner.addClass('payment-banner');
+    }
+    else {
+        mega.ui.secondaryNav.showBanner(options);
+    }
+};
+
+MegaData.prototype.showPlanExpiredBanner = async function(data) {
+    'use strict';
+
+    const { slevel } = data;
+    const options = {
+        type: 'error',
+        title: l.plan_ended_banner_title.replace('%s', pro.getProPlanName(slevel)),
+        msgText: l.plan_ended_banner_text,
+        ctaHref: `/propay_${slevel}`,
+        ctaText: l.upgrade_now,
+        ctaEvent: 500869,
+        closeEvent: 500868,
+        closeBtn: true
+    };
+
+    if (is_mobile) {
+        const banner = mobile.banner.show(options);
+        banner.on('cta', () => {
+            loadSubPage(`propay_${slevel}`);
+            eventlog(500869);
+        });
+        banner.on('close', () => eventlog(500868));
+        banner.addClass('payment-banner');
+        return;
+    }
+    mega.ui.secondaryNav.showBanner(options);
+};
 
 MegaData.prototype.showPaymentCardBanner = function(status) {
     'use strict';
 
-    const $banner = $('.fm-notification-block.payment-card-status')
-        .removeClass('payment-card-almost-expired payment-card-expired visible');
+    const $banner = $('.fm-notification-block.payment-card-status').removeClass('visible');
+    const $cmp = $('.mega-component.banner', $banner).removeClass('warning error');
+
     if (!status) {
         return;
     }
 
-    $('.notification-block-icon', $banner)
+    $cmp.addClass(status === 'exp' ? 'error' : 'warning');
+    $('.mega-component.banner > i', $banner)
         .removeClass('icon-alert-triangle-thin-outline icon-alert-circle-thin-outline')
         .addClass(`icon-alert-${status === 'exp' ? 'triangle' : 'circle'}-thin-outline`);
 
@@ -760,35 +1006,80 @@ MegaData.prototype.showPaymentCardBanner = function(status) {
 
     $('a', $banner).rebind('click', loadSubPage.bind(null, 'fm/account/plan/account-card-info'));
 
-    $banner.addClass(`visible ${isExpiredClassName}`);
-    $('.banner-title', $banner).text(bannerTitle);
-    $('.banner-txt', $banner).text(bannerDialog);
+    // @todo: Use mega.ui.secondaryNav.showBanner instead
+    $banner.addClass('visible');
+    $('.title-text', $banner).text(bannerTitle);
+    $('.message-text', $banner).text(bannerDialog);
 };
 
+/**
+ * Show/hide Converted to free account banner
+ * @param {Boolean} hide Hide banner if true
+ * @returns {void} void
+ */
+MegaData.prototype.convertedToFreeBanner = function(hide) {
+    'use strict';
+
+    const pl = self.u_attr && (u_attr.p || u_attr.b || u_attr.pf);
+    const st = sessionStorage.cnv2free;
+    let cfg = fmconfig.cnv2free;
+
+    // Hide banner, remove config, sessionStorage data
+    if (hide || pl || st === '3' || !st && cfg === undefined) {
+        mega.config.remove('cnv2free');
+        delete sessionStorage.cnv2free;
+
+        // Hide
+        if (is_mobile && mobile.banner) {
+            mobile.banner.hide('cnv2freeBanner');
+            return false;
+        }
+        mega.ui.secondaryNav.hideBanner('cnv2freeBanner');
+        return false;
+    }
+
+    // Save config if successfully converted
+    if (st) {
+        cfg = parseInt(st) || 0;
+        mega.config.set('cnv2free', cfg);
+        delete sessionStorage.cnv2free;
+    }
+
+    const options = {
+        name: 'cnv2freeBanner',
+        title: l.bn_reverted_pf_title,
+        msgText: cfg === 1 ? l.bn_reverted_pf_s4_text : l.bn_reverted_pf_text,
+        type: 'success',
+        ctaText: l[433],
+        ctaHref: `/pro`,
+        onClose: () => {
+            mega.config.remove('cnv2free');
+            sessionStorage.cnv2free = 3;
+        }
+    };
+
+    if (is_mobile) {
+        if (!mobile.banner) {
+            MegaMobileBanner.init();
+        }
+        const banner = mobile.banner.show(options);
+        banner.on('cta', () => loadSubPage(options.ctaHref));
+        banner.on('close', options.onClose);
+        return;
+    }
+    mega.ui.secondaryNav.showBanner(options);
+};
 
 /**
  * Show storage overquota dialog
  * @param {*} quota Storage quota data, as returned from M.getStorageQuota()
  * @param {Object} [options] Additional options
  */
-MegaData.prototype.showOverStorageQuota = function(quota, options) {
+MegaData.prototype.showOverStorageQuota = async function(quota, options) {
     'use strict';
 
     if (quota === undefined && options === undefined) {
         return Promise.reject(EARGS);
-    }
-
-    if (!pro.membershipPlans || !pro.membershipPlans.length) {
-        return new Promise((resolve, reject) => {
-            pro.loadMembershipPlans(() => {
-                if (!pro.membershipPlans || !pro.membershipPlans.length) {
-                    reject(EINCOMPLETE);
-                }
-                else {
-                    M.showOverStorageQuota(quota, options).then(resolve).catch(reject);
-                }
-            });
-        });
     }
     const {promise} = mega;
 
@@ -801,13 +1092,16 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
     var $strgdlgBodyFull = $('.fm-dialog-body.storage-dialog.full', $strgdlg).removeClass('odq');
     var $strgdlgBodyAFull = $('.fm-dialog-body.storage-dialog.almost-full', $strgdlg);
 
-    var prevState = $('.pm-main').is('.almost-full, .full');
+    const $pmMain = $('.pm-main', '.main-layout');
+    const prevState = $pmMain.is('.almost-full, .full');
     $('.pm-main').removeClass('fm-notification almost-full full');
     var $odqWarn = $('.odq-warning', $strgdlgBodyFull).addClass('hidden');
     var $upgradeBtn = $('.choose-plan span', $strgdlg).text(l[8696]);
     const $headerFull = $('header h2.full', $strgdlg);
     const $estimatedPriceText = $('.estimated-price-text', $strgdlg);
     const $rubbishBinText = $('.rubbish-text', $strgdlg).toggleClass('hidden', quota === EPAYWALL);
+    const $fBanner = $('.fm-notification-block.full', $pmMain).removeClass('visible');
+    const $afBanner = $('.fm-notification-block.almost-full', $pmMain).removeClass('visible');
 
     let upgradeTo;
     let isEuro;
@@ -825,11 +1119,12 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
                 });
             });
         }
-        $('.pm-main').addClass('fm-notification full');
+        $pmMain.addClass('fm-notification full');
 
         $strgdlg.addClass('full');
         $('.body-header', $strgdlgBodyFull).text(l[23519]);
 
+        await pro.loadMembershipPlans();
         var dlgTexts = odqPaywallDialogTexts(u_attr || {}, M.account);
         $('.body-p.long', $strgdlgBodyFull).safeHTML(dlgTexts.dialogText);
 
@@ -840,15 +1135,22 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
 
         $('.storage-dialog.body-p', $odqWarn).safeHTML(dlgTexts.dlgFooterText);
 
-        $('.fm-notification-block.full').safeHTML(
-            `<i class="notification-block-icon sprite-fm-mono icon-offline"></i>
-            <span>${dlgTexts.fmBannerText}</span>`);
+        // @todo: Use mega.ui.secondaryNav.showBanner instead
+        $('.title-text', $fBanner).text(l.bn_full_storage_title);
+        $('.message-text', $fBanner).safeHTML(dlgTexts.fmBannerText);
+        $fBanner.addClass('visible');
     }
-    else {
+    else if (quota === -1 || quota && (quota.isFull || quota.isAlmostFull) || options && options.custom) {
         if (quota === -1) {
             quota = { percent: 100 };
             quota.isFull = quota.isAlmostFull = true;
+            quota.cstrg = M.storageQuotaCache ? M.storageQuotaCache.cstrg : '';
             options = { custom: 1 };
+        }
+        // @todo revamp, we're meant to do the below whenever the dialog is opened, and only when the data is required
+        await pro.loadMembershipPlans();
+        if (!pro.membershipPlans.length) {
+            throw EINCOMPLETE;
         }
 
         const lowestRequiredPlan = pro.filter.lowestRequired(quota.cstrg || '', 'storageTransferDialogs');
@@ -903,13 +1205,15 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
         if (quota.isFull) {
             $strgdlg.addClass('full');
             $('.pm-main').addClass('fm-notification full');
+            $fBanner.addClass('visible');
             $('header h2', $strgdlgBodyFull).text(myOptions.title || l[16302]);
             $('.body-header', $strgdlgBodyFull).safeHTML(myOptions.body || l[16360]);
             $headerFull.text(l.cloud_strg_100_percent_full);
         }
         else if (quota.isAlmostFull || myOptions.custom) {
             if (quota.isAlmostFull) {
-                $('.pm-main').addClass('fm-notification almost-full');
+                $pmMain.addClass('fm-notification almost-full');
+                $afBanner.addClass('visible');
                 if (mega.tpw.initialized && mega.tpw.isWidgetVisibile()) {
                     mega.tpw.showAlmostOverquota();
                 }
@@ -946,28 +1250,25 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
             $('.chart.data .pecents-txt', $strgdlg).text(strQuotaLimit[0]);
             $('.chart.data .gb-txt', $strgdlg).text(strQuotaLimit[1]);
             $('.chart.body .perc-txt', $strgdlg).text(quota.percent + '%');
-
         }
         else {
-            if ($strgdlg.is(':visible')) {
-                window.closeDialog();
-            }
-            $('.pm-main').removeClass('fm-notification almost-full full');
-
-            return Promise.reject();
+            console.error('Huh?');
         }
 
-        $('.fm-notification-block.full')
-            .safeHTML(
-                `<i class="notification-block-icon sprite-fm-mono icon-offline"></i>
-                <span>${l[22667].replace('%1', maxStorage)}</span>`);
+        // @todo: Use mega.ui.secondaryNav.showBanner instead
+        $('.title-text', $fBanner).text(l.storage_full);
+        $('.message-text', $fBanner).text(l.bn_full_storage_text);
+    }
+    else {
+        if ($strgdlg.is(':visible')) {
+            window.closeDialog();
+        }
+        $pmMain.removeClass('fm-notification almost-full full');
+        $fBanner.removeClass('visible');
+        $afBanner.removeClass('visible');
 
-        $('.fm-notification-block.almost-full')
-            .safeHTML(
-                `<i class="notification-block-icon sprite-fm-mono icon-offline"></i>
-                <span>${l[22668].replace('%1', maxStorage)}</span>
-                <i class="fm-notification-close sprite-fm-mono icon-close-component"></i>`);
-
+        promise.reject();
+        return promise;
     }
 
     var closeDialog = function() {
@@ -1008,11 +1309,13 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
 
     $('button.skip', $strgdlg).toggleClass('hidden', upgradeTo === 'min');
 
-    $('.fm-notification-block .fm-notification-close')
-        .rebind('click', function() {
-            $('.pm-main').removeClass('fm-notification almost-full full');
-            $.tresizer();
-        });
+    // @todo: Use mega.ui.secondaryNav.showBanner instead
+    $('.fm-notification-block .end-box button').rebind('click.closeBanners', (ev) => {
+        const $banner = $(ev.currentTarget).closest('.fm-notification-block');
+        $('.pm-main').removeClass($banner.attr('class'));
+        $banner.removeClass('visible');
+        $.tresizer();
+    });
 
     clickURLs();
 
@@ -1087,16 +1390,83 @@ function voucherData(arr) {
     return vouchers;
 }
 
-mBroadcaster.once('fm:initialized', () => {
+/**
+ * Notify users that their data has been deleted due to inactivity
+ * @returns {void} void
+ */
+mBroadcaster.once('fm:initialized', tryCatch(() => {
     'use strict';
 
-    if (u_attr && (u_attr.p || u_attr.b)) {
+    const lp = self.u_attr && u_attr.lastpurge || [];
+    let banner = null;
 
-        if (M.account && M.account.cce) {
-            M.showPaymentCardBanner(M.account.cce);
+    if (pfid || !lp.length || lp[0] === fmconfig.lastpurge || lp[1] !== 4) {
+        return false;
+    }
+
+    const options = {
+        name: 'inactive-account',
+        title: l.bn_inactive_acc_title,
+        msgText: l.bn_inactive_acc_text.replace('%1', 9),
+        type: 'error',
+        ctaText: l[8742],
+        onCtaClick: () => {
+            mega.redirect(
+                'help.mega.io',
+                'files-folders/restore-delete/data-deleted-by-mega', false, false, false
+            );
+        },
+        onClose: () => {
+            mega.config.set('lastpurge', lp[0]);
+
+            if (banner.length) {
+                banner.removeClass('visible');
+            }
+        },
+        closeBtn: true
+    };
+
+    if (is_mobile) {
+        if (!mobile.banner) {
+            MegaMobileBanner.init();
         }
-        else {
-            M.updatePaymentCardState().catch(dump);
+        banner = mobile.banner.show(options);
+        banner.on('cta', options.onCtaClick);
+        banner.on('close', options.onClose);
+        return;
+    }
+
+    // @todo: Use mega.ui.secondaryNav.showBanner instead
+    banner = $(`.fm-notification-block.${options.name}`, '.fmholder');
+    const $cta = $('a', banner);
+
+    $('.title-text', banner).text(options.title);
+    $('.message-text', banner).text(options.msgText);
+    $cta.text(options.ctaText);
+    $cta.rebind('click.showHelp', (ev) => {
+        ev.preventDefault();
+        ev.stopPropagation();
+        options.onCtaClick();
+    });
+    $('.end-box button', banner).rebind('click.hideBanner', options.onClose);
+    banner.addClass('visible');
+}));
+
+
+mBroadcaster.addListener('fm:initialized', () => {
+    'use strict';
+
+    if (u_type === 3 && !pfid) {
+        // Try showing this banner for users with a one-off plan/sub and are still pro, or that are no longer pro.
+        tSleep(4 + Math.random())
+            .then(() => u_attr.p ? M.showPlanExpiringBanner() : M.showPaymentFailedBanner())
+            .catch(dump);
+
+        // Try showing converted Pro Flexi to Free account
+        if (sessionStorage.cnv2free || fmconfig.cnv2free !== undefined) {
+            queueMicrotask(() => M.convertedToFreeBanner());
         }
+
+        return 0xDEAD;
     }
 });

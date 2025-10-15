@@ -205,9 +205,11 @@ mBroadcaster.once('boot_done', () => {
             promise.tryCatch = promise.then;
             return promise;
         },
+        safeShowDialog(name) {
+            msgDialog('warninga', l[16], l[20858], `Ref: ${name}`);
+        },
         getNodeShare: dummy,
         getS4NodeType: dummy,
-        importWelcomePDF: dummy,
         getNodeShareUsers: dummy,
         getShareNodesSync: dummy,
         shouldCreateThumbnail: () => true,
@@ -217,7 +219,6 @@ mBroadcaster.once('boot_done', () => {
                 ul_queue = new UploadQueue();
                 ulmanager.isUploading = false;
                 ulQueue._pending = [];
-                ulQueue.setSize(fmconfig.ul_maxSlots);
 
                 clearTransferXHRs();
                 delete $.transferprogress;
@@ -292,6 +293,8 @@ mBroadcaster.once('boot_done', () => {
                 }
             }
         },
+        setPitag: () => false,
+        isOutShare: () => false,
         getNodeRights: () => false,
         isInvalidUserStatus: () => false,
         getNodeByHandle: (h) => M.d[M.xh[h]] || M.d[h] || false,

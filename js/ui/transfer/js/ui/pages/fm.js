@@ -215,10 +215,32 @@ lazy(T.ui, 'viewFilesLayout', () => {
         */
         async renderReadyToDownload(xh) {
             if (!this.readyToDownload.cn) {
-                MediaInfoLib.getMediaCodecsList().catch(dump);
+                MediaInfoLib.getMediaCodecsList()
+                    .catch((ex) => {
+                        self.reportError(new Error(`Failed to load media-codecs list, ${ex}`));
+                    });
                 await this.initReadyToDownload(xh);
             }
             const { cn } = this.readyToDownload;
+            const m = from8(base64urldecode(this.data.xi.m || '')).trim();
+            const t = from8(base64urldecode(this.data.xi.t || ''));
+            const msgCn = cn.querySelector('.msg-area');
+            const titleCn = cn.querySelector('.link-info .title');
+
+            msgCn.classList.add('hidden');
+            titleCn.classList.add('hidden');
+
+            // Show message
+            if (m) {
+                msgCn.classList.remove('hidden');
+                msgCn.querySelector('span').textContent = m;
+            }
+
+            // Show title
+            if (t) {
+                titleCn.classList.remove('hidden');
+                titleCn.textContent = t;
+            }
 
             // Items num and size
             this.updateItemsInfo(cn);

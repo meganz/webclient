@@ -1095,7 +1095,7 @@ class MEGAKeepAliveStream {
                 reader.cancel(reason)
                     .then(() => reader.releaseLock())
                     .catch((ex) => {
-                        if (verbose) {
+                        if (verbose && ex.name !== 'AbortError') {
                             logger.warn('release-lock', ex);
                         }
                     });
@@ -1190,7 +1190,7 @@ class MEGAKeepAliveStream {
                 return onload && onload(buf);
             })
             .catch((ex) => {
-                if (verbose || debug && ex && ex.name !== 'AbortError') {
+                if (debug && ex && ex.name !== 'AbortError') {
                     logger.warn(ex);
                 }
                 if (!signal.aborted) {
@@ -1412,6 +1412,20 @@ lazy(self, 'api', () => {
     });
     let gSearchParams, currst, lastst;
     const uSearchParams = Object.create(null);
+    const debugTreeFetch = self.srvlog2 && (!self.buildOlderThan10Days || !self.is_livesite)
+        && tryCatch((n) => {
+            if (n && !n.t && !n.tvf) {
+                logger.error('Trying to fetch node already on memory...', n.h);
+
+                if (!debugTreeFetch.sent) {
+                    const {owner, actors} = mBroadcaster.crossTab;
+                    const args = [M.getStack(), self.page, n.h, n.p];
+
+                    self.srvlog2('inv-tree-fetch', mega.infinity, !!owner | 0, Object(actors).length | 0, ...args);
+                    debugTreeFetch.sent = 1;
+                }
+            }
+        });
 
     // cache entries lifetime rules.
     cache.commands = Object.assign(Object.create(null), {
@@ -1870,6 +1884,10 @@ lazy(self, 'api', () => {
 
                     payload.n.push(n);
                     inflightTreeFetch.add(n);
+
+                    if (debugTreeFetch && M.d[n]) {
+                        debugTreeFetch(M.d[n]);
+                    }
                 }
 
                 if (payload.n.length) {

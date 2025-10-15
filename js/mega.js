@@ -39,6 +39,51 @@ Object.defineProperties(window, {
     }
 });
 
+// @see {@link fm_fullreload}
+Object.defineProperty(mega, 'halt', {
+    async value(reason) {
+        'use strict';
+
+        if (self.fminitialized) {
+
+            if (window.loadingDialog) {
+                // 1141: 'Please be patient.'
+                loadingInitDialog.hide('force');
+                loadingDialog.show(reason, l[1141]);
+                loadingDialog.show = loadingDialog.hide = nop;
+            }
+
+            mBroadcaster.crossTab.leave();
+            watchdog.notify(`halt(${reason})`);
+
+            // stop further SC processing
+            window.execsc = nop;
+
+            // and error reporting, if any
+            window.onerror = null;
+
+            // nuke w/sc connection
+            getsc.stop(-1, reason);
+
+            window.getsc = nop;
+            window.waitsc = nop;
+
+            getsc.stop = nop;
+            getsc.validate = nop;
+
+            // shutdown chat..
+            if (self.megaChatIsReady) {
+                megaChat.destroy(true);
+            }
+
+            // abort any scheduled task
+            if (self.delay) {
+                delay.abort();
+            }
+        }
+    }
+});
+
 /** @property mega.shouldApplyNetworkBackPressure */
 lazy(mega, 'shouldApplyNetworkBackPressure', () => {
     'use strict';
@@ -648,50 +693,6 @@ function sc_packet(a) {
         queueMicrotask(sc_fetcher);
     }
 
-    if ((a.a === 's' || a.a === 's2') && a.k && !self.secureKeyMgr) {
-        /**
-         * There are two occasions where `crypto_process_sharekey()` must not be called:
-         *
-         * 1. `a.k` is symmetric (AES), `a.u` is set and `a.u != u_handle`
-         *    (because the resulting sharekey would be rubbish)
-         *
-         * 2. `a.k` is asymmetric (RSA), `a.u` is set and `a.u != u_handle`
-         *    (because we either get a rubbish sharekey or an RSA exception from asmcrypto)
-         */
-        let prockey = false;
-
-        if (a.k.length > 43) {
-            if (!a.u || a.u === u_handle) {
-                // RSA-keyed share command targeted to u_handle: run through worker
-                prockey = !a.o || a.o !== u_handle;
-
-                if (prockey) {
-                    rsasharekeys[a.n] = true;
-                }
-            }
-        }
-        else {
-            prockey = (!a.o || a.o === u_handle);
-        }
-
-        if (prockey) {
-            if (decWorkerPool.ok && rsasharekeys[a.n]) {
-                decWorkerPool.postPacket(a, scqhead++);
-                return;
-            }
-
-            const k = crypto_process_sharekey(a.n, a.k);
-
-            if (k === false) {
-                console.warn(`Failed to decrypt RSA share key for ${a.n}: ${a.k}`);
-            }
-            else {
-                a.k = k;
-                crypto_setsharekey(a.n, k, true);
-            }
-        }
-    }
-
     if (a.a === 't') {
         startNodesFetching(scqhead);
     }
@@ -737,7 +738,6 @@ var scpubliclinksuiupd;
 var scContactsSharesUIUpdate;
 var loadavatars = [];
 var scinshare = Object.create(null);
-var sckeyrequest = Object.create(null);
 
 // sc packet parser
 var scparser = Object.create(null);
@@ -849,7 +849,7 @@ scparser.$add('s', {
                 M.delNodeShare(a.n, a.u);
 
                 if (a.p) {
-                    M.deletePendingShare(a.n, a.p);
+                    M.delPS(a.p, a.n);
                 }
                 else if (!pfid && fminitialized && a.u in M.u) {
                     setLastInteractionWith(a.u, `0:${unixtime()}`);
@@ -860,7 +860,6 @@ scparser.$add('s', {
                 }
             }
             else {
-                const shares = Object(M.d[a.n]).shares || {};
 
                 if (self.secureKeyMgr) {
 
@@ -874,7 +873,7 @@ scparser.$add('s', {
                         console.assert(a.a === 's2', `INVALID SHARE, missing user-handle for ${a.n}`, a);
                     }
                 }
-                else if (a.u in shares || a.ha === crypto_handleauth(a.n)) {
+                else if (M.su[a.n] && M.su[a.n].has(a.u) || a.ha === crypto_handleauth(a.n)) {
 
                     // I updated or created my share
                     const k = decrypt_key(u_k_aes, base64_to_a32(a.ok));
@@ -1113,12 +1112,18 @@ scparser.$add('t', function(a, scnodes) {
         const targetid = rootNode.p;
         const pnodes = [];
 
+        let ver = false;
         for (i = 0; i < scnodes.length; i++) {
-            if (scnodes[i] && scnodes[i].p === targetid) {
-                pnodes.push({
-                    h: scnodes[i].h,
-                    t: scnodes[i].t
-                });
+            if (scnodes[i]) {
+                if (!ver && rootNode.t === 0 && scnodes[i].p === rootNode.h) {
+                    ver = true;
+                }
+                if (scnodes[i].p === targetid) {
+                    pnodes.push({
+                        h: scnodes[i].h,
+                        t: scnodes[i].t
+                    });
+                }
             }
         }
 
@@ -1126,7 +1131,8 @@ scparser.$add('t', function(a, scnodes) {
             a: a.ou ? 'put' : 'puu',
             n: targetid,
             u: a.ou,
-            f: pnodes
+            f: pnodes,
+            ver
         });
     }
 
@@ -1409,24 +1415,6 @@ scparser.$add('fa', function(a) {
     }
 });
 
-scparser.$add('k', function(a) {
-    // key request
-    if (a.sr) {
-        crypto_procsr(a.sr);
-    }
-    if (a.cr) {
-        crypto_proccr(a.cr);
-    }
-    else if (!pfid && a.n) {
-        if (!sckeyrequest[a.h]) {
-            sckeyrequest[a.h] = [];
-        }
-        sckeyrequest[a.h].push(...a.n);
-    }
-
-    scsharesuiupd = true;
-});
-
 scparser.$add('u', function(a) {
     // update node attributes
     const n = M.d[a.n];
@@ -1508,6 +1496,8 @@ scparser.$add('d', function(a) {
         if (d) {
             console.time(`sc:d.${a.n}`);
         }
+
+        // @todo as we're "deprecating" MegaNode.shares, we can ditch this?..
         $.moveNodeShares = $.moveNodeShares || Object.create(null);
         (function _checkMoveNodeShare(h) {
             const n = M.d[h];
@@ -1589,6 +1579,8 @@ scparser.$bulkAdd(['psts', 'psts_v2'], function(a) {
     if (fminitialized && !pfid) {
         pro.processPaymentReceived(a);
     }
+    M.delPersistentData('payfail-last').catch(nop);
+    M.delPersistentData('planexp-last').catch(nop);
 
     this.sqac(a);
 });
@@ -1626,7 +1618,8 @@ scparser.$add('sqac', (a) => {
     }
 
     // If a user is on FM, update the account status with this packet.
-    if (fminitialized) {
+    // If the user is making a payment, do not refresh. The user will only have 1 option, to reload
+    if (fminitialized && !addressDialog.paymentInProcess) {
 
         delay('sqac:ui-update', () => {
 
@@ -1677,19 +1670,7 @@ scparser.$add('pses', function(a) {
     'use strict';
     if (!folderlink) {
         notify.notifyFromActionPacket(a).catch(dump);
-    }
-});
-
-// Payment card status
-scparser.$add('cce', () => {
-    'use strict';
-
-    // assuming that this AP will come only to PRO/Business accounts.
-    if (fminitialized && !folderlink) {
-
-        delay('cce-action-packet', () => {
-            M.updatePaymentCardState().catch(dump);
-        }, 2000);
+        M.showPlanExpiringBanner({ expiry: a.ts }).catch(dump);
     }
 });
 
@@ -1802,7 +1783,7 @@ scparser.$add('_sn', function(a) {
     if (d) {
         console.info(` --- New SN: ${a.sn}`);
     }
-    onIdle(() => setsn(a.sn));
+    setsn(a.sn);
 
     // rewrite accumulated RSA keys to AES to save CPU & bandwidth & space
     crypto_node_rsa2aes();
@@ -1820,8 +1801,6 @@ scparser.$add('_sn', function(a) {
 
 scparser.$add('_fm', function() {
     // completed initial processing, enable UI
-    crypto_fixmissingkeys(missingkeys);
-    delay('reqmissingkeys', crypto_reqmissingkeys, 4e3);
     loadfm_done();
 });
 
@@ -1831,7 +1810,7 @@ scparser.$add('ssc', process_businessAccountSubUsers_SC);
 // business account change which requires reload (such as payment against expired account)
 scparser.$add('ub', function() {
     "use strict";
-    if (!folderlink) {
+    if (!folderlink && !addressDialog.paymentInProcess) {
         fm_fullreload(null, 'ub-business').catch(dump);
     }
 });
@@ -1984,26 +1963,6 @@ scparser.$finalize = async() => {
         });
 
         scpubliclinksuiupd = false;
-    }
-
-    if (!pfid && $.len(sckeyrequest)) {
-        const keyof = (h) => crypto_keyok(M.d[h]);
-
-        if (d) {
-            console.debug('Supplying requested keys...', sckeyrequest);
-        }
-
-        // eslint-disable-next-line guard-for-in
-        for (const h in sckeyrequest) {
-            const n = sckeyrequest[h].filter(keyof);
-            const cr = crypto_makecr(n, [h], true);
-
-            if (cr[2].length) {
-                api_req({a: 'k', cr, i: requesti});
-            }
-        }
-
-        sckeyrequest = Object.create(null);
     }
 
     if (`chat/contacts/${scContactsSharesUIUpdate}` === M.currentdirid) {
@@ -2203,29 +2162,10 @@ async function fm_fullreload(light, logMsg) {
             localStorage.force = 1;
             delete sessionStorage.lightTreeReload;
         }
-
     }
-
-    if (window.loadingDialog) {
-        // 1141: 'Please be patient.'
-        loadingInitDialog.hide('force');
-        loadingDialog.show('full-reload', l[1141]);
-        loadingDialog.show = loadingDialog.hide = nop;
-    }
-
-    // stop further SC processing
-    window.execsc = nop;
-
-    // and error reporting, if any
-    window.onerror = null;
-
-    // nuke w/sc connection
-    getsc.stop(-1, 'full-reload');
-    window.getsc = nop;
-    getsc.stop = nop;
-    getsc.validate = nop;
 
     return Promise.allSettled([
+        mega.halt('full-reload'),
         fmdb && fmdb.invalidate(),
         logMsg && eventlog(99624, logMsg)
     ]).then(() => location.reload(true));
@@ -2389,6 +2329,7 @@ function tree_residue(data) {
     // request an "I am done" confirmation ({}) from all workers
     if (decWorkerPool.ok) {
         dumpsremaining = decWorkerPool.length;
+        decWorkerPool.expedite();
         decWorkerPool.signal({});
     }
     else {
@@ -2401,6 +2342,12 @@ function tree_residue(data) {
 function worker_procmsg(ev) {
     "use strict";
 
+    if (Array.isArray(ev.data) && ev.data.bulkpm) {
+        while (ev.data.length) {
+            worker_procmsg({ data: ev.data.shift() });
+        }
+        return;
+    }
     if (ev.data.scqi >= 0) {
         // enqueue processed actionpacket
         if (scq[ev.data.scqi]) scq[ev.data.scqi][0] = ev.data;
@@ -2454,7 +2401,7 @@ function worker_procmsg(ev) {
             // Additionally, in case we're under Infinity and incrementally loading nodes in the background,
             // don't emplace anything into memory otherwise crawling nodes back to root won't work properly.
             // @todo way to expunge nodes from memory, we've an overhead having to decrypt nodes out of FMDB next.
-            const inc = mega.infinity && !ufsc.cache;
+            const inc = mega.infinity && !ufsc.cache && ok;
 
             const emplace = !inc
                 && (mega.nobp || !ok || fminitialized || fmdb && fmdb.memoize || M.isInRoot(ev.data, true));
@@ -2572,7 +2519,7 @@ function loadfm(force) {
                 fetchfm(false).catch(tell);
             }
             else if (!u_k_aes) {
-                console.error('No master key found... please contact support@mega.nz');
+                console.error('No master key found... please contact support@mega.io');
             }
             else {
                 const f_table_schema = '&h, p, s, c, t, fa';
@@ -2601,11 +2548,15 @@ function loadfm(force) {
                     // channel 1: non-transactional (maintained by IndexedDBKVStorage)
                 }, {});
 
+                const ident = `get-tree(f:db)`;
                 if (d) {
-                    console.time(`get-tree(f:db)`);
+                    console.time(ident);
                 }
+                api.webLockSummary();
 
-                fmdb.init(localStorage.force)
+                // Initialize FMDB and/or retrieve account data ('f' cmd) behind a mutex,
+                // thus effectively preventing multiple tabs from concurrently doing so.
+                mutex.lock(ident).then((unlock) => fmdb.init(localStorage.force)
                     .catch(dump)
                     .then(fetchfm)
                     .catch((ex) => {
@@ -2615,9 +2566,10 @@ function loadfm(force) {
                     .finally(() => {
                         if (d) {
                             api.webLockSummary();
-                            console.timeEnd(`get-tree(f:db)`);
+                            console.timeEnd(ident);
                         }
-                    });
+                        unlock();
+                    }));
             }
         }
     }
@@ -2625,6 +2577,10 @@ function loadfm(force) {
 
 async function fetchfm(sn) {
     "use strict";
+
+    if (self.d > 0) {
+        console.log(`[${new Date().toISOString()}] begin fetchfm()...`, sn, pfid);
+    }
 
     // we always intially fetch historical actionpactions
     // before showing the filemanager
@@ -2859,9 +2815,13 @@ function dbfetchfm(residual) {
                         crypto_setsharekey(r[i].t, base64_to_a32(r[i].sk), true);
                     }
                 }
-                else {
+                // XXX: if we ever have writable folder-links outside the RootID, re-consider this...
+                else if (!mega.infinity || r[i].w) {
                     // this is an outbound share
                     promises.push(M.nodeShare(r[i].h, r[i], true));
+                }
+                else {
+                    M.setNodeShare(r[i], true);
                 }
             }
             loadReport('pn4');
@@ -2948,7 +2908,7 @@ shared.is = function(h) {
     'use strict';
 
     while (M.d[h]) {
-        if (M.ps[h] || M.d[h].shares) {
+        if (M.isOutShare(h)) {
             return h;
         }
         h = M.d[h].p;
@@ -3275,12 +3235,15 @@ function processOPC(a, ignoreDB) {
 }
 
 /**
- * processPH
- *
  * Process export link (public handle) action packet and 'f' tree response.
+ * (The set of eligible keys for ph during f is: {h, ph, ts, etd, down, w})
+ *
  * @param {Object} publicHandles The Public Handles action packet i.e. a: 'ph'.
+ * @param {Boolean} [tree] whether we're parsing the get-tree 'f' response
+ * @param {Boolean} [inf] whether we shall process in infinity/lite-mode.
+ * @returns {Promise<*>} settle
  */
-function processPH(publicHandles) {
+function processPH(publicHandles, tree, inf) {
     'use strict';
     const promises = [];
     var UiExportLink = fminitialized && !is_mobile && new mega.UI.Share.ExportLink();
@@ -3300,14 +3263,12 @@ function processPH(publicHandles) {
 
         // remove exported link, down: 1
         if (d) {
+            console.assert(!tree);
             promises.push(M.delNodeShare(h, 'EXP'));
 
             if (fminitialized && M.currentdirid === 'public-links') {
-                removeUInode(h, p);
 
-                if (typeof selectionManager !== 'undefined') {
-                    selectionManager.remove_from_selection(h);
-                }
+                removeUInode(h, p);
             }
 
             if (UiExportLink) {
@@ -3323,23 +3284,31 @@ function processPH(publicHandles) {
             share.u = 'EXP';
             share.r = 0;
 
-            promises.push(M.nodeShare(h, share));
+            if (inf && !share.w) {
+                console.assert(tree);
+                M.setNodeShare(share);
+            }
+            else {
+                promises.push(M.nodeShare(h, share));
+            }
 
             if (UiExportLink) {
                 UiExportLink.addExportLinkIcon(h);
             }
         }
 
-        if (is_mobile) {
-            mobile.cloud.updateLinkIcon(h);
-        }
+        if (fminitialized) {
+            if (is_mobile) {
+                mobile.cloud.updateLinkIcon(h);
+            }
 
-        if (UiExportLink && down !== undefined) {
-            UiExportLink.updateTakenDownItem(h, down);
-        }
+            if (UiExportLink && down !== undefined) {
+                UiExportLink.updateTakenDownItem(h, down);
+            }
 
-        if (fminitialized && M.recentsRender) {
-            M.recentsRender.nodeChanged(h);
+            if (M.recentsRender) {
+                M.recentsRender.nodeChanged(h);
+            }
         }
     }
 
@@ -3836,27 +3805,13 @@ function loadfm_callback(res) {
         // this is a legacy cached tree without an ok0 element
         process_ok(res.ok);
     }
-    /**
-    if (res.u) {
-        process_u(res.u);
-    }
-    if (res.opc) {
-        processOPC(res.opc);
-    }
-    /**/
+
     if (res.suba) {
         if (!is_mobile) {
             process_suba(res.suba);
         }
     }
-    /**
-    if (res.ipc) {
-        processIPC(res.ipc);
-    }
-    if (res.ps) {
-        processPS(res.ps);
-    }
-    /**/
+
     if (res.mcf) {
         // save the response to be processed later once chat files were loaded
         loadfm.chatmcf = res.mcf.c || res.mcf;
@@ -3950,13 +3905,18 @@ function loadfm_callback(res) {
                     console.info(`[f.s(${res.s.length})] %s`, res.s.map(n => `${n.h}*${n.u}`).sort());
                 }
                 for (let i = res.s.length; i--;) {
-                    pending.push(M.nodeShare(res.s[i].h, res.s[i]));
+                    if (mega.infinity) {
+                        M.setNodeShare(res.s[i]);
+                    }
+                    else {
+                        pending.push(M.nodeShare(res.s[i].h, res.s[i]));
+                    }
                 }
             }
 
             // Handle public/export links. Why here? Make sure that M.d already exists
             if (res.ph) {
-                pending.push(processPH(res.ph));
+                pending.push(processPH(res.ph, true, !!mega.infinity));
             }
 
             // This package is sent on hard refresh if owner have enabled or disabled PUF
@@ -4038,6 +3998,13 @@ function loadfm_done(mDBload) {
 
         // load/initialise the authentication system
         authring.initAuthenticationSystem();
+
+        tryCatch(() => {
+            // Initialise the Back to MEGA button (only shown if in MEGA Lite mode)
+            if (mega.lite.inLiteMode) {
+                mega.lite.initBackToMegaButton();
+            }
+        })();
     }
 
     // This function is invoked once the M.openFolder()'s promise (through renderfm()) is fulfilled.
@@ -4045,7 +4012,7 @@ function loadfm_done(mDBload) {
 
         window.loadingInitDialog.step3(100);
 
-        if ((location.host === 'mega.nz' || !megaChatIsDisabled) && !is_mobile) {
+        if ((is_livesite || !megaChatIsDisabled) && !is_mobile) {
 
             if (!pfid && !loadfm.chatloading && (u_type === 3 || is_eplusplus)) {
                 loadfm.chatloading = true;
@@ -4077,7 +4044,7 @@ function loadfm_done(mDBload) {
         }
 
         // Check Business (or Pro Flexi) account is expired on initial phase in desktop web
-        if (!is_mobile && u_attr && (u_attr.b || u_attr.pf)) {
+        if (!pfid && !is_mobile && u_attr && (u_attr.b || u_attr.pf)) {
 
             M.require('businessAcc_js', 'businessAccUI_js').done(() => {
 
@@ -4112,10 +4079,10 @@ function loadfm_done(mDBload) {
             fm_resize_handler(true);
 
             // Securing previously generated public album data to use later in the importing procedure
-            if (sessionStorage.albumLinkImport) {
+            if (localStorage.albumLinkImport) {
                 $.albumImport = Object.values(mega.gallery.albums.store)
-                    .find(({ p }) => !!p && p.ph === sessionStorage.albumLinkImport);
-                delete sessionStorage.albumLinkImport;
+                    .find(({p}) => !!p && p.ph === localStorage.albumLinkImport);
+                delete localStorage.albumLinkImport;
             }
         });
 

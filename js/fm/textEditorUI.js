@@ -284,11 +284,6 @@ mega.textEditorUI = new function TextEditorUI() {
                             $('.text-editor-file-name span', $editorContainer).text(fileName);
                         }
 
-                        if (M.currentrootid !== M.RubbishID) {
-                            mega.ui.searchbar.recentlyOpened.files.delete(fileHandle);
-                            mega.ui.searchbar.recentlyOpened.addFile(fh, true);
-                        }
-
                         if (cb && typeof cb === 'function') {
                             cb();
                         }
@@ -345,7 +340,7 @@ mega.textEditorUI = new function TextEditorUI() {
             function sendToContactMenuClick() {
                 selectionManager.clear_selection();
                 selectionManager.add_to_selection(versionHandle || fileHandle);
-                openCopyDialog('conversations');
+                openSendToChatDialog();
             }
         );
 
@@ -623,9 +618,6 @@ mega.textEditorUI = new function TextEditorUI() {
             fileName = fName;
             if (page !== 'download') {
                 eventlog(99807);
-                if (M.currentrootid !== M.RubbishID) {
-                    mega.ui.searchbar.recentlyOpened.addFile(handle, true);
-                }
             }
 
             const $getLink = $('.file-menu .get-link-f', $menuBar);

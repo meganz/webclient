@@ -20,6 +20,13 @@ lazy(mega, 'lite', () => {
     /** Timer to count how long the load is taking */
     let liteModeTimeoutId;
 
+    /** Disabled sections for MEGA Lite*/
+    const disabledSections = freeze({
+        faves: 1,
+        photos: 1,
+        recents: 1
+    });
+
     /**
      * Recommend MEGA Lite mode (if applicable). For the dialog to be shown, they must be a PRO user
      * AND they have over x nodes AND also their load time takes over x minutes
@@ -121,8 +128,25 @@ lazy(mega, 'lite', () => {
      * @returns {undefined}
      */
     function initBackToMegaButton(topbarSelector) {
+        assert(inLiteMode);
 
-        $('.js-back-to-mega-button', topbarSelector).rebind('click.backtomega', () => {
+        // @todo: Use mega.ui.secondaryNav.showBanner instead
+        const $banner = $('.fm-notification-block.mega-lite-mode', '.pm-main')
+            .addClass('visible');
+
+        if (mega.flags.inf > 1) {
+            return;
+        }
+
+        const {domNode} = new MegaLink({
+            prepend: true,
+            type: "normal",
+            text: l.back_to_mega,
+            componentClassname: "outline",
+            parentNode: document.querySelector(topbarSelector || '.top-block .nav-actions')
+        });
+
+        $(domNode).rebind('click.backtomega', () => {
 
             // Remove the local storage variable which triggers MEGA Lite mode to load
             delete localStorage.megaLiteMode;
@@ -131,6 +155,11 @@ lazy(mega, 'lite', () => {
             // Then reload the account back into regular MEGA
             loadingDialog.show();
             Promise.resolve(eventlog(99897)).finally(() => location.reload());
+        });
+
+        $('.end-box button', $banner).rebind('click.closeBanner', () => {
+            $banner.removeClass('visible');
+            $.tresizer();
         });
     }
 
@@ -147,7 +176,7 @@ lazy(mega, 'lite', () => {
                 const handle = selectedNodes[i];
 
                 // If type is folder, return true
-                if (M.d[handle].t === 1) {
+                if (M.getNodeByHandle(handle).t === 1) {
                     return true;
                 }
             }
@@ -162,6 +191,7 @@ lazy(mega, 'lite', () => {
         recommendLiteMode,
         initBackToMegaButton,
         containsFolderInSelection,
+        disabledSections,
         abort() {
             clearTimeout(liteModeTimeoutId);
         }

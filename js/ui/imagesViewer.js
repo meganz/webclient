@@ -757,6 +757,9 @@ var slideshowid;
                     slider: !(is_mobile && self.is_transferit) // only for mega desktop
                 });
             }
+            else if (!(is_mobile && self.is_transferit)) {
+                zoomPan.setSliderValue();
+            }
         }
 
         $img.css({
@@ -908,7 +911,7 @@ var slideshowid;
             video.pause();
         }
         $.noOpenChatFromPreview = true;
-        openCopyDialog('conversations');
+        openSendToChatDialog();
 
         mBroadcaster.sendMessage('trk:event', 'preview', 'send-chat');
     }
@@ -1050,10 +1053,6 @@ var slideshowid;
             // then pushing fake states of history/hash
             if (page !== 'download' && (!history.state || history.state.view !== id)) {
                 pushHistoryState();
-
-                if (n.p && !self.pfid && M.getNodeRoot(n.p) !== M.RubbishID && mega.ui.searchbar) {
-                    onIdle(() => mega.ui.searchbar.recentlyOpened.addFile(id, false));
-                }
             }
             _hideCounter = !d && hideCounter;
         }
@@ -1179,12 +1178,7 @@ var slideshowid;
                         closeDialog($.dialog);
                     }
                     else if ($.msgDialog) {
-                        closeMsg();
-
-                        if ($.warningCallback) {
-                            $.warningCallback(false);
-                            $.warningCallback = null;
-                        }
+                        closeMsg(false);
                     }
                     else if (slideshowplay) {
                         slideshow_imgControls(1);
@@ -2042,6 +2036,9 @@ var slideshowid;
                 }
             }
 
+            if (!newPdfIframe.contentWindow) {
+                throw EINCOMPLETE;
+            }
             var doc = newPdfIframe.contentWindow.document;
             doc.open();
             doc.write(myPage);
@@ -2091,7 +2088,9 @@ var slideshowid;
                     p.appendChild(newIframe);
                 }
             }
-
+            if (!newIframe.contentWindow) {
+                throw EINCOMPLETE;
+            }
             const doc = newIframe.contentWindow.document;
             // eslint-disable-next-line local-rules/open
             doc.open();
@@ -2455,6 +2454,7 @@ var slideshowid;
      * @global
      */
     global.slideshow = slideshow;
+    global.slideshow.prepareAndViewPdfViewer = prepareAndViewPdfViewer;
     global.slideshow_next = slideshow_next;
     global.slideshow_prev = slideshow_prev;
     global.slideshow_handle = slideshow_handle;

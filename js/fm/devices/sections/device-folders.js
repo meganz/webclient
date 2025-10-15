@@ -79,6 +79,12 @@ lazy(mega.devices.sections, 'deviceFolders', () => {
                 return {err: true, id: rootId};
             }
 
+            const chip = document.querySelector('.fm-filter-chip-type');
+            if (!selectionManager || !selectionManager.selected_list.length) {
+                mega.ui.mNodeFilter.resetFilterSelections(
+                    M.previousdirid === M.currentdirid && !(chip && !chip.classList.contains('hidden'))
+                );
+            }
             ui.$gridWrapper.removeClass('hidden');
             this.$grid.removeClass('hidden');
             this._renderHeader(device);
@@ -88,10 +94,21 @@ lazy(mega.devices.sections, 'deviceFolders', () => {
         /**
          * Update the Node properties passed for UI renderisation
          * @param {Object} props - node renderisation properties
-         * @param {DeviceCentreFolder} folder - folder to render
+         * @param {DeviceCentreFolder|MegaNode} folder - folder to render
          * @returns {void}
          */
+
         updateProps(props, folder) {
+            if (!folder) {
+                return;
+            }
+
+            if (!folder.isDeviceFolder && M.dcd[M.currentCustomView.nodeID]) {
+                folder = M.dcd[M.currentCustomView.nodeID].folders[folder.h];
+                if (!folder) {
+                    return;
+                }
+            }
             props.time = time2date(folder.ts);
             props.icon = folder.icon;
             props.type = folder.typeText;
@@ -112,6 +129,7 @@ lazy(mega.devices.sections, 'deviceFolders', () => {
         updateTemplate(aNode, aProperties, aTemplate) {
             const elIcon = aTemplate.querySelector('.device-centre-item-icon');
             const elName = aTemplate.querySelector('.device-centre-item-name');
+            const elLabel = aTemplate.querySelector('.label');
             const elInfo = aTemplate.querySelector('.device-centre-item-info');
             const elType = aTemplate.querySelector('.device-centre-item-type');
             const elSize = aTemplate.querySelector('.device-centre-item-size');
@@ -122,9 +140,10 @@ lazy(mega.devices.sections, 'deviceFolders', () => {
                 aTemplate.classList.add('is-sensitive');
             }
 
-            if (elIcon && elName && elInfo && elType && elSize && elAdded && elModified) {
+            if (elIcon && elName && elLabel && elInfo && elType && elSize && elAdded && elModified) {
                 elIcon.classList.add(`icon-${aProperties.icon}-90`);
                 elName.textContent = aProperties.name || l[164];
+                elLabel.textContent = aProperties.labelC || '';
 
                 StatusUI.get(aProperties.status)({
                     status: aProperties.status,
@@ -145,34 +164,21 @@ lazy(mega.devices.sections, 'deviceFolders', () => {
          * @returns {void}
          */
         _renderHeader(device) {
+            mega.ui.secondaryNav.updateInfoChipsAndViews();
             mega.ui.secondaryNav.showCard(
                 device.h,
                 {
                     text: l.add_backup_button,
+                    icon: 'sprite-fm-mono icon-database-plus-thin-outline',
                     onClick: () => {
                         ui.desktopApp.backup.add(500751);
                     }
                 },
                 {
                     text: l.add_syncs_button,
+                    icon: 'sprite-fm-mono icon-sync-thin-outline',
                     onClick: () => {
                         ui.desktopApp.sync.add(500752);
-                    }
-                },
-                (ev) => {
-                    ev.preventDefault();
-                    const path = M.currentdirid.split('/');
-                    if (path.length > 1) {
-                        $.hideContextMenu();
-
-                        selectionManager.resetTo(path.pop());
-
-                        ev.originalEvent.delegateTarget = ev.currentTarget.domNode;
-                        ui.contextMenu(ev.originalEvent);
-
-                        delay('deviceFolders:hide:selectionBar', () => {
-                            selectionManager.hideSelectionBar();
-                        }, 80);
                     }
                 }
             );
@@ -221,12 +227,20 @@ lazy(mega.devices.sections, 'deviceFolders', () => {
                 M.viewmode = 0;
             }
 
-            M.v = Object.values(device.folders).filter(n => mega.sensitives.shouldShowNode(n.h));
+            M.v = Object.values(device.folders).filter(n => {
+                if (M.currentLabelFilter && !M.filterByLabel(n)) {
+                    return false;
+                }
+                if (mega.ui.mNodeFilter.selectedFilters.value && !mega.ui.mNodeFilter.match(n)) {
+                    return false;
+                }
+                return mega.sensitives.shouldShowNode(n.h);
+            });
 
             if (M.v.length) {
                 this.$empty.addClass('hidden');
             }
-            else {
+            else if (!mega.ui.mNodeFilter.selectedFilters.value) {
                 this.$empty.removeClass('hidden');
             }
 

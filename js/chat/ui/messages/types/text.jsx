@@ -12,6 +12,13 @@ import { PerfectScrollbar } from '../../../../ui/perfectScrollbar.jsx';
 
 export default class Text extends AbstractGenericMessage {
 
+    constructor(props) {
+        super(props);
+        this.state = {
+            editText: ''
+        };
+    }
+
     isRichPreview(message) {
         return message.metaType === Message.MESSAGE_META_TYPE.RICH_PREVIEW;
     }
@@ -271,6 +278,7 @@ export default class Text extends AbstractGenericMessage {
                 <TypingArea
                     iconClass="small-icon writing-pen textarea-icon"
                     initialText={msgContents}
+                    text={this.state.editText || msgContents}
                     chatRoom={chatRoom}
                     showButtons={true}
                     editing={true}
@@ -291,6 +299,9 @@ export default class Text extends AbstractGenericMessage {
                         return true;
                     }}
                     onResized={this.props.onResized ? this.props.onResized : false}
+                    onValueChanged={val => {
+                        this.setState({editText: val});
+                    }}
                 />
             );
         }

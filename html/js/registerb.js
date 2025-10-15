@@ -677,6 +677,7 @@ BusinessRegister.prototype.doRegister = function(nbusers, cname, fname, lname, t
                 }
                 else {
                     msgDialog('warninga', l[1578], l[19508], res < 0 ? api_strerror(res) : res, () => {
+                        parsepage(pages.registerb);
                         loadingDialog.hide();
                         mySelf.initPage(nbusers, cname, tel, fname, lname, email);
                     });
@@ -746,6 +747,8 @@ BusinessRegister.prototype.processPayment = function(payDetails, businessPlan) {
             const isStrip = businessPlan.usedGatewayId ?
                 (businessPlan.usedGatewayId | 0) === addressDialog.gatewayId_stripe : false;
 
+            // if u_attr.pf, then it is pro flexi repay
+            addressDialog.businessPurchase = u_attr && !u_attr.pf;
             addressDialog.processUtcResult(result, isStrip, saleId);
         };
 

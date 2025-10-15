@@ -6,7 +6,7 @@
     height: 100% !important;
     opacity: 1;
     pointer-events: all;
-    width: 256px;
+    width: 286px;
     max-width: 400px;
 }
 .rtl .mega-top-menu {
@@ -54,6 +54,9 @@
 .mega-top-menu .menu .ps__rail-y {
     right: 12px;
 }
+.rtl .mega-top-menu .menu .ps__rail-y {
+    right: 0;
+}
 .mega-top-menu:not(.drive):not(.root-folder) .menu > .nav-elem:not(.drive):not(.root-folder):last-of-type {
     margin-top: auto;
 }
@@ -71,7 +74,12 @@
     text-align: start;
 }
 .mega-top-menu .menu .spacer {
-    padding: 12px;
+    flex-basis: 12px;
+    flex-shrink: 1;
+    min-height: 6px;
+}
+.mega-top-menu .menu.ps--active-y .spacer {
+    min-height: 12px;
 }
 .mega-top-menu nav.menu button.tree-expander.icon-only {
     padding: 0;
@@ -118,8 +126,8 @@
     padding-inline-end: 0;
     width: auto;
 }
-.mega-top-menu .menu .nav-elem.full-width::after,
-.mega-top-menu .menu .nav-elem.full-width .right-badge::before,
+.mega-top-menu .menu.ps--active-x .nav-elem.full-width::after,
+.mega-top-menu .menu.ps--active-x .nav-elem.full-width .right-badge::before,
 .mega-top-menu .nw-fm-tree-item .nw-fm-tree-iconwrap {
     background: var(--surface-tree-iconwrap);
     content: '';
@@ -178,7 +186,7 @@
     right: 16px;
     z-index: 1;
 }
-.mega-top-menu .menu .nav-elem.full-width .right-badge::before {
+.mega-top-menu .menu.ps--active-x .nav-elem.full-width .right-badge::before {
     padding-inline-start: 24px;
     position: absolute;
     right: 100%;
@@ -191,4 +199,91 @@
 .rtl .mega-top-menu .menu .nav-elem.full-width .right-badge::before {
     left: 100%;
     right: auto;
+}
+
+.mega-top-menu .top-nav .small-menu-btn {
+    background: transparent;
+    color: var(--mobile-icon-primary);
+}
+.mega-top-menu .top-nav .small-menu-btn:active,
+.mega-top-menu .top-nav .small-menu-btn:hover {
+    background: var(--mobile-button-disabled);
+}
+.mega-top-menu.small-resize-pane .top-nav .home .text-box-wrapper,
+.mega-top-menu.small-resize-pane .menu .content-panel.active,
+.mega-top-menu.small-resize-pane nav.menu button.tree-expander.icon-only,
+.mega-top-menu.small-resize-pane .menu .menu-item .text-box-wrapper,
+.mega-top-menu.small-resize-pane .menu .ps__rail-x,
+.mega-top-menu.small-resize-pane .storage-block .storage-usage-panel .title-block,
+.mega-top-menu.small-resize-pane .storage-block .storage-usage-panel .storage-graph,
+.mega-top-menu.small-resize-pane .storage-block .storage-usage-panel .loader,
+.mega-top-menu.small-resize-pane .storage-block .storage-usage-panel .info a.upgrade .text-box-wrapper,
+.mega-top-menu.small-resize-pane .storage-block .lp-storage-information-popup,
+.mega-top-menu.small-resize-pane .storage-block .storage-usage-panel .achieve-link {
+    display: none;
+}
+.mega-top-menu.small-resize-pane .top-nav {
+    flex-direction: column;
+    flex-wrap: wrap;
+    padding: 24px 0;
+}
+.mega-top-menu.small-resize-pane .top-nav::after {
+    content: '';
+    background: rgba(217, 217, 217, 1);
+    height: 1px;
+    margin-inline: auto;
+    position: relative;
+    bottom: -12px;
+    width: 40px;
+}
+.mega-top-menu.small-resize-pane .top-nav .home {
+    width: 100%;
+}
+.mega-top-menu.small-resize-pane .top-nav .home i {
+    margin: 0;
+}
+.mega-top-menu.small-resize-pane .top-nav .small-menu-btn {
+    margin-inline: auto;
+}
+.mega-top-menu.small-resize-pane .menu .menu-item {
+    justify-content: center;
+    padding: 16px 0;
+}
+.mega-top-menu.small-resize-pane .menu .menu-item i {
+    margin-inline-end: 4px;
+}
+.mega-top-menu.small-resize-pane .storage-block .storage-usage-panel .info {
+    margin-inline: auto;
+}
+.mega-top-menu.small-resize-pane .storage-block .storage-usage-panel .info::before {
+    content: '';
+    display: block;
+    background: rgba(217, 217, 217, 1);
+    height: 1px;
+    margin-inline: auto;
+    position: relative;
+    top: -16px;
+    width: 40px;
+}
+.mega-top-menu.small-resize-pane .storage-block .storage-usage-panel .info a.upgrade {
+    height: 40px;
+    padding: 0;
+    width: 40px;
+}
+.mega-top-menu.small-resize-pane .storage-block .storage-usage-panel .info a.upgrade i {
+    display: block;
+}
+.dark-direct-tooltip.simpletip-tooltip.small-sidebar-tip,
+.dark-direct-tooltip.simpletip-tooltip.small-sidebar-tip .tooltip-arrow,
+.dark-direct-tooltip.simpletip-tooltip.small-sidebar-tip-vis .tooltip-arrow {
+    display: none;
+}
+.small-lhp .dark-direct-tooltip.simpletip-tooltip.small-sidebar-tip,
+.dark-direct-tooltip.simpletip-tooltip.small-sidebar-tip-vis {
+    display: block;
+    background: var(--mobile-background-inverse);
+    color: var(--mobile-text-inverse);
+    font: var(--mobile-font-caption-large-regular);
+    padding: 12px;
+    line-height: 14px;
 }

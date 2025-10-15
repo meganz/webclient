@@ -10,6 +10,7 @@ lazy(mega, 'keyMgr', () => {
     });
     const logger = MegaLogger.getLogger('KeyMgr');
     const dump = logger.warn.bind(logger, 'Caught Promise Rejection');
+    const deepShareScan = tryCatch(() => !!localStorage.deepss)() || mega.flags.dss === 7;
 
     const pkPull = {
         lock: null,
@@ -18,10 +19,10 @@ lazy(mega, 'keyMgr', () => {
     };
     let sNodeUsers = Object.create(null);
 
-    const decryptShareKeys = async(h) => {
+    const decryptShareKeys = async(h, mem) => {
         let n;
         const debug = d > 0 && [];
-        const nodes = await M.getNodes(h, true);
+        const nodes = !deepShareScan || mem ? M.getNodesSync(h, true) : await M.getNodes(h, true);
 
         for (let i = nodes.length; i--;) {
             n = M.getNodeByHandle(nodes[i]);
@@ -1175,9 +1176,10 @@ lazy(mega, 'keyMgr', () => {
 
         // try decrypting inshares based on the current key situation
         async decryptInShares(pz) {
+            const lite = u_attr.s4 || mega.infinity || this.didLoadFromAPI || !deepShareScan;
 
-            if (pz !== -0xFEED && u_attr.s4) {
-                // Let's make S4 users life easier,
+            if (pz !== -0xFEED && lite || !(self.fmdb && !fmdb.crashed)) {
+                // Let's make S4/Lite users life easier...
                 // only do this whenever actually entering into the in-shares section,
                 // not on the background right after entering the site.
                 // @todo 'this.gotHereFromAFolderLink' (?)..
@@ -1187,13 +1189,13 @@ lazy(mega, 'keyMgr', () => {
             if (!pkPull.dsLock) {
                 pkPull.dsLock = mega.promise;
 
-                let shares = (u_attr.s4 || mega.infinity) && array.unique((await fmdb.get('s')).map(n => n.t || n.h));
+                let shares = lite && Object.keys(M.c.shares || {});
 
                 onIdle(() => {
                     const {resolve} = pkPull.dsLock;
 
                     const promises = [];
-                    if (!shares.length) {
+                    if (!shares) {
                         shares = Object.keys(u_sharekeys);
                     }
 
@@ -1203,7 +1205,7 @@ lazy(mega, 'keyMgr', () => {
 
                     for (let i = shares.length; i--;) {
 
-                        promises.push(decryptShareKeys(shares[i]));
+                        promises.push(decryptShareKeys(shares[i], pz === -0xFEED || this.didLoadFromAPI));
                     }
 
                     Promise.allSettled(promises)
@@ -1477,18 +1479,25 @@ lazy(mega, 'keyMgr', () => {
         // creates a sharekey for a node and sends the subtree's shareufskeys to the API
         // FIXME: (this must be called right before opening the share dialog
         //         to prevent the API from clandestinely adding nodes later)
-        async createShare(node, fromsetsharekey) {
-            let sharekey;
+        async createShare(node, fromsetsharekey, sharekey) {
 
             if (u_sharekeys[node]) {
+                assert(!sharekey, 'share-key clash');
                 sharekey = u_sharekeys[node][0];
             }
             else {
-                sharekey = [...crypto.getRandomValues(new Int32Array(4))];
+                // if 'sharekey' is provided, it comes from s4p invocation, and we treat it as trusted...
+                if (sharekey) {
+                    const {s4 = false} = M.getNodeByHandle(node);
+                    assert(s4.s4ses, 'invalid invocation');
 
-                if (this.secure) {
-                    this.trustedsharekeys[node] = true;
+                    const valid = Array.isArray(sharekey) && sharekey.length === 4 && Math.max(...sharekey) >>> 0;
+                    assert(valid, 'invalid share-key');
                 }
+                if (this.secure) {
+                    this.trustedsharekeys[node] = sharekey ? 3 : 1;
+                }
+                sharekey = sharekey || [...crypto.getRandomValues(new Int32Array(4))];
             }
 
             // take a snapshot of the current tree under node
@@ -1627,7 +1636,7 @@ lazy(mega, 'keyMgr', () => {
 
             // snapshot exists?
             if (!this.sharechildren[node]) {
-                this.createShare(node).catch(dump);
+                this.createShare(node).catch(reportError);
                 this.sharechildren[node] = await M.getNodes(node, true);
             }
         }
@@ -1918,7 +1927,7 @@ lazy(mega, 'keyMgr', () => {
             while (n && n.p) {
                 if (u_sharekeys[n.h]) {
 
-                    if (all || n.su || n.shares || M.ps[n.h]) {
+                    if (all || n.su || M.isOutShare(n)) {
 
                         sh.push(n.h);
                     }

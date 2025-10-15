@@ -53,7 +53,7 @@ class MegaToggleButton extends MegaComponent {
         if (isProUserOption && !Object(u_attr).p) {
             this.proLabel = subNode = document.createElement('a');
             subNode.className = 'pro-label';
-            subNode.href = 'https://mega.nz/pro';
+            subNode.href = `https://mega.${mega.tld}/pro`;
             subNode.target = '_blank';
             subNode.textContent = l.mobile_pro_only_toggle;
             targetNode.appendChild(subNode);

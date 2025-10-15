@@ -10,7 +10,9 @@
     transition: transform 0.2s ease-out;
     max-height: calc(100% - 16px);
 }
-
+.rtl .mega-sheet .sheet {
+    direction: rtl;
+}
 .mobile .mega-sheet .sheet {
     padding-bottom: 16px;
     background: var(--mobile-surface-1);
@@ -26,6 +28,9 @@
     padding: 0 40px;
     width: 100%;
     box-sizing: border-box;
+}
+.mega-sheet .sheet .header:empty {
+    display: none;
 }
 
 body.mobile .mega-sheet .sheet .header,
@@ -61,9 +66,14 @@ body.mobile .mega-sheet.normal .sheet .main {
     text-align: center;
 }
 
-.mega-sheet.modal-dialog-left.main {
+.mega-sheet.modal-dialog .main > .image {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.mega-sheet.modal-dialog-left .main {
     align-items: flex-start;
-    text-align: left;
+    text-align: start;
 }
 
 .mega-sheet i.icon {
@@ -97,7 +107,6 @@ body.mobile .mega-sheet.normal .sheet .main {
 .mega-sheet .actions .button span {
     font-weight: var(--mobile-font-weight-semibold);
 }
-
 
 .mega-sheet .image:empty,
 .mega-sheet .header-title:empty
@@ -140,6 +149,11 @@ body.web-desktop .mega-sheet .sheet.ps {
     margin: auto;
 }
 
+body.web-desktop .mega-sheet .sheet .title a,
+body.web-desktop .mega-sheet .sheet .content a {
+    color: var(--mobile-link-primary);
+}
+
 body.web-desktop .mega-sheet .overlay-footer {
     margin-top: 24px;
     border-radius: 0 0 var(--mobile-border-radius-large) var(--mobile-border-radius-large);
@@ -159,4 +173,19 @@ body.web-desktop .mega-sheet.discard-dialog .sheet,
 body.web-desktop.pwm-ui .mega-sheet.normal.with-footer .sheet,
 body.web-desktop .mega-sheet.promo-dialog .sheet {
     max-width: 640px;
+}
+body.web-desktop .mega-sheet.overlay-wrap .title h1,
+body.web-desktop .mega-sheet.overlay-wrap .title h2 {
+    overflow-wrap: anywhere;
+    word-break: normal;
+}
+
+body.mobile .mega-sheet .sheet .content .qrcode {
+    padding: 16px;
+    background-color: rgb(255, 255, 255, 1);
+    border-radius: 8px;
+    align-self: center;
+}
+body.mobile .mega-sheet .sheet .content .qrcode canvas {
+    display: block;
 }

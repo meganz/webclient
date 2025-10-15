@@ -247,6 +247,7 @@ html .theme-light-forced {
         --text-color-warning: rgba(255, 153, 36, 1);
         --text-color-error: rgba(253, 62, 56, 1);
         --text-color-medium-sensitive: var(--text-color-black-medium-sensitive);
+        --text-color-highlight: rgb(0 191 165 / 0.3);
 
     /* button */
 
@@ -372,6 +373,7 @@ html .theme-light-forced {
     /* Badges */
         --badge-fill: linear-gradient(180deg, rgba(250, 250, 250, 1) 0%, rgba(242, 242, 242, 1) 100%);
         --badge-border: rgba(255, 255, 255, 1);
+        --badge-search-outline: rgb(0  191 165 / 0.2);
 
     /* Chips */
     --chips-fill: rgb(245 245 245);
@@ -628,6 +630,7 @@ html .theme-dark-forced {
     /* Badges */
         --badge-fill: linear-gradient(180deg, rgba(159, 159, 159, 1) 0%, rgba(102, 102, 102, 1) 100%);
         --badge-border: rgba(51, 51, 51, 1);
+        --badge-search-outline: rgb(0  191 165 / 0.2);
 
     /* Chips */
         --chips-fill: rgb(84 84 84);

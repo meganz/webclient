@@ -66,6 +66,7 @@ lazy(mega, 'rewind', () => {
             this.lastRewindableMonth = null;
             this.lastRewindableYear = null;
             this.folderRedirect = null;
+            this.enabled = false;
 
             // Now adding 'public-links', 'out-shares' to the following object will work as expected
             this.permittedRoots = freeze({
@@ -111,8 +112,142 @@ lazy(mega, 'rewind', () => {
                 }
             };
 
+            const rewindSettings = () => {
+                const user = {
+                    isPro: u_attr.p,
+                    isLegacy: mega.flags.lrw,
+                    get isLowPro() {
+                        return u_attr.p === pro.ACCOUNT_LEVEL_STARTER ||
+                            u_attr.p === pro.ACCOUNT_LEVEL_BASIC ||
+                            u_attr.p === pro.ACCOUNT_LEVEL_ESSENTIAL ||
+                            u_attr.p === pro.ACCOUNT_LEVEL_PRO_LITE;
+                    },
+                };
+
+                const gracePeriod = {
+                    start: 1759449600000, // Fri Oct 03 2025 00:00:00 GMT+0000
+                    get end() {
+                        return this.start + 30 * 24 * 60 * 60 * 1000;
+                    },
+                    get isActive() {
+                        const now = Date.now();
+                        return now >= this.start && now < this.end;
+                    }
+                };
+
+                const retentionDays = {
+                    _attr: 'rewinddays',
+                    default: '30',
+                    get max() {
+                        if (user.isPro) {
+                            if (user.isLegacy) {
+                                return user.isLowPro ? '90' : '180';
+                            }
+                            return '60';
+                        }
+                        return '30';
+                    },
+                    isValid(val) {
+                        const config = user.isLegacy ?
+                            user.isLowPro ?
+                                {'0': 1, '30': 1, '60': 1, '90': 1} :
+                                {'0': 1, '30': 1, '60': 1, '90': 1, '180': 1} :
+                            {'0': 1, '30': 1, '60': 1};
+
+                        return config[val];
+                    },
+                    async fetch() {
+                        const val = Object.values(
+                            await Promise.resolve(mega.attr.get(u_handle, this._attr, -1, false))
+                                .catch(() => [])).join('');
+                        const bVal = base64urldecode(val);
+                        return this.isValid(bVal) ? bVal : false;
+                    },
+                    async save(val) {
+                        if (this.isValid(val)) {
+                            val = String(val);
+                            mega.attr.set(this._attr, base64urlencode(val), -1, false);
+                            mega.rewind.enabled = val !== '0';
+                            return true;
+                        }
+                        return false;
+                    }
+                };
+
+                const reductionBanner = {
+                    config: {
+                        main: {
+                            id: 'dsmRewRed1',
+                            event: {
+                                _isSent: false,
+                                loaded: () => {
+                                    if (!this._isSent) {
+                                        eventlog(500981);
+                                        this._isSent = true;
+                                    }
+                                },
+                                dismissed: 500983
+                            }
+                        },
+                        inline: {
+                            id: 'dsmRewRed2',
+                            event: {
+                                loaded: 500982,
+                                dismissed: 500984
+                            }
+                        }
+                    },
+                    async init($notif, configName) {
+                        if (user.isPro && user.isLegacy && gracePeriod.isActive) {
+                            if (await retentionDays.fetch()) {
+                                $notif.removeClass('visible');
+                                return;
+                            }
+
+                            const {id: configId, event} = this.config[configName] || {};
+
+                            if (configId && !mega.config.get(configId)) {
+                                $('.message-text',$notif).safeHTML(
+                                    l.bf_rewind_rd_notif_msg
+                                        .replace('%1', 30)
+                                        .replace('%d', time2date(gracePeriod.end / 1000, 2)));
+
+                                $notif.addClass('visible');
+
+                                if (typeof event.loaded === 'function') {
+                                    event.loaded();
+                                }
+                                else {
+                                    eventlog(event.loaded);
+                                }
+
+                                $('button', $notif).rebind('click.bfrRwRetBanner.close', () => {
+                                    mega.config.set(configId, 1);
+                                    $notif.removeClass('visible');
+                                    eventlog(event.dismissed);
+                                });
+                            }
+                        }
+                    }
+                };
+
+                return {
+                    user,
+                    gracePeriod,
+                    retentionDays,
+                    reductionBanner
+                };
+            };
+
+            lazy(this, 'settings', () => rewindSettings());
+
             mBroadcaster.addListener('rewind:accountUpgraded', () => openSidebarListener(true));
             mBroadcaster.addListener('mega:openfolder', () => openSidebarListener());
+        }
+
+        async init() {
+            this.enabled = await this.settings.retentionDays.fetch() !== '0';
+            onIdle(fmtopUI);
         }
 
         async removeNodeListener() {
@@ -166,6 +301,8 @@ lazy(mega, 'rewind', () => {
             });
 
             await mega.rewindUi.sidebar.init(listContainer, selectedHandle, isOpenFolder || isAccUpgraded);
+            await this.settings.reductionBanner.init(
+                $('.reduction-notification', mega.rewindUi.sidebar.sidebar), 'inline');
 
             onIdle(clickURLs);
             logger.info('Rewind.openSidebar - Sidebar opened..');
@@ -198,7 +335,7 @@ lazy(mega, 'rewind', () => {
 
         isAccountProType() {
             this.accountType = this.accountType || this.getAccountType();
-            return this.accountType !== ACCOUNT_TYPE_PRO_LITE && this.accountType !== ACCOUNT_TYPE_FREE;
+            return this.accountType !== ACCOUNT_TYPE_FREE;
         }
 
         async loadTreeCacheList() {
@@ -387,55 +524,13 @@ lazy(mega, 'rewind', () => {
             return currentDate;
         }
 
-        getRewindDescriptionData() {
-            let hasUpgrade = true;
-            const title = l.rewind_upg_header;
-            let description = l.rewind_select_date_free;
-
-            switch (this.accountType) {
-                case ACCOUNT_TYPE_PRO_LITE:
-                    // description = l.rewind_upg_content_pro_lite;
-                    description = l.rewind_select_date_pro_lite;
-                    break;
-                case ACCOUNT_TYPE_PRO:
-                case ACCOUNT_TYPE_PRO_FLEXI:
-                case ACCOUNT_TYPE_BUSINESS:
-                    description = l.rewind_select_date_pro;
-                    hasUpgrade = false;
-                    break;
-            }
-
-            return {
-                hasUpgrade,
-                title,
-                description
-            };
-        }
-
         getUpgradeSectionData() {
-            let upgradeInfoText = l.rewind_upgrade_info_text;
-            switch (this.accountType) {
-                case ACCOUNT_TYPE_PRO:
-                case ACCOUNT_TYPE_PRO_FLEXI:
-                case ACCOUNT_TYPE_BUSINESS:
-                    upgradeInfoText = false;
-                    break;
-            }
-            return upgradeInfoText;
+            return this.accountType === ACCOUNT_TYPE_FREE ? l.rewind_upgrade_info_text : null;
         }
 
-        getDatepickerOverlayContent(type) {
-            let description = null;
-            switch (this.accountType) {
-                case ACCOUNT_TYPE_FREE:
-                    description = l.rewind_datepicker_overlay_free_days;
-                    break;
-                case ACCOUNT_TYPE_PRO_LITE:
-                    description = l.rewind_datepicker_overlay_pro_lite_days;
-                    break;
-            }
-
-            return description;
+        getDatepickerOverlayContent() {
+            return this.accountType === ACCOUNT_TYPE_FREE ?
+                l.rewind_datepicker_overlay_free_days : null;
         }
 
         sortTreeCacheList() {
@@ -761,6 +856,8 @@ lazy(mega, 'rewind', () => {
                 const promiseSet = new Set();
                 let batchPromise = null;
 
+                logger.info(`Rewind.loadActionPacket - Processing ${packets.length} packets`);
+                console.time('rewind:index:getRecords:packet:process');
                 for (let i = 0; i < packets.length; i++) {
                     const packet = packets[i];
                     if (!packet) {
@@ -815,6 +912,7 @@ lazy(mega, 'rewind', () => {
 
                     order++;
                 }
+                console.timeEnd('rewind:index:getRecords:packet:process');
 
                 if ((sn && lastSn && lastSn !== sn) || (sn && !lastSn) || !treeCacheState.lastSn) {
                     // We fill in necessary details for
@@ -853,14 +951,18 @@ lazy(mega, 'rewind', () => {
         handleUpdatePacket(
             dateData, actionPacket, actionPacketFiles, actionDateString, actionPacketTimestamp
         ) {
-            const nodes = actionPacketFiles.map((file) => {
-                const node = this.nodeDictionary[file.h];
-                if (node) {
-                    file.p = node.p;
-                    file.t = node.t;
+            const nodes = [];
+            for (let i = 0; i < actionPacketFiles.length; i++) {
+                const node = actionPacketFiles[i];
+                const nodeInDict = this.nodeDictionary[node.h];
+                if (nodeInDict) {
+                    node.p = nodeInDict.p;
+                    node.t = nodeInDict.t;
                 }
-                return file;
-            }).filter((file) => file.t !== undefined);
+                if (node.t !== undefined) {
+                    nodes.push(node);
+                }
+            }
 
             dateData[actionDateString].actions.push({
                 d: {
@@ -872,7 +974,8 @@ lazy(mega, 'rewind', () => {
 
             for (let i = 0; i < nodes.length; i++) {
                 const node = nodes[i];
-                this.prepareNode(node, dateData[actionDateString].modified, false, true);
+                this.prepareNode({...node, ts: actionPacketTimestamp},
+                                 dateData[actionDateString].modified, false, true);
                 dateData[actionDateString].type[node.h] = TYPE_MODIFIED;
 
                 // Cleanup previous records (might be at top of hierarchy)
@@ -908,8 +1011,9 @@ lazy(mega, 'rewind', () => {
                     this.prepareNode(node, this.nodeDictionary, this.nodeChildrenDictionary);
                 }
 
-                if (node.fv || actionPacketFiles.length > 1) {
-                    this.prepareNode(node, dateData[actionDateString].modified, false, true);
+                if (node.fv) {
+                    this.prepareNode({...node, ts: actionPacketTimestamp},
+                                     dateData[actionDateString].modified, false, true);
                     dateData[actionDateString].type[node.h] = TYPE_MODIFIED;
 
                     // Cleanup previous records (might be at top of hierarchy)
@@ -1076,8 +1180,12 @@ lazy(mega, 'rewind', () => {
 
             for (let i = 0; i < sortedNodes.length; i++) {
                 const node = mega.rewind.nodeDictionary[sortedNodes[i]];
+
                 if (node) {
-                    if (!timestampInSeconds || node.ts <= timestampInSeconds) {
+                    if (
+                        (!timestampInSeconds || node.ts <= timestampInSeconds)
+                        && (!node.sen || mega.sensitives.showGlobally)
+                    ) {
                         if (node.t && this.isTreeOpen(node.h)) {
                             const result = this.getChildNodes({
                                 selectedHandle: node.h,
@@ -1334,10 +1442,10 @@ lazy(mega, 'rewind', () => {
                             emptyFolderName = '.fm-empty-folder';
                             break;
                         }
-                        emptyFolderName = '.fm-empty-cloud';
+                        emptyFolderName = '.empty-state';
                         break;
                     default:
-                        emptyFolderName = '.fm-empty-folder';
+                        emptyFolderName = '.empty-state';
                         break;
                 }
 

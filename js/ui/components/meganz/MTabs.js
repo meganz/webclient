@@ -22,6 +22,10 @@ class MTabs extends MComponent {
         }
     }
 
+    get activeTab() {
+        return this._activeTab;
+    }
+
     /**
      * @param {Object[]} tabs Array of Tab objects to work with
      * @param {String} tabs[].label - Label of the option

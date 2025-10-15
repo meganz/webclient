@@ -43,6 +43,10 @@ class MegaSheet extends MegaOverlay {
                     : document.body.offsetHeight / 4;
             });
         }
+
+        // Aria updates
+        this.domNode.ariaModal = "true";
+        this.domNode.role = "dialog";
     }
 
     set type(key) {
@@ -175,7 +179,7 @@ class MegaSheet extends MegaOverlay {
 
         if (typeof subNode === 'string') {
             subNode = document.createElement('h2');
-            subNode.textContent = title;
+            subNode.append(parseHTML(title));
 
             if (className) {
                 subNode.className = className;
@@ -203,6 +207,27 @@ mega.ui.sheet = new MegaSheet({
     componentClassname: 'mega-sheet',
     wrapperClassname: 'sheet'
 });
+
+MegaSheet.getRectFromParent = (parent, target) => {
+
+    'use strict';
+
+    if (!parent || !target) {
+        return false;
+    }
+
+    const parentRect = parent.getBoundingClientRect();
+    const targetRect = target.getBoundingClientRect();
+
+    return {
+        left: targetRect.left - parentRect.left,
+        top: targetRect.top - parentRect.top,
+        width: targetRect.width,
+        height: targetRect.height,
+        bottom: targetRect.bottom - parentRect.top,
+        right: targetRect.right - parentRect.left
+    };
+};
 
 window.addEventListener('popstate', () => {
 

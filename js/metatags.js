@@ -134,7 +134,7 @@ mega.metatags = new function() {
 
         if (type === 'Product') {
             structContent['name'] = data.name;
-            structContent['image'] = [data.image || 'https://g.static.mega.co.nz/b41537c0eae056cfe5ab05902fca322b.png'];
+            structContent.image = [data.image || `${defaultStaticPath}meta_tags_logo_mega.png`];
             structContent['description'] = data.description;
             structContent['brand'] = { '@type': 'Brand', 'name': 'MEGA' };
             structContent['offers'] = {
@@ -352,7 +352,7 @@ mega.metatags = new function() {
             }
         }
 
-        mTags.image = mTags.image || 'https:///g.static.mega.co.nz/b41537c0eae056cfe5ab05902fca322b.png';
+        mTags.image = mTags.image || `${defaultStaticPath}meta_tags_logo_mega.png`;
         insertOgTwitterMetas(
             mTags.mega_title,
             mTags.mega_desc,

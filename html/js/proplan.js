@@ -438,6 +438,7 @@ pro.proplan = {
             else {
                 monthOrYearWording = l[931];
             }
+            pro.proplan.period = value;
 
             // Updte price and transfer values
             pro.proplan.updateEachPriceBlock($dialog ? 'D' : 'P', $pricingBoxes, $dialog, parseInt(value));
@@ -448,6 +449,7 @@ pro.proplan = {
 
         // Set yearly prices by default
         const preSelectedPeriod = (sessionStorage.getItem('pro.period') | 0) || 12;
+        pro.proplan.period = preSelectedPeriod;
         $radioButtons.filter(`input[value="${preSelectedPeriod}"]`).trigger('click');
     },
 
@@ -693,14 +695,25 @@ pro.proplan = {
         }
 
         // Save selected payment period
-        sessionStorage.setItem('pro.period', period);
+        tryCatch(() => sessionStorage.setItem('pro.period', period))();
 
         // If no period is given, we are showing all mini plans regardless of duration
         const multipleDurations = !period;
 
+        const {shared} = pro.instantDiscounts;
+
+        const discountAll = shared['matchingDiscount' + period];
+        const discountAny = shared['anyDiscount' + period];
+        const $offerAll = $('.offer-all', $dialog).addClass('hidden');
+
+        if (shared.matchingDiscount12 || shared.matchingDiscount1) {
+            $offerAll.removeClass('hidden');
+        }
+
         for (var i = 0, length = pro.membershipPlans.length; i < length; i++) {
 
             // Get plan details
+            const planObj = pro.getPlanObj(pro.membershipPlans[i]);
             var currentPlan = pro.membershipPlans[i];
             var months = currentPlan[pro.UTQA_RES_INDEX_MONTHS];
             var planNum = currentPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL];
@@ -731,14 +744,19 @@ pro.proplan = {
                 continue;
             }
 
+            const offer = currentPlan[pro.UTQA_RES_INDEX_EXTRAS].insdis;
+
+            const $onlySection = $('.pricing-page.plan-only', $currentBox).removeClass('line-through').text(l.pr_only);
+            const $singleOffer = $('.offer-single', $currentBox);
             var $price = $('.plan-price .price', $currentBox);
             var $euroPrice = $('.pricing-page.euro-price', $currentBox);
             var $currncyAbbrev = $('.pricing-page.plan-currency', $currentBox);
             var $planName = $('.pricing-page.plan-title', $currentBox);
             var $planButton = $('.pricing-page.plan-button', $currentBox);
             var basePrice;
+            const baseMonthlyPrice = period === 12 ? planObj.correlatedPlan.price : planObj.price;
             let baseCurrency = 'EUR';
-            $currentBox.removeClass('hidden');
+            $currentBox.removeClass('hidden save-yearly-offer offer-hidden outlined');
 
             if (currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE]) {
                 basePrice = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE];
@@ -762,6 +780,14 @@ pro.proplan = {
                 baseCurrency = 'EUR';
             }
 
+            const monthlyPrice = planObj.price / planObj.months;
+            let discountedPrice = monthlyPrice;
+            if (currentPlan[pro.UTQA_RES_INDEX_EXTRAS].insdis
+                && currentPlan[pro.UTQA_RES_INDEX_EXTRAS].insdis.dp) {
+
+                discountedPrice = monthlyPrice * (1 - (currentPlan[pro.UTQA_RES_INDEX_EXTRAS].insdis.dp / 100));
+            }
+
             // Calculate the monthly base price
             var storageGigabytes = currentPlan[pro.UTQA_RES_INDEX_STORAGE];
             var storageBytes = storageGigabytes * 1024 * 1024 * 1024;
@@ -783,7 +809,52 @@ pro.proplan = {
                 $planButton.first().text(l[23776].replace('%1', planName));
             }
 
-            $price.text(formatCurrency(basePrice, baseCurrency, 'narrowSymbol'));
+            $currentBox.toggleClass('offer', !discountAll && !!(offer || discountAny));
+            $singleOffer.addClass('hidden').removeClass('invisible');
+
+            const saveAmount = pro
+                .calculateSavings([currentPlan[pro.UTQA_RES_INDEX_EXTRAS].insdis.dp, months === 12
+                    ? pro.yearlyDiscountPercentage : 0]);
+
+            const text = l.discount_save
+                .replace('%1', currentPlan[pro.UTQA_RES_INDEX_EXTRAS].insdis.dn)
+                .replace('%2', formatPercentage(saveAmount));
+
+            let showOldPrice = false;
+
+            if (discountAll) {
+                $singleOffer.addClass('hidden');
+                showOldPrice = true;
+            }
+            else if (offer) {
+                $singleOffer.removeClass('hidden').text(text);
+                showOldPrice = true;
+                $currentBox.addClass('outlined');
+            }
+            else if (discountAny && (period === 12)) {
+                $singleOffer.removeClass('hidden').text(l.yearly_plan_saving
+                    .replace('%1', Math.floor(pro.yearlyDiscountPercentage)));
+                $currentBox.addClass('save-yearly-offer');
+                showOldPrice = true;
+            }
+            else if (discountAny) {
+                $singleOffer.removeClass('hidden').addClass('invisible');
+                $currentBox.addClass('offer-hidden');
+            }
+            else {
+                $singleOffer.addClass('hidden');
+            }
+
+            if (showOldPrice) {
+                $onlySection.addClass('line-through')
+                    .text(formatCurrency(baseMonthlyPrice, baseCurrency, 'narrowSymbol'));
+            }
+
+            $price.text(formatCurrency(
+                discountAny ? discountedPrice : basePrice,
+                baseCurrency,
+                'narrowSymbol'
+            ));
 
             if (pageType === 'D') {
 
@@ -793,26 +864,41 @@ pro.proplan = {
                 const $taxInfo = $('.pricing-plan-tax', $currentBox);
                 if (planTaxInfo) {
                     if (pro.taxInfo.variant === 0) {
-                        $('.tax-info', $taxInfo).text(l.before_tax);
-                        $('.tax-price', $taxInfo).text(l.p_with_tax
-                            .replace('%1', formatCurrency(planTaxInfo.taxedPrice, baseCurrency, 'narrowSymbol')
-                            + (baseCurrency === 'EUR' ? ' ' : '* ') + baseCurrency))
+                        const discount = currentPlan[pro.UTQA_RES_INDEX_EXTRAS].insdis;
+                        const discountMult = discount && discount.dp
+                            ? (1 - (discount.dp / 100))
+                            : 1;
+                        $('.tax-info', $taxInfo).addClass('hidden');
+                        const taxPrice = (planTaxInfo.taxedPrice * discountMult)
+                            / (pro.instantDiscounts.shared.anyDiscount12 ? planObj.months : 1);
+
+                        const priceHTML = '<span class="bold">'
+                            + formatCurrency(taxPrice, baseCurrency, 'narrowSymbol')
+                            + (baseCurrency === 'EUR' ? ' ' : '* ')
+                            + '</span>'
+                            + baseCurrency;
+
+                        $('.tax-price', $taxInfo).safeHTML(l.p_with_tax
+                            .replace('%1', priceHTML))
                             .removeClass('hidden');
                     }
                     else if (pro.taxInfo.variant === 1) {
-                        $('.tax-info', $taxInfo).text(l.t_may_appy.replace('%1', pro.taxInfo.taxName));
+                        $('.tax-info', $taxInfo).removeClass('hidden')
+                            .text(l.t_may_appy.replace('%1', pro.taxInfo.taxName));
                     }
 
                     $taxInfo.removeClass('hidden');
                 }
 
-                const $onlySection = $('.pricing-page.plan-only', $currentBox);
                 const $currencyAndPeriod = $('.pricing-page.currency-and-period', $currentBox);
                 const periodIsYearly = months === 12;
 
                 // TODO change strings to be "<currency> billed monthly/yearly" in future ticket
-                const billingPeriodText = `${baseCurrency} / ${periodIsYearly ? l[932] : l[931]}`;
-                const onlyText = l.pr_only;
+                let billingPeriodText = `${baseCurrency} / ${periodIsYearly ? l[932] : l[931]}`;
+
+                if (pro.instantDiscounts.shared.anyDiscount12 && periodIsYearly) {
+                    billingPeriodText = l.per_m_billed_yearly;
+                }
 
                 // TODO re-enable in future ticket
                 // const $monthlyPrice = $('.pricing-page.monthly-price', $currentBox)
@@ -824,18 +910,6 @@ pro.proplan = {
                 //         planObj.correlatedPlan.price, baseCurrency, 'narrowSymbol') + '*';
                 //     $('span', $monthlyPrice).text(perMonthPrice);
                 // }
-
-                // TODO: Make yearlyMiniPlans calculated instead of hardcoded
-                if (pro.filter.simple.yearlyMiniPlans.has(planNum)) {
-                    const $periodSubTitle = $('.pricing-page.period-subtitle', $currentBox);
-                    $periodSubTitle.text(periodIsYearly ? l.yearly_unit : l[918]);
-                    if (saveUpTo) {
-                        const savingsString = l.yearly_plan_saving.replace('%1', saveUpTo);
-                        $('.pricing-page.plan-saving', $currentBox).text(savingsString).removeClass('hidden');
-                    }
-                }
-
-                $onlySection.text(onlyText); // TODO toggle strikethrough class in future ticket
                 $currencyAndPeriod.text(billingPeriodText);
             }
 
@@ -845,6 +919,54 @@ pro.proplan = {
             // Update storage and bandwidth data
             pro.proplan.updatePlanData($currentBox, storageValue, bandwidthValue, period);
         }
+
+        $dialog.toggleClass('offer', !!discountAny).toggleClass('offer-all', !!discountAll);
+
+        $offerAll.addClass('invisible');
+        if (discountAll) {
+            const saveAmount = pro
+                .calculateSavings([pro.instantDiscounts.shared['matchingDiscount' + period].dp, period === 12
+                    ? pro.yearlyDiscountPercentage : 0]);
+
+            const text = l.discount_save
+                .replace('%1', pro.instantDiscounts.shared['matchingDiscount' + period].dn)
+                .replace('%2', formatPercentage(saveAmount));
+            $offerAll.removeClass('invisible').text(text);
+        }
+        else if (discountAny) {
+            const isHidden = $dialog.hasClass('hidden');
+            if (isHidden) {
+                $dialog.addClass('opacity-0').removeClass('hidden');
+            }
+            let maxHeight = 0;
+            const singleDiscounts = $('.offer-single', $dialog);
+            for (let i = 0; i < singleDiscounts.length; i++) {
+                singleDiscounts[i].style.height = 'max-content';
+                maxHeight = Math.max(maxHeight, singleDiscounts[i].offsetHeight);
+            }
+            $('.offer-single', $dialog).css('height', maxHeight + 10);
+            $offerAll.addClass('invisible');
+            if (isHidden) {
+                $dialog.removeClass('opacity-0').addClass('hidden');
+            }
+        }
+
+        const {maxYearlyDiscount, minYearlyDiscount} = pro.yearlyDiscount;
+        const anyYearlyDiscount = pro.instantDiscounts.shared.anyDiscount12;
+        let saveText;
+
+        if (anyYearlyDiscount) {
+            saveText = l.pr_save_up_to.replace('%1', pro.softFloor(maxYearlyDiscount * 100));
+        }
+        else {
+            saveText = l.pr_save_from.replace('%1', formatPercentage(pro.softFloor(minYearlyDiscount * 100) / 100));
+        }
+
+        const hide = period === 12 && anyYearlyDiscount;
+
+        $('.save-yearly', $dialog)
+            .toggleClass('invisible', hide)
+            .text(saveText);
 
         return pageType === "P" ? [oneLocalPriceFound] : classType;
     },

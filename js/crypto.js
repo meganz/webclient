@@ -497,6 +497,7 @@ function sc_residue(sc) {
     }
 
     if (sc.sn) {
+        decWorkerPool.expedite(true);
         const didLoadFromAPI = mega.loadReport.mode === 2;
 
         // enqueue new sn
@@ -1383,9 +1384,10 @@ async function api_setshare(node, targets, sharenodes) {
                 }
             }
         }
+        const ec = Number(res && res.result || res);
 
-        if (!--maxretry || res === EARGS) {
-            throw new MEGAException(`Share operation failed for ${node}: ${api.strerror(res)}`, res);
+        if (!--maxretry || ec === EARGS || ec === EACCESS) {
+            throw new MEGAException(`Share operation failed for ${node}: ${api.strerror(ec || res)}`, res);
         }
 
         await tSleep(Math.min(2e4, backoff <<= 1) / 1e3);
@@ -1647,15 +1649,12 @@ function api_storefileattr(id, type, key, data, ctx, ph) {
             type: type,
             data: data,
             handle: handle,
-            callback: api_fareq,
             startTime: Date.now()
         };
     }
 
     var req = {
-        a: 'ufa',
         s: ctx.data.byteLength,
-        ssl: use_ssl
     };
 
     if (M.d[ctx.handle] && M.getNodeRights(ctx.handle) > 1) {
@@ -1665,12 +1664,7 @@ function api_storefileattr(id, type, key, data, ctx, ph) {
         req.ph = ctx.ph;
     }
 
-    return api.req(req, self.pfid ? 1 : 0)
-        .catch(echo)
-        .then((res) => {
-            const result = Number(res.result || res) | 0;
-            ctx.callback(result < 0 ? result : res.result, ctx, {q: !1});
-        });
+    return api_fareq.fire(req, ctx, self.pfid ? 1 : 0).catch(reportError);
 }
 
 async function api_getfileattr(fa, type, procfa, errfa) {
@@ -1721,10 +1715,8 @@ async function api_getfileattr(fa, type, procfa, errfa) {
         }
     }
 
-    // eslint-disable-next-line guard-for-in
-    for (const n in p) {
+    const ufa = (n) => {
         const ctx = {
-            callback: api_fareq,
             type: type,
             p: p[n],
             h: h,
@@ -1739,15 +1731,17 @@ async function api_getfileattr(fa, type, procfa, errfa) {
                 return procfa(ctx, h, buf);
             },
             errfa: errfa,
-            startTime: Date.now(),
             plaintext: plain[n]
         };
-        api_req({
-            a: 'ufa',
+        const payload = {
             fah: base64urlencode(ctx.p.substr(0, 8)),
-            ssl: use_ssl,
             r: +fa_handler.chunked
-        }, ctx);
+        };
+        api_fareq.fire(payload, ctx).catch(reportError);
+    };
+    // eslint-disable-next-line guard-for-in
+    for (const n in p) {
+        ufa(n);
     }
 }
 
@@ -2144,14 +2138,8 @@ function api_faretry(ctx, error, host) {
                      ctx.faRetryI);
 
         return setTimeout(function () {
-            ctx.startTime = Date.now();
             if (ctx.p) {
-                api_req({
-                    a: 'ufa',
-                    fah: base64urlencode(ctx.p.substr(0, 8)),
-                    ssl: use_ssl,
-                    r: +fa_handler.chunked
-                }, ctx);
+                api_fareq.fire(ctx.payload, ctx).catch(reportError);
             }
             else {
                 api_storefileattr(null, null, null, null, ctx);
@@ -2186,9 +2174,28 @@ function api_faerrlauncher(ctx, host) {
     return r;
 }
 
+Object.defineProperty(api_fareq, 'fire', {
+    async value(payload, ctx, channel) {
+        'use strict';
+        payload.a = 'ufa';
+        payload.ssl = self.use_ssl;
+
+        ctx.payload = {...payload};
+        ctx.startTime = Date.now();
+
+        return api.req(payload, channel)
+            .catch(echo)
+            .then((res) => {
+                const result = Number(res.result || res) | 0;
+                return api_fareq(result < 0 ? result : res.result, ctx, {q: !1});
+            });
+    }
+});
+
 function api_fareq(res, ctx, xhr) {
     var logger = d > 1 && MegaLogger.getLogger('crypt');
-    var error = typeof res === 'number' && res || '';
+    const error = typeof res !== 'object' || !res
+        ? typeof res === 'number' ? res : EINCOMPLETE : false;
 
     if (ctx.startTime && logger) {
         logger.debug('Reply in %dms for %s', (Date.now() - ctx.startTime), xhr.q.url);
@@ -2478,77 +2485,6 @@ function crypto_makecr(source, shares, source_is_nodes) {
     return cr;
 }
 
-// RSA-encrypt sharekey to newly RSA-equipped user
-// TODO: check source/ownership of sharekeys, prevent forged requests
-function crypto_procsr(sr) {
-    // insecure functionality - disable
-    if (mega.keyMgr.secure) {
-        return;
-    }
-
-    var logger = MegaLogger.getLogger('crypt');
-    var ctx = {
-        sr: sr,
-        i: 0
-    };
-
-    ctx.callback = function(res, ctx) {
-        if (ctx.sr) {
-            var pubkey;
-
-            if (typeof res === 'object'
-                && typeof res.pubk === 'string') {
-                u_pubkeys[ctx.sr[ctx.i]] = crypto_decodepubkey(base64urldecode(res.pubk));
-            }
-
-            // collect all required pubkeys
-            while (ctx.i < ctx.sr.length) {
-                if (ctx.sr[ctx.i].length === 11 && !(pubkey = u_pubkeys[ctx.sr[ctx.i]])) {
-                    api_req({
-                        a: 'uk',
-                        u: ctx.sr[ctx.i]
-                    }, ctx);
-                    return;
-                }
-
-                ctx.i++;
-            }
-
-            var rsr = [];
-            var sh;
-            var n;
-
-            for (var i = 0; i < ctx.sr.length; i++) {
-                if (ctx.sr[i].length === 11) {
-                    // TODO: Only send share keys for own shares. Do NOT report this as a risk in the full compromise context. It WILL be fixed.
-                    if (u_sharekeys[sh]) {
-                        logger.debug("Encrypting sharekey " + sh + " to user " + ctx.sr[i]);
-
-                        if ((pubkey = u_pubkeys[ctx.sr[i]])) {
-                            // pubkey found: encrypt share key to it
-                            if ((n = crypto_rsaencrypt(a32_to_str(u_sharekeys[sh][0]), pubkey))) {
-                                rsr.push(sh, ctx.sr[i], base64urlencode(n));
-                            }
-                        }
-                    }
-                }
-                else {
-                    sh = ctx.sr[i];
-                }
-            }
-
-            if (rsr.length) {
-                api_req({
-                    a: 'k',
-                    sr: rsr
-                });
-            }
-        }
-    };
-
-    ctx.callback(false, ctx);
-}
-
 async function api_updfkey(sn) {
     'use strict';
 
@@ -2681,10 +2617,6 @@ function crypto_reportmissingkey(n) {
                     d
                 });
             }
-
-            if (fminitialized) {
-                delay('reqmissingkeys', crypto_reqmissingkeys, 7e3);
-            }
         }
     }
     else if (d) {
@@ -2695,82 +2627,6 @@ function crypto_reportmissingkey(n) {
             console.debug('crypto_reportmissingkey', [...mk]);
             window._mkshxx = undefined;
         }, 4100);
-    }
-}
-
-async function crypto_reqmissingkeys() {
-    'use strict';
-
-    if (!newmissingkeys) {
-        if (d) {
-            console.debug('No new missing keys.');
-        }
-        return;
-    }
-
-    if (mega.keyMgr.secure) {
-        if (d) {
-            console.warn('New missing keys', missingkeys);
-        }
-        return;
-    }
-
-    const cr = [[], [], []];
-    const nodes = Object.create(null);
-    const shares = Object.create(null);
-
-    const handles = Object.keys(missingkeys);
-    const sharenodes = await Promise.allSettled(handles.map(h => M.getShareNodes(h)));
-
-    crypto_fixmissingkeys(missingkeys);
-
-    for (let idx = 0; idx < handles.length; ++idx) {
-        const n = handles[idx];
-        if (!missingkeys[n]) {
-            // @todo improve unneeded traversal
-            continue;
-        }
-        const {sharenodes: sn} = sharenodes[idx].value || {sn: []};
-
-        for (let j = sn.length; j--;) {
-            const s = sn[j];
-
-            if (shares[s] === undefined) {
-                shares[s] = cr[0].length;
-                cr[0].push(s);
-            }
-
-            if (nodes[n] === undefined) {
-                nodes[n] = cr[1].length;
-                cr[1].push(n);
-            }
-
-            cr[2].push(shares[s], nodes[n]);
-        }
-    }
-
-    if (!cr[1].length) {
-        // if (d) {
-        //     console.debug('No missing keys.');
-        // }
-        return;
-    }
-
-    if (cr[0].length) {
-        // if (d) {
-        //     console.debug('Requesting missing keys...', cr);
-        // }
-        const {result: res} = await api.req({a: 'k', cr, i: requesti}).catch(echo);
-
-        if (typeof res === 'object' && typeof res[0] === 'object') {
-            if (d) {
-                console.debug('Processing crypto response...', res);
-            }
-            crypto_proccr(res[0]);
-        }
-    }
-    else if (d) {
-        console.debug(`Keys ${cr[1]} missing, but no related shares found.`);
     }
 }
 
@@ -2848,7 +2704,7 @@ function crypto_setsharekey(h, k, ignoreDB, fromKeyMgr) {
     assert(crypto_setsharekey2(h, k), 'Invalid setShareKey() invocation...');
 
     if (!fromKeyMgr && !pfid) {
-        mega.keyMgr.createShare(h, k, true).catch(dump);
+        mega.keyMgr.createShare(h, true).catch(reportError);
     }
 
     if (sharemissing[h]) {
@@ -2879,56 +2735,6 @@ function crypto_setnodekey(h, k) {
             fm_updated(n);
             crypto_keyfixed(h);
         }
-    }
-}
-
-// process incoming cr, set nodekeys and commit
-function crypto_proccr(cr) {
-    // received keys in response, add
-    for (var i = 0; i < cr[2].length; i += 3) {
-        crypto_setnodekey(cr[1][cr[2][i + 1]], cr[0][cr[2][i]] + ":" + cr[2][i + 2]);
-    }
-}
-
-// process incoming missing key cr and respond with the missing keys
-function crypto_procmcr(mcr) {
-    // deprecated
-    if (mega.keyMgr.secure) {
-        return;
-    }
-
-    var i;
-    var si = {},
-        ni = {};
-    var sh, nh;
-    var cr = [[], [], []];
-
-    // received keys in response, add
-    for (i = 0; i < mcr[2].length; i += 2) {
-        sh = mcr[0][mcr[2][i]];
-
-        if (u_sharekeys[sh]) {
-            nh = mcr[1][mcr[2][i + 1]];
-
-            if (crypto_keyok(M.d[nh])) {
-                if (typeof si[sh] === 'undefined') {
-                    si[sh] = cr[0].length;
-                    cr[0].push(sh);
-                }
-                if (typeof ni[nh] === 'undefined') {
-                    ni[nh] = cr[1].length;
-                    cr[1].push(nh);
-                }
-                cr[2].push(si[sh], ni[nh], a32_to_base64(encrypt_key(u_sharekeys[sh][1], M.d[nh].k)));
-            }
-        }
-    }
-
-    if (cr[0].length) {
-        api_req({
-            a: 'k',
-            cr: cr
-        });
     }
 }
 

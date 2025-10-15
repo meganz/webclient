@@ -58,7 +58,7 @@
     }
 
     function start_upload() {
-        if (u_type && u_attr) { // logged in user landing on start-page
+        if (u_type !== false) { // existing user (incl ephemeral/e++) send to fm if not initialised
             if (!self.fminitialized) {
                 loadSubPage('fm');
             }
@@ -366,6 +366,13 @@
         };
         factory.require('file-list').getFileList(e, filter)
             .then((files) => {
+
+                const trigger = e && e.dataTransfer ? 'd' : 'p';
+
+                for (let i = 0; i < files.length; i++) {
+                    files[i].pitagTrigger = trigger;
+                }
+
                 if (!e.dataTransfer) {
                     $.doStraightUpload = true;
                 }

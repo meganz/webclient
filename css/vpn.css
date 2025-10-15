@@ -27,8 +27,12 @@
 
 .fm-right-account-block .fm-account-vpn .desktop-download-links {
     margin-top: 6px;
-    margin-bottom: 12px;
     display: flex;
+    flex-wrap: wrap;
+}
+.fm-right-account-block .fm-account-vpn .desktop-download-links > * {
+    margin-inline-end: 12px;
+    margin-bottom: 12px;
 }
 
 .fm-right-account-block .fm-account-vpn .qr-img canvas {
@@ -67,7 +71,7 @@
     align-items: center;
 }
 .fm-right-account-block .fm-account-vpn .vpn-link.windows {
-    margin-right: 12px;
+    margin-inline-end: 12px;
 }
 .fm-right-account-block .fm-account-vpn .vpn-link.clickurl:not(.mega-button) {
     color: var(--text-color-info);

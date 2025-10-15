@@ -57,7 +57,10 @@ MegaData.prototype.filterByParent = function(id) {
         for (i = inshares.length; i--;) {
             node = this.d[inshares[i]] || false;
             // filter label applies here.
-            if (node.su && !this.d[node.p] && (!M.currentLabelFilter || M.filterByLabel(node))) {
+            if (
+                node.su && !this.d[node.p] && (!M.currentLabelFilter || M.filterByLabel(node)) &&
+                (!mega.ui.mNodeFilter || !mega.ui.mNodeFilter.selectedFilters.value || mega.ui.mNodeFilter.match(node))
+            ) {
                 this.v.push(node);
             }
         }
@@ -93,7 +96,12 @@ MegaData.prototype.filterByParent = function(id) {
     }
 };
 
-MegaData.prototype.filterBySearch = function (str) {
+/**
+ * @param {String} str Keywords to look for
+ * @param {String} [customFn] Optional function to call in addition to others
+ * @returns {Function}
+ */
+MegaData.prototype.filterBySearch = function(str, customFn) {
     'use strict';
 
     str = String(str || '').replace('search/', '').trim();
@@ -203,11 +211,16 @@ MegaData.prototype.filterBySearch = function (str) {
     }
 
     if (str) {
-        this.filterBy(this.getFilterBySearchFn(str), true);
+        this.filterBy(this.getFilterBySearchFn(str, customFn), true);
     }
 };
 
-MegaData.prototype.getFilterBySearchFn = function(searchTerm) {
+/**
+ * @param {String} searchTerm Keywords to look for
+ * @param {String} [customFn] Optional function to call in addition to others
+ * @returns {Function}
+ */
+MegaData.prototype.getFilterBySearchFn = function(searchTerm, customFn) {
     'use strict';
 
     // Simple glob/wildcard support.
@@ -222,28 +235,25 @@ MegaData.prototype.getFilterBySearchFn = function(searchTerm) {
         catch (ex) {}
     }
 
-    if (mega.ui.mNodeFilter.selectedFilters.value) {
-        if (regex) {
-            return (n) => n.name && regex.test(n.name) && mega.ui.mNodeFilter.match(n);
-        }
-        return (n) => n.name && n.name.toLowerCase().includes(str) && mega.ui.mNodeFilter.match(n);
+    const strCheck = regex
+        ? ({ name }) => name && regex.test(name) || false
+        : ({ name }) => name && name.toLowerCase().includes(str) || false;
+
+    const { showGlobally } = mega.sensitives;
+
+    const basicCheck = (n) => n.p !== 'contacts'
+        && !n.pwm
+        && !n.fv
+        && (!M.BackupsId || n.h !== M.BackupsId && n.p !== M.BackupsId)
+        && (showGlobally || !n.sen)
+        && !mega.devices.ui.isDeprecated(n)
+        && (!customFn || customFn(n));
+
+    if (!folderlink && mega.ui.mNodeFilter.selectedFilters.value) {
+        return n => strCheck(n) && basicCheck(n) && mega.ui.mNodeFilter.match(n);
     }
 
-    if (regex) {
-        return function(node) {
-            return node.name && regex.test(node.name)
-                && node.p !== 'contacts'
-                && !(node.s4 && node.p === M.RootID && M.getS4NodeType(node) === 'container');
-        };
-    }
-
-    return function(node) {
-        return node.name && node.name.toLowerCase().includes(str)
-            && node.p !== 'contacts'
-            && !(node.s4 && node.p === M.RootID && M.getS4NodeType(node) === 'container')
-            && (!M.BackupsId || node.h !== M.BackupsId && node.p !== M.BackupsId)
-            && !mega.devices.ui.isDeprecated(node);
-    };
+    return n => strCheck(n) && basicCheck(n);
 };
 
 /**

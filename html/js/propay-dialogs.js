@@ -496,7 +496,8 @@ var astroPayDialog = {
      * Process the result from the API User Transaction Complete call
      * @param {Object} utcResult The results from the UTC call
      */
-    processUtcResult: function (utcResult) {
+    processUtcResult(utcResult) {
+        'use strict';
 
         // If successful AstroPay result, redirect
         if (utcResult.EUR.url) {
@@ -815,7 +816,8 @@ var voucherDialog = {
                 voucherDialog.$dialog.find('#voucher-code-input input').val('');
 
                 // Remove link information to get just the code
-                voucherCode = voucherCode.replace('https://mega.nz/#voucher', '');
+                voucherCode = voucherCode.replace('https://mega.nz/#voucher', '')
+                    .replace('https://mega.app/#voucher', '');
 
                 // Add the voucher
                 voucherDialog.addVoucher(voucherCode);
@@ -1393,6 +1395,8 @@ var addressDialog = {
     validInputs: null,
     billingInfoFilled: null,
 
+    businessPurchase: false,
+
     /**
      * Open and setup the dialog
      */
@@ -1411,8 +1415,6 @@ var addressDialog = {
             delete this.businessRegPage;
         }
 
-        loadingDialog.show();
-
         this.fetchBillingInfo().always(function (billingInfo) {
             billingInfo = billingInfo || Object.create(null);
 
@@ -1424,7 +1426,6 @@ var addressDialog = {
             self.initStateDropDown(selectedState, billingInfo.country);
             self.initCountryDropDown(billingInfo.country);
 
-            loadingDialog.hide();
             self.initCountryDropdownChangeHandler();
             self.initBuyNowButton();
             self.initCloseButton();
@@ -1524,11 +1525,7 @@ var addressDialog = {
             $('.payment-plan-price', this.$dialog).toggleClass('hidden', !!trial);
 
             if (trial) {
-                const trailText = l.after_trial_card_charged_m
-                    .replace('%1', trial.days)
-                    .replace('%2', formatCurrency(selectedPackage[pro.UTQA_RES_INDEX_PRICE]));
-
-                $freeTrial.filter('.free-trial-info').text(trailText);
+                $freeTrial.filter('.free-trial-info').text(l.after_trial_card_charged_m);
             }
 
 
@@ -2409,7 +2406,12 @@ var addressDialog = {
     redirectToSite: function(utcResult) {
 
         var url = utcResult.EUR['url'];
-        window.location = url + '?lang=' + lang;
+        if (pro.propay.currentGateway && pro.propay.currentGateway.gatewayId === 16) {
+            window.location = url;
+        }
+        else {
+            window.location = url + '?lang=' + lang;
+        }
     },
 
     /**
@@ -2475,12 +2477,14 @@ var addressDialog = {
 
         mainContentDiv.appendChild(textItems);
 
-        const button = document.createElement('button');
-        button.textContent = btnTxt;
-        button.className = 'mega-button large positive';
-        button.addEventListener('click', callback);
+        if (btnTxt !== false) {
+            const button = document.createElement('button');
+            button.textContent = btnTxt;
+            button.className = 'mega-button large positive';
+            button.addEventListener('click', callback);
+            mainContentDiv.appendChild(button);
+        }
 
-        mainContentDiv.appendChild(button);
         div.appendChild(spacerDiv);
         div.appendChild(mainContentDiv);
         div.appendChild(estimatedPriceDiv);
@@ -2503,13 +2507,29 @@ var addressDialog = {
             return $('.payment-stripe-dialog:not(.stripe-button):not(.business)');
         }
 
-        return $(`footer.${$('body').innerWidth() >= 1080 ? 'desktop' : 'mobile'} .stripe-button`, pro.propay.$page);
+        const isWide = $('body').innerWidth() >= 1080;
+
+        if (is_mobile && !isWide) {
+            return $('#propay .fixed-continue-btn .stripe-button');
+        }
+
+        return $(`footer.${isWide ? 'desktop' : 'mobile'} .stripe-button`, pro.propay.$page);
     },
 
     showPaymentSuccess() {
         'use strict';
+
         const $stripeDialog = this.getStripeDialog();
         const $stripeIframe = $('iframe#stripe-widget', $stripeDialog);
+
+        // Hide Expired/Grace banners
+        if (is_mobile && mobile.banner) {
+            mobile.banner.hide('grace-business');
+        }
+        else {
+            // @todo: Use mega.ui.secondaryNav.showBanner instead
+            $('.grace-business', '.fm-banner-holder').removeClass('visible');
+        }
 
         if (parseInt(pro.propay.planNum) === pro.ACCOUNT_LEVEL_FEATURE_VPN) {
             this.showSuccessCloak(
@@ -2529,23 +2549,54 @@ var addressDialog = {
                 l.pwm_purchase_success_txt.replace('%1', u_attr.email || ''),
                 l.goto_mega_pass,
                 () => {
-                    mega.redirect('mega.io', 'pass#downloadapps', false, false);
+                    mega.redirect('mega.io', 'pass#downloadapp', false, false);
                 }
             );
 
             pro.propay.hideLoadingOverlay();
         }
-        else if (pro.propay.onPropayPage() && pro.propay.paymentButton) {
+        else if (pro.propay.onPropayPage() || (page === 'registerb') || (page === 'repay')) {
+
+            let mainTxt = l.upgraded_account
+                .replace('%1', u_attr.email || '');
+            let btnTxt = l['6826'];
+
+            let planNum = pro.propay.planNum;
+
+            if (addressDialog.businessPurchase) {
+                planNum = pro.ACCOUNT_LEVEL_BUSINESS;
+            }
+            else if (u_attr && u_attr.pf) {
+                planNum = pro.ACCOUNT_LEVEL_PRO_FLEXI;
+            }
+
+            const isEphemeralAccount = isEphemeral();
+            if (page === 'registerb') {
+                mainTxt = [mainTxt.replace('%2', pro.getProPlanName(pro.ACCOUNT_LEVEL_BUSINESS))];
+                if (isEphemeralAccount) {
+                    mainTxt.push(l.if_new_account_verify);
+                    btnTxt = false;
+                }
+            }
+            else {
+                mainTxt = [mainTxt.replace('%2', pro.getProPlanName(planNum))];
+            }
+
             this.showSuccessCloak(
                 l['6961'],
-                l.upgraded_account
-                    .replace('%1', u_attr.email || '')
-                    .replace('%2', pro.getProPlanName(pro.propay.planNum)),
-                l['6826'],
+                mainTxt,
+                btnTxt,
                 () => {
                     if (pro.propay.planObj && (pro.propay.planObj.level === pro.ACCOUNT_LEVEL_PRO_FLEXI)) {
                         delete addressDialog.paymentInProcess;
+                        if (isEphemeralAccount) {
+                            pro.redirectToSite();
+                            return;
+                        }
                         fm_fullreload(null, 'upf-proflexi').catch(dump);
+                    }
+                    else if (addressDialog.businessPurchase) {
+                        fm_fullreload(null, 'ub-business').catch(dump);
                     }
                     else {
                         pro.redirectToSite();
@@ -2553,6 +2604,7 @@ var addressDialog = {
                 });
 
             pro.propay.hideLoadingOverlay();
+            addressDialog.closeDialog();
         }
         else {
             const $stripeSuccessDialog = $('.payment-stripe-success-dialog'
@@ -2606,8 +2658,7 @@ var addressDialog = {
                     const $stripeDialog = this.getStripeDialog();
                     const $stripeIframe = $('iframe#stripe-widget', $stripeDialog);
 
-                    // Assume all trials are monthly plans at the moment
-                    const plan = pro.getPlan(pro.propay.planNum, 1);
+                    const plan = pro.getPlan(pro.propay.planNum, pro.propay.selectedPeriod);
                     const planPrice = plan[pro.UTQA_RES_INDEX_LOCALPRICE] || plan[pro.UTQA_RES_INDEX_PRICE];
                     const planCurrency = plan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY] || 'EUR';
                     const planNumber = parseInt(pro.propay.planNum);
@@ -2647,7 +2698,7 @@ var addressDialog = {
                             l.goto_mega_pass,
                             () => {
                                 onIdle(() => eventlog(500564));
-                                mega.redirect('mega.io', 'pass#downloadapps', false, false);
+                                mega.redirect('mega.io', 'pass#downloadapp', false, false);
                             },
                             planCurrency
                         );
@@ -2658,6 +2709,7 @@ var addressDialog = {
 
                     closeStripeDialog(true);
                     delete addressDialog.paymentInProcess;
+                    pro.loadMembershipPlans(null, true);
                 }
 
             }).catch((ex) => {
@@ -2728,13 +2780,13 @@ var addressDialog = {
         clearTimeout(pro.propay.paymentStatusChecker);
         clearTimeout(pro.propay.listenRemover);
 
-        const failHandle = (error) => {
+        const failHandle = (error, failReason) => {
             const $stripeDialog = addressDialog.getStripeDialog();
             const $stripeFailureDialog = $('.payment-stripe-failure-dialog');
             const $stripeIframe = $('iframe#stripe-widget', $stripeDialog);
+            pro.propay.hideLoadingOverlay();
 
-            $('button.js-close, .btn-close-dialog', $stripeFailureDialog).rebind('click.stripeDlg', () => {
-
+            const failFunc = () => {
                 closeDialog();
                 // if we are coming from business plan, we need to reset registration
                 if (addressDialog.businessPlan && addressDialog.userInfo) {
@@ -2747,18 +2799,41 @@ var addressDialog = {
                         loadSubPage('repay');
                     }
                 }
-            });
+            };
 
-            $('.stripe-error', $stripeFailureDialog).safeHTML(error || '');
+            if (pro.propay.onPropayPage()) {
+                pro.propay.hideLoadingOverlay();
+                pro.propay.updatePayment();
 
-            if (addressDialog.stripeSaleId === 'EDIT') {
-                $((is_mobile ? '.fail-head' : '.payment-stripe-failure-dialog-title'), $stripeFailureDialog)
-                    .text(l.payment_gw_update_fail);
+                pro.dialog.show(
+                    failReason === 'incorrect_cvc'
+                        ? l.incorrect_cvc_warn_header
+                        : l['25049'],
+                    parseHTML(error || ''),
+                    {
+                        onClick: () => {
+                            failFunc();
+                            pro.dialog.hide();
+                        },
+                        text: l.ok_button
+                    }
+                );
+            }
+            else {
+                $('button.js-close, .btn-close-dialog', $stripeFailureDialog).rebind('click.stripeDlg', failFunc);
+
+                $('.stripe-error', $stripeFailureDialog).safeHTML(error || '');
+
+                if (addressDialog.stripeSaleId === 'EDIT') {
+                    $((is_mobile ? '.fail-head' : '.payment-stripe-failure-dialog-title'), $stripeFailureDialog)
+                        .text(l.payment_gw_update_fail);
+                }
+
+                $stripeIframe.remove();
+                closeStripeDialog();
+                M.safeShowDialog('stripe-pay-failure', $stripeFailureDialog);
             }
 
-            $stripeIframe.remove();
-            closeStripeDialog();
-            M.safeShowDialog('stripe-pay-failure', $stripeFailureDialog);
         };
 
         const getErrorText = (failData) => {
@@ -2790,7 +2865,7 @@ var addressDialog = {
             if (typeof event.data !== 'string') {
                 tryCatch(() => {
                     api_req({a: 'log', e: 99741, m: JSON.stringify(event.data)});
-                });
+                })();
                 failHandle(l[1679]);
                 return;
             }
@@ -2802,6 +2877,12 @@ var addressDialog = {
                     const $stripeIframe = $('.iframe-container', $stripeDialog);
                     if ($stripeIframe) {
                         $stripeIframe.css('height', eventData.height + 'px');
+                    }
+                }
+                if (eventData && (eventData.type === 'loading') && (eventData.action === 'end')) {
+                    $('.sk-stripe-loading', addressDialog.getStripeDialog()).addClass('hidden');
+                    if (pro.propay.skItems.continueBtn) {
+                        pro.propay.skItems.continueBtn.endLoad();
                     }
                 }
                 window.addEventListener('message', addressDialog.stripeFrameHandler, {once: true});
@@ -2848,7 +2929,9 @@ var addressDialog = {
                     pro.propay.updatePayment();
                 }
                 else if (event.data === 'validInput') {
-                    pro.propay.showLoadingOverlay('transferring');
+                    pro.propay.showLoadingOverlay(pro.propay.proPaymentMethod === 'stripe'
+                        ? 'processing'
+                        : 'transferring');
                 }
                 else {
                     $('.stripe-button .loader').addClass('hidden');
@@ -2862,7 +2945,8 @@ var addressDialog = {
             }
 
             if (event.data.startsWith('payfail^')) {
-                failHandle(getErrorText(event.data.split('^')));
+                const failInfo = event.data.split('^');
+                failHandle(getErrorText(failInfo), failInfo[3]);
             }
             else if (event.data === 'paysuccess') {
 
@@ -2874,6 +2958,10 @@ var addressDialog = {
                             mega.ui.toast.show(l.payment_card_update_desc, 6);
                             loadSubPage('fm/account');
                         }
+                        const banner = document.componentSelector('.payment-banner');
+                        if (banner) {
+                            banner.hide();
+                        }
                     }
                     else {
                         msgDialog('info', '', l.payment_card_update, l.payment_card_update_desc, () => {
@@ -2881,6 +2969,10 @@ var addressDialog = {
                                 accountUI.plan.init(M.account);
                             }
                         });
+                        const banner = mega.ui.secondaryNav.bannerHolder.querySelector('.new-banner');
+                        if (banner) {
+                            banner.classList.add('hidden');
+                        }
                     }
                 }
                 else {
@@ -2940,6 +3032,9 @@ var addressDialog = {
         if (utcResult.EUR === 0) {
 
             this.showPaymentSuccess();
+            if (pro.propay.skItems.continueBtn) {
+                pro.propay.skItems.continueBtn.endLoad();
+            }
             return;
         }
 
@@ -3009,8 +3104,13 @@ var addressDialog = {
 
                 this.stripeSaleId = 'EDIT';
 
-                if (pro.propay.onPropayPage()) {
-                    iframeSrc += `&v=2`;
+                if (pro.propay.onPropayPage() || (page === 'registerb') || (page === 'repay')) {
+                    // v (version)
+                    // rtc (returnToClient): Have client handle stripe success/failure
+                    if (pro.propay.onPropayPage()) {
+                        iframeSrc += `&v=2`;
+                    }
+                    iframeSrc += `&rtc=${(d && localStorage.rtc) || 1}`;
                 }
 
                 if (pro.propay.paymentButton) {
@@ -3067,8 +3167,10 @@ var addressDialog = {
                 $stripeIframe.src = iframeSrc;
                 $stripeIframe.id = 'stripe-widget';
 
-                pro.propay.hideLoadingOverlay();
-                loadingDialog.hide();
+                if (!pro.propay.useSavedCard) {
+                    pro.propay.hideLoadingOverlay();
+                    loadingDialog.hide();
+                }
 
                 // $('.content', $stripeDialog).toggleClass('hidden', pro.propay.useSavedCard);
 
@@ -3545,7 +3647,8 @@ var cardDialog = {
      * Process the result from the API User Transaction Complete call
      * @param {Object} utcResult The results from the UTC call
      */
-    processUtcResult: function(utcResult) {
+    processUtcResult(utcResult) {
+        'use strict';
 
         // Hide the loading animation
         pro.propay.hideLoadingOverlay();
@@ -3747,8 +3850,10 @@ var bitcoinDialog = {
         var expiryTime = new Date(apiResponse.expiry);
 
         const discountInfo = pro.propay.getDiscount();
-        if (discountInfo && ((numOfMonths === 1 && discountInfo.emp) || (numOfMonths === 12 && discountInfo.eyp))) {
-            priceEuros = numOfMonths === 1 ? mega.intl.number.format(discountInfo.emp)
+        if (discountInfo && ((pro.propay.planObj.months === 1 && discountInfo.emp)
+            || (pro.propay.planObj.months === 12 && discountInfo.eyp))) {
+
+            priceEuros = pro.propay.planObj.months === 1 ? mega.intl.number.format(discountInfo.emp)
                 : mega.intl.number.format(discountInfo.eyp);
         }
 
@@ -3795,6 +3900,9 @@ var bitcoinDialog = {
         // Make background overlay darker and show the dialog
         // $dialogBackgroundOverlay.addClass('bitcoin-invoice-dialog-overlay').removeClass('hidden');
         $bitcoinDialog.removeClass('hidden');
+        if (pro.propay.skItems.bitcoin) {
+            pro.propay.skItems.bitcoin.endLoad();
+        }
     },
 
     /**
@@ -3869,7 +3977,8 @@ var bitcoinDialog = {
      * Process the result from the API User Transaction Complete call
      * @param {Object} utcResult The results from the UTC call
      */
-    processUtcResult: function(utcResult) {
+    processUtcResult(utcResult) {
+        'use strict';
 
         // Hide the loading animation
         // pro.propay.hideLoadingOverlay();
@@ -3915,4 +4024,66 @@ var insertEmailToPayResult = function($overlay) {
         $overlay.find('.payment-result-txt .user-email').text(acc.email);
     }
 };
+
+/**
+ * Generic dialog handler using the MegaSheet component
+ */
+pro.dialog = {
+    sheet: null,
+
+    /**
+     * Shows a generic dialog
+     * @param {string} title - The title text for the dialog
+     * @param {string|HTMLElement|Array} contents - The content to display in the dialog body.
+     * @param {string|Object} [button] - Button configuration. Can be a string for default behaviour
+     * @param {Object} [options] - Additional options for the dialog
+     * @param {string} [options.className] - CSS class name for the button
+     * @param {Function} [options.onShow] - Callback function called when dialog is shown
+     * @param {Function} [options.onClose] - Callback function called when dialog is closed
+     * @returns {MegaSheet} Returns the MegaSheet instance
+     */
+    show(title, contents, button, options) {
+        'use strict';
+
+        options = options || Object.create(null);
+
+        let actions;
+
+        if (button) {
+            actions = [{
+                type: 'normal',
+                text: typeof button === 'string' ? button : button.text,
+                className: options.className || 'primary',
+                onClick: button.onClick
+            }];
+        }
+
+        contents = Array.isArray(contents) ? contents : [contents];
+
+        mega.ui.sheet.show({
+            title,
+            contents,
+            actions,
+            name: 'propay-generic-dialog',
+            type: 'modal',
+            icon: 'sprite-fm-mono icon-x-circle-thin-outline error',
+            showClose: true,
+            preventBgClosing: false,
+            onShow: options.onShow,
+            onClose: options.onClose
+        });
+
+        return this.sheet;
+    },
+
+    /**
+     * Hides the currently displayed propay dialog
+     */
+    hide() {
+        'use strict';
+
+        mega.ui.sheet.hide('propay-generic-dialog');
+    }
+};
+
 

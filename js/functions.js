@@ -850,7 +850,7 @@ function srvlog(msg, data, silent) {
 
 // log failures through event id 99666
 function srvlog2(type /*, ...*/) {
-    if (d || window.exTimeLeft) {
+    if (!self.buildOlderThan10Days || !self.is_livesite) {
         var args    = toArray.apply(null, arguments);
         var version = buildVersion.website;
 
@@ -1079,6 +1079,9 @@ function str_mtrunc(str, len) {
 }
 
 function getTransfersPercent() {
+    if (getTransfersPercent.cache && getTransfersPercent.cache.exp > Date.now()) {
+        return getTransfersPercent.cache;
+    }
     var dl_r = 0;
     var dl_t = 0;
     var ul_r = 0;
@@ -1105,14 +1108,15 @@ function getTransfersPercent() {
         }
     }
     for (i = ul_queue.length; i--;) {
-        var tu = tp['ul_' + ul_queue[i].id];
+        const q = ul_queue[i];
+        var tu = tp['ul_' + q.id];
 
         if (tu) {
             ul_r += tu[0];
             ul_t += tu[1];
         }
         else {
-            ul_t += ul_queue[i].size || 0;
+            ul_t += q.size || 0;
         }
     }
     if (dl_t) {
@@ -1124,12 +1128,14 @@ function getTransfersPercent() {
         ul_r += tp['ulc'] || 0;
     }
 
-    return {
+    getTransfersPercent.cache = {
         ul_total: ul_t,
         ul_done: ul_r,
         dl_total: dl_t,
-        dl_done: dl_r
+        dl_done: dl_r,
+        exp: Date.now() + 1000,
     };
+    return getTransfersPercent.cache;
 }
 
 function percent_megatitle() {
@@ -1154,30 +1160,6 @@ function percent_megatitle() {
         $.transferprogress = Object.create(null);
     }
     megatitle(t);
-
-    var d_deg = 360 * x_dl / 100;
-    var u_deg = 360 * x_ul / 100;
-    var $dl_rchart = $('.transfers .download .nw-fm-chart0.right-c p');
-    var $dl_lchart = $('.transfers .download .nw-fm-chart0.left-c p');
-    var $ul_rchart = $('.transfers .upload .nw-fm-chart0.right-c p');
-    var $ul_lchart = $('.transfers .upload .nw-fm-chart0.left-c p');
-
-    if (d_deg <= 180) {
-        $dl_rchart.css('transform', 'rotate(' + d_deg + 'deg)');
-        $dl_lchart.css('transform', 'rotate(0deg)');
-    }
-    else {
-        $dl_rchart.css('transform', 'rotate(180deg)');
-        $dl_lchart.css('transform', 'rotate(' + (d_deg - 180) + 'deg)');
-    }
-    if (u_deg <= 180) {
-        $ul_rchart.css('transform', 'rotate(' + u_deg + 'deg)');
-        $ul_lchart.css('transform', 'rotate(0deg)');
-    }
-    else {
-        $ul_rchart.css('transform', 'rotate(180deg)');
-        $ul_lchart.css('transform', 'rotate(' + (u_deg - 180) + 'deg)');
-    }
 }
 
 /**
@@ -1197,8 +1179,8 @@ function percentageDiff(initial, final, format) {
 
     let change = (difference / changeFrom) * 100;
 
-    if (format & 2) { // Round down
-        change = Math.floor(change);
+    if (format & 2) {
+        change = Math.floor(Math.round(change * 10) / 10);
     }
     return change;
 }
@@ -1284,7 +1266,7 @@ function getHtmlElemPos(elem, n) {
  * @returns {String}
  */
 function getBaseUrl() {
-    return 'https://' + (((location.protocol === 'https:') && location.host) || 'mega.nz');
+    return 'https://' + (((location.protocol === 'https:') && location.host) || `mega.${mega.tld}`);
 }
 
 /**
@@ -1557,6 +1539,9 @@ function mLogout(aCallback, force) {
             return proceed;
         })
         .then((logout) => {
+            if (logout && mega.ui.flyoutInit && mega.ui.flyout.name) {
+                mega.ui.flyout.hide();
+            }
             return logout && M.logout();
         })
         .catch((ex) => {
@@ -1565,7 +1550,7 @@ function mLogout(aCallback, force) {
                 getsc(true);
             }
             if (ex) {
-                dump(ex);
+                reportError(ex);
             }
         });
 }
@@ -1781,20 +1766,6 @@ mBroadcaster.addListener('crossTab:owner', function _setup() {
     };
 });
 
-// Update account UI on other tabs when cancelling subscription
-mBroadcaster.addListener('crossTab:cancelSub', () => {
-    'use strict';
-
-    // Fetch new account data
-    if (M.account) {
-        M.account.lastupdate = 0;
-    }
-
-    if (page.indexOf('fm/account') === 0) {
-        accountUI();
-    }
-});
-
 /**
  * Simple alias that will return a random number in the range of: a < b
  *
@@ -1872,114 +1843,6 @@ if (typeof sjcl !== 'undefined') {
         };
 
         self.options = $.extend(true, {}, defaultOptions, opts);    };
-
-    /**
-     * isShareExists
-     *
-     * Checking if there's available shares for selected nodes.
-     * @param {Array} nodes Holds array of ids from selected folders/files (nodes).
-     * @param {Boolean} fullShare Do we need info about full share.
-     * @param {Boolean} pendingShare Do we need info about pending share .
-     * @param {Boolean} linkShare Do we need info about link share 'EXP'.
-     * @returns {Boolean} result.
-     */
-    Share.prototype.isShareExist = function(nodes, fullShare, pendingShare, linkShare) {
-
-        var self = this;
-
-        var shares = {}, length;
-
-        for (var i in nodes) {
-            if (nodes.hasOwnProperty(i)) {
-
-                // Look for full share
-                if (fullShare) {
-                    shares = M.d[nodes[i]] && M.d[nodes[i]].shares;
-
-                    // Look for link share
-                    if (linkShare) {
-                        if (shares && Object.keys(shares).length) {
-                            return true;
-                        }
-                    }
-                    else { // Exclude folder/file links,
-                        if (shares) {
-                            length = self.getFullSharesNumber(shares);
-                            if (length) {
-                                return true;
-                            }
-                        }
-                    }
-                }
-
-                // Look for pending share
-                if (pendingShare) {
-                    shares = M.ps[nodes[i]];
-
-                    if (shares && Object.keys(shares).length) {
-                        return true;
-                    }
-                }
-            }
-        }
-
-        return false;
-    };
-
-    /**
-     * hasExportLink, check if at least one selected item have public link.
-     *
-     * @param {String|Array} nodes Node id or array of nodes string
-     * @returns {Boolean}
-     */
-    Share.prototype.hasExportLink = function(nodes) {
-
-        if (typeof nodes === 'string') {
-            nodes = [nodes];
-        }
-
-        // Loop through all selected items
-        for (var i in nodes) {
-            var node = M.d[nodes[i]];
-
-            if (node && Object(node.shares).EXP) {
-                return true;
-            }
-        }
-
-        return false;
-    };
-
-    /**
-     * getFullSharesNumber
-     *
-     * Loops through all shares and return number of full shares excluding
-     * ex. full contacts. Why ex. full contact, in the past when client removes
-     * full contact from the list, share related to client remains active on
-     * owners side. That behaviour is changed/updated on API side, so now after
-     * full contact relationship is removed, related shares are also removed.
-     *
-     * @param {Object} shares
-     * @returns {Integer} result Number of shares
-     */
-    Share.prototype.getFullSharesNumber = function(shares) {
-
-        var result = 0;
-        var contactKeys = [];
-
-        if (shares) {
-            contactKeys = Object.keys(shares);
-            $.each(contactKeys, function(ind, key) {
-
-                // Count only full contacts
-                if (M.u[key] && M.u[key].c) {
-                    result++;
-                }
-            });
-        }
-
-        return result;
-    };
 
     /**
      * addContactToFolderShare
@@ -2101,15 +1964,12 @@ if (typeof sjcl !== 'undefined') {
         'use strict';
         $.removedContactsFromShare = {};
         const nodeHandle = target || String($.selected[0]);
-        let userHandles = M.getNodeShareUsers(nodeHandle, 'EXP');
+        const shares = M.getOutShares(nodeHandle);
 
-        if (M.ps[nodeHandle]) {
-            const pendingShares = Object(M.ps[nodeHandle]);
-            userHandles = [...userHandles, ...Object.keys(pendingShares)];
-        }
-
-        for (let i = 0; i < userHandles.length; i++) {
-            const userHandle = userHandles[i];
+        for (const userHandle in shares) {
+            if (userHandle === 'EXP') {
+                continue;
+            }
             const userEmailOrHandle = Object(M.opc[userHandle]).m || userHandle;
 
             $.removedContactsFromShare[userHandle] = {
@@ -2410,6 +2270,34 @@ function getLastDayofTheMonth(dateObj) {
 }
 
 /**
+ * Function to format start and end dates of the month
+ *
+ * @param {Date} leadingDate The start date of the required month
+ * @returns {Object} {{fromDate: string, toDate: string}} The format of dates in YYYYMMDD
+ */
+function getReportDates(leadingDate) {
+    "use strict";
+
+    const today = leadingDate || new Date();
+    const todayMonth = today.getMonth() + 1;
+    let currMonth = String(todayMonth);
+    if (currMonth.length < 2) {
+        currMonth = `0${currMonth}`;
+    }
+    const currYear = String(today.getFullYear());
+
+    const startDate = `${currYear}${currMonth}01`;
+
+    const endDate = getLastDayofTheMonth(today);
+    if (!endDate) {
+        return;
+    }
+    const endDateStr = String(endDate.getFullYear()) + currMonth + String(endDate.getDate());
+
+    return { fromDate: startDate, toDate: endDateStr };
+}
+
+/**
  * Block Chrome Password manager for password field with attribute `autocomplete="new-password"`
  */
 function blockChromePasswordManager() {
@@ -2478,7 +2366,7 @@ function odqPaywallDialogTexts(user_attr, accountData) {
 
     var dialogText = mega.icu.format(l[23525], totalFiles);
     var dlgFooterText = l[23524];
-    var fmBannerText = l[23534];
+    var fmBannerText = l.bn_odq_text;
 
     if (user_attr.uspw) {
         if (user_attr.uspw.dl) {
@@ -2491,12 +2379,16 @@ function odqPaywallDialogTexts(user_attr, accountData) {
                 return escapeHTML(string)
                     .replace(/\[S]/g, '<span>')
                     .replace(/\[\/S]/g, '</span>')
+                    .replace(/\[B]/g, '<b>')
+                    .replace(/\[\/B]/g, '</b>')
                     .replace(/\[A]/g, '<a href="/pro" class="clickurl">')
                     .replace(/\[\/A]/g, '</a>');
             };
             if (remainDays > 0) {
                 dlgFooterText = sanitiseString(mega.icu.format(l.dialog_exceed_storage_quota, remainDays));
-                fmBannerText = sanitiseString(mega.icu.format(l.fm_banner_exceed_storage_quota, remainDays));
+                fmBannerText = sanitiseString(mega.icu.format(
+                    l.bn_odq_with_count_text, remainDays
+                ));
             }
             else if (remainDays === 0 && remainHours > 0) {
                 dlgFooterText = sanitiseString(mega.icu.format(l.dialog_exceed_storage_quota_hours, remainHours));
@@ -2538,7 +2430,7 @@ function odqPaywallDialogTexts(user_attr, accountData) {
 
     // In here, it's guaranteed that we have pro.membershipPlans,
     // but we will check for error free logic in case of changes
-    let neededPro = 4;
+    let neededPro = 1;
     const minPlan = pro.filter.lowestRequired(accountData.space_used, 'storageTransferDialogs');
 
     if (minPlan) {

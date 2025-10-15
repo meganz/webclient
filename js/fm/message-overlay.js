@@ -22,14 +22,19 @@ var megaMsgDialog = (() => {
      * @returns {Function}
      */
     const closeHandler = (callbacks, callbackArg, actionButton, index) => {
-        return function() {
+        return function(ev, data) {
             /* Cleanup */
             if (actionButton) {
-                actionButton.off('tap');
+                actionButton.off('click');
                 targetSheet.hide();
             }
-            targetSheet.off('close.mobileSheet');
+            targetSheet.off('close.megaSheet');
             targetSheet.clear();
+
+            // Triggered by trigger function
+            if (actionButton === undefined && data !== undefined) {
+                callbackArg = data;
+            }
 
             if (callbacks) {
                 if (callbacks.onInteraction && typeof callbacks.onInteraction === 'function') {
@@ -63,11 +68,8 @@ var megaMsgDialog = (() => {
                 labelTitle: l[229], // Do not show again
                 checked: false
             });
-            checkboxNode.on('tap', () => {
-                // We haven't hit the rising or falling edge yet, so it's actually
-                // the inverse of the current state.
-                // Looks like tap is called before click...
-                checkboxCallback(!checkboxNode.checked);
+            checkboxNode.on('toggle.change', function() {
+                checkboxCallback(this.checked);
             });
         }
     }
@@ -179,7 +181,9 @@ var megaMsgDialog = (() => {
                 targetSheet.clear();
                 targetSheet.type = options.sheetType || 'modal';
                 targetSheet.showClose = closeButton || false;
-                targetSheet.preventBgClosing = typeof closeButton === 'boolean' ? !closeButton : true;
+                targetSheet.preventBgClosing = typeof closeButton === 'boolean' ? !closeButton : is_mobile;
+                targetSheet.addClass('msg-dialog');
+                targetSheet.one('clear', () => targetSheet.removeClass('msg-dialog'));
 
                 buttonTemplate = {
                     parentNode: targetSheet.actionsNode,
@@ -228,19 +232,26 @@ var megaMsgDialog = (() => {
                         confirmButton = options.footer.confirmButton === undefined ? confirmButton :
                             options.footer.confirmButton;
                     }
+
+                    if (options.image) {
+                        targetSheet.addImage(options.image);
+                    }
                 }
 
                 // Bind to the sheet actions
-                targetSheet.on('close.mobileSheet', closeHandler(callbacks, false));
+                targetSheet.on('close.megaSheet', closeHandler(callbacks, false));
 
                 renderButtons(callbacks);
             };
 
             if (safeShow) {
-                M.safeShowDialog(`mobile-messageOverlay-${dialogName}`, () => {
+
+                const name = typeof safeShow === 'string' ? safeShow : `messageOverlay-${dialogName}`;
+
+                M.safeShowDialog(name, () => {
                     _sheet();
 
-                    targetSheet.name = `mobile-messageOverlay-${dialogName}`;
+                    targetSheet.name = name;
                     targetSheet.safeShow = true;
 
                     targetSheet.show();
@@ -289,7 +300,3 @@ var megaMsgDialog = (() => {
         }
     };
 })();
-
-if (is_mobile) {
-    mobile.messageOverlay = megaMsgDialog;
-}

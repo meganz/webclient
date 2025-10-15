@@ -218,7 +218,7 @@
         attribute = buildAttribute(attribute, pub, nonHistoric, decodeValues);
 
         // Prevent firing API requests when API already gave the attribute value with 'ug'
-        if ((attribute[0] === '^' || attribute[0] === '+') && userhandle in M.u) {
+        if (attribute[0] === '^' || attribute[0] === '+') {
 
             const data = Object(window.u_attr).u === userhandle && u_attr[attribute]
                 || M.getUserByHandle(userhandle)[attribute];
@@ -431,10 +431,12 @@
                 api.req(payload, ATTR_REQ_CHANNEL[attribute])
                     .then(({result}) => settleFunction(result))
                     .catch((ex) => {
-                        if (ex !== ENOENT) {
+                        const ec = Number(ex);
+
+                        if (ec !== ENOENT) {
                             logger.warn(attribute, ex);
                         }
-                        settleFunction(ex);
+                        settleFunction(ec || ex);
                     });
             }
         };

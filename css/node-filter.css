@@ -2,12 +2,11 @@
 .fm-filter-chips-wrapper {
     height: 32px;
     padding-inline: 24px 88px;
-    padding-bottom: 8px;
     transition: 200ms linear;
     display: flex;
     align-items: center;
     margin-inline-end: auto;
-    margin-top: 8px;
+    align-self: flex-start;
 }
 
 .fm-filter-chips-wrapper .fm-filter-chips {
@@ -99,16 +98,14 @@ tr.is-sensitive td span.item-type-icon {
 tr.is-sensitive span.simpletip-breadcrumb,
 tr.is-sensitive span.tranfer-filetype-txt,
 tr.is-sensitive span.transfer-filetype-icon:not(.image),
-.fm-left-panel span.is-sensitive.nw-fm-tree-item,
-.fm-left-panel span.is-sensitive + ul span.nw-fm-tree-item,
+.fm-tree-panel span.is-sensitive.nw-fm-tree-item,
+.fm-tree-panel span.is-sensitive + ul span.nw-fm-tree-item,
 span.is-sensitive.dropdown,
 span.is-sensitive.dropdown-item,
 a.is-sensitive.fm-breadcrumbs,
-a.is-sensitive .dropdown-recently-opened-item-filename,
 a.is-sensitive .dropdown-search-results-item-location span,
 a.is-sensitive .dropdown-search-results-item-location,
-a.is-sensitive .dropdown-recently-opened-item-location,
-a.is-sensitive .dropdown-recently-opened-item-time {
+.rewind-sidebar .is-sensitive {
     opacity: 0.5;
 }
 a.is-sensitive img,
@@ -118,8 +115,7 @@ div.is-sensitive img {
 .is-sensitive .dropdown-search-results-item-file-icon img {
     filter: blur(2px);
 }
-tr.is-sensitive img,
-a.dropdown-recently-opened-item.is-sensitive img {
+tr.is-sensitive img {
     filter: blur(0.25rem);
 }
 tr.is-sensitive td.size,

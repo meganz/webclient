@@ -19,12 +19,12 @@ class MegaOverlay extends MegaComponent {
         targetNode = overlay;
 
         subNode = document.createElement('div');
-        subNode.className = 'header mb-4 relative';
+        subNode.className = 'header relative';
         targetNode.appendChild(subNode);
         targetNode = subNode;
 
         this.headerTitleNode = subNode = document.createElement('div');
-        subNode.className = 'header-title flex flex-row items-center';
+        subNode.className = 'header-title flex flex-row items-center mb-4';
         targetNode.appendChild(subNode);
 
         this.closeButton = new MegaButton({
@@ -120,6 +120,10 @@ class MegaOverlay extends MegaComponent {
             };
 
             this.name = options.name || '';
+
+            if (options.videoHeader) {
+                this.addVideoHeader(options.videoHeader);
+            }
 
             if (options.navImage) {
                 this.addNavImage(options.navImage, true);
@@ -238,6 +242,7 @@ class MegaOverlay extends MegaComponent {
         this.clearUserEvents();
 
         this.removeClass('action-button-bottom');
+        this.trigger('clear');
     }
 
     // Methods for each of its elements
@@ -328,6 +333,28 @@ class MegaOverlay extends MegaComponent {
         const elem = document.createElement('i');
         elem.className = icon ? `icon ${imageClass}` : imageClass;
         this.imageNode.append(elem);
+    }
+
+    addVideoHeader(videoData) {
+        if (typeof videoData === 'string') {
+            videoData = { file: videoData };
+        }
+        const { file, muted = true, loop = true } = videoData;
+        const { browser, version } = browserdetails(ua);
+        if (!file || browser === 'Safari' && parseInt(version.split('.').shift(), 10) < 16) {
+            return;
+        }
+        const elem = document.createElement('video');
+        elem.className = 'overlay-video';
+        elem.muted = muted;
+        elem.loop = loop;
+        elem.playsInline = true;
+        const src = document.createElement('source');
+        src.type = 'video/webm';
+        src.src = `${staticpath}media/${file}.webm`;
+        elem.appendChild(src);
+        this.headerTitleNode.appendChild(elem);
+        elem.play().catch(nop);
     }
 
     addNavImage(imageClass, icon = true) {

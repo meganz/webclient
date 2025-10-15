@@ -18,10 +18,12 @@
                     return false;
                 }
 
+                const hasNodeFilter = mega.ui.mNodeFilter && mega.ui.mNodeFilter.selectedFilters.value;
                 const root = M.getNodeRoot(n.h);
                 return root !== M.RubbishID
                     && root !== 'shares'
-                    && mega.sensitives.shouldShowNode(n);
+                    && mega.sensitives.shouldShowNode(n)
+                    && (!hasNodeFilter || hasNodeFilter && mega.ui.mNodeFilter.match(n));
             },
             /**
              * Internal properties, populated as options.
@@ -195,6 +197,9 @@
             }
 
             if (!M.v.length) {
+                if (mega.ui.mNodeFilter && mega.ui.mNodeFilter.selectedFilters.value) {
+                    return;
+                }
                 this.setEmptyPage().catch(dump);
             }
         }
@@ -391,8 +396,10 @@
         const $resultsCount = $('.fm-search-count', $fmRightHeader).addClass('hidden');
 
         $('.nw-fm-tree-item.opened').removeClass('opened');
-        $('.fm-notification-block.duplicated-items-found').removeClass('visible');
         $('.fm-breadcrumbs-wrapper, .column-settings.overlap', $fmRightFilesBlock).removeClass('hidden');
+
+        // Hide duplicated items banner
+        M.duplicatedItemsBanner();
 
         if (folderlink && !pfcol || id !== this.RootID && this.currentrootid === this.RootID
             || this.onDeviceCenter && !mega.devices.ui.isCustomRender()) {
@@ -516,7 +523,10 @@
                 })([id]);
             }
             else if (id.substr(0, 6) === 'search') {
-                this.filterBySearch(this.currentdirid);
+                const chipBtn = $('button.search-chip', $('.mega-header'));
+                this.filterBySearch(
+                    this.currentdirid, mega.ui.searchbar.locationFn(chipBtn.length && chipBtn.attr('data-location'))
+                );
                 $('.fm-breadcrumbs-wrapper', $fmRightHeader).addClass('hidden');
                 $('.column-settings.overlap').addClass('hidden');
                 $resultsCount.removeClass('hidden');
@@ -652,9 +662,18 @@
             loadSubPage(path);
         }
 
-        if (!this.gallery && !this.albums) {
+        if (!M.isGalleryPage() && !this.albums) {
             $('#media-section-controls, #media-tabs, #media-section-right-controls', $fmRightFilesBlock)
                 .addClass('hidden');
+        }
+
+        if (mega.ui.secondaryNav) {
+            const noScroll = mega.ui.secondaryNav.bindScrollEvents();
+            if (!mega.ui.secondaryNav.isSmall && noScroll && !mega.ui.secondaryNav.actionsHolder) {
+                mega.ui.secondaryNav.domNode.classList.remove('buttons-up');
+                mega.ui.secondaryNav.domNode.querySelector('.fm-card-holder')
+                    .before(mega.ui.header.domNode.querySelector('.fm-header-buttons'));
+            }
         }
     };
 
@@ -695,6 +714,18 @@
         if (mega.ui.secondaryNav) {
             mega.ui.secondaryNav.updateGalleryLayout(pfid);
             mega.ui.secondaryNav.updateLayoutButton();
+            mega.ui.secondaryNav.hideActionButtons();
+        }
+
+        // In MEGA Lite mode, remove this temporary class
+        if (mega.lite.inLiteMode) {
+            $('.files-grid-view.fm').removeClass('mega-lite-hidden');
+
+            // Redirect disabled sections
+            if (mega.lite.disabledSections[id]) {
+                cv = false;
+                id = this.RootID;
+            }
         }
         $('.fm-right-account-block, .fm-right-block, .fm-filter-chips-wrapper').addClass('hidden');
 
@@ -837,11 +868,13 @@
         else if (id === 'shares') {
             id = 'shares';
         }
-        else if (id === 'out-shares') {
-            id = 'out-shares';
-        }
-        else if (id === 'public-links') {
-            id = 'public-links';
+        else if (id === 'out-shares' || id === 'public-links') {
+            if (mega.infinity) {
+                const p = this.loadNodeShares(id);
+                if (p) {
+                    await p;
+                }
+            }
         }
         else if (id === 'file-requests') {
             id = 'file-requests';
@@ -996,10 +1029,6 @@
             }
 
             if (handles.length) {
-                if ((mega.infinity || u_attr.s4) && !$.inSharesRebuild) {
-                    // @todo validate which nodes are legit to query here
-                    loadingDialog.show();
-                }
                 await dbfetch.geta(handles).catch(dump);
             }
 
@@ -1007,7 +1036,8 @@
                 $.inSharesRebuild = Date.now();
 
                 queueMicrotask(() => {
-                    mega.keyMgr.decryptInShares(-0xFEED)
+                    // @todo add a button to let users do this on-demand
+                    mega.keyMgr.decryptInShares(!mega.infinity && -0xFEED)
                         .then(() => {
                             return this.showContactVerificationDialog();
                         })
@@ -1015,11 +1045,6 @@
                 });
                 M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
             }
-        }
-
-        // In MEGA Lite mode, remove this temporary class
-        if (mega.lite.inLiteMode) {
-            $('.files-grid-view.fm').removeClass('mega-lite-hidden');
         }
 
         _openFolderCompletion.call(this, id = cv.original || id, isFirstOpen);

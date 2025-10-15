@@ -404,21 +404,29 @@ function init_page() {
             return;
         }
         $.lastSeenFilelink = getSitePath();
+
+        if (fminitialized) {
+            // Clean up internal state in case we're navigating back to a public-link
+            M.currentdirid = M.RootID = M.currentCustomView = false;
+            delete $.mcImport;
+        }
     }
 
     // Rmove business class to affect the top header
     // Remove bottom-page class and old class
     // Remove pro class when user come back from pro page
-    document.body.classList.remove('business', 'bottom-pages', 'old', 'pro', 'mega-lite-mode');
-
-    // Add mega-lite-mode class to hide/show various elements in MEGA Lite mode
-    if (mega.lite.inLiteMode) {
-        document.body.classList.add('mega-lite-mode');
-    }
+    document.body.classList.remove('business', 'bottom-pages', 'old', 'pro');
 
     // Redirect url to extensions when it tries to go plugin or chrome or firefox
     if (page === 'plugin') {
         mega.redirect('mega.io', 'extensions', false, false);
+        return false;
+    }
+
+    // This is a redirect page for primary mobile devices
+    if (is_mobile && page === 'go') {
+        window.location.replace(getMobileStoreLink());
+        eventlog(500921);
         return false;
     }
 
@@ -937,7 +945,7 @@ function init_page() {
     /**
      * Activate S4 Auth Code for Pro Flexi accounts
      */
-    else if (page === 'activate-s4') {
+    else if (page.substr(0, 11) === 'activate-s4') {
         ActivateS4Page.load();
     }
     else if (page === 'confirm') {
@@ -1453,8 +1461,11 @@ function init_page() {
     }
     else if (page === 'cookie') {
         if (mega.flags.ab_adse) {
+            if (mega.tld !== 'nz') {
+                pages.cookiepolicy = pages.cookiepolicy.replace(/\.nz/g, `.${mega.tld}`);
+            }
             parsepage(pages.cookiepolicy);
-            $cookiePolicyPage = $('body #mainlayout #startholder .bottom-page.cookie-policy');
+            const $cookiePolicyPage = $('body #mainlayout #startholder .bottom-page.cookie-policy');
             $('.cookie-policy .cookiesdialog', $cookiePolicyPage).rebind('click', () => {
                 csp.trigger().dump('csp.trigger');
             });
@@ -1719,7 +1730,15 @@ function init_page() {
             }
         }
         else if ((!pfid || flhashchange) && (id && id !== M.currentdirid || page === 'start' || page === 'fm/pwm')) {
-            M.openFolder(id, true);
+
+            M.openFolder(id, true)
+                .then(() => {
+
+                    if (localStorage.dlimp) {
+                        return M.fireFMDependantActions();
+                    }
+                })
+                .catch(reportError);
         }
         else {
             if (ul_queue.length > 0) {
@@ -1770,7 +1789,7 @@ function init_page() {
                                 onIdle(() => closeDialog());
                             }
                         );
-                        return $('#msgDialog');
+                        return $(mega.ui.sheet.domNode);
                     });
 
                 }
@@ -1901,7 +1920,7 @@ function topbarUI(holderId) {
     if (!topbar) {
         return;
     }
-    onIdle(() => mega.ui.searchbar.refresh());
+    onIdle(() => mega.ui.searchbar.refresh(null, !M.previousdirid));
 
     topbarUITogglePresence(topbar);
 
@@ -1941,11 +1960,6 @@ function topbarUI(holderId) {
 
     if (u_type && u_attr && u_attr.email && (element = topbar.querySelector('.email'))) {
         $(element).text(u_attr.email).attr('data-simpletip', u_attr.email);
-    }
-
-    // Initialise the Back to MEGA button (only shown if in MEGA Lite mode)
-    if (mega.lite.inLiteMode) {
-        mega.lite.initBackToMegaButton();
     }
 
     $('.js-topbaravatar, .js-activity-status', topbar).rebind('click', function() {
@@ -2087,7 +2101,6 @@ function topmenuUI() {
     var $headerActivityBlock = $('.activity-status-block .activity-status,.activity-status-block', $topHeader);
     var $headerIndividual = $('.individual', $topHeader);
     var $headerIndividualSpan = $('.individual span', $topHeader);
-    var $headerSearch = $('.mini-search', $topHeader);
     var $headerButtons = $('.top-buttons', $topHeader);
     var $loginButton = $('.top-login-button', $headerButtons);
     var $headerRegisterBotton = $('.create-account-button', $headerButtons);
@@ -2129,10 +2142,6 @@ function topmenuUI() {
     }
     else {
         $headerIndividual.removeClass('hidden');
-    }
-
-    if (!fminitialized) {
-        $headerSearch.addClass('hidden');
     }
 
     if (page === 'download') {
@@ -2536,7 +2545,7 @@ function topmenuUI() {
             elements = document.getElementsByClassName('js-dropdown-rewind-progress');
 
             for (i = elements.length; i--;) {
-                if (!elements[i].classList.contains('active') || e && e.target.closest('.topbar-links, .mega-header')) {
+                if (!elements[i].classList.contains('active')) {
                     elements[i].classList.remove('show');
                 }
             }
@@ -3170,6 +3179,11 @@ function loadSubPage(tpage, event) {
     }
 
     if (event && event.type === 'popstate' || event === 'override') {
+        if (event.state && event.state.subpage === 'fm/search') {
+            // We need to preload the searchbar before opening/searching closed nodes
+            MegaHeader.updateSearchForm(event.state.searchLocation);
+        }
+
         // In case we navigated to a location.hash, clean it up replacing the current history entry.
         pushHistoryState(true, page);
     }
@@ -3207,8 +3221,16 @@ window.addEventListener('popstate', function(event) {
     passive: true,
 });
 
-window.addEventListener('beforeunload', () => {
+window.addEventListener('beforeunload', (ev) => {
     'use strict';
+    const confirm = (msg, quiet) => {
+        ev.preventDefault();
+        if (quiet) {
+            return null;
+        }
+        ev.returnValue = '';
+        return msg || l[761];
+    };
 
     if ('rad' in mega) {
         mega.rad.flush().dump('rad.flush');
@@ -3216,18 +3238,22 @@ window.addEventListener('beforeunload', () => {
 
     if (megaChatIsReady && megaChat.activeCall) {
         megaChat.playSound(megaChat.SOUNDS.ALERT);
-        return false;
+        return confirm();
     }
 
     if (window.dlmanager && (dlmanager.isDownloading || ulmanager.isUploading)) {
-        return $.memIOSaveAttempt ? null : l[377];
+        return confirm(l[377], $.memIOSaveAttempt);
     }
 
     if (window.fmdb && window.currsn && fminitialized
         && Object(fmdb.pending).length && Object.keys(fmdb.pending[0] || {}).length) {
 
         setsn(currsn);
-        return l[16168];
+        return confirm(l[16168]);
+    }
+
+    if (mega.s4c) {
+        return confirm();
     }
 
     if (window.doUnloadLogOut) {
@@ -3415,30 +3441,6 @@ mBroadcaster.once('boot_done', () => {
             setTimeout(performMeasurement, interval);
         })();
     }
-});
-
-mBroadcaster.addListener('fm:initialized', () => {
-    'use strict';
-
-    if (folderlink) {
-        return;
-    }
-
-    onIdle(() => {
-        // Add the dynamic notifications
-        if (typeof notify.addDynamicNotifications !== 'undefined') {
-            notify.addDynamicNotifications().catch(dump);
-        }
-
-        if (u_attr['^!welpdf'] === '0') {
-            Promise.all([
-                M.importWelcomePDF(),
-                mega.attr.set2(null, 'welpdf', '1', -2, true)
-            ]).dump('welpdf');
-        }
-    });
-
-    return 0xDEAD;
 });
 
 // After open folder call, check if we should restore any previously opened preview node.

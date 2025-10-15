@@ -12,7 +12,8 @@
     width: 100%;
 }
 
-.fm-empty-section.active-rewind {
+.fm-empty-section.active-rewind,
+.empty-state.active-rewind {
     flex-direction: row;
     min-height: 0;
 }
@@ -22,8 +23,7 @@
     min-width: 456px;
 }
 
-
-.active-rewind.files-grid-view.fm .column-settings {
+body:not(.rtl) .active-rewind.files-grid-view.fm .column-settings {
     order: 2;
 }
 
@@ -194,6 +194,41 @@ body.theme-dark .active-rewind .rewind-sidebar {
     --icon-size: 24px;
 }
 
+.rtl .rewind-sidebar .reduction-notification {
+    direction: rtl;
+}
+
+.rewind-sidebar .reduction-notification {
+    display: none;
+}
+
+.rewind-sidebar .reduction-notification.visible {
+    display: block;
+}
+
+.rewind-sidebar .reduction-notification .content {
+    display: grid;
+    order: 5;
+}
+
+.rewind-sidebar .reduction-notification .content > * {
+    padding: 4px 0;
+}
+
+.rewind-sidebar .reduction-notification .date,
+.fm-notification-block.rewind-reduction .date {
+    font-weight: bold;
+}
+
+.rewind-sidebar .reduction-notification .action {
+    grid-row: 3;
+}
+
+.rewind-sidebar .reduction-notification .close {
+    display: flex;
+    order: 10;
+    padding: 4px 0;
+}
 
 .rewind-datepicker-calendar {
     position: absolute;
@@ -489,6 +524,11 @@ body.theme-dark .rewind-datepicker-calendar .datepicker--cell.-current- {
     font: var(--text-body2);
     margin-bottom: 18px;
     width: 304px;
+}
+
+.sidebar .sidebar-container .sidebar-content .content-upgrade .rewind-description a {
+    display: block;
+    padding: 12px 0;
 }
 
 .sidebar .sidebar-container .sidebar-content .content-upgrade .upgrade-description {
@@ -860,17 +900,21 @@ body.theme-dark .rewind-datepicker-calendar .datepicker--cell.-current- {
 }
 
 .fm-rewind-progress-section .image {
-    background-image: url("../images/mega/rewind/mega-main.png");
-    background-size: 248px auto;
+
+    /* background-image: url("../images/mega/rewind/mega-main.png"); */
+    background-image: url("../images/mega/rewind-loader.gif");
+    background-size: 127px auto;
     background-repeat: no-repeat;
-    height: 248px;
-    width: 248px;
-    margin-bottom: 24px;
+    height: 127px;
+    width: 127px;
+    margin-bottom: 26px;
     flex-shrink: 0;
 }
 
 .fm-rewind-progress-section .title {
-    font: var(--text-h0);
+    font: var(--text-h2);
+    margin-bottom: 24px;
+    max-width: 448px;
 }
 
 .fm-rewind-progress-section .message {
@@ -880,6 +924,78 @@ body.theme-dark .rewind-datepicker-calendar .datepicker--cell.-current- {
 
 .fm-rewind-progress-section span.medium-color {
     color: var(--text-color-medium);
+}
+
+.fm-rewind-progress-section .rw-steps {
+    display: flex;
+    flex-direction: column-reverse;
+    height: 52px;
+    justify-content: start;
+    align-items: start;
+}
+
+.fm-rewind-progress-section .rw-steps .rw-progress-step {
+    height: 0;
+    opacity: 0;
+    display: flex;
+    align-items: center;
+    transition: all 200ms ease-in-out;
+}
+
+.fm-rewind-progress-section .rw-steps .rw-progress-step:not(:last-child) {
+    margin-top: 14px;
+}
+
+.fm-rewind-progress-section .rw-steps .rw-progress-step.loading,
+.fm-rewind-progress-section .rw-steps .rw-progress-step.loaded {
+    height: 20px;
+}
+
+.fm-rewind-progress-section .rw-steps .rw-progress-step.loading {
+    opacity: 1.0;
+}
+
+.fm-rewind-progress-section .rw-steps .rw-progress-step.loaded {
+    opacity: 0.5;
+}
+
+.fm-rewind-progress-section .rw-steps .rw-progress-step i.rw-progress-spinner {
+    animation: rotate 0.8s infinite steps(8);
+    height: 24px;
+    width: 24px;
+    margin: 0 10px 0 0;
+    vertical-align: middle;
+    display: none;
+}
+
+.fm-rewind-progress-section .rw-steps .rw-progress-step i.rw-progress-done {
+    display: none;
+}
+
+.fm-rewind-progress-section .rw-steps .rw-progress-step.loading i.rw-progress-spinner {
+    display: inline-block;
+}
+
+.fm-rewind-progress-section .rw-steps .rw-progress-step.loaded i.rw-progress-done {
+    height: 24px;
+    width: 24px;
+    display: inline-block;
+    animation: none;
+    margin: 0 10px 0 0;
+}
+
+
+.dropdown.js-dropdown-rewind-progress {
+    width: 0 !important;
+    margin-left: 0 !important;
+}
+
+.rtl .dropdown.js-dropdown-rewind-progress {
+    margin-right: 0 !important;
+}
+
+.dropdown.js-dropdown-rewind-progress::before {
+    background-color: unset !important;
 }
 
 .dropdown.rewind-progress .content {

@@ -310,8 +310,8 @@ lazy(mega, 'sets', () => {
          * @param {String} setKey Set key to use for encryption
          * @returns {function(...[*]): Promise<void>}
          */
-        add: (h, setId, setKey) => {
-            const n = M.d[h];
+        add: async(h, setId, setKey) => {
+            const n = M.d[h] || (await dbfetch.node([h]).catch(nop) || [])[0];
 
             if (!n) {
                 throw new Error('Cannot find the node to add to the set...');
@@ -340,9 +340,14 @@ lazy(mega, 'sets', () => {
             const e = [];
             const savingEls = {};
 
+            const nodes = (await dbfetch.node(handles.map(({ h }) => h)).catch(nop) || []).reduce((accum, n) => {
+                accum[n.h] = n;
+                return accum;
+            }, Object.create(null));
+
             for (let i = 0; i < handles.length; i++) {
                 const { h, o } = handles[i];
-                const n = M.d[h];
+                const n = M.d[h] || nodes[h];
 
                 if (!n) {
                     dump(`Node ${h} cannot be added to the set...`);

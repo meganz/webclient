@@ -32,7 +32,22 @@ class MegaNavCard extends MegaComponent {
 
         subNode = document.createElement('div');
         subNode.className = 'fm-item-name';
-        labelWrapper.appendChild(subNode);
+        if (typeof options.onContextMenu === 'function') {
+            const contextName = new MegaComponent({
+                nodeType: 'button',
+                parentNode: labelWrapper,
+                componentClassname: 'fm-context-name',
+                id: `cardctx_${this.handle}`,
+            });
+            contextName.domNode.appendChild(subNode);
+            const icon = document.createElement('i');
+            icon.className = 'sprite-fm-mono icon-chevron-down-thin-outline';
+            contextName.domNode.appendChild(icon);
+            contextName.on('click', options.onContextMenu);
+        }
+        else {
+            labelWrapper.appendChild(subNode);
+        }
 
         subNode = document.createElement('div');
         subNode.className = 'fm-label-badge';
@@ -47,31 +62,21 @@ class MegaNavCard extends MegaComponent {
 
         wrapper = document.createElement('div');
         wrapper.className = 'fm-item-actions-block';
-        MegaButton.factory({
+        this.primaryOptions = {
             parentNode: wrapper,
             ...options.primaryButton,
             componentClassname: `primary ${options.primaryButton.componentClassname || ''}`,
-        });
-        const secondaryBtn = new MegaButton({
+        };
+        MegaButton.factory(this.primaryOptions);
+        this.secondaryOptions = {
             parentNode: wrapper,
             ...options.secondaryButton,
             componentClassname: `secondary outline ${options.secondaryButton.componentClassname || ''}`
-        });
+        };
         if (this.isSync || this.isBackup) {
-            secondaryBtn.removeClass('outline');
+            this.secondaryOptions.componentClassname = this.secondaryOptions.componentClassname.replace(' outline', '');
         }
-        if (typeof options.onContextMenu === 'function') {
-            MegaButton.factory({
-                parentNode: wrapper,
-                type: 'icon',
-                icon: 'sprite-fm-mono icon-side-menu',
-                componentClassname: 'transparent-icon fm-header-context',
-                id: `fmhead_${this.handle}`,
-                onClick: (ev) => {
-                    options.onContextMenu(ev);
-                }
-            });
-        }
+        MegaButton.factory(this.secondaryOptions);
 
         this.domNode.appendChild(wrapper);
         this.update();
@@ -121,14 +126,25 @@ class MegaNavCard extends MegaComponent {
     }
 
     get badgeHtml() {
+        if (this._lastShareName && !this.isSharedRoot) {
+            delete this._lastShareName;
+        }
         if (this.isSharedRoot) {
             const { su } = this.node;
+            const data = {
+                n: M.getNameByHandle(su),
+                m: M.u[su].m
+            };
+            if (this._lastShareName && data.n === this._lastShareName.n && data.m === this._lastShareName.m) {
+                return '';
+            }
+            this._lastShareName = data;
             return `
                 <div class="fm-item-badge">
                     <div class="fm-share-avatar"></div>
-                    <div class="fm-share-user">${escapeHTML(M.getNameByHandle(su))}</div>
+                    <div class="fm-share-user">${escapeHTML(data.n)}</div>
                     <span class="dot">.</span>
-                    <div class="fm-share-email">${escapeHTML(M.u[su].m)}</div>
+                    <div class="fm-share-email">${escapeHTML(data.m)}</div>
                 </div>
             `;
         }
@@ -185,7 +201,7 @@ class MegaNavCard extends MegaComponent {
         else if (this.isDevice || this.isBackup || this.isSync) {
             return `
                 <div class="fm-label-badge">
-                    <i class="sprite-fm-mono icon-info-thin-outline dc-badge-info-icon simpletip"></i>
+                    <i class="sprite-fm-mono icon-question-filled dc-badge-info-icon simpletip"></i>
                 </div>
             `;
         }
@@ -227,7 +243,7 @@ class MegaNavCard extends MegaComponent {
         if (!this.isDevice && !this.isSync && !this.isBackup) {
             const html = this.badgeHtml;
             this.badge = html;
-            didRender = !!html;
+            didRender = !!html || this.isSharedRoot;
         }
         else if (this.isSync || this.isBackup) {
             const { status } = this.node;
@@ -276,10 +292,11 @@ class MegaNavCard extends MegaComponent {
         if (this.isSharedRoot) {
             const parentNode = this.domNode.querySelector('.fm-share-avatar');
             if (parentNode) {
-                this.avatar = this.avatar || new MegaAvatarComponent({
-                    parentNode,
-                    userHandle: this.node.su,
-                });
+                this.avatar = this.avatar && this.avatar.parentNode === parentNode ? this.avatar :
+                    new MegaAvatarComponent({
+                        parentNode,
+                        userHandle: this.node.su,
+                    });
                 this.avatar.update();
             }
             let iconClass = `fm-icon item-type-icon icon-${fileIcon(this.node)}-24`;
@@ -303,6 +320,10 @@ class MegaNavCard extends MegaComponent {
         }
         else if (this.isBackup) {
             this.icon = 'fm-icon item-type-icon icon-folder-backup-24';
+        }
+        else if (!folderlink && this.node.t && this.node.lbl) {
+            const lbl = MegaNodeComponent.label[this.node.lbl | 0] || '';
+            this.icon = `fm-icon item-type-icon icon-${fileIcon(this.node)}-24 ${lbl}`;
         }
         else {
             this.icon = `fm-icon item-type-icon icon-${fileIcon(this.node)}-24`;
@@ -335,6 +356,7 @@ lazy(mega.ui, 'secondaryNav', () => {
         icon: 'sprite-fm-mono icon-download-standard',
         text: l[5928],
         onClick: () => {
+            $.hideContextMenu();
             if (!mega.ui.secondaryNav.dlId) {
                 return;
             }
@@ -342,19 +364,19 @@ lazy(mega.ui, 'secondaryNav', () => {
             delete mega.ui.secondaryNav.dlId;
         }
     });
-    MegaButton.factory({
+    const downloadZip = new MegaButton({
         parentNode: downloadMenu,
         type: 'fullwidth',
         componentClassname: 'text-icon',
         icon: 'sprite-fm-mono icon-download-zip',
         text: l[864],
         onClick: () => {
+            $.hideContextMenu();
             if (!mega.ui.secondaryNav.dlId) {
                 return;
             }
             M.addDownload([mega.ui.secondaryNav.dlId], true);
             delete mega.ui.secondaryNav.dlId;
-            $.hideContextMenu();
         }
     });
     const downloadMegaSync = new MegaButton({
@@ -364,6 +386,7 @@ lazy(mega.ui, 'secondaryNav', () => {
         icon: 'sprite-fm-mono icon-session-history',
         text: l.btn_dlwitdeskapp,
         onClick: () => {
+            $.hideContextMenu();
             if (!mega.ui.secondaryNav.dlId) {
                 return;
             }
@@ -385,6 +408,7 @@ lazy(mega.ui, 'secondaryNav', () => {
 
     let infoButtonBound = false;
     let layoutButtonBound = false;
+    let smallButtonBound = false;
     const layoutMenu = document.createElement('div');
     layoutMenu.className = 'fm-layout-dropdown';
     layoutMenu.appendChild(parseHTML(`<span class="layout-label">${escapeHTML(l.layout_menu)}</span>`));
@@ -396,13 +420,19 @@ lazy(mega.ui, 'secondaryNav', () => {
             fmviewmode(M.currentdirid, viewValue);
         }
 
-        if (folderlink && String(M.currentdirid).startsWith('search')) {
+        const isSearch = String(M.currentdirid).startsWith('search/');
+
+        if (folderlink && isSearch) {
             M.viewmode = viewValue;
             $.hideContextMenu();
             M.renderMain();
         }
         else {
             M.openFolder(M.currentdirid, true).then(reselect.bind(null, 1));
+        }
+
+        if (isSearch) {
+            mega.ui.searchbar.reinitiateSearchTerm();
         }
 
         if (viewValue === 2 && mega.ui.mNodeFilter) {
@@ -605,19 +635,8 @@ lazy(mega.ui, 'secondaryNav', () => {
     };
 
     const updateColBtnText = () => {
-
-        if (page === 'fm/public-links') {
-            timeAdBtn.text = l[20694];
-            colBtnsText.date = l[20694];
-        }
-        else if (page === 'fm/file-requests') {
-            timeAdBtn.text = l.file_request_page_label_request_created;
-            colBtnsText.date = l.file_request_page_label_request_created;
-        }
-        else {
-            timeAdBtn.text = l[17445];
-            colBtnsText.date = l[17445];
-        }
+        timeAdBtn.text = l[17445];
+        colBtnsText.date = l[17445];
     };
 
     selectAllGrid.addEventListener('click', _allAction);
@@ -653,7 +672,7 @@ lazy(mega.ui, 'secondaryNav', () => {
                     colkey = 'timeMd';
                 }
 
-                if ((colkey === 'versions' || colkey === 'size') && mega.lite.inLiteMode ||
+                if (colkey === 'versions' && mega.lite.inLiteMode ||
                     M.currentdirid === 'faves' && colkey === 'fav') {
                     forceHide = true;
                 }
@@ -800,8 +819,12 @@ lazy(mega.ui, 'secondaryNav', () => {
         }
     };
 
-    let filterChipShown = false;
     let dcChipShown = false;
+    let startedScrolling = false;
+    let scrollHandler = false;
+    let chipsViewWrapShown = false;
+    let moveUpTimer = false;
+    let showBreadcrumbs = false;
 
     const toggleGridExtraButtons = hide => extraBtnWrapper.classList.toggle('hidden', hide);
 
@@ -811,9 +834,11 @@ lazy(mega.ui, 'secondaryNav', () => {
         showColumnSelectionMenu,
         handleNodeSelection,
         toggleGridExtraButtons,
+
         get bannerHolder() {
-            return this.domNode.querySelector('.fm-banner-holder');
+            return document.querySelector('.fm-banner-holder');
         },
+
         get actionsHolder() {
             return this.domNode.querySelector('.fm-header-buttons');
         },
@@ -842,6 +867,28 @@ lazy(mega.ui, 'secondaryNav', () => {
         get filterChipsHolder() {
             return this.domNode.querySelector('.fm-filter-chips-wrapper');
         },
+        get chipsViewsWrapper() {
+            return this.domNode.querySelector('.fm-header-chips-and-view-buttons');
+        },
+        get ps() {
+            if (M.onDeviceCenter) {
+                const config = {
+                    'device-centre-devices': 'devices',
+                    'device-centre-folders': 'folders'
+                };
+                const renderSection = mega.devices.ui.getRenderSection();
+                if (config[renderSection]) {
+                    return document.querySelector(`.fm-right-files-block .ps.${config[renderSection]}`);
+                }
+            }
+            return document.querySelector('.fm-right-files-block .ps:not(.breadcrumb-dropdown)');
+        },
+        get smallNavButton() {
+            return this.domNode.querySelector('.fm-small-nav');
+        },
+        get isSmall() {
+            return document.body.classList.contains('small-nav');
+        },
         openNewMenu(ev) {
             if (
                 M.InboxID &&
@@ -850,7 +897,13 @@ lazy(mega.ui, 'secondaryNav', () => {
                 return;
             }
 
-            M.contextMenuUI(ev, 8, ['.fileupload-item', '.folderupload-item', '.newfolder-item', '.newfile-item']);
+            const items = ['.fileupload-item', '.folderupload-item'];
+            const target = ev.currentTarget instanceof MegaComponent ? ev.currentTarget.domNode : ev.currentTarget;
+            if (this.cardComponent && (this.cardComponent.domNode.contains(target) || this.isSmall)) {
+                items.push('.newfolder-item', '.newfile-item');
+            }
+            M.contextMenuUI(ev, 8, items);
+
             eventlog(500721);
         },
         openDownloadMenu(ev) {
@@ -859,12 +912,21 @@ lazy(mega.ui, 'secondaryNav', () => {
             if (id) {
                 const classList =  ['fm-download-menu', 'fm-thin-dropdown'];
                 if (folderlink) {
-                    downloadMegaSync.show();
-                    downloadStandard.hide();
+                    if (window.useMegaSync && (useMegaSync === 2 || useMegaSync === 3)) {
+                        downloadMegaSync.show();
+                        downloadStandard.hide();
+                        downloadZip.hide();
+                    }
+                    else {
+                        downloadMegaSync.hide();
+                        downloadStandard.show();
+                        downloadZip.show();
+                    }
                     classList.push('fl-download');
                 }
                 else {
                     downloadStandard.show();
+                    downloadZip.show();
                     downloadMegaSync.hide();
                 }
                 this.dlId = id;
@@ -874,6 +936,7 @@ lazy(mega.ui, 'secondaryNav', () => {
                     event: ev,
                     eventTarget: target,
                     contents: [downloadMenu],
+                    resizeHandler: true,
                     onClose: () => {
                         target.domNode.classList.remove('active');
                     }
@@ -881,19 +944,24 @@ lazy(mega.ui, 'secondaryNav', () => {
             }
         },
         openContextMenu(ev) {
-            let { id } = ev.currentTarget.domNode;
+            let { id, classList } = ev.currentTarget;
+            if (classList.contains('active')) {
+                ev.stopPropagation();
+                $.hideContextMenu();
+                classList.remove('active');
+                return false;
+            }
             if (id) {
-                if (id.startsWith('fmhead_')) {
-                    id = id.replace('fmhead_', '');
+                if (id.startsWith('pathbc-')) {
+                    id = id.replace('pathbc-', '');
                 }
                 $.selected = [id];
                 if (id === M.RootID) {
-                    ev.currentTarget.domNode.classList.add('cloud-drive');
+                    ev.currentTarget.classList.add('cloud-drive');
                 }
 
-                M.contextMenuUI(ev.originalEvent, 1);
-                ev.currentTarget.domNode.classList.add('active');
-                ev.currentTarget.domNode.classList.remove('cloud-drive');
+                M.contextMenuUI(ev, 1);
+                ev.currentTarget.classList.remove('cloud-drive');
             }
         },
         addActionButton(options) {
@@ -904,52 +972,69 @@ lazy(mega.ui, 'secondaryNav', () => {
                 return;
             }
             const sel = `.${options.componentClassname.split(' ').filter(c => c.startsWith('fm-')).join('.')}`;
-            if (sel === '.' || this.actionsHolder.querySelector(sel)) {
+            const holder = this.actionsHolder || mega.ui.header.domNode.querySelector('.fm-header-buttons');
+            if (sel === '.' || holder.querySelector(sel)) {
                 if (d && sel === '.') {
                     console.warn('No fm- prefixed class found', options.componentClassname);
                 }
                 return;
             }
-            MegaButton.factory({
-                parentNode: this.actionsHolder,
+            const button = new MegaButton({
+                parentNode: holder,
                 ...options,
                 componentClassname: `${options.componentClassname} hidden`,
             });
+            if (options.title) {
+                button.domNode.title = options.title;
+            }
         },
-        showActionButtons(primarySelector, secondarySelector, contextMenuItem) {
+        showActionButtons(...selectors) {
+            const holder = this.actionsHolder || mega.ui.header.domNode.querySelector('.fm-header-buttons');
+            if (!holder) {
+                return;
+            }
             this.hideActionButtons();
-            if (primarySelector) {
-                const primary = this.actionsHolder.querySelector(primarySelector);
-                if (primary) {
-                    primary.classList.remove('hidden');
-                    primary.classList.add('primary');
+            let shown = false;
+            for (let i = 0; i < selectors.length; i++) {
+                const selector = selectors[i];
+                const elem = holder.querySelector(selector);
+                if (elem) {
+                    if (shown) {
+                        elem.classList.add('secondary');
+                    }
+                    else {
+                        elem.classList.add('primary');
+                    }
+                    elem.classList.remove('hidden');
+                    shown = true;
                 }
             }
-            if (secondarySelector) {
-                const secondary = this.actionsHolder.querySelector(secondarySelector);
-                if (secondary) {
-                    secondary.classList.remove('hidden');
-                    secondary.classList.add('secondary');
-                }
-            }
-            contextMenuItem = false;
-            // if (contextMenuItem) {
-            //     const context = this.actionsHolder.querySelector('.fm-context');
-            //     context.id = `fmhead_${contextMenuItem}`;
-            //     context.classList.remove('hidden');
-            // }
-            if (primarySelector || secondarySelector || contextMenuItem) {
-                this.actionsHolder.classList.remove('hidden');
+            if (shown) {
+                holder.classList.remove('hidden');
             }
         },
         hideActionButtons() {
-            const children = this.actionsHolder.children;
-            for (const child of children) {
+            let holder = this.actionsHolder;
+            if (!holder) {
+                const {ps} = this;
+                holder = mega.ui.header.domNode.querySelector('.fm-header-buttons');
+                if (!this.isSmall && ps && !(ps.scrollTop !== 0 && !M.search)) {
+                    // Scrolled back up. Place back and hide.
+                    holder.parentNode.classList.add('contract');
+                    holder.parentNode.classList.remove('expand');
+                    this.domNode.querySelector('.fm-card-holder').before(holder);
+                    holder = this.actionsHolder;
+                    holder.classList.add('open');
+                    holder.classList.remove('collapse');
+                    startedScrolling = false;
+                }
+            }
+            for (const child of holder.children) {
                 child.classList.add('hidden');
                 child.classList.remove('primary', 'secondary');
                 child.id = '';
             }
-            this.actionsHolder.classList.add('hidden');
+            holder.classList.add('hidden');
         },
         showCard(nodeHandle, primaryButton, secondaryButton, onContextMenu) {
             this.hideCard();
@@ -958,8 +1043,12 @@ lazy(mega.ui, 'secondaryNav', () => {
                 nodeHandle,
                 primaryButton,
                 secondaryButton,
-                // onContextMenu,
+                onContextMenu,
             });
+            if (M.onDeviceCenter && this.isSmall) {
+                // Device centre re-render will replace the card. Reinit the buttons.
+                this.collapse();
+            }
         },
         updateCard(handle) {
             if (!this.cardComponent) {
@@ -982,13 +1071,28 @@ lazy(mega.ui, 'secondaryNav', () => {
                 this.cardComponent.destroy();
             }
             this.cardHolder.textContent = '';
+            if (this.isSmall) {
+                const buttons = mega.ui.header.domNode.componentSelectorAll('.fm-header-buttons .card-copy');
+                for (let i = buttons.length; i--;) {
+                    buttons[i].destroy();
+                }
+            }
             delete this.cardComponent;
         },
         showBreadcrumb() {
             this.breadcrumbHolder.classList.remove('hidden');
+            showBreadcrumbs = true;
         },
         hideBreadcrumb() {
             this.breadcrumbHolder.classList.add('hidden');
+            showBreadcrumbs = false;
+            if (this.isSmall) {
+                delay('navchecksmallcrumb', () => {
+                    if (this.isSmall && this.cardComponent) {
+                        this.breadcrumbHolder.classList.remove('hidden');
+                    }
+                });
+            }
         },
         updateInfoPanelButton(show) {
             if (!infoButtonBound) {
@@ -1082,16 +1186,19 @@ lazy(mega.ui, 'secondaryNav', () => {
             return false;
         },
         showSelectionBar() {
+            if (!this.filterChipsHolder.classList.contains('hidden')) {
+                this.filterChipsHolder.classList.add('hidden');
+            }
             if (!this.selectionBar.classList.contains('hidden')) {
                 return;
             }
             this.selectionBar.classList.remove('hidden');
-            if (this.filterChipsHolder.classList.contains('hidden')) {
-                filterChipShown = false;
+            if (this.chipsViewsWrapper.classList.contains('hidden')) {
+                this.chipsViewsWrapper.classList.remove('hidden');
+                chipsViewWrapShown = false;
             }
             else {
-                this.filterChipsHolder.classList.add('hidden');
-                filterChipShown = true;
+                chipsViewWrapShown = true;
             }
             if (M.gallery) {
                 this.selectionBar.classList.add('gallery-pad');
@@ -1113,26 +1220,343 @@ lazy(mega.ui, 'secondaryNav', () => {
             this.selectionBar.classList.add('hidden');
             this.selectionBar.classList.remove('gallery-pad');
             if (M.gallery) {
-                filterChipShown = false;
                 const media = document.getElementById('media-section-controls');
                 if (media) {
                     media.classList.remove('hidden');
                 }
             }
-            if (filterChipShown) {
+            if (mega.ui.mNodeFilter.viewEnabled && M.v.length > 0) {
                 this.filterChipsHolder.classList.remove('hidden');
             }
+            if (!chipsViewWrapShown) {
+                this.chipsViewsWrapper.classList.add('hidden');
+            }
+            this.chipsViewsWrapper.classList.remove('top-spacer');
             if (M.onDeviceCenter && dcChipShown) {
                 mega.devices.ui.filterChipUtils.resetSelections(true);
             }
         },
         onPageChange() {
-            filterChipShown = false;
             dcChipShown = false;
+            chipsViewWrapShown = true;
             if (window.selectionManager) {
                 // selectionManager should eventually reset but this needs to be empty now for some context menu updates
                 selectionManager.selected_list = [];
             }
+            if (scrollHandler) {
+                scrollHandler.target.removeEventListener('scroll', scrollHandler.handler);
+                scrollHandler = false;
+            }
+            if (this.isSmall) {
+                return;
+            }
+            if (!this.actionsHolder) {
+                this.domNode.classList.remove('buttons-up');
+                const buttons = mega.ui.header.domNode.querySelector('.fm-header-buttons');
+                buttons.parentNode.classList.remove('expand');
+                this.domNode.querySelector('.fm-card-holder')
+                    .before(buttons);
+                this.actionsHolder.classList.add('open', 'hidden');
+                this.actionsHolder.classList.remove('collapse');
+            }
+            if (moveUpTimer) {
+                moveUpTimer.abort();
+                moveUpTimer = false;
+            }
         },
+        bindScrollEvents(ps) {
+            ps = ps || this.ps;
+            startedScrolling = false;
+            if (!ps) {
+                return true;
+            }
+            if (scrollHandler) {
+                scrollHandler.target.removeEventListener('scroll', scrollHandler.handler);
+            }
+            scrollHandler = {
+                handler: (e) => {
+                    if (!e.isTrusted || this.isSmall) {
+                        return;
+                    }
+                    const { offsetHeight, scrollHeight } = ps;
+                    if (
+                        !startedScrolling &&
+                        this.actionsHolder &&
+                        scrollHeight - offsetHeight <= this.actionsHolder.getBoundingClientRect().height
+                    ) {
+                        // Don't animate if it might just bounce back up again with the new space.
+                        return;
+                    }
+                    if (e.target.scrollTop === 0) {
+                        this.moveButtonsDown();
+                        return;
+                    }
+                    if (!startedScrolling) {
+                        this.moveButtonsUp();
+                    }
+                },
+                target: ps,
+            };
+            ps.addEventListener('scroll', scrollHandler.handler);
+            if (ps.scrollTop === 0) {
+                return true;
+            }
+            if (this.actionsHolder) {
+                this.actionsHolder.classList.remove('open');
+                const actions = mega.ui.header.domNode.querySelector('.nav-secondary-actions');
+                actions.appendChild(this.actionsHolder);
+                actions.classList.remove('hidden');
+                actions.classList.add('expand');
+                actions.classList.remove('contract');
+            }
+            startedScrolling = true;
+            return false;
+        },
+        moveButtonsUp(expedite) {
+            if (!this.actionsHolder) {
+                return;
+            }
+            // Scroll down animation.
+            // 1) Swap open for collapse in secondary nav
+            // 2) Move DOM node to header
+            // 3) Remove collapse and add expand in the header.
+            this.domNode.classList.add('buttons-up');
+            this.actionsHolder.classList.add('collapse');
+            this.actionsHolder.classList.remove('open');
+            startedScrolling = true;
+            const doMove = () => {
+                moveUpTimer = false;
+                const actions = mega.ui.header.domNode.querySelector('.nav-secondary-actions');
+                actions.appendChild(this.actionsHolder);
+                actions.classList.remove('hidden');
+                actions.firstElementChild.classList.remove('collapse');
+                actions.classList.add('expand');
+                actions.classList.remove('contract');
+                // Force reposition since resize may not always trigger correctly
+                $.tresizer();
+                if (mega.ui.menu.name && mega.ui.menu.onResize) {
+                    mega.ui.menu.onResize();
+                }
+            };
+            if (expedite) {
+                return doMove();
+            }
+            moveUpTimer = tSleep(0.1);
+            moveUpTimer.then(doMove);
+        },
+        moveButtonsDown() {
+            if (this.isSmall) {
+                return;
+            }
+            // Scroll up animation
+            // 1) Swap expand for contract in the header
+            // 2) Move DOM node to secondary nav
+            // 3) Ensure open over collapse on secondary nav
+            if (moveUpTimer) {
+                moveUpTimer.abort();
+                moveUpTimer = false;
+                this.actionsHolder.classList.remove('collapse');
+                this.actionsHolder.classList.add('open');
+                return;
+            }
+            if (!this.actionsHolder) {
+                this.domNode.classList.remove('buttons-up');
+                const buttons = mega.ui.header.domNode.querySelector('.fm-header-buttons');
+                buttons.parentNode.classList.add('contract');
+                buttons.parentNode.classList.remove('expand');
+            }
+            requestAnimationFrame(() => {
+                if (!this.actionsHolder) {
+                    this.domNode.querySelector('.fm-card-holder')
+                        .before(mega.ui.header.domNode.querySelector('.fm-header-buttons'));
+                }
+                this.actionsHolder.classList.add('open');
+                this.actionsHolder.classList.remove('collapse');
+                // Force reposition since resize may not always trigger correctly
+                $.tresizer();
+                if (mega.ui.menu.name && mega.ui.menu.onResize) {
+                    mega.ui.menu.onResize();
+                }
+                startedScrolling = false;
+            });
+        },
+        updateInfoChipsAndViews(hide) {
+            if (hide) {
+                this.chipsViewsWrapper.classList.add('hidden');
+                return;
+            }
+            this.chipsViewsWrapper.classList.remove('hidden');
+        },
+        showBanner(opts) {
+            // @todo migrate the banner component to be available here
+            const banner = this.bannerHolder.querySelector('.new-banner');
+            const icon = banner.querySelector('.banner.left-icon');
+            const {
+                name, title, type, msgText, msgHtml, ctaHref, ctaText,
+                ctaEvent, onCtaClick, onClose
+            } = opts;
+
+            this.bannerOpts = { ...opts, banner };
+
+            icon.classList.remove(
+                'icon-alert-triangle-thin-outline', 'icon-alert-circle-thin-outline', 'icon-check-circle-thin-outline'
+            );
+            if (type === 'error') {
+                icon.classList.add('icon-alert-triangle-thin-outline');
+            }
+            else if (type === 'warning') {
+                icon.classList.add('icon-alert-circle-thin-outline');
+            }
+            else if (type === 'success') {
+                icon.classList.add('icon-check-circle-thin-outline');
+            }
+
+            const titleText = banner.querySelector('.banner.title-text');
+            const messageText = banner.querySelector('.banner.message-text');
+            const contentBox = banner.querySelector('.content-box');
+            const endBox = banner.querySelector('.end-box');
+            const cta = contentBox.componentSelector('.action-link') || new MegaLink({
+                parentNode: contentBox,
+                componentClassname: 'action-link',
+                type: 'normal',
+            });
+            const dismiss = endBox.componentSelector('button.icon-only') || new MegaButton({
+                parentNode: endBox,
+                type: 'icon',
+                icon: 'sprite-fm-mono icon-dialog-close',
+                iconSize: 24,
+                componentClassname: 'text-icon',
+            });
+            const alert = banner.querySelector('.mega-component.alert');
+
+            alert.classList.remove('warning', 'error', 'success');
+            alert.classList.add(type);
+            titleText.textContent = title;
+            if (msgHtml) {
+                messageText.textContent = '';
+                messageText.appendChild(parseHTML(msgHtml));
+            }
+            else {
+                messageText.textContent = msgText;
+            }
+            cta.href = ctaHref;
+            cta.text = ctaText;
+            cta.rebind('click.eventLog', () => {
+                if (ctaEvent) {
+                    eventlog(ctaEvent);
+                }
+                if (typeof onCtaClick === 'function') {
+                    onCtaClick();
+                }
+            });
+
+            dismiss.rebind('click', () => {
+                if (typeof onClose === 'function') {
+                    onClose();
+                }
+                this.hideBanner(name);
+            });
+
+            banner.classList.remove('warning', 'error', 'hidden');
+            banner.classList.add(type);
+            clickURLs();
+        },
+        hideBanner(id) {
+            if (!this.bannerOpts) {
+                return false;
+            }
+
+            const { name, banner, closeEvent, onClose } = this.bannerOpts;
+
+            if (id && id !== name) {
+                return false;
+            }
+
+            banner.classList.add('hidden');
+            if (typeof closeEvent === 'number') {
+                eventlog(closeEvent);
+            }
+            if (typeof onClose === 'function') {
+                onClose();
+            }
+        },
+        extHideFilterChip() {
+            if (mega.ui.mNodeFilter.selectedFilters.value) {
+                return;
+            }
+            this.filterChipsHolder.classList.add('hidden');
+        },
+        extShowFilterChip() {
+            this.filterChipsHolder.classList.remove('hidden');
+        },
+        updateSmallNavButton(show) {
+            if (!smallButtonBound) {
+                smallButtonBound = true;
+                this.smallNavButton.addEventListener('click', (ev) => {
+                    ev.stopPropagation();
+                    $.hideContextMenu();
+                    if (this.isSmall) {
+                        this.expand();
+                        fmconfig.smallNav = 0;
+                        eventlog(500957);
+                    }
+                    else {
+                        this.collapse();
+                        fmconfig.smallNav = 1;
+                        eventlog(500956);
+                    }
+                });
+            }
+            this.smallNavButton.classList[show ? 'remove' : 'add']('hidden');
+        },
+        collapse() {
+            document.body.classList.add('small-nav');
+            const icon = this.smallNavButton.querySelector('i');
+            icon.classList.add('icon-chevrons-down-thin-outline');
+            icon.classList.remove('icon-chevrons-up-thin-outline');
+            this.smallNavButton.dataset.simpletip = l.show_options;
+            if (!showBreadcrumbs) {
+                this.showBreadcrumb();
+                showBreadcrumbs = false;
+            }
+            this.moveButtonsUp(true);
+            if (this.cardComponent) {
+                const { primaryOptions, secondaryOptions } = this.cardComponent;
+                const parentNode = mega.ui.header.domNode.querySelector('.fm-header-buttons');
+                parentNode.classList.remove('hidden');
+                let button = new MegaButton({
+                    ...primaryOptions,
+                    parentNode,
+                    componentClassname: `${primaryOptions.componentClassname} card-copy`,
+                });
+                button.domNode.title = primaryOptions.text;
+                button = new MegaButton({
+                    ...secondaryOptions,
+                    parentNode,
+                    componentClassname: `${secondaryOptions.componentClassname} card-copy`,
+                });
+                button.domNode.title = secondaryOptions.text;
+            }
+        },
+        expand() {
+            document.body.classList.remove('small-nav');
+            const icon = this.smallNavButton.querySelector('i');
+            icon.classList.add('icon-chevrons-up-thin-outline');
+            icon.classList.remove('icon-chevrons-down-thin-outline');
+            this.smallNavButton.dataset.simpletip = l.hide_options;
+            if (!showBreadcrumbs) {
+                this.hideBreadcrumb();
+            }
+            if (this.cardComponent) {
+                const buttons = mega.ui.header.domNode.componentSelectorAll('.fm-header-buttons .card-copy');
+                for (let i = buttons.length; i--;) {
+                    buttons[i].parentNode.classList.add('hidden');
+                    buttons[i].destroy();
+                }
+            }
+            if (!scrollHandler || !scrollHandler.target || scrollHandler.target.scrollTop === 0) {
+                this.moveButtonsDown();
+            }
+        }
     };
 });

@@ -36,7 +36,14 @@ class MegaStorageBlock extends MegaComponent {
         }
 
         // Upgrade button
-        MegaTopMenu.renderUpgradeButton(infoBlock, eventid);
+        const btn = MegaTopMenu.renderUpgradeButton(infoBlock, eventid);
+        if (btn) {
+            btn.icon = 'sprite-fm-mono icon-crown-thin-outline';
+            btn.addClass('simpletip');
+            btn.dataset.simpletip = l[433];
+            btn.dataset.simpletipClass = 'small-sidebar-tip';
+            btn.dataset.simpletipposition = 'right';
+        }
         if (options.achievements && u_attr && (!u_attr.p || u_attr.p >= pro.ACCOUNT_LEVEL_FEATURE) && !u_attr.b) {
             const achieveWrap = document.createElement('div');
             achieveWrap.className = 'achieve-link hidden';
@@ -55,6 +62,9 @@ class MegaStorageBlock extends MegaComponent {
                     achieveWrap.classList.remove('hidden');
                 });
             }
+        }
+        else if (!btn) {
+            infoBlock.classList.add('hidden');
         }
 
         M.onFileManagerReady(() => this.checkUpdate());

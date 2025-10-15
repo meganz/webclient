@@ -84,6 +84,30 @@
         }
     };
 
+    const page = storage.page = (...args) => {
+        console.error('Unhandled condition.', ...args);
+    };
+
+    page.key = (data) => {
+        parsepage(pages.key);
+        const parentNode = document.querySelector('.registration-generating-keys .widget-holder');
+        parentNode.closest('.registration-generating-keys').classList.remove('hidden');
+
+        const flags = parseInt(data.flags) | 0;
+        if (mega.ui.key[`step${flags}`]) {
+            // Step 1 = key creation. Step 2 = recovery key download
+            mega.ui.key[`step${flags}`]();
+        }
+        else {
+            // Other flags show the related dialog on the recovery key download view.
+            mega.ui.key.step2();
+            const btn = parentNode.querySelector('button.secondary');
+            if (btn && btn.component) {
+                btn.component.events.click();
+            }
+        }
+    };
+
     var set = storage.set = function(data) {
         data = debloat(data);
 
@@ -128,7 +152,7 @@
             }
         }
 
-        set({apipath: 'staging', link: data.link, d: 1, minLogLevel: '0', jj: location.host !== 'mega.nz'});
+        set({apipath: 'staging', link: data.link, d: 1, minLogLevel: '0', jj: !is_livesite});
     };
 
     patchAccountData = function(data) {

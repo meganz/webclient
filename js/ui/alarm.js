@@ -547,8 +547,7 @@ var alarm = {
             }
 
             // Only run the update on mega.nz, or the testSiteUpdate flag is set
-            if (window.location.hostname === 'mega.nz' ||
-                    localStorage.getItem('testSiteUpdate')) {
+            if (is_livesite || localStorage.getItem('testSiteUpdate')) {
 
                 // Clear old timer
                 window.clearTimeout(this.timeoutId);

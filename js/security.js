@@ -568,6 +568,9 @@ var security = {
      */
     showVerifyEmailDialog: function(aStep) {
         'use strict';
+        if (is_mobile && !document.body.classList.contains('mobile')) {
+            document.body.classList.add('mobile');
+        }
         var name = 'verify-email' + (aStep ? '-' + aStep : '');
 
         if ($.hideTopMenu) {
@@ -1056,6 +1059,7 @@ security.register = {
         delete registerData.password;
 
         localStorage.awaitingConfirmationAccount = JSON.stringify(registerData);
+        localStorage.removeItem('megaLiteMode');
 
         if (localStorage.voucher) {
             const data = [localStorage.voucher, localStorage[localStorage.voucher] || -1];

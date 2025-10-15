@@ -5,6 +5,8 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
     const { albums } = scope;
     const defZoomStep = 2;
 
+    let clickedItemId = '';
+
     /**
      * Getting the month label for the node
      * @param {MegaNode} node Node to fetch the label from
@@ -119,7 +121,7 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
 
             this._sensitive = status;
 
-            if (status) {
+            if (status && !folderlink) {
                 this.el.classList.add('is-sensitive');
             }
             else {
@@ -134,17 +136,32 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
 
         attachEvents(clickFn, dbclickFn, useMenu) {
             if (clickFn) {
-                this.attachEvent('mouseup', (evt) => {
-                    if (evt.which === 3) {
+                let startX = 0;
+                let startY = 0;
+
+                this.attachEvent('pointerdown', ({ clientX, clientY }) => {
+                    startX = clientX;
+                    startY = clientY;
+                });
+
+                this.attachEvent('pointerup', (e) => {
+                    if (e.which !== 1 || Math.abs(e.clientX - startX) > 15 || Math.abs(e.clientY - startY) > 15) {
                         return false;
                     }
 
-                    if (!evt.detail || evt.detail === 1) {
-                        clickFn(this, evt);
+                    const { id } = e.target.closest('.album-timeline-cell');
+
+                    if (clickedItemId === id) {
+                        dbclickFn(this, e);
                     }
-                    else if (evt.detail === 2) {
-                        dbclickFn(this, evt);
+                    else {
+                        clickFn(this, e);
+                        clickedItemId = id;
                     }
+
+                    delay('albums:clear-clicks', () => {
+                        clickedItemId = '';
+                    }, 300);
                 });
             }
 
@@ -163,13 +180,17 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
                         const albumId = scope.getAlbumIdFromPath();
                         const { filterFn, at, eIds, nodes } = albums.store[albumId];
 
-                        $.selected = [...selections];
+                        for (let i = selections.length; i--;) {
+                            selectionManager.add_to_selection(selections[i]);
+                            $.selected.push(selections[i]);
+                        }
 
                         let selectionsPreviewable = false;
                         let onlyPlayableVideosSelected = true;
                         for (let i = 0; i < selections.length; i++) {
-                            if (scope.isPreviewable(M.d[selections[i]])) {
-                                if (!is_video(M.d[selections[i]])) {
+                            const n = mega.gallery.getNodeCache(selections[i]);
+                            if (scope.isPreviewable(n)) {
+                                if (!is_video(n)) {
                                     onlyPlayableVideosSelected = false;
                                 }
                                 selectionsPreviewable = true;
@@ -187,7 +208,9 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
                         }
 
                         if (albums.isPublic) {
-                            const hasImageSelected = selections.some(h => !!M.isGalleryImage(M.d[h]));
+                            const hasImageSelected = selections.some(
+                                h => !!M.isGalleryImage(mega.gallery.getNodeCache(h))
+                            );
 
                             if (hasImageSelected && scope.nodesAllowSlideshow(nodes)) {
                                 selectedItems.push('.play-slideshow');
@@ -218,7 +241,7 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
 
                             if (
                                 mega.gallery.canShowAddToAlbum() &&
-                                selections.every(h => M.isGalleryNode(M.getNodeByHandle(h)))
+                                selections.every(h => M.isGalleryNode(mega.gallery.getNodeCache(h)))
                             ) {
                                 selectedItems.push('.add-to-album');
                             }
@@ -520,7 +543,7 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
 
             for (let i = 0; i < handles.length; i++) {
                 if (handles[i] !== ignoreHandle) {
-                    this.deselectNode(M.d[handles[i]]);
+                    this.deselectNode(mega.gallery.getNodeCache(handles[i]));
                 }
             }
         }
@@ -708,7 +731,7 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
                 const selections = Object.keys(this.selections);
 
                 if (selections.length) {
-                    this.lastNavNode = M.d[selections[selections.length - 1]];
+                    this.lastNavNode = mega.gallery.getNodeCache(selections[selections.length - 1]);
                 }
             }
 
@@ -1211,7 +1234,8 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
          */
         getCachedCell(node) {
             if (this.cellCache[node.h]) {
-                this.cellCache[node.h].isSensitive = !!mega.sensitives.isSensitive(node);
+                this.cellCache[node.h].isSensitive = this.cellCache[node.h].isSensitive
+                    || !!mega.sensitives.isSensitive(node);
             }
             else {
                 this.cellCache[node.h] = new AlbumTimelineCell({
@@ -1292,12 +1316,12 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
 
                 if (newVal) {
                     for (let i = 0; i < nodes.length; i++) {
-                        this.selectNode(M.d[nodes[i]], true);
+                        this.selectNode(mega.gallery.getNodeCache(nodes[i]), true);
                     }
                 }
                 else {
                     for (let i = 0; i < nodes.length; i++) {
-                        this.deselectNode(M.d[nodes[i]], true);
+                        this.deselectNode(mega.gallery.getNodeCache(nodes[i]), true);
                     }
                 }
 

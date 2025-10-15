@@ -68,6 +68,12 @@
     color: var(--mobile-link-primary);
 }
 
+.pm.mega-component.banner .action-link .text-box-wrapper {
+    display: inline-flex;
+    flex-flow: column nowrap;
+    align-items: flex-start;
+}
+
 /* Component attribute styles */
 .pm.mega-component.banner .title-text {
     font: var(--mobile-font-heading-h3);

@@ -212,7 +212,24 @@ class MegaMobileHeader extends MegaComponent {
         title.className = 'heading';
         targetNode.appendChild(title);
 
+
         if (!pfcol) {
+            this.openInAppLink = new MegaLink({
+                type: 'text',
+                parentNode: subNode,
+                text: l.view_file_open_in_app,
+                componentClassname: 'openapp'
+            });
+            this.openInAppLink.on('tap', () => {
+                if (!pfid) {
+                    return false;
+                }
+                eventlog(99912);
+
+                goToMobileApp(MegaMobileViewOverlay.getAppLink(pfid));
+                return false;
+            });
+
             const filterButton = new MegaButton({
                 parentNode: subNode,
                 type: 'icon',
@@ -233,11 +250,18 @@ class MegaMobileHeader extends MegaComponent {
             });
         }
 
+        targetNode = this.domNode;
+        this.secondaryBannerHolder = document.createElement('div');
+        this.secondaryBannerHolder.className = 'block banner-block secondary-banners';
+        targetNode.appendChild(this.secondaryBannerHolder);
+
         const _throttledUpdate = SoonFc(100, this.update.bind(this));
 
-        mBroadcaster.addListener('mega:openfolder', _throttledUpdate);
-        mBroadcaster.addListener('pagechange', _throttledUpdate);
-        window.addEventListener('resize', () => this.resetBottomBlock());
+        this.addBroadcasterListener('mega:openfolder', _throttledUpdate);
+        this.addBroadcasterListener('pagechange', _throttledUpdate);
+        const _resizeHandler = () => this.resetBottomBlock();
+        window.addEventListener('resize', _resizeHandler);
+        this.on('destroy', () => window.removeEventListener('resize', _resizeHandler));
     }
 
     // Options: setter
@@ -703,6 +727,7 @@ class MegaMobileHeader extends MegaComponent {
                     return !!M.currentdirid; // no currentdirid means it is not found
                 },
                 'back': false,
+                'openapp': !!pfid,
                 'filter': true,
                 'heading': true,
                 'clear-bin': showBinIcon,
@@ -714,6 +739,7 @@ class MegaMobileHeader extends MegaComponent {
                 'close': false,
                 'menu': true,
                 'bottom-block': true,
+                'openapp': !!pfid,
                 'back': true,
                 'filter': true,
                 'heading': true,
@@ -867,6 +893,7 @@ lazy(MegaMobileHeader, 'headings', () => {
         'fm/account/about/terms-policies': l.mobile_settings_tos_title,
         'move': l.move_to,
         'copy': l.copy_to,
+        'import': l.save_to_header,
         'support': l[516],
         'keybackup': l[8839]
     });

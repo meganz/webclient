@@ -47,6 +47,8 @@ lazy(mega, 'requestStatusMonitor', () => {
             this.buffer = false;
             this.progress = -1;
             this.visible = false;
+
+            Object.defineProperty(this, 'chlst', {value: Object.create(null)});
         }
 
         show() {
@@ -187,6 +189,14 @@ lazy(mega, 'requestStatusMonitor', () => {
             return super.schedule(this.backoff / 1e3);
         }
 
+        listen(ch) {
+            this.chlst[ch] = true;
+        }
+
+        unlisten(ch) {
+            delete this.chlst[ch];
+        }
+
         init() {
             const {u_sid} = window;
             if (!u_sid) {
@@ -220,7 +230,7 @@ mBroadcaster.once('boot_done', () => {
 
             api.hook(({channel}) => {
 
-                if (channel === 0 || channel === 4) {
+                if (channel === 0 || channel === 4 || mega.requestStatusMonitor.chlst[channel]) {
                     mega.requestStatusMonitor.show();
 
                     // hide progress bar whenever this request completes.

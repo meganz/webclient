@@ -82,7 +82,7 @@ lazy(T.ui, 'pageHeader', () => {
             const u = M.getUser(u_handle);
             const avatarNodes = target.querySelectorAll('.js-avatar');
             const accNode = target.querySelector('.js-acc-info');
-            const name = u.name || u.fullname || '';
+            const name = u.fullname || u.name || '';
 
             if (accNode) {
                 accNode.querySelector('.name').textContent = name;

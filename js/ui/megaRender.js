@@ -127,6 +127,7 @@ mBroadcaster.once('boot_done', () => {
                             '<div class="device-centre-item-info"></div>' +
                         '</div>' +
                     '</td>' +
+                    '<td megatype="label" class="label"></td>' +
                     '<td megatype="type">' +
                         '<div class="device-centre-item-type"></div>' +
                     '</td>' +
@@ -563,14 +564,14 @@ mBroadcaster.once('boot_done', () => {
                     fmRightFileBlock.classList.add('emptied');
                 }
 
-                if (M.RubbishID && M.currentdirid === M.RubbishID) {
-                    $('.fm-empty-trashbin').removeClass('hidden');
-                    mega.ui.secondaryNav.hideActionButtons();
-                }
-                else if (String(M.currentdirid).substr(0, 7) === 'search/'
+                if (String(M.currentdirid).substr(0, 7) === 'search/'
                         || mega.ui.mNodeFilter.selectedFilters.value
                         && M.currentrootid !== 'shares') {
                     $('.fm-empty-search').removeClass('hidden');
+                }
+                else if (M.RubbishID && M.currentdirid === M.RubbishID) {
+                    $('.fm-empty-trashbin').removeClass('hidden');
+                    mega.ui.secondaryNav.hideActionButtons();
                 }
                 else if (M.currentdirid === M.RootID && folderlink) {
                     // FIXME: implement
@@ -589,10 +590,18 @@ mBroadcaster.once('boot_done', () => {
                         $('.fm-empty-filter').removeClass('hidden');
                     }
                     else if (M.currentdirid === M.RootID) {
-                        $('.fm-empty-cloud').removeClass('hidden');
+                        mega.ui.empty.root();
                     }
                     else if (M.currentrootid) {
-                        $('.fm-empty-folder').removeClass('hidden');
+                        onIdle(() => {
+                            if (!M.v.length) {
+                                if (M.onMediaView) {
+                                    $('.gallery-view', '.fm-right-files-block').addClass('hidden');
+                                }
+
+                                mega.ui.empty.folder();
+                            }
+                        });
                     }
                 }
                 else if (M.currentrootid === 'out-shares') {
@@ -627,12 +636,6 @@ mBroadcaster.once('boot_done', () => {
                     else {
                         M.emptySharefolderUI(aListSelector);
                     }
-                }
-                else if (M.isGalleryPage()) {
-                    const pagetype = M.currentdirid === M.currentCustomView.nodeID ? M.currentdirid : 'discovery';
-
-                    $(`.fm-empty-${pagetype}`).removeClass('hidden');
-                    $('.gallery-view').addClass('hidden');
                 }
                 else if (M.isDynPage(M.currentdirid)) {
                     if (d > 2) {
@@ -737,6 +740,7 @@ mBroadcaster.once('boot_done', () => {
             }
 
             this.container.classList.toggle('fat', this.fat);
+            this.container.classList.toggle('search-page', !!M.search);
 
             if (this.container.nodeName === 'TABLE') {
                 var tbody = this.container.querySelector('tbody');
@@ -1026,17 +1030,22 @@ mBroadcaster.once('boot_done', () => {
                     props.classNames.push('device-item');
                 }
                 else if (aNode.isDeviceFolder) {
+                    props.classNames.push('device-folder-item');
                     props.size = bytesToSize(aNode.tb || 0);
                 }
                 else if (aNode.s4 && M.getS4NodeType(aNode) === 'bucket') {
                     props.type = l.s4_bucket_type;
                     props.classNames.push('folder');
-                    props.size = bytesToSize(aNode.tb || 0);
+                    if (!mega.lite.inLiteMode) {
+                        props.size = bytesToSize(aNode.tb || 0);
+                    }
                 }
                 else if (aNode.t) {
                     props.type = l[1049];
                     props.classNames.push('folder');
-                    props.size = bytesToSize(aNode.tb || 0);
+                    if (!mega.lite.inLiteMode) {
+                        props.size = bytesToSize(aNode.tb || 0);
+                    }
                 }
                 else {
                     props.classNames.push('file');
@@ -1090,8 +1099,8 @@ mBroadcaster.once('boot_done', () => {
                     }
 
                     if (!this.viewmode) {
-                        if (M.currentCustomView.type === 'public-links' && aNode.shares && aNode.shares.EXP) {
-                            props.time = aNode.shares.EXP.ts ? time2date(aNode.shares.EXP.ts) : '';
+                        if (share && M.currentCustomView.type === 'public-links') {
+                            props.time = share.ts ? time2date(share.ts) : '';
                             props.mTime = aNode.mtime ? time2date(aNode.mtime) : '';
                         }
                         else {
@@ -1134,7 +1143,7 @@ mBroadcaster.once('boot_done', () => {
                 return props;
             },
             'device-centre-folders'(aNode, aHandle) {
-                const props = this.nodeProperties['*'].call(this, aNode, aHandle, false);
+                const props = this.nodeProperties['*'].call(this, aNode, aHandle, true);
                 if (mega.devices.main) {
                     mega.devices.main.run('updateProps', props, aNode);
                 }
@@ -1200,20 +1209,13 @@ mBroadcaster.once('boot_done', () => {
                 props.userHandles = [];
                 props.avatars = [];
 
-                for (var i in aNode.shares) {
-                    if (i !== 'EXP') {
-                        props.lastSharedAt = Math.max(props.lastSharedAt, aNode.shares[i].ts);
-                        props.userNames.push(M.getNameByHandle(i));
-                        props.userHandles.push(aNode.shares[i].u);
-                    }
-                }
+                const shares = M.getOutShares(aNode);
 
-                // Adding pending shares data
-                for (var suh in M.ps[aNode.h]) {
-                    if (M.ps[aNode.h] && M.opc[suh]) {
-                        props.lastSharedAt = Math.max(props.lastSharedAt, M.ps[aNode.h][suh].ts);
-                        props.userNames.push(M.opc[suh].m);
-                        props.userHandles.push(suh);
+                for (const u in shares) {
+                    if (u !== 'EXP') {
+                        props.lastSharedAt = Math.max(props.lastSharedAt, shares[u].ts);
+                        props.userNames.push(M.getNameByHandle(u));
+                        props.userHandles.push(u);
                     }
                 }
 
@@ -1263,7 +1265,7 @@ mBroadcaster.once('boot_done', () => {
                         elm.dataset.simpletip = l[5872];
                     }
                 }
-                if (mega.sensitives.shouldBlurNode(aNode)) {
+                if (!folderlink && mega.sensitives.shouldBlurNode(aNode)) {
                     aTemplate.classList.add('is-sensitive');
                 }
 
@@ -1340,6 +1342,34 @@ mBroadcaster.once('boot_done', () => {
 
                     tmp = aTemplate.querySelector('.tranfer-filetype-txt');
                     tmp.textContent = aProperties.name;
+
+                    const term = M.search ? M.currentdirid.replace('search/', '').trim().toLowerCase() : '';
+
+                    if (M.search && term) {
+                        const termArr = term.toLowerCase().split(' ');
+                        const hasTerm = str => !!str && str.length >= term.length
+                            && ((str = str.toLowerCase()).includes(term) || termArr.every(str.includes.bind(str)));
+
+                        if (hasTerm(aProperties.name)) {
+                            const {
+                                prefix,
+                                match,
+                                suffix
+                            } = mega.ui.searchbar.findMatchWithSearchTerm(aProperties.name, term);
+
+                            const els = [
+                                mCreateElement('span', { class: 'prefix' }),
+                                mCreateElement('span', { class: 'middle-txt' }),
+                                mCreateElement('span', { class: 'suffix' })
+                            ];
+
+                            els[0].textContent = prefix;
+                            els[1].textContent = match;
+                            els[2].textContent = suffix;
+
+                            tmp.replaceChildren(mCreateElement('div', { class: 'search-results-item-filename' }, els));
+                        }
+                    }
 
                     tmp = aTemplate.querySelector('.item-type-icon');
 
@@ -1637,7 +1667,9 @@ mBroadcaster.once('boot_done', () => {
                         else {
                             megaListOptions.extraRows = 4;
                             megaListOptions.itemWidth = false;
-                            megaListOptions.itemHeight = this.fat ? 48 : 32;
+                            megaListOptions.itemHeight = M.search
+                                ? (this.fat ? 81 : 73)
+                                : (this.fat ? 48 : 32);
                             megaListOptions.headerHeight = 56;
                             megaListOptions.bottomSpacing = 6;
                             megaListOptions.appendTo = 'tbody';

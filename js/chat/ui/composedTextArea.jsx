@@ -4,7 +4,7 @@ import { TypingArea } from './typingArea.jsx';
 import { Button } from '../../ui/buttons.jsx';
 import { Dropdown, DropdownItem } from '../../ui/dropdowns.jsx';
 
-const ComposedTextArea = ({ chatRoom, parent, containerRef }) =>
+const ComposedTextArea = ({ chatRoom, parent, containerRef, typingAreaText, onTypingAreaChanged }) =>
     <div className="chat-textarea-block">
         <WhosTyping chatRoom={chatRoom}/>
         <TypingArea
@@ -13,6 +13,8 @@ const ComposedTextArea = ({ chatRoom, parent, containerRef }) =>
             containerRef={containerRef}
             disabled={chatRoom.isReadOnly()}
             persist={true}
+            text={typingAreaText}
+            onValueChanged={onTypingAreaChanged}
             onUpEditPressed={() => {
                 const keys = chatRoom.messagesBuff.messages.keys();
                 for (var i = keys.length; i--;) {

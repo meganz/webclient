@@ -36,9 +36,6 @@
 .topbar .fm-import-download-buttons {
     margin-left: 8px;
 }
-.dropdown-section .dropdown-section-clear {
-    color: var(--stroke-info)
-}
 .dropdown-section .dropdown-section-item {
     display: flex;
     width: 100%;
@@ -55,10 +52,6 @@
     display: flex;
     width: 100%;
     justify-content: space-between;
-    padding: 0 16px;
-}
-.dropdown-section-header-text {
-    color: var(--text-color-medium);
 }
 .dropdown-section-body{
     display: flex;
@@ -72,38 +65,32 @@
     align-items: center;
     justify-content: space-between;
     align-self: stretch;
-    height: 48px;
+    min-height: 48px;
     gap: 8px;
-    padding: 2px 16px;
+    padding: 4px 16px;
     padding-inline-start: 20px;
+    margin: 0 4px;
 }
 .dropdown-section-body .dropdown-section-body-item:hover {
-    background: var(--stroke-grey-2);
+    background: var(--mobile-surface-1);
+    border-radius: var(--mobile-border-radius-medium);
 }
-.dropdown-search .dropdown-recents .dropdown-section.last-section .dropdown-section-body-item:last-child:hover {
-    border-radius: 0 0 18px 18px;
+.dropdown-section-body .dropdown-section-body-item:focus {
+    background: var(--mobile-surface-2);
 }
 .dropdown-section-body .dropdown-recently-searched-item {
     display: flex;
 }
-.dropdown-section-body .dropdown-recently-opened-item {
-    display: grid;
-    grid-template-columns: 1.5fr 1fr 1fr;
+.dropdown-search-results-item-filename .prefix {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: pre;
 }
-.dropdown-recently-opened-file {
-    display: flex;
-    align-items: center;
-}
-.dropdown-recently-opened-item-file-icon {
+.dropdown-search-results-item-file-icon {
     width: 22px;
     height: 24px;
-    text-align: start;
-}
-.dropdown-recently-opened-item-location {
-    text-align: center;
-}
-.dropdown-recently-opened-item-time {
-    text-align: end;
+    grid-column: 1;
+    align-self: center;
 }
 .dropdown-recently-searched-item .dropdown-recently-searched-item-text {
     overflow: hidden;
@@ -113,18 +100,6 @@
 .dropdown-recent-item-delete-icon {
     --icon-size: 16px !important;
     --mask-color: var(--icon-rest) !important;
-}
-.dropdown-item-file {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    align-items: center;
-}
-.dropdown-recently-opened-item-filename,
-.dropdown-recently-opened-item-location {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    margin-inline-start: 8px;
 }
 .dropdown-item-text-medium {
     color: var(--text-color-medium);
@@ -175,7 +150,7 @@
     border-top-color: var(--progress-round-fill);
     border-radius: 50%;
     animation: loading 0.75s ease infinite;
-} 
+}
 
 @keyframes loading {
 from {
@@ -185,117 +160,6 @@ to {
     transform: rotate(1turn);
 }
       }
-/* mini search */
-
-.topbar .mini-search {
-    margin-inline-end: 16px;
-    overflow: hidden;
-    position: relative;
-}
-
-.mega-lite-mode .topbar .mini-search {
-    display: none;
-}
-
-.topbar .mini-search button {
-    cursor: pointer;
-    flex-shrink: 0;
-    height: 32px;
-    margin: 0;
-    padding: 4px;
-    width: 32px;
-}
-
-.topbar .mini-search .topbar-mini-search {
-    padding: 4px;
-}
-
-.topbar .mini-search .topbar-mini-search-close {
-    height: 32px;
-    position: relative;
-    width: 32px;
-}
-
-.topbar .mini-search .topbar-searcher {
-    background: transparent;
-    display: flex;
-    align-items: center;
-    transition: background-color 350ms, width 350ms;
-    width: 32px;
-    height: 32px;
-    border-radius: 50px !important;
-    min-height: 32px;
-    position: static;
-}
-
-.topbar .mini-search button i::before {
-    transition: color 350ms;
-    --mask-color: var(--icon-rest);
-}
-
-.topbar .mini-search button:hover i::before {
-    --mask-color: var(--icon-active);
-}
-
-.topbar .mini-search .topbar-searcher form {
-    flex-shrink: 0;
-    overflow: hidden;
-    width: 168px;
-}
-
-.topbar .mini-search .topbar-searcher input {
-    margin: 0 12px;
-}
-
-/* highlighted state */
-
-.topbar .mini-search.highlighted .topbar-searcher {
-    background: var(--surface-grey-6);
-}
-
-.topbar .mini-search.highlighted .topbar-mini-search i::before {
-    --mask-color: var(--icon-inactive);
-}
-
-/* active state */
-
-.topbar .mini-search.active .topbar-mini-search {
-    pointer-events: none;
-}
-
-.topbar .mini-search.active .topbar-searcher {
-    width: 200px;
-}
-
-/* has a valid input state */
-
-.topbar .mini-search form .valid,
-.topbar .mini-search form .invalid {
-    backface-visibility: hidden;
-    display: block;
-    position: absolute;
-    right: 8px;
-    top: 8px;
-    transition: transform 350ms, opacity 350ms;
-}
-
-.topbar .mini-search form.valid .valid,
-.topbar .mini-search form .invalid {
-    transform: rotateZ(0);
-    opacity: 1;
-}
-
-.topbar .mini-search form .valid {
-    transform: rotateZ(-180deg);
-    opacity: 0;
-}
-
-.topbar .mini-search form.valid .invalid {
-    transform: rotateZ(180deg);
-    opacity: 0;
-}
-
-/* end mini search */
 
 .topbar .fmdb-loader {
     display: inline-block;

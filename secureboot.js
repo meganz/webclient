@@ -242,7 +242,7 @@ var is_karma = !is_iframed && /^localhost:987[6-9]/.test(window.top.location.hos
 var is_microsoft = /msie|edge|trident/i.test(ua);
 var is_bot = !is_extension && /bot|crawl/i.test(ua);
 var is_webcache = location.host === 'webcache.googleusercontent.com';
-var is_livesite = location.host === 'mega.nz' || location.host === 'mega.io'
+var is_livesite = location.host === 'mega.nz' || location.host === 'mega.app'
     || location.host === 'smoketest.mega.nz' || is_extension;
 var is_transferit = !is_livesite && (/transfer\.it$/.test(location.host) || localStorage.it);
 
@@ -323,7 +323,7 @@ function getSitePath() {
     'use strict';
 
     if (is_webcache) {
-        var m = String(location.href).match(/mega\.nz\/([\w-]+)/);
+        var m = String(location.href).match(/mega\.(nz|app)\/([\w-]+)/);
         if (m) {
             return '/' + m[1];
         }
@@ -789,7 +789,7 @@ var mega = {
     redirect: function(to, page, kv, urlQs, st) {
         'use strict';
         var storage = localStorage;
-        var toMegaIo = to === 'mega.io';
+        var toMegaIo = ['mega.io', 'blog.mega.io', 'help.mega.io'].includes(to);
         var getCount = 0;
         st = typeof st === 'undefined' || st;
 
@@ -981,6 +981,11 @@ lazy(mega, 'viewID', function() {
 lazy(mega, 'utqav', function() {
     'use strict';
     return (mega.flags.utqav || localStorage.utqa_nf || 3);
+});
+
+lazy(mega, 'tld', function() {
+    'use strict';
+    return mega.flags && mega.flags.ff_site ? 'app' : 'nz';
 });
 
 (function(chrome) {
@@ -1556,7 +1561,7 @@ function siteLoadError(error, filename) {
     message.push('Please click OK to refresh and try again.');
     message.push("If the problem persists, please try disabling all third-party browser extensions " +
         "and ensure your browser is up to date. " +
-        "If that does not help, contact support@" + (self.is_extension ? 'mega.nz' : location.host));
+        "If that does not help, contact support@" + (self.is_livesite ? 'mega.io' : location.host));
 
     message.push('BrowserID: ' + self.ua + '\n' +
                  'Static server: ' + staticpath + '\n' +
@@ -1678,7 +1683,6 @@ mCreateElement('meta', {
 // Determine whether to show the legacy mobile page for these links so that they redirect back to the app
 tmp = is_mobile && (
     page.substr(0, 9) === 'newsignup'
-    || page.substr(0, 7) === 'account'
     || is_old_windows_phone && page.substr(0, 7) === 'confirm'
 );
 
@@ -2166,6 +2170,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/transfers/meths.js', n: 'dl_meths', j: 1, w: 3});
     jsl.push({f:'js/transfers/upload2.js', n: 'upload_js', j:1,w:2});
     jsl.push({f:'js/transfers/reader.js', n: 'upload_reader_js', j: 1, w: 2});
+    jsl.push({f:'js/transfers/wsu.js', n: 'upload_wsu_js', j: 1, w: 2});
     jsl.push({f:'js/transfers/zip64.js', n: 'zip_js', j: 1});
     jsl.push({f:'js/transfers/cloudraid.js', n: 'cloudraid_js', j: 1});
 
@@ -2356,6 +2361,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/vendor/favico.js', n: 'favico_js', j:1});
         jsl.push({f:'js/vendor/avatar.js', n: 'avatar_js', j:1, w:3});
         jsl.push({f:'js/fm/vpn.js', n: 'fmvpn_js', j: 1});
+        jsl.push({f:'js/ui/empty.js', n: 'js_ui_empty_js', j: 1});
 
         jsl.push({f:'css/gallery.css', n: 'gallery_css', j:2,w:5});
         jsl.push({f:'js/fm/gallery/gallery.js', n: 'fm_gallery_js', j:1});
@@ -2364,6 +2370,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/fm/gallery/helpers/GalleryTitleControl.js', n: 'fm_gallery_title_control_js', j:1});
         jsl.push({f:'js/fm/gallery/helpers/GalleryTypeControl.js', n: 'fm_gallery_type_control_js', j:1});
         jsl.push({f:'js/fm/gallery/helpers/GalleryEmptyBlock.js', n: 'fm_gallery_empty_block_js', j:1});
+        jsl.push({f:'js/fm/gallery/helpers/GalleryEmpty.js', n: 'fm_gallery_empty_js', j:1});
         jsl.push({f:'js/fm/gallery/helpers/GalleryEmptyPhotos.js', n: 'fm_gallery_empty_photos_js', j:1});
         jsl.push({f:'js/fm/gallery/helpers/GalleryEmptyImages.js', n: 'fm_gallery_empty_images_js', j:1});
         jsl.push({f:'js/fm/gallery/helpers/GalleryEmptyVideos.js', n: 'fm_gallery_empty_videos_js', j:1});
@@ -2398,6 +2405,7 @@ else if (!browserUpdate) {
         jsl.push({f:'css/recents.css', n: 'recents_css', j:2, w:30});
         jsl.push({f:'css/vpn.css', n: 'vpn_css', j:2, w:30});
         jsl.push({f:'css/transfer-widget.css', n: 'transfer_widget_css', j:2, w:30});
+        jsl.push({f:'css/rewind-settings.css', n: 'rewind_settings_css', j:2, w:30});
 
         // CSS Revamp changes
         jsl.push({f:'css/components/meganz/fm-left-pane.css', n: 'fm_left_pane_css', j:2, w:30, c:1, d:1, cache:1});
@@ -2434,6 +2442,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/ui/components/chatitem.js', n: 'chatitem_js', j: 1, w:1});
         jsl.push({f:'css/components/chatitem.css', n: 'chatitem_css', j:2,w:5});
         jsl.push({f:'css/components/meganz/fm-context-menu.css', n: 'fm_context_menu_css', j:2,w:5});
+        jsl.push({f:'css/message-dialog.css', n: 'message_dialog_css', j:2,w:5});
     } // !is_mobile
 
     // do not change the order...
@@ -2459,7 +2468,8 @@ else if (!browserUpdate) {
     jsl.push({f:'js/ui/share-dialog.js', n: 'fm_share_js', j: 1});
     jsl.push({f:'js/ui/share-unverified-contacts-dialog.js', n: 'fm_share_unverified_contacts_js', j: 1});
     jsl.push({f:'js/ui/share-collaborators-dialog.js', n: 'fm_share_collaborators_js', j: 1});
-
+    jsl.push({f:'js/fm/message-dialog.js', n: 'fm_message-dialog_js', j: 1, w: 1});
+    jsl.push({f:'js/fm/message-overlay.js', n: 'fm_message_overlay_js', j: 1, w: 1});
 
     if (localStorage.makeCache) {
         jsl.push({f:'makecache.js', n: 'makecache', j:1});
@@ -2495,6 +2505,7 @@ else if (!browserUpdate) {
     jsl.push({f:'css/components/radial.css', n: 'radial_css', j:2, w:30, c:1, d:1, cache:1});
     jsl.push({f:'css/components/textarea.css', n: 'comp_textarea_css', j:2, w:1});
     jsl.push({f:'css/components/tooltip.css', n: 'tooltip_css', j:2, w:30, c:1, d:1, cache:1});
+    jsl.push({f:'css/components/banner.css', n: 'banner_css', j:2, w:30, c:1, d:1, cache:1});
 
     // Load files common to all mobile pages
     if (is_mobile) {
@@ -2506,7 +2517,6 @@ else if (!browserUpdate) {
         jsl.push({f:'css/mobile/mobile.footer.css', n: 'mobile_footer_css', j:2,w:5});
         jsl.push({f:'css/mobile/mobile.msgdialog.css', n: 'mobile_msgdialog_css', j:2,w:5});
         jsl.push({f:'css/mobile/mobile.rubbish-bin.css', n: 'mobile_rubbish_bin_css', j:2,w:5});
-        jsl.push({f:'css/mobile/mobile.banner.css', n: 'mobile_banner_css', j:2,w:5});
         jsl.push({f:'css/mobile/mobile.node-selector.css', n: 'mobile_node_selector_css', j:2, w:5});
         jsl.push({f:'css/mobile/mobile.empty.state.css', n: 'mobile_empty_state_css', j:2, w:1});
         jsl.push({f:'css/mobile/mobile.transfer.block.css', n: 'mobile_transfer_block_css', j:2,w:5});
@@ -2555,7 +2565,6 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/mobile.language-menu.js', n: 'mobile_language_menu_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.link-management.js', n: 'mobile_link_management_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.file-request-management.js', n: 'mobile_file_request_management_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.message-overlay.js', n: 'mobile_message_overlay_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.not-found.js', n: 'mobile_not_found_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.pro-signup-prompt.js', n: 'mobile_pro_signup_prompt_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.propay.js', n: 'mobile_propay_js', j: 1, w: 1});
@@ -2613,7 +2622,6 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/settings/notifications.js', n: 'mobile_account_notifications_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/settings/termsPolicies.js', n: 'mobile_terms_policies_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/settings/twofactorSettings.js', n: 'mobile_twofactor_settings_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.msgdialog.js', n: 'mobile_msgdialog_js', j: 1, w:1});
         jsl.push({f:'js/mobile/mobile.banner.js', n: 'mobile_banner_js', j: 1, w:1});
         jsl.push({f:'js/mobile/mobile.datepicker.js', n: 'mobile_datepicker_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.tab.js', n: 'mobile_tab_js', j: 1, w:1});
@@ -2640,6 +2648,7 @@ else if (!browserUpdate) {
     // Shared dialog/sheet styles
     jsl.push({f:'css/dialogs/recovery-logout-dialog.css', n: 'recovery_logout_css', j: 2, w: 1});
     jsl.push({f:'css/dialogs/backup-recovery-dialog.css', n: 'backup_recovery_css', j: 2, w: 1});
+    jsl.push({f:'css/key.css', n: 'key_css', j:2, w:1});
 
     if (is_megadrop) {
         // @todo FIXME: we *should* load required resources only!
@@ -2749,6 +2758,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/transfers/upload2.js', n: 'upload_js', j:1,w:2});
         jsl.push({f:'js/transfers/downloader.js', n: 'dl_downloader', j: 1, w: 3});
         jsl.push({f:'js/transfers/reader.js', n: 'upload_reader_js', j: 1, w: 2});
+        jsl.push({f:'js/transfers/wsu.js', n: 'upload_wsu_js', j: 1, w: 2});
 
         jsl.push({f:'js/utils/factory/file-list.js', n: 'factory:filelist_js', j:1});
         jsl.push({f:'js/utils/factory/pbkdf2.js', n: 'factory:pbkdf2_js', j: 1});
@@ -3084,7 +3094,6 @@ else if (!browserUpdate) {
             'pwm:settings_list_css': {f:'css/pwm/settings/list.css', n: 'pm_settings_list_css', j:2, w:1},
 
             'pwm:read_only_field_js': {f:'js/ui/pwm/components/read-only-field.js', n: 'pm_read_only_field_js', j: 1, w:1},
-            'pwm:mobile_message_overlay_js': {f:'js/mobile/mobile.message-overlay.js', n: 'mobile_message_overlay_js', j: 1, w:1},
             'pwm:mobile_banner_js': {f:'js/mobile/mobile.banner.js', n: 'mobile_banner_js', j: 1, w:1},
             'pwm:pm_js': {f:'js/ui/pwm/pm.js', n: 'pm_js', j: 1, w:1},
             'pwm:pm_ui_js': {f:'js/ui/pwm/pm-ui.js', n: 'pm_ui_js', j: 1, w:1},
@@ -3721,7 +3730,7 @@ else if (!browserUpdate) {
         'use strict';
         return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
     })();
-    mCreateElement('style', {type: 'text/css'}, 'body').textContent = 'div, span, input {outline: none;}.hidden {display: none;}.clear {clear: both;margin: 0px;padding: 0px;display: block;}.loading-main-block {width: 100%;height: 100%;position: fixed;z-index: 10000;font-family:Arial, Helvetica, sans-serif;top:0;left:0;}.main-blur-block,.bottom-page.scroll-block{display:none}.loading-mid-white-block {height: 100%;width:100%;' + (self.is_transferit ? darkloader ? 'background-color: rgb(30, 33, 36);' : 'background-color: rgb(250, 252, 255);' : darkloader ? 'background-color: #222' : '') + '}.loading-cloud {width: 225px;position: fixed;height: 160px;' + (self.is_transferit ? '' : 'background-image: url(' + istaticpath + 'loading-sprite_' + (darkloader ? 'dark' : 'light') + '.png);') + 'background-repeat: no-repeat;background-position: center 0;left:50%;top:50%;margin:-80px 0 0 -112px;}.loading-m-block{' + (self.is_transferit ? 'width:100px;height:100px;left:50%; top:50%;transform:translate(-50%, -50%);' : 'width:60px;height:60px;left:82px;top:66px;') + 'position:absolute;background-color:' + (self.is_transferit ? darkloader ? 'rgb(30, 33, 36);' : 'rgb(250, 252, 255);' : darkloader ? '#222' : 'white') + ';background-image: url(' + istaticpath + (self.is_transferit ? 'transferit-loading.svg' : 'loading-sprite_' + (darkloader ? 'dark' : 'light') + '.png') + ');background-repeat: no-repeat;background-position: ' + (self.is_transferit ? 'center;background-size:52px;' : '-86px -61px;') + 'border-radius: 100%;z-index:10;}.loading-percentage {' + (self.is_transferit ? 'width: 116px;height: 116px;left: 50%;top: 50%;transform: translate(-50%, -50%);' : 'width: 80px;height: 80px;left:72px;top:56px;') + ' background-color:' + (self.is_transferit ? 'rgba(29, 129, 255, 0.1)' : darkloader ? '#444' : '#e1e1e1') + ';position: absolute;border-radius: 100%;overflow: hidden;}.loading-percentage ul {list-style-type: none;border-radius: 100%;overflow: hidden;}.loading-percentage li {position: absolute;top: 0px;}.loading-percentage p, .loading-percentage li, .loading-percentage ul{width: 100%;height: 100%;padding: 0;margin: 0;}.loading-percentage span {display: block;width: 50%;height: 100%;}.loading-percentage ul :nth-child(odd) {' + (self.is_transferit ? 'clip: rect(0px, 116px, 116px, 58px);' : 'clip: rect(0, 80px, 80px, 40px);') + '}.loading-percentage ul :nth-child(even) {' + (self.is_transferit ? 'clip: rect(0, 58px, 116px, 0);' : 'clip: rect(0, 40px, 80px, 0);') + '}.loading-percentage .right-c span {border-top-left-radius: 50%;border-bottom-left-radius: 50%;background-color:' + (self.is_transferit ? '#1D81FF' : '#dc0000') + ';}.loading-percentage .left-c span {margin-left: 50%;border-top-right-radius: 50%;border-bottom-right-radius: 50%;background-color:' + (self.is_transferit ? '#1D81FF' : '#dc0000') + ';}.st-social-block-load {position: fixed;bottom: 20px;left: 0;width: 100%;height: 43px;text-align: center;}.st-bottom-button {height: 24px;width: 24px;margin: 0 8px;display: inline-block;background-image: url(' + istaticpath + 'loading-sprite_' + (darkloader ? 'dark' : 'light') + '.png);background-repeat: no-repeat;background-position: 11px -171px;cursor: pointer;border-radius: 100%;-webkit-transition: all 200ms ease-in-out;-moz-transition: background-color 200ms ease-in-out;-o-transition: background-color 200ms ease-in-out;-ms-transition: background-color 200ms ease-in-out;transition: background-color 200ms ease-in-out;background-color:#999999;}..st-bottom-button.st-google-button {background-position: -69px -171px;}.st-bottom-button.st-twitter-button{background-position: -29px -171px;}.st-bottom-button:hover {background-color:#334f8d;}.st-bottom-button.st-twitter-button:hover {background-color:#1a96f0;}.st-bottom-button.st-google-button:hover {background-color:#d0402a;}@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {.st-bottom-button, .loading-m-block, .loading-cloud {' + (self.is_transferit ? '' : 'background-image: url(' + istaticpath + 'loading-sprite_' + (darkloader ? 'dark' : 'light') + '@2x.png);background-size: 225px auto;') + '}}';
+    mCreateElement('style', {type: 'text/css'}, 'body').textContent = 'div, span, input {outline: none;}.hidden {display: none;}.clear {clear: both;margin: 0px;padding: 0px;display: block;}.loading-main-block {width: 100%;height: 100%;position: fixed;z-index: 10000;font-family:Arial, Helvetica, sans-serif;top:0;left:0;}.main-blur-block,.bottom-page.scroll-block{display:none}.loading-mid-white-block {height: 100%;width:100%;' + (self.is_transferit ? darkloader ? 'background-color: rgb(30, 33, 36);' : 'background-color: rgb(250, 252, 255);' : darkloader ? 'background-color: #222' : '') + '}.loading-cloud {width: 225px;position: fixed;height: 160px;' + (self.is_transferit ? '' : 'background-image: url(' + istaticpath + 'loading-sprite_' + (darkloader ? 'dark' : 'light') + '.png);background-size: 225px auto;') + 'background-repeat: no-repeat;background-position: center 0;left:50%;top:50%;margin:-80px 0 0 -112px;}.loading-m-block{' + (self.is_transferit ? 'width:100px;height:100px;left:50%; top:50%;transform:translate(-50%, -50%);' : 'width:60px;height:60px;left:82px;top:66px;') + 'position:absolute;background-color:' + (self.is_transferit ? darkloader ? 'rgb(30, 33, 36);' : 'rgb(250, 252, 255);' : darkloader ? '#222' : 'white') + ';background-image: url(' + istaticpath + (self.is_transferit ? 'transferit-loading.svg' : 'loading-sprite_' + (darkloader ? 'dark' : 'light') + '.png') + ');background-repeat: no-repeat;background-position: ' + (self.is_transferit ? 'center;background-size:52px;' : '-86px -61px; background-size: 225px auto;') + 'border-radius: 100%;z-index:10;}.loading-percentage {' + (self.is_transferit ? 'width: 116px;height: 116px;left: 50%;top: 50%;transform: translate(-50%, -50%);' : 'width: 80px;height: 80px;left:72px;top:56px;') + ' background-color:' + (self.is_transferit ? 'rgba(29, 129, 255, 0.1)' : darkloader ? '#444' : '#e1e1e1') + ';position: absolute;border-radius: 100%;overflow: hidden;}.loading-percentage ul {list-style-type: none;border-radius: 100%;overflow: hidden;}.loading-percentage li {position: absolute;top: 0px;}.loading-percentage p, .loading-percentage li, .loading-percentage ul{width: 100%;height: 100%;padding: 0;margin: 0;}.loading-percentage span {display: block;width: 50%;height: 100%;}.loading-percentage ul :nth-child(odd) {' + (self.is_transferit ? 'clip: rect(0px, 116px, 116px, 58px);' : 'clip: rect(0, 80px, 80px, 40px);') + '}.loading-percentage ul :nth-child(even) {' + (self.is_transferit ? 'clip: rect(0, 58px, 116px, 0);' : 'clip: rect(0, 40px, 80px, 0);') + '}.loading-percentage .right-c span {border-top-left-radius: 50%;border-bottom-left-radius: 50%;background-color:' + (self.is_transferit ? '#1D81FF' : '#dc0000') + ';}.loading-percentage .left-c span {margin-left: 50%;border-top-right-radius: 50%;border-bottom-right-radius: 50%;background-color:' + (self.is_transferit ? '#1D81FF' : '#dc0000') + ';}.st-social-block-load {position: fixed;bottom: 20px;left: 0;width: 100%;height: 43px;text-align: center;}.st-bottom-button {height: 24px;width: 24px;margin: 0 8px;display: inline-block;background-image: url(' + istaticpath + 'loading-sprite_' + (darkloader ? 'dark' : 'light') + '.png);background-repeat: no-repeat;background-position: 0px -400px;background-size: 450px 450px;cursor: pointer;-webkit-transition: all 200ms ease-in-out;}.st-bottom-button.st-twitter-button{background-position: -24px -400px;}@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {.st-bottom-button, .loading-m-block, .loading-cloud {' + (self.is_transferit ? '' : 'background-image: url(' + istaticpath + 'loading-sprite_' + (darkloader ? 'dark' : 'light') + '@2x.png);background-size: 225px auto;') + '} a.st-bottom-button { background-size: 450px 450px;}}';
 
     mCreateElement('div', { "class": "loading-main-block", id: "loading"}, 'body')
         .innerHTML =
@@ -3748,8 +3757,11 @@ else if (!browserUpdate) {
             tmp = 1 + (document.cookie | 0);
 
             document.body.textContent = '';
-            document.body.style.background = is_drop ? '#fff' : '#000';
-            document.body.className = is_drop ? 'theme-light' : 'theme-dark-forced';
+
+            if (!is_drop && !is_megadrop) {
+                document.body.style.background = '#000';
+                document.body.className = 'theme-dark-forced';
+            }
 
             jsl_progress = function() {};
         }
@@ -3906,7 +3918,7 @@ else if (!browserUpdate) {
 
         // Redirect static pages to mega.io if there isn't a stored session ID (regardless of its validity),
         // since without a session-id it's not possible to access any internal page.
-        if (location.host === 'mega.nz' && !u_storage.sid && !is_iframed && isStaticPage(page) && !location.hash) {
+        if ((location.host === 'mega.nz' || location.host === 'mega.app') && !u_storage.sid && !is_iframed && isStaticPage(page) && !location.hash) {
             return mega.redirect('mega.io', page, false, locationSearchParams);
         }
 
@@ -4082,6 +4094,13 @@ function pushHistoryState(page, state) {
 
         if (page.substr(0, 9) === 'fm/search') {
             state.searchString = page.substr(9) || state.searchString;
+
+            var chipBtn = document.querySelector('button.search-chip');
+            state.searchLocation = chipBtn && chipBtn.dataset.location || false;
+
+            if (state.searchFilters !== null) {
+                state.searchFilters = state.searchFilters || history.state.searchFilters;
+            }
             page = state.subpage = 'fm/search';
         }
 
@@ -4257,9 +4276,20 @@ tryCatch(function(x) {
     var psy = tryCatch(function(f) {
         return String(f).indexOf('Synchronizetion') > 0;
     });
+    var seal = tryCatch(function(p, f) {
+        var v = p[f];
+        if (v !== undefined) {
+            delete p[f];
+            return Object.defineProperty(p, f, {value: v, writable: false, configurable: true});
+        }
+    });
     x.addEventListener = function(t, f) {
+        if (t === 'antifor-fC') {
+            window.onerror = nop;
+            throw t;
+        }
         if (t === 'contextmenu' && psy(f)) {
-            window.onerror = null;
+            window.onerror = nop;
             return;
         }
         return ael.apply(x, arguments);
@@ -4267,6 +4297,13 @@ tryCatch(function(x) {
     mBroadcaster.once('startMega', tryCatch(function() {
         x.addEventListener = ael;
     }));
+    [[window, 'fetch'], [window, 'WebSocket'], [XMLHttpRequest.prototype, 'open']]
+        .forEach(function(m) {
+            var v = m[0][m[1]];
+            if (seal(m[0], m[1]) !== m[0]) {
+                m[0][m[1]] = v;
+            }
+        });
 })(window);
 
 var dump = nop;

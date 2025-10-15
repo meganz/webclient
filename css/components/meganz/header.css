@@ -8,7 +8,7 @@
 .mega-header .top-block {
     align-items: center;
     padding: 12px;
-    height: 65px;
+    height: 64px;
     border-bottom: none;
 }
 .mega-header .top-block.border-bottom,
@@ -67,6 +67,54 @@ body.pwm-ui .mega-header .top-block {
 }
 .mega-header .bottom-block .block .nav-actions {
     margin-bottom: 0;
+}
+.mega-header .nav-secondary-actions {
+    overflow: hidden;
+}
+.mega-header .nav-secondary-actions.expand {
+    animation: expand-out 0.1s ease forwards;
+}
+.mega-header .nav-secondary-actions.contract {
+    animation: collapse-in 0.1s ease forwards;
+}
+
+@keyframes expand-out {
+    from {
+        opacity: 0;
+        max-width: 0;
+    }
+    to {
+        opacity: 1;
+        max-width: 170px;
+    }
+}
+
+@keyframes collapse-in {
+    from {
+        opacity: 1;
+        max-width: 170px;
+    }
+    to {
+        opacity: 0;
+        max-width: 0;
+    }
+}
+
+.mega-header .fm-header-buttons {
+    padding: 0;
+}
+.mega-header .fm-header-buttons .nav-elem {
+    height: 40px;
+    width: 40px;
+    padding: 0;
+    border-radius: 4px;
+}
+.mega-header .fm-header-buttons .nav-elem i {
+    margin-inline-end: 0;
+    --icon-size: 22px;
+}
+.mega-header .fm-header-buttons .nav-elem .primary-text {
+    display: none;
 }
 .mega-header .nav-elem.text-only {
     height: 24px;
@@ -139,6 +187,10 @@ body.pwm-ui .mega-header .top-block {
     border: 1px solid var(--mobile-border-strong);
     border-radius: var(--mobile-border-radius-large);
     z-index: 2000;
+}
+.rtl .mega-header div.header-dropdown-menu {
+    left: -8px;
+    right: auto;
 }
 .mega-header div.header-dropdown-menu {
     max-height: calc(100vh - 74px);

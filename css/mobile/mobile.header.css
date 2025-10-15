@@ -15,7 +15,7 @@
     flex-flow: row wrap;
     justify-content: space-between;
     align-items: flex-start;
-    padding: 24px;
+    padding: 16px 24px;
     width: 100%;
     height: auto;
     box-sizing: border-box;
@@ -37,11 +37,17 @@
 .mega-header .nav-actions {
     display: flex;
     flex-direction: row;
-    align-items: flex-start;
     padding: 0;
 }
 
-.mega-header .nav-elem.text-icon {
+.mega-header .nav-elem.text-icon,
+.mega-header .nav-elem.icon-only {
+    padding: 0;
+    margin: 0;
+}
+
+.mega-header .nav-elem.text-only {
+    height: auto;
     padding: 0;
     margin: 0;
 }

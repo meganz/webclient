@@ -15,6 +15,7 @@ lazy(mega.ui, 'mInfoPanel', () => {
         activeStats.outShareCount = 0;
         activeStats.inShareCount = 0;
         activeStats.takedownCount = 0;
+        activeStats.fileRequestCount = 0;
         activeStats.bytes = 0;
         activeStats.subDirs = 0;
         activeStats.subFiles = 0;
@@ -34,8 +35,11 @@ lazy(mega.ui, 'mInfoPanel', () => {
         else if (typeof node.r === 'number') {
             activeStats.inShareCount++;
         }
-        else if (node.t & M.IS_SHARED || M.ps[node.h] || M.getNodeShareUsers(node, 'EXP').length) {
+        else if (M.isOutShare(node, 'EXP')) {
             activeStats.outShareCount++;
+        }
+        else if (mega.fileRequest && mega.fileRequest.publicFolderExists(node.h)) {
+            activeStats.fileRequestCount++;
         }
         else if (node.t) {
             activeStats.basicFolderCount++;
@@ -145,22 +149,21 @@ lazy(mega.ui, 'mInfoPanel', () => {
     function getIconForMultipleNodes(selectedHandles) {
 
         const totalNodeCount = selectedHandles.length;
-        const { deviceCount, basicFolderCount, outShareCount, inShareCount } = activeStats;
-        const isFolders = inShareCount + outShareCount + basicFolderCount;
+        const { deviceCount, basicFolderCount, outShareCount, inShareCount, fileRequestCount } = activeStats;
+        const isFolders = inShareCount + outShareCount + basicFolderCount + fileRequestCount;
 
         // If all selected nodes are devices, show the generic device icon
         if (deviceCount === totalNodeCount) {
             return { icon: 'pc' };
         }
 
-        // If all selected nodes are incoming shares, show the incoming share icon
-        if (inShareCount === totalNodeCount) {
-            return { icon: 'folder-incoming' };
+        // If all selected nodes are shares, show the share icon
+        if (inShareCount === totalNodeCount || outShareCount === totalNodeCount) {
+            return { icon: 'folder-users' };
         }
 
-        // If all selected nodes are incoming shares, show the incoming share icon
-        if (outShareCount === totalNodeCount) {
-            return { icon: 'folder-outgoing' };
+        if (fileRequestCount === totalNodeCount) {
+            return { icon: 'folder-public' };
         }
 
         // If all selected nodes are folders, show the folder icon
@@ -447,7 +450,7 @@ lazy(mega.ui, 'mInfoPanel', () => {
                     this.text = l.type_inshare;
                     return;
                 }
-                if (M.getNodeShareUsers(this.node, 'EXP').length) {
+                if (M.isOutShare(this.node, 'EXP')) {
                     this.text = l.type_outshare;
                     return;
                 }
@@ -666,6 +669,7 @@ lazy(mega.ui, 'mInfoPanel', () => {
         showMime(hide) {
             let mime = '';
             let count = 1;
+            let labelClass = '';
             if (!hide && this.handles.length === 1) {
 
                 if (activeStats.takedownCount === 1) {
@@ -682,6 +686,9 @@ lazy(mega.ui, 'mInfoPanel', () => {
                 }
                 else {
                     mime = `item-type-icon-90 icon-${fileIcon(this.node)}-90`;
+                    if (activeStats.basicFolderCount && this.node.lbl && !folderlink) {
+                        labelClass = MegaNodeComponent.label[this.node.lbl];
+                    }
                 }
             }
             else if (!hide) {
@@ -712,6 +719,9 @@ lazy(mega.ui, 'mInfoPanel', () => {
                     icon.classList.add(stackClass);
                 }
                 mimeNode.appendChild(icon);
+                if (labelClass) {
+                    icon.classList.add(labelClass);
+                }
             }
             else {
                 mimeNode.remove();
@@ -801,6 +811,11 @@ lazy(mega.ui, 'mInfoPanel', () => {
     class MegaInfoInputBlock extends MegaComponent {
         constructor(options) {
             super({ ...options, id: undefined });
+
+            if (pfid) {
+                return; // No need to render meta info on folderlinks
+            }
+
             if (
                 !options.id ||
                 options.id !== MegaInfoBlock.TYPES.DESCRIPTION && options.id !== MegaInfoBlock.TYPES.TAGS
@@ -1384,7 +1399,7 @@ lazy(mega.ui, 'mInfoPanel', () => {
             blockSet.add(TYPES.PERMISSION);
             blockSet.add(TYPES.SHARE_OWNER);
         }
-        else if (M.getNodeShareUsers(node, 'EXP').length) {
+        else if (M.isOutShare(node, 'EXP')) {
             blockSet.add(TYPES.SHARE_USERS);
         }
         if (node.h !== M.RootID && node.h !== M.RubbishID) {
@@ -1393,7 +1408,7 @@ lazy(mega.ui, 'mInfoPanel', () => {
         if (node.ts) {
             blockSet.add(TYPES.TIME_ADDED);
         }
-        if (node.tvf && !mega.inLiteMode) {
+        if (node.tvf && !mega.lite.inLiteMode) {
             blockSet.add(TYPES.VERSION_COUNT);
             blockSet.add(TYPES.VERSION_CUR_SIZE);
             blockSet.add(TYPES.VERSION_PRE_SIZE);
@@ -1558,6 +1573,10 @@ lazy(mega.ui, 'mInfoPanel', () => {
              * @returns {undefined}
              */
             set(tag, handles, isRemove) {
+                if (!this.t) {
+                    console.error('tagsDB is not yet initialized...', tag, handles, isRemove);
+                    return false;
+                }
                 if (isRemove) {
                     const tagSet = this.t.get(tag);
                     if (handles && tagSet) {
@@ -1577,7 +1596,7 @@ lazy(mega.ui, 'mInfoPanel', () => {
             },
             async init() {
                 if (!this.t) {
-                    this.t = new MapSet();
+                    this.t = new MapSet(10e3);
                     return fmdb.get('f')
                         .then(nodes => {
                             for (let i = nodes.length; i--;) {
@@ -1617,6 +1636,10 @@ lazy(mega.ui, 'mInfoPanel', () => {
                     blockSet.add(TYPES.NODE_SIZE);
                 }
                 blockSet.add(TYPES.MIME);
+            }
+            if (mega.lite.inLiteMode && activeStats.folderCount) {
+                blockSet.delete(TYPES.BYTE_SIZE);
+                blockSet.delete(TYPES.NODE_SIZE);
             }
             if (isTakenDown) {
                 blockSet.add(TYPES.TAKEDOWN);

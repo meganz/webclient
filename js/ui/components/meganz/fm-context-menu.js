@@ -371,6 +371,85 @@
         }
     }
 
+    class MegaAppDlHintSection extends MegaComponent {
+        constructor(options) {
+            super(options);
+            this.addClass('context-section', 'context-app-dl-section');
+
+            const dlTxt = mCreateElement('div', { class: 'pt-1 ps-6' });
+            dlTxt.textContent = l.download_desktop_app_hint;
+
+            const dlLink = mCreateElement('div');
+
+            MegaLink.factory({
+                componentClassname: 'text-icon font-bold slim',
+                parentNode: dlLink,
+                text: l.download_app,
+                onClick: megasync.downloadApp.bind(null, 500918)
+            });
+
+            const closeHint = mCreateElement('div');
+
+            const wrapper = mCreateElement(
+                'div',
+                { class: 'flex flex-row pe-6 pt-2 pb-2 max-w-80' },
+                [
+                    mCreateElement('div', null, [dlTxt, dlLink]),
+                    closeHint
+                ]
+            );
+
+            MegaButton.factory({
+                parentNode: closeHint,
+                type: 'icon',
+                icon: 'sprite-fm-mono icon-dialog-close-thin',
+                iconSize: 24,
+                componentClassname: 'text-icon cursor-pointer',
+                onClick: (e) => {
+                    mega.config.set('dadlh', Date.now() / 1000 >>> 0);
+
+                    e.stopPropagation();
+
+                    if (this.domNode.classList.contains('last')) {
+                        this.domNode.classList.remove('last');
+
+                        let prev = this.domNode.previousElementSibling;
+
+                        while (prev) {
+                            if (!prev.classList.contains('hidden')) {
+                                prev.classList.add('last');
+                                break;
+                            }
+
+                            prev = prev.previousElementSibling;
+                        }
+                    }
+
+                    super.hide();
+                    $(window).trigger('resize.ccmui');
+                }
+            });
+
+            this.domNode.appendChild(wrapper);
+            this.selected = false;
+        }
+
+        show(ids) {
+            if (ids.includes('app-dl-hint')) {
+                const timeout = 120 * 24 * 60 * 60; // 120 days
+                const refused = mega.config.get('dadlh') | 0;
+                const isAppDl = window.useMegaSync === 2 || window.useMegaSync === 3;
+
+                if (!isAppDl && (!refused || (refused + timeout) * 1000 < Date.now())) {
+                    super.show();
+                    return true;
+                }
+            }
+            super.hide();
+            return false;
+        }
+    }
+
     /**
      * @property {*} mega.ui.contextMenu Context UI.
      */
@@ -634,7 +713,7 @@
                                 ) {
                                     return false;
                                 }
-                                if (M.isAlbumsPage(1)) {
+                                if (M.isAlbumsPage(1) || mega.ui.contextMenu.firstAlbum) {
                                     dlHandles = mega.gallery.getAlbumsHandles(dlHandles);
                                 }
 
@@ -710,7 +789,9 @@
                 M.fmTabState.gallery.prev = M.currentdirid;
             }
             M.openFolder(target).then(() => {
-                selectionManager.add_to_selection(node.h, true);
+                if (node.h !== M.RootID) {
+                    selectionManager.add_to_selection(node.h, true);
+                }
             });
         };
         const doImport = () => {
@@ -756,6 +837,10 @@
             },
         ]));
         const openShare = () => {
+            // @todo support share operations by passing handles to mShareDialog
+            if ($.selected[0] !== mega.ui.contextMenu.selectedItems[0]) {
+                $.selected = mega.ui.contextMenu.selectedItems;
+            }
             mega.ui.mShareDialog.init(mega.ui.contextMenu.selectedItems[0]);
             eventlog(500029);
             M.fmEventLog(500681);
@@ -922,7 +1007,7 @@
                             text: l[17764],
                             icon: 'sprite-fm-mono icon-send-to-chat-thin-outline',
                             onClick() {
-                                openCopyDialog('conversations');
+                                openSendToChatDialog();
                                 M.fmEventLog(500678);
                             }
                         },
@@ -1022,6 +1107,10 @@
                     if (mega.ui.contextMenu.firstAlbum) {
                         return mega.gallery.albums.openDialog('AlbumNameDialog', mega.ui.contextMenu.firstAlbum.id);
                     }
+                    // @todo support passing handle to renameDialog
+                    if ($.selected[0] !== mega.ui.contextMenu.selectedItems[0]) {
+                        $.selected = mega.ui.contextMenu.selectedItems;
+                    }
                     renameDialog();
                     M.fmEventLog(500689);
                 }
@@ -1098,6 +1187,10 @@
                 text: l[63],
                 icon: 'sprite-fm-mono icon-copy-thin-outline',
                 onClick(ev) {
+                    // @todo support passing handles directly to the copyDialog.
+                    if ($.selected[0] !== mega.ui.contextMenu.selectedItems[0]) {
+                        $.selected = mega.ui.contextMenu.selectedItems;
+                    }
                     openCopyDialog(ev.originalEvent);
                     M.fmEventLog(500692);
                 }
@@ -1133,6 +1226,7 @@
         ]));
 
         sections.addChild('label', new MegaLabelSection({ parentNode: menu }));
+        sections.addChild('appDl', new MegaAppDlHintSection({ parentNode: menu }));
         const doFavourite = (add) => {
             if (M.isInvalidUserStatus()) {
                 return;
@@ -1213,6 +1307,7 @@
                             rightBadge: proOnlyBadge,
                             onClick() {
                                 doSensitive(true);
+                                eventlog(500923, JSON.stringify({ c: $.selected.length }));
                             }
                         },
                         {
@@ -1221,6 +1316,7 @@
                             icon: 'sprite-fm-mono icon-eye-reveal1',
                             onClick() {
                                 doSensitive(false);
+                                eventlog(500924, JSON.stringify({ c: $.selected.length }));
                             }
                         },
                         {
@@ -1387,6 +1483,75 @@
             }
         ]));
 
+        sections.addChild('share-nosub', new MegaContextSection(menu, [
+            {
+                buttonId: 'getlink-nosub',
+                text: l[5622],
+                icon: 'sprite-fm-mono icon-link-thin-outline',
+                onClick() {
+                    M.getLinkAction(mega.ui.contextMenu.selectedItems);
+                }
+            },
+            {
+                buttonId: 'managelink-nosub',
+                text: l[6909],
+                icon: 'sprite-fm-mono icon-link-thin-outline',
+                onClick() {
+                    M.getLinkAction(mega.ui.contextMenu.selectedItems);
+                }
+            },
+            {
+                buttonId: 'share-nosub',
+                text: l[5631],
+                icon: 'sprite-fm-mono icon-folder-users-thin-outline',
+                onClick() {
+                    openShare();
+                }
+            },
+            {
+                buttonId: 'manageshare-nosub',
+                text: l.manage_share,
+                icon: 'sprite-fm-mono icon-folder-users-thin-outline',
+                onClick() {
+                    openShare();
+                }
+            },
+            {
+                buttonId: 'sendchat-nosub',
+                text: l[17764],
+                icon: 'sprite-fm-mono icon-send-to-chat-thin-outline',
+                onClick() {
+                    $.selected = mega.ui.contextMenu.selectedItems;
+                    // @todo support passing handles directly to the copyDialog.
+                    openCopyDialog('conversations');
+                }
+            },
+            {
+                buttonId: 'filerequestcreate-nosub',
+                text: l.file_request_dropdown_create,
+                icon: 'sprite-fm-mono icon-folder-arrow-02-thin-outline',
+                onClick() {
+                    if (M.isInvalidUserStatus()) {
+                        return;
+                    }
+
+                    mega.fileRequest.dialogs.createDialog.init(mega.ui.contextMenu.selectedItems[0]);
+                }
+            },
+            {
+                buttonId: 'filerequestmanage-nosub',
+                text: l.file_request_dropdown_manage,
+                icon: 'sprite-fm-mono icon-folder-arrow-02-thin-outline',
+                onClick() {
+                    if (M.isInvalidUserStatus()) {
+                        return;
+                    }
+
+                    mega.fileRequest.dialogs.manageDialog.init({ h: mega.ui.contextMenu.selectedItems[0] });
+                }
+            },
+        ]));
+
         const manipulations = {
             '.import-item': (items) => {
                 if (!u_type) {
@@ -1449,7 +1614,7 @@
             },
             '.sh4r1ng-item': (items, { node }) => {
                 const isS4Bucket = node.s4 && 'kernel' in s4 && s4.kernel.getS4NodeType(node) === 'bucket';
-                const hasShares = M.getNodeShareUsers(node, 'EXP').length || M.ps[node];
+                const hasShares = M.isOutShare(node, 'EXP');
                 let removed = false;
                 if (isS4Bucket) {
                     array.remove(items, '.sh4r1ng-item');
@@ -1504,7 +1669,29 @@
                 if (pfcol && sel.length === 1 && M.d[sel[0]].t === 2) {
                     array.remove(items, '.properties-item');
                 }
-            }
+            },
+            '.getlink-nosub': (items, { stats }) => {
+                // Currently supports single folder selection
+                const component = sections.getChild('share-nosub');
+                const { numOfExistingLinks } = stats;
+                if (numOfExistingLinks) {
+                    array.remove(items, '.getlink-nosub');
+                    items.push('.managelink-nosub');
+                    component.getChild('managelink-nosub').text = l[6909];
+                }
+                else {
+                    component.getChild('getlink-nosub').text = mega.icu.format(l.share_link, 1);
+                }
+            },
+            '.share-nosub': (items, { node }) => {
+                const hasShares = M.getNodeShareUsers(node, 'EXP').length || M.ps[node];
+                if (hasShares) {
+                    array.remove(items, '.share-nosub');
+                    items.push('.manageshare-nosub');
+                }
+                sections.getChild('share-nosub').getChild('share-nosub').text =
+                    M.currentrootid === M.InboxID || M.getNodeRoot(node.h) === M.InboxID ? l.read_only_share : l[5631];
+            },
         };
         const manipulateItems = (items) => {
             const { firstNode: node, selectedItems } = mega.ui.contextMenu;
@@ -1572,7 +1759,8 @@
         return {
             selectedItems: [],
             get firstNode() {
-                return M.d[this.selectedItems[0]];
+                return M.d[this.selectedItems[0]] ||
+                    (M.gallery || M.albums) && mega.gallery.getNodeCache(this.selectedItems[0]);
             },
             get firstAlbum() {
                 if (!mega.gallery || !mega.gallery.albums) {
@@ -1598,7 +1786,7 @@
                     this.ready = true;
                 }
             },
-            show(itemOptions) {
+            show(itemOptions, forcedSelection) {
                 this.init();
                 if (!this.ready) {
                     return false;
@@ -1606,7 +1794,10 @@
                 if (!itemOptions.length) {
                     return prepareOldMenu();
                 }
-                if ($.selected.length) {
+                if (Array.isArray(forcedSelection) && forcedSelection.length) {
+                    this.selectedItems = [...forcedSelection];
+                }
+                else if ($.selected.length) {
                     this.selectedItems = [...$.selected];
                 }
                 else if (

@@ -202,6 +202,19 @@ if (Object.hasOwn === undefined) {
             }
         });
     }
+
+    if (!Blob.prototype.arrayBuffer) {
+        Object.defineProperty(Blob.prototype, 'arrayBuffer', {
+            value() {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onerror = reject;
+                    reader.onload = (ev) => resolve(ev.target.result);
+                    reader.readAsArrayBuffer(this);
+                });
+            }
+        });
+    }
 })();
 
 mBroadcaster.once('boot_done', tryCatch(() => {
@@ -320,13 +333,18 @@ mBroadcaster.once('startMega', tryCatch(() => {
     const {mecmatst} = sessionStorage;
     const {buildOlderThan10Days, eventlog = nop, is_karma, is_extension} = window;
 
-    if (is_karma || is_extension !== false) {
+    if (is_karma || is_extension !== false || self.is_transferit || self.is_iframed) {
         return;
     }
     scriptTest(
         'megaecmastest = window.foo?.bar ?? -1',
         (error) => {
             if (error || window.megaecmastest !== -1) {
+
+                if (!mecmatst && window.u_attr && u_attr.p) {
+                    eventlog(500953, JSON.stringify([1, 1]));
+                }
+
                 return mecmatst || eventlog(99777, JSON.stringify([1, 1]));
             }
 

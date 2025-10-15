@@ -180,6 +180,7 @@
             <div class="topbar-searcher js-topbar-searcher">
                 <!-- This div contains three dropdown sections -->
                 <div class="dropdown-search hidden">
+
                     <!-- EMPTY STATE - Show when recents are disabled/no recents exist -->
                     <div class="dropdown-no-recents dropdown-section hidden">
                         <i class="dropdown-no-recents-icon sprite-fm-mono icon-clock-rotate"></i>
@@ -192,52 +193,18 @@
                             </div>
                         </div>
                     </div>
-                    <div class="search-loader hidden"></div>
-                    <!-- Search Results section -->
-                    <div class="dropdown-results dropdown-section hidden">
-                        <div class="dropdown-search-results dropdown-section-item">
-                            <!-- Every section has a header -->
-                            <div class="dropdown-section-header">
-                                <div class="dropdown-section-header-contents">
-                                    <div class="dropdown-section-header-text">
-                                        [$searchbar_result_label]
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- Every section has a body -->
-                            <div class="dropdown-section-body">
-                                <!-- Suggestion search result - dynamically populated -->
-                            </div>
-                            <!-- Template for search result item -->
-                            <a
-                                class="dropdown-search-results-item dropdown-section-body-item dropdown-search-results-item-template hidden">
-                                <div class="dropdown-item-file dropdown-search-results-file">
-                                    <div class="dropdown-search-results-item-file-icon">
-                                        <span class="item-type-icon">
-                                            <img>
-                                        </span>
-                                    </div>
-                                    <div class="dropdown-search-results-item-filename">
-                                        <span class="prefix"></span>
-                                        <span class="txt-bold"></span>
-                                        <span class="suffix"></span>
-                                    </div>
-                                </div>
-                                <div class="dropdown-search-results-item-location dropdown-item-text-medium"></div>
-                            </a>
-                        </div>
-                    </div>
+
                     <div class="dropdown-recents dropdown-section">
                         <!-- Recently Searched section -->
                         <div class="dropdown-section dropdown-recently-searched-wrapper">
-                            <div class="dropdown-recently-searched dropdown-section-item">
+                            <div class="dropdown-recently-searched dropdown-section-item my-1">
                                 <!-- Every section has a header -->
                                 <div class="dropdown-section-header">
-                                    <div class="dropdown-section-header-contents">
-                                        <div class="dropdown-section-header-text">
+                                    <div class="dropdown-section-header-contents px-6 py-2">
+                                        <div class="dropdown-section-header-text font-bold text-color-high">
                                             [$recently_searched]
                                         </div>
-                                        <a class="dropdown-section-clear js-dropdownClearRecentlySearched">
+                                        <a class="dropdown-section-clear js-dropdownClearRecentlySearched underline font-bold text-color-high">
                                             [$clear_all]
                                         </a>
                                     </div>
@@ -249,49 +216,57 @@
                                 <!-- Dummy template for each item in body -->
                                 <a
                                     class="dropdown-recently-searched-item dropdown-section-body-item dropdown-recently-searched-template hidden">
-                                    <div class="dropdown-recently-searched-item-text"></div>
+                                    <div class="dropdown-recently-searched-item-text flex-1 pr-2">
+                                        <div class="dropdown-tag-results-item"></div>
+                                    </div>
                                     <i class="sprite-fm-mono icon-dialog-close dropdown-recent-item-delete-icon"></i>
                                 </a>
                             </div>
                         </div>
-                        <!-- Recently Opened section -->
-                        <div class="dropdown-section dropdown-recently-opened-wrapper hidden">
-                            <div class="dropdown-recently-opened dropdown-section-item">
-                                <!-- Every section has a header -->
-                                <div class="dropdown-section-header">
-                                    <div class="dropdown-section-header-contents">
-                                        <div class="dropdown-section-header-text">
-                                            [$recently_opened_files]
-                                        </div>
+                    </div>
+
+                    <!-- Search Results section -->
+                    <div class="dropdown-results dropdown-section hidden">
+                        <div class="dropdown-search-results dropdown-section-item my-1">
+                            <!-- Every section has a header -->
+                            <div class="dropdown-section-header">
+                                <div class="dropdown-section-header-contents px-6 py-2">
+                                    <div class="dropdown-section-header-text font-bold text-color-high">
+                                        [$searchbar_result_label]
                                     </div>
                                 </div>
-                                <!-- Every section has a body -->
-                                <div class="dropdown-section-body">
-                                    <!-- Recently Opened Files - dynamically populated -->
-                                </div>
-                                <!-- Dummy template for each item in body -->
-                                <a
-                                    class="dropdown-recently-opened-item dropdown-section-body-item dropdown-recently-opened-template hidden">
-                                    <div class="dropdown-item-file dropdown-recently-opened-file">
-                                        <div class="dropdown-recently-opened-item-file-icon">
-                                            <span class="item-type-icon file">
-                                                <img>
-                                            </span>
-                                        </div>
-                                        <div class="dropdown-recently-opened-item-filename"></div>
-                                    </div>
-                                    <div class="dropdown-recently-opened-item-location dropdown-item-text-medium"></div>
-                                    <div class="dropdown-recently-opened-item-time dropdown-item-text-medium"></div>
-                                </a>
                             </div>
+                            <!-- Every section has a body -->
+                            <div class="dropdown-section-body">
+                                <!-- Suggestion search result - dynamically populated -->
+                            </div>
+                            <!-- Template for search result item -->
+                            <a
+                                class="dropdown-search-results-item dropdown-section-body-item dropdown-search-results-item-template hidden gap-1">
+                                <div class="dropdown-search-results-item-file-icon">
+                                    <span class="item-type-icon">
+                                        <img>
+                                    </span>
+                                </div>
+                                <div class="flex-1 text-ellipsis">
+                                    <div class="dropdown-search-results-item-filename flex flex-row">
+                                        <span class="prefix"></span>
+                                        <span class="middle-txt"></span>
+                                        <span class="suffix flex-1 text-ellipsis"></span>
+                                    </div>
+                                </div>
+                                <div class="dropdown-search-results-item-location dropdown-item-text-medium flex-1 text-right"></div>
+                            </a>
                         </div>
                     </div>
+
+                    <div class="search-loader hidden"></div>
                 </div>
-                <form autocomplete="disabled" id="main-search-fake-form">
-                    <i class="search-icon sprite-fm-mono icon-preview-reveal"></i>
-                    <input type="text" placeholder="[$102]" autocomplete="disabled" class="js-filesearcher"
+                <form autocomplete="disabled" id="main-search-fake-form" class="flex flex-row items-center border-1 border-radius-2">
+                    <i class="search-icon sprite-fm-mono icon-search-light-outline"></i>
+                    <input type="text" placeholder="[$102]" autocomplete="disabled" class="js-filesearcher text-ellipsis"
                         spellcheck="false" />
-                    <button class="js-btnclearSearch" type="button"><i class="sprite-fm-mono icon-dialog-close"></i></button>
+                    <button class="js-btnclearSearch" type="button"><i class="sprite-fm-mono icon-dialog-close-thin"></i></button>
                 </form>
             </div>
         </div>
@@ -386,6 +361,9 @@
 
                 <div class="content-panel account">
                     <div class="lp-header">
+                        <button class="mega-component nav-elem icon-only settings-back">
+                            <i class="sprite-fm-mono icon-arrow-left-thin-solid"></i>
+                        </button>
                         <span>[$823]</span>
                     </div>
                     <div class="lp-content-wrap">
@@ -452,6 +430,7 @@
                             </div>
                             <div class="sub-menu slide-item">
                                 <div class="sub-title" data-scrollto="file-version">[$19475]</div>
+                                <div class="sub-title" data-scrollto="rewind">[$rewind]</div>
                                 <div class="sub-title" data-scrollto="rubbish-cleaning">[$20229]</div>
                                 <div class="sub-title" data-scrollto="user-interface">[$16158]</div>
                                 <div class="sub-title" data-scrollto="dialog-options">[$20169]</div>
@@ -577,54 +556,140 @@
                 </div>
             </div>
             <div class="fm-banner-holder">
-                <div class="fm-notification-block mega-lite-mode-warning">
-                    <i class="notification-block-icon sprite-fm-mono icon-lock"></i>
-                    <span>[$in_mega_lite_mode_banner]</span>
+                <div class="mega-component banner-rack flow-up top rack system-wide hidden new-banner">
+                    <div class="rack-slot">
+                        <div class="slot-inner">
+                            <div class="mega-component alert banner warning">
+                                <i class="banner left-icon sprite-fm-mono icon-alert-circle-thin-outline"></i>
+                                <div class="content-box">
+                                    <span class="banner title-text"></span>
+                                    <span class="banner message-text"></span>
+                                </div>
+                                <div class="banner end-box"></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="fm-notification-block unverified-share">
-                    <i class="notification-block-icon sprite-fm-mono icon-info"></i>
-                    <span></span>
+                <!-- @todo: Use mega.ui.secondaryNav.showBanner instead !-->
+                <div class="fm-notification-block mega-lite-mode">
+                    <div class="mega-component alert banner info">
+                        <i class="banner left-icon sprite-fm-mono icon-alert-circle-thin-outline"></i>
+                        <div class="content-box">
+                            <span class="banner title-text"></span>
+                            <span class="banner message-text">[$in_mega_lite_mode_banner]</span>
+                        </div>
+                        <div class="banner end-box">
+                            <button class="mega-component text-icon nav-elem icon-only button">
+                                <i class="sprite-fm-mono icon-dialog-close-thin left-icon icon-size-24"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
                 <div class="fm-notification-block full">
-                    <i class="notification-block-icon sprite-fm-mono icon-offline"></i>
-                    <span>[$22667]</span>
+                    <div class="mega-component alert banner error">
+                        <i class="banner left-icon sprite-fm-mono icon-alert-triangle-thin-outline"></i>
+                        <div class="content-box">
+                            <span class="banner title-text"></span>
+                            <span class="banner message-text"></span>
+                            <a href="/pro" class="clickurl action-link">[$upgrade_now]</a>
+                        </div>
+                    </div>
                 </div>
-                <div class="fm-notification-block expired-business"></div>
+                <div class="fm-notification-block expired-business">
+                    <div class="mega-component alert banner error">
+                        <i class="banner left-icon sprite-fm-mono icon-alert-triangle-thin-outline"></i>
+                        <div class="content-box">
+                            <span class="banner title-text"></span>
+                            <span class="banner message-text"></span>
+                            <a href="/repay" class="clickurl action-link"></a>
+                        </div>
+                    </div>
+                </div>
                 <div class="fm-notification-block almost-full">
-                    <i class="notification-block-icon sprite-fm-mono icon-offline"></i>
-                    <span>[$16316]</span>
-                    <i class="fm-notification-close sprite-fm-mono icon-close-component"></i>
+                    <div class="mega-component alert banner warning">
+                        <i class="banner left-icon sprite-fm-mono icon-alert-circle-thin-outline"></i>
+                        <div class="content-box">
+                            <span class="banner title-text">[$storage_almost_full]</span>
+                            <span class="banner message-text">[$bn_almost_full_text]</span>
+                            <a href="/pro" class="clickurl action-link">[$upgrade_now]</a>
+                        </div>
+                        <div class="banner end-box">
+                            <button class="mega-component text-icon nav-elem icon-only button">
+                                <i class="sprite-fm-mono icon-dialog-close-thin left-icon icon-size-24"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                 <div class="fm-notification-block rewind-reduction">
+                    <div class="mega-component alert banner warning">
+                        <i class="banner left-icon sprite-fm-mono icon-alert-circle-thin-outline"></i>
+                        <div class="content-box">
+                            <span class="banner title-text">[$bf_rewind_rd_notif_title]</span>
+                            <span class="banner message-text">[$bf_rewind_rd_notif_msg]</span>
+                        </div>
+                        <div class="banner end-box">
+                            <button class="mega-component text-icon nav-elem icon-only button">
+                                <i class="sprite-fm-mono icon-dialog-close-thin left-icon icon-size-24"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
                 <div class="fm-notification-block grace-business">
-                    <span>[$16316]</span>
+                    <div class="mega-component alert banner error">
+                        <i class="banner left-icon sprite-fm-mono icon-alert-triangle-thin-outline"></i>
+                        <div class="content-box">
+                            <span class="banner title-text"></span>
+                            <span class="banner message-text"></span>
+                            <a href="/repay" class="clickurl action-link"></a>
+                        </div>
+                    </div>
                 </div>
-                <div class="fm-notification-block business-next-tier"></div>
-                <div class="fm-notification-block duplicated-items-found">
-                    <span>[$22101]</span>
-                    <a class="fix-me-btn">[$22102]</a>
-                    <div class="fm-notification-close fix-me-close sprite-fm-mono icon-close-component"></div>
+                <div class="fm-notification-block business-next-tier">
+                    <div class="mega-component alert banner info">
+                        <i class="banner left-icon sprite-fm-mono icon-alert-circle-thin-outline"></i>
+                        <div class="content-box">
+                            <span class="banner title-text"></span>
+                            <span class="banner message-text"></span>
+                            <a href="" class="action-link"></a>
+                        </div>
+                        <div class="banner end-box">
+                            <button class="mega-component text-icon nav-elem icon-only button">
+                                <i class="sprite-fm-mono icon-dialog-close-thin left-icon"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
                 <div class="fm-notification-block payment-card-status">
-                    <i class="notification-block-icon sprite-fm-mono icon-alert-circle-thin-outline"></i>
-                    <span class="payment-banner-content-wrapper">
-                            <span class="banner-title"></span>
-                            <span class="banner-txt"></span>
-                            <a>[$update_card]</a>
-                        </span>
-                </div>
-                <div class="fm-notification-block new-feature-rewind-notification">
-                    <span>[$new_feature_rewind_message]</span>
-                    <div class="learn-more">
-                        <span>[$new_feature_rewind_learn_more]</span>
-                        <i class="fm-notification-close sprite-fm-mono icon-close-component"></i>
+                    <div class="mega-component alert banner">
+                        <i class="banner left-icon sprite-fm-mono"></i>
+                        <div class="content-box">
+                            <span class="banner title-text"></span>
+                            <span class="banner message-text"></span>
+                            <a href="" class="action-link">[$update_card]</a>
+                        </div>
                     </div>
                 </div>
                 <div class="fm-notification-block device-centre">
-                    <i class="notification-block-icon sprite-fm-mono icon-offline"></i>
-                    <span></span>
+                    <div class="mega-component alert banner error">
+                        <i class="banner left-icon sprite-fm-mono icon-alert-triangle-thin-outline"></i>
+                        <div class="content-box">
+                            <span class="banner title-text"></span>
+                            <span class="banner message-text"></span>
+                        </div>
+                    </div>
                 </div>
                 <div class="s4-info-header-blocks hidden">
-                    <div class="fm-notification-block bucket-access-warning"></div>
+                    <div class="fm-notification-block bucket-access-warning">
+                        <div class="mega-component alert banner info">
+                            <i class="banner left-icon sprite-fm-mono icon-alert-circle-thin-outline"></i>
+                            <div class="content-box">
+                                <span class="banner title-text"></span>
+                                <span class="banner message-text"></span>
+                                <a href="http://help.mega.io/megas4/s4-buckets/change-bucket-object-url-access"
+                                   target="_blank" class="clickurl action-link" rel="noopener noreferrer">[$8742]</a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="onboarding-control-panel hidden">
@@ -670,91 +735,106 @@
                 <input type="file" id="fileselect2" title="" class="hidden" webkitdirectory multiple />
 
                 <div class="fm-header-buttons">
-                    <button class="mega-component nav-elem normal button action fm-share-folder hidden" title="[$5631]">
+                    <button class="mega-component nav-elem normal button action fm-share-folder hidden" title="[$60]">
+                        <i class="sprite-fm-mono icon-share-thin-outline left-icon"></i>
                         <div class="text-box-wrapper sk-elm">
-                            <span class="primary-text">[$5631]</span>
+                            <span class="primary-text">[$60]</span>
                         </div>
                     </button>
 
                     <button class="mega-component nav-elem normal button action fm-manage-share-folder hidden" title="[$manage_share]">
+                        <i class="sprite-fm-mono icon-folder-users-thin-outline left-icon"></i>
                         <div class="text-box-wrapper sk-elm">
                             <span class="primary-text">[$manage_share]</span>
                         </div>
                     </button>
 
-                    <button class="mega-component nav-elem normal button action fm-clearbin-button hidden">
+                    <button class="mega-component nav-elem normal button action fm-clearbin-button hidden" title="[$7741]">
+                        <i class="sprite-fm-mono icon-dialog-close-thin left-icon"></i>
                         <div class="text-box-wrapper sk-elm">
                             <span class="primary-text">[$7741]</span>
                         </div>
                     </button>
 
-                    <button class="mega-component nav-elem normal button action fm-new-shared-folder hidden">
+                    <button class="mega-component nav-elem normal button action fm-new-shared-folder hidden" title="[$16533]">
+                        <i class="sprite-fm-mono icon-folder-users-thin-outline left-icon"></i>
                         <div class="text-box-wrapper sk-elm">
                             <span class="primary-text">[$16533]</span>
                         </div>
                     </button>
 
-                    <button class="mega-component nav-elem normal button action fm-new-link hidden">
+                    <button class="mega-component nav-elem normal button action fm-new-link hidden" title="[$20667]">
+                        <i class="sprite-fm-mono icon-link-thin-outline left-icon"></i>
                         <div class="text-box-wrapper sk-elm">
                             <span class="primary-text">[$20667]</span>
                         </div>
                     </button>
 
-                    <button class="mega-component nav-elem normal button action fm-new-file-request hidden">
+                    <button class="mega-component nav-elem normal button action fm-new-file-request hidden" title="[$file_request_action_create]">
+                        <i class="sprite-fm-mono icon-folder-arrow-02-thin-outline left-icon"></i>
                         <div class="text-box-wrapper sk-elm">
                             <span class="primary-text">[$file_request_action_create]</span>
                         </div>
                     </button>
 
                     <button class="mega-component nav-elem normal button action fm-s4-new-bucket js-s4-new-bucket hidden" title="[$s4_create_bkt]">
+                        <i class="sprite-fm-mono icon-bucket-objects-regular-outline left-icon"></i>
                         <div class="text-box-wrapper sk-elm">
                             <span class="primary-text">[$s4_create_bkt]</span>
                         </div>
                     </button>
 
                     <button class="mega-component nav-elem normal button action fm-s4-settings js-s4-settings hidden" title="[$823]">
+                        <i class="sprite-fm-mono icon-settings-thin-outline left-icon"></i>
                         <div class="text-box-wrapper sk-elm">
                             <span class="primary-text">[$823]</span>
                         </div>
                     </button>
 
                     <button class="mega-component nav-elem normal button action fm-s4-new-key hidden" title="[$s4_key_create]">
+                        <i class="sprite-fm-mono icon-plus-light-solid left-icon"></i>
                         <div class="text-box-wrapper sk-elm">
                             <span class="primary-text">[$s4_key_create]</span>
                         </div>
                     </button>
 
-                    <button class="mega-component nav-elem normal button action fm-s4-new-user hidden" title="Create new user">
+                    <button class="mega-component nav-elem normal button action fm-s4-new-user hidden" title="[$s4_user_create_button]">
+                        <i class="sprite-fm-mono icon-plus-light-solid left-icon"></i>
                         <div class="text-box-wrapper sk-elm">
                             <span class="primary-text">[$s4_user_create_button]</span>
                         </div>
                     </button>
 
-                    <button class="mega-component nav-elem normal button action fm-s4-new-group hidden" title="Create new group">
+                    <button class="mega-component nav-elem normal button action fm-s4-new-group hidden" title="[$s4_group_create_button]">
+                        <i class="sprite-fm-mono icon-plus-light-solid left-icon"></i>
                         <div class="text-box-wrapper sk-elm">
                             <span class="primary-text">[$s4_group_create_button]</span>
                         </div>
                     </button>
 
-                    <button class="mega-component nav-elem normal button action fm-add-backup" title="[$add_backup_button]">
+                    <button class="mega-component nav-elem normal button action fm-add-backup hidden" title="[$add_backup_button]">
+                        <i class="sprite-fm-mono icon-database-plus-thin-outline left-icon"></i>
                         <div class="text-box-wrapper sk-elm">
                             <span class="primary-text">[$add_backup_button]</span>
                         </div>
                     </button>
 
-                    <button class="mega-component nav-elem normal button action fm-add-syncs" title="[$add_syncs_button]">
+                    <button class="mega-component nav-elem normal button action fm-add-syncs hidden" title="[$add_syncs_button]">
+                        <i class="sprite-fm-mono icon-sync-thin-outline left-icon"></i>
                         <div class="text-box-wrapper sk-elm">
                             <span class="primary-text">[$add_syncs_button]</span>
                         </div>
                     </button>
 
                     <button class="mega-component nav-elem normal button action fm-import-to-cloudrive hidden" title="[$btn_imptomega]">
+                        <i class="sprite-fm-mono icon-cloud-upload-thin-outline left-icon"></i>
                         <div class="text-box-wrapper sk-elem">
                             <span class="primary-text">[$btn_imptomega]</span>
                         </div>
                     </button>
 
-                    <button class="mega-component nav-elem normal button fm-download hidden">
+                    <button class="mega-component nav-elem normal button fm-download hidden" title="[$58]">
+                        <i class="sprite-fm-mono icon-arrow-down-circle-thin-outline left-icon"></i>
                         <div class="text-box-wrapper sk-elm">
                             <span class="primary-text">[$58]</span>
                         </div>
@@ -768,7 +848,7 @@
                 <div class="fm-breadcrumbs-wrapper">
                     <div class="crumb-overflow-link dropdown">
                         <a class="breadcrumb-dropdown-link">
-                            <i class="menu-icon sprite-fm-mono icon-options icon16"></i>
+                            <i class="menu-icon sprite-fm-mono icon-more-horizontal-thin-outline icon16"></i>
                         </a>
                         <i class="sprite-fm-mono icon-chevron-right-thin-outline icon16"></i>
                     </div>
@@ -853,6 +933,19 @@
                             </div>
                             <div class="fm-filter-reset hidden">
                                 [$filter_chip_reset]
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dc-filter-chips-wrapper hidden">
+                        <i class="sprite-fm-mono icon-check selected-mark selected-mark-template hidden"></i>
+                        <i class="sprite-fm-mono icon-question-filled simpletip tooltip-question-mark-template dropdown-inline-tooltip hidden"></i>
+                        <div class="dc-filter-chips">
+                            <div class="dc-filter-chip-button dc-filter-chip-deviceactivity">
+                                <div class="dc-filter-chip-button-text">
+                                    [$dc_fchips_all_devices]
+                                </div>
+                                <span class="nw-fm-tree-arrow rot-90"></span>
                             </div>
                         </div>
                     </div>
@@ -960,6 +1053,9 @@
                         <button class="mega-component nav-elem icon-only transparent-icon fm-header-info hidden">
                             <i class="sprite-fm-mono icon-info-thin-outline"></i>
                         </button>
+                        <button class="mega-component nav-elem icon-only transparent-icon fm-small-nav simpletip" data-simpletip="[$hide_options]" data-simpletip-class="small-nav-tip">
+                            <i class="sprite-fm-mono icon-chevrons-up-thin-outline"></i>
+                        </button>
                     </div>
 
                     <div id="media-section-right-controls" class="hidden">
@@ -978,6 +1074,38 @@
                                     </div>
                                     <span>[$gallery_exit_discovery]</span>
                                 </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Secondary banners holder !-->
+                    <div class="fm-banner-holder secondary-banners">
+                        <!-- Duplicated items !-->
+                        <div class="fm-notification-block duplicated-items-found">
+                            <div class="mega-component alert banner warning">
+                                <i class="banner left-icon sprite-fm-mono icon-alert-circle-thin-outline"></i>
+                                <div class="content-box">
+                                    <span class="banner title-text"></span>
+                                    <span class="banner message-text">[$bn_duplicates_text]</span>
+                                    <a href="" class="action-link">[$bn_duplicates_lnk]</a>
+                                </div>
+                                <div class="banner end-box">
+                                    <button class="mega-component text-icon nav-elem icon-only button">
+                                        <i class="sprite-fm-mono icon-dialog-close-thin left-icon"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Rubbish bin schedule !-->
+                        <div class="fm-notification-block rubbish-schedule">
+                            <div class="mega-component alert banner info">
+                                <i class="banner left-icon sprite-fm-mono icon-alert-circle-thin-outline"></i>
+                                <div class="content-box">
+                                    <span class="banner title-text"></span>
+                                    <span class="banner message-text"></span>
+                                    <a href="/fm/account/file-management/rubbish-cleaning" class="clickurl action-link">[$1776]</a>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1054,19 +1182,6 @@
             </div>
 
             <!-- End Users Management Header -->
-
-            <div class="dc-filter-chips-wrapper hidden">
-                <i class="sprite-fm-mono icon-check selected-mark selected-mark-template hidden"></i>
-                <i class="sprite-fm-mono icon-question-filled simpletip tooltip-question-mark-template dropdown-inline-tooltip hidden"></i>
-                <div class="dc-filter-chips">
-                    <div class="dc-filter-chip-button dc-filter-chip-deviceactivity">
-                        <div class="dc-filter-chip-button-text">
-                            [$dc_fchips_all_devices]
-                        </div>
-                        <span class="nw-fm-tree-arrow rot-90"></span>
-                    </div>
-                </div>
-            </div>
 
             <div class="device-centre-shimmer hidden"></div>
 
@@ -1332,7 +1447,12 @@
                 <div class="content">
                     <div class="image"></div>
                     <div class="title"></div>
-                    <div class="message"></div>
+                    <div class="rw-steps">
+                        <div class="rw-progress-step rw-progress-step-template hidden">
+                            <i class="rw-progress-spinner sprite-fm-mono icon-loader-grad-small-regular-outline icon24"></i>
+                            <i class="rw-progress-done sprite-fm-mono icon-check-thin-outline icon24"></i>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="files-grid-view fm hidden">
@@ -1888,7 +2008,7 @@
                                         <ul>
                                             <li class="inv-mega-contact">
                                                 <div class="email-small-icon icon12"></div>
-                                                <p class="biller-email">invoicing@mega.nz</p>
+                                                <p class="biller-email">invoicing@mega.io</p>
                                             </li>
                                             <li class="inv-mega-contact">
                                                 <div class="add-small-icon icon12"></div>
@@ -1927,7 +2047,7 @@
                                         <ul>
                                             <li class="inv-company-name billed-name">AAA LTD.</li>
                                             <li class="inv-per-name billed-attn hidden">ATTN: Khaled Captain</li>
-                                            <li class="billed-email">money@mega.co.nz</li>
+                                            <li class="billed-email">money@mega.io</li>
                                             <li class="billed-address">120 Albert St, Auckland 1010, 120 Albert St, Auckland
                                                 1010 </li>
                                             <li class="billed-country">New Zealand</li>
@@ -1968,7 +2088,7 @@
                                         <ul>
                                             <li class="inv-mega-contact">
                                                 <div class="email-small-icon icon12"></div>
-                                                <p class="biller-email">invoicing@mega.nz</p>
+                                                <p class="biller-email">invoicing@mega.io</p>
                                             </li>
                                             <li class="inv-mega-contact">
                                                 <div class="add-small-icon icon12"></div>
@@ -2007,7 +2127,7 @@
                                         <ul>
                                             <li class="inv-company-name billed-name">AAA LTD.</li>
                                             <li class="inv-per-name billed-attn hidden">ATTN: Khaled Captain</li>
-                                            <li class="billed-email">money@mega.co.nz</li>
+                                            <li class="billed-email">money@mega.io</li>
                                             <li class="billed-address">120 Albert St, Auckland 1010, 120 Albert St, Auckland
                                                 1010 </li>
                                             <li class="billed-country">New Zealand</li>
@@ -2197,6 +2317,10 @@
                                     <th></th>
                                     <th megatype="fname" class="full-width-col" data-minwidth="250">
                                         <div class="arrow name desc sprite-fm-mono icon-arrow-left-thin-solid">[$86]</div>
+                                        <div class="grid-view-resize">&nbsp;</div>
+                                    </th>
+                                    <th megatype="label" width="98" data-minwidth="98">
+                                        <div class="arrow label sprite-fm-mono icon-arrow-left-thin-solid">[$17398]</div>
                                         <div class="grid-view-resize">&nbsp;</div>
                                     </th>
                                     <th megatype="type" width="258" data-minwidth="180">
@@ -2627,6 +2751,7 @@
                     </div>
                 </div>
             </div>
+
             <div class="search-bottom-wrapper hidden">
                 <div class="crumb-overflow-link dropdown">
                     <a class="breadcrumb-dropdown-link">
@@ -2644,7 +2769,7 @@
             <div class="widgets content-block">
 
                 <!-- for business dashboard -->
-                <div class="business-dashboard hidden">
+                <div class="dashboard-section business-dashboard hidden">
                     <div class="business-dashboard-container">
                         <div class="welcome-message-banner hidden">
                             <i class="sprite-fm-uni icon-sun"></i>
@@ -2972,7 +3097,7 @@
                     </div>
                 </div>
 
-                <div class="non-business-dashboard">
+                <div class="dashboard-section non-business-dashboard">
                     <div class="welcome-message-banner hidden">
                         <i class="sprite-fm-uni icon-sun"></i>
                         <span class="message"></span>
@@ -3107,6 +3232,46 @@
 
                     <div class="account quota-alert-banner hidden"></div>
 
+                    <div class="account widget body s4-egress hidden">
+                        <div class="account widget content">
+                            <div class="account widget title">
+                                <span>[$s4_ergess_analytics]</span>
+                            </div>
+                            <div class="analysis-container">
+                                <div class="analysis-summary-container lg-size">
+                                    <div class="usage last">
+                                        <span class="label"></span>
+                                    </div>
+                                    <a href="https://help.mega.io/megas4/s4-clouddrive/transfer-quota-egress-traffic" class="link l-more">[$s4_more_about_egress]</a>
+                                </div>
+                                <div class="analysis-body">
+                                    <div class="chart-month-container">
+                                        <div class="daily-title">[$s4_dailty_ergess_vol]</div>
+                                        <div class="mega-input dropdown-input text-style inline chart-month-selector">
+                                            <div class="mega-input-title"></div>
+                                            <span>[$996]</span>
+                                            <i class="sprite-fm-mono icon-dropdown"></i>
+                                            <div class="mega-input-dropdown hidden">
+                                                <div class="dropdown-scroll"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="chart-container">
+                                            <canvas class="daily-transfer-chart"></canvas>
+                                        </div>
+                                    </div>
+                                    <div class="analysis-remarks-container">
+                                        [$20936]
+                                    </div>
+                                    <div class="analysis-remarks-container">
+                                        [$s4_pro_egress_info]
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="account responsive-widget-block">
                         <div class="account widget body achievements">
                             <div class="account widget content">
@@ -3171,6 +3336,16 @@
                                         0 folders
                                     </td>
                                     <td class="account right-textalign">
+                                        0 MB
+                                    </td>
+                                </tr>
+                                <tr class="account data-item s4 dynamic hidden">
+                                    <td class="account">
+                                        <i class="sprite-fm-mono icon-bucket-outline"></i>
+                                        <span class="s4-dashboard pointer-c">[$obj_storage]</span>
+                                    </td>
+                                    <td class="account"></td>
+                                    <td class="account right-textalign value">
                                         0 MB
                                     </td>
                                 </tr>
@@ -3746,6 +3921,7 @@
                                             <div class="option" data-value="fm">[$164]</div>
                                             <div class="option" data-value="recents">[$20141]</div>
                                             <div class="option" data-value="chat">[$7997]</div>
+                                            <div class="option" data-value="s4">[$obj_storage]</div>
                                         </div>
                                     </div>
                                 </div>
@@ -3889,6 +4065,7 @@
                                 </div>
                                 <div class="payment-card-bottom">
                                     <a class="payment-card-edit">[$edit_card]</a>
+                                    <a class="payment-card-delete hidden">[$delete_card]</a>
                                 </div>
                             </div>
                         </div>
@@ -4281,6 +4458,55 @@
                             </div>
                         </div>
                     </div>
+                    <div class="account data-block rewind">
+                        <div class="settings-left-block">
+                            <div class="title-txt">[$rewind]</div>
+                        </div>
+                        <div class="settings-right-block slide-in-out closed">
+                            <div class="settings-sub-section">
+                                <div class="subtitle-txt">[$rewind_stgs_title]</div>
+                                <div class="mega-switch hidden" id="rewind-enabled">
+                                    <div class="mega-feature-switch"></div>
+                                </div>
+                                <div class="pro-badge">[$8695]</div>
+                                <div class="content-txt">[$rewind_stgs_content]</div>
+                                <div class="container-rewind-upgrade">
+                                    <div class="mega-banner body with-btn">
+                                        <div class="mega-banner cell">
+                                            <div class="settings-info-icon">
+                                                <i class="sprite-fm-mono icon-info-filled"></i>
+                                            </div>
+                                        </div>
+                                        <div class="mega-banner cell text-cell">
+                                            <div class="versioning-body-text">
+                                                [$rewind_stgs_upgrade_to_pro]
+                                            </div>
+                                        </div>
+                                        <div class="mega-banner cell btn-cell">
+                                            <button class="mega-button positive upgrade-to-pro rewind-upgrade">
+                                                <span>[$129]</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="settings-sub-section slide-item container-rewind-retention hidden">
+                                <div class="subtitle-txt">[$rewind_stgs_retention_title]</div>
+                                <div class="container-rewind-retention-selector">
+                                    <form autocomplete="disabled">
+                                        <div class="mega-input dropdown-input rewind-retention-selector"
+                                        id="rewind-retention-days">
+                                            <span></span>
+                                            <i class="sprite-fm-mono icon-dropdown"></i>
+                                            <div class="mega-input-dropdown hidden">
+                                                <div class="dropdown-scroll"></div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="account data-block rubbish-cleaning">
                         <div class="settings-left-block">
                             <div class="title-txt">[$7226]</div>
@@ -4364,13 +4590,13 @@
                                         <div class="uiviewmode radioOn" id="rad10_div">
                                             <input type="radio" id="rad10" class="uiviewmode radioOn" value="0">
                                         </div>
-                                        <div class="radio-txt">[$1384]</div>
+                                        <div class="radio-txt">[$description_layout_option_individual_folder]</div>
                                     </div>
                                     <div class="label-wrap">
                                         <div class="uiviewmode radioOff" id="rad11_div">
                                             <input type="radio" id="rad11" class="uiviewmode radioOff" value="1">
                                         </div>
-                                        <div class="radio-txt">[$1385]</div>
+                                        <div class="radio-txt">[$description_layout_option_all_folders]</div>
                                     </div>
                                 </div>
                             </div>
@@ -4400,6 +4626,13 @@
                                     <div class="mega-feature-switch no-trans-init"></div>
                                 </div>
                                 <div class="content-txt">[$show_hidden_files_txt]</div>
+                            </div>
+                            <div class="settings-sub-section">
+                                <div class="subtitle-txt">[$setting_colour_folder_title]</div>
+                                <div class="mega-switch toggle-on" id="colour-folder">
+                                    <div class="mega-feature-switch no-trans-init"></div>
+                                </div>
+                                <div class="content-txt">[$setting_colour_folder_desc]</div>
                             </div>
                         </div>
                     </div>
@@ -4523,6 +4756,7 @@
                             </div>
                             <div class="settings-sub-section">
                                 <div class="subtitle-txt">[$570]</div>
+                                <div class="content-txt">[$subtext_num_parallel_upload_connections]</div>
                                 <div class="upload-settings full-sized">
                                     <div id="slider-range-max"></div>
                                     <div class="slider numbers-wrap">
@@ -4537,6 +4771,7 @@
                             </div>
                             <div class="settings-sub-section">
                                 <div class="subtitle-txt">[$571]</div>
+                                <div class="content-txt">[$subtext_num_parallel_dl_connections]</div>
                                 <div class="download-settings full-sized">
                                     <div id="slider-range-max2"></div>
                                     <div class="slider numbers-wrap">
@@ -4792,7 +5027,7 @@
                                 </div>
                             </div>
                             <div class="settings-sub-section sub-container">
-                                <a class="content-txt resellerbuy" href="mailto:resellers@mega.nz">[$7715]</a>
+                                <a class="content-txt resellerbuy" href="mailto:resellers@mega.io"></a>
                                 <button class="mega-button positive vouchercreate">
                                     <span>[$6876]</span>
                                 </button>
@@ -4871,7 +5106,7 @@
                             <div class="step-device">[$vpn_page_desktop_heading]</div>
                             <div class="desktop-download-links">
                                 <a href="https://mega.nz/MEGAvpnSetup64.exe" target="_blank" rel="noopener noreferrer"
-                                    class="mega-button vpn-link clickurl js-vpn-client-desktop windows">[$vpn_page_install_windows_desktop]</a>
+                                    class="mega-button vpn-link clickurl js-vpn-client-desktop windows nz-url">[$vpn_page_install_windows_desktop]</a>
                                 <a href="https://apps.apple.com/app/mega-vpn-privacy-online/id6456784858" target="_blank"
                                     rel="noopener noreferrer"
                                     class="mega-button vpn-link clickurl js-vpn-client-desktop macos">[$vpn_page_install_macos_desktop]</a>
@@ -4954,11 +5189,13 @@
                         <div class="settings-right-block">
                             <div class="settings-sub-section">
                                 <div class="full-sized">
-                                    <div class="settings-body-txt">[$s4_available_endpoints]</div>
+                                    <div class="subtitle-txt">[$s4_s3_compatible_endpoints]</div>
+                                    <div class="content-txt">[$s4_s3_endpoint_prefix_tip]</div>
                                     <table class="secondary-table js-endpoints-table"></table>
-                                    <div class="settings-body-txt bold">[$s4_endpoints_prefix_info]</div>
+                                    <div class="settings-body-txt js-endpoints-s4"></div><br>
+                                    <div class="settings-body-txt bold">[$s4_api_prefix_usage]</div>
                                     <ul class="js-endpoints-desc"></ul>
-                                    <div class="settings-body-txt">[$s4_endpoints_info]</div>
+                                    <div class="settings-body-txt">[$s4_endpont_region_usage]</div>
                                 </div>
                             </div>
                         </div>
@@ -5006,7 +5243,7 @@
                                 </div>
                             </div>
                             <div class="settings-sub-section">
-                                <div class="subtitle-txt">[$s4_setting_warn_from_s4_to_cd]</div>
+                                <div class="subtitle-txt">[$s4_setting_move_from_s4_to_cd]</div>
                                 <div class="mega-switch" name="skips4tocd">
                                     <div class="mega-feature-switch no-trans-init"></div>
                                 </div>
@@ -5014,6 +5251,12 @@
                             <div class="settings-sub-section">
                                 <div class="subtitle-txt">[$s4_setting_warn_from_s4_to_s4]</div>
                                 <div class="mega-switch" name="skips4tos4">
+                                    <div class="mega-feature-switch no-trans-init"></div>
+                                </div>
+                            </div>
+                            <div class="settings-sub-section">
+                                <div class="subtitle-txt">[$s4_setting_warn_from_hidden_to_s4]</div>
+                                <div class="mega-switch" name="skipSenToS4">
                                     <div class="mega-feature-switch no-trans-init"></div>
                                 </div>
                             </div>
@@ -5071,4 +5314,3 @@
         <ul></ul>
     </li>
 </ul>
-

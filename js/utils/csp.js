@@ -424,7 +424,8 @@ lazy(self, 'csp', () => {
 
                     const ctx = is_extension ? 1 :
                         location.host === 'mega.nz' ? 2 :
-                            location.host === 'mega.io' ? 3 : location.host;
+                            location.host === 'mega.io' ? 3 :
+                                location.host === 'mega.app' ? 4 : location.host;
 
                     eventlog(99743, JSON.stringify([1, type, value | 0, chg | 0, pid, ctx]));
                 }

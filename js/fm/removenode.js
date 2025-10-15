@@ -65,7 +65,24 @@ function removeUInode(h, parent) {
         }
 
         delay('removeNodeExtraToggle', () => {
-            mega.ui.secondaryNav.toggleGridExtraButtons(M.v.length === 0);
+            if (!M.v.length) {
+                mega.ui.secondaryNav.toggleGridExtraButtons(true);
+                if (mega.ui.mNodeFilter && mega.ui.mNodeFilter.selectedFilters.value) {
+                    let childCount;
+                    if (M.search) {
+                        // @todo - need to calculate the search result count and use that as childCount
+                    }
+                    else {
+                        const tgt = M.c[M.currentCustomView.nodeID || M.currentdirid];
+                        childCount = tgt && Object.keys(tgt).length;
+                    }
+                    if (childCount === 0 || childCount === undefined) {
+                        mega.ui.mNodeFilter.resetFilterSelections(false);
+                    }
+                }
+                M.clearSelectedNodes();
+                mega.ui.secondaryNav.extHideFilterChip();
+            }
         }, 100);
     };
 
@@ -132,16 +149,9 @@ function removeUInode(h, parent) {
                 $('.files-grid-view').addClass('hidden');
                 $('.grid-table.fm tbody tr').remove();
 
-                if (M.gallery) {
-                    const lastToRemove = M.c[M.currentdirid] &&
-                        Object.values(M.c[M.currentdirid]).length === 1 && h in M.c[M.currentdirid];
-                    mega.gallery.showEmpty(M.currentdirid, lastToRemove);
-                }
-                else if (folderlink) {
-                    $('.fm-empty-folder').removeClass('hidden');
-                }
-                else {
-                    $('.fm-empty-cloud').removeClass('hidden');
+                mega.ui.empty.root();
+
+                if (!folderlink) {
                     if (u_type !== 3) {
                         $('.fm-not-logged-description').safeHTML(l[8762].replace('%s', bytesToSize(mega.bstrg, 0)));
                     }
@@ -153,7 +163,7 @@ function removeUInode(h, parent) {
             if (!hasItems) {
 
                 __markEmptied();
-                $('.files-grid-view').addClass('hidden');
+                $('.files-grid-view, #gallery-view', '.fm-right-files-block').addClass('hidden');
                 $('.grid-table.fm tbody tr').remove();
 
                 mega.gallery.showEmpty(M.currentdirid);
@@ -172,11 +182,9 @@ function removeUInode(h, parent) {
 
                 __markEmptied();
                 if (M.gallery) {
-                    $('.files-grid-view').addClass('hidden');
+                    $('.files-grid-view, #gallery-view', '.fm-right-files-block').addClass('hidden');
 
-                    const lastToRemove = M.c[M.currentdirid] &&
-                        Object.values(M.c[M.currentdirid]).length === 1 && h in M.c[M.currentdirid];
-                    mega.gallery.showEmpty(M.currentdirid, lastToRemove);
+                    mega.ui.empty.folder();
                 }
                 else if (M.dyh) {
                     M.dyh('empty-ui');
@@ -192,6 +200,9 @@ function removeUInode(h, parent) {
                     else if (M.currentdirid === 'out-shares') {
                         $('.fm-empty-outgoing').removeClass('hidden');
                     }
+                    else if (M.currentrootid === 'out-shares') {
+                        $('.fm-empty-folder', '.fm-right-files-block').removeClass('hidden');
+                    }
                     else if (M.currentdirid !== 'public-links' &&
                         M.currentdirid !== 'file-requests' &&
                         M.currentdirid !== 's4' &&
@@ -203,8 +214,11 @@ function removeUInode(h, parent) {
                             $('.fm-empty-search').removeClass('hidden');
                             $('.fm-right-files-block:not(.in-chat) .search-bottom-wrapper').addClass('hidden');
                         }
+                        else if (M.currentrootid === 'file-requests' || M.currentrootid === 'public-links') {
+                            $('.fm-empty-folder', '.fm-right-files-block').removeClass('hidden');
+                        }
                         else {
-                            $('.fm-empty-folder').removeClass('hidden');
+                            mega.ui.empty.folder();
                         }
                     }
                 }

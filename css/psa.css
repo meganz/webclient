@@ -2,28 +2,33 @@
  * CSS for the Public Service Announcement for desktop and mobile
  */
 
-/* Desktop */
+/* All clients */
 
-.psa-holder .anouncement {
+.psa-holder .mega-component.anouncement {
     --icon-size: 24px;
-    background: linear-gradient(to bottom, #ffffff 0%, #eeeeee 100%);
     border-top: 1px solid rgba(0, 0, 0, 0.05);
     bottom: 0;
     box-sizing: border-box;
     display: flex;
     padding: 24px;
     position: fixed;
+    top: auto;
     width: 100%;
     z-index: 1400;
 }
 
-.theme-dark .psa-holder .anouncement {
+.psa-holder .mega-component.banner.anouncement {
+    background: linear-gradient(to bottom, #ffffff 0%, #eeeeee 100%);
+}
+
+.theme-dark .psa-holder .mega-component.banner.anouncement {
     background: linear-gradient(to bottom, rgb(60, 60, 60) 0%, rgb(51, 51, 51) 100%);
 }
 
-.psa-holder .anouncement .content-box {
+.psa-holder .mega-component.anouncement .content-box {
     align-items: flex-start;
     display: flex;
+    flex: initial;
     flex-direction: column;
     margin: auto;
     margin-inline-start: 0;
@@ -32,51 +37,64 @@
 
 /* Gap for all content child elems */
 
-.psa-holder .anouncement .content-box > * {
+.psa-holder .mega-component.anouncement .content-box > * {
     margin-top: 8px;
+    padding: 0;
 }
 
-.psa-holder .anouncement .content-box > *:empty,
-.psa-holder .anouncement .content-box > *:first-child {
+.psa-holder .mega-component.anouncement .content-box > *:empty,
+.psa-holder .mega-component.anouncement .content-box > *:first-child {
     margin-top: 0;
 }
 
 /* Component attribute styles */
 
-.psa-holder .anouncement .title-text {
+.psa-holder .mega-component.anouncement .title-text {
     color: var(--text-color-high);
     font: var(--text-h3);
     width: 100%;
 }
 
-.psa-holder .anouncement .message-text {
+.psa-holder .mega-component.anouncement .message-text {
     color: var(--text-color-medium);
     font: var(--text-body1);
 }
 
-.psa-holder .anouncement img {
+.psa-holder .mega-component.anouncement img {
     height: 128px;
     width: 128px;
     margin-inline-start: auto;
 }
 
-.psa-holder .anouncement .content-box .mega-button {
-    margin-top: 16px;
+.psa-holder .mega-component.anouncement .content-box .mega-button {
+    margin-top: 8px;
 }
 
-.psa-holder .anouncement .mega-button.icon {
+.psa-holder .mega-component.anouncement .mega-button.icon {
     margin: 0;
 }
 
-/* end of Desktop */
+.psa-holder .mega-component.anouncement .end-box {
+    align-items: initial;
+    justify-content: initial;
+    padding: 0;
+}
 
-/* Mobile */
+/* end of common */
+
+/* Mobile overrides */
 
 .mobile .psa-holder {
     grid-row: 5 / 6;
 }
 
-.mobile .psa-holder .anouncement .content-box {
+.mobile .psa-holder .mega-component.banner.anouncement,
+.mobile.theme-dark .psa-holder .mega-component.banner.anouncement {
+    background: var(--mobile-surface-2);
+}
+
+.mobile .psa-holder .mega-component.anouncement .content-box {
+    flex: 1 1 auto;
     flex-flow: row wrap;
     margin: unset;
     padding: 0 8px;
@@ -84,18 +102,19 @@
 
 /* Component attribute styles */
 
-.mobile .psa-holder .anouncement .message-text {
-    padding-inline-end: 8px;
+.mobile .psa-holder .mega-component.anouncement .message-text {
+    color: var(--mobile-text-primary);
     font: var(--mobile-font-caption-large-regular);
+    padding-inline-end: 8px;
 }
 
-.mobile .psa-holder .anouncement .action-link span {
+.mobile .psa-holder .mega-component.anouncement .action-link span {
     color: var(--mobile-text-primary);
     font: var(--mobile-font-link-small-bold);
     text-decoration: underline;
 }
 
-.mobile .psa-holder .anouncement .mega-button.icon {
+.mobile .psa-holder .mega-component.anouncement .mega-button.icon {
      --mask-color: var(--mobile-text-primary);
 }
 .mobile .psa-holder .mega-component.banner {
@@ -104,14 +123,21 @@
 .mobile .psa-holder .mega-component.banner .content-box > * {
     margin-top: 4px;
 }
-.mobile .psa-holder .anouncement .banner.title-text {
+
+.mobile .psa-holder .mega-component.anouncement {
+    position: static;
+    z-index: auto;
+}
+
+.mobile .psa-holder .mega-component.anouncement .banner.title-text {
     font: var(--mobile-font-copy-bold);
 }
 
-.mobile .psa-holder .anouncement img {
+.mobile .psa-holder .mega-component.anouncement img {
     height: 64px;
     width: 64px;
 }
+
 /* Queue advertisement banners if PSA is visible */
 
 .psa-notification .mega-component.banner.advertisement {

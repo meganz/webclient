@@ -261,6 +261,7 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sSubMap) {
 
         const tn = fmconfig.treenodes || Object.create(null);
         const dn = $.openedDialogNodes || Object.create(null);
+        const isInShare = stype === 'shared-with-me';
 
         for (var idx = 0; idx < folders.length; idx++) {
             buildnode = false;
@@ -329,7 +330,9 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sSubMap) {
                     node.classList.add('linked');
                 }
 
-                M.applySensitiveStatus(node, folders[idx]);
+                if (!isInShare) {
+                    M.applySensitiveStatus(node, folders[idx]);
+                }
 
                 var titleTooltip = [];
                 if (folders[idx].t & M.IS_TAKENDOWN) {
@@ -377,7 +380,22 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sSubMap) {
                 else if (curItemHandle === M.cf.h) {
                     node.classList.add('chat-folder');
                 }
+                else if (folders[idx].lbl) {
+                    node.classList.add(MegaNodeComponent.label[folders[idx].lbl]);
+                }
                 node.textContent = name;
+                if (dialog === 'fm-picker-dialog') {
+                    node.previousElementSibling.classList.add(
+                        'sprite-fm-mono',
+                        buildnode ? 'icon-chevron-down-thin-outline' : 'icon-chevron-right-thin-outline'
+                    );
+                    if (folders[idx].t & M.IS_LINKED) {
+                        const icon = node.nextElementSibling.querySelector('.file-status-ico');
+                        if (icon) {
+                            icon.classList.add('sprite-fm-mono', 'icon-link-thin-outline');
+                        }
+                    }
+                }
                 html = node.parentNode.parentNode;
 
                 if (folders[idx - 1] && !(folders[idx - 1].t & M.IS_S4CRT)
@@ -768,27 +786,28 @@ MegaData.prototype.getOutShareTree = function() {
 
 /**
  * Get t value of custom view trees
- * @return {MegaNode} An ufs-node
+ * @return {Number} bitwise
  */
 MegaData.prototype.getTreeValue = function(n) {
-
     'use strict';
 
-    var t = n.t;
+    let t = +n.t | 0;
     if (n.fav) {
         t |= M.IS_FAV;
     }
     if (n.sen) {
         t |= M.IS_SEN;
     }
-    if (M.su.EXP && M.su.EXP[n.h]) {
+
+    const s = this.getNodeShare(n);
+    if (s) {
+        if (s.down) {
+            t |= M.IS_TAKENDOWN;
+        }
         t |= M.IS_LINKED;
     }
-    if (M.getNodeShareUsers(n, 'EXP').length || M.ps[n.h]) {
+    if (this.isOutShare(n, 'EXP')) {
         t |= M.IS_SHARED;
-    }
-    if (M.getNodeShare(n).down === 1) {
-        t |= M.IS_TAKENDOWN;
     }
     return t;
 };
@@ -827,8 +846,10 @@ MegaData.prototype.addTreeUI = function() {
                         id = id.replace(/treea_+|(os_|pl_)/g, '');
                     }
                     if (id && M.d[id]) {
+                        const icon = fileIcon(M.d[id]);
+                        const labelClass = icon === 'folder' && MegaNodeComponent.label[M.d[id].lbl | 0] || '';
                         html = ('<div class="tree-item-dragger nw-fm-tree-item">' +
-                                '<span class="nw-fm-tree-folder ' + fileIcon(M.d[id]) + '"></span>' +
+                                `<span class="nw-fm-tree-folder ${icon} ${labelClass}"></span>` +
                                 '<span class="item-name">' +
                                     escapeHTML(M.d[id].name) + '</span>' +
                                 '</div>'
@@ -1159,17 +1180,13 @@ MegaData.prototype.onTreeUIOpen = function(id, event, ignoreScroll) {
             const b = t + ps.offsetHeight;
             let et = scrollTo.offsetTop;
 
-            if (!mega.ui.topmenu.activeItem) {
+            if (mega.ui.topmenu.activeItem && mega.ui.topmenu.activeItem.classList.contains('nw-fm-tree-item')) {
 
-                let p = scrollTo.parentElement;
+                let p = scrollTo.offsetParent;
 
-                while (p && !p.classList.contains('fm-tree-panel')) {
-
-                    if (p.tagName === 'LI') {
-                        et += p.offsetTop;
-                    }
-
-                    p = p.parentElement;
+                while (p && !p.classList.contains('ps')) {
+                    et += p.offsetTop;
+                    p = p.offsetParent;
                 }
             }
 

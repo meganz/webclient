@@ -566,3 +566,10 @@
             }
 
         /* some complex dialogs are untemplated so have no dialog-* class */
+
+        /* dialog specifics */
+        .mega-dialog.cancel-subscription-st2 .message-body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }

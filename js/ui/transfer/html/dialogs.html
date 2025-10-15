@@ -142,132 +142,129 @@
 </dialog>
 
 <!-- Login dialog !-->
-<dialog class="it-dialog-holder js-login-dialog blur hidden"
+<dialog class="it-dialog-holder js-login-dialog side hidden"
     aria-labelledby="login-dialog-title"
     aria-modal="true">
 
-    <section class="it-box it-dialog fh-size lg-shadow auth-dialog login">
+    <section class="it-dialog it-box auth-dialog login">
         <div class="body">
-            <button class="it-button ghost icon close-btn js-close" aria-label="Close">
-                <i class="sprite-it-x32-mono icon-close-circle"></i>
-            </button>
-            <div class="split-content">
-                <div class="content illustration">
-                    <div class="illustration-body auth">
-                        <img alt class="icon img1" src="data:,">
-                    </div>
-                </div>
-                <div class="content login-cn">
-                    <div class="scroll-area">
-                        <div class="content-body">
-                            <div class="it-logo"></div>
-                            <h5 id="login-dialog-title">
-                                [$transferit_welcome_hdr]
-                            </h5>
-                            <form>
-                                <div class="it-input fl-label xl-size">
-                                    <div class="input-box">
-                                        <div class="input-field">
-                                            <input type="text" placeholder="[$transferit_your_email_adress]" name="login-dlg-email-input" id="login-dlg-email-input" value="" required />
-                                            <label for="login-dlg-email-input">[$transferit_email_adress]</label>
-                                        </div>
-                                    </div>
-                                    <div class="error-text"></div>
-                                </div>
-
-                                <div class="it-input fl-label xl-size">
-                                    <div class="input-box">
-                                        <div class="input-field">
-                                            <input type="password" placeholder="[$transferit_your_email_pass]" name="login-dlg-password-input" id="login-dlg-password-input" value="" required />
-                                            <label for="login-dlg-password-input">[$909]</label>
-                                        </div>
-                                    </div>
-                                    <div class="error-text"></div>
-                                </div>
-
-                                <a href="https://mega.nz/recovery" target="_blank" class="link sm-size bold">[$1934]</a>
-
-                                <button class="it-button xl-size f-w js-continue-button">
-                                    <span>[$transferit_continue_w_mega]</span>
-                                </button>
-
-                                <div class="bottom-info">
-                                    [$transferit_dont_have_acc] <a href="https://mega.nz/register" target="_blank" class="link strong js-sign-in">[$transferit_create_mega_acc]</a>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-                <div class="content two-fa-cn hidden">
+            <header>
+                <div>
                     <button class="it-button ghost lg-size back-btn js-back">
                         <i class="sprite-it-x24-mono icon-arrow-big-left"></i>
                         <span>[$822]</span>
                     </button>
-                    <div class="scroll-area">
-                        <div class="content-body">
-                            <div class="it-logo"></div>
-                            <h5>
-                                [$transferit_enter_mega_2fa]
-                            </h5>
-                            <form>
-                                <div class="multiple-inputs">
-                                    <div class="it-input xl-size">
-                                        <div class="input-box">
-                                            <div class="input-field">
-                                                <input type="number" maxlength="1" data-number="1" value="" required />
-                                            </div>
-                                        </div>
+                </div>
+                <button class="it-button ghost icon js-close" aria-label="Close">
+                    <i class="sprite-it-x32-mono icon-size-32 icon-close"></i>
+                </button>
+            </header>
+            <div class="content login-cn">
+                <div class="scroll-area">
+                    <div class="content-body">
+                        <div class="it-logo"></div>
+                        <h5 id="login-dialog-title">
+                            [$transferit_welcome_hdr]
+                        </h5>
+                        <form>
+                            <div class="it-input fl-label xl-size">
+                                <div class="input-box">
+                                    <div class="input-field">
+                                        <input type="text" placeholder="[$transferit_your_email_adress]" name="login-dlg-email-input" id="login-dlg-email-input" value="" required />
+                                        <label for="login-dlg-email-input">[$transferit_email_adress]</label>
                                     </div>
-                                    <div class="it-input xl-size">
-                                        <div class="input-box">
-                                            <div class="input-field">
-                                                <input type="number" maxlength="1" data-number="2" value="" required />
-                                            </div>
-                                        </div>
+                                </div>
+                                <div class="error-text"></div>
+                            </div>
+
+                            <div class="it-input fl-label xl-size">
+                                <div class="input-box">
+                                    <div class="input-field">
+                                        <input type="password" placeholder="[$transferit_your_email_pass]" name="login-dlg-password-input" id="login-dlg-password-input" value="" required />
+                                        <label for="login-dlg-password-input">[$909]</label>
                                     </div>
-                                    <div class="it-input xl-size">
-                                        <div class="input-box">
-                                            <div class="input-field">
-                                                <input type="number" maxlength="1" data-number="3" value="" required />
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="it-input xl-size">
-                                        <div class="input-box">
-                                            <div class="input-field">
-                                                <input type="number" maxlength="1" data-number="4" value="" required />
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="it-input xl-size">
-                                        <div class="input-box">
-                                            <div class="input-field">
-                                                <input type="number" maxlength="1" data-number="5" value="" required />
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="it-input xl-size">
-                                        <div class="input-box">
-                                            <div class="input-field">
-                                                <input type="number" maxlength="1" data-number="6" value="" required />
-                                            </div>
+                                </div>
+                                <div class="error-text"></div>
+                            </div>
+
+                            <a href="https://mega.nz/recovery" target="_blank" class="link sm-size bold nz-url">[$1934]</a>
+
+                            <button class="it-button xl-size f-w js-continue-button">
+                                <span>[$transferit_continue_w_mega]</span>
+                            </button>
+
+                            <div class="bottom-info">
+                                [$transferit_dont_have_acc] <a href="https://mega.nz/register" target="_blank" class="link strong js-sign-in nz-url">[$transferit_create_mega_acc]</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="content two-fa-cn hidden">
+                <div class="scroll-area">
+                    <div class="content-body">
+                        <div class="it-logo"></div>
+                        <h5>
+                            [$transferit_enter_mega_2fa]
+                        </h5>
+                        <form>
+                            <div class="multiple-inputs">
+                                <div class="it-input xl-size">
+                                    <div class="input-box">
+                                        <div class="input-field">
+                                            <input type="number" maxlength="1" data-number="1" value="" required />
                                         </div>
                                     </div>
                                 </div>
-
-                                <div class="error-text v-hidden">
-                                    [$19192]
+                                <div class="it-input xl-size">
+                                    <div class="input-box">
+                                        <div class="input-field">
+                                            <input type="number" maxlength="1" data-number="2" value="" required />
+                                        </div>
+                                    </div>
                                 </div>
-
-                                <button class="it-button xl-size f-w js-submit-2fa">
-                                    <span>[$1694]</span>
-                                </button>
-
-                                <div class="bottom-info">
-                                    <a href="https://mega.nz/recover" target="_blank" class="link">[$19215]</a>
+                                <div class="it-input xl-size">
+                                    <div class="input-box">
+                                        <div class="input-field">
+                                            <input type="number" maxlength="1" data-number="3" value="" required />
+                                        </div>
+                                    </div>
                                 </div>
-                            </form>
-                        </div>
+                                <div class="it-input xl-size">
+                                    <div class="input-box">
+                                        <div class="input-field">
+                                            <input type="number" maxlength="1" data-number="4" value="" required />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="it-input xl-size">
+                                    <div class="input-box">
+                                        <div class="input-field">
+                                            <input type="number" maxlength="1" data-number="5" value="" required />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="it-input xl-size">
+                                    <div class="input-box">
+                                        <div class="input-field">
+                                            <input type="number" maxlength="1" data-number="6" value="" required />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="error-text v-hidden">
+                                [$19192]
+                            </div>
+
+                            <button class="it-button xl-size f-w js-submit-2fa">
+                                <span>[$1694]</span>
+                            </button>
+
+                            <div class="bottom-info">
+                                <a href="https://mega.nz/recover" target="_blank" class="link nz-url">[$19215]</a>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>

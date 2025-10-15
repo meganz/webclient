@@ -10,10 +10,11 @@
     transition: 200ms linear;
 }
 .shares-tabs-bl {
-    padding: 12px 24px 0;
+    padding: 0 24px;
 }
 .rtl .gallery-tabs-bl,
-.rtl .s4-user-tabs-bl {
+.rtl .s4-user-tabs-bl,
+.rtl .shares-tabs-bl {
     direction: rtl;
 }
 .fm-right-files-block.emptied .gallery-tabs-bl button:not(.gallery-close-discovery) {

@@ -140,28 +140,24 @@ function sharedUInode(nodeHandle, force) {
         return delay(`sharedUInode:${nodeHandle}`, () => sharedUInode(nodeHandle, true), 666);
     }
 
-    var oShares;
     var bExportLink = false;
     var bAvailShares = false;
     var UiExportLink = new mega.UI.Share.ExportLink();
-    var share = new mega.Share();
     var target;
     const iconSize = M.onIconView ? 90 : 24;
     const iconSpriteClass = `item-type-icon${M.onIconView ? '-90' : ''}`;
 
     // Is there a full share or pending share available
-    if ((M.d[nodeHandle] && M.d[nodeHandle].shares) || M.ps[nodeHandle]) {
-
-        // Contains full shares and/or export link
-        oShares = M.d[nodeHandle] && M.d[nodeHandle].shares;
+    if (M.isOutShare(nodeHandle)) {
+        const exp = M.getNodeShare(nodeHandle);
 
         // Do we have export link for selected node?
-        if (oShares && oShares.EXP) {
+        if (exp) {
 
             UiExportLink.addExportLinkIcon(nodeHandle);
 
             // Item is taken down, make sure that user is informed
-            if (oShares.EXP.down === 1) {
+            if (exp.down) {
                 UiExportLink.addTakenDownIcon(nodeHandle);
             }
 
@@ -170,13 +166,17 @@ function sharedUInode(nodeHandle, force) {
 
         // Add share icon in left panel for selected node only if we have full or pending share
         // Don't show share icon when we have export link only
-        if (share.isShareExist([nodeHandle], true, true, false)) {
+        if (M.isOutShare(nodeHandle, 'EXP')) {
 
             // Left panel
             target = document.querySelector('#treea_' + nodeHandle + ' .nw-fm-tree-folder');
 
             if (target) {
                 target.classList.add('shared-folder');
+                const {lbl} = M.getNodeByHandle(nodeHandle);
+                if (lbl) {
+                    target.classList.remove(MegaNodeComponent.label[lbl]);
+                }
             }
 
             bAvailShares = true;
@@ -206,6 +206,7 @@ function sharedUInode(nodeHandle, force) {
 
         if (target) {
             target.classList.remove('shared-folder');
+            MegaNodeComponent.label.set(M.d[nodeHandle], target);
         }
 
         target = document.getElementById(nodeHandle);
@@ -449,14 +450,14 @@ function setContactLink($container) {
     // Check data exists in M.account
     if (account.contactLink && account.contactLink.length) {
         contactPrefix =  M.account.contactLink.match('^C!') ? '' : 'C!';
-        $publicLink.attr('data-lnk', 'https://mega.nz/' + contactPrefix + M.account.contactLink);
+        $publicLink.attr('data-lnk', `${getBaseUrl()}/${contactPrefix}${M.account.contactLink}`);
     }
     else {
         api.send('clc')
             .then((res) => {
                 if (typeof res === 'string') {
                     contactPrefix = res.match('^C!') ? '' : 'C!';
-                    res = 'https://mega.nz/' + contactPrefix + res;
+                    res = `${getBaseUrl()}/${contactPrefix}${res}`;
                     $publicLink.attr('data-lnk', res);
                     mBroadcaster.sendMessage('contact:setContactLink', res);
                 }
@@ -628,20 +629,9 @@ function fmtopUI() {
 
     let primary = false;
     let secondary = false;
-    let contextMenuItem = false;
+    let tertiary = false;
 
     const id = String(M.currentdirid || '').split('/').pop();
-    if (mega.rewind
-        && M.getSelectedSourceRoot() === M.RootID
-        && M.currentrootid === M.RootID
-        && !pfid && M.onDeviceCenter !== M.RootID
-    ) {
-        contextMenuItem = id;
-    }
-
-    const $rewindNotifBanner =
-        $('.fm-notification-block.new-feature-rewind-notification', '.fm-right-files-block');
-    $rewindNotifBanner.addClass('hidden');
 
     $('.shares-tab-lnk.active', $sharesTabBlock).removeClass('active');
     $('.gallery-tab-lnk.active', $galleryTabBlock).removeClass('active');
@@ -659,34 +649,37 @@ function fmtopUI() {
         M.currentdirid === 'file-requests'
     );
     mega.ui.secondaryNav.updateInfoPanelButton(id && M.d[id] && M.d[id].t);
-    mega.ui.secondaryNav.showBreadcrumb();
+    if (M.currentdirid !== 'shares') {
+        mega.ui.secondaryNav.showBreadcrumb();
+    }
+    mega.ui.secondaryNav.updateInfoChipsAndViews();
+    mega.ui.secondaryNav.breadcrumbHolder.classList.remove('top-spacer');
+    mega.ui.secondaryNav.chipsViewsWrapper.classList.remove('no-crumb', 'grid-spacer');
+    mega.ui.secondaryNav.domNode.classList.remove('no-small-content', 'crumb-info', 's4-spacer', 'search-link');
+    mega.ui.secondaryNav.updateSmallNavButton(
+        !(
+            M.onDeviceCenter ||
+            M.currentdirid === 'shares' ||
+            M.currentdirid === M.RubbishID ||
+            M.currentdirid === 'faves' ||
+            M.currentdirid === 'recents'
+        ) || M.v.length
+    );
     $('.fm-right-files-block').removeClass('visible-notification rubbish-bin');
 
     const isSearchResult = String(M.currentdirid).substring(0, 6) === 'search';
+    if (isSearchResult && pfid) {
+        mega.ui.secondaryNav.domNode.classList.add('search-link');
+    }
     if (M.currentrootid === M.RubbishID) {
         if (M.v.length) {
             primary = '.fm-clearbin-button';
         }
 
-        if (mega.config.get('dsmRubRwd')) {
-            $rewindNotifBanner.addClass('hidden');
-        }
-        else {
-            $rewindNotifBanner.removeClass('hidden');
-            delay('rubbish-bin:rewind-prom', () => eventlog(500530, true), 4e3);
-
-            $('.fm-notification-close', $rewindNotifBanner).rebind('click.rewindnotifbanner', () => {
-                eventlog(500529);
-                mega.config.set('dsmRubRwd', 1);
-                $rewindNotifBanner.addClass('hidden');
-            });
-
-            $('.learn-more a', $rewindNotifBanner).rebind('click.rnb-lm', () => eventlog(500528));
-        }
-
-        $('.fm-right-files-block').addClass('rubbish-bin visible-notification');
+        $('.fm-right-files-block').addClass('visible-notification rubbish-bin');
     }
     else {
+        const cl = new mega.Share.ExportLink();
         if (M.currentrootid === M.InboxID) {
             if (d) {
                 console.log('Inbox');
@@ -705,15 +698,19 @@ function fmtopUI() {
             if (M.currentdirid !== 'shares' && !M.d[M.currentdirid].su) {
                 if (M.getNodeRights(M.currentdirid) > 0) {
                     primary = '.fm-new-menu';
-                    secondary = '.fm-download';
+                    secondary = '.fm-new-folder';
+                    tertiary = '.fm-download';
                 }
                 else {
                     primary = '.fm-download';
                 }
-                contextMenuItem = contextMenuItem || M.currentdirid;
             }
             else if (M.currentdirid !== 'shares') {
                 mega.ui.secondaryNav.hideBreadcrumb();
+                mega.ui.secondaryNav.chipsViewsWrapper.classList.add('no-crumb');
+            }
+            else if (M.currentdirid === 'shares') {
+                mega.ui.secondaryNav.domNode.classList.add('no-small-content');
             }
         }
         else if (M.currentrootid === 'out-shares') {
@@ -726,15 +723,16 @@ function fmtopUI() {
             if (M.currentdirid === M.currentrootid) {
                 primary = '.fm-new-shared-folder';
                 mega.ui.secondaryNav.hideBreadcrumb();
+                mega.ui.secondaryNav.domNode.classList.add('no-small-content');
             }
-            else if (M.getNodeShareUsers(M.d[M.currentdirid.replace('out-shares/', '')], 'EXP').length) {
+            else if (M.isOutShare(id, 'EXP')) {
                 primary = '.fm-new-menu';
-                secondary = '.fm-manage-share-folder';
-                contextMenuItem = contextMenuItem || id;
+                secondary = '.fm-new-folder';
+                tertiary = cl.isTakenDown(id) ? false : '.fm-share-folder';
             }
             else {
                 primary = '.fm-new-menu';
-                contextMenuItem = contextMenuItem || id;
+                secondary = '.fm-new-folder';
             }
         }
         else if (M.currentrootid === 'public-links') {
@@ -747,11 +745,19 @@ function fmtopUI() {
             if (M.currentdirid === M.currentrootid) {
                 primary = '.fm-new-link';
                 mega.ui.secondaryNav.hideBreadcrumb();
+                mega.ui.secondaryNav.domNode.classList.add('no-small-content');
+                if (M.onIconView) {
+                    mega.ui.secondaryNav.chipsViewsWrapper.classList.add('grid-spacer');
+                }
+            }
+            else if (M.getNodeShare(M.d[id])) {
+                primary = '.fm-new-menu';
+                secondary = '.fm-new-folder';
+                tertiary = cl.isTakenDown(id) ? false : '.fm-share-folder';
             }
             else {
                 primary = '.fm-new-menu';
-                secondary = '.fm-manage-link';
-                contextMenuItem = contextMenuItem || id;
+                secondary = '.fm-new-folder';
             }
         }
         else if (M.currentrootid === 'file-requests') {
@@ -763,11 +769,12 @@ function fmtopUI() {
             if (M.currentdirid === M.currentrootid) {
                 primary = '.fm-new-file-request';
                 mega.ui.secondaryNav.hideBreadcrumb();
+                mega.ui.secondaryNav.domNode.classList.add('no-small-content');
             }
             else {
                 primary = '.fm-new-menu';
-                secondary = mega.fileRequest.storage.getPuHandleByNodeHandle(id) ? '.fm-manage-file-request' : false;
-                contextMenuItem = contextMenuItem || id;
+                secondary = '.fm-new-folder';
+                tertiary = mega.fileRequest.storage.getPuHandleByNodeHandle(id) ? '.fm-manage-file-request' : false;
             }
         }
         else if (M.isGalleryPage()) {
@@ -787,86 +794,93 @@ function fmtopUI() {
         }
         else if (M.currentrootid === 's4' && M.currentCustomView) {
             const {subType, original, nodeID, containerID} = M.currentCustomView;
-            mega.ui.secondaryNav.updateLayoutButton(!subType.startsWith('bucket'));
+            const hideElems = !subType.startsWith('bucket') && !$.selected.length;
+            mega.ui.secondaryNav.updateLayoutButton(hideElems || subType === 'container');
+            let hideChipsViews = false;
             if (subType === 'container') {
                 primary = '.fm-s4-new-bucket';
                 secondary = '.fm-s4-settings';
+                mega.ui.secondaryNav.domNode.classList.add('crumb-info', 's4-spacer');
             }
             else if (subType === 'bucket') {
                 if (M.d[nodeID].p === containerID) {
                     mega.ui.secondaryNav.showCard(
                         nodeID,
                         {
-                            text: l.add_item_btn,
+                            text: l.create_and_upload,
                             icon: 'sprite-fm-mono icon-plus-light-solid',
                             id: `newctx_${nodeID}`,
                             onClick: (ev) => {
+                                if (ev.currentTarget.active) {
+                                    return;
+                                }
+                                ev.currentTarget.active = true;
                                 mega.ui.secondaryNav.openNewMenu(ev);
                             }
                         },
                         {
                             text: l.s4_bkt_settings,
+                            icon: 'sprite-fm-mono icon-settings-thin-outline',
                             onClick: () => {
                                 s4.ui.showDialog(s4.buckets.dialogs.settings, s4.ui.bucket);
                                 eventlog(500745);
                             }
-                        },
-                        (ev) => {
-                            mega.ui.secondaryNav.openContextMenu(ev);
                         }
                     );
                 }
                 else {
                     primary = '.fm-new-menu';
-                    contextMenuItem = contextMenuItem || nodeID;
+                    secondary = '.fm-new-folder';
+                    tertiary = cl.isTakenDown(nodeID) ? false : '.fm-share-folder';
                 }
+                mega.ui.secondaryNav.domNode.classList.add('s4-spacer');
             }
             else if (subType === 'keys') {
                 primary = '.fm-s4-new-key';
+                mega.ui.secondaryNav.domNode.classList.add('crumb-info', 's4-spacer');
             }
             else if (subType === 'policies') {
+                mega.ui.secondaryNav.breadcrumbHolder.classList.add('top-spacer');
+                mega.ui.secondaryNav.updateSmallNavButton();
+                mega.ui.secondaryNav.domNode.classList.add('s4-spacer');
+                hideChipsViews = true;
             }
             else if (subType === 'users') {
                 if (original.endsWith('users')) {
                     primary = '.fm-s4-new-user';
+                    mega.ui.secondaryNav.domNode.classList.add('crumb-info', 's4-spacer');
+                }
+                else {
+                    mega.ui.secondaryNav.breadcrumbHolder.classList.add('top-spacer');
+                    hideChipsViews = true;
                 }
             }
             else if (subType === 'groups') {
                 if (original.endsWith('groups')) {
                     primary = '.fm-s4-new-group';
+                    mega.ui.secondaryNav.domNode.classList.add('crumb-info', 's4-spacer');
+                }
+                else {
+                    mega.ui.secondaryNav.breadcrumbHolder.classList.add('top-spacer');
+                    hideChipsViews = true;
                 }
             }
+            mega.ui.secondaryNav.updateInfoChipsAndViews(hideChipsViews);
             $('.fm-right-files-block').addClass('visible-notification');
         }
         else if (M.onDeviceCenter) {
-            if (M.currentdirid === M.currentrootid && mega.devices.ui.hasDevices && mega.devices.ui.isCustomRender()) {
-                primary = '.fm-add-backup';
-                secondary = '.fm-add-syncs';
-            }
             if (mega.devices.ui.isCustomRender()) {
                 mega.ui.secondaryNav.updateLayoutButton(true);
             }
-            else {
-                const h = M.currentCustomView.nodeID;
-                const { device } = mega.devices.ui.getCurrentDirData();
-                const isBackup = mega.devices.ui.isBackupRelated(h);
-                if (device && !device.folders[h]) {
-                    primary = isBackup ? '.fm-share-folder' : '.fm-new-menu';
-                    secondary = isBackup ? false : '.fm-share-folder';
-                    contextMenuItem = contextMenuItem || h;
-                }
-            }
-
             $('.fm-right-files-block', document).addClass('visible-notification');
-            mega.devices.ui.handleAddBtnVisibility();
         }
         else if (String(M.currentdirid).length === 8
             && M.getNodeRights(M.currentdirid) > 0) {
 
             $('.fm-right-files-block').addClass('visible-notification');
             primary = '.fm-new-menu';
-            secondary = M.currentdirid === M.RootID ? false : '.fm-share-folder';
-            contextMenuItem = contextMenuItem || id;
+            secondary = '.fm-new-folder';
+            tertiary = M.currentdirid === M.RootID || cl.isTakenDown(id) ? false : '.fm-share-folder';
         }
         else if (folderlink) {
             primary = '.fm-import-to-cloudrive';
@@ -876,6 +890,11 @@ function fmtopUI() {
             mega.ui.secondaryNav.hideBreadcrumb();
         }
     }
+
+    if (mega.rewind) {
+        mega.rewind.settings.reductionBanner.init($('.rewind-reduction', '.fmholder'), 'main');
+    }
+
     $('.fm-clearbin-button').rebind('click', function() {
         if (M.isInvalidUserStatus()) {
             return;
@@ -890,11 +909,13 @@ function fmtopUI() {
     }
     $.tresizer();
 
-    if (isSearchResult) {
+    if (isSearchResult || M.onDeviceCenter) {
         return;
     }
-    // do not call when isSearchResult
-    mega.ui.secondaryNav.showActionButtons(primary, secondary, contextMenuItem);
+    mega.ui.secondaryNav.showActionButtons(primary, secondary, tertiary);
+    if (fmconfig.smallNav) {
+        mega.ui.secondaryNav.collapse();
+    }
 }
 
 /**
@@ -1169,18 +1190,19 @@ function FMShortcuts() {
             !M.gallery &&
             !M.albums
         ) {
-            if (!current_operation || (M.getNodeRights(M.currentdirid || '') | 0) < 1) {
+            const nodeId = M.currentCustomView ? M.currentCustomView.nodeID : M.currentdirid;
+            if (!current_operation || (M.getNodeRights(nodeId || '') | 0) < 1) {
                 return false; // stop prop.
             }
 
             let {src: handles, op, dir} = current_operation;
-            op = op === 'cut' && dir === M.currentdirid ? 'copy' : op;
+            op = op === 'cut' && dir === nodeId ? 'copy' : op;
 
             if (op === "copy") {
-                M.copyNodes(handles, M.currentdirid).catch((ex) => ex !== EBLOCKED && tell(ex));
+                M.copyNodes(handles, nodeId).catch((ex) => ex !== EBLOCKED && tell(ex));
             }
             else if (op === "cut") {
-                M.moveNodes(handles, M.currentdirid).catch(tell);
+                M.moveNodes(handles, nodeId).catch(tell);
                 current_operation = null;
             }
 
@@ -1425,8 +1447,11 @@ function renameDialog() {
             .text(n.t ? s4Folder ? l.s4_bucket_rename : l[425] : l[426]);
         $input.val(n.name);
 
-        $('.input-icon', $dialog)
-            .attr('class', `input-icon item-type-icon icon-${fileIcon(n)}-24`);
+        const icon = fileIcon(n);
+        const $icon = $('.input-icon', $dialog).attr('class', `input-icon item-type-icon icon-${icon}-24`);
+        if (icon === 'folder') {
+            MegaNodeComponent.label.set(n, $icon);
+        }
 
         if (!n.t && ext.length > 0) {
             $input[0].selectionStart = 0;
@@ -1472,429 +1497,6 @@ function renameDialog() {
             }
         });
     }
-}
-
-/**
- * Show message dialog
- * @param {String} type Dialog type. May also contain button labels: "remove:!^$Cancel!Delete"
- * @param {String} title Header text
- * @param {String} msg Main information text
- * @param {String} [submsg] Addition text (Optional)
- * @param {Function} [callback] The function to invoke on button click
- * @param {Boolean|String} [checkboxSetting] Show "Do not show again" block if True
- * @returns {void}
- */
-// eslint-disable-next-line complexity, sonarjs/cognitive-complexity
-function msgDialog(type, title, msg, submsg, callback, checkboxSetting) {
-    'use strict';
-    let negate = false;
-    let doneButton = l.ok_button;
-    let showCloseButton = checkboxSetting === 1;
-
-    type = String(type);
-    if (type[0] === '*') {
-        type = type.slice(1);
-        showCloseButton = true;
-    }
-    if (type[0] === '-') {
-        type = type.slice(1);
-        negate = true;
-    }
-    let extraButton = type.split(':');
-
-    if (extraButton.length === 1) {
-        extraButton = null;
-    }
-    else {
-        type = extraButton.shift();
-        extraButton = extraButton.join(':');
-
-        if (extraButton[0] === '!') {
-            doneButton  = l[82];
-            extraButton = extraButton.substr(1);
-
-            if (extraButton[0] === '^') {
-                extraButton = extraButton.substr(1);
-                var pos = extraButton.indexOf('!');
-                doneButton = extraButton.substr(0, pos++);
-                extraButton = extraButton.substr(pos);
-            }
-        }
-    }
-    if (d && $.warningCallback) {
-        console.warn(`There is another dialog open!.. ${$.msgDialog}, ${$.warningCallback}`);
-    }
-    $.msgDialog = type;
-    $.warningCallback = typeof callback === 'function' && ((res) => onIdle(callback.bind(null, res, null)));
-
-    // eslint-disable-next-line sonarjs/no-duplicate-string
-    var $dialog = $('#msgDialog').removeClass('confirmation warning info error question ' +
-        'delete-contact loginrequired-dialog multiple with-close-btn');
-
-    $dialog.parent().addClass('msg-dialog-container');
-    $('#msgDialog aside').addClass('hidden');
-
-    // Show the top right close (x) button
-    if (showCloseButton) {
-        $dialog.addClass('with-close-btn');
-    }
-
-    if (type === 'clear-bin') {
-        $('#msgDialog').addClass('warning');
-        $('#msgDialog footer .footer-container')
-            .safeHTML(
-                `<button class="mega-button cancel">
-                    <span>@@</span>
-                </button>
-                <button class="mega-button positive confirm">
-                    <span>@@</span>
-                </button>`,
-                l[82],
-                extraButton || l[1018]);
-
-        $('#msgDialog .mega-button.confirm').rebind('click', function() {
-            closeMsg();
-            if ($.warningCallback) {
-                $.warningCallback(true);
-                $.warningCallback = null;
-            }
-        });
-        $('#msgDialog .mega-button.cancel').rebind('click', function() {
-            closeMsg();
-            if ($.warningCallback) {
-                $.warningCallback(false);
-                $.warningCallback = null;
-            }
-        });
-    }
-    else if (type === 'delete-contact') {
-        $('#msgDialog').addClass('delete-contact');
-        $('#msgDialog footer .footer-container')
-            .safeHTML(
-                `<button class="mega-button cancel">
-                    <span>@@</span>
-                </button>
-                <button class="mega-button positive confirm">
-                    <span>@@</span>
-                </button>`,
-                l[79],
-                l[78]);
-
-        // eslint-disable-next-line sonarjs/no-identical-functions
-        $('#msgDialog .mega-button.confirm').rebind('click', function() {
-            closeMsg();
-            if ($.warningCallback) {
-                $.warningCallback(true);
-                $.warningCallback = null;
-            }
-        });
-
-        // eslint-disable-next-line sonarjs/no-identical-functions
-        $('#msgDialog .mega-button.cancel').rebind('click', function() {
-            closeMsg();
-            if ($.warningCallback) {
-                $.warningCallback(false);
-                $.warningCallback = null;
-            }
-        });
-    }
-    else if (type === 'warninga' || type === 'warningb' || type === 'info' || type === 'error') {
-        if (extraButton) {
-            $('#msgDialog footer .footer-container')
-                .safeHTML(
-                    `<button class="mega-button cancel">
-                        <span>@@</span>
-                    </button>
-                    <button class="mega-button positive confirm">
-                        <span>@@</span>
-                    </button>`,
-                    extraButton,
-                    doneButton
-                );
-
-            // eslint-disable-next-line sonarjs/no-identical-functions
-            $('#msgDialog .mega-button.confirm').rebind('click', function() {
-                closeMsg();
-                if ($.warningCallback) {
-                    $.warningCallback(false);
-                    $.warningCallback = null;
-                }
-            });
-
-            // eslint-disable-next-line sonarjs/no-identical-functions
-            $('#msgDialog .mega-button.cancel').rebind('click', function() {
-                closeMsg();
-                if ($.warningCallback) {
-                    $.warningCallback(true);
-                    $.warningCallback = null;
-                }
-            });
-        }
-        else {
-            $('#msgDialog footer .footer-container').safeHTML(
-                `<button class="mega-button confirm ${checkboxSetting === 1 ? 'positive' : ''}">
-                    <span>@@</span>
-                </button>`,
-                l.ok_button
-            );
-
-            // eslint-disable-next-line sonarjs/no-identical-functions
-            $('#msgDialog .mega-button.confirm').rebind('click', function() {
-                closeMsg();
-                if ($.warningCallback) {
-                    $.warningCallback(true);
-                    $.warningCallback = null;
-                }
-            });
-        }
-        if (type === 'warninga') {
-            $('#msgDialog').addClass('info');
-        }
-        else if (type === 'warningb') {
-            $('#msgDialog').addClass('warning');
-        }
-        else if (type === 'info') {
-            $('#msgDialog').addClass('info');
-        }
-        else if (type === 'error') {
-            $('#msgDialog').addClass('error');
-        }
-    }
-    else if (type === 'confirmationa' || type === 'confirmation' || type === 'remove') {
-        if (doneButton === l.ok_button) {
-            doneButton = false;
-        }
-
-        negate = negate || doneButton === l[23737];
-        $('#msgDialog footer .footer-container')
-            .safeHTML(
-                `<div class="space-between">
-                    <button class="mega-button cancel">
-                        <span>@@</span>
-                    </button>
-                    <button class="mega-button ${negate ? 'negative' : 'positive'} confirm">
-                        <span>@@</span>
-                    </button>
-                </div>`,
-                extraButton || l[79],
-                doneButton || l[78]);
-
-        $('#msgDialog aside')
-            .safeHTML(`<div class="checkbox-block top-pad">
-                    <div class="checkdiv checkboxOff">
-                        <input type="checkbox" name="confirmation-checkbox"
-                            id="confirmation-checkbox" class="checkboxOff">
-                    </div>
-                    <label for="confirmation-checkbox" class="radio-txt">@@</label>
-                </div>`, l.do_not_show_this_again);
-        $('#msgDialog aside').removeClass('hidden');
-
-        // eslint-disable-next-line sonarjs/no-identical-functions
-        $('#msgDialog .mega-button.confirm').rebind('click', function() {
-            closeMsg();
-            if ($.warningCallback) {
-                $.warningCallback(true);
-                $.warningCallback = null;
-            }
-        });
-        // eslint-disable-next-line sonarjs/no-identical-functions
-        $('#msgDialog .mega-button.cancel').rebind('click', function() {
-            closeMsg();
-            if ($.warningCallback) {
-                $.warningCallback(false);
-                $.warningCallback = null;
-            }
-        });
-        if (type === 'remove') {
-            $('#msgDialog').addClass('warning');
-        }
-        else if (type === 'confirmationa') {
-            $('#msgDialog').addClass('info');
-        }
-        else {
-            $('#msgDialog').addClass('confirmation');
-        }
-
-        checkboxSetting = checkboxSetting === 1 ? null : checkboxSetting;
-        if (checkboxSetting) {
-            assert(
-                checkboxSetting === 'cslrem'
-                || checkboxSetting === 'nowarnpl'
-                || checkboxSetting === 'skipDelWarning'
-                || checkboxSetting === 'skipcdtos4'
-                || checkboxSetting === 'skips4tocd'
-                || checkboxSetting === 'skips4tos4'
-                || checkboxSetting === 'rwReinstate'
-                || checkboxSetting === 'dcPause', checkboxSetting);
-
-
-            $('#msgDialog .checkbox-block .checkdiv,' +
-                '#msgDialog .checkbox-block input')
-                    .removeClass('checkboxOn').addClass('checkboxOff');
-
-            $.warningCheckbox = false;
-            $('#msgDialog aside').removeClass('hidden');
-            $('#msgDialog .checkbox-block').rebind('click', function() {
-                var $o = $('#msgDialog .checkbox-block .checkdiv, #msgDialog .checkbox-block input');
-                if ($('#msgDialog .checkbox-block input').hasClass('checkboxOff')) {
-                    $o.removeClass('checkboxOff').addClass('checkboxOn');
-                    mega.config.set(checkboxSetting, 1);
-                }
-                else {
-                    $o.removeClass('checkboxOn').addClass('checkboxOff');
-                    mega.config.remove(checkboxSetting);
-                }
-
-                return false;
-            });
-        }
-        else {
-            $('#msgDialog aside').addClass('hidden');
-        }
-    }
-    else if (type === 'import_login_or_register') {
-        // Show import confirmation dialog if a user isn't logged in
-        $('#msgDialog').addClass('question with-close-btn');
-        $('#msgDialog footer .footer-container')
-            .safeHTML(
-                `<a class="bottom-bar-link">@@</a>
-                <button class="mega-button cancel">
-                    <span>@@</span>
-                </button>
-                <button class="mega-button positive confirm">
-                    <span>@@</span>
-                </button>`,
-                l[20754],
-                l[171],
-                l[209]);
-
-        // Register a new account to complete the import
-        $('#msgDialog .mega-button.confirm').rebind('click', function() {
-            closeMsg();
-            if ($.warningCallback) {
-                $.warningCallback('register');
-                $.warningCallback = null;
-            }
-        });
-        // Login to complete the import
-        $('#msgDialog .mega-button.cancel').rebind('click', function() {
-            closeMsg();
-            if ($.warningCallback) {
-                $.warningCallback('login');
-                $.warningCallback = null;
-            }
-        });
-        // Have an ephemeral account to complete the import
-        $('#msgDialog .bottom-bar-link').rebind('click', function() {
-            closeMsg();
-            if ($.warningCallback) {
-                $.warningCallback('ephemeral');
-                $.warningCallback = null;
-            }
-        });
-    }
-    else if (type === 'save_discard_cancel') {
-        $('footer .footer-container', $dialog)
-            .safeHTML(
-                `<div class="space-between">
-                    <button class="mega-button cancel">
-                        <span>@@</span>
-                    </button>
-                    <button class="mega-button discard">
-                        <span>@@</span>
-                    </button>
-                    <button class="mega-button positive confirm">
-                        <span>@@</span>
-                    </button>
-                </div>`,
-                l.msg_dlg_cancel, l.msg_dlg_discard, l.msg_dlg_save);
-
-        $('.mega-button.confirm', $dialog).rebind('click.msgdlg', () => {
-            closeMsg();
-            if ($.warningCallback) {
-                $.warningCallback(1);
-                $.warningCallback = null;
-            }
-        });
-        $('.mega-button.cancel', $dialog).rebind('click.msgdlg', () => {
-            closeMsg();
-            if ($.warningCallback) {
-                $.warningCallback(0);
-                $.warningCallback = null;
-            }
-        });
-        $('.mega-button.discard', $dialog).rebind('click.msgdlg', () => {
-            closeMsg();
-            if ($.warningCallback) {
-                $.warningCallback(-1);
-                $.warningCallback = null;
-            }
-        });
-        $dialog.addClass('confirmation');
-
-        $('aside', $dialog).addClass('hidden');
-    }
-
-    $('#msgDialog header p.subtitle').text(title);
-
-    if (msg) {
-        $('#msgDialog header h3').safeHTML(msg);
-    }
-    else {
-        $('#msgDialog header h3').addClass('hidden');
-    }
-
-    clickURLs();
-    if (submsg) {
-        $('#msgDialog header p.text').safeHTML(submsg);
-        $('#msgDialog header p.text').removeClass('hidden');
-    }
-    else {
-        $('#msgDialog header p.text').addClass('hidden');
-    }
-
-    // eslint-disable-next-line sonarjs/no-identical-functions
-    $('#msgDialog button.js-close').rebind('click', function() {
-        closeMsg();
-        if ($.warningCallback) {
-            $.warningCallback(null);
-            $.warningCallback = null;
-        }
-    });
-    $('#msgDialog').removeClass('hidden');
-    fm_showoverlay();
-
-    if ($.dialog) {
-        $('.mega-dialog:not(#msgDialog)').addClass('arrange-to-back');
-        $('.mega-dialog-container.common-container').addClass('arrange-to-back');
-    }
-}
-
-// eslint-disable-next-line strict -- see {@link msgDialog}
-function asyncMsgDialog(...args) {
-    return new Promise((resolve, reject) => {
-        const callback = args[4] || echo;
-        args[4] = tryCatch((value) => {
-            Promise.resolve(callback(value)).then(resolve).catch(reject);
-        }, reject);
-        msgDialog(...args);
-    });
-}
-
-function closeMsg() {
-    var $dialog = $('#msgDialog').addClass('hidden');
-    $dialog.parent().removeClass('msg-dialog-container');
-
-    if ($.dialog && !((M.chat && $.dialog === 'onboardingDialog') || $.dialog === 'Mega-Onboarding')) {
-        $('.mega-dialog').removeClass('arrange-to-back');
-        $('.mega-dialog-container.common-container').removeClass('arrange-to-back');
-    }
-    else {
-        fm_hideoverlay();
-    }
-
-    delete $.msgDialog;
-    mBroadcaster.sendMessage('msgdialog-closed');
 }
 
 /**
@@ -2139,9 +1741,8 @@ function closeDialog(ev) {
         MegaLogger.getLogger('closeDialog').debug($.dialog);
     }
 
-    if (!$('.mega-dialog.registration-page-success').hasClass('hidden')) {
-        fm_hideoverlay();
-        $('.mega-dialog.registration-page-success').addClass('hidden').removeClass('special');
+    if (mega.onCloseDialogDispatcher) {
+        tryCatch(mega.onCloseDialogDispatcher)();
     }
 
     if ($('.mega-dialog.incoming-call-dialog').is(':visible') === true || $.dialog === 'download-pre-warning') {
@@ -2171,6 +1772,11 @@ function closeDialog(ev) {
     else if ($.dialog === 'createfolder' && ($.copyDialog || $.moveDialog || $.selectFolderDialog || $.saveAsDialog)) {
         $('.mega-dialog.create-folder-dialog, .mega-dialog.s4-create-bucket-dialog').addClass('hidden');
         $('.mega-dialog.create-folder-dialog .create-folder-size-icon').removeClass('hidden');
+    }
+    else if ($.dialog === 'start-group-chat' && ($.copyDialog || $.sendToChatDialog)) {
+        $('.mega-dialog.fm-picker-dialog').removeClass('arrange-to-back');
+        fm_showoverlay();
+        delete $.dialog;
     }
     else if (($.dialog === 'slideshow') && $.copyrightsDialog) {
         $('.copyrights-dialog').addClass('hidden');
@@ -2281,12 +1887,15 @@ function closeDialog(ev) {
         delete $.saveAsDialog;
         delete $.nodeSaveAs;
         delete $.shareDialog;
+        delete $.fileRequestNew;
 
         /* copy/move dialog - save to */
         delete $.saveToDialogCb;
         delete $.saveToDialogNode;
         delete $.saveToDialog;
         delete $.chatAttachmentShare;
+        delete $.sendToChatDialog;
+        delete $.dialogSelChats;
 
         if ($.saveToDialogPromise) {
             if (typeof $.saveToDialogPromise === 'function') {
@@ -2318,6 +1927,12 @@ function closeDialog(ev) {
                 mega.ui.onboarding.$hotSpotNode.removeClass('onboarding-hotspot-animation-rect');
             }
         }
+
+        if ($.cpdGroupChat && megaChat) {
+            megaChat.off('onNewGroupChatRequest.cpd');
+            megaChat.off('onRoomInitialized.cpd');
+        }
+        delete $.cpdGroupChat;
     }
     $('.mega-dialog, .overlay.arrange-to-back, .mega-dialog-container.common-container').removeClass('arrange-to-back');
     // $('.mega-dialog .dialog-sorting-menu').remove();
@@ -2328,10 +1943,12 @@ function closeDialog(ev) {
     }
 
     if ($.dialog === 'createfolder') {
+        $('.mega-dialog').trigger('dialog-closed::create-folder');
         if ($.cfpromise) {
             $.cfpromise.reject();
             delete $.cfpromise;
         }
+        delete $.cftarget;
     }
     else if ($.dialog !== 'terms') {
         delete $.mcImport;
@@ -2354,10 +1971,10 @@ function closeDialog(ev) {
         $.dialog = $.propertiesDialog;
     }
 
-    if ($.copyDialog || $.moveDialog || $.selectFolderDialog || $.saveAsDialog) {
-        // the createfolder dialog was closed
+    if ($.copyDialog || $.moveDialog || $.selectFolderDialog || $.saveAsDialog || $.sendToChatDialog) {
+        // the createfolder/create group chat dialog was closed
         // eslint-disable-next-line local-rules/hints
-        $.dialog = $.copyDialog || $.moveDialog || $.selectFolderDialog || $.saveAsDialog;
+        $.dialog = $.copyDialog || $.moveDialog || $.selectFolderDialog || $.saveAsDialog || $.sendToChatDialog;
     }
 
     if ($.fingerprintDialog && $.shareCollaboratorsDialog && $.shareDialog) {
@@ -2400,9 +2017,6 @@ function createFolderDialog(close) {
     const ltWSpaceWarning = InputFloatWarning($dialog).hide();
 
     if (close) {
-        if ($.cftarget) {
-            delete $.cftarget;
-        }
         if ($.dialog === 'createfolder') {
             closeDialog();
         }
@@ -2411,7 +2025,7 @@ function createFolderDialog(close) {
 
     var doCreateFolder = function(v) {
         var errorMsg = '';
-        if (v.trim() === '' || v.trim() === l[157]) {
+        if (v.trim() === '') {
             errorMsg = l.EmptyName;
         }
         else if (v.length > 250) {
@@ -2865,7 +2479,10 @@ function fm_resize_handler(force) {
     }
 
     // Only for old left pane pages
-    if (!mega.ui.topmenu.activeItem) {
+    if (mega.ui.topmenu.activeItem) {
+        mega.ui.topmenu.menuNode.Ps.update();
+    }
+    else {
         initTreeScroll();
     }
 
@@ -2971,6 +2588,9 @@ function sharedFolderUI() {
     // are we in an inshare?
     if (M.currentrootid === 'shares' || M.currentrootid === 'out-shares') {
         mega.ui.secondaryNav.hideCard();
+        if (!nodeData && M.currentdirid === M.currentrootid) {
+            mega.ui.secondaryNav.hideBreadcrumb();
+        }
     }
     while (nodeData && !nodeData.su) {
         nodeData = M.d[nodeData.p];
@@ -2986,26 +2606,51 @@ function sharedFolderUI() {
 
         $(rightPanelView).wrap('<div class="shared-details-block"></div>');
 
-        const { r } = nodeData;
+        const { r, h, p, su } = nodeData;
         const downloadButton = {
-            text: l[58],
+            text: l.transferit_download_all,
+            icon: 'sprite-fm-mono icon-arrow-down-circle-thin-outline',
             onClick(ev) {
+                if (ev.currentTarget.active) {
+                    $.hideContextMenu();
+                    ev.currentTarget.active = false;
+                    return;
+                }
+                ev.currentTarget.active = true;
                 mega.ui.secondaryNav.openDownloadMenu(ev);
                 eventlog(500733);
             }
         };
         const newButton = {
-            text: l.add_item_btn,
+            text: l.create_and_upload,
             icon: 'sprite-fm-mono icon-plus-light-solid',
             id: `newctx_${nodeData.h}`,
             onClick(ev) {
+                if (ev.currentTarget.active) {
+                    return;
+                }
+                ev.currentTarget.active = true;
                 mega.ui.secondaryNav.openNewMenu(ev);
             }
         };
         const onContextMenu = (ev) => {
-            mega.ui.secondaryNav.openContextMenu(ev);
+            if (ev.currentTarget.hasClass('active')) {
+                $.hideContextMenu();
+                ev.stopPropagation();
+                ev.currentTarget.removeClass('active');
+                return false;
+            }
+            const buttons = ['.properties-item', '.copy-item'];
+            const ed = authring.getContactAuthenticated(su, 'Ed25519');
+            if (!(ed && ed.method >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON)) {
+                buttons.push('.verify-credential');
+            }
+            if (r === 2) {
+                buttons.push('.rename-item');
+            }
+            M.contextMenuUI(ev, 8, buttons.join(','), [h]);
         };
-        if (nodeData.h === M.currentdirid) {
+        if (h === M.currentdirid) {
             mega.ui.secondaryNav.hideBreadcrumb();
             if (r === 1 || r === 2) {
                 mega.ui.secondaryNav.showCard(M.currentdirid, newButton, downloadButton, onContextMenu);
@@ -3025,7 +2670,7 @@ function sharedFolderUI() {
 
         $(rightPanelView).addClass('shared-folder-content');
 
-        if (M.d[M.currentdirid] !== nodeData || M.d[nodeData.p]) {
+        if (M.d[M.currentdirid] !== nodeData || M.d[p]) {
             // hide leave-share under non-root shares
             $('.fm-leave-share').addClass('hidden');
         }
@@ -3333,7 +2978,9 @@ function FMResizablePane(element, opts) {
         'maxWidth': 400,
         'minHeight': undefined,
         'minWidth': undefined,
-        'handle': '.transfer-drag-handle'
+        'handle': '.transfer-drag-handle',
+        shrinkBelow: false,
+        onShrinkBelow: undefined,
     };
 
     var size_attr = 'height';
@@ -3341,6 +2988,11 @@ function FMResizablePane(element, opts) {
     opts = $.extend(true, {}, defaults, opts);
 
     self.options = opts; //expose as public
+
+    if (opts.shrinkBelow && opts.shrinkBelow <= opts.minWidth) {
+        opts.shrinkBelow = false;
+        delete opts.onShrinkBelow;
+    }
 
     console.assert(opts.multiple || $element.length === 1, 'FMResizablePane: Invalid number of elements.');
 
@@ -3414,6 +3066,13 @@ function FMResizablePane(element, opts) {
             }
         }
 
+        if (opts.shrinkBelow && value < opts.shrinkBelow) {
+            $element.addClass('small-resize-pane');
+        }
+        else if (opts.shrinkBelow) {
+            $element.removeClass('small-resize-pane');
+        }
+
         if (value > 0) {
             $element.width(value);
         }
@@ -3473,10 +3132,17 @@ function FMResizablePane(element, opts) {
                 } else {
                     css_attrs[size_attr] = ui.size[size_attr];
                     $element.css(css_attrs);
-                    if (opts.persistanceKey) {
+                    if (opts.persistanceKey && !opts.shrinkBelow) {
                         mega.config.set(opts.persistanceKey, ui.size[size_attr]);
                     }
                     self["current_" + size_attr] = ui.size[size_attr];
+                    // Only supported for width currently
+                    if (opts.shrinkBelow && size_attr === 'width' && ui.size.width < opts.shrinkBelow) {
+                        $element[0].classList.add('small-resize-pane');
+                    }
+                    else if (opts.shrinkBelow) {
+                        $element[0].classList.remove('small-resize-pane');
+                    }
                 }
 
                 delay('fm-resizable-pane:refresh', () => self.refresh(e, ui));
@@ -3484,6 +3150,21 @@ function FMResizablePane(element, opts) {
             'stop': function(e, ui) {
                 $.tresizer();
                 $(self.element).removeClass('resizable-pane-active');
+                if (opts.shrinkBelow) {
+                    if (ui.size.width < opts.shrinkBelow) {
+                        self.setWidth(opts.minWidth);
+                        if (typeof opts.onShrinkBelow === 'function') {
+                            opts.onShrinkBelow(true);
+                        }
+                    }
+                    else if (typeof opts.onShrinkBelow === 'function') {
+                        opts.onShrinkBelow();
+                    }
+                    // State isn't persisted yet. If not shrunk update it. If shrunk then keep the previous value.
+                    if (opts.persistanceKey && opts.shrinkBelow < ui.size.width) {
+                        mega.config.set(opts.persistanceKey, ui.size.width);
+                    }
+                }
                 $self.trigger('resizestop', [e, ui]);
             }
         };
@@ -3505,13 +3186,17 @@ function FMResizablePane(element, opts) {
 Object.defineProperty(FMResizablePane, 'refresh', {
     value() {
         'use strict';
-        if (M.fmTabPages) {
+        const width = M.fmTabPages && M.fmTabPages['cloud-drive'][M.currentrootid] ? null : 400;
+        if (M.fmTabPages && FMResizablePane.last !== width) {
             // @todo revamp if we ever use other than '.fm-left-panel' for these
             const cl = $('.fm-left-panel:visible, .mega-top-menu.ui-resizable:not(.hidden)').data('fmresizable');
 
-            if (cl) {
-
-                cl.setOption('maxWidth', M.fmTabPages['cloud-drive'][M.currentrootid] ? null : 400);
+            if (cl && !(cl.options.shrinkBelow && fmconfig.smallLhp)) {
+                FMResizablePane.last = width;
+                cl.setOption('maxWidth', width);
+            }
+            else if (cl) {
+                cl.refresh();
             }
 
             return cl;

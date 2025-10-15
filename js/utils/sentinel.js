@@ -3,18 +3,24 @@ mBroadcaster.once('boot_done', () => {
     const storage = localStorage;
     const domain2event = freeze({
         'mega.nz': 99702,
+        'mega.app': 99702,
         'transfer.it': 99623,
-        'smoketest.transfer.it': 99623
+        'smoketest.transfer.it': 99623,
+        'bigefpfhnfcobdlfbedofhhaibnlghod': 99702,
+        'jemjknhgpjaacbghpdhgchbgccbpkkgf': 99702
     });
-    const eid = self.is_extension ? 99702 : domain2event[location.host];
+    const eid = domain2event[location.host];
 
-    if (!eid
+    /**/
+    if (!eid && !self.is_extension
         || self.buildOlderThan10Days
+        || self.onerror === self.nop
         || storage.mSentinelOptOut) {
 
         self.onerror = null;
         return false;
     }
+    /**/
 
     const disable = (...a) => {
         self.onerror = null;
@@ -60,8 +66,9 @@ mBroadcaster.once('boot_done', () => {
     };
 
     const thirdPartyScript = (dump, data) => {
-        return /userscript|user\.js|EvalError/.test(dump.m + data)
+        return /userscript|(?:user|inpage|inject)\.js|EvalError/.test(dump.m + data)
             || dump.m.includes('Permission denied to access property')
+            || dump.m.includes('Object Not Found Matching')
             || dump.m.includes('Cannot redefine property')
             || dump.m.includes("evaluating 'r(a,c)'")
             || dump.m.includes("evaluating 'ze(e,")
@@ -74,7 +81,7 @@ mBroadcaster.once('boot_done', () => {
             || data.includes('Function code:')
             || data.includes('(eval code:')
             || data.includes('(unknown source)')
-            || /<anonymous>:\d+:/.test(data);
+            || /<anonymous[^>]*>:\d+:/.test(data);
     };
 
     const getCallStack = tryCatch((msg, stack) => {
@@ -197,7 +204,7 @@ mBroadcaster.once('boot_done', () => {
             if (errobj.stack) {
                 dump.s = getCallStack(msg, errobj.stack);
 
-                if (unknownScriptSource(dump.s)) {
+                if (unknownScriptSource(dump.m + dump.s)) {
 
                     return optOut('Got uncaught exception from unknown resource...', msg, [errobj], url, ln);
                 }
@@ -212,6 +219,25 @@ mBroadcaster.once('boot_done', () => {
         return !/Access to (?:the script at )?'.*(?:' from script|'?is) denied|origin 'null'/.test(dump.m);
     };
 
+    const getCustomErrorMessage = (msg, ex) => {
+
+        if (ex && String(msg).includes('Object')) {
+
+            if (typeof MEGAException !== 'undefined' && ex instanceof MEGAException) {
+
+                msg = `${ex} :boom:`;
+            }
+            else if (ex.name) {
+                msg = `Uncaught ${ex.name}: ${ex.message || ':bee:'}`;
+            }
+            else {
+                msg = ex.message || msg;
+            }
+        }
+
+        return msg;
+    };
+
     // ----------------------------------------------------------------------------------------
 
     const gExceptionHandler = tryCatch((msg, url, ln, cn, errobj) => {
@@ -220,6 +246,7 @@ mBroadcaster.once('boot_done', () => {
             console.debug([errobj || msg]);
             return;
         }
+        msg = getCustomErrorMessage(msg, errobj);
 
         const dump = {
             l: ln,
@@ -296,4 +323,11 @@ mBroadcaster.once('boot_done', () => {
         })();
     }
     self.onerror = gExceptionHandler;
+
+    if (!eid) {
+        const msg = `unk:${location.host}`;
+
+        queueMicrotask(() => optOut(msg));
+        eventlog(99702, JSON.stringify([Object(self.buildVersion).website, 999, msg]), true);
+    }
 });

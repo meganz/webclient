@@ -44,12 +44,6 @@ mega.tpw = new function TransferProgressWidget() {
 
     var monitors = Object.create(null);
 
-    var initScrolling = function() {
-        delay('tpw:initScrolling', () => {
-            initPerfectScrollbar($bodyContainer);
-        }, 250);
-    };
-
     var removeRow = function(transferId) {
         if (!transferId) {
             return;
@@ -62,25 +56,8 @@ mega.tpw = new function TransferProgressWidget() {
 
         mega.tpw.removeDOMRow(transferId);
         delay('tpw:remove', () => {
-            initScrolling();
             mega.tpw.updateHeaderAndContent();
         }, 1500);
-    };
-
-    /**
-     * Show a tab in Transfer progress widget
-     * @returns {void} void
-     */
-    var viewTransferSection = function() {
-        if ($widgetTabCompleted.hasClass('active')) {
-            $bodyContainer.addClass('completed').removeClass('active');
-            $('.ps__rail-y', $bodyContainer).addClass('y-rail-offset');
-        }
-        else {
-            $bodyContainer.addClass('active').removeClass('completed');
-        }
-
-        initScrolling();
     };
 
     var initEventsHandlers = function() {
@@ -102,7 +79,6 @@ mega.tpw = new function TransferProgressWidget() {
                         $widgetFooter.removeClass('hidden');
                     }
                     $widgetTabsHeader.removeClass('hidden');
-                    initScrolling();
                 });
             }
             return false;
@@ -142,21 +118,21 @@ mega.tpw = new function TransferProgressWidget() {
         });
 
         // open section
-        const openTransferSection = function() {
-            const $this = $(this);
+        const openTransferSection = function(ev, viewId) {
+            const $this = $(ev.currentTarget);
             if ($this.hasClass('inactive') || $this.hasClass('active')) {
                 return false;
             }
             $widgetTabCompleted.toggleClass('active');
-            viewTransferSection();
+            mega.tpw.renderView(viewId);
             $widgetTabActive.toggleClass('active');
             $widgetFooter.toggleClass('hidden');
 
             // This disables the propagation of the click to ancestors triggering the $.hideTopMenu
             return false;
         };
-        $widgetTabActive.rebind('click.tpw', openTransferSection);
-        $widgetTabCompleted.rebind('click.tpw', openTransferSection);
+        $widgetTabActive.rebind('click.tpw', (ev) => openTransferSection(ev, mega.tpw.views.ACTIVE));
+        $widgetTabCompleted.rebind('click.tpw', (ev) => openTransferSection(ev, mega.tpw.views.COMPLETE));
 
         bindTransfersMassEvents($widgetFooter);
     };
@@ -312,6 +288,7 @@ mega.tpw = new function TransferProgressWidget() {
         if (!initUI()) {
             return;
         }
+        const page = String(self.page || '');
 
         // pages to hide always
         if (page.indexOf('transfers') !== -1 || page.indexOf('register') !== -1 || page.indexOf('download') !== -1) {
@@ -370,17 +347,6 @@ mega.tpw = new function TransferProgressWidget() {
         }
     };
 
-
-    var cleanOverLimitRows = function() {
-        if (mega.tpw.rowsLength > maximumLength) {
-            mega.tpw.clearRows(mega.tpw.DONE);
-            $widgetTabCompleted.removeClass('active');
-            $widgetTabActive.addClass('active');
-            $widgetFooter.removeClass('hidden');
-            $bodyContainer.removeClass('completed').addClass('active');
-        }
-    };
-
     var initUI = function() {
         var $currWidget = clearAndReturnWidget();
 
@@ -393,7 +359,7 @@ mega.tpw = new function TransferProgressWidget() {
 
             initEventsHandlers();
             // init sections
-            viewTransferSection();
+            mega.tpw.renderView(mega.tpw.views.ACTIVE);
         }
         return true;
     };
@@ -404,18 +370,16 @@ mega.tpw = new function TransferProgressWidget() {
             $widgetTabCompleted.addClass('active');
             $widgetTabActive.addClass('inactive');
             $widgetFooter.addClass('hidden');
-            $bodyContainer.addClass('completed').removeClass('active');
+            mega.tpw.renderView(mega.tpw.views.COMPLETE);
         }
-        initScrolling();
     };
 
     var finalizeUpdates = function() {
-        cleanOverLimitRows();
         mega.tpw.updateHeaderAndContent();
         if (!mega.tpw.isWidgetVisibile() && !page.includes('download') && !page.includes('transfers')) {
             mega.tpw.showWidget();
         }
-        initScrolling();
+        mega.tpw.renderView(mega.tpw.currView || mega.tpw.views.ACTIVE, true);
     };
 
     const validateEntry = function(type, entry) {
@@ -470,18 +434,15 @@ mega.tpw = new function TransferProgressWidget() {
             if ($widgetHeadAndBody.hasClass('expand')) {
                 $widgetFooter.removeClass('hidden');
             }
-            $bodyContainer.addClass('active').removeClass('completed');
         }
         for (var r = 0; r < entriesArray.length; r++) {
             var fName;
             var dId = entriesArray[r].id;
             var prefix;
-            var toolTipText;
 
             if (type === this.DOWNLOAD) {
                 fName = entriesArray[r].n;
                 prefix = downloadRowPrefix;
-                toolTipText = l[1196];
 
                 if (entriesArray[r].zipid) {
                     fName = entriesArray[r].zipname;
@@ -491,7 +452,6 @@ mega.tpw = new function TransferProgressWidget() {
             else {
                 fName = entriesArray[r].name;
                 prefix = uploadRowPrefix;
-                toolTipText = l[1617];
             }
             const transferId = `${prefix}${dId}`;
             const rowData = {
@@ -776,7 +736,6 @@ mega.tpw = new function TransferProgressWidget() {
         }
         $widget.removeClass('hidden');
         $widget.show();
-        initScrolling();
         isHiddenByUser = false;
     };
 
@@ -877,7 +836,7 @@ mega.tpw = new function TransferProgressWidget() {
         if (tfStats.ulDone === 0 && tfStats.dlDone === 0) {
             $widgetTabCompleted.addClass('inactive');
             if (!$widgetTabActive.hasClass('active')) {
-                $widgetTabActive.trigger('click');
+                mega.tpw.renderView(mega.tpw.views.ACTIVE);
             }
         }
 
@@ -907,6 +866,9 @@ mega.tpw = new function TransferProgressWidget() {
 ((scope) => {
     'use strict';
     let root;
+    let megaList;
+    let megaListDsp;
+    const megaListItems = new Set();
     const rows = new Map();
     const toAnimate = new Map();
     const toEventuallyAnimate = new Map();
@@ -1246,6 +1208,17 @@ mega.tpw = new function TransferProgressWidget() {
         scope.TYPE_OVERQUOTA,
         scope.TYPE_ERRORED
     ];
+    scope.views = freeze({
+        ACTIVE: 0,
+        COMPLETE: 1,
+    });
+    scope.currView = scope.views.ACTIVE;
+    const dsp = () => {
+        megaListDsp = megaListDsp || tSleep(0.3).then(() => {
+            megaListDsp = false;
+            scope.renderView(scope.currView, true);
+        });
+    };
     scope.addDOMRow = (data) => {
         if (!scope.domReady || !data.transferId) {
             return false;
@@ -1254,8 +1227,8 @@ mega.tpw = new function TransferProgressWidget() {
             rows.get(data.transferId).detachEl();
         }
         const row = new MTransferRow(data);
-        root.append(row.el);
         rows.set(data.transferId, row);
+        dsp();
         return true;
     };
     scope.updateDOMRow = (id, update) => {
@@ -1265,6 +1238,10 @@ mega.tpw = new function TransferProgressWidget() {
         const row = rows.get(id);
         for (const key in update) {
             if (update.hasOwnProperty(key)) {
+                if (key === 'complete' && scope.currView !== scope.views.COMPLETE) {
+                    megaListItems.delete(id);
+                    megaList.remove(id);
+                }
                 row[key] = update[key];
             }
         }
@@ -1286,6 +1263,8 @@ mega.tpw = new function TransferProgressWidget() {
         if (!scope.domReady || !rows.has(id)) {
             return true;
         }
+        megaListItems.delete(id);
+        megaList.remove(id);
         rows.get(id).detachEl();
         toAnimate.delete(id);
         const promise = toEventuallyAnimate.get(id);
@@ -1385,6 +1364,56 @@ mega.tpw = new function TransferProgressWidget() {
             return;
         }
         root = document.querySelector('.tpw .widget-body-container .transfer-progress-widget-body');
+        megaList = new MegaList(root, {
+            itemRenderFunction(id) {
+                if (rows.has(id)) {
+                    return rows.get(id).el;
+                }
+            },
+            preserveOrderInDOM: true,
+            usingNativeScroll: false,
+            itemWidth: 536,
+            itemHeight: 48,
+            renderAdapter: new MegaList.RENDER_ADAPTERS.List({ usingNativeScroll: false }),
+            perfectScrollOptions: {
+                'handlers': ['click-rail', 'drag-thumb', 'wheel', 'touch'],
+                'minScrollbarLength': 20,
+            },
+        });
+        megaList.initialRender();
+    };
+    scope.renderView = (viewId, updated) => {
+        if (scope.currView === viewId && !updated) {
+            return;
+        }
+        if (viewId === scope.views.ACTIVE) {
+            megaListItems.clear();
+            for (const [id, row] of rows) {
+                if (row.complete) {
+                    row.el.remove();
+                }
+                else {
+                    megaListItems.add(id);
+                }
+            }
+        }
+        else if (viewId === scope.views.COMPLETE) {
+            megaListItems.clear();
+            for (const [id, row] of rows) {
+                if (row.complete) {
+                    megaListItems.add(id);
+                }
+                else {
+                    row.el.remove();
+                }
+            }
+        }
+        scope.currView = viewId;
+        megaList.batchReplace([...megaListItems]);
+        megaListDsp = false;
+    };
+    scope.getIncompleteIds = () => {
+        return [...rows.keys()].filter(id => !rows.get(id).complete);
     };
 
     Object.defineProperty(scope, 'rowsLength', {

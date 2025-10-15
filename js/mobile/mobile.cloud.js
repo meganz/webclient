@@ -377,15 +377,32 @@ mobile.cloud = {
 
         const node = M.getNodeByHandle(M.currentdirid);
         const downloadSupport = await MegaMobileViewOverlay.checkSupport(node);
-        const actions = (downloadSupport)
-            ? ['download-button', l[864], () => {
+        const buttons = {
+            saveToMegaButton: ['import-button', l.btn_imptomega, () => {
+                if (!pfid) {
+                    return false;
+                }
+                eventlog(500969, 2);
+                M.importFolderLinkNodes([M.RootID]);
+            }],
+            'downloadButton': ['download-button',  pfcol ? l[864] : 'icon-download-thin', () => {
                 eventlog(pfcol ? 500842 : 99913);
                 mobile.downloadOverlay.startDownload(node.h);
-            }]
-            : ['openapp-button', l.view_file_open_in_app, () => {
+                return false;
+            }],
+            'openappButton': ['openapp-button', l.view_file_open_in_app, () => {
                 eventlog(99912);
                 goToMobileApp(MegaMobileViewOverlay.getAppLink(node.h));
-            }];
+            }]
+        };
+        const actions = pfcol ? [] : [[buttons.saveToMegaButton]];
+
+        if (downloadSupport) {
+            actions.push([buttons.downloadButton]);
+        }
+        else if (pfcol) {
+            actions.push([buttons.openappButton]);
+        }
 
         if (this.bottomBar) {
             this.bottomBar.destroy();
@@ -393,7 +410,7 @@ mobile.cloud = {
 
         this.bottomBar = new MegaMobileBottomBar({
             parentNode: document.getElementById('fmholder'),
-            actions: [[actions]],
+            actions,
             adWrapper: 'adFolder'
         });
     }

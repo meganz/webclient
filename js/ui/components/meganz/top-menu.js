@@ -9,7 +9,7 @@ class MegaTopMenu extends MegaMobileTopMenu {
 
         // @todo: Wrap menu items in a div to fix stretching bug when scrolling horizontally
         this.menuNode.Ps = new PerfectScrollbar(this.menuNode);
-        mBroadcaster.addListener('pagechange', () => this.menuNode.Ps.update());
+        this.addBroadcasterListener('pagechange', () => this.menuNode.Ps.update());
         this.on('click.topmenuClicked', () => {
 
             // Adding this classname if it is required to make CSS applies first so Ps can position scrollbar correctly
@@ -24,21 +24,68 @@ class MegaTopMenu extends MegaMobileTopMenu {
             this.menuNode.Ps.update();
         });
 
-        window.addEventListener('resize', SoonFc(90, this.menuNode.Ps.update));
+        const _resizeHandler = SoonFc(90, this.menuNode.Ps.update);
+        window.addEventListener('resize', _resizeHandler);
+        this.on('destroy', () => window.removeEventListener('resize', _resizeHandler));
 
         this.domNode.prepend(mCreateElement('div', {'class': 'left-pane-drag-handle'}));
 
         M.onFileManagerReady(() => {
+            const leftIcon = 'sprite-fm-mono icon-chevrons-left-thin-outline';
+            const rightIcon = 'sprite-fm-mono icon-chevrons-right-thin-outline';
+            const uiShrink = (didShrink) => {
+                fmconfig.smallLhp = didShrink | 0;
+                if (didShrink) {
+                    document.body.classList.add('small-lhp');
+                    this.smallPaneButton.icon = rightIcon;
+                    this.smallPaneButton.dataset.simpletip = l.expand_sidebar;
+                }
+                else {
+                    document.body.classList.remove('small-lhp');
+                    this.smallPaneButton.icon = leftIcon;
+                    this.smallPaneButton.dataset.simpletip = l.collapse_sidebar;
+                }
+            };
             this.leftPaneResizable = $.leftPaneResizable = new FMResizablePane($(this.domNode), {
                 'direction': 'e',
-                'minWidth': mega.flags.ab_ads ? 260 : 200,
+                // ignoring mega.flags.ab_ads (260) now due to collapsing behaviour
+                'minWidth': 72,
                 'maxWidth': 400,
                 'persistanceKey': 'leftPaneWidth',
-                'handle': '.left-pane-drag-handle'
+                'handle': '.left-pane-drag-handle',
+                shrinkBelow: 200,
+                onShrinkBelow: uiShrink
             });
+            const { persistanceKey, minWidth } = this.leftPaneResizable.options;
+            this.smallPaneButton = new MegaButton({
+                parentNode: this.domNode.querySelector('.top-nav'),
+                icon: leftIcon,
+                type: 'icon',
+                componentClassname: 'small-menu-btn',
+                simpletip: l.collapse_sidebar,
+                simpletipClass: 'small-sidebar-tip-vis',
+                simpletipPos: 'right',
+                onClick: () => {
+                    let width = fmconfig[persistanceKey] || 286;
+                    if (fmconfig.smallLhp) {
+                        eventlog(500955);
+                    }
+                    else {
+                        eventlog(500954);
+                        width = minWidth;
+                    }
+                    uiShrink(!fmconfig.smallLhp);
+                    this.leftPaneResizable.setWidth(width);
+                },
+            });
+            if (fmconfig.smallLhp) {
+                uiShrink(true);
+                this.leftPaneResizable.setWidth(minWidth);
+                this.leftPaneResizable.element[0].classList.add('small-resize-pane');
+            }
         });
 
-        mBroadcaster.addListener('updFileManagerUI', () => {
+        this.addBroadcasterListener('updFileManagerUI', () => {
             this.rootBtnWrap.classList.toggle('contains-tree', !!M.tree[M.RootID]);
         });
     }
@@ -114,6 +161,11 @@ class MegaTopMenu extends MegaMobileTopMenu {
                 treeWrapClass: 'js-public-tree-panel',
                 name: 'root-folder',
                 typeClassname: 'root-folder folder-link',
+                simpletip: M.getNameByHandle(M.RootID),
+                simpletipClass: 'small-sidebar-tip',
+                simpletipPos: 'right',
+                simpletipWrapper: 'body',
+                simpletipOffset: '-16',
                 onContextmenu: _openContext
             }];
         }
@@ -130,18 +182,45 @@ class MegaTopMenu extends MegaMobileTopMenu {
                 treeWrapClass: 'js-myfile-tree-panel',
                 name: 'cloud-drive',
                 typeClassname: 'drive',
+                simpletip: l[164],
+                simpletipClass: 'small-sidebar-tip',
+                simpletipPos: 'right',
+                simpletipWrapper: 'body',
+                simpletipOffset: '-16',
                 onContextmenu: _openContext,
                 eventLog: 500631
             },
             {
                 text: l.shared_items,
                 icon: 'sprite-fm-mono icon-folder-users-thin-outline',
-                href: '/fm/shares',
                 hasTree: 'shared-with-me', // hidden tree for copy dialog
                 treeWrapClass: 'hidden-tree',
                 name: 'shares',
                 typeClassname: 'drive',
-                eventLog: 500641
+                eventLog: 500641,
+                simpletip: l.shared_items,
+                simpletipClass: 'small-sidebar-tip',
+                simpletipPos: 'right',
+                simpletipWrapper: 'body',
+                simpletipOffset: '-16',
+                binding: () => {
+                    console.assert(self.fminitialized);
+                    return M.openFolder(localStorage.sihp || 'shares');
+                }
+            },
+            {
+                text: l.device_centre,
+                icon: 'sprite-fm-mono icon-devices-thin-outline',
+                href: '/fm/device-centre',
+                treeWrapClass: 'js-device-centre-tree-panel',
+                name: 'device-centre',
+                typeClassname: 'drive',
+                simpletip: l.device_centre,
+                simpletipClass: 'small-sidebar-tip',
+                simpletipPos: 'right',
+                simpletipWrapper: 'body',
+                simpletipOffset: '-16',
+                eventLog: 500613
             },
             {
                 type: 'spacer',
@@ -153,6 +232,11 @@ class MegaTopMenu extends MegaMobileTopMenu {
                 href: '/fm/transfers',
                 name: 'transfers',
                 typeClassname: 'drive',
+                simpletip: l[1346],
+                simpletipClass: 'small-sidebar-tip',
+                simpletipPos: 'right',
+                simpletipWrapper: 'body',
+                simpletipOffset: '-16',
                 eventLog: 500634
             },
             {
@@ -161,6 +245,11 @@ class MegaTopMenu extends MegaMobileTopMenu {
                 href: '/fm/rubbish',
                 name: 'rubbish-bin',
                 typeClassname: 'drive',
+                simpletip: l[167],
+                simpletipClass: 'small-sidebar-tip',
+                simpletipPos: 'right',
+                simpletipWrapper: 'body',
+                simpletipOffset: '-16',
                 onContextmenu: _openContext,
                 eventLog: 500635
             },
@@ -171,7 +260,12 @@ class MegaTopMenu extends MegaMobileTopMenu {
                 icon: 'sprite-pm-mono icon-square-regular-outline',
                 href: '/fm/pwm',
                 name: 'pwm',
-                typeClassname: 'pwm'
+                typeClassname: 'pwm',
+                simpletip: l.rewind_label_all_default,
+                simpletipClass: 'small-sidebar-tip',
+                simpletipPos: 'right',
+                simpletipWrapper: 'body',
+                simpletipOffset: '-16',
             },
             {
                 text: l[823],
@@ -179,6 +273,11 @@ class MegaTopMenu extends MegaMobileTopMenu {
                 href: '/fm/pwm/account',
                 typeClassname: 'pwm',
                 name: 'pwm-settings',
+                simpletip: l[823],
+                simpletipClass: 'small-sidebar-tip',
+                simpletipPos: 'right',
+                simpletipWrapper: 'body',
+                simpletipOffset: '-16',
                 eventLog: 500573
             }
         ];
@@ -191,17 +290,12 @@ class MegaTopMenu extends MegaMobileTopMenu {
                 href: '/fm/photos',
                 name: 'media',
                 typeClassname: 'drive',
+                simpletip: l.media,
+                simpletipClass: 'small-sidebar-tip',
+                simpletipPos: 'right',
+                simpletipWrapper: 'body',
+                simpletipOffset: '-16',
                 eventLog: 500447
-            });
-
-            loggedInCD.splice(3, 0, {
-                text: l.device_centre,
-                icon: 'sprite-fm-mono icon-devices-thin-outline',
-                href: '/fm/device-centre',
-                treeWrapClass: 'js-device-centre-tree-panel',
-                name: 'device-centre',
-                typeClassname: 'drive',
-                eventLog: 500613
             });
 
             loggedInCD.splice(5, 0, {
@@ -210,6 +304,11 @@ class MegaTopMenu extends MegaMobileTopMenu {
                 href: '/fm/recents',
                 name: 'recents',
                 typeClassname: 'drive',
+                simpletip: l[20141],
+                simpletipClass: 'small-sidebar-tip',
+                simpletipPos: 'right',
+                simpletipWrapper: 'body',
+                simpletipOffset: '-16',
                 eventLog: 500632
             }, {
                 text: l.gallery_favourites,
@@ -217,24 +316,33 @@ class MegaTopMenu extends MegaMobileTopMenu {
                 href: '/fm/faves',
                 name: 'faves',
                 typeClassname: 'drive',
+                simpletip: l.gallery_favourites,
+                simpletipClass: 'small-sidebar-tip',
+                simpletipPos: 'right',
+                simpletipWrapper: 'body',
+                simpletipOffset: '-16',
                 eventLog: 500633
             });
         }
 
+        // @todo: Show button for business account with activated S4 when ready
+        // if (!(u_attr.b && !u_attr.s4)) {
         if (!u_attr.b) {
-            loggedInCD.splice(mega.lite.inLiteMode ? 1 : 4, 0, {
+            loggedInCD.splice(mega.lite.inLiteMode ? 3 : 4, 0, {
+                autoExpand: true,
                 text: l.obj_storage,
                 icon: 'sprite-fm-mono icon-bucket-triangle-thin-outline',
-                href: 'fm/s4',
                 hasTree: u_attr.s4 ? 's4' : null,
                 treeWrapClass: 'js-s4-tree-panel',
                 name: 's4',
                 typeClassname: 'drive',
+                simpletip: l.obj_storage,
+                simpletipClass: 'small-sidebar-tip',
+                simpletipPos: 'right',
+                simpletipWrapper: 'body',
+                simpletipOffset: '-16',
                 eventLog: 500636,
-                rightBadge: u_attr.s4 ? null : {
-                    badgeClass: 'brand-filled',
-                    text: l[24648]
-                }
+                binding: () => s4.main.render()
             });
         }
 
@@ -320,7 +428,16 @@ class MegaTopMenu extends MegaMobileTopMenu {
 
         if (selected) {
             this.removeClass('hidden');
-            if (selected !== true) {
+            if (selected === true) {
+                const currNode = M.currentCustomView ? M.currentCustomView.nodeID : M.currentdirid;
+
+                this.activeItem = document.getElementById(`treea_${currNode}`);
+            }
+            else {
+                // Auto expand when rendering items or selected item is not active
+                if (!(active && active.domNode === selected) && selected.dataset.expandEvt) {
+                    selected.component.trigger(selected.dataset.expandEvt);
+                }
                 selected.classList.add('active');
                 selected.component.icon = selected.component.icon.replace('outline', 'solid');
                 this.activeItem = selected;

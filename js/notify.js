@@ -219,7 +219,15 @@ var notify = {
         }
 
         switch (notification.a || notification.t) {
-            case 'put':
+            case 'put': {
+                if (
+                    !mega.notif.has('cloud_enabled') ||
+                    u_attr.s4 && notification.n && M.getNodeRoot(notification.n) === 's4'
+                ) {
+                    return true;
+                }
+                break;
+            }
             case 'share':
             case 'dshare':
                 if (!mega.notif.has('cloud_enabled')) {
@@ -283,7 +291,10 @@ var notify = {
                 break;
 
             case 'puu':
-                if (mega.notif.has('cloud_upload')) {
+                if (
+                    mega.notif.has('cloud_upload') ||
+                    u_attr.s4 && notification.n && M.getNodeRoot(notification.n) === 's4'
+                ) {
                     return true;
                 }
                 break;
@@ -389,6 +400,11 @@ var notify = {
         // If time difference is older than 5 minutes it's a separate event and not worth combining,
         // so add it to start of the list without modification and exit
         if (previousNotification.timestamp - currentNotification.timestamp > 300) {
+            notify.notifications.unshift(currentNotification);
+            return false;
+        }
+
+        if (previousNotification.data.ver !== currentNotification.data.ver) {
             notify.notifications.unshift(currentNotification);
             return false;
         }
@@ -840,8 +856,19 @@ var notify = {
             M.openFolder(folderId)
                 .then(() => {
                     const {allDataItems, data: {f}} = notify.notifications.find(elem => elem.id === notificationID);
-
-                    M.addSelectedNodes(allDataItems || f && f.map((n) => n.h) || [], true);
+                    const allAvailable = M.c[folderId] || M.v.reduce((acc, n) => {
+                        acc[n.h] = 1;
+                        return acc;
+                    }, Object.create(null));
+                    const toSelect = (allDataItems || f || [])
+                        .reduce((set, n) => {
+                            const h = n.h || n;
+                            if (allAvailable[h]) {
+                                set.add(h);
+                            }
+                            return set;
+                        }, new Set());
+                    M.addSelectedNodes([...toSelect], true);
                 })
                 .catch(dump);
 
@@ -1478,7 +1505,11 @@ var notify = {
         const fileText = mega.icu.format(l.file_count, fileCount);
 
         // Set wording of the title
-        if (folderCount >= 1 && fileCount >= 1) {
+        if (notification.data.ver && folderCount === 0 && fileCount > 0) {
+            title = email ? mega.icu.format(l.user_file_updated_count, fileCount).replace('[X]', email)
+                : mega.icu.format(l.file_updated_count, fileCount);
+        }
+        else if (folderCount >= 1 && fileCount >= 1) {
             title = email ? mega.icu.format(l.user_item_added_count, folderCount + fileCount).replace('[X]', email) :
                 mega.icu.format(l.item_added_count, folderCount + fileCount);
         }
@@ -1509,7 +1540,7 @@ var notify = {
     renderPayment: function($notificationHtml, notification) {
 
         // If user has not seen the welcome dialog before, show it and set ^!welDlg to 2 (seen)
-        if (!notification.seen && !(u_attr.pf || u_attr.b)) {
+        if (!notification.seen && !(u_attr.pf || u_attr.b) && !pro.propay.onPropayPage()) {
             mega.attr.get(u_handle, 'welDlg', -2, 1, (res) => {
                 if ((res | 0) === 1) {
                     notify.createNewUserDialog(notification);
@@ -1592,15 +1623,34 @@ var notify = {
 
                 const newPlan = pro.getProPlanName(newPlanLevel);
                 const currentPlan = pro.getProPlanName(u_attr.p);
-                const plansEndingAfterPurchase = getPlansEndingAfterPurchase();
-                const bodyText = plansEndingAfterPurchase < 2
-                    ? l.welcome_dialog_active_until
-                    : l.welcome_dialog_active_check;
+
+                let bodyText = l.welcome_dialog_active_check;
+                if (getPlansEndingAfterPurchase() < 2) {
+                    bodyText = l.welcome_dialog_active_until;
+
+                    if (!purchaseEndTime) {
+                        console.assert(account.stype === 'S' || !account.srenew);
+
+                        if (account.srenew) {
+                            purchaseEndTime = account.srenew[0];
+                        }
+                        else {
+                            const data = pro.proplan.planData;
+                            if (data) {
+                                purchaseEndTime = data.nextplan ? data.nextplan.t : data.suntil;
+                            }
+                        }
+                    }
+                    purchaseEndTime = purchaseEndTime && time2date(purchaseEndTime, 1);
+
+                    console.assert(purchaseEndTime);
+                    bodyText = bodyText.replace('%3', purchaseEndTime || '');
+                }
+
                 msgDialog('warninga', '',
                           l.welcome_dialog_thanks_for_sub.replace('%1', newPlan),
                           bodyText
                               .replace('%1', currentPlan)
-                              .replace('%3', time2date(purchaseEndTime || account.srenew[0], 1))
                               .replace('%2', newPlan));
                 return;
             }
@@ -2251,7 +2301,8 @@ var notify = {
 
             const link = document.querySelector('link[rel="icon"]');
             if (link) {
-                link.href = `${location.hostname === 'mega.nz' ? 'https://mega.nz/' : bootstaticpath}favicon.ico`;
+                link.href = (location.hostname === 'mega.nz' || location.hostname === 'mega.app' ?
+                    `https://mega.${mega.tld}/` : bootstaticpath) + 'favicon.ico';
             }
 
             this.favico = new Favico({

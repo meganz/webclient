@@ -45,7 +45,7 @@ class MegaMobileContextMenu extends MegaComponentGroup {
 
             tappableListItem.on('tap', (megaDataEvent, touchEvent) => {
                 this.sheet.hide();
-                item.onClick(this.handle, touchEvent);
+                item.onClick(this.handle, touchEvent || megaDataEvent);
 
                 return false;
             });
@@ -81,6 +81,7 @@ class MegaMobileContextMenu extends MegaComponentGroup {
 
             if (node.link) {
                 items = Object.create(null);
+                items['.save-to-mega'] = 1;
                 items['.open-app'] = 1;
                 items['.download-item'] = 1;
             }
@@ -117,12 +118,6 @@ class MegaMobileContextMenu extends MegaComponentGroup {
         if (is_image3(node) && M.v.filter(is_image3).length > 1) {
             items['.play-slideshow'] = 1;
         }
-
-        // Phase 2
-        // if (items['.sh4r1ng-item']) {
-        //     // show Manage share or share folder text depending on the status
-        //     onIdle(() => M.setContextMenuShareText());
-        // }
 
         if (items['.getlink-item']) {
             // Show the Manage link text if it already has a public link
@@ -238,10 +233,12 @@ class MegaMobileContextMenu extends MegaComponentGroup {
                 itemInfo.append(sharedOwner);
             }
 
+            const copyImage = itemImage.cloneNode(true);
+            MegaNodeComponent.label.set(node, copyImage.querySelector('i'));
             // title node
             this.sheet.clearTitle();
             this.sheet.titleNode.classList.add('context-menu');
-            this.sheet.titleNode.append(itemImage.cloneNode(true), itemInfo);
+            this.sheet.titleNode.append(copyImage, itemInfo);
             const thumbTag = this.sheet.titleNode.querySelector('img'); // remove thumbnails if it has
             if (thumbTag) {
                 thumbTag.remove();
@@ -546,6 +543,16 @@ mBroadcaster.once('boot_done', () => {
                 return false;
             }
         },
+        '.save-to-mega': {
+            text: l.btn_imptomega,
+            icon: 'sprite-mobile-fm-mono icon-cloud-download-thin-outline',
+            subMenu: false,
+            classNames: '',
+            onClick: () => {
+                eventlog(500969, 1);
+                start_import();
+            }
+        },
         '.open-app': {
             text: l.open_in_app,
             icon: 'sprite-mobile-fm-mono icon-mega-thin-outline',
@@ -580,7 +587,7 @@ mBroadcaster.once('boot_done', () => {
 
                 mobile.nodeSelector.registerPreviousViewNode();
                 mega.ui.viewerOverlay.hide();
-                mobile.nodeSelector.show('move', nodeHandle);
+                mobile.nodeSelector.show({ type: 'move', original: nodeHandle });
 
                 M.fmEventLog(500699);
             }
@@ -597,7 +604,7 @@ mBroadcaster.once('boot_done', () => {
 
                 mobile.nodeSelector.registerPreviousViewNode();
                 mega.ui.viewerOverlay.hide();
-                mobile.nodeSelector.show('copy', nodeHandle);
+                mobile.nodeSelector.show({ type: 'copy', original: nodeHandle });
 
                 M.fmEventLog(500700);
             }

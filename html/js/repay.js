@@ -4,6 +4,48 @@ function RepayPage() {
     this.unknownErrorCode = -99;
 }
 
+RepayPage.prototype.convertToFree = function() {
+    "use strict";
+
+    if (!u_attr.pf) {
+        return false;
+    }
+
+    const title = l.revert_to_free_confirmation_question;
+    const message = l.revert_to_free_confirmation_info;
+    const cfg = u_attr.s4 ? 1 : 0;
+
+    if (is_mobile) {
+        parsepage(pages.mobile);
+    }
+
+    msgDialog('confirmation', '', title, message, (e) => {
+        if (e) {
+            loadingDialog.show();
+
+            // Downgrade the user to Free
+            api.req({a: 'urpf', r: 1})
+                .then(() => {
+                    sessionStorage.cnv2free = cfg;
+                })
+                .catch(dump)
+                .finally(() => {
+
+                    // Reset account cache so all account data will be refetched
+                    if (M.account) {
+                        M.account.lastupdate = 0;
+                    }
+                    loadSubPage(is_mobile ? 'fm/account' : 'fm/account/plan');
+                });
+        }
+        else if (is_mobile) {
+
+            // Close button for mobile we need to reload as loadSubPage on the same page doesn't work
+            location.reload();
+        }
+    });
+};
+
 RepayPage.prototype.initPage = function() {
     "use strict";
 
@@ -82,39 +124,7 @@ RepayPage.prototype.initPage = function() {
 
         // Show the 'Revert to free account' button and add click handler for it
         $revertToFreeBtn.removeClass('hidden');
-        $revertToFreeBtn.rebind('click.revert', () => {
-
-            const title = l.revert_to_free_confirmation_question;
-            const message = l.revert_to_free_confirmation_info;
-
-            if (is_mobile) {
-                parsepage(pages.mobile);
-            }
-
-            msgDialog('confirmation', '', title, message, (e) => {
-                if (e) {
-                    loadingDialog.show();
-
-                    // Downgrade the user to Free
-                    api.req({a: 'urpf', r: 1})
-                        .catch(dump)
-                        .finally(() => {
-
-                            // Reset account cache so all account data will be refetched
-                            if (M.account) {
-                                M.account.lastupdate = 0;
-                            }
-
-                            loadSubPage('fm/account/plan');
-                        });
-                }
-                else if (is_mobile) {
-
-                    // Close button for mobile we need to reload as loadSubPage on the same page doesn't work
-                    location.reload();
-                }
-            });
-        });
+        $revertToFreeBtn.rebind('click.revert', () => mySelf.convertToFree());
     }
 
     // event handler for repay button
@@ -273,6 +283,12 @@ RepayPage.prototype.initPage = function() {
             const sep = mIntl.decimalSeparator;
 
             const applyFormat = (val) => {
+
+                // Default to Euros
+                if (!res.l) {
+                    return `${intl.format(val)} \u20ac`;
+                }
+
                 if (sep !== res.l.sp[0]) {
                     const reg1 = new RegExp(`\\${sep}`, 'g');
                     const reg2 = new RegExp(`\\${res.l.sp[1]}`, 'g');

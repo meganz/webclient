@@ -165,7 +165,7 @@ lazy(T.ui, 'dashboardLayout', () => {
                     return o;
                 }, Object.create(null));
 
-                const smk = Object.keys(flt).sort();
+                const smk = Object.keys(flt).sort((a, b) => dir === 1 ? a - b : b - a);
                 for (let i = smk.length; i--;) {
                     const k = smk[i];
                     const v = flt[k];

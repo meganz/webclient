@@ -506,22 +506,7 @@ lazy(mega.ui, 'mShareDialog', () => {
      */
     function getActiveShareContacts() {
 
-        const activeContacts = {};
-        const nodeHandle = String(target);
-        const node = M.getNodeByHandle(nodeHandle);
-        let userHandles = M.getNodeShareUsers(node, 'EXP');
-
-        if (M.ps[nodeHandle]) {
-            const pendingShares = Object(M.ps[nodeHandle]);
-            userHandles = userHandles.concat(Object.keys(pendingShares));
-        }
-
-        // Add existing contact with access
-        userHandles.forEach((u) => {
-            activeContacts[u] = 1;
-        });
-
-        return activeContacts;
+        return M.getOutShares(target, 'EXP');
     }
 
     /**
@@ -556,9 +541,9 @@ lazy(mega.ui, 'mShareDialog', () => {
         }
 
         // Check this contact hasn't already been added to the active access list but pending contact invite
-        if ($(".share-dialog-access-node[id='" + escapeHTML(opc) + "']", $dialog).length > 0 ||
-            Object.values($.removedContactsFromShare).some(r => r.userEmailOrHandle === email) ||
-            (opc && activeContacts[opc])) {
+        if (activeContacts[opc]
+            || $(`.share-dialog-access-node[id='${escapeHTML(opc)}']`, $dialog).length > 0
+            || Object.values($.removedContactsFromShare).some(r => r.userEmailOrHandle === email)) {
 
             showErrorMessage(l.share_add_contact_already_shared_error);
             return false;
@@ -601,11 +586,7 @@ lazy(mega.ui, 'mShareDialog', () => {
      */
     function getAddedContacts() {
 
-        const addedContacts = {};
-        const nodeHandle = String(target);
-        const node = M.getNodeByHandle(nodeHandle);
-        let userHandles = M.getNodeShareUsers(node, 'EXP');
-
+        const addedContacts = {...getActiveShareContacts()};
         const $pendingAccessContacts = $('.contact-selected-item', $dialog);
 
         // Add pending contacts
@@ -614,15 +595,6 @@ lazy(mega.ui, 'mShareDialog', () => {
             const handle = $(contact).attr('data-contact-handle');
 
             addedContacts[handle] = 1;
-        });
-
-        if (M.ps[nodeHandle]) {
-            const pendingShares = Object(M.ps[nodeHandle]);
-            userHandles = userHandles.concat(Object.keys(pendingShares));
-        }
-        // Add existing contact with access
-        userHandles.forEach((u) => {
-            addedContacts[u] = 1;
         });
 
         return addedContacts;
@@ -652,16 +624,16 @@ lazy(mega.ui, 'mShareDialog', () => {
         }
 
         // Check this contact hasn't already been added to the active access list (including hidden sharees)
-        if ($(".share-dialog-access-node[id='" + contactHandle + "']", $dialog).length > 0 ||
-            activeContacts[contactHandle]) {
+        if (activeContacts[contactHandle]
+            || $(`.share-dialog-access-node[id='${contactHandle}']`, $dialog).length > 0) {
 
             showErrorMessage(l.share_add_contact_already_shared_error);
             return false;
         }
 
         // Check this contact hasn't already been added to the pending access list
-        if ($(".contact-selected-item[data-contact-handle='" + contactHandle + "']", $dialog).length > 0 ||
-            addedContacts[contactHandle]) {
+        if (addedContacts[contactHandle]
+            || $(`.contact-selected-item[data-contact-handle='${contactHandle}']`, $dialog).length > 0) {
 
             showErrorMessage(l.email_address_already_entered);
             return false;
@@ -1119,16 +1091,10 @@ lazy(mega.ui, 'mShareDialog', () => {
         const $shareCollaboratorsDialog = $('.mega-dialog.share-access-contacts-dialog', 'body');
         const $currDialog = $shareCollaboratorsDialog.hasClass('hidden') ? $dialog : $shareCollaboratorsDialog;
 
-        let pendingShares = {};
         const nodeHandle = String(target);
         const node = M.getNodeByHandle(nodeHandle);
-        let userHandles   = M.getNodeShareUsers(node, 'EXP');
+        const userHandles = Object.keys(getActiveShareContacts() || {});
         const readonly = M.currentrootid === M.InboxID || M.getNodeRoot(target) === M.InboxID;
-
-        if (M.ps[nodeHandle]) {
-            pendingShares = Object(M.ps[nodeHandle]);
-            userHandles   = userHandles.concat(Object.keys(pendingShares));
-        }
 
         // Remove items in the removed contacts list
         for (var rmContact in $.removedContactsFromShare) {
@@ -1156,14 +1122,14 @@ lazy(mega.ui, 'mShareDialog', () => {
             if ($(`.share-dialog-access-node[email-encoded="${userEmailEncoded}"]`, $currDialog).length === 0) {
 
                 const name  = M.getNameByHandle(handle) || user.m;
-                const share = M.getNodeShare(node, handle) || Object(pendingShares[handle]);
+                const share = M.getNodeShare(node, handle);
 
                 generateShareDialogRow(
                     name,
                     user.m,
                     share.r | 0,
                     handle,
-                    handle in pendingShares,
+                    !!share.p,
                     readonly
                 );
             }
@@ -1388,13 +1354,11 @@ lazy(mega.ui, 'mShareDialog', () => {
 
         let pendingShares = {};
         const nodeHandle = String(target);
-        const node = M.getNodeByHandle(nodeHandle);
-        let userHandles   = M.getNodeShareUsers(node, 'EXP');
+        const userHandles = Object.keys(getActiveShareContacts() || {});
         $.sharedTokens = [];// GLOBAL VARIABLE, Hold items currently visible in share folder content (above multi-input)
 
         if (M.ps[nodeHandle]) {
             pendingShares = Object(M.ps[nodeHandle]);
-            userHandles   = userHandles.concat(Object.keys(pendingShares));
         }
 
         // Fill the owner of the folder on the top of the access list
@@ -1536,8 +1500,7 @@ lazy(mega.ui, 'mShareDialog', () => {
         var $doneBtnText = $('span', $doneBtn);
         var $removeBtn = $('.remove-share', dc);
         const $footer = $('.footer-container', dc);
-        const node = M.getNodeByHandle(target);
-        const hasShare = node && M.getNodeShareUsers(node, 'EXP').length || M.ps[node];
+        const hasShare = M.isOutShare(target, 'EXP');
 
         // Taking care about the Remove Share button enabled/disabled
         if (itemsNum > 1 || hasShare) {
@@ -1850,6 +1813,7 @@ lazy(mega.ui, 'mShareDialog', () => {
         }
         else {
             $('.remove-share', $dialog).addClass('disabled');
+            MegaNodeComponent.label.set(node, $('.item-type-icon-90', $dialog));
         }
 
         // Fill the shared folder's name
@@ -1880,7 +1844,7 @@ lazy(mega.ui, 'mShareDialog', () => {
 
         $shareDialogTitle.text(l[5631]);
 
-        if (node && M.getNodeShareUsers(node, 'EXP').length || M.ps[node]) {
+        if (M.isOutShare(node, 'EXP')) {
             $shareDialogTitle.text(l.manage_share);
         }
 
@@ -2067,6 +2031,11 @@ lazy(mega.ui, 'mShareDialog', () => {
      */
     function showShareDlg() {
 
+        $.addContactsToShare = {};       // GLOBAL VARIABLE, add contacts to a share
+        $.changedPermissions = {};       // GLOBAL VARIABLE, changed permissions shared dialog
+        $.removedContactsFromShare = {}; // GLOBAL VARIABLE, removed contacts from a share
+        $.shareDialog = 'share';
+
         $dialog.rebind('dialog-closed.share', () => {
 
             $dialog.off('dialog-closed.share');
@@ -2079,8 +2048,8 @@ lazy(mega.ui, 'mShareDialog', () => {
 
         $.hideContextMenu();
 
-        // eslint-disable-next-line no-use-before-define
-        fillShareDlg(target).catch(dump);
+        fillShareDlg(target)
+            .catch(reportError);
 
         // Show the Share dialog
         return $dialog;
@@ -2107,11 +2076,6 @@ lazy(mega.ui, 'mShareDialog', () => {
                 return ephemeralDialog(l[1006]); // Sharing folders is only for logged-in users
             }
 
-            $.addContactsToShare = {};       // GLOBAL VARIABLE, add contacts to a share
-            $.changedPermissions = {};       // GLOBAL VARIABLE, changed permissions shared dialog
-            $.removedContactsFromShare = {}; // GLOBAL VARIABLE, removed contacts from a share
-            $.shareDialog = 'share';
-
             Promise.resolve(mega.fileRequestCommon.storage.isDropExist(target))
                 .then((res) => {
                     if (res.length) {
@@ -2121,7 +2085,12 @@ lazy(mega.ui, 'mShareDialog', () => {
                 .then(() => mega.keyMgr.setShareSnapshot(target))
                 .then(() => !M.getSharingUsers(target).length && mega.sensitives.passShareCheck(target))
                 .then(() => M.safeShowDialog('share', showShareDlg))
-                .catch(dump);
+                .catch((ex) => {
+                    if (ex !== EBLOCKED) {
+                        // if it isn't a user-cancel from showRemoveWarning()
+                        reportError(ex);
+                    }
+                });
         },
 
         /**

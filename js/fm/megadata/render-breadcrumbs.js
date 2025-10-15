@@ -19,9 +19,12 @@
         const block = scope.querySelector('.fm-breadcrumbs-block');
         const $block = $(block);
         const dropdown = scope.querySelector('.breadcrumb-dropdown');
-        $block.empty();
+        const hasContext = !!block.querySelector('.ctx-source');
 
-        const extraItems = prepareBreadcrumbItems(items, dictionary, block);
+        const extraItems = prepareBreadcrumbItems(items, dictionary, block, hasContext);
+        if (!extraItems) {
+            return;
+        }
 
         removeSimpleTip($('.fm-breadcrumbs', $block));
         showHideBreadcrumbDropdown(extraItems, scope, dropdown);
@@ -41,7 +44,7 @@
         const scope = wrapperNode
             || document.querySelector('.fm-right-files-block .fm-right-header .fm-breadcrumbs-wrapper');
 
-        if (typeof scope !== 'object') {
+        if (!(scope && scope.parentNode)) {
             console.assert(false, 'invalid scope');
             return;
         }
@@ -131,6 +134,7 @@
                     const {name: deviceName} = this.dcd[handle] || {};
                     if (deviceName) {
                         name = deviceName;
+                        typeClass = 'folder device-item';
                     }
                 }
 
@@ -145,7 +149,7 @@
                 else if (folderlink) {
                     typeClass = 'folder-link';
                 }
-                else {
+                else if (!typeClass) {
                     typeClass = 'folder';
                 }
 
@@ -292,6 +296,7 @@
                     else {
                         Ps.initialize(dropdown);
                     }
+                    $.hideContextMenu();
                 }
                 return false;
             });
@@ -307,6 +312,11 @@
             if (id) {
                 clickAction(id);
             }
+        });
+
+        $('.fm-header-context', scope).rebind('click.breadcrumb', ev => {
+            mega.ui.secondaryNav.openContextMenu(ev);
+            return false;
         });
 
         $('.fm-breadcrumbs', scope).rebind('contextmenu.breadcrumb', () => {
@@ -325,7 +335,8 @@
         });
     }
 
-    function updateBreadcrumbNode(sizingNode, typeClass, name, isRoot, isDyhRoot, isLastItem) {
+    function updateBreadcrumbNode(options) {
+        const {sizingNode, typeClass, name, isRoot, isDyhRoot, isLastItem, withContext, count} = options;
         sizingNode.className = `fm-breadcrumbs ${typeClass} ${isRoot || isDyhRoot ? 'root' : ''} ui-droppable`;
         sizingNode.textContent = '';
         const span = document.createElement('span');
@@ -348,6 +359,37 @@
             iconNode.className = `next-arrow ${mega.ui.sprites.mono} icon-chevron-right-thin-outline icon16`;
             sizingNode.appendChild(iconNode);
         }
+        else if (withContext && !isRoot) {
+            const contextIcon = document.createElement('i');
+            contextIcon.className = `next-arrow ${mega.ui.sprites.mono} icon-chevron-down-thin-outline icon-16`;
+            sizingNode.appendChild(contextIcon);
+            sizingNode.classList.add('fm-header-context');
+        }
+        if (isLastItem && (count === 1 || !withContext)) {
+            sizingNode.classList.add('no-hover');
+        }
+    }
+
+    function prepareContextFilters(noCtx, container, items) {
+        if ('kernel' in s4 && M.currentrootid === 's4') {
+            noCtx.add('keys').add('policies').add('groups').add('users');
+            if (items.some(h => noCtx.has(h))) {
+                // Skip context for children of the policies, groups, and users
+                noCtx.add(items[0]);
+            }
+            const containers = s4.utils.getContainersList();
+            for (let i = containers.length; i--;) {
+                noCtx.add(containers[i].h);
+            }
+        }
+        if (M.currentrootid === M.RubbishID) {
+            for (let i = items.length; i--;) {
+                if (M.getNodeShare(items[i]).down) {
+                    noCtx.add(items[i]);
+                }
+            }
+        }
+        return mega.ui.secondaryNav && mega.ui.secondaryNav.breadcrumbHolder.contains(container);
     }
 
     /**
@@ -356,19 +398,20 @@
      * @param {Array} items - the items in the path
      * @param {function} dictionary - a function which will convert the item id into a full breadcrumb datum
      * @param {HTMLElement} container - the HTMLElement that contains the breadcrumbs
+     * @param {boolean} hasContext - When re-rendering if the context menu was opened in the breadcrumbs
      * @return {object} - the HTML for the breadcrumbs and the list of parent folders not in the breadcrumbs
      */
-    function prepareBreadcrumbItems(items, dictionary, container) {
+    function prepareBreadcrumbItems(items, dictionary, container, hasContext) {
         let containerWidth = container.clientWidth;
         let totalWidth = 0;
         let remainItems = 4;
-        const sizingNode = document.createElement('a');
-        container.appendChild(sizingNode);
 
         let extraItems = [];
         let isSimpletip = false;
         let isDyhRoot = false;
         let lastPos = 0;
+        let withContext = false;
+        const noCtx = new Set();
 
         if (container.parentNode.parentNode.classList.contains('simpletip-tooltip')) {
             isSimpletip = true;
@@ -386,11 +429,38 @@
             remainItems = Infinity;
             containerWidth = Infinity;
         }
+        else {
+            withContext = prepareContextFilters(noCtx, container, items);
+        }
 
-        if (M.dyh && M.dyh('is-breadcrumb-root', items)) {
+        if (M.dyh && M.dyh('is-breadcrumb-root', items) && !container.closest('.fm-picker-dialog')) {
             isDyhRoot = true;
             containerWidth = Infinity;
         }
+
+        const { lastCrumbPath, lastCrumbWidth } = container.dataset;
+        let nextCrumb = '';
+        for (let i = 0; i < items.length; i++) {
+            if (isSimpletip && i === lastPos) {
+                continue;
+            }
+            const {name} = dictionary(items[i]);
+            if (name !== '') {
+                nextCrumb = `${name}/${nextCrumb}`;
+            }
+            else if (lastPos === i) {
+                lastPos++;
+            }
+        }
+        if (nextCrumb === lastCrumbPath && String(containerWidth) === lastCrumbWidth) {
+            return false;
+        }
+        const sizingNode = document.createElement('a');
+        container.appendChild(sizingNode);
+        container.textContent = '';
+        container.dataset.lastCrumbPath = nextCrumb;
+        container.dataset.lastCrumbWidth = String(containerWidth);
+        lastPos = 0;
 
         for (let i = 0; i < items.length; i++) {
 
@@ -405,13 +475,25 @@
             if (name !== '') {
                 const isLastItem = isSimpletip ? i === lastPos + 1 : i === lastPos;
                 const isRoot = i === items.length - 1;
-                updateBreadcrumbNode(sizingNode, typeClass, name, isRoot, isDyhRoot, isLastItem);
+                updateBreadcrumbNode({
+                    sizingNode,
+                    typeClass,
+                    name,
+                    isRoot,
+                    isDyhRoot,
+                    isLastItem,
+                    withContext: withContext && !noCtx.has(id),
+                    count: items.length
+                });
 
                 const nodeWidth = sizingNode.clientWidth;
                 const prepareRealNode = (node) => {
                     node = node.cloneNode(true);
                     node.dataset.id = id;
                     node.id = `pathbc-${items[i]}`;
+                    if (hasContext && isLastItem) {
+                        node.classList.add('ctx-source', 'active');
+                    }
                     return node;
                 };
                 if (!remainItems || totalWidth + nodeWidth > containerWidth) {

@@ -10,9 +10,8 @@ class MegaHeader extends MegaMobileHeader {
 
         const navNavigation = this.domNode.querySelector('.top-block .nav-navigation');
         const navActions = this.domNode.querySelector('.top-block .nav-actions');
-        let wrapper;
 
-        navNavigation.querySelector('.home').classList.add('.hidden');
+        navNavigation.querySelector('.home').classList.add('hidden');
 
         // Remove mobile kebab menu
         const kebab = navActions.querySelector('.menu');
@@ -27,42 +26,42 @@ class MegaHeader extends MegaMobileHeader {
             this.searchInput.classList.add('search');
             this.searchInput.classList.remove('hidden');
             navNavigation.prepend(this.searchInput);
-
-            // Notification
-            wrapper = mCreateElement(
-                'div',
-                {class: 'menu-wrapper notif-wrapper notification js-dropdown-notification'},
-                navActions
-            );
-            navActions.prepend(wrapper);
-
-            this.notifButton = new MegaButton({
-                parentNode: wrapper,
-                type: 'icon',
-                componentClassname: 'text-icon alarm',
-                icon: 'sprite-fm-mono icon-bell-thin-outline',
-                iconSize: 24,
-                simpletip: l[862]
-            });
-
-            this.notifMenu = options.parentNode.querySelector('.notification-popup');
-
-            wrapper.append(this.notifMenu);
-
-            this.notifButton.on('click.list', e => {
-                $.hideContextMenu();
-                if (this.notifButton.toggleClass('active')) {
-                    this.showNotifMenu();
-                }
-                else {
-                    this.closeNotifMenu(e);
-                }
-
-                return false;
-            });
-
-            this.notifButton.domNode.prepend(mCreateElement('span', {class: 'js-notification-num icon-badge hidden'}));
         }
+
+        // Notification
+        let wrapper = mCreateElement(
+            'div',
+            {class: 'menu-wrapper notif-wrapper notification js-dropdown-notification'},
+            navActions
+        );
+        navActions.prepend(wrapper);
+
+        this.notifButton = new MegaButton({
+            parentNode: wrapper,
+            type: 'icon',
+            componentClassname: 'text-icon alarm',
+            icon: 'sprite-fm-mono icon-bell-thin-outline',
+            iconSize: 24,
+            simpletip: l[862]
+        });
+
+        this.notifMenu = options.parentNode.querySelector('.notification-popup');
+
+        wrapper.append(this.notifMenu);
+
+        this.notifButton.on('click.list', e => {
+            $.hideContextMenu();
+            if (this.notifButton.toggleClass('active')) {
+                this.showNotifMenu();
+            }
+            else {
+                this.closeNotifMenu(e);
+            }
+
+            return false;
+        });
+
+        this.notifButton.domNode.prepend(mCreateElement('span', {class: 'js-notification-num icon-badge hidden'}));
 
         // Contacts menu
         wrapper = mCreateElement('div', {class: 'menu-wrapper contacts-wrapper top-contacts'}, navActions);
@@ -120,6 +119,8 @@ class MegaHeader extends MegaMobileHeader {
         wrapper = mCreateElement('div', {class: 'menu-wrapper bento-wrapper bento'}, navActions);
         navActions.prepend(wrapper);
 
+        const hasVpn = this.hasVpn();
+
         this.bentoButton = new MegaButton({
             parentNode: wrapper,
             type: 'icon',
@@ -162,8 +163,8 @@ class MegaHeader extends MegaMobileHeader {
             vpn: {
                 componentClassname: 'vpn extlink',
                 text: l.vpn,
-                href: 'https://mega.io/vpn',
-                target: '_blank',
+                href: hasVpn ? '/fm/account/vpn' : 'https://mega.io/vpn',
+                target: hasVpn ? '' : '_blank',
                 icon: 'sprite-fm-mono icon-zap-thin-outline',
                 iconSize: 24,
                 eventLog: 500629
@@ -201,27 +202,6 @@ class MegaHeader extends MegaMobileHeader {
                 this.closeBentoMenu();
             }
         });
-
-        if (mega.lite.inLiteMode) {
-            const backtomega = new MegaLink({
-                parentNode: navActions,
-                text: l.back_to_mega,
-                type: "normal",
-                componentClassname: "outline",
-                prepend: true
-            });
-
-            backtomega.on('click.backtomega', () => {
-
-                // Remove the local storage variable which triggers MEGA Lite mode to load
-                delete localStorage.megaLiteMode;
-
-                // Store a log for statistics (User decided to go back to regular MEGA - Back to MEGA button)
-                // Then reload the account back into regular MEGA
-                loadingDialog.show();
-                Promise.resolve(eventlog(99897)).finally(() => location.reload());
-            });
-        }
 
         if (!u_type) {
 
@@ -399,6 +379,9 @@ class MegaHeader extends MegaMobileHeader {
         this.domNode.querySelector('.bottom-block .nav-navigation').textContent = '';
         this.domNode.querySelector('.bottom-block .nav-actions').textContent = '';
 
+        const secondaryButtons = mCreateElement('div', { class: 'nav-secondary-actions hidden' });
+        this.topBlock.prepend(secondaryButtons);
+
         this.resetBottomBlock = nop;
     }
 
@@ -458,8 +441,8 @@ class MegaHeader extends MegaMobileHeader {
         mega.ui.header.handleMenu('notif');
         mega.ui.header.notifButton.icon = mega.ui.header.notifButton.icon.replace('thin-outline', 'regular-filled');
         if (document.body.classList.contains('rtl')) {
-            this.notifMenu.style.right = fmconfig.leftPaneWidth <= 270 ?
-                `-${8 + (270 - fmconfig.leftPaneWidth)}px` : '-8px';
+            const width = document.body.classList.contains('small-lhp') ? 72 : fmconfig.leftPaneWidth;
+            this.notifMenu.style.right = width <= 270 ? `-${8 + (270 - width)}px` : '-8px';
         }
         eventlog(500322);
     }
@@ -585,9 +568,14 @@ class MegaHeader extends MegaMobileHeader {
     }
 
     update() {
+        const types = MegaHeader.getType();
 
-        this.headerOptions = MegaHeader.getType();
+        this.headerOptions = types;
         mega.ui.topmenu.megaLink.text = MegaHeader.getHeading();
+
+        if (types.search) {
+            MegaHeader.updateSearchForm(false, this.domNode);
+        }
 
         if (u_type || window.is_eplusplus) {
             this.bentoMenu.items.chat[0].show();
@@ -670,7 +658,9 @@ class MegaHeader extends MegaMobileHeader {
 
             this.avatarMenu.Ps = new PerfectScrollbar(this.avatarMenu);
 
-            window.addEventListener('resize', SoonFc(90, this.avatarMenu.Ps.update));
+            const _resizeHandler = SoonFc(90, this.avatarMenu.Ps.update);
+            window.addEventListener('resize', _resizeHandler);
+            this.on('destroy', () => window.removeEventListener('resize', _resizeHandler));
 
             this.activityStatus = mCreateElement('div', {'class': 'activity-status-block js-activity-status hidden'}, [
                 mCreateElement('div', {'class': 'loading-animation'}),
@@ -1107,6 +1097,129 @@ class MegaHeader extends MegaMobileHeader {
         return this.types(iType);
     }
 
+    /**
+     * Updating the placeholder for the search input
+     * @param {String} [dirId] Predefined location
+     * @param {HTMLElement} [header] Parent block
+     * @returns {void}
+     */
+    static updateSearchForm(dirId = false, header = pmlayout) {
+        if (!header || (!dirId && String(M.currentdirid).startsWith('search/'))) {
+            return;
+        }
+
+        let loc = '';
+        let chip = '';
+        let chipIcon = '';
+        let placeholder = l.search_all;
+        const input = header.querySelector('input.js-filesearcher');
+
+        if (!input) {
+            return;
+        }
+
+        dirId = dirId || M.currentdirid;
+        const isRootFolder = dirId === M.RootID;
+
+        const adjustDetails = () => {
+            if (M.getNodeRoot(dirId) === M.RootID) {
+                const setInputDetails = (h, i) => {
+                    loc = h;
+                    chip = M.getNameByHandle(loc);
+                    chipIcon = i;
+                    placeholder = l.search_loc.replace('%s', chip);
+                };
+
+                if (isRootFolder) {
+                    if (pfid) {
+                        placeholder = l.search_loc.replace('%s', M.getNameByHandle(M.RootID));
+                    }
+                    else {
+                        setInputDetails(M.RootID, 'sprite-fm-mono icon-cloud-thin-outline');
+                    }
+                }
+                else {
+                    setInputDetails(dirId, 'sprite-fm-mono icon-folder-thin-outline');
+                }
+            }
+            else if (dirId === 'photos' || (M.gallery && M.isGalleryPage()) || M.albums) {
+                loc = 'photos';
+                chip = l.media;
+                chipIcon = 'sprite-fm-mono icon-image-01-thin-outline';
+                placeholder = l.search_media;
+            }
+        };
+
+        adjustDetails();
+
+        input.placeholder = placeholder;
+        let chipBtn = input.previousElementSibling || Object.create(null);
+
+        if (loc) {
+            let txt;
+            let icon;
+
+            const btnClasses = 'search-chip h-7 grid grid-flow-col gap-2 items-center whitespace-nowrap p-0 ms-2'
+                + ' border-none outline-none border-radius-3'
+                + ' text-color-high bg-btn-secondary';
+            const txtClasses = 'expand-on-focus text-ellipsis w-min-content max-w-24';
+            const iconClasses = `${chipIcon} ms-3`;
+
+            if (chipBtn.tagName === 'BUTTON') {
+                txt = chipBtn.querySelector('span');
+                icon = chipBtn.querySelector('i');
+            }
+            else {
+                txt = mCreateElement('span');
+                icon = mCreateElement('i', { class: iconClasses });
+                chipBtn = mCreateElement(
+                    'button',
+                    { tabindex: '-1', type: 'button' },
+                    [
+                        icon,
+                        txt,
+                        mCreateElement(
+                            'i',
+                            { class: 'sprite-fm-mono icon-dialog-close-thin icon-size-4 p-1 me-2 close-icon' }
+                        )
+                    ]
+                );
+
+                chipBtn.addEventListener('click', ({ target }) => {
+                    input.focus();
+
+                    if (target && !target.classList.contains('close-icon')) {
+                        return;
+                    }
+
+                    chipBtn.parentNode.removeChild(chipBtn);
+                    input.placeholder = (pfid) ? l.search_loc.replace('%s', M.getNameByHandle(M.RootID)) : l.search_all;
+
+                    mega.ui.searchbar.clearLastSearches();
+                    mega.ui.mNodeFilter.resetFilterSelections();
+
+                    eventlog(500936);
+                });
+
+                chipBtn.addEventListener('pointerdown', (e) => {
+                    e.preventDefault();
+                });
+
+                input.parentNode.insertBefore(chipBtn, input);
+            }
+
+            chipBtn.className = btnClasses;
+            chipBtn.dataset.location = loc;
+
+            txt.textContent = chip;
+            txt.className = txtClasses;
+            icon.className = iconClasses;
+        }
+        else if (!M.search && !loc && chipBtn.tagName === 'BUTTON') {
+            chipBtn.parentNode.removeChild(chipBtn);
+        }
+    }
+
     set topBlockBottomBorder(show) {
 
         const topBlock = this.domNode.querySelector('.top-block');
@@ -1121,6 +1234,11 @@ class MegaHeader extends MegaMobileHeader {
             'mega-pass-secure-passwor/hjdopmdfeekbcakjbbienpbkdldkalfe' :
             browser === 'Firefox' ? 'https://addons.mozilla.org/en-US/firefox/addon/mega-password-manager/' :
                 'https://chromewebstore.google.com/detail/mega-pass/deelhmmhejpicaaelihagchjjafjapjc';
+    }
+
+    hasVpn() {
+        return u_attr && u_attr.p && u_attr.p > 0 ||
+            pro && pro.proplan2 && pro.proplan2.getUserFeature('vpn');
     }
 }
 

@@ -137,6 +137,7 @@ var psa = {
 
         // Create PSA details button
         if (psa.currentPsa.l) {
+            innerNode = mCreateElement('div', null, innerNode);
             innerNode = mCreateElement('button', {
                 'class': `${is_mobile ? 'action-link nav-elem normal button' : 'mega-button'} js-more-info`,
                 'data-continue-link': psa.currentPsa.l
@@ -204,6 +205,11 @@ var psa = {
     showAnnouncement: function() {
 
         'use strict';
+
+        // skip psa where not needed
+        if (is_mobile && page.indexOf('propay_') === 0) {
+            return;
+        }
 
         var bannerNode = document.querySelector('.psa-holder .banner');
 

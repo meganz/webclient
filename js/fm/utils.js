@@ -145,7 +145,11 @@ MegaUtils.prototype.xhr = megaUtilsXHR;
  */
 MegaUtils.prototype.getStack = function megaUtilsGetStack() {
     'use strict';
-    return String(new Error('trace').stack);
+    return String(new Error('trace').stack)
+        .split('\n')
+        .slice(1 + !!window.chrome)
+        .filter((ln) => ln && !/trycatch|transport|megalog/i.test(ln))
+        .join('\n');
 };
 
 /**
@@ -171,7 +175,6 @@ MegaUtils.prototype.resetUploadDownload = function megaUtilsResetUploadDownload(
         ulmanager.isUploading = false;
         ASSERT(ulQueue._running === 0, 'ulQueue._running inconsistency on completion');
         ulQueue._pending = [];
-        ulQueue.setSize((fmconfig.ul_maxSlots | 0) || ulmanager.ulDefConcurrency || 4);
 
         if (is_megadrop) {
             mega.fileRequestUpload.onUploadCompletion();
@@ -199,7 +202,9 @@ MegaUtils.prototype.resetUploadDownload = function megaUtilsResetUploadDownload(
         clearTransferXHRs();
 
         $('.transfer-pause-icon').addClass('disabled');
-        $('.transfer-clear-all-icon').addClass('disabled');
+        if ($('tr.transfer-error', M.getTransferElements.domTable).length === 0) {
+            $('.transfer-clear-all-icon').addClass('disabled');
+        }
         $('.nw-fm-left-icon.transfers').removeClass('transfering');
         $('.transfers .nw-fm-percentage li p').css('transform', 'rotate(0deg)');
         M.tfsdomqueue = Object.create(null);
@@ -383,7 +388,7 @@ MegaUtils.prototype.reload = function megaUtilsReload(force) {
             localStorage.d = 1;
             localStorage.minLogLevel = 0;
 
-            if (location.host !== 'mega.nz') {
+            if (!is_livesite) {
                 localStorage.dd = true;
                 if (!is_extension && jj) {
                     localStorage.jj = jj;
@@ -431,7 +436,6 @@ MegaUtils.prototype.reload = function megaUtilsReload(force) {
             sessionStorage.fmAetherReload = 1;
         }
         location.reload(true);
-        loadingDialog.hide();
     };
 
     if (u_type !== 3 && page !== 'download') {
@@ -442,7 +446,7 @@ MegaUtils.prototype.reload = function megaUtilsReload(force) {
     }
 
     // Show message that this operation will destroy the browser cache and reload the data stored by MEGA
-    msgDialog('confirmation', l[761], l[7713], l[6994], (doIt) => {
+    msgDialog('reload-account', l.reload_account_btn, l[7713], false, (doIt) => {
         if (!doIt) {
             return;
         }
@@ -463,6 +467,10 @@ MegaUtils.prototype.reload = function megaUtilsReload(force) {
 
         promise.then(() => {
             const waitingPromises = [];
+
+            if (self.fminitialized) {
+                waitingPromises.push(mega.halt('full-reload'));
+            }
 
             loadingDialog.show();
             waitsc.stop();
@@ -1016,9 +1024,10 @@ MegaUtils.prototype.findDupes = function() {
 /**
  * Search for nodes
  * @param {String} searchTerm The search term to look for.
+ * @param {Function|false} customFn Optional function to call in addition to others
  * @returns {Promise}
  */
-MegaUtils.prototype.fmSearchNodes = function(searchTerm) {
+MegaUtils.prototype.fmSearchNodes = function(searchTerm, customFn) {
     'use strict';
 
     if (String(searchTerm).startsWith('--')) {
@@ -1042,7 +1051,18 @@ MegaUtils.prototype.fmSearchNodes = function(searchTerm) {
                     r = 1;
                 }
                 else if (!n.fv) {
-                    M.nn[n.h] = n.name;
+                    M.nn[n.h] = {
+                        name: n.name,
+                        p: n.p,
+                        s4: n.s4,
+                        pwm: n.pwm,
+                        sen: n.sen,
+                        fa: n.fa,
+                        k: n.k,
+                        t: n.t,
+                        des: n.des,
+                        tags: n.tags
+                    };
                 }
             }
 
@@ -1115,16 +1135,27 @@ MegaUtils.prototype.fmSearchNodes = function(searchTerm) {
         }
 
         promise.then(function() {
+
             var h;
-            var filter = M.getFilterBySearchFn(searchTerm);
+            var filter = M.getFilterBySearchFn(searchTerm, customFn);
 
             if (folderlink) {
                 M.v = [];
+
+                const chipBtn = $('button.search-chip', '.searcher-wrapper');
+                const location = mega.ui.searchbar.locationFn(chipBtn.length && chipBtn.attr('data-location'));
+
                 for (h in M.nn) {
-                    if (filter({name: M.nn[h]}) && h !== M.currentrootid) {
+                    if (
+                        filter(M.nn[h])
+                        && h !== M.currentrootid
+                        && (!location || location(M.nn[h]))
+                        && (!mega.ui.mNodeFilter.selectedFilters.value || mega.ui.mNodeFilter.match(M.d[h]))
+                    ) {
                         M.v.push(M.d[h]);
                     }
                 }
+
                 M.currentdirid = 'search/' + searchTerm;
                 if (mega.gallery) {
                     mega.gallery.clearMdView();
@@ -1133,6 +1164,12 @@ MegaUtils.prototype.fmSearchNodes = function(searchTerm) {
                 M.onSectionUIOpen('cloud-drive');
                 $('.fm-right-header .fm-breadcrumbs-wrapper').addClass('hidden');
                 mega.ui.secondaryNav.hideActionButtons();
+                if (M.v.length) {
+                    mega.ui.secondaryNav.extShowFilterChip();
+                }
+                else {
+                    mega.ui.secondaryNav.extHideFilterChip();
+                }
                 onIdle(resolve);
                 // mBroadcaster.sendMessage('!sitesearch', searchTerm, 'folder-link', M.v.length);
             }
@@ -1140,7 +1177,7 @@ MegaUtils.prototype.fmSearchNodes = function(searchTerm) {
                 var handles = [];
 
                 for (h in M.nn) {
-                    if (!M.d[h] && filter({name: M.nn[h]}) && handles.push(h) > 4e3) {
+                    if (!M.d[h] && filter(M.nn[h]) && handles.push(h) > 4e3) {
                         break;
                     }
                 }
@@ -1258,22 +1295,75 @@ MegaUtils.prototype.checkForDuplication = function(id) {
     }
 };
 
+/** Show/hide Duplicated items banner
+ * @param {Object} dups Duplicated items
+ * @param {String} id Handle of the current view's parent
+ * @returns {void} void
+*/
+MegaUtils.prototype.duplicatedItemsBanner = function(dups, id) {
+    'use strict';
+
+    if (is_mobile && mobile.banner) {
+        if (!dups || !id || mobile.nodeSelector.type) {
+            mobile.banner.hide('duplicatedItemsBanner', 0);
+            return false;
+        }
+
+        const banner = mobile.banner.show({
+            name: 'duplicatedItemsBanner',
+            msgText: l.bn_duplicates_text,
+            type: 'warning',
+            ctaText: l.bn_duplicates_lnk,
+            secondary: true
+        });
+        banner.on('cta', () => fileconflict.resolveExistedDuplication(dups, id));
+        return;
+    }
+
+    // @todo: Use mega.ui.secondaryNav.showBanner instead
+    const $banner = $('.fm-notification-block.duplicated-items-found', '.main-layout');
+
+    if (!dups || !id) {
+        $banner.removeClass('visible');
+        return false;
+    }
+
+    $banner.addClass('visible');
+
+    $('.content-box > a', $banner).rebind('click.df', () => {
+        fileconflict.resolveExistedDuplication(dups, id);
+    });
+    $('.end-box button', $banner).rebind('click.df', () => {
+        $banner.removeClass('visible');
+    });
+};
+
+
 mBroadcaster.addListener('mega:openfolder', SoonFc(300, function(id) {
     'use strict';
 
     let dups = false;
 
     // Show desktop notification
-    if (!is_mobile && (dups = M.checkForDuplication(id)) && (dups.files || dups.folders)) {
-        const $bar = $('.fm-notification-block.duplicated-items-found').addClass('visible');
-
-        $('.fix-me-btn', $bar).rebind('click.df', function() {
-            fileconflict.resolveExistedDuplication(dups, id);
-        });
-        $('.fix-me-close', $bar).rebind('click.df', function() {
-            $bar.removeClass('visible');
-        });
+    if ((dups = M.checkForDuplication(id)) && (dups.files || dups.folders)) {
+        M.duplicatedItemsBanner(dups, id);
         reselect(1);
+    }
+
+    if (!is_mobile && M.RubbishID && M.currentrootid === M.RubbishID
+        && mega.flags.ssrs > 0) {
+
+        // @todo: Use mega.ui.secondaryNav.showBanner instead
+        // @todo: Move banner creation out of SoonFc once component is implemnted
+        const $banner = $('.fm-notification-block.rubbish-schedule', '.fmholder')
+            .removeClass('visible');
+
+        if (u_attr['^!rubbishtime'] | 0) {
+            $('.message-text', $banner).text(
+                mega.icu.format(l.bn_rubbish_schedule_text, u_attr['^!rubbishtime'])
+            );
+            $banner.addClass('visible');
+        }
     }
 }));
 
@@ -1304,6 +1394,7 @@ MegaUtils.prototype.transferFromMegaCoNz = function(data) {
 
     // Get site transfer data from after the hash in the URL
     var urlParts = /sitetransfer!(.*)/.exec(data || window.location);
+    eventlog(500938)
 
     if (urlParts) {
 
@@ -1313,6 +1404,7 @@ MegaUtils.prototype.transferFromMegaCoNz = function(data) {
         }
         catch (ex) {
             console.error(ex);
+            eventlog(500939, String(ex));
             loadSubPage('login');
             return false;
         }
@@ -1322,6 +1414,10 @@ MegaUtils.prototype.transferFromMegaCoNz = function(data) {
             api_req({a: 'log', e: 99804, m: 'User tries to transfer a session from mega.co.nz.'});
 
             var toPage = String(urlParts[2] || 'fm').replace('#', '');
+
+            if (toPage.includes('uao=MEGAsync')) {
+                eventlog(500940);
+            }
 
             if (toPage.includes('?')) {
                 const pageParts = toPage.split('?');
@@ -1344,7 +1440,7 @@ MegaUtils.prototype.transferFromMegaCoNz = function(data) {
                     toPage = 'fm/pwm';
                 }
                 else {
-                    toPage = value || target;
+                    toPage = value || target || type;
                 }
             }
 
@@ -1440,6 +1536,7 @@ MegaUtils.prototype.transferFromMegaCoNz = function(data) {
             return false;
         }
     }
+    eventlog(500939, 'No URL parts found');
 };
 
 MegaUtils.prototype.setTabAndScroll = function(target) {
@@ -1541,7 +1638,7 @@ MegaUtils.prototype.getStorageState = async function(force) {
  */
 MegaUtils.prototype.getStorageQuota = async function() {
     'use strict';
-    const {result} = await api.req({a: 'uq', strg: 1, qc: 1}, {cache: -4});
+    const {result} = await api.req({a: 'uq', strg: 1, qc: 1}, {cache: -6});
 
     if (result.uslw === undefined) {
         result.uslw = 9000;
@@ -2582,35 +2679,6 @@ MegaUtils.prototype.noSleep = async function(stop, title) {
     }
 };
 
-MegaUtils.prototype.updatePaymentCardState = () => {
-    'use strict';
-    return api.req({a: 'cci'}).then((res) => {
-        const date = new Date();
-        const cardM = res.result.exp_month;
-        const cardY = res.result.exp_year;
-        const currentM = date.getMonth() + 1;
-        const currentY = date.getFullYear();
-        const currentD = date.getDate();
-        const isCurrentYear = currentY === cardY;
-        let state;
-        // Expired
-        if (currentY > cardY || ((currentM > cardM) && isCurrentYear)) {
-            state = 'exp';
-        }
-        // Expires this month
-        else if ((currentM === cardM) && isCurrentYear) {
-            state = 'expThisM';
-        }
-        // Expires next month (only show on/after the 15th of the current month)
-        else if ((((currentM + 1) === cardM) && (currentD >= 15)) && isCurrentYear) {
-            state = 'expNextM';
-        }
-        M.showPaymentCardBanner(state);
-        if (M.account && state) {
-            M.account.cce = state;
-        }
-    });
-};
 
 MegaUtils.prototype.fmEventLog = function(eid) {
     'use strict';

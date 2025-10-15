@@ -189,17 +189,12 @@ lazy(s4, 'main', () => {
                 return s4.ui.renderRoot();
             }
 
-            if (!u_attr.b) {
-                if (page !== 'fm/s4') {
-                    return loadSubPage('fm/s4');
-                }
-
-                renderActivation();
-                eventlog(500854);
-                return;
+            if (page !== 'fm/s4') {
+                return loadSubPage('fm/s4');
             }
 
-            return loadSubPage('fm');
+            renderActivation();
+            eventlog(500854);
         },
     });
 });

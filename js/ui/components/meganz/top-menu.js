@@ -325,26 +325,22 @@ class MegaTopMenu extends MegaMobileTopMenu {
             });
         }
 
-        // @todo: Show button for business account with activated S4 when ready
-        // if (!(u_attr.b && !u_attr.s4)) {
-        if (!u_attr.b) {
-            loggedInCD.splice(mega.lite.inLiteMode ? 3 : 4, 0, {
-                autoExpand: true,
-                text: l.obj_storage,
-                icon: 'sprite-fm-mono icon-bucket-triangle-thin-outline',
-                hasTree: u_attr.s4 ? 's4' : null,
-                treeWrapClass: 'js-s4-tree-panel',
-                name: 's4',
-                typeClassname: 'drive',
-                simpletip: l.obj_storage,
-                simpletipClass: 'small-sidebar-tip',
-                simpletipPos: 'right',
-                simpletipWrapper: 'body',
-                simpletipOffset: '-16',
-                eventLog: 500636,
-                binding: () => s4.main.render()
-            });
-        }
+        loggedInCD.splice(mega.lite.inLiteMode ? 3 : 4, 0, {
+            autoExpand: true,
+            text: l.obj_storage,
+            icon: 'sprite-fm-mono icon-bucket-triangle-thin-outline',
+            hasTree: u_attr.s4 ? 's4' : null,
+            treeWrapClass: 'js-s4-tree-panel',
+            name: 's4',
+            typeClassname: 'drive',
+            simpletip: l.obj_storage,
+            simpletipClass: 'small-sidebar-tip',
+            simpletipPos: 'right',
+            simpletipWrapper: 'body',
+            simpletipOffset: '-16',
+            eventLog: 500636,
+            binding: () => s4.main.render()
+        });
 
         return loggedInCD;
     }

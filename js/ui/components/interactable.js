@@ -151,6 +151,11 @@ class MegaInteractable extends MegaComponent {
             this.domNode.appendChild(elm);
             this.domNode.icon = {};
         }
+        if (iconClass === false) {
+            elm.remove();
+            delete this.domNode.icon;
+            return;
+        }
 
         elm.className = `${iconClass} left-icon`;
         this.domNode.icon.c = iconClass;
@@ -207,6 +212,11 @@ class MegaInteractable extends MegaComponent {
 
             this.domNode.appendChild(elm);
             this.domNode.rightIcon = {};
+        }
+        if (iconClass === false) {
+            elm.remove();
+            delete this.domNode.icon;
+            return;
         }
 
         elm.className = `${iconClass} right-icon`;

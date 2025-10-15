@@ -279,6 +279,7 @@ function pageregister() {
                                 signin.old.startLogin,
                                 signin.new.startLogin);
 
+                            mega.ui.onboardBusSub = 1;
                             delete localStorage.businessSubAc;
                         }
                     },

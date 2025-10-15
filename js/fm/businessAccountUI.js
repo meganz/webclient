@@ -1244,6 +1244,7 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
         const backupsInfo = subUserStats["3"] || emptyArray;
         const publicFolderInfo = subUserStats.ps || emptyArray;
         const publicFileInfo = subUserStats.pf || emptyArray;
+        const s4Info = subUserStats.s4 || emptyArray;
 
         totalStorage = subUserStats["ts"] || 0;
         totalBandwidth = subUserStats["dl"] || 0;
@@ -1256,7 +1257,7 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
 
         var totalStorageFormatted = numOfBytes(totalStorage, 2);
         var totalBandwidthFormatted = numOfBytes(totalBandwidth, 2);
-        var rootTotalFormatted = numOfBytes(rootInfo[0], 2);
+        const rootTotalFormatted = numOfBytes(rootInfo[0] - s4Info[0], 2);
         var rubbishTotalFormatted = numOfBytes(rubbishInfo[0], 2);
         var inshareInternalTotalFormatted = numOfBytes(inshareInternalInfo[0], 2);
         var inshareExternalTotalFormatted = numOfBytes(inshareExternalInfo[0], 2);
@@ -1264,6 +1265,7 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
         var outshareTotalInternalFormatted = numOfBytes(outshareInternalInfo[0], 2);
         const backupsTotalFormatted = numOfBytes(backupsInfo[0], 2);
         const linksTotalFormatted = numOfBytes(publicFolderInfo[0] + publicFileInfo[0], 2);
+        const s4TotalFormatted = numOfBytes(s4Info[0], 2);
 
         var versionsTotalFormatted = numOfBytes(rootInfo[3] + rubbishInfo[3]
             + inshareInternalInfo[3] + inshareExternalInfo[3] + backupsInfo[3], 2);
@@ -1294,6 +1296,10 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
         );
         var $versionsSection = $('.user-management-view-data .subaccount-view-used-data' +
             ' .used-storage-info.ba-version', $subAccountContainer);
+        const $s4Section = $(
+            '.user-management-view-data .subaccount-view-used-data .ba-s4',
+            $subAccountContainer
+        );
 
         var ffNumText = function(value, type) {
             var counter = value || 0;
@@ -1358,6 +1364,14 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
             + inshareInternalInfo[4] + inshareExternalInfo[4], 'file');
         $('.ff-occupy', $versionsSection).text(versionsTotalFormatted.size + ' ' + versionsTotalFormatted.unit);
         $('.file-number', $versionsSection).text(versionsFileNumText);
+
+        if (s4Info[0]) {
+            $s4Section.removeClass('hidden');
+            $('.ff-occupy', $s4Section).text(s4TotalFormatted.size + ' ' + s4TotalFormatted.unit);
+        }
+        else {
+            $s4Section.addClass('hidden');
+        }
     };
 
     // getting quotas
@@ -1403,6 +1417,7 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
         let rubbishTotal = 0;
         let outshareTotal = 0;
         let backupsTotal = 0;
+        let s4Total = 0;
 
         const emptyArray = [0, 0, 0, 0, 0];
         let currRoot;
@@ -1410,6 +1425,7 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
         let currInhareEx;
         let currRubbish;
         let currBackups;
+        let currS4;
 
         for (const sub in todayStats.u) {
             currRoot = todayStats.u[sub]["2"] || emptyArray;
@@ -1417,19 +1433,18 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
             currInhareEx = todayStats.u[sub]["ise"] || emptyArray;
             currRubbish = todayStats.u[sub]["4"] || emptyArray;
             currBackups = todayStats.u[sub]["3"] || emptyArray;
+            currS4 = todayStats.u[sub].s4 || emptyArray;
 
             rootTotal += currRoot[0];
             rubbishTotal += currRubbish[0];
             outshareTotal += currInhareEx[0];
             inshareTotal += currInhare[0];
             backupsTotal += currBackups[0];
+            s4Total += currS4[0];
         }
 
         totalStorage = rootTotal + rubbishTotal + outshareTotal + inshareTotal + backupsTotal;
-
-        // Get Object storgae size and reduce cloud drive size if needed
-        const { ts: s4Total = 0 } = 'utils' in s4 && s4.utils.getStorageData() || {};
-        rootTotal -= s4Total;
+        rootTotal -= s4Total; // Reduce cloud drive size if S4 data exists
 
         const totalStorageFormatted = numOfBytes(totalStorage, 2);
         const rootTotalFormatted = numOfBytes(rootTotal, 2);
@@ -1501,7 +1516,7 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
         }
 
         // Show Object storage is available
-        if (u_attr.s4) {
+        if (u_attr.s4 || s4Total) {
             $('.storage-division-container.s4-node', $storageAnalysisPie).removeClass('hidden');
             $('.storage-division-container.s4-node .storage-division-num', $storageAnalysisPie)
                 .text(s4TotalFormatted.size + ' ' + s4TotalFormatted.unit);
@@ -1652,8 +1667,12 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
         const values = Object.values(res).map(a => a[isTrfGraph ? 'tdl' : 'ts'] || 0);
         const divider = dashboardUI.getBarChartScale(values, $units);
         const isTBGraph = divider === 1024 * 1024 * 1024 * 1024;
-        const extraColor = u_attr.s4 ? 'blue' : 'yellow';
         const ftr = isTrfGraph ? 'dl' : 'st';
+
+        // Check if s4 is enabled or any of sub-user has s4 data
+        const isVisibleS4 = u_attr.s4 || u_attr.b && !!Object.values(res).some(
+            date => Object.values(date.u).some(data =>  data.s4[0] !== 0)
+        );
 
         const updateData = (name) => {
             filters[ftr] = name;
@@ -1662,7 +1681,7 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
 
         // Render legend boxes and filtering buttons
         const renderLegend = (ds = []) => {
-            if (!u_attr.s4) {
+            if (!isVisibleS4) {
                 return;
             }
             for (let i = -1; i < ds.length; ++i) {
@@ -1704,7 +1723,7 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
             const index = parseInt(elm.substr(6, 2), 10);
             const total = isTrfGraph ? res[elm].tdl : res[elm].ts || 0;
 
-            if (u_attr.s4) {
+            if (isVisibleS4) {
                 let s4 = 0;
                 for (const v of Object.values(res[elm].u || {})) {
                     s4 += isTrfGraph ? v.s4dl : v.s4 && v.s4[0] || 0;
@@ -1724,11 +1743,12 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
             }
         }
 
+        const extraColor = isVisibleS4 ? 'blue' : 'yellow';
         const datasets = [
             {
                 name: 'base',
                 label: l[18051],
-                helperLabel: u_attr.s4 ? l.cloud_drive_x : l.base_quota_v,
+                helperLabel: isVisibleS4 ? l.cloud_drive_x : l.base_quota_v,
                 backgroundColor: style.getPropertyValue('--label-red-hover').trim(),
                 borderWidth: 0,
                 data: chartBaseData,
@@ -1738,8 +1758,8 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
             },
             {
                 name: 'extra',
-                label: u_attr.s4 ? l.obj_storage : l.extra_quota,
-                helperLabel: u_attr.s4 ? l.object_storage_x : l.extra_quota,
+                label: isVisibleS4 ? l.obj_storage : l.extra_quota,
+                helperLabel: isVisibleS4 ? l.object_storage_x : l.extra_quota,
                 data: chartExtraData,
                 backgroundColor: style.getPropertyValue(`--label-${extraColor}-hover`).trim(),
                 hoverBackgroundColor: style.getPropertyValue(`--label-${extraColor}-hover`).trim(),
@@ -1750,7 +1770,7 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
         ];
 
         const filteredDatasets = datasets.filter(
-            (elm) => !u_attr.s4 || !filters[ftr] || filters[ftr] === elm.name
+            (elm) => !isVisibleS4 || !filters[ftr] || filters[ftr] === elm.name
         );
 
         renderLegend(datasets);

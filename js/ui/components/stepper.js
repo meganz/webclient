@@ -11,7 +11,10 @@ class MegaStepper extends MegaComponent {
 
     render() {
         this.domNode.textContent = '';
-        for (let index = 1; index < this.steps.length; index++) {
+        for (let index = 1; index < this.steps.length + 1; index++) {
+            if (this.steps[index - 1].noStepper) {
+                continue;
+            }
             const stepElement = this.createStepElement(this.steps[index - 1], index);
             this.domNode.appendChild(stepElement);
         }
@@ -47,7 +50,7 @@ class MegaStepper extends MegaComponent {
         stepContent.classList.add('step-content', `${stepPrefix}-step-content`);
 
         const stepIcon = document.createElement('div');
-        stepIcon.classList.add('step-icon', `${stepPrefix}-step-icon`, 'sprite-fm-mono');
+        stepIcon.classList.add('step-icon', `${stepPrefix}-step-icon`, 'sprite-fm-mono', 'simpletip');
 
         // Icon type depends on the step state
         if (stepElement.classList.contains('completed')) {
@@ -70,6 +73,9 @@ class MegaStepper extends MegaComponent {
         const stepTitle = document.createElement('div');
         stepTitle.classList.add('step-title', `${stepPrefix}-step-title`);
         stepTitle.innerText = step.label;
+        stepIcon.dataset.simpletip = step.label;
+        stepIcon.dataset.simpletipClass = 'small-stepper-tip';
+        stepIcon.dataset.simpletipposition = 'right';
 
         stepContent.append(stepIcon, stepTitle);
 

@@ -1542,7 +1542,7 @@ var notify = {
         // If user has not seen the welcome dialog before, show it and set ^!welDlg to 2 (seen)
         if (!notification.seen && !(u_attr.pf || u_attr.b) && !pro.propay.onPropayPage()) {
             mega.attr.get(u_handle, 'welDlg', -2, 1, (res) => {
-                if ((res | 0) === 1) {
+                if ((res | 0) === 1 && !notify.welcomeDialogShown) {
                     notify.createNewUserDialog(notification);
                     notify.welcomeDialogShown = true;
                     mega.attr.set('welDlg', 2, -2, true);

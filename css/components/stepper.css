@@ -27,6 +27,7 @@
 
 .mega-component.stepper .step .step-title {
     font: var(--mobile-font-caption-large-bold);
+    line-height: 16px;
     margin-inline-start: 16px;
 }
 
@@ -47,22 +48,25 @@
     position: relative;
 }
 
-.mega-component.stepper .primary-step:not(:last-child) > .step-content::before,
+.mega-component.stepper .primary-step > .step-content::before,
 .mega-component.stepper .secondary-step .step-content::before {
     content: '';
     position: absolute;
     left: 15px;
-    top: 32px;
+    bottom: 0;
     width: 3px;
     height: 28px;
     background-color: var(--mobile-text-disabled);
     border-radius: var(--mobile-border-radius-extra-small);
 }
 
-.rtl .mega-component.stepper .primary-step:not(:last-child) > .step-content::before,
+.rtl .mega-component.stepper .primary-step > .step-content::before,
 .rtl .mega-component.stepper .secondary-step .step-content::before {
     left: auto;
     right: 15px;
+}
+.mega-component.stepper .primary-step:last-child > .step-content::before {
+    visibility: hidden;
 }
 
 .mega-component.stepper .secondary-step .step-content::before {
@@ -93,9 +97,25 @@
     background-color: var(--mobile-button-brand);
 }
 
+.dark-direct-tooltip.simpletip-tooltip.small-stepper-tip {
+    display: none;
+}
+.dark-direct-tooltip.simpletip-tooltip.small-stepper-tip,
+.dark-direct-tooltip.simpletip-tooltip.small-stepper-tip .tooltip-arrow {
+    display: none;
+}
 @media only screen and (max-width: 1079px) {
     .mega-component.stepper .primary-step .step-title,
     .mega-component.stepper .primary-step .secondary-step-title  {
         display: none;
+    }
+
+    .dark-direct-tooltip.simpletip-tooltip.small-stepper-tip {
+        display: block;
+        background: var(--mobile-background-inverse);
+        color: var(--mobile-text-inverse);
+        font: var(--mobile-font-caption-large-regular);
+        padding: 12px;
+        line-height: 14px;
     }
 }

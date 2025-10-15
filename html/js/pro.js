@@ -173,7 +173,8 @@ var pro = {
                     var lmbps = {};
                     const durationsChecked = new Set();
 
-                    pro.blockPlans = d && localStorage.blockPlans && new Set(localStorage.blockPlans.split(','));
+                    pro.blockPlans = d && localStorage.blockPlans
+                        && new Set(localStorage.blockPlans.split(',').map(n => +n));
 
                     const {txn, tx, txva, l, txe} = results[0];
 
@@ -1582,6 +1583,51 @@ var pro = {
 
         return pro.planSearch.searchedPlans[searchKey] || false;
     },
+    /**
+     * Sorts the plan levels by storage, with flexi then business at the end
+     * @param {Array} planLevels - The plan levels to sort
+     * @returns {Array} - The sorted plan levels
+     */
+    sortPlans(planLevels) {
+        'use strict';
+
+        if (!Array.isArray(planLevels)) {
+            return [];
+        }
+
+        const variablePlans = pro.filter.simple.variableStorage;
+
+        return [...planLevels].sort((a, b) => {
+            a = +a;
+            b = +b;
+
+            const aIsVariable = variablePlans.has(a);
+            const bIsVariable = variablePlans.has(b);
+
+            if (aIsVariable && bIsVariable) {
+                return b - a;
+            }
+
+            if (aIsVariable) {
+                return 1;
+            }
+            if (bIsVariable) {
+                return -1;
+            }
+
+            const aObj = pro.getPlanObj(a);
+            const bObj = pro.getPlanObj(b);
+
+            if (!aObj || !bObj) {
+                if (d) {
+                    console.error(`No plan obj found for plan ${aObj ? b : a} ${bObj ? '' : 'or ' + b}`);
+                }
+                return a - b;
+            }
+
+            return aObj.storage - bObj.storage;
+        });
+    }
 };
 
 lazy(pro, 'yearlyDiscountPercentage', () => {
@@ -1638,10 +1684,9 @@ lazy(pro, 'filter', () => {
                 ]),
 
             // storageTransferDialogs: 11, 12, 13, 4, 1, 2, 3, 101 - plans that should be shown in the storage
-            // and transfer upsell dialogs
+            // and transfer upsell dialogs as the min recommended plan
             storageTransferDialogs:
                 new Set([
-                    pro.ACCOUNT_LEVEL_STARTER, pro.ACCOUNT_LEVEL_BASIC, pro.ACCOUNT_LEVEL_ESSENTIAL,
                     pro.ACCOUNT_LEVEL_PRO_LITE, pro.ACCOUNT_LEVEL_PRO_I, pro.ACCOUNT_LEVEL_PRO_II,
                     pro.ACCOUNT_LEVEL_PRO_III, pro.ACCOUNT_LEVEL_PRO_FLEXI
                 ]),
@@ -1654,10 +1699,10 @@ lazy(pro, 'filter', () => {
                     pro.ACCOUNT_LEVEL_PRO_LITE
                 ]),
 
-            // miniPlans: 11, 12, 13 - mini plans available to targeted users
+            // miniPlans: 11 - mini plans available to targeted users
             miniPlans:
                 new Set([
-                    pro.ACCOUNT_LEVEL_STARTER, pro.ACCOUNT_LEVEL_BASIC, pro.ACCOUNT_LEVEL_ESSENTIAL
+                    pro.ACCOUNT_LEVEL_STARTER
                 ]),
 
             // ninetyDayRewind: 11, 12, 13, 4 - plans that have up to 90 days rewind instead of up to 180 days
@@ -1674,11 +1719,12 @@ lazy(pro, 'filter', () => {
                     pro.ACCOUNT_LEVEL_PRO_III, pro.ACCOUNT_LEVEL_PRO_FLEXI
                 ]),
 
-            // core 4, 1, 2, 3 - plans with a set amount of storage and transfer and are available to most or all users
+            // core 12, 13, 4, 1, 2, 3
+            // - plans with a set amount of storage and transfer and are available to most or all users
             core:
                 new Set([
-                    pro.ACCOUNT_LEVEL_PRO_LITE, pro.ACCOUNT_LEVEL_PRO_I, pro.ACCOUNT_LEVEL_PRO_II,
-                    pro.ACCOUNT_LEVEL_PRO_III
+                    pro.ACCOUNT_LEVEL_BASIC, pro.ACCOUNT_LEVEL_ESSENTIAL, pro.ACCOUNT_LEVEL_PRO_LITE,
+                    pro.ACCOUNT_LEVEL_PRO_I, pro.ACCOUNT_LEVEL_PRO_II, pro.ACCOUNT_LEVEL_PRO_III
                 ]),
 
             // recommend: 1, 2, 3 - plans that are able to be recommended to users
@@ -1687,26 +1733,22 @@ lazy(pro, 'filter', () => {
                     pro.ACCOUNT_LEVEL_PRO_I, pro.ACCOUNT_LEVEL_PRO_II, pro.ACCOUNT_LEVEL_PRO_III
                 ]),
 
-            // TODO: Make this dynamic instead of hardcoding the values. Cannot guarantee no changes in the future.
-            // yearlyMiniPlans: 12, 13 - mini plans available to targeted users which allow yearly subscriptions
-            yearlyMiniPlans:
-                new Set([
-                    pro.ACCOUNT_LEVEL_BASIC, pro.ACCOUNT_LEVEL_ESSENTIAL
-                ]),
-
             // Plans that can show on the pricing page that come under the exclusive offers tab
             excTab: new Set([
-                pro.ACCOUNT_LEVEL_STARTER, pro.ACCOUNT_LEVEL_BASIC, pro.ACCOUNT_LEVEL_ESSENTIAL,
+                pro.ACCOUNT_LEVEL_STARTER,
             ]),
-            // Plans that can show on the pricing page that come under the exclusive offers tab
+
+            // Plans that can show on the pricing page that come under the pro/individual tab
             proTab: new Set([
-                pro.ACCOUNT_LEVEL_PRO_LITE, pro.ACCOUNT_LEVEL_PRO_I, pro.ACCOUNT_LEVEL_PRO_II,
-                pro.ACCOUNT_LEVEL_PRO_III,
+                pro.ACCOUNT_LEVEL_BASIC, pro.ACCOUNT_LEVEL_ESSENTIAL, pro.ACCOUNT_LEVEL_PRO_LITE,
+                pro.ACCOUNT_LEVEL_PRO_I, pro.ACCOUNT_LEVEL_PRO_II, pro.ACCOUNT_LEVEL_PRO_III,
             ]),
+
             // Plans that can show on the pricing page that come under the MEGA VPN tab
             vpnTab: new Set([
                 pro.ACCOUNT_LEVEL_FEATURE_VPN,
             ]),
+
             // Plans that can show on the pricing page that come under the MEGA PWM tab
             pwmTab: new Set([
                 pro.ACCOUNT_LEVEL_FEATURE_PWM,
@@ -1720,11 +1762,17 @@ lazy(pro, 'filter', () => {
                     pro.ACCOUNT_LEVEL_PRO_III, pro.ACCOUNT_LEVEL_PRO_FLEXI
                 ]),
 
-            // showFeatureInfo: 4, 1, 2, 3 - plans that should show feature info on propay page
+            // showFeatureInfo: 12, 13, 4, 1, 2, 3, 101 - plans that should show feature info on propay page
             showFeatureInfo:
                 new Set([
-                    pro.ACCOUNT_LEVEL_PRO_LITE, pro.ACCOUNT_LEVEL_PRO_I, pro.ACCOUNT_LEVEL_PRO_II,
-                    pro.ACCOUNT_LEVEL_PRO_III, pro.ACCOUNT_LEVEL_PRO_FLEXI,
+                    pro.ACCOUNT_LEVEL_BASIC, pro.ACCOUNT_LEVEL_ESSENTIAL, pro.ACCOUNT_LEVEL_PRO_LITE,
+                    pro.ACCOUNT_LEVEL_PRO_I, pro.ACCOUNT_LEVEL_PRO_II, pro.ACCOUNT_LEVEL_PRO_III,
+                    pro.ACCOUNT_LEVEL_PRO_FLEXI,
+                ]),
+
+            variableStorage:
+                new Set([
+                    pro.ACCOUNT_LEVEL_PRO_FLEXI, pro.ACCOUNT_LEVEL_BUSINESS
                 ]),
         },
 

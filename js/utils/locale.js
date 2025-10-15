@@ -1493,7 +1493,14 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[S2]', '<span class="get-more-quota">')
         .replace('[S3]', '<span class="learn-more">')
         .replace(/\[\/S\d]/g, '</span>');
-
+    l.dl_limited_tq_pro = escapeHTML(l.dl_limited_tq_pro)
+        .replace('[A]',
+            `<a target="_blank" href="https://help.mega.io/plans-storage/space-storage/transfer-quota">`)
+        .replace('[/A]', '</a>')
+        .replace('[S1]', '<span>')
+        .replace('[S2]', '<span class="get-more-quota">')
+        .replace('[S3]', '<span class="learn-more">')
+        .replace(/\[\/S\d]/g, '</span>');
     l.dl_tq_exceeded_mini = escapeHTML(l.dl_tq_exceeded_mini)
         .replace('[A]',
                  `<a target="_blank" href="https://help.mega.io/plans-storage/space-storage/transfer-quota">`)

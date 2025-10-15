@@ -64,6 +64,8 @@ lazy(pro, 'proplan2', () => {
 
     let resizeHandler = false;
 
+    const PLANS_PER_TAB_LIMIT = 4;
+
     const allowedPeriods = new Set([1, 12]);
 
     /**
@@ -1275,6 +1277,7 @@ lazy(pro, 'proplan2', () => {
     const fillPlansInfo = (period) => {
 
         let tab = 'pro';
+        let count = 0;
         if (typeof period === 'object') {
             tab = period.tab;
             period = period.duration;
@@ -1369,6 +1372,12 @@ lazy(pro, 'proplan2', () => {
             }
 
             if (months !== period || planNum === pro.ACCOUNT_LEVEL_BUSINESS) {
+                continue;
+            }
+
+            count++;
+            if (count > PLANS_PER_TAB_LIMIT) {
+                // continue instead of break so that features coming after this are still handled
                 continue;
             }
 

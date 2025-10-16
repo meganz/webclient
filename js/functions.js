@@ -1079,6 +1079,9 @@ function str_mtrunc(str, len) {
 }
 
 function getTransfersPercent() {
+    if (getTransfersPercent.cache && getTransfersPercent.cache.exp > Date.now()) {
+        return getTransfersPercent.cache;
+    }
     var dl_r = 0;
     var dl_t = 0;
     var ul_r = 0;
@@ -1105,14 +1108,15 @@ function getTransfersPercent() {
         }
     }
     for (i = ul_queue.length; i--;) {
-        var tu = tp['ul_' + ul_queue[i].id];
+        const q = ul_queue[i];
+        var tu = tp['ul_' + q.id];
 
         if (tu) {
             ul_r += tu[0];
             ul_t += tu[1];
         }
         else {
-            ul_t += ul_queue[i].size || 0;
+            ul_t += q.size || 0;
         }
     }
     if (dl_t) {
@@ -1124,12 +1128,14 @@ function getTransfersPercent() {
         ul_r += tp['ulc'] || 0;
     }
 
-    return {
+    getTransfersPercent.cache = {
         ul_total: ul_t,
         ul_done: ul_r,
         dl_total: dl_t,
-        dl_done: dl_r
+        dl_done: dl_r,
+        exp: Date.now() + 1000,
     };
+    return getTransfersPercent.cache;
 }
 
 function percent_megatitle() {
@@ -1154,30 +1160,6 @@ function percent_megatitle() {
         $.transferprogress = Object.create(null);
     }
     megatitle(t);
-
-    var d_deg = 360 * x_dl / 100;
-    var u_deg = 360 * x_ul / 100;
-    var $dl_rchart = $('.transfers .download .nw-fm-chart0.right-c p');
-    var $dl_lchart = $('.transfers .download .nw-fm-chart0.left-c p');
-    var $ul_rchart = $('.transfers .upload .nw-fm-chart0.right-c p');
-    var $ul_lchart = $('.transfers .upload .nw-fm-chart0.left-c p');
-
-    if (d_deg <= 180) {
-        $dl_rchart.css('transform', 'rotate(' + d_deg + 'deg)');
-        $dl_lchart.css('transform', 'rotate(0deg)');
-    }
-    else {
-        $dl_rchart.css('transform', 'rotate(180deg)');
-        $dl_lchart.css('transform', 'rotate(' + (d_deg - 180) + 'deg)');
-    }
-    if (u_deg <= 180) {
-        $ul_rchart.css('transform', 'rotate(' + u_deg + 'deg)');
-        $ul_lchart.css('transform', 'rotate(0deg)');
-    }
-    else {
-        $ul_rchart.css('transform', 'rotate(180deg)');
-        $ul_lchart.css('transform', 'rotate(' + (u_deg - 180) + 'deg)');
-    }
 }
 
 /**
@@ -2448,7 +2430,7 @@ function odqPaywallDialogTexts(user_attr, accountData) {
 
     // In here, it's guaranteed that we have pro.membershipPlans,
     // but we will check for error free logic in case of changes
-    let neededPro = 4;
+    let neededPro = 1;
     const minPlan = pro.filter.lowestRequired(accountData.space_used, 'storageTransferDialogs');
 
     if (minPlan) {

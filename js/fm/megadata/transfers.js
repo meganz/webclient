@@ -614,16 +614,9 @@ MegaData.prototype.dlprogress = function(id, perc, bl, bt, kbps, dl_queue_num, f
                 $tr.find('.left-c p').css('transform', 'rotate(' + (transferDeg - 180) + 'deg)');
             }
             if (retime > 0) {
-                var title = '';
-                try {
-                    title = new Date((unixtime() + retime) * 1000).toLocaleString();
-                }
-                catch (ex) {
-                }
                 $tr.find('.eta')
                     .text(secondsToTime(retime))
-                    .removeClass('unknown')
-                    .attr('title', title);
+                    .removeClass('unknown');
             }
             else {
                 $tr.find('.eta').addClass('unknown').text('');
@@ -870,7 +863,7 @@ MegaData.prototype.getTransferTableLengths = function() {
     if (!te) {
         return false;
     }
-    var used = te.domTable.querySelectorAll('tr').length;
+    var used = te.domTable.children.length;
     var size = (Math.ceil(te.domScrollingTable.offsetHeight / 32) || 27) + 1;
     return { size: size, used: used, left: size - used };
 };
@@ -1345,7 +1338,10 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
             }
             else {
                 u = Array.prototype.concat.apply([], Object.values(queue).concat(files));
-                M.createFolders(paths, toChat ? M.cf.p || M.RootID : target).always(function(res) {
+                M.createFolders(paths, toChat ? M.cf.p || M.RootID : target, {
+                    pitagFrom: 'U',
+                    pitagTrigger: u[0].pitagTrigger
+                }).always(res => {
                     if (d && res !== paths) {
                         ulmanager.logger.debug('Failed to create paths hierarchy...', res);
                     }
@@ -1993,9 +1989,6 @@ function fm_tfsupdate() {
     'use strict';
     /* jshint -W074 */
 
-    var i = 0;
-    var u = 0;
-
     var tfse = M.getTransferElements();
     if (!tfse) {
         return false;
@@ -2028,23 +2021,8 @@ function fm_tfsupdate() {
     }
 
     var $trs = domTable.querySelectorAll('tr:not(.transfer-completed)');
-    i = $trs.length;
-    while (i--) {
-        if ($trs[i].classList.contains('transfer-upload')) {
-            ++u;
-        }
-    }
-    i = $trs.length - u;
-    for (var k in M.tfsdomqueue) {
-        if (k[0] === 'u') {
-            ++u;
-        }
-        else {
-            ++i;
-        }
-    }
 
-    M.pendingTransfers = i + u;
+    M.pendingTransfers = $trs.length + Object.keys(M.tfsdomqueue).length;
     tfsheadupdate();
 }
 

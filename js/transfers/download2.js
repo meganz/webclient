@@ -1800,22 +1800,12 @@ var dlmanager = {
                 .toggleClass('starter', miniPlanId === pro.ACCOUNT_LEVEL_STARTER)
                 .attr('data-payment', miniPlanId)
                 .attr('data-period', 1);
-
-            if (pro.filter.simple.yearlyMiniPlans.has(miniPlanId)) {
-                const $yearlyCard = $pricingBoxTemplate.clone(true).appendTo($pricingBoxTemplate.parent());
-                $yearlyCard
-                    .removeClass('template')
-                    .addClass(`pro${miniPlanId} duration12`)
-                    .attr('data-payment', miniPlanId)
-                    .attr('data-period', 12);
-
-                $('.pricing-page.plan-button', $monthlyCard).removeClass('positive');
-            }
         }
         else {
-            const planIds = [4, 1, 2, 3];
+            const planIds = pro.filter.plans.coreM.map(p => p[pro.UTQA_RES_INDEX_ACCOUNTLEVEL]);
 
-            for (const id of planIds) {
+            for (let i = 0; i < Math.min(planIds.length, 4); i++) {
+                const id = planIds[i];
                 const $newNode = $pricingBoxTemplate.clone(true).appendTo($pricingBoxTemplate.parent());
                 $newNode.removeClass('template').addClass(`pro${id}`).attr('data-payment', id);
             }

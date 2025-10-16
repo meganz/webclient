@@ -705,6 +705,8 @@ var ulmanager = {
             i: requesti
         };
 
+        M.setPitag(req, 'U', file);
+
         var ctx = {
             file: file,
             target: target,

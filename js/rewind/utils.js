@@ -583,13 +583,30 @@ lazy(mega, 'rewindUtils', () => {
         }
 
         _addToRequests(requests, target, nodes) {
-            requests.push({
+            const req = {
                 a: 'pd',
                 v: 3,
                 sm: 1,
                 t: target,
                 n: nodes,
-            });
+            };
+
+            const sn = M.getShareNodesSync(target, null, true);
+            if (sn.length) {
+                const nodesInDict = [];
+                const handles = [];
+
+                for (let i = 0; i < nodes.length; i++) {
+                    const {h} = nodes[i];
+                    nodesInDict.push(mega.rewind.nodeDictionary[h]);
+                    handles.push(h);
+                }
+
+                req.cr = crypto_makecr(nodesInDict, sn, false);
+                req.cr[1].push(...handles);
+            }
+
+            requests.push(req);
         }
 
         async _getDupeData(handlesToCheck, target) {

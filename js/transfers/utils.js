@@ -491,7 +491,7 @@ function bindTransfersMassEvents(context) {
                     ids = [...Object.keys(M.tfsdomqueue), ...$trs.attrs('id')];
                 }
                 else {
-                    ids = $('.transfer-progress-widget .transfer-task-row:not(.completed)', '.fmholder').attrs('id');
+                    ids = mega.tpw.getIncompleteIds();
                     ids = ids.map((attr) => {
                         return attr.substr(4);
                     });

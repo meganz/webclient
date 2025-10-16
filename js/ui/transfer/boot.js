@@ -293,6 +293,7 @@ mBroadcaster.once('boot_done', () => {
                 }
             }
         },
+        setPitag: () => false,
         isOutShare: () => false,
         getNodeRights: () => false,
         isInvalidUserStatus: () => false,

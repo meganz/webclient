@@ -236,4 +236,8 @@ window.addEventListener('popstate', () => {
     if (mega.ui.sheet.visible) {
         mega.ui.sheet.hide();
     }
+
+    if (mega.ui.onboarding && mega.ui.onboarding.sheet && mega.ui.onboarding.sheet.dialog.visible) {
+        mega.ui.onboarding.sheet.hide();
+    }
 });

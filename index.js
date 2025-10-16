@@ -404,6 +404,12 @@ function init_page() {
             return;
         }
         $.lastSeenFilelink = getSitePath();
+
+        if (fminitialized) {
+            // Clean up internal state in case we're navigating back to a public-link
+            M.currentdirid = M.RootID = M.currentCustomView = false;
+            delete $.mcImport;
+        }
     }
 
     // Rmove business class to affect the top header

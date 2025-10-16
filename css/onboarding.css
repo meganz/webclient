@@ -152,8 +152,6 @@
         opacity: 0;
     }
 }
-.onboarding-control-panel .onboarding-step-link.hotspot::before,
-.onboarding-control-panel .onboarding-step-link.hotspot::after,
 .button.onboarding-hotspot-animation-rect::before,
 .button.onboarding-hotspot-animation-rect::after,
 .js-more-menu.onboarding-hotspot-animation-rect::before,
@@ -171,7 +169,6 @@
     height: calc(100% - 6px);
     top: 3px;
 }
-.onboarding-control-panel .onboarding-step-link.hotspot::after,
 .button.onboarding-hotspot-animation-rect::after {
     animation-name: onboarding-hotspot-rect-2;
     animation-delay: 400ms;
@@ -187,235 +184,6 @@
     top: 6px;
     width: 64%;
     z-index: 4;
-}
-
-/* Onboarding control panel */
-
-.onboarding-control-panel {
-    border-radius: 12px;
-    margin: 8px 24px;
-    position: relative;
-    box-shadow: inset 0 0 0 2px var(--table-border);
-    transition: 200ms linear;
-}
-.rtl .onboarding-control-panel {
-    direction: rtl;
-}
-.onboarding-control-panel .onboarding-control-panel-content {
-    display: flex;
-    height: 100%;
-    align-items: center;
-    overflow: hidden;
-    position: relative;
-    border-radius: 12px;
-    background: var(--surface-grey-1);
-}
-.onboarding-control-panel .mega-button.close {
-    position: absolute;
-    right: 15px;
-    top: 15px;
-    z-index: 2;
-}
-.rtl .onboarding-control-panel .mega-button.close {
-    right: auto;
-    left: 15px;
-}
-.onboarding-control-panel .onboarding-control-panel-title {
-    font: var(--text-h3-bold);
-    color: var(--text-color-high);
-    text-align: start;
-    height: 80px;
-    width: calc(30% - 55px);
-    display: flex;
-    align-items: center;
-    position: relative;
-    margin-inline-start: 24px;
-    flex-shrink: 0;
-    flex-grow: 0;
-}
-.onboarding-control-panel-title-bg,
-.onboarding-control-panel-title-bg::after {
-    content: '';
-    height: 100%;
-    width: 100%;
-    position: absolute;
-    background-image: var(--onboarding-control-panel-fill);
-    background-size: contain;
-    background-position: right;
-    background-repeat: no-repeat;
-    z-index: 0;
-}
-.onboarding-control-panel-title-bg {
-    transform: skew(-20deg);
-    left: -15px;
-    width: 30%;
-    overflow: hidden;
-}
-.rtl .onboarding-control-panel-title-bg {
-    transform: skew(20deg) scaleX(-1);
-    left: auto;
-    right: -15px;
-}
-.onboarding-control-panel-title-bg::after {
-    background-image: url(../images/mega/achievements/header_backdrop.svg);
-    right: -5px;
-    transform: skewX(20deg);
-}
-.rtl .onboarding-control-panel-title-bg::after {
-    right: -15px;
-    transform: skewX(20deg);
-}
-.onboarding-control-panel .onboarding-control-panel-step {
-    text-align: start;
-    vertical-align: middle;
-    display: flex;
-    height: 100%;
-    width: 70%;
-    position: relative;
-    margin-inline-end: 36px;
-    margin-inline-start: 30px;
-    align-items: center;
-}
-.onboarding-control-panel .onboarding-step-link {
-    padding: 0 var(--outer-padding);
-    margin: 0 12px;
-    min-height: 32px;
-    z-index: 2;
-    overflow: visible;
-}
-.onboarding-control-panel .onboarding-step-link.complete {
-    cursor: default;
-}
-.onboarding-control-panel .onboarding-step-link .onboarding-step {
-    --width: 24px;
-    --height: 24px;
-    border-radius: 100%;
-    font-style: normal;
-    position: relative;
-}
-.onboarding-control-panel .onboarding-step-link.active .onboarding-step,
-.onboarding-control-panel .onboarding-step-link.complete .onboarding-step {
-    background: var(--button-fill-blue);
-    color: var(--text-color-white-high);
-    position: relative;
-    border: none;
-    box-shadow: none;
-}
-.onboarding-control-panel .onboarding-step-link.active .onboarding-step::before {
-    content: '';
-    position: absolute;
-    border-radius: 50%;
-    width: 28px;
-    height: 28px;
-    border: 2px solid var(--label-blue);
-}
-.onboarding-control-panel .onboarding-step-link:not(.active):not(.complete):hover .onboarding-step {
-    background: var(--neutral-hover);
-}
-.onboarding-control-panel .onboarding-step-link.complete .onboarding-step {
-    cursor: default;
-}
-.onboarding-control-panel .onboarding-step-link .onboarding-step-complete-icon,
-.onboarding-control-panel .onboarding-step-link.complete .onboarding-step .onboarding-step-count {
-    display: none;
-}
-.onboarding-control-panel .onboarding-step-link.complete .onboarding-step-complete-icon {
-    --mask-color: var(--text-color-white-high);
-    display: block;
-    --icon-size: 16px;
-}
-.onboarding-control-panel .onboarding-step-link span {
-    font: var(--text-body1);
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    display: inline;
-}
-.onboarding-control-panel .onboarding-step-link.complete span {
-    color: var(--text-color-low);
-}
-.onboarding-control-panel .onboarding-control-panel-dismiss,
-.onboarding-control-panel .onboarding-control-panel-complete {
-    min-height: 80px;
-    display: flex;
-    align-items: center;
-    font: var(--text-body1);
-    color: var(--text-color-high);
-}
-.onboarding-control-panel .onboarding-control-panel-dismiss *,
-.onboarding-control-panel .onboarding-control-panel-complete * {
-    display: inline-block;
-    vertical-align: middle;
-}
-.onboarding-control-panel .onboarding-control-panel-dismiss .mega-button,
-.onboarding-control-panel .onboarding-control-panel-complete .mega-button {
-    margin-inline-start: 8px;
-    margin-inline-end: 0;
-    flex: 0 0 auto;
-}
-.onboarding-control-panel .onboarding-control-panel-dismiss .question-content,
-.onboarding-control-panel .onboarding-control-panel-complete .question-content {
-    margin-inline-start: 10px;
-    margin-inline-end: auto;
-    font: var(--text-body1);
-}
-.onboarding-control-panel .onboarding-control-panel-dismiss {
-    padding: 0 24px;
-    border-radius: 12px;
-    background: var(--surface-grey-1);
-}
-.onboarding-control-panel .onboarding-control-panel-complete {
-    background: var(--label-blue);
-    color: var(--text-color-white-high);
-    height: auto;
-    min-height: 56px;
-    margin: 0;
-    border-radius: 8px;
-}
-.onboarding-control-panel .onboarding-control-panel-complete i {
-    --mask-color: var(--text-color-white-high);
-}
-.onboarding-control-panel .onboarding-control-panel-complete .icon-accept {
-    margin-inline-start: 17px;
-    margin-inline-end: 0;
-    flex: 0 0 auto;
-}
-.onboarding-control-panel .onboarding-control-panel-complete .question-content {
-    font: var(--text-h3-bold);
-    margin-inline-start: 13px;
-    margin-inline-end: 36px;
-    vertical-align: middle;
-}
-.onboarding-control-panel .onboarding-control-panel-complete .question-content a,
-.onboarding-control-panel .onboarding-control-panel-complete .question-content a:visited,
-.onboarding-control-panel .onboarding-control-panel-complete .question-content a:active {
-    font: var(--text-body1);
-    vertical-align: middle;
-    text-decoration: underline;
-    color: var(--text-color-white-high);
-}
-
-/* Small width view for control panel */
-@media only screen and (max-width: 1100px) {
-
-    .onboarding-control-panel-title-bg {
-        display: none;
-    }
-    .onboarding-control-panel .onboarding-control-panel-content {
-        flex-wrap: wrap;
-        height: auto;
-    }
-    .onboarding-control-panel .onboarding-control-panel-title {
-        height: auto;
-        width: auto;
-        margin-top: 24px;
-        margin-bottom: 18px;
-    }
-    .onboarding-control-panel .onboarding-control-panel-step {
-        width: 100%;
-        margin-bottom: 24px;
-        margin-inline-start: 6px;
-    }
 }
 
 /* v4 onboarding end */
@@ -458,3 +226,95 @@
     width: auto;
     margin: inherit;
 }
+
+/* MEGA Pass otp promo dialog end */
+
+/* Cloud drive new user onboarding */
+.mega-on-boarding .main-content .image-wrapper.qr-block {
+    width: calc(100% - 80px);
+    box-sizing: border-box;
+    min-height: 224px;
+    height: 224px;
+    margin: 12px 40px;
+    background: var(--mobile-surface-1);
+    border-radius: 8px;
+    display: flex;
+}
+.mega-on-boarding .main-content .image-wrapper .app-qr-image {
+    margin: auto;
+    background-image: url("../../images/mega/go-qr.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+    width: 140px;
+    height: 140px;
+}
+.mega-on-boarding .main-content .image-wrapper .cd-onboard-1 {
+    background-image: url("../../images/onboarding/cloud_ob_1.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+    width: 100%;
+    height: 270px;
+    border-radius: 8px;
+}
+.mega-on-boarding .main-content .image-wrapper .cd-onboard-2 {
+    background-image: url("../../images/onboarding/cloud_ob_2.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+    width: 100%;
+    height: 240px;
+    border-radius: 8px;
+}
+.mega-on-boarding .main-content .image-wrapper .cd-onboard-3 {
+    background-image: url("../../images/onboarding/cloud_ob_3.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+    width: 100%;
+    height: 240px;
+    border-radius: 8px;
+}
+.menu-container.ob-upload-menu {
+    z-index: 102;
+}
+.mega-on-boarding .main-content .content-block.cd-onboard {
+    color: var(--mobile-text-secondary);
+    font: var(--mobile-font-caption-large-regular);
+    margin-top: 16px;
+    --icon-size: 24px;
+    --mask-color: var(--mobile-icon-secondary);
+}
+.mega-on-boarding .main-content .content-block.cd-onboard.image {
+    margin-top: 8px;
+}
+.mega-on-boarding .main-content .cd-onboard .content-title {
+    font: var(--mobile-font-caption-large-bold);
+    margin: 12px 0 8px;
+}
+.mega-on-boarding .main-content .cd-onboard .content-row {
+    display: flex;
+    min-height: 40px;
+    padding: 8px 40px;
+    align-items: center;
+    box-sizing: border-box;
+}
+.mega-on-boarding .main-content .cd-onboard .content-row.app-store {
+    padding: 8px 40px 0;
+    margin: 24px 0 4px;
+}
+.mega-on-boarding .main-content .cd-onboard .content-row i {
+    margin-inline-end: 16px;
+}
+.mega-on-boarding .main-content .cd-onboard .content-footer {
+    font: var(--mobile-font-caption-small-regular);
+    margin-top: 24px;
+}
+.mega-on-boarding .main-content .cd-onboard .app-store-link {
+    height: 40px;
+    overflow: hidden;
+}
+.mega-on-boarding .main-content .cd-onboard .app-store-link.android img {
+    height: 60px;
+    object-position: -8px -10px;
+    margin-inline-start: 16px;
+}
+
+/* Cloud drive new user onboarding end */

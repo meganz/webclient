@@ -29,6 +29,7 @@ class MegaOnboardingJourney {
                 imageClass: step.imageClass || '',
                 next: step.next,
                 skip: step.skip,
+                back: step.back,
                 customContent: step.customContent
             };
 
@@ -45,7 +46,8 @@ class MegaOnboardingJourney {
                     imageClass: secondaryStep.imageClass || '',
                     customContent: secondaryStep.customContent,
                     next: secondaryStep.next,
-                    skip: secondaryStep.skip
+                    skip: secondaryStep.skip,
+                    back: secondaryStep.back,
                 };
 
                 stepConfigs.push(secondaryStepConfig);
@@ -62,6 +64,16 @@ class MegaOnboardingJourney {
             parentNode: document.body,
             componentClassname: this.options.componentClassname || 'mega-sheet on-boarding',
             wrapperClassname: this.options.wrapperClassname || 'sheet'
+        });
+        this.dialog.on('click.context', () => {
+            if (mega.ui.menu.name) {
+                mega.ui.menu.hide();
+                if (this.next.active) {
+                    this.next.active = false;
+                }
+                // Remain overlayed.
+                document.documentElement.classList.add('overlayed');
+            }
         });
         this.megaOnboardingDiv = document.createElement('div');
         this.megaOnboardingDiv.className = this.options.contentClassname || 'mega-on-boarding';
@@ -113,7 +125,7 @@ class MegaOnboardingJourney {
         }
 
         if (titleText) {
-            const title = document.createElement('h1');
+            const title = document.createElement('h2');
             title.textContent = titleText;
             step.appendChild(title);
         }
@@ -158,6 +170,14 @@ class MegaOnboardingJourney {
             this.stepConfigs[0] &&
             this.stepConfigs[0].next &&
             this.stepConfigs[0].next.text || l[556];
+        const nextLeftIcon =
+            this.stepConfigs[0] &&
+            this.stepConfigs[0].next &&
+            this.stepConfigs[0].next.leftIcon || undefined;
+        const nextRightIcon =
+            this.stepConfigs[0] &&
+            this.stepConfigs[0].next &&
+            this.stepConfigs[0].next.rightIcon || undefined;
         const skipText =
             this.stepConfigs[0] &&
             this.stepConfigs[0].skip &&
@@ -166,20 +186,34 @@ class MegaOnboardingJourney {
             this.stepConfigs[0] &&
             this.stepConfigs[0].next &&
             this.stepConfigs[0].next.disabled || false;
+        const backText =
+            this.stepConfigs[0] &&
+            this.stepConfigs[0].back &&
+            this.stepConfigs[0].back.text || l[822];
 
         this.next = new MegaButton({
             parentNode: actions,
             text: nextText,
             disabled: nextDisabled,
             componentClassname: 'primary next-button',
-            onClick: () => this.handleNext()
+            icon: nextLeftIcon,
+            rightIcon: nextRightIcon,
+            onClick: (ev) => this.handleNext(ev)
         });
 
         this.skip = new MegaButton({
             parentNode: actions,
             text: skipText,
             componentClassname: 'secondary',
-            onClick: () => this.handleSkip()
+            onClick: (ev) => this.handleSkip(ev)
+        });
+
+        this.back = new MegaButton({
+            parentNode: actions,
+            text: backText,
+            type: 'text',
+            componentClassname: 'back-button',
+            onClick: (ev) => this.handleBack(ev),
         });
 
         return actions;
@@ -190,7 +224,11 @@ class MegaOnboardingJourney {
             name: this.options.dialogName || 'Mega-Onboarding',
             contents: [this.megaOnboardingDiv],
             showClose: this.options.showClose || false,
-            preventBgClosing: this.options.preventBgClosing || true
+            preventBgClosing: this.options.preventBgClosing || true,
+            onClose: this.options.onClose || nop,
+            onShow: () => {
+                Ps.initialize(this.mainContent.children[0]);
+            }
         });
     }
 
@@ -202,11 +240,39 @@ class MegaOnboardingJourney {
         const currentConfig = this.stepConfigs[this.currentStepIndex];
 
         if (currentConfig) {
-            this.next.text = currentConfig.next && currentConfig.next.text || l[556];
+            if (currentConfig.next) {
+                const { text, leftIcon, rightIcon } = currentConfig.next;
+                this.next.text = text || l[556];
+                this.next.icon = leftIcon || false;
+                if (rightIcon) {
+                    this.next.rightIcon = rightIcon;
+                    this.next.rightIconSize = 24;
+                }
+                else {
+                    this.next.rightIcon = false;
+                }
+            }
             this.skip.text = currentConfig.skip && currentConfig.skip.text || l.mega_pass_onboarding_skip;
             this.next.disabled = currentConfig.next && currentConfig.next.disabled || false;
 
-            if (this.currentStepIndex === this.stepConfigs.length - 1) {
+            if (this.currentStepIndex === this.stepConfigs.length - 1 || !currentConfig.skip) {
+                this.skip.hide();
+            }
+            else if (currentConfig.skip) {
+                this.skip.show();
+            }
+
+            if (currentConfig.back) {
+                this.back.show();
+            }
+            else {
+                this.back.hide();
+            }
+
+            if (currentConfig.skip) {
+                this.skip.show();
+            }
+            else {
                 this.skip.hide();
             }
 
@@ -214,6 +280,9 @@ class MegaOnboardingJourney {
             const mainContentDivs = this.megaOnboardingDiv.querySelectorAll('.main-content-div');
             for (let i = 0; i < mainContentDivs.length; i++) {
                 mainContentDivs[i].classList.add('hidden');
+                if (mainContentDivs[i].classList.contains('ps')) {
+                    Ps.destroy(mainContentDivs[i]);
+                }
             }
 
             if (forceRedraw || !this.createdSteps[currentConfig.id]) {
@@ -247,53 +316,50 @@ class MegaOnboardingJourney {
                 this.megaOnboardingDiv.querySelector(`.main-content-${currentConfig.id.replace(/\./g, '_')}`);
             if (currentDiv) {
                 currentDiv.classList.remove('hidden');
+                Ps.initialize(currentDiv);
             }
 
             this.stepper.setStep(Number(currentConfig.id));
         }
     }
 
-    handleNext() {
-        const currentConfig = this.stepConfigs[this.currentStepIndex];
+    procAction(origEv, action, event) {
+        if (typeof action === 'function') {
+            action(origEv);
+        }
+        else if (typeof action === 'number') {
+            this.goToStep(Number(action));
+        }
+        else {
+            this.hide();
+        }
 
-        if (currentConfig && currentConfig.next) {
-            const {action, event} = currentConfig.next;
-
-            if (typeof action === 'function') {
-                action();
-            }
-            else if (typeof action === 'number') {
-                this.goToStep(Number(action));
-            }
-            else {
-                this.hide();
-            }
-
-            if (event) {
-                eventlog(event);
-            }
+        if (event) {
+            eventlog(event);
         }
     }
 
-    handleSkip() {
+    handleNext(ev) {
+        const currentConfig = this.stepConfigs[this.currentStepIndex];
+
+        if (currentConfig && currentConfig.next) {
+            this.procAction(ev, currentConfig.next.action, currentConfig.next.event);
+        }
+    }
+
+    handleSkip(ev) {
         const currentConfig = this.stepConfigs[this.currentStepIndex];
 
         if (currentConfig && currentConfig.skip) {
-            const {action, event} = currentConfig.skip;
+            this.procAction(ev, currentConfig.skip.action, currentConfig.skip.event);
+        }
+    }
 
-            if (typeof action === 'function') {
-                action();
-            }
-            else if (typeof action === 'number') {
-                this.goToStep(action);
-            }
-            else {
-                this.hide();
-            }
+    handleBack(ev) {
+        const currentConfig = this.stepConfigs[this.currentStepIndex];
 
-            if (event) {
-                eventlog(event);
-            }
+        if (currentConfig && currentConfig.back) {
+            this.procAction(ev, currentConfig.back.action, currentConfig.back.event);
         }
     }
 

@@ -910,17 +910,6 @@ pro.proplan = {
                 //         planObj.correlatedPlan.price, baseCurrency, 'narrowSymbol') + '*';
                 //     $('span', $monthlyPrice).text(perMonthPrice);
                 // }
-
-                // TODO: Make yearlyMiniPlans calculated instead of hardcoded
-                if (pro.filter.simple.yearlyMiniPlans.has(planNum)) {
-                    const $periodSubTitle = $('.pricing-page.period-subtitle', $currentBox);
-                    $periodSubTitle.text(periodIsYearly ? l.yearly_unit : l[918]);
-                    if (saveUpTo) {
-                        const savingsString = l.yearly_plan_saving.replace('%1', saveUpTo);
-                        $('.pricing-page.plan-saving', $currentBox).text(savingsString).removeClass('hidden');
-                    }
-                }
-
                 $currencyAndPeriod.text(billingPeriodText);
             }
 

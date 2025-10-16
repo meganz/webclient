@@ -524,6 +524,10 @@ lazy(mega, 'rewind', () => {
             return currentDate;
         }
 
+        getUpgradeSectionData() {
+            return this.accountType === ACCOUNT_TYPE_FREE ? l.rewind_upgrade_info_text : null;
+        }
+
         getDatepickerOverlayContent() {
             return this.accountType === ACCOUNT_TYPE_FREE ?
                 l.rewind_datepicker_overlay_free_days : null;
@@ -1958,6 +1962,22 @@ lazy(mega, 'rewind', () => {
         }
 
         /**
+         * Sets valid view mode (0) compact list in case current one is gallery
+         * @param {String} h - node handle
+         * @return {void}
+         */
+        _setValidViewMode(h) {
+            if (getFmViewMode(h) === 2) {
+                if (fmconfig.uiviewmode | 0) {
+                    mega.config.set('viewmode', 0);
+                }
+                else {
+                    fmviewmode(h, 0);
+                }
+            }
+        }
+
+        /**
          * Returns true whether redirect must be done
          * @param {String} selectedHandle - current selected handle
          * @returns {Boolean}
@@ -1971,17 +1991,13 @@ lazy(mega, 'rewind', () => {
 
                 if (selectedHandle !== M.currentdirid) {
                     const nodeParent = M.getNodeParent(selectedHandle);
+                    this._setValidViewMode(selectedHandle);
                     return mega.rewindUi.sidebar.active ? M.currentdirid !== nodeParent : true;
                 }
 
                 if (M.gallery) {
                     M.gallery = false;
-                    if (fmconfig.uiviewmode | 0) {
-                        mega.config.set('viewmode', 0);
-                    }
-                    else {
-                        fmviewmode(M.currentdirid, 0);
-                    }
+                    this._setValidViewMode(M.currentdirid);
                     return true;
                 }
             }

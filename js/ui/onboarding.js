@@ -1,13 +1,13 @@
 // initialising onboarding v4
 
 // Bump this version number if changes are required in an existing section or if required to reduce complexity.
-window.ONBOARD_VERSION = 5;
+window.ONBOARD_VERSION = 6;
 window.OBV4_FLAGS = {
     OBV4: 'obv4f',
     CLOUD_DRIVE: 'obcd',
-    CLOUD_DRIVE_UPLOAD: 'obcduf',
-    CLOUD_DRIVE_MANAGE_FILES: 'obcdmyf',
-    CLOUD_DRIVE_MEGASYNC: 'obcdda',
+    CLOUD_DRIVE_INIT: 'obcdi',
+    UNUSED_2: 'unused2',
+    UNUSED_3: 'unused3',
     CHAT: 'obmc',
     UNUSED_1: 'unused1',
     CHAT_NAV: 'obmclp',
@@ -60,6 +60,11 @@ mBroadcaster.addListener('fm:initialized', () => {
         ? attribCache.bitMapsManager.get('obv4')
         : new MegaDataBitMap('obv4', false, Object.values(OBV4_FLAGS));
 
+    let pwmReady = false;
+    let ulListener = false;
+    const psURL = 'https://play.google.com/store/apps/details?id=mega.privacy.android.app&referrer=meganzob';
+    const isAchEnabled = u_attr && !(u_attr.p || u_attr.b) && u_attr.flags && u_attr.flags.ach;
+
     // Onboarding Flow map. This need to be set carefully for design flow on each section.
     // Instruction requires to be place on later stage.
     const obMap = {
@@ -69,65 +74,244 @@ mBroadcaster.addListener('fm:initialized', () => {
             steps: [
                 {
                     name: l[372],
-                    flag: OBV4_FLAGS.CLOUD_DRIVE_UPLOAD,
-                    actions: [
-                        {
-                            type: 'showDialog',
-                            dialogTitle: l.onboard_v4_upload_dialog_title,
-                            dialogDesc: l.onboard_v4_upload_dialog_desc,
-                            targetElmClass: '.button.fm-new-menu',
-                            targetElmPosition: 'left bottom',
-                            targetHotSpot: true,
-                            markComplete: true,
-                            nextEvent: 500802,
-                            skipEvent: 500801,
-                        }
-                    ],
-                    cpEvent: 500799,
-                },
-                {
-                    name: l.onboard_v4_manage_file_control_button,
-                    flag: OBV4_FLAGS.CLOUD_DRIVE_MANAGE_FILES,
+                    flag: OBV4_FLAGS.CLOUD_DRIVE_INIT,
                     get prerequisiteCondition() {
-                        return M.v.length !== 0;
+                        // Just confirmed in this tab
+                        return !!(confirmok || mega.ui.onboardBusSub);
                     },
-                    prerequisiteWarning: l.onboard_v4_manage_file_prerequisite_warning,
                     actions: [
                         {
-                            type: 'showDialog',
-                            dialogTitle: l.onboard_v4_manage_file_dialog_title,
-                            dialogDesc: l.onboard_v4_manage_file_dialog_desc,
-                            targetElmClass: '.megaListItem:first',
-                            get targetElmPosition() {
-                                return M.onIconView ? 'right' : 'bottom';
+                            type: 'showOnBoardingDialog',
+                            options: {
+                                showClose: true,
+                                onClose: () => {
+                                    if (mega.ui.menu.name === 'ob-upload-menu') {
+                                        mega.ui.menu.hide();
+                                    }
+                                    if (ulListener) {
+                                        mBroadcaster.removeListener('upload:start', ulListener);
+                                    }
+                                    eventlog(500980);
+                                },
+                                steps: [
+                                    {
+                                        label: l[20556],
+                                        title: l.onboard_cd_p1_title,
+                                        description: l.onboard_cd_p1_text,
+                                        imageClass: 'cd-onboard-1',
+                                        next: {
+                                            text: l[20556],
+                                            action: 2,
+                                            event: 500972
+                                        },
+                                        skip: {
+                                            text: l[1379],
+                                            event: 500971
+                                        },
+                                    },
+                                    {
+                                        label: isAchEnabled ? l.onboard_cd_p2_label_ach : l.download_desktop_app,
+                                        title: isAchEnabled ? l.onboard_cd_p2_title_ach : l.onboard_cd_p2_title,
+                                        description: isAchEnabled ? l.onboard_cd_p2_text_ach : '',
+                                        imageClass: 'cd-onboard-2',
+                                        next: {
+                                            text: l.download_continue,
+                                            action: () => {
+                                                window.open(megasync.getMegaSyncUrl(), '_blank', 'noopener,noreferrer');
+                                                mega.ui.onboarding.sheet.nextStep();
+                                            },
+                                            event: 500974,
+                                        },
+                                        skip: {
+                                            text: l.onboard_cd_p2_skip,
+                                            action: 3,
+                                            event: 500973
+                                        },
+                                        customContent: () => {
+                                            return mCreateElement('div', {'class': 'content-block cd-onboard'}, [
+                                                mCreateElement('div', {'class': 'content-title'}, [
+                                                    document.createTextNode(l.onboard_cd_p2_list_title)
+                                                ]),
+                                                mCreateElement('div', {'class': 'content-row'}, [
+                                                    mCreateElement('i', {
+                                                        'class': 'sprite-fm-mono icon-zap-thin-outline'
+                                                    }),
+                                                    mCreateElement('div', {'class': 'content-text'}, [
+                                                        document.createTextNode(l.onboard_cd_p2_list_item1)
+                                                    ])
+                                                ]),
+                                                mCreateElement('div', {'class': 'content-row'}, [
+                                                    mCreateElement('i', {
+                                                        'class': 'sprite-fm-mono icon-sync-thin-outline'
+                                                    }),
+                                                    mCreateElement('div', {'class': 'content-text'}, [
+                                                        document.createTextNode(l.onboard_cd_p2_list_item2)
+                                                    ])
+                                                ]),
+                                                mCreateElement('div', {'class': 'content-row'}, [
+                                                    mCreateElement('i', {
+                                                        'class': 'sprite-fm-mono icon-wifi-off-thin-outline'
+                                                    }),
+                                                    mCreateElement('div', {'class': 'content-text'}, [
+                                                        document.createTextNode(l.onboard_cd_p2_list_item3)
+                                                    ])
+                                                ]),
+                                                mCreateElement('div', {
+                                                    'class': `content-footer ${isAchEnabled ? '' : 'hidden'}`
+                                                }, [
+                                                    document.createTextNode(l.onboard_cd_note_ach)
+                                                ])
+                                            ]);
+                                        }
+                                    },
+                                    {
+                                        label: isAchEnabled ? l.onboard_cd_p3_label_ach : l.download_mobile_app,
+                                        title: isAchEnabled ? l.onboard_cd_p3_title_ach : l.onboard_cd_p3_title,
+                                        description: isAchEnabled ? l.onboard_cd_p3_text_ach : l.onboard_cd_p3_text,
+                                        next: {
+                                            text: l[507],
+                                            action: 4
+                                        },
+                                        back: {
+                                            text: l[822],
+                                            action: 2,
+                                            event: 500988,
+                                        },
+                                        customContent: () => {
+                                            const elm = mCreateElement('div', {
+                                                'class': 'content-block cd-onboard image'
+                                            }, [
+                                                mCreateElement('div', {'class': 'image-wrapper qr-block'}, [
+                                                    mCreateElement('div', {'class': 'app-qr-image'})
+                                                ]),
+                                                mCreateElement('div', {'class': 'content-title'}, [
+                                                    document.createTextNode(l.onboard_cd_p3_list_title)
+                                                ]),
+                                                mCreateElement('div', {'class': 'content-row'}, [
+                                                    mCreateElement('i', {
+                                                        'class': 'sprite-fm-mono icon-image-01-thin-outline'
+                                                    }),
+                                                    mCreateElement('div', {'class': 'content-text'}, [
+                                                        document.createTextNode(l.onboard_cd_p3_list_item1)
+                                                    ])
+                                                ]),
+                                                mCreateElement('div', {'class': 'content-row'}, [
+                                                    mCreateElement('i', {
+                                                        'class': 'sprite-fm-mono icon-sync-thin-outline'
+                                                    }),
+                                                    mCreateElement('div', {'class': 'content-text'}, [
+                                                        document.createTextNode(l.onboard_cd_p3_list_item2)
+                                                    ])
+                                                ]),
+                                                mCreateElement('div', {'class': 'content-row app-store'}, [
+                                                    mCreateElement('a', {
+                                                        'class': 'app-store-link clickurl',
+                                                        'data-eventid': "500986",
+                                                        href: 'https://itunes.apple.com/app/mega/id706857885',
+                                                        target: '_blank'
+                                                    }, [
+                                                        mCreateElement('img', {
+                                                            'class': 'app-store-link',
+                                                            src: `${staticpath}images/mega/locale/${lang}_appstore.svg`
+                                                        }),
+                                                    ]),
+                                                    mCreateElement('a', {
+                                                        'class': 'app-store-link android clickurl',
+                                                        'data-eventid': "500987",
+                                                        href: psURL,
+                                                        target: '_blank'
+                                                    }, [
+                                                        mCreateElement('img', {
+                                                            'class': 'app-store-link',
+                                                            src: `${staticpath}images/mega/locale/${lang}_playstore.png`
+                                                        }),
+                                                    ])
+                                                ]),
+                                                mCreateElement('div', {
+                                                    'class': `content-footer ${isAchEnabled ? '' : 'hidden'}`
+                                                }, [document.createTextNode(l.onboard_cd_note_ach)])
+                                            ]);
+                                            onIdle(clickURLs);
+                                            return elm;
+                                        }
+                                    },
+                                    {
+                                        label: l.onboard_cd_p4_label,
+                                        title: l.onboard_cd_p4_title,
+                                        description: l.onboard_cd_p4_text,
+                                        imageClass: 'cd-onboard-3',
+                                        next: {
+                                            text: l[372],
+                                            leftIcon: 'sprite-fm-mono icon-arrow-up-thin-outline',
+                                            rightIcon: 'sprite-fm-mono icon-chevron-down-thin-outline',
+                                            action: (ev) => {
+                                                if (ev.currentTarget.active) {
+                                                    ev.currentTarget.active = false;
+                                                    return;
+                                                }
+                                                ev.stopPropagation();
+                                                ev.currentTarget.active = true;
+                                                const parentNode = document.createElement('div');
+                                                parentNode.className = 'context-section last';
+                                                ulListener = ulListener ||
+                                                    mBroadcaster.addListener('upload:start', () => {
+                                                        ulListener = false;
+                                                        mega.ui.onboarding.sheet.hide();
+                                                        return 0xDEAD;
+                                                    });
+                                                MegaButton.factory({
+                                                    parentNode,
+                                                    buttonId: 'fileupload-item',
+                                                    text: l[99],
+                                                    icon: 'sprite-fm-mono icon-file-upload-thin-outline',
+                                                    type: 'fullwidth',
+                                                    componentClassname: 'context-button text-icon',
+                                                    onClick() {
+                                                        document.getElementById('fileselect1').click();
+                                                        eventlog(500977);
+                                                    }
+                                                });
+                                                MegaButton.factory({
+                                                    parentNode,
+                                                    buttonId: 'folderupload-item',
+                                                    text: l[98],
+                                                    icon: 'sprite-fm-mono icon-folder-arrow-01-thin-outline',
+                                                    type: 'fullwidth',
+                                                    componentClassname: 'context-button text-icon',
+                                                    onClick() {
+                                                        document.getElementById('fileselect2').click();
+                                                        eventlog(500978);
+                                                    }
+                                                });
+                                                mega.ui.menu.show({
+                                                    name: 'ob-upload-menu',
+                                                    classList: ['ob-upload-menu', 'fm-context-menu'],
+                                                    resizeHandler: true,
+                                                    contents: [parentNode],
+                                                    event: ev,
+                                                    onClose: () => {
+                                                        if ($.dialog === 'Mega-Onboarding') {
+                                                            // Remain overlayed
+                                                            document.documentElement.classList.add('overlayed');
+                                                        }
+                                                        ev.currentTarget.active = false;
+                                                    }
+                                                });
+                                            },
+                                            event: 500976
+                                        },
+                                        skip: {
+                                            text: l[18682],
+                                            event: 500975,
+                                        },
+                                        back: {
+                                            text: l[822],
+                                            action: 3,
+                                            event: 500979,
+                                        }
+                                    }
+                                ]
                             },
-                            markComplete: true,
-                            nextActionTrigger: 'contextmenu',
-                            nextEvent: 500804,
-                            skipEvent: 500803,
-                        },
-                        {
-                            type: 'markContextMenu',
-                            targetElmClass: [
-                                '.dropdown.context.files-menu a.sh4r1ng-item',
-                                '.dropdown.context.files-menu a.getlink-item'
-                            ],
-                            targetDescription: [
-                                l.onboard_v4_manage_file_context_desc_1,
-                                l.onboard_v4_manage_file_context_desc_2
-                            ],
-                            contextElmClass: '.megaListItem:first',
-                        }
-                    ]
-                },
-                {
-                    name: l[956],
-                    flag: OBV4_FLAGS.CLOUD_DRIVE_MEGASYNC,
-                    actions: [
-                        {
-                            type: 'showExtDialog',
-                            targetElmClass: '.mega-dialog.mega-desktopapp-download',
-                            dialogInitFunc: initDownloadDesktopAppDialog,
                             markComplete: true
                         }
                     ]
@@ -168,6 +352,9 @@ mBroadcaster.addListener('fm:initialized', () => {
                     actions: [
                         {
                             type: 'showOnBoardingDialog',
+                            get prerequisiteCondition() {
+                                return !!pwmReady;
+                            },
                             options: {
                                 steps: [
                                     {
@@ -267,7 +454,8 @@ mBroadcaster.addListener('fm:initialized', () => {
                                         next: {
                                             text: l.mega_pass_onboarding_finish_button,
                                             event: 500906
-                                        }
+                                        },
+                                        noStepper: true,
                                     }
                                 ]
                             },
@@ -357,6 +545,13 @@ mBroadcaster.addListener('fm:initialized', () => {
             flagMap.setSync(OBV4_FLAGS.CLOUD_DRIVE_DC_BUBBLE, 1);
         }
 
+        if (upgradeFrom !== false && upgradeFrom < 6) {
+            // Removing old cd onboarding.
+            flagMap.setSync(flags[3], 0);
+            flagMap.setSync(flags[4], 0);
+            upgraded = true;
+        }
+
         // Future upgrades may be added here
         if (upgraded || disableDeviceCentre) {
             flagMap.safeCommit();
@@ -372,7 +567,6 @@ mBroadcaster.addListener('fm:initialized', () => {
             _obMap['cloud-drive'] = {
                 title: l.mega_pwm,
                 flag: OBV4_FLAGS.CLOUD_DRIVE_NEW_NAV,
-                noCP: true,
                 dismissNoConfirm: true,
                 steps: [
                     {
@@ -479,7 +673,6 @@ mBroadcaster.addListener('fm:initialized', () => {
             _obMap['cloud-drive'] = {
                 title: l.mega_device_centre,
                 flag: OBV4_FLAGS.CLOUD_DRIVE_DC,
-                noCP: true,
                 steps: [
                     {
                         name: l.mega_device_centre,
@@ -509,17 +702,9 @@ mBroadcaster.addListener('fm:initialized', () => {
             };
             mega.ui.onboarding.map = _obMap;
             mBroadcaster.addListener('pagechange', () => {
-                // Hide the control panel while the page change is finishing up.
-                $('.onboarding-control-panel', '.fm-right-files-block').addClass('hidden');
                 onIdle(mega.ui.onboarding.start.bind(mega.ui.onboarding));
             });
             mega.ui.onboarding.start();
-
-            // Device centre onboarding requires kickstarting manually as it does not have control panel
-            const {currentSection} = mega.ui.onboarding;
-            if (currentSection.map.flag === OBV4_FLAGS.CLOUD_DRIVE_DC && M.currentrootid === M.RootID) {
-                currentSection.startNextOpenSteps();
-            }
         }
     };
 
@@ -559,24 +744,8 @@ mBroadcaster.addListener('fm:initialized', () => {
             if (!pwmFeature || pwmFeature[0] <= Date.now() / 1000 || M.currentdirid !== 'pwm') {
                 return;
             }
-
-            const {onboarding} = mega.ui;
-
-            if (onboarding && onboarding.currentSection) {
-                const {currentSection} = onboarding;
-
-                // Check if the current section is relevant and execute open steps
-                if (
-                    currentSection.map &&
-                    currentSection.map.flag === OBV4_FLAGS.PASS
-                ) {
-                    currentSection.startNextOpenSteps();
-                }
-            }
+            pwmReady = true;
         };
-
-        const isOverridden = obMap && obMap['cloud-drive'].flag === OBV4_FLAGS.CLOUD_DRIVE_NEW_NAV ||
-                                    obMap['cloud-drive'].flag === OBV4_FLAGS.CLOUD_DRIVE_PASS_OTP;
 
         const _delayStart = () => {
             delay('delayKickstartOB', () => {
@@ -599,20 +768,11 @@ mBroadcaster.addListener('fm:initialized', () => {
 
                 mega.ui.onboarding.start();
 
-                // this onboarding requires kickstarting manually as it does not have control panel
-                if (isOverridden && M.currentrootid === M.RootID ||
-                    flagMap.getSync(OBV4_FLAGS.PASS) && M.currentrootid === 'pwm') {
-                    mega.ui.onboarding.currentSection.startNextOpenSteps();
-                }
-
                 _handleMegaPassSteps();
             }, 1000);
         };
 
         mBroadcaster.addListener('pagechange', () => {
-            // Hide the control panel while the page change is finishing up.
-            $('.onboarding-control-panel').addClass('hidden');
-
             // Closing dialog that is not closed by background click but user try navigate to another page
             if ($.dialog === 'onboardingDialog') {
                 closeDialog();
@@ -709,21 +869,17 @@ mBroadcaster.addListener('fm:initialized', () => {
             this.map = map;
             this.steps = [];
             this.parent = parent;
-            this.$obControlPanel = $('.onboarding-control-panel')
             this.init();
         }
 
         init() {
             // This section is completed let move on.
             if (!this.map || this.isComplete || isPublicLink()) {
-                $('.onboarding-control-panel').addClass('hidden');
-
                 return;
             }
 
-            this.prepareControlPanel();
-            this.bindControlPanelEvents();
-            this.hotspotNextStep();
+            this.prepareSteps();
+            onIdle(() => this.hotspotNextStep());
         }
 
         get currentStep() {
@@ -734,7 +890,7 @@ mBroadcaster.addListener('fm:initialized', () => {
             return !!this.parent.flagStorage.getSync(this.map.flag);
         }
 
-        prepareControlPanel() {
+        prepareSteps() {
 
             const currentSteps = this.map.steps;
 
@@ -742,71 +898,10 @@ mBroadcaster.addListener('fm:initialized', () => {
                 return;
             }
 
-            let html = '';
-
-            this.$obControlPanel.removeClass('hidden');
-
-            $('.onboarding-control-panel-title', this.$obControlPanel).text(this.map.title);
-
             for (let i = 0; i < currentSteps.length; i++) {
-
-                const eventId = currentSteps[i].cpEvent || 0;
-                html += `<button class="onboarding-step-link mega-button action no-hover" data-eventid="${eventId}">
-                            <div class="onboarding-step mega-button icon">
-                                <i class="onboarding-step-complete-icon sprite-fm-mono icon-check"></i>
-                                <span class="onboarding-step-count">${i + 1}</span>
-                            </div>
-                            <span>${escapeHTML(currentSteps[i].name)}</span>
-                        </button>`;
-
-                this.steps[i] = new OnboardV4Step(this, i ,currentSteps[i], this.$obControlPanel);
+                // eslint-disable-next-line no-use-before-define
+                this.steps[i] = new OnboardV4Step(this, i, currentSteps[i]);
             }
-
-            if (this.map.noCP) {
-                this.$obControlPanel.addClass('hidden');
-            }
-
-            $('.onboarding-control-panel-step', this.$obControlPanel).safeHTML(html);
-        }
-
-        bindControlPanelEvents() {
-
-            $('.onboarding-step-link', this.$obControlPanel).rebind('click.onboarding', e => {
-
-                const clickedStep = $('.onboarding-step-count', e.currentTarget).text() - 1;
-
-                if (clickedStep === this.currentStepIndex) {
-                    return false;
-                }
-                const eventId = parseInt(e.currentTarget.dataset.eventid, 10);
-                if (eventId) {
-                    eventlog(eventId);
-                }
-
-                onIdle(() => {
-                    this.startNextOpenSteps(clickedStep);
-                });
-
-                return false;
-            });
-
-            $('.onboarding-control-panel-content .js-close', this.$obControlPanel)
-                .rebind('click.onboarding', () => {
-                    this.showConfirmDismiss();
-                    eventlog(500800);
-                });
-            $('.onboarding-control-panel-complete .js-close', this.$obControlPanel)
-                .rebind('click.onboarding', this.markSectionComplete.bind(this));
-            $('.js-dismiss', this.$obControlPanel).rebind('click.onboarding', this.markSectionComplete.bind(this));
-            $('.js-dismiss-cancel', this.$obControlPanel)
-                .rebind('click.onboarding', this.hideConfirmDismiss.bind(this));
-            $('.onboarding-step-link', this.$obControlPanel).rebind('mouseenter.onboarding', e => {
-
-                const stepIndex = e.currentTarget.querySelector('.onboarding-step-count').textContent;
-                if (this.steps && this.steps[stepIndex - 1]) {
-                    this.steps[stepIndex - 1].checkPrerequisite();
-                }
-            });
         }
 
         showConfirmDismiss() {
@@ -814,27 +909,8 @@ mBroadcaster.addListener('fm:initialized', () => {
             this.hotspotNextStep();
             this.currentStepIndex = undefined;
             if (this.map.dismissNoConfirm) {
-                return this.markSectionComplete();
+                return this.setSectionComplete();
             }
-
-            $('.onboarding-control-panel-dismiss', this.$obControlPanel).removeClass('hidden');
-            $('.onboarding-control-panel-content', this.$obControlPanel).addClass('hidden');
-        }
-
-        hideConfirmDismiss() {
-
-            $('.onboarding-control-panel-dismiss', this.$obControlPanel).addClass('hidden');
-            $('.onboarding-control-panel-content', this.$obControlPanel).removeClass('hidden');
-        }
-
-        showCompleteMessage() {
-
-            clickURLs();
-
-            $('.onboarding-control-panel-complete', this.$obControlPanel).removeClass('hidden');
-            $('.onboarding-control-panel-content', this.$obControlPanel).addClass('hidden');
-
-            this.setSectionComplete();
         }
 
         searchNextOpenStep() {
@@ -861,11 +937,11 @@ mBroadcaster.addListener('fm:initialized', () => {
             if (nextStepIndex === false) {
 
                 // This section is completed lets show user there is no more.
-                this.showCompleteMessage();
+                this.setSectionComplete();
                 return false;
             }
 
-            this.steps[nextStepIndex].markHotspot();
+            this.startNextOpenSteps(nextStepIndex);
         }
 
         startNextOpenSteps(step) {
@@ -881,7 +957,7 @@ mBroadcaster.addListener('fm:initialized', () => {
                 if (this.currentStepIndex === false) {
 
                     // This section is completed lets show user there is no more.
-                    this.showCompleteMessage();
+                    this.setSectionComplete();
                     return false;
                 }
             }
@@ -892,27 +968,15 @@ mBroadcaster.addListener('fm:initialized', () => {
 
             if (!this.currentStep.checkPrerequisite()) {
 
-                if (!step) {
-                    this.currentStep.showPrerequisiteMessage();
-                }
-
                 delete this.currentStepIndex;
 
-                this.hotspotNextStep();
+                // Pre-requisite related code should call this again when the condition is met.
 
                 return false;
             }
 
-            this.currentStep.markActive();
             this.currentStep.currentActionIndex = 0;
             this.currentStep.executeAction();
-        }
-
-        // Mark section completed and hide onboarding control panel
-        markSectionComplete() {
-
-            this.$obControlPanel.addClass('hidden');
-            this.setSectionComplete();
         }
 
         // set section completed on fmconfig
@@ -925,55 +989,18 @@ mBroadcaster.addListener('fm:initialized', () => {
     // Step level like Upload, File Management, Desktop app, etc.
     class OnboardV4Step {
 
-        constructor(parent, index, map, $cp) {
+        constructor(parent, index, map) {
 
             this.index = index;
             this.map = map;
             this.currentActionIndex = 0;
-            this.$controlPanel = $cp;
             this.parentSection = parent;
 
             this.initActions();
         }
 
         checkPrerequisite() {
-
-            if (this.map.prerequisiteCondition === false) {
-
-                this.addPrerequisiteMessage();
-                return false;
-            }
-
-            this.removePrerequisiteMessage();
-
-            return true;
-        }
-
-        addPrerequisiteMessage() {
-
-            this.$stepButton.addClass('simpletip').attr({
-                'data-simpletip': this.map.prerequisiteWarning,
-                'data-simpletipposition': 'bottom',
-                'data-simpletip-class': 'bluetip medium-width theme-light-forced center-align',
-            });
-        }
-
-        showPrerequisiteMessage() {
-
-            this.$stepButton.addClass('manual-tip').trigger('mouseenter.simpletip');
-
-            setTimeout(() => {
-                this.$stepButton.removeClass('manual-tip').trigger('simpletipClose.internal');
-            }, 4000);
-        }
-
-        removePrerequisiteMessage() {
-            this.$stepButton.removeClass('simpletip').removeAttr(
-                'data-simpletip data-simpletipposition data-simpletip-class data-simpletip-display-duration');
-        }
-
-        get $stepButton() {
-            return $('.onboarding-step-link', this.$controlPanel).eq(this.index);
+            return this.map.prerequisiteCondition !== false;
         }
 
         initActions() {
@@ -1014,29 +1041,7 @@ mBroadcaster.addListener('fm:initialized', () => {
             return !!this.parentSection.parent.flagStorage.getSync(this.map.flag);
         }
 
-        markHotspot() {
-
-            delay('markingDelay', () => {
-
-                if (this.parentSection.currentStepIndex !== this.index) {
-                    $('.onboarding-step-link', this.$controlPanel).eq(this.index)
-                        .removeClass('active').addClass('hotspot');
-                }
-            }, 1000);
-        }
-
-        markActive() {
-            $('.onboarding-step-link', this.$controlPanel).removeClass('hotspot').eq(this.index).addClass('active');
-        }
-
-        markDeactive() {
-            $('.onboarding-step-link', this.$controlPanel).eq(this.index).removeClass('active');
-        }
-
         markDone() {
-
-            $('.onboarding-step-link', this.$controlPanel).eq(this.index).removeClass('active').addClass('complete');
-
             this.parentSection.parent.flagStorage.setSync(this.map.flag, 1);
             this.parentSection.parent.flagStorage.safeCommit();
         }
@@ -1229,9 +1234,6 @@ mBroadcaster.addListener('fm:initialized', () => {
                     if (typeof this.map.postComplete === 'function') {
                         this.map.postComplete();
                     }
-                }
-                else if (noComplete) {
-                    this.parentStep.markDeactive();
                 }
             };
 
@@ -1432,7 +1434,7 @@ mBroadcaster.addListener('fm:initialized', () => {
 
                 const _killOBEvent = () => {
                     currSec.currentStepIndex = false;
-                    currSec.markSectionComplete();
+                    currSec.setSectionComplete();
                 };
 
                 $actionButton.rebind('click.ob-promo', () => {

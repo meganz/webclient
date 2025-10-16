@@ -20,9 +20,11 @@
         const $block = $(block);
         const dropdown = scope.querySelector('.breadcrumb-dropdown');
         const hasContext = !!block.querySelector('.ctx-source');
-        $block.empty();
 
         const extraItems = prepareBreadcrumbItems(items, dictionary, block, hasContext);
+        if (!extraItems) {
+            return;
+        }
 
         removeSimpleTip($('.fm-breadcrumbs', $block));
         showHideBreadcrumbDropdown(extraItems, scope, dropdown);
@@ -403,8 +405,6 @@
         let containerWidth = container.clientWidth;
         let totalWidth = 0;
         let remainItems = 4;
-        const sizingNode = document.createElement('a');
-        container.appendChild(sizingNode);
 
         let extraItems = [];
         let isSimpletip = false;
@@ -437,6 +437,30 @@
             isDyhRoot = true;
             containerWidth = Infinity;
         }
+
+        const { lastCrumbPath, lastCrumbWidth } = container.dataset;
+        let nextCrumb = '';
+        for (let i = 0; i < items.length; i++) {
+            if (isSimpletip && i === lastPos) {
+                continue;
+            }
+            const {name} = dictionary(items[i]);
+            if (name !== '') {
+                nextCrumb = `${name}/${nextCrumb}`;
+            }
+            else if (lastPos === i) {
+                lastPos++;
+            }
+        }
+        if (nextCrumb === lastCrumbPath && String(containerWidth) === lastCrumbWidth) {
+            return false;
+        }
+        const sizingNode = document.createElement('a');
+        container.appendChild(sizingNode);
+        container.textContent = '';
+        container.dataset.lastCrumbPath = nextCrumb;
+        container.dataset.lastCrumbWidth = String(containerWidth);
+        lastPos = 0;
 
         for (let i = 0; i < items.length; i++) {
 

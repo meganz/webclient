@@ -434,6 +434,7 @@ mega.tpw = new function TransferProgressWidget() {
             if ($widgetHeadAndBody.hasClass('expand')) {
                 $widgetFooter.removeClass('hidden');
             }
+            this.renderView(this.views.ACTIVE);
         }
         for (var r = 0; r < entriesArray.length; r++) {
             var fName;

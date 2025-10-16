@@ -841,7 +841,12 @@ lazy(mega, 'wsuploadmgr', () => {
         async run(val = 500) {
 
             if (this.running === null) {
-                this.poolmgr.refreshpools().catch(reportError);
+                this.poolmgr.refreshpools()
+                    .catch((ex) => {
+                        M.uscex(ex);
+                        this.running = null;
+                        this.logger.error(ex);
+                    });
             }
             const pid = this.running = ++mIncID;
 

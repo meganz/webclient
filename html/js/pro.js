@@ -234,7 +234,7 @@ var pro = {
                         // Api may return a discount that does not match, for now ignore non matching discounts
                         if (results[i].insdis.dm !== results[i].m) {
                             results[i].insdis = false;
-                            eventlog(500941);
+                            eventlog(500941, true);
                         }
 
                         pro.anyDiscount |= !!results[i].insdis;

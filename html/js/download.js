@@ -918,7 +918,7 @@ function start_import() {
     };
 
     msgDialog(dialogType, l[1193], dialogHeader, dialogTxt, function(e) {
-        if (e < 1) {
+        if (e === -1) {
             buttonEventLogin();
         }
         else if (e === 1) {

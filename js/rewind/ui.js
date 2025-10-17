@@ -173,6 +173,7 @@ lazy(mega, 'rewindUi', () => {
             this.$contentDownload = $('.folder-download', this.$contentFolder);
             this.$contentLoading = $('.content-loading', this.$sidebarContent);
             this.$contentLoadingProgress = $('.progress', this.$contentLoading);
+            this.$contentLoadingProgressStep = $('.progress-step', this.$contentLoading);
             this.$upgradeButton = $('.upgrade-purchase-button', this.sidebar);
             this.$restoreButton = $('.js-rewind', this.sidebar);
             this.$contextMenu = $('.dropdown.body.context', document.body);
@@ -860,7 +861,14 @@ lazy(mega, 'rewindUi', () => {
         }
 
         progressListener(progress) {
-            this.$contentLoadingProgress.text(formatPercentage(progress / 100));
+            if (this.$contentLoadingProgress.length) {
+                this.$contentLoadingProgress.text(formatPercentage(progress / 100));
+            }
+        }
+        updateProgressStep(text) {
+            if (this.$contentLoadingProgressStep.length) {
+                this.$contentLoadingProgressStep.text(text);
+            }
         }
 
         // There can be multiple places from which user can begin the upgrade flow
@@ -1176,16 +1184,14 @@ lazy(mega, 'rewindUi', () => {
                 this.folderList = null;
             }
 
-            // Remove filters
-            /*
-            if (date) {
-                this.updateFilterLabel(date, 0, true);
-            }
-            */
-
             if (!isOpenFolder) {
                 this.$contentLoading.removeClass('hidden');
-                const hasRecords = await mega.rewind.getRecords(date.getTime());
+                const hasRecords = await mega.rewind.getRecords(date.getTime())
+                    .finally(() => {
+                        mega.rewindUtils.tree.finalise();
+                        mega.rewindUtils.packet.finalise();
+                    });
+
                 this.$contentLoading.addClass('hidden');
                 if (!hasRecords || hasRecords < 0) {
                     this.$contentTreeCacheEmpty.removeClass('hidden');
@@ -2124,6 +2130,7 @@ lazy(mega, 'rewindUi', () => {
                         }
                     })
                     .finally(() => {
+                        mega.rewindUi.sidebar.close();
                         mega.rewindUtils.reinstate.finalise();
                         mBroadcaster.removeListener(this.openFolderListener);
                         mega.rewindUi.sidebar.teardownLoader();

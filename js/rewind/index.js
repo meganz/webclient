@@ -434,13 +434,13 @@ lazy(mega, 'rewind', () => {
             // }
 
             if (!hasRecords) {
-                console.time('rewind:index:changeLog:api');
+                console.time('rewind:index:changeLog:api:get');
                 const changeLogResponse = await mega.rewindUtils.getChangeLog(
                     selectedHandle,
                     startInSeconds,
                     endInSeconds
                 );
-                console.timeEnd('rewind:index:changeLog:api');
+                console.timeEnd('rewind:index:changeLog:api:get');
 
                 const changeLogData = {
                     dates: Object.create(null),
@@ -608,9 +608,10 @@ lazy(mega, 'rewind', () => {
             if (this.treeCache && selectedTreeCache.sn === this.treeCache.sn && this.treeCacheHistory.length) {
                 logger.info(`Rewind.loadTreeCacheItem - #Rewind #API - TreeCache - Reusing current tree cache`);
 
-                console.time('rewind:index:getRecords:tree:cache');
+                this.handleProgressStep('tree', 'cache:read');
+                console.time('rewind:index:getRecords:tree:cache:read');
                 const hasTreeCache = await this.loadTreeCacheItemFromCache();
-                console.timeEnd('rewind:index:getRecords:tree:cache');
+                console.timeEnd('rewind:index:getRecords:tree:cache:read');
 
                 // FIXME: Treecache might not be available but action packet can (verify with api)
                 if (!hasTreeCache) {
@@ -672,18 +673,28 @@ lazy(mega, 'rewind', () => {
             let treeCacheHistory = false;
 
             // Get tree cache state
+            this.handleProgressStep('tree', 'state:storage:read');
+            console.time('rewind:index:getRecords:tree:state:storage:read');
             const treeCacheState = await mega.rewindStorage.getTreeCacheSNState(sequenceNumber);
+            console.timeEnd('rewind:index:getRecords:tree:state:storage:read');
+
             logger.info(`Rewind.loadTreeCacheItem - #Rewind #API - TreeCache - Current state`,
                         sequenceNumber, treeCacheState);
 
             if (treeCacheState && treeCacheState.s === mega.rewindStorage.STATE_SN_END) {
                 logger.info(`Rewind.loadTreeCacheItem - #Rewind #API - TreeCache - Rewinding from DB`);
-                console.time('rewind:index:getRecords:tree:db');
+                this.handleProgressStep('tree', 'storage:read');
+                console.time('rewind:index:getRecords:tree:storage:read');
                 treeCacheHistory = await mega.rewindStorage.getTreeCacheHistoryNodes(sequenceNumber, (progress) => {
                     mega.rewind.handleProgress(4, progress);
                 });
-                console.timeEnd('rewind:index:getRecords:tree:db');
+                console.timeEnd('rewind:index:getRecords:tree:storage:read');
+
+                this.handleProgressStep('tree', 'state:storage:save');
+                console.time('rewind:index:getRecords:tree:state:storage:save');
                 await this.prepareTreeCacheNodes(treeCacheHistory, this.nodeDictionary, this.nodeChildrenDictionary);
+                console.timeEnd('rewind:index:getRecords:tree:state:storage:save');
+
                 logger.info(`Rewind.loadTreeCacheItem - #Rewind #DB - TreeCache ` +
                     `- Loaded from DB - ${treeCacheHistory.length} files`);
             }
@@ -697,17 +708,24 @@ lazy(mega, 'rewind', () => {
                 // This is just the residue
                 // If we are done processing then
                 logger.info(`Rewind.loadTreeCacheItem - #Rewind #API - TreeCache - Rewinding from API`);
+                this.handleProgressStep('tree', 'state:storage:save');
+                console.time('rewind:index:getRecords:tree:state:storage:save');
                 await mega.rewindStorage.saveTreeCacheSNStateStart(sequenceNumber, treeCacheState);
-                console.time('rewind:index:getRecords:tree:api');
+                console.timeEnd('rewind:index:getRecords:tree:state:storage:save');
+
+                this.handleProgressStep('tree', 'api:get');
+                console.time('rewind:index:getRecords:tree:api:get');
                 treeCacheHistory = await mega.rewindUtils.getChunkedTreeCacheHistory(
-                    cacheTimestamp,
-                    cacheHandle,
-                    (progress) => {
+                    cacheTimestamp, cacheHandle, (progress) => {
                         mega.rewind.handleProgress(0, progress);
                     }
                 );
-                console.timeEnd('rewind:index:getRecords:tree:api');
+                console.timeEnd('rewind:index:getRecords:tree:api:get');
+
+                this.handleProgressStep('tree', 'storage:save');
+                console.time('rewind:index:getRecords:tree:storage:save');
                 await mega.rewindStorage.saveTreeCacheSNStateEnd(sequenceNumber, treeCacheState);
+                console.timeEnd('rewind:index:getRecords:tree:storage:save');
 
                 logger.info(`Rewind.loadTreeCacheItem - #Rewind #API - TreeCache - Loaded from API - ` +
                     `${Object.keys(this.nodeDictionary).length - 1} files`);
@@ -749,14 +767,15 @@ lazy(mega, 'rewind', () => {
             let isOutdated = false;
             let sn = null;
 
-            console.time('rewind:index:getRecords:packet:db');
+            this.handleProgressStep('packet', 'storage:read');
+            console.time('rewind:index:getRecords:packet:storage:read');
             let packets = await mega.rewindStorage.getActionPackets(
                 cacheSequenceNumber,
                 +currentTimestamp,
                 (progress) => {
                     mega.rewind.handleProgress(6, progress);
                 });
-            console.timeEnd('rewind:index:getRecords:packet:db');
+            console.timeEnd('rewind:index:getRecords:packet:storage:read');
             logger.info(`Rewind.loadActionPacket - #Rewind #DB - ActionPacket - Loaded from DB - ` +
                     `${packets.length} action packets`);
             if (!packets || !packets.length) {
@@ -786,15 +805,17 @@ lazy(mega, 'rewind', () => {
                         logger.info(`Rewind.loadActionPacket - #Rewind #API - ActionPacket - Loaded from API - ` +
                             `${response.packets.length} action packets`);
                         packetPromise.resolve();
-                        console.timeEnd('rewind:index:getRecords:packet:api');
                     });
 
-                    console.time('rewind:index:getRecords:packet:api');
+                    this.handleProgressStep('packet', 'api:get');
+                    console.time('rewind:index:getRecords:packet:api:get');
                     // Check if we have records in DB, if not, get from API
-                    await mega.rewindUtils.getChunkedActionPacketHistory(lastSn, currentTimestamp, () => {
-                        this.handleProgress(5, progress);
-                        hasActionPacketProgress = true;
-                    });
+                    await mega.rewindUtils.getChunkedActionPacketHistory(
+                        lastSn, currentTimestamp, (progress) => {
+                            this.handleProgress(5, progress);
+                            hasActionPacketProgress = true;
+                        });
+                    console.timeEnd('rewind:index:getRecords:packet:api:get');
 
                     await packetPromise;
                 }
@@ -857,7 +878,8 @@ lazy(mega, 'rewind', () => {
                 let batchPromise = null;
 
                 logger.info(`Rewind.loadActionPacket - Processing ${packets.length} packets`);
-                console.time('rewind:index:getRecords:packet:process');
+                this.handleProgressStep('packet', 'prepare');
+                console.time('rewind:index:getRecords:packet:prepare');
                 for (let i = 0; i < packets.length; i++) {
                     const packet = packets[i];
                     if (!packet) {
@@ -912,7 +934,7 @@ lazy(mega, 'rewind', () => {
 
                     order++;
                 }
-                console.timeEnd('rewind:index:getRecords:packet:process');
+                console.timeEnd('rewind:index:getRecords:packet:prepare');
 
                 if ((sn && lastSn && lastSn !== sn) || (sn && !lastSn) || !treeCacheState.lastSn) {
                     // We fill in necessary details for
@@ -935,7 +957,10 @@ lazy(mega, 'rewind', () => {
                 const promiseArray = Array.from(promiseSet);
                 // Wait to have everything flushed on the DB
                 if (promiseArray.length) {
+                    this.handleProgressStep('packet', 'storage:save');
+                    console.time('rewind:index:getRecords:packet:storage:save');
                     await Promise.all(promiseArray);
+                    console.timeEnd('rewind:index:getRecords:packet:storage:save');
                 }
 
                 // For debugging only
@@ -1636,6 +1661,32 @@ lazy(mega, 'rewind', () => {
             this.treeCacheHistory = Object.create(null);
         }
 
+        // TODO confirm this feature and then replace fixed strings by "t" labels
+        handleProgressStep(domain, step) {
+            const config = {
+                'tree': {
+                    'cache:read': 'Accessing history...',
+                    'state:storage:read': 'Reading state...',
+                    'state:storage:save': 'Saving state...',
+                    'storage:read': 'Reading history...',
+                    'storage:save': 'Saving history...',
+                    'api:get': 'Retrieving history...',
+                    'api:get:process': 'Processing history...'
+                },
+                'packet': {
+                    'storage:read': 'Reading data...',
+                    'storage:save': 'Saving data...',
+                    'api:get': 'Retrieving data...',
+                    'api:get:process': 'Processing data...',
+                    'prepare': 'Preparing data...'
+                }
+            }
+
+            if (config[domain] && config[domain][step]) {
+                mega.rewindUi.sidebar.updateProgressStep(config[domain][step]);
+            }
+        }
+
         // eslint-disable-next-line complexity
         handleProgress(type, progress, done) {
             if (!this.progress) {
@@ -1691,6 +1742,9 @@ lazy(mega, 'rewind', () => {
                     this.progress.percentage[type] = [progress, 0.20]; // 0.5 factor because of action packets retrieval
                     break;
                 case 6: // Action Packets - DB Request
+                    this.progress.percentage[type] = [progress, 0.20]; // 0.5 factor because of action packets retrieval
+                    break;
+                case 7: // Action Packets - Check API request done
                     this.progress.percentage[type] = [progress, 0.20]; // 0.5 factor because of action packets retrieval
                     break;
             }

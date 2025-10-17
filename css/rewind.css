@@ -597,6 +597,12 @@ body.theme-dark .rewind-datepicker-calendar .datepicker--cell.-current- {
     width: 200px;
 }
 
+.sidebar .sidebar-container .sidebar-content .content-loading .progress-step {
+    font: var(--text-body2);
+    color: var(--text-color-low);
+    padding-top: 8px;
+}
+
 .sidebar .sidebar-container .sidebar-content .content-folder {
     padding: 2px;
     display: flex;

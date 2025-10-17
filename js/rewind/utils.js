@@ -3,8 +3,6 @@ lazy(mega, 'rewindUtils', () => {
     'use strict';
 
     const logger = new MegaLogger('utils', null, MegaLogger.getLogger('rewind'));
-    let treeChannel = -1;
-    let packetChannel = -1;
     let rewindWorker = null;
 
     const RewindAdditionType = {
@@ -179,25 +177,63 @@ lazy(mega, 'rewindUtils', () => {
         rewindWorker = new RewindMEGAWorker(decWorkerPool.url.split('/').pop(), 8, workerStateData);
     };
 
-    class RewindChunkTreeHandler {
+    class ReinstateLogger {
         constructor() {
-            this.apiInit = false;
+            this.init();
+        }
+        init() {
+            this.prefix = 'Rewind:reinstateLogger';
+            this.entryCount = -1;
+        }
+        next() {
+            this.entryCount += 1;
+            return this;
+        }
+        log(type, data) {
+            console.log(
+                this.prefix,
+                `[${this.entryCount}]`,
+                `[${type}]`,
+                data
+            );
+            return this;
+        }
+    }
+
+    class RewindChunkHandler {
+        constructor(isMonitored) {
+            this.channel = -1;
+            this.isMonitored = isMonitored;
         }
 
-        initChannel() {
-            if (!this.apiInit) {
-                treeChannel = api.addChannel(
-                    -1,
-                    'cs',
-                    freeze({
-                        '[': this.handleResidue,
-                        '[{[ok0{': this.handleOwnerKey,
-                        '[{[f{': this.handleNode,
-                        '[{[f2{': this.handleNode
-                    })
-                );
-                this.apiInit = true;
+        initChannel(id, cmd, handlers) {
+            if (this.channel === -1) {
+                this.channel = api.addChannel(id, cmd, handlers ? freeze(handlers) : undefined);
+                if (this.isMonitored) {
+                    mega.requestStatusMonitor.listen(this.channel);
+                }
             }
+        }
+
+        finalise() {
+            if (this.channel !== -1) {
+                if (this.isMonitored) {
+                    mega.requestStatusMonitor.unlisten(this.channel);
+                }
+                api.removeChannel(this.channel);
+                this.channel = -1;
+            }
+        }
+    }
+
+    class RewindChunkTreeHandler extends RewindChunkHandler {
+        initChannel() {
+            super.initChannel(-1, 'cs', {
+                '[': this.handleResidue,
+                '[{[ok0{': this.handleOwnerKey,
+                '[{[f{': this.handleNode,
+                '[{[f2{': this.handleNode
+            });
         }
 
         handleNode(node) {
@@ -278,26 +314,16 @@ lazy(mega, 'rewindUtils', () => {
         }
     }
 
-    class RewindChunkPacketHandler {
-        constructor() {
-            this.apiInit = false;
+    class RewindChunkPacketHandler extends RewindChunkHandler {
+        initChannel() {
+            super.initChannel(-1,  'sc', {
+                '{': this.handleResidue,
+                '{[a{': this.handlePacket,
+                '{[a{{t[f{': this.handleNode,  // SC node
+                '{[a{{t[f2{': this.handleNode  // SC node (versioned)
+            });
         }
 
-        initChannel() {
-            if (!this.apiInit) {
-                packetChannel = api.addChannel(
-                    -1,
-                    'sc',
-                    freeze({
-                        '{': this.handleResidue,
-                        '{[a{': this.handlePacket,
-                        '{[a{{t[f{': this.handleNode,  // SC node
-                        '{[a{{t[f2{': this.handleNode  // SC node (versioned)
-                    })
-                );
-                this.apiInit = true;
-            }
-        }
         handleNode(node) {
             const apiId = this.__ident_1; // Will just tell us what request they are in
 
@@ -447,57 +473,21 @@ lazy(mega, 'rewindUtils', () => {
         }
     }
 
-    class ReinstateLogger {
+    class RewindReinstateHandler extends RewindChunkHandler {
         constructor() {
-            this.init();
-        }
-        init() {
-            this.prefix = 'Rewind:reinstateLogger';
-            this.entryCount = -1;
-        }
-        next() {
-            this.entryCount += 1;
-            return this;
-        }
-        log(type, data) {
-            console.log(
-                this.prefix,
-                `[${this.entryCount}]`,
-                `[${type}]`,
-                data
-            );
-            return this;
-        }
-    }
-
-    class RewindReinstateHandler {
-        constructor() {
-            this.init();
-        }
-
-        init() {
-            this.channel = -1;
+            super(true);
             this.progressCallback = null;
             this.inProgress = false;
             this.numFoldersProcessed = 0;
-            this.apiInit = false;
             this.reinstateLogger = new ReinstateLogger();
         }
 
         initChannel() {
-            if (!this.apiInit) {
-                this.channel = api.addChannel(-1, 'cs');
-                mega.requestStatusMonitor.listen(this.channel);
-                this.apiInit = true;
-            }
+            super.initChannel(-1,  'cs');
         }
 
         finalise() {
-            if (this.apiInit) {
-                mega.requestStatusMonitor.unlisten(this.channel);
-                api.removeChannel(this.channel);
-                this.apiInit = false;
-            }
+            super.finalise();
             this.inProgress = false;
         }
 
@@ -781,15 +771,15 @@ lazy(mega, 'rewindUtils', () => {
             progress.showSection();
             progress.next();
 
-            console.time('Rewind:build-requests');
+            console.time('rewind:utils:requests:build');
             const requests = await this.buildRequests(rwRoot);
-            console.timeEnd('Rewind:build-requests');
+            console.timeEnd('rewind:utils:requests:build');
 
             progress.next();
 
-            console.time('Rewind:run-requests');
+            console.time('rewind:utils:requests:run');
             const res = requests.length ? await api.screq(requests, this.channel) : null;
-            console.timeEnd('Rewind:run-requests');
+            console.timeEnd('rewind:utils:requests:run');
 
             progress.next();
             progress.hideSection();
@@ -822,6 +812,7 @@ lazy(mega, 'rewindUtils', () => {
                 d: 1
             };
 
+            logger.info('RewindUtils.getTreeCacheList - Send request', payload);
             return api.req(payload).then(({result}) => result);
         }
 
@@ -845,10 +836,13 @@ lazy(mega, 'rewindUtils', () => {
                 td: toDate
             };
 
+            logger.info('RewindUtils.getChangeLog - Send request', payload);
             return api.req(payload).then(({result}) => result);
         }
 
-        getTreeCacheHistory(timestamp, handle, channel, progressCallback) {
+        getChunkedTreeCacheHistory(timestamp, handle, progressCallback) {
+            this.tree.initChannel();
+
             const payload = {
                 a: 'tch',
                 ts: timestamp,
@@ -857,19 +851,15 @@ lazy(mega, 'rewindUtils', () => {
 
             const options = {
                 progress: progressCallback,
-                channel
+                channel: this.tree.channel,
             };
 
-            logger.info('RewindUtils.getTreeCacheHistory - Send request', payload);
+            logger.info('RewindUtils.getChunkedTreeCacheHistory - Send request', payload);
             return api.req(payload, options).then(({result}) => result);
         }
 
-        getChunkedTreeCacheHistory(timestamp, handle, progressCallback) {
-            this.tree.initChannel();
-            return this.getTreeCacheHistory(timestamp, handle, treeChannel, progressCallback);
-        }
-
-        getActionPacketHistory(sequenceNumber, endDate, channel, progressCallback) {
+        getChunkedActionPacketHistory(sequenceNumber, endDate, progressCallback) {
+            this.packet.initChannel();
 
             if (endDate instanceof Date) {
                 endDate = endDate.getTime();
@@ -877,21 +867,12 @@ lazy(mega, 'rewindUtils', () => {
 
             const payload = `sn=${sequenceNumber}&ts=1&ets=${Math.round(endDate)}`;
             const options = {
-                callback: progressCallback,
-                channel
+                progress: progressCallback,
+                channel: this.packet.channel
             };
 
-            logger.info('RewindUtils.getActionPacketHistory - Send request', payload);
-            return this.makeApiRequest(payload, options).then(({result}) => result);
-        }
-
-        getChunkedActionPacketHistory(sequenceNumber, endDate, progressCallback) {
-            this.packet.initChannel();
-            return this.getActionPacketHistory(sequenceNumber, endDate, packetChannel, progressCallback);
-        }
-
-        makeApiRequest(request, channel) {
-            return api.req(request, channel || 3);
+            logger.info('RewindUtils.getChunkedActionPacketHistory - Send request', payload);
+            return api.req(payload, options).then(({result}) => result);
         }
 
         async handleWorkerMessage(promiseData) {
@@ -906,22 +887,27 @@ lazy(mega, 'rewindUtils', () => {
         }
 
         async checkRequestDone(apiId, progressSource, fromPacket) {
-            // If we know
-            if (mega.rewindUtils.inflight[apiId]) {
-                const chunkArray = (array, size) => {
-                    const chunkedArr = [];
-                    for (let i = 0; i < array.length; i += size) {
-                        chunkedArr.push(array.slice(i, i + size));
-                    }
-                    return chunkedArr;
-                };
+            mega.rewind.handleProgressStep(fromPacket ? 'packet' : 'tree', 'api:get:process');
 
-                if (mega.rewindUtils.queue[apiId] && mega.rewindUtils.queue[apiId].length) {
-                    const chunkedArray = chunkArray(mega.rewindUtils.queue[apiId], 10000);
-                    for (const itemArray of chunkedArray) {
-                        await Promise.allSettled(itemArray);
+            if (mega.rewindUtils.inflight[apiId]) {
+                const logPrefix = `rewind:utils:getRecords:${fromPacket ? 'packet' : 'tree'}:api:get:process`;
+                console.time(logPrefix);
+
+                console.time(`${logPrefix}:chunk`);
+                const limit = 10000;
+                const queue = mega.rewindUtils.queue[apiId];
+                if (queue && queue.length) {
+                    for (let i = 0; i < queue.length; i += limit) {
+                        mega.rewind.handleProgress(7, i / queue.length * 100);
+                        const end = Math.min(i + limit, queue.length);
+                        const chunk = [];
+                        for (let j = i; j < end; j++) {
+                            chunk.push(queue[j]);
+                        }
+                        await Promise.allSettled(chunk);
                     }
                 }
+                console.timeEnd(`${logPrefix}:chunk`);
 
                 const inflight = mega.rewindUtils.inflight[apiId];
                 for (const api of inflight) {
@@ -930,7 +916,9 @@ lazy(mega, 'rewindUtils', () => {
                     }
                 }
 
+                console.time(`${logPrefix}:queue`);
                 if (mega.rewind.putQueue && mega.rewind.putQueue.length) {
+
                     await new Promise((resolve) => {
                         const batch = mega.rewind.putQueue.slice(0, FMDB_FLUSH_THRESHOLD);
                         mega.rewind.putQueue.splice(0, FMDB_FLUSH_THRESHOLD);
@@ -938,8 +926,8 @@ lazy(mega, 'rewindUtils', () => {
                         let oldPromise = null;
                         const promiseArray = [];
 
-                        for (const item of batch) {
-                            const [putFunction, ...putArgs] = item;
+                        for (let i = 0; i < batch.length; i++) {
+                            const [putFunction, ...putArgs] = batch[i];
                             const promise = putFunction(...putArgs);
                             if (promise !== oldPromise) {
                                 oldPromise = promise;
@@ -955,6 +943,7 @@ lazy(mega, 'rewindUtils', () => {
                         });
                     });
                 }
+                console.timeEnd(`${logPrefix}:queue`);
 
                 mega.rewind.handleProgress(progressSource, 0, true);
 
@@ -972,6 +961,7 @@ lazy(mega, 'rewindUtils', () => {
                 // cleanup queue
                 delete mega.rewindUtils.queue[apiId];
                 logger.info(`Api.checkRequestDone - Request done - with inflight - from packet: ${fromPacket}`);
+                console.timeEnd(logPrefix);
                 return true;
             }
 

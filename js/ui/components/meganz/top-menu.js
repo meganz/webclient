@@ -325,6 +325,11 @@ class MegaTopMenu extends MegaMobileTopMenu {
             });
         }
 
+        // No S4 for low tier plans
+        if ([11, 12, 13].includes(u_attr.p)) {
+            return loggedInCD;
+        }
+
         loggedInCD.splice(mega.lite.inLiteMode ? 3 : 4, 0, {
             autoExpand: true,
             text: l.obj_storage,

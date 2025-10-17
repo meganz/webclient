@@ -1950,6 +1950,9 @@
                 var tab = M.chat ? 'conversations' : M.currentrootid === 'shares' ?
                     'shared-with-me' : M.currentrootid === 's4' ? 's4' : 'cloud-drive';
                 var dir = M.currentdirid === 'transfers' ? M.lastSeenCloudFolder || M.RootID : M.currentdirid;
+                if (tab === 'conversations' && $.dialogSelChats) {
+                    delete $.dialogSelChats;
+                }
                 closeMsg();
                 handleOpenDialog(tab, dir, { key: 'copyToUpload', value: [files, emptyFolders] });
                 return uiCheckboxes($dialog);

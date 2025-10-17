@@ -10,23 +10,6 @@ mobile.rubbishBin = {
     retryCount: 0,
 
     /**
-     * Restore the selected node from the rubbish bin
-     * @param {String} nodeHandle
-     * @returns Returns the restored node
-     */
-    async restore(nodeHandle) {
-        'use strict';
-
-        mobile.rubbishBin.isRestoring = true;
-
-        const node = await M.revertRubbishNodes(nodeHandle).catch((ex) => ex !== EBLOCKED && tell(ex));
-
-        mobile.rubbishBin.isRestoring = false;
-
-        return node;
-    },
-
-    /**
      * Trigger this function when the user confirms to empty the bin
      * @returns {void}
      */

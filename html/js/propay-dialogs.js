@@ -3110,7 +3110,7 @@ var addressDialog = {
                     if (pro.propay.onPropayPage()) {
                         iframeSrc += `&v=2`;
                     }
-                    iframeSrc += `&rtc=${(d && localStorage.rtc) || 1}`;
+                    iframeSrc += `&rtc=${(d && localStorage.rtc) || 0}`;
                 }
 
                 if (pro.propay.paymentButton) {

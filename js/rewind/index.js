@@ -639,8 +639,7 @@ lazy(mega, 'rewind', () => {
             }
 
             console.time('rewind:index:getRecords:packet');
-            await this.loadActionPacket(timestampInSeconds, selectedTreeCache && selectedTreeCache.sn || null
-                , selectedTreeCache, this.treeCacheState);
+            await this.loadActionPacket(timestampInSeconds, selectedTreeCache && selectedTreeCache.sn || null);
             console.timeEnd('rewind:index:getRecords:packet');
             console.timeEnd('rewind:index:getRecords');
 
@@ -690,10 +689,10 @@ lazy(mega, 'rewind', () => {
                 });
                 console.timeEnd('rewind:index:getRecords:tree:storage:read');
 
-                this.handleProgressStep('tree', 'state:storage:save');
-                console.time('rewind:index:getRecords:tree:state:storage:save');
+                this.handleProgressStep('tree', 'prepare');
+                console.time('rewind:index:getRecords:tree:prepare');
                 await this.prepareTreeCacheNodes(treeCacheHistory, this.nodeDictionary, this.nodeChildrenDictionary);
-                console.timeEnd('rewind:index:getRecords:tree:state:storage:save');
+                console.timeEnd('rewind:index:getRecords:tree:prepare');
 
                 logger.info(`Rewind.loadTreeCacheItem - #Rewind #DB - TreeCache ` +
                     `- Loaded from DB - ${treeCacheHistory.length} files`);
@@ -722,10 +721,10 @@ lazy(mega, 'rewind', () => {
                 );
                 console.timeEnd('rewind:index:getRecords:tree:api:get');
 
-                this.handleProgressStep('tree', 'storage:save');
-                console.time('rewind:index:getRecords:tree:storage:save');
+                this.handleProgressStep('tree', 'state:storage:save');
+                console.time('rewind:index:getRecords:tree:state:storage:save');
                 await mega.rewindStorage.saveTreeCacheSNStateEnd(sequenceNumber, treeCacheState);
-                console.timeEnd('rewind:index:getRecords:tree:storage:save');
+                console.timeEnd('rewind:index:getRecords:tree:state:storage:save');
 
                 logger.info(`Rewind.loadTreeCacheItem - #Rewind #API - TreeCache - Loaded from API - ` +
                     `${Object.keys(this.nodeDictionary).length - 1} files`);
@@ -762,7 +761,8 @@ lazy(mega, 'rewind', () => {
         }
 
         // eslint-disable-next-line complexity
-        async loadActionPacket(currentTimestamp, cacheSequenceNumber, treeCache, treeCacheState) {
+        async loadActionPacket(currentTimestamp, cacheSequenceNumber) {
+            const {treeCacheState} = this;
             const dateData = Object.create(null);
             let isOutdated = false;
             let sn = null;
@@ -798,15 +798,6 @@ lazy(mega, 'rewind', () => {
             let hasActionPacketProgress = false;
             if (currentTimestamp) {
                 if (isOutdated) {
-                    const packetPromise = mega.promise;
-                    mBroadcaster.once('rewind:packet:done', (response) => {
-                        sn = response.sn;
-                        packets = packets.concat(response.packets);
-                        logger.info(`Rewind.loadActionPacket - #Rewind #API - ActionPacket - Loaded from API - ` +
-                            `${response.packets.length} action packets`);
-                        packetPromise.resolve();
-                    });
-
                     this.handleProgressStep('packet', 'api:get');
                     console.time('rewind:index:getRecords:packet:api:get');
                     // Check if we have records in DB, if not, get from API
@@ -815,9 +806,18 @@ lazy(mega, 'rewind', () => {
                             this.handleProgress(5, progress);
                             hasActionPacketProgress = true;
                         });
-                    console.timeEnd('rewind:index:getRecords:packet:api:get');
 
-                    await packetPromise;
+                    this.handleProgressStep('packet', 'api:get:process');
+                    await new Promise((resolve) => {
+                        mBroadcaster.once('rewind:packet:done', (response) => {
+                            sn = response.sn;
+                            packets = [...packets, ...response.packets];
+                            logger.info(`Rewind.loadActionPacket - #Rewind #API - ActionPacket - Loaded from API - ` +
+                                `${response.packets.length} action packets`);
+                            resolve();
+                        });
+                    });
+                    console.timeEnd('rewind:index:getRecords:packet:api:get');
                 }
 
                 const parsePacketData = (packetData, order) => {
@@ -957,10 +957,10 @@ lazy(mega, 'rewind', () => {
                 const promiseArray = Array.from(promiseSet);
                 // Wait to have everything flushed on the DB
                 if (promiseArray.length) {
-                    this.handleProgressStep('packet', 'storage:save');
-                    console.time('rewind:index:getRecords:packet:storage:save');
+                    this.handleProgressStep('packet', 'state:storage:save');
+                    console.time('rewind:index:getRecords:packet:state:storage:save');
                     await Promise.all(promiseArray);
-                    console.timeEnd('rewind:index:getRecords:packet:storage:save');
+                    console.timeEnd('rewind:index:getRecords:packet:state:storage:save');
                 }
 
                 // For debugging only
@@ -1624,8 +1624,6 @@ lazy(mega, 'rewind', () => {
         addNodeFromWorker(decryptedNode) {
             if (!this.putQueue) {
                 this.putQueue = [];
-                this.putQueueTail = 0;
-                this.putQueueHead = 0;
             }
 
             this.putQueue.push([
@@ -1635,14 +1633,13 @@ lazy(mega, 'rewind', () => {
             ]);
 
             if (this.putQueue.length > FMDB_FLUSH_THRESHOLD) {
-                const batch = this.putQueue.slice(0, FMDB_FLUSH_THRESHOLD);
-                this.putQueue.splice(0, FMDB_FLUSH_THRESHOLD);
-
+                const batch = this.putQueue.splice(0, FMDB_FLUSH_THRESHOLD);
                 if (d) {
                     logger.info('Flushing nodes');
                 }
-                for (const item of batch) {
-                    const [putFunction, ...putArgs] = item;
+
+                for (let i = 0; i < batch.length; i++) {
+                    const [putFunction, ...putArgs] = batch[i];
                     putFunction(...putArgs);
                 }
             }
@@ -1671,11 +1668,12 @@ lazy(mega, 'rewind', () => {
                     'storage:read': 'Reading history...',
                     'storage:save': 'Saving history...',
                     'api:get': 'Retrieving history...',
-                    'api:get:process': 'Processing history...'
+                    'api:get:process': 'Processing history...',
+                    'prepare': 'Preparing history...'
                 },
                 'packet': {
                     'storage:read': 'Reading data...',
-                    'storage:save': 'Saving data...',
+                    'state:storage:save': 'Saving state...',
                     'api:get': 'Retrieving data...',
                     'api:get:process': 'Processing data...',
                     'prepare': 'Preparing data...'

@@ -310,7 +310,10 @@ lazy(mega, 'rewindUtils', () => {
             // This is just to check if we are done processing
             // from worker earlier than expected and residue
             // might take a long time to finish parsing/downloading
-            mega.rewindUtils.checkRequestDone(apiId, 1);
+            mega.rewindUtils.checkRequestDone(apiId, 1).catch((ex) => {
+                mega.rewindUi.sidebar.close();
+                tell(ex);
+            });
         }
     }
 
@@ -452,7 +455,10 @@ lazy(mega, 'rewindUtils', () => {
         async handlePostRequest(apiId, response) {
             // We know the request is done and
             // make all the nodes are processed already
-            await mega.rewindUtils.checkRequestDone(apiId, 3, true);
+            await mega.rewindUtils.checkRequestDone(apiId, 3, true).catch((ex) => {
+                mega.rewindUi.sidebar.close();
+                tell(ex);
+            });
 
             const sn = response.sn; // Last SN on the action packet
             const packets = mega.rewindUtils.packets; // Processed packets
@@ -876,56 +882,55 @@ lazy(mega, 'rewindUtils', () => {
         }
 
         async handleWorkerMessage(promiseData) {
-            const data = await promiseData;
+            const node = await promiseData;
 
-            if (data.h) {
-                data.apiId = null;
-                delete data.apiId;
+            if (node.h) {
+                node.apiId = null;
+                delete node.apiId;
 
-                mega.rewind.addNodeFromWorker(data);
+                mega.rewind.addNodeFromWorker(node);
             }
         }
 
         async checkRequestDone(apiId, progressSource, fromPacket) {
-            mega.rewind.handleProgressStep(fromPacket ? 'packet' : 'tree', 'api:get:process');
-
             if (mega.rewindUtils.inflight[apiId]) {
                 const logPrefix = `rewind:utils:getRecords:${fromPacket ? 'packet' : 'tree'}:api:get:process`;
+                mega.rewind.handleProgressStep(fromPacket ? 'packet' : 'tree', 'api:get:process');
                 console.time(logPrefix);
 
-                console.time(`${logPrefix}:chunk`);
+                console.time(`${logPrefix}:queue`);
                 const limit = 10000;
-                const queue = mega.rewindUtils.queue[apiId];
-                if (queue && queue.length) {
-                    for (let i = 0; i < queue.length; i += limit) {
-                        mega.rewind.handleProgress(7, i / queue.length * 100);
-                        const end = Math.min(i + limit, queue.length);
-                        const chunk = [];
-                        for (let j = i; j < end; j++) {
-                            chunk.push(queue[j]);
-                        }
-                        await Promise.allSettled(chunk);
+                const queue = mega.rewindUtils.queue[apiId] || [];
+                const qTotal = queue.length;
+                for (let i = 0; i < queue.length; i += limit) {
+                    mega.rewind.handleProgress(7, i / qTotal * 100);
+                    const end = Math.min(i + limit, qTotal);
+                    const chunk = [];
+                    for (let j = i; j < end; j++) {
+                        chunk.push(queue[j]);
                     }
+                    await Promise.allSettled(chunk);
                 }
-                console.timeEnd(`${logPrefix}:chunk`);
+                delete mega.rewindUtils.queue[apiId];
+                console.timeEnd(`${logPrefix}:queue`);
 
+                console.time(`${logPrefix}:inflight`);
                 const inflight = mega.rewindUtils.inflight[apiId];
                 for (const api of inflight) {
                     if (api.residual && api.residual.length) {
                         api.residual[0].resolve();
                     }
                 }
+                delete mega.rewindUtils.inflight[apiId];
+                console.timeEnd(`${logPrefix}:inflight`);
 
-                console.time(`${logPrefix}:queue`);
+                console.time(`${logPrefix}:putQueue`);
                 if (mega.rewind.putQueue && mega.rewind.putQueue.length) {
-
                     await new Promise((resolve) => {
-                        const batch = mega.rewind.putQueue.slice(0, FMDB_FLUSH_THRESHOLD);
-                        mega.rewind.putQueue.splice(0, FMDB_FLUSH_THRESHOLD);
-
                         let oldPromise = null;
                         const promiseArray = [];
 
+                        const batch = mega.rewind.putQueue.splice(0, FMDB_FLUSH_THRESHOLD);
                         for (let i = 0; i < batch.length; i++) {
                             const [putFunction, ...putArgs] = batch[i];
                             const promise = putFunction(...putArgs);
@@ -943,12 +948,8 @@ lazy(mega, 'rewindUtils', () => {
                         });
                     });
                 }
-                console.timeEnd(`${logPrefix}:queue`);
-
+                console.timeEnd(`${logPrefix}:putQueue`);
                 mega.rewind.handleProgress(progressSource, 0, true);
-
-                mega.rewindUtils.inflight[apiId] = null;
-                delete mega.rewindUtils.inflight[apiId];
 
                 // Clone size dictionary
                 if (!fromPacket) {
@@ -958,8 +959,6 @@ lazy(mega, 'rewindUtils', () => {
                         `Downloaded ${Object.keys(mega.rewind.nodeDictionary).length - 1} nodes`);
                 }
 
-                // cleanup queue
-                delete mega.rewindUtils.queue[apiId];
                 logger.info(`Api.checkRequestDone - Request done - with inflight - from packet: ${fromPacket}`);
                 console.timeEnd(logPrefix);
                 return true;

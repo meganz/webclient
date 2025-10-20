@@ -3546,7 +3546,7 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
                 tappedItemId = '';
             }, 600);
 
-            return false;
+            return;
         }
 
         if (n.t || M.dcd[n.h]) {

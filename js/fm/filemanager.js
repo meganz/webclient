@@ -2355,7 +2355,9 @@ FileManager.prototype.initUIKeyEvents = function() {
             !$.dialog &&
             (M.getNodeRights(M.currentdirid) > 1 || M.currentCustomView) &&
             !M.isGalleryPage() &&
-            M.currentrootid !== M.InboxID
+            M.currentrootid !== M.InboxID &&
+            !(M.onDeviceCenter && mega.devices.ui &&
+                mega.devices.ui.getRenderSection() === 'device-centre-devices')
         ) {
             const nodes = s.filter(h => !M.d[h] || M.getNodeRoot(M.d[h].h) !== M.InboxID);
             if (M.isInvalidUserStatus() || $.msgDialog === 'remove') {

@@ -905,11 +905,7 @@ lazy(mega, 'rewindUtils', () => {
                 for (let i = 0; i < queue.length; i += limit) {
                     mega.rewind.handleProgress(7, i / qTotal * 100);
                     const end = Math.min(i + limit, qTotal);
-                    const chunk = [];
-                    for (let j = i; j < end; j++) {
-                        chunk.push(queue[j]);
-                    }
-                    await Promise.allSettled(chunk);
+                    await Promise.allSettled(queue.slice(i, end));
                 }
                 delete mega.rewindUtils.queue[apiId];
                 console.timeEnd(`${logPrefix}:queue`);

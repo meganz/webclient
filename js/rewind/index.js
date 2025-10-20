@@ -959,7 +959,7 @@ lazy(mega, 'rewind', () => {
                 if (promiseArray.length) {
                     this.handleProgressStep('packet', 'state:storage:save');
                     console.time('rewind:index:getRecords:packet:state:storage:save');
-                    await Promise.all(promiseArray);
+                    await Promise.allSettled(promiseArray);
                     console.timeEnd('rewind:index:getRecords:packet:state:storage:save');
                 }
 

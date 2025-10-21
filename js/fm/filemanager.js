@@ -915,14 +915,23 @@ FileManager.prototype.initFileManagerUI = function() {
                         loadingDialog.pshow();
                         M.moveNodes($.moveids, $.movet)
                             .then((moves) => {
-                                if (moves
-                                    && M.currentdirid !== 'out-shares'
-                                    && M.currentdirid !== 'public-links'
-                                    && M.currentdirid !== 'file-requests'
-                                    && String(M.currentdirid).split("/")[0] !== "search"
-                                    && (M.currentrootid !== mega.devices.rootId
-                                        || !mega.devices.ui.isCustomRender())) {
-                                    $ddelm.remove();
+                                if (moves) {
+                                    let type = 'copy';
+                                    if (M.currentdirid !== 'out-shares'
+                                        && M.currentdirid !== 'public-links'
+                                        && M.currentdirid !== 'file-requests'
+                                        && String(M.currentdirid).split("/")[0] !== "search"
+                                        && (M.currentrootid !== mega.devices.rootId
+                                            || !mega.devices.ui.isCustomRender())) {
+                                        $ddelm.remove();
+                                        type = 'move';
+                                    }
+                                    showItemOperationToast({
+                                        nodes: $.moveids,
+                                        target: $.movet,
+                                        type,
+                                        viewItems: true
+                                    });
                                 }
                             })
                             .catch((ex) => {
@@ -941,11 +950,18 @@ FileManager.prototype.initFileManagerUI = function() {
                 $.copyt = t;
                 setTimeout(() => {
                     M.copyNodes($.copyids, $.copyt, dd === 'copydel')
-                        .then(() => {
-
-                            // Update files count...
-                            if (M.currentdirid === 'shares' && !M.onIconView) {
-                                M.openFolder('shares', 1);
+                        .then((res) => {
+                            if (res && res.length) {
+                                // Update files count...
+                                if (M.currentdirid === 'shares' && !M.onIconView) {
+                                    M.openFolder('shares', 1);
+                                }
+                                showItemOperationToast({
+                                    nodes: res,
+                                    target: $.copyt,
+                                    type: dd === 'copydel' && 'move',
+                                    viewItems: true
+                                });
                             }
                         })
                         .catch((ex) => {

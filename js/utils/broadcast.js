@@ -390,7 +390,7 @@
          */
         once(topic, callback) {
 
-            this.addListener(topic, {once: true, onBroadcast: callback});
+            this.addListener(topic, {once: true, onBroadcast: tryCatch(callback, reportError)});
         },
 
         /**

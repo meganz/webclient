@@ -13,6 +13,66 @@ lazy(mega, 'rewindUtils', () => {
         SKIP_FILE: 'Skipped',
     };
 
+    class Progress {
+        constructor() {
+            this.timers = new Set();
+            this.reset();
+        }
+
+        reset() {
+            this.progress = {
+                'getRecords:tree:storage:read': 0,
+                'getRecords:tree:api:get': 0,
+                'getRecords:tree:api:get:process': 0,
+                'getRecords:packet:prepare': 0,
+                'getRecords:packet:storage:read': 0,
+                'getRecords:packet:api:get': 0,
+                'getRecords:packet:api:get:process': 0,
+            };
+        }
+
+        start(label) {
+            mega.rewindUi.sidebar.updateProgressStep(label);
+            this.update(label, 0);
+
+            if (!this.timers.has(label)) {
+                logger.info(`rewind:${label}: started...`);
+                logger.time(`rewind:${label}`);
+                this.timers.add(label);
+            }
+        }
+
+        complete(label) {
+            this.update(label, 100);
+
+            if (this.timers.has(label)) {
+                logger.timeEnd(`rewind:${label}`);
+                this.timers.delete(label);
+            }
+        }
+
+        update(label, value) {
+            if (this.progress && this.progress.hasOwnProperty(label) && this.progress[label] !== value) {
+                this.progress[label] = value;
+
+                let entries = 0;
+                let labelProgress = 0;
+                const values = Object.values(this.progress);
+
+                for (let i = 0; i < values.length; i++) {
+                    const v = Number(values[i]) || 0;
+                    if (v >= 0 && v <= 100) {
+                        entries++;
+                        labelProgress += v;
+                    }
+                }
+
+                mBroadcaster.sendMessage('rewind:progress', entries
+                    ? Math.min(100, Math.floor(labelProgress / entries)) : 0);
+            }
+        }
+    }
+
     class RewindMEGAWorker extends MEGAWorker {
         attachNewWorker() {
             const worker = new Worker(this.url);
@@ -257,13 +317,11 @@ lazy(mega, 'rewindUtils', () => {
                 nodePromise = Promise.resolve(node);
             }
 
-            // Throw in as promise as we are waiting for the
-            // dispatch to finish.
-            const queueLength = mega.rewindUtils.queue[node.apiId].length;
-            // This is for handling the current progress
-            mega.rewind.handleProgress(1, queueLength);
-
-            mega.rewindUtils.handleWorkerMessage(nodePromise);
+            mega.rewindUtils.handleWorkerMessage(
+                nodePromise,
+                'getRecords:tree:api:get:process',
+                node.apiId,
+                mega.rewindUtils.queue[node.apiId].length);
             mega.rewindUtils.queue[node.apiId].push(nodePromise);
         }
 
@@ -290,7 +348,10 @@ lazy(mega, 'rewindUtils', () => {
             // The context for this function is MEGAPIRequest
             const apiId = this.__ident_1;
 
-            rewindWorker.broadcast('flush', {flush: true});
+            if (rewindWorker) {
+                rewindWorker.broadcast('flush', {flush: true});
+            }
+
             // This is for request tracking that is still in progress
             // and be terminated once the nodes are processed already
             if (!mega.rewindUtils.inflight[apiId]) {
@@ -310,10 +371,11 @@ lazy(mega, 'rewindUtils', () => {
             // This is just to check if we are done processing
             // from worker earlier than expected and residue
             // might take a long time to finish parsing/downloading
-            mega.rewindUtils.checkRequestDone(apiId, 1).catch((ex) => {
-                mega.rewindUi.sidebar.close();
-                tell(ex);
-            });
+            mega.rewindUtils.checkRequestDone(apiId, 'getRecords:tree:api:get:process')
+                .catch((ex) => {
+                    mega.rewindUi.sidebar.close();
+                    tell(ex);
+                });
         }
     }
 
@@ -426,7 +488,10 @@ lazy(mega, 'rewindUtils', () => {
         handleResidue(response) {
             const apiId = this.__ident_1;
 
-            rewindWorker.broadcast('flush', {flush: true});
+            if (rewindWorker) {
+                rewindWorker.broadcast('flush', {flush: true});
+            }
+
             if (response.ts && response.ts.length) {
                 mega.rewindUtils.packet.handleTimestamp(response.ts);
             }
@@ -455,15 +520,16 @@ lazy(mega, 'rewindUtils', () => {
         async handlePostRequest(apiId, response) {
             // We know the request is done and
             // make all the nodes are processed already
-            await mega.rewindUtils.checkRequestDone(apiId, 3, true).catch((ex) => {
-                mega.rewindUi.sidebar.close();
-                tell(ex);
-            });
+            await mega.rewindUtils.checkRequestDone(apiId, 'getRecords:packet:api:get:process', true)
+                .catch((ex) => {
+                    mega.rewindUi.sidebar.close();
+                    tell(ex);
+                });
 
             const sn = response.sn; // Last SN on the action packet
             const packets = mega.rewindUtils.packets; // Processed packets
 
-            logger.info('Packet.handlePostRequest - rewind:packet:done');
+            logger.info('Packet.handlePostRequest - sendMessage "rewind:packet:done"');
             mBroadcaster.sendMessage('rewind:packet:done', {
                 packets,
                 sn
@@ -777,15 +843,15 @@ lazy(mega, 'rewindUtils', () => {
             progress.showSection();
             progress.next();
 
-            console.time('rewind:utils:requests:build');
+            mega.rewindUtils.progress.start('restore:requests:build');
             const requests = await this.buildRequests(rwRoot);
-            console.timeEnd('rewind:utils:requests:build');
+            mega.rewindUtils.progress.complete('restore:requests:build');
 
             progress.next();
 
-            console.time('rewind:utils:requests:run');
+            mega.rewindUtils.progress.start('restore:requests:run');
             const res = requests.length ? await api.screq(requests, this.channel) : null;
-            console.timeEnd('rewind:utils:requests:run');
+            mega.rewindUtils.progress.complete('restore:requests:run');
 
             progress.next();
             progress.hideSection();
@@ -804,6 +870,7 @@ lazy(mega, 'rewindUtils', () => {
             lazy(this, 'tree', () => new RewindChunkTreeHandler());
             lazy(this, 'packet', () => new RewindChunkPacketHandler());
             lazy(this, 'reinstate', () => new RewindReinstateHandler());
+            lazy(this, 'progress', () => new Progress());
 
             this.queue = Object.create(null);
             this.inflight = Object.create(null);
@@ -881,8 +948,11 @@ lazy(mega, 'rewindUtils', () => {
             return api.req(payload, options).then(({result}) => result);
         }
 
-        async handleWorkerMessage(promiseData) {
+        async handleWorkerMessage(promiseData, progressSource, apiId, length) {
             const node = await promiseData;
+
+            const qTotal = this.queue[apiId].length;
+            this.progress.update(progressSource, (qTotal - length) / qTotal * 100);
 
             if (node.h) {
                 node.apiId = null;
@@ -892,39 +962,39 @@ lazy(mega, 'rewindUtils', () => {
             }
         }
 
-        async checkRequestDone(apiId, progressSource, fromPacket) {
-            if (mega.rewindUtils.inflight[apiId]) {
-                const logPrefix = `rewind:utils:getRecords:${fromPacket ? 'packet' : 'tree'}:api:get:process`;
-                mega.rewind.handleProgressStep(fromPacket ? 'packet' : 'tree', 'api:get:process');
-                console.time(logPrefix);
+        async checkRequestDone(apiId, progressSource, isPacket) {
+            if (this.inflight[apiId]) {
+                this.progress.start(progressSource);
 
-                console.time(`${logPrefix}:queue`);
+                this.progress.start(`${progressSource}:queue`);
                 const limit = 10000;
-                const queue = mega.rewindUtils.queue[apiId] || [];
+                const queue = this.queue[apiId] || [];
                 const qTotal = queue.length;
                 for (let i = 0; i < queue.length; i += limit) {
-                    mega.rewind.handleProgress(7, i / qTotal * 100);
+                    if (isPacket) {
+                        this.progress.update(progressSource, i / qTotal * 100);
+                    }
                     const end = Math.min(i + limit, qTotal);
                     await Promise.allSettled(queue.slice(i, end));
                 }
-                delete mega.rewindUtils.queue[apiId];
-                console.timeEnd(`${logPrefix}:queue`);
+                delete this.queue[apiId];
+                this.progress.complete(`${progressSource}:queue`);
 
-                console.time(`${logPrefix}:inflight`);
-                const inflight = mega.rewindUtils.inflight[apiId];
+                this.progress.start(`${progressSource}:inflight`);
+                const inflight = this.inflight[apiId];
                 for (const api of inflight) {
                     if (api.residual && api.residual.length) {
                         api.residual[0].resolve();
                     }
                 }
-                delete mega.rewindUtils.inflight[apiId];
-                console.timeEnd(`${logPrefix}:inflight`);
+                delete this.inflight[apiId];
+                this.progress.complete(`${progressSource}:inflight`);
 
-                console.time(`${logPrefix}:putQueue`);
+                this.progress.start(`${progressSource}:putQueue`);
                 if (mega.rewind.putQueue && mega.rewind.putQueue.length) {
                     await new Promise((resolve) => {
                         let oldPromise = null;
-                        const promiseArray = [];
+                        const promises = [];
 
                         const batch = mega.rewind.putQueue.splice(0, FMDB_FLUSH_THRESHOLD);
                         for (let i = 0; i < batch.length; i++) {
@@ -932,11 +1002,11 @@ lazy(mega, 'rewindUtils', () => {
                             const promise = putFunction(...putArgs);
                             if (promise !== oldPromise) {
                                 oldPromise = promise;
-                                promiseArray.push(oldPromise);
+                                promises.push(oldPromise);
                             }
                         }
 
-                        Promise.allSettled(promiseArray).then(() => {
+                        Promise.allSettled(promises).then(() => {
                             if (d) {
                                 logger.info('Flushing nodes - request done');
                             }
@@ -944,23 +1014,22 @@ lazy(mega, 'rewindUtils', () => {
                         });
                     });
                 }
-                console.timeEnd(`${logPrefix}:putQueue`);
-                mega.rewind.handleProgress(progressSource, 0, true);
+                this.progress.complete(`${progressSource}:putQueue`);
 
                 // Clone size dictionary
-                if (!fromPacket) {
+                if (!isPacket) {
                     // Sum all the size data for the nodes
                     mega.rewind.sumSizeData();
                     logger.info(`Api.checkRequestDone -` +
                         `Downloaded ${Object.keys(mega.rewind.nodeDictionary).length - 1} nodes`);
                 }
 
-                logger.info(`Api.checkRequestDone - Request done - with inflight - from packet: ${fromPacket}`);
-                console.timeEnd(logPrefix);
+                logger.info(`Api.checkRequestDone - Request done - with inflight - isPacket: ${isPacket}`);
+                this.progress.complete(progressSource);
                 return true;
             }
 
-            logger.info(`Api.checkRequestDone - Request done - without inflight - from packet: ${fromPacket}`);
+            logger.info(`Api.checkRequestDone - Request done - without inflight - isPacket: ${progressSource}`);
             return false;
         }
     };

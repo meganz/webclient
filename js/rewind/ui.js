@@ -76,6 +76,25 @@ lazy(mega, 'rewindUi', () => {
             this.rewindOptions = Object.create(null);
             this.openFolderListener = null;
 
+            // TODO confirm this feature and then replace fixed strings by "t" labels
+            /** @property RewindSidebar.progressStepLabels */
+            lazy(this, 'progressStepLabels', () => {
+                return {
+                    'getRecords:tree:cache:read': 'Accessing history...',
+                    'getRecords:tree:state:storage:read': 'Reading state...',
+                    'getRecords:tree:state:storage:save': 'Saving state...',
+                    'getRecords:tree:storage:read': 'Reading history...',
+                    'getRecords:tree:api:get': 'Retrieving history...',
+                    'getRecords:tree:api:get:process': 'Processing history...',
+                    'getRecords:tree:prepare': 'Preparing history...',
+                    'getRecords:packet:storage:read': 'Reading data...',
+                    'getRecords:packet:state:storage:save': 'Saving state...',
+                    'getRecords:packet:api:get': 'Retrieving data...',
+                    'getRecords:packet:api:get:process': 'Processing data...',
+                    'getRecords:packet:prepare': 'Preparing data...'
+                };
+            });
+
             /** @property RewindSidebar.template */
             lazy(this, 'template', () => {
                 const res = getTemplate('rewind');
@@ -749,6 +768,9 @@ lazy(mega, 'rewindUi', () => {
                 return false;
             }
 
+            mega.rewindUtils.tree.finalise();
+            mega.rewindUtils.packet.finalise();
+
             let isOpenFolder = false;
             let closeRewind = true;
 
@@ -865,9 +887,10 @@ lazy(mega, 'rewindUi', () => {
                 this.$contentLoadingProgress.text(formatPercentage(progress / 100));
             }
         }
-        updateProgressStep(text) {
-            if (this.$contentLoadingProgressStep.length) {
-                this.$contentLoadingProgressStep.text(text);
+
+        updateProgressStep(step) {
+            if (this.progressStepLabels[step] && this.$contentLoadingProgressStep.length) {
+                this.$contentLoadingProgressStep.text(this.progressStepLabels[step]);
             }
         }
 
@@ -1187,6 +1210,12 @@ lazy(mega, 'rewindUi', () => {
             if (!isOpenFolder) {
                 this.$contentLoading.removeClass('hidden');
                 const hasRecords = await mega.rewind.getRecords(date.getTime())
+                    .catch((ex) => {
+                        mega.rewindUi.sidebar.close();
+                        if (typeof ex !== 'object' || ex.code !== EROLLEDBACK) {
+                            tell(ex);
+                        }
+                    })
                     .finally(() => {
                         mega.rewindUtils.tree.finalise();
                         mega.rewindUtils.packet.finalise();
@@ -2036,7 +2065,7 @@ lazy(mega, 'rewindUi', () => {
                     this.selectedDate = dateObj;
                 }
 
-                console.time('rewind:index:restore');
+                mega.rewindUtils.progress.start('restore');
                 this.$restoreButton.addClass('disabled');
 
                 this.openFolderListener = mBroadcaster.addListener('beforepagechange', () => {
@@ -2136,7 +2165,7 @@ lazy(mega, 'rewindUi', () => {
                         mega.rewindUi.sidebar.teardownLoader();
                         mega.rewindUi.sidebar.updateRestoreProgress();
                         this.$restoreButton.removeClass('disabled');
-                        console.timeEnd('rewind:index:restore');
+                        mega.rewindUtils.progress.complete('restore');
                     });
                 return false;
             };

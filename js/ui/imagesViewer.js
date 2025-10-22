@@ -861,16 +861,16 @@ var slideshowid;
 
         if (page !== 'download') {
 
-            options.onSwipeRight = function() {
+            options.onSwipeRight = function(ev) {
 
-                if (this.onEdge.left) {
+                if (this.onEdge.left && ev.target.closest('.video-progress-bar') === null) {
                     slideshow_prev();
                 }
             };
 
-            options.onSwipeLeft = function() {
+            options.onSwipeLeft = function(ev) {
 
-                if (this.onEdge.right) {
+                if (this.onEdge.right && ev.target.closest('.video-progress-bar') === null) {
                     slideshow_next();
                 }
             };

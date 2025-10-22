@@ -420,6 +420,14 @@
         transition: var(--transition-height);
         width: 100%;
     }
+    .media-viewer .video-progress-bar::before {
+        content: '';
+        position: absolute;
+        top: -1rem;
+        bottom: -1rem;
+        left: 0;
+        width: 100%;
+    }
     .video-progress-block:hover .video-progress-bar {
         height: 100%;
     }

@@ -21,7 +21,7 @@ lazy(mega, 'rewindUtils', () => {
 
         reset() {
             this.current = 0;
-            this.progress = {
+            this.labels = {
                 'getRecords:tree:cache:read': 0,
                 'getRecords:tree:storage:read': 0,
                 'getRecords:tree:prepare': 0,
@@ -57,16 +57,16 @@ lazy(mega, 'rewindUtils', () => {
         }
 
         update(label, value) {
-            if (this.progress && this.progress.hasOwnProperty(label) && this.progress[label] !== value) {
-                if (value > 0 && value.toFixed(2) === this.progress[label].toFixed(2)) {
+            if (this.labels.hasOwnProperty(label)) {
+                if (value.toFixed(2) === this.labels[label].toFixed(2)) {
                     return;
                 }
 
-                this.progress[label] = value;
+                this.labels[label] = value;
 
                 let entries = 0;
                 let labelProgress = 0;
-                const values = Object.values(this.progress);
+                const values = Object.values(this.labels);
 
                 for (let i = 0; i < values.length; i++) {
                     const v = Number(values[i]) || 0;

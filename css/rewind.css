@@ -599,7 +599,7 @@ body.theme-dark .rewind-datepicker-calendar .datepicker--cell.-current- {
 
 .sidebar .sidebar-container .sidebar-content .content-loading .progress-step {
     font: var(--text-body2);
-    color: var(--text-color-low);
+    color: var(--text-color-medium);
     padding-top: 8px;
 }
 

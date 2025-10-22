@@ -605,7 +605,9 @@ lazy(mega, 'rewind', () => {
                 logger.info(`Rewind.loadTreeCacheItem - #Rewind #API - TreeCache - Reusing current tree cache`);
 
                 mega.rewindUtils.progress.start('getRecords:tree:cache:read');
-                const hasTreeCache = await this.loadTreeCacheItemFromCache();
+                const hasTreeCache = await this.loadTreeCacheItemFromCache((progress) => {
+                    mega.rewindUtils.progress.update('getRecords:tree:cache:read', progress);
+                });
                 mega.rewindUtils.progress.complete('getRecords:tree:cache:read');
 
                 // FIXME: Treecache might not be available but action packet can (verify with api)
@@ -614,6 +616,8 @@ lazy(mega, 'rewind', () => {
                 }
             }
             else {
+                mega.rewindUtils.progress.complete('getRecords:tree:cache:read');
+
                 this.treeCache = selectedTreeCache;
                 this.sequenceNumber = selectedTreeCache.sn;
                 logger.info(`Rewind.loadTreeCacheItem - #Rewind #API - TreeCache - Reloading tree cache`);
@@ -675,13 +679,17 @@ lazy(mega, 'rewind', () => {
             if (treeCacheState && treeCacheState.s === mega.rewindStorage.STATE_SN_END) {
                 logger.info(`Rewind.loadTreeCacheItem - #Rewind #API - TreeCache - Rewinding from DB`);
                 mega.rewindUtils.progress.start('getRecords:tree:storage:read');
-                treeCacheHistory = await mega.rewindStorage.getTreeCacheHistoryNodes(sequenceNumber, (progress) => {
-                    mega.rewindUtils.progress.update('getRecords:tree:storage:read', progress);
-                });
+                treeCacheHistory = await mega.rewindStorage.getTreeCacheHistoryNodes(
+                    sequenceNumber, (progress) => {
+                        mega.rewindUtils.progress.update('getRecords:tree:storage:read', progress);
+                    });
                 mega.rewindUtils.progress.complete('getRecords:tree:storage:read');
 
                 mega.rewindUtils.progress.start('getRecords:tree:prepare');
-                await this.prepareTreeCacheNodes(treeCacheHistory, this.nodeDictionary, this.nodeChildrenDictionary);
+                await this.prepareTreeCacheNodes(
+                    treeCacheHistory, this.nodeDictionary, this.nodeChildrenDictionary, (progress) => {
+                        mega.rewindUtils.progress.update('getRecords:tree:prepare', progress);
+                    });
                 mega.rewindUtils.progress.complete('getRecords:tree:prepare');
 
                 logger.info(`Rewind.loadTreeCacheItem - #Rewind #DB - TreeCache ` +
@@ -689,6 +697,7 @@ lazy(mega, 'rewind', () => {
             }
             else {
                 mega.rewindUtils.progress.complete('getRecords:tree:storage:read');
+                mega.rewindUtils.progress.complete('getRecords:tree:prepare');
             }
 
             treeCacheHistory = localStorage.rewindTreeCacheDisable === '1' ? false : treeCacheHistory;
@@ -725,7 +734,7 @@ lazy(mega, 'rewind', () => {
             return !(!this.treeCacheHistory) || (this.treeCacheHistory && Object.keys(this.treeCacheHistory).length);
         }
 
-        async loadTreeCacheItemFromCache() {
+        async loadTreeCacheItemFromCache(onProgress) {
             // this.treeCacheHistoryTask = mega.promise;
             this.nodeDictionary = Object.create(null);
             // This is just to add placeholder for empty parents
@@ -740,7 +749,8 @@ lazy(mega, 'rewind', () => {
                 return false;
             }
 
-            await this.prepareTreeCacheNodes(this.treeCacheHistory, this.nodeDictionary, this.nodeChildrenDictionary);
+            await this.prepareTreeCacheNodes(
+                this.treeCacheHistory, this.nodeDictionary, this.nodeChildrenDictionary, onProgress);
 
             return !(!this.treeCacheHistory) || (this.treeCacheHistory && Object.keys(this.treeCacheHistory).length);
         }
@@ -1083,13 +1093,17 @@ lazy(mega, 'rewind', () => {
             this.removeNode(n, this.nodeDictionary, this.nodeChildrenDictionary);
         }
 
-        async prepareTreeCacheNodes(treeCacheHistory, nodeDictionary, nodeChildrenDictionary) {
+        async prepareTreeCacheNodes(treeCacheHistory, nodeDictionary, nodeChildrenDictionary, onProgress) {
             const fileList = treeCacheHistory;
             const processInBatches = async(array, batchSize, callback) => {
-                for (let i = 0; i < array.length; i += batchSize) {
+                const aTotal = array.length;
+                for (let i = 0; i < aTotal; i += batchSize) {
                     const batch = array.slice(i, i + batchSize);
                     // Perform some processing on the batch
                     await callback(batch);
+                    if (typeof onProgress === 'function') {
+                        onProgress(i / aTotal * 100);
+                    }
                 }
             };
 

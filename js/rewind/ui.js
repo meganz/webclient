@@ -82,7 +82,8 @@ lazy(mega, 'rewindUi', () => {
                 return {
                     'getRecords:tree:cache:read': 'Accessing history...',
                     'getRecords:tree:state:storage:read': 'Reading state...',
-                    'getRecords:tree:state:storage:save': 'Saving state...',
+                    'getRecords:tree:state:storage:save:start': 'Saving state...',
+                    'getRecords:tree:state:storage:save:end': 'Saving state...',
                     'getRecords:tree:storage:read': 'Reading history...',
                     'getRecords:tree:api:get': 'Retrieving history...',
                     'getRecords:tree:api:get:process': 'Processing history...',
@@ -878,11 +879,9 @@ lazy(mega, 'rewindUi', () => {
             this.removeDownloadUpgradeHandlers();
 
             $(DATEPICKER_SELECTOR, document).off('click.rewind');
-
-            mBroadcaster.removeListener('rewind:progress');
         }
 
-        progressListener(progress) {
+        updateProgress(progress) {
             if (this.$contentLoadingProgress.length) {
                 this.$contentLoadingProgress.text(formatPercentage(progress / 100));
             }
@@ -1024,11 +1023,6 @@ lazy(mega, 'rewindUi', () => {
             $(this.sidebar).rebind('contextmenu.rewind', () => {
                 return false;
             });
-
-            const progressKey = 'rewind:progress';
-
-            mBroadcaster.removeListener(progressKey);
-            mBroadcaster.addListener(progressKey, this.progressListener.bind(this));
         }
 
         contextOpenItem() {
@@ -1164,7 +1158,7 @@ lazy(mega, 'rewindUi', () => {
             const date = new Date(datepickerDate);
             $('.content-item', this.$sidebarContent).addClass('hidden');
             this.$contentLoading.removeClass('hidden');
-            this.progressListener(0); // Set loading to 0
+            this.updateProgress(0);
             this.$contentEmpty.addClass('hidden');
             this.$contentTreeCacheEmpty.addClass('hidden');
             this.$contentUpgrade.addClass('hidden');

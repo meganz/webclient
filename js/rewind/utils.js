@@ -20,14 +20,19 @@ lazy(mega, 'rewindUtils', () => {
         }
 
         reset() {
+            this.current = 0;
             this.progress = {
+                'getRecords:tree:cache:read': 0,
                 'getRecords:tree:storage:read': 0,
+                'getRecords:tree:prepare': 0,
                 'getRecords:tree:api:get': 0,
-                'getRecords:tree:api:get:process': 0,
+                'getRecords:tree:api:get:process:queue': 0,
+                'getRecords:tree:api:get:process:putQueue': 0,
                 'getRecords:packet:prepare': 0,
                 'getRecords:packet:storage:read': 0,
                 'getRecords:packet:api:get': 0,
-                'getRecords:packet:api:get:process': 0,
+                'getRecords:packet:api:get:process:queue': 0,
+                'getRecords:packet:api:get:process:putQueue': 0,
             };
         }
 
@@ -36,7 +41,7 @@ lazy(mega, 'rewindUtils', () => {
             this.update(label, 0);
 
             if (!this.timers.has(label)) {
-                logger.info(`rewind:${label}: started...`);
+                logger.info(`rewind:${label}: started`);
                 logger.time(`rewind:${label}`);
                 this.timers.add(label);
             }
@@ -53,6 +58,10 @@ lazy(mega, 'rewindUtils', () => {
 
         update(label, value) {
             if (this.progress && this.progress.hasOwnProperty(label) && this.progress[label] !== value) {
+                if (value > 0 && value.toFixed(2) === this.progress[label].toFixed(2)) {
+                    return;
+                }
+
                 this.progress[label] = value;
 
                 let entries = 0;
@@ -67,8 +76,11 @@ lazy(mega, 'rewindUtils', () => {
                     }
                 }
 
-                mBroadcaster.sendMessage('rewind:progress', entries
-                    ? Math.min(100, Math.floor(labelProgress / entries)) : 0);
+                const progress = entries ? Math.min(100, Math.floor(labelProgress / entries)) : 0;
+                if (this.current !== progress) {
+                    this.current = progress;
+                    mega.rewindUi.sidebar.updateProgress(progress);
+                }
             }
         }
     }
@@ -319,7 +331,7 @@ lazy(mega, 'rewindUtils', () => {
 
             mega.rewindUtils.handleWorkerMessage(
                 nodePromise,
-                'getRecords:tree:api:get:process',
+                'getRecords:tree:api:get:process:queue',
                 node.apiId,
                 mega.rewindUtils.queue[node.apiId].length);
             mega.rewindUtils.queue[node.apiId].push(nodePromise);
@@ -965,9 +977,9 @@ lazy(mega, 'rewindUtils', () => {
                 const limit = 10000;
                 const queue = this.queue[apiId] || [];
                 const qTotal = queue.length;
-                for (let i = 0; i < queue.length; i += limit) {
+                for (let i = 0; i < qTotal; i += limit) {
                     if (isPacket) {
-                        this.progress.update(progressSource, i / qTotal * 100);
+                        this.progress.update(`${progressSource}:queue`, i / qTotal * 100);
                     }
                     const end = Math.min(i + limit, qTotal);
                     await Promise.allSettled(queue.slice(i, end));
@@ -975,7 +987,6 @@ lazy(mega, 'rewindUtils', () => {
                 delete this.queue[apiId];
                 this.progress.complete(`${progressSource}:queue`);
 
-                this.progress.start(`${progressSource}:inflight`);
                 const inflight = this.inflight[apiId];
                 for (const api of inflight) {
                     if (api.residual && api.residual.length) {
@@ -983,7 +994,6 @@ lazy(mega, 'rewindUtils', () => {
                     }
                 }
                 delete this.inflight[apiId];
-                this.progress.complete(`${progressSource}:inflight`);
 
                 this.progress.start(`${progressSource}:putQueue`);
                 if (mega.rewind.putQueue && mega.rewind.putQueue.length) {
@@ -992,12 +1002,15 @@ lazy(mega, 'rewindUtils', () => {
                         const promises = [];
 
                         const batch = mega.rewind.putQueue.splice(0, FMDB_FLUSH_THRESHOLD);
-                        for (let i = 0; i < batch.length; i++) {
+                        const bTotal = batch.length;
+                        for (let i = 0; i < bTotal; i++) {
                             const [putFunction, ...putArgs] = batch[i];
                             const promise = putFunction(...putArgs);
                             if (promise !== oldPromise) {
                                 oldPromise = promise;
-                                promises.push(oldPromise);
+                                promises.push(oldPromise.finally(() => {
+                                    this.progress.update(`${progressSource}:putQueue`, i / bTotal * 100);
+                                }));
                             }
                         }
 

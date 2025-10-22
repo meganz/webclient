@@ -893,9 +893,13 @@ lazy(s4, 'ui', () => {
         }
 
         show() {
-            M.safeShowDialog(this.getDialogName(), () => {
-                this.$dialogContainer.rebind('dialog-closed::create-folder.s4dlg', () => {
-                    this.$dialogContainer.unbind('dialog-closed::create-folder.s4dlg');
+            const dialogName = this.getDialogName();
+            M.safeShowDialog(dialogName, () => {
+                const eventName = dialogName === 'createfolder' ?
+                    'dialog-closed::create-folder.s4dlg' :
+                    'dialog-closed.s4dlg';
+                this.$dialogContainer.rebind(eventName, () => {
+                    this.$dialogContainer.unbind(eventName);
                     this.destroy();
                 });
                 $('button.js-close', this.$dialogContainer).rebind('click.s4dlg', () => {
@@ -909,6 +913,7 @@ lazy(s4, 'ui', () => {
         }
 
         unbindEvents() {
+            this.$dialogContainer.unbind('dialog-closed::create-folder.s4dlg');
             this.$dialogContainer.unbind('dialog-closed.s4dlg');
             this.$dialogCancel.unbind('click.s4dlg');
             $('button.js-close', this.$dialogContainer).unbind('click.s4dlg');

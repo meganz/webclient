@@ -488,6 +488,9 @@ def inspectcss(file, ln, line, result):
         fatal += 1
         result.append('{}:{}: {}\n{}^ Potentially invalid url()'
             .format(file, ln, line, indent))
+    elif re.search(r'z-index\s*:\s*\d{4,}', line, re.IGNORECASE):
+        result.append(f'{file}:{ln}: {line}\n{indent}^ Large z-index values'
+                      f' are reserved and could lead to certain issues with dialogs, watch out!')
 
     return fatal
 

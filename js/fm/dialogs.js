@@ -1950,6 +1950,9 @@
                 var tab = M.chat ? 'conversations' : M.currentrootid === 'shares' ?
                     'shared-with-me' : M.currentrootid === 's4' ? 's4' : 'cloud-drive';
                 var dir = M.currentdirid === 'transfers' ? M.lastSeenCloudFolder || M.RootID : M.currentdirid;
+                if (tab === 'conversations' && $.dialogSelChats) {
+                    delete $.dialogSelChats;
+                }
                 closeMsg();
                 handleOpenDialog(tab, dir, { key: 'copyToUpload', value: [files, emptyFolders] });
                 return uiCheckboxes($dialog);
@@ -2130,6 +2133,75 @@
         }
 
         return false;
+    };
+
+    global.showItemOperationToast = function(data = {}) {
+        const {nodes, target, type, viewItems} = data;
+        const targetName = M.getNameByHandle(target);
+        const res = [];
+        let itemType = '';
+
+        for (let i = nodes.length; i--;) {
+            const n = typeof nodes[i] === 'string' ? M.getNodeByHandle(nodes[i]) : nodes[i];
+            let nt = '';
+
+            if (!n || n.p !== target) {
+                continue;
+            }
+
+            res.push(n);
+
+            const root = M.getNodeRoot(n);
+            if (root === 's4' && (nt = M.getS4NodeType(n))) {
+                nt = nt === 'bucket-child' ? 'folder' : nt;
+            }
+            else if (n.t) {
+                nt = 'folder';
+            }
+            else {
+                nt = 'file';
+            }
+
+            itemType = itemType && itemType !== nt ? 'item' : nt;
+        }
+
+        if (!itemType) {
+            return false;
+        }
+
+        const string = mega.icu.format(
+            l[`toast_${type || 'copy'}_${itemType}${type === 'import' ? '' : 's'}`],
+            res.length
+        ).replace(/%s/g, `<span class="long-title-truncate">${targetName}</span>`);
+
+        if (viewItems) {
+            mega.ui.toast.show(
+                parseHTML(string),
+                4,
+                l[16797],
+                {
+                    actionButtonCallback: () => {
+                        M.openFolder(target).then(() => {
+                            if (window.selectionManager) {
+                                let reset = false;
+                                for (let i = res.length; i--;) {
+                                    if (reset) {
+                                        selectionManager.add_to_selection(res[i].h);
+                                    }
+                                    else {
+                                        selectionManager.resetTo(res[i].h);
+                                        reset = true;
+                                    }
+                                }
+                            }
+                        }).catch(dump);
+                    }
+                }
+            );
+        }
+        else {
+            mega.ui.toast.show(parseHTML(string));
+        }
     };
 
     mBroadcaster.addListener('fm:initialized', function copyMoveDialogs() {
@@ -2610,64 +2682,6 @@
             if (Array.isArray($.selected)) {
                 selectedNodes = [...$.selected];
             }
-            let fileCount = 0;
-            let folderCount = 0;
-            let objectCount = 0;
-            let bucketCount = 0;
-            if ($.mcImport) {
-                if ($.saveToDialogNode) {
-                    if ($.saveToDialogNode.t === 0) {
-                        fileCount++;
-                    }
-                    else {
-                        folderCount++;
-                    }
-                }
-                else {
-                    for (let i = $.onImportCopyNodes.length; i--;) {
-                        const n = $.onImportCopyNodes[i];
-                        if (!n.p && n.t === 1) {
-                            folderCount++;
-                        }
-                        else if (!n.p) {
-                            fileCount++;
-                        }
-                    }
-                }
-            }
-            else {
-                for (let i = selectedNodes.length; i--;) {
-                    const node = M.getNodeByHandle(selectedNodes[i]);
-                    if (node) {
-                        const root = M.getNodeRoot(selectedNodes[i]);
-                        if (root === 's4') {
-                            const type = M.getS4NodeType(node);
-                            if (type === 'bucket') {
-                                bucketCount++;
-                            }
-                            else if (type === 'object') {
-                                objectCount++;
-                            }
-                            else {
-                                folderCount++;
-                            }
-                        }
-                        else if (node.t) {
-                            folderCount++;
-                        }
-                        else {
-                            fileCount++;
-                        }
-                    }
-                }
-            }
-            const isMultiTyped = fileCount && folderCount ||
-                bucketCount && objectCount ||
-                bucketCount && folderCount ||
-                objectCount && folderCount ||
-                bucketCount && objectCount && folderCount;
-            let unclearResult = false;
-            const targetName = M.getNameByHandle($.mcselected);
 
             // closeDialog would cleanup some $.* variables, so we need them cloned here
             const {
@@ -2678,72 +2692,6 @@
                 mcImport,
             } = $;
             const saveToDialog = $.saveToDialog || saveToDialogNode;
-            let viewCb = false;
-            // eslint-disable-next-line complexity
-            const showToast = (isMove) => {
-                let string = '';
-                let count = 0;
-                if (unclearResult) {
-                    if (mcImport) {
-                        string = l.toast_import_items_nc;
-                    }
-                    else {
-                        string = isMove ? l.toast_move_items_nc : l.toast_copy_items_nc;
-                    }
-                }
-                else if (isMultiTyped) {
-                    count = bucketCount + objectCount + folderCount + fileCount;
-                    if (mcImport) {
-                        string = l.toast_import_items;
-                    }
-                    else {
-                        string = isMove ? l.toast_move_items : l.toast_copy_items;
-                    }
-                }
-                else if (objectCount) {
-                    count = objectCount;
-                    string = isMove ? l.toast_move_objects : l.toast_copy_objects;
-                }
-                else if (bucketCount) {
-                    count = bucketCount;
-                    string = isMove ? l.toast_move_buckets : l.toast_copy_buckets;
-                }
-                else if (fileCount) {
-                    count = fileCount;
-                    if (mcImport) {
-                        string = l.toast_import_file;
-                    }
-                    else {
-                        string = isMove ? l.toast_move_files : l.toast_copy_files;
-                    }
-                }
-                else if (folderCount) {
-                    count = folderCount;
-                    if (mcImport) {
-                        string = l.toast_import_folder;
-                    }
-                    else {
-                        string = isMove ? l.toast_move_folders : l.toast_copy_folders;
-                    }
-                }
-                else {
-                    return;
-                }
-
-                string = (unclearResult ? string : mega.icu.format(string, count))
-                    .replace(/%s/g, `<span class="long-title-truncate">${targetName}</span>`);
-                if (typeof viewCb === 'function') {
-                    mega.ui.toast.show(
-                        parseHTML(string),
-                        4,
-                        l[16797],
-                        { actionButtonCallback: viewCb }
-                    );
-                }
-                else {
-                    mega.ui.toast.show(string);
-                }
-            };
 
             delete $.saveToDialogPromise;
             delete $.noOpenChatFromPreview;
@@ -2789,26 +2737,12 @@
                 mLoadingSpinner.show('safeMoveNodes');
                 M.safeMoveNodes(t)
                     .then(() => {
-                        viewCb = selectedNodes.length ? () => {
-                            M.openFolder(t).then(() => {
-                                if (window.selectionManager) {
-                                    let reset = false;
-                                    for (let i = selectedNodes.length; i--;) {
-                                        const n = M.getNodeByHandle(selectedNodes[i]);
-                                        if (n.p === t) {
-                                            if (reset) {
-                                                selectionManager.add_to_selection(n.h);
-                                            }
-                                            else {
-                                                selectionManager.resetTo(n.h);
-                                                reset = true;
-                                            }
-                                        }
-                                    }
-                                }
-                            }).catch(dump);
-                        } : false;
-                        showToast(true);
+                        showItemOperationToast({
+                            nodes: selectedNodes,
+                            target: t,
+                            type: 'move',
+                            viewItems: selectedNodes.length
+                        });
                     })
                     .catch(dump).finally(() => mLoadingSpinner.hide('safeMoveNodes'));
                 return false;
@@ -2936,29 +2870,6 @@
                     M.copyNodes(selectedNodes, t)
                         .then((res) => {
                             if (res && res.length) {
-                                if (res.length < selectedNodes.length) {
-                                    unclearResult = true;
-                                }
-                                viewCb = () => {
-                                    M.openFolder(t).then(() => {
-                                        if (window.selectionManager) {
-                                            let reset = false;
-                                            for (let i = res.length; i--;) {
-                                                const n = M.getNodeByHandle(res[i]);
-                                                if (n.p === t) {
-                                                    if (reset) {
-                                                        selectionManager.add_to_selection(n.h);
-                                                    }
-                                                    else {
-                                                        selectionManager.resetTo(n.h);
-                                                        reset = true;
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }).catch(dump);
-                                };
-
                                 const toUnhide = section === 's4' && mega.sensitives.featureEnabled
                                     ? res.filter(h => M.d[h].sen)
                                     : [];
@@ -2967,7 +2878,12 @@
                                     mega.sensitives.toggleStatus(toUnhide, false);
                                 }
 
-                                showToast();
+                                showItemOperationToast({
+                                    nodes: res,
+                                    target: t,
+                                    type: mcImport && 'import',
+                                    viewItems: true
+                                });
                             }
                         })
                         .catch((ex) => ex !== EBLOCKED && tell(ex));
@@ -2977,27 +2893,11 @@
                 M.copyNodes(getNonCircularNodes(selectedNodes), t)
                     .then((res) => {
                         if (res && res.length) {
-                            if (res.length < selectedNodes.length) {
-                                unclearResult = true;
-                            }
-                            viewCb = () => {
-                                M.openFolder(t).then(() => {
-                                    let reset = false;
-                                    for (let i = res.length; i--;) {
-                                        const n = M.getNodeByHandle(res[i]);
-                                        if (n.p === t) {
-                                            if (reset) {
-                                                selectionManager.add_to_selection(n.h);
-                                            }
-                                            else {
-                                                selectionManager.resetTo(n.h);
-                                                reset = true;
-                                            }
-                                        }
-                                    }
-                                }).catch(dump);
-                            };
-                            showToast();
+                            showItemOperationToast({
+                                nodes: res,
+                                target: t,
+                                viewItems: true
+                            });
                         }
                     })
                     .catch(tell);

@@ -833,6 +833,10 @@ FullScreenManager.prototype.enterFullscreen = function() {
 (function _initVideoStream(global) {
     'use strict';
 
+    const actionEv = (self.is_touchable)
+        ? { UP: 'pointerup.videoprogress', DOWN: 'pointerdown.videoprogress', MOVE: 'pointermove.video-player' }
+        : { UP: 'mouseup.videorpogress', DOWN: 'mousedown.videorpogress', MOVE: 'mousemove.video-player' } ;
+
     // @private Make thumb/preview images if missing
     var _makethumb = function(n, stream) {
         if (String(n.fa).indexOf(':0*') < 0 || String(n.fa).indexOf(':1*') < 0) {
@@ -1658,16 +1662,11 @@ FullScreenManager.prototype.enterFullscreen = function() {
         $vcSResetAll.rebind('click', () => setVideoFilterLevel());
 
         // Get page X based on event
-        var getX = function(e) {
-            if (e.type.includes("mouse")) {
-                return e.pageX;
-            }
-            else if (e.type.includes("touch")) {
-                return (e.changedTouches || e.touches)[0].pageX;
-            }
-        };
+        var getX = (e) => (e.type.includes('pointer') || e.type.includes('mouse'))
+            ? e.pageX
+            : (e.type.includes('touch') && (e.changedTouches || e.touches)[0].pageX || 0);
 
-        $progress.rebind('mousedown.videoprogress touchstart.videoprogress', function(e) {
+        $progress.rebind(actionEv.DOWN, (e) => {
             timeDrag = true;
 
             if (streamer && streamer.currentTime) {
@@ -1682,7 +1681,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
             }
         });
 
-        $document.rebind('mouseup.video-player touchend.videoprogress', function(e) {
+        $document.rebind(actionEv.UP, (e) => {
             // video progress
             if (timeDrag) {
                 timeDrag = false;
@@ -1719,7 +1718,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
             }
         });
 
-        $document.rebind('mousemove.video-player', (e) => {
+        $document.rebind(actionEv.MOVE, (e) => {
             // video progress
             if (timeDrag && streamer && streamer.currentTime) {
                 updatebar(getX(e));
@@ -2034,10 +2033,10 @@ FullScreenManager.prototype.enterFullscreen = function() {
             $wrapper.removeClass('mouse-idle video-theatre-mode video').off('is-over-quota');
             $pendingBlock.addClass('hidden');
             $('.vol-wrapper', $wrapper).off();
-            $document.off('mousemove.video-player');
-            $document.off('mouseup.video-player');
             $wrapper.off('mouseup.video-player');
             $wrapper.off('mousedown.video-player');
+            $document.off(actionEv.MOVE);
+            $document.off(actionEv.UP);
             $document.off('mousemove.idle');
             $(window).off('video-destroy.main');
             videoElement = streamer = null;

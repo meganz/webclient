@@ -209,7 +209,6 @@ class MegaMobileTopMenu extends MegaComponent {
                     if (mobile.nodeSelector.active) {
                         mobile.nodeSelector.hide('/fm/account');
                     }
-                    return false;
                 });
             }
 

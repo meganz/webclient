@@ -1211,7 +1211,7 @@ lazy(mega, 'rewindUi', () => {
                 this.$contentLoading.removeClass('hidden');
                 const hasRecords = await mega.rewind.getRecords(date.getTime())
                     .catch((ex) => {
-                        mega.rewindUi.sidebar.close();
+                        this.close();
                         if (typeof ex !== 'object' || ex.code !== EROLLEDBACK) {
                             tell(ex);
                         }
@@ -2159,11 +2159,11 @@ lazy(mega, 'rewindUi', () => {
                         }
                     })
                     .finally(() => {
-                        mega.rewindUi.sidebar.close();
+                        this.close();
                         mega.rewindUtils.reinstate.finalise();
                         mBroadcaster.removeListener(this.openFolderListener);
-                        mega.rewindUi.sidebar.teardownLoader();
-                        mega.rewindUi.sidebar.updateRestoreProgress();
+                        this.teardownLoader();
+                        this.updateRestoreProgress();
                         this.$restoreButton.removeClass('disabled');
                         mega.rewindUtils.progress.complete('restore');
                     });

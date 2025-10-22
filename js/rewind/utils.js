@@ -563,11 +563,6 @@ lazy(mega, 'rewindUtils', () => {
             this.inProgress = false;
         }
 
-        // TODO: Implement this later
-        async checkRestored() {
-            // Verify if restore worked by checking each restored node
-        }
-
         _countNestedFolders(root) {
             let count = 0;
             const handles = [root];

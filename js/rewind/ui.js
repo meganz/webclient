@@ -76,26 +76,6 @@ lazy(mega, 'rewindUi', () => {
             this.rewindOptions = Object.create(null);
             this.openFolderListener = null;
 
-            // TODO confirm this feature and then replace fixed strings by "t" labels
-            /** @property RewindSidebar.progressStepLabels */
-            lazy(this, 'progressStepLabels', () => {
-                return {
-                    'getRecords:tree:cache:read': 'Accessing history...',
-                    'getRecords:tree:state:storage:read': 'Reading state...',
-                    'getRecords:tree:state:storage:save:start': 'Saving state...',
-                    'getRecords:tree:state:storage:save:end': 'Saving state...',
-                    'getRecords:tree:storage:read': 'Reading history...',
-                    'getRecords:tree:api:get': 'Retrieving history...',
-                    'getRecords:tree:api:get:process': 'Processing history...',
-                    'getRecords:tree:prepare': 'Preparing history...',
-                    'getRecords:packet:storage:read': 'Reading data...',
-                    'getRecords:packet:state:storage:save': 'Saving state...',
-                    'getRecords:packet:api:get': 'Retrieving data...',
-                    'getRecords:packet:api:get:process': 'Processing data...',
-                    'getRecords:packet:prepare': 'Preparing data...'
-                };
-            });
-
             /** @property RewindSidebar.template */
             lazy(this, 'template', () => {
                 const res = getTemplate('rewind');
@@ -881,15 +861,22 @@ lazy(mega, 'rewindUi', () => {
             $(DATEPICKER_SELECTOR, document).off('click.rewind');
         }
 
-        updateProgress(progress) {
-            if (this.$contentLoadingProgress.length) {
-                this.$contentLoadingProgress.text(formatPercentage(progress / 100));
+        updateProgress(val) {
+            if (this.$contentLoadingProgress && this.$contentLoadingProgress.length) {
+                this.$contentLoadingProgress.text(formatPercentage(val / 100));
             }
         }
 
-        updateProgressStep(step) {
-            if (this.progressStepLabels[step] && this.$contentLoadingProgressStep.length) {
-                this.$contentLoadingProgressStep.text(this.progressStepLabels[step]);
+        updateTaskProgress(cur, val) {
+            // TODO remove when label created
+            l.rewind_prg_step_summary = 'Task #%1 in progress... [S]%2[/S]';
+
+            if (this.$contentLoadingProgressStep && this.$contentLoadingProgressStep.length) {
+                this.$contentLoadingProgressStep.safeHTML(l.rewind_prg_step_summary
+                    .replace('%1', cur)
+                    .replace('[S]', '<span class="percent">')
+                    .replace('%2', val < 1 ? formatPercentage(val / 100) : '')
+                    .replace('[/S]', '</span>'));
             }
         }
 
@@ -2059,7 +2046,7 @@ lazy(mega, 'rewindUi', () => {
                     this.selectedDate = dateObj;
                 }
 
-                mega.rewindUtils.progress.start('restore');
+                mega.rewindUtils.task.start('restore');
                 this.$restoreButton.addClass('disabled');
 
                 this.openFolderListener = mBroadcaster.addListener('beforepagechange', () => {
@@ -2159,7 +2146,7 @@ lazy(mega, 'rewindUi', () => {
                         this.teardownLoader();
                         this.updateRestoreProgress();
                         this.$restoreButton.removeClass('disabled');
-                        mega.rewindUtils.progress.complete('restore');
+                        mega.rewindUtils.task.complete('restore');
                     });
                 return false;
             };

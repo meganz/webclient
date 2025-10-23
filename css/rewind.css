@@ -598,9 +598,22 @@ body.theme-dark .rewind-datepicker-calendar .datepicker--cell.-current- {
 }
 
 .sidebar .sidebar-container .sidebar-content .content-loading .progress-step {
+    display: flex;
+    align-items: center;
     font: var(--text-body2);
     color: var(--text-color-medium);
-    padding-top: 8px;
+    padding-top: 12px;
+}
+
+.sidebar .sidebar-container .sidebar-content .content-loading .progress-step .percent {
+    min-width: 30px;
+    width: 30px;
+    flex-shrink: 0;
+    margin-left: 2px;
+}
+
+.rtl .sidebar .sidebar-container .sidebar-content .content-loading .progress-step .percent {
+    margin-right: 2px;
 }
 
 .sidebar .sidebar-container .sidebar-content .content-folder {

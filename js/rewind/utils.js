@@ -13,75 +13,89 @@ lazy(mega, 'rewindUtils', () => {
         SKIP_FILE: 'Skipped',
     };
 
-    class Progress {
+    class RewindTask {
         constructor() {
-            this.timers = new Set();
             this.reset();
         }
 
         reset() {
-            this.current = 0;
-            this.labels = {
+            this.timers = new Set();
+            this.totalPercent = 0;
+            this.totalInProgress = 0;
+            this.progress = {
                 'getRecords:tree:cache:read': 0,
                 'getRecords:tree:storage:read': 0,
+                'getRecords:tree:state:storage:read': 0,
+                'getRecords:tree:state:storage:save:start': 0,
+                'getRecords:tree:state:storage:save:end': 0,
                 'getRecords:tree:prepare': 0,
                 'getRecords:tree:api:get': 0,
                 'getRecords:tree:api:get:process:queue': 0,
                 'getRecords:tree:api:get:process:putQueue': 0,
                 'getRecords:packet:prepare': 0,
                 'getRecords:packet:storage:read': 0,
+                'getRecords:packet:state:storage:save': 0,
                 'getRecords:packet:api:get': 0,
                 'getRecords:packet:api:get:process:queue': 0,
                 'getRecords:packet:api:get:process:putQueue': 0,
             };
         }
 
-        start(label) {
-            mega.rewindUi.sidebar.updateProgressStep(label);
-            this.update(label, 0);
+        start(id) {
+            const isProgressTask = this._isProgressTask(id);
+            if (isProgressTask) {
+                this.totalInProgress++;
+            }
 
-            if (!this.timers.has(label)) {
-                logger.info(`rewind:${label}: started`);
-                logger.time(`rewind:${label}`);
-                this.timers.add(label);
+            this.update(id, 0);
+
+            if (!this.timers.has(id)) {
+                const taskInfo = isProgressTask ? `-> Task #${this.totalInProgress}` : '';
+                logger.info(`rewind:${id}: started ${taskInfo}`);
+                logger.time(`rewind:${id}`);
+                this.timers.add(id);
             }
         }
 
-        complete(label) {
-            this.update(label, 100);
+        complete(id) {
+            this.update(id, 100);
 
-            if (this.timers.has(label)) {
-                logger.timeEnd(`rewind:${label}`);
-                this.timers.delete(label);
+            if (this.timers.has(id)) {
+                logger.timeEnd(`rewind:${id}`);
+                this.timers.delete(id);
             }
         }
 
-        update(label, value) {
-            if (this.labels.hasOwnProperty(label)) {
-                if (value.toFixed(2) === this.labels[label].toFixed(2)) {
+        update(id, val) {
+            if (this._isProgressTask(id) && val >= 0 && val <= 100) {
+                if (val.toFixed(2) === this.progress[id].toFixed(2)) {
+                    if (val === 0 || val === 100) {
+                        mega.rewindUi.sidebar.updateTaskProgress(this.totalInProgress, val);
+                    }
                     return;
                 }
 
-                this.labels[label] = value;
+                this.progress[id] = val;
+                mega.rewindUi.sidebar.updateTaskProgress(this.totalInProgress, val);
 
-                let entries = 0;
-                let labelProgress = 0;
-                const values = Object.values(this.labels);
+                let percent = 0;
+                const values = Object.values(this.progress);
 
                 for (let i = 0; i < values.length; i++) {
                     const v = Number(values[i]) || 0;
-                    if (v >= 0 && v <= 100) {
-                        entries++;
-                        labelProgress += v;
-                    }
+                    percent += v;
                 }
 
-                const progress = entries ? Math.min(100, Math.floor(labelProgress / entries)) : 0;
-                if (this.current !== progress) {
-                    this.current = progress;
-                    mega.rewindUi.sidebar.updateProgress(progress);
+                percent = Math.min(100, Math.floor(percent / values.length));
+                if (this.totalPercent !== percent) {
+                    this.totalPercent = percent;
+                    mega.rewindUi.sidebar.updateProgress(percent);
                 }
             }
+        }
+
+        _isProgressTask(id) {
+            return this.progress.hasOwnProperty(id);
         }
     }
 
@@ -843,6 +857,8 @@ lazy(mega, 'rewindUtils', () => {
         async restoreNodes(rwRoot, progress, options) {
             this.inProgress = true;
             const {folderName, restoreDate} = options;
+
+            mega.rewindUtils.task.reset();
             progress.init(folderName, restoreDate);
 
             this.initChannel();
@@ -850,15 +866,15 @@ lazy(mega, 'rewindUtils', () => {
             progress.showSection();
             progress.next();
 
-            mega.rewindUtils.progress.start('restore:requests:build');
+            mega.rewindUtils.task.start('restore:requests:build');
             const requests = await this.buildRequests(rwRoot);
-            mega.rewindUtils.progress.complete('restore:requests:build');
+            mega.rewindUtils.task.complete('restore:requests:build');
 
             progress.next();
 
-            mega.rewindUtils.progress.start('restore:requests:run');
+            mega.rewindUtils.task.start('restore:requests:run');
             const res = requests.length ? await api.screq(requests, this.channel) : null;
-            mega.rewindUtils.progress.complete('restore:requests:run');
+            mega.rewindUtils.task.complete('restore:requests:run');
 
             progress.next();
             progress.hideSection();
@@ -877,7 +893,7 @@ lazy(mega, 'rewindUtils', () => {
             lazy(this, 'tree', () => new RewindChunkTreeHandler());
             lazy(this, 'packet', () => new RewindChunkPacketHandler());
             lazy(this, 'reinstate', () => new RewindReinstateHandler());
-            lazy(this, 'progress', () => new Progress());
+            lazy(this, 'task', () => new RewindTask());
 
             this.queue = Object.create(null);
             this.inflight = Object.create(null);
@@ -959,7 +975,7 @@ lazy(mega, 'rewindUtils', () => {
             const node = await promiseData;
 
             const qTotal = this.queue[apiId].length;
-            this.progress.update(progressSource, (qTotal - length) / qTotal * 100);
+            this.task.update(progressSource, (qTotal - length) / qTotal * 100);
 
             if (node.h) {
                 node.apiId = null;
@@ -971,21 +987,21 @@ lazy(mega, 'rewindUtils', () => {
 
         async checkRequestDone(apiId, progressSource, isPacket) {
             if (this.inflight[apiId]) {
-                this.progress.start(progressSource);
+                this.task.start(progressSource);
 
-                this.progress.start(`${progressSource}:queue`);
+                this.task.start(`${progressSource}:queue`);
                 const limit = 10000;
                 const queue = this.queue[apiId] || [];
                 const qTotal = queue.length;
                 for (let i = 0; i < qTotal; i += limit) {
                     if (isPacket) {
-                        this.progress.update(`${progressSource}:queue`, i / qTotal * 100);
+                        this.task.update(`${progressSource}:queue`, i / qTotal * 100);
                     }
                     const end = Math.min(i + limit, qTotal);
                     await Promise.allSettled(queue.slice(i, end));
                 }
                 delete this.queue[apiId];
-                this.progress.complete(`${progressSource}:queue`);
+                this.task.complete(`${progressSource}:queue`);
 
                 const inflight = this.inflight[apiId];
                 for (const api of inflight) {
@@ -995,7 +1011,7 @@ lazy(mega, 'rewindUtils', () => {
                 }
                 delete this.inflight[apiId];
 
-                this.progress.start(`${progressSource}:putQueue`);
+                this.task.start(`${progressSource}:putQueue`);
                 if (mega.rewind.putQueue && mega.rewind.putQueue.length) {
                     await new Promise((resolve) => {
                         let oldPromise = null;
@@ -1009,7 +1025,7 @@ lazy(mega, 'rewindUtils', () => {
                             if (promise !== oldPromise) {
                                 oldPromise = promise;
                                 promises.push(oldPromise.finally(() => {
-                                    this.progress.update(`${progressSource}:putQueue`, i / bTotal * 100);
+                                    this.task.update(`${progressSource}:putQueue`, i / bTotal * 100);
                                 }));
                             }
                         }
@@ -1022,7 +1038,7 @@ lazy(mega, 'rewindUtils', () => {
                         });
                     });
                 }
-                this.progress.complete(`${progressSource}:putQueue`);
+                this.task.complete(`${progressSource}:putQueue`);
 
                 // Clone size dictionary
                 if (!isPacket) {
@@ -1033,7 +1049,7 @@ lazy(mega, 'rewindUtils', () => {
                 }
 
                 logger.info(`Api.checkRequestDone - Request done - with inflight - isPacket: ${isPacket}`);
-                this.progress.complete(progressSource);
+                this.task.complete(progressSource);
                 return true;
             }
 

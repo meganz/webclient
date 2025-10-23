@@ -1656,6 +1656,10 @@ MegaData.prototype.ulcomplete = function(ul, h, faid) {
         M.ulprogress(ul, 100, ul.size, ul.size, 0);
     }
 
+    if (self.d > 0) {
+        ulmanager.logger.info('completing upload %s... (%s->%s)', ul.owner || ul.id, ul.target, h, ul.response, [ul]);
+    }
+
     mBroadcaster.sendMessage('upload:completion', ul.id, h || -0xBADF, faid, ul.chatid);
 
     if (ul.skipfile) {
@@ -1670,6 +1674,11 @@ MegaData.prototype.ulcomplete = function(ul, h, faid) {
 
 MegaData.prototype.ulfinalize = function(ul, status, h) {
     'use strict';
+
+    if (self.d > 0) {
+        ulmanager.logger.info('finalising %s (%s)', ul.owner || ul.id, status, h, ul.promiseToInvoke, ul.wsfu, [ul]);
+    }
+
     if (ul.promiseToInvoke) {
         ul.promiseToInvoke.resolve(h);
         ul_queue[ul.pos] = Object.freeze({});

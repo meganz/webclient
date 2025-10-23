@@ -741,7 +741,7 @@ var ulmanager = {
         });
 
         if (d) {
-            ulmanager.logger.info("Completing upload for %s, into %s", file.name, target, req);
+            ulmanager.logger.info("Enqueueing put-nodes for '%s' into %s; %s", file.name, target, file.owner, req);
             console.assert(file.owner && file.owner.gid, 'No assoc owner..');
         }
 
@@ -957,6 +957,9 @@ var ulmanager = {
             if (ul_queue[ctx.ul_queue_num]) {
                 ulmanager.ulIDToNode[ulmanager.getGID(ul_queue[ctx.ul_queue_num])] = h || ctx.target;
                 M.ulcomplete(ul_queue[ctx.ul_queue_num], h || false, ctx.faid);
+            }
+            else if (d) {
+                ulmanager.logger.warn('Unknown upload on #%s, %s', ctx.ul_queue_num, ctx.file.owner, [ctx.file]);
             }
 
             if (MediaInfoLib.isFileSupported(h)) {
@@ -1295,7 +1298,7 @@ FileUpload.prototype.destroy = function(mul) {
     'use strict';
 
     if (d) {
-        ulmanager.logger.info('Destroying ' + this);
+        ulmanager.logger[this.file ? 'group' : 'warn'](`Destroying ${this} (%s)`, this.file && this.file.name || 'n/a');
     }
     if (!this.file) {
         return;
@@ -1314,6 +1317,11 @@ FileUpload.prototype.destroy = function(mul) {
 
     if (this.file.wsfu) {
         this.file.wsfu.destroy();
+    }
+    if (d) {
+        const tr = document.getElementById(ulmanager.getGID(this.file));
+        ulmanager.logger.debug(`${this} DOM State: ${tr ? tr.classList.value : 'INVALID'}`);
+        queueMicrotask(() => ulmanager.logger.groupEnd());
     }
     oDestroy(this.file);
     oDestroy(this);
@@ -1350,7 +1358,7 @@ FileUpload.prototype.run = function(done) {
     }
 
     if (d) {
-        ulmanager.logger.info(file.name, "starting upload", file.id);
+        ulmanager.logger.group(`Starting upload ${this} (%s)`, file.name);
     }
 
     var started = false;
@@ -1362,6 +1370,9 @@ FileUpload.prototype.run = function(done) {
         ulmanager.ulStartingPhase = false;
         delete file.done_starting;
 
+        if (d) {
+            queueMicrotask(() => ulmanager.logger.groupEnd());
+        }
         file = self = false;
         done();
     };

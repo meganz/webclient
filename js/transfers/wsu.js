@@ -554,10 +554,14 @@ lazy(mega, 'wsuploadmgr', () => {
                 this.pools[i].numconn = this.numconn;
                 this.pools[i].files[fileno] = fu;
                 this.pools[i].sendchunks();
+
+                if (self.d) {
+                    this.logger.info(`fileno#${fileno} assigned to ${file.owner}`, [fu]);
+                }
             }
             else {
                 if (self.d) {
-                    this.logger.warn(`We don't have any usc response yet, queueing...`);
+                    this.logger.warn(`We don't have any usc response yet, queueing #${fileno}...`, [fu]);
                 }
                 this.unassigned.push(fu);
             }

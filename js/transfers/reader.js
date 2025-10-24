@@ -47,40 +47,73 @@ class FileUploadReader {
         this.file = file;
         this.readpos = 0;
         this.cache = new Map();
+        this.reread = new Map();
         this.debug = self.d > -1;
         this.verbose = this.debug && !self.is_livesite;
         this.name = `FUR(${file.name.slice(this.verbose ? -56 : -4)}.${file.size})`;
         this.logger = new MegaLogger(this.name, false, self.ulmanager && ulmanager.logger);
     }
 
-    // return chunk from cache
+    // return chunk from cache and delete it
     getChunk(pos) {
-        return this.cache.get(pos);
+        const chunk = this.cache.get(pos);
+        this.cache.delete(pos);
+        return chunk;
     }
 
-    // delete chunk from cache
-    deleteChunk(pos) {
-        return this.cache.delete(pos);
+    // queue specific chunk for (prioritised) reading
+    readChunk(pos) {
+        this.reread.set(pos, true);
+        this.readahead(0);
+    }
+
+    haveChunk(pos) {
+        return this.cache.has(pos);
     }
 
     // read chunks into the cache
     // returns the maximum total number of chunks held _after_ the readahead completes
     readahead(cachelimit) {
-        const {cache, file = false, readpos, debug, logger} = this;
+        const {cache, reread, file = false, debug, logger} = this;
+        var readpos, len;
 
-        // don't read from aborted files, don't read past EOF, don't exceed cachelimit
-        if (!file.wsfu || readpos >= file.size || cache.size >= cachelimit) {
+        // don't read from aborted files
+        if (!file.wsfu) {
             return cache.size;
         }
 
-        if (debug) {
-            logger.log(`readahead(): ${cache.size} chunks in the cache, limit: ${cachelimit}`);
+        // prioritise re-reading old chunks to be resent over reading new chunks
+        if (reread.size) {
+            readpos = reread.keys().next().value;
+            reread.delete(readpos);
+
+            len = FileUploadReader.chunkmap[readpos] || 0x100000;
+            if (readpos + len > file.size) {
+                len = file.size - readpos;
+            }
+
+            if (debug) {
+                logger.log(`readahead(): re-reading old chunk ${readpos} ${len}`);
+            }
         }
+        else {
+            // otherwise, proceed with the readahead logic
+            // don't read past EOF, don't exceed cachelimit
+            readpos = this.readpos;
 
-        // after the first eight individual chunks, we read in 8 MB increments
-        const len = Math.min(file.size - readpos, FileUploadReader.chunkmap[readpos] || 8 * 0x100000);
+            if (readpos >= file.size || cache.size >= cachelimit) {
+                return cache.size;
+            }
 
-        this.readpos += len;
+            if (debug) {
+                logger.log(`readahead(): ${cache.size} chunks in the cache, limit: ${cachelimit}`);
+            }
+
+            // after the first eight individual chunks, we read in 8 MB increments
+            len = Math.min(file.size - readpos, FileUploadReader.chunkmap[readpos] || 8 * 0x100000);
+
+            this.readpos += len;
+        }
 
         this._read(readpos, len)
             .then((chunk) => {
@@ -89,7 +122,6 @@ class FileUploadReader {
                     return;
                 }
                 assert('byteLength' in chunk);
-
                 if (len > 0x100000) {
                     // split
                     let chunksize = len & 0xfffff || 0x100000;
@@ -127,7 +159,7 @@ class FileUploadReader {
 
         if (this.headpos > this.file.size || !this.file.size) {
             this.headpos = this.file.size;
-            eof = true;	// eof is set by a short final chunk, so we don't need an extra empty chunk
+            eof = true; // eof is set by a short final chunk, so we don't need an extra empty chunk
         }
 
         let len = FileUploadReader.chunkmap[pos] || 1048576;

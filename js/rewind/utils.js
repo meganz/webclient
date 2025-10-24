@@ -20,9 +20,9 @@ lazy(mega, 'rewindUtils', () => {
 
         reset() {
             this.timers = new Set();
-            this.totalPercent = 0;
-            this.totalInProgress = 0;
-            this.progress = {
+            this.percent = 0;
+            this.running = 0;
+            this.tasks = {
                 'getRecords:tree:cache:read': 0,
                 'getRecords:tree:storage:read': 0,
                 'getRecords:tree:state:storage:read': 0,
@@ -44,13 +44,13 @@ lazy(mega, 'rewindUtils', () => {
         start(id) {
             const isProgressTask = this._isProgressTask(id);
             if (isProgressTask) {
-                this.totalInProgress++;
+                this.running++;
             }
 
             this.update(id, 0);
 
             if (!this.timers.has(id)) {
-                const taskInfo = isProgressTask ? `-> Task #${this.totalInProgress}` : '';
+                const taskInfo = isProgressTask ? `-> Task #${this.running}` : '';
                 logger.info(`rewind:${id}: started ${taskInfo}`);
                 logger.time(`rewind:${id}`);
                 this.timers.add(id);
@@ -68,34 +68,33 @@ lazy(mega, 'rewindUtils', () => {
 
         update(id, val) {
             if (this._isProgressTask(id) && val >= 0 && val <= 100) {
-                if (val.toFixed(2) === this.progress[id].toFixed(2)) {
+                if (val.toFixed(2) === this.tasks[id].toFixed(2)) {
                     if (val === 0 || val === 100) {
-                        mega.rewindUi.sidebar.updateTaskProgress(this.totalInProgress, val);
+                        mega.rewindUi.sidebar.updateTaskProgress(this.running, val);
                     }
                     return;
                 }
 
-                this.progress[id] = val;
-                mega.rewindUi.sidebar.updateTaskProgress(this.totalInProgress, val);
+                this.tasks[id] = val;
+                mega.rewindUi.sidebar.updateTaskProgress(this.running, val);
 
                 let percent = 0;
-                const values = Object.values(this.progress);
+                const tasksPercents = Object.values(this.tasks);
 
-                for (let i = 0; i < values.length; i++) {
-                    const v = Number(values[i]) || 0;
-                    percent += v;
+                for (let i = 0; i < tasksPercents.length; i++) {
+                    percent += Number(tasksPercents[i]) || 0;
                 }
 
-                percent = Math.min(100, Math.floor(percent / values.length));
-                if (this.totalPercent !== percent) {
-                    this.totalPercent = percent;
+                percent = Math.min(100, Math.floor(percent / tasksPercents.length));
+                if (this.percent !== percent) {
+                    this.percent = percent;
                     mega.rewindUi.sidebar.updateProgress(percent);
                 }
             }
         }
 
         _isProgressTask(id) {
-            return this.progress.hasOwnProperty(id);
+            return this.tasks.hasOwnProperty(id);
         }
     }
 

@@ -875,7 +875,7 @@ lazy(mega, 'rewindUi', () => {
                 this.$contentLoadingProgressStep.safeHTML(l.rewind_prg_step_summary
                     .replace('%1', cur)
                     .replace('[S]', '<span class="percent">')
-                    .replace('%2', val < 1 ? formatPercentage(val / 100) : '')
+                    .replace('%2', val < 1 ? '' : formatPercentage(val / 100))
                     .replace('[/S]', '</span>'));
             }
         }

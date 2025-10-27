@@ -1079,9 +1079,6 @@ function str_mtrunc(str, len) {
 }
 
 function getTransfersPercent() {
-    if (getTransfersPercent.cache && getTransfersPercent.cache.exp > Date.now()) {
-        return getTransfersPercent.cache;
-    }
     var dl_r = 0;
     var dl_t = 0;
     var ul_r = 0;
@@ -1128,14 +1125,12 @@ function getTransfersPercent() {
         ul_r += tp['ulc'] || 0;
     }
 
-    getTransfersPercent.cache = {
+    return {
         ul_total: ul_t,
         ul_done: ul_r,
         dl_total: dl_t,
         dl_done: dl_r,
-        exp: Date.now() + 1000,
     };
-    return getTransfersPercent.cache;
 }
 
 function percent_megatitle() {

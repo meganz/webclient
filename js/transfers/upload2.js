@@ -1304,10 +1304,11 @@ FileUpload.prototype.destroy = function(mul) {
         return;
     }
 
-    // Hmm, looks like there are more ChunkUploads than what we really upload (!?)
-    if (d) {
-        ASSERT(GlobalProgress[this.gid].working.length === 0, 'Huh, there are working upload chunks?..');
+    if (!GlobalProgress[this.gid]) {
+        // xxx: if !this.file wasn't meet, this should not be reached...
+        ulmanager.logger.warn(`Unexpected state; Weak GP-record for ${this}`, [this]);
     }
+
     ASSERT(this.file.owner === this, 'Invalid FileUpload Owner...');
     window.ulQueue.poke(this.file, mul === -0xbeef ? mul : 0xdead);
     if (this.file.done_starting) {

@@ -1340,7 +1340,7 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
                 u = Array.prototype.concat.apply([], Object.values(queue).concat(files));
                 M.createFolders(paths, toChat ? M.cf.p || M.RootID : target, {
                     pitagFrom: 'U',
-                    pitagTrigger: u[0].pitagTrigger
+                    pitagTrigger: u[0] && u[0].pitagTrigger
                 }).always(res => {
                     if (d && res !== paths) {
                         ulmanager.logger.debug('Failed to create paths hierarchy...', res);

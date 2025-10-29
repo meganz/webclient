@@ -1559,6 +1559,18 @@ MegaData.prototype.ulprogress = function(ul, perc, bl, bt, bps) {
     mega.tpw.updateDownloadUpload(mega.tpw.UPLOAD, id, perc, bl, bt, bps, ul.pos, ul.starttime);
 };
 
+// Handle 'usc' errors
+MegaData.prototype.uscex = function(ex) {
+    'use strict';
+
+    if (ex === EOVERQUOTA || ex === EGOINGOVERQUOTA) {
+
+        return ulmanager.ulShowOverStorageQuotaDialog();
+    }
+
+    return this.ulerror(null, ex);
+};
+
 // Handle upload error
 MegaData.prototype.ulerror = function(ul, error) {
     'use strict';

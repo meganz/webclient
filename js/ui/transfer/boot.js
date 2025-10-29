@@ -293,6 +293,9 @@ mBroadcaster.once('boot_done', () => {
                 }
             }
         },
+        uscex(ex) {
+            onUploadError(null, ex);
+        },
         setPitag: () => false,
         isOutShare: () => false,
         getNodeRights: () => false,

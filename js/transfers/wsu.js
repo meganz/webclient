@@ -37,39 +37,79 @@
  *
  * ***************** END MEGA LIMITED CODE REVIEW LICENCE ***************** */
 
-// WebSocket uploading v0.2
+// WebSocket uploading v0.9
 //
 // FIXME: add logic to give up on/retry uploads that are too slow or run into too many connection/CRC failures
-// FIXME: proper warning/error logging
 // @todo abort inflight chunks on pause (?)
 
 /** @property mega.wsuploadmgr */
 lazy(mega, 'wsuploadmgr', () => {
     'use strict';
 
-    // pre-compute CRC32 table
-    const crc32table = new Uint32Array(256);
+    const crc32b = (() => {
+        /**
+         * Fast CRC32 in JavaScript
+         * 101arrowz (https://github.com/101arrowz)
+         * License: MIT
+         */
+        const crct = new Int32Array(4096);
 
-    for (let i = 0; i < 256; i++) {
-        let c = i;
-        for (let j = 0; j < 8; j++) {
-            c = c & 1 ? 0xEDB88320 ^ c >>> 1 : c >>> 1;
-        }
-        crc32table[i] = c;
-    }
-
-    const crc32b = (buf, crc = 0) => {
-        crc = (crc ^ 0xFFFFFFFF) >>> 0;
-        const data = new Uint8Array(buf);
-
-        for (let i = 0; i < data.length; i++) {
-            const byte = data[i];
-            crc = crc32table[(crc ^ byte) & 0xFF] ^ crc >>> 8;
+        for (let i = 0; i < 256; ++i) {
+            let c = i;
+            let k = 9;
+            while (--k) {
+                c = (c & 1 && -306674912) ^ c >>> 1;
+            }
+            crct[i] = c;
         }
 
-        // results are unsigned!
-        return (crc ^ 0xFFFFFFFF) >>> 0;
-    };
+        for (let i = 0; i < 256; ++i) {
+            let lv = crct[i];
+            for (let j = 256; j < 4096; j += 256) {
+                lv = crct[i | j] = lv >>> 8 ^ crct[lv & 255];
+            }
+        }
+
+        const crcts = [];
+
+        for (let i = 0; i < 16;) {
+            crcts[i] = crct.subarray(i << 8, ++i << 8);
+        }
+
+        const [t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16] = crcts;
+
+        return (d, c) => {
+            c = ~c;
+            d = new Uint8Array(d);
+            let i = 0;
+            const max = d.length - 16;
+            while (i < max) {
+                c =
+                    t16[d[i++] ^ c & 255] ^
+                    t15[d[i++] ^ c >> 8 & 255] ^
+                    t14[d[i++] ^ c >> 16 & 255] ^
+                    t13[d[i++] ^ c >>> 24] ^
+                    t12[d[i++]] ^
+                    t11[d[i++]] ^
+                    t10[d[i++]] ^
+                    t9[d[i++]] ^
+                    t8[d[i++]] ^
+                    t7[d[i++]] ^
+                    t6[d[i++]] ^
+                    t5[d[i++]] ^
+                    t4[d[i++]] ^
+                    t3[d[i++]] ^
+                    t2[d[i++]] ^
+                    t1[d[i++]];
+            }
+            for (; i < d.length; ++i) {
+                c = t1[c & 255 ^ d[i]] ^ c >>> 8;
+            }
+
+            // results are unsigned!
+            return (c ^ 0xFFFFFFFF) >>> 0;
+        };
+    })();
 
     const logger = new MegaLogger('WSU', false, self.ulmanager && ulmanager.logger);
 
@@ -95,7 +135,7 @@ lazy(mega, 'wsuploadmgr', () => {
             this.errored = null;
             this.chunksinflight = 0;
 
-            this.files = Object.create(null);	// the files in this pool
+            this.files = Object.create(null);   // the files in this pool
             this.logger = new MegaLogger(`WsPool(${makeUUID().slice(-16)})`, false, logger);
 
             setupws(this.conn[0], this);
@@ -171,7 +211,7 @@ lazy(mega, 'wsuploadmgr', () => {
             }
 
             if (lowest >= 0) {
-                this.retries = 0;	// we're good, reset retry counter
+                this.retries = 0;     // we're good, reset retry counter
                 return this.conn[lowest];
             }
 
@@ -192,7 +232,7 @@ lazy(mega, 'wsuploadmgr', () => {
                 for (let j = this.conn[i].chunksonthewire.length; j--;) {
                     const c = this.conn[i].chunksonthewire[j];
 
-                    buffered -= c[1] + 20;	// subtract chunk and header length
+                    buffered -= c[1] + 20;     // subtract chunk and header length
                     if (buffered < 0) {
                         // part of this chunk and all previous chunks are no longer buffered
                         // and can be added to the server-confirmed amount as having left the local machine
@@ -230,16 +270,6 @@ lazy(mega, 'wsuploadmgr', () => {
                 }
             }
 
-            /*
-            let t = 0, b = 0;
-            for (let i = this.conn.length; i--; ) {
-                t += this.conn[i].chunksonthewire.length;
-                b += this.conn[i].bufferedAmount;
-            }
-            if (t || b || this.chunksinflight) {
-            console.log('Inflight: ' + this.chunksinflight + ' Onthewire: ' + t + ' Buffered: ' + b);
-            }*/
-
             return stop;
         }
 
@@ -252,18 +282,34 @@ lazy(mega, 'wsuploadmgr', () => {
                 return false;
             }
 
-            // do we have any failed chunks that need to be resent? do these first
+            // do we have any failed chunks to resend available in the cache?
             while (this.toresend && this.toresend.length) {
-                const chunk = this.toresend.splice(0, 1)[0];
+                const [pos, len, fileno] = this.toresend[0];
+                const ul = this.files[fileno];
+
+                // if the file upload has been cancelled, skip
+                if (!ul || ul.done || ul.abort) {
+                    if (self.d) {
+                        this.logger.info(`Not resending chunk (file #${fileno} ${pos} ${len}) - done/aborted`);
+                    }
+                    this.toresend.splice(0, 1);
+                    continue;
+                }
+
+                // if the chunk isn't available yet, proceed with fresh chunks until it is
+                if (pos < ul.reader.file.size && !ul.reader.haveChunk(pos)) {
+                    if (self.d) {
+                        this.logger.info(`Not resending chunk (file #${fileno} ${pos} ${len}) - waiting for reader`);
+                    }
+                    break;
+                }
 
                 if (self.d) {
-                    this.logger.info(`Resending chunk ${JSON.stringify(chunk)}`);
+                    this.logger.info(`Resending chunk (file #${fileno} ${pos} ${len})`);
                 }
 
-                // return chunk unless the file upload has ben cancelled
-                if (this.files[chunk[2]] && !this.files[chunk[2]].abort) {
-                    return chunk;
-                }
+                this.toresend.splice(0, 1);
+                return [pos, len, fileno];
             }
 
             let fileno, ulfile;
@@ -283,6 +329,13 @@ lazy(mega, 'wsuploadmgr', () => {
                     if (error) {
                         // @todo report
                         continue;
+                    }
+
+                    // upload confirmation lost? retrigger.
+                    if (ul.havelastchunkconfirmation && Date.now() - ul.havelastchunkconfirmation > 3000) {
+                        this.logger.info(`Missing upload confirmation for file #${fileno} - retriggering`);
+                        ul.havelastchunkconfirmation = Date.now();
+                        return [file.size, 0, fileno];
                     }
 
                     if (cachelimit > 0) {
@@ -315,15 +368,29 @@ lazy(mega, 'wsuploadmgr', () => {
             return [pos, len, fileno];
         }
 
-        retrychunk(chunk) {
-            if (self.d) {
-                this.logger.debug(`Going to retry chunk ${JSON.stringify(chunk)}`);
-            }
+        retrychunk(chunk, reread) {
+            const fu = this.files[chunk[2]];
 
-            if (!this.toresend) {
-                this.toresend = [];
+            if (!fu || fu.done || fu.abort) {
+                if (self.d) {
+                    this.logger.debug(`Not retrying chunk ${JSON.stringify(chunk)} (done/aborted)`);
+                }
             }
-            this.toresend.push(chunk);
+            else {
+                if (self.d) {
+                    this.logger.debug(`Going to retry chunk ${JSON.stringify(chunk)}`);
+                }
+
+                if (reread && fu.reader.file && chunk[0] < fu.reader.file.size) {
+                    fu.reader.readChunk(chunk[0]);
+                }
+
+                if (!this.toresend) {
+                    this.toresend = [];
+                }
+
+                this.toresend.push(chunk);
+            }
         }
 
         sendchunkdata(ws, fileno, pos, chunkdata) {
@@ -348,18 +415,6 @@ lazy(mega, 'wsuploadmgr', () => {
         // send one chunk from the WsPool to the given WebSocket
         // returns true if something was sent, false otherwise
         sendchunk(ws) {
-            // if the connection dropped unexpectedly, we return the in-flight chunk to the pool
-            if (ws.readyState === WebSocket.CLOSED) {
-                if (self.d) {
-                    this.logger.error(`WebSocket connection to ${ws.url} lost.`);
-                }
-
-                // we must resend all unacknowledged in-flight chunks
-                for (let i = ws.chunksonthewire.length; i--;) {
-                    this.retrychunk(ws.chunksonthewire[i]);
-                }
-            }
-
             // if connection is up and buffer is not too full, we send another chunk
             if (ws.readyState === WebSocket.OPEN && ws.bufferedAmount < 1500000) {
                 const chunk = this.nextchunk();
@@ -382,14 +437,15 @@ lazy(mega, 'wsuploadmgr', () => {
 
                     if (self.d) {
                         if (buf) {
-                            this.logger.error(`GetChunk failed at ${chunk[0]}: ${buf.byteLength} != ${chunk[1]}`, buf);
+                            const at = `${chunk[0]}: ${buf.byteLength} != ${chunk[1]}`;
+                            this.logger.error(`GetChunk for file #${chunk[2]} failed at ${at}`, buf);
                         }
                         else {
-                            this.logger.log(`No chunk at ${chunk[0]}`);
+                            this.logger.log(`No chunk at ${chunk[0]} file #${chunk[2]}`);
                         }
                     }
 
-                    this.retrychunk(chunk);
+                    this.retrychunk(chunk, false);
                 }
             }
 
@@ -554,10 +610,14 @@ lazy(mega, 'wsuploadmgr', () => {
                 this.pools[i].numconn = this.numconn;
                 this.pools[i].files[fileno] = fu;
                 this.pools[i].sendchunks();
+
+                if (self.d) {
+                    this.logger.info(`fileno#${fileno} assigned to ${file.owner}`, [fu]);
+                }
             }
             else {
                 if (self.d) {
-                    this.logger.warn(`We don't have any usc response yet, queueing...`);
+                    this.logger.warn(`We don't have any usc response yet, queueing #${fileno}...`, [fu]);
                 }
                 this.unassigned.push(fu);
             }
@@ -597,7 +657,7 @@ lazy(mega, 'wsuploadmgr', () => {
             this.fileno = fileno;
             this.bytesuploaded = 0;
             this.needsizeconfirmation = false;
-            this.havelastchunkconfirmation = false;
+            this.havelastchunkconfirmation = 0;
             this.reader = new FileUploadReader(file);
 
             // start the Speedometer the first activity
@@ -646,8 +706,8 @@ lazy(mega, 'wsuploadmgr', () => {
                         this.logger.log(`Connected to ${ws.url}`);
                     }
                     ws.pool.errored = false;
-                    ws.pool.sendchunk(ws);	// immediately send a chunk to the new connection
-                    ws.pool.sendchunks();	// and fill the whole pool's buffers
+                    ws.pool.sendchunk(ws);      // immediately send a chunk to the new connection
+                    ws.pool.sendchunks();       // and fill the whole pool's buffers
                 };
 
                 ws.onerror = (ev) => {
@@ -660,7 +720,16 @@ lazy(mega, 'wsuploadmgr', () => {
                         const {wasClean, code, reason} = ev;
                         this.logger.info(`Disconnected from ${ws.url}`, wasClean, code, reason, [ev]);
                     }
-                    ws.pool.sendchunk(ws);	// re-enqueue inflight chunks
+
+                    // if the connection dropped unexpectedly, we return the in-flight chunks to the pool
+                    ws.pool.chunksinflight -= ws.chunksonthewire.length;
+
+                    // we must resend all unacknowledged in-flight chunks
+                    for (let i = 0; i < ws.chunksonthewire.length; i++) {
+                        ws.pool.retrychunk(ws.chunksonthewire[i], true);
+                    }
+
+                    ws.pool.sendchunk(ws);       // re-enqueue inflight chunks
                 };
 
                 // process a server message
@@ -698,27 +767,21 @@ lazy(mega, 'wsuploadmgr', () => {
             const chunkpos = Number(view.getBigUint64(4, true));
             const fu = ws.pool.files[fileno] || {abort: -1};
 
-            // this.logger.debug(`ws.ack:#${fileno}@${chunkpos}:${type}`, data);
-
             if (type > 0 && type < 4 || type === 7) {
                 // server confirmation received: this chunk is no longer in flight (ul confirmation follows separately)
                 chunk = this.flush(ws, fileno, chunkpos);
 
-                if (fu.reader) {
-                    if (type !== 3) {
-                        // we can discard the queued chunk in all cases except CRC32 failure
-                        fu.reader.deleteChunk(chunkpos);
-                    }
-                }
-                else {
-                    this.logger.warn(`no file-upload associated with #${fileno}`);
+                if (!fu.reader) {
+                    this.logger.warn(`No upload associated with file #${fileno}`);
                     delete ws.pool.files[fileno];
                     return this.stop();
                 }
             }
 
             if (type < 0) {
-                if (!fu.abort) {
+                this.logger.error(`File #${fileno} failed at ${chunkpos} (${type})`);
+
+                if (!fu.abort && !fu.done) {
                     this.uploadfailed(fu, type);
                 }
                 return;
@@ -737,7 +800,7 @@ lazy(mega, 'wsuploadmgr', () => {
                 case 3:
                     // CRC failed (unlikely on SSL, but very possible on TCP)
                     this.logger.error(`Chunk CRC FAILED on ${ws.url}`);
-                    ws.pool.retrychunk(chunk);
+                    ws.pool.retrychunk(chunk, true);
                     break;
 
                 case 4:
@@ -756,7 +819,7 @@ lazy(mega, 'wsuploadmgr', () => {
                 case 6:
                     // server requests a break
                     // FIXME: implement
-                    this.logger.warn(`server requests pause of ${chunkpos} ms`);
+                    this.logger.warn(`Server requests pause of ${chunkpos} ms`);
                     break;
 
                 default:
@@ -774,9 +837,7 @@ lazy(mega, 'wsuploadmgr', () => {
                 }
                 else {
                     if (!fu.needsizeconfirmation) {
-                        if (self.d) {
-                            this.logger.error('Unexpected file size confirmation; starting over...', [fu]);
-                        }
+                        this.logger.warn('Unexpected file size confirmation (file #${chunk[2]}); starting over!', [fu]);
                         this.uploadfailed(fu, -2);
                         return;
                     }
@@ -785,20 +846,16 @@ lazy(mega, 'wsuploadmgr', () => {
 
                 if (type === 7) {
                     if (fu.reader.readpos < fu.reader.file.size) {
-                        if (self.d) {
-                            this.logger.error('Premature end-of-file ack; starting over...', [fu]);
-                        }
+                        this.logger.warn('Premature end-of-file ack (file #${chunk[2]}); starting over...', [fu]);
                         this.uploadfailed(fu, -13);
                         return;
                     }
                     if (fu.havelastchunkconfirmation) {
-                        if (self.d) {
-                            this.logger.error('Duplicate end-of-file ack; starting over...', [fu]);
-                        }
+                        this.logger.warn('Duplicate end-of-file ack (file #${chunk[2]}); starting over...', [fu]);
                         this.uploadfailed(fu, -12);
                         return;
                     }
-                    fu.havelastchunkconfirmation = true;
+                    fu.havelastchunkconfirmation = Date.now();
                 }
 
                 if (fu.bytesuploaded >= fu.reader.file.size
@@ -808,8 +865,7 @@ lazy(mega, 'wsuploadmgr', () => {
                     // the server is telling us that it thinks it will send more confirmations
                     // this means that the server has lost its state
                     if (self.d) {
-                        const s = `${chunk[2]} type ${type} ${chunk[1]}, ${fu.bytesuploaded} >= ${fu.reader.file.size}`;
-                        this.logger.warn(`The server has lost the plot (file ${s}); starting over...`, [fu]);
+                        this.logger.warn(`Server has lost the plot (file #${chunk[2]}); starting over...`, [fu]);
                     }
                     this.uploadfailed(fu, -8);
                 }
@@ -829,7 +885,7 @@ lazy(mega, 'wsuploadmgr', () => {
             }
 
             if (!chunk) {
-                this.logger.error(`PROTOCOL ERROR - Server confirmed chunk not in flight: #${fileno}@${offset}`);
+                this.logger.error(`Server confirmed chunk not in flight: File #${fileno}@${offset}`);
             }
 
             return chunk;
@@ -863,7 +919,7 @@ lazy(mega, 'wsuploadmgr', () => {
         stop() {
             if (this.running && !this.poolmgr.files) {
                 if (self.d) {
-                    this.logger.info('Entered into an idle state.');
+                    this.logger.info('Entered idle state.');
                 }
                 this.running = false;
             }

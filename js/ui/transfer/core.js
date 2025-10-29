@@ -595,7 +595,7 @@ lazy(self.T, 'core', () => {
                 'https://mega.app': 'https://transfer.it',
                 'https://mega.nz': 'https://transfer.it',
                 'https://transfer.it': `https://mega.${mega.tld}`
-            })[location.origin];
+            })[self.is_extension || `${location.origin}`.endsWith('mega.co.nz') ? 'https://mega.nz' : location.origin];
 
             if (target) {
                 let q = '';

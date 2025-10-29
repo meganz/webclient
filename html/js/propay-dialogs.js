@@ -2866,7 +2866,8 @@ var addressDialog = {
                 tryCatch(() => {
                     api_req({a: 'log', e: 99741, m: JSON.stringify(event.data)});
                 })();
-                failHandle(l[1679]);
+                console.warn('Unexpected message from stripe iframe', event);
+                window.addEventListener('message', addressDialog.stripeFrameHandler, {once: true});
                 return;
             }
             if (event.data.startsWith('json^')) {

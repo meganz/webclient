@@ -188,8 +188,9 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
     if (M.onDeviceCenter) {
         const { ui } = mega.devices;
         const section = ui.getRenderSection();
-        if (section !== 'cloud-drive' &&
-            evt.currentTarget.classList.contains('device-folder-item')
+        const elem = $(evt.currentTarget).get(0) || {};
+        if (section !== 'cloud-drive' && elem.classList &&
+            elem.classList.contains('device-folder-item')
             || ui.isBackupRelated($.selected)
         ) {
             return ui.getContextMenuItems($.selected, isHeaderContext);

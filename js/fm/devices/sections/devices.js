@@ -108,6 +108,8 @@ lazy(mega.devices.sections, 'devices', () => {
             const elContain = aTemplate.querySelector('.device-centre-item-contain');
             const elSize = aTemplate.querySelector('.device-centre-item-size');
 
+            aTemplate.classList.add('megaListItem');
+
             if (elIcon && elName && elInfo && elContain && elSize) {
                 elIcon.classList.add(`icon-${aProperties.icon}-filled`);
                 elName.textContent = aProperties.name;

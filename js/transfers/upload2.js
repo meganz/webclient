@@ -165,6 +165,9 @@ var ulmanager = {
 
         ulQueue.resume();
         this.ulOverStorageQuota = false;
+        if (ul_queue.length) {
+            mega.wsuploadmgr.run();
+        }
 
         if (!this.ulOverStorageQueue.length) {
             if (d) {

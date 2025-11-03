@@ -3,7 +3,7 @@
  */
 function UFSSizeCache() {
     'use strict';
-    // handle[d, f, b, parent, td, tf, tb, tvf, tvb, fv, n{}]
+    // handle[d, f, b, parent, td, tf, tb, tvf, tvb, fv, n{}, sen]
     this.cache = Object.create(null);
     // version linkage.
     this.versions = new Set();
@@ -20,7 +20,7 @@ UFSSizeCache.prototype.feednode = function(n) {
     if (n.p) {
         if (!this.cache[n.p]) {
             // create previously unknown parent
-            this.cache[n.p] = [n.t, 1 - n.t, n.s || 0, false, 0, 0, 0, 0, 0, 0, null];
+            this.cache[n.p] = [n.t, 1 - n.t, n.s || 0, false, 0, 0, 0, 0, 0, 0, null, 0];
         }
         else if (n.fv || this.cache[n.p][9]) {
             if (this.cache[n.p][9]) {
@@ -42,7 +42,7 @@ UFSSizeCache.prototype.feednode = function(n) {
             this.cache[n.h][3] = n.p;
         }
         else {
-            this.cache[n.h] = [0, 0, 0, n.p, 0, 0, 0, 0, 0, 0, (n.t || n.fv) && n];
+            this.cache[n.h] = [0, 0, 0, n.p, 0, 0, 0, 0, 0, 0, (n.t || n.fv) && n, n.sen | 0];
         }
 
         // record file version
@@ -73,6 +73,7 @@ UFSSizeCache.prototype.sum = function() {
 
         do {
             this.cache[p][4] += this.cache[h][0];
+            this.cache[p][11] += this.cache[h][11];
 
             if (this.cache[h][9]) {
                 this.cache[p][7] += this.cache[h][1];
@@ -95,6 +96,7 @@ UFSSizeCache.prototype._saveNodeState = function(n, entry) {
     n.tb = (n.tb || 0) + entry[6];
     n.tvf = (n.tvf || 0) + entry[7];
     n.tvb = (n.tvb || 0) + entry[8];
+    n.tsf = (n.tsf || 0) + entry[11];
     this.addToDB(n);
 };
 
@@ -196,7 +198,6 @@ UFSSizeCache.prototype.addToDB = function(n) {
             s: n.s >= 0 ? n.s : -n.t,
             t: n.t ? 1262304e3 - n.ts : n.ts,
             c: n.hash || '',
-            fa: n.fa || '',
             d: n
         });
 
@@ -213,6 +214,109 @@ UFSSizeCache.prototype.addToDB = function(n) {
             M.onFolderSizeChangeUIUpdate(n);
         }
     }
+    else {
+        this.link(n);
+    }
+};
+
+// link node to supplementary table(s)
+UFSSizeCache.prototype.link = function(n) {
+    'use strict';
+
+    if (self.fmdb && !fmdb.crashed) {
+
+        for (let m = this.famap, i = m.length; i--;) {
+            const k = m[i];
+
+            if (n[k] !== undefined) {
+
+                fmdb.add(k, {
+                    h: n.h,
+                    p: n.p,
+                    ts: n.mtime || n.ts,
+                    d: {[k]: n[k], t: this.bitfield(n)}
+                });
+            }
+        }
+    }
+};
+
+// unlink node from supplementary table(s)
+UFSSizeCache.prototype.unlink = function(n, a) {
+    'use strict';
+
+    if (self.d) {
+        console.info(`UFSSizeCache.unlink(${n.h}): ${a && Object.keys(a)}`);
+    }
+
+    if (self.fmdb && !fmdb.crashed) {
+
+        for (let m = this.famap, i = m.length; i--;) {
+            const k = m[i];
+
+            if (n[k] === undefined && (!a || a[k] !== undefined)) {
+                console.assert(!a || this.famap.removable[k], `'${k}' is not meant to be removed...`);
+
+                fmdb.del(k, n.h);
+            }
+        }
+    }
+};
+
+// node flags
+UFSSizeCache.prototype.bitfield = function(n) {
+    'use strict';
+
+    let t = +!!n.t;
+    if (n.fav) {
+        t |= M.IS_FAV;
+    }
+    if (n.sen) {
+        t |= M.IS_SEN;
+    }
+
+    const s = M.getNodeShare(n);
+    if (s) {
+        if (s.down) {
+            t |= M.IS_TAKENDOWN;
+        }
+        t |= M.IS_LINKED;
+    }
+    if (M.isOutShare(n, s ? 'EXP' : null)) {
+        t |= M.IS_SHARED;
+    }
+    return t;
+};
+
+// update node attributes
+UFSSizeCache.prototype.onattribute = function(n, a) {
+    'use strict';
+    const map = [
+        ['sen', 'tsf']
+    ];
+
+    for (let i = map.length; i--;) {
+        const [k, v] = map[i];
+
+        if (n[k] !== a[k]) {
+            let e = n;
+
+            if (n[k] > 0) {
+                while ((e = M.d[e.p])) {
+                    e[v] = (e[v] | 0) + 1;
+                    this.addToDB(e);
+                }
+            }
+            else if (a[k] > 0) {
+                while ((e = M.d[e.p])) {
+                    e[v] = e[v] > 0 ? e[v] - 1 : 0;
+                    this.addToDB(e);
+                }
+            }
+        }
+    }
+
+    return this.unlink(n, a);
 };
 
 /**
@@ -233,6 +337,7 @@ UFSSizeCache.prototype.addTreeNode = function(n, ignoreDB) {
     tmp.td = n.td || 0;
     tmp.tf = n.tf || 0;
     tmp.tb = n.tb || 0;
+    tmp.tsf = n.tsf || 0;
     tmp.tvf = n.tvf || 0;
     tmp.tvb = n.tvb || 0;
     tmp.h = n.h;
@@ -244,11 +349,7 @@ UFSSizeCache.prototype.addTreeNode = function(n, ignoreDB) {
         if (n.t & M.IS_TREE) tmp.t = n.t;
     }
     else {
-        if (n.fav)                                                   tmp.t |= M.IS_FAV;
-        if (n.sen)                                                   tmp.t |= M.IS_SEN;
-        if (M.su.EXP && M.su.EXP[n.h])                               tmp.t |= M.IS_LINKED;
-        if (M.getNodeShareUsers(n, 'EXP').length || M.ps[n.h])       tmp.t |= M.IS_SHARED;
-        if (M.getNodeShare(n).down === 1)                            tmp.t |= M.IS_TAKENDOWN;
+        tmp.t |= this.bitfield(n);
     }
 
     if (n.su || p === 's4') {
@@ -313,7 +414,7 @@ UFSSizeCache.prototype.delTreeNode = function(h, p) {
  */
 UFSSizeCache.prototype.addNode = function(n, ignoreDB) {
     'use strict';
-    var td, tf, tb, tvf, tvb;
+    let td, tf, tb, tsf, tvf, tvb;
 
     if (n.t) {
         td = (n.td || 0) + 1;
@@ -321,6 +422,7 @@ UFSSizeCache.prototype.addNode = function(n, ignoreDB) {
         tb = (n.tb || 0);
         tvf = (n.tvf || 0);
         tvb = (n.tvb || 0);
+        tsf = n.tsf || 0;
 
         if (!ignoreDB) {
             // if a new folder was created, save it to db
@@ -328,11 +430,20 @@ UFSSizeCache.prototype.addNode = function(n, ignoreDB) {
         }
     }
     else {
+        if (n.fv) {
+            tf = 0;
+            tb = 0;
+            tvf = 1;
+            tvb = n.s;
+        }
+        else {
+            tf = 1;
+            tb = n.s;
+            tvf = 0;
+            tvb = 0;
+        }
         td = 0;
-        tf = (n.fv) ? 0 : 1;
-        tb = (n.fv) ? 0 : n.s;
-        tvf = (n.fv) ? 1 : 0;
-        tvb = (n.fv) ? n.s : 0;
+        tsf = n.sen ? 1 : 0;
     }
 
     if (d) {
@@ -343,6 +454,7 @@ UFSSizeCache.prototype.addNode = function(n, ignoreDB) {
         n.td = (n.td || 0) + td;
         n.tf = (n.tf || 0) + tf;
         n.tb = (n.tb || 0) + tb;
+        n.tsf = (n.tsf || 0) + tsf;
         n.tvf = (n.tvf || 0) + tvf;
         n.tvb = (n.tvb || 0) + tvb;
         this.addToDB(n);
@@ -358,7 +470,7 @@ UFSSizeCache.prototype.delNode = function(h, ignoreDB) {
     var n = M.d[h];
 
     if (n) {
-        var td, tf, tb, tvf, tvb;
+        let td, tf, tb, tsf, tvf, tvb;
 
         if (n.t) {
             td = n.td + 1;
@@ -366,15 +478,25 @@ UFSSizeCache.prototype.delNode = function(h, ignoreDB) {
             tb = n.tb;
             tvf = n.tvf || 0;
             tvb = n.tvb || 0;
+            tsf = n.tsf || 0;
 
             this.delTreeNode(n.h, n.p);
         }
         else {
+            if (n.fv) {
+                tf = 0;
+                tb = 0;
+                tvf = 1;
+                tvb = n.s;
+            }
+            else {
+                tf = 1;
+                tb = n.s;
+                tvf = 0;
+                tvb = 0;
+            }
             td = 0;
-            tf = (n.fv) ? 0 : 1;
-            tb = (n.fv) ? 0 : n.s;
-            tvf = (n.fv) ? 1 : 0;
-            tvb = (n.fv) ? n.s : 0;
+            tsf = n.sen ? 1 : 0;
         }
 
         if (d) {
@@ -387,6 +509,7 @@ UFSSizeCache.prototype.delNode = function(h, ignoreDB) {
             n.td -= td;
             n.tf -= tf;
             n.tb -= tb;
+            n.tsf -= tsf;
             n.tvf -= tvf;
             n.tvb -= tvb;
             this.addToDB(n);
@@ -396,3 +519,37 @@ UFSSizeCache.prototype.delNode = function(h, ignoreDB) {
         console.error('ufsc.delNode: Node not found', h);
     }
 };
+
+Object.defineProperty(UFSSizeCache.prototype, 'famap', {
+    get() {
+        'use strict';
+        return UFSSizeCache.link._mKey;
+    }
+});
+
+/** @property UFSSizeCache.link */
+lazy(UFSSizeCache, 'link', () => {
+    'use strict';
+    /**
+     * !!!..WARNING.!!!
+     *
+     * This is used in the FMDB schema, and therefore any change will cause a DB drop for everybody around the world.
+     *
+     * !!!..WARNING.!!!
+     */
+
+    const schema = '&h, p, ts';
+    const removable = freeze({des: 1, tags: 1});
+
+    const map = new Map([
+        ['fa', schema],
+        ...Object.keys(removable).map((k) => [k, schema])
+    ]);
+
+    Object.defineProperty(map, '_mKey', {value: [...map.keys()]});
+    Object.defineProperty(map, '_mObj', {value: Object.fromEntries(map)});
+
+    Object.defineProperty(map._mKey, 'removable', {value: removable});
+
+    return map;
+});

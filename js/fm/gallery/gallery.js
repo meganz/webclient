@@ -3871,26 +3871,17 @@ mega.gallery.initialiseMediaNodes = async(filterFn) => {
     'use strict';
 
     if (!mega.gallery.tmpFa) {
-        const nodesToObject = async() => {
-            const res = Object.create(null);
+        mega.gallery.tmpFa = (await dbfetch.media())
+            .reduce((t, n) => {
+                t[n.h] = n;
+                return t;
+            }, Object.create(null));
 
-            const assignNodes = (r) => {
-                for (let i = r.length; i--;) {
-                    const n = r[i];
-
-                    if (n.fa && !n.fv && n.s) {
-                        res[n.h] = n;
-                    }
-                }
-            };
-
-            await M.collectNodes(M.RootID);
-            assignNodes(Object.values(M.d));
-
-            return res;
-        };
-
-        mega.gallery.tmpFa = await nodesToObject();
+        // @todo work with the in-memory nodes, without loading them normally!
+        await dbfetch.geta(Object.keys(mega.gallery.tmpFa));
+        for (const h in mega.gallery.tmpFa) {
+            mega.gallery.tmpFa[h] = M.d[h] || mega.gallery.tmpFa[h];
+        }
     }
 
     return Object.values(mega.gallery.tmpFa).filter((n) => mega.gallery.allowedInMedia(n, filterFn));

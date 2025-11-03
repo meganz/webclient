@@ -11,6 +11,7 @@ MegaData.prototype.reset = function() {
     this.opc = Object.create(null);
     this.ipc = Object.create(null);
     this.tree = Object.create(null);
+    this.sets = Object.create(null);
     this.c.shares = Object.create(null);
     this.c.contacts = Object.create(null);
     this.cfInflightR = Object.create(null);

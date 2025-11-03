@@ -790,26 +790,7 @@ MegaData.prototype.getOutShareTree = function() {
  */
 MegaData.prototype.getTreeValue = function(n) {
     'use strict';
-
-    let t = +n.t | 0;
-    if (n.fav) {
-        t |= M.IS_FAV;
-    }
-    if (n.sen) {
-        t |= M.IS_SEN;
-    }
-
-    const s = this.getNodeShare(n);
-    if (s) {
-        if (s.down) {
-            t |= M.IS_TAKENDOWN;
-        }
-        t |= M.IS_LINKED;
-    }
-    if (this.isOutShare(n, 'EXP')) {
-        t |= M.IS_SHARED;
-    }
-    return t;
+    return (self.ufsc && ufsc.bitfield(n)) | 0;
 };
 
 /**

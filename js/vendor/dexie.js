@@ -4,7 +4,7 @@
  *
  * By David Fahlander, david.fahlander@gmail.com
  *
- * Version 3.2.1.meganz, 2023-06-29T11:23:08.477Z
+ * Version 3.2.9.meganz, 2025-10-20T11:03:54.966Z
  *
  * https://dexie.org
  *
@@ -31,11 +31,9 @@ function extend(obj, extension) {
         return obj;
     return Object.assign(obj, extension);
 }
-const getProto = Object.getPrototypeOf;
 const _hasOwn = {}.hasOwnProperty;
-function hasOwn(obj, prop) {
-    return _hasOwn.call(obj, prop);
-}
+const getProto = Object.getPrototypeOf;
+const hasOwn = (obj, prop) => _hasOwn.call(obj, prop);
 function props(proto, extension) {
     if (typeof extension === 'function')
         extension = extension(getProto(proto));
@@ -89,16 +87,8 @@ function arrayToObject(array, extractor) {
         return result;
     }, Object.create(null));
 }
-function tryCatch(fn, onerror, args) {
-    try {
-        fn.apply(null, args);
-    }
-    catch (ex) {
-        onerror && onerror(ex);
-    }
-}
 function getByKeyPath(obj, keyPath) {
-    if (hasOwn(obj, keyPath))
+    if (typeof keyPath === 'string' && hasOwn(obj, keyPath))
         return obj[keyPath];
     if (!keyPath)
         return obj;
@@ -112,7 +102,7 @@ function getByKeyPath(obj, keyPath) {
     const period = keyPath.indexOf('.');
     if (period !== -1) {
         const innerObj = obj[keyPath.substr(0, period)];
-        return innerObj === undefined ? undefined : getByKeyPath(innerObj, keyPath.substr(period + 1));
+        return innerObj == null ? undefined : getByKeyPath(innerObj, keyPath.substr(period + 1));
     }
     return undefined;
 }
@@ -173,7 +163,7 @@ const concat = [].concat;
 function flatten(a) {
     return concat.apply([], a);
 }
-const intrinsicTypeNames = "Boolean,String,Date,RegExp,Blob,File,FileList,FileSystemFileHandle,ArrayBuffer,DataView,Uint8ClampedArray,ImageBitmap,ImageData,Map,Set,CryptoKey"
+const intrinsicTypeNames = "BigUint64Array,BigInt64Array,Array,Boolean,String,Date,RegExp,Blob,File,FileList,FileSystemFileHandle,FileSystemDirectoryHandle,ArrayBuffer,DataView,Uint8ClampedArray,ImageBitmap,ImageData,Map,Set,CryptoKey"
     .split(',').concat(flatten([8, 16, 32, 64].map(num => ["Int", "Uint", "Float"].map(t => t + num + "Array")))).filter(t => _global[t]);
 const intrinsicTypes = new Set(intrinsicTypeNames.map(t => _global[t]));
 let circularRefs = null;
@@ -254,29 +244,6 @@ const isAsyncFunction = typeof Symbol !== 'undefined'
     ? (fn) => fn[Symbol.toStringTag] === 'AsyncFunction'
     : () => false;
 
-var debug = typeof localStorage === 'object' && !!localStorage.dexieDebug;
-function setDebug(value, filter) {
-    debug = value;
-    libraryFilter = filter;
-}
-var libraryFilter = () => true;
-function getErrorWithStack() {
-    return new Error();
-}
-function prettyStack(exception, numIgnoredFrames) {
-    var stack = exception.stack;
-    if (!stack)
-        return "";
-    numIgnoredFrames = (numIgnoredFrames || 0);
-    if (stack.indexOf(exception.name) === 0)
-        numIgnoredFrames += (exception.name + exception.message).split('\n').length;
-    return stack.split('\n')
-        .slice(numIgnoredFrames)
-        .filter(libraryFilter)
-        .map(frame => "\n" + frame)
-        .join('');
-}
-
 var dexieErrorNames = [
     'Modify',
     'Bulk',
@@ -320,17 +287,10 @@ var defaultTexts = {
     MissingAPI: "IndexedDB API missing."
 };
 function DexieError(name, msg) {
-    this._e = getErrorWithStack();
     this.name = name;
     this.message = msg;
 }
 derive(DexieError).from(Error).extend({
-    stack: {
-        get: function () {
-            return this._stack ||
-                (this._stack = this.name + ": " + this.message + prettyStack(this._e, 2));
-        }
-    },
     toString: function () { return this.name + ": " + this.message; }
 });
 function getMultiErrorMessage(msg, failures) {
@@ -340,7 +300,6 @@ function getMultiErrorMessage(msg, failures) {
         .join('\n');
 }
 function ModifyError(msg, failures, successCount, failedKeys) {
-    this._e = getErrorWithStack();
     this.failures = failures;
     this.failedKeys = failedKeys;
     this.successCount = successCount;
@@ -348,7 +307,6 @@ function ModifyError(msg, failures, successCount, failedKeys) {
 }
 derive(ModifyError).from(DexieError);
 function BulkError(msg, failures) {
-    this._e = getErrorWithStack();
     this.name = "BulkError";
     this.failures = Object.keys(failures).map(pos => failures[pos]);
     this.failuresByPos = failures;
@@ -360,7 +318,6 @@ const BaseException = DexieError;
 var exceptions = errorList.reduce((obj, name) => {
     var fullName = name + "Error";
     function DexieError(msgOrInner, inner) {
-        this._e = getErrorWithStack();
         this.name = fullName;
         if (!msgOrInner) {
             this.message = defaultTexts[name] || fullName;
@@ -440,9 +397,13 @@ function promisableChain(f1, f2) {
     };
 }
 
+var debug = typeof localStorage === 'object' && !!localStorage.dexieDebug;
+function setDebug(value, filter) {
+    debug = value;
+}
+
 var INTERNAL = {};
-const LONG_STACKS_CLIP_LIMIT = 100,
-MAX_LONG_STACKS = 20, ZONE_ECHO_LIMIT = 100, [resolvedNativePromise, nativePromiseProto, resolvedGlobalPromise] = (() => {
+const ZONE_ECHO_LIMIT = 100, [resolvedNativePromise, nativePromiseProto, resolvedGlobalPromise] = (() => {
     let globalP = Promise.resolve();
     if (typeof crypto === 'undefined' || !crypto.subtle)
         return [globalP, getProto(globalP), globalP];
@@ -455,7 +416,6 @@ MAX_LONG_STACKS = 20, ZONE_ECHO_LIMIT = 100, [resolvedNativePromise, nativePromi
 })();
 const NativePromise = resolvedNativePromise && resolvedNativePromise.constructor;
 const patchGlobalPromise = !!resolvedGlobalPromise;
-var stack_being_generated = false;
 const schedulePhysicalTick = () => {
     queueMicrotask(physicalTick);
 };
@@ -470,7 +430,7 @@ var isOutsideMicroTick = true,
 needsNewPhysicalTick = true,
 unhandledErrors = [],
 rejectingErrors = [],
-currentFulfiller = null, rejectionMapper = mirror;
+rejectionMapper = mirror;
 var globalPSD = {
     id: 'global',
     global: true,
@@ -497,11 +457,6 @@ function DexiePromise(fn) {
     this.onuncatched = nop;
     this._lib = false;
     var psd = (this._PSD = PSD);
-    if (debug) {
-        this._stackHolder = getErrorWithStack();
-        this._prev = null;
-        this._numPrev = 0;
-    }
     if (typeof fn !== 'function') {
         if (fn !== INTERNAL)
             throw new TypeError('Not a function');
@@ -525,7 +480,8 @@ const thenProp = {
             var rv = new DexiePromise((resolve, reject) => {
                 propagateToListener(this, new Listener(nativeAwaitCompatibleWrap(onFulfilled, psd, possibleAwait, cleanup), nativeAwaitCompatibleWrap(onRejected, psd, possibleAwait, cleanup), resolve, reject, psd));
             });
-            debug && linkToPreviousPromise(rv, this);
+            if (this._consoleTask)
+                rv._consoleTask = this._consoleTask;
             return rv;
         }
         then.prototype = INTERNAL;
@@ -566,23 +522,6 @@ props(DexiePromise.prototype, {
             onFinally();
             return PromiseReject(err);
         });
-    },
-    stack: {
-        get: function () {
-            if (this._stack)
-                return this._stack;
-            try {
-                stack_being_generated = true;
-                var stacks = getStack(this, [], MAX_LONG_STACKS);
-                var stack = stacks.join("\nFrom previous: ");
-                if (this._state !== null)
-                    this._stack = stack;
-                return stack;
-            }
-            finally {
-                stack_being_generated = false;
-            }
-        }
     },
     timeout: function (ms, msg) {
         return ms < Infinity ?
@@ -625,9 +564,7 @@ props(DexiePromise, {
             return new DexiePromise((resolve, reject) => {
                 value.then(resolve, reject);
             });
-        var rv = new DexiePromise(INTERNAL, true, value);
-        linkToPreviousPromise(rv, currentFulfiller);
-        return rv;
+        return new DexiePromise(INTERNAL, true, value);
     },
     reject: PromiseReject,
     race: function () {
@@ -732,17 +669,6 @@ function handleRejection(promise, reason) {
     reason = rejectionMapper(reason);
     promise._state = false;
     promise._value = reason;
-    debug && reason !== null && typeof reason === 'object' && !reason._promise && tryCatch(() => {
-        var origProp = getPropertyDescriptor(reason, "stack");
-        reason._promise = promise;
-        setProp(reason, "stack", {
-            get: () => stack_being_generated ?
-                origProp && (origProp.get ?
-                    origProp.get.apply(reason) :
-                    origProp.value) :
-                promise.stack
-        });
-    });
     addPossiblyUnhandledError(promise);
     propagateAllListeners(promise);
     if (shouldExecuteTick)
@@ -779,17 +705,12 @@ function propagateToListener(promise, listener) {
 }
 function callListener(cb, promise, listener) {
     try {
-        currentFulfiller = promise;
         var ret, value = promise._value;
-        if (promise._state) {
-            ret = cb(value);
-        }
-        else {
-            if (rejectingErrors.length)
-                rejectingErrors = [];
-            ret = cb(value);
-            if (!rejectingErrors.includes(value))
-                markErrorAsHandled(promise);
+        if (!promise._state && rejectingErrors.length)
+            rejectingErrors = [];
+        ret = debug && promise._consoleTask ? promise._consoleTask.run(() => cb(value)) : cb(value);
+        if (!promise._state && rejectingErrors.indexOf(value) === -1) {
+            markErrorAsHandled(promise);
         }
         listener.resolve(ret);
     }
@@ -797,43 +718,9 @@ function callListener(cb, promise, listener) {
         listener.reject(e);
     }
     finally {
-        currentFulfiller = null;
         if (--numScheduledCalls === 0)
             finalizePhysicalTick();
         --listener.psd.ref || listener.psd.finalize();
-    }
-}
-function getStack(promise, stacks, limit) {
-    if (stacks.length === limit)
-        return stacks;
-    var stack = "";
-    if (promise._state === false) {
-        var failure = promise._value, errorName, message;
-        if (failure != null) {
-            errorName = failure.name || "Error";
-            message = failure.message || failure;
-            stack = prettyStack(failure, 0);
-        }
-        else {
-            errorName = failure;
-            message = "";
-        }
-        stacks.push(errorName + (message ? ": " + message : "") + stack);
-    }
-    if (debug) {
-        stack = prettyStack(promise._stackHolder, 2);
-        if (stack && stacks.indexOf(stack) === -1)
-            stacks.push(stack);
-        if (promise._prev)
-            getStack(promise._prev, stacks, limit);
-    }
-    return stacks;
-}
-function linkToPreviousPromise(promise, prev) {
-    var numPrev = prev ? prev._numPrev + 1 : 0;
-    if (numPrev < LONG_STACKS_CLIP_LIMIT) {
-        promise._prev = prev;
-        promise._numPrev = numPrev;
     }
 }
 function physicalTick() {
@@ -929,7 +816,6 @@ function newScope(fn, props, a1, a2) {
     psd.ref = 0;
     psd.global = false;
     psd.id = ++zone_id_counter;
-    var globalEnv = globalPSD.env;
     psd.env = patchGlobalPromise ? {
         Promise: DexiePromise,
         PromiseProp: { value: DexiePromise, configurable: true, writable: true },
@@ -938,9 +824,7 @@ function newScope(fn, props, a1, a2) {
         allSettled: DexiePromise.allSettled,
         any: DexiePromise.any,
         resolve: DexiePromise.resolve,
-        reject: DexiePromise.reject,
-        nthen: getPatchedPromiseThen(globalEnv.nthen, psd),
-        gthen: getPatchedPromiseThen(globalEnv.gthen, psd)
+        reject: DexiePromise.reject
     } : {};
     if (props)
         extend(psd, props);
@@ -1007,8 +891,6 @@ function switchToZone(targetZone, bEnteringZone) {
     if (patchGlobalPromise) {
         var GlobalPromise = globalPSD.env.Promise;
         var targetEnv = targetZone.env;
-        nativePromiseProto.then = targetEnv.nthen;
-        GlobalPromise.prototype.then = targetEnv.gthen;
         if (currentZone.global || targetZone.global) {
             Object.defineProperty(_global, 'Promise', targetEnv.PromiseProp);
             GlobalPromise.all = targetEnv.all;
@@ -1032,9 +914,7 @@ function snapShot() {
         allSettled: GlobalPromise.allSettled,
         any: GlobalPromise.any,
         resolve: GlobalPromise.resolve,
-        reject: GlobalPromise.reject,
-        nthen: nativePromiseProto.then,
-        gthen: GlobalPromise.prototype.then
+        reject: GlobalPromise.reject
     } : {};
 }
 function usePSD(psd, fn, a1, a2, a3) {
@@ -1064,11 +944,6 @@ function nativeAwaitCompatibleWrap(fn, zone, possibleAwait, cleanup) {
             if (cleanup)
                 enqueueNativeMicroTask(decrementExpectedAwaits);
         }
-    };
-}
-function getPatchedPromiseThen(origThen, zone) {
-    return function (onResolved, onRejected) {
-        return origThen.call(this, nativeAwaitCompatibleWrap(onResolved, zone), nativeAwaitCompatibleWrap(onRejected, zone));
     };
 }
 const UNHANDLEDREJECTION = "unhandledrejection";
@@ -1143,16 +1018,12 @@ function tempTransaction(db, mode, storeNames, fn) {
     }
 }
 
-const DEXIE_VERSION = '3.2.1.meganz';
+const DEXIE_VERSION = '3.2.9.meganz';
 const maxString = String.fromCharCode(65535);
 const minKey = -Infinity;
 const INVALID_KEY_ARGUMENT = "Invalid key provided. Keys must be of type string, number, Date or Array<string | number | Date>.";
 const STRING_EXPECTED = "String expected.";
 const connections = [];
-const isIEOrEdge = typeof navigator !== 'undefined' && /(MSIE|Trident|Edge)/.test(navigator.userAgent);
-const hasIEDeleteObjectStoreBug = isIEOrEdge;
-const hangsOnDeleteLargeKeyRange = isIEOrEdge;
-const dexieStackFrameFilter = frame => !/(dexie\.js|dexie\.min\.js)/.test(frame);
 const DBNAMES_DB = '__dbnames';
 const READONLY = 'readonly';
 const READWRITE = 'readwrite';
@@ -1269,6 +1140,7 @@ class Table {
     _trans(mode, fn, writeLocked) {
         const trans = this._tx || PSD.trans;
         const tableName = this.name;
+        const task = debug && console.createTask && console.createTask(`Dexie: ${mode === 'readonly' ? 'read' : 'write'} ${this.name}`);
         function checkTableInTransaction(resolve, reject, trans) {
             if (!trans.schema[tableName])
                 throw new exceptions.NotFound("Table " + tableName + " not part of transaction");
@@ -1276,11 +1148,19 @@ class Table {
         }
         const wasRootExec = beginMicroTickScope();
         try {
-            return trans && trans.db === this.db ?
+            let p = trans && trans.db === this.db ?
                 trans === PSD.trans ?
                     trans._promise(mode, checkTableInTransaction, writeLocked) :
                     newScope(() => trans._promise(mode, checkTableInTransaction, writeLocked), { trans: trans, transless: PSD.transless || PSD }) :
                 tempTransaction(this.db, mode, [this.name], checkTableInTransaction);
+            if (task) {
+                p._consoleTask = task;
+                p = p.catch(err => {
+                    console.trace(err);
+                    return rejection(err);
+                });
+            }
+            return p;
         }
         finally {
             if (wasRootExec)
@@ -1297,6 +1177,8 @@ class Table {
     getKey(keyOrCrit, cb) {
         if (keyOrCrit && keyOrCrit.constructor === Object)
             return this.where(keyOrCrit).first(cb);
+        if (keyOrCrit == null)
+            return rejection(new exceptions.Type(`Invalid argument to Table.get()`));
         return this._trans('readonly', (trans) => {
             return this.core.get({ trans, key: keyOrCrit, method: 'getKey' });
         }).then(cb);
@@ -1327,13 +1209,23 @@ class Table {
             return this
                 .where(keyPaths[0])
                 .equals(indexOrCrit[keyPaths[0]]);
-        const compoundIndex = this.schema.indexes.concat(this.schema.primKey).filter(ix => ix.compound &&
-            keyPaths.every(keyPath => ix.keyPath.indexOf(keyPath) >= 0) &&
-            ix.keyPath.every(keyPath => keyPaths.indexOf(keyPath) >= 0))[0];
-        if (compoundIndex && this.db._maxKey !== maxString)
+        const compoundIndex = this.schema.indexes.concat(this.schema.primKey).filter(ix => {
+            if (ix.compound &&
+                keyPaths.every(keyPath => ix.keyPath.includes(keyPath))) {
+                for (let i = 0; i < keyPaths.length; ++i) {
+                    if (!keyPaths.includes(ix.keyPath[i]))
+                        return false;
+                }
+                return true;
+            }
+            return false;
+        }).sort((a, b) => a.keyPath.length - b.keyPath.length)[0];
+        if (compoundIndex && this.db._maxKey !== maxString) {
+            const keyPathsInValidOrder = compoundIndex.keyPath.slice(0, keyPaths.length);
             return this
-                .where(compoundIndex.name)
-                .equals(compoundIndex.keyPath.map(kp => indexOrCrit[kp]));
+                .where(keyPathsInValidOrder)
+                .equals(keyPathsInValidOrder.map(kp => indexOrCrit[kp]));
+        }
         if (!compoundIndex && debug)
             console.warn(`The query ${JSON.stringify(indexOrCrit)} on ${this.name} would benefit of a ` +
                 `compound index [${keyPaths.join('+')}]`);
@@ -1991,7 +1883,7 @@ class Collection {
     delete() {
         var ctx = this._ctx, range = ctx.range;
         if (isPlainKeyRange(ctx) &&
-            ((ctx.isPrimKey && !hangsOnDeleteLargeKeyRange) || range.type === 3 ))
+            (ctx.isPrimKey || range.type === 3 ))
          {
             return this._write(trans => {
                 const { primaryKey } = ctx.table.core.schema;
@@ -3155,7 +3047,6 @@ function updateTablesAndIndexes({ _novip: db }, oldVersion, trans, idbUpgradeTra
     const queue = [];
     const versions = db._versions;
     let globalSchema = db._dbSchema = buildGlobalSchema(db, db.idbdb, idbUpgradeTrans);
-    let anyContentUpgraderHasRun = false;
     const versToRun = versions.filter(v => v._cfg.version >= oldVersion);
     versToRun.forEach(version => {
         queue.push(() => {
@@ -3186,7 +3077,6 @@ function updateTablesAndIndexes({ _novip: db }, oldVersion, trans, idbUpgradeTra
             if (contentUpgrade && version._cfg.version > oldVersion) {
                 generateMiddlewareStacks(db, idbUpgradeTrans);
                 trans._memoizedTables = {};
-                anyContentUpgraderHasRun = true;
                 let upgradeSchema = shallowClone(newSchema);
                 diff.del.forEach(table => {
                     upgradeSchema[table] = oldSchema[table];
@@ -3213,10 +3103,8 @@ function updateTablesAndIndexes({ _novip: db }, oldVersion, trans, idbUpgradeTra
             }
         });
         queue.push(idbtrans => {
-            if (!anyContentUpgraderHasRun || !hasIEDeleteObjectStoreBug) {
-                const newSchema = version._cfg.dbschema;
-                deleteRemovedTables(newSchema, idbtrans);
-            }
+            const newSchema = version._cfg.dbschema;
+            deleteRemovedTables(newSchema, idbtrans);
             removeTablesApi(db, [db.Transaction.prototype]);
             setApiOnPlace(db, [db.Transaction.prototype], db._storeNames, db._dbSchema);
             trans.schema = db._dbSchema;
@@ -3257,7 +3145,7 @@ function getSchemaDiff(oldSchema, newSchema) {
             };
             if ((
             '' + (oldDef.primKey.keyPath || '')) !== ('' + (newDef.primKey.keyPath || '')) ||
-                (oldDef.primKey.auto !== newDef.primKey.auto && !isIEOrEdge))
+                (oldDef.primKey.auto !== newDef.primKey.auto))
              {
                 change.recreate = true;
                 diff.change.push(change);
@@ -3500,7 +3388,6 @@ function dexieOpen(db) {
         return state.dbReadyPromise.then(() => state.dbOpenError ?
             rejection(state.dbOpenError) :
             db);
-    debug && (state.openCanceller._stackHolder = getErrorWithStack());
     state.isBeingOpened = true;
     state.dbOpenError = null;
     state.openComplete = false;
@@ -3511,69 +3398,79 @@ function dexieOpen(db) {
     }
     let resolveDbReady = state.dbReadyResolve,
     upgradeTransaction = null, wasCreated = false;
-    return DexiePromise.race([openCanceller, safari14Workaround(indexedDB).then(() => new DexiePromise((resolve, reject) => {
-            throwIfCancelled();
-            if (!indexedDB)
-                throw new exceptions.MissingAPI();
-            const dbName = db.name;
-            const req = state.autoSchema ?
-                indexedDB.open(dbName) :
-                indexedDB.open(dbName, Math.round(db.verno * 10));
-            if (!req)
-                throw new exceptions.MissingAPI();
-            req.onerror = eventRejectHandler(reject);
-            req.onblocked = wrap(db._fireOnBlocked);
-            req.onupgradeneeded = wrap(e => {
-                upgradeTransaction = req.transaction;
-                if (state.autoSchema && !db._options.allowEmptyDB) {
-                    req.onerror = preventDefault;
-                    upgradeTransaction.abort();
-                    req.result.close();
-                    const delreq = indexedDB.deleteDatabase(dbName);
-                    delreq.onsuccess = delreq.onerror = wrap(() => {
-                        reject(new exceptions.NoSuchDatabase(`Database ${dbName} doesnt exist`));
-                    });
-                }
-                else {
-                    upgradeTransaction.onerror = eventRejectHandler(reject);
-                    var oldVer = e.oldVersion > Math.pow(2, 62) ? 0 : e.oldVersion;
-                    wasCreated = oldVer < 1;
-                    db._novip.idbdb = req.result;
-                    runUpgraders(db, oldVer / 10, upgradeTransaction, reject);
-                }
-            }, reject);
-            req.onsuccess = wrap(() => {
-                upgradeTransaction = null;
-                const idbdb = db._novip.idbdb = req.result;
-                const objectStoreNames = slice(idbdb.objectStoreNames);
-                if (objectStoreNames.length > 0)
-                    try {
-                        const tmpTrans = idbdb.transaction(safariMultiStoreFix(objectStoreNames), 'readonly');
-                        if (state.autoSchema)
-                            readGlobalSchema(db, idbdb, tmpTrans);
-                        else {
-                            adjustToExistingIndexNames(db, db._dbSchema, tmpTrans);
-                            if (!verifyInstalledSchema(db, tmpTrans)) {
-                                console.warn(`Dexie SchemaDiff: Schema was extended without increasing the number passed to db.version(). Some queries may fail.`);
-                            }
+    const tryOpenDB = () => new DexiePromise((resolve, reject) => {
+        throwIfCancelled();
+        if (!indexedDB)
+            throw new exceptions.MissingAPI();
+        const dbName = db.name;
+        const req = state.autoSchema ?
+            indexedDB.open(dbName) :
+            indexedDB.open(dbName, Math.round(db.verno * 10));
+        if (!req)
+            throw new exceptions.MissingAPI();
+        req.onerror = eventRejectHandler(reject);
+        req.onblocked = wrap(db._fireOnBlocked);
+        req.onupgradeneeded = wrap(e => {
+            upgradeTransaction = req.transaction;
+            if (state.autoSchema && !db._options.allowEmptyDB) {
+                req.onerror = preventDefault;
+                upgradeTransaction.abort();
+                req.result.close();
+                const delreq = indexedDB.deleteDatabase(dbName);
+                delreq.onsuccess = delreq.onerror = wrap(() => {
+                    reject(new exceptions.NoSuchDatabase(`Database ${dbName} doesnt exist`));
+                });
+            }
+            else {
+                upgradeTransaction.onerror = eventRejectHandler(reject);
+                var oldVer = e.oldVersion > Math.pow(2, 62) ? 0 : e.oldVersion;
+                wasCreated = oldVer < 1;
+                db._novip.idbdb = req.result;
+                runUpgraders(db, oldVer / 10, upgradeTransaction, reject);
+            }
+        }, reject);
+        req.onsuccess = wrap(() => {
+            upgradeTransaction = null;
+            const idbdb = db._novip.idbdb = req.result;
+            const objectStoreNames = slice(idbdb.objectStoreNames);
+            if (objectStoreNames.length > 0)
+                try {
+                    const tmpTrans = idbdb.transaction(safariMultiStoreFix(objectStoreNames), 'readonly');
+                    if (state.autoSchema)
+                        readGlobalSchema(db, idbdb, tmpTrans);
+                    else {
+                        adjustToExistingIndexNames(db, db._dbSchema, tmpTrans);
+                        if (!verifyInstalledSchema(db, tmpTrans)) {
+                            console.warn(`Dexie SchemaDiff: Schema was extended without increasing the number passed to db.version(). Some queries may fail.`);
                         }
-                        generateMiddlewareStacks(db, tmpTrans);
                     }
-                    catch (e) {
-                    }
-                connections.push(db);
-                idbdb.onversionchange = wrap(ev => {
-                    state.vcFired = true;
-                    db.on("versionchange").fire(ev);
-                });
-                idbdb.onclose = wrap(ev => {
-                    db.on("close").fire(ev);
-                });
-                if (wasCreated)
-                    _onDatabaseCreated(db._deps, dbName);
-                resolve();
-            }, reject);
-        }))]).then(() => {
+                    generateMiddlewareStacks(db, tmpTrans);
+                }
+                catch (e) {
+                }
+            connections.push(db);
+            idbdb.onversionchange = wrap(ev => {
+                state.vcFired = true;
+                db.on("versionchange").fire(ev);
+            });
+            idbdb.onclose = wrap(ev => {
+                db.on("close").fire(ev);
+            });
+            if (wasCreated)
+                _onDatabaseCreated(db._deps, dbName);
+            resolve();
+        }, reject);
+    }).catch(err => {
+        if (err && err.name === 'UnknownError' && state.PR1398_maxLoop > 0) {
+            state.PR1398_maxLoop--;
+            console.warn('Dexie: Workaround for Chrome UnknownError on open()');
+            return tryOpenDB();
+        }
+        else {
+            return DexiePromise.reject(err);
+        }
+    });
+    return DexiePromise.race([openCanceller, safari14Workaround(indexedDB).then(tryOpenDB)]).then(() => {
         throwIfCancelled();
         state.onReadyBeingFired = [];
         return DexiePromise.resolve(vip(() => db.on.ready.fire(db.vip))).then(function fireRemainders() {
@@ -4225,7 +4122,7 @@ props(Dexie, {
     debug: {
         get: () => debug,
         set: value => {
-            setDebug(value, value === 'dexie' ? () => true : dexieStackFrameFilter);
+            setDebug(value);
         }
     },
     derive: derive,
@@ -4254,7 +4151,7 @@ props(Dexie, {
 Dexie.maxKey = getMaxKey(Dexie.dependencies.IDBKeyRange);
 
 DexiePromise.rejectionMapper = mapError;
-setDebug(debug, dexieStackFrameFilter);
+setDebug(debug);
 
 var namedExports = /*#__PURE__*/Object.freeze({
 __proto__: null,

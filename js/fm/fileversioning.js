@@ -249,7 +249,7 @@
                 .then((versions) => {
                     const promises = [];
                     for (let i = 1; i < versions.length; i++) {
-                        promises.push(api.setNodeAttributes(versions[i], {des: desc}));
+                        promises.push(api.setNodeAttributes(versions[i], {des: desc || undefined}));
                     }
                     return Promise.allSettled(promises);
                 });

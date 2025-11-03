@@ -1488,6 +1488,10 @@ scparser.$add('u', function(a) {
                 }
             }
 
+            if (a.at && self.ufsc) {
+                ufsc.onattribute(n, oldattr);
+            }
+
             // save modified node
             M.nodeUpdated(n, !M.d[n.h]);
         }
@@ -1834,38 +1838,12 @@ scparser.$add('upf', () => {
 });
 
 // Sets handlers
-scparser.$add('asp', (data) => {
+scparser.asp = scparser.asr = scparser.aep = scparser.aer = scparser.ass = (ap) => {
     'use strict';
-    if (folderlink) {
-        return;
+    if (!pfid) {
+        mega.sets.parseActionPacket(ap);
     }
-    mega.sets.parseAsp(data);
-});
-scparser.$add('asr',(data) => {
-    'use strict';
-    if (folderlink) {
-        return;
-    }
-    mega.sets.parseAsr(data);
-});
-scparser.$add('aep', (data) => {
-    'use strict';
-    if (folderlink) {
-        return;
-    }
-    mega.sets.parseAep(data);
-});
-scparser.$add('aer', (data) => {
-    'use strict';
-    if (folderlink) {
-        return;
-    }
-    mega.sets.parseAer(data);
-});
-scparser.$add('ass', (data) => {
-    'use strict';
-    mega.sets.parseAss(data);
-});
+};
 
 scparser.$notify = function(a) {
     // only show a notification if we did not trigger the action ourselves
@@ -2545,7 +2523,7 @@ function loadfm(force) {
                 console.error('No master key found... please contact support@mega.io');
             }
             else {
-                const f_table_schema = '&h, p, s, c, t, fa';
+                const f_table_schema = '&h, p, s, c, t';
                 fmdb = FMDB(u_handle, {
                     // channel 0: transactional by _sn update
                     f      : f_table_schema,   // nodes - handle, parent, size (negative size: type), checksum
@@ -2561,12 +2539,16 @@ function loadfm(force) {
                     ps     : '&h_p',           // pending share - handle/id
                     mcf    : '&id',            // chats - id
                     mcsm   : '&id',            // scheduled meetings - id
-                    asp    : '&id, ts, cts',   // Element Sets (set)
-                    aep    : '&id, ts, s, h',  // Element Sets (elements)
+                    sets   : '&id, ts, t',     // Element Sets (set)
+                    sete   : '&id, ts, s, h',  // Element Sets (elements)
+                    setp   : '&s, ph, ts',     // Element Sets (public)
                     ua     : '&k',             // user attributes - key (maintained by IndexedBKVStorage)
                     _sn    : '&i',             // sn - fixed index 1
                     puf    : '&ph',            // public upload folder - handle
                     pup    : '&p',             // public upload page - handle
+
+                    // file-attribute linkage on supplementary tables
+                    ...UFSSizeCache.link._mObj,
 
                     // channel 1: non-transactional (maintained by IndexedDBKVStorage)
                 }, {});
@@ -2715,6 +2697,14 @@ async function fetchfm(sn) {
 function dbfetchfm(residual) {
     "use strict";
     var tables = {
+        async sets(r) {
+            if (r.length) {
+                if (d) {
+                    console.debug('processing %d sets.', r.length);
+                }
+                return mega.sets.loadSets(r, true);
+            }
+        },
         tree: function(r) {
             for (var i = r.length; i--;) {
                 ufsc.addTreeNode(r[i], true);
@@ -3804,11 +3794,9 @@ function loadfm_callback(res) {
 
     if (res.aesp) {
         tryCatch(() => {
-            const a = res.aesp;
-
-            if ((a.s && a.s.length) | (a.e && a.e.length) | (a.p && a.p.length)) {
-
-                mega.sets.resetDB(res.aesp);
+            const {s} = res.aesp;
+            if (s && s.length) {
+                mega.sets.loadSets(res.aesp).catch(dump);
             }
         })();
     }
@@ -4034,7 +4022,7 @@ function loadfm_done(mDBload) {
             // Securing previously generated public album data to use later in the importing procedure
             if (localStorage.albumLinkImport) {
                 $.albumImport = Object.values(mega.gallery.albums.store)
-                    .find(({p}) => !!p && p.ph === localStorage.albumLinkImport);
+                    .find(({ph}) => ph === localStorage.albumLinkImport);
                 delete localStorage.albumLinkImport;
             }
         });

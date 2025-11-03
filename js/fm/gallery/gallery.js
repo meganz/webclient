@@ -1292,6 +1292,11 @@ class MegaGallery {
         rfBlock.removeClass('hidden');
         $('.files-grid-view.fm, .fm-blocks-view.fm, .fm-empty-section', rfBlock).addClass('hidden');
         mega.ui.secondaryNav.updateGalleryLayout();
+
+        if (M.gallery === 1) {
+            mega.ui.secondaryNav.hideBreadcrumb();
+        }
+
         mega.ui.secondaryNav.updateInfoChipsAndViews();
         mega.ui.secondaryNav.updateSmallNavButton(!M.isGalleryPage() && !M.isAlbumsPage());
 
@@ -3142,7 +3147,6 @@ async function galleryUI(id) {
     // cleanup existing (FM-side) MegaRender and such.
     M.v = [];
     $.selected = [];
-    M.gallery |= 1;
     M.renderMain();
     delay.cancel('rmSetupUI');
 

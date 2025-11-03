@@ -2768,6 +2768,8 @@ lazy(mega.gallery, 'albums', () => {
                 }
             };
 
+            mega.ui.secondaryNav.updateSmallNavButton();
+
             if (isPublic) {
                 mega.ui.secondaryNav.showCard(
                     albumId,
@@ -2799,7 +2801,6 @@ lazy(mega.gallery, 'albums', () => {
                         M.contextMenuUI(ev, 8, '.play-slideshow', [albumId]);
                     })
                 );
-                mega.ui.secondaryNav.updateSmallNavButton();
             }
             else if (filterFn) {
                 const slideshow = needSlideshow ? {

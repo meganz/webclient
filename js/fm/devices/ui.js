@@ -461,7 +461,7 @@ lazy(mega.devices, 'ui', () => {
                                 folder = folder || target;
 
                                 M.safeShowDialog('stop-backup', $backupDialog);
-                                return folder === M.RootID ? folder : dbfetch.get(folder).then(() => folder);
+                                return M.getChildren(folder) ? folder : dbfetch.get(folder).then(() => folder);
                             })
                             .then((folder) => {
                                 target = folder;

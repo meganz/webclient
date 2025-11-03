@@ -62,7 +62,9 @@ mega.textEditorUI = new function TextEditorUI() {
             mega.fileTextEditor.getFile(nodeHandle).done(
                 function(data) {
                     loadingDialog.hide();
-                    mega.textEditorUI.setupEditor(M.d[nodeHandle].name, data, nodeHandle);
+                    mega.textEditorUI.setupEditor(
+                        M.getNodeByHandle(nodeHandle).name, data, nodeHandle
+                    );
                 }
             ).fail(function() {
                 loadingDialog.hide();
@@ -280,7 +282,7 @@ mega.textEditorUI = new function TextEditorUI() {
 
                         if (fh) {
                             selectionManager.wantResetTo(fh, true);
-                            fileName = M.d[fh].name;
+                            fileName = M.getNodeByHandle(fh).name;
                             $('.text-editor-file-name span', $editorContainer).text(fileName);
                         }
 
@@ -437,11 +439,13 @@ mega.textEditorUI = new function TextEditorUI() {
         loadingDialog.show('common', l[23131]);
 
         if (rights === 1 && M.getNodeRoot(fh) === 'shares') {
-            const name = fileconflict.findNewName(M.getSafeName(M.d[fh].name), M.d[fh].p);
+            const name = fileconflict.findNewName(
+                M.getSafeName(M.getNodeByHandle(fh).name), M.getNodeByHandle(fh).p
+            );
             res = await Promise.resolve(
                 val
-                    ? mega.fileTextEditor.saveFileAs(name, M.d[fileHandle].p, val)
-                    : M.addNewFile(name, M.d[fileHandle].p)
+                    ? mega.fileTextEditor.saveFileAs(name, M.getNodeByHandle(fileHandle).p, val)
+                    : M.addNewFile(name, M.getNodeByHandle(fileHandle).p)
             ).catch(dump);
 
             return res;
@@ -497,7 +501,9 @@ mega.textEditorUI = new function TextEditorUI() {
                     mega.ui.viewerOverlay.show(h);
                 }
                 else {
-                    mega.textEditorUI.setupEditor(M.d[h].name, editedTxt || savedFileData, h);
+                    mega.textEditorUI.setupEditor(
+                        M.getNodeByHandle(h).name, editedTxt || savedFileData, h
+                    );
                 }
                 return h;
             }
@@ -509,7 +515,7 @@ mega.textEditorUI = new function TextEditorUI() {
             mega.fileTextEditor.removeOldVersion(versionHandle);
             versionHandle = fh;
         }
-        else if (M.d[fileHandle] && M.d[fileHandle].s === 0) {
+        else if (M.getNodeByHandle(fileHandle).s === 0) {
             mega.fileTextEditor.removeOldVersion(fileHandle);
             fileHandle = fh;
             versionHandle = '';
@@ -578,7 +584,8 @@ mega.textEditorUI = new function TextEditorUI() {
                 // Without parentheses && will be applied first,
                 // I want JS to start from left and go in with first match
                 // eslint-disable-next-line no-extra-parens
-                if (isReadonly || folderlink || (M.currentrootid === 'shares' && M.getNodeRights(handle) < 1) ||
+                if (isReadonly || folderlink ||
+                    (M.currentrootid === 'shares' && M.getNodeRights(handle) < 1) ||
                     inRubbishBin || root === M.InboxID) {
                     editor.options.readOnly = true;
 

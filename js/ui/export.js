@@ -294,7 +294,7 @@ var exportPassword = {
                 if (handles.hasOwnProperty(i)) {
 
                     // Get the node information
-                    const node = M.d[handles[i]];
+                    const node = M.getNodeByHandle(handles[i]);
                     const linkInfo = Object.create(null);
 
                     // Only nodes with public handle
@@ -976,7 +976,7 @@ var exportExpiry = {
             if (handles.hasOwnProperty(i)) {
 
                 // Get the node handle
-                var node = M.d[handles[i]];
+                var node = M.getNodeByHandle(handles[i]);
                 var expiryTimestamp = M.getNodeShare(node).ets;
 
                 // If it has an expiry time, increment the count
@@ -1032,7 +1032,7 @@ var exportExpiry = {
             if (handles.hasOwnProperty(i)) {
 
                 // Get the node handle
-                var node = M.d[handles[i]];
+                var node = M.getNodeByHandle(handles[i]);
                 var handle = node.h;
 
                 // Update the link with the new expiry timestamp
@@ -1300,8 +1300,8 @@ function logExportEvt(evtId, data) {
             );
 
             nameRow.textContent = item.name;
-            const numFolders = M.d[nodeHandle].td;
-            const numFiles = M.d[nodeHandle].tf;
+            const numFolders = M.getNodeByHandle(nodeHandle).td;
+            const numFiles = M.getNodeByHandle(nodeHandle).tf;
 
             if (item.t && (numFiles || numFolders)) {
                 let wording = '';
@@ -1385,7 +1385,7 @@ function logExportEvt(evtId, data) {
 
         for (let i = 0; i < $.itemExport.length; i++) {
             const value = $.itemExport[i];
-            const node = M.d[value];
+            const node = M.getNodeByHandle(value);
 
             if (node && (folderlink || node.ph)) {
                 items.push(itemExportLinkHtml(node, dec, (pwdArr || [])[i]));
@@ -1431,7 +1431,7 @@ function logExportEvt(evtId, data) {
         let i = $.itemExport.length;
 
         while (--i >= 0) {
-            counts[M.d[$.itemExport[i]].t]++;
+            counts[M.getNodeByHandle($.itemExport[i]).t]++;
         }
 
         logExportEvt(500767, counts);
@@ -1514,7 +1514,7 @@ function logExportEvt(evtId, data) {
             let i = count;
 
             while (--i >= 0) {
-                counts[M.d[$.itemExport[i]].t]++;
+                counts[M.getNodeByHandle($.itemExport[i]).t]++;
             }
 
             MegaButton.factory({
@@ -2003,8 +2003,7 @@ function logExportEvt(evtId, data) {
                 ];
 
                 // 0 - no need, 1 - is_video, 2 - is_audio
-                const needsEmbed = $.itemExport.length === 1 && M.d[$.itemExport[0]].fa
-                    && is_video(M.d[$.itemExport[0]]) || 0;
+                const needsEmbed = $.itemExport.length === 1 && is_video(M.getNodeByHandle($.itemExport[0])) || 0;
 
                 if (needsEmbed) {
                     const embedBtn = mCreateElement(
@@ -2109,7 +2108,7 @@ function logExportEvt(evtId, data) {
 
                     if (hasNewPwd) {
                         nodeExpiryTimestamps = $.itemExport.map((h) => {
-                            const node = M.d[h];
+                            const node = M.getNodeByHandle(h);
                             const { ets } = M.getNodeShare(node);
 
                             // If it has an expiry time, add it to the array
@@ -2208,7 +2207,7 @@ function logExportEvt(evtId, data) {
                 let i = $.itemExport.length;
 
                 while (--i >= 0) {
-                    counts[M.d[$.itemExport[i]].t]++;
+                    counts[M.getNodeByHandle($.itemExport[i]).t]++;
                 }
 
                 logExportEvt(500768, counts);
@@ -2319,7 +2318,7 @@ function logExportEvt(evtId, data) {
 
                 // Determine number of files and folders so the dialog wording is correct
                 while (--i >= 0) {
-                    counts[M.d[handles[i]].t]++;
+                    counts[M.getNodeByHandle(handles[i]).t]++;
                 }
 
                 // Change message to folder/s or file/s depending on number of files and folders
@@ -2450,14 +2449,14 @@ function logExportEvt(evtId, data) {
 
         const show = (mediaType) => {
             const { sheet, toast } = mega.ui;
+            const node = M.getNodeByHandle($.itemExport[0]);
             // 1 - Video, 2 - Audio
             const audio = typeof mediaType === 'number' ?
                 mediaType === 2 :
-                ($.itemExport.length === 1 && M.d[$.itemExport[0]].fa && is_video(M.d[$.itemExport[0]]) || 0) === 2;
+                ($.itemExport.length === 1 && is_video(node) || 0) === 2;
 
             const setCode = () => {
-                const n = M.d[$.itemExport[0]];
-                const link = getBaseUrl() + '/embed/' + n.ph + '#' + a32_to_base64(n.k);
+                const link = getBaseUrl() + '/embed/' + node.ph + '#' + a32_to_base64(node.k);
 
                 const iframe = '<iframe width="%w" height="%h" frameborder="0" src="%s" allowfullscreen %a></iframe>\n';
                 const { sheet } = mega.ui;
@@ -2537,7 +2536,6 @@ function logExportEvt(evtId, data) {
             };
 
             const createContents = () => {
-                const node = M.d[$.itemExport[0]];
                 const naming = mCreateElement(
                     'div',
                     { class: 'flex flex-row items-center font-body-1 mb-4' },
@@ -2955,7 +2953,7 @@ function logExportEvt(evtId, data) {
         const promises = [];
         for (var i = 0; i < nodes.length; i++) {
             var h = nodes[i];
-            var n = M.d[h];
+            var n = M.getNodeByHandle(h);
 
             if (n) {
                 if (n.t) {
@@ -3007,7 +3005,7 @@ function logExportEvt(evtId, data) {
 
             for (let i = handles.length; i--;) {
                 const h = handles[i];
-                const n = M.d[h];
+                const n = M.getNodeByHandle(h);
 
                 if (n) {
                     if (n.t) {
@@ -3039,7 +3037,7 @@ function logExportEvt(evtId, data) {
 
         // No need to perform an API call if this folder was already exported (Ie, we're updating)
         if (share.h === nodeId) {
-            if (!M.d[nodeId].t || u_sharekeys[nodeId]) {
+            if (!M.getNodeByHandle(nodeId).t || u_sharekeys[nodeId]) {
                 return this._getExportLinkRequest(nodeId);
             }
 
@@ -3083,7 +3081,7 @@ function logExportEvt(evtId, data) {
                 }
                 if (n && handle) {
                     n.ph = handle;
-                    M.nodeUpdated(n);
+                    M.nodeUpdated(n, !M.d[n.h]);
                 }
             }
 
@@ -3112,11 +3110,11 @@ function logExportEvt(evtId, data) {
         var request = { a: 'l', n: nodeId, i: requesti };
 
         if (d) {
-            console.debug('_getExportLinkRequest', share.ph, Object(M.d[nodeId]).ph, share);
+            console.debug('_getExportLinkRequest', share.ph, M.getNodeByHandle(nodeId).ph, share);
         }
 
         // No need to perform an API call if this file was already exported (Ie, we're updating)
-        if (share.h === nodeId && Object(M.d[nodeId]).ph) {
+        if (share.h === nodeId && M.getNodeByHandle(nodeId).ph) {
             return done(nodeId);
         }
 
@@ -3402,7 +3400,7 @@ function logExportEvt(evtId, data) {
         var self = this;
 
         if (isTakenDown) {
-            if (M.d[nodeId].fav === 1) {
+            if (M.getNodeByHandle(nodeId).fav === 1) {
 
                 // Remove favourite (star)
                 M.favourite(nodeId, 0);
@@ -3429,6 +3427,7 @@ function logExportEvt(evtId, data) {
 
         var titleTooltip = '';
         var $element;
+        const node = M.getNodeByHandle(nodeId);
 
         // Add taken-down to list view
         $element = $('.grid-table.fm #' + nodeId).addClass('taken-down');
@@ -3446,13 +3445,13 @@ function logExportEvt(evtId, data) {
         $('.file-status-ico', $element).removeClass('icon-link-small').addClass('icon-takedown');
 
         // Add title, mouse popup
-        if (M.d[nodeId].t === 1) {// Item is folder
+        if (node.t === 1) {// Item is folder
 
             titleTooltip = l[7705];
 
             // Undecryptable node indicators
             if (missingkeys[nodeId]) {
-                titleTooltip += '\n' + M.getUndecryptedLabel(M.d[nodeId]);
+                titleTooltip += '\n' + M.getUndecryptedLabel(node);
             }
 
             $('#' + nodeId).attr('title', titleTooltip);
@@ -3463,7 +3462,7 @@ function logExportEvt(evtId, data) {
 
             // Undecryptable node indicators
             if (missingkeys[nodeId]) {
-                titleTooltip += '\n' + M.getUndecryptedLabel(M.d[nodeId]);
+                titleTooltip += '\n' + M.getUndecryptedLabel(node);
             }
 
             $('#' + nodeId).attr('title', titleTooltip);

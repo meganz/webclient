@@ -689,7 +689,7 @@
     MegaData.prototype.openFolder = async function(id, force) {
         let isFirstOpen, fetchDBNodes, fetchDBShares, sink;
 
-        document.documentElement.classList.remove('wait-cursor');
+        document.documentElement.classList.remove('wait-cursor', 'loading-nodes');
 
         if (d) {
             console.warn('openFolder(%s, %s), currentdir=%s, fmloaded=%s',
@@ -718,6 +718,7 @@
 
         // In MEGA Lite mode, remove this temporary class
         if (mega.lite.inLiteMode) {
+            tryCatch(() => mega.lite.limitedNodesBanner(1))();
             $('.files-grid-view.fm').removeClass('mega-lite-hidden');
 
             // Redirect disabled sections

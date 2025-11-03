@@ -99,6 +99,10 @@
     width: 100%;
 }
 
+.overlay-wrap .content a.link {
+    color: var(--mobile-link-primary);
+}
+
 .overlay-wrap .actions {
     display: flex;
     flex-direction: column;

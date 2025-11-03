@@ -610,7 +610,7 @@ lazy(mega.devices, 'data', () => {
                 const handles = new Set();
                 for (let i = 0; i < folders.length; i++) {
                     const handle = folders[i].h;
-                    if (!M.c[handle]) {
+                    if (!M.getChildren(handle)) {
                         handles.add(handle);
                     }
                 }

@@ -126,44 +126,224 @@ lazy(mega, 'lite', () => {
     }
 
     /**
-     * Initialise a button to go back to regular MEGA Cloud Drive from the top bar
-     * @param {Object} topbarSelector The selector for the top bar
-     * @returns {undefined}
+     * Exit MEGA Lite mode
+     * @returns {void}
      */
-    function initBackToMegaButton(topbarSelector) {
+    function exitMegaLite() {
         assert(inLiteMode);
 
-        // @todo: Use mega.ui.secondaryNav.showBanner instead
-        const $banner = $('.fm-notification-block.mega-lite-mode', '.pm-main')
-            .addClass('visible');
+        // Remove the local storage variable which triggers MEGA Lite mode to load
+        delete localStorage.megaLiteMode;
 
-        if (mega.flags.inf > 1) {
+        // Store a log for statistics (User decided to go back to regular MEGA - Back to MEGA button)
+        // Then reload the account back into regular MEGA
+        loadingDialog.show();
+        Promise.allSettled([mega.config.flush(), eventlog(99897)]).finally(() => location.reload());
+    }
+
+    /**
+     * Show "You are in MEGA Lite" dialog
+     * @param {String} [type] Type of action: "start" or "exit" (optional)
+     * @returns {void}
+     */
+    function showMegaliteDialog(type) {
+        const types = {
+            start: {
+                header: l.mlite_start_dialog_header,
+                msg: l.mlite_start_dialog_info,
+                buttons: [{text: l[6826]}]
+            },
+            exit: {
+                header: l.mlite_exit_dialog_header,
+                msg: l.mlite_exit_dialog_info,
+                buttons: [
+                    {
+                        text: l.mlite_exit_megalite,
+                        onClick: () => exitMegaLite()
+                    },
+                    {
+                        text: l.mlite_stay_in_megalite
+                    }
+                ]
+            }
+        };
+
+        type = types[type] && type || 'start';
+
+        const {header, msg, buttons} = types[type];
+        const cfgName = `skip${type}ml`;
+
+        if (fmconfig[cfgName]) {
+            if (type === 'exit') {
+                onIdle(exitMegaLite);
+            }
+            return false;
+        }
+
+        const { sheet } = mega.ui;
+        const name = 'megalite-dialog';
+        const txt = mCreateElement('div', { class: 'text-left' });
+        txt.append(parseHTML(
+            escapeHTML(msg).replace('[A]', '<a href="" class="link">').replace('[/A]', '</a>')
+        ));
+
+        const lnkNode = txt.querySelector('a');
+        if (lnkNode) {
+            lnkNode.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                mega.redirect('help.mega.io', 'files-folders/view-move/mega-lite', false, false, false);
+                return false;
+            });
+        }
+
+        const footerElements = [
+            mCreateElement('div', { class: 'flex flex-row mb-10' }),
+            mCreateElement('div', {
+                class: is_mobile ? 'actions' : 'flex flex-row-reverse flex-wrap row-gap-2'
+            })
+        ];
+
+        const ch = new MegaCheckbox({
+            parentNode: footerElements[0],
+            componentClassname: 'mega-checkbox',
+            labelTitle: l[229],
+            checked: false
+        });
+
+        for (let i = 0; i < buttons.length; i++) {
+            const {text, onClick} = buttons[i];
+            MegaButton.factory({
+                parentNode: footerElements[1],
+                type: 'normal',
+                componentClassname: i > 0 ? 'ms-2 secondary' : 'ms-2',
+                text,
+            }).on('click.hideDialog', () => {
+                sheet.hide(name);
+                sheet.removeClass('info', 'msg-dialog');
+                if (ch.checked && text !== l.mlite_stay_in_megalite) {
+                    fmconfig[cfgName] = 1;
+                }
+                if (onClick) {
+                    onClick();
+                }
+            });
+        }
+
+        const options = {
+            name,
+            contents: [txt],
+            header,
+            showClose: true,
+            footer: {
+                slot: footerElements
+            },
+            type: 'modal',
+            onClose: () => {
+                sheet.removeClass('info', 'msg-dialog');
+            }
+        };
+
+        sheet.show(options);
+        sheet.addClass('info', 'msg-dialog');
+    }
+
+    /** Show/hide banner if nodes number > 10k
+     * @param {Boolean} hide Hide banner if true
+     * @returns {void} void
+    */
+    function limitedNodesBanner(hide) {
+        if (hide) {
+            lPatialContents = null;
+
+            if (is_mobile) {
+                if (mobile.banner) {
+                    mobile.banner.hide('limitedNodesBanner');
+                }
+                return;
+            }
+            $('.fm-notification-block.mlite-limited-nodes', '.main-layout').removeClass('visible');
+            return;
+        }
+        const nc = M.atrophy();
+        if (nc < 1) {
+            console.warn(`we lost the plot... invoking limitedNodesBanner(1)`, nc);
+            return this.limitedNodesBanner(true);
+        }
+        lPatialContents = M.currentdirid || -1;
+
+        const msgHtml = escapeHTML(l.mlite_limited_nodes_info)
+            .replace('%1', nc)
+            .replace('[B]', '<b>').replace('[/B]', '</b>');
+
+        const opts = {
+            name: 'limitedNodesBanner',
+            msgHtml,
+            type: 'warning',
+            ctaText: l.mlite_load_all_items,
+            secondary: true,
+            onCtaClick: (ev) => {
+                ev.preventDefault();
+                ev.stopPropagation();
+
+                // Disable FM sorting, show loader
+                document.documentElement.classList.add('loading-nodes');
+                limitedNodesBanner(1);
+
+                // Show All
+                M.atrophy(null);
+            }
+        };
+
+        if (is_mobile) {
+            if (!mobile.banner) {
+                MegaMobileBanner.init();
+            }
+            mobile.banner.show(opts).on('cta', opts.onCtaClick);
             return;
         }
 
+        // @todo: Use mega.ui.secondaryNav.showBanner instead
+        const $banner = $('.fm-notification-block.mlite-limited-nodes', '.main-layout');
+
+        $('.message-text', $banner).safeHTML(opts.msgHtml);
+        $('.action-link', $banner).text(opts.ctaText);
+        $('.content-box > a', $banner).rebind('click.showAll', opts.onCtaClick);
+
+        $banner.addClass('visible');
+    }
+
+    /**
+     * Initialise a button to go back to regular MEGA Cloud Drive from the top bar
+     * @returns {undefined}
+     */
+    function initMegaLiteUI() {
+        assert(inLiteMode);
+
+        // Show "You're in MEGA Lite" dialog
+        if (security.login.issued > 0) {
+
+            onIdle(showMegaliteDialog);
+        }
+
+        if (mega.flags.inf > 1) {
+            // Lite is enforced API-side, this user cannot exit...
+            return;
+        }
+
+        // Show Exit button
+        const parentNode = document.querySelector('.top-block .nav-actions');
+        assert(parentNode);
+
         const {domNode} = new MegaLink({
             prepend: true,
-            type: "normal",
-            text: l.back_to_mega,
-            componentClassname: "outline",
-            parentNode: document.querySelector(topbarSelector || '.top-block .nav-actions')
+            type: "text",
+            text: l.mlite_exit_megalite,
+            componentClassname: 'underline',
+            parentNode
         });
 
-        $(domNode).rebind('click.backtomega', () => {
-
-            // Remove the local storage variable which triggers MEGA Lite mode to load
-            delete localStorage.megaLiteMode;
-
-            // Store a log for statistics (User decided to go back to regular MEGA - Back to MEGA button)
-            // Then reload the account back into regular MEGA
-            loadingDialog.show();
-            Promise.resolve(eventlog(99897)).finally(() => location.reload());
-        });
-
-        $('.end-box button', $banner).rebind('click.closeBanner', () => {
-            $banner.removeClass('visible');
-            $.tresizer();
-        });
+        $(domNode).rebind('click.backtomega', () => showMegaliteDialog('exit'));
     }
 
     /**
@@ -195,7 +375,8 @@ lazy(mega, 'lite', () => {
         },
         inLiteMode,
         recommendLiteMode,
-        initBackToMegaButton,
+        initMegaLiteUI,
+        limitedNodesBanner,
         containsFolderInSelection,
         disabledSections,
         abort() {

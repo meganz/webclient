@@ -128,7 +128,7 @@ MegaData.prototype.checkSendToChat = function(isSearch, sourceRoot, nodes) {
 
         for (let i = nodes.length; i--;) {
 
-            const n = M.d[nodes[i]];
+            const n = M.getNodeByHandle(nodes[i]);
             const nRoot = isSearch ? n && n.u === u_handle && M.getNodeRoot(nodes[i]) : sourceRoot;
 
             if (!n || n.h === M.RootID || n.t && (nRoot !== M.RootID && nRoot !== M.InboxID &&
@@ -204,7 +204,7 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
     let restrictedFolders = false;
     const isInShare = M.currentrootid === 'shares' || M.onDeviceCenter && !!sharer(selNode.h);
 
-    if (selNode && selNode.su && !M.d[selNode.p]) {
+    if (selNode && selNode.su && !M.getNodeByHandle(selNode.p)) {
         items['.leaveshare-item'] = 1;
     }
     else if (M.getNodeRights($.selected[0]) > 1) {
@@ -724,8 +724,8 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
         }
     }
 
-    const node = $.selected.length && M.d[$.selected[0]];
-    const parent = node && M.d[node.p];
+    const node = $.selected.length && M.getNodeByHandle($.selected[0]);
+    const parent = node && M.getNodeByHandle(node.p);
 
     if (parent && parent.devid || sourceRoot === M.InboxID || M.getNodeRoot($.selected[0]) === M.InboxID) {
         delete items['.open-cloud-item'];
@@ -1067,9 +1067,12 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items, forcedSe
         else if (pfcol) {
             const albums = mega.gallery.albums;
             const selections = Object.keys(albums.grid.timeline.selections);
-            const oneImageSelected = selections.length === 1 && !!M.isGalleryImage(M.d[selections[0]]);
-            const hasImageSelected = selections.some((h) => !!M.isGalleryImage(M.d[h]));
-            const onlyPlayableVideosSelected = selections.every((h) => !!is_video(M.d[h]));
+            const oneImageSelected = selections.length === 1
+                && !!M.isGalleryImage(M.getNodeByHandle(selections[0]));
+            const hasImageSelected =
+                  selections.some((h) => !!M.isGalleryImage(M.getNodeByHandle(h)));
+            const onlyPlayableVideosSelected =
+                  selections.every((h) => !!is_video(M.getNodeByHandle(h)));
             const allowSlideshow = oneImageSelected
                 && mega.gallery.nodesAllowSlideshow(mega.gallery.albums.store[M.d[pfid].id].nodes);
 

@@ -77,7 +77,7 @@ lazy(mega.devices.sections, 'folderChildren', () => {
             const hasToRenderHeader = !!folder;
 
             if (!folder) {
-                if (!M.c[h]) {
+                if (!M.getChildren(h)) {
                     logger.debug('mega.devices.sections.folderChildren dbfetch.get', h);
                     await dbfetch.get(h);
                 }

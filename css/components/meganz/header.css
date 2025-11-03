@@ -21,6 +21,9 @@ body.pwm-ui .mega-header .top-block {
 .mega-header .top-block .nav-actions > *:not(i):not(a) {
     margin-inline-start: 24px;
 }
+.mega-header .top-block .nav-actions > .topbar-links {
+    margin-inline-start: 12px;
+}
 .mega-header .top-block .nav-actions > :not(.avatar-menu) > button {
     display: inline-block;
     vertical-align: top;
@@ -144,6 +147,7 @@ body.pwm-ui .mega-header .top-block {
 .mega-header .fmdb-loader {
     display: inline-block;
     margin: 0 24px;
+    order: -1;
     width: 24px;
     height: 24px;
     opacity: 0;

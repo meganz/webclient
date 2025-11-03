@@ -17,10 +17,17 @@
     border: 1px solid var(--mobile-border-strong-selected);
     box-sizing: border-box;
     cursor: pointer;
+    position: relative;
 }
 
 .mega-checkbox .checkbox-wrapper input {
     cursor: pointer;
+    height: 100%;
+    left: 0;
+    margin: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
 }
 
 .mobile .mega-checkbox .checkbox-wrapper {
@@ -40,6 +47,7 @@
 }
 
 .mega-checkbox .checkbox-action {
+    color: var(--mobile-text-secondary);
     width: 200px;
     order: 1;
     flex-grow: 1;

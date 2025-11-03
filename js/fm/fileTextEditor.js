@@ -107,7 +107,7 @@ mega.fileTextEditor = new function FileTextEditor() {
         }
 
         // this is empty file, no need to bother Data Servers + API
-        if (node.s <= 0 && M.d[node.h]) {
+        if (node.s <= 0 && M.getNodeByHandle(node.h)) {
             storeFileData(handle, '');
             return operationPromise.resolve(filesDataMap[handle]);
         }
@@ -159,11 +159,11 @@ mega.fileTextEditor = new function FileTextEditor() {
         var operationPromise = new MegaPromise();
 
         // if called with no handle or invalid one, exit
-        if (!handle || !M.d[handle]) {
+        if (!handle || !M.getNodeByHandle(handle)) {
             return operationPromise.reject();
         }
 
-        var fileNode = M.d[handle];
+        const fileNode = M.getNodeByHandle(handle);
         var fileType = filemime(fileNode);
 
         var nFile = new File([content], fileNode.name, { type: fileType });
@@ -206,7 +206,7 @@ mega.fileTextEditor = new function FileTextEditor() {
         // if content is not changed, then do a copy operation with new name
         if (typeof content === 'undefined' || content === null) {
             if (typeof nodeToSaveAs === 'string') {
-                nodeToSaveAs = M.d[nodeToSaveAs];
+                nodeToSaveAs = M.getNodeByHandle(nodeToSaveAs);
             }
             var nNode = Object.create(null);
             var node = clone(nodeToSaveAs);

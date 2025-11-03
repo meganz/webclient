@@ -2314,26 +2314,25 @@ class MegaTargetGallery extends MegaGallery {
         let subs = [];
 
         if (self.fmdb) {
-            await dbfetch.geta(handles).catch(nop);
+            await dbfetch.acquired(handles).catch(dump);
         }
 
         for (let i = handles.length; i--;) {
             const h = handles[i];
+            const c = M.getChildren(h);
 
-            if (!M.c[h]) {
-                if (self.d && !M.d[h]) {
-                    console.error(`Gallery cannot find handle ${h}`);
-                }
-                continue;
+            if (c) {
+                subs.push(...Object.keys(c));
             }
-
-            subs.push(...Object.keys(M.c[h]));
+            else if (self.d) {
+                console.warn(`Gallery cannot find folder ${h}`);
+            }
         }
 
         const rubTree = array.to.object(M.getTreeHandles(M.RubbishID), true);
 
         subs = subs.filter(h => {
-            const n = M.d[h];
+            const n = M.getNodeByHandle(h);
 
             return n
                 && !n.t
@@ -2346,7 +2345,7 @@ class MegaTargetGallery extends MegaGallery {
         }).sort(this.sortByMtime.bind(this));
 
         for (const h of subs) {
-            const n = M.d[h];
+            const n = M.getNodeByHandle(h);
             this.nodes[n.h] = this.setGroup(n)[0];
             M.v.push(n);
         }
@@ -2595,7 +2594,7 @@ mega.gallery.fillMainView = (list, mapper) => {
 
 mega.gallery.getNodeCache = h => {
     'use strict';
-    return M.d[h] || (mega.gallery.tmpFa && mega.gallery.tmpFa[h]) || undefined;
+    return M.getNodeByHandle(h) || (mega.gallery.tmpFa && mega.gallery.tmpFa[h]) || undefined;
 };
 
 mega.gallery.handleNodeRemoval = tryCatch((n) => {
@@ -3197,7 +3196,7 @@ async function galleryUI(id) {
             return loadingDialog.hide('MegaGallery');
         }
 
-        mega.gallery.titleControl.title = M.d[id].name;
+        mega.gallery.titleControl.title = M.getNodeByHandle(id).name;
         mega.gallery.titleControl.icon = 'images';
         mega.gallery.titleControl.isClickable = false;
         mega.gallery.titleControl.addTooltipToTitle();

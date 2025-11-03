@@ -69,7 +69,6 @@
 .recoverykey-logout-overlay .overlay-footer label {
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space: nowrap;
 }
 .recoverykey-logout-overlay button {
     cursor: pointer;

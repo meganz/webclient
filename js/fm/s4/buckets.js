@@ -71,10 +71,10 @@ lazy(s4, 'buckets', () => {
                 mLoadingSpinner.show('s4-loading-toast', l.s4_creating_bucket);
                 this.$dialogProgress.addClass('disabled');
                 this.progress = true;
-                Promise.resolve(M.d[this.containerId] || dbfetch.get(this.containerId))
+                Promise.resolve(M.getNodeByHandle(this.containerId) || dbfetch.get(this.containerId))
                     .then(() => s4.kernel.bucket.create(this.containerId, name))
                     .then((h) => {
-                        logger.assert(M.d[h], `Failed creating bucket on ${this.containerId}`);
+                        logger.assert(M.getNodeByHandle(h), `Failed creating bucket on ${this.containerId}`);
 
                         if (typeof this.callback === 'function') {
                             this.callback(h);

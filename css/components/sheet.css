@@ -39,6 +39,11 @@ body.mobile .mega-sheet .sheet .actions {
     padding: 0 24px;
 }
 
+body.mobile .mega-sheet .overlay-footer {
+    padding-left: 24px;
+    padding-right: 24px;
+}
+
 body.mobile .mega-sheet .sheet .main,
 .mega-sheet .sheet > .close {
     margin-bottom: 16px;
@@ -149,9 +154,19 @@ body.web-desktop .mega-sheet .sheet.ps {
     margin: auto;
 }
 
+body.web-desktop .mega-sheet.info .sheet {
+    background: var(--mobile-page-background);
+    border: 1px var(--mobile-border-strong) solid;
+    max-width: 640px;
+}
+
 body.web-desktop .mega-sheet .sheet .title a,
 body.web-desktop .mega-sheet .sheet .content a {
     color: var(--mobile-link-primary);
+}
+
+body.web-desktop .mega-sheet .sheet .row-gap-2 {
+    row-gap: 0.5rem;
 }
 
 body.web-desktop .mega-sheet .overlay-footer {

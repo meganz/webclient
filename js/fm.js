@@ -1298,15 +1298,7 @@ function duplicated(value, target) {
         return M.v.some((n) => n.name === value);
     }
 
-    if (M.c[target]) {
-        for (const handle in M.c[target]) {
-            if (M.d[handle] && M.d[handle].name === value) {
-                return true;
-            }
-        }
-    }
-
-    return false;
+    return M.getChildren(target, (n) => n.name === value);
 }
 
 /**

@@ -8,6 +8,8 @@
         }
         keepBothState[target][name] = node;
     };
+    const getStore = (h) => M.c[h] ? M.c : M.tnc;
+    const contents = (h) => getStore(h)[h];
 
     var setName = function(file, name) {
         try {
@@ -48,7 +50,7 @@
              * 2. must be to 1 target.
              * --> no need to consider in all logical space of file/folder conflicts
              */
-            const copyingFromChat = M.d[target] && M.d[target].name === M.myChatFilesFolder.name;
+            const copyingFromChat = M.getNodeByHandle(target).name === M.myChatFilesFolder.name;
 
             /**
              * Special case 2: "Moving" stopped backups to inshares requires a copy + remove
@@ -73,7 +75,7 @@
                 var file = files[i];
 
                 if (typeof file === 'string') {
-                    file = clone(M.getNodeByHandle(file) || false);
+                    file = clone(M.getNodeByHandle(file));
                 }
 
                 if (!file) {
@@ -99,7 +101,7 @@
                 var nodeTarget = file.target || target;
                 var nodeName = M.getSafeName(file.name);
 
-                if (M.c[nodeTarget]) {
+                if (contents(nodeTarget)) {
                     found = this.getNodeByName(nodeTarget, nodeName, false);
                 }
 
@@ -259,7 +261,7 @@
                         var conflictedNodes = [];
                         var okNodes = [];
                         for (var k = 0; k < merges.length; k++) {
-                            var res = mySelf.filesFolderConfilicts(M.c[merges[k][0].h], merges[k][1].h);
+                            var res = mySelf.filesFolderConfilicts(contents(merges[k][0].h), merges[k][1].h);
                             conflictedNodes = conflictedNodes.concat(res.conflicts);
                             okNodes = okNodes.concat(res.okNodes);
                         }
@@ -433,7 +435,7 @@
 
 
             for (var k = 0; k < nodesToCopy.length; k++) {
-                var currNode = clone(M.d[nodesToCopy[k]] || false);
+                var currNode = clone(M.getNodeByHandle(nodesToCopy[k]));
 
                 if (!currNode) {
                     console.warn('Got invalid node (file|folder)...');
@@ -444,7 +446,7 @@
                 var found = null;
 
                 var nodeName = M.getSafeName(currNode.name);
-                if (M.c[target]) {
+                if (contents(target)) {
                     found = this.getNodeByName(target, nodeName, false);
                 }
 
@@ -470,7 +472,8 @@
                 var newOkNodes = [];
                 for (var k2 = 0; k2 < conflictedNodes.length; k2++) {
                     if (conflictedNodes[k2][0].t) { // array contains either files or folders only
-                        var res = this.filesFolderConfilicts(M.c[conflictedNodes[k2][0].h], conflictedNodes[k2][1].h);
+                        const res =
+                            this.filesFolderConfilicts(contents(conflictedNodes[k2][0].h), conflictedNodes[k2][1].h);
                         newConflictedNodes = newConflictedNodes.concat(res.conflicts);
                         newOkNodes = newOkNodes.concat(res.okNodes);
                     }
@@ -851,17 +854,18 @@
             if (keepBothState[target] && keepBothState[target][name]) {
                 return keepBothState[target][name];
             }
+            const c = contents(target);
 
-            if (!matchSingle && M.c[target]) {
+            if (!matchSingle && c) {
                 if (!keepBothState[target]) {
                     keepBothState[target] = Object.create(null);
                 }
                 if (!keepBothState[target]['~/.names.db']) {
                     const store = keepBothState[target]['~/.names.db'] = Object.create(null);
-                    const handles = Object.keys(M.c[target]);
+                    const handles = Object.keys(c);
 
                     for (let i = handles.length; i--;) {
-                        let n = M.d[handles[i]];
+                        const n = M.getNodeByHandle(handles[i]);
                         if (n && n.name) {
                             store[n.name] = n;
                         }
@@ -870,8 +874,8 @@
                 return keepBothState[target]['~/.names.db'][name];
             }
 
-            for (var h in M.c[target]) {
-                var n = M.d[h] || false;
+            for (const h in c) {
+                const n = M.getNodeByHandle(h);
 
                 if (n.name === name) {
 
@@ -896,7 +900,7 @@
          * @returns {Object} The found node
          */
         getFolderByName(target, name) {
-            const t = M.c[target];
+            const t = contents(target);
 
             if (t) {
                 if (!keepBothState[target]) {
@@ -907,7 +911,7 @@
 
                     for (const h in t) {
                         if (t[h] > 1) {
-                            const n = M.d[h];
+                            const n = M.getNodeByHandle(h);
                             if (n && n.name) {
                                 store[n.name] = n;
                             }
@@ -979,14 +983,14 @@
 
                     if (duplicateEntries[type][name].length == 2) {
                         olderNode = duplicateEntries[type][name][0];
-                        if (M.d[duplicateEntries[type][name][1]].ts < M.d[olderNode].ts) {
+                        if (M.getNodeByHandle(duplicateEntries[type][name][1]).ts < M.getNodeByHandle(olderNode).ts) {
                             olderNode = duplicateEntries[type][name][1];
                         }
                     }
                     else {
                         for (var k = 0; k < duplicateEntries[type][name].length; k++) {
-                            if (M.d[duplicateEntries[type][name][k]].ts > newestTS) {
-                                newestTS = M.d[duplicateEntries[type][name][k]].ts;
+                            if (M.getNodeByHandle(duplicateEntries[type][name][k]).ts > newestTS) {
+                                newestTS = M.getNodeByHandle(duplicateEntries[type][name][k]).ts;
                                 newestIndex = k;
                             }
                         }
@@ -1008,7 +1012,9 @@
                                         continue;
                                     }
                                     newName = fileconflict.findNewName(name, target);
-                                    saveKeepBothState(target, M.d[dupEntriesOfGivenTypeAndName[h]], newName);
+                                    saveKeepBothState(
+                                        target, M.getNodeByHandle(dupEntriesOfGivenTypeAndName[h]), newName
+                                    );
                                     M.rename(dupEntriesOfGivenTypeAndName[h], newName).catch(dump);
                                 }
                             }
@@ -1037,7 +1043,7 @@
                                     // 2 items
                                     pauseRecusrion = true;
 
-                                    var originalParent = M.d[olderNode].p;
+                                    var originalParent = M.getNodeByHandle(olderNode).p;
 
                                     var f1 = M.getShareNodesSync(duplicateEntries[type][name][0]);
                                     var f2 = M.getShareNodesSync(duplicateEntries[type][name][1]);
@@ -1081,11 +1087,14 @@
                     contuineResolving(null, null, applyToAll, applyToAll);
                 }
                 else {
-                    fileconflict.prompt('dups', M.d[duplicateEntries[type][name][0]],
-                        M.d[duplicateEntries[type][name][1]], allDups - 1, target,
-                        duplicateEntries[type][name].length).always(
-                            contuineResolving
-                        );
+                    fileconflict.prompt(
+                        'dups',
+                        M.getNodeByHandle(duplicateEntries[type][name][0]),
+                        M.getNodeByHandle(duplicateEntries[type][name][1]), allDups - 1, target,
+                        duplicateEntries[type][name].length
+                    ).always(
+                        contuineResolving
+                    );
                 }
             };
 

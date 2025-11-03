@@ -915,7 +915,7 @@ mega.tpw = new function TransferProgressWidget() {
                         break;
                     }
                     case 'link': {
-                        const node = M.d[this.handle || id];
+                        const node = M.getNodeByHandle(this.handle || id);
                         if (node) {
                             $.selected = [node.h];
                             M.getLinkAction();
@@ -923,7 +923,7 @@ mega.tpw = new function TransferProgressWidget() {
                         break;
                     }
                     case 'cloud': {
-                        const node = M.d[this.handle || id];
+                        const node = M.getNodeByHandle(this.handle || id);
                         if (node && node.p) {
                             $.autoSelectNode = node.h;
                             M.openFolder(node.p).always((res) => {

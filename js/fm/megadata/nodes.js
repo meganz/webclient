@@ -2292,16 +2292,14 @@ MegaData.prototype.getLabelClassFromId = function(id) {
 /**
  * labelDomUpdate
  *
- * @param {String} handle
+ * @param {MegaNode} n ufs-node
  * @param {Number} value Current labelId
  */
-MegaData.prototype.labelDomUpdate = function(handle, value) {
+MegaData.prototype.labelDomUpdate = function(n, value) {
     "use strict";
 
     if (fminitialized) {
-
-        const n = M.d[handle] || false;
-
+        const handle = n.h;
         var labelId = parseInt(value);
         var removeClasses = 'red orange yellow blue green grey purple';
         var color = '<div class="colour-label-ind %1"></div>';
@@ -2309,7 +2307,7 @@ MegaData.prototype.labelDomUpdate = function(handle, value) {
         var $treeElements = $(`#treea_${handle}`).add(`#treea_os_${handle}`).add(`#treea_pl_${handle}`);
 
         // Remove all colour label classes
-        var $item = $(M.megaRender && M.megaRender.nodeMap[handle] || `#${handle}`);
+        const $item = $(document.getElementById(handle));
         $item.removeClass(`colour-label ${removeClasses}`);
         const $lbl = $('i.colour-label', $item).removeClass(removeClasses);
         $('.label', $item).text('');
@@ -2344,7 +2342,7 @@ MegaData.prototype.labelDomUpdate = function(handle, value) {
 
         if (n.p === M.currentdirid && dir === 'label') {
 
-            const domNode = M.megaRender && M.megaRender.nodeMap[n.h] || document.getElementById(n.h);
+            const domNode = $item[0];
 
             this.updateDomNodePosition(n, domNode);
         }
@@ -2488,7 +2486,7 @@ MegaData.prototype.favouriteDomUpdate = function(node, favState) {
                 return;
             }
 
-            const domListNode = M.megaRender && M.megaRender.nodeMap[node.h] || document.getElementById(node.h);
+            const domListNode = document.getElementById(node.h);
 
             if (domListNode) {
                 const $gridView = $('.grid-status-icon', domListNode);
@@ -3412,7 +3410,7 @@ MegaData.prototype.createFolder = promisify(function(resolve, reject, target, na
         }
 
         const n = {...attrs, name};
-        if (M.d[target].s4 && 'kernel' in s4) {
+        if (M.getNodeByHandle(target).s4 && 'kernel' in s4) {
             s4.kernel.setNodeAttributesByRef(target, n);
         }
 

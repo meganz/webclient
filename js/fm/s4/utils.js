@@ -446,7 +446,7 @@ lazy(s4, 'utils', () => {
                 return bucket.p ? `${bucket.p}/${path[path.length - 1]}` : false;
             }
 
-            if (path.length > 2 && !(allowedPages.has(path[2]) || M.d[path[2]])) {
+            if (path.length > 2 && !(allowedPages.has(path[2]) || M.getNodeByHandle(path[2]))) {
                 return path[1];
             }
 

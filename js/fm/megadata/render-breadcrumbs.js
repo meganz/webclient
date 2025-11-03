@@ -121,7 +121,7 @@
                 cases[handle]();
             }
             else {
-                const n = this.d[handle];
+                const n = this.getNodeByHandle(handle);
                 if (n) {
                     if (n.name) {
                         name = n.name;
@@ -182,7 +182,7 @@
 
         // if in custom component we do not want to open the file versioning dialog
         if (M.search) {
-            const node = M.d[items[0]];
+            const node = M.getNodeByHandle(items[0]);
             const isBackup = node && M.getNodeRoot(node.h) === M.InboxID;
             if (isBackup) {
                 items = mega.devices.ui.getNodePathFromOuterView(node.h);
@@ -342,13 +342,13 @@
         const span = document.createElement('span');
         span.className = 'right-arrow-bg simpletip simpletip-tc';
         sizingNode.appendChild(span);
-        if (isRoot) {
+        if (isLastItem) {
             const innerSpan = document.createElement('span');
             innerSpan.className = 'not-loading selectable-txt';
             innerSpan.textContent = name;
             span.appendChild(innerSpan);
             const icon = document.createElement('i');
-            icon.className = 'loading sprite-fm-theme icon-loading-spinner';
+            icon.className = 'loading sprite-fm-theme icon-loader-throbber-dark-outline';
             span.appendChild(icon);
         }
         else {
@@ -562,7 +562,7 @@
      * @return {undefined}
      */
     function breadcrumbClickHandler(id) {
-        const n = this.d[id];
+        const n = this.getNodeByHandle(id);
         const specialCases = [
             'shares',
             'out-shares',

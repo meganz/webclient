@@ -196,7 +196,7 @@ function FileManager() {
                 }
             }
 
-            if (M.currentrootid === 's4' && M.d[path.pop()]) {
+            if (M.currentrootid === 's4' && M.getNodeByHandle(path.pop())) {
                 M.columnsWidth.cloud.accessCtrl.viewed = true;
                 M.columnsWidth.cloud.accessCtrl.disabled = false;
             }
@@ -778,7 +778,7 @@ FileManager.prototype.initFileManagerUI = function() {
                 else if (t && t.indexOf('path_') > -1) {
                     t = t.replace('path_', '');
                 }
-                else if (M.currentdirid !== 'shares' || !M.d[t] || M.getNodeRoot(t) !== 'shares') {
+                else if (M.currentdirid !== 'shares' || !M.getNodeByHandle(t) || M.getNodeRoot(t) !== 'shares') {
                     t = undefined;
                 }
             }
@@ -875,7 +875,7 @@ FileManager.prototype.initFileManagerUI = function() {
             }
             else {
                 const {type} = M.isCustomView(t) || {};
-                $.draggingClass = M.d[t] || type === 's4' || type === mega.devices.rootId
+                $.draggingClass = M.getNodeByHandle(t) || type === 's4' || type === mega.devices.rootId
                 || M.onDeviceCenter && !mega.devices.ui.canMove(ids)
                     ? 'dndc-warning' :
                     'dndc-move';
@@ -984,7 +984,7 @@ FileManager.prototype.initFileManagerUI = function() {
         };
 
         if (a === 'drop' && dd !== undefined) {
-            dbfetch.get(t).always(function() {
+            Promise.resolve(M.getNodeByHandle(t) || dbfetch.get(t)).finally(() => {
                 setDDType();
                 if (dd) {
                     onMouseDrop();
@@ -3356,7 +3356,7 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
                 var max = ($(window).height() - 96) / 24;
                 var html = [];
                 $.selected.forEach((id, i) => {
-                    var n = M.d[id];
+                    const n = M.getNodeByHandle(id);
                     if (n && max > i) {
                         const lblClass = MegaNodeComponent.label[n.lbl | 0] || '';
                         html.push(
@@ -3962,7 +3962,8 @@ FileManager.prototype.getLinkAction = function(selNodes, isEmbed) {
 
         const mdList = mega.fileRequestCommon.storage.isDropExist(selNodes);
         if (mdList.length) {
-            var fldName = mdList.length > 1 ? l[17626] : l[17403].replace('%1', escapeHTML(M.d[mdList[0]].name));
+            const fldName = mdList.length > 1 ? l[17626] :
+                l[17403].replace('%1', escapeHTML(M.getNodeByHandle(mdList[0]).name));
 
             msgDialog('confirmation', l[1003], fldName, l[18229], function(e) {
                 if (e) {

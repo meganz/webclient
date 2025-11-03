@@ -1498,6 +1498,9 @@ security.login = {
             .then((res) => {
                 if (security.login.loginCompleteCallback) {
                     security.login.loginCompleteCallback(res);
+
+                    security.login.issued = performance.now();
+                    security.login.loginCompleteCallback = dump;
                 }
 
                 // Logging to see how many people are signing in

@@ -406,7 +406,7 @@
 
             this.gallery = 0;
             if (!is_mobile && (fmconfig.uiviewmode | 0 && fmconfig.viewmode === 2 || fmViewMode === 2)) {
-                this.gallery = 1;
+                this.gallery = 2;
                 this.viewmode = 2;
             }
             if (mega.ui.secondaryNav) {
@@ -881,17 +881,6 @@
         }
         else if (id && id.substr(0, 7) === 'search/') {
             this.search = true;
-        }
-        else if (id && id.substr(0, 10) === 'discovery/') {
-            if (cv.nodeID === M.RootID || cv.nodeID === M.RubbishID || !M.d[cv.nodeID]) {
-                // Preventing MD on root folder
-                return M.openFolder('cloudroot');
-            }
-
-            fetchDBNodes = true;
-            id = cv.nodeID;
-
-            this.gallery = 2;
         }
         else if (cv.type === 'gallery' && !pfcol) {
             this.gallery = 1;

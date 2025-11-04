@@ -462,7 +462,7 @@ lazy(mega, 'fileRequest', () => {
                 nodeHandle: selectedHandle
             });
 
-            this.fileObject = M.d[selectedHandle];
+            this.fileObject = M.getNodeByHandle(selectedHandle);
             this.fileHandle = selectedHandle;
             this.folderName = this.fileObject && this.fileObject.name || null;
             if (this.folderName) {
@@ -987,7 +987,7 @@ lazy(mega, 'fileRequest', () => {
             return new Promise((resolve, reject) => {
                 const fldName = list.length > 1
                     ? l[17626]
-                    : l[17403].replace('%1', escapeHTML(M.d[list[0]].name));
+                    : l[17403].replace('%1', escapeHTML(M.getNodeByHandle(list[0]).name));
 
                 const ack = () => {
                     onIdle(closeDialog);

@@ -379,6 +379,10 @@ FMDB.prototype.serialize = function(table, row) {
 
             // Restore overhead (In Firefox, Object.assign() is ~63% faster than for..in)
             Object.assign(j, t);
+
+            if (self.d) {
+                this.logger.assert(!j.transient, 'a transient node was slipped into FMDB...');
+            }
         }
         else {
             // otherwise, just stringify it all
@@ -1215,9 +1219,14 @@ FMDB.prototype.restorenode = Object.freeze({
 FMDB.prototype.add = function fmdb_add(table, row) {
     "use strict";
 
-    if (this.crashed) return;
-
-    this.enqueue(table, row, 0);
+    if (!this.crashed) {
+        if ((row.d || row).transient) {
+            this.logger.error(`Prevented a transient node from sneaking into...`, row);
+        }
+        else {
+            this.enqueue(table, row, 0);
+        }
+    }
 };
 
 // enqueue IndexedDB deletions
@@ -3128,20 +3137,47 @@ Object.defineProperty(self, 'dbfetch', (function() {
     'use strict';
     const node_inflight = new Set();
     const tree_inflight = Object.create(null);
+    const ssp = (self.d > 0 && !self.is_livesite || mega.flags.ff_fpage) && mega.infinity;
 
-    const getNode = (h, cb) => {
-        if (M.d[h]) {
-            return cb(M.d[h]);
+    const page = async({h}) => {
+        if (page.has(h)) {
+            return h;
         }
-        fmdb.getbykey('f', 'h', ['h', [h]])
-            .always(function(r) {
-                if (r.length) {
-                    emplacenode(r[0], true);
-                }
-                cb(M.d[h]);
-            });
+        let tmp = await fmdb.getbykey('f', {limit: 1, localOnly: true}, ['p', [h]]).catch(dump);
 
+        if (!(tmp && tmp.length)) {
+            tmp = await api.req({a: 'f', r: 1, inc: 1, n: h, o: 0}, 7);
+
+            if (tmp.result.o && tmp.result.f) {
+                for (let s = tmp.result.f, d = M.tnc[h] = Object.create(null), i = s.length; i--;) {
+                    const n = s[i];
+
+                    if (n.p === h) {
+                        crypto_decryptnode(n);
+                        if (n.name) {
+                            M.tnd[n.h] = d[n.h] = new MegaNode(n);
+                            Object.defineProperty(d[n.h], 'transient', {value: true});
+
+                            if (n.t) {
+                                ufsc.addTreeNode(n, true);
+                            }
+                        }
+                    }
+                    else if (self.d) {
+                        console.warn(`Invalid parent node for ${n.h} (${n.p}), expected ${h}`);
+                    }
+                }
+
+                return h;
+            }
+        }
     };
+
+    Object.defineProperty(page, 'has', {
+        value(h) {
+            return M.c[h] ? -1 : M.tnc[h] ? 1 : 0;
+        }
+    });
 
     const emplace = (r, noc) => {
         for (let i = r.length; i--;) {
@@ -3212,7 +3248,9 @@ Object.defineProperty(self, 'dbfetch', (function() {
          * @returns {*|MegaPromise}
          * @memberOf dbfetch
          */
-        open: promisify((resolve, reject, handle, waiter) => {
+        async open(handle, waiter) {
+            let {promise, resolve, reject} = Promise.withResolvers();
+
             const fail = (ex) => {
                 reject(ex);
                 hideLoading(handle);
@@ -3222,6 +3260,7 @@ Object.defineProperty(self, 'dbfetch', (function() {
                     }
                     waiter.reject(ex);
                 });
+                return promise;
             };
             const done = (res) => {
                 if (resolve) {
@@ -3234,6 +3273,7 @@ Object.defineProperty(self, 'dbfetch', (function() {
                     }
                     waiter.resolve(handle);
                 });
+                return promise;
             };
 
             // Dear ESLint, this is not a window.open call.
@@ -3241,7 +3281,8 @@ Object.defineProperty(self, 'dbfetch', (function() {
             let ready = (n) => dbfetch.open(n.p).catch(nop);
 
             if (typeof handle !== 'string' || handle.length !== 8) {
-                return resolve(handle);
+                resolve(handle);
+                return promise;
             }
             var silent = waiter === undefined;
 
@@ -3262,59 +3303,75 @@ Object.defineProperty(self, 'dbfetch', (function() {
             }
             tree_inflight[handle] = waiter;
 
-            getNode(handle, (n) => {
-                if (!n) {
-                    return fail(ENOENT);
-                }
-                if (!n.t || M.c[n.h]) {
-                    return ready(n).finally(done);
-                }
-                if (!silent) {
-                    showLoading(handle);
-                }
+            if (!M.getNodeByHandle(handle)) {
+                const res = await fmdb.getbykey('f', 'h', ['h', [handle]]).catch(dump);
 
-                let promise;
-                const opts = {
-                    limit: 4,
-                    offset: 0,
-                    anyof: ['p', [handle]]
-                };
-                const ack = (res) => {
-                    if (ready) {
-                        promise = ready(n).finally(resolve);
-                        ready = resolve = null;
-                    }
-                    else if (res) {
-                        promise.finally(() => {
-                            newnodes = newnodes.concat(res);
-                            queueMicrotask(() => {
-                                M.updFileManagerUI().dump(`dbf-open-${opts.i || handle}`);
-                            });
+                if (res && res.length) {
+                    emplacenode(res[0], true);
+                }
+            }
+            const n = M.getNodeByHandle(handle);
+
+            if (!n) {
+                return fail(ENOENT);
+            }
+            if (!n.t || M.c[n.h]) {
+                return ready(n).finally(done);
+            }
+            if (!silent) {
+                showLoading(handle);
+            }
+
+            if (ssp && M.tnc[n.h] !== null) {
+                const res = await page(n).catch(dump);
+                if (res) {
+                    return done(res);
+                }
+            }
+
+            let dsp;
+            const opts = {
+                limit: 4,
+                offset: 0,
+                anyof: ['p', [handle]]
+            };
+            const ack = (res) => {
+                if (ready) {
+                    dsp = ready(n).finally(resolve);
+                    ready = resolve = null;
+                }
+                else if (res) {
+                    dsp.finally(() => {
+                        newnodes = newnodes.concat(res);
+                        queueMicrotask(() => {
+                            M.updFileManagerUI().dump(`dbf-open-${opts.i || handle}`);
                         });
-                    }
-                    return promise;
-                };
+                    });
+                }
+                return dsp;
+            };
 
-                if (d) {
-                    opts.i = `${makeid(9)}.${handle}`;
+            if (d) {
+                opts.i = `${makeid(9)}.${handle}`;
+            }
+
+            fmdb.getchunk('f', opts, (r) => {
+                if (!opts.offset) {
+                    M.c[n.h] = M.c[n.h] || Object.create(null);
                 }
 
-                fmdb.getchunk('f', opts, (r) => {
-                    if (!opts.offset) {
-                        M.c[n.h] = M.c[n.h] || Object.create(null);
-                    }
+                opts.offset += opts.limit;
+                if (opts.limit < 4096) {
+                    opts.limit <<= 2;
+                }
 
-                    opts.offset += opts.limit;
-                    if (opts.limit < 4096) {
-                        opts.limit <<= 2;
-                    }
+                emplace(r);
+                ack(r);
 
-                    emplace(r);
-                    ack(r);
+            }).catch(dump).finally(() => (dsp || ack()).finally(done));
 
-                }).catch(dump).finally(() => (promise || ack()).finally(done));
-            });
-        }),
+            return promise;
+        },
 
         /**
          * Fetch all children; also, fetch path to root; populates M.c and M.d
@@ -3354,11 +3411,11 @@ Object.defineProperty(self, 'dbfetch', (function() {
                 }
 
                 // have the children been fetched yet?
-                if (M.d[parent].t && !M.c[parent]) {
+                if (M.d[parent].t && !page.has(parent)) {
                     // no: do so now.
                     await this.tree([parent], 0);
 
-                    if (!M.c[parent]) {
+                    if (!page.has(parent)) {
                         if (d) {
                             console.error(`Failed to fill M.c for folder node ${parent}...!`, M.d[parent]);
                         }
@@ -3390,7 +3447,7 @@ Object.defineProperty(self, 'dbfetch', (function() {
                 emplace(await fmdb.getbykey('f', options, ['h', bulk]), true);
             }
 
-            bulk = handles.filter(h => M.d[h] && M.d[h].t && !M.c[h]);
+            bulk = handles.filter(h => M.d[h] && M.d[h].t && !page.has(h));
             if (bulk.length) {
                 await this.flushed();
                 await this.tree(bulk, {...options, level: 0});
@@ -3419,7 +3476,7 @@ Object.defineProperty(self, 'dbfetch', (function() {
                 throw new Error('Invalid operation, FMDB is not available.');
             }
             const inflight = new Set();
-            const {promise} = mega;
+            const {promise, infinity} = mega;
 
             // ptf = partial tree fetching.
             // Under Infinity, upon requesting a file-node, we will get their
@@ -3441,7 +3498,7 @@ Object.defineProperty(self, 'dbfetch', (function() {
                     if (tree_inflight[h]) {
                         inflight.add(tree_inflight[h]);
                     }
-                    else if (!M.c[h]) {
+                    else if (!page.has(h)) {
                         tree_inflight[h] = promise;
                         p.push(h);
                     }
@@ -3458,7 +3515,9 @@ Object.defineProperty(self, 'dbfetch', (function() {
 
                         // M.c should be set when *all direct* children have
                         // been fetched from the DB (even if there are none)
-                        M.c[p[i]] = M.c[p[i]] || Object.create(null);
+                        if (!infinity || !options.localOnly) {
+                            M.c[p[i]] = M.c[p[i]] || Object.create(null);
+                        }
                     }
 
                     emplace(r);
@@ -3491,7 +3550,12 @@ Object.defineProperty(self, 'dbfetch', (function() {
          */
         async acquire(h) {
             if (Array.isArray(h)) {
-                h.forEach(node_inflight.add, node_inflight);
+                for (let i = h.length; i--;) {
+                    if (self.d && node_inflight.any && node_inflight.any.has(h[i])) {
+                        console.warn(`another process is fetching ${h[i]} locally...`);
+                    }
+                    node_inflight.add(h[i]);
+                }
             }
             else {
                 node_inflight.add(h);
@@ -3520,8 +3584,60 @@ Object.defineProperty(self, 'dbfetch', (function() {
                     console.warn('acquiring nodes...', handles);
                 }
 
-                await this.geta(handles);
+                await this.geta(handles).catch(reportError);
+
                 node_inflight.lock = false;
+            }
+        },
+
+        /**
+         * Similar to {@link acquire} but meant to acquire locally cached nodes, only.
+         * @param {*} any any
+         * @return {Promise<*>} any
+         */
+        async acquired(any) {
+            if (!mega.infinity) {
+                return this.acquire(any);
+            }
+            if (!node_inflight.any) {
+                node_inflight.any = new Set();
+            }
+            if (Array.isArray(any)) {
+                for (let i = any.length; i--;) {
+                    if (self.d && node_inflight.has(any[i])) {
+                        console.warn(`another process is fetching ${any[i]}...`);
+                    }
+                    node_inflight.any.add(any[i]);
+                }
+            }
+            else {
+                node_inflight.any.add(any);
+            }
+            let backoff = 32 + Math.random() * 96;
+
+            while (1) {
+                await tSleep(backoff / 1e3);
+                if (!node_inflight.lockd) {
+                    break;
+                }
+                if (backoff < 4e3) {
+                    backoff *= 1.6;
+                }
+            }
+
+            if (node_inflight.any.size) {
+                const handles = [...node_inflight.any];
+
+                node_inflight.any.clear();
+                node_inflight.lockd = true;
+
+                if (d) {
+                    console.warn('acquiring(l)nodes...', handles);
+                }
+
+                await this.geta(handles, {localOnly: true}).catch(reportError);
+
+                node_inflight.lockd = false;
             }
         },
 

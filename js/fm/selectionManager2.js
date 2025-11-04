@@ -241,7 +241,8 @@ class SelectionManager2Base {
             }
 
             this.removing_list.push(nodeId);
-            const node = M.d[nodeId] || (M.gallery || M.albums) && mega.gallery.getNodeCache(nodeId);
+            const node = M.getNodeByHandle(nodeId)
+                || (M.gallery || M.albums) && mega.gallery.getNodeCache(nodeId);
             if (node) {
                 this.removing_sizes[nodeId] = node.t ? node.tb : node.s;
             }
@@ -774,7 +775,8 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             for (let i = this.selected_list.length; i--;) {
                 let n = this.selected_list[i];
                 const e = M.megaRender ? M.megaRender.getDOMNode(n) : document.getElementById(n);
-                const node = M.d[n] || (M.gallery || M.albums) && mega.gallery.getNodeCache(n);
+                const node = M.getNodeByHandle(n)
+                    || (M.gallery || M.albums) && mega.gallery.getNodeCache(n);
                 if (node) {
                     selectionSize += node.t ? node.tb : node.s;
                 }
@@ -850,7 +852,8 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             if (this.selected_list.length !== 0 && this.removing_list.length > 1) {
 
                 const cb = (pv, c) => {
-                    const node = M.d[c] || (M.gallery || M.albums) && mega.gallery.getNodeCache(c);
+                    const node = M.getNodeByHandle(c)
+                        || (M.gallery || M.albums) && mega.gallery.getNodeCache(c);
                     return pv + (node ?
                         node.tb === undefined ? node.s : node.tb :
                         this.removing_sizes[c] || 0);
@@ -859,7 +862,8 @@ class SelectionManager2_DOM extends SelectionManager2Base {
                 nid = this.selected_totalSize - removingSize;
             }
 
-            const node = M.d[nid] || (M.gallery || M.albums) && mega.gallery.getNodeCache(nid);
+            const node = M.getNodeByHandle(nid)
+                || (M.gallery || M.albums) && mega.gallery.getNodeCache(nid);
             if (typeof nid !== 'number' && !node) {
                 nid = this.selected_totalSize - (this.removing_sizes[nid] || 0);
             }
@@ -874,9 +878,10 @@ class SelectionManager2_DOM extends SelectionManager2Base {
 
         var container = this._get_selectable_container().get(0);
         var nodeList = container && container.querySelectorAll('.megaListItem') || false;
-        const currentNode = M.d[this.currentdirid] || M.search
+        const currentNode = M.getNodeByHandle(this.currentdirid) || M.search
             || ['shares', 'out-shares', 'public-links', 'file-requests', 'faves'].includes(M.currentrootid)
-            || M.currentrootid === 's4' && M.d[this.currentdirid.split('/').pop()] || folderlink;
+            || M.currentrootid === 's4' && M.getNodeByHandle(this.currentdirid.split('/').pop())
+            || folderlink;
 
         if (nodeList.length) {
             for (var i = nodeList.length; i--;) {
@@ -909,7 +914,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
         if (
             M.chat
             || (typeof nodeId !== 'number' &&
-                !(M.d[nodeId] || (M.gallery || M.albums) && mega.gallery.getNodeCache(nodeId)))
+                !(M.getNodeByHandle(nodeId) || (M.gallery || M.albums) && mega.gallery.getNodeCache(nodeId)))
             || (M.isGalleryPage() && mega.gallery.photos && mega.gallery.photos.mode !== 'a')
             || (M.isMediaDiscoveryPage() && mega.gallery.discovery && mega.gallery.discovery.mode !== 'a')
             || M.isAlbumsPage(1)
@@ -924,7 +929,8 @@ class SelectionManager2_DOM extends SelectionManager2Base {
         }
         else {
             const _getNodeSize = () => {
-                const node = M.d[nodeId] || (M.gallery || M.albums) && mega.gallery.getNodeCache(nodeId);
+                const node = M.getNodeByHandle(nodeId)
+                    || (M.gallery || M.albums) && mega.gallery.getNodeCache(nodeId);
                 return node.t ? node.tb : node.s;
             };
 
@@ -959,7 +965,8 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             }
             else {
                 this.selected_totalSize = this.selected_list.reduce((s, h) => {
-                    const node = M.d[h] || (M.gallery || M.albums) && mega.gallery.getNodeCache(h);
+                    const node = M.getNodeByHandle(h)
+                        || (M.gallery || M.albums) && mega.gallery.getNodeCache(h);
                     if (!node) {
                         return s + 0;
                     }
@@ -1242,7 +1249,8 @@ class SelectionManager2_DOM extends SelectionManager2Base {
                 }
             }
             else if (!isRootSelected && !folderlink && M.currentrootid !== 'shares' && M.currentdirid !== 'shares'
-                || M.currentrootid === 'shares' && M.currentdirid !== 'shares' && M.d[M.currentdirid].r === 2) {
+                || M.currentrootid === 'shares' && M.currentdirid !== 'shares'
+                && M.getNodeRights(M.currentdirid) > 1) {
                 __showBtn('delete');
             }
 
@@ -1259,7 +1267,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
                     }
                     else if (root === 'shares') {
                         hasInshare = true;
-                        if (M.d[h].t === 0 && rights === 2) {
+                        if (M.getNodeByHandle(h).t === 0 && rights === 2) {
                             fullInshareFiles++;
                         }
                     }
@@ -1377,7 +1385,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             }
 
             if (!M.onDeviceCenter) {
-                const parent = selNode && M.d[selNode.p];
+                const parent = selNode && M.getNodeByHandle(selNode.p);
                 if (parent && parent.devid || M.getNodeRoot(selNode.h) === M.InboxID) {
                     __hideButton('rename');
                     __hideButton('move');

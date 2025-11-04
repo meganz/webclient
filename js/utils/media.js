@@ -2985,7 +2985,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
      * @returns {String}
      */
     MediaInfoLib.getObjectName = function(n) {
-        return String(n && n.name || Object(M.d[n]).name || n);
+        return String(n && n.name || M.getNodeByHandle(n).name || n);
     };
 
     /**
@@ -4407,7 +4407,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
             var success = function({result: fa}) {
                 MEGAException.assert(typeof fa === 'string' && /:\d+\*/.test(fa));
-                var n = M.d[req.n];
+                const n = M.getNodeByHandle(req.n);
 
                 if (n) {
                     // n.fa = fa;

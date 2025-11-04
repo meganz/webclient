@@ -20,6 +20,12 @@ MegaData.prototype.reset = function() {
     // M.d & M.c for chat
     this.chd = Object.create(null);
     this.chc = Object.create(null);
+
+    // Transient M.d/c
+    this.tnd = Object.create(null);
+    this.tnc = Object.create(null);
+
+    // Misc.
     this.dcd = Object.create(null);
     this.suba = Object.create(null);
     if (typeof MegaDataMap !== 'undefined') {

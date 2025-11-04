@@ -327,7 +327,7 @@
                         }
                         let labelId = ev.currentTarget.hasClass('selected') ? 0 : i + 1;
                         const sel = mega.ui.contextMenu.selectedItems;
-                        if (sel.length > 1 && sel.some(h => M.d[h].lbl !== i + 1)) {
+                        if (sel.length > 1 && sel.some(h => M.getNodeByHandle(h).lbl !== i + 1)) {
                             // Multiple selected with different labels.
                             labelId = i + 1;
                         }
@@ -466,14 +466,14 @@
                 icon: 'sprite-fm-mono icon-warning-triangle',
                 onClick() {
                     for (let i = mega.ui.contextMenu.selectedItems.length; i--;) {
-                        let n = M.d[mega.ui.contextMenu.selectedItems[i]];
+                        let n = M.getNodeByHandle(mega.ui.contextMenu.selectedItems[i]);
                         if (n) {
                             if ((n.vhl |= 1) > 3) {
                                 n.vhl = 0;
                             }
                             $(`#${n.h}`).removeClassWith('highlight').addClass(`highlight${++n.vhl}`);
 
-                            while ((n = M.d[n.p])) {
+                            while ((n = M.getNodeByHandle(n.p))) {
                                 if (!n.vhl) {
                                     n.vhl = 1;
                                 }
@@ -649,7 +649,9 @@
                     }
                     else if (M.getNodeRoot(target) === M.InboxID) {
                         isInboxRoot = true;
-                        target = mega.devices.ui.getNodeURLPathFromOuterView(M.d[target]);
+                        target = mega.devices.ui.getNodeURLPathFromOuterView(
+                            M.getNodeByHandle(target)
+                        );
                     }
                     else if (M.isAlbumsPage(1)) {
                         target = `albums/${target}`;
@@ -781,7 +783,7 @@
             },
         ]));
         const openItem = (node) => {
-            const target = node.su && (!node.p || !M.d[node.p])
+            const target = node.su && (!node.p || !M.getNodeByHandle(node.p))
                 ? 'shares'
                 : node.h === M.BackupsId ? node.h : node.p;
 
@@ -1640,8 +1642,9 @@
                 }
             },
             '.colour-label-items': (items, { selectedItems }) => {
-                sections.getChild('label').selected =
-                    new Set(selectedItems.map(h => M.d[h] ? String(M.d[h].lbl) : false));
+                sections.getChild('label').selected = new Set(selectedItems.map(
+                    h => M.getNodeByHandle(h) ? String(M.getNodeByHandle(h).lbl) : false)
+                );
             },
             '.togglepausesync-item': (items, { selectedItems }) => {
                 array.remove(items, '.togglepausesync-item');
@@ -1666,7 +1669,7 @@
                 items.push('.open-in-location');
             },
             '.properties-item': (items, { selectedItems: sel }) => {
-                if (pfcol && sel.length === 1 && M.d[sel[0]].t === 2) {
+                if (pfcol && sel.length === 1 && M.getNodeByHandle(sel[0]).t === 2) {
                     array.remove(items, '.properties-item');
                 }
             },
@@ -1759,7 +1762,7 @@
         return {
             selectedItems: [],
             get firstNode() {
-                return M.d[this.selectedItems[0]] ||
+                return M.getNodeByHandle(this.selectedItems[0]) ||
                     (M.gallery || M.albums) && mega.gallery.getNodeCache(this.selectedItems[0]);
             },
             get firstAlbum() {

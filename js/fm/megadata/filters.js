@@ -68,6 +68,9 @@ MegaData.prototype.filterByParent = function(id) {
     else if (this.c[id]) {
         this.v = this.filterByLocation(this.c[id], mega.sensitives.shouldShowNode);
     }
+    else if (this.tnc[id]) {
+        this.v = this.filterByLocation(this.tnc[id], mega.sensitives.shouldShowNode, true);
+    }
     else if (id === 'file-requests') {
         this.v = this.filterByLocation(mega.fileRequest.getPuHandleList());
     }
@@ -275,16 +278,17 @@ MegaData.prototype.filterByLabel = function(node) {
 /**
  * @param {Object<String, MegaNode>} nodes Predefined nodes to filter
  * @param {Function} [filter] Filter function
+ * @param {*} [sin] source is nodes
  * @returns {Array<MegaNode>} Filtered nodes
  */
-MegaData.prototype.filterByLocation = function(nodes, filter) {
+MegaData.prototype.filterByLocation = function(nodes, filter, sin) {
     'use strict';
 
     const res = [];
     const hasNodeFilter = mega.ui.mNodeFilter && mega.ui.mNodeFilter.selectedFilters.value;
 
     for (const h in nodes) {
-        const n = this.d[h];
+        const n = sin ? nodes[h] : this.d[h];
 
         if (
             !n // Undefined node

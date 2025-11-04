@@ -309,7 +309,7 @@ var ulmanager = {
             }
 
             if (aVersion) {
-                if (typeof h !== 'string' || !M.d[h]) {
+                if (!M.getNodeByHandle(h)) {
                     var n = fileconflict.getNodeByName(aFile.target, aFile.name);
                     h = n && n.h;
 
@@ -966,7 +966,7 @@ var ulmanager = {
             }
 
             if (MediaInfoLib.isFileSupported(h)) {
-                var n = M.d[h] || false;
+                const n = M.getNodeByHandle(h);
                 var file = ctx.file;
                 var done = function() {
                     // get thumb/prev created if it wasn't already, eg. an mp4 renamed as avi/mov/etc
@@ -1047,7 +1047,7 @@ var ulmanager = {
         else if (M.h[uq.hash]) {
             if (!(n = mNode)) {
                 const [h] = M.h[uq.hash];
-                n = M.d[h];
+                n = M.getNodeByHandle(h);
             }
 
             if (!identical && n && uq.size !== n.s) {
@@ -1135,20 +1135,14 @@ var ulmanager = {
     },
 
     ulIdentical: function UM_ul_Identical(file) {
-        var nodes = M.c[file.target];
-        if (nodes) {
-            for (var node in nodes) {
-                node = M.d[node];
+        return M.getChildren(file.target, (n) => {
+            if (file.size === n.s
+                && file.name === n.name
+                && file.hash === n.hash) {
 
-                if (node
-                        && file.size === node.s
-                        && file.name === node.name
-                        && file.hash === node.hash) {
-                    return node;
-                }
+                return n;
             }
-        }
-        return false;
+        });
     },
 
     /**
@@ -1206,12 +1200,12 @@ var ulmanager = {
 
         var promises = [];
 
-        if (!M.c[aFile.target]) {
+        if (!M.getChildren(aFile.target)) {
             promises.push(dbfetch.get(aFile.target));
         }
 
         const [h] = M.h[aFile.hash] || [];
-        if (!M.d[h]) {
+        if (!M.getNodeByHandle(h)) {
             promises.push(dbfetch.hash(aFile.hash).then(node => (hashNode = node)));
         }
 

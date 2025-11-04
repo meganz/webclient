@@ -34,12 +34,7 @@ export default class FMView extends MegaRenderMixin {
             'entries': null
         };
 
-        if (this.props.dataSource) {
-            this.dataSource = this.props.dataSource;
-        }
-        else {
-            this.dataSource = M.d;
-        }
+        this.dataSource = this.props.dataSource;
         this.state.entries = this.getEntries();
 
         this.onAttachClicked = this.onAttachClicked.bind(this);
@@ -56,6 +51,11 @@ export default class FMView extends MegaRenderMixin {
         }
         this.initSelectionManager();
     }
+
+    getDataSourceNode(h) {
+        return this.dataSource && this.dataSource[h] || M.getNodeByHandle(h);
+    }
+
     _translateFmConfigSortMode(currentSortModes) {
         const sortId = this.props.fmConfigSortId;
         assert(sortId, 'missing fmConfigSortId');
@@ -106,7 +106,7 @@ export default class FMView extends MegaRenderMixin {
         // If folderSelectNotAllowed and folderSelectable select a single folder
         // Browser entries should handle only allowing a single folder selection in this case.
         if (this.props.folderSelectNotAllowed && !this.props.folderSelectable) {
-            selectedList = selectedList.filter((nodeId) => this.dataSource[nodeId].t !== 1);
+            selectedList = selectedList.filter((nodeId) => !this.getDataSourceNode(nodeId).t);
         }
 
         this.setState({'selected': selectedList, 'highlighted': highlighted});
@@ -129,18 +129,20 @@ export default class FMView extends MegaRenderMixin {
             self.props.searchValue &&
             self.props.searchValue.length >= minSearchLength
         ) {
-            dataSource = this.dataSource;
+            dataSource = this.dataSource || {...M.tnd, ...M.d};
             filterFunc = M.getFilterBySearchFn(self.props.searchValue);
         }
         else {
             const tmp =
-                M.c[self.props.currentlyViewedEntry]
+                M.getChildren(self.props.currentlyViewedEntry)
                 || M.tree[self.props.currentlyViewedEntry]
                 || this.props.dataSource;
+
             dataSource = Object.create(null);
             for (const h in tmp) {
-                if (this.dataSource[h]) {
-                    dataSource[h] = this.dataSource[h];
+                const n = this.getDataSourceNode(h);
+                if (n) {
+                    dataSource[h] = n;
                 }
             }
         }
@@ -276,7 +278,7 @@ export default class FMView extends MegaRenderMixin {
                     });
                 return;
             }
-            if (!this.dataSource[handle] || this.dataSource[handle].t && !M.c[handle]) {
+            if (this.getDataSourceNode(handle).t && !M.getChildren(handle)) {
                 this.setState({'isLoading': true});
                 dbfetch.get(handle)
                     .always(() => {

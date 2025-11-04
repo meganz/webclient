@@ -41,10 +41,10 @@
         $ro.each(function(i, v) {
             var h = $(v).attr('id').replace('mctreea_', '');
             var s = shares[h] = Object.create(null);
-            var n = M.d[h];
+            let n = M.getNodeByHandle(h);
 
             while (n && !n.su) {
-                n = M.d[n.p];
+                n = M.getNodeByHandle(n.p);
             }
 
             if (n) {
@@ -2050,7 +2050,7 @@
             ltWSpaceWarning.hide();
 
             $.saveAsCallBack = cb;
-            $.nodeSaveAs = typeof node === 'string' ? M.d[node] : node;
+            $.nodeSaveAs = typeof node === 'string' ? M.getNodeByHandle(node) : node;
             $.saveAsContent = content;
             handleOpenDialog(null, node.p || M.RootID);
             return $dialog;
@@ -2432,7 +2432,7 @@
                 // Force clear search since closeDialog will but s4 won't do that in the same order.
                 treesearch = false;
                 // Auto-select the created folder.
-                const p = Object(M.d[h]).p || $.cftarget;
+                const p = M.getNodeByHandle(h).p || $.cftarget;
 
                 // Refresh list (moved from sc-parser)
                 refreshDialogContent();
@@ -2849,7 +2849,7 @@
                     mega.keyMgr.setShareSnapshot(target)
                         .then(() => doShare(target, [user]))
                         .then(() => {
-                            mega.ui.toast.show(l.share_folder_toast.replace('%1', targetName));
+                            mega.ui.toast.show(l.share_folder_toast.replace('%1', M.getNameByHandle(target)));
                         })
                         .catch(tell);
                 }
@@ -2871,7 +2871,7 @@
                         .then((res) => {
                             if (res && res.length) {
                                 const toUnhide = section === 's4' && mega.sensitives.featureEnabled
-                                    ? res.filter(h => M.d[h].sen)
+                                    ? res.filter(h => M.getNodeByHandle(h).sen)
                                     : [];
 
                                 if (toUnhide.length) {

@@ -789,7 +789,7 @@ lazy(mega, 'fileRequestCommon', () => {
 
             if ((entries = entries.filter(Boolean)).length) {
 
-                return dbfetch.acquire(entries);
+                return dbfetch.acquired(entries);
             }
         }
 

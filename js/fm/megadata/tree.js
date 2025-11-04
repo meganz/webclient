@@ -1096,7 +1096,7 @@ MegaData.prototype.onTreeUIOpen = function(id, event, ignoreScroll) {
         var ids = this.getPath(id);
         let i = ids.length;
         while (i-- > 1) {
-            if (this.d[ids[i]] && ids[i].length === 8) {
+            if (ids[i].length === 8 && this.getNodeByHandle(ids[i])) {
                 this.onTreeUIExpand(ids[i], 1);
             }
         }

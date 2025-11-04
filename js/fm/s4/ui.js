@@ -105,7 +105,7 @@ lazy(s4, 'ui', () => {
             }
         },
         'empty-ui': () => {
-            const n = M.d[M.currentdirid.split('/').pop()];
+            const n = M.getNodeByHandle(M.currentdirid.split('/').pop());
 
             if (M.currentLabelFilter) {
                 $('.fm-empty-filter', '.fm-right-files-block').removeClass('hidden');
@@ -379,7 +379,7 @@ lazy(s4, 'ui', () => {
                 return this.layoutCleanup();
             }
 
-            if (!M.d[n.h]) {
+            if (!M.getNodeByHandle(n.h)) {
                 await dbfetch.get(n.h);
             }
 

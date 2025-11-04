@@ -406,7 +406,7 @@
 
             this.gallery = 0;
             if (!is_mobile && (fmconfig.uiviewmode | 0 && fmconfig.viewmode === 2 || fmViewMode === 2)) {
-                this.gallery = 1;
+                this.gallery = 2;
                 this.viewmode = 2;
             }
             if (mega.ui.secondaryNav) {
@@ -440,11 +440,10 @@
             const stash = this.previousdirid === this.currentdirid;
             mega.devices.ui.filterChipUtils.resetSelections(stash);
         }
-        if (
-            mega.ui.secondaryNav &&
-            this.previousdirid !== this.currentdirid &&
-            !(String(this.previousdirid).startsWith('search') && String(this.currentdirid).startsWith('search'))
-        ) {
+        if (mega.ui.secondaryNav
+            && treetype(this.previousdirid) !== treetype(this.currentdirid)
+            && !(M.search && String(this.previousdirid).startsWith('search'))) {
+
             mega.ui.secondaryNav.onPageChange();
         }
 
@@ -617,7 +616,7 @@
                 }
 
                 if (!document.getElementById(`treea_${treeid}`)) {
-                    n = this.d[nodeid];
+                    n = this.getNodeByHandle(nodeid);
                     if (n && n.p) {
                         M.onTreeUIOpen(prefixPath + n.p, false, true);
                     }
@@ -667,7 +666,7 @@
                 .addClass('hidden');
         }
 
-        if (mega.ui.secondaryNav) {
+        if (mega.ui.secondaryNav && treetype(this.previousdirid) !== treetype(this.currentdirid)) {
             const noScroll = mega.ui.secondaryNav.bindScrollEvents();
             if (!mega.ui.secondaryNav.isSmall && noScroll && !mega.ui.secondaryNav.actionsHolder) {
                 mega.ui.secondaryNav.domNode.classList.remove('buttons-up');
@@ -690,7 +689,7 @@
     MegaData.prototype.openFolder = async function(id, force) {
         let isFirstOpen, fetchDBNodes, fetchDBShares, sink;
 
-        document.documentElement.classList.remove('wait-cursor');
+        document.documentElement.classList.remove('wait-cursor', 'loading-nodes');
 
         if (d) {
             console.warn('openFolder(%s, %s), currentdir=%s, fmloaded=%s',
@@ -711,7 +710,7 @@
         }
         let cv = this.isCustomView(id);
 
-        if (mega.ui.secondaryNav) {
+        if (mega.ui.secondaryNav && treetype(this.previousdirid) !== treetype(id)) {
             mega.ui.secondaryNav.updateGalleryLayout(pfid);
             mega.ui.secondaryNav.updateLayoutButton();
             mega.ui.secondaryNav.hideActionButtons();
@@ -719,6 +718,7 @@
 
         // In MEGA Lite mode, remove this temporary class
         if (mega.lite.inLiteMode) {
+            tryCatch(() => mega.lite.limitedNodesBanner(1))();
             $('.files-grid-view.fm').removeClass('mega-lite-hidden');
 
             // Redirect disabled sections
@@ -882,17 +882,6 @@
         else if (id && id.substr(0, 7) === 'search/') {
             this.search = true;
         }
-        else if (id && id.substr(0, 10) === 'discovery/') {
-            if (cv.nodeID === M.RootID || cv.nodeID === M.RubbishID || !M.d[cv.nodeID]) {
-                // Preventing MD on root folder
-                return M.openFolder('cloudroot');
-            }
-
-            fetchDBNodes = true;
-            id = cv.nodeID;
-
-            this.gallery = 2;
-        }
         else if (cv.type === 'gallery' && !pfcol) {
             this.gallery = 1;
         }
@@ -994,6 +983,10 @@
                 if (stream) {
                     // eslint-disable-next-line local-rules/open -- not a window.open() call.
                     await dbfetch.open(id, promise).catch(dump);
+
+                    if (this.atrophy(id) > 0) {
+                        onIdle(() => mega.lite.limitedNodesBanner());
+                    }
                 }
                 else if (!this.d[id] || this.d[id].t && !this.c[id]) {
 
@@ -1014,7 +1007,7 @@
 
             fetchDBShares = true;
         }
-        else if (!this.d[id] && !dynPages[id] && !sink && (pfid || fetchDBNodes)) {
+        else if (!this.getNodeByHandle(id) && !dynPages[id] && !sink && (pfid || fetchDBNodes)) {
 
             id = M.RootID;
         }

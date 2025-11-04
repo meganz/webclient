@@ -639,14 +639,16 @@ function fmtopUI() {
     $('.fm-s4-settings, .fm-s4-new-bucket, .fm-s4-new-key, .fm-s4-new-user, .fm-s4-new-group', $header)
         .addClass('hidden');
 
-    if (M.currentrootid !== 'shares' && !M.onDeviceCenter) {
+    if (M.currentrootid !== 'shares' && !M.onDeviceCenter && M.gallery !== 1 && !M.albums) {
         mega.ui.secondaryNav.hideCard();
         mega.ui.secondaryNav.hideActionButtons();
     }
     mega.ui.secondaryNav.updateLayoutButton(
         M.currentdirid === 'shares' ||
         M.currentdirid === 'out-shares' ||
-        M.currentdirid === 'file-requests'
+        M.currentdirid === 'file-requests' ||
+        M.gallery === 1 ||
+        M.albums
     );
     mega.ui.secondaryNav.updateInfoPanelButton(id && M.d[id] && M.d[id].t);
     if (M.currentdirid !== 'shares') {
@@ -657,13 +659,17 @@ function fmtopUI() {
     mega.ui.secondaryNav.chipsViewsWrapper.classList.remove('no-crumb', 'grid-spacer');
     mega.ui.secondaryNav.domNode.classList.remove('no-small-content', 'crumb-info', 's4-spacer', 'search-link');
     mega.ui.secondaryNav.updateSmallNavButton(
-        !(
-            M.onDeviceCenter ||
-            M.currentdirid === 'shares' ||
-            M.currentdirid === M.RubbishID ||
-            M.currentdirid === 'faves' ||
-            M.currentdirid === 'recents'
-        ) || M.v.length
+        !(M.gallery === 1 || M.albums)
+        && (
+            !(
+                M.onDeviceCenter ||
+                M.currentdirid === 'shares' ||
+                M.currentdirid === M.RubbishID ||
+                M.currentdirid === 'faves' ||
+                M.currentdirid === 'recents'
+            )
+            || M.v.length
+        )
     );
     $('.fm-right-files-block').removeClass('visible-notification rubbish-bin');
 
@@ -791,6 +797,9 @@ function fmtopUI() {
                 $('.gallery-tab-lnk', $galleryTabBlock).removeClass('active');
                 $(`.gallery-tab-lnk-${mega.gallery[M.currentdirid].mode}`, $galleryTabBlock).addClass('active');
             }
+        }
+        else if (M.isAlbumsPage(1)) {
+            primary = '.fm-new-album';
         }
         else if (M.currentrootid === 's4' && M.currentCustomView) {
             const {subType, original, nodeID, containerID} = M.currentCustomView;
@@ -1289,15 +1298,7 @@ function duplicated(value, target) {
         return M.v.some((n) => n.name === value);
     }
 
-    if (M.c[target]) {
-        for (const handle in M.c[target]) {
-            if (M.d[handle] && M.d[handle].name === value) {
-                return true;
-            }
-        }
-    }
-
-    return false;
+    return M.getChildren(target, (n) => n.name === value);
 }
 
 /**

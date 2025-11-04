@@ -1080,7 +1080,7 @@ lazy(mega, 'keyMgr', () => {
         async pathShares(node) {
             const sharedNodes = [node, []];
 
-            if (!M.d[node]) {
+            if (!M.getNodeByHandle(node)) {
                 await dbfetch.acquire(node);
             }
             this.setRefShareNodes(sharedNodes);
@@ -1411,16 +1411,16 @@ lazy(mega, 'keyMgr', () => {
         // sanity check: don't allow inshare keys on cloud drive nodes
         isInShare(node) {
             for (; ;) {
-                if (!M.d[node]) {
+                if (!(node = M.getNodeByHandle(node))) {
                     // we have reached the parent of the inshare
                     return true;
                 }
-                if (!M.d[node].p) {
+                if (!node.p) {
                     // no parent: cloud drive root
                     return false;
                 }
 
-                node = M.d[node].p;
+                node = node.p;
             }
         }
 
@@ -1595,7 +1595,7 @@ lazy(mega, 'keyMgr', () => {
                         for (let i = handles.length; i--;) {
                             const h = handles[i];
 
-                            if (M.d[h]) {
+                            if (M.getNodeByHandle(h)) {
                                 logger.warn(`Cannot revoke share-key for ${h}, node exists...`);
                                 handles.splice(i, 1);
                             }
@@ -1620,7 +1620,7 @@ lazy(mega, 'keyMgr', () => {
         // structure of uploads/backups: id => [node, [key1, key2, ...]]
         addShare(sharenode, t) {
             for (const id in t) {
-                for (let p = t[id][0]; p; p = M.d[p].p) {
+                for (let p = t[id][0]; p; p = M.getNodeByHandle(p).p) {
                     if (p === sharenode) {
                         t[1].push(sharenode);
                     }
@@ -1868,7 +1868,7 @@ lazy(mega, 'keyMgr', () => {
 
                 // we temporarily instantly speculatively complete the moves
                 for (let i = 0; i < cmds.length; i++) {
-                    const n = M.d[cmds[i].n];
+                    const n = M.getNodeByHandle(cmds[i].n);
                     if (n && n.t) {
                         // a folder is being moved - record old parent and move it to the new location
                         cmds[i].pp = n.p;
@@ -1894,7 +1894,7 @@ lazy(mega, 'keyMgr', () => {
                 // FIXME - this is prone to race condition by concurrent user action or actionpackets
                 for (let i = 0; i < cmds.length; i++) {
                     if (cmds[i].pp) {
-                        const n = M.d[cmds[i].n];
+                        const n = M.getNodeByHandle(cmds[i].n);
 
                         if (n && n.p === cmds[i].t) {
                             // a folder is being moved - record old parent and move it to the new location
@@ -1923,7 +1923,7 @@ lazy(mega, 'keyMgr', () => {
             const [h, a] = sn;
             const ss = a.join(',');
 
-            let n = M.d[h];
+            let n = M.getNodeByHandle(h);
             while (n && n.p) {
                 if (u_sharekeys[n.h]) {
 
@@ -1935,7 +1935,7 @@ lazy(mega, 'keyMgr', () => {
                         logger.warn(`Skipping share-key for ${n.h} which seems no longer shared...`);
                     }
                 }
-                n = M.d[n.p];
+                n = M.getNodeByHandle(n.p);
             }
 
             if (root) {

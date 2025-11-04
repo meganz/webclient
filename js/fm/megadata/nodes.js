@@ -1474,7 +1474,7 @@ MegaData.prototype.moveNodes = async function(n, t, folderConflictResolution) {
                         const [{h, p}, target, root] = nodes[i];
                         const n = this.getNodeByHandle(h);
 
-                        assert(n.h === h && n.p !== p && n.p === target, `APIv3 ${l[16]}...mv:${n.h}`);
+                        assert(this.tnc[p] || n.h === h && n.p !== p && n.p === target, `APIv3 ${l[16]}...mv:${n.h}`);
 
                         const a = getAttributeChanges(n, p, target, root);
                         if (a) {
@@ -3940,13 +3940,16 @@ MegaData.prototype.delNodeShare = async function(h, u) {
     // @todo ditch MegaNode.shares use completely, maintain M.su only, adapt MegaNode.ph uses(?)
 
     if (!(this.d[h] && this.d[h].shares)) {
-        console.assert(mega.infinity, 'just saying...');
-
+        if (self.d) {
+            console.assert(this.d[h] || mega.infinity, `we don't know about ${h}...yet?`, mega.infinity);
+        }
         await this.loadNodeShares(h);
     }
-    console.assert(this.d[h] || !this.su[u]);
+    const n = this.getNodeByHandle(h);
 
-    if (this.d[h]) {
+    console.assert(n || !this.su[u], `invalid share status for ${h}...`, [n], !!this.su[u], mega.infinity);
+
+    if (n) {
         var updnode;
 
         if (this.su[u]) {
@@ -3969,13 +3972,13 @@ MegaData.prototype.delNodeShare = async function(h, u) {
         }
 
         api_updfkey(h);
-        if (this.d[h].shares) {
-            delete this.d[h].shares[u];
+        if (n.shares) {
+            delete n.shares[u];
         }
 
         if (u === 'EXP') {
-            updnode = updnode || !!this.d[h].ph;
-            delete this.d[h].ph;
+            updnode = updnode || !!n.ph;
+            delete n.ph;
 
             if (fmdb) {
                 fmdb.del('ph', h);
@@ -3984,22 +3987,22 @@ MegaData.prototype.delNodeShare = async function(h, u) {
         }
 
         var a;
-        for (var i in this.d[h].shares) {
+        for (const i in n.shares) {
 
             // If there is only public link in shares, and deletion is not target public link.
-            if (i === 'EXP' && Object.keys(this.d[h].shares).length === 1 && u !== 'EXP') {
+            if (i === 'EXP' && Object.keys(n.shares).length === 1 && u !== 'EXP') {
                 updnode = true;
             }
 
-            if (this.d[h].shares[i]) {
+            if (n.shares[i]) {
                 a = true;
                 break;
             }
         }
 
         if (!a) {
-            updnode = updnode || !!this.d[h].shares;
-            delete this.d[h].shares;
+            updnode = updnode || !!n.shares;
+            delete n.shares;
 
             if (!M.ps[h]) {
                 // out-share revoked, clear bit from trusted-share-keys
@@ -4008,7 +4011,7 @@ MegaData.prototype.delNodeShare = async function(h, u) {
         }
 
         if (updnode) {
-            this.nodeUpdated(this.d[h]);
+            this.nodeUpdated(n, !this.d[h]);
 
             if (fminitialized) {
                 sharedUInode(h);

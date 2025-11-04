@@ -2238,11 +2238,11 @@ function emplacenode(node, noc) {
         if (M.tnc[node.p]) {
             const n = M.tnd[node.h] = M.tnc[node.p][node.h] = Object.setPrototypeOf(node, MegaNode.prototype);
             Object.defineProperty(n, 'transient', {value: true});
-            if (n.t) {
+            if (n.t && !M.tnc[n.h]) {
                 M.tnc[n.h] = Object.create(null);
             }
             if (self.d) {
-                console.warn(`newly established transient node with handle '${n.h}' (${n.t})...`);
+                console.warn(`newly established transient node with handle '${n.h}' (${n.t}, ${n.p})...`);
             }
             return;
         }

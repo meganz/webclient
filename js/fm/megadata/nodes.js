@@ -869,6 +869,16 @@ MegaData.prototype.setPitag = function(req, purpose, extra) {
     }
 
     req.p = `${purpose}${trigger}${pick}${targetTag}${source}`;
+
+    if (req.a === 'p' && req.n) {
+        for (let i = req.n.length; i--;) {
+            const n = req.n[i];
+
+            if (n.k && n.k.length > 511) {
+                eventlog(500996, JSON.stringify([1, req.v | 0, n.k.length, req.p]));
+            }
+        }
+    }
 };
 
 

@@ -3167,6 +3167,7 @@ Object.defineProperty(self, 'dbfetch', (function() {
                         console.warn(`Invalid parent node for ${n.h} (${n.p}), expected ${h}`);
                     }
                 }
+                onIdle(() => eventlog(501017));
 
                 return h;
             }

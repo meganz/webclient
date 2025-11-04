@@ -1629,7 +1629,7 @@ function logExportEvt(evtId, data) {
                         );
 
                         if (mega.xferit && (fmconfig.noItBanner || 0) < Date.now()) {
-                            const header = sheet.overlayNode.querySelector('.header');
+                            const header = sheet.overlayNode.querySelector('.header-title');
                             const title = mCreateElement('div', { class: 'font-title-h3' });
                             const txt = mCreateElement('div', { class: 'font-body-1' });
 
@@ -1691,6 +1691,7 @@ function logExportEvt(evtId, data) {
                 },
                 onClose: () => {
                     document.removeEventListener('keydown', onKeyDown, true);
+                    sheet.overlayNode.classList.remove('has-it-banner');
                     sheet.removeClass(name);
                     removeItBanner();
                 }

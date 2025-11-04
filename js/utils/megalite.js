@@ -292,6 +292,7 @@ lazy(mega, 'lite', () => {
 
                 // Show All
                 M.atrophy(null);
+                eventlog(501018);
             }
         };
 

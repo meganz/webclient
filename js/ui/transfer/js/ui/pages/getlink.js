@@ -291,6 +291,65 @@ lazy(T.ui, 'addFilesLayout', () => {
             }
         },
 
+        // Init floating menu with scroll to buttons
+        initFloatingMenu() {
+            const { cn } = this.addedFiles;
+            let menu = cn.querySelector('.add-files-floating-menu');
+
+            if (menu) {
+                menu.classList.remove('visible');
+                return false;
+            }
+
+            // Create menu
+            menu = ce('div', { class: 'it-box tag lg-shadow add-files-floating-menu' }, cn);
+            const body = ce('div', { class: 'body' }, menu);
+
+            // Scroll to Add files button
+            let btn = ce('div', { class: 'it-button ghost sm-size' }, body);
+            ce('i', { class: 'sprite-it-x24-mono icon-add-file' }, btn);
+            ce('span', null, btn).textContent = l.transferit_add_files;
+
+            btn.addEventListener('click', () => {
+                document.body.querySelector('.page-header').scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'end'
+                });
+            });
+
+            // Scroll to Transfer button
+            btn = ce('div', { class: 'it-button ghost sm-size' }, body);
+            ce('i', { class: 'sprite-it-x24-mono icon-arrow-up-circle' }, btn);
+            ce('span', null, btn).textContent = l.transferit_transfer_btn;
+
+            btn.addEventListener('click', () => {
+                cn.querySelector('.get-link-box').scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'end'
+                });
+            });
+
+            // Show/hide menu
+            const toggleMenu = () => {
+                if (page !== 'start' || this.data.step !== 2) {
+                    menu.remove();
+                    document.body.removeEventListener('scroll', toggleMenu);
+                    window.removeEventListener('resize', toggleMenu);
+                    return false;
+                }
+
+                if (document.body.scrollTop > 80 && window.outerWidth < 960) {
+                    menu.classList.add('visible');
+                }
+                else {
+                    menu.classList.remove('visible');
+                }
+            };
+
+            document.body.addEventListener('scroll', toggleMenu);
+            window.addEventListener('resize', toggleMenu);
+        },
+
         // Init MEGA integrated page evts
         initMegaPageEvts() {
             const {cn} = this.addedFiles;
@@ -508,6 +567,9 @@ lazy(T.ui, 'addFilesLayout', () => {
 
             // Reset Get link button
             btn.classList.add('disabled');
+
+            // Init floating menu
+            this.initFloatingMenu();
 
             // Render files list
             this.renderUploadList();

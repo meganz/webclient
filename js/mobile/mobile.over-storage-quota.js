@@ -153,23 +153,11 @@ mobile.overStorageQuota = {
         upgradeDiv.className = 'blurb-text';
         upgradeDiv.append(upgradeString);
 
-        const rubbishDiv = document.createElement('div');
-        rubbishDiv.className = 'rubbish-bin-text';
-        rubbishDiv.append(parseHTML(l[16306]));
-
-        // Add touchend event to span tag as a workaround to load fm/rubbish without
-        // a page reload
-        const gotoDiv = rubbishDiv.querySelector('span.gotorub');
-        if (gotoDiv) {
-            gotoDiv.addEventListener('touchend', () => {
-                mega.ui.sheet.hide();
-                mega.ui.overlay.hide();
-                loadSubPage('fm/rubbish');
-            });
-        }
+        const infoDiv = document.createElement('div');
+        infoDiv.append(parseHTML(l[16306]));
 
         contentsDiv.append(upgradeDiv);
-        contentsDiv.append(rubbishDiv);
+        contentsDiv.append(infoDiv);
 
         if (!isEuro && upgradeTo === 'min') {
             const disclaimerDiv = document.createElement('div');

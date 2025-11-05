@@ -1238,14 +1238,11 @@ mBroadcaster.once('boot_done', function populate_l() {
 
     // Mobile only
     if (is_mobile) {
-        l[16306] = escapeHTML(l[16306]).replace('[A]', '<span class="gotorub">').replace('[/A]', '</span>');
         l[20220] = escapeHTML(l[20220]).replace('%1', '<span class="mobile user-number js-user-phone-number"></span>');
     }
-    else {
-        // Desktop only
-        l[16306] = escapeHTML(l[16306])
-            .replace('[A]', '<a href="/fm/rubbish" class="clickurl gotorub">').replace('[/A]', '</a>');
-    }
+    l[16306] = escapeHTML(l[16306])
+        .replace('[A]', '<a href="https://help.mega.io/plans-storage/space-storage/storage-exceeded" ' +
+            'target="_blank" class="clickurl" rel="noopener noreferrer">').replace('[/A]', '</a>');
 
     l[20223] = escapeHTML(l[20223]).replace('%1', '24');  // 24 hours
 

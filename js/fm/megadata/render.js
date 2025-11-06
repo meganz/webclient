@@ -381,7 +381,7 @@ MegaData.prototype.megaListRenderNode = function(aHandle) {
         }
         return false;
     }
-    if (!M.d[aHandle]) {
+    if (!M.d[aHandle] && !(mega.infinity && M.getNodeByHandle(aHandle))) {
         if (d) {
             console.warn("megaListRenderNode was called with aHandle '%s' which was not found in M.d", aHandle);
         }

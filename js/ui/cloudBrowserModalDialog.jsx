@@ -203,7 +203,7 @@ class CloudBrowserDialog extends ModalDialogsUI.SafeShowDialogController {
         }
 
         // Click to open allowed only on folders as breadcrumb nodes
-        if (M.d[nodeId] && M.d[nodeId].t) {
+        if (M.getNodeByHandle(nodeId).t) {
             const nodeRoot = M.getNodeRoot(nodeId);
 
             this.setState({
@@ -246,7 +246,7 @@ class CloudBrowserDialog extends ModalDialogsUI.SafeShowDialogController {
         let isIncomingShare = M.getNodeRoot(entryId) === "shares";
 
         this.state.highlighted.forEach(nodeId => {
-            if (M.d[nodeId] && M.d[nodeId].t === 1) {
+            if (M.getNodeByHandle(nodeId).t) {
                 folderIsHighlighted = true;
 
                 // Is S4 Container selected

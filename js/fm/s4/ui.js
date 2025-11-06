@@ -52,16 +52,10 @@ lazy(s4, 'ui', () => {
                 [type, localeName] = s4BcProp[id];
             }
             else {
-                const s4Type = M.getS4NodeType(id);
+                const data = s4.utils.getBreadcrumbsData(id);
 
-                if (s4Type === 'container') {
-                    type = 's4-object-storage';
-                    localeName = s4.utils.getContainersList().length === 1
-                        ? l.obj_storage : M.getNameByHandle(id);
-                }
-                else if (s4Type === 'bucket') {
-                    type = 's4-buckets';
-                    localeName = M.getNameByHandle(id);
+                if (data) {
+                    ({type, localeName} = data);
                 }
                 else if (subType === 'bucket') {
                     type = 'folder';
@@ -105,7 +99,7 @@ lazy(s4, 'ui', () => {
             }
         },
         'empty-ui': () => {
-            const n = M.d[M.currentdirid.split('/').pop()];
+            const n = M.getNodeByHandle(M.currentdirid.split('/').pop());
 
             if (M.currentLabelFilter) {
                 $('.fm-empty-filter', '.fm-right-files-block').removeClass('hidden');
@@ -379,7 +373,7 @@ lazy(s4, 'ui', () => {
                 return this.layoutCleanup();
             }
 
-            if (!M.d[n.h]) {
+            if (!M.getNodeByHandle(n.h)) {
                 await dbfetch.get(n.h);
             }
 

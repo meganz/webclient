@@ -446,7 +446,7 @@ lazy(s4, 'utils', () => {
                 return bucket.p ? `${bucket.p}/${path[path.length - 1]}` : false;
             }
 
-            if (path.length > 2 && !(allowedPages.has(path[2]) || M.d[path[2]])) {
+            if (path.length > 2 && !(allowedPages.has(path[2]) || M.getNodeByHandle(path[2]))) {
                 return path[1];
             }
 
@@ -630,6 +630,30 @@ lazy(s4, 'utils', () => {
 
                 copyToClipboard(e.currentTarget.dataset.url, l.s4_endpoint_copied, 'hidden');
             });
+        },
+
+        getBreadcrumbsData(h) {
+            const s4Type = M.getS4NodeType(h);
+
+            if (!s4Type) {
+                return false;
+            }
+
+            if (s4Type === 'container') {
+                return {
+                    type: 's4-object-storage',
+                    localeName: s4.utils.getContainersList().length === 1 ? l.obj_storage : M.getNameByHandle(h)
+                };
+            }
+
+            if (s4Type === 'bucket') {
+                return {
+                    type: 's4-buckets',
+                    localeName: M.getNameByHandle(h)
+                };
+            }
+
+            return false;
         },
 
         /**

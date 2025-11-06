@@ -45,22 +45,19 @@ export default class Breadcrumbs extends MegaRenderMixin {
                 continue;
             }
 
-            if (item.type === 'cloud-drive') {
-                icon = <i className="sprite-fm-mono icon-cloud icon24"></i>;
-            }
-            else if (item.type === 'backups') {
-                icon = <i className="sprite-fm-mono icon-database-filled icon24"></i>;
-            }
-            else if (item.type === 'folder') {
-                icon = <i className="sprite-fm-mono icon-folder-filled icon24"></i>;
-            }
+            const classes = {
+                'cloud-drive': 'icon-cloud',
+                'backups': 'icon-database-filled',
+                's4-object-storage': 'icon-bucket-triangle-thin-solid',
+                's4-buckets': 'icon-bucket-outline'
+            };
 
             contents.push(
                 <a
                     className="crumb-drop-link"
                     key={'drop_link_' + item.nodeId}
                     onClick={(e) => this.onBreadcrumbNodeClick(e, item.nodeId)}>
-                    {icon}
+                    <i className={`sprite-fm-mono icon24 ${classes[item.type] || 'folder'}`}></i>
                     <span>
                         {item.name}
                     </span>
@@ -129,7 +126,8 @@ export default class Breadcrumbs extends MegaRenderMixin {
         if (entryId !== undefined) {
             (path || M.getPath(entryId))
                 .forEach((nodeId, k, path) => {
-                    var breadcrumbClasses = "";
+                    let breadcrumbClasses = '';
+                    let folderType = 'folder';
                     if (nodeId === M.RootID) {
                         breadcrumbClasses += " cloud-drive";
                     }
@@ -146,11 +144,10 @@ export default class Breadcrumbs extends MegaRenderMixin {
                     const prevNodeId = path[k - 1];
                     let nodeName = this.getBreadcrumbNodeText(nodeId, prevNodeId);
 
-                    if (M.dyh) {
-                        const {localeName} = M.dyh('breadcrumb-properties', handle);
-
-                        if (localeName) {
-                            nodeName = localeName;
+                    if ('utils' in s4) {
+                        const data = s4.utils.getBreadcrumbsData(nodeId);
+                        if (data) {
+                            ({ type: folderType, localeName: nodeName } = data);
                         }
                     }
 
@@ -176,7 +173,7 @@ export default class Breadcrumbs extends MegaRenderMixin {
                             );
                         }
                         else {
-                            let folderType = nodeId === M.RootID ? 'cloud-drive' : 'folder';
+                            folderType = nodeId === M.RootID ? 'cloud-drive' : folderType;
 
                             if (M.BackupsId && nodeId === M.BackupsId) {
                                 folderType = 'backups';

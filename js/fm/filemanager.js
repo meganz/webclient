@@ -196,7 +196,7 @@ function FileManager() {
                 }
             }
 
-            if (M.currentrootid === 's4' && M.d[path.pop()]) {
+            if (M.currentrootid === 's4' && M.getNodeByHandle(path.pop())) {
                 M.columnsWidth.cloud.accessCtrl.viewed = true;
                 M.columnsWidth.cloud.accessCtrl.disabled = false;
             }
@@ -778,7 +778,7 @@ FileManager.prototype.initFileManagerUI = function() {
                 else if (t && t.indexOf('path_') > -1) {
                     t = t.replace('path_', '');
                 }
-                else if (M.currentdirid !== 'shares' || !M.d[t] || M.getNodeRoot(t) !== 'shares') {
+                else if (M.currentdirid !== 'shares' || !M.getNodeByHandle(t) || M.getNodeRoot(t) !== 'shares') {
                     t = undefined;
                 }
             }
@@ -875,7 +875,7 @@ FileManager.prototype.initFileManagerUI = function() {
             }
             else {
                 const {type} = M.isCustomView(t) || {};
-                $.draggingClass = M.d[t] || type === 's4' || type === mega.devices.rootId
+                $.draggingClass = M.getNodeByHandle(t) || type === 's4' || type === mega.devices.rootId
                 || M.onDeviceCenter && !mega.devices.ui.canMove(ids)
                     ? 'dndc-warning' :
                     'dndc-move';
@@ -984,7 +984,7 @@ FileManager.prototype.initFileManagerUI = function() {
         };
 
         if (a === 'drop' && dd !== undefined) {
-            dbfetch.get(t).always(function() {
+            Promise.resolve(M.getNodeByHandle(t) || dbfetch.get(t)).finally(() => {
                 setDDType();
                 if (dd) {
                     onMouseDrop();
@@ -1484,7 +1484,7 @@ FileManager.prototype.initFileManagerUI = function() {
                         targetFolder = M.currentdirid;
                     }
                 }
-                else if (tab.prev && (M.d[tab.prev] || M.isCustomView(tab.prev) ||
+                else if (tab.prev && (M.getNodeByHandle(tab.prev) || M.isCustomView(tab.prev) ||
                     (tab.subpages && tab.subpages.indexOf(tab.prev) > -1))) {
                     targetFolder = tab.prev;
                 }
@@ -1589,7 +1589,7 @@ FileManager.prototype.initShortcutsAndSelection = function(container, aUpdate, r
         // or re-rendering the same view but previous view is media discovery view
         else if (!M.gallery && !$('#gallery-view').hasClass('hidden')) {
             for (let i = $.selected.length - 1; i >= 0; i--) {
-                if (!M.v.includes(M.d[$.selected[i]])) {
+                if (!M.v.includes(M.getNodeByHandle($.selected[i]))) {
                     $.selected.splice(i, 1);
                 }
             }
@@ -2359,10 +2359,10 @@ FileManager.prototype.initUIKeyEvents = function() {
             !(M.onDeviceCenter && mega.devices.ui &&
                 mega.devices.ui.getRenderSection() === 'device-centre-devices')
         ) {
-            const nodes = s.filter(h => !M.d[h] || M.getNodeRoot(M.d[h].h) !== M.InboxID);
             if (M.isInvalidUserStatus() || $.msgDialog === 'remove') {
                 return;
             }
+            const nodes = s.filter(h => M.getNodeRoot(h) !== M.InboxID);
 
             if (nodes.length) {
                 // delete
@@ -2393,7 +2393,7 @@ FileManager.prototype.initUIKeyEvents = function() {
             $.selected = s.filter(h => !M.getNodeShare(h).down);
 
             if ($.selected && $.selected.length > 0) {
-                var n = M.d[$.selected[0]];
+                const n = M.getNodeByHandle($.selected[0]);
 
                 if (!M.dcd[$.selected[0]] && M.getNodeRoot(n.h) === M.RubbishID) {
                     mega.ui.mInfoPanel.show($.selected);
@@ -2461,9 +2461,9 @@ FileManager.prototype.initUIKeyEvents = function() {
             !is_transfers_or_accounts &&
             (e.keyCode === 113 /* F2 */) &&
             (s.length > 0) &&
-            !$.dialog && M.getNodeRights(M.d[s[0]] && M.d[s[0]].h) > 1 &&
+            !$.dialog && M.getNodeRights(s[0]) > 1 &&
             M.currentrootid !== M.InboxID &&
-            M.getNodeRoot(M.d[s[0]].h) !== M.InboxID
+            M.getNodeRoot(s[0]) !== M.InboxID
         ) {
             renameDialog();
         }
@@ -3192,7 +3192,7 @@ FileManager.prototype.addGridUI = function(refresh) {
         const node = M.getNodeByHandle(h);
 
         // Incoming Shares section if shared folder doesn't have parent
-        const originalTarget = node.su && (!node.p || !M.d[node.p]) ? 'shares' : node.p;
+        const originalTarget = M.getNodeParent(node);
         let target = originalTarget;
 
         const isInboxRoot = M.getNodeRoot(target) === M.InboxID;
@@ -3356,7 +3356,7 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
                 var max = ($(window).height() - 96) / 24;
                 var html = [];
                 $.selected.forEach((id, i) => {
-                    var n = M.d[id];
+                    const n = M.getNodeByHandle(id);
                     if (n && max > i) {
                         const lblClass = MegaNodeComponent.label[n.lbl | 0] || '';
                         html.push(
@@ -3962,7 +3962,8 @@ FileManager.prototype.getLinkAction = function(selNodes, isEmbed) {
 
         const mdList = mega.fileRequestCommon.storage.isDropExist(selNodes);
         if (mdList.length) {
-            var fldName = mdList.length > 1 ? l[17626] : l[17403].replace('%1', escapeHTML(M.d[mdList[0]].name));
+            const fldName = mdList.length > 1 ? l[17626] :
+                l[17403].replace('%1', escapeHTML(M.getNodeByHandle(mdList[0]).name));
 
             msgDialog('confirmation', l[1003], fldName, l[18229], function(e) {
                 if (e) {
@@ -4043,7 +4044,7 @@ FileManager.prototype.initStatusBarLinks = function() {
                 mega.gallery.albums.previewSelectedElements();
             }
             else {
-                slideshow(M.d[$.selected[0]], false);
+                slideshow($.selected[0], false);
             }
         }
         else if (this.classList.contains('delete-from-album')) {

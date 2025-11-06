@@ -121,6 +121,7 @@ class MegaSheet extends MegaOverlay {
                 this.type = options.type || 'normal';
                 this.height = options.sheetHeight || 'auto';
                 this.preventBgClosing = options.preventBgClosing || false;
+                this.onClose = options.onClose;
                 document.documentElement.classList.add('overlayed');
             });
         }
@@ -156,11 +157,13 @@ class MegaSheet extends MegaOverlay {
             this.safeShow = false;
         }
 
+        this.clear();
+
         super.hide(name);
     }
 
     clear() {
-        this.domNode.classList.remove(this.type, this.height);
+        this.domNode.classList.remove(this.name, this.type, this.height);
         delete this.domNode.megaSheetType;
         delete this.domNode.megaSheetHeight;
 

@@ -50,28 +50,53 @@ body *:not(input):not(textarea) {
     background-repeat: no-repeat !important;
 }
 
-.fm-breadcrumbs:first-child:not(.public-links) .loading {
+.fm-breadcrumbs .loading,
+.loading-nodes .fm-breadcrumbs:last-child .loading {
+    --icon-size: 24px;
     display: none;
-    position: absolute;
-    left: calc(50% - 8px);
-    top: 0;
+    margin: 0 -6px;
+    margin-inline-start: 4px;
 }
+
 .block-loading-spinner,
-.wait-cursor .fm-breadcrumbs:first-child:not(.public-links) .loading {
+.wait-cursor .fm-breadcrumbs:last-child:not(.public-links) .loading,
+.loading-nodes .fm-breadcrumbs:last-child .loading {
     display: block;
     font-size: 0 !important;
     background-position: 100% 0;
     animation: rotate 0.8s infinite linear;
     animation-timing-function: steps(8, end);
 }
-.wait-cursor .fm-breadcrumbs:first-child:not(.public-links) .not-loading {
-    opacity: 0;
+
+.wait-cursor .fm-breadcrumbs:last-child:not(.public-links) .next-arrow,
+.loading-nodes .fm-breadcrumbs:last-child .next-arrow {
+    display: none;
 }
 
-.fmdb-working #topmenu .membership-status,
-.wait-cursor .fm-breadcrumbs:first-child:not(.public-links) .right-arrow-bg > span {
-    visibility: collapse;
+/* Force loading more then X nodes, disable soring UI */
+
+.loading-nodes .fm-right-header .fm-filter-chips,
+.loading-nodes .fm-header-grid-extra,
+.loading-nodes .files-grid-view .grid-table th {
+    pointer-events: none;
 }
+
+.loading-nodes .fm-right-header .fm-filter-chips .fm-filter-chip-button *,
+.loading-nodes .fm-header-grid-extra *,
+.loading-nodes .files-grid-view .grid-table th * {
+    --mask-color: var(--mobile-text-disabled);
+    color: var(--mobile-text-disabled);
+    border-color: var(--mobile-text-disabled);
+}
+
+.loading-nodes .fm-header-grid-extra > i.select-all-checkbox {
+    outline: 1px solid var(--mobile-text-disabled);
+}
+
+.loading-nodes .fm-filter-chips .fm-filter-chip-button {
+    background: var(--mobile-button-disabled);
+}
+
 
 /* Developer dark mode */
 html.dark-mode {

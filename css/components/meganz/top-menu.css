@@ -219,7 +219,8 @@
 .mega-top-menu.small-resize-pane .storage-block .storage-usage-panel .loader,
 .mega-top-menu.small-resize-pane .storage-block .storage-usage-panel .info a.upgrade .text-box-wrapper,
 .mega-top-menu.small-resize-pane .storage-block .lp-storage-information-popup,
-.mega-top-menu.small-resize-pane .storage-block .storage-usage-panel .achieve-link {
+.mega-top-menu.small-resize-pane .storage-block .storage-usage-panel .achieve-link,
+.mega-top-menu.small-resize-pane .menu .menu-item .right-badge {
     display: none;
 }
 .mega-top-menu.small-resize-pane .top-nav {

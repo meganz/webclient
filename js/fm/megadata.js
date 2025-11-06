@@ -227,7 +227,22 @@ function MegaData() {
         seal.delete(safe[i]);
     }
 
+    let pDbg = self.d > 10;
+    if (pDbg) {
+        pDbg = {
+            set(target, prop, value) {
+                console.warn(`[proxy] mutating M.%s`, prop, target[prop], value);
+                return Reflect.set(target, prop, value);
+            },
+            deleteProperty(target, prop) {
+                console.warn(`[proxy] removing M.%s...`, prop, target[prop]);
+                return Reflect.deleteProperty(target, prop);
+            }
+        };
+    }
+
     return new Proxy(this, {
+        ...pDbg,
         defineProperty(target, prop, descriptor) {
             if (seal.has(prop)) {
                 throw new MEGAException('Invariant', prop, 'DataCloneError');

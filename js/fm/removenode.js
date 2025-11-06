@@ -8,10 +8,10 @@ function removeUInode(h, parent) {
 
     // check subfolders
     if (n && n.t) {
-        const cns = M.c[parent];
+        const cns = M.getChildren(parent);
         if (cns) {
             for (var cn in cns) {
-                if (M.d[cn] && M.d[cn].t && cn !== h) {
+                if (cn !== h && M.getNodeByHandle(cn).t) {
                     hasSubFolders++;
                     break;
                 }
@@ -55,7 +55,8 @@ function removeUInode(h, parent) {
             }
         }
     });
-    var hasItems = !!M.v.length;
+
+    const hasItems = M.v.length || mega.lite.partial;
     const __markEmptied = () => {
 
         let fmRightFileBlock = document.querySelector('.fm-right-files-block:not(.in-chat)');
@@ -271,11 +272,13 @@ async function fmremove(selectedNodes, skipDelWarning) {
     if (!Array.isArray(selectedNodes)) {
         selectedNodes = selectedNodes ? [selectedNodes] : [];
     }
-
     const handles = [...selectedNodes];
-    await dbfetch.coll(handles.filter((h) => h && h.length === 8)).catch(nop);
 
-    if (handles.some((h) => M.d[h] && M.d[h].su)) {
+    if (!mega.infinity) {
+        await dbfetch.coll(handles.filter((h) => h && h.length === 8)).catch(nop);
+    }
+
+    if (handles.some((h) => M.getNodeByHandle(h).su)) {
         const promises = [];
 
         for (let i = handles.length; i--;) {
@@ -299,7 +302,7 @@ async function fmremove(selectedNodes, skipDelWarning) {
     skipDelWarning = skipDelWarning ? 1 : mega.config.get('skipDelWarning');
 
     for (i = 0; i < selectedNodes.length; i++) {
-        var n = M.d[selectedNodes[i]];
+        const n = M.getNodeByHandle(selectedNodes[i]);
         const s4Type = M.getS4NodeType(n);
 
         if (n && n.su) {

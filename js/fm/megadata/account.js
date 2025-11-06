@@ -1099,7 +1099,6 @@ MegaData.prototype.showOverStorageQuota = async function(quota, options) {
     var $upgradeBtn = $('.choose-plan span', $strgdlg).text(l[8696]);
     const $headerFull = $('header h2.full', $strgdlg);
     const $estimatedPriceText = $('.estimated-price-text', $strgdlg);
-    const $rubbishBinText = $('.rubbish-text', $strgdlg).toggleClass('hidden', quota === EPAYWALL);
     const $fBanner = $('.fm-notification-block.full', $pmMain).removeClass('visible');
     const $afBanner = $('.fm-notification-block.almost-full', $pmMain).removeClass('visible');
 
@@ -1325,14 +1324,6 @@ MegaData.prototype.showOverStorageQuota = async function(quota, options) {
             closeDialog();
         });
     }
-
-    $('a', $rubbishBinText).attr('href', '/fm/' + M.RubbishID)
-        .rebind('click', function() {
-            closeDialog();
-            loadSubPage('fm/' + M.RubbishID);
-            return false;
-        });
-
 
     // if another dialog wasn't opened previously
     if (!prevState || Object(options).custom || quota === EPAYWALL) {

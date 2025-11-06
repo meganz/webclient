@@ -14354,28 +14354,21 @@ class Breadcrumbs extends mixins.w9 {
   getBreadcrumbDropdownContents(items) {
     const contents = [];
     for (const item of items) {
-      let icon;
       if (!item.name) {
         continue;
-      }
-      if (item.type === 'cloud-drive') {
-        icon = REaCt().createElement("i", {
-          className: "sprite-fm-mono icon-cloud icon24"
-        });
-      } else if (item.type === 'backups') {
-        icon = REaCt().createElement("i", {
-          className: "sprite-fm-mono icon-database-filled icon24"
-        });
-      } else if (item.type === 'folder') {
-        icon = REaCt().createElement("i", {
-          className: "sprite-fm-mono icon-folder-filled icon24"
-        });
       }
       contents.push(REaCt().createElement("a", {
         className: "crumb-drop-link",
         key: `drop_link_${  item.nodeId}`,
         onClick: e => this.onBreadcrumbNodeClick(e, item.nodeId)
-      }, icon, REaCt().createElement("span", null, item.name)));
+      }, REaCt().createElement("i", {
+        className: `sprite-fm-mono icon24 ${{
+          'cloud-drive': 'icon-cloud',
+          'backups': 'icon-database-filled',
+          's4-object-storage': 'icon-bucket-triangle-thin-solid',
+          's4-buckets': 'icon-bucket-outline'
+        }[item.type] || 'folder'}`
+      }), REaCt().createElement("span", null, item.name)));
     }
     return contents;
   }
@@ -14439,7 +14432,8 @@ class Breadcrumbs extends mixins.w9 {
     const entryId = isSearch ? highlighted[0] : currentlyViewedEntry;
     if (entryId !== undefined) {
       (path || M.getPath(entryId)).forEach((nodeId, k, path) => {
-        let breadcrumbClasses = "";
+        let breadcrumbClasses = '';
+        let folderType = 'folder';
         if (nodeId === M.RootID) {
           breadcrumbClasses += " cloud-drive";
         } else {
@@ -14453,12 +14447,13 @@ class Breadcrumbs extends mixins.w9 {
         }
         const prevNodeId = path[k - 1];
         let nodeName = this.getBreadcrumbNodeText(nodeId, prevNodeId);
-        if (M.dyh) {
-          const {
-            localeName
-          } = M.dyh('breadcrumb-properties', handle);
-          if (localeName) {
-            nodeName = localeName;
+        if ('utils' in s4) {
+          const data = s4.utils.getBreadcrumbsData(nodeId);
+          if (data) {
+            ({
+              type: folderType,
+              localeName: nodeName
+            } = data);
           }
         }
         if (!nodeName) {
@@ -14479,7 +14474,7 @@ class Breadcrumbs extends mixins.w9 {
               className: "next-arrow sprite-fm-mono icon-arrow-right icon16"
             })));
           } else {
-            let folderType = nodeId === M.RootID ? 'cloud-drive' : 'folder';
+            folderType = nodeId === M.RootID ? 'cloud-drive' : folderType;
             if (M.BackupsId && nodeId === M.BackupsId) {
               folderType = 'backups';
             }
@@ -14691,7 +14686,7 @@ class CloudBrowserDialog extends modalDialogs.A.SafeShowDialogController {
     if (nodeId === 'shares' || nodeId === 's4') {
       return this.handleTabChange(nodeId);
     }
-    if (M.d[nodeId] && M.d[nodeId].t) {
+    if (M.getNodeByHandle(nodeId).t) {
       const nodeRoot = M.getNodeRoot(nodeId);
       this.setState({
         selectedTab: nodeRoot === "contacts" ? 'shares' : nodeRoot,
@@ -14724,7 +14719,7 @@ class CloudBrowserDialog extends modalDialogs.A.SafeShowDialogController {
     const filterFn = CloudBrowserDialog.getFilterFunction(this.props.customFilterFn);
     const isIncomingShare = M.getNodeRoot(entryId) === "shares";
     this.state.highlighted.forEach(nodeId => {
-      if (M.d[nodeId] && M.d[nodeId].t === 1) {
+      if (M.getNodeByHandle(nodeId).t) {
         folderIsHighlighted = true;
         if (M.tree.s4 && M.tree.s4[nodeId]) {
           isS4Cn = true;
@@ -25614,11 +25609,7 @@ class FMView extends mixins.w9 {
       'highlighted': [],
       'entries': null
     };
-    if (this.props.dataSource) {
-      this.dataSource = this.props.dataSource;
-    } else {
-      this.dataSource = M.d;
-    }
+    this.dataSource = this.props.dataSource;
     this.state.entries = this.getEntries();
     this.onAttachClicked = this.onAttachClicked.bind(this);
     this.onContextMenu = this.onContextMenu.bind(this);
@@ -25633,6 +25624,9 @@ class FMView extends mixins.w9 {
       });
     }
     this.initSelectionManager();
+  }
+  getDataSourceNode(h) {
+    return this.dataSource && this.dataSource[h] || M.getNodeByHandle(h);
   }
   _translateFmConfigSortMode(currentSortModes) {
     const sortId = this.props.fmConfigSortId;
@@ -25670,7 +25664,7 @@ class FMView extends mixins.w9 {
     selectedList = [...selectedList];
     const highlighted = selectedList;
     if (this.props.folderSelectNotAllowed && !this.props.folderSelectable) {
-      selectedList = selectedList.filter(nodeId => this.dataSource[nodeId].t !== 1);
+      selectedList = selectedList.filter(nodeId => !this.getDataSourceNode(nodeId).t);
     }
     this.setState({
       'selected': selectedList,
@@ -25689,14 +25683,18 @@ class FMView extends mixins.w9 {
     const minSearchLength = self.props.minSearchLength || 3;
     const showSen = mega.sensitives.showGlobally;
     if (self.props.currentlyViewedEntry === "search" && self.props.searchValue && self.props.searchValue.length >= minSearchLength) {
-      dataSource = this.dataSource;
+      dataSource = this.dataSource || {
+        ...M.tnd,
+        ...M.d
+      };
       filterFunc = M.getFilterBySearchFn(self.props.searchValue);
     } else {
-      const tmp = M.c[self.props.currentlyViewedEntry] || M.tree[self.props.currentlyViewedEntry] || this.props.dataSource;
+      const tmp = M.getChildren(self.props.currentlyViewedEntry) || M.tree[self.props.currentlyViewedEntry] || this.props.dataSource;
       dataSource = Object.create(null);
       for (const h in tmp) {
-        if (this.dataSource[h]) {
-          dataSource[h] = this.dataSource[h];
+        const n = this.getDataSourceNode(h);
+        if (n) {
+          dataSource[h] = n;
         }
       }
     }
@@ -25816,7 +25814,7 @@ class FMView extends mixins.w9 {
         });
         return;
       }
-      if (!this.dataSource[handle] || this.dataSource[handle].t && !M.c[handle]) {
+      if (this.getDataSourceNode(handle).t && !M.getChildren(handle)) {
         this.setState({
           'isLoading': true
         });

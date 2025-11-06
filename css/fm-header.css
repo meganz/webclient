@@ -223,8 +223,9 @@
     --icon-size: 16px;
 }
 .fm-breadcrumbs .right-arrow-bg {
+    align-items: center;
+    display: flex;
     font: var(--text-body1);
-    display: block;
     padding: 0 8px;
     position: relative;
     text-align: center;

@@ -326,8 +326,8 @@ var notify = {
         }
 
         // Make sure that neither notification has been deleted
-        const previousNotificationNode = M.d[previousNotification.data.h];
-        const currentNotificationNode = M.d[currentNotification.data.h];
+        const previousNotificationNode = M.getNodeByHandle(previousNotification.data.h);
+        const currentNotificationNode = M.getNodeByHandle(currentNotification.data.h);
         if (!previousNotificationNode || !currentNotificationNode) {
             return false;
         }
@@ -1730,7 +1730,7 @@ var notify = {
         var title = '';
         var cssClass = '';
         var handle = notification.data.h;
-        var node = M.d[handle] || {};
+        const node = M.getNodeByHandle(handle);
         var name = (node.name) ? '(' + notify.shortenNodeName(node.name) + ')' : '';
 
         // Takedown notice
@@ -1924,14 +1924,13 @@ var notify = {
         'use strict';
 
         const fileHandle = notification.data.h || notification.allDataItems[0].h;
-        const fileNode = M.d[fileHandle] || {};
-        const folderHandle = fileNode.p || notification.data.n;
+        const folderHandle = M.getNodeByHandle(fileHandle).p || notification.data.n;
 
         // File has likely been deleted
         if (!folderHandle) {
             return false;
         }
-        const folderNode = M.d[folderHandle];
+        const folderNode = M.getNodeByHandle(folderHandle);
         const folderName = folderNode.name ? notify.shortenNodeName(folderNode.name) : false;
 
         let title;

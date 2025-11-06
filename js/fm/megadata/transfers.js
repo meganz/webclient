@@ -8,20 +8,20 @@ MegaData.prototype.getDownloadFolderNodes = function(n, md, nodes, paths) {
         var path = '';
 
         for (var k = 0; k < p.length; k++) {
-            if (this.d[p[k]] && this.d[p[k]].t) {
-                path = M.getSafeName(this.d[p[k]].name) + '/' + path;
+            if (this.getNodeByHandle(p[k]).t) {
+                path = M.getSafeName(this.getNodeByHandle(p[k]).name) + '/' + path;
             }
             if (p[k] == n) {
                 break;
             }
         }
 
-        if (!this.d[subids[j]].t) {
-            nodes.push(subids[j]);
-            paths[subids[j]] = path;
+        if (this.getNodeByHandle(subids[j]).t) {
+            console.log('0 path', path);
         }
         else {
-            console.log('0 path', path);
+            nodes.push(subids[j]);
+            paths[subids[j]] = path;
         }
     }
 };
@@ -263,23 +263,23 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
 
     if (!is_extension && !preview && !z && dlMethod === MemoryIO) {
         var nf = [], cbs = [];
-        for (var i in n) {
-            if (this.d[n[i]] && this.d[n[i]].t) {
+        for (const i in n) {
+            if (this.getNodeByHandle(n[i]).t) {
                 var nn = [], pp = {};
                 this.getDownloadFolderNodes(n[i], false, nn, pp);
-                cbs.push(this.addDownload.bind(this, nn, 0x21f9A, pp, this.d[n[i]].name));
+                cbs.push(this.addDownload.bind(this, nn, 0x21f9A, pp, this.getNodeByHandle(n[i]).name));
             }
             else {
                 nf.push(n[i]);
             }
         }
 
-        quiet = n && M.d[n[0]] && M.d[n[0]].t && M.d[n[0]].tb;
+        quiet = n && M.getNodeByHandle(n[0]).t && M.getNodeByHandle(n[0]).tb;
         n = nf;
 
         if (cbs.length) {
-            for (var i in cbs) {
-                Soon(cbs[i]);
+            for (const j in cbs) {
+                Soon(cbs[j]);
             }
         }
     }
@@ -290,17 +290,17 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
         quiet = true;
     }
     else {
-        for (var i in n) {
-            if (this.d[n[i]]) {
-                if (this.d[n[i]].t) {
-                    this.getDownloadFolderNodes(n[i], !!z, nodes, paths);
+        for (const k in n) {
+            if (this.getNodeByHandle(n[k])) {
+                if (this.getNodeByHandle(n[k]).t) {
+                    this.getDownloadFolderNodes(n[k], !!z, nodes, paths);
                 }
                 else {
-                    nodes.push(n[i]);
+                    nodes.push(n[k]);
                 }
             }
-            else if (this.isFileNode(n[i])) {
-                nodes.push(n[i]);
+            else if (this.isFileNode(n[k])) {
+                nodes.push(n[k]);
             }
         }
     }
@@ -348,7 +348,7 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
     let errorStatus = null;
     for (var k in nodes) {
         /* jshint -W089 */
-        if (!nodes.hasOwnProperty(k) || !this.isFileNode((n = this.d[nodes[k]]))) {
+        if (!nodes.hasOwnProperty(k) || !this.isFileNode((n = this.getNodeByHandle(nodes[k])))) {
             n = nodes[k];
             if (this.isFileNode(n)) {
                 dlmanager.logger.info('Using plain provided node object.');
@@ -1369,7 +1369,8 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
             // On ephemeral was undefined
             target = M.RootID;
         }
-        dbfetch.get(String(target)).finally(() => {
+        target = `${target || ''}`;
+        Promise.resolve(!target || M.getChildren(target) || dbfetch.get(target)).finally(() => {
             makeDirProc();
             // M.checkGoingOverStorageQuota(ulOpSize).done(makeDirProc);
         });
@@ -1397,10 +1398,10 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
             targets[file.target] = 1;
         }
 
-        return dbfetch.geta(Object.keys(targets)).then((r) => {
+        return dbfetch.geta(Object.keys(targets).filter(h => !M.getChildren(h))).then((r) => {
             // loadingDialog.hide();
 
-            if (!M.c[target] && String(target).length !== 11 && !toChat) {
+            if (!toChat && !M.getChildren(target) && String(target).length !== 11) {
                 if (d) {
                     ulmanager.logger.warn("Error dbfetch'ing target %s", target, r);
                 }

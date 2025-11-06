@@ -14354,28 +14354,21 @@ class Breadcrumbs extends mixins.w9 {
   getBreadcrumbDropdownContents(items) {
     const contents = [];
     for (const item of items) {
-      let icon;
       if (!item.name) {
         continue;
-      }
-      if (item.type === 'cloud-drive') {
-        icon = REaCt().createElement("i", {
-          className: "sprite-fm-mono icon-cloud icon24"
-        });
-      } else if (item.type === 'backups') {
-        icon = REaCt().createElement("i", {
-          className: "sprite-fm-mono icon-database-filled icon24"
-        });
-      } else if (item.type === 'folder') {
-        icon = REaCt().createElement("i", {
-          className: "sprite-fm-mono icon-folder-filled icon24"
-        });
       }
       contents.push(REaCt().createElement("a", {
         className: "crumb-drop-link",
         key: `drop_link_${  item.nodeId}`,
         onClick: e => this.onBreadcrumbNodeClick(e, item.nodeId)
-      }, icon, REaCt().createElement("span", null, item.name)));
+      }, REaCt().createElement("i", {
+        className: `sprite-fm-mono icon24 ${{
+          'cloud-drive': 'icon-cloud',
+          'backups': 'icon-database-filled',
+          's4-object-storage': 'icon-bucket-triangle-thin-solid',
+          's4-buckets': 'icon-bucket-outline'
+        }[item.type] || 'folder'}`
+      }), REaCt().createElement("span", null, item.name)));
     }
     return contents;
   }
@@ -14439,7 +14432,8 @@ class Breadcrumbs extends mixins.w9 {
     const entryId = isSearch ? highlighted[0] : currentlyViewedEntry;
     if (entryId !== undefined) {
       (path || M.getPath(entryId)).forEach((nodeId, k, path) => {
-        let breadcrumbClasses = "";
+        let breadcrumbClasses = '';
+        let folderType = 'folder';
         if (nodeId === M.RootID) {
           breadcrumbClasses += " cloud-drive";
         } else {
@@ -14453,12 +14447,13 @@ class Breadcrumbs extends mixins.w9 {
         }
         const prevNodeId = path[k - 1];
         let nodeName = this.getBreadcrumbNodeText(nodeId, prevNodeId);
-        if (M.dyh) {
-          const {
-            localeName
-          } = M.dyh('breadcrumb-properties', handle);
-          if (localeName) {
-            nodeName = localeName;
+        if ('utils' in s4) {
+          const data = s4.utils.getBreadcrumbsData(nodeId);
+          if (data) {
+            ({
+              type: folderType,
+              localeName: nodeName
+            } = data);
           }
         }
         if (!nodeName) {
@@ -14479,7 +14474,7 @@ class Breadcrumbs extends mixins.w9 {
               className: "next-arrow sprite-fm-mono icon-arrow-right icon16"
             })));
           } else {
-            let folderType = nodeId === M.RootID ? 'cloud-drive' : 'folder';
+            folderType = nodeId === M.RootID ? 'cloud-drive' : folderType;
             if (M.BackupsId && nodeId === M.BackupsId) {
               folderType = 'backups';
             }

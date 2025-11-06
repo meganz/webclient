@@ -563,6 +563,7 @@ lazy(mega, 'rewind', () => {
         }
 
         async getRecords(timestamp) {
+            mega.rewindUtils.reset();
             mega.rewindUtils.task.reset();
 
             mega.rewindUtils.task.start('getRecords');

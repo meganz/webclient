@@ -342,12 +342,9 @@ lazy(mega, 'rewindUtils', () => {
                 nodePromise = Promise.resolve(node);
             }
 
-            mega.rewindUtils.handleWorkerMessage(
-                nodePromise,
-                'getRecords:tree:api:get:process:queue',
-                node.apiId,
-                mega.rewindUtils.queue[node.apiId].length);
-            mega.rewindUtils.queue[node.apiId].push(nodePromise);
+            const {length} = mega.rewindUtils.queue[node.apiId];
+            return mega.rewindUtils.queue[node.apiId].push(
+                nodePromise.then((node) => mega.rewindUtils.handleTreeNode(node, length)));
         }
 
         handleOwnerKey(ownerKey) {
@@ -894,6 +891,10 @@ lazy(mega, 'rewindUtils', () => {
             lazy(this, 'reinstate', () => new RewindReinstateHandler());
             lazy(this, 'task', () => new RewindTask());
 
+            this.reset();
+        }
+
+        reset() {
             this.queue = Object.create(null);
             this.inflight = Object.create(null);
             this.pending = Object.create(null);
@@ -970,40 +971,38 @@ lazy(mega, 'rewindUtils', () => {
             return api.req(payload, options).then(({result}) => result);
         }
 
-        async handleWorkerMessage(promiseData, progressSource, apiId, length) {
-            const node = await promiseData;
-
-            const qTotal = this.queue[apiId].length;
-            this.task.update(progressSource, (qTotal - length) / qTotal * 100);
+        async handleTreeNode(node, length) {
+            const qTotal = this.queue[node.apiId].length;
+            this.task.update('getRecords:tree:api:get:process:queue', (qTotal - length) / qTotal * 100);
 
             if (node.h) {
                 node.apiId = null;
                 delete node.apiId;
 
-                mega.rewind.addNodeFromWorker(node);
+                return mega.rewind.addNodeFromWorker(node);
             }
         }
 
         async checkRequestDone(apiId, progressSource, isPacket) {
-            if (this.inflight[apiId]) {
+            if (this.inflight && this.inflight[apiId]) {
                 this.task.start(progressSource);
 
                 this.task.start(`${progressSource}:queue`);
-                const limit = 10000;
-                const queue = this.queue[apiId] || [];
-                const qTotal = queue.length;
-                for (let i = 0; i < qTotal; i += limit) {
-                    if (isPacket) {
-                        this.task.update(`${progressSource}:queue`, i / qTotal * 100);
+                if (this.queue && this.queue[apiId]) {
+                    const limit = 10000;
+                    const qTotal = this.queue[apiId].length;
+                    for (let i = 0; i < qTotal; i += limit) {
+                        if (isPacket) {
+                            this.task.update(`${progressSource}:queue`, i / qTotal * 100);
+                        }
+                        const end = Math.min(i + limit, qTotal);
+                        await Promise.allSettled(this.queue[apiId].slice(i, end));
                     }
-                    const end = Math.min(i + limit, qTotal);
-                    await Promise.allSettled(queue.slice(i, end));
+                    delete this.queue[apiId];
                 }
-                delete this.queue[apiId];
                 this.task.complete(`${progressSource}:queue`);
 
-                const inflight = this.inflight[apiId];
-                for (const api of inflight) {
+                for (const api of this.inflight[apiId]) {
                     if (api.residual && api.residual.length) {
                         api.residual[0].resolve();
                     }
@@ -1012,30 +1011,25 @@ lazy(mega, 'rewindUtils', () => {
 
                 this.task.start(`${progressSource}:putQueue`);
                 if (mega.rewind.putQueue && mega.rewind.putQueue.length) {
-                    await new Promise((resolve) => {
-                        let oldPromise = null;
-                        const promises = [];
+                    let oldPromise = null;
+                    const promises = [];
 
-                        const batch = mega.rewind.putQueue.splice(0, FMDB_FLUSH_THRESHOLD);
-                        const bTotal = batch.length;
-                        for (let i = 0; i < bTotal; i++) {
-                            const [putFunction, ...putArgs] = batch[i];
-                            const promise = putFunction(...putArgs);
-                            if (promise !== oldPromise) {
-                                oldPromise = promise;
-                                promises.push(oldPromise.finally(() => {
-                                    this.task.update(`${progressSource}:putQueue`, i / bTotal * 100);
-                                }));
-                            }
+                    const batch = mega.rewind.putQueue.splice(0, FMDB_FLUSH_THRESHOLD);
+                    const bTotal = batch.length;
+
+                    for (let i = 0; i < bTotal; i++) {
+                        const [putFunction, ...putArgs] = batch[i];
+                        const promise = putFunction(...putArgs);
+                        if (promise !== oldPromise) {
+                            oldPromise = promise;
+                            promises.push(oldPromise.finally(() => {
+                                this.task.update(`${progressSource}:putQueue`, i / bTotal * 100);
+                            }));
                         }
+                    }
 
-                        Promise.allSettled(promises).then(() => {
-                            if (d) {
-                                logger.info('Flushing nodes - request done');
-                            }
-                            resolve();
-                        });
-                    });
+                    await Promise.allSettled(promises);
+                    logger.info('Flushing nodes done');
                 }
                 this.task.complete(`${progressSource}:putQueue`);
 

@@ -292,7 +292,7 @@ lazy(mega, 'lite', () => {
 
                 // Show All
                 M.atrophy(null);
-                eventlog(501018);
+                eventlog(501018, JSON.stringify([1, M.currentrootid, M.currentdirid]));
             }
         };
 

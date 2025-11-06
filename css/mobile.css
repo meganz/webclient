@@ -4304,7 +4304,8 @@ div.checkboxOn {
     padding-top: 4px;
     font: var(--mobile-font-caption-small-regular);
 }
-.storage-dialog-contents span.gotorub {
+
+.storage-dialog-contents a.clickurl {
     color: var(--mobile-link-primary);
     text-decoration: underline;
 }

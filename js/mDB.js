@@ -381,7 +381,7 @@ FMDB.prototype.serialize = function(table, row) {
             Object.assign(j, t);
 
             if (self.d) {
-                this.logger.assert(!j.transient, 'a transient node was slipped into FMDB...');
+                this.logger.assert(!this.transient(j), 'a transient node was slipped into FMDB...', j.p, j.h, [j]);
             }
         }
         else {
@@ -1212,6 +1212,14 @@ FMDB.prototype.restorenode = Object.freeze({
     }
 });
 
+// @todo FIXME,
+// @todo such a node may does originate from worker_procmsg(),
+// @todo we need to stop API from providing a back-to-root traversal we didn't asked for...
+FMDB.prototype.transient = function(n) {
+    'use strict';
+    return n.transient || M.tnc[n.h] || M.tnc[n.p];
+};
+
 // enqueue IndexedDB puts
 // sn must be added last and effectively (mostly actually) "commits" the "transaction"
 // the next addition will then start a new "transaction"
@@ -1220,8 +1228,8 @@ FMDB.prototype.add = function fmdb_add(table, row) {
     "use strict";
 
     if (!this.crashed) {
-        if ((row.d || row).transient) {
-            this.logger.error(`Prevented a transient node from sneaking into...`, row);
+        if (this.useMap[table] && this.transient(row.d || row)) {
+            this.logger.warn(`Prevented a transient node from sneaking into...`, row);
         }
         else {
             this.enqueue(table, row, 0);
@@ -3167,7 +3175,7 @@ Object.defineProperty(self, 'dbfetch', (function() {
                         console.warn(`Invalid parent node for ${n.h} (${n.p}), expected ${h}`);
                     }
                 }
-                onIdle(() => eventlog(501017));
+                onIdle(() => eventlog(501017, JSON.stringify([1, h, M.currentrootid, M.currentdirid])));
 
                 return h;
             }

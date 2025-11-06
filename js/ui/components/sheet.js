@@ -156,9 +156,7 @@ class MegaSheet extends MegaOverlay {
             closeDialog();
             this.safeShow = false;
         }
-        if (typeof this.onClose === 'function') {
-            this.onClose();
-        }
+
         this.clear();
 
         super.hide(name);

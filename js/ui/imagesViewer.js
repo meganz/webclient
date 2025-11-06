@@ -725,6 +725,11 @@ var slideshowid;
             return false;
         }
 
+        if (zoomPan && zoomPan.domNode.classList.value !== $img[0].classList.value) {
+            zoomPan.destroy();
+            zoomPan = false;
+        }
+
         let imgWidth, imgHeight;
         const id = $imgWrap.attr('data-image');
         const viewerWidth = $imgWrap.width();

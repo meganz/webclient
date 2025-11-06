@@ -632,6 +632,30 @@ lazy(s4, 'utils', () => {
             });
         },
 
+        getBreadcrumbsData(h) {
+            const s4Type = M.getS4NodeType(h);
+
+            if (!s4Type) {
+                return false;
+            }
+
+            if (s4Type === 'container') {
+                return {
+                    type: 's4-object-storage',
+                    localeName: s4.utils.getContainersList().length === 1 ? l.obj_storage : M.getNameByHandle(h)
+                };
+            }
+
+            if (s4Type === 'bucket') {
+                return {
+                    type: 's4-buckets',
+                    localeName: M.getNameByHandle(h)
+                };
+            }
+
+            return false;
+        },
+
         /**
          * Set node multiple text in order to avoid long items name using all the container space
          * The purpose is to have following representations in the UI

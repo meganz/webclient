@@ -20,6 +20,11 @@ class MegaZoomPan {
                 translateY: 0,
                 scale: 1
             },
+            touchGesture: {
+                isActive: false,
+                initialDistance: 0,
+                initialScale: 1
+            }
         };
         this.viewerNode = this.domNode.closest('.media-viewer');
         this.containerNode = this.domNode.parentNode;
@@ -50,6 +55,9 @@ class MegaZoomPan {
                 e.movementY
             );
         };
+        this.onTouchStart = this.onTouchStart.bind(this);
+        this.onTouchMove = this.onTouchMove.bind(this);
+        this.onTouchEnd = this.onTouchEnd.bind(this);
 
         // Init slider
         if (this.slider) {
@@ -62,6 +70,9 @@ class MegaZoomPan {
         this.containerNode.addEventListener('mouseup', this.onPick);
         this.containerNode.addEventListener('mouseleave', this.onPick);
         this.containerNode.addEventListener('mousemove', this.onMove);
+        this.containerNode.addEventListener('touchstart', this.onTouchStart, { passive: false });
+        this.containerNode.addEventListener('touchmove', this.onTouchMove, { passive: false });
+        this.containerNode.addEventListener('touchend', this.onTouchEnd, { passive: false });
 
         // Init Zoom
         $(this.viewerNode).rebind('mousewheel.imgzoom', (e) => {
@@ -246,6 +257,67 @@ class MegaZoomPan {
         );
     }
 
+    getTouchDistance(touch1, touch2) {
+        const dx = touch1.clientX - touch2.clientX;
+        const dy = touch1.clientY - touch2.clientY;
+        return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    getTouchCenter(touch1, touch2) {
+        return {
+            x: (touch1.clientX + touch2.clientX) / 2,
+            y: (touch1.clientY + touch2.clientY) / 2
+        };
+    }
+
+    onTouchStart(e) {
+        const touches = [...e.touches];
+
+        if (touches.length === 2) {
+            e.preventDefault();
+
+            const touch1 = touches[0];
+            const touch2 = touches[1];
+            const distance = this.getTouchDistance(touch1, touch2);
+
+            if (distance > 0) {
+                this.state.touchGesture = {
+                    isActive: true,
+                    initialDistance: distance,
+                    initialScale: this.state.transform.scale
+                };
+            }
+        }
+    }
+
+    onTouchMove(e) {
+        const touches = [...e.touches];
+
+        if (touches.length === 2 && this.state.touchGesture.isActive) {
+            e.preventDefault();
+
+            const touch1 = touches[0];
+            const touch2 = touches[1];
+            const currentDistance = this.getTouchDistance(touch1, touch2);
+            const center = this.getTouchCenter(touch1, touch2);
+
+            const scaleChange = currentDistance / this.state.touchGesture.initialDistance;
+            const newScale = this.state.touchGesture.initialScale * scaleChange;
+
+            this.zoom(center.x, center.y, newScale, true);
+        }
+    }
+
+    onTouchEnd(e) {
+        const touches = [...e.touches];
+
+        if (touches.length < 2) {
+            this.state.touchGesture.isActive = false;
+            this.state.touchGesture.initialDistance = 0;
+            this.state.touchGesture.initialScale = 1;
+        }
+    }
+
     reset() {
         if (this.domNode) {
             this.domNode.style.transformOrigin = '';
@@ -263,6 +335,11 @@ class MegaZoomPan {
                 translateY: 0,
                 scale: 1
             },
+            touchGesture: {
+                isActive: false,
+                initialDistance: 0,
+                initialScale: 1
+            }
         };
         this.zoomMode = false;
     }
@@ -273,6 +350,9 @@ class MegaZoomPan {
         this.containerNode.removeEventListener('mouseup', this.onPick);
         this.containerNode.removeEventListener('mouseleave', this.onPick);
         this.containerNode.removeEventListener('mousemove', this.onMove);
+        this.containerNode.removeEventListener('touchstart', this.onTouchStart);
+        this.containerNode.removeEventListener('touchmove', this.onTouchMove);
+        this.containerNode.removeEventListener('touchend', this.onTouchEnd);
         $(this.viewerNode).unbind('mousewheel.imgzoom');
         $(this.containerNode).unbind('mousemove.imgzoom');
 

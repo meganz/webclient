@@ -202,6 +202,11 @@ var megasync = (function() {
      * @return {MegaPromise}
      */
     function megaSyncRequest(args, resolve, reject) {
+
+        if (typeof reject === 'function') {
+            reject('Disabled');
+        }
+        return MegaPromise.reject('Disabled');
         // var timeout = (args.a === 'v') ? 250 : 0;
         var timeout = 0;
         try {

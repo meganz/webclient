@@ -1484,7 +1484,7 @@ FileManager.prototype.initFileManagerUI = function() {
                         targetFolder = M.currentdirid;
                     }
                 }
-                else if (tab.prev && (M.d[tab.prev] || M.isCustomView(tab.prev) ||
+                else if (tab.prev && (M.getNodeByHandle(tab.prev) || M.isCustomView(tab.prev) ||
                     (tab.subpages && tab.subpages.indexOf(tab.prev) > -1))) {
                     targetFolder = tab.prev;
                 }
@@ -1589,7 +1589,7 @@ FileManager.prototype.initShortcutsAndSelection = function(container, aUpdate, r
         // or re-rendering the same view but previous view is media discovery view
         else if (!M.gallery && !$('#gallery-view').hasClass('hidden')) {
             for (let i = $.selected.length - 1; i >= 0; i--) {
-                if (!M.v.includes(M.d[$.selected[i]])) {
+                if (!M.v.includes(M.getNodeByHandle($.selected[i]))) {
                     $.selected.splice(i, 1);
                 }
             }
@@ -2359,10 +2359,10 @@ FileManager.prototype.initUIKeyEvents = function() {
             !(M.onDeviceCenter && mega.devices.ui &&
                 mega.devices.ui.getRenderSection() === 'device-centre-devices')
         ) {
-            const nodes = s.filter(h => !M.d[h] || M.getNodeRoot(M.d[h].h) !== M.InboxID);
             if (M.isInvalidUserStatus() || $.msgDialog === 'remove') {
                 return;
             }
+            const nodes = s.filter(h => M.getNodeRoot(h) !== M.InboxID);
 
             if (nodes.length) {
                 // delete
@@ -2393,7 +2393,7 @@ FileManager.prototype.initUIKeyEvents = function() {
             $.selected = s.filter(h => !M.getNodeShare(h).down);
 
             if ($.selected && $.selected.length > 0) {
-                var n = M.d[$.selected[0]];
+                const n = M.getNodeByHandle($.selected[0]);
 
                 if (!M.dcd[$.selected[0]] && M.getNodeRoot(n.h) === M.RubbishID) {
                     mega.ui.mInfoPanel.show($.selected);
@@ -3192,7 +3192,7 @@ FileManager.prototype.addGridUI = function(refresh) {
         const node = M.getNodeByHandle(h);
 
         // Incoming Shares section if shared folder doesn't have parent
-        const originalTarget = node.su && (!node.p || !M.d[node.p]) ? 'shares' : node.p;
+        const originalTarget = M.getNodeParent(node);
         let target = originalTarget;
 
         const isInboxRoot = M.getNodeRoot(target) === M.InboxID;
@@ -4044,7 +4044,7 @@ FileManager.prototype.initStatusBarLinks = function() {
                 mega.gallery.albums.previewSelectedElements();
             }
             else {
-                slideshow(M.d[$.selected[0]], false);
+                slideshow($.selected[0], false);
             }
         }
         else if (this.classList.contains('delete-from-album')) {

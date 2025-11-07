@@ -356,6 +356,8 @@ lazy(mega, 'rewindUtils', () => {
                 }
 
                 rewindWorker.hello.initSignal.push(ownerKey);
+                // TODO: ownerKeyPromise will never resolve most of the times:
+                // rewind process is stuck waiting these promises to resolve in "checkRequestDone"
                 const ownerKeyPromise = rewindWorker.broadcast('decrypt', ownerKey);
 
                 if (!mega.rewindUtils.queue[apiId]) {

@@ -356,7 +356,7 @@ lazy(mega, 'rewindUtils', () => {
                 }
 
                 rewindWorker.hello.initSignal.push(ownerKey);
-                // TODO: ownerKeyPromise will never resolve most of the times:
+                // TODO: ownerKeyPromise will never resolve the second time:
                 // rewind process is stuck waiting these promises to resolve in "checkRequestDone"
                 const ownerKeyPromise = rewindWorker.broadcast('decrypt', ownerKey);
 
@@ -974,8 +974,14 @@ lazy(mega, 'rewindUtils', () => {
         }
 
         async handleTreeNode(node, length) {
-            const qTotal = this.queue[node.apiId].length;
-            this.task.update('getRecords:tree:api:get:process:queue', (qTotal - length) / qTotal * 100);
+            if (!node) {
+                return;
+            }
+
+            if (this.queue && this.queue[node.apiId]) {
+                const qTotal = this.queue[node.apiId].length;
+                this.task.update('getRecords:tree:api:get:process:queue', (qTotal - length) / qTotal * 100);
+            }
 
             if (node.h) {
                 node.apiId = null;

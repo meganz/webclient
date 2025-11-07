@@ -1245,6 +1245,7 @@ lazy(mega, 'keyMgr', () => {
 
                 return k1 && decryptFrom(k1, u) || decryptFrom(k2, u);
             });
+            const nodes = new Set();
 
             // (new users appearing during the commit attempts will not be cached and have to wait for the next round)
             do {
@@ -1261,6 +1262,7 @@ lazy(mega, 'keyMgr', () => {
                         // decrypted successfully - set key and delete record
                         crypto_setsharekey(node, str_to_a32(sharekey), false, true);
                         delete this.pendinginshares[node];
+                        nodes.add(node);
                         changed = true;
 
                         if (d) {
@@ -1291,6 +1293,22 @@ lazy(mega, 'keyMgr', () => {
                     break;
                 }
             } while (!await this.commit());
+
+            return nodes.size && M.collectNodes([...nodes])
+                .then(() => {
+                    const bulk = [...nodes].map((h) => M.getNodes(h, true));
+
+                    return Promise.all(bulk);
+                })
+                .then((tree) => {
+                    return tree.flat()
+                        .filter((h) => !crypto_keyok(M.getNodeByHandle(h)));
+                })
+                .then((nodes) => nodes.length && crypto_fixmissingkeys(array.to.object(nodes)))
+                .catch((ex) => {
+                    reportError(ex);
+                    throw ex;
+                });
         }
 
         // cache peer public keys required to decrypt pendinginshare

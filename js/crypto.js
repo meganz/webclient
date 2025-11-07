@@ -2680,7 +2680,7 @@ function crypto_fixmissingkeys(hs) {
 
     if (hs) {
         for (var h in hs) {
-            var n = M.d[h];
+            const n = M.getNodeByHandle(h);
 
             if (n && !crypto_keyok(n)) {
                 crypto_decryptnode(n);

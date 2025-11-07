@@ -343,7 +343,7 @@ lazy(mega, 'rewindUtils', () => {
             }
 
             const {length} = mega.rewindUtils.queue[node.apiId];
-            return mega.rewindUtils.queue[node.apiId].push(
+            mega.rewindUtils.queue[node.apiId].push(
                 nodePromise.then((node) => mega.rewindUtils.handleTreeNode(node, length)));
         }
 
@@ -979,7 +979,7 @@ lazy(mega, 'rewindUtils', () => {
                 node.apiId = null;
                 delete node.apiId;
 
-                return mega.rewind.addNodeFromWorker(node);
+                mega.rewind.addNodeFromWorker(node);
             }
         }
 

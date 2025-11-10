@@ -356,8 +356,9 @@ lazy(mega, 'rewindUtils', () => {
                 }
 
                 rewindWorker.hello.initSignal.push(ownerKey);
-                // TODO: ownerKeyPromise will never resolve the second time:
-                // rewind process is stuck waiting these promises to resolve in "checkRequestDone"
+                // in some cases "ownerKeyPromise" will never resolve the second time run
+                // - rewind process is stuck waiting these promises to resolve in "checkRequestDone"
+                // Fixed by removing rewindWorker at the end of "checkRequestDone"
                 const ownerKeyPromise = rewindWorker.broadcast('decrypt', ownerKey);
 
                 if (!mega.rewindUtils.queue[apiId]) {
@@ -1047,6 +1048,11 @@ lazy(mega, 'rewindUtils', () => {
                     mega.rewind.sumSizeData();
                     logger.info(`Api.checkRequestDone -` +
                         `Downloaded ${Object.keys(mega.rewind.nodeDictionary).length - 1} nodes`);
+                }
+
+                if (rewindWorker) {
+                    rewindWorker.dispose();
+                    rewindWorker = null;
                 }
 
                 logger.info(`Api.checkRequestDone - Request done - with inflight - isPacket: ${isPacket}`);

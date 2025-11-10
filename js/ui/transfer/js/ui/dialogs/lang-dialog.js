@@ -16,8 +16,12 @@ lazy(T.ui, 'langDialog', () => {
     const setLanguage = (e) => {
         const code = e.currentTarget.dataset.code;
         if (code && code !== lang) {
-            localStorage.lang = code;
-            location.reload();
+            T.ui.page.safeLeave().then((res) => {
+                if (res === true) {
+                    localStorage.lang = code;
+                    location.reload();
+                }
+            });
         }
     };
 

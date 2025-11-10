@@ -116,6 +116,10 @@ lazy(T.ui, 'loginDialog', () => {
 
         async tryLogin(e) {
             stop(e);
+
+            if (!await T.ui.page.safeLeave()) {
+                return false;
+            }
             /*
             disable temporary session warning for now (as we don't properly support it on transfer.it):
             we may improve in the future

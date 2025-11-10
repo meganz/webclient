@@ -562,7 +562,7 @@
             {
                 buttonId: 'new-link-item',
                 text: l[20667],
-                icon: 'sprite-fm-mono icon-link-thin-outline',
+                icon: 'sprite-fm-mono icon-plus-light-solid',
                 onClick() {
                     if (M.isInvalidUserStatus()) {
                         return;
@@ -851,7 +851,7 @@
             {
                 buttonId: 'copy-link',
                 text: l.copy_link,
-                icon: 'sprite-fm-mono icon-link-thin-outline',
+                icon: 'sprite-fm-mono icon-copy-link-thin-outline',
                 onClick() {
                     const links = [];
                     for (const handle of mega.ui.contextMenu.selectedItems) {
@@ -874,7 +874,8 @@
                             }
                         }
                     }
-                    copyToClipboard(links.join('\n'), mega.icu.format(l.toast_copy_link, links.length));
+                    copyToClipboard(links.join('\n'));
+                    mega.ui.toast.show(links.length > 1 ? l.links_copied : l[1642]);
                 }
             },
             {

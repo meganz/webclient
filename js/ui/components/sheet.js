@@ -154,7 +154,7 @@ class MegaSheet extends MegaOverlay {
         mega.ui.overlay.domNode.classList.remove('arrange-to-back');
 
         if ($.msgDialog) {
-            closeMsg();
+            closeMsg(null);
         }
         else if (this.safeShow && $.dialog === this.name) {
             closeDialog();

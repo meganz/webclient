@@ -1174,6 +1174,37 @@ body.de .mega-dialog.contact-picker-widget {
 }
 /* end of MegaSync dialog */
 
+/* Megasync local network access dialog */
+
+.msg-dialog .lna-dialog.msync-perm-info {
+    margin-bottom: 12px;
+}
+.msg-dialog .lna-dialog.msync-perm-info i {
+    line-height: 16px;
+    margin: 0 4px;
+}
+.msg-dialog .lna-dialog.lna-image {
+    background-repeat: no-repeat;
+    background-size: contain;
+    margin: 24px 0;
+    height: 250px;
+    width: 560px;
+}
+.msg-dialog .lna-dialog.lna-reset-image {
+    background-image: url("../images/mega/lna-reset-light.png");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-reset-image {
+    background-image: url("../images/mega/lna-reset-dark.png");
+}
+.msg-dialog .lna-dialog.lna-prompt-image {
+    background-image: url("../images/mega/lna-prompt-light.png");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-prompt-image {
+    background-image: url("../images/mega/lna-prompt-dark.png");
+}
+
+/* end of Megasync local network access dialog */
+
 /* FM file versioning overlay */
 .fm-versioning.overlay {
     position: absolute;

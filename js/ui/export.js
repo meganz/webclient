@@ -1402,7 +1402,6 @@ function logExportEvt(evtId, data) {
 
         if (sheet.name === name) {
             sheet.hide();
-            sheet.clear();
         }
 
         if ($.dialog === name) {

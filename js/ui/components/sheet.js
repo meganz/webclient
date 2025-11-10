@@ -12,6 +12,10 @@ class MegaSheet extends MegaOverlay {
                 }
                 this.hide();
                 this.trigger('close');
+
+                if (typeof this.onClose === 'function') {
+                    this.onClose();
+                }
             }
         });
 

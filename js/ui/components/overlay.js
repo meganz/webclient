@@ -197,6 +197,11 @@ class MegaOverlay extends MegaComponent {
             }
 
             this.hide();
+
+            if (typeof this.onClose === 'function') {
+                this.onClose();
+            }
+
             if (mega.ui.toast) {
                 mega.ui.toast.rack.removeClass('above-actions');
             }

@@ -1605,6 +1605,7 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
                 }
             });
 
+            const eventIdMap = [500998, 500999, 501000, 501016, 501001, 501002];
             const $customChartLegend = $('.storage-pie-data-container .storage-division-container', $storageAnalysisPie)
                 .rebind('click.subuser', function chartLegendClickHandler(e) {
                     const $me = $(this);
@@ -1623,6 +1624,10 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
                     }
                     else if ($me.hasClass('rubbish-node')) {
                         ix = 5;
+                    }
+
+                    if (eventIdMap[ix]) {
+                        eventlog(eventIdMap[ix]);
                     }
 
                     if ($me.hasClass('disabled')) {
@@ -1679,6 +1684,13 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
             populateBarChart(success, res, isTrfGraph, targetDate);
         };
 
+        const getEventId = (name) => {
+            const codes = isTrfGraph
+                ? { base: 500994, extra: 500995, default: 500993 }
+                : { base: 501014, extra: 501015, default: 501013 };
+            return codes[name] || codes.default;
+        };
+
         // Render legend boxes and filtering buttons
         const renderLegend = (ds = []) => {
             if (!isVisibleS4) {
@@ -1697,7 +1709,10 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
                 }, $legendBtns[0]);
 
                 btn.textContent = label;
-                btn.addEventListener('click', () => updateData(name));
+                btn.addEventListener('click', () => {
+                    updateData(name);
+                    eventlog(getEventId(name));
+                });
 
                 if (i === -1) {
                     mCreateElement('hr', null, $legendBtns[0]);
@@ -1938,11 +1953,16 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
         $('.forecast-remarks', $stgeTrfAnalysisContainer).addClass('hidden');
     }
 
+    const eventIdMap = {storage: 500991, transfer: 500992};
     // Init storage/transfer analytics tabs
     $('.tab', $stgeTrfAnalysisContainer).rebind('click.dashTabSwicth', (e) => {
+        const selected = e.currentTarget.dataset.value;
+        if (e.originalEvent && eventIdMap[selected]) {
+            eventlog(eventIdMap[selected]);
+        }
         $('.analysis-container', $stgeTrfAnalysisContainer).addClass('vo-hidden');
         $('.tab.active', $stgeTrfAnalysisContainer).removeClass('active');
-        $(`.analysis-container.${e.currentTarget.dataset.value}`, $stgeTrfAnalysisContainer)
+        $(`.analysis-container.${selected}`, $stgeTrfAnalysisContainer)
             .removeClass('vo-hidden');
         $(e.currentTarget).addClass('active');
     });

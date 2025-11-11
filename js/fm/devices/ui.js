@@ -1015,9 +1015,12 @@ lazy(mega.devices, 'ui', () => {
 
             this._preRender();
             await mega.devices.main.render(M.megaRender ? isRefresh : false);
-            this._postRender();
 
-            delay(refreshEventName, () => this.render(id, {isRefresh: true}).catch(dump), refreshMillis);
+            if (M.onDeviceCenter) {
+                this._postRender();
+                delay(refreshEventName, () =>
+                    this.render(id, {isRefresh: true}).catch(dump), refreshMillis);
+            }
         }
 
         /**
@@ -1267,6 +1270,10 @@ lazy(mega.devices, 'ui', () => {
          * @returns {Boolean} whether backup folder exists in given handles
          */
         isBackupRelated(handles) {
+            if (!handles) {
+                return false;
+            }
+
             if (typeof handles === 'string') {
                 handles = [handles];
             }

@@ -779,7 +779,8 @@ table.grid-table tbody .versioning-indicator i.icon-clock-rotate {
     display: block;
 }
 
-table.grid-table tbody tr:not(.linked) td.own-data .icon-link-thin-outline {
+table.grid-table tbody tr:not(.linked) td.own-data .icon-link-thin-outline,
+table.grid-table tbody tr.taken-down td.own-data .icon-link-thin-outline {
     display: none;
 }
 

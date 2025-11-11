@@ -72,7 +72,7 @@ function msgDialog(type, title, msg, subMsg, callback, checkboxCallback) {
 
         // @todo: Remove stuff once mobile msgDialog and ephemeral session UI are ready
         if (type === 'import_login_or_register' && typeof callback === 'function') {
-            callback(0);
+            callback(-1);
             return false;
         }
 

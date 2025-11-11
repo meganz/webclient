@@ -14,13 +14,9 @@ Object.defineProperty(T.ui, 'loadPage', {
             });
             return false;
         }
-        if (M.hasPendingTransfers()) {
-            // confirm with the user moving away will abort transfers
-            const res = await T.ui.confirm(l[377]);
-            if (res !== true) {
-                return false;
-            }
-            ulmanager.abort(null);
+
+        if (!await T.ui.page.safeLeave()) {
+            return false;
         }
         if (typeof T.ui.sweeper === 'function') {
             tryCatch(T.ui.sweeper)();

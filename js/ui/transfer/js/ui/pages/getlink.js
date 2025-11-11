@@ -42,6 +42,10 @@ lazy(T.ui, 'addFilesLayout', () => {
         linkReady: Object.create(null),
         transferring: Object.create(null),
 
+        get hasTransfers() {
+            return M.hasPendingTransfers() || this.data.files && this.data.files.length;
+        },
+
         /*
          * Init common events.
         */
@@ -736,7 +740,10 @@ lazy(T.ui, 'addFilesLayout', () => {
                     while (ulmanager.isUploading) {
                         await tSleep(-1);
                     }
-                })().finally(() => T.ui.loadPage());
+                })().finally(() => {
+                    this.data.files = [];
+                    T.ui.loadPage();
+                });
             });
 
             resumeBtn.addEventListener('click', () => {
@@ -978,6 +985,7 @@ lazy(T.ui, 'addFilesLayout', () => {
 
             // Show section
             this.data.step = 4;
+            this.data.files = [];
             T.ui.page.showSection(cn);
 
             input.focus();

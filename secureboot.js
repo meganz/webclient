@@ -4331,6 +4331,46 @@ mBroadcaster.once('startMega', function() {
     if (window.uTagMCT) {
         onIdle(function() {
             eventlog(99988, window.uTagMCT);
+
+            var mctRec = tryCatch(function() {
+                if (localStorage.mctRec) {
+                    var stored = JSON.parse(localStorage.mctRec);
+                    if (Array.isArray(stored)) {
+                        return stored;
+                    }
+                }
+            }, false)() || [];
+
+            var tagEntry = null;
+
+            for (var i = 0; i < mctRec.length; i++) {
+                if (mctRec[i] && mctRec[i].tag === window.uTagMCT) {
+                    tagEntry = mctRec[i];
+                    break;
+                }
+            }
+
+            if (!tagEntry) {
+                tagEntry = {tag: window.uTagMCT};
+                mctRec.push(tagEntry);
+
+                if (mctRec.length > 20) {
+                    mctRec.shift();
+                }
+            }
+
+            if (!Array.isArray(tagEntry.ts)) {
+                tagEntry.ts = [];
+            }
+
+            tagEntry.ts.push(Date.now());
+
+            if (tagEntry.ts.length > 5) {
+                tagEntry.ts.shift();
+            }
+
+            localStorage.mctRec = JSON.stringify(mctRec);
+
             delete window.uTagMCT;
         });
     }

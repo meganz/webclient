@@ -2486,6 +2486,7 @@ accountUI.fileManagement = {
                 val = val === 1 ? 0 : 1;
                 mega.attr.set('dv', val, -2, true).done(function() {
                     fileversioning.dvState = val;
+                    u_attr['^!dv'] = `${val}`;
                 });
             };
 

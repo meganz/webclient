@@ -2005,6 +2005,8 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[/A]', '</a>');
     l[19146] = escapeHTML(l[19146]).replace('%s', `${getBaseUrl()}/support`);
     l[19511] = escapeHTML(l[19511]).replace('%s', `${getBaseUrl()}/support`);
+    l.lna_reset_p2 = escapeHTML(l.lna_reset_p2)
+        .replace('[I]', '<i class="sprite-fm-mono icon-sliders-horizontal-outline"></i>');
 
     const common = [
         15536, 16119, 16120, 16313, 16316, 16360, 18228, 18268, 18282,
@@ -2023,7 +2025,12 @@ mBroadcaster.once('boot_done', function populate_l() {
         's4_activation_tools_info',
         's4_s3_prefix_usage',
         'info_panel_tags_create_btn',
-        'bn_odq_text'
+        'bn_odq_text',
+        'lna_grant_p1',
+        'lna_grant_p2',
+        'lna_grant_warning',
+        'lna_reset_p1',
+        'lna_reset_p3',
     ];
     for (let i = common.length; i--;) {
         var num = common[i];

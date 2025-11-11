@@ -811,6 +811,21 @@
     border-width: 1px;
     border-radius: 8px;
 }
+#propay .payment-address-dialog .input-block .taxcode-invoice-note {
+    color: var(--mobile-text-secondary);
+    display: flex;
+    font: var(--mobile-font-caption-large-regular);
+    line-height: 16px;
+    margin-top: 4px;
+    --mask-color: var(--mobile-icon-secondary);
+}
+#propay .payment-address-dialog .input-block .taxcode-invoice-note i {
+    margin-inline-end: 8px;
+}
+#propay .payment-address-dialog .input-block .taxcode-invoice-note.error {
+    color: var(--mobile-text-error);
+    --mask-color: var(--mobile-text-error)
+}
 #propay .payment-address-dialog aside {
     display: none;
 }

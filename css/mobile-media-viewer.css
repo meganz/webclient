@@ -180,6 +180,10 @@
     z-index: 9;
 }
 
+.mobile .media-viewer .img-wrap.hidden ~ .video-block {
+    width: 100%;
+}
+
 .mobile .media-viewer .video-block video {
     height: 100%;
     max-height: 100vh;

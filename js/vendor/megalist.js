@@ -322,7 +322,7 @@
                     this._onScroll(e);
                 }
 
-                this._throttledStage = -1;
+                this._throttledStage = 0;
                 // dump('throttledOnScroll()---END');
             });
         }
@@ -1101,7 +1101,7 @@
                     appendFragment.appendChild(renderedNode);
                 }
                 else {
-                    if (i === 0) {
+                    if (i === first) {
                         DOMUtils.prepend(renderedNode, prependFragment);
                     }
                     else {

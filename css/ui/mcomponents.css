@@ -783,6 +783,10 @@ i.green-check-circle {
     user-select: text;
     -webkit-user-select: text;
 }
+.select-none {
+    user-select: none;
+    -webkit-user-select: none;
+}
 .object-cover {
     object-fit: cover;
 }

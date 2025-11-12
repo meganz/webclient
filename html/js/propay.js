@@ -5,6 +5,7 @@ pro.propay = {
     BITCOIN_GATE_ID: 4,
 
     $page: null,
+    $continueButton: null,
 
     planNum: null,
     selectedPeriod: null,
@@ -60,6 +61,7 @@ pro.propay = {
     fixedContinue: false,
 
     skItems: {},
+    continueButtonLoadingReasons: new Set([]),
 
     gatewayElmsByName: {
         'stripe': '.payment-stripe-dialog',
@@ -153,38 +155,56 @@ pro.propay = {
         $('.error', this.$page).removeClass('error');
 
         if (reasons === true) {
-            this.errors = false;
             return false;
         }
 
-        if (!reasons) {
-            this.errors = false;
+        if (!reasons || Object.keys(reasons).length === 0) {
             return false;
         }
 
         if (reasons.gatewayNeeded) {
-            this.errors = true;
             $('.dropdown-wrapper-primary', this.$page).addClass('error');
             $('.dropdown-wrapper-primary .mega-input', this.$page).addClass('error');
         }
 
         if (reasons.addressNeeded || reasons.addressInvalid) {
-            this.errors = true;
             $('.billing-address .billing-info', this.$page).addClass('error');
         }
 
         if (reasons.s4TosNeeded) {
-            this.errors = true;
             const locationSelector = $('body').innerWidth() >= 1080 ? 'footer.desktop' : 'footer.mobile';
             $(`${locationSelector} .s4-tos`, this.$page).addClass('error');
         }
 
-        if (this.errors) {
-            $('.error', this.$page)[0].scrollIntoView({behavior: "smooth", block: "center", inline: "nearest"});
+        if (this.isNewAccount) {
+            const $accountDetails = $('.account-details', this.$page);
+
+            if (reasons.nameNeeded) {
+                $('.name-wrapper', $accountDetails).addClass('error');
+            }
+
+            if (reasons.emailNeeded || reasons.emailExists) {
+                const $emailWrapper = $('.email-wrapper', $accountDetails);
+                const $emailErrorText = $('.error-message-text', $emailWrapper);
+                $emailErrorText.text(reasons.emailExists ? l['7869'] : l.enter_valid_email);
+                $emailWrapper.addClass('error');
+            }
+            // good1 is still too weak to be considered valid
+            if (reasons.passwordNeeded) {
+                this.signup.updatePasswordStrength(reasons.passwordNeeded);
+                $('.password-wrapper', $accountDetails).addClass('error');
+            }
         }
+
+        const $firstError = $('.error', this.$page);
+        if ($firstError.length) {
+            $firstError[0].scrollIntoView({behavior: "smooth", block: "center", inline: "nearest"});
+        }
+
+        return true;
     },
 
-    blockFlow() {
+    blockFlow(skipAccountDetails) {
         'use strict';
 
         const reasons = Object.create(null);
@@ -207,6 +227,23 @@ pro.propay = {
 
         if (window.s4ac && this.s4Active && !this.s4TosAccepted) {
             reasons.s4TosNeeded = 1;
+        }
+
+        if (this.isNewAccount && !skipAccountDetails) {
+            const {name, email, password} = this.signup.getNewAccountDetails();
+
+            const nameNeeded = !name || !this.signup.validateName(name);
+            const emailNeeded = !email || !this.signup.validateEmail(email);
+            const passwordValidity = this.signup.validatePassword(password);
+            const passwordNeeded = (typeof passwordValidity === 'string')
+                || (passwordValidity.className && passwordValidity.className === 'good1');
+
+            if (passwordNeeded || nameNeeded || emailNeeded) {
+
+                reasons.nameNeeded = nameNeeded;
+                reasons.emailNeeded = emailNeeded;
+                reasons.passwordNeeded = passwordNeeded && passwordValidity;
+            }
         }
 
         return Object.keys(reasons).length && reasons;
@@ -511,7 +548,36 @@ pro.propay = {
             return;
         }
 
-        this.skItems.continueBtn.startLoad();
+        const isBusinessOrFlexi = u_attr && (u_attr.b || u_attr.pf);
+
+        if (isBusinessOrFlexi) {
+            const currentPlanName = pro
+                .getProPlanName(u_attr.b ? pro.ACCOUNT_LEVEL_BUSINESS : pro.ACCOUNT_LEVEL_PRO_FLEXI);
+
+            pro.dialog.show(
+                l.already_have_x_sub.replace('%1', currentPlanName),
+                l.cant_sub_aready_on_pf_or_b.replace('%1', currentPlanName),
+                l.ok_button,
+                () => {
+                    fm_fullreload();
+                },
+                'error'
+            );
+            return;
+        }
+
+        if (!u_attr) {
+            console.error('No user account found');
+            return;
+        }
+
+        if (((this.currentGateway.gatewayId === this.BITCOIN_GATE_ID)) && this.isNewAccount) {
+            sessionStorage.setItem('acc_creation_bitcoin', '1');
+            window.location.reload();
+            return;
+        }
+
+        this.skItems.continueBtn.startLoad('purchase');
 
         // TODO: Show inline loading dialog for stripe and bitcoin
 
@@ -705,7 +771,7 @@ pro.propay = {
                         ];
 
                         if (shouldEndLoading.includes(pro.lastPaymentProviderId)) {
-                            this.skItems.continueBtn.endLoad();
+                            this.skItems.continueBtn.endLoad('purchase');
                         }
                     });
                 });
@@ -745,7 +811,7 @@ pro.propay = {
 
                 tell(errorMessage);
 
-                this.skItems.continueBtn.endLoad();
+                this.skItems.continueBtn.endLoad('purchase');
             });
     },
 
@@ -1159,6 +1225,7 @@ pro.propay = {
                 return {subs, plans};
             });
         }
+        return pro.propay.currentPlanData;
     },
 
     async checkCurrentFeatureStatus(planLevel) {
@@ -1202,11 +1269,11 @@ pro.propay = {
 
             if (status === 2 || !strings.canContinue) {
                 loadSubPage('pro');
-                return;
+                return false;
             }
             // User left propay page
             else if (status === -1) {
-                return;
+                return false;
             }
         }
 
@@ -1214,6 +1281,8 @@ pro.propay = {
 
         const propayPageVisitEventId = pro.propay.getPropayPageEventId(pro.propay.planNum);
         eventlog(propayPageVisitEventId);
+
+        return true;
     },
 
     async loadPlansAndCheckStorage() {
@@ -1223,9 +1292,10 @@ pro.propay = {
         try {
             // Fetch storage quota and membership plans in parallel
             const [storage] = await Promise.all([
-                M.getStorageQuota(),
-                voucherDialog.getLatestBalance(),
+                u_attr && M.getStorageQuota(),
+                u_attr && voucherDialog.getLatestBalance(),
                 pro.loadMembershipPlans(),
+                !u_type && M.require('zxcvbn_js')
             ]);
 
             this.planObj = pro.getPlanObj(this.planNum, this.getPreSelectedDuration());
@@ -1247,11 +1317,11 @@ pro.propay = {
             await this.checkUserFeatures();
 
             // Check storage against the plan and handle the result
-            const enoughStorage = checkPlanStorage(storage.used, this.planNum);
-            if (!enoughStorage) {
+            const enoughStorage = storage && checkPlanStorage(storage.used, this.planNum);
+            if (storage && !enoughStorage) {
                 console.error('Selected plan does not have enough storage space');
             }
-            return enoughStorage;
+            return !storage || enoughStorage;
 
         }
         catch (ex) {
@@ -1318,6 +1388,10 @@ pro.propay = {
             if (isApplePayAndBlocked || isGooglePayAndBlocked) {
                 return false;
             }
+        }
+
+        if ((gate.gatewayId === 0) && !u_type) {
+            return false;
         }
 
         if (
@@ -2173,11 +2247,15 @@ pro.propay = {
 
     },
 
-    updatePayment() {
+    updatePayment(fromSignup, reloadedPlans) {
         'use strict';
 
         if (page === 'registerb') {
             return;
+        }
+
+        if (reloadedPlans) {
+            this.planObj = pro.getPlanObj(this.planNum, this.selectedPeriod);
         }
 
         this.currentGateway = this.gatewaysByName[this.currentGatewayName];
@@ -2194,6 +2272,14 @@ pro.propay = {
             $('.specific-payment-info', this.$page).addClass('hidden');
             return;
         }
+
+        if (u_type === false && !fromSignup) {
+            this.signup.attemptAccountCreation();
+            return;
+        }
+
+
+        const currentGatewayId = this.currentGateway.gatewayId;
 
         $('.propay-inline-dialog', this.$leftBlock).addClass('hidden');
         const currentGatewayElementStr = this.getGatewayElement();
@@ -2219,7 +2305,7 @@ pro.propay = {
         const isAstropay = this.currentGateway.gatewayId === astroPayDialog.gatewayId;
 
         let shouldBlockFlow = false;
-        const blockFlowReasons = this.blockFlow();
+        const blockFlowReasons = this.blockFlow(true);
 
         // If s4Tos needed but not accepted, still load payment option
         if (blockFlowReasons) {
@@ -2231,9 +2317,10 @@ pro.propay = {
             && !(this.currentGateway.gatewayId === 16)      // ecp
             && !isAstropay
             && !usingBalanceOnVoucher
-            && !shouldBlockFlow;
+            && !shouldBlockFlow
+            && !(this.currentGateway.gatewayId === this.BITCOIN_GATE_ID && this.isNewAccount);
 
-        const showPaymentButton = this.paymentButton && !this.blockFlow();
+        const showPaymentButton = this.paymentButton && !blockFlowReasons;
 
         $('.specific-payment-info', this.$page).toggleClass('hidden', !showPaymentSection);
 
@@ -2253,20 +2340,39 @@ pro.propay = {
 
         this.updateRightBlock();
 
+        const requiresAccount = this.signup.checkPaymentType();
+
+        if (this.skItems.bitcoin) {
+            this.skItems.bitcoin.startLoad();
+        }
+
+
+        if (this.isNewAccount) {
+            if (this.skItems.astropay && currentGatewayId === astroPayDialog.gatewayId) {
+                pro.propay.skItems.astropay.startLoad('initAstropay');
+            }
+
+            if (!pro.propay.signup.accountCreationFinished && requiresAccount === 1) {
+                this.signup.continueAccountCreation();
+                return;
+            }
+        }
+
         // TODO: Refactor the below options to be more readable and make more sense. Temp fix to reduce risk of breaking
         if (paymentType === 'voucher') {
             voucherDialog.init();
             $('.balance', this.$page).removeClass('hidden');
         }
 
+        if (paymentType === 'astropay') {
+            astroPayDialog.init(this.currentGateway);
+            return;
+        }
         if (!showPaymentSection && !showPaymentButton && !isAstropay) {
             return;
         }
 
-        if (paymentType === 'astropay') {
-            astroPayDialog.init(this.currentGateway);
-        }
-        else if (paymentType === 'creditcard') {
+        if (paymentType === 'creditcard') {
             // Reset the stripe payment card details
             this.renderSavedCard();
 
@@ -2401,7 +2507,10 @@ pro.propay = {
 
         $optionsWrapper = $('.mega-input-dropdown', $container);
         $container.rebind('click', () => {
-            handleIsOpen();
+            if (!pro.propay.ignoreDropdownContainerClick) {
+                handleIsOpen();
+            }
+            delete pro.propay.ignoreDropdownContainerClick;
         });
         $('.option', $optionsWrapper).rebind('click', (e) => {
             $span.text($(e.currentTarget).text());
@@ -2648,6 +2757,9 @@ pro.propay = {
                                 svg = 'icon-ticket';
                             }
                         }
+                        else if (gateway.gatewayId === this.BITCOIN_GATE_ID) {
+                            extraClasses += ' bitcoin-dropdown-item';
+                        }
                         else if (gateway.gatewayName === 'stripe') {
                             svg = 'icon-credit-card';
                         }
@@ -2685,61 +2797,97 @@ pro.propay = {
         }
     },
 
+    proceedPayment(paymentType, gatewayId) {
+        'use strict';
+
+        let showLoading = false;
+        if (paymentType === 'creditcard') {
+            showLoading = true;
+        }
+
+        // Show different loading animation text depending on the payment methods
+        switch (showLoading && this.proPaymentMethod) {
+            case 'stripe':
+                break;
+            case 'bitcoin':
+                pro.propay.showLoadingOverlay('loading');
+                break;
+            case 'pro_prepaid':
+            case 'perfunctio':
+                pro.propay.showLoadingOverlay('processing');
+                break;
+            default:
+                pro.propay.showLoadingOverlay('transferring');
+        }
+
+        if (gatewayId === 0) {
+            pro.propay.sendPurchaseToApi(gatewayId);
+        }
+        else if (gatewayId === 19) {
+            if (this.sca) {
+                addressDialog.processUtcResult(this.sca.utcResult, this.sca.saleId);
+            }
+            else if (this.useSavedCard) {
+                pro.propay.showLoadingOverlay('processing');
+                addressDialog.validateAndPay(pro.propay.initBillingInfo, false, true);
+
+            }
+            const iframe = document.getElementById('stripe-widget');
+            if (iframe && iframe.contentWindow) {
+                iframe.contentWindow.postMessage('submit', '*');
+            }
+        }
+        else if (gatewayId === 16) {
+            addressDialog.validateAndPay(pro.propay.initBillingInfo, false, true);
+        }
+        else if (gatewayId === astroPayDialog.gatewayId) {
+            astroPayDialog.submit();
+        }
+    },
+
+    toggleContinueButtonLoading(showLoading, loadingReason) {
+        'use strict';
+
+        const reasons = pro.propay.continueButtonLoadingReasons;
+
+        loadingReason = loadingReason || 'unknown';
+
+        if (showLoading) {
+            reasons.add(loadingReason);
+        }
+        else {
+            reasons.delete(loadingReason);
+        }
+
+        if (reasons.size > 0 && !showLoading) {
+            return;
+        }
+
+        pro.propay.$continueButton
+            .toggleClass(
+                'loading sprite-fm-theme-after icon-loader-throbber-light-outline-after select-none visible-txt',
+                showLoading || reasons.size > 0
+            );
+    },
+
     initContinueButton() {
         'use strict';
-        const $continueButton = $('.continue', this.$page);
-        $continueButton.rebind('click.propay', () => {
+        pro.propay.$continueButton = $('.continue', this.$page);
+
+        if (!pro.propay.$continueButton) {
+            return;
+        }
+
+        pro.propay.$continueButton.rebind('click.propay', () => {
+
+            if (pro.propay.$continueButton.hasClass('loading')) {
+                return;
+            }
 
             const reasons = this.blockFlow();
             const paymentType = this.getPaymentType(this.currentGateway);
             const gatewayId = this.currentGateway && this.currentGateway.gatewayId;
             pro.propay.paymentType = gatewayId;
-
-            const proceedPayment = () => {
-                let showLoading = false;
-                if (paymentType === 'creditcard') {
-                    showLoading = true;
-                }
-
-                // Show different loading animation text depending on the payment methods
-                switch (showLoading && this.proPaymentMethod) {
-                    case 'stripe':
-                        break;
-                    case 'bitcoin':
-                        pro.propay.showLoadingOverlay('loading');
-                        break;
-                    case 'pro_prepaid':
-                    case 'perfunctio':
-                        pro.propay.showLoadingOverlay('processing');
-                        break;
-                    default:
-                        pro.propay.showLoadingOverlay('transferring');
-                }
-
-                if (gatewayId === 0) {
-                    pro.propay.sendPurchaseToApi(gatewayId);
-                }
-                else if (gatewayId === 19) {
-                    if (this.sca) {
-                        addressDialog.processUtcResult(this.sca.utcResult, this.sca.saleId);
-                    }
-                    else if (this.useSavedCard) {
-                        pro.propay.showLoadingOverlay('processing');
-                        addressDialog.validateAndPay(pro.propay.initBillingInfo, false, true);
-
-                    }
-                    const iframe = document.getElementById('stripe-widget');
-                    if (iframe && iframe.contentWindow) {
-                        iframe.contentWindow.postMessage('submit', '*');
-                    }
-                }
-                else if (gatewayId === 16) {
-                    addressDialog.validateAndPay(pro.propay.initBillingInfo, false, true);
-                }
-                else if (gatewayId === astroPayDialog.gatewayId) {
-                    astroPayDialog.submit();
-                }
-            };
 
             this.showErrors(reasons);
             if (reasons) {
@@ -2751,13 +2899,33 @@ pro.propay = {
 
             delay('subscribe.plan', eventlog.bind(null, 99788));
 
+            if (this.isNewAccount) {
+                const requiresAccount = this.signup.checkPaymentType();
+
+                if (pro.propay.signup.accountCreationFinished
+                    && (this.currentGateway.gatewayId === this.BITCOIN_GATE_ID)) {
+                    sessionStorage.setItem('acc_creation_bitcoin', '1');
+                    window.location.reload();
+                    return;
+                }
+
+                if ((requiresAccount === 2 || this.paymentButton
+                        || this.currentGateway.gatewayId === this.BITCOIN_GATE_ID)
+                    && !pro.propay.signup.accountCreationFinished) {
+
+                    pro.propay.toggleContinueButtonLoading(true, 'accountCreation');
+                    this.signup.continueAccountCreation();
+                    return;
+                }
+            }
+
             if (u_type === false) {
 
                 u_storage = init_storage(localStorage);
 
                 u_checklogin({
                     checkloginresult() {
-                        pro.propay.proceedPayment();
+                        pro.propay.proceedPayment(paymentType, gatewayId);
 
                     }
                 }, true);
@@ -2773,16 +2941,16 @@ pro.propay = {
                         // Detect the user has subscribed to a Pro plan with Google Play or Apple store
                         // pop up the warning dialog but let the user proceed with an upgrade
                         msgDialog('warninga', '', l.warning_has_subs_with_3p, '', () => {
-                            proceedPayment();
+                            pro.propay.proceedPayment(paymentType, gatewayId);
                         });
                     }
                     else {
-                        proceedPayment();
+                        pro.propay.proceedPayment(paymentType, gatewayId);
                     }
                 }
                 else {
                     // For other methods we do a uts and utc call to get the provider details first
-                    proceedPayment();
+                    pro.propay.proceedPayment(paymentType, gatewayId);
                 }
             }
         });
@@ -2794,8 +2962,12 @@ pro.propay = {
         'use strict';
         const recurringEnabled = this.currentGateway && this.currentGateway.supportsRecurring;
         const gatewayId = this.currentGateway && this.currentGateway.gatewayId;
+
+
+        const showBitcoinCode = gatewayId === this.BITCOIN_GATE_ID && !this.isNewAccount;
+
         const $continueButton = $('.continue', this.$page)
-            .toggleClass('hidden', !!this.paymentButton || (gatewayId === this.BITCOIN_GATE_ID));
+            .toggleClass('hidden', !!this.paymentButton || showBitcoinCode);
 
         if (this.errors) {
             this.showErrors();
@@ -2805,21 +2977,22 @@ pro.propay = {
             return;
         }
 
+        let label = this.isNewAccount ? l.agree_continue : l.continue_to_payment;
+
         if (this.shouldShowTrial()) {
-            $continueButton.text(l.start_free_trial);
+            label = !this.isNewAccount ? l.start_free_trial : l.agree_continue;
         }
         else if (gatewayId === 16) {
-            $continueButton.text(l.continue_to_payment);
+            label = !this.isNewAccount ? l.continue_to_payment : l.agree_continue;
         }
         else if (gatewayId === 0) {
-            $continueButton.text(l['6190']);
+            label = !this.isNewAccount ? l['6190'] : l.agree_pay;
         }
         else if ((!gatewayId && (gatewayId !== 0)) || recurringEnabled) {
-            $continueButton.text(l.subscribe_btn);
+            label = !this.isNewAccount ? l.subscribe_btn : l.agree_sub;
         }
-        else {
-            $continueButton.text(l.continue_to_payment);
-        }
+
+        $continueButton.text(label);
     },
 
     fillBillingInfo(info) {
@@ -2856,7 +3029,7 @@ pro.propay = {
 
 
         try {
-            info = info || await mega.attr.get(u_attr.u, 'billinginfo', false, true).catch(dump);
+            info = info || (u_attr && await mega.attr.get(u_attr.u, 'billinginfo', false, true).catch(dump));
         }
         catch (ex) {
             if (ex !== ENOENT) {
@@ -3155,6 +3328,25 @@ pro.propay = {
             const continueButtons = page.querySelectorAll('.continue');
             return pro.propay.sk.initSk(continueButtons);
         });
+
+        lazy(this.skItems, 'billingAddress', () => {
+            const billingAddress = page.querySelector('.billing-address');
+            return pro.propay.sk.initSk(billingAddress);
+        });
+
+        lazy(this.skItems, 'astropay', () => {
+            const astropay = page.querySelector('.left-block-wrapper .astropay-dialog');
+            return pro.propay.sk.initSk(astropay, 4);
+        });
+    },
+
+    selectPreSelectedGateway() {
+        'use strict';
+
+        if (sessionStorage.getItem('acc_creation_bitcoin')) {
+            pro.propay.ignoreDropdownContainerClick = true;
+            $('.bitcoin-dropdown-item', this.$page).click();
+        }
     },
 
     init() {
@@ -3220,13 +3412,18 @@ pro.propay = {
             return;
         }
 
+        if (u_type === false || !localStorage.awaitingConfirmationAccount || !isEphemeral()) {
+            delete sessionStorage.acc_creation_bitcoin;
+            delete sessionStorage.acc_creation_button;
+        }
+
         // Ephemeral accounts (accounts not registered at all but have a few files in the cloud
         // drive) are *not* allowed to reach the Pro Pay page as we can't track their payment (no email address).
         // Accounts that have registered but have not confirmed their email address yet *are* allowed to reach the Pro
         // Pay page e.g. if they registered on the Pro Plan selection page first (this gets more conversions).
         if ((u_type === 0) && (localStorage.awaitingConfirmationAccount === undefined)) {
-            loadSubPage('pro');
-            return;
+            // loadSubPage('pro');
+            // return;
         }
 
         if (!this.setPlanFromUrl()) {
@@ -3250,14 +3447,6 @@ pro.propay = {
 
         this.loadingPage = true;
 
-        // If the user is not logged in, show the login / register dialog
-        if (u_type === false) {
-            pro.propay.showAccountRequiredDialog();
-
-            // login / register action while on /propay_x will recall init()
-            return;
-        }
-
         if (pro.propay.pageChangeHandler) {
             mBroadcaster.removeListener(pro.propay.pageChangeHandler);
             delete pro.propay.pageChangeHandler;
@@ -3271,6 +3460,8 @@ pro.propay = {
                 delete pro.propay.pageChangeHandler;
             }
         });
+
+        pro.propay.signup.initNewAccountDetails();
 
         this.loadPlansAndCheckStorage().then((canProceed) => {
 
@@ -3343,6 +3534,8 @@ pro.propay = {
                 const propayPageVisitEventId = pro.propay.getPropayPageEventId(pro.propay.planNum);
 
                 this.sk.endLoadAll();
+
+                this.selectPreSelectedGateway();
 
                 eventlog(propayPageVisitEventId);
             });
@@ -3454,6 +3647,8 @@ pro.propay = {
             console.error('redeemFreeTrial: Invalid payment method:', pro.propay.proPaymentMethod);
             return;
         }
+
+        this.skItems.continueBtn.startLoad('purchase');
 
         pro.lastPaymentProviderId = addressDialog.gatewayId_stripe;
 
@@ -3682,85 +3877,6 @@ pro.propay = {
         };
     },
 
-    showAccountRequiredDialog() {
-        'use strict';
-
-        if (is_mobile) {
-            login_next = page;
-            mobile.proSignupPrompt.init();
-            return;
-        }
-
-        if (!pro.propay.accountRequiredDialog) {
-            pro.propay.accountRequiredDialog = new mega.ui.Dialog({
-                className: 'loginrequired-dialog',
-                focusable: false,
-                expandable: false,
-                requiresOverlay: true,
-                title: l[5841],
-            });
-        }
-        else {
-            pro.propay.accountRequiredDialog.visible = false; // Allow it to go through the show() motions again
-        }
-
-        pro.propay.accountRequiredDialog.bind('onBeforeShow', () => {
-            const $dialog = pro.propay.accountRequiredDialog.$dialog;
-
-            $dialog.addClass('with-close-btn');
-
-            let loginProceed = false;
-            $('.pro-login', $dialog).rebind('click.loginrequired', () => {
-                loginProceed = true;
-                pro.propay.accountRequiredDialog.hide();
-                showLoginDialog();
-
-                onIdle(() => eventlog(500512));
-
-                return false;
-            });
-
-            $('header p', $dialog).text(l[5842]);
-
-            $('button.close.js-close', $dialog).rebind('click.closeDialog', () => {
-                delay('login-dlg-x.log', eventlog.bind(null, 500514));
-            });
-
-            $('.pro-register', $dialog).rebind('click.loginrequired', () => {
-                loginProceed = true;
-                pro.propay.accountRequiredDialog.hide();
-                if (u_wasloggedin()) {
-                    var msg = l[8743];
-                    msgDialog('confirmation', l[1193], msg, null, res => {
-                        if (res) {
-                            showRegisterDialog();
-                        }
-                        else {
-                            showLoginDialog();
-                        }
-                    });
-                }
-                else {
-                    showRegisterDialog();
-                }
-
-                delay('create-acc-btn.log', eventlog.bind(null, 500513));
-
-                return false;
-            });
-
-            pro.propay.accountRequiredDialog.rebind('onHide', () => {
-                if (!loginProceed) {
-                    loadSubPage('pro');
-                }
-            });
-        });
-
-        pro.propay.accountRequiredDialog.show();
-
-        onIdle(() => eventlog(500511));
-    },
-
     /** This function to show the discount offer dialog if applies */
     showDiscountOffer() {
         'use strict';
@@ -3899,20 +4015,30 @@ pro.propay = {
                 this.apply(el, maxDepth, reset, depth);
             }
 
+            const loadingOrigins = new Set();
+
             return {
                 unset: () => {
                     for (const el of roots) {
                         this.unset(el);
                     }
                 },
-                startLoad: () => {
+                startLoad: (origin) => {
+                    if (origin) {
+                        loadingOrigins.add(origin);
+                    }
                     for (const el of roots) {
                         this.startLoad(el);
                     }
                 },
-                endLoad: () => {
-                    for (const el of roots) {
-                        this.endLoad(el);
+                endLoad: (origin) => {
+                    if (typeof origin === 'string') {
+                        loadingOrigins.delete(origin);
+                    }
+                    if (origin === true || loadingOrigins.size === 0) {
+                        for (const el of roots) {
+                            this.endLoad(el);
+                        }
                     }
                 },
                 element: root,

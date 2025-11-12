@@ -192,6 +192,15 @@ mobile.settings.account.twofactorVerifyAction = Object.create(mobile.settingsHel
 
             this.resolve(value);
 
+
+            if (pro.propay.signup.activeMobileLogin) {
+                const {email, password, rememberMe} = security.login;
+                security.login.checkLoginMethod(email, password, value, rememberMe,
+                    pro.propay.signup.onAttemptLoginOld.bind(pro.propay.signup),
+                    pro.propay.signup.onAttemptLoginNew.bind(pro.propay.signup));
+                return;
+            }
+
             if (!u_attr) {
                 // Get cached data that was already entered on the login form
                 const {email, password, rememberMe} = security.login;

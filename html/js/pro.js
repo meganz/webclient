@@ -115,6 +115,7 @@ var pro = {
         pro.singleDurationPlans = Object.create(null);
         pro.planSearch.reset();
         pro.anyDiscount = false;
+        pro.planObjects.reset();
     },
 
     divideAllBy100(obj, excl) {
@@ -232,7 +233,7 @@ var pro = {
                         results[i].insdis = results[i].insdis || false;
 
                         // Api may return a discount that does not match, for now ignore non matching discounts
-                        if (results[i].insdis.dm !== results[i].m) {
+                        if (results[i].insdis && (results[i].insdis.dm !== results[i].m)) {
                             results[i].insdis = false;
                             eventlog(500941, true);
                         }
@@ -914,6 +915,12 @@ var pro = {
         planKeys: Object.create(null),
         planTypes: Object.create(null),
 
+        reset() {
+            'use strict';
+            pro.planObjects.planKeys = Object.create(null);
+            pro.planObjects.planTypes = Object.create(null);
+        },
+
         createPlanObject(plan, planFromApi) {
             'use strict';
             const key = plan[pro.UTQA_RES_INDEX_ID] + plan[pro.UTQA_RES_INDEX_ITEMNUM];
@@ -1257,6 +1264,7 @@ var pro = {
         else if (options.useTaxAmount) {
             const {taxAmount, taxAmountEuro} = plan.taxInfo;
             localPrice = plan.taxInfo && (returnEuro ? taxAmountEuro : taxAmount);
+
             if (typeof localPrice !== 'number') {
                 localPrice = returnEuro ? plan.priceEuro : plan.price;
             }

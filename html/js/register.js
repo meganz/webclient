@@ -112,6 +112,9 @@ var loginFromEphemeral = {
 
                 }, reload));
             }
+            else if (pro.propay.onPropayPage()) {
+                pro.propay.signup.continuePaymentFlow();
+            }
             else {
                 // Show message that they've been successfully logged in then on OK reload the page
                 msgDialog('info', l[18280], l[8745], null, reload);

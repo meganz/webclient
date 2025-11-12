@@ -26,9 +26,10 @@ var security = {
      * Checks if the password is valid and meets minimum strength requirements
      * @param {String} password The user's password
      * @param {String} confirmPassword The second password the user typed again as a confirmation to avoid typos
+     * @param {Boolean} dontEstimateScore skip estimation of the password strength score using the zxcvbn library
      * @returns {true|String} Returns true if the password is valid, or the error message if not valid
      */
-    isValidPassword: function(password, confirmPassword) {
+    isValidPassword: function(password, confirmPassword, dontEstimateScore) {
 
         'use strict';
         // Check for a password
@@ -48,6 +49,11 @@ var security = {
         // Check for minimum password length
         if (password.length < security.minPasswordLength) {
             return l[18701];        // Your password needs to be at least x characters long.
+        }
+
+        // If dontEstimateScore is true, then skip the password strength estimation
+        if (dontEstimateScore) {
+            return true;
         }
 
         // Check that the estimator library is initialised
@@ -919,7 +925,7 @@ security.register = {
      * @param {Boolean} fromProPage Whether the registration started on the Pro page or not
      * @param {Function} completeCallback A function to run when the registration is complete
      */
-    startRegistration: function(firstName, lastName, email, password, fromProPage, completeCallback) {
+    startRegistration: function(firstName, lastName, email, password, fromProPage, completeCallback, skipLoading) {
         'use strict';
 
         if (this.sendEmailRequestParams) {
@@ -928,8 +934,10 @@ security.register = {
         }
         this.sendEmailRequestParams = true;
 
-        // Show loading dialog
-        loadingDialog.show();
+        if (!skipLoading) {
+            // Show loading dialog
+            loadingDialog.show();
+        }
 
         // First create an ephemeral account and the Master Key (to be removed at a later date)
         security.register.createEphemeralAccount(function() {
@@ -1313,6 +1321,33 @@ security.login = {
             requestVars.mfa = pinCode;
         }
 
+        const continueAuthentication = (result) => {
+            // Get values from Object
+            var temporarySessionIdBase64 = result.tsid;
+            var encryptedSessionIdBase64 = result.csid;
+            var encryptedMasterKeyBase64 = result.k;
+            var encryptedPrivateRsaKey = result.privk;
+            var userHandle = result.u;
+
+            // Decrypt the Master Key
+            var encryptedMasterKeyArray32 = base64_to_a32(encryptedMasterKeyBase64);
+            var cipherObject = new sjcl.cipher.aes(derivedEncryptionKeyArray32);
+            var decryptedMasterKeyArray32 = decrypt_key(cipherObject, encryptedMasterKeyArray32);
+
+            // If the temporary session ID is set then we need to generate RSA keys
+            if (temporarySessionIdBase64 === undefined) {
+                // Continue a regular login
+                return security.login.decryptRsaKeyAndSessionId(
+                    decryptedMasterKeyArray32,
+                    encryptedSessionIdBase64,
+                    encryptedPrivateRsaKey,
+                    userHandle
+                );
+            }
+            // Skip to generate RSA keys
+            security.login.skipToGenerateRsaKeys(decryptedMasterKeyArray32, temporarySessionIdBase64);
+        };
+
         // Send the Email and Authentication Key to the API
         return api.req(requestVars)
             .then(({result}) => {
@@ -1320,31 +1355,45 @@ security.login = {
                 // If successful
                 if (typeof result === 'object') {
 
-                    // Get values from Object
-                    var temporarySessionIdBase64 = result.tsid;
-                    var encryptedSessionIdBase64 = result.csid;
-                    var encryptedMasterKeyBase64 = result.k;
-                    var encryptedPrivateRsaKey = result.privk;
-                    var userHandle = result.u;
+                    if (pro.propay.requireconfirmation) {
+                        delete pro.propay.requireconfirmation;
 
-                    // Decrypt the Master Key
-                    var encryptedMasterKeyArray32 = base64_to_a32(encryptedMasterKeyBase64);
-                    var cipherObject = new sjcl.cipher.aes(derivedEncryptionKeyArray32);
-                    var decryptedMasterKeyArray32 = decrypt_key(cipherObject, encryptedMasterKeyArray32);
+                        pro.dialog.show(l.welc_back_alr_have_acc, l.log_in_and_sub_on_existing_acc, [
+                            {
+                                text: l.log_in_and_sub,
+                                onClick: async () => {
+                                    continueAuthentication(result);
+                                    loadingDialog.show();
+                                    await pro.loadMembershipPlans(false, true);
+                                    loadingDialog.hide();
+                                    const proceed = await pro.propay.checkUserFeatures();
+                                    if (proceed) {
+                                        pro.propay.updatePayment(false, true);
+                                    }
+                                    else {
+                                        return false;
+                                    }
+                                }
+                            },
+                            {
+                                text: l.msg_dlg_cancel,
+                                onClick: () => {
+                                    security.login.loginCompleteCallback(false);
+                                    security.login.email = null;
+                                    security.login.password = null;
+                                    security.login.rememberMe = false;
+                                    u_logout();
+                                    return false;
+                                }
+                            },
+                        ], {showClose: true});
 
-                    // If the temporary session ID is set then we need to generate RSA keys
-                    if (typeof temporarySessionIdBase64 !== 'undefined') {
-                        security.login.skipToGenerateRsaKeys(decryptedMasterKeyArray32, temporarySessionIdBase64);
+                        pro.propay.hideLoadingOverlay();
+
+                        return;
                     }
-                    else {
-                        // Otherwise continue a regular login
-                        return security.login.decryptRsaKeyAndSessionId(
-                            decryptedMasterKeyArray32,
-                            encryptedSessionIdBase64,
-                            encryptedPrivateRsaKey,
-                            userHandle
-                        );
-                    }
+
+                    return continueAuthentication(result);
                 }
                 else {
                     // Return failure

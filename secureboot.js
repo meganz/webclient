@@ -2190,6 +2190,7 @@ else if (!browserUpdate) {
     jsl.push({f:'html/js/proplan.js', n: 'proplan_js', j:1});
     jsl.push({f:'html/js/planpricing.js', n: 'planpricing_js', j:1});
     jsl.push({f:'html/js/propay.js', n: 'propay_js', j:1});
+    jsl.push({f:'html/js/propay-signup.js', n: 'propay_signup_js', j:1});
     jsl.push({f:'html/js/propay-dialogs.js', n: 'propay_js', j:1});
     jsl.push({f:'js/states-countries.js', n: 'states_countries_js', j:1});
 

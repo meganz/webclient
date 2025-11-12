@@ -322,17 +322,6 @@ lazy(pro, 'proplan2', () => {
     const moveToBuyStep = (planId) => {
         pro.proplan2.selectedPlan = planId;
 
-        if (!u_handle) {
-            showSignupPromptDialog();
-            return false;
-        }
-        // If they're ephemeral but awaiting email confirmation,
-        // let them continue to choose a plan and pay
-        else if (isEphemeral() && !localStorage.awaitingConfirmationAccount) {
-            showRegisterDialog();
-            return false;
-        }
-
         // If they clicked the plan immediately after completing registration,
         // set the flag so it can be logged
         if (localStorage.keycomplete) {

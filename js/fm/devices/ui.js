@@ -1175,7 +1175,18 @@ lazy(mega.devices, 'ui', () => {
          */
         getCurrentDirPath(handle) {
             if (M.currentCustomView && M.currentCustomView.type === rootId) {
-                return [...M.currentdirid.split('/').slice(0, 2), handle].join('/');
+                const curPath = M.currentdirid.split('/');
+                const path = [];
+                if (curPath.length < 2) {
+                    path.push(...curPath, handle);
+                }
+                else {
+                    path.push(...curPath.slice(0, 2));
+                    if (!path.includes(handle)) {
+                        path.push(handle);
+                    }
+                }
+                return path.join('/');
             }
             return handle;
         }

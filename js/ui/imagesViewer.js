@@ -1802,19 +1802,9 @@ var slideshowid;
         const $pendingBlock = $('.loader-grad', $content);
         var $video = $('video', $content);
         var $playVideoButton = $('.play-video-button', $content);
-        let bgsize = 'auto';
 
-        if (is_audio(n)) {
-            bgsize = 'contain';
-        }
-        else {
-            if (previews[id].fma === undefined) {
-                previews[id].fma = MediaAttribute(n).data || false;
-            }
-
-            if (previews[id].fma.width > previews[id].fma.height) {
-                bgsize = 'cover';
-            }
+        if (previews[id].fma === undefined && !is_audio(n)) {
+            previews[id].fma = MediaAttribute(n).data || false;
         }
 
         $playVideoButton.rebind('click', function() {
@@ -1910,7 +1900,6 @@ var slideshowid;
 
         if (previews[id].poster !== undefined) {
             // $video.attr('poster', previews[id].poster);
-            $video.css('background-size', bgsize);
             $video.css('background-image', `url(${previews[id].poster})`);
         }
         else if (String(n.fa).indexOf(':1*') > 0) {
@@ -1925,7 +1914,6 @@ var slideshowid;
                     }
 
                     // $video.attr('poster', uri);
-                    $video.css('background-size', bgsize);
                     $video.css('background-image', `url(${uri})`);
                 }
             }).catch(console.debug.bind(console));

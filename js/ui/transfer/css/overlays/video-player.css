@@ -43,14 +43,9 @@
 
 .video .media-viewer video {
     background: var(--main-forced-black);
-    max-height: 100%;
-    max-width: 100%;
-    min-height: 70%;
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
-}
-.video-theatre-mode .media-viewer video {
     height: 100%;
     width: 100%;
 }

@@ -176,7 +176,7 @@ Object.defineProperty(msgDialog, 'desktop', {
                     if (typeof callback === 'function') {
                         callback(res);
                     }
-                    mega.ui.sheet.hide();
+                    closeMsg();
                 });
                 priBtn[isDestructive ? 'addClass' : 'removeClass']('destructive');
             }
@@ -195,7 +195,7 @@ Object.defineProperty(msgDialog, 'desktop', {
                     if (typeof callback === 'function') {
                         callback(res);
                     }
-                    mega.ui.sheet.hide();
+                    closeMsg();
                 });
             }
 
@@ -209,7 +209,7 @@ Object.defineProperty(msgDialog, 'desktop', {
                     if (typeof callback === 'function') {
                         callback(0);
                     }
-                    mega.ui.sheet.hide();
+                    closeMsg();
                 });
             }
 
@@ -223,7 +223,7 @@ Object.defineProperty(msgDialog, 'desktop', {
                     if (typeof callback === 'function') {
                         callback(-2);
                     }
-                    mega.ui.sheet.hide();
+                    closeMsg();
                 });
             }
         }

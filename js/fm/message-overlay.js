@@ -26,7 +26,7 @@ var megaMsgDialog = (() => {
             /* Cleanup */
             if (actionButton) {
                 actionButton.off('click');
-                targetSheet.hide();
+                closeMsg();
             }
             targetSheet.off('close.megaSheet');
             targetSheet.clear();

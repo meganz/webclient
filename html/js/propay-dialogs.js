@@ -1827,6 +1827,7 @@ var addressDialog = {
         const $titleElemTaxCode = $('.mega-input-title', $taxcodeMegaInput.$input.parent());
         const $titleElemPostCode = $('.mega-input-title', $postcodeInput.$input.parent());
         const $propayTaxTitle = $('.taxcode-title', this.$dialog);
+        const $invoiceNote = $('.taxcode-invoice-note', this.$dialog);
 
         const countryCode = $('.option[data-state="active"]', $countriesSelect).attr('data-value');
         const taxName = getTaxName(countryCode);
@@ -1838,10 +1839,14 @@ var addressDialog = {
         else {
             $taxcodeMegaInput.$input.attr('placeholder', fullTaxName);
         }
+        $taxcodeMegaInput.hideError();
+        $taxcodeMegaInput.$input.next('.message-container').addClass('hidden');
 
         if (pro.propay.onPropayPage() && $propayTaxTitle.length) {
             $propayTaxTitle.text(taxName);
         }
+        $invoiceNote.removeClass('error hidden');
+        $('span', $invoiceNote).text(l.taxcode_note.replace('%s', taxName));
 
         // Change the States depending on the selected country
         var changeStates = function(selectedCountryCode) {
@@ -1901,6 +1906,7 @@ var addressDialog = {
             else {
                 $taxcodeMegaInput.$input.attr('placeholder',taxName + ' ' + l[7347]);
             }
+            $('span', $invoiceNote).text(l.taxcode_note.replace('%s', taxName));
 
             // Remove any previous validation error
             $statesSelect.removeClass('error');
@@ -2226,7 +2232,7 @@ var addressDialog = {
         const $countrySelect = $('.countries', this.$dialog);
         const state = $('.option[data-state="active"]', $stateSelect).attr('data-value');
         const country = $('.option[data-state="active"]', $countrySelect).attr('data-value');
-        const taxCode = inputSelector(this.taxCodeMegaInput).$input.val();
+        const taxCode = inputSelector(this.taxCodeMegaInput).$input.val().trim();
 
         // Selectors for error handling
         const $errorMessage = $('.error-message', this.$dialog);
@@ -2260,6 +2266,26 @@ var addressDialog = {
             $stateSelect.addClass('error');
             stateNotSet = true;
         }
+
+        const $invoiceNote = $('.taxcode-invoice-note', this.$dialog);
+        const taxName = getTaxName(country);
+        const taxMegaInput = inputSelector(this.taxCodeMegaInput);
+        if (taxCode && !this.testTaxCode(taxCode, country)) {
+            taxMegaInput.showError(l.taxcode_error.replace('%s', taxName));
+            if (!pro.propay.onPropayPage()) {
+                taxMegaInput.$input.next('.message-container').removeClass('hidden');
+                $invoiceNote.addClass('hidden');
+            }
+            $invoiceNote.addClass('error');
+            $('i', $invoiceNote).addClass('icon-alert-triangle-thin-outline').removeClass('icon-info-thin-outline');
+            $('span', $invoiceNote).text(l.taxcode_error.replace('%s', taxName));
+            return false;
+        }
+        taxMegaInput.hideError();
+        taxMegaInput.$input.next('.message-container').addClass('hidden');
+        $invoiceNote.removeClass('error hidden');
+        $('i', $invoiceNote).removeClass('icon-alert-triangle-thin-outline').addClass('icon-info-thin-outline');
+        $('span', $invoiceNote).text(l.taxcode_note.replace('%s', taxName));
 
         // Check all required fields
         if (!fieldValues['first-name']
@@ -2392,6 +2418,9 @@ var addressDialog = {
             }
             else if ((propayGatewayId !== 16) || allowEcpFlow) {
                 pro.propay.sendPurchaseToApi(propayGatewayId);
+            }
+            if (taxCode) {
+                mega.attr.set2(null, 'taxnum', to8(taxCode), -2).catch(dump);
             }
         }
         else {
@@ -3271,6 +3300,27 @@ var addressDialog = {
     showPaymentResult: function(verifyUrlParam) {
         'use strict';
         return pro.showPaymentResult(verifyUrlParam);
+    },
+
+    testTaxCode(taxCode, countryCode) {
+        'use strict';
+
+        const EU_CODES = [
+            'AT', 'BE', 'BG', 'HR', 'CY', 'CZ', 'DK',
+            'EE', 'FI', 'FR', 'DE', 'GR', // 'HU', Separate rules for Hungary
+            'IE', 'IT', 'LV', 'LT', 'LU', 'MT', 'NL',
+            'PL', 'PT', 'RO', 'SK', 'SI', 'ES', 'SE',
+        ];
+        countryCode = countryCode.toUpperCase();
+        return !(
+            countryCode === 'HU' && !(
+                /^\d{8}-[1-5]-\d{2}$/.test(taxCode) ||
+                /^\d{8}$/.test(taxCode) ||
+                /^HU\d{8}$/.test(taxCode)
+            ) ||
+            EU_CODES.includes(countryCode) && !/^[A-Z]{2}[\dA-Z]{2,13}$/.test(taxCode) ||
+            !/\S/.test(taxCode)
+        );
     }
 };
 

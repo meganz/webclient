@@ -740,8 +740,12 @@ BusinessRegister.prototype.goToPayment = function(userInfo) {
 BusinessRegister.prototype.processPayment = function(payDetails, businessPlan) {
     "use strict";
     loadingDialog.show();
+    const ba = new BusinessAccount();
+    if (payDetails.taxCode) {
+        ba.updateBusinessAttrs([{ key: '%taxnum', val: payDetails.taxCode }]).catch(dump);
+    }
 
-    new BusinessAccount().doPaymentWithAPI(payDetails, businessPlan).then(({result, saleId}) => {
+    ba.doPaymentWithAPI(payDetails, businessPlan).then(({result, saleId}) => {
 
         const redirectToPaymentGateway = () => {
             const isStrip = businessPlan.usedGatewayId ?

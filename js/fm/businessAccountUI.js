@@ -2401,6 +2401,7 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = SoonFc(60, function() {
         var taxName = mySelf.business.getTaxCodeName(countryCode);
         if (taxName) {
             $('input#prof-vat', $profileContainer).attr("placeholder", taxName);
+            $('.taxcode-invoice-note', $profileContainer).text(l.taxcode_note.replace('%s', taxName));
         }
     };
 
@@ -2514,15 +2515,24 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = SoonFc(60, function() {
                 }
             }
             if ($cVatInput.val().trim() !== cVat) {
-                if (!$cVatInput.val().trim()) {
+                const newTaxCode = $cVatInput.val().trim();
+                const cc = $selectedCountry.attr('data-value');
+                $('.taxcode-invoice-note', $profileContainer).removeClass('hidden');
+                if (!newTaxCode) {
                     $cVatInput.megaInputsShowError(l[20953]);
                     $cVatInput.focus();
                     valid = false;
                 }
-                else {
+                else if (addressDialog.testTaxCode(newTaxCode, cc)) {
                     $cVatInput.megaInputsHideError();
-                    attrsToChange.push({ key: '%taxnum', val: $cVatInput.val().trim() });
+                    attrsToChange.push({ key: '%taxnum', val: newTaxCode });
                     isTaxChanged = true;
+                }
+                else {
+                    valid = false;
+                    $cVatInput.megaInputsShowError(l.taxcode_error.replace('%s', mySelf.business.getTaxCodeName(cc)));
+                    $cVatInput.focus();
+                    $('.taxcode-invoice-note', $profileContainer).addClass('hidden');
                 }
             }
             if ($cAddressInput.val().trim() !== cAddress) {

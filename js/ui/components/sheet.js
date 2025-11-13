@@ -12,6 +12,10 @@ class MegaSheet extends MegaOverlay {
                 }
                 this.hide();
                 this.trigger('close');
+
+                if (typeof this.onClose === 'function') {
+                    this.onClose();
+                }
             }
         });
 
@@ -150,7 +154,7 @@ class MegaSheet extends MegaOverlay {
         mega.ui.overlay.domNode.classList.remove('arrange-to-back');
 
         if ($.msgDialog) {
-            closeMsg();
+            closeMsg(null);
         }
         else if (this.safeShow && $.dialog === this.name) {
             closeDialog();

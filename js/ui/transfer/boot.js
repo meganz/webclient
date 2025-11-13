@@ -472,11 +472,17 @@ window.addEventListener('popstate', (ev) => {
     passive: true,
 });
 
-window.addEventListener('beforeunload', () => {
+window.addEventListener('beforeunload', (ev) => {
     'use strict';
 
     if ('rad' in mega) {
         mega.rad.flush().dump('rad.flush');
+    }
+
+    if (T.ui.addFilesLayout.hasTransfers) {
+        ev.preventDefault();
+        ev.returnValue = true;
+        return l[761] || '-';
     }
 
     mBroadcaster.crossTab.leave();

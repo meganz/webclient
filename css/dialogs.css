@@ -1174,6 +1174,37 @@ body.de .mega-dialog.contact-picker-widget {
 }
 /* end of MegaSync dialog */
 
+/* Megasync local network access dialog */
+
+.msg-dialog .lna-dialog.msync-perm-info {
+    margin-bottom: 12px;
+}
+.msg-dialog .lna-dialog.msync-perm-info i {
+    line-height: 16px;
+    margin: 0 4px;
+}
+.msg-dialog .lna-dialog.lna-image {
+    background-repeat: no-repeat;
+    background-size: contain;
+    margin: 24px 0;
+    height: 250px;
+    width: 560px;
+}
+.msg-dialog .lna-dialog.lna-reset-image {
+    background-image: url("../images/mega/lna-reset-light.png");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-reset-image {
+    background-image: url("../images/mega/lna-reset-dark.png");
+}
+.msg-dialog .lna-dialog.lna-prompt-image {
+    background-image: url("../images/mega/lna-prompt-light.png");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-prompt-image {
+    background-image: url("../images/mega/lna-prompt-dark.png");
+}
+
+/* end of Megasync local network access dialog */
+
 /* FM file versioning overlay */
 .fm-versioning.overlay {
     position: absolute;
@@ -4205,6 +4236,12 @@ body.de .mega-dialog.contact-picker-widget {
         width: 100%;
         float: none;
         margin: 19px 0 0 0;
+    }
+    .mega-dialog.payment-address-dialog .taxcode-invoice-note {
+        color: var(--mobile-text-secondary);
+        display: flex;
+        font: var(--mobile-font-caption-large-regular);
+        margin-top: -10px;
     }
     .mega-dialog.payment-address-dialog .footer-container {
         flex-direction: column;
@@ -10656,3 +10693,13 @@ body.de .mega-dialog.contact-picker-widget {
 }
 
 /* DC App Promo dialog end */
+
+.mega-sheet.discount-offer .close,
+.mega-sheet.discount-offer .close:hover {
+    background-color: var(--text-color-white-medium);
+    border-radius: 50%;
+}
+
+.theme-dark .mega-sheet.discount-offer .close {
+    color: var(--mobile-button-primary-pressed);
+}

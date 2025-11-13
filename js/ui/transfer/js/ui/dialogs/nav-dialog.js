@@ -73,7 +73,13 @@ lazy(T.ui, 'navDialog', () => {
     });
 
     // Logout btn
-    logoutBtn.addEventListener('click', logout);
+    logoutBtn.addEventListener('click', () => {
+        T.ui.page.safeLeave().then((res) => {
+            if (res === true) {
+                logout();
+            }
+        });
+    });
 
     // Theme switcher
     themeRadio.addEventListener('change', (e) => {

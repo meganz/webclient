@@ -291,18 +291,20 @@ lazy(mega.devices, 'ui', () => {
                     const { config } = this;
                     const addSyncReq = config.requests.add;
 
-                    megasync.megaSyncRequest(addSyncReq, (_, res) => {
-                        // Invalid user handle
-                        if (res === config.err.issueFound && config.options.handleInvalidUser) {
-                            msgDialog('info', l[23967], l[200]);
-                        }
-                        else if (res === config.err.wrongUserBackup || res === config.err.wrongUserSync) {
-                            msgDialog('info', l[23967], l.account_mismatch_info);
-                        }
-                    }, () => {
-                        // MEGAsync is not running
-                        msgDialog('info', l[23967], l[23967], l.empty_bakups_info);
-                    });
+                    megasync.megaSyncRequest(addSyncReq)
+                        .then((res) => {
+                            // Invalid user handle
+                            if (res === config.err.issueFound && config.options.handleInvalidUser) {
+                                msgDialog('info', l[23967], l[200]);
+                            }
+                            else if (res === config.err.wrongUserBackup || res === config.err.wrongUserSync) {
+                                msgDialog('info', l[23967], l.account_mismatch_info);
+                            }
+                        })
+                        .catch(() => {
+                            // MEGAsync is not running
+                            msgDialog('info', l[23967], l[23967], l.empty_bakups_info);
+                        });
                 }
                 else {
                     mega.ui.dcAppPromoDialog.showDialog(this.config.appPromoPageNum);
@@ -1013,9 +1015,12 @@ lazy(mega.devices, 'ui', () => {
 
             this._preRender();
             await mega.devices.main.render(M.megaRender ? isRefresh : false);
-            this._postRender();
 
-            delay(refreshEventName, () => this.render(id, {isRefresh: true}).catch(dump), refreshMillis);
+            if (M.onDeviceCenter) {
+                this._postRender();
+                delay(refreshEventName, () =>
+                    this.render(id, {isRefresh: true}).catch(dump), refreshMillis);
+            }
         }
 
         /**
@@ -1265,6 +1270,10 @@ lazy(mega.devices, 'ui', () => {
          * @returns {Boolean} whether backup folder exists in given handles
          */
         isBackupRelated(handles) {
+            if (!handles) {
+                return false;
+            }
+
             if (typeof handles === 'string') {
                 handles = [handles];
             }

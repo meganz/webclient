@@ -12,6 +12,7 @@ var closeStripeDialog = (blockPaymentRefresh) => {
     if (pro.propay.onPropayPage() && !blockPaymentRefresh) {
         pro.propay.updatePayment();
     }
+    pro.megapay.destroy();
 
     pro.propay.hideLoadingOverlay();
     closeDialog();
@@ -94,6 +95,8 @@ var astroPayDialog = {
         // this.initConfirmButton();
         this.updateDialogDetails();
         this.showDialog();
+
+        pro.propay.skItems.astropay.endLoad('initAstropay');
     },
 
     /**
@@ -1757,7 +1760,7 @@ var addressDialog = {
         let $countriesSelect;
         if (pro.propay.onPropayPage()) {
             $countriesSelect = $('.countries' + (is_mobile ? '.mobile' : '.desktop') + '-device', this.$dialog)
-                .removeClass('hidden');
+                .removeClass('hidden error');
             $('.countries' + (is_mobile ? '.desktop' : '.mobile') + '-device', this.$dialog).addClass('hidden');
         }
         else {
@@ -1827,6 +1830,7 @@ var addressDialog = {
         const $titleElemTaxCode = $('.mega-input-title', $taxcodeMegaInput.$input.parent());
         const $titleElemPostCode = $('.mega-input-title', $postcodeInput.$input.parent());
         const $propayTaxTitle = $('.taxcode-title', this.$dialog);
+        const $invoiceNote = $('.taxcode-invoice-note', this.$dialog);
 
         const countryCode = $('.option[data-state="active"]', $countriesSelect).attr('data-value');
         const taxName = getTaxName(countryCode);
@@ -1838,10 +1842,14 @@ var addressDialog = {
         else {
             $taxcodeMegaInput.$input.attr('placeholder', fullTaxName);
         }
+        $taxcodeMegaInput.hideError();
+        $taxcodeMegaInput.$input.next('.message-container').addClass('hidden');
 
         if (pro.propay.onPropayPage() && $propayTaxTitle.length) {
             $propayTaxTitle.text(taxName);
         }
+        $invoiceNote.removeClass('error hidden');
+        $('span', $invoiceNote).text(l.taxcode_note.replace('%s', taxName));
 
         // Change the States depending on the selected country
         var changeStates = function(selectedCountryCode) {
@@ -1901,6 +1909,7 @@ var addressDialog = {
             else {
                 $taxcodeMegaInput.$input.attr('placeholder',taxName + ' ' + l[7347]);
             }
+            $('span', $invoiceNote).text(l.taxcode_note.replace('%s', taxName));
 
             // Remove any previous validation error
             $statesSelect.removeClass('error');
@@ -2038,6 +2047,11 @@ var addressDialog = {
         'use strict';
         var self = this;
         var promise = new MegaPromise();
+
+        if (!u_attr) {
+            return promise.resolve({});
+        }
+
         mega.attr.get(u_attr.u, 'billinginfo', false, true).always(function(billingInfo) {
             if (typeof billingInfo !== "object") {
                 billingInfo = {};
@@ -2226,7 +2240,7 @@ var addressDialog = {
         const $countrySelect = $('.countries', this.$dialog);
         const state = $('.option[data-state="active"]', $stateSelect).attr('data-value');
         const country = $('.option[data-state="active"]', $countrySelect).attr('data-value');
-        const taxCode = inputSelector(this.taxCodeMegaInput).$input.val();
+        const taxCode = inputSelector(this.taxCodeMegaInput).$input.val().trim();
 
         // Selectors for error handling
         const $errorMessage = $('.error-message', this.$dialog);
@@ -2260,6 +2274,26 @@ var addressDialog = {
             $stateSelect.addClass('error');
             stateNotSet = true;
         }
+
+        const $invoiceNote = $('.taxcode-invoice-note', this.$dialog);
+        const taxName = getTaxName(country);
+        const taxMegaInput = inputSelector(this.taxCodeMegaInput);
+        if (taxCode && !this.testTaxCode(taxCode, country)) {
+            taxMegaInput.showError(l.taxcode_error.replace('%s', taxName));
+            if (!pro.propay.onPropayPage()) {
+                taxMegaInput.$input.next('.message-container').removeClass('hidden');
+                $invoiceNote.addClass('hidden');
+            }
+            $invoiceNote.addClass('error');
+            $('i', $invoiceNote).addClass('icon-alert-triangle-thin-outline').removeClass('icon-info-thin-outline');
+            $('span', $invoiceNote).text(l.taxcode_error.replace('%s', taxName));
+            return false;
+        }
+        taxMegaInput.hideError();
+        taxMegaInput.$input.next('.message-container').addClass('hidden');
+        $invoiceNote.removeClass('error hidden');
+        $('i', $invoiceNote).removeClass('icon-alert-triangle-thin-outline').addClass('icon-info-thin-outline');
+        $('span', $invoiceNote).text(l.taxcode_note.replace('%s', taxName));
 
         // Check all required fields
         if (!fieldValues['first-name']
@@ -2392,6 +2426,9 @@ var addressDialog = {
             }
             else if ((propayGatewayId !== 16) || allowEcpFlow) {
                 pro.propay.sendPurchaseToApi(propayGatewayId);
+            }
+            if (taxCode) {
+                mega.attr.set2(null, 'taxnum', to8(taxCode), -2).catch(dump);
             }
         }
         else {
@@ -2799,21 +2836,32 @@ var addressDialog = {
                         loadSubPage('repay');
                     }
                 }
+                if (pro.propay.isNewAccount) {
+                    pro.propay.signup.checkShowAccountDetails();
+                }
             };
 
             if (pro.propay.onPropayPage()) {
                 pro.propay.hideLoadingOverlay();
                 pro.propay.updatePayment();
 
-                pro.dialog.show(
-                    failReason === 'incorrect_cvc'
+                let title;
+
+                if (pro.propay.signup.accountCreationFinished) {
+                    title = l.account_created_payment_failed;
+                }
+                else {
+                    title = failReason === 'incorrect_cvc'
                         ? l.incorrect_cvc_warn_header
-                        : l['25049'],
-                    parseHTML(error || ''),
+                        : l['25049'];
+                }
+
+                pro.dialog.show(
+                    title,
+                    error || '',
                     {
                         onClick: () => {
                             failFunc();
-                            pro.dialog.hide();
                         },
                         text: l.ok_button
                     }
@@ -2870,9 +2918,19 @@ var addressDialog = {
                 window.addEventListener('message', addressDialog.stripeFrameHandler, {once: true});
                 return;
             }
-            if (event.data.startsWith('json^')) {
+
+            const isJson = event.data.startsWith('json^');
+            const isRes = event.data.startsWith('res^');
+
+            if (isJson || isRes) {
                 const eventData = JSON.parse(event.data.split('^')[1]);
-                if (eventData && (eventData.type === 'resize')) {
+
+                // If it is res style, it will be handled elsewhere. Ensure that there is still a listener for here.
+                if (!eventData || isRes) {
+                    window.addEventListener('message', addressDialog.stripeFrameHandler, {once: true});
+                    return;
+                }
+                if (eventData.type === 'resize') {
                     // Resize the stripe iframe
                     const $stripeDialog = addressDialog.getStripeDialog();
                     const $stripeIframe = $('.iframe-container', $stripeDialog);
@@ -2880,10 +2938,54 @@ var addressDialog = {
                         $stripeIframe.css('height', eventData.height + 'px');
                     }
                 }
-                if (eventData && (eventData.type === 'loading') && (eventData.action === 'end')) {
+                if (eventData.type === 'loading' && eventData.action === 'end') {
                     $('.sk-stripe-loading', addressDialog.getStripeDialog()).addClass('hidden');
                     if (pro.propay.skItems.continueBtn) {
-                        pro.propay.skItems.continueBtn.endLoad();
+                        pro.propay.skItems.continueBtn.endLoad('purchase');
+                        pro.propay.toggleContinueButtonLoading(false, 'accountCreation');
+                    }
+                }
+                if (eventData.type === 'validate' && eventData.action === 'signup') {
+                    const validSignup = pro.propay.signup.continueAccountCreation(true);
+                    if (!validSignup) {
+                        pro.propay.showErrors();
+                    }
+                }
+                if (eventData.type === 'account') {
+                    const iframe = document.getElementById('stripe-widget');
+                    let message = '';
+                    if (eventData.action === 'finishCreation') {
+                        pro.propay.signup.continueAccountCreation(true, (success) => {
+                            let message = '';
+                            if (success) {
+                                message = 'accountCreated';
+                            }
+                            else {
+                                message = 'accountCreationFailed';
+                            }
+
+                            if (iframe && iframe.contentWindow) {
+                                iframe.contentWindow.postMessage(message, '*');
+                            }
+
+                            if (!success) {
+                                failHandle(message);
+                            }
+                        });
+                    }
+                    else if (eventData.action === 'validateAccountDetails') {
+                        const validDetails = !pro.propay.showErrors();
+
+                        if (validDetails) {
+                            message = 'detailsValid';
+                        }
+                        else {
+                            message = 'detailsInvalid';
+                        }
+                    }
+
+                    if (iframe && iframe.contentWindow && message) {
+                        iframe.contentWindow.postMessage(message, '*');
                     }
                 }
                 window.addEventListener('message', addressDialog.stripeFrameHandler, {once: true});
@@ -3034,7 +3136,7 @@ var addressDialog = {
 
             this.showPaymentSuccess();
             if (pro.propay.skItems.continueBtn) {
-                pro.propay.skItems.continueBtn.endLoad();
+                pro.propay.skItems.continueBtn.endLoad('purchase');
             }
             return;
         }
@@ -3116,6 +3218,9 @@ var addressDialog = {
 
                 if (pro.propay.paymentButton) {
                     iframeSrc += `&pt=${pro.propay.paymentButton}`;
+                    if (pro.propay.isNewAccount && !u_type) {
+                        iframeSrc += `&na=1`;
+                    }
                 }
                 else if (pro.propay.currentGateway && pro.propay.currentGateway.gatewayName) {
                     iframeSrc += `&pt=${pro.propay.currentGateway.gatewayName}`;
@@ -3176,6 +3281,7 @@ var addressDialog = {
                 // $('.content', $stripeDialog).toggleClass('hidden', pro.propay.useSavedCard);
 
                 $stripeDialog.removeClass('hidden');
+                pro.megapay.init();
 
                 onIdle(() => eventlog(500518));
 
@@ -3271,6 +3377,27 @@ var addressDialog = {
     showPaymentResult: function(verifyUrlParam) {
         'use strict';
         return pro.showPaymentResult(verifyUrlParam);
+    },
+
+    testTaxCode(taxCode, countryCode) {
+        'use strict';
+
+        const EU_CODES = [
+            'AT', 'BE', 'BG', 'HR', 'CY', 'CZ', 'DK',
+            'EE', 'FI', 'FR', 'DE', 'GR', // 'HU', Separate rules for Hungary
+            'IE', 'IT', 'LV', 'LT', 'LU', 'MT', 'NL',
+            'PL', 'PT', 'RO', 'SK', 'SI', 'ES', 'SE',
+        ];
+        countryCode = countryCode.toUpperCase();
+        return !(
+            countryCode === 'HU' && !(
+                /^\d{8}-[1-5]-\d{2}$/.test(taxCode) ||
+                /^\d{8}$/.test(taxCode) ||
+                /^HU\d{8}$/.test(taxCode)
+            ) ||
+            EU_CODES.includes(countryCode) && !/^[A-Z]{2}[\dA-Z]{2,13}$/.test(taxCode) ||
+            !/\S/.test(taxCode)
+        );
     }
 };
 
@@ -4027,64 +4154,106 @@ var insertEmailToPayResult = function($overlay) {
 };
 
 /**
- * Generic dialog handler using the MegaSheet component
+ * Generic dialog handler using the megaMsgDialog component or mobile, and msgDialog component for desktop
  */
 pro.dialog = {
-    sheet: null,
 
     /**
      * Shows a generic dialog
      * @param {string} title - The title text for the dialog
      * @param {string|HTMLElement|Array} contents - The content to display in the dialog body.
      * @param {string|Object} [button] - Button configuration. Can be a string for default behaviour
-     * @param {Object} [options] - Additional options for the dialog
-     * @param {string} [options.className] - CSS class name for the button
-     * @param {Function} [options.onShow] - Callback function called when dialog is shown
+     * @param {Object} [options] - Additional options for the dialog, or a function for a single button
      * @param {Function} [options.onClose] - Callback function called when dialog is closed
-     * @returns {MegaSheet} Returns the MegaSheet instance
+     * @param {string} [type] - The type of dialog to show: "warninga", "warningb", "info", "error", "custom"
+     * @returns {void}
      */
-    show(title, contents, button, options) {
+    show(title, contents, buttons, options, type) {
         'use strict';
 
         options = options || Object.create(null);
 
-        let actions;
-
-        if (button) {
-            actions = [{
-                type: 'normal',
-                text: typeof button === 'string' ? button : button.text,
-                className: options.className || 'primary',
-                onClick: button.onClick
+        // Allow overloading for a single button
+        if (typeof buttons === 'string') {
+            buttons = {
+                text: buttons,
+                onClick: typeof options === 'function' ? options : () => {}
+            };
+            options = {type}
+        }
+        // If no button, show a simple dialog with just an OK button to close it
+        else if (!buttons || !buttons[0]) {
+            buttons = [{
+                text: l.ok_button,
+                onClick: () => {}
             }];
         }
 
-        contents = Array.isArray(contents) ? contents : [contents];
+        buttons = Array.isArray(buttons) ? buttons : [buttons];
 
-        mega.ui.sheet.show({
+        contents = Array.isArray(contents) ? contents.join('\n') : contents;
+
+        type = type || options.type || '';
+        let callback = buttons[0] ? buttons[0].onClick : () => {};
+
+        if (buttons.length > 1) {
+            callback = (res) => {
+                if (res && buttons[0].onClick) {
+                    buttons[0].onClick(res);
+                }
+                else if (!res && buttons[1].onClick) {
+                    buttons[1].onClick(res);
+                }
+
+                if (typeof options.onClose === 'function') {
+                    options.onClose(res);
+                }
+            }
+        }
+
+        const buttonsTexts = buttons.map(button => button.text);
+
+        const icon = msgDialog.icons[type] || '';
+
+        pro.dialog.setupAndShow({
             title,
-            contents,
-            actions,
-            name: 'propay-generic-dialog',
-            type: 'modal',
-            icon: 'sprite-fm-mono icon-x-circle-thin-outline error',
-            showClose: true,
-            preventBgClosing: false,
-            onShow: options.onShow,
-            onClose: options.onClose
+            msg: title,
+            subMsg: contents,
+            callback,
+            type,
+            buttonsArray: buttonsTexts,
+            showClose: options.showClose,
+            icon,
         });
-
-        return this.sheet;
     },
 
-    /**
-     * Hides the currently displayed propay dialog
-     */
-    hide() {
+    setupAndShow(dialogParams) {
         'use strict';
 
-        mega.ui.sheet.hide('propay-generic-dialog');
-    }
+        const {buttonsArray, callback, showClose, icon} = dialogParams;
+
+        if (is_mobile) {
+            megaMsgDialog.render(
+                dialogParams.msg,
+                dialogParams.subMsg,
+                false,
+                {
+                    onInteraction: callback,
+                    checkbox: dialogParams.checkboxCallback,
+                },
+                {
+                    icon,
+                    buttons: buttonsArray,
+                    image: dialogParams.image,
+                },
+                false,
+                showClose,
+            );
+        }
+        else {
+            msgDialog.desktop(dialogParams);
+        }
+    },
 };
 
 

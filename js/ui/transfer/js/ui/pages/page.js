@@ -55,6 +55,18 @@ lazy(T.ui, 'page', () => {
             return footer;
         },
 
+        async safeLeave() {
+            if (T.ui.addFilesLayout.hasTransfers) {
+                const res = await T.ui.confirm(l[377]);
+                if (res !== true) {
+                    return false;
+                }
+                ulmanager.abort(null);
+                delete T.ui.addFilesLayout.data.files;
+            }
+            return true;
+        },
+
         showSection(cn, path, subpage) {
             // Update history
             if (typeof path === 'string' && getSitePath() !== `/${path}`) {

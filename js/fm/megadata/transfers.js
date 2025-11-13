@@ -239,10 +239,10 @@ MegaData.prototype.addDownloadSync = function(n, z, preview) {
             cmd.f = files;
 
             sync.megaSyncRequest(cmd)
-                .done(function() {
+                .then(() => {
                     showToast('megasync-transfer', l[8635]);
                 })
-                .fail(
+                .catch(
                 function () {
                     sync.megaSyncIsNotResponding(webdl);
 

@@ -193,31 +193,52 @@ var megasync = (function() {
         }
     }
 
+    let promptedLna = false;
+
+    async function promptDeniedPermission() {
+        const skipShow = await M.getPersistentData('lnapermprompt').catch(nop);
+        if (skipShow) {
+            throw new Error('Permission denied');
+        }
+        eventlog(501025);
+        let hideAgain = false;
+        const res = await asyncMsgDialog('warninga', '', l.lna_reset_title, `
+            <div class="lna-dialog msync-perm-info">${l.lna_reset_p1}</div>
+            <div class="lna-dialog lna-image lna-reset-image"></div>
+            <div class="lna-dialog msync-perm-info">${l.lna_reset_p2}</div>
+            <div class="lna-dialog msync-perm-info">${l.lna_reset_p3}</div>
+        `, '', (e) => {
+            hideAgain = e;
+        });
+        if (hideAgain) {
+            await M.setPersistentData('lnapermprompt', 1).catch(dump);
+        }
+        if (res === null) {
+            // User skipped dialog. Don't continue
+            throw EBLOCKED;
+        }
+    }
+
     /**
      * Perform an http request to the running MEGAsync instance.
      *
      * @param {Object}   args    parameters to send.
-     * @param {Function} resolve on promise's resolve (Optional)
-     * @param {Function} reject  on promise's reject (Optional)
-     * @return {MegaPromise}
+     * @return {Promise}
      */
-    function megaSyncRequest(args, resolve, reject) {
+    async function megaSyncRequest(args) {
 
-        if (typeof reject === 'function') {
-            reject('Disabled');
+        // eslint-disable-next-line compat/compat
+        const { state } = navigator.permissions ?
+            // eslint-disable-next-line compat/compat
+            await navigator.permissions.query({ name: 'local-network-access' }).catch(() => ({ state: 'granted' })) :
+            // Safari < 16
+            { state: 'granted' };
+        if (state === 'denied') {
+            await promptDeniedPermission();
         }
-        return MegaPromise.reject('Disabled');
         // var timeout = (args.a === 'v') ? 250 : 0;
         var timeout = 0;
-        try {
-            args = JSON.stringify(args);
-        }
-        catch (ex) {
-            if (typeof reject === 'function') {
-                reject(ex);
-            }
-            return MegaPromise.reject(ex);
-        }
+        args = JSON.stringify(args);
 
         if (!megasyncUrl) {
             megasyncUrl = switchMegasyncUrlToHttpWhenPossible();
@@ -225,54 +246,81 @@ var megasync = (function() {
 
         if (megasyncUrl === ShttpMegasyncUrl) {
             // not supported any more.
-            const errMsg = 'Browser doesn\'t support Mega Desktop integration';
-            if (typeof reject === 'function') {
-                reject(errMsg);
-            }
-            return MegaPromise.reject(errMsg);
+            throw new Error('Browser doesn\'t support Mega Desktop integration');
         }
 
+        let timer = false;
+        let lastXHRState = false;
+        let lastXHRStatus = false;
         var promise = M.xhr({
             url: megasyncUrl,
             data: args,
-            type: 'json'  ,
-            timeout: timeout // fasten the no-response cases
+            type: 'json',
+            prepare(xhr) {
+                if (state === 'prompt') {
+                    timer = tSleep(1);
+                    timer.then(() => {
+                        if (lastXHRStatus === 0 && lastXHRState < 4) {
+                            // Recheck permissions just in case they denied in the timeout
+                            // eslint-disable-next-line compat/compat -- Safari/incompatible shouldn't reach here
+                            navigator.permissions.query({ name: 'local-network-access' })
+                                .then(({ state }) => {
+                                    if (state === 'denied') {
+                                        return promptDeniedPermission();
+                                    }
+                                    if (state === 'prompt' && !promptedLna) {
+                                        promptedLna = true;
+                                        M.delPersistentData('lnapermprompt').catch(nop);
+                                        msgDialog('info', '', l.lna_grant_title, `
+                                            <div class="lna-dialog msync-perm-info">${l.lna_grant_p1}</div>
+                                            <div class="lna-dialog msync-perm-info">${l.lna_grant_p2}</div>
+                                            <div class="lna-dialog lna-image lna-prompt-image"></div>
+                                            <b class="lna-dialog msync-perm-warn">${l.lna_grant_warning}</b>
+                                        `);
+                                    }
+                                })
+                                .catch((ex) => promise.reject(ex));
+                        }
+                    });
+                    lastXHRState = xhr.readyState;
+                    lastXHRStatus = xhr.status;
+                    xhr.onreadystatechange = (ev) => {
+                        lastXHRState = ev.target.readyState;
+                        lastXHRStatus = ev.target.status;
+                    };
+                }
+            },
+            timeout // fasten the no-response cases
         });
-
-        if (typeof resolve === 'function') {
-            promise.done(function() {
-                try {
-                    resolve.apply(null, arguments);
+        return new Promise((resolve, reject) => {
+            promise.done((ev, res) => {
+                if (timer) {
+                    timer.abort();
                 }
-                catch (ex) {
-                    if (typeof reject === 'function') {
-                        reject(ex);
-                    }
-                    else {
-                        throw ex;
-                    }
-                }
+                resolve(res);
             });
-        }
-
-        if (typeof reject === 'function') {
-            promise.fail(reject);
-        }
-
-        return promise;
+            promise.fail(ex => {
+                if (timer) {
+                    timer.abort();
+                }
+                reject(ex);
+            });
+        });
     }
 
     function SyncAPI(args, next, closeFlag) {
 
-        megaSyncRequest(args, function(ev, response) {
-            api_handle(next, response, args);
-        }, function(ev) {
-            if (args && args.a === 'v') {
-                lastCheckStatus = 0;
-                lastCheckTime = Date.now();
-            }
-            handler.error(next, ev, closeFlag);
-        });
+        megaSyncRequest(args)
+            .then(response => {
+                api_handle(next, response, args);
+            })
+            .catch(ex => {
+                if (args && args.a === 'v') {
+                    lastCheckStatus = 0;
+                    lastCheckTime = Date.now();
+                }
+                handler.error(next, ex, closeFlag);
+            });
     }
 
     function api_handle(next, response, requestArgs) {

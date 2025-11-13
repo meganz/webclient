@@ -1043,6 +1043,7 @@ mBroadcaster.once('boot_done', function populate_l() {
 
     // MEGA io links
     const mega_io_links = {
+        'terms': "https://mega.io/terms",
         'terms#recPaiSub': "https://mega.io/terms#RecurringPaidSubscriptions",
         'terms#ref': "https://mega.io/terms#Refunds",
         'p-s/p-b/c-s': "https://help.mega.io/plans-storage/payments-billing/cancel-subscription",
@@ -1448,7 +1449,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         ).replace('[/A]', '</a>');
     l.s4_pro_egress_info = escapeHTML(l.s4_pro_egress_info)
         .replace(
-            '[A]', '<a class="link clickurl" target="_blank" href="https://mega.io/terms#S4">'
+            '[A]', '<a class="link clickurl" data-eventid="500997" target="_blank" href="https://mega.io/terms#S4">'
         ).replace('[/A]', '</a>');
     l.pro_flexi_expired_banner = escapeHTML(l.pro_flexi_expired_banner)
         .replace('[A]', '<a href="/repay" class="clickurl">').replace('[/A]', '</a>')
@@ -2003,8 +2004,19 @@ mBroadcaster.once('boot_done', function populate_l() {
             `<a href="${recoveryKeyLink}" class="clickurl" data-eventid="500915" target="_blank" rel="noopener">`
         )
         .replace('[/A]', '</a>');
+    l.we_dont_store_password = escapeHTML(l.we_dont_store_password)
+        .replace('[S]', '<span class="bold">').replace('[/S]', '</span>');
+
     l[19146] = escapeHTML(l[19146]).replace('%s', `${getBaseUrl()}/support`);
     l[19511] = escapeHTML(l[19511]).replace('%s', `${getBaseUrl()}/support`);
+    l.for_months = escapeHTML(l.for_months)
+        .replaceAll('[S]', '<span class="red font-bold">')
+        .replaceAll('[/S]', '</span>');
+    l.lna_reset_p2 = escapeHTML(l.lna_reset_p2)
+        .replace('[I]', '<i class="sprite-fm-mono icon-sliders-horizontal-outline"></i>');
+    l.signup_agree_tos = escapeHTML(l.signup_agree_tos)
+        .replace('[A]', mega_io_hyperlinks.terms)
+        .replace('[/A]', '</a>');
 
     const common = [
         15536, 16119, 16120, 16313, 16316, 16360, 18228, 18268, 18282,
@@ -2023,7 +2035,12 @@ mBroadcaster.once('boot_done', function populate_l() {
         's4_activation_tools_info',
         's4_s3_prefix_usage',
         'info_panel_tags_create_btn',
-        'bn_odq_text'
+        'bn_odq_text',
+        'lna_grant_p1',
+        'lna_grant_p2',
+        'lna_grant_warning',
+        'lna_reset_p1',
+        'lna_reset_p3',
     ];
     for (let i = common.length; i--;) {
         var num = common[i];

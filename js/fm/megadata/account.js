@@ -211,7 +211,9 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
                 if (res.mkt) {
                     u_attr.mkt = res.mkt;
                     if (Array.isArray(u_attr.mkt.dc) && u_attr.mkt.dc.length) {
-                        delay('ShowDiscountOffer', pro.propay.showDiscountOffer, 7000);
+                        delay('ShowDiscountOffer', () => {
+                            pro.getTargetedDiscountInfo().then(pro.propay.showDiscountOffer);
+                        }, 7e3);
                     }
                 }
                 else {

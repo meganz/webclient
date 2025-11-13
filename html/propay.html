@@ -130,9 +130,61 @@
                                 </button>
                             </div>
                         </div>
+                        <div class="create-account-wrapper no-sk hidden">
+                            <h2 class="title">
+                                <span class="number">1</span>
+                                [$create_your_account]
+                            </h2>
+                            <div class="login">[$5585] <a class="login-link">[$171]</a></div>
+                            <div class="account-details no-sk">
+                                <div class="name-wrapper no-sk mb-4 mt-1">
+                                    <label for="propay-create-account-name">[$7987]</label>
+                                    <div class="mega-input box-style name">
+                                        <input type="text" value="" id="propay-create-account-name"/>
+                                    </div>
+                                    <div class="error-message">
+                                        <i class="sprite-fm-mono icon-alert-triangle"></i>
+                                        <span class="error-message-text">[$enter_first_last_eg]</span>
+                                    </div>
+                                </div>
+                                <div class="email-wrapper no-sk mb-4 mt-1">
+                                    <label for="propay-create-account-email">[$7434]</label>
+                                    <div class="mega-input box-style email">
+                                        <input type="email" value="" id="propay-create-account-email"/>
+                                    </div>
+                                    <div class="error-message">
+                                        <i class="sprite-fm-mono icon-alert-triangle"></i>
+                                        <span class="error-message-text">[$enter_valid_email]</span>
+                                    </div>
+                                </div>
+                                <div class="password-wrapper no-sk">
+                                    <label for="propay-create-account-password">[$909]</label>
+                                    <div class="mega-input box-style password mt-1">
+                                        <input type="password" value="" id="propay-create-account-password"/>
+                                        <i class="sprite-fm-mono pass-visible icon-eye-hidden"></i>
+                                    </div>
+                                    <div class="password-strength hidden">
+                                    <i class="sprite-fm-mono icon-size-18"></i>
+                                    <span class="password-strength-text"></span>
+                                </div>
+                                <div class="password-info">
+                                    <span class="pass-incr-strength bold">[$stronger_pass_have]</span>
+                                    <ul class="pass-incr-strength">
+                                        <li>[$upper_and_lower_letters]</li>
+                                        <li>[$number_or_special]</li>
+                                    </ul>
+                                    <span class="password-not-stored hidden">[$we_dont_store_password]</span>
+                                </div>
+                                </div>
+                            </div>
+                        </div>
                         <div class="method-duration-wrapper no-sk">
                             <div class="payment-method no-sk">
-                                <h2 class="title">[$478]</h2>
+                                <h2 class="title no-create-account">[$478]</h2>
+                                <h2 class="title create-account">
+                                    <span class="number">2</span>
+                                    [$6963]
+                                </h2>
                                 <div class="dropdown-wrapper-primary">
                                     <div class="mega-input dropdown-input payment-options sk-pro" id="propay-payment-dropdown-pri">
                                         <span>[$select_payment_method]</span>
@@ -156,14 +208,14 @@
                                     [$method_does_not_support_trial]
                                 </div>
                             </div>
-                                                        <div class="astropay-dialog propay-inline-dialog hidden" role="dialog" aria-labelledby="astropay-dialog-title"
+                                                        <div class="astropay-dialog propay-inline-dialog hidden no-sk" role="dialog" aria-labelledby="astropay-dialog-title"
                                                             aria-modal="true">
 
                                                             <h2>[$enter_details_below]</h2>
                                                             <div class="redirect-info">[$redirect_to_third_party_info]</div>
 
-                                                            <section class="content">
-                                                                <div class="content-block gap-1 flex flex-column">
+                                                            <section class="content no-sk">
+                                                                <div class="content-block gap-1 flex flex-column no-sk">
                                                                     <label class="astropay-label" for="propay-astropay-name-field">[$7987]:</label>
                                                                     <div class="mega-input box-style">
                                                                         <input id="propay-astropay-name-field" class="astropay-name-field" type="text" placeholder="[$7988]">
@@ -197,7 +249,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="billing-address hidden">
+                        <div class="billing-address hidden no-sk">
                             <h2 class="title">[$my_billing_address]</h2>
                             <div class="wrapper"></div>
                         </div>
@@ -333,6 +385,9 @@
                                     [$after_trial_card_charged_m]
                                     [$10630]
                                 </div>
+                                <div class="new-account-tos hidden">
+                                    [$signup_agree_tos]
+                                </div>
                             </div>
                             <div class="balance hidden">
                                 <span class="balance-amount">0.00</span>
@@ -395,6 +450,9 @@
                         <div class="trial hidden">
                             [$after_trial_card_charged_m]
                             [$10630]
+                        </div>
+                        <div class="new-account-tos hidden">
+                            [$signup_agree_tos]
                         </div>
                     </div>
                     <div class="balance hidden">
@@ -492,6 +550,10 @@
                             <div class="input-block">
                                 <span><span class="taxcode-title"></span><span class="optional"> ([$2028])</span></span>
                                 <input class="taxcode underlinedText" type="text" value="" tabindex="8">
+                                <div class="taxcode-invoice-note">
+                                    <i class="sprite-fm-mono icon-info-thin-outline"></i>
+                                    <span></span>
+                                </div>
                             </div>
                         </div>
 

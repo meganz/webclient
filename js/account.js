@@ -212,6 +212,12 @@ function u_checklogin3a(res, ctx) {
             r = 3;      // Fully registered
         }
 
+        // Send MCT details if user logged in or create an fully registered account
+        if (r === 3 && localStorage.mctRec) {
+            eventlog(501024, localStorage.mctRec);
+            delete localStorage.mctRec;
+        }
+
         // Notify session resumption.
         mBroadcaster.sendMessage('login2', r);
 

@@ -1073,7 +1073,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             allButtons[i].classList.remove('collapsible');
         }
 
-        const priority = ['download', 'link', 'share', 'rename', 'delete', 'options'];
+        const priority = ['download', 'link', 'copy-link', 'remove-link', 'share', 'rename', 'delete', 'options'];
         const toShow = Object.create(null);
         let __showBtn = (className) => {
             toShow[className] = 1;
@@ -1103,8 +1103,15 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             for (const key of priority) {
                 if (toShow[key]) {
                     doShow(key);
-                    count--;
                     delete toShow[key];
+                    --count;
+                    if (count === 1 && toShow.options) {
+                        doShow('options');
+                        break;
+                    }
+                    else if (count === 0) {
+                        break;
+                    }
                 }
             }
             if (count) {
@@ -1368,12 +1375,16 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             }
 
             if (M.currentrootid === 'public-links') {
+                __showBtn('copy-link');
+                __showBtn('remove-link');
                 if ($.selected.length > 1) {
-                    __showBtn('move');
+                    __hideButton('move');
                 }
                 else {
                     __showBtn('rename');
                 }
+                __hideButton('delete');
+                __hideButton('share');
             }
 
             if (mega.lite.inLiteMode) {

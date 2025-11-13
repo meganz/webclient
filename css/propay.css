@@ -16,6 +16,10 @@
     --font-i-14-600: normal 600 var(--font-copy-medium) var(--font-inter-r);
     --font-i-16-400: normal 400 var(--font-copy-small) var(--font-inter-r);
 }
+#propay .bold {
+    font: inherit;
+    font-weight: 600;
+}
 #propay.mobile-device {
     margin: 0 auto;
 }
@@ -31,6 +35,21 @@
     font: var(--text-h6-pricing);
     text-align: start;
     margin-bottom: 24px;
+}
+#propay button.continue.loading {
+    color: transparent;
+    cursor: default;
+}
+#propay .loading.sprite-fm-theme-after::after,
+#propay .loading.sprite-fm-uni-after::after {
+    animation-name: rotate;
+    animation-duration: 1000ms;
+    animation-iteration-count: infinite;
+    animation-timing-function: steps(8, end);
+    margin: auto;
+    display: block;
+    --icon-size: 22px;
+    position: absolute;
 }
 
 /* Page types */
@@ -156,6 +175,93 @@
     width: 100%;
     max-width: 621px;
 }
+#propay .left-block .create-account-wrapper {
+    display: flex;
+    flex-direction: column;
+}
+#propay .left-block .create-account-wrapper .mega-input input:-webkit-autofill {
+    margin: 0 1px;
+    box-shadow: 0 0 0 50px var(--surface-grey-1) inset;
+}
+#propay .left-block .create-account-wrapper .title,
+#propay .left-block .create-account.title {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+}
+#propay .left-block .create-account-wrapper .title .number,
+#propay .left-block .create-account.title .number {
+    border: 1px solid var(--stroke-mid-grey);
+    border-radius: 100%;
+    aspect-ratio: 1 / 1;
+    height: 100%;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 22px;
+}
+#propay .left-block .create-account-wrapper .login {
+    font: var(--text-inter-400-16);
+    color: var(--color-copy-secondary);
+    margin-bottom: 24px;
+}
+#propay .left-block .create-account-wrapper .login .login-link {
+    text-decoration: underline;
+    font: var(--text-inter-600-16);
+    color: var(--text-color-high);
+}
+#propay .left-block .create-account-wrapper label {
+    font: var(--text-inter-600-14);
+}
+#propay .left-block .create-account-wrapper .password-strength {
+    display: flex;
+    flex-direction: row;
+    color: var(--text-color-error);
+    border-radius: 8px;
+    margin-top: 8px;
+}
+#propay .left-block .create-account-wrapper .password-wrapper {
+    font: var(--text-inter-400-14);
+}
+#propay .left-block .create-account-wrapper .password-wrapper .password-info {
+    color: var(--text-color-secondary);
+    margin-top: 12px;
+}
+#propay .left-block .create-account-wrapper .password-wrapper .pass-incr-strength {
+    display: none;
+    flex-direction: column;
+}
+#propay .left-block .create-account-wrapper .password-wrapper span.pass-incr-strength {
+    margin-bottom: 17px;
+}
+#propay .left-block .create-account-wrapper .password-wrapper ul.pass-incr-strength li {
+    margin-bottom: 12px;
+}
+#propay .left-block .create-account-wrapper .password-wrapper .password-not-stored {
+    margin-top: 12px;
+}
+#propay .left-block .create-account-wrapper .password-wrapper ul {
+    padding-inline-start: 18px;
+}
+#propay .left-block .create-account-wrapper .password-wrapper.strengthen .pass-incr-strength {
+    display: flex;
+}
+#propay .left-block .create-account-wrapper .password-strength span.strong {
+    font: var(--text-inter-600-14);
+}
+#propay .left-block .create-account-wrapper .password-strength.good2,
+#propay .left-block .create-account-wrapper .password-strength.good3 {
+    color: var(--text-color-warning);
+}
+#propay .left-block .create-account-wrapper .password-strength.good4,
+#propay .left-block .create-account-wrapper .password-strength.good5,
+#propay .left-block .create-account-wrapper .password-strength.good6 {
+    color: var(--text-color-success);
+}
+#propay .left-block .create-account-wrapper .password-strength i {
+    margin: 0 8px 0 0;
+}
 #propay .left-block > *:not(.s4):not(footer) {
     display: flex;
     flex-direction: column;
@@ -208,6 +314,9 @@
     margin-bottom: 56px;
     padding-bottom: 56px;
     border-bottom: 1px solid var(--stroke-mid-grey);
+}
+#propay .left-block .sk-active .sk-pro.mega-input::before {
+    border: 0;
 }
 #propay .left-block .mega-input::before {
     border: 1px solid var(--stroke-mid-grey);
@@ -811,6 +920,21 @@
     border-width: 1px;
     border-radius: 8px;
 }
+#propay .payment-address-dialog .input-block .taxcode-invoice-note {
+    color: var(--mobile-text-secondary);
+    display: flex;
+    font: var(--mobile-font-caption-large-regular);
+    line-height: 16px;
+    margin-top: 4px;
+    --mask-color: var(--mobile-icon-secondary);
+}
+#propay .payment-address-dialog .input-block .taxcode-invoice-note i {
+    margin-inline-end: 8px;
+}
+#propay .payment-address-dialog .input-block .taxcode-invoice-note.error {
+    color: var(--mobile-text-error);
+    --mask-color: var(--mobile-text-error)
+}
 #propay .payment-address-dialog aside {
     display: none;
 }
@@ -885,9 +1009,10 @@
     background-color: transparent;
 }
 #propay h1.sk-pro,
-#propay h2.sk-pro,
+#propay .sk-active h2.sk-pro,
 #propay span.sk-pro,
 #propay p.sk-pro,
+#propay label.sk-pro,
 #propay .dropdown-wrapper-primary.sk-pro {
     width: max-content;
     max-width: 100%;
@@ -929,6 +1054,7 @@
     top: 50%;
     border-radius: 8px;
     cursor: default;
+    z-index: 12;
 }
 
 /* Skeleton Loading Content - All items here will be overlayed, and are for spacing only */

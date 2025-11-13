@@ -197,6 +197,11 @@ class MegaOverlay extends MegaComponent {
             }
 
             this.hide();
+
+            if (typeof this.onClose === 'function') {
+                this.onClose();
+            }
+
             if (mega.ui.toast) {
                 mega.ui.toast.rack.removeClass('above-actions');
             }
@@ -292,7 +297,7 @@ class MegaOverlay extends MegaComponent {
         const btn = new MegaButton({
             parentNode: this.headerTitleNode,
             icon: 'sprite-fm-mono icon-arrow-left-regular-outline rtl-rot-180',
-            componentClassname: 'transparent-icon text-icon secondary me-4',
+            componentClassname: 'transparent-icon text-icon secondary me-2',
             type: 'icon'
         }).on('click.dialogBack', cb.bind(null));
 

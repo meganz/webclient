@@ -2685,7 +2685,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                     $fn.attr('title', node.name + ' (' + c + ')');
                     getImage(node, 1).then(uri => {
                         const a = !is_audio(node) && MediaAttribute(node).data || false;
-                        $video.css('background-size', a.width > a.height ? 'cover' : 'contain');
+                        $video[a.width > a.height ? 'addClass' : 'removeClass']('cover');
                         $video.css('background-image', `url(${uri})`);
                     }).catch(dump);
                 }

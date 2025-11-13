@@ -2968,8 +2968,9 @@ var addressDialog = {
                                 iframe.contentWindow.postMessage(message, '*');
                             }
 
-                            if (!success) {
-                                failHandle(message);
+                            if (!success && pro.propay.onPropayPage()) {
+                                pro.propay.hideLoadingOverlay();
+                                pro.propay.updatePayment();
                             }
                         });
                     }
@@ -3365,6 +3366,7 @@ var addressDialog = {
             message = l[7982];
             callbackFn = addressDialog.closeDialog.bind(addressDialog);
         }
+
 
         // Show error dialog
         msgDialog('warninga', l[7235], message, '', callbackFn || addressDialog.showDialog.bind(addressDialog));

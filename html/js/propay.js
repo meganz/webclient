@@ -431,6 +431,8 @@ pro.propay = {
             mega.attr.set('welDlg', 1, -2, true);
         }
 
+        pro.propay.setContinuebuttonText();
+
         // Handle results for different payment providers
         switch (pro.lastPaymentProviderId) {
 

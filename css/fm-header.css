@@ -819,3 +819,21 @@ body:not(.small-nav) .fm-right-header.buttons-up .fm-header-chips-and-view-butto
 .small-nav .fm-right-header .fm-header-chips-and-view-buttons.grid-spacer {
     margin-top: 12px;
 }
+
+@media (max-width: 1198px) {
+    .nav-actions button.promo-button {
+        padding: 10px;
+    }
+    .nav-actions button.promo-button .text-box-wrapper {
+        display: none;
+    }
+    .nav-actions button.promo-button i {
+        margin-inline-end: 0;
+    }
+}
+
+@media (max-width: 1065px) {
+    .nav-actions button.promo-button {
+        display: none;
+    }
+}

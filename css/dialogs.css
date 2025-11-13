@@ -10693,3 +10693,13 @@ body.de .mega-dialog.contact-picker-widget {
 }
 
 /* DC App Promo dialog end */
+
+.mega-sheet.discount-offer .close,
+.mega-sheet.discount-offer .close:hover {
+    background-color: var(--text-color-white-medium);
+    border-radius: 50%;
+}
+
+.theme-dark .mega-sheet.discount-offer .close {
+    color: var(--mobile-button-primary-pressed);
+}

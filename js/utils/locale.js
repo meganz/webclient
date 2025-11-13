@@ -2009,6 +2009,9 @@ mBroadcaster.once('boot_done', function populate_l() {
 
     l[19146] = escapeHTML(l[19146]).replace('%s', `${getBaseUrl()}/support`);
     l[19511] = escapeHTML(l[19511]).replace('%s', `${getBaseUrl()}/support`);
+    l.for_months = escapeHTML(l.for_months)
+        .replaceAll('[S]', '<span class="red font-bold">')
+        .replaceAll('[/S]', '</span>');
     l.lna_reset_p2 = escapeHTML(l.lna_reset_p2)
         .replace('[I]', '<i class="sprite-fm-mono icon-sliders-horizontal-outline"></i>');
     l.signup_agree_tos = escapeHTML(l.signup_agree_tos)

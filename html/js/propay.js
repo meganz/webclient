@@ -3877,118 +3877,311 @@ pro.propay = {
         };
     },
 
-    /** This function to show the discount offer dialog if applies */
-    showDiscountOffer() {
+    async getDiscountedPlanInfo(al, m) {
         'use strict';
-        if (window.offerPopupTimer) {
-            clearTimeout(window.offerPopupTimer);
-        }
-        if (is_mobile || typeof page !== 'string' || page.includes('propay')) {
+
+        await pro.loadMembershipPlans();
+
+        const alIndex = pro.UTQA_RES_INDEX_ACCOUNTLEVEL;
+        const monthIndex = pro.UTQA_RES_INDEX_MONTHS;
+
+        return pro.membershipPlans.find(plan => plan[alIndex] === al && plan[monthIndex] === (m || 12))
+            || pro.membershipPlans.find(plan => plan[alIndex] === al && plan[monthIndex] === 1);
+    },
+
+    /**
+     * @param {Object.<String, String|Number>} dci Discount data received from API
+     * @param {Boolean} ignoreCooldown Whether to ignore the cooldown and show offer right away or not
+     * @returns {Promise<void>}
+     */
+    async showDiscountOffer(dci, ignoreCooldown) {
+        'use strict';
+
+        if (!dci || is_mobile || typeof page !== 'string' || page.includes('propay')) {
             return;
         }
 
-        if (u_attr && u_attr.mkt && Array.isArray(u_attr.mkt.dc) && u_attr.mkt.dc.length) {
-            // if we have multiple offers, we have no preferences we will take the first one.
-            const offer = u_attr.mkt.dc[0];
+        const { sheet } = mega.ui;
 
-            // check if we previewed a popup in the past 20 hours
-            let discountOffers = u_attr['^!discountoffers'] ? JSON.parse(u_attr['^!discountoffers']) : null;
-            if (discountOffers && discountOffers[offer.dc]) {
-                const timeDif = Date.now() - discountOffers[offer.dc];
-                if (timeDif < 72e6) {
-                    if (timeDif > 0) {
-                        window.offerPopupTimer = setTimeout(pro.propay.showDiscountOffer, 72e6 - timeDif + 10);
-                    }
-                    return;
-                }
-            }
-            discountOffers = discountOffers || Object.create(null);
-
-            if (offer.al && offer.pd && (offer.m !== undefined)) {
-                const $discountDlg = $('.mega-dialog.pro-discount', 'body');
-                let title = l[24703];
-                if (offer.m === 1) {
-                    title = l[24702];
-                }
-                else if (offer.m === 12) {
-                    title = l[24701];
-                }
-                title = title.replace('%1', offer.pd + '%').replace('%2', pro.getProPlanName(offer.al));
-                $('.discount-title', $discountDlg).text(title);
-                pro.loadMembershipPlans(() => {
-                    const matchedPlan = pro.membershipPlans.find(plan => {
-                        return plan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL] === offer.al
-                            && plan[pro.UTQA_RES_INDEX_MONTHS] === (offer.m || 12);
-                    });
-                    if (matchedPlan) {
-                        const storageFormatted = numOfBytes(matchedPlan[pro.UTQA_RES_INDEX_STORAGE] * 1073741824, 0);
-                        const desc = l[24704]
-                            .replace('%1', Math.round(storageFormatted.size) + ' ' + storageFormatted.unit);
-                        $('.discount-desc', $discountDlg).text(desc);
-
-                        let discountPopupPref = Date.now();
-                        let reTrigger = true;
-
-                        const storeViewTime = () => {
-                            discountOffers[offer.dc] = discountPopupPref;
-                            mega.attr.set('discountoffers', JSON.stringify(discountOffers), -2, true);
-                        };
-
-                        // binding events
-                        $('button.js-close, .close-btn', $discountDlg).rebind('click.discount', (ev) => {
-                            storeViewTime();
-                            window.closeDialog();
-                            if (reTrigger) {
-                                window.offerPopupTimer = setTimeout(pro.propay.showDiscountOffer, 72e6);
-                            }
-                            mBroadcaster.sendMessage(
-                                'trk:event',
-                                'discountPopup',
-                                'closed',
-                                'btnUsed',
-                                ev.currentTarget.className.indexOf('close-btn') > -1 ? 1 : 0);
-                            mBroadcaster.sendMessage(
-                                'trk:event',
-                                'discountPopup',
-                                'closed',
-                                'notShowAgain',
-                                reTrigger ? 0 : 1);
-                        });
-
-                        $('.get-btn', $discountDlg).rebind('click.discount', () => {
-                            storeViewTime();
-                            $discountDlg.addClass('hidden');
-                            if (reTrigger) {
-                                window.offerPopupTimer = setTimeout(pro.propay.showDiscountOffer, 72e6);
-                            }
-                            loadSubPage('discount' + offer.dc);
-                            mBroadcaster.sendMessage(
-                                'trk:event',
-                                'discountPopup',
-                                'requested',
-                                'notShowAgain',
-                                reTrigger ? 0 : 1);
-                        });
-
-                        $('.fm-picker-notagain.checkbox-block', $discountDlg).rebind('click.discount', () => {
-                            const $check = $('.fm-picker-notagain.checkbox-block .checkdiv', $discountDlg);
-                            if ($check.hasClass('checkboxOff')) {
-                                $check.removeClass('checkboxOff').addClass('checkboxOn');
-                                discountPopupPref = new Date(9999, 11, 30).getTime();
-                                reTrigger = false;
-                            }
-                            else {
-                                $check.addClass('checkboxOff').removeClass('checkboxOn');
-                                discountPopupPref = Date.now();
-                                reTrigger = true;
-                            }
-                        });
-                        M.safeShowDialog('discount-offer', $discountDlg, true);
-                        mBroadcaster.sendMessage('trk:event', 'discountPopup', 'shown');
-                    }
-                });
-            }
+        if (!sheet || sheet.visible) {
+            return;
         }
+
+        const {
+            al,  // Account level
+            dc,  // Discount code
+            m,   // Months
+            lcc, // Currency
+            ldtp, // Discount price
+            ldtpn, // Discount net price
+            ltp, // Current price
+            ltpn, // Current net price
+            edtp, // Discount price (Eur)
+            edtpn,  // Discount net price (Eur)
+            etp, // Current price (Eur)
+            etpn, // Current net price (Eur)
+            pd,   // Discount value
+            ex,   // Expiration time
+            txe,  // Tax excempt
+            txn   // Tax label
+        } = dci;
+
+        const matchedPlan = await pro.propay.getDiscountedPlanInfo(al, m);
+
+        if (!matchedPlan) {
+            return;
+        }
+
+        const cooldown = 60 * 60 * 24 * 7 * 1000; // 1 week cooldown
+
+        // check if we previewed a popup in the past week
+        let discountOffers = u_attr['^!discountoffers'] ? JSON.parse(u_attr['^!discountoffers']) : null;
+
+        if (ignoreCooldown) { // The dialog invoked manually
+            eventlog(501022);
+        }
+        else if (discountOffers && discountOffers[dc]) { // Dialog is on cooldown
+            const timeDif = Date.now() - discountOffers[dc];
+
+            if (timeDif < cooldown) {
+                return;
+            }
+
+            eventlog(501020);
+        }
+
+        discountOffers = discountOffers || Object.create(null);
+
+        let offerTimer = null;
+
+        const storeViewTime = () => {
+            discountOffers[dc] = Date.now();
+            mega.attr.set('discountoffers', JSON.stringify(discountOffers), -2, true);
+        };
+
+        const doCleanup = () => {
+            sheet.overlayNode.classList.remove('overflow-hidden', 'discount-offer');
+            sheet.headerTitleNode.classList.remove('h-40');
+            sheet.contentNode.Ps.destroy();
+
+            if (offerTimer) {
+                clearInterval(offerTimer);
+            }
+
+            storeViewTime();
+        };
+
+        const template = mega.templates.getTemplate('discount-dialog-content-temp')[0];
+        const isEuro = !lcc || lcc === 'EUR';
+        const currency = isEuro && 'EUR' || lcc;
+        const isBeforeTax = txe === 2;
+        const actions = mCreateElement('div', { class: 'flex flex-row justify-end' });
+
+        MegaButton.factory({
+            parentNode: actions,
+            text: l.grab_deal,
+            componentClassname: 'promo-button mx-2',
+            type: 'normal'
+        }).on('click.promoAccept', () => {
+            eventlog(501019);
+            sheet.hide();
+
+            onIdle(() => {
+                doCleanup();
+                loadSubPage(`discount${dc}`);
+            });
+        });
+
+        const remainingLabel = mCreateElement('div', { class: 'font-bold text-color-high' });
+        remainingLabel.textContent = l.offer_ends_in;
+
+        const remainingCounter = mCreateElement(
+            'div',
+            { class: 'remaining flex flex-row items-center mt-2 text-color-high' }
+        );
+
+
+        sheet.show({
+            name: 'targeted-discount-dialog',
+            classList: ['discount-offer'],
+            contents: [template],
+            centered: false,
+            showClose: true,
+            preventBgClosing: true,
+            footer: {
+                slot: [
+                    mCreateElement('div', { class: 'ends-in-info' }, [ remainingLabel, remainingCounter ]),
+                    actions
+                ]
+            },
+            onShow: () => {
+                const { contentNode, headerTitleNode, overlayNode } = sheet;
+                const newPrice = isEuro ? (isBeforeTax ? edtpn : edtp) : (isBeforeTax ? ldtpn : ldtp);
+                const prevPrice = isEuro ? (isBeforeTax ? etpn : etp) : (isBeforeTax ? ltpn : ltp);
+
+                const img = mCreateElement(
+                    'img',
+                    {
+                        src: '/images/mega/promo/discount-banner.webp',
+                        class: 'absolute -top-10 left-0 w-full max-h-48 object-cover' },
+                    [],
+                    headerTitleNode
+                );
+
+                img.addEventListener('click', () => {
+                    eventlog(501021);
+                });
+
+                overlayNode.classList.add('overflow-hidden');
+                headerTitleNode.classList.add('h-40');
+
+                contentNode.querySelector('h1').textContent = pro.getProPlanName(al);
+                contentNode.querySelector('.promo-overtext').textContent = l.notif_limited_time_offer;
+
+                contentNode.querySelector('.duration').appendChild(
+                    parseHTML(mega.icu.format(l.for_months, m).replace('%1', `${pd}%`))
+                );
+                contentNode.querySelector('.previous-price .amount').textContent = formatCurrency(
+                    prevPrice,
+                    currency,
+                    'narrowSymbol'
+                );
+
+                const price = formatCurrency(newPrice, currency, 'narrowSymbol') + (isEuro ? '' : '*');
+
+                contentNode.querySelector('.price').textContent = price;
+
+                const featureArr = [
+                    l.mega_vpn,
+                    l.mega_pwm,
+                    l.obj_storage
+                ];
+                const features = contentNode.querySelector('.features');
+
+                for (let i = 0; i < featureArr.length; i++) {
+                    const row = mCreateElement('div', { class: 'flex flex-row gap-2 items-center my-1' }, [], features);
+
+                    mCreateElement('i', { class: 'sprite-fm-mono icon-check-thin-outline red icon-size-6' }, [], row);
+                    const txt = mCreateElement('div', null, [], row);
+
+                    txt.textContent = featureArr[i];
+                }
+
+                const addDigit = (units) => {
+                    const digitClasses = 'font-bold me-1 text-color-high';
+                    let currentValue = 0;
+                    let digit = mCreateElement('div', { class: digitClasses }, [], remainingCounter);
+                    digit.textContent = currentValue;
+
+                    const label = mCreateElement('span', { class: 'text-color-medium me-3' }, [], remainingCounter);
+
+                    // Update function
+                    return (newValue) => {
+                        if (newValue !== currentValue) {
+                            currentValue = newValue;
+
+                            const newNode = mCreateElement('div', { class: digitClasses });
+                            newNode.textContent = newValue;
+
+                            digit.replaceWith(newNode);
+                            digit = newNode;
+                        }
+
+                        label.textContent = mega.icu.format(units, newValue);
+                    };
+                };
+
+                const updateDays = addDigit(l.plural_day);
+                const updateHours = addDigit(l.plural_hour);
+                const updateMinutes = addDigit(l.plural_minute);
+
+                const update = () => {
+                    const now = parseInt(Date.now() / 1000);
+                    const difference = ex - now;
+
+                    if (difference <= 0) {
+                        remainingCounter.textContent = l.notif_offer_expired;
+                        clearInterval(offerTimer);
+                        return false;
+                    }
+
+                    updateDays(Math.floor(difference / (60 * 60 * 24)));
+                    updateHours(Math.floor((difference % (60 * 60 * 24)) / (60 * 60)));
+                    updateMinutes(Math.floor((difference % (60 * 60)) / 60));
+
+                    return true;
+                };
+
+                update();
+                offerTimer = setInterval(update, 60e3);
+
+                const attachHint = () => {
+                    const hint = [];
+
+                    if (!isEuro) {
+                        hint.push(l.est_price);
+                    }
+
+                    if (isBeforeTax) {
+                        hint.push(`${l.t_may_appy.replace('%1', txn)}`);
+                    }
+
+                    if (hint.length) {
+                        const hintEl = contentNode.querySelector('.price-hint');
+
+                        if (hintEl) {
+                            hintEl.textContent = `* ${hint.join(' ')}`;
+                            hintEl.classList.remove('hidden');
+                        }
+                    }
+                };
+
+                attachHint();
+
+                const perMonth = contentNode.querySelector('.per-month');
+
+                perMonth.textContent = (m % 12)
+                    ? l.per_month.replace('%1', currency)
+                    : l.curr_per_month_billed_yearly.replace('%1', currency);
+
+                const planObj = pro.getPlanObj(
+                    matchedPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL],
+                    matchedPlan[pro.UTQA_RES_INDEX_MONTHS]
+                );
+
+                const valueKeys = [
+                    [planObj.storage, l.of_storage],
+                    [planObj.baseTransfer * m, l.of_transfer]
+                ];
+
+                for (let i = valueKeys.length; i--;) {
+                    const value = [valueKeys[i][0]];
+
+                    if (!value) {
+                        continue;
+                    }
+
+                    const el = mCreateElement('div', { class: 'font-body-1-bold text-color-medium' });
+                    el.textContent = valueKeys[i][1].replace('%1', bytesToSize(value, undefined, 4));
+                    perMonth.after(el);
+                }
+
+                sheet.addClass('discount-offer');
+                contentNode.Ps = new PerfectScrollbar(contentNode);
+
+                if (!ignoreCooldown && mega.ui.header) {
+                    mega.ui.header.showTargetedDiscountButton(dci);
+                }
+
+                mBroadcaster.sendMessage('trk:event', 'discountPopup', 'shown');
+            },
+            onClose: () => {
+                eventlog(501023);
+                doCleanup();
+            }
+        });
+
+        loadingDialog.hide();
     },
 
     sk: {

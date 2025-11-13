@@ -1192,6 +1192,7 @@ pro.proplan = {
     handleDiscount: function(page) {
         'use strict';
         mega.discountCode = page.substr(8);
+
         if (mega.discountCode.length < 15) {
             // it should be 22 length. but made 10 because i am not sure if len=22 is guaranteed
             delete mega.discountInfo;
@@ -1205,9 +1206,10 @@ pro.proplan = {
             login_next = 'discount' + mega.discountCode;
             return loadSubPage('login');
         }
+
         loadingDialog.show();
         delete mega.discountInfo;
-        api.req({a: 'dci', dc: mega.discountCode, extra: true}).then(({result: res}) => {
+        api.req({a: 'dci', dc: mega.discountCode, extra: 1, v: 2}).then(({result: res}) => {
             loadingDialog.hide();
             if (res && res.al && res.pd) {
                 DiscountPromo.storeDiscountInfo(res);

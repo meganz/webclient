@@ -132,6 +132,20 @@ var pro = {
         return obj;
     },
 
+    async getTargetedDiscountInfo() {
+        'use strict';
+
+        if (!u_attr || !u_attr.mkt || !u_attr.mkt.dc) {
+            return false;
+        }
+
+        const { result } = await api.req({ a: 'dci', v: 2, dc: u_attr.mkt.dc[0].dc, extra: 1 }).catch(nop);
+
+        return (result && result.ex > Date.now() / 1000)
+            ? result
+            : false;
+    },
+
     /**
      * Load pricing plan information from the API. The data will be loaded into 'pro.membershipPlans'.
      * @param {Function} loadedCallback The function to call when the data is loaded

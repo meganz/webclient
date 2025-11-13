@@ -374,7 +374,7 @@ class MegaHeader extends MegaMobileHeader {
 
         navActions.prepend(this.loader);
 
-        if (u_attr.mkt && u_attr.mkt.dc.length) {
+        if (u_attr && u_attr.mkt && (u_attr.mkt.dc || []).length) {
             pro.getTargetedDiscountInfo().then((dci) => {
                 this.showTargetedDiscountButton(dci);
             });

@@ -5781,6 +5781,7 @@
     "transferit_overlay_info": "Transfer.it es un servicio de transferencia de archivos desarrollado por MEGA. No utiliza el cifrado punto a punto y est\u00e1 dise\u00f1ado para compartir de forma r\u00e1pida archivos de gran tama\u00f1o, como im\u00e1genes, v\u00eddeos y documentos en alta calidad, facilitando el intercambio de informaci\u00f3n.",
     "transferit_overlay_info2": "Al utilizar Transfer.it, aceptas proporcionarnos las claves de cifrado de los archivos seleccionados, a los que solo t\u00fa tienes acceso actualmente. Se desactivar\u00e1 la privacidad por dise\u00f1o para dichos archivos. A partir de entonces, se aplicar\u00e1 la privacidad por pol\u00edtica.",
     "transferit_powered_by": "Desarrollado por",
+    "transferit_powered_by_mega": "[S]Powered by[/S] %1",
     "transferit_privacy": "Pol\u00edtica de privacidad",
     "transferit_product": "Producto",
     "transferit_ready_to_dl": "Listo para la descarga",

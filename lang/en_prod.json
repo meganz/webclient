@@ -5781,6 +5781,7 @@
     "transferit_overlay_info": "Transfer.it is a file transfer service powered by MEGA. It does not use end-to-end encryption and is ideal for quickly sharing large files such as high-quality images, videos, and documents, making collaboration smoother.",
     "transferit_overlay_info2": "By using Transfer.it, you agree to provide us with the encryption keys for the selected files, which only you currently have access to. This will disable privacy by design for the selected files. Privacy by policy will apply going forward.",
     "transferit_powered_by": "Powered by",
+    "transferit_powered_by_mega": "[S]Powered by[/S] %1",
     "transferit_privacy": "Privacy Policy",
     "transferit_product": "Product",
     "transferit_ready_to_dl": "Ready to download",

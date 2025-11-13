@@ -5781,6 +5781,7 @@
     "transferit_overlay_info": "Transfer.it adalah layanan transfer file yang didukung oleh MEGA. Ini tidak menggunakan enkripsi ujung ke ujung dan sangat ideal untuk berbagi file besar dengan cepat seperti gambar, video, dan dokumen berkualitas tinggi, membuat kolaborasi lebih lancar.",
     "transferit_overlay_info2": "Dengan menggunakan Transfer.it, anda setuju untuk memberi kami kunci enkripsi untuk file yang dipilih, yang saat ini hanya anda yang memiliki akses. Ini akan menonaktifkan privasi berdasarkan desain untuk file yang dipilih. Privasi berdasarkan kebijakan akan berlaku di masa mendatang.",
     "transferit_powered_by": "Didukung oleh",
+    "transferit_powered_by_mega": "[S]Powered by[/S] %1",
     "transferit_privacy": "Kebijakan Privasi",
     "transferit_product": "Produk",
     "transferit_ready_to_dl": "Siap untuk mengunduh",

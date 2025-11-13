@@ -33,7 +33,7 @@ lazy(s4, 'kernel', () => {
         if (self.d) {
             logger.warn("\u26c8", ...a);
         }
-        return self.buildOlderThan10Days || !self.d && self.eventlog(99644, JSON.stringify([1, ...a]));
+        return self.buildOlderThan10Days || self.eventlog(99644, JSON.stringify([1, ...a]));
     });
 
     const te = new TextEncoder();
@@ -332,6 +332,30 @@ lazy(s4, 'kernel', () => {
         const res = privy.ak.getEncryptionKey(ak);
 
         return res.validCrc && res.ek;
+    };
+
+    const createEncryptionKey = () => {
+        const ek = [...crypto.getRandomValues(new Int32Array(4))];
+        const sk = a32_to_base64(ek);
+        const ph = makeUUID().slice(-8);
+        const ak = privy.ak.create(ph, sk, ek[3] & 0xffff);
+
+        const res = privy.ak.getEncryptionKey(ak);
+
+        if (res.validCrc && res.ek === sk && res.ph === ph
+            && `${base64_to_a32(sk)}` === `${ek}` && sk.length === 22) {
+
+            return ek;
+        }
+        const data = Object.entries({ph, ek: sk, dek: res.ek, dph: res.ph, crc: res.validCrc, ak})
+            .reduce((a, [k, v]) => {
+                a.push(`${k}(${v.length | 0})=${v}`);
+                return a;
+            }, []);
+
+        eventlog(`EKFAIL: ${data.join(', ')}`);
+
+        return tSleep(Math.random()).then(() => createEncryptionKey());
     };
 
     const haveGoodBucketParent = (n, p) => {
@@ -900,6 +924,7 @@ lazy(s4, 'kernel', () => {
             return name;
         }
 
+        // @returns {Promise}
         create(name, attrs, stub) {
             api.webLockSummary();
 
@@ -1121,7 +1146,7 @@ lazy(s4, 'kernel', () => {
                 logger.assert(!tree.filter('s4', (n) => getS4NodeByHandle(n.h, true) && !n.s4.sh).length);
                 name = 'S4 Object storage';
             }
-            const ek = [...crypto.getRandomValues(new Int32Array(4))];
+            const ek = await createEncryptionKey();
             const s4 = {u: {}, g: {}, k: {}, p: {}, sh: 1, li: 0x100, s4ses: S4SES};
             const h = await tree.create(name, {s4}, async(t, n, p) => {
                 n = {name: n, ...p};
@@ -2193,6 +2218,7 @@ lazy(s4, 'kernel', () => {
         getEncryptionKey,
         getS4NodeByHandle,
         validateS4Container,
+        createEncryptionKey,
         getS4BucketForObject,
         ...sup,
         ...validator,
@@ -2234,6 +2260,8 @@ lazy(s4, 'kernel', () => {
                 const pid = token(6);
 
                 if (!containerHandle) {
+                    localStorage.s4pf = 1;
+
                     // Create a MEGA-managed container.
                     containerHandle = await s4.kernel.container.create(true);
                 }

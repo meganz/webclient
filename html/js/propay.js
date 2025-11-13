@@ -431,6 +431,8 @@ pro.propay = {
             mega.attr.set('welDlg', 1, -2, true);
         }
 
+        pro.propay.setContinuebuttonText();
+
         // Handle results for different payment providers
         switch (pro.lastPaymentProviderId) {
 
@@ -4020,10 +4022,11 @@ pro.propay = {
                 const prevPrice = isEuro ? (isBeforeTax ? etpn : etp) : (isBeforeTax ? ltpn : ltp);
 
                 const img = mCreateElement(
-                    'img',
+                    'div',
                     {
-                        src: '/images/mega/promo/discount-banner.webp',
-                        class: 'absolute -top-10 left-0 w-full max-h-48 object-cover' },
+                        class: 'promo-banner absolute -top-10 left-0'
+                            + ' w-full h-full max-h-48 bg-center bg-no-repeat'
+                    },
                     [],
                     headerTitleNode
                 );

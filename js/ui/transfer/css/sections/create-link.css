@@ -257,6 +257,25 @@
     visibility: hidden;
 }
 
+.it-box.add-files-floating-menu {
+    border-radius: 0 0 var(--radius-i-lg) var(--radius-i-lg);
+    opacity: 0;
+    position: fixed;
+    top: 0;
+    transform: translateY(-100%);
+    transition: all 0.4s ease;
+    z-index: 100;
+}
+
+.it-box.add-files-floating-menu.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.it-box.add-files-floating-menu > .body {
+    justify-content: center;
+}
+
 
 /* Transfering files box */
 

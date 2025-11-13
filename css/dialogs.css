@@ -10700,6 +10700,10 @@ body.de .mega-dialog.contact-picker-widget {
     border-radius: 50%;
 }
 
+.mega-sheet.discount-offer .promo-banner {
+    background: url("../images/mega/promo/discount-banner.webp");
+}
+
 .theme-dark .mega-sheet.discount-offer .close {
     color: var(--mobile-button-primary-pressed);
 }

@@ -192,6 +192,9 @@ mBroadcaster.once('boot_done', function populate_lx() {
         .replace('[/A1]', '</a>')
         .replace('[A2]', '<a href="mailto:copyright@transfer.it" target="_blank" class="clickurl link">')
         .replace('[/A2]', '</a>');
+    l.transferit_powered_by_mega = escapeHTML(l.transferit_powered_by_mega)
+        .replace(/\[S]/g, '<span class="label">').replace(/\[\/S]/g, '</span>')
+        .replace('%1', '<i class="sprite-it-x16-mono icon-mega"></i>');
 
     if (self.is_transferit) {
         for (const k in self.l) {

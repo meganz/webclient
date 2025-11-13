@@ -716,9 +716,17 @@ lazy(mega, 'wsuploadmgr', () => {
                 };
 
                 ws.onclose = (ev) => {
+                    const {wasClean, code, reason} = ev;
+
                     if (self.d) {
-                        const {wasClean, code, reason} = ev;
                         this.logger.info(`Disconnected from ${ws.url}`, wasClean, code, reason, [ev]);
+                    }
+
+                    if (ws.pool.errored) {
+                        tryCatch(() => {
+                            const srv = ws.url.split('/')[2].split('.')[0];
+                            eventlog(501026, JSON.stringify([1, srv, wasClean, code, reason]), true);
+                        })();
                     }
 
                     // if the connection dropped unexpectedly, we return the in-flight chunks to the pool

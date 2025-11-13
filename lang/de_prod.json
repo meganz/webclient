@@ -5781,6 +5781,7 @@
     "transferit_overlay_info": "Transfer.it ist ein auf MEGA aufbauender Dateitransfer-Service ohne Ende-zu-Ende-Verschl\u00fcsselung, der sich ideal f\u00fcr den schnellen Austausch gro\u00dfer Dateien \u2013 zum Beispiel hochaufl\u00f6sende Bilder, Videos und Dokumente \u2013 eignet und die Zusammenarbeit vereinfacht.",
     "transferit_overlay_info2": "Mit der Nutzung von Transfer.it erkl\u00e4ren Sie sich damit einverstanden, die Verschl\u00fcsselungsschl\u00fcssel f\u00fcr die ausgew\u00e4hlten Dateien, auf die derzeit nur Sie Zugriff haben, uns zur Verf\u00fcgung zu stellen. Damit wird der Datenschutz f\u00fcr die ausgew\u00e4hlten Dateien deaktiviert. Ab diesem Zeitpunkt wird die Sicherheit durch Richtlinien gew\u00e4hrleistet (\u201eprivacy by policy\u201c).",
     "transferit_powered_by": "Powered by",
+    "transferit_powered_by_mega": "[S]Powered by[/S] %1",
     "transferit_privacy": "Datenschutzerkl\u00e4rung",
     "transferit_product": "Produkt",
     "transferit_ready_to_dl": "Bereit zum Download",

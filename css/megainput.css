@@ -947,6 +947,21 @@
     display: none;
 }
 
+div.mega-input.slim.box-style {
+    height: 36px;
+    font: var(--mobile-font-caption-small-regular);
+    margin-bottom: 8px;
+}
+div.mega-input.slim.box-style input {
+    font: var(--mobile-font-caption-large-regular);
+}
+div.mega-input.slim.box-style .message-container {
+    top: 36px;
+}
+div.mega-input.slim.box-style .message-container i {
+    --mask-color: var(--mobile-text-error);
+    --icon-size: 16px;
+}
 
 /*
  * Revamped styles

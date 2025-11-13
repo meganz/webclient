@@ -1004,7 +1004,7 @@ self.openSaveAsDialog = (node, content, cb) => {
     mobile.nodeSelector.show({ type: 'saveTextTo', original: node });
 
     if (!mega.ui.saveTextAs) {
-        mega.ui.saveTextAs = new MobileNodeNameControl({type: 'saveTextAs'});
+        mega.ui.saveTextAs = new NodeNameControl({type: 'saveTextAs'});
     }
 
     mega.ui.saveTextAs.onSubmit = async nn => {

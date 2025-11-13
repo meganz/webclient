@@ -40,7 +40,7 @@ lazy(s4, 'groups', () => {
                 .then((item) => {
                     const {name, gid: id} = item;
                     const obj = {name, id, kernel: 'group'};
-                    return s4.ui.renameDialog('groups', obj, l.s4_group_rename, 'icon-contacts');
+                    return s4.ui.renameDialog('groups', obj, l.s4_group_rename);
                 })
                 .catch(tell);
         },

@@ -573,9 +573,6 @@
                 text: l[68],
                 icon: 'sprite-fm-mono icon-folder-plus-thin-outline',
                 onClick() {
-                    if (M.isInvalidUserStatus()) {
-                        return;
-                    }
                     createFolderDialog();
                     eventlog(500007);
                 }

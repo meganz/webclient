@@ -105,10 +105,9 @@ mega.ui.MegaInputs.prototype.underlinedText._init = function() {
     if (!$input.hasClass('megaInputs')) {
 
         const hasTitle = !$input.hasClass('no-title-top') && ($input.attr('title') || $input.attr('placeholder'));
-        const wrapperClass = hasTitle ? 'title-ontop' : '';
 
         // Wrap it with another div for styling and animation
-        $input.wrap(`<div class="mega-input ${wrapperClass}"></div>`);
+        $input.wrap(`<div class="mega-input"></div>`);
 
         const $wrapper = this.$wrapper = $input.closest(`.mega-input`);
 
@@ -119,27 +118,7 @@ mega.ui.MegaInputs.prototype.underlinedText._init = function() {
         }
 
         if (hasTitle) {
-            // Insert animatied title
-            let title = escapeHTML($input.attr('title') || $input.attr('placeholder'));
-
-            // Adding required sign
-            title += this.required ? ' <span class="required-red">*</span>' : '';
-
-            const titleBlock = '<div class="mega-input-title">' + title + '</div>';
-
-            // Insert title block
-            $wrapper.safePrepend(titleBlock);
-
-            // Bind event for animation on title
-            const $titleBlock = $('.title', $input.parent());
-            $titleBlock.rebind('click.underlinedText', function() {
-
-                const $this = $(this);
-
-                if (!$this.parent().hasClass('active')) {
-                    $this.next('input').trigger('focus');
-                }
-            });
+            this.underlinedText._addTitleBlock.call(this);
         }
 
         // Insert error message block
@@ -236,6 +215,25 @@ mega.ui.MegaInputs.prototype.underlinedText._bindEvent = function() {
             }
         });
     }
+};
+
+mega.ui.MegaInputs.prototype.underlinedText._addTitleBlock = function() {
+
+    'use strict';
+
+    // Insert animatied title
+    let title = escapeHTML(this.$input.attr('title') || this.$input.attr('placeholder'));
+
+    // Adding required sign
+    title += this.required ? ' <span class="required-red">*</span>' : '';
+
+    const titleBlock = `<div class="mega-input-title">${title}</div>`;
+
+    // Insert title block
+    this.$wrapper.safePrepend(titleBlock);
+    this.$wrapper.addClass('title-ontop');
+
+    return $('.mega-input-title', this.$wrapper);
 };
 
 mega.ui.MegaInputs.prototype.underlinedText._updateShowHideErrorAndMessage = function() {
@@ -590,16 +588,22 @@ mega.ui.MegaInputs.prototype.underlinedText._extendedFunctions = function() {
     'use strict';
 
     /**
-     * Update title after MegaInput is already inited, if a title exists.
+     * Update title after MegaInput is already inited.
      * The title can be passed as parameter
      * or simply update title or placeholder on the input and call this will update title.
      *
      * @param {String} [title] - New title.
      */
     this.updateTitle = function(title) {
-        const $titleElem = $('.mega-input-title', this.$input.parent());
 
-        if ($titleElem) {
+        let $titleElem = $('.mega-input-title', this.$input.parent());
+
+        if ($titleElem.length === 0 && title) {
+            // If there is no title block, create one.
+            $titleElem = this.underlinedText._addTitleBlock.call(this);
+        }
+
+        if ($titleElem.length) {
             title = title || this.$input.attr('title') || this.$input.attr('placeholder');
 
             // Note: This should remain as text() as some place use third party pulling text as title.

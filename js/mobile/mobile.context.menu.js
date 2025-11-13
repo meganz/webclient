@@ -113,9 +113,10 @@ class MegaMobileContextMenu extends MegaComponentGroup {
             delete items['.copy-item'];
             delete items['.move-item'];
             delete items['.send-to-contact-item'];
+            delete items['.rename-item'];
+            delete items['.properties-item'];
         }
-
-        if (is_image3(node) && M.v.filter(is_image3).length > 1) {
+        else if (is_image3(node) && M.v.filter(is_image3).length > 1) {
             items['.play-slideshow'] = 1;
         }
 

@@ -846,6 +846,9 @@ lazy(mega, 'rewindUtils', () => {
             mega.rewindUtils.task.start('restore:requests:build');
             const requests = await this.buildRequests(rwRoot);
             mega.rewindUtils.task.complete('restore:requests:build');
+            if (!requests.length) {
+                logger.info('RewindReinstateHandler.restoreNodes: none to restore');
+            }
 
             progress.next();
 

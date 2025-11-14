@@ -42,15 +42,15 @@ lazy(mega, 'rewindUtils', () => {
         }
 
         start(id) {
-            const isProgressTask = this._isProgressTask(id);
-            if (isProgressTask) {
+            const isTaskHandled = this._isTaskHandled(id);
+            if (isTaskHandled) {
                 this.running++;
             }
 
             this.update(id, 0);
 
             if (!this.timers.has(id)) {
-                const taskInfo = isProgressTask ? `-> Task #${this.running}` : '';
+                const taskInfo = isTaskHandled ? `-> Task #${this.running}` : '';
                 logger.info(`rewind:${id}: started ${taskInfo}`);
                 logger.time(`rewind:${id}`);
                 this.timers.add(id);
@@ -67,7 +67,7 @@ lazy(mega, 'rewindUtils', () => {
         }
 
         update(id, val) {
-            if (this._isProgressTask(id) && val >= 0 && val <= 100) {
+            if (this._isTaskHandled(id) && val >= 0 && val <= 100) {
                 if (val.toFixed(2) === this.tasks[id].toFixed(2)) {
                     if (val === 0 || val === 100) {
                         mega.rewindUi.sidebar.updateTaskProgress(this.running, val);
@@ -93,7 +93,7 @@ lazy(mega, 'rewindUtils', () => {
             }
         }
 
-        _isProgressTask(id) {
+        _isTaskHandled(id) {
             return this.tasks.hasOwnProperty(id);
         }
     }
@@ -256,6 +256,7 @@ lazy(mega, 'rewindUtils', () => {
             u_privk,
             u_handle,
             allowNullKeys,
+            secureKeyMgr: true,
             usk: window.u_attr && u_attr['*~usk']
         };
 
@@ -315,7 +316,6 @@ lazy(mega, 'rewindUtils', () => {
         initChannel() {
             super.initChannel(-1, 'cs', {
                 '[': this.handleResidue,
-                '[{[ok0{': this.handleOwnerKey,
                 '[{[f{': this.handleNode,
                 '[{[f2{': this.handleNode
             });
@@ -345,28 +345,6 @@ lazy(mega, 'rewindUtils', () => {
             const {length} = mega.rewindUtils.queue[node.apiId];
             mega.rewindUtils.queue[node.apiId].push(
                 nodePromise.then((node) => mega.rewindUtils.handleTreeNode(node, length)));
-        }
-
-        handleOwnerKey(ownerKey) {
-            const apiId = this.__ident_1;
-            initRewindWorker();
-            if (rewindWorker) {
-                if (!rewindWorker.hello.initSignal) {
-                    rewindWorker.hello.initSignal = [];
-                }
-
-                rewindWorker.hello.initSignal.push(ownerKey);
-                // in some cases "ownerKeyPromise" will never resolve the second time run
-                // - rewind process is stuck waiting these promises to resolve in "checkRequestDone"
-                // Fixed by removing rewindWorker at the end of "checkRequestDone"
-                const ownerKeyPromise = rewindWorker.broadcast('decrypt', ownerKey);
-
-                if (!mega.rewindUtils.queue[apiId]) {
-                    mega.rewindUtils.queue[apiId] = [];
-                }
-
-                mega.rewindUtils.queue[apiId].push(ownerKeyPromise);
-            }
         }
 
         handleResidue(response) {
@@ -1048,11 +1026,6 @@ lazy(mega, 'rewindUtils', () => {
                     mega.rewind.sumSizeData();
                     logger.info(`Api.checkRequestDone -` +
                         `Downloaded ${Object.keys(mega.rewind.nodeDictionary).length - 1} nodes`);
-                }
-
-                if (rewindWorker) {
-                    rewindWorker.dispose();
-                    rewindWorker = null;
                 }
 
                 logger.info(`Api.checkRequestDone - Request done - with inflight - isPacket: ${isPacket}`);

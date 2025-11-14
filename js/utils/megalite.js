@@ -184,7 +184,7 @@ lazy(mega, 'lite', () => {
         const name = 'megalite-dialog';
         const txt = mCreateElement('div', { class: 'text-left' });
         txt.append(parseHTML(
-            escapeHTML(msg).replace('[A]', '<a href="" class="link">').replace('[/A]', '</a>')
+            escapeHTML(msg).replace('[A]', '<a href="" class="primary-link">').replace('[/A]', '</a>')
         ));
 
         const lnkNode = txt.querySelector('a');

@@ -26,7 +26,7 @@ var megaMsgDialog = (() => {
             /* Cleanup */
             if (actionButton) {
                 actionButton.off('click');
-                targetSheet.hide();
+                closeMsg();
             }
             targetSheet.off('close.megaSheet');
             targetSheet.clear();
@@ -38,7 +38,7 @@ var megaMsgDialog = (() => {
 
             if (callbacks) {
                 if (callbacks.onInteraction && typeof callbacks.onInteraction === 'function') {
-                    callbacks.onInteraction(callbackArg || false, index);
+                    callbacks.onInteraction(callbackArg, index);
                 }
 
                 if (callbackArg && callbacks.onSuccess && typeof callbacks.onSuccess === 'function') {

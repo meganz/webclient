@@ -136,6 +136,7 @@ lazy(mega.devices.sections, 'deviceFolders', () => {
             const elAdded = aTemplate.querySelector('.device-centre-item-added');
             const elModified = aTemplate.querySelector('.device-centre-item-modified');
 
+            aTemplate.classList.add('megaListItem');
             if (mega.sensitives.shouldBlurNode(M.d[aNode.h])) {
                 aTemplate.classList.add('is-sensitive');
             }

@@ -556,15 +556,6 @@ button.megasync-slider.prev {
 :not(.video-theatre-mode).video .download.video-block {
     height: 261px;
 }
-.video .download.video-block video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.video.video-theatre-mode .download.video-block video {
-    object-fit: contain;
-}
 .video.video-theatre-mode .download.download-page.expanded,
 .video.video-theatre-mode .download.download-page.expanded:not(.en) {
     max-height: 100%;

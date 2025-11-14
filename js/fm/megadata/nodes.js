@@ -4359,7 +4359,7 @@ MegaData.prototype.nodeRemovalUIRefresh = function(handle, parent) {
             if (target && this.getNodeRoot(handle) !== root) {
                 if (customView) {
                     const {type, original, prefixPath} = customView;
-                    target = target === this.RootID ?
+                    target = target === this.RootID && !M.onDeviceCenter ?
                         type :
                         type === mega.devices.rootId ? original : prefixPath + target;
                 }

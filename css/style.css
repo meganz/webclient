@@ -10537,7 +10537,12 @@ div.camera-bottom-txt {
     vertical-align: top;
     width: 50%;
 }
-
+.user-management-account-settings .bus-input-block .taxcode-invoice-note {
+    color: var(--text-color-medium);
+    font: var(--text-body2);
+    margin-top: -12px;
+    text-align: start;
+}
 
 .user-management-account-settings .setting-block {
     background: var(--mobile-surface-1);

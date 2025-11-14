@@ -517,7 +517,11 @@ function dashboardUI(updProcess) {
                 $('.value', $s4DataItem).text(bytesToSize(s4StrgVal));
                 $s4DataItem.removeClass('hidden');
 
-                $('.s4-dashboard', $s4DataItem).rebind('click.openS4', () => s4.main.render());
+                $('.s4-dashboard', $s4DataItem).rebind('click.openS4', () => {
+                    const res = s4.main.render();
+                    eventlog(501012);
+                    return res;
+                });
 
                 // Update a tags
                 clickURLs();
@@ -671,14 +675,25 @@ function dashboardUI(updProcess) {
 
             $('.ba-version .versioning-settings').rebind('click', function() {
                 loadSubPage('fm/account/file-management');
+                eventlog(501008);
             });
 
             $('.used-storage-info.ba-pub-links .links-s', $bsnDashboard).rebind('click.suba', () => {
                 loadSubPage('fm/links');
+                eventlog(501006);
             });
 
             $('.used-storage-info.ba-s4 .object-storage', $bsnDashboard)
-                .rebind('click.openS4', () => s4.main.render());
+                .rebind('click.openS4', () => {
+                    const res = s4.main.render();
+                    eventlog(501012);
+                    return res;
+                });
+            $('.used-storage-info.ba-root', $bsnDashboard).rebind('click', () => eventlog(501011));
+            $('.used-storage-info.ba-version span', $bsnDashboard).rebind('click', () => eventlog(501007));
+            $('.used-storage-info.ba-inshare span', $bsnDashboard).rebind('click', () => eventlog(501003));
+            $('.used-storage-info.ba-outshare span', $bsnDashboard).rebind('click', () => eventlog(501004));
+            $('.used-storage-info.ba-rubbish span', $bsnDashboard).rebind('click', () => eventlog(501005));
 
             fileNumText = ffNumText(verFiles, 'file');
             $('.ba-version .ff-occupy', $dataStats).text(bytesToSize(verBytes));
@@ -702,6 +717,7 @@ function dashboardUI(updProcess) {
         // Button on dashboard to backup their master key
         $('.dashboard .backup-master-key').rebind('click', function() {
             M.showRecoveryKeyDialog(2);
+            eventlog(500990);
         });
     });
 }
@@ -720,27 +736,35 @@ dashboardUI.updateCloudDataWidget = function() {
 
     $('.data-item .links-s').rebind('click', function() {
         loadSubPage('fm/public-links');
+        eventlog(501006);
         return false;
     });
 
     $('.data-item .rubbish-bin-dashboard').rebind('click', function() {
         loadSubPage('fm/' + M.RubbishID);
+        eventlog(501005);
         return false;
     });
 
     $('.data-item .incoming').rebind('click', function() {
         loadSubPage('fm/shares');
+        eventlog(501003);
         return false;
     });
 
     $('.data-item .outgoing').rebind('click', function() {
         loadSubPage('fm/out-shares');
+        eventlog(501004);
         return false;
     });
 
     $('.account.data-item .versioning-settings').rebind('click', function() {
         loadSubPage('fm/account/file-management');
+        eventlog(501008);
     });
+    $('.account.data-item i.icon-file').next('span').rebind('click', () => eventlog(501009));
+    $('.account.data-item i.icon-folder').next('span').rebind('click', () => eventlog(501010));
+    $('.account.data-item.account-data-item-versions span').rebind('click', () => eventlog(501007));
 
     for (let idx = 0; idx < $itemNodes.length; idx++) {
         const elm = $itemNodes[idx];

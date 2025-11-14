@@ -374,6 +374,12 @@ class MegaHeader extends MegaMobileHeader {
 
         navActions.prepend(this.loader);
 
+        if (u_attr && u_attr.mkt && (u_attr.mkt.dc || []).length) {
+            pro.getTargetedDiscountInfo().then((dci) => {
+                this.showTargetedDiscountButton(dci);
+            });
+        }
+
         /* Bottom block */
 
         this.domNode.querySelector('.bottom-block .nav-navigation').textContent = '';
@@ -383,6 +389,30 @@ class MegaHeader extends MegaMobileHeader {
         this.topBlock.prepend(secondaryButtons);
 
         this.resetBottomBlock = nop;
+    }
+
+    showTargetedDiscountButton(dci) {
+        if (!dci) {
+            return;
+        }
+
+        const navActions = this.domNode.querySelector('.top-block .nav-actions');
+
+        if (!navActions || navActions.querySelector('.promo-button')) {
+            return;
+        }
+
+        const { al, pd } = dci;
+        const btn = new MegaButton({
+            parentNode: navActions,
+            text: l.discount_off.replace('%1', `${pd}%`).replace('%2', pro.getProPlanName(al)),
+            icon: 'sprite-fm-mono icon-label-thin-outline',
+            componentClassname: 'promo-button'
+        }).on('click.headerPromo', () => {
+            pro.propay.showDiscountOffer(dci, true);
+        });
+
+        navActions.prepend(btn.domNode);
     }
 
     handleMenu(type, close) {

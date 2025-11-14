@@ -515,3 +515,8 @@ button.nav-elem.pro-only:active {
 .nav-elem.text-only span.primary-text:active {
     color: var(--mobile-button-primary-pressed);
 }
+
+.nav-elem.promo-button {
+    background-color: var(--mobile-button-brand);
+    color: white;
+}

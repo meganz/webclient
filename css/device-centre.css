@@ -292,8 +292,8 @@ table.device-centre .device-centre-item-modified {
     padding-left: 0;
 }
 
-.device-centre-grid-view .grid-table td.grid-url-field a.grid-url-arrow {
-    top: 25%;
+.device-centre-grid-view .grid-table td a.grid-url-arrow {
+    top: 50%;
 }
 
 /* ============================ *\

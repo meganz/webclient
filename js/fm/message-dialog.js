@@ -72,7 +72,7 @@ function msgDialog(type, title, msg, subMsg, callback, checkboxCallback) {
 
         // @todo: Remove stuff once mobile msgDialog and ephemeral session UI are ready
         if (type === 'import_login_or_register' && typeof callback === 'function') {
-            callback(0);
+            callback(-1);
             return false;
         }
 
@@ -176,7 +176,7 @@ Object.defineProperty(msgDialog, 'desktop', {
                     if (typeof callback === 'function') {
                         callback(res);
                     }
-                    mega.ui.sheet.hide();
+                    closeMsg();
                 });
                 priBtn[isDestructive ? 'addClass' : 'removeClass']('destructive');
             }
@@ -195,7 +195,7 @@ Object.defineProperty(msgDialog, 'desktop', {
                     if (typeof callback === 'function') {
                         callback(res);
                     }
-                    mega.ui.sheet.hide();
+                    closeMsg();
                 });
             }
 
@@ -209,7 +209,7 @@ Object.defineProperty(msgDialog, 'desktop', {
                     if (typeof callback === 'function') {
                         callback(0);
                     }
-                    mega.ui.sheet.hide();
+                    closeMsg();
                 });
             }
 
@@ -223,7 +223,7 @@ Object.defineProperty(msgDialog, 'desktop', {
                     if (typeof callback === 'function') {
                         callback(-2);
                     }
-                    mega.ui.sheet.hide();
+                    closeMsg();
                 });
             }
         }

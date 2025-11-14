@@ -99,7 +99,7 @@
     width: 100%;
 }
 
-.overlay-wrap .content a.link {
+.overlay-wrap .content a.primary-link {
     color: var(--mobile-link-primary);
 }
 

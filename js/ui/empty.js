@@ -10,14 +10,15 @@ lazy(mega.ui, 'empty', () => {
                 '.fm-empty-search',
             ];
 
-            if (!M.currentdirid.includes('/')) {
-                emptyArr.push(`.fm-empty-${M.currentdirid}`);
+            const c = M.currentdirid;
+            if (typeof c === 'string' && !c.includes('/')) {
+                emptyArr.push(`.fm-empty-${c}`);
             }
 
             $(emptyArr.join(',')).addClass('hidden');
         }
 
-        const existing = target.querySelector('.empty-state');
+        const existing = target && target.querySelector('.empty-state');
 
         if (existing) {
             target.removeChild(existing);

@@ -51,7 +51,6 @@ function msgDialog(type, title, msg, subMsg, callback, checkboxCallback) {
         }
     }
 
-    $.msgDialog = type;
     const reverseAction = ['warninga', 'warningb', 'info', 'error'].includes(type);
 
     if (is_mobile) {
@@ -66,8 +65,11 @@ function msgDialog(type, title, msg, subMsg, callback, checkboxCallback) {
 
         if (type === 'reload-account') {
             showClose = true;
-            safeShow = 'reload-account';
+            safeShow = type;
             image = 'reload';
+        }
+        else {
+            $.msgDialog = type;
         }
 
         // @todo: Remove stuff once mobile msgDialog and ephemeral session UI are ready
@@ -231,6 +233,7 @@ Object.defineProperty(msgDialog, 'desktop', {
         // Reload account is using a different layout
         const contents = type === 'reload-account' ? [title, msg] : [msg, subMsg];
 
+        $.msgDialog = type;
         megaMsgDialog.render(
             ...contents,
             false,

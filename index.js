@@ -705,7 +705,7 @@ function init_page() {
 
             if (fminitialized && (!folderlink || pfkey !== oldPFKey)) {
                 // Clean up internal state in case we're navigating back to a folderlink
-                M.currentdirid = M.RootID = M.currentCustomView = undefined;
+                M.currentdirid = M.RootID = M.currentCustomView = false;
                 delete $.onImportCopyNodes;
                 delete $.mcImport;
                 delete $.albumImport;

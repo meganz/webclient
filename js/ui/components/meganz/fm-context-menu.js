@@ -40,7 +40,7 @@
                 componentClassname: 'context-button text-icon',
                 onClick: (ev) => {
                     if (this.filtered.length === 1) {
-                        this.getChild(this.filtered[0]).trigger('click');
+                        this.getChild(this.filtered[0]).trigger(ev.originalEvent);
                     }
                     else if (typeof options.onClick === 'function') {
                         options.onClick(ev);

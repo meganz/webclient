@@ -215,6 +215,32 @@ if (Object.hasOwn === undefined) {
             }
         });
     }
+
+    if (!RegExp.escape) {
+        // @todo unicode...
+        Object.defineProperty(RegExp, 'escape', {
+            value(x) {
+                let p = '';
+                const c = ((x = String(x))).codePointAt(0);
+                if (c < 0xff) {
+                    x = x.slice(1);
+                    p = `\\x${c.toString(16)}`;
+                }
+                return p + x.replace(/[$()*+.?[\\\]^{|}]/g, '\\$&');
+            }
+        });
+    }
+
+    if (!String.prototype.replaceAll) {
+        Object.defineProperty(String.prototype, 'replaceAll', {
+            value(search, replace) {
+                if (!(search instanceof RegExp)) {
+                    search = new RegExp(RegExp.escape(search), 'g');
+                }
+                return this.replace(search, replace);
+            }
+        });
+    }
 })();
 
 mBroadcaster.once('boot_done', tryCatch(() => {

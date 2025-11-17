@@ -470,7 +470,9 @@ function resetSensitives() {
             }
         };
 
-        sensitives.resetGlobalParameters();
+        delay('resetSensitives', () => {
+            mega.sensitives.resetGlobalParameters();
+        });
 
         if (featureEnabled) {
             sensitives = {

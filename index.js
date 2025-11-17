@@ -1703,6 +1703,10 @@ function init_page() {
             if (pfid) {
                 api_setfolder(n_h);
             }
+
+            delay('resetSensitives', () => {
+                mega.sensitives.resetGlobalParameters();
+            });
         }
 
         // Set System default theme or any previously selected
@@ -1797,6 +1801,10 @@ function init_page() {
         }
 
         $('#pageholder, #startholder').addClass('hidden');
+
+        if (pfid) {
+            $('.fm-notification-block', '.fm-banner-holder').removeClass('visible');
+        }
 
         // Prevent duplicate HTML content breaking things
         // what a strange solution!  [emptying #startholder!]

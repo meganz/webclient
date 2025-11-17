@@ -1351,7 +1351,7 @@
             }
         };
         uaPacketParserHandler['^!dv'] = function() {
-            if (fminitialized && M.account) {
+            if (fminitialized) {
                 delay('fv:uvi^dv', fileversioning.updateVersionInfo.bind(fileversioning), 4e3);
             }
         };

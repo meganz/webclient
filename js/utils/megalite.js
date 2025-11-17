@@ -25,6 +25,7 @@ lazy(mega, 'lite', () => {
 
     /** Disabled sections for MEGA Lite*/
     const disabledSections = freeze({
+        albums: 1,
         faves: 1,
         photos: 1,
         recents: 1

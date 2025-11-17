@@ -246,7 +246,9 @@ MegaData.prototype.getPath = function(id) {
             // we reached the inshare root, use the owner next
             id = inshare;
         }
-        const n = M.getNodeByHandle(id);
+
+        // skip devices
+        const n = M.onDeviceCenter && this.dcd[id] ? false : M.getNodeByHandle(id);
 
         if (
             n

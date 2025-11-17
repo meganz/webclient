@@ -3151,10 +3151,7 @@ var addressDialog = {
             this.stripeSaleId = null;
             if (utcResult.EUR) {
                 const $stripeDialog = this.getStripeDialog().toggleClass('edit', !!utcResult.edit);
-                const $iframeContainer = pro.propay.paymentButton
-                    ? $('.iframe-container', $stripeDialog)
-                    : $('.mobile.payment-stripe-dialog .iframe-container,' +
-                          ' .payment-stripe-dialog .iframe-container');
+                const $iframeContainer = $('.iframe-container', $stripeDialog);
                 let $stripeIframe = $('iframe#stripe-widget');
                 $stripeIframe.remove();
                 const sandBoxCSP = 'allow-scripts allow-same-origin allow-forms allow-popups allow-top-navigation';
@@ -3279,7 +3276,14 @@ var addressDialog = {
                     loadingDialog.hide();
                 }
 
-                // $('.content', $stripeDialog).toggleClass('hidden', pro.propay.useSavedCard);
+                if (!addressDialog.iframePageChangeHandler) {
+                    addressDialog.iframePageChangeHandler = mBroadcaster.addListener('pagechange', () => {
+                        $('iframe#stripe-widget').remove();
+                        closeStripeDialog();
+                        mBroadcaster.removeListener(addressDialog.iframePageChangeHandler);
+                        delete addressDialog.iframePageChangeHandler;
+                    });
+                }
 
                 $stripeDialog.removeClass('hidden');
                 pro.megapay.init();

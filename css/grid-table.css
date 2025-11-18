@@ -710,6 +710,11 @@ table.grid-table .grid-url-header-nw .grid-url-arrow {
     right: auto;
 }
 
+.out-shared-grid-view table.grid-table .grid-url-header-nw .grid-url-arrow,
+.shared-grid-view table.grid-table .grid-url-header-nw .grid-url-arrow {
+    top: unset;
+}
+
 table.grid-table tr {
     box-sizing: border-box;
 }

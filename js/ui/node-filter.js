@@ -704,7 +704,7 @@ lazy(mega.ui, 'mNodeFilter', () => {
                 this.initSearchFilter();
             }
 
-            if (M.search && !stash && history.state.searchFilters) {
+            if (M.search && !stash && window.history && history.state && history.state.searchFilters) {
                 this.reapplyFilterSelections(history.state.searchFilters);
             }
         },

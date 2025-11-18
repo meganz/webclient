@@ -251,6 +251,7 @@ var megaMsgDialog = (() => {
                 M.safeShowDialog(name, () => {
                     _sheet();
 
+                    $.msgDialog = safeShow;
                     targetSheet.name = name;
                     targetSheet.safeShow = true;
 

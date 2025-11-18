@@ -2014,6 +2014,11 @@ class Call extends mixins.w9 {
     this.bindCallEvents();
     didMount == null || didMount();
   }
+  componentDidUpdate() {
+    if (typeof psa !== 'undefined') {
+      psa.repositionMeetingsCall();
+    }
+  }
   render() {
     let _ref;
     const {
@@ -11510,6 +11515,11 @@ class FloatingVideo extends REaCt().Component {
     this.collapseListener = mBroadcaster.addListener('meetings:collapse', () => this.setState({
       collapsed: true
     }));
+  }
+  componentDidUpdate() {
+    if (typeof psa !== 'undefined') {
+      psa.repositionMeetingsCall();
+    }
   }
   render() {
     const {

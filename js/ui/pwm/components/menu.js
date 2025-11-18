@@ -56,8 +56,10 @@ class MegaPMMenu extends MegaMenu {
         const menuWidth = parseFloat(dialog.offsetWidth);
         let menuHeight = parseFloat(dialog.offsetHeight);
 
+        const psaBannerHeight = typeof psa === 'undefined' ? 0 : psa.getBannerHeight();
+
         // calculate the max width & height available for the context menu dialog
-        const maxHeight = POPUP_HEIGHT - mega.ui.pm.POPUP_TOP_MARGIN;
+        const maxHeight = POPUP_HEIGHT - mega.ui.pm.POPUP_TOP_MARGIN - psaBannerHeight;
 
         if (this.event.type === 'contextmenu') {
             posLeft = this.event.originalEvent.clientX;
@@ -68,8 +70,8 @@ class MegaPMMenu extends MegaMenu {
                 posLeft = POPUP_WIDTH - menuWidth - mega.ui.pm.POPUP_SIDE_MARGIN;
             }
             // if the bottom side of the popup is out of the window, move it to fit the bottom side of the window
-            if (posTop + menuHeight + mega.ui.pm.POPUP_TOP_MARGIN > POPUP_HEIGHT) {
-                posTop = POPUP_HEIGHT - menuHeight - mega.ui.pm.POPUP_TOP_MARGIN;
+            if (posTop + menuHeight + mega.ui.pm.POPUP_TOP_MARGIN + psaBannerHeight > POPUP_HEIGHT) {
+                posTop = POPUP_HEIGHT - menuHeight - mega.ui.pm.POPUP_TOP_MARGIN - psaBannerHeight;
             }
         }
         else {

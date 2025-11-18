@@ -1769,6 +1769,10 @@ FullScreenManager.prototype.enterFullscreen = function() {
                     .addClass('icon-maximize-02-small-regular-outline');
                 $('.fs-wrapper .tooltip', $wrapper).text(l.video_player_fullscreen);
             }
+
+            if (typeof psa !== 'undefined') {
+                psa.repositionMediaPlayer();
+            }
         };
 
         var $element = page === 'download' ? $wrapper.find('.video-block') : $wrapper;
@@ -2744,6 +2748,10 @@ FullScreenManager.prototype.enterFullscreen = function() {
                             node.stream = stream;
                         }
                         stream.start();
+
+                        if (typeof psa !== 'undefined') {
+                            psa.repositionMediaPlayer();
+                        }
                     }).fail(console.warn.bind(console));
 
                     if (is_embed === 2) {

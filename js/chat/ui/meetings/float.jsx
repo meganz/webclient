@@ -38,6 +38,12 @@ export default class FloatingVideo extends React.Component {
         this.collapseListener = mBroadcaster.addListener('meetings:collapse', () => this.setState({ collapsed: true }));
     }
 
+    componentDidUpdate() {
+        if (typeof psa !== 'undefined') {
+            psa.repositionMeetingsCall();
+        }
+    }
+
     render() {
         const { peers, minimized, call, floatDetached } = this.props;
 

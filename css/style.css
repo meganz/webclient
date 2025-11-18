@@ -11351,7 +11351,7 @@ div.camera-bottom-txt {
 
 /* corner toasts and transfer popup */
 .corner-messages {
-    position: fixed;
+    position: absolute;
     bottom: 0;
     left: 8px;
     z-index: 221;

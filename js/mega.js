@@ -4624,3 +4624,60 @@ mega.commercials.addCommsToBottomBar = (node) => {
     return node;
 };
 
+/**
+ * @property {Object} mega.ui.quickAccessLocations
+ */
+lazy(mega, 'quickAccessLocations', () => {
+    'use strict';
+    const map = new MegaHitMap('rcntlocs');
+    let firstLoad = false;
+    let loading = map.load().always(() => {
+        loading = false;
+        firstLoad = true;
+    });
+    return freeze({
+        async load() {
+            return loading;
+        },
+        hit(handle) {
+            if (u_type < 3 || handle === M.RootID || handle === M.RubbishID || handle === M.InboxID) {
+                return;
+            }
+            const node = M.getNodeByHandle(handle);
+            if (!node || !node.t) {
+                return;
+            }
+            if (loading) {
+                loading.then(() => this.hit(handle));
+                return;
+            }
+            map.hit(handle);
+        },
+        remove(handle) {
+            if (loading) {
+                loading.then(() => this.remove(handle));
+                return;
+            }
+            if (map.remove(handle)) {
+                map.save();
+            }
+        },
+        top() {
+            return map.top();
+        },
+        async refresh() {
+            if (!firstLoad) {
+                return;
+            }
+            if (loading) {
+                await loading;
+            }
+            loading = map.load().catch(ex => {
+                map.logger.error('Failed to update quick access', ex);
+            }).always(() => {
+                loading = false;
+            });
+            return loading;
+        },
+    });
+});

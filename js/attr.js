@@ -1503,6 +1503,10 @@
             }
         };
 
+        uaPacketParserHandler['^!rcntlocs'] = () => {
+            mega.quickAccessLocations.refresh().catch(dump);
+        };
+
         if (d) {
             global._uaPacketParserHandler = uaPacketParserHandler;
         }

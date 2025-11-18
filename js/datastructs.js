@@ -1625,6 +1625,300 @@ MegaIntBitMap.prototype.handleAttributeUpdate = function() {
     return this.isReady();
 };
 
+class MegaHitMap {
+
+    /**
+     * Tracking and storing in a CSV style attribute the number of hits a key gets over time
+     * e.g.: Recent locations
+     *
+     * @constructor
+     * @param {string} attr The attr key/name to be saved to (prefixes not required)
+     * @param {Object} [opts] Configuration settings
+     *     opts.capacity: Maximum items to store in the attribute. Default: 10
+     *     opts.hitCap: Maximum value for the hit counter. 0 for unbounded. Default: 0xff
+     *     opts.timeCompression: Value to remove from the time for attribute compression. Default: 175e10
+     * @param {MegaLogger} [parentLogger] optional parent logger
+     */
+    constructor(attr, opts, parentLogger) {
+        const { capacity = 10, hitCap = 0xff, timeCompression = 175e10 } = opts || {};
+        Object.defineProperty(this, 'attr', {
+            value: attr,
+        });
+        Object.defineProperty(this, 'capacity', {
+            value: capacity,
+        });
+        Object.defineProperty(this, 'hitcap', {
+            value: hitCap,
+        });
+        Object.defineProperty(this, 'mscomp', {
+            value: timeCompression,
+        });
+        this.logger = new MegaLogger(`hitmap-${attr}`, {
+            minLogLevel: () => d ? MegaLogger.LEVELS.DEBUG : MegaLogger.LEVELS.WARN,
+        }, parentLogger);
+        this._hits = Object.create(null);
+        this.ordered = false;
+    }
+
+    /**
+     * Track that the given key was hit at the current time.
+     *
+     * @param {String} key The identifier to try and track.
+     * @returns {boolean} If the given key was added or updated in the map.
+     */
+    hit(key) {
+        if (!key) {
+            return false;
+        }
+        key = String(key);
+        if (key in this._hits) {
+            this._hits[key] = [
+                this.hitcap ? Math.min(this.hitcap, this._hits[key][0] + 1) : this._hits[key][0] + 1, Date.now()
+            ];
+            this.ordered = false;
+            this.save();
+            return true;
+        }
+        if (this.size < this.capacity) {
+            this.logger.debug('New hit entry', key);
+            this._hits[key] = [1, Date.now()];
+            this.ordered = false;
+            this.save();
+            return true;
+        }
+        let lastts = Infinity;
+        let last = '';
+        const all = this.all();
+        for (let i = all.length; i--;) {
+            const k = all[i];
+            const [hits, ts] = this._hits[k];
+            if (hits === 1 && ts < lastts) {
+                lastts = ts;
+                last = k;
+            }
+        }
+        if (last) {
+            this.logger.debug('Replacing hit entry %s with %s', last, key);
+            this.remove(last);
+            this._hits[key] = [1, Date.now()];
+            this.ordered = false;
+            this.save();
+            return true;
+        }
+        for (let i = all.length; i--;) {
+            const k = all[i];
+            const [hits, ts] = this._hits[k];
+            this._hits[k] = [Math.min(1, hits - 1), ts];
+        }
+        this.logger.debug('Nothing to evict for', key);
+        this.save();
+        return false;
+    }
+
+    /**
+     * Returns the top hit results in descending order
+     *
+     * @param {number} [count] Optional maximum to return
+     * @returns {Array<String>} Array of the keys hit in descending order by hit
+     */
+    top(count) {
+        count = count || this.capacity;
+        if (this.ordered && this.ordered[0]) {
+            return this.ordered[0].slice(0, count);
+        }
+        const order = this.all().sort((a, b) => {
+            const diff = this._hits[b][0] - this._hits[a][0];
+            if (diff === 0) {
+                // Fallback to time based sorting
+                return this._hits[b][1] - this._hits[a][1];
+            }
+            return diff;
+        });
+        this.ordered = this.ordered || [];
+        this.ordered = [order, this.ordered[1]];
+        return order.slice(0, count);
+    }
+
+    /**
+     * Returns the most recent hit results in descending order
+     *
+     * @param {number} [count] Optional maximum to return
+     * @returns {Array<String>} Array of the keys hit in descending order by time
+     */
+    recent(count) {
+        count = count || this.capacity;
+        if (this.ordered && this.ordered[1]) {
+            return this.ordered[1].slice(0, count);
+        }
+        const order = this.all().sort((a, b) => {
+            return this._hits[b][1] - this._hits[a][1];
+        });
+        this.ordered = this.ordered || [];
+        this.ordered = [this.ordered[0], order];
+        return order.slice(0, count);
+    }
+
+    /**
+     * Un-ordered list of all hit items
+     *
+     * @returns {Array<String>} Array of keys hit
+     */
+    all() {
+        return Object.keys(this._hits);
+    }
+
+    get size() {
+        return this.all().length;
+    }
+
+    /**
+     * Remove the given key from the internal state.
+     * n.b: Does NOT trigger a save to the attribute.
+     *
+     * @param {String} key The key to be removed
+     * @returns {boolean} Did remove the item
+     */
+    remove(key) {
+        if (!(key in this._hits)) {
+            return false;
+        }
+        delete this._hits[key];
+        this.ordered = false;
+        return true;
+    }
+
+    /**
+     * Eventually save the data to the attribute
+     *
+     * @returns {void} void
+     */
+    save() {
+        if (this._saving) {
+            return;
+        }
+        this._saving = true;
+        tSleep(3).then(() => {
+            this._saving = false;
+            return this._save();
+        }).catch(dump);
+    }
+
+    /**
+     * Internal save mechanism.
+     * Writes the hit data in a CSV like format. key,hits,timestamp
+     * Items are not guaranteed to be in order.
+     * Hit and timestamp values are hexadecimal
+     * Timestamps are truncated seconds to save space
+     *
+     * e.g:
+     * abcdef,a,958940
+     * uvwxyz,1,9432d9
+     * lmnopq,7,986646
+     *
+     * @returns {Promise} Save completed
+     * @private
+     */
+    async _save() {
+        this.logger.info('Saving %d items', this.size);
+        return Promise.resolve(mega.attr.set2(null, this.attr, this.toString(), -2, true)).catch(ex => {
+            this.logger.error('Failed to save attribute', ex);
+        });
+    }
+
+    /**
+     * Load the hit map data from the attribute into the structure
+     * n.b: Can cause a save from truncation or to remove/update invalid items.
+     *
+     * @param {String} [fromAttr] Optional attribute string to load data from. If invalid will be ignored
+     * @returns {Promise} Load completed
+     */
+    async load(fromAttr) {
+        if (!fromAttr) {
+            fromAttr = await Promise.resolve(mega.attr.get(u_handle, this.attr, -2, true)).catch(ex => {
+                if (ex === ENOENT) {
+                    this.logger.info('No attribute stored');
+                }
+                else {
+                    this.logger.warn('Attribute error. Loading with no previous state', ex);
+                }
+                return '';
+            });
+        }
+        if (typeof fromAttr !== 'string') {
+            this.logger.warn('Non-string value. Loading with no state');
+            fromAttr = '';
+        }
+        if (fromAttr === this.toString()) {
+            return;
+        }
+
+        this._hits = Object.create(null);
+        this.ordered = false;
+        const internal = [];
+        let shouldSave = false;
+
+        const lines = fromAttr.split('\n');
+        while (lines.length) {
+            let [key, hits, time] = lines.pop().split(',');
+            if (key && hits && time && !internal.includes(key)) {
+                hits = parseInt(hits, 16);
+                if (hits > 0) {
+                    time = parseInt(time, 16) * 1000 + this.mscomp;
+                    if (this.hitcap !== 0 && hits > this.hitcap) {
+                        this.logger.debug('Replacing hit count (%d) over cap (%d)', hits, this.hitcap);
+                        hits = this.hitcap;
+                        shouldSave = true;
+                    }
+                    this._hits[key] = [hits, time];
+                    internal.push(key);
+                }
+                else {
+                    this.logger.warn('Skipping invalid entry (%s, %d, %s)', key, hits, time);
+                    shouldSave = true;
+                }
+            }
+            else {
+                this.logger.warn(
+                    'Skipping bad entry. Found (%s, %s, %s), dupe %s',
+                    key, hits, time, internal.includes(key)
+                );
+                shouldSave = true;
+            }
+        }
+        if (this.size > this.capacity) {
+            this.logger.debug('Expunging %d entries', this.size - this.capacity);
+            const top = this.top();
+            for (let i = internal.length; i--;) {
+                if (!top.includes(internal[i])) {
+                    this.remove(internal[i]);
+                    if (this.size <= this.capacity) {
+                        return this._save();
+                    }
+                }
+            }
+        }
+        if (shouldSave) {
+            return this._save();
+        }
+    }
+
+    /**
+     * String representation used in the attribute
+     *
+     * @returns {String} Attribute string
+     */
+    toString() {
+        const all = this.all();
+        if (all.length) {
+            return all.map(key => {
+                const [hits, ts] = this._hits[key];
+                return [key, Number(hits).toString(16), Number(Math.floor((ts - this.mscomp) / 1000)).toString(16)];
+            }).join('\n');
+        }
+        return '';
+    }
+}
+
 // ----------------------------------------------------------------------------------------
 
 Object.defineProperty(global, 'MegaDataMap', {value: MegaDataMap});
@@ -1639,6 +1933,8 @@ Object.defineProperty(global, 'MegaDataEmitter', {value: MegaDataEmitter});
 Object.defineProperty(global, 'MegaIntBitMap', {value: MegaIntBitMap});
 Object.defineProperty(global, 'MegaDataBitMap', {value: MegaDataBitMap});
 Object.defineProperty(global, 'MegaDataBitMapManager', {value: MegaDataBitMapManager});
+/** @class MegaHitMap */
+Object.defineProperty(global, 'MegaHitMap', {value: MegaHitMap});
 
 if (d) {
     if (d > 2) {

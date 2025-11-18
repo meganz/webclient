@@ -2462,18 +2462,23 @@ body.de .mega-dialog.contact-picker-widget {
         overflow: hidden;
         text-overflow: ellipsis;
     }
-    .mega-dialog.fm-picker-dialog .folder-container .shared-with-me .user-card-name {
+    .mega-dialog.fm-picker-dialog .folder-container .shared-with-me .user-card-name,
+    .mega-dialog.fm-picker-dialog .folder-container .quick-access .user-card-name {
+        line-height: 24px;
         margin-inline-start: 12px;
     }
-    .mega-dialog.fm-picker-dialog .folder-container .shared-with-me .disabled .avatar {
+    .mega-dialog.fm-picker-dialog .folder-container .shared-with-me .disabled .avatar,
+    .mega-dialog.fm-picker-dialog .folder-container .quick-access .disabled .avatar {
         opacity: 0.5;
     }
-    .mega-dialog.fm-picker-dialog .folder-container .shared-with-me .mega-node.user {
+    .mega-dialog.fm-picker-dialog .folder-container .shared-with-me .mega-node.user,
+    .mega-dialog.fm-picker-dialog .folder-container .quick-access .mega-node.user {
         display: flex;
         overflow: hidden;
         width: 224px;
     }
-    .mega-dialog.fm-picker-dialog .folder-container .shared-with-me .avatar span {
+    .mega-dialog.fm-picker-dialog .folder-container .shared-with-me .avatar span,
+    .mega-dialog.fm-picker-dialog .folder-container .quick-access .avatar span{
         color: white;
     }
     .mega-dialog.fm-picker-dialog .folder-container .dialog-tree-panel-scroll ul {
@@ -2741,6 +2746,9 @@ body.de .mega-dialog.contact-picker-widget {
 .mega-dialog.fm-picker-dialog .left-panel .menu-item:not(.active):hover {
     background: var(--mobile-surface-1);
 }
+.mega-dialog.fm-picker-dialog .left-panel .menu-item.nav-elem.full-width > *:not(:last-child) {
+    margin-inline-end: 16px;
+}
 .mega-dialog.fm-picker-dialog .left-panel .text-box-wrapper {
     overflow: hidden;
     transition: 200ms ease-in-out;
@@ -2893,17 +2901,23 @@ body.de .mega-dialog.contact-picker-widget {
     color: var(--mobile-text-secondary);
     font: var(--mobile-font-caption-small-regular);
 }
-.fm-picker-dialog .content-block.sort .sort-height:hover {
+.fm-picker-dialog .content-block.sort .sort-height:not(.no-sort):hover {
     background: var(--mobile-button-outline-background-hover);
 }
-.fm-picker-dialog .content-block.sort .sort-height:hover .item-names {
+.fm-picker-dialog .content-block.sort .sort-height:not(.no-sort):hover .item-names {
     color: var(--mobile-text-primary);
     font: var(--mobile-font-caption-small-bold);
 }
 .fm-picker-dialog .content-block.sort .sort-height:hover .fm-picker-dialog-panel-arrows {
     --mask-color: var(--mobile-icon-primary);
 }
-
+.fm-picker-dialog .content-block.sort .sort-height.no-sort .fm-picker-dialog-panel-arrows {
+    display: none;
+}
+.fm-picker-dialog .content-block.sort .sort-height.no-sort,
+.fm-picker-dialog .content-block.sort .sort-height.no-sort .item-names {
+    cursor: default;
+}
 .fm-picker-dialog .content-block.folder-container {
     padding: 0;
     flex: 1;
@@ -2965,6 +2979,9 @@ body.de .mega-dialog.contact-picker-widget {
 }
 .fm-picker-dialog .content-block.folder-container .dialog-empty-block.send-to-meeting i.glass-meetings {
     background-image: url("../images/mega/glass/glass-video.png");
+}
+.fm-picker-dialog .content-block.folder-container .dialog-empty-block.quick-access i.glass-clock {
+    background-image: url("../images/mega/glass/glass-clock.png");
 }
 .fm-picker-dialog .content-block.folder-container .dialog-empty-block .title {
     margin: 24px 0 8px;

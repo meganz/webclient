@@ -451,8 +451,7 @@ class MegaMobileViewOverlay extends MegaComponent {
         this.nodeComponent = MegaNodeComponent.getNodeComponentByHandle(nodeHandle) ||
             new MegaNodeComponent({parentNode: document.createElement('div'), nodeHandle});
 
-        this.domNode.querySelector('.media-viewer-container .file-name').textContent =
-            pfcol ? l[6859] : this.nodeComponent.name;
+        this.domNode.querySelector('.media-viewer-container .file-name').textContent = this.nodeComponent.name;
 
         if (is_video(this.nodeComponent.node)) {
 

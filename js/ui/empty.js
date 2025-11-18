@@ -1,13 +1,14 @@
 lazy(mega.ui, 'empty', () => {
     'use strict';
 
+    const path = `${staticpath}images/mega/empty/`;
     const defaultTarget = '.fm-right-files-block';
 
     const clear = (target = document.querySelector(defaultTarget)) => {
         if (pfid || M.currentrootid === M.RubbishID) {
             const emptyArr = [
                 '.fm-empty-folder',
-                '.fm-empty-search',
+                '.fm-empty-search'
             ];
 
             const c = M.currentdirid;
@@ -94,11 +95,85 @@ lazy(mega.ui, 'empty', () => {
         target.appendChild(container);
     };
 
-    const path = `${staticpath}images/mega/empty/`;
-
     return {
-        root: showEmptyCloud.bind(null, l.empty_cloud_title, path + 'empty-cloud.webp'),
-        folder: showEmptyCloud.bind(null, l.empty_folder_title, path + 'empty-folder.webp'),
-        clear
+        clear,
+        root: showEmptyCloud.bind(null, l.empty_cloud_title, `${path}empty-cloud.webp`),
+        folder: showEmptyCloud.bind(null, l.empty_folder_title, `${path}empty-folder.webp`),
+        /**
+         * @param {HTMLElement} [target] DOM node to attach to
+         * @param {0|1|2} view Whether Recents are disabled (0), Empty (0) or Filtered->Empty (1)
+         * @returns {void}
+         */
+        recents: (target = document.querySelector(defaultTarget), view = 0) => {
+            clear(target);
+
+            const strings = {
+                hint: l.recents_disabled_hint,
+                src: `${path}disabled-recents.webp`,
+                title: l.recent_activity_hidden
+            };
+
+            if (view === 2) {
+                target.classList.add('empty-filter');
+                strings.src = `${path}empty-recents-filter.webp`;
+                strings.title = l.recents_filter_empty_title;
+                strings.hint = l.recents_filter_empty_txt;
+            }
+            else {
+                target.classList.add('emptied');
+                if (view === 1) {
+                    strings.src = `${path}empty-recents.webp`;
+                    strings.hint = l.recents_empty_hint;
+                    strings.title = l[20152];
+                }
+            }
+
+            const img = mCreateElement('div', { class: 'bg-no-repeat bg-center bg-contain h-full w-full max-h-60' });
+            img.style.backgroundImage = `url(${strings.src})`;
+
+            const title = mCreateElement('h3', { class: 'pt-6 font-title-h2-bold text-color-high my-0' });
+            title.textContent = strings.title;
+
+            const hint = mCreateElement('div', { class: 'pt-4 text-color-medium' });
+            hint.textContent = strings.hint;
+
+            const btn = mCreateElement('div', { class: 'pt-6' });
+
+            if (!view) {
+                MegaButton.factory({
+                    parentNode: btn,
+                    text: l.show_activity,
+                    componentClassname: 'cursor-pointer',
+                    onClick: () => {
+                        M.recentsRender._setConfigShow(1);
+                    }
+                });
+            }
+            else if (view === 1) {
+                MegaButton.factory({
+                    parentNode: btn,
+                    text: l[372],
+                    componentClassname: 'cursor-pointer',
+                    icon: 'sprite-fm-mono icon-upload',
+                    iconSize: 24,
+                    onClick: (ev) => {
+                        M.contextMenuUI(ev, 9);
+                    }
+                });
+            }
+
+            target.appendChild(
+                mCreateElement(
+                    'div',
+                    { class: 'empty-state flex-1 flex flex-column text-center justify-center' },
+                    [
+                        img,
+                        title,
+                        hint,
+                        btn
+                    ]
+                )
+            );
+        }
     };
 });

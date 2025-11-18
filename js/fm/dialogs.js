@@ -1602,7 +1602,7 @@
             $s4.addClass('hidden');
         }
 
-        if ($.copyToUpload) {
+        if ($.copyToUpload && M.currentdirid !== 'recents') {
             $('.fm-picker-notagain', $dialog).removeClass('hidden');
             $('footer', $dialog).removeClass('dialog-bottom');
             if (Object(window.fmconfig).ulddd) {

@@ -105,7 +105,8 @@ span.is-sensitive.dropdown-item,
 a.is-sensitive.fm-breadcrumbs,
 a.is-sensitive .dropdown-search-results-item-location span,
 a.is-sensitive .dropdown-search-results-item-location,
-.rewind-sidebar .is-sensitive {
+.rewind-sidebar .is-sensitive,
+.fm-recents.content-row.is-sensitive {
     opacity: 0.5;
 }
 a.is-sensitive img,
@@ -115,7 +116,8 @@ div.is-sensitive img {
 .is-sensitive .dropdown-search-results-item-file-icon img {
     filter: blur(2px);
 }
-tr.is-sensitive img {
+tr.is-sensitive img,
+.is-sensitive.fm-recents img {
     filter: blur(0.25rem);
 }
 tr.is-sensitive td.size,

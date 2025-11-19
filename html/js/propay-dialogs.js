@@ -7,7 +7,7 @@
 
 var closeButtonJS = 'button.js-close';
 
-var closeStripeDialog = (blockPaymentRefresh) => {
+var closeStripeDialog = (blockPaymentRefresh, skipCloseFunc) => {
     'use strict';
     if (pro.propay.onPropayPage() && !blockPaymentRefresh) {
         pro.propay.updatePayment();
@@ -15,7 +15,9 @@ var closeStripeDialog = (blockPaymentRefresh) => {
     pro.megapay.destroy();
 
     pro.propay.hideLoadingOverlay();
-    closeDialog();
+    if (!skipCloseFunc) {
+        closeDialog();
+    }
     $('.fm-dialog-overlay').off('click.stripeDialog');
     $(document).off('keydown.stripeDialog');
 };
@@ -3279,7 +3281,7 @@ var addressDialog = {
                 if (!addressDialog.iframePageChangeHandler) {
                     addressDialog.iframePageChangeHandler = mBroadcaster.addListener('pagechange', () => {
                         $('iframe#stripe-widget').remove();
-                        closeStripeDialog();
+                        closeStripeDialog(false, true);
                         mBroadcaster.removeListener(addressDialog.iframePageChangeHandler);
                         delete addressDialog.iframePageChangeHandler;
                     });

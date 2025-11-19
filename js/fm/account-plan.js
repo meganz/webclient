@@ -1381,6 +1381,7 @@ accountUI.plan = {
                         .then((res) => {
                             assert(typeof res === 'string');
                             addressDialog.processUtcResult({EUR: res, edit: true}, true);
+                            fm_showoverlay();
                         })
                         .catch((ex) => {
                             msgDialog('warninga', '', l.edit_card_error.replace('%1', ex), l.edit_card_error_des);

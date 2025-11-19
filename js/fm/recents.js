@@ -515,8 +515,8 @@ RecentsRender.prototype._doRenderWorker = function(id) {
             this._renderCache[id] = this._renderFunctions[id](id);
         } else {
             var action = this.actionIdMap[id];
-            if (action.type === "date") {
-                var $newTitleDiv = this._$titleTemplate.clone().removeClass("template title-template");
+            if (action.type === 'date') {
+                var $newTitleDiv = this._$titleTemplate.clone().removeClass('template title-template');
                 $newTitleDiv.text(action.date);
                 this._renderCache[id] = $newTitleDiv[0];
             } else {

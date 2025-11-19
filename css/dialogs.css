@@ -1190,17 +1190,461 @@ body.de .mega-dialog.contact-picker-widget {
     height: 250px;
     width: 560px;
 }
-.msg-dialog .lna-dialog.lna-reset-image {
-    background-image: url("../images/mega/lna-reset-light.png");
+.msg-dialog .lna-dialog.lna-reset-image.locale-en {
+    background-image: url("../images/mega/locale/lna-reset-light-en.webp");
 }
-.theme-dark .msg-dialog .lna-dialog.lna-reset-image {
-    background-image: url("../images/mega/lna-reset-dark.png");
+.theme-dark .msg-dialog .lna-dialog.lna-reset-image.locale-en {
+    background-image: url("../images/mega/locale/lna-reset-dark-en.webp");
 }
-.msg-dialog .lna-dialog.lna-prompt-image {
-    background-image: url("../images/mega/lna-prompt-light.png");
+.msg-dialog .lna-dialog.lna-prompt-image.locale-en {
+    background-image: url("../images/mega/locale/lna-prompt-light-en.webp");
 }
-.theme-dark .msg-dialog .lna-dialog.lna-prompt-image {
-    background-image: url("../images/mega/lna-prompt-dark.png");
+.theme-dark .msg-dialog .lna-dialog.lna-prompt-image.locale-en {
+    background-image: url("../images/mega/locale/lna-prompt-dark-en.webp");
+}
+.msg-dialog .lna-dialog.lna-reset-image.locale-ar {
+    background-image: url("../images/mega/locale/lna-reset-light-ar.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-reset-image.locale-ar {
+    background-image: url("../images/mega/locale/lna-reset-dark-ar.webp");
+}
+.msg-dialog .lna-dialog.lna-prompt-image.locale-ar {
+    background-image: url("../images/mega/locale/lna-prompt-light-ar.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-prompt-image.locale-ar {
+    background-image: url("../images/mega/locale/lna-prompt-dark-ar.webp");
+}
+.msg-dialog .lna-dialog.lna-reset-image.locale-br {
+    background-image: url("../images/mega/locale/lna-reset-light-br.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-reset-image.locale-br {
+    background-image: url("../images/mega/locale/lna-reset-dark-br.webp");
+}
+.msg-dialog .lna-dialog.lna-prompt-image.locale-br {
+    background-image: url("../images/mega/locale/lna-prompt-light-br.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-prompt-image.locale-br {
+    background-image: url("../images/mega/locale/lna-prompt-dark-br.webp");
+}
+.msg-dialog .lna-dialog.lna-reset-image.locale-cn {
+    background-image: url("../images/mega/locale/lna-reset-light-cn.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-reset-image.locale-cn {
+    background-image: url("../images/mega/locale/lna-reset-dark-cn.webp");
+}
+.msg-dialog .lna-dialog.lna-prompt-image.locale-cn {
+    background-image: url("../images/mega/locale/lna-prompt-light-cn.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-prompt-image.locale-cn {
+    background-image: url("../images/mega/locale/lna-prompt-dark-cn.webp");
+}
+.msg-dialog .lna-dialog.lna-reset-image.locale-ct {
+    background-image: url("../images/mega/locale/lna-reset-light-ct.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-reset-image.locale-ct {
+    background-image: url("../images/mega/locale/lna-reset-dark-ct.webp");
+}
+.msg-dialog .lna-dialog.lna-prompt-image.locale-ct {
+    background-image: url("../images/mega/locale/lna-prompt-light-ct.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-prompt-image.locale-ct {
+    background-image: url("../images/mega/locale/lna-prompt-dark-ct.webp");
+}
+.msg-dialog .lna-dialog.lna-reset-image.locale-de {
+    background-image: url("../images/mega/locale/lna-reset-light-de.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-reset-image.locale-de {
+    background-image: url("../images/mega/locale/lna-reset-dark-de.webp");
+}
+.msg-dialog .lna-dialog.lna-prompt-image.locale-de {
+    background-image: url("../images/mega/locale/lna-prompt-light-de.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-prompt-image.locale-de {
+    background-image: url("../images/mega/locale/lna-prompt-dark-de.webp");
+}
+.msg-dialog .lna-dialog.lna-reset-image.locale-es {
+    background-image: url("../images/mega/locale/lna-reset-light-es.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-reset-image.locale-es {
+    background-image: url("../images/mega/locale/lna-reset-dark-es.webp");
+}
+.msg-dialog .lna-dialog.lna-prompt-image.locale-es {
+    background-image: url("../images/mega/locale/lna-prompt-light-es.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-prompt-image.locale-es {
+    background-image: url("../images/mega/locale/lna-prompt-dark-es.webp");
+}
+.msg-dialog .lna-dialog.lna-reset-image.locale-fr {
+    background-image: url("../images/mega/locale/lna-reset-light-fr.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-reset-image.locale-fr {
+    background-image: url("../images/mega/locale/lna-reset-dark-fr.webp");
+}
+.msg-dialog .lna-dialog.lna-prompt-image.locale-fr {
+    background-image: url("../images/mega/locale/lna-prompt-light-fr.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-prompt-image.locale-fr {
+    background-image: url("../images/mega/locale/lna-prompt-dark-fr.webp");
+}
+.msg-dialog .lna-dialog.lna-reset-image.locale-id {
+    background-image: url("../images/mega/locale/lna-reset-light-id.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-reset-image.locale-id {
+    background-image: url("../images/mega/locale/lna-reset-dark-id.webp");
+}
+.msg-dialog .lna-dialog.lna-prompt-image.locale-id {
+    background-image: url("../images/mega/locale/lna-prompt-light-id.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-prompt-image.locale-id {
+    background-image: url("../images/mega/locale/lna-prompt-dark-id.webp");
+}
+.msg-dialog .lna-dialog.lna-reset-image.locale-it {
+    background-image: url("../images/mega/locale/lna-reset-light-it.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-reset-image.locale-it {
+    background-image: url("../images/mega/locale/lna-reset-dark-it.webp");
+}
+.msg-dialog .lna-dialog.lna-prompt-image.locale-it {
+    background-image: url("../images/mega/locale/lna-prompt-light-it.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-prompt-image.locale-it {
+    background-image: url("../images/mega/locale/lna-prompt-dark-it.webp");
+}
+.msg-dialog .lna-dialog.lna-reset-image.locale-jp {
+    background-image: url("../images/mega/locale/lna-reset-light-jp.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-reset-image.locale-jp {
+    background-image: url("../images/mega/locale/lna-reset-dark-jp.webp");
+}
+.msg-dialog .lna-dialog.lna-prompt-image.locale-jp {
+    background-image: url("../images/mega/locale/lna-prompt-light-jp.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-prompt-image.locale-jp {
+    background-image: url("../images/mega/locale/lna-prompt-dark-jp.webp");
+}
+.msg-dialog .lna-dialog.lna-reset-image.locale-kr {
+    background-image: url("../images/mega/locale/lna-reset-light-kr.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-reset-image.locale-kr {
+    background-image: url("../images/mega/locale/lna-reset-dark-kr.webp");
+}
+.msg-dialog .lna-dialog.lna-prompt-image.locale-kr {
+    background-image: url("../images/mega/locale/lna-prompt-light-kr.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-prompt-image.locale-kr {
+    background-image: url("../images/mega/locale/lna-prompt-dark-kr.webp");
+}
+.msg-dialog .lna-dialog.lna-reset-image.locale-nl {
+    background-image: url("../images/mega/locale/lna-reset-light-nl.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-reset-image.locale-nl {
+    background-image: url("../images/mega/locale/lna-reset-dark-nl.webp");
+}
+.msg-dialog .lna-dialog.lna-prompt-image.locale-nl {
+    background-image: url("../images/mega/locale/lna-prompt-light-nl.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-prompt-image.locale-nl {
+    background-image: url("../images/mega/locale/lna-prompt-dark-nl.webp");
+}
+.msg-dialog .lna-dialog.lna-reset-image.locale-pl {
+    background-image: url("../images/mega/locale/lna-reset-light-pl.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-reset-image.locale-pl {
+    background-image: url("../images/mega/locale/lna-reset-dark-pl.webp");
+}
+.msg-dialog .lna-dialog.lna-prompt-image.locale-pl {
+    background-image: url("../images/mega/locale/lna-prompt-light-pl.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-prompt-image.locale-pl {
+    background-image: url("../images/mega/locale/lna-prompt-dark-pl.webp");
+}
+.msg-dialog .lna-dialog.lna-reset-image.locale-ro {
+    background-image: url("../images/mega/locale/lna-reset-light-ro.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-reset-image.locale-ro {
+    background-image: url("../images/mega/locale/lna-reset-dark-ro.webp");
+}
+.msg-dialog .lna-dialog.lna-prompt-image.locale-ro {
+    background-image: url("../images/mega/locale/lna-prompt-light-ro.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-prompt-image.locale-ro {
+    background-image: url("../images/mega/locale/lna-prompt-dark-ro.webp");
+}
+.msg-dialog .lna-dialog.lna-reset-image.locale-ru {
+    background-image: url("../images/mega/locale/lna-reset-light-ru.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-reset-image.locale-ru {
+    background-image: url("../images/mega/locale/lna-reset-dark-ru.webp");
+}
+.msg-dialog .lna-dialog.lna-prompt-image.locale-ru {
+    background-image: url("../images/mega/locale/lna-prompt-light-ru.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-prompt-image.locale-ru {
+    background-image: url("../images/mega/locale/lna-prompt-dark-ru.webp");
+}
+.msg-dialog .lna-dialog.lna-reset-image.locale-th {
+    background-image: url("../images/mega/locale/lna-reset-light-th.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-reset-image.locale-th {
+    background-image: url("../images/mega/locale/lna-reset-dark-th.webp");
+}
+.msg-dialog .lna-dialog.lna-prompt-image.locale-th {
+    background-image: url("../images/mega/locale/lna-prompt-light-th.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-prompt-image.locale-th {
+    background-image: url("../images/mega/locale/lna-prompt-dark-th.webp");
+}
+.msg-dialog .lna-dialog.lna-reset-image.locale-tr {
+    background-image: url("../images/mega/locale/lna-reset-light-tr.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-reset-image.locale-tr {
+    background-image: url("../images/mega/locale/lna-reset-dark-tr.webp");
+}
+.msg-dialog .lna-dialog.lna-prompt-image.locale-tr {
+    background-image: url("../images/mega/locale/lna-prompt-light-tr.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-prompt-image.locale-tr {
+    background-image: url("../images/mega/locale/lna-prompt-dark-tr.webp");
+}
+.msg-dialog .lna-dialog.lna-reset-image.locale-vi {
+    background-image: url("../images/mega/locale/lna-reset-light-vi.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-reset-image.locale-vi {
+    background-image: url("../images/mega/locale/lna-reset-dark-vi.webp");
+}
+.msg-dialog .lna-dialog.lna-prompt-image.locale-vi {
+    background-image: url("../images/mega/locale/lna-prompt-light-vi.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-prompt-image.locale-vi {
+    background-image: url("../images/mega/locale/lna-prompt-dark-vi.webp");
+}
+.msg-dialog .lna-dialog.lna-reset-image.locale-en.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-reset-light-en.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-reset-image.locale-en.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-reset-dark-en.webp");
+}
+.msg-dialog .lna-dialog.lna-prompt-image.locale-en.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-prompt-light-en.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-prompt-image.locale-en.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-prompt-dark-en.webp");
+}
+.msg-dialog .lna-dialog.lna-reset-image.locale-ar.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-reset-light-ar.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-reset-image.locale-ar.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-reset-dark-ar.webp");
+}
+.msg-dialog .lna-dialog.lna-prompt-image.locale-ar.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-prompt-light-ar.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-prompt-image.locale-ar.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-prompt-dark-ar.webp");
+}
+.msg-dialog .lna-dialog.lna-reset-image.locale-br.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-reset-light-br.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-reset-image.locale-br.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-reset-dark-br.webp");
+}
+.msg-dialog .lna-dialog.lna-prompt-image.locale-br.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-prompt-light-br.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-prompt-image.locale-br.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-prompt-dark-br.webp");
+}
+.msg-dialog .lna-dialog.lna-reset-image.locale-cn.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-reset-light-cn.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-reset-image.locale-cn.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-reset-dark-cn.webp");
+}
+.msg-dialog .lna-dialog.lna-prompt-image.locale-cn.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-prompt-light-cn.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-prompt-image.locale-cn.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-prompt-dark-cn.webp");
+}
+.msg-dialog .lna-dialog.lna-reset-image.locale-ct.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-reset-light-ct.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-reset-image.locale-ct.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-reset-dark-ct.webp");
+}
+.msg-dialog .lna-dialog.lna-prompt-image.locale-ct.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-prompt-light-ct.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-prompt-image.locale-ct.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-prompt-dark-ct.webp");
+}
+.msg-dialog .lna-dialog.lna-reset-image.locale-de.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-reset-light-de.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-reset-image.locale-de.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-reset-dark-de.webp");
+}
+.msg-dialog .lna-dialog.lna-prompt-image.locale-de.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-prompt-light-de.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-prompt-image.locale-de.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-prompt-dark-de.webp");
+}
+.msg-dialog .lna-dialog.lna-reset-image.locale-es.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-reset-light-es.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-reset-image.locale-es.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-reset-dark-es.webp");
+}
+.msg-dialog .lna-dialog.lna-prompt-image.locale-es.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-prompt-light-es.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-prompt-image.locale-es.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-prompt-dark-es.webp");
+}
+.msg-dialog .lna-dialog.lna-reset-image.locale-fr.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-reset-light-fr.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-reset-image.locale-fr.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-reset-dark-fr.webp");
+}
+.msg-dialog .lna-dialog.lna-prompt-image.locale-fr.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-prompt-light-fr.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-prompt-image.locale-fr.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-prompt-dark-fr.webp");
+}
+.msg-dialog .lna-dialog.lna-reset-image.locale-id.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-reset-light-id.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-reset-image.locale-id.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-reset-dark-id.webp");
+}
+.msg-dialog .lna-dialog.lna-prompt-image.locale-id.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-prompt-light-id.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-prompt-image.locale-id.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-prompt-dark-id.webp");
+}
+.msg-dialog .lna-dialog.lna-reset-image.locale-it.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-reset-light-it.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-reset-image.locale-it.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-reset-dark-it.webp");
+}
+.msg-dialog .lna-dialog.lna-prompt-image.locale-it.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-prompt-light-it.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-prompt-image.locale-it.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-prompt-dark-it.webp");
+}
+.msg-dialog .lna-dialog.lna-reset-image.locale-jp.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-reset-light-jp.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-reset-image.locale-jp.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-reset-dark-jp.webp");
+}
+.msg-dialog .lna-dialog.lna-prompt-image.locale-jp.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-prompt-light-jp.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-prompt-image.locale-jp.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-prompt-dark-jp.webp");
+}
+.msg-dialog .lna-dialog.lna-reset-image.locale-kr.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-reset-light-kr.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-reset-image.locale-kr.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-reset-dark-kr.webp");
+}
+.msg-dialog .lna-dialog.lna-prompt-image.locale-kr.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-prompt-light-kr.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-prompt-image.locale-kr.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-prompt-dark-kr.webp");
+}
+.msg-dialog .lna-dialog.lna-reset-image.locale-nl.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-reset-light-nl.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-reset-image.locale-nl.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-reset-dark-nl.webp");
+}
+.msg-dialog .lna-dialog.lna-prompt-image.locale-nl.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-prompt-light-nl.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-prompt-image.locale-nl.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-prompt-dark-nl.webp");
+}
+.msg-dialog .lna-dialog.lna-reset-image.locale-pl.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-reset-light-pl.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-reset-image.locale-pl.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-reset-dark-pl.webp");
+}
+.msg-dialog .lna-dialog.lna-prompt-image.locale-pl.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-prompt-light-pl.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-prompt-image.locale-pl.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-prompt-dark-pl.webp");
+}
+.msg-dialog .lna-dialog.lna-reset-image.locale-ro.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-reset-light-ro.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-reset-image.locale-ro.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-reset-dark-ro.webp");
+}
+.msg-dialog .lna-dialog.lna-prompt-image.locale-ro.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-prompt-light-ro.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-prompt-image.locale-ro.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-prompt-dark-ro.webp");
+}
+.msg-dialog .lna-dialog.lna-reset-image.locale-ru.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-reset-light-ru.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-reset-image.locale-ru.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-reset-dark-ru.webp");
+}
+.msg-dialog .lna-dialog.lna-prompt-image.locale-ru.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-prompt-light-ru.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-prompt-image.locale-ru.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-prompt-dark-ru.webp");
+}
+.msg-dialog .lna-dialog.lna-reset-image.locale-th.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-reset-light-th.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-reset-image.locale-th.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-reset-dark-th.webp");
+}
+.msg-dialog .lna-dialog.lna-prompt-image.locale-th.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-prompt-light-th.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-prompt-image.locale-th.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-prompt-dark-th.webp");
+}
+.msg-dialog .lna-dialog.lna-reset-image.locale-tr.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-reset-light-tr.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-reset-image.locale-tr.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-reset-dark-tr.webp");
+}
+.msg-dialog .lna-dialog.lna-prompt-image.locale-tr.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-prompt-light-tr.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-prompt-image.locale-tr.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-prompt-dark-tr.webp");
+}
+.msg-dialog .lna-dialog.lna-reset-image.locale-vi.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-reset-light-vi.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-reset-image.locale-vi.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-reset-dark-vi.webp");
+}
+.msg-dialog .lna-dialog.lna-prompt-image.locale-vi.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-prompt-light-vi.webp");
+}
+.theme-dark .msg-dialog .lna-dialog.lna-prompt-image.locale-vi.tld-nz {
+    background-image: url("../images/mega/locale/nz-lna-prompt-dark-vi.webp");
 }
 
 /* end of Megasync local network access dialog */

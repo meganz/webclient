@@ -241,8 +241,6 @@ twofactor.loginDialog = {
 
         'use strict';
 
-        delete pro.propay.requireconfirmation;
-
         var $dialog = $('.mega-dialog.verify-two-factor-login');
         var $warningText = $('.warning-text-field.failed', $dialog);
         var $warningText2 = $('.warning-text-field.empty', $dialog);

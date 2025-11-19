@@ -1321,33 +1321,6 @@ security.login = {
             requestVars.mfa = pinCode;
         }
 
-        const continueAuthentication = (result) => {
-            // Get values from Object
-            var temporarySessionIdBase64 = result.tsid;
-            var encryptedSessionIdBase64 = result.csid;
-            var encryptedMasterKeyBase64 = result.k;
-            var encryptedPrivateRsaKey = result.privk;
-            var userHandle = result.u;
-
-            // Decrypt the Master Key
-            var encryptedMasterKeyArray32 = base64_to_a32(encryptedMasterKeyBase64);
-            var cipherObject = new sjcl.cipher.aes(derivedEncryptionKeyArray32);
-            var decryptedMasterKeyArray32 = decrypt_key(cipherObject, encryptedMasterKeyArray32);
-
-            // If the temporary session ID is set then we need to generate RSA keys
-            if (temporarySessionIdBase64 === undefined) {
-                // Continue a regular login
-                return security.login.decryptRsaKeyAndSessionId(
-                    decryptedMasterKeyArray32,
-                    encryptedSessionIdBase64,
-                    encryptedPrivateRsaKey,
-                    userHandle
-                );
-            }
-            // Skip to generate RSA keys
-            security.login.skipToGenerateRsaKeys(decryptedMasterKeyArray32, temporarySessionIdBase64);
-        };
-
         // Send the Email and Authentication Key to the API
         return api.req(requestVars)
             .then(({result}) => {
@@ -1355,45 +1328,31 @@ security.login = {
                 // If successful
                 if (typeof result === 'object') {
 
-                    if (pro.propay.requireconfirmation) {
-                        delete pro.propay.requireconfirmation;
+                    // Get values from Object
+                    var temporarySessionIdBase64 = result.tsid;
+                    var encryptedSessionIdBase64 = result.csid;
+                    var encryptedMasterKeyBase64 = result.k;
+                    var encryptedPrivateRsaKey = result.privk;
+                    var userHandle = result.u;
 
-                        pro.dialog.show(l.welc_back_alr_have_acc, l.log_in_and_sub_on_existing_acc, [
-                            {
-                                text: l.log_in_and_sub,
-                                onClick: async () => {
-                                    continueAuthentication(result);
-                                    loadingDialog.show();
-                                    await pro.loadMembershipPlans(false, true);
-                                    loadingDialog.hide();
-                                    const proceed = await pro.propay.checkUserFeatures();
-                                    if (proceed) {
-                                        pro.propay.updatePayment(false, true);
-                                    }
-                                    else {
-                                        return false;
-                                    }
-                                }
-                            },
-                            {
-                                text: l.msg_dlg_cancel,
-                                onClick: () => {
-                                    security.login.loginCompleteCallback(false);
-                                    security.login.email = null;
-                                    security.login.password = null;
-                                    security.login.rememberMe = false;
-                                    u_logout();
-                                    return false;
-                                }
-                            },
-                        ], {showClose: true});
+                    // Decrypt the Master Key
+                    var encryptedMasterKeyArray32 = base64_to_a32(encryptedMasterKeyBase64);
+                    var cipherObject = new sjcl.cipher.aes(derivedEncryptionKeyArray32);
+                    var decryptedMasterKeyArray32 = decrypt_key(cipherObject, encryptedMasterKeyArray32);
 
-                        pro.propay.hideLoadingOverlay();
-
-                        return;
+                    // If the temporary session ID is set then we need to generate RSA keys
+                    if (typeof temporarySessionIdBase64 !== 'undefined') {
+                        security.login.skipToGenerateRsaKeys(decryptedMasterKeyArray32, temporarySessionIdBase64);
                     }
-
-                    return continueAuthentication(result);
+                    else {
+                        // Otherwise continue a regular login
+                        return security.login.decryptRsaKeyAndSessionId(
+                            decryptedMasterKeyArray32,
+                            encryptedSessionIdBase64,
+                            encryptedPrivateRsaKey,
+                            userHandle
+                        );
+                    }
                 }
                 else {
                     // Return failure

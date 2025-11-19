@@ -2807,6 +2807,11 @@ pro.propay = {
             showLoading = true;
         }
 
+        this.isNewAccount = pro.propay.signup.getIsNewAccount();
+        if (!this.isNewAccount && mega.discountInfo && this.discountInfo) {
+            mega.discountInfo.used = true;
+        }
+
         // Show different loading animation text depending on the payment methods
         switch (showLoading && this.proPaymentMethod) {
             case 'stripe':
@@ -3473,7 +3478,9 @@ pro.propay = {
             }
 
             if (discountInfo && !this.instantDiscount) {
-                mega.discountInfo.used = true;
+                if (!this.isNewAccount) {
+                    mega.discountInfo.used = true;
+                }
                 pro.propay.discountInfo = discountInfo;
                 this.fromURL = true;
             }

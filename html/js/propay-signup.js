@@ -438,12 +438,17 @@ pro.propay.signup = {
         return true;
     },
 
+    getIsNewAccount() {
+        'use strict';
+        return (u_type === false) || (!u_type && !localStorage.awaitingConfirmationAccount);
+    },
+
     initNewAccountDetails() {
         'use strict';
 
         this.$accountDetailsDiv = $('.create-account-wrapper', pro.propay.$page);
 
-        pro.propay.isNewAccount = (u_type === false) || (!u_type && !localStorage.awaitingConfirmationAccount);
+        pro.propay.isNewAccount = this.getIsNewAccount();
 
         $('.new-account-tos', pro.propay.$page).toggleClass('hidden', !pro.propay.isNewAccount);
         $('.title.no-create-account', pro.propay.$page).toggleClass('hidden', pro.propay.isNewAccount);

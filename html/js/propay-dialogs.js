@@ -7,7 +7,7 @@
 
 var closeButtonJS = 'button.js-close';
 
-var closeStripeDialog = (blockPaymentRefresh) => {
+var closeStripeDialog = (blockPaymentRefresh, skipCloseFunc) => {
     'use strict';
     if (pro.propay.onPropayPage() && !blockPaymentRefresh) {
         pro.propay.updatePayment();
@@ -15,7 +15,9 @@ var closeStripeDialog = (blockPaymentRefresh) => {
     pro.megapay.destroy();
 
     pro.propay.hideLoadingOverlay();
-    closeDialog();
+    if (!skipCloseFunc) {
+        closeDialog();
+    }
     $('.fm-dialog-overlay').off('click.stripeDialog');
     $(document).off('keydown.stripeDialog');
 };
@@ -3151,10 +3153,7 @@ var addressDialog = {
             this.stripeSaleId = null;
             if (utcResult.EUR) {
                 const $stripeDialog = this.getStripeDialog().toggleClass('edit', !!utcResult.edit);
-                const $iframeContainer = pro.propay.paymentButton
-                    ? $('.iframe-container', $stripeDialog)
-                    : $('.mobile.payment-stripe-dialog .iframe-container,' +
-                          ' .payment-stripe-dialog .iframe-container');
+                const $iframeContainer = $('.iframe-container', $stripeDialog);
                 let $stripeIframe = $('iframe#stripe-widget');
                 $stripeIframe.remove();
                 const sandBoxCSP = 'allow-scripts allow-same-origin allow-forms allow-popups allow-top-navigation';
@@ -3230,8 +3229,12 @@ var addressDialog = {
                 if (!utcResult.edit) {
 
                     iframeSrc += `&p=${this.proNum}`;
-                    if (this.extraDetails.recurring &&
-                        (pro.propay.currentGateway && pro.propay.currentGateway.supportsRecurring)) {
+
+                    const gateSupportsRecurring = this.extraDetails.recurring && (pro.propay.onPropayPage()
+                        ? pro.propay.currentGateway && pro.propay.currentGateway.supportsRecurring
+                        : true);
+
+                    if (gateSupportsRecurring) {
                         iframeSrc += '&r=1';
                     }
 
@@ -3279,7 +3282,14 @@ var addressDialog = {
                     loadingDialog.hide();
                 }
 
-                // $('.content', $stripeDialog).toggleClass('hidden', pro.propay.useSavedCard);
+                if (!addressDialog.iframePageChangeHandler) {
+                    addressDialog.iframePageChangeHandler = mBroadcaster.addListener('pagechange', () => {
+                        $('iframe#stripe-widget').remove();
+                        closeStripeDialog(false, true);
+                        mBroadcaster.removeListener(addressDialog.iframePageChangeHandler);
+                        delete addressDialog.iframePageChangeHandler;
+                    });
+                }
 
                 $stripeDialog.removeClass('hidden');
                 pro.megapay.init();

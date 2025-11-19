@@ -126,6 +126,9 @@ body.web-desktop .mega-sheet.on-boarding .sheet {
 .mega-on-boarding .main-content .actions button.back-button .primary-text {
     text-decoration: underline;
 }
+body.ru .mega-on-boarding .main-content .actions button.back-button .primary-text {
+    text-underline-offset: 0.24em;
+}
 .mega-on-boarding .main-content .actions button.primary .right-icon {
     --mask-color: var(--mobile-icon-inverse);
 }

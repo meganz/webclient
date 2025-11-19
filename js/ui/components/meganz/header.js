@@ -1040,6 +1040,7 @@ class MegaHeader extends MegaMobileHeader {
     }
 
     static types(index) {
+        const { type: cvType } = M.currentCustomView || {};
         const type = [
             { // logged in default
                 'home': false,
@@ -1052,8 +1053,8 @@ class MegaHeader extends MegaMobileHeader {
                 'heading': true,
                 'top-help': !u_type,
                 'top-language': !u_type,
-                'download-desktop-app': M.currentCustomView.type !== 'pwm' && !window.useMegaSync,
-                'download-pwm-ext': M.currentCustomView.type === 'pwm',
+                'download-desktop-app': cvType !== 'pwm' && !window.useMegaSync,
+                'download-pwm-ext': cvType === 'pwm',
                 'top-contacts': !pfid && u_type,
                 'top-chats': !pfid && u_type,
             },
@@ -1077,7 +1078,7 @@ class MegaHeader extends MegaMobileHeader {
 
         if (pfcol || // Album link
             M.chat || // Chat or meetings
-            M.currentCustomView.type === 'pwm' || // password manager
+            cvType === 'pwm' || // password manager
             M.currentdirid && (
                 M.currentdirid.startsWith('account') || // settings
                 M.currentdirid === 'dashboard' || // dashboard

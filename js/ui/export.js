@@ -1472,15 +1472,6 @@ function logExportEvt(evtId, data) {
             }
         };
 
-        let itBanner = null;
-
-        const removeItBanner = () => {
-            if (itBanner) {
-                itBanner.remove();
-                itBanner = null;
-            }
-        };
-
         /**
          * @param {Object.<String, Boolean|String[]>} dialogOpts Whether to show the decryption key separately or not
          * @returns {void}
@@ -1627,72 +1618,12 @@ function logExportEvt(evtId, data) {
                                 : sheet.headerTitleNode
                         );
 
-                        if (mega.xferit && (fmconfig.noItBanner || 0) < Date.now()) {
-                            const header = sheet.overlayNode.querySelector('.header-title');
-                            const title = mCreateElement('div', { class: 'font-title-h3' });
-                            const txt = mCreateElement('div', { class: 'font-body-1' });
-
-                            if ((itBanner = header.querySelector('.it-banner'))) {
-                                itBanner.remove();
-                            }
-
-                            itBanner = mCreateElement(
-                                'div',
-                                {
-                                    class: 'it-banner absolute bg-it p-6 flex flex-row items-center w-full left-0'
-                                        + ' text-color-white box-border rounded-3xl'
-                                        + ' box-border opacity-0 transition-opacity'
-                                },
-                                [
-                                    mCreateElement('i', { class: 'sprite-fm-mono icon-transfer-it icon-size-8' }),
-                                    mCreateElement('div', { class: 'flex-1 px-4' }, [ title, txt ])
-                                ]
-                            );
-
-                            title.textContent = l.it_banner_title;
-                            txt.textContent = l.it_banner_txt;
-
-                            header.prepend(itBanner);
-
-                            MegaButton.factory({
-                                parentNode: itBanner,
-                                text: l.it_banner_btn,
-                                componentClassname: 'primary whitespace-nowrap font-600 slim theme-dark-forced',
-                                type: 'button'
-                            }).on('click.pro', () => {
-                                M.openTransferItOverlay($.selected).catch(tell);
-                                sheet.trigger('close');
-                            });
-
-                            MegaButton.factory({
-                                parentNode: itBanner,
-                                icon: 'sprite-fm-mono icon-dialog-close icon-size-20',
-                                componentClassname: 'theme-dark-forced text-icon close',
-                                type: 'icon'
-                            }).on('click.close', () => {
-                                sheet.overlayNode.classList.remove('has-it-banner');
-                                itBanner.classList.add('hidden');
-                                // Show it again after a week
-                                mega.config.set('noItBanner', Date.now() + 1000 * 60 * 60 * 24 * 7);
-                            });
-
-                            sheet.overlayNode.classList.add('has-it-banner');
-
-                            tSleep(0.3).then(() => {
-                                if (itBanner) {
-                                    itBanner.classList.add('opacity-100');
-                                }
-                            });
-                        }
-
                         document.addEventListener('keydown', onKeyDown, true);
                     }
                 },
                 onClose: () => {
                     document.removeEventListener('keydown', onKeyDown, true);
-                    sheet.overlayNode.classList.remove('has-it-banner');
                     sheet.removeClass(name);
-                    removeItBanner();
                 }
             };
 
@@ -1705,7 +1636,6 @@ function logExportEvt(evtId, data) {
             hide: () => {
                 document.removeEventListener('keydown', onKeyDown, true);
                 hideDialog(name);
-                removeItBanner();
             }
         };
     });

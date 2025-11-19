@@ -12,11 +12,6 @@ lazy(mega.ui, 'mNodeFilter', () => {
     const lastYearStart = new Date(today.getFullYear() - 1, 0, 1);
     const lastYearEnd =  new Date(today.getFullYear() - 1, 11, 31, 23, 59, 59);
 
-    // static sections where we don't show filtering capabilities
-    const hiddenSections = new Set([
-        'recents'
-    ]);
-
     const selectedFilters = {
         value: 0,
         data: null
@@ -272,10 +267,12 @@ lazy(mega.ui, 'mNodeFilter', () => {
                 // Match nodes in Cloud Drive, Favourites, Rubbish bin, Incoming shares,
                 // or Outgoing shares (NB: Outgoing shares (includes the external links - for now)
                 if ((this.selection.includes('cloud') && root === M.RootID) ||
-                   (this.selection.includes('favourites') && n.fav) ||
-                   (this.selection.includes('rubbish') && root === M.RubbishID) ||
-                   (this.selection.includes('incoming') && root === 'shares') ||
-                    this.selection.includes('outgoing') && M.su[n.h]) {
+                    (this.selection.includes('favourites') && n.fav) ||
+                    (this.selection.includes('rubbish') && root === M.RubbishID) ||
+                    (this.selection.includes('incoming') && root === 'shares') ||
+                    (this.selection.includes('outgoing') && M.su[n.h]) ||
+                    (this.selection.includes('s4') && M.getNodeRoot(n.h) === 's4')
+                ) {
 
                     return true;
                 }
@@ -336,6 +333,12 @@ lazy(mega.ui, 'mNodeFilter', () => {
                     icon: 'folder-outgoing-share',
                     label: l['5543'],
                     data: ['outgoing'],
+                    eid: 99987
+                },
+                {
+                    icon: 'bucket-triangle-thin-outline',
+                    label: l.obj_storage,
+                    data: ['s4'],
                     eid: 99987
                 }
             ]
@@ -662,9 +665,10 @@ lazy(mega.ui, 'mNodeFilter', () => {
                 }
             });
         },
+        filters,
         match(n) {
 
-            if (n.name && n.p !== 'contacts' && !(n.s4 && M.getS4NodeType(n))) {
+            if (n.name && n.p !== 'contacts' && !(n.s4 && M.getS4NodeType(n) === 'container')) {
 
                 for (const name in filters) {
                     const ctx = filters[name];
@@ -704,7 +708,7 @@ lazy(mega.ui, 'mNodeFilter', () => {
                 this.initSearchFilter();
             }
 
-            if (M.search && !stash && history.state.searchFilters) {
+            if (M.search && !stash && window.history && history.state && history.state.searchFilters) {
                 this.reapplyFilterSelections(history.state.searchFilters);
             }
         },
@@ -715,7 +719,6 @@ lazy(mega.ui, 'mNodeFilter', () => {
             return !(M.gallery
                 || M.chat
                 || M.albums
-                || hiddenSections.has(M.currentdirid)
                 || M.currentrootid === 's4' && M.currentCustomView.subType !== 'bucket'
                 || String(M.currentdirid).startsWith('user-management')
                 || pfcol

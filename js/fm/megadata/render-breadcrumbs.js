@@ -129,12 +129,8 @@
                     if (n.t) {
                         typeClass = 'folder';
                     }
-                }
-                else {
-                    const {name: deviceName} = this.dcd[handle] || {};
-                    if (deviceName) {
-                        name = deviceName;
-                        typeClass = 'folder device-item';
+                    if (M.onDeviceCenter && this.dcd[handle]) {
+                        typeClass += ' device-item';
                     }
                 }
 

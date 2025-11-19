@@ -705,7 +705,7 @@ function init_page() {
 
             if (fminitialized && (!folderlink || pfkey !== oldPFKey)) {
                 // Clean up internal state in case we're navigating back to a folderlink
-                M.currentdirid = M.RootID = M.currentCustomView = undefined;
+                M.currentdirid = M.RootID = M.currentCustomView = false;
                 delete $.onImportCopyNodes;
                 delete $.mcImport;
                 delete $.albumImport;
@@ -1703,6 +1703,10 @@ function init_page() {
             if (pfid) {
                 api_setfolder(n_h);
             }
+
+            delay('resetSensitives', () => {
+                mega.sensitives.resetGlobalParameters();
+            });
         }
 
         // Set System default theme or any previously selected
@@ -1797,6 +1801,10 @@ function init_page() {
         }
 
         $('#pageholder, #startholder').addClass('hidden');
+
+        if (pfid) {
+            $('.fm-notification-block', '.fm-banner-holder').removeClass('visible');
+        }
 
         // Prevent duplicate HTML content breaking things
         // what a strange solution!  [emptying #startholder!]

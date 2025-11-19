@@ -987,7 +987,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
      * @returns {void} void
      */
     showSelectionBar(itemSelected, itemsTotalSize, scrollTo = true) {
-        if (this.currentdirid.substr(0, 7) === 'search/') {
+        if (String(this.currentdirid).substr(0, 7) === 'search/') {
             M.renderSearchBreadcrumbs();
         }
         const { selectionBar } = mega.ui.secondaryNav;

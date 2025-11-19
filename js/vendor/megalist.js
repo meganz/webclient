@@ -1,7 +1,8 @@
 (function(scope, $) {
     var PUSH = Array.prototype.push;
 
-    if (typeof lazy === 'undefined') lazy = function(a,b,c) { a[b] = c.call(a); }
+    /** @ignore */
+    if (typeof lazy === 'undefined') self.lazy = function(a,b,c) { a[b] = c.call(a); }
     if (typeof delay === 'undefined') delay = function(a,b) { b() }
     if (typeof SoonFc === 'undefined') SoonFc = function(a,b) { return b }
 

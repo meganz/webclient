@@ -3408,91 +3408,36 @@
 
         <section class="fm-recents container hidden">
             <div class="fm-recents header">[$20141]</div>
+            <div class="flex flex-row items-center pr-4">
+                <div class="fm-recents fm-filter-chips flex flex-row gap-2 px-7 py-2 flex-1"></div>
+            </div>
+            <div class="fm-recents header-row grid gap-2 font-body-2 ml-1">
+                <div></div>
+                <div>[$86]</div>
+                <div></div>
+                <div>[$8020]</div>
+                <div>[$file_location_label]</div>
+                <div></div>
+            </div>
             <div class="fm-recents scroll"></div>
             <!--<div class="fm-recents content"></div>-->
-            <div class="fm-empty-section fm-recents no-content hidden">
-                <div class="fm-empty-pad">
-                    <i class="section-icon sprite-fm-mono icon-recents-filled"></i>
-                    <div class="fm-empty-cloud-txt">[$20152]</div>
-                </div>
-            </div>
-            <div class="fm-empty-section fm-recents disabled-content hidden">
-                <div class="fm-empty-pad">
-                    <i class="section-icon sprite-fm-mono icon-recents-filled"></i>
-                    <div class="fm-empty-cloud-txt">[$recent_activity_hidden]</div>
-                    <button class="mega-button large positive upgrade-to-pro">
-                        <span>[$show_activity]</span>
-                    </button>
-                </div>
-            </div>
             <!-- Templates for recents list -->
-            <div class="fm-recents date title-template template"></div>
+            <div class="fm-recents date title-template text-color-medium template"></div>
             <div class="fm-recents content-row single content-row-template template">
-                <div class="expand-collapse-toggle">
-                    <i class="sprite-fm-mono icon-arrow-right"></i>
-                </div>
-                <div class="content">
-                    <div class="item-type-icon-90"></div>
-                    <div class="fm-recents file-info">
+                <div class="content grid items-center gap-2">
+                    <div class="expand-collapse-toggle flex flex-row-reverse">
+                        <i class="sprite-fm-mono icon-chevron-right-thin-outline"></i>
+                    </div>
+                    <div class="file-icon item-type-icon-90 overflow-hidden border-radius-1 relative"></div>
+                    <div class="fm-recents file-info text-ellipsis">
                         <div class="fm-recents file-name"></div>
-                        <div class="fm-recents breadcrumbs"></div>
                     </div>
-                    <div class="fm-recents file-action">
-                        <a class="sprite-fm-mono icon-download-filled"></a>
-                        <a class="sprite-fm-mono icon-link"></a>
-                        <a class="sprite-fm-mono icon-options context-menu-button"></a>
+                    <div class="fm-recents file-action text-ellipsis text-color-medium"></div>
+                    <div class="fm-recents file-location text-ellipsis">
+                        <a class="simpletip underline text-color-primary-link"
+                            data-simpletip-class="recents-file-path"></a>
                     </div>
-                </div>
-            </div>
-            <div class="fm-recents content-row single images-content-row-template template">
-                <div class="expand-collapse-toggle">
-                    <i class="sprite-fm-mono icon-arrow-right"></i>
-                </div>
-                <div class="content">
-                    <div class="item-type-icon-90 double">
-                        <div class="item-type-icon-90"></div>
-                    </div>
-                    <div class="fm-recents file-info">
-                        <div class="fm-recents file-name"></div>
-                        <div class="fm-recents breadcrumbs"></div>
-                    </div>
-                    <div class="fm-recents file-action">
-                        <a class="sprite-fm-mono icon-download-filled"></a>
-                        <a class="sprite-fm-mono icon-link"></a>
-                        <a class="sprite-fm-mono icon-options context-menu-button"></a>
-                    </div>
-                    <div class="fm-recents previews-wrapper">
-                        <div class="fm-recents previews-scroll">
-                            <div class="fm-recents previews-body">
-                                <a class="data-block-view template">
-                                    <span class="data-block-bg">
-                                        <span class="data-block-indicators">
-                                            <span class="file-status-icon indicator sprite-fm-mono"></span>
-                                            <span class="versioning-indicator">
-                                                <i class="sprite-fm-mono icon-versions-previous"></i>
-                                            </span>
-                                            <i class="sprite-fm-mono icon-link"></i>
-                                        </span>
-                                        <span class="item-type-icon-90"><img /></span>
-                                        <span class="file-settings-icon active">
-                                            <i class="sprite-fm-mono icon-options"></i>
-                                        </span>
-                                        <div class="video-thumb-details">
-                                            <i class="small-icon small-play-icon"></i>
-                                            <span>00:00</span>
-                                        </div>
-                                    </span>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    <button class="mega-button action link-button toggle-expanded-state hidden">
-                        <span>[$x_more_files]</span>
-                        <div>
-                            <i class="sprite-fm-mono icon-arrow-down"></i>
-                        </div>
-                    </button>
-                    <div class="clear"></div>
+                    <a class="sprite-fm-mono icon-more-vertical-thin-outline p-1 context-menu-button"></a>
                 </div>
             </div>
             <!-- END Templates for recents list -->

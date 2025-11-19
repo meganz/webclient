@@ -470,12 +470,15 @@ function resetSensitives() {
             }
         };
 
-        sensitives.resetGlobalParameters();
+        delay('resetSensitives', () => {
+            mega.sensitives.resetGlobalParameters();
+        });
 
         if (featureEnabled) {
             sensitives = {
                 ...sensitives,
                 isSensitive,
+                isNormalNode,
                 SAFE_TO_SHARE: Math.floor(Math.random() * Number.MAX_SAFE_INTEGER),
                 /**
                  * Reflects the fmconfig showSen setting
@@ -844,6 +847,7 @@ function resetSensitives() {
             sensitives.updateDom = nop;
             sensitives.updateDomNode = nop;
             sensitives.isNormalArea = () => true;
+            sensitives.isNormalNode = () => true;
             sensitives.shouldBlurNode = () => false;
             sensitives.shouldShowNode = () => true;
             sensitives.shouldShowInTree = () => true;

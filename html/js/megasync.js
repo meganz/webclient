@@ -204,7 +204,7 @@ var megasync = (function() {
         let hideAgain = false;
         const res = await asyncMsgDialog('warninga', '', l.lna_reset_title, `
             <div class="lna-dialog msync-perm-info">${l.lna_reset_p1}</div>
-            <div class="lna-dialog lna-image lna-reset-image"></div>
+            <div class="lna-dialog lna-image lna-reset-image locale-${lang} tld-${mega.tld}"></div>
             <div class="lna-dialog msync-perm-info">${l.lna_reset_p2}</div>
             <div class="lna-dialog msync-perm-info">${l.lna_reset_p3}</div>
         `, '', (e) => {
@@ -274,7 +274,8 @@ var megasync = (function() {
                                         msgDialog('info', '', l.lna_grant_title, `
                                             <div class="lna-dialog msync-perm-info">${l.lna_grant_p1}</div>
                                             <div class="lna-dialog msync-perm-info">${l.lna_grant_p2}</div>
-                                            <div class="lna-dialog lna-image lna-prompt-image"></div>
+                                            <div class="lna-dialog lna-image lna-prompt-image locale-${lang}
+                                             tld-${mega.tld}"></div>
                                             <b class="lna-dialog msync-perm-warn">${l.lna_grant_warning}</b>
                                         `);
                                     }

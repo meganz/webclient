@@ -3230,8 +3230,12 @@ var addressDialog = {
                 if (!utcResult.edit) {
 
                     iframeSrc += `&p=${this.proNum}`;
-                    if (this.extraDetails.recurring &&
-                        (pro.propay.currentGateway && pro.propay.currentGateway.supportsRecurring)) {
+
+                    const gateSupportsRecurring = this.extraDetails.recurring && (pro.propay.onPropayPage()
+                        ? pro.propay.currentGateway && pro.propay.currentGateway.supportsRecurring
+                        : true);
+
+                    if (gateSupportsRecurring) {
                         iframeSrc += '&r=1';
                     }
 

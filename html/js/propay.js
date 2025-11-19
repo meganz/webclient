@@ -4150,9 +4150,7 @@ pro.propay = {
 
                 const perMonth = contentNode.querySelector('.per-month');
 
-                perMonth.textContent = (m % 12)
-                    ? l.per_month.replace('%1', currency)
-                    : l.curr_per_month_billed_yearly.replace('%1', currency);
+                perMonth.textContent = currency;
 
                 const planObj = pro.getPlanObj(
                     matchedPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL],
@@ -4173,7 +4171,7 @@ pro.propay = {
 
                     const el = mCreateElement('div', { class: 'font-body-1-bold text-color-medium' });
                     el.textContent = valueKeys[i][1].replace('%1', bytesToSize(value, undefined, 4));
-                    perMonth.after(el);
+                    perMonth.parentNode.after(el);
                 }
 
                 sheet.addClass('discount-offer');

@@ -184,6 +184,8 @@ function init_embed(ph, key, g) {
 
         if (String($.playbackOptions).includes('1v')) {
             $('.video-wrapper').remove();
+            $('.audio-wrapper video', '.media-viewer').addClass('hidden');
+
             Object.defineProperty(window, 'is_embed', {value: 2, writable: false});
 
             document.body.style.backgroundColor = 'transparent';

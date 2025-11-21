@@ -809,6 +809,7 @@ class MegaFlyoutMenu extends MegaComponent {
                 delete this.showContactsFlyout.searchTerm;
                 this.flyoutMenu.off('onHidden.contacts');
                 this.flyoutMenu.off('onFlyoutChange.contacts');
+                mega.ui.mInfoPanel.cleanup();
             });
             this.flyoutMenu.rebind('onFlyoutChange.contacts', () => {
                 delete this.showContactsFlyout.searchTerm;

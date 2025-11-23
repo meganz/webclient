@@ -316,7 +316,7 @@ async function setupSingleDownloadPage(res) {
                     if (fdl_filesize > maxDownloadSize) {
                         setMegaSyncDownloadOptions();
                     }
-                    else if (is_mobile) {
+                    else if (is_mobile || dlResumeInfo || dl_node.fa && !mega.flags.msfadl) {
                         setStandardDownloadOptions();
                     }
                     else {

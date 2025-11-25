@@ -141,6 +141,14 @@ lazy(mega, 'wsuploadmgr', () => {
             setupws(this.conn[0], this);
         }
 
+        // close all connections
+        closeconn() {
+            for (let i = this.conn.length; i--;) {
+                this.conn[i].close();
+            }
+            this.conn = [];
+        }
+
         // close excess connections
         closexconn() {
             while (this.conn.length > this.numconn) {
@@ -592,6 +600,9 @@ lazy(mega, 'wsuploadmgr', () => {
                 }
                 this.unassigned = [];
             }
+
+            // and send data/close orphaned pools
+            this.pumpdata();
         }
 
         assignfile(fu) {
@@ -630,6 +641,7 @@ lazy(mega, 'wsuploadmgr', () => {
                     if (self.d) {
                         this.logger.log(`Closing idle pool ${i}`);
                     }
+                    this.pools[i].closeconn();
                     this.pools.splice(i, 1);
                 }
             }
@@ -717,17 +729,10 @@ lazy(mega, 'wsuploadmgr', () => {
                 };
 
                 ws.onclose = (ev) => {
-                    const {wasClean, code, reason} = ev;
 
                     if (self.d) {
+                        const {wasClean, code, reason} = ev;
                         this.logger.info(`Disconnected from ${ws.url}`, wasClean, code, reason, [ev]);
-                    }
-
-                    if (ws.pool.errored) {
-                        tryCatch(() => {
-                            const srv = ws.url.split('/')[2].split('.')[0];
-                            eventlog(501026, JSON.stringify([1, srv, wasClean, code, reason]), true);
-                        })();
                     }
 
                     // if the connection dropped unexpectedly, we return the in-flight chunks to the pool

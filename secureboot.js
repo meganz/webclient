@@ -43,7 +43,7 @@ var is_mobile = (function isMobile() {
     ];
     for (var i = mobileStrings.length; i--;) {
         if (ua.indexOf(mobileStrings[i]) > 0) {
-            return true;
+            return !localStorage.it;
         }
     }
 })();
@@ -1510,6 +1510,13 @@ function logStaticServerFailure(errorType, filename, staticPathToLog) {
 
         if (typeof errorType !== 'number') {
             errorType = String(errorType).split('\n').slice(0, 3).join(' ').substr(0, 96);
+
+            if (/(?:redefine|on proxy:|only) property/i.test(errorType)) {
+                return false;
+            }
+        }
+        else if (self.is_transferit) {
+            return false;
         }
         window.log99723 = true;
     }
@@ -1518,10 +1525,11 @@ function logStaticServerFailure(errorType, filename, staticPathToLog) {
     // and due to the onIdle timeout below it hasn't actually sent the log yet
     setTimeout(function() {
         var xhr = new XMLHttpRequest();
+        var eid = self.is_transferit ? 99623 : 99723;
         xhr.open('POST', apipath + 'cs?id=0', true);
         xhr.send(
             JSON.stringify(
-                [{a: 'log', e: 99723, m: JSON.stringify([1, errorType, filename, staticPathToLog])}]
+                [{a: 'log', e: eid, m: JSON.stringify([2, errorType, filename, staticPathToLog])}]
             )
         );
     });
@@ -1615,11 +1623,13 @@ if (is_mobile) {
 
 if (is_transferit) {
     mCreateElement('link', {
+        rel: 'icon',
         type: 'image/png',
         href: staticpath + 'js/ui/transfer/images/favicons/favicon-96x96.png',
         sizes: '96x96'
     }, 'head');
     mCreateElement('link', {
+        rel: 'icon',
         type: 'image/svg+xml',
         href: staticpath + 'js/ui/transfer/images/favicons/favicon.svg'
     }, 'head');

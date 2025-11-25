@@ -4107,7 +4107,7 @@ function pushHistoryState(page, state) {
             state.searchString = page.substr(9) || state.searchString;
 
             var chipBtn = document.querySelector('button.search-chip');
-            state.searchLocation = chipBtn && chipBtn.dataset.location || false;
+            state.searchLocation = chipBtn && chipBtn.dataset.location || 'everything';
 
             if (state.searchFilters !== null) {
                 state.searchFilters = state.searchFilters || history.state.searchFilters;

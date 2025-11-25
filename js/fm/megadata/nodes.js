@@ -4850,7 +4850,7 @@ MegaData.prototype.importFileLink = function importFileLink(ph, key, attr, srcNo
                             parseHTML(
                                 mega.icu.format(l.toast_import_file, 1).replace('%s', M.getNameByHandle(target))
                             ),
-                            null,
+                            6,
                             l[16797],
                             {actionButtonCallback: () => M.openFolder(target)}
                         );

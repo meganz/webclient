@@ -185,6 +185,9 @@ span.rot-90::before {
 .pb-2 {
     padding-bottom: 0.5rem;
 }
+.pb-4 {
+    padding-bottom: 1rem;
+}
 .pb-6 {
     padding-bottom: 1.5rem;
 }
@@ -247,6 +250,10 @@ span.rot-90::before {
 .px-6 {
     padding-left: 1.5rem;
     padding-right: 1.5rem;
+}
+.px-7 {
+    padding-left: 1.75rem;
+    padding-right: 1.75rem;
 }
 .mobile .mob-px-6 {
     padding-left: 1.5rem;
@@ -342,6 +349,9 @@ span.rot-90::before {
 }
 .max-h-48 {
     max-height: 12rem;
+}
+.max-h-60 {
+    max-height: 15rem;
 }
 .max-h-100 {
     max-height: 25rem;
@@ -670,6 +680,9 @@ i.green-check-circle {
 }
 .text-color-primary {
     color: var(--mobile-text-primary);
+}
+.text-color-primary-link {
+    color: var(--mobile-link-primary);
 }
 .text-color-secondary {
     color: var(--mobile-text-secondary);

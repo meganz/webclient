@@ -117,6 +117,7 @@ class MobileSelectionRender extends MobileMegaRender {
                             mobile.nodeSelector.hide();
                             button.loading = true;
                         });
+                    mega.quickAccessLocations.hit(h);
 
                     return false;
                 },
@@ -152,7 +153,7 @@ class MobileSelectionRender extends MobileMegaRender {
                             mobile.nodeSelector.hide();
                             button.loading = false;
                         });
-
+                    mega.quickAccessLocations.hit(h);
                     return false;
                 },
                 tabs: moveCopyTabOpts,
@@ -167,6 +168,7 @@ class MobileSelectionRender extends MobileMegaRender {
                     mega.ui.saveTextAs.targetFolder = h;
                     const origNode = M.getNodeByHandle(mobile.nodeSelector.selected);
                     mega.ui.saveTextAs.show({name: origNode.name, t: origNode.t}, {noBtnDisable: true});
+                    mega.quickAccessLocations.hit(h);
                     return false;
                 },
                 tabs: moveCopyTabOpts,

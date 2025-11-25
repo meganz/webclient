@@ -1807,10 +1807,13 @@ pro.propay = {
             let addNumMonths = false;
 
             if (this.instantDiscount) {
-                discountHeaderText = discountHeaderText
-                    .replace('%1', formatPercentage(pro.calculateSavings([
-                        this.planObj.instantDiscount.percentage,
-                        this.planObj.months === 12 ? pro.yearlyDiscountPercentage : 0
+                const {months, instantDiscount} = this.planObj;
+
+                discountHeaderText = l.insdis_discount_header
+                    .replace('%1', instantDiscount.name)
+                    .replace('%2', formatPercentage(pro.calculateSavings([
+                        instantDiscount.percentage,
+                        months === 12 ? pro.yearlyDiscountPercentage : 0
                     ])));
                 addNumMonths = true;
             }
@@ -2807,6 +2810,11 @@ pro.propay = {
             showLoading = true;
         }
 
+        this.isNewAccount = pro.propay.signup.getIsNewAccount();
+        if (!this.isNewAccount && mega.discountInfo && this.discountInfo) {
+            mega.discountInfo.used = true;
+        }
+
         // Show different loading animation text depending on the payment methods
         switch (showLoading && this.proPaymentMethod) {
             case 'stripe':
@@ -3473,7 +3481,9 @@ pro.propay = {
             }
 
             if (discountInfo && !this.instantDiscount) {
-                mega.discountInfo.used = true;
+                if (!this.isNewAccount) {
+                    mega.discountInfo.used = true;
+                }
                 pro.propay.discountInfo = discountInfo;
                 this.fromURL = true;
             }
@@ -4143,9 +4153,7 @@ pro.propay = {
 
                 const perMonth = contentNode.querySelector('.per-month');
 
-                perMonth.textContent = (m % 12)
-                    ? l.per_month.replace('%1', currency)
-                    : l.curr_per_month_billed_yearly.replace('%1', currency);
+                perMonth.textContent = currency;
 
                 const planObj = pro.getPlanObj(
                     matchedPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL],
@@ -4166,7 +4174,7 @@ pro.propay = {
 
                     const el = mCreateElement('div', { class: 'font-body-1-bold text-color-medium' });
                     el.textContent = valueKeys[i][1].replace('%1', bytesToSize(value, undefined, 4));
-                    perMonth.after(el);
+                    perMonth.parentNode.after(el);
                 }
 
                 sheet.addClass('discount-offer');

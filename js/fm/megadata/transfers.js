@@ -107,12 +107,17 @@ MegaData.prototype.addDownload = function(n, z, preview) {
     }
 
     var args = toArray.apply(null, arguments);
-    // fetch all nodes needed by M.getNodesSync
-    dbfetch.coll(n)
-        .always(function () {
-            M.addDownloadSync.apply(M, args);
-        });
 
+    mLoadingSpinner.show('load-add-download-nodes', l[258]);
+
+    // fetch all nodes needed by M.getNodesSync
+    Promise.resolve(this.collectNodes(n))
+        .catch(reportError)
+        .finally(() => {
+            mLoadingSpinner.hide('load-add-download-nodes');
+
+            this.addDownloadSync(...args);
+        });
 };
 
 MegaData.prototype.addDownloadSync = function(n, z, preview) {

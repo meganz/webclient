@@ -338,18 +338,23 @@ lazy(mega, 'sets', () => {
         bulkAdd: async(handles, setId, setKey) => {
             const setPubKey = a32_to_ab(decrypt_key(u_k_aes, base64_to_a32(setKey)));
             const e = [];
-            const savingEls = {};
+            const savingEls = Object.create(null);
+            let nodes = Object.create(null);
 
-            const nodes = (await dbfetch.node(handles.map(({ h }) => h)).catch(nop) || []).reduce((accum, n) => {
-                accum[n.h] = n;
-                return accum;
-            }, Object.create(null));
+            const toSearch = handles.filter(h => !M.d[h]);
+
+            if (toSearch.length) {
+                nodes = (await dbfetch.node(handles.map(({ h }) => h)).catch(nop) || []).reduce((accum, n) => {
+                    accum[n.h] = n;
+                    return accum;
+                }, nodes);
+            }
 
             for (let i = 0; i < handles.length; i++) {
                 const { h, o } = handles[i];
                 const n = M.d[h] || nodes[h];
 
-                if (!n) {
+                if (!n || n.t) {
                     dump(`Node ${h} cannot be added to the set...`);
                     continue;
                 }
@@ -413,14 +418,7 @@ lazy(mega, 'sets', () => {
         const handlesToAdd = [];
 
         for (let i = 0; i < handles.length; i++) {
-            const node = M.d[handles[i]];
-
-            if (!node) {
-                dump(`Cannot find node ${handles[i]} to be imported into set...`);
-            }
-            else if (!node.t) {
-                handlesToAdd.push({ h: handles[i], o: (i + 1) * 1000});
-            }
+            handlesToAdd.push({ h: handles[i], o: (i + 1) * 1000});
         }
 
         // No need in tmp value, can be removed now

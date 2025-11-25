@@ -215,7 +215,7 @@
             $btn.addClass('disabled');
         }
         else if ($.selectFolderDialog && (
-            section === 'cloud-drive' && $.mcselected !== M.RootID ||
+            (section === 'cloud-drive' || section === 'quick-access') && $.mcselected !== M.RootID ||
             section === 's4' && M.tree.s4 && !M.tree.s4[$.mcselected]
         )) {
             $btn.removeClass('disabled');
@@ -455,11 +455,21 @@
         if (section === 'shared-with-me' && !aTarget) {
             path = ['shares'];
         }
+        const scope = dialog.querySelector('.fm-picker-breadcrumbs');
+        if (section === 'quick-access' && !aTarget) {
+            $.mcselected = undefined;
+            scope.classList.add('hidden');
+            return;
+        }
+        scope.classList.remove('hidden');
 
         // Update global $.mcselected with the target handle
         $.mcselected = aTarget && aTarget !== 'transfers' ? aTarget : undefined;
         path = path || M.getPath($.mcselected);
-        if (section === 'shared-with-me' && path.length > 1) {
+        if (
+            section === 'shared-with-me' && path.length > 1 ||
+            section === 'quick-access' && path.length > 1 && path[path.length - 1] === 'shares'
+        ) {
             path.splice(-2, 1);
         }
 
@@ -496,7 +506,6 @@
             }
         }
 
-        const scope = dialog.querySelector('.fm-picker-breadcrumbs');
         const dictionary = function _(handle) {
 
             // If this is gallery view, make it default to root path instead
@@ -1118,7 +1127,107 @@
             $conversationNoConvTab.addClass('active');
             $('.dialog-tree-panel-scroll').addClass('hidden');
         }
-    };
+    }
+
+    function renderQuickAccessRow(node) {
+
+        if (!node) {
+            return false;
+        }
+        const { name, lbl, p, su, h } = node;
+        const folder = M.tree[p] && M.tree[p][h];
+        const { t, s4 } = folder || {};
+        let typeClass = 'nw-fm-tree-folder';
+        if (s4 || M.tree.s4 && M.tree.s4[p]) {
+            typeClass = 'nw-fm-tree-icon-wrap sprite-fm-mono icon-bucket-outline';
+        }
+        else if (su || Object(M.c.shares[h]).su) {
+            typeClass = 'nw-fm-tree-folder inbound-share';
+        }
+        else if (t & M.IS_SHARED) {
+            typeClass = 'nw-fm-tree-folder shared-folder';
+        }
+        else if (mega.fileRequest.publicFolderExists(h, true)) {
+            typeClass = 'nw-fm-tree-folder file-request-folder';
+        }
+        else if (h === M.CameraId) {
+            typeClass = 'nw-fm-tree-folder camera-folder';
+        }
+        else if (h === M.cf.h) {
+            typeClass = 'nw-fm-tree-folder chat-folder';
+        }
+        else if (lbl) {
+            typeClass = `nw-fm-tree-folder ${MegaNodeComponent.label[lbl]}`;
+        }
+        const elem = mCreateElement('li', { id: `mctreeli_${h}` }, [
+            mCreateElement('span', {
+                'class': `nw-fm-tree-item ${t & M.IS_LINKED ? 'linked' : ''}`, id: `mctreea_${h}`
+            }, [
+                mCreateElement('span', { 'class': typeClass }, [document.createTextNode(name)]),
+                mCreateElement('div', { 'class': 'nw-fm-tree-iconwrap' }, [
+                    mCreateElement('span', {
+                        'class': `colour-label-ind ${lbl ? M.getLabelClassFromId(lbl) : 'hidden'}`
+                    }),
+                    mCreateElement('span', { 'class': 'gallery-status-icon sprite-fm-mono icon-photos' }),
+                    mCreateElement('span', {
+                        'class': `file-status-ico sprite-fm-mono ${t & M.IS_LINKED ? 'icon-link-thin-outline' : ''}`
+                    })
+                ])
+            ])
+        ]);
+
+        if (su) {
+            const root = document.createElement('div');
+            root.className = 'mega-node user';
+            elem.firstElementChild.appendChild(root);
+            MegaAvatarComponent.factory({
+                parentNode: root,
+                userHandle: su,
+                size: 24,
+            });
+            const name = document.createElement('div');
+            name.className = 'user-card-name';
+            name.textContent = M.getNameByHandle(su);
+            root.appendChild(name);
+        }
+
+        return elem;
+    }
+
+    async function handleQuickAccessContent() {
+        await mega.quickAccessLocations.load();
+
+        const top = mega.quickAccessLocations.top();
+        if (top.some(h => !M.c[h])) {
+            await dbfetch.geta(top);
+        }
+        const content = $dialog[0].querySelector('.dialog-content-block');
+        content.textContent = '';
+        const ul = mCreateElement('ul', { 'class': 'mctreesub_quickaccess' });
+        content.appendChild(ul);
+        const filter = (h) => {
+            const root = M.getNodeRoot(h);
+            if ($.fileRequestNew && root !== M.RootID) {
+                return false;
+            }
+            if (($.selectFolderDialog || $.copyToShare) && sharer(h)) {
+                return false;
+            }
+            if ($.saveAsDialog && root === 's4' && M.getS4NodeType(h) === 'bucket') {
+                return false;
+            }
+            return M.getNodeByHandle(h);
+        };
+        for (let i = 0; i < top.length; i++) {
+            const node = filter(top[i]);
+            if (node) {
+                const row = renderQuickAccessRow(node);
+                if (row) {
+                    ul.appendChild(row);
+                }
+            }
+        }
+    }
 
     async function handleShareTabContent() {
         const elems = $dialog[0].querySelectorAll('.shared-with-me .nw-fm-tree-item');
@@ -1200,7 +1309,9 @@
             if ($.saveAsDialog) {
                 sortIcon.classList.remove('hidden');
                 sortLabel.classList.remove('hidden');
-                collapseBar.classList.remove('hidden');
+                if (section !== 'quick-access') {
+                    collapseBar.classList.remove('hidden');
+                }
             }
             else {
                 sort.classList.remove('hidden');
@@ -1261,8 +1372,11 @@
                     subtitle.textContent = l.file_req_dlg_empty_cd;
                     summary.classList.add('hidden');
                 }
+                if (section === 'quick-access') {
+                    subtitle.textContent = l.dlg_empty_text_frequents;
+                }
 
-                if (section === 'shared-with-me') {
+                if (section === 'shared-with-me' || section === 'quick-access') {
                     summary.classList.add('hidden');
                 }
                 if (section === 's4') {
@@ -1283,7 +1397,30 @@
 
         const instructions = $dialog[0].querySelector('.summary-container > .summary-row .summary-instructions');
         const instructionTxt = instructions.querySelector('.instruction');
-        if ($.copyToShare || $.selectFolderDialog && !$.fileRequestNew) {
+        if (section === 'quick-access') {
+            instructions.classList.remove('hidden');
+            let txt = l.dlg_cont_instruction_freq;
+            if ($.selectFolderDialog && !$.fileRequestNew) {
+                txt = l.dlg_share_instruction_freq;
+            }
+            else if ($.mcImport || $.chatAttachmentShare || $.saveToDialog || $.saveAsDialog) {
+                txt = l.dlg_save_instruction_freq;
+            }
+            else if ($.copyToShare) {
+                txt = l.dlg_share_instruction_freq;
+            }
+            else if ($.copyToUpload) {
+                txt = l.dlg_upload_instruction_freq;
+            }
+            else if ($.moveDialog) {
+                txt = l.dlg_move_instruction_freq;
+            }
+            else if ($.copyDialog) {
+                txt = l.dlg_copy_instruction_freq;
+            }
+            instructionTxt.textContent = txt;
+        }
+        else if ($.copyToShare || $.selectFolderDialog && !$.fileRequestNew) {
             instructions.classList.remove('hidden');
             instructionTxt.textContent = section === 's4' ?
                 l.share_folder_dlg_instruction_s4 :
@@ -1357,6 +1494,12 @@
         else {
             $arrow.addClass('icon-arrow-down-thin-outline').removeClass('icon-arrow-up-thin-outline');
         }
+        if (section === 'quick-access') {
+            $arrow[0].parentNode.parentNode.classList.add('no-sort');
+        }
+        else {
+            $arrow[0].parentNode.parentNode.classList.remove('no-sort');
+        }
 
         if (section === 'cloud-drive' || section === 'folder-link') {
             M.buildtree(M.d[M.RootID], 'fm-picker-dialog', 'cloud-drive');
@@ -1404,6 +1547,17 @@
                     }
                 });
             }
+        }
+        else if (section === 'quick-access') {
+            handleQuickAccessContent()
+                .then(() => {
+                    showDialogContent('quick-access', 'ul');
+                    disableFolders();
+                    initPerfectScrollbar($('.dialog-tree-panel-scroll', $dialog));
+                    setDialogButtonState($('.dialog-picker-button', $dialog));
+                })
+                .catch(dump);
+            return;
         }
 
         if (treesearch) {
@@ -1512,7 +1666,7 @@
      * @private
      */
     var handleDialogContent = function(dialogTabClass, buttonLabel) {
-        section = dialogTabClass || 'cloud-drive';
+        section = dialogTabClass || ($.sendToChatDialog ? 'conversations' : 'quick-access');
         buttonLabel = buttonLabel || getActionButtonLabel();
 
         var $pickerButtons = $('.fm-picker-dialog-button', $dialog).removeClass('active');
@@ -1534,6 +1688,7 @@
         const $s4 = $pickerButtons.filter('[data-section="s4"]');
         const $sharedMe = $pickerButtons.filter('[data-section="shared-with-me"]');
         const $conversations = $pickerButtons.filter('[data-section="conversations"]');
+        const $quickAccess = $pickerButtons.filter('[data-section="quick-access"]');
         $cloudDrive.removeClass('hidden');
         if (section === 'cloud-drive') {
             $('i', $cloudDrive).removeClass('icon-cloud-thin-outline').addClass('icon-cloud-thin-solid');
@@ -1558,6 +1713,12 @@
         }
         else {
             $('i', $conversations).removeClass('icon-chat-filled').addClass('icon-message-chat-circle-thin');
+        }
+        if (section === 'quick-access') {
+            $('i', $quickAccess).removeClass('icon-clock-thin-outline').addClass('icon-clock-thin-solid');
+        }
+        else {
+            $('i', $quickAccess).removeClass('icon-clock-thin-solid').addClass('icon-clock-thin-outline');
         }
 
         // Action button label
@@ -1602,7 +1763,7 @@
             $s4.addClass('hidden');
         }
 
-        if ($.copyToUpload) {
+        if ($.copyToUpload && M.currentdirid !== 'recents') {
             $('.fm-picker-notagain', $dialog).removeClass('hidden');
             $('footer', $dialog).removeClass('dialog-bottom');
             if (Object(window.fmconfig).ulddd) {
@@ -1625,6 +1786,10 @@
             $s4.addClass('hidden');
             $sharedMe.addClass('hidden');
             $conversations.removeClass('hidden');
+            $quickAccess.addClass('hidden');
+        }
+        else {
+            $quickAccess.removeClass('hidden');
         }
 
         const searchInput = $dialog[0].querySelector('.search-bar input');
@@ -1640,12 +1805,23 @@
         else if (section === 'conversations') {
             searchInput.placeholder = l.dlg_search_chat;
         }
+        if (section === 'quick-access' && !$.saveAsDialog) {
+            searchInput.parentNode.classList.add('hidden');
+        }
+        else {
+            searchInput.parentNode.classList.remove('hidden');
+        }
 
         if ($.saveAsDialog) {
             searchInput.placeholder = l.save_name_placeholder;
             searchInput.parentNode.classList.add('save-input');
             document.getElementById('fm-picker-dialog-title').classList.add('save-as');
-            $('.search-collapse-bar', $dialog).removeClass('hidden').addClass('collapsed');
+            if (section === 'quick-access') {
+                $('.search-collapse-bar', $dialog).addClass('hidden');
+            }
+            else {
+                $('.search-collapse-bar', $dialog).removeClass('hidden').addClass('collapsed');
+            }
             searchInput.previousElementSibling.className = 'sprite-fm-mime icon-text-24 left-icon';
         }
         else {
@@ -1660,7 +1836,7 @@
         buildDialogTree();
 
         // 'New Folder' button
-        if (section === 'shared-with-me' || section === 'conversations') {
+        if (section === 'shared-with-me' || section === 'conversations' || section === 'quick-access') {
             $('.dialog-newfolder-button', $dialog).addClass('hidden');
         }
         else {
@@ -1681,7 +1857,7 @@
         // If copying from contacts tab (Ie, sharing)
         if (
             !$.saveToDialog &&
-            (section === 'cloud-drive' || section === 's4') &&
+            (section === 'cloud-drive' || section === 's4' || section === 'quick-access') &&
             (M.currentrootid === 'chat' || $.copyToShare) &&
             !$.copyToUpload
         ) {
@@ -1716,7 +1892,7 @@
         else if ($.selectFolderDialog) {
             $permissionSelect.addClass('hidden');
             if ($.fileRequestNew) {
-                $dialog.addClass('fm-picker-file-request no-left');
+                $dialog.addClass('fm-picker-file-request');
 
                 $('.fm-picker-dialog-desc', $dialog)
                     .removeClass('hidden');
@@ -1929,7 +2105,7 @@
         if (isUserAllowedToOpenDialogs()) {
             M.safeShowDialog('copy', function() {
                 $.shareToContactId = u_id;
-                handleOpenDialog('cloud-drive', M.RootID, 'copyToShare');
+                handleOpenDialog('quick-access', undefined, 'copyToShare');
                 return $dialog;
             });
         }
@@ -1983,7 +2159,10 @@
                     onBeforeShown($dialog);
                 }
 
-                handleOpenDialog(activeTab, M.RootID);
+                handleOpenDialog(
+                    activeTab,
+                    !activeTab || typeof activeTab !== 'string' || activeTab === 'quick-access' ? undefined : M.RootID
+                );
                 return $dialog;
             });
 
@@ -2006,7 +2185,7 @@
         // Not allowed chats
         if (isUserAllowedToOpenDialogs()) {
             M.safeShowDialog('move', function() {
-                handleOpenDialog(0, M.RootID);
+                handleOpenDialog(0);
                 return $dialog;
             });
         }
@@ -2024,7 +2203,11 @@
             M.safeShowDialog('copy', function() {
                 $.saveToDialogCb = cb;
                 $.saveToDialogNode = node;
-                handleOpenDialog(activeTab, M.RootID, activeTab !== 'conversations' && 'saveToDialog');
+                handleOpenDialog(
+                    activeTab,
+                    !activeTab || activeTab === 'quick-access' ? undefined : M.RootID,
+                    activeTab !== 'conversations' && 'saveToDialog'
+                );
                 return $dialog;
             });
         }
@@ -2052,7 +2235,7 @@
             $.saveAsCallBack = cb;
             $.nodeSaveAs = typeof node === 'string' ? M.getNodeByHandle(node) : node;
             $.saveAsContent = content;
-            handleOpenDialog(null, node.p || M.RootID);
+            handleOpenDialog(null);
             return $dialog;
         });
 
@@ -2089,7 +2272,7 @@
                     if (dialogName === 'selectFolder') {
                         M.clearSelectedNodes();
                     }
-                    handleOpenDialog(0, target || M.RootID, mode);
+                    handleOpenDialog(0, undefined, mode);
 
                     $.selectFolderCallback = (target) => {
                         if ($.dialog !== dialogName) {
@@ -2277,7 +2460,10 @@
             setDialogButtonState($btn);
         });
 
-        $('.sort-height', $dialog).rebind('click.pickerdlg', () => {
+        $('.sort-height', $dialog).rebind('click.pickerdlg', (ev) => {
+            if (ev.currentTarget.classList.contains('no-sort')) {
+                return;
+            }
             const key = String($.dialog)[0].toUpperCase() + String($.dialog).substr(1) + section;
             if (!M.sortTreePanel[key]) {
                 return;
@@ -2525,7 +2711,7 @@
         $dialog.rebind('click', '.nw-fm-tree-item', function(e) {
 
             const disabled = e.currentTarget.classList.contains('disabled');
-            const expandable = e.currentTarget.classList.contains('expandable');
+            const expandable = section !== 'quick-access' && e.currentTarget.classList.contains('expandable');
             if (disabled && !expandable) {
                 return false;
             }
@@ -2538,7 +2724,9 @@
                 setDialogBreadcrumb(id);
             }
             treesearch = false;
-            M.buildtree({h: expandable ? id : $.mcselected}, 'fm-picker-dialog', section);
+            if (section !== 'quick-access') {
+                M.buildtree({h: expandable ? id : $.mcselected}, 'fm-picker-dialog', section);
+            }
             treesearch = ts;
             disableFolders();
 
@@ -2547,7 +2735,7 @@
             const elmId = `#mctreesub_${expandable ? id : $.mcselected}`;
             const arrow = this.querySelector('.nw-fm-tree-arrow');
             // Sub-folder exist?
-            if (c && c.indexOf('nw-fm-tree-arrow') > -1) {
+            if (arrow && c && c.includes('nw-fm-tree-arrow')) {
 
                 c = $(this).attr('class');
 
@@ -2565,7 +2753,7 @@
                     $(elmId).addClass('opened');
                 }
             }
-            else {
+            else if (arrow) {
 
                 c = $(this).attr('class');
 
@@ -2609,16 +2797,16 @@
                 setDialogBreadcrumb();
             }
 
-            initPerfectScrollbar($scrollBlock);
-
             // Disable action button if there is no selected items
             setDialogButtonState($btn);
 
             const instructions = $dialog[0].querySelector('.summary-container > .summary-row .summary-instructions');
             instructions.classList.add('hidden');
 
+            initPerfectScrollbar($scrollBlock);
+
             // // If not copying from contacts tab (Ie, sharing)
-            if (!$.copyToShare) {
+            if (!$.copyToShare && section !== 'quick-access') {
                 if ($.mcselected && (section === 's4' || M.getNodeRights($.mcselected) > 0)) {
                     $('.dialog-newfolder-button', $dialog).removeClass('hidden');
                 }
@@ -2715,6 +2903,9 @@
                         }
                     });
                 }
+                else {
+                    mega.quickAccessLocations.hit(target);
+                }
 
                 if ($('.notagain', $dialog).prop('checked')) {
                     mega.config.setn('ulddd', 1);
@@ -2728,6 +2919,7 @@
             if ($.selectFolderCallback) {
                 tryCatch(() => $.selectFolderCallback($.mcselected))();
                 closeDialog();
+                mega.quickAccessLocations.hit($.mcselected);
                 return false;
             }
 
@@ -2745,6 +2937,7 @@
                         });
                     })
                     .catch(dump).finally(() => mLoadingSpinner.hide('safeMoveNodes'));
+                mega.quickAccessLocations.hit(t);
                 return false;
             }
 
@@ -2815,6 +3008,7 @@
                     mega.fileTextEditor.saveFileAs(saveAsName, $.mcselected, $.saveAsContent, nodeToSave)
                         .then($.saveAsCallBack || nop)
                         .catch(tell);
+                    mega.quickAccessLocations.hit(t);
                 });
 
                 return false;
@@ -2824,11 +3018,19 @@
 
             if (saveToDialog) {
                 saveToDialogCb(saveToDialogNode, section === 'conversations' && chats || $.mcselected);
+                if (section !== 'conversations') {
+                    mega.quickAccessLocations.hit(t);
+                }
                 return false;
             }
 
             // Get active tab
-            if (section === 'cloud-drive' || section === 'folder-link' || section === 's4') {
+            if (
+                section === 'cloud-drive' ||
+                section === 'folder-link' ||
+                section === 's4' ||
+                section === 'quick-access'
+            ) {
 
                 // If copying from contacts tab (Ie, sharing)
                 if ($(this).text().trim() === l[1344]) {
@@ -2888,6 +3090,7 @@
                         })
                         .catch((ex) => ex !== EBLOCKED && tell(ex));
                 }
+                mega.quickAccessLocations.hit(t);
             }
             else if (section === 'shared-with-me') {
                 M.copyNodes(getNonCircularNodes(selectedNodes), t)
@@ -2901,6 +3104,7 @@
                         }
                     })
                     .catch(tell);
+                mega.quickAccessLocations.hit(t);
             }
             else if (section === 'conversations') {
                 if (window.megaChatIsReady) {

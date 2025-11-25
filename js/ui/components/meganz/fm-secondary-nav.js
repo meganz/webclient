@@ -892,7 +892,7 @@ lazy(mega.ui, 'secondaryNav', () => {
         openNewMenu(ev) {
             if (
                 M.InboxID &&
-                (M.currentrootid === M.InboxID || M.getNodeRoot(M.currentdirid.split('/').pop()) === M.InboxID)
+                (M.currentrootid === M.InboxID || M.getNodeRoot(String(M.currentdirid).split('/').pop()) === M.InboxID)
             ) {
                 return;
             }

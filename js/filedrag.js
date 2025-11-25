@@ -374,7 +374,7 @@
                 }
 
                 if (!e.dataTransfer) {
-                    $.doStraightUpload = true;
+                    $.doStraightUpload = String(M.currentdirid) !== 'recents';
                 }
                 addUpload(files, files.empty);
             })

@@ -3145,7 +3145,11 @@ Object.defineProperty(self, 'dbfetch', (function() {
     'use strict';
     const node_inflight = new Set();
     const tree_inflight = Object.create(null);
-    const ssp = (self.d > 0 && !self.is_livesite || mega.flags.ff_fpage) && mega.infinity;
+
+    /** @property ssp */
+    const prop = lazy(Object.create(null), 'ssp', () => {
+        return (self.d > 0 && !self.is_livesite || mega.flags.ff_fpage) && mega.infinity;
+    });
 
     const page = async({h}) => {
         if (page.has(h)) {
@@ -3331,7 +3335,7 @@ Object.defineProperty(self, 'dbfetch', (function() {
                 showLoading(handle);
             }
 
-            if (ssp && M.tnc[n.h] !== null) {
+            if (prop.ssp && M.tnc[n.h] !== null) {
                 const res = await page(n).catch(dump);
                 if (res) {
                     return done(res);

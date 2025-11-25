@@ -691,6 +691,7 @@ lazy(mega, 'wsuploadmgr', () => {
         constructor() {
             this.fileno = 0;
             this.running = null;
+            this.refreshing = false;
             this.logger = new MegaLogger(`WsUploadMgr(${makeUUID().slice(-16)})`, false, logger);
 
             this.poolmgr = new WsPoolMgr((ws, pool) => {
@@ -822,7 +823,18 @@ lazy(mega, 'wsuploadmgr', () => {
 
                 case 5:
                     // server in distress - refresh pool target URLs from API
-                    return this.poolmgr.refreshpools();
+                    queueMicrotask(() => {
+                        if (!this.refreshing) {
+                            this.refreshing = true;
+
+                            this.poolmgr.refreshpools()
+                                .catch(dump)
+                                .finally(() => {
+                                    this.refreshing = false;
+                                });
+                        }
+                    });
+                    return;
 
                 case 6:
                     // server requests a break

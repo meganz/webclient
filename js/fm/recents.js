@@ -66,7 +66,9 @@ function RecentsRender() {
         second: '2-digit',
         hour12: false
     });
+    this.isRtl = document.body.classList.contains('rtl');
     this._expandedStates = {};
+    this.pathSeparatorClass = `sprite-fm-mono ${this.isRtl ? 'icon-arrow-left' : 'icon-arrow-right'}`;
 
     this._initScrollPosition = false;
 
@@ -86,6 +88,12 @@ function RecentsRender() {
 
     var self = this;
 
+    /**
+     * Object storing currently selected filters by the selected index
+     * @type {Object.<String, [Number, Function]>}
+     */
+    this.selectedFilters = Object.create(null);
+
     // Default click handlers
     this.$container.rebind("click contextmenu", function(e) {
         $.hideTopMenu(e);
@@ -95,6 +103,246 @@ function RecentsRender() {
         return false;
     });
 }
+
+RecentsRender.prototype.dropAllFilters = function() {
+    'use strict';
+
+    const buttons = [...$('button.fm-filter-chip-button', this.$container)];
+
+    for (let i = buttons.length; i--;) {
+        const btn = buttons[i];
+        btn.classList.remove('selected');
+        btn.querySelector('.fm-filter-chip-button-text').textContent = btn.dataset.label;
+    }
+
+    this.selectedFilters = Object.create(null);
+
+    $('.fm-filter-reset', this.$container).remove();
+};
+
+/**
+ * Selecting DOM chip and showing the reset button
+ * @param {Number} index Index of the filter to work with
+ * @param {String} label Label of the filter to replace the header to
+ * @returns {void}
+ */
+RecentsRender.prototype.adjustFilterChip = function(index, label) {
+    'use strict';
+
+    const chips = $('.fm-filter-chips', this.$container);
+    const chip = $(`button.fm-filter-chip-button:nth-child(${index + 1})`, chips);
+
+    if (!chip.length) {
+        return;
+    }
+
+    chip.addClass('selected');
+
+    $('.fm-filter-chip-button-text', chip).text(label);
+
+    if (!$('.fm-filter-reset', chips).length) {
+        chips.safeAppend(`<button class="fm-filter-reset font-body-1">${l.filter_chip_reset}</button>`);
+        const resetBtn = $('.fm-filter-reset', chips);
+
+        resetBtn.rebind('click.recentsReset', () => {
+            this.dropAllFilters();
+            this.renderFiltered(M.recentActions);
+            return false;
+        });
+    }
+};
+
+/**
+ * Clearing the filter chip by index
+ * @param {Number} index Index to use in Chips list
+ * @returns {void}
+ */
+RecentsRender.prototype.clearFilterChip = function(index) {
+    'use strict';
+
+    const chips = $('.fm-filter-chips', this.$container);
+    const chip = $(`button.fm-filter-chip-button:nth-child(${index + 1})`, chips);
+
+    chip.removeClass('selected');
+    $('.fm-filter-chip-button-text', chip).text(chip.data('label'));
+
+    if (!$('button.fm-filter-chip-button.selected', chips).length) {
+        $('.fm-filter-reset', chips).remove();
+    }
+};
+
+/**
+ * Rendering only the filtered actions if any
+ * @param {Object.<String, any>[]} filtered Filtered actions
+ * @returns {void}
+ */
+RecentsRender.prototype.renderFiltered = function(filtered) {
+    'use strict';
+
+    const container = document.querySelector('.fm-recents.container');
+    const header = container.querySelector('.fm-recents.header-row');
+
+    if (filtered.length) {
+        mega.ui.empty.clear(container);
+        if (header) {
+            header.classList.remove('hidden');
+        }
+    }
+    else if (this._rendered) {
+        this.reset();
+
+        if (header) {
+            header.classList.add('hidden');
+        }
+    }
+
+    this._initialRender(filtered);
+};
+
+/**
+ * Setting filter chips in header
+ * @param {Object.<String, any>[]} actions All actions to filter through
+ * @returns {void}
+ */
+RecentsRender.prototype.setFilters = function(actions) {
+    'use strict';
+
+    const chips = $('.fm-filter-chips', this.$container);
+
+    if (chips.children().length) {
+        return;
+    }
+
+    const locStrings = [l[164], l[5542], l[5543]];
+    const typeExStrings = [l.filter_chip_type_folder];
+
+    if (u_attr.s4) {
+        locStrings.push(l.obj_storage);
+    }
+
+    const allowedLocations = array.to.object(locStrings, true);
+    const disallowedTypes = array.to.object(typeExStrings, true);
+
+    const { filters } = mega.ui.mNodeFilter;
+    const filterArr = [filters.location, filters.type, filters.dateadded];
+
+    const filteredActions = () => {
+        const arr = [];
+
+        for (let i = M.recentActions.length; i--;) {
+            const action = M.recentActions[i];
+
+            if (action.type === 'date') {
+                if (Array.isArray(arr[0])) {
+                    arr.unshift(action);
+                }
+            }
+            else if (action.length) {
+                const filtered = action.filter((n) => {
+                    const keys = Object.keys(this.selectedFilters);
+                    for (let j = keys.length; j--;) {
+                        if (!this.selectedFilters[keys[j]][1](n)) {
+                            return false;
+                        }
+                    }
+
+                    return true;
+                });
+
+                if (filtered.length) {
+                    const keys = Object.keys(action).filter(isNaN);
+
+                    for (let j = keys.length; j--;) {
+                        filtered[keys[j]] = action[keys[j]];
+                    }
+
+                    arr.unshift(filtered);
+                }
+            }
+        }
+
+        return arr;
+    };
+
+    for (let i = 0; i < filterArr.length; i++) {
+        const { title, menu, match } = filterArr[i];
+        const txt = mCreateElement('div', { class: 'fm-filter-chip-button-text font-body-1' });
+        txt.textContent = title;
+        const chip = mCreateElement('button', { class: 'fm-filter-chip-button', 'data-label': title }, [
+            txt,
+            mCreateElement('i', { class: 'sprite-fm-mono icon-chevron-down-thin-outline' })
+        ]);
+        chip.addEventListener('click', () => {
+            const { x, bottom, width } = chip.getBoundingClientRect();
+
+            const subMenu = new MMenuSelect();
+            subMenu.parentItem = { el: chip };
+
+            let items = [...menu];
+
+            if (!i) { // Stripping unneeded locations
+                const tmp = [];
+
+                for (let i = 0; i < items.length; i++) {
+                    if (!allowedLocations[items[i].label]) {
+                        continue;
+                    }
+
+                    tmp.push({ ...items[i], icon: undefined });
+                }
+
+                items = tmp;
+            }
+            else if (i === 1) { // Stripping unneded types
+                items = items.filter(({ label }) => !disallowedTypes[label]);
+            }
+
+            subMenu.options = items.map(({ label, icon, data }, index) => {
+                return {
+                    label,
+                    icon,
+                    click: () => {
+                        if (data) {
+                            filterArr[i].selection = data;
+                            this.selectedFilters[i] = [index, match.bind(filterArr[i])];
+                            this.adjustFilterChip(i, label, actions);
+                        }
+                        else {
+                            delete filterArr[i].selection;
+                            delete this.selectedFilters[i];
+                            this.clearFilterChip(i);
+                        }
+
+                        const filtered = filteredActions();
+                        this.renderFiltered(filtered);
+                    },
+                    selected: (!!this.selectedFilters[i] && this.selectedFilters[i][0] === index)
+                        || (!data && !this.selectedFilters[i]),
+                    checkFn() {
+                        if (!this.checkEl) {
+                            this.checkEl = document.createElement('i');
+                            this.el.append(this.checkEl);
+                            this.checkEl.className = 'sprite-fm-mono icon-check selected-mark';
+                            this.el.classList.add('selected', 'hide-radio-on');
+                        }
+
+                    }
+                };
+            });
+
+            subMenu.show(x + (this.isRtl ? width : 0), bottom + 2);
+        });
+
+        chips[0].appendChild(chip);
+    }
+
+    MegaButton.factory({
+        parentNode: chips.parent()[0],
+        icon: 'sprite-fm-mono icon-info-thin-outline cursor-pointer',
+        componentClassname: 'transparent-icon text-icon secondary recents-info-btn',
+        type: 'icon'
+    }).on('click.recentsInfo', mega.ui.mInfoPanel.show);
+};
 
 /**
  * Trigger a render init or update.
@@ -139,6 +387,7 @@ RecentsRender.prototype.render = function(limit, until, forceInit) {
     }
 
     if (!this._rendered) {
+        this.dropAllFilters();
         loadingDialog.show();
     }
     M.initShortcutsAndSelection(this.container);
@@ -166,14 +415,14 @@ RecentsRender.prototype.render = function(limit, until, forceInit) {
  */
 RecentsRender.prototype._initialRender = function(actions) {
     'use strict';
+
     var self = this;
     if (!this._showRecents) {
         this.recentActions = actions;
         this._view = [];
         M.v = this._view;
-        this.$disabledContent.removeClass('hidden');
-        this.$noContent.addClass('hidden');
         this.$content.addClass('hidden');
+        mega.ui.empty.recents(this.$container[0], 0);
 
         this.$buttonEnableRecents
             .rebind('click.enableRecents', () => this._setConfigShow(1));
@@ -182,15 +431,15 @@ RecentsRender.prototype._initialRender = function(actions) {
         this.recentActions = actions;
         this._view = [];
         M.v = this._view;
-        this.$noContent.removeClass('hidden');
-        this.$disabledContent.addClass('hidden');
         this.$content.addClass('hidden');
+        mega.ui.empty.recents(this.$container[0], Object.keys(this.selectedFilters).length > 0 ? 2 : 1);
     } else {
-        self.$noContent.addClass('hidden');
-        self.$disabledContent.addClass('hidden');
+        mega.ui.empty.clear(this.$container[0]);
+        this.$container.removeClass('emptied empty-filter');
         this.recentActions = actions;
+        this.setFilters(actions);
+
         if (this._rendered) {
-            this._dynamicList.destroy();
             this.reset();
         }
         this._dynamicList = new MegaDynamicList(this.scrollDiv, {
@@ -205,7 +454,7 @@ RecentsRender.prototype._initialRender = function(actions) {
                 'handlers': ['click-rail', 'drag-thumb', 'wheel', 'touch'],
                 'minScrollbarLength': 20
             },
-            'viewPortBuffer': 50
+            'viewPortBuffer': 50,
         });
 
         this._dynamicList.getItemHeight = function(position) {
@@ -247,6 +496,7 @@ RecentsRender.prototype._initialRender = function(actions) {
                 this._populateNodeActionMap(actions[i]);
             }
         }
+
         M.v = this._view;
         this._dynamicList.batchAdd(keys);
         this._dynamicList.initialRender();
@@ -259,13 +509,14 @@ RecentsRender.prototype._initialRender = function(actions) {
 
 RecentsRender.prototype._doRenderWorker = function(id) {
     'use strict';
+
     if (!this._renderCache[id]) {
         if (this._renderFunctions[id]) {
             this._renderCache[id] = this._renderFunctions[id](id);
         } else {
             var action = this.actionIdMap[id];
-            if (action.type === "date") {
-                var $newTitleDiv = this._$titleTemplate.clone().removeClass("template title-template");
+            if (action.type === 'date') {
+                var $newTitleDiv = this._$titleTemplate.clone().removeClass('template title-template');
                 $newTitleDiv.text(action.date);
                 this._renderCache[id] = $newTitleDiv[0];
             } else {
@@ -278,27 +529,12 @@ RecentsRender.prototype._doRenderWorker = function(id) {
 
 RecentsRender.prototype._getItemHeight = function(id) {
     'use strict';
-    var h;
-    if (this._childIds[id]) {
-        h = 49;
-    } else if (this._renderCache[id]) {
-        h = this._renderCache[id].offsetHeight;
-    } else {
-        var a = this.actionIdMap[id];
-        if (a.type === "date") {
-            h = 62;
-        } else if (a.type === "media" && a.length > this.getMaxFitOnScreen()) {
-            h = 254;
-        } else if (a.type === "media" && a.length > 1) {
-            h = 219;
-        } else if (a.length > 1) {
-            h = 66;
-        } else {
-            h = 49;
-        }
 
+    if (this._renderCache[id]) {
+        return this._renderCache[id].offsetHeight;
     }
-    return h;
+
+    return (this.actionIdMap[id] && this.actionIdMap[id].type === 'date') ? 57 : 48;
 };
 
 RecentsRender.prototype._onNodeInjected = function() {
@@ -456,97 +692,12 @@ RecentsRender.prototype.keySelectUpDown = function(dir, shift) {
 };
 
 /**
- * Generate a breadcrumb based off array of partPart (or node) objects.
- * @param $container
- * @param action
- */
-RecentsRender.prototype.populateBreadCrumb = function($container, action) {
-    'use strict';
-    var self = this;
-    var newBreadCrumb = function(node) {
-        var $breadCrumb = $('<span/>');
-        $breadCrumb
-            .attr('data-id', node.h)
-            .text(node.name)
-            .rebind('click dblclick', function () {
-                M.openFolder(node.h);
-                return false;
-            })
-            .rebind("contextmenu", function(e) {
-                self.markSelected($breadCrumb.add($breadCrumb.closest('.content-row')));
-                selectionManager.clear_selection();
-                selectionManager.add_to_selection(node.h);
-                $.hideTopMenu();
-                return M.contextMenuUI(e, 1) ? true : false;
-            });
-        if (node.h === M.RootID) {
-            $breadCrumb.addClass('cloud-drive');
-        }
-        return $breadCrumb;
-    };
-
-    var getActionUserString = function(isOtherUser, isCreated, isUnknownUser) {
-        var actionUserString = '<span>';
-        if (isOtherUser) {
-            actionUserString += isCreated
-                ? isUnknownUser ? l.recents_shared_by : l[19937]
-                : l[19940];
-            actionUserString = actionUserString
-                .replace("%3", '<span class="link action-user-name"></span>');
-        }
-        else {
-            actionUserString += isCreated ? l[24769] : l[24770];
-        }
-        actionUserString = actionUserString.replace("%1", '<span class="dot-separator">&#183;</span>');
-
-        return actionUserString + '</span>';
-    };
-
-    if (!action || !Array.isArray(action.path) || !action.path.length) {
-        // FIXME: check out where this does originates...
-        console.warn('Invalid parameters, cannot render breadcrumb...', action);
-        return;
-    }
-
-    var iconFolderType = 'icon-folder';
-    if (action.inshare) {
-        iconFolderType = "icon-folder-incoming-share";
-    }
-    else if (action.outshare) {
-        iconFolderType = "icon-folder-outgoing-share";
-    }
-    $container.safeAppend('<i class="js-path-icon sprite-fm-mono ' + iconFolderType + '"></i>');
-
-    var pathTooltip = '';
-    for (var k = action.path.length; k--;) {
-        pathTooltip += action.path[k].name;
-        if (k >= 1) {
-            pathTooltip += '[I class="sprite-fm-mono icon-arrow-right"][/I]';
-        }
-    }
-
-    $container.append(newBreadCrumb(action.path[0]));
-    $('span', $container).addClass('link parent-folder-name simpletip').attr({
-        "data-simpletip": pathTooltip,
-        "data-simpletip-class": "recents-file-path",
-        "data-simpletipposition": "top"
-    });
-
-    $container.safeAppend(getActionUserString(
-        action.user !== u_handle,
-        action.action === "added",
-        !M.getNameByHandle(action.user) && action.su
-    ));
-};
-
-/**
  * Populate, enable and attach event listeners to the `by <name>` parts of the template.
  * @param $newRow
  * @param action
  */
 RecentsRender.prototype.handleByUserHandle = function($newRow, action) {
     'use strict';
-    var self = this;
 
     // If the user is not a contact, and the added node belongs in an inshare w/o full-access,
     // we show '[Node name] shared by [Sharer]'
@@ -555,39 +706,34 @@ RecentsRender.prototype.handleByUserHandle = function($newRow, action) {
         && !M.getNameByHandle(action.user)
         && action.su;
 
-    var user = useInshareUser ? M.getUserByHandle(useInshareUser) : M.getUserByHandle(action.user);
-    var $userNameContainer = $(".breadcrumbs .action-user-name", $newRow);
+    const user = M.getUserByHandle(useInshareUser || action.user);
+    const $userNameContainer = $('.action-user-name', $newRow);
+    const username = M.getNameByHandle(useInshareUser || action.user) || l[24061];
 
     $userNameContainer
-        .removeClass("hidden")
-        .text(M.getNameByHandle(useInshareUser || action.user) || l[24061]);
+        .text(username);
 
-    if (!user.h) {
+    if (!user.h || isValidEmail(username) || username === l[24061]) {
         // unknown/deleted contact, no business here...
         return;
     }
     $userNameContainer
         .attr('id', user.h)
-        .rebind("contextmenu", function(e) {
-            self.markSelected($userNameContainer.add($newRow));
-            selectionManager.clear_selection();
-            selectionManager.add_to_selection(user.h);
-            $.hideTopMenu();
-            return M.contextMenuUI(e, 1) ? true : false;
-        })
-        .rebind("click", function(e) {
-            $userNameContainer.trigger({
-                type: 'contextmenu',
-                originalEvent: e.originalEvent
-            });
-            return false;
-        })
-        .rebind("dblclick", function() {
+        .rebind('click.recentUser', () => {
             if (user.h) {
-                M.openFolder(user.h);
+                mega.ui.flyout.showContactFlyout(user.h);
             }
             return false;
         });
+};
+
+/**
+ * @param {Boolean} action Action to work with
+ * @returns {Boolean}
+ */
+RecentsRender.prototype.hasMore = function(action) {
+    'use strict';
+    return !action.isChild && (action.path.length !== 1 || action.path[0].h !== M.RootID);
 };
 
 /**
@@ -595,14 +741,30 @@ RecentsRender.prototype.handleByUserHandle = function($newRow, action) {
  * @param $newRow
  * @param action
  */
-RecentsRender.prototype.handleInOutShareState = function($newRow, action) {
+RecentsRender.prototype.getActionIcon = function(action) {
     'use strict';
 
-    $('.js-path-icon', $newRow)
-        .removeClass('hidden icon-folder icon-folder-outgoing-share icon-folder-incoming-share')
-        .addClass(action.outshare ? 'icon-folder-outgoing-share' : 'icon-folder-incoming-share');
-    $('.in-out-tooltip span', $newRow)
-        .text(action.outshare ? l[5543] : l[5542]);
+    if (this.hasMore(action)) {
+        if (action.outshare || action.inshare) {
+            return 'folder-users';
+        }
+        if (action.path[0].h === M.CameraId) {
+            return 'folder-camera-uploads';
+        }
+        if (action.path[0].h === M.cf.h) {
+            return 'folder-chat';
+        }
+        if (action.path[1].s4Root) {
+            return 'bucket';
+        }
+        if (mega.fileRequest && mega.fileRequest.publicFolderExists(action.path[0].h)) {
+            return 'folder-public';
+        }
+
+        return 'folder';
+    }
+
+    return fileIcon(action[0]);
 };
 
 /**
@@ -619,63 +781,149 @@ RecentsRender.prototype.getMaxFitOnScreen = function(force) {
 };
 
 /**
- * Generate a new action row.
- * @param action
- * @param actionId
- * @returns {*|Autolinker.HtmlTag}
+ * Preparing an action string to show
+ * @param {Object.<String, any>} action Action to work with
+ * @returns {String}
  */
-RecentsRender.prototype.generateRow = function (action, actionId) {
+RecentsRender.prototype.getActionUserString = function(action) {
     'use strict';
 
-    var self = this;
+    const isMore = this.hasMore(action);
 
-    // Get correct template.
-    var $newRow;
-    if (action.type === "media" && action.length > 1) {
-        $newRow = self.getTemplate("images-content-row-template").removeClass("template");
-    } else {
-        $newRow = self.getTemplate("content-row-template").removeClass("template");
+    let str = '<span>';
+
+    str += action.action === 'added'
+        ? (isMore ? mega.icu.format(l.recents_added_count, action.length) : l.recent_added_by)
+        : (isMore ? mega.icu.format(l.recents_modified_count, action.length) : l.recent_modified_by);
+
+    str = str.replace("%1", '<a class="action-user-name underline text-color-primary-link"></a>');
+
+    if (isMore) {
+        const dot = '<span class="dot-separator">&nbsp;&#183;&nbsp;</span>';
+
+        if (action.outshare) {
+            str += `${dot}<span>${l.type_outshare}</span>`;
+        }
+        else if (action.inshare) {
+            str += `${dot}<span>${l.type_inshare}</span>`;
+        }
+        else if (action.path[0].h === M.CameraId) {
+            str += `${dot}<span>${l.sync_folder}</span>`;
+        }
+        else if (action.path[0].h === M.cf.h) {
+            str += `${dot}<span>${l.chat_folder}</span>`;
+        }
+        else if (action.path[1].s4Root) {
+            str += `${dot}<span>${l.s4_bucket_type}</span>`;
+        }
+        else if (mega.fileRequest && mega.fileRequest.publicFolderExists(action.path[0].h)) {
+            str += `${dot}<span>${l.file_request}</span>`;
+        }
     }
+
+    return `${str}</span>`;
+};
+
+/**
+ * Preparing a location string in the row
+ * @param {jQuery} row Row to work with
+ * @param {Object.<String, any>} action Action to work with
+ * @returns {String}
+ */
+RecentsRender.prototype.setActionLocation = function(row, action) {
+    'use strict';
+
+    const { path, outshare, inshare, isChild } = action;
+
+    if (!Array.isArray(path) || !path.length) {
+        return;
+    }
+
+    if (isChild) {
+        $('.file-location a', row).text('');
+        return;
+    }
+
+    let parent = path[0];
+    let pathArr = [];
+
+    if (outshare) {
+        parent = { name: l.type_outshare, h: 'out-shares' };
+    }
+    else if (inshare) {
+        parent = path[1];
+        pathArr = [...path.slice(1)];
+    }
+    else if (path.length > 1) {
+        parent = path[1];
+
+        pathArr = path;
+        const { s4Root } = path[path.length - 2];
+        const maxPathItems = 5 + (s4Root | 0);
+
+        if (path.length > maxPathItems) {
+            const skipNum = s4Root ? 2 : 1;
+            pathArr = [...path.slice(1, maxPathItems - skipNum), { name: '...' }, path[path.length - skipNum]];
+        }
+        else {
+            pathArr = path.slice(s4Root | 0, -1);
+        }
+    }
+
+    const loc = $('.file-location a', row);
+
+    loc.text(parent.name).rebind('click.recentLoc', () => {
+        M.openFolder(parent.h);
+        return false;
+    });
+
+    if (pathArr.length > 1 || (pathArr.length === 1 && pathArr[0].h !== path[0].h && pathArr[0].h !== parent.h)) {
+        loc.attr(
+            'data-simpletip',
+            pathArr.reduceRight(
+                (acc, { name }) => acc ? `${acc}[I class="${this.pathSeparatorClass}"][/I]${name}` : name,
+                ''
+            )
+        );
+    }
+};
+
+/**
+ * Generate a new action row.
+ * @param {Object.<String, any>} action Action to work with
+ * @param {String|Number} actionId Action id to map to
+ * @returns {*|Autolinker.HtmlTag}
+ */
+RecentsRender.prototype.generateRow = function(action, actionId) {
+    'use strict';
+
+    const $newRow = this.getTemplate('content-row-template').removeClass('template');
 
     // Attach unique class & data attributes for this action.
     if (actionId !== undefined) {
-        $newRow.addClass("action-" + actionId).data("action", actionId);
+        $newRow.addClass(`action-${actionId}`).data('action', actionId);
     }
 
-    // Populate breadcrumb path
-    this.populateBreadCrumb($newRow.find(".breadcrumbs"), action);
+    $newRow.attr('id', this.hasMore(action) ? action.path[0].h : action[0].h);
+    this._renderFiles($newRow, action, actionId);
 
-    // The following commented out code may require to back later.
-    // Render the date/time views.
-    // var date = new Date(action.ts * 1000 || 0);
-    // $newRow.find(".file-data .time").text(this._shortTimeFormatter.format(date));
-    // $newRow.find(".file-data .uploaded-on-message.dark-direct-tooltip span").text(
-    //     (action.action !== "added" ?)
-    //         .replace('%1', acc_time2date(action.ts, true))
-    //         .replace('%2', this._fullTimeFormatter.format(date))
-    // );
+    const actionEl = $('.file-action', $newRow);
+    actionEl.safeAppend(this.getActionUserString(action));
 
-    // Render in/out share icons.
-    if (action.outshare || action.inshare) {
-        self.handleInOutShareState($newRow, action);
-    }
+    this.setActionLocation($newRow, action);
 
-    // Show correct icon for action.
-    if (action.action !== 'added') {
-        $newRow.find(".action-icon.tiny-icon").removeClass("top-arrow").addClass("refresh");
-    }
-
-    if (action.type === "media" && action.length > 1) {
-        this._renderMedia($newRow, action, actionId);
-    } else {
-        $newRow.attr('id', action[0].h);
-        this._renderFiles($newRow, action, actionId);
-    }
-
-    // Show by user if not current user.
     if (action.user !== u_handle) {
-        self.handleByUserHandle($newRow, action);
+        // Show by user if not current user
+        this.handleByUserHandle($newRow, action);
     }
+    else {
+        $('.action-user-name', $newRow)
+            .text(`${u_attr.fullname} (${l[8885]})`)
+            .removeClass();
+    }
+
+    actionEl.addClass('simpletip').attr('data-simpletip', actionEl.text());
+
     return $newRow;
 };
 
@@ -688,19 +936,41 @@ RecentsRender.prototype.generateRow = function (action, actionId) {
  */
 RecentsRender.prototype._renderFiles = function($newRow, action, actionId) {
     'use strict';
-    var self = this;
-    var isCreated = action.action === "added";
-    var isOtherUser = action.user !== u_handle;
-    var $icon = $('.item-type-icon-90', $newRow);
-    var iconClass = fileIcon(action[0]);
+    const emptyPixel = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E`;
+    const $icon = $('.item-type-icon-90', $newRow);
+    let iconClass = this.getActionIcon(action);
 
     // handle icon
     $icon.addClass(`${iconClass.includes('video') ? 'video ' : ''}icon-${iconClass}-90`);
 
-    if (action.length === 1 && (iconClass === 'image' && is_image2(action[0]) ||
-        iconClass === 'video' && is_video(action[0]) || iconClass === 'pdf')) {
+    if (!Array.isArray(action.path) || !action.path.length) {
+        // FIXME: check out where this does originates...
+        console.warn('Invalid parameters, cannot render group...', action);
+    }
 
-        $icon.addClass('thumb').safeHTML('<img>');
+    // handle filename.
+    const $fileName = $('.file-name', $newRow);
+    const isMore = this.hasMore(action);
+
+    $fileName.safeHTML('<span class="link title first-node-name"></span>');
+
+    let node = action[0];
+
+    if (isMore) {
+        node = action.path[0];
+        iconClass = 'folder';
+    }
+    else if (
+        iconClass === 'pdf'
+        || iconClass === 'image' && is_image2(action[0])
+        || iconClass === 'video' && is_video(action[0])
+    ) {
+        $icon.addClass('thumb').safeHTML(`<img src="${emptyPixel}" class="shimmer" />`);
+        $('img', $icon).rebind('load.recentThumb', ({ target }) => {
+            if (target.src !== emptyPixel) {
+                target.classList.remove('shimmer');
+            }
+        });
 
         if (M.d[action[0].h]) {
             M.d[action[0].h].seen = true;
@@ -715,46 +985,53 @@ RecentsRender.prototype._renderFiles = function($newRow, action, actionId) {
         }
     }
 
-    // handle filename.
-    var $fileName = $newRow.find(".file-name");
-    var titleString;
-    var isMore = action.length > 1;
-    if (isMore) {
-        titleString = l[24835];
-    } else {
-        titleString = '%1';
-    }
-
-    titleString = titleString
-        .replace("%1", '<span class="link title first-node-name"></span>')
-        .replace("%2", action.length - 1)
-        .replace("[A]", '<span class="link more-less-toggle">')
-        .replace("[/A]", '</span>')
-        .replace("[A1]", '<span class="rest-nodes-counter">')
-        .replace("[/A1]", '</span>');
-
-    $fileName.safeHTML(titleString);
-
-    var $fileNameContainer = $fileName.find(".title");
+    const $fileNameContainer = $('.title', $fileName);
     $fileNameContainer
-        .text(action[0].name)
-        .attr('id', action[0].h)
-        .rebind('click', function(e) {
-            self.markSelected();
-            $.hideContextMenu();
-            if (is_image(action[0]) || is_video(action[0])) {
-                if (is_video(action[0])) {
-                    $.autoplay = action[0].h;
-                }
-                slideshow(action[0].h);
-            }
-            else if (is_text(action[0])) {
+        .text(node.name)
+        .attr('id', node.h)
+        .addClass('simpletip')
+        .attr('data-simpletip', node.name);
 
+    $newRow
+        .rebind('click.recentNode', (e) => {
+            $.hideContextMenu();
+
+            if (!e.ctrlKey && !e.metaKey) {
+                this.markSelected();
+                selectionManager.clear_selection();
+            }
+
+            let ids = '';
+
+            for (let i = action.length; i--;) {
+                const { h } = action[i];
+                selectionManager.add_to_selection(h);
+                ids += `#${h},`;
+            }
+
+            $(ids.slice(0, -1), this.$container).addClass('ui-selected');
+
+            return false;
+        }).rebind('dblclick.recentNode', () => {
+            this.markSelected();
+            $.hideContextMenu();
+
+            if (isMore) {
+                M.openFolder(node.h);
+            }
+            else if (is_image(node)) {
+                slideshow(node.h);
+            }
+            else if (is_video(node)) {
+                $.autoplay = node.h;
+                slideshow(node.h);
+            }
+            else if (is_text(node)) {
                 loadingDialog.show();
 
-                mega.fileTextEditor.getFile(action[0].h)
+                mega.fileTextEditor.getFile(node.h)
                     .then((data) => {
-                        mega.textEditorUI.setupEditor(action[0].name, data, action[0].h);
+                        mega.textEditorUI.setupEditor(node.name, data, node.h);
                     })
                     .catch(dump)
                     .finally(() => {
@@ -762,73 +1039,78 @@ RecentsRender.prototype._renderFiles = function($newRow, action, actionId) {
                     });
             }
             else {
-                $fileNameContainer.trigger({
-                    type: 'contextmenu',
-                    originalEvent: e.originalEvent
-                });
+
             }
             return false;
         });
 
-    var expandedIds = [];
+    let expandedIds = [];
 
     // Use a render function to delay the rendering of a child node till it is in view.
-    var generateRenderFunction = function(i, id) {
-        return function() {
-            if (!self._renderCache[id]) {
-                var nodeAction = action.createEmptyClone();
-                var node = action[i];
+    const generateRenderFunction = (i, id) => {
+        return () => {
+            if (!this._renderCache[id]) {
+                const nodeAction = action.createEmptyClone();
+                const node = action[i];
                 nodeAction.ts = node.ts;
                 nodeAction.push(node);
-                var $newChildAction = self.generateRow(nodeAction);
+                nodeAction.isChild = true;
+                const $newChildAction = this.generateRow(nodeAction);
                 $newChildAction.addClass(`action-${actionId}-child`);
                 $newChildAction.addClass(i === action.length - 1 ? 'last-child' : 'child-note');
-                self._renderCache[id] = $newChildAction[0];
+                this._renderCache[id] = $newChildAction[0];
             }
-            return self._renderCache[id];
+            return this._renderCache[id];
         };
     };
 
-    var expandCollapseHelper = function() {
-        self.markSelected();
+    const doExpand = () => {
+        this._expandedStates[actionId] = true;
+        $newRow.removeClass('collapsed').addClass('expanded');
+        expandedIds = [];
+        const toInsert = [];
+
+        for (let i = 0; i < action.length; i++) {
+            const id = `${actionId}:${i}`;
+            this._nodeRenderedItemIdMap[action[i].h] = id;
+            this._renderFunctions[id] = generateRenderFunction(i, id);
+
+            if (!this._dynamicList.items.includes(id)) {
+                toInsert.push(id);
+            }
+
+            this._childIds[id] = true;
+            expandedIds.push(id);
+        }
+        if (toInsert.length) {
+            // Insert new items only if they haven't already been inserted
+            this._dynamicList.insert(actionId, toInsert, false);
+        }
+        this._actionChildren[actionId] = expandedIds;
+    };
+
+    const expandCollapseHelper = () => {
+        this.markSelected();
         $.hideContextMenu();
+
         if ($newRow.hasClass('expanded')) {
-            self._expandedStates[actionId] = false;
-            $newRow.removeClass('expanded').addClass("collapsed");
-            self._dynamicList.remove(expandedIds, false);
-            self._dynamicList.itemRenderChanged(actionId);
-            delete self._actionChildren[actionId];
+            this._expandedStates[actionId] = false;
+            $newRow.removeClass('expanded').addClass('collapsed');
+            this._dynamicList.remove(expandedIds, false);
+            this._dynamicList.itemRenderChanged(actionId);
+            delete this._actionChildren[actionId];
             expandedIds = [];
         }
         else {
-            // Render new action views.
-            self._expandedStates[actionId] = true;
-            $newRow.removeClass("collapsed").addClass("expanded");
-            expandedIds = [];
-            for (var i = 1; i < action.length; i++) {
-                var id = `${actionId}:${i}`;
-                self._nodeRenderedItemIdMap[action[i].h] = id;
-                self._renderFunctions[id] = generateRenderFunction(i, id);
-                self._childIds[id] = true;
-                expandedIds.push(id);
-            }
-            self._dynamicList.insert(actionId, expandedIds, false);
-            self._dynamicList.itemRenderChanged(actionId);
-            self._actionChildren[actionId] = expandedIds;
+            doExpand();
+            this._dynamicList.itemRenderChanged(actionId);
         }
-    };
-    var clickFunction = (e) => {
-        if ((e.detail === 2 || $newRow.hasClass('ui-selected'))
-            && ($newRow.hasClass('expanded') || $newRow.hasClass('collapsed'))) {
-            expandCollapseHelper();
-        }
-        return self._handleSelectionClick(e, action[0].h, $newRow);
     };
 
     // If more than 1 file in action.
     if (isMore) {
         action.createEmptyClone = function() {
-            var clone = [];
+            const clone = [];
             clone.action = this.action;
             clone.ts = this.ts;
             clone.date = this.date;
@@ -851,29 +1133,38 @@ RecentsRender.prototype._renderFiles = function($newRow, action, actionId) {
                 return false;
             });
 
-        $newRow.rebind('click.recents', clickFunction);
+        $newRow.removeClass('single').addClass('group');
 
-        $newRow.removeClass("single").addClass("group collapsed");
-    }
-    else {
-        $newRow.rebind('click.recents', clickFunction);
+        if (node.lbl) {
+            $newRow.addClass(`folder colour-label ${M.getLabelClassFromId(node.lbl)}`);
+        }
+
+        doExpand();
+        delay('recent-render-resize', () => {
+            this._dynamicList.resized();
+        });
     }
 
     $newRow
-        .rebind("contextmenu", function(e) {
-            if (selectionManager.selected_list.indexOf(action[0].h) === -1) {
+        .rebind('contextmenu', (e) => {
+            const selector = `.content-row#${action.map(({ h }) => h).join(',.content-row#')}`;
+            const allChildrenSelected = isMore
+                && $(selector, this.$container).filter('.ui-selected').length === action.length;
+
+            if (!$.selected.includes(node.h) && !allChildrenSelected) {
                 selectionManager.clear_selection();
-                selectionManager.add_to_selection(action[0].h);
-                self.markSelected($newRow);
+                selectionManager.add_to_selection(node.h);
+                this.markSelected($newRow);
             }
-            return M.contextMenuUI(e, 1) ? true : false;
+
+            return !!M.contextMenuUI(e, isMore ? 10 : 1);
         });
 
-    var $contextMenuButton = $newRow.find(".context-menu-button");
+    const $contextMenuButton = $('.context-menu-button', $newRow);
     $contextMenuButton
-        .attr('id', action[0].h)
+        .attr('id', node.h)
         .rebind("click", function (e) {
-            $contextMenuButton.trigger({
+            $newRow.trigger({
                 type: 'contextmenu',
                 originalEvent: e.originalEvent
             });
@@ -882,337 +1173,17 @@ RecentsRender.prototype._renderFiles = function($newRow, action, actionId) {
         .rebind("dblclick", function() {
             return false;
         })
-        .rebind("contextmenu", function(e) {
-            self.markSelected($newRow);
+        .rebind('contextmenu', (e) => {
+            this.markSelected($newRow);
             selectionManager.clear_selection();
-            selectionManager.add_to_selection(action[0].h);
+            selectionManager.add_to_selection(node.h);
             $.hideTopMenu();
             return M.contextMenuUI(e, 1) ? true : false;
         });
 
-    if (mega.sensitives.isSensitive(action[0])) {
+    if (mega.sensitives.isSensitive(node) && !mega.sensitives.isNormalNode(node)) {
         $newRow.addClass('is-sensitive');
     }
-};
-
-/**
- * Render Media Block
- * @param $newRow
- * @param action
- * @private
- */
-RecentsRender.prototype._renderMedia = function($newRow, action, actionId) {
-    'use strict';
-    var self = this;
-    var isCreated = action.action === "added";
-    var isOtherUser = action.user !== u_handle;
-    var $previewBody = $newRow.find(".previews-body");
-    var $thumbTemplate = $previewBody.find(".data-block-view.template");
-    var maxFitOnScreen = self.getMaxFitOnScreen();
-    var imagesToRender = action.length;
-
-    // Maintain the index of images that we have rendered.
-    var renderedIndex = 0;
-    var renderedThumbs = [];
-    var mediaCounts = self._countMedia(action);
-    var videos = mediaCounts.videos;
-    var images = mediaCounts.images;
-    var pdfs = mediaCounts.pdfs;
-    var docxs = mediaCounts.docxs;
-
-    $newRow.addClass('media expanded');
-
-    // Create & append new image container, fire async method to collect thumbnail.
-    var renderThumb = function(i) {
-        var $newThumb = $thumbTemplate.clone().removeClass("template");
-        var node = action[i];
-        $newThumb
-            .attr('id', node.h)
-            .attr('title', node.name)
-            .rebind('dblclick', () => {
-                self.markSelected();
-                $.hideContextMenu();
-
-                // Close node Info panel as it's not applicable when opening Preview
-                mega.ui.mInfoPanel.hide();
-
-                slideshow(node.h);
-                $.autoplay = node.h;
-                return false;
-            })
-            .rebind('click', e => {
-
-                const result = self._handleSelectionClick(e, node.h, $newThumb.add($newRow));
-
-                // Update the Info panel if it's open once the selection is made
-                mega.ui.mInfoPanel.reRenderIfVisible($.selected);
-
-                return result;
-            })
-            .rebind('contextmenu', e => {
-                if (!selectionManager.selected_list.includes(node.h)) {
-                    selectionManager.clear_selection();
-                    self.clearSelected();
-                }
-                self.appendSelected($newThumb.add($newRow));
-                selectionManager.add_to_selection(node.h);
-                $.hideTopMenu();
-                return Boolean(M.contextMenuUI(e, 1));
-            });
-
-        if (M.d[node.h]) {
-            M.d[node.h].seen = true;
-
-            if (M.getNodeShare(node)) {
-                $newThumb.addClass('linked');
-            }
-        }
-
-        if (!node.t && node.tvf) {
-            $newThumb.addClass('versioning');
-        }
-        node.seen = true;
-
-        $('.item-type-icon-90', $newThumb).addClass(`icon-${fileIcon(node)}-90`);
-
-        if (is_video(node)) {
-            $('.data-block-bg', $newThumb).addClass('video');
-            node = MediaAttribute(node, node.k);
-            if (node && node.data && node.data.playtime) {
-                $('.video-thumb-details span', $newThumb).text(secondsToTimeShort(node.data.playtime));
-            }
-        }
-
-        if (node.fav) {
-            $('.file-status-icon', $newThumb).addClass('sprite-fm-mono icon-favourite-filled');
-        }
-
-        if (mega.sensitives.isSensitive(node)) {
-            $newThumb.addClass('is-sensitive');
-        }
-
-        if (M.getNodeShare(node.h).down) {
-            $('.file-status-icon', $newThumb).removeClass('icon-favourite-filled').addClass('icon-takedown');
-        }
-
-        var $contextMenuHandle = $(".file-settings-icon", $newThumb);
-        $contextMenuHandle
-            .attr('id', node.h)
-            .rebind("contextmenu", e => {
-                self.markSelected($newThumb.add($newRow));
-                selectionManager.clear_selection();
-                selectionManager.add_to_selection(node.h);
-                $.hideTopMenu();
-                Boolean(M.contextMenuUI(e, 1));
-            })
-            .rebind('click', e => {
-                $contextMenuHandle.trigger({
-                    type: 'contextmenu',
-                    originalEvent: e.originalEvent
-                });
-            });
-
-            $previewBody.append($newThumb);
-            renderedThumbs[i] = $newThumb;
-    };
-
-    var $toggleExpandedButton = $newRow.find(".toggle-expanded-state");
-    var $toggleExpandedButtonText = $toggleExpandedButton.find("span");
-    var $toggleExpandedButtonIcon = $toggleExpandedButton.find("i");
-
-    var $previewsScroll = $newRow.find(".previews-scroll");
-
-    // If there are more images than we can fit onto the initial screen size.
-    if (action.length > maxFitOnScreen) {
-        imagesToRender = maxFitOnScreen;
-        $toggleExpandedButton.removeClass('hidden');
-    }
-
-    var toggleOpenState = function() {
-        if ($previewsScroll.hasClass('expanded')) {
-            self._expandedStates[actionId] = false;
-            $previewsScroll.removeClass('expanded');
-            $toggleExpandedButtonText.text(l.x_more_files.replace('%1', action.length - maxFitOnScreen));
-            $toggleExpandedButtonIcon.removeClass('icon-arrow-up').addClass('icon-arrow-down');
-            // Mark thumbs that are no longer viewable as hidden.
-            for (var i = maxFitOnScreen; i < renderedIndex; i++) {
-                if (renderedThumbs[i]) {
-                    renderedThumbs[i].addClass('hidden');
-                }
-            }
-
-        } else {
-            if (action.length >= maxFitOnScreen) {
-                self._expandedStates[actionId] = true;
-                $previewsScroll.addClass('expanded');
-                $toggleExpandedButtonText.text(l[19963]);
-                $toggleExpandedButtonIcon.removeClass('icon-arrow-down').addClass('icon-arrow-up');
-                $('.data-block-view', $previewsScroll).removeClass('hidden');
-                // Inject the rest of the images that were not loaded initially.
-                for (;renderedIndex < action.length; renderedIndex++) {
-                    renderThumb(renderedIndex);
-                }
-                fm_thumbnails();
-            }
-        }
-        self._dynamicList.itemRenderChanged(actionId);
-        return false;
-    };
-
-    $toggleExpandedButtonText.text(l.x_more_files.replace('%1', action.length - maxFitOnScreen));
-    $toggleExpandedButton.rebind('click', function() {
-        toggleOpenState();
-        return false;
-    });
-
-    // render inital image containers.
-    for (renderedIndex = 0; renderedIndex < imagesToRender; renderedIndex++) {
-        renderThumb(renderedIndex);
-    }
-
-    // Set title based on content.
-    var $title = $newRow.find(".file-name");
-    var $titleString;
-
-    const makeTitle = function() {
-
-        const numOfFiles = images + videos + pdfs + docxs;
-        const titleString = mega.icu.format(l.file_count, numOfFiles);
-
-        return '<span class="title number-of-files">' + titleString + '</span>';
-    };
-
-    $titleString = makeTitle();
-    $title.safeHTML($titleString);
-
-    // Attach title click to open folder.
-    $title.find("span.title").on('click', function() {
-            toggleOpenState();
-            return false;
-        })
-        .rebind("dblclick", function() {
-            return false;
-        });
-
-    // Set the media block icons according to media content.
-    let fIcon;
-    let rIcon;
-
-    if (images) {
-        fIcon = rIcon = 'image';
-        if (videos) {
-            rIcon = 'video';
-        }
-        else if (pdfs) {
-            rIcon = 'pdf';
-        }
-        else if (docxs) {
-            rIcon = 'word';
-        }
-    }
-    else if (videos) {
-        fIcon = rIcon = 'video';
-        if (pdfs) {
-            rIcon = 'pdf';
-        }
-        else if (docxs) {
-            rIcon = 'word';
-        }
-    }
-    else if (pdfs) {
-        fIcon = rIcon = 'pdf';
-        if (docxs) {
-            rIcon = 'word';
-        }
-    }
-    else if (docxs) {
-        fIcon = rIcon = 'word';
-    }
-
-    const $rearIcon = $('.item-type-icon-90.double', $newRow).addClass(`icon-${rIcon}-90`);
-    $('.item-type-icon-90', $rearIcon).addClass(`icon-${fIcon}-90`);
-
-    // Attach resize listener to the image block.
-    self._resizeListeners.push(function() {
-        var newMax = self.getMaxFitOnScreen();
-        const isExpanded = $previewsScroll.hasClass('expanded');
-
-        // Render new more images if we can now fit more on the screen.
-        if (newMax > maxFitOnScreen) {
-            for (; renderedIndex < newMax && renderedIndex < action.length; renderedIndex++) {
-                renderThumb(renderedIndex);
-            }
-        }
-        maxFitOnScreen = newMax;
-
-        if (!isExpanded) {
-            for (let i = renderedIndex; i--;) {
-                renderedThumbs[i][i < maxFitOnScreen ? 'removeClass' : 'addClass']('hidden');
-            }
-        }
-
-        // Enable/disable showall button if resize makes appropriate.
-        if (newMax < action.length) {
-            $toggleExpandedButton.removeClass("hidden");
-            if (isExpanded) {
-                $toggleExpandedButtonText.text(l[19963]);
-            }
-            else {
-                $toggleExpandedButtonText.text(l.x_more_files.replace('%1', action.length - newMax));
-            }
-        }
-        else {
-            $toggleExpandedButton.addClass("hidden");
-        }
-    });
-
-    $('.expand-collapse-toggle', $newRow).rebind('click', function() {
-        if ($newRow.hasClass('expanded')) {
-            $newRow.removeClass('expanded').addClass('collapsed');
-        }
-        else {
-            $newRow.removeClass('collapsed').addClass('expanded');
-        }
-        self._dynamicList.itemRenderChanged(actionId);
-        return false;
-    }).rebind("dblclick", function() {
-        return false;
-    });
-
-    $newRow.rebind('click.recents', (e) => {
-        if (e.detail === 2 || e.detail === 1 && $newRow.hasClass('ui-selected')) {
-            if ($newRow.hasClass('expanded')) {
-                $newRow.removeClass('expanded').addClass('collapsed');
-            }
-            else {
-                $newRow.removeClass('collapsed').addClass('expanded');
-            }
-        }
-        return self._handleSelectionClick(e, '', $newRow);
-    }).rebind('dblclick.recents', () => {
-        return false;
-    });
-
-    const triggerContextMenu = (ev) => {
-        const sm = selectionManager;
-        sm.clear_selection();
-        sm.selected_list = action.map(n => n.h);
-        sm.add_to_selection(sm.selected_list.pop(), false, true);
-        mega.ui.mInfoPanel.reRenderIfVisible($.selected);
-        self.markSelected($newRow);
-        $.hideTopMenu();
-        return !!M.contextMenuUI(ev, 3);
-    };
-
-    $newRow.rebind("contextmenu", triggerContextMenu);
-
-    var $contextMenuButton = $newRow.find(".context-menu-button");
-    $contextMenuButton
-        .rebind("dblclick", () => false)
-        .rebind("click contextmenu", triggerContextMenu);
-
-    // Remove the template that we no longer need.
-    $thumbTemplate.remove();
 };
 
 /**
@@ -1223,42 +1194,6 @@ RecentsRender.prototype._renderMedia = function($newRow, action, actionId) {
 RecentsRender.prototype.getTemplate = function(className) {
     'use strict';
     return this.$container.find(".template." + className).clone().removeClass(className);
-};
-
-/**
- * Generate count of images/videos in action block.
- * @param action
- * @private
- */
-RecentsRender.prototype._countMedia = function(action) {
-    'use strict';
-    var counts = {
-        images: 0,
-        videos: 0,
-        pdfs: 0,
-        docxs: 0
-    };
-
-    for (var idx = action.length; idx--;) {
-        var n = action[idx];
-
-        if (is_video(n)) {
-            counts.videos++;
-        }
-        else if (is_image3(n)) {
-            counts.images++;
-        }
-        else if (fileIcon(n) === 'pdf') {
-            counts.pdfs++;
-        }
-        else if (fileIcon(n) === 'word') {
-            counts.docxs++;
-        }
-        else if (d) {
-            console.warn('What is this?...', n);
-        }
-    }
-    return counts;
 };
 
 /**
@@ -1300,10 +1235,9 @@ RecentsRender.prototype.hasConfigChanged = function() {
 RecentsRender.prototype.onConfigChange = function() {
     'use strict';
     this._showRecents = this._getConfigShow();
-    this._rendered = false;
-    if (this._dynamicList) {
-        this._dynamicList.destroy();
-        this._dynamicList = false;
+
+    if (!this._showRecents) {
+        this.reset();
     }
 };
 
@@ -1406,31 +1340,6 @@ RecentsRender.prototype.onScroll = function() {
 };
 
 /**
- * Helper function to add items to the selection based on common key shortcuts.
- * @param e
- * @param handle
- * @param $element
- * @returns boolean
- * @private
- */
-RecentsRender.prototype._handleSelectionClick = function(e, handle, $element) {
-    'use strict';
-    $.hideContextMenu();
-    if (e.ctrlKey !== false || e.metaKey !== false) {
-        this.appendSelected($element);
-    }
-    else {
-        selectionManager.clear_selection();
-        this.markSelected($element);
-    }
-    if (handle) {
-        selectionManager.add_to_selection(handle);
-        mega.ui.mInfoPanel.reRenderIfVisible($.selected);
-    }
-    return false;
-};
-
-/**
  * Trigger for when a single node gets changes (renamed, etc).
  * This will attempt to re-render the action that houses the node or the breadcrumb if its parent.
  * The parent/breadcrumb can change if its share status or name is changed
@@ -1440,30 +1349,17 @@ RecentsRender.prototype._handleSelectionClick = function(e, handle, $element) {
  */
 RecentsRender.prototype.nodeChanged = function(handle) {
     'use strict';
-    // Parent/breadcrumb change
-    if (this._isBreadcrumb(handle)) {
-        const $nodes = $(`.parent-folder-name[data-id='${handle}']`, '.fm-recents.container');
-        for (const node of $nodes) {
-            const row = node.closest('.fm-recents.content-row');
-            if (row.id) {
-                this._updateNodeBreadcrumb(row.id);
-            }
-            else {
-                let actionId = '';
-                for (const cls of row.classList) {
-                    if (cls.startsWith('action-')) {
-                        actionId = cls.split('-')[1];
-                        break;
-                    }
-                }
-                if (actionId && this.actionIdMap[actionId]) {
-                    this._updateNodeBreadcrumb(actionId);
-                }
-            }
-        }
+
+    const currentNode = M.d[handle];
+
+    if (!currentNode) {
+        return;
     }
-    // Action row change
-    else if (handle && M.d[handle] && this._nodeActionMap[handle] && this._dynamicList) {
+
+    if (currentNode.t) { // Updating parent for all actions
+        this._updateParentFolder(currentNode);
+    }
+    else if (this._nodeActionMap[handle] && this._dynamicList) {
         var actionId = this._nodeActionMap[handle];
         var action = this.actionIdMap[actionId];
         if (action) {
@@ -1474,8 +1370,6 @@ RecentsRender.prototype.nodeChanged = function(handle) {
             }
 
             var i;
-            // Get the new node state.
-            var currentNode = M.d[handle];
 
             // Update the internal list.
             for (i = 0; i < action.length; i++) {
@@ -1501,18 +1395,6 @@ RecentsRender.prototype.nodeChanged = function(handle) {
     } else if (this._dynamicList.active) {
         this.updateState();
     }
-};
-
-/**
- * Utility function, used to check whether a handle belongs to a row item or its path breadcrumb
- *
- * @param {String} handle The handle to check
- * @returns {Boolean} Whether the handle belongs to a breadcrumb
- * @private
- */
-RecentsRender.prototype._isBreadcrumb = function(handle) {
-    'use strict';
-    return $(`.parent-folder-name[data-id='${handle}']`, '.fm-recents.container').length;
 };
 
 /**
@@ -1780,39 +1662,32 @@ RecentsRender.prototype._updateNodeName = function(node) {
 };
 
 /**
- * Update the path breadcrumb of a rendered node.
- * @param {String} id The handle of the action row, NOT the parent/breadcrumb handle
- * @returns {Boolean} If the update was handled.
- * @private
+ * Updating the cached values of the parent folder
+ * @param {MegaNode} node Node to work with
  */
-RecentsRender.prototype._updateNodeBreadcrumb = function(id) {
+RecentsRender.prototype._updateParentFolder = function(node) {
     'use strict';
-    M.getRecentActionsList().then(actions => {
-        this._fillActionIds(actions);
-        for (let i = 0; i < actions.length; i++) {
-            const $item = $(this._renderCache[actions[i].id]);
-            if ($item.length && ($item.attr('id') === id || $item.hasClass(`action-${id}`))) {
-                this.actionIdMap[actions[i].id] = actions[i];
-                return actions[i];
+
+    const { h, name, lbl, sen } = node;
+    const keys = Object.keys(this.actionIdMap);
+
+    for (let i = keys.length; i--;) {
+        const id = keys[i];
+        const action = this.actionIdMap[id];
+
+        if (!Array.isArray(action.path)) {
+            continue;
+        }
+
+        for (let j = action.path.length; j--;) {
+            if (action.path[j].h === h) {
+                action.path[j].name = name;
+                action.path[j].lbl = lbl;
+                action.path[j].sen = sen;
+
+                delete this._renderCache[id];
+                break;
             }
         }
-    }).then(action => {
-        if (action) {
-            let $oldBreadcrumb = $('.fm-recents.breadcrumbs', `#${id}`);
-            if ($oldBreadcrumb.length === 0) {
-                $oldBreadcrumb = $('.fm-recents.breadcrumbs', `.action-${id}`);
-            }
-            $oldBreadcrumb.empty();
-            // Correct names
-            for (let i = 0; i < action.path.length; i++) {
-                const updNode = M.getNodeByHandle(action.path[i].h);
-                if (updNode && updNode.name) {
-                    action.path[i].name = updNode.name;
-                }
-            }
-            this.populateBreadCrumb($oldBreadcrumb, action);
-            return true;
-        }
-        return false;
-    });
+    }
 };

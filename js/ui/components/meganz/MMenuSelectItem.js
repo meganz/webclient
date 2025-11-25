@@ -10,6 +10,7 @@ class MMenuSelectItem extends MComponent {
      * @param {String} props.additionalClasses Additional classes to add to the item along with global ones
      * @param {MMenuSelectItem} props.children Additional items to render when hovering above the item
      * @param {Function} props.oncreate A callback to run when the item is created
+     * @param {Function} [props.checkFn] A custom function to call instead of the default one
      */
     constructor({
         label,
@@ -20,7 +21,8 @@ class MMenuSelectItem extends MComponent {
         rightIcon,
         additionalClasses,
         children,
-        oncreate
+        oncreate,
+        checkFn
     }) {
         super();
 
@@ -67,6 +69,10 @@ class MMenuSelectItem extends MComponent {
 
         if (rightIcon) {
             this.addRightIcon(leftIcon);
+        }
+
+        if (typeof checkFn === 'function') {
+            this.checkFn = checkFn.bind(this);
         }
 
         if (selected === true) {
@@ -142,8 +148,13 @@ class MMenuSelectItem extends MComponent {
     }
 
     selectItem() {
-        this.createCheck();
-        this.checkEl.className = 'radioOn';
+        if (this.checkFn) {
+            this.checkFn();
+        }
+        else {
+            this.createCheck();
+            this.checkEl.className = 'radioOn';
+        }
     }
 
     deselectItem() {

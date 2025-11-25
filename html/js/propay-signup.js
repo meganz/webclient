@@ -9,6 +9,7 @@ pro.propay.signup = {
     newAccount: false,
 
     currentcreation: null,
+    current2FA: false,
 
     // Payments with no redirect
     requireAccountOnShow: new Set([
@@ -169,6 +170,15 @@ pro.propay.signup = {
 
         this.newAccount = false;
 
+        // This is not completely accurate as it ignores the case of EEXIST when auth code already used
+        // This case needs fixing for all 2FA locations
+        if ([EFAILED, EMFAREQUIRED].includes(res)) {
+            this.current2FA = true;
+        }
+        else if (res < 0) {
+            this.current2FA = false;
+        }
+
         if (is_mobile && (res === EFAILED || res === EMFAREQUIRED)) {
             pro.propay.signup.activeMobileLogin = true;
 
@@ -229,13 +239,14 @@ pro.propay.signup = {
             this.initNewAccountDetails();
 
             if (u_attr) {
+                let dialogShown = false;
                 if (u_attr.b || u_attr.pf) {
                     addressDialog.closeDialog();
 
                     const currentPlanName = pro
                         .getProPlanName(u_attr.b ? pro.ACCOUNT_LEVEL_BUSINESS : pro.ACCOUNT_LEVEL_PRO_FLEXI);
 
-
+                    dialogShown = true;
                     pro.dialog.show(
                         l.already_have_x_sub.replace('%1', currentPlanName),
                         l.cant_sub_aready_on_pf_or_b.replace('%1', currentPlanName),
@@ -252,12 +263,18 @@ pro.propay.signup = {
                     const {subs} = await pro.propay.getUserPlanInfo();
 
                     if (subs.length) {
+                        dialogShown = true;
                         pro.dialog.show(l.have_active_sub_title, l.have_active_sub_msg
                             .replace('%1', pro.getProPlanName(u_attr.p)), [
                             {text: l.subscribe_btn, onClick: pro.propay.updatePayment.bind(pro.propay)},
                             {text: l.dont_subscribe, onClick: () => {addressDialog.closeDialog(); loadSubPage('fm');}},
                         ], null, 'warninga');
                     }
+                }
+
+                // If the user was logged in and no other dialog is shown, inform them of the login
+                if (!dialogShown) {
+                    pro.dialog.show(l.welcome_back, l.alr_have_acc_so_logged_in);
                 }
             }
         }
@@ -292,8 +309,6 @@ pro.propay.signup = {
 
     attemptLogin() {
         'use strict';
-
-        pro.propay.requireconfirmation = true;
 
         const email = $('.email input', this.$accountDetailsDiv).val().trim();
         const password = $('.password input', this.$accountDetailsDiv).val();
@@ -438,12 +453,17 @@ pro.propay.signup = {
         return true;
     },
 
+    getIsNewAccount() {
+        'use strict';
+        return (u_type === false) || (!u_type && !localStorage.awaitingConfirmationAccount);
+    },
+
     initNewAccountDetails() {
         'use strict';
 
         this.$accountDetailsDiv = $('.create-account-wrapper', pro.propay.$page);
 
-        pro.propay.isNewAccount = (u_type === false) || (!u_type && !localStorage.awaitingConfirmationAccount);
+        pro.propay.isNewAccount = this.getIsNewAccount();
 
         $('.new-account-tos', pro.propay.$page).toggleClass('hidden', !pro.propay.isNewAccount);
         $('.title.no-create-account', pro.propay.$page).toggleClass('hidden', pro.propay.isNewAccount);

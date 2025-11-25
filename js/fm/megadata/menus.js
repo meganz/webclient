@@ -1,101 +1,3 @@
-/*
- * buildSubMenu - context menu related
- * Create sub-menu for context menu parent directory
- *
- * @param {string} id - parent folder handle
- */
-MegaData.prototype.buildSubMenu = function(id) {
-    'use strict'; /* jshint -W074 */
-
-    var csb;
-    var cs = '';
-    var sm = '';
-    var tree = Object(this.tree[id]);
-    var folders = obj_values(tree);
-    var rootID = escapeHTML(this.RootID);
-    var rootTree = this.tree[rootID] || false;
-    var rootTreeLen = $.len(rootTree);
-    var arrow = '<span class="context-top-arrow"></span><span class="context-bottom-arrow"></span>';
-
-    csb = document.getElementById('sm_move');
-    if (!csb || parseInt(csb.dataset.folders) !== rootTreeLen) {
-        if (rootTree && Object.values(rootTree).some(mega.sensitives.shouldShowInTree)) {
-            cs = ' contains-submenu sprite-fm-mono-after icon-arrow-right-after';
-            sm = '<span class="dropdown body submenu" id="sm_' + rootID + '">'
-                + '<span id="csb_' + rootID + '"></span>' + arrow + '</span>';
-        }
-
-        if (csb) {
-            csb.parentNode.removeChild(csb);
-        }
-
-        $('.dropdown-item.move-item').after(
-            '<span class="dropdown body submenu" id="sm_move">' +
-            '  <span id="csb_move">' +
-            '    <span class="dropdown-item cloud-item' + cs + '" id="fi_' + rootID + '">' +
-            '      <i class="sprite-fm-mono icon-cloud"></i>' +
-            '      <span>' + escapeHTML(l[164]) + '</span>' +
-            '    </span>' + sm +
-            '    <hr />' +
-            '    <span class="dropdown-item advanced-item">' +
-            '      <i class="sprite-fm-mono icon-target"></i>' +
-            '      <span>' + escapeHTML(l[9108]) + '</span>' +
-            '    </span>' + arrow +
-            '  </span>' +
-            '</span>'
-        );
-
-        if ((csb = document.getElementById('sm_move'))) {
-            csb.dataset.folders = rootTreeLen;
-            M.initContextUI(); // rebind just recreated dropdown-item's
-        }
-    }
-
-    csb = document.getElementById('csb_' + id);
-    if (csb && csb.querySelectorAll('.dropdown-item').length !== folders.length) {
-        var $csb = $(csb).empty();
-
-        folders.sort(M.getSortByNameFn2(1));
-        for (var i = 0; i < folders.length; i++) {
-            if (folders[i].t & M.IS_S4CRT || !mega.sensitives.shouldShowInTree(folders[i])) {
-                continue;
-            }
-
-            var fid = escapeHTML(folders[i].h);
-
-            cs = '';
-            sm = '';
-            if (this.tree[fid] && Object.values(this.tree[fid]).some(mega.sensitives.shouldShowInTree)) {
-                cs = ' contains-submenu sprite-fm-mono-after icon-arrow-right-after';
-                sm = '<span class="dropdown body submenu" id="sm_' + fid + '">'
-                    + '<span id="csb_' + fid + '"></span>' + arrow + '</span>';
-            }
-
-            var classes = 'folder-item';
-            var iconClass = 'icon-folder';
-            if (folders[i].t & M.IS_SHARED) {
-                classes += ' shared-folder-item';
-                iconClass = 'icon-folder-outgoing-share';
-            }
-            else if (mega.fileRequest.publicFolderExists(fid)) {
-                classes += ' file-request-folder';
-                iconClass = 'icon-folder-mega-drop';
-            }
-
-            var nodeName = missingkeys[fid] ? l[8686] : folders[i].name;
-
-            $csb.append(
-                '<span class="dropdown-item ' + classes + cs + '" id="fi_' + fid + '">' +
-                '  <i class="sprite-fm-mono ' + iconClass + '"></i>' +
-                '  <span>' + escapeHTML(nodeName) + '</span>' +
-                '</span>' + sm
-            );
-        }
-    }
-
-    M.disableCircularTargets('#fi_');
-};
-
 MegaData.prototype.getNodeSourceRoot = function(h, isSearch, isTree) {
     'use strict';
 
@@ -493,6 +395,7 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
             delete items['.revert-item'];
         }
     };
+    const anyNodeInRubbish = () => $.selected.some(h => M.getNodeRoot(h) === M.RubbishID);
     if ((sourceRoot === M.RootID || sourceRoot === M.InboxID || sourceRoot === 'out-shares'
          || sourceRoot === 's4' || M.isDynPage(M.currentrootid)) && !folderlink) {
 
@@ -533,7 +436,7 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
         handleRubbishNodes();
     }
 
-    if (isSearch && $.selected.some(h => M.getNodeRoot(h) === M.RubbishID)) {
+    if (isSearch && anyNodeInRubbish()) {
         handleRubbishNodes();
     }
 
@@ -603,6 +506,9 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
             if (!error && response === 0) {
                 items['.syncmegasync-item'] = 1;
             }
+        }
+        if (anyNodeInRubbish()) {
+            handleRubbishNodes();
         }
     }
     else if (items['.download-item']) {
@@ -983,6 +889,11 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items, forcedSe
     else if (ll === 9) {
         asyncShow = true;
         finalItems = ['.fileupload-item', '.folderupload-item', '.app-dl-hint'];
+        onIdle(showContextMenu);
+    }
+    else if (ll === 10) {
+        asyncShow = true;
+        finalItems = ['.open-in-location'];
         onIdle(showContextMenu);
     }
     else if (ll) {// Click on item

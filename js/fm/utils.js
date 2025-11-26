@@ -1428,7 +1428,9 @@ MegaUtils.prototype.transferFromMegaCoNz = function(data) {
                         M.setTabAndScroll(queryParts[1].split('/')[0]);
                     }
                     if (toPage.startsWith('propay_') && (queryParts[0] === 'm')) {
-                        sessionStorage['pro.period'] = queryParts[1].split('/')[0];
+                        const monthsValue = queryParts[1].split('/')[0];
+                        sessionStorage['pro.period'] = monthsValue;
+                        sessionStorage['pro.initialDuration'] = monthsValue;
                     }
                 }
             }

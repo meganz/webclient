@@ -165,6 +165,10 @@ body.web-desktop .mega-sheet .sheet .content a {
     color: var(--mobile-link-primary);
 }
 
+body.web-desktop .mega-sheet .sheet .content a.text-only {
+    color: var(--mobile-text-primary);
+}
+
 body.web-desktop .mega-sheet .sheet .row-gap-2 {
     row-gap: 0.5rem;
 }

@@ -406,6 +406,7 @@ function getCleanSitePath(path) {
             }
             if (path.m && path[0].startsWith('propay_')) {
                 sessionStorage['pro.period'] = path.m;
+                sessionStorage['pro.initialDuration'] = path.m;
             }
         }, false)();
 

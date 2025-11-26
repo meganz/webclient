@@ -138,6 +138,10 @@
             'cbvm', 'mgvm', 'uiviewmode', 'uisorting', 'uidateformat', 'skipsmsbanner', 'skipDelWarning', 'smallLhp',
             'nowarnpl', 'zip64n', 'callemptytout', 'callinout', 'showHideChat', 'showRecents', 'nocallsup', 'cslrem',
             'showSen', 'noSubfolderMd', 'rwReinstate', 'colourFolder', 'smallNav', 'dcPause', 'skiptritwarn'
+        ],
+        xb2: [
+            // do NOT change the order, add new entries at the tail UP TO 31, and 8 per row.
+            'mnzw', 'uiw'
         ]
     });
     shrink.zero = new Set([...Object.keys(shrink.bitdef), 'xs1', 'xs2', 'xs3', 'xs4', 'xs5']);

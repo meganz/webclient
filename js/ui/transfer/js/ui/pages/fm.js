@@ -515,7 +515,8 @@ lazy(T.ui, 'viewFilesLayout', () => {
         bindItemEvts(n, item) {
             const dlBtn = item.querySelector('.js-download');
             const download = () => {
-                window.open(T.core.getDownloadLink(n), '_blank', 'noopener,noreferrer');
+                // eslint-disable-next-line local-rules/open -- opening ourselves
+                window.open(T.core.getDownloadLink(n), '_self', 'noopener');
             };
 
             const openItem = (ev) => {

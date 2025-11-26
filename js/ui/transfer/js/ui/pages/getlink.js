@@ -43,7 +43,10 @@ lazy(T.ui, 'addFilesLayout', () => {
         transferring: Object.create(null),
 
         get hasTransfers() {
-            return M.hasPendingTransfers() || this.data.files && this.data.files.length;
+            if (!self.M) {
+                console.warn('prematurely invoked?...');
+            }
+            return self.M && M.hasPendingTransfers() || this.data.files && this.data.files.length;
         },
 
         /*

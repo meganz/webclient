@@ -324,23 +324,39 @@ MegaData.prototype.sortByType = function(d) {
 };
 
 MegaData.prototype.sortByOwner = function(d) {
+    const key = M.currentdirid.startsWith('search/') ? 'u' : 'su';
+
     this.sortfn = function(a, b, d) {
-        var usera = Object(M.d[a.su]);
-        var userb = Object(M.d[b.su]);
+        const usera = Object(M.d[a[key]] || { name: u_attr.name });
+        const userb = Object(M.d[b[key]] || { name: u_attr.name });
 
         if (typeof usera.name === 'string' && typeof userb.name === 'string') {
 
             // If nickname exist, use nickname for sorting
-            var namea = usera.nickname || usera.name;
-            var nameb = userb.nickname || userb.name;
+            let namea = usera.nickname || usera.name;
+            let nameb = userb.nickname || userb.name;
 
-            namea = namea === nameb ? namea + a.su : namea;
-            nameb = namea === nameb ? nameb + b.su : nameb;
+            namea = namea === nameb ? namea + a[key] : namea;
+            nameb = namea === nameb ? nameb + b[key] : nameb;
 
             return namea.localeCompare(nameb) * d;
         }
 
         return M.doFallbackSort(usera, userb, d);
+    };
+    this.sortd = d;
+    this.sort();
+};
+
+MegaData.prototype.sortByLocation = function(d) {
+    'use strict';
+
+    this.sortfn = (a, b, d) => {
+        return M.compareStrings(
+            M.getNameByHandle(a.p).toLowerCase(),
+            M.getNameByHandle(b.p).toLowerCase(),
+            d
+        );
     };
     this.sortd = d;
     this.sort();

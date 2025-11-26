@@ -902,6 +902,9 @@ lazy(mega.ui, 'secondaryNav', () => {
             if (this.cardComponent && (this.cardComponent.domNode.contains(target) || this.isSmall)) {
                 items.push('.newfolder-item', '.newfile-item');
             }
+            else if (M.currentrootid === M.RootID) {
+                items.push('.import-from-link');
+            }
             M.contextMenuUI(ev, 8, items);
 
             eventlog(500721);

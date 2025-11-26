@@ -1,4 +1,4 @@
-class MegaOnboardingJourney {
+class MegaJourney {
     constructor(options) {
         this.options = options || {};
         // Convert step definitions into a structured configuration
@@ -62,9 +62,11 @@ class MegaOnboardingJourney {
     initDialog() {
         this.dialog = new MegaSheet({
             parentNode: document.body,
-            componentClassname: this.options.componentClassname || 'mega-sheet on-boarding',
-            wrapperClassname: this.options.wrapperClassname || 'sheet'
+            componentClassname: this.options.componentClassname || 'mega-sheet journey',
+            wrapperClassname: this.options.wrapperClassname || 'sheet',
+            onClose: this.options.onClose
         });
+
         this.dialog.on('click.context', () => {
             if (mega.ui.menu.name) {
                 mega.ui.menu.hide();
@@ -75,16 +77,16 @@ class MegaOnboardingJourney {
                 document.documentElement.classList.add('overlayed');
             }
         });
-        this.megaOnboardingDiv = document.createElement('div');
-        this.megaOnboardingDiv.className = this.options.contentClassname || 'mega-on-boarding';
+        this.megaJourneyDiv = document.createElement('div');
+        this.megaJourneyDiv.className = this.options.contentClassname || 'mega-journey';
     }
 
     initContent() {
         this.stepsColumn = this.createStepsColumn();
         this.mainContent = this.createMainContent();
 
-        this.megaOnboardingDiv.appendChild(this.stepsColumn);
-        this.megaOnboardingDiv.appendChild(this.mainContent);
+        this.megaJourneyDiv.appendChild(this.stepsColumn);
+        this.megaJourneyDiv.appendChild(this.mainContent);
     }
 
     createStepsColumn() {
@@ -94,7 +96,8 @@ class MegaOnboardingJourney {
         this.stepper = new MegaStepper({
             steps: this.options.steps,
             parentNode: steps,
-            currentStep: this.options.initialStep || 1
+            currentStep: this.options.initialStep || 1,
+            hideSecondary: true
         });
 
         return steps;
@@ -113,7 +116,6 @@ class MegaOnboardingJourney {
     createStepContent(id, titleText, subtitleText, descriptionText, imageClass, customContent) {
         const step = document.createElement('div');
         step.className = `main-content-div hidden main-content-${id.replace(/\./g, '_')}`;
-        step.id = id;
 
         if (imageClass) {
             const imageWrapper = document.createElement('div');
@@ -153,6 +155,13 @@ class MegaOnboardingJourney {
                 if (customNode instanceof HTMLElement) {
                     customDiv.appendChild(customNode);
                 }
+                else if (customNode instanceof Promise) {
+                    customNode.then((node) => {
+                        if (node instanceof HTMLElement) {
+                            customDiv.appendChild(node);
+                        }
+                    });
+                }
             }
             else if (customContent instanceof HTMLElement) {
                 customDiv.appendChild(customContent);
@@ -174,6 +183,10 @@ class MegaOnboardingJourney {
             this.stepConfigs[0] &&
             this.stepConfigs[0].next &&
             this.stepConfigs[0].next.leftIcon || undefined;
+        const nextClassName =
+            this.stepConfigs[0] &&
+            this.stepConfigs[0].next &&
+            this.stepConfigs[0].next.className || '';
         const nextRightIcon =
             this.stepConfigs[0] &&
             this.stepConfigs[0].next &&
@@ -182,6 +195,10 @@ class MegaOnboardingJourney {
             this.stepConfigs[0] &&
             this.stepConfigs[0].skip &&
             this.stepConfigs[0].skip.text || l.mega_pass_onboarding_skip;
+        const skipClassName =
+            this.stepConfigs[0] &&
+            this.stepConfigs[0].skip &&
+            this.stepConfigs[0].skip.className || '';
         const nextDisabled =
             this.stepConfigs[0] &&
             this.stepConfigs[0].next &&
@@ -190,12 +207,16 @@ class MegaOnboardingJourney {
             this.stepConfigs[0] &&
             this.stepConfigs[0].back &&
             this.stepConfigs[0].back.text || l[822];
+        const backClassName =
+            this.stepConfigs[0] &&
+            this.stepConfigs[0].back &&
+            this.stepConfigs[0].back.className || '';
 
         this.next = new MegaButton({
             parentNode: actions,
             text: nextText,
             disabled: nextDisabled,
-            componentClassname: 'primary next-button',
+            componentClassname: `primary next-button ${nextClassName}`,
             icon: nextLeftIcon,
             rightIcon: nextRightIcon,
             onClick: (ev) => this.handleNext(ev)
@@ -204,7 +225,7 @@ class MegaOnboardingJourney {
         this.skip = new MegaButton({
             parentNode: actions,
             text: skipText,
-            componentClassname: 'secondary',
+            componentClassname: `secondary ${skipClassName}`,
             onClick: (ev) => this.handleSkip(ev)
         });
 
@@ -212,7 +233,7 @@ class MegaOnboardingJourney {
             parentNode: actions,
             text: backText,
             type: 'text',
-            componentClassname: 'back-button',
+            componentClassname: `back-button ${backClassName}`,
             onClick: (ev) => this.handleBack(ev),
         });
 
@@ -222,7 +243,7 @@ class MegaOnboardingJourney {
     show() {
         this.dialog.show({
             name: this.options.dialogName || 'Mega-Onboarding',
-            contents: [this.megaOnboardingDiv],
+            contents: [this.megaJourneyDiv],
             showClose: this.options.showClose || false,
             preventBgClosing: this.options.preventBgClosing || true,
             onClose: this.options.onClose || nop,
@@ -234,6 +255,10 @@ class MegaOnboardingJourney {
 
     hide() {
         this.dialog.hide();
+    }
+
+    destroy() {
+        this.dialog.destroy();
     }
 
     updateStep(forceRedraw = false) {
@@ -277,7 +302,7 @@ class MegaOnboardingJourney {
             }
 
             // Hide all previous steps
-            const mainContentDivs = this.megaOnboardingDiv.querySelectorAll('.main-content-div');
+            const mainContentDivs = this.megaJourneyDiv.querySelectorAll('.main-content-div');
             for (let i = 0; i < mainContentDivs.length; i++) {
                 mainContentDivs[i].classList.add('hidden');
                 if (mainContentDivs[i].classList.contains('ps')) {
@@ -289,7 +314,7 @@ class MegaOnboardingJourney {
                 // If the step content hasn't been created yet, generate it
                 if (this.createdSteps[currentConfig.id]) {
                     const existingStep =
-                        this.megaOnboardingDiv.querySelector(`.main-content-${currentConfig.id.replace(/\./g, '_')}`);
+                        this.megaJourneyDiv.querySelector(`.main-content-${currentConfig.id.replace(/\./g, '_')}`);
                     if (existingStep) {
                         existingStep.remove();
                     }
@@ -313,7 +338,7 @@ class MegaOnboardingJourney {
             }
 
             const currentDiv =
-                this.megaOnboardingDiv.querySelector(`.main-content-${currentConfig.id.replace(/\./g, '_')}`);
+                this.megaJourneyDiv.querySelector(`.main-content-${currentConfig.id.replace(/\./g, '_')}`);
             if (currentDiv) {
                 currentDiv.classList.remove('hidden');
                 Ps.initialize(currentDiv);
@@ -325,7 +350,7 @@ class MegaOnboardingJourney {
 
     procAction(origEv, action, event) {
         if (typeof action === 'function') {
-            action(origEv);
+            action.call(this, origEv);
         }
         else if (typeof action === 'number') {
             this.goToStep(Number(action));

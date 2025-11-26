@@ -190,7 +190,8 @@ body.web-desktop .mega-sheet.remove-link-dialog .sheet,
 body.web-desktop .mega-sheet.link-settings-discard-dialog .sheet,
 body.web-desktop .mega-sheet.discard-dialog .sheet,
 body.web-desktop.pwm-ui .mega-sheet.normal.with-footer .sheet,
-body.web-desktop .mega-sheet.promo-dialog .sheet {
+body.web-desktop .mega-sheet.promo-dialog .sheet,
+body.web-desktop .mega-sheet.medium-size .sheet {
     max-width: 640px;
 }
 body.web-desktop .mega-sheet.overlay-wrap .title h1,
@@ -199,6 +200,21 @@ body.web-desktop .mega-sheet.overlay-wrap .title h2 {
     word-break: normal;
 }
 
+body.web-desktop .mega-sheet.horizontal-actions .actions {
+    flex-direction: row;
+    justify-content: end;
+}
+
+body.web-desktop .mega-sheet.horizontal-actions .actions button {
+    margin-top: 0;
+}
+body.web-desktop .mega-sheet.horizontal-actions .actions button.slim {
+    width: auto;
+    height: 36px;
+}
+body.web-desktop .mega-sheet.horizontal-actions .actions button:not(:first-of-type) {
+    margin-inline-start: 16px;
+}
 body.mobile .mega-sheet .sheet .content .qrcode {
     padding: 16px;
     background-color: rgb(255, 255, 255, 1);

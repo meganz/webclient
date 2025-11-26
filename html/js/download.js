@@ -678,6 +678,8 @@ async function setupSingleDownloadPage(res) {
         }
     }
 
+    mBroadcaster.sendMessage('dlpage:initialized', res);
+
     if ($.doFireDownload) {
         delete $.doFireDownload;
         if (fdl_queue_var) {

@@ -72,6 +72,10 @@ class MegaOverlay extends MegaComponent {
         this.footerNode = subNode = document.createElement('footer');
         subNode.className = 'overlay-footer hidden';
         targetNode.appendChild(subNode);
+
+        if (typeof options.onClose === 'function') {
+            this.one('hide', options.onClose);
+        }
     }
 
     get centered() {

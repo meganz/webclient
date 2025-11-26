@@ -27,9 +27,9 @@ class MegaNodeComponent extends MegaComponent {
         });
 
         Object.defineProperty(this, 'node', {
-            value: options.nodeHandle.length === 8 ?
+            value: options.nodeData || (options.nodeHandle.length === 8 ?
                 M.getNodeByHandle(options.nodeHandle) :
-                M.getUserByHandle(options.nodeHandle),
+                M.getUserByHandle(options.nodeHandle)),
             writable: false
         });
 

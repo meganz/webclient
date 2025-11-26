@@ -1002,6 +1002,7 @@ async function mKeyDialog(ph, fl, keyr, selector) {
     $button.addClass('disabled').removeClass('active');
 
     M.safeShowDialog('dlkey-dialog', $dialog);
+    mBroadcaster.sendMessage('mKeyDialog', !!keyr);
 
     const processKeyboardEvent = (evt) => {
         if (evt.key === 'Escape') {

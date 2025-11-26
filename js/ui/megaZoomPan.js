@@ -23,7 +23,9 @@ class MegaZoomPan {
             touchGesture: {
                 isActive: false,
                 initialDistance: 0,
-                initialScale: 1
+                initialScale: 1,
+                lastTouchX: null,
+                lastTouchY: null
             }
         };
         this.viewerNode = this.domNode.closest('.media-viewer');
@@ -284,7 +286,9 @@ class MegaZoomPan {
                 this.state.touchGesture = {
                     isActive: true,
                     initialDistance: distance,
-                    initialScale: this.state.transform.scale
+                    initialScale: this.state.transform.scale,
+                    lastTouchX: null,
+                    lastTouchY: null
                 };
             }
         }
@@ -306,6 +310,16 @@ class MegaZoomPan {
 
             this.zoom(center.x, center.y, newScale, true);
         }
+        else if (touches.length === 1 && this.zoomMode) {
+            e.preventDefault();
+            const touch = touches[0];
+            const {lastTouchX, lastTouchY} = this.state.touchGesture;
+            const movementX = touch.clientX - (lastTouchX || touch.clientX);
+            const movementY = touch.clientY - (lastTouchY || touch.clientY);
+            this.state.touchGesture.lastTouchX = touch.clientX;
+            this.state.touchGesture.lastTouchY = touch.clientY;
+            this.pan(movementX, movementY);
+        }
     }
 
     onTouchEnd(e) {
@@ -315,6 +329,8 @@ class MegaZoomPan {
             this.state.touchGesture.isActive = false;
             this.state.touchGesture.initialDistance = 0;
             this.state.touchGesture.initialScale = 1;
+            this.state.touchGesture.lastTouchX = null;
+            this.state.touchGesture.lastTouchY = null;
         }
     }
 
@@ -338,7 +354,9 @@ class MegaZoomPan {
             touchGesture: {
                 isActive: false,
                 initialDistance: 0,
-                initialScale: 1
+                initialScale: 1,
+                lastTouchX: null,
+                lastTouchY: null
             }
         };
         this.zoomMode = false;

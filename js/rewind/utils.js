@@ -69,15 +69,10 @@ lazy(mega, 'rewindUtils', () => {
         update(id, val) {
             if (this._isTaskHandled(id) && val >= 0 && val <= 100) {
                 if (val.toFixed(2) === this.tasks[id].toFixed(2)) {
-                    if (val === 0 || val === 100) {
-                        mega.rewindUi.sidebar.updateTaskProgress(this.running, val);
-                    }
                     return;
                 }
 
                 this.tasks[id] = val;
-                mega.rewindUi.sidebar.updateTaskProgress(this.running, val);
-
                 let percent = 0;
                 const tasksPercents = Object.values(this.tasks);
 

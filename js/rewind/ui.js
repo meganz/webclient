@@ -173,7 +173,6 @@ lazy(mega, 'rewindUi', () => {
             this.$contentDownload = $('.folder-download', this.$contentFolder);
             this.$contentLoading = $('.content-loading', this.$sidebarContent);
             this.$contentLoadingProgress = $('.progress', this.$contentLoading);
-            this.$contentLoadingProgressStep = $('.progress-step', this.$contentLoading);
             this.$upgradeButton = $('.upgrade-purchase-button', this.sidebar);
             this.$restoreButton = $('.js-rewind', this.sidebar);
             this.$contextMenu = $('.dropdown.body.context', document.body);
@@ -864,19 +863,6 @@ lazy(mega, 'rewindUi', () => {
         updateProgress(val) {
             if (this.$contentLoadingProgress && this.$contentLoadingProgress.length) {
                 this.$contentLoadingProgress.text(formatPercentage(val / 100));
-            }
-        }
-
-        updateTaskProgress(cur, val) {
-            // TODO remove when label created
-            l.rewind_prg_step_summary = 'Task #%1 in progress... [S]%2[/S]';
-
-            if (this.$contentLoadingProgressStep && this.$contentLoadingProgressStep.length) {
-                this.$contentLoadingProgressStep.safeHTML(l.rewind_prg_step_summary
-                    .replace('%1', cur)
-                    .replace('[S]', '<span class="percent">')
-                    .replace('%2', val < 1 ? '' : formatPercentage(val / 100))
-                    .replace('[/S]', '</span>'));
             }
         }
 

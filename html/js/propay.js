@@ -1821,13 +1821,10 @@ pro.propay = {
             let addNumMonths = false;
 
             if (this.instantDiscount) {
-                const {months, instantDiscount} = this.planObj;
-
-                discountHeaderText = l.insdis_discount_header
-                    .replace('%1', instantDiscount.name)
-                    .replace('%2', formatPercentage(pro.calculateSavings([
-                        instantDiscount.percentage,
-                        months === 12 ? pro.yearlyDiscountPercentage : 0
+                discountHeaderText = discountHeaderText
+                    .replace('%1', formatPercentage(pro.calculateSavings([
+                        this.planObj.instantDiscount.percentage,
+                        this.planObj.months === 12 ? pro.yearlyDiscountPercentage : 0
                     ])));
                 addNumMonths = true;
             }

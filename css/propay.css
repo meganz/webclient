@@ -571,7 +571,7 @@
     align-items: center;
     justify-content: center;
     min-height: 22px;
-    padding: 8px 12px;
+    padding: 8px;
     font: var(--text-copy-medium-bold-pricing);
     background-color: var(--color-primary-red-500);
     color: var(--text-color-white-high);

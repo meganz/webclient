@@ -1688,6 +1688,9 @@ pro.propay = {
 
             $taxInfo.removeClass('hidden');
         }
+        else {
+            $taxInfo.addClass('hidden');
+        }
 
         const $preDiscount = $('.pre-discount', $planCard).addClass('hidden');
 

@@ -709,12 +709,6 @@
                             icon: 'sprite-fm-mono icon-arrow-down-circle-thin-outline',
                             onClick() {
                                 let dlHandles = mega.ui.contextMenu.selectedItems;
-                                if (
-                                    mega.lite.inLiteMode &&
-                                    mega.lite.containsFolderInSelection(dlHandles)
-                                ) {
-                                    return false;
-                                }
                                 if (M.isAlbumsPage(1) || mega.ui.contextMenu.firstAlbum) {
                                     dlHandles = mega.gallery.getAlbumsHandles(dlHandles);
                                 }

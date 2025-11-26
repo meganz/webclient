@@ -366,6 +366,7 @@ table tr.ui-selected .grid-file-request-manage {
 .grid-table.fm.v-size [megatype="size"],
 .grid-table.fm.v-type [megatype="type"],
 .grid-table.fm.v-accessCtrl [megatype="accessCtrl"],
+.grid-table.fm.v-owner [megatype="owner"],
 .grid-table.fm.v-timeAd [megatype="timeAd"],
 .grid-table.fm.v-timeMd [megatype="timeMd"],
 .grid-table.fm.v-versions [megatype="versions"],
@@ -754,6 +755,10 @@ table.grid-table tbody i:not(.verified-user-icon):not(.icon-dot):not(.selected) 
     display: inline-block;
     vertical-align: middle;
     margin-bottom: 1px;
+}
+table.fm.grid-table td.fileLoc i.grid-file-icon {
+    --icon-size: 16px;
+    --mask-color: var(--text-color-medium);
 }
 table.grid-table tbody i.icon-manage-folders:not(.verified-user-icon):not(.icon-dot):not(.selected),
 table.grid-table tbody i.icon-link-thin-outline:not(.verified-user-icon):not(.icon-dot):not(.selected),

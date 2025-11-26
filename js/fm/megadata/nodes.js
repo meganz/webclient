@@ -5286,6 +5286,16 @@ MegaData.prototype.isGalleryVideo = function(n) {
 };
 
 /**
+ * This method works only when Devices are already loaded into the system
+ * @param {String} h Node handle to check against
+ * @returns {Boolean}
+ */
+MegaData.prototype.isInDevice = function(h) {
+    'use strict';
+    return !!mega.devices.ui.hasDevices && Object.values(M.dcd).some(({ folders }) => folders[h]);
+};
+
+/**
  * Checking if the file is even available for the gallery
  * @param {String|MegaNode|Object} n An ufs-node, or filename
  * @param {String} [ext] Optional filename extension

@@ -23,8 +23,18 @@ class MegaTextArea extends MegaComponent {
         if (is_mobile || options.noScroller) {
             return;
         }
+
         this.minHeight = options.minHeight || 20;
-        this.maxHeight = options.maxHeight || 90;
+
+        if (options.fixedHeight) {
+            this.fixedHeight = options.fixedHeight;
+            this.heightNode.style.height = `${this.fixedHeight}px`;
+            this.textArea.style.minHeight = `${this.fixedHeight}px`;
+        }
+        else {
+            this.maxHeight = options.maxHeight || 90;
+        }
+
         this.cloneArea = document.createElement('div');
         this.cloneArea.className = 'textarea-clone';
         this.domNode.appendChild(this.cloneArea);
@@ -83,7 +93,7 @@ class MegaTextArea extends MegaComponent {
         const content = `${escapeHTML(this.value).replace(/\n/g, '<br />')}<br>`;
         this.cloneArea.appendChild(parseHTML(content));
         const { height } = this.cloneArea.getBoundingClientRect();
-        this.heightNode.style.height = `${Math.min(height, this.maxHeight)}px`;
+        this.heightNode.style.height = `${this.fixedHeight || Math.min(height, this.maxHeight)}px`;
         this.textArea.style.height = `${Math.max(this.minHeight, height)}px`;
         this.cloneArea.textContent = '';
         this.Ps.update();

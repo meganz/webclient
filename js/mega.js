@@ -3712,6 +3712,8 @@ function folderreqerr(c, e) {
         // Show file/folder not found page
         mobile.notFound.show(message || parseInt(e && e.err || e));
     }
+
+    mBroadcaster.sendMessage('folderreqerr', e);
 }
 
 /**

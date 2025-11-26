@@ -1396,7 +1396,11 @@ mBroadcaster.addListener('fm:initialized', () => {
 
         showOnBoardingDialog() {
 
-            mega.ui.onboarding.sheet = new MegaOnboardingJourney(this.map.options);
+            mega.ui.onboarding.sheet = new MegaJourney({
+                componentClassname: 'mega-sheet journey on-boarding',
+                contentClassname: 'mega-journey mega-on-boarding',
+                ...this.map.options
+            });
             mega.ui.onboarding.sheet.show();
 
             if (this.map.markComplete) {

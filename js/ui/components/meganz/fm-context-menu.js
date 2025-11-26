@@ -582,6 +582,16 @@
                 }
             }
         ]));
+        sections.addChild('importFrom', new MegaContextSection(menu, [
+            {
+                buttonId: 'import-from-link',
+                text: l.url_import_feature_title,
+                icon: 'sprite-fm-mono icon-cloud-upload-thin-outline',
+                onClick() {
+                    mega.linkImport.showDialog();
+                }
+            }
+        ]));
         sections.addChild('rubbish', new MegaContextSection(menu, [
             {
                 buttonId: 'clearbin-item',

@@ -1,0 +1,124 @@
+/* Migration Warning dialog */
+
+.url-import-warning-image {
+    background-image: url('../../images/mega/glass/glass-cloud-arrow-up.png');;
+    width: 96px;
+    height: 96px;
+    background-size: 100%;
+}
+.mega-sheet.modal-dialog.url-import-warning .main {
+    text-align: start;
+    align-items: start;
+}
+
+/* End of Migration Warning dialog */
+
+.journey.link-import-dialog .import-summary-select-all {
+    width: 76px;
+    padding: 0;
+    text-align: end;
+}
+.journey.link-import-dialog .main-content-div {
+    flex-grow: 1;
+}
+.journey.link-import-dialog .import-link-input-info {
+    font: var(--mobile-font-caption-large-regular);
+    color: var(--mobile-text-secondary);
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+}
+.journey.link-import-dialog .import-link-input-info i {
+    margin-inline-end: 8px;
+}
+.journey.link-import-dialog .import-review-description {
+    padding: 0 48px;
+}
+/* .journey.link-import-dialog .main-content .custom-div,
+.journey.link-import-dialog .main-content .custom-div > div {
+    min-height: 100%;
+} */
+.journey.link-import-dialog a.mega-node .props *:not(.num-files):not(.file-size),
+.journey.link-import-dialog a.mega-node .props-bottom-left,
+.journey.link-import-dialog a.mega-node .props-bottom-right {
+    display: none;
+}
+.journey.link-import-dialog table.grid-table th:first-child,
+.journey.link-import-dialog table.grid-table td:first-child {
+    padding-inline-start: 48px;
+}
+.journey.link-import-dialog table.grid-table th:last-child,
+.journey.link-import-dialog table.grid-table td:last-child {
+    padding-inline-end: 48px;
+    z-index: 1;
+}
+
+.journey.link-import-dialog table.grid-table .mega-node.fm-item {
+    grid-template-columns: 48px auto 28px;
+}
+.journey.link-import-dialog table.grid-table tbody i.item-type-icon {
+    position: static;
+    --icon-size: 32px;
+}
+.journey.link-import-dialog .grid-table.import-summary tr i.icon-check {
+    grid-row: 1/4;
+    grid-column: -1/-2;
+    justify-self: end;
+    margin-inline-end: 1px;
+}
+.journey.link-import-dialog .import-link-input-wrapper,
+.journey.link-import-dialog .errored-link-input-wrapper {
+    margin-top: 24px;
+}
+.journey.link-import-dialog .import-link-input-wrapper label {
+    font: var(--mobile-font-copy-bold);
+}
+.journey.link-import-dialog .errored-link-input-wrapper {
+    display: grid;
+    grid-template-columns: auto 48px;
+    align-items: start;
+}
+.journey.link-import-dialog .errored-link-input-wrapper .mega-input {
+    margin-bottom: 40px;
+    height: 36px;
+    font: var(--mobile-font-caption-small-regular);
+}
+.journey.link-import-dialog .errored-link-input-wrapper .mega-input input {
+    font: var(--mobile-font-caption-large-regular);
+}
+.journey.link-import-dialog .errored-link-input-wrapper .mega-input .message-container {
+    top: 36px;
+}
+.journey.link-import-dialog .errored-link-input-wrapper .mega-input:not(.error) .message-container {
+    color: var(--mobile-text-success);
+}
+.journey.link-import-dialog .errored-link-input-wrapper .mega-input .message-container i {
+    --mask-color: var(--mobile-text-error);
+    --icon-size: 16px;
+}
+.journey.link-import-dialog .errored-link-input-wrapper .mega-input:not(.error) .message-container i {
+    --mask-color: var(--mobile-text-success);
+}
+.journey.link-import-dialog .errored-link-input-wrapper button {
+    justify-self: end;
+    --icon-size: 16px;
+    padding: 10px;
+}
+.journey.link-import-dialog .import-no-errors-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 24px;
+}
+.journey.link-import-dialog .import-no-errors-wrapper > * {
+    margin-top: 16px;
+}
+.journey.link-import-dialog .import-no-errors-wrapper > h2 {
+    margin-top: 24px;
+}
+.journey.link-import-dialog .import-no-errors-icon {
+    width: 120px;
+    height: 120px;
+    background: url('../../images/mega/glass/glass-check-circle.png');
+    background-size: cover;
+}

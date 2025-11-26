@@ -449,7 +449,8 @@ lazy(self.T, 'core', () => {
                     .then((pw) => pw && location.assign(`${url}&pw=${pw}`));
             }
 
-            window.open(url, '_blank', 'noopener,noreferrer');
+            // eslint-disable-next-line local-rules/open -- opening ourselves
+            window.open(url, '_self', 'noopener');
         },
 
         async upload(file, to, xh) {

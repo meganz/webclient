@@ -1537,7 +1537,8 @@ var slideshowid;
 
         $('.js-download-t-file').rebind('click.media-viewer', () => {
             if (n.xh) {
-                window.open(T.core.getDownloadLink(n), '_blank', 'noopener,noreferrer');
+                // eslint-disable-next-line local-rules/open -- opening ourselves
+                window.open(T.core.getDownloadLink(n), '_self', 'noopener');
             }
             return false;
         });

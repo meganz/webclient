@@ -22,6 +22,10 @@ mBroadcaster.once('boot_done', () => {
                             `data-simpletip="${l[5871]}" data-simpletipposition="top"></span > ` +
                     '</td>' +
                     '<td megatype="label" class="label"></td>' +
+                    '<td megatype="owner" class="owner">' +
+                        '<div class="owner-avatar"></div>' +
+                        '<span class="owner-name ps-2"></span>' +
+                    '</td>' +
                     '<td megatype="timeAd" class="time ad"></td>' +
                     '<td megatype="timeMd" class="time md"></td>' +
                     '<td megatype="type" class="type"></td>' +
@@ -29,6 +33,7 @@ mBroadcaster.once('boot_done', () => {
                     '<td megatype="versions" class="hd-versions"></td>' +
                     '<td megatype="playtime" class="playtime"></td>' +
                     '<td megatype="fileLoc" class="fileLoc">' +
+                        '<i class="grid-file-icon sprite-fm-mono hidden me-2"></i>' +
                         '<span class="grid-file-location"></span>' +
                     '</td>' +
                     '<td megatype="extras" class="grid-url-field own-data">' +
@@ -487,6 +492,7 @@ mBroadcaster.once('boot_done', () => {
         };
 
         this.numInsertedDOMNodes = 0;
+        this.userNames = Object.create(null);
 
         define(this, 'viewmode',            aViewMode);
         define(this, 'nodeMap',             Object.create(null));
@@ -877,6 +883,155 @@ mBroadcaster.once('boot_done', () => {
         },
 
         /**
+         * Getting a name by node or by the condition
+         * @param {MegaNode} node Node to work with
+         * @returns {String}
+         */
+        getNodeParentName(node) {
+            if (node.su) {
+                return l[5542];
+            }
+            if (node.p === M.RubbishID) {
+                return l[167];
+            }
+            if (M.isOutShare(node.h, 'EXP')) {
+                return l[5543];
+            }
+
+            const pHandle = M.getNodeByHandle(node.p);
+            return M.getNameByHandle(pHandle) || l[164];
+        },
+
+        /**
+         * Adjusting the node view to work on a search page
+         * @param {String} term Search term to use
+         * @param {HTMLElement} aTemplate DOM node to work with
+         * @param {MegaNode} aNode Search node to work with
+         * @param {Object.<String, any>} aProperties Additional node properties
+         * @param {HTMLElement} tmp Temporary DOM buffer
+         * @returns {void}
+         */
+        adjustForSearch(term, aTemplate, aNode, aProperties, tmp) {
+            if (!term) {
+                return;
+            }
+
+            aTemplate.querySelector('.owner .owner-avatar').appendChild(parseHTML(useravatar.contact(aNode.u)));
+            aTemplate.querySelector('.owner .owner-name').textContent = this.getUserName(aNode.u);
+
+            const termArr = term.toLowerCase().split(' ');
+            const hasTerm = str => !!str && str.length >= term.length
+                && ((str = str.toLowerCase()).includes(term) || termArr.every(str.includes.bind(str)));
+
+            const getPath = () => {
+                const maxLen = 5;
+                let arr = [
+                    { h: aNode.p, name: aProperties.parentName }
+                ];
+
+                let pNode = M.getNodeByHandle(aNode.p);
+
+                while (pNode) {
+                    const name = this.getNodeParentName(pNode);
+                    pNode = M.getNodeByHandle(pNode.p);
+
+                    if (name) {
+                        arr.push({ h: pNode.h, name });
+                    }
+                }
+
+                let slice = 0;
+
+                // This is a Backup folder
+                if (arr.at(-1).h === M.InboxID && arr.at(-2).h === M.BackupsId) {
+                    slice = -2;
+                }
+                else if (arr.at(-1).h === undefined && arr.at(-2).h === M.InboxID && arr.at(-3).h === M.BackupsId) {
+                    slice = -3;
+                }
+
+                if (slice < 0) {
+                    arr = [...arr.slice(0, slice), { h: '', name: l.restricted_folder_button }];
+                }
+
+                return arr.length > maxLen
+                    ? [...arr.slice(0, maxLen - 2), { h: '...', name: '...' }, arr.at(-1)]
+                    : arr;
+            };
+
+            if (hasTerm(aProperties.name)) {
+                const {
+                    prefix,
+                    match,
+                    suffix
+                } = mega.ui.searchbar.findMatchWithSearchTerm(aProperties.name, term);
+
+                const els = [
+                    mCreateElement('span', { class: 'prefix' }),
+                    mCreateElement('span', { class: 'middle-txt' }),
+                    mCreateElement('span', { class: 'suffix' })
+                ];
+
+                els[0].textContent = prefix;
+                els[1].textContent = match;
+                els[2].textContent = suffix;
+
+                tmp.replaceChildren(mCreateElement('div', { class: 'search-results-item-filename' }, els));
+            }
+
+            const pathArr = getPath();
+
+            const getLocIcon = () => {
+                if (aNode.p === M.CameraId || M.isInDevice(aNode.p)) {
+                    return 'icon-folder-sync-thin-outline';
+                }
+                if (aProperties.type === l.s4_bucket_type) {
+                    return 'icon-bucket-triangle-thin-outline';
+                }
+                if (mega.fileRequest && mega.fileRequest.publicFolderExists(aNode.p)) {
+                    return 'icon-folder-arrow-02-thin-outline';
+                }
+                if (aNode.su || M.isOutShare(aNode.h, 'EXP')) {
+                    return 'icon-folder-users-thin-outline';
+                }
+                if (aNode.p === M.RootID || aNode.h === M.RootID) {
+                    return 'icon-cloud-thin-outline';
+                }
+                if (pathArr.at(-1).name === l.restricted_folder_button) {
+                    return 'icon-folder-arrow-01-thin-outline';
+                }
+                if (M.getNodeRoot(aNode.p) === M.RubbishID) {
+                    return 'icon-trash-thin-outline';
+                }
+                if (M.d[aNode.p] && M.d[aNode.p].s4 && M.getS4NodeType(M.d[aNode.p]) === 'bucket') {
+                    return 'icon-bucket-objects-regular-outline';
+                }
+
+                return 'icon-folder-thin-outline';
+            };
+
+            const icon = aTemplate.querySelector('.fileLoc i');
+
+            if (icon) {
+                icon.classList.add(getLocIcon());
+                icon.classList.remove('hidden');
+            }
+
+            if (pathArr.length > 1) {
+                const dividerClass = 'sprite-fm-mono '
+                    + (document.body.classList.contains('rtl') ? 'icon-arrow-left' : 'icon-arrow-right');
+                const loc = aTemplate.querySelector('.fileLoc .grid-file-location');
+
+                loc.classList.add('simpletip');
+                loc.dataset.simpletipClass = 'recents-file-path';
+                loc.dataset.simpletip = loc.dataset.simpletip = pathArr.reduceRight(
+                    (acc, { name }) => acc ? `${acc}[I class="${dividerClass}"][/I]${name}` : name,
+                    ''
+                );
+            }
+        },
+
+        /**
          * Expunges a DOM node stored in the `nodeMap`.
          *
          * @param {String} aHandle The ufs-node's handle
@@ -941,6 +1096,19 @@ mBroadcaster.once('boot_done', () => {
          */
         removeClasses: function(aDOMNode, aClassNames) {
             aDOMNode.classList.remove(...aClassNames);
+        },
+
+        /**
+         * Getting an owner name for a given handle
+         * @param {String} u User handle
+         * @returns {String}
+         */
+        getUserName(u) {
+            if (!this.userNames[u]) {
+                this.userNames[u] = M.getNameByHandle(u) + (u === u_handle ? ` (${l[8885]})` : '');
+            }
+
+            return this.userNames[u];
         },
 
         /**
@@ -1122,17 +1290,8 @@ mBroadcaster.once('boot_done', () => {
                     props.linked = true;
                     props.classNames.push('linked');
                 }
-                if (aNode.su) {
-                    props.parentName = l[5542];
-                }
-                else if (aNode.p === M.RubbishID) {
-                    props.parentName = l[167];
-                }
-                else {
-                    const pHandle = M.getNodeByHandle(aNode.p);
-                    props.parentName = M.getNameByHandle(pHandle);
-                }
 
+                props.parentName = this.getNodeParentName(aNode);
                 return props;
             },
             'device-centre-devices'(aNode, aHandle) {
@@ -1343,32 +1502,14 @@ mBroadcaster.once('boot_done', () => {
                     tmp = aTemplate.querySelector('.tranfer-filetype-txt');
                     tmp.textContent = aProperties.name;
 
-                    const term = M.search ? M.currentdirid.replace('search/', '').trim().toLowerCase() : '';
-
-                    if (M.search && term) {
-                        const termArr = term.toLowerCase().split(' ');
-                        const hasTerm = str => !!str && str.length >= term.length
-                            && ((str = str.toLowerCase()).includes(term) || termArr.every(str.includes.bind(str)));
-
-                        if (hasTerm(aProperties.name)) {
-                            const {
-                                prefix,
-                                match,
-                                suffix
-                            } = mega.ui.searchbar.findMatchWithSearchTerm(aProperties.name, term);
-
-                            const els = [
-                                mCreateElement('span', { class: 'prefix' }),
-                                mCreateElement('span', { class: 'middle-txt' }),
-                                mCreateElement('span', { class: 'suffix' })
-                            ];
-
-                            els[0].textContent = prefix;
-                            els[1].textContent = match;
-                            els[2].textContent = suffix;
-
-                            tmp.replaceChildren(mCreateElement('div', { class: 'search-results-item-filename' }, els));
-                        }
+                    if (M.search) {
+                        this.adjustForSearch(
+                            M.currentdirid.replace('search/', '').trim().toLowerCase(),
+                            aTemplate,
+                            aNode,
+                            aProperties,
+                            tmp
+                        );
                     }
 
                     tmp = aTemplate.querySelector('.item-type-icon');

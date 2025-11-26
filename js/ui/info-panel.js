@@ -522,6 +522,10 @@ lazy(mega.ui, 'mInfoPanel', () => {
                     name = l[5542];
                     break;
                 }
+                case 'out-shares': {
+                    name = l[5543];
+                    break;
+                }
                 default: {
                     if (!name) {
                         name = M.getNodeByHandle(handle).name || l[7381];

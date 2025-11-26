@@ -221,6 +221,9 @@ span.rot-90::before {
 .pl-4 {
     padding-left: 1rem;
 }
+.ps-2 {
+    padding-inline-start: 0.5rem;
+}
 .ps-6 {
     padding-inline-start: 1.5rem;
 }

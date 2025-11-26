@@ -2102,6 +2102,7 @@ function getFMColPrefs(pref) {
     columnsPreferences.playtime = pref & 128;
     columnsPreferences.accessCtrl = pref & 256;
     columnsPreferences.fileLoc = pref & 512;
+    columnsPreferences.owner = pref & 1024;
 
     return columnsPreferences;
 }
@@ -2124,6 +2125,7 @@ function getNumberColPrefs(colName) {
         case 'playtime': return 128;
         case 'accessCtrl': return 256;
         case 'fileLoc': return 512;
+        case 'owner': return 1024;
         default: return null;
     }
 }

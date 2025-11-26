@@ -141,12 +141,30 @@ lazy(mega, 'wsuploadmgr', () => {
             setupws(this.conn[0], this);
         }
 
-        // close all connections
-        closeconn() {
-            for (let i = this.conn.length; i--;) {
-                this.conn[i].close();
+        // gracefully close a connection
+        dispose(idx) {
+            const [ws] = this.conn.splice(idx, 1);
+            if (self.d) {
+                this.logger.warn(`disposing connection at #${idx}...`, ws);
             }
-            this.conn = [];
+            if (ws) {
+                ws.onopen = null;
+                ws.onclose = null;
+                ws.onerror = null;
+                ws.onmessage = null;
+                ws.close();
+            }
+        }
+
+        // close all connections
+        purge() {
+            for (let i = this.conn.length; i--;) {
+                this.dispose(i);
+            }
+            if (self.d) {
+                this.logger.warn('pool purged.', [this]);
+            }
+            oDestroy(this);
         }
 
         // close excess connections
@@ -154,9 +172,12 @@ lazy(mega, 'wsuploadmgr', () => {
             while (this.conn.length > this.numconn) {
                 // delete closing connections
                 for (let i = this.conn.length; i--;) {
-                    if (this.conn[i].closing && !this.conn[i].bufferedAmount && !this.conn[i].chunksonthewire.length) {
-                        this.conn[i].close();
-                        this.conn.splice(i, 1);
+
+                    if (this.conn[i].closing
+                        && !this.conn[i].bufferedAmount
+                        && !this.conn[i].chunksonthewire.length) {
+
+                        this.dispose(i);
                     }
 
                     if (this.conn.length <= this.numconn) {
@@ -201,8 +222,7 @@ lazy(mega, 'wsuploadmgr', () => {
                 if (ws.closing) {
                     // can this connection be deleted?
                     if (!ws.bufferedAmount && !ws.chunksonthewire.length) {
-                        this.conn[i].close();
-                        this.conn.splice(i, 1);
+                        this.dispose(i);
                     }
                 }
                 else if (ws.readyState === WebSocket.OPEN) {
@@ -641,7 +661,7 @@ lazy(mega, 'wsuploadmgr', () => {
                     if (self.d) {
                         this.logger.log(`Closing idle pool ${i}`);
                     }
-                    this.pools[i].closeconn();
+                    this.pools[i].purge();
                     this.pools.splice(i, 1);
                 }
             }

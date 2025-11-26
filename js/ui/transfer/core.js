@@ -400,7 +400,7 @@ lazy(self.T, 'core', () => {
             if (direct === true) {
                 setLink(`${this.apipath}cs/g?x=${xh}&n=${h}&fn=`);
             }
-            if (!M.l[h]) {
+            if (!M.l[h] || direct === false) {
                 M.l[h] = this.xreq({a: 'g', n: h, pt: 1, g: 1, ssl: 1}, n)
                     .then((res) => {
                         if (res.e || typeof res.g !== 'string' || !res.g.startsWith('http')) {

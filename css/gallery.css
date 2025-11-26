@@ -509,6 +509,7 @@ body.rtl .gallery-view.gallery-type-m .gallery-date-block i::before {
 .gallery-view.gallery-type-d .data-block-view {
     width: auto;
     border-radius: 0;
+    overflow: visible;
 }
 .gallery-view.gallery-type-y .data-block-view .data-block-bg {
     padding-top: 0;

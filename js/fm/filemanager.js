@@ -3213,6 +3213,9 @@ FileManager.prototype.addGridUI = function(refresh) {
         if (isInboxRoot) {
             target = mega.devices.ui.getNodeURLPathFromOuterView(node, true);
         }
+        else if (!mega.fileRequest || !mega.fileRequest.publicFolderExists(node.p) && M.isOutShare(node.h, 'EXP')) {
+            target = 'out-shares';
+        }
 
         Promise.resolve(target)
             .then((target) => {

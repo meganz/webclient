@@ -894,12 +894,12 @@ mBroadcaster.once('boot_done', () => {
             if (node.p === M.RubbishID) {
                 return l[167];
             }
-            if (M.isOutShare(node.h, 'EXP')) {
+            if (M.isOutShare(node.h, 'EXP') && (!mega.fileRequest || !mega.fileRequest.publicFolderExists(node.p))) {
                 return l[5543];
             }
 
             const pHandle = M.getNodeByHandle(node.p);
-            return M.getNameByHandle(pHandle) || l[164];
+            return M.getNameByHandle(pHandle);
         },
 
         /**
@@ -933,6 +933,11 @@ mBroadcaster.once('boot_done', () => {
 
                 while (pNode) {
                     const name = this.getNodeParentName(pNode);
+
+                    if (M.isOutShare(pNode.h, 'EXP')) {
+                        break;
+                    }
+
                     pNode = M.getNodeByHandle(pNode.p);
 
                     if (name) {
@@ -940,22 +945,13 @@ mBroadcaster.once('boot_done', () => {
                     }
                 }
 
-                let slice = 0;
-
                 // This is a Backup folder
-                if (arr.at(-1).h === M.InboxID && arr.at(-2).h === M.BackupsId) {
-                    slice = -2;
-                }
-                else if (arr.at(-1).h === undefined && arr.at(-2).h === M.InboxID && arr.at(-3).h === M.BackupsId) {
-                    slice = -3;
-                }
-
-                if (slice < 0) {
-                    arr = [...arr.slice(0, slice), { h: '', name: l.restricted_folder_button }];
+                if (arr[arr.length - 1].h === M.InboxID && arr[arr.length - 2].h === M.BackupsId) {
+                    arr = [...arr.slice(0, -2), { h: '', name: l.restricted_folder_button }];
                 }
 
                 return arr.length > maxLen
-                    ? [...arr.slice(0, maxLen - 2), { h: '...', name: '...' }, arr.at(-1)]
+                    ? [...arr.slice(0, maxLen - 2), { h: '...', name: '...' }, arr[arr.length - 1]]
                     : arr;
             };
 
@@ -997,7 +993,7 @@ mBroadcaster.once('boot_done', () => {
                 if (aNode.p === M.RootID || aNode.h === M.RootID) {
                     return 'icon-cloud-thin-outline';
                 }
-                if (pathArr.at(-1).name === l.restricted_folder_button) {
+                if (pathArr[pathArr.length - 1].name === l.restricted_folder_button) {
                     return 'icon-folder-arrow-01-thin-outline';
                 }
                 if (M.getNodeRoot(aNode.p) === M.RubbishID) {

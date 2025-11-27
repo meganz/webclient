@@ -857,7 +857,7 @@ var slideshowid;
         const options = {
             domNode: elm,
             onTouchStart(e) {
-                e.stopPropagation();
+
                 const container = this.domNode.querySelector(containerSelector);
                 const style = {
                     top: container.scrollTop,

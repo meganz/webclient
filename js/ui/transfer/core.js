@@ -400,7 +400,7 @@ lazy(self.T, 'core', () => {
             if (direct === true) {
                 setLink(`${this.apipath}cs/g?x=${xh}&n=${h}&fn=`);
             }
-            if (!M.l[h]) {
+            if (!M.l[h] || direct === false) {
                 M.l[h] = this.xreq({a: 'g', n: h, pt: 1, g: 1, ssl: 1}, n)
                     .then((res) => {
                         if (res.e || typeof res.g !== 'string' || !res.g.startsWith('http')) {
@@ -449,7 +449,8 @@ lazy(self.T, 'core', () => {
                     .then((pw) => pw && location.assign(`${url}&pw=${pw}`));
             }
 
-            window.open(url, '_blank', 'noopener,noreferrer');
+            // eslint-disable-next-line local-rules/open -- opening ourselves
+            window.open(url, '_self', 'noopener');
         },
 
         async upload(file, to, xh) {

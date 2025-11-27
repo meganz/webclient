@@ -406,6 +406,7 @@ function getCleanSitePath(path) {
             }
             if (path.m && path[0].startsWith('propay_')) {
                 sessionStorage['pro.period'] = path.m;
+                sessionStorage['pro.initialDuration'] = path.m;
             }
         }, false)();
 
@@ -2297,7 +2298,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/ui/components/textarea.js', n: 'textarea_js', j: 1, w: 1});
     jsl.push({f:'js/ui/components/menu.js', n: 'menu_js', j: 1, w:1});
     jsl.push({f:'js/ui/components/stepper.js', n: 'stepper_js', j: 1, w:1});
-    jsl.push({f:'js/ui/components/onboarding-journey.js', n: 'onboarding_journey_js', j:1,w:1});
+    jsl.push({f:'js/ui/components/journey.js', n: 'journey_js', j:1,w:1});
     jsl.push({f:'js/ui/components/card.js', n: 'card_js', j: 1, w:1});
     jsl.push({f:'js/ui/components/card-group.js', n: 'card_select_js', j: 1, w:1});
     jsl.push({f:'js/ui/components/checkbox-group.js', n: 'checkbox_select_js', j: 1, w:1});
@@ -2372,6 +2373,8 @@ else if (!browserUpdate) {
         jsl.push({f:'js/vendor/favico.js', n: 'favico_js', j:1});
         jsl.push({f:'js/vendor/avatar.js', n: 'avatar_js', j:1, w:3});
         jsl.push({f:'js/fm/vpn.js', n: 'fmvpn_js', j: 1});
+        jsl.push({f:'js/fm/link-import.js', n: 'fm_link_import_js', j: 1});
+        jsl.push({f:'css/dialogs/link-import.css', n: 'link_import_css', j:2,w:5});
         jsl.push({f:'js/ui/empty.js', n: 'js_ui_empty_js', j: 1});
 
         jsl.push({f:'css/gallery.css', n: 'gallery_css', j:2,w:5});
@@ -2511,7 +2514,7 @@ else if (!browserUpdate) {
     jsl.push({f:'css/components/menu.css', n: 'comp_menu_css', j:2, w:1});
     jsl.push({f:'css/components/toggle-button.css', n: 'toggle_button_css', j:2,w:5});
     jsl.push({f:'css/components/stepper.css', n: 'stepper_css', j:2, w:30, c:1, d:1, cache:1});
-    jsl.push({f:'css/components/onboarding-journey.css', n: 'onboarding_journey_css', j:2, w:30, c:1, d:1, cache:1});
+    jsl.push({f:'css/components/journey.css', n: 'journey_css', j:2, w:30, c:1, d:1, cache:1});
     jsl.push({f:'css/components/card.css', n: 'card_css', j:2, w:30, c:1, d:1, cache:1});
     jsl.push({f:'css/components/radial.css', n: 'radial_css', j:2, w:30, c:1, d:1, cache:1});
     jsl.push({f:'css/components/textarea.css', n: 'comp_textarea_css', j:2, w:1});

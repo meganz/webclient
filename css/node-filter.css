@@ -98,6 +98,7 @@ tr.is-sensitive td span.item-type-icon {
 tr.is-sensitive span.simpletip-breadcrumb,
 tr.is-sensitive span.tranfer-filetype-txt,
 tr.is-sensitive span.transfer-filetype-icon:not(.image),
+tr.is-sensitive .owner-avatar img,
 .fm-tree-panel span.is-sensitive.nw-fm-tree-item,
 .fm-tree-panel span.is-sensitive + ul span.nw-fm-tree-item,
 span.is-sensitive.dropdown,
@@ -120,11 +121,15 @@ tr.is-sensitive img,
 .is-sensitive.fm-recents img {
     filter: blur(0.25rem);
 }
+.is-sensitive .owner-avatar img {
+    filter: none;
+}
 tr.is-sensitive td.size,
 tr.is-sensitive td.type,
 tr.is-sensitive td.time,
 tr.is-sensitive td.playtime,
-tr.is-sensitive td.hd-versions {
+tr.is-sensitive td.hd-versions,
+tr.is-sensitive .owner {
     color: var(--text-color-medium-sensitive);
 }
 span.hidden-as-sensitive,

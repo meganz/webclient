@@ -527,7 +527,6 @@
                     this.currentdirid, mega.ui.searchbar.locationFn(chipBtn.length && chipBtn.attr('data-location'))
                 );
                 $('.fm-breadcrumbs-wrapper', $fmRightHeader).addClass('hidden');
-                $('.column-settings.overlap').addClass('hidden');
                 $resultsCount.removeClass('hidden');
                 $resultsCount.text(mega.icu.format(l.search_results_count, M.v.length));
             }

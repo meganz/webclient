@@ -13,12 +13,13 @@
 .mega-component.stepper .step .step-content {
     display: flex;
     align-items: center;
-    margin-bottom: 28px;
     padding: 4px;
+    padding-bottom: 32px;
+    position: relative;
 }
 
 .mega-component.stepper .step .secondary-step-content {
-    padding: 0 4px;
+    padding: 0 4px 32px;
 }
 
 .mega-component.stepper .step .step-content > * {

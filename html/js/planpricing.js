@@ -328,6 +328,8 @@ lazy(pro, 'proplan2', () => {
             pro.propay.planChosenAfterRegistration = true;
         }
 
+        pro.propay.storeInitialDuration = true;
+
         loadSubPage('propay_' + planId);
     };
 

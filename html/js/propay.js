@@ -63,6 +63,8 @@ pro.propay = {
     skItems: {},
     continueButtonLoadingReasons: new Set([]),
 
+    storeInitialDuration: false,
+
     gatewayElmsByName: {
         'stripe': '.payment-stripe-dialog',
         'bitcoin': '.bitcoin-invoice-dialog',
@@ -1313,6 +1315,15 @@ pro.propay = {
                 }
             }
 
+            if (this.storeInitialDuration) {
+                this.initialDuration = this.planObj.months;
+                delete this.storeInitialDuration;
+            }
+            else {
+                this.initialDuration = sessionStorage['pro.initialDuration'] | 0;
+                delete sessionStorage['pro.initialDuration'];
+            }
+
             this.selectedPeriod = this.planObj.months;
             this.selectedProPackage = this.planObj.planArray;
 
@@ -1677,6 +1688,9 @@ pro.propay = {
 
             $taxInfo.removeClass('hidden');
         }
+        else {
+            $taxInfo.addClass('hidden');
+        }
 
         const $preDiscount = $('.pre-discount', $planCard).addClass('hidden');
 
@@ -1807,13 +1821,10 @@ pro.propay = {
             let addNumMonths = false;
 
             if (this.instantDiscount) {
-                const {months, instantDiscount} = this.planObj;
-
-                discountHeaderText = l.insdis_discount_header
-                    .replace('%1', instantDiscount.name)
-                    .replace('%2', formatPercentage(pro.calculateSavings([
-                        instantDiscount.percentage,
-                        months === 12 ? pro.yearlyDiscountPercentage : 0
+                discountHeaderText = discountHeaderText
+                    .replace('%1', formatPercentage(pro.calculateSavings([
+                        this.planObj.instantDiscount.percentage,
+                        this.planObj.months === 12 ? pro.yearlyDiscountPercentage : 0
                     ])));
                 addNumMonths = true;
             }
@@ -1943,7 +1954,11 @@ pro.propay = {
          * Indicating the best option to save money on
          */
         const biggestSaveOption = [0, 0];
-        const { durationOptions } = this.planObj;
+        let {durationOptions} = this.planObj;
+
+        if (!this.planObj.isIn('validFeatures')) {
+            durationOptions = durationOptions.filter(([,,,,months]) => months >= this.initialDuration);
+        }
 
         const appendDurationOption = ([,al,,,months]) => {
             if (discountMonths === months) {

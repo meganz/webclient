@@ -242,7 +242,13 @@ var astroPayDialog = {
 
 
         // Make sure they entered something
-        if ((astroPayDialog.fullName === '')) {
+        if (
+            astroPayDialog.fullName === '' ||
+            // If the provider supports extra address information, validate it.
+            // Currently only India needs Address and City, but others may need them in future.
+            this.selectedProvider.supportsExtraAddressInfo &&
+            (astroPayDialog.address === '' || astroPayDialog.city === '')
+        ) {
 
             pro.propay.hideLoadingOverlay();
             // Show error dialog with Missing payment details
@@ -267,6 +273,12 @@ var astroPayDialog = {
             });
 
 
+            return false;
+        }
+
+        // eslint-disable-next-line no-use-before-define
+        if (addressDialog.checkAndUpdateTaxAttr(astroPayDialog.taxNumber)) {
+            pro.propay.hideLoadingOverlay();
             return false;
         }
 
@@ -2027,8 +2039,11 @@ var addressDialog = {
                 prefillMultipleInputs(this.postCodeMegaInput, getBillingProp('postcode', encodedVer));
             }
 
-            if (billingInfo.taxCode) {
-                prefillMultipleInputs(this.taxCodeMegaInput, getBillingProp('taxCode', encodedVer));
+            if (u_attr && u_attr['^taxnum'] || billingInfo.taxCode) {
+                prefillMultipleInputs(
+                    this.taxCodeMegaInput,
+                    u_attr && u_attr['^taxnum'] || getBillingProp('taxCode', encodedVer)
+                );
             }
         }
         if (noFname) {
@@ -2383,6 +2398,10 @@ var addressDialog = {
             callback(addressDialog.mostRecentValidInput);
             delete addressDialog.mostRecentValidInput;
         }
+        if (addressDialog.checkAndUpdateTaxAttr(taxCode)) {
+            addressDialog.closeDialog();
+            return;
+        }
         if (pro.propay.onPropayPage()) {
             addressDialog.closeDialog();
         }
@@ -2391,6 +2410,72 @@ var addressDialog = {
         if (!blockPayment) {
             this.proceedToPay(fieldValues, state, country, taxCode, allowEcpFlow);
         }
+    },
+
+    /**
+     * Compare the new taxCode to the existing ^taxnum/%taxnum attribute as appropriate.
+     * Set if different and update the pricing information.
+     *
+     * @param {*} taxCode code to be set
+     * @returns {boolean}
+     */
+    checkAndUpdateTaxAttr(taxCode) {
+        'use strict';
+
+        const updateProTax = !u_attr.b || !this.businessPlan || !this.userInfo || !this.businessRegPage;
+        const taxAttr = updateProTax ? '^taxnum' : '%taxnum';
+        if (taxCode && taxCode !== u_attr[taxAttr]) {
+            loadingDialog.show('propay-taxset');
+            const promise = (
+                updateProTax ?
+                    Promise.resolve(mega.attr.set2(null, 'taxnum', to8(taxCode), -2)) :
+                    Promise.resolve(new BusinessAccount().updateBusinessAttrs([{ key: taxAttr, val: taxCode }]))
+            )
+                .then(() => {
+                    u_attr[taxAttr] = taxCode;
+                })
+                .then(() => {
+                    return pro.loadMembershipPlans(nop, true);
+                });
+
+            if (pro.propay.onPropayPage()) {
+                promise
+                    .then(() => {
+                        pro.propay.updatePayment(undefined, true);
+                        pro.propay.renderPlanInfo();
+                    })
+                    .catch(dump)
+                    .always(() => {
+                        loadingDialog.hide('propay-taxset');
+                    });
+            }
+            else {
+                promise
+                    .then(() => {
+                        if (is_mobile) {
+                            parsepage(pages.registerb);
+                        }
+                        if (mega.buinsessAccount && mega.buinsessAccount.cachedBusinessPlan) {
+                            delete mega.buinsessAccount.cachedBusinessPlan;
+                        }
+                        const $pageContainer = $('.bus-reg-body');
+                        const preSetNb = $('#business-nbusrs', $pageContainer).val();
+                        const preSetName = $('#business-cname', $pageContainer).val();
+                        const preSetTel = $('#business-tel', $pageContainer).val();
+                        const preSetFname = $('#business-fname', $pageContainer).val();
+                        const preSetLname = $('#business-lname', $pageContainer).val();
+                        const preSetEmail = $('#business-email', $pageContainer).val();
+                        const regBusiness = new BusinessRegister();
+                        regBusiness.initPage(preSetNb, preSetName, preSetTel, preSetFname, preSetLname, preSetEmail);
+                    })
+                    .catch(dump)
+                    .always(() => {
+                        loadingDialog.hide('propay-taxset');
+                    });
+            }
+            return true;
+        }
+        return false;
     },
 
     /**
@@ -2428,9 +2513,6 @@ var addressDialog = {
             }
             else if ((propayGatewayId !== 16) || allowEcpFlow) {
                 pro.propay.sendPurchaseToApi(propayGatewayId);
-            }
-            if (taxCode) {
-                mega.attr.set2(null, 'taxnum', to8(taxCode), -2).catch(dump);
             }
         }
         else {

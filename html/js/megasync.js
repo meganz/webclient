@@ -193,8 +193,6 @@ var megasync = (function() {
         }
     }
 
-    let promptedLna = false;
-
     async function promptDeniedPermission() {
         const skipShow = await M.getPersistentData('lnapermprompt').catch(nop);
         if (skipShow) {
@@ -258,34 +256,41 @@ var megasync = (function() {
             type: 'json',
             prepare(xhr) {
                 if (state === 'prompt') {
-                    timer = tSleep(1);
-                    timer.then(() => {
-                        if (lastXHRStatus === 0 && lastXHRState < 4) {
-                            // Recheck permissions just in case they denied in the timeout
-                            // eslint-disable-next-line compat/compat -- Safari/incompatible shouldn't reach here
-                            navigator.permissions.query({ name: 'local-network-access' })
-                                .then(({ state }) => {
-                                    if (state === 'denied') {
-                                        return promptDeniedPermission();
-                                    }
-                                    if (state === 'prompt' && !promptedLna) {
-                                        promptedLna = true;
-                                        M.delPersistentData('lnapermprompt').catch(nop);
-                                        msgDialog('info', '', l.lna_grant_title, `
-                                            <div class="lna-dialog msync-perm-info">${l.lna_grant_p1}</div>
-                                            <div class="lna-dialog msync-perm-info">${l.lna_grant_p2}</div>
-                                            <div class="lna-dialog lna-image lna-prompt-image locale-${lang}
-                                             tld-${mega.tld}"></div>
-                                            <b class="lna-dialog msync-perm-warn">${l.lna_grant_warning}</b>
-                                        `);
-                                    }
-                                })
-                                .catch((ex) => promise.reject(ex));
-                        }
-                    });
                     lastXHRState = xhr.readyState;
                     lastXHRStatus = xhr.status;
                     xhr.onreadystatechange = (ev) => {
+                        if (!timer) {
+                            timer = tSleep(3);
+                            timer.then(() => {
+                                if (lastXHRStatus === 0 && lastXHRState < 4) {
+                                    // Recheck permissions just in case they denied in the timeout
+                                    // eslint-disable-next-line compat/compat -- Safari/incompatible shouldn't reach it
+                                    navigator.permissions.query({ name: 'local-network-access' })
+                                        .then(({ state }) => {
+                                            if (state === 'denied') {
+                                                return promptDeniedPermission();
+                                            }
+                                            // In case it progressed during the permission lookup
+                                            if (lastXHRState === 4) {
+                                                return;
+                                            }
+                                            if (state === 'prompt' && !sessionStorage.promptedLna) {
+                                                sessionStorage.promptedLna = 1;
+                                                eventlog(501027, String(self.page).replace(/[^\w/-].*$/, ''));
+                                                M.delPersistentData('lnapermprompt').catch(nop);
+                                                msgDialog('info', '', l.lna_grant_title, `
+                                                    <div class="lna-dialog msync-perm-info">${l.lna_grant_p1}</div>
+                                                    <div class="lna-dialog msync-perm-info">${l.lna_grant_p2}</div>
+                                                    <div class="lna-dialog lna-image lna-prompt-image locale-${lang}
+                                                     tld-${mega.tld}"></div>
+                                                    <b class="lna-dialog msync-perm-warn">${l.lna_grant_warning}</b>
+                                                `);
+                                            }
+                                        })
+                                        .catch((ex) => promise.reject(ex));
+                                }
+                            });
+                        }
                         lastXHRState = ev.target.readyState;
                         lastXHRStatus = ev.target.status;
                     };

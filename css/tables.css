@@ -290,6 +290,23 @@
 .data-table tr td:last-child::after {
     width: calc(100% - 22px);
 }
+.data-table tr td:first-child:last-child::after {
+    width: calc(100% - 44px);
+    right: 22px;
+    left: 22px;
+}
+
+.data-table tr td .mega-button {
+    --height: 24px;
+    padding: 4px;
+    border-radius: 2px;
+}
+.data-table tr:hover td .mega-button {
+    background: var(--mobile-surface-2);
+}
+.data-table tr td:hover .mega-button:hover {
+    background: var(--mobile-page-background);
+}
 
 /* Data boxes */
 

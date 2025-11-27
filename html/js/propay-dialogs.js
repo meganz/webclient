@@ -2424,7 +2424,7 @@ var addressDialog = {
 
         const updateProTax = !u_attr.b || !this.businessPlan || !this.userInfo || !this.businessRegPage;
         const taxAttr = updateProTax ? '^taxnum' : '%taxnum';
-        if (taxCode !== u_attr[taxAttr]) {
+        if (taxCode && taxCode !== u_attr[taxAttr]) {
             loadingDialog.show('propay-taxset');
             const promise = (
                 updateProTax ?
@@ -2452,6 +2452,9 @@ var addressDialog = {
             else {
                 promise
                     .then(() => {
+                        if (is_mobile) {
+                            parsepage(pages.registerb);
+                        }
                         if (mega.buinsessAccount && mega.buinsessAccount.cachedBusinessPlan) {
                             delete mega.buinsessAccount.cachedBusinessPlan;
                         }

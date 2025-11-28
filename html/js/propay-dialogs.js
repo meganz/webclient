@@ -2392,15 +2392,14 @@ var addressDialog = {
 
         // log the click on the 'subscribe' button
         delay('addressDlg.click', eventlog.bind(null, 99789));
-
+        if (addressDialog.checkAndUpdateTaxAttr(taxCode)) {
+            addressDialog.closeDialog();
+            return;
+        }
 
         if (typeof callback === 'function') {
             callback(addressDialog.mostRecentValidInput);
             delete addressDialog.mostRecentValidInput;
-        }
-        if (addressDialog.checkAndUpdateTaxAttr(taxCode)) {
-            addressDialog.closeDialog();
-            return;
         }
         if (pro.propay.onPropayPage()) {
             addressDialog.closeDialog();
@@ -2424,16 +2423,14 @@ var addressDialog = {
 
         const updateProTax = !u_attr.b || !this.businessPlan || !this.userInfo || !this.businessRegPage;
         const taxAttr = updateProTax ? '^taxnum' : '%taxnum';
-        if (taxCode && taxCode !== u_attr[taxAttr]) {
+        if (taxCode !== undefined && taxCode !== u_attr[taxAttr]) {
             loadingDialog.show('propay-taxset');
+            u_attr[taxAttr] = taxCode;
             const promise = (
                 updateProTax ?
                     Promise.resolve(mega.attr.set2(null, 'taxnum', to8(taxCode), -2)) :
                     Promise.resolve(new BusinessAccount().updateBusinessAttrs([{ key: taxAttr, val: taxCode }]))
             )
-                .then(() => {
-                    u_attr[taxAttr] = taxCode;
-                })
                 .then(() => {
                     return pro.loadMembershipPlans(nop, true);
                 });
@@ -2472,6 +2469,10 @@ var addressDialog = {
                     .always(() => {
                         loadingDialog.hide('propay-taxset');
                     });
+            }
+            if (addressDialog.mostRecentValidInput) {
+                pro.propay.initBillingInfo(addressDialog.mostRecentValidInput);
+                delete addressDialog.mostRecentValidInput;
             }
             return true;
         }

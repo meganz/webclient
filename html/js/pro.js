@@ -120,6 +120,11 @@ var pro = {
 
     divideAllBy100(obj, excl) {
         'use strict';
+        if (!obj || obj.dividedBy100) {
+            return obj;
+        }
+
+        obj.dividedBy100 = true;
 
         excl = excl || [];
 

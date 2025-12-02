@@ -2421,7 +2421,10 @@ var addressDialog = {
     checkAndUpdateTaxAttr(taxCode) {
         'use strict';
 
-        const updateProTax = !u_attr.b || !this.businessPlan || !this.userInfo || !this.businessRegPage;
+        // If user currently on the registerb page, assume it is a business account for tax code updating.
+        const isBusinessRegistration = (page === 'registerb') && !u_type;
+        const updateProTax = (!u_attr.b || !this.businessPlan || !this.userInfo || !this.businessRegPage)
+            && !isBusinessRegistration;
         const taxAttr = updateProTax ? '^taxnum' : '%taxnum';
         if (taxCode !== undefined && taxCode !== u_attr[taxAttr]) {
             loadingDialog.show('propay-taxset');

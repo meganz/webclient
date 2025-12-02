@@ -1302,9 +1302,9 @@ pro.propay = {
                 !u_type && M.require('zxcvbn_js')
             ]);
 
-            this.planObj = pro.getPlanObj(this.planNum, this.getPreSelectedDuration());
+            this.planObj = pro.getPlanOfDurationOrLower(this.planNum, this.getPreSelectedDuration());
 
-            // If no plan of selected duration found, see if there are any plans of the same level
+            // If no plan of selected duration or lower found, see if there are any plans of the same level
             if (!this.planObj) {
                 this.planObj = pro.getPlanObj(this.planNum);
 

@@ -3716,7 +3716,7 @@
     "import_dlg_instruction_s4": "Somente \u00e9 poss\u00edvel salvar em buckets. Selecione um bucket para continuar.",
     "import_dlg_instruction_share": "Selecione uma pasta compartilhada para salvar os seus itens",
     "import_fail_message": "N\u00e3o foi poss\u00edvel importar as suas senhas. Verifique a sua conex\u00e3o \u00e0 internet e o tipo de arquivo, e tente novamente.",
-    "import_file": "Economize\u00a0%s",
+    "import_file": "Salvar\u00a0%s",
     "import_files": "{count, plural, one {Salvar # item} many {Salvar # de itens} other {Salvar # itens}}",
     "import_info_message": "Pode demorar alguns minutos para importar, n\u00e3o feche nem atualize esta janela.",
     "import_notes": "Aviso: para migrar senhas, primeiro voc\u00ea deve export\u00e1-las do seu gerenciador de senhas anterior como um arquivo CSV. Se o seu gereciador n\u00e3o estiver na lista, escolha \u201cCSV gen\u00e9rico\u201d e verifique se ele est\u00e1 formatado corretamente. [A]Mais informa\u00e7\u00f5es sobre como formatar o seu arquivo CSV para o MEGA\u00a0Pass[/A]",

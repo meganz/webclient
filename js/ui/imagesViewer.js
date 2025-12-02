@@ -856,7 +856,7 @@ var slideshowid;
 
         const options = {
             domNode: elm,
-            onTouchStart(e) {
+            onTouchStart() {
 
                 const container = this.domNode.querySelector(containerSelector);
                 const style = {
@@ -868,8 +868,10 @@ var slideshowid;
 
                 if (containerSelector === '.img-wrap') {
                     const img = container.querySelector('img.active');
-                    this.onEdge = detectEdgesViaCenter(img, container);
-                    return;
+                    if (img) {
+                        this.onEdge = detectEdgesViaCenter(img, container);
+                        return;
+                    }
                 }
 
                 this.onEdge = {

@@ -1,0 +1,6 @@
+{
+    "PROJECT": "webclient",
+    "SOURCE_TOKEN": "",
+    "BASE_URL": "https://translate.developers.mega.co.nz/api",
+    "COMPONENT": "prod"
+}

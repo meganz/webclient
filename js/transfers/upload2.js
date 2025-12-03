@@ -1194,7 +1194,7 @@ var ulmanager = {
             }
         };
 
-        if (is_megadrop || self.is_transferit) {
+        if (is_megadrop) {
             return startUpload();
         }
 

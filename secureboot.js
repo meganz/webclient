@@ -1465,7 +1465,7 @@ function logStaticServerFailure(errorType, filename, staticPathToLog) {
     'use strict';
 
     // Don't log if the build is older than 10 days
-    if (window.buildOlderThan10Days) {
+    if (window.buildOlderThan10Days || self.is_transferit && typeof errorType === 'number') {
         return false;
     }
 
@@ -1512,13 +1512,11 @@ function logStaticServerFailure(errorType, filename, staticPathToLog) {
         if (typeof errorType !== 'number') {
             errorType = String(errorType).split('\n').slice(0, 3).join(' ').substr(0, 96);
 
-            if (/(?:redefine|on proxy:|only) property/i.test(errorType)) {
+            if (/(?:redefine|on proxy:|only) property|evalerror|chrome-ext|user\w*\./i.test(errorType + filename)) {
                 return false;
             }
         }
-        else if (self.is_transferit) {
-            return false;
-        }
+
         window.log99723 = true;
     }
 

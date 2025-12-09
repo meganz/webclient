@@ -369,24 +369,23 @@ async function componentDownload(id, target, langKeys) {
     }
     const promises = [];
     const langs = await api.fetchComponentTranslatedLanguages(componentId, projectId);
-    const enPromise = api.componentGetEnglish(componentId, projectId)
+    target.en = await api.componentGetEnglish(componentId, projectId)
         .then(res => {
-            target.en = convertToStructuredJSON(res);
+            return convertToStructuredJSON(res);
         });
-    promises.push(enPromise);
     for (const [langCode, langId] of Object.entries(langKeys)) {
         if (langId !== 'en') {
             if (langs[langId]) {
                 promises.push(
                     api.componentGetLanguage(componentId, langId, projectId)
                         .then(res => {
-                            target[langCode] = convertToStructuredJSON(res);
+                            target[langCode] = convertToStructuredJSON(res, false, target.en);
                         })
                 );
             }
             else {
                 promises.push(
-                    enPromise.then(() => {
+                    Promise.resolve(() => {
                         target[langCode] = {...target.en};
                     })
                 );
@@ -439,7 +438,7 @@ async function download(branchSuffix, webProdStrings, sharedTag, build) {
         promises.push(
             api.componentGetLanguage(api.COMPONENT, langId)
                 .then(res => {
-                    sharedProdLangs[langCode] = convertToStructuredJSON(res);
+                    sharedProdLangs[langCode] = convertToStructuredJSON(res, false, webProdStrings);
                 })
         );
     }

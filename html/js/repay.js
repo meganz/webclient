@@ -86,11 +86,13 @@ RepayPage.prototype.initPage = function() {
 
         Promise.allSettled([
             u_attr['%name'] || mega.attr.get(u_attr.b.bu, '%name', -1),
-            u_attr['%email'] || mega.attr.get(u_attr.b.bu, '%email', -1)
-        ]).then(([{value: name}, {value: email}]) => {
+            u_attr['%email'] || mega.attr.get(u_attr.b.bu, '%email', -1),
+            u_attr['%taxnum'] || mega.attr.get(u_attr.b.bu, '%taxnum', -1),
+        ]).then(([{value: name}, {value: email}, {value: taxnum}]) => {
 
             name = u_attr['%name'] = name && from8(base64urldecode(name) || name) || '';
             email = u_attr['%email'] = email && from8(base64urldecode(email) || email) || u_attr.email;
+            u_attr['%taxnum'] = taxnum && from8(base64urldecode(taxnum) || taxnum) || '';
 
             assert(name && email, `Invalid account state (${name}:${email})`);
 

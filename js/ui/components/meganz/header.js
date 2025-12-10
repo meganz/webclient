@@ -392,13 +392,20 @@ class MegaHeader extends MegaMobileHeader {
     }
 
     showTargetedDiscountButton(dci) {
-        if (!dci) {
+        const navActions = this.domNode.querySelector('.top-block .nav-actions');
+        if (!navActions) {
             return;
         }
 
-        const navActions = this.domNode.querySelector('.top-block .nav-actions');
+        const currentButton = navActions.querySelector('.promo-button');
+        if (!dci) {
+            if (currentButton) {
+                currentButton.remove();
+            }
+            return;
+        }
 
-        if (!navActions || navActions.querySelector('.promo-button')) {
+        if (currentButton) {
             return;
         }
 

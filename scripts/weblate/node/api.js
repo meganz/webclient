@@ -213,6 +213,12 @@ class API {
         formData.append('source_language', 'en');
         formData.append('new_lang', 'add');
         formData.append('file_format', this.FILE_FORMAT);
+        formData.append('filemask', `${name}/*${this.fileExt}`);
+        formData.append('template', `${name}/${this.TEMPLATE_NAME}`);
+        formData.append('new_base', `${name}/${this.TEMPLATE_NAME}`);
+        formData.append('edit_template', 'on');
+        formData.append('priority', '100');
+        formData.append('is_glossary', 'false');
         projectId = projectId || this.projectSlug;
         if (ARGS.verbose) {
             console.debug('Creating new component', name, projectId);
@@ -226,33 +232,15 @@ class API {
             }
             return false;
         }
-        const payload = {
-            name,
-            slug: name,
-            project: projectId,
-            filemask: `${name}/*${this.fileExt}`,
-            template: `${name}/${this.TEMPLATE_NAME}`,
-            new_base: `${name}/${this.TEMPLATE_NAME}`,
-            edit_template: true,
-            priority: 100,
-            is_glossary: false,
-        };
-        const res = await this.sendRequest(`components/${projectId}/${name}`, { payload, method: 'PATCH' });
-        if (!res.id) {
-            const { errors, type } = safeParse(data);
-            console.error('Error: Failed to finalise branch component', type || data);
-            this.logErrorObject(errors);
-            return false;
-        }
         if (this.components) {
             const componentData = await this.sendRequest(`components/${projectId}/${name}/statistics/`);
             this.components[`${projectId}:r:${name}`] = {
-                name: res.name,
+                name,
                 strings: componentData?.results?.[0]?.total || 0,
             };
         }
         if (ARGS.verbose) {
-            console.debug('New component created', res.id, res.name);
+            console.debug('New component created', data.id, name);
         }
         return data;
     }

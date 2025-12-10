@@ -80,7 +80,7 @@ MegaLink.bindEvent = function() {
         }
 
         /* Handle redirection internally */
-        if (!pfid && this.href.startsWith('/fm/')) {
+        if (!pfid && !dlid && this.href.startsWith('/fm/')) {
             M.openFolder(this.href.slice(4));
         }
         else if (pfcol && this.href.startsWith('/collection/')){

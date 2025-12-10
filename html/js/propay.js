@@ -107,6 +107,7 @@ pro.propay = {
      */
     shouldShowTrial() {
         return (this.gateSupportsTrial || !this.currentGateway)
+            && !pro.propay.discountInfo
             && this.onPropayPage()
             && (this.planObj && this.planObj.trial);
     },
@@ -407,8 +408,9 @@ pro.propay = {
 
         this.updateS4Continue();
 
-        $('.free-trial-unsupported', this.$page)
-            .toggleClass('hidden', (!!this.shouldShowTrial() === !!this.planObj.trial));
+        const hideWarning = (!!this.shouldShowTrial() === !!this.planObj.trial) || !!pro.propay.discountInfo;
+        $('.free-trial-unsupported', this.$page).toggleClass('hidden', hideWarning);
+
         this.renderLocaleInfo(this.isVoucherBalance());
     },
 
@@ -894,7 +896,7 @@ pro.propay = {
     shouldShowTrialBlocker: (blockerText, blockerTitle) => {
         'use strict';
 
-        const trialExpected = !sessionStorage[`noTrial${pro.propay.planNum}`];
+        const trialExpected = !sessionStorage[`noTrial${pro.propay.planNum}`] && !pro.propay.discountInfo;
 
         return !pro.propay.ignoreTrial
             && !pro.filter.simple.validPurchases.has(pro.propay.planNum)

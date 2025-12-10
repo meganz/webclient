@@ -13,7 +13,6 @@ lazy(mega.ui, 'searchbar', () => {
     let $dropdownRecents;
     let $dropdownResults;
     let $fileSearch;
-
     let showEmptyState;
 
     const recentlySearched = {
@@ -174,7 +173,7 @@ lazy(mega.ui, 'searchbar', () => {
      * @returns {Function|false}
      */
     const locationFn = (location) => {
-        
+
         if (!location) {
             if (!folderlink) {
                 return false;
@@ -183,7 +182,7 @@ lazy(mega.ui, 'searchbar', () => {
         }
 
         if (location === 'photos') {
-            return M.isGalleryNode.bind(M);
+            return mega.gallery.allowedInMedia;
         }
 
         if (M.getNodeByHandle(location)) {

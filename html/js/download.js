@@ -366,6 +366,20 @@ async function setupSingleDownloadPage(res) {
                         return false;
                     }
 
+                    const {classList, tagName} = event.currentTarget;
+                    if (classList.contains('js-standard-download')) {
+                        eventlog(tagName === 'A' ? 501034 : 501030);
+                    }
+                    else if (classList.contains('js-megasync-download')) {
+                        eventlog(501031);
+                    }
+                    else if (classList.contains('js-resume-download')) {
+                        eventlog(501032);
+                    }
+                    else if (classList.contains('js-save-download')) {
+                        eventlog(501033);
+                    }
+
                     $('.download.progress-bar').width('0%');
                     $('.open-in-folder').addClass('hidden');
 
@@ -387,7 +401,9 @@ async function setupSingleDownloadPage(res) {
                                 dlPageStartDownload(true);
                             }
                             else {
-                                dlmanager.showMEGASyncOverlay(fdl_filesize > maxDownloadSize);
+                                const sizeExceeded = fdl_filesize > maxDownloadSize;
+                                const eventId = sizeExceeded ? 501035 : 501036;
+                                dlmanager.showMEGASyncOverlay(sizeExceeded, undefined, undefined, eventId);
                             }
                         });
                     }
@@ -470,7 +486,10 @@ async function setupSingleDownloadPage(res) {
                     });
             });
 
-            $('.mid-button.to-clouddrive, button.to-clouddrive').rebind('click', start_import);
+            $('.mid-button.to-clouddrive, button.to-clouddrive').rebind('click', () => {
+                eventlog(501038);
+                start_import();
+            });
 
             $('.share-content-button').rebind('click', function() {
                 copyToClipboard(getBaseUrl() + '#!' + dlpage_ph + '!' + dlpage_key, l[1642]);

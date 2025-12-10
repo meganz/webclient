@@ -2426,6 +2426,10 @@ function topmenuUI() {
         });
 
         $loginButton.removeClass('hidden').rebind('click.auth', function() {
+            if (page === 'download') {
+                eventlog(501037);
+            }
+
             if (u_type === 0) {
                 mLogout();
             }

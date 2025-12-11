@@ -6,7 +6,7 @@ const { convertToStructuredJSON, convertToGoi18nv2 } = require('./convert.js');
 
 let api;
 
-function sanitiseString(string, convertQuotes, escapeTag) {
+function sanitiseString(string, convertQuotes, escapeTag, isDownload) {
     'use strict';
     if (!string) {
         return '';
@@ -21,7 +21,7 @@ function sanitiseString(string, convertQuotes, escapeTag) {
         /\.{3}/g,
     ];
     const replacements = [
-        '\u8230'
+        isDownload ? '\\u2026' : '\u2026',
     ];
     if (convertQuotes) {
         regexps.push(
@@ -29,11 +29,20 @@ function sanitiseString(string, convertQuotes, escapeTag) {
             /(\W)'(._)'/g,
             /(\w)'/g
         );
-        replacements.push(
-            '\u201c$1\u201d',
-            '$1\u2018$2\u2019',
-            '$1\u2019'
-        );
+        if (isDownload) {
+            replacements.push(
+                '\\u201c$1\\u201d',
+                '$1\\u2018$2\\u2019',
+                '$1\\u2019'
+            );
+        }
+        else {
+            replacements.push(
+                '\u201c$1\u201d',
+                '$1\u2018$2\u2019',
+                '$1\u2019'
+            );
+        }
     }
 
     for (let i = 0; i < regexps.length; i++) {
@@ -205,7 +214,7 @@ function prepareComponents(langKeys, sharedProd, sharedBranch, baseProd, baseBra
         }
         // Sanitise and replace empty translations
         for (const [key, data] of Object.entries(mergedFiles[lang])) {
-            mergedFiles[lang][key] = sanitiseString(data.string, lang === 'en', true);
+            mergedFiles[lang][key] = sanitiseString(data.string, lang === 'en', true, true);
             if (lang !== 'en' && !mergedFiles[lang][key]) {
                 mergedFiles[lang][key] = mergedFiles.en[key];
             }

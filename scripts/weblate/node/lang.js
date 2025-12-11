@@ -503,7 +503,7 @@ async function main() {
     const [ branchRes, prodRes, languagesRes ] = await Promise.allSettled([
         typeof ARGS.forcebranch === 'string' ? Promise.resolve(ARGS.forcebranch) : asyncExec('git symbolic-ref --short -q HEAD'),
         api.componentGetEnglish(api.COMPONENT).then(res => {
-            return convertToStructuredJSON(res);
+            return convertToStructuredJSON(res, undefined, undefined, true);
         }),
         api.fetchLanguages(),
         api.fetchComponents(),

@@ -371,7 +371,7 @@ async function componentDownload(id, target, langKeys) {
     const langs = await api.fetchComponentTranslatedLanguages(componentId, projectId);
     target.en = await api.componentGetEnglish(componentId, projectId)
         .then(res => {
-            return convertToStructuredJSON(res);
+            return convertToStructuredJSON(res, false, undefined, true);
         });
     for (const [langCode, langId] of Object.entries(langKeys)) {
         if (langId !== 'en') {
@@ -379,7 +379,7 @@ async function componentDownload(id, target, langKeys) {
                 promises.push(
                     api.componentGetLanguage(componentId, langId, projectId)
                         .then(res => {
-                            target[langCode] = convertToStructuredJSON(res, false, target.en);
+                            target[langCode] = convertToStructuredJSON(res, false, target.en, true);
                         })
                 );
             }
@@ -479,7 +479,7 @@ async function download(branchSuffix, webProdStrings, sharedTag, build) {
     console.log('Creating Translation Files...');
     for (const [lang, fileContent] of Object.entries(componentFiles)) {
         promises.push(
-            writeFile(`${__dirname}/../../../lang/${lang}${ARGS.production && !ARGS.shared ? '_prod' : ''}.json`, fileContent)
+            writeFile(`${__dirname}/../../../lang/${lang}${ARGS.production && !ARGS.shared ? '_prod' : ''}.json`, fileContent.replace(/\\\\u([0-9a-fA-F]{4})/g, '\\u$1'))
         );
     }
     return Promise.allSettled(promises);

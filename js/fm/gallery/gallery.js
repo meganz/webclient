@@ -3869,14 +3869,6 @@ lazy(mega.gallery, 'resetMediaCounts', () => {
 mega.gallery.initialiseMediaNodes = async(filterFn) => {
     'use strict';
 
-    const cameraTree = MegaGallery.getCameraHandles();
-    const cdTree = Object.freeze(array.to.object(M.getTreeHandles(M.RootID), true));
-
-    const allowedInMedia = n => cdTree[n.p]
-        && M.isGalleryNode(n)
-        && mega.sensitives.shouldShowNode(n)
-        && (!filterFn || filterFn(n, cameraTree));
-
     if (!mega.gallery.tmpFa) {
         const nodesToObject = async() => {
             const res = Object.create(null);
@@ -3905,7 +3897,18 @@ mega.gallery.initialiseMediaNodes = async(filterFn) => {
         mega.gallery.tmpFa = await nodesToObject();
     }
 
-    return Object.values(mega.gallery.tmpFa).filter(allowedInMedia);
+    return Object.values(mega.gallery.tmpFa).filter((n) => mega.gallery.allowedInMedia(n, filterFn));
+};
+
+mega.gallery.allowedInMedia = (n, filterFn) => {
+    'use strict';
+
+    const cameraTree = MegaGallery.getCameraHandles();
+    const cdTree = Object.freeze(array.to.object(M.getTreeHandles(M.RootID), true));
+    return cdTree[n.p]
+        && M.isGalleryNode(n)
+        && mega.sensitives.shouldShowNode(n)
+        && (!filterFn || filterFn(n, cameraTree));
 };
 
 mega.gallery.appendAppBanner = async(target) => {

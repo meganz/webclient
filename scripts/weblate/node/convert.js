@@ -1,13 +1,22 @@
 const { ARGS } = require('./args.js');
 const { safeParse, readFile, writeFile } = require('./utils.js');
 
+function escapeUnicode(str) {
+    return str.replace(/[\u0080-\uFFFF]/g, (c) => {
+        return '\\u' + ('0000' + c.charCodeAt(0).toString(16)).slice(-4);
+    });
+}
+
 module.exports = {
-    convertToStructuredJSON(obj, asStr) {
+    convertToStructuredJSON(obj, asStr, source, escaped) {
         if (ARGS.verbose && ARGS.convert) {
             console.log('Converting to Structured JSON', obj);
         }
         if (typeof obj === 'string') {
             obj = safeParse(obj);
+        }
+        if (typeof source === 'string') {
+            source = safeParse(source);
         }
         const pluralsKeys = ['zero', 'one', 'two', 'few', 'many', 'other'];
         const keys = Object.keys(obj);
@@ -18,18 +27,18 @@ module.exports = {
             out[key] = {
                 developer_comment: val.description || '',
             };
-            if (Object.keys(val).length > 2) {
+            if (Object.keys(val).length > 2 || source && source[key] && source[key].string?.includes('plural,')) {
                 let content = '{count, plural,';
                 for (let j = 0; j < pluralsKeys.length; j++) {
                     const part = pluralsKeys[j];
                     if (val[part]) {
-                        content = `${content} ${part} {${val[part]}}`;
+                        content = `${content} ${part} {${escaped ? escapeUnicode(val[part]) : val[part]}}`;
                     }
                 }
                 out[key].string = `${content}}`;
             }
             else {
-                out[key].string = val.other;
+                out[key].string = escaped ? escapeUnicode(val.other) : val.other;
             }
         }
         if (!asStr) {

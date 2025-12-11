@@ -383,6 +383,8 @@ mBroadcaster.once('boot_done', () => {
         self.bytesToSpeed = (...a) => `${bytesToSize(...a)}/s`;
     }
 
+    ulmanager.ulSetup = (a0) => a0 && ulmanager.ulStart(a0);
+
     // @todo
     self.time2date = (unixTime, format) => {
         const date = new Date(unixTime * 1e3 || 0);

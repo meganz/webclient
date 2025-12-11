@@ -259,6 +259,7 @@ lang/*
 
 # Transifex
 scripts/transifex.json
+scripts/weblate/translate.json
 
 #############
 ## Netbeans project metadata

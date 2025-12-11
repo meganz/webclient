@@ -67,6 +67,7 @@ mBroadcaster.once('boot_done', () => {
 
     const thirdPartyScript = (dump, data) => {
         return /userscript|(?:user|inpage|inject)\.js|EvalError/.test(dump.m + data)
+            || dump.m.includes('on proxy: property')
             || dump.m.includes('Permission denied to access property')
             || dump.m.includes('Object Not Found Matching')
             || dump.m.includes('Cannot redefine property')

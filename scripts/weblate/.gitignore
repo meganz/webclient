@@ -1,0 +1,33 @@
+*.json
+*.xml
+*.strings
+*.stringsdict
+*.ts
+*.yml
+
+#############
+## Operating System detritus
+#############
+
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
+
+# Folder config file
+Desktop.ini
+
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
+
+# Mac
+.DS_Store
+
+.vscode
+jsconfig.json #vscode js config
+/.vs
+
+#############
+## PHPstorm project metadata
+#############
+.idea/
+

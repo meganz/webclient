@@ -2356,13 +2356,14 @@ var addressDialog = {
             return;
         }
 
+        const saveAttribute = function(name, value, force) {
+            if (value || force) {
+                return mega.attr.setArrayAttribute('billinginfo', name, value, false, true);
+            }
+        };
+
         // If remember billing address, save as user attribute for future usage.
         if (this.$rememberDetailsCheckbox.hasClass("checkboxOn")) {
-            const saveAttribute = function(name, value) {
-                if (value) {
-                    return mega.attr.setArrayAttribute('billinginfo', name, value, false, true);
-                }
-            };
             saveAttribute('firstname', to8(fieldValues['first-name']));
             saveAttribute('lastname', to8(fieldValues['last-name']));
             saveAttribute('address1', to8(fieldValues.address1));
@@ -2371,7 +2372,6 @@ var addressDialog = {
             saveAttribute('city', to8(fieldValues.city));
             saveAttribute('country', country);
             saveAttribute('state', state);
-            saveAttribute('taxCode', to8(taxCode));
             saveAttribute('version', '2');
         } else {
             // Forget Attribute.
@@ -2386,9 +2386,11 @@ var addressDialog = {
             removeAttribute('city');
             removeAttribute('country');
             removeAttribute('state');
-            removeAttribute('taxCode');
             removeAttribute('version');
         }
+
+        // Always save tax code, even if it is an empty string
+        saveAttribute('taxCode', to8(taxCode), true);
 
         // log the click on the 'subscribe' button
         delay('addressDlg.click', eventlog.bind(null, 99789));
@@ -2421,9 +2423,14 @@ var addressDialog = {
     checkAndUpdateTaxAttr(taxCode) {
         'use strict';
 
-        const updateProTax = !u_attr.b || !this.businessPlan || !this.userInfo || !this.businessRegPage;
+        // If user currently on the registerb page and has no current account,
+        // assume it is a business account for tax code updating.
+        const isBusinessRegistration = (page === 'registerb') && !u_type;
+        const updateProTax = (!u_attr.b || !this.businessPlan || !this.userInfo || !this.businessRegPage)
+            && !isBusinessRegistration;
         const taxAttr = updateProTax ? '^taxnum' : '%taxnum';
-        if (taxCode !== undefined && taxCode !== u_attr[taxAttr]) {
+
+        if (taxCode !== undefined && taxCode !== u_attr[taxAttr] && !(!taxCode && !u_attr[taxAttr])) {
             loadingDialog.show('propay-taxset');
             u_attr[taxAttr] = taxCode;
             const promise = (
@@ -2449,21 +2456,31 @@ var addressDialog = {
             else {
                 promise
                     .then(() => {
-                        if (is_mobile) {
-                            parsepage(pages.registerb);
+                        if (page === 'registerb') {
+                            if (is_mobile) {
+                                parsepage(pages.registerb);
+                            }
+                            if (mega.buinsessAccount && mega.buinsessAccount.cachedBusinessPlan) {
+                                delete mega.buinsessAccount.cachedBusinessPlan;
+                            }
+                            this.billingInfoFilled = false;
+                            const regBusiness = new BusinessRegister();
+
+                            const {nbusers, cname, fname, lname, tel, email} =
+                                (addressDialog.businessRegisterData || Object.create(null));
+
+                            delete addressDialog.businessRegisterData;
+
+                            regBusiness.initPage(nbusers, cname, tel, fname, lname, email, {
+                                skipPasswordReset: true,
+                                skipTermsReset: true,
+                            });
                         }
-                        if (mega.buinsessAccount && mega.buinsessAccount.cachedBusinessPlan) {
-                            delete mega.buinsessAccount.cachedBusinessPlan;
+                        else if (page === 'repay') {
+                            parsepage(pages.repay);
+                            var repayPage = new RepayPage();
+                            repayPage.initPage();
                         }
-                        const $pageContainer = $('.bus-reg-body');
-                        const preSetNb = $('#business-nbusrs', $pageContainer).val();
-                        const preSetName = $('#business-cname', $pageContainer).val();
-                        const preSetTel = $('#business-tel', $pageContainer).val();
-                        const preSetFname = $('#business-fname', $pageContainer).val();
-                        const preSetLname = $('#business-lname', $pageContainer).val();
-                        const preSetEmail = $('#business-email', $pageContainer).val();
-                        const regBusiness = new BusinessRegister();
-                        regBusiness.initPage(preSetNb, preSetName, preSetTel, preSetFname, preSetLname, preSetEmail);
                     })
                     .catch(dump)
                     .always(() => {

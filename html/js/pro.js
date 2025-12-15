@@ -1654,7 +1654,23 @@ var pro = {
 
             return aObj.storage - bObj.storage;
         });
-    }
+    },
+
+    getPlanOfDurationOrLower(planLevel, duration) {
+        'use strict';
+        const firstPlanOfLevel = pro.getPlanObj(planLevel);
+        if (!firstPlanOfLevel) {
+            return false;
+        }
+
+        return firstPlanOfLevel.durationOptions.reduce((acc, plan) => {
+            plan = pro.getPlanObj(plan);
+            if (plan && (plan.months <= duration) && (plan.months > acc.months)) {
+                return plan;
+            }
+            return acc;
+        }, firstPlanOfLevel) || false;
+    },
 };
 
 lazy(pro, 'yearlyDiscountPercentage', () => {

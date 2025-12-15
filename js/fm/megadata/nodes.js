@@ -801,7 +801,7 @@ MegaData.prototype.setPitag = function(req, purpose, extra) {
 
     "use strict";
 
-    if (req.a !== 'p') {
+    if (!['p', 'pp', 'xp'].includes(req.a)) {
         console.error('Invalid request type for setting Pitag, only p is allowed:', req.a);
         return;
     }

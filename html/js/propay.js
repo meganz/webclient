@@ -107,6 +107,7 @@ pro.propay = {
      */
     shouldShowTrial() {
         return (this.gateSupportsTrial || !this.currentGateway)
+            && !pro.propay.discountInfo
             && this.onPropayPage()
             && (this.planObj && this.planObj.trial);
     },
@@ -407,8 +408,9 @@ pro.propay = {
 
         this.updateS4Continue();
 
-        $('.free-trial-unsupported', this.$page)
-            .toggleClass('hidden', (!!this.shouldShowTrial() === !!this.planObj.trial));
+        const hideWarning = (!!this.shouldShowTrial() === !!this.planObj.trial) || !!pro.propay.discountInfo;
+        $('.free-trial-unsupported', this.$page).toggleClass('hidden', hideWarning);
+
         this.renderLocaleInfo(this.isVoucherBalance());
     },
 
@@ -894,7 +896,7 @@ pro.propay = {
     shouldShowTrialBlocker: (blockerText, blockerTitle) => {
         'use strict';
 
-        const trialExpected = !sessionStorage[`noTrial${pro.propay.planNum}`];
+        const trialExpected = !sessionStorage[`noTrial${pro.propay.planNum}`] && !pro.propay.discountInfo;
 
         return !pro.propay.ignoreTrial
             && !pro.filter.simple.validPurchases.has(pro.propay.planNum)
@@ -1302,9 +1304,9 @@ pro.propay = {
                 !u_type && M.require('zxcvbn_js')
             ]);
 
-            this.planObj = pro.getPlanObj(this.planNum, this.getPreSelectedDuration());
+            this.planObj = pro.getPlanOfDurationOrLower(this.planNum, this.getPreSelectedDuration());
 
-            // If no plan of selected duration found, see if there are any plans of the same level
+            // If no plan of selected duration or lower found, see if there are any plans of the same level
             if (!this.planObj) {
                 this.planObj = pro.getPlanObj(this.planNum);
 

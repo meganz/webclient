@@ -1779,7 +1779,7 @@ function init_page() {
                 if (!is_mobile) {
                     M.safeShowDialog('terms', () => {
                         msgDialog(
-                            `confirmation:!^${l[1037]}!${l[82]}`,
+                            `confirmation:!^${l[1037]}!${l.msg_dlg_cancel}`,
                             '',
                             l.terms_dialog_title,
                             l.terms_dialog_text,

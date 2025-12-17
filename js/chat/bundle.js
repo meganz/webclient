@@ -685,7 +685,7 @@ const Footer = ({
   }, REaCt().createElement(meetings_button.A, {
     className: "mega-button",
     onClick: onClose
-  }, l[82]), REaCt().createElement(meetings_button.A, {
+  }, l.msg_dlg_cancel), REaCt().createElement(meetings_button.A, {
     className: `
                         mega-button
                         positive
@@ -1027,7 +1027,7 @@ const Offline = ({
     noCloseOnClickOutside: true,
     buttons: [{
       key: 'ok',
-      label: l[82],
+      label: l.msg_dlg_cancel,
       onClick: onClose
     }, {
       key: 'leave',
@@ -1625,7 +1625,7 @@ class Call extends mixins.w9 {
       if (Object.values(M.u.toJS()).some(u => u.c === 1)) {
         const participants = (0,conversationpanel.zV)(this.props.chatRoom);
         if ((0,conversationpanel.e4)(participants)) {
-          msgDialog(`confirmationa:!^${l[8726]}!${l[82]}`, null, `${l.all_contacts_added}`, `${l.all_contacts_added_to_chat}`, res => {
+          msgDialog(`confirmationa:!^${l[8726]}!${l.msg_dlg_cancel}`, null, `${l.all_contacts_added}`, `${l.all_contacts_added_to_chat}`, res => {
             if (res) {
               contactAddDialog(null, false);
             }
@@ -1636,7 +1636,7 @@ class Call extends mixins.w9 {
           });
         }
       } else {
-        msgDialog(`confirmationa:!^${l[8726]}!${l[82]}`, null, `${l.no_contacts}`, `${l.no_contacts_text}`, resp => {
+        msgDialog(`confirmationa:!^${l[8726]}!${l.msg_dlg_cancel}`, null, `${l.no_contacts}`, `${l.no_contacts_text}`, resp => {
           if (resp) {
             contactAddDialog(null, false);
           }
@@ -1687,7 +1687,7 @@ class Call extends mixins.w9 {
       if (this.state.recorderCid) {
         return msgDialog(`confirmation:!^${l.stop_recording_dialog_cta}!${l.stop_recording_nop_dialog_cta}`, undefined, l.stop_recording_dialog_heading, l.stop_recording_dialog_body, cb => cb && sfuClient.recordingStop(), 1);
       }
-      msgDialog(`warningb:!^${l.start_recording_dialog_cta}!${l[82]}`, null, l.notify_participants_dialog_heading, l.notify_participants_dialog_body, cb => {
+      msgDialog(`warningb:!^${l.start_recording_dialog_cta}!${l.msg_dlg_cancel}`, null, l.notify_participants_dialog_heading, l.notify_participants_dialog_body, cb => {
         if (cb || cb === null) {
           return;
         }
@@ -4302,7 +4302,7 @@ class ColumnContactRequestsSentBtns extends mixins.w9 {
     }), !node.dts && REaCt().createElement(buttons.$, {
       className: "mega-button action contact-reject",
       icon: "sprite-fm-mono icon-close-component",
-      label: l[82],
+      label: l.msg_dlg_cancel,
       onClick: () => this.props.onReject(node.m)
     })));
   }
@@ -6452,7 +6452,7 @@ class Incoming extends react1().Component {
       } = this.state;
       const CALL_IN_PROGRESS = window.sfuClient;
       const isPrivateRoom = chatRoom.type === 'private';
-      const rejectLabel = isPrivateRoom ? l[20981] : l[82];
+      const rejectLabel = isPrivateRoom ? l[20981] : l.msg_dlg_cancel;
       return react1().createElement(_ui_modalDialogs_jsx3__.A.ModalDialog, (0,_extends0__.A)({}, this.state, {
         name: NAMESPACE,
         className: NAMESPACE,
@@ -7132,7 +7132,7 @@ class SelectContactDialog extends mixins.w9 {
 SelectContactDialog.clickTime = 0;
 SelectContactDialog.defaultProps = {
   selectLabel: l.share_contact_action,
-  cancelLabel: l[82],
+  cancelLabel: l.msg_dlg_cancel,
   hideable: true
 };
 class ConfirmDialog extends mixins.w9 {
@@ -7260,7 +7260,7 @@ class ConfirmDialog extends mixins.w9 {
 lazy(ConfirmDialog, 'defaultProps', () => {
   return freeze({
     'confirmLabel': l[6826],
-    'cancelLabel': l[82],
+    'cancelLabel': l.msg_dlg_cancel,
     'dontShowAgainCheckbox': true,
     'hideable': true,
     'dialogType': 'message'
@@ -14950,7 +14950,7 @@ class CloudBrowserDialog extends modalDialogs.A.SafeShowDialogController {
 CloudBrowserDialog.defaultProps = {
   'selectLabel': l[8023],
   'openLabel': l[1710],
-  'cancelLabel': l[82],
+  'cancelLabel': l.msg_dlg_cancel,
   'hideable': true,
   'className': ''
 };
@@ -15159,7 +15159,7 @@ class HistoryRetentionDialog extends React_.Component {
     }, REaCt().createElement("button", {
       className: "mega-button",
       onClick: onClose
-    }, REaCt().createElement("span", null, l[82])), REaCt().createElement("button", {
+    }, REaCt().createElement("span", null, l.msg_dlg_cancel)), REaCt().createElement("button", {
       className: `
                                 mega-button positive
                                 ${this.hasInput() ? '' : 'disabled'}
@@ -16134,7 +16134,7 @@ class PushSettingsDialog extends REaCt().Component {
     }, REaCt().createElement("button", {
       className: "mega-button",
       onClick: this.props.onClose
-    }, REaCt().createElement("span", null, l[82])), REaCt().createElement("button", {
+    }, REaCt().createElement("span", null, l.msg_dlg_cancel)), REaCt().createElement("button", {
       className: "mega-button positive",
       onClick: () => this.props.onConfirm(this.state.pushSettingsValue)
     }, REaCt().createElement("span", null, l[726])))));
@@ -16313,7 +16313,7 @@ class Join extends REaCt().Component {
         noCloseOnClickOutside: true,
         buttons: [{
           key: 'cancel',
-          label: l[82],
+          label: l.msg_dlg_cancel,
           onClick: onCancel
         }, {
           key: 'continue',
@@ -17425,7 +17425,7 @@ class Occurrences extends mixins.w9 {
         }
       })), REaCt().createElement("div", {
         className: "chat-occurrence-control simpletip",
-        "data-simpletip": l[82],
+        "data-simpletip": l.msg_dlg_cancel,
         "data-simpletipposition": "top",
         "data-simpletipoffset": "5"
       }, REaCt().createElement(buttons.$, {
@@ -17568,7 +17568,7 @@ class ConversationRightArea extends mixins.w9 {
   handleAddParticipants() {
     if (Object.values(M.u.toJS()).some(u => u.c === 1)) {
       if (allContactsInChat(excludedParticipants(this.props.chatRoom))) {
-        return msgDialog(`confirmationa:!^${l[8726]}!${l[82]}`, null, `${l.all_contacts_added}`, `${l.all_contacts_added_to_chat}`, res => {
+        return msgDialog(`confirmationa:!^${l[8726]}!${l.msg_dlg_cancel}`, null, `${l.all_contacts_added}`, `${l.all_contacts_added_to_chat}`, res => {
           if (res) {
             contactAddDialog(null, false);
           }
@@ -17578,7 +17578,7 @@ class ConversationRightArea extends mixins.w9 {
         contactPickerDialog: true
       });
     }
-    msgDialog(`confirmationa:!^${l[8726]}!${l[82]}`, null, `${l.no_contacts}`, `${l.no_contacts_text}`, resp => {
+    msgDialog(`confirmationa:!^${l[8726]}!${l.msg_dlg_cancel}`, null, `${l.no_contacts}`, `${l.no_contacts_text}`, resp => {
       if (resp) {
         contactAddDialog(null, false);
       }
@@ -17768,11 +17768,11 @@ class ConversationRightArea extends mixins.w9 {
       disabled: (0,call.P)() || room.isReadOnly() || !(room.iAmOperator() || room.type !== 'private' && room.options[MCO_FLAGS.OPEN_INVITE]),
       onClick: () => Object.values(M.u.toJS()).some(u => u.c === 1) ? !allContactsInChat(exParticipants) ? this.setState({
         contactPickerDialog: true
-      }) : msgDialog(`confirmationa:!^${l[8726]}!${l[82]}`, null, `${l.all_contacts_added}`, `${l.all_contacts_added_to_chat}`, res => {
+      }) : msgDialog(`confirmationa:!^${l[8726]}!${l.msg_dlg_cancel}`, null, `${l.all_contacts_added}`, `${l.all_contacts_added_to_chat}`, res => {
         if (res) {
           contactAddDialog(null, false);
         }
-      }, 1) : msgDialog(`confirmationa:!^${l[8726]}!${l[82]}`, null, `${l.no_contacts}`, `${l.no_contacts_text}`, resp => {
+      }, 1) : msgDialog(`confirmationa:!^${l[8726]}!${l.msg_dlg_cancel}`, null, `${l.no_contacts}`, `${l.no_contacts_text}`, resp => {
         if (resp) {
           contactAddDialog(null, false);
         }
@@ -18185,7 +18185,7 @@ const ConversationPanel = (conversationpanel_dec = utils.Ay.SoonFcWrap(360), _de
           renameDialogValue: undefined
         }),
         buttons: [{
-          label: l[1686],
+          label: l.msg_dlg_cancel,
           onClick: () => this.setState({
             renameDialog: false,
             renameDialogValue: undefined
@@ -23057,7 +23057,7 @@ ChatRoom.prototype.recover = function () {
   }
 };
 ChatRoom.prototype.showMissingUnifiedKeyDialog = function () {
-  return msgDialog(`warningb:!^${l[82]}!${l[23433]}`, null, l[200], l.chat_key_failed_dlg_text, reload => reload ? M.reload() : null, 1);
+  return msgDialog(`warningb:!^${l.msg_dlg_cancel}!${l[23433]}`, null, l[200], l.chat_key_failed_dlg_text, reload => reload ? M.reload() : null, 1);
 };
 ChatRoom.prototype.hasInvalidKeys = function () {
   if (!is_chatlink && this.type === 'public') {
@@ -28788,7 +28788,7 @@ class StartGroupChatWizard extends mixins.w9 {
 StartGroupChatWizard.clickTime = 0;
 StartGroupChatWizard.defaultProps = {
   'selectLabel': l[1940],
-  'cancelLabel': l[82],
+  'cancelLabel': l.msg_dlg_cancel,
   'hideable': true,
   'flowType': 1,
   'pickerClassName': '',
@@ -32010,7 +32010,7 @@ const TypingArea = (_dec = (0,mixins.hG)(54, true), _class = class TypingArea ex
       }), REaCt().createElement(ui_buttons.$, {
         key: "cancel",
         className: "mega-button right",
-        label: l[1718],
+        label: l.msg_dlg_cancel,
         onClick: self.onCancelClicked.bind(self)
       })];
     }
@@ -36888,7 +36888,7 @@ const withHostsObserver = Component => {
         })), react1().createElement("footer", null, react1().createElement("div", {
           className: "footer-container"
         }, react1().createElement(_ui_buttons_jsx5__.$, {
-          label: l[82],
+          label: l.msg_dlg_cancel,
           className: "mega-button",
           onClick: this.toggleDialog
         }), react1().createElement(_ui_buttons_jsx5__.$, {
@@ -36922,7 +36922,7 @@ const withHostsObserver = Component => {
         cta,
         altCta
       }) => {
-        msgDialog(`confirmationa:!^${cta}!${altCta || l[82]}`, null, title, body, cb => {
+        msgDialog(`confirmationa:!^${cta}!${altCta || l.msg_dlg_cancel}`, null, title, body, cb => {
           if (cb) {
             this.toggleDialog();
           } else if (cb === false) {
@@ -37353,7 +37353,7 @@ class Button extends _chat_mixins_js2__.w9 {
 
 	// The module cache
 	const __webpack_module_cache__ =Object.create(null);
-	
+
 	// The require function
 	function REQ_(moduleId) {
 		// Check if module is in cache
@@ -37367,16 +37367,16 @@ class Button extends _chat_mixins_js2__.w9 {
 			// no module.loaded needed
 			exports:Object.create(null)
 		};
-	
+
 		// Execute the module function
 		__webpack_modules__[moduleId](module, module.exports, REQ_);
-	
+
 		// Return the exports of the module
 		return module.exports;
 	}
-	
 
-	
+
+
 	(() => {
 		// getDefaultExport function for compatibility with non-harmony modules
 		REQ_.n = (module) => {
@@ -37387,8 +37387,8 @@ class Button extends _chat_mixins_js2__.w9 {
 			return getter;
 		};
 	})();
-	
-	
+
+
 	(() => {
 		// define getter functions for harmony exports
 		REQ_.d = (exports, definition) => {
@@ -37399,13 +37399,13 @@ class Button extends _chat_mixins_js2__.w9 {
 			}
 		};
 	})();
-	
-	
+
+
 	(() => {
 		REQ_.o = (obj, prop) => Object.prototype.hasOwnProperty.call(obj, prop)
 	})();
-	
-	
+
+
 	(() => {
 		// define __esModule on exports
 		REQ_.r = (exports) => {
@@ -37415,14 +37415,14 @@ class Button extends _chat_mixins_js2__.w9 {
 			Object.defineProperty(exports, '__esModule', { value: true });
 		};
 	})();
-	
 
-	
+
+
 	// startup
 	// Load entry module and return exports
 	REQ_(326);
 	// This entry module is referenced by other modules so it can't be inlined
 	const EXP_ = REQ_(732);
-	
+
 })()
 ;

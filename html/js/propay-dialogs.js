@@ -2844,7 +2844,7 @@ var addressDialog = {
                         : l.pwm_free_trial_used_h;
 
                     msgDialog(
-                        `confirmationa:!^${l.subscribe_btn}!${l[82]}`,
+                        `confirmationa:!^${l.subscribe_btn}!${l.msg_dlg_cancel}`,
                         '',
                         warningTitle,
                         l.vpn_free_trial_used_b,

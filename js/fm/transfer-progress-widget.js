@@ -1099,7 +1099,7 @@ mega.tpw = new function TransferProgressWidget() {
             }
             if (isPaused) {
                 this.actionLeft.statePlay();
-                this.actionRight.stateCancel(l.tfw_transfer_cancel);
+                this.actionRight.stateCancel(l.msg_dlg_cancel);
                 this.actionRight.hidden = false;
                 this._paused = true;
                 this._running = false;

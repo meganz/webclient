@@ -63,7 +63,7 @@
                             promise.reject();
                             return false;
                         });
-                    $('button.pro-register span', this.$dialog).text(l[82]);
+                    $('button.pro-register span', this.$dialog).text(l.msg_dlg_cancel);
                 }
             });
 

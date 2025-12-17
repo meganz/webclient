@@ -107,7 +107,7 @@ function resetSensitives() {
                     classes: ['mega-button', 'branded-green']
                 },
                 cancel: {
-                    label: l[82],
+                    label: l.msg_dlg_cancel,
                     callback: () => {
                         reject(EBLOCKED);
                     }

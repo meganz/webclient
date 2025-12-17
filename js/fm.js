@@ -1052,7 +1052,7 @@ function avatarDialog(close) {
                 <span>@@</span>
             </button>
         </div>`,
-        l[82],
+        l.msg_dlg_cancel,
         l[1016],
         l[1017],
         l[6974]

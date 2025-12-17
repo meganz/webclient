@@ -2984,7 +2984,7 @@ accountUI.fileManagement = {
                     async(val) => {
                         if (val) {
                             return asyncMsgDialog(
-                                `confirmationa:!^${l.rewind_stgs_disbl_dlg_ok}!${l[82]}`,
+                                `confirmationa:!^${l.rewind_stgs_disbl_dlg_ok}!${l.msg_dlg_cancel}`,
                                 null,
                                 l.rewind_stgs_disbl_dlg_title,
                                 l.rewind_stgs_disbl_dlg_msg,
@@ -4088,7 +4088,7 @@ accountUI.s4 = {
         // Disable S4 feature
         $('.disable-obj-storage', this.$container).rebind('click.openKeys', () => {
             msgDialog(
-                `remove:!^${l.s4_accept_opts_out_btn}!${l[82]}`,
+                `remove:!^${l.s4_accept_opts_out_btn}!${l.msg_dlg_cancel}`,
                 l.s4_obj_storage_opt_out,
                 l.s4_disable_feature_header,
                 l.s4_disable_feature_info, (yes) => {

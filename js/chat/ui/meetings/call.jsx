@@ -837,7 +837,7 @@ export default class Call extends MegaRenderMixin {
 
             if (allContactsInChat(participants)) {
                 msgDialog(
-                    `confirmationa:!^${l[8726]}!${l[82]}`,
+                    `confirmationa:!^${l[8726]}!${l.msg_dlg_cancel}`,
                     null,
                     `${l.all_contacts_added}`,
                     `${l.all_contacts_added_to_chat}`,
@@ -854,7 +854,7 @@ export default class Call extends MegaRenderMixin {
         }
         else {
             msgDialog(// new user adding a partcipant
-                `confirmationa:!^${l[8726]}!${l[82]}`,
+                `confirmationa:!^${l[8726]}!${l.msg_dlg_cancel}`,
                 null,
                 `${l.no_contacts}`,
                 `${l.no_contacts_text}`,
@@ -961,7 +961,7 @@ export default class Call extends MegaRenderMixin {
         }
 
         msgDialog(
-            `warningb:!^${l.start_recording_dialog_cta}!${l[82]}`,
+            `warningb:!^${l.start_recording_dialog_cta}!${l.msg_dlg_cancel}`,
             null,
             l.notify_participants_dialog_heading,
             l.notify_participants_dialog_body,

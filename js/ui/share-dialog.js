@@ -363,7 +363,7 @@ lazy(mega.ui, 'mShareDialog', () => {
             const message = mega.utils.trans.listToString(nonContactEmails, l.share_add_non_contact_warning_msg);
 
             // Set to warning dialog with custom button labels
-            const dialogType = `*warningb:!^${l.share_confirm_dialog_proceed}!${l[82]}`;
+            const dialogType = `*warningb:!^${l.share_confirm_dialog_proceed}!${l.msg_dlg_cancel}`;
 
             // Show "Share with non-contact" warning dialog
             msgDialog(dialogType, '', l.share_confirm_dialog_title, message, (res) => {
@@ -1775,7 +1775,8 @@ lazy(mega.ui, 'mShareDialog', () => {
 
         $('.remove-share', $dialog).rebind('click', function() {
             if (!$(this).is('.disabled')) {
-                msgDialog(`remove:!^${l[23737]}!${l[82]}`, '', l.remove_share_title, l.remove_share_msg, res => {
+                msgDialog(`remove:!^${l[23737]}!${l.msg_dlg_cancel}`, '', l.remove_share_title,
+                          l.remove_share_msg, res => {
                     if (res) {
                         loadingDialog.show();
                         new mega.Share().removeSharesFromSelected(target).always(() => {

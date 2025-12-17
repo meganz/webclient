@@ -8,7 +8,7 @@ const Footer = ({ selected, onClose, onAdd }) => {
                 <Button
                     className="mega-button"
                     onClick={onClose}>
-                    {l[82] /* `Cancel` */}
+                    {l.msg_dlg_cancel}
                 </Button>
                 <Button
                     className={`

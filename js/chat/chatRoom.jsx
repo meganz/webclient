@@ -1996,7 +1996,7 @@ ChatRoom.prototype.recover = function() {
 ChatRoom.prototype.showMissingUnifiedKeyDialog = function() {
     return (
         msgDialog(
-            `warningb:!^${l[82] /* `Cancel` */}!${l[23433] /* `Reload your account` */}`,
+            `warningb:!^${l.msg_dlg_cancel}!${l[23433] /* `Reload your account` */}`,
             null,
             l[200] /* `Oops, something went wrong.` */,
             l.chat_key_failed_dlg_text, /* `Unable to join the call. Reload MEGA Chat and try again.` */

@@ -112,7 +112,7 @@ Object.defineProperty(T.ui, 'prompt', {
         return T.ui.msgDialog.show({
             msg,
             type: 'prompt',
-            buttons: [l[507], l[82]],
+            buttons: [l[507], l.msg_dlg_cancel],
             ...options
         });
     }
@@ -125,7 +125,7 @@ Object.defineProperty(T.ui, 'askPassword', {
         return this.prompt(`${l[9071]} ${l[9072]}`, {
             type: 'password',
             title: l[9073],
-            buttons: [l[81], l[82]],
+            buttons: [l[81], l.msg_dlg_cancel],
             placeholders: [l[9073], l[909]],
             validate(value) {
                 return (!value || value === options.currentValue) && l[17920];

@@ -115,6 +115,10 @@ function msgDialog(type, title, msg, subMsg, callback, checkboxCallback) {
         $('.mega-dialog:not(#msgDialog)').addClass('arrange-to-back');
         $('.mega-dialog-container.common-container').addClass('arrange-to-back');
     }
+
+    if (typeof psa !== 'undefined') {
+        psa.repositionAll();
+    }
 }
 
 // Desktop version dedicated methods
@@ -346,4 +350,8 @@ function closeMsg(value) {
     mega.ui.sheet.off('close.megaSheet');
     mega.ui.sheet.off('close.msgDialog');
     mega.ui.sheet.clear();
+
+    if (typeof psa !== 'undefined') {
+        psa.repositionAll();
+    }
 }

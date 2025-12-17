@@ -1273,6 +1273,12 @@ export default class Call extends MegaRenderMixin {
         didMount?.();
     }
 
+    componentDidUpdate() {
+        if (typeof psa !== 'undefined') {
+            psa.repositionMeetingsCall();
+        }
+    }
+
     render() {
         const {
             minimized, peers, call, chatRoom, parent, typingAreaText,

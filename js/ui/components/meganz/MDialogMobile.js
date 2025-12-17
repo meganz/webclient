@@ -47,7 +47,7 @@ class MDialog {
             actions.push({
                 type: 'normal',
                 className: 'secondary',
-                text: cancel.label || l[82],
+                text: cancel.label || l.msg_dlg_cancel,
                 onClick: async() => {
                     if (typeof cancel === 'function') {
                         await cancel();

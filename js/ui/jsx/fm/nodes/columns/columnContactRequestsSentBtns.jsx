@@ -38,7 +38,7 @@ export class ColumnContactRequestsSentBtns extends MegaRenderMixin {
                         <Button
                             className="mega-button action contact-reject"
                             icon="sprite-fm-mono icon-close-component"
-                            label={l[82]}
+                            label={l.msg_dlg_cancel}
                             onClick={() => this.props.onReject(node.m)}
                         />
                     }

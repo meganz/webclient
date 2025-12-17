@@ -288,12 +288,12 @@ lazy(msgDialog, 'defaultButtons', () => {
     'use strict';
 
     const strings = is_mobile ? {
-        'clear-bin': [l[1730], l[82]],
+        'clear-bin': [l[1730], l.msg_dlg_cancel],
         'confirmation': [l[78], l[79]],
         'remove': [l[78], l[79]],
         'reload-account' : [l.reload_account_btn]
     } : {
-        'clear-bin': [l[1018], l[82]],
+        'clear-bin': [l[1018], l.msg_dlg_cancel],
         'delete-contact': [l[78], l[79]],
         'remove': [l[78], l[79]],
         'confirmationa': [l[78], l[79]],

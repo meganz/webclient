@@ -250,7 +250,7 @@ class CreditCardItemForm extends MegaForm {
                     }
                 },
                 {
-                    text: l[82],
+                    text: l.msg_dlg_cancel,
                     classname: 'secondary',
                     typeAttr: 'button',
                     onClick: async() => {

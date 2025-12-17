@@ -52,7 +52,7 @@
 
                 MegaButton.factory({
                     parentNode: footerElements,
-                    text: l[82],
+                    text: l.msg_dlg_cancel,
                     componentClassname: 'slim font-600 mx-2 secondary',
                     type: 'normal'
                 }).on('click', () => {
@@ -117,7 +117,7 @@
                     },
                     {
                         icon: 'sprite-pm-mono icon-x-circle-thin-outline error',
-                        buttons: [l.delete_item, l[82]],
+                        buttons: [l.delete_item, l.msg_dlg_cancel],
                         confirmButtonClass: 'destructive'
                     },
                     false,

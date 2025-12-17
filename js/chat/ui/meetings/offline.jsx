@@ -10,7 +10,7 @@ const Offline = ({ onCallEnd, onClose }) => {
             title={l.no_internet}
             noCloseOnClickOutside={true}
             buttons={[
-                { key: 'ok', label: l[82] /* `Cancel` */, onClick: onClose },
+                { key: 'ok', label: l.msg_dlg_cancel, onClick: onClose },
                 { key: 'leave', label: l[5883] /* `Leave call` */, className: 'negative', onClick: onCallEnd }
             ]}
             onClose={onClose}>

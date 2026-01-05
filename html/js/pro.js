@@ -144,10 +144,10 @@ var pro = {
             return false;
         }
 
-        const { result } = await api.req({ a: 'dci', v: 2, dc: u_attr.mkt.dc[0].dc, extra: 1 }).catch(nop);
+        const res = await api.send({a: 'dci', v: 2, dc: u_attr.mkt.dc[0].dc, extra: 1}).catch(nop);
 
-        return (result && result.ex > Date.now() / 1000)
-            ? result
+        return (res && res.ex > Date.now() / 1000)
+            ? res
             : false;
     },
 

@@ -2670,6 +2670,10 @@ var addressDialog = {
             $('.grace-business', '.fm-banner-holder').removeClass('visible');
         }
 
+        pro.getTargetedDiscountInfo().then((dci) => {
+            mega.ui.header.showTargetedDiscountButton(dci);
+        });
+
         if (parseInt(pro.propay.planNum) === pro.ACCOUNT_LEVEL_FEATURE_VPN) {
             this.showSuccessCloak(
                 l[6961],

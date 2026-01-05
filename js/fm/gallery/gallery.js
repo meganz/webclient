@@ -3883,13 +3883,8 @@ mega.gallery.initialiseMediaNodes = async(filterFn) => {
                 }
             };
 
-            if (fmdb && fmdb.db && !fmdb.crashed) {
-                await fmdb.get('f', assignNodes);
-            }
-            else {
-                console.warn('Cannot build nodes list from the local database...');
-                assignNodes(Object.values(M.d));
-            }
+            await M.collectNodes(M.RootID);
+            assignNodes(Object.values(M.d));
 
             return res;
         };
@@ -3904,11 +3899,13 @@ mega.gallery.allowedInMedia = (n, filterFn) => {
     'use strict';
 
     const cameraTree = MegaGallery.getCameraHandles();
-    const cdTree = Object.freeze(array.to.object(M.getTreeHandles(M.RootID), true));
-    return cdTree[n.p]
-        && M.isGalleryNode(n)
+    const isInCD = M.getNodeRoot(n) === M.RootID;
+
+    const toAdd = isInCD && M.isGalleryNode(n)
         && mega.sensitives.shouldShowNode(n)
         && (!filterFn || filterFn(n, cameraTree));
+
+    return toAdd;
 };
 
 mega.gallery.appendAppBanner = async(target) => {

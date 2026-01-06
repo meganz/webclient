@@ -1,6 +1,6 @@
 import React from "react";
 import {Avatar} from "../../../../../chat/ui/contacts.jsx";
-import { OFlowEmoji, withOverflowObserver } from '../../../../utils';
+import {OFlowEmoji, ParsedHTML, withOverflowObserver} from '../../../../utils';
 import { GenericNodePropsComponent } from "../genericNodePropsComponent";
 
 export class ColumnContactName extends GenericNodePropsComponent {
@@ -16,16 +16,40 @@ export class ColumnContactName extends GenericNodePropsComponent {
         <span className="contact-item-email">{this.props.nodeAdapter.props.node.m}</span>
     );
 
-    render() {
+    /**
+     * Getter for contact name
+     * @return {string} - Contact name
+     */
+    get name() {
+        const { nodeAdapter, node } = this.props;
+        if (nodeAdapter.nodeProps) {
+            return nodeAdapter.nodeProps.title;
+        }
+
+        return M.getNameByEmail(node.m);
+    }
+
+    _renderAvatar() {
         const { nodeAdapter } = this.props;
         const { node } = nodeAdapter.props;
 
+        if (nodeAdapter.nodeProps || node.name !== '') {
+            return <Avatar contact={node} className="avatar-wrapper box-avatar"/>;
+        }
+        else if (node.name === '') {
+            return <ParsedHTML>{useravatar.contact(node.m, 'box-avatar')}</ParsedHTML>;
+        }
+
+        return null;
+    }
+
+    render() {
         return (
             <td>
-                <Avatar contact={node} className="avatar-wrapper box-avatar"/>
+                {this._renderAvatar()}
                 <div className="contact-item">
                     <div className="contact-item-user">
-                        <OFlowEmoji>{nodeAdapter.nodeProps.title}</OFlowEmoji>
+                        <OFlowEmoji>{this.name}</OFlowEmoji>
                     </div>
                     <this.Mail />
                 </div>

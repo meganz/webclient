@@ -2130,38 +2130,7 @@ var notify = {
      * @returns {String} Returns the name and email as a string e.g. "Ed Snowden (ed@fredom.press)" or just the email
      */
     getDisplayName: function(email) {
-
-        // Use the email by default
-        var displayName = email;
-
-        // Search through contacts for the email address
-        if (M && M.u) {
-            M.u.forEach(function(contact) {
-
-                var contactEmail = contact.m;
-                var contactHandle = contact.u;
-
-                // If the email is found
-                if (contactEmail === email) {
-
-                    // If the nickname is available use: Nickname
-                    if (M.u[contactHandle].nickname !== '') {
-                        displayName = nicknames.getNickname(contactHandle);
-                    }
-                    else {
-                        // Otherwise use: FirstName LastName (Email)
-                        displayName = (M.u[contactHandle].firstName + ' ' + M.u[contactHandle].lastName).trim()
-                                    + ' (' + email + ')';
-                    }
-
-                    // Exit foreach loop
-                    return true;
-                }
-            });
-        }
-
-        // Escape and return
-        return displayName;
+        return M.getNameByEmail(email);
     },
 
     /**

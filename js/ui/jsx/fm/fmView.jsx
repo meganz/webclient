@@ -256,7 +256,10 @@ export default class FMView extends MegaRenderMixin {
     componentDidUpdate(prevProps) {
         const { currentlyViewedEntry: currEntry, searchValue: currSearch } = this.props;
         const { currentlyViewedEntry: prevEntry, searchValue: prevSearch } = prevProps;
-        if (prevEntry !== currEntry || currSearch !== prevSearch) {
+        const dataSourceChanged = this.props.dataSource !== prevProps.dataSource;
+
+        if (dataSourceChanged || prevEntry !== currEntry || currSearch !== prevSearch) {
+            this.dataSource = this.props.dataSource; // update data source cached member
             let newState = {
                 'selected': [],
                 'highlighted': []

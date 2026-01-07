@@ -49,7 +49,7 @@ function init_page() {
         elm.addEventListener("click", function() {
             window.open(
                 getAppBaseUrl() + (is_extension ? '#' : '/') + 'filerequest/' + id, "_blank",
-                "width=750, height=738, resizable=no, status=no, location=no, titlebar=no, toolbar=no",
+                "width=769, height=738, resizable=no, status=no, location=no, titlebar=no, toolbar=no",
                 true
             );
         });

@@ -131,10 +131,14 @@ function reselect(n) {
     if (d) {
         console.debug('reselect(%s)', n, [window.selectionManager]);
     }
+
+    for (const elm of document.querySelectorAll('.ui-selected')) {
+        elm.classList.remove('ui-selected');
+    }
+
     if (window.selectionManager) {
         return selectionManager.reinitialize();
     }
-    $('.ui-selected').removeClass('ui-selected');
 
     if (!Array.isArray($.selected)) {
         $.selected = [];

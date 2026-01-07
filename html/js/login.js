@@ -194,6 +194,32 @@ function pagelogin() {
     }
 }
 
+/**
+ * Binds the login button handler
+ *
+ * @param options - {buttonEl, withEvents} - Options object
+ * @param {jQuery} [options.buttonEl] The button element to bind the handler to.
+ * If not provided, it will default to the login button within the main login form.
+ * @param {boolean} [options.withEvents=true] Whether to log events when the button is clicked.
+ *
+ * @returns {void}
+ */
+function bindLoginHandler(options) {
+    'use strict';
+
+    const {buttonEl, withEvents = true} = options;
+    const $button = buttonEl || $('button.login-button', $('.main-mid-pad.login'));
+    $button.rebind('click.initlogin', () => {
+        pagelogin();
+        if (withEvents) {
+            eventlog(99796);
+            if (confirmok) {
+                eventlog(500813);
+            }
+        }
+    });
+}
+
 function init_login() {
     'use strict';
 
@@ -261,13 +287,7 @@ function init_login() {
         }
     });
 
-    $button.rebind('click.initlogin', function() {
-        pagelogin();
-        eventlog(99796);
-        if (confirmok) {
-            eventlog(500813);
-        }
-    });
+    bindLoginHandler({buttonEl: $button});
 
     if (self.InitFileDrag) {
         onIdle(InitFileDrag);

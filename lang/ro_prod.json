@@ -5959,5 +5959,8 @@
     "you_have_selected_vpn": "A\u021bi selectat [S]MEGA\u00a0VPN[/S]",
     "you_have_selected_vpn_trial": "A\u021bi selectat [S]MEGA\u00a0VPN de \u00eencercare gratuit\u0103[/S]",
     "you_muted_all_peers": "A\u021bi dezactivat microfonul pentru to\u021bi participan\u021bii",
-    "you_muted_peer": "A\u021bi dezactivat microfonul lui %NAME"
+    "you_muted_peer": "A\u021bi dezactivat microfonul lui %NAME",
+    "team": "Team",
+    "n_plus_users": "%1+ Users",
+    "url_import_toast_success_3rd_party":  "Your links are being imported to $2, please be patient as this may take a while."
 }

@@ -2016,5 +2016,8 @@
     "17881": "%nbFo folders containing a total of %nbFi file were added to the transfer manager",
     "17882": "%nbFo folder containing a total of %nbFi file was added to the transfer manager",
     "17883": "%nbFi files were added to the transfer manager",
-    "17884": "%nbFi file was added to the transfer manager"
+    "17884": "%nbFi file was added to the transfer manager",
+    "team": "Team",
+    "n_plus_users": "%1+ Users",
+    "url_import_toast_success_3rd_party":  "Your links are being imported to $2, please be patient as this may take a while."
 }

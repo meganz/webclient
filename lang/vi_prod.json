@@ -5959,5 +5959,8 @@
     "you_have_selected_vpn": "B\u1ea1n \u0111\u00e3 l\u1ef1a ch\u1ecdn [S]MEGA\u00a0VPN[/S]",
     "you_have_selected_vpn_trial": "B\u1ea1n \u0111\u00e3 l\u1ef1a ch\u1ecdn [S]h\u1ea1n d\u00f9ng th\u1eed MEGA\u00a0VPN[/S]",
     "you_muted_all_peers": "B\u1ea1n \u0111\u00e3 t\u1eaft ti\u1ebfng t\u1ea5t\u00a0c\u1ea3 c\u00e1c ng\u01b0\u1eddi tham\u00a0gia",
-    "you_muted_peer": "B\u1ea1n \u0111\u00e3 t\u1eaft ti\u1ebfng c\u1ee7a %NAME"
+    "you_muted_peer": "B\u1ea1n \u0111\u00e3 t\u1eaft ti\u1ebfng c\u1ee7a %NAME",
+    "team": "Team",
+    "n_plus_users": "%1+ Users",
+    "url_import_toast_success_3rd_party":  "Your links are being imported to $2, please be patient as this may take a while."
 }

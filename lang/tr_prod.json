@@ -5959,5 +5959,8 @@
     "you_have_selected_vpn": "[S]MEGA\u00a0VPN[/S]\u2019i se\u00e7tiniz",
     "you_have_selected_vpn_trial": "[S]MEGA\u00a0VPN \u00fccretsiz denemesini[/S] se\u00e7tiniz",
     "you_muted_all_peers": "T\u00fcm kat\u0131l\u0131mc\u0131lar\u0131 susturdunuz",
-    "you_muted_peer": "%NAME adl\u0131 ki\u015fiyi susturdunuz"
+    "you_muted_peer": "%NAME adl\u0131 ki\u015fiyi susturdunuz",
+    "team": "Team",
+    "n_plus_users": "%1+ Users",
+    "url_import_toast_success_3rd_party":  "Your links are being imported to $2, please be patient as this may take a while."
 }

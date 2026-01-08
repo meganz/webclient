@@ -5959,5 +5959,17 @@
     "you_have_selected_vpn": "You have selected [S]MEGA\u00a0VPN[/S]",
     "you_have_selected_vpn_trial": "You have selected [S]MEGA\u00a0VPN free trial[/S]",
     "you_muted_all_peers": "You\u2019ve muted all participants",
-    "you_muted_peer": "You\u2019ve muted %NAME"
+    "you_muted_peer": "You\u2019ve muted %NAME",
+"team": {
+        "description": "WEB-19127: Alternative name for the business plan, used as a title for the plan",
+        "other": "Team"
+    },
+    "n_plus_users": {
+        "description": "WEB-19127: String shown when a user is part of a business plan with a minimum number of users. %1 will be replaced with the minimum number of users.",
+        "other": "%1+ Users"
+    },
+	"url_import_toast_success_3rd_party": {
+        "description": "WEB-19014: URL import - success enqueue message for 3rd party links import",
+        "other": "Your links are being imported to $2, please be patient as this may take a while."
+    }
 }

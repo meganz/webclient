@@ -817,9 +817,17 @@ body:not(.mobile) .current .pricing-page.plan-button:hover {
 }
 
 /* If plan block is a part of a Plans list */
-.pricing-page.plans-row {
+/* .pricing-page.plans-row {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+} */
+.pricing-page.plans-row {
+    display: flex;
+    overflow-x: auto;
+}
+.pricing-page.plans-row > * {
+    flex: 1 1 180px;
+    min-width: 180px;
 }
 .plans-row .pricing-page.plan {
     border-width: 0 0 0 1px;

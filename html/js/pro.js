@@ -71,6 +71,8 @@ var pro = {
 
     anyDiscount: false,
 
+    usedDiscountCode: null,
+
     /**
      * Determines if a Business or Pro Flexi account is expired or in grace period
      * @param {Number} accountStatus The account status e.g. from u_attr.b.s (Business) or u_attr.pf.s (Pro Flexi)
@@ -145,7 +147,17 @@ var pro = {
             return false;
         }
 
-        const res = await api.send({a: 'dci', v: 2, dc: u_attr.mkt.dc[0].dc, extra: 1}).catch(nop);
+        let discountCode = u_attr.mkt.dc[0].dc;
+
+        if (pro.usedDiscountCode === discountCode) {
+            const unusedDiscount = u_attr.mkt.dc.find(d => d.dc !== pro.usedDiscountCode);
+            if (!unusedDiscount) {
+                return false;
+            }
+            discountCode = unusedDiscount.dc;
+        }
+
+        const res = await api.send({a: 'dci', v: 2, dc: discountCode, extra: 1}).catch(nop);
 
         return (res && res.ex > Date.now() / 1000)
             ? res

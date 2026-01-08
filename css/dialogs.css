@@ -6414,6 +6414,9 @@ body.de .mega-dialog.contact-picker-widget {
         margin: 0;
         box-sizing: border-box;
     }
+    .mega-dialog.limited-bandwidth-dialog .pricing-page.plans-row {
+        overflow-y: hidden;
+    }
     .mega-dialog.limited-bandwidth-dialog.pro-mini .pricing-page.plans-row {
         margin-top: 32px;
         display: flex;
@@ -6477,6 +6480,9 @@ body.de .mega-dialog.contact-picker-widget {
     .mega-dialog.limited-bandwidth-dialog.offer .offer {
         display: flex;
     }
+    .mega-dialog.limited-bandwidth-dialog.offer .pricing-page.plans-row > *:not(.offer) {
+        padding-top: 40px;
+    }
     .mega-dialog.limited-bandwidth-dialog.offer .pricing-page.plans-row > .offer {
         padding-top: 0;
     }
@@ -6484,8 +6490,7 @@ body.de .mega-dialog.contact-picker-widget {
         display: flex;
         flex-direction: column;
         text-align: unset;
-        padding: 32px 24px;
-        height: 396px;
+        padding: 28px 24px;
     }
     .mega-dialog.limited-bandwidth-dialog.pro-mini .pricing-page.plans-row > *:not(.starter) {
         padding: 12px 16px 12px 24px;
@@ -6588,6 +6593,12 @@ body.de .mega-dialog.contact-picker-widget {
     .mega-dialog.limited-bandwidth-dialog section * {
         font-family: var(--text-font-family);
     }
+    .mega-dialog.limited-bandwidth-dialog .monthly .pricing-page.plan-features.users {
+        font: var(--text-body1);
+    }
+    .mega-dialog.limited-bandwidth-dialog .yearly .pricing-page.plan-features.users {
+        display: none;
+    }
     .mega-dialog.limited-bandwidth-dialog:not(.pro3):not(.no-cards) section .content-block .messages > *,
     .mega-dialog.limited-bandwidth-dialog .pricing-page.plan-only,
     .mega-dialog.limited-bandwidth-dialog .pricing-page.currency-and-period,
@@ -6631,6 +6642,12 @@ body.de .mega-dialog.contact-picker-widget {
     }
     .mega-dialog.limited-bandwidth-dialog .pricing-page.plan-only.strikethrough {
         text-decoration: line-through;
+    }
+    .mega-dialog.limited-bandwidth-dialog .pricing-page.info-and-button-wrapper {
+        margin-top: auto;
+    }
+    .mega-dialog.limited-bandwidth-dialog .pricing-page.info-and-button-wrapper button.mega-button {
+        margin-top: 12px;
     }
     .mega-dialog.limited-bandwidth-dialog section i.img-dialog-overquota-storage {
         width: 128px;
@@ -11143,4 +11160,32 @@ body.de .mega-dialog.contact-picker-widget {
 
 .theme-dark .mega-sheet.discount-offer .close {
     color: var(--mobile-button-primary-pressed);
+}
+
+@supports selector(::-webkit-scrollbar) {
+
+    .mega-dialog.limited-bandwidth-dialog .pricing-page.plans-block * {
+        scrollbar-color: auto;
+        scrollbar-width: auto;
+    }
+
+    .mega-dialog.limited-bandwidth-dialog .pricing-page.plans-block ::-webkit-scrollbar {
+        height: 8px;
+        width: 8px;
+    }
+
+    .mega-dialog.limited-bandwidth-dialog .pricing-page.plans-block ::-webkit-scrollbar-track {
+        box-shadow: none;
+        border-radius: 4px;
+    }
+
+    .mega-dialog.limited-bandwidth-dialog .pricing-page.plans-block ::-webkit-scrollbar-thumb {
+        border-radius: 4px;
+        background: var(--scroll-bar-handle);
+        box-shadow: none;
+    }
+
+    .mega-dialog.limited-bandwidth-dialog .pricing-page.plans-block ::-webkit-scrollbar-thumb:window-inactive {
+        background: var(--scroll-bar-handle-inactive);
+    }
 }

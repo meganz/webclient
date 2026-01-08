@@ -1591,8 +1591,15 @@ var dlmanager = {
             }
 
             if ($(this).hasClass('plan-button')) {
-                sessionStorage.fromOverquotaPeriod = $(this).parent().data('period') || pro.proplan.period;
-                open(getAppBaseUrl() + '#propay_' + $(this).closest('.plan').data('payment'));
+                const planNum = $(this).closest('.plan').data('payment');
+                if (planNum === pro.ACCOUNT_LEVEL_BUSINESS) {
+                    open(getAppBaseUrl() + '#registerb');
+                    eventlog(501041, true);
+                }
+                else {
+                    sessionStorage.fromOverquotaPeriod = $(this).parent().data('period') || pro.proplan.period;
+                    open(getAppBaseUrl() + '#propay_' + planNum);
+                }
             }
             else {
                 if (flags & dlmanager.LMT_PRO3) {
@@ -1802,9 +1809,11 @@ var dlmanager = {
                 .attr('data-period', 1);
         }
         else {
-            const planIds = pro.filter.plans.coreM.map(p => p[pro.UTQA_RES_INDEX_ACCOUNTLEVEL]);
+            const planIds = pro.sortPlansByStorage(
+                Array.from(pro.filter.simple.obqDialog).filter(p => pro.getPlanObj(p))
+            );
 
-            for (let i = 0; i < Math.min(planIds.length, 4); i++) {
+            for (let i = 0; i < planIds.length; i++) {
                 const id = planIds[i];
                 const $newNode = $pricingBoxTemplate.clone(true).appendTo($pricingBoxTemplate.parent());
                 $newNode.removeClass('template').addClass(`pro${id}`).attr('data-payment', id);
@@ -1830,7 +1839,7 @@ var dlmanager = {
         return typeof res.mstrg === 'number' ? res : M.getStorageQuota();
     },
 
-    setPlanPrices($dialog, ignoreStorageReq) {
+    async setPlanPrices($dialog, ignoreStorageReq) {
         'use strict';
 
         var $scrollBlock = $('.scrollable', $dialog);
@@ -1838,66 +1847,76 @@ var dlmanager = {
         // Set scroll to top
         $scrollBlock.scrollTop(0);
 
+        await M.require('businessAcc_js');
+        const business = new BusinessAccount();
+
+        const awaitItems = [
+            !ignoreStorageReq && this.getRequiredStorageQuota(),
+            business.getBusinessPlanInfo(false),
+            pro.loadMembershipPlans()
+        ];
+
         // Load the membership plans, and the required storage quota if needed
-        return Promise.all([!ignoreStorageReq && this.getRequiredStorageQuota(), pro.loadMembershipPlans()])
-            .then(([storageObj]) => {
+        const [storageObj, businessPlanInfo] = await Promise.all(awaitItems);
 
-                const slideshowPreview = slideshowid && is_video(M.getNodeByHandle(slideshowid));
-                const isStreaming = !dlmanager.isDownloading && (dlmanager.isStreaming || slideshowPreview);
+        pro.businessPlanData = businessPlanInfo;
+        pro.planObjects.createBusinessPlanObject(businessPlanInfo);
 
-                const requiredQuota = storageObj.mstrg || 0;
+        const slideshowPreview = slideshowid && is_video(M.getNodeByHandle(slideshowid));
+        const isStreaming = !dlmanager.isDownloading && (dlmanager.isStreaming || slideshowPreview);
 
-                const freeOrLowerTier = !Object(self.u_attr).p ||
-                    [
-                        pro.ACCOUNT_LEVEL_STARTER,
-                        pro.ACCOUNT_LEVEL_BASIC,
-                        pro.ACCOUNT_LEVEL_ESSENTIAL
-                    ].includes(u_attr.p);
+        const requiredQuota = storageObj.mstrg || 0;
 
-                const lowestRequiredMiniPlan = freeOrLowerTier
-                    && pro.filter.lowestRequired(requiredQuota, 'miniPlans', ignoreStorageReq);
-                const lowestPlanIsMini = !!lowestRequiredMiniPlan;
+        const freeOrLowerTier = !Object(self.u_attr).p ||
+            [
+                pro.ACCOUNT_LEVEL_STARTER,
+                pro.ACCOUNT_LEVEL_BASIC,
+                pro.ACCOUNT_LEVEL_ESSENTIAL
+            ].includes(u_attr.p);
 
-                let miniPlanId;
-                if (lowestPlanIsMini) {
-                    $dialog.addClass('pro-mini');
+        const lowestRequiredMiniPlan = freeOrLowerTier
+            && pro.filter.lowestRequired(requiredQuota, 'miniPlans', ignoreStorageReq);
+        const lowestPlanIsMini = !!lowestRequiredMiniPlan;
 
-                    if (isStreaming) {
-                        $dialog.addClass('no-cards');
-                    }
-                    miniPlanId = lowestPlanIsMini ? lowestRequiredMiniPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL] : '';
+        let miniPlanId;
+        if (lowestPlanIsMini) {
+            $dialog.addClass('pro-mini');
+
+            if (isStreaming) {
+                $dialog.addClass('no-cards');
+            }
+            miniPlanId = lowestPlanIsMini ? lowestRequiredMiniPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL] : '';
+        }
+
+        // Update the blurb text of the dialog
+        dlmanager.updateOBQDialogBlurb($dialog, miniPlanId, isStreaming);
+
+        // Render the plan details if required
+        if (!$dialog.hasClass('no-cards')) {
+            dlmanager.prepareOBQDialogPlans($dialog, lowestPlanIsMini, miniPlanId);
+        }
+
+        if (dlmanager.isOverQuota) {
+            dlmanager._overquotaInfo();
+        }
+
+        if (!is_mobile) {
+
+            // Check if touch device
+            var is_touch = function() {
+                return 'ontouchstart' in window || 'onmsgesturechange' in window;
+            };
+
+            // Initialise scrolling
+            if (!is_touch()) {
+                if ($scrollBlock.is('.ps')) {
+                    Ps.update($scrollBlock[0]);
                 }
-
-                // Update the blurb text of the dialog
-                dlmanager.updateOBQDialogBlurb($dialog, miniPlanId, isStreaming);
-
-                // Render the plan details if required
-                if (!$dialog.hasClass('no-cards')) {
-                    dlmanager.prepareOBQDialogPlans($dialog, lowestPlanIsMini, miniPlanId);
+                else {
+                    Ps.initialize($scrollBlock[0]);
                 }
-
-                if (dlmanager.isOverQuota) {
-                    dlmanager._overquotaInfo();
-                }
-
-                if (!is_mobile) {
-
-                    // Check if touch device
-                    var is_touch = function() {
-                        return 'ontouchstart' in window || 'onmsgesturechange' in window;
-                    };
-
-                    // Initialise scrolling
-                    if (!is_touch()) {
-                        if ($scrollBlock.is('.ps')) {
-                            Ps.update($scrollBlock[0]);
-                        }
-                        else {
-                            Ps.initialize($scrollBlock[0]);
-                        }
-                    }
-                }
-            });
+            }
+        }
     },
 
     showLimitedBandwidthDialog: function(res, callback, flags) {

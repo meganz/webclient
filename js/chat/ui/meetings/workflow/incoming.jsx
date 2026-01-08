@@ -107,7 +107,7 @@ export default class Incoming extends React.Component {
             const { unsupported } = this.state;
             const CALL_IN_PROGRESS = window.sfuClient;
             const isPrivateRoom = chatRoom.type === 'private';
-            const rejectLabel = isPrivateRoom ? l[20981] /* `Reject` */ : l[82] /* `Cancel` */;
+            const rejectLabel = isPrivateRoom ? l[20981] /* `Reject` */ : l.msg_dlg_cancel;
 
             return (
                 <ModalDialogsUI.ModalDialog

@@ -4,138 +4,157 @@
 
 /* All clients */
 
-.psa-holder .mega-component.anouncement {
-    --icon-size: 24px;
-    border-top: 1px solid rgba(0, 0, 0, 0.05);
+.psa-notification .download.main-pad {
+    height: 100%;
+}
+
+.psa-notification .float-video {
+    z-index: 1101;
+}
+
+.psa-holder {
+    position: absolute;
     bottom: 0;
-    box-sizing: border-box;
-    display: flex;
-    padding: 24px;
-    position: fixed;
-    top: auto;
     width: 100%;
+    background: var(--mobile-page-background);
+    z-index: 1100;
+}
+
+.loading .psa-holder {
     z-index: 1400;
 }
 
-.psa-holder .mega-component.banner.anouncement {
-    background: linear-gradient(to bottom, #ffffff 0%, #eeeeee 100%);
-}
-
-.theme-dark .psa-holder .mega-component.banner.anouncement {
-    background: linear-gradient(to bottom, rgb(60, 60, 60) 0%, rgb(51, 51, 51) 100%);
-}
-
-.psa-holder .mega-component.anouncement .content-box {
-    align-items: flex-start;
-    display: flex;
-    flex: initial;
-    flex-direction: column;
-    margin: auto;
-    margin-inline-start: 0;
-	padding: 0 24px;
-}
-
-/* Gap for all content child elems */
-
-.psa-holder .mega-component.anouncement .content-box > * {
-    margin-top: 8px;
-    padding: 0;
-}
-
-.psa-holder .mega-component.anouncement .content-box > *:empty,
-.psa-holder .mega-component.anouncement .content-box > *:first-child {
-    margin-top: 0;
-}
-
-/* Component attribute styles */
-
-.psa-holder .mega-component.anouncement .title-text {
-    color: var(--text-color-high);
-    font: var(--text-h3);
-    width: 100%;
-}
-
-.psa-holder .mega-component.anouncement .message-text {
-    color: var(--text-color-medium);
-    font: var(--text-body1);
-}
-
-.psa-holder .mega-component.anouncement img {
-    height: 128px;
-    width: 128px;
-    margin-inline-start: auto;
-}
-
-.psa-holder .mega-component.anouncement .content-box .mega-button {
-    margin-top: 8px;
-}
-
-.psa-holder .mega-component.anouncement .mega-button.icon {
-    margin: 0;
-}
-
-.psa-holder .mega-component.anouncement .end-box {
-    align-items: initial;
-    justify-content: initial;
-    padding: 0;
-}
-
-/* end of common */
-
-/* Mobile overrides */
-
-.mobile .psa-holder {
-    grid-row: 5 / 6;
-}
-
-.mobile .psa-holder .mega-component.banner.anouncement,
-.mobile.theme-dark .psa-holder .mega-component.banner.anouncement {
-    background: var(--mobile-surface-2);
-}
-
-.mobile .psa-holder .mega-component.anouncement .content-box {
-    flex: 1 1 auto;
-    flex-flow: row wrap;
-    margin: unset;
-    padding: 0 8px;
-}
-
-/* Component attribute styles */
-
-.mobile .psa-holder .mega-component.anouncement .message-text {
-    color: var(--mobile-text-primary);
-    font: var(--mobile-font-caption-large-regular);
-    padding-inline-end: 8px;
-}
-
-.mobile .psa-holder .mega-component.anouncement .action-link span {
-    color: var(--mobile-text-primary);
-    font: var(--mobile-font-link-small-bold);
-    text-decoration: underline;
-}
-
-.mobile .psa-holder .mega-component.anouncement .mega-button.icon {
-     --mask-color: var(--mobile-text-primary);
-}
-.mobile .psa-holder .mega-component.banner {
-    padding: 16px;
-}
-.mobile .psa-holder .mega-component.banner .content-box > * {
-    margin-top: 4px;
-}
-
-.mobile .psa-holder .mega-component.anouncement {
-    position: static;
+.overlayed .psa-holder {
+    filter: blur(0.25em);
     z-index: auto;
 }
 
-.mobile .psa-holder .mega-component.anouncement .banner.title-text {
-    font: var(--mobile-font-copy-bold);
+.psa-holder .mega-component.anouncement {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: auto;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 16px * 2); 
+    box-sizing: border-box;
+    padding: 14px 20px;
+    border: 0;
+    border-radius: 12px;
 }
 
-.mobile .psa-holder .mega-component.anouncement img {
+.rtl .psa-holder .mega-component.anouncement {
+    direction: rtl;
+    left: auto;
+    right: 50%;
+    transform: translateX(50%);
+}
+
+.psa-holder .mega-component.banner.anouncement {
+    background: linear-gradient(to right, rgba(198, 130, 246, 0.1) -20.78%, rgba(239, 131, 134, 0.1) 80.61%), var(--mobile-page-background);
+}
+
+.rtl .psa-holder .mega-component.banner.anouncement {
+    background: linear-gradient(to left, rgba(198, 130, 246, 0.1) -20.78%, rgba(239, 131, 134, 0.1) 80.61%), var(--mobile-page-background);
+}
+
+.theme-dark .psa-holder .mega-component.banner.anouncement {
+    background: linear-gradient(to right, rgba(86, 2, 146, 0.2) -20.78%, rgba(201, 0, 50, 0.2) 87.18%), var(--mobile-page-background);
+}
+
+.rtl.theme-dark .psa-holder .mega-component.banner.anouncement {
+    background: linear-gradient(to left, rgba(86, 2, 146, 0.2) -20.78%, rgba(201, 0, 50, 0.2) 87.18%), var(--mobile-page-background);
+}
+
+.psa-holder .mega-component.anouncement .banner-image {
+    position: absolute;
+    top: 50%;
+    left: 28px;
+    right: auto;
+    transform: translateY(-50%);
+}
+
+.rtl .psa-holder .mega-component.anouncement .banner-image {
+    left: auto;
+    right: 28px;
+}
+
+.psa-holder .mega-component.anouncement .banner-image img {
     height: 64px;
     width: 64px;
+}
+
+.psa-holder .mega-component.anouncement .banner-content {
+    display: flex;
+    padding: 4px 12px 4px 98px;
+}
+
+.rtl .psa-holder .mega-component.anouncement .banner-content {
+    padding-left: 12px;
+    padding-right: 98px;
+}
+
+.psa-holder .mega-component.anouncement .banner-message {
+    flex: 1 1 auto;
+}
+
+.psa-holder .mega-component.anouncement .banner-message .banner-title {
+    margin: 0 0 8px;
+    font: var(--mobile-font-copy-semibold);
+}
+
+.psa-holder .mega-component.anouncement .banner-message .banner-text {
+    font: var(--mobile-font-caption-large-regular);
+}
+
+.psa-holder .mega-component.anouncement .banner-actions {
+    display: flex;
+    flex-wrap: wrap;
+    padding-left: 98px;
+}
+
+.rtl .psa-holder .mega-component.anouncement .banner-actions {
+    padding-left: 0;
+    padding-right: 98px;
+}
+
+.psa-holder .mega-component.anouncement .banner-actions button {
+    margin-top: 12px;
+}
+
+.psa-holder .mega-component.anouncement .banner-actions button:not(:last-child) {
+    margin-right: 16px;
+}
+
+.rtl .psa-holder .mega-component.anouncement .banner-actions button:not(:last-child) {
+    margin-left: 16px;
+    margin-right: 0;
+}
+
+.psa-holder .mega-component.anouncement .banner-actions button span {
+    display: inline-block;
+    text-align: left;
+    font: var(--mobile-font-link-small-semibold);
+}
+
+.rtl .psa-holder .mega-component.anouncement .banner-actions button span {
+    text-align: right;
+}
+
+.psa-holder .mega-component.anouncement .banner-close button {
+    position: absolute;
+    top: 12px;
+    right: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.rtl .psa-holder .mega-component.anouncement .banner-close button {
+    left: 0;
+    right: auto;
 }
 
 /* Queue advertisement banners if PSA is visible */
@@ -143,5 +162,114 @@
 .psa-notification .mega-component.banner.advertisement {
     display: none;
 }
+
+/* end of common */
+
+/* Large screens */
+
+@media (min-width: 1080px) {
+    .psa-holder .mega-component.anouncement {
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .psa-holder .mega-component.anouncement .banner-content {
+        flex: 1 1 auto;
+        align-items: center;
+    }
+
+    .psa-holder .mega-component.anouncement .banner-actions {
+        flex: 0 0 auto;
+        align-self: stretch;
+        padding: 0 0 0 26px;
+        border-left: 1px solid #DBD3D4;
+    }
+
+    .rtl .psa-holder .mega-component.anouncement .banner-actions {
+        padding-left: 0;
+        padding-right: 26px;
+        border-left: 0;
+        border-right: 1px solid #DBD3D4;
+    }
+
+    .psa-holder .mega-component.anouncement .banner-actions button {
+        flex: 0 0 auto;
+        align-self: center;
+        margin-top: 0;
+    }
+
+    .psa-holder .mega-component.anouncement .banner-close button {
+        position: static;
+        margin-left: 26px;
+    }
+
+    .rtl .psa-holder .mega-component.anouncement .banner-close button {
+        margin-left: auto;
+        margin-right: 26px;
+    }
+}
+
+/* End of large screens */
+
+/* Mobile overrides */
+
+.mobile .psa-holder {
+    grid-row: 5 / 6;
+    position: static;
+    z-index: auto;
+}
+
+.mobile .psa-holder .mega-component.anouncement,
+.mobile.rtl .psa-holder .mega-component.anouncement,
+.mobile.theme-dark .psa-holder .mega-component.banner.anouncement,
+.mobile.rtl.theme-dark .psa-holder .mega-component.banner.anouncement {
+    position: relative;
+    bottom: 0;
+    border-radius: 0;
+    width: 100%;
+    background: var(--mobile-surface-2);
+}
+
+.mobile .psa-holder .mega-component.anouncement .banner-image {
+    top: 20px;
+    left: 16px;
+    transform: none;
+}
+
+.mobile.rtl .psa-holder .mega-component.anouncement .banner-image {
+    right: 16px;
+}
+
+.mobile .psa-holder .mega-component.anouncement .banner-content {
+    padding-left: 72px;
+}
+
+.mobile.rtl .psa-holder .mega-component.anouncement .banner-content {
+    padding-left: 12px;
+    padding-right: 72px;
+}
+
+.mobile .psa-holder .mega-component.anouncement .banner-actions {
+    padding-left: 72px;
+}
+
+.mobile.rtl .psa-holder .mega-component.anouncement .banner-actions {
+    padding-right: 72px;
+}
+
+.mobile .psa-holder .mega-component.anouncement .banner-actions button.mobile-secondary {
+    font-weight: normal;
+}
+
+.mobile .psa-holder .mega-component.anouncement .banner-actions .action-link span {
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-link-small-bold);
+    text-decoration: underline;
+}
+
+.mobile .psa-holder .mega-component.anouncement .banner-actions .action-link span.secondary-text {
+    font: var(--mobile-font-link-small-regular);
+}
+
 
 /* end of Mobile */

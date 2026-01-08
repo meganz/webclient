@@ -1286,6 +1286,9 @@
     gap: 8px;
     height: 40px;
 }
+.chat-settings .chat-row .flex-1 .subtitle-txt {
+    max-width: unset;
+}
 .chat-settings .chat-txt {
     font: var(--text-body2);
     font-size: 12px;

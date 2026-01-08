@@ -1052,7 +1052,7 @@ function avatarDialog(close) {
                 <span>@@</span>
             </button>
         </div>`,
-        l[82],
+        l.msg_dlg_cancel,
         l[1016],
         l[1017],
         l[6974]
@@ -2073,15 +2073,9 @@ function createFolderDialog(close) {
                     return awaitingPromise;
                 }
 
-                const {type, original} = M.currentCustomView;
-                let id = type === mega.devices.rootId ? original : M.getNodeByHandle(h).p || target;
-                if (
-                    M.currentrootid === 'out-shares' ||
-                    M.currentrootid === 'file-requests' ||
-                    M.currentrootid === 'public-links'
-                ) {
-                    id = `${M.currentrootid}/${id}`;
-                }
+                // If this is custom view, we need to open custom view folder instead
+                const {original} = M.currentCustomView;
+                const id = original || M.getNodeByHandle(h).p || target;
 
                 // By default, auto-select the newly created folder as long no awaiting promise
                 return M.openFolder(id)

@@ -269,7 +269,7 @@ lazy(mega.devices, 'ui', () => {
                 if (!err && is) {
                     if (typeof is === 'object' && is.v && M.vtol(is.v) < M.vtol(this.config.minVersion)) {
                         msgDialog(
-                            `confirmation:!^${l[20826]}!${l[1597]}`,
+                            `confirmation:!^${l[20826]}!${l.msg_dlg_cancel}`,
                             l[23967],
                             l.outdated_app_ver,
                             undefined,
@@ -507,7 +507,7 @@ lazy(mega.devices, 'ui', () => {
                         return false;
                     }
 
-                    let type = `-remove:!^${ l.stop_syncing_button}!${l[1597]}`;
+                    let type = `-remove:!^${ l.stop_syncing_button}!${l.msg_dlg_cancel}`;
                     let title = l.stop_syncing_dialog_title;
                     let info = l.stop_syncing_info;
 
@@ -602,7 +602,7 @@ lazy(mega.devices, 'ui', () => {
                     : l.dc_pause_sync;
 
                 msgDialog(
-                    `confirmation:!^${pauseText}!${l[1597]}`,
+                    `confirmation:!^${pauseText}!${l.msg_dlg_cancel}`,
                     '',
                     pauseText,
                     l.dc_pause_sync_confirm_desc,

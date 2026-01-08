@@ -213,7 +213,7 @@ lazy(s4, 'utils', () => {
             // Show confirmation dialog
             if (title && message && !mega.config.get(cfgName)) {
                 return asyncMsgDialog(
-                    `confirmation:!^${toMove ? l[62] : l[63]}!${l[82]}`,
+                    `confirmation:!^${toMove ? l[62] : l[63]}!${l.msg_dlg_cancel}`,
                     null,
                     title,
                     message,
@@ -306,7 +306,7 @@ lazy(s4, 'utils', () => {
 
                 const hiddenAcknowledged = () => (sensitives.length && !mega.config.get('skipSenToS4'))
                     ? asyncMsgDialog(
-                        `confirmationb:!^${l[507]}!${l[82]}`,
+                        `confirmationb:!^${l[507]}!${l.msg_dlg_cancel}`,
                         null,
                         l.sen_s4_warn_title,
                         l.sen_s4_warn_txt,

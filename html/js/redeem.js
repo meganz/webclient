@@ -729,7 +729,7 @@ var redeem = {
                 greenBtnText = l[19516];
                 if (window.bCreatedVoucher || u_type === 3) {
                     greenBtnText = l[458];
-                    whiteBtnText = l[82];
+                    whiteBtnText = l.msg_dlg_cancel;
                     descText = l[23496];
                 }
             }
@@ -812,7 +812,7 @@ var redeem = {
                 // pro voucher redemption
                 if (u_type === 3) {
                     greenBtnText = l[458];
-                    whiteBtnText = l[82];
+                    whiteBtnText = l.msg_dlg_cancel;
                     descText = l[23496];
                 }
 
@@ -821,7 +821,7 @@ var redeem = {
                     $greenBtn.addClass('disabled');
                     descText = l[23541];
                     $dlgTitle.addClass('red');
-                    whiteBtnText = l[82];
+                    whiteBtnText = l.msg_dlg_cancel;
                     $whiteBtn.attr('bFail', 1);
                 }
 

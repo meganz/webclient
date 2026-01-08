@@ -620,7 +620,7 @@ export class TypingArea extends MegaRenderMixin {
                 <Button
                     key="cancel"
                     className={className}
-                    label={l[1718] /* `Cancel` */}
+                    label={l.msg_dlg_cancel}
                     onClick={self.onCancelClicked.bind(self)}
                 />
             ];

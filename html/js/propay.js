@@ -1002,7 +1002,7 @@ pro.propay = {
                         resolve(2);
                     },
                     cancel: {
-                        label: l[82],
+                        label: l.msg_dlg_cancel,
                         callback: () => {
                             resolve(2);
                         }
@@ -1166,7 +1166,7 @@ pro.propay = {
             blockerTitle = l.free_trial_unavailable;
             blockerText = l.subs_to_make_online_life_x;
             btnLabel = l.subscribe_btn;
-            btnLabelCancel = l[82];
+            btnLabelCancel = l.msg_dlg_cancel;
             canContinue = true;
         }
 

@@ -312,6 +312,11 @@ if (typeof loadingDialog === 'undefined') {
             $('.main-loader', $spinner).addClass('hidden');
         }
 
+        // If the PSA is visible reposition loading bar
+        if (typeof psa !== 'undefined') {
+            psa.repositionLoadingBar();
+        }
+
         $('.loader-progressbar', $spinner).addClass('active');
 
         if (progress) {
@@ -401,7 +406,7 @@ if (typeof loadingInitDialog === 'undefined') {
 
             // If the PSA is visible reposition the account loading bar
             if (typeof psa !== 'undefined') {
-                psa.repositionAccountLoadingBar();
+                psa.repositionLoadingBar();
             }
         }
         if (progress) {
@@ -1132,7 +1137,8 @@ scparser.$add('t', function(a, scnodes) {
             n: targetid,
             u: a.ou,
             f: pnodes,
-            ver
+            ver,
+            mid: a.mid
         });
     }
 

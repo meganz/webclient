@@ -456,7 +456,7 @@ function eventlog(id, msg, once) {
             }
         }
 
-        if (id > 99799 && self.buildOlderThan10Days) {
+        if (id > 99799 && self.buildOlderThan10Days && !eventlog.ignore10d.has(id)) {
             return self.d && console.info('eventlog(%d)', id, once, [req]);
         }
 
@@ -471,7 +471,9 @@ function eventlog(id, msg, once) {
 }
 
 eventlog.sent = Object.create(null);
-
+eventlog.ignore10d = new Set([
+    99988, 500510, 501024
+]);
 
 /**
  * Network connectivity watcher.

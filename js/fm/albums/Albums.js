@@ -951,7 +951,7 @@ lazy(mega.gallery, 'albums', () => {
                     classes: ['mega-button', 'branded-green']
                 },
                 cancel: {
-                    label: l[82]
+                    label: l.msg_dlg_cancel
                 },
                 dialogClasses: null,
                 icon: 'sprite-fm-uni icon-question icon-size-16'

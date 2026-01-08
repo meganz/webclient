@@ -2670,6 +2670,10 @@ var addressDialog = {
             $('.grace-business', '.fm-banner-holder').removeClass('visible');
         }
 
+        pro.getTargetedDiscountInfo().then((dci) => {
+            mega.ui.header.showTargetedDiscountButton(dci);
+        });
+
         if (parseInt(pro.propay.planNum) === pro.ACCOUNT_LEVEL_FEATURE_VPN) {
             this.showSuccessCloak(
                 l[6961],
@@ -2861,7 +2865,7 @@ var addressDialog = {
                         : l.pwm_free_trial_used_h;
 
                     msgDialog(
-                        `confirmationa:!^${l.subscribe_btn}!${l[82]}`,
+                        `confirmationa:!^${l.subscribe_btn}!${l.msg_dlg_cancel}`,
                         '',
                         warningTitle,
                         l.vpn_free_trial_used_b,

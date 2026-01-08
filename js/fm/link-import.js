@@ -4,7 +4,7 @@ lazy(mega, 'linkImport', () => {
 
     let dialog;
     let urlInput;
-    let importLinks = [];
+    let importLinks = new Set();
     let importTarget;
     const iframeWrapper = document.createElement('div');
     const iframeLoader = (() => {
@@ -86,34 +86,39 @@ lazy(mega, 'linkImport', () => {
             && isPublicLink(s.pathname + s.hash)) {
             return 'mega';
         }
-        // Google for later
-        // else if (s.host === 'drive.google.com' &&
-        //     (s.pathname.startsWith('/file/') || s.pathname.startsWith('/drive/folders/'))) {
-        //     return 'google';
-        // }
+        else if (s.host === 'drive.google.com' &&
+            (s.pathname.startsWith('/file/') || s.pathname.startsWith('/drive/folders/')) ||
+            s.host === 'docs.google.com' &&
+            (s.pathname.startsWith('/document/d/') || s.pathname.startsWith('/spreadsheets/d/') ||
+            s.pathname.startsWith('/presentation/d/') || s.pathname.startsWith('/videos/d/'))
+        ) {
+            return 'google';
+        }
     };
+
+    const linkImportRequestStates = Object.freeze({
+        PENDING: 0,
+        IN_PROGRESS: 1,
+        SUCCESS: 2,
+        CANCELLED: 3,
+        ERROR: 4
+    });
 
     const handlers = {
 
         mega: {
 
-            linkHandler(url, link) {
+            linkHandler(link) {
 
                 return new Promise((resolve, reject) => {
 
-                    const urlObj = link.url = new URL(url);
-                    const linkProvider = _getUrlType(urlObj);
-
-                    link.raw = url;
-                    link.provider = linkProvider;
-
-                    if (linkProvider !== 'mega') {
+                    if (link.provider !== 'mega') {
                         return reject(l.url_import_invalid_link);
                     }
 
-                    iframeLoader.run(urlObj, async iframe => {
+                    iframeLoader.run(link.url, async iframe => {
 
-                        const loadRes = await handlers.mega.iframeLoad(iframe, urlObj);
+                        const loadRes = await handlers.mega.iframeLoad(iframe, link.url);
 
                         if (loadRes === 'file' || loadRes === 'folder') {
 
@@ -260,13 +265,184 @@ lazy(mega, 'linkImport', () => {
                 }
 
                 return Object.create(null);
+            },
+            async import(link, targetHandle) {
+
+                const {url} = link;
+                let res;
+
+                await iframeLoader.run(url, async iframe => {
+
+                    const loadRes = await handlers.mega.iframeLoad(iframe, url);
+
+                    if (loadRes === 'folder') {
+
+                        const cw = iframe.contentWindow;
+
+                        res = await cw.M.getCopyNodes([cw.M.RootID], {clearna: true}).then(nodes => {
+                            nodes.isImporting = true;
+                            cw.resetSensitives();
+
+                            if (cw.pfcol && nodes[0].t > 1) {
+                                nodes[0].t = 1;
+                            }
+
+                            M.copyNodes([cw.M.RootID], targetHandle, false, nodes);
+                        }).catch(echo);
+                    }
+                    else {
+                        mega.ui.toast.show(`${loadRes} - ${url}`, 4);
+                    }
+                });
+
+                return res;
+            }
+        },
+
+        google: {
+            icon: 'sprite-fm-uni icon-googledrive',
+            PROVIDER_ID: 1,
+            _friendlyError(err) {
+
+                if (typeof err === 'string') {
+                    return err;
+                }
+
+                if (typeof err === 'number') {
+                    if (err === ETOOMANY) {
+                        return l.url_import_terms_violation;
+                    }
+
+                    if (err === ETEMPUNAVAIL) {
+                        return l.url_import_temporarily_unavailable;
+                    }
+
+                    return l.url_import_invalid_link;
+                }
+
+                if (err && err.cc === 2) {
+                    return l.url_import_temporarily_unavailable;
+                }
+
+                return l.url_import_invalid_link;
+            },
+            async linkHandler(link) {
+
+                if (link.provider !== 'google') {
+                    throw l.url_import_invalid_link;
+                }
+
+                const {result: jobId} = await api.req({
+                    a: 'mspq',
+                    tp: 4,
+                    p: this.PROVIDER_ID,
+                    e: {ls: [link.raw]}
+                }).catch(ex => {
+                    throw this._friendlyError(ex);
+                });
+
+                if (typeof jobId === 'number' && jobId < 0) {
+                    throw this._friendlyError(jobId);
+                }
+
+                let metadata;
+
+                const _fetchStatus = async() => {
+
+                    const {result} = await api.req({a: 'mspf', id: jobId}).catch(ex => {
+                        throw this._friendlyError(ex);
+                    });
+
+                    if (typeof result === 'number' && result < 0) {
+                        throw this._friendlyError(result);
+                    }
+
+                    const {SUCCESS, ERROR, CANCELLED} = linkImportRequestStates;
+
+                    if (result.s === SUCCESS) {
+
+                        const {items} = result.d;
+                        metadata = items[link.raw];
+                    }
+                    else if (result.s === ERROR || result.s === CANCELLED) {
+                        throw l.url_import_invalid_link;
+                    }
+                    else {
+                        await tSleep(5);
+                        return _fetchStatus();
+                    }
+                };
+
+                await _fetchStatus();
+
+                if (!metadata) {
+                    throw l.url_import_invalid_link;
+                }
+
+                link.nodeHandle = `ext-google-${jobId}-${Date.now()}`;
+                link.nodeData = {
+                    name: metadata.n || link.raw
+                };
+
+                if (metadata.t === 1) {
+                    link.type = 'file';
+                    link.nodeData = {
+                        name: metadata.n,
+                        t: 0,
+                        s: metadata.b || 0,
+                    };
+                }
+                else {
+                    link.type = 'folder';
+                    link.nodeData = {
+                        name: link.raw,
+                        t: 1,
+                        td: metadata.d,
+                        tf: metadata.f,
+                        tb: metadata.b || 0
+                    };
+                }
+            },
+            async import(links, targetHandle) {
+
+                const node = M.getNodeByHandle(targetHandle);
+                const writableKey = a32_to_base64([...crypto.getRandomValues(new Uint32Array(4))]);
+                const sres = await api_setshare(targetHandle, [{u: 'EXP', r: 0, w: writableKey, t: 2}]).catch(echo);
+                const share = M.getNodeShare(targetHandle);
+
+                if (!sres || sres.r && sres.r[0] !== 0) {
+                    throw l.url_import_temporarily_unavailable;
+                }
+
+                const results = [];
+
+                for (const link of links) {
+
+                    const {result: ires} = await api.req({
+                        a: 'msq',
+                        tp: 8,
+                        ph: node.ph,
+                        e: {
+                            ls: [link],
+                            tph: node.ph,
+                            tek: a32_to_base64(u_sharekeys[targetHandle][0]),
+                            tak: share.w
+                        }
+                    }).catch(ex => {
+                        throw this._friendlyError(ex);
+                    });
+
+                    results.push(ires);
+                }
+
+                return results;
             }
         }
     };
 
     const killIframes = () => {
         iframeLoader.destroy();
-        importLinks = [];
+        importLinks = new Set();
         iframeWrapper.textContent = '';
     };
 
@@ -345,42 +521,54 @@ lazy(mega, 'linkImport', () => {
                     className: 'slim',
                     action: async() => {
 
-                        const raw = urlInput.textArea.value.trim();
-                        const duplicateCheck = [];
-                        const rawLinks = raw.split(/[\n,]+/);
+                        const raw = urlInput.textArea.value;
+                        const rawLinks = new Set();
+                        for (const part of raw.split(/[\n,]+/)) {
+                            const trimmed = part.trim();
+                            if (trimmed) {
+                                rawLinks.add(trimmed);
+                            }
+                        }
                         let errored = 0;
 
                         const _ = (ex, link) => {
                             link.err = !link.url || !link.provider ? l.url_import_invalid_link : ex;
                             errored++;
                         };
-                        importLinks = []; // reset
 
                         loadingDialog.show('url-import');
 
                         killIframes();
+                        importLinks = new Set();
+                        let i = 0;
 
-                        for (let i = 0; i < rawLinks.length; i++) {
+                        for (const linkStr of rawLinks) {
 
-                            const linkStr = rawLinks[i].trim();
-
-                            if (!linkStr || duplicateCheck.includes(linkStr)) {
-                                continue;
-                            }
-
-                            duplicateCheck.push(linkStr);
+                            i++;
 
                             const link = Object.create(null);
-                            importLinks[i] = link;
+                            importLinks.add(link);
                             link.raw = linkStr;
+                            link.url = tryCatch(() => new URL(linkStr), false)();
+                            if (link.url) {
+                                link.provider = _getUrlType(link.url);
 
-                            if (d) {
-                                console.log('Processing link for import:', linkStr, 'count:', i);
+                                if (link.provider) {
+                                    if (d) {
+                                        console.log('Processing link for import:', linkStr, 'count:', i);
+                                    }
+
+                                    await handlers[link.provider].linkHandler(link).catch(ex => _(ex, link));
+                                }
+                                else {
+                                    _(l.url_import_invalid_link, link);
+                                }
+                            }
+                            else {
+                                _(l.url_import_invalid_link, link);
                             }
 
-                            await handlers.mega.linkHandler(linkStr, link).catch(ex => _(ex, link));
-
-                            loadingDialog.showProgress(i / rawLinks.length * 100);
+                            loadingDialog.showProgress(i / rawLinks.size * 100);
                         }
 
                         loadingDialog.hideProgress();
@@ -421,7 +609,41 @@ lazy(mega, 'linkImport', () => {
                         inputWrapper.className = 'errored-link-input-wrapper';
                         container.appendChild(inputWrapper);
 
-                        importLinks.forEach(({raw, err}, i) => {
+                        const hasErrors = () => [...importLinks].some(link => link.err);
+                        const isDuplicate = link => {
+
+                            for (const other of importLinks) {
+
+                                if (other === link || other.err || !other.url) {
+                                    continue;
+                                }
+
+                                if (other.url.href === link.url.href) {
+                                    return true;
+                                }
+                            }
+
+                            return false;
+                        };
+                        const _finally = (link, erroredInput) => {
+                            dialog.next.disabled = hasErrors();
+                            loadingDialog.hide('url-import');
+                            let icon = '<i class="sprite-fm-mono icon-alert-triangle-thin-outline"></i>';
+
+                            if (link.err) {
+                                erroredInput.error = `${icon}${link.err}`;
+                            }
+                            else {
+                                icon = '<i class="sprite-fm-mono icon-check-circle-thin-outline"></i>';
+                                erroredInput.message = `${icon}${l.url_import_review_issue_resolved}`;
+                            }
+
+                            _recalcErrorHeight(erroredInput);
+                        };
+
+                        for (const link of importLinks) {
+
+                            const {raw, err} = link;
 
                             if (err) {
 
@@ -429,32 +651,37 @@ lazy(mega, 'linkImport', () => {
                                     parentNode: inputWrapper,
                                     className: 'pmText no-title-top'
                                 });
-                                const link = importLinks[i];
-                                let icon = '<i class="sprite-fm-mono icon-alert-triangle-thin-outline"></i>';
+                                const icon = '<i class="sprite-fm-mono icon-alert-triangle-thin-outline"></i>';
                                 erroredInput.value = raw;
                                 erroredInput.error = `${icon}${err}`;
-                                link.ei = i;
 
                                 erroredInput.on('change', function() {
 
                                     delete link.err;
                                     delete link.type;
+                                    link.raw = this.value.trim();
+                                    link.url = tryCatch(() => new URL(link.raw), false)();
+                                    if (link.url) {
+                                        link.provider = _getUrlType(link.url);
 
-                                    loadingDialog.show('url-import');
-
-                                    handlers.mega.linkHandler(this.value, link).catch(ex => {
-                                        link.err = !link.url || !link.provider ? l.url_import_invalid_link : ex;
-                                        erroredInput.error = `${icon}${link.err}`;
-                                    }).always(() => {
-                                        dialog.next.disabled = importLinks.some(l => l.err);
-                                        loadingDialog.hide('url-import');
-                                        if (!link.err) {
-                                            icon = '<i class="sprite-fm-mono icon-check-circle-thin-outline"></i>';
-                                            erroredInput.message = `${icon}${l.url_import_review_issue_resolved}`;
+                                        if (!link.provider) {
+                                            link.err = l.url_import_invalid_link;
+                                            return _finally(link, erroredInput);
                                         }
+                                        if (isDuplicate(link)) {
+                                            link.err = l[16485];
+                                            return _finally(link, erroredInput);
+                                        }
+                                        loadingDialog.show('url-import');
 
-                                        _recalcErrorHeight(erroredInput);
-                                    });
+                                        handlers[link.provider].linkHandler(link).catch(ex => {
+                                            link.err = !link.url || !link.provider ? l.url_import_invalid_link : ex;
+                                        }).always(() => _finally(link, erroredInput));
+                                    }
+                                    else {
+                                        link.err = l.url_import_invalid_link;
+                                        _finally(link, erroredInput);
+                                    }
                                 });
 
                                 _recalcErrorHeight(erroredInput);
@@ -469,8 +696,8 @@ lazy(mega, 'linkImport', () => {
 
                                         const {parentNode} = erroredInput;
 
-                                        importLinks.splice(importLinks.findIndex(l => l.ei === i), 1);
-                                        dialog.next.disabled = importLinks.some(l => l.err);
+                                        importLinks.delete(link);
+                                        dialog.next.disabled = hasErrors();
                                         this.destroy();
                                         erroredInput.destroy();
 
@@ -493,7 +720,7 @@ lazy(mega, 'linkImport', () => {
                                     }
                                 });
                             }
-                        });
+                        }
 
                         return container;
                     },
@@ -545,8 +772,9 @@ lazy(mega, 'linkImport', () => {
 
                     const th = document.createElement('th');
                     th.id = 'import-summary-count';
-                    th.textContent = mega.icu.format(l.url_import_selected_links_count, importLinks.length)
-                        .replace('$1', importLinks.length);
+                    const importLinkCount = importLinks.size;
+                    th.textContent = mega.icu.format(l.url_import_selected_links_count, importLinkCount)
+                        .replace('$1', importLinkCount);
                     tr.appendChild(th);
 
                     const th2 = document.createElement('th');
@@ -571,27 +799,19 @@ lazy(mega, 'linkImport', () => {
                         });
                     });
 
-                    const duplicateCheck = [];
+                    const duplicateCheck = new Set();
 
-                    importLinks.forEach((link, i) => {
+                    for (const link of importLinks) {
 
-                        const {provider} = link;
-                        let nodeData;
-                        let nodeHandle;
+                        const {nodeData, nodeHandle, provider} = link;
                         const tr = document.createElement('tr');
                         tbody.appendChild(tr);
 
-                        if (provider === 'mega') {
-
-                            nodeHandle = link.nodeHandle;
-                            nodeData = link.nodeData;
+                        if (duplicateCheck.has(nodeHandle)) {
+                            continue;
                         }
 
-                        if (duplicateCheck.includes(nodeHandle)) {
-                            return;
-                        }
-
-                        duplicateCheck.push(nodeHandle);
+                        duplicateCheck.add(nodeHandle);
 
                         const td = document.createElement('td');
                         td.colSpan = 2;
@@ -604,7 +824,7 @@ lazy(mega, 'linkImport', () => {
 
                                 const checked = nc.domNode.querySelector('.icon-check').classList.toggle('selected');
 
-                                importLinks[i].dnd = !checked;
+                                link.dnd = !checked;
 
                                 const selCount = tbody.querySelectorAll('.icon-check.selected').length;
                                 const totalCount = tbody.querySelectorAll('.icon-check').length;
@@ -638,8 +858,12 @@ lazy(mega, 'linkImport', () => {
                             nc.domNode.querySelector('.file-size').textContent = nc.size;
                         }
 
+                        if (provider === 'google') {
+                            nc.iconNode.className = handlers.google.icon;
+                        }
+
                         tr.appendChild(td);
-                    });
+                    }
 
                     container.addEventListener('mouseenter', () => {
                         Ps.initialize(container);
@@ -665,49 +889,34 @@ lazy(mega, 'linkImport', () => {
                         }
 
                         const fileLinks = [];
+                        const googleLinks = [];
                         let success = 0;
+                        let start = 0;
 
                         for (const link of importLinks) {
 
-                            const {provider, url, dnd, type} = link;
-                            let res;
+                            const {provider, url, dnd, type, raw} = link;
 
                             if (dnd) {
                                 continue;
                             }
 
+                            // if it is mega file link, collect for bulk import
                             if (provider === 'mega') {
 
-                                // if it is mega file link, collect for bulk import
+                                eventlog(501039);
+
                                 if (type === 'file') {
                                     fileLinks.push(url.href);
                                     continue;
                                 }
-
-                                await iframeLoader.run(url, async iframe => {
-
-                                    const loadRes = await handlers.mega.iframeLoad(iframe, url);
-
-                                    if (loadRes === 'folder') {
-
-                                        const cw = iframe.contentWindow;
-
-                                        res = await cw.M.getCopyNodes([cw.M.RootID], {clearna: true}).then(nodes => {
-                                            nodes.isImporting = true;
-                                            cw.resetSensitives();
-
-                                            if (cw.pfcol && nodes[0].t > 1) {
-                                                nodes[0].t = 1;
-                                            }
-
-                                            M.copyNodes([cw.M.RootID], h, false, nodes);
-                                        }).catch(echo);
-                                    }
-                                    else {
-                                        mega.ui.toast.show(`${loadRes} - ${url}`, 4);
-                                    }
-                                });
                             }
+                            else if (provider === 'google') {
+                                googleLinks.push(raw);
+                                continue;
+                            }
+
+                            const res = await handlers[provider].import(link, h);
 
                             // Importing failed, lets stop further processing
                             if (typeof res === 'number' && res < 0) {
@@ -717,6 +926,7 @@ lazy(mega, 'linkImport', () => {
                             success++;
                         }
 
+                        // Mega file links bulk import
                         if (fileLinks.length) {
 
                             const bulkRes = await M.bulkFileLinkImport(fileLinks, h).catch(echo);
@@ -726,13 +936,27 @@ lazy(mega, 'linkImport', () => {
                             }
                         }
 
+                        if (googleLinks.length) {
+
+                            const googleResArray = await handlers.google.import(googleLinks, h).catch(echo);
+
+                            for (const googleRes of googleResArray) {
+
+                                if (typeof googleRes !== 'number') {
+                                    start++;
+                                    eventlog(501040);
+                                }
+                            }
+                        }
+
                         dialog.hide();
                         loadingDialog.hide('url-import');
+                        const msg = start ? l.url_import_toast_success_3rd_party : l.url_import_toast_success;
 
                         // TODO: improve feedback for partial success/failure
-                        if (success > 0) {
+                        if (success > 0 || start > 0) {
                             mega.ui.toast.show(
-                                l.url_import_toast_success.replace('$2', tFolderName),
+                                msg.replace('$2', tFolderName),
                                 4,
                                 l[16797],
                                 {actionButtonCallback: () => M.openFolder(h)}
@@ -742,7 +966,7 @@ lazy(mega, 'linkImport', () => {
                     text: l.import_title,
                     className: 'slim',
                     get disabled() {
-                        return importLinks.length === 0;
+                        return importLinks.size === 0;
                     }
                 },
                 skip: {

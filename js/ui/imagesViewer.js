@@ -251,6 +251,10 @@ var slideshowid;
             if (!$overlay.is('.video-theatre-mode')) {
                 slideshow_imgPosition($overlay);
             }
+
+            if (typeof psa !== 'undefined') {
+                psa.repositionMediaPlayer();
+            }
         };
 
         fullScreenManager = FullScreenManager($button, $overlay).change(setFullscreenData);
@@ -672,6 +676,9 @@ var slideshowid;
             $overlay.addClass('browserscreen');
             $overlay.parents('.download.download-page').addClass('browserscreen');
             slideshow_imgPosition($overlay);
+            if (typeof psa !== 'undefined') {
+                psa.repositionMediaPlayer();
+            }
             return false;
         });
 
@@ -1224,6 +1231,9 @@ var slideshowid;
                         $overlay.removeClass('fullscreen browserscreen');
                         $overlay.parents('.download.download-page').removeClass('fullscreen browserscreen');
                         slideshow_imgPosition($overlay);
+                        if (typeof psa !== 'undefined') {
+                            psa.repositionMediaPlayer();
+                        }
                     }
                     else {
                         history.back();
@@ -1252,6 +1262,9 @@ var slideshowid;
                         zoomPan = false;
                     }
                     slideshow_imgPosition($overlay);
+                    if (typeof psa !== 'undefined') {
+                        psa.repositionMediaPlayer();
+                    }
                     return false;
                 }
                 history.back();
@@ -1913,6 +1926,10 @@ var slideshowid;
 
                     return true;
                 });
+
+                if (typeof psa !== 'undefined') {
+                    psa.repositionMediaPlayer();
+                }
             }).catch(console.warn.bind(console));
         });
 

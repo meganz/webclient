@@ -76,7 +76,7 @@ export default class PushSettingsDialog extends React.Component {
                 <footer>
                     <div className="footer-container">
                         <button className="mega-button" onClick={this.props.onClose}>
-                            <span>{l[82] /* `Cancel` */}</span>
+                            <span>{l.msg_dlg_cancel}</span>
                         </button>
                         <button
                             className="mega-button positive"

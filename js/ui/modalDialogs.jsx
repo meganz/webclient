@@ -349,7 +349,7 @@ class SelectContactDialog extends MegaRenderMixin {
     static clickTime = 0;
     static defaultProps = {
         selectLabel: l.share_contact_action, /* `Share` */
-        cancelLabel: l[82],
+        cancelLabel: l.msg_dlg_cancel,
         hideable: true
     };
 
@@ -614,7 +614,7 @@ class ConfirmDialog extends MegaRenderMixin {
 lazy(ConfirmDialog, 'defaultProps', () => {
     return freeze({
         'confirmLabel': l[6826],
-        'cancelLabel': l[82],
+        'cancelLabel': l.msg_dlg_cancel,
         'dontShowAgainCheckbox': true,
         'hideable': true,
         'dialogType': 'message'

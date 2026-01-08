@@ -898,7 +898,7 @@
                 const latestPeer = this.peers[[...this.presenterStreams].pop()];
                 if (latestPeer) {
                     return msgDialog(
-                        `confirmation:!^${l.takeover_presenter_scr_btn}!${l[82]}`,
+                        `confirmation:!^${l.takeover_presenter_scr_btn}!${l.msg_dlg_cancel}`,
                         '',
                         l.takeover_presenter_scr_title,
                         l.takeover_presenter_text.replace('%s', escapeHTML(M.getNameByHandle(latestPeer.userHandle))),

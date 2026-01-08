@@ -78,7 +78,7 @@ export default class Join extends React.Component {
                 title={l.ephemeral_data_lost_title}
                 noCloseOnClickOutside={true}
                 buttons={[
-                    { key: 'cancel', label: l[82] /* Cancel */, onClick: onCancel },
+                    { key: 'cancel', label: l.msg_dlg_cancel, onClick: onCancel },
                     { key: 'continue', label: l[507] /* Continue */, className: 'positive', onClick: onConfirm }
                 ]}
                 onClose={onCancel}>

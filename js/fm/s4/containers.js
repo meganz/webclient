@@ -44,8 +44,8 @@ lazy(s4, 'containers', () => {
             }
 
             msgDialog(
-                `confirmation:!^${l.s4_skip_setup_btn}!${l[1597]}`,
-                l[1597],
+                `confirmation:!^${l.s4_skip_setup_btn}!${l.msg_dlg_cancel}`,
+                l.msg_dlg_cancel,
                 l.s4_skip_setup_question,
                 l.s4_skip_setup_warn,
                 (yes) => {

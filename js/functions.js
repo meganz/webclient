@@ -296,7 +296,28 @@ function numOfBytes(bytes, precision, isSpd) {
     return { size: parts[0], unit: parts[1] || 'B' };
 }
 
+/**
+ * Converts bytes to a human-readable size format (B, KB, MB, GB, TB, PB)
+ *
+ * @param {number} bytes - The number of bytes to convert
+ * @param {number} [precision] - Number of decimal places to show.
+ *                            Auto-determined if undefined: Based on following logic.
+ *                              2 decimals for GB
+ *                              1 decimal for MB+
+ *                              0 decimals for smaller sizes
+ *                            if -1 then enhance auto-detection based on size range
+ *                              3 decimals for 1GB-10GB, 1TB - 10TB, 1PB - 10PB
+ * @param {number} [format] - Output formatting option:
+ *                           - 0 (default): "1.5 MB" with non-breaking space
+ *                           - 1: "<span>1.5</span>MB" with span around number
+ *                           - 2: "1.5<span>MB</span>" with span around unit
+ *                           - 3: "1.5" (number only)
+ *                           - 4: "1.5" (number only, removes trailing zeros)
+ *                           - negative: Caps maximum unit to MB
+ * @returns {string} Formatted size string with appropriate unit
+ */
 function bytesToSize(bytes, precision, format) {
+
     'use strict'; /* jshint -W074 */
 
     var s_b = l[20158] || 'B';
@@ -314,6 +335,17 @@ function bytesToSize(bytes, precision, format) {
     var resultSize = 0;
     var resultUnit = '';
     var capToMB = false;
+
+    if (precision === -1) {
+        precision = undefined;
+        if (
+            gigabyte * 10 >= bytes && bytes > gigabyte ||
+            terabyte * 10 >= bytes && bytes > terabyte ||
+            petabyte * 10 >= bytes && bytes > petabyte
+        ) {
+            precision = 3;
+        }
+    }
 
     if (precision === undefined) {
         if (bytes > gigabyte) {

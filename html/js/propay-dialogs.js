@@ -2326,11 +2326,11 @@ var addressDialog = {
             return false;
         }
 
-        if (pro.propay.onPropayPage()
+        const isBitcoin = pro.propay.onPropayPage()
             && pro.propay.currentGateway
-            && pro.propay.currentGateway.gatewayId === pro.propay.BITCOIN_GATE_ID
-            && !taxCode
-            && !dateOfBirth) {
+            && pro.propay.currentGateway.gatewayId === pro.propay.BITCOIN_GATE_ID;
+
+        if (isBitcoin && !taxCode && !dateOfBirth) {
 
             validCoinify = false;
             $dateOfBirthInputSection.addClass('error');
@@ -2445,6 +2445,10 @@ var addressDialog = {
             addressDialog.closeDialog();
         }
 
+        if (isBitcoin) {
+            fieldValues.dob = dateOfBirth;
+        }
+
         // Send to the API
         if (!blockPayment) {
             this.proceedToPay(fieldValues, state, country, taxCode, allowEcpFlow);
@@ -2552,6 +2556,7 @@ var addressDialog = {
         this.extraDetails.country = country;
         this.extraDetails.recurring = true;
         this.extraDetails.taxCode = taxCode;
+        this.extraDetails.dob = fieldValues.dob;
 
         // If the country is US or Canada, add the state by stripping the country code off e.g. to get QC from CA-QC
         if ((country === 'US') || (country === 'CA')) {

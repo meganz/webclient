@@ -649,6 +649,8 @@ pro.propay = {
             }
             else if (this.proPaymentMethod === 'bitcoin') {
                 pro.lastPaymentProviderId = 4;
+                Object.assign(extra, addressDialog.extraDetails);
+                extra.pm = this.currentGateway.gatewayName;
             }
             else if (this.proPaymentMethod === 'perfunctio') {
                 pro.lastPaymentProviderId = 8;

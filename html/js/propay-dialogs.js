@@ -1465,6 +1465,13 @@ var addressDialog = {
         const dialogParent = is_mobile ? '#startholder' : 'section.mega-dialog-container';
 
         if (pro.propay.onPropayPage()) {
+            const isBitcoin = pro.propay.currentGateway
+                && pro.propay.currentGateway.gatewayId === pro.propay.BITCOIN_GATE_ID;
+
+            const $dobBlock = $('.date-of-birth-block', this.$dialog).toggleClass('hidden', !isBitcoin)
+            $('.error', $dobBlock).removeClass('error');
+            $('.message-container', $dobBlock).addClass('hidden');
+
             this.$dialog = $('#propay .payment-address-dialog.propay-dialog');
         }
         else {
@@ -1669,6 +1676,7 @@ var addressDialog = {
         this.cityMegaInput = new mega.ui.MegaInputs($('.city', this.$dialog));
         this.postCodeMegaInput = new mega.ui.MegaInputs($('.postcode', this.$dialog));
         this.taxCodeMegaInput = new mega.ui.MegaInputs($('.taxcode', this.$dialog));
+        this.dateOfBirthMegaInput = new mega.ui.MegaInputs($('.date-of-birth-input', this.$dialog));
 
         this.firstNameMegaInput.$input.rebind('focus.logFnEvent', () => eventlog(500450));
         this.lastNameMegaInput.$input.rebind('focus.logLnEvent', () => eventlog(500451));
@@ -1677,6 +1685,7 @@ var addressDialog = {
         this.cityMegaInput.$input.rebind('focus.logCityEvent', () => eventlog(500454));
         this.postCodeMegaInput.$input.rebind('focus.logPcEvent', () => eventlog(500455));
         this.taxCodeMegaInput.$input.rebind('focus.logTaxEvent', () => eventlog(500456));
+        this.dateOfBirthMegaInput.$input.rebind('focus.logDobEvent', () => eventlog(501071));
 
         if (!is_mobile) {
             // Keep the ps scrollbar block code after remove the hidden class from the dialog
@@ -2045,6 +2054,10 @@ var addressDialog = {
                     u_attr && u_attr['^taxnum'] || getBillingProp('taxCode', encodedVer)
                 );
             }
+
+            if (billingInfo.dateOfBirth) {
+                prefillMultipleInputs(this.dateOfBirthMegaInput, getBillingProp('dateOfBirth', encodedVer));
+            }
         }
         if (noFname) {
             fillInputFromAttr(this.firstNameMegaInput, 'fname', 'firstname');
@@ -2255,9 +2268,12 @@ var addressDialog = {
         // Get the values from the dropdowns
         const $stateSelect = $('.states', this.$dialog);
         const $countrySelect = $('.countries', this.$dialog);
+        const $dateOfBirthBlock = $('.date-of-birth-block', this.$dialog);
+        const $dateOfBirthInputSection = $('.date-of-birth', $dateOfBirthBlock);
         const state = $('.option[data-state="active"]', $stateSelect).attr('data-value');
         const country = $('.option[data-state="active"]', $countrySelect).attr('data-value');
         const taxCode = inputSelector(this.taxCodeMegaInput).$input.val().trim();
+        const dateOfBirth = $('input.date-of-birth-input', $dateOfBirthBlock).val();
 
         // Selectors for error handling
         const $errorMessage = $('.error-message', this.$dialog);
@@ -2266,11 +2282,14 @@ var addressDialog = {
 
         // Reset state of past error messages
         let stateNotSet = false;
+        let validCoinify = true;
+
         $errorMessage.addClass(is_mobile ? 'v-hidden' : 'hidden');
         $errorMessageContainers.addClass('hidden');
         $allInputs.removeClass('error');
         $stateSelect.removeClass('error');
         $countrySelect.removeClass('error');
+        $dateOfBirthInputSection.removeClass('error');
 
         // Add red border around the missing fields
         $.each(fieldValues, function(fieldName, value) {
@@ -2306,6 +2325,20 @@ var addressDialog = {
             $('span', $invoiceNote).text(l.taxcode_error.replace('%s', taxName));
             return false;
         }
+
+        if (pro.propay.onPropayPage()
+            && pro.propay.currentGateway
+            && pro.propay.currentGateway.gatewayId === pro.propay.BITCOIN_GATE_ID
+            && !taxCode
+            && !dateOfBirth) {
+
+            validCoinify = false;
+            $dateOfBirthInputSection.addClass('error');
+            $dateOfBirthBlock.addClass('error');
+            $('.message-container', $dateOfBirthBlock).removeClass('hidden')
+                .text(l.coinify_req_dob_or_tax.replace('%1', taxName));
+        }
+
         taxMegaInput.hideError();
         taxMegaInput.$input.next('.message-container').addClass('hidden');
         $invoiceNote.removeClass('error hidden');
@@ -2319,7 +2352,8 @@ var addressDialog = {
             || !fieldValues.city
             || !fieldValues.postcode
             || !country
-            || stateNotSet) {
+            || stateNotSet
+            || !validCoinify) {
 
             console.warn('validateAndPay: Incomplete form fields', fieldValues, country, state, taxCode);
 
@@ -2342,6 +2376,7 @@ var addressDialog = {
             return false;
         }
         addressDialog.validInputs = true;
+        addressDialog.validDob = !!dateOfBirth;
 
         addressDialog.mostRecentValidInput = {
             ...fieldValues,
@@ -2349,7 +2384,8 @@ var addressDialog = {
             lastname: fieldValues['last-name'],
             country,
             state,
-            taxCode
+            taxCode,
+            dateOfBirth,
         };
 
         if (validateOnly) {
@@ -2373,6 +2409,7 @@ var addressDialog = {
             saveAttribute('country', country);
             saveAttribute('state', state);
             saveAttribute('version', '2');
+            saveAttribute('dateOfBirth', to8(dateOfBirth));
         } else {
             // Forget Attribute.
             const removeAttribute = function(name) {
@@ -2387,6 +2424,7 @@ var addressDialog = {
             removeAttribute('country');
             removeAttribute('state');
             removeAttribute('version');
+            removeAttribute('dateOfBirth');
         }
 
         // Always save tax code, even if it is an empty string

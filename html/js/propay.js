@@ -99,6 +99,7 @@ pro.propay = {
     requiresBillingAddress: {
         19: true,
         16: true,
+        4: true,
     },
 
     /**
@@ -224,6 +225,13 @@ pro.propay = {
                 reasons.addressNeeded = 1;
             }
             else if (addressDialog.validInputs === false) {
+                reasons.addressInvalid = 1;
+            }
+
+            if (this.currentGateway
+                && this.currentGateway.gatewayId === this.BITCOIN_GATE_ID
+                && !addressDialog.validDob) {
+
                 reasons.addressInvalid = 1;
             }
         }
@@ -2419,10 +2427,11 @@ pro.propay = {
         }
         else if ((paymentType === 'other')
             && (this.currentGateway.gatewayName === 'bitcoin')) {
+            addressDialog.showDialog(true);
+            addressDialog.validateAndPay(pro.propay.initBillingInfo);
             if (this.skItems.bitcoin) {
                 this.skItems.bitcoin.startLoad();
             }
-            this.sendPurchaseToApi(this.currentGateway.gatewayId);
         }
     },
 

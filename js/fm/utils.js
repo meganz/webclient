@@ -1022,6 +1022,28 @@ MegaUtils.prototype.findDupes = function() {
 };
 
 /**
+ * Updating search count in breadcrumbs
+ * @param {Object} [options] The options
+ * @param {Number} [options.count] The count to set, -1 to hide
+ * @param {jQuery} [options.target] The target element to update the count in
+ * @returns {void}
+ */
+MegaUtils.prototype.updateSearchCount = function(options){
+    'use strict';
+
+    const {count, target} = options || {};
+    const countDisplay = target || $('.fm-search-count', '.fm-right-files-block .fm-right-header');
+
+    if (count === -1) {
+        countDisplay.addClass('hidden').text('');
+        return;
+    }
+
+    countDisplay.removeClass('hidden')
+        .text(mega.icu.format(l.search_results_count, count === undefined ? M.v.length : count));
+};
+
+/**
  * Search for nodes
  * @param {String} searchTerm The search term to look for.
  * @param {Function|false} customFn Optional function to call in addition to others
@@ -1157,11 +1179,13 @@ MegaUtils.prototype.fmSearchNodes = function(searchTerm, customFn) {
                 }
 
                 M.currentdirid = 'search/' + searchTerm;
+                M.search = true;
                 if (mega.gallery) {
                     mega.gallery.clearMdView();
                 }
                 M.renderMain();
                 M.onSectionUIOpen('cloud-drive');
+                M.updateSearchCount();
                 $('.fm-right-header .fm-breadcrumbs-wrapper').addClass('hidden');
                 mega.ui.secondaryNav.hideActionButtons();
                 if (M.v.length) {

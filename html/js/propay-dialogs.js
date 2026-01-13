@@ -1468,7 +1468,7 @@ var addressDialog = {
             const isBitcoin = pro.propay.currentGateway
                 && pro.propay.currentGateway.gatewayId === pro.propay.BITCOIN_GATE_ID;
 
-            const $dobBlock = $('.date-of-birth-block', this.$dialog).toggleClass('hidden', !isBitcoin)
+            const $dobBlock = $('.date-of-birth-block', this.$dialog).toggleClass('hidden', !isBitcoin);
             $('.error', $dobBlock).removeClass('error');
             $('.message-container', $dobBlock).addClass('hidden');
 

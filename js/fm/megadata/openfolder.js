@@ -527,8 +527,8 @@
                     this.currentdirid, mega.ui.searchbar.locationFn(chipBtn.length && chipBtn.attr('data-location'))
                 );
                 $('.fm-breadcrumbs-wrapper', $fmRightHeader).addClass('hidden');
-                $resultsCount.removeClass('hidden');
-                $resultsCount.text(mega.icu.format(l.search_results_count, M.v.length));
+                $('.column-settings.overlap').addClass('hidden');
+                M.updateSearchCount({target: $resultsCount});
             }
             else if (this.currentCustomView) {
                 this.filterByParent(this.currentCustomView.nodeID);

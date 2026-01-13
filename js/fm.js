@@ -652,7 +652,7 @@ function fmtopUI() {
         M.albums
     );
     mega.ui.secondaryNav.updateInfoPanelButton(id && M.getNodeByHandle(id).t);
-    if (M.currentdirid !== 'shares') {
+    if (M.currentdirid !== 'shares' && !M.currentdirid.startsWith('search/')) {
         mega.ui.secondaryNav.showBreadcrumb();
     }
     mega.ui.secondaryNav.updateInfoChipsAndViews();

@@ -75,8 +75,9 @@
     --font-inter: "Inter", sans-serif;
 
     --font-size-12: 12px/14px;
+    --font-size-24: 24px/32px;
 
-    --text-poppins-600-24: 600 var(--font-size-h5) var(--font-poppins);
+    --text-poppins-600-24: 600 var(--font-size-24) var(--font-poppins);
 
     --text-inter-600-16: 600 var(--font-copy-medium) var(--font-inter);
     --text-inter-600-14: 600 var(--font-copy-small) var(--font-inter);
@@ -90,6 +91,7 @@
     --color-disabled: #D5D5D5;
     --selected-tab-border: rgba(221, 20, 5, 1);
     --tabs-bottom-border: rgba(216, 217, 219, 1);
+    --color-text-success: rgba(0, 124, 62, 1);
     /* End Colors*/
 }
 

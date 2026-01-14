@@ -4158,14 +4158,34 @@ var bitcoinDialog = {
     gatewayId: 4,
 
     /**
-     * Redirect to the site
-     * @param {String} utcResult containing the url to redirect to
+     * Stores the URL to redirect to
+     * @param {String} url The URL to redirect to
      */
-    redirectToSite: function(utcResult) {
+    storeUtcResult: function(utcResult) {
+        'use strict';
+
+        if (typeof utcResult.EUR !== 'object') {
+            processUtcResult(utcResult);
+            return;
+        }
+
+        this.utcResult = utcResult;
+    },
+
+    /**
+     * Redirect to the site
+     */
+    redirectToSite: function() {
 
         pro.propay.showLoadingOverlay('redirecting');
 
-        var url = utcResult.EUR['url'];
+        const url = this.utcResult.EUR.url;
+
+        if (!url) {
+            console.error('No URL to redirect to');
+            return;
+        }
+
         window.location = url;
     },
 
@@ -4178,6 +4198,8 @@ var bitcoinDialog = {
         /* Testing data to watch the invoice expire in 5 secs
         apiResponse['expiry'] = Math.round(Date.now() / 1000) + 5;
         //*/
+
+        pro.propay.showPaymentSection();
 
         // Set details
         var bitcoinAddress = apiResponse.address;
@@ -4325,7 +4347,8 @@ var bitcoinDialog = {
         // Show the Bitcoin invoice dialog, or redirect to coinify if url provided
         if (typeof utcResult.EUR === 'object') {
             if (utcResult.EUR.url) {
-                bitcoinDialog.redirectToSite(utcResult);
+                bitcoinDialog.redirectToSite();
+                return;
             }
             else {
                 bitcoinDialog.showInvoice(utcResult.EUR);
@@ -4340,6 +4363,8 @@ var bitcoinDialog = {
      * Show a failure dialog if the provider can't be contacted
      */
     showBitcoinProviderFailureDialog: function() {
+
+        pro.propay.showPaymentSection();
 
         var $dialogBackgroundOverlay = $('.fm-dialog-overlay');
         var $bitcoinFailureDialog = $('.bitcoin-provider-failure-dialog');

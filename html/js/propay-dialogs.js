@@ -1446,6 +1446,7 @@ var addressDialog = {
             self.initCountryDropdownChangeHandler();
             self.initBuyNowButton();
             self.initCloseButton();
+            self.initCoinifyShareConsent();
             self.initRememberDetailsCheckbox();
 
             onIdle(() => eventlog(500516));
@@ -1469,6 +1470,8 @@ var addressDialog = {
                 && pro.propay.currentGateway.gatewayId === pro.propay.BITCOIN_GATE_ID;
 
             const $dobBlock = $('.date-of-birth-block', this.$dialog).toggleClass('hidden', !isBitcoin);
+            $('.coinify-share-consent-container', this.$dialog).toggleClass('hidden', !isBitcoin);
+
             $('.error', $dobBlock).removeClass('error');
             $('.message-container', $dobBlock).addClass('hidden');
 
@@ -1676,7 +1679,6 @@ var addressDialog = {
         this.cityMegaInput = new mega.ui.MegaInputs($('.city', this.$dialog));
         this.postCodeMegaInput = new mega.ui.MegaInputs($('.postcode', this.$dialog));
         this.taxCodeMegaInput = new mega.ui.MegaInputs($('.taxcode', this.$dialog));
-        this.dateOfBirthMegaInput = new mega.ui.MegaInputs($('.date-of-birth-input', this.$dialog));
 
         this.firstNameMegaInput.$input.rebind('focus.logFnEvent', () => eventlog(500450));
         this.lastNameMegaInput.$input.rebind('focus.logLnEvent', () => eventlog(500451));
@@ -1685,7 +1687,11 @@ var addressDialog = {
         this.cityMegaInput.$input.rebind('focus.logCityEvent', () => eventlog(500454));
         this.postCodeMegaInput.$input.rebind('focus.logPcEvent', () => eventlog(500455));
         this.taxCodeMegaInput.$input.rebind('focus.logTaxEvent', () => eventlog(500456));
-        this.dateOfBirthMegaInput.$input.rebind('focus.logDobEvent', () => eventlog(501071));
+
+        if (pro.propay.onPropayPage()) {
+            this.dateOfBirthMegaInput = new mega.ui.MegaInputs($('.date-of-birth-input', this.$dialog));
+            this.dateOfBirthMegaInput.$input.rebind('focus.logDobEvent', () => eventlog(501071));
+        }
 
         if (!is_mobile) {
             // Keep the ps scrollbar block code after remove the hidden class from the dialog
@@ -2157,6 +2163,34 @@ var addressDialog = {
     },
 
     /**
+     * Initialize the coinify share consent checkbox.
+     */
+    initCoinifyShareConsent: function() {
+        'use strict';
+
+        if (!pro.propay.onPropayPage()) {
+            return;
+        }
+
+        this.$coinifyShareConsentContainer = $('.coinify-share-consent-container', this.$dialog);
+        if (!this.$coinifyShareConsentContainer.length) {
+            console.error('Coinify share consent container not found');
+            return;
+        }
+
+        $(this.$coinifyShareConsentContainer).rebind('click', function() {
+            const $this = $(this);
+            const $checkbox = $('.checkbox-item', $this);
+            const currentlyOn = $checkbox.hasClass('checkboxOn');
+            $checkbox.toggleClass('checkboxOn', !currentlyOn);
+            $checkbox.toggleClass('checkboxOff', currentlyOn);
+            addressDialog.coinifyShareConsentConfirmed = !currentlyOn;
+        });
+
+        this.$coinifyShareConsentContainer.add('hidden');
+    },
+
+    /**
      * Initialize the remember billing information checkbox.
      */
     initRememberDetailsCheckbox: function() {
@@ -2386,6 +2420,7 @@ var addressDialog = {
             state,
             taxCode,
             dateOfBirth,
+            cconsent: !!addressDialog.coinifyShareConsentConfirmed,
         };
 
         if (validateOnly) {
@@ -2447,6 +2482,7 @@ var addressDialog = {
 
         if (isBitcoin) {
             fieldValues.dob = dateOfBirth;
+            fieldValues.cconsent = addressDialog.coinifyShareConsentConfirmed;
         }
 
         // Send to the API
@@ -2557,6 +2593,7 @@ var addressDialog = {
         this.extraDetails.recurring = true;
         this.extraDetails.taxCode = taxCode;
         this.extraDetails.dob = fieldValues.dob;
+        this.extraDetails.cconsent = fieldValues.cconsent;
 
         // If the country is US or Canada, add the state by stripping the country code off e.g. to get QC from CA-QC
         if ((country === 'US') || (country === 'CA')) {
@@ -4121,6 +4158,18 @@ var bitcoinDialog = {
     gatewayId: 4,
 
     /**
+     * Redirect to the site
+     * @param {String} utcResult containing the url to redirect to
+     */
+    redirectToSite: function(utcResult) {
+
+        pro.propay.showLoadingOverlay('redirecting');
+
+        var url = utcResult.EUR['url'];
+        window.location = url;
+    },
+
+    /**
      * Step 3 in plan purchase with Bitcoin
      * @param {Object} apiResponse API result
      */
@@ -4273,12 +4322,14 @@ var bitcoinDialog = {
     processUtcResult(utcResult) {
         'use strict';
 
-        // Hide the loading animation
-        // pro.propay.hideLoadingOverlay();
-
-        // Show the Bitcoin invoice dialog
+        // Show the Bitcoin invoice dialog, or redirect to coinify if url provided
         if (typeof utcResult.EUR === 'object') {
-            bitcoinDialog.showInvoice(utcResult.EUR);
+            if (utcResult.EUR.url) {
+                bitcoinDialog.redirectToSite(utcResult);
+            }
+            else {
+                bitcoinDialog.showInvoice(utcResult.EUR);
+            }
         }
         else {
             bitcoinDialog.showBitcoinProviderFailureDialog();

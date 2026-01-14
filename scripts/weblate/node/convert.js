@@ -19,14 +19,28 @@ module.exports = {
             source = safeParse(source);
         }
         const pluralsKeys = ['zero', 'one', 'two', 'few', 'many', 'other'];
-        const keys = Object.keys(obj);
+        const keys = Object.keys(source || obj);
         const out = {};
         for (let i = keys.length; i--;) {
             const key = keys[i];
-            const val = obj[key];
+            let val = obj[key];
+
+            if (!val && source) {
+                val = {description: source[key].description, other: source[key].string};
+            }
+
             out[key] = {
                 developer_comment: val.description || '',
             };
+
+            if (typeof val === 'string') {
+                val = {description: source[key].description, other: val};
+            }
+
+            if (val.other === '' && source) {
+                val.other = source[key].string;
+            }
+
             if (Object.keys(val).length > 2 || source && source[key] && source[key].string?.includes('plural,')) {
                 let content = '{count, plural,';
                 for (let j = 0; j < pluralsKeys.length; j++) {

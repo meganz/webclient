@@ -652,7 +652,7 @@ function fmtopUI() {
         M.albums
     );
     mega.ui.secondaryNav.updateInfoPanelButton(id && M.getNodeByHandle(id).t);
-    if (M.currentdirid !== 'shares' && !M.currentdirid.startsWith('search/')) {
+    if (M.currentdirid !== 'shares' && !M.search) {
         mega.ui.secondaryNav.showBreadcrumb();
     }
     mega.ui.secondaryNav.updateInfoChipsAndViews();
@@ -2519,7 +2519,7 @@ function fm_resize_handler(force) {
         // Init dashboard content scrolling
         initDashboardScroll();
     }
-    else if (M.currentdirid && M.currentdirid.startsWith('user-management') &&
+    else if (String(M.currentdirid).startsWith('user-management') &&
         typeof initBusinessAccountScroll === 'function') {
         initBusinessAccountScroll($('.user-management-view .ps:visible', fmholder));
     }

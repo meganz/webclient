@@ -27,7 +27,7 @@ lazy(mega.gallery, 'albums', () => {
     scope.maxSelectionsCount = 1500;
 
     scope.getAlbumIdFromPath = () => {
-        if (M.currentdirid && M.currentdirid.startsWith('albums/')) {
+        if (String(M.currentdirid).startsWith('albums/')) {
             return M.currentdirid.replace(/^albums\//, '');
         }
 

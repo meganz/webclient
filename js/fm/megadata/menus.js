@@ -580,7 +580,7 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
 
         delete items['.open-cloud-item'];
 
-        if (M.currentCustomView.type !== 's4' || M.currentdirid.startsWith('search/')) {
+        if (M.currentCustomView.type !== 's4' || M.search) {
             items['.open-s4-item'] = 1;
         }
 

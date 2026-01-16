@@ -2869,6 +2869,7 @@ FileManager.prototype.addTransferPanelUI = function() {
 
     $('.transfer-clear-completed').rebind('click', function() {
         if (!$(this).hasClass('disabled')) {
+            eventlog(501082)
             $.removeTransferItems();
         }
     });

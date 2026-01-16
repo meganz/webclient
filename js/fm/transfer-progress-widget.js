@@ -70,6 +70,7 @@ mega.tpw = new function TransferProgressWidget() {
                     $widgetFooter.addClass('hidden');
                     $widgetTabsHeader.addClass('hidden');
                 });
+                eventlog(501072);
             }
             else {
                 isMinimizedByUser = false;
@@ -80,6 +81,7 @@ mega.tpw = new function TransferProgressWidget() {
                     }
                     $widgetTabsHeader.removeClass('hidden');
                 });
+                eventlog(501073);
             }
             return false;
         });
@@ -87,6 +89,7 @@ mega.tpw = new function TransferProgressWidget() {
         // close event handler
         $('.transfer-progress-icon.tpw-close', $rowsHeader).off('click').on('click',
             function tpw_CloseHandler() {
+                eventlog(501068);
                 isHiddenByUser = true;
                 mega.tpw.hideWidget();
             });
@@ -114,6 +117,7 @@ mega.tpw = new function TransferProgressWidget() {
 
         // open transfer page
         $('.js-tpm-open', $widgetHeadAndBody).rebind('click.tpw', () => {
+            eventlog(501074);
             M.openFolder('transfers');
         });
 
@@ -123,6 +127,11 @@ mega.tpw = new function TransferProgressWidget() {
             if ($this.hasClass('inactive') || $this.hasClass('active')) {
                 return false;
             }
+
+            if (viewId === mega.tpw.views.COMPLETE) {
+                eventlog(501081);
+            }
+
             $widgetTabCompleted.toggleClass('active');
             mega.tpw.renderView(viewId);
             $widgetTabActive.toggleClass('active');

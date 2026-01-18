@@ -651,6 +651,14 @@ body.rtl .gallery-view.gallery-type-m .gallery-date-block i::before {
 .album-timeline-cell.ui-selected .thumb-area {
     box-shadow: 0 0 0 3px var(--radio-border-active);
 }
+.albums-grid-cell.ui-selected.is-sensitive,
+.album-timeline-cell.ui-selected.is-sensitive {
+    overflow: unset;
+}
+.albums-grid-cell.ui-selected.is-sensitive > div,
+.album-timeline-cell.ui-selected.is-sensitive > div {
+    overflow: hidden;
+}
 .albums-grid-cell.album-placeholder > div.pt-full  {
     background-color: var(--surface-grey-2);
     border-radius: 12px;

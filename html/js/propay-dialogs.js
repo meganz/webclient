@@ -2097,6 +2097,10 @@ var addressDialog = {
                 if (!billingInfo.country) {
                     billingInfo.country = u_attr.country ? u_attr.country : u_attr.ipcc;
                 }
+                if ((!billingInfo.taxCode || billingInfo.taxCode === '') && u_attr['%taxnum']) {
+                    billingInfo.taxCode = u_attr['%taxnum'];
+                }
+
                 promise.resolve(billingInfo);
             };
 

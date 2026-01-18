@@ -29,12 +29,17 @@
     display: flex;
 }
 #propay h1 {
-    font: var(--text-h5-pricing);
+    font: var(--text-poppins-600-24);
+    margin-block-start: 0;
+    margin-block-end: 0;
+    margin-inline-start: 0;
+    margin-inline-end: 0;
 }
 #propay h2 {
     font: var(--text-h6-pricing);
     text-align: start;
-    margin-bottom: 24px;
+    margin-bottom: 16px;
+    margin-top: 0;
 }
 #propay button.continue.loading {
     color: transparent;
@@ -229,7 +234,9 @@
     color: var(--text-color-high);
 }
 #propay .left-block .create-account-wrapper label {
+    display: flex;
     font: var(--text-inter-600-14);
+    margin-bottom: 4px;
 }
 #propay .left-block .create-account-wrapper .password-strength {
     display: flex;
@@ -321,15 +328,17 @@
     display: flex;
     flex-direction: column;
     width: 100%;
-    margin-top: 32px;
 }
 #propay .left-block .method-duration-wrapper > *  {
     display: flex;
     flex-direction: column;
 }
+#propay .left-block .method-duration-wrapper > .duration {
+    padding-top: 40px;
+}
 #propay .left-block > *:not(:last-child):not(:first-child):not(.s4-wrapper) {
-    margin-bottom: 56px;
-    padding-bottom: 56px;
+    margin-bottom: 40px;
+    padding-bottom: 40px;
     border-bottom: 1px solid var(--stroke-mid-grey);
 }
 #propay .left-block .sk-active .sk-pro.mega-input::before {
@@ -339,11 +348,19 @@
     border: 1px solid var(--stroke-mid-grey);
     border-radius: 8px;
 }
+#propay .left-block .mega-input:focus-within::before,
+#propay .left-block .mega-input.active::before {
+    border: 1px solid var(--text-color-high);
+}
 #propay .left-block .mega-input.error::before {
+    border: 1px solid var(--input-text-underline-error);
+}
+#propay .left-block .error .mega-input::before {
     border: 1px solid var(--input-text-underline-error);
 }
 #propay .left-block h1.plan-name {
     display: inline-block;
+    margin-bottom: 40px;
 }
 #propay .left-block .plan-name span {
     color: var(--color-primary-red-500);
@@ -383,7 +400,6 @@
 #propay .left-block .payment-method {
     display: flex;
     width: 100%;
-    margin-bottom: 0;
 }
 #propay .left-block .payment-method .dropdown-wrapper-primary .payment-options {
     font: var(--text-body1);
@@ -431,15 +447,12 @@
 #propay .left-block .duration-note.promo-ends-info {
     color: var(--text-color-secondary);
 }
-#propay .left-block .duration {
-    margin: 42px 0 -12px;
-}
 #propay .left-block .duration .options-wrapper {
     display: flex;
     flex-direction: column;
 }
-#propay .left-block .duration .options-wrapper > * {
-    margin-bottom: 12px;
+#propay .left-block .duration .options-wrapper > *:not(:last-child) {
+    margin-bottom: 16px;
 }
 #propay .left-block .duration .duration-head {
     display: flex;
@@ -468,7 +481,7 @@
 #propay .ar.warning {
     flex-direction: row;
     align-items: center;
-    margin-top: 18px;
+    margin-top: 16px;
     font: var(--font-copy-sm);
 }
 #propay .ar.warning {
@@ -780,6 +793,7 @@
 #propay .specific-payment-info .propay-inline-dialog.payment-stripe-dialog .iframe-container {
     height: 366px;
     transition: all 200ms ease;
+    margin-top: -26px;
 }
 #propay .specific-payment-info .bitcoin-invoice-dialog .content {
     display: flex;
@@ -825,7 +839,6 @@
     display: flex;
     flex-direction: column;
     font: var(--text-copy-medium);
-    margin-top: 25px;
 }
 #propay .specific-payment-info .voucher-block .redeem-voucher-title {
     font: var(--text-copy-medium-bold-pricing);
@@ -864,7 +877,7 @@
     color: var(--color-warning-orange);
 }
 #propay .specific-payment-info .voucher-block .redeemed {
-    color: rgba(0, 124, 62, 1);
+    color: var(--color-text-success);
 }
 #propay .specific-payment-info .voucher-block .info > * {
     display: flex;
@@ -1073,6 +1086,7 @@
     position: absolute;
     width: 100%;
     background: var(--surface-main);
+    margin-top: 26px;
 }
 #propay .sk-stripe-loading div.sk-pro {
     min-height: 48px;
@@ -1169,7 +1183,14 @@
     #propay .left-block {
         width: calc(100% - 48px);
         margin: auto;
-        padding: 24px;
+        padding: 24px 24px 0;
+    }
+    #propay .left-block > *:not(:last-child):not(:first-child):not(.s4-wrapper) {
+        margin-bottom: 32px;
+        padding-bottom: 32px;
+    }
+    #propay .left-block h1.plan-name {
+        margin-bottom: 32px;
     }
     #propay .right-block {
         background-color: var(--surface-main);
@@ -1237,11 +1258,10 @@
     .rtl .bottom-page.propay .top-head.floating {
         background: var(--surface-main);
     }
-    #propay .subscription-info .trial,
-    #propay .subscription-info .one-time,
-    #propay .subscription-info .recurring {
+    #propay .subscription-info > * {
         max-width: 621px;
         margin: 0 auto 2rem;
+        width: 100%;
     }
 }
 

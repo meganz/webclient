@@ -2533,7 +2533,14 @@ pro.propay = {
 
         let isOpen = false;
 
+        const $dropdownWrapper = $('.dropdown-wrapper-primary', this.$page);
+
         const handleIsOpen = (close) => {
+            if (close === undefined) {
+                $container.removeClass('error');
+                $dropdownWrapper.removeClass('error');
+            }
+
             if (close) {
                 isOpen = false;
                 $container.removeClass('active');

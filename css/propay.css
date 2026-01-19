@@ -990,6 +990,8 @@
     flex-direction: row;
 }
 #propay .payment-address-dialog footer .coinify-share-consent-container {
+    display: flex;
+    flex-direction: row;
     margin-inline-end: auto;
     margin-bottom: auto;
     margin-top: auto;
@@ -999,6 +1001,9 @@
 }
 #propay .payment-address-dialog footer .coinify-share-consent-container label {
     cursor: pointer;
+}
+#propay .payment-address-dialog footer .coinify-share-consent-container > .checkbox  {
+    margin-top: 5px;
 }
 #propay .payment-address-dialog footer button {
     background: var(--surface-black);

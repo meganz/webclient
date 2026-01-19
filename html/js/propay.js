@@ -171,7 +171,7 @@ pro.propay = {
             $('.dropdown-wrapper-primary .mega-input', this.$page).addClass('error');
         }
 
-        if (reasons.addressNeeded || reasons.addressInvalid) {
+        if (reasons.addressNeeded || reasons.addressInvalid || reasons.dobNeeded) {
             $('.billing-address .billing-info', this.$page).addClass('error');
         }
 
@@ -226,6 +226,9 @@ pro.propay = {
             }
             else if (addressDialog.validInputs === false) {
                 reasons.addressInvalid = 1;
+            }
+            else if (addressDialog.validDob === false) {
+                reasons.dobNeeded = 1;
             }
 
             if (this.currentGateway
@@ -2340,6 +2343,7 @@ pro.propay = {
 
         if (this.requiresBillingAddress[gatewayId]
             && (!addressDialog.billingInfoFilled || (addressDialog.validInputs === false))) {
+
             $('.specific-payment-info', this.$page).addClass('hidden');
             return;
         }
@@ -3019,14 +3023,18 @@ pro.propay = {
         this.setContinuebuttonText();
     },
 
-    setContinuebuttonText() {
+    setContinuebuttonText(hide) {
         'use strict';
         const recurringEnabled = this.currentGateway && this.currentGateway.supportsRecurring;
         const gatewayId = this.currentGateway && this.currentGateway.gatewayId;
 
 
         const $continueButton = $('.continue', this.$page)
-            .toggleClass('hidden', !!this.paymentButton);
+            .toggleClass('hidden', !!this.paymentButton || !!hide);
+
+        if (hide) {
+            return;
+        }
 
         if (this.errors) {
             this.showErrors();
@@ -3052,6 +3060,11 @@ pro.propay = {
         }
 
         $continueButton.text(label);
+    },
+
+    hideContinueButton() {
+        'use strict';
+        this.setContinuebuttonText(true);
     },
 
     fillBillingInfo(info) {

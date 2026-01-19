@@ -2182,7 +2182,15 @@ var addressDialog = {
             return;
         }
 
-        $(this.$coinifyShareConsentContainer).rebind('click', function() {
+        $('.coinify-share-consent-container label', this.$dialog).safeHTML(l.coinify_share_consent);
+
+        $(this.$coinifyShareConsentContainer).rebind('click', function(event) {
+
+            const $target = $(event.target);
+            if ($target.closest('a').length) {
+                return;
+            }
+
             const $this = $(this);
             const $checkbox = $('.checkbox-item', $this);
             const currentlyOn = $checkbox.hasClass('checkboxOn');
@@ -2384,14 +2392,15 @@ var addressDialog = {
         $('span', $invoiceNote).text(l.taxcode_note.replace('%s', taxName));
 
         // Check all required fields
-        if (!fieldValues['first-name']
-            || !fieldValues['last-name']
-            || !fieldValues.address1
-            || !fieldValues.city
-            || !fieldValues.postcode
-            || !country
-            || stateNotSet
-            || !validCoinify) {
+        const fieldsValid = fieldValues['first-name']
+            && fieldValues['last-name']
+            && fieldValues.address1
+            && fieldValues.city
+            && fieldValues.postcode
+            && country
+            && !stateNotSet
+
+        if (!fieldsValid || !validCoinify) {
 
             console.warn('validateAndPay: Incomplete form fields', fieldValues, country, state, taxCode);
 
@@ -2407,7 +2416,8 @@ var addressDialog = {
                 }
             }
 
-            addressDialog.validInputs = addressDialog.validInputs || false;
+            addressDialog.validInputs = addressDialog.validInputs || fieldsValid ||false;
+            addressDialog.validDob = addressDialog.validDob || validCoinify || false;
 
             onIdle(() => eventlog(500517));
 
@@ -4204,6 +4214,7 @@ var bitcoinDialog = {
         //*/
 
         pro.propay.showPaymentSection();
+        pro.propay.hideContinueButton();
 
         // Set details
         var bitcoinAddress = apiResponse.address;
@@ -4369,6 +4380,7 @@ var bitcoinDialog = {
     showBitcoinProviderFailureDialog: function() {
 
         pro.propay.showPaymentSection();
+        pro.propay.hideContinueButton();
 
         var $dialogBackgroundOverlay = $('.fm-dialog-overlay');
         var $bitcoinFailureDialog = $('.bitcoin-provider-failure-dialog');

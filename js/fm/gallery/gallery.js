@@ -3,7 +3,8 @@ class GalleryNodeBlock {
         this.node = node;
         this.el = document.createElement('a');
 
-        this.el.className = `data-block-view ${mega.sensitives.isSensitive(node) ? ' is-sensitive' : ''}`;
+        this.el.className = `data-block-view content-visibility-auto
+            ${mega.sensitives.isSensitive(node) ? ' is-sensitive' : ''}`;
         this.el.id = node.h;
 
         if (mode === 'a') {
@@ -13,7 +14,7 @@ class GalleryNodeBlock {
         }
 
         this.spanEl = document.createElement('span');
-        this.spanEl.className = 'data-block-bg content-visibility-auto';
+        this.spanEl.className = 'data-block-bg';
         this.el.appendChild(this.spanEl);
 
         this.el.nodeBlock = this;

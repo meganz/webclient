@@ -536,7 +536,10 @@ function bindTransfersMassEvents(context) {
     });
 
     $('.transfer-clear-all-icon', context).rebind('click.transfers', function() {
-        if (!$(this).hasClass('disabled')) {
+
+        const $this = $(this);
+
+        if (!$this.hasClass('disabled')) {
 
             if ($this.parent('.transfer-widget-footer').length) {
                 eventlog(501079);

@@ -2377,7 +2377,6 @@ var addressDialog = {
             && pro.propay.currentGateway.gatewayId === pro.propay.BITCOIN_GATE_ID;
 
         if (isBitcoin && !taxCode && !dateOfBirth) {
-
             validCoinify = false;
             $dateOfBirthInputSection.addClass('error');
             $dateOfBirthBlock.addClass('error');

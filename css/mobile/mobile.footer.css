@@ -7,6 +7,9 @@
     position: relative;
     bottom: 0;
     right: 0;
+    width: min-content;
+    margin-left: auto;
+    margin-right: 0;
     z-index: 100;
     transition: bottom 100ms linear;
     transform: translateY(-100%);
@@ -15,6 +18,8 @@
 .rtl .mega-footer {
     left: 0;
     right: auto;
+    margin-left: 0;
+    margin-right: auto;
 }
 
 .mega-footer .nav-elem.icon-only {

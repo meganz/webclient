@@ -1779,7 +1779,7 @@ function init_page() {
                 if (!is_mobile) {
                     M.safeShowDialog('terms', () => {
                         msgDialog(
-                            `confirmation:!^${l[1037]}!${l[82]}`,
+                            `confirmation:!^${l[1037]}!${l.msg_dlg_cancel}`,
                             '',
                             l.terms_dialog_title,
                             l.terms_dialog_text,
@@ -2426,6 +2426,10 @@ function topmenuUI() {
         });
 
         $loginButton.removeClass('hidden').rebind('click.auth', function() {
+            if (page === 'download') {
+                eventlog(501037);
+            }
+
             if (u_type === 0) {
                 mLogout();
             }

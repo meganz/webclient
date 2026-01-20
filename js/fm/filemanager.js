@@ -20,6 +20,7 @@ function FileManager() {
     this.columnsWidth.cloud.extras = { max: 140, min: 93, curr: 93, viewed: true };
     this.columnsWidth.cloud.accessCtrl = { max: 220, min: 175, curr: 175, viewed: true };
     this.columnsWidth.cloud.fileLoc = { max: 180, min: 130, curr: 130, viewed: false };
+    this.columnsWidth.cloud.owner = { max: 180, min: 130, curr: 130, viewed: false };
     this.columnsWidth.cloud.numFolders = { max: 280, min: 130, curr: 200, viewed: false };
     this.columnsWidth.cloud.hbtime = { max: 180, min: 130, curr: 130, viewed: false };
 
@@ -137,7 +138,8 @@ function FileManager() {
             if (storedColumnsPreferences === undefined) {
                 // restore default columns (to show/hide columns)
                 const defaultColumnShow = new Set(['fav', 'fname', 'size', 'type', 'timeAd', 'extras', 'accessCtrl']);
-                const defaultColumnHidden = new Set(['label', 'timeMd', 'versions', 'playtime', 'fileLoc']);
+                const defaultColumnHidden = new Set(['label', 'timeMd', 'versions', 'playtime', 'fileLoc', 'owner']);
+
                 for (const col in M.columnsWidth.cloud) {
                     if (defaultColumnShow.has(col)) {
                         M.columnsWidth.cloud[col].viewed = true;
@@ -167,7 +169,19 @@ function FileManager() {
 
             if (String(M.currentdirid).startsWith('search')) {
                 // modified column to show for /search (Added link location dir)
-                const searchCol = new Set(['fav', 'fname', 'size', 'timeMd', 'fileLoc', 'extras', 'label', 'type']);
+                const searchCol = new Set(
+                    ['fav', 'fname', 'size', 'timeMd', 'fileLoc', 'extras', 'label', 'type']
+                );
+
+                if (M.onListView || M.onFatListView) {
+                    for (let i = M.v.length; i--;) {
+                        if (M.v[i].u !== u_handle) {
+                            searchCol.add('owner');
+                            break;
+                        }
+                    }
+                }
+
                 for (const col in M.columnsWidth.cloud) {
                     if (searchCol.has(col)) {
                         M.columnsWidth.cloud[col].viewed = true;
@@ -2855,6 +2869,7 @@ FileManager.prototype.addTransferPanelUI = function() {
 
     $('.transfer-clear-completed').rebind('click', function() {
         if (!$(this).hasClass('disabled')) {
+            eventlog(501082)
             $.removeTransferItems();
         }
     });
@@ -3198,6 +3213,9 @@ FileManager.prototype.addGridUI = function(refresh) {
         const isInboxRoot = M.getNodeRoot(target) === M.InboxID;
         if (isInboxRoot) {
             target = mega.devices.ui.getNodeURLPathFromOuterView(node, true);
+        }
+        else if (!mega.fileRequest || !mega.fileRequest.publicFolderExists(node.p) && M.isOutShare(node.h, 'EXP')) {
+            target = 'out-shares';
         }
 
         Promise.resolve(target)

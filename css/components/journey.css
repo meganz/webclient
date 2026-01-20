@@ -1,44 +1,43 @@
-body.web-desktop .mega-sheet.on-boarding .sheet {
+body.web-desktop .mega-sheet.journey .sheet {
     max-width: 900px;
     height: 740px;
     padding: 0;
     background: var(--mobile-page-background);
     border: 1px solid var(--mobile-border-subtle);
 }
-
-.mega-sheet.on-boarding .sheet .header {
+.mega-sheet.journey .sheet .header {
     margin: 0;
     height: 0;
 }
-.mega-sheet.on-boarding .sheet .header .close {
+.mega-sheet.journey .sheet .header .close {
     top: 16px;
     z-index: 2;
     padding: 0;
 }
-.mega-sheet.on-boarding .sheet .main,
-.mega-sheet.on-boarding .sheet .actions {
+.mega-sheet.journey .sheet .main,
+.mega-sheet.journey .sheet .actions {
     width: 100%;
     padding: 0;
 }
 
-.mega-sheet.on-boarding .sheet .content {
+.mega-sheet.journey .sheet .content {
     height: 100%;
 }
 
-.mega-on-boarding {
+.mega-journey {
     display: flex;
     flex-direction: row;
     align-items: flex-start;
     height: 100%;
 }
 
-.mega-on-boarding .steps {
+.mega-journey .steps {
     width: 248px;
     padding: 48px 24px;
     box-sizing: border-box;
 }
 
-.mega-on-boarding .main-content {
+.mega-journey .main-content {
     display: flex;
     flex-direction: column;
     padding: 48px 0 40px;
@@ -50,7 +49,7 @@ body.web-desktop .mega-sheet.on-boarding .sheet {
     justify-content: space-between;
 }
 
-.mega-on-boarding .main-content-div {
+.mega-journey .main-content-div {
     max-height: 100%;
     height: 100%;
     overflow: hidden;
@@ -58,32 +57,37 @@ body.web-desktop .mega-sheet.on-boarding .sheet {
     flex-direction: column;
 }
 
-.mega-on-boarding .main-content .image-wrapper > div {
+.mega-journey .main-content .image-wrapper > div {
     border-radius: 0;
     margin-bottom: 20px;
 }
 
-.mega-on-boarding .main-content .image-wrapper .green-check {
+.mega-journey .main-content .image-wrapper .green-check {
     background-image: url("../../images/onboarding/green-check-3d.png");
     background-size: contain;
     width: 96px;
     height: 96px;
 }
 
-.mega-on-boarding .main-content h2 {
+.mega-journey .main-content h1 {
+    font: var(--mobile-font-heading-h1);
+    margin: 0 0 4px;
+}
+.mega-journey .main-content h2 {
     color: var(--mobile-text-primary);
     font: var(--mobile-font-heading-h2);
     margin: 4px 0 0;
 }
 
-.mega-on-boarding .main-content a {
+.mega-journey .main-content a {
     color: var(--mobile-link-primary);
 }
 
-.mega-on-boarding  .main-content p:not(.subtitle) {
+.mega-journey .main-content p:not(.subtitle) {
     margin-bottom: 0;
 }
-.mega-on-boarding .main-content p.subtitle {
+
+.mega-journey .main-content p.subtitle {
     font: var(--mobile-font-caption-small-regular);
     color: var(--mobile-text-secondary);
     line-height: 18px;
@@ -91,55 +95,65 @@ body.web-desktop .mega-sheet.on-boarding .sheet {
     margin: 0 0 16px;
 }
 
-.mega-on-boarding .main-content .custom-div,
-.mega-on-boarding .main-content .custom-div > div {
+.mega-journey .main-content .custom-div,
+.mega-journey .main-content .custom-div > div {
     display: flex;
     flex-direction: column;
 }
 
-.mega-on-boarding .main-content-div > *:not(.custom-div),
-.mega-sheet.on-boarding .sheet .actions,
-.mega-on-boarding .custom-div > div > *:not(.mega-component) {
-    padding: 0 40px;
+.mega-journey .main-content-div > *:not(.custom-div),
+.mega-sheet.journey .sheet .actions,
+.mega-journey .custom-div > div:not(.no-padding) > *:not(.mega-component) {
+    padding: 0 48px;
 }
-.mega-on-boarding .main-content-div div.ps__rail-y {
+.mega-journey .main-content-div div.ps__rail-y {
     padding: 0;
 }
-.mega-on-boarding .main-content .actions {
+.mega-journey .main-content .actions {
     margin-top: 44px;
     display: flex;
     justify-content: flex-start;
     flex-direction: row-reverse;
 }
 
-.mega-on-boarding .main-content .actions button {
+.mega-journey .main-content .actions button {
     width: auto;
     margin-top: 0;
+    margin-inline-start: 8px;
 }
-.mega-on-boarding .main-content .actions button:nth-child(even) {
-    margin-inline-end: 16px;
+.mega-journey .main-content .actions button.slim {
+    height: 36px;
 }
-.mega-on-boarding .main-content .actions button.back-button {
+
+.pwm-image {
+    background: url('../../images/pm/plan-subscription.png') center / cover no-repeat;
+    width: 100%;
+    height: 200px;
+    display: block;
+    border-radius: var(--mobile-border-radius-large) var(--mobile-border-radius-large) 0 0;
+}
+
+.mega-journey .main-content .actions button.back-button {
     margin-inline-end: auto;
     padding: 0;
 }
-.mega-on-boarding .main-content .actions button.back-button .primary-text {
+.mega-journey .main-content .actions button.back-button .primary-text {
     text-decoration: underline;
 }
-body.ru .mega-on-boarding .main-content .actions button.back-button .primary-text {
+body.ru .mega-journey .main-content .actions button.back-button .primary-text {
     text-underline-offset: 0.24em;
 }
-.mega-on-boarding .main-content .actions button.primary .right-icon {
+.mega-journey .main-content .actions button.primary .right-icon {
     --mask-color: var(--mobile-icon-inverse);
 }
 
 @media only screen and (max-width: 1079px) {
 
-    body.web-desktop .mega-sheet.on-boarding .sheet {
+    body.web-desktop .mega-sheet.journey .sheet {
         max-width: 600px;
     }
 
-    .mega-on-boarding .steps {
+    .mega-journey .steps {
         width: 80px;
     }
 }

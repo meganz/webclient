@@ -7,6 +7,7 @@ var pro = {
     /** An array of the possible membership plans from the API */
     membershipPlans: [],
     conversionRate: 0,
+    businessPlanData: null,     // Business plan data from the API
 
     lastLoginStatus: -99, // a var to store the user login status when prices feteched
 
@@ -70,6 +71,8 @@ var pro = {
 
     anyDiscount: false,
 
+    usedDiscountCode: null,
+
     /**
      * Determines if a Business or Pro Flexi account is expired or in grace period
      * @param {Number} accountStatus The account status e.g. from u_attr.b.s (Business) or u_attr.pf.s (Pro Flexi)
@@ -120,6 +123,11 @@ var pro = {
 
     divideAllBy100(obj, excl) {
         'use strict';
+        if (!obj || obj.dividedBy100) {
+            return obj;
+        }
+
+        obj.dividedBy100 = true;
 
         excl = excl || [];
 
@@ -139,10 +147,20 @@ var pro = {
             return false;
         }
 
-        const { result } = await api.req({ a: 'dci', v: 2, dc: u_attr.mkt.dc[0].dc, extra: 1 }).catch(nop);
+        let discountCode = u_attr.mkt.dc[0].dc;
 
-        return (result && result.ex > Date.now() / 1000)
-            ? result
+        if (pro.usedDiscountCode === discountCode) {
+            const unusedDiscount = u_attr.mkt.dc.find(d => d.dc !== pro.usedDiscountCode);
+            if (!unusedDiscount) {
+                return false;
+            }
+            discountCode = unusedDiscount.dc;
+        }
+
+        const res = await api.send({a: 'dci', v: 2, dc: discountCode, extra: 1}).catch(nop);
+
+        return (res && res.ex > Date.now() / 1000)
+            ? res
             : false;
     },
 
@@ -978,6 +996,7 @@ var pro = {
                         && ((pro.taxInfo && (type1info.trns.lpn || type1info.trns.pn))
                             || (type1info.trns.lp || type1info.trns.p)),
                     isPlanObj: true,
+                    minUsers: plan[pro.UTQA_RES_INDEX_EXTRAS].minUsers || false,
                 };
 
                 lazy(thisPlan, 'id', () => plan[pro.UTQA_RES_INDEX_ID]);
@@ -1244,6 +1263,8 @@ var pro = {
                 trial: false,
                 trialStrings: false,
                 featureStrings: false,
+                insdis: false,
+                minUsers: minu,
             };
 
             this.createPlanObject(bussinessPlanArray);
@@ -1426,6 +1447,11 @@ var pro = {
             if (planTypes[type]) {
                 return planTypes[type];
             }
+            if (plan === pro.ACCOUNT_LEVEL_BUSINESS) {
+                key = pro.businessPlanData.id + pro.businessPlanData.it;
+                return pro.planObjects.planKeys[key] || false;
+            }
+
             plan = pro.membershipPlans.find((searchPlan) => {
                 return ((searchPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL] === plan)
                     && (searchPlan[pro.UTQA_RES_INDEX_MONTHS] === months));
@@ -1605,13 +1631,40 @@ var pro = {
 
         return pro.planSearch.searchedPlans[searchKey] || false;
     },
+
+    sortPlansByStorage(planObjs) {
+        'use strict';
+        if (!Array.isArray(planObjs) || !planObjs.length) {
+            return planObjs;
+        }
+
+        return planObjs.sort((a, b) => {
+            a = pro.getPlanObj(a);
+            b = pro.getPlanObj(b);
+            if (a.level === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
+                return 1;
+            }
+            if (b.level === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
+                return -1;
+            }
+            if (a.storage === b.storage) {
+                return a.level - b.level;
+            }
+            return a.storage - b.storage;
+        });
+    },
+
     /**
      * Sorts the plan levels by storage, with flexi then business at the end
      * @param {Array} planLevels - The plan levels to sort
      * @returns {Array} - The sorted plan levels
      */
-    sortPlans(planLevels) {
+    sortPlans(planLevels, businessLast) {
         'use strict';
+
+        if (businessLast === undefined) {
+            businessLast = true;
+        }
 
         if (!Array.isArray(planLevels)) {
             return [];
@@ -1649,7 +1702,23 @@ var pro = {
 
             return aObj.storage - bObj.storage;
         });
-    }
+    },
+
+    getPlanOfDurationOrLower(planLevel, duration) {
+        'use strict';
+        const firstPlanOfLevel = pro.getPlanObj(planLevel);
+        if (!firstPlanOfLevel) {
+            return false;
+        }
+
+        return firstPlanOfLevel.durationOptions.reduce((acc, plan) => {
+            plan = pro.getPlanObj(plan);
+            if (plan && (plan.months <= duration) && (plan.months > acc.months)) {
+                return plan;
+            }
+            return acc;
+        }, firstPlanOfLevel) || false;
+    },
 };
 
 lazy(pro, 'yearlyDiscountPercentage', () => {
@@ -1795,6 +1864,12 @@ lazy(pro, 'filter', () => {
             variableStorage:
                 new Set([
                     pro.ACCOUNT_LEVEL_PRO_FLEXI, pro.ACCOUNT_LEVEL_BUSINESS
+                ]),
+
+            obqDialog:
+                new Set([
+                    pro.ACCOUNT_LEVEL_BASIC, pro.ACCOUNT_LEVEL_PRO_LITE, pro.ACCOUNT_LEVEL_PRO_I,
+                    pro.ACCOUNT_LEVEL_PRO_II, pro.ACCOUNT_LEVEL_PRO_III, pro.ACCOUNT_LEVEL_BUSINESS
                 ]),
         },
 

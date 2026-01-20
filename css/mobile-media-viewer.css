@@ -180,7 +180,7 @@
     z-index: 9;
 }
 
-.mobile .media-viewer .img-wrap.hidden ~ .video-block {
+.mobile.video .media-viewer .video-block {
     width: 100%;
 }
 

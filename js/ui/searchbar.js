@@ -13,7 +13,6 @@ lazy(mega.ui, 'searchbar', () => {
     let $dropdownRecents;
     let $dropdownResults;
     let $fileSearch;
-
     let showEmptyState;
 
     const recentlySearched = {
@@ -174,7 +173,7 @@ lazy(mega.ui, 'searchbar', () => {
      * @returns {Function|false}
      */
     const locationFn = (location) => {
-        
+
         if (!location) {
             if (!folderlink) {
                 return false;
@@ -183,7 +182,7 @@ lazy(mega.ui, 'searchbar', () => {
         }
 
         if (location === 'photos') {
-            return M.isGalleryNode.bind(M);
+            return mega.gallery.allowedInMedia;
         }
 
         if (M.getNodeByHandle(location)) {
@@ -244,6 +243,7 @@ lazy(mega.ui, 'searchbar', () => {
      * @return {undefined}
      */
     function initSearch(currentPage) {
+        const $searchCount = $('.fm-search-count', '.fm-right-files-block .fm-right-header');
         $topbar = $('#startholder .js-topbar, #fmholder .mega-header');
         $dropdownSearch = $('.dropdown-search', $topbar);
 
@@ -266,9 +266,17 @@ lazy(mega.ui, 'searchbar', () => {
             var val = $.trim($('.js-filesearcher', this).val());
 
             // if current page is search and value is empty result move to root.
-            if (!val && window.page.includes('/search')) {
+            if (val === '') {
                 $('.js-btnclearSearch', $(this)).addClass('hidden');
-                loadSubPage(window.page.slice(0, window.page.indexOf('/search')));
+                if (window.page.includes('/search')) {
+                    loadSubPage(window.page.slice(0, window.page.indexOf('/search')));
+                }
+                else if (folderlink && window.page.indexOf('fm') === 0) { // page is fm or fm/node_handle
+                    // reset the filter view to folder view
+                    const chipBtn = $('button.search-chip', this);
+                    const location = chipBtn.length && chipBtn.attr('data-location');
+                    M.openFolder(location);
+                }
             }
             else if (val.length >= minTermLen || !asciionly(val)) {
                 const chipBtn = $('button.search-chip', this);
@@ -288,8 +296,7 @@ lazy(mega.ui, 'searchbar', () => {
                             if (M.currentdirid === searchPage) {
                                 M.v = M.getFilterBy(M.getFilterBySearchFn(val, location));
                                 M.renderMain();
-                                $('.fm-search-count', '.fm-right-header')
-                                    .text(mega.icu.format(l.search_results_count, M.v.length));
+                                M.updateSearchCount({target: $searchCount});
                             }
                             else {
                                 loadSubPage(`fm/${searchPage}`);
@@ -350,7 +357,6 @@ lazy(mega.ui, 'searchbar', () => {
             $('.js-btnclearSearch', $topbar).addClass('hidden');
             $fileSearch.val('').focus();
             renderUpdatedDropdown(null, true);
-
         });
 
         // Add all the relevant input event listeners for dropdown

@@ -78,7 +78,7 @@ MegaData.prototype.putToTransferTable = function(node, ttl) {
         + '<td><span class="item-type-icon icon-' + fileIcon(node) + '-24"></span>'
         + '<span class="tranfer-filetype-txt">' + htmlentities(node.name) + '</span></td>'
         + '<td>' + filetype(node) + '</td>'
-        + '<td class="transfer-size">' + bytesToSize(node.s, 2) + '</td>'
+        + '<td class="transfer-size">' + bytesToSize(node.s, -1) + '</td>'
         + '<td><span class="downloaded-size">' + bytesToSize(dowloadedSize) + '</span></td>'
         + '<td><span class="eta"></span><span class="speed">' + pauseTxt + '</span></td>'
         + '<td><span class="transfer-status">' + l[7227] + '</span></td>'
@@ -1127,7 +1127,7 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
                 + '<td><span class="item-type-icon icon-' + fileIcon({ name: f.name }) + '-24"></span>'
                 + '<span class="tranfer-filetype-txt">' + htmlentities(f.name) + '</span></td>'
                 + '<td>' + filetype(f.name) + '</td>'
-                + '<td class="transfer-size">' + bytesToSize(filesize, 2) + '</td>'
+                + '<td class="transfer-size">' + bytesToSize(filesize, -1) + '</td>'
                 + '<td><span class="uploaded-size">' + bytesToSize(0) + '</span></td>'
                 + '<td><span class="eta"></span><span class="speed">' + pauseTxt + '</span></td>'
                 + '<td><span class="transfer-status">' + l[7227] + '</span></td>'
@@ -1526,7 +1526,7 @@ MegaData.prototype.ulprogress = function(ul, perc, bl, bt, bps) {
             domElement._elmSentSize.textContent = bytesToSize(bt, 2);
         }
         else {
-            domElement._elmSentSize.textContent = bytesToSize(bl, 1, -1);
+            domElement._elmSentSize.textContent = bytesToSize(bl, -1);
         }
     }
 

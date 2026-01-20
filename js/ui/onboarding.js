@@ -394,7 +394,8 @@ mBroadcaster.addListener('fm:initialized', () => {
                                             action: 3,
                                             event: 500899
                                         },
-                                        customContent: () => {
+                                        customContent: async() => {
+                                            await M.require('pwm');
                                             mega.ui.onboarding.selector = new MegaImportPassSelector();
                                             return mega.ui.onboarding.selector.container;
                                         },
@@ -1396,7 +1397,11 @@ mBroadcaster.addListener('fm:initialized', () => {
 
         showOnBoardingDialog() {
 
-            mega.ui.onboarding.sheet = new MegaOnboardingJourney(this.map.options);
+            mega.ui.onboarding.sheet = new MegaJourney({
+                componentClassname: 'mega-sheet journey on-boarding',
+                contentClassname: 'mega-journey mega-on-boarding',
+                ...this.map.options
+            });
             mega.ui.onboarding.sheet.show();
 
             if (this.map.markComplete) {

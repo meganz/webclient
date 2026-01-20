@@ -455,6 +455,14 @@ function bindTransfersMassEvents(context) {
         if (!$this.hasClass('disabled')) {
             let $elm;
             if ($this.hasClass('active')) {
+
+                if ($this.parent('.transfer-widget-footer').length) {
+                    eventlog(501075);
+                }
+                else if ($this.parent('.transfer-panel-actions').length) {
+                    eventlog(501076);
+                }
+
                 // terms of service
                 if (u_type || folderlink || Object(u_attr).terms || $('.transfer-table', '.fmholder').length === 0) {
                     Object.keys(dlQueue._qpaused).map(fm_tfsresume);
@@ -485,6 +493,14 @@ function bindTransfersMassEvents(context) {
                 }
             }
             else {
+
+                if ($this.parent('.transfer-widget-footer').length) {
+                    eventlog(501077);
+                }
+                else if ($this.parent('.transfer-panel-actions').length) {
+                    eventlog(501078);
+                }
+
                 var $trs = $('.transfer-table tr:not(.transfer-completed)', '.fmholder');
                 let ids;
                 if ($('.transfer-table', '.fmholder').length) {
@@ -521,6 +537,14 @@ function bindTransfersMassEvents(context) {
 
     $('.transfer-clear-all-icon', context).rebind('click.transfers', function() {
         if (!$(this).hasClass('disabled')) {
+
+            if ($this.parent('.transfer-widget-footer').length) {
+                eventlog(501079);
+            }
+            else if ($this.parent('.transfer-panel-actions').length) {
+                eventlog(501080);
+            }
+
             msgDialog('confirmation', 'clear all transfers', l.cancel_transfers_dlg_title, l[7225], (e) => {
                 if (!e) {
                     return;

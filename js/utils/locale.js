@@ -129,7 +129,7 @@ function localeImages(scope) {
  * 5:       Monday, 3 October 2022 at 10:30:00 NZDT
  * 6:       Oct 2022
  * 7:       Monday, 3 October 2022 at 10:30 NZDT
- * 8:       3 October 2022
+ * 8:       3 October 2022 at 10:30
  * 9:       3 October 2022
  * 10:      Mon
  * 11:      Monday
@@ -161,7 +161,7 @@ function setDateTimeFormat(locales, format) {
         options.day = format === 3 || format === 6 ? undefined : 'numeric';
         options.weekday = format === 4 || format === 5 ? 'long' : undefined;
 
-        if (format === 0 || format === 5 || format === 7) {
+        if (format === 0 || format === 5 || format === 7 || format === 8) {
             options.minute = 'numeric';
             options.hour = 'numeric';
             if (format === 5) {
@@ -176,6 +176,9 @@ function setDateTimeFormat(locales, format) {
         if (format === 7) {
             options.weekday = 'long';
             options.timeZoneName = 'short';
+        }
+        if (format === 8) {
+            options.weekday = undefined;
         }
     }
     // Set non full date format
@@ -2036,11 +2039,12 @@ mBroadcaster.once('boot_done', function populate_l() {
         's4_s3_prefix_usage',
         'info_panel_tags_create_btn',
         'bn_odq_text',
+        'url_import_feature_warning',
         'lna_grant_p1',
         'lna_grant_p2',
         'lna_grant_warning',
         'lna_reset_p1',
-        'lna_reset_p3',
+        'lna_reset_p3'
     ];
     for (let i = common.length; i--;) {
         var num = common[i];

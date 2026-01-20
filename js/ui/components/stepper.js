@@ -4,6 +4,7 @@ class MegaStepper extends MegaComponent {
 
         this.steps = options.steps;
         this.currentStep = options.currentStep || 1;
+        this.hideSecondary = options.hideSecondary || false;
 
         this.addClass('stepper');
         this.render();
@@ -32,8 +33,13 @@ class MegaStepper extends MegaComponent {
             if (this.currentStep === index + 0.1) {
                 stepElement.classList.add('active');
             }
-            else if (this.currentStep > index + 0.1) {
-                stepElement.classList.add('completed');
+            else {
+                if (this.currentStep > index + 0.1) {
+                    stepElement.classList.add('completed');
+                }
+                if (this.hideSecondary) {
+                    stepElement.classList.add('hidden');
+                }
             }
         }
         else if (currentPrimaryIndex === index) {

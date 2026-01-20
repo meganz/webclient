@@ -242,7 +242,13 @@ var astroPayDialog = {
 
 
         // Make sure they entered something
-        if ((astroPayDialog.fullName === '')) {
+        if (
+            astroPayDialog.fullName === '' ||
+            // If the provider supports extra address information, validate it.
+            // Currently only India needs Address and City, but others may need them in future.
+            this.selectedProvider.supportsExtraAddressInfo &&
+            (astroPayDialog.address === '' || astroPayDialog.city === '')
+        ) {
 
             pro.propay.hideLoadingOverlay();
             // Show error dialog with Missing payment details
@@ -267,6 +273,12 @@ var astroPayDialog = {
             });
 
 
+            return false;
+        }
+
+        // eslint-disable-next-line no-use-before-define
+        if (addressDialog.checkAndUpdateTaxAttr(astroPayDialog.taxNumber)) {
+            pro.propay.hideLoadingOverlay();
             return false;
         }
 
@@ -2027,8 +2039,11 @@ var addressDialog = {
                 prefillMultipleInputs(this.postCodeMegaInput, getBillingProp('postcode', encodedVer));
             }
 
-            if (billingInfo.taxCode) {
-                prefillMultipleInputs(this.taxCodeMegaInput, getBillingProp('taxCode', encodedVer));
+            if (u_attr && u_attr['^taxnum'] || billingInfo.taxCode) {
+                prefillMultipleInputs(
+                    this.taxCodeMegaInput,
+                    u_attr && u_attr['^taxnum'] || getBillingProp('taxCode', encodedVer)
+                );
             }
         }
         if (noFname) {
@@ -2063,6 +2078,10 @@ var addressDialog = {
                 if (!billingInfo.country) {
                     billingInfo.country = u_attr.country ? u_attr.country : u_attr.ipcc;
                 }
+                if ((!billingInfo.taxCode || billingInfo.taxCode === '') && u_attr['%taxnum']) {
+                    billingInfo.taxCode = u_attr['%taxnum'];
+                }
+
                 promise.resolve(billingInfo);
             };
 
@@ -2341,13 +2360,14 @@ var addressDialog = {
             return;
         }
 
+        const saveAttribute = function(name, value, force) {
+            if (value || force) {
+                return mega.attr.setArrayAttribute('billinginfo', name, value, false, true);
+            }
+        };
+
         // If remember billing address, save as user attribute for future usage.
         if (this.$rememberDetailsCheckbox.hasClass("checkboxOn")) {
-            const saveAttribute = function(name, value) {
-                if (value) {
-                    return mega.attr.setArrayAttribute('billinginfo', name, value, false, true);
-                }
-            };
             saveAttribute('firstname', to8(fieldValues['first-name']));
             saveAttribute('lastname', to8(fieldValues['last-name']));
             saveAttribute('address1', to8(fieldValues.address1));
@@ -2356,7 +2376,6 @@ var addressDialog = {
             saveAttribute('city', to8(fieldValues.city));
             saveAttribute('country', country);
             saveAttribute('state', state);
-            saveAttribute('taxCode', to8(taxCode));
             saveAttribute('version', '2');
         } else {
             // Forget Attribute.
@@ -2371,13 +2390,18 @@ var addressDialog = {
             removeAttribute('city');
             removeAttribute('country');
             removeAttribute('state');
-            removeAttribute('taxCode');
             removeAttribute('version');
         }
 
+        // Always save tax code, even if it is an empty string
+        saveAttribute('taxCode', to8(taxCode), true);
+
         // log the click on the 'subscribe' button
         delay('addressDlg.click', eventlog.bind(null, 99789));
-
+        if (addressDialog.checkAndUpdateTaxAttr(taxCode)) {
+            addressDialog.closeDialog();
+            return;
+        }
 
         if (typeof callback === 'function') {
             callback(addressDialog.mostRecentValidInput);
@@ -2391,6 +2415,89 @@ var addressDialog = {
         if (!blockPayment) {
             this.proceedToPay(fieldValues, state, country, taxCode, allowEcpFlow);
         }
+    },
+
+    /**
+     * Compare the new taxCode to the existing ^taxnum/%taxnum attribute as appropriate.
+     * Set if different and update the pricing information.
+     *
+     * @param {*} taxCode code to be set
+     * @returns {boolean}
+     */
+    checkAndUpdateTaxAttr(taxCode) {
+        'use strict';
+
+        // If user currently on the registerb page and has no current account,
+        // assume it is a business account for tax code updating.
+        const isBusinessRegistration = (page === 'registerb') && !u_type;
+        const updateProTax = (!u_attr.b || !this.businessPlan || !this.userInfo || !this.businessRegPage)
+            && !isBusinessRegistration;
+        const taxAttr = updateProTax ? '^taxnum' : '%taxnum';
+
+        if (taxCode !== undefined && taxCode !== u_attr[taxAttr] && !(!taxCode && !u_attr[taxAttr])) {
+            loadingDialog.show('propay-taxset');
+            u_attr[taxAttr] = taxCode;
+            const promise = (
+                updateProTax ?
+                    Promise.resolve(mega.attr.set2(null, 'taxnum', to8(taxCode), -2)) :
+                    Promise.resolve(new BusinessAccount().updateBusinessAttrs([{ key: taxAttr, val: taxCode }]))
+            )
+                .then(() => {
+                    return pro.loadMembershipPlans(nop, true);
+                });
+
+            if (pro.propay.onPropayPage()) {
+                promise
+                    .then(() => {
+                        pro.propay.updatePayment(undefined, true);
+                        pro.propay.renderPlanInfo();
+                    })
+                    .catch(dump)
+                    .always(() => {
+                        loadingDialog.hide('propay-taxset');
+                    });
+            }
+            else {
+                promise
+                    .then(() => {
+                        if (page === 'registerb') {
+                            if (is_mobile) {
+                                parsepage(pages.registerb);
+                            }
+                            if (mega.buinsessAccount && mega.buinsessAccount.cachedBusinessPlan) {
+                                delete mega.buinsessAccount.cachedBusinessPlan;
+                            }
+                            this.billingInfoFilled = false;
+                            const regBusiness = new BusinessRegister();
+
+                            const {nbusers, cname, fname, lname, tel, email} =
+                                (addressDialog.businessRegisterData || Object.create(null));
+
+                            delete addressDialog.businessRegisterData;
+
+                            regBusiness.initPage(nbusers, cname, tel, fname, lname, email, {
+                                skipPasswordReset: true,
+                                skipTermsReset: true,
+                            });
+                        }
+                        else if (page === 'repay') {
+                            parsepage(pages.repay);
+                            var repayPage = new RepayPage();
+                            repayPage.initPage();
+                        }
+                    })
+                    .catch(dump)
+                    .always(() => {
+                        loadingDialog.hide('propay-taxset');
+                    });
+            }
+            if (addressDialog.mostRecentValidInput) {
+                pro.propay.initBillingInfo(addressDialog.mostRecentValidInput);
+                delete addressDialog.mostRecentValidInput;
+            }
+            return true;
+        }
+        return false;
     },
 
     /**
@@ -2428,9 +2535,6 @@ var addressDialog = {
             }
             else if ((propayGatewayId !== 16) || allowEcpFlow) {
                 pro.propay.sendPurchaseToApi(propayGatewayId);
-            }
-            if (taxCode) {
-                mega.attr.set2(null, 'taxnum', to8(taxCode), -2).catch(dump);
             }
         }
         else {
@@ -2568,6 +2672,16 @@ var addressDialog = {
         else {
             // @todo: Use mega.ui.secondaryNav.showBanner instead
             $('.grace-business', '.fm-banner-holder').removeClass('visible');
+        }
+
+        if (pro.propay.discountInfo) {
+            pro.usedDiscountCode = pro.propay.discountInfo.dc;
+        }
+
+        if (fminitialized) {
+            pro.getTargetedDiscountInfo().then((dci) => {
+                mega.ui.header.showTargetedDiscountButton(dci);
+            });
         }
 
         if (parseInt(pro.propay.planNum) === pro.ACCOUNT_LEVEL_FEATURE_VPN) {
@@ -2761,7 +2875,7 @@ var addressDialog = {
                         : l.pwm_free_trial_used_h;
 
                     msgDialog(
-                        `confirmationa:!^${l.subscribe_btn}!${l[82]}`,
+                        `confirmationa:!^${l.subscribe_btn}!${l.msg_dlg_cancel}`,
                         '',
                         warningTitle,
                         l.vpn_free_trial_used_b,

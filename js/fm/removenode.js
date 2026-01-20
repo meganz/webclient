@@ -123,7 +123,7 @@ function removeUInode(h, parent) {
 
                 // If they have permanently removed all files from the search results screen, show empty search
                 if (M.search) {
-                    $('.fm-search-count').text(mega.icu.format(l.search_results_count, 0));
+                    M.updateSearchCount({count: 0});
                     $('.fm-empty-search').removeClass('hidden');
                     $('.fm-right-files-block:not(.in-chat) .search-bottom-wrapper').addClass('hidden');
                 }
@@ -211,7 +211,7 @@ function removeUInode(h, parent) {
 
                         // If they have removed all files from the search results screen, show empty search
                         if (M.search) {
-                            $('.fm-search-count').text(mega.icu.format(l.search_results_count, 0));
+                            M.updateSearchCount({count: 0});
                             $('.fm-empty-search').removeClass('hidden');
                             $('.fm-right-files-block:not(.in-chat) .search-bottom-wrapper').addClass('hidden');
                         }

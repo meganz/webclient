@@ -63,6 +63,8 @@ pro.propay = {
     skItems: {},
     continueButtonLoadingReasons: new Set([]),
 
+    storeInitialDuration: false,
+
     gatewayElmsByName: {
         'stripe': '.payment-stripe-dialog',
         'bitcoin': '.bitcoin-invoice-dialog',
@@ -105,6 +107,7 @@ pro.propay = {
      */
     shouldShowTrial() {
         return (this.gateSupportsTrial || !this.currentGateway)
+            && !pro.propay.discountInfo
             && this.onPropayPage()
             && (this.planObj && this.planObj.trial);
     },
@@ -405,8 +408,9 @@ pro.propay = {
 
         this.updateS4Continue();
 
-        $('.free-trial-unsupported', this.$page)
-            .toggleClass('hidden', (!!this.shouldShowTrial() === !!this.planObj.trial));
+        const hideWarning = (!!this.shouldShowTrial() === !!this.planObj.trial) || !!pro.propay.discountInfo;
+        $('.free-trial-unsupported', this.$page).toggleClass('hidden', hideWarning);
+
         this.renderLocaleInfo(this.isVoucherBalance());
     },
 
@@ -892,7 +896,7 @@ pro.propay = {
     shouldShowTrialBlocker: (blockerText, blockerTitle) => {
         'use strict';
 
-        const trialExpected = !sessionStorage[`noTrial${pro.propay.planNum}`];
+        const trialExpected = !sessionStorage[`noTrial${pro.propay.planNum}`] && !pro.propay.discountInfo;
 
         return !pro.propay.ignoreTrial
             && !pro.filter.simple.validPurchases.has(pro.propay.planNum)
@@ -998,7 +1002,7 @@ pro.propay = {
                         resolve(2);
                     },
                     cancel: {
-                        label: l[82],
+                        label: l.msg_dlg_cancel,
                         callback: () => {
                             resolve(2);
                         }
@@ -1162,7 +1166,7 @@ pro.propay = {
             blockerTitle = l.free_trial_unavailable;
             blockerText = l.subs_to_make_online_life_x;
             btnLabel = l.subscribe_btn;
-            btnLabelCancel = l[82];
+            btnLabelCancel = l.msg_dlg_cancel;
             canContinue = true;
         }
 
@@ -1300,9 +1304,9 @@ pro.propay = {
                 !u_type && M.require('zxcvbn_js')
             ]);
 
-            this.planObj = pro.getPlanObj(this.planNum, this.getPreSelectedDuration());
+            this.planObj = pro.getPlanOfDurationOrLower(this.planNum, this.getPreSelectedDuration());
 
-            // If no plan of selected duration found, see if there are any plans of the same level
+            // If no plan of selected duration or lower found, see if there are any plans of the same level
             if (!this.planObj) {
                 this.planObj = pro.getPlanObj(this.planNum);
 
@@ -1311,6 +1315,15 @@ pro.propay = {
                     console.error('No plan found for selected level');
                     return false;
                 }
+            }
+
+            if (this.storeInitialDuration) {
+                this.initialDuration = this.planObj.months;
+                delete this.storeInitialDuration;
+            }
+            else {
+                this.initialDuration = sessionStorage['pro.initialDuration'] | 0;
+                delete sessionStorage['pro.initialDuration'];
             }
 
             this.selectedPeriod = this.planObj.months;
@@ -1677,6 +1690,9 @@ pro.propay = {
 
             $taxInfo.removeClass('hidden');
         }
+        else {
+            $taxInfo.addClass('hidden');
+        }
 
         const $preDiscount = $('.pre-discount', $planCard).addClass('hidden');
 
@@ -1940,7 +1956,11 @@ pro.propay = {
          * Indicating the best option to save money on
          */
         const biggestSaveOption = [0, 0];
-        const { durationOptions } = this.planObj;
+        let {durationOptions} = this.planObj;
+
+        if (!this.planObj.isIn('validFeatures')) {
+            durationOptions = durationOptions.filter(([,,,,months]) => months >= this.initialDuration);
+        }
 
         const appendDurationOption = ([,al,,,months]) => {
             if (discountMonths === months) {
@@ -2489,7 +2509,14 @@ pro.propay = {
 
         let isOpen = false;
 
+        const $dropdownWrapper = $('.dropdown-wrapper-primary', this.$page);
+
         const handleIsOpen = (close) => {
+            if (close === undefined) {
+                $container.removeClass('error');
+                $dropdownWrapper.removeClass('error');
+            }
+
             if (close) {
                 isOpen = false;
                 $container.removeClass('active');

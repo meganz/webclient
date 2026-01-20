@@ -98,6 +98,11 @@ lazy(T.ui, 'page', () => {
                 document.body.classList.add('subpage');
                 footer.querySelector('.js-main-footer').classList.add('hidden');
                 footer.querySelector('.js-subpage-footer').classList.remove('hidden');
+
+                const yn = footer.querySelector('.js-ft-year');
+                if (yn) {
+                    yn.textContent = new Date().getFullYear();
+                }
             }
             else {
                 document.body.classList.remove('subpage');

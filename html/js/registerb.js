@@ -17,10 +17,12 @@ function BusinessRegister() {
 
 /** a function to rest business registration page to its initial state*/
 /* eslint-disable-next-line complexity */
-BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, preSetFname, preSetLname, preSetEmail) {
+BusinessRegister.prototype.initPage = function(
+    preSetNb, preSetName, preSetTel, preSetFname, preSetLname, preSetEmail, extra) {
     "use strict";
 
     loadingDialog.show();
+    extra = extra || Object.create(null);
 
     var $pageContainer = $('.bus-reg-body');
     var mySelf = this;
@@ -31,12 +33,25 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
     var $fnameInput = $('#business-fname', $pageContainer).val(preSetFname || '');
     var $lnameInput = $('#business-lname', $pageContainer).val(preSetLname || '');
     var $emailInput = $('#business-email', $pageContainer).val(preSetEmail || '');
-    var $passInput = $('#business-pass', $pageContainer).val('');
-    var $rPassInput = $('#business-rpass', $pageContainer).val('');
+    var $passInput = $('#business-pass', $pageContainer);
+    var $rPassInput = $('#business-rpass', $pageContainer);
+
+    if (!extra.skipPasswordReset) {
+        $passInput.val('');
+        $rPassInput.val('');
+    }
+
     var $storageInfo = $('.business-plan-note span', $pageContainer);
 
+    const $termsCheckbox = $('.mega-terms.bus-reg-agreement .checkdiv', $pageContainer);
+    if (extra.skipTermsReset) {
+        $termsCheckbox.addClass('checkboxOn').removeClass('checkboxOff');
+    }
+    else {
+        $termsCheckbox.removeClass('checkboxOn');
+    }
+
     $('.bus-reg-radio-block .bus-reg-radio', $pageContainer).removeClass('radioOn').addClass('radioOff');
-    $('.mega-terms.bus-reg-agreement .checkdiv', $pageContainer).removeClass('checkboxOn');
     $('.ok-to-auto.bus-reg-agreement .checkdiv', $pageContainer).addClass('checkboxOn');
     $('.bus-reg-agreement.mega-terms .radio-txt', $pageContainer).safeHTML(l['208s']);
     $('.bus-reg-plan .business-base-plan .left', $pageContainer)
@@ -434,6 +449,16 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
             }
         });
 
+    if (extra.skipTermsReset) {
+        const $busRegBtns = $('.bus-reg-btn, .bus-reg-btn-2', $pageContainer);
+        if ($('.bus-reg-agreement .checkdiv.checkboxOn', $pageContainer).length === 2) {
+            $busRegBtns.removeClass('disabled');
+        }
+        else {
+            $busRegBtns.addClass('disabled');
+        }
+    }
+
     // event handlers for focus and blur on checkBoxes
     var $regChk = $('.checkdiv input', $pageContainer);
     $regChk.rebind(
@@ -697,6 +722,9 @@ BusinessRegister.prototype.doRegister = function(nbusers, cname, fname, lname, t
             if (pMethod !== 'voucher') {
                 mySelf.planInfo.usedGatewayId = $paymentMethod.attr('prov-id');
                 mySelf.planInfo.usedGateName = $paymentMethod.attr('gate-n');
+            }
+            if (addressDialog) {
+                addressDialog.businessRegisterData = {nbusers, cname, fname, lname, tel, email};
             }
             mySelf.goToPayment(userInfo);
         });

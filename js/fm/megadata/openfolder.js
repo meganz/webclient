@@ -528,8 +528,7 @@
                 );
                 $('.fm-breadcrumbs-wrapper', $fmRightHeader).addClass('hidden');
                 $('.column-settings.overlap').addClass('hidden');
-                $resultsCount.removeClass('hidden');
-                $resultsCount.text(mega.icu.format(l.search_results_count, M.v.length));
+                M.updateSearchCount({target: $resultsCount});
             }
             else if (this.currentCustomView) {
                 this.filterByParent(this.currentCustomView.nodeID);

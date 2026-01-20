@@ -27,7 +27,7 @@ lazy(mega.gallery, 'albums', () => {
     scope.maxSelectionsCount = 1500;
 
     scope.getAlbumIdFromPath = () => {
-        if (M.currentdirid && M.currentdirid.startsWith('albums/')) {
+        if (String(M.currentdirid).startsWith('albums/')) {
             return M.currentdirid.replace(/^albums\//, '');
         }
 
@@ -951,7 +951,7 @@ lazy(mega.gallery, 'albums', () => {
                     classes: ['mega-button', 'branded-green']
                 },
                 cancel: {
-                    label: l[82]
+                    label: l.msg_dlg_cancel
                 },
                 dialogClasses: null,
                 icon: 'sprite-fm-uni icon-question icon-size-16'

@@ -698,7 +698,11 @@ class SelectionManager2_DOM extends SelectionManager2Base {
         var nodeList = this.selected_list = $.selected = $.selected || [];
 
         if (nodeList.length) {
-            if (nodeList.length === this.items.length) {
+
+            const sameSingleItemList = nodeList.length === 1 && this.items.length === 1 &&
+                nodeList[0] === this.items[0].h;
+
+            if (sameSingleItemList || nodeList.length !== 1 && nodeList.length === this.items.length) {
                 this.select_all();
             }
             else {

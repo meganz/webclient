@@ -580,7 +580,7 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
 
         delete items['.open-cloud-item'];
 
-        if (M.currentCustomView.type !== 's4' || M.currentdirid.startsWith('search/')) {
+        if (M.currentCustomView.type !== 's4' || M.search) {
             items['.open-s4-item'] = 1;
         }
 
@@ -1394,7 +1394,8 @@ MegaData.prototype.reCalcMenuPosition = function(menuNode, x, y, ico) {
         menuNode.classList.remove('v-hidden');
     }
 
-    const wH = window.innerHeight;
+    const psaBannerHeight = typeof psa === 'undefined' ? 0 : psa.getBannerHeight();
+    const wH = window.innerHeight - psaBannerHeight;
     const wW = window.innerWidth;
     const maxX = wW - SIDE_MARGIN; // max horizontal coordinate, right side of window
     const maxY = wH - TOP_MARGIN; // max vertical coordinate, bottom side of window

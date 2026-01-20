@@ -13,7 +13,7 @@ class CloudBrowserDialog extends ModalDialogsUI.SafeShowDialogController {
     static defaultProps = {
         'selectLabel': l[8023],
         'openLabel': l[1710],
-        'cancelLabel': l[82],
+        'cancelLabel': l.msg_dlg_cancel,
         'hideable': true,
         'className': ''
     };

@@ -277,7 +277,10 @@ lazy(mega.ui, 'mInfoPanel', () => {
                     break;
                 }
                 case TYPES.SHARE_OWNER: {
-                    this.users = { userHandles: [this.node.su], useName: true, size: 16 };
+                    const owner = u_handle !== this.node.u && this.node.u || sharer(this.node.h);
+                    if (owner) {
+                        this.users = {userHandles: [owner], useName: true, size: 16};
+                    }
                     break;
                 }
                 case TYPES.SHARE_USERS: {
@@ -520,6 +523,10 @@ lazy(mega.ui, 'mInfoPanel', () => {
                 }
                 case 'shares': {
                     name = l[5542];
+                    break;
+                }
+                case 'out-shares': {
+                    name = l[5543];
                     break;
                 }
                 default: {
@@ -1395,8 +1402,12 @@ lazy(mega.ui, 'mInfoPanel', () => {
         else {
             blockSet.add(TYPES.NODE_TYPE);
         }
+
         if (node.su) {
             blockSet.add(TYPES.PERMISSION);
+            blockSet.add(TYPES.SHARE_OWNER);
+        }
+        else if (node.u && node.u !== u_handle && !pfid && !pfcol) {
             blockSet.add(TYPES.SHARE_OWNER);
         }
         else if (M.isOutShare(node, 'EXP')) {

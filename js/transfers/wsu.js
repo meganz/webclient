@@ -37,10 +37,9 @@
  *
  * ***************** END MEGA LIMITED CODE REVIEW LICENCE ***************** */
 
-// WebSocket uploading v0.9
+// WebSocket uploading v0.95
 //
 // FIXME: add logic to give up on/retry uploads that are too slow or run into too many connection/CRC failures
-// @todo abort inflight chunks on pause (?)
 
 /** @property mega.wsuploadmgr */
 lazy(mega, 'wsuploadmgr', () => {
@@ -115,13 +114,14 @@ lazy(mega, 'wsuploadmgr', () => {
 
     // manages a pool of WebSocket connections to a fixed URL
     class WsPool {
-        constructor(host, uri, setupws) {
+        constructor(wspmgr, host, uri, setupws) {
+            this.wspmgr = wspmgr;
 
             this.host = host;
             this.setupws = setupws;
             this.url = `wss://${host}/${uri}`;
 
-            // pools need to be refreshed every 24 hours
+            // pools need to be refreshed every 24 hours (wallclock time)
             this.timestamp = Date.now();
 
             // we keep a single standby connection per url open for faster upload starts
@@ -130,9 +130,6 @@ lazy(mega, 'wsuploadmgr', () => {
             // one connection per pool open while idle
             this.numconn = 1;
 
-            this.retries = 0;
-            this.retryat = 0;
-            this.errored = null;
             this.chunksinflight = 0;
 
             this.files = Object.create(null);   // the files in this pool
@@ -141,40 +138,47 @@ lazy(mega, 'wsuploadmgr', () => {
             setupws(this.conn[0], this);
         }
 
-        // close excess connections
+        // gracefully close a connection
+        dispose(idx) {
+            const [ws] = this.conn.splice(idx, 1);
+            if (self.d) {
+                this.logger.warn(`disposing connection at #${idx}...`, ws);
+            }
+            if (ws) {
+                ws.cleanclose();
+            }
+        }
+
+        // close all connections
+        purge() {
+            for (let i = this.conn.length; i--;) {
+                this.dispose(i);
+            }
+            if (self.d) {
+                this.logger.warn('pool purged.', [this]);
+            }
+            oDestroy(this);
+        }
+
+        // close idle excess connections
         closexconn() {
-            while (this.conn.length > this.numconn) {
-                // delete closing connections
+            if (this.conn.length > this.numconn) {
                 for (let i = this.conn.length; i--;) {
-                    if (this.conn[i].closing && !this.conn[i].bufferedAmount && !this.conn[i].chunksonthewire.length) {
-                        this.conn[i].close();
-                        this.conn.splice(i, 1);
+
+                    if (!this.conn[i].bufferedAmount
+                     && !this.conn[i].chunksonthewire.length) {
+
+                        this.dispose(i);
                     }
 
                     if (this.conn.length <= this.numconn) {
                         break;
                     }
                 }
-
-                // mark connections as closing
-                // FIXME: select the ones with the lowest amount of inflight packets
-                let toclose = this.conn.length - this.numconn;
-
-                for (let i = this.conn.length; i--;) {
-                    if (!this.conn[i].closing) {
-                        if (!toclose--) {
-                            break;
-                        }
-                        /** @name WebSocket.closing */
-                        this.conn[i].closing = true;
-                    }
-                }
             }
         }
 
-        // returns connection with the lowest bufferedAmount
-        // also reopens failed connections and handles retries
-        // returns true if there is hope for a successful reconnect, false if the transfer needs to be abandoned
+        // returns connection with the lowest suitable bufferedAmount, false if none available
         getmostidlews() {
             // FIXME: ramp up connection count as configured
             let lowest = -1;
@@ -188,36 +192,33 @@ lazy(mega, 'wsuploadmgr', () => {
             this.closexconn();
 
             for (let i = this.conn.length; i--;) {
-                const ws = this.conn[i];
 
-                if (ws.closing) {
-                    // can this connection be deleted?
-                    if (!ws.bufferedAmount && !ws.chunksonthewire.length) {
-                        this.conn[i].close();
-                        this.conn.splice(i, 1);
-                    }
-                }
-                else if (ws.readyState === WebSocket.OPEN) {
-                    if (lowest < 0 || ws.bufferedAmount < this.conn[lowest].bufferedAmount) {
+                if (this.conn[i].readyState === WebSocket.OPEN) {
+                    if (lowest < 0 || this.conn[i].bufferedAmount < this.conn[lowest].bufferedAmount) {
                         lowest = i;
                     }
-                }
-                else if (!this.errored && ws.readyState === WebSocket.CLOSED || Date.now() > this.retryat) {
-                    // try to re-establish a failed connection every five seconds min.
-                    this.retryat = Date.now() + Math.min(31, Math.max(5, ++this.retries)) * 1e3;
-                    this.conn[i] = new WebSocket(this.url);
-                    this.setupws(this.conn[i], this);
                 }
             }
 
             if (lowest >= 0) {
-                this.retries = 0;     // we're good, reset retry counter
                 return this.conn[lowest];
             }
 
-            // give up after too many unsuccessful consecutive retries
-            // FIXME: make max wait time dependent on amount of partially uploaded data that would be lost
-            return this.retries < 10;
+            return false;
+        }
+
+        // closes all timed out connections
+        enforcetimeouts() {
+            for (let i = this.conn.length; i--;) {
+                const ws = this.conn[i];
+
+                if (ws.reconnectat ? this.wspmgr.wsumgr.seconds > ws.reconnectat : ws.readyState === ws.CLOSED) {
+                    // re-establish a failed/timed out connection
+                    ws.cleanclose();
+                    this.conn[i] = new WebSocket(this.url);
+                    this.setupws(this.conn[i], this);
+                }
+            }
         }
 
         filethroughputs() {
@@ -332,9 +333,9 @@ lazy(mega, 'wsuploadmgr', () => {
                     }
 
                     // upload confirmation lost? retrigger.
-                    if (ul.havelastchunkconfirmation && Date.now() - ul.havelastchunkconfirmation > 3000) {
+                    if (ul.havelastchunkconfirmation && this.wspmgr.wsumgr.seconds - ul.havelastchunkconfirmation > 3) {
                         this.logger.info(`Missing upload confirmation for file #${fileno} - retriggering`);
-                        ul.havelastchunkconfirmation = Date.now();
+                        ul.havelastchunkconfirmation = this.wspmgr.wsumgr.seconds;
                         return [file.size, 0, fileno];
                     }
 
@@ -453,18 +454,16 @@ lazy(mega, 'wsuploadmgr', () => {
         }
 
         // fills the buffers of all connections of the pool
-        sendchunks(round, wmgr) {
+        sendchunks(round) {
             let tooslow = false;
+
+            this.enforcetimeouts();
 
             for (; ;) {
                 const ws = this.getmostidlews();
 
                 if (ws === false) {
-                    // FIXME: close all pool connections and start over
-                    break;
-                }
-                else if (ws === true) {
-                    // wait
+                    // all filled up
                     break;
                 }
                 else {
@@ -473,7 +472,7 @@ lazy(mega, 'wsuploadmgr', () => {
                         break;
                     }
 
-                    // did the socket buffer run empty? i
+                    // did the socket buffer run empty?
                     if (ws.lastround !== undefined && !ws.bufferedAmount && (round - ws.lastround & 0xffffffff) === 1) {
                         tooslow = true;
                     }
@@ -490,9 +489,9 @@ lazy(mega, 'wsuploadmgr', () => {
                 }
             }
 
-            if (this.filethroughputs() && wmgr) {
+            if (this.filethroughputs()) {
 
-                wmgr.stop();
+                this.wspmgr.wsumgr.stop();
             }
 
             // if any buffer ran empty, we need to increase invocation frequency
@@ -504,7 +503,8 @@ lazy(mega, 'wsuploadmgr', () => {
     // creates a WsPool for each
     // setupws attaches message handlers etc. to the websocket
     class WsPoolMgr {
-        constructor(setupws) {
+        constructor(wsumgr, setupws) {
+            this.wsumgr = wsumgr;
             this.pools = [];
             this.maxulsize = [];
             this.setupws = setupws;
@@ -562,15 +562,17 @@ lazy(mega, 'wsuploadmgr', () => {
                         pools.push(this.pools[j]);
                         this.pools.splice(j, 1);
 
-                        maxulsize.push(this.maxulsize[j]);
-                        this.maxulsize.splice(j, 1);
+                        if (this.maxulsize[j]) {
+                            maxulsize.push(this.maxulsize[j]);
+                            this.maxulsize.splice(j, 1);
+                        }
                         break;
                     }
                 }
 
                 if (!found) {
                     // not found, we'll create a fresh one
-                    pools.push(new WsPool(u[i][0], u[i][1], this.setupws));
+                    pools.push(new WsPool(this, u[i][0], u[i][1], this.setupws));
                     if (u[i][2]) {
                         maxulsize.push(u[i][2]);
                     }
@@ -592,6 +594,9 @@ lazy(mega, 'wsuploadmgr', () => {
                 }
                 this.unassigned = [];
             }
+
+            // and send data/close orphaned pools
+            this.pumpdata();
         }
 
         assignfile(fu) {
@@ -609,7 +614,7 @@ lazy(mega, 'wsuploadmgr', () => {
                 // ramp up connections, FIXME: set timer to downramp after no upload inactivity
                 this.pools[i].numconn = this.numconn;
                 this.pools[i].files[fileno] = fu;
-                this.pools[i].sendchunks();
+                this.pools[i].sendchunks(0);
 
                 if (self.d) {
                     this.logger.info(`fileno#${fileno} assigned to ${file.owner}`, [fu]);
@@ -630,6 +635,7 @@ lazy(mega, 'wsuploadmgr', () => {
                     if (self.d) {
                         this.logger.log(`Closing idle pool ${i}`);
                     }
+                    this.pools[i].purge();
                     this.pools.splice(i, 1);
                 }
             }
@@ -642,7 +648,7 @@ lazy(mega, 'wsuploadmgr', () => {
             let tooslow = false;
 
             for (let i = this.pools.length; i--;) {
-                if (this.pools[i].sendchunks(this.round, wmgr)) {
+                if (this.pools[i].sendchunks(this.round)) {
                     tooslow = true;
                 }
             }
@@ -690,11 +696,11 @@ lazy(mega, 'wsuploadmgr', () => {
     class WsUploadMgr {
         constructor() {
             this.fileno = 0;
-            this.running = null;
+            this.seconds = 0;
             this.refreshing = false;
             this.logger = new MegaLogger(`WsUploadMgr(${makeUUID().slice(-16)})`, false, logger);
 
-            this.poolmgr = new WsPoolMgr((ws, pool) => {
+            this.poolmgr = new WsPoolMgr(this, (ws, pool) => {
                 // configure the freshly created WebSocket
                 ws.binaryType = 'arraybuffer';
                 ws.pool = pool;
@@ -702,53 +708,47 @@ lazy(mega, 'wsuploadmgr', () => {
                 ws.chunksonthewire = [];
 
                 // run the datapump if a connection is established/closed
-                ws.onopen = () => {
+                function openhandler() {
                     if (self.d) {
-                        this.logger.log(`Connected to ${ws.url}`);
+                        this.pool.wspmgr.wsumgr.logger.log(`Connected to ${this.url}`);
                     }
-                    ws.pool.errored = false;
-                    ws.pool.sendchunk(ws);      // immediately send a chunk to the new connection
-                    ws.pool.sendchunks();       // and fill the whole pool's buffers
-                };
+                    this.pool.sendchunk(ws);      // immediately send a chunk to the new connection
+                    this.pool.sendchunks();       // and fill the whole pool's buffers
+                }
 
-                ws.onerror = (ev) => {
-                    this.logger.error(`Connection error for ${ws.url}`, ev);
-                    ws.pool.errored = ev.timeStamp | 1;
-                };
+                function errorhandler(ev) {
+                    this.pool.wspmgr.wsumgr.logger.error(`Connection error for ${this.url}`, ev);
+                    this.reconnectat = this.pool.wspmgr.wsumgr.seconds + 5; // reconnect after 5 seconds
+		}
 
-                ws.onclose = (ev) => {
-                    const {wasClean, code, reason} = ev;
+                function closehandler(ev) {
+                    // ignore the closure of sockets on oDestroy()'d pools
+                    if (!this.pool.wspmgr) return;
 
                     if (self.d) {
-                        this.logger.info(`Disconnected from ${ws.url}`, wasClean, code, reason, [ev]);
-                    }
-
-                    if (ws.pool.errored) {
-                        tryCatch(() => {
-                            const srv = ws.url.split('/')[2].split('.')[0];
-                            eventlog(501026, JSON.stringify([1, srv, wasClean, code, reason]), true);
-                        })();
+                        const {wasClean, code, reason} = ev;
+                        this.pool.wspmgr.wsumgr.logger.info(`Disconnected from ${this.url}`, wasClean, code, reason, [ev]);
                     }
 
                     // if the connection dropped unexpectedly, we return the in-flight chunks to the pool
-                    ws.pool.chunksinflight -= ws.chunksonthewire.length;
+                    this.pool.chunksinflight -= this.chunksonthewire.length;
 
                     // we must resend all unacknowledged in-flight chunks
-                    for (let i = 0; i < ws.chunksonthewire.length; i++) {
-                        ws.pool.retrychunk(ws.chunksonthewire[i], true);
+                    for (let i = 0; i < this.chunksonthewire.length; i++) {
+                        this.pool.retrychunk(this.chunksonthewire[i], true);
                     }
 
-                    ws.pool.sendchunk(ws);       // re-enqueue inflight chunks
-                };
+                    this.pool.sendchunk(ws);       // re-enqueue inflight chunks
+                }
 
                 // process a server message
-                ws.onmessage = ({data}) => {
+                function messagehandler({data}) {
                     const view = new DataView(data);
 
                     // parse and action the message from the upload server
                     if (view.byteLength < 9) {
                         if (self.d) {
-                            this.logger.error(`Invalid server message length ${view.byteLength}`);
+                            this.pool.wspmgr.wsumgr.logger.error(`Invalid server message length ${view.byteLength}`);
                         }
                     }
                     else {
@@ -756,15 +756,28 @@ lazy(mega, 'wsuploadmgr', () => {
 
                         if (crc === crc32b(new Uint8Array(data, 0, view.byteLength - 4))) {
 
-                            return this.process(ws, data, view);
+                            return this.pool.wspmgr.wsumgr.process(this, data, view);
                         }
 
                         if (self.d) {
-                            this.logger.error(`CRC failed, byteLength=${view.byteLength} ${crc}`);
+                            this.pool.wspmgr.wsumgr.logger.error(`CRC failed, byteLength=${view.byteLength} ${crc}`);
                         }
                     }
 
-                    ws.close();
+                    this.close();
+                }
+
+                ws.addEventListener('open', openhandler);
+                ws.addEventListener('message', messagehandler);
+                ws.addEventListener('close', closehandler);
+                ws.addEventListener('error', errorhandler);
+
+                // delete listeners (except closehandler - we need it to run)
+                ws.cleanclose = function() {
+                    this.removeEventListener('open', openhandler);
+                    this.removeEventListener('message', messagehandler);
+                    this.removeEventListener('error', errorhandler);
+                    this.close();
                 };
             });
         }
@@ -823,6 +836,8 @@ lazy(mega, 'wsuploadmgr', () => {
 
                 case 5:
                     // server in distress - refresh pool target URLs from API
+                    this.logger.warn(`Server ${ws.pool.url} shedding connections`);
+
                     queueMicrotask(() => {
                         if (!this.refreshing) {
                             this.refreshing = true;
@@ -839,12 +854,19 @@ lazy(mega, 'wsuploadmgr', () => {
                 case 6:
                     // server requests a break
                     // FIXME: implement
-                    this.logger.warn(`Server requests pause of ${chunkpos} ms`);
+                    this.logger.warn(`Server ${ws.pool.url} requests pause of ${chunkpos} ms`);
                     break;
 
                 default:
                     // ignore unknown messages for compatibility with future protocol features
                     this.logger.warn(`Unknown response from server ${type}`);
+            }
+
+            // if we have chunks in flight, expect the next response in at most 10 seconds
+            if (ws.chunksonthewire.length) {
+                ws.reconnectat = this.seconds + 10;
+            } else {
+                ws.reconnectat = 0;
             }
         }
 
@@ -875,7 +897,7 @@ lazy(mega, 'wsuploadmgr', () => {
                         this.uploadfailed(fu, -12);
                         return;
                     }
-                    fu.havelastchunkconfirmation = Date.now();
+                    fu.havelastchunkconfirmation = this.seconds;
                 }
 
                 if (fu.bytesuploaded >= fu.reader.file.size
@@ -914,9 +936,9 @@ lazy(mega, 'wsuploadmgr', () => {
         // this loop is responsible for maintaining the (standby) connections and pumping data during transfers
         // since WebSocket doesn't have an onbufferempty(), we need
         // to busy-loop with adaptive frequency to keep the data flowing)
-        async run(val = 500) {
+       async run(val = 500) {
 
-            if (this.running === null) {
+            if (!this.poolmgr.pools.length) {
                 this.poolmgr.refreshpools()
                     .catch((ex) => {
                         M.uscex(ex);
@@ -928,6 +950,7 @@ lazy(mega, 'wsuploadmgr', () => {
 
             while (1) {
                 await sleep(val / 1e3);
+                this.seconds += val / 1e3;
 
                 if (pid !== this.running) {
                     break;
@@ -947,6 +970,12 @@ lazy(mega, 'wsuploadmgr', () => {
                     this.logger.info('Entered idle state.');
                 }
                 this.running = false;
+
+                // maintain one stand-by connection per pool
+                for (let i = this.poolmgr.pools.length; i--; ) {
+                    this.poolmgr.pools[i].numconn = 1;
+                    this.poolmgr.pools[i].closexconn();
+                }
             }
         }
 
@@ -1008,9 +1037,8 @@ lazy(mega, 'wsuploadmgr', () => {
 
         // enqueue upload and start sending data
         upload(file) {
-            if (!this.running) {
-                this.run().catch(reportError);
-            }
+            this.run().catch(reportError);
+
             this.fileno++;
             this.poolmgr.assignfile(new WsFileUpload(file, this.fileno));
         }

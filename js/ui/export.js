@@ -2347,7 +2347,7 @@ function logExportEvt(evtId, data) {
 
             MegaButton.factory({
                 parentNode: footer,
-                text: l[82],
+                text: l.msg_dlg_cancel,
                 componentClassname: 'mx-2 secondary slim',
                 type: 'normal'
             }).on('click.settingsDiscardBack', onBack);

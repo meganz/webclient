@@ -398,7 +398,7 @@ class Occurrences extends MegaRenderMixin {
                                             </div>
                                             <div
                                                 className="chat-occurrence-control simpletip"
-                                                data-simpletip={l[82]}
+                                                data-simpletip={l.msg_dlg_cancel}
                                                 data-simpletipposition="top"
                                                 data-simpletipoffset="5">
                                                 <Button
@@ -609,7 +609,7 @@ export class ConversationRightArea extends MegaRenderMixin {
         if (Object.values(M.u.toJS()).some(u => u.c === 1)) {
             if (allContactsInChat(excludedParticipants(this.props.chatRoom))) {
                 return msgDialog(
-                    `confirmationa:!^${l[8726]}!${l[82]}`,
+                    `confirmationa:!^${l[8726]}!${l.msg_dlg_cancel}`,
                     null,
                     `${l.all_contacts_added}`,
                     `${l.all_contacts_added_to_chat}`,
@@ -624,7 +624,7 @@ export class ConversationRightArea extends MegaRenderMixin {
             return this.setState({ contactPickerDialog: true });
         }
         msgDialog( // new user adding a partcipant
-            `confirmationa:!^${l[8726]}!${l[82]}`,
+            `confirmationa:!^${l[8726]}!${l.msg_dlg_cancel}`,
             null,
             `${l.no_contacts}`,
             `${l.no_contacts_text}`,
@@ -875,7 +875,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                         !allContactsInChat(exParticipants)
                             ? this.setState({ contactPickerDialog: true }) :
                             msgDialog(
-                                `confirmationa:!^${l[8726]}!${l[82]}`,
+                                `confirmationa:!^${l[8726]}!${l.msg_dlg_cancel}`,
                                 null,
                                 `${l.all_contacts_added}`,
                                 `${l.all_contacts_added_to_chat}`,
@@ -885,7 +885,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                                     }
                                 }, 1) :
                         msgDialog( // new user adding a partcipant
-                            `confirmationa:!^${l[8726]}!${l[82]}`,
+                            `confirmationa:!^${l[8726]}!${l.msg_dlg_cancel}`,
                             null,
                             `${l.no_contacts}`,
                             `${l.no_contacts_text}`,
@@ -1553,7 +1553,7 @@ export class ConversationPanel extends MegaRenderMixin {
                 onClose={() => this.setState({ renameDialog: false, renameDialogValue: undefined })}
                 buttons={[
                     {
-                        label: l[1686] /* `Cancel` */,
+                        label: l.msg_dlg_cancel,
                         onClick: () => this.setState({ renameDialog: false, renameDialogValue: undefined })
                     },
                     {

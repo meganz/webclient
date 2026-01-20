@@ -39,7 +39,7 @@
             'title': l[1356],
             'buttons': [
                 {
-                    'label': l[1686],
+                    'label': l.msg_dlg_cancel,
                     'className': "mega-button large feedback-button-cancel disabled",
                     'callback': function() {
                         this.hide();

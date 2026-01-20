@@ -54,7 +54,7 @@ export const withHostsObserver = Component => {
                         <footer>
                             <div className="footer-container">
                                 <Button
-                                    label={l[82] /* `Cancel` */}
+                                    label={l.msg_dlg_cancel}
                                     className="mega-button"
                                     onClick={this.toggleDialog}
                                 />
@@ -89,7 +89,7 @@ export const withHostsObserver = Component => {
 
             confirmLeave = ({ title, body, cta, altCta }) => {
                 msgDialog(
-                    `confirmationa:!^${cta}!${altCta || l[82] /* `Cancel` */}`,
+                    `confirmationa:!^${cta}!${altCta || l.msg_dlg_cancel}`,
                     null,
                     title,
                     body,

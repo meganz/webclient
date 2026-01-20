@@ -1270,8 +1270,7 @@ textarea {
     --mask-color: var(--icon-rest);
 }
 .audio-wrapper video {
-    width: 0;
-    height: 0;
+    display: none;
 }
 [data-simpletip]:hover {
     position: relative;

@@ -251,6 +251,10 @@ var slideshowid;
             if (!$overlay.is('.video-theatre-mode')) {
                 slideshow_imgPosition($overlay);
             }
+
+            if (typeof psa !== 'undefined') {
+                psa.repositionMediaPlayer();
+            }
         };
 
         fullScreenManager = FullScreenManager($button, $overlay).change(setFullscreenData);
@@ -672,6 +676,9 @@ var slideshowid;
             $overlay.addClass('browserscreen');
             $overlay.parents('.download.download-page').addClass('browserscreen');
             slideshow_imgPosition($overlay);
+            if (typeof psa !== 'undefined') {
+                psa.repositionMediaPlayer();
+            }
             return false;
         });
 
@@ -777,6 +784,44 @@ var slideshowid;
         }
     }
 
+    function detectEdgesViaCenter(img, container, buffer = 0.05) {
+        const imgRect = img.getBoundingClientRect();
+        const contRect = container.getBoundingClientRect();
+
+        const scaledWidth = imgRect.width;
+        const scaledHeight = imgRect.height;
+
+        const imgCenterX = imgRect.left + imgRect.width / 2;
+        const imgCenterY = imgRect.top + imgRect.height / 2;
+
+        const contCenterX = contRect.left + contRect.width / 2;
+        const contCenterY = contRect.top + contRect.height / 2;
+
+        const deltaX = imgCenterX - contCenterX;
+        const deltaY = imgCenterY - contCenterY;
+
+        const maxPanX = Math.max(0, (scaledWidth - contRect.width) / 2);
+        const maxPanY = Math.max(0, (scaledHeight - contRect.height) / 2);
+
+        const thresholdX = contRect.width * buffer;
+        const thresholdY = contRect.height * buffer;
+
+        const nearLeft = deltaX >= (maxPanX - thresholdX);
+        const nearRight = deltaX <= -(maxPanX - thresholdX);
+        const nearTop = deltaY >= (maxPanY - thresholdY);
+        const nearBottom = deltaY <= -(maxPanY - thresholdY);
+
+        const canPanX = scaledWidth > contRect.width;
+        const canPanY = scaledHeight > contRect.height;
+
+        return { // left, right, top, bottom etc indicate if we are at that edge or zoomed out from an edge
+            left: canPanX && nearLeft || scaledWidth <= contRect.width,
+            right: canPanX && nearRight || scaledWidth <= contRect.width,
+            top: canPanY && nearTop || scaledHeight <= contRect.height,
+            bottom: canPanY && nearBottom || scaledHeight <= contRect.height
+        };
+    }
+
     // Mobile finger gesture
     function slideshow_gesture(h, elm, type) {
 
@@ -818,7 +863,7 @@ var slideshowid;
 
         const options = {
             domNode: elm,
-            onTouchStart: function() {
+            onTouchStart() {
 
                 const container = this.domNode.querySelector(containerSelector);
                 const style = {
@@ -829,16 +874,10 @@ var slideshowid;
                 };
 
                 if (containerSelector === '.img-wrap') {
-
                     const img = container.querySelector('img.active');
-                    const compstyle = img && getComputedStyle(img);
-
-                    if (compstyle && compstyle.position === 'absolute') {
-
-                        style.top = Math.abs(parseInt(compstyle.top));
-                        style.left = Math.abs(parseInt(compstyle.left));
-                        style.width = parseInt(compstyle.width);
-                        style.height = parseInt(compstyle.height);
+                    if (img) {
+                        this.onEdge = detectEdgesViaCenter(img, container);
+                        return;
                     }
                 }
 
@@ -1192,6 +1231,9 @@ var slideshowid;
                         $overlay.removeClass('fullscreen browserscreen');
                         $overlay.parents('.download.download-page').removeClass('fullscreen browserscreen');
                         slideshow_imgPosition($overlay);
+                        if (typeof psa !== 'undefined') {
+                            psa.repositionMediaPlayer();
+                        }
                     }
                     else {
                         history.back();
@@ -1220,6 +1262,9 @@ var slideshowid;
                         zoomPan = false;
                     }
                     slideshow_imgPosition($overlay);
+                    if (typeof psa !== 'undefined') {
+                        psa.repositionMediaPlayer();
+                    }
                     return false;
                 }
                 history.back();
@@ -1507,7 +1552,8 @@ var slideshowid;
 
         $('.js-download-t-file').rebind('click.media-viewer', () => {
             if (n.xh) {
-                window.open(T.core.getDownloadLink(n), '_blank', 'noopener,noreferrer');
+                // eslint-disable-next-line local-rules/open -- opening ourselves
+                window.open(T.core.getDownloadLink(n), '_self', 'noopener');
             }
             return false;
         });
@@ -1880,6 +1926,10 @@ var slideshowid;
 
                     return true;
                 });
+
+                if (typeof psa !== 'undefined') {
+                    psa.repositionMediaPlayer();
+                }
             }).catch(console.warn.bind(console));
         });
 

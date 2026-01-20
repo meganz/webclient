@@ -600,6 +600,17 @@
 .data-table.sessions .status-label.blue {
     background-color: var(--label-blue);
 }
+/*region TODO piggybacking off sessions table */
+.data-table.sessions .status-label.yellow {
+    background-color: var(--label-yellow);
+}
+.data-table.sessions .status-label.orange {
+    background-color: var(--label-orange);
+}
+.data-table.sessions .status-label.red {
+    background-color: var(--label-red);
+}
+/* endregion */
 
 
 /* Settings content. File management section */
@@ -1275,6 +1286,9 @@
     gap: 8px;
     height: 40px;
 }
+.chat-settings .chat-row .flex-1 .subtitle-txt {
+    max-width: unset;
+}
 .chat-settings .chat-txt {
     font: var(--text-body2);
     font-size: 12px;
@@ -1295,4 +1309,20 @@
 }
 .chat-settings .chat-selected {
     display: none;
+}
+#migration-table-container .content-txt {
+    margin-bottom: 16px;
+}
+#migration-table-container .actions-cell {
+    width: 84px;
+    text-align: end;
+}
+#migration-table-container .actions-cell .mega-button {
+    margin-inline-start: 2px;
+    margin-inline-end: 0;
+    display: inline-block;
+    visibility: hidden;
+}
+#migration-table-container tr:hover .actions-cell .mega-button {
+    visibility: visible;
 }

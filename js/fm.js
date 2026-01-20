@@ -652,7 +652,7 @@ function fmtopUI() {
         M.albums
     );
     mega.ui.secondaryNav.updateInfoPanelButton(id && M.getNodeByHandle(id).t);
-    if (M.currentdirid !== 'shares') {
+    if (M.currentdirid !== 'shares' && !M.search) {
         mega.ui.secondaryNav.showBreadcrumb();
     }
     mega.ui.secondaryNav.updateInfoChipsAndViews();
@@ -1052,7 +1052,7 @@ function avatarDialog(close) {
                 <span>@@</span>
             </button>
         </div>`,
-        l[82],
+        l.msg_dlg_cancel,
         l[1016],
         l[1017],
         l[6974]
@@ -2073,15 +2073,9 @@ function createFolderDialog(close) {
                     return awaitingPromise;
                 }
 
-                const {type, original} = M.currentCustomView;
-                let id = type === mega.devices.rootId ? original : M.getNodeByHandle(h).p || target;
-                if (
-                    M.currentrootid === 'out-shares' ||
-                    M.currentrootid === 'file-requests' ||
-                    M.currentrootid === 'public-links'
-                ) {
-                    id = `${M.currentrootid}/${id}`;
-                }
+                // If this is custom view, we need to open custom view folder instead
+                const {original} = M.currentCustomView;
+                const id = original || M.getNodeByHandle(h).p || target;
 
                 // By default, auto-select the newly created folder as long no awaiting promise
                 return M.openFolder(id)
@@ -2525,7 +2519,7 @@ function fm_resize_handler(force) {
         // Init dashboard content scrolling
         initDashboardScroll();
     }
-    else if (M.currentdirid && M.currentdirid.startsWith('user-management') &&
+    else if (String(M.currentdirid).startsWith('user-management') &&
         typeof initBusinessAccountScroll === 'function') {
         initBusinessAccountScroll($('.user-management-view .ps:visible', fmholder));
     }

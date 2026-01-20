@@ -188,7 +188,8 @@ table tr td:last-child::after {
     border-left: none;
     border-right: 2px solid var(--mobile-border-brand);
 }
-.table-hover tr i.selected {
+.table-hover tr i.selected,
+.grid-table.import-summary tr td i.icon-check {
     opacity: 0;
     cursor: pointer;
     border-radius: 2px;
@@ -200,6 +201,11 @@ table tr td:last-child::after {
     padding: 2px;
     pointer-events: all;
     position: relative;
+}
+table.grid-table.import-summary tbody tr td i.icon-check:not(.verified-user-icon):not(.icon-dot):not(.selected) {
+    opacity: 1;
+    --icon-size: 16px;
+    --mask-color: transparent;
 }
 .table-hover tr i.selected::after {
     content: '';
@@ -216,7 +222,8 @@ table tr td:last-child::after {
 .table-hover tbody.animate-select tr i.selected {
     transition: opacity 300ms;
 }
-.table-hover tbody tr.ui-selected i.selected {
+.table-hover tbody tr.ui-selected i.selected,
+.grid-table.import-summary tbody tr i.selected {
     opacity: 1;
     background: var(--mobile-selection-control);
     color: var(--mobile-icon-inverse);
@@ -366,6 +373,7 @@ table tr.ui-selected .grid-file-request-manage {
 .grid-table.fm.v-size [megatype="size"],
 .grid-table.fm.v-type [megatype="type"],
 .grid-table.fm.v-accessCtrl [megatype="accessCtrl"],
+.grid-table.fm.v-owner [megatype="owner"],
 .grid-table.fm.v-timeAd [megatype="timeAd"],
 .grid-table.fm.v-timeMd [megatype="timeMd"],
 .grid-table.fm.v-versions [megatype="versions"],
@@ -754,6 +762,10 @@ table.grid-table tbody i:not(.verified-user-icon):not(.icon-dot):not(.selected) 
     display: inline-block;
     vertical-align: middle;
     margin-bottom: 1px;
+}
+table.fm.grid-table td.fileLoc i.grid-file-icon {
+    --icon-size: 16px;
+    --mask-color: var(--text-color-medium);
 }
 table.grid-table tbody i.icon-manage-folders:not(.verified-user-icon):not(.icon-dot):not(.selected),
 table.grid-table tbody i.icon-link-thin-outline:not(.verified-user-icon):not(.icon-dot):not(.selected),

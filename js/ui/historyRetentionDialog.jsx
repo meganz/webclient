@@ -224,7 +224,7 @@ export class HistoryRetentionDialog extends Component {
                         <button
                             className="mega-button"
                             onClick={onClose}>
-                            <span>{l[82] /* `Cancel` */}</span>
+                            <span>{l.msg_dlg_cancel}</span>
                         </button>
                         <button
                             className={`

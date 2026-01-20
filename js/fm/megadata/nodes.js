@@ -570,6 +570,18 @@ MegaData.prototype.addSelectedNodes = function(handles, clean) {
 };
 
 /**
+ * Returns the currently selected node handles.
+ * Uses `selectionManager.selected_list` if available, otherwise falls back to `$.selected`.
+ *
+ * @returns {Array<string>} Array of selected node handles.
+ */
+MegaData.prototype.getSelectedNodes = function() {
+    'use strict';
+
+    return window.selectionManager && selectionManager.selected_list || $.selected || false;
+};
+
+/**
  * Checking if is the page is in Gallery section
  * @param {String} [path] Path to check or this.currentdirid
  * @returns {Boolean}
@@ -801,7 +813,7 @@ MegaData.prototype.setPitag = function(req, purpose, extra) {
 
     "use strict";
 
-    if (req.a !== 'p') {
+    if (!['p', 'pp', 'xp'].includes(req.a)) {
         console.error('Invalid request type for setting Pitag, only p is allowed:', req.a);
         return;
     }
@@ -4397,6 +4409,9 @@ MegaData.prototype.nodeRemovalUIRefresh = function(handle, parent) {
     }
 
     delay(`refresh-dialog-content:${handle}`, () => {
+        if (self.selectionManager) {
+            selectionManager.remove_from_selection(handle);
+        }
         if ($.dialog === 'move' || $.dialog === 'copy') {
             refreshDialogContent();
         }
@@ -4825,7 +4840,7 @@ MegaData.prototype.bulkFileLinkImport = async function(data, target, verify) {
  * @param {String} [srcNode] Prompt the user to choose a target for this source node...
  * @returns {Promise}
  */
-MegaData.prototype.importFileLink = function importFileLink(ph, key, attr, srcNode) {
+MegaData.prototype.importFileLink = function importFileLink(ph, key, attr, srcNode, targetNode) {
     'use strict';
     return new Promise((resolve, reject) => {
         var req = {a: 'p'};
@@ -4845,12 +4860,12 @@ MegaData.prototype.importFileLink = function importFileLink(ph, key, attr, srcNo
             api.screq(req)
                 .then(resolve)
                 .then(() => {
-                    if (srcNode) {
+                    if (srcNode && !targetNode) {
                         mega.ui.toast.show(
                             parseHTML(
                                 mega.icu.format(l.toast_import_file, 1).replace('%s', M.getNameByHandle(target))
                             ),
-                            null,
+                            6,
                             l[16797],
                             {actionButtonCallback: () => M.openFolder(target)}
                         );
@@ -4872,6 +4887,8 @@ MegaData.prototype.importFileLink = function importFileLink(ph, key, attr, srcNo
             delete srcNode.lbl;
 
             n.a = ab_to_base64(crypto_makeattr(srcNode));
+
+            const openSaveToDialog = targetNode ? (srcNode, cb) => cb(srcNode, targetNode) : window.openSaveToDialog;
 
             openSaveToDialog(srcNode, (srcNode, target) => {
                 M.getShareNodes(target, null, true).then(({sharenodes}) => {
@@ -5283,6 +5300,16 @@ MegaData.prototype.isGalleryVideo = function(n) {
     const props = MediaAttribute.prototype.fromAttributeString(n.fa, n.k);
 
     return props && props.width && props.height ? p : false;
+};
+
+/**
+ * This method works only when Devices are already loaded into the system
+ * @param {String} h Node handle to check against
+ * @returns {Boolean}
+ */
+MegaData.prototype.isInDevice = function(h) {
+    'use strict';
+    return !!mega.devices.ui.hasDevices && Object.values(M.dcd).some(({ folders }) => folders[h]);
 };
 
 /**

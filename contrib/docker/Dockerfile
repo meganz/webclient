@@ -4,7 +4,7 @@ RUN apt-get update && apt-get -y install supervisor nginx curl xz-utils && apt-g
 
 COPY contrib/docker/assets/webclient.nginx.conf /etc/nginx/sites-enabled/default
 COPY contrib/docker/assets/supervisord.conf /etc/supervisord.conf
-RUN curl https://artifactory.developers.mega.co.nz/artifactory/devrepo-generic-local/Linux/Node%20JS/node-v18.0.0-linux-x64.tar.xz --output /root/nodeinstaller.tar.xz
+RUN curl https://artifactory.developers.mega.co.nz/artifactory/devrepo-generic-local/Linux/Node%20JS/node-v24.2.0-linux-x64.tar.xz --output /root/nodeinstaller.tar.xz
 RUN mkdir /root/node && tar xf /root/nodeinstaller.tar.xz -C /root/node --strip-components=1
 RUN mv /root/node /usr/local/
 ENV PATH="${PATH}:/usr/local/node/bin"

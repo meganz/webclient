@@ -120,8 +120,15 @@ var ulmanager = {
             $('.header-before-icon.exceeded', $dialog).text(l[19135]);
             $('.pricing-page.plan .plan-button', $dialog).rebind('click', function() {
                 eventlog(99700, true);
-                sessionStorage.fromOverquotaPeriod = $(this).parent().data('period') || pro.proplan.period;
-                open(getAppBaseUrl() + '#propay_' + $(this).closest('.plan').data('payment'));
+                const planNum = $(this).closest('.plan').data('payment');
+                if (planNum === pro.ACCOUNT_LEVEL_BUSINESS) {
+                    eventlog(501042);
+                    open(getAppBaseUrl() + '#registerb');
+                }
+                else {
+                    sessionStorage.fromOverquotaPeriod = $(this).parent().data('period') || pro.proplan.period;
+                    open(getAppBaseUrl() + '#propay_' + planNum);
+                }
                 return false;
             });
 
@@ -1194,7 +1201,7 @@ var ulmanager = {
             }
         };
 
-        if (is_megadrop || self.is_transferit) {
+        if (is_megadrop) {
             return startUpload();
         }
 

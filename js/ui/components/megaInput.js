@@ -3,9 +3,12 @@ class MegaInputComponent extends MegaComponent {
     constructor(options) {
         super(options);
 
-        this.input = document.createElement('input');
-        this.input.className = 'form-element pmText no-title-top clearButton';
-        this.icon = `${options.icon || ''} left-icon`;
+        this.input = document.createElement(options.type || 'input');
+        this.input.className = options.className || 'form-element pmText no-title-top clearButton';
+
+        if (options.icon) {
+            this.icon = `${options.icon} left-icon`;
+        }
         this.placeholder = options.placeholder || '';
         this.disabled = false;
         this.domNode.append(this.input);
@@ -49,6 +52,14 @@ class MegaInputComponent extends MegaComponent {
             return;
         }
         this.megaInput.hideError();
+    }
+
+    set message(message) {
+        if (message) {
+            this.megaInput.showMessage(message);
+            return;
+        }
+        this.megaInput.hideMessage();
     }
 
     blur() {

@@ -966,6 +966,9 @@ function api_getsid(ctx, user, passwordkey, hash, pinCode) {
 api_getsid.warning = function() {
     var time = new Date(api_getsid.etoomany + 3780000).toLocaleTimeString();
 
+    if (typeof bindLoginHandler === 'function') {
+        bindLoginHandler({withEvents: false});
+    }
     msgDialog('warningb', l[882], l[8855].replace('%1', time));
 };
 

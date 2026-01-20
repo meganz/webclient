@@ -2169,7 +2169,7 @@ var addressDialog = {
     /**
      * Initialize the coinify share consent checkbox.
      */
-    initCoinifyShareConsent: function() {
+    initCoinifyShareConsent() {
         'use strict';
 
         if (!pro.propay.onPropayPage()) {
@@ -2288,6 +2288,24 @@ var addressDialog = {
     },
 
     /**
+     * Check if the date of birth is older than the age
+     * @param {string} dob The date of birth
+     * @param {number} age The age
+     * @returns {boolean}
+     */
+    checkIsOlderThan(dob, age) {
+        'use strict';
+
+        const today = new Date();
+        const ageDate = new Date(
+            today.getFullYear() - age,
+            today.getMonth(),
+            today.getDate()
+        );
+        return new Date(dob) < ageDate;
+    },
+
+    /**
      * Collects the form details and validates the form
      */
     validateAndPay(callback, validateOnly, allowEcpFlow, blockPayment) {
@@ -2299,7 +2317,6 @@ var addressDialog = {
         // Selectors for form text fields
         const fields = ['first-name', 'last-name', 'address1', 'address2', 'city', 'postcode'];
         const fieldValues = Object.create(null);
-
         // Get the values from the inputs
         for (let i = 0; i < fields.length; i++) {
 
@@ -2376,7 +2393,9 @@ var addressDialog = {
             && pro.propay.currentGateway
             && pro.propay.currentGateway.gatewayId === pro.propay.BITCOIN_GATE_ID;
 
-        if (isBitcoin && !taxCode && !dateOfBirth) {
+        const dobOlderThan10 = dateOfBirth && isBitcoin && this.checkIsOlderThan(dateOfBirth, 10);
+
+        if (isBitcoin && !taxCode && !dobOlderThan10) {
             validCoinify = false;
             $dateOfBirthInputSection.addClass('error');
             $dateOfBirthBlock.addClass('error');
@@ -2397,7 +2416,7 @@ var addressDialog = {
             && fieldValues.city
             && fieldValues.postcode
             && country
-            && !stateNotSet
+            && !stateNotSet;
 
         if (!fieldsValid || !validCoinify) {
 
@@ -2415,7 +2434,7 @@ var addressDialog = {
                 }
             }
 
-            addressDialog.validInputs = addressDialog.validInputs || fieldsValid ||false;
+            addressDialog.validInputs = addressDialog.validInputs || fieldsValid || false;
             addressDialog.validDob = addressDialog.validDob || validCoinify || false;
 
             onIdle(() => eventlog(500517));
@@ -4174,12 +4193,11 @@ var bitcoinDialog = {
      * Stores the URL to redirect to
      * @param {String} url The URL to redirect to
      */
-    storeUtcResult: function(utcResult) {
+    storeUtcResult(utcResult) {
         'use strict';
 
         if (typeof utcResult.EUR !== 'object') {
-            processUtcResult(utcResult);
-            return;
+            this.processUtcResult(utcResult);
         }
 
         this.utcResult = utcResult;
@@ -4188,7 +4206,8 @@ var bitcoinDialog = {
     /**
      * Redirect to the site
      */
-    redirectToSite: function() {
+    redirectToSite() {
+        'use strict';
 
         pro.propay.showLoadingOverlay('redirecting');
 
@@ -4362,11 +4381,8 @@ var bitcoinDialog = {
         if (typeof utcResult.EUR === 'object') {
             if (utcResult.EUR.url) {
                 bitcoinDialog.redirectToSite();
-                return;
             }
-            else {
-                bitcoinDialog.showInvoice(utcResult.EUR);
-            }
+            bitcoinDialog.showInvoice(utcResult.EUR);
         }
         else {
             bitcoinDialog.showBitcoinProviderFailureDialog();

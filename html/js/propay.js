@@ -217,6 +217,8 @@ pro.propay = {
             reasons.gatewayNeeded = 1;
         }
 
+        const currentGateway = this.currentGateway && this.currentGateway.gatewayId;
+
         if (this.requiresBilling()) {
             if (!addressDialog.validInputs) {
                 addressDialog.validateAndPay(false, true);
@@ -227,7 +229,7 @@ pro.propay = {
             else if (addressDialog.validInputs === false) {
                 reasons.addressInvalid = 1;
             }
-            else if (addressDialog.validDob === false) {
+            else if (currentGateway === this.BITCOIN_GATE_ID && addressDialog.validDob === false) {
                 reasons.dobNeeded = 1;
             }
 

@@ -804,17 +804,6 @@ class MegaFlyoutMenu extends MegaComponent {
                     }
                 });
             });
-            this.flyoutMenu.on('onHidden.contacts', () => {
-                flyoutState.clearListeners();
-                delete this.showContactsFlyout.searchTerm;
-                this.flyoutMenu.off('onHidden.contacts');
-                this.flyoutMenu.off('onFlyoutChange.contacts');
-                mega.ui.mInfoPanel.cleanup();
-            });
-            this.flyoutMenu.rebind('onFlyoutChange.contacts', () => {
-                delete this.showContactsFlyout.searchTerm;
-                this.flyoutMenu.off('onFlyoutChange.contacts');
-            });
             if (list.length === 0) {
                 this.flyoutMenu.show({
                     name: 'contacts',
@@ -839,6 +828,14 @@ class MegaFlyoutMenu extends MegaComponent {
                             },
                         }
                     ]
+                });
+                flyoutState.attachEventListener(this.flyoutMenu, 'onHidden.contacts', () => {
+                    flyoutState.clearListeners();
+                    delete this.showContactsFlyout.searchTerm;
+                });
+                flyoutState.attachEventListener(this.flyoutMenu, 'onChange.contacts', () => {
+                    flyoutState.clearListeners();
+                    delete this.showContactsFlyout.searchTerm;
                 });
                 return;
             }
@@ -874,7 +871,15 @@ class MegaFlyoutMenu extends MegaComponent {
                 targetPage: 'fm/chat/contacts',
                 targetLabel: l.open_contacts,
             });
-            this.flyoutMenu.on('search', ({ data }) => {
+            flyoutState.attachEventListener(this.flyoutMenu, 'onHidden.contacts', () => {
+                flyoutState.clearListeners();
+                delete this.showContactFlyout.searchTerm;
+            });
+            flyoutState.attachEventListener(this.flyoutMenu, 'onFlyoutChange.contacts', () => {
+                flyoutState.clearListeners();
+                delete this.showContactFlyout.searchTerm;
+            });
+            flyoutState.attachEventListener(this.flyoutMenu, 'search.contacts', ({ data }) => {
                 if (this.name !== 'contacts') {
                     return;
                 }
@@ -1062,7 +1067,11 @@ class MegaFlyoutMenu extends MegaComponent {
             });
             this.flyoutMenu.back = true;
             this.flyoutMenu.bodyLabel = l.shared_folders_from.replace('%NAME', uName);
-            this.flyoutMenu.on('back', () => this.showContactsFlyout());
+            flyoutState.attachEventListener(this.flyoutMenu, 'back.contact', () => this.showContactsFlyout());
+            flyoutState.attachEventListener(this.flyoutMenu, 'onHidden.contact', () => flyoutState.clearListeners());
+            flyoutState.attachEventListener(
+                this.flyoutMenu, 'onFlyoutChange.contact', () => flyoutState.clearListeners()
+            );
             this.loadingState({ name });
             dbfetch.geta(Object.keys(M.c.shares || {})).always(() => {
                 if (this.name === name) {
@@ -1137,9 +1146,17 @@ class MegaFlyoutMenu extends MegaComponent {
             });
             this.flyoutMenu.topBodyLabelVisible = true;
 
+            // These listeners aren't added in flyoutState due to the sub panels holding specific additional state
             this.flyoutMenu.rebind('onHidden.chatsflyout', () => {
                 flyoutState.clearListeners();
                 this.flyoutMenu.off('onHidden.chatsflyout');
+                this.flyoutMenu.off('onFlyoutChange.chatsflyout');
+                delete this.flyoutMenu.chatTabGroup;
+            });
+            this.flyoutMenu.rebind('onFlyoutChange.chatsflyout', () => {
+                flyoutState.clearListeners();
+                this.flyoutMenu.off('onHidden.chatsflyout');
+                this.flyoutMenu.off('onFlyoutChange.chatsflyout');
                 delete this.flyoutMenu.chatTabGroup;
             });
             if (!flyoutState.chatFlyoutSetup) {
@@ -1498,23 +1515,21 @@ class MegaFlyoutMenu extends MegaComponent {
                 }
             }
             flyoutState.clearListeners();
-            this.flyoutMenu.on('onHidden.infopanel', () => {
-                infoPanelPromise = false;
-                mega.ui.mInfoPanel.cleanup();
-                this.flyoutMenu.off('onHidden.infopanel');
-                this.flyoutMenu.off('onFlyoutChange.infopanel');
-            });
-            this.flyoutMenu.rebind('onFlyoutChange.infopanel', () => {
-                infoPanelPromise = false;
-                mega.ui.mInfoPanel.cleanup();
-                this.flyoutMenu.off('onHidden.infopanel');
-                this.flyoutMenu.off('onFlyoutChange.infopanel');
-            });
             this.flyoutMenu.show({
                 name,
                 topSection: {
                     label: l[6859],
                 },
+            });
+            flyoutState.attachEventListener(this.flyoutMenu, 'onHidden.infopanel', () => {
+                infoPanelPromise = false;
+                mega.ui.mInfoPanel.cleanup();
+                flyoutState.clearListeners();
+            });
+            flyoutState.attachEventListener(this.flyoutMenu, 'onFlyoutChange.infopanel', () => {
+                infoPanelPromise = false;
+                mega.ui.mInfoPanel.cleanup();
+                flyoutState.clearListeners();
             });
             if (!handles.length) {
                 this.emptyState({

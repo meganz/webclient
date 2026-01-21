@@ -548,7 +548,7 @@
     border-radius: 4px;
     padding: 6px;
     font: var(--text-body1);
-    display: flex;
+    display: block;
 }
 #propay .date-of-birth-block .message-container {
     display: none;

@@ -1310,6 +1310,18 @@
 .chat-settings .chat-selected {
     display: none;
 }
+.auto-away .label-wrap.full-sized {
+    font: var(--text-body1);
+}
+.auto-away #autoaway_txt_1,
+.auto-away #autoaway_txt_4 {
+    white-space: nowrap;
+}
+.auto-away .account-counter-number.short {
+    max-width: 38px;
+    flex: 1 1 38px;
+    min-width: 24px;
+}
 #migration-table-container .content-txt {
     margin-bottom: 16px;
 }

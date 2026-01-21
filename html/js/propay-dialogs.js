@@ -1432,7 +1432,7 @@ var addressDialog = {
             delete this.businessRegPage;
         }
 
-        this.fetchBillingInfo().always(function (billingInfo) {
+        return this.fetchBillingInfo().always((billingInfo) => {
             billingInfo = billingInfo || Object.create(null);
 
             const selectedState =

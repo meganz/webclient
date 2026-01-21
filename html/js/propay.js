@@ -3168,15 +3168,16 @@ pro.propay = {
         this.clearPage();
         this.getPageElements();
 
-        addressDialog.init(false, false, false, true);
-
-        this.renderGateways();
-        this.renderDurations();
-        this.initBillingInfo();
-        this.renderPlanInfo();
-        this.initContinueButton();
-        this.renderLocaleInfo();
-        this.updatePageInfo();
+        addressDialog.init(false, false, false, true).then(() => {
+            this.renderGateways();
+            this.selectPreSelectedGateway();
+            this.renderDurations();
+            this.initBillingInfo();
+            this.renderPlanInfo();
+            this.initContinueButton();
+            this.renderLocaleInfo();
+            this.updatePageInfo();
+        });
 
         return true;
     },
@@ -3610,8 +3611,6 @@ pro.propay = {
                 const propayPageVisitEventId = pro.propay.getPropayPageEventId(pro.propay.planNum);
 
                 this.sk.endLoadAll();
-
-                this.selectPreSelectedGateway();
 
                 eventlog(propayPageVisitEventId);
             });

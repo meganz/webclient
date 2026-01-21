@@ -2399,8 +2399,14 @@ var addressDialog = {
             validCoinify = false;
             $dateOfBirthInputSection.addClass('error');
             $dateOfBirthBlock.addClass('error');
-            $('.message-container', $dateOfBirthBlock).removeClass('hidden')
-                .text(l.coinify_req_dob_or_tax.replace('%1', taxName));
+            if (dateOfBirth && !dobOlderThan10) {
+                $('.message-container', $dateOfBirthBlock).removeClass('hidden').text(l.coinify_too_young);
+            }
+            else {
+                $('.message-container', $dateOfBirthBlock).removeClass('hidden')
+                    .safeHTML(l.coinify_req_dob_or_tax.replace('%1', taxName));
+            }
+
         }
 
         taxMegaInput.hideError();

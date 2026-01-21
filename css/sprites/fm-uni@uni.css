@@ -289,6 +289,12 @@
 .sprite-fm-uni.icon-nordpass, .sprite-fm-uni-before.icon-nordpass-before::before, .sprite-fm-uni-after.icon-nordpass-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-nordpass");
 }
+.sprite-fm-uni.icon-notif-reinstate, .sprite-fm-uni-before.icon-notif-reinstate-before::before, .sprite-fm-uni-after.icon-notif-reinstate-after::after {
+   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-notif-reinstate");
+}
+.sprite-fm-uni.icon-notif-takedown, .sprite-fm-uni-before.icon-notif-takedown-before::before, .sprite-fm-uni-after.icon-notif-takedown-after::after {
+   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-notif-takedown");
+}
 .sprite-fm-uni.icon-onedrive, .sprite-fm-uni-before.icon-onedrive-before::before, .sprite-fm-uni-after.icon-onedrive-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-onedrive");
 }

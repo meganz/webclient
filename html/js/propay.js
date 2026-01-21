@@ -1530,6 +1530,8 @@ pro.propay = {
         this.pageInfo.$planCard = (planCardInitialized && this.pageInfo.$planCard)
             || mega.templates.getTemplate('propay-page-plan-card-tmplt', false, this.pageInfo.$templates);
 
+        this.pageInfo.$planCard.addClass('fixed');
+
         this.pageInfo.$planCard.toggleClass('flexi', isFlexi);
 
         let formattedPlanPrice;
@@ -2388,8 +2390,6 @@ pro.propay = {
         // check all required fields are filled
 
         $('.balance:not(.option)', this.$page).addClass('hidden');
-
-        this.updateRightBlock();
 
         const requiresAccount = this.signup.checkPaymentType();
 
@@ -3599,9 +3599,6 @@ pro.propay = {
 
                 this.renderPropayPage();
 
-                this.updateRightBlock = this.initScrollHandler();
-                this.updateRightBlock();
-
                 this.initResizeHandler();
 
                 if (window.s4ac && isFlexi) {
@@ -3635,8 +3632,6 @@ pro.propay = {
                 return;
             }
 
-            this.updateRightBlock();
-
             if (!this.paymentButton) {
                 return;
             }
@@ -3648,47 +3643,6 @@ pro.propay = {
                 this.updatePayment();
             }
         });
-    },
-
-    initScrollHandler() {
-        'use strict';
-
-        const $fmHolder = $('.fmholder', 'body.bottom-pages');
-
-        const topPadding = 14;
-
-        const updateRightBlock = () => {
-
-            if (!pro.propay.onPropayPage()) {
-                $fmHolder.off('scroll.propay-page');
-                return;
-            }
-
-            const child = pro.propay.pageInfo.$planCard && pro.propay.pageInfo.$planCard[0];
-
-            if (!child) {
-                return;
-            }
-
-            const parentHeight = $('#propay > div.right-block').outerHeight();
-            const childHeight = child.offsetHeight;
-
-            const distanceScrolled = $fmHolder.scrollTop();
-
-            if ((distanceScrolled + childHeight) < parentHeight - topPadding) {
-                child.classList.add('fixed');
-                child.classList.remove('relative');
-            }
-            else {
-                child.classList.remove('fixed');
-                child.classList.add('relative');
-            }
-        };
-
-        $fmHolder.rebind('scroll.propay-page', updateRightBlock);
-
-        return updateRightBlock;
-
     },
 
     getDiscount() {

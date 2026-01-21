@@ -3657,12 +3657,16 @@ pro.propay = {
 
         const topPadding = 14;
 
-        const child = document.querySelector('.plan-card:not(#propay-page-plan-card-tmplt)');
-
         const updateRightBlock = () => {
 
             if (!pro.propay.onPropayPage()) {
                 $fmHolder.off('scroll.propay-page');
+                return;
+            }
+
+            const child = pro.propay.pageInfo.$planCard && pro.propay.pageInfo.$planCard[0];
+
+            if (!child) {
                 return;
             }
 
@@ -3682,8 +3686,6 @@ pro.propay = {
         };
 
         $fmHolder.rebind('scroll.propay-page', updateRightBlock);
-
-        // updateRightBlock();
 
         return updateRightBlock;
 

@@ -2442,7 +2442,7 @@ var addressDialog = {
             return false;
         }
         addressDialog.validInputs = true;
-        addressDialog.validDob = !!dateOfBirth;
+        addressDialog.validDob = !!validCoinify;
 
         addressDialog.mostRecentValidInput = {
             ...fieldValues,

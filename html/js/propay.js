@@ -171,8 +171,15 @@ pro.propay = {
             $('.dropdown-wrapper-primary .mega-input', this.$page).addClass('error');
         }
 
+        const $billingAddressInfo = $('.billing-address .billing-info', this.$page);
+        const $billingAddressErrorMessage = $('.error-message-text', $billingAddressInfo)
+            .text(l.enter_billing_address);
+
         if (reasons.addressNeeded || reasons.addressInvalid || reasons.dobNeeded) {
-            $('.billing-address .billing-info', this.$page).addClass('error');
+            if (reasons.dobNeeded) {
+                $billingAddressErrorMessage.text(l.further_details_required);
+            }
+            $billingAddressInfo.addClass('error');
         }
 
         if (reasons.s4TosNeeded) {

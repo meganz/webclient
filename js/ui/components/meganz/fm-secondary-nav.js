@@ -897,7 +897,7 @@ lazy(mega.ui, 'secondaryNav', () => {
                 return;
             }
 
-            const items = ['.fileupload-item', '.folderupload-item'];
+            const items = ['.fileupload-item', '.folderupload-item', '.app-dl-hint'];
             const target = ev.currentTarget instanceof MegaComponent ? ev.currentTarget.domNode : ev.currentTarget;
             if (this.cardComponent && (this.cardComponent.domNode.contains(target) || this.isSmall)) {
                 items.push('.newfolder-item', '.newfile-item');

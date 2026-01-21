@@ -1009,6 +1009,9 @@
     background: var(--surface-black);
     border-radius: 8px;
 }
+#propay .payment-address-dialog footer button span {
+    margin: 0 auto;
+}
 .pricing-pg.bottom-page .payment-result.main-block {
     width: 100%;
     height: 100%;

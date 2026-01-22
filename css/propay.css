@@ -127,6 +127,23 @@
 #propay .mega-input-dropdown .option span {
     display: contents;
 }
+/* Date */
+#propay .mega-input[type="date"] {
+    background-color: transparent;
+    border: none;
+    box-sizing: border-box;
+    flex: 1;
+    font: var(--text-body1);
+    color: var(--text-color-high);
+    cursor: text;
+    overflow: hidden;
+    padding: 2px 8px;
+    position: relative;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 100%;
+    z-index: 11;
+}
 /* Error */
 #propay .error {
     border-color: var(--input-text-underline-error);
@@ -520,6 +537,21 @@
 }
 #propay .left-block .billing-address .info .name {
     font: var(--text-copy-medium-bold-pricing);
+}
+#propay .date-of-birth-block.error .message-container {
+    position: relative;
+    top: 0;
+    margin-top: 4px;
+    color: var(--banner-text-error);
+    border: 1px solid var(--banner-border-error);
+    background: var(--banner-background-error);
+    border-radius: 4px;
+    padding: 6px;
+    font: var(--text-body1);
+    display: block;
+}
+#propay .date-of-birth-block .message-container {
+    display: none;
 }
 #propay .left-block .propay-inline-dialog {
     font: var(--text-copy-secondary-pricing)
@@ -951,9 +983,34 @@
 #propay .payment-address-dialog aside {
     display: none;
 }
+#propay .payment-address-dialog footer .footer-container {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    flex-direction: row;
+}
+#propay .payment-address-dialog footer .coinify-share-consent-container {
+    display: flex;
+    flex-direction: row;
+    margin-inline-end: auto;
+    margin-bottom: auto;
+    margin-top: auto;
+    padding-top: 16px;
+    cursor: pointer;
+    --mask-color: var(--text-color-high-inverted);
+}
+#propay .payment-address-dialog footer .coinify-share-consent-container label {
+    cursor: pointer;
+}
+#propay .payment-address-dialog footer .coinify-share-consent-container > .checkbox  {
+    margin-top: 5px;
+}
 #propay .payment-address-dialog footer button {
     background: var(--surface-black);
     border-radius: 8px;
+}
+#propay .payment-address-dialog footer button span {
+    margin: 0 auto;
 }
 .pricing-pg.bottom-page .payment-result.main-block {
     width: 100%;

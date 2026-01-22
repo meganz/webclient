@@ -122,7 +122,7 @@ class MegaMobileHeader extends MegaComponent {
         backLink.on('tap.back', () => {
 
             if (!M.currentdirid || M.currentrootid === 'out-shares' || M.currentrootid === 'public-links'
-                    || M.currentdirid.startsWith('account/')) {
+                    || String(M.currentdirid).startsWith('account/')) {
 
                 if (typeof mobile.settingsHelper.currentPage !== 'undefined'){
                     mobile.settingsHelper.currentPage.hide();

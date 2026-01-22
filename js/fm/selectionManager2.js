@@ -1379,16 +1379,19 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             }
 
             if (M.currentrootid === 'public-links') {
-                __showBtn('copy-link');
-                __showBtn('remove-link');
+                if ($.selected.some(h => M.getNodeShare(h))) {
+                    __showBtn('link');
+                    __showBtn('copy-link');
+                    __showBtn('remove-link');
+                    __hideButton('delete');
+                    __hideButton('share');
+                }
                 if ($.selected.length > 1) {
                     __hideButton('move');
                 }
                 else {
                     __showBtn('rename');
                 }
-                __hideButton('delete');
-                __hideButton('share');
             }
 
             if (mega.lite.inLiteMode) {

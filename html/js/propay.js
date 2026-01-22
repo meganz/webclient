@@ -99,6 +99,7 @@ pro.propay = {
     requiresBillingAddress: {
         19: true,
         16: true,
+        4: true,
     },
 
     /**
@@ -170,8 +171,15 @@ pro.propay = {
             $('.dropdown-wrapper-primary .mega-input', this.$page).addClass('error');
         }
 
-        if (reasons.addressNeeded || reasons.addressInvalid) {
-            $('.billing-address .billing-info', this.$page).addClass('error');
+        const $billingAddressInfo = $('.billing-address .billing-info', this.$page);
+        const $billingAddressErrorMessage = $('.error-message-text', $billingAddressInfo)
+            .text(l.enter_billing_address);
+
+        if (reasons.addressNeeded || reasons.addressInvalid || reasons.dobNeeded) {
+            if (reasons.dobNeeded) {
+                $billingAddressErrorMessage.text(l.further_details_required);
+            }
+            $billingAddressInfo.addClass('error');
         }
 
         if (reasons.s4TosNeeded) {
@@ -216,6 +224,8 @@ pro.propay = {
             reasons.gatewayNeeded = 1;
         }
 
+        const currentGateway = this.currentGateway && this.currentGateway.gatewayId;
+
         if (this.requiresBilling()) {
             if (!addressDialog.validInputs) {
                 addressDialog.validateAndPay(false, true);
@@ -224,6 +234,16 @@ pro.propay = {
                 reasons.addressNeeded = 1;
             }
             else if (addressDialog.validInputs === false) {
+                reasons.addressInvalid = 1;
+            }
+            else if (currentGateway === this.BITCOIN_GATE_ID && addressDialog.validDob === false) {
+                reasons.dobNeeded = 1;
+            }
+
+            if (this.currentGateway
+                && this.currentGateway.gatewayId === this.BITCOIN_GATE_ID
+                && !addressDialog.validDob) {
+
                 reasons.addressInvalid = 1;
             }
         }
@@ -447,7 +467,12 @@ pro.propay = {
 
             // If Bitcoin provider then show the Bitcoin invoice dialog
             case bitcoinDialog.gatewayId:
-                bitcoinDialog.processUtcResult(utcResult);
+                if (typeof utcResult.EUR === 'object' && utcResult.EUR.url) {
+                    bitcoinDialog.storeUtcResult(utcResult);
+                }
+                else {
+                    bitcoinDialog.processUtcResult(utcResult);
+                }
                 break;
 
             // If Dynamic/Union Pay provider then redirect to their site
@@ -641,6 +666,9 @@ pro.propay = {
             }
             else if (this.proPaymentMethod === 'bitcoin') {
                 pro.lastPaymentProviderId = 4;
+                Object.assign(extra, addressDialog.extraDetails);
+                extra.pm = this.currentGateway.gatewayName;
+                extra.recurring = false;
             }
             else if (this.proPaymentMethod === 'perfunctio') {
                 pro.lastPaymentProviderId = 8;
@@ -1509,6 +1537,8 @@ pro.propay = {
         this.pageInfo.$planCard = (planCardInitialized && this.pageInfo.$planCard)
             || mega.templates.getTemplate('propay-page-plan-card-tmplt', false, this.pageInfo.$templates);
 
+        this.pageInfo.$planCard.addClass('fixed');
+
         this.pageInfo.$planCard.toggleClass('flexi', isFlexi);
 
         let formattedPlanPrice;
@@ -2269,6 +2299,12 @@ pro.propay = {
 
     },
 
+    showPaymentSection() {
+        'use strict';
+
+        $('.specific-payment-info', this.$page).removeClass('hidden');
+    },
+
     updatePayment(fromSignup, reloadedPlans) {
         'use strict';
 
@@ -2300,7 +2336,6 @@ pro.propay = {
             return;
         }
 
-
         const currentGatewayId = this.currentGateway.gatewayId;
 
         $('.propay-inline-dialog', this.$leftBlock).addClass('hidden');
@@ -2319,12 +2354,14 @@ pro.propay = {
 
         if (this.requiresBillingAddress[gatewayId]
             && (!addressDialog.billingInfoFilled || (addressDialog.validInputs === false))) {
+
             $('.specific-payment-info', this.$page).addClass('hidden');
             return;
         }
 
         const usingBalanceOnVoucher = this.usingBalance && (gatewayId === 0);
         const isAstropay = this.currentGateway.gatewayId === astroPayDialog.gatewayId;
+        const isBitcoin = this.currentGateway.gatewayId === this.BITCOIN_GATE_ID;
 
         let shouldBlockFlow = false;
         const blockFlowReasons = this.blockFlow(true);
@@ -2340,6 +2377,7 @@ pro.propay = {
             && !isAstropay
             && !usingBalanceOnVoucher
             && !shouldBlockFlow
+            && !isBitcoin
             && !(this.currentGateway.gatewayId === this.BITCOIN_GATE_ID && this.isNewAccount);
 
         const showPaymentButton = this.paymentButton && !blockFlowReasons;
@@ -2359,8 +2397,6 @@ pro.propay = {
         // check all required fields are filled
 
         $('.balance:not(.option)', this.$page).addClass('hidden');
-
-        this.updateRightBlock();
 
         const requiresAccount = this.signup.checkPaymentType();
 
@@ -2390,7 +2426,7 @@ pro.propay = {
             astroPayDialog.init(this.currentGateway);
             return;
         }
-        if (!showPaymentSection && !showPaymentButton && !isAstropay) {
+        if (!showPaymentSection && !showPaymentButton && !isAstropay && !isBitcoin) {
             return;
         }
 
@@ -2419,10 +2455,11 @@ pro.propay = {
         }
         else if ((paymentType === 'other')
             && (this.currentGateway.gatewayName === 'bitcoin')) {
+            addressDialog.showDialog(true);
+            addressDialog.validateAndPay(pro.propay.initBillingInfo);
             if (this.skItems.bitcoin) {
                 this.skItems.bitcoin.startLoad();
             }
-            this.sendPurchaseToApi(this.currentGateway.gatewayId);
         }
     },
 
@@ -2857,6 +2894,9 @@ pro.propay = {
         if (gatewayId === 0) {
             pro.propay.sendPurchaseToApi(gatewayId);
         }
+        else if (gatewayId === this.BITCOIN_GATE_ID) {
+            bitcoinDialog.redirectToSite();
+        }
         else if (gatewayId === 19) {
             if (this.sca) {
                 addressDialog.processUtcResult(this.sca.utcResult, this.sca.saleId);
@@ -2992,16 +3032,18 @@ pro.propay = {
         this.setContinuebuttonText();
     },
 
-    setContinuebuttonText() {
+    setContinuebuttonText(hide) {
         'use strict';
         const recurringEnabled = this.currentGateway && this.currentGateway.supportsRecurring;
         const gatewayId = this.currentGateway && this.currentGateway.gatewayId;
 
 
-        const showBitcoinCode = gatewayId === this.BITCOIN_GATE_ID && !this.isNewAccount;
-
         const $continueButton = $('.continue', this.$page)
-            .toggleClass('hidden', !!this.paymentButton || showBitcoinCode);
+            .toggleClass('hidden', !!this.paymentButton || !!hide);
+
+        if (hide) {
+            return;
+        }
 
         if (this.errors) {
             this.showErrors();
@@ -3027,6 +3069,11 @@ pro.propay = {
         }
 
         $continueButton.text(label);
+    },
+
+    hideContinueButton() {
+        'use strict';
+        this.setContinuebuttonText(true);
     },
 
     fillBillingInfo(info) {
@@ -3128,15 +3175,16 @@ pro.propay = {
         this.clearPage();
         this.getPageElements();
 
-        addressDialog.init(false, false, false, true);
-
-        this.renderGateways();
-        this.renderDurations();
-        this.initBillingInfo();
-        this.renderPlanInfo();
-        this.initContinueButton();
-        this.renderLocaleInfo();
-        this.updatePageInfo();
+        addressDialog.init(false, false, false, true).then(() => {
+            this.renderGateways();
+            this.selectPreSelectedGateway();
+            this.renderDurations();
+            this.initBillingInfo();
+            this.renderPlanInfo();
+            this.initContinueButton();
+            this.renderLocaleInfo();
+            this.updatePageInfo();
+        });
 
         return true;
     },
@@ -3558,9 +3606,6 @@ pro.propay = {
 
                 this.renderPropayPage();
 
-                this.updateRightBlock = this.initScrollHandler();
-                this.updateRightBlock();
-
                 this.initResizeHandler();
 
                 if (window.s4ac && isFlexi) {
@@ -3570,8 +3615,6 @@ pro.propay = {
                 const propayPageVisitEventId = pro.propay.getPropayPageEventId(pro.propay.planNum);
 
                 this.sk.endLoadAll();
-
-                this.selectPreSelectedGateway();
 
                 eventlog(propayPageVisitEventId);
             });
@@ -3596,8 +3639,6 @@ pro.propay = {
                 return;
             }
 
-            this.updateRightBlock();
-
             if (!this.paymentButton) {
                 return;
             }
@@ -3609,45 +3650,6 @@ pro.propay = {
                 this.updatePayment();
             }
         });
-    },
-
-    initScrollHandler() {
-        'use strict';
-
-        const $fmHolder = $('.fmholder', 'body.bottom-pages');
-
-        const topPadding = 14;
-
-        const child = document.querySelector('.plan-card:not(#propay-page-plan-card-tmplt)');
-
-        const updateRightBlock = () => {
-
-            if (!pro.propay.onPropayPage()) {
-                $fmHolder.off('scroll.propay-page');
-                return;
-            }
-
-            const parentHeight = $('#propay > div.right-block').outerHeight();
-            const childHeight = child.offsetHeight;
-
-            const distanceScrolled = $fmHolder.scrollTop();
-
-            if ((distanceScrolled + childHeight) < parentHeight - topPadding) {
-                child.classList.add('fixed');
-                child.classList.remove('relative');
-            }
-            else {
-                child.classList.remove('fixed');
-                child.classList.add('relative');
-            }
-        };
-
-        $fmHolder.rebind('scroll.propay-page', updateRightBlock);
-
-        // updateRightBlock();
-
-        return updateRightBlock;
-
     },
 
     getDiscount() {

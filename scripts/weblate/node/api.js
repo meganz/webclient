@@ -172,10 +172,12 @@ class API {
         this.languages = {};
         for (let i = res.results.length; i--;) {
             const { language } = res.results[i];
-            this.languages[language.code] = language;
+            if (!ARGS.lang || ARGS.lang.split(',').includes(language.code)) {
+                this.languages[language.code] = language;
+            }
         }
         if (ARGS.verbose) {
-            console.debug(`Fetched ${res.results.length} languages`);
+            console.debug(`Fetched ${Object.keys(this.languages).length} language(s)`);
         }
         return this.languages;
     }

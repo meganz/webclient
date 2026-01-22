@@ -2441,7 +2441,7 @@ var addressDialog = {
             }
 
             addressDialog.validInputs = addressDialog.validInputs || fieldsValid || false;
-            addressDialog.validDob = addressDialog.validDob || validCoinify || false;
+            addressDialog.validDob = (addressDialog.validDob && !isBitcoin) || validCoinify || false;
 
             onIdle(() => eventlog(500517));
 

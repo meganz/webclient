@@ -172,10 +172,12 @@ class API {
         this.languages = {};
         for (let i = res.results.length; i--;) {
             const { language } = res.results[i];
-            this.languages[language.code] = language;
+            if (!ARGS.lang || ARGS.lang.split(',').includes(language.code)) {
+                this.languages[language.code] = language;
+            }
         }
         if (ARGS.verbose) {
-            console.debug(`Fetched ${res.results.length} languages`);
+            console.debug(`Fetched ${Object.keys(this.languages).length} language(s)`);
         }
         return this.languages;
     }
@@ -441,6 +443,10 @@ class API {
         }
         const res = await fetch(endpoint, options);
         if (res.status < 200 || res.status > 399) {
+            if (res.status === 401 || res.status === 403 || res.status > 499) {
+                console.error(res);
+                throw new Error(`${res.status} ${res.statusText} (${await res.text()})`);
+            }
             return res.text();
         }
         return res.json();

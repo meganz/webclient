@@ -12,6 +12,7 @@ const ARGS = {
     pushmain: false,
 };
 const argMap = {
+    '-l': '--lang',
     '-p': '--production',
     '-u': '--update',
     '-f': '--filepath',

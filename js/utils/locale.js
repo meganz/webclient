@@ -2020,6 +2020,12 @@ mBroadcaster.once('boot_done', function populate_l() {
     l.signup_agree_tos = escapeHTML(l.signup_agree_tos)
         .replace('[A]', mega_io_hyperlinks.terms)
         .replace('[/A]', '</a>');
+    l.coinify_share_consent = escapeHTML(l.coinify_share_consent)
+        .replace('[A]', '<a href="https://www.coinify.com/privacy-policy-payers" target="_blank" class="clickurl">')
+        .replace('[/A]', '</a>');
+    l.coinify_req_dob_or_tax = escapeHTML(l.coinify_req_dob_or_tax)
+        .replace('[A]', '<a href="https://www.coinify.com/privacy-policy-payers" target="_blank" class="clickurl">')
+        .replace('[/A]', '</a>');
 
     const common = [
         15536, 16119, 16120, 16313, 16316, 16360, 18228, 18268, 18282,

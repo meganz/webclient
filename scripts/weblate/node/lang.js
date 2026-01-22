@@ -494,6 +494,21 @@ async function download(branchSuffix, webProdStrings, sharedTag, build) {
     return Promise.allSettled(promises);
 }
 
+async function setupProxy(url) {
+    const [host, port] = url.split('//').pop().split(':');
+
+    const {setGlobalDispatcher} = require('undici');
+    const {socksDispatcher} = require("fetch-socks");
+
+    const dispatcher = socksDispatcher({type: 5, host, port: parseInt(port)});
+
+    setGlobalDispatcher(dispatcher);
+
+    if (ARGS.verbose) {
+        console.log(`Created proxy dispatcher for ${host}:${port}`);
+    }
+}
+
 async function main() {
     'use strict';
     console.log('--- Weblate Language Management ---');
@@ -501,13 +516,22 @@ async function main() {
         throw new Error(`Invalid shared project. Expected one of: ${Object.keys(SHARED_PROJECTS).join(', ')}`);
     }
     const configFile = await readFile(`${__dirname}/../translate.json`).catch(() => {
-        console.warn('Trying sample config');
+        if (ARGS.verbose) {
+            console.warn('Trying sample config');
+        }
         return readFile(`${__dirname}/../translate.json.example`);
     });
     const config = safeParse(configFile);
     const sharedTag = ARGS.shared ? String(ARGS.shared).toLowerCase() : undefined;
     config.SHARED = SHARED_PROJECTS[sharedTag];
     api = API(config);
+
+    if (process.env.WEBLATE_PROXY) {
+        await setupProxy(process.env.WEBLATE_PROXY)
+            .catch((ex) => {
+                console.warn('Failed to instantiate proxy...', ex);
+            });
+    }
 
     const [ branchRes, prodRes, languagesRes ] = await Promise.allSettled([
         typeof ARGS.forcebranch === 'string' ? Promise.resolve(ARGS.forcebranch) : asyncExec('git symbolic-ref --short -q HEAD'),

@@ -522,16 +522,13 @@ async function main() {
         branchRes.value = 'main';
     }
     if (!branchRes.value || !branchRes.value.trim()) {
-        console.error('Error: Failed to retrieve your current git branch.');
-        return false;
+        throw new Error('Failed to retrieve your current git branch.');
     }
     if (!prodRes.value || !Object.keys(prodRes.value).length) {
-        console.error('Error: Failed to download the prod component');
-        return false;
+        throw new Error('Failed to download the prod component');
     }
     if (!languagesRes.value) {
-        console.error('Error: Failed to fetch project languages');
-        return false;
+        throw new Error('Failed to fetch project languages');
     }
 
     const branchSuffix = branchRes.value.replace(/[^A-Za-z0-9]+/g, '').toLowerCase();

@@ -525,10 +525,10 @@ async function main() {
         throw new Error('Failed to retrieve your current git branch.');
     }
     if (!prodRes.value || !Object.keys(prodRes.value).length) {
-        throw new Error('Failed to download the prod component');
+        throw new Error(`Failed to download the ${api.COMPONENT} component, ${prodRes.reason}`);
     }
     if (!languagesRes.value) {
-        throw new Error('Failed to fetch project languages');
+        throw new Error(`Failed to fetch project languages, ${languagesRes.reason}`);
     }
 
     const branchSuffix = branchRes.value.replace(/[^A-Za-z0-9]+/g, '').toLowerCase();

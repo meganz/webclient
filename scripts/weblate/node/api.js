@@ -441,6 +441,10 @@ class API {
         }
         const res = await fetch(endpoint, options);
         if (res.status < 200 || res.status > 399) {
+            if (res.status === 401 || res.status === 403 || res.status > 499) {
+                console.error(res);
+                throw new Error(`${res.status} ${res.statusText} (${await res.text()})`);
+            }
             return res.text();
         }
         return res.json();

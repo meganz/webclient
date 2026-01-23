@@ -748,6 +748,9 @@ lazy(mega, 'rewindUi', () => {
                 return false;
             }
 
+            mega.rewindUtils.tree.finalise();
+            mega.rewindUtils.packet.finalise();
+
             let isOpenFolder = false;
             let closeRewind = true;
 
@@ -855,12 +858,12 @@ lazy(mega, 'rewindUi', () => {
             this.removeDownloadUpgradeHandlers();
 
             $(DATEPICKER_SELECTOR, document).off('click.rewind');
-
-            mBroadcaster.removeListener('rewind:progress');
         }
 
-        progressListener(progress) {
-            this.$contentLoadingProgress.text(formatPercentage(progress / 100));
+        updateProgress(val) {
+            if (this.$contentLoadingProgress && this.$contentLoadingProgress.length) {
+                this.$contentLoadingProgress.text(formatPercentage(val / 100));
+            }
         }
 
         // There can be multiple places from which user can begin the upgrade flow
@@ -993,11 +996,6 @@ lazy(mega, 'rewindUi', () => {
             $(this.sidebar).rebind('contextmenu.rewind', () => {
                 return false;
             });
-
-            const progressKey = 'rewind:progress';
-
-            mBroadcaster.removeListener(progressKey);
-            mBroadcaster.addListener(progressKey, this.progressListener.bind(this));
         }
 
         contextOpenItem() {
@@ -1133,7 +1131,7 @@ lazy(mega, 'rewindUi', () => {
             const date = new Date(datepickerDate);
             $('.content-item', this.$sidebarContent).addClass('hidden');
             this.$contentLoading.removeClass('hidden');
-            this.progressListener(0); // Set loading to 0
+            this.updateProgress(0);
             this.$contentEmpty.addClass('hidden');
             this.$contentTreeCacheEmpty.addClass('hidden');
             this.$contentUpgrade.addClass('hidden');
@@ -1176,18 +1174,23 @@ lazy(mega, 'rewindUi', () => {
                 this.folderList = null;
             }
 
-            // Remove filters
-            /*
-            if (date) {
-                this.updateFilterLabel(date, 0, true);
-            }
-            */
-
             if (!isOpenFolder) {
                 this.$contentLoading.removeClass('hidden');
-                const hasRecords = await mega.rewind.getRecords(date.getTime());
+                const hasRecords = await mega.rewind.getRecords(date.getTime())
+                    .catch((ex) => {
+                        this.close();
+                        if (typeof ex !== 'object' || ex.code !== EROLLEDBACK) {
+                            tell(ex);
+                        }
+                    })
+                    .finally(() => {
+                        mega.rewindUtils.tree.finalise();
+                        mega.rewindUtils.packet.finalise();
+                    });
+
                 this.$contentLoading.addClass('hidden');
                 if (!hasRecords || hasRecords < 0) {
+                    logger.info('Rewind.displayList - no records', date.getTime(), hasRecords);
                     this.$contentTreeCacheEmpty.removeClass('hidden');
                     this.$contentFolder.addClass('hidden');
                     this.isListLoading = false;
@@ -1198,6 +1201,7 @@ lazy(mega, 'rewindUi', () => {
             const currentCacheNode = mega.rewind.nodeDictionary[this.currentNode.h];
             if (!currentCacheNode) {
                 // No node available on the dictionary. No value found
+                logger.info('Rewind.displayList - no cache node', this.currentNode.h);
                 this.$contentTreeCacheEmpty.removeClass('hidden');
                 this.$contentFolder.addClass('hidden');
                 this.isListLoading = false;
@@ -1209,6 +1213,7 @@ lazy(mega, 'rewindUi', () => {
             const totalDirectories = sizeTreeNode.td || 0;
 
             if (totalFiles === 0 && totalDirectories === 0) {
+                logger.info('Rewind.displayList - no nodes');
                 this.$contentEmpty.removeClass('hidden');
                 this.$contentFolder.addClass('hidden');
                 // SAT-1023
@@ -1353,8 +1358,19 @@ lazy(mega, 'rewindUi', () => {
         prepareListView({type, ts}) {
             this.$contentFolderOptions.addClass('hidden');
 
+            const {nodeChildrenDictionary} = mega.rewind;
+            if (nodeChildrenDictionary && nodeChildrenDictionary[this.currentHandle]) {
+                logger.info('Rewind.prepareListView - nodeChildrenDictionary',
+                            this.currentHandle, Object.keys(nodeChildrenDictionary[this.currentHandle]).length);
+            }
+            else {
+                logger.warn('Rewind.prepareListView - nodeChildrenDictionary empty', this.currentHandle);
+            }
+
             if (type) {
                 this.getFilterNodes(type, this.currentHandle);
+                logger.info('Rewind.prepareListView - filtered view nodes',
+                            type, this.currentHandle, this.viewNodes.length);
                 this.$contentFolderOptions.removeClass('hidden');
             }
             else {
@@ -1362,6 +1378,8 @@ lazy(mega, 'rewindUi', () => {
                     selectedHandle: this.currentHandle,
                     ts,
                 });
+                logger.info('Rewind.prepareListView - view nodes',
+                            this.currentHandle, ts, this.viewNodes.length);
             }
 
             if (this.folderList) {
@@ -1370,6 +1388,7 @@ lazy(mega, 'rewindUi', () => {
             }
 
             if (this.isEmptyList()) {
+                logger.warn('Rewind.prepareListView - view nodes empty, no nodes to render');
                 return false;
             }
 
@@ -1416,9 +1435,13 @@ lazy(mega, 'rewindUi', () => {
 
             if (this.folderList) {
                 onIdle(() => {
+                    logger.info('Rewind.prepareListView - add view nodes to render', this.viewNodes.length);
                     this.folderList.batchAdd(this.viewNodes);
                     this.folderList.initialRender();
                 });
+            }
+            else {
+                logger.warn('Rewind.prepareListView - cannot add nodes to render');
             }
         }
 
@@ -2030,7 +2053,7 @@ lazy(mega, 'rewindUi', () => {
                     this.selectedDate = dateObj;
                 }
 
-                console.time('rewind:index:restore');
+                mega.rewindUtils.task.start('restore');
                 this.$restoreButton.addClass('disabled');
 
                 this.openFolderListener = mBroadcaster.addListener('beforepagechange', () => {
@@ -2124,12 +2147,13 @@ lazy(mega, 'rewindUi', () => {
                         }
                     })
                     .finally(() => {
+                        this.close();
                         mega.rewindUtils.reinstate.finalise();
                         mBroadcaster.removeListener(this.openFolderListener);
-                        mega.rewindUi.sidebar.teardownLoader();
-                        mega.rewindUi.sidebar.updateRestoreProgress();
+                        this.teardownLoader();
+                        this.updateRestoreProgress();
                         this.$restoreButton.removeClass('disabled');
-                        console.timeEnd('rewind:index:restore');
+                        mega.rewindUtils.task.complete('restore');
                     });
                 return false;
             };

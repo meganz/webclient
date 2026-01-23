@@ -279,7 +279,7 @@ class MDialog extends MComponent {
 
         if (this._cancel) {
             this.cancelBtn = new MButton(
-                this._cancel.label || l[1597],
+                this._cancel.label || l.msg_dlg_cancel,
                 null,
                 () => {
                     this.triggerCancelAction();

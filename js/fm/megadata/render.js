@@ -46,7 +46,12 @@ MegaData.prototype.renderMain = function(aUpdate) {
         this.rmSetupUI(aUpdate, aUpdate ? !!$.dbOpenHandle : false);
     }
 
-    if (mega.ui.secondaryNav && M.v.length && mega.ui.mNodeFilter.viewEnabled) {
+    if (
+        this.v.length &&
+        mega.ui.secondaryNav &&
+        mega.ui.mNodeFilter.viewEnabled &&
+        !this.getSelectedNodes().length
+    ) {
         mega.ui.secondaryNav.extShowFilterChip();
     }
     else if (mega.ui.secondaryNav) {
@@ -403,9 +408,8 @@ MegaData.prototype.megaListRenderNode = function(aHandle) {
             megaRender.setDOMColumnsWidth(node);
         }
 
-        var selList = selectionManager && selectionManager.selected_list ? selectionManager.selected_list : $.selected;
-
-        if (selList && selList.length) {
+        const selList = M.getSelectedNodes();
+        if (selList.length) {
             if (selList.includes(aHandle)) {
                 node.classList.add('ui-selected');
             }

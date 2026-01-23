@@ -284,7 +284,7 @@ class VpnPage {
 
         if (cred === EACCESS) {
             msgDialog(
-                `info:!^${l.vpn_eaccess_dialog_upgrade}!${l.vpn_eaccess_dialog_cancel}`,
+                `info:!^${l.vpn_eaccess_dialog_upgrade}!${l.msg_dlg_cancel}`,
                 '',
                 l.vpn_eaccess_dialog_title,
                 l.vpn_eaccess_dialog_msg,
@@ -312,13 +312,14 @@ class VpnPage {
         loadingDialog.show('vpn-deactivate');
 
         msgDialog(
-            `warningb:!^${l.vpn_page_delete_credential_confirm}!${l.vpn_page_delete_credential_dialog_cancel}`,
+            `warningb:!^${l.msg_dlg_cancel}!${l.vpn_page_delete_credential_confirm}`,
             '', '', l.vpn_page_delete_credential, async(e) => {
-                if (!e) {
-        await VpnCredsManager.deactivateCredential(credNum);
+                // [cancel => primary button][delete => secondary button]
+                if (e === true) {
+                    await VpnCredsManager.deactivateCredential(credNum);
+                    this._onCredDeactivated(credNum);
                 }
-        loadingDialog.hide('vpn-deactivate');
-                this._onCredDeactivated(credNum);
+                loadingDialog.hide('vpn-deactivate');
             }
         );
     }

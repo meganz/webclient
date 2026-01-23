@@ -238,7 +238,7 @@ lazy(mega, 'rewindUi', () => {
                             l.rewind_datepicker_cell_tooltip_disabled_pro
                                 .replace('%d', mega.rewind.rewindableDays);
 
-                        disabledCellContent = `<span 
+                        disabledCellContent = `<span
                             class="cell-value simpletip"
                             data-simpletip="${tooltip}"
                             data-simpletip-class="rewind-calendar-tooltip theme-dark-forced">
@@ -258,7 +258,7 @@ lazy(mega, 'rewindUi', () => {
                         if (hasRecord && !apiDelayElapsed) {
                             // Keep the indicator dot, but don't show the tooltip if data has not matured
                             cellClasses += ' -has-value-';
-                            cellContent = `<span 
+                            cellContent = `<span
                                 class="cell-value">
                                 ${oldHtml}
                             </span>`;
@@ -308,7 +308,7 @@ lazy(mega, 'rewindUi', () => {
                                 ${divRemoved}
                             `;
 
-                            cellContent = `<span 
+                            cellContent = `<span
                                 class="cell-value simpletip"
                                 data-simpletip="${tooltip}"
                                 data-simpletip-class="rewind-calendar-tooltip theme-dark-forced">
@@ -2088,7 +2088,7 @@ lazy(mega, 'rewindUi', () => {
                             case -9:
                                 dlg = {
                                     // Malformed attributes
-                                    type: `warningb:!^${l[1364]}!${l[82]}`,
+                                    type: `warningb:!^${l[1364]}!${l.msg_dlg_cancel}`,
                                     title: l.rw_err_invalid_request_title,
                                     msg: l.rw_err_invalid_request_message,
                                     onClickPrimary: () => {
@@ -2114,7 +2114,7 @@ lazy(mega, 'rewindUi', () => {
                             case -3:
                                 dlg = {
                                     // Network/API error
-                                    type: `warningb:!^${l[1364]}!${l[82]}`,
+                                    type: `warningb:!^${l[1364]}!${l.msg_dlg_cancel}`,
                                     title: l.rw_err_network_error_title,
                                     msg: multiple
                                         ? l.rw_err_network_error_message_more
@@ -2166,7 +2166,7 @@ lazy(mega, 'rewindUi', () => {
                     .replace('[B]', '<b>').replace('[/B]', '</b>')
                     .replace('%1', this.rewindOptions.restoreDate);
 
-                msgDialog(`confirmation:!^${l.rewind}!${l[82]}`, "", l.rewind_folder, desc, (proceed)=>{
+                msgDialog(`confirmation:!^${l.rewind}!${l.msg_dlg_cancel}`, "", l.rewind_folder, desc, (proceed)=>{
                     if (proceed) {
                         proceedWithReinstate();
                     }

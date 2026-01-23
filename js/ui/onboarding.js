@@ -394,7 +394,8 @@ mBroadcaster.addListener('fm:initialized', () => {
                                             action: 3,
                                             event: 500899
                                         },
-                                        customContent: () => {
+                                        customContent: async() => {
+                                            await M.require('pwm');
                                             mega.ui.onboarding.selector = new MegaImportPassSelector();
                                             return mega.ui.onboarding.selector.container;
                                         },

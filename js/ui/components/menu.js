@@ -85,8 +85,10 @@ class MegaMenu extends MegaOverlay {
         const menuWidth = parseFloat(dialog.offsetWidth);
         let menuHeight = parseFloat(dialog.offsetHeight);
 
+        const psaBannerHeight = typeof psa === 'undefined' ? 0 : psa.getBannerHeight();
+
         // calculate the max width & height available for the context menu dialog
-        const maxHeight = window.innerHeight;
+        const maxHeight = window.innerHeight - psaBannerHeight;
 
         if (this.event.type === 'contextmenu' || this.pos === 'bottomRight') {
 

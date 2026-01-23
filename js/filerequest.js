@@ -485,7 +485,7 @@ lazy(mega, 'fileRequest', () => {
             this.commonDialog.closeWarning = true;
             this.commonDialog.selectFolder = true;
             this.commonDialog.sectionPrimary = true;
-            this.commonDialog.close = l[82];
+            this.commonDialog.close = l.msg_dlg_cancel;
             this.commonDialog.save = l[158];
             this.commonDialog.savePositive = true;
             this.commonDialog.preview = true;
@@ -645,7 +645,7 @@ lazy(mega, 'fileRequest', () => {
 
             this.commonDialog.closeWarning = true;
             this.commonDialog.sectionPrimary = true;
-            this.commonDialog.close = l[82];
+            this.commonDialog.close = l.msg_dlg_cancel;
             this.commonDialog.save = l.msg_dlg_save;
             this.commonDialog.savePositive = true;
             this.commonDialog.preview = true;
@@ -705,7 +705,7 @@ lazy(mega, 'fileRequest', () => {
                 };
 
                 msgDialog(
-                    `confirmation:!^${l.file_request_action_remove_prompt_button}!${l[82]}`,
+                    `confirmation:!^${l.file_request_action_remove_prompt_button}!${l.msg_dlg_cancel}`,
                     title,
                     message,
                     description,

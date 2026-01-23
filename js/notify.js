@@ -161,7 +161,7 @@ var notify = {
         'use strict';
 
         // We should not show notifications if we haven't yet done the initial notifications load yet
-        if (!notify.initialLoadComplete || notify.isUnwantedNotification(actionPacket)) {
+        if (!notify.initialLoadComplete || notify.isUnwantedNotification(actionPacket) || actionPacket.mid) {
             return false;
         }
 

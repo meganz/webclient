@@ -953,7 +953,7 @@ lazy(s4, 'ui', () => {
 
                 msgDialog(
                     `-confirmation:!^${l.s4_dialog_confirm_cancel_discard}!${l.s4_dialog_confirm_cancel_continue}`,
-                    l[1597],
+                    l.msg_dlg_cancel,
                     l.s4_dialog_confirm_cancel_title,
                     submsg,
                     (yes) => {

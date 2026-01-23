@@ -56,7 +56,8 @@
 .journey.link-import-dialog table.grid-table .mega-node.fm-item {
     grid-template-columns: 48px auto 28px;
 }
-.journey.link-import-dialog table.grid-table tbody i.item-type-icon {
+.journey.link-import-dialog table.grid-table tbody i.item-type-icon,
+.journey.link-import-dialog table.grid-table tbody i.sprite-fm-uni {
     position: static;
     --icon-size: 32px;
 }

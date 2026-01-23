@@ -15,7 +15,7 @@ export class StartGroupChatWizard extends MegaRenderMixin {
     static clickTime = 0;
     static defaultProps = {
         'selectLabel': l[1940],
-        'cancelLabel': l[82],
+        'cancelLabel': l.msg_dlg_cancel,
         'hideable': true,
         'flowType': 1,
         'pickerClassName': '',

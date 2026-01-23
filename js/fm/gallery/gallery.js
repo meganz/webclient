@@ -3,7 +3,8 @@ class GalleryNodeBlock {
         this.node = node;
         this.el = document.createElement('a');
 
-        this.el.className = `data-block-view ${mega.sensitives.isSensitive(node) ? ' is-sensitive' : ''}`;
+        this.el.className = `data-block-view content-visibility-auto
+            ${mega.sensitives.isSensitive(node) ? ' is-sensitive' : ''}`;
         this.el.id = node.h;
 
         if (mode === 'a') {
@@ -13,7 +14,7 @@ class GalleryNodeBlock {
         }
 
         this.spanEl = document.createElement('span');
-        this.spanEl.className = 'data-block-bg content-visibility-auto';
+        this.spanEl.className = 'data-block-bg';
         this.el.appendChild(this.spanEl);
 
         this.el.nodeBlock = this;
@@ -3883,13 +3884,8 @@ mega.gallery.initialiseMediaNodes = async(filterFn) => {
                 }
             };
 
-            if (fmdb && fmdb.db && !fmdb.crashed) {
-                await fmdb.get('f', assignNodes);
-            }
-            else {
-                console.warn('Cannot build nodes list from the local database...');
-                assignNodes(Object.values(M.d));
-            }
+            await M.collectNodes(M.RootID);
+            assignNodes(Object.values(M.d));
 
             return res;
         };
@@ -3904,11 +3900,13 @@ mega.gallery.allowedInMedia = (n, filterFn) => {
     'use strict';
 
     const cameraTree = MegaGallery.getCameraHandles();
-    const cdTree = Object.freeze(array.to.object(M.getTreeHandles(M.RootID), true));
-    return cdTree[n.p]
-        && M.isGalleryNode(n)
+    const isInCD = M.getNodeRoot(n) === M.RootID;
+
+    const toAdd = isInCD && M.isGalleryNode(n)
         && mega.sensitives.shouldShowNode(n)
         && (!filterFn || filterFn(n, cameraTree));
+
+    return toAdd;
 };
 
 mega.gallery.appendAppBanner = async(target) => {

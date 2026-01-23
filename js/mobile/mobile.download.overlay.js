@@ -164,7 +164,7 @@ mobile.downloadOverlay = {
             parentNode: mega.ui.overlay.actionsNode,
             type: 'normal',
             componentClassname: 'block secondary',
-            text: l[82],
+            text: l.msg_dlg_cancel,
         });
 
         cancelTransfer.on('tap.cancelTransfer', () => this.close());

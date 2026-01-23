@@ -713,19 +713,34 @@ pro.proplan = {
             $offerAll.removeClass('hidden');
         }
 
-        for (var i = 0, length = pro.membershipPlans.length; i < length; i++) {
+        let planArray = pro.membershipPlans.map(p => pro.getPlanObj(p));
+        const businessPlan = pro.getPlanObj(pro.ACCOUNT_LEVEL_BUSINESS);
+        if (businessPlan) {
+            planArray.push(businessPlan);
+        }
+        planArray = pro.sortPlansByStorage(planArray.filter(plan => plan.isIn('obqDialog')));
+
+        $pricingBoxes.toggleClass('monthly', period === 1);
+        $pricingBoxes.toggleClass('yearly', period === 12);
+
+        for (var i = 0, length = planArray.length; i < length; i++) {
 
             // Get plan details
-            const planObj = pro.getPlanObj(pro.membershipPlans[i]);
-            var currentPlan = pro.membershipPlans[i];
+            const planObj = planArray[i];
+            const currentPlan = planObj.planArray;
             var months = currentPlan[pro.UTQA_RES_INDEX_MONTHS];
             var planNum = currentPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL];
-            var planName = pro.getProPlanName(planNum);
+            var planName = planNum === pro.ACCOUNT_LEVEL_BUSINESS ? l.team : pro.getProPlanName(planNum);
             var priceIndex = pro.UTQA_RES_INDEX_MONTHLYBASEPRICE;
             let saveUpTo;
 
+            // Avoid any potential issues when a desired plan is not loaded
+            if (!planObj) {
+                continue;
+            }
+
             // Skip if data differs from selected period, unless it is mini plans
-            if ((months !== period) && !multipleDurations) {
+            if ((months !== period) && !multipleDurations && (planNum !== pro.ACCOUNT_LEVEL_BUSINESS)) {
                 continue;
             }
             // Set yearly variable index
@@ -756,10 +771,24 @@ pro.proplan = {
             var $currncyAbbrev = $('.pricing-page.plan-currency', $currentBox);
             var $planName = $('.pricing-page.plan-title', $currentBox);
             var $planButton = $('.pricing-page.plan-button', $currentBox);
+            var $usersAmount = $('.pricing-page.plan-features.users', $currentBox);
             var basePrice;
-            const baseMonthlyPrice = period === 12 ? planObj.correlatedPlan.price : planObj.price;
+            let baseMonthlyPrice = period === 12 ? planObj.correlatedPlan.price : planObj.price;
             let baseCurrency = 'EUR';
             $currentBox.removeClass('hidden save-yearly-offer offer-hidden outlined');
+            let hasMultiDuration = true;
+
+            if (!baseMonthlyPrice) {
+                hasMultiDuration = false;
+                baseMonthlyPrice = planObj.priceEuro;
+            }
+
+            if (planObj.level === pro.ACCOUNT_LEVEL_BUSINESS && planObj.minUsers) {
+                $usersAmount.removeClass('hidden').text(l.n_plus_users.replace('%1', planObj.minUsers));
+            }
+            else {
+                $usersAmount.addClass('hidden');
+            }
 
             if (currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE]) {
                 basePrice = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE];
@@ -812,7 +841,7 @@ pro.proplan = {
                 $planButton.first().text(l[23776].replace('%1', planName));
             }
 
-            $currentBox.toggleClass('offer', !discountAll && !!(offer || discountAny));
+            $currentBox.toggleClass('offer', !discountAll && !!(offer || discountAny) && hasMultiDuration);
             $singleOffer.addClass('hidden').removeClass('invisible');
 
             const saveAmount = pro
@@ -848,6 +877,8 @@ pro.proplan = {
                 $singleOffer.addClass('hidden');
             }
 
+            showOldPrice = showOldPrice && hasMultiDuration;
+
             if (showOldPrice) {
                 $onlySection.addClass('line-through')
                     .text(formatCurrency(baseMonthlyPrice, baseCurrency, 'narrowSymbol'));
@@ -861,8 +892,7 @@ pro.proplan = {
 
             if (pageType === 'D') {
 
-                const planTaxInfo = pro.taxInfo
-                    && pro.getStandardisedTaxInfo(currentPlan[pro.UTQA_RES_INDEX_EXTRAS].taxInfo);
+                const planTaxInfo = planObj.taxInfo;
 
                 const $taxInfo = $('.pricing-plan-tax', $currentBox);
                 if (planTaxInfo) {
@@ -920,7 +950,7 @@ pro.proplan = {
             storageValue = storageSizeRounded + ' ' + storageFormatted.unit;
 
             // Update storage and bandwidth data
-            pro.proplan.updatePlanData($currentBox, storageValue, bandwidthValue, period);
+            pro.proplan.updatePlanData($currentBox, storageValue, bandwidthValue, period, planObj);
         }
 
         $dialog.toggleClass('offer', !!discountAny).toggleClass('offer-all', !!discountAll);
@@ -977,7 +1007,7 @@ pro.proplan = {
     /**
      * Update Storage and bandwidth data in plaan card
      */
-    updatePlanData: function($pricingBox, storageValue, bandwidthValue, period) {
+    updatePlanData($pricingBox, storageValue, bandwidthValue, period, planObj) {
 
         "use strict";
 
@@ -986,6 +1016,7 @@ pro.proplan = {
         var $bandwidthAmount = $('.plan-feature.transfer', $pricingBox);
         var $bandwidthTip = $('i', $bandwidthAmount);
         var bandwidthText = period === 1 ? l[23808] : l[24065];
+        const $usersAmount = $('.plan-feature.users', $pricingBox);
 
         // Update storage
         $('span span', $storageAmount).text(storageValue);
@@ -994,9 +1025,17 @@ pro.proplan = {
         }
 
         // Update bandwidth
-        $('span span', $bandwidthAmount).text(bandwidthValue);
-        if ($bandwidthTip && $bandwidthTip.data('simpletip')) {
-            $bandwidthTip.attr('data-simpletip', bandwidthText.replace('%1', '[U]' + bandwidthValue + '[/U]'));
+        if (planObj && planObj.level === pro.ACCOUNT_LEVEL_BUSINESS && period === 12) {
+            $bandwidthAmount.addClass('hidden');
+            $usersAmount.removeClass('hidden').text(l.n_plus_users.replace('%1', planObj.minUsers));
+        }
+        else {
+            $usersAmount.addClass('hidden');
+            $bandwidthAmount.removeClass('hidden');
+            $('span span', $bandwidthAmount).text(bandwidthValue);
+            if ($bandwidthTip && $bandwidthTip.data('simpletip')) {
+                $bandwidthTip.attr('data-simpletip', bandwidthText.replace('%1', '[U]' + bandwidthValue + '[/U]'));
+            }
         }
     },
 

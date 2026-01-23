@@ -494,6 +494,21 @@ async function download(branchSuffix, webProdStrings, sharedTag, build) {
     return Promise.allSettled(promises);
 }
 
+async function setupProxy(url) {
+    const [host, port] = url.split('//').pop().split(':');
+
+    const {setGlobalDispatcher} = require('undici');
+    const {socksDispatcher} = require("fetch-socks");
+
+    const dispatcher = socksDispatcher({type: 5, host, port: parseInt(port)});
+
+    setGlobalDispatcher(dispatcher);
+
+    if (ARGS.verbose) {
+        console.log(`Created proxy dispatcher for ${host}:${port}`);
+    }
+}
+
 async function main() {
     'use strict';
     console.log('--- Weblate Language Management ---');
@@ -501,13 +516,22 @@ async function main() {
         throw new Error(`Invalid shared project. Expected one of: ${Object.keys(SHARED_PROJECTS).join(', ')}`);
     }
     const configFile = await readFile(`${__dirname}/../translate.json`).catch(() => {
-        console.warn('Trying sample config');
+        if (ARGS.verbose) {
+            console.warn('Trying sample config');
+        }
         return readFile(`${__dirname}/../translate.json.example`);
     });
     const config = safeParse(configFile);
     const sharedTag = ARGS.shared ? String(ARGS.shared).toLowerCase() : undefined;
     config.SHARED = SHARED_PROJECTS[sharedTag];
     api = API(config);
+
+    if (process.env.WEBLATE_PROXY) {
+        await setupProxy(process.env.WEBLATE_PROXY)
+            .catch((ex) => {
+                console.warn('Failed to instantiate proxy...', ex);
+            });
+    }
 
     const [ branchRes, prodRes, languagesRes ] = await Promise.allSettled([
         typeof ARGS.forcebranch === 'string' ? Promise.resolve(ARGS.forcebranch) : asyncExec('git symbolic-ref --short -q HEAD'),
@@ -522,16 +546,13 @@ async function main() {
         branchRes.value = 'main';
     }
     if (!branchRes.value || !branchRes.value.trim()) {
-        console.error('Error: Failed to retrieve your current git branch.');
-        return false;
+        throw new Error('Failed to retrieve your current git branch.');
     }
     if (!prodRes.value || !Object.keys(prodRes.value).length) {
-        console.error('Error: Failed to download the prod component');
-        return false;
+        throw new Error(`Failed to download the ${api.COMPONENT} component, ${prodRes.reason}`);
     }
     if (!languagesRes.value) {
-        console.error('Error: Failed to fetch project languages');
-        return false;
+        throw new Error(`Failed to fetch project languages, ${languagesRes.reason}`);
     }
 
     const branchSuffix = branchRes.value.replace(/[^A-Za-z0-9]+/g, '').toLowerCase();

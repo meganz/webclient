@@ -570,6 +570,18 @@ MegaData.prototype.addSelectedNodes = function(handles, clean) {
 };
 
 /**
+ * Returns the currently selected node handles.
+ * Uses `selectionManager.selected_list` if available, otherwise falls back to `$.selected`.
+ *
+ * @returns {Array<string>} Array of selected node handles.
+ */
+MegaData.prototype.getSelectedNodes = function() {
+    'use strict';
+
+    return window.selectionManager && selectionManager.selected_list || $.selected || false;
+};
+
+/**
  * Checking if is the page is in Gallery section
  * @param {String} [path] Path to check or this.currentdirid
  * @returns {Boolean}
@@ -4397,6 +4409,9 @@ MegaData.prototype.nodeRemovalUIRefresh = function(handle, parent) {
     }
 
     delay(`refresh-dialog-content:${handle}`, () => {
+        if (self.selectionManager) {
+            selectionManager.remove_from_selection(handle);
+        }
         if ($.dialog === 'move' || $.dialog === 'copy') {
             refreshDialogContent();
         }

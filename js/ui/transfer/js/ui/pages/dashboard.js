@@ -445,7 +445,7 @@ lazy(T.ui, 'dashboardLayout', () => {
                 const {xh, name} = this.data.selected;
                 const opt = {
                     title: l.transferit_edit_title,
-                    buttons: [l[776], l[82]],
+                    buttons: [l[776], l.msg_dlg_cancel],
                     placeholders: [l.transferit_enter_title, l.file_request_title_heading],
                     inputValue: name
                 };
@@ -463,7 +463,7 @@ lazy(T.ui, 'dashboardLayout', () => {
                 const opt = {
                     title: p ? l[23262] : l.transferit_add_pass,
                     type: 'password',
-                    buttons: [l[776], l[82]],
+                    buttons: [l[776], l.msg_dlg_cancel],
                     placeholders: [l[17454], l[909]],
                 };
                 T.ui.prompt(msg, opt)
@@ -475,7 +475,7 @@ lazy(T.ui, 'dashboardLayout', () => {
             cn.querySelector('.js-tr-change-exp-date').addEventListener('click', () => {
                 const {xh} = this.data.selected;
                 const opt = {
-                    buttons: [l[776], l[82]],
+                    buttons: [l[776], l.msg_dlg_cancel],
                     title: l.mobile_manage_link_expiry_date,
                     msg: l.transferit_change_availability,
                     submsg: l.transferit_availability_tip,
@@ -504,7 +504,7 @@ lazy(T.ui, 'dashboardLayout', () => {
                 const opt = {
                     title: l.transferit_change_sched_hdr,
                     type: 'calendar',
-                    buttons: [l[776], l[82]],
+                    buttons: [l[776], l.msg_dlg_cancel],
                     placeholders: [l.transferit_sending_date],
                     value: xrf.length ? xrf[0].s : null
                 };
@@ -526,7 +526,7 @@ lazy(T.ui, 'dashboardLayout', () => {
                 const {name, xh} = this.data.selected;
                 const msg = escapeHTML(l.transferit_delete_tr_info).replace('%1', `<strong>${name}</strong>`);
 
-                T.ui.confirm(msg, {title: 'Delete', buttons: [l[1730], l[82]]})
+                T.ui.confirm(msg, {title: 'Delete', buttons: [l[1730], l.msg_dlg_cancel]})
                     .then((yes) => yes && T.core.delete(xh))
                     .then(() => this.init(true))
                     .catch(tell);

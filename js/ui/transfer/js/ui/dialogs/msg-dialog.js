@@ -137,7 +137,7 @@ lazy(T.ui, 'msgDialog', () => {
             }
 
             if (buttons.length < 2 && (type === 'prompt' || type === 'password')) {
-                buttons.splice(0, 1, l[81], l[82]);
+                buttons.splice(0, 1, l[81], l.msg_dlg_cancel);
             }
 
             box.append(elm);
@@ -171,7 +171,7 @@ lazy(T.ui, 'msgDialog', () => {
         content.classList.remove('prioritize');
         content.querySelector('header > h5').textContent = title || '';
         confirmBtn.querySelector('span').textContent = buttons[0];
-        cancelBtn.querySelector('span').textContent = buttons[1] || l[82];
+        cancelBtn.querySelector('span').textContent = buttons[1] || l.msg_dlg_cancel;
 
         // Set class for warnings/errors to be on top of other dialogs
         if (/warning|error/.test(type)) {

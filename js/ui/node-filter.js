@@ -602,6 +602,7 @@ lazy(mega.ui, 'mNodeFilter', () => {
          * @returns {undefined}
          */
         initSearchFilter(overloadedFilters) {
+            const $searchCount = $('.fm-search-count', '.fm-right-files-block .fm-right-header');
             overloadedFilters = overloadedFilters || Object.create(null);
             $fmFilterChipsWrapper = $('.fm-filter-chips-wrapper', '.fm-right-files-block');
             $resetFilterChips = $('.fm-filter-reset', $fmFilterChipsWrapper);
@@ -655,10 +656,7 @@ lazy(mega.ui, 'mNodeFilter', () => {
                     M.renderMain();
 
                     mega.ui.searchbar.reinitiateSearchTerm();
-
-                    const $resultsCount = $('.fm-search-count', '.fm-right-files-block .fm-right-header');
-                    $resultsCount.removeClass('hidden');
-                    $resultsCount.text(mega.icu.format(l.search_results_count, M.v.length));
+                    M.updateSearchCount({target: $searchCount});
                 }
                 else {
                     M.openFolder(M.currentdirid, true);

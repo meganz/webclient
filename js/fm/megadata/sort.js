@@ -324,7 +324,7 @@ MegaData.prototype.sortByType = function(d) {
 };
 
 MegaData.prototype.sortByOwner = function(d) {
-    const key = M.currentdirid.startsWith('search/') ? 'u' : 'su';
+    const key = this.search ? 'u' : 'su';
 
     this.sortfn = function(a, b, d) {
         const usera = Object(M.d[a[key]] || { name: u_attr.name });

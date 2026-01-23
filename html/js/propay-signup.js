@@ -348,7 +348,7 @@ pro.propay.signup = {
         const {className} = strength;
 
         const $passwordWrapper = $('.password-wrapper', this.$accountDetailsDiv)
-            .removeClass('strengthen');
+            .removeClass('strengthen error');
         const $passwordStrength = $('.password-strength', $passwordWrapper)
             .addClass('hidden')
         const $passwordStrengthIcon = $('i', $passwordStrength);

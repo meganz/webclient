@@ -2222,8 +2222,12 @@ function logExportEvt(evtId, data) {
             const { sheet } = mega.ui;
             handles = handles || $.itemExport;
 
-            if (!Array.isArray(handles) || !handles.length) {
-                return; // No nodes supplied to the dialog
+            if (!Array.isArray(handles)) {
+                return;
+            }
+            handles = handles.filter(h => M.getNodeShare(h));
+            if (!handles.length) {
+                return; // No nodes with links supplied to the dialog
             }
 
             let i = handles.length;
@@ -2347,7 +2351,7 @@ function logExportEvt(evtId, data) {
 
             MegaButton.factory({
                 parentNode: footer,
-                text: l[82],
+                text: l.msg_dlg_cancel,
                 componentClassname: 'mx-2 secondary slim',
                 type: 'normal'
             }).on('click.settingsDiscardBack', onBack);

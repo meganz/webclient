@@ -509,7 +509,6 @@ body.rtl .gallery-view.gallery-type-m .gallery-date-block i::before {
 .gallery-view.gallery-type-d .data-block-view {
     width: auto;
     border-radius: 0;
-    overflow: visible;
 }
 .gallery-view.gallery-type-y .data-block-view .data-block-bg {
     padding-top: 0;
@@ -650,6 +649,14 @@ body.rtl .gallery-view.gallery-type-m .gallery-date-block i::before {
 .albums-grid-cell.ui-selected .thumb-area,
 .album-timeline-cell.ui-selected .thumb-area {
     box-shadow: 0 0 0 3px var(--radio-border-active);
+}
+.albums-grid-cell.ui-selected.is-sensitive,
+.album-timeline-cell.ui-selected.is-sensitive {
+    overflow: unset;
+}
+.albums-grid-cell.ui-selected.is-sensitive > div,
+.album-timeline-cell.ui-selected.is-sensitive > div {
+    overflow: hidden;
 }
 .albums-grid-cell.album-placeholder > div.pt-full  {
     background-color: var(--surface-grey-2);

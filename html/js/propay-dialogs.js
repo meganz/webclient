@@ -1432,7 +1432,7 @@ var addressDialog = {
             delete this.businessRegPage;
         }
 
-        this.fetchBillingInfo().always(function (billingInfo) {
+        return this.fetchBillingInfo().always((billingInfo) => {
             billingInfo = billingInfo || Object.create(null);
 
             const selectedState =
@@ -1446,6 +1446,7 @@ var addressDialog = {
             self.initCountryDropdownChangeHandler();
             self.initBuyNowButton();
             self.initCloseButton();
+            self.initCoinifyShareConsent();
             self.initRememberDetailsCheckbox();
 
             onIdle(() => eventlog(500516));
@@ -1465,6 +1466,15 @@ var addressDialog = {
         const dialogParent = is_mobile ? '#startholder' : 'section.mega-dialog-container';
 
         if (pro.propay.onPropayPage()) {
+            const isBitcoin = pro.propay.currentGateway
+                && pro.propay.currentGateway.gatewayId === pro.propay.BITCOIN_GATE_ID;
+
+            const $dobBlock = $('.date-of-birth-block', this.$dialog).toggleClass('hidden', !isBitcoin);
+            $('.coinify-share-consent-container', this.$dialog).toggleClass('hidden', !isBitcoin);
+
+            $('.error', $dobBlock).removeClass('error');
+            $('.message-container', $dobBlock).addClass('hidden');
+
             this.$dialog = $('#propay .payment-address-dialog.propay-dialog');
         }
         else {
@@ -1677,6 +1687,11 @@ var addressDialog = {
         this.cityMegaInput.$input.rebind('focus.logCityEvent', () => eventlog(500454));
         this.postCodeMegaInput.$input.rebind('focus.logPcEvent', () => eventlog(500455));
         this.taxCodeMegaInput.$input.rebind('focus.logTaxEvent', () => eventlog(500456));
+
+        if (pro.propay.onPropayPage()) {
+            this.dateOfBirthMegaInput = new mega.ui.MegaInputs($('.date-of-birth-input', this.$dialog));
+            this.dateOfBirthMegaInput.$input.rebind('focus.logDobEvent', () => eventlog(501071));
+        }
 
         if (!is_mobile) {
             // Keep the ps scrollbar block code after remove the hidden class from the dialog
@@ -2045,6 +2060,10 @@ var addressDialog = {
                     u_attr && u_attr['^taxnum'] || getBillingProp('taxCode', encodedVer)
                 );
             }
+
+            if (billingInfo.dateOfBirth) {
+                prefillMultipleInputs(this.dateOfBirthMegaInput, getBillingProp('dateOfBirth', encodedVer));
+            }
         }
         if (noFname) {
             fillInputFromAttr(this.firstNameMegaInput, 'fname', 'firstname');
@@ -2078,6 +2097,10 @@ var addressDialog = {
                 if (!billingInfo.country) {
                     billingInfo.country = u_attr.country ? u_attr.country : u_attr.ipcc;
                 }
+                if ((!billingInfo.taxCode || billingInfo.taxCode === '') && u_attr['%taxnum']) {
+                    billingInfo.taxCode = u_attr['%taxnum'];
+                }
+
                 promise.resolve(billingInfo);
             };
 
@@ -2141,6 +2164,42 @@ var addressDialog = {
         }, 3000);
 
         return promise;
+    },
+
+    /**
+     * Initialize the coinify share consent checkbox.
+     */
+    initCoinifyShareConsent() {
+        'use strict';
+
+        if (!pro.propay.onPropayPage()) {
+            return;
+        }
+
+        this.$coinifyShareConsentContainer = $('.coinify-share-consent-container', this.$dialog);
+        if (!this.$coinifyShareConsentContainer.length) {
+            console.error('Coinify share consent container not found');
+            return;
+        }
+
+        $('.coinify-share-consent-container label', this.$dialog).safeHTML(l.coinify_share_consent);
+
+        $(this.$coinifyShareConsentContainer).rebind('click', function(event) {
+
+            const $target = $(event.target);
+            if ($target.closest('a').length) {
+                return;
+            }
+
+            const $this = $(this);
+            const $checkbox = $('.checkbox-item', $this);
+            const currentlyOn = $checkbox.hasClass('checkboxOn');
+            $checkbox.toggleClass('checkboxOn', !currentlyOn);
+            $checkbox.toggleClass('checkboxOff', currentlyOn);
+            addressDialog.coinifyShareConsentConfirmed = !currentlyOn;
+        });
+
+        this.$coinifyShareConsentContainer.add('hidden');
     },
 
     /**
@@ -2229,6 +2288,24 @@ var addressDialog = {
     },
 
     /**
+     * Check if the date of birth is older than the age
+     * @param {string} dob The date of birth
+     * @param {number} age The age
+     * @returns {boolean}
+     */
+    checkIsOlderThan(dob, age) {
+        'use strict';
+
+        const today = new Date();
+        const ageDate = new Date(
+            today.getFullYear() - age,
+            today.getMonth(),
+            today.getDate()
+        );
+        return new Date(dob) < ageDate;
+    },
+
+    /**
      * Collects the form details and validates the form
      */
     validateAndPay(callback, validateOnly, allowEcpFlow, blockPayment) {
@@ -2240,7 +2317,6 @@ var addressDialog = {
         // Selectors for form text fields
         const fields = ['first-name', 'last-name', 'address1', 'address2', 'city', 'postcode'];
         const fieldValues = Object.create(null);
-
         // Get the values from the inputs
         for (let i = 0; i < fields.length; i++) {
 
@@ -2255,9 +2331,12 @@ var addressDialog = {
         // Get the values from the dropdowns
         const $stateSelect = $('.states', this.$dialog);
         const $countrySelect = $('.countries', this.$dialog);
+        const $dateOfBirthBlock = $('.date-of-birth-block', this.$dialog);
+        const $dateOfBirthInputSection = $('.date-of-birth', $dateOfBirthBlock);
         const state = $('.option[data-state="active"]', $stateSelect).attr('data-value');
         const country = $('.option[data-state="active"]', $countrySelect).attr('data-value');
         const taxCode = inputSelector(this.taxCodeMegaInput).$input.val().trim();
+        const dateOfBirth = $('input.date-of-birth-input', $dateOfBirthBlock).val();
 
         // Selectors for error handling
         const $errorMessage = $('.error-message', this.$dialog);
@@ -2266,11 +2345,14 @@ var addressDialog = {
 
         // Reset state of past error messages
         let stateNotSet = false;
+        let validCoinify = true;
+
         $errorMessage.addClass(is_mobile ? 'v-hidden' : 'hidden');
         $errorMessageContainers.addClass('hidden');
         $allInputs.removeClass('error');
         $stateSelect.removeClass('error');
         $countrySelect.removeClass('error');
+        $dateOfBirthInputSection.removeClass('error');
 
         // Add red border around the missing fields
         $.each(fieldValues, function(fieldName, value) {
@@ -2306,6 +2388,27 @@ var addressDialog = {
             $('span', $invoiceNote).text(l.taxcode_error.replace('%s', taxName));
             return false;
         }
+
+        const isBitcoin = pro.propay.onPropayPage()
+            && pro.propay.currentGateway
+            && pro.propay.currentGateway.gatewayId === pro.propay.BITCOIN_GATE_ID;
+
+        const dobOlderThan10 = dateOfBirth && isBitcoin && this.checkIsOlderThan(dateOfBirth, 10);
+
+        if (isBitcoin && !taxCode && !dobOlderThan10) {
+            validCoinify = false;
+            $dateOfBirthInputSection.addClass('error');
+            $dateOfBirthBlock.addClass('error');
+            if (dateOfBirth && !dobOlderThan10) {
+                $('.message-container', $dateOfBirthBlock).removeClass('hidden').text(l.coinify_too_young);
+            }
+            else {
+                $('.message-container', $dateOfBirthBlock).removeClass('hidden')
+                    .safeHTML(l.coinify_req_dob_or_tax.replace('%1', taxName));
+            }
+
+        }
+
         taxMegaInput.hideError();
         taxMegaInput.$input.next('.message-container').addClass('hidden');
         $invoiceNote.removeClass('error hidden');
@@ -2313,13 +2416,15 @@ var addressDialog = {
         $('span', $invoiceNote).text(l.taxcode_note.replace('%s', taxName));
 
         // Check all required fields
-        if (!fieldValues['first-name']
-            || !fieldValues['last-name']
-            || !fieldValues.address1
-            || !fieldValues.city
-            || !fieldValues.postcode
-            || !country
-            || stateNotSet) {
+        const fieldsValid = fieldValues['first-name']
+            && fieldValues['last-name']
+            && fieldValues.address1
+            && fieldValues.city
+            && fieldValues.postcode
+            && country
+            && !stateNotSet;
+
+        if (!fieldsValid || !validCoinify) {
 
             console.warn('validateAndPay: Incomplete form fields', fieldValues, country, state, taxCode);
 
@@ -2335,13 +2440,15 @@ var addressDialog = {
                 }
             }
 
-            addressDialog.validInputs = addressDialog.validInputs || false;
+            addressDialog.validInputs = addressDialog.validInputs || fieldsValid || false;
+            addressDialog.validDob = (addressDialog.validDob && !isBitcoin) || validCoinify || false;
 
             onIdle(() => eventlog(500517));
 
             return false;
         }
         addressDialog.validInputs = true;
+        addressDialog.validDob = !!validCoinify;
 
         addressDialog.mostRecentValidInput = {
             ...fieldValues,
@@ -2349,7 +2456,9 @@ var addressDialog = {
             lastname: fieldValues['last-name'],
             country,
             state,
-            taxCode
+            taxCode,
+            dateOfBirth,
+            cconsent: !!addressDialog.coinifyShareConsentConfirmed,
         };
 
         if (validateOnly) {
@@ -2373,6 +2482,7 @@ var addressDialog = {
             saveAttribute('country', country);
             saveAttribute('state', state);
             saveAttribute('version', '2');
+            saveAttribute('dateOfBirth', to8(dateOfBirth));
         } else {
             // Forget Attribute.
             const removeAttribute = function(name) {
@@ -2387,6 +2497,7 @@ var addressDialog = {
             removeAttribute('country');
             removeAttribute('state');
             removeAttribute('version');
+            removeAttribute('dateOfBirth');
         }
 
         // Always save tax code, even if it is an empty string
@@ -2405,6 +2516,11 @@ var addressDialog = {
         }
         if (pro.propay.onPropayPage()) {
             addressDialog.closeDialog();
+        }
+
+        if (isBitcoin) {
+            fieldValues.dob = dateOfBirth;
+            fieldValues.cconsent = addressDialog.coinifyShareConsentConfirmed;
         }
 
         // Send to the API
@@ -2514,6 +2630,8 @@ var addressDialog = {
         this.extraDetails.country = country;
         this.extraDetails.recurring = true;
         this.extraDetails.taxCode = taxCode;
+        this.extraDetails.dob = fieldValues.dob;
+        this.extraDetails.cconsent = fieldValues.cconsent;
 
         // If the country is US or Canada, add the state by stripping the country code off e.g. to get QC from CA-QC
         if ((country === 'US') || (country === 'CA')) {
@@ -2668,6 +2786,16 @@ var addressDialog = {
         else {
             // @todo: Use mega.ui.secondaryNav.showBanner instead
             $('.grace-business', '.fm-banner-holder').removeClass('visible');
+        }
+
+        if (pro.propay.discountInfo) {
+            pro.usedDiscountCode = pro.propay.discountInfo.dc;
+        }
+
+        if (fminitialized) {
+            pro.getTargetedDiscountInfo().then((dci) => {
+                mega.ui.header.showTargetedDiscountButton(dci);
+            });
         }
 
         if (parseInt(pro.propay.planNum) === pro.ACCOUNT_LEVEL_FEATURE_VPN) {
@@ -2861,7 +2989,7 @@ var addressDialog = {
                         : l.pwm_free_trial_used_h;
 
                     msgDialog(
-                        `confirmationa:!^${l.subscribe_btn}!${l[82]}`,
+                        `confirmationa:!^${l.subscribe_btn}!${l.msg_dlg_cancel}`,
                         '',
                         warningTitle,
                         l.vpn_free_trial_used_b,
@@ -3498,17 +3626,20 @@ var addressDialog = {
             'AT', 'BE', 'BG', 'HR', 'CY', 'CZ', 'DK',
             'EE', 'FI', 'FR', 'DE', 'GR', // 'HU', Separate rules for Hungary
             'IE', 'IT', 'LV', 'LT', 'LU', 'MT', 'NL',
-            'PL', 'PT', 'RO', 'SK', 'SI', 'ES', 'SE',
+            'PL', 'PT', 'RO', 'SK', 'SI', 'SE', // 'ES', Separate rules for Spain
         ];
         countryCode = countryCode.toUpperCase();
         return !(
             countryCode === 'HU' && !(
                 /^\d{8}-[1-5]-\d{2}$/.test(taxCode) ||
                 /^\d{8}$/.test(taxCode) ||
-                /^HU\d{8}$/.test(taxCode)
-            ) ||
-            EU_CODES.includes(countryCode) && !/^[A-Z]{2}[\dA-Z]{2,13}$/.test(taxCode) ||
-            !/\S/.test(taxCode)
+                /^HU\d{8}$/.test(taxCode))
+            || countryCode === 'ES' && !(
+                /^\d{8}[A-Z]$/.test(taxCode)
+                || /^[X-Z]\d{7}[A-Z]$/.test(taxCode)
+                || /^[A-Z]\d{7}[\dA-Z]$/.test(taxCode))
+            || EU_CODES.includes(countryCode) && !/^[A-Z]{2}[\dA-Z]{2,13}$/.test(taxCode) ||
+                !/\S/.test(taxCode)
         );
     }
 };
@@ -4068,6 +4199,38 @@ var bitcoinDialog = {
     gatewayId: 4,
 
     /**
+     * Stores the URL to redirect to
+     * @param {String} url The URL to redirect to
+     */
+    storeUtcResult(utcResult) {
+        'use strict';
+
+        if (typeof utcResult.EUR !== 'object') {
+            this.processUtcResult(utcResult);
+        }
+
+        this.utcResult = utcResult;
+    },
+
+    /**
+     * Redirect to the site
+     */
+    redirectToSite() {
+        'use strict';
+
+        pro.propay.showLoadingOverlay('redirecting');
+
+        const url = this.utcResult.EUR.url;
+
+        if (!url) {
+            console.error('No URL to redirect to');
+            return;
+        }
+
+        window.location = url;
+    },
+
+    /**
      * Step 3 in plan purchase with Bitcoin
      * @param {Object} apiResponse API result
      */
@@ -4076,6 +4239,9 @@ var bitcoinDialog = {
         /* Testing data to watch the invoice expire in 5 secs
         apiResponse['expiry'] = Math.round(Date.now() / 1000) + 5;
         //*/
+
+        pro.propay.showPaymentSection();
+        pro.propay.hideContinueButton();
 
         // Set details
         var bitcoinAddress = apiResponse.address;
@@ -4220,11 +4386,11 @@ var bitcoinDialog = {
     processUtcResult(utcResult) {
         'use strict';
 
-        // Hide the loading animation
-        // pro.propay.hideLoadingOverlay();
-
-        // Show the Bitcoin invoice dialog
+        // Show the Bitcoin invoice dialog, or redirect to coinify if url provided
         if (typeof utcResult.EUR === 'object') {
+            if (utcResult.EUR.url) {
+                bitcoinDialog.redirectToSite();
+            }
             bitcoinDialog.showInvoice(utcResult.EUR);
         }
         else {
@@ -4236,6 +4402,9 @@ var bitcoinDialog = {
      * Show a failure dialog if the provider can't be contacted
      */
     showBitcoinProviderFailureDialog: function() {
+
+        pro.propay.showPaymentSection();
+        pro.propay.hideContinueButton();
 
         var $dialogBackgroundOverlay = $('.fm-dialog-overlay');
         var $bitcoinFailureDialog = $('.bitcoin-provider-failure-dialog');

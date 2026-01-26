@@ -1666,6 +1666,9 @@ lazy(mega, 'keyMgr', () => {
 
         // remove previously created share-nodes snapshot
         removeShareSnapshot(node) {
+            if (self.d) {
+                logger.warn(`Revoking share-snapshot for ${node}...`, !!this.getShareSnapshot(node));
+            }
             delete this.sharechildren[node];
         }
 

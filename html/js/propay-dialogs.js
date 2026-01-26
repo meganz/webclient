@@ -1989,6 +1989,10 @@ var addressDialog = {
         }
 
         const prefillMultipleInputs = (inputs, value) => {
+            if (!inputs) {
+                console.error('Missing input field to fill');
+                return;
+            }
             if (Array.isArray(inputs)) {
                 inputs.forEach(($megaInput) => {
                     $megaInput.setValue(value);
@@ -2061,7 +2065,7 @@ var addressDialog = {
                 );
             }
 
-            if (billingInfo.dateOfBirth) {
+            if (billingInfo.dateOfBirth && pro.propay.onPropayPage()) {
                 prefillMultipleInputs(this.dateOfBirthMegaInput, getBillingProp('dateOfBirth', encodedVer));
             }
         }

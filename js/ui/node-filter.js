@@ -256,6 +256,7 @@ lazy(mega.ui, 'mNodeFilter', () => {
             eid: 99979,
             shouldShow() {
                 return !!M.search
+                    && !folderlink
                     && !$('button.search-chip', '.searcher-wrapper').length
                     && !['shares', 'out-shares', 'file-requests'].includes(M.currentdirid);
             },

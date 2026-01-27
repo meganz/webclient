@@ -2570,14 +2570,12 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/mobile.cloud.js', n: 'mobile_cloud_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.cloud.action-bar.js', n: 'mobile_cloud_action_bar_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.node-name-control.js', n: 'mobile_node_name_control_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.key.decryption.js', n: 'mobile_mobile_dec_key_overlay_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.password.decryption.js', n: 'mobile_dec_pass_overlay_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.download.overlay.js', n: 'mobile_download_overlay_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.chatlink.js', n: 'mobile_chatlink_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.language-menu.js', n: 'mobile_language_menu_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.link-management.js', n: 'mobile_link_management_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.file-request-management.js', n: 'mobile_file_request_management_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.not-found.js', n: 'mobile_not_found_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.pro-signup-prompt.js', n: 'mobile_pro_signup_prompt_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.propay.js', n: 'mobile_propay_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.recovery.js', n: 'mobile_rec_js', j: 1, w: 1});
@@ -2878,6 +2876,8 @@ else if (!browserUpdate) {
         'register_js': {f:'html/js/register.js', n: 'register_js', j:1},
         'download': {f:'html/download.html', n: 'download', j:0},
         'download_js': {f:'html/js/download.js', n: 'download_js', j:1},
+        'downloadUI_js': {f:'html/js/downloadUI.js', n: 'downloadUI_js', j:1},
+        'linkAccess_js': {f:'js/ui/linkAccess.js', n: 'linkAccess_js', j:1},
         'disputenotice': {f:'html/disputenotice.html', n: 'disputenotice', j:0},
         'copyright_js': {f:'html/js/copyright.js', n: 'copyright_js', j:1},
         'keybackup': {f:'html/backup.html', n: 'keybackup', j:0},
@@ -3149,11 +3149,12 @@ else if (!browserUpdate) {
         'register': ['register', 'register_js', 'zxcvbn_js'],
         'newsignup': ['register', 'register_js', 'zxcvbn_js'],
         'emailverify': ['zxcvbn_js'],
-        '!': ['download', 'download_js'],
-        'file': ['download', 'download_js'],
-        'F!': ['folderlink_css'],
-        'folder': ['folderlink_css'],
-        'collection': ['folderlink_css'],
+        '!': ['download', 'download_js', 'downloadUI_js', 'linkAccess_js'],
+        'file': ['download', 'download_js', 'downloadUI_js', 'linkAccess_js'],
+        'F!': ['folderlink_css', 'linkAccess_js'],
+        'P!': ['linkAccess_js'],
+        'folder': ['folderlink_css', 'linkAccess_js'],
+        'collection': ['folderlink_css', 'linkAccess_js'],
         'discountpromo': ['discountpromo_js'],
         'discount': ['discountpromo_js'],
         's': ['discountpromo_js'], // Short URL for 'sale' e.g. /s/blackfriday
@@ -3167,7 +3168,9 @@ else if (!browserUpdate) {
 
     if (is_mobile) {
         // Page specific
-        subpages['!'] = ['download_js'];
+        subpages['!'] = ['download_js', 'linkAccess_js'];
+        subpages.file = ['download_js', 'linkAccess_js'];
+        subpages.collection = ['linkAccess_js'];
     }
 
     if (page.substr(0, 5) === 'chat/') {

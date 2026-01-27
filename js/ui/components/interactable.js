@@ -53,6 +53,10 @@ class MegaInteractable extends MegaComponent {
             this.loaderColor = options.loaderColor;
         }
 
+        if (options.loaderIcon) {
+            this.loaderIcon = options.loaderIcon;
+        }
+
         if (options.onClick) {
             this.on('click.onclick', options.onClick);
         }
@@ -107,6 +111,18 @@ class MegaInteractable extends MegaComponent {
         return this.domNode.classList.contains('loading');
     }
 
+    get simpletip() {
+        return this.dataset.simpletip;
+    }
+
+    set simpletip(value) {
+        if (!value || !this.dataset.simpletip) {
+            return;
+        }
+
+        this.dataset.simpletip = value;
+    }
+
     set loading(stateBool) {
         if (this.loading === !!stateBool) {
             return;
@@ -115,14 +131,19 @@ class MegaInteractable extends MegaComponent {
         const sprite = this.loaderColor === 'w' ? 'uni' : 'theme';
 
         if (stateBool) {
-            this.addClass('loading', `sprite-fm-${sprite}-after`, 'icon-loader-throbber-light-outline-after');
+            this.addClass(
+                'loading',
+                `sprite-fm-${sprite}-after`,
+                this.loaderIcon || 'icon-loader-throbber-light-outline-after'
+            );
         }
         else {
             this.removeClass(
                 'loading',
                 'sprite-fm-theme-after',
                 'sprite-fm-uni-after',
-                'icon-loader-throbber-light-outline-after'
+                'icon-loader-throbber-light-outline-after',
+                this.loaderIcon
             );
         }
     }

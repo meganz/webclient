@@ -123,7 +123,7 @@ var tooltiplogin = {
         var $dialog = $('.dropdown.top-login-popup');
 
         if (close) {
-            $dialog.find('form').empty();
+            $('#login-name, #login-password', $dialog).val('');
             $dialog.addClass('hidden');
             return false;
         }
@@ -134,8 +134,6 @@ var tooltiplogin = {
         else {
             $('.extension-advise', $dialog).removeClass('hidden');
         }
-
-        $dialog.find('form').replaceWith(getTemplate('top-login'));
 
         if (localStorage.hideloginwarning) {
             $dialog.find('.top-login-warning').addClass('hidden');
@@ -174,8 +172,6 @@ var tooltiplogin = {
             loadSubPage('recovery');
         });
 
-        $dialog.removeClass('hidden');
-
         if ($('body').hasClass('logged')) {
             topPopupAlign('.top-head .user-name', '.dropdown.top-login-popup', 60);
         }
@@ -190,6 +186,8 @@ var tooltiplogin = {
                 );
             }
         }
+
+        $dialog.removeClass('hidden');
 
         // Init inputs events
         accountinputs.init($dialog);

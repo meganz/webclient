@@ -22,7 +22,7 @@ MobileContactLink.prototype.showContactLinkInfo = function _showContactLinkInfo(
             return;
         }
         if (!u_type) {
-            $('#startholder').safeAppend(mega.ui.contactLinkCardDialog);
+            $('#startholder  > .content-holder').safeAppend(mega.ui.contactLinkCardDialog);
         }
         else {
             $('#fmholder').safeAppend(mega.ui.contactLinkCardDialog);

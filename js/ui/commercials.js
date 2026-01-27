@@ -379,7 +379,7 @@ lazy(mega, 'commercials', () => {
     const setVideoTheatreMode = (add, $wrapper) => {
 
         $videoTheatreModeWrapper = $videoTheatreModeWrapper || $wrapper;
-        $theatreMode = $theatreMode || $('.download.main-pad .download.transfer-wrapper', $videoTheatreModeWrapper);
+        $theatreMode = $theatreMode || $videoTheatreModeWrapper;
         if (/* !mega.flags.ab_ads ||*/ !$videoTheatreModeWrapper || currentPage !== 'filelink') {
             return;
         }
@@ -493,7 +493,7 @@ lazy(mega, 'commercials', () => {
             $closeButton = $closeButton && $closeButton[0].length
                 ? $closeButton
                 : currentPage === 'filelink'
-                    ? $('.bottom-page .download-content #commercial-close-button', $startholder)
+                    ? $('.download-page #commercial-close-button', $startholder)
                     : $('#commercial-close-button', $fileManagerBlock);
 
             const $closeClone = $closeButton.clone().addClass('hidden');

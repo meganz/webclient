@@ -591,6 +591,7 @@ var notify = {
             }
             else {
                 $elem.addClass('show');
+                $('.notification-popup', '.top-head').removeClass('hidden');
                 notify.renderNotifications();
 
                 // Check if any dynamic notifications can be seen

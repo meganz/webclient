@@ -185,6 +185,10 @@ class MegaTopMenu extends MegaMobileTopMenu {
             }];
         }
 
+        if (!self.u_attr) {
+            return [];
+        }
+
         this.ready |= 2;
 
         const loggedInCD = [
@@ -487,7 +491,7 @@ class MegaTopMenu extends MegaMobileTopMenu {
     "use strict";
 
     lazy(mega.ui, 'topmenu', () => new MegaTopMenu({
-        parentNode: pmlayout,
+        parentNode: is_fm() && self.pmlayout || document.getElementById('startholder'),
         componentClassname: 'mega-top-menu',
         prepend: true
     }));

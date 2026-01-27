@@ -1841,6 +1841,9 @@ else if (!browserUpdate) {
                 // loading the site, this should only happen on some fancy
                 // browsers other than what we use during development, and
                 // hopefully they'll report it back to us for troubleshoot
+                if (self.is_transferit) {
+                    return console.warn(msg);
+                }
                 return siteLoadError(msg, url + '^~' + ln);
             }
 

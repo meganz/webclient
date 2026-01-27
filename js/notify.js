@@ -295,6 +295,7 @@ var notify = {
                     mega.notif.has('cloud_upload') ||
                     u_attr.s4 && notification.n && M.getNodeRoot(notification.n) === 's4'
                 ) {
+                    // xxx: the above won't work for s4 if the nodes aren't on memory, i.e. Lite-mode.
                     return true;
                 }
                 break;
@@ -847,6 +848,11 @@ var notify = {
             const $this = $(this);
             const folderId = $this.attr('data-folder-id');
             const notificationID = $this.attr('id');
+
+            if (!folderId) {
+                console.warn('Invalid node association...');
+                return false;
+            }
 
             // Mark all notifications as seen and close the popup
             // (because they clicked on a notification within the popup)
@@ -1924,14 +1930,16 @@ var notify = {
         'use strict';
 
         const fileHandle = notification.data.h || notification.allDataItems[0].h;
-        const folderHandle = M.getNodeByHandle(fileHandle).p || notification.data.n;
+        const folderNode = M.getNodeByHandle(M.getNodeByHandle(fileHandle).p || notification.data.n);
 
         // File has likely been deleted
-        if (!folderHandle) {
+        if (!(folderNode.h && folderNode.name)) {
+            if (self.d) {
+                console.info(`Ignoring notification, file-request no longer available(?), ${fileHandle}`, notification);
+            }
             return false;
         }
-        const folderNode = M.getNodeByHandle(folderHandle);
-        const folderName = folderNode.name ? notify.shortenNodeName(folderNode.name) : false;
+        const folderName = notify.shortenNodeName(folderNode.name);
 
         let title;
         let header;

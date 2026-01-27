@@ -912,6 +912,10 @@ mega.tpw = new function TransferProgressWidget() {
                         else if (GlobalProgress[gid]) {
                             ulmanager.abort(gid);
                         }
+                        // This is completed transfer removal
+                        if (this.parent._complete) {
+                            eventlog(501087);
+                        }
                         $(`.transfer-table tr#${gid}`).remove();
                         if ($.clearTransferPanel) {
                             $.clearTransferPanel();
@@ -924,6 +928,7 @@ mega.tpw = new function TransferProgressWidget() {
                         break;
                     }
                     case 'link': {
+                        eventlog(501085);
                         const node = M.getNodeByHandle(this.handle || id);
                         if (node) {
                             $.selected = [node.h];
@@ -932,6 +937,7 @@ mega.tpw = new function TransferProgressWidget() {
                         break;
                     }
                     case 'cloud': {
+                        eventlog(501086);
                         const node = M.getNodeByHandle(this.handle || id);
                         if (node && node.p) {
                             $.autoSelectNode = node.h;

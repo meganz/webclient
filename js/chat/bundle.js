@@ -3542,21 +3542,39 @@ class ColumnContactName extends genericNodePropsComponent.B {
   static get label() {
     return l[86];
   }
-  render() {
+  get name() {
+    const {
+      nodeAdapter,
+      node
+    } = this.props;
+    if (nodeAdapter.nodeProps) {
+      return nodeAdapter.nodeProps.title;
+    }
+    return M.getNameByEmail(node.m);
+  }
+  _renderAvatar() {
     const {
       nodeAdapter
     } = this.props;
     const {
       node
     } = nodeAdapter.props;
-    return REaCt().createElement("td", null, REaCt().createElement(contacts.Avatar, {
-      contact: node,
-      className: "avatar-wrapper box-avatar"
-    }), REaCt().createElement("div", {
+    if (nodeAdapter.nodeProps || node.name !== '') {
+      return REaCt().createElement(contacts.Avatar, {
+        contact: node,
+        className: "avatar-wrapper box-avatar"
+      });
+    } else if (node.name === '') {
+      return REaCt().createElement(utils.P9, null, useravatar.contact(node.m, 'box-avatar'));
+    }
+    return null;
+  }
+  render() {
+    return REaCt().createElement("td", null, this._renderAvatar(), REaCt().createElement("div", {
       className: "contact-item"
     }, REaCt().createElement("div", {
       className: "contact-item-user"
-    }, REaCt().createElement(utils.sp, null, nodeAdapter.nodeProps.title)), REaCt().createElement(this.Mail, null)), REaCt().createElement("div", {
+    }, REaCt().createElement(utils.sp, null, this.name)), REaCt().createElement(this.Mail, null)), REaCt().createElement("div", {
       className: "clear"
     }));
   }
@@ -4220,11 +4238,14 @@ ColumnContactRequestsRcvdBtns.megatype = "grid-url-header-nw contact-controls-co
 const ReceivedRequests = ({
   received
 }) => {
+  const nameOrEmailColumn = received.mixed ? ColumnContactName : [ColumnContactRequestsEmail, {
+    currView: "ipc"
+  }];
   return REaCt().createElement("div", {
     className: "contacts-list"
   }, REaCt().createElement(fmView.A, {
     sortFoldersFirst: false,
-    dataSource: received,
+    dataSource: received.data,
     customFilterFn: r => {
       return !r.dts;
     },
@@ -4238,9 +4259,7 @@ const ReceivedRequests = ({
     megaListItemHeight: 59,
     headerContainerClassName: "contacts-table requests-table contacts-table-head",
     containerClassName: "contacts-table requests-table contacts-table-results",
-    listAdapterColumns: [[ColumnContactRequestsEmail, {
-      currView: "ipc"
-    }], [ColumnContactRequestsTs, {
+    listAdapterColumns: [nameOrEmailColumn, [ColumnContactRequestsTs, {
       label: l[19505]
     }], [ColumnContactRequestsRcvdBtns, {
       onReject: handle => {
@@ -4747,8 +4766,8 @@ class ContactsPanel extends mixins.w9 {
     };
     this.handleAcceptAllRequests = () => {
       const {
-        received
-      } = this.props;
+        data: received
+      } = this.props.received;
       const receivedKeys = Object.keys(received || {});
       if (receivedKeys.length) {
         for (let i = receivedKeys.length; i--;) {
@@ -25806,8 +25825,10 @@ class FMView extends mixins.w9 {
       currentlyViewedEntry: prevEntry,
       searchValue: prevSearch
     } = prevProps;
-    if (prevEntry !== currEntry || currSearch !== prevSearch) {
+    const dataSourceChanged = this.props.dataSource !== prevProps.dataSource;
+    if (dataSourceChanged || prevEntry !== currEntry || currSearch !== prevSearch) {
       let _this$dataSource3;
+      this.dataSource = this.props.dataSource;
       const newState = {
         'selected': [],
         'highlighted': []
@@ -30590,7 +30611,8 @@ class ConversationsApp extends mixins.w9 {
       freeCallEndedDialog: false,
       contactSelectorDialog: false,
       view: VIEWS.LOADING,
-      callExpanded: false
+      callExpanded: false,
+      ipcData: null
     };
     this._cacheRouting();
     megaChat.rebind('onStartNewMeeting.convApp', () => this.startMeeting());
@@ -30690,13 +30712,47 @@ class ConversationsApp extends mixins.w9 {
         v: Chatd.VERSION
       }).catch(dump);
     }
+    this.requestReceivedListener = mBroadcaster.addListener('fmViewUpdate:ipc', () => {
+      this.setState({
+        ipcData: this.makeIpcData()
+      });
+    });
+    this.setState({
+      ipcData: this.makeIpcData()
+    });
   }
   componentWillUnmount() {
     super.componentWillUnmount();
     $(document).off('keydown.megaChatTextAreaFocus');
+    mBroadcaster.removeListener('fmViewUpdate:ipc', this.requestReceivedListener);
   }
-  componentDidUpdate() {
+  componentDidUpdate(prevProps, prevState) {
     this.handleOnboardingStep();
+    const {
+      names: prevNames
+    } = prevState.ipcData;
+    const newIpcData = this.makeIpcData();
+    const {
+      names: newNames
+    } = newIpcData;
+    if (newNames.size !== prevNames.size) {
+      this.setState({
+        ipcData: newIpcData
+      });
+      return;
+    }
+    let different = false;
+    for (const [email, name] of newNames) {
+      if (!prevNames.has(email) || prevNames.get(email) !== name) {
+        different = true;
+        break;
+      }
+    }
+    if (different) {
+      this.setState({
+        ipcData: newIpcData
+      });
+    }
   }
   handleOnboardingStep() {
     if (this.state.view === VIEWS.LOADING) {
@@ -30722,6 +30778,29 @@ class ConversationsApp extends mixins.w9 {
         megaChat.renderListing(null, false).catch(dump);
       }
     });
+  }
+  makeIpcData() {
+    let mixed = false;
+    const names = new Map();
+    const data = Object.values(M.ipc).reduce((acc, curr) => {
+      const name = M.getNameByEmail(curr.m);
+      if (name !== curr.m) {
+        names.set(curr.m, name);
+        mixed = true;
+      }
+      return {
+        ...acc,
+        [curr.p]: {
+          ...curr,
+          name
+        }
+      };
+    }, Object.create(null));
+    return {
+      mixed,
+      data,
+      names
+    };
   }
   render() {
     const {
@@ -30757,7 +30836,7 @@ class ConversationsApp extends mixins.w9 {
     }), !isLoading && routingSection === 'contacts' && REaCt().createElement(contactsPanel.A, {
       megaChat,
       contacts: M.u,
-      received: M.ipc,
+      received: this.state.ipcData,
       sent: M.opc
     }), !isLoading && routingSection === 'notFound' && REaCt().createElement("span", null, REaCt().createElement("center", null, "Section not found")), !isLoading && isEmpty && REaCt().createElement(conversationpanel.Yk, {
       isMeeting: view === MEETINGS,

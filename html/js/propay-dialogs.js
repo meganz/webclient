@@ -3629,6 +3629,13 @@ var addressDialog = {
             'PL', 'PT', 'RO', 'SK', 'SI', 'SE', // 'ES', Separate rules for Spain
         ];
         countryCode = countryCode.toUpperCase();
+        const upperTaxCode = taxCode.toUpperCase();
+        const isEu = EU_CODES.includes(countryCode);
+
+        if (isEu && !upperTaxCode.startsWith(countryCode)) {
+            taxCode = countryCode + taxCode;
+        }
+
         return !(
             countryCode === 'HU' && !(
                 /^\d{8}-[1-5]-\d{2}$/.test(taxCode) ||
@@ -3638,7 +3645,7 @@ var addressDialog = {
                 /^\d{8}[A-Z]$/.test(taxCode)
                 || /^[X-Z]\d{7}[A-Z]$/.test(taxCode)
                 || /^[A-Z]\d{7}[\dA-Z]$/.test(taxCode))
-            || EU_CODES.includes(countryCode) && !/^[A-Z]{2}[\dA-Z]{2,13}$/.test(taxCode) ||
+            || isEu && !/^[A-Z]{2}[\dA-Z]{2,13}$/.test(taxCode) ||
                 !/\S/.test(taxCode)
         );
     }

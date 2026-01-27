@@ -73,7 +73,7 @@ class MegaStorageBlock extends MegaComponent {
     // TODO: need further update to make more fit on component
     async checkUpdate(data) {
 
-        const _checkCondition = () => !u_type || !fminitialized || (!data && M.storageQuotaCache);
+        const _checkCondition = () => !u_type || !data && M.storageQuotaCache;
 
         if (_checkCondition()) {
 

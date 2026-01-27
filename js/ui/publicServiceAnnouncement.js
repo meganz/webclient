@@ -544,7 +544,6 @@ var psa = {
                 .resize('.meetings-loading')
                 .avatarMenu('.mega-header div.header-dropdown-menu')
                 .mediaPlayer('.media-viewer:not(.download-grid *)')
-                .mediaPlayer('.download-grid', true)
                 .browserScreen('.download-grid .media-viewer-container')
                 .meetingsCall('.meetings-call');
         });
@@ -682,7 +681,6 @@ var psa = {
         if (psa.layout && psa.visible) {
             psa.layout
                 .mediaPlayer('.media-viewer:not(.download-grid *)')
-                .mediaPlayer('.download-grid', true)
                 .browserScreen('.download-grid .media-viewer-container');
         }
     },

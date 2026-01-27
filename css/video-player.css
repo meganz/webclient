@@ -2,7 +2,6 @@
     .media-viewer .viewer-bars {
         align-items: center;
         background: var(--surface-grey-2);
-        border: 2px solid var(--stroke-black);
         border-width: 0 0 2px;
         box-sizing: border-box;
         display: flex;
@@ -265,6 +264,7 @@
         z-index: 10;
         padding: 36px;
         border: 5px solid rgba(225, 225, 225, 0.50);
+        transition: var(--transition-transform);
     }
     .download .media-viewer .play-video-button {
         position: absolute;

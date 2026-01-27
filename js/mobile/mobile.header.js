@@ -20,19 +20,29 @@ class MegaMobileHeader extends MegaComponent {
         subNode.className = 'nav-navigation';
         targetNode.appendChild(subNode);
 
-        const megaLink = new MegaLink({
+        const opts = {
             parentNode: subNode,
             type: 'icon',
             componentClassname: 'text-icon home',
-            icon: 'sprite-fm-illustration-wide img-mega-logo',
-            iconSize: 24
-        });
-        megaLink.on('tap.home', () => {
-            loadSubPage(u_attr ? 'fm' : 'start');
+            icon: 'sprite-fm-uni icon-mega-logo',
+            iconSize: 32,
+            evt: 'click'
+        };
+
+        if (is_mobile) {
+            opts.icon = 'sprite-fm-illustration-wide img-mega-logo';
+            opts.iconSize = 24;
+            opts.evt = 'tap';
+        }
+
+        const megaLink = new MegaLink(opts);
+        megaLink.on(`${opts.evt}.home`, () => {
+            loadSubPage(u_type ? 'fm' : 'login');
 
             if (mega.ui.topmenu.visible) {
                 mega.ui.topmenu.hide();
             }
+            return false;
         });
 
         const actionsNode = document.createElement('div');
@@ -49,7 +59,7 @@ class MegaMobileHeader extends MegaComponent {
                 parentNode: actionsNode,
                 text: l.log_in,
                 type: "normal",
-                componentClassname: "action-link login-button"
+                componentClassname: "underline no-bg login-button"
             });
 
             loginLink.on('tap', () => {
@@ -151,6 +161,7 @@ class MegaMobileHeader extends MegaComponent {
             else {
                 M.openFolder(M.getNodeParent(M.currentdirid));
             }
+            return false;
         });
 
         subNode = document.createElement('div');

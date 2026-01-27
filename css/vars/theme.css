@@ -155,6 +155,7 @@ body,
         --transition-opacity: opacity 200ms ease-in-out;
         --transition-padding: padding 200ms ease-in-out;
         --transition-shadow: box-shadow 200ms ease-in-out;
+        --transition-transform: transform 200ms ease-in-out;
         --transition-width: width 200ms ease-in-out;
 
     /* FM selection */

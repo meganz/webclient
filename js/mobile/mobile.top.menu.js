@@ -314,7 +314,7 @@ class MegaMobileTopMenu extends MegaComponent {
             {
                 text: l[384],
                 icon: 'sprite-mobile-fm-mono icon-headset-thin-outline',
-                href: 'help'
+                href: '/help'
             },
             {
                 text: l.mobile_settings_appearance_title,
@@ -435,7 +435,7 @@ class MegaMobileTopMenu extends MegaComponent {
         if (u_attr && !u_attr.pf && !u_attr.b) {
             btn = new MegaLink({
                 parentNode: userInfoContainer,
-                href: 'pro',
+                href: '/pro',
                 componentClassname: 'upgrade outline',
                 text: l[433],
                 eventLog: eventid
@@ -448,7 +448,7 @@ class MegaMobileTopMenu extends MegaComponent {
 
             btn = new MegaLink({
                 parentNode: userInfoContainer,
-                href: 'repay',
+                href: '/repay',
                 componentClassname: 'upgrade outline',
                 text: l.mobile_account_reactivate,
                 eventLog: eventid

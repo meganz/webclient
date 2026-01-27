@@ -2441,31 +2441,6 @@ body.de .mega-dialog.contact-picker-widget {
 
 /* end set-password-dialog */
 
-/* password-dialog: Password decryption dialog */
-
-    .mega-dialog.password-dialog .instruction-message {
-        line-height: 20px;
-        padding: 0 0 20px;
-    }
-    .mega-dialog.password-dialog .decryption-password {
-        position: relative;
-    }
-    .mega-dialog.password-dialog .decryption-password i {
-        left: 12px;
-        top: 6px;
-        position: absolute;
-        --icon-size: 24px;
-        --mask-color: var(--text-color-medium);
-    }
-    .mega-dialog.password-dialog .decryption-password input {
-        text-indent: 36px;
-    }
-    .mega-dialog.password-dialog .decryption-in-progress i {
-        animation: rotate 0.8s infinite linear;
-    }
-
-/* end password-dialog */
-
 /* rename-dialog */
 
     .mega-dialog.rename-dialog {
@@ -5425,48 +5400,6 @@ body.de .mega-dialog.contact-picker-widget {
     }
 
 /* end key-signature-warning-dialog */
-
-/* dlkey-dialog */
-
-    .mega-dialog.dlkey-dialog {
-        width: 480px;
-    }
-    .mega-dialog.dlkey-dialog .fm-dialog-new-folder-pad {
-        margin: 0 36px 0 0;
-    }
-    .mega-dialog.dlkey-dialog .instruction-message {
-        padding: 0 0 10px;
-    }
-    .mega-dialog.dlkey-dialog .decryption-key {
-        position: relative;
-    }
-    .mega-dialog.dlkey-dialog .decryption-key .icon {
-        background-image: url(../images/mega/dialog-sprite.png);
-        background-position: -6px -5510px;
-        background-repeat: no-repeat;
-        height: 22px;
-        left: 13px;
-        opacity: 0.5;
-        position: absolute;
-        top: 5px;
-        width: 24px;
-    }
-    .mega-dialog.dlkey-dialog .dlkey-err {
-        min-height: 24px;
-        position: relative;
-        background-color: var(--banner-background-error);
-        border: 1px solid var(--banner-border-error);
-        padding: 2px 12px;
-        width: 100%;
-        color: var(--banner-text-error);
-        font: var(--text-body1);
-        margin-top: 6px;
-        border-radius: 4px;
-        box-sizing: border-box;
-        z-index: 100;
-    }
-
-/* end dlkey-dialog */
 
 /* bitcoin-invoice-dialog */
 

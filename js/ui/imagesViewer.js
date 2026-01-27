@@ -675,10 +675,10 @@ var slideshowid;
         $('.v-btn.browserscreen', $overlay).rebind('click.media-viewer', () => {
             $overlay.addClass('browserscreen');
             $overlay.parents('.download.download-page').addClass('browserscreen');
-            slideshow_imgPosition($overlay);
             if (typeof psa !== 'undefined') {
                 psa.repositionMediaPlayer();
             }
+            delay('viewerReze', () => slideshow_imgPosition($overlay), 200);
             return false;
         });
 
@@ -1230,10 +1230,10 @@ var slideshowid;
                     else if (isDownloadPage) {
                         $overlay.removeClass('fullscreen browserscreen');
                         $overlay.parents('.download.download-page').removeClass('fullscreen browserscreen');
-                        slideshow_imgPosition($overlay);
                         if (typeof psa !== 'undefined') {
                             psa.repositionMediaPlayer();
                         }
+                        delay('viewerReze', () => slideshow_imgPosition($overlay), 200);
                     }
                     else {
                         history.back();
@@ -1261,10 +1261,10 @@ var slideshowid;
                         zoomPan.destroy();
                         zoomPan = false;
                     }
-                    slideshow_imgPosition($overlay);
                     if (typeof psa !== 'undefined') {
                         psa.repositionMediaPlayer();
                     }
+                    delay('viewerReze', () => slideshow_imgPosition($overlay), 200);
                     return false;
                 }
                 history.back();

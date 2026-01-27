@@ -1056,6 +1056,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         'vpn#dow': "https://mega.io/vpn#downloadapps",
         'pass': "https://mega.io/pass",
         'pass#dow': "https://mega.io/pass#downloadapp",
+        'desktop': "https://mega.io/desktop",
     };
 
     const mega_io_hyperlinks = Object.create(null);
@@ -1767,8 +1768,8 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[/A1]', '</a>')
         .replace('[A2]', `<a href="https://mega.io/takedown" target="_blank">`)
         .replace('[/A2]', '</a>')
-        .replace('[P]', '<h3 class="sub-header">')
-        .replace('[/P]', '</h3>');
+        .replace('[P]', '<strong>')
+        .replace('[/P]', '</strong>');
 
     l.s4_iam_prefix_usage = escapeHTML(l.s4_iam_prefix_usage)
         .replace(/\[S]/g, '<span class="code">')
@@ -2009,6 +2010,16 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[/A]', '</a>');
     l.we_dont_store_password = escapeHTML(l.we_dont_store_password)
         .replace('[S]', '<span class="bold">').replace('[/S]', '</span>');
+
+    l.dl_upgade_to_hide_ads = escapeHTML(l.dl_upgade_to_hide_ads)
+        .replace('[A]', `<a class="clickurl" href="/pro" target="_blank">`)
+        .replace('[/A]', '</a>');
+    l.dl_gross_violation_err = escapeHTML(l.dl_gross_violation_err)
+        .replace('[A]', `<a class="clickurl" href="/terms" target="_blank">`)
+        .replace('[/A]', '</a>');
+    l.dl_downloaded_app_info = escapeHTML(l.dl_downloaded_app_info)
+        .replace('[A]', mega_io_hyperlinks.desktop)
+        .replace('[/A]', '</a>');
 
     l[19146] = escapeHTML(l[19146]).replace('%s', `${getBaseUrl()}/support`);
     l[19511] = escapeHTML(l[19511]).replace('%s', `${getBaseUrl()}/support`);

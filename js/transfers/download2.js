@@ -1327,10 +1327,8 @@ var dlmanager = {
         }
 
         if (page === 'download') {
-            var $dtb = $('.download.download-page');
+            var $dtb = $('.download.download-page', '.fmholder');
             $dtb.removeClass('stream-overquota overquota');
-            $('.download.over-transfer-quota', $dtb).addClass('hidden');
-            $(window).trigger('resize');
         }
         else if (ids.length) {
             if (is_mobile) {
@@ -1479,17 +1477,10 @@ var dlmanager = {
                 delay('overquota:retry', () => this._onQuotaRetry(), timeLeft * 1000);
             }
 
-            let $dlPageCountdown = $('.download.transfer-overquota-txt', 'body')
-                .text(String(l[7100]).replace('%1', ''));
-
-            if (!$dlPageCountdown.is(':visible')) {
-                $dlPageCountdown = null;
-            }
-
             this._overquotaClickListeners($dialog);
             let lastCheck = Date.now();
 
-            if ($dialog.is(':visible') || $dlPageCountdown) {
+            if ($dialog.is(':visible')) {
                 const $countdown = $('.countdown', $dialog).removeClass('hidden');
                 const tick = () => {
                     const curTime = Date.now();
@@ -1506,19 +1497,11 @@ var dlmanager = {
                     if (time) {
                         $countdown.safeHTML(time);
                         $countdown.removeClass('hidden');
-
-                        if ($dlPageCountdown) {
-                            const html = `<span class="countdown">${secondsToTimeLong(timeLeft)}</span>`;
-                            $dlPageCountdown.safeHTML(escapeHTML(l[7100]).replace('%1', html));
-                        }
                     }
                     else {
                         $countdown.text('');
                         $countdown.addClass('hidden');
 
-                        if ($dlPageCountdown) {
-                            $dlPageCountdown.text(String(l[7100]).replace('%1', ''));
-                        }
                         clearInterval(dlmanager._overQuotaTimeLeftTick);
                     }
                 };
@@ -1643,14 +1626,7 @@ var dlmanager = {
             $('.video-theatre-mode:visible').addClass('paused');
 
             if (page === 'download') {
-                var $dtb = $('.download.download-page');
-
-                $('.see-our-plans', $dtb).rebind('click', onclick);
-
-                $('.download.over-transfer-quota', $dtb).removeClass('hidden');
-                $('.resume-download', $dtb).removeClass('hidden');
-                $dtb.addClass('stream-overquota');
-                $(window).trigger('resize');
+                setTransferStatus(0, l[17]);
             }
         }
 
@@ -2297,9 +2273,6 @@ var dlmanager = {
                         'noopener,noreferrer'
                     );
                 }
-            }
-            if ($('.download.download-page').hasClass('video')) {
-                $elm.removeClass('visible');
             }
         });
 

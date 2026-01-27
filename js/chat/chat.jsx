@@ -316,9 +316,8 @@ Chat.prototype.init = promisify(function(resolve, reject) {
 
             if (is_chatlink) {
                 const start = document.getElementById('startholder');
-                this.flyoutStartHolder = document.createElement('div');
-                this.flyoutStartHolder.className = 'flyout-holder';
-                start.appendChild(this.flyoutStartHolder);
+                this.flyoutStartHolder = start.querySelector('.flyout-holder')
+                    || mCreateElement('div', {class: 'flyout-holder'}, start);
             }
             const selector = is_chatlink ? '.chat-links-preview > .chat-app-container' : '.section.conversations';
             const rootDOMNode = this.rootDOMNode = document.querySelector(selector);

@@ -1989,6 +1989,10 @@ var addressDialog = {
         }
 
         const prefillMultipleInputs = (inputs, value) => {
+            if (!inputs) {
+                console.error('Missing input field to fill');
+                return;
+            }
             if (Array.isArray(inputs)) {
                 inputs.forEach(($megaInput) => {
                     $megaInput.setValue(value);
@@ -2061,7 +2065,7 @@ var addressDialog = {
                 );
             }
 
-            if (billingInfo.dateOfBirth) {
+            if (billingInfo.dateOfBirth && pro.propay.onPropayPage()) {
                 prefillMultipleInputs(this.dateOfBirthMegaInput, getBillingProp('dateOfBirth', encodedVer));
             }
         }
@@ -3626,17 +3630,20 @@ var addressDialog = {
             'AT', 'BE', 'BG', 'HR', 'CY', 'CZ', 'DK',
             'EE', 'FI', 'FR', 'DE', 'GR', // 'HU', Separate rules for Hungary
             'IE', 'IT', 'LV', 'LT', 'LU', 'MT', 'NL',
-            'PL', 'PT', 'RO', 'SK', 'SI', 'ES', 'SE',
+            'PL', 'PT', 'RO', 'SK', 'SI', 'SE', // 'ES', Separate rules for Spain
         ];
         countryCode = countryCode.toUpperCase();
         return !(
             countryCode === 'HU' && !(
                 /^\d{8}-[1-5]-\d{2}$/.test(taxCode) ||
                 /^\d{8}$/.test(taxCode) ||
-                /^HU\d{8}$/.test(taxCode)
-            ) ||
-            EU_CODES.includes(countryCode) && !/^[A-Z]{2}[\dA-Z]{2,13}$/.test(taxCode) ||
-            !/\S/.test(taxCode)
+                /^HU\d{8}$/.test(taxCode))
+            || countryCode === 'ES' && !(
+                /^\d{8}[A-Z]$/.test(taxCode)
+                || /^[X-Z]\d{7}[A-Z]$/.test(taxCode)
+                || /^[A-Z]\d{7}[\dA-Z]$/.test(taxCode))
+            || EU_CODES.includes(countryCode) && !/^[A-Z]{2}[\dA-Z]{2,13}$/.test(taxCode) ||
+                !/\S/.test(taxCode)
         );
     }
 };

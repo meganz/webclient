@@ -556,23 +556,6 @@ FileManager.prototype.initFileManagerUI = function() {
         pmlayout.classList.remove('hidden');
     }
 
-    // May better deprecate lazy instead
-    if (mega.ui.header) {
-
-        // Header is exist but not available on dom, so lets re-init it.
-        if (!fmholder.contains(mega.ui.header.domNode)) {
-
-            mega.ui.header.destroy();
-            delete mega.ui.header;
-            mega.ui.header = new MegaHeader({
-                parentNode: pmlayout,
-                componentClassname: 'mega-header',
-                prepend: true
-            });
-        }
-
-        mega.ui.header.show();
-    }
     if (mega.ui.topmenu) {
 
         // Top menu is exist but not available on dom, so lets re-init it.

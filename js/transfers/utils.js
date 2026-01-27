@@ -15,31 +15,8 @@ function setTransferStatus(dl, status, ethrow, lock, fatalError) {
     }
 
     if (page === 'download') {
-        var $dlTopBar = $('.download.download-page');
-        var $dlMainTNfo = $('.download.main-transfer-info');
-        var $dlTopBarErrorBlock = $('.download.main-transfer-error', $dlTopBar);
-
-        if (status === l[20666]) {
-            $('.download.error-text', $dlTopBar).addClass('hidden');
-            $('.download.over-transfer-quota', $dlTopBar).removeClass('hidden');
-            $dlTopBarErrorBlock = $('.download.overquoata-error', $dlTopBar);
-        }
-
-        $dlTopBar.addClass('error');
-        $('.download.speed-block', $dlTopBar).addClass('hidden');
-        $('.download.eta-block', $dlTopBar).addClass('hidden');
-        $('.bar-table .progress-block', $dlTopBar).addClass('hidden');
-
-        $dlTopBarErrorBlock
-            .removeClass('hidden')
-            .attr('title', status)
-            .find('span')
-            .text(text);
-
-        if (fatalError) {
-            $('.mid-pause', $dlTopBar).addClass('hidden');
-            $('.mega-button', $dlMainTNfo).addClass('hidden');
-            dlmanager.setBrowserWarningClasses('.download.warning-block', 0, status);
+        if ('dlPage' in mega.ui) {
+            mega.ui.dlPage.showErrorUI({msg: text, fatalError});
         }
     }
     else {
@@ -114,7 +91,7 @@ function dlFatalError(dl, error, ethrow, lock) {
 
     // Set transfer status and abort it
     setTransferStatus(dl, error, ethrow, lock !== undefined ? lock : true, String(error).indexOf(l[1668]) < 0);
-    dlmanager.abort(dl);
+    dlmanager.abort(dl, error === l.dl_decryption_failed);
 }
 
 // Quick hack for sane average speed readings

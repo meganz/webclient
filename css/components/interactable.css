@@ -21,6 +21,8 @@ Implemented styles:
 .nav-elem.disabled,
 .nav-elem.disabled:active
 .nav-elem.info-elem
+.nav-elem.no-deco
+.nav-elem.no-bg - sometimes needed together with 'underline'
 .nav-elem.primary
 .nav-elem.secondary
 .nav-elem.text-only
@@ -35,12 +37,14 @@ Implemented styles:
 .nav-elem,
 .nav-elem.no-active:active {
     color: var(--mobile-text-primary);
+    cursor: pointer;
     background: none;
 }
 
 .nav-elem,
 .nav-elem button,
 .nav-elem a {
+    cursor: pointer;
     display: inline-flex;
     flex-flow: row nowrap;
     justify-content: center;
@@ -176,6 +180,9 @@ button.nav-elem.no-active:active,
 .nav-elem.secondary:hover {
     background: var(--mobile-button-secondary-hover);
 }
+.nav-elem.secondary.icon-only:hover {
+    color: var(--mobile-text-primary);
+}
 
 .nav-elem.outline,
 .nav-elem.outline.no-active:active {
@@ -305,10 +312,18 @@ button.nav-elem.no-active:active,
     font: var(--mobile-font-label-bold);
     text-decoration: none;
 }
+
 .nav-elem.action-link.login-button,
 .nav-elem.action-link.create-account-button {
     color: var(--mobile-text-primary);
     text-decoration: underline;
+}
+
+@media (hover: hover) {
+    .nav-elem.action-link.login-button:hover,
+    .nav-elem.action-link.create-account-button:hover {
+        text-decoration: none;
+    }
 }
 
 .nav-elem.action-link.toast {
@@ -318,22 +333,50 @@ button.nav-elem.no-active:active,
     font: var(--mobile-font-copy-semibold);
 }
 
+
 /* .nav-elem text */
+
 .nav-elem span {
     color: inherit;
     text-decoration: inherit;
     font: var(--mobile-font-link-large-regular);
 }
+
 .nav-elem.slim span {
     font: var(--mobile-font-link-small-regular);
 }
+
 .nav-elem.slim.font-bold span {
     font: var(--mobile-font-link-small-semibold);
 }
+
+/* underlined text */
+
 .nav-elem.underline span,
 .nav-elem.underline-offset-4 span {
     text-decoration: underline;
 }
+
+@media (hover: hover) {
+    .nav-elem.underline:hover span,
+    .nav-elem.underline-offset-4:hover span {
+        text-decoration: none;
+    }
+}
+
+/* no-bg to keep button style, but remove hover/active bg change */
+
+.nav-elem.no-bg {
+    background: transparent;
+}
+
+.nav-elem.no-bg:hover,
+.nav-elem.no-bg:active,
+.nav-elem.no-bg:active {
+    color: var(--mobile-button-primary-pressed);
+}
+
+
 .nav-elem.font-600 span {
     font-weight: 600;
 }

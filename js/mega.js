@@ -2634,7 +2634,7 @@ async function fetchfm(sn) {
                 loadfm_callback(res);
             })
             .catch((ex) => {
-                folderreqerr(false, ex);
+                folderreqerr(ex);
                 dump(`Could not load collection... Error: ${ex}`);
             });
 
@@ -3639,86 +3639,14 @@ function processMCSM(mcsm, ignoreDB) {
     }
 }
 
-function folderreqerr(c, e) {
+function folderreqerr(e) {
     'use strict';
-
-    var title = (pfcol) ? l.album_broken_link_title : l[1043];
-    var message = null;
-    var submessage = false;
 
     u_reset();
     loadingInitDialog.hide();
-
-    if ($.dialog) {
-        return mBroadcaster.once('closedialog', SoonFc(90, () => folderreqerr(c, e)));
-    }
-
-    if (typeof e === 'object' && e.err < 0) {
-        if (e.u === 7) {
-            if (e.l === 2) {
-                const link = 'https://www.stopitnow.org.uk/concerned-about-your-own-thoughts-or-behaviour/' +
-                    'concerned-about-use-of-the-internet/self-help/understanding-the-behaviour/?utm_source=mega' +
-                    '&utm_medium=banner&utm_campaign=mega_warning';
-                message = l.etd_link_removed_title;
-                submessage = `${l.etd_link_removed_body}<br><br>` +
-                    `<a class="clickurl" href="${link}" target="_blank" data-eventid="500245">` +
-                        l.etd_link_removed_button +
-                    `</a>`;
-                eventlog(500243);
-                if (is_mobile) {
-                    message = [message, 'icon sprite-mobile-fm-mono icon-alert-circle-thin-outline', false, submessage];
-                }
-            }
-            else {
-                message = l[23243];
-                if (is_mobile) {
-                    message = [title, 'icon sprite-mobile-fm-mono icon-alert-circle-thin-outline', false, message];
-                }
-            }
-        }
-        else {
-            e = e.err;
-        }
-    }
-
-    // If desktop site show "Folder link unavailable" dialog
     parsepage(pages.placeholder);
 
-    // Make sure error code is an integer
-    const errorCode = parseInt(e);
-
-    if (!is_mobile) {
-        if (errorCode === EARGS) {
-            if (pfcol) {
-                title = l.album_broken_link_title;
-                message = l.album_broken_link_text;
-            }
-            else {
-                title = l[20198];
-                message = l[20199];
-            }
-        }
-        else if (errorCode === EEXPIRED) {
-            message = l[20856]; // Your link has expired
-        }
-        else if (pfcol) {
-            message = l.album_broken_link_text;
-        }
-        else if (!message) {
-            message = l[1044] + '<ul><li>' + l[1045] + '</li><li>' + l[247] + '</li><li>' + l[1046] + '</li>';
-        }
-
-        msgDialog('warninga', title, message, submessage, () => {
-
-            // If the user is logged-in, he'll be redirected to the cloud
-            loadSubPage('login');
-        });
-    }
-    else {
-        // Show file/folder not found page
-        mobile.notFound.show(message || parseInt(e && e.err || e));
-    }
-
+    mega.ui.linkAccess.showErrorUI(e);
     mBroadcaster.sendMessage('folderreqerr', e);
 }
 
@@ -3822,7 +3750,8 @@ function loadfm_callback(res) {
                 eventlog(99977, JSON.stringify([1, pfid, M.RootID]));
             }
 
-            return mKeyDialog(pfid, true, true).catch(() => loadSubPage('start'));
+            return mega.ui.linkAccess.showDecryptionKeyUI(pfid, true, pfkey)
+                .catch(() => loadSubPage('start'));
         }
     }
 

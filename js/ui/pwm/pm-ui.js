@@ -144,6 +144,10 @@ mega.ui.pm = {
             return;
         }
 
+        if ('menu' in mega.ui.pm) {
+            mega.ui.pm.menu.hide();
+        }
+
         if (this.list) {
             this.list.removeResizeListener();
             this.list.hide();

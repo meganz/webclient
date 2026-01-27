@@ -258,7 +258,7 @@ lazy(mega, 'rewind', () => {
             let finished;
 
             if (d) {
-                console.time('rewind:index:open');
+                mega.rewindUtils.task.start('open');
             }
             setTimeout(() => !finished && loadingDialog.show('rewind-sidebar'), 480);
 
@@ -270,7 +270,7 @@ lazy(mega, 'rewind', () => {
                     finished = true;
                     loadingDialog.hide('rewind-sidebar');
                     if (d) {
-                        console.timeEnd('rewind:index:open');
+                        mega.rewindUtils.task.complete('open');
                     }
                 });
         }
@@ -339,7 +339,7 @@ lazy(mega, 'rewind', () => {
         }
 
         async loadTreeCacheList() {
-            console.time('rewind:index:treeCache');
+            mega.rewindUtils.task.start('treeCache');
             this.accountType = this.getAccountType();
 
             // FIXME: Disable caching first for testing
@@ -395,11 +395,11 @@ lazy(mega, 'rewind', () => {
 
             this.currentMonth = this.getStartOfMonth(this.currentDate);
             this.currentYear = this.getStartOfYear(this.currentDate);
-            console.timeEnd('rewind:index:treeCache');
+            mega.rewindUtils.task.complete('treeCache');
         }
 
         async loadChangeLog() {
-            console.time('rewind:index:changeLog');
+            mega.rewindUtils.task.start('changeLog');
             const selectedHandle = this.selectedHandle;
 
             const currentTimeInSeconds = this.getCurrentTimeInSeconds();
@@ -413,7 +413,7 @@ lazy(mega, 'rewind', () => {
 
             // TODO: If record is old on database, refresh
             this.changeLogTimestamp = currentTimeInSeconds;
-            console.timeEnd('rewind:index:changeLog');
+            mega.rewindUtils.task.complete('changeLog');
         }
 
         async getChangeLogByRewindableDays(selectedHandle, savedChangeLog, lastRewindableDate
@@ -434,13 +434,13 @@ lazy(mega, 'rewind', () => {
             // }
 
             if (!hasRecords) {
-                console.time('rewind:index:changeLog:api');
+                mega.rewindUtils.task.start('changeLog:api:get');
                 const changeLogResponse = await mega.rewindUtils.getChangeLog(
                     selectedHandle,
                     startInSeconds,
                     endInSeconds
                 );
-                console.timeEnd('rewind:index:changeLog:api');
+                mega.rewindUtils.task.complete('changeLog:api:get');
 
                 const changeLogData = {
                     dates: Object.create(null),
@@ -469,10 +469,6 @@ lazy(mega, 'rewind', () => {
                         };
                     }
                 }
-
-                // console.timeEnd('rewind:index:changeLog');
-                // await mega.rewindStorage.saveChangeLogByMonth(selectedHandle, startOfMonth, changeLogData);
-                // console.timeEnd('rewind:index:changeLog');
 
                 return changeLogData;
             }
@@ -567,9 +563,10 @@ lazy(mega, 'rewind', () => {
         }
 
         async getRecords(timestamp) {
-            this.resetProgress();
+            mega.rewindUtils.reset();
+            mega.rewindUtils.task.reset();
 
-            console.time('rewind:index:getRecords');
+            mega.rewindUtils.task.start('getRecords');
             const date = new Date(timestamp);
             date.setHours(23, 59, 59, 999);
             date.setDate(date.getDate());
@@ -608,9 +605,11 @@ lazy(mega, 'rewind', () => {
             if (this.treeCache && selectedTreeCache.sn === this.treeCache.sn && this.treeCacheHistory.length) {
                 logger.info(`Rewind.loadTreeCacheItem - #Rewind #API - TreeCache - Reusing current tree cache`);
 
-                console.time('rewind:index:getRecords:tree:cache');
-                const hasTreeCache = await this.loadTreeCacheItemFromCache();
-                console.timeEnd('rewind:index:getRecords:tree:cache');
+                mega.rewindUtils.task.start('getRecords:tree:cache:read');
+                const hasTreeCache = await this.loadTreeCacheItemFromCache((progress) => {
+                    mega.rewindUtils.task.update('getRecords:tree:cache:read', progress);
+                });
+                mega.rewindUtils.task.complete('getRecords:tree:cache:read');
 
                 // FIXME: Treecache might not be available but action packet can (verify with api)
                 if (!hasTreeCache) {
@@ -622,9 +621,9 @@ lazy(mega, 'rewind', () => {
                 this.sequenceNumber = selectedTreeCache.sn;
                 logger.info(`Rewind.loadTreeCacheItem - #Rewind #API - TreeCache - Reloading tree cache`);
 
-                console.time('rewind:index:getRecords:tree');
+                mega.rewindUtils.task.start('getRecords:tree');
                 const hasTreeCache = await this.loadTreeCacheItem(selectedTreeCache);
-                console.timeEnd('rewind:index:getRecords:tree');
+                mega.rewindUtils.task.complete('getRecords:tree');
 
                 // FIXME: Treecache might not be available but action packet can (verify with api)
                 if (!hasTreeCache) {
@@ -637,13 +636,10 @@ lazy(mega, 'rewind', () => {
                 timestampInSeconds = currentDate / 1000;
             }
 
-            console.time('rewind:index:getRecords:packet');
-            await this.loadActionPacket(timestampInSeconds, selectedTreeCache && selectedTreeCache.sn || null
-                , selectedTreeCache, this.treeCacheState);
-            console.timeEnd('rewind:index:getRecords:packet');
-            console.timeEnd('rewind:index:getRecords');
-
-            this.handleProgress(-1, 0, true);
+            mega.rewindUtils.task.start('getRecords:packet');
+            await this.loadActionPacket(timestampInSeconds, selectedTreeCache && selectedTreeCache.sn || null);
+            mega.rewindUtils.task.complete('getRecords:packet');
+            mega.rewindUtils.task.complete('getRecords');
 
             return true;
         }
@@ -672,23 +668,31 @@ lazy(mega, 'rewind', () => {
             let treeCacheHistory = false;
 
             // Get tree cache state
+            mega.rewindUtils.task.start('getRecords:tree:state:storage:read');
             const treeCacheState = await mega.rewindStorage.getTreeCacheSNState(sequenceNumber);
+            mega.rewindUtils.task.complete('getRecords:tree:state:storage:read');
+
             logger.info(`Rewind.loadTreeCacheItem - #Rewind #API - TreeCache - Current state`,
                         sequenceNumber, treeCacheState);
 
             if (treeCacheState && treeCacheState.s === mega.rewindStorage.STATE_SN_END) {
                 logger.info(`Rewind.loadTreeCacheItem - #Rewind #API - TreeCache - Rewinding from DB`);
-                console.time('rewind:index:getRecords:tree:db');
-                treeCacheHistory = await mega.rewindStorage.getTreeCacheHistoryNodes(sequenceNumber, (progress) => {
-                    mega.rewind.handleProgress(4, progress);
-                });
-                console.timeEnd('rewind:index:getRecords:tree:db');
-                await this.prepareTreeCacheNodes(treeCacheHistory, this.nodeDictionary, this.nodeChildrenDictionary);
+                mega.rewindUtils.task.start('getRecords:tree:storage:read');
+                treeCacheHistory = await mega.rewindStorage.getTreeCacheHistoryNodes(
+                    sequenceNumber, (progress) => {
+                        mega.rewindUtils.task.update('getRecords:tree:storage:read', progress);
+                    });
+                mega.rewindUtils.task.complete('getRecords:tree:storage:read');
+
+                mega.rewindUtils.task.start('getRecords:tree:prepare');
+                await this.prepareTreeCacheNodes(
+                    treeCacheHistory, this.nodeDictionary, this.nodeChildrenDictionary, (progress) => {
+                        mega.rewindUtils.task.update('getRecords:tree:prepare', progress);
+                    });
+                mega.rewindUtils.task.complete('getRecords:tree:prepare');
+
                 logger.info(`Rewind.loadTreeCacheItem - #Rewind #DB - TreeCache ` +
                     `- Loaded from DB - ${treeCacheHistory.length} files`);
-            }
-            else {
-                mega.rewind.handleProgress(4, 100);
             }
 
             treeCacheHistory = localStorage.rewindTreeCacheDisable === '1' ? false : treeCacheHistory;
@@ -697,23 +701,24 @@ lazy(mega, 'rewind', () => {
                 // This is just the residue
                 // If we are done processing then
                 logger.info(`Rewind.loadTreeCacheItem - #Rewind #API - TreeCache - Rewinding from API`);
+                mega.rewindUtils.task.start('getRecords:tree:state:storage:save:start');
                 await mega.rewindStorage.saveTreeCacheSNStateStart(sequenceNumber, treeCacheState);
-                console.time('rewind:index:getRecords:tree:api');
+                mega.rewindUtils.task.complete('getRecords:tree:state:storage:save:start');
+
+                mega.rewindUtils.task.start('getRecords:tree:api:get');
                 treeCacheHistory = await mega.rewindUtils.getChunkedTreeCacheHistory(
-                    cacheTimestamp,
-                    cacheHandle,
-                    (progress) => {
-                        mega.rewind.handleProgress(0, progress);
+                    cacheTimestamp, cacheHandle, (progress) => {
+                        mega.rewindUtils.task.update('getRecords:tree:api:get', progress);
                     }
                 );
-                console.timeEnd('rewind:index:getRecords:tree:api');
+                mega.rewindUtils.task.complete('getRecords:tree:api:get');
+
+                mega.rewindUtils.task.start('getRecords:tree:state:storage:save:end');
                 await mega.rewindStorage.saveTreeCacheSNStateEnd(sequenceNumber, treeCacheState);
+                mega.rewindUtils.task.complete('getRecords:tree:state:storage:save:end');
 
                 logger.info(`Rewind.loadTreeCacheItem - #Rewind #API - TreeCache - Loaded from API - ` +
                     `${Object.keys(this.nodeDictionary).length - 1} files`);
-            }
-            else {
-                mega.rewind.handleProgress(0, 100);
             }
 
             this.treeCacheState = treeCacheState;
@@ -721,7 +726,7 @@ lazy(mega, 'rewind', () => {
             return !(!this.treeCacheHistory) || (this.treeCacheHistory && Object.keys(this.treeCacheHistory).length);
         }
 
-        async loadTreeCacheItemFromCache() {
+        async loadTreeCacheItemFromCache(onProgress) {
             // this.treeCacheHistoryTask = mega.promise;
             this.nodeDictionary = Object.create(null);
             // This is just to add placeholder for empty parents
@@ -736,27 +741,27 @@ lazy(mega, 'rewind', () => {
                 return false;
             }
 
-            await this.prepareTreeCacheNodes(this.treeCacheHistory, this.nodeDictionary, this.nodeChildrenDictionary);
-            mega.rewind.handleProgress(4, 100);
-            mega.rewind.handleProgress(0, 100);
+            await this.prepareTreeCacheNodes(
+                this.treeCacheHistory, this.nodeDictionary, this.nodeChildrenDictionary, onProgress);
 
             return !(!this.treeCacheHistory) || (this.treeCacheHistory && Object.keys(this.treeCacheHistory).length);
         }
 
         // eslint-disable-next-line complexity
-        async loadActionPacket(currentTimestamp, cacheSequenceNumber, treeCache, treeCacheState) {
+        async loadActionPacket(currentTimestamp, cacheSequenceNumber) {
+            const {treeCacheState} = this;
             const dateData = Object.create(null);
             let isOutdated = false;
             let sn = null;
 
-            console.time('rewind:index:getRecords:packet:db');
+            mega.rewindUtils.task.start('getRecords:packet:storage:read');
             let packets = await mega.rewindStorage.getActionPackets(
                 cacheSequenceNumber,
                 +currentTimestamp,
                 (progress) => {
-                    mega.rewind.handleProgress(6, progress);
+                    mega.rewindUtils.task.update('getRecords:packet:storage:read', progress);
                 });
-            console.timeEnd('rewind:index:getRecords:packet:db');
+            mega.rewindUtils.task.complete('getRecords:packet:storage:read');
             logger.info(`Rewind.loadActionPacket - #Rewind #DB - ActionPacket - Loaded from DB - ` +
                     `${packets.length} action packets`);
             if (!packets || !packets.length) {
@@ -776,27 +781,30 @@ lazy(mega, 'rewind', () => {
                 }
             }
 
-            let hasActionPacketProgress = false;
             if (currentTimestamp) {
                 if (isOutdated) {
-                    const packetPromise = mega.promise;
-                    mBroadcaster.once('rewind:packet:done', (response) => {
-                        sn = response.sn;
-                        packets = packets.concat(response.packets);
-                        logger.info(`Rewind.loadActionPacket - #Rewind #API - ActionPacket - Loaded from API - ` +
-                            `${response.packets.length} action packets`);
-                        packetPromise.resolve();
-                        console.timeEnd('rewind:index:getRecords:packet:api');
+                    // promise fulfilled after "getChunkedActionPacketHistory" invoked below is processed
+                    // in "rewindUtils::RewindChunkPacketHandle.handlePostRequest"
+                    const promise = new Promise((resolve) => {
+                        mBroadcaster.once('rewind:packet:done', (response) => {
+                            sn = response.sn;
+                            packets = [...packets, ...response.packets];
+                            logger.info(`Rewind.loadActionPacket - receivedMessage ` +
+                                 `"rewind:packet:done" ActionPacket - Loaded from API - ` +
+                                `${response.packets.length} action packets`);
+                            resolve();
+                        });
                     });
 
-                    console.time('rewind:index:getRecords:packet:api');
                     // Check if we have records in DB, if not, get from API
-                    await mega.rewindUtils.getChunkedActionPacketHistory(lastSn, currentTimestamp, () => {
-                        this.handleProgress(5, progress);
-                        hasActionPacketProgress = true;
-                    });
+                    mega.rewindUtils.task.start('getRecords:packet:api:get');
+                    await mega.rewindUtils.getChunkedActionPacketHistory(
+                        lastSn, currentTimestamp, (progress) => {
+                            mega.rewindUtils.task.update('getRecords:packet:api:get', progress);
+                        });
 
-                    await packetPromise;
+                    await promise;
+                    mega.rewindUtils.task.complete('getRecords:packet:api:get');
                 }
 
                 const parsePacketData = (packetData, order) => {
@@ -857,8 +865,9 @@ lazy(mega, 'rewind', () => {
                 let batchPromise = null;
 
                 logger.info(`Rewind.loadActionPacket - Processing ${packets.length} packets`);
-                console.time('rewind:index:getRecords:packet:process');
+                mega.rewindUtils.task.start('getRecords:packet:prepare');
                 for (let i = 0; i < packets.length; i++) {
+                    mega.rewindUtils.task.update('getRecords:packet:prepare', i / packets.length * 100);
                     const packet = packets[i];
                     if (!packet) {
                         // Since we set from 1, not 0, possibility of null value
@@ -912,7 +921,7 @@ lazy(mega, 'rewind', () => {
 
                     order++;
                 }
-                console.timeEnd('rewind:index:getRecords:packet:process');
+                mega.rewindUtils.task.complete('getRecords:packet:prepare');
 
                 if ((sn && lastSn && lastSn !== sn) || (sn && !lastSn) || !treeCacheState.lastSn) {
                     // We fill in necessary details for
@@ -935,16 +944,13 @@ lazy(mega, 'rewind', () => {
                 const promiseArray = Array.from(promiseSet);
                 // Wait to have everything flushed on the DB
                 if (promiseArray.length) {
-                    await Promise.all(promiseArray);
+                    mega.rewindUtils.task.start('getRecords:packet:state:storage:save');
+                    await Promise.allSettled(promiseArray);
+                    mega.rewindUtils.task.complete('getRecords:packet:state:storage:save');
                 }
 
                 // For debugging only
                 this.dateData = dateData;
-            }
-
-            if (!hasActionPacketProgress) {
-                // We know there was no progress for action packet history
-                this.handleProgress(5, 100);
             }
         }
 
@@ -1075,13 +1081,17 @@ lazy(mega, 'rewind', () => {
             this.removeNode(n, this.nodeDictionary, this.nodeChildrenDictionary);
         }
 
-        async prepareTreeCacheNodes(treeCacheHistory, nodeDictionary, nodeChildrenDictionary) {
+        async prepareTreeCacheNodes(treeCacheHistory, nodeDictionary, nodeChildrenDictionary, onProgress) {
             const fileList = treeCacheHistory;
             const processInBatches = async(array, batchSize, callback) => {
-                for (let i = 0; i < array.length; i += batchSize) {
+                const aTotal = array.length;
+                for (let i = 0; i < aTotal; i += batchSize) {
                     const batch = array.slice(i, i + batchSize);
                     // Perform some processing on the batch
                     await callback(batch);
+                    if (typeof onProgress === 'function') {
+                        onProgress(i / aTotal * 100);
+                    }
                 }
             };
 
@@ -1599,8 +1609,6 @@ lazy(mega, 'rewind', () => {
         addNodeFromWorker(decryptedNode) {
             if (!this.putQueue) {
                 this.putQueue = [];
-                this.putQueueTail = 0;
-                this.putQueueHead = 0;
             }
 
             this.putQueue.push([
@@ -1610,14 +1618,13 @@ lazy(mega, 'rewind', () => {
             ]);
 
             if (this.putQueue.length > FMDB_FLUSH_THRESHOLD) {
-                const batch = this.putQueue.slice(0, FMDB_FLUSH_THRESHOLD);
-                this.putQueue.splice(0, FMDB_FLUSH_THRESHOLD);
-
+                const batch = this.putQueue.splice(0, FMDB_FLUSH_THRESHOLD);
                 if (d) {
                     logger.info('Flushing nodes');
                 }
-                for (const item of batch) {
-                    const [putFunction, ...putArgs] = item;
+
+                for (let i = 0; i < batch.length; i++) {
+                    const [putFunction, ...putArgs] = batch[i];
                     putFunction(...putArgs);
                 }
             }
@@ -1634,98 +1641,6 @@ lazy(mega, 'rewind', () => {
             this.nodeTreeStateDictionary = Object.create(null);
             this.sizeTreeDictionary = Object.create(null);
             this.treeCacheHistory = Object.create(null);
-        }
-
-        // eslint-disable-next-line complexity
-        handleProgress(type, progress, done) {
-            if (!this.progress) {
-                this.resetProgress();
-            }
-
-            // percentage factor is 25%
-            switch (type) {
-                case 0: //  Tree Cache - API Request
-                    this.progress.percentage[type] = [progress, 0.20];
-                    break;
-                case 1: // Tree Cache - Worker process
-                    {
-                        // API Percentage
-                        const apiProgress = this.progress.percentage[0] && this.progress.percentage[0][0] || 0;
-
-                        // If api is greater than 10%, we assume its 10% of the items
-                        if (!this.progress.treeCacheThreshold) {
-                            // We get the 10% of the remaining before the first tree node was loaded
-                            this.progress.treeCacheThreshold = apiProgress + ((100 - apiProgress) / 10);
-                        }
-
-                        if (this.progress.treeCacheThresholdReached) {
-                            const percentage = (progress / this.progress.totalEstTreeCacheItems);
-                            const finalPercent = !isNaN(percentage) && Number.isFinite(percentage) && percentage || 1;
-                            this.progress.percentage[type] = [
-                                finalPercent * 100,
-                                0.20
-                            ];
-                        }
-                        else if (apiProgress >= this.progress.treeCacheThreshold) {
-                            this.progress.treeCacheThresholdReached = true;
-                            this.progress.totalEstTreeCacheItems = progress * 10;
-                            const percentage = (progress / this.progress.totalEstTreeCacheItems);
-                            const finalPercent = !isNaN(percentage) && Number.isFinite(percentage) && percentage || 1;
-                            this.progress.percentage[type] = [finalPercent * 100, 0.20];
-                        }
-                        else {
-                            this.progress.currentTreeCacheItems = progress;
-                        }
-                    }
-                    break;
-                case 2: // Action Packet - API Request
-                    // this.progress[type].percentage = progress * 0.25;
-                    break;
-                case 3: // Action Packet - Worker process
-                    // this.progress[type].percentage = progress * 0.25;
-                    break;
-                case 4: // Tree Cache - DB Request
-                    this.progress.percentage[type] = [progress, 0.20]; // 0.5 factor because of action packets retrieval
-                    break;
-                case 5: // Action Packets - API Request
-                    this.progress.percentage[type] = [progress, 0.20]; // 0.5 factor because of action packets retrieval
-                    break;
-                case 6: // Action Packets - DB Request
-                    this.progress.percentage[type] = [progress, 0.20]; // 0.5 factor because of action packets retrieval
-                    break;
-            }
-
-            if (done) {
-                this.progress.percentage[type] = [100, 0.20];
-            }
-
-            if (this.progress.percentage.length) {
-                let totalProgress = this.progress.percentage.reduce((total, currentValue) => {
-                    return parseInt(total) + (currentValue[0] || 0) * (currentValue[1] || 0);
-                }, 0);
-
-                if (type === -1 && done) {
-                    totalProgress = 100;
-                }
-
-                if (totalProgress > 100) {
-                    delay('rewind:datafetch-percent-over-100', eventlog.bind(null, 500523));
-                    totalProgress = 100;
-                }
-
-                mBroadcaster.sendMessage('rewind:progress', totalProgress);
-            }
-        }
-
-        async resetProgress() {
-            this.progress = Object.create(null);
-            this.progress.treeCacheThreshold = 0;
-            this.progress.currentTreeCacheItems = 0;
-            this.progress.totalEstTreeCacheItems = 0;
-            this.progress.treeCacheThresholdReached = false;
-            this.progress.currentActionItems = 0;
-            this.progress.totalEstActionItems = 0;
-            this.progress.percentage = [];
         }
 
         async resetStorageCache() {

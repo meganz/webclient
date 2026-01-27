@@ -41,8 +41,6 @@ var pro_json = '[[["N02zLAiWqRU",1,500,1024,1,"9.99","EUR"],["zqdkqTtOtGc",1,500
 
 pages.placeholder = '<div class="bottom-page scroll-block placeholder selectable-txt">' +
     '((TOP))' +
-    '<div class="main-pad-block">' +
-    '<div class="main-mid-pad new-bottom-pages"></div>' +
     '</div>';
 
 mBroadcaster.once('startMega', function() {
@@ -286,7 +284,7 @@ function scrollMenu() {
 function topPopupAlign(button, popup, topPos) {
     'use strict';
 
-    const popupAlign = () => {
+    requestAnimationFrame(() => {
         var $button = $(button),
             $popup = $(popup),
             $popupArrow = $popup.children('.dropdown-white-arrow'),
@@ -335,16 +333,7 @@ function topPopupAlign(button, popup, topPos) {
                 })
             }
         }
-    };
-
-    // If top menu is opened - set timeout to count correct positions
-    if (!$('.top-menu-popup').hasClass('o-hidden') || $('body').hasClass('hidden')) {
-
-        tSleep(0.2).then(() => requestAnimationFrame(popupAlign));
-    }
-    else {
-        requestAnimationFrame(popupAlign);
-    }
+    });
 }
 
 function init_page() {
@@ -407,7 +396,7 @@ function init_page() {
 
         if (fminitialized) {
             // Clean up internal state in case we're navigating back to a public-link
-            M.currentdirid = M.RootID = M.currentCustomView = false;
+            M.currentdirid = M.currentCustomView = false;
             delete $.mcImport;
         }
     }
@@ -675,8 +664,8 @@ function init_page() {
             ]);
             eventlog(pfcol ? is_mobile ? 99911 : 99910 : is_mobile ? 99631 : 99632, data, true);
 
-            if (pfid.length !== 8 || window['preflight-folder-link-error:' + pfid]) {
-                folderreqerr(false, window['preflight-folder-link-error:' + pfid] || EARGS);
+            if (pfid.length !== 8 || window[`preflight-folder-link-error:${pfid}`]) {
+                folderreqerr(window[`preflight-folder-link-error:${pfid}`] || EARGS);
                 return false;
             }
 
@@ -691,10 +680,9 @@ function init_page() {
 
                 // Let's apply theme for this dialog
                 mega.ui.setTheme();
-                onIdle(topmenuUI);
 
                 // Show the decryption key dialog on top
-                mKeyDialog(pfid, true, pfkey, newLinkSelector)
+                mega.ui.linkAccess.showDecryptionKeyUI(pfid, true, pfkey, newLinkSelector)
                     .catch(() => {
                         loadSubPage('start');
                     });
@@ -842,12 +830,7 @@ function init_page() {
         // Password protected link decryption dialog
         parsepage(pages.placeholder);
 
-        if (is_mobile) {
-            mobile.passwordDecryption.show(page);
-        }
-        else {
-            exportPassword.decrypt.init(page);
-        }
+        mega.ui.linkAccess.showDecryptionPassUI(page);
 
         // lets set them for the dialog.
         mega.ui.setTheme();
@@ -1522,7 +1505,6 @@ function init_page() {
         parsepage(pages.download);
 
         dlinfo(dlid, dlkey, false);
-        topmenuUI();
     }
     else if (page.substr(0, 5) === 'reset') {
         localStorage.clear();
@@ -2069,15 +2051,17 @@ function topmenuUI() {
 
     'use strict';
 
+    const isFm = is_fm();
     var topMenuElm = document.getElementById('topmenu');
 
+    // @todo: remove when we start using the revamped header in all sections
     if (topMenuElm) {
         var topHeader = topMenuElm.querySelector('.top-head');
 
         if (!topHeader) {
             $(topMenuElm).safeHTML(parsetopmenu());
 
-            if (!is_fm()) {
+            if (!isFm) {
                 $('.top-head .logo', topMenuElm).css("display", "block");
             }
         }
@@ -2085,7 +2069,41 @@ function topmenuUI() {
         $.tresizer();
     }
 
-    const holderId = is_fm() && page !== 'start' ? 'fmholder' : 'startholder';
+    // Init/update revamped header for FM and revamped subpages
+    if (!is_mobile && mega.ui.header) {
+        // skip error page in Folder link section
+        const holder = isFm && !document.body.classList.contains('bottom-pages')
+            && self.pmlayout || document.getElementById('startholder');
+
+        // Header is exist but not available on dom, so lets re-init it.
+        if (!holder.contains(mega.ui.header.domNode)) {
+            mega.ui.header.destroy();
+            delete mega.ui.header;
+
+            if (mega.ui.flyoutInit) {
+                mega.ui.flyout.reinit();
+            }
+            mega.ui.header = new MegaHeader({
+                parentNode: holder,
+                componentClassname: 'mega-header',
+                prepend: true
+            });
+        }
+
+        // @todo: remove condition when we start using new header in all sections
+        if (isFm || dlid || pfid || page === 'linkaccess') {
+            mega.ui.header.show();
+            mega.ui.header.update();
+        }
+        else {
+            mega.ui.header.hide();
+        }
+    }
+
+    /*
+     * @todo: remove the rest old stuff we start using new header in all sections
+    */
+    const holderId = isFm && page !== 'start' ? 'fmholder' : 'startholder';
 
     topbarUI(holderId);
 
@@ -2145,7 +2163,7 @@ function topmenuUI() {
     $('.membership-status, .top-head .user-name', $topHeader).addClass('hidden');
 
     // Show/hide MEGA for Business/ Try Individual button
-    if (u_type > 0 || u_type === 0 && is_fm()) {
+    if (u_type > 0 || u_type === 0 && isFm) {
         $headerIndividual.addClass('hidden');
     }
     else {
@@ -2226,7 +2244,7 @@ function topmenuUI() {
         });
     }
 
-    if (u_type > 0 || is_fm()) {
+    if (u_type > 0 || isFm) {
         $headerButtons.addClass('hidden');
         $headerIndividual.addClass('hidden');
     }
@@ -2325,7 +2343,7 @@ function topmenuUI() {
             document.body.classList.add('free');
         }
 
-        if (is_fm()) {
+        if (isFm) {
             $menuRefreshItem.removeClass('hidden');
 
             if (self.d && !self.is_extension && !String(location.host).includes('mega.')) {
@@ -2434,7 +2452,7 @@ function topmenuUI() {
                 mLogout();
             }
             else {
-                var c = $('.dropdown.top-login-popup', $topHeader).attr('class');
+                var c = $('.dropdown.top-login-popup', 'body').attr('class');
                 if (c && c.indexOf('hidden') > -1) {
                     if (page === 'register') {
                         delay('registerloginevlog', () => eventlog(99818));
@@ -2519,7 +2537,7 @@ function topmenuUI() {
 
         if (!e || !e.target.closest('.top-login-popup') &&
             (!c || !c.includes('top-login-popup') && !c.includes('top-login-button'))) {
-            $('#pmlayout .dropdown.top-login-popup').addClass('hidden');
+            $('.dropdown.top-login-popup', 'body').addClass('hidden');
         }
 
         if (!e || !e.target.closest('.create-new-folder')) {
@@ -3008,7 +3026,11 @@ function parsepage(pagehtml) {
     }
     pagehtml = (($.mTransferWidgetPage || '') + pagehtml).replace(/{staticpath}/g, staticpath);
 
-    $('#startholder').safeHTML(pagehtml).removeClass('hidden');
+    const startHolder = document.getElementById('startholder');
+    const cn = startHolder.querySelector('.content-holder')
+        || mCreateElement('div', {class: 'content-holder'}, startHolder);
+    $(cn).safeHTML(pagehtml);
+    startHolder.classList.remove('hidden', 'empty');
 
     // With new mobile page render, startholder page should not have M.currentdirid kept to avoid bug
     if (is_mobile) {
@@ -3016,10 +3038,9 @@ function parsepage(pagehtml) {
     }
 
     // if this is bottom page & not Download Page we have to enforce light mode for now.
-    if (page === 'download') {
-        mega.ui.setTheme();
-    }
-    else if (page === 'login' || page.substring(0, 8) === 'register' || page === 'recovery') {
+    if (page === 'download' || pfid ||
+        page === 'login' || page.substring(0, 8) === 'register' || page === 'recovery') {
+
         mega.ui.setTheme();
         document.body.classList.add('bottom-pages');
     }
@@ -3078,6 +3099,10 @@ function loadSubPage(tpage, event) {
 
     if ('transferItOverlay' in T.ui && T.ui.transferItOverlay.data.active) {
         T.ui.transferItOverlay.hide();
+    }
+
+    if ('pm' in mega.ui) {
+        mega.ui.pm.closeUI();
     }
 
     if (window.textEditorVisible) {
@@ -3459,6 +3484,7 @@ mBroadcaster.addListener('fm:initialized', () => {
     'use strict';
 
     if (folderlink) {
+        topmenuUI();
         return;
     }
 

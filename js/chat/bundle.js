@@ -2,8 +2,8 @@
 (() => { // webpackBootstrap
 	const __webpack_modules__ = {
 
-3:
-(_, EXP_, REQ_) => {
+3
+(_, EXP_, REQ_) {
 
 "use strict";
 
@@ -2301,8 +2301,8 @@ Call.getUnsupportedBrowserMessage = () => navigator.userAgent.match(/Chrom(e|ium
 
 },
 
-77:
-(_, EXP_, REQ_) => {
+77
+(_, EXP_, REQ_) {
 
 "use strict";
 
@@ -2519,8 +2519,8 @@ const composedTextArea = ComposedTextArea;
 
 },
 
-110:
-(_, EXP_, REQ_) => {
+110
+(_, EXP_, REQ_) {
 
 "use strict";
 REQ_.d(EXP_, {
@@ -2590,8 +2590,8 @@ const getTimeIntervals = (timestamp, offsetFrom, interval = 30) => {
 
 },
 
-137:
-(_, EXP_, REQ_) => {
+137
+(_, EXP_, REQ_) {
 
 "use strict";
 REQ_.d(EXP_, {
@@ -3365,8 +3365,8 @@ ContactAwareComponent.unavailableNames = Object.create(null);
 
 },
 
-161:
-(_, EXP_, REQ_) => {
+161
+(_, EXP_, REQ_) {
 
 "use strict";
 REQ_.d(EXP_, {
@@ -3408,8 +3408,8 @@ ColumnFavIcon.headerClassName = "grid-first-th fav";
 
 },
 
-168:
-(__webpack_module__, EXP_, REQ_) => {
+168
+(__webpack_module__, EXP_, REQ_) {
 
 "use strict";
 REQ_.d(EXP_, {
@@ -3428,8 +3428,8 @@ function _extends() {
 
 },
 
-173:
-(_, EXP_, REQ_) => {
+173
+(_, EXP_, REQ_) {
 
 "use strict";
 
@@ -3542,21 +3542,39 @@ class ColumnContactName extends genericNodePropsComponent.B {
   static get label() {
     return l[86];
   }
-  render() {
+  get name() {
+    const {
+      nodeAdapter,
+      node
+    } = this.props;
+    if (nodeAdapter.nodeProps) {
+      return nodeAdapter.nodeProps.title;
+    }
+    return M.getNameByEmail(node.m);
+  }
+  _renderAvatar() {
     const {
       nodeAdapter
     } = this.props;
     const {
       node
     } = nodeAdapter.props;
-    return REaCt().createElement("td", null, REaCt().createElement(contacts.Avatar, {
-      contact: node,
-      className: "avatar-wrapper box-avatar"
-    }), REaCt().createElement("div", {
+    if (nodeAdapter.nodeProps || node.name !== '') {
+      return REaCt().createElement(contacts.Avatar, {
+        contact: node,
+        className: "avatar-wrapper box-avatar"
+      });
+    } else if (node.name === '') {
+      return REaCt().createElement(utils.P9, null, useravatar.contact(node.m, 'box-avatar'));
+    }
+    return null;
+  }
+  render() {
+    return REaCt().createElement("td", null, this._renderAvatar(), REaCt().createElement("div", {
       className: "contact-item"
     }, REaCt().createElement("div", {
       className: "contact-item-user"
-    }, REaCt().createElement(utils.sp, null, nodeAdapter.nodeProps.title)), REaCt().createElement(this.Mail, null)), REaCt().createElement("div", {
+    }, REaCt().createElement(utils.sp, null, this.name)), REaCt().createElement(this.Mail, null)), REaCt().createElement("div", {
       className: "clear"
     }));
   }
@@ -4220,11 +4238,14 @@ ColumnContactRequestsRcvdBtns.megatype = "grid-url-header-nw contact-controls-co
 const ReceivedRequests = ({
   received
 }) => {
+  const nameOrEmailColumn = received.mixed ? ColumnContactName : [ColumnContactRequestsEmail, {
+    currView: "ipc"
+  }];
   return REaCt().createElement("div", {
     className: "contacts-list"
   }, REaCt().createElement(fmView.A, {
     sortFoldersFirst: false,
-    dataSource: received,
+    dataSource: received.data,
     customFilterFn: r => {
       return !r.dts;
     },
@@ -4238,9 +4259,7 @@ const ReceivedRequests = ({
     megaListItemHeight: 59,
     headerContainerClassName: "contacts-table requests-table contacts-table-head",
     containerClassName: "contacts-table requests-table contacts-table-results",
-    listAdapterColumns: [[ColumnContactRequestsEmail, {
-      currView: "ipc"
-    }], [ColumnContactRequestsTs, {
+    listAdapterColumns: [nameOrEmailColumn, [ColumnContactRequestsTs, {
       label: l[19505]
     }], [ColumnContactRequestsRcvdBtns, {
       onReject: handle => {
@@ -4747,8 +4766,8 @@ class ContactsPanel extends mixins.w9 {
     };
     this.handleAcceptAllRequests = () => {
       const {
-        received
-      } = this.props;
+        data: received
+      } = this.props.received;
       const receivedKeys = Object.keys(received || {});
       if (receivedKeys.length) {
         for (let i = receivedKeys.length; i--;) {
@@ -4881,16 +4900,16 @@ ContactsPanel.getUserFingerprint = handle => {
 
 },
 
-206:
-(module) => {
+206
+(module) {
 
 "use strict";
 module.exports = ReactDOM;
 
 },
 
-251:
-(_, EXP_, REQ_) => {
+251
+(_, EXP_, REQ_) {
 
 "use strict";
 REQ_.r(EXP_);
@@ -6331,8 +6350,8 @@ class ContactPickerDialog extends _mixins2__.w9 {
 
 },
 
-269:
-(_, EXP_, REQ_) => {
+269
+(_, EXP_, REQ_) {
 
 "use strict";
 REQ_.r(EXP_);
@@ -6504,8 +6523,8 @@ window.ChatCallIncomingDialog = Incoming;
 
 },
 
-280:
-(_, EXP_, REQ_) => {
+280
+(_, EXP_, REQ_) {
 
 "use strict";
 REQ_.d(EXP_, {
@@ -6559,8 +6578,8 @@ class Link extends react0().Component {
 
 },
 
-314:
-(_, EXP_, REQ_) => {
+314
+(_, EXP_, REQ_) {
 
 "use strict";
 REQ_.d(EXP_, {
@@ -6725,8 +6744,8 @@ const __WEBPACK_DEFAULT_EXPORT__ = {
 
 },
 
-318:
-(_, EXP_, REQ_) => {
+318
+(_, EXP_, REQ_) {
 
 "use strict";
 
@@ -7280,8 +7299,8 @@ const modalDialogs = {
 
 },
 
-326:
-(_, EXP_, REQ_) => {
+326
+(_, EXP_, REQ_) {
 
 "use strict";
 
@@ -8867,9 +8886,9 @@ Chat.prototype.init = promisify(function (resolve, reject) {
     }
     if (is_chatlink) {
       const start = document.getElementById('startholder');
-      this.flyoutStartHolder = document.createElement('div');
-      this.flyoutStartHolder.className = 'flyout-holder';
-      start.appendChild(this.flyoutStartHolder);
+      this.flyoutStartHolder = start.querySelector('.flyout-holder') || mCreateElement('div', {
+        class: 'flyout-holder'
+      }, start);
     }
     const selector = is_chatlink ? '.chat-links-preview > .chat-app-container' : '.section.conversations';
     const rootDOMNode = this.rootDOMNode = document.querySelector(selector);
@@ -10783,8 +10802,8 @@ const chat = {
 
 },
 
-414:
-(_, EXP_, REQ_) => {
+414
+(_, EXP_, REQ_) {
 
 "use strict";
 REQ_.d(EXP_, {
@@ -11359,8 +11378,8 @@ class AudioLevelIndicator extends react0().Component {
 
 },
 
-415:
-(_, EXP_, REQ_) => {
+415
+(_, EXP_, REQ_) {
 
 "use strict";
 
@@ -13891,8 +13910,8 @@ class stream_Stream extends mixins.w9 {
 
 },
 
-424:
-(_, EXP_, REQ_) => {
+424
+(_, EXP_, REQ_) {
 
 "use strict";
 REQ_.d(EXP_, {
@@ -14272,8 +14291,8 @@ class ChatToastMsg extends react0().Component {
 
 },
 
-438:
-(_, EXP_, REQ_) => {
+438
+(_, EXP_, REQ_) {
 
 "use strict";
 
@@ -19498,8 +19517,8 @@ function isStartCallDisabled(room) {
 
 },
 
-446:
-(_, EXP_, REQ_) => {
+446
+(_, EXP_, REQ_) {
 
 "use strict";
 REQ_.d(EXP_, {
@@ -19886,8 +19905,8 @@ class ConversationMessageMixin extends _mixins1__.u9 {
 
 },
 
-485:
-(_, EXP_, REQ_) => {
+485
+(_, EXP_, REQ_) {
 
 "use strict";
 REQ_.d(EXP_, {
@@ -20094,8 +20113,8 @@ const __WEBPACK_DEFAULT_EXPORT__ = (0,_mixins_js1__.Zz)(_permissionsObserver_jsx
 
 },
 
-486:
-(_, EXP_, REQ_) => {
+486
+(_, EXP_, REQ_) {
 
 "use strict";
 REQ_.d(EXP_, {
@@ -20405,8 +20424,8 @@ const PerfectScrollbar = (_dec = (0,_chat_mixins1__.hG)(30, true), _dec2 = (0,_c
 
 },
 
-489:
-(_, EXP_, REQ_) => {
+489
+(_, EXP_, REQ_) {
 
 "use strict";
 REQ_.d(EXP_, {
@@ -21117,8 +21136,8 @@ const __WEBPACK_DEFAULT_EXPORT__ = (0,_mixins2__.Zz)(_micObserver_jsx5__.Q, _per
 
 },
 
-501:
-(_, EXP_, REQ_) => {
+501
+(_, EXP_, REQ_) {
 
 "use strict";
 REQ_.d(EXP_, {
@@ -21165,8 +21184,8 @@ const withUpdateObserver = Component => class extends _mixins_js2__.w9 {
 
 },
 
-539:
-(_, EXP_, REQ_) => {
+539
+(_, EXP_, REQ_) {
 
 "use strict";
 REQ_.d(EXP_, {
@@ -21339,8 +21358,8 @@ VideoNodeMenu.NAMESPACE = 'node-menu';
 
 },
 
-542:
-(_, EXP_, REQ_) => {
+542
+(_, EXP_, REQ_) {
 
 "use strict";
 REQ_.d(EXP_, {
@@ -21689,8 +21708,8 @@ const withPermissionsObserver = Component => {
 
 },
 
-553:
-(_, EXP_, REQ_) => {
+553
+(_, EXP_, REQ_) {
 
 "use strict";
 // ESM COMPAT FLAG
@@ -23766,16 +23785,16 @@ const chatRoom = {
 
 },
 
-594:
-(module) => {
+594
+(module) {
 
 "use strict";
 module.exports = React;
 
 },
 
-623:
-() => {
+623
+() {
 
 (function () {
   const ChatGlobalEventManager = function () {};
@@ -23806,8 +23825,8 @@ module.exports = React;
 
 },
 
-691:
-(_, EXP_, REQ_) => {
+691
+(_, EXP_, REQ_) {
 
 "use strict";
 
@@ -24265,8 +24284,8 @@ class GifPanel extends REaCt().Component {
 
 },
 
-701:
-(_, EXP_, REQ_) => {
+701
+(_, EXP_, REQ_) {
 
 "use strict";
 
@@ -25806,8 +25825,10 @@ class FMView extends mixins.w9 {
       currentlyViewedEntry: prevEntry,
       searchValue: prevSearch
     } = prevProps;
-    if (prevEntry !== currEntry || currSearch !== prevSearch) {
+    const dataSourceChanged = this.props.dataSource !== prevProps.dataSource;
+    if (dataSourceChanged || prevEntry !== currEntry || currSearch !== prevSearch) {
       let _this$dataSource3;
+      this.dataSource = this.props.dataSource;
       const newState = {
         'selected': [],
         'highlighted': []
@@ -25951,8 +25972,8 @@ class FMView extends mixins.w9 {
 
 },
 
-707:
-(_, EXP_, REQ_) => {
+707
+(_, EXP_, REQ_) {
 
 "use strict";
 REQ_.d(EXP_, {
@@ -25973,8 +25994,8 @@ class MetaRichpreviewLoading extends ConversationMessageMixin {
 
 },
 
-732:
-(_, EXP_, REQ_) => {
+732
+(_, EXP_, REQ_) {
 
 "use strict";
 
@@ -30590,7 +30611,8 @@ class ConversationsApp extends mixins.w9 {
       freeCallEndedDialog: false,
       contactSelectorDialog: false,
       view: VIEWS.LOADING,
-      callExpanded: false
+      callExpanded: false,
+      ipcData: null
     };
     this._cacheRouting();
     megaChat.rebind('onStartNewMeeting.convApp', () => this.startMeeting());
@@ -30690,13 +30712,47 @@ class ConversationsApp extends mixins.w9 {
         v: Chatd.VERSION
       }).catch(dump);
     }
+    this.requestReceivedListener = mBroadcaster.addListener('fmViewUpdate:ipc', () => {
+      this.setState({
+        ipcData: this.makeIpcData()
+      });
+    });
+    this.setState({
+      ipcData: this.makeIpcData()
+    });
   }
   componentWillUnmount() {
     super.componentWillUnmount();
     $(document).off('keydown.megaChatTextAreaFocus');
+    mBroadcaster.removeListener('fmViewUpdate:ipc', this.requestReceivedListener);
   }
-  componentDidUpdate() {
+  componentDidUpdate(prevProps, prevState) {
     this.handleOnboardingStep();
+    const {
+      names: prevNames
+    } = prevState.ipcData;
+    const newIpcData = this.makeIpcData();
+    const {
+      names: newNames
+    } = newIpcData;
+    if (newNames.size !== prevNames.size) {
+      this.setState({
+        ipcData: newIpcData
+      });
+      return;
+    }
+    let different = false;
+    for (const [email, name] of newNames) {
+      if (!prevNames.has(email) || prevNames.get(email) !== name) {
+        different = true;
+        break;
+      }
+    }
+    if (different) {
+      this.setState({
+        ipcData: newIpcData
+      });
+    }
   }
   handleOnboardingStep() {
     if (this.state.view === VIEWS.LOADING) {
@@ -30722,6 +30778,29 @@ class ConversationsApp extends mixins.w9 {
         megaChat.renderListing(null, false).catch(dump);
       }
     });
+  }
+  makeIpcData() {
+    let mixed = false;
+    const names = new Map();
+    const data = Object.values(M.ipc).reduce((acc, curr) => {
+      const name = M.getNameByEmail(curr.m);
+      if (name !== curr.m) {
+        names.set(curr.m, name);
+        mixed = true;
+      }
+      return {
+        ...acc,
+        [curr.p]: {
+          ...curr,
+          name
+        }
+      };
+    }, Object.create(null));
+    return {
+      mixed,
+      data,
+      names
+    };
   }
   render() {
     const {
@@ -30757,7 +30836,7 @@ class ConversationsApp extends mixins.w9 {
     }), !isLoading && routingSection === 'contacts' && REaCt().createElement(contactsPanel.A, {
       megaChat,
       contacts: M.u,
-      received: M.ipc,
+      received: this.state.ipcData,
       sent: M.opc
     }), !isLoading && routingSection === 'notFound' && REaCt().createElement("span", null, REaCt().createElement("center", null, "Section not found")), !isLoading && isEmpty && REaCt().createElement(conversationpanel.Yk, {
       isMeeting: view === MEETINGS,
@@ -30898,8 +30977,8 @@ const conversations = {
 
 },
 
-757:
-(_, EXP_, REQ_) => {
+757
+(_, EXP_, REQ_) {
 
 "use strict";
 REQ_.d(EXP_, {
@@ -31171,8 +31250,8 @@ window.ScheduleMetaChange = ScheduleMetaChange;
 
 },
 
-772:
-(_, EXP_, REQ_) => {
+772
+(_, EXP_, REQ_) {
 
 "use strict";
 REQ_.d(EXP_, {
@@ -31273,8 +31352,8 @@ const withMicObserver = Component => class extends _mixins2__.w9 {
 
 },
 
-793:
-(__webpack_module__, EXP_, REQ_) => {
+793
+(__webpack_module__, EXP_, REQ_) {
 
 "use strict";
 REQ_.d(EXP_, {
@@ -31292,8 +31371,8 @@ function _applyDecoratedDescriptor(i, e, r, n, l) {
 
 },
 
-795:
-(_, EXP_, REQ_) => {
+795
+(_, EXP_, REQ_) {
 
 "use strict";
 
@@ -32176,8 +32255,8 @@ const TypingArea = (_dec = (0,mixins.hG)(54, true), _class = class TypingArea ex
 
 },
 
-814:
-(_, EXP_, REQ_) => {
+814
+(_, EXP_, REQ_) {
 
 "use strict";
 
@@ -33297,8 +33376,8 @@ const HistoryPanel = (_dec = (0,mixins.hG)(450, true), _class = class HistoryPan
 
 },
 
-815:
-(_, EXP_, REQ_) => {
+815
+(_, EXP_, REQ_) {
 
 "use strict";
 REQ_.d(EXP_, {
@@ -33526,8 +33605,8 @@ class InviteParticipantsPanel extends react0().Component {
 
 },
 
-818:
-(_, EXP_, REQ_) => {
+818
+(_, EXP_, REQ_) {
 
 "use strict";
 REQ_.d(EXP_, {
@@ -33578,8 +33657,8 @@ const __WEBPACK_DEFAULT_EXPORT__ = {
 
 },
 
-844:
-(_, EXP_, REQ_) => {
+844
+(_, EXP_, REQ_) {
 
 "use strict";
 REQ_.d(EXP_, {
@@ -34017,8 +34096,8 @@ DropdownEmojiSelector.defaultProps = {
 
 },
 
-890:
-(_, EXP_, REQ_) => {
+890
+(_, EXP_, REQ_) {
 
 "use strict";
 
@@ -36314,8 +36393,8 @@ class GenericConversationMessage extends mixin.M {
 
 },
 
-911:
-(_, EXP_, REQ_) => {
+911
+(_, EXP_, REQ_) {
 
 "use strict";
 REQ_.r(EXP_);
@@ -36706,8 +36785,8 @@ DropdownItem.defaultProps = {
 
 },
 
-959:
-(_, EXP_, REQ_) => {
+959
+(_, EXP_, REQ_) {
 
 "use strict";
 REQ_.d(EXP_, {
@@ -36830,8 +36909,8 @@ const __WEBPACK_DEFAULT_EXPORT__ = Button;
 
 },
 
-972:
-(_, EXP_, REQ_) => {
+972
+(_, EXP_, REQ_) {
 
 "use strict";
 REQ_.d(EXP_, {
@@ -36953,8 +37032,8 @@ const withHostsObserver = Component => {
 
 },
 
-984:
-(_, EXP_, REQ_) => {
+984
+(_, EXP_, REQ_) {
 
 "use strict";
 
@@ -37179,8 +37258,8 @@ class GenericNodePropsComponent extends mixins.w9 {
 
 },
 
-994:
-(_, EXP_, REQ_) => {
+994
+(_, EXP_, REQ_) {
 
 "use strict";
 REQ_.d(EXP_, {
@@ -37363,7 +37442,7 @@ class Button extends _chat_mixins_js2__.w9 {
 
 	// The module cache
 	const __webpack_module_cache__ =Object.create(null);
-
+	
 	// The require function
 	function REQ_(moduleId) {
 		// Check if module is in cache
@@ -37377,16 +37456,16 @@ class Button extends _chat_mixins_js2__.w9 {
 			// no module.loaded needed
 			exports:Object.create(null)
 		};
-
+	
 		// Execute the module function
 		__webpack_modules__[moduleId](module, module.exports, REQ_);
-
+	
 		// Return the exports of the module
 		return module.exports;
 	}
+	
 
-
-
+	
 	(() => {
 		// getDefaultExport function for compatibility with non-harmony modules
 		REQ_.n = (module) => {
@@ -37397,8 +37476,8 @@ class Button extends _chat_mixins_js2__.w9 {
 			return getter;
 		};
 	})();
-
-
+	
+	
 	(() => {
 		// define getter functions for harmony exports
 		REQ_.d = (exports, definition) => {
@@ -37409,13 +37488,13 @@ class Button extends _chat_mixins_js2__.w9 {
 			}
 		};
 	})();
-
-
+	
+	
 	(() => {
 		REQ_.o = (obj, prop) => Object.prototype.hasOwnProperty.call(obj, prop)
 	})();
-
-
+	
+	
 	(() => {
 		// define __esModule on exports
 		REQ_.r = (exports) => {
@@ -37425,14 +37504,14 @@ class Button extends _chat_mixins_js2__.w9 {
 			Object.defineProperty(exports, '__esModule', { value: true });
 		};
 	})();
+	
 
-
-
+	
 	// startup
 	// Load entry module and return exports
 	REQ_(326);
 	// This entry module is referenced by other modules so it can't be inlined
 	const EXP_ = REQ_(732);
-
+	
 })()
 ;

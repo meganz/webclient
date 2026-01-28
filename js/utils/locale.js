@@ -2037,6 +2037,11 @@ mBroadcaster.once('boot_done', function populate_l() {
     l.coinify_req_dob_or_tax = escapeHTML(l.coinify_req_dob_or_tax)
         .replace('[A]', '<a href="https://www.coinify.com/privacy-policy-payers" target="_blank" class="clickurl">')
         .replace('[/A]', '</a>');
+    l.total_price = escapeHTML(l.total_price)
+        .replace('[S]', '<span class="bold">').replace('[/S]', '</span>');
+    l.total_price_taxed = escapeHTML(l.total_price_taxed)
+        .replace('[S1]', '<span class="bold">').replace('[/S1]', '</span>')
+        .replace('[S2]', '<span class="tax">').replace('[/S2]', '</span>');
 
     const common = [
         15536, 16119, 16120, 16313, 16316, 16360, 18228, 18268, 18282,
@@ -2061,7 +2066,8 @@ mBroadcaster.once('boot_done', function populate_l() {
         'lna_grant_p2',
         'lna_grant_warning',
         'lna_reset_p1',
-        'lna_reset_p3'
+        'lna_reset_p3',
+        'propay_discount_title',
     ];
     for (let i = common.length; i--;) {
         var num = common[i];

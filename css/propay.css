@@ -1057,6 +1057,18 @@
 #propay .fixed-continue-btn {
     display: none;
 }
+#propay .fixed-continue-btn .pricing-note-fixed-txt {
+    margin-bottom: 14px;
+    font: var(--text-inter-400-16);
+}
+#propay .fixed-continue-btn .pricing-note-fixed-txt .bold {
+    font: var(--text-inter-600-16);
+}
+#propay .fixed-continue-btn .pricing-note-fixed-txt .tax {
+    font: var(--text-inter-400-14);
+    color: var(--text-color-secondary);
+}
+
 
 /* Skeleton loading */
 #propay .sk-loading-pro i.sk-elm-pro {

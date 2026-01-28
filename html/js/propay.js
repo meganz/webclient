@@ -1588,6 +1588,8 @@ pro.propay = {
         let planNameTitleString;
         let planNameCardString;
 
+        this.discountInfo = this.getDiscount();
+
         if (this.planObj.isIn('validFeatures')) {
             let titleStringKey;
             if (this.planObj.level === pro.ACCOUNT_LEVEL_FEATURE_PWM) {
@@ -1606,6 +1608,18 @@ pro.propay = {
             }
 
             planNameTitleString = l[titleStringKey];
+        }
+        else if (this.discountInfo) {
+            planNameTitleString = l.propay_discount_title
+                .replace('%1', (this.instantDiscount
+                    ? this.planObj.instantDiscount.name : this.discountInfo.dn)
+                    || l.special_offer)
+                .replace('%2', formatPercentage(pro.calculateSavings([
+                    this.discountInfo.pd,
+                    this.planObj.months === 12 && this.instantDiscount ? pro.yearlyDiscountPercentage : 0
+                ])))
+                .replace('%3', this.planObj.name)
+                .replace('%4', this.getNumOfMonthsWording(this.discountInfo.m ||this.planObj.months, true));
         }
         else {
             planNameTitleString = l.you_have_selected_pro_plan.replace('%1', `<span>${this.planObj.name}</span>`);
@@ -1801,6 +1815,7 @@ pro.propay = {
         const currentDiscount = this.instantDiscount ? this.planObj.instantDiscount : discountInfo;
 
         const $discountHeader = $('.discount-header', $planCard).addClass('hidden').removeClass('annual-discount');
+        const $totalPrice = $('.pricing-note-fixed-txt', this.$page).addClass('hidden');
 
         // TODO: Clean this up
         if (currentDiscount && discountInfo.md && discountInfo.pd && discountInfo.al === pro.propay.planNum) {
@@ -1812,8 +1827,7 @@ pro.propay = {
             }
 
             const createPriceHTML = (price, noAsterisk) => {
-                return `${price}
-                <span class="local">${(isEuro || noAsterisk) ? '' : '*'}<span>
+                return `${price}<span class="local">${(isEuro || noAsterisk) ? '' : '*'}<span>
                 <span class="currency"> ${this.planObj.currency}</span>`;
             };
 
@@ -1878,10 +1892,22 @@ pro.propay = {
             }
 
             if (addNumMonths) {
-                discountHeaderText += ` (${this.getNumOfMonthsWording(discountDuration, true)})`;
+                discountHeaderText += ` - ${this.getNumOfMonthsWording(discountDuration, true)}`;
             }
 
             $discountHeader.text(discountHeaderText).removeClass('hidden');
+
+            if (is_mobile) {
+                $totalPrice
+                    .safeHTML((this.planObj.taxInfo ? l.total_price_taxed : l.total_price)
+                        .replace('%1', newPrice)
+                        .replace('%2', pro.taxInfo
+                            && (pro.taxInfo.taxName + ' ' + formatPercentage(pro.taxInfo.taxPercent))))
+                    .removeClass('hidden');
+            }
+            else {
+                $totalPrice.addClass('hidden');
+            }
 
             $('.price', $planCard).safeHTML(newPrice);
             $('.pre-discount-price', $planCard).safeHTML(oldPrice);

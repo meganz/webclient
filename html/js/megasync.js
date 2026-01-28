@@ -262,17 +262,13 @@ var megasync = (function() {
                         if (!timer) {
                             timer = tSleep(3);
                             timer.then(() => {
-                                if (lastXHRStatus === 0 && lastXHRState < 4) {
+                                if (lastXHRStatus === 0) {
                                     // Recheck permissions just in case they denied in the timeout
                                     // eslint-disable-next-line compat/compat -- Safari/incompatible shouldn't reach it
                                     navigator.permissions.query({ name: 'local-network-access' })
                                         .then(({ state }) => {
                                             if (state === 'denied') {
                                                 return promptDeniedPermission();
-                                            }
-                                            // In case it progressed during the permission lookup
-                                            if (lastXHRState === 4) {
-                                                return;
                                             }
                                             if (state === 'prompt' && !sessionStorage.promptedLna) {
                                                 sessionStorage.promptedLna = 1;
@@ -293,6 +289,11 @@ var megasync = (function() {
                         }
                         lastXHRState = ev.target.readyState;
                         lastXHRStatus = ev.target.status;
+                        if (timer && lastXHRStatus === 0 && lastXHRState === 4) {
+                            // Progressed to finished but status is wrong.
+                            // Probably hit the permission which will reject the promise so allow the timer to elapse
+                            timer = false;
+                        }
                     };
                 }
             },

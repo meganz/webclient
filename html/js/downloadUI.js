@@ -31,7 +31,8 @@ lazy(mega.ui, 'dlPage', () => {
 
             node = ce('div', header, {class: 'actions'});
 
-            // Report Abuse button
+            // Report Abuse button. Hidden until new dialog is implemented
+            /*
             subNode = new MegaButton({
                 parentNode: node,
                 type: 'icon',
@@ -48,6 +49,7 @@ lazy(mega.ui, 'dlPage', () => {
                 },
                 eventLog: 501059
             });
+            */
 
             // Download/Save/Resume button
             this.dlButton = new MegaButton({

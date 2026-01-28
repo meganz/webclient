@@ -1112,7 +1112,8 @@ scparser.$add('t', function(a, scnodes) {
 
     // notification logic
     if (fminitialized && !pfid && a.ou !== u_handle
-        && rootNode && rootNode.p && !rootNode.su) {
+        && rootNode && rootNode.p && !rootNode.su
+        && (a.ou || !mega.infinity || M.c[rootNode.p] || M.tnc[rootNode.p])) {
 
         const targetid = rootNode.p;
         const pnodes = [];

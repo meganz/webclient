@@ -3199,7 +3199,7 @@ MegaData.prototype.getTreeHandles = function _(h, seen) {
     for (var i = tree.length; i--;) {
         if (seen[tree[i]]) {
             console.error('Circular reference detected in getTreeHandles', tree[i]);
-            eventlog(501088, JSON.stringify([1, tree[i], M.getNodeRoot(tree[i])]), true);
+            eventlog(501088, JSON.stringify([1, M.currentdirid, tree[i], M.getNodeRoot(tree[i])]), true);
         }
         else {
             seen[tree[i]] = 1;

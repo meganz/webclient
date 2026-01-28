@@ -1,482 +1,269 @@
-<div class="bottom-page download scroll-block selectable-txt">
+<div class="bottom-page download download-page selectable-txt hidden">
     ((TOP))
-    <div class="download-content download download-page">
+     <section class="download-grid">
+            
+        <!-- Download header container !-->
+        <div class="dl-header-container"></div>
+         
+         <!-- Download widget container !-->
+         <div class="dl-widget-container"></div>
 
-        <div id="commercial-close-button" class="commercial-close-button hidden">
-            <i class="sprite-fm-mono icon-dialog-close"></i>
-        </div>
+        <!-- Content block !-->
+        <div class="download main-pad">
+            <div class="download transfer-wrapper">
 
-        <section class="download-grid js-download-scroll-panel">
+                <!-- Video block -->
+                <div class="download video-block theme-dark-forced hidden">
+                    <div class="media-viewer">
+                        <section class="content" data-fullscreen="false">
+                            <video id="video" data-autoplayvideo="false" data-playvideoonclick="false"></video>
 
-                <div class="download main-pad">
-                    <div class="download transfer-wrapper">
-                        <!-- Video block -->
-                        <div class="download video-block theme-dark-forced">
-                            <div class="media-viewer">
-                                <section class="content" data-fullscreen="false">
-                                    <video id="video" data-autoplayvideo="false" data-playvideoonclick="false"></video>
-
-                                    <div class="loader-grad hidden">
-                                        <i class="sprite-fm-mono icon-loader-grad-small-regular-outline"></i>
-                                    </div>
-
-                                    <div class="download play-video-button">
-                                        <i class="sprite-fm-mono icon-play-small-regular-solid"></i>
-                                    </div>
-
-                                    <div class="play-pause-video-button hidden">
-                                        <i class="sprite-fm-mono icon-play-small-regular-solid"></i>
-                                    </div>
-
-                                    <div class="watch-again-button hidden">
-                                        <i class="sprite-fm-mono icon-rotate-ccw-small-regular-outline"></i>
-                                        <span>[$video_player_watch_again]</span>
-                                    </div>
-
-                                    <div class="watch-again-button-overlay"></div>
-
-                                    <div class="bouncing-loader viewer-pending hidden">
-                                        <span></span><span></span><span></span>
-                                    </div>
-
-                                    <div class="loader-grad-overlay"></div>
-                                </section>
-
-                                <footer>
-                                    <nav class="viewer-bars video-controls hidden" data-state="hidden">
-                                        <div class="video-progress-block">
-                                            <div class="video-progress-bar">
-                                                <div class="video-time-bar"></div>
-                                                <div class="video-expected-time-bar">
-                                                    <div class="video-progress-time">
-                                                        00:00
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <ul class="bar">
-                                            <li>
-                                                <div class="playpause-wrapper wrapper">
-                                                    <button class="v-btn playpause" aria-label="[[play pause]]" data-state="play">
-                                                        <!-- Active state: .icon-pause !-->
-                                                        <i class="sprite-fm-mono icon-play-small-regular-outline"></i>
-                                                    </button>
-                                                    <div class="tooltip">
-                                                        [$video_player_play]
-                                                    </div>
-                                                </div>
-                                                <div class="vol-wrapper wrapper">
-                                                    <button class="v-btn mute" data-state="mute" aria-label="[[volume]]">
-                                                        <!-- Active state: .icon-volume-muted !-->
-                                                        <i class="sprite-fm-mono icon-volume-max-small-regular-outline"></i>
-                                                    </button>
-                                                    <div class="video-vol-range">
-                                                        <div class="volume-bar"><span></span></div>
-                                                    </div>
-                                                    <div class="tooltip">
-                                                        [$video_player_mute]
-                                                    </div>
-                                                </div>
-                                            </li>
-                                            <li class="timing">
-                                                <div class="video-timing current">
-                                                    00:00
-                                                </div>
-                                                <div>
-                                                    /
-                                                </div>
-                                                <div class="video-timing duration">
-                                                    00:00
-                                                </div>
-                                            </li>
-                                            <li>
-                                                <div class="speed-wrapper wrapper">
-                                                    <button class="v-btn speed" aria-label="[[speed]]" data-state="speed">
-                                                        <i class="sprite-fm-mono icon-playback-1x-small-regular-outline"></i>
-                                                    </button>
-                                                    <div class="tooltip">
-                                                        [$video_player_playback_speed]
-                                                    </div>
-                                                </div>
-                                                <div class="repeat-wrapper wrapper">
-                                                    <button class="v-btn repeat" aria-label="[[repeat]]" data-state="repeat">
-                                                        <i class="sprite-fm-mono icon-repeat-one-small-regular-solid"></i>
-                                                    </button>
-                                                    <div class="tooltip">
-                                                        [$video_player_repeat]
-                                                    </div>
-                                                </div>
-                                                <div class="subtitles-wrapper wrapper">
-                                                    <button class="v-btn subtitles" aria-label="[[subtitles]]" data-state="subtitles">
-                                                        <i class="sprite-fm-mono icon-subtitles-02-small-regular-outline"></i>
-                                                    </button>
-                                                    <div class="tooltip">
-                                                        [$video_player_subtitles]
-                                                    </div>
-                                                </div>
-                                                <div class="settings-wrapper wrapper">
-                                                    <button class="v-btn settings" aria-label="[[settings]]" data-state="settings">
-                                                        <i class="sprite-fm-mono icon-settings-02-small-regular-outline"></i>
-                                                    </button>
-                                                    <div class="tooltip">
-                                                        [$823]
-                                                    </div>
-                                                </div>
-                                                <div class="fs-wrapper wrapper">
-                                                    <button class="v-btn fs" aria-label="[[fullscreen]]" data-state="go-fullscreen">
-                                                        <!-- Active state: .icon-fullscreen-leave !-->
-                                                        <i class="sprite-fm-mono icon-maximize-02-small-regular-outline"></i>
-                                                    </button>
-                                                    <div class="tooltip">
-                                                        [$video_player_fullscreen]
-                                                    </div>
-                                                </div>
-                                            </li>
-                                        </ul>
-                                    </nav>
-
-                                    <div class="viewer-vad-control lato hidden"></div>
-                                    <div class="viewer-vad-info hidden">
-                                        <div class="vad-info-title">
-                                            <i></i>
-                                            <p></p>
-                                        </div>
-                                        <div class="vad-info-txt"></div>
-                                        <button class="mega-button positive">
-                                            <span>[$ad_more]</span>
-                                        </button>
-                                    </div>
-
-                                    <div class="video-progress-bar vad" title="">
-                                        <div class="video-time-bar"></div>
-                                    </div>
-
-                                    <template id="media-viewer-speed-menu">
-                                        <nav class="context-menu playback-speed options-menu avoid-bottom" aria-expanded="false">
-                                            <ul>
-                                                <li>
-                                                    <div class="title">[$video_player_playback_speed]</div>
-                                                </li>
-                                                <li>
-                                                    <button class="05x">
-                                                        <span>[$video_player_speed_0.5x]</span>
-                                                        <i class="sprite-fm-mono icon-active icon-check-small-regular-outline hidden"></i>
-                                                    </button>
-                                                </li>
-                                                <li>
-                                                    <button class="1x">
-                                                        <span>[$video_player_speed_1x]</span>
-                                                        <i class="sprite-fm-mono icon-active icon-check-small-regular-outline"></i>
-                                                    </button>
-                                                </li>
-                                                <li>
-                                                    <button class="15x">
-                                                        <span>[$video_player_speed_1.5x]</span>
-                                                        <i class="sprite-fm-mono icon-active icon-check-small-regular-outline hidden"></i>
-                                                    </button>
-                                                </li>
-                                                <li>
-                                                    <button class="2x">
-                                                        <span>[$video_player_speed_2x]</span>
-                                                        <i class="sprite-fm-mono icon-active icon-check-small-regular-outline hidden"></i>
-                                                    </button>
-                                                </li>
-                                            </ul>
-                                        </nav>
-                                    </template>
-                                    <template id="media-viewer-video-settings-menu">
-                                        <nav class="context-menu settings options-menu avoid-bottom" aria-expanded="false">
-                                            <ul>
-                                                <li>
-                                                    <div class="settings-wrapper">
-                                                        <span>[$video_player_brightness]</span>
-                                                        <div class="settings-range">
-                                                            <span>0</span>
-                                                            <div class="settings-bar brightness-bar"><span></span></div>
-                                                            <div class="value">50</div>
-                                                            <span>100</span>
-                                                        </div>
-                                                    </div>
-                                                </li>
-                                                <li>
-                                                    <div class="settings-wrapper">
-                                                        <span>[$video_player_contrast]</span>
-                                                        <div class="settings-range">
-                                                            <span>0</span>
-                                                            <div class="settings-bar contrast-bar"><span></span></div>
-                                                            <div class="value">50</div>
-                                                            <span>100</span>
-                                                        </div>
-                                                    </div>
-                                                </li>
-                                                <li>
-                                                    <div class="settings-wrapper">
-                                                        <span>[$video_player_saturation]</span>
-                                                        <div class="settings-range">
-                                                            <span>0</span>
-                                                            <div class="settings-bar saturate-bar"><span></span></div>
-                                                            <div class="value">50</div>
-                                                            <span>100</span>
-                                                        </div>
-                                                    </div>
-                                                </li>
-                                                <li>
-                                                    <button class="reset-all invisible">[$video_player_reset_all]</button>
-                                                </li>
-                                            </ul>
-                                        </nav>
-                                    </template>
-                                </footer>
+                            <div class="loader-grad hidden">
+                                <i class="sprite-fm-mono icon-loader-grad-small-regular-outline"></i>
                             </div>
-                        </div>
 
-                        <!-- Textview block -->
-                        <div class="download textviewer-block js-text-viewer">
-                            <div class="text-editor">
-                                <section class="content js-textview">
-                                    <textarea class="txtar"></textarea>
-                                </section>
-                                <div class="item-type-icon-90 icon-text-90 js-text-viewer-icon hidden"></div>
+                            <div class="download play-video-button">
+                                <i class="sprite-fm-mono icon-play-small-regular-solid"></i>
                             </div>
+
+                            <div class="play-pause-video-button hidden">
+                                <i class="sprite-fm-mono icon-play-small-regular-solid"></i>
+                            </div>
+
+                            <div class="watch-again-button hidden">
+                                <i class="sprite-fm-mono icon-rotate-ccw-small-regular-outline"></i>
+                                <span>[$video_player_watch_again]</span>
+                            </div>
+
+                            <div class="watch-again-button-overlay"></div>
+
                             <div class="bouncing-loader viewer-pending hidden">
                                 <span></span><span></span><span></span>
                             </div>
-                        </div>
 
-                        <!-- Image Previewer block -->
-                        <div class="download image-block js-image-preview">
-                        </div>
+                            <div class="loader-grad-overlay"></div>
+                        </section>
 
-                        <div class="download info-block">
-                            <div class="file-type-wrapper">
-                                <div class="item-type-icon-90 icon-generic-90"></div>
-                            </div>
-                            <div class="download thumb-block">
-                                <img />
-                            </div>
-
-                            <div class="file-details-wrapper">
-                                <div class="title-container js-file-info">
-                                    <div class="title-block big-txt" >
-                                        <span class="filename"></span>
-                                        <span class="extension"></span>
-                                    </div>
-                                    <div class="file-size-block">
-                                        <div class="download info-txt small-txt"></div>
+                        <footer>
+                            <nav class="viewer-bars video-controls hidden" data-state="hidden">
+                                <div class="video-progress-block">
+                                    <div class="video-progress-bar">
+                                        <div class="video-time-bar"></div>
+                                        <div class="video-expected-time-bar">
+                                            <div class="video-progress-time">
+                                                00:00
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="links-container">
-
-                                    <button class="mega-button negative resume js-cancel-download hidden">
-                                        <span>[$1196]</span>
-                                    </button>
-
-                                    <button class="mega-button positive resume js-resume-download hidden">
-                                        <span>[$1649]</span>
-                                    </button>
-
-                                    <button class="mega-button positive save js-save-download hidden">
-                                        <span>[$776]</span>
-                                    </button>
-
-                                    <div class="merge-mega-button download js-download">
-                                        <button class="mega-button positive js-default-download">
-                                            <span>[$58]</span>
-                                        </button>
-
-                                        <div class="download-dropdown">
-                                            <button class="mega-button positive icon square">
-                                                <i class="sprite-fm-mono icon-arrow-down"></i>
+                                <ul class="bar">
+                                    <li>
+                                        <div class="playpause-wrapper wrapper">
+                                            <button class="v-btn playpause" aria-label="[[play pause]]" data-state="play">
+                                                <!-- Active state: .icon-pause !-->
+                                                <i class="sprite-fm-mono icon-play-small-regular-outline"></i>
                                             </button>
-                                            <div class="download-dropdown-content">
-                                                <div>
-                                                    <a class="js-standard-download">
-                                                        <i class="sprite-fm-mono icon-download"></i>
-                                                        <span>[$5928]</span>
-                                                    </a>
-                                                    <a class="js-megasync-download">
-                                                        <i class="sprite-fm-mono icon-session-history"></i>
-                                                        <span>[$btn_dlwitdeskapp]</span>
-                                                        <i class="sprite-fm-mono icon-question-filled simpletip" data-simpletip="[$tooltip_why_desktop_app]" data-simpletip-class="large-width center-align"></i>
-                                                    </a>
+                                            <div class="tooltip">
+                                                [$video_player_play]
+                                            </div>
+                                        </div>
+                                        <div class="vol-wrapper wrapper">
+                                            <button class="v-btn mute" data-state="mute" aria-label="[[volume]]">
+                                                <!-- Active state: .icon-volume-muted !-->
+                                                <i class="sprite-fm-mono icon-volume-max-small-regular-outline"></i>
+                                            </button>
+                                            <div class="video-vol-range">
+                                                <div class="volume-bar"><span></span></div>
+                                            </div>
+                                            <div class="tooltip">
+                                                [$video_player_mute]
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li class="timing">
+                                        <div class="video-timing current">
+                                            00:00
+                                        </div>
+                                        <div>
+                                            /
+                                        </div>
+                                        <div class="video-timing duration">
+                                            00:00
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="speed-wrapper wrapper">
+                                            <button class="v-btn speed" aria-label="[[speed]]" data-state="speed">
+                                                <i class="sprite-fm-mono icon-playback-1x-small-regular-outline"></i>
+                                            </button>
+                                            <div class="tooltip">
+                                                [$video_player_playback_speed]
+                                            </div>
+                                        </div>
+                                        <div class="repeat-wrapper wrapper">
+                                            <button class="v-btn repeat" aria-label="[[repeat]]" data-state="repeat">
+                                                <i class="sprite-fm-mono icon-repeat-one-small-regular-solid"></i>
+                                            </button>
+                                            <div class="tooltip">
+                                                [$video_player_repeat]
+                                            </div>
+                                        </div>
+                                        <div class="subtitles-wrapper wrapper">
+                                            <button class="v-btn subtitles" aria-label="[[subtitles]]" data-state="subtitles">
+                                                <i class="sprite-fm-mono icon-subtitles-02-small-regular-outline"></i>
+                                            </button>
+                                            <div class="tooltip">
+                                                [$video_player_subtitles]
+                                            </div>
+                                        </div>
+                                        <div class="settings-wrapper wrapper">
+                                            <button class="v-btn settings" aria-label="[[settings]]" data-state="settings">
+                                                <i class="sprite-fm-mono icon-settings-02-small-regular-outline"></i>
+                                            </button>
+                                            <div class="tooltip">
+                                                [$823]
+                                            </div>
+                                        </div>
+                                        <div class="fs-wrapper wrapper">
+                                            <button class="v-btn fs" aria-label="[[fullscreen]]" data-state="go-fullscreen">
+                                                <!-- Active state: .icon-fullscreen-leave !-->
+                                                <i class="sprite-fm-mono icon-maximize-02-small-regular-outline"></i>
+                                            </button>
+                                            <div class="tooltip">
+                                                [$video_player_fullscreen]
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </nav>
+
+                            <div class="viewer-vad-control lato hidden"></div>
+                            <div class="viewer-vad-info hidden">
+                                <div class="vad-info-title">
+                                    <i></i>
+                                    <p></p>
+                                </div>
+                                <div class="vad-info-txt"></div>
+                                <button class="mega-button positive">
+                                    <span>[$ad_more]</span>
+                                </button>
+                            </div>
+
+                            <div class="video-progress-bar vad" title="">
+                                <div class="video-time-bar"></div>
+                            </div>
+
+                            <template id="media-viewer-speed-menu">
+                                <nav class="context-menu playback-speed options-menu avoid-bottom" aria-expanded="false">
+                                    <ul>
+                                        <li>
+                                            <div class="title">[$video_player_playback_speed]</div>
+                                        </li>
+                                        <li>
+                                            <button class="05x">
+                                                <span>[$video_player_speed_0.5x]</span>
+                                                <i class="sprite-fm-mono icon-active icon-check-small-regular-outline hidden"></i>
+                                            </button>
+                                        </li>
+                                        <li>
+                                            <button class="1x">
+                                                <span>[$video_player_speed_1x]</span>
+                                                <i class="sprite-fm-mono icon-active icon-check-small-regular-outline"></i>
+                                            </button>
+                                        </li>
+                                        <li>
+                                            <button class="15x">
+                                                <span>[$video_player_speed_1.5x]</span>
+                                                <i class="sprite-fm-mono icon-active icon-check-small-regular-outline hidden"></i>
+                                            </button>
+                                        </li>
+                                        <li>
+                                            <button class="2x">
+                                                <span>[$video_player_speed_2x]</span>
+                                                <i class="sprite-fm-mono icon-active icon-check-small-regular-outline hidden"></i>
+                                            </button>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            </template>
+                            <template id="media-viewer-video-settings-menu">
+                                <nav class="context-menu settings options-menu avoid-bottom" aria-expanded="false">
+                                    <ul>
+                                        <li>
+                                            <div class="settings-wrapper">
+                                                <span>[$video_player_brightness]</span>
+                                                <div class="settings-range">
+                                                    <span>0</span>
+                                                    <div class="settings-bar brightness-bar"><span></span></div>
+                                                    <div class="value">50</div>
+                                                    <span>100</span>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </div>
-
-                                    <button class="mega-button download to-clouddrive rtl-block-if-rtl transition">
-                                        <span>[$btn_imptomega]</span>
-                                    </button>
-
-                                    <div class="options-dropdown">
-                                        <button class="mega-button icon square">
-                                            <i class="sprite-fm-mono icon-options"></i>
-                                        </button>
-                                        <div class="options-dropdown-content">
-                                            <div>
-                                                <a class="js-video-share video-share">
-                                                    <span>[$60]</span>
-                                                </a>
-                                                <a class="js-report-abuse report-abuse hidden">
-                                                    <span>[$btn_reportabuse]</span>
-                                                </a>
+                                        </li>
+                                        <li>
+                                            <div class="settings-wrapper">
+                                                <span>[$video_player_contrast]</span>
+                                                <div class="settings-range">
+                                                    <span>0</span>
+                                                    <div class="settings-bar contrast-bar"><span></span></div>
+                                                    <div class="value">50</div>
+                                                    <span>100</span>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                            <div class="message-container">
-                                <div class="download state-text resume hidden">
-                                    <span>[$17081]</span>
-                                </div>
-
-                                <div class="download state-text save hidden">
-                                    <span>[$17082]</span>
-                                </div>
-                            </div>
-
-                            <div class="progress-container download in-progress">
-                                <div class="progress-info-block">
-                                    <div class="progress-stats-block">
-                                        <div class="download main-transfer-info">
-                                            <span class="download eta-block left">
-                                                <i class="sprite-fm-mono icon-recents"></i>
-                                                <span class="dark-numbers"></span>
-                                                <span class="light-txt small"></span>
-                                            </span>
-
-                                            <span class="download complete-block">
-                                                <i class="sprite-fm-mono icon-check"></i>
-                                                <span class="dark-numbers">[$1418]</span>
-                                            </span>
-
-                                            <div class="download error-text main-transfer-error left hidden">
-                                                <i class="sprite-fm-mono icon-close-component"></i>
-                                                <span>[$233]</span>
+                                        </li>
+                                        <li>
+                                            <div class="settings-wrapper">
+                                                <span>[$video_player_saturation]</span>
+                                                <div class="settings-range">
+                                                    <span>0</span>
+                                                    <div class="settings-bar saturate-bar"><span></span></div>
+                                                    <div class="value">50</div>
+                                                    <span>100</span>
+                                                </div>
                                             </div>
-
-                                            <div class="clear"></div>
-                                        </div>
-                                        <div class="download speed-block">
-                                            <i class="sprite-fm-mono icon-down"></i>
-                                            <span class="dark-numbers"></span>
-                                            <span class="light-txt"></span>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <button class="mega-button action pause-transfer right hidden">
-                                            <i class="semi-small-icon icons-sprite pause"></i>
-                                            <span>[$9112]</span>
-                                        </button>
-                                        <button class="mega-button open-in-folder right hidden">
-                                            <i class="semi-small-icon icons-sprite folder-with-loupe"></i>
-                                            <span>[$20695]</span>
-                                        </button>
-                                        <button class="mega-button retry-transfer right hidden">
-                                            <i class="semi-small-icon icons-sprite grey-down-arrow"></i>
-                                            <span>[$1364]</span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div>
-                                    <div class="download progress-block">
-                                        <div class="download progress-bar"></div>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
-
-                        <!-- Remove hidden class from over-transfer-quota when a user has gone over the quota allowance -->
-                        <div class="download over-transfer-quota hidden">
-                            <div class="download overquota-message-block">
-                                <div class="download overquota-message transfer-overquota-txt">
-                                    <!-- [$7100] -->
-                                </div>
-                            </div>
-                            <div class="download overquoata-error">
-                                <i class="sprite-fm-mono icon-exclamation-filled"></i>
-                                <span>[$233]</span>
-                            </div>
-                            <div class="download video-transfer-buttons">
-                                <button class="mega-button resume-download js-resume-download">
-                                    <span>[$1649]</span>
-                                </button>
-                                <button class="mega-button positive see-our-plans">
-                                    <span>[$16353]</span>
-                                </button>
-                                <button class="mega-button branded-red create-account-button hidden">
-                                    <span>[$16352]</span>
-                                </button>
-                            </div>
-                            <div class="clear"></div>
-                        </div>
-                    </div>
-
-                    <div class="commercial-wrapper hidden" id="commercial-wrapper-webfilinkb"></div>
-                    <div class="commercial-wrapper hidden" id="commercial-wrapper-webfilinkbs"></div>
-
-                </div>
-
-                <div class="download error-text message hidden">
-                    [$7154]
-                </div>
-
-                <div class="download some-reason">
-                    <i class="download sprite-fm-uni icon-error"></i>
-                    <div class="download error-content">
-                        <div class="download error-title">[$243]</div>
-                        <div class="download error-description">[$244]</div>
-                        <div class="download error-list-item">[$246]</div>
-                        <div class="download error-list-item">[$247]</div>
-                        <div class="download error-list-item">[$248]</div>
-                    </div>
-                </div>
-                <div class="download deleted-user">
-                    <i class="download sprite-fm-uni icon-error"></i>
-                    <div class="download error-content">
-                        <div class="download error-title">[$243]</div>
-                        <div class="download error-list-item">[$731]</div>
-                    </div>
-                </div>
-                <div class="download invalid-error">
-                    <i class="download sprite-fm-uni icon-error"></i>
-                    <div class="download error-content">
-                        <div class="download error-title">[$20198]</div>
-                        <div class="download error-list-item">[$20199]</div>
-                    </div>
-                </div>
-                <div class="download temporarty-error">
-                    <i class="download sprite-fm-uni icon-error"></i>
-                    <div class="download error-content">
-                        <div class="download error-title">[$1191]</div>
-                        <div class="download error-list-item">[$253]</div>
+                                        </li>
+                                        <li>
+                                            <button class="reset-all invisible">[$video_player_reset_all]</button>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            </template>
+                        </footer>
                     </div>
                 </div>
 
-        </section>
-        <!-- Please add "visible" classname !-->
-        <!-- Please add "ff"/"safari"/"opera"/"edge"/"ie" classname !-->
-        <div class="download warning-block">
-
-            <div  class="fm-dialog-close medium"></div>
-            <div class="content-wrapper">
-                <i class="download big-icon"></i>
-                <div class="content">
-                    <span class="txt">[$16866]</span>
-                </div>
-                <div>
-                    <button class="mega-button">
-                        <span>[$20697]</span>
-                    </button>
+                <!-- Textview block -->
+                <div class="download textviewer-block js-text-viewer hidden">
+                    <div class="text-editor">
+                        <section class="content js-textview">
+                            <textarea class="txtar"></textarea>
+                        </section>
+                        <div class="item-type-icon-90 icon-text-90 js-text-viewer-icon hidden"></div>
+                    </div>
+                    <div class="bouncing-loader viewer-pending hidden">
+                        <span></span><span></span><span></span>
+                    </div>
                 </div>
 
+                <!-- Image Previewer block -->
+                <div class="download image-block js-image-preview hidden"></div>
+
+                <!-- Filetype icon !-->
+                <div class="download info-block">
+                    <div class="item-type-icon-90 icon-generic-90"></div>
+                </div>
             </div>
         </div>
 
-    </div>
+        <!-- Ads. Add "vertical" classname to place vertical ad on the side of the main block !-->
+        <div class="dl-ads-body">
+            <div id="commercial-close-button" class="commercial-close-button hidden">
+                <i class="sprite-fm-mono icon-dialog-close"></i>
+            </div>
+            <div class="commercial-wrapper hidden" id="commercial-wrapper-webfilinkb"></div>
+            <!-- <div class="commercial-wrapper hidden" id="commercial-wrapper-webfilinkbs"></div> !-->
+            <div class="info">[$dl_upgade_to_hide_ads]</div>
+        </div>
 
+    </section>
 </div>

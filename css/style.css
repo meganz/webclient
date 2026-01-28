@@ -2254,6 +2254,7 @@ button.l-pane-visibility {
     height: 100%;
     left: 0;
     position: absolute;
+    top: 0;
     width: 100%;
     z-index: 1100;
 }
@@ -7267,7 +7268,8 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     -webkit-filter: blur(0.25em);
     overflow: hidden;
 }
-.overlayed .bottom-page.scroll-block, .overlayed.bottom-pages .mega-dialog.arrange-to-back {
+.overlayed #startholder,
+.overlayed.bottom-pages .mega-dialog.arrange-to-back {
     filter: blur(0.25em);
     -webkit-filter: blur(0.25em);
 }

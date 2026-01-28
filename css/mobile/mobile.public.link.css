@@ -1,3 +1,22 @@
+.dl-access-box {
+    display: flex;
+    min-height: 100%;
+}
+
+.dl-access-box.decrytion-box {
+    min-height: auto;
+}
+
+.dl-access-box.decrytion-box h2 {
+    text-align: start;
+    width: 100%;
+}
+
+.dl-access-box .input-label {
+    font: var(--mobile-font-caption-large-bold);
+    margin: 0 0 4px;
+}
+
 .file-folder-view {
     display: flex;
     flex-direction: column;
@@ -10,6 +29,7 @@
 
 .file-folder-view.main-content {
     align-items: center;
+    margin: auto;
     text-align: center;
 }
 
@@ -22,6 +42,10 @@
     color: var(--mobile-text-primary);
     text-align: left;
     align-self: stretch;
+}
+
+.file-folder-view .no-content > *:not(:last-child) {
+    margin: 0 0 16px;
 }
 
 .file-folder-view .no-content.folder-file {
@@ -78,6 +102,10 @@
     font: var(--mobile-font-copy-regular);
 }
 
+.file-folder-view .no-content p.strong {
+    font-weight: 600;
+}
+
 .mobile.decrypt-button.nav-elem.normal {
     max-width: var(--mobile-elem-max-width);
     width: 100%;
@@ -87,4 +115,34 @@
 .decryption-msg {
     color: var(--mobile-text-primary);
     font: var(--mobile-font-copy-regular);
+}
+
+
+/* Stop illegal content error */
+
+.dl-access-box .sn-error {
+    display: block;
+}
+
+.dl-access-box .sn-error em {
+    border: 1px solid var(--mobile-border-strong);
+    border-radius: var(--mobile-border-radius-medium);
+    color: var(--mobile-text-secondary);
+    display: block;
+    font: var(--mobile-font-link-small-regular);
+    margin: 24px 0 0;
+    padding: 16px;
+}
+
+.dl-access-box .sn-error em strong {
+    display: block;
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-caption-large-semibold);
+    margin: 0 0 8px;
+}
+
+.dl-access-box .sn-error em a {
+    display: inline-block;
+    font: var(--mobile-font-link-small-regular);
+    margin: 16px 0 0;
 }

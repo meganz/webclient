@@ -1,23 +1,51 @@
-<form id="form_login_header" autocomplete="off" class="account top-login-form">
-    <input class="underlinedText" type="text" name="login-name" id="login-name" value="" placeholder="[$195]" maxlength="190" />
-    <input class="underlinedText" type="password" name="login-password" id="login-password" placeholder="[$909]"  />
-    <div class="login-page-forgot-bl">
-        <a class="top-login-forgot-pass" tabindex="-1">
-            <span>[$1934]</span>
-        </a>
+<div class="dropdown body popup dropdown-arrow top-login-popup sign hidden">
+    <header>
+        <div class="top-login-full"></div>
         <div class="clear"></div>
+        <i class="top-login-full sprite-fm-mono icon-new-window"></i>
+    </header>
+    <div class="login">
+        <form id="form_login_header" autocomplete="off" class="account top-login-form">
+            <input class="underlinedText" type="text" name="login-name" id="login-name" value="" placeholder="[$195]" maxlength="190" />
+            <input class="underlinedText" type="password" name="login-password" id="login-password" placeholder="[$909]"  />
+            <div class="login-page-forgot-bl">
+                <a class="top-login-forgot-pass" tabindex="-1">
+                    <span>[$1934]</span>
+                </a>
+                <div class="clear"></div>
+            </div>
+            <div class="account checkbox-block">
+                <div class="login-check checkboxOn checkbox">
+                    <input class="checkboxOn" type="checkbox" name="login-check" id="login-check" checked="checked">
+                </div>
+                <label class="radio-txt">[$192]</label>
+            </div>
+            <button class="mega-button branded-red top-dialog-login-button" tabindex="0" type="button">
+                <span>[$16345]</span>
+                <div class="loader">
+                    <img alt="" src="{staticpath}images/mega/ajax-loader-white.gif" />
+                </div>
+            </button>
+            <div class="clear"></div>
+        </form>
     </div>
-    <div class="account checkbox-block">
-        <div class="login-check checkboxOn checkbox">
-            <input class="checkboxOn" type="checkbox" name="login-check" id="login-check" checked="checked">
+    <div class="top-login-warning active">
+        <div class="top-login-warning-arrow"></div>
+        <div class="top-login-warning-close"></div>
+        <div class="dropdown-inverted-arrow"></div>
+        <div class="top-login-warning-close sprite-fm-mono icon-dialog-close"></div>
+        <div class="top-login-warning-pad">
+            <i class="top-login-warning-icon sprite-fm-uni icon-warning"></i>
+            <div class="top-login-warning-txt">
+                [$1093]<br>
+            </div>
+            <div class="clear"></div>
+            <div class="extension-advise"> [$1094] </div>
+            <div class="top-login-warning-bott">
+                <div class="loginwarning-checkbox checkboxOff checkbox"></div>
+                <label class="radio-txt">[$229]</label>
+                <div class="clear"></div>
+            </div>
         </div>
-        <label class="radio-txt">[$192]</label>
     </div>
-    <button class="mega-button branded-red top-dialog-login-button" tabindex="0" type="button">
-        <span>[$16345]</span>
-        <div class="loader">
-            <img alt="" src="{staticpath}images/mega/ajax-loader-white.gif" />
-        </div>
-    </button>
-    <div class="clear"></div>
-</form>
+</div>

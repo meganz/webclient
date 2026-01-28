@@ -6,6 +6,11 @@ class MegaHeader extends MegaMobileHeader {
 
         super(options);
 
+        // Parse login dropdown
+        if (!options.parentNode.querySelector('.dropdown.top-login-popup')) {
+            options.parentNode.append(parseHTML(getTemplate('top-login')));
+        }
+
         /* Top block */
 
         const navNavigation = this.domNode.querySelector('.top-block .nav-navigation');
@@ -19,10 +24,11 @@ class MegaHeader extends MegaMobileHeader {
             kebab.remove();
         }
 
-        if (!mega.lite.inLiteMode) {
+        if (!mega.lite.inLiteMode
+            && (this.searchInput = options.parentNode.querySelector('.searcher-wrapper'))) {
 
             // Search - Current using old search bar
-            this.searchInput = options.parentNode.querySelector('.searcher-wrapper');
+            this.searchInput = this.searchInput.cloneNode(true);
             this.searchInput.classList.add('search');
             this.searchInput.classList.remove('hidden');
             navNavigation.prepend(this.searchInput);
@@ -46,6 +52,7 @@ class MegaHeader extends MegaMobileHeader {
         });
 
         this.notifMenu = options.parentNode.querySelector('.notification-popup');
+        this.notifMenu = this.notifMenu ? this.notifMenu.cloneNode(true) : null;
 
         wrapper.append(this.notifMenu);
 
@@ -140,7 +147,7 @@ class MegaHeader extends MegaMobileHeader {
                 icon: 'sprite-fm-mono icon-cloud-thin-outline',
                 iconSize: 24,
                 activeCondition: () => mega.ui.topmenu.hasClass('drive'),
-                eventLog: 500446
+                eventLog: 500446,
             },
             chat: {
                 componentClassname: 'chat',
@@ -203,51 +210,63 @@ class MegaHeader extends MegaMobileHeader {
             }
         });
 
-        if (!u_type) {
+        this.loginBtn = navActions.componentSelector('.login-button') || new MegaLink({
+            parentNode: navActions,
+            text: l.log_in,
+            type: "normal",
+            componentClassname: "action-link login-button"
+        });
 
-            const loginBtn = navActions.componentSelector('.login-button');
-
-            loginBtn.addClass('outline').removeClass('action-link').off('tap').rebind('click.auth', () => {
-                if (u_type === 0) {
-                    mLogout();
-                }
-                else {
-                    var c = $('.dropdown.top-login-popup', pmlayout).attr('class');
-                    if (c && c.includes('hidden')) {
-                        if (page === 'register') {
-                            delay('registerloginevlog', () => eventlog(99818));
-                        }
-                        tooltiplogin.init();
-                        return false;
-                    }
-
-                    tooltiplogin.init(1);
-
-                }
-            });
-
+        this.loginBtn.off('tap').rebind('click.auth', () => {
+            if (dlid) {
+                eventlog(501062);
+            }
             if (u_type === 0) {
-                loginBtn.text = l.log_out;
+                mLogout();
+            }
+            else {
+                var c = $('.dropdown.top-login-popup', options.parentNode).attr('class');
+                if (c && c.includes('hidden')) {
+                    if (page === 'register') {
+                        delay('registerloginevlog', () => eventlog(99818));
+                    }
+                    tooltiplogin.init();
+                    return false;
+                }
+
+                tooltiplogin.init(1);
+
+            }
+        });
+
+        if (u_type === 0) {
+            this.loginBtn.text = l.log_out;
+        }
+
+        this.signupBtn = new MegaLink({
+            parentNode: navActions,
+            text: l[968],
+            type: "normal",
+            componentClassname: "create-account-button outline signup-button"
+        });
+
+        this.signupBtn.on('click.signup', () => {
+            if (dlid) {
+                eventlog(501063);
             }
 
-            const signupBtn = new MegaLink({
-                parentNode: navActions,
-                text: l[968],
-                type: "normal",
-                componentClassname: "create-account-button primary"
-            });
+            if (this.hasClass('business-reg')) {
+                loadSubPage('registerb');
+            }
+            else {
+                if (page === 'login') {
+                    delay('loginregisterevlog', () => eventlog(99798));
+                }
+                loadSubPage('register');
+            }
+        });
 
-            signupBtn.on('click.signup', () => {
-                if (this.hasClass('business-reg')) {
-                    loadSubPage('registerb');
-                }
-                else {
-                    if (page === 'login') {
-                        delay('loginregisterevlog', () => eventlog(99798));
-                    }
-                    loadSubPage('register');
-                }
-            });
+        if (!u_type) {
 
             this.topLangButton = new MegaButton({
                 parentNode: navActions,
@@ -258,6 +277,9 @@ class MegaHeader extends MegaMobileHeader {
                 prepend: true,
                 text: getRemappedLangCode(lang).toUpperCase(),
                 onClick: () => {
+                    if (dlid) {
+                        eventlog(501061);
+                    }
                     langDialog.show();
                 }
             });
@@ -346,6 +368,9 @@ class MegaHeader extends MegaMobileHeader {
 
             // Lets kill tap and move to click events
             this.topHelpButton.rebind('click', e => {
+                if (dlid) {
+                    eventlog(501060);
+                }
                 if (this.topHelpButton.toggleClass('active')) {
                     this.showTopHelpMenu();
                 }
@@ -353,6 +378,10 @@ class MegaHeader extends MegaMobileHeader {
                     this.closeTopHelpMenu(e);
                 }
             });
+
+            if (mega.ui.flyout) {
+                mega.ui.flyout.reinit();
+            }
         }
 
         // Temporary account status items fetch from old header until we revamp this
@@ -444,9 +473,10 @@ class MegaHeader extends MegaMobileHeader {
             actions[2](() => {
 
                 const fcType = type.replace(/^./, char => char.toUpperCase());
+                const layoutNode = document.getElementById('mainlayout');
 
-                fmholder[actions[3]]('mouseup', mega.ui.header[`close${fcType}Menu`], true);
-                fmholder[actions[3]]('contextmenu', mega.ui.header[`close${fcType}Menu`], true);
+                layoutNode[actions[3]]('mouseup', mega.ui.header[`close${fcType}Menu`], true);
+                layoutNode[actions[3]]('contextmenu', mega.ui.header[`close${fcType}Menu`], true);
             });
         }
     }
@@ -455,7 +485,7 @@ class MegaHeader extends MegaMobileHeader {
 
         return !opts[0] || e && (e.target === opts[0] ||
             e.target.closest([opts[1]]) && (!e.target.closest('button, a') || e.which !== 1) ||
-            e.currentTarget === fmholder && e.target.closest(opts[2]));
+            e.currentTarget === document.getElementById('mainlayout') && e.target.closest(opts[2]));
     }
 
     closeNotifMenu(e) {
@@ -608,7 +638,10 @@ class MegaHeader extends MegaMobileHeader {
         const types = MegaHeader.getType();
 
         this.headerOptions = types;
-        mega.ui.topmenu.megaLink.text = MegaHeader.getHeading();
+
+        if (fminitialized) {
+            mega.ui.topmenu.megaLink.text = MegaHeader.getHeading();
+        }
 
         if (types.search) {
             MegaHeader.updateSearchForm(false, this.domNode);
@@ -636,37 +669,54 @@ class MegaHeader extends MegaMobileHeader {
             this.activityStatus.classList.add('hidden');
         }
 
+        this.renderLoggedIn();
+
         tooltiplogin.init(1);
         if (mega.ui.flyout) {
             mega.ui.flyout.closeIfNeeded();
         }
     }
 
+    destroy() {
+        const {secondaryNav} = mega.ui;
+        let actions = null;
+        let target = null;
+
+        // Restore secondary nav if wasted
+        if (secondaryNav && !secondaryNav.actionsHolder
+            && (actions = this.domNode.querySelector('.fm-header-buttons'))
+            && (target = secondaryNav.domNode.querySelector('.fm-card-holder'))) {
+            target.before(actions);
+        }
+
+        super.destroy();
+    }
+
     renderLoggedIn(replace) {
 
-        // logged in but ephemeral
-        if (u_type === 0) {
+        if (this.avatarButton || !this.loginBtn) {
+            return;
+        }
 
-            const navActions = this.domNode.querySelector('.top-block .nav-actions');
-            const loginLink = new MegaLink({
-                parentNode: navActions,
-                text: l.log_in,
-                type: "normal",
-                componentClassname: "action-link login-button"
-            });
+        if (!u_type) {
+            if (u_type === 0 || u_attr) {
+                this.loginBtn.text = l.log_out;
 
-            mBroadcaster.once('login2', () => {
-                this.renderLoggedIn(loginLink);
-            });
+                mBroadcaster.once('login2', () => {
+                    this.renderLoggedIn(this.loginBtn);
+                });
+            }
+            else {
+                this.loginBtn.text = l.log_in;
+            }
 
             return;
         }
 
         super.renderLoggedIn(replace);
 
-        const registerBtn = this.domNode.componentSelector('.create-account-button');
-        if (registerBtn) {
-            registerBtn.destroy();
+        if (this.registerBtn) {
+            this.registerBtn.destroy();
         }
 
         // Avatar Menu
@@ -732,7 +782,7 @@ class MegaHeader extends MegaMobileHeader {
                 type: 'text',
                 componentClassname: 'to-my-profile',
                 text: l[16668],
-                href: 'fm/dashboard',
+                href: '/fm/dashboard',
                 eventLog: 500445
             });
 
@@ -859,7 +909,7 @@ class MegaHeader extends MegaMobileHeader {
             _buildInteractable({
                 componentClassname: 'settings',
                 text: l[823],
-                href: 'fm/account',
+                href: '/fm/account',
                 eventLog: 500325
             });
 
@@ -1048,12 +1098,14 @@ class MegaHeader extends MegaMobileHeader {
 
     static types(index) {
         const { type: cvType } = M.currentCustomView || {};
+        const isFm = folderlink || is_fm() && !pfid;
+        const uta = !dlid && !pfid && u_type;
         const type = [
             { // logged in default
-                'home': false,
+                'home': !isFm,
                 'top-block': true,
                 'search': true,
-                'notification': !pfid && u_type,
+                'notification': uta,
                 'bottom-block': false,
                 'avatar': true,
                 'bento': u_type || is_eplusplus,
@@ -1062,11 +1114,13 @@ class MegaHeader extends MegaMobileHeader {
                 'top-language': !u_type,
                 'download-desktop-app': cvType !== 'pwm' && !window.useMegaSync,
                 'download-pwm-ext': cvType === 'pwm',
-                'top-contacts': !pfid && u_type,
-                'top-chats': !pfid && u_type,
+                'top-contacts': uta,
+                'top-chats': uta,
+                'login-button': !u_type,
+                'signup-button': !u_type,
             },
             { // logged out
-                'home': false,
+                'home': !isFm || !self.pmlayout,
                 'top-block': true,
                 'search': true,
                 'notification': false,
@@ -1080,6 +1134,8 @@ class MegaHeader extends MegaMobileHeader {
                 'download-pwm-ext': false,
                 'top-contacts': false,
                 'top-chats': false,
+                'login-button': true,
+                'signup-button': true,
             }
         ][index];
 
@@ -1130,7 +1186,7 @@ class MegaHeader extends MegaMobileHeader {
     }
 
     static getType() {
-        const iType = u_attr ? 0 : 1;
+        const iType = u_type ? 0 : 1;
 
         return this.types(iType);
     }
@@ -1141,7 +1197,7 @@ class MegaHeader extends MegaMobileHeader {
      * @param {HTMLElement} [header] Parent block
      * @returns {void}
      */
-    static updateSearchForm(dirId = false, header = pmlayout) {
+    static updateSearchForm(dirId = false, header = self.pmlayout) {
         if (!header || (!dirId && String(M.currentdirid).startsWith('search/'))) {
             return;
         }
@@ -1284,7 +1340,7 @@ class MegaHeader extends MegaMobileHeader {
     "use strict";
 
     lazy(mega.ui, 'header', () => new MegaHeader({
-        parentNode: pmlayout,
+        parentNode: is_fm() && self.pmlayout || document.getElementById('startholder'),
         componentClassname: 'mega-header',
         prepend: true
     }));

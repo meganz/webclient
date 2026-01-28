@@ -360,19 +360,50 @@ body:not(.loading) #mainlayout {
     overflow-x: hidden;
     overflow-y: hidden;
 }
-body:not(.mobile) #startholder {
+
+.web-desktop .fmholder.empty .mega-header,
+.web-desktop .fmholder.empty .content-holder {
+     background-color: var(--mobile-surface-1);
+ }
+
+.web-desktop #startholder {
     display: grid;
-    grid-template-columns: auto 0;
-    transition: 200ms linear;
+    grid-template-columns: 0 1fr 0;
+    grid-template-rows: auto 1fr;
 }
-body:not(.mobile) #startholder.flyout-expanded {
+
+.web-desktop #startholder.flyout-expanded {
     grid-template-columns: auto var(--flyout-width);
 }
-.fmholder .bottom-page.scroll-block {
+
+#startholder .bottom-page.scroll-block,
+#startholder > .content-holder {
     position: relative;
     display: block;
     height: 100%;
 }
+
+.web-desktop #startholder > .content-holder {
+    grid-row: 2 / 3;
+    grid-column: 2 / 3;
+}
+
+.web-desktop #startholder > .mega-header {
+    grid-row: 1 / 2;
+    grid-column: 2 / 3;
+}
+
+.web-desktop #startholder > .mega-top-menu {
+    display: none;
+    grid-row: 1 / 2;
+    grid-column: 1 / 2;
+}
+
+/* TODO: remove when old top header is removed everywhere */
+.web-desktop #startholder > .mega-header:not(.hidden) ~ .content-holder .topbar {
+    display: none;
+}
+
 .fmholder .bottom-page.scroll-block.placeholder {
     background: var(--surface-main);
 }

@@ -1989,6 +1989,10 @@ var addressDialog = {
         }
 
         const prefillMultipleInputs = (inputs, value) => {
+            if (!inputs) {
+                console.error('Missing input field to fill');
+                return;
+            }
             if (Array.isArray(inputs)) {
                 inputs.forEach(($megaInput) => {
                     $megaInput.setValue(value);
@@ -2061,7 +2065,7 @@ var addressDialog = {
                 );
             }
 
-            if (billingInfo.dateOfBirth) {
+            if (billingInfo.dateOfBirth && pro.propay.onPropayPage()) {
                 prefillMultipleInputs(this.dateOfBirthMegaInput, getBillingProp('dateOfBirth', encodedVer));
             }
         }
@@ -2556,6 +2560,10 @@ var addressDialog = {
             )
                 .then(() => {
                     return pro.loadMembershipPlans(nop, true);
+                })
+                .then(() => {
+                    const plan = pro.getPlanObj(pro.propay.planNum, pro.propay.selectedPeriod);
+                    return plan && plan.getInstantDiscountInfo();
                 });
 
             if (pro.propay.onPropayPage()) {
@@ -3629,6 +3637,13 @@ var addressDialog = {
             'PL', 'PT', 'RO', 'SK', 'SI', 'SE', // 'ES', Separate rules for Spain
         ];
         countryCode = countryCode.toUpperCase();
+        const upperTaxCode = taxCode.toUpperCase();
+        const isEu = EU_CODES.includes(countryCode);
+
+        if (isEu && !upperTaxCode.startsWith(countryCode)) {
+            taxCode = countryCode + taxCode;
+        }
+
         return !(
             countryCode === 'HU' && !(
                 /^\d{8}-[1-5]-\d{2}$/.test(taxCode) ||
@@ -3638,7 +3653,7 @@ var addressDialog = {
                 /^\d{8}[A-Z]$/.test(taxCode)
                 || /^[X-Z]\d{7}[A-Z]$/.test(taxCode)
                 || /^[A-Z]\d{7}[\dA-Z]$/.test(taxCode))
-            || EU_CODES.includes(countryCode) && !/^[A-Z]{2}[\dA-Z]{2,13}$/.test(taxCode) ||
+            || isEu && !/^[A-Z]{2}[\dA-Z]{2,13}$/.test(taxCode) ||
                 !/\S/.test(taxCode)
         );
     }

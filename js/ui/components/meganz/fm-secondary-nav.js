@@ -976,6 +976,11 @@ lazy(mega.ui, 'secondaryNav', () => {
             }
             const sel = `.${options.componentClassname.split(' ').filter(c => c.startsWith('fm-')).join('.')}`;
             const holder = this.actionsHolder || mega.ui.header.domNode.querySelector('.fm-header-buttons');
+
+            if (!holder) {
+                return false;
+            }
+
             if (sel === '.' || holder.querySelector(sel)) {
                 if (d && sel === '.') {
                     console.warn('No fm- prefixed class found', options.componentClassname);
@@ -1020,7 +1025,11 @@ lazy(mega.ui, 'secondaryNav', () => {
             let holder = this.actionsHolder;
             if (!holder) {
                 const {ps} = this;
-                holder = mega.ui.header.domNode.querySelector('.fm-header-buttons');
+
+                if (!(holder = mega.ui.header.domNode.querySelector('.fm-header-buttons'))) {
+                    return false;
+                }
+
                 if (!this.isSmall && ps && !(ps.scrollTop !== 0 && !M.search)) {
                     // Scrolled back up. Place back and hide.
                     holder.parentNode.classList.add('contract');

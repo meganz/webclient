@@ -502,14 +502,15 @@
 .mega-input.fix-msg.error .message-container {
     color: var(--banner-text-error);
 }
-.mega-input .pass-visible {
+.mega-input .action-icon {
+    --icon-size: 20px;
     opacity: 0.7;
     transition: opacity 200ms;
     right: 4px;
     z-index: 12;
     cursor: pointer;
 }
-.mega-input .pass-visible:hover {
+.mega-input .action-icon:hover {
     opacity: 1;
 }
 /* Password strength Checker - Bar */
@@ -942,4 +943,72 @@
 /* Hide the password reveal button in Microsoft Edge */
 .mega-input input[type="password"]::-ms-reveal {
     display: none;
+}
+
+
+/*
+ * Revamped styles
+ * TODO: replace main styles when there is no old elms left
+*/
+
+.mega-input.rvp input,
+.mega-input.rvp textarea {
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-caption-large-regular);
+}
+
+.mega-input.rvp::before {
+    border-color: var(--mobile-border-strong);
+}
+
+.mega-input.rvp:hover::before,
+.mega-input.rvp.active::before,
+.mega-input.rvp.valued::before {
+    border-color: var(--mobile-border-strong-selected);
+}
+
+.mega-input.rvp.error::before {
+    border-color: var(--mobile-support-error);
+}
+
+/* Icons after span or input (Usually dropdown its dropdown arrow or three dots) */
+.mega-input.rvp > input ~ i,
+.mega-input.rvp > span ~ i {
+    --mask-color: var(--mobile-icon-secondary);
+    opacity: 1;
+}
+
+.mega-input.rvp i.action-icon:hover {
+    --mask-color: var(--mobile-icon-primary);
+}
+
+.mega-input.box-style.rvp {
+    height: 40px;
+    padding: 2px 4px;
+}
+
+.mega-input.box-style.rvp::before {
+    background: var(--mobile-page-background);
+    border-radius: 8px;
+}
+
+/* Revamped error messages */
+
+.mega-input.error.rvp .message-container {
+    background: none;
+    border: 0;
+    color: var(--mobile-text-error);
+    display: flex;
+    font: var(--mobile-font-link-small-regular);
+    margin: 4px 0 0;
+    text-align: start;
+}
+
+.mega-input.error.rvp .message-container i {
+    --icon-size: 16px;
+    --mask-color: var(--mobile-text-error);
+    display: block;
+    flex: 0 0 auto;
+    margin: 3px 0;
+    margin-inline-end: 8px;
 }

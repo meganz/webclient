@@ -20,12 +20,8 @@ var alarm = {
     handler: function() {
         'use strict';
 
-        if (is_fm() && page !== 'start') {
-            return document.getElementById('old-header-account-states-popups');
-        }
-
-        const holder = document.getElementById('startholder');
-        return holder && holder.querySelector('.js-topbar');
+        return document.getElementById('old-header-account-states-popups')
+            || document.getElementById('header-account-states-popups');
     },
 
     /**

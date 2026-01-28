@@ -895,16 +895,21 @@ FullScreenManager.prototype.enterFullscreen = function() {
         const video = $video.get(0);
         const $button = $('button.subtitles', $videoControls);
         const manager = mega.utils.subtitles.init();
+
         // Subtitles context menu
-        let menu = $('.context-menu.subtitles', $wrapper).get(0);
-        if (!menu) {
-            menu = contextMenu.create({
-                template: $('#media-viewer-subtitles-menu', $wrapper)[0],
+        const template = document.getElementById('media-viewer-subtitles-menu');
+        const menu = $('.context-menu.subtitles', $wrapper)[0]
+            || template && contextMenu.create({
+                template,
                 sibling: $('.subtitles-wrapper .tooltip', $wrapper)[0],
                 animationDuration: 150,
                 boundingElement: $wrapper[0]
             });
+
+        if (!menu) {
+            return false;
         }
+
         const destroy = tryCatch(() => {
             if ($subtitles) {
                 $subtitles.off();

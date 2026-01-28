@@ -13,7 +13,6 @@
   "env": {
     "development": {
       "plugins": [
-        "react-hot-loader/babel",
         "@babel/transform-react-display-name",
         [
           "@babel/plugin-proposal-decorators",

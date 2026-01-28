@@ -297,6 +297,7 @@
             ],
             "rules": {
                 "complexity": [2, 28],
+                "es/no-dynamic-import": "off",
                 "es/no-optional-chaining": "off",
                 "local-rules/classes": "off",
                 "no-negated-condition": "off",

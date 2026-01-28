@@ -1,10 +1,8 @@
 import React from 'react';
-import ContactsPanel from './contactsPanel.jsx';
 import { Button } from '../../../ui/buttons.jsx';
+import { LABEL, VIEW } from './utils.jsx';
 
 const Navigation = ({ view, receivedRequestsCount }) => {
-    const { VIEW, LABEL } = ContactsPanel;
-
     return (
         <div className="contacts-navigation">
             <ul>

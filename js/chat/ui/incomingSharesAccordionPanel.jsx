@@ -1,4 +1,4 @@
-var React = require("react");
+import React from 'react';
 import {MegaRenderMixin} from "../mixins";
 
 const SharedFolderItem = ({ node, isLoading }) => {

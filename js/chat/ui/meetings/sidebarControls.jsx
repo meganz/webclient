@@ -1,6 +1,6 @@
 import React from 'react';
 import Button from './button.jsx';
-import { VIEW } from './call.jsx';
+import { VIEW } from './utils.jsx';
 
 const SidebarControls = ({
     npeers,

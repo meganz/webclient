@@ -4,7 +4,6 @@ import { Avatar, ContactPresence } from '../contacts.jsx';
 import { Button } from '../../../ui/buttons.jsx';
 import { Dropdown } from '../../../ui/dropdowns.jsx';
 import { Emoji } from '../../../ui/utils.jsx';
-import ContactsPanel from './contactsPanel.jsx';
 import ContextMenu from './contextMenu.jsx';
 import FMView from '../../../ui/jsx/fm/fmView.jsx';
 import { ColumnFavIcon } from '../../../ui/jsx/fm/nodes/columns/columnFavIcon.jsx';
@@ -14,6 +13,14 @@ import { ColumnSharedFolderButtons } from '../../../ui/jsx/fm/nodes/columns/colu
 import Nil from './nil.jsx';
 import Link from '../link.jsx';
 import { EVENTS, VIEWS } from '../conversations.jsx';
+import {
+    getUserFingerprint,
+    isVerified,
+    resetCredentials,
+    verifyCredentials,
+    LABEL,
+    hasRelationship
+} from './utils.jsx';
 
 export default class ContactProfile extends MegaRenderMixin {
     domRef = React.createRef();
@@ -79,7 +86,7 @@ export default class ContactProfile extends MegaRenderMixin {
             <div className="profile-breadcrumb">
                 <ul>
                     <li>
-                        <Link to="/fm/chat/contacts">{ContactsPanel.LABEL.CONTACTS}</Link>
+                        <Link to="/fm/chat/contacts">{LABEL.CONTACTS}</Link>
                         <i className="sprite-fm-mono icon-arrow-right" />
                     </li>
                     <li>
@@ -95,12 +102,12 @@ export default class ContactProfile extends MegaRenderMixin {
         const contact = M.u[handle];
 
         if (handle && contact && contact.c === 1) {
-            const IS_VERIFIED = ContactsPanel.isVerified(contact);
+            const IS_VERIFIED = isVerified(contact);
             return (
                 <div className="profile-credentials">
                     <span className="credentials-head">{l[6872]}</span>
                     <div className="credentials-fingerprints">
-                        {ContactsPanel.getUserFingerprint(handle)}
+                        {getUserFingerprint(handle)}
                     </div>
                     <button
                         className={`
@@ -108,7 +115,7 @@ export default class ContactProfile extends MegaRenderMixin {
                             small
                             ${IS_VERIFIED ? '' : 'positive'}
                         `}
-                        onClick={() => ContactsPanel[IS_VERIFIED ? 'resetCredentials' : 'verifyCredentials'](contact)}>
+                        onClick={() => (IS_VERIFIED ? resetCredentials : verifyCredentials)(contact)}>
                         {IS_VERIFIED ? l[742] : l.verify_credentials}
                     </button>
                 </div>
@@ -167,7 +174,7 @@ export default class ContactProfile extends MegaRenderMixin {
                 return <Nil title={l.contact_not_found /* Contact not found */} />;
             }
 
-            const HAS_RELATIONSHIP = ContactsPanel.hasRelationship(contact);
+            const HAS_RELATIONSHIP = hasRelationship(contact);
 
             return (
                 <div

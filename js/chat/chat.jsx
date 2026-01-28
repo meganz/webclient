@@ -1,19 +1,42 @@
-import React from 'react';
+import React, { lazy } from 'react';
 import { createRoot } from 'react-dom';
-import ConversationsUI from './ui/conversations.jsx';
 
-require("./chatGlobalEventManager.jsx");
-// load chatRoom.jsx, so that its included in bundle.js, despite that ChatRoom is legacy ES ""class""
-require("./chatRoom.jsx");
+import './chatRoom.jsx';
+import ConversationsApp from './ui/conversations.jsx';
 
-// ensure that the Incoming dialog is included, so that it would be added to the window scope for accessing from
-// vanilla JS
-require("./ui/meetings/workflow/incoming.jsx");
-
-import ChatRouting from "./chatRouting.jsx";
+import ChatRouting from './chatRouting.jsx';
 import MeetingsManager from './meetingsManager.jsx';
-import { ChatOnboarding } from "./chatOnboarding.jsx";
-import { inProgressAlert } from "./ui/meetings/call.jsx";
+import { ChatOnboarding } from './chatOnboarding.jsx';
+import { inProgressAlert } from './ui/meetings/utils.jsx';
+
+import { chatGlobalEventManager } from './chatGlobalEventManager';
+window.chatGlobalEventManager = chatGlobalEventManager;
+
+import { getMessageString } from './ui/messages/utils.jsx';
+mega.ui = mega.ui || {};
+mega.ui.chat = mega.ui.chat || {};
+mega.ui.chat.getMessageString = getMessageString;
+
+import { withSuspense } from './utils.jsx';
+import Incoming from './ui/meetings/workflow/incoming.jsx';
+
+const ScheduleMeeting =
+    lazy(() => import(/* webpackChunkName: "schedule-meeting" */ './ui/meetings/schedule/schedule.jsx'));
+const StartMeeting =
+    lazy(() => import(/* webpackChunkName: "start-conversation" */ './ui/meetings/workflow/start.jsx'));
+const ContactSelectorDialog =
+    lazy(() => import(/* webpackChunkName: "start-conversation" */ './ui/contactSelectorDialog.jsx'));
+const StartGroupChatWizard =
+    lazy(() => import(/* webpackChunkName: "start-conversation" */ './ui/startGroupChatWizard.jsx'));
+const CloudBrowserDialog =
+    lazy(() => import(/* webpackChunkName: "cloud-browser" */ '../ui/cloudBrowserModalDialog.jsx'));
+
+window.ChatCallIncomingDialog = withSuspense(Incoming);
+window.ScheduleMeetingDialogUI = { Schedule: withSuspense(ScheduleMeeting) };
+window.StartMeetingDialogUI = { Start: withSuspense(StartMeeting) };
+window.ContactSelectorDialogUI = { ContactSelectorDialog: withSuspense(ContactSelectorDialog) };
+window.StartGroupChatDialogUI = { StartGroupChatWizard: withSuspense(StartGroupChatWizard) };
+Object.defineProperty(mega, 'CloudBrowserDialog', { value: withSuspense(CloudBrowserDialog) });
 
 const EMOJI_DATASET_VERSION = 5;
 const CHAT_ONHISTDECR_RECNT = "onHistoryDecrypted.recent";
@@ -324,7 +347,7 @@ Chat.prototype.init = promisify(function(resolve, reject) {
             const rootDOMNode = this.rootDOMNode = document.querySelector(selector);
             const $$root = this.$$root = createRoot(rootDOMNode);
             $$root.render(
-                <ConversationsUI.ConversationsApp
+                <ConversationsApp
                     megaChat={this}
                     routingSection={this.routingSection}
                     routingSubSection={this.routingSubSection}
@@ -3102,9 +3125,5 @@ Chat.prototype.fetchSoundBuffer = async function(sound) {
 };
 
 window.Chat = Chat;
-
-if (module.hot) {
-    module.hot.accept();
-}
 
 export default {Chat};

@@ -1,7 +1,7 @@
 import React from 'react';
 import { MegaRenderMixin } from '../../mixins';
 import { Avatar, ContactAwareName } from '../contacts.jsx';
-import Call, { MODE } from './call.jsx';
+import { MODE } from './utils.jsx';
 import { Emoji } from "../../../ui/utils";
 
 /** The class hiearachy of video components is the following:

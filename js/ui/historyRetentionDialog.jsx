@@ -10,7 +10,7 @@ const LIMIT = {
     MONTHS: 12
 };
 
-export class HistoryRetentionDialog extends Component {
+export default class HistoryRetentionDialog extends Component {
     dialogName = 'msg-retention-dialog';
     inputRef = React.createRef();
 

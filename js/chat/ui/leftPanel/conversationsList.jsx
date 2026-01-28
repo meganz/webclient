@@ -2,7 +2,7 @@ import React from 'react';
 import { MegaRenderMixin } from '../../mixins.js';
 import { PerfectScrollbar } from '../../../ui/perfectScrollbar.jsx';
 import ConversationsListItem from './conversationsListItem.jsx';
-import { FILTER, NAMESPACE } from './leftPanel.jsx';
+import { FILTER, NAMESPACE } from './utils.jsx';
 import Button from '../meetings/button.jsx';
 
 export const ConversationsList = ({ conversations, className, children }) => {

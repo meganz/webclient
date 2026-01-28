@@ -6,19 +6,14 @@ import Preview from './preview.jsx';
 import HistoryPanel from "../../historyPanel.jsx";
 import Link from '../../link.jsx';
 
-export default class Join extends React.Component {
-    static NAMESPACE = 'join-meeting';
+import { JOIN_VIEW } from './utils.jsx';
 
-    static VIEW = {
-        INITIAL: 0,
-        GUEST: 1,
-        ACCOUNT: 2,
-        UNSUPPORTED: 4
-    };
+export default class Join extends React.Component {
+    NAMESPACE = 'join-meeting';
 
     state = {
         preview: false,
-        view: Join.VIEW.INITIAL,
+        view: JOIN_VIEW.INITIAL,
         firstName: '',
         lastName: '',
         previewAudio: true,
@@ -28,7 +23,7 @@ export default class Join extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state.view = sessionStorage.guestForced ? Join.VIEW.GUEST : props.initialView || this.state.view;
+        this.state.view = sessionStorage.guestForced ? JOIN_VIEW.GUEST : props.initialView || this.state.view;
         if (localStorage.awaitingConfirmationAccount) {
             this.showConfirmationDialog();
         }
@@ -95,8 +90,8 @@ export default class Join extends React.Component {
 
     Head = () => {
         return (
-            <div className={`${Join.NAMESPACE}-head`}>
-                <div className={`${Join.NAMESPACE}-logo`}>
+            <div className={`${this.NAMESPACE}-head`}>
+                <div className={`${this.NAMESPACE}-logo`}>
                     <i
                         className={`
                             sprite-fm-illustration-wide
@@ -122,7 +117,7 @@ export default class Join extends React.Component {
     Intro = () => {
         const $$CONTAINER = ({ children }) =>
             <>
-                <div className={`${Join.NAMESPACE}-content`}>{children}</div>
+                <div className={`${this.NAMESPACE}-content`}>{children}</div>
                 {this.Chat()}
             </>;
 
@@ -150,7 +145,7 @@ export default class Join extends React.Component {
                             onClick={() =>
                                 mega.ui.showLoginRequiredDialog({ minUserType: 3, skipInitialDialog: 1 })
                                     .done(() =>
-                                        this.setState({ view: Join.VIEW.ACCOUNT })
+                                        this.setState({ view: JOIN_VIEW.ACCOUNT })
                                     )
                             }>
                             {l[171] /* `Login` */}
@@ -169,7 +164,7 @@ export default class Join extends React.Component {
             <$$CONTAINER>
                 <Button
                     className="mega-button positive"
-                    onClick={() => this.setState({ view: Join.VIEW.GUEST })}>
+                    onClick={() => this.setState({ view: JOIN_VIEW.GUEST })}>
                     {l.join_as_guest /* `Join as guest` */}
                 </Button>
                 <Button
@@ -180,7 +175,7 @@ export default class Join extends React.Component {
                             false,
                             true,
                             undefined,
-                            () => this.setState({ view: Join.VIEW.ACCOUNT })
+                            () => this.setState({ view: JOIN_VIEW.ACCOUNT })
                         );
                     }}>
                     {l[171] /* `Login` */}
@@ -194,7 +189,7 @@ export default class Join extends React.Component {
                                 true,
                                 undefined,
                                 undefined,
-                                () => this.setState({ view: Join.VIEW.ACCOUNT })
+                                () => this.setState({ view: JOIN_VIEW.ACCOUNT })
                             );
                         }}>
                         {l[20635] /* `Don't have an account? Create one now` */}
@@ -211,7 +206,7 @@ export default class Join extends React.Component {
         return (
             <div
                 className={`
-                    ${Join.NAMESPACE}-chat
+                    ${this.NAMESPACE}-chat
                     ${preview ? 'expanded' : ''}
                 `}>
                 <div className="chat-content">
@@ -250,7 +245,7 @@ export default class Join extends React.Component {
                     <Preview
                         audio={previewAudio}
                         video={previewVideo}
-                        context={Join.NAMESPACE}
+                        context={this.NAMESPACE}
                         onToggle={(audio, video) => this.setState({ previewAudio: audio, previewVideo: video })}
                     />
                 </div>
@@ -361,11 +356,11 @@ export default class Join extends React.Component {
         switch (view) {
             default:
                 return this.Intro();
-            case Join.VIEW.GUEST:
+            case JOIN_VIEW.GUEST:
                 return this.Guest();
-            case Join.VIEW.ACCOUNT:
+            case JOIN_VIEW.ACCOUNT:
                 return this.Account();
-            case Join.VIEW.UNSUPPORTED:
+            case JOIN_VIEW.UNSUPPORTED:
                 return this.Unsupported();
         }
     };
@@ -377,7 +372,7 @@ export default class Join extends React.Component {
         alarm.hideAllWarningPopups();
         sessionStorage.removeItem('guestForced');
         if (!megaChat.hasSupportForCalls) {
-            this.setState({ view: Join.VIEW.UNSUPPORTED });
+            this.setState({ view: JOIN_VIEW.UNSUPPORTED });
         }
     }
 
@@ -394,7 +389,7 @@ export default class Join extends React.Component {
         const { view, ephemeralDialog } = this.state;
         return (
             <utils.RenderTo element={document.body}>
-                <div className={Join.NAMESPACE}>
+                <div className={this.NAMESPACE}>
                     {this.Head()}
                     {this.View(view)}
                     {ephemeralDialog && <this.Ephemeral />}

@@ -3189,14 +3189,22 @@ MegaData.prototype.getRecentActionsList = function(limit, until) {
  * @param {String} h The root node handle
  * @return {Array} node handles
  */
-MegaData.prototype.getTreeHandles = function _(h) {
+MegaData.prototype.getTreeHandles = function _(h, seen) {
     'use strict';
 
     var result = [h];
     var tree = Object.keys(M.tree[h] || {});
+    seen = seen || {[h]: 1};
 
     for (var i = tree.length; i--;) {
-        result.push.apply(result, _(tree[i]));
+        if (seen[tree[i]]) {
+            console.error('Circular reference detected in getTreeHandles', tree[i]);
+            eventlog(501088, JSON.stringify([1, M.currentdirid, tree[i], M.getNodeRoot(tree[i])]), true);
+        }
+        else {
+            seen[tree[i]] = 1;
+            result.push.apply(result, _(tree[i], seen));
+        }
     }
 
     return result;

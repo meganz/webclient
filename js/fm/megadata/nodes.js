@@ -3197,7 +3197,9 @@ MegaData.prototype.getTreeHandles = function _(h, seen) {
     seen = seen || {[h]: 1};
 
     for (var i = tree.length; i--;) {
-        if (seen[tree[i]]) {
+        // if seen contains shares, it means it is share list, which can contain one folder multiple times,
+        // but this is not circular reference.
+        if (seen[tree[i]] && !seen.shares) {
             console.error('Circular reference detected in getTreeHandles', tree[i]);
             eventlog(501088, JSON.stringify([1, M.currentdirid, tree[i], M.getNodeRoot(tree[i])]), true);
         }

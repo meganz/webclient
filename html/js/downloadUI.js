@@ -477,16 +477,16 @@ lazy(mega.ui, 'dlPage', () => {
                 this.appDl = true;
                 dlmanager.showMEGASyncOverlay(true);
             }
-            // Save downloaded file
+            // Downloaded previewed file (Save)
             else if (Object(previews[dlpage_ph]).full) {
                 dlprogress(-0xbadf, 100, fdl_filesize, fdl_filesize);
                 this.showCompleteUI();
-                eventlog(501033);
+                eventlog(501030);
                 M.saveAs(previews[dlpage_ph].buffer, dl_node.name);
             }
-            // Complete downloading
+            // Save downloaded file
             else if (dlResumeInfo && dlResumeInfo.byteLength === fdl_filesize) {
-                eventlog(501030);
+                eventlog(501033);
                 dlPageStartDownload();
             }
             // Start downloading

@@ -2071,9 +2071,9 @@ function topmenuUI() {
 
     // Init/update revamped header for FM and revamped subpages
     if (!is_mobile && mega.ui.header) {
-        // skip error page in Folder link section
-        const holder = isFm && !document.body.classList.contains('bottom-pages')
-            && self.pmlayout || document.getElementById('startholder');
+        // @todo: use common header for FM and subpages
+        const holder = self.pmlayout && pmlayout.offsetWidth ?
+            pmlayout : document.getElementById('startholder');
 
         // Header is exist but not available on dom, so lets re-init it.
         if (!holder.contains(mega.ui.header.domNode)) {
@@ -2091,7 +2091,7 @@ function topmenuUI() {
         }
 
         // @todo: remove condition when we start using new header in all sections
-        if (isFm || dlid || pfid || page === 'linkaccess') {
+        if (isFm || dlid || page === 'linkaccess' || page === 'chat') {
             mega.ui.header.show();
             mega.ui.header.update();
         }

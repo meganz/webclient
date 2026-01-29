@@ -1,7 +1,6 @@
 import React from 'react';
-import { MegaRenderMixin } from '../../mixins';
-import { STATUS } from './searchPanel.jsx';
-import { LABEL } from './resultContainer.jsx';
+import { MegaRenderMixin } from '../../mixins.js';
+import { STATUS, LABEL } from './utils.jsx';
 
 const SEARCH_STATUS_CLASS = 'search-field-status';
 const BASE_ICON_CLASS = 'sprite-fm-mono';

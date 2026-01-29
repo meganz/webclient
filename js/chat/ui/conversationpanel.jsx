@@ -1,12 +1,11 @@
-import React from 'react';
-import utils, { Emoji, ParsedHTML, reactStringWrap } from './../../ui/utils.jsx';
+import React, { Suspense, lazy } from 'react';
+import utils, { Emoji, ParsedHTML } from './../../ui/utils.jsx';
 import { MegaRenderMixin, timing } from '../mixins.js';
 import { Button } from '../../ui/buttons.jsx';
 import ModalDialogsUI from './../../ui/modalDialogs.jsx';
-import CloudBrowserModalDialog from './../../ui/cloudBrowserModalDialog.jsx';
-import { HistoryRetentionDialog } from '../../ui/historyRetentionDialog.jsx';
 import { Dropdown, DropdownItem } from '../../ui/dropdowns.jsx';
 import { ContactCard, ContactPickerDialog, MembersAmount } from './contacts.jsx';
+import HistoryRetentionDialog from '../../ui/historyRetentionDialog.jsx';
 import { PerfectScrollbar } from '../../ui/perfectScrollbar.jsx';
 import { Accordion, AccordionPanel } from '../../ui/accordion.jsx';
 import { ParticipantsList } from './participantsList.jsx';
@@ -14,20 +13,40 @@ import GenericConversationMessage from './messages/generic.jsx';
 import { SharedFilesAccordionPanel } from './sharedFilesAccordionPanel.jsx';
 import { IncSharesAccordionPanel } from './incomingSharesAccordionPanel.jsx';
 import { ChatlinkDialog } from './chatlinkDialog.jsx';
-import PushSettingsDialog from './pushSettingsDialog.jsx';
-import Call, { EXPANDED_FLAG, TYPE, inProgressAlert, isGuest } from './meetings/call.jsx';
 import HistoryPanel from './historyPanel.jsx';
 import ComposedTextArea from './composedTextArea.jsx';
-import Loading from './meetings/workflow/loading.jsx';
-import Join from './meetings/workflow/join.jsx';
+import PushSettingsDialog from './pushSettingsDialog.jsx';
 import Alert from './meetings/workflow/alert.jsx';
-import { isSameDay, isToday, isTomorrow } from './meetings/schedule/helpers.jsx';
+import { isSameDay } from './meetings/schedule/helpers.jsx';
 import { withHostsObserver } from './meetings/hostsObserver.jsx';
-import WaitingRoom from './meetings/waitingRoom/waitingRoom.jsx';
-import { renderEndConfirm, renderLeaveConfirm } from './meetings/streamControls';
 import { InviteParticipantsPanel } from './inviteParticipantsPanel.jsx';
 import ChatOverlay, { ChatOverlays } from './chatOverlay.jsx';
-import Link from './link.jsx';
+import { JOIN_VIEW } from './meetings/workflow/utils.jsx';
+import Occurrences from './meetings/schedule/occurrences.jsx';
+import Fallback from './fallback.jsx';
+import {
+    inProgressAlert,
+    isGuest,
+    isModerator,
+    isExpanded,
+    EXPANDED_FLAG,
+    getUnsupportedBrowserMessage,
+    TYPE,
+    renderEndConfirm,
+    renderLeaveConfirm
+} from './meetings/utils.jsx';
+
+const Call =
+    lazy(() => import(/* webpackChunkName: "call" */ './meetings/call.jsx'));
+const Loading =
+    lazy(() => import(/* webpackChunkName: "call" */ './meetings/workflow/loading.jsx'));
+const Join =
+    lazy(() => import(/* webpackChunkName: "call" */ './meetings/workflow/join.jsx'));
+
+const CloudBrowserDialog =
+    lazy(() => import(/* webpackChunkName: "cloud-browser" */ './../../ui/cloudBrowserModalDialog.jsx'));
+const WaitingRoom =
+    lazy(() => import(/* webpackChunkName: "waiting-room" */ './meetings/waitingRoom/waitingRoom.jsx'));
 
 const ENABLE_GROUP_CALLING_FLAG = true;
 const MAX_USERS_CHAT_PRIVATE = 100;
@@ -39,7 +58,7 @@ const DISMISS_TRANSITIONS = {
 };
 
 class EndCallButton extends React.Component {
-    IS_MODERATOR = Call.isModerator(this.props.chatRoom, u_handle);
+    IS_MODERATOR = isModerator(this.props.chatRoom, u_handle);
 
     LeaveButton = withHostsObserver(
         ({ hasHost, chatRoom, confirmLeave, onLeave }) => {
@@ -191,7 +210,7 @@ const StartMeetingNotification = ({ chatRoom, offset, onWaitingRoomJoin, onStart
     );
 };
 
-export const JoinCallNotification = ({ chatRoom, offset, rhpCollapsed }) => {
+const JoinCallNotification = ({ chatRoom, offset, rhpCollapsed }) => {
     if (chatRoom.call) {
         return null;
     }
@@ -266,181 +285,7 @@ export const excludedParticipants = (room) => {
     return excParticipants;
 };
 
-class Occurrences extends MegaRenderMixin {
-    domRef = React.createRef();
-    loadingMore = false;
-
-    state = {
-        editDialog: false,
-        occurrenceId: undefined
-    };
-
-    loadOccurrences() {
-        if (!this.loadingMore) {
-            const { scheduledMeeting, occurrences } = this.props;
-            const occurrenceItems = Object.values(occurrences || {});
-            const lastOccurrence = occurrenceItems[occurrenceItems.length - 1];
-
-            if (lastOccurrence) {
-                this.loadingMore = true;
-                scheduledMeeting.getOccurrences({ from: lastOccurrence.start })
-                    .catch(dump)
-                    .finally(() => {
-                        this.loadingMore = false;
-                    });
-            }
-        }
-    }
-
-    renderCancelConfirmation(occurrence) {
-        const { scheduledMeeting, chatRoom } = this.props;
-        const nextOccurrences = Object.values(scheduledMeeting.occurrences).filter(o => o.isUpcoming);
-
-        if (nextOccurrences.length > 1) {
-            return (
-                msgDialog(
-                    `confirmation:!^${l.cancel_meeting_occurrence_button}!${l.schedule_cancel_abort}`,
-                    'cancel-occurrence',
-                    l.schedule_cancel_occur_dlg_title,
-                    l.schedule_cancel_occur_dlg_text,
-                    cb => cb && occurrence.cancel(),
-                    1
-                )
-            );
-        }
-
-        return chatRoom.hasMessages(true) ?
-            msgDialog(
-                `confirmation:!^${l.cancel_meeting_button}!${l.schedule_cancel_abort}`,
-                'cancel-occurrence',
-                l.schedule_cancel_all_dialog_title,
-                l.schedule_cancel_all_dialog_move,
-                cb => cb && megaChat.plugins.meetingsManager.cancelMeeting(scheduledMeeting, scheduledMeeting.chatId),
-                1
-            ) :
-            msgDialog(
-                `confirmation:!^${l.cancel_meeting_button}!${l.schedule_cancel_abort}`,
-                'cancel-occurrence',
-                l.schedule_cancel_all_dialog_title,
-                l.schedule_cancel_all_dialog_archive,
-                cb => cb && megaChat.plugins.meetingsManager.cancelMeeting(scheduledMeeting, scheduledMeeting.chatId),
-                1
-            );
-    }
-
-    renderLoading() {
-        return (
-            <div className="loading-sketch">
-                {Array.from({ length: 10 }, (el, i) => {
-                    return (
-                        <div
-                            key={i}
-                            className="chat-occurrence">
-                            <div className="chat-occurrence-date" />
-                            <div className="chat-occurrence-content">
-                                <div className="chat-occurrence-title" />
-                                <div className="chat-occurrence-time" />
-                            </div>
-                        </div>
-                    );
-                })}
-            </div>
-        );
-    }
-
-    renderOccurrences() {
-        const { chatRoom, occurrences, occurrencesLoading, scheduledMeeting } = this.props;
-
-        if (occurrencesLoading) {
-            return this.renderLoading();
-        }
-
-        if (occurrences && occurrences.length > 0) {
-            const sortedOccurrences = Object.values(occurrences).sort((a, b) => a.start - b.start);
-            return (
-                <>
-                    {sortedOccurrences.map(occurrence =>
-                        occurrence.isUpcoming ?
-                            <div
-                                key={occurrence.uid}
-                                className={`
-                                    chat-occurrence
-                                    ${occurrence.uid}
-                                `}>
-                                <div className="chat-occurrence-date">
-                                    {isToday(occurrence.start) && <span>{l.today_occurrence_label} -</span>}
-                                    {isTomorrow(occurrence.start) && <span>{l.tomorrow_occurrence_label} -</span>}
-                                    <span>{time2date(occurrence.start / 1000, 19)}</span>
-                                </div>
-                                <div className="chat-occurrence-content">
-                                    <div className="chat-occurrence-title">{scheduledMeeting.title}</div>
-                                    <div className="chat-occurrence-time">
-                                        {toLocaleTime(occurrence.start)} -
-                                        &nbsp;
-                                        {toLocaleTime(occurrence.end)}
-                                    </div>
-                                    {chatRoom.iAmOperator() &&
-                                        <div className="chat-occurrence-controls">
-                                            <div
-                                                className="chat-occurrence-control simpletip"
-                                                data-simpletip={l[1342]}
-                                                data-simpletipposition="top"
-                                                data-simpletipoffset="5">
-                                                <Button
-                                                    icon="sprite-fm-mono icon-rename"
-                                                    onClick={() => {
-                                                        megaChat.trigger(
-                                                            megaChat.plugins.meetingsManager.EVENTS.EDIT,
-                                                            occurrence
-                                                        );
-                                                    }}
-                                                />
-                                            </div>
-                                            <div
-                                                className="chat-occurrence-control simpletip"
-                                                data-simpletip={l.msg_dlg_cancel}
-                                                data-simpletipposition="top"
-                                                data-simpletipoffset="5">
-                                                <Button
-                                                    icon="sprite-fm-mono icon-bin"
-                                                    onClick={() => this.renderCancelConfirmation(occurrence)}
-                                                />
-                                            </div>
-                                        </div>
-                                    }
-                                </div>
-                            </div> :
-                            null
-                    )}
-                </>
-            );
-        }
-
-        return <span>{l.no_occurrences_remain}</span>;
-    }
-
-    render() {
-        return (
-            <div
-                ref={this.domRef}
-                className="chat-occurrences-list">
-                <PerfectScrollbar
-                    chatRoom={this.props.chatRoom}
-                    ref={ref => {
-                        this.contactsListScroll = ref;
-                    }}
-                    disableCheckingVisibility={true}
-                    onUserScroll={ps => ps.isCloseToBottom(30) && this.loadOccurrences()}
-                    isVisible={this.isCurrentlyActive}
-                    options={{ suppressScrollX: true }}>
-                    <div className="chat-occurrences-list-inner">{this.renderOccurrences()}</div>
-                </PerfectScrollbar>
-            </div>
-        );
-    }
-}
-
-export class ConversationRightArea extends MegaRenderMixin {
+class ConversationRightArea extends MegaRenderMixin {
     domRef = React.createRef();
 
     static defaultProps = {
@@ -1415,7 +1260,7 @@ export class ConversationRightArea extends MegaRenderMixin {
     }
 }
 
-export class ConversationPanel extends MegaRenderMixin {
+class ConversationPanel extends MegaRenderMixin {
     domRef = React.createRef();
     messagesBlockRef = React.createRef();
 
@@ -1499,7 +1344,7 @@ export class ConversationPanel extends MegaRenderMixin {
         if (this.props.onToggleExpandedFlag) {
             this.props.onToggleExpandedFlag();
         }
-        return document.body.classList[Call.isExpanded() ? 'remove' : 'add'](EXPANDED_FLAG);
+        return document.body.classList[isExpanded() ? 'remove' : 'add'](EXPANDED_FLAG);
     }
 
     startCall(type, scheduled) {
@@ -1587,31 +1432,6 @@ export class ConversationPanel extends MegaRenderMixin {
                     </div>
                 </section>
             </ModalDialogsUI.ModalDialog>
-        );
-    };
-
-    CloudBrowserDialog = () => {
-        const { chatRoom } = this.props;
-
-        return (
-            <CloudBrowserModalDialog.CloudBrowserDialog
-                room={chatRoom}
-                allowAttachFolders={true}
-                onSelected={nodes => {
-                    this.selectedNodes = nodes;
-                }}
-                onAttachClicked={() => {
-                    this.setState({ attachCloudDialog: false }, () => {
-                        chatRoom.scrolledToBottom = true;
-                        chatRoom.attachNodes(this.selectedNodes).catch(dump);
-                    });
-                }}
-                onClose={() => {
-                    this.setState({ attachCloudDialog: false }, () => {
-                        this.selectedNodes = [];
-                    });
-                }}
-            />
         );
     };
 
@@ -2356,120 +2176,123 @@ export class ConversationPanel extends MegaRenderMixin {
                 `}
                 onMouseMove={() => self.onMouseMove()}
                 data-room-id={self.props.chatRoom.chatId}>
-                {room.meetingsLoading && <Loading chatRoom={room} title={room.meetingsLoading.title} />}
-                {room.call && (
-                    <Call
-                        chatRoom={room}
-                        peers={room.call.peers}
-                        call={room.call}
-                        minimized={this.state.callMinimized}
-                        typingAreaText={this.state.typingAreaText}
-                        onCallMinimize={() => {
-                            return this.state.callMinimized ?
-                                null :
-                                this.setState({ callMinimized: true }, () => {
-                                    this.toggleExpandedFlag();
-                                    this.safeForceUpdate();
-                                });
-                        }}
-                        onCallExpand={() => {
-                            return this.state.callMinimized &&
-                                this.setState({ callMinimized: false }, () => {
-                                    $.hideTopMenu();
-                                    if ($.dialog) {
-                                        closeDialog();
-                                    }
-                                    loadSubPage('fm/chat');
-                                    room.show();
-                                    this.toggleExpandedFlag();
-                                });
-                        }}
-                        didMount={() => {
-                            this.toggleExpandedFlag();
-                            if (room.isMeeting) {
-                                room.updatePublicHandle().catch(dump);
+                <Suspense fallback={<Fallback />}>
+                    {room.meetingsLoading && <Loading chatRoom={room} title={room.meetingsLoading.title} />}
+
+                    {room.call && (
+                        <Call
+                            chatRoom={room}
+                            peers={room.call.peers}
+                            call={room.call}
+                            minimized={this.state.callMinimized}
+                            typingAreaText={this.state.typingAreaText}
+                            onCallMinimize={() => {
+                                return this.state.callMinimized ?
+                                    null :
+                                    this.setState({ callMinimized: true }, () => {
+                                        this.toggleExpandedFlag();
+                                        this.safeForceUpdate();
+                                    });
+                            }}
+                            onCallExpand={() => {
+                                return this.state.callMinimized &&
+                                    this.setState({ callMinimized: false }, () => {
+                                        $.hideTopMenu();
+                                        if ($.dialog) {
+                                            closeDialog();
+                                        }
+                                        loadSubPage('fm/chat');
+                                        room.show();
+                                        this.toggleExpandedFlag();
+                                    });
+                            }}
+                            didMount={() => {
+                                this.toggleExpandedFlag();
+                                if (room.isMeeting) {
+                                    room.updatePublicHandle().catch(dump);
+                                }
+                            }}
+                            willUnmount={minimised =>
+                                this.setState({ callMinimized: false }, () =>
+                                    minimised ? null : this.toggleExpandedFlag()
+                                )
                             }
-                        }}
-                        willUnmount={minimised =>
-                            this.setState({ callMinimized: false }, () =>
-                                minimised ? null : this.toggleExpandedFlag()
-                            )
-                        }
-                        onCallEnd={() => this.safeForceUpdate()}
-                        onDeleteMessage={msg => this.handleDeleteDialog(msg)}
-                        onTypingAreaChanged={this.updateTypingAreaText}
-                        parent={this}
-                    />
-                )}
-                {megaChat.initialPubChatHandle && room.publicChatHandle === megaChat.initialPubChatHandle &&
-                    !room.call && (
-                    room.isMeeting && !room.call && room.activeCallIds.length > 0
-                ) &&
-                    <Join
-                        initialView={u_type || is_eplusplus ? Join.VIEW.ACCOUNT : Join.VIEW.INITIAL}
-                        chatRoom={room}
-                        onJoinGuestClick={(firstName, lastName, audioFlag, videoFlag) => {
-                            room.meetingsLoading = l.joining;
-                            u_eplusplus(firstName, lastName)
-                                .then(() => {
-                                    return megaChat.routing.reinitAndJoinPublicChat(
-                                        room.chatId,
-                                        room.publicChatHandle,
-                                        room.publicChatKey
-                                    );
-                                })
-                                .then(() => {
-                                    delete megaChat.initialPubChatHandle;
-                                    return megaChat.getChatById(room.chatId).joinCall(audioFlag, videoFlag);
-                                })
-                                .catch((ex) => {
-                                    if (d) {
-                                        console.error('E++ account failure!', ex);
-                                    }
+                            onCallEnd={() => this.safeForceUpdate()}
+                            onDeleteMessage={msg => this.handleDeleteDialog(msg)}
+                            onTypingAreaChanged={this.updateTypingAreaText}
+                            parent={this}
+                        />
+                    )}
 
-                                    setTimeout(() => {
-                                        msgDialog(
-                                            'warninga',
-                                            l[135],
-                                            /* Failed to create E++ account. Please try again later. */
-                                            l.eplusplus_create_failed,
-                                            escapeHTML(api_strerror(ex) || ex)
-                                        );
-                                    }, 1234);
-
-                                    eventlog(99745, JSON.stringify([1, String(ex).split('\n')[0]]));
-                                });
-                        }}
-                        onJoinClick={(audioFlag, videoFlag) => {
-                            const chatId = room.chatId;
-
-                            if (room.members[u_handle]) {
-                                delete megaChat.initialPubChatHandle;
-
-                                megaChat.routing.reinitAndOpenExistingChat(chatId, room.publicChatHandle)
+                    {megaChat.initialPubChatHandle && room.publicChatHandle === megaChat.initialPubChatHandle &&
+                        !room.call && (room.isMeeting && !room.call && room.activeCallIds.length > 0) &&
+                        <Join
+                            initialView={u_type || is_eplusplus ? JOIN_VIEW.ACCOUNT : JOIN_VIEW.INITIAL}
+                            chatRoom={room}
+                            onJoinGuestClick={(firstName, lastName, audioFlag, videoFlag) => {
+                                room.meetingsLoading = l.joining;
+                                u_eplusplus(firstName, lastName)
                                     .then(() => {
-                                        return megaChat.getChatById(chatId).joinCall(audioFlag, videoFlag);
+                                        return megaChat.routing.reinitAndJoinPublicChat(
+                                            room.chatId,
+                                            room.publicChatHandle,
+                                            room.publicChatKey
+                                        );
+                                    })
+                                    .then(() => {
+                                        delete megaChat.initialPubChatHandle;
+                                        return megaChat.getChatById(room.chatId).joinCall(audioFlag, videoFlag);
                                     })
                                     .catch((ex) => {
-                                        console.error("Failed to open existing room and join call:", ex);
-                                    });
-                            }
-                            else {
-                                megaChat.routing.reinitAndJoinPublicChat(
-                                    chatId,
-                                    room.publicChatHandle,
-                                    room.publicChatKey
-                                ).then(() => {
-                                    delete megaChat.initialPubChatHandle;
-                                    return megaChat.getChatById(chatId).joinCall(audioFlag, videoFlag);
-                                }).catch((ex) => {
-                                    console.error("Failed to join room:", ex);
-                                });
-                            }
+                                        if (d) {
+                                            console.error('E++ account failure!', ex);
+                                        }
 
-                        }}
-                    />
-                }
+                                        setTimeout(() => {
+                                            msgDialog(
+                                                'warninga',
+                                                l[135],
+                                                /* Failed to create E++ account. Please try again later. */
+                                                l.eplusplus_create_failed,
+                                                escapeHTML(api_strerror(ex) || ex)
+                                            );
+                                        }, 1234);
+
+                                        eventlog(99745, JSON.stringify([1, String(ex).split('\n')[0]]));
+                                    });
+                            }}
+                            onJoinClick={(audioFlag, videoFlag) => {
+                                const chatId = room.chatId;
+
+                                if (room.members[u_handle]) {
+                                    delete megaChat.initialPubChatHandle;
+
+                                    megaChat.routing.reinitAndOpenExistingChat(chatId, room.publicChatHandle)
+                                        .then(() => {
+                                            return megaChat.getChatById(chatId).joinCall(audioFlag, videoFlag);
+                                        })
+                                        .catch((ex) => {
+                                            console.error("Failed to open existing room and join call:", ex);
+                                        });
+                                }
+                                else {
+                                    megaChat.routing.reinitAndJoinPublicChat(
+                                        chatId,
+                                        room.publicChatHandle,
+                                        room.publicChatKey
+                                    ).then(() => {
+                                        delete megaChat.initialPubChatHandle;
+                                        return megaChat.getChatById(chatId).joinCall(audioFlag, videoFlag);
+                                    }).catch((ex) => {
+                                        console.error("Failed to join room:", ex);
+                                    });
+                                }
+
+                            }}
+                        />
+                    }
+                </Suspense>
+
                 <div
                     className={`
                         chat-content-block
@@ -2547,10 +2370,31 @@ export class ConversationPanel extends MegaRenderMixin {
                         />
                     }
 
-                    {this.state.attachCloudDialog && <this.CloudBrowserDialog/>}
                     {this.state.sendContactDialog && <this.SelectContactDialog/>}
                     {this.state.descriptionDialog && <this.DescriptionDialog/>}
                     {this.state.pushSettingsDialog && <this.PushSettingsDialog/>}
+                    <Suspense fallback={<Fallback />}>
+                        {this.state.attachCloudDialog &&
+                            <CloudBrowserDialog
+                                room={room}
+                                allowAttachFolders={true}
+                                onSelected={nodes => {
+                                    this.selectedNodes = nodes;
+                                }}
+                                onAttachClicked={() => {
+                                    this.setState({ attachCloudDialog: false }, () => {
+                                        chatRoom.scrolledToBottom = true;
+                                        chatRoom.attachNodes(this.selectedNodes).catch(dump);
+                                    });
+                                }}
+                                onClose={() => {
+                                    this.setState({ attachCloudDialog: false }, () => {
+                                        this.selectedNodes = [];
+                                    });
+                                }}
+                            />
+                        }
+                    </Suspense>
 
                     {privateChatDialog}
                     {nonLoggedInJoinChatDialog}
@@ -2984,7 +2828,7 @@ export class ConversationPanels extends MegaRenderMixin {
                                 ${isEmpty ? 'empty-state' : ''}
                                 unsupported-call-alert
                             `}
-                            content={Call.getUnsupportedBrowserMessage()}
+                            content={getUnsupportedBrowserMessage()}
                             ref={ref => {
                                 this.noSupportRef = ref;
                             }}
@@ -3015,146 +2859,6 @@ export class ConversationPanels extends MegaRenderMixin {
                     }
                     return null;
                 })}
-            </div>
-        );
-    }
-}
-
-export class EmptyConvPanel extends React.Component {
-    domRef = React.createRef();
-
-    state = {
-        linkData: '',
-    };
-
-    componentDidMount() {
-        (M.account && M.account.contactLink ? Promise.resolve(M.account.contactLink) : api.send('clc'))
-            .then(res => {
-                if (this.domRef?.current && typeof res === 'string') {
-                    const prefix = res.startsWith('C!') ? '' : 'C!';
-                    this.setState({ linkData: `${getBaseUrl()}/${prefix}${res}` });
-                }
-            })
-            .catch(dump);
-    }
-
-    Tile = ({ title, desc, imgClass, buttonPrimary, buttonSecondary, onClickPrimary, onClickSecondary }) =>
-        <div className="conversations-empty-tile">
-            <span className={`chat-tile-img ${imgClass}`} />
-            <div className="tile-content">
-                <h2>{title}</h2>
-                <div>{desc}</div>
-                <Button
-                    className="mega-button positive"
-                    label={buttonPrimary}
-                    onClick={onClickPrimary}
-                />
-                {
-                    buttonSecondary &&
-                    <Button
-                        className="mega-button action positive"
-                        icon="sprite-fm-mono icon-link"
-                        label={buttonSecondary}
-                        onClick={onClickSecondary}
-                    />
-                }
-            </div>
-        </div>;
-
-    render() {
-        const { isMeeting, onNewChat, onStartMeeting, onScheduleMeeting } = this.props;
-        const { linkData } = this.state;
-
-        return (
-            <div
-                ref={this.domRef}
-                className="conversations-empty">
-                <div className="conversations-empty-header">
-                    <h1>{
-                        isMeeting ?
-                            l.meetings_empty_header : /* `Get together with MEGA meetings` */
-                            l.chat_empty_header /* `Keep in touch with MEGA chat` */
-                    }</h1>
-                    <h3>
-                        {reactStringWrap(
-                            isMeeting ?
-                                l.meetings_empty_subheader : /* `Voice and video calls, protected with...` */
-                                l.chat_empty_subheader, /* `Direct messaging, group chats and calling anyone, on...` */
-                            '[A]',
-                            Link,
-                            {
-                                onClick: () => {
-                                    window.open('https://mega.io/chatandmeetings', '_blank', 'noopener,noreferrer');
-                                    eventlog(this.props.isMeeting ? 500281 : 500280);
-                                }
-                            }
-                        )}
-                    </h3>
-                </div>
-                <div className="conversations-empty-content">
-                    <this.Tile
-                        title={
-                            isMeeting ?
-                                l.meetings_empty_calls_head : /* `Video call with anyone` */
-                                l.invite_friend_btn /* `Invite a friend` */
-                        }
-                        desc={
-                            isMeeting ?
-                                l.meetings_empty_calls_desc : /* `Start a meeting now, and invite anyone to join...` */
-                                l.chat_empty_contact_desc /* `Add friends and family and get 5 GB of free cloud...` */
-                        }
-                        imgClass={isMeeting ? 'empty-meetings-call' : 'empty-chat-contacts'}
-                        buttonPrimary={
-                            isMeeting ?
-                                l.new_meeting_start : /* `Start meeting now` */
-                                l[71] /* `Add contact` */
-                        }
-                        buttonSecondary={!isMeeting && linkData && l.copy_contact_link_btn}
-                        onClickPrimary={() => {
-                            if (isMeeting) {
-                                onStartMeeting();
-                                eventlog(500275);
-                            }
-                            else {
-                                contactAddDialog();
-                                eventlog(500276);
-                            }
-                        }}
-                        onClickSecondary={() => {
-                            /* `Copied to clipboard` */
-                            copyToClipboard(linkData, `${l[371]}<span class="link-text">${linkData}</span>`);
-                            delay('chat-event-copy-contact-link', () => eventlog(500277));
-                        }}
-                    />
-                    <this.Tile
-                        title={
-                            isMeeting ?
-                                l.meetings_empty_schedule_head /* `Plan a meeting` */
-                                : l.chat_empty_add_chat_header /* `Start chatting` */
-                        }
-                        desc={
-                            isMeeting ?
-                                l.meetings_empty_schedule_desc : /* `Schedule one-off or recurring meetings, ...` */
-                                l.chat_empty_add_chat_desc /* `Anyone with a link can join your chat, ...` */
-                        }
-                        imgClass={isMeeting ? 'empty-meetings-schedule' : 'empty-chat-new'}
-                        buttonPrimary={
-                            isMeeting ?
-                                l.schedule_meeting_start : /* `Schedule meeting` */
-                                l.add_chat /* `New chat` */
-                        }
-                        onClickPrimary={() => {
-                            if (isMeeting) {
-                                onScheduleMeeting();
-                                eventlog(500278);
-                            }
-                            else {
-                                onNewChat();
-                                eventlog(500279);
-                            }
-                        }}
-                    />
-                </div>
             </div>
         );
     }

@@ -1,7 +1,7 @@
-var React = require("react");
-var ContactsUI = require('./../contacts.jsx');
-var ConversationMessageMixin = require('./mixin.jsx').ConversationMessageMixin;
+import React from 'react';
 import { Emoji, ParsedHTML } from '../../../ui/utils.jsx';
+import { Avatar, ContactButton } from '../contacts.jsx';
+import { ConversationMessageMixin } from './mixin.jsx';
 
 class AltPartsConvMessage extends ConversationMessageMixin {
     haveMoreContactListeners() {
@@ -41,7 +41,7 @@ class AltPartsConvMessage extends ConversationMessageMixin {
                 'c': 0,
             };
 
-            var avatar = <ContactsUI.Avatar contact={otherContact}
+            var avatar = <Avatar contact={otherContact}
                 chatRoom={self.props.chatRoom}
                 className="message avatar-wrapper small-rounded-avatar"/>;
             var otherDisplayName = M.getNameByHandle(otherContact.u);
@@ -65,7 +65,7 @@ class AltPartsConvMessage extends ConversationMessageMixin {
                     {avatar}
 
                     <div className="message content-area small-info-txt selectable-txt">
-                        <ContactsUI.ContactButton
+                        <ContactButton
                             className="message"
                             contact={otherContact}
                             chatRoom={self.props.chatRoom}
@@ -87,7 +87,7 @@ class AltPartsConvMessage extends ConversationMessageMixin {
                 'c': 0,
             };
 
-            var avatar = <ContactsUI.Avatar contact={otherContact}
+            var avatar = <Avatar contact={otherContact}
                 chatRoom={self.props.chatRoom}
                 className="message avatar-wrapper small-rounded-avatar"/>;
             var otherDisplayName = M.getNameByHandle(otherContact.u);
@@ -114,7 +114,7 @@ class AltPartsConvMessage extends ConversationMessageMixin {
                     {avatar}
 
                     <div className="message content-area small-info-txt selectable-txt">
-                        <ContactsUI.ContactButton
+                        <ContactButton
                             className="message"
                             chatRoom={self.props.chatRoom}
                             contact={otherContact}

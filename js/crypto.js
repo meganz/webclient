@@ -323,7 +323,7 @@ function api_reqfailed(channel, error) {
     if (this.sid[0] === 'n' && c !== 2) {
         // yes: handle as a failed folder link access
         api.reset(c);
-        return folderreqerr(c, this.error || error);
+        return folderreqerr(this.error || error);
     }
 
     if (e === ESID) {

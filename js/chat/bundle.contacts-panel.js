@@ -1542,8 +1542,10 @@ class FMView extends mixins.w9 {
       currentlyViewedEntry: prevEntry,
       searchValue: prevSearch
     } = prevProps;
-    if (prevEntry !== currEntry || currSearch !== prevSearch) {
+    const dataSourceChanged = this.props.dataSource !== prevProps.dataSource;
+    if (dataSourceChanged || prevEntry !== currEntry || currSearch !== prevSearch) {
       let _this$dataSource3;
+      this.dataSource = this.props.dataSource;
       const newState = {
         'selected': [],
         'highlighted': []
@@ -2025,21 +2027,39 @@ class ColumnContactName extends genericNodePropsComponent.B {
   static get label() {
     return l[86];
   }
-  render() {
+  get name() {
+    const {
+      nodeAdapter,
+      node
+    } = this.props;
+    if (nodeAdapter.nodeProps) {
+      return nodeAdapter.nodeProps.title;
+    }
+    return M.getNameByEmail(node.m);
+  }
+  _renderAvatar() {
     const {
       nodeAdapter
     } = this.props;
     const {
       node
     } = nodeAdapter.props;
-    return JSX_("td", null, JSX_(contacts.eu, {
-      contact: node,
-      className: "avatar-wrapper box-avatar"
-    }), JSX_("div", {
+    if (nodeAdapter.nodeProps || node.name !== '') {
+      return JSX_(contacts.eu, {
+        contact: node,
+        className: "avatar-wrapper box-avatar"
+      });
+    } else if (node.name === '') {
+      return JSX_(ui_utils.P9, null, useravatar.contact(node.m, 'box-avatar'));
+    }
+    return null;
+  }
+  render() {
+    return JSX_("td", null, this._renderAvatar(), JSX_("div", {
       className: "contact-item"
     }, JSX_("div", {
       className: "contact-item-user"
-    }, JSX_(ui_utils.sp, null, nodeAdapter.nodeProps.title)), JSX_(this.Mail, null)), JSX_("div", {
+    }, JSX_(ui_utils.sp, null, this.name)), JSX_(this.Mail, null)), JSX_("div", {
       className: "clear"
     }));
   }
@@ -2700,14 +2720,18 @@ ColumnContactRequestsRcvdBtns.megatype = "grid-url-header-nw contact-controls-co
 
 
 
+
 const ReceivedRequests = ({
   received
 }) => {
+  const nameOrEmailColumn = received.mixed ? ColumnContactName : [ColumnContactRequestsEmail, {
+    currView: "ipc"
+  }];
   return JSX_("div", {
     className: "contacts-list"
   }, JSX_(fmView.A, {
     sortFoldersFirst: false,
-    dataSource: received,
+    dataSource: received.data,
     customFilterFn: r => {
       return !r.dts;
     },
@@ -2721,9 +2745,7 @@ const ReceivedRequests = ({
     megaListItemHeight: 59,
     headerContainerClassName: "contacts-table requests-table contacts-table-head",
     containerClassName: "contacts-table requests-table contacts-table-results",
-    listAdapterColumns: [[ColumnContactRequestsEmail, {
-      currView: "ipc"
-    }], [ColumnContactRequestsTs, {
+    listAdapterColumns: [nameOrEmailColumn, [ColumnContactRequestsTs, {
       label: l[19505]
     }], [ColumnContactRequestsRcvdBtns, {
       onReject: handle => {
@@ -3231,8 +3253,8 @@ class ContactsPanel extends mixins.w9 {
     };
     this.handleAcceptAllRequests = () => {
       const {
-        received
-      } = this.props;
+        data: received
+      } = this.props.received;
       const receivedKeys = Object.keys(received || {});
       if (receivedKeys.length) {
         for (let i = receivedKeys.length; i--;) {

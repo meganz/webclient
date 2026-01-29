@@ -41,6 +41,7 @@ mega.tpw = new function TransferProgressWidget() {
     var mySelf = this;
     var isHiddenByUser = false;
     var isMinimizedByUser = false;
+    let isHiddenForUpgrade = false;
 
     var monitors = Object.create(null);
 
@@ -106,6 +107,7 @@ mega.tpw = new function TransferProgressWidget() {
             function overquota_bannerUpgrade() {
                 $('.transfer-progress-icon.tpw-close', $rowsHeader).click();
                 isHiddenByUser = true;
+                isHiddenForUpgrade = true;
                 loadSubPage('pro');
             });
 
@@ -305,6 +307,11 @@ mega.tpw = new function TransferProgressWidget() {
             return;
         }
 
+        if (isHiddenForUpgrade && is_fm()) {
+            isHiddenForUpgrade = false;
+            isHiddenByUser = false;
+        }
+
         if (!isHiddenByUser) {
 
             if (page !== 'securechat' && page.indexOf('chat') === -1) {
@@ -367,6 +374,7 @@ mega.tpw = new function TransferProgressWidget() {
             $currWidget.replaceWith($widget);
 
             initEventsHandlers();
+            mega.tpw.rebindListEvents();
             // init sections
             mega.tpw.renderView(mega.tpw.views.ACTIVE);
         }
@@ -747,6 +755,7 @@ mega.tpw = new function TransferProgressWidget() {
         $widget.removeClass('hidden');
         $widget.show();
         isHiddenByUser = false;
+        this.renderView(this.currView || this.views.ACTIVE, true);
     };
 
     this.hideWidget = function() {
@@ -912,6 +921,10 @@ mega.tpw = new function TransferProgressWidget() {
                         else if (GlobalProgress[gid]) {
                             ulmanager.abort(gid);
                         }
+                        // This is completed transfer removal
+                        if (this.parent._complete) {
+                            eventlog(501087);
+                        }
                         $(`.transfer-table tr#${gid}`).remove();
                         if ($.clearTransferPanel) {
                             $.clearTransferPanel();
@@ -924,6 +937,7 @@ mega.tpw = new function TransferProgressWidget() {
                         break;
                     }
                     case 'link': {
+                        eventlog(501085);
                         const node = M.getNodeByHandle(this.handle || id);
                         if (node) {
                             $.selected = [node.h];
@@ -932,6 +946,7 @@ mega.tpw = new function TransferProgressWidget() {
                         break;
                     }
                     case 'cloud': {
+                        eventlog(501086);
                         const node = M.getNodeByHandle(this.handle || id);
                         if (node && node.p) {
                             $.autoSelectNode = node.h;
@@ -1424,6 +1439,10 @@ mega.tpw = new function TransferProgressWidget() {
     };
     scope.getIncompleteIds = () => {
         return [...rows.keys()].filter(id => !rows.get(id).complete);
+    };
+    scope.rebindListEvents = () => {
+        megaList.scrollUpdate();
+        megaList._bindEvents();
     };
 
     Object.defineProperty(scope, 'rowsLength', {

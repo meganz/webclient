@@ -337,67 +337,6 @@ var exportPassword = {
      */
     decrypt: {
 
-        // The jQuery selector for the Export dialog
-        $dialog: null,
-
-        /**
-         * Initialise function
-         * @param {String} page The current page's URL hash e.g. #P!AAA5TWTcNMtFlJ5A...
-         */
-        init: function(page) {
-
-            "use strict";
-
-            // Cache dialog selector
-            this.$dialog = $('.mega-dialog.password-dialog', 'body');
-
-            this.$megaInput = new mega.ui.MegaInputs($('#password-decrypt-input',this.$dialog));
-
-            // Show the dialog
-            this.showDialog(page);
-        },
-
-        /**
-         * Shows the dialog to let the user decrypt the link using a password
-         * @param {String} page The current page's URL hash e.g. #P!AAA5TWTcNMtFlJ5A...
-         */
-        showDialog: function(page) {
-
-            "use strict";
-            var $megaInput = this.$megaInput;
-            var $closeButton = $('button.js-close', this.$dialog);
-            var $decryptButton = $('.decrypt-link-button', this.$dialog);
-            var $decryptButtonText = $('.decrypt-text', $decryptButton);
-
-            // Show a background overlay
-            fm_showoverlay();
-
-            // Show the dialog
-            $.dialog = 'passwordlink-dialog';
-            this.$dialog.removeClass('hidden');
-
-            // Reset state of dialog for future password link decryptions
-            $decryptButtonText.text(l[1027]);   // Decrypt
-
-            // Add a click handler for the close button to return to the home page (or cloud drive if logged in)
-            $closeButton.rebind('click', function() {
-                loadSubPage('');
-                return false;
-            });
-
-            // Add click handler for Decrypt button
-            $decryptButton.rebind('click', function() {
-                exportPassword.decrypt.decryptLink(page);
-            });
-
-            // Listen for Enter key to fire decryption
-            $megaInput.$input.rebind('keyup', (ev) => {
-                if (ev.keyCode === 13) {
-                    exportPassword.decrypt.decryptLink(page);
-                }
-            });
-        },
-
         /**
          * Decrypts the password protected link and redirects to the real folder/file link
          * @param {String} page The current page's URL hash e.g. #P!AAA5TWTcNMtFlJ5A...
@@ -405,21 +344,21 @@ var exportPassword = {
         decryptLink: function(page) {
 
             "use strict";
-            var $megaInput = this.$megaInput;
-            var $decryptButton = $('.decrypt-link-button', this.$dialog);
-            var $decryptButtonText = $('.decrypt-text', $decryptButton);
-            var $decryptButtonProgress = $('.decryption-in-progress', $decryptButton);
-            var $password = $megaInput.$input;
-
 
             // Get the password and the encoded information in the URL
-            var password = $password.val();
-            var urlEncodedInfo = page.replace('P!', '');
-            var decodedBytes = null;
+            const urlEncodedInfo = page.replace('P!', '');
+            const {
+                linkAccess = {
+                    getInputValue: nop,
+                    showInputError: nop
+                }
+            } = mega.ui;
+            const password = linkAccess.inputValue;
+            let decodedBytes = null;
 
             // If no password given...
             if (!password) {
-                $megaInput.showError(l[970]); // Please enter a valid password...
+                linkAccess.showInputError(l.dl_enter_valid_pass_err); // Please enter a valid password...
                 return false;
             }
 
@@ -430,7 +369,7 @@ var exportPassword = {
             catch (exception) {
 
                 // Show error and abort
-                $megaInput.showError(l[9068]);  // The link could not be decoded...
+                linkAccess.showInputError(l[9068]);  // The link could not be decoded...
                 return false;
             }
 
@@ -441,7 +380,7 @@ var exportPassword = {
             if (typeof exportPassword.algorithms[algorithm] === 'undefined') {
 
                 // Show error and abort
-                $megaInput.showError(l[9069]);  // The algorithm this link was encrypted with is not supported
+                linkAccess.showInputError(l[9069]);  // The algorithm this link was encrypted with is not supported
                 return false;
             }
 
@@ -452,8 +391,7 @@ var exportPassword = {
             var saltBytes = decodedBytes.subarray(saltStartOffset, saltEndOffset);
 
             // Show encryption loading animation and change text to 'Decrypting'
-            $decryptButtonProgress.removeClass('hidden');
-            $decryptButtonText.text(l[8579]);
+            linkAccess.loader = true;
 
             // Compute the PBKDF
             exportPassword.deriveKey(algorithm, saltBytes, password, function(derivedKeyBytes) {
@@ -494,9 +432,7 @@ var exportPassword = {
                 if (macString !== macToVerifyString) {
 
                     // Show error and abort
-                    $megaInput.showError(l[9076]);  // The link could not be decrypted...
-                    $decryptButtonProgress.addClass('hidden');
-                    $decryptButtonText.text(l[1027]);
+                    linkAccess.showInputError(l.dl_incorrect_pass_err);  // The link could not be decrypted...
                     return false;
                 }
 
@@ -529,13 +465,6 @@ var exportPassword = {
                 var folderIdentifier = (linkType === exportPassword.LINK_TYPE_FOLDER) ? 'F' : '';
 
                 const url = `${folderIdentifier ? '/folder/' : '/file/'}${handleUrlEncoded}#${decryptedKeyUrlEncoded}`;
-
-                // Show completed briefly before redirecting
-                $decryptButtonProgress.addClass('hidden');
-                $decryptButtonText.text(l[9077]);   // Decrypted
-
-                // Clear password field
-                $password.val('');
 
                 // Add a log to see if the feature is used often
                 api_req({ a: 'log', e: 99633, m: 'Successfully decrypted password protected link on regular web' });

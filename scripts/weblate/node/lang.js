@@ -411,7 +411,9 @@ async function download(branchSuffix, webProdStrings, sharedTag, build) {
     const baseBranch = api.hasBranchComponent(branchSuffix, !!ARGS.shared);
     const sharedBranch = api.hasBranchComponent(branchSuffix);
     const extraBranch = ARGS.branch ? api.hasBranchComponent(ARGS.branch, !!ARGS.shared) : false;
-    promises.push(api.fetchAllComponentStringMeta(api.COMPONENT));
+    if (sharedTag) {
+        promises.push(api.fetchAllComponentStringMeta(api.COMPONENT));
+    }
 
     const langKeys = getLanguageKeys();
     const baseProdLangs = {};

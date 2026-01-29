@@ -1542,8 +1542,10 @@ class FMView extends mixins.w9 {
       currentlyViewedEntry: prevEntry,
       searchValue: prevSearch
     } = prevProps;
-    if (prevEntry !== currEntry || currSearch !== prevSearch) {
+    const dataSourceChanged = this.props.dataSource !== prevProps.dataSource;
+    if (dataSourceChanged || prevEntry !== currEntry || currSearch !== prevSearch) {
       let _this$dataSource3;
+      this.dataSource = this.props.dataSource;
       const newState = {
         'selected': [],
         'highlighted': []

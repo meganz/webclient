@@ -2151,7 +2151,8 @@ class ConversationsApp extends mixins.w9 {
       freeCallEndedDialog: false,
       contactSelectorDialog: false,
       view: VIEWS.LOADING,
-      callExpanded: false
+      callExpanded: false,
+      ipcData: null
     };
     this._cacheRouting();
     megaChat.rebind('onStartNewMeeting.convApp', () => this.startMeeting());
@@ -2251,13 +2252,47 @@ class ConversationsApp extends mixins.w9 {
         v: Chatd.VERSION
       }).catch(dump);
     }
+    this.requestReceivedListener = mBroadcaster.addListener('fmViewUpdate:ipc', () => {
+      this.setState({
+        ipcData: this.makeIpcData()
+      });
+    });
+    this.setState({
+      ipcData: this.makeIpcData()
+    });
   }
   componentWillUnmount() {
     super.componentWillUnmount();
     $(document).off('keydown.megaChatTextAreaFocus');
+    mBroadcaster.removeListener('fmViewUpdate:ipc', this.requestReceivedListener);
   }
-  componentDidUpdate() {
+  componentDidUpdate(prevProps, prevState) {
     this.handleOnboardingStep();
+    const {
+      names: prevNames
+    } = prevState.ipcData;
+    const newIpcData = this.makeIpcData();
+    const {
+      names: newNames
+    } = newIpcData;
+    if (newNames.size !== prevNames.size) {
+      this.setState({
+        ipcData: newIpcData
+      });
+      return;
+    }
+    let different = false;
+    for (const [email, name] of newNames) {
+      if (!prevNames.has(email) || prevNames.get(email) !== name) {
+        different = true;
+        break;
+      }
+    }
+    if (different) {
+      this.setState({
+        ipcData: newIpcData
+      });
+    }
   }
   handleOnboardingStep() {
     if (this.state.view === VIEWS.LOADING) {
@@ -2283,6 +2318,29 @@ class ConversationsApp extends mixins.w9 {
         megaChat.renderListing(null, false).catch(dump);
       }
     });
+  }
+  makeIpcData() {
+    let mixed = false;
+    const names = new Map();
+    const data = Object.values(M.ipc).reduce((acc, curr) => {
+      const name = M.getNameByEmail(curr.m);
+      if (name !== curr.m) {
+        names.set(curr.m, name);
+        mixed = true;
+      }
+      return {
+        ...acc,
+        [curr.p]: {
+          ...curr,
+          name
+        }
+      };
+    }, Object.create(null));
+    return {
+      mixed,
+      data,
+      names
+    };
   }
   render() {
     const {
@@ -2320,7 +2378,7 @@ class ConversationsApp extends mixins.w9 {
     }), !isLoading && routingSection === 'contacts' && JSX_(ContactsPanel, {
       megaChat,
       contacts: M.u,
-      received: M.ipc,
+      received: this.state.ipcData,
       sent: M.opc
     }), !isLoading && JSX_(ConversationPanels, (0,esm_extends.A)({}, this.props, {
       className: routingSection === 'chat' ? '' : 'hidden',
@@ -10317,9 +10375,9 @@ Chat.prototype.init = promisify(function (resolve, reject) {
     }
     if (is_chatlink) {
       const start = document.getElementById('startholder');
-      this.flyoutStartHolder = document.createElement('div');
-      this.flyoutStartHolder.className = 'flyout-holder';
-      start.appendChild(this.flyoutStartHolder);
+      this.flyoutStartHolder = start.querySelector('.flyout-holder') || mCreateElement('div', {
+        class: 'flyout-holder'
+      }, start);
     }
     const selector = is_chatlink ? '.chat-links-preview > .chat-app-container' : '.section.conversations';
     const rootDOMNode = this.rootDOMNode = document.querySelector(selector);

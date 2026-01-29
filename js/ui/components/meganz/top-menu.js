@@ -31,10 +31,14 @@ class MegaTopMenu extends MegaMobileTopMenu {
         this.domNode.prepend(mCreateElement('div', {'class': 'left-pane-drag-handle'}));
 
         M.onFileManagerReady(() => {
+            let tempCollapseState = false;
             const leftIcon = 'sprite-fm-mono icon-chevrons-left-thin-outline';
             const rightIcon = 'sprite-fm-mono icon-chevrons-right-thin-outline';
-            const uiShrink = (didShrink) => {
-                fmconfig.smallLhp = didShrink | 0;
+            const uiShrink = (didShrink, noPersist) => {
+                if (!noPersist) {
+                    fmconfig.smallLhp = didShrink | 0;
+                    tempCollapseState = false;
+                }
                 if (didShrink) {
                     document.body.classList.add('small-lhp');
                     this.smallPaneButton.icon = rightIcon;
@@ -78,11 +82,22 @@ class MegaTopMenu extends MegaMobileTopMenu {
                     this.leftPaneResizable.setWidth(width);
                 },
             });
-            if (fmconfig.smallLhp) {
-                uiShrink(true);
+            if (fmconfig.smallLhp || folderlink) {
+                tempCollapseState = !!folderlink;
+                uiShrink(true, tempCollapseState);
                 this.leftPaneResizable.setWidth(minWidth);
                 this.leftPaneResizable.element[0].classList.add('small-resize-pane');
             }
+            this.addBroadcasterListener('pagechange', () => {
+                if (!folderlink) {
+                    if (tempCollapseState && !fmconfig.smallLhp) {
+                        uiShrink(false);
+                        this.leftPaneResizable.setWidth(fmconfig[persistanceKey] || 286);
+                        this.leftPaneResizable.element[0].classList.remove('small-resize-pane');
+                    }
+                    return 0xDEAD;
+                }
+            });
         });
 
         this.addBroadcasterListener('updFileManagerUI', () => {
@@ -168,6 +183,10 @@ class MegaTopMenu extends MegaMobileTopMenu {
                 simpletipOffset: '-16',
                 onContextmenu: _openContext
             }];
+        }
+
+        if (!self.u_attr) {
+            return [];
         }
 
         this.ready |= 2;
@@ -472,7 +491,7 @@ class MegaTopMenu extends MegaMobileTopMenu {
     "use strict";
 
     lazy(mega.ui, 'topmenu', () => new MegaTopMenu({
-        parentNode: pmlayout,
+        parentNode: is_fm() && self.pmlayout || document.getElementById('startholder'),
         componentClassname: 'mega-top-menu',
         prepend: true
     }));

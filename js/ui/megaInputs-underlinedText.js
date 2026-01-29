@@ -188,7 +188,7 @@ mega.ui.MegaInputs.prototype.underlinedText._bindEvent = function() {
 
         var $this = $(this);
 
-        if ($this.hasClass('clearButton')) {
+        if ($this.hasClass('clearButton') && !$this.val()) {
             const $clearBtn = $('.clear-input', $this.parent());
             $clearBtn.addClass('hidden');
         }
@@ -342,8 +342,11 @@ mega.ui.MegaInputs.prototype.underlinedText._withIconOrPrefix = function() {
 
     // Copy to clipboard button
     if ($input.hasClass('copyButton')) {
-
-        $wrapper.safeAppend(`<i class="${mega.ui.sprites.mono} icon-square-copy copy-input-value"></i>`);
+        // @todo: use same icon names
+        const icon = is_mobile ? 'icon-square-copy' : 'icon-copy-thin-outline';
+        $wrapper.safeAppend(
+            `<i class="${mega.ui.sprites.mono} ${icon} action-icon copy-input-value"></i>`
+        );
 
         const $copyBtn = $('.copy-input-value', $wrapper);
 
@@ -357,9 +360,10 @@ mega.ui.MegaInputs.prototype.underlinedText._withIconOrPrefix = function() {
     }
 
     if ($input.hasClass('clearButton')) {
-
+        // @todo: use same icon names
+        const icon = `icon-dialog-close${is_mobile ? '' : '-thin'}`;
         $wrapper.safeAppend(
-            `<i class="${mega.ui.sprites.mono} icon-close-component clear-input"></i>`
+            `<i class="${mega.ui.sprites.mono} ${icon} action-icon clear-input"></i>`
         );
 
         const $clearBtn = $('.clear-input', $wrapper);
@@ -382,12 +386,14 @@ mega.ui.MegaInputs.prototype.underlinedText._withIconOrPrefix = function() {
     }
 
     if (this.type === 'password') {
+        // @todo: use same icon names
+        const suffix = is_mobile ? '' : '1';
+        const showTextIcon = `icon-eye-reveal${suffix}`;
+        const hideTextIcon = `icon-eye-hidden${suffix}`;
 
-        const iconSprite = mega.ui.sprites.mono;
-        const showTextIcon = 'icon-eye-reveal';
-        const hideTextIcon = 'icon-eye-hidden';
-
-        $wrapper.safeAppend(`<i class="${iconSprite} ${showTextIcon} pass-visible"></i>`);
+        $wrapper.safeAppend(
+            `<i class="${mega.ui.sprites.mono} ${showTextIcon} action-icon pass-visible"></i>`
+        );
 
         $('.pass-visible', $wrapper).rebind('click.togglePassV', function() {
 

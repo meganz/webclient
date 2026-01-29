@@ -3189,14 +3189,24 @@ MegaData.prototype.getRecentActionsList = function(limit, until) {
  * @param {String} h The root node handle
  * @return {Array} node handles
  */
-MegaData.prototype.getTreeHandles = function _(h) {
+MegaData.prototype.getTreeHandles = function _(h, seen) {
     'use strict';
 
     var result = [h];
     var tree = Object.keys(M.tree[h] || {});
+    seen = seen || {[h]: 1};
 
     for (var i = tree.length; i--;) {
-        result.push.apply(result, _(tree[i]));
+        // if seen contains shares, it means it is share list, which can contain one folder multiple times,
+        // but this is not circular reference.
+        if (seen[tree[i]] && !seen.shares) {
+            console.error('Circular reference detected in getTreeHandles', tree[i]);
+            eventlog(501088, JSON.stringify([1, M.currentdirid, tree[i], M.getNodeRoot(tree[i])]), true);
+        }
+        else {
+            seen[tree[i]] = 1;
+            result.push.apply(result, _(tree[i], seen));
+        }
     }
 
     return result;
@@ -4131,6 +4141,9 @@ MegaData.prototype.getUser = function(str) {
             // Yup, likely.. let's see
             user = this.getUserByHandle(str.u);
         }
+        else if (Object(str).hasOwnProperty('m')) {
+            user = this.getUserByEmail(str.m);
+        }
     }
     else if (str.length === 11) {
         // It's an user handle
@@ -4142,6 +4155,21 @@ MegaData.prototype.getUser = function(str) {
     }
 
     return user;
+};
+
+
+/**
+ * Gets a display name for given email. If available it will use the user or contact's name.
+ * If the name is unavailable (e.g. a new contact request or similar scenario) then it will use the email address.
+ * NB: Up to the caller performing any sanitization prior to HTML insertion.
+ * @param {*} any an email address, or object possibly containing one
+ * @returns {String|*} Returns a "display-name" for the associated email, or just the email.
+ */
+MegaData.prototype.getNameByEmail = function(any) {
+    'use strict';
+
+    const user = this.getUser(any);
+    return this.getNameByHandle(user.u || user.h) || any || false;
 };
 
 /**

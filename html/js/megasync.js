@@ -174,6 +174,7 @@ var megasync = (function() {
                 l[17795],
                 l[17796],
                 function(disableMsync) {
+                    const {dlPage} = mega.ui;
                     if (disableMsync) {
                         lastCheckStatus = null;
                         lastCheckTime = null;
@@ -182,8 +183,11 @@ var megasync = (function() {
                             nextIfYes();
                         }
                     }
-                    else if (page === "download") {
-                        setTransferStatus(0, l[17795]);
+                    else if (page === 'download' && dlPage) {
+                        dlPage.cancelDownload().then(() => {
+                            dlPage.appDl = false;
+                            dlPage.startDownload();
+                        }).catch(nop);
                     }
                 }
             );
@@ -262,17 +266,13 @@ var megasync = (function() {
                         if (!timer) {
                             timer = tSleep(3);
                             timer.then(() => {
-                                if (lastXHRStatus === 0 && lastXHRState < 4) {
+                                if (lastXHRStatus === 0) {
                                     // Recheck permissions just in case they denied in the timeout
                                     // eslint-disable-next-line compat/compat -- Safari/incompatible shouldn't reach it
                                     navigator.permissions.query({ name: 'local-network-access' })
                                         .then(({ state }) => {
                                             if (state === 'denied') {
                                                 return promptDeniedPermission();
-                                            }
-                                            // In case it progressed during the permission lookup
-                                            if (lastXHRState === 4) {
-                                                return;
                                             }
                                             if (state === 'prompt' && !sessionStorage.promptedLna) {
                                                 sessionStorage.promptedLna = 1;
@@ -293,6 +293,11 @@ var megasync = (function() {
                         }
                         lastXHRState = ev.target.readyState;
                         lastXHRStatus = ev.target.status;
+                        if (timer && lastXHRStatus === 0 && lastXHRState === 4) {
+                            // Progressed to finished but status is wrong.
+                            // Probably hit the permission which will reject the promise so allow the timer to elapse
+                            timer = false;
+                        }
                     };
                 }
             },
@@ -331,7 +336,6 @@ var megasync = (function() {
 
     function api_handle(next, response, requestArgs) {
         "use strict";
-        var $topBar;
         next = (typeof next === "function") ? next : function () { };
         var _uploadTick = function _upTick() {
             if (currBid === requestArgs.bid) {
@@ -341,6 +345,14 @@ var megasync = (function() {
         var _statusTick = function _stTick() {
             megasync.downloadStatus(requestArgs.h);
         };
+        const {
+            dlPage = {
+                showProgressUI: nop,
+                showCompleteUI: nop,
+                showPausedUI: nop,
+                showErrorUI: nop
+            }
+        } = mega.ui || {};
 
         if (response === 0) {
             if (requestArgs.a === "l" ) {
@@ -393,8 +405,7 @@ var megasync = (function() {
                     dlprogress(requestArgs.h, prec.toPrecision(3), response.p, response.t, response.v);
                     if (currStatus !== l[17592]) { // 'Downloading with MEGAsync .'
                         currStatus = l[17592]; // 'Downloading with MEGAsync .'
-                        $topBar = $('.download.download-page').removeClass('paused');
-                        $('.download.eta-block .light-txt', $topBar).text(currStatus);
+                        dlPage.showProgressUI();
                     }
                     setTimeout(_statusTick, 1000);
                 }
@@ -407,11 +418,8 @@ var megasync = (function() {
                         setTimeout(_statusTick, 2000);
                     }
                     else if (currStatus !== l[17593]) {
-                        $('.download.progress-bar').width('100%');
-                        $('.download.download-page').removeClass('downloading').addClass('download-complete');
                         currStatus = l[17593];
-                        $topBar = $('.download.download-page');
-                        $('.download.eta-block .light-txt', $topBar).text(currStatus);
+                        dlPage.showCompleteUI({msg: currStatus});
                     }
                 }
                 else if (response.s && response.s == 0) { // allow implied convert
@@ -422,26 +430,16 @@ var megasync = (function() {
                         setTimeout(_statusTick, 5000);
                     }
                     else {
-                        setTransferStatus(0, l[17591]);
+                        dlPage.showErrorUI({msg: l[17591]});
                     }
                 }
                 else if (response.s && response.s == 6) { // allow implied convert
                     // STATE_COMPLETED = 6
                     dlprogress(-0xbadf, 100, response.t, response.t);
-                    $('.download.download-page').removeClass('paused');
-                    $('.download.progress-bar').width('100%');
-                    $('.download.download-page').removeClass('downloading').addClass('download-complete');
-                    var $pageScrollBlock = $('.bottom-page.scroll-block');
-                    $pageScrollBlock.addClass('resumable');
-                    if (window.dlpage_ph) {
-                        $('.open-in-folder').removeClass('hidden').rebind('click', function() {
-                            ns.megaSyncRequest({a: 'sf', h: dlpage_ph}).dump();
-                            return false;
-                        });
-                    }
+                    dlPage.showCompleteUI({ns});
                 }
                 else if (response.s && response.s == 7) {
-                    setTransferStatus(0, l[17586]);
+                    dlPage.showErrorUI({msg: l[17586], fatalError: true});
                     // give it one more try, since if user opened the a file link to download and this file
                     // is already getting downloaded, then the first response is 7 then it's OK
                     // because MEGAsync means that the new download is canceled.
@@ -454,8 +452,7 @@ var megasync = (function() {
                     // then send a new update status request after longer timeout 3 sec
                     if (currStatus !== l[17594]) {
                         currStatus = l[17594];
-                        $topBar = $('.download.download-page').addClass('paused');
-                        $('.download.eta-block .light-txt', $topBar).text(currStatus);
+                        dlPage.showPausedUI();
                     }
                     setTimeout(_statusTick, 3000);
                 }
@@ -464,8 +461,7 @@ var megasync = (function() {
                     // then send a new update status request after longer timeout 3 sec
                     if (currStatus !== l[17603]) {
                         currStatus = l[17603];
-                        $topBar = $('.download.download-page').addClass('paused');
-                        $('.download.eta-block .light-txt', $topBar).text(currStatus);
+                        dlPage.showPausedUI(currStatus);
                     }
                     setTimeout(_statusTick, 3000);
                 }
@@ -474,15 +470,14 @@ var megasync = (function() {
                     // then send a new update status request
                     if (currStatus !== l[17604]) {
                         currStatus = l[17604];
-                        $topBar = $('.download.download-page').addClass('paused');
-                        $('.download.eta-block .light-txt', $topBar).text(currStatus);
+                        dlPage.showPausedUI(currStatus);
                     }
                     setTimeout(_statusTick, 1000);
                 }
                 else if (response.s && response.s == 8) { // allow implied convert
                     // this means we are in status [STATE_FAILED = 8] which is final
                     // then stop
-                    setTransferStatus(0, l[17605]);
+                    dlPage.showErrorUI({msg: l.dl_download_failed, fatalError: true});
                 }
                 else {
                     // no response !! ,or value out of range [0,8]
@@ -492,7 +487,7 @@ var megasync = (function() {
                         setTimeout(_statusTick, 5000);
                     }
                     else {
-                        setTransferStatus(0, l[17606]);
+                        dlPage.showErrorUI({msg: l[17606]});
                     }
                 }
             }

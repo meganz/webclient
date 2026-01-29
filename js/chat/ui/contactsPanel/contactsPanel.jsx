@@ -50,7 +50,7 @@ export default class ContactsPanel extends MegaRenderMixin {
     };
 
     handleAcceptAllRequests = () => {
-        const {received} = this.props;
+        const {data: received} = this.props.received;
         const receivedKeys = Object.keys(received || {});
         if (receivedKeys.length) {
             for (let i = receivedKeys.length; i--;) {

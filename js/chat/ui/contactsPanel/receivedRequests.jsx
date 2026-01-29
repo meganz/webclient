@@ -4,13 +4,18 @@ import FMView from '../../../ui/jsx/fm/fmView.jsx';
 import { ColumnContactRequestsEmail } from '../../../ui/jsx/fm/nodes/columns/columnContactRequestsEmail.jsx';
 import { ColumnContactRequestsTs } from '../../../ui/jsx/fm/nodes/columns/columnContactRequestsTs.jsx';
 import { ColumnContactRequestsRcvdBtns } from '../../../ui/jsx/fm/nodes/columns/columnContactRequestsRcvdBtns.jsx';
+import { ColumnContactName } from "../../../ui/jsx/fm/nodes/columns/columnContactName";
 
 const ReceivedRequests = ({ received }) => {
+    const nameOrEmailColumn = received.mixed ?
+        ColumnContactName :
+        [ColumnContactRequestsEmail, { currView: "ipc" }];
+
     return (
         <div className="contacts-list">
             <FMView
                 sortFoldersFirst={false}
-                dataSource={received}
+                dataSource={received.data}
                 customFilterFn={(r) => {
                     return !r.dts;
                 }}
@@ -25,9 +30,7 @@ const ReceivedRequests = ({ received }) => {
                 headerContainerClassName="contacts-table requests-table contacts-table-head"
                 containerClassName="contacts-table requests-table contacts-table-results"
                 listAdapterColumns={[
-                    [ColumnContactRequestsEmail, {
-                        currView: "ipc"
-                    }],
+                    nameOrEmailColumn,
                     [ColumnContactRequestsTs, {
                         label: l[19505]
                     }],

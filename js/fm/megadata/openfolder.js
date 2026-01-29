@@ -447,10 +447,6 @@
             mega.ui.secondaryNav.onPageChange();
         }
 
-        if (mega.ui.pm) {
-            mega.ui.pm.closeUI();
-        }
-
         if (!is_mobile) {
             mega.ui.topmenu.toggleActive();
         }

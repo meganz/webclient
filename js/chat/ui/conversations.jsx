@@ -62,7 +62,8 @@ class ConversationsApp extends MegaRenderMixin {
         freeCallEndedDialog: false,
         contactSelectorDialog: false,
         view: VIEWS.LOADING,
-        callExpanded: false
+        callExpanded: false,
+        ipcData: null
     };
 
     constructor(props) {
@@ -202,15 +203,41 @@ class ConversationsApp extends MegaRenderMixin {
         if (megaChat.WITH_SELF_NOTE && !megaChat.getNoteChat() && !is_chatlink) {
             api.req({ a: 'mcc', u: [], m: 0, g: 0, v: Chatd.VERSION }).catch(dump);
         }
+
+        this.requestReceivedListener = mBroadcaster.addListener('fmViewUpdate:ipc', () => {
+            this.setState({ ipcData: this.makeIpcData() });
+        });
+        this.setState({ ipcData: this.makeIpcData() });
     }
 
     componentWillUnmount() {
         super.componentWillUnmount();
         $(document).off('keydown.megaChatTextAreaFocus');
+        mBroadcaster.removeListener('fmViewUpdate:ipc', this.requestReceivedListener);
     }
 
-    componentDidUpdate() {
+    componentDidUpdate(prevProps, prevState) {
         this.handleOnboardingStep();
+        const {names: prevNames} = prevState.ipcData;
+        const newIpcData = this.makeIpcData();
+        const {names: newNames} = newIpcData;
+
+        if (newNames.size !== prevNames.size) {
+            this.setState({ ipcData: newIpcData });
+            return;
+        }
+
+        let different = false;
+        for (const [email, name] of newNames) {
+            if (!prevNames.has(email) || prevNames.get(email) !== name) {
+                different = true;
+                break;
+            }
+        }
+
+        if (different) {
+            this.setState({ ipcData: newIpcData });
+        }
     }
 
     handleOnboardingStep() {
@@ -232,6 +259,21 @@ class ConversationsApp extends MegaRenderMixin {
                 megaChat.renderListing(null, false).catch(dump);
             }
         });
+    }
+
+    makeIpcData() {
+        let mixed = false;
+        const names = new Map();
+        const data = Object.values(M.ipc).reduce((acc, curr) => {
+            const name = M.getNameByEmail(curr.m);
+            if (name !== curr.m) { // it's a name, not an email
+                names.set(curr.m, name);
+                mixed = true;
+            }
+
+            return {...acc, [curr.p]: {...curr, name}};
+        }, Object.create(null));
+        return {mixed, data, names};
     }
 
     render() {
@@ -261,7 +303,7 @@ class ConversationsApp extends MegaRenderMixin {
                 <Suspense fallback={<Fallback />}>
                     {!isLoading && <ChatToaster isRootToaster={true}/>}
                     {!isLoading && routingSection === 'contacts' && (
-                        <ContactsPanel megaChat={megaChat} contacts={M.u} received={M.ipc} sent={M.opc}/>
+                        <ContactsPanel megaChat={megaChat} contacts={M.u} received={this.state.ipcData} sent={M.opc}/>
                     )}
                     {!isLoading &&
                         <ConversationPanels

@@ -702,8 +702,12 @@ class MegaFlyoutMenu extends MegaComponent {
 
     const flyoutMenu = () => {
         mega.ui.flyoutInit = true;
+        const holder = is_fm() && self.pmlayout || document.getElementById('startholder');
+        const wrapper = holder.querySelector('.flyout-holder')
+            || mCreateElement('div', {class: 'flyout-holder'}, holder);
+
         return new MegaFlyoutMenu({
-            parentNode: document.getElementsByClassName('flyout-holder')[0],
+            parentNode: wrapper,
             componentClassname: 'flyout-main',
         });
     };

@@ -2097,10 +2097,10 @@ lazy(pro, 'proplan2', () => {
             }
 
             loadingDialog.show('pricingReady');
+            parsepage(pages.planpricing);
 
             await fetchPlansData();
             await fetchBusinessPlanInfo();
-            parsepage(pages.planpricing);
 
             // Temporary fix for desktop propay as it does not using new header
             if (is_mobile && mega.ui.header) {

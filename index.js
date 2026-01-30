@@ -3488,6 +3488,10 @@ mBroadcaster.addListener('fm:initialized', () => {
         return;
     }
 
+    if (self.fmdb && !fmdb.crashed && fmdb.influx) {
+
+        queueMicrotask(() => fmdb.writepending(fmdb.head.length - 1));
+    }
     tryCatch(() => {
         // Initialise the Back to MEGA button and Welcome dialog
         if (mega.lite.inLiteMode) {

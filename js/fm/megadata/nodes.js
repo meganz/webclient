@@ -3010,18 +3010,7 @@ MegaData.prototype.getRecentNodes = function(limit, until) {
         until = until || Math.round((Date.now() - 7776e6) / 1e3);
 
         if (fmdb) {
-            rubTree = rubTree.map((h) => {
-                return fmdb.toStore(h);
-            });
-            var binRubFilter = function(n) {
-                for (var i = rubTree.length; i--;) {
-                    if (!indexedDB.cmp(rubTree[i], n.p)) {
-                        return false;
-                    }
-                }
-                return true;
-            };
-            var dbRubFilter = FMDB.$useBinaryKeys ? binRubFilter : rubFilter;
+            var dbRubFilter = rubFilter;
             var options = {
                 limit: limit,
 
@@ -5225,7 +5214,7 @@ MegaData.prototype.setNodeDescription = async function(itemHandle, newItemDescri
     }
 
     if (n && n.des !== newItemDescription) {
-        const prop = {des: newItemDescription};
+        const prop = {des: newItemDescription || undefined};
 
         // TODO S4
 

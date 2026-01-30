@@ -1568,6 +1568,9 @@ lazy(mega.ui, 'mInfoPanel', () => {
              * @returns {undefined}
              */
             update(oldattr, node) {
+                if (!this.t) {
+                    return false;
+                }
                 const diff = array.diff(oldattr.tags || [], node.tags || []);
                 if (diff.added.length) {
                     this.set(diff.added[0], [node.h]);
@@ -1608,18 +1611,17 @@ lazy(mega.ui, 'mInfoPanel', () => {
             async init() {
                 if (!this.t) {
                     this.t = new MapSet(10e3);
-                    return fmdb.get('f')
-                        .then(nodes => {
-                            for (let i = nodes.length; i--;) {
-                                const n = nodes[i];
-                                if (n.tags) {
-                                    for (let j = n.tags.length; j--;) {
-                                        this.t.set(n.tags[j], n.h);
-                                    }
-                                }
-                            }
+                    const res = await fmdb.get('tags');
 
-                        });
+                    for (let i = res.length; i--;) {
+                        const {h, tags} = res[i];
+
+                        if (tags) {
+                            for (let j = tags.length; j--;) {
+                                this.t.set(tags[j], h);
+                            }
+                        }
+                    }
                 }
             }
         },

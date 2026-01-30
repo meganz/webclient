@@ -1522,6 +1522,9 @@ lazy(mega.ui, 'secondaryNav', () => {
             this.smallNavButton.classList[show ? 'remove' : 'add']('hidden');
         },
         collapse() {
+            if (!is_fm()) {
+                return false;
+            }
             document.body.classList.add('small-nav');
             const icon = this.smallNavButton.querySelector('i');
             icon.classList.add('icon-chevrons-down-thin-outline');

@@ -1098,11 +1098,12 @@ class MegaHeader extends MegaMobileHeader {
 
     static types(index) {
         const { type: cvType } = M.currentCustomView || {};
-        const isFm = folderlink || is_fm() && !pfid;
-        const uta = !dlid && !pfid && u_type;
+        const isFm = is_fm();
+        const uta = isFm && !pfid && u_type;
+
         const type = [
             { // logged in default
-                'home': !isFm,
+                'home': page === 'linkaccess' || !isFm,
                 'top-block': true,
                 'search': true,
                 'notification': uta,
@@ -1120,7 +1121,7 @@ class MegaHeader extends MegaMobileHeader {
                 'signup-button': !u_type,
             },
             { // logged out
-                'home': !isFm || !self.pmlayout,
+                'home': page === 'linkaccess' || !isFm,
                 'top-block': true,
                 'search': true,
                 'notification': false,

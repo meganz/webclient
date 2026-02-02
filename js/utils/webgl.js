@@ -656,10 +656,15 @@ class MEGACanvasElement extends MEGAImageElement {
         return !!(MEGACanvasElement.sup & MEGACanvasElement[`SUPPORT_${String(name).toUpperCase()}`]);
     }
 
-    async resample(source, width, height, type, quality = MEGAImageElement.DEFAULT_QUALITY) {
-        this.assert(this.doesSupport('BitmapRenderer'));
+    async resample(source, sx, sy, sw, sh, width, height, type, quality = MEGAImageElement.DEFAULT_QUALITY) {
+        // this.assert(this.doesSupport('BitmapRenderer'));
 
-        source = await createImageBitmap(source, {resizeWidth: width, resizeHeight: height, resizeQuality: 'high'});
+        // eslint-disable-next-line compat/compat -- should not be reached on Safari < 14
+        source = await createImageBitmap(source, sx, sy, sw, sh, {
+            resizeWidth: width,
+            resizeHeight: height,
+            resizeQuality: 'high'
+        });
 
         if (!this.bitmaprenderer) {
             this.bitmaprenderer = new MEGACanvasElement(1, 1, 'bitmaprenderer');
@@ -722,7 +727,11 @@ class MEGACanvasElement extends MEGAImageElement {
         sw = sw || ctx.canvas.width;
         sh = sh || ctx.canvas.height;
 
-        if (renderingContextType === '2d') {
+        if (renderingContextType !== 'webgl') {
+            if (renderingContextType === 'bitmaprenderer') {
+                // from resample(), for convertTo()->isTainted()
+                return {data: new Uint8Array([1, 1]), width: 1, height: 1};
+            }
             return ctx.getImageData(sx, sy, sw, sh);
         }
 
@@ -1198,7 +1207,19 @@ class MEGACanvasElement extends MEGAImageElement {
                     }
 
                     type = type === 'thumb' ? 'broken' : type;
-                    return new MEGACanvasElement()._drawImage(image, sx, sy, sw, sh, dx, dy, dw, dh, type, quality);
+                    return new MEGACanvasElement()._drawImage(image, sx, sy, sw, sh, dx, dy, dw, dh, type, quality)
+                        .catch((ex) => {
+                            // @todo watch out above crbug and apply to preview images (type != broken) too..
+                            if (type === 'broken' && self.createImageBitmap) {
+                                if (self.d) {
+                                    this.debug(`Canvas failed, too. Trying bitmap resampler...`, ex);
+                                }
+                                const fmt = type === 'broken' ? MEGAImageElement.ALPHA_FORMAT : type;
+                                return this.resample(image, sx, sy, sw, sh, dw, dh, fmt, quality);
+                            }
+
+                            throw ex;
+                        });
                 }
 
                 throw ex;
@@ -1271,7 +1292,7 @@ class MEGACanvasElement extends MEGAImageElement {
         const blob = await this.convertToBlob(type, quality);
 
         if (this.engine === 'Gecko' && !this.postTaintedChecked) {
-            const t = this.isTainted(await this.createImage(blob, 0, 0, 'imaged'));
+            const t = this.isTainted(await this.createImage(blob, 0, 0, 'imaged').catch(dump));
             if (t) {
                 throw new MEGAException('The image is tainted', this, 'SecurityError');
             }
@@ -2329,15 +2350,32 @@ lazy(self, 'faceDetector', () => Promise.resolve((async() => {
             return webgl.createPreviewImage(blob || buffer || source || data, options);
         },
         'scissor': async(data) => {
+            let error = self.EKEY || "Unkn0wn";
             let {blob, buffer, source, createPreview = true, createThumbnail = true} = data;
             source = await webgl.getCanvasImageSource(blob || buffer || source || data);
 
             const thumbnail = createThumbnail
-                && await webgl.createThumbnailImage(source).then(blob => webgl.readAsAESCBCBuffer(blob));
+                && await webgl.createThumbnailImage(source)
+                    .then(blob => webgl.readAsAESCBCBuffer(blob))
+                    .catch((ex) => {
+                        error = ex;
+                        dump(`Failed to create thumbnail image, attempting to continue...`, ex);
+                    });
             const preview = createPreview
-                && await webgl.createPreviewImage(source).then(blob => webgl.readAsAESCBCBuffer(blob));
+                && await webgl.createPreviewImage(source)
+                    .then(blob => webgl.readAsAESCBCBuffer(blob))
+                    .catch((ex) => {
+                        error = ex;
+                        if (thumbnail) {
+                            dump(`Failed to create preview image, attempting to continue...`, [thumbnail], ex);
+                        }
+                    });
 
-            return {thumbnail, preview};
+            if (thumbnail || preview) {
+                return {thumbnail, preview};
+            }
+
+            throw error;
         },
         'convert': async(data) => {
             const {blob, buffer, target = 'image/jpeg', quality = 0.9} = data;

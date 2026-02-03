@@ -485,7 +485,7 @@ if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop(
     delete mThumbHandler.sup.SVG;
 }
 
-mBroadcaster.once('startMega', tryCatch(() => {
+tryCatch(() => {
     'use strict';
     const images = [
         [
@@ -545,7 +545,7 @@ mBroadcaster.once('startMega', tryCatch(() => {
 
         test(...images[i]);
     }
-}));
+})();
 
 
 // ---------------------------------------------------------------------------------------------------------------

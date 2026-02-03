@@ -332,7 +332,7 @@ Message.prototype._onAttachmentReceived = function(data) {
         }
         else {
             if (n.fa) {
-                if (String(n.fa).indexOf(':1*') > 0) {
+                if (megaChat._shallLoadImageFor(n)) {
                     // storing a reference to the message to fire trackDataChange once the preview is loaded
                     n.mo = this;
                 }

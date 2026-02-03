@@ -1640,7 +1640,7 @@ Chat.prototype.setAttachments = function(roomId) {
                 if (!n.revoked && !n.seen) {
                     n.seen = -1;
 
-                    if (String(n.fa).indexOf(':1*') > 0) {
+                    if (this._shallLoadImageFor(n)) {
                         this._enqueueImageLoad(n);
                     }
                 }
@@ -1683,6 +1683,15 @@ Chat.prototype._enqueueMessageUpdate = function(message) {
 };
 
 /**
+ * @private
+ * @param {MegaNode|*} n a meganode-like instance.
+ * @returns {Boolean} whether should we
+ */
+Chat.prototype._shallLoadImageFor = function(n) {
+    return n && /:[01]\*/.test(n.fa);
+};
+
+/**
  * Enqueue image loading.
  * @param {MegaNode} n The attachment node
  * @private
@@ -1713,7 +1722,7 @@ Chat.prototype._enqueueImageLoad = function(n) {
     // check the node does have a file attribute, this should be implicit
     // invoking this function but we may want to load originals later.
 
-    if (String(n.fa).indexOf(':1*') > 0) {
+    if (this._shallLoadImageFor(n)) {
         var load = false;
         var dedup = true;
 

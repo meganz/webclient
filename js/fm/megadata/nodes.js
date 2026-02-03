@@ -4295,7 +4295,7 @@ MegaData.prototype.getChildren = function(handle, each) {
     }
 
     if (res && self.d) {
-        const expr = handle === 'contacts' || this.getNodeByHandle(handle);
+        const expr = handle === 'contacts' || handle === 'shares' || this.getNodeByHandle(handle);
         console.assert(expr, `Misplaced or invalid '${handle}' node(?)`, M.tnc[handle]);
     }
 

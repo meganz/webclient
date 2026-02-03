@@ -3101,10 +3101,6 @@ function loadSubPage(tpage, event) {
         T.ui.transferItOverlay.hide();
     }
 
-    if ('pm' in mega.ui) {
-        mega.ui.pm.closeUI();
-    }
-
     if (window.textEditorVisible) {
         // if we are loading a page and text editor was visible, then hide it.
         mega.textEditorUI.doClose();

@@ -448,12 +448,10 @@ lazy(mega.ui, 'dlPage', () => {
         },
 
         startDownload() {
-            // Start download with MEGAsync
-            if (this.appDl) {
-                loadingDialog.show();
-                megasync.isInstalled((err, is) => {
-                    loadingDialog.hide();
-
+            loadingDialog.show('dl-msync-check');
+            megasync.isInstalled((err, is) => {
+                loadingDialog.hide('dl-msync-check');
+                if (!err && is) {
                     // If 'msd' (MegaSync download) flag is turned on and application is installed
                     if (this.data.msd !== 0 && (!err || is)) {
                         $('.megasync-overlay', 'body').removeClass('downloading'); // @todo: revamp
@@ -470,61 +468,61 @@ lazy(mega.ui, 'dlPage', () => {
                     else {
                         dlmanager.showMEGASyncOverlay(fdl_filesize > maxDownloadSize);
                     }
-                });
-            }
-            // Show Download MEGAsync app dialog
-            else if (fdl_filesize > maxDownloadSize) {
-                this.appDl = true;
-                dlmanager.showMEGASyncOverlay(true);
-            }
-            // Downloaded previewed file (Save)
-            else if (Object(previews[dlpage_ph]).full) {
-                dlprogress(-0xbadf, 100, fdl_filesize, fdl_filesize);
-                this.showCompleteUI();
-                eventlog(501030);
-                M.saveAs(previews[dlpage_ph].buffer, dl_node.name);
-            }
-            // Save downloaded file
-            else if (dlResumeInfo && dlResumeInfo.byteLength === fdl_filesize) {
-                eventlog(501033);
-                dlPageStartDownload();
-            }
-            // Start downloading
-            else {
-                watchdog.query('dling')
-                    .always((res) => {
-                        var proceed = true;
+                }
+                else if (fdl_filesize > maxDownloadSize) {
+                    this.appDl = true;
+                    dlmanager.showMEGASyncOverlay(true);
+                }
+                // Downloaded previewed file (Save)
+                else if (Object(previews[dlpage_ph]).full) {
+                    dlprogress(-0xbadf, 100, fdl_filesize, fdl_filesize);
+                    this.showCompleteUI();
+                    eventlog(501030);
+                    M.saveAs(previews[dlpage_ph].buffer, dl_node.name);
+                }
+                // Save downloaded file
+                else if (dlResumeInfo && dlResumeInfo.byteLength === fdl_filesize) {
+                    eventlog(501033);
+                    dlPageStartDownload();
+                }
+                // Start downloading
+                else {
+                    watchdog.query('dling')
+                        .always((res) => {
+                            var proceed = true;
 
-                        if (Array.isArray(res)) {
-                            res = Array.prototype.concat.apply([], res);
-                            proceed = !res.includes(dlmanager.getGID({ph: dlpage_ph}));
-                        }
+                            if (Array.isArray(res)) {
+                                res = Array.prototype.concat.apply([], res);
+                                proceed = !res.includes(dlmanager.getGID({ph: dlpage_ph}));
+                            }
 
-                        if (proceed) {
-                            dlmanager.getFileSizeOnDisk(dlpage_ph, dl_node.name)
-                                .always((size) => {
-                                    if (size === fdl_filesize) {
-                                        // another tab finished the download
-                                        dlResumeInfo = Object.assign({}, dlResumeInfo, {byteLength: size});
-                                        onDownloadReady();
-                                    }
+                            if (proceed) {
+                                dlmanager.getFileSizeOnDisk(dlpage_ph, dl_node.name)
+                                    .always((size) => {
+                                        if (size === fdl_filesize) {
+                                            // another tab finished the download
+                                            dlResumeInfo = Object.assign({}, dlResumeInfo, {byteLength: size});
+                                            this.updateDlOptions(fdl_filesize, false);
+                                            dlprogress(-0xbadf, 100, fdl_filesize, fdl_filesize);
+                                        }
 
-                                    if (dlResumeInfo && dlResumeInfo.byteLength === dlResumeInfo.byteOffset) {
-                                        eventlog(501032); // Resume
-                                    }
-                                    else {
-                                        eventlog(501030); // Stardart dl
-                                    }
+                                        if (dlResumeInfo && dlResumeInfo.byteLength === dlResumeInfo.byteOffset) {
+                                            eventlog(501032); // Resume
+                                        }
+                                        else {
+                                            eventlog(501030); // Stardart dl
+                                        }
 
-                                    dlPageStartDownload();
-                                });
-                        }
-                        // another tab is downloading this
-                        else {
-                            setTransferStatus(0, l[18]); // Too many connections for this download
-                        }
-                    });
-            }
+                                        dlPageStartDownload();
+                                    });
+                            }
+                            // another tab is downloading this
+                            else {
+                                setTransferStatus(0, l[18]); // Too many connections for this download
+                            }
+                        });
+                }
+            });
             return false;
         },
 
@@ -557,9 +555,7 @@ lazy(mega.ui, 'dlPage', () => {
                 this.appDl = false;
             }
             else {
-                megasync.isInstalled((err, is) => {
-                    this.appDl = !!(!err && is);
-                });
+                this.appDl = false;
             }
         },
 

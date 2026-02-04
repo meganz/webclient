@@ -660,11 +660,9 @@ var megasync = (function() {
         }
     };
 
-    var periodicCheckTimeout;
-
-    ns.periodicCheck = function() {
-        if (periodicCheckTimeout) {
-            clearTimeout(periodicCheckTimeout);
+    ns.periodicCheck = function(cb) {
+        if (folderlink && typeof cb !== 'function') {
+            return;
         }
         ns.isInstalled(function(err, is, off) {
             // relevant useMegaSync states for downloads
@@ -674,11 +672,9 @@ var megasync = (function() {
             if (!err || is) {
                 if (megasync.currUser === u_handle) {
                     window.useMegaSync = 2;
-                    periodicCheckTimeout = setTimeout(ns.periodicCheck, defaultStatusThreshold);
                 }
                 else {
                     window.useMegaSync = megasync.currUser ? 3 : 1;
-                    periodicCheckTimeout = setTimeout(ns.periodicCheck, statusThresholdWhenDifferentUsr);
                 }
             }
             else {
@@ -686,16 +682,27 @@ var megasync = (function() {
                 if (off) {
                     return;
                 }
-                periodicCheckTimeout = setTimeout(ns.periodicCheck, statusThresholdWhenDifferentUsr);
+            }
+            if (typeof cb === 'function') {
+                cb();
             }
         });
     };
-    if ((is_livesite && !is_mobile) || usemsync) {
-        mBroadcaster.once('fm:initialized', ns.periodicCheck);
-    }
-    else {
-        ns.periodicCheck = function() { };
-    }
+    let preCheckPromise = false;
+    ns.preCheck = () => {
+        if (window.useMegaSync) {
+            return Promise.resolve();
+        }
+        if (!preCheckPromise) {
+            loadingDialog.show('msync-precheck');
+        }
+        preCheckPromise = preCheckPromise || new Promise((resolve) => {
+            ns.periodicCheck(resolve);
+        }).always(() => {
+            loadingDialog.hide('msync-precheck');
+        });
+        return preCheckPromise;
+    };
 
     return ns;
 })();

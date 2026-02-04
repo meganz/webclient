@@ -57,7 +57,6 @@ async function setupSingleDownloadPage(res) {
             updateDlOptions: nop,
             showPausedUI: nop,
             showErrorUI: nop,
-            updateAppDlFlag: nop
         },
         linkAccess
     } = mega.ui || {};
@@ -177,7 +176,7 @@ async function setupSingleDownloadPage(res) {
                             }
                             else if (size === fdl_filesize) {
                                 onIdle(() => {
-                                    dlPage.updateDlOptions(fdl_filesize, false);
+                                    dlPage.updateDlOptions(fdl_filesize);
                                     dlprogress(-0xbadf, 100, fdl_filesize, fdl_filesize);
                                 });
                             }
@@ -196,8 +195,6 @@ async function setupSingleDownloadPage(res) {
                             }
                         });
                     }
-
-                    dlPage.updateAppDlFlag();
                 });
             });
 
@@ -396,15 +393,15 @@ async function setupSingleDownloadPage(res) {
     }
 }
 
-function dlPageStartDownload(isDlWithMegaSync) {
+/*
+ * Download via browser
+*/
+function dlPageStartDownload() {
     'use strict';
 
     if ('dlPage' in mega.ui) {
+        mega.ui.dlPage.appDl = false;
         mega.ui.dlPage.showInitUI();
-    }
-
-    if (isDlWithMegaSync) {
-        return;
     }
 
     if (!is_mobile && mediaCollectFn) {

@@ -447,82 +447,88 @@ lazy(mega.ui, 'dlPage', () => {
             this.data.msd = res.msd || 0;
         },
 
-        startDownload() {
-            loadingDialog.show('dl-msync-check');
-            megasync.isInstalled((err, is) => {
-                loadingDialog.hide('dl-msync-check');
-                if (!err && is) {
-                    // If 'msd' (MegaSync download) flag is turned on and application is installed
-                    if (this.data.msd !== 0 && (!err || is)) {
-                        $('.megasync-overlay', 'body').removeClass('downloading'); // @todo: revamp
+        startDownload(forceBrowserDl) {
+            if (!forceBrowserDl) {
+                loadingDialog.show('dl-msync-check');
+                megasync.isInstalled((err, is) => {
+                    loadingDialog.hide('dl-msync-check');
+                    if (!err && is) {
+                        // If 'msd' (MegaSync download) flag is turned on and application is installed
+                        if (this.data.msd === 0) {
+                            dlmanager.showMEGASyncOverlay(fdl_filesize > maxDownloadSize);
+                        }
+                        else {
+                            $('.megasync-overlay', 'body').removeClass('downloading'); // @todo: revamp
 
-                        megasync.download(dlpage_ph, a32_to_base64(base64_to_a32(dlkey).slice(0, 8)), (err) => {
-                            if (err) {
-                                this.appDl = false;
-                                this.startDownload();
-                            }
-                        }, true);
-                        eventlog(501031);
-                        dlPageStartDownload(true);
+                            megasync.download(dlpage_ph, a32_to_base64(base64_to_a32(dlkey).slice(0, 8)), (err) => {
+                                if (err) {
+                                    this.startDownload(true);
+                                }
+                            }, true);
+                            eventlog(501031);
+                            this.appDl = true;
+                            this.showInitUI();
+                        }
                     }
                     else {
-                        dlmanager.showMEGASyncOverlay(fdl_filesize > maxDownloadSize);
+                        this.startDownload(true);
                     }
-                }
-                else if (fdl_filesize > maxDownloadSize) {
-                    this.appDl = true;
-                    dlmanager.showMEGASyncOverlay(true);
-                }
-                // Downloaded previewed file (Save)
-                else if (Object(previews[dlpage_ph]).full) {
-                    dlprogress(-0xbadf, 100, fdl_filesize, fdl_filesize);
-                    this.showCompleteUI();
-                    eventlog(501030);
-                    M.saveAs(previews[dlpage_ph].buffer, dl_node.name);
-                }
-                // Save downloaded file
-                else if (dlResumeInfo && dlResumeInfo.byteLength === fdl_filesize) {
-                    eventlog(501033);
-                    dlPageStartDownload();
-                }
-                // Start downloading
-                else {
-                    watchdog.query('dling')
-                        .always((res) => {
-                            var proceed = true;
+                });
+            }
+            else if (fdl_filesize > maxDownloadSize) {
+                this.appDl = true;
+                dlmanager.showMEGASyncOverlay(true);
+            }
+            // Downloaded previewed file (Save)
+            else if (Object(previews[dlpage_ph]).full) {
+                dlprogress(-0xbadf, 100, fdl_filesize, fdl_filesize);
+                this.showCompleteUI();
+                eventlog(501030);
+                M.saveAs(previews[dlpage_ph].buffer, dl_node.name);
+            }
+            // Save downloaded file
+            else if (dlResumeInfo && dlResumeInfo.byteLength === fdl_filesize) {
+                eventlog(501033);
+                dlPageStartDownload();
+            }
+            // Start downloading
+            else {
+                watchdog.query('dling')
+                    .always((res) => {
+                        var proceed = true;
 
-                            if (Array.isArray(res)) {
-                                res = Array.prototype.concat.apply([], res);
-                                proceed = !res.includes(dlmanager.getGID({ph: dlpage_ph}));
-                            }
+                        if (Array.isArray(res)) {
+                            res = Array.prototype.concat.apply([], res);
+                            proceed = !res.includes(dlmanager.getGID({ph: dlpage_ph}));
+                        }
 
-                            if (proceed) {
-                                dlmanager.getFileSizeOnDisk(dlpage_ph, dl_node.name)
-                                    .always((size) => {
-                                        if (size === fdl_filesize) {
-                                            // another tab finished the download
-                                            dlResumeInfo = Object.assign({}, dlResumeInfo, {byteLength: size});
-                                            this.updateDlOptions(fdl_filesize, false);
-                                            dlprogress(-0xbadf, 100, fdl_filesize, fdl_filesize);
-                                        }
+                        if (proceed) {
+                            dlmanager.getFileSizeOnDisk(dlpage_ph, dl_node.name)
+                                .always((size) => {
+                                    if (size === fdl_filesize) {
+                                        // another tab finished the download
+                                        dlResumeInfo = Object.assign({}, dlResumeInfo, {byteLength: size});
+                                        this.updateDlOptions(fdl_filesize, false);
+                                        dlprogress(-0xbadf, 100, fdl_filesize, fdl_filesize);
+                                    }
 
-                                        if (dlResumeInfo && dlResumeInfo.byteLength === dlResumeInfo.byteOffset) {
-                                            eventlog(501032); // Resume
-                                        }
-                                        else {
-                                            eventlog(501030); // Stardart dl
-                                        }
+                                    if (dlResumeInfo && dlResumeInfo.byteLength === dlResumeInfo.byteOffset) {
+                                        eventlog(501032); // Resume
+                                    }
+                                    else {
+                                        eventlog(501030); // Stardart dl
+                                    }
 
-                                        dlPageStartDownload();
-                                    });
-                            }
-                            // another tab is downloading this
-                            else {
-                                setTransferStatus(0, l[18]); // Too many connections for this download
-                            }
-                        });
-                }
-            });
+                                    dlPageStartDownload();
+                                });
+                        }
+                        // another tab is downloading this
+                        else {
+                            setTransferStatus(0, l[18]); // Too many connections for this download
+                        }
+                    });
+            }
+
             return false;
         },
 
@@ -536,7 +542,6 @@ lazy(mega.ui, 'dlPage', () => {
             fdl_queue_var = false;
 
             this.updateDlOptions();
-            this.updateAppDlFlag();
 
             if (hide) {
                 this.closeWidgets();
@@ -547,26 +552,9 @@ lazy(mega.ui, 'dlPage', () => {
             }
         },
 
-        updateAppDlFlag() {
-            if (fdl_filesize > maxDownloadSize) {
-                this.appDl = true;
-            }
-            else if (dlResumeInfo) {
-                this.appDl = false;
-            }
-            else {
-                this.appDl = false;
-            }
-        },
-
-        updateDlOptions(byteLength, appDl) {
+        updateDlOptions(byteLength) {
             const {header} = this.data;
             let tip = l[58]; // Download
-
-            // Update application download if needed
-            if (appDl !== undefined) {
-                this.appDl = appDl;
-            }
 
             // this.closeWidgets();
             header.loader = false;

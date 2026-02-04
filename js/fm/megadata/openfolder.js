@@ -724,6 +724,10 @@
         }
         $('.fm-right-account-block, .fm-right-block, .fm-filter-chips-wrapper').addClass('hidden');
 
+        if (cv.type !== 'pwm' && 'pm' in mega.ui) {
+            tryCatch(() => mega.ui.pm.closeUI())();
+        }
+
         this.chat = false;
         this.search = false;
         this.recents = false;

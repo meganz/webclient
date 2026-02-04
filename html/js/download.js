@@ -419,6 +419,7 @@ function dlPageStartDownload() {
             key: dl_node.k,
             size: dl_node.s,
             dlkey: dlpage_key,
+            n: dl_node.n || dl_node.name,
             onDownloadProgress: dlprogress,
             onDownloadComplete: dlcomplete,
             onDownloadStart: dlstart,

@@ -345,7 +345,7 @@ function resetSensitives() {
             getOnboardedStatus,
             resetGlobalParameters() {
                 showSen = mega.config.get('showSen') === 1;
-                featureEnabled = !!mega.flags.ff_hnir && !pfid && checkAccountPermission();
+                featureEnabled = !!mega.flags.ff_hnir && !dlid && !pfid && checkAccountPermission();
                 sensitives.showGlobally = !featureEnabled || showSen;
             },
             showOnboardingDialog,

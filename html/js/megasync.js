@@ -185,8 +185,7 @@ var megasync = (function() {
                     }
                     else if (page === 'download' && dlPage) {
                         dlPage.cancelDownload().then(() => {
-                            dlPage.appDl = false;
-                            dlPage.startDownload();
+                            dlPage.startDownload(true);
                         }).catch(nop);
                     }
                 }

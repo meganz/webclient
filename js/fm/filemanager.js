@@ -1978,6 +1978,12 @@ FileManager.prototype.createFolderUI = function() {
             $.hideContextMenu();
             return;
         }
+        if (folderlink && !window.useMegaSync) {
+            megasync.preCheck().always(() => {
+                $('.fm-download').trigger('click');
+            });
+            return;
+        }
         ev.currentTarget.classList.add('active');
         ev.currentTarget.domNode = ev.currentTarget;
         mega.ui.secondaryNav.openDownloadMenu(ev);

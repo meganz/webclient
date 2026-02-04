@@ -292,7 +292,7 @@ function resetSensitives() {
                 return false;
             }
 
-            if (!n || !n.p) {
+            if (!n || !M.getNodeByHandle(n.p).tsf) {
                 return false;
             }
 
@@ -314,7 +314,7 @@ function resetSensitives() {
          */
         const isSensitive = (n, checkParent = true) => {
             // This feature is disabled for public links and non-paid users
-            if (!featureEnabled) {
+            if (!featureEnabled || !M.d[M.RootID].tsf) {
                 return 0;
             }
 
@@ -345,7 +345,7 @@ function resetSensitives() {
             getOnboardedStatus,
             resetGlobalParameters() {
                 showSen = mega.config.get('showSen') === 1;
-                featureEnabled = !!mega.flags.ff_hnir && !pfid && checkAccountPermission();
+                featureEnabled = !!mega.flags.ff_hnir && !dlid && !pfid && checkAccountPermission();
                 sensitives.showGlobally = !featureEnabled || showSen;
             },
             showOnboardingDialog,
@@ -784,7 +784,7 @@ function resetSensitives() {
                         const album = mega.gallery.albums.store[handles[index]];
 
                         // Skip the album if it is already shared
-                        if (album.p) {
+                        if (!album || album.ph) {
                             continue;
                         }
 

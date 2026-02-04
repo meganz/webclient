@@ -71,9 +71,6 @@ function FMDB(plainname, schema, channelmap) {
     // whether multi-table transactions work (1) or not (0) (Apple, looking at you!)
     this.cantransact = -1;
 
-    // @see {@link FMDB.compare}
-    this._cache = Object.create(null);
-
     // initialise additional channels
     for (var i in this.channelmap) {
         i = this.channelmap[i];
@@ -96,29 +93,19 @@ function FMDB(plainname, schema, channelmap) {
         'LOG':   '#5b5352'
     };
 
-    if (self.d > 7 || 'rad' in mega) {
+    if (self.d > 7 || self.is_livesite && 'rad' in mega) {
+
         Dexie.debug = "dexie";
     }
 }
 
-tryCatch(function() {
-    'use strict';
-
-    // Check for indexedDB 2.0 + binary keys support.
-    Object.defineProperty(FMDB, 'iDBv2', {value: indexedDB.cmp(new Uint8Array(0), 0)});
-}, false)();
-
-// options
-FMDB.$useBinaryKeys = FMDB.iDBv2 ? 1 : 0;
-FMDB.$usePostSerialz = 2;
-
 // @private increase to drop/recreate *all* databases.
-FMDB.version = 1;
+FMDB.version = 2;
 
 /** @property FMDB.perspex -- @private persistence prefix */
 lazy(FMDB, 'perspex', () => {
     'use strict';
-    return `.${(mega.infinity << 5 | FMDB.iDBv2 << 4 | FMDB.$usePostSerialz | FMDB.version).toString(16)}`;
+    return `.${(mega.infinity << 7 | FMDB.version).toString(16)}`;
 });
 
 /** @property fmdb.memoize */
@@ -126,6 +113,16 @@ lazy(FMDB.prototype, 'memoize', () => {
     'use strict';
     // leave cloud nodes in memory?..
     return parseInt(localStorage.cnize) !== 0;
+});
+
+/** @property FMDB.influx */
+lazy(FMDB.prototype, 'influx', function() {
+    'use strict';
+    const res = mega.nobp && !mega.infinity && parseInt(localStorage.dinflux) !== 0;
+    if (self.d) {
+        this.logger.info('influx...', res, mega.nobp, mega.infinity);
+    }
+    return res;
 });
 
 // set up and check fm DB for user u
@@ -136,7 +133,8 @@ FMDB.prototype.init = async function(wipe) {
     assert(!this.db && !this.opening, 'Something went wrong... FMDB is already ongoing...');
 
     // prefix database name with options/capabilities, plus making it dependent on the current schema.
-    const dbpfx = `fm32${FMDB.perspex.substr(1)}${MurmurHash3(JSON.stringify(this.schema), 0x6f01f).toString(16)}`;
+    const ver = 10;
+    const dbpfx = `fm${ver}${FMDB.perspex.substr(1)}${MurmurHash3(JSON.stringify(this.schema), 0x6f01f).toString(16)}`;
 
     this.crashed = false;
     this.inval_cb = false;
@@ -356,7 +354,9 @@ FMDB.prototype.enqueue = function fmdb_enqueue(table, row, type) {
         if (!ch) {
             fmdb.head[ch]++;
         }
-        fmdb.writepending(fmdb.head.length - 1);
+        if (self.fminitialized || !this.influx) {
+            fmdb.writepending(fmdb.head.length - 1);
+        }
     }
 };
 
@@ -369,35 +369,18 @@ FMDB.prototype.enqueue = function fmdb_enqueue(table, row, type) {
 FMDB.prototype.serialize = function(table, row) {
     'use strict';
 
-    if (row.d) {
-        if (this.stripnode[table]) {
-            // this node type is stripnode-optimised: temporarily remove redundant elements
-            // to create a leaner JSON and save IndexedDB space
-            var j = row.d;  // this references the live object!
-            var t = this.stripnode[table](j);   // remove overhead
-            row.d = JSON.stringify(j);          // store lean result
+    if (row.d && this.stripnode[table]) {
+        // this node type is stripnode-optimised: temporarily remove redundant elements
+        // to create a leaner JSON and save IndexedDB space
 
-            // Restore overhead (In Firefox, Object.assign() is ~63% faster than for..in)
-            Object.assign(j, t);
+        var j = {...row.d}; // this references the live object!
 
-            if (self.d) {
-                this.logger.assert(!this.transient(j), 'a transient node was slipped into FMDB...', j.p, j.h, [j]);
-            }
+        if (self.d) {
+            this.logger.assert(!this.transient(j), 'a transient node was slipped into FMDB...', j.p, j.h, [j]);
         }
-        else {
-            // otherwise, just stringify it all
-            row.d = JSON.stringify(row.d);
-        }
-    }
 
-    // obfuscate index elements as base64-encoded strings, payload as ArrayBuffer
-    for (var i in row) {
-        if (i === 'd') {
-            row.d = this.strcrypt(row.d);
-        }
-        else if (table !== 'f' || i !== 't') {
-            row[i] = this.toStore(row[i]);
-        }
+        this.stripnode[table](j);  // remove overhead
+        row.d = j;                 // store lean result
     }
 
     return row;
@@ -536,19 +519,6 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
         return;
     }
 
-    // signal when we start/finish to save stuff
-    if (!ch) {
-        if (this.tail[ch] === this.head[ch] - 1) {
-            mLoadingSpinner.show('fmdb', 'Storing account into local database...');
-        }
-        else if (this.tail[ch] === this.head[ch]) {
-            mLoadingSpinner.hide('fmdb', true);
-            this.pending[ch] = this.pending[ch].filter(Boolean);
-            this.tail[ch] = this.head[ch] = 0;
-            this._cache = Object.create(null);
-        }
-    }
-
     // iterate all channels to find pending writes
     if (!this.pending[ch][this.tail[ch]]) {
         return this.writepending(ch - 1);
@@ -566,6 +536,8 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
             fmdb.logger.group("Transaction started", self.currsn, fmdb.pending[0][fmdb.tail[0]]._sn);
             fmdb.logger.time('fmdb-transaction');
         }
+        mLoadingSpinner.show('fmdb', 'Storing account into local database...');
+
         // if the write job is on channel 0 and already complete (has _sn set),
         // we execute it in a single transaction without first clearing sn
         fmdb.state = 1;
@@ -614,6 +586,8 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
                 fmdb.state = -1;
                 fmdb.invalidate();
             }
+        }).finally(() => {
+            mLoadingSpinner.hide('fmdb');
         });
     }
     else {
@@ -642,7 +616,9 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
     // start writing all pending data in this transaction to the DB
     // conclude/commit the (virtual or real) transaction once _sn has been written
     function dispatchputs() {
-        if (fmdb.inflight) return;
+        if (fmdb.inflight) {
+            return;
+        }
 
         if (fmdb.commit) {
             // invalidation commit completed?
@@ -754,29 +730,9 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
         }
         const limit = window.fminitialized ? fmdb.limit >> 3 : data.length + 1;
 
-        if (FMDB.$usePostSerialz) {
-            if (d) {
-                console.time('fmdb-serialize');
-            }
-
-            if (op === 'bulkPut') {
-                if (!data[0].d || fmdb._raw(data[0])) {
-                    for (let x = data.length; x--;) {
-                        fmdb.serialize(table, data[x]);
-                    }
-                }
-                else if (d) {
-                    fmdb.logger.debug('No data serialization was needed, retrying?', data);
-                }
-            }
-            else if (!(data[0] instanceof ArrayBuffer)) {
-                for (let j = data.length; j--;) {
-                    data[j] = fmdb.toStore(data[j]);
-                }
-            }
-
-            if (d) {
-                console.timeEnd('fmdb-serialize');
+        if (op === 'bulkPut') {
+            for (let x = data.length; x--;) {
+                fmdb.serialize(table, data[x]);
             }
         }
 
@@ -805,9 +761,8 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
 
     // event handler for bulk operation completion
     function writeend() {
-        if (d) {
-            fmdb.logger.log('DB write successful'
-                + (fmdb.commit ? ' - transaction complete' : '') + ', state: ' + fmdb.state);
+        if (self.d > 1 || self.d && !fmdb.state) {
+            fmdb.logger.log(`DB write successful${fmdb.commit ? ' - transaction complete' : ''}, state: ${fmdb.state}`);
         }
 
         // if we are non-transactional, remove the written data from pending
@@ -875,11 +830,6 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
 FMDB.prototype.strcrypt = function fmdb_strcrypt(s) {
     "use strict";
 
-    if (d && String(s).length > 0x10000) {
-        (this.logger || console)
-            .warn('The data you are trying to write is too large and will degrade the performance...', [s]);
-    }
-
     var len = (s = '' + s).length;
     var bytes = this.utf8length(s);
     if (bytes === len) {
@@ -943,13 +893,14 @@ FMDB.prototype.strdecrypt0 = function fmdb_strdecrypt(ab) {
 FMDB._mcfCache = {};
 
 // tables storing pending writes as Map() instances.
-FMDB.prototype.useMap = Object.assign(Object.create(null), {f: true, tree: true});
+Object.defineProperty(FMDB.prototype, 'useMap', {
+    value: freeze({f: true, fa: true, tree: true})
+});
 
 // remove fields that are duplicated in or can be inferred from the index to reduce database size
-FMDB.prototype.stripnode = Object.freeze({
+FMDB.prototype.stripnode = freeze({
     f : function(f) {
         'use strict';
-        var t = { h : f.h, t : f.t, s : f.s };
 
         // Remove pollution from the ufs-size-cache
         // 1. non-folder nodes does not need tb/td/tf
@@ -957,37 +908,32 @@ FMDB.prototype.stripnode = Object.freeze({
             delete f.tb;
             delete f.td;
             delete f.tf;
+            delete f.tsf;
         }
         // 2. remove Zero properties from versioning nodes inserted everywhere...
         if (f.tvb === 0) delete f.tvb;
         if (f.tvf === 0) delete f.tvf;
+        if (f.tsf === 0) {
+            delete f.tsf;
+        }
 
         // Remove properties used as indexes
         delete f.h;
         delete f.t;
         delete f.s;
 
-        t.ts = f.ts;
         delete f.ts;
 
         if (f.hash) {
-            t.hash = f.hash;
             delete f.hash;
-        }
-
-        if (f.fa) {
-            t.fa = f.fa;
-            delete f.fa;
         }
 
         // Remove other garbage
         if ('seen' in f) {
-            t.seen = f.seen;
             delete f.seen; // inserted by the dynlist
         }
 
         if (f.shares) {
-            t.shares = f.shares;
             delete f.shares; // will be populated from the s table
         }
 
@@ -1002,26 +948,41 @@ FMDB.prototype.stripnode = Object.freeze({
         }
 
         if (f.p) {
-            t.p = f.p;
             delete f.p;
         }
 
         if (f.ar) {
-            t.ar = f.ar;
             delete f.ar;
         }
 
         if (f.u === u_handle) {
-            t.u = f.u;
             f.u = '~';
         }
+    },
 
-        return t;
+    sete(f) {
+        'use strict';
+        delete f.s;
+        delete f.h;
+        delete f.ts;
+        delete f.id;
+    },
+
+    sets(f) {
+        'use strict';
+        delete f.t;
+        delete f.e;
+        delete f.ph;
+        delete f.ts;
+        delete f.id;
+
+        if (f.u === u_handle) {
+            delete f.u;
+        }
     },
 
     tree: function(f) {
         'use strict';
-        var t = {h: f.h};
         delete f.h;
         if (f.td !== undefined && !f.td) {
             delete f.td;
@@ -1032,6 +993,9 @@ FMDB.prototype.stripnode = Object.freeze({
         if (f.tf !== undefined && !f.tf) {
             delete f.tf;
         }
+        if (f.tsf !== undefined && !f.tsf) {
+            delete f.tsf;
+        }
         if (f.tvf !== undefined && !f.tvf) {
             delete f.tvf;
         }
@@ -1041,7 +1005,6 @@ FMDB.prototype.stripnode = Object.freeze({
         if (f.lbl !== undefined && !(f.lbl | 0)) {
             delete f.lbl;
         }
-        return t;
     },
 
     ua: function(ua) {
@@ -1081,48 +1044,44 @@ FMDB.prototype.stripnode = Object.freeze({
         }
         // transient properties, that need to be resetted
         cache.n = mcf.n || undefined;
+        cache.oi = mcf.oi ? 1 : 0;
+        cache.sr = mcf.sr ? 1 : 0;
+        cache.w = mcf.w ? 1 : 0;
 
         FMDB._mcfCache[cache.id] = Object.assign({}, FMDB._mcfCache[mcf.id], cache);
         Object.assign(mcf, FMDB._mcfCache[cache.id]);
 
-        var t = {id: mcf.id, ou: mcf.ou, n: mcf.n, url: mcf.url};
         delete mcf.id;
         delete mcf.ou;
         delete mcf.url;
         delete mcf.n;
 
         if (mcf.g === 0) {
-            t.g = 0;
             delete mcf.g;
         }
         if (mcf.m === 0) {
-            t.m = 0;
             delete mcf.m;
         }
         if (mcf.f === 0) {
-            t.f = 0;
             delete mcf.f;
         }
         if (mcf.cs === 0) {
-            t.cs = 0;
             delete mcf.cs;
         }
 
         if (mcf.u) {
-            t.u = mcf.u;
+            const {u} = mcf;
             mcf.u = '';
 
-            for (var i = t.u.length; i--;) {
-                mcf.u += t.u[i].u + t.u[i].p;
+            for (let i = u.length; i--;) {
+                mcf.u += u[i].u + u[i].p;
             }
         }
-
-        return t;
     }
 });
 
 // re-add previously removed index fields to the payload object
-FMDB.prototype.restorenode = Object.freeze({
+FMDB.prototype.restorenode = freeze({
     ok : function(ok, index) {
         'use strict';
         ok.h = index.h;
@@ -1136,9 +1095,7 @@ FMDB.prototype.restorenode = Object.freeze({
         if (index.c) {
             f.hash = index.c;
         }
-        if (index.fa) {
-            f.fa = index.fa;
-        }
+
         if (index.s < 0) f.t = -index.s;
         else {
             f.t = 0;
@@ -1151,6 +1108,46 @@ FMDB.prototype.restorenode = Object.freeze({
             f.u = u_handle;
         }
     },
+
+    fa(d, idx) {
+        'use strict';
+        delete idx.d;
+        Object.assign(d, idx);
+    },
+
+    des(d, idx) {
+        'use strict';
+        delete idx.d;
+        Object.assign(d, idx);
+    },
+
+    sete(f, idx) {
+        'use strict';
+        delete idx.d;
+        Object.assign(f, idx);
+    },
+
+    setp(f, idx) {
+        'use strict';
+        delete idx.d;
+        Object.assign(f, idx);
+    },
+
+    sets(f, idx) {
+        'use strict';
+        delete idx.d;
+        Object.assign(f, idx);
+        if (!f.u) {
+            f.u = u_handle;
+        }
+    },
+
+    tags(d, idx) {
+        'use strict';
+        delete idx.d;
+        Object.assign(d, idx);
+    },
+
     tree : function(f, index) {
         'use strict';
         f.h = index.h;
@@ -1175,12 +1172,6 @@ FMDB.prototype.restorenode = Object.freeze({
             usr.h = usr.u;
             usr.p = 'contacts';
         }
-    },
-
-    h: function(out, index) {
-        'use strict';
-        out.h = index.h;
-        out.hash = index.c;
     },
 
     mk : function(mk, index) {
@@ -1228,8 +1219,9 @@ FMDB.prototype.add = function fmdb_add(table, row) {
     "use strict";
 
     if (!this.crashed) {
-        if (this.useMap[table] && this.transient(row.d || row)) {
+        if (table === 'f' && this.transient(row.d || row)) {
             this.logger.warn(`Prevented a transient node from sneaking into...`, row);
+            eventlog(501083, JSON.stringify([1, !!(row.d || row).transient | 0]), true);
         }
         else {
             this.enqueue(table, row, 0);
@@ -1294,40 +1286,18 @@ FMDB.prototype.normaliseresult = function fmdb_normaliseresult(table, r) {
 
     var t;
     for (var i = r.length; i--; ) {
-        try {
-            if (!r[i]) {
-                // non-existing bulkGet result.
-                r.splice(i, 1);
-                continue;
-            }
-
-            if (this._raw(r[i])) {
-                // not encrypted.
-                if (d > 1) {
-                    console.assert(FMDB.$usePostSerialz);
-                }
-                r[i] = r[i].d;
-                continue;
-            }
-
-            t = r[i].d ? JSON.parse(this.strdecrypt(r[i].d)) : {};
+        if (r[i]) {
+            t = r[i].d || {};
 
             if (this.restorenode[table]) {
                 // restore attributes based on the table's indexes
-                for (var p in r[i]) {
-                    if (p !== 'd' && (table !== 'f' || p !== 't')) {
-                        r[i][p] = this.fromStore(r[i][p]);
-                    }
-                }
                 this.restorenode[table](t, r[i]);
             }
 
             r[i] = t;
         }
-        catch (ex) {
-            if (d) {
-                this.logger.error("IndexedDB corruption: " + this.strdecrypt(r[i].d), ex);
-            }
+        else {
+            // non-existing bulkGet result.
             r.splice(i, 1);
         }
     }
@@ -1393,14 +1363,8 @@ FMDB.prototype.getbykey = async function fmdb_getbykey(table, index, anyof, wher
     /**/
 
     if (anyof) {
-        // encrypt all values in the list
-        for (i = anyof[1].length; i--;) {
-            if (typeof anyof[1][i] === 'string') {
-                if (p.t) {
-                    p.push(anyof[1][i]);
-                }
-                anyof[1][i] = this.toStore(anyof[1][i]);
-            }
+        if (p.t) {
+            p.push(...anyof[1]);
         }
 
         if (!t) {
@@ -1433,13 +1397,6 @@ FMDB.prototype.getbykey = async function fmdb_getbykey(table, index, anyof, wher
     }
     else if (where) {
         for (let k = where.length; k--;) {
-            // encrypt the filter values (logical AND is commutative, so we can reverse the order)
-            if (typeof where[k][1] === 'string') {
-                if (!this._cache[where[k][1]]) {
-                    this._cache[where[k][1]] = this.toStore(where[k][1]);
-                }
-                where[k][1] = this._cache[where[k][1]];
-            }
 
             // apply filter criterion
             if (i) {
@@ -1515,7 +1472,7 @@ FMDB.prototype.getbykey = async function fmdb_getbykey(table, index, anyof, wher
                             if (dbRecords) {
                                 // deletion - always by bare index
                                 for (j = data.length; j--;) {
-                                    f = this._value(data[j]);
+                                    f = data[j];
 
                                     if (typeof matches[f] == 'undefined') {
                                         // boolean false means "record deleted"
@@ -1532,12 +1489,12 @@ FMDB.prototype.getbykey = async function fmdb_getbykey(table, index, anyof, wher
                             for (j = data.length; j--;) {
                                 const update = data[j];
 
-                                f = this._value(update[index]);
+                                f = update[index];
                                 if (typeof matches[f] == 'undefined') {
                                     // check if this update matches our criteria, if any
                                     if (where) {
                                         for (k = where.length; k--;) {
-                                            if (!this.compare(table, where[k][0], where[k][1], update)) {
+                                            if (update[where[k][0]] !== where[k][1]) {
                                                 break;
                                             }
                                         }
@@ -1565,7 +1522,7 @@ FMDB.prototype.getbykey = async function fmdb_getbykey(table, index, anyof, wher
                                     else if (anyof) {
                                         // does this update modify a record matched by the anyof inclusion list?
                                         for (k = anyof[1].length; k--;) {
-                                            if (this.compare(table, anyof[0], anyof[1][k], update)) {
+                                            if (update[anyof[0]] === anyof[1][k]) {
                                                 break;
                                             }
                                         }
@@ -1603,7 +1560,7 @@ FMDB.prototype.getbykey = async function fmdb_getbykey(table, index, anyof, wher
 
             for (i = r.length; i--;) {
                 // if this is a binary key, convert it to string
-                f = this._value(r[i][index]);
+                f = r[i][index];
 
                 if (typeof matches[f] !== 'undefined') {
                     if (matches[f] === false) {
@@ -1632,7 +1589,7 @@ FMDB.prototype.getbykey = async function fmdb_getbykey(table, index, anyof, wher
         if (where) {
             for (i = r.length; i--;) {
                 for (k = where.length; k--;) {
-                    if (!this.compare(table, where[k][0], where[k][1], r[i])) {
+                    if (r[i][where[k][0]] !== where[k][1]) {
                         r.splice(i, 1);
                         break;
                     }
@@ -1951,116 +1908,11 @@ FMDB.prototype.utf8length = function(str) {
 };
 
 /**
- * Check for needle into haystack
- * @param {Array} haystack haystack
- * @param {String|ArrayBuffer} needle needle
- * @returns {Boolean} whether is found.
- */
-FMDB.prototype.exists = function(haystack, needle) {
-    'use strict';
-    for (var i = haystack.length; i--;) {
-        if (this.equal(haystack[i], needle)) {
-            return true;
-        }
-    }
-    return false;
-};
-
-/**
- * Check whether two indexedDB-stored values are equal.
- * @param {ArrayBuffer} a1 first item to compare
- * @param {ArrayBuffer} a2 second item to compere
- * @returns {Boolean} true if both are deep equal
- */
-FMDB.prototype.equal = function(a1, a2) {
-    'use strict';
-    const len = a1.byteLength;
-
-    if (len === a2.byteLength) {
-        a1 = new Uint8Array(a1);
-        a2 = new Uint8Array(a2);
-
-        let i = 0;
-        while (i < len) {
-            if (a1[i] !== a2[i]) {
-                return false;
-            }
-            ++i;
-        }
-
-        return true;
-    }
-
-    return false;
-};
-
-/**
- * Check whether two indexedDB-stored values are equal.
- * @param {String} a1 first item to compare
- * @param {String} a2 second item to compere
- * @returns {Boolean} true if both are deep equal
- */
-FMDB.prototype.equals = function(a1, a2) {
-    'use strict';
-    return a1 === a2;
-};
-
-/**
- * Validate store-ready entry
- * @param {Object} entry An object
- * @returns {Boolean} whether it is..
- * @private
- */
-FMDB.prototype._raw = function(entry) {
-    'use strict';
-    return entry.d && entry.d.byteLength === undefined;
-};
-
-/**
- * Get raw value for encrypted record.
- * @param {String|ArrayBuffer} value Input
- * @returns {String} raw value
- * @private
- */
-FMDB.prototype._value = function(value) {
-    'use strict';
-
-    if (value instanceof ArrayBuffer) {
-        value = this.fromStore(value.slice(0));
-    }
-
-    return value;
-};
-
-/**
- * store-agnostic value comparison.
- * @param {String} table The DB table
- * @param {String} key The row index.
- * @param {String|ArrayBuffer} value item to compare (always encrypted)
- * @param {Object} store Store containing key. (*may* not be encrypted)
- * @returns {Boolean} true if both are deep equal
- */
-FMDB.prototype.compare = function(table, key, value, store) {
-    'use strict';
-    let eq = store[key];
-
-    if (this._raw(store)) {
-
-        if (!this._cache[eq]) {
-            this._cache[eq] = this.toStore(eq);
-        }
-        eq = this._cache[eq];
-    }
-
-    return this.equal(value, eq);
-};
-
-/**
  * indexedDB data serialization.
  * @param {String} data Input string
  * @returns {*|String} serialized data (as base64, unless we have binary keys support)
  */
-FMDB.prototype.toStore = function(data) {
+FMDB.prototype.toB64 = function(data) {
     'use strict';
     return ab_to_base64(this.strcrypt(data));
 };
@@ -2070,43 +1922,13 @@ FMDB.prototype.toStore = function(data) {
  * @param {TypedArray|ArrayBuffer|String} data Input data
  * @returns {*} de-serialized data.
  */
-FMDB.prototype.fromStore = function(data) {
+FMDB.prototype.fromB64 = function(data) {
     'use strict';
     return this.strdecrypt(base64_to_ab(data));
 };
 
-// convert to encrypted-base64
-FMDB.prototype.toB64 = FMDB.prototype.toStore;
-// convert from encrypted-base64
-FMDB.prototype.fromB64 = FMDB.prototype.fromStore;
-
-if (FMDB.$useBinaryKeys) {
-    FMDB.prototype.toStore = FMDB.prototype.strcrypt;
-    FMDB.prototype.fromStore = FMDB.prototype.strdecrypt;
-}
-else {
-    FMDB.prototype.equal = FMDB.prototype.equals;
-
-    if (!FMDB.$usePostSerialz) {
-        FMDB.prototype.compare = FMDB.prototype.equal;
-        console.warn('Fix FMDB._value()....');
-    }
-}
-
-if (!FMDB.$usePostSerialz) {
-    FMDB.prototype.add = function fmdb_adds(table, row) {
-        'use strict';
-        if (!this.crashed) {
-            this.enqueue(table, this.serialize(table, row), 0);
-        }
-    };
-    FMDB.prototype.del = function fmdb_dels(table, index) {
-        "use strict";
-        if (!this.crashed) {
-            this.enqueue(table, this.toStore(index), 1);
-        }
-    };
-}
+FMDB.prototype.toStore = FMDB.prototype.strcrypt;
+FMDB.prototype.fromStore = FMDB.prototype.strdecrypt;
 
 // @private
 FMDB.prototype._bench = function(v, m) {
@@ -2168,7 +1990,6 @@ FMDB.prototype.invalidate = promisify(function(resolve, reject, readop) {
         this.tail[i] = 0;
         this.pending[i] = [];
     }
-    this._cache = Object.create(null);
 
     // clear the writing flag for the next del() call to pass through
     this.writing = null;
@@ -2590,7 +2411,7 @@ MegaDexie.prototype.bulkUpdate = promisify(function(resolve, reject, table, bulk
     for (i = bulkData.length; i--;) {
         var v = bulkData[i][keyPath || schema.primKey.keyPath];
 
-        if (FMDB.prototype.exists(anyOf, v)) {
+        if (this.exists(anyOf, v)) {
             bulkData.splice(i, 1);
         }
         else {
@@ -2605,7 +2426,7 @@ MegaDexie.prototype.bulkUpdate = promisify(function(resolve, reject, table, bulk
             keyPath = keyPath || schema.primKey.keyPath;
             for (var i = r.length; i--;) {
                 for (var j = r[i] && bulkData.length; j--;) {
-                    if (FMDB.prototype.equal(r[i][keyPath], bulkData[j][keyPath])) {
+                    if (!indexedDB.cmp(r[i][keyPath], bulkData[j][keyPath])) {
                         delete bulkData[j][keyPath];
                         toUpdate.push([r[i], bulkData.splice(j, 1)[0]]);
                         break;
@@ -2624,6 +2445,22 @@ MegaDexie.prototype.bulkUpdate = promisify(function(resolve, reject, table, bulk
         .then(resolve)
         .catch(reject);
 });
+
+/**
+ * Check for needle into haystack
+ * @param {Array} haystack haystack
+ * @param {String|ArrayBuffer} needle needle
+ * @returns {Boolean} whether is found.
+ */
+MegaDexie.prototype.exists = function(haystack, needle) {
+    'use strict';
+    for (var i = haystack.length; i--;) {
+        if (!indexedDB.cmp(haystack[i], needle)) {
+            return true;
+        }
+    }
+    return false;
+};
 
 /**
  * Remember newly opened database.
@@ -2721,7 +2558,7 @@ MegaDexie.prototype.__checkStaleDBNames = function() {
  */
 MegaDexie.prototype.__fromUniqueID = function(aUniqueID) {
     'use strict';
-    return MurmurHash3('mega' + aUniqueID + window.u_handle, -0x9fffee);
+    return MurmurHash3(`mega${FMDB.version}${aUniqueID}${window.u_handle}`, -0x9fffee);
 };
 
 /**
@@ -3224,7 +3061,7 @@ Object.defineProperty(self, 'dbfetch', (function() {
             }
 
             // fetch the three root nodes
-            const r = await fmdb.getbykey('f', 'h', ['s', ['-2', '-3', '-4']]);
+            const r = await fmdb.getbykey('f', 'h', ['s', [-2, -3, -4]]);
 
             emplace(r);
             if (!r.length || !M.RootID || !M.RubbishID) {
@@ -3456,13 +3293,11 @@ Object.defineProperty(self, 'dbfetch', (function() {
             let bulk = handles.filter(h => !M.d[h]);
 
             if (bulk.length) {
-                await this.flushed();
                 emplace(await fmdb.getbykey('f', options, ['h', bulk]), true);
             }
 
             bulk = handles.filter(h => M.d[h] && M.d[h].t && !page.has(h));
             if (bulk.length) {
-                await this.flushed();
                 await this.tree(bulk, {...options, level: 0});
             }
 
@@ -3655,44 +3490,6 @@ Object.defineProperty(self, 'dbfetch', (function() {
         },
 
         /**
-         * Wait for DB rows to have been flushed to disk.
-         * @param {Number} [int] Iteration interval.
-         * @param {String} [table] DB Table.
-         * @returns {Promise<*>} void
-         */
-        async flushed(int = 3, table = 'f') {
-            if (fmdb.pwh) {
-                return fmdb.pwh;
-            }
-            if (fmdb.hasPendingWrites(table)) {
-                const p = fmdb.pwh = mega.promise;
-
-                // @todo we have to do something about the dirty-reads procedure becoming a nefarious bottleneck
-                fmdb.logger.warn('Holding data retrieval until there are no pending writes...');
-
-                let max = int << 2;
-
-                do {
-
-                    await tSleep(int);
-                }
-                while (--max && fmdb.hasPendingWrites(table));
-
-                if (max < 1) {
-                    // a failure in fmdb's head/tail handling can lead to misbehavior here, so...
-                    fmdb.logger.warn('Holding data retrieval ran for too long, suppressing further calls...');
-                    fmdb.pwh = -1;
-                }
-                else {
-                    delete fmdb.pwh;
-                }
-
-                p.resolve();
-                return p;
-            }
-        },
-
-        /**
          * Retrieve nodes by handle.
          * WARNING: emplacenode() is not used, it's up to the caller if so desired.
          *
@@ -3752,6 +3549,15 @@ Object.defineProperty(self, 'dbfetch', (function() {
             return n;
         },
 
+        /**
+         * Retrieve media nodes (i.e. files containing attributes)
+         * WARNING: emplacenode() is not used, it's up to the caller if so desired.
+         *
+         * @param {Number} [limit] amount of nodes to fetch at once in chunked mode
+         * @param {Function} [onchunk] chunked retrieval callback
+         * @returns {Promise} void
+         * @memberOf dbfetch
+         */
         async media(limit = 2e3, onchunk = null) {
             if (fmdb) {
                 if (typeof limit === 'function') {
@@ -3760,18 +3566,15 @@ Object.defineProperty(self, 'dbfetch', (function() {
                 }
 
                 const options = {
-                    limit,
-                    query(t) {
-                        return t.where('fa').notEqual(fmdb.toStore(''));
-                    }
+                    limit
                 };
 
                 if (onchunk) {
-                    return fmdb.getchunk('f', options, onchunk);
+                    return fmdb.getchunk('fa', options, onchunk);
                 }
 
                 delete options.limit;
-                return fmdb.getbykey('f', options);
+                return fmdb.getbykey('fa', options);
             }
         },
 

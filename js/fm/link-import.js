@@ -7,6 +7,8 @@ lazy(mega, 'linkImport', () => {
     let importLinks = new Set();
     let importTarget;
     const iframeWrapper = document.createElement('div');
+    const isExtLink = url => url.protocol === 'chrome-extension:' && url.host === 'bigefpfhnfcobdlfbedofhhaibnlghod' ||
+        url.protocol === 'extension:' && url.host === 'jemjknhgpjaacbghpdhgchbgccbpkkgf';
     const iframeLoader = (() => {
 
         let iframe;
@@ -28,7 +30,24 @@ lazy(mega, 'linkImport', () => {
                 };
 
                 iframe.addEventListener('load', onLoad);
-                iframe.src = location.origin + urlObj.pathname + urlObj.hash;
+                let base = location.origin;
+                let hash = urlObj.pathname + urlObj.hash;
+
+                if (is_extension) {
+                    base += location.pathname;
+
+                    if (isExtLink(urlObj)) {
+                        hash = urlObj.hash;
+                    }
+                    else {
+                        hash = hash.replace(/^\//, '#');
+                    }
+                }
+                else if (isExtLink(urlObj)) {
+                    hash = hash.replace(/^#/, '/');
+                }
+
+                iframe.src = base + hash;
             });
         };
 
@@ -82,8 +101,10 @@ lazy(mega, 'linkImport', () => {
     const _getUrlType = (s) => {
 
         // If link is same url as current site lets treat as mega link
-        if ((s.host === location.host || s.host === 'mega.nz' || s.host === 'mega.app')
-            && isPublicLink(s.pathname + s.hash)) {
+        if ((s.host === location.host || s.host === 'mega.nz' || s.host === 'mega.app' ||
+            s.host === 'bigefpfhnfcobdlfbedofhhaibnlghod' || // MEGA official Chrome extension
+            s.host === 'jemjknhgpjaacbghpdhgchbgccbpkkgf') && // MEGA official Edge extension
+            isPublicLink(isExtLink(s) ? s.hash : s.pathname + s.hash)) {
             return 'mega';
         }
         else if (s.host === 'drive.google.com' &&

@@ -2071,9 +2071,9 @@ function topmenuUI() {
 
     // Init/update revamped header for FM and revamped subpages
     if (!is_mobile && mega.ui.header) {
-        // skip error page in Folder link section
-        const holder = isFm && !document.body.classList.contains('bottom-pages')
-            && self.pmlayout || document.getElementById('startholder');
+        // @todo: use common header for FM and subpages
+        const holder = self.pmlayout && pmlayout.offsetWidth ?
+            pmlayout : document.getElementById('startholder');
 
         // Header is exist but not available on dom, so lets re-init it.
         if (!holder.contains(mega.ui.header.domNode)) {
@@ -2091,7 +2091,7 @@ function topmenuUI() {
         }
 
         // @todo: remove condition when we start using new header in all sections
-        if (isFm || dlid || pfid || page === 'linkaccess') {
+        if (isFm || dlid || page === 'linkaccess' || page === 'chat') {
             mega.ui.header.show();
             mega.ui.header.update();
         }
@@ -3101,10 +3101,6 @@ function loadSubPage(tpage, event) {
         T.ui.transferItOverlay.hide();
     }
 
-    if ('pm' in mega.ui) {
-        mega.ui.pm.closeUI();
-    }
-
     if (window.textEditorVisible) {
         // if we are loading a page and text editor was visible, then hide it.
         mega.textEditorUI.doClose();
@@ -3488,6 +3484,10 @@ mBroadcaster.addListener('fm:initialized', () => {
         return;
     }
 
+    if (self.fmdb && !fmdb.crashed && fmdb.influx) {
+
+        queueMicrotask(() => fmdb.writepending(fmdb.head.length - 1));
+    }
     tryCatch(() => {
         // Initialise the Back to MEGA button and Welcome dialog
         if (mega.lite.inLiteMode) {

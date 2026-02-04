@@ -207,22 +207,7 @@ class CreditCardItemForm extends MegaForm {
 
                             if (!navigator.onLine) {
                                 this.setLoading(false);
-                                megaMsgDialog.render(
-                                    l.unable_to_save,
-                                    l.check_connection,
-                                    '',
-                                    {
-                                        onInteraction: () => {
-                                            mega.ui.pm.overlay.hide();
-                                        }
-                                    },
-                                    {
-                                        icon: 'sprite-pm-mono icon-alert-triangle-thin-outline warning',
-                                        buttons: [l.ok_button]
-                                    },
-                                    false,
-                                    true
-                                );
+                                this.showOfflineDialog('save');
 
                                 return;
                             }
@@ -285,19 +270,7 @@ class CreditCardItemForm extends MegaForm {
 
         // check connection before proceeding
         if (!navigator.onLine) {
-            megaMsgDialog.render(
-                options.type === 'create' ? l.unable_to_add : l.unable_to_edit,
-                l.check_connection,
-                '',
-                '',
-                {
-                    icon: 'sprite-pm-mono icon-alert-triangle-thin-outline warning',
-                    buttons: [l.ok_button]
-                },
-                false,
-                true
-            );
-
+            this.showOfflineDialog(options.type);
             return;
         }
 

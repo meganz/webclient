@@ -397,6 +397,10 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
             onDownloadStart: this.dlstart.bind(this)
         };
 
+        if (self.dlpage_ph) {
+            entry.ph = dlpage_ph;
+        }
+
         if (n.rewind) {
             entry.customRequest = 'gd';
         }

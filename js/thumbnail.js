@@ -80,7 +80,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
     var sendToPreview = function(h, ab) {
         var n = h && M.getNodeByHandle(h);
 
-        if (n && fileext(n.name, 0, 1) !== 'pdf' && !is_video(n)) {
+        if (n && !$.funkyThumbRegen && fileext(n.name, 0, 1) !== 'pdf' && !is_video(n)) {
             previewimg(h, ab || dataURLToAB(noThumbURI));
         }
     };

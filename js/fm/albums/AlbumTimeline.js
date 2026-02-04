@@ -685,7 +685,9 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
                             this.selectRenderedCells(posArr);
 
                             delay('album_timeline:drag_select', () => {
-                                this.selectNonRenderedCells(posArr);
+                                if (this.dynamicList) {
+                                    this.selectNonRenderedCells(posArr);
+                                }
                             }, 50);
                         }
                     },

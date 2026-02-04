@@ -35,9 +35,9 @@ lazy(mega.gallery, 'albums', () => {
             const albumIds = Object.keys(scope.albums.store);
 
             for (let i = 0; i < albumIds.length; i++) {
-                const { filterFn, p, id } = scope.albums.store[albumIds[i]];
+                const {filterFn, ph, id} = scope.albums.store[albumIds[i]];
 
-                if (!filterFn && id && p && p.ph === pfid) {
+                if (!filterFn && id && ph === pfid) {
                     return id;
                 }
             }
@@ -558,7 +558,7 @@ lazy(mega.gallery, 'albums', () => {
     const fillAlbumCell = (cell) => {
         cell.titleEl.textContent = cell.el.album.label;
         cell.titleEl.setAttribute('title', cell.el.album.label);
-        cell.isShared = !!cell.el.album.p;
+        cell.isShared = !!cell.el.album.ph;
         cell.updatePlaceholders();
     };
 
@@ -1051,7 +1051,7 @@ lazy(mega.gallery, 'albums', () => {
 
                 this.linkInput.el.classList.add('mr-4');
                 this.keyInput = new ToCopyInput(true);
-                this.keyInput.value = a32_to_base64(decrypt_key(u_k_aes, base64_to_a32(this._album.k)));
+                this.keyInput.value = a32_to_base64(decrypt_key(u_k_aes, this._album.k));
                 this.flexContainer.appendChild(this.keyInput.el);
                 this.updateInputValue();
             }
@@ -1068,12 +1068,12 @@ lazy(mega.gallery, 'albums', () => {
         }
 
         updateInputValue() {
-            const { p: { ph }, k } = this._album;
+            const {ph, k} = this._album;
 
             let value = `${getBaseUrl()}/collection/${ph}`;
 
             if (!this._separated) {
-                value += `#${a32_to_base64(decrypt_key(u_k_aes, base64_to_a32(k)))}`;
+                value += `#${a32_to_base64(decrypt_key(u_k_aes, k))}`;
             }
 
             this.linkInput.value = value;
@@ -1892,7 +1892,6 @@ lazy(mega.gallery, 'albums', () => {
                             else if (albumId) {
                                 mega.sets.updateAttrValue(
                                     {
-                                        at: scope.albums.store[albumId].at,
                                         k: scope.albums.store[albumId].k,
                                         id: albumId
                                     },
@@ -2322,7 +2321,7 @@ lazy(mega.gallery, 'albums', () => {
                         cell.appendChild(icon);
                     }
                     checkbox.beforeLabel = cell;
-                    if (album.p) {
+                    if (album.ph) {
                         const icon = document.createElement('i');
                         icon.className = 'sprite-fm-mono icon-link-small icon-size-6 ml-auto';
                         checkbox.afterLabel = icon;
@@ -2746,7 +2745,7 @@ lazy(mega.gallery, 'albums', () => {
                 return;
             }
 
-            const { nodes, filterFn, p } = scope.albums.store[albumId];
+            const {nodes, filterFn, ph} = scope.albums.store[albumId];
             const { isPublic } = scope.albums;
 
             const nodesAvailable = !!nodes.length;
@@ -2856,21 +2855,21 @@ lazy(mega.gallery, 'albums', () => {
                         }
                     },
                     {
-                        text: p ? l[6909] : mega.icu.format(l.album_share_link, 1),
+                        text: ph ? l[6909] : mega.icu.format(l.album_share_link, 1),
                         icon: 'sprite-fm-mono icon-link-thin-outline',
                         onClick: () => {
                             if (M.isInvalidUserStatus()) {
                                 return;
                             }
 
-                            const newP = scope.albums.store[albumId].p;
+                            const newP = scope.albums.store[albumId].ph;
 
                             // The share has changed already, ignoring
-                            if (!!p !== !!newP) {
+                            if (!!ph !== !!newP) {
                                 return;
                             }
 
-                            if (p) {
+                            if (ph) {
                                 const dialog = new AlbumShareDialog([albumId]);
                                 dialog.show();
                             }
@@ -3702,12 +3701,12 @@ lazy(mega.gallery, 'albums', () => {
 
             this.setsSubscribers = [
                 mega.sets.subscribe('asp', 'albums', (data) => {
-                    const { id, at, k } = data;
-                    const isPending = pendingName !== '' && mega.sets.decryptSetAttr(at, k).n === pendingName;
-
-                    let prevName = '';
+                    const { id } = data;
+                    const isPending = pendingName && data.name === pendingName;
                     const album = this.store[id];
                     const isExisting = !!album;
+                    let prevName = '';
+                    let prevCover = '';
 
                     if (isPending) {
                         if (this.grid) {
@@ -3715,47 +3714,31 @@ lazy(mega.gallery, 'albums', () => {
                         }
                         pendingName = '';
                     }
-                    else if (album) {
+                    else if (isExisting) {
                         prevName = album.label;
-                    }
-
-                    sortStore();
-
-                    if (isExisting) {
-                        const ids = Object.keys(album.eIds);
-                        data.e = Object.create(null);
-
-                        for (let i = 0; i < ids.length; i++) {
-                            const id = ids[i];
-
-                            data.e[id] = {
-                                id,
-                                h: album.eIds[id]
-                            };
-                        }
-
-                        data.p = album.p;
+                        prevCover = album.at.c;
                     }
 
                     this.createAlbumData(data, unwantedHandles());
 
-                    const nameChanged = album && prevName !== album.label;
+                    const nameChanged = isExisting && prevName !== album.label;
+                    const coverChanged = isExisting && prevCover !== album.at.c;
 
                     sortStore();
 
                     if (M.isAlbumsPage(1) && this.grid) {
-                        if (isExisting) {
-                            this.grid.removeAlbum(album);
-
-                            if (album.cellEl && nameChanged) {
+                        if (!isExisting) {
+                            this.grid.insertUserAlbum(id);
+                            this.grid.refresh();
+                        }
+                        else if (album.cellEl) {
+                            if (nameChanged) {
                                 album.cellEl.updateName();
                             }
-                        }
 
-                        this.grid.insertUserAlbum(id);
-
-                        if (!isExisting) {
-                            this.grid.refresh();
+                            if (coverChanged) {
+                                album.cellEl.updateCoverImage();
+                            }
                         }
 
                         delay('album:trigger_items_dialog', () => {
@@ -3857,7 +3840,7 @@ lazy(mega.gallery, 'albums', () => {
         async initPublicAlbum() {
             const albumData = {
                 ...M.d[M.RootID],
-                p: { ph: pfid }
+                ph: pfid
             };
             const handles = M.c[M.RootID] ? Object.keys(M.c[M.RootID]) : [];
 
@@ -4020,7 +4003,7 @@ lazy(mega.gallery, 'albums', () => {
             }
 
             const albums = [];
-            const sets = Object.values(await mega.sets.buildTmp());
+            const sets = Object.values(M.sets);
 
             if (!Array.isArray(sets) || !sets.length) {
                 return [];
@@ -4080,14 +4063,17 @@ lazy(mega.gallery, 'albums', () => {
         /**
          * @param {Object.<String, any>} data Set data to process
          * @param {String[]|*} ignoreHandles Handles to ignore when add to the album
-         * @param {Boolean} [isPublic] Whether the specified key is encrypted
          * @returns {Object}
          */
-        createAlbumData({e, at, k, id, ts, p, cts}, ignoreHandles = false, isPublic = false) {
-            const attr = at === '' || !at ? {} : isPublic
-                ? mega.sets.decryptPublicSetAttr(at, k)
-                : mega.sets.decryptSetAttr(at, k);
-            const label = attr.n || l.unknown_album_name;
+        createAlbumData({e, name, k, id, ts, ph, cts, cover}, ignoreHandles = false) {
+            const attr = {
+                n: name || l.unknown_album_name
+            };
+
+            if (cover) {
+                attr.c = cover;
+            }
+
             const coverHandle = attr.c || '';
             let album = this.store[id];
             const nodes = [];
@@ -4096,7 +4082,7 @@ lazy(mega.gallery, 'albums', () => {
             let node = null;
 
             if (e) {
-                const elements = Object.values(e);
+                const elements = [...e.values()];
 
                 for (let i = 0; i < elements.length; i++) {
                     const { h, id } = elements[i];
@@ -4127,34 +4113,19 @@ lazy(mega.gallery, 'albums', () => {
                 node = nodes[0];
             }
 
-            if (album) {
-                album.at = attr;
-                album.k = k;
-                album.label = label;
-                album.ts = ts;
-                album.nodes = nodes;
-                album.node = node;
-                album.eHandles = eHandles;
-                album.eIds = eIds;
-                album.p = p;
+            if (!album) {
+                album = this.store[id] = {id, cts};
             }
-            else {
-                album = {
-                    at: attr,
-                    k,
-                    id,
-                    label,
-                    nodes,
-                    node,
-                    ts,
-                    cts,
-                    eHandles,
-                    eIds,
-                    p
-                };
 
-                this.store[id] = album;
-            }
+            album.at = attr;
+            album.k = k;
+            album.label = attr.n;
+            album.ts = ts;
+            album.nodes = nodes;
+            album.node = node;
+            album.eHandles = eHandles;
+            album.eIds = eIds;
+            album.ph = ph;
 
             return album;
         }
@@ -4174,12 +4145,11 @@ lazy(mega.gallery, 'albums', () => {
             const removing = r === 1;
 
             if (removing) {
-                if (album.p) {
-                    delete album.p;
-                }
+                delete album.ph;
             }
             else {
-                album.p = { ph, ts };
+                album.ts = ts;
+                album.ph = ph;
             }
 
             if (s === scope.getAlbumIdFromPath() && this.grid && this.grid.header) {
@@ -4627,7 +4597,7 @@ lazy(mega.gallery, 'albums', () => {
         updateAlbumCover({ at, id, k, eHandles }, handle) {
             loadingDialog.show('MegaAlbumsUpdateCover');
 
-            mega.sets.updateAttrValue({ at, k, id }, 'c', eHandles[handle] || '')
+            mega.sets.updateAttrValue({ k, id }, 'c', eHandles[handle] || '')
                 .then(() => {
                     if (this.grid && this.grid.timeline) {
                         this.grid.timeline.clearSiblingSelections();
@@ -4645,16 +4615,15 @@ lazy(mega.gallery, 'albums', () => {
         }
 
         async getUniqueSetName(setNode) {
-            const sets = Object.values(await mega.sets.buildTmp());
+            const sets = Object.values(M.sets);
             const names = Object.create(null);
             const  { h, name } = setNode;
 
             for (let i = 0; i < sets.length; i++) {
-                const { at, k } = sets[i];
 
-                tryCatch(() => {
-                    names[mega.sets.decryptSetAttr(at, k).n] = true;
-                })();
+                if (sets[i].name) {
+                    names[sets[i].name] = true;
+                }
             }
 
             if (!names[name]) {
@@ -4688,8 +4657,6 @@ lazy(mega.gallery, 'albums', () => {
                     const promises = [];
                     const availableIds = [];
 
-                    const { getSetById, elements } = mega.sets;
-
                     for (let i = 0; i < albumIds.length; i++) {
                         const id = albumIds[i];
                         const album = scope.albums.store[id];
@@ -4698,45 +4665,10 @@ lazy(mega.gallery, 'albums', () => {
                             continue;
                         }
 
-                        // Checking that all elements are good to be a part of share
-                        const s = await getSetById(id).catch((ex) => console.error(ex));
-
                         availableIds.push(id);
 
-                        if (!album.p) {
+                        if (!album.ph) {
                             promises.push(mega.sets.addShare(id));
-                        }
-
-                        if (!s) {
-                            continue;
-                        }
-
-                        const elsToReset = {};
-                        const { e, k } = s;
-
-                        if (e && typeof e === 'object') {
-                            const minKeyLen = 43; // The length of 32b ByteArray in Base64 string
-
-                            for (const eId in e) {
-                                if (Object.hasOwnProperty.call(e, eId)) {
-                                    const { h, k, o, at, ts } = e[eId];
-
-                                    // Repairing the elements with old incorrect keys
-                                    if (k.length < minKeyLen || (!at && ts < 1695340800)) {
-                                        elsToReset[eId] = { h, o: o || 1500 };
-                                    }
-                                }
-                            }
-                        }
-
-                        const eIds = Object.keys(elsToReset);
-
-                        if (eIds.length) {
-                            elements.bulkRemove(eIds, id)
-                                .then(() => {
-                                    return elements.bulkAdd(Object.values(elsToReset), id, k);
-                                })
-                                .catch(dump);
                         }
                     }
 
@@ -4746,8 +4678,8 @@ lazy(mega.gallery, 'albums', () => {
                                 const p = results[i][1] || results[i];
 
                                 // In case there is a race, it is safer to assign ass result to albums directly
-                                if (!scope.albums.store[availableIds[i]].p) {
-                                    scope.albums.store[availableIds[i]].p = p;
+                                if (!scope.albums.store[availableIds[i]].ph) {
+                                    scope.albums.store[availableIds[i]].ph = p.ph;
                                 }
                             }
 
@@ -4778,7 +4710,7 @@ lazy(mega.gallery, 'albums', () => {
                 const id = albumIds[i];
                 const album = scope.albums.store[id];
 
-                if (album && album.p) {
+                if (album && album.ph) {
                     idsToClear.push(id);
                 }
             }

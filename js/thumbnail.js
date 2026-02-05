@@ -109,6 +109,11 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
     };
 
     const store = ({thumbnail, preview}) => {
+        if (d) {
+            const p = preview ? preview.byteLength : 'none';
+            const t = thumbnail ? thumbnail.byteLength : 'none';
+            debug(`store thumb=%s, prev=%s`, t, p, canStoreAttr, onPreviewRetry);
+        }
         if (canStoreAttr) {
             // FIXME hack into cipher and extract key
             const key = aes._key[0].slice(0, 4);
@@ -123,7 +128,15 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                 api_storefileattr(id, 1, key, preview, n.h, ph);
             }
 
+            const c = !thumbnail + !preview;
+            if (c) {
+                mBroadcaster.sendMessage('fa:error', id, 'unk0', false, c);
+            }
+
             // @todo make async and hold until api_storefileattr() completes (SC-ack)
+        }
+        else {
+            mBroadcaster.sendMessage('fa:error', id, 'eperm', false, 2);
         }
 
         if (node) {
@@ -187,6 +200,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
 
         if (d) {
             console.timeEnd(tag);
+            debug('scissor+store', res);
         }
         return res;
     })().catch(ex => {

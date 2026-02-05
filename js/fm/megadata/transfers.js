@@ -1193,7 +1193,7 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
             $('.transfer-clear-completed').removeClass('disabled');
             $('.transfer-clear-all-icon').removeClass('disabled');
 
-            M.onFileManagerReady(function() {
+            queueMicrotask(() => {
 
                 if (ulmanager.ulOverStorageQuota) {
                     ulmanager.ulShowOverStorageQuotaDialog();
@@ -1207,6 +1207,7 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
 
                         data[f.id] = {
                             uid: f.id,
+                            faid: f.faid,
                             size: f.size,
                             name: f.name,
                             chat: f.chatid,

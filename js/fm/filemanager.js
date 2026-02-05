@@ -3793,11 +3793,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
             if (id === mega.devices.rootId &&
                 mega.devices.ui &&
                 mega.devices.ui.isReady &&
-                !mega.devices.ui.hasDevices ||
-                !M.v.length && (
-                    id === 'shared-with-me' && M.currentdirid !== 'shares' ||
-                    id === 's4' && M.currentCustomView.subType === 'bucket'
-                )) {
+                !mega.devices.ui.hasDevices) {
                 headerButtons.classList.add('hidden');
             }
         }

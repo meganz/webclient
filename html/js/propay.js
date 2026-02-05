@@ -1616,7 +1616,7 @@ pro.propay = {
                     || l.special_offer)
                 .replace('%2', formatPercentage(pro.calculateSavings([
                     this.discountInfo.pd,
-                    this.planObj.months === 12 && this.instantDiscount ? pro.yearlyDiscountPercentage : 0
+                    this.planObj.hasYearlyDiscount && this.instantDiscount ? pro.yearlyDiscountPercentage : 0
                 ])))
                 .replace('%3', this.planObj.name)
                 .replace('%4', this.getNumOfMonthsWording(this.discountInfo.m ||this.planObj.months, true));
@@ -1780,7 +1780,7 @@ pro.propay = {
                 $('.discount-amount-descr', $discountAmount)
                     .text(l.discount_save_amount.replace('%1', formatPercentage(pro.calculateSavings([
                         discountInfo.pd,
-                        this.planObj.months === 12 && this.instantDiscount ? pro.yearlyDiscountPercentage : 0
+                        this.planObj.hasYearlyDiscount && this.instantDiscount ? pro.yearlyDiscountPercentage : 0
                     ]))));
 
                 $('.discount-amount-value', $discountAmount)
@@ -1870,7 +1870,7 @@ pro.propay = {
                 discountHeaderText = discountHeaderText
                     .replace('%1', formatPercentage(pro.calculateSavings([
                         this.planObj.instantDiscount.percentage,
-                        this.planObj.months === 12 ? pro.yearlyDiscountPercentage : 0
+                        this.planObj.hasYearlyDiscount ? pro.yearlyDiscountPercentage : 0
                     ])));
                 addNumMonths = true;
             }

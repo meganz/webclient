@@ -73,6 +73,9 @@ var pro = {
 
     usedDiscountCode: null,
 
+    // Ignore discounts of less that 2%
+    minimumAcknowledgedDiscount: 2,
+
     /**
      * Determines if a Business or Pro Flexi account is expired or in grace period
      * @param {Number} accountStatus The account status e.g. from u_attr.b.s (Business) or u_attr.pf.s (Pro Flexi)
@@ -92,6 +95,7 @@ var pro = {
         const allowLocal = localStorage.blockLocal !== '1';
         const blockFreeTrial = localStorage.blockFreeTrial
             && new Set(localStorage.blockFreeTrial.split(',').map(n => +n));
+        const blockSpecificPlans = localStorage.blockSpecificPlans && JSON.parse(localStorage.blockSpecificPlans);
 
         pro.membershipPlans = pro.membershipPlans.map((plan) => {
             if (!allowLocal) {
@@ -106,6 +110,11 @@ var pro = {
 
             if (blockFreeTrial && blockFreeTrial.has(plan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL])) {
                 plan[pro.UTQA_RES_INDEX_EXTRAS].trial = false;
+            }
+
+            if (blockSpecificPlans
+                && (blockSpecificPlans[plan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL]] === plan[pro.UTQA_RES_INDEX_MONTHS])) {
+                return null;
             }
 
             return plan;
@@ -1093,6 +1102,12 @@ var pro = {
                     return Math.floor(Math.round(thisPlan.saveUpToPrecise * 10) / 10);
                 });
 
+                lazy(thisPlan, 'hasYearlyDiscount', () => {
+                    return thisPlan.months === 12
+                        && thisPlan.saveUpToPrecise
+                        && (thisPlan.saveUpToPrecise >= pro.minimumAcknowledgedDiscount);
+                });
+
                 lazy(thisPlan, 'maxCorrPriceEuro', () => {
                     if (thisPlan._maxCorrPriceEur === null) {
                         // map by UTQA_RES_INDEX_PRICE
@@ -1430,6 +1445,8 @@ var pro = {
     getPlanObj(plan, months, key) {
         'use strict';
 
+        const anyDuration = !months;
+
         if (key) {
             return pro.planObjects.planKeys[key] || false;
         }
@@ -1439,7 +1456,7 @@ var pro = {
             return;
         }
         const {planTypes} = pro.planObjects;
-        months = (months |= 0) || 1;
+        months |= 0;
         let type;
         if (typeof plan === 'number' || typeof plan === 'string') {
             plan |= 0;
@@ -1454,7 +1471,7 @@ var pro = {
 
             plan = pro.membershipPlans.find((searchPlan) => {
                 return ((searchPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL] === plan)
-                    && (searchPlan[pro.UTQA_RES_INDEX_MONTHS] === months));
+                    && (anyDuration || searchPlan[pro.UTQA_RES_INDEX_MONTHS] === months));
             });
         }
 
@@ -1728,7 +1745,10 @@ lazy(pro, 'yearlyDiscountPercentage', () => {
         return 0;
     }
 
-    const minYearlyDiscount = Math.min(...pro.filter.plans.proTabY.map(p => pro.getPlanObj(p).saveUpToPrecise));
+    const minYearlyDiscount = Math.min(...pro.filter.plans.proTabY
+        .map(p => pro.getPlanObj(p).saveUpToPrecise)
+        .filter((d) => d && d >= pro.minimumAcknowledgedDiscount)
+    );
     console.assert(
         minYearlyDiscount >= 16 && minYearlyDiscount <= 17,
         `Yearly discount percentage is expected to be 16. Got ${minYearlyDiscount}`

@@ -494,6 +494,9 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
         }
     }
 
+    if (folderlink && !window.useMegaSync) {
+        await megasync.preCheck().catch(nop);
+    }
     const {useMegaSync} = window;
 
     if (useMegaSync === 2 || useMegaSync === 3) {

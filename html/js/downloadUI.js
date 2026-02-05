@@ -447,46 +447,48 @@ lazy(mega.ui, 'dlPage', () => {
             this.data.msd = res.msd || 0;
         },
 
-        startDownload() {
-            // Start download with MEGAsync
-            if (this.appDl) {
-                loadingDialog.show();
+        startDownload(forceBrowserDl) {
+            if (!forceBrowserDl) {
+                loadingDialog.show('dl-msync-check');
                 megasync.isInstalled((err, is) => {
-                    loadingDialog.hide();
+                    loadingDialog.hide('dl-msync-check');
+                    if (!err && is) {
+                        // If 'msd' (MegaSync download) flag is turned on and application is installed
+                        if (this.data.msd === 0) {
+                            dlmanager.showMEGASyncOverlay(fdl_filesize > maxDownloadSize);
+                        }
+                        else {
+                            $('.megasync-overlay', 'body').removeClass('downloading'); // @todo: revamp
 
-                    // If 'msd' (MegaSync download) flag is turned on and application is installed
-                    if (this.data.msd !== 0 && (!err || is)) {
-                        $('.megasync-overlay', 'body').removeClass('downloading'); // @todo: revamp
-
-                        megasync.download(dlpage_ph, a32_to_base64(base64_to_a32(dlkey).slice(0, 8)), (err) => {
-                            if (err) {
-                                this.appDl = false;
-                                this.startDownload();
-                            }
-                        }, true);
-                        eventlog(501031);
-                        dlPageStartDownload(true);
+                            megasync.download(dlpage_ph, a32_to_base64(base64_to_a32(dlkey).slice(0, 8)), (err) => {
+                                if (err) {
+                                    this.startDownload(true);
+                                }
+                            }, true);
+                            eventlog(501031);
+                            this.appDl = true;
+                            this.showInitUI();
+                        }
                     }
                     else {
-                        dlmanager.showMEGASyncOverlay(fdl_filesize > maxDownloadSize);
+                        this.startDownload(true);
                     }
                 });
             }
-            // Show Download MEGAsync app dialog
             else if (fdl_filesize > maxDownloadSize) {
                 this.appDl = true;
                 dlmanager.showMEGASyncOverlay(true);
             }
-            // Save downloaded file
+            // Downloaded previewed file (Save)
             else if (Object(previews[dlpage_ph]).full) {
                 dlprogress(-0xbadf, 100, fdl_filesize, fdl_filesize);
                 this.showCompleteUI();
-                eventlog(501033);
+                eventlog(501030);
                 M.saveAs(previews[dlpage_ph].buffer, dl_node.name);
             }
-            // Complete downloading
+            // Save downloaded file
             else if (dlResumeInfo && dlResumeInfo.byteLength === fdl_filesize) {
-                eventlog(501030);
+                eventlog(501033);
                 dlPageStartDownload();
             }
             // Start downloading
@@ -506,7 +508,8 @@ lazy(mega.ui, 'dlPage', () => {
                                     if (size === fdl_filesize) {
                                         // another tab finished the download
                                         dlResumeInfo = Object.assign({}, dlResumeInfo, {byteLength: size});
-                                        onDownloadReady();
+                                        this.updateDlOptions(fdl_filesize, false);
+                                        dlprogress(-0xbadf, 100, fdl_filesize, fdl_filesize);
                                     }
 
                                     if (dlResumeInfo && dlResumeInfo.byteLength === dlResumeInfo.byteOffset) {
@@ -525,6 +528,7 @@ lazy(mega.ui, 'dlPage', () => {
                         }
                     });
             }
+
             return false;
         },
 
@@ -538,7 +542,6 @@ lazy(mega.ui, 'dlPage', () => {
             fdl_queue_var = false;
 
             this.updateDlOptions();
-            this.updateAppDlFlag();
 
             if (hide) {
                 this.closeWidgets();
@@ -549,28 +552,9 @@ lazy(mega.ui, 'dlPage', () => {
             }
         },
 
-        updateAppDlFlag() {
-            if (fdl_filesize > maxDownloadSize) {
-                this.appDl = true;
-            }
-            else if (dlResumeInfo) {
-                this.appDl = false;
-            }
-            else {
-                megasync.isInstalled((err, is) => {
-                    this.appDl = !!(!err && is);
-                });
-            }
-        },
-
-        updateDlOptions(byteLength, appDl) {
+        updateDlOptions(byteLength) {
             const {header} = this.data;
             let tip = l[58]; // Download
-
-            // Update application download if needed
-            if (appDl !== undefined) {
-                this.appDl = appDl;
-            }
 
             // this.closeWidgets();
             header.loader = false;

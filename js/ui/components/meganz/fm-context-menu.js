@@ -871,8 +871,8 @@
                         }
                         else if (M.isAlbumsPage(1)) {
                             const album = mega.gallery.albums.store[handle];
-                            if (album && album.p) {
-                                const { p: { ph }, k } = album;
+                            if (album && album.ph) {
+                                const {ph, k} = album;
                                 const key = a32_to_base64(decrypt_key(u_k_aes, base64_to_a32(k)));
                                 links.push(`${getBaseUrl()}/collection/${ph}#${key}`);
                             }
@@ -959,7 +959,7 @@
 
                                 const albumIds = [];
                                 for (const handle of mega.ui.contextMenu.selectedItems) {
-                                    if (mega.gallery.albums.store[handle].p) {
+                                    if (mega.gallery.albums.store[handle].ph) {
                                         albumIds.push(handle);
                                     }
                                 }
@@ -1711,7 +1711,7 @@
             for (const handle of selectedItems) {
                 if (M.isAlbumsPage(1)) {
                     const album = mega.gallery.albums.store[handle];
-                    if (album && album.p) {
+                    if (album && album.ph) {
                         stats.numOfExistingLinks++;
                     }
                 }

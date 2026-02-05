@@ -275,25 +275,17 @@ class MegaGallery {
     findMiddleImage() {
         const $blockViews = $(".MegaDynamicList .data-block-view", this.galleryBlock);
         const contentOffset = this.dynamicList.$content.offset();
-        const listContainerHeight = this.dynamicList.$listContainer.height();
 
         let $middleBlock = null;
-        let minDistance = 1e6;
 
         const scrollTop = this.dynamicList.getScrollTop();
 
         for (const v of $blockViews) {
             const $v = $(v);
 
-            if ($v.offset().left < contentOffset.left + 5) {
-                const {blockSize, blockTop} = this.getBlockTop($v.attr('id'));
-                const middle = blockTop + blockSize / 2 - scrollTop;
-                const distance = Math.abs(listContainerHeight / 2 - middle);
-
-                if (distance < minDistance) {
-                    minDistance = distance;
-                    $middleBlock = $v;
-                }
+            if ($v.offset().top >= contentOffset.top + scrollTop) {
+                $middleBlock = $v;
+                break;
             }
 
         }
@@ -1598,10 +1590,9 @@ class MegaGallery {
             this.dynamicList.itemRenderChanged(false, true);
 
             if (this.$middleBlock) {
-                const listContainerHeight = this.dynamicList.$listContainer.height();
-                const {blockSize, blockTop} = this.getBlockTop(this.$middleBlock.attr('id'));
+                const { blockTop } = this.getBlockTop(this.$middleBlock.attr('id'));
                 this.shouldProcessScroll = false;
-                this.dynamicList.scrollToYPosition(blockTop - (listContainerHeight - blockSize) / 2);
+                this.dynamicList.scrollToYPosition(blockTop);
             }
 
             return false;
@@ -1970,7 +1961,7 @@ class MegaGallery {
             }
             else {
                 const maxItemsInRow = this.maxItems[this.zoom];
-                blockSize = this.dynamicList.$content.width() / maxItemsInRow;
+                blockSize = Math.min(560, this.dynamicList.$content.width() / maxItemsInRow);
                 height += Math.floor(index / maxItemsInRow) * blockSize;
                 return {
                     blockSize: blockSize,
@@ -1986,13 +1977,12 @@ class MegaGallery {
 
     getGroupHeight(id) {
 
-        const wrapWidth = Math.max(Math.min(this.dynamicList.$content.width(), 820), 620);
         const group = this.getGroupById(id);
 
         if (this.mode === 'a') {
             const headerHeight = group.l ? 64 : 0;
             const maxItemsInRow = this.maxItems[this.zoom];
-            const blockSize = this.dynamicList.$content.width() / maxItemsInRow;
+            const blockSize = Math.min(560, this.dynamicList.$content.width() / maxItemsInRow);
 
             return Math.ceil(group.n.length / maxItemsInRow) * blockSize + headerHeight;
         }
@@ -3871,26 +3861,17 @@ mega.gallery.initialiseMediaNodes = async(filterFn) => {
     'use strict';
 
     if (!mega.gallery.tmpFa) {
-        const nodesToObject = async() => {
-            const res = Object.create(null);
+        mega.gallery.tmpFa = (await dbfetch.media())
+            .reduce((t, n) => {
+                t[n.h] = n;
+                return t;
+            }, Object.create(null));
 
-            const assignNodes = (r) => {
-                for (let i = r.length; i--;) {
-                    const n = r[i];
-
-                    if (n.fa && !n.fv && n.s) {
-                        res[n.h] = n;
-                    }
-                }
-            };
-
-            await M.collectNodes(M.RootID);
-            assignNodes(Object.values(M.d));
-
-            return res;
-        };
-
-        mega.gallery.tmpFa = await nodesToObject();
+        // @todo work with the in-memory nodes, without loading them normally!
+        await dbfetch.geta(Object.keys(mega.gallery.tmpFa));
+        for (const h in mega.gallery.tmpFa) {
+            mega.gallery.tmpFa[h] = M.d[h] || mega.gallery.tmpFa[h];
+        }
     }
 
     return Object.values(mega.gallery.tmpFa).filter((n) => mega.gallery.allowedInMedia(n, filterFn));

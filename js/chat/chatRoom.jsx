@@ -2340,7 +2340,7 @@ ChatRoom.prototype.isReadOnly = function() {
     // check if still contacts.
     if (this.type === "private") {
         var members = this.getParticipantsExceptMe();
-        if (members[0] && !M.u[members[0]].c) {
+        if (members[0] && !Object(M.u[members[0]]).c) {
             return true;
         }
     }

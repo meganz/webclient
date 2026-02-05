@@ -1329,6 +1329,8 @@ lazy(pro, 'proplan2', () => {
         $planCardsContainer.toggleClass('promo', !!anyDiscount);
         $planCardsContainer.toggleClass('promo-all', !!matchingDiscount);
 
+        $('.pricing-plan-card', $planCardsContainer).addClass('hidden');
+
         for (const currentPlan of pro.membershipPlans) {
 
             const months = currentPlan[pro.UTQA_RES_INDEX_MONTHS];
@@ -1355,7 +1357,7 @@ lazy(pro, 'proplan2', () => {
                 continue;
             }
 
-            if (!periodSwapped && pro.singleDurationPlans[planNum]) {
+            if (tab !== 'pro' && !periodSwapped && pro.singleDurationPlans[planNum]) {
                 period = pro.singleDurationPlans[planNum];
                 periodText = period === 12 ? l[932] : l[931];
                 periodSwapped = true;
@@ -1412,7 +1414,9 @@ lazy(pro, 'proplan2', () => {
                 $('.pricing-plan-only', $planCard).addClass('line-through')
                     .text(basePricePlan.getFormattedPrice('narrowSymbol', false, false, 1));
             }
-            else if (pro.instantDiscounts.shared.anyDiscount12 && months === 12) {
+            else if (pro.instantDiscounts.shared.anyDiscount12 && months === 12
+                && (yearlyDifference >= pro.minimumAcknowledgedDiscount)) {
+
                 setCardClassTxt(currentPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL], 'save spacer', l.yearly_plan_saving
                     .replace('%1', Math.floor(yearlyDifference)));
             }

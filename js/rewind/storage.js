@@ -31,20 +31,7 @@ lazy(mega, 'rewindStorage', () => {
         }
 
         normaliseRows(table, rows) {
-            if (fmdb.restorenode[table]) {
-                fmdb.normaliseresult(table, rows);
-            }
-            else {
-                for (let i = rows.length; i--;) {
-                    for (const property in rows[i]) {
-                        const plainText = DB_DONT_ENCRYPT[table] && DB_DONT_ENCRYPT[table][property];
-                        rows[i][property] = plainText ? rows[i][property] : fmdb.fromStore(rows[i][property]);
-                        if (property === 'd') {
-                            rows[i][property] = JSON.parse(rows[i][property]);
-                        }
-                    }
-                }
-            }
+            fmdb.normaliseresult(table, rows);
         }
 
         processKey(table, key) {
@@ -55,11 +42,6 @@ lazy(mega, 'rewindStorage', () => {
 
                 key = Object.create(null);
                 key[index] = value;
-            }
-
-            for (const property in key) {
-                const plainText = DB_DONT_ENCRYPT[table] && DB_DONT_ENCRYPT[table][property];
-                key[property] = plainText ? key[property] : fmdb.toStore(key[property]);
             }
 
             return key;

@@ -7,9 +7,6 @@ mega.tpw = new function TransferProgressWidget() {
     const textSelector = '.transfer-progress-txt';
     const transferPauseAllSelector = '.transfer-pause-icon';
     const frozenTimeout = 60; // 60 sec
-    const completedTimeToStay = 300; // 5 min
-    const failedTimeToStay = 900; // 15 min
-    var maximumLength = 200; // maximum rows to draw in normal mode
 
     var $widget;
     var $widgetWarnings;
@@ -81,6 +78,7 @@ mega.tpw = new function TransferProgressWidget() {
                         $widgetFooter.removeClass('hidden');
                     }
                     $widgetTabsHeader.removeClass('hidden');
+                    mega.tpw.renderView(mega.tpw.currView, true);
                 });
                 eventlog(501073);
             }
@@ -583,7 +581,6 @@ mega.tpw = new function TransferProgressWidget() {
             postProcessComplete();
         }, 400);
 
-        this.eventuallyFadeOutRow(transferId, completedTimeToStay);
         this.updateDOMRow(transferId, {
             status: 'complete',
             statusText: l[1418],
@@ -617,7 +614,6 @@ mega.tpw = new function TransferProgressWidget() {
         }
 
         this.updateDOMRow(transferId, update);
-        this.eventuallyFadeOutRow(transferId, failedTimeToStay);
         this.updateHeaderAndContent();
     };
 
@@ -773,6 +769,11 @@ mega.tpw = new function TransferProgressWidget() {
             this.applyToRows(removeRow, this.TYPE_COMPLETE);
         }
 
+        $widgetTabCompleted.addClass('inactive').removeClass('active');
+        mega.tpw.renderView(mega.tpw.views.ACTIVE);
+        $widgetTabActive.addClass('active');
+        $widgetFooter.removeClass('hidden');
+
         if (d) {
             console.timeEnd('tpw:clearRows');
         }
@@ -890,7 +891,6 @@ mega.tpw = new function TransferProgressWidget() {
     const megaListItems = new Set();
     const rows = new Map();
     const toAnimate = new Map();
-    const toEventuallyAnimate = new Map();
     const animationLength = 400;
     let animateUntil = false;
     let animationTick = 0;
@@ -926,7 +926,7 @@ mega.tpw = new function TransferProgressWidget() {
                             eventlog(501087);
                         }
                         $(`.transfer-table tr#${gid}`).remove();
-                        if ($.clearTransferPanel) {
+                        if (rows.size === 1 && $.clearTransferPanel) {
                             $.clearTransferPanel();
                         }
                         if (M.tfsdomqueue[gid]) {
@@ -934,6 +934,9 @@ mega.tpw = new function TransferProgressWidget() {
                         }
                         tfsheadupdate({c: gid});
                         scope.fadeOutRow(this.transferId);
+                        if (Object.keys(M.tfsdomqueue).length) {
+                            M.tfsResizeHandler();
+                        }
                         break;
                     }
                     case 'link': {
@@ -1292,11 +1295,6 @@ mega.tpw = new function TransferProgressWidget() {
         megaList.remove(id);
         rows.get(id).detachEl();
         toAnimate.delete(id);
-        const promise = toEventuallyAnimate.get(id);
-        if (promise) {
-            promise.abort();
-            toEventuallyAnimate.delete(id);
-        }
         return rows.delete(id);
     };
     scope.applyToRows = (fn, type) => {
@@ -1358,31 +1356,12 @@ mega.tpw = new function TransferProgressWidget() {
         if (!rows.has(id)) {
             return;
         }
-        if (toEventuallyAnimate.has(id)) {
-            toEventuallyAnimate.get(id).abort();
-            toEventuallyAnimate.delete(id);
-        }
         toAnimate.set(id, 0);
         const wasAnimating = !!animateUntil;
         animateUntil = Date.now() + animationLength;
         if (!wasAnimating) {
             animate();
         }
-    };
-    scope.eventuallyFadeOutRow = (id, timeout) => {
-        if (toAnimate.has(id)) {
-            return false;
-        }
-        if (toEventuallyAnimate.has(id)) {
-            toEventuallyAnimate.get(id).abort();
-        }
-        const promise = tSleep(timeout);
-        promise.then(() => {
-            toEventuallyAnimate.delete(id);
-            scope.fadeOutRow(id);
-        });
-        toEventuallyAnimate.set(id, promise);
-        return true;
     };
     scope.initDOM = () => {
         if (scope.domReady) {

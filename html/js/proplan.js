@@ -689,6 +689,8 @@ pro.proplan = {
         var classType = 1;
         var intl = mega.intl.number;
 
+        $pricingBoxes.addClass('hidden');
+
         // If user is logged in, and the page type is P, get curent/next plan info
         if (pageType === 'P') {
             pro.proplan.updateCurrentPlanData($pricingBoxes);

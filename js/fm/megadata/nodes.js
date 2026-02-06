@@ -4455,7 +4455,8 @@ MegaData.prototype.getMediaProperties = function(node) {
     var mediaType = is_video(node);
     var isVideo = mediaType > 0;
     var isAudio = mediaType > 1;
-    var isPreviewable = isImage || isVideo;
+    var showThumbnail = /:[01]\*/.test(node.fa);
+    var isPreviewable = isImage || isVideo || showThumbnail;
 
     if (!isPreviewable && is_text(node)) {
         isText = isPreviewable = true;
@@ -4468,7 +4469,7 @@ MegaData.prototype.getMediaProperties = function(node) {
         isAudio: isAudio,
         icon: fileIcon(node),
         isPreviewable: isPreviewable,
-        showThumbnail: String(node.fa).indexOf(':1*') > 0
+        showThumbnail
     };
 };
 

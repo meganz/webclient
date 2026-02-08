@@ -9476,143 +9476,137 @@ body.de .mega-dialog.contact-picker-widget {
 /* End mega-desktopapp-download */
 
 /* Report Abuse dialog Begin */
-.mega-dialog.report-abuse {
-    max-height: 90vh;
-}
-.mega-dialog.report-abuse .subtitle {
-    font: var(--text-h3-bold);
-    color: var(--text-color-error);
-}
-.mega-dialog.report-abuse .content-block {
-    min-height: 300px;
+
+body.web-desktop .mega-sheet.report-abuse .sheet {
+    max-width: 640px;
 }
 
-@media screen and (max-height: 500px) {
-    .mega-dialog.report-abuse .content-block {
-        min-height: 50px;
-    }
+.mega-sheet.report-abuse b {
+    font-weight: 600;
 }
 
-.mega-dialog.report-abuse .content-block > section {
-    padding-top: 10px;
+.mega-sheet.report-abuse a.link,
+.mega-sheet.report-abuse a.link:visited {
+    color: var(--mobile-link-primary);
 }
-.mega-dialog.report-abuse .sub-container {
-    margin-top: 24px;
+
+.mega-sheet.report-abuse .main > .subtitle {
+    margin-bottom: 24px;
 }
-.mega-dialog.report-abuse .abusetypes-block p {
-    color: var(--text-color-medium);
-    margin-bottom: 20px;
+
+.mega-sheet.report-abuse .content {
+    max-height: 382px;
 }
-.mega-dialog.report-abuse .radio-buttons > * {
-    margin: 12px 0;
+
+.mega-sheet.report-abuse .content .body,
+.mega-sheet.report-abuse .sections {
+    display: grid;
+    gap: 24px;
+    grid-auto-flow: row;
+}
+
+.mega-sheet.report-abuse .sections {
+    gap: 16px;
+}
+
+.mega-sheet.report-abuse .section,
+.mega-sheet.report-abuse .section:hover {
+    background: none;
+    border: 1px solid var(--mobile-border-strong);
+    display: grid;
+    gap: 8px;
+    grid-auto-flow: row;
+    height: auto;
+    justify-content: start;
+    padding: 16px;
+    transition: var(--transition-border);
+}
+
+.mega-sheet.report-abuse .section:hover,
+.mega-sheet.report-abuse .section.active {
+    border-color: var(--mobile-border-brand);
+}
+
+.mega-sheet.report-abuse .section span {
+    color: var(--mobile-text-secondary);
+    font: var(--mobile-font-caption-small-regular);
+}
+
+.mega-sheet.report-abuse .section b {
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-caption-large-semibold);
+}
+
+.mega-sheet.report-abuse .links-wrapper {
+    grid-auto-flow: row;
+    overflow: hidden;
+    padding: 0 0 16px;
+}
+
+.mega-sheet.report-abuse .link-box {
+    margin: 16px 0 0;
+    overflow: hidden;
+}
+
+.mega-sheet.report-abuse .link-box .info {
+    align-items: center;
     display: flex;
-}
-.mega-dialog.report-abuse input.form-control,
-.mega-dialog.report-abuse textarea.form-control {
+    overflow: hidden;
+    white-space: nowrap;
     width: 100%;
-    height: 36px;
-    box-sizing: border-box;
-    font: var(--text-body1);
-    color: var(--text-color-high);
+}
+
+.mega-sheet.report-abuse .link-box .info i {
+    --icon-size: 32px;
+}
+
+.mega-sheet.report-abuse .link-box .name {
+    flex: 0 1 auto;
+    font: var(--mobile-font-caption-large-regular);
+    min-width: 0;
+    overflow: hidden;
     padding: 0 8px;
-    margin: 0;
-    border: 1px solid var(--stroke-grey-2);
-    background: var(--surface-grey-1);
-    border-radius: 4px;
-    transition: color 200ms ease-in-out;
+    text-overflow: ellipsis;
 }
-.mega-dialog.report-abuse textarea.form-control {
-    height: 100px;
-    padding: 8px;
-}
-.mega-dialog.report-abuse form .form-row {
-    margin-bottom: 12px;
-}
-.mega-dialog.report-abuse form > section {
-    margin-top: 20px;
-}
-.mega-dialog.report-abuse form > section.abusetypes-block {
-    margin-top: 10px;
-}
-.mega-dialog.report-abuse form p {
-    margin-bottom: 6px;
-    color: var(--text-color-higher);
-}
-.mega-dialog.report-abuse form .form-row.two-col {
+
+.mega-sheet.report-abuse .link-box .count {
+    align-items: center;
+    color: var(--mobile-text-secondary);
+    font: var(--mobile-font-caption-small-regular);
+    margin-inline-end: 8px;
     display: flex;
 }
-.mega-dialog.report-abuse form .form-row.two-col input.form-control:first-child {
-    margin-right: 20px;
+
+.mega-sheet.report-abuse .link-box .count::before {
+    background: var(--mobile-border-strong);
+    content: '';
+    display: block;
+    height: 12px;
+    margin-inline-end: 8px;
+    width: 1px;
 }
-.mega-dialog.report-abuse form .form-row.two-col .form-control.half {
-    width: calc(50% - 10px);
+
+.mega-sheet.report-abuse .link-wrap {
+    align-items: center;
+    background: var(--mobile-text-inverse);
+    border-radius: var(--mobile-border-radius-medium);
+    display: flex;
+    overflow: hidden;
+    padding: 6px;
 }
-.mega-dialog.report-abuse form .form-row.two-col :placeholder-shown {
-    opacity: 2;
-}
-.mega-dialog.report-abuse textarea::placeholder,
-.mega-dialog.report-abuse input::placeholder {
-    color: var(--surface-mid-grey);
-}
-.mega-dialog.report-abuse textarea:focus::placeholder,
-.mega-dialog.report-abuse input:focus::placeholder {
-    opacity: 0;
-}
-.mega-dialog.report-abuse .mega-input.form-control {
-    width: 100%;
-    height: 36px;
-    box-sizing: border-box;
-    font: var(--text-body1);
-    color: var(--text-color-high);
-    padding: 0;
-    margin: 0;
-    border: 1px solid var(--stroke-grey-2);
-    background: var(--surface-grey-1);
-    border-radius: 4px;
-    transition: color 200ms ease-in-out;
-}
-.mega-dialog.report-abuse .mega-input.form-control::before {
-    content: none;
-}
-.mega-dialog.report-abuse .mega-input.form-control .placeholder {
-    opacity: 0.4;
-}
-.mega-dialog.report-abuse .mega-input-dropdown .dropdown-scroll {
-    max-height: 250px;
-}
-.mega-dialog.report-abuse .form-control.error {
-    border: 1px solid var(--input-text-underline-error);
-}
-.mega-dialog.report-abuse a {
-    text-decoration: underline;
-    user-select: text;
-}
-.mega-dialog.report-abuse a:hover {
-    text-decoration: none;
-}
-.mega-dialog.report-abuse .message-container {
-    box-sizing: border-box;
-    color: var(--banner-text-error);
-    text-align: center;
-    background: var(--banner-background-error);
-    border: 1px solid var(--banner-border-error);
-    border-radius: 4px;
-    font: var(--text-body1);
-    padding: 2px;
-    margin-bottom: 10px;
-}
-.mega-dialog.report-abuse .radio-buttons .radio-txt {
-    color: var(--text-color-higher);
-}
-.mega-dialog.report-abuse .checkbox-block {
-    margin-top: 20px;
-}
-.mega-dialog.report-abuse .checkbox-block .checkbox-txt {
-    font: var(--text-body2);
-    color: var(--text-color-higher);
+
+.mega-sheet.report-abuse .link-text {
+    flex: 1 1 auto;
+    font: var(--mobile-font-caption-large-regular);
+    margin: 0 6px;
+    margin-inline-end: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 /* Report Abuse dialog End */
+
 
 /* S4 Dialogs Begin */
 

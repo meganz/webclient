@@ -91,9 +91,13 @@
     display: flex;
 }
 
-.download-page .dl-header .actions button {
+.download-page .dl-header button {
     margin-inline-start: 16px;
     order: 1;
+}
+
+.download-page .dl-header button + button.icon-only {
+    margin-inline-start: 4px;
 }
 
 .download-page .dl-header button.loading::after {
@@ -113,9 +117,13 @@
         padding: 12px 0 0;
     }
     
-    .download-page .dl-header .actions button {
+    .download-page .dl-header button {
         margin: 0;
         margin-inline-end: 16px;
+    }
+    
+    .download-page .dl-header button + button.icon-only {
+        margin-inline-end: 4px;
     }
     
     .download-page .dl-header.wrapped button.normal {

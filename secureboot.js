@@ -3151,12 +3151,12 @@ else if (!browserUpdate) {
         'register': ['register', 'register_js', 'zxcvbn_js'],
         'newsignup': ['register', 'register_js', 'zxcvbn_js'],
         'emailverify': ['zxcvbn_js'],
-        '!': ['download', 'download_js', 'downloadUI_js', 'linkAccess_js'],
-        'file': ['download', 'download_js', 'downloadUI_js', 'linkAccess_js'],
-        'F!': ['folderlink_css', 'linkAccess_js'],
+        '!': ['download', 'download_js', 'downloadUI_js', 'linkAccess_js', 'reportabuse_js'],
+        'file': ['download', 'download_js', 'downloadUI_js', 'linkAccess_js', 'reportabuse_js'],
+        'F!': ['folderlink_css', 'linkAccess_js', 'reportabuse_js'],
         'P!': ['linkAccess_js'],
-        'folder': ['folderlink_css', 'linkAccess_js'],
-        'collection': ['folderlink_css', 'linkAccess_js'],
+        'folder': ['folderlink_css', 'linkAccess_js', 'reportabuse_js'],
+        'collection': ['folderlink_css', 'linkAccess_js', 'reportabuse_js'],
         'discountpromo': ['discountpromo_js'],
         'discount': ['discountpromo_js'],
         's': ['discountpromo_js'], // Short URL for 'sale' e.g. /s/blackfriday
@@ -3172,6 +3172,7 @@ else if (!browserUpdate) {
         // Page specific
         subpages['!'] = ['download_js', 'linkAccess_js'];
         subpages.file = ['download_js', 'linkAccess_js'];
+        subpages.folder = ['linkAccess_js'];
         subpages.collection = ['linkAccess_js'];
     }
 

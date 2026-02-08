@@ -1639,6 +1639,17 @@
             },
         ]));
 
+        sections.addChild('report', new MegaContextSection(menu, [
+            {
+                buttonId: 'report-item',
+                text: l.report_label,
+                icon: 'sprite-fm-mono icon-message-alert',
+                onClick() {
+                    mega.ui.reportAbuse.show();
+                }
+            },
+        ]));
+
         const manipulations = {
             '.import-item': (items) => {
                 if (!u_type) {

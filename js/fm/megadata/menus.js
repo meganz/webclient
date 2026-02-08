@@ -343,7 +343,7 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
         delete items['.add-to-album'];
 
         items['.import-item'] = 1;
-        items['.getlink-item'] = 1;
+        items['.report-item'] = 1;
 
         if (selNode.vhl || !selNode.t && self.d && localStorage.compli) {
             items['.vhl-item'] = 1;
@@ -947,7 +947,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items, forcedSe
             finalItems.push('.properties-item');
 
             if (folderlink) {
-                finalItems.push('.import-item');
+                finalItems.push('.import-item', '.report-item');
                 if (M.v.length) {
                     if (window.useMegaSync && (useMegaSync === 2 || useMegaSync === 3)) {
                         finalItems.push('.download-item');
@@ -958,9 +958,6 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items, forcedSe
                     if (pfcol) {
                         finalItems.push('.play-slideshow');
                     }
-                }
-                if (!pfcol) {
-                    finalItems.push('.getlink-item');
                 }
             }
             else if (mega.rewind && mega.rewind.enabled) {
@@ -991,7 +988,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items, forcedSe
             const allowSlideshow = oneImageSelected
                 && mega.gallery.nodesAllowSlideshow(mega.gallery.albums.store[M.d[pfid].id].nodes);
 
-            finalItems.push('.properties-item', '.import-item');
+            finalItems.push('.properties-item', '.import-item', '.report-item');
             if (allowSlideshow) {
                 finalItems.push('.play-slideshow');
             }

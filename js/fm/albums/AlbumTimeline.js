@@ -212,7 +212,7 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
                             }
 
 
-                            selectedItems.push('.properties-item', '.import-item');
+                            selectedItems.push('.properties-item', '.import-item', '.report-item');
                         }
                         else {
                             // 0 - Disable, 1 - Hide, 2 - Unhide

@@ -286,7 +286,7 @@
 #propay .left-block .create-account-wrapper .password-strength i {
     margin: 0 8px 0 0;
 }
-#propay .left-block > *:not(.s4):not(footer) {
+#propay .left-block > *:not(.s4):not(footer):not(.back-header-wrapper) {
     display: flex;
     flex-direction: column;
 }
@@ -358,9 +358,32 @@
 #propay .left-block .error .mega-input::before {
     border: 1px solid var(--input-text-underline-error);
 }
+#propay .left-block .back-header-wrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 40px;
+}
+#propay .left-block .back-header-wrapper .back-button {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    --icon-size: 24px;
+    cursor: pointer;
+    height: 40px;
+    width: 40px;
+    border-radius: 4px;
+    margin-inline-end: 8px;
+}
+#propay .left-block .back-header-wrapper .back-button:hover {
+    background: var(--mobile-button-outline-background-hover)
+}
+.rtl #propay .left-block .back-header-wrapper .back-button i {
+    transform: rotate(180deg);
+}
 #propay .left-block h1.plan-name {
     display: inline-block;
-    margin-bottom: 40px;
 }
 #propay .left-block .plan-name span {
     color: var(--color-primary-red-500);

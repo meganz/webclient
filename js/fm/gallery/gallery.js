@@ -1418,11 +1418,11 @@ class MegaGallery {
             }
 
             if ($eTarget.hasClass('ui-selected')) {
-                selectionManager.remove_from_selection(h);
+                selectionManager.remove_from_selection(h, false);
                 this.updateGroupDeselect($eTarget);
             }
             else {
-                selectionManager.add_to_selection(h);
+                selectionManager.add_to_selection(h, true);
                 this.updateGroupSelect($eTarget);
             }
 
@@ -1761,12 +1761,12 @@ class MegaGallery {
 
                 if (newVal) {
                     for (let i = 0; i < nodes.length; i++) {
-                        selectionManager.add_to_selection(nodes[i]);
+                        selectionManager.add_to_selection(nodes[i], false);
                     }
                 }
                 else {
                     for (let i = 0; i < nodes.length; i++) {
-                        selectionManager.remove_from_selection(nodes[i]);
+                        selectionManager.remove_from_selection(nodes[i], false);
                     }
                 }
 

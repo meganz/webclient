@@ -220,12 +220,19 @@ function pageregister() {
     var email = $.trim($email.val());
     var password = $password.val();
     var confirmPassword = $confirmPassword.val();
+    var errReasons = [];
 
     // Check if the entered passwords are valid or strong enough
     var passwordValidationResult = security.isValidPassword(password, confirmPassword);
 
     // If bad result
     if (passwordValidationResult !== true) {
+        if (!password) {
+            errReasons.push('mp');
+        }
+        else if (password !== confirmPassword) {
+            errReasons.push('pm');
+        }
 
         // Show error for password field, clear the value and refocus it
         $password.val('').focus().trigger('input');
@@ -239,16 +246,35 @@ function pageregister() {
     }
 
     if (email === '' || !isValidEmail(email)) {
+        if (email === '') {
+            errReasons.push('me');
+        }
+        else {
+            errReasons.push('ie');
+        }
+
         $email.megaInputsShowError(l[1100] + ' ' + l[1101]);
         $email.focus();
         err = 1;
     }
 
     if (firstName === '' || lastName === '') {
+        if (firstName === '') {
+            errReasons.push('mf');
+        }
+        if (lastName === '') {
+            errReasons.push('ml');
+        }
+
         $firstName.megaInputsShowError(l[1098] + ' ' + l[1099]);
         $lastName.megaInputsShowError();
         $firstName.focus();
         err = 1;
+    }
+
+    // Fire eventlog once if submit can't proceed
+    if (err) {
+        eventlog(501133, errReasons.join(','), true);
     }
 
     if (!err) {
@@ -342,6 +368,11 @@ function init_register() {
 
     $lastName.rebind('input.resetWithFirstname', function() {
         $firstName.megaInputsHideError();
+    });
+
+    $inputs.rebind('keyup.registerforminteraction', () => {
+        eventlog(501133, errReasons.join(','), true);
+        $inputs.off('keyup.registerforminteraction');
     });
 
     $inputs.rebind('keydown.initregister', function(e) {

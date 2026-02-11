@@ -175,11 +175,6 @@ Unless otherwise noted, they were released under a [MIT License].
 > **This is a fork**, [Compare the changes](https://github.com/MattiasBuelens/web-streams-polyfill/compare/master...meganz:master)
 
 ---
-[webp.js]: library to encode and decode images in WebP format.
-
-> **This is a fork**, [Compare the changes](https://github.com/webmproject/libwebp/compare/master...meganz:master)
-
----
 [zxcvbn.js]: Low-Budget Password Strength Estimation.
 
 > NB: We are using a custom, unobfuscated build which was created using:
@@ -242,5 +237,4 @@ Unless otherwise noted, they were released under a [MIT License].
 [tiff.js]: <https://github.com/seikichi/tiff.js>
 [videostream.js]: <https://github.com/meganz/videostream>
 [web-streams-polyfill.js]: <https://github.com/meganz/web-streams-polyfill>
-[webp.js]: <https://github.com/meganz/libwebp>
 [zxcvbn.js]: <https://github.com/dropbox/zxcvbn/tree/1.0.1>

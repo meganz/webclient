@@ -298,6 +298,9 @@
         if (localStorage.testWebGL) {
             return WebGLMEGAContext.test(...files);
         }
+        else if (sessionStorage.testWebGL) {
+            return WebGLMEGAContext.test2([...files]);
+        }
 
         if (localStorage.testDCRaw) {
             (function _rawNext(files) {

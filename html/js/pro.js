@@ -1932,6 +1932,12 @@ lazy(pro, 'filter', () => {
                 new Set([
                     pro.ACCOUNT_LEVEL_BUSINESS
                 ]),
+
+            // Plans that show durations that are >= equal to the initially selected duration
+            showPlanDurGreaterThanEqual:
+                new Set([
+                    pro.ACCOUNT_LEVEL_FEATURE_PWM, pro.ACCOUNT_LEVEL_FEATURE_VPN, pro.ACCOUNT_LEVEL_PRO_FLEXI,
+                ]),
         },
 
         superSet: {

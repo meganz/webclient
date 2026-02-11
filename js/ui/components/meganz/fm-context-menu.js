@@ -894,7 +894,7 @@
                             const album = mega.gallery.albums.store[handle];
                             if (album && album.ph) {
                                 const {ph, k} = album;
-                                const key = a32_to_base64(decrypt_key(u_k_aes, base64_to_a32(k)));
+                                const key = a32_to_base64(decrypt_key(u_k_aes, k));
                                 links.push(`${getBaseUrl()}/collection/${ph}#${key}`);
                             }
                         }

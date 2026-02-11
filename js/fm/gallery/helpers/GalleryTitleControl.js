@@ -71,6 +71,7 @@ lazy(mega.gallery, 'GalleryTitleControl', () => {
 
                 this.attachEvent('click', () => {
                     this.toggleMenu();
+                    eventlog(501092);
                 });
             }
             else {
@@ -200,6 +201,7 @@ lazy(mega.gallery, 'GalleryTitleControl', () => {
                     label: this.allItemsTitle,
                     click: () => {
                         this.openLocationFolder(this._filterSection);
+                        eventlog(501089);
                     },
                     selectable: true,
                     selected: M.currentdirid === this._filterSection
@@ -208,6 +210,7 @@ lazy(mega.gallery, 'GalleryTitleControl', () => {
                     label: l.gallery_from_cloud_drive,
                     click: () => {
                         this.openLocationFolder(this.cdFolder);
+                        eventlog(501090);
                     },
                     selectable: true,
                     selected: M.currentdirid === this.cdFolder
@@ -216,6 +219,7 @@ lazy(mega.gallery, 'GalleryTitleControl', () => {
                     label: l.gallery_camera_uploads,
                     click: () => {
                         this.openLocationFolder(this.cuFolder);
+                        eventlog(501091);
                     },
                     selectable: true,
                     selected: M.currentdirid === this.cuFolder

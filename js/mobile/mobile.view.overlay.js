@@ -389,7 +389,7 @@ class MegaMobileViewOverlay extends MegaComponent {
                 contentBlock.classList.add('v-hidden');
                 loadingDialog.show();
 
-                if (this.bottomBar && !dlid) {
+                if (this.bottomBar && !dlid && !pfid) {
                     this.bottomBar.actions[0].disabled = true;
                 }
 
@@ -500,7 +500,7 @@ class MegaMobileViewOverlay extends MegaComponent {
                 goToMobileApp(MegaMobileViewOverlay.getAppLink(this.nodeComponent.handle));
             }],
 
-            'downloadButton': ['download-button', pfcol ? l[58] : 'icon-download-thin', () => {
+            'downloadButton': ['download-button', pfid ? l[58] : 'icon-download-thin', () => {
                 if (!validateUserAction() || !this.nodeComponent) {
                     return false;
                 }
@@ -530,7 +530,7 @@ class MegaMobileViewOverlay extends MegaComponent {
             'saveTextButton': ['save-text-button', l[776], MegaMobileContextMenu.menuItems['.save-text'].onClick]
         };
 
-        const shareBtn = M.currentrootid !== 'shares' && [buttons.sharelinkButton];
+        const shareBtn = !pfid && M.currentrootid !== 'shares' && [buttons.sharelinkButton];
 
         if (pfcol) {
             const arr = [[buttons.downloadButton]];
@@ -554,6 +554,9 @@ class MegaMobileViewOverlay extends MegaComponent {
             return shareBtn && [shareBtn];
         }
         if (isPreviewable && isPreviewable !== 'text') {
+            if (!shareBtn) {
+                return [[buttons.downloadButton], [buttons.slideshowButton]];
+            }
             return [shareBtn, [buttons.downloadButton, buttons.slideshowButton]];
         }
         if (isPreviewable === 'text' && this.nodeComponent.rights) {
@@ -580,7 +583,7 @@ class MegaMobileViewOverlay extends MegaComponent {
 
             return [[buttons.saveTextButton], [buttons.downloadButton]];
         }
-        return [shareBtn, [buttons.downloadButton]];
+        return shareBtn ? [shareBtn, [buttons.downloadButton]] : [[buttons.downloadButton]];
     }
 
     /**

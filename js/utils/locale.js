@@ -2043,6 +2043,19 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[S1]', '<span class="bold">').replace('[/S1]', '</span>')
         .replace('[S2]', '<span class="tax">').replace('[/S2]', '</span>');
 
+    l.report_main_info = escapeHTML(l.report_main_info)
+        .replace('[A]', `<a href="${mega_io_links.terms}" class="link clickurl" target="_blank">`)
+        .replace('[/A]', '</a>');
+    l.report_copyright_info = escapeHTML(l.report_copyright_info)
+        .replace('[BR]', '<br><br>')
+        .replace('%1', '<a href = "mailto:%2" class="link clickurl">%2</a>')
+        .replace(/%2/g, 'copyright@mega.io');
+    l.report_illegal_info = escapeHTML(l.report_illegal_info)
+        .replace('[A]', `<a href="${mega_io_links.terms}" class="link clickurl" target="_blank">`)
+        .replace('[/A]', '</a>')
+        .replace('%1', '<a href = "mailto:%2" class="link clickurl">%2</a>')
+        .replace(/%2/g, 'abuse@mega.io');
+
     const common = [
         15536, 16119, 16120, 16313, 16316, 16360, 18228, 18268, 18282,
         18284, 18285, 18286, 18287, 18289, 18290, 18291, 18294, 18295, 18296, 18297, 18298, 18302, 18303, 18304,

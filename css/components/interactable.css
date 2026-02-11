@@ -107,6 +107,9 @@ Implemented styles:
 .nav-elem.icon-only:hover {
     background: transparent;
 }
+.nav-elem.icon-only.visible-active.active {
+    background: var(--mobile-button-secondary-hover);
+}
 
 /* Full width of container */
 .nav-elem.full-width {
@@ -427,6 +430,10 @@ button.nav-elem.no-active:active,
 
 .nav-elem .right-icon.primary-color {
     --mask-color: var(--mobile-icon-primary);
+}
+
+.nav-elem .right-icon.inverse-color {
+    --mask-color: var(--mobile-text-inverse);
 }
 
 .rtl .nav-elem .right-icon.icon-chevron-right-thin-outline {

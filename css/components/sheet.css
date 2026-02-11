@@ -33,6 +33,13 @@
     display: none;
 }
 
+.mega-sheet .content.ps {
+    margin-left: -40px;
+    margin-right: -40px;
+    padding-left: 40px;
+    padding-right: 40px;
+}
+
 body.mobile .mega-sheet .sheet .header,
 body.mobile .mega-sheet .sheet .main,
 body.mobile .mega-sheet .sheet .actions {
@@ -152,6 +159,10 @@ body.web-desktop .mega-sheet .sheet.ps {
     min-width: unset;
     max-height: 95%;
     margin: auto;
+}
+
+body.web-desktop .mega-sheet .sheet .subtitle {
+    margin-top: 0;
 }
 
 body.web-desktop .mega-sheet.info .sheet {

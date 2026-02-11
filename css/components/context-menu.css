@@ -15,6 +15,10 @@
     padding: 8px 0;
 }
 
+.mega-component.context-menu .main.ps {
+    padding-bottom: 0;
+}
+
 .mega-component.context-menu .content {
     max-height: 450px;
     overflow-y: auto;
@@ -45,6 +49,24 @@
 
 .mega-component.context-menu .context-menu-items .nav-elem {
     padding: 16px 8px;
+}
+
+.mega-component.context-menu.overlay-wrap .nav-elem.context-button {
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    height: 36px;
+    margin: 0 8px;
+    max-width: calc(100% - 16px);
+    padding: 0 8px;
+}
+
+.mega-component.context-menu.overlay-wrap .nav-elem.context-button:hover {
+    background: var(--mobile-button-outline-background-hover);
+}
+
+.mega-component.context-menu.overlay-wrap .nav-elem.context-button .primary-text {
+    font: var(--mobile-font-caption-large-regular);
 }
 
 .rtl .mega-component.context-menu {

@@ -112,6 +112,10 @@ mobile.register = {
 
         $allFields.rebind('keyup.registerbuttoncheck', registerButtonCheck);
         $tncBlock.rebind('tap.registerbuttoncheck', registerButtonCheck);
+        $allFields.rebind('keyup.registerforminteraction', () => {
+            eventlog(501132, true);
+            $allFields.off('keyup.registerforminteraction');
+        });
     },
 
     /**
@@ -166,6 +170,8 @@ mobile.register = {
         // Add click/tap handler to login button
         $registerButton.rebind('tap', () => {
 
+            eventlog(99809, true);
+
             // Get the current text field values
             const firstName = $.trim($firstNameField.val());
             const lastName = $.trim($lastNameField.val());
@@ -177,6 +183,22 @@ mobile.register = {
             if (firstName.length < 1 || lastName.length < 1 || email.length < 1 ||
                 password.length < 1 || confirmPassword.length < 1 || $tncCheckbox[0].checked === false) {
 
+                var errReasons = [];
+                if (!firstName.length) {
+                    errReasons.push('mf');
+                }
+                if (!lastName.length) {
+                    errReasons.push('ml');
+                }
+                if (!email.length) {
+                    errReasons.push('me');
+                }
+                if (!password.length) {
+                    errReasons.push('mp');
+                }
+                if (errReasons.length) {
+                    eventlog(501133, errReasons.join(','), true);
+                }
                 return false;
             }
 
@@ -187,6 +209,7 @@ mobile.register = {
                 }
                 $emailField.parent().addClass('incorrect');
                 $registerButton.removeClass('active');
+                eventlog(501133, 'ie', true);
                 return false;
             }
 
@@ -216,6 +239,10 @@ mobile.register = {
 
                 // Show error dialog and return early
                 mobile.messageOverlay.show(passwordValidationResult);
+
+                if (password && password !== confirmPassword) {
+                    eventlog(501133, 'pm', true);
+                }
                 return false;
             }
 

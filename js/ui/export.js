@@ -2078,6 +2078,7 @@ function logExportEvt(evtId, data) {
                 contents: [createContents()],
                 showClose: true,
                 header: l.link_settings,
+                headerClassName: 'tittle-header',
                 footer: {
                     slot: [footer]
                 },

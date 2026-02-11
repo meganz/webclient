@@ -37,7 +37,7 @@ class MegaOverlay extends MegaComponent {
 
         targetNode = overlay;
 
-        subNode = document.createElement('div');
+        this.mainNode = subNode = document.createElement('div');
         subNode.className = 'main';
         targetNode.appendChild(subNode);
 
@@ -96,6 +96,16 @@ class MegaOverlay extends MegaComponent {
     }
 
     show(options) {
+        if (!is_mobile) {
+            if (this.overlayNode.Ps) {
+                this.overlayNode.Ps.destroy();
+            }
+            this.overlayNode.Ps = new PerfectScrollbar(
+                options && (options.scrollOverlay && this.overlayNode || options.scrollNode)
+                    || this.mainNode
+            );
+        }
+
         if (options) {
             this.clear();
             this.showClose = options.showClose;
@@ -324,7 +334,7 @@ class MegaOverlay extends MegaComponent {
         this.clearSubTitle();
         if (subtitle) {
             const subNode = document.createElement('span');
-            subNode.textContent = subtitle;
+            subNode.append(parseHTML(subtitle));
             this.subTitleNode.appendChild(subNode);
         }
     }
@@ -386,9 +396,7 @@ class MegaOverlay extends MegaComponent {
 
         this.contentNode.appendChild(content);
 
-        if (this.overlayNode.Ps) {
-            this.overlayNode.Ps.update();
-        }
+        this.updateScrollbar();
     }
 
     addContents(contents, clear) {
@@ -402,9 +410,7 @@ class MegaOverlay extends MegaComponent {
 
     clearContent() {
         this.contentNode.textContent = '';
-        if (this.overlayNode.Ps) {
-            this.overlayNode.Ps.update();
-        }
+        this.updateScrollbar();
     }
 
     addActions(actions, clear) {
@@ -478,6 +484,12 @@ class MegaOverlay extends MegaComponent {
     }
 
     // Other util methods
+
+    updateScrollbar() {
+        if (this.overlayNode.Ps) {
+            this.overlayNode.Ps.update();
+        }
+    }
 
     scrollTo(element) {
         if (element) {

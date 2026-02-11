@@ -570,9 +570,10 @@ var megasync = (function() {
     };
 
     ns.isInstalled = function (next) {
-        if ((!fmconfig.dlThroughMEGAsync && page !== "download" && page !== 'fm/account/transfers' && !folderlink)
-            || (!is_livesite && !usemsync)) {
-            next(true, false, true); // next with error=true and isworking=false, off=true
+        if ((!fmconfig.dlThroughMEGAsync && page !== "download"
+             && page !== 'fm/account/transfers' && !folderlink)) {
+            // next with error=true and isworking=false, off=true
+            next(true, false, true);
         }
         else if (!lastCheckStatus || !lastCheckTime) {
             if (lastCheckTime) {
@@ -692,13 +693,8 @@ var megasync = (function() {
         if (window.useMegaSync) {
             return Promise.resolve();
         }
-        if (!preCheckPromise) {
-            loadingDialog.show('msync-precheck');
-        }
         preCheckPromise = preCheckPromise || new Promise((resolve) => {
             ns.periodicCheck(resolve);
-        }).always(() => {
-            loadingDialog.hide('msync-precheck');
         });
         return preCheckPromise;
     };

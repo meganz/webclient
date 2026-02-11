@@ -136,6 +136,14 @@ function reselect(n) {
         elm.classList.remove('ui-selected');
     }
 
+    // Minor tweak to detect reported file in collection
+    if (!is_mobile && n && pfcol && 'gallery' in mega) {
+        const node = M.d[$.selected && $.selected[0]];
+        if (node) {
+            mega.gallery.albums.grid.timeline.selectNode(node);
+        }
+    }
+
     if (window.selectionManager) {
         return selectionManager.reinitialize();
     }

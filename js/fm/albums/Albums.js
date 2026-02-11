@@ -2514,6 +2514,7 @@ lazy(mega.gallery, 'albums', () => {
 
                         M.contextMenuUI(ev, 8, selectedItems.join(','));
                         ev.stopPropagation();
+                        eventlog(501108);
                     }
                 }
             );
@@ -2887,6 +2888,7 @@ lazy(mega.gallery, 'albums', () => {
                             return false;
                         }
                         M.contextMenuUI(ev, 8, buttons.join(','), [albumId]);
+                        eventlog(501115);
                     }
                 );
             }

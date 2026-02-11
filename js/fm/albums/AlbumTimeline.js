@@ -212,7 +212,7 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
                             }
 
 
-                            selectedItems.push('.properties-item', '.import-item');
+                            selectedItems.push('.properties-item', '.import-item', '.report-item');
                         }
                         else {
                             // 0 - Disable, 1 - Hide, 2 - Unhide
@@ -1520,6 +1520,7 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
                     icon: 'icon-minimise',
                     clickFn: () => {
                         this.zoomStep--;
+                        eventlog(501121);
                     },
                     checkIfDisabled: () => this.zoomStep <= 0
                 },
@@ -1529,6 +1530,7 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
                     icon: 'icon-add',
                     clickFn: () => {
                         this.zoomStep++;
+                        eventlog(501120);
                     },
                     checkIfDisabled: () => this.zoomStep >= AlbumTimeline.zoomSteps.length - 1
                 }

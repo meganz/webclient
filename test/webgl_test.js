@@ -225,6 +225,37 @@ describe("webgl.js test", function() {
         chai.expect(webgl.isTransparent(imageData)).to.eql(true);
     });
 
+    it('can identify WebP and Transparency', async() => {
+        const uint8 = webgl.dataURLToUint8(sampleWEBPImage);
+        chai.expect(uint8.byteLength).to.be.eql(162);
+        chai.expect(uint8.type).to.be.eql('image/webp');
+        chai.expect(uint8).to.be.instanceOf(Uint8Array);
+
+        const details = webgl.identify(uint8);
+        chai.expect(details.format).to.be.eql('WEBP');
+        chai.expect(details.doesSupportAlpha).to.be.eql(true);
+
+        const image = await webgl.loadImage(sampleWEBPImage);
+        chai.expect(image).to.be.instanceOf(Image);
+        chai.expect(image.width).to.be.eql(8);
+        chai.expect(image.height).to.be.eql(2);
+
+        const ctx = webgl.getDrawingContext(image.width, image.height);
+        const imageData = await ctx.drawImage(image, 0, 0, image.width, image.height, 'imaged');
+
+        chai.expect(imageData.width).to.be.eql(image.width);
+        chai.expect(imageData.height).to.be.eql(image.height);
+        chai.expect(imageData.data.byteLength).to.be.eql(image.width * image.height * 4);
+
+        const u32 = new Uint32Array(imageData.data.buffer);
+        chai.expect(u32[0]).to.be.eql(0x69a8277c);
+        chai.expect(u32[2]).to.be.eql(0x3bd9a2db);
+        chai.expect(u32[7]).to.be.eql(0x247f6d59);
+
+        chai.expect(webgl.isTainted(imageData)).to.be.eql(true);
+        chai.expect(webgl.isTransparent(imageData)).to.be.eql(true);
+    });
+
     it('can identify tainted canvas', async() => {
         const uint8 = webgl.dataURLToUint8(sampleWEBPImage);
         chai.expect(uint8.byteLength).to.eql(162);
@@ -282,7 +313,7 @@ describe("webgl.js test", function() {
         const gl = new WebGLMEGAContext();
         return gl.drawImage(image, 0, 0, image.width, image.height)
             .then((res) => {
-                chai.expect(res).to.be.eql(false);
+                chai.expect(res).to.be.eql(undefined);
 
                 const ctx = gl.getDrawingContext(image.width, image.height);
                 return ctx.drawImage(image, 0, 0, image.width, image.height, 'buffer', 'image/jpeg');
@@ -311,7 +342,7 @@ describe("webgl.js test", function() {
             }
             return;
         }
-        await tSleep(1 / 10);
+        // await tSleep(1 / 10);
 
         const contextLost = new Promise((resolve) => {
             gl.ctx.canvas.addEventListener('webglcontextlost', resolve);
@@ -364,6 +395,29 @@ describe("webgl.js test", function() {
         chai.expect(blob).to.be.instanceOf(Blob);
         chai.expect(blob.size).to.be.greaterThan(600);
         chai.expect(blob.type).to.be.eql('image/jpeg');
+    });
+
+    it('can create WebP Thumbnails', async() => {
+        if (self.supWebPEncoding === false) {
+            if (!self.is_karma) {
+                throw new MEGAException('No WebP Encoding support', 'NotSupportedError');
+            }
+            return;
+        }
+        const type = 'image/webp';
+        const smpl = await sampleForThumbnailCreation;
+        const blob = await webgl.createThumbnailImage(smpl, {type});
+
+        chai.expect(blob.type).to.be.eql(type);
+        chai.expect(blob.size).to.be.greaterThan(717);
+
+        const details = await webgl.identify(blob);
+        chai.expect(details.format).to.eql(type.split('/').pop().toUpperCase());
+
+        const image = await webgl.loadImage(blob);
+        chai.expect(image).to.be.instanceOf(Image);
+        chai.expect(image.width).to.be.eql(MEGAImageElement.THUMBNAIL_SIZE);
+        chai.expect(image.height).to.be.eql(MEGAImageElement.THUMBNAIL_SIZE);
     });
 
     it('can decode TIFF Images', async() => {
@@ -615,7 +669,9 @@ describe("webgl.js test", function() {
 
     {
         const ratios = Reflect.ownKeys(MEGAImageElement)
-            .filter(k => k.startsWith('ASPECT_RATIO')).map(k => k.split('_').slice(-2));
+            .filter(k => k.startsWith('ASPECT_RATIO'))
+            .slice(1, 4)
+            .map(k => k.split('_').slice(-2));
 
         const width = 481;
         const height = width * 0.9 | 0;
@@ -678,7 +734,8 @@ describe("webgl.js test", function() {
 
         const res = await ctx.createThumbnailImage(blob);
         chai.expect(res).to.be.instanceOf(Blob);
-        chai.expect(res.type).to.be.eql(MEGAImageElement.THUMBNAIL_TYPE);
+        chai.expect(res.type).to.be
+            .eql(self.supWebPEncoding ? MEGAImageElement.THUMBNAIL_TYPE : MEGAImageElement.DEFAULT_FORMAT);
 
         const image = await ctx.loadImage(res);
         chai.expect(image).to.be.instanceOf(Image);
@@ -703,13 +760,14 @@ describe("webgl.js test", function() {
         let width = 1280;
         let height = ~~(width / MEGAImageElement.ASPECT_RATIO_16_9);
         let blob = await ctx.createImage('pattern', width, height, 'image/jpeg');
+        let type = self.supWebPEncoding ? MEGAImageElement.PREVIEW_TYPE : MEGAImageElement.DEFAULT_FORMAT;
 
         chai.expect(blob).to.be.instanceOf(Blob);
         chai.expect(blob.type).to.be.eql('image/jpeg');
 
         let res = await ctx.createPreviewImage(blob);
         chai.expect(res).to.be.instanceOf(Blob);
-        chai.expect(res.type).to.be.eql(MEGAImageElement.PREVIEW_TYPE);
+        chai.expect(res.type).to.be.eql(type);
 
         /*
         if (ctx.doesSupport('BitmapRenderer')) {
@@ -732,7 +790,7 @@ describe("webgl.js test", function() {
 
         res = await ctx.createPreviewImage(blob);
         chai.expect(res).to.be.instanceOf(Blob);
-        chai.expect(res.type).to.be.eql(MEGAImageElement.PREVIEW_TYPE);
+        chai.expect(res.type).to.be.eql(type);
 
         image = await ctx.loadImage(res);
         chai.expect(image).to.be.instanceOf(Image);

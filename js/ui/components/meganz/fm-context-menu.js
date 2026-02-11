@@ -699,6 +699,13 @@
                 onClick() {
                     playPreviewItem(false, false);
                     M.fmEventLog(500676);
+                    if (
+                        mega.ui.contextMenu.contextSource &&
+                        mega.ui.contextMenu.contextSource.classList.contains('js-statusbarbtn') &&
+                        M.isGalleryPage()
+                    ) {
+                        eventlog(501109);
+                    }
                 }
             },
             {
@@ -727,6 +734,15 @@
 
                                 if (M.isAlbumsPage()) {
                                     eventlog(99954);
+                                    if (
+                                        mega.ui.contextMenu.contextSource &&
+                                        mega.ui.secondaryNav &&
+                                        mega.ui.secondaryNav.cardComponent &&
+                                        mega.ui.secondaryNav.cardComponent
+                                            .domNode.contains(mega.ui.contextMenu.contextSource)
+                                    ) {
+                                        eventlog(501116);
+                                    }
                                 }
                                 else {
                                     M.fmEventLog(500677);
@@ -814,7 +830,12 @@
                 text: l.folder_link_show_in_location,
                 icon: 'sprite-fm-mono icon-file-search-01-thin-outline',
                 onClick() {
+                    const shouldLog = M.isGalleryPage() && mega.ui.contextMenu.contextSource &&
+                        mega.ui.contextMenu.contextSource.classList.contains('js-statusbarbtn');
                     openItem(mega.ui.contextMenu.firstNode);
+                    if (shouldLog) {
+                        eventlog(501110);
+                    }
                 }
             },
             {
@@ -912,6 +933,13 @@
 
                                 eventlog(500028);
                                 M.fmEventLog(500679);
+                                if (
+                                    mega.ui.contextMenu.contextSource &&
+                                    mega.ui.contextMenu.contextSource.classList.contains('js-statusbarbtn') &&
+                                    M.isGalleryPage()
+                                ) {
+                                    eventlog(501111);
+                                }
                             }
                         },
                         {
@@ -1016,6 +1044,13 @@
                             onClick() {
                                 openSendToChatDialog();
                                 M.fmEventLog(500678);
+                                if (
+                                    mega.ui.contextMenu.contextSource &&
+                                    mega.ui.contextMenu.contextSource.classList.contains('js-statusbarbtn') &&
+                                    M.isGalleryPage()
+                                ) {
+                                    eventlog(501112);
+                                }
                             }
                         },
                         {
@@ -1089,6 +1124,16 @@
                         true,
                         false
                     );
+                    if (
+                        mega.ui.contextMenu.contextSource &&
+                        mega.ui.secondaryNav &&
+                        mega.ui.secondaryNav.cardComponent &&
+                        mega.ui.secondaryNav.cardComponent
+                            .domNode.contains(mega.ui.contextMenu.contextSource) &&
+                        M.isAlbumsPage()
+                    ) {
+                        eventlog(501117);
+                    }
                 }
             },
         ]));
@@ -1112,7 +1157,18 @@
                         return;
                     }
                     if (mega.ui.contextMenu.firstAlbum) {
-                        return mega.gallery.albums.openDialog('AlbumNameDialog', mega.ui.contextMenu.firstAlbum.id);
+                        mega.gallery.albums.openDialog('AlbumNameDialog', mega.ui.contextMenu.firstAlbum.id);
+                        if (
+                            mega.ui.contextMenu.contextSource &&
+                            mega.ui.secondaryNav &&
+                            mega.ui.secondaryNav.cardComponent &&
+                            mega.ui.secondaryNav.cardComponent
+                                .domNode.contains(mega.ui.contextMenu.contextSource) &&
+                            M.isAlbumsPage()
+                        ) {
+                            eventlog(501118);
+                        }
+                        return;
                     }
                     // @todo support passing handle to renameDialog
                     if ($.selected[0] !== mega.ui.contextMenu.selectedItems[0]) {
@@ -1250,6 +1306,13 @@
                 icon: 'sprite-fm-mono icon-heart-thin-outline',
                 onClick() {
                     doFavourite(true);
+                    if (
+                        mega.ui.contextMenu.contextSource &&
+                        mega.ui.contextMenu.contextSource.classList.contains('js-statusbarbtn') &&
+                        M.isGalleryPage()
+                    ) {
+                        eventlog(501113);
+                    }
                 }
             },
             {
@@ -1315,6 +1378,13 @@
                             onClick() {
                                 doSensitive(true);
                                 eventlog(500923, JSON.stringify({ c: $.selected.length }));
+                                if (
+                                    mega.ui.contextMenu.contextSource &&
+                                    mega.ui.contextMenu.contextSource.classList.contains('js-statusbarbtn') &&
+                                    M.isGalleryPage()
+                                ) {
+                                    eventlog(501114);
+                                }
                             }
                         },
                         {
@@ -1423,6 +1493,16 @@
                         return;
                     }
                     mega.gallery.albums.openDialog('RemoveAlbumDialog', mega.ui.contextMenu.selectedItems);
+                    if (
+                        mega.ui.contextMenu.contextSource &&
+                        mega.ui.secondaryNav &&
+                        mega.ui.secondaryNav.cardComponent &&
+                        mega.ui.secondaryNav.cardComponent
+                            .domNode.contains(mega.ui.contextMenu.contextSource) &&
+                        M.isAlbumsPage()
+                    ) {
+                        eventlog(501119);
+                    }
                 }
             },
             {
@@ -1555,6 +1635,17 @@
                     }
 
                     mega.fileRequest.dialogs.manageDialog.init({ h: mega.ui.contextMenu.selectedItems[0] });
+                }
+            },
+        ]));
+
+        sections.addChild('report', new MegaContextSection(menu, [
+            {
+                buttonId: 'report-item',
+                text: l.report_label,
+                icon: 'sprite-fm-mono icon-message-alert',
+                onClick() {
+                    mega.ui.reportAbuse.show();
                 }
             },
         ]));

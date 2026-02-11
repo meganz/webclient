@@ -635,9 +635,10 @@ lazy(mega.devices, 'data', () => {
          * @param {Object} data - device names
          * @returns {Promise<void>} void
          */
-        setDeviceNames: (data) => {
+        async setDeviceNames(data) {
             mega.devices.utils.logger.debug('mega.devices.data.setDeviceNames', data);
-            mega.attr.set('dn', mega.attr.encodeObjectValues(data), false, true);
+            const current = await mega.attr.get(u_handle, 'dn', false, true);
+            return mega.attr.set2(null, 'dn', mega.attr.encodeObjectValues({...current, ...data}), false, true);
         },
     });
 });

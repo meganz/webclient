@@ -2898,7 +2898,6 @@ else if (!browserUpdate) {
         'support': {f:'html/support.html', n: 'support', j:0},
         'pdfjs': {f:'js/vendor/pdf.js', n: 'pdfjs', j:1},
         'tiffjs': {f:'js/vendor/tiff.js', n: 'tiffjs', j:1},
-        'webpjs': {f:'js/vendor/webp.js', n: 'webpjs', j:1},
         'videostream': {f:'js/vendor/videostream.js', n: 'videostream', j:1},
         'mediainfo': {f:'js/vendor/mediainfo.js', n: 'mediainfo', j:1},
         'zxcvbn_js': {f:'js/vendor/zxcvbn.js', n: 'zxcvbn_js', j:1},
@@ -3152,12 +3151,12 @@ else if (!browserUpdate) {
         'register': ['register', 'register_js', 'zxcvbn_js'],
         'newsignup': ['register', 'register_js', 'zxcvbn_js'],
         'emailverify': ['zxcvbn_js'],
-        '!': ['download', 'download_js', 'downloadUI_js', 'linkAccess_js'],
-        'file': ['download', 'download_js', 'downloadUI_js', 'linkAccess_js'],
-        'F!': ['folderlink_css', 'linkAccess_js'],
+        '!': ['download', 'download_js', 'downloadUI_js', 'linkAccess_js', 'reportabuse_js'],
+        'file': ['download', 'download_js', 'downloadUI_js', 'linkAccess_js', 'reportabuse_js'],
+        'F!': ['folderlink_css', 'linkAccess_js', 'reportabuse_js'],
         'P!': ['linkAccess_js'],
-        'folder': ['folderlink_css', 'linkAccess_js'],
-        'collection': ['folderlink_css', 'linkAccess_js'],
+        'folder': ['folderlink_css', 'linkAccess_js', 'reportabuse_js'],
+        'collection': ['folderlink_css', 'linkAccess_js', 'reportabuse_js'],
         'discountpromo': ['discountpromo_js'],
         'discount': ['discountpromo_js'],
         's': ['discountpromo_js'], // Short URL for 'sale' e.g. /s/blackfriday
@@ -3173,6 +3172,7 @@ else if (!browserUpdate) {
         // Page specific
         subpages['!'] = ['download_js', 'linkAccess_js'];
         subpages.file = ['download_js', 'linkAccess_js'];
+        subpages.folder = ['linkAccess_js'];
         subpages.collection = ['linkAccess_js'];
     }
 

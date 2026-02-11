@@ -648,27 +648,33 @@ mBroadcaster.once('boot_done', () => {
                         console.log('Deferred dyn-page.', M.currentdirid);
                     }
                 }
-                else if (M.onDeviceCenter
-                    && mega.devices.ui.getRenderSection() !== 'cloud-drive') {
-
-                    // TODO: [iha] Add new empty states for (1. devices, 2. folders)
-                    // TODO: [iha] Check if we have the correct option selected
-                    const currSect = mega.devices.ui.getRenderSection();
-                    const filterData = mega.devices.ui.filterChipUtils.selectedFilters.data;
-
-                    switch (currSect) {
-                        case 'device-centre-devices':
-                            if (filterData && filterData.name === 'deviceactivity' && filterData.index === 0) {
-                                $('.fm-no-active-devices', '.fm-right-files-block').removeClass('hidden');
-                            }
-                            break;
-                        case 'device-centre-folders':
-                            if (filterData && filterData.name === 'folderactivity' && filterData.index === 0) {
-                                $('.fm-no-active-folders', '.fm-right-files-block').removeClass('hidden');
-                            }
-                            break;
-
+                else if (M.onDeviceCenter) {
+                    if (mega.devices.ui.getRenderSection() === 'cloud-drive') {
+                        $('.fm-empty-folder', '.fmholder').removeClass('hidden');
                     }
+                    else {
+                        // TODO: [iha] Add new empty states for (1. devices, 2. folders)
+                        // TODO: [iha] Check if we have the correct option selected
+                        const currSect = mega.devices.ui.getRenderSection();
+                        const filterData = mega.devices.ui.filterChipUtils.selectedFilters.data;
+
+                        switch (currSect) {
+                            case 'device-centre-devices':
+                                if (filterData && filterData.name === 'deviceactivity' && filterData.index === 0) {
+                                    $('.fm-no-active-devices', '.fm-right-files-block').removeClass('hidden');
+                                }
+                                break;
+                            case 'device-centre-folders':
+                                if (filterData && filterData.name === 'folderactivity' && filterData.index === 0) {
+                                    $('.fm-no-active-folders', '.fm-right-files-block').removeClass('hidden');
+                                }
+                                break;
+
+                        }
+                    }
+                }
+                else if (M.dyh) {
+                    M.dyh('empty-ui');
                 }
                 else if (this.logger) {
                     this.logger.info('Empty folder not handled...', M.currentdirid, M.currentrootid);

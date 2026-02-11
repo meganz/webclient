@@ -1938,6 +1938,11 @@ var addressDialog = {
             else {
                 $taxcodeMegaInput.$input.attr('placeholder',taxName + ' ' + l[7347]);
             }
+
+            if (pro.propay.onPropayPage() && $propayTaxTitle.length) {
+                $propayTaxTitle.text(taxName);
+            }
+
             $('span', $invoiceNote).text(l.taxcode_note.replace('%s', taxName));
 
             // Remove any previous validation error

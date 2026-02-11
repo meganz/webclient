@@ -28,6 +28,9 @@ class MegaMenu extends MegaOverlay {
 
         this.event = options.event;
         this.pos = options.pos || 'left';
+
+        // 12px space between the target element and the context menu dialog
+        this.posOffset = options.posOffset || {left: 0, top: 12};
         this.calcPosition();
 
         // This is opened by click event.
@@ -96,8 +99,8 @@ class MegaMenu extends MegaOverlay {
 
                 const {bottom, left} = this.event.currentTarget.domNode.getBoundingClientRect();
 
-                posLeft = left;
-                posTop = bottom + 12;
+                posLeft = left + this.posOffset.left;
+                posTop = bottom + this.posOffset.top;
             }
             else {
                 posLeft = this.event.originalEvent.clientX;
@@ -117,8 +120,8 @@ class MegaMenu extends MegaOverlay {
             const {top, bottom, right} = this.event.currentTarget.domNode.getBoundingClientRect();
 
             // calculate the position of the context menu dialog from the left & top of the target element
-            posLeft = right - menuWidth;
-            posTop = bottom + 12; // 12px space between the target element and the context menu dialog
+            posLeft = right - menuWidth + this.posOffset.left;
+            posTop = bottom + this.posOffset.top;
 
             // check if top is at the second half of the popup.
             // if so, show the context menu dialog above the target element

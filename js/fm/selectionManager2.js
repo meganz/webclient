@@ -1243,7 +1243,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
                 __showBtn('download');
             }
 
-            if ((showGetLink || folderlink) && !mkfound) {
+            if (showGetLink && !mkfound) {
                 __showBtn('link');
             }
 

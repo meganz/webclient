@@ -31,25 +31,90 @@ lazy(mega.ui, 'dlPage', () => {
 
             node = ce('div', header, {class: 'actions'});
 
-            // Report Abuse button. Hidden until new dialog is implemented
-            /*
+            const submenu = ce('div');
+            subNode = ce('div', submenu, {class: 'context-section'});
+
+            MegaButton.factory({
+                parentNode: subNode,
+                type: 'fullwidth',
+                componentClassname: 'context-button text-icon',
+                icon: 'sprite-fm-mono icon-link-thin-outline',
+                text: l[1394],
+                onClick: () => {
+                    // @todo get rid of this '$.itemExport' ...
+                    $.itemExport = [dlpage_ph];
+
+                    mega.Share.ExportLink.pullShareLink($.itemExport, {showExportLinkDialog: true})
+                        .catch(tell)
+                        .finally(() => {
+                            $(this).removeClass('disabled');
+                        });
+                },
+                eventLog: 501057
+            });
+
+            MegaButton.factory({
+                parentNode: subNode,
+                type: 'fullwidth',
+                componentClassname: 'context-button text-icon',
+                icon: 'sprite-fm-mono icon-message-alert',
+                text: l.report_label,
+                onClick: () => mega.ui.reportAbuse.show(),
+                eventLog: 501059
+            });
+
+            // More actions
             subNode = new MegaButton({
                 parentNode: node,
                 type: 'icon',
-                componentClassname: 'text-icon secondary',
-                icon: 'sprite-fm-mono icon-message-alert',
+                componentClassname: 'text-icon secondary visible-active',
+                icon: 'sprite-fm-mono icon-more-vertical-thin-outline',
                 iconSize: 24,
-                simpletip: l.btn_reportabuse,
+                simpletip: l.more_actions,
                 simpletipPos: 'bottom',
-                onClick: () => {
-                    M.require('reportabuse_js').done(() => {
-                        window.disableVideoKeyboardHandler = true;
-                        mega.ui.ReportAbuse = new ReportAbuse(); // @todo: revamp dialog
+                onClick: (ev) => {
+                    const target = ev.currentTarget.domNode;
+                    const {menu} = mega.ui;
+
+                    const close = (ev) => {
+                        if (ev.type !== 'click' || !target.contains(ev.target)) {
+                            menu.hide();
+                            mega.ui.menu.trigger('close');
+                        }
+                    };
+
+                    const handleKeyDown = (ev) => {
+                        if (ev.key === 'Escape') {
+                            close(ev);
+                        }
+                    };
+
+                    menu.show({
+                        name: 'file-link-items',
+                        event: ev,
+                        eventTarget: target,
+                        contents: [submenu],
+                        pos: 'bottomRight',
+                        posOffset: {
+                            left: -11,
+                            top: 8
+                        },
+                        resizeHandler: true,
+                        onClose: () => {
+                            document.removeEventListener('click', close);
+                            document.removeEventListener('keydown', handleKeyDown);
+                            window.removeEventListener('popstate', close);
+                            target.classList.remove('active');
+                        },
+                        onShow: () => {
+                            document.addEventListener('click', close);
+                            document.addEventListener('keydown', handleKeyDown);
+                            window.addEventListener('popstate', close);
+                            target.classList.add('active');
+                        }
                     });
                 },
-                eventLog: 501059
             });
-            */
 
             // Download/Save/Resume button
             this.dlButton = new MegaButton({
@@ -65,28 +130,6 @@ lazy(mega.ui, 'dlPage', () => {
                     mega.ui.dlPage.startDownload();
                 },
                 eventLog: 501056
-            });
-
-            // Share link button
-            subNode = new MegaButton({
-                parentNode: node,
-                type: 'icon',
-                componentClassname: 'text-icon secondary',
-                icon: 'sprite-fm-mono icon-link-thin-outline',
-                iconSize: 24,
-                simpletip: l[1394],
-                simpletipPos: 'bottom',
-                onClick: () => {
-                    // @todo get rid of this '$.itemExport' ...
-                    $.itemExport = [dlpage_ph];
-
-                    mega.Share.ExportLink.pullShareLink($.itemExport, {showExportLinkDialog: true})
-                        .catch(tell)
-                        .finally(() => {
-                            $(this).removeClass('disabled');
-                        });
-                },
-                eventLog: 501057
             });
 
             // Save to MEGA button
@@ -653,13 +696,14 @@ lazy(mega.ui, 'dlPage', () => {
             const {cancelDlBtn, pauseBtn, statusCn} = progressWg;
 
             if (perc) {
+                perc = Math.round(perc);
                 this.progressValue = perc;
             }
             statusCn.textContent = this.dlStatus;
             statusCn.classList.remove('complete', 'error');
 
             if (this.isInitialized) {
-                if (perc === 100) {
+                if (perc >= 100) {
                     this.showCompleteUI();
                 }
                 // Do not update UI is DL is in progress

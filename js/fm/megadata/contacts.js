@@ -412,6 +412,9 @@ MegaData.prototype.addOPC = function(u, ignoreDB) {
         fmdb.add('opc', {p: d.p, d});
     }
     this.opc[u.p] = u;
+
+    // easy handling for getUser* family functions.
+    u.h = u.p;
 };
 
 /**
@@ -449,6 +452,9 @@ MegaData.prototype.addIPC = function(u, ignoreDB) {
         fmdb.add('ipc', {p: d.p, d});
     }
     this.ipc[u.p] = u;
+
+    // easy handling for getUser* family functions.
+    u.h = u.p;
 };
 
 /**

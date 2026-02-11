@@ -4073,11 +4073,12 @@ MegaData.prototype.getUserByHandle = function(handle) {
             user = user._data;
         }
     }
-    else if (this.opc[handle]) {
-        user = this.opc[handle];
-    }
-    else if (this.ipc[handle]) {
-        user = this.ipc[handle];
+    else {
+        user = this.ipc[handle] || this.opc[handle];
+
+        if (user && self.d) {
+            console.warn(`feeding pending-contact under handle ${user.h}`);
+        }
     }
 
     if (!user && handle === u_handle) {
@@ -4110,6 +4111,20 @@ MegaData.prototype.getUserByEmail = function(email) {
         return true;
     });
 
+    if (!user) {
+        const pending = Object.values({...this.ipc, ...this.opc});
+
+        for (let i = pending.length; i--;) {
+            if (String(pending[i].m).toLowerCase() === emailLowercase) {
+                user = pending[i];
+                if (self.d) {
+                    console.warn(`feeding pending-contact under handle ${user.h}`, emailLowercase);
+                }
+                break;
+            }
+        }
+    }
+
     return user;
 };
 
@@ -4129,6 +4144,9 @@ MegaData.prototype.getUser = function(str) {
         if (Object(str).hasOwnProperty('u')) {
             // Yup, likely.. let's see
             user = this.getUserByHandle(str.u);
+        }
+        else if (Object(str).hasOwnProperty('h')) {
+            user = this.getUserByHandle(str.h);
         }
         else if (Object(str).hasOwnProperty('m')) {
             user = this.getUserByEmail(str.m);
@@ -4455,7 +4473,8 @@ MegaData.prototype.getMediaProperties = function(node) {
     var mediaType = is_video(node);
     var isVideo = mediaType > 0;
     var isAudio = mediaType > 1;
-    var isPreviewable = isImage || isVideo;
+    var showThumbnail = /:[01]\*/.test(node.fa);
+    var isPreviewable = isImage || isVideo || showThumbnail;
 
     if (!isPreviewable && is_text(node)) {
         isText = isPreviewable = true;
@@ -4468,7 +4487,7 @@ MegaData.prototype.getMediaProperties = function(node) {
         isAudio: isAudio,
         icon: fileIcon(node),
         isPreviewable: isPreviewable,
-        showThumbnail: String(node.fa).indexOf(':1*') > 0
+        showThumbnail
     };
 };
 

@@ -392,7 +392,7 @@ lazy(mega.ui, 'secondaryNav', () => {
             }
 
             megasync.isInstalled((err, is) => {
-                if (fmconfig.dlThroughMEGAsync && (!err || is)) {
+                if ((!u_attr || fmconfig.dlThroughMEGAsync) && (!err || is)) {
                     $('.megasync-overlay').removeClass('downloading');
                     M.addDownload([mega.ui.secondaryNav.dlId]);
                 }

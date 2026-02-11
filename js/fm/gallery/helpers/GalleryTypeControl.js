@@ -93,6 +93,7 @@ lazy(mega.gallery, 'GalleryTypeControl', () => {
                         label: l.filter_chip_type_all,
                         click: () => {
                             M.openFolder(getLocation('photos'), true);
+                            eventlog(501096);
                         },
                         selected: true,
                         selectable: true
@@ -101,6 +102,7 @@ lazy(mega.gallery, 'GalleryTypeControl', () => {
                         label: l.gallery_images,
                         click: () => {
                             M.openFolder(getLocation('images'), true);
+                            eventlog(501094);
                         },
                         selectable: true
                     },
@@ -108,6 +110,7 @@ lazy(mega.gallery, 'GalleryTypeControl', () => {
                         label: l.gallery_videos,
                         click: () => {
                             M.openFolder(getLocation('videos'), true);
+                            eventlog(501095);
                         },
                         selectable: true
                     }
@@ -130,6 +133,7 @@ lazy(mega.gallery, 'GalleryTypeControl', () => {
                 window.removeEventListener('resize', this.onResize);
                 delete this.onResize;
             }
+            eventlog(501093);
         }
 
         getSelectedIndex() {

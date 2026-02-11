@@ -1562,8 +1562,21 @@ class MegaGallery {
             selectionManager.clear_selection();
             this.clearSelections();
 
-            this.setMode(e.currentTarget.attributes['data-folder'].value, 1, true);
+            const { value } = e.currentTarget.attributes['data-folder'];
+            this.setMode(value, 1, true);
             this.render(false);
+            if (value === 'y') {
+                eventlog(501097);
+            }
+            else if (value === 'm') {
+                eventlog(501098);
+            }
+            else if (value === 'd') {
+                eventlog(501099);
+            }
+            else if (value === 'a') {
+                eventlog(501100);
+            }
         });
 
         $('.gallery-view-zoom-control > button', this.galleryBlock).rebind('click.galleryZoom', e => {
@@ -1582,9 +1595,11 @@ class MegaGallery {
             }
             else if (e.currentTarget.classList.contains('zoom-in')) {
                 this.setZoom(this.zoom - 1);
+                eventlog(501101);
             }
             else if (e.currentTarget.classList.contains('zoom-out')) {
                 this.setZoom(this.zoom + 1);
+                eventlog(501102);
             }
 
             this.dynamicList.itemRenderChanged(false, true);

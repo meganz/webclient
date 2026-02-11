@@ -4025,6 +4025,9 @@ FileManager.prototype.initStatusBarLinks = function() {
             else {
                 M.addDownload($.selected);
             }
+            if (M.isGalleryPage()) {
+                eventlog(501103);
+            }
         }
         else if (this.classList.contains('share')) {
             mega.ui.mShareDialog.init($.selected[0]);
@@ -4070,6 +4073,10 @@ FileManager.prototype.initStatusBarLinks = function() {
 
             closeDialog();
             fmremove();
+
+            if (M.isGalleryPage()) {
+                eventlog(501104);
+            }
         }
         else if (this.classList.contains('options')) {
             if (this.classList.contains('c-opened')) {
@@ -4080,6 +4087,9 @@ FileManager.prototype.initStatusBarLinks = function() {
 
             M.contextMenuUI(e, 1);
             this.classList.add('c-opened');
+            if (M.isGalleryPage()) {
+                eventlog(501105);
+            }
         }
         else if (this.classList.contains('preview')) {
             if (M.isAlbumsPage()) {
@@ -4102,6 +4112,9 @@ FileManager.prototype.initStatusBarLinks = function() {
         }
         else if (this.classList.contains('add-to-album')) {
             mega.gallery.albums.addToAlbum($.selected);
+            if (M.isGalleryPage()) {
+                eventlog(501106);
+            }
         }
         else if (this.classList.contains('rename')) {
             if (M.isInvalidUserStatus()) {
@@ -4121,6 +4134,9 @@ FileManager.prototype.initStatusBarLinks = function() {
         }
         else if (this.classList.contains('info')) {
             mega.ui.mInfoPanel.show($.selected);
+            if (M.isGalleryPage()) {
+                eventlog(501107);
+            }
         }
         else if (this.classList.contains('restore')) {
             if (M.isInvalidUserStatus()) {

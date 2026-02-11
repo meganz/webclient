@@ -315,6 +315,7 @@ var slideshowid;
                     else {
                         $('i', $button).removeClass('icon-favourite').addClass('icon-favourite-removed');
                     }
+                    eventlog(501127);
                 }
                 else {
                     $('span', $button).text(l[5871]);
@@ -346,7 +347,11 @@ var slideshowid;
                 mega.sensitives.applyMenuItemStyle($senBtn, toHide);
 
                 $senBtn.rebind('click.mediaviewer.sensitive_toggle', () => {
-                    mega.sensitives.toggleStatus([n.h], !$senBtn.hasClass('sensitive-added'));
+                    const doHide = !$senBtn.hasClass('sensitive-added');
+                    mega.sensitives.toggleStatus([n.h], doHide);
+                    if (doHide) {
+                        eventlog(501128);
+                    }
                 });
             }
             else {
@@ -435,7 +440,11 @@ var slideshowid;
                 return false;
             };
 
-            $removeButton.rebind('click.mediaviewer', removeFunc);
+            $removeButton.rebind('click.mediaviewer', () => {
+                const res = removeFunc();
+                eventlog(501130);
+                return res;
+            });
             $removeButtonV.rebind('click.mediaviewer', removeFunc);
         }
 
@@ -470,6 +479,7 @@ var slideshowid;
 
             $addToAlbumButton.rebind('click.mediaviewer', () => {
                 mega.gallery.albums.addToAlbum([n.h]);
+                eventlog(501129);
             });
         }
         else {
@@ -527,7 +537,7 @@ var slideshowid;
                             mega.Share.initCopyrightsDialog([slideshow_handle()]);
                         }
                     }
-
+                    eventlog(501125);
                     return false;
                 });
             }
@@ -644,6 +654,9 @@ var slideshowid;
                     // force the call to img position
                     slideshow_imgPosition();
                 }
+            }
+            else {
+                eventlog(501131);
             }
 
             // hack to start the slideshow in full screen mode
@@ -956,6 +969,7 @@ var slideshowid;
         }
         $.noOpenChatFromPreview = true;
         openSendToChatDialog();
+        eventlog(501124);
 
         mBroadcaster.sendMessage('trk:event', 'preview', 'send-chat');
     }
@@ -1289,6 +1303,7 @@ var slideshowid;
                 $document.fullScreen(false);
                 // Use original ID to render info from chats
                 mega.ui.mInfoPanel.show([slideshowid]);
+                eventlog(501126);
                 return false;
             });
 
@@ -1355,6 +1370,7 @@ var slideshowid;
                         contextMenu.open(menu);
                         $overlay.addClass('context-menu-open');
                     }
+                    eventlog(501122);
                     return false;
                 });
 
@@ -1546,6 +1562,7 @@ var slideshowid;
             else {
                 M.addDownload([n]);
             }
+            eventlog(501123);
 
             return false;
         });

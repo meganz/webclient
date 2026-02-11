@@ -617,6 +617,22 @@ pro.propay = {
         const price = (this.planObj.taxInfo || Object.create(null)).taxedPriceEuro || this.planObj.priceEuro;
         const currency = 'EUR';
         const itemNum = this.planObj.itemNum;
+        const discountInfo = pro.propay.getDiscount();
+
+        let discountedPriceUsed = price;
+        if (discountInfo) {
+            const {edtp, ldtp} = discountInfo;
+
+            discountedPriceUsed = (!this.isVoucherBalance() && ldtp) || edtp;
+        }
+
+        if (this.currentGateway.minimumEURAmountSupported
+            && (discountedPriceUsed < this.currentGateway.minimumEURAmountSupported)) {
+
+            console.error(`Attempting to pay ${discountedPriceUsed} EUR, but the minimum amount supported` +
+                `by ${this.currentGateway.displayName} is ${this.currentGateway.minimumEURAmountSupported} EUR`);
+            eventlog(501028, JSON.stringify({discount: this.discountInfo, discountedPriceUsed}));
+        }
 
         // Convert from boolean to integer for API
         const fromBandwidthDialog = ((Date.now() - parseInt(localStorage.seenOverQuotaDialog)) < 2 * 3600000) ? 1 : 0;
@@ -648,7 +664,6 @@ pro.propay = {
 
         // Add the discount information to the User Transaction Sale request
 
-        const discountInfo = pro.propay.getDiscount();
         if (discountInfo && discountInfo.dc) {
             utsRequest.dc = discountInfo.dc;
         }
@@ -1374,12 +1389,11 @@ pro.propay = {
         }
     },
 
-    checkGateway(gate) {
+    checkGateway(gate, maxCorrPriceEuro) {
         'use strict';
 
         const {
             level,
-            maxCorrPriceEuro,
             trial,
             months,
             durationOptions
@@ -3241,8 +3255,31 @@ pro.propay = {
 
         this.browser = String((ua.details || false).browser || '');
 
+        let maxCorrPriceEuro;
+
+        if (this.discountInfo) {
+            maxCorrPriceEuro = this.discountInfo.edtp;
+        }
+        else if (this.planObj.isIn('showPlanDurGreaterThanEqual')) {
+            maxCorrPriceEuro = this.planObj.durationOptions.reduce((acc, p) => {
+                const plan = pro.getPlanObj(p);
+                if (plan.instantDiscount) {
+                    return acc;
+                }
+                if (plan.months >= this.initialDuration) {
+                    return Math.max(acc, plan.priceEuro);
+                }
+                return acc;
+            }, 0);
+
+            maxCorrPriceEuro = maxCorrPriceEuro || Math.Infinity;
+        }
+        else {
+            maxCorrPriceEuro = this.planObj.maxCorrPriceEuro;
+        }
+
         let tempGatewayOptions = gatewayOptions.filter((gate) => {
-            const validGate = this.checkGateway(gate);
+            const validGate = this.checkGateway(gate, maxCorrPriceEuro);
             if (validGate) {
                 this.trialSupported |= validGate.supportsTrial;
                 const info = pro.getPaymentGatewayName(validGate.gatewayId, validGate);
@@ -3262,10 +3299,6 @@ pro.propay = {
             const discountPriceEuro = discountInfo.edtp;
 
             tempGatewayOptions = tempGatewayOptions.filter(gate => {
-                if ((gate.gatewayId === this.BITCOIN_GATE_ID)
-                    && (!d || !localStorage.allowBitcoinForDiscounts)) {
-                    return false;
-                }
                 if (gate.minimumEURAmountSupported > discountPriceEuro) {
                     return false;
                 }

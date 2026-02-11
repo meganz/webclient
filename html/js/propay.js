@@ -602,7 +602,8 @@ pro.propay = {
             return;
         }
 
-        if (((this.currentGateway.gatewayId === this.BITCOIN_GATE_ID)) && this.isNewAccount) {
+        const requiresAccount = this.signup.checkPaymentType();
+        if (((this.currentGateway.gatewayId === this.BITCOIN_GATE_ID)) && this.isNewAccount && requiresAccount === 1) {
             sessionStorage.setItem('acc_creation_bitcoin', '1');
             window.location.reload();
             return;
@@ -2403,8 +2404,7 @@ pro.propay = {
             && !isAstropay
             && !usingBalanceOnVoucher
             && !shouldBlockFlow
-            && !isBitcoin
-            && !(this.currentGateway.gatewayId === this.BITCOIN_GATE_ID && this.isNewAccount);
+            && !isBitcoin;
 
         const showPaymentButton = this.paymentButton && !blockFlowReasons;
 
@@ -3002,8 +3002,10 @@ pro.propay = {
             if (this.isNewAccount) {
                 const requiresAccount = this.signup.checkPaymentType();
 
-                if (pro.propay.signup.accountCreationFinished
-                    && (this.currentGateway.gatewayId === this.BITCOIN_GATE_ID)) {
+                if (requiresAccount === 1
+                    && pro.propay.signup.accountCreationFinished
+                    && this.currentGateway.gatewayId === this.BITCOIN_GATE_ID) {
+
                     sessionStorage.setItem('acc_creation_bitcoin', '1');
                     window.location.reload();
                     return;

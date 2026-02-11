@@ -12,9 +12,7 @@ pro.propay.signup = {
     current2FA: false,
 
     // Payments with no redirect
-    requireAccountOnShow: new Set([
-        'bitcoin'
-    ]),
+    requireAccountOnShow: new Set([]),
 
     /**
      * Check the payment type

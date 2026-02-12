@@ -2,9 +2,9 @@ import React from 'react';
 import { DropdownItem } from '../../../ui/dropdowns.jsx';
 import { Avatar, ContactPresence } from '../contacts.jsx';
 import { Emoji } from '../../../ui/utils.jsx';
-import ContactsPanel from './contactsPanel.jsx';
-import { inProgressAlert } from '../meetings/call.jsx';
+import { inProgressAlert } from '../meetings/utils.jsx';
 import { EVENTS, VIEWS } from '../conversations.jsx';
+import { getUserFingerprint, hasRelationship, isVerified, resetCredentials, verifyCredentials } from './utils.jsx';
 
 export default class ContextMenu extends React.Component {
     EVENT_CLOSE = new Event('closeDropdowns');
@@ -39,7 +39,7 @@ export default class ContextMenu extends React.Component {
 
     render() {
         const { contact, selected, withProfile } = this.props;
-        if (ContactsPanel.hasRelationship(contact)) {
+        if (hasRelationship(contact)) {
             return (
                 <>
                     {withProfile &&
@@ -168,17 +168,17 @@ export default class ContextMenu extends React.Component {
                         label={l[6872] /* `Authenticity Credentials` */}
                     />
                     <div className="dropdown body white-context-menu submenu">
-                        {ContactsPanel.isVerified(contact) ?
+                        {isVerified(contact) ?
                             <DropdownItem
                                 label={l[742] /* `Reset` */}
-                                onClick={() => this.close(() => ContactsPanel.resetCredentials(contact))} /> :
+                                onClick={() => this.close(() => resetCredentials(contact))} /> :
                             <DropdownItem
                                 label={l[1960] /* `Verify` */}
-                                onClick={() => this.close(() => ContactsPanel.verifyCredentials(contact))} />
+                                onClick={() => this.close(() => verifyCredentials(contact))} />
                         }
                     </div>
                     <div className="dropdown-credentials">
-                        {ContactsPanel.getUserFingerprint(contact.u)}
+                        {getUserFingerprint(contact.u)}
                     </div>
                     <hr />
                     <DropdownItem

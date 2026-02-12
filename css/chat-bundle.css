@@ -1600,6 +1600,33 @@ body.theme-dark .lhp-container .lhp-filter-tag {
   margin-top: 24px;
 }
 
+.meetings-error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  border: 1px solid tomato;
+}
+.meetings-error--content {
+  text-align: center;
+  color: var(--text-color-medium);
+}
+.meetings-error--content i {
+  display: block;
+  margin: 32px auto;
+  width: 195px;
+  height: 65px;
+}
+.meetings-error--content a {
+  text-decoration: underline;
+  color: var(--text-color-high);
+}
+.meetings-error--details {
+  margin: 58px 0;
+  font: var(--text-code1);
+}
+
 .meetings-call {
   position: fixed;
   top: 0;
@@ -1609,9 +1636,6 @@ body.theme-dark .lhp-container .lhp-filter-tag {
   background: #222;
   z-index: 120;
   transition: width 200ms ease-in-out;
-  /**
-  * Sidebar controls
-   */
 }
 .meetings-call.minimized {
   display: none;
@@ -1812,7 +1836,6 @@ body.theme-dark .lhp-container .lhp-filter-tag {
   grid-template-columns: 1fr 1fr;
   grid-gap: 8px;
   width: 100%;
-  /* TODO: look into `.video-node` re: replicate and unify */
 }
 @media only screen and (max-height: 760px) {
   .meetings-call .stream .stream-participants-block .participants-container .participants-grid {
@@ -1853,6 +1876,9 @@ body.theme-dark .lhp-container .lhp-filter-tag {
 }
 .meetings-call .stream .stream-participants-block .participants-container .participants-grid .local-stream-node .node-menu-content button span {
   padding: 0 0 0 10px;
+}
+.meetings-call .stream .stream-participants-block .participants-container .participants-grid {
+  /* TODO: look into `.video-node` re: replicate and unify */
 }
 .meetings-call .stream .stream-participants-block .participants-container .participants-grid .video-node {
   width: 100%;
@@ -2346,6 +2372,11 @@ body.theme-dark .lhp-container .lhp-filter-tag {
   padding: 0;
   margin-inline-start: 4px;
 }
+.meetings-call {
+  /**
+  * Sidebar controls
+   */
+}
 .meetings-call .sidebar-controls {
   display: flex;
   justify-content: flex-end;
@@ -2771,10 +2802,12 @@ body.theme-dark .lhp-container .lhp-filter-tag {
 .meetings-call .sidebar-wrapper .sidebar .participants-empty {
   margin: 20px;
   text-align: center;
-  /* TODO: move to sprite sheet */
 }
 .meetings-call .sidebar-wrapper .sidebar .participants-empty h3 {
   margin: 8px 0 0 0;
+}
+.meetings-call .sidebar-wrapper .sidebar .participants-empty {
+  /* TODO: move to sprite sheet */
 }
 .meetings-call .sidebar-wrapper .sidebar .participants-empty span.empty-check-icon {
   display: block;
@@ -3895,9 +3928,6 @@ body.theme-dark .start-meeting-preview .preview-meeting {
   height: 100%;
   background: var(--surface-grey-1);
   z-index: 141;
-  /* --- */
-  /* TODO: unify w/ `Join` */
-  /* --- */
 }
 .waiting-room--await, .waiting-room--redirect {
   justify-content: center;
@@ -3908,6 +3938,10 @@ body.theme-dark .start-meeting-preview .preview-meeting {
 }
 .waiting-room--chatlink-landing .waiting-room-head {
   margin: 80px 0 0;
+}
+.waiting-room {
+  /* --- */
+  /* TODO: unify w/ `Join` */
 }
 .waiting-room-head {
   /* [...] */
@@ -3931,6 +3965,9 @@ body.theme-dark .start-meeting-preview .preview-meeting {
     margin-top: 14px;
     margin-bottom: 18px;
   }
+}
+.waiting-room {
+  /* --- */
 }
 .waiting-room .card {
   /* [...] */
@@ -4576,8 +4613,6 @@ body.theme-dark .meetings-recurring-navigation .mega-button.recurring-nav-button
 }
 .meetings-recurring-content {
   /* [...] */
-  /* --- */
-  /* --- */
 }
 .meetings-recurring-content .mega-button.recurring-toggle-button {
   width: 36px;
@@ -4591,6 +4626,9 @@ body.theme-dark .meetings-recurring-navigation .mega-button.recurring-nav-button
 }
 body.theme-dark .meetings-recurring-content .mega-button.recurring-toggle-button.active {
   color: black;
+}
+.meetings-recurring-content {
+  /* --- */
 }
 .meetings-recurring-content .recurring-field-row {
   display: flex;
@@ -4644,6 +4682,9 @@ body.theme-dark .meetings-recurring-content .mega-button.recurring-toggle-button
 }
 .meetings-recurring-content .recurring-field-row .recurring-radio-buttons .meetings-datepicker .datepicker-input {
   margin-top: -8px;
+}
+.meetings-recurring-content {
+  /* --- */
 }
 .meetings-recurring-content .meetings-recurring-daily {
   /* [...] */

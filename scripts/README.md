@@ -7,12 +7,14 @@ Code Builder and Dev Server
 To run the webclient, some tools are needed to generate derived
 artifacts. For this, two scripts are given.
 
-- `build.sh` -- Static build of the `js/chat/bundle.js`, used for
-  example for deployment
+- `build.sh` -- Static build of the `js/chat/bundle.js` and associated
+  lazy-loaded chunks (`js/chat/bundle.*.js`). Performs optimizations
+  and prepares the bundles for production deployment.
 
 - `dev_server.sh` -- Dynamic web server usable during development as a
   simple web server. It will generate the artifacts required in memory
-  (no disk writes), and will reload certain resources on change.
+  (no disk writes). Note, Hot Module Replacement (HMR) is disabled; page
+  reload is needed to see the updated resources.
 
 
 Development

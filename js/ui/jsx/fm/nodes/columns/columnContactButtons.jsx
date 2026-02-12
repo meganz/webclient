@@ -3,7 +3,7 @@ import { Button } from '../../../../buttons.jsx';
 import { Dropdown } from "../../../../dropdowns.jsx";
 import ContextMenu from '../../../../../chat/ui/contactsPanel/contextMenu.jsx';
 import { GenericNodePropsComponent } from '../genericNodePropsComponent.jsx';
-import { inProgressAlert } from '../../../../../chat/ui/meetings/call.jsx';
+import { inProgressAlert } from '../../../../../chat/ui/meetings/utils.jsx';
 import { EVENTS, VIEWS } from '../../../../../chat/ui/conversations.jsx';
 
 export class ColumnContactButtons extends GenericNodePropsComponent {

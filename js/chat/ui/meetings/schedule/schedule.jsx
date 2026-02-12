@@ -5,16 +5,25 @@ import Button from '../button.jsx';
 import { PerfectScrollbar } from '../../../../ui/perfectScrollbar.jsx';
 import Invite from './invite.jsx';
 import { getTimeIntervals, getNearestHalfHour, getUserTimezone, addMonths } from './helpers.jsx';
-import Recurring from './recurring.jsx';
 import { DateTime } from './datetime.jsx';
 import { MCO_FLAGS } from '../../../chatRoom.jsx';
 import { ParsedHTML } from '../../../../ui/utils';
 import { EVENTS, VIEWS } from '../../conversations.jsx';
+import Recurring from './recurring.jsx';
+import {
+    Checkbox,
+    CloseDialog,
+    Column,
+    dialogName,
+    Input,
+    NAMESPACE,
+    Row,
+    Switch,
+    Textarea,
+    UpgradeNotice
+} from './utils.jsx';
 
-export class Schedule extends MegaRenderMixin {
-    static NAMESPACE = 'schedule-dialog';
-    static dialogName = `meetings-${Schedule.NAMESPACE}`;
-
+export default class Schedule extends MegaRenderMixin {
     domRef = React.createRef();
     scheduledMeetingRef = null;
     localStreamRef = '.float-video';
@@ -348,11 +357,11 @@ export class Schedule extends MegaRenderMixin {
     componentWillUnmount() {
         super.componentWillUnmount();
 
-        if ($.dialog === Schedule.dialogName) {
+        if ($.dialog === dialogName) {
             closeDialog();
         }
 
-        [document, this.localStreamRef].map(el => $(el).unbind(`.${Schedule.NAMESPACE}`));
+        [document, this.localStreamRef].map(el => $(el).unbind(`.${NAMESPACE}`));
         megaChat.off(this.incomingCallListener);
     }
 
@@ -386,14 +395,14 @@ export class Schedule extends MegaRenderMixin {
             closeDialog();
         }
 
-        M.safeShowDialog(Schedule.dialogName, () => {
+        M.safeShowDialog(dialogName, () => {
             if (!this.isMounted()) {
-                throw new Error(`${Schedule.dialogName} dialog: component ${Schedule.NAMESPACE} not mounted.`);
+                throw new Error(`${dialogName} dialog: component ${NAMESPACE} not mounted.`);
             }
 
             // Invoke submit on hitting enter, excl. while typing in the `description` text area or
             // if the confirmation dialog is currently shown
-            $(document).rebind(`keyup.${Schedule.NAMESPACE}`, ({ keyCode, target }) => {
+            $(document).rebind(`keyup.${NAMESPACE}`, ({ keyCode, target }) => {
                 return this.state.closeDialog || target instanceof HTMLTextAreaElement ?
                     null :
                     keyCode === 13 /* Enter */ && this.handleSubmit();
@@ -402,7 +411,7 @@ export class Schedule extends MegaRenderMixin {
             // Clicked on the `Local` component (the call's mini view) while the `Schedule meeting`
             // dialog is opened -> ask for close confirmation if any changes have been done or close the dialog
             // immediately
-            $(this.localStreamRef).rebind(`click.${Schedule.NAMESPACE}`, () => {
+            $(this.localStreamRef).rebind(`click.${NAMESPACE}`, () => {
                 if (this.state.isDirty) {
                     this.handleToggle('closeDialog');
                     return false;
@@ -423,7 +432,7 @@ export class Schedule extends MegaRenderMixin {
                 }
             });
 
-            return $(`#${Schedule.NAMESPACE}`);
+            return $(`#${NAMESPACE}`);
         });
     }
 
@@ -431,7 +440,7 @@ export class Schedule extends MegaRenderMixin {
         if (prevProps.callExpanded && !this.props.callExpanded) {
             if (!$.dialog) {
                 // The call opening clears $.dialog so since the dialog is still mounted update it.
-                M.safeShowDialog(Schedule.dialogName, `#${Schedule.NAMESPACE}`);
+                M.safeShowDialog(dialogName, `#${NAMESPACE}`);
             }
             fm_showoverlay();
             this.setState({ closeDialog: false });
@@ -466,12 +475,12 @@ export class Schedule extends MegaRenderMixin {
         return (
             <ModalDialogsUI.ModalDialog
                 {...this.state}
-                id={Schedule.NAMESPACE}
+                id={NAMESPACE}
                 className={`
                     ${closeDialog ? 'with-confirmation-dialog' : ''}
                     ${this.props.callExpanded || overlayed ? 'hidden' : ''}
                 `}
-                dialogName={Schedule.dialogName}
+                dialogName={dialogName}
                 dialogType="main"
                 onClose={() => isDirty ? this.handleToggle('closeDialog') : this.props.onClose()}>
                 <Header
@@ -727,59 +736,6 @@ export class Schedule extends MegaRenderMixin {
     }
 }
 
-window.ScheduleMeetingDialogUI = {
-    Schedule,
-};
-
-// --
-
-export const CloseDialog = ({ onToggle, onClose }) => {
-    return (
-        <>
-            <ModalDialogsUI.ModalDialog
-                name={`${Schedule.NAMESPACE}-confirmation`}
-                dialogType="message"
-                className={`
-                    with-close-btn
-                    ${Schedule.NAMESPACE}-confirmation
-                `}
-                title={l.schedule_discard_dlg_title /* `Discard meeting or keep editing?` */}
-                icon="sprite-fm-uni icon-question"
-                buttons={[
-                    { key: 'n', label: l.schedule_discard_cancel, onClick: () => onToggle('closeDialog') },
-                    { key: 'y', label: l.schedule_discard_confirm, className: 'positive', onClick: onClose }
-                ]}
-                noCloseOnClickOutside={true}
-                stopKeyPropagation={true}
-                hideOverlay={true}
-                onClose={() => onToggle('closeDialog')}
-            />
-            <div
-                className={`${Schedule.NAMESPACE}-confirmation-overlay`}
-                onClick={() => onToggle('closeDialog')}
-            />
-        </>
-    );
-};
-
-export const Row = ({ children, className }) =>
-    <div
-        className={`
-            ${Schedule.NAMESPACE}-row
-            ${className || ''}
-        `}>
-        {children}
-    </div>;
-
-export const Column = ({ children, className }) =>
-    <div
-        className={`
-            ${Schedule.NAMESPACE}-column
-            ${className || ''}
-        `}>
-        {children}
-    </div>;
-
 /**
  * Header
  * @param chatRoom
@@ -798,192 +754,6 @@ const Header = ({ chatRoom }) => {
     }
 
     return $$container(l.schedule_meeting_title);
-};
-
-/**
- * Input
- * @param name
- * @param placeholder
- * @param value
- * @param invalid
- * @param invalidMessage
- * @param autoFocus
- * @param isLoading
- * @param onFocus
- * @param onChange
- * @return {React.Element}
- */
-
-const Input = ({ name, placeholder, value, invalid, invalidMessage, autoFocus, isLoading, onFocus, onChange }) => {
-    return (
-        <Row className={invalid ? 'invalid-aligned' : ''}>
-            <Column>
-                <i className="sprite-fm-mono icon-rename"/>
-            </Column>
-            <Column>
-                <div
-                    className={`
-                        mega-input
-                        ${invalid ? 'error msg' : ''}
-                    `}>
-                    <input
-                        type="text"
-                        name={`${Schedule.NAMESPACE}-${name}`}
-                        className={isLoading ? 'disabled' : ''}
-                        disabled={isLoading}
-                        autoFocus={autoFocus}
-                        autoComplete="off"
-                        placeholder={placeholder}
-                        value={value}
-                        onFocus={onFocus}
-                        onChange={({ target }) => onChange(target.value)}
-                    />
-                    {invalid &&
-                        <div className="message-container mega-banner">
-                            {invalidMessage}
-                        </div>
-                    }
-                </div>
-            </Column>
-        </Row>
-    );
-};
-
-/**
- * Checkbox
- * @param name
- * @param className
- * @param checked
- * @param label
- * @param subLabel
- * @param onToggle
- * @param isLoading
- * @return {React.Element}
- */
-
-const Checkbox = ({ name, className, checked, label, subLabel, isLoading, onToggle }) => {
-    return (
-        <Row
-            className={`
-                ${subLabel ? 'start-aligned' : ''}
-                ${className || ''}
-            `}>
-            <Column>
-                <div
-                    className={`
-                        checkdiv
-                        ${checked ? 'checkboxOn' : 'checkboxOff'}
-                        ${isLoading ? 'disabled' : ''}
-                    `}>
-                    <input
-                        name={`${Schedule.NAMESPACE}-${name}`}
-                        disabled={isLoading}
-                        type="checkbox"
-                        onChange={() => onToggle(name)}
-                    />
-                </div>
-            </Column>
-            <Column className={subLabel ? 'with-sub-label' : ''}>
-                <label
-                    htmlFor={`${Schedule.NAMESPACE}-${name}`}
-                    className={isLoading ? 'disabled' : ''}
-                    onClick={() => isLoading ? null : onToggle(name)}>
-                    {label}
-                </label>
-                {subLabel && <div className="sub-label">{subLabel}</div>}
-            </Column>
-        </Row>
-    );
-};
-
-/**
- * Switch
- * @param name
- * @param toggled
- * @param label
- * @param isLoading
- * @param subLabel
- * @param onToggle
- * @return {React.Element}
- */
-
-const Switch = ({ name, toggled, label, isLoading, subLabel, onToggle }) => {
-    const className = `${Schedule.NAMESPACE}-switch`;
-    return (
-        <Row>
-            <Column>
-                <i className="sprite-fm-uni icon-mega-logo"/>
-            </Column>
-            <Column className={subLabel ? `with-sub-label ${className}` : className}>
-                <span
-                    className={`
-                        schedule-label
-                        ${isLoading ? 'disabled' : ''}
-                    `}
-                    onClick={() => isLoading ? null : onToggle(name)}>
-                    {label}
-                </span>
-                <div
-                    className={`
-                        mega-switch
-                        ${toggled ? 'toggle-on' : ''}
-                        ${isLoading ? 'disabled' : ''}
-                    `}
-                    onClick={() => isLoading ? null : onToggle(name)}>
-                    <div
-                        className={`
-                            mega-feature-switch
-                            sprite-fm-mono-after
-                            ${toggled ? 'icon-check-after' : 'icon-minimise-after'}
-                        `}
-                    />
-                </div>
-                {subLabel && <div className="sub-label">{subLabel}</div>}
-            </Column>
-        </Row>
-    );
-};
-
-/**
- * Textarea
- * @param name
- * @param placeholder
- * @param isLoading
- * @param value
- * @param invalid
- * @param onChange
- * @param onFocus
- * @return {React.Element}
- */
-
-const Textarea = ({ name, placeholder, isLoading, value, invalid, onChange, onFocus }) => {
-    return (
-        <Row className="start-aligned">
-            <Column>
-                <i className="sprite-fm-mono icon-description"/>
-            </Column>
-            <Column>
-                <div className={`mega-input box-style textarea ${invalid ? 'error' : ''}`}>
-                    <textarea
-                        name={`${Schedule.NAMESPACE}-${name}`}
-                        className={isLoading ? 'disabled' : ''}
-                        placeholder={placeholder}
-                        value={value}
-                        readOnly={isLoading}
-                        onChange={({ target }) => onChange(target.value)}
-                        onFocus={onFocus}
-                    />
-                </div>
-                {invalid &&
-                    <div className="mega-input error msg textarea-error">
-                        <div className="message-container mega-banner">
-                            {l.err_schedule_desc_long /* `Enter fewer than 3000 characters` */}
-                        </div>
-                    </div>
-                }
-            </Column>
-        </Row>
-    );
 };
 
 /**
@@ -1015,23 +785,3 @@ const Footer = ({ isLoading, isEdit, topic, onSubmit }) => {
     );
 };
 
-
-/**
- * Upgrade notice for free users
- *
- * @returns {React.Element}
- */
-
-export const UpgradeNotice = ({ onUpgradeClicked }) => {
-    return !!mega.flags.ff_chmon && (
-        <Row className="schedule-upgrade-notice">
-            <h3>{l.schedule_limit_title}</h3>
-            <div>{l.schedule_limit_upgrade_features}</div>
-            <Button
-                className="mega-button positive"
-                onClick={onUpgradeClicked}>
-                <span>{l.upgrade_now}</span>
-            </Button>
-        </Row>
-    );
-};

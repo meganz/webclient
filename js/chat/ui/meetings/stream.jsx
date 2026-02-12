@@ -1,21 +1,20 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { MegaRenderMixin } from '../../mixins';
-import { MODE } from './call.jsx';
+import { chatGlobalEventManager } from '../../chatGlobalEventManager.jsx';
+import { MODE, PAGINATION, STREAMS_PER_PAGE } from './utils.jsx';
 import { PeerVideoHiRes, LocalVideoHiRes, PeerVideoThumb, LocalVideoThumb, PeerVideoThumbFixed } from './videoNode.jsx';
-import FloatingVideo from './float.jsx';
 import ParticipantsNotice from './participantsNotice.jsx';
 import ChatToaster from "../chatToaster.jsx";
 import ParticipantsBlock from './participantsBlock.jsx';
 import VideoNodeMenu from './videoNodeMenu.jsx';
 import Button from './button.jsx';
 import StreamHead from './streamHead.jsx';
-import Admit from './waitingRoom/admit.jsx';
+import Fallback from '../fallback.jsx';
+import FloatingVideo from './float.jsx';
+
+const Admit = lazy(() => import(/* webpackChunkName: "waiting-room" */ './waitingRoom/admit.jsx'));
 
 const NAMESPACE = 'stream';
-export const STREAM_ACTIONS = { ADD: 1, REMOVE: 2 };
-export const PAGINATION = { PREV: -1, NEXT: 1 };
-export const MAX_STREAMS = 99; // 99 + me -> 100
-export const STREAMS_PER_PAGE = { MIN: 9, MED: 21, MAX: 49 };
 
 /**
  * chunkNodes
@@ -800,16 +799,18 @@ export default class Stream extends MegaRenderMixin {
                     ${sidebar ? '' : 'full'}
                     ${hovered ? 'hovered' : ''}
                 `}>
-                {waitingRoomPeers && waitingRoomPeers.length ?
-                    <Admit
-                        chatRoom={chatRoom}
-                        call={call}
-                        peers={waitingRoomPeers}
-                        expanded={wrToggled}
-                        onWrListToggle={this.toggleWaitingRoomList}
-                    /> :
-                    null
-                }
+                <Suspense fallback={<Fallback />}>
+                    {waitingRoomPeers && waitingRoomPeers.length ?
+                        <Admit
+                            chatRoom={chatRoom}
+                            call={call}
+                            peers={waitingRoomPeers}
+                            expanded={wrToggled}
+                            onWrListToggle={this.toggleWaitingRoomList}
+                        /> :
+                        null
+                    }
+                </Suspense>
 
                 {this.renderToaster()}
 
@@ -850,39 +851,42 @@ export default class Stream extends MegaRenderMixin {
                     </>
                 }
 
-                <FloatingVideo
-                    call={call}
-                    peers={peers}
-                    mode={mode}
-                    view={view}
-                    floatDetached={floatDetached}
-                    isOnHold={isOnHold}
-                    chatRoom={chatRoom}
-                    minimized={minimized}
-                    sidebar={sidebar}
-                    forcedLocal={forcedLocal}
-                    isPresenterNode={isFloatingPresenter}
-                    wrapperRef={this.domRef}
-                    waitingRoomPeers={waitingRoomPeers}
-                    recorderCid={recorderCid}
-                    raisedHandPeers={raisedHandPeers}
-                    onRecordingToggle={onRecordingToggle}
-                    onAudioClick={onAudioClick}
-                    onVideoClick={onVideoClick}
-                    onCallEnd={onCallEnd}
-                    onScreenSharingClick={onScreenSharingClick}
-                    onCallMinimize={onCallMinimize}
-                    onMoveIntoGrid={this.toggleFloatDetachment}
-                    onCallExpand={async() => {
-                        await onCallExpand();
-                        this.scaleNodes(undefined, true);
-                    }}
-                    onSpeakerChange={onSpeakerChange}
-                    onModeChange={onModeChange}
-                    onHoldClick={onHoldClick}
-                    onParticipantsToggle={onParticipantsToggle}
-                    onWrListToggle={this.toggleWaitingRoomList}
-                />
+                {minimized || floatDetached ?
+                    <FloatingVideo
+                        call={call}
+                        peers={peers}
+                        mode={mode}
+                        view={view}
+                        floatDetached={floatDetached}
+                        isOnHold={isOnHold}
+                        chatRoom={chatRoom}
+                        minimized={minimized}
+                        sidebar={sidebar}
+                        forcedLocal={forcedLocal}
+                        isPresenterNode={isFloatingPresenter}
+                        wrapperRef={this.domRef}
+                        waitingRoomPeers={waitingRoomPeers}
+                        recorderCid={recorderCid}
+                        raisedHandPeers={raisedHandPeers}
+                        onRecordingToggle={onRecordingToggle}
+                        onAudioClick={onAudioClick}
+                        onVideoClick={onVideoClick}
+                        onCallEnd={onCallEnd}
+                        onScreenSharingClick={onScreenSharingClick}
+                        onCallMinimize={onCallMinimize}
+                        onMoveIntoGrid={this.toggleFloatDetachment}
+                        onCallExpand={async() => {
+                            await onCallExpand();
+                            this.scaleNodes(undefined, true);
+                        }}
+                        onSpeakerChange={onSpeakerChange}
+                        onModeChange={onModeChange}
+                        onHoldClick={onHoldClick}
+                        onParticipantsToggle={onParticipantsToggle}
+                        onWrListToggle={this.toggleWaitingRoomList}
+                    /> :
+                    null
+                }
             </div>
         );
     }

@@ -2,8 +2,8 @@ import React from 'react';
 import { Avatar } from '../../contacts.jsx';
 import ModalDialogsUI from '../../../../ui/modalDialogs.jsx';
 import Button from '../button.jsx';
-import Call from '../call.jsx';
 import { Emoji } from '../../../../ui/utils.jsx';
+import { getUnsupportedBrowserMessage } from '../utils.jsx';
 
 export default class Incoming extends React.Component {
     static NAMESPACE = 'incoming-dialog';
@@ -149,7 +149,7 @@ export default class Incoming extends React.Component {
                         </div>
                         {unsupported && (
                             <div className={`${NAMESPACE}-unsupported`}>
-                                <div className="unsupported-message">{Call.getUnsupportedBrowserMessage()}</div>
+                                <div className="unsupported-message">{getUnsupportedBrowserMessage()}</div>
                             </div>
                         )}
                     </div>
@@ -161,5 +161,3 @@ export default class Incoming extends React.Component {
         return null;
     }
 }
-
-window.ChatCallIncomingDialog = Incoming;

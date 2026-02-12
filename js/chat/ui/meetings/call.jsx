@@ -1,6 +1,6 @@
 import React from 'react';
 import { MegaRenderMixin } from '../../mixins.js';
-import Stream, { STREAM_ACTIONS, MAX_STREAMS } from './stream.jsx';
+import Stream from './stream.jsx';
 import Sidebar from './sidebar.jsx';
 import Invite from './workflow/invite/invite.jsx';
 import Ephemeral from './workflow/ephemeral.jsx';
@@ -14,120 +14,10 @@ import { ParsedHTML } from '../../../ui/utils.jsx';
 import Link from '../link.jsx';
 import { InviteParticipantsPanel } from '../inviteParticipantsPanel.jsx';
 import { Dropdown } from '../../../ui/dropdowns.jsx';
+import { isExpanded, isGuest, isModerator, MODE, VIEW, STREAM_ACTIONS, MAX_STREAMS } from './utils.jsx';
 
 const NAMESPACE = 'meetings-call';
-export const EXPANDED_FLAG = 'in-call';
 const MOUSE_OUT_DELAY = 2500;
-
-/**
- * MODE
- * @description Describes the available call modes.
- * @enum {number}
- * @property {number} THUMBNAIL
- * @property {number} MAIN
- * @readonly
- */
-
-export const MODE = {
-    THUMBNAIL: 1,
-    MAIN: 2,
-    MINI: 3
-};
-
-/**
- * VIEW
- * @description Describes the available view states.
- * @enum {number}
- * @property {number} DEFAULT
- * @property {number} CHAT
- * @property {number} PARTICIPANTS
- * @readonly
- */
-
-export const VIEW = {
-    DEFAULT: 0,
-    CHAT: 1,
-    PARTICIPANTS: 2
-};
-
-/**
- * TYPE
- * @description Describes the available call types.
- * @type {{VIDEO: number, AUDIO: number}}
- * @enum {number}
- * @property {number} AUDIO
- * @property {number} VIDEO
- * @readonly
- */
-
-export const TYPE = {
-    AUDIO: 1,
-    VIDEO: 2
-};
-
-/**
- * isGuest
- * @description Returns the true if the current user is a guest.
- * @returns {boolean}
- */
-
-export const isGuest = () => !u_type;
-
-/**
- * inProgressAlert
- * @description Renders conditionally message dialog if there is another active call currently. Attached to the
- * audio/video call controls on various places across the UI.
- * @returns {Promise}
- */
-
-export const inProgressAlert = (isJoin, chatRoom) => {
-    return new Promise((resolve, reject) => {
-        if (megaChat.haveAnyActiveCall()) {
-            if (window.sfuClient) {
-                // Active call w/ the current client
-                const { chatRoom: activeCallRoom } = megaChat.activeCall;
-                const peers = activeCallRoom ?
-                    activeCallRoom.getParticipantsExceptMe(activeCallRoom.getCallParticipants())
-                        .map(h => M.getNameByHandle(h)) :
-                    [];
-                let body = isJoin ? l.cancel_to_join : l.cancel_to_start;
-                if (peers.length) {
-                    body = mega.utils.trans.listToString(
-                        peers,
-                        isJoin ? l.cancel_with_to_join : l.cancel_with_to_start
-                    );
-                }
-                msgDialog('warningb', null, l.call_in_progress, body, null, 1);
-                return reject();
-            }
-
-            // Active call on another client; incl. current user already being in the call ->
-            // skip warning notification
-            if (chatRoom.getCallParticipants().includes(u_handle)) {
-                return resolve();
-            }
-
-            // Active call on another client
-            return (
-                msgDialog(
-                    `warningb:!^${l[2005]}!${isJoin ? l.join_call_anyway : l.start_call_anyway}`,
-                    null,
-                    isJoin ? l.join_multiple_calls_title : l.start_multiple_calls_title,
-                    isJoin ? l.join_multiple_calls_text : l.start_multiple_calls_text,
-                    join => {
-                        if (join) {
-                            return resolve();
-                        }
-                        return reject();
-                    },
-                    1
-                )
-            );
-        }
-        resolve();
-    });
-};
-window.inProgressAlert = inProgressAlert;
 
 class RecordingConsentDialog extends React.Component {
     static dialogName = `${NAMESPACE}-consent`;
@@ -254,44 +144,6 @@ export default class Call extends MegaRenderMixin {
         showTimeoutUpgrade: false,
         activeElement: false
     };
-
-    /**
-     * isModerator
-     * @description Given `chatRoom` and `handle` -- returns true if the user is moderator.
-     * @param chatRoom {ChatRoom}
-     * @param handle {string}
-     * @returns {boolean}
-     */
-
-    static isModerator = (chatRoom, handle) => {
-        if (chatRoom && handle) {
-            return chatRoom.members[handle] === ChatRoom.MembersSet.PRIVILEGE_STATE.OPERATOR;
-        }
-        return false;
-    };
-
-    /**
-     * isExpanded
-     * @description Returns true if the in-call UI is expanded; false when minimized.
-     * @returns {boolean}
-     */
-
-    static isExpanded = () => document.body.classList.contains(EXPANDED_FLAG);
-
-    /**
-     * getUnsupportedBrowserMessage
-     * @description Returns conditionally message for unsupported browser; used along w/ feature detection within
-     * `megaChat.hasSupportForCalls`. The two message variants concern a) outdated browser version (e.g. Chromium-based)
-     * or b) completely unsupported browsers, such as Safari/Firefox.
-     * @see megaChat.hasSupportForCalls
-     * @see Alert
-     * @returns {String}
-     */
-
-    static getUnsupportedBrowserMessage = () =>
-        navigator.userAgent.match(/Chrom(e|ium)\/(\d+)\./) ?
-            l.alert_unsupported_browser_version :
-            l.alert_unsupported_browser;
 
     constructor(props) {
         super(props);
@@ -1018,7 +870,7 @@ export default class Call extends MegaRenderMixin {
     renderRecordingControl = () => {
         const { chatRoom, call, peers } = this.props;
         const { recorderCid, recordingTooltip, recordingActivePeer } = this.state;
-        const isModerator = Call.isModerator(chatRoom, u_handle);
+        const userIsModerator = isModerator(chatRoom, u_handle);
         const $$CONTAINER = ({ className, onClick, children }) =>
             <div
                 className={`
@@ -1031,7 +883,7 @@ export default class Call extends MegaRenderMixin {
             </div>;
 
         if (recorderCid) {
-            const isRecorder = isModerator && recorderCid === call.sfuClient.cid;
+            const isRecorder = userIsModerator && recorderCid === call.sfuClient.cid;
             const recordingPeer = peers[recorderCid];
 
             return (
@@ -1096,7 +948,7 @@ export default class Call extends MegaRenderMixin {
 
         const isOnHold = !!(call?.av & Av.onHold);
         return (
-            isModerator &&
+            userIsModerator &&
             <$$CONTAINER
                 className={isOnHold ? 'disabled' : ''}
                 onClick={() => {
@@ -1237,7 +1089,7 @@ export default class Call extends MegaRenderMixin {
 
         this.pageChangeListener = mBroadcaster.addListener('pagechange', () => {
             const currentRoom = megaChat.getCurrentRoom();
-            if (Call.isExpanded() && (!M.chat || currentRoom && currentRoom.chatId !== chatRoom.chatId)) {
+            if (isExpanded() && (!M.chat || currentRoom && currentRoom.chatId !== chatRoom.chatId)) {
                 this.handleCallMinimize();
             }
         });
@@ -1483,7 +1335,7 @@ export default class Call extends MegaRenderMixin {
                     </div>
                 }
 
-                {onboardingRecording && Call.isModerator(chatRoom, u_handle) &&
+                {onboardingRecording && isModerator(chatRoom, u_handle) &&
                     <div className={`${NAMESPACE}-onboarding`}>
                         <div
                             className="mega-dialog mega-onboarding-dialog dialog-template-message onboarding-recording"

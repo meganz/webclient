@@ -1,4 +1,4 @@
-var React = require("react");
+import React from 'react';
 import {MegaRenderMixin, SoonFcWrap} from "../chat/mixins";
 
 /**

@@ -1,17 +1,38 @@
-import { hot } from 'react-hot-loader/root';
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { MegaRenderMixin } from '../mixins.js';
-import { ConversationPanels, EmptyConvPanel } from './conversationpanel.jsx';
-import ContactsPanel from './contactsPanel/contactsPanel.jsx';
-import { Start as StartMeetingDialog } from './meetings/workflow/start.jsx';
-import { Schedule as ScheduleMeetingDialog } from './meetings/schedule/schedule.jsx';
-import { Edit as ScheduleOccurrenceDialog } from './meetings/schedule/recurring.jsx';
-import { StartGroupChatWizard } from './startGroupChatWizard.jsx';
-import Call, { inProgressAlert } from './meetings/call.jsx';
-import ChatToaster from './chatToaster.jsx';
-import LeftPanel from './leftPanel/leftPanel.jsx';
+import { inProgressAlert, isExpanded } from './meetings/utils.jsx';
 import { FreeCallEnded as FreeCallEndedDialog } from './meetings/workflow/freeCallEnded.jsx';
-import ContactSelectorDialog from './contactSelectorDialog.jsx';
+import { hasContacts } from './contactsPanel/utils.jsx';
+import { NAMESPACE } from './leftPanel/utils.jsx';
+import ErrorBoundary from './errorBoundary.jsx';
+import Fallback from './fallback.jsx';
+
+const LeftPanel =
+    lazy(() => import(/* webpackChunkName: "core-ui" */ './leftPanel/leftPanel.jsx'));
+const EmptyConversationsPanel =
+    lazy(() => import(/* webpackChunkName: "core-ui" */ './emptyConversationsPanel.jsx'));
+const ChatToaster =
+    lazy(() => import(/* webpackChunkName: "core-ui" */ './chatToaster.jsx'));
+const ConversationPanels =
+    lazy(() =>
+        import(/* webpackChunkName: "core-ui" */ './conversationpanel.jsx')
+            .then(m => ({ default: m.ConversationPanels }))
+    );
+
+const ContactsPanel =
+    lazy(() => import(/* webpackChunkName: "contacts-panel" */ './contactsPanel/contactsPanel.jsx'));
+
+const ScheduleMeetingDialog =
+    lazy(() => import(/* webpackChunkName: "schedule-meeting" */ './meetings/schedule/schedule.jsx'));
+const ScheduleOccurrenceDialog =
+    lazy(() => import(/* webpackChunkName: "schedule-meeting" */ './meetings/schedule/edit.jsx'));
+
+const ContactSelectorDialog =
+    lazy(() => import(/* webpackChunkName: "start-conversation" */ './contactSelectorDialog.jsx'));
+const StartGroupChatWizard =
+    lazy(() => import(/* webpackChunkName: "start-conversation" */ './startGroupChatWizard.jsx'));
+const StartMeetingDialog =
+    lazy(() => import(/* webpackChunkName: "start-conversation" */ './meetings/workflow/start.jsx'));
 
 export const VIEWS = {
     CHATS: 0x00,
@@ -279,163 +300,163 @@ class ConversationsApp extends MegaRenderMixin {
                     in-chat
                     ${is_chatlink ? 'chatlink' : ''}
                 `}>
-                {!isLoading && <ChatToaster isRootToaster={true}/>}
-                {!isLoading && routingSection === 'contacts' && (
-                    <ContactsPanel megaChat={megaChat} contacts={M.u} received={this.state.ipcData} sent={M.opc}/>
-                )}
+                <Suspense fallback={<Fallback />}>
+                    {!isLoading && <ChatToaster isRootToaster={true}/>}
+                    {!isLoading && routingSection === 'contacts' && (
+                        <ContactsPanel megaChat={megaChat} contacts={M.u} received={this.state.ipcData} sent={M.opc}/>
+                    )}
+                    {!isLoading &&
+                        <ConversationPanels
+                            {...this.props}
+                            className={routingSection === 'chat' ? '' : 'hidden'}
+                            routingSection={routingSection}
+                            currentlyOpenedChat={currentlyOpenedChat}
+                            isEmpty={isEmpty}
+                            chatUIFlags={chatUIFlags}
+                            onToggleExpandedFlag={() => this.setState(() => ({ callExpanded: isExpanded() }))}
+                            onMount={() => {
+                                const chatRoom = megaChat.getCurrentRoom();
+                                const view = chatRoom && chatRoom.isMeeting ? MEETINGS : CHATS;
+                                this.setState({ view }, () => {
+                                    megaChat.currentlyOpenedView = view;
+                                });
+                            }}
+                        />
+                    }
+                    {!isLoading && isEmpty &&
+                        <EmptyConversationsPanel
+                            isMeeting={view === MEETINGS}
+                            onNewChat={() => this.setState({ contactSelectorDialog: true })}
+                            onStartMeeting={() => this.startMeeting()}
+                            onScheduleMeeting={() => this.setState({ scheduleMeetingDialog: true })}
+                        />
+                    }
+                </Suspense>
                 {!isLoading && routingSection === 'notFound' && <span><center>Section not found</center></span>}
-                {!isLoading && isEmpty &&
-                    <EmptyConvPanel
-                        isMeeting={view === MEETINGS}
-                        onNewChat={() => this.setState({ contactSelectorDialog: true })}
-                        onStartMeeting={() => this.startMeeting()}
-                        onScheduleMeeting={() => this.setState({ scheduleMeetingDialog: true })}
-                    />
-                }
-                {!isLoading &&
-                    <ConversationPanels
-                        {...this.props}
-                        className={routingSection === 'chat' ? '' : 'hidden'}
-                        routingSection={routingSection}
-                        currentlyOpenedChat={currentlyOpenedChat}
-                        isEmpty={isEmpty}
-                        chatUIFlags={chatUIFlags}
-                        onToggleExpandedFlag={() => this.setState(() => ({ callExpanded: Call.isExpanded() }))}
-                        onMount={() => {
-                            const chatRoom = megaChat.getCurrentRoom();
-                            const view = chatRoom && chatRoom.isMeeting ? MEETINGS : CHATS;
-                            this.setState({ view }, () => {
-                                megaChat.currentlyOpenedView = view;
-                            });
-                        }}
-                    />
-                }
             </div>
         );
 
         const noteChat = megaChat.getNoteChat();
         return (
-            <div
-                ref={this.domRef}
-                className="conversationsApp">
-                {contactSelectorDialog && (
-                    <ContactSelectorDialog
-                        className={`main-start-chat-dropdown ${LeftPanel.NAMESPACE}-contact-selector`}
-                        multiple={false}
-                        topButtons={[
-                            {
-                                key: 'newGroupChat',
-                                title: l[19483] /* `New group chat` */,
-                                className: 'positive',
-                                onClick: () =>
-                                    this.setState({ startGroupChatDialog: true, contactSelectorDialog: false })
-                            },
-                            ...megaChat.WITH_SELF_NOTE ?
-                                ContactsPanel.hasContacts() || noteChat && noteChat.hasMessages() ? [] : [{
-                                    key: 'noteChat',
-                                    title: l.note_label,
-                                    icon: 'sprite-fm-mono icon-file-text-thin-outline note-chat-icon',
-                                    onClick: () => {
-                                        closeDialog();
-                                        loadSubPage(`fm/chat/p/${u_handle}`);
+            <ErrorBoundary>
+                <div
+                    ref={this.domRef}
+                    className="conversationsApp">
+                    <Suspense fallback={<Fallback />}>
+                        {startMeetingDialog && (
+                            <StartMeetingDialog
+                                onStart={(topic, audio, video) => {
+                                    megaChat.createAndStartMeeting(topic, audio, video);
+                                    this.setState({ startMeetingDialog: false });
+                                }}
+                                onClose={() => this.setState({ startMeetingDialog: false })}
+                            />
+                        )}
+
+                        {startGroupChatDialog && (
+                            <StartGroupChatWizard
+                                name="start-group-chat"
+                                flowType={1}
+                                onClose={() => this.setState({ startGroupChatDialog: false })}
+                                onConfirmClicked={() => this.setState({ startGroupChatDialog: false })}
+                            />
+                        )}
+
+                        {scheduleMeetingDialog && (
+                            <ScheduleMeetingDialog
+                                chatRoom={this.chatRoomRef}
+                                callExpanded={callExpanded}
+                                onClose={() => {
+                                    this.setState({ scheduleMeetingDialog: false }, () => {
+                                        this.chatRoomRef = null;
+                                    });
+                                }}
+                            />
+                        )}
+
+                        {scheduleOccurrenceDialog && (
+                            <ScheduleOccurrenceDialog
+                                chatRoom={this.occurrenceRef.scheduledMeeting.chatRoom}
+                                scheduledMeeting={this.occurrenceRef.scheduledMeeting}
+                                occurrenceId={this.occurrenceRef.uid}
+                                callExpanded={callExpanded}
+                                onClose={() => {
+                                    this.setState({ scheduleOccurrenceDialog: false }, () => {
+                                        this.occurrenceRef = null;
+                                    });
+                                }}
+                            />
+                        )}
+
+                        {contactSelectorDialog && (
+                            <ContactSelectorDialog
+                                className={`main-start-chat-dropdown ${NAMESPACE}-contact-selector`}
+                                multiple={false}
+                                topButtons={[
+                                    {
+                                        key: 'newGroupChat',
+                                        title: l[19483] /* `New group chat` */,
+                                        className: 'positive',
+                                        onClick: () =>
+                                            this.setState({ startGroupChatDialog: true, contactSelectorDialog: false })
+                                    },
+                                    ...megaChat.WITH_SELF_NOTE ?
+                                        hasContacts() || noteChat && noteChat.hasMessages() ? [] : [{
+                                            key: 'noteChat',
+                                            title: l.note_label,
+                                            icon: 'sprite-fm-mono icon-file-text-thin-outline note-chat-icon',
+                                            onClick: () => {
+                                                closeDialog();
+                                                loadSubPage(`fm/chat/p/${u_handle}`);
+                                            }
+                                        }] :
+                                        []
+                                ]}
+                                showAddContact={hasContacts()}
+                                onClose={() => this.setState({ contactSelectorDialog: false })}
+                                onSelectDone={selected => {
+                                    if (selected.length === 1) {
+                                        return megaChat.createAndShowPrivateRoom(selected[0])
+                                            .then(room => room.setActive());
                                     }
-                                }] :
-                                []
-                        ]}
-                        showAddContact={ContactsPanel.hasContacts()}
-                        onClose={() => this.setState({ contactSelectorDialog: false })}
-                        onSelectDone={selected => {
-                            if (selected.length === 1) {
-                                return megaChat.createAndShowPrivateRoom(selected[0])
-                                    .then(room => room.setActive());
-                            }
-                            megaChat.createAndShowGroupRoomFor(selected);
-                        }}
-                    />
-                )}
+                                    megaChat.createAndShowGroupRoomFor(selected);
+                                }}
+                            />
+                        )}
+                    </Suspense>
 
-                {startGroupChatDialog && (
-                    <StartGroupChatWizard
-                        name="start-group-chat"
-                        flowType={1}
-                        onClose={() => this.setState({ startGroupChatDialog: false })}
-                        onConfirmClicked={() => this.setState({ startGroupChatDialog: false })}
-                    />
-                )}
+                    <Suspense fallback={<Fallback />}>
+                        <LeftPanel
+                            view={view}
+                            views={VIEWS}
+                            routingSection={routingSection}
+                            conversations={chats}
+                            renderView={view => this.renderView(view)}
+                            startMeeting={() => {
+                                this.startMeeting();
+                                eventlog(500293);
+                            }}
+                            scheduleMeeting={() => {
+                                this.setState({ scheduleMeetingDialog: true });
+                                delay('chat-event-sm-button-main', () => eventlog(99918));
+                            }}
+                            createNewChat={() => this.setState({ contactSelectorDialog: true })}
+                        />
+                    </Suspense>
 
-                {startMeetingDialog && (
-                    <StartMeetingDialog
-                        onStart={(topic, audio, video) => {
-                            megaChat.createAndStartMeeting(topic, audio, video);
-                            this.setState({ startMeetingDialog: false });
-                        }}
-                        onClose={() => this.setState({ startMeetingDialog: false })}
-                    />
-                )}
+                    {freeCallEndedDialog && (
+                        <FreeCallEndedDialog
+                            onClose={() => {
+                                this.setState({ freeCallEndedDialog: false });
+                            }}
+                        />
+                    )}
 
-                {scheduleMeetingDialog && (
-                    <ScheduleMeetingDialog
-                        chatRoom={this.chatRoomRef}
-                        callExpanded={callExpanded}
-                        onClose={() => {
-                            this.setState({ scheduleMeetingDialog: false }, () => {
-                                this.chatRoomRef = null;
-                            });
-                        }}
-                    />
-                )}
-
-                {scheduleOccurrenceDialog && (
-                    <ScheduleOccurrenceDialog
-                        chatRoom={this.occurrenceRef.scheduledMeeting.chatRoom}
-                        scheduledMeeting={this.occurrenceRef.scheduledMeeting}
-                        occurrenceId={this.occurrenceRef.uid}
-                        callExpanded={callExpanded}
-                        onClose={() => {
-                            this.setState({ scheduleOccurrenceDialog: false }, () => {
-                                this.occurrenceRef = null;
-                            });
-                        }}
-                    />
-                )}
-
-                {freeCallEndedDialog && (
-                    <FreeCallEndedDialog
-                        onClose={() => {
-                            this.setState({ freeCallEndedDialog: false });
-                        }}
-                    />
-                )}
-
-                <LeftPanel
-                    view={view}
-                    views={VIEWS}
-                    routingSection={routingSection}
-                    conversations={chats}
-                    renderView={view => this.renderView(view)}
-                    startMeeting={() => {
-                        this.startMeeting();
-                        eventlog(500293);
-                    }}
-                    scheduleMeeting={() => {
-                        this.setState({ scheduleMeetingDialog: true });
-                        delay('chat-event-sm-button-main', () => eventlog(99918));
-                    }}
-                    createNewChat={() => this.setState({ contactSelectorDialog: true })}
-                />
-
-                {rightPane}
-            </div>
+                    {rightPane}
+                </div>
+            </ErrorBoundary>
         );
     }
 }
 
-
-if (module.hot) {
-    module.hot.accept();
-    ConversationsApp = hot(ConversationsApp);
-}
-
-export default {
-    ConversationsApp: ConversationsApp
-};
+export default ConversationsApp;

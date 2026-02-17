@@ -488,8 +488,56 @@ var slideshowid;
         }
     }
 
+    function slideshow_shareBtnUpd(n, $overlay) {
+        const $getLinkBtn = $('.v-btn.getlink', $overlay || '.media-viewer-container');
+
+        if (!$getLinkBtn.length) {
+            return;
+        }
+
+        n = typeof n === 'object' ? n : M.getNodeByHandle(n);
+
+        const root = M.getNodeRoot(n.h);
+
+        if (!n || !n.p || root === 'shares' || root === M.RubbishID || self.pfid
+            || !M.getNodeByHandle(n.h).u && M.getNodeRights(n.p) < 2) {
+
+            $getLinkBtn.addClass('hidden');
+            return;
+        }
+
+        const hasLink = M.getNodeShare(n.h);
+        const label = hasLink ? l[6909] : mega.icu.format(l.share_link, 1);
+
+        $('i', $getLinkBtn).attr('class', `sprite-fm-mono icon-link${hasLink ? '-gear' : ''}`);
+        $getLinkBtn
+            .attr('data-simpletip', label).attr('aria-label', label)
+            .removeClass('hidden');
+
+        $getLinkBtn.rebind('click.mediaviewer', () => {
+            if ($getLinkBtn.hasClass('disabled')) {
+                return;
+            }
+
+            $getLinkBtn.addClass('disabled');
+            tSleep(3).then(() => $getLinkBtn.removeClass('disabled'));
+
+            $(document).fullScreen(false);
+
+            if (u_type === 0) {
+                ephemeralDialog(l[1005]);
+            }
+            else {
+                mega.Share.initCopyrightsDialog([slideshow_handle()]);
+            }
+
+            eventlog(501125);
+            return false;
+        });
+    }
+
     function slideshow_node(id, $overlay) {
-        var n = M.getNodeByHandle(id);
+        let n = M.getNodeByHandle(id);
 
         if (!n) {
             if (typeof id === 'object') {
@@ -501,46 +549,7 @@ var slideshowid;
         }
 
         if ($overlay) {
-            var root = M.getNodeRoot(n && n.h || false);
-            var $getLinkBtn = $('.v-btn.getlink', $overlay);
-
-            if (!n
-                || !n.p
-                || root === 'shares'
-                || root === M.RubbishID
-                || self.pfid
-                || !M.getNodeByHandle(n.h).u && M.getNodeRights(n.p) < 2
-            ) {
-                $getLinkBtn.addClass('hidden');
-            }
-            else {
-
-                $getLinkBtn.removeClass('hidden');
-                $getLinkBtn.rebind('click.mediaviewer', function() {
-                    if ($getLinkBtn.hasClass('disabled')) {
-                        return;
-                    }
-
-                    $getLinkBtn.addClass('disabled');
-                    tSleep(3).then(() => $getLinkBtn.removeClass('disabled'));
-
-                    if (is_mobile) {
-                        mobile.linkManagement.showOverlay(n.h);
-                    }
-                    else {
-                        $(document).fullScreen(false);
-
-                        if (u_type === 0) {
-                            ephemeralDialog(l[1005]);
-                        }
-                        else {
-                            mega.Share.initCopyrightsDialog([slideshow_handle()]);
-                        }
-                    }
-                    eventlog(501125);
-                    return false;
-                });
-            }
+            slideshow_shareBtnUpd(n, $overlay);
         }
 
         return n || false;
@@ -2519,6 +2528,7 @@ var slideshowid;
     global.slideshow_prev = slideshow_prev;
     global.slideshow_handle = slideshow_handle;
     global.slideshow_steps = slideshowsteps;
+    global.slideshow_shareBtnUpd = slideshow_shareBtnUpd;
     global.previewsrc = previewsrc;
     global.previewimg = previewimg;
     global.slideshowNodeAttributes = slideshowNodeAttributes;

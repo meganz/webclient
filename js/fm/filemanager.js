@@ -1159,7 +1159,7 @@ FileManager.prototype.initFileManagerUI = function() {
     });
     mega.ui.secondaryNav.addActionButton({
         componentClassname: 'fm-manage-link hidden',
-        icon: 'sprite-fm-mono icon-link-thin-outline',
+        icon: 'sprite-fm-mono icon-link-gear-thin-outline',
         text: l[6909],
         title: l[6909],
         onClick: () => {
@@ -3999,12 +3999,20 @@ FileManager.prototype.initStatusBarLinks = function() {
     const linkCount = $.selected.reduce((a, b) => {
         return a + (M.getNodeShare(b) ? 1 : 0);
     }, 0);
+    const total = $.selected.length;
     const { selectionBar } = mega.ui.secondaryNav;
     const linkButton = selectionBar.querySelector('.link');
     if (linkButton) {
-        linkButton.dataset.simpletip = linkCount === 0 ?
-            mega.icu.format(l.share_link, $.selected.length) :
-            linkCount === 1 ? l[6909] : l[17520];
+        const icon = linkButton.querySelector('i');
+
+        if (icon) {
+            icon.className =
+                `sprite-fm-mono icon-link${linkCount === total ? '-gear' : ''}-thin-outline`;
+        }
+
+        linkButton.dataset.simpletip = linkCount === total ?
+            total === 1 ? l[6909] : l[17520] :
+            mega.icu.format(l.share_link, total);
     }
     const copyLinkButton = selectionBar.querySelector('.copy-link');
     if (copyLinkButton) {

@@ -1449,7 +1449,7 @@ var addressDialog = {
             delete this.businessRegPage;
         }
 
-        return this.fetchBillingInfo().always((billingInfo) => {
+        this.loadingBillingInfo = this.fetchBillingInfo().always((billingInfo) => {
             billingInfo = billingInfo || Object.create(null);
 
             const selectedState =
@@ -1468,6 +1468,8 @@ var addressDialog = {
 
             onIdle(() => eventlog(500516));
         });
+
+        return this.loadingBillingInfo;
     },
 
     /**

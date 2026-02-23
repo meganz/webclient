@@ -6,19 +6,74 @@
     --mask-color: var(--text-color-white-high);
     max-width: 450px;
 }
+#ob-dialog.obdark {
+    background: var(--mobile-background-inverse);
+    color: var(--mobile-text-inverse);
+    max-width: 348px;
+    --border-radius: 8px;
+    --mask-color: var(--mobile-icon-inverse-secondary);
+}
+#ob-dialog.obdark header {
+    padding-top: 16px;
+    padding-inline: 16px 48px;
+}
 #ob-dialog .mega-button.action,
 #ob-dialog header div > * {
     color: var(--text-color-white-high);
     --mask-color: var(--text-color-white-high);
 }
+#ob-dialog.obdark .mega-button.action,
+#ob-dialog header div > * {
+    color: var(--mobile-text-inverse);
+    --mask-color: var(--mobile-icon-inverse-secondary);
+}
 #ob-dialog header h2 {
     text-align: start;
+}
+#ob-dialog.obdark header h2 {
+    color: var(--mobile-text-inverse);
+    font: var(--mobile-font-copy-semibold);
+}
+#ob-dialog.obdark header p {
+    color: var(--mobile-text-inverse-secondary);
+    font: var(--mobile-font-caption-large-regular);
+    margin-top: 8px;
+    padding-bottom: 8px;
+    border-bottom: var(--mobile-icon-secondary) 1px solid;
+}
+#ob-dialog.obdark footer .footer-container {
+    align-items: center;
+    padding: 12px 16px 16px;
+}
+#ob-dialog.obdark .mega-button.js-next {
+    background: transparent;
+    box-shadow: none;
+    color: var(--mobile-text-inverse-accent);
+    font: var(--mobile-font-copy-semibold);
+    margin-inline-end: auto;
+    height: 20px;
+    padding: 0;
+    --horizontal-padding: 0;
+}
+#ob-dialog.obdark .ob-step-count {
+    color: var(--mobile-text-inverse-secondary);
+    font: var(--mobile-font-caption-small-regular);
 }
 #ob-dialog-arrow {
     position: absolute;
     --mask-color: var(--label-blue);
     --icon-size: 24px;
     height: 16px;
+}
+#ob-dialog.obdark #ob-dialog-arrow {
+    background: var(--mobile-background-inverse);
+    border-radius: 2px;
+    transform: rotate(45deg);
+    width: 18px;
+    height: 20px;
+}
+#ob-dialog.obdark #ob-dialog-arrow::before {
+    display: none;
 }
 #ob-dialog-arrow.right {
     transform: rotate(270deg);
@@ -49,6 +104,20 @@
     right: 40px;
     top: -8px;
 }
+#ob-dialog-arrow.bottom-left {
+    left: 40px;
+    bottom: -8px;
+}
+#ob-dialog-arrow.bottom-right {
+    right: 40px;
+    bottom: -8px;
+}
+.obdark #ob-dialog-arrow.bottom-left {
+    left: 8px;
+}
+.obdark #ob-dialog-arrow.bottom-right {
+    right: 8px;
+}
 #ob-dialog .link-button {
     color: var(--text-color-white-high);
     margin-right: auto;
@@ -57,6 +126,20 @@
 .rtl #ob-dialog .link-button {
     margin-left: auto;
     margin-right: 0;
+}
+#ob-dialog.obdark header i.js-dark-skip {
+    right: 16px;
+    top: 16px;
+    width: 24px;
+    height: 24px;
+    position: absolute;
+    display: block;
+    cursor: pointer;
+    --icon-size: 24px;
+}
+.rtl #ob-dialog.obdark header i.js-dark-skip {
+    right: unset;
+    left: 16px;
 }
 .context .onboarding-highlight-dot,
 .context .onboarding-highlight-dot::before,

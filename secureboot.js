@@ -2374,7 +2374,6 @@ else if (!browserUpdate) {
         jsl.push({f:'html/top.html', n: 'top', j:0});
         jsl.push({f:'css/style.css', n: 'style_css', j:2, w:30});
         jsl.push({f:'css/tree.css', n: 'tree_css', j:2, w:30});
-        jsl.push({f:'css/transfer.css', n: 'style_css', j:2, w:30});
         jsl.push({f:'css/fm-header.css', n: 'fm_header_css', j:2,w:5});
         jsl.push({f:'css/fm-breadcrumb.css', n: 'fm_breadcrumb_css', j:2,w:5});
         jsl.push({f:'css/fm-lists.css', n: 'fm_lists_css', j:2,w:5});
@@ -2496,6 +2495,7 @@ else if (!browserUpdate) {
         jsl.push({f:'css/components/chatitem.css', n: 'chatitem_css', j:2,w:5});
         jsl.push({f:'css/components/meganz/fm-context-menu.css', n: 'fm_context_menu_css', j:2,w:5});
         jsl.push({f:'css/message-dialog.css', n: 'message_dialog_css', j:2,w:5});
+        jsl.push({f:'html/transfers.html', n: 'transfers', j:0});
     } // !is_mobile
 
     // do not change the order...

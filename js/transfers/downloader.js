@@ -539,8 +539,6 @@ ClassFile.prototype.run = function(task_done) {
                 else {
                     this.dl.n = newName;
                 }
-
-                $('#' + dlmanager.getGID(this.dl) + ' .tranfer-filetype-txt').text(newName);
             }
 
             if (this.dl.pzBufferStateChange) {

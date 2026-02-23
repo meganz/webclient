@@ -521,14 +521,6 @@ TransferQueue.prototype.pause = function(gid) {
             }
         }
         this._qpaused[gid] = this.slurp(gid).concat(this._qpaused[gid] || []);
-        var $tr = $('#' + gid);
-        if ($tr.hasClass('transfer-started')) {
-            $tr.find('.speed').addClass('unknown').text(l[1651]);
-            $tr.find('.eta').addClass('unknown').text('');
-        } else {
-            $tr.find('.speed').text('');
-            $tr.find('.eta').text('');
-        }
         GlobalProgress[gid].speed = 0; // reset speed
         if (($.transferprogress || {})[gid]) {
             $.transferprogress[gid][2] = 0; // reset speed
@@ -536,6 +528,9 @@ TransferQueue.prototype.pause = function(gid) {
         if (page !== 'download') {
             delay('percent_megatitle', percent_megatitle);
         }
+
+        tfsheadupdate({p: gid});
+        mega.tpw.pauseDownloadUpload(gid);
     }
     else if (d) {
         if (!GlobalProgress[gid]) {
@@ -553,11 +548,13 @@ TransferQueue.prototype.resume = function(gid) {
     }
 
     if (GlobalProgress[gid] && GlobalProgress[gid].paused) {
+        tfsheadupdate({r: gid});
+        mega.tpw.resumeDownloadUpload(gid);
+
         delete GlobalProgress[gid].paused;
         if (this.isEmpty()) {
             this.dispatch(gid);
         }
-        $('#' + gid + ' .speed').text('');
     }
     else if (d) {
         if (!GlobalProgress[gid]) {

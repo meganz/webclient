@@ -30,10 +30,6 @@ function accountUI() {
     $('.fm-account-save', accountUI.$contentBlock).removeClass('disabled');
     accountUI.$contentBlock.removeClass('hidden');
 
-    if ($('.fmholder', 'body').hasClass('transfer-panel-opened')) {
-        $.transferClose();
-    }
-
     M.onSectionUIOpen('account');
 
     if (u_attr && u_attr.b && !u_attr.b.m) {

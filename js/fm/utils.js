@@ -201,20 +201,8 @@ MegaUtils.prototype.resetUploadDownload = function megaUtilsResetUploadDownload(
         /* destroy all xhr */
         clearTransferXHRs();
 
-        $('.transfer-pause-icon').addClass('disabled');
-        if ($('tr.transfer-error', M.getTransferElements.domTable).length === 0) {
-            $('.transfer-clear-all-icon').addClass('disabled');
-        }
-        $('.nw-fm-left-icon.transfers').removeClass('transfering');
-        $('.transfers .nw-fm-percentage li p').css('transform', 'rotate(0deg)');
-        M.tfsdomqueue = Object.create(null);
         GlobalProgress = Object.create(null);
         delete $.transferprogress;
-        if ($.mTransferAnalysis) {
-            clearInterval($.mTransferAnalysis);
-            delete $.mTransferAnalysis;
-        }
-        $('.transfer-panel-title span').text('');
         dlmanager.dlRetryInterval = 3000;
         percent_megatitle();
 
@@ -272,6 +260,9 @@ MegaUtils.prototype.abortTransfers = function megaUtilsAbortTransfers(force) {
                 promise.resolve();
             }
         }, 350);
+        if (mega.tpw && mega.tpw.isWidgetVisibile()) {
+            mega.tpw.hideWidget();
+        }
     };
 
     if (!M.hasPendingTransfers()) {

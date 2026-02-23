@@ -92,25 +92,6 @@ table.grid-table .inbound-share.unverified-share .sprite-fm-uni-after.icon-warni
     pointer-events: none;
 }
 
-/* ============================ *\
-    transfer-table - Wrapper
-\* ============================ */
-
-.transfer-table-wrapper {
-    box-sizing: border-box;
-    height: 100%;
-    height: calc(100% - 48px);
-    overflow: hidden;
-    position: relative;
-    top: -1px;
-}
-
-.transfer-table-wrapper th:last-child::before,
-.transfer-table-wrapper th:first-child::before,
-.transfer-table-wrapper th:nth-child(7)::before {
-    display: none;
-}
-
 /* ======================================== *\
    grid-scrolling-table
 \* ======================================== */
@@ -123,16 +104,8 @@ table.grid-table .inbound-share.unverified-share .sprite-fm-uni-after.icon-warni
     display: inline-block;
     vertical-align: top; /* do not remove this is for prevent mysterious spacing from inline-block */
 }
-.grid-scrolling-table:not(.subtitles-grid-table),
-.transfer-scrolling-table {
+.grid-scrolling-table:not(.subtitles-grid-table) {
     height: 100%;
-}
-
-.transfer-scrolling-table {
-    /* do not remove, needed for perfect-scrollbar */
-    position: relative !important;
-    background: no-repeat center 24px linear-gradient(90deg, var(--stroke-grey-2), var(--stroke-grey-2));
-    background-size: auto 1px;
 }
 
 /* ======================================== *\
@@ -252,10 +225,6 @@ table.grid-table.import-summary tbody tr td i.icon-check:not(.verified-user-icon
 }
 table tr:hover .grid-url-arrow,
 table tr.ui-selected .grid-url-arrow,
-table tr:hover .clear-transfer-icon,
-table tr.ui-selected .clear-transfer-icon,
-table tr:hover .link-transfer-status,
-table tr.ui-selected .link-transfer-status,
 table tr:hover .grid-file-request-manage,
 table tr.ui-selected .grid-file-request-manage {
      opacity: 1;
@@ -506,8 +475,7 @@ table.grid-table th:last-child,
 table.grid-table td:first-child,
 table.grid-table td:last-child,
 table.grid-table td.space-maintainer-start,
-table.grid-table td.space-maintainer-end,
-.transfer-table tr td:nth-child(8) {
+table.grid-table td.space-maintainer-end {
     overflow: visible;
 }
 
@@ -1282,170 +1250,6 @@ table.out-shares .fm-chat-users {
     white-space: nowrap;
 }
 
-/* ======================================== *\
-   transfer-table header
-\* ======================================== */
-
-.transfer-table thead {
-    width: calc(100% - 32px);
-    white-space: nowrap;
-    margin: 0 16px;
-    min-width: 1152px;
-}
-.transfer-table th {
-    box-sizing: border-box;
-    height: 24px;
-    font: var(--text-body2);
-    padding: 0 13px 0 5px;
-    color: var(--stroke-main-inverted);
-    text-align: left;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    position: sticky;
-    position: -webkit-sticky;
-    display: table-cell;
-    float: none;
-    top: 0;
-    background-color: var(--mobile-page-background);
-    z-index: 1;
-}
-.transfer-table th:first-child span {
-    display: block;
-    background-image: url(../images/mega/fm-main-sprite.png);
-    background-repeat: no-repeat;
-    background-position: -6px -4019px;
-    height: 24px;
-}
-
-/* ======================================== *\
-   transfer-table
-\* ======================================== */
-
-.fm-transfers-block td {
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    height: 32px;
-    line-height: 32px;
-    font-size: 13px;
-    padding: 0 13px 0 5px;
-    color: #707070;
-    font-weight: normal;
-    text-align: left;
-    white-space: nowrap;
-    overflow: hidden;
-    -o-text-overflow: ellipsis;
-    text-overflow: ellipsis;
-    position: relative;
-}
-.transfer-table {
-    min-width: 1152px;
-}
-.transfer-table,
-.transfer-table tbody {
-    height: auto;
-    table-layout: fixed;
-    white-space: nowrap;
-}
-.transfer-table .tranfer-filetype-txt {
-    position: absolute;
-    left: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    width: 100%;
-    padding-left: 30px;
-    padding-top: 6px;
-    box-sizing: border-box;
-    display: block;
-}
-.transfer-table .item-type-icon {
-    --icon-size: 24px;
-    left: 2px;
-    position: absolute;
-    top: 4px;
-}
-.transfer-table .transfer-type {
-    margin: 0 auto;
-}
-.transfer-table .transfer-type::before {
-    background-image: none;
-}
-
-.transfer-table td {
-    border-bottom: 1px solid var(--stroke-grey-2);
-}
-.transfer-table td {
-    color: var(--text-color-high);
-    padding-left: 5px;
-    height: 32px;
-    font: var(--text-body1);
-    cursor: default;
-    box-sizing: border-box;
-    position: relative;
-    line-height: 32px;
-    z-index: 0;
-}
-.transfer-table td object {
-    position: absolute;
-    z-index: 10;
-    width: 100%;
-    height: 26px;
-    top: 0;
-    left: 0;
-    opacity: 0;
-}
-.transfer-table td:nth-child(1),
-.transfer-table th:nth-child(1) {
-    background-image: none;
-    padding: 0;
-    overflow: visible;
-}
-.transfer-table tr td:nth-child(1) {
-    padding-inline-start: 4px;
-}
-.transfer-table tr.ui-selected td:nth-child(1) {
-    padding-inline-start: 0;
-}
-.transfer-table td:nth-child(2) {
-    vertical-align: top;
-}
-.transfer-table td:nth-child(7),
-.transfer-table th:nth-child(7) {
-    background-image: none;
-}
-.transfer-table td:nth-child(8)::before {
-    border-radius: 0 4px 4px 0;
-}
-.transfer-table td:nth-child(9),
-.transfer-table th:nth-child(9) {
-    width: 0;
-    overflow: visible;
-}
-.transfer-table th:nth-child(9),
-.transfer-table td:nth-child(9),
-.dndc-sort .transfer-table td:nth-child(9) {
-    display: none;
-}
-.transfer-table .link-transfer-status i,
-.transfer-table .grid-url-arrow i,
-.transfer-table .clear-transfer-icon i {
-    --icon-size: 24px;
-    display: inline-block;
-    --mask-color: var(--mobile-icon-primary);
-    vertical-align: middle;
-}
-.transfer-table .link-transfer-status:hover i,
-.transfer-table .grid-url-arrow i,
-.transfer-table .clear-transfer-icon:hover i {
-    --mask-color: var(--icon-active);
-}
-
-.transfer-table th:nth-child(2) {
-    min-width: 448px;
-}
-
 
 /* ======================================== *\
    grid-table vouchers
@@ -1499,9 +1303,6 @@ table.out-shares .fm-chat-users {
 }
 .add-from-cloud-dialog .grid-scrolling-table.ps > .ps__rail-y {
     margin-top: 34px;
-}
-.transfer-scrolling-table.ps > .ps__rail-y {
-    margin-top: 26px;
 }
 
 /* ======================================== *\

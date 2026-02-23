@@ -859,6 +859,7 @@
                     $(window).rebind('resize.fileversioning', SoonFc(() => {
                         initPerfectScrollbar($scrollBlock);
                     }));
+                    mBroadcaster.sendMessage('fileversioning:open');
                 });
 
             $(document).rebind('keydown.fileversioningKeydown', (e) => {
@@ -871,6 +872,14 @@
                 $versionOverlay.addClass('hidden');
                 loadSubPage('fm/account/file-management');
             });
+            if (mega.ui.onboarding) {
+                onIdle(() => {
+                    mega.ui.onboarding.forceSection();
+                    if ($.dialog === 'onboardingDialog') {
+                        closeDialog();
+                    }
+                });
+            }
             pushHistoryState(page);
         },
 

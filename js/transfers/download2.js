@@ -1336,8 +1336,11 @@ var dlmanager = {
                 mobile.downloadOverlay.downloadTransfer.resetTransfer();
             }
             else {
-                resetOverQuotaTransfers(ids);
+                tfsheadupdate({t: ids});
             }
+        }
+        if (mega.tpw) {
+            mega.tpw.resetErrorsAndQuotasUI(mega.tpw.DOWNLOAD);
         }
 
         for (var i = 0; i < this._dlQuotaListener.length; ++i) {

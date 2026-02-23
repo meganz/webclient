@@ -1179,7 +1179,7 @@ class MegaHeader extends MegaMobileHeader {
                 M.isGalleryPage() || M.isAlbumsPage() ||
                 M.currentrootid === M.InboxID || // Temporary title for backup
                 M.onDeviceCenter ||
-                M.currentdirid === 'transfers' || M.search) {
+                M.search) {
                 return 'drive';
             }
             else if (M.currentCustomView.type === 'pwm') {

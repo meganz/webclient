@@ -28,20 +28,11 @@ function setTransferStatus(dl, status, ethrow, lock, fatalError) {
                 mobile.downloadOverlay.handleFatalError(dl, status);
             }
         }
-
-        $('.transfer-table #' + id + ' .transfer-status')
-            .attr('title', status)
-            .text(text);
     }
 
     if (lock) {
-        var $tr = $('.transfer-table #' + id)
-            .addClass('transfer-completed')
-            .removeClass('transfer-initiliazing')
-            .attr('id', 'LOCKed_' + id);
-
         if (lock === 2) {
-            $tr.remove();
+            mega.tpw.removeRow(id);
         }
     }
 
@@ -438,8 +429,8 @@ function chksum(buf) {
 
 function bindTransfersMassEvents(context) {
     'use strict';
-    const pauseIconClass = 'icon-pause';
-    const playIconClass = 'icon-play-small';
+    const pauseIconClass = 'icon-pause-thin-outline';
+    const playIconClass = 'icon-play-thin-outline';
     $('.transfer-pause-icon', context).rebind('click.transfers', function() {
         const $this = $(this);
         if ($this.hasClass('active')) {
@@ -453,18 +444,12 @@ function bindTransfersMassEvents(context) {
         }
 
         if (!$this.hasClass('disabled')) {
-            let $elm;
             if ($this.hasClass('active')) {
 
-                if ($this.parent('.transfer-widget-footer').length) {
-                    eventlog(501075);
-                }
-                else if ($this.parent('.transfer-panel-actions').length) {
-                    eventlog(501076);
-                }
+                eventlog(501075);
 
                 // terms of service
-                if (u_type || folderlink || Object(u_attr).terms || $('.transfer-table', '.fmholder').length === 0) {
+                if (u_type || folderlink || Object(u_attr).terms) {
                     Object.keys(dlQueue._qpaused).map(fm_tfsresume);
                     Object.keys(ulQueue._qpaused).map(fm_tfsresume);
                     uldl_hold = false;
@@ -473,17 +458,6 @@ function bindTransfersMassEvents(context) {
 
                     $('span', $this.removeClass('active')).text(l[6993]);
                     $('i', $this).addClass(pauseIconClass).removeClass(playIconClass);
-
-                    $elm = $('.transfer-table-wrapper tr', '.fmholder').removeClass('transfer-paused');
-                    $elm = $('.link-transfer-status', $elm).removeClass('transfer-play').addClass('transfer-pause');
-                    $('i', $elm).removeClass(playIconClass).addClass(pauseIconClass);
-                    $('.nw-fm-left-icon', '.fm-holder').removeClass('paused');
-                    const $otherButton =
-                        $this.parent().hasClass('transfer-widget-footer')
-                            ? $('.transfer-pause-icon', '.fm-transfers-header')
-                            : $('.transfer-pause-icon', '.transfer-widget-footer');
-                    $('span', $otherButton.removeClass('active')).text(l[6993]);
-                    $('i', $otherButton).addClass(pauseIconClass).removeClass(playIconClass);
                 }
                 else {
                     msgDialog('error', 'terms', l[214]);
@@ -494,43 +468,17 @@ function bindTransfersMassEvents(context) {
             }
             else {
 
-                if ($this.parent('.transfer-widget-footer').length) {
-                    eventlog(501077);
-                }
-                else if ($this.parent('.transfer-panel-actions').length) {
-                    eventlog(501078);
-                }
+                eventlog(501077);
 
-                var $trs = $('.transfer-table tr:not(.transfer-completed)', '.fmholder');
-                let ids;
-                if ($('.transfer-table', '.fmholder').length) {
-                    ids = [...Object.keys(M.tfsdomqueue), ...$trs.attrs('id')];
-                }
-                else {
-                    ids = mega.tpw.getIncompleteIds();
-                    ids = ids.map((attr) => {
-                        return attr.substr(4);
-                    });
-                }
-                ids.map(fm_tfspause);
+                ul_queue.filter(isQueueActive).map((ul) => fm_tfspause(ulmanager.getGID(ul)));
+                dl_queue.filter(isQueueActive).map((dl) => fm_tfspause(dlmanager.getGID(dl)));
 
                 dlQueue.pause();
                 ulQueue.pause();
                 uldl_hold = true;
 
-                $('span', $this.addClass('active')).text(l[7101]);
+                $('span', $this.addClass('active')).text(l.transfers_resume_all);
                 $('i', $this).removeClass(pauseIconClass).addClass(playIconClass);
-
-                $trs.addClass('transfer-paused');
-                $elm = $('.link-transfer-status', $trs).removeClass('transfer-pause').addClass('transfer-play');
-                $('i', $elm).removeClass(pauseIconClass).addClass(playIconClass);
-                $('.nw-fm-left-icon', '.fmholder').addClass('paused');
-                const $otherButton =
-                    $this.parent().hasClass('transfer-widget-footer')
-                        ? $('.transfer-pause-icon', '.fm-transfers-header')
-                        : $('.transfer-pause-icon', '.transfer-widget-footer');
-                $('span', $otherButton.addClass('active')).text(l[7101]);
-                $('i', $otherButton).removeClass(pauseIconClass).addClass(playIconClass);
             }
         }
     });
@@ -541,12 +489,11 @@ function bindTransfersMassEvents(context) {
 
         if (!$this.hasClass('disabled')) {
 
-            if ($this.parent('.transfer-widget-footer').length) {
-                eventlog(501079);
+            if ($this.hasClass('clear-rows')) {
+                mega.tpw.clearCurrentView();
+                return;
             }
-            else if ($this.parent('.transfer-panel-actions').length) {
-                eventlog(501080);
-            }
+            eventlog(501079);
 
             msgDialog('confirmation', 'clear all transfers', l.cancel_transfers_dlg_title, l[7225], (e) => {
                 if (!e) {
@@ -565,11 +512,6 @@ function bindTransfersMassEvents(context) {
                 };
 
                 uldl_hold = true;
-                if (typeof $.removeTransferItems === 'function' && Object.keys(M.tfsdomqueue).length) {
-                    tfsheadupdate({
-                        c: Object.keys(M.tfsdomqueue),
-                    });
-                }
                 time('dlm:abort', () => dlmanager.abort(null));
                 time('ulm:abort', () => ulmanager.abort(null));
                 time('tfs:abort', () => {
@@ -578,8 +520,11 @@ function bindTransfersMassEvents(context) {
                         if (d && keys.length) {
                             console.log('Not removing %d completing uploads', keys.length);
                         }
-                        const $trs = $('.transfer-table tbody tr', '.fmholder');
-                        $.removeTransferItems(keys.length ? $($trs.toArray().filter(r => !keys.includes(r.id))) : $trs);
+                        const ids = [
+                            ...Object.keys(tfsheadupdate.stats.dl),
+                            Object.keys(tfsheadupdate.stats.ul).filter(id => !keys.includes(id))
+                        ];
+                        $.removeTransferItems(ids);
                     }
                     else {
                         tfsheadupdate({

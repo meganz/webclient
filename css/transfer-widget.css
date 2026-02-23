@@ -1,97 +1,147 @@
-.float-widget.transfer-progress * {
-    font-family: var(--text-font-family);
+.transfer-root {
+    height: var(--tpw-height);
+    width: var(--tpw-width);
+    position: fixed;
+    left: var(--tpw-left);
+    top: var(--tpw-top);
+    display: flex;
+    z-index: 220;
+    transition: height 100ms;
+    flex-wrap: wrap;
+    --tpw-width: 500px;
+    --tpw-height: 400px;
+    --tpw-left: calc(100% - 12px - var(--tpw-width));
+    --tpw-top: calc(100% - 12px - var(--tpw-height));
+    --tpw-banner-height: 175px;
 }
+
+@keyframes tpw-expand {
+    0% {
+        transform: translate(var(--tpw-left), var(--tpw-top));
+        height: var(--tpw-height);
+        width: var(--tpw-width);
+    }
+    100% {
+        transform: translate(0, 0);
+        height: 100%;
+        width: 100%;
+    }
+}
+
+@keyframes tpw-collapse {
+    0% {
+        left: 120px;
+        top: 60px;
+        width: calc(100% - 240px);
+        height: calc(100% - 120px);
+    }
+    100% {
+        left: var(--tpw-end-left);
+        top: var(--tpw-end-top);
+        height: var(--tpw-height);
+        width: var(--tpw-width);
+    }
+}
+
+.transfer-root.collapse {
+    --tpw-height: 62px;
+    --tpw-width: 400px;
+}
+.transfer-root.expanded {
+    width: 100%;
+    height: 100%;
+    padding: 60px 120px;
+    left: 0;
+    top: 0;
+    box-sizing: border-box;
+    z-index: 1112;
+    animation: tpw-expand 150ms;
+    min-width: 1010px;
+    --tpw-banner-height: 98px;
+}
+.overlayed .transfer-root:not(.expanded) {
+    z-index: 0;
+    filter: blur(0.25em);
+}
+.transfer-root.shrink {
+    animation: tpw-collapse 150ms;
+}
+.transfer-root.banner-shown:not(.collapse) {
+    --tpw-height: 500px;
+}
+
+/* Main widget */
 .float-widget.transfer-progress {
-    height: auto;
+    width: 100%;
+    height: 100%;
     margin-bottom: 8px;
     position: relative;
     z-index: 110;
+    background: var(--mobile-page-background);
+    border-radius: 9px;
+    border: var(--mobile-border-strong) 1px solid;
+    box-shadow: var(--mobile-shadow-medium);
+    display: flex;
+    align-content: flex-start;
+    flex-direction: column;
+    box-sizing: border-box;
 }
-.transfer-progress-widget,
-.banner.transfer {
+.transfer-root.banner-shown:not(.collapse) .float-widget.transfer-progress {
+    border-radius: 0 0 9px 9px;
+    border-top: none;
+    height: calc(100% - var(--tpw-banner-height));
+}
+.float-widget.transfer-progress > div {
+    width: 100%;
+}
+.transfer-progress-widget {
+    height: 100%;
     position: relative;
     border-radius: 16px;
     box-shadow: var(--dialog-shadow);
     overflow: hidden;
 }
-.transfer-progress-widget.collapse {
-    display: inline-block;
-    min-width: 264px;
-    max-width: 446px;
-}
-.transfer-progress-widget.expand {
-    width: 536px;
-    background: var(--surface-main);
-}
-.transfer-progress-txt {
-    font: var(--text-body1-bold);
-    color: var(--text-color-high);
-    display: inline-block;
-    padding: 5px 0 4px;
-    vertical-align: top;
-    margin-left: 8px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-.transfer-panel-title .transfer-progress-txt {
-    color: var(--text-color-high);
-}
-.transfer-progress-type.error .transfer-progress-txt,
-.transfer-progress-type.overquota .transfer-progress-txt {
-    font-family: var(--text-font-family);
-    color: var(--secondary-red);
-}
-.transfer-progress-type.error.almost-overquota .transfer-progress-txt {
-    color: var(--secondary-orange);
-}
-/* Transfer tooltips - head */
+
+/* Transfer widget header */
 .transfer-progress-head {
     display: flex;
-    min-width: 264px;
-    max-width: inherit;
-    position: relative;
-    width: auto;
-    border-radius: 16px 16px 0 0;
-    background: var(--surface-grey-1);
-    font-size: 0;
+    cursor: move;
+    justify-content: flex-end;
+    padding: 8px 12px 0;
+    height: 40px;
+    box-sizing: border-box;
+    align-items: center;
 }
-.transfer-progress-widget.expand .transfer-progress-head {
-    min-width: 536px;
+.transfer-root.expanded .transfer-progress-head {
+    cursor: initial;
 }
-.transfer-progress-widget.collapse .transfer-progress-head {
-    border-radius: 8px;
-}
+
+/* Transfer charts */
 .transfer-progress-type {
-    margin: 10px 0;
     display: flex;
-    overflow: hidden;
     white-space: nowrap;
     align-self: flex-start;
-}
-.transfer-progress-spacing {
-    flex-grow: 1;
-}
-.transfer-progress-widget.expand .transfer-progress-type.upload.hidden + .transfer-progress-type.download,
-.transfer-progress-widget.expand .transfer-progress-type.upload:not(.hidden) {
-    margin-left: 24px;
-}
-.transfer-progress-widget.collapse .transfer-progress-type.upload.hidden + .transfer-progress-type.download,
-.transfer-progress-widget.collapse .transfer-progress-type.upload:not(.hidden) {
-    margin-left: 16px;
-}
-.transfer-progress-type:nth-child(1) {
-    margin-right: 32px;
+    align-items: center;
+    color: var(--mobile-text-secondary);
+    font: var(--mobile-font-caption-small-regular);
+    margin-top: auto;
+    margin-bottom: auto;
+    margin-inline-end: 24px;
+    position: relative;
 }
 .transfer-progress-type .progress-chart {
-    width: 28px;
-    height: 28px;
+    width: 24px;
+    height: 24px;
     transform: none;
     display: inline-block;
     float: none;
     vertical-align: middle;
-    background: var(--surface-progress-background);
+    background: var(--mobile-border-strong);
     border-radius: 100%;
     position: relative;
+}
+.transfer-progress-type.no-progress .progress-chart {
+    background: var(--mobile-icon-primary);
 }
 .transfer-progress-type .progress-chart .charts {
     width: 100%;
@@ -105,31 +155,25 @@
     left: 6px;
     z-index: 11;
     position: absolute;
+    --icon-size: 12px;
+    --mask-color: var(--mobile-icon-primary);
 }
-.transfer-progress-type.download .progress-chart i {
-    --mask-color: var(--secondary-green);
-}
-.transfer-progress-type.upload .progress-chart i {
-    --mask-color: var(--secondary-blue);
-}
-.transfer-progress-type.error .progress-chart i,
-.transfer-progress-type.overquota .progress-chart i {
-    --mask-color: var(--stroke-error);
+.transfer-progress-type.all-transfers .progress-chart i {
+    top: 0;
+    left: 0;
+    --icon-size: 24px;
 }
 .transfer-progress-type .progress-chart::after {
-    width: 22px;
-    height: 22px;
-    margin: 3px;
+    width: 20px;
+    height: 20px;
+    margin: 2px;
     content: "";
     display: block;
     position: absolute;
     padding: 0;
     border-radius: 100%;
     z-index: 10;
-    background: var(--surface-main);
-}
-.transfer-progress-head .transfer-progress-type .progress-chart::after {
-    background: var(--surface-grey-1);
+    background: var(--mobile-page-background);
 }
 .transfer-progress-type .charts .right-chart {
     width: 100%;
@@ -144,10 +188,10 @@
     clip: rect(0, 50px, 100px, 0);
 }
 .transfer-progress-type .charts .right-chart.low-percent-clip {
-    clip: rect(0, 14px, 28px, 0);
+    clip: rect(0, 12px, 24px, 0);
 }
 .transfer-progress-type .charts .left-chart.low-percent-clip {
-    clip: rect(0, 28px, 28px, 14px);
+    clip: rect(0, 24px, 24px, 12px);
 }
 .transfer-progress-type .charts span {
     transform: rotate(180deg);
@@ -163,504 +207,679 @@
     position: absolute;
     top: 0;
     left: 0;
-}
-.transfer-progress-type.upload .charts span::before {
-    background: var(--secondary-blue);
-}
-.transfer-progress-type.download .charts span::before {
-    background: var(--secondary-green);
+    background: var(--mobile-support-success);
 }
 .transfer-progress-type .charts .left-chart span::before {
     margin-left: 50%;
 }
-.transfer-progress-type.error .charts span::before,
-.transfer-progress-type.error .charts span::after,
-.transfer-progress-type.overquota .charts span::before,
-.transfer-progress-type.overquota .charts span::after {
-    background: var(--stroke-error);
+.transfer-progress-type.no-progress .charts span::before {
+    background: var(--mobile-icon-primary);
 }
-.transfer-panel-title .transfer-progress-type {
-    margin: 0 16px;
- }
+.transfer-progress-type.paused .charts span::before {
+    background: var(--mobile-support-warning);
+}
+.transfer-root .float-widget.overquota:not(.almost-overquota) .transfer-progress-type .charts span::before {
+    background: var(--mobile-support-error);
+}
 .status-indicator {
+    margin-inline-start: 9px;
     width: auto;
-    height: 28px;
+    height: 24px;
     border-radius: 12px;
     box-sizing: border-box;
     display: inline-block;
     position: relative;
     vertical-align: top;
 }
-.transfer-progress-type.download .transfer-progress-pct::before,
-.transfer-progress-type.upload .transfer-progress-pct::before {
-    --icon-size: 16px;
-    left: 4px;
-    top: 4px;
-    display: block;
-    position: absolute;
-    z-index: 11;
-    --mask-color: var(--secondary-white);
-}
 .transfer-progress-type .transfer-progress-icon {
     display: none;
 }
-.transfer-progress-type.complete .transfer-progress-icon,
-.transfer-progress-type.error .transfer-progress-icon,
-.transfer-progress-type.overquota .transfer-progress-icon {
-    display: inline-block;
-    vertical-align: top;
+
+/* End Transfer charts */
+.transfer-progress-head button.mega-component.nav-elem {
+    margin-inline-start: 8px;
+    color: var(--mobile-icon-primary);
+    background: transparent;
+    width: 32px;
+    height: 32px;
 }
-.transfer-progress-pct {
-    color:var(--text-color-white-high);
-    font: var(--text-body1);
+.transfer-progress-head button.mega-component.nav-elem:hover {
+    background: var(--mobile-button-disabled);
+}
+
+/* Collapsed view */
+.transfer-root.collapse .transfer-progress.tpw {
+    background: var(--mobile-surface-2);
+    border: var(--mobile-border-subtle) 1px solid;
+}
+.transfer-root.collapse .transfer-progress-type .progress-chart::after {
+    background: var(--mobile-surface-2);
+}
+.transfer-root.collapse .transfer-progress-head {
+    height: 100%;
+    padding: 12px 8px;
+}
+.transfer-root.collapse .transfer-progress-head button.transfer-progress-icon {
+    --mask-color: var(--mobile-icon-secondary);
+}
+.transfer-progress.tpw .transfer-progress-head .widget-collapse {
+    display: grid;
+    grid-template-rows: 1fr;
+    grid-template-columns: 32px 1fr;
+    width: 100%;
+}
+.transfer-progress.tpw .widget-collapse .all-transfers {
+    grid-column: 1/2;
     position: relative;
-    display: inline-block;
-    padding: 4px 8px 4px 20px;
-    line-height: 16px;
-    width: auto;
-    height: auto;
 }
-.transfer-progress-widget .transfer-control-panel {
+.transfer-progress.tpw .widget-collapse .all-transfers .status-indicator {
+    margin-inline-start: 0;
+}
+.transfer-progress.tpw .transfer-progress-type .status-icon {
+    position: absolute;
+    right: -2px;
+    top: 11px;
+    z-index: 110;
+    border-radius: 100%;
+    background: var(--mobile-surface-2);
+    --icon-size: 16px;
+    --mask-color: var(--mobile-icon-secondary);
+}
+.transfer-progress.tpw .widget-collapse .all-transfers .status-icon {
+    right: -20px;
+    top: 11px;
+}
+.transfer-progress.tpw .transfer-progress-type .status-icon.icon-check-circle-regular-solid {
+    --mask-color: var(--mobile-support-success);
+}
+.transfer-progress.tpw .widget-collapse .all-transfers .status-icon.icon-alert-circle-regular-solid {
+    --mask-color: var(--mobile-support-error);
+}
+.transfer-progress.tpw .widget-collapse .collapse-status-block {
+    grid-column: 2/3;
     display: flex;
-    align-self: flex-end;
-    cursor: pointer;
+    align-items: center;
+    flex-wrap: wrap;
+    overflow: hidden;
 }
-.transfer-progress-widget.expand .transfer-control-panel {
-    margin-right: 16px;
+.transfer-progress.tpw .widget-collapse .collapse-status-block .transfer-status-title {
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-copy-regular);
+    line-height: 20px;
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
-.transfer-progress-widget.collapse .transfer-control-panel {
-    margin-right: 8px;
-    margin-left: 32px;
+.transfer-root.banner-shown .transfer-progress.tpw:not(.almost-overquota) .widget-collapse .collapse-status-block .transfer-status-title {
+    color: var(--mobile-text-error);
 }
-.transfer-control-panel .transfer-progress-icon i {
-    --icon-size: 24px;
-    --mask-color: var(--icon-rest);
+.transfer-progress.tpw .widget-collapse .collapse-status-block .transfer-progress-time,
+.transfer-progress.tpw .widget-collapse .collapse-status-block .transfer-progress-subtext {
+    color: var(--mobile-text-secondary);
+    font: var(--mobile-font-caption-small-regular);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
-.transfer-control-panel .transfer-progress-icon i:hover {
-    --mask-color: var(--icon-active);
+.transfer-progress.tpw .widget-collapse .collapse-status-block .transfer-progress-time {
+    max-width: 48%;
+    margin-inline-end: 4px;
 }
-.transfer-control-panel .transfer-progress-icon {
-    margin: 12px 8px 12px 0;
-    transition: 0.2s;
-    display: inline-block;
+.transfer-progress.tpw .widget-collapse .collapse-status-block .transfer-progress-subtext {
+    flex: 1 0 10%;
 }
-.transfer-progress-widget.expand .transfer-progress-icon.expand,
-.transfer-progress-widget.collapse .transfer-progress-icon.collapse {
-    display: none;
+.transfer-progress.tpw .widget-collapse .collapse-status-block .transfer-progress-subtext.error {
+    border-left: 1px solid var(--mobile-text-secondary);
+    color: var(--mobile-text-error);
+    line-height: 14px;
+    margin-inline-start: 4px;
+    padding-inline-start: 4px;
 }
-.transfer-control-panel .transfer-progress-icon:hover {
-    opacity: 1;
+.transfer-progress.tpw .widget-collapse .collapse-status-block .transfer-progress-time.hidden + .transfer-progress-subtext.error {
+    border-left: none;
+    margin-inline-start: 0;
+    padding-inline-start: 0;
 }
-.transfer-progress-tabs-head {
-    background: var(--surface-main);
-    line-height: 32px;
-    border-bottom: var(--stroke-grey-2) solid 1px;
+.rtl .transfer-progress.tpw .widget-collapse .collapse-status-block .transfer-progress-subtext.error {
+    border-left: unset;
+    border-right: 1px solid var(--mobile-text-secondary);
 }
-.transfer-progress-tabs-head .transfer-tabs-panel {
-    padding-left: 24px;
-}
-.transfer-progress-tabs-head .tab-lnk {
-    font: var(--text-body2-bold);
-    color: var(--text-color-high);
-    cursor: pointer;
-    background-color: transparent;
-    border: 0;
-    outline: 0;
-    padding: 0;
+
+/* End Transfer widget header */
+
+/* Widget top controls */
+.transfer-progress .mega-component.transfer-tabs-panel {
+    height: 49px;
+    border-bottom: var(--mobile-border-strong) solid 1px;
+    padding: 0 24px;
     box-sizing: border-box;
+    overflow: hidden;
+}
+.transfer-tabs-panel.mega-component.tab-group .mega-component.mega-tab-option {
+    flex: 0;
+    padding: 12px;
+}
+.transfer-tabs-panel.mega-component.tab-group .mega-tab-option .decorator {
+    display: flex;
+    padding: 0 6px;
+    border-radius: 4px;
+    color: var(--mobile-text-info);
+    background: var(--mobile-notification-info);
     height: 24px;
-    position: relative;
-    margin: 8px 36px 6px 0;
+    align-items: center;
+    max-width: 48px;
 }
-.transfer-progress-tabs-head .tab-lnk.active {
-    font: var(--text-body1-bold);
-    color: var(--text-color-info);
+.transfer-tabs-panel.mega-component.tab-group .mega-tab-option .decorator span {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    font: var(--mobile-font-caption-large-regular);
 }
-.transfer-progress-tabs-head .tab-lnk.inactive {
-    font: var(--text-body2);
-    color: var(--text-color-low);
-    cursor: default;
+.transfer-tabs-panel.mega-component.tab-group .mega-tab-option.js-tab-error .decorator {
+    background: var(--mobile-notification-error);
+    color: var(--mobile-text-error);
 }
-/* Transfer tooltips - body */
-.transfer-progress-widget.collapse .transfer-progress-widget-body {
+.transfer-root .transfer-panel-sort {
     display: none;
 }
+.transfer-root.expanded .transfer-panel-sort {
+    display: flex;
+    box-sizing: border-box;
+    padding: 0 24px;
+    height: 56px;
+    border-bottom: solid 1px var(--mobile-border-subtle);
+}
+.transfer-panel-sort .transfer-column {
+    height: 100%;
+    padding: 0 8px;
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    font: var(--mobile-font-caption-small-regular);
+    color: var(--mobile-text-secondary);
+    background: transparent;
+    border: none;
+}
+.transfer-panel-sort button.transfer-column {
+    cursor: pointer;
+}
+.transfer-panel-sort .transfer-column:hover {
+    background: var(--mobile-surface-1);
+}
+.transfer-panel-sort .transfer-column i {
+    margin-inline-start: 12px;
+}
+.transfer-root .transfer-panel-filters {
+    height: 52px;
+    box-sizing: border-box;
+    padding: 16px 24px 8px;
+}
+.transfer-panel-filters .tpw-filter-chips-wrapper {
+    display: flex;
+    align-items: center;
+    align-self: flex-start;
+}
+.transfer-panel-filters .tpw-filter-chips-wrapper .nav-elem.slim span.primary-text {
+    font: var(--mobile-font-link-small-regular);
+}
+.transfer-panel-filters .tpw-filter-chips-wrapper .fm-filter-chips {
+    display: flex;
+    align-items: center;
+}
+.transfer-panel-filters .tpw-filter-chips-wrapper .nav-elem.fm-filter-reset {
+    height: 24px;
+    padding: 0 8px;
+}
+.transfer-panel-filters .tpw-filter-chips-wrapper .nav-elem.fm-filter-reset .primary-text {
+    text-decoration: underline;
+    color: var(--mobile-text-secondary);
+}
+.mega-component.menu-container.overlay-wrap.transfers-filter-dropdown {
+    width: 188px;
+    z-index: 1200;
+}
+
+/* End Widget top controls */
+
+/* Transfer widget body */
 .transfer-progress-widget-body {
     position: relative;
-    background: var(--surface-main);
     overflow: hidden;
     z-index: 40;
-    max-height: 248px;
+    height: 100%;
 }
 .transfer-progress.tpw .widget-body-container {
-    min-height: 56px;
-    max-height: 248px;
+    flex: 1 1 224px;
     overflow: hidden;
     position: relative;
+}
+.transfer-root.banner-shown .transfer-progress.tpw .widget-body-container {
+    flex-basis: 148px;
+}
+
+/* Empty states */
+.widget-body-container .transfer-widget-empty {
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    flex-direction: column;
+    height: 100%;
+}
+.widget-body-container .transfer-widget-empty .empty-title {
+    margin: 24px auto;
+    font: var(--mobile-font-heading-h2);
+    color: var(--mobile-text-primary);
+}
+.widget-body-container .transfer-widget-empty i {
+    background-size: contain;
+    width: 120px;
+    height: 120px;
+    margin: 0 auto;
+}
+.widget-body-container .transfer-widget-empty i.icon-empty-transfers {
+    background-image: url("../images/mega/empty/empty-recents-filter.webp");
+}
+.widget-body-container .transfer-widget-empty i.icon-empty-vault {
+    background-image: url("../images/mega/empty/empty-folder.webp");
+}
+.widget-body-container .transfer-widget-empty i.icon-empty-error {
+    background-image: url("../images/onboarding/green-check-3d.png");
+}
+
+/* End Empty states */
+
+/* Transfer rows */
+.transfer-column.transfer-header-name,
+.transfer-task-row .transfer-name-block {
+    width: 26%;
+}
+.transfer-column.transfer-header-size,
+.transfer-column.transfer-header-speed,
+.transfer-column.transfer-header-time,
+.transfer-column.transfer-header-type,
+.transfer-task-row .transfer-size,
+.transfer-task-row .transfer-speed,
+.transfer-task-row .transfer-time,
+.transfer-task-row .transfer-item-type {
+    width: 12%;
+}
+.transfer-column.transfer-header-status,
+.transfer-task-row .transfer-task-status {
+    width: 16%;
+}
+.transfer-column.transfer-header-actions {
+    flex: 1 1 96px;
+    cursor: initial;
+}
+.transfer-column.transfer-header-actions:hover {
+    background: transparent;
 }
 .transfer-task-row {
     width: 100%;
-    height: 48px;
-    padding: 12px 16px 12px 24px;
+    height: 54px;
+    padding: 20px 24px;
     position: relative;
     box-sizing: border-box;
     display: flex;
     align-items: center;
+    border-bottom: solid 1px var(--mobile-border-subtle);
+    font: var(--mobile-font-caption-small-regular);
+    color: var(--mobile-text-primary);
 }
-.transfer-task-row:hover::after {
-    content: '';
-    width: 504px;
-    height: 40px;
-    position: absolute;
-    left: 16px;
-    top: 4px;
-    border-radius: 4px;
-    background-color: var(--stroke-grey-3);
-    border: 1px solid var(--stroke-grey-2);
-    z-index: -1;
+.transfer-task-row.sprite-fm-mono {
+    height: 48px;
+    padding: 8px 16px;
 }
-.transfer-task-row::before {
-    content: "";
-    left: 27px;
-    top: 16px;
+.transfer-task-row:hover {
+    background: var(--mobile-surface-1);
+}
+.transfer-task-row.sprite-fm-mono::before {
     width: 16px;
     height: 16px;
-    display: block;
+    --mask-color: var(--mobile-icon-secondary);
+}
+.transfer-task-row > div {
+    box-sizing: border-box;
+    padding: 0 8px;
+}
+.transfer-task-row .transfer-name-block {
+    display: flex;
+    padding-inline: 4px 16px;
+    align-items: center;
+}
+.transfer-task-row.sprite-fm-mono .transfer-name-block {
+    flex: 1;
+}
+.transfer-task-row .transfer-name-block .transfer-filetype-txt,
+.transfer-task-row .transfer-task-status > div,
+.transfer-task-row .transfer-size,
+.transfer-task-row .transfer-speed .speed-text,
+.transfer-task-row .transfer-time,
+.transfer-task-row .transfer-item-type {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
 }
 .transfer-task-row .item-type-icon {
-    margin: 0 12px;
+    margin-inline-end: 8px;
 }
-.transfer-task-row .transfer-filetype-txt {
-    display: inline-block;
-    max-width: 282px;
-    font: var(--text-body1);
-    line-height: 24px;
-    color: var(--text-color-high);
-    overflow: hidden;
-    text-overflow: ellipsis;
+.transfer-task-row .transfer-speed {
+    display: flex;
+}
+.transfer-task-row .transfer-speed i {
+    margin-inline-end: 4px;
+}
+.transfer-task-row .transfer-task-status {
+    display: flex;
+    padding: 0 8px;
+    color: var(--mobile-text-secondary);
     white-space: nowrap;
 }
-.transfer-task-row.complete .transfer-filetype-txt {
-    max-width: 282px;
+.transfer-task-row.sprite-fm-mono .transfer-task-status {
+    justify-content: flex-end;
+    padding-inline-end: 0;
+    max-width: 35%;
+    width: fit-content;
 }
-.transfer-task-row .transfer-file-size {
-    position: relative;
-    display: inline-block;
-    margin: 0 8px;
-    padding-left: 12px;
-    font: var(--text-body2);
-    line-height: 24px;
-    color: var(--text-color-low);
-    vertical-align: top;
-    white-space: nowrap;
+.transfer-task-row.sprite-fm-mono:hover .transfer-task-actions {
+    padding-inline-end: 0;
 }
-.transfer-task-row .transfer-file-size::before {
-    content: "";
-    width: 1px;
-    height: 16px;
-    background-color: var(--stroke-grey-2);
-    display: block;
-    position: absolute;
-    top: 4px;
-    left: 0;
+.transfer-task-row:not(.inqueue) .transfer-task-status {
+    color: var(--mobile-text-success);
 }
-.transfer-task-status {
-    font: var(--text-body1);
-    line-height: 24px;
-    min-width: 28px;
-    min-height: 24px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    cursor: pointer;
-    margin-left: auto;
-    margin-right: 8px;
-    flex-shrink: 0;
-    position: relative;
-    color: var(--text-color-high);
+.transfer-task-row.sprite-fm-mono:not(.inqueue) .transfer-task-status {
+    color: var(--mobile-text-secondary);
 }
-.transfer-task-row.paused .transfer-task-status i {
-    --icon-size: 24px;
-    display: inline-block;
-    margin-right: 8px;
-    --mask-color: var(--icon-rest);
-    vertical-align: middle;
+.transfer-progress-widget-body .transfer-task-row.paused .transfer-task-status {
+    color: var(--mobile-text-warning);
 }
-.transfer-task-status span {
-    display: inline-block;
-    height: 24px;
-    vertical-align: middle;
-    box-sizing: border-box;
+.transfer-progress-widget-body .transfer-task-row.error .transfer-task-status,
+.transfer-progress-widget-body .transfer-task-row.overquota .transfer-task-status {
+    color: var(--mobile-text-error);
+}
+.transfer-task-row .transfer-task-status i {
+    margin-inline-end: 4px;
+    --mask-color: var(--mobile-icon-secondary);
+}
+.transfer-task-row .transfer-item-type {
+    color: var(--mobile-text-secondary);
 }
 .transfer-task-actions {
     display: none;
     z-index: 25;
 }
 .transfer-task-row:hover .transfer-task-actions {
-    display: inline-block;
-    position: absolute;
-    right: 24px;
-    top: 9px;
+    display: flex;
+    margin-inline-start: auto;
 }
-.transfer-task-row:hover .transfer-task-status {
-    display: none;
-}
-.transfer-task-actions button {
-    display: inline-block;
-    cursor: pointer;
-    position: relative;
-    outline: none;
+.transfer-task-actions button.mega-component.nav-elem {
+    margin-inline-start: 8px;
+    background: var(--mobile-page-background);
+    width: 24px;
+    height: 24px;
+    --icon-size: 16px;
 }
 .transfer-task-actions i {
-    --mask-color: var(--icon-rest);
+    --mask-color: var(--mobile-icon-primary);
 }
-.transfer-task-actions i:hover {
-    --mask-color: var(--icon-active);
+.transfer-task-actions button.mega-component.nav-elem:hover,
+.transfer-task-actions button.mega-component.nav-elem:active {
+    background: var(--mobile-button-secondary-hover);
 }
-.transfer-progress-bar,
+.transfer-task-row.sprite-fm-mono:hover .transfer-task-status {
+    display: none;
+}
+.transfer-progress-bar {
+    position: absolute;
+    display: block;
+    width: calc(26% - 24px);
+    height: 2px;
+    border-radius: 5px;
+    background: var(--mobile-surface-2);
+    left: 24px;
+    bottom: 8px;
+    z-index: 8;
+}
 .transfer-progress-bar-pct {
     position: absolute;
     display: block;
-    width: 488px;
     height: 2px;
-    border-radius: 1.5px;
-    background: var(--surface-progress-background);
-    left: 24px;
-    bottom: 0;
+    border-radius: 5px;
+    background: var(--mobile-support-success);
     z-index: 8;
-}
-.transfer-task-row.upload .transfer-progress-bar-pct {
-    width: 200px;
-    background: var(--secondary-blue);
     left: 0;
-    z-index: 9;
+    transition: width 50ms;
 }
-.transfer-task-row.download .transfer-progress-bar-pct {
-    width: 200px;
-    background: var(--secondary-green);
-    left: 0;
-    z-index: 9;
+.transfer-task-row.paused .transfer-progress-bar-pct {
+    background: var(--mobile-support-warning);
 }
-/* complete mode */
-.transfer-task-row.complete .transfer-task-status {
-    color: var(--stroke-success);
-}
-.transfer-complete-actions {
-    display: none;
-    position: absolute;
-    right: 48px;
-    z-index: 25;
-}
-.transfer-task-row:hover .transfer-complete-actions {
-    display: inline-block;
-}
-.transfer-complete-actions button {
-    display: inline-block;
-    position: relative;
-    margin-right: 8px;
-    cursor: pointer;
-    outline: none;
-}
-.transfer-complete-actions i {
-    --mask-color: var(--icon-rest);
-}
-.transfer-complete-actions i:hover {
-    --mask-color: var(--icon-active);
-}
-.transfer-task-row.complete .transfer-progress-bar {
-    display: none;
-}
-/* error mode */
 .transfer-task-row.error .transfer-progress-bar-pct,
 .transfer-task-row.overquota .transfer-progress-bar-pct {
-    width: 200px;
-    background-color: var(--secondary-red);
-    left: 0;
-    z-index: 9;
+    background: var(--mobile-support-error);
 }
-.transfer-task-row.error .transfer-task-status,
-.transfer-task-row.overquota .transfer-task-status {
-    color: var(--secondary-red);
+.transfer-task-row.sprite-fm-mono .transfer-progress-bar {
+    width: calc(100% - 32px);
+    left: 16px;
 }
-.transfer-task-row .transfer-task-status + i {
+.transfer-task-row.sprite-fm-mono .transfer-item-path,
+.transfer-root.expanded .transfer-task-row.complete .transfer-speed,
+.transfer-root.expanded .transfer-task-row.complete .transfer-time,
+.transfer-root.expanded .transfer-task-row.error .transfer-speed,
+.transfer-root.expanded .transfer-task-row.error .transfer-time,
+.transfer-root.expanded .transfer-task-row.overquota .transfer-speed,
+.transfer-root.expanded .transfer-task-row.overquota .transfer-time {
     display: none;
 }
-/* inqueue mode */
-.transfer-task-row.inqueue .transfer-task-status + i {
-    animation: rotate 1s infinite linear;
-    display: block;
-    margin: 4px 12px 0 0;
-    opacity: 0.6;
-    --icon-size: 22px;
-    animation-timing-function: steps(8, end);
+.transfer-root.expanded .transfer-task-row.complete .transfer-item-path {
+    display: inline-flex;
+    color: var(--mobile-link-primary);
+    max-width: 30%;
 }
-/* deploy icons */
-.transfer-task-row.paused .transfer-task-status::before {
-    display: block;
-    background-position: -2px -37px;
-}
-.transfer-progress-icon.collapse {
-    height: auto;
-}
-.transfer-progress-icon.wait {
-    background-position: -195px -342px;
-}
-.transfer-progress-icon.complete {
-    display: block;
-    background-position: -160px -1697px;
-}
-.btn-icon.transfer-progress-btn:hover::after {
-    content: '';
-    position: absolute;
-    width: 24px;
-    height: 24px;
-    background: var(--button-hover);
-    border-radius: 4px;
-    left: 0;
-    right: 0;
-    z-index: -1;
-}
-button.btn-icon .transfer-progress-icon {
-    --icon-size: 24px;
-    display: inline-block;
-}
-.transfer-progress-type.upload .status-indicator::before {
-    background-position: -8px -1804px;
-}
-.transfer-task-row.download::before {
-    --mask-color: var(--secondary-green);
-}
-.transfer-task-row.upload::before {
-    --mask-color: var(--secondary-blue);
-}
-.transfer-task-row.complete .transfer-task-status::before {
-    display: block;
-    background-position: -160px -1696px;
-}
-.transfer-task-row.error .transfer-task-status::before,
-.transfer-task-row.overquota .transfer-task-status::before {
-    display: block;
-    background-position: -159px -1804px;
-}
-.transfer-widget-footer {
-    width: 100%;
-    height: 24px;
-    padding: 6px 0;
-    background-color: var(--stroke-grey-2);
-    display: flex;
-    justify-content: flex-end;
-}
-.transfer-widget-footer button {
-    height: 24px;
-    --height: 24px;
-}
-.transfer-widget-footer .transfer-clear-all-icon {
-    margin-right: 18px;
-    margin-left: 8px;
-}
-.transfer-widget-footer button.action span {
-    display: block;
+.transfer-root.expanded .transfer-task-row.complete .transfer-item-path .text-box-wrapper {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
-.transfer-widget-footer button i {
-    --mask-color: var(--icon-rest);
+.transfer-task-row .mega-component.nav-elem.transfer-item-path {
+    padding: 0 8px;
 }
-.transfer-widget-footer button:hover i {
-    --mask-color: var(--icon-active);
+.transfer-task-row .nav-elem.transfer-item-path .primary-text {
+    color: var(--mobile-link-primary);
+    font: var(--mobile-font-caption-small-regular);
 }
-.transfer-progress-widget.collapse .transfer-section-button {
-    display: none;
+
+/* End Transfer rows */
+
+/* End Transfer widget body */
+
+/* Transfer widget footer */
+.transfer-widget-footer {
+    padding: 8px 16px;
+    display: flex;
+    justify-content: flex-end;
+    border-top: var(--mobile-border-strong) 1px solid;
+    flex-wrap: wrap;
+    box-sizing: border-box;
 }
-/*overquota banner*/
-.float-widget.transfer-progress .banner {
+.transfer-widget-footer .transfer-footer-row {
+    height: 36px;
     width: 100%;
+    display: flex;
+    align-items: center;
+}
+.transfer-footer-row .transfer-progress-time {
+    margin-inline-end: auto;
+    white-space: nowrap;
+    color: var(--mobile-text-secondary);
+    font: var(--mobile-font-caption-small-regular);
+}
+.transfer-footer-row.transfer-actions {
+    justify-content: flex-end;
+}
+.transfer-widget-footer .transfer-footer-row button.mega-component.nav-elem.slim {
+    padding: 0 12px;
+    align-self: flex-end;
+}
+.transfer-widget-footer .transfer-footer-row button.mega-component.nav-elem.slim span {
+    max-width: 140px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    font: var(--mobile-font-link-small-bold);
+    text-decoration: underline;
+}
+.transfer-widget-footer .mega-component.nav-elem.transfer-clear-all-icon:not(.clear-rows) {
+    color: var(--mobile-text-error);
+}
+
+/* End transfer widget footer */
+
+/*overquota banner*/
+.transfer-root .banner {
+    width: 100%;
+    height: var(--tpw-banner-height);
     min-width: 148px;
-    max-width: 536px;
-    background-color: var(--stroke-main);
-    padding: 24px;
-    margin-bottom: 4px;
+    background: var(--mobile-notification-error);
+    padding: 16px;
     box-sizing: border-box;
     overflow: hidden;
+    border-radius: 9px 9px 0 0;
+    border: var(--mobile-border-strong) 1px solid;
+    border-bottom: var(--mobile-border-subtle) 1px solid;
 }
-.float-widget.transfer-progress .banner .close-over {
+.transfer-root.obq-shown {
+    --tpw-banner-height: 103px;
+}
+.transfer-root.expanded.obq-shown {
+    --tpw-banner-height: 81px;
+}
+.transfer-root .banner.obq-banner {
+    padding: 20px 24px;
+}
+.transfer-root .banner .close-over {
     position: absolute;
-    width: 24px;
-    height: 24px;
-    top: 16px;
-    right: 16px;
-    transition: 0.2s;
+    width: 32px;
+    height: 32px;
+    top: 8px;
+    right: 12px;
+    border-radius: var(--mobile-border-radius-medium);
     cursor: pointer;
-    z-index: 19;
+    padding: 4px;
 }
-.float-widget.transfer-progress .banner .close-over:hover {
-    opacity: 0.8;
+.transfer-root.collapse .banner {
+    display: none;
 }
-.float-widget.transfer-progress .banner .close-over .sprite-fm-mono {
+.transfer-root.expanded .banner {
+    position: relative;
+}
+.transfer-root.expanded .banner .close-over {
+    top: 30px;
+}
+.transfer-root.expanded.obq-shown .banner .close-over {
+    top: 20px;
+}
+.transfer-root .banner .close-over:hover {
+    background: var(--mobile-button-secondary-hover);
+}
+.transfer-root .banner .close-over .sprite-fm-mono {
     width: 24px;
     height: 24px;
-    --mask-color: var(--icon-rest);
+    --mask-color: var(--mobile-icon-primary);
     --icon-size: 24px;
 }
-.left-section.circle-dashboard {
-    width: 64px;
-    height: 64px;
-    margin: 12px 40px 0 16px;
+.transfer-root .banner .left-section {
     position: relative;
     display: inline-block;
-    border-radius: 100%;
     box-sizing: border-box;
     text-align: center;
     vertical-align: top;
-    background: var(--surface-progress-background);
+}
+.transfer-root .banner.odq-banner .left-section {
+    border-radius: 100%;
+    background: var(--mobile-border-strong);
+}
+.left-section.circle-dashboard {
+    width: 48px;
+    height: 48px;
+}
+.left-section.alert-icon {
+    width: 24px;
+    height: 24px;
+    --icon-size: 24px;
+    --mask-color: var(--mobile-support-error);
+}
+.transfer-root.expanded .left-section.alert-icon {
+    width: 18px;
+    height: 18px;
+    --icon-size: 18px;
 }
 .quota-info-pct-txt {
-    font: var(--text-h3-bold);
+    font: var(--mobile-font-caption-small-bold);
     position: relative;
-    margin-top: 20px;
+    margin-top: 16px;
     z-index: 11;
 }
-.float-widget.transfer-progress .banner.almost-overquota .quota-info-pct-txt,
-.float-widget.transfer-progress .banner.almost-overquota .quota-info-pr-txt .quota-info-pr-txt-used {
-    color: var(--secondary-orange);
+.transfer-root .banner.almost-overquota {
+    background: var(--mobile-notification-warning);
 }
-.float-widget.transfer-progress .banner.overquota .quota-info-pct-txt,
-.float-widget.transfer-progress .banner.overquota .quota-info-pr-txt .quota-info-pr-txt-used {
-    color: var(--secondary-red);
+.transfer-root .banner.almost-overquota .quota-info-pct-txt {
+    color: var(--mobile-text-warning);
 }
-.quota-info-pr-txt {
-    font: var(--text-body2);
-    color: var(--text-color-high);
-    position: relative;
-    margin: -24px -16px 0;
-}
-.quota-info-pr-txt .quota-info-pr-txt-used {
-    font: var(--text-body1);
-}
-.quota-info-pr-txt.small-font {
-    color: var(--text-color-medium);
-}
-.quota-info-pr-txt.small-font .quota-info-pr-txt-used {
-    font: var(--text-body1);
+.transfer-root .banner.overquota .quota-info-pct-txt {
+    color: var(--mobile-text-error);
 }
 .right-section.upgrade-block {
-    width: calc(100% - 136px);
+    width: calc(100% - 52px);
     display: inline-block;
+    padding-inline-start: 16px;
+    box-sizing: border-box;
+}
+.transfer-root .banner.obq-banner .right-section.upgrade-block {
+    padding-inline-start: 8px;
+}
+.transfer-root.expanded .right-section.upgrade-block {
+    display: inline-flex;
+    align-items: center;
+    align-content: flex-start;
+    flex-wrap: wrap;
+    width: calc(100% - 76px);
+    position: relative;
+}
+.transfer-root.expanded .right-section.upgrade-block > div {
+    width: calc(100% - 180px);
+}
+.transfer-root.expanded .right-section.upgrade-block .head-title {
+    min-width: 230px;
+}
+.transfer-root.expanded .right-section.upgrade-block button {
+    position: absolute;
+    top: 16px;
+    right: 24px;
+}
+.transfer-root.expanded.obq-shown .right-section.upgrade-block button {
+    top: 8px;
 }
 .right-section.upgrade-block .head-title {
-    color: var(--text-color-high);
-    font: var(--text-h3-bold);
-    left: 0;
-    top: 0;
-    padding: 0;
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-copy-bold);
+}
+.transfer-root .obq-banner .right-section.upgrade-block .head-title {
+    font: var(--mobile-font-caption-large-regular);
+}
+.transfer-root .obq-banner .right-section.upgrade-block .head-title b {
+    font: var(--mobile-font-caption-large-bold);
+}
+.transfer-root.expanded .obq-banner .right-section.upgrade-block .head-title b {
+    display: block;
+    margin-bottom: 4px;
+    width: 100%;
 }
 .right-section.upgrade-block .head-title span.pct-used {
-    font: var(--text-h1-bold);
-    color: var(--text-color-error);
+    color: var(--mobile-text-error);
 }
 .almost-overquota .right-section.upgrade-block .head-title span.pct-used {
-    color: var(--text-color-warning);
+    color: var(--mobile-text-warning);
 }
 .right-section.upgrade-block .head-title:hover {
     background-color: transparent;
@@ -669,34 +888,57 @@ button.btn-icon .transfer-progress-icon {
     display: none;
 }
 .right-section.upgrade-block .content-txt {
-    padding-top: 4px;
-    color: var(--text-color-medium);
+    margin: 14px 0;
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-caption-large-regular);
+    line-height: 1.2;
 }
-.right-section.upgrade-block button {
-    margin-top: 16px;
-    display: inline-block;
-    z-index: 14;
+.transfer-root.expanded .right-section.upgrade-block .content-txt {
+    margin: 8px 0 0;
+    min-width: 484px;
+}
+.right-section.upgrade-block .content-txt span {
+    font: var(--mobile-font-caption-large-bold);
+}
+.right-section.upgrade-block .content-txt span.storage-used {
+    color: var(--mobile-text-error);
+}
+.transfer-root .odq-banner .right-section.upgrade-block button.nav-elem.up-action .primary-text {
+    font: var(--mobile-font-caption-large-semibold);
+}
+.transfer-root .obq-banner .right-section.upgrade-block button.nav-elem.up-action {
+    padding: 0;
+    height: 24px;
+    right: 0;
+}
+.transfer-root .obq-banner .right-section.upgrade-block button.nav-elem.up-action .primary-text {
+    font: var(--mobile-font-caption-large-semibold);
+    color: var(--mobile-link-primary);
+    text-decoration: underline;
 }
 .quota-info-pct-circle ul,
 .quota-info-pct-circle li,
 .quota-info-pct-circle p,
 .quota-info-pct-circle span {
-    height: 64px;
-    width: 64px;
+    height: 48px;
+    width: 48px;
     padding: 0;
     margin: 0;
     list-style-type: none;
 }
 .quota-info-pct-circle .overlay {
-    width: 54px;
-    height: 54px;
-    background-color: var(--stroke-main);
+    width: 40px;
+    height: 40px;
+    background: var(--mobile-notification-error);
     position: absolute;
     display: block;
-    left: 5px;
-    top: 5px;
+    left: 4px;
+    top: 4px;
     border-radius: 100%;
     z-index: 10;
+}
+.almost-overquota .quota-info-pct-circle .overlay {
+    background: var(--mobile-notification-warning);
 }
 .pro .quota-info-pct-circle li:not(.no-red-dot),
 .blog-new-full .quota-info-pct-circle ul li,
@@ -711,20 +953,23 @@ button.btn-icon .transfer-progress-icon {
     background: none;
 }
 .quota-info-pct-circle ul .right-c {
-    clip: rect(0, 64px, 64px, 32px);
+    clip: rect(0, 48px, 48px, 24px);
 }
 .quota-info-pct-circle ul .left-c {
-    clip: rect(0, 32px, 64px, 0);
+    clip: rect(0, 24px, 48px, 0);
 }
-.quota-info-pct-circle ul .left-c p {
-    transform: rotate(-180deg);
+.quota-info-pct-circle ul .right-c.low-percent-clip {
+    clip: rect(0, 24px, 48px, 0);
 }
-.quota-info-pct-circle ul .right-c p {
-    transform: rotate(-30deg);
+.quota-info-pct-circle ul .left-c.low-percent-clip {
+    clip: rect(0, 48px, 48px, 24px);
+}
+.quota-info-pct-circle ul .nw-fm-chart0 p {
+    transform: rotate(180deg);
 }
 .quota-info-pct-circle ul li span {
-    width: 32px;
-    height: 64px;
+    width: 24px;
+    height: 48px;
     display: block;
 }
 .quota-info-pct-circle ul li.right-c span {
@@ -734,35 +979,11 @@ button.btn-icon .transfer-progress-icon {
 .quota-info-pct-circle ul li.left-c span {
     border-top-right-radius: 32px;
     border-bottom-right-radius: 32px;
-    margin-left: 32px;
+    margin-left: 24px;
 }
-.float-widget.transfer-progress .banner.almost-overquota .quota-info-pct-circle ul span {
-    background-color: var(--secondary-orange);
+.transfer-root .banner.almost-overquota .quota-info-pct-circle ul span {
+    background-color: var(--mobile-support-warning);
 }
-.float-widget.transfer-progress .banner.overquota .quota-info-pct-circle ul span {
-    background-color: var(--secondary-red);
-}
-.float-widget.transfer-progress .transfer-task-row hr {
-    display: none;
-}
-.float-widget.transfer-progress .transfer-task-row.complete hr {
-    position: absolute;
-    background: var(--surface-grey-2);
-    width: 488px;
-    height: 1px;
-    right: 24px;
-    display: block;
-    border: none;
-    bottom: -8px;
-}
-
-/*
- For the temporary usage, please remove it later.
- */
-.float-widget.transfer-progress .btn-icon {
-    background: none;
-    padding: 0;
-    border: none;
-    outline: none;
-    cursor: pointer;
+.transfer-root .banner.overquota .quota-info-pct-circle ul span {
+    background-color: var(--mobile-support-error);
 }

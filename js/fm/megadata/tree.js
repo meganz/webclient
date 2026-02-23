@@ -1049,9 +1049,6 @@ MegaData.prototype.onTreeUIOpen = function(id, event, ignoreScroll) {
     else if (this.RubbishID && id_r === this.RubbishID) {
         this.onSectionUIOpen('rubbish-bin');
     }
-    else if (id_s === 'transfers') {
-        this.onSectionUIOpen('transfers');
-    }
     else if (id_s === 'recents') {
         this.onSectionUIOpen('recents');
     }

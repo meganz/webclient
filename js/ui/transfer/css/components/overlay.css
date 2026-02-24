@@ -65,41 +65,41 @@
 @keyframes clockwiseSizeChanger {
     0% {
         clip-path: polygon(50% 50%, 0 0, 0 0, 0 0, 0 0, 0 0);
-        border-color: rgba(24, 117, 255, 1);
+        opacity: 1;
         transform: rotate(45deg);
     }
     12.5% {
         clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 0, 100% 0, 100% 0);
-        border-color: rgba(24, 117, 255, 0.85);
+        opacity: 0.85;
     }
     25% {
         clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 100%, 100% 100%, 100% 100%);
-        border-color: rgba(24, 117, 255, 0.7);
+        opacity: 0.7;
     }
     37.5% {
         clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 100%, 0 100%, 0 100%);
-        border-color: rgba(24, 117, 255, 0.65);
+        opacity: 0.65;
     }
     50% {
         clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 100%, 0 100%, 0 0);
-        border-color: rgba(24, 117, 255, 0.5);
+        opacity: 0.5;
         transform: rotate(405deg);
     }
     62.5% {
         clip-path: polygon(50% 50%, 100% 0, 100% 0, 100% 100%, 0 100%, 0 0);
-        border-color: rgba(24, 117, 255, 0.65);
+        opacity: 0.65;
     }
     75% {
         clip-path: polygon(50% 50%, 100% 100%, 100% 100%, 100% 100%, 0 100%, 0 0);
-        border-color: rgba(24, 117, 255, 0.7);
+        opacity: 0.7;
     }
     87.5% {
         clip-path: polygon(50% 50%, 0 100%, 0 100%, 0 100%, 0 100%, 0 0);
-        border-color: rgba(24, 117, 255, 0.85);
+        opacity: 0.85;
     }
     100% {
         clip-path: polygon(50% 50%, 0 0, 0 0, 0 0, 0 0, 0 0);
-        border-color: rgba(24, 117, 255, 1);
+        opacity: 1;
         transform: rotate(770deg);
     }
 }

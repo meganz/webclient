@@ -393,13 +393,12 @@ async function componentDownload(id, target, langKeys) {
                 );
             }
             else {
-                promises.push(
-                    Promise.resolve(() => {
-                        target[langCode] = {...target.en};
-                    })
-                );
+                target[langCode] = {...target.en};
             }
         }
+    }
+    if (!promises.length) {
+        return;
     }
     return Promise.allSettled(promises);
 }

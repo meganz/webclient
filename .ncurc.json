@@ -3,6 +3,12 @@
     "cache": true,
     "format": "ownerChanged, time",
     "reject": [
+        "eslint",
+        "eslint-plugin-compat",
+        "eslint-plugin-unicorn",
+        "eslint-plugin-sonarjs",
+        "eslint-plugin-no-unsanitized",
+        "stylelint-config-standard",
         "chai",
         "sinon"
     ]

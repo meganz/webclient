@@ -568,6 +568,8 @@
         ];
         mBroadcaster.sendMessage('trk:event', 'breadcrumb', 'click', id);
 
+        closeOverlays();
+
         // super special case (contact)
         if (M.u.hasOwnProperty(id)) {
             loadSubPage("chat/contacts/" + id);

@@ -4325,7 +4325,13 @@ lazy(mega.gallery, 'albums', () => {
                 && scope.albums.store.fav.nodes
                 && scope.albums.store.fav.nodes.some(({ h }) => h === node.h)
             ) {
-                this.onCDNodeRemove(node);
+                removeNodeFromAlbum('fav', node.h);
+                if (slideshowid) {
+                    tmpMv.splice(tmpMv.indexOf(node), 1);
+                }
+                if ($.timelineDialog) {
+                    removeNodeFromTimelineDialog(node.h);
+                }
                 return;
             }
 

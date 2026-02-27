@@ -2634,12 +2634,19 @@ MegaUtils.prototype.agreedToCopyrightWarning = function() {
         return true;
     }
 
-    if (Object.keys((this.su || !1).EXP || {}).length > 0) {
-        // rely on the presence of public-links.
+    const shares = Object.keys((this.su || !1).EXP || {});
+    if (shares.length) {
+        if (shares.length === 1) {
+            const node = M.getNodeByHandle(shares[0]);
+            if (node.s4) {
+                // s4 node does not count
+                return false;
+            }
+        }
+        // rely on the presence of public-links
         mega.config.set('cws', 1);
         return true;
     }
-
     return false;
 };
 

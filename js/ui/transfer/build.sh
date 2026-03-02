@@ -11,6 +11,7 @@ declare -a root_files=(
   "aesasm.js"
   "worklet.js"
   "encrypter.js"
+  "update.css"
   "update.html"
   "pdf.worker.js"
   "mediainfo.mem"

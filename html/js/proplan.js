@@ -390,6 +390,7 @@ pro.proplan = {
         var $savePercs = $('.pricing-page.save-percs:visible', $stepOne);
         var $saveArrow = $('.save-green-arrow:visible', $stepOne);
         var savePercsReposition;
+        let initialising = true;
 
         if ($savePercs.length && $saveArrow.length) {
 
@@ -445,12 +446,26 @@ pro.proplan = {
 
             // Update the plan period text
             $pricePeriod.text('/' + monthOrYearWording);
+
+            if (!initialising && $.dialog) {
+                if ($.dialog === 'upload-overquota') {
+                    eventlog(value === '12' ? 501141 : 501142);
+                }
+                else if ($.dialog === 'download-overquota'
+                    || $.dialog === 'download-pre-warning'
+                ) {
+                    eventlog(value === '12' ? 501147 : 501148);
+                }
+            }
         });
 
         // Set yearly prices by default
         const preSelectedPeriod = (sessionStorage.getItem('pro.period') | 0) || 12;
         pro.proplan.period = preSelectedPeriod;
         $radioButtons.filter(`input[value="${preSelectedPeriod}"]`).trigger('click');
+
+        // Track initialisation as a fake click is made during setup that should not be logged
+        initialising = false;
     },
 
     /**

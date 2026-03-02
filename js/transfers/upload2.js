@@ -126,6 +126,13 @@ var ulmanager = {
                     open(getAppBaseUrl() + '#registerb');
                 }
                 else {
+                    const events = {
+                        4: 501143,
+                        1: 501144,
+                        2: 501145,
+                        3: 501146,
+                    };
+                    eventlog(events[planNum]);
                     sessionStorage.fromOverquotaPeriod = $(this).parent().data('period') || pro.proplan.period;
                     open(getAppBaseUrl() + '#propay_' + planNum);
                 }
@@ -136,6 +143,7 @@ var ulmanager = {
                 .rebind('click.closeOverQuotaDialog', () => {
 
                     ulmanager.ulHideOverStorageQuotaDialog();
+                    eventlog(501140);
                 });
 
             // Load the membership plans

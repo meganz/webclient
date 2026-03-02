@@ -641,11 +641,6 @@
     z-index: 1;
 }
 
-.share-dialog-access-node.pending .access-node-avatar {
-    border: 1px dotted var(--text-color-low);
-    background: linear-gradient(225deg, #9AEAFF 0%, #D2D2D2 0.01%, #F8F8F8 100%);
-    color: transparent;
-}
 .share-dialog-access-node.pending .access-node-username {
     color: var(--text-color-low);
 }

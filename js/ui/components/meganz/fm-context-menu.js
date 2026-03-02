@@ -945,7 +945,7 @@
                         {
                             buttonId: 'managelink-item',
                             text: l[6909],
-                            icon: 'sprite-fm-mono icon-link-thin-outline',
+                            icon: 'sprite-fm-mono icon-link-gear-thin-outline',
                             onClick(ev) {
                                 if (mega.ui.contextMenu.firstAlbum) {
                                     if (M.isInvalidUserStatus()) {
@@ -1619,7 +1619,7 @@
             {
                 buttonId: 'managelink-nosub',
                 text: l[6909],
-                icon: 'sprite-fm-mono icon-link-thin-outline',
+                icon: 'sprite-fm-mono icon-link-gear-thin-outline',
                 onClick() {
                     M.getLinkAction(mega.ui.contextMenu.selectedItems);
                 }

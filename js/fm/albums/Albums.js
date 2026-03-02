@@ -2859,7 +2859,7 @@ lazy(mega.gallery, 'albums', () => {
                     },
                     {
                         text: ph ? l[6909] : mega.icu.format(l.album_share_link, 1),
-                        icon: 'sprite-fm-mono icon-link-thin-outline',
+                        icon: `sprite-fm-mono icon-link${ph ? '-gear' : ''}-thin-outline`,
                         onClick: () => {
                             if (M.isInvalidUserStatus()) {
                                 return;

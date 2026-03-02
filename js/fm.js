@@ -237,6 +237,11 @@ function sharedUInode(nodeHandle, force) {
         selectionManager.updateSelectionNotification();
     }
 
+    // Update Share btn state in media viewer
+    if (slideshow_handle() === nodeHandle) {
+        slideshow_shareBtnUpd(nodeHandle);
+    }
+
     // If no export link is available, remove export link from left and right panels (list and block view)
     if (!bExportLink) {
         UiExportLink.removeExportLinkIcon(nodeHandle);

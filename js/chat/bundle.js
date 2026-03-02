@@ -31489,7 +31489,7 @@ class GenericConversationMessage extends mixin.M {
     const haveLink = self._isNodeHavingALink(h) === true;
     const getManageLinkText = haveLink ? l[6909] : l[5622];
     arr.push(REaCt().createElement(dropdowns.DropdownItem, {
-      icon: "sprite-fm-mono icon-link",
+      icon: `sprite-fm-mono icon-link${haveLink ? '-gear' : ''}`,
       key: "getLinkButton",
       label: getManageLinkText,
       disabled: mega.paywall,

@@ -122,7 +122,7 @@ class MegaMobileContextMenu extends MegaComponentGroup {
 
         if (items['.getlink-item']) {
             // Show the Manage link text if it already has a public link
-            onIdle(() => M.setContextMenuGetLinkText());
+            onIdle(() => this.setGetLinkText());
         }
 
         // download text
@@ -257,6 +257,42 @@ class MegaMobileContextMenu extends MegaComponentGroup {
 
             this.sheet.show();
         });
+    }
+
+    /**
+     * Sets the text in the context menu for the Get link and Remove link items. If there are
+     * more than one nodes selected then the text will be pluralised. If all the selected nodes
+     * have public links already then the text will change to 'Update link/s'.
+     */
+    setGetLinkText() {
+        const selNodes = Object($.selected).length;
+        const getLinkItem = mega.ui.contextMenu.getChild('.getlink-item');
+        let pubLinks = 0;
+        let getLinkText = '';
+        let icon = 'icon-link-thin-outline';
+
+        // Loop through all selected nodes
+        for (var i = 0; i < selNodes; i++) {
+            // If it has a public link, then increment the count
+            if (M.getNodeShare($.selected[i])) {
+                pubLinks++;
+            }
+        }
+
+        // If all the selected nodes have existing public links, set text to 'Manage links' or 'Manage link'
+        if (selNodes === pubLinks) {
+            icon = 'icon-link-gear-thin-outline';
+            getLinkText = selNodes > 1 ? l[17520] : l[6909];
+        }
+        else {
+            // Otherwise change text to 'Share links' or 'Share link' if there are selected nodes without links
+            getLinkText = mega.icu.format(l.share_link, selNodes);
+        }
+
+        // Set the text for the 'Get/Update link/s' and 'Remove link/s' context menu items
+        getLinkItem.text = getLinkText;
+        getLinkItem.icon = `${mega.ui.sprites.mono} ${icon}`;
+        mega.ui.contextMenu.getChild('.removelink-item').text = pubLinks > 1 ? l[8735] : l[6821];
     }
 }
 
@@ -408,7 +444,7 @@ mBroadcaster.once('boot_done', () => {
         },
         '.getlink-item': {
             text: l[5622],
-            icon: 'sprite-mobile-fm-mono icon-link-thin-solid',
+            icon: 'sprite-mobile-fm-mono icon-link-thin-outline',
             subMenu: false,
             classNames: '',
             onClick: function(nodeHandle) {

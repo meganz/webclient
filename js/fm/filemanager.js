@@ -2411,11 +2411,10 @@ FileManager.prototype.initUIKeyEvents = function() {
                 if (!M.dcd[$.selected[0]] && M.getNodeRoot(n.h) === M.RubbishID) {
                     mega.ui.mInfoPanel.show($.selected);
                 }
-                else if (M.onDeviceCenter || M.dcd[$.selected[0]]) {
-                    M.openFolder(mega.devices.ui.getCurrentDirPath($.selected[0]));
-                }
                 else if (n && n.t) {
-                    M.openFolder(n.h);
+                    M.openFolder(M.onDeviceCenter || M.dcd[$.selected[0]]
+                        ? mega.devices.ui.getCurrentDirPath($.selected[0])
+                        : n.h);
                 }
                 else if ($.selected.length < 2 && (is_image2(n) || is_video(n))) {
                     const $elm = mega.gallery.sections[M.currentdirid]

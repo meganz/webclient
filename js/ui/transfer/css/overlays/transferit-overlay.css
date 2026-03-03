@@ -7,6 +7,7 @@
 
 .global-transferit-container {
     background: no-repeat center / cover var(--wall-img1-url) var(--main-surface-primary);
+    color: var(--main-neutral-primary);
     height: 100%;
     overflow: hidden;
     position: fixed;
@@ -23,6 +24,10 @@
 
 .global-transferit-container .global-page-container {
     overflow: auto;
+}
+
+.global-transferit-container h4 {
+    color: var(--main-neutral-primary);
 }
 
 

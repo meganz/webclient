@@ -350,6 +350,7 @@ mBroadcaster.once('boot_done', () => {
                         delete vOverlay.confirmDiscard;
 
                         vOverlay.bottomBar.actions[0].disabled = true;
+                        eventlog(501053);
                     })
                     .catch(tell)
                     .finally(() => {

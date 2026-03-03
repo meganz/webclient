@@ -967,6 +967,8 @@ lazy(T.ui, 'addFilesLayout', () => {
                         T.ui.dashboardLayout.data.refresh = true;
                     }
                     delete T.ui.ulprogress;
+                    this.data.name = name;
+                    this.data.files = [];
 
                     this.finishTransferring().catch(dump);
                 })
@@ -1019,6 +1021,11 @@ lazy(T.ui, 'addFilesLayout', () => {
                 T.ui.copyLinkToClipboard(input.value);
             });
 
+            cn.querySelector('.js-share-qr').addEventListener('click', (e) => {
+                stop(e);
+                T.ui.qrDialog.show({fileName: this.data.name, text: input.value});
+            });
+
             cn.querySelector('.js-new-link').addEventListener('click', () => this.init());
 
             cn.querySelector('.js-show-content').addEventListener('click', () => {
@@ -1050,7 +1057,6 @@ lazy(T.ui, 'addFilesLayout', () => {
 
             // Show section
             this.data.step = 4;
-            this.data.files = [];
             T.ui.page.showSection(cn);
 
             input.focus();

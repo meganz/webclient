@@ -441,6 +441,14 @@ lazy(T.ui, 'dashboardLayout', () => {
                 T.ui.copyLinkToClipboard(this.data.selected.xh);
             });
 
+            cn.querySelector('.js-share-qr').addEventListener('click', () => {
+                const {xh, name} = this.data.selected;
+                T.ui.qrDialog.show({
+                    fileName: name,
+                    text: `${getBaseUrl()}/t/${xh}`
+                });
+            });
+
             cn.querySelector('.js-tr-edit-link-title').addEventListener('click', () => {
                 const {xh, name} = this.data.selected;
                 const opt = {

@@ -332,7 +332,8 @@ lazy(self.T, 'core', () => {
                                             return l[17920];
                                         }
                                         xPwStore[xh] = queryString.pw = pw;
-                                    }
+                                    },
+                                    errorText: opw && l[17920]
                                 });
                                 return pw && self.EEXPIRED || self.EROLLEDBACK;
                             }

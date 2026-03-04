@@ -518,6 +518,15 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
         delete items['.download-item'];
         items['.download-standart-item'] = 1;
     }
+    if (
+        !megasync.hideSyncOption &&
+        fmconfig.dlThroughMEGAsync &&
+        !useMegaSync &&
+        $.selected.length === 1 &&
+        selNode.t
+    ) {
+        items['.syncmegasync-item'] = 1;
+    }
 
     if (M.currentdirid === 'file-requests' && !isTree) {
         delete items['.move-item'];

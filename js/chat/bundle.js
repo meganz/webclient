@@ -8920,7 +8920,7 @@ class ColumnContactButtons extends genericNodePropsComponent.B {
         'data-simpletip': !megaChat.hasSupportForCalls ? l.unsupported_browser_audio : l[5896]
       },
       disabled: !navigator.onLine || !megaChat.hasSupportForCalls,
-      onClick: () => (0,call.dQ)().then(() => megaChat.createAndShowPrivateRoom(handle).then(room => {
+      onClick: () => M.isInvalidUserStatus() || (0,call.dQ)().then(() => megaChat.createAndShowPrivateRoom(handle).then(room => {
         room.setActive();
         room.startAudioCall();
       })).catch(() => d && console.warn('Already in a call.'))
@@ -8940,7 +8940,7 @@ class ColumnContactButtons extends genericNodePropsComponent.B {
       attrs: {
         'data-simpletip': l[6834]
       },
-      onClick: () => megaChat.openChatAndSendFilesDialog(handle)
+      onClick: () => M.isInvalidUserStatus() || megaChat.openChatAndSendFilesDialog(handle)
     }), REaCt().createElement(buttons.$, {
       ref: node => {
         this.props.onContextMenuRef(handle, node);
@@ -37466,7 +37466,7 @@ function _extends() {
 
 	// The module cache
 	const __webpack_module_cache__ =Object.create(null);
-	
+
 	// The require function
 	function REQ_(moduleId) {
 		// Check if module is in cache
@@ -37480,16 +37480,16 @@ function _extends() {
 			// no module.loaded needed
 			exports:Object.create(null)
 		};
-	
+
 		// Execute the module function
 		__webpack_modules__[moduleId](module, module.exports, REQ_);
-	
+
 		// Return the exports of the module
 		return module.exports;
 	}
-	
 
-	
+
+
 	(() => {
 		// getDefaultExport function for compatibility with non-harmony modules
 		REQ_.n = (module) => {
@@ -37500,8 +37500,8 @@ function _extends() {
 			return getter;
 		};
 	})();
-	
-	
+
+
 	(() => {
 		// define getter functions for harmony exports
 		REQ_.d = (exports, definition) => {
@@ -37512,13 +37512,13 @@ function _extends() {
 			}
 		};
 	})();
-	
-	
+
+
 	(() => {
 		REQ_.o = (obj, prop) => Object.prototype.hasOwnProperty.call(obj, prop)
 	})();
-	
-	
+
+
 	(() => {
 		// define __esModule on exports
 		REQ_.r = (exports) => {
@@ -37528,14 +37528,14 @@ function _extends() {
 			Object.defineProperty(exports, '__esModule', { value: true });
 		};
 	})();
-	
 
-	
+
+
 	// startup
 	// Load entry module and return exports
 	REQ_(326);
 	// This entry module is referenced by other modules so it can't be inlined
 	const EXP_ = REQ_(732);
-	
+
 })()
 ;

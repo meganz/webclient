@@ -10,6 +10,7 @@ declare -a root_files=(
   "cmaps"
   "aesasm.js"
   "worklet.js"
+  "nodedec.js"
   "encrypter.js"
   "update.css"
   "update.html"
@@ -64,7 +65,7 @@ if [[ -n $(git status -s) ]]; then
   [[ -z $(git status -s) ]] || fatal "You have unstaged changes, commit or stash them."
 fi
 
-./scripts/transifex.py --production
+./scripts/lang.sh -p -v
 
 ./node_modules/.bin/grunt --debug it | sed 's!^Done.!Please wait...!'
 

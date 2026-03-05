@@ -16,22 +16,31 @@ lazy(T.ui, 'viewFilesLayout', () => {
         }
     });
 
-    const thumbnailer = tryCatch((list) => {
+    const thumbnailer = tryCatch((list, max = 7) => {
+        let cnt = 0;
+        let req = 0;
         const thumbs = Object.create(null);
 
-        for (let i = list.length; i--;) {
+        for (let i = 0; i < list.length; i++) {
             const n = list[i];
             if (n.fa) {
                 if (thumbnails.has(n.fa)) {
                     thumb(n, thumbnails.get(n.fa));
                 }
-                else if (thumbnails.queued(n, 0)) {
+                else if (thumbnails.queued(n, 1)) {
+                    req = 1;
                     thumbs[n.fa] = n;
+                }
+                if (++cnt > max) {
+                    break;
                 }
             }
         }
 
-        if ($.len(thumbs)) {
+        if (req) {
+            if (self.d) {
+                console.warn(`Requesting ${$.len(thumbs)} preview images...`);
+            }
             return api_getfileattr(thumbs, 1, (_, fa, data) => {
                 if (data.byteLength) {
                     const uri = mObjectURL([data.buffer], 'image/jpeg');
@@ -41,8 +50,34 @@ lazy(T.ui, 'viewFilesLayout', () => {
         }
     });
 
+    lazy(thumbnailer, 'observer', () => {
+        const dsp = (lst) => {
+            const rdy = [];
+            for (let i = 0; i < lst.length; ++i) {
+                if (lst[i].isIntersecting) {
+                    const e = lst[i];
+                    const n = M.d[e.target.id];
+
+                    if (n && n.fa) {
+                        rdy.push(n);
+                    }
+                    thumbnailer.observer.unobserve(e.target);
+                }
+            }
+            if (rdy.length) {
+                thumbnailer(rdy, rdy.length);
+            }
+        };
+        return new IntersectionObserver(dsp, {
+            threshold: 0.1,
+            root: document.querySelector('.js-fm-section .desktop-scroll-area.bottom')
+        });
+    });
+
     return freeze({
         data: {
+            tick: 0,
+            state: 0,
             type: 'list',
             sort: {
                 dir: 1,
@@ -63,6 +98,8 @@ lazy(T.ui, 'viewFilesLayout', () => {
         }),
 
         async init(xh, folder) {
+            await scheduler.yield();
+
             const first = !this.readyToDownload.cn;
             if (first) {
                 await this.renderReadyToDownload(xh);
@@ -71,6 +108,10 @@ lazy(T.ui, 'viewFilesLayout', () => {
                 if (!this.data.preload) {
                     return;
                 }
+            }
+            else if (this.data.state > 0) {
+                console.warn('ongoing initialization, moving on...');
+                return;
             }
             if (!M.RootID) {
                 if (!first) {
@@ -108,7 +149,6 @@ lazy(T.ui, 'viewFilesLayout', () => {
             else if (!first) {
                 this.renderReadyToDownload(xh);
             }
-            thumbnailer(M.v);
         },
 
         isMediaFile(n) {
@@ -135,24 +175,27 @@ lazy(T.ui, 'viewFilesLayout', () => {
             const cn = this.readyToDownload.cn = T.ui.page.content.querySelector(
                 '.it-box-holder.js-ready-to-dl-section'
             );
+
             loadingDialog.show();
             this.data.xi = await T.core.getTransferInfo(xh)
                 .finally(() => loadingDialog.hide());
 
-            // Init view content button
-            cn.querySelector('.js-view-content').addEventListener('click', () => {
-                if (!cn.classList.contains('view-content-clicked')) {
-                    cn.classList.add('view-content-clicked');
+            const viewCnBtn = cn.querySelector('.js-view-content');
+            // Enable button if user opened another page and got back to Ready to Dl
+            // viewCnBtn.classList.remove('loading');
 
-                    this.preload(xh)
-                        .then(() => this.initViewContent(xh))
-                        .then(() => this.init(xh))
-                        .catch((ex) => {
-                            this.data.preload = null;
-                            return Number(ex) !== self.EROLLEDBACK && tell(ex);
-                        })
-                        .finally(() => cn.classList.remove('view-content-clicked'));
-                }
+            // Init view content button
+            viewCnBtn.addEventListener('click', () => {
+                viewCnBtn.classList.add('loading');
+
+                this.preload(xh)
+                    .then(() => this.initViewContent(xh))
+                    .then(() => this.init(xh))
+                    .catch((ex) => {
+                        this.data.preload = null;
+                        return Number(ex) !== self.EROLLEDBACK && tell(ex);
+                    })
+                    .finally(() => viewCnBtn.classList.remove('loading'));
             });
 
             // Init download all button
@@ -329,15 +372,26 @@ lazy(T.ui, 'viewFilesLayout', () => {
 
             for (var i = 0; i < viewBtns.length; i++) {
                 viewBtns[i].addEventListener('click', (e) => {
-                    if (e.currentTarget.classList.contains('active')) {
-                        return false;
+                    stop(e);
+                    if (!e.currentTarget.classList.contains('active')) {
+                        const elm = e.currentTarget;
+
+                        if (M.v.length > 1e4) {
+                            loadingDialog.show();
+                        }
+
+                        requestAnimationFrame(() => {
+                            this.updateViewModeBtns(elm);
+
+                            this.data.type = elm.dataset.type || 'list';
+                            this.data.customView = true;
+                            this.renderContent();
+
+                            if (M.v.length > 1e4) {
+                                loadingDialog.hide();
+                            }
+                        });
                     }
-
-                    this.updateViewModeBtns(e.currentTarget);
-
-                    this.data.type = e.currentTarget.dataset.type || 'list';
-                    this.data.customView = true;
-                    this.renderContent();
                 });
             }
         },
@@ -434,26 +488,26 @@ lazy(T.ui, 'viewFilesLayout', () => {
             // Sort M.v
             T.ui.sort.doSort(M.v, mode, dir);
 
-            // Render list or grid view
-            if (this.data.type === 'list') {
-                this.renderListView(cn);
-            }
-            else {
-                this.renderGridView(cn);
-            }
+            this.data.state++;
+            requestAnimationFrame(() => {
+                this.data.tick++;
+
+                // Render list or grid view
+                const p = this.data.type === 'list' ? this.renderListView(cn) : this.renderGridView(cn);
+
+                p.catch(dump).finally(() => --this.data.state);
+            });
 
             // Update sorting UI
             this.updateSortingUI();
         },
 
-        renderListView(cn) {
+        async renderListView(cn) {
             cn = ce('div', cn, { class: 'it-grid list-type alternating-bg' });
 
             this.renderListiHeader(cn);
 
-            for (let i = 0; i < M.v.length; i++) {
-                this.renderListitem(M.v[i], cn);
-            }
+            await this.renderItems('renderListitem', M.v, cn);
 
             this.initSortBtns(cn);
         },
@@ -479,6 +533,34 @@ lazy(T.ui, 'viewFilesLayout', () => {
             ce('i', wrap, { class: 'sprite-it-x16-mono icon-chevron-up' });
 
             ce('div', item, { class: 'col' });
+        },
+
+        async renderItems(fn, list, cn) {
+            if (self.d) {
+                console.group(`${fn}(${list.length})`, cn);
+                console.time(fn);
+            }
+            const {tick} = this.data;
+
+            thumbnailer(list);
+
+            for (let i = 0; i < list.length;) {
+                this[fn](list[i], cn);
+
+                if (!(++i % 32)) {
+                    await api.yield(0);
+
+                    if (tick !== this.data.tick) {
+                        console.warn('suppression', this.data.state, this.data.tick, tick);
+                        break;
+                    }
+                }
+            }
+
+            if (self.d) {
+                console.timeEnd(fn);
+                console.groupEnd();
+            }
         },
 
         renderListitem(n, cn) {
@@ -594,7 +676,7 @@ lazy(T.ui, 'viewFilesLayout', () => {
             }
         },
 
-        renderGridView(cn) {
+        async renderGridView(cn) {
             const { mode } = this.data.sort;
             const groups = [
                 { name: l.transferit_folders_type, type: 'folder' }
@@ -653,12 +735,8 @@ lazy(T.ui, 'viewFilesLayout', () => {
                 wrap = ce('div', wrap, { class: 'items-group-body' });
 
                 // Render items in the group
-                for (let j = 0; j < g.n.length; j++) {
-                    this.renderGirditem(g.n[j], wrap);
-                }
+                await this.renderItems('renderGirditem', g.n, wrap);
             }
-
-            thumbnailer(M.v);
         },
 
         renderGirditem(n, cn) {
@@ -668,9 +746,6 @@ lazy(T.ui, 'viewFilesLayout', () => {
                 tabindex: 0
             });
             const { sort: { mode: sortmode } } = this.data;
-            const mType = is_video(n);
-            const prop = mType && MediaAttribute(n, n.k);
-            const playtime = prop && prop.data && prop.data.playtime;
             let dn = null;
 
             // Add "thumb" class to show thumbnail
@@ -683,14 +758,14 @@ lazy(T.ui, 'viewFilesLayout', () => {
             ce('img', wrap, { src: '' });
 
             // If Previewable video, show play icon
-            if (mType === 1) {
+            if (n.width) {
                 dn = ce('div', wrap, { class: 'play-icon' });
                 ce('i', dn, { class: 'sprite-fm-mono icon-play-small-regular-solid' });
             }
 
             // Show paytime tag in thumbnail node,
             // If Video file or Audio file when sorting by type
-            if (playtime && (sortmode !== 'type' || mType === 1)) {
+            if (n.playtime && (sortmode !== 'type' || n.width)) {
 
                 // If Video, audio, animated images, show tag
                 dn = ce('div', wrap, { class: 'tag' });
@@ -699,11 +774,11 @@ lazy(T.ui, 'viewFilesLayout', () => {
                 // "icon-play" for audio,
                 // "icon-animation" for animated images
                 ce('i', dn, {
-                    class: `sprite-it-x16-mono ${mType === 2 ? 'icon-play' : 'icon-video'}`
+                    class: `sprite-it-x16-mono ${n.width ? 'icon-video' : 'icon-play'}`
                 });
 
                 // Set audio/video duration or anumated image ext, i.e. GIF
-                ce('span', dn, { class: 'num' }).textContent = secondsToTimeShort(playtime);
+                ce('span', dn, {class: 'num'}).textContent = secondsToTimeShort(n.playtime);
             }
 
             // Wrappers
@@ -724,10 +799,10 @@ lazy(T.ui, 'viewFilesLayout', () => {
             ce('div', info, {class: 'size'}).textContent = bytesToSize(n.s || n.tb || 0);
 
             // Show audio playtime tag in file info when sorting by type
-            if (playtime && mType === 2 && sortmode === 'type') {
+            if (n.playtime && !n.width && sortmode === 'type') {
                 ce('div', dn, {
                     class: 'item-tag'
-                }).textContent = secondsToTimeShort(playtime);
+                }).textContent = secondsToTimeShort(n.playtime);
             }
 
             // Download button
@@ -740,6 +815,9 @@ lazy(T.ui, 'viewFilesLayout', () => {
 
             // Bind evts
             this.bindItemEvts(n, item);
+            if (n.fa) {
+                thumbnailer.observer.observe(item);
+            }
         }
     });
 });

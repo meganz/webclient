@@ -438,8 +438,9 @@ lazy(pro, 'proplan2', () => {
 
             $freeBanner.toggleClass(
                 'hidden',
-                !!tab || (typeof u_handle !== 'undefined' && !localStorage.keycomplete)
+                !!tab || (typeof u_handle !== 'undefined' && (!localStorage.keycomplete || !window.accountConfirmed))
             );
+            window.accountConfirmed = false;
 
             if (tab === 1) {
                 setFooterBannerTxt(l.pr_business_started, l.pr_easily_add, l[24549]);

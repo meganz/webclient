@@ -1749,10 +1749,9 @@ Chat.prototype.unregisterUploadListeners = function (destroy) {
   delete self._uplError;
 };
 Chat.prototype.registerUploadListeners = function () {
-  'use strict';
-
   const self = this;
   const logger = d && MegaLogger.getLogger('chatUploadListener', false, self.logger);
+  const ufo = Object.create(null);
   self.unregisterUploadListeners(true);
   const forEachChat = function (chats, callback) {
     let result = 0;
@@ -1778,6 +1777,9 @@ Chat.prototype.registerUploadListeners = function () {
   const unregisterListeners = function () {
     if (!$.len(ulmanager.ulEventData)) {
       self.unregisterUploadListeners();
+      if (d) {
+        logger.warn('Revoked upload listeners.');
+      }
     }
   };
   const onUploadComplete = function (ul) {
@@ -1790,6 +1792,8 @@ Chat.prototype.registerUploadListeners = function () {
       });
       delete ulmanager.ulEventData[ul.uid];
       unregisterListeners();
+    } else if (d) {
+      logger.warn('could not complete upload...', ul);
     }
   };
   const onUploadCompletion = function (uid, handle, faid, chat) {
@@ -1815,11 +1819,17 @@ Chat.prototype.registerUploadListeners = function () {
           logger.error('Invalid state, efa set on deduplication?', ul.efa, ul);
         }
         ul.efa = 0;
+      } else if (ufo[faid]) {
+        if (d) {
+          logger.info(`Recovering fa:error state for ${faid}`, ufo[faid], ul.efa);
+        }
+        ul.efa = Math.max(0, ul.efa - ufo[faid]) | 0;
       }
       if (ul.efa && (!n.fa || String(n.fa).split('/').length < ul.efa)) {
+        console.assert(!ul.faid || ul.faid === faid, `${faid} != ${ul.faid}`);
         ul.faid = faid;
         if (d) {
-          logger.info('Waiting for file attribute to arrive.', handle, ul);
+          logger.info('Waiting for file attribute to arrive.', handle, ul.efa, n.fa, n.name, ul, [n]);
         }
       } else {
         onUploadComplete(ul);
@@ -1834,6 +1844,8 @@ Chat.prototype.registerUploadListeners = function () {
     if (ul) {
       delete ulmanager.ulEventData[uid];
       unregisterListeners();
+    } else if (d) {
+      logger.warn(`No upload association for #${uid}`, error);
     }
   };
   const onAttributeReady = function (handle, fa) {
@@ -1841,12 +1853,12 @@ Chat.prototype.registerUploadListeners = function () {
       const uid = lookupPendingUpload(handle);
       const ul = ulmanager.ulEventData[uid] || false;
       if (d) {
-        logger.debug('fa:ready', handle, fa, uid, ul);
+        logger.debug('fa:ready', handle, fa, ul.efa, uid, ul);
       }
       if (ul.h && String(fa).split('/').length >= ul.efa) {
         onUploadComplete(ul);
       } else if (d) {
-        logger.debug('Not enough file attributes yet, holding...', ul);
+        logger.debug('Not enough file attributes yet, holding...', handle, fa, ul.efa, ul);
       }
     });
   };
@@ -1864,6 +1876,11 @@ Chat.prototype.registerUploadListeners = function () {
           onUploadComplete(ul);
         }
       }
+    } else {
+      if (d) {
+        logger.warn(`No upload association for ${faid} (yet?)`, nFAiled, error);
+      }
+      ufo[faid] = (ufo[faid] | 0) + nFAiled;
     }
   };
   const registerLocalListeners = function () {
@@ -31489,7 +31506,7 @@ class GenericConversationMessage extends mixin.M {
     const haveLink = self._isNodeHavingALink(h) === true;
     const getManageLinkText = haveLink ? l[6909] : l[5622];
     arr.push(REaCt().createElement(dropdowns.DropdownItem, {
-      icon: "sprite-fm-mono icon-link",
+      icon: `sprite-fm-mono icon-link${haveLink ? '-gear' : ''}`,
       key: "getLinkButton",
       label: getManageLinkText,
       disabled: mega.paywall,

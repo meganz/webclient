@@ -826,8 +826,7 @@ body:not(.mobile) .current .pricing-page.plan-button:hover {
     overflow-x: auto;
 }
 .pricing-page.plans-row > * {
-    flex: 1 1 180px;
-    min-width: 180px;
+    flex: 1 0 220px;
 }
 .plans-row .pricing-page.plan {
     border-width: 0 0 0 1px;

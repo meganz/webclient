@@ -2,7 +2,11 @@
 lazy(T.ui, 'dialog', () => {
     'use strict';
 
-    const content = mCreateElement('div', {class: 'global-dialog-container'}, 'body');
+    const content = mCreateElement(
+        'div',
+        {class: 'global-dialog-container'},
+        document.querySelector('body > .global-transferit-container') || 'body'
+    );
     T.ui.appendTemplate('js_ui_transfer_dialogs', content);
     const inert = tryCatch((selector, value = true) => {
         const pcn = document.querySelector(selector);

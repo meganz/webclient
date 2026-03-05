@@ -2,7 +2,7 @@ self.fmdb = false;
 self.locale = self.lang || 'en';
 lazy(self, 'thumbnails', () => {
     'use strict';
-    return new ThumbManager(384);
+    return new ThumbManager(4096);
 });
 lazy(self, 'is_touchable', () => {
     'use strict';
@@ -104,6 +104,7 @@ mBroadcaster.once('boot_done', () => {
         u: Object.create(null),
         xh: Object.create(null),
         dcd: false,
+        megaRender: false,
         tree: Object.create(null)
     });
     const wrap = freeze({

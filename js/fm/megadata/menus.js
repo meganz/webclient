@@ -518,6 +518,15 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
         delete items['.download-item'];
         items['.download-standart-item'] = 1;
     }
+    if (
+        !megasync.hideSyncOption &&
+        fmconfig.dlThroughMEGAsync &&
+        !useMegaSync &&
+        $.selected.length === 1 &&
+        selNode.t
+    ) {
+        items['.syncmegasync-item'] = 1;
+    }
 
     if (M.currentdirid === 'file-requests' && !isTree) {
         delete items['.move-item'];
@@ -1120,67 +1129,6 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items, forcedSe
     }
 
     e.preventDefault();
-};
-
-/**
- * Sets the text in the context menu for the Get link and Remove link items. If there are
- * more than one nodes selected then the text will be pluralised. If all the selected nodes
- * have public links already then the text will change to 'Update link/s'.
- */
-MegaData.prototype.setContextMenuGetLinkText = function() {
-    "use strict";
-
-    var numOfExistingPublicLinks = 0;
-    var numOfSelectedNodes = Object($.selected).length;
-    var getLinkText = '';
-
-    // Loop through all selected nodes
-    for (var i = 0; i < numOfSelectedNodes; i++) {
-
-        // Get the node handle of the current node
-        var nodeHandle = $.selected[i];
-
-        // If it has a public link, then increment the count
-        if (M.getNodeShare(nodeHandle)) {
-            numOfExistingPublicLinks++;
-        }
-    }
-
-    // Toggle manage link class for a/b testing purposes
-    const cdGetLinkToggle = (func) => {
-        const el = document.querySelector('.dropdown.body .cd-getlink-item');
-
-        if (el && !is_mobile) {
-            el.classList[func]('manage-link');
-        }
-    };
-
-    // If all the selected nodes have existing public links, set text to 'Manage links' or 'Manage link'
-    if (numOfSelectedNodes === numOfExistingPublicLinks) {
-        getLinkText = numOfSelectedNodes > 1 ? l[17520] : l[6909];
-        cdGetLinkToggle('add');
-    }
-    else {
-        // Otherwise change text to 'Share links' or 'Share link' if there are selected nodes without links
-        getLinkText = mega.icu.format(l.share_link, numOfSelectedNodes);
-        cdGetLinkToggle('remove');
-    }
-
-    // If there are multiple nodes with existing links selected, set text to 'Remove links', otherwise 'Remove link'
-    const removeLinkText = numOfExistingPublicLinks > 1 ? l[8735] : l[6821];
-
-    // Set the text for the 'Get/Update link/s' and 'Remove link/s' context menu items
-    if (is_mobile) {
-
-        mega.ui.contextMenu.getChild('.getlink-item').text = getLinkText;
-        mega.ui.contextMenu.getChild('.removelink-item').text = removeLinkText;
-    }
-    else {
-        document.querySelector('.dropdown.body .getlink-item span').textContent = getLinkText;
-        document.querySelector('.dropdown.body .removelink-item span').textContent = removeLinkText;
-        document.querySelector('.dropdown.body .cd-getlink-item span').textContent = getLinkText;
-        document.querySelector('.dropdown.body .cd-removelink-item span').textContent = removeLinkText;
-    }
 };
 
 /**

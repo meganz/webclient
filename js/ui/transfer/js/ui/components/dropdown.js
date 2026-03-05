@@ -11,6 +11,7 @@ lazy(T.ui, 'dropdown', () => {
             const options = dropdown.querySelectorAll('.js-option');
             const radios = dropdown.querySelectorAll('input[type="radio"]');
             const btn = select.querySelector('.js-select-button');
+            const closeBtn = dropdown.querySelector('.js-close');
 
             if (typeof opts === 'function') {
                 opts = {ucb: opts};
@@ -18,7 +19,9 @@ lazy(T.ui, 'dropdown', () => {
 
             // Hide opened dropdown
             const hideDropdown = (e) => {
-                if (!btn.contains(e.target)) {
+                if (!btn.contains(e.target)
+                    && !(opts.preventClose && dropdown.contains(e.target)
+                    && !(closeBtn && closeBtn.contains(e.target)))) {
                     dropdown.classList.remove('visible');
                     window.removeEventListener('click', hideDropdown);
                 }
@@ -35,12 +38,14 @@ lazy(T.ui, 'dropdown', () => {
                     const at = opts.position;
                     const my = at.includes('top') ? at.replace('top', 'bottom') : at.replace('bottom', 'top');
                     dropdown.classList.add('fixed');
-                    $(dropdown).position({
-                        of: btn,
-                        my,
-                        at,
-                        collision: 'flipfit',
-                        within: document.body
+                    requestAnimationFrame(() => {
+                        $(dropdown).position({
+                            of: btn,
+                            my,
+                            at,
+                            collision: 'flipfit',
+                            within: document.body
+                        });
                     });
                 }
 
@@ -49,6 +54,14 @@ lazy(T.ui, 'dropdown', () => {
 
             // Init select button click
             btn.addEventListener('click', showDropdown);
+
+            // Init close button click
+            if (closeBtn) {
+                closeBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    hideDropdown(e);
+                });
+            }
 
             // Init it-radio component and change event
             if (radios.length) {

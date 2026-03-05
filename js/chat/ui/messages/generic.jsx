@@ -161,7 +161,7 @@ export default class GenericConversationMessage extends ConversationMessageMixin
 
         arr.push(
             <DropdownItem
-                icon="sprite-fm-mono icon-link"
+                icon={`sprite-fm-mono icon-link${haveLink ? '-gear' : ''}`}
                 key="getLinkButton"
                 label={getManageLinkText}
                 disabled={mega.paywall}

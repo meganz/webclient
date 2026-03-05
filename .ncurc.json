@@ -1,8 +1,16 @@
 {
     "peer": true,
     "cache": true,
-    "format": "ownerChanged, time",
+    "cooldown": "3d",
+    "format": "ownerChanged,time,diff",
     "reject": [
+        "eslint",
+        "eslint-plugin-compat",
+        "eslint-plugin-unicorn",
+        "eslint-plugin-sonarjs",
+        "eslint-plugin-no-unsanitized",
+        "stylelint",
+        "stylelint-config-standard",
         "chai",
         "sinon"
     ]

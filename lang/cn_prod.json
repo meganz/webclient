@@ -5724,6 +5724,7 @@
     "transferit_sent_to_x": "{count, plural, other {\u5df2\u53d1\u9001\u7ed9#\u4e2a\u63a5\u6536\u4eba}}",
     "transferit_sent_x": "\u53d1\u9001\u4e8e%1",
     "transferit_share_ideas": "\u5206\u4eab\u60a8\u7684\u610f\u89c1",
+    "transferit_share_qr": "\u5206\u4eab\u4e8c\u7ef4\u7801",
     "transferit_share_uploaded_error": "\u60a8\u53ea\u80fd\u5171\u4eab\u60a8\u4e0a\u4f20\u5230MEGA\u7684\u6587\u4ef6",
     "transferit_simple_share_hdr": "\u6109\u5feb\u7684\u6587\u4ef6\u5171\u4eab\uff0c\u7b80\u5355\u800c\u5f3a\u5927",
     "transferit_size_low": "\u5927\u5c0f",

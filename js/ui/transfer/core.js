@@ -190,10 +190,68 @@ lazy(self.T, 'core', () => {
     };
     freeze(cast);
 
+    const TWorker = class {
+        constructor(url) {
+            const wk = new Worker(url);
+
+            wk.onerror = (ex) => {
+                console.error('Worker(s) sub-system error...', ex);
+                this.kill(ex);
+            };
+            wk.onmessage = (ev) => {
+                const {data} = ev;
+
+                if (data && this.ongoing.has(data.ttoken)) {
+                    const {resolve} = this.ongoing.get(data.ttoken);
+
+                    resolve(data);
+                    this.ongoing.delete(data.ttoken);
+
+                    if (self.d) {
+                        console.info(`wrk took ${~~(performance.now() - data.ts)}ms for ${data.length} nodes.`);
+                    }
+                }
+                else {
+                    console.log('Unknown message received...', ev);
+                }
+            };
+
+            Object.defineProperty(this, 'wk', {value: wk});
+            Object.defineProperty(this, 'ongoing', {value: new Map()});
+        }
+
+        kill(ex) {
+            for (const [, {reject}] of this.ongoing) {
+                reject(ex);
+            }
+            this.wk.onerror = null;
+            this.wk.onmessage = null;
+            tryCatch(() => this.wk.terminate())();
+        }
+
+        send(bulk) {
+            assert(bulk.length);
+            assert(this.wk.onmessage);
+
+            const token = makeUUID();
+            const resolver = Promise.withResolvers();
+
+            bulk.ttoken = token;
+            bulk.bulkpm = token;
+            bulk.ts = performance.now();
+
+            this.wk.postMessage(bulk);
+            this.ongoing.set(token, resolver);
+
+            return resolver.promise;
+        }
+    };
+
     return freeze({
         get apipath() {
             return 'https://bt7.api.mega.co.nz/';
         },
+        wkpool: [],
 
         /**
          * create transfer.
@@ -281,20 +339,55 @@ lazy(self.T, 'core', () => {
                 payload.xnc = 1;
                 xPwStore[xh] = xnc[1];
             }
-            const {f} = await this.xreq(payload, xh);
+            let {f} = await this.xreq(payload, xh);
 
             if (!xnc) {
                 this.setExpiryValue(xh, [1, xPwStore[xh]]).catch(dump);
             }
-            this.populate(f, xh);
+            f = await this.populate(f, xh).catch(dump) || f;
             return freeze(f);
         },
 
-        populate(f, xh) {
+        async populate(f, xh) {
+            if (f.length > 1e3) {
+                const res = await this.decrypt(f).catch(dump);
+                if (res && res.length === f.length) {
+                    f = res;
+                }
+                else if (self.d) {
+                    console.error('decryptor failed...', res, f);
+                }
+            }
             for (let i = f.length; i--;) {
                 f[f[i].h] = f[i] = new TransferNode(f[i], xh);
             }
             process_f(f);
+
+            return f;
+        },
+
+        async decrypt(f) {
+            if (!this.wkpool.length) {
+                const mw = Math.max(4, Math.min(navigator.hardwareConcurrency | 0, 12));
+
+                for (let i = mw; i--;) {
+                    this.wkpool.push(new TWorker(`/nodedec.js?v=${buildVersion.timestamp}`));
+                }
+            }
+
+            let idx = 0;
+            const wkp = [];
+            const blk = 256 + f.length / this.wkpool.length;
+            while (true) {
+                const bulk = f.slice(idx, idx += blk);
+
+                if (!bulk.length) {
+                    break;
+                }
+                wkp.push(this.wkpool[wkp.length].send(bulk));
+            }
+
+            return (await Promise.all(wkp)).flat();
         },
 
         xreq(payload, x) {
@@ -332,7 +425,8 @@ lazy(self.T, 'core', () => {
                                             return l[17920];
                                         }
                                         xPwStore[xh] = queryString.pw = pw;
-                                    }
+                                    },
+                                    errorText: opw && l[17920]
                                 });
                                 return pw && self.EEXPIRED || self.EROLLEDBACK;
                             }

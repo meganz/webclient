@@ -70,8 +70,13 @@
 }
 
 .it-dialog > .body > header h5 {
+    color: var(--main-neutral-primary);
     flex: 1 1 auto;
     text-align: center;
+}
+
+.it-dialog > .body > header button i {
+    --icon-size: 32px;
 }
 
 .it-dialog button.close-btn {
@@ -164,6 +169,13 @@
     text-align: start;
 }
 
+.it-box.modal > .body.scroll-area {
+    height: calc(100% - 24px);
+    margin: 12px;
+    padding: 12px;
+    width: calc(100% - 24px);
+}
+
 .it-dialog.modal footer {
     display: flex;
     flex-direction: row;
@@ -172,6 +184,10 @@
 
 .it-dialog.modal  footer.end-align {
     justify-content: end;
+}
+
+.it-dialog.modal footer.fw-items > * {
+    flex: 1 1 auto;
 }
 
 .it-dialog.modal footer > button {

@@ -11,7 +11,7 @@
 .it-box.add-files-box .content {
     align-items: center;
     border: 3px dashed var(--main-overlay-primary);
-    border-radius: 12px;
+    border-radius: var(--radius-i-md);
     padding: 0 24px 40px;
 }
 
@@ -536,6 +536,22 @@
 
 .it-box.link-ready-box .it-grid .col > span.md-font-size {
     font-weight: normal;
+}
+
+/* QR code dialog */
+
+.it-dialog.qr-dialog {
+    height: 100%;
+    max-height: 592px;
+}
+
+.it-dialog.qr-dialog .canvas-cn {
+    background: var(--main-forced-white);
+    border-radius: 44px;
+    box-shadow: var(--shadow-md);
+    line-height: 0;
+    margin: auto;
+    padding: 20px;
 }
 
 

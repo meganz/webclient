@@ -6266,6 +6266,12 @@ body.de .mega-dialog.contact-picker-widget {
     .mega-dialog.limited-bandwidth-dialog .pricing-page.plans-row {
         overflow-y: hidden;
     }
+    body .mega-dialog.limited-bandwidth-dialog .pricing-page.plans-row > .plan:not(.hidden) {
+        border-inline-start: 1px solid var(--surface-mid-grey);
+    }
+    .mega-dialog.limited-bandwidth-dialog .pricing-page.plans-row > :not(.hidden) ~ :not(.hidden) {
+        border-inline-start: 0;
+    }
     .mega-dialog.limited-bandwidth-dialog.pro-mini .pricing-page.plans-row {
         margin-top: 32px;
         display: flex;
@@ -6277,7 +6283,6 @@ body.de .mega-dialog.contact-picker-widget {
     }
     body:not(.rtl) .mega-dialog.limited-bandwidth-dialog:not(.pro-mini) .pricing-page.plans-row {
         border-top: 1px solid var(--surface-mid-grey);
-        border-left: 1px solid var(--surface-mid-grey);
     }
     body:not(.rtl) .mega-dialog.limited-bandwidth-dialog:not(.pro-mini) .pricing-page.plans-row > * {
         border-bottom: 1px solid var(--surface-mid-grey);

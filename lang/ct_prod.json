@@ -5724,6 +5724,7 @@
     "transferit_sent_to_x": "{count, plural, other {\u5df2\u767c\u9001\u7d66#\u500b\u63a5\u6536\u8005}}",
     "transferit_sent_x": "\u5df2\u767c\u9001%1",
     "transferit_share_ideas": "\u5206\u4eab\u4f60\u7684\u60f3\u6cd5",
+    "transferit_share_qr": "Share QR code",
     "transferit_share_uploaded_error": "\u60a8\u53ea\u80fd\u53ea\u4eab\u5df2\u4e0a\u50b3\u5230MEGA\u7684\u6a94\u6848",
     "transferit_simple_share_hdr": "\u7c21\u55ae\u6613\u7528\u4e14\u529f\u80fd\u5f37\u5927\u7684\u6a94\u6848\u5171\u4eab",
     "transferit_size_low": "\u5927\u5c0f",

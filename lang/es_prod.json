@@ -5724,6 +5724,7 @@
     "transferit_sent_to_x": "{count, plural, one {Enviado a # destinatario} many {Enviado a # de destinatarios} other {Enviado a # destinatarios}}",
     "transferit_sent_x": "Enviado %1",
     "transferit_share_ideas": "Comparte tus ideas",
+    "transferit_share_qr": "Compartir c\u00f3digo QR",
     "transferit_share_uploaded_error": "Solo puedes compartir archivos que hayas subido a MEGA",
     "transferit_simple_share_hdr": "La forma m\u00e1s simple y r\u00e1pida de compartir archivos.",
     "transferit_size_low": "Tama\u00f1o",

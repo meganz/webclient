@@ -5724,6 +5724,7 @@
     "transferit_sent_to_x": "{count, plural, one {Verzonden naar # ontvanger} other {Verzonden naar # ontvangers}}",
     "transferit_sent_x": " %1 Verzonden",
     "transferit_share_ideas": "Deel uw idee\u00ebn",
+    "transferit_share_qr": "QR code delen",
     "transferit_share_uploaded_error": "U kunt alleen bestanden delen die u heeft ge\u00fcpload naar MEGA",
     "transferit_simple_share_hdr": "Heerlijk eenvoudig en krachtig bestanden delen",
     "transferit_size_low": "Grootte",

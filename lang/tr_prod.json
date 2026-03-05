@@ -5724,6 +5724,7 @@
     "transferit_sent_to_x": "{count, plural, one {# al\u0131c\u0131ya g\u00f6nderildi} other {# al\u0131c\u0131ya g\u00f6nderildi}}",
     "transferit_sent_x": "%1 g\u00f6nderildi",
     "transferit_share_ideas": "Fikirlerinizi payla\u015f\u0131n",
+    "transferit_share_qr": "QR kodu payla\u015f",
     "transferit_share_uploaded_error": "Yaln\u0131zca MEGA\u2019ya y\u00fckledi\u011finiz dosyalar\u0131 payla\u015fabilirsiniz",
     "transferit_simple_share_hdr": "Son derece basit ve g\u00fc\u00e7l\u00fc dosya payla\u015f\u0131m\u0131",
     "transferit_size_low": "Boyut",

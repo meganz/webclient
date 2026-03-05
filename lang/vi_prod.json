@@ -5724,6 +5724,7 @@
     "transferit_sent_to_x": "{count, plural, other {\u0110\u00e3 g\u1eedi cho # ng\u01b0\u1eddi}}",
     "transferit_sent_x": "\u0110\u00e3 g\u1eedi %1",
     "transferit_share_ideas": "Chia\u00a0s\u1ebb \u00fd\u00a0t\u01b0\u1edfng c\u1ee7a b\u1ea1n",
+    "transferit_share_qr": "Share QR code",
     "transferit_share_uploaded_error": "B\u1ea1n ch\u1ec9 c\u00f3 th\u1ec3 chia\u00a0s\u1ebb nh\u1eefng t\u1ec7p\u00a0tin m\u00e0 b\u1ea1n \u0111\u00e3 t\u1ea3i l\u00ean MEGA",
     "transferit_simple_share_hdr": "Chia\u00a0s\u1ebb t\u1ec7p\u00a0tin c\u1ef1c\u00a0k\u1ef3 \u0111\u01a1n\u00a0gi\u1ea3n v\u00e0 m\u1ea1nh\u00a0m\u1ebd",
     "transferit_size_low": "K\u00edch c\u1ee1",

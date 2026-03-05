@@ -848,7 +848,7 @@ pro.proplan = {
             var bandwidthBytes = bandwidthGigabytes * 1024 * 1024 * 1024;
 
             // Get bandwidth
-            const bandwidthValue = bytesToSize(bandwidthBytes, 3, 4);
+            const bandwidthValue = bytesToSize(bandwidthBytes, 1, 4);
 
             // Update the plan name
             $planName.text(planName);

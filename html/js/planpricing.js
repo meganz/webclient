@@ -64,8 +64,6 @@ lazy(pro, 'proplan2', () => {
 
     let resizeHandler = false;
 
-    const PLANS_PER_TAB_LIMIT = 4;
-
     const allowedPeriods = new Set([1, 12]);
 
     /**
@@ -1268,7 +1266,6 @@ lazy(pro, 'proplan2', () => {
     const fillPlansInfo = (period) => {
 
         let tab = 'pro';
-        let count = 0;
         if (typeof period === 'object') {
             tab = period.tab;
             period = period.duration;
@@ -1365,12 +1362,6 @@ lazy(pro, 'proplan2', () => {
             }
 
             if (months !== period || planNum === pro.ACCOUNT_LEVEL_BUSINESS) {
-                continue;
-            }
-
-            count++;
-            if (count > PLANS_PER_TAB_LIMIT) {
-                // continue instead of break so that features coming after this are still handled
                 continue;
             }
 
@@ -1478,10 +1469,10 @@ lazy(pro, 'proplan2', () => {
 
             // get the storage/bandwidth, then convert it to bytes (it comes in GB) to format.
             // 1073741824 = 1024 * 1024 * 1024
-            const storageFormatted = bytesToSize(currentPlan[pro.UTQA_RES_INDEX_STORAGE] * 1073741824, 3, 4);
+            const storageFormatted = bytesToSize(currentPlan[pro.UTQA_RES_INDEX_STORAGE] * 1073741824, 1, 4);
             const storageTxt = l[23789].replace('%1', storageFormatted);
 
-            const bandwidthFormatted = bytesToSize(currentPlan[pro.UTQA_RES_INDEX_TRANSFER] * 1073741824, 3, 4);
+            const bandwidthFormatted = bytesToSize(currentPlan[pro.UTQA_RES_INDEX_TRANSFER] * 1073741824, 1, 4);
             const bandwidthTxt = l[23790].replace('%1', bandwidthFormatted);
 
             $('.pricing-plan-storage', $planCard).text(storageTxt);

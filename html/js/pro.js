@@ -363,7 +363,7 @@ var pro = {
                                     trial: results[i].trial,
                                     trialStrings: results[i].trialStrings,
                                     featureStrings: results[i].featureStrings,
-                                    taxInfo: !!(taxInfo && p && pn && mbp && mbpn)
+                                    taxInfo: !!(taxInfo && p && pn && (mbp !== undefined) && (mbpn !== undefined))
                                         && {p, pn, mbp, mbpn, lp, lpn},
                                     insdis: results[i].insdis,
                                 },
@@ -1901,8 +1901,8 @@ lazy(pro, 'filter', () => {
 
             obqDialog:
                 new Set([
-                    pro.ACCOUNT_LEVEL_BASIC, pro.ACCOUNT_LEVEL_PRO_LITE, pro.ACCOUNT_LEVEL_PRO_I,
-                    pro.ACCOUNT_LEVEL_PRO_II, pro.ACCOUNT_LEVEL_PRO_III, pro.ACCOUNT_LEVEL_BUSINESS
+                    pro.ACCOUNT_LEVEL_BASIC, pro.ACCOUNT_LEVEL_ESSENTIAL, pro.ACCOUNT_LEVEL_PRO_LITE,
+                    pro.ACCOUNT_LEVEL_PRO_I, pro.ACCOUNT_LEVEL_PRO_II, pro.ACCOUNT_LEVEL_PRO_III
                 ]),
         },
 

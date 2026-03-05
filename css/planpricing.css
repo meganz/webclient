@@ -222,13 +222,16 @@
     display: none;
 }
 .pricing-pg .pricing-pg.plans-cards-container {
-    padding: var(--right-padding);
-    padding-bottom: 32px;
+    margin: var(--right-padding) var(--right-padding) 0;
+    margin-bottom: 32px;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(max-content, 1fr);
+    overflow-x: auto;
 }
 .pricing-pg .pricing-pg.plans-cards-container .pricing-plan-card {
     display: flex;
+    position: relative;
     flex-direction: column;
     padding-bottom: 32px;
     border: 1px solid var(--color-grey-150);
@@ -1264,6 +1267,32 @@ p.promo-txt {
 .pricing-pg .pricing-pg.tabs-module .tabs-module-block .tabs-block-title {
     padding-left: 16px;
     padding-right: 16px;
+}
+@supports selector(::-webkit-scrollbar) {
+    .pricing-pg .pricing-pg.plans-cards-container * {
+        scrollbar-color: auto;
+        scrollbar-width: auto;
+    }
+
+    .pricing-pg .pricing-pg.plans-cards-container::-webkit-scrollbar {
+        max-width: 8px;
+        max-height: 8px;
+    }
+
+    .pricing-pg .pricing-pg.plans-cards-container::-webkit-scrollbar-track {
+        box-shadow: none;
+        border-radius: 4px;
+    }
+
+    .pricing-pg .pricing-pg.plans-cards-container::-webkit-scrollbar-thumb {
+        border-radius: 4px;
+        background-color: var(--scroll-bar-handle);
+        box-shadow: none;
+    }
+
+    .pricing-pg .pricing-pg.plans-cards-container::-webkit-scrollbar-thumb:window-inactive {
+        background-color: var(--scroll-bar-handle-inactive);
+    }
 }
 /* Responsiveness */
     /* The range from Medium (M) 768px ---> to Large (L) 1080px */

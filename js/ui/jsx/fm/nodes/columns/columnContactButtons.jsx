@@ -29,7 +29,7 @@ export class ColumnContactButtons extends GenericNodePropsComponent {
                             /* `Your browser doesn't support audio calls. Please try a different one!`
                             : `Start Audio Call` */ }}
                         disabled={!navigator.onLine || !megaChat.hasSupportForCalls}
-                        onClick={() =>
+                        onClick={() => M.isInvalidUserStatus() ||
                             inProgressAlert()
                                 .then(() =>
                                     megaChat.createAndShowPrivateRoom(handle)
@@ -39,7 +39,6 @@ export class ColumnContactButtons extends GenericNodePropsComponent {
                                         })
                                 )
                                 .catch(() => d && console.warn('Already in a call.'))
-
                         }
                     />
                     <Button
@@ -55,7 +54,7 @@ export class ColumnContactButtons extends GenericNodePropsComponent {
                         className="mega-button action simpletip"
                         icon="sprite-fm-mono icon-send-files"
                         attrs={{ 'data-simpletip': l[6834] }}
-                        onClick={() => megaChat.openChatAndSendFilesDialog(handle)}
+                        onClick={() => M.isInvalidUserStatus() || megaChat.openChatAndSendFilesDialog(handle)}
                     />
                     <Button
                         ref={node => {

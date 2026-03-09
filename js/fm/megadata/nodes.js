@@ -3975,7 +3975,7 @@ MegaData.prototype.delNodeShare = async function(h, u) {
 
     // @todo ditch MegaNode.shares use completely, maintain M.su only, adapt MegaNode.ph uses(?)
 
-    if (!(this.d[h] && this.d[h].shares)) {
+    if (!(this.d[h] && this.d[h].shares) && mega.infinity) {
         if (self.d) {
             console.assert(this.d[h] || mega.infinity, `we don't know about ${h}...yet?`, mega.infinity);
         }

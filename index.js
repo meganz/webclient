@@ -1957,13 +1957,8 @@ function topbarUI(holderId) {
 
         const $wrap = $clickedItem.closest('.js-dropdown-account');
         const $btn = $('.downloadmega', $wrap).parent();
-        if (!$btn.hasClass('sync-checked')) {
-            megasync.isInstalled((err, is) => {
-                if (!err || is) {
-                    $btn.addClass('hidden');
-                }
-                $btn.addClass('sync-checked');
-            });
+        if (window.useMegaSync === 2 || window.useMegaSync === 3) {
+            $btn.addClass('hidden');
         }
 
         const container = this.parentNode;

@@ -20,7 +20,11 @@ class MegaMobileTopMenu extends MegaComponent {
         });
         this.megaLink.on('tap.home', async() => {
 
-            if (mega.ui.viewerOverlay.confirmDiscard && !await mega.ui.viewerOverlay.confirmDiscard()) {
+            if (
+                mega.ui.viewerOverlay &&
+                mega.ui.viewerOverlay.confirmDiscard &&
+                !await mega.ui.viewerOverlay.confirmDiscard()
+            ) {
                 return false;
             }
 

@@ -1148,68 +1148,15 @@ MegaData.prototype.showOverStorageQuota = async function(quota, options) {
             quota.cstrg = M.storageQuotaCache ? M.storageQuotaCache.cstrg : '';
             options = { custom: 1 };
         }
-        // @todo revamp, we're meant to do the below whenever the dialog is opened, and only when the data is required
-        await pro.loadMembershipPlans();
-        if (!pro.membershipPlans.length) {
-            throw EINCOMPLETE;
-        }
-
-        const lowestRequiredPlan = pro.filter.lowestRequired(quota.cstrg || '', 'storageTransferDialogs');
-
-        let upgradeString;
-        isEuro = !lowestRequiredPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY];
-
-        lowestPlanLevel = lowestRequiredPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL];
-
-        // If user requires lowest available plan (Pro Lite or a Mini plan)
-        if (pro.filter.simple.lowStorageQuotaPlans.has(lowestPlanLevel)) {
-            upgradeString = isEuro
-                ? l[16313]
-                : l.cloud_strg_upgrade_price_ast;
-            upgradeTo = 'min';
-        }
-        // If user requires pro flexi
-        else if (lowestPlanLevel === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
-            upgradeString = l.over_storage_upgrade_flexi;
-            upgradeTo = 'flexi';
-        }
-        // User requires a regular plan
-        else {
-            upgradeString = l.over_storage_upgrade_pro;
-            upgradeTo = 'regular';
-        }
-
-        const planName = pro.getProPlanName(lowestPlanLevel);
-
-        const localPrice = isEuro
-            ? lowestRequiredPlan[pro.UTQA_RES_INDEX_PRICE]
-            : lowestRequiredPlan[pro.UTQA_RES_INDEX_LOCALPRICE];
-
-        const localCurrency = isEuro
-            ? 'EUR'
-            : lowestRequiredPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY];
-
-        if (upgradeTo !== 'flexi') {
-            upgradeString = upgradeString.replace('%1', planName)
-                .replace('%2', formatCurrency(localPrice, localCurrency, 'narrowSymbol'))
-                .replace('%3', bytesToSize(lowestRequiredPlan[pro.UTQA_RES_INDEX_STORAGE] * pro.BYTES_PER_GB, 0))
-                .replace('%4', bytesToSize(lowestRequiredPlan[pro.UTQA_RES_INDEX_TRANSFER] * pro.BYTES_PER_GB, 0));
-        }
-
-        $('.body-p.main-text', $strgdlgBodyFull).text(upgradeString);
-        $('.body-p.main-text', $strgdlgBodyAFull).text(upgradeString);
-
-        const maxStorage = bytesToSize(pro.maxPlan[2] * pro.BYTES_PER_GB, 0) +
-            ' (' + pro.maxPlan[2] + ' ' + l[17696] + ')';
 
         var myOptions = Object(options);
+        
         if (quota.isFull) {
-            $strgdlg.addClass('full');
+
+            ulmanager.ulShowOverStorageQuotaDialog();
+
             $('.pm-main').addClass('fm-notification full');
             $fBanner.addClass('visible');
-            $('header h2', $strgdlgBodyFull).text(myOptions.title || l[16302]);
-            $('.body-header', $strgdlgBodyFull).safeHTML(myOptions.body || l[16360]);
-            $headerFull.text(l.cloud_strg_100_percent_full);
         }
         else if (quota.isAlmostFull || myOptions.custom) {
             if (quota.isAlmostFull) {
@@ -1219,6 +1166,9 @@ MegaData.prototype.showOverStorageQuota = async function(quota, options) {
                     mega.tpw.showAlmostOverquota();
                 }
             }
+            // log almost overquota shown
+            eventlog(501160);
+            
             $strgdlg.addClass('almost-full');
             $('header h2.almost-full', $strgdlg).text(myOptions.title || l[16312]);
             if (myOptions.body) {
@@ -1328,7 +1278,7 @@ MegaData.prototype.showOverStorageQuota = async function(quota, options) {
     }
 
     // if another dialog wasn't opened previously
-    if (!prevState || Object(options).custom || quota === EPAYWALL) {
+    if (!quota.isFull && (!prevState || Object(options).custom || quota === EPAYWALL)) {
         M.safeShowDialog('over-storage-quota', $strgdlg);
     }
     else {

@@ -922,8 +922,8 @@ pro.proplan = {
                             ? (1 - (discount.dp / 100))
                             : 1;
                         $('.tax-info', $taxInfo).addClass('hidden');
-                        const taxPrice = (planTaxInfo.taxedPrice * discountMult)
-                            / (pro.instantDiscounts.shared.anyDiscount12 ? planObj.months : 1);
+                        const taxPrice = planTaxInfo.taxedPrice * discountMult
+                            / planObj.months;
 
                         const priceHTML = '<span class="bold">'
                             + formatCurrency(taxPrice, baseCurrency, 'narrowSymbol')

@@ -1168,6 +1168,57 @@ MegaData.prototype.showOverStorageQuota = async function(quota, options) {
             }
             // log almost overquota shown
             eventlog(501160);
+
+            await pro.loadMembershipPlans();
+            if (!pro.membershipPlans.length) {
+                throw EINCOMPLETE;
+            }
+
+            const lowestRequiredPlan = pro.filter.lowestRequired(quota.cstrg || '', 'storageTransferDialogs');
+
+            let upgradeString;
+            isEuro = !lowestRequiredPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY];
+
+            lowestPlanLevel = lowestRequiredPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL];
+
+            // If user requires lowest available plan (Pro Lite or a Mini plan)
+            if (pro.filter.simple.lowStorageQuotaPlans.has(lowestPlanLevel)) {
+                upgradeString = isEuro
+                    ? l[16313]
+                    : l.cloud_strg_upgrade_price_ast;
+                upgradeTo = 'min';
+            }
+            // If user requires pro flexi
+            else if (lowestPlanLevel === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
+                upgradeString = l.over_storage_upgrade_flexi;
+                upgradeTo = 'flexi';
+            }
+            // User requires a regular plan
+            else {
+                upgradeString = l.over_storage_upgrade_pro;
+                upgradeTo = 'regular';
+            }
+
+            const planName = pro.getProPlanName(lowestPlanLevel);
+            const localPrice = isEuro
+                ? lowestRequiredPlan[pro.UTQA_RES_INDEX_PRICE]
+                : lowestRequiredPlan[pro.UTQA_RES_INDEX_LOCALPRICE];
+
+            const localCurrency = isEuro
+                ? 'EUR'
+                : lowestRequiredPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY];
+
+            if (upgradeTo !== 'flexi') {
+                upgradeString = upgradeString.replace('%1', planName)
+                    .replace('%2', formatCurrency(localPrice, localCurrency, 'narrowSymbol'))
+                    .replace('%3', bytesToSize(lowestRequiredPlan[pro.UTQA_RES_INDEX_STORAGE] * pro.BYTES_PER_GB, 0))
+                    .replace('%4', bytesToSize(lowestRequiredPlan[pro.UTQA_RES_INDEX_TRANSFER] * pro.BYTES_PER_GB, 0));
+            }
+
+            $('.body-p.main-text', $strgdlgBodyFull).text(upgradeString);
+            $('.body-p.main-text', $strgdlgBodyAFull).text(upgradeString);
+
+            
             
             $strgdlg.addClass('almost-full');
             $('header h2.almost-full', $strgdlg).text(myOptions.title || l[16312]);

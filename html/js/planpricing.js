@@ -1206,6 +1206,8 @@ lazy(pro, 'proplan2', () => {
     const initResizeHandler = () => {
 
         const previousSizes = [];
+        const $planCardsContainer = $('.pricing-pg.pro-plans-cards-container', $page);
+        const $discountHeader = $('.all-plans-promotional-info', $page);
 
         const resizeRecommendSection = (force) => {
             const recommends = [];
@@ -1235,9 +1237,34 @@ lazy(pro, 'proplan2', () => {
             }
         };
 
+        const resizePlansSection = () => {
+            const windowWidth = $(window).outerWidth();
+            const pageWidth = $page.outerWidth();
+            const discountHeaderHeight = $discountHeader.hasClass('hidden') ? 0 : $discountHeader.outerHeight();
+            const variablePadding = windowWidth > 970 ? 40 : 24;
+
+            const $nonHiddenCard = $planCards.not('.hidden').first();
+
+            const planCardsOffsetHeight = $nonHiddenCard && $nonHiddenCard[0] ? $nonHiddenCard[0].offsetHeight : 0;
+
+            if (windowWidth < pageWidth || windowWidth < 800) {
+                $planCardsContainer.removeClass('wide-container').css('height', '');
+            }
+            else if (planCardsOffsetHeight) {
+                $planCardsContainer.addClass('wide-container').css('height', planCardsOffsetHeight + discountHeaderHeight + variablePadding*2);
+            }
+            else {
+                $planCardsContainer.removeClass('wide-container').css('height', '');
+            }
+        };
+
+        resizePlansSection();
         resizeRecommendSection();
 
-        $(window).rebind('resize.pricing-page', SoonFc(100, resizeRecommendSection));
+        $(window).rebind('resize.pricing-page', SoonFc(100, () => {
+            resizePlansSection();
+            resizeRecommendSection();
+        }));
 
         mBroadcaster.once('pagechange', () => {
             $(window).off('resize.pricing-page');
@@ -1245,6 +1272,7 @@ lazy(pro, 'proplan2', () => {
 
         return {
             resizeRecommendSection,
+            resizePlansSection,
         };
     };
 
@@ -1580,6 +1608,7 @@ lazy(pro, 'proplan2', () => {
 
         if (resizeHandler) {
             resizeHandler.resizeRecommendSection();
+            resizeHandler.resizePlansSection();
         }
     };
 

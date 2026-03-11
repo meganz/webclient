@@ -730,6 +730,7 @@ pro.propay = {
                 extra.address = astroPayDialog.address;
                 extra.city = astroPayDialog.city;
                 extra.cpf = astroPayDialog.taxNumber;
+                extra.phone = astroPayDialog.phoneNumber;
             }
 
             // If Ecomprocessing, send extra details

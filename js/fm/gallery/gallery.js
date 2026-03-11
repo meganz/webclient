@@ -1369,7 +1369,7 @@ class MegaGallery {
                     this.updateGroupSelect($(ui.selecting));
                 },
                 unselecting: (_, ui) => {
-                    this.updateGroupDeselect($(ui.unselecting));
+                    this.updateGroupSelect($(ui.unselecting));
                 },
                 appendTo: $.selectddUIgrid
             });
@@ -1414,16 +1414,27 @@ class MegaGallery {
 
             const $eTarget = $(e.currentTarget);
             const h = $eTarget.attr('id');
+            const isCtrl = e.ctrlKey || e.metaKey;
 
-            if (this.mode !== 'a') {
-                selectionManager.clear_selection();
+            if (e.shiftKey) {
+                selectionManager.shift_select_to(h, false, true, $.selected.length === 0);
+                this.syncRenderedGroups();
             }
-
-            if ($eTarget.hasClass('ui-selected')) {
-                selectionManager.remove_from_selection(h, false);
-                this.updateGroupDeselect($eTarget);
+            else if (isCtrl) {
+                if ($eTarget.hasClass('ui-selected')) {
+                    selectionManager.remove_from_selection(h, false);
+                    this.updateGroupSelect($eTarget);
+                }
+                else {
+                    $.gridLastSelected = e.currentTarget;
+                    selectionManager.add_to_selection(h, true);
+                    this.updateGroupSelect($eTarget);
+                }
             }
             else {
+                $.gridLastSelected = e.currentTarget;
+                selectionManager.clear_selection();
+                this.clearSelections();
                 selectionManager.add_to_selection(h, true);
                 this.updateGroupSelect($eTarget);
             }
@@ -2092,28 +2103,37 @@ class MegaGallery {
     }
 
     /**
-     * @param {jQuery} $el Cell element
+     * @param {String} groupId Group row id
      * @returns {void}
      */
-    updateGroupSelect($el) {
-        if (this.mode !== 'a') {
-            return;
-        }
-
-        const groupId = $el.closest('.content-row').attr('id');
-
-        if (!groupId) {
+    updateGroupState(groupId) {
+        if (this.mode !== 'a' || !groupId) {
             return;
         }
 
         delay(`gallery.check-select-${groupId}`, () => {
             const initGroupId = `${Math.ceil(groupId.replace('gallery-', ''))}.00000`;
             const monthNodes = this.getGroupMonthNodes(initGroupId);
+
+            if (!monthNodes.length) {
+                return;
+            }
+
+            const cacheBlock = this.renderCache[`a${initGroupId}`];
+            const checkbox = cacheBlock
+                ? cacheBlock.querySelector(`#${groupId.replace('.', '\\.')} .checkdiv`)
+                : null;
+
+            if (!checkbox) {
+                return;
+            }
+
+            const selSet = new Set($.selected);
             let all = true;
             let some = false;
-            const selSet = new Set($.selected);
+            let i = monthNodes.length;
 
-            for (let i = 0; i < monthNodes.length; i++) {
+            while (--i >= 0) {
                 if (selSet.has(monthNodes[i])) {
                     some = true;
                 }
@@ -2125,15 +2145,6 @@ class MegaGallery {
                 if (some && !all) {
                     break;
                 }
-            }
-
-            const cacheBlock = this.renderCache[`a${initGroupId}`];
-            const checkbox = cacheBlock
-                ? cacheBlock.querySelector(`#${groupId.replace('.', '\\.')} .checkdiv`)
-                : null;
-
-            if (!checkbox) {
-                return;
             }
 
             const { mComponent: mc } = checkbox.parentNode;
@@ -2152,48 +2163,32 @@ class MegaGallery {
      * @param {jQuery} $el Cell element
      * @returns {void}
      */
-    updateGroupDeselect($el) {
+    updateGroupSelect($el) {
+        if (this.mode !== 'a') {
+            return;
+        }
+
         const groupId = $el.closest('.content-row').attr('id');
 
         if (!groupId) {
             return;
         }
 
-        delay(`gallery.check-select-${groupId}`, () => {
-            const initGroupId = `${Math.ceil(groupId.replace('gallery-', ''))}.00000`;
-            let someSelected = false;
+        this.updateGroupState(groupId);
+    }
 
-            if ($.selected.length) {
-                const selSet = new Set($.selected);
-                const monthNodes = this.getGroupMonthNodes(initGroupId);
+    /**
+     * Sync selection state of rendered groups with current selection
+     * @returns {void}
+     */
+    syncRenderedGroups() {
+        const rows = this.galleryBlock.querySelectorAll(
+            '.MegaDynamicList-content .content-row[id^="gallery-"]'
+        );
 
-                for (let i = 0; i < monthNodes.length; i++) {
-                    if (selSet.has(monthNodes[i])) {
-                        someSelected = true;
-                        break;
-                    }
-                }
-            }
-
-            const cacheBlock = this.renderCache[`a${initGroupId}`];
-            const checkbox = cacheBlock
-                ? cacheBlock.querySelector(`#${groupId.replace('.', '\\.')} .checkdiv`)
-                : null;
-
-            if (!checkbox) {
-                return;
-            }
-
-            const { mComponent: mc } = checkbox.parentNode;
-
-            if (someSelected) {
-                checkbox.classList.add('checkboxMinimize');
-            }
-            else {
-                mc.checked = false;
-                checkbox.classList.remove('checkboxMinimize');
-            }
-        }, 100);
+        for (let i = 0; i < rows.length; i++) {
+            this.updateGroupState(rows[i].id);
+        }
     }
 
     enableGroupChecks() {

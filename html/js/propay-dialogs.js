@@ -55,6 +55,8 @@ var astroPayDialog = {
     address: '',
     city: '',
     taxNumber: '',
+    phoneNumber: '',
+    country: '',
 
     confirmationIsShowing: false,
 
@@ -101,6 +103,12 @@ var astroPayDialog = {
         pro.propay.skItems.astropay.endLoad('initAstropay');
     },
 
+    getRequiresPhoneNumber() {
+        'use strict';
+        return (((u_attr && u_attr.ipcc) || getCountryAndLocales().country) === 'IN')
+            || (astroPayDialog.country === 'IN');
+    },
+
     /**
      * Update the dialog details
      */
@@ -145,6 +153,11 @@ var astroPayDialog = {
             this.$dialog.find('.astropay-address-field').parent().addClass('hidden');
             this.$dialog.find('.astropay-label.city').addClass('hidden');
             this.$dialog.find('.astropay-city-field').parent().addClass('hidden');
+        }
+
+        if (!astroPayDialog.getRequiresPhoneNumber()) {
+            this.$dialog.find('.astropay-label.phone').addClass('hidden');
+            this.$dialog.find('.astropay-phone-field').parent().addClass('hidden');
         }
     },
 
@@ -239,11 +252,15 @@ var astroPayDialog = {
         astroPayDialog.address = $.trim(astroPayDialog.$dialog.find(`#${propayIndicator}astropay-address-field`).val());
         astroPayDialog.city = $.trim(astroPayDialog.$dialog.find(`#${propayIndicator}astropay-city-field`).val());
         astroPayDialog.taxNumber = $.trim(astroPayDialog.$dialog.find(`#${propayIndicator}astropay-tax-field`).val());
+        astroPayDialog.phoneNumber =
+            $.trim(astroPayDialog.$dialog.find(`#${propayIndicator}astropay-phone-field`).val());
 
+        const requirePhoneNumber = astroPayDialog.getRequiresPhoneNumber();
 
         // Make sure they entered something
         if (
             astroPayDialog.fullName === '' ||
+            (requirePhoneNumber && !M.validatePhoneNumber(astroPayDialog.phoneNumber)) ||
             // If the provider supports extra address information, validate it.
             // Currently only India needs Address and City, but others may need them in future.
             this.selectedProvider.supportsExtraAddressInfo &&
@@ -2469,6 +2486,7 @@ var addressDialog = {
             dateOfBirth,
             cconsent: !!addressDialog.coinifyShareConsentConfirmed,
         };
+        astroPayDialog.country = country;
 
         if (validateOnly) {
             return;

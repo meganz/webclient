@@ -1466,7 +1466,7 @@ var pro = {
             if (planTypes[type]) {
                 return planTypes[type];
             }
-            if (plan === pro.ACCOUNT_LEVEL_BUSINESS) {
+            if (plan === pro.ACCOUNT_LEVEL_BUSINESS && pro.businessPlanData) {
                 key = pro.businessPlanData.id + pro.businessPlanData.it;
                 return pro.planObjects.planKeys[key] || false;
             }

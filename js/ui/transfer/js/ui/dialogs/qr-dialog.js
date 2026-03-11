@@ -91,6 +91,7 @@ lazy(T.ui, 'qrDialog', () => {
         fileName = `transfer.it_${fileName}.png`;
 
         const canvas = ce('canvas', canvasCn);
+        const lnk = ce('a', canvasCn, {class: 'qr-logo', tabindex: -1, 'aria-disabled': 'true'});
         const ctx = canvas.getContext('2d');
 
         const qr = new QRCode(0, QRErrorCorrectLevel.H);
@@ -146,19 +147,22 @@ lazy(T.ui, 'qrDialog', () => {
         drawFinder(ctx, offset, offset + qrSize - finderSize, finderSize);
 
         // Add logo
-        const svgUrl = `${getBaseUrl()}/js/ui/transfer/images/svg/qr-logo.svg`;
-        const img = new Image();
-        img.src = svgUrl;
-        img.onload = () => {
-            ctx.drawImage(img, logoX, logoY, logoSize, logoSize);
-
-            // Allow DL image
-            btnNode.classList.remove('disabled');
-            ce('a', canvasCn, {
-                href: canvas.toDataURL('image/png'),
-                download: fileName
+        const src = String(getComputedStyle(lnk).backgroundImage).replace(/^url\(["']?/, '').replace(/["']?\)$/, '');
+        webgl.loadImage(src)
+            .then((img) => {
+                if (img.naturalWidth) {
+                    ctx.drawImage(img, logoX, logoY, logoSize, logoSize);
+                }
+            })
+            .catch((ex) => self.d && console.error('Failed to load logo...', ex))
+            .finally(() => {
+                // Allow DL image ieven if logo is not loaged
+                canvas.toBlob((blob) => {
+                    lnk.download = fileName;
+                    lnk.href = URL.createObjectURL(blob);
+                    btnNode.classList.remove('disabled');
+                });
             });
-        };
     };
 
     return freeze({

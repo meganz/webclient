@@ -130,79 +130,71 @@ function resetSensitives() {
          * @param {String} okLabel Label to show in the OK button
          * @param {Function} [okFn] Action to perform when a user confirms
          * @param {Boolean} [passOnboarding] Whether to pass the onboarding status or not
-         * @returns {Promise<1>}
+         * @returns {Promise<number>}
          */
         const showOnboardingDialog = (okLabel, okFn, passOnboarding) => new Promise((resolve) => {
-            const dialog = new MDialog({
-                dialogName: 'onboarding',
-                ok: {
-                    label: okLabel,
-                    callback: () => {
-                        if (typeof okFn === 'function') {
-                            okFn();
-                        }
+            const content = (() => {
+                const bulletPoints = [
+                    [l.sen_onboard_subtitle1, l.sen_onboard_text1, 'icon-eye-hidden1'],
+                    [l.sen_onboard_subtitle2, l.sen_onboard_text2, 'icon-image-x-thin-outline'],
+                    [l.sen_onboard_subtitle3, l.sen_onboard_text3, 'icon-eye-reveal1']
+                ];
 
-                        if (passOnboarding === true) {
-                            toggleOnboarded(true);
-                            eventlog(500927);
-                        }
+                return bulletPoints.map(([t, tx, ic]) => `
+                    <div class="flex flex-row items-center py-2 text-left">
+                        <i class="sprite-fm-mono icon-size-6 mr-4 ${ic}"></i>
+                        <div>
+                            <p class="font-title-h3-bold my-0">${escapeHTML(t)}</p>
+                            <p class="text-color-secondary my-0">${escapeHTML(tx)}</p>
+                        </div>
+                    </div>
+                `).join('');
+            })();
+
+            megaMsgDialog.render(
+                l.sen_onboard_title,
+                content,
+                '',
+                {
+                    onSuccess: () => {
+                        tryCatch(() => {
+                            if (typeof okFn === 'function') {
+                                okFn();
+                            }
+
+                            if (passOnboarding === true) {
+                                toggleOnboarded(true);
+                                eventlog(500927);
+                            }
+                        })();
 
                         resolve(1);
                     },
-                    classes: ['mega-button', 'branded-green']
+                    onFailure: () => resolve(0)
                 },
-                setContent() {
-                    const slot = document.createElement('div');
-                    const imgDiv = document.createElement('div');
-                    const img = document.createElement('img');
-                    const title = document.createElement('h2');
-                    const bulletPoints = [
-                        [l.sen_onboard_subtitle1, l.sen_onboard_text1, 'icon-eye-hidden1'],
-                        [l.sen_onboard_subtitle2, l.sen_onboard_text2, 'icon-images1'],
-                        [l.sen_onboard_subtitle3, l.sen_onboard_text3, 'icon-eye-reveal1']
-                    ];
-
-                    imgDiv.appendChild(img);
-                    slot.appendChild(imgDiv);
-                    slot.appendChild(title);
-
-                    slot.className = is_mobile ? '' : 'p-6';
-                    img.className = 'w-32 h-32';
-                    title.className = 'text-center py-2';
-                    imgDiv.className = 'text-center';
-
-                    img.src = `${staticpath}/images/mega/hidden/hidden_pro.png`;
-                    title.textContent = l.sen_onboard_title;
-
-                    for (let i = 0; i < bulletPoints.length; i++) {
-                        const [t, tx, ic] = bulletPoints[i];
-
-                        const div = document.createElement('div');
-                        const divRight = document.createElement('div');
-                        const titleLine = document.createElement('p');
-                        const txtLine = document.createElement('p');
-                        const icon = document.createElement('i');
-
-                        div.className = 'flex flex-row items-center py-2 text-left';
-                        icon.className = `sprite-fm-mono icon-size-6 mx-4 ${ic}`;
-                        titleLine.className = 'font-title-h3-bold text-color-high my-1';
-                        txtLine.className = 'sensitive-onboarding-txt my-0';
-
-                        titleLine.textContent = t;
-                        txtLine.textContent = tx;
-
-                        div.appendChild(icon);
-                        div.appendChild(divRight);
-                        divRight.appendChild(titleLine);
-                        divRight.appendChild(txtLine);
-                        slot.appendChild(div);
-                    }
-
-                    this.slot = slot;
-                }
-            });
-
-            dialog.show();
+                {
+                    icon: 'hidden-3d',
+                    sheetType: 'normal',
+                    sheetClassList: ['horizontal-actions'],
+                    buttons: okLabel === l.ok_button ? [
+                        {
+                            text: okLabel,
+                            componentClassname: 'slim'
+                        }
+                    ] : [
+                        {
+                            text: okLabel,
+                            componentClassname: 'slim'
+                        },
+                        {
+                            text: l.msg_dlg_cancel,
+                            componentClassname: 'slim secondary'
+                        }
+                    ]
+                },
+                true,
+                true
+            );
         });
 
         /**
@@ -246,7 +238,7 @@ function resetSensitives() {
                 return 0;
             }
 
-            if (await getOnboardedStatus() || await showOnboardingDialog(l[507], nop, true)) {
+            if (await getOnboardedStatus() || await showOnboardingDialog(l.ok_button, nop, true)) {
                 return 1;
             }
 

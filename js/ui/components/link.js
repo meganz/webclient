@@ -58,8 +58,13 @@ MegaLink.bindEvent = function() {
     }
 
     this.on('click', async e => {
-        if (this.disabled
-            || is_mobile && mega.ui.viewerOverlay.confirmDiscard && !await mega.ui.viewerOverlay.confirmDiscard()) {
+        if (
+            this.disabled ||
+            is_mobile &&
+            mega.ui.viewerOverlay &&
+            mega.ui.viewerOverlay.confirmDiscard &&
+            !await mega.ui.viewerOverlay.confirmDiscard()
+        ) {
             return false;
         }
 

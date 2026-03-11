@@ -829,6 +829,8 @@ pro.proplan = {
                 baseCurrency = 'EUR';
             }
 
+            basePrice /= period;
+
             const monthlyPrice = planObj.price / planObj.months;
             let discountedPrice = monthlyPrice;
             if (currentPlan[pro.UTQA_RES_INDEX_EXTRAS].insdis
@@ -920,8 +922,8 @@ pro.proplan = {
                             ? (1 - (discount.dp / 100))
                             : 1;
                         $('.tax-info', $taxInfo).addClass('hidden');
-                        const taxPrice = (planTaxInfo.taxedPrice * discountMult)
-                            / (pro.instantDiscounts.shared.anyDiscount12 ? planObj.months : 1);
+                        const taxPrice = planTaxInfo.taxedPrice * discountMult
+                            / planObj.months;
 
                         const priceHTML = '<span class="bold">'
                             + formatCurrency(taxPrice, baseCurrency, 'narrowSymbol')
@@ -947,8 +949,8 @@ pro.proplan = {
                 // TODO change strings to be "<currency> billed monthly/yearly" in future ticket
                 let billingPeriodText = `${baseCurrency} / ${periodIsYearly ? l[932] : l[931]}`;
 
-                if (pro.instantDiscounts.shared.anyDiscount12 && periodIsYearly) {
-                    billingPeriodText = l.per_m_billed_yearly;
+                if (periodIsYearly) {
+                    billingPeriodText = l.curr_per_month_billed_yearly.replace('%1', baseCurrency);
                 }
 
                 // TODO re-enable in future ticket

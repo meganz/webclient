@@ -1809,8 +1809,8 @@ var dlmanager = {
         var $pricingBoxes = $('.plan', $dialog);
 
         // Set yearly prices by default if not showing mini plan cards
-        const preSelectedPeriod = lowestPlanIsMini ? 0 : ((sessionStorage.getItem('pro.period') | 0) || 12);
-        const planType = lowestPlanIsMini ? 'miniPlans' : 'core';
+        const preSelectedPeriod = (sessionStorage.getItem('pro.period') | 0) || 12;
+        const planType = 'core'; // 'miniPlans' or 'core'
         pro.proplan.updateEachPriceBlock("D", $pricingBoxes, $dialog, preSelectedPeriod, planType);
     },
 
@@ -1830,20 +1830,14 @@ var dlmanager = {
         // Set scroll to top
         $scrollBlock.scrollTop(0);
 
-        await M.require('businessAcc_js');
-        const business = new BusinessAccount();
-
         const awaitItems = [
             !ignoreStorageReq && this.getRequiredStorageQuota(),
-            business.getBusinessPlanInfo(false),
             pro.loadMembershipPlans()
         ];
 
         // Load the membership plans, and the required storage quota if needed
-        const [storageObj, businessPlanInfo] = await Promise.all(awaitItems);
+        const [storageObj] = await Promise.all(awaitItems);
 
-        pro.businessPlanData = businessPlanInfo;
-        pro.planObjects.createBusinessPlanObject(businessPlanInfo);
 
         const slideshowPreview = slideshowid && is_video(M.getNodeByHandle(slideshowid));
         const isStreaming = !dlmanager.isDownloading && (dlmanager.isStreaming || slideshowPreview);

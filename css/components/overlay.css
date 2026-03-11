@@ -196,11 +196,16 @@
     background-image: url("../../images/mobile/warning-3d.png");
 }
 
+.overlay-wrap .image i.hidden-3d {
+    background-image: url("../../images/mega/hidden/hidden_pro.png");
+}
+
 .overlay-wrap .image i.key,
 .overlay-wrap .image i.reload,
 .overlay-wrap .image i.bell,
 .overlay-wrap .image i.password,
-.overlay-wrap .image i.warning-3d {
+.overlay-wrap .image i.warning-3d,
+.overlay-wrap .image i.hidden-3d {
     background-size: contain;
     width: 96px;
     height: 96px;

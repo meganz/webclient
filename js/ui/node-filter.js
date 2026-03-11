@@ -31,7 +31,10 @@ lazy(mega.ui, 'mNodeFilter', () => {
             },
             match(n) {
                 if (n.t) {
-                    return this.selection.includes('folder');
+                    if (this.selection.includes('bucket')) {
+                        return M.getS4NodeType(n) === 'bucket';
+                    }
+                    return this.selection.includes('folder') && M.getS4NodeType(n) !== 'bucket';
                 }
 
                 const fext = fileext(n.name, false, true);
@@ -50,64 +53,67 @@ lazy(mega.ui, 'mNodeFilter', () => {
             },
             menu: [
                 {
-                    icon: 'recents',
-                    label: l.filter_chip_type_all,
-                    data: null,
-                    eid: 99942
-                },
-                {
-                    icon: 'images',
-                    label: l.filter_chip_type_images,
-                    data: ['image'],
-                    eid: 99943
-                },
-                {
-                    icon: 'file',
-                    label: l.filter_chip_type_documents,
-                    data: ['word', 'text'],
-                    eid: 99944
-                },
-                {
-                    icon: 'audio-filled',
-                    label: l.filter_chip_type_audio,
-                    data: ['audio'],
-                    eid: 99945
-                },
-                {
-                    icon: 'videos',
-                    label: l.filter_chip_type_video,
-                    data: ['video'],
-                    eid: 99946
-                },
-                {
-                    icon: 'file',
-                    label: l.filter_chip_type_pdf,
-                    data: ['pdf'],
-                    eid: 99947
-                },
-                {
-                    icon: 'play-square',
-                    label: l.filter_chip_type_presentation,
-                    data: ['powerpoint'],
-                    eid: 99948
-                },
-                {
-                    icon: 'view-medium-list',
-                    label: l.filter_chip_type_spreadsheets,
-                    data: ['spreadsheet', 'excel'],
-                    eid: 99949
-                },
-                {
-                    icon: 'folder',
+                    icon: 'folder-thin-outline',
                     label: l.filter_chip_type_folder,
                     data: ['folder'],
-                    eid: 99950
+                    eid: 99950,
+                    chipLabel: l.filtered_chip_folder,
                 },
                 {
-                    icon: 'question-filled',
+                    icon: 'image-01-thin-outline',
+                    label: l.filter_chip_type_images,
+                    data: ['image'],
+                    eid: 99943,
+                    chipLabel: l.filtered_chip_image,
+                },
+                {
+                    icon: 'film-thin',
+                    label: l.filter_chip_type_video,
+                    data: ['video'],
+                    eid: 99946,
+                    chipLabel: l.filtered_chip_video,
+                },
+                {
+                    icon: 'mic-thin-outline',
+                    label: l.filter_chip_type_audio,
+                    data: ['audio'],
+                    eid: 99945,
+                    chipLabel: l.filtered_chip_audio,
+                },
+                {
+                    icon: 'file-text-thin-outline',
+                    label: l.filter_chip_type_documents,
+                    data: ['word', 'text'],
+                    eid: 99944,
+                    chipLabel: l.filtered_chip_documents,
+                },
+                {
+                    icon: 'pdf-thin-outline',
+                    label: l.filter_chip_type_pdf,
+                    data: ['pdf'],
+                    eid: 99947,
+                    chipLabel: l.filtered_chip_pdf,
+                },
+                {
+                    icon: 'play-square-thin-outline',
+                    label: l.filter_chip_type_presentation,
+                    data: ['powerpoint'],
+                    eid: 99948,
+                    chipLabel: l.filtered_chip_presentation,
+                },
+                {
+                    icon: 'file-spreadsheet-thin-outline',
+                    label: l.filter_chip_type_spreadsheets,
+                    data: ['spreadsheet', 'excel'],
+                    eid: 99949,
+                    chipLabel: l.filtered_chip_spreadsheets,
+                },
+                {
+                    icon: 'file-02-thin-outline',
                     label: l.filter_chip_type_other,
                     data: ['other'],
-                    eid: 99951
+                    eid: 99951,
+                    chipLabel: l.filtered_chip_other,
                 },
             ]
         },
@@ -133,7 +139,7 @@ lazy(mega.ui, 'mNodeFilter', () => {
                     return nodeMtime >= this.selection.min && nodeMtime <= this.selection.max;
                 }
 
-                return this.selection < 0 ? nodeMtime < lastYearStart : nodeMtime >= this.selection;
+                return this.selection < 0 ? nodeMtime < currentYearStart : nodeMtime >= this.selection;
             },
             menu: [
                 {
@@ -142,45 +148,40 @@ lazy(mega.ui, 'mNodeFilter', () => {
                     get data() {
                         // Set hours to 12am today
                         return new Date().setHours(0, 0 ,0 ,0);
-                    }
+                    },
+                    chipLabel: l.filtered_chip_mtime_today,
                 },
                 {
                     eid: 99958,
                     label: l.filter_chip_mdate_seven,
                     get data() {
                         return new Date().setDate(today.getDate() - 7);
-                    }
+                    },
+                    chipLabel: l.filtered_chip_mtime_seven,
                 },
                 {
                     eid: 99959,
                     label: l.filter_chip_mdate_thirty,
                     get data() {
                         return new Date().setDate(today.getDate() - 30);
-                    }
+                    },
+                    chipLabel: l.filtered_chip_mtime_thirty,
                 },
                 {
                     eid: 99960,
                     label: l.filter_chip_mdate_year,
                     get data() {
                         return currentYearStart;
-                    }
-                },
-                {
-                    eid: 99974,
-                    label: l.filter_chip_mdate_lyear,
-                    get data() {
-                        return  {
-                            min: lastYearStart,
-                            max: lastYearEnd
-                        };
-                    }
+                    },
+                    chipLabel: l.filtered_chip_mtime_year,
                 },
                 {
                     eid: 99961,
                     label: l.filter_chip_mdate_older,
                     get data() {
                         return -1;
-                    }
+                    },
+                    chipLabel: l.filtered_chip_mtime_older
                 }
             ]
         },
@@ -198,7 +199,7 @@ lazy(mega.ui, 'mNodeFilter', () => {
                     return nodeAddedTime >= this.selection.min && nodeAddedTime <= this.selection.max;
                 }
 
-                return this.selection < 0 ? nodeAddedTime < lastYearStart : nodeAddedTime >= this.selection;
+                return this.selection < 0 ? nodeAddedTime < currentYearStart : nodeAddedTime >= this.selection;
             },
             menu: [
                 {
@@ -207,45 +208,40 @@ lazy(mega.ui, 'mNodeFilter', () => {
                     get data() {
                         // Set hours to 12am today
                         return new Date().setHours(0, 0 ,0 ,0);
-                    }
+                    },
+                    chipLabel: l.filtered_chip_date_today,
                 },
                 {
                     eid: 500013,
                     label: l.filter_chip_mdate_seven,
                     get data() {
                         return new Date().setDate(today.getDate() - 7);
-                    }
+                    },
+                    chipLabel: l.filtered_chip_date_seven,
                 },
                 {
                     eid: 500014,
                     label: l.filter_chip_mdate_thirty,
                     get data() {
                         return new Date().setDate(today.getDate() - 30);
-                    }
+                    },
+                    chipLabel: l.filtered_chip_date_thirty,
                 },
                 {
                     eid: 500015,
                     label: l.filter_chip_mdate_year,
                     get data() {
                         return currentYearStart;
-                    }
-                },
-                {
-                    eid: 500017,
-                    label: l.filter_chip_mdate_lyear,
-                    get data() {
-                        return  {
-                            min: lastYearStart,
-                            max: lastYearEnd
-                        };
-                    }
+                    },
+                    chipLabel: l.filtered_chip_date_year,
                 },
                 {
                     eid: 500016,
                     label: l.filter_chip_mdate_older,
                     get data() {
                         return -1;
-                    }
+                    },
+                    chipLabel: l.filtered_chip_date_older,
                 }
             ]
         },
@@ -298,53 +294,70 @@ lazy(mega.ui, 'mNodeFilter', () => {
                     icon: 'mega-thin-solid',
                     label: l.all_mega,
                     data: null,
+                    chipLabel: l.filtered_chip_all_mega,
                     eid: 99980
                 },
                 {
                     icon: 'cloud-drive',
                     label: l['164'],
                     data: ['cloud'],
+                    chipLabel: l.filtered_chip_cloud,
                     eid: 99981
                 },
                 {
                     icon: 'recents-filled',
                     label: l['20141'],
                     data: ['recents'],
+                    chipLabel: l.filtered_chip_recents,
                     eid: 99982
                 },
                 {
                     icon: 'favourite-filled',
                     label: l.gallery_favourites,
                     data: ['favourites'],
+                    chipLabel: l.filtered_chip_faves,
                     eid: 99983
                 },
                 {
                     icon: 'bin-filled',
                     label: l['168'],
                     data: ['rubbish'],
+                    chipLabel: l.filtered_chip_bin,
                     eid: 99985
                 },
                 {
                     icon: 'folder-incoming-share',
                     label: l['5542'],
                     data: ['incoming'],
+                    chipLabel: l.filtered_chip_inshare,
                     eid: 99986
                 },
                 {
                     icon: 'folder-outgoing-share',
                     label: l['5543'],
                     data: ['outgoing'],
+                    chipLabel: l.filtered_chip_outshare,
                     eid: 99987
                 },
                 {
                     icon: 'bucket-triangle-thin-outline',
                     label: l.obj_storage,
                     data: ['s4'],
+                    chipLabel: l.filtered_chip_s4,
                     eid: 99987
                 }
             ]
         }
     };
+    if (u_attr && u_attr.s4) {
+        filters.type.menu.splice(-1, 0, {
+            icon: 'bucket-objects-thin-outline',
+            label: l.filter_chip_type_buckets,
+            data: ['bucket'],
+            eid: 501134,
+            chipLabel: l.filtered_chip_buckets
+        });
+    }
     Object.setPrototypeOf(filters, null);
 
     /**
@@ -381,6 +394,21 @@ lazy(mega.ui, 'mNodeFilter', () => {
             Object.defineProperty(this, 'ident', {value: 1 << Object.keys(this.filters).indexOf(name)});
             Object.defineProperty(this, 'ctx', {value: this.filters[name]});
 
+            const head = mCreateElement('div', { 'class': 'filter-title-block' }, [
+                mCreateElement('div', { 'class': 'filter-title-text' }, [document.createTextNode(this.ctx.title)]),
+            ]);
+            this.clearButton = new MegaButton({
+                parentNode: head,
+                type: 'text',
+                componentClassname: 'filter-clear underline-offset-4 hidden',
+                text: l.filter_chip_clear,
+                onClick: () => {
+                    this.onItemSelect(this.selectedIndex);
+                }
+            });
+            this.el.prepend(head);
+            this.el.classList.add('filter-chip-drop');
+
             // @todo make this 'click' still optional for our purpose in MMenuSelect(?)
             for (let i = this.ctx.menu.length; i--;) {
                 this.ctx.menu[i].click = nop;
@@ -390,7 +418,7 @@ lazy(mega.ui, 'mNodeFilter', () => {
 
             const position = () => {
                 let {x, bottom, width} = this.$element.get(0).getBoundingClientRect();
-                bottom++;
+                bottom += 9;
                 if (document.body.classList.contains('rtl')) {
                     x += width;
                 }
@@ -412,6 +440,14 @@ lazy(mega.ui, 'mNodeFilter', () => {
                 if (this.selectedIndex === -1) {
                     this.$text.text(this.ctx.title);
                     this.$element.removeClass('selected');
+                }
+                if (name === 'type' && u_attr && u_attr.s4) {
+                    if (M.search || M.currentdirid === 'public-links' || M.currentdirid === 'faves') {
+                        $('a .icon-bucket-objects-thin-outline', this.el).parent().removeClass('hidden');
+                    }
+                    else {
+                        $('a .icon-bucket-objects-thin-outline', this.el).parent().addClass('hidden');
+                    }
                 }
             });
 
@@ -478,6 +514,7 @@ lazy(mega.ui, 'mNodeFilter', () => {
 
                 this.$element.toggleClass('hidden', !this.ctx.shouldShow());
             }
+            this.clearButton.hide();
         }
 
         /**
@@ -536,7 +573,6 @@ lazy(mega.ui, 'mNodeFilter', () => {
                     }
                 }
 
-                this.$text.text(item.el.innerText);
             }
 
             this.selectedIndex = index;
@@ -553,7 +589,7 @@ lazy(mega.ui, 'mNodeFilter', () => {
 
             this.selectedFilters.value |= this.ident;
             this.selectedFilters.data = freeze({ name: this.name, index });
-            this.$text.text(item.el.innerText);
+            this.$text.text(this.ctx.menu[index].chipLabel || this.ctx.menu[index].label);
             this.$element.addClass('selected');
             this.$resetFilterChips.removeClass('hidden');
             tryCatch(() => {
@@ -587,6 +623,7 @@ lazy(mega.ui, 'mNodeFilter', () => {
                     mega.ui.searchbar.reinitiateSearchTerm();
                 }
             }
+            this.clearButton.show();
         }
     }
 

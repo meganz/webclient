@@ -981,19 +981,6 @@ class MegaHeader extends MegaMobileHeader {
                         rightIcon: 'sprite-fm-mono icon-chevron-right-thin-outline'
                     },
                     {
-                        componentClassname: 'feedback',
-                        text: l.join_survey_share_opinion,
-                        onClick: () => {
-                            mega.config.set('rvonbrddl', 1);
-                            window.open(
-                                'https://survey.mega.co.nz/index.php?r=survey/index&sid=692176&lang=en',
-                                '_blank',
-                                'noopener,noreferrer'
-                            );
-                            eventlog(500328);
-                        }
-                    },
-                    {
                         componentClassname: 'helpcentre extlink',
                         text: l[384],
                         target: '_blank',

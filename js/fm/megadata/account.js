@@ -1120,6 +1120,10 @@ MegaData.prototype.showOverStorageQuota = async function(quota, options) {
                 });
             });
         }
+
+        // log ODQ paywall shown
+        eventlog(501165);
+
         $pmMain.addClass('fm-notification full');
 
         $strgdlg.addClass('full');
@@ -1302,7 +1306,7 @@ MegaData.prototype.showOverStorageQuota = async function(quota, options) {
 
         loadSubPage('pro');
 
-        eventlog(quota.isFull ? 500493 : 500492);
+        eventlog(quota.isFull ? 500493 : quota === EPAYWALL ? 501164 : 500492);
 
         return false;
     });

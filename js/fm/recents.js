@@ -214,7 +214,7 @@ RecentsRender.prototype.setFilters = function(actions) {
     }
 
     const locStrings = [l[164], l[5542], l[5543]];
-    const typeExStrings = [l.filter_chip_type_folder];
+    const typeExStrings = [l.filter_chip_type_folder, l.filter_chip_type_buckets];
 
     if (u_attr.s4) {
         locStrings.push(l.obj_storage);
@@ -277,6 +277,25 @@ RecentsRender.prototype.setFilters = function(actions) {
 
             const subMenu = new MMenuSelect();
             subMenu.parentItem = { el: chip };
+            const head = mCreateElement('div', { 'class': 'filter-title-block' }, [
+                mCreateElement('div', { 'class': 'filter-title-text' }, [document.createTextNode(title)]),
+            ]);
+            const clearButton = new MegaButton({
+                parentNode: head,
+                type: 'text',
+                componentClassname: 'filter-clear underline-offset-4 hidden',
+                text: l.filter_chip_clear,
+                onClick: () => {
+                    delete filterArr[i].selection;
+                    delete this.selectedFilters[i];
+                    this.clearFilterChip(i);
+                    const filtered = filteredActions();
+                    this.renderFiltered(filtered);
+                    subMenu.hide(true);
+                }
+            });
+            subMenu.el.prepend(head);
+            subMenu.el.classList.add('filter-chip-drop');
 
             let items = [...menu];
 
@@ -297,7 +316,12 @@ RecentsRender.prototype.setFilters = function(actions) {
                 items = items.filter(({ label }) => !disallowedTypes[label]);
             }
 
-            subMenu.options = items.map(({ label, icon, data }, index) => {
+            subMenu.options = items.map(({ label, icon, data, chipLabel }, index) => {
+                const selected = (!!this.selectedFilters[i] && this.selectedFilters[i][0] === index)
+                    || (!data && !this.selectedFilters[i]);
+                if (selected) {
+                    clearButton.show();
+                }
                 return {
                     label,
                     icon,
@@ -305,7 +329,7 @@ RecentsRender.prototype.setFilters = function(actions) {
                         if (data) {
                             filterArr[i].selection = data;
                             this.selectedFilters[i] = [index, match.bind(filterArr[i])];
-                            this.adjustFilterChip(i, label, actions);
+                            this.adjustFilterChip(i, chipLabel, actions);
                         }
                         else {
                             delete filterArr[i].selection;
@@ -316,13 +340,12 @@ RecentsRender.prototype.setFilters = function(actions) {
                         const filtered = filteredActions();
                         this.renderFiltered(filtered);
                     },
-                    selected: (!!this.selectedFilters[i] && this.selectedFilters[i][0] === index)
-                        || (!data && !this.selectedFilters[i]),
+                    selected,
                     checkFn() {
                         if (!this.checkEl) {
                             this.checkEl = document.createElement('i');
                             this.el.append(this.checkEl);
-                            this.checkEl.className = 'sprite-fm-mono icon-check selected-mark';
+                            this.checkEl.className = 'sprite-fm-mono icon-check-thin-outline selected-mark';
                             this.el.classList.add('selected', 'hide-radio-on');
                         }
 
@@ -330,7 +353,7 @@ RecentsRender.prototype.setFilters = function(actions) {
                 };
             });
 
-            subMenu.show(x + (this.isRtl ? width : 0), bottom + 2);
+            subMenu.show(x + (this.isRtl ? width : 0), bottom + 8);
         });
 
         chips[0].appendChild(chip);

@@ -80,7 +80,7 @@ lazy(mega.devices, 'ui', () => {
      */
     const filters = {
         deviceactivity: {
-            title: l.dc_fchips_all_devices,
+            title: l.filter_chip_dc_status,
             selection: false,
             shouldShow() {
                 const {ui} = mega.devices;
@@ -98,11 +98,17 @@ lazy(mega.devices, 'ui', () => {
             },
             menu: [
                 {
+                    label: l.dc_fchips_all_devices,
+                    data: null,
+                    chipLabel: l.filtered_chip_dc_all,
+                },
+                {
                     defaultOption: true,
                     label: l.dc_fchips_active_devices,
                     get data() {
                         return (hb) => mega.devices.data.isActive(hb);
                     },
+                    chipLabel: l.filtered_chip_dc_active,
                     // eid: 99942
                 },
                 {
@@ -111,6 +117,7 @@ lazy(mega.devices, 'ui', () => {
                     get data() {
                         return (hb) => !mega.devices.data.isActive(hb);
                     },
+                    chipLabel: l.filtered_chip_dc_inactive,
                     // eid: 99943
                 },
             ]
@@ -158,7 +165,7 @@ lazy(mega.devices, 'ui', () => {
          * @returns {undefined}
          */
         onItemSelect(index, item, clickFn, preventReload, autoSelected) {
-            const {name} = this;
+            const {name, clearButton} = this;
             selectionManager.clear_selection();
             selectedFilters.data = freeze({
                 name,
@@ -166,6 +173,7 @@ lazy(mega.devices, 'ui', () => {
             });
             selectedFilters.manual = !autoSelected;
             super.onItemSelect(index, item, clickFn, preventReload);
+            clearButton.hide();
         }
 
         /**
@@ -922,7 +930,7 @@ lazy(mega.devices, 'ui', () => {
                     const currSect = ui.getRenderSection();
                     switch (currSect) {
                         case renderSection.devices:
-                            this.autoSelect('deviceactivity', 0, preventReload);
+                            this.autoSelect('deviceactivity', 1, preventReload);
                             break;
                         default:
                             this.resetSelections();

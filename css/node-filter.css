@@ -63,7 +63,7 @@
 /* For the MComponent dropdowns */
 .hide-radio-on .radioOn {
     display: none !important;
-};
+}
 .m-dropdown-item.hide-radio-on:hover {
     color: var(--text-color-medium);
 }
@@ -75,16 +75,11 @@
 .m-dropdown-item.hide-radio-on > div {
     align-items: center;
 }
-.m-dropdown-item.hide-radio-on.selected {
-    background: var(--surface-grey-2);
-    color: var(--text-color-medium);
-}
 .m-dropdown-item.hide-radio-on .selected-mark {
     display: none;
 }
 .m-dropdown-item.hide-radio-on.selected .selected-mark {
     display: block;
-    --mask-color: var(--icon-rest);
 }
 .is-sensitive,
 tr.is-sensitive td span.item-type-icon {
@@ -140,4 +135,35 @@ tr.hidden-as-sensitive {
 .m-dropdown-item.hide-radio-on .dropdown-inline-tooltip {
     margin-left: 4px;
     margin-right: 4px;
+}
+.dropdown.body.context.filter-chip-drop {
+    border-color: var(--mobile-border-strong);
+    border-radius: 16px;
+    box-shadow: var(--mobile-shadow-medium);
+    min-width: 280px;
+    padding: 16px;
+}
+.filter-title-block {
+    display: flex;
+    align-items: center;
+    height: 36px;
+    justify-content: space-between;
+}
+.filter-title-block .filter-title-text {
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-caption-large-bold);
+    padding: 0 8px;
+}
+.filter-title-block .filter-clear.nav-elem.text-only {
+    padding: 0 8px;
+}
+.filter-title-block .filter-clear span {
+    color: var(--mobile-text-secondary);
+    font: var(--mobile-font-caption-large-regular);
+}
+.filter-chip-drop .m-dropdown-item {
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-caption-large-regular);
+    height: 36px;
+    --mask-color: var(--mobile-icon-primary);
 }

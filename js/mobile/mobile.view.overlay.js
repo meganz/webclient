@@ -411,16 +411,19 @@ class MegaMobileViewOverlay extends MegaComponent {
                         contentBlock.classList.remove('v-hidden');
 
                         const changeHandler = () => {
-                            this.confirmDiscard = () => mobile.messageOverlay.show(
-                                l.file_request_confirm_close_page,
-                                l.file_request_discard_changes,
-                                'sprite-mobile-fm-mono icon-alert-triangle-thin-outline warning',
-                                [l.file_request_discard_btn],
-                                false,
-                                true
-                            ).then(() => true).catch(() => false);
+                            if (this.bottomBar.actions[0].disabled) {
+                                this.confirmDiscard = () => mobile.messageOverlay.show(
+                                    l.file_request_confirm_close_page,
+                                    l.file_request_discard_changes,
+                                    'sprite-mobile-fm-mono icon-alert-triangle-thin-outline warning',
+                                    [l.file_request_discard_btn],
+                                    false,
+                                    true
+                                ).then(() => true).catch(() => false);
 
-                            this.bottomBar.actions[0].disabled = false;
+                                eventlog(501157);
+                                this.bottomBar.actions[0].disabled = false;
+                            }
                         };
 
                         this.versionHandle = '';

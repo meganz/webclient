@@ -311,3 +311,45 @@
 .it-button.disabled::before {
     display: none;
 }
+
+
+/* States. Loading state */
+
+.it-button.loading {
+    pointer-events: none;
+    position: relative;
+}
+
+.it-button.loading > * {
+    opacity: 0;
+}
+
+.it-button.loading::after {
+    animation: clockwiseSizeChanger 2s ease-in-out infinite;
+    border-radius: 50%;
+    border: 3px solid var(--main-forced-white);
+    box-sizing: border-box;
+    content: "";
+    height: 24px;
+    left: 50%;
+    margin: -12px 0 0 -12px;
+    position: absolute;
+    top: 50%;
+    width: 24px;
+}
+
+/* States. Loading state. Outline and ghost types. */
+
+.it-button.ouline.loading::after,
+.it-button.ghost.loading::after {
+    border-color: var(--main-primary);
+}
+
+/* States. Loading state. Sizes */
+
+.it-button.lg-size.loading::after,
+.it-button.xl-size.loading::after {
+    height: 28px;
+    margin: -14px 0 0 -14px;
+    width: 28px;
+}

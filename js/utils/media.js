@@ -4303,57 +4303,9 @@ FullScreenManager.prototype.enterFullscreen = function() {
      * @returns {Object}
      */
     MediaAttribute.prototype.fromAttributeString = function(attrs, filekey) {
-        var r = null;
         attrs = attrs || this.fa;
         filekey = filekey || this.k;
-        if (!Array.isArray(filekey) || filekey.length !== 8) {
-            attrs = null;
-        }
-        var pos = String(attrs).indexOf(':8*');
-
-        if (pos >= 0) {
-            var v = new Uint32Array(base64_to_ab(attrs.substr(pos + 3, 11)), 0, 2);
-            v = xxtea.decryptUint32Array(v, xxkey(filekey));
-            v = new Uint8Array(v.buffer);
-
-            r = Object.create(null);
-
-            r.width = (v[0] >> 1) + ((v[1] & 127) << 7);
-            if (v[0] & 1) {
-                r.width = (r.width << 3) + 16384;
-            }
-
-            r.height = v[2] + ((v[3] & 63) << 8);
-            if (v[1] & 128) {
-                r.height = (r.height << 3) + 16384;
-            }
-
-            r.fps = (v[3] >> 7) + ((v[4] & 63) << 1);
-            if (v[3] & 64) {
-                r.fps = (r.fps << 3) + 128;
-            }
-
-            r.playtime = (v[4] >> 7) + (v[5] << 1) + (v[6] << 9);
-            if (v[4] & 64) {
-                r.playtime = r.playtime * 60 + 131100;
-            }
-
-            if (!(r.shortformat = v[7])) {
-                pos = attrs.indexOf(':9*');
-
-                if (pos >= 0) {
-                    v = new Uint32Array(base64_to_ab(attrs.substr(pos + 3, 11)), 0, 2);
-                    v = xxtea.decryptUint32Array(v, xxkey(filekey));
-                    v = new Uint8Array(v.buffer);
-
-                    r.container = v[0];
-                    r.videocodec = v[1] + ((v[2] & 15) << 8);
-                    r.audiocodec = (v[2] >> 4) + (v[3] << 4);
-                }
-            }
-        }
-
-        return r;
+        return xxtea.decryptMediaAttributes(attrs, filekey) || null;
     };
 
     /**

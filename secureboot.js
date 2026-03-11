@@ -2737,6 +2737,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/vendor/jquery-ui.js', n: 'jquery_ui', j: 1, w: 10});
         jsl.push({f:'js/vendor/jquery.fullscreen.js', n: 'jquery_fullscreen', j:1, w:10});
         jsl.push({f:'js/vendor/jquery.mousewheel.js', n: 'jquerymouse_js', j:1});
+        jsl.push({f:'js/vendor/qrcode.js', n: 'qrcode', j:1,w:2, g: 'vendor'});
 
         jsl.push({f:'js/utils/broadcast.js', n: 'js_utils_broadcast_js', j: 1});
         jsl.push({f:'js/utils/clipboard.js', n: 'js_utils_clipboard_js', j: 1});
@@ -2990,6 +2991,7 @@ else if (!browserUpdate) {
 
             // Dialogs
             'it:0040': {f:'js/ui/transfer/js/ui/dialogs/dialog.js', n: 'ui_dialog_js', j: 1},
+            'it:0041': {f:'js/ui/transfer/js/ui/dialogs/qr-dialog.js', n: 'ui_qr_dialog_js', j: 1},
 
             'it:0050': {f:'js/ui/transfer/js/common.js', n: 'utils_common_js', j: 1},
 

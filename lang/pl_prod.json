@@ -5724,6 +5724,7 @@
     "transferit_sent_to_x": "{count, plural, one {Wys\u0142ane do # odbiorcy} few {Wys\u0142ane do # odbiorc\u00f3w} many {Wys\u0142ane do # odbiorc\u00f3w}}",
     "transferit_sent_x": "Wys\u0142ane %1",
     "transferit_share_ideas": "Podziel si\u0119 swoimi pomys\u0142ami",
+    "transferit_share_qr": "Udost\u0119pnij kod QR",
     "transferit_share_uploaded_error": "Mo\u017cesz udost\u0119pnia\u0107 tylko plik przes\u0142ane do MEGA",
     "transferit_simple_share_hdr": "Zachwycaj\u0105co proste i wydajne udost\u0119pnianie plik\u00f3w",
     "transferit_size_low": "Rozmiar",

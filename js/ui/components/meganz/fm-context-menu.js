@@ -945,7 +945,7 @@
                         {
                             buttonId: 'managelink-item',
                             text: l[6909],
-                            icon: 'sprite-fm-mono icon-link-thin-outline',
+                            icon: 'sprite-fm-mono icon-link-gear-thin-outline',
                             onClick(ev) {
                                 if (mega.ui.contextMenu.firstAlbum) {
                                     if (M.isInvalidUserStatus()) {
@@ -1267,9 +1267,30 @@
                         return;
                     }
 
+                    const handle = mega.ui.contextMenu.selectedItems[0];
                     megasync.isInstalled((err, is) => {
-                        if ((!err || is) && megasync.currUser === u_handle) {
-                            megasync.syncFolder(mega.ui.contextMenu.selectedItems[0]);
+                        if (!err || is) {
+                            if (megasync.currUser === u_handle) {
+                                megasync.syncPossibleA(handle).then(({ error, response }) => {
+                                    if (!error && response === 0) {
+                                        megasync.syncFolder(handle);
+                                    }
+                                    else {
+                                        throw new Error('Sync not possible');
+                                    }
+                                }).catch(() => {
+                                    msgDialog('error', '', escapeHTML(l.err_unknown_temp)
+                                        .replace('[A]', '<a href="/support" target="_blank" rel="noopener,noreferrer">')
+                                        .replace('[/A]', '</a>'));
+                                    megasync.hideSyncOption = true;
+                                });
+                            }
+                            else {
+                                msgDialog('warninga', '', l.account_mismatch_info);
+                            }
+                        }
+                        else {
+                            dlmanager.showMEGASyncOverlay();
                         }
                     });
                 }
@@ -1619,7 +1640,7 @@
             {
                 buttonId: 'managelink-nosub',
                 text: l[6909],
-                icon: 'sprite-fm-mono icon-link-thin-outline',
+                icon: 'sprite-fm-mono icon-link-gear-thin-outline',
                 onClick() {
                     M.getLinkAction(mega.ui.contextMenu.selectedItems);
                 }

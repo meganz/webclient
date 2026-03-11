@@ -5724,6 +5724,7 @@
     "transferit_sent_to_x": "{count, plural, one {Trimis c\u0103tre # destinatar} few {Trimis c\u0103tre # destinatari} other {Trimis c\u0103tre # destinatari}}",
     "transferit_sent_x": "Trimis %1",
     "transferit_share_ideas": "Partajeaz\u0103 ideile tale",
+    "transferit_share_qr": "Distribuie codul QR",
     "transferit_share_uploaded_error": "Pute\u021bi partaja numai fi\u0219ierele pe care le-a\u021bi \u00eenc\u0103rcat \u00een MEGA",
     "transferit_simple_share_hdr": "Partajare de fi\u0219iere \u00eenc\u00e2nt\u0103tor de simpl\u0103 \u0219i puternic\u0103",
     "transferit_size_low": "Dimensiune",

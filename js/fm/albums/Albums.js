@@ -2859,7 +2859,7 @@ lazy(mega.gallery, 'albums', () => {
                     },
                     {
                         text: ph ? l[6909] : mega.icu.format(l.album_share_link, 1),
-                        icon: 'sprite-fm-mono icon-link-thin-outline',
+                        icon: `sprite-fm-mono icon-link${ph ? '-gear' : ''}-thin-outline`,
                         onClick: () => {
                             if (M.isInvalidUserStatus()) {
                                 return;
@@ -4325,7 +4325,13 @@ lazy(mega.gallery, 'albums', () => {
                 && scope.albums.store.fav.nodes
                 && scope.albums.store.fav.nodes.some(({ h }) => h === node.h)
             ) {
-                this.onCDNodeRemove(node);
+                removeNodeFromAlbum('fav', node.h);
+                if (slideshowid) {
+                    tmpMv.splice(tmpMv.indexOf(node), 1);
+                }
+                if ($.timelineDialog) {
+                    removeNodeFromTimelineDialog(node.h);
+                }
                 return;
             }
 

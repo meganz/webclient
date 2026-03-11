@@ -63,8 +63,13 @@ mega.textEditorUI = new function TextEditorUI() {
                 function(data) {
                     loadingDialog.hide();
                     mega.textEditorUI.setupEditor(
-                        M.getNodeByHandle(nodeHandle).name, data, nodeHandle
-                    );
+                        M.getNodeByHandle(nodeHandle).name,
+                        data,
+                        nodeHandle,
+                        undefined,
+                        undefined,
+                        true
+                    ).then(() => eventlog(501045)).catch(dump);
                 }
             ).fail(function() {
                 loadingDialog.hide();
@@ -81,10 +86,17 @@ mega.textEditorUI = new function TextEditorUI() {
             return;
         }
 
-        var changeListner = function() {
+        var changeListner = tryCatch((...args) => {
             $saveButton.removeClass('disabled');
             editor.off('change', changeListner);
-        };
+
+            const skipEventLog = args.length && args[1] &&
+                args[1].origin === 'setValue' &&
+                args[1].text[0] === '';
+            if (!skipEventLog) {
+                eventlog(501157);
+            }
+        });
 
         editor.on('change', changeListner);
 
@@ -145,6 +157,7 @@ mega.textEditorUI = new function TextEditorUI() {
         mywindow.focus();
         mywindow.print();
         mywindow.close();
+        eventlog(501051);
         return true;
     };
 
@@ -233,6 +246,7 @@ mega.textEditorUI = new function TextEditorUI() {
                     return false;
                 }
                 contextMenu.toggle(formatMenu);
+                eventlog(501054);
                 return false;
             }
         );
@@ -246,10 +260,20 @@ mega.textEditorUI = new function TextEditorUI() {
             }
         );
 
+        const closeActionEventMap = {
+            'SPAN': 501048,
+            'I': 501055
+        };
+
         $('header .close-btn, .file-menu .close-f', $editorContainer).rebind(
             'click.txt-editor',
-            function textEditorCloseBtnClick() {
-
+            function textEditorCloseBtnClick(e) {
+                const cb = tryCatch(() => {
+                    const eventId = closeActionEventMap[e.target.tagName];
+                    if (eventId) {
+                        eventlog(eventId);
+                    }
+                });
                 if (editor) {
                     confirmSaveOrExit();
                 }
@@ -257,6 +281,7 @@ mega.textEditorUI = new function TextEditorUI() {
                     history.back();
                     mega.textEditorUI.doClose();
                 }
+                cb();
                 return false;
             }
         );
@@ -289,6 +314,7 @@ mega.textEditorUI = new function TextEditorUI() {
                         if (cb && typeof cb === 'function') {
                             cb();
                         }
+                        eventlog(cb && cb.eventId || 501053);
                     };
 
                     mega.textEditorUI.save(fileHandle, versionHandle, editor.getValue())
@@ -311,7 +337,7 @@ mega.textEditorUI = new function TextEditorUI() {
         $('.file-menu .save-f', $menuBar).rebind(
             'click.txt-editor',
             function saveFileMenuClick() {
-                $saveButton.trigger('click');
+                $saveButton.trigger('click', {eventId: 501049});
             }
         );
 
@@ -334,6 +360,7 @@ mega.textEditorUI = new function TextEditorUI() {
                 selectionManager.clear_selection();
                 selectionManager.add_to_selection(versionHandle || fileHandle);
                 M.getLinkAction();
+                eventlog(501046);
             }
         );
 
@@ -343,6 +370,7 @@ mega.textEditorUI = new function TextEditorUI() {
                 selectionManager.clear_selection();
                 selectionManager.add_to_selection(versionHandle || fileHandle);
                 openSendToChatDialog();
+                eventlog(501047);
             }
         );
 
@@ -374,7 +402,9 @@ mega.textEditorUI = new function TextEditorUI() {
                     l[22750],
                     l[22753],
                     () => {
-                        M.saveAs(savedFileData, fileName);
+                        M.saveAs(savedFileData, fileName)
+                            .then(() => eventlog(501052))
+                            .catch(dump);
                     }
                 );
             }
@@ -485,7 +515,7 @@ mega.textEditorUI = new function TextEditorUI() {
             node,
             contents,
             async h => {
-
+                const logEvent = eventlog.bind(null, n ? 501044 : 501050);
                 $.selected = Array.isArray(h) ? h : [h];
                 h = $.selected[0];
                 const data = await M.getStorageQuota().catch(dump);
@@ -494,6 +524,7 @@ mega.textEditorUI = new function TextEditorUI() {
 
                 if (data.isFull) {
                     ulmanager.ulShowOverStorageQuotaDialog();
+                    logEvent();
                     return false;
                 }
 
@@ -502,8 +533,13 @@ mega.textEditorUI = new function TextEditorUI() {
                 }
                 else {
                     mega.textEditorUI.setupEditor(
-                        M.getNodeByHandle(h).name, editedTxt || savedFileData, h
-                    );
+                        M.getNodeByHandle(h).name,
+                        editedTxt || savedFileData,
+                        h,
+                        undefined,
+                        undefined,
+                        true
+                    ).then(() => logEvent()).catch(dump);
                 }
                 return h;
             }
@@ -552,9 +588,10 @@ mega.textEditorUI = new function TextEditorUI() {
      * @param {String} handle       Node handle
      * @param {Boolean} isReadonly  Flag to open Editor in read-only mode
      * @param {jQuery} $viewerContainer  just use the plain text content block, aka viewer-mode
-     * @returns {Void}              void
+     * @param {Boolean} skipEventLog  Flag to skip event log
+     * @returns {Promise}           Promise which resolves when editor is setup and initialized
      */
-    this.setupEditor = function(fName, txt, handle, isReadonly, $viewerContainer) {
+    this.setupEditor = function(fName, txt, handle, isReadonly, $viewerContainer, skipEventLog) {
         return Promise.resolve(M.require('codemirror_js', 'codemirrorscroll_js')).then(() => {
             if ($viewerContainer) {
                 this.cleanup();
@@ -623,7 +660,7 @@ mega.textEditorUI = new function TextEditorUI() {
             fileHandle = handle;
             versionHandle = '';
             fileName = fName;
-            if (page !== 'download') {
+            if (page !== 'download' && !skipEventLog) {
                 eventlog(99807);
             }
 

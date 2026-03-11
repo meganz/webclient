@@ -472,7 +472,7 @@ lazy(mega.devices, 'data', () => {
             }
             else {
                 props.icon = 'folder-sync';
-                props.typeText = l[17621];
+                props.typeText = l.footer_item_sync;
             }
 
             folder.props = {

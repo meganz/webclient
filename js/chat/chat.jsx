@@ -549,9 +549,9 @@ Chat.prototype.unregisterUploadListeners = function(destroy) {
 };
 
 Chat.prototype.registerUploadListeners = function() {
-    'use strict';
     var self = this;
     var logger = d && MegaLogger.getLogger('chatUploadListener', false, self.logger);
+    const ufo = Object.create(null);
 
     self.unregisterUploadListeners(true);
 
@@ -588,6 +588,10 @@ Chat.prototype.registerUploadListeners = function() {
     var unregisterListeners = function() {
         if (!$.len(ulmanager.ulEventData)) {
             self.unregisterUploadListeners();
+
+            if (d) {
+                logger.warn('Revoked upload listeners.');
+            }
         }
     };
 
@@ -604,6 +608,9 @@ Chat.prototype.registerUploadListeners = function() {
 
             delete ulmanager.ulEventData[ul.uid];
             unregisterListeners();
+        }
+        else if (d) {
+            logger.warn('could not complete upload...', ul);
         }
     };
 
@@ -638,13 +645,21 @@ Chat.prototype.registerUploadListeners = function() {
                 }
                 ul.efa = 0;
             }
+            else if (ufo[faid]) {
+                if (d) {
+                    logger.info(`Recovering fa:error state for ${faid}`, ufo[faid], ul.efa);
+                }
+                ul.efa = Math.max(0, ul.efa - ufo[faid]) | 0;
+            }
 
             if (ul.efa && (!n.fa || String(n.fa).split('/').length < ul.efa)) {
                 // The fa was not yet attached to the node, wait for fa:* events
+
+                console.assert(!ul.faid || ul.faid === faid, `${faid} != ${ul.faid}`);
                 ul.faid = faid;
 
                 if (d) {
-                    logger.info('Waiting for file attribute to arrive.', handle, ul);
+                    logger.info('Waiting for file attribute to arrive.', handle, ul.efa, n.fa, n.name, ul, [n]);
                 }
             }
             else {
@@ -666,6 +681,9 @@ Chat.prototype.registerUploadListeners = function() {
             delete ulmanager.ulEventData[uid];
             unregisterListeners();
         }
+        else if (d) {
+            logger.warn(`No upload association for #${uid}`, error);
+        }
     };
 
     // Signal upload completion on file attribute availability
@@ -675,7 +693,7 @@ Chat.prototype.registerUploadListeners = function() {
             var ul = ulmanager.ulEventData[uid] || false;
 
             if (d) {
-                logger.debug('fa:ready', handle, fa, uid, ul);
+                logger.debug('fa:ready', handle, fa, ul.efa, uid, ul);
             }
 
             if (ul.h && String(fa).split('/').length >= ul.efa) {
@@ -683,7 +701,7 @@ Chat.prototype.registerUploadListeners = function() {
                 onUploadComplete(ul);
             }
             else if (d) {
-                logger.debug('Not enough file attributes yet, holding...', ul);
+                logger.debug('Not enough file attributes yet, holding...', handle, fa, ul.efa, ul);
             }
         });
     };
@@ -711,6 +729,12 @@ Chat.prototype.registerUploadListeners = function() {
                     onUploadComplete(ul);
                 }
             }
+        }
+        else {
+            if (d) {
+                logger.warn(`No upload association for ${faid} (yet?)`, nFAiled, error);
+            }
+            ufo[faid] = (ufo[faid] | 0) + nFAiled;
         }
     };
 

@@ -79,6 +79,16 @@ if (typeof importScripts !== 'undefined') {
         'use strict';
         const req = e.data;
         if (Array.isArray(req) && req.bulkpm) {
+            if (req.bulkpm === req.ttoken) {
+                // transfer.it
+                for (let i = req.length; i--;) {
+                    const n = req[i];
+                    if (n.a) {
+                        req[i] = new TransferNode(n);
+                    }
+                }
+                return self.postMessage(req);
+            }
             while (req.length) {
                 _msgproc({data: req.shift()});
             }
@@ -1020,6 +1030,112 @@ function from8(utf8) {
 
 // --------------------------------------------------------------------------
 
+self.xxtea = (function() {
+    'use strict';
+    // (from https://github.com/xxtea/xxtea-js/blob/master/src/xxtea.js)
+    const DELTA = 0x9E3779B9;
+    const ns = Object.create(null);
+    const int32 = (i) => i & 0xFFFFFFFF;
+    const mx = (sum, y, z, p, e, k) => (z >>> 5 ^ y << 2) + (y >>> 3 ^ z << 4) ^ (sum ^ y) + (k[p & 3 ^ e] ^ z);
+    const xxkey = (k) => {
+        const key = new Uint32Array(4);
+        for (let i = 4; i--;) {
+            key[i] = k[i + 4];
+        }
+        return key;
+    };
+
+    ns.encryptUint32Array = (v, k) => {
+        const {length} = v;
+        const n = length - 1;
+        let sum = 0;
+        let z = v[n];
+        let y, e, p, q;
+        for (q = Math.floor(6 + 52 / length) | 0; q > 0; --q) {
+            sum = int32(sum + DELTA);
+            e = sum >>> 2 & 3;
+            for (p = 0; p < n; ++p) {
+                y = v[p + 1];
+                z = v[p] = int32(v[p] + mx(sum, y, z, p, e, k));
+            }
+            y = v[0];
+            z = v[n] = int32(v[n] + mx(sum, y, z, n, e, k));
+        }
+        return v;
+    };
+
+    ns.decryptUint32Array = (v, k) => {
+        const {length} = v;
+        const n = length - 1;
+        let y = v[0];
+        let z, sum, e, p;
+        const q = Math.floor(6 + 52 / length);
+        for (sum = int32(q * DELTA); sum !== 0; sum = int32(sum - DELTA)) {
+            e = sum >>> 2 & 3;
+            for (p = n; p > 0; --p) {
+                z = v[p - 1];
+                y = v[p] = int32(v[p] - mx(sum, y, z, p, e, k));
+            }
+            z = v[n];
+            y = v[0] = int32(v[0] - mx(sum, y, z, 0, e, k));
+        }
+        return v;
+    };
+
+    ns.decryptMediaAttributes = function(fa, key) {
+        let pos = -1;
+        let res = false;
+
+        if (Array.isArray(key) && key.length === 8 && typeof fa === 'string' && (pos = fa.indexOf(':8*')) >= 0) {
+            let v = new Uint32Array(base64_to_ab(fa.substr(pos + 3, 11)), 0, 2);
+            v = xxtea.decryptUint32Array(v, xxkey(key));
+            v = new Uint8Array(v.buffer);
+
+            res = Object.create(null);
+
+            res.width = (v[0] >> 1) + ((v[1] & 127) << 7);
+            if (v[0] & 1) {
+                res.width = (res.width << 3) + 16384;
+            }
+
+            res.height = v[2] + ((v[3] & 63) << 8);
+            if (v[1] & 128) {
+                res.height = (res.height << 3) + 16384;
+            }
+
+            res.fps = (v[3] >> 7) + ((v[4] & 63) << 1);
+            if (v[3] & 64) {
+                res.fps = (res.fps << 3) + 128;
+            }
+
+            res.playtime = (v[4] >> 7) + (v[5] << 1) + (v[6] << 9);
+            if (v[4] & 64) {
+                res.playtime = res.playtime * 60 + 131100;
+            }
+
+            if (!(res.shortformat = v[7])) {
+                pos = fa.indexOf(':9*');
+
+                if (pos >= 0) {
+                    v = new Uint32Array(base64_to_ab(fa.substr(pos + 3, 11)), 0, 2);
+                    v = xxtea.decryptUint32Array(v, xxkey(key));
+                    v = new Uint8Array(v.buffer);
+
+                    res.container = v[0];
+                    res.videocodec = v[1] + ((v[2] & 15) << 8);
+                    res.audiocodec = (v[2] >> 4) + (v[3] << 4);
+                }
+            }
+        }
+
+        return res;
+    };
+
+    return Object.freeze(ns);
+})();
+
+// --------------------------------------------------------------------------
+
 class MegaNode {
     constructor(node) {
         if (node) {
@@ -1050,6 +1166,12 @@ class TransferNode extends MegaNode {
     constructor(n, value) {
         if (n.a) {
             crypto_procattr(n, base64_to_a32(n.k));
+            delete n.a; // anyway
+
+            if (n.fa) {
+                const a = xxtea.decryptMediaAttributes(n.fa, n.k);
+                Object.assign(n, a.shortformat !== 0xff && a);
+            }
         }
         super(n);
         Object.defineProperty(this, 'xh', {value});
@@ -1071,7 +1193,7 @@ lazy(self, 'decWorkerPool', function decWorkerPool() {
     /** @class decWorkerPool */
     return new class extends Array {
         get url() {
-            const WORKER_VERSION = 12;
+            const WORKER_VERSION = 13;
             return `${window.is_extension || window.is_karma ? '' : '/'}nodedec.js?v=${WORKER_VERSION}`;
         }
 

@@ -1662,8 +1662,8 @@ pro.propay = {
 
         if (this.planObj.storage && this.planObj.transfer) {
             const $planInfo = $('.plan-info', $planCard).removeClass('hidden');
-            $('.storage', $planInfo).text(bytesToSize(this.planObj.storage, 3, 4) + ' storage');
-            $('.transfer', $planInfo).text(bytesToSize(this.planObj.transfer, 3, 4) + ' transfer');
+            $('.storage', $planInfo).text(bytesToSize(this.planObj.storage, 1, 4) + ' storage');
+            $('.transfer', $planInfo).text(bytesToSize(this.planObj.transfer, 1, 4) + ' transfer');
         }
 
         const $includesContent = $('.includes-content', $planCard);
@@ -1806,7 +1806,7 @@ pro.propay = {
                 .text(this.getNumOfMonthsWording(discountDuration, true));
 
             $('.plan-info .transfer', $planCard)
-                .text(bytesToSize(this.planObj.baseTransfer * discountInfo.m, 3, 4) + ' transfer');
+                .text(bytesToSize(this.planObj.baseTransfer * discountInfo.m, 1, 4) + ' transfer');
 
             const localDiscountAmount = (!forceEuro && lda) || eda;
 

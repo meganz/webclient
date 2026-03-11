@@ -1547,7 +1547,7 @@ var dlmanager = {
         var self = this;
         var unbindEvents = function() {
             $(window).unbind('resize.overQuotaDialog');
-            $('.fm-dialog-overlay', 'body').unbind('click.closeOverQuotaDialog');
+            $('.fm-dialog-overlay', 'body').unbind('click.closeOverQuotaDialog').unbind('click.oqDialogEvents');
         };
         var closeDialog = function() {
             if ($.dialog === 'download-pre-warning') {
@@ -1580,6 +1580,13 @@ var dlmanager = {
                     eventlog(501041, true);
                 }
                 else {
+                    const events = {
+                        4: 501150,
+                        1: 501151,
+                        2: 501152,
+                        3: 501153,
+                    };
+                    eventlog(events[planNum]);
                     sessionStorage.fromOverquotaPeriod = $(this).parent().data('period') || pro.proplan.period;
                     open(getAppBaseUrl() + '#propay_' + planNum);
                 }
@@ -1949,6 +1956,13 @@ var dlmanager = {
                 uiCheckboxes($dialog, 'ignoreLimitedBandwidth');
                 dlmanager._overquotaClickListeners($dialog, flags, res || true);
 
+                $('.fm-dialog-overlay', 'body').rebind('click.oqDialogEvents', () => {
+                    eventlog(501156);
+                });
+                $('.dialog-action', $dialog).rebind('click.oqDialogEvents', () => {
+                    eventlog(501155);
+                });
+
                 return $dialog;
             });
         });
@@ -2003,19 +2017,30 @@ var dlmanager = {
             M.safeShowDialog('download-overquota', () => {
                 $('.header-before-icon.exceeded', $dialog).text(l[17]);
 
-
                 dlmanager._overquotaClickListeners($dialog, flags);
 
-                $('.fm-dialog-overlay').rebind(
-                    'click.dloverq', dlmanager.doCloseModal.bind(dlmanager, 'dloverq', $dialog)
-                );
+                $('.fm-dialog-overlay').rebind('click.dloverq', () => {
+                    dlmanager.doCloseModal('dloverq', $dialog);
+                    eventlog(501149);
+                    return false;
+                });
 
                 $dialog
                     .rebind('dialog-closed', dlmanager.doCloseModal.bind(dlmanager, 'dloverq', $dialog));
 
-                $('button.js-close, .fm-dialog-close, .dialog-action', $dialog).rebind(
-                    'click.quota', dlmanager.doCloseModal.bind(dlmanager, 'dloverq', $dialog)
-                );
+                $('button.js-close, .fm-dialog-close', $dialog)
+                    .rebind('click.quota', () => {
+                        dlmanager.doCloseModal('dloverq', $dialog);
+                        eventlog(501149);
+                        return false;
+                    });
+
+                $('.dialog-action', $dialog)
+                    .rebind('click.quota', () => {
+                        dlmanager.doCloseModal('dloverq', $dialog);
+                        eventlog(501154);
+                        return false;
+                    });
 
                 if (window.pfcol) {
                     eventlog(99956);

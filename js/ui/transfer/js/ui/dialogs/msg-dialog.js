@@ -105,6 +105,7 @@ lazy(T.ui, 'msgDialog', () => {
             inputValue = '',
             placeholders = [],
             value,
+            errorText,
             type = 'warning',
             buttons = [l.ok_button],
             joy = true
@@ -133,6 +134,10 @@ lazy(T.ui, 'msgDialog', () => {
 
                 if (type !== 'calendar') {
                     onIdle(() => input.focus());
+                }
+
+                if (errorText) {
+                    T.ui.input.errorMsg(input, errorText);
                 }
             }
 

@@ -598,14 +598,14 @@ class MeetingsManager {
         },
         time: {
           occur: l.schedule_mgmt_update_occur,
-          all: l.schedule_mgmt_update_recur
+          all: l.schedule_mgmt_update_occur
         },
         convert: l.schedule_mgmt_update_convert_recur,
-        inv: l.schedule_notif_invite_recur,
-        multi: l.schedule_notif_update_multi,
+        inv: l.schedule_notif_invite,
+        multi: l.schedule_mgmt_update_occur,
         cancel: {
           occur: l.schedule_mgmt_cancel_occur,
-          all: l.schedule_mgmt_cancel_recur
+          all: l.schedule_mgmt_cancel_occur
         }
       },
       once: {
@@ -617,14 +617,14 @@ class MeetingsManager {
         },
         time: {
           occur: '',
-          all: l.schedule_mgmt_update
+          all: l.schedule_mgmt_update_occur
         },
         convert: l.schedule_mgmt_update_convert,
         inv: l.schedule_notif_invite,
-        multi: l.schedule_notif_update_multi,
+        multi: l.schedule_mgmt_update_occur,
         cancel: {
           occur: '',
-          all: l.schedule_mgmt_cancel
+          all: l.schedule_mgmt_cancel_occur
         }
       }
     };
@@ -908,7 +908,7 @@ class MeetingsManager {
         endTime
       } = timeRules;
       string = OCCUR_STRINGS.once[mode].occur;
-      res.push(string.replace('%1', toLocaleTime(startTime)).replace('%2', toLocaleTime(endTime)).replace('%6', time2date(startTime, 20)).replace('%s', time2date(startTime, 11)));
+      res.push(string.replace('%1', toLocaleTime(startTime)).replace('%2', toLocaleTime(endTime)).replace('%6', time2date(startTime, 4)).replace('%s', time2date(startTime, 11)));
       if (prevTiming) {
         const {
           startTime: pStartTime,
@@ -917,7 +917,7 @@ class MeetingsManager {
         if (converted) {
           res.push(this._parseOccurrence(prevTiming, mode, occurrence));
         } else {
-          res.push(string.replace('%1', toLocaleTime(pStartTime)).replace('%2', toLocaleTime(pEndTime)).replace('%6', time2date(pStartTime, 20)).replace('%s', time2date(pStartTime, 11)));
+          res.push(string.replace('%1', toLocaleTime(pStartTime)).replace('%2', toLocaleTime(pEndTime)).replace('%6', time2date(pStartTime, 4)).replace('%s', time2date(pStartTime, 11)));
         }
       }
     }
@@ -974,7 +974,7 @@ class MeetingsManager {
       return string.replace('%1', toLocaleTime(startTime)).replace('%2', toLocaleTime(endTime)).replace('%3', time2date(startTime, 2)).replace('%4', time2date(recurEnd, 2));
     }
     string = once[mode].occur;
-    return string.replace('%1', toLocaleTime(startTime)).replace('%2', toLocaleTime(endTime)).replace('%6', time2date(startTime, 20)).replace('%s', time2date(startTime, 11));
+    return string.replace('%1', toLocaleTime(startTime)).replace('%2', toLocaleTime(endTime)).replace('%6', time2date(startTime, 4)).replace('%s', time2date(startTime, 11));
   }
   getFormattingMeta(scheduledId, data, chatRoom) {
     const {
@@ -20894,7 +20894,7 @@ class TopicChange extends topicChange_ConversationMessageMixin {
       label: topicChange_React.createElement(utils.zT, null, displayName)
     }), datetime, topicChange_React.createElement("div", {
       className: "message text-block"
-    }, topicChange_React.createElement(utils.P9, null, (chatRoom.scheduledMeeting ? l.schedule_mgmt_title.replace('%1', `<strong>${oldTopic}</strong>`) : l[9081]).replace('%s', `<strong>${topic}</strong>`))))));
+    }, topicChange_React.createElement(utils.P9, null, chatRoom.scheduledMeeting ? l.schedule_mgmt_title.replace('%1', oldTopic).replace('%2', topic).replaceAll('[B]', '<b>').replaceAll('[/B]', '</b>') : l[9081].replace('%s', `<b>${topic}</b>`))))));
     return topicChange_React.createElement("div", null, messages);
   }
 }
@@ -32239,44 +32239,45 @@ class ScheduleMetaChange extends _mixin_jsx1__.M {
       }, 250);
     }
   }
-  static getTitleText(meta) {
+  static getTitleText(meta, chatRoom) {
     const {
       mode,
       recurring,
       occurrence,
       converted,
-      prevTiming
+      prevTiming,
+      topic
     } = meta;
     const {
       MODE
     } = ScheduleMetaChange;
+    let title = '';
     switch (mode) {
       case MODE.CREATED:
         {
-          return recurring ? l.schedule_mgmt_new_recur : l.schedule_mgmt_new;
+          title = l.schedule_notif_invite;
+          break;
         }
       case MODE.EDITED:
         {
           if (converted) {
-            return recurring ? l.schedule_mgmt_update_convert_recur : l.schedule_mgmt_update_convert;
+            title = recurring ? l.schedule_mgmt_update_convert_recur : l.schedule_mgmt_update_convert;
+          } else if (occurrence) {
+            title = l.schedule_mgmt_update_occur;
+          } else if (prevTiming) {
+            title = l.schedule_mgmt_update_occur;
+          } else {
+            title = l.schedule_notif_update_desc;
           }
-          if (occurrence) {
-            return l.schedule_mgmt_update_occur;
-          }
-          if (prevTiming) {
-            return recurring ? l.schedule_mgmt_update_recur : l.schedule_mgmt_update;
-          }
-          return l.schedule_mgmt_update_desc;
+          break;
         }
       case MODE.CANCELLED:
         {
-          if (recurring) {
-            return occurrence ? l.schedule_mgmt_cancel_occur : l.schedule_mgmt_cancel_recur;
-          }
-          return l.schedule_mgmt_cancel;
+          title = l.schedule_mgmt_cancel_occur;
+          break;
         }
     }
-    return '';
+    return megaChat.html(title.replace('%1', topic || chatRoom.topic)).replaceAll('[B]', '<b>').replaceAll('[/B]', '</b>');
   }
   renderTimingBlock() {
     const {
@@ -32292,10 +32293,10 @@ class ScheduleMetaChange extends _mixin_jsx1__.M {
     if (mode === MODE.CANCELLED && !meta.occurrence) {
       return null;
     }
-    const [now, prev] = megaChat.plugins.meetingsManager.getOccurrenceStrings(meta);
+    const [now] = megaChat.plugins.meetingsManager.getOccurrenceStrings(meta);
     return react0().createElement("div", {
       className: "schedule-timing-block"
-    }, meta.prevTiming && react0().createElement("s", null, prev || ''), now);
+    }, now);
   }
   checkAndFakeOccurrenceMeta(meta) {
     const {
@@ -32360,9 +32361,9 @@ class ScheduleMetaChange extends _mixin_jsx1__.M {
       "data-simpletip": time2date(this.getTimestamp())
     }, this.getTimestampAsString()), react0().createElement("div", {
       className: "message text-block"
-    }, ScheduleMetaChange.getTitleText(meta), " ", !!d && meta.handle), react0().createElement("div", {
+    }, react0().createElement(_ui_utils_jsx3__.P9, null, ScheduleMetaChange.getTitleText(meta, chatRoom)), " ", !!d && meta.handle), react0().createElement("div", {
       className: "message body-block"
-    }, (meta.prevTiming || meta.calendar || meta.topic && meta.onlyTitle || meta.recurring) && react0().createElement("div", {
+    }, mode !== MODE.CANCELLED && (meta.prevTiming || meta.calendar || meta.topic && meta.onlyTitle || meta.recurring) && react0().createElement("div", {
       className: "schedule-detail-block"
     }, meta.calendar && scheduledMeeting && (meta.recurring && !scheduledMeeting.recurring || meta.occurrence && meta.mode === MODE.CANCELLED || !meta.recurring) && react0().createElement("div", {
       className: "schedule-calendar-icon"

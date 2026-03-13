@@ -2370,6 +2370,7 @@ else if (!browserUpdate) {
         jsl.push({f:'css/node-filter.css', n: 'nodefilter_css', j:2});
         jsl.push({f:'js/ui/node-filter.js', n: 'nodefilter_js', j:1});
         jsl.push({f:'js/ui/info-panel.js', n: 'infopanel_js', j:1});
+        jsl.push({f:'css/notify.css', n: 'notify_css', j:2});
         jsl.push({f:'js/notify.js', n: 'notify_js', j:1});
         jsl.push({f:'js/vendor/favico.js', n: 'favico_js', j:1});
         jsl.push({f:'js/vendor/avatar.js', n: 'avatar_js', j:1, w:3});
@@ -2438,6 +2439,7 @@ else if (!browserUpdate) {
         jsl.push({f:'html/contact-avatar.svg', n: 'contact_avatar', j:0});
         jsl.push({f:'html/rewind.html', n: 'rewind', j:0});
         jsl.push({f:'html/device-centre-shimmer.html', n: 'device_centre_shimmer_html', j:0});
+        jsl.push({f:'html/notification-shimmer.html', n: 'notification_shimmer_html', j:0});
         jsl.push({f:'css/topbar.css', n: 'topbar_css', j:2,w:5});
 
         // Notification banner

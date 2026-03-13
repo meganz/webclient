@@ -68,8 +68,6 @@ class MegaHeader extends MegaMobileHeader {
             return false;
         });
 
-        this.notifButton.domNode.prepend(mCreateElement('span', {class: 'js-notification-num icon-badge hidden'}));
-
         // Contacts menu
         wrapper = mCreateElement('div', {class: 'menu-wrapper contacts-wrapper top-contacts'}, navActions);
         this.contactsButton = new MegaButton({
@@ -504,7 +502,6 @@ class MegaHeader extends MegaMobileHeader {
 
     showNotifMenu() {
         mega.ui.header.notifButton.parentNode.classList.add('show');
-        notify.renderNotifications();
         mega.ui.header.handleMenu('notif');
         mega.ui.header.notifButton.icon = mega.ui.header.notifButton.icon.replace('thin-outline', 'regular-filled');
         if (document.body.classList.contains('rtl')) {
@@ -512,6 +509,7 @@ class MegaHeader extends MegaMobileHeader {
             this.notifMenu.style.right = width <= 270 ? `-${8 + (270 - width)}px` : '-8px';
         }
         eventlog(500322);
+        notify.renderHydratedNotifications().catch(dump);
     }
 
     closeAvatarMenu(e) {

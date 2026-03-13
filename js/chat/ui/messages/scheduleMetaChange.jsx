@@ -97,43 +97,42 @@ export default class ScheduleMetaChange extends ConversationMessageMixin {
         }
     }
 
-    static getTitleText(meta) {
-        const { mode, recurring, occurrence, converted, prevTiming } = meta;
+    static getTitleText(meta, chatRoom) {
+        const { mode, recurring, occurrence, converted, prevTiming, topic } = meta;
         const { MODE } = ScheduleMetaChange;
+
+        let title = '';
         switch (mode) {
             case MODE.CREATED: {
-                return recurring
-                    ? l.schedule_mgmt_new_recur /* `Created a recurring meeting` */
-                    : l.schedule_mgmt_new /* `Created a meeting` */;
+                title = l.schedule_notif_invite;
+                break;
             }
             case MODE.EDITED: {
                 if (converted) {
-                    return recurring
-                        ? l.schedule_mgmt_update_convert_recur/* `Updated the one-off meeting to a recurring meeting` */
-                        : l.schedule_mgmt_update_convert; /* `Changed the meeting to a one-off meeting` */
+                    title = recurring
+                        ? l.schedule_mgmt_update_convert_recur
+                        : l.schedule_mgmt_update_convert;
                 }
-                if (occurrence) {
-                    return l.schedule_mgmt_update_occur;  /* `Updated an occurrence as below:` */
+                else if (occurrence) {
+                    title = l.schedule_mgmt_update_occur;
                 }
-                if (prevTiming) {
-                    return recurring
-                        ? l.schedule_mgmt_update_recur /* `Updated the recurring meeting as below:` */
-                        : l.schedule_mgmt_update; /* `Updated the meeting as below:` */
+                else if (prevTiming) {
+                    title = l.schedule_mgmt_update_occur;
                 }
-                return l.schedule_mgmt_update_desc; /* `Updated the meeting description` */
+                else {
+                    title = l.schedule_notif_update_desc;
+                }
+                break;
             }
             case MODE.CANCELLED: {
-                if (recurring) {
-                    return occurrence
-                        ? l.schedule_mgmt_cancel_occur /* `Cancelled an occurrence` */
-                        : l.schedule_mgmt_cancel_recur; /* `Cancelled the recurring meeting` */
-                }
-                return l.schedule_mgmt_cancel; /* `Cancelled the meeting` */
+                title = l.schedule_mgmt_cancel_occur;
+                break;
             }
         }
-        return '';
+        return megaChat.html(title.replace('%1', topic || chatRoom.topic))
+            .replaceAll('[B]', '<b>')
+            .replaceAll('[/B]', '</b>');
     }
-
 
     renderTimingBlock() {
         const { message, mode } = this.props;
@@ -144,11 +143,10 @@ export default class ScheduleMetaChange extends ConversationMessageMixin {
             return null;
         }
 
-        const [now, prev] = megaChat.plugins.meetingsManager.getOccurrenceStrings(meta);
+        const [now] = megaChat.plugins.meetingsManager.getOccurrenceStrings(meta);
 
         return (
             <div className="schedule-timing-block">
-                {meta.prevTiming && <s>{prev || ''}</s>}
                 {now}
             </div>
         );
@@ -207,14 +205,17 @@ export default class ScheduleMetaChange extends ConversationMessageMixin {
                             {this.getTimestampAsString()}
                         </div>
                         <div className="message text-block">
-                            {ScheduleMetaChange.getTitleText(meta)} {!!d && meta.handle}
+                            <ParsedHTML>
+                                {ScheduleMetaChange.getTitleText(meta, chatRoom)}
+                            </ParsedHTML> {!!d && meta.handle}
                         </div>
                         <div className="message body-block">
                             {(
-                                meta.prevTiming
+                                mode !== MODE.CANCELLED
+                                && (meta.prevTiming
                                 || meta.calendar
                                 || meta.topic && meta.onlyTitle
-                                || meta.recurring
+                                || meta.recurring)
                             ) && <div className="schedule-detail-block">
                                 {
                                     meta.calendar &&

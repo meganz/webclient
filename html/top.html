@@ -214,14 +214,23 @@
         </div>
 
         <div class="dropdown js-dropdown-notification hidden">
-            <button class="btn-icon notification js-topbarnotification js-top-buttons">
-                <i class="sprite-fm-theme icon-notifications"></i><span class="js-notification-num icon-badge">99+</span>
-                <div class="dark-tooltip top">[$862]</div>
-            </button>
             <div class="dropdown body popup notification-popup dropdown-content dropdown-arrow hidden">
                 <div class="js-notification-popup notification-popup loading">
                     <div class="notification-header">
-                        <div class="notification-txt">[$862]</div>
+                        <div class="notif-filter-chips-wrapper">
+                            <i class="sprite-fm-mono icon-check-thin-outline selected-mark selected-mark-template hidden"></i>
+                            <div class="notif-filter-chips">
+                                <div class="notif-filter-chip-button notif-filter-chip-type nolink">
+                                    <div class="notif-filter-chip-button-text">
+                                        [$862]
+                                    </div>
+                                    <i class="sprite-fm-mono icon-chevron-down-thin-outline hidden"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="notification-settings">
+                            <i class="sprite-fm-mono icon-settings-thin-outline icon-size-6"></i>
+                        </div>
                     </div>
                     <div class="notification-scroll">
                         <div class="notification-scr-list">
@@ -229,73 +238,57 @@
                             <a class="notification-item template">
                                 <span class="notification-status-icon">
                                     <span class="notification-status"></span>
-                                    <span class="notification-avatar hidden">
+                                    <span class="notification-avatar">
+                                        <span class="notification-avatar-user hidden"></span>
+                                        <span class="notification-avatar-custom hidden"></span>
                                         <span class="notification-avatar-icon">
-                                            <i class="plus sprite-fm-mono icon-add-small"></i>
-                                            <i class="minus sprite-fm-mono icon-disabled-filled"></i>
-                                            <i class="cross sprite-fm-mono icon-remove"></i>
+                                            <i class="plus sprite-fm-mono icon-add-circle"></i>
+                                            <i class="minus sprite-fm-mono icon-minus-circle-thin-outline"></i>
+                                            <i class="arrow-right sprite-fm-mono icon-arrow-up-circle-thin-outline"></i>
+                                            <i class="cross sprite-fm-mono icon-x-circle-thin-outline"></i>
                                             <i class="exclamation sprite-fm-mono icon-exclamation-filled"></i>
-                                            <i class="contact sprite-fm-mono icon-user-circle-filled"></i>
+                                            <i class="contact-plus sprite-fm-mono icon-user-plus-thin-outline"></i>
+                                            <i class="contact sprite-fm-mono icon-user-thin-outline"></i>
+                                            <i class="clock sprite-fm-mono icon-clock-thin-outline"></i>
+                                            <i class="clock-rotate sprite-fm-mono icon-clock-rotate-thin-outline"></i>
+                                            <i class="leave sprite-fm-mono icon-log-out-02-thin-outline"></i>
                                             <i class="camera sprite-fm-mono icon-meeting-notification"></i>
+                                            <i class="success sprite-fm-mono icon-check-circle-thin-outline"></i>
                                         </span>
-                                    </span>
-                                    <span class="notification-icon hidden">
-                                        <i class="sprite-fm-uni icon-payment payment-icon"></i>
-                                        <i class="sprite-fm-uni icon-check-circle reinstated-icon"></i>
-                                        <i class="sprite-fm-uni icon-takedown takedown-icon"></i>
-                                        <i class="sprite-fm-uni icon-mega-logo dynamic-icon"></i>
                                     </span>
                                     <span class="notification-type">
                                         <span class="notification-content">
-                                            <span class="notification-promo hidden">
-                                                <span class="promo-text">[$notif_limited_time_offer]</span>
-                                                <span class="promo-icon">[$notif_promo]</span>
-                                            </span>
-                                            <span class="notification-username"></span>
+                                            <span class="notification-title"></span>
                                             <span class="notification-info"></span>
                                         </span>
                                         <img class="hidden dynamic-image" />
                                         <span class="notification-request-buttons hidden">
-                                            <button class="mega-button notifications-button accept">
-                                                <span>[$5856]</span>
+                                            <button class="nav-elem outline notifications-button hidden">
+                                                <span></span>
                                             </button>
-                                        </span>
-                                        <span class="cta-buttons hidden">
-                                            <button class="mega-button notifications-button">
+                                            <button class="nav-elem primary notifications-button hidden">
                                                 <span></span>
                                             </button>
                                         </span>
                                         <span class="notification-scheduled-body hidden">
-                                            <span class="notification-scheduled-title hidden"></span>
-                                            <span class="notification-scheduled-prev hidden">
-                                                <s></s>
-                                            </span>
                                             <span class="notification-scheduled-occurrence hidden"></span>
                                         </span>
                                         <span class="notification-date"></span>
-                                        <span class="notification-accepted-bl">
-                                            <span class="notification-accepted">[$7375]</span>
-                                        </span>
+                                    </span>
+                                    <span class="notification-link">
+                                        <i class="sprite-fm-mono icon-chevron-right-thin-outline"></i>
                                     </span>
                                 </span>
                             </a>
                         </div>
                     </div>
-                    <div class="fm-notifications-bottom">
-                        <button class="mega-button action settings">
-                            <span>[$823]</span>
-                    </button>
-                    </div>
                     <div class="notification-popup-loading">
-                        <div class="notification-loading-icon sprite-fm-mono icon-notification-filled"></div>
-                        <div class="notification-popup-loading-txt">
-                            <span>[$1456]</span>
-                            <i class="notification-loading-spinner sprite-fm-theme icon-loading-spinner"></i>
-                        </div>
+                        <span>[$1456]</span>
                     </div>
                     <div class="notification-popup-empty">
-                        <div class="notification-empty-icon sprite-fm-mono icon-notification-off-filled"></div>
-                        <div class="notification-popup-empty-txt">[$8589]</div>
+                        <div class="notification-popup-empty-icon"></div>
+                        <div class="notification-popup-empty-txt">[$notif_empty_title]</div>
+                        <div class="notification-popup-empty-hint">[$notif_empty_message]</div>
                     </div>
                 </div>
             </div>

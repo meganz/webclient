@@ -2578,11 +2578,6 @@ function topmenuUI() {
             }
         }
 
-        if (!e || (!e.target.closest('.js-dropdown-notification') &&
-            ((c && c.indexOf('js-topbarnotification') === -1) || !c))) {
-            notify.closePopup();
-        }
-
         if (!e || (!e.target.closest('.js-dropdown-warning') &&
             ((c && c.indexOf('js-dropdown-warning') === -1) || !c))) {
             elements = document.getElementsByClassName('js-dropdown-warning');

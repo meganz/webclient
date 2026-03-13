@@ -1,0 +1,457 @@
+.notification-popup.loading .notification-popup-empty {
+    display: none;
+}
+.notification-popup.dropdown.body.popup {
+    width: 384px;
+}
+.dropdown.popup.notification-popup {
+    padding: 0 !important;
+}
+.notification-popup-loading {
+    display: none;
+}
+.loading .notification-popup-loading {
+    display: block;
+    text-align: center;
+    height: 436px;
+    overflow: hidden;
+}
+.notification-popup-loading .notification-shimmer {
+    height: 100%;
+    width: 100%;
+    background-color: var(--surface-main);
+    position: absolute;
+    z-index: 202;
+}
+.notification-popup-loading .notification-shimmer-element {
+    background-color: var(--surface-grey-2);
+    transition: var(--transition-bg-color);
+}
+.notification-popup-loading .notification-shimmer-container {
+    height: 80px;
+    display: flex;
+    align-items: center;
+    margin: 0 18px;
+}
+.notification-popup-loading .notification-shimmer-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 32px;
+}
+.notification-popup-loading .notification-shimmer-info {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    margin-inline-start: 12px;
+}
+.notification-popup-loading .notification-shimmer-title {
+    width: 120px;
+    height: 10px;
+    border-radius: 6px;
+}
+.notification-popup-loading .notification-shimmer-text {
+    width: 224px;
+    height: 8px;
+    border-radius: 6px;
+    margin-top: 8px;
+}
+.notification-popup-loading .notification-shimmer-date {
+    width: 48px;
+    height: 8px;
+    border-radius: 6px;
+    margin-top: 8px;
+}
+.notification-popup-empty {
+    display: none;
+}
+.empty .notification-popup-empty,
+.no-new-notifications .notification-popup-empty {
+    display: block;
+    text-align: center;
+}
+.empty .notification-popup-empty {
+    height: 356px;
+    margin-top: 80px;
+}
+.notification-popup-empty-icon {
+    height: 104px;
+    width: 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+.notification-popup-empty-txt {
+    font: var(--mobile-font-heading-h3);
+    color: var(--text-color-high);
+}
+.notification-popup-empty-hint {
+    font: var(--text-body2);
+    color: var(--text-color-medium);
+    padding-top: 4px;
+}
+.notification-empty {
+    display: none;
+}
+.empty .notification-empty {
+    width: 400px;
+    height: 270px;
+    text-align: center;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    margin: -135px 0;
+    margin-inline-start: -72px;
+    display: block;
+}
+.empty .notification-scroll,
+.loading .notification-scroll {
+    height: 0;
+}
+.notification-scroll {
+    height: 436px;
+    overflow: hidden;
+    box-sizing: border-box;
+    width: 100%;
+    position: relative;
+}
+.notification-scr-list {
+    box-sizing: border-box;
+}
+.empty .notification-scr-list {
+    display: none;
+}
+.notification-item.template {
+    display: none;
+}
+a.notification-item {
+    cursor: default;
+}
+a.notification-item.clickable {
+    cursor: pointer;
+}
+.notification-item {
+    --notification-color-promo: rgba(0, 191, 165, 1);
+    display: block;
+}
+.notification-item:hover {
+    background: var(--surface-grey-4);
+}
+.notification-filter {
+    margin-inline: 2px;
+    min-width: 200px;
+}
+.notification-filter.m-dropdown-item.hide-radio-on.selected {
+    background: var(--mobile-page-background);
+}
+.notification-filter.m-dropdown-item.hide-radio-on:hover,
+.notification-filter.m-dropdown-item.hide-radio-on:focus,
+.notification-filter.m-dropdown-item.hide-radio-on:active img {
+    --mask-color: var(--icon-active);
+    background: var(--button-hover);
+    color: var(--text-color-high);
+}
+.notification-status-icon {
+    display: flex;
+    position: relative;
+}
+.notification-type {
+    display: flex;
+    flex-direction: column;
+    table-layout: fixed;
+    width: calc(100% - 82px);
+    box-sizing: border-box;
+    transition: mask-image 300ms ease, -webkit-mask-image 300ms ease;
+}
+.notification-item.clickable:not(.nt-contact-request):not(.nt-contact-request-reminder):hover .notification-type {
+    mask-image: linear-gradient(to right, #000 32%, transparent 82%);
+}
+.notification-avatar {
+    margin-top: 12px;
+    position: relative;
+    width: 32px;
+    height: 32px;
+    border-radius: 100%;
+    color: white;
+    font-size: 23px;
+    text-align: center;
+    line-height: 48px;
+    display: block;
+}
+.notification-item .avatar-wrapper {
+    width: 32px;
+    height: 32px;
+    font-size: 18px;
+    line-height: 32px;
+    margin: 0;
+    color: white;
+}
+.notification-item .avatar-wrapper img {
+    width: 32px;
+    height: 32px;
+}
+.notification-request-buttons {
+    margin: 2px 0;
+    text-align: start;
+    align-self: flex-start;
+    padding-inline-start: 12px
+}
+.notification-request-buttons button {
+   height: 36px;
+   margin-inline-end: 4px;
+}
+.notification-request-buttons button span {
+   font: var(--text-body1-bold);
+}
+.notification-request-buttons .dynamic-link {
+    color: var(--secondary-blue);
+    text-decoration: underline;
+    font-size: 12px;
+}
+.fm-dialog-button.notifications-button {
+    margin-top: 0;
+}
+.nt-contact-request .notification-request-buttons {
+    display: table-cell;
+}
+.notification-avatar-custom i {
+    width: 32px;
+    height: 32px;
+}
+.notification-avatar-icon {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    inset-inline-end: -6px;
+    top: 20px;
+    padding: 2px;
+    background: var(--mobile-page-background);
+    border-radius: 50%;
+}
+
+/* Small notification icons on top of the notification avatar */
+.notification-avatar-icon i {
+    display: none;
+    --icon-size: 16px;
+}
+.nt-new-files .notification-avatar-icon i.plus,
+.nt-updated-files .notification-avatar-icon i.clock-rotate,
+.nt-incoming-share .notification-avatar-icon i.plus,
+.nt-contact-request .notification-avatar-icon i.contact-plus,
+.nt-contact-accepted .notification-avatar-icon i.contact,
+.nt-removed-items .notification-avatar-icon i.minus,
+.nt-incoming-left .notification-avatar-icon i.leave,
+.nt-incoming-removed .notification-avatar-icon i.minus,
+.nt-contact-request-reminder .notification-avatar-icon i.clock,
+.nt-contact-request-denied .notification-avatar-icon i.minus,
+.nt-contact-request-blocked .notification-avatar-icon i.minus,
+.nt-contact-request-ignored .notification-avatar-icon i.minus,
+.nt-payment-success-notification .notification-avatar-icon i.success,
+.nt-payment-failed-notification .notification-avatar-icon i.cross,
+.nt-payment-reminder-low-notification .notification-avatar-icon i.clock,
+.nt-payment-reminder-medium-notification .notification-avatar-icon i.clock,
+.nt-payment-reminder-high-notification .notification-avatar-icon i.clock,
+.nt-schedule-meet-created .notification-avatar-icon i.plus,
+.nt-schedule-meet-edited .notification-avatar-icon i.arrow-right,
+.nt-schedule-meet-cancelled .notification-avatar-icon i.minus {
+    display: block;
+}
+.nt-schedule-meet-edited .notification-avatar-icon i.arrow-right {
+    transform: rotate(90deg);
+}
+.nt-file-request .notification-avatar .file-request-notification {
+    width: 40px;
+    height: 40px;
+    margin: 2px -4px;
+}
+.nt-incoming-share .notification-avatar-icon i,
+.nt-schedule-meet-created .notification-avatar-icon i,
+.nt-new-files .notification-avatar-icon i,
+.nt-payment-success-notification .notification-avatar-icon i {
+    --mask-color: var(--secondary-green);
+}
+.nt-contact-request-reminder .notification-avatar-icon i,
+.nt-payment-reminder-medium-notification .notification-avatar-icon i {
+    --mask-color: var(--secondary-orange);
+}
+.nt-contact-request .notification-avatar-icon i {
+    --mask-color: var(--secondary-green);
+}
+.nt-updated-files .notification-avatar-icon i,
+.nt-contact-accepted .notification-avatar-icon i,
+.nt-schedule-meet-edited .notification-avatar-icon i {
+    --mask-color: var(--secondary-blue);
+}
+.nt-payment-failed-notification .notification-avatar-icon i,
+.nt-payment-reminder-low-notification .notification-avatar-icon i,
+.nt-payment-reminder-high-notification .notification-avatar-icon i {
+    --mask-color: var(--secondary-red);
+}
+.nt-removed-items .notification-avatar-icon i,
+.nt-incoming-left .notification-avatar-icon i,
+.nt-incoming-removed .notification-avatar-icon i,
+.nt-contact-request-denied .notification-avatar-icon i,
+.nt-contact-request-blocked .notification-avatar-icon i,
+.nt-contact-request-ignored .notification-avatar-icon i,
+.nt-schedule-meet-cancelled .notification-avatar-icon i {
+    --mask-color: var(--secondary-black);
+}
+.clickable:hover .notification-link {
+    display: inline-flex;
+}
+.notification-link {
+    display: none;
+    position: absolute; 
+    inset-inline-end: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    align-items: center;
+    justify-content: center; 
+    color: var(--text-color-medium);
+    width: 32px;
+    height: 32px;
+    padding: 4px;
+    border-radius: 4px;
+}
+.rtl .notification-link {
+    transform: translateY(-50%) rotateY(180deg);
+}
+.notification-link:hover {
+    background: var(--surface-mid-grey);
+}
+.notification-link i {
+    --icon-size: 24px;
+}
+.notification-avatar img {
+    width: 48px;
+    height: 48px;
+}
+.nt-dynamic-notification .notification-title {
+    white-space: initial;
+    text-overflow: initial;
+    overflow: initial;
+    margin-bottom: 8px;
+}
+.nt-dynamic-notification img {
+	margin: 4px 12px 6px;
+	width: 300px;
+}
+.notification-title {
+    display: block;
+    font: var(--text-body1-bold);
+    padding: 0 12px 0 0;
+    overflow-wrap: break-word;
+    color: var(--text-color-high);
+}
+.notification-content {
+    overflow: hidden;
+    box-sizing: border-box;
+    padding: 8px 12px 0;
+    vertical-align: middle;
+}
+.nt-payment-success-notification .notification-content,
+.nt-payment-failed-notification .notification-content,
+.nt-payment-reminder-low-notification .notification-content,
+.nt-payment-reminder-medium-notification .notification-content,
+.nt-payment-reminder-high-notification .notification-content {
+    min-height: 32px;
+}
+.notification-info {
+    color: var(--text-color-medium);
+    display: block;
+    font: var(--text-body2);
+    padding: 1px 0;
+    overflow-wrap: break-word;
+    margin-inline-end: 22px;
+}
+.notification-date {
+    display: block;
+    font: var(--text-caption);
+    font-size: 12px;
+    color: var(--text-color-medium);
+    padding-inline-start: 12px;
+    margin: 4px 0 12px;
+}
+body.notification-body {
+    background-color: #f2f2f3 !important;
+}
+.notification-scheduled-body {
+    box-sizing: border-box;
+    color: var(--text-color-medium);
+    font: var(--text-body2);
+    overflow: hidden;
+    padding: 12px 0 4px;
+    margin-inline: 12px 22px;
+    vertical-align: middle;
+}
+.notification-scheduled-body .notification-scheduled-title {
+    color: var(--text-color-high);
+    display: block;
+    font: var(--text-body2-bold);
+}
+.notification-scheduled-body .notification-scheduled-prev,
+.notification-scheduled-body .notification-scheduled-occurrence {
+    display: block;
+}
+.notification-header {
+    display: flex;
+    height: 72px;
+    align-items: center;
+    justify-content: space-between;
+    box-sizing: border-box;
+    text-align: center;
+    position: relative;
+    color: var(--text-color-high);
+    z-index: 1;
+}
+.notif-filter-chip-button.nolink {
+    cursor: default;
+}
+.notif-filter-chip-button {
+    display: flex;
+    align-items: center;
+    padding-inline-start: 18px;
+    cursor: pointer;
+}
+.notif-filter-chip-button-text {
+    max-width: 280px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    font: var(--mobile-font-heading-h2);
+    margin-inline-end: 6px;
+}
+.notif-filter-chip-button i {
+    padding: 4px;
+    border-radius: 2px;
+}
+.notif-filter-chip-button i:hover {
+    background-color: var(--surface-grey-4);
+}
+.notification-settings {
+    margin-inline-end: 22px;
+    padding: 4px;
+    border-radius: 2px;
+    cursor: pointer;
+}
+.notification-settings:hover {
+    background-color: var(--surface-grey-4);
+}
+.notification-status {
+    width: 8px;
+    height: 8px;
+    display: block;
+    border-radius: 100%;
+    margin: 24px 4px 0;
+    background: var(--label-red);
+    transition: background-color 200ms ease-in-out;
+    flex-shrink: 0;
+    flex-grow: 0;
+}
+.read .notification-status {
+    background: none;
+}
+.simpletip-tooltip.notify-tooltip span {
+    display: block;
+    max-width: 320px;
+    overflow-wrap: break-word;
+}

@@ -56,9 +56,13 @@ class TopicChange extends ConversationMessageMixin {
                     <div className="message text-block">
                         <ParsedHTML>
                             {(chatRoom.scheduledMeeting
-                                ? l.schedule_mgmt_title.replace('%1', `<strong>${oldTopic}</strong>`)
-                                : l[9081]
-                            ).replace('%s', `<strong>${topic}</strong>`)}
+                                ? l.schedule_mgmt_title
+                                    .replace('%1', oldTopic)
+                                    .replace('%2', topic)
+                                    .replaceAll('[B]', '<b>')
+                                    .replaceAll('[/B]', '</b>')
+                                : l[9081].replace('%s', `<b>${topic}</b>`)
+                            )}
                         </ParsedHTML>
                     </div>
                 </div>

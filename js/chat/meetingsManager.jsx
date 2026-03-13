@@ -588,40 +588,40 @@ class MeetingsManager {
     NOTIF_TITLES = {
         recur: {
             desc: {
-                update: l.schedule_notif_update_desc, /* `Updated the description of the following meeting:` */
+                update: l.schedule_notif_update_desc,
             },
             name: {
-                update: l.schedule_mgmt_title /* `Updated the meeting name from "%1" to "%s"` */
+                update: l.schedule_mgmt_title
             },
             time: {
-                occur: l.schedule_mgmt_update_occur, /* `Updated an occurrence as below:` */
-                all: l.schedule_mgmt_update_recur /* `Updated the recurring meeting as below:` */
+                occur: l.schedule_mgmt_update_occur,
+                all: l.schedule_mgmt_update_occur
             },
-            convert: l.schedule_mgmt_update_convert_recur, /* `Changed the one-off meeting to a recurring meeting` */
-            inv: l.schedule_notif_invite_recur, /* `Invited you to a recurring meeting` */
-            multi: l.schedule_notif_update_multi,  /* `Updated the meeting details:` */
+            convert: l.schedule_mgmt_update_convert_recur,
+            inv: l.schedule_notif_invite,
+            multi: l.schedule_mgmt_update_occur,
             cancel: {
-                occur: l.schedule_mgmt_cancel_occur, /* `Cancelled an occurrence` */
-                all: l.schedule_mgmt_cancel_recur, /* `Cancelled the recurring meeting and all its occurrences` */
+                occur: l.schedule_mgmt_cancel_occur,
+                all: l.schedule_mgmt_cancel_occur,
             }
         },
         once: {
             desc: {
-                update: l.schedule_notif_update_desc, /* `Updated the description of the following meeting:` */
+                update: l.schedule_notif_update_desc,
             },
             name: {
-                update: l.schedule_mgmt_title, /* `Updated the meeting name from "%1" to "%s"` */
+                update: l.schedule_mgmt_title,
             },
             time: {
                 occur: '',
-                all: l.schedule_mgmt_update, /* `Updated the meeting as below:` */
+                all: l.schedule_mgmt_update_occur,
             },
-            convert: l.schedule_mgmt_update_convert, /* `Changed the recurring meeting to a one-off meeting` */
-            inv: l.schedule_notif_invite, /* `Invited you to a meeting` */
-            multi: l.schedule_notif_update_multi, /* `Updated the meeting details:` */
+            convert: l.schedule_mgmt_update_convert,
+            inv: l.schedule_notif_invite,
+            multi: l.schedule_mgmt_update_occur,
             cancel: {
                 occur: '',
-                all: l.schedule_mgmt_cancel /* `Cancelled the meeting` */
+                all: l.schedule_mgmt_cancel_occur,
             },
         },
     };
@@ -848,7 +848,7 @@ class MeetingsManager {
                 string
                     .replace('%1', toLocaleTime(startTime))
                     .replace('%2', toLocaleTime(endTime))
-                    .replace('%6', time2date(startTime, 20))
+                    .replace('%6', time2date(startTime, 4))
                     .replace('%s', time2date(startTime, 11))
             );
             if (prevTiming) {
@@ -861,7 +861,7 @@ class MeetingsManager {
                         string
                             .replace('%1', toLocaleTime(pStartTime))
                             .replace('%2', toLocaleTime(pEndTime))
-                            .replace('%6', time2date(pStartTime, 20))
+                            .replace('%6', time2date(pStartTime, 4))
                             .replace('%s', time2date(pStartTime, 11))
                     );
                 }
@@ -949,7 +949,7 @@ class MeetingsManager {
         return string
             .replace('%1', toLocaleTime(startTime))
             .replace('%2', toLocaleTime(endTime))
-            .replace('%6', time2date(startTime, 20))
+            .replace('%6', time2date(startTime, 4))
             .replace('%s', time2date(startTime, 11));
     }
 

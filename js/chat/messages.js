@@ -211,7 +211,7 @@ Message._getTextContentsForDialogType = function(message) {
             }
         }
         else if (message.dialogType === 'scheduleMeta') {
-            textMessage = ScheduleMetaChange.getTitleText(message.meta);
+            textMessage = ScheduleMetaChange.getTitleText(message.meta, message.chatRoom);
         }
         else if (textMessage.splice) {
             textMessage = CallManager2._getMltiStrTxtCntsForMsg(message, textMessage, undefined, undefined);

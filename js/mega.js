@@ -2948,6 +2948,46 @@ function sharer(h) {
     return false;
 }
 
+
+/**
+ * Returns the in-share a node belongs to, or false
+ * @property sharer.has
+ */
+lazy(sharer, 'has', () => {
+    'use strict';
+    const cache = new Map();
+
+    Object.defineProperty(sharer, 'clear', {
+        value() {
+            cache.clear();
+        }
+    });
+
+    return async(h) => {
+
+        while (h) {
+            const [n, c] = M.d[h] ? [M.d[h], 1] : cache.get(h) || await dbfetch.node([h]);
+
+            if (!n) {
+                break;
+            }
+
+            if (!c) {
+                cache.set(h, [n, 1]);
+            }
+
+            if (n.su) {
+                console.assert(M.c.shares[n.h]);
+                return n;
+            }
+
+            h = n.p;
+        }
+
+        return false;
+    };
+});
+
 // FIXME: remove alt
 function ddtype(ids, toid, alt) {
     "use strict";

@@ -501,7 +501,11 @@ mega.textEditorUI = new function TextEditorUI() {
         if (typeof n === 'object') {
             node = n;
         }
-        else if (!n) {
+        else if (n) {
+            editedTxt = '';
+            savedFileData = '';
+        }
+        else {
             editedTxt = editor.getValue();
             if (editedTxt === savedFileData) {
                 editedTxt = null;

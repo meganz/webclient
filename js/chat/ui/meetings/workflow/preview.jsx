@@ -1,7 +1,7 @@
 import React from 'react';
 import { compose } from '../../../mixins.js';
 import { Avatar } from '../../contacts.jsx';
-import { isGuest } from '../call.jsx';
+import { isGuest } from '../utils.jsx';
 import Button from '../button.jsx';
 import { withPermissionsObserver } from '../permissionsObserver.jsx';
 

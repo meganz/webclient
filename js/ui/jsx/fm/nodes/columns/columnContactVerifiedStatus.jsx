@@ -1,6 +1,6 @@
 import React from "react";
 import {GenericNodePropsComponent} from "../genericNodePropsComponent";
-import ContactsPanel from "../../../../../chat/ui/contactsPanel/contactsPanel";
+import { isVerified, verifyCredentials } from '../../../../../chat/ui/contactsPanel/utils.jsx';
 
 export class ColumnContactVerifiedStatus extends GenericNodePropsComponent {
     static sortable = true;
@@ -30,7 +30,7 @@ export class ColumnContactVerifiedStatus extends GenericNodePropsComponent {
 
     getFingerPrintDialogLink = handle => {
         const onVerifyContactClicked = (handle) => {
-            ContactsPanel.verifyCredentials(this.props.contacts[handle]);
+            verifyCredentials(this.props.contacts[handle]);
         };
 
         return <div className="verify-contact-link-container">
@@ -47,7 +47,7 @@ export class ColumnContactVerifiedStatus extends GenericNodePropsComponent {
         return <td megatype={ColumnContactVerifiedStatus.megatype} className={ColumnContactVerifiedStatus.megatype}>
             <div className="contact-item">
                 <div className="contact-item-verification">
-                    {ContactsPanel.isVerified(this.props.contacts[node.h])
+                    {isVerified(this.props.contacts[node.h])
                         ? ColumnContactVerifiedStatus.verifiedLabel
                         : this.getFingerPrintDialogLink(node.h)
                     }

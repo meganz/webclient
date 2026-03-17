@@ -5,10 +5,10 @@ import { Emoji, ParsedHTML, OFlowEmoji, reactStringWrap } from '../../ui/utils.j
 import { PerfectScrollbar } from '../../ui/perfectScrollbar.jsx';
 import { Button } from '../../ui/buttons.jsx';
 import { Dropdown, DropdownItem } from '../../ui/dropdowns.jsx';
-import ContactsPanel from './contactsPanel/contactsPanel.jsx';
 import ModalDialogs from '../../ui/modalDialogs';
 import Link from './link.jsx';
 import { withUpdateObserver } from './updateObserver.jsx';
+import { hasContacts } from './contactsPanel/utils.jsx';
 
 export const MAX_FREQUENTS = 3;
 
@@ -1399,7 +1399,7 @@ export class ContactPickerWidget extends MegaRenderMixin {
             self._eventuallyAddContact(M.u[u_handle], contacts, selectableContacts, true);
         }
         var noOtherContacts = false;
-        if (contacts.length === 0 || !ContactsPanel.hasContacts() && this.props.step !== 1) {
+        if (contacts.length === 0 || !hasContacts() && this.props.step !== 1) {
             noOtherContacts = true;
             var noContactsMsg = "";
             if (M.u.length < 2) {
@@ -1598,7 +1598,7 @@ export class ContactPickerWidget extends MegaRenderMixin {
                 }
                 {this.props.participantsList ? this.renderParticipantsList() : contactsList}
                 {selectFooter}
-                {this.props.showAddContact && ContactsPanel.hasContacts() ?
+                {this.props.showAddContact && hasContacts() ?
                     <div className="contacts-search-bottom">
                         <Button
                             className="mega-button action positive"

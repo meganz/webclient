@@ -1,6 +1,6 @@
 import React from 'react';
 import Button from '../meetings/button.jsx';
-import { NAMESPACE } from './leftPanel.jsx';
+import { NAMESPACE } from './utils.jsx';
 
 export const Navigation =
     ({ view, views: { CHATS, MEETINGS }, routingSection, unreadChats, unreadMeetings, contactRequests, renderView }) =>

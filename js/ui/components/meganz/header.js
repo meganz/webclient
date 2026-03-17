@@ -141,7 +141,7 @@ class MegaHeader extends MegaMobileHeader {
             drive: {
                 componentClassname: 'drive',
                 text: l.drive,
-                href: '/fm',
+                href: '/fm/cloudroot',
                 icon: 'sprite-fm-mono icon-cloud-thin-outline',
                 iconSize: 24,
                 activeCondition: () => mega.ui.topmenu.hasClass('drive'),

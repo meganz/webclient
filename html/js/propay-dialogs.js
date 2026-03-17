@@ -2585,8 +2585,11 @@ var addressDialog = {
                     return pro.loadMembershipPlans(nop, true);
                 })
                 .then(() => {
-                    const plan = pro.getPlanObj(pro.propay.planNum, pro.propay.selectedPeriod);
-                    return plan && plan.getInstantDiscountInfo();
+                    // Assume that busines plan does not have an instant discount
+                    if (pro.propay.onPropayPage()) {
+                        const plan = pro.getPlanObj(pro.propay.planNum, pro.propay.selectedPeriod);
+                        return plan && plan.getInstantDiscountInfo();
+                    }
                 });
 
             if (pro.propay.onPropayPage()) {

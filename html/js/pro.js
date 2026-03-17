@@ -1453,6 +1453,13 @@ var pro = {
             return pro.planObjects.planKeys[key] || false;
         }
 
+        if (!plan) {
+            if (d) {
+                console.error('getPlanObj called with no plan or key');
+            }
+            return false;
+        }
+
         if (!pro.membershipPlans.length) {
             console.assert(!d, 'getPlanObj called before membershipPlans were loaded.');
             return;

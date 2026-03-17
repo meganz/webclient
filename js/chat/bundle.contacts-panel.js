@@ -471,7 +471,7 @@ class ColumnContactButtons extends genericNodePropsComponent.B {
         'data-simpletip': !megaChat.hasSupportForCalls ? l.unsupported_browser_audio : l[5896]
       },
       disabled: !navigator.onLine || !megaChat.hasSupportForCalls,
-      onClick: () => (0,meetings_utils.dQ)().then(() => megaChat.createAndShowPrivateRoom(handle).then(room => {
+      onClick: () => M.isInvalidUserStatus() || (0,meetings_utils.dQ)().then(() => megaChat.createAndShowPrivateRoom(handle).then(room => {
         room.setActive();
         room.startAudioCall();
       })).catch(() => d && console.warn('Already in a call.'))
@@ -491,7 +491,7 @@ class ColumnContactButtons extends genericNodePropsComponent.B {
       attrs: {
         'data-simpletip': l[6834]
       },
-      onClick: () => megaChat.openChatAndSendFilesDialog(handle)
+      onClick: () => M.isInvalidUserStatus() || megaChat.openChatAndSendFilesDialog(handle)
     }), JSX_(buttons.$, {
       ref: node => {
         this.props.onContextMenuRef(handle, node);

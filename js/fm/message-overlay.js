@@ -85,7 +85,10 @@ var megaMsgDialog = (() => {
                             ...buttonTemplate,
                             text: button,
                             componentClassname: confirmButtonClass
-                        } : button;
+                        } : {
+                            ...buttonTemplate,
+                            ...button
+                        };
                         confirmButton = button;
                     }
                     else {
@@ -93,7 +96,10 @@ var megaMsgDialog = (() => {
                             ...buttonTemplate,
                             text: button,
                             componentClassname: 'secondary',
-                        } : button;
+                        } : {
+                            ...buttonTemplate,
+                            ...button
+                        };
                         buttons.push(button);
                     }
                 }
@@ -102,7 +108,10 @@ var megaMsgDialog = (() => {
                 buttons.push(typeof buttonsArg === 'string' ? {
                     ...buttonTemplate,
                     text: buttonsArg,
-                } : buttonsArg);
+                } : {
+                    ...buttonTemplate,
+                    ...buttonsArg
+                });
             }
         }
     }
@@ -164,6 +173,7 @@ var megaMsgDialog = (() => {
          * @param {String|Object} [options.icon] Sheet icon class to display. May be string or sheet icon class.
          * @param {String|List} [options.buttons] Additional buttons to display. If string, button is added
          * @param {String} [options.confirmButtonClass] An optional CSS class to apply to the confirmation button.
+         * @param {Array} [options.sheetClassList] An optional list of CSS classes to apply to the sheet.
          * as secondary "Failure/cancel" button. If array, i=0 is confirm, i>0 is cancel and index is passed.
          * @param {Boolean} [safeShow] Whether to use M.safeShowDialog or not, mainly for msgDialogs which in
          * desktop web are shown without this mechanism.
@@ -182,8 +192,11 @@ var megaMsgDialog = (() => {
                 targetSheet.type = options.sheetType || 'modal';
                 targetSheet.showClose = closeButton || false;
                 targetSheet.preventBgClosing = typeof closeButton === 'boolean' ? !closeButton : is_mobile;
-                targetSheet.addClass('msg-dialog');
-                targetSheet.one('clear', () => targetSheet.removeClass('msg-dialog'));
+                const sheetClasses = options.sheetClassList || [];
+                targetSheet.addClass('msg-dialog', ...sheetClasses);
+                targetSheet.one('clear', () => {
+                    targetSheet.removeClass('msg-dialog', ...sheetClasses);
+                });
 
                 buttonTemplate = {
                     parentNode: targetSheet.actionsNode,

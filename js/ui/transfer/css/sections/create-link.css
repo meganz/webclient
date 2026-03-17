@@ -554,6 +554,11 @@
     padding: 20px;
 }
 
+.it-dialog.qr-dialog .qr-logo {
+    background-image: url('../../images/svg/qr-logo.svg');
+    pointer-events: none;
+}
+
 
 /* Ready to download box */
 

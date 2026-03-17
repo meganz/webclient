@@ -3291,15 +3291,12 @@ accountUI.transfers = {
                         }
                     });
 
-                megasync.isInstalled((err, is) => {
-
-                    if (!err && is) {
-                        $('.mega-banner', $section).addClass('hidden');
-                    }
-                    else {
-                        $('.mega-banner', $section).removeClass('hidden');
-                    }
-                });
+                if (window.useMegaSync === 2 || window.useMegaSync === 3) {
+                    $('.mega-banner', $section).addClass('hidden');
+                }
+                else {
+                    $('.mega-banner', $section).removeClass('hidden');
+                }
             }
         }
     }

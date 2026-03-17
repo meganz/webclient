@@ -597,7 +597,8 @@ lazy(mega.ui, 'secondaryNav', () => {
         'type': l[93],
         'size': l[87],
         'versions': l[17150],
-        'playtime': l.duration
+        'playtime': l.duration,
+        'fileLoc': l.file_location_label
     };
 
     const colBtnTextkeys = Object.keys(colBtnsText);

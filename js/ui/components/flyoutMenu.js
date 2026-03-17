@@ -963,7 +963,7 @@ class MegaFlyoutMenu extends MegaComponent {
                         simpletipClass: 'mobile-theme-tip',
                     },
                     onClick({ currentTarget }) {
-                        if (currentTarget.disabled) {
+                        if (currentTarget.disabled || M.isInvalidUserStatus()) {
                             return;
                         }
                         eventlog(500662);
@@ -1017,7 +1017,7 @@ class MegaFlyoutMenu extends MegaComponent {
                         simpletipClass: 'mobile-theme-tip',
                     },
                     onClick({ currentTarget }) {
-                        if (currentTarget.disabled) {
+                        if (currentTarget.disabled || M.isInvalidUserStatus()) {
                             return;
                         }
                         eventlog(500663);

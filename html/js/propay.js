@@ -274,7 +274,7 @@ pro.propay = {
         if (this.isNewAccount && !skipAccountDetails) {
             const {name, email, password} = this.signup.getNewAccountDetails();
 
-            const nameNeeded = !name;
+            const nameNeeded = !name || !this.signup.validateName(name);
             const emailNeeded = !email || !this.signup.validateEmail(email);
             const passwordValidity = this.signup.validatePassword(password);
             const passwordNeeded = (typeof passwordValidity === 'string')

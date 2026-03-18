@@ -1249,10 +1249,14 @@ MegaUtils.prototype.checkForDuplication = function(id) {
     for (let i = M.v.length; i--;) {
         const n = M.v[i] || false;
 
-        if (!n.name || missingkeys[n.h] || n.p !== id) {
+        if (!n.name || missingkeys[n.h]) {
             if (d) {
-                console.debug('name-less node', missingkeys[n.h], [n]);
+                console.debug('name-less node', n.h, n.p, missingkeys[n.h], [n]);
+                console.assert(!n.name && missingkeys[n.h], `node ${n.h}@${n.p} misplaced as undecryptable?`);
             }
+            continue;
+        }
+        if (n.p !== id) {
             continue;
         }
 

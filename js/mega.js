@@ -2606,6 +2606,9 @@ async function fetchfm(sn) {
     // link arrives, and this is how it knows that it is the first node.
     M.RootID = false;
 
+    self.newmissingkeys = false;
+    self.missingkeys = Object.create(null);
+
     if (window.pfcol) {
         console.assert(!window.fmdb);
         console.assert(loadfm.loading);

@@ -57,6 +57,7 @@ function Chat() {
     this.FORCE_EMAIL_LOADING = localStorage.fel;
     this.WITH_SELF_NOTE = mega.flags.ff_n2s || localStorage.withSelfNote;
 
+    this._createPrivRoom = Object.create(null);
     this._imageLoadCache = Object.create(null);
     this._imagesToBeLoaded = Object.create(null);
     this._imageAttributeCache = Object.create(null);
@@ -535,15 +536,29 @@ Chat.prototype.registerUploadListeners = function() {
     // Iterate chats for which we are uploading
     var forEachChat = function(chats, callback) {
         var result = 0;
+        let p = Promise.resolve();
 
         if (!Array.isArray(chats)) {
-            chats = [chats];
+            chats = String(chats).split(',');
         }
 
         for (var i = chats.length; i--;) {
             var room = self.getRoomFromUrlHash(chats[i]);
             if (room) {
                 callback(room, ++result);
+            }
+            else {
+                const [, t, h] = chats[i].split('/');
+                const c = t === 'p' && h in M.u;
+
+                if (d) {
+                    logger.warn(`room ${chats[i]} not found%s`, c ? ', attempting to create...' : '.');
+                }
+
+                if (c) {
+                    ++result;
+                    p = p.then(() => self.createAndShowPrivateRoom(h).then((room) => callback(room))).catch(dump);
+                }
             }
         }
 
@@ -2084,16 +2099,26 @@ Chat.prototype.getPrivateRoom = function(h) {
     return this.chats[h] || false;
 };
 
+Chat.prototype.createAndShowPrivateRoom = async function(h) {
 
-Chat.prototype.createAndShowPrivateRoom = promisify(function(resolve, reject, h) {
-    M.openFolder('chat/p/' + h)
-        .then(() => {
-            const room = this.getPrivateRoom(h);
-            assert(room, 'room not found..');
-            resolve(room);
-        })
-        .catch(reject);
-});
+    if (!this._createPrivRoom[h]) {
+        this._createPrivRoom[h] = M.openFolder(`chat/p/${h}`, true)
+            .then(() => this.getPrivateRoom(h) || tSleep(2 + Math.random()))
+            .then(() => {
+                const room = this.getPrivateRoom(h);
+                if (!room) {
+                    this.logger.warn(`Could not create private room '${h}'`);
+                    throw ENOENT;
+                }
+                return room;
+            })
+            .finally(() => {
+                delete this._createPrivRoom[h];
+            });
+    }
+
+    return this._createPrivRoom[h];
+};
 
 Chat.prototype.createAndShowGroupRoomFor = function(contactHashes, topic = '', opts = {}) {
     this.trigger('onNewGroupChatRequest', [contactHashes, { topic, ...opts }]);

@@ -1080,9 +1080,11 @@ mega.tpw = new function TransferProgressWidget() {
 
             this.attachEvent('mouseover', () => {
                 if (this._complete) {
-                    const handle = this.transferId.split('_').pop();
-                    const node = M.getNodeByHandle(handle);
-                    if (!node || M.getNodeRoot(node) === M.RubbishID) {
+                    const handle = this.type === mega.tpw.UPLOAD
+                        ? this._handle
+                        : this.transferId.split('_').pop();
+
+                    if (M.getNodeRoot(handle) === M.RubbishID) {
                         $('.transfer-complete-actions', this.el).addClass('hidden');
                     }
                     else {

@@ -7,10 +7,343 @@
  * 3) On action packet receive, put the notification at the top of the queue and update the red circle to indicate a
  *    new notification. Next time the popup opens this will show the new notification and old ones.
  */
+
+lazy(mega.ui, 'notifyUtils', () => {
+    'use strict';
+
+    const { FilterChipComponent } = mega.ui.mNodeFilter;
+
+    /**
+     * Notification Filter UI Chip Component for Notification Center
+     */
+    class NotifCenterFilter extends FilterChipComponent {
+        /**
+         * Class constructor
+         * @param {Object} $wrapper Element filter wrapper
+         * @param {Function} onItemSelectFn Function to run when filter item is selected
+         */
+        constructor($wrapper, onItemSelectFn) {
+            const name = 'type';
+            const prefix = 'notif';
+
+            const filters = {
+                [name]: {
+                    title: l.all_notifications,
+                    match(n) {
+                        return !this.selection || this.selection.includes(n.type);
+                    },
+                    menu: [
+                        {
+                            label: l[164],
+                            classes: ['notification-filter'],
+                            get data() {
+                                return ['share', 'd', 'dshare', 'put', 'ph', 'puu'];
+                            },
+                        },
+                        {
+                            label: l.chats_meetings,
+                            classes: ['notification-filter'],
+                            get data() {
+                                return ['mcsmp'];
+                            },
+                        },
+                        {
+                            label: l[165],
+                            classes: ['notification-filter'],
+                            get data() {
+                                return ['ipc', 'c', 'upci', 'upco'];
+                            },
+                        },
+                        {
+                            label: l[403],
+                            classes: ['notification-filter'],
+                            get data() {
+                                return ['psts', 'psts_v2', 'pses', 'dynamic'];
+                            },
+                        }
+                    ]
+                }
+            };
+
+            super(name, prefix, $wrapper, filters);
+            this.onItemSelectFn = onItemSelectFn;
+        }
+
+        /**
+         * Updates position of the filter list element
+         * @param {Number} x current filter list element x coordinate
+         * @param {Number} y current filter list element y coordinate
+         * @param {Number} proposeX proposed filter list element x coordinate
+         * @param {Number} proposeY proposed filter list element y coordinate
+         * @returns {void}
+         */
+        setPositionByCoordinates(x, y, proposeX, proposeY) {
+            super.setPositionByCoordinates(x, y, proposeX, proposeY);
+
+            const currentLeft = parseInt(this.el.style.left, 10) || 0;
+            const correction = 16;
+            const left = document.body.classList.contains('rtl')
+                ? currentLeft - correction
+                : currentLeft + correction;
+
+            this.el.style.left = `${left}px`;
+        }
+
+        /**
+         * Initializes filter or set selection if index passed
+         * @param {Function} fn initialisation function
+         * @returns {void}
+         */
+        init(fn) {
+            this.$element.removeClass('hidden');
+            if (typeof fn === 'function') {
+                fn();
+            }
+        }
+
+        /**
+         * Handles the selection of an item
+         * @param {Number} index the index of the selected item
+         * @param {Object} item the selected item object
+         * @param {Function} clickFn onclick function
+         * @returns {void}
+         */
+        onItemSelect(index, item, clickFn) {
+            super.onItemSelect(index, item, clickFn, true);
+            if (typeof this.onItemSelectFn === 'function') {
+                this.onItemSelectFn();
+            }
+        }
+    }
+
+    /**
+     * Shimmer UI for Notification Center
+     */
+    class NotifCenterShimmer {
+        /**
+         * Class constructor
+         * @param {Object} $container Element containing loading shimmer
+         */
+        constructor($container) {
+            this.$container = $container;
+
+            lazy(this, 'template', () => {
+                const res = pages.notification_shimmer_html || getTemplate('notification_shimmer_html');
+                delete pages.notification_shimmer_html;
+                return parseHTML(res).querySelector('template');
+            });
+        }
+
+        /**
+         * Creates shimmer
+         * @returns {void}
+         */
+        init() {
+            const {content} = this.template;
+            this.$container.empty();
+
+            for (let i = 0; i < Math.floor(436 / 80); i++) {
+                const newItem = $(content).clone(true);
+                this.$container.append(newItem);
+            }
+        }
+    }
+
+    /**
+     * Notification Data Manager (NDM) for Notification Center
+     * Fetches extra data (users, nodes, shares) related to notifications
+     */
+    class NotifCenterNDM {
+        /**
+         * Class constructor
+         */
+        constructor() {
+            /** cached nodes loaded from DB */
+            this.nodes = Object.create(null);
+
+            /** (nested) nodes within incoming shared folders at any level in the tree */
+            this.nodesInShares = Object.create(null);
+
+            this.init();
+        }
+
+        /**
+         * Initialization to start a fresh data fetch
+         * @returns {void}
+         */
+        init() {
+            /** whether fetching is in progress */
+            this.isFetching = false;
+
+            /** request payload */
+            this.payload = {u: new Set(), n: new Set(), s: new Set()};
+        }
+
+        /**
+         * Returns node corresponding to handle passed
+         * @param {String} handle node handle
+         * @returns {Object|Boolean} node or false if not found
+         */
+        getNode(handle) {
+            return this.nodes[handle] || M.getNodeByHandle(handle);
+        }
+
+        /**
+         * Returns shared folder node handle containing node handle passed
+         * @param {String} h node handle
+         * @returns {String|Boolean} handle or false if not found
+         */
+        getShare(h) {
+            if (this.nodesInShares[h]) {
+                return this.nodesInShares[h];
+            }
+            while (h) {
+                const n = M.d[h];
+                if (n && n.su) {
+                    return n.h;
+                }
+                h = n  && n.p;
+            }
+            return false;
+        }
+
+        /**
+         * Adds notifications data to payload to be fetched later
+         * @param {Array<Object>|Object} notifications List or single notification object
+         * @returns {void}
+         */
+        addToPayload(notifications) {
+            if (!Array.isArray(notifications)) {
+                notifications = [notifications];
+            }
+
+            for (let i = 0; i < notifications.length; i++) {
+                const {userHandle, type, data} = notifications[i];
+
+                if (userHandle) {
+                    this.payload.u.add(userHandle);
+                }
+
+                if (!mega.lite.inLiteMode) {
+                    const {h, n} = data;
+                    const handle = typeof h === 'string'
+                        ? h
+                        : typeof n === 'string' ? n : false;
+
+                    if (handle) {
+                        if (type === 'put' && !M.c.shares[handle]) {
+                            this.payload.s.add(handle);
+                        }
+                        else {
+                            this.payload.n.add(handle);
+                        }
+                    }
+                }
+            }
+        }
+
+        /**
+         * Ensures needed data is fetched before rendering notifications
+         * @returns {Promise<void>} void
+         */
+        async fetch() {
+            if (!this.isFetching) {
+                this.isFetching = true;
+                const promises = [];
+
+                if (this.payload) {
+                    const {u: users, n: nodes, s: nodesInShares} = this.payload;
+                    if (users.size) {
+                        promises.push(this._fetchUsers([...users]));
+                    }
+                    if (!mega.lite.inLiteMode) {
+                        if (nodes.size) {
+                            promises.push(this._fetchNodes([...nodes]));
+                        }
+                        if (nodesInShares.size) {
+                            promises.push(this._fetchNodesInShares([...nodesInShares]));
+                        }
+                    }
+                }
+
+                return Promise.all(promises).finally(() => {
+                    this.isFetching = false;
+                    this.payload = null;
+                    if (sharer.clear) {
+                        sharer.clear();
+                    }
+                });
+            }
+        }
+
+        /**
+         * Add users to be accessed later when redering notification
+         * @param {Array<String>} handles user handles
+         * @returns {Promise<Array>} promise result array including user name and email
+         */
+        async _fetchUsers(handles) {
+            const promises = [];
+            for (let i = 0; i <= handles.length; i++) {
+                const h = handles[i];
+                if (!h) {
+                    continue;
+                }
+                const {firstName, lastName} = M.getUserByHandle(h) || {};
+                if (firstName && lastName) {
+                    continue;
+                }
+                M.setUser(h);
+                promises.push(
+                    M.syncUsersFullname(h),
+                    M.syncContactEmail(h, true));
+            }
+            return Promise.allSettled(promises);
+        }
+
+        /**
+         * Fetch and store in cache not yet loaded nodes
+         * @param {Array<String>} handles node handles to fetch
+         * @returns {Promise<void>} void
+         */
+        async _fetchNodes(handles) {
+            const nodes = await dbfetch.node(handles).catch(dump) || false;
+            for (let i = 0; i < nodes.length; i++) {
+                const node = nodes[i];
+                this.nodes[node.h] = node;
+            }
+        }
+
+        /**
+         * Fetch and store in cache the nodes up to shared node containing a node
+         * @param {Array<String>} handles node handles to fetch
+         * @returns {Promise<void>} void
+         */
+        async _fetchNodesInShares(handles) {
+            for (let i = 0; i < handles.length; i++) {
+                const handle = handles[i];
+                const node = await sharer.has(handle);
+                if (node) {
+                    // cache shared node
+                    this.nodes[node.h] = node;
+
+                    // cache node assigned to the shared folder it belongs
+                    this.nodesInShares[handle] = node.h;
+                }
+            }
+        }
+    }
+
+    return freeze({NotifCenterFilter, NotifCenterShimmer, NotifCenterNDM});
+
+});
+
 var notify = {
 
     /** The current notifications **/
     notifications: [],
+
+    /** Contact request notifications for users already rendered */
+    renderedPendingContacts: new Set(),
 
     /** Number of notifications to fetch in the 'c=100' API request. This is reduced to 50 for fast rendering. */
     numOfNotifications: 50,
@@ -19,21 +352,16 @@ var notify = {
     userEmails: Object.create(null),
 
     /** jQuery objects for faster lookup */
+    $wrapper: null,
     $popup: null,
     $popupIcon: null,
-    $popupNum: null,
+    $headerButton: null,
 
     /** Promise of if the intial notifications have loaded */
     initialLoading: false,
 
     /** A flag for if the initial loading of notifications is complete */
     initialLoadComplete: false,
-
-    /** A list of already rendered pending contact request IDs (multiple can exist with reminders) */
-    renderedContactRequests: [],
-
-    /** Temp list of accepted contact requests */
-    acceptedContactRequests: [],
 
     // The welcome dialog has been shown this session
     welcomeDialogShown: false,
@@ -48,15 +376,25 @@ var notify = {
     newNotifications: 0,
     lastFavicoState: false,
 
+    // Notification Shimmer (NotifCenterShimmer) instance
+    shimmer: null,
+
+    // Notification Data Manager (NotifCenterNDM) instance
+    ndm: null,
+
+    // Notification filter (NotifCenterFilter) instance
+    filter: null,
+
     /**
      * Initialise the notifications system
      */
     init: function() {
 
         // Cache lookups
+        notify.$wrapper = $('.notif-wrapper', '.nav-actions');
         notify.$popup = $('.js-notification-popup');
         notify.$popupIcon = $('.top-head .top-icon.notification');
-        notify.$popupNum = $('.js-notification-num');
+        notify.$headerButton = $('.notif-wrapper .nav-elem.alarm', '.mega-header');
 
         // Init event handler to open popup
         notify.initNotifyIconClickHandler();
@@ -65,10 +403,67 @@ var notify = {
         notify.countAndShowNewNotifications();
     },
 
+    initShimmer() {
+        'use strict';
+
+        const {NotifCenterShimmer} = mega.ui.notifyUtils || {};
+
+        notify.shimmer = notify.shimmer ||
+            NotifCenterShimmer && new NotifCenterShimmer($('.notification-popup-loading', '.notif-wrapper'));
+
+        if (notify.shimmer) {
+            notify.shimmer.init();
+        }
+    },
+
+    initNDM() {
+        'use strict';
+
+        const {NotifCenterNDM} = mega.ui.notifyUtils || {};
+
+        notify.ndm = notify.ndm ||
+            NotifCenterNDM && new NotifCenterNDM();
+
+        if (notify.ndm) {
+            notify.ndm.init();
+        }
+    },
+
+    initFilter() {
+        'use strict';
+
+        const {NotifCenterFilter} = mega.ui.notifyUtils || {};
+
+        notify.filter = notify.filter || NotifCenterFilter && new NotifCenterFilter(
+            $('.notif-filter-chips-wrapper', '.notif-wrapper'),
+            () => {
+                if (!notify.ndm.isFetching) {
+                    const scrollBlock = document.querySelector('.notif-wrapper .notification-scroll.ps');
+                    if (scrollBlock) {
+                        scrollBlock.scrollTop = 0;
+                    }
+                    notify.renderNotifications();
+                }
+            });
+
+        if (notify.filter) {
+            notify.filter.init(() => {
+                const $button = $('.notif-filter-chip-button', '.notif-wrapper');
+                $button.removeClass('nolink');
+                $('i', $button).removeClass('hidden');
+            });
+        }
+    },
+
     /**
-     * Get the most recent 100 notifications from the API
+     * Get the most recent notifications from the API
      */
-    getInitialNotifications: function() {
+    getInitialNotifications() {
+        'use strict';
+
+        notify.initShimmer();
+        notify.initNDM();
+        notify.initFilter();
 
         // Clear notifications before fetching (sometimes this needs to be done if re-logging in)
         notify.notifications = [];
@@ -115,16 +510,17 @@ var notify = {
                             // - TBD.
                         }
 
-                        // Add notifications to list
                         const newNotification = {
-                            data: notification, // The full notification object
-                            id: id,
-                            seen: seen,
-                            timeDelta: timeDelta,
-                            timestamp: timestamp,
-                            type: type,
+                            data: notification,
+                            id,
+                            seen,
+                            timeDelta,
+                            timestamp,
+                            type,
                             userHandle,
                         };
+
+                        notify.ndm.addToPayload(newNotification);
 
                         if (type === 'puu') {
                             newNotification.allDataItems = [notification.h];
@@ -144,10 +540,8 @@ var notify = {
                 // Show the notifications
                 notify.countAndShowNewNotifications();
 
-                // If the popup is already open (they opened it while the notifications were being fetched) then render
-                // the notifications. If the popup is not open, then clicking the icon will render the notifications.
-                if (!notify.$popup.hasClass('hidden')) {
-                    notify.renderNotifications();
+                if ($('.notif-wrapper', '.nav-actions').hasClass('show')) {
+                    return notify.renderHydratedNotifications();
                 }
             })
             .catch(dump);
@@ -169,24 +563,15 @@ var notify = {
         var newNotification = {
             data: actionPacket,                             // The action packet
             id: makeid(10),                                 // Make random ID
-            seen: actionPacket.seen || false,                                  // New notification, so mark as unread
+            seen: actionPacket.seen || false,               // New notification, so mark as unread
             timeDelta: 0,                                   // Time since notification was sent
-            timestamp: actionPacket.timestamp || unixtime(),                   // Get the current timestamps in seconds
+            timestamp: actionPacket.timestamp || unixtime(),// Get the current timestamps in seconds
             type: actionPacket.a,                           // Type of notification e.g. share
             userHandle: actionPacket.u || actionPacket.ou   // User handle e.g. new share from this user
         };
 
         if (actionPacket.a === 'dshare' && actionPacket.orig && actionPacket.orig !== u_handle) {
             newNotification.userHandle = actionPacket.orig;
-        }
-
-        // If the user handle is not known to the local state we need to fetch the email from the API. This happens in
-        // some sharing scenarios where a user is part of a share then another user adds files to the share but they
-        // are not contacts with that other user so the local state has no information about them and would display a
-        // broken notification if the email is not known.
-        if (newNotification.type === 'put' && String(newNotification.userHandle).length === 11) {
-
-            this.getUserEmailByTheirHandle(newNotification.userHandle);
         }
 
         if (newNotification.type === 'puu') {
@@ -199,10 +584,16 @@ var notify = {
         // Show the new notification icon
         notify.countAndShowNewNotifications();
 
-        // If the popup is open, re-render the notifications to show the latest one
-        if (!notify.$popup.hasClass('hidden')) {
-            notify.renderNotifications();
-        }
+        delay(`notifyFromAP-${newNotification.id}`, () => {
+            notify.ndm.init();
+            notify.ndm.addToPayload(newNotification);
+
+            const promise = notify.$wrapper.hasClass('show')
+                ? notify.renderHydratedNotifications()
+                : Promise.resolve();
+
+            promise.catch(dump);
+        }, 1e3);
     },
 
     /**
@@ -248,6 +639,11 @@ var notify = {
                     return true;
                 }
                 break;
+            case 'mcsmp':
+                if (!mega.notif.has('chat_enabled')) {
+                    return true;
+                }
+                break;
         }
 
         switch (notification.a || notification.t) {
@@ -270,14 +666,14 @@ var notify = {
                 break;
 
             case 'ipc':
-                if (!mega.notif.has('contacts_fcrin')) {
+                if (!mega.notif.has('contacts_fcrin') || notification.dts) {
                     return true;
                 }
                 break;
 
             case 'c':
                 action = (typeof notification.c !== 'undefined') ? notification.c : notification.u[0].c;
-                if ((action === 0 && !mega.notif.has('contacts_fcrdel')) ||
+                if (action === 0 || action === 2 ||
                     (action === 1 && !mega.notif.has('contacts_fcracpt'))) {
                     return true;
                 }
@@ -285,7 +681,7 @@ var notify = {
 
             case 'upco':
                 action = (typeof notification.s !== 'undefined') ? notification.s : notification.u[0].s;
-                if (action === 2 && !mega.notif.has('contacts_fcracpt')) {
+                if (action === 3 || action === 2 && !mega.notif.has('contacts_fcracpt')) {
                     return true;
                 }
                 break;
@@ -327,8 +723,8 @@ var notify = {
         }
 
         // Make sure that neither notification has been deleted
-        const previousNotificationNode = M.getNodeByHandle(previousNotification.data.h);
-        const currentNotificationNode = M.getNodeByHandle(currentNotification.data.h);
+        const previousNotificationNode = this.ndm.getNode(previousNotification.data.h);
+        const currentNotificationNode = this.ndm.getNode(currentNotification.data.h);
         if (!previousNotificationNode || !currentNotificationNode) {
             return false;
         }
@@ -473,7 +869,6 @@ var notify = {
     countAndShowNewNotifications: function() {
 
         var newNotifications = 0;
-        var $popup = $(notify.$popupNum);
 
         // Loop through the notifications
         for (var i = 0; i < notify.notifications.length; i++) {
@@ -506,14 +901,12 @@ var notify = {
             }
         }
 
-        // If there is a new notification, show the red circle with the number of notifications in it
         if (newNotifications >= 1) {
-            $popup.removeClass('hidden').text(newNotifications);
+            notify.$headerButton.addClass('decorated');
             $(document.body).trigger('onMegaNotification', newNotifications);
         }
         else {
-            // Otherwise hide it
-            $popup.addClass('hidden').text(newNotifications);
+            notify.$headerButton.removeClass('decorated');
             $(document.body).trigger('onMegaNotification', false);
         }
         this.newNotifications = newNotifications;
@@ -550,9 +943,7 @@ var notify = {
             mega.attr.set('lnotif', String(this.lastSeenDynamic), -2, true);
         }
 
-        // Hide red circle with number of new notifications
-        notify.$popupNum.addClass('hidden');
-        notify.$popupNum.html(0);
+        notify.$headerButton.removeClass('decorated');
 
         // Update page title
         this.newNotifications = 0;
@@ -583,32 +974,6 @@ var notify = {
                 notify.renderNotifications();
             }
         });
-
-
-        $('.js-topbarnotification').rebind('click', function() {
-            let $elem = $(this).parent();
-            if ($elem.hasClass('show')) {
-                notify.closePopup();
-            }
-            else {
-                $elem.addClass('show');
-                $('.notification-popup', '.top-head').removeClass('hidden');
-                notify.renderNotifications();
-
-                // Check if any dynamic notifications can be seen
-                const dynamicNotifIds = [];
-                for (const notif of $('.nt-dynamic-notification', notify.$popup)) {
-                    dynamicNotifIds.push($(notif).data('dynamic-id'));
-                }
-
-                // Send event to the API if any dynamic notifications can be seen
-                if (dynamicNotifIds.length) {
-                    notify.sendNotifSeenEvent(dynamicNotifIds);
-                }
-
-                eventlog(500322);
-            }
-        });
     },
 
     /**
@@ -631,9 +996,13 @@ var notify = {
 
     /**
      * Sort dynamic notifications to be at the top sorted by id, then other notifications by timestamp
+     * @param {Object[]} notifications current list of notifications
+     * @return {void}
      */
-    sortNotificationsByMostRecent: function() {
-        notify.notifications.sort(function(notificationA, notificationB) {
+    sortNotificationsByMostRecent(notifications) {
+        'use strict';
+
+        notifications.sort((notificationA, notificationB) => {
 
             if (notificationA.type === 'dynamic' || notificationB.type === 'dynamic') {
                 if (notificationB.type !== 'dynamic') {
@@ -713,16 +1082,60 @@ var notify = {
             return false;
         }
         // Fetch data from API
-        M.setUser(userHandle);
-        const promises = [
-            M.syncUsersFullname(userHandle),
-            M.syncContactEmail(userHandle, true)
-        ];
-        this.userEmails[userHandle] = Promise.allSettled(promises)
+        this.userEmails[userHandle] = notify.addUsers([userHandle])
             .then(() => {
                 this.userEmails[userHandle] = M.getUserByHandle(userHandle).m;
             });
         return false;
+    },
+
+    /**
+     * Filter notifications by type
+     * @returns {Object[]} filtered notifications
+     */
+    filterByType() {
+        'use strict';
+
+        if (!(this.filter && this.filter.filters.type.selection)) {
+            return this.notifications;
+        }
+
+        const notifications = [];
+        for (let i = 0; i < this.notifications.length; i++) {
+            const notification = this.notifications[i];
+            if (this.filter.filters.type.match(notification)) {
+                notifications.push(notification);
+            }
+        }
+        return notifications;
+    },
+
+    /**
+     * Render empty notifications state
+     * @returns {void}
+     */
+    renderEmpty() {
+        'use strict';
+
+        this.$popup.removeClass('loading').addClass('empty');
+        const icon = this.$popup.find('.notification-popup-empty-icon');
+        if (icon.length) {
+            icon.css('backgroundImage', `url(${staticpath}images/mega/empty/no-notifications.webp)`);
+        }
+    },
+
+    /**
+     * Renders notifications after fetching related data if notifications are loaded
+     * @returns {Promise<void>} void
+     */
+    async renderHydratedNotifications() {
+        'use strict';
+
+        if (!this.initialLoadComplete) {
+            return;
+        }
+
+        return this.ndm.fetch().then(() => this.renderNotifications());
     },
 
     /**
@@ -731,14 +1144,14 @@ var notify = {
     renderNotifications: function() {
         'use strict';
 
-        // Get the number of notifications
-        var numOfNotifications = notify.notifications.length;
-        var allNotificationsHtml = '';
+        const notifications = notify.filterByType();
+        let allNotificationsHtml = '';
+
+        notify.initSettingsClickHander();
 
         // If no notifications, show empty
-        if (notify.initialLoadComplete && numOfNotifications === 0) {
-            notify.$popup.removeClass('loading');
-            notify.$popup.addClass('empty');
+        if (notify.initialLoadComplete && !notifications.length) {
+            this.renderEmpty();
             return false;
         }
         else if (!notify.initialLoadComplete) {
@@ -746,10 +1159,11 @@ var notify = {
         }
 
         // Sort the notifications
-        notify.sortNotificationsByMostRecent();
+        notify.sortNotificationsByMostRecent(notifications);
 
-        // Reset rendered contact requests so the Accept button will show again
-        notify.renderedContactRequests = [];
+        // Keep number of notifications limited
+        // Notifications from APs might result in more than allowed
+        notifications.splice(notify.numOfNotifications);
 
         // Cache the template selector
         var $template = this.$popup.find('.notification-item.template');
@@ -757,18 +1171,20 @@ var notify = {
         // Remove existing notifications and so they are re-rendered
         this.$popup.find('.notification-item:not(.template)').remove();
 
+        notify.renderedPendingContacts.clear();
+
         // Loop through all the notifications
-        for (var i = 0; i < numOfNotifications; i++) {
+        for (var i = 0; i < notifications.length; i++) {
 
             // Get the notification data and clone the notification template in /html/top.html
-            var notification = notify.notifications[i];
+            const notification = notifications[i];
             var $notificationHtml = $template.clone();
 
             // Update template
             $notificationHtml = notify.updateTemplate($notificationHtml, notification);
 
             // Skip this notification if it's not one that is recognised
-            if ($notificationHtml === false) {
+            if (!$notificationHtml) {
                 continue;
             }
 
@@ -777,9 +1193,8 @@ var notify = {
         }
 
         // If all notifications are not recognised, show empty
-        if (allNotificationsHtml === "") {
-            notify.$popup.removeClass('loading');
-            notify.$popup.addClass('empty');
+        if (!allNotificationsHtml) {
+            this.renderEmpty();
             return false;
         }
 
@@ -789,17 +1204,17 @@ var notify = {
 
         // Add scrolling for the notifications
         Soon(() => {
-            initPerfectScrollbar($('.notification-scroll', notify.$popup));
+            initPerfectScrollbar($('.notification-scroll', notify.$wrapper));
         });
 
         // Add click handlers for various notifications
+        notify.initContactReqClickHandler();
         notify.initFullContactClickHandler();
         notify.initShareClickHandler();
         notify.initTakedownClickHandler();
         notify.initPaymentClickHandler();
         notify.initPaymentReminderClickHandler();
-        notify.initAcceptContactClickHandler();
-        notify.initSettingsClickHander();
+        notify.initContactReqClickHandlers();
         notify.initScheduledClickHandler();
         notify.initDynamicClickHandler();
 
@@ -813,27 +1228,38 @@ var notify = {
     },
 
     /**
-     * When the other user has accepted the contact request and the 'Contact relationship established' notification
-     * appears, make this is clickable so they can go to the contact's page to verify fingerprints or start chatting.
+     * On click of an incoming pending contact request, go to received requests page
+     * @returns {void}
      */
-    initFullContactClickHandler: function() {
+    initContactReqClickHandler: () => {
+        'use strict';
 
-        // Add click handler for the 'Contact relationship established' notification
-        this.$popup.find('.nt-contact-accepted').rebind('click', function() {
-            // Redirect to the contact's page only if it's still a contact
-            if (M.c.contacts && $(this).attr('data-contact-handle') in M.c.contacts) {
-                loadSubPage('fm/chat/contacts/' + $(this).attr('data-contact-handle'));
-                notify.closePopup();
-            } else {
+        notify.$popup.find('.notification-item.nt-contact-request,'
+            + '.notification-item.nt-contact-request-reminder').rebind('click', () => {
+            notify.closePopup();
+            loadSubPage('/fm/chat/contacts/received');
+        });
+    },
+
+    /**
+     * On click of an accepted contact request, open the contact in contacts panel
+     * @returns {void}
+     */
+    initFullContactClickHandler: () => {
+        'use strict';
+
+        notify.$popup.find('.notification-item.nt-contact-accepted').rebind('click', (e) => {
+            const contactId = $(e.currentTarget).closest('.notification-item').attr('contact-id');
+            notify.closePopup();
+
+            if (M.c.contacts && contactId in M.c.contacts) {
+                mega.ui.flyout.showContactFlyout(contactId);
+            }
+            else {
                 msgDialog('info', '', l[20427]);
             }
 
             eventlog(500462);
-        });
-        clickURLs();
-        $('a.clickurl', this.$popup).rebind('click.notif', () => {
-            eventlog(500462);
-            notify.closePopup();
         });
     },
 
@@ -843,7 +1269,9 @@ var notify = {
     initShareClickHandler: function() {
 
         // Select the notifications with shares or new files/folders
-        this.$popup.find('.notification-item.nt-incoming-share, .notification-item.nt-new-files').rebind('click', function() {
+        this.$popup.find('.notification-item.nt-incoming-share,'
+            + '.notification-item.nt-new-files,'
+            + '.notification-item.nt-updated-files').rebind('click', function() {
 
             // Get the folder ID from the HTML5 data attribute
             const $this = $(this);
@@ -892,17 +1320,33 @@ var notify = {
         this.$popup.find('.nt-takedown-notification, .nt-takedown-reinstated-notification').rebind('click', function() {
 
             // Get the folder ID from the HTML5 data attribute
-            var folderOrFileId = $(this).attr('data-folder-or-file-id');
-            var parentFolderId = M.getNodeByHandle(folderOrFileId).p;
+            const folderOrFileId = $(this).attr('data-folder-or-file-id');
+            const parentFolderId = folderOrFileId ? (notify.ndm.getNode(folderOrFileId) || {}).p : false;
 
             // Mark all notifications as seen and close the popup
             // (because they clicked on a notification within the popup)
             notify.closePopup();
 
+            // takedown notice notification: redirect to dispute URL
+            if ($(this).hasClass('nt-takedown-notification')) {
+                localStorage.removeItem('takedownDisputeNodeURL');
+                const node = notify.ndm.getNode(folderOrFileId);
+                if (M.getNodeShare(node).down) {
+                    const disputeURL = mega.getPublicNodeExportLink(node);
+                    if (disputeURL) {
+                        localStorage.setItem('takedownDisputeNodeURL', disputeURL);
+                    }
+                }
+                mega.redirect('mega.io', 'dispute', false, false, false);
+            }
+
             if (parentFolderId) {
-                // Open the folder
                 M.openFolder(parentFolderId)
-                    .always(function() {
+                    .then(() => {
+                        M.addSelectedNodes(folderOrFileId, true);
+                    })
+                    .catch(dump)
+                    .finally(() => {
                         reselect(true);
                     });
             }
@@ -912,77 +1356,48 @@ var notify = {
     },
 
     /**
-     * If they click on a payment notification, then redirect them to the Account History page
+     * If they click on a payment failed notification, then redirect them to the Account History page
      */
     initPaymentClickHandler: function() {
-
-        // On payment notification click
-        this.$popup.find('.notification-item.nt-payment-notification').rebind('click', function() {
-
-            // Mark all notifications as seen (because they clicked on a notification within the popup)
+        this.$popup.find('.notification-item.nt-payment-failed-notification').rebind('click', () => {
             notify.closePopup();
-            var $target = $('.data-block.account-balance');
-
-            // Redirect to payment history
-            loadSubPage('fm/account/plan');
-            mBroadcaster.once('settingPageReady', function () {
-                const $scrollBlock = $('.fm-right-account-block.ps');
-                if ($scrollBlock.length) {
-                    $scrollBlock.scrollTop(
-                        $target.offset().top - $scrollBlock.offset().top + $scrollBlock.scrollTop()
-                    );
-                }
-            });
-
+            loadSubPage('pro');
             eventlog(500465);
         });
     },
 
     /**
-     * If they click on a payment reminder notification, then redirect them to the Pro page
+     * If they click on a payment reminder high (priority) notification (expired today)
+     * then redirect them to the Pro page
      */
     initPaymentReminderClickHandler: function() {
-
-        // On payment reminder notification click
-        this.$popup.find('.notification-item.nt-payment-reminder-notification').rebind('click', function() {
-
-            // Mark all notifications as seen and close the popup
-            // (because they clicked on a notification within the popup)
+        this.$popup.find('.notification-item.nt-payment-reminder-high-notification').rebind('click', () => {
             notify.closePopup();
-
-            // Redirect to pro page
             loadSubPage('pro');
-
             eventlog(500466);
         });
     },
 
     /**
-     * If the click on Accept for a contact request, accept the contact
+     * Set click handlers for accept and decline contact request buttons
      */
-    initAcceptContactClickHandler: function() {
+    initContactReqClickHandlers: () => {
+        'use strict';
 
-        // Add click handler to Accept button
-        this.$popup.find('.notification-item .notifications-button.accept').rebind('click', function() {
-
-            var $this = $(this);
-            var pendingContactId = $this.attr('data-pending-contact-id');
-
-            // Send the User Pending Contact Action (upca) API 2.0 request to accept the request
-            M.acceptPendingContactRequest(pendingContactId)
-                .catch(() => {
-                    notify.acceptedContactRequests.splice(notify.acceptedContactRequests.indexOf(pendingContactId), 1);
-                });
-
-            // Show the Accepted icon and text
-            $this.closest('.notification-item').addClass('accepted');
-            notify.acceptedContactRequests.push(pendingContactId);
-
-            // Mark all notifications as seen and close the popup
-            // (because they clicked on a notification within the popup)
+        $('.notifications-button.accept-contact-request', this.$popup).rebind('click.acceptContactRequest', (e) => {
+            const contactId = $(e.currentTarget).closest('.notification-item').attr('contact-id');
+            M.acceptPendingContactRequest(contactId).catch(dump);
             notify.closePopup();
-
             eventlog(500467);
+            return false;
+        });
+
+        $('.notifications-button.decline-contact-request', this.$popup).rebind('click.declineContactRequest', (e) => {
+            const contactId = $(e.currentTarget).closest('.notification-item').attr('contact-id');
+            M.denyPendingContactRequest(contactId).catch(dump);
+            notify.closePopup();
+            // TODO event log?
+            return false;
         });
     },
 
@@ -992,7 +1407,7 @@ var notify = {
      */
     initSettingsClickHander: function() {
         'use strict';
-        $('button.settings', this.$popup).rebind('click.notifications', () => {
+        $('.notification-settings', this.$popup).rebind('click.notifications', () => {
             notify.closePopup();
             loadSubPage('fm/account/notifications');
         });
@@ -1000,7 +1415,9 @@ var notify = {
 
     initScheduledClickHandler: () => {
         'use strict';
-        $('.nt-schedule-meet', this.$popup).rebind('click.notifications', e => {
+        $('.nt-schedule-meet-created,'
+            + '.nt-schedule-meet-edited,'
+            + '.nt-schedule-meet-cancelled', this.$popup).rebind('click.notifications', e => {
             const chatId = $(e.currentTarget).attr('data-chatid');
             if (chatId) {
                 notify.closePopup();
@@ -1018,39 +1435,70 @@ var notify = {
 
     initDynamicClickHandler: () => {
         'use strict';
-        $('.nt-dynamic-notification', this.$popup).rebind('click.notifications', e => {
+
+        $('.nt-dynamic-notification', this.$popup).rebind('click.dynamicNotification', e => {
             const dynamicId = $(e.currentTarget).attr('data-dynamic-id');
-            const ctaButton = notify.dynamicNotifs[dynamicId].cta1 || notify.dynamicNotifs[dynamicId].cta2;
-            if (ctaButton && ctaButton.link) {
+            const {cta1, cta2, e: expTime} = notify.dynamicNotifs[dynamicId] || {};
+
+            if (expTime !== undefined && expTime - unixtime() <= 0) {
+                return false;
+            }
+
+            const ctaButton = cta1 || cta2;
+            const link = ctaButton && ctaButton.link;
+
+            if (link) {
                 notify.closePopup();
-                const link = ctaButton.link;
-                if (link) {
-                    window.open(link, '_blank', 'noopener,noreferrer');
-                }
+                window.open(link, '_blank', 'noopener,noreferrer');
                 eventlog(500242, dynamicId | 0);
             }
         });
     },
 
     /**
+     * Formats notification date
+     * @param {Number} ts timestamp
+     * @returns {String} formatted notification date
+     */
+    formatNotificationDate(ts) {
+        'use strict';
+
+        if (!ts) {
+            return;
+        }
+
+        const toDayNum = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime() / 86400000;
+        const diff = toDayNum(new Date()) - toDayNum(new Date(ts * 1000));
+
+        if (diff < 2) {
+            return mega.icu.format(
+                diff ? l.notif_date_yesterday : l.notif_date_today,
+                new Date(ts * 1000).getHours())
+                .replace('%1', time2date(ts, 21));
+        }
+        return time2date(ts, 8);
+    },
+
+    /**
      * Main function to update each notification with relevant style and details
      * @param {Object} $notificationHtml The jQuery clone of the HTML notification template
      * @param {Object} notification The notification object
-     * @returns {Object}
+     * @returns {Object|false} The HTML to be rendered for the notification
      */
     updateTemplate: function($notificationHtml, notification)
     {
         // Remove the template class
         $notificationHtml.removeClass('template');
 
-        var date = time2last(notification.timestamp);
+        const date = this.formatNotificationDate(notification.timestamp);
         var data = notification.data;
         var userHandle = notification.userHandle;
         var userEmail = l[7381];    // Unknown
         var avatar = '';
 
-        // Payment & Takedown notification types, file-request upload type
-        const customIconNotifications = ['psts', 'pses', 'ph', 'puu', 'dynamic', 'psts_v2'];
+        // Notifications having a custom avatar instead of the regular user one
+        const customIconNotifications = [
+            'psts', 'pses', 'ph', 'puu', 'dynamic', 'psts_v2', 'share', 'd', 'put', 'dynamic'];
 
         // If a contact action packet
         if (typeof userHandle !== 'string') {
@@ -1081,33 +1529,30 @@ var notify = {
         // If the notification is not one of the custom ones, generate an avatar from the user information
         if (customIconNotifications.indexOf(notification.type) === -1) {
 
-            // Generate avatar from the user handle which will load their profile pic if they are already a contact
-            if (typeof M.u[userHandle] !== 'undefined') {
-                avatar = useravatar.contact(userHandle);
-            }
-
-            // If it failed to generate an avatar from the user handle, or we haven't generated one yet use the email
-            // address. With the new v2.0 API for pending contacts, the user handle will usually not be available as
-            // they are not a full contact yet.
-            if (avatar === '') {
-                avatar = useravatar.contact(userEmail);
-            }
+            // Generate avatar from the user email
+            avatar = useravatar.contact(userEmail);
 
             // Add the avatar HTML and show it
-            $notificationHtml.find('.notification-avatar').removeClass('hidden').prepend(avatar);
+            $('.notification-avatar-user', $notificationHtml).removeClass('hidden').safePrepend(avatar);
         }
         else {
             // Hide the notification avatar code, the specific notification will render the icon
-            $notificationHtml.find('.notification-icon').removeClass('hidden');
+            $('.notification-avatar-custom', $notificationHtml).removeClass('hidden');
         }
-
-        // Get the user's name if we have it, otherwise use their email
-        var displayNameOrEmail = notify.getDisplayName(userEmail);
 
         // Update common template variables
         $notificationHtml.attr('id', notification.id);
-        $notificationHtml.find('.notification-date').text(date);
-        $notificationHtml.find('.notification-username').text(displayNameOrEmail);
+        $('.notification-date', $notificationHtml).text(date);
+
+        let displayName = '';
+        let tooltip;
+        if (userEmail && userEmail !== l[7381]) {
+            displayName = M.getNameByEmail(userEmail);
+            if (displayName !== userEmail) {
+                tooltip = userEmail;
+            }
+            this.renderNotificationTitle($notificationHtml, displayName, tooltip);
+        }
 
         // Add read status
         if (notification.seen) {
@@ -1121,17 +1566,16 @@ var notify = {
             case 'c':
                 return notify.renderContactChange($notificationHtml, notification);
             case 'upci':
-                return notify.renderUpdatedPendingContactIncoming($notificationHtml, notification);
             case 'upco':
-                return notify.renderUpdatedPendingContactOutgoing($notificationHtml, notification);
+                return notify.renderUpdatedPendingContact($notificationHtml, notification);
             case 'share':
-                return notify.renderNewShare($notificationHtml, notification, userEmail);
+                return notify.renderNewShare($notificationHtml, notification, displayName, tooltip);
             case 'd':
                 return notify.renderRemovedSharedNode($notificationHtml, notification);
             case 'dshare':
-                return notify.renderDeletedShare($notificationHtml, userEmail, notification);
+                return notify.renderDeletedShare($notificationHtml, notification, displayName);
             case 'put':
-                return notify.renderNewSharedNodes($notificationHtml, notification, userEmail);
+                return notify.renderNewSharedNodes($notificationHtml, notification, displayName, tooltip);
             case 'psts':
             case 'psts_v2':
                 return notify.renderPayment($notificationHtml, notification);
@@ -1148,268 +1592,258 @@ var notify = {
                 return notify.renderScheduled($notificationHtml, notification);
             }
             case 'puu':
-                return notify.renderFileRequestUpload($notificationHtml, notification);
+                return notify.renderFileRequestUpload($notificationHtml, notification, displayName);
             default:
                 return false;   // If it's a notification type we do not recognise yet
         }
     },
 
     /**
-     * Render pending contact requests
+     * Render notification title adding tooltip in case provided or removing otherwise
      * @param {Object} $notificationHtml jQuery object of the notification template HTML
-     * @param {Object} notification
-     * @returns {Object} The HTML to be rendered for the notification
+     * @param {String} title Main title text
+     * @param {String} tooltip Tooltip (optional) to be shown over title
+     * @returns {void}
      */
-    renderIncomingPendingContact: function($notificationHtml, notification) {
+    renderNotificationTitle($notificationHtml, title, tooltip) {
+        'use strict';
 
-        var pendingContactId = notification.data.p;
-        var mostRecentNotification = true;
-        let isAccepted = false;
-        var className = '';
-        var title = '';
-
-        // Check if a newer contact request for this user has already been rendered (notifications are sorted by timestamp)
-        for (var i = 0, length = notify.renderedContactRequests.length; i < length; i++) {
-
-            // If this contact request has already been rendered, don't render the current notification with buttons
-            if (pendingContactId === notify.renderedContactRequests[i]) {
-                mostRecentNotification = false;
-            }
+        if (!title) {
+            return;
         }
 
-        if (notify.acceptedContactRequests.includes(pendingContactId)) {
-            isAccepted = true;
-        }
-        // If this is the most recent contact request from this user
-        if (mostRecentNotification && !isAccepted) {
+        const $title = $('.notification-title', $notificationHtml);
+        $title.text(title);
 
-            // If this IPC notification also exists in the state
-            if (typeof M.ipc[pendingContactId] === 'object') {
-
-                // Show the Accept button
-                $notificationHtml.find('.notification-request-buttons').removeClass('hidden');
-            }
-
-            // Set a flag so the buttons are not rendered again on older notifications
-            notify.renderedContactRequests.push(pendingContactId);
-        }
-
-        // If the other user deleted their contact request to the current user
-        if (typeof notification.data.dts !== 'undefined') {
-            className = 'nt-contact-deleted';
-            title = l[7151];      // Cancelled their contact request
-        }
-
-        // If the other user sent a reminder about their contact request
-        else if (typeof notification.data.rts !== 'undefined') {
-            className = 'nt-contact-request';
-            title = l[7150];      // Reminder: you have a contact request
+        if (tooltip) {
+            $title.addClass('simpletip')
+                .attr('data-simpletip', tooltip)
+                .attr('data-simpletip-class', 'notify-tooltip')
+                .attr('data-simpletipposition', 'top');
         }
         else {
-            // Creates notification with 'Sent you a contact request' and 'Accept' button
-            className = 'nt-contact-request';
-            title = l[5851];
+            $title.removeClass('simpletip')
+                .removeAttr('data-simpletip')
+                .removeAttr('data-simpletipposition');
         }
-
-        // Populate other template information
-        $notificationHtml.addClass(className);
-        if (notification.data && notification.data.m) {
-            const user = M.getUserByEmail(notification.data.m);
-            if (user && user.c === 1 && user.h) {
-                $notificationHtml.addClass('clickurl').attr('href', `/fm/chat/contacts/${user.h}`);
-            }
-            else if (isAccepted) {
-                // In-flight request so user.h is unknown. Send to contacts on click
-                $notificationHtml.addClass('clickurl').attr('href', `/fm/chat/contacts`);
-            }
-        }
-        $notificationHtml.find('.notification-info').text(title);
-        $notificationHtml.find('.notifications-button.accept').attr('data-pending-contact-id', pendingContactId);
-
-        return $notificationHtml;
     },
 
     /**
-     * Renders notifications related to contact changes
+     * Render pending contact requests in case:
+     * - not duplicate
+     * - pending or from already added contacts
+     * Otherwise render is skipped
      * @param {Object} $notificationHtml jQuery object of the notification template HTML
-     * @param {Object} notification
-     * @returns {Object} The HTML to be rendered for the notification
+     * @param {Object} notification Notification data
+     * @returns {Object|false} The HTML to be rendered for the notification
      */
-    renderContactChange: function($notificationHtml, notification) {
+    renderIncomingPendingContact($notificationHtml, notification) {
+        'use strict';
 
-        // Get data from initial c=50 notification fetch or action packet
-        var action = (typeof notification.data.c !== 'undefined') ? notification.data.c : notification.data.u[0].c;
-        var userHandle = (Array.isArray(notification.userHandle)) ?
-            notification.data.ou || notification.userHandle[0].u : notification.userHandle;
-        var className = '';
-        var title = '';
+        let info;
+        let className;
 
-        // If the user deleted the request
-        if (action === 0) {
-            className = 'nt-contact-deleted';
-            title = l[7146];        // Deleted you as a contact
+        const {p: contactId, m: contactEmail, dts, rts} = notification.data;
+
+        if (dts || this.renderedPendingContacts.has(contactEmail)) {
+            return false;
         }
-        else if (action === 1) {
+
+        const isPending = M.ipc[contactId];
+        const isContact = M.u.some(u => u.c === 1 && u.m === contactEmail);
+
+        // skip notifications already managed from non-contacts
+        if (!(isPending || isContact)) {
+            return false;
+        }
+
+        this.renderedPendingContacts.add(contactEmail);
+
+        if (isContact) {
             className = 'nt-contact-accepted';
-            title = l.notification_contact_accepted; // Accepted your contact request
-
-            if (u_attr.b && !u_attr.b.m && u_attr.b.mu && u_attr.b.mu[0] === userHandle) {
-                title = l.admin_sub_contacts; // your admin and you are now contacts.
-            }
-
-            // Add a data attribute for the click handler
-            $notificationHtml.attr('data-contact-handle', userHandle);
-            $notificationHtml.addClass('clickable');
+            info = l.notification_contact_accepted;
         }
-        else if (action === 2) {
-            className = 'nt-contact-deleted';
-            title = l[7144];        // Account has been deleted/deactivated
-        }
-
-        // Populate other template information
-        $notificationHtml.addClass(className);
-        $notificationHtml.find('.notification-info').text(title);
-
-        return $notificationHtml;
-    },
-
-    /**
-     * Renders Updated Pending Contact (Incoming) notifications
-     * @param {Object} $notificationHtml jQuery object of the notification template HTML
-     * @param {Object} notification
-     * @returns {Object} The HTML to be rendered for the notification
-     */
-    renderUpdatedPendingContactIncoming: function($notificationHtml, notification) {
-
-        // The action 's' will only be available if initial fetch of notifications, 'u[0].s' is used if action packet
-        var action = (typeof notification.data.s !== 'undefined') ? notification.data.s : notification.data.u[0].s;
-        var className = '';
-        var title = '';
-
-        if (action === 1) {
-            className = 'nt-contact-request-ignored';
-            title = l[7149];      // You ignored a contact request
-        }
-        else if (action === 2) {
-            className = 'nt-contact-accepted';
-            title = l[7148];      // You accepted a contact request
-        }
-        else if (action === 3) {
-            className = 'nt-contact-request-denied';
-            title = l[7147];      // You denied a contact request
-        }
-
-        // Populate other template information
-        $notificationHtml.addClass(className);
-        $notificationHtml.find('.notification-info').text(title);
-
-        return $notificationHtml;
-    },
-
-    /**
-     * Renders Updated Pending Contact (Outgoing) notifications
-     * @param {Object} $notificationHtml jQuery object of the notification template HTML
-     * @param {Object} notification
-     * @returns {Object} The HTML to be rendered for the notification
-     */
-    renderUpdatedPendingContactOutgoing: function($notificationHtml, notification) {
-
-        // The action 's' will only be available if initial fetch of notifications, 'u[0].s' is used if action packet
-        var action = (typeof notification.data.s !== 'undefined') ? notification.data.s : notification.data.u[0].s;
-        var className = '';
-        var title = '';
-
-        // Display message depending on action
-        if (action === 2) {
-            className = 'nt-contact-accepted';
-            title = l[5852];        // Accepted your contact request
-        }
-        else if (action === 3) {
-            className = 'nt-contact-request-denied';
-            title = l[5853];        // Denied your contact request
-        }
-
-        // Populate other template information
-        $notificationHtml.addClass(className);
-        $notificationHtml.find('.notification-info').text(title);
-
-        return $notificationHtml;
-    },
-
-    /**
-     * Render new share notification
-     * @param {Object} $notificationHtml jQuery object of the notification template HTML
-     * @param {Object} notification
-     * @param {String} email The email address
-     * @returns {Object} The HTML to be rendered for the notification
-     */
-    renderNewShare: function($notificationHtml, notification, email) {
-
-        var title = '';
-        var folderId = notification.data.n;
-
-        // If the email exists use language string 'New shared folder from [X]'
-        if (email) {
-            title = l[824].replace('[X]', email);
+        else if (rts) {
+            className = 'nt-contact-request-reminder';
+            info = l[7150].replace('[B]', '<b>').replace('[/B]', '</b>');
         }
         else {
-            // Otherwise use string 'New shared folder'
-            title = l[825];
+            className = 'nt-contact-request';
+            info = l[5851];
         }
 
-        // Populate other template information
+        $notificationHtml.addClass(className);
+        $('.notification-info', $notificationHtml).safeHTML(info);
+
+        if (isContact) {
+            const user = M.getUserByEmail(contactEmail);
+            if (user) {
+                $notificationHtml.addClass('clickable').attr('contact-id', user.h);
+            }
+        }
+        else {
+            const $buttons = $('.notification-request-buttons', $notificationHtml).removeClass('hidden');
+            const $bDecline = $('button.outline', $buttons)
+                .addClass('decline-contact-request').removeClass('hidden');
+            $('span', $bDecline).text(l.decline);
+
+            const $bAccept = $('button.primary', $buttons)
+                .addClass('accept-contact-request').removeClass('hidden');
+            $('span', $bAccept).text(l[5856]);
+
+            $notificationHtml.addClass('clickable').attr('contact-id', contactId);
+        }
+
+        return $notificationHtml;
+    },
+
+    /**
+     * Renders notifications related to contact request acepted
+     * Otherwise (user deleted or account disabled) render is skipped
+     * @param {Object} $notificationHtml jQuery object of the notification template HTML
+     * @param {Object} notification Notification data
+     * @returns {Object|false} The HTML to be rendered for the notification
+     */
+    renderContactChange($notificationHtml, notification) {
+        'use strict';
+
+        const action = notification.data.c || notification.data.u[0].c;
+
+        // user deleted as contact or account deleted / deactivated or invalid notification
+        if (action !== 1) {
+            return false;
+        }
+
+        const userHandle = Array.isArray(notification.userHandle)
+            ? notification.data.ou || notification.userHandle[0].u
+            : notification.userHandle;
+
+        // contact request accepted (action === 1)
+        const title = u_attr.b && !u_attr.b.m && u_attr.b.mu && u_attr.b.mu[0] === userHandle
+            ? l.admin_sub_contacts
+            : l.notification_contact_accepted;
+
+        $notificationHtml.addClass('nt-contact-accepted clickable').attr('contact-id', userHandle);
+        $('.notification-info', $notificationHtml).text(title);
+
+        return $notificationHtml;
+    },
+
+    /**
+     * Render accepted updated pending contact notifications
+     * @param {Object} $notificationHtml jQuery object of the notification template HTML
+     * @param {Object} notification
+     * @returns {Object} The HTML to be rendered for the notification
+     */
+    renderUpdatedPendingContact($notificationHtml, notification) {
+        'use strict';
+
+        const action = notification.data.s || notification.data.u[0].s;
+
+        // contact request rejected or invalid notification
+        if (action !== 2) {
+            return false;
+        }
+
+        const userHandle = Array.isArray(notification.userHandle)
+            ? notification.data.ou || notification.userHandle[0].u
+            : notification.userHandle;
+
+        // contact request accepted (action === 2)
+        $notificationHtml.addClass('nt-contact-accepted clickable').attr('contact-id', userHandle);
+        $('.notification-info', $notificationHtml).text(l.notification_contact_accepted);
+
+        return $notificationHtml;
+    },
+
+    /**
+     * Render new shared folder notification
+     * @param {Object} $notificationHtml jQuery object of the notification template HTML
+     * @param {Object} notification Notification data
+     * @param {String} displayName The user display name
+     * @param {String} tooltip The tooltip for default title
+     * @returns {Object|false} The HTML to be rendered for the notification
+     */
+    renderNewShare($notificationHtml, notification, displayName, tooltip) {
+        'use strict';
+
+        let isDefaults = true;
+        const handle = notification.data.n;
+
         $notificationHtml.addClass('nt-incoming-share');
-        $notificationHtml.addClass('clickable');
-        $notificationHtml.find('.notification-info').text(title);
-        $notificationHtml.attr('data-folder-id', folderId);
+
+        const notifIcon = '<i class="item-type-icon icon-folder-users-24"></i>';
+        $('.notification-avatar-custom', $notificationHtml).safeHTML(notifIcon);
+
+        if (M.c.shares[handle]) {
+            const node = this.ndm.getNode(handle);
+            if (node && node.name) {
+                isDefaults = false;
+                this.renderNotificationTitle($notificationHtml, this.shortenNodeName(node.name));
+                const info = displayName ? l[824].replace('[X]', displayName) : l[825];
+                $('.notification-info', $notificationHtml).text(info);
+            }
+
+            $notificationHtml.addClass('clickable').attr('data-folder-id', handle);
+        }
+
+        if (isDefaults) {
+            const title = displayName
+                ? l[824].replace('[X]', displayName)
+                : l[825];
+            this.renderNotificationTitle($notificationHtml, title, tooltip);
+        }
 
         return $notificationHtml;
     },
 
     /**
-     * Render removed share node notification
+     * Render removed node(s) from a shared folder notification
+     * shared folder node is never available
      * @param {Object} $notificationHtml jQuery object of the notification template HTML
+     * @param {Object} notification Notification data
      * @returns {Object} The HTML to be rendered for the notification
      */
-    renderRemovedSharedNode: function($notificationHtml, notification) {
+    renderRemovedSharedNode($notificationHtml, notification) {
+        'use strict';
 
-        var itemsNumber = 0;
-        var title = '';
+        const items = Array.isArray(notification.data.n) ? notification.data.n : [notification.data.n];
 
-        if (Array.isArray(notification.data.n)) {
-            itemsNumber = notification.data.n.length;
-        }
-        else {
-            itemsNumber = 1;
-        }
+        $notificationHtml.addClass('nt-removed-items');
 
-        title = mega.icu.format(l[8913], itemsNumber);
+        const notifIcon = '<i class="item-type-icon icon-folder-users-24"></i>';
+        $('.notification-avatar-custom', $notificationHtml).safeHTML(notifIcon);
 
-        // Populate other template information
-        $notificationHtml.addClass('nt-revocation-of-incoming');
-        $notificationHtml.find('.notification-info').text(title);
+        const info = mega.icu.format(l[8913], items.length);
+        $('.notification-info', $notificationHtml).text(info);
 
         return $notificationHtml;
     },
 
     /**
-     * Render a deleted share notification
+     * Render removed shared folder notification
+     * sharee (receiver) notification: "owner removed access to shared folder"
+     *   - always render, shared folder node never in (in)shares, it was removed
+     * sharer (owner) notification: "sharee left shared folder"
+     *   - render notification if shared folder node in (out)shares and available
+     *   - otherwise render is skipped
      * @param {Object} $notificationHtml jQuery object of the notification template HTML
-     * @param {String} email The email address
-     * @param {Object} notification notification object
-     * @returns {Object} The HTML to be rendered for the notification
+     * @param {Object} notification Notification data
+     * @param {String} displayName The user display name
+     * @returns {Object|false} The HTML to be rendered for the notification
      */
-    renderDeletedShare: function ($notificationHtml, email, notification) {
+    renderDeletedShare($notificationHtml, notification, displayName) {
+        'use strict';
 
-        var title = '';
-        var notificationOwner;
-        var notificationTarget;
-        var notificationOrginating;
+        let info;
+        let notificationOwner;
+        let notificationOrginating;
+
+        const handle = notification.data.n;
 
         // first we are parsing an action packet.
         if (notification.data.orig) {
             notificationOwner = notification.data.u;
-            notificationTarget = notification.data.rece;
             notificationOrginating = notification.data.orig;
         }
         else {
@@ -1422,12 +1856,6 @@ var notify = {
                         notification
                     );
                 }
-                else {
-                    notificationTarget = notificationOrginating;
-                }
-            }
-            else {
-                notificationTarget = u_handle;
             }
 
             // if we are dealing with old notification which doesnt support the new data
@@ -1440,111 +1868,160 @@ var notify = {
             if (notification.data.rece) {
                 notificationOwner = notificationOrginating;
             }
-
         }
-        var sharingRemovedByReciver = notificationOrginating !== notificationOwner;
 
-        if (!sharingRemovedByReciver) {
-            // If the email exists use string 'Access to folders shared by [X] was removed'
-            if (email) {
-                title = l[7879].replace('[X]', email);
+        let className;
+        if (notificationOrginating === notificationOwner) {
+            // notification for sharee (receiver)
+            // shared node is not available anymore
+            const node = this.ndm.getNode(handle);
+            if (node) {
+                this.renderNotificationTitle($notificationHtml, this.shortenNodeName(node.name));
+                info = l.shared_folder_removed.replace('%1', displayName);
             }
             else {
-                // Otherwise use string 'Access to folders was removed.'
-                title = l[7880];
+                info = l[7879];
             }
+
+            className = 'nt-incoming-removed';
+            $('.notification-avatar-user', $notificationHtml).addClass('hidden');
+
+            const notifIcon = '<i class="item-type-icon icon-folder-users-24"></i>';
+            $('.notification-avatar-custom', $notificationHtml).removeClass('hidden').safeHTML(notifIcon);
         }
         else {
-            var folderName = M.getNameByHandle(notification.data.n) || '';
-            var removerEmail = notify.getUserEmailByTheirHandle(notificationTarget);
-            if (removerEmail) {
-                title = l[19153].replace('{0}', removerEmail).replace('{1}', folderName);
+            // notification for sharer (owner)
+            const node = this.ndm.getNode(handle);
+
+            // when last sharee leaves a shared folder, the related node will not be in (out)shares anymore
+            // however notification "sharee left shared folder" must be shown to the owner
+            // if related node exists
+            if (!(M.isOutShare(handle) || node)) {
+                return false;
             }
-            else {
-                title = l[19154].replace('{0}', folderName);
-            }
+
+            className = 'nt-incoming-left';
+            info = node && node.name
+                ? l.shared_folder_left.replace('%1', this.shortenNodeName(node.name))
+                : l.shared_folder_left_nameless;
         }
 
-        // Populate other template information
-        $notificationHtml.addClass('nt-revocation-of-incoming');
-        $notificationHtml.find('.notification-info').text(title);
+        $notificationHtml.addClass(className);
+        $('.notification-info', $notificationHtml).text(info);
 
         return $notificationHtml;
     },
 
     /**
-     * Render a notification for when another user has added files/folders into an already shared folder.
-     * This condenses all the files and folders that were shared into a single notification.
-     * @param {Object} $notificationHtml jQuery object of the notification template HTML
-     * @param {Object} notification
-     * @param {String} email The email address
-     * @returns {Object} The HTML to be rendered for the notification
+     * Builds configuration for new shared nodes added notification
+     * @param {Object} notification Notification data
+     * @returns {Object} Configuration
      */
-    renderNewSharedNodes: function($notificationHtml, notification, email) {
+    buildSharedNodesConfig(notification) {
+        'use strict';
 
-        var nodes = notification.data.f;
-        var fileCount = 0;
-        var folderCount = 0;
-        var folderId = notification.data.n;
-        var notificationText = '';
-        var title = '';
+        let numFiles = 0;
+        let numFolders = 0;
+        const nodes = notification.data.f;
 
-        // Count the number of new files and folders
-        for (var node in nodes) {
-
-            // Skip if not own property
-            if (!nodes.hasOwnProperty(node)) {
-                continue;
-            }
-
-            // If folder, increment
-            if (nodes[node].t) {
-                folderCount++;
+        for (let i = 0; i < nodes.length; i++) {
+            if (nodes[i].t) {
+                numFolders++;
             }
             else {
-                // Otherwise is file
-                fileCount++;
+                numFiles++;
             }
         }
 
-        // Get wording for the number of files and folders added
-        const folderText = mega.icu.format(l.folder_count, folderCount);
-        const fileText = mega.icu.format(l.file_count, fileCount);
+        let isUpdate = false;
+        let label;
+        let numItems;
 
-        // Set wording of the title
-        if (notification.data.ver && folderCount === 0 && fileCount > 0) {
-            title = email ? mega.icu.format(l.user_file_updated_count, fileCount).replace('[X]', email)
-                : mega.icu.format(l.file_updated_count, fileCount);
+        // files updated
+        if (notification.data.ver && numFolders === 0 && numFiles > 0) {
+            isUpdate = true;
+            label = l.file_count;
+            numItems = numFiles;
         }
-        else if (folderCount >= 1 && fileCount >= 1) {
-            title = email ? mega.icu.format(l.user_item_added_count, folderCount + fileCount).replace('[X]', email) :
-                mega.icu.format(l.item_added_count, folderCount + fileCount);
+        // items (files and folders) added
+        else if (numFolders >= 1 && numFiles >= 1) {
+            label = l.items_count;
+            numItems = numFolders + numFiles;
         }
-        else if (folderCount > 0) {
-            title = email ? l[836].replace('[X]', email).replace('[DATA]', folderText) :
-                mega.icu.format(l.folder_added_count, folderCount);
+        // folders added
+        else if (numFolders > 0) {
+            label = l.folder_count;
+            numItems = numFolders;
         }
-        else if (fileCount > 0) {
-            title = email ? l[836].replace('[X]', email).replace('[DATA]', fileText) :
-                mega.icu.format(l.file_added_count, fileCount);
+        // files added
+        else if (numFiles > 0) {
+            label = l.file_count;
+            numItems = numFiles;
         }
 
-        // Populate other template information
-        $notificationHtml.addClass('nt-new-files');
-        $notificationHtml.addClass('clickable');
-        $notificationHtml.find('.notification-info').text(title);
-        $notificationHtml.attr('data-folder-id', folderId);
+        return {isUpdate, label, numItems};
+    },
+
+    /**
+     * Render new node(s) added to a shared folder notification
+     * @param {Object} $notificationHtml jQuery object of the notification template HTML
+     * @param {Object} notification Notification data
+     * @param {String} displayName The user display name
+     * @param {String} tooltip The tooltip for default title
+     * @returns {Object|false} The HTML to be rendered for the notification
+     */
+    renderNewSharedNodes($notificationHtml, notification, displayName, tooltip) {
+        'use strict';
+
+        let isDefaults = true;
+        const handle = notification.data.n;
+
+        const notifIcon = '<i class="item-type-icon icon-folder-users-24"></i>';
+        $('.notification-avatar-custom', $notificationHtml).safeHTML(notifIcon);
+
+        const share = this.ndm.getShare(handle);
+
+        if (share || M.isOutShare(handle)) {
+            const sharedFolder = this.ndm.getNode(share || handle);
+
+            if (sharedFolder && sharedFolder.name) {
+                isDefaults = false;
+                this.renderNotificationTitle($notificationHtml, this.shortenNodeName(sharedFolder.name));
+
+                // TODO cambiar buildSharedNodesConfig por renderNewSharedNodesInfo y meter lo de abajo
+                const {isUpdate, label, numItems} = this.buildSharedNodesConfig(notification);
+
+                const infoLabel = isUpdate ? l.shared_nodes_updated : l.shared_nodes_added;
+                const info = infoLabel
+                    .replace('%1', displayName || l.notif_no_username)
+                    .replace('%2', mega.icu.format(label, numItems));
+                $('.notification-info', $notificationHtml).text(info);
+
+                $notificationHtml.addClass(isUpdate ? 'nt-updated-files' : 'nt-new-files');
+            }
+
+            $notificationHtml.addClass('clickable').attr('data-folder-id', handle);
+        }
+
+        if (isDefaults) {
+            $notificationHtml.addClass('nt-new-files');
+            const title = displayName
+                ? l.notif_new_items_shared_folder.replace('%1', displayName)
+                : l.notif_new_items_shared_folder_no_username;
+            this.renderNotificationTitle($notificationHtml, title, tooltip);
+        }
 
         return $notificationHtml;
     },
 
     /**
-     * Process payment notification sent from payment provider e.g. Bitcoin.
+     * Render payment notification (sucess and failed) for past notifications
      * @param {Object} $notificationHtml jQuery object of the notification template HTML
-     * @param {Object} notification The notification object
-     * @returns {Object} The HTML to be rendered for the notification
+     * @param {Object} notification Notification data
+     * @returns {Object|false} The HTML to be rendered for the notification
      */
-    renderPayment: function($notificationHtml, notification) {
+    renderPayment($notificationHtml, notification) {
+        'use strict';
 
         // If user has not seen the welcome dialog before, show it and set ^!welDlg to 2 (seen)
         if (!notification.seen && !(u_attr.pf || u_attr.b) && !pro.propay.onPropayPage()) {
@@ -1557,30 +2034,30 @@ var notify = {
             }).catch(dump);
         }
 
-        var proLevel = notification.data.p;
+        let title;
+        let className;
 
-        if (proLevel === pro.ACCOUNT_LEVEL_FEATURE) {
-            proLevel += pro.getStandaloneBits(notification.data.f);
+        // success payment
+        if (notification.data.r === 's') {
+            className = 'nt-payment-success-notification';
+            title = l[7142];
         }
-
-        var proPlan = pro.getProPlanName(proLevel);
-        var success = (notification.data.r === 's') ? true : false;
-        var header = l[1230];   // Payment info
-        var title = '';
-
-        // Change wording depending on success or failure
-        if (success) {
-            title = l[7142].replace('%1', proPlan);   // Your payment for the PRO III plan was received.
-        }
+        // failed payment
         else {
-            title = l[7141].replace('%1', proPlan);   // Your payment for the PRO II plan was unsuccessful.
+            className = 'nt-payment-failed-notification clickable';
+            title = l[7141];
+
+            const $buttons = $('.notification-request-buttons', $notificationHtml).removeClass('hidden');
+            const $bReactivate = $('button.primary', $buttons)
+                .addClass('reactivate-subscription').removeClass('hidden');
+            $('span', $bReactivate).text(l.reactivate_subscription);
         }
 
-        // Populate other template information
-        $notificationHtml.addClass('nt-payment-notification');
-        $notificationHtml.addClass('clickable');
-        $notificationHtml.find('.notification-info').text(title);
-        $notificationHtml.find('.notification-username').text(header);      // Use 'Payment info' instead of an email
+        const notifIcon = '<i class="sprite-fm-uni icon-mega-logo"></i>';
+        $('.notification-avatar-custom', $notificationHtml).safeHTML(notifIcon);
+
+        $notificationHtml.addClass(className);
+        this.renderNotificationTitle($notificationHtml, title);
 
         return $notificationHtml;
     },
@@ -1683,91 +2160,118 @@ var notify = {
     }),
 
     /**
-     * Process payment reminder notification to remind them their PRO plan is due for renewal.
-     * Example PSES (Pro Status Expiring Soon) packet: {"a":"pses", "ts":expirestimestamp}.
+     * Render payment reminder notification for past notifications based on notification timestamp
+     * Otherwise (future notifications) render is skipped
      * @param {Object} $notificationHtml jQuery object of the notification template HTML
-     * @param {Object} notification The notification object
+     * @param {Object} notification Notification data
      * @returns {Object|false} The HTML to be rendered for the notification
      */
-    renderPaymentReminder: function($notificationHtml, notification) {
+    renderPaymentReminder($notificationHtml, notification) {
+        'use strict';
 
-        // Find the time difference between the current time and the plan expiry time
-        var currentTimestamp = unixtime();
-        var expiringTimestamp = notification.data.ts;
-        var secondsDifference = (expiringTimestamp - currentTimestamp);
-
-        // If the notification is still in the future
-        if (secondsDifference > 0) {
-
-            // Calculate day/days remaining
-            var days = Math.floor(secondsDifference / 86400);
-
-            // PRO membership plan expiring soon
-            // Your PRO membership plan will expire in 1 day/x days.
-            var header = l[8598];
-            var title;
-            if (days === 0) {
-                title = l[25041];
-            }
-            else {
-                title = mega.icu.format(l[8597], days);
-            }
-
-            // Populate other template information
-            $notificationHtml.addClass('nt-payment-reminder-notification clickable');
-            $notificationHtml.find('.notification-username').text(header);
-            $notificationHtml.find('.notification-info').addClass('red').text(title);
-
-            return $notificationHtml;
-        }
-
-        // Don't show any notification if the time has passed
-        return false;
-    },
-
-    /**
-     * Processes a takedown notice or counter-notice to restore the file.
-     * @param {Object} $notificationHtml jQuery object of the notification template HTML
-     * @param {Object} notification The notification object
-     * @returns {Object|false} The HTML to be rendered for the notification
-     */
-    renderTakedown: function($notificationHtml, notification) {
-
-        var header = '';
-        var title = '';
-        var cssClass = '';
-        var handle = notification.data.h;
-        const node = M.getNodeByHandle(handle);
-        var name = (node.name) ? '(' + notify.shortenNodeName(node.name) + ')' : '';
-
-        // Takedown notice
-        // Your publicly shared %1 (%2) has been taken down.
-        if (notification.data.down === 1) {
-            header = l[8521];
-            title = (node.t === 0) ? l.publicly_shared_file_taken_down.replace('%1', name)
-                : l.publicly_shared_folder_taken_down.replace('%1', name);
-            cssClass = 'nt-takedown-notification';
-        }
-
-        // Takedown reinstated
-        // Your taken down %1 (%2) has been reinstated.
-        else if (notification.data.down === 0) {
-            header = l[8524];
-            title = (node.t === 0) ? l.taken_down_file_reinstated.replace('%1', name)
-                : l.taken_down_folder_reinstated.replace('%1', name);
-            cssClass = 'nt-takedown-reinstated-notification';
-        }
-        else {
-            // Not applicable so don't return anything or it will show a blank notification
+        const secondsDifference = (notification.data.ts || 0) - unixtime();
+        if (secondsDifference <= 0) {
             return false;
         }
 
-        // Populate other template information
+        const notifIcon = '<i class="sprite-fm-uni icon-mega-logo"></i>';
+        $('.notification-avatar-custom', $notificationHtml).safeHTML(notifIcon);
+
+        let cssClass;
+        const days = Math.floor(secondsDifference / 86400);
+
+        if (!days) {
+            cssClass = 'nt-payment-reminder-high-notification clickable';
+            const $buttons = $('.notification-request-buttons', $notificationHtml).removeClass('hidden');
+            const $bRenew = $('button.primary', $buttons)
+                .addClass('renew-subscription').removeClass('hidden');
+            $('span', $bRenew).text(l.renew_subscription);
+        }
+        else if (days > 14) {
+            cssClass = 'nt-payment-reminder-medium-notification';
+        }
+        else {
+            cssClass = 'nt-payment-reminder-low-notification';
+        }
+
         $notificationHtml.addClass(cssClass);
-        $notificationHtml.addClass('clickable');
-        $notificationHtml.find('.notification-info').text(title);
-        $notificationHtml.find('.notification-username').text(header);
-        $notificationHtml.attr('data-folder-or-file-id', handle);
+
+        this.renderNotificationTitle($notificationHtml, days ? mega.icu.format(l[8597], days) : l[25041]);
+
+        return $notificationHtml;
+    },
+
+    /**
+     * Render takedown notifications (disabled / reinstated)
+     * @param {Object} $notificationHtml jQuery object of the notification template HTML
+     * @param {Object} notification Notification data
+     * @returns {Object|false} The HTML to be rendered for the notification
+     */
+    renderTakedown($notificationHtml, notification) {
+        'use strict';
+
+        let title;
+        let cssClass;
+        let info;
+        let icon;
+        let isClickable = true;
+
+        const handle = notification.data.h;
+        const node = this.ndm.getNode(handle);
+        const nodeName = node && node.name ? this.shortenNodeName(node.name) : false;
+
+        // Takedown notice (disabled)
+        if (notification.data.down === 1) {
+            cssClass = 'nt-takedown-notification';
+            icon = 'icon-notif-takedown';
+
+            if (nodeName) {
+                title = node.t ? l.folder_disabled : l.file_disabled;
+                info = (node.t
+                    ? l.publicly_shared_folder_taken_down
+                    : l.publicly_shared_file_taken_down).replace('%1', nodeName);
+            }
+            else {
+                title = l.item_disabled;
+                info = l.publicly_shared_item_taken_down;
+            }
+        }
+        // Takedown reinstated
+        else if (notification.data.down === 0) {
+            cssClass = 'nt-takedown-reinstated-notification';
+            icon = 'icon-notif-reinstate';
+
+            if (nodeName) {
+                title = node.t ? l.folder_reinstated : l.file_reinstated;
+                info = (node.t
+                    ? l.taken_down_folder_reinstated
+                    : l.taken_down_file_reinstated).replace('%1', nodeName);
+            }
+            else {
+                isClickable = false;
+                title = l.item_reinstated;
+            }
+        }
+        else {
+            return false;
+        }
+
+        if (info) {
+            info = info.replace('[B]', '<b>').replace('[/B]', '</b>');
+            $('.notification-info', $notificationHtml).safeHTML(info);
+        }
+
+        $notificationHtml.addClass(cssClass);
+        if (isClickable) {
+            $notificationHtml.addClass('clickable').attr('data-folder-or-file-id', handle);
+        }
+
+        $('.notification-avatar-icon', $notificationHtml).addClass('hidden');
+
+        const notifIcon = `<i class="sprite-fm-uni ${icon}"></i>`;
+        $('.notification-avatar-custom', $notificationHtml).safeHTML(notifIcon);
+
+        this.renderNotificationTitle($notificationHtml, title);
 
         return $notificationHtml;
     },
@@ -1810,8 +2314,17 @@ var notify = {
         return meta;
     },
 
-    renderScheduled: function($notificationHtml, notification) {
+    /**
+     * Render meeting notification if meeting exists
+     * Otherwise render is skipped
+     * @param {Object} $notificationHtml jQuery object of the notification template HTML
+     * @param {Object} notification Notification data
+     * @returns {Object|false} The HTML to be rendered for the notification
+     */
+    renderScheduled($notificationHtml, notification) {
         'use strict';
+
+        let className;
         const { data } = notification;
 
         const meta = this.getScheduledNotifOrReject(data);
@@ -1838,19 +2351,17 @@ var notify = {
         }
 
         const $notifBody = $('.notification-scheduled-body', $notificationHtml);
-        $notifBody.removeClass('hidden');
         const $notifLabel = $('.notification-content .notification-info', $notificationHtml).eq(0);
 
         const { NOTIF_TITLES } = megaChat.plugins.meetingsManager;
-        let showTitle = true;
 
         const titleSelect = (core) => {
+            let title;
             const occurrenceKey = meta.occurrence ? 'occur' : 'all';
             if (meta.mode === MODE.CREATED) {
-                return core.inv;
+                title = core.inv.replace('%1', chatRoom.topic);
             }
             else if (meta.mode === MODE.EDITED) {
-                let string = '';
                 let diffCounter = 0;
                 if (
                     meta.prevTiming
@@ -1864,111 +2375,88 @@ var notify = {
                     )
                     || (meta.occurrence && meta.mode !== MODE.CANCELLED)
                 ) {
-                    string = core.time[occurrenceKey];
+                    title = core.time[occurrenceKey].replace('%1', chatRoom.topic);
                     diffCounter++;
                 }
                 if (meta.topicChange) {
-                    string = core.name.update.replace('%1', meta.oldTopic).replace('%s', meta.topic);
+                    title = core.name.update.replace('%1', meta.oldTopic).replace('%2', meta.topic);
                     diffCounter++;
-                    showTitle = false;
                 }
                 if (meta.description) {
-                    string = core.desc.update;
+                    title = core.desc.update.replace('%1', chatRoom.topic);
                     diffCounter++;
                     $notificationHtml.attr('data-desc', diffCounter);
                 }
                 if (meta.converted) {
-                    string = core.convert;
+                    title = core.convert.replace('%1', chatRoom.topic);
                 }
                 else if (diffCounter > 1) {
-                    string = core.multi;
+                    title = core.multi.replace('%1', chatRoom.topic);
                     now = false;
                     prev = false;
-                    showTitle = true;
                 }
-                return string;
             }
-            return core.cancel[occurrenceKey];
+            else {
+                title = core.cancel[occurrenceKey].replace('%1', chatRoom.topic);
+            }
+            return escapeHTML(title).replaceAll('[B]', '<b>').replaceAll('[/B]', '</b>');
         };
 
         if (meta.mode === MODE.CREATED) {
-            let email = this.getUserEmailByTheirHandle(data.ou);
-            if (email) {
-                const avatar = useravatar.contact(email);
-                if (avatar) {
-                    const $avatar = $('.notification-avatar', $notificationHtml).removeClass('hidden');
-                    $avatar.empty();
-                    $avatar.safePrepend(avatar);
-                }
-                email = this.getDisplayName(email);
-                $('.notification-username', $notificationHtml).text(email);
-            }
+            className = 'nt-schedule-meet-created';
+        }
+        else if (meta.mode === MODE.EDITED) {
+            className = 'nt-schedule-meet-edited';
+        }
+        else {
+            className = 'nt-schedule-meet-cancelled';
         }
 
-        $notifLabel.text(titleSelect(meta.recurring ? NOTIF_TITLES.recur : NOTIF_TITLES.once));
-        const $title = $('.notification-scheduled-title', $notifBody);
+        const html = titleSelect(meta.recurring ? NOTIF_TITLES.recur : NOTIF_TITLES.once);
+        $notifLabel.safeHTML(html);
 
-        if (showTitle) {
-            $title.text(chatRoom.topic).removeClass('hidden');
-        }
-
-        const $prev = $('.notification-scheduled-prev', $notifBody);
-        const $new = $('.notification-scheduled-occurrence', $notifBody);
-
-        if (prev && !(meta.occurrence && meta.mode === MODE.CANCELLED)) {
-            $prev.removeClass('hidden');
-            $('s', $prev).text(prev);
-        }
         if (now) {
-            $new.removeClass('hidden');
-            $new.text(now);
+            $notifBody.removeClass('hidden');
+            $('.notification-scheduled-occurrence', $notifBody).removeClass('hidden').text(now);
         }
-        $notificationHtml.addClass('nt-schedule-meet').attr('data-chatid', chatRoom.chatId);
+        $notificationHtml.addClass(`${className} clickable`).attr('data-chatid', chatRoom.chatId);
         return $notificationHtml;
     },
 
-    renderFileRequestUpload($notificationHtml, notification) {
+    /**
+     * Render new node(s) added to a file request folder notification
+     * @param {Object} $notificationHtml jQuery object of the notification template HTML
+     * @param {Object} notification Notification data
+     * @param {String} displayName The user display name
+     * @returns {Object|false} The HTML to be rendered for the notification
+     */
+    renderFileRequestUpload($notificationHtml, notification, displayName) {
         'use strict';
 
-        const fileHandle = notification.data.h || notification.allDataItems[0].h;
-        const folderNode = M.getNodeByHandle(M.getNodeByHandle(fileHandle).p || notification.data.n);
+        const handle = notification.data.h || notification.allDataItems[0];
+        const node = this.ndm.getNode(handle);
+        const folderNode = node ? this.ndm.getNode(node.p || notification.data.n) : false;
 
-        // File has likely been deleted
-        if (!(folderNode.h && folderNode.name)) {
-            if (self.d) {
-                console.info(`Ignoring notification, file-request no longer available(?), ${fileHandle}`, notification);
+        if (folderNode) {
+            $notificationHtml.addClass('clickable').attr('data-folder-id', folderNode.h);
+            if (folderNode.name) {
+                this.renderNotificationTitle($notificationHtml, this.shortenNodeName(folderNode.name));
             }
-            return false;
-        }
-        const folderName = notify.shortenNodeName(folderNode.name);
 
-        let title;
-        let header;
-
-        const numberOfFiles = notification.allDataItems.length;
-        const uploader = notification.userHandle;
-
-        if (uploader) {
-            title = mega.icu.format(l.file_request_notification, numberOfFiles)
-                .replace('%1', uploader).replace('%2', folderName);
-            header = uploader;
+            const numFiles = notification.allDataItems.length;
+            const info = displayName
+                ? mega.icu.format(l.file_request_notification, numFiles).replace('%1', displayName)
+                : mega.icu.format(l.file_request_notification_nameless, numFiles);
+            $('.notification-info', $notificationHtml).text(info);
         }
         else {
-            title = mega.icu.format(l.file_request_notification_nameless, numberOfFiles).replace('%1', folderName);
-            header = l.file_request_notification_header;
+            this.renderNotificationTitle($notificationHtml, l.notif_new_files_file_req);
         }
 
-        const $iconHtml = this.$popup.find('.file-request-notification.template').clone().removeClass('hidden');
+        $notificationHtml.addClass('nt-new-files nt-file-request');
 
-        $('.notification-info', $notificationHtml).text(title);
-        $notificationHtml.attr('data-folder-id', folderNode.h);
-        $notificationHtml.addClass('nt-new-files nt-file-request clickable');
-        $('.notification-username', $notificationHtml).text(header);
-        $('.notification-avatar', $notificationHtml)
-            .removeClass('hidden')
-            .safePrepend($iconHtml.prop('outerHTML'));
-        $('.notification-icon', $notificationHtml).addClass('hidden');
-        $('.notification-avatar-icon', $notificationHtml).addClass('hidden');
+        const notifIcon = '<i class="item-type-icon icon-folder-public-24"></i>';
+        $('.notification-avatar-custom', $notificationHtml).safeHTML(notifIcon);
 
         return $notificationHtml;
     },
@@ -2061,59 +2549,75 @@ var notify = {
     renderDynamic($notificationHtml, notification) {
         'use strict';
 
-        const {data} = notification;
-        if (!data.t || !data.d || !data.id) {
-            return;
+        const {cta1, cta2, t, d, e, dsp, img, id} = notification.data;
+        if (!t || !d || !id) {
+            return false;
         }
 
-        if (data.e) {
+        let cssClass = 'nt-dynamic-nolink-notification';
+        const ctaButton = cta1 || cta2;
+        const link = ctaButton && ctaButton.link;
+
+        if (link) {
+            cssClass = 'nt-dynamic-notification';
+            $notificationHtml.addClass('clickable');
+        }
+
+        if (e) {
             // If the notification is expired, do not show it.
-            const remaining = data.e - unixtime();
+            const remaining = e - unixtime();
             if (remaining <= 0) {
                 return false;
             }
             else if (remaining <= 3600) {
-                notify.dynamicNotifCountdown.addNotifToCounter(data.id, data.e);
+                notify.dynamicNotifCountdown.addNotifToCounter(id, e);
             }
-            const offerExpiryText = time2offerExpire(data.e);
+            const offerExpiryText = time2offerExpire(e);
             $('.notification-date', $notificationHtml)
                 .text(offerExpiryText)
                 .addClass(remaining <= 3600 ? 'red' : '');
-        }
 
-        const ctaButton = data.cta1 || data.cta2;
-        if (ctaButton && ctaButton.link) {
-            const $ctas = $('.cta-buttons', $notificationHtml)
+            if (dsp && img) {
+                let failed = 0;
+                const retina = window.devicePixelRatio > 1 ? '@2x' : '';
+                const imagePath = `${staticpath}images/mega/psa/${img}${retina}.png`;
+
+                $('.dynamic-image', $notificationHtml)
+                    .attr('src', imagePath)
+                    .removeClass('hidden')
+                    .rebind('error.dynamicImage', function() {
+                        // If it failed once it will likely keep failing, prevent infinite loop
+                        if (failed) {
+                            $(this).addClass('hidden');
+                            return;
+                        }
+                        $(this).attr('src', `${dsp}${img}${retina}.png`);
+                        failed = 1;
+                    });
+            }
+
+            if (link) {
+                const $buttons = $('.notification-request-buttons', $notificationHtml).removeClass('hidden');
+                const $bAccept = $('button.primary', $buttons).removeClass('hidden');
+                $('span', $bAccept).text(ctaButton.text);
+            }
+        }
+        else if (link) {
+            $('.notification-request-buttons', $notificationHtml)
                 .removeClass('hidden')
-                .addClass(data.cta1 ? 'positive' : '');
-            const $button = $('button', $ctas).toggleClass('positive', !!data.cta1);
-            $('span', $button).text(ctaButton.text);
-        }
-        if (data.dsp && data.img) {
-            let failed = 0;
-            const retina = (window.devicePixelRatio > 1) ? '@2x' : '';
-            const imagePath = staticpath + 'images/mega/psa/' + data.img + '@2x.png';
-
-            $('.dynamic-image', $notificationHtml)
-                .attr('src', imagePath)
-                .removeClass('hidden')
-                .rebind('error', function() {
-                    // If it failed once it will likely keep failing, prevent infinite loop
-                    if (failed) {
-                        $(this).addClass('hidden');
-                        return;
-                    }
-                    $(this).attr('src', data.dsp + data.img + retina + '.png');
-                    failed = 1;
-                });
+                .safeHTML(`<span class="dynamic-link">${ctaButton.text}</span>`);
         }
 
-        $('.notification-info', $notificationHtml).text(data.d);
-        $('.notification-username', $notificationHtml).text(data.t);
-        $('.notification-promo', $notificationHtml).removeClass('hidden');
-        $notificationHtml.addClass('nt-dynamic-notification');
-        $notificationHtml.attr('data-dynamic-id', data.id);
-        $notificationHtml.attr('id', 'dynamic-notif-' + data.id);
+        const notifIcon = '<i class="sprite-fm-uni icon-mega-logo"></i>';
+        $('.notification-avatar-custom', $notificationHtml).safeHTML(notifIcon);
+        $('.notification-avatar-icon', $notificationHtml).addClass('hidden');
+
+        this.renderNotificationTitle($notificationHtml, t);
+        $('.notification-info', $notificationHtml).text(d);
+
+        $notificationHtml.addClass(cssClass);
+        $notificationHtml.attr('data-dynamic-id', id);
+        $notificationHtml.attr('id', `dynamic-notif-${id}`);
 
         return $notificationHtml;
     },
@@ -2130,16 +2634,6 @@ var notify = {
         }
 
         return htmlentities(name);
-    },
-
-    /**
-     * Gets a display name for the notification. If available it will use the user or contact's name.
-     * If the name is unavailable (e.g. a new contact request) then it will use the email address.
-     * @param {String} email The email address e.g. ed@fredom.press
-     * @returns {String} Returns the name and email as a string e.g. "Ed Snowden (ed@fredom.press)" or just the email
-     */
-    getDisplayName: function(email) {
-        return M.getNameByEmail(email);
     },
 
     /**

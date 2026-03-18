@@ -547,6 +547,7 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
         attachEvents() {
             this.onNodeClick = (cell, evt) => {
                 const { shiftKey } = evt;
+                const isCtrl = scope.getCtrlKeyStatus(evt);
                 const { el, isSelected } = cell;
 
                 if (this.selectionLimit === 1) {
@@ -559,14 +560,16 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
 
                 if (shiftKey) {
                     if (this.selectStartNode && this.selectStartNode.h !== el.ref.node.h) {
-                        this.selectElementsRange(this.selectStartNode, el.ref.node, true);
+                        this.selectElementsRange(this.selectStartNode, el.ref.node);
                     }
                     else {
+                        this.selectNode(el.ref.node);
                         this.clearSiblingSelections(el.ref.node.h);
                         this.selectStartNode = el.ref.node;
+                        this.shiftSelectedIndexes = [];
                     }
                 }
-                else {
+                else if (isCtrl) {
                     if (isSelected) {
                         this.deselectNode(el.ref.node);
                         this.selectStartNode = null;
@@ -577,6 +580,12 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
                         this.selectStartNode = el.ref.node;
                     }
 
+                    this.shiftSelectedIndexes = [];
+                }
+                else {
+                    this.selectNode(el.ref.node);
+                    this.selectStartNode = el.ref.node;
+                    this.clearSiblingSelections(el.ref.node.h);
                     this.shiftSelectedIndexes = [];
                 }
             };
@@ -695,7 +704,7 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
                     onDragEnd: (wasDragging, yCorrection, rect, { target }) => {
                         if (!wasDragging
                             && this.selCount
-                            && (target === this.el || target.classList.contains('MegaDynamicListItem'))) {
+                            && (target === this.el || target.closest('.MegaDynamicListItem'))) {
                             this.clearSiblingSelections();
                             this.selectArea = null;
                             this.lastNavNode = null;

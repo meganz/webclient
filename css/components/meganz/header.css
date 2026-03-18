@@ -273,7 +273,8 @@ body.pwm-ui .mega-header .top-block {
     padding: 16px 0;
     width: 280px;
 }
-.mega-header .chats-wrapper .flyout-option.chats.decorated::after {
+.mega-header .chats-wrapper .flyout-option.chats.decorated::after,
+.mega-header .notif-wrapper .nav-elem.alarm.decorated::after {
     background: var(--mobile-icon-brand);
     border-radius: 200px;
     content: '';

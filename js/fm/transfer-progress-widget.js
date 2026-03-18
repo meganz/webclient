@@ -1077,6 +1077,21 @@ mega.tpw = new function TransferProgressWidget() {
             this._complete = false;
             this.errored = false;
             this.overquota = false;
+
+            this.attachEvent('mouseover', () => {
+                if (this._complete) {
+                    const handle = this.type === mega.tpw.UPLOAD
+                        ? this._handle
+                        : this.transferId.split('_').pop();
+
+                    if (M.getNodeRoot(handle) === M.RubbishID) {
+                        $('.transfer-complete-actions', this.el).addClass('hidden');
+                    }
+                    else {
+                        $('.transfer-complete-actions', this.el).removeClass('hidden');
+                    }
+                }
+            });
         }
 
         get running() {

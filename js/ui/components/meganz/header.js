@@ -68,8 +68,6 @@ class MegaHeader extends MegaMobileHeader {
             return false;
         });
 
-        this.notifButton.domNode.prepend(mCreateElement('span', {class: 'js-notification-num icon-badge hidden'}));
-
         // Contacts menu
         wrapper = mCreateElement('div', {class: 'menu-wrapper contacts-wrapper top-contacts'}, navActions);
         this.contactsButton = new MegaButton({
@@ -143,7 +141,7 @@ class MegaHeader extends MegaMobileHeader {
             drive: {
                 componentClassname: 'drive',
                 text: l.drive,
-                href: '/fm',
+                href: '/fm/cloudroot',
                 icon: 'sprite-fm-mono icon-cloud-thin-outline',
                 iconSize: 24,
                 activeCondition: () => mega.ui.topmenu.hasClass('drive'),
@@ -504,7 +502,6 @@ class MegaHeader extends MegaMobileHeader {
 
     showNotifMenu() {
         mega.ui.header.notifButton.parentNode.classList.add('show');
-        notify.renderNotifications();
         mega.ui.header.handleMenu('notif');
         mega.ui.header.notifButton.icon = mega.ui.header.notifButton.icon.replace('thin-outline', 'regular-filled');
         if (document.body.classList.contains('rtl')) {
@@ -512,6 +509,7 @@ class MegaHeader extends MegaMobileHeader {
             this.notifMenu.style.right = width <= 270 ? `-${8 + (270 - width)}px` : '-8px';
         }
         eventlog(500322);
+        notify.renderHydratedNotifications().catch(dump);
     }
 
     closeAvatarMenu(e) {
@@ -981,19 +979,6 @@ class MegaHeader extends MegaMobileHeader {
                         componentClassname: 'support small-btn',
                         text: l[383],
                         rightIcon: 'sprite-fm-mono icon-chevron-right-thin-outline'
-                    },
-                    {
-                        componentClassname: 'feedback',
-                        text: l.join_survey_share_opinion,
-                        onClick: () => {
-                            mega.config.set('rvonbrddl', 1);
-                            window.open(
-                                'https://survey.mega.co.nz/index.php?r=survey/index&sid=692176&lang=en',
-                                '_blank',
-                                'noopener,noreferrer'
-                            );
-                            eventlog(500328);
-                        }
                     },
                     {
                         componentClassname: 'helpcentre extlink',

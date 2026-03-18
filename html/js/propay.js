@@ -16,6 +16,7 @@ pro.propay = {
     paymentGateways: {
         primary: null,
         secondary: null,
+        tertiary: null,
     },
 
     gateSupportsTrial: false,
@@ -87,6 +88,18 @@ pro.propay = {
         }
 
         return this.gatewayElmsByName[currentGatewayName] || '';
+    },
+    previousPurchaseProvider: null,
+
+    getPreviousProvider() {
+        'use strict';
+        this.previousPurchaseProvider = sessionStorage.prevProv;
+        return this.previousPurchaseProvider;
+    },
+
+    setPreviousProvider(name) {
+        'use strict';
+        sessionStorage.prevProv = name;
     },
 
     isVoucherBalance() {
@@ -261,7 +274,7 @@ pro.propay = {
         if (this.isNewAccount && !skipAccountDetails) {
             const {name, email, password} = this.signup.getNewAccountDetails();
 
-            const nameNeeded = !name;
+            const nameNeeded = !name || !this.signup.validateName(name);
             const emailNeeded = !email || !this.signup.validateEmail(email);
             const passwordValidity = this.signup.validatePassword(password);
             const passwordNeeded = (typeof passwordValidity === 'string')
@@ -452,6 +465,7 @@ pro.propay = {
 
         const welDlgAttr =
             parseInt(await Promise.resolve(mega.attr.get(u_handle, 'welDlg', -2, true)).catch(nop)) | 0;
+
 
         // If the user has purchased a subscription and they haven't seen the welcome dialog before (
         // u_attr[^!welDlg] = 0), set welDlg to 1 which will show it when the psts notification arrives.
@@ -2533,6 +2547,10 @@ pro.propay = {
         const optionContainer = document.createElement('div');
         optionContainer.className = option.className;
 
+        if (option.id) {
+            optionContainer.id = option.id;
+        }
+
         const textContainer = document.createElement('span');
         textContainer.className = 'text';
         textContainer.textContent = option.text;
@@ -2581,12 +2599,13 @@ pro.propay = {
     createDropdown($container, options) {
         'use strict';
         $container.empty();
+        const selectedOption = options.selected || false;
 
         const optionsWrapper = document.createElement('div');
         optionsWrapper.className = 'mega-input-dropdown dropdown-scroll hidden';
         let $optionsWrapper = $(optionsWrapper);
 
-        const text = options.selected || options.placeholder;
+        const text = selectedOption.text || options.placeholder;
 
         $container.safeAppend('<span>');
         $container.safeAppend('<i class="sprite-fm-mono icon-dropdown">');
@@ -2597,6 +2616,9 @@ pro.propay = {
 
         for (let i = 0; i < options.items.length; i++) {
             const option = options.items[i];
+            if (selectedOption && (option.value === selectedOption.value)) {
+                option.className += ' selected';
+            }
             const optionContainer = this.createDropdownItem(option);
 
 
@@ -2644,6 +2666,8 @@ pro.propay = {
             if (typeof options.click === 'function') {
                 options.click(e);
             }
+            handleIsOpen(true);
+            e.stopPropagation();
         });
 
         $('i.simpletip', $optionsWrapper).rebind('click', (e) => {
@@ -2682,22 +2706,14 @@ pro.propay = {
 
     renderGateways() {
         'use strict';
-
         const $primaryOptionsContainer = $('#propay-payment-dropdown-pri');
+        this.$primaryOptionsContainer = $primaryOptionsContainer;
         const $secondaryOptionsContainer = $('.payment-options-secondary');
+        this.$secondaryOptionsContainer = $secondaryOptionsContainer;
         const $tertiaryOptionsContainer = $('#propay-payment-dropdown-ter');
 
-        const optionArrays = {
-            'primary': this.paymentGateways.primary.map(
-                gateway => gateway.displayName),
-            'secondary': this.paymentGateways.secondary.length && this.paymentGateways.secondary.map(
-                gateway => gateway.displayName),
-            'tertiary': this.paymentGateways.tertiary.length && this.paymentGateways.tertiary.map(
-                gateway => gateway.displayName),
-        };
-
-        if (optionArrays.secondary) {
-            optionArrays.primary.push(l.more_options_eli);
+        if (this.paymentGateways.secondary.length) {
+            this.paymentGateways.primary.push(l.more_options_eli);
         }
 
         const providerEventIds = {
@@ -2731,13 +2747,15 @@ pro.propay = {
 
             const $target = $(e.currentTarget);
 
-            if ($target.is('i.tooltip')) {
+            // debugger
+
+            if (!$target.length || $target.is('i.tooltip')) {
                 return;
             }
 
             const optionIndex = +$target.attr('data-value');
 
-            const options = optionArrays[type];
+            const options = this.paymentGateways[type];
 
             $('.payment-method .selected').removeClass('selected');
 
@@ -2748,12 +2766,14 @@ pro.propay = {
                 $target.addClass('selected');
 
                 // If 'More options' clicked, show more options and do not change the current gateway
-                if (optionArrays.secondary && (optionIndex === options.length - 1)) {
+                if (this.paymentGateways.secondary && (optionIndex === options.length - 1)) {
                     $secondaryOptionsContainer.removeClass('hidden');
-                    if (optionArrays.tertiary) {
+                    if (this.paymentGateways.tertiary) {
                         $tertiaryOptionsContainer.removeClass('hidden');
                     }
-                    this.currentGatewayName = null;
+                    if (!pro.propay.preSelect) {
+                        this.currentGatewayName = null;
+                    }
                     this.renderPlanInfo();
                     this.updatePayment();
 
@@ -2765,9 +2785,10 @@ pro.propay = {
                 $tertiaryOptionsContainer.addClass('hidden');
             }
 
-
-            this.currentGatewayName = options[optionIndex];
+            this.currentGatewayName = options[optionIndex].gatewayName;
             logProviderClick(this.gatewaysByName[this.currentGatewayName]);
+
+            this.setPreviousProvider(this.currentGatewayName);
 
             this.updatePayment();
             this.renderPlanInfo();
@@ -2776,76 +2797,87 @@ pro.propay = {
 
         const renderSecondaryOptions = () => {
             const $secondaryOptionTemplate = mega.templates.getTemplate('radio-with-icon-label-tmplt');
-            const $seeAllBtn = optionArrays.tertiary
-                && mega.templates.getTemplate('down-arrow-text-after-tmplt')
+            const $seeAllBtn = this.paymentGateways.tertiary.length &&
+                mega.templates.getTemplate('down-arrow-text-after-tmplt')
                     .addClass('see-all-btn')
                     .removeClass('hidden template');
 
             $secondaryOptionsContainer.empty();
 
-            for (let i = 0; i < optionArrays.secondary.length; i++) {
-                const $secondaryOption = $secondaryOptionTemplate.clone()
-                    .removeClass('hidden template')
-                    .addClass('option secondary')
-                    .attr('data-value', i);
+            let preselectedIsTertiary = false;
 
-                $('.radio-txt', $secondaryOption).text(optionArrays.secondary[i]);
-                const gateway = pro.propay.gatewaysByName[optionArrays.secondary[i]];
+            const renderOption = (gateway, index, type, isInitiallyHidden = false) => {
+                const isPreselected = gateway.gatewayName === this.previousPurchaseProvider;
+
+                const $option = $secondaryOptionTemplate.clone()
+                    .removeClass('hidden template')
+                    .addClass(`option ${type} ${gateway.gatewayName}`
+                        + (isInitiallyHidden && !isPreselected ? ' hidden' : ''))
+                    .attr('data-value', index);
+
+                $('.radio-txt', $option).text(gateway.displayName);
+
                 if (gateway) {
-                    $('.radio-icon', $secondaryOption)
+                    $('.radio-icon', $option)
                         .addClass('provider-icon mr-2 ' + gateway.gatewayName)
                         .removeClass('hidden');
                 }
 
-                $secondaryOptionsContainer.safeAppend($secondaryOption.prop('outerHTML'));
+                if (isPreselected) {
+                    $('.radio', $option).removeClass('radioOff').addClass('radioOn');
+                    if (type === 'tertiary') {
+                        preselectedIsTertiary = true;
+                    }
+                }
+                else {
+                    $('.radio', $option).removeClass('radioOn').addClass('radioOff');
+                }
+
+                $secondaryOptionsContainer.safeAppend($option.prop('outerHTML'));
+            };
+
+            // Render secondary options
+            for (let i = 0; i < this.paymentGateways.secondary.length; i++) {
+                renderOption(this.paymentGateways.secondary[i], i, 'secondary');
             }
 
-            if (optionArrays.tertiary) {
-
-                for (let i = 0; i < optionArrays.tertiary.length; i++) {
-                    const $tertiaryOption = $secondaryOptionTemplate.clone()
-                        .removeClass('template')
-                        .addClass('option tertiary hidden')
-                        .attr('data-value', i);
-
-                    $('.radio-txt', $tertiaryOption).text(optionArrays.tertiary[i]);
-                    const gateway = pro.propay.gatewaysByName[optionArrays.tertiary[i]];
-                    if (gateway) {
-                        $('.radio-icon', $tertiaryOption)
-                            .addClass('provider-icon mr-2 ' + gateway.gatewayName)
-                            .removeClass('hidden');
-                    }
-
-                    $secondaryOptionsContainer.safeAppend($tertiaryOption.prop('outerHTML'));
+            // Render tertiary options
+            if (this.paymentGateways.tertiary.length) {
+                for (let i = 0; i < this.paymentGateways.tertiary.length; i++) {
+                    renderOption(this.paymentGateways.tertiary[i], i, 'tertiary', true);
                 }
 
                 $('.txt', $seeAllBtn).text('See all');
                 $secondaryOptionsContainer.safeAppend($seeAllBtn.prop('outerHTML'));
 
-                let showingAll = false;
+                let showingAll = preselectedIsTertiary;
 
-                $('.see-all-btn', $secondaryOptionsContainer).rebind('click.propay', () => {
+                const $seeAllBtnInstance = $('.see-all-btn', $secondaryOptionsContainer);
+                if (showingAll) {
+                    $seeAllBtnInstance.addClass('see-less');
+                    $('.txt', $seeAllBtnInstance).text(l.see_less);
+                    $('.option.tertiary', $secondaryOptionsContainer).removeClass('hidden');
+                }
+
+                $seeAllBtnInstance.rebind('click.propay', () => {
                     showingAll = !showingAll;
                     $('.option.tertiary', $secondaryOptionsContainer).toggleClass('hidden', !showingAll);
-                    $('.see-all-btn', $secondaryOptionsContainer).toggleClass('see-less', showingAll);
-                    $('.see-all-btn .txt', $secondaryOptionsContainer).text(l[showingAll ? 'see_less' : 'see_all']);
+                    $seeAllBtnInstance.toggleClass('see-less', showingAll);
+                    $('.txt', $seeAllBtnInstance).text(l[showingAll ? 'see_less' : 'see_all']);
                 });
-
             }
 
             $('.option', $secondaryOptionsContainer).rebind('click.propay', (e) => {
-
                 const $this = $(e.currentTarget);
                 const optionType = $this.is('.option.secondary') ? 'secondary' : 'tertiary';
                 const index = +$this.attr('data-value');
-                const options = optionArrays[optionType];
+                const options = this.paymentGateways[optionType];
 
-                if (options[index] === this.currentGatewayName) {
+                if (options[index].gatewayName === this.currentGatewayName) {
                     return;
                 }
 
                 $('.radio', $secondaryOptionsContainer).removeClass('radioOn').addClass('radioOff');
-
                 $('.radio', $this).removeClass('radioOff').addClass('radioOn');
 
                 handleProviderClick(e, optionType);
@@ -2860,18 +2892,22 @@ pro.propay = {
             this.usingBalance = false;
             this.balanceStringForDropdown = false;
 
+            let preSelected;
+
             pro.propay.createDropdown($primaryOptionsContainer, {
 
                 placeholder: l['1523'],
-                items: optionArrays.primary.reduce((acc, item) => {
-                    const gateway = this.gatewaysByName[item];
+                items: this.paymentGateways.primary.reduce((acc, gateway) => {
 
-                    let text = item;
+                    let text = typeof gateway === 'string'
+                        ? gateway
+                        : gateway.displayName;
                     let tooltip;
                     let svg;
                     let extraClasses = '';
+                    let id;
 
-                    if (gateway) {
+                    if (gateway && typeof gateway === 'object') {
                         if (gateway.gatewayId === 0) {
                             if (pro.propay.useBalance(gateway)) {
                                 extraClasses += ' balance';
@@ -2902,26 +2938,37 @@ pro.propay = {
                             svg = ' sprite-fm-uni icon-ideal';
                         }
                     }
+                    else {
+                        id = "payment-more-options";
+                    }
 
-
-                    acc.push({
+                    const dropdownOption = {
                         text,
                         svg,
                         tooltip,
-                        className: 'option' + extraClasses,
-                        value: item,
+                        id,
+                        className: 'option' + extraClasses + (gateway ? ` ${gateway.gatewayName}` : ''),
+                        value: gateway.gatewayName,
                         icon: gateway && gateway.gatewayName,
-                    });
+                    };
+
+                    if ((gateway && gateway.gatewayName) && (gateway.gatewayName === this.previousPurchaseProvider)) {
+                        preSelected = dropdownOption;
+                        pro.propay.updatePayment();
+                    }
+
+                    acc.push(dropdownOption);
+
                     return acc;
                 }, []),
+                selected: preSelected,
             });
-
 
             $('.option', $primaryOptionsContainer).rebind('click.propay', (e) => handleProviderClick(e, 'primary'));
         };
 
         renderPrimaryDropdown();
-        if (optionArrays.secondary) {
+        if (this.paymentGateways.secondary) {
             renderSecondaryOptions();
         }
     },
@@ -3307,7 +3354,7 @@ pro.propay = {
                 this.trialSupported |= validGate.supportsTrial;
                 const info = pro.getPaymentGatewayName(validGate.gatewayId, validGate);
                 validGate.displayName = info.displayName;
-                this.gatewaysByName[validGate.displayName] = validGate;
+                this.gatewaysByName[validGate.gatewayName] = validGate;
             }
             return validGate;
         });
@@ -3417,11 +3464,9 @@ pro.propay = {
             return sortValues[getSortVal(a)] - sortValues[getSortVal(b)];
         });
 
-
-
         this.paymentGateways.primary = primaryOptions;
-        this.paymentGateways.secondary = remainingOptions.splice(0, 5);
-        this.paymentGateways.tertiary = remainingOptions;
+        this.paymentGateways.secondary = remainingOptions.length && remainingOptions.splice(0, 5);
+        this.paymentGateways.tertiary = remainingOptions.length && remainingOptions;
 
         return this.paymentGateways;
     },
@@ -3677,6 +3722,8 @@ pro.propay = {
                     return;
                 }
 
+                this.getPreviousProvider();
+
                 if (discountInfo) {
                     this.discountInfo = discountInfo;
                     this.instantDiscount = true;
@@ -3698,7 +3745,50 @@ pro.propay = {
 
                 const propayPageVisitEventId = pro.propay.getPropayPageEventId(pro.propay.planNum);
 
-                this.sk.endLoadAll();
+                const checkGateways = (gateways) => gateways.find((g) => {
+                    return (g.gatewayName === this.previousPurchaseProvider);
+                });
+
+                let preSelectedType = this.previousPurchaseProvider
+                    ? 'tertiary'
+                    : false;
+
+                if (preSelectedType) {
+                    if (checkGateways(this.paymentGateways.primary)) {
+                        preSelectedType = 'primary';
+                    }
+                    else if (checkGateways(this.paymentGateways.secondary)) {
+                        preSelectedType = 'secondary';
+                    }
+                }
+
+                // If user has made a payment before, show the payment method used.
+                // It will be pre-selected.
+                const preSelect = () => {
+                    const $paymentMethod = preSelectedType === 'primary'
+                        ? $(`.option.selected`, this.$primaryOptionsContainer)
+                        : $('.option:has(.radioOn:not(input))', this.$secondaryOptionsContainer);
+                    if ($paymentMethod.length) {
+                        pro.propay.handleProviderClick({currentTarget: $paymentMethod}, preSelectedType);
+                        if (preSelectedType !== 'primary') {
+                            pro.propay.preSelect = true;
+                            document.getElementById('payment-more-options').click();
+                            pro.propay.preSelect = false;
+                        }
+                    }
+                    this.sk.endLoadAll();
+                };
+
+                // If payment requires billing info, wait for it to be loaded before proceeding
+                if (addressDialog.loadingBillingInfo) {
+                    addressDialog.loadingBillingInfo.then(() => {
+                        preSelect();
+                    });
+                }
+                else {
+                    preSelect();
+                }
+
 
                 eventlog(propayPageVisitEventId);
             });
@@ -4362,7 +4452,7 @@ pro.propay = {
         clickHandler(e) {
             'use strict';
             const root = e.currentTarget.closest('.sk-setup');
-            if (root && root.classList.contains('sk-active')) {
+            if (root && root.classList.contains('sk-active') && !pro.propay.preSelect) {
                 e.stopPropagation();
             }
         },

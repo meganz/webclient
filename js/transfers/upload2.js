@@ -149,7 +149,9 @@ var ulmanager = {
             // Load the membership plans
             dlmanager.setPlanPrices($dialog);
 
-            eventlog(99699, true);
+            if (aFileUpload !== null) {
+                eventlog(99699, true);
+            }
             return $dialog;
         });
     },

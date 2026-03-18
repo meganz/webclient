@@ -1449,7 +1449,7 @@ var addressDialog = {
             delete this.businessRegPage;
         }
 
-        return this.fetchBillingInfo().always((billingInfo) => {
+        this.loadingBillingInfo = this.fetchBillingInfo().always((billingInfo) => {
             billingInfo = billingInfo || Object.create(null);
 
             const selectedState =
@@ -1468,6 +1468,8 @@ var addressDialog = {
 
             onIdle(() => eventlog(500516));
         });
+
+        return this.loadingBillingInfo;
     },
 
     /**
@@ -2585,8 +2587,11 @@ var addressDialog = {
                     return pro.loadMembershipPlans(nop, true);
                 })
                 .then(() => {
-                    const plan = pro.getPlanObj(pro.propay.planNum, pro.propay.selectedPeriod);
-                    return plan && plan.getInstantDiscountInfo();
+                    // Assume that busines plan does not have an instant discount
+                    if (pro.propay.onPropayPage()) {
+                        const plan = pro.getPlanObj(pro.propay.planNum, pro.propay.selectedPeriod);
+                        return plan && plan.getInstantDiscountInfo();
+                    }
                 });
 
             if (pro.propay.onPropayPage()) {

@@ -598,14 +598,14 @@ class MeetingsManager {
         },
         time: {
           occur: l.schedule_mgmt_update_occur,
-          all: l.schedule_mgmt_update_recur
+          all: l.schedule_mgmt_update_occur
         },
         convert: l.schedule_mgmt_update_convert_recur,
-        inv: l.schedule_notif_invite_recur,
-        multi: l.schedule_notif_update_multi,
+        inv: l.schedule_notif_invite,
+        multi: l.schedule_mgmt_update_occur,
         cancel: {
           occur: l.schedule_mgmt_cancel_occur,
-          all: l.schedule_mgmt_cancel_recur
+          all: l.schedule_mgmt_cancel_occur
         }
       },
       once: {
@@ -617,14 +617,14 @@ class MeetingsManager {
         },
         time: {
           occur: '',
-          all: l.schedule_mgmt_update
+          all: l.schedule_mgmt_update_occur
         },
         convert: l.schedule_mgmt_update_convert,
         inv: l.schedule_notif_invite,
-        multi: l.schedule_notif_update_multi,
+        multi: l.schedule_mgmt_update_occur,
         cancel: {
           occur: '',
-          all: l.schedule_mgmt_cancel
+          all: l.schedule_mgmt_cancel_occur
         }
       }
     };
@@ -908,7 +908,7 @@ class MeetingsManager {
         endTime
       } = timeRules;
       string = OCCUR_STRINGS.once[mode].occur;
-      res.push(string.replace('%1', toLocaleTime(startTime)).replace('%2', toLocaleTime(endTime)).replace('%6', time2date(startTime, 20)).replace('%s', time2date(startTime, 11)));
+      res.push(string.replace('%1', toLocaleTime(startTime)).replace('%2', toLocaleTime(endTime)).replace('%6', time2date(startTime, 4)).replace('%s', time2date(startTime, 11)));
       if (prevTiming) {
         const {
           startTime: pStartTime,
@@ -917,7 +917,7 @@ class MeetingsManager {
         if (converted) {
           res.push(this._parseOccurrence(prevTiming, mode, occurrence));
         } else {
-          res.push(string.replace('%1', toLocaleTime(pStartTime)).replace('%2', toLocaleTime(pEndTime)).replace('%6', time2date(pStartTime, 20)).replace('%s', time2date(pStartTime, 11)));
+          res.push(string.replace('%1', toLocaleTime(pStartTime)).replace('%2', toLocaleTime(pEndTime)).replace('%6', time2date(pStartTime, 4)).replace('%s', time2date(pStartTime, 11)));
         }
       }
     }
@@ -974,7 +974,7 @@ class MeetingsManager {
       return string.replace('%1', toLocaleTime(startTime)).replace('%2', toLocaleTime(endTime)).replace('%3', time2date(startTime, 2)).replace('%4', time2date(recurEnd, 2));
     }
     string = once[mode].occur;
-    return string.replace('%1', toLocaleTime(startTime)).replace('%2', toLocaleTime(endTime)).replace('%6', time2date(startTime, 20)).replace('%s', time2date(startTime, 11));
+    return string.replace('%1', toLocaleTime(startTime)).replace('%2', toLocaleTime(endTime)).replace('%6', time2date(startTime, 4)).replace('%s', time2date(startTime, 11));
   }
   getFormattingMeta(scheduledId, data, chatRoom) {
     const {
@@ -1396,6 +1396,7 @@ function Chat() {
   this.archivedChatsCount = 0;
   this.FORCE_EMAIL_LOADING = localStorage.fel;
   this.WITH_SELF_NOTE = mega.flags.ff_n2s || localStorage.withSelfNote;
+  this._createPrivRoom = Object.create(null);
   this._imageLoadCache = Object.create(null);
   this._imagesToBeLoaded = Object.create(null);
   this._imageAttributeCache = Object.create(null);
@@ -1755,13 +1756,24 @@ Chat.prototype.registerUploadListeners = function () {
   self.unregisterUploadListeners(true);
   const forEachChat = function (chats, callback) {
     let result = 0;
+    let p = Promise.resolve();
     if (!Array.isArray(chats)) {
-      chats = [chats];
+      chats = String(chats).split(',');
     }
     for (let i = chats.length; i--;) {
       const room = self.getRoomFromUrlHash(chats[i]);
       if (room) {
         callback(room, ++result);
+      } else {
+        const [, t, h] = chats[i].split('/');
+        const c = t === 'p' && h in M.u;
+        if (d) {
+          logger.warn(`room ${chats[i]} not found%s`, c ? ', attempting to create...' : '.');
+        }
+        if (c) {
+          ++result;
+          p = p.then(() => self.createAndShowPrivateRoom(h).then(room => callback(room))).catch(dump);
+        }
       }
     }
     return result;
@@ -2755,13 +2767,21 @@ Chat.prototype.getPrivateRoom = function (h) {
 
   return this.chats[h] || false;
 };
-Chat.prototype.createAndShowPrivateRoom = promisify(function (resolve, reject, h) {
-  M.openFolder(`chat/p/${  h}`).then(() => {
-    const room = this.getPrivateRoom(h);
-    assert(room, 'room not found..');
-    resolve(room);
-  }).catch(reject);
-});
+Chat.prototype.createAndShowPrivateRoom = async function (h) {
+  if (!this._createPrivRoom[h]) {
+    this._createPrivRoom[h] = M.openFolder(`chat/p/${h}`, true).then(() => this.getPrivateRoom(h) || tSleep(2 + Math.random())).then(() => {
+      const room = this.getPrivateRoom(h);
+      if (!room) {
+        this.logger.warn(`Could not create private room '${h}'`);
+        throw ENOENT;
+      }
+      return room;
+    }).finally(() => {
+      delete this._createPrivRoom[h];
+    });
+  }
+  return this._createPrivRoom[h];
+};
 Chat.prototype.createAndShowGroupRoomFor = function (contactHashes, topic = '', opts = {}) {
   this.trigger('onNewGroupChatRequest', [contactHashes, {
     topic,
@@ -20894,7 +20914,7 @@ class TopicChange extends topicChange_ConversationMessageMixin {
       label: topicChange_React.createElement(utils.zT, null, displayName)
     }), datetime, topicChange_React.createElement("div", {
       className: "message text-block"
-    }, topicChange_React.createElement(utils.P9, null, (chatRoom.scheduledMeeting ? l.schedule_mgmt_title.replace('%1', `<strong>${oldTopic}</strong>`) : l[9081]).replace('%s', `<strong>${topic}</strong>`))))));
+    }, topicChange_React.createElement(utils.P9, null, chatRoom.scheduledMeeting ? l.schedule_mgmt_title.replace('%1', oldTopic).replace('%2', topic).replaceAll('[B]', '<b>').replaceAll('[/B]', '</b>') : l[9081].replace('%s', `<b>${topic}</b>`))))));
     return topicChange_React.createElement("div", null, messages);
   }
 }
@@ -32239,44 +32259,45 @@ class ScheduleMetaChange extends _mixin_jsx1__.M {
       }, 250);
     }
   }
-  static getTitleText(meta) {
+  static getTitleText(meta, chatRoom) {
     const {
       mode,
       recurring,
       occurrence,
       converted,
-      prevTiming
+      prevTiming,
+      topic
     } = meta;
     const {
       MODE
     } = ScheduleMetaChange;
+    let title = '';
     switch (mode) {
       case MODE.CREATED:
         {
-          return recurring ? l.schedule_mgmt_new_recur : l.schedule_mgmt_new;
+          title = l.schedule_notif_invite;
+          break;
         }
       case MODE.EDITED:
         {
           if (converted) {
-            return recurring ? l.schedule_mgmt_update_convert_recur : l.schedule_mgmt_update_convert;
+            title = recurring ? l.schedule_mgmt_update_convert_recur : l.schedule_mgmt_update_convert;
+          } else if (occurrence) {
+            title = l.schedule_mgmt_update_occur;
+          } else if (prevTiming) {
+            title = l.schedule_mgmt_update_occur;
+          } else {
+            title = l.schedule_notif_update_desc;
           }
-          if (occurrence) {
-            return l.schedule_mgmt_update_occur;
-          }
-          if (prevTiming) {
-            return recurring ? l.schedule_mgmt_update_recur : l.schedule_mgmt_update;
-          }
-          return l.schedule_mgmt_update_desc;
+          break;
         }
       case MODE.CANCELLED:
         {
-          if (recurring) {
-            return occurrence ? l.schedule_mgmt_cancel_occur : l.schedule_mgmt_cancel_recur;
-          }
-          return l.schedule_mgmt_cancel;
+          title = l.schedule_mgmt_cancel_occur;
+          break;
         }
     }
-    return '';
+    return megaChat.html(title.replace('%1', topic || chatRoom.topic)).replaceAll('[B]', '<b>').replaceAll('[/B]', '</b>');
   }
   renderTimingBlock() {
     const {
@@ -32292,10 +32313,10 @@ class ScheduleMetaChange extends _mixin_jsx1__.M {
     if (mode === MODE.CANCELLED && !meta.occurrence) {
       return null;
     }
-    const [now, prev] = megaChat.plugins.meetingsManager.getOccurrenceStrings(meta);
+    const [now] = megaChat.plugins.meetingsManager.getOccurrenceStrings(meta);
     return react0().createElement("div", {
       className: "schedule-timing-block"
-    }, meta.prevTiming && react0().createElement("s", null, prev || ''), now);
+    }, now);
   }
   checkAndFakeOccurrenceMeta(meta) {
     const {
@@ -32360,9 +32381,9 @@ class ScheduleMetaChange extends _mixin_jsx1__.M {
       "data-simpletip": time2date(this.getTimestamp())
     }, this.getTimestampAsString()), react0().createElement("div", {
       className: "message text-block"
-    }, ScheduleMetaChange.getTitleText(meta), " ", !!d && meta.handle), react0().createElement("div", {
+    }, react0().createElement(_ui_utils_jsx3__.P9, null, ScheduleMetaChange.getTitleText(meta, chatRoom)), " ", !!d && meta.handle), react0().createElement("div", {
       className: "message body-block"
-    }, (meta.prevTiming || meta.calendar || meta.topic && meta.onlyTitle || meta.recurring) && react0().createElement("div", {
+    }, mode !== MODE.CANCELLED && (meta.prevTiming || meta.calendar || meta.topic && meta.onlyTitle || meta.recurring) && react0().createElement("div", {
       className: "schedule-detail-block"
     }, meta.calendar && scheduledMeeting && (meta.recurring && !scheduledMeeting.recurring || meta.occurrence && meta.mode === MODE.CANCELLED || !meta.recurring) && react0().createElement("div", {
       className: "schedule-calendar-icon"
@@ -37466,7 +37487,7 @@ function _extends() {
 
 	// The module cache
 	const __webpack_module_cache__ =Object.create(null);
-
+	
 	// The require function
 	function REQ_(moduleId) {
 		// Check if module is in cache
@@ -37480,16 +37501,16 @@ function _extends() {
 			// no module.loaded needed
 			exports:Object.create(null)
 		};
-
+	
 		// Execute the module function
 		__webpack_modules__[moduleId](module, module.exports, REQ_);
-
+	
 		// Return the exports of the module
 		return module.exports;
 	}
+	
 
-
-
+	
 	(() => {
 		// getDefaultExport function for compatibility with non-harmony modules
 		REQ_.n = (module) => {
@@ -37500,8 +37521,8 @@ function _extends() {
 			return getter;
 		};
 	})();
-
-
+	
+	
 	(() => {
 		// define getter functions for harmony exports
 		REQ_.d = (exports, definition) => {
@@ -37512,13 +37533,13 @@ function _extends() {
 			}
 		};
 	})();
-
-
+	
+	
 	(() => {
 		REQ_.o = (obj, prop) => Object.prototype.hasOwnProperty.call(obj, prop)
 	})();
-
-
+	
+	
 	(() => {
 		// define __esModule on exports
 		REQ_.r = (exports) => {
@@ -37528,14 +37549,14 @@ function _extends() {
 			Object.defineProperty(exports, '__esModule', { value: true });
 		};
 	})();
+	
 
-
-
+	
 	// startup
 	// Load entry module and return exports
 	REQ_(326);
 	// This entry module is referenced by other modules so it can't be inlined
 	const EXP_ = REQ_(732);
-
+	
 })()
 ;

@@ -450,6 +450,9 @@
         var autoSelect = $.copyToUpload && !$.copyToUpload[2];
 
         if (section === 'conversations') {
+            if (!aTarget) {
+                $.mcselected = undefined;
+            }
             return handleChatBreadcrumb(aTarget, autoSelect);
         }
         if (section === 'shared-with-me' && !aTarget) {
@@ -2887,6 +2890,17 @@
             if ($.copyToUpload) {
                 var data = $.copyToUpload;
                 var target = $.mcselected;
+                const isSameTarget = $.mcselected === (M.currentCustomView.nodeID || M.currentdirid);
+                const skipForSameChatTarget = section === 'conversations' &&
+                    chats.length === 1 &&
+                    (
+                        !M.currentdirid ||
+                        chats.includes(M.currentdirid.split('/').pop())
+                    );
+
+                if (!isSameTarget && !skipForSameChatTarget) {
+                    eventlog(section === 'quick-access' ? 501139 : 501138);
+                }
 
                 if (section === 'conversations') {
                     target = chats.map(function(h) {
@@ -2909,6 +2923,7 @@
 
                 if ($('.notagain', $dialog).prop('checked')) {
                     mega.config.setn('ulddd', 1);
+                    eventlog(501137);
                 }
 
                 closeDialog();

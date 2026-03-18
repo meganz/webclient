@@ -181,6 +181,7 @@ html .theme-light-forced {
         --secondary-red: rgba(253, 62, 56, var(--secondary-alpha, 1));
         --secondary-white: rgba(255, 255, 255, var(--secondary-alpha, 1));
         --secondary-grey: rgba(204, 204, 204, var(--secondary-alpha, 1));
+        --secondary-black: rgba(73, 74, 77, var(--secondary-alpha, 1));
 
     /* surfaces */
 
@@ -447,6 +448,7 @@ html .theme-dark-forced {
         --secondary-white: rgba(255, 255, 255, var(--secondary-alpha, 1));
         --secondary-red: rgba(255, 102, 97, var(--secondary-alpha, 1));
         --secondary-grey: rgba(204, 204, 204, var(--secondary-alpha, 1));
+        --secondary-black: rgba(253, 111, 144, var(--secondary-alpha, 1));
 
     /* surfaces */
 

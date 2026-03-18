@@ -66,6 +66,9 @@ pro.propay.signup = {
             return false;
         }
 
+        const [firstName, ...rest] = name.trim().split(' ');
+        const lastName = rest.length ? rest.join(' ') : '';
+
         const callbackFunc = (res) => {
             if (res >= 0 || res === EINCOMPLETE) {
                 pro.propay.signup.accountCreationFinished = true;
@@ -106,7 +109,7 @@ pro.propay.signup = {
             }
         }
 
-        security.register.startRegistration(name, '', email, password, true, callbackFunc, true);
+        security.register.startRegistration(firstName, lastName, email, password, true, callbackFunc, true);
 
         return true;
     },
@@ -395,6 +398,11 @@ pro.propay.signup = {
 
     validateEmail(email) {
         return isValidEmail(email);
+    },
+
+    validateName(name) {
+        'use strict';
+        return name.trim().split(' ').length >= 2;
     },
 
     getNewAccountDetails() {

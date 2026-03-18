@@ -1154,10 +1154,10 @@ MegaData.prototype.showOverStorageQuota = async function(quota, options) {
         }
 
         var myOptions = Object(options);
-        
+
         if (quota.isFull) {
 
-            ulmanager.ulShowOverStorageQuotaDialog();
+            ulmanager.ulShowOverStorageQuotaDialog(null);
 
             $('.pm-main').addClass('fm-notification full');
             $fBanner.addClass('visible');
@@ -1222,8 +1222,7 @@ MegaData.prototype.showOverStorageQuota = async function(quota, options) {
             $('.body-p.main-text', $strgdlgBodyFull).text(upgradeString);
             $('.body-p.main-text', $strgdlgBodyAFull).text(upgradeString);
 
-            
-            
+
             $strgdlg.addClass('almost-full');
             $('header h2.almost-full', $strgdlg).text(myOptions.title || l[16312]);
             if (myOptions.body) {

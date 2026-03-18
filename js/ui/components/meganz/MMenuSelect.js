@@ -22,7 +22,6 @@ class MMenuSelect extends MContextMenu {
      * @param {Function} list[].click A specific behaviour when option is clicked
      * @param {Boolean} list[].selected Checking if the option is selected initially
      * @param {Boolean} list[].selectable Checking if the option is actually selectable
-     * @param {Boolean} list[].separator Checking if the option has a separator
      * @param {Boolean} list[].icon Icon on the left for the item
      * @param {Boolean} list[].iconRight Icon on the right for the item
      * @param {String[]} list[].classes Additional classes for a single option
@@ -44,7 +43,6 @@ class MMenuSelect extends MContextMenu {
                 click,
                 selected,
                 selectable,
-                separator,
                 icon,
                 iconRight,
                 classes,
@@ -96,10 +94,6 @@ class MMenuSelect extends MContextMenu {
             }
 
             section.appendChild(item.el);
-
-            if (separator) {
-                section.appendChild(document.createElement('hr'));
-            }
         }
     }
 

@@ -34,14 +34,6 @@ lazy(mega.ui, 'notifyUtils', () => {
                     },
                     menu: [
                         {
-                            label: l.all_notifications,
-                            separator: true,
-                            classes: ['notification-filter'],
-                            get data() {
-                                return false;
-                            },
-                        },
-                        {
                             label: l[164],
                             classes: ['notification-filter'],
                             get data() {
@@ -100,40 +92,13 @@ lazy(mega.ui, 'notifyUtils', () => {
         /**
          * Initializes filter or set selection if index passed
          * @param {Function} fn initialisation function
-         * @param {Numebr} index filter option selected index
          * @returns {void}
          */
-        init(fn, index) {
+        init(fn) {
             this.$element.removeClass('hidden');
-            if (index === undefined) {
-                this.onItemSelect(0, this._options[0]);
-            }
-            else {
-                this.selectItem(index, this._options[index]);
-            }
             if (typeof fn === 'function') {
                 fn();
             }
-        }
-
-        /**
-         * Selects an item
-         * @param {Number} index the selected item index
-         * @param {Object} item the selected item object
-         * @param {Function} clickFn onclick function
-         * @returns {void}
-         */
-        selectItem(index, item, clickFn) {
-            const isSameSelection = index === this.selectedIndex;
-            if (!index && isSameSelection) {
-                super.hide(true);
-                return;
-            }
-
-            super.onItemSelect(
-                isSameSelection ? 0 : index,
-                isSameSelection ? this._options[0] : item,
-                clickFn, true);
         }
 
         /**
@@ -144,8 +109,7 @@ lazy(mega.ui, 'notifyUtils', () => {
          * @returns {void}
          */
         onItemSelect(index, item, clickFn) {
-            this.selectItem(index, item, clickFn);
-
+            super.onItemSelect(index, item, clickFn, true);
             if (typeof this.onItemSelectFn === 'function') {
                 this.onItemSelectFn();
             }
@@ -388,6 +352,7 @@ var notify = {
     userEmails: Object.create(null),
 
     /** jQuery objects for faster lookup */
+    $wrapper: null,
     $popup: null,
     $popupIcon: null,
     $headerButton: null,
@@ -411,9 +376,6 @@ var notify = {
     newNotifications: 0,
     lastFavicoState: false,
 
-    // page change event handler
-    pageChangeHandler: null,
-
     // Notification Shimmer (NotifCenterShimmer) instance
     shimmer: null,
 
@@ -429,6 +391,7 @@ var notify = {
     init: function() {
 
         // Cache lookups
+        notify.$wrapper = $('.notif-wrapper', '.nav-actions');
         notify.$popup = $('.js-notification-popup');
         notify.$popupIcon = $('.top-head .top-icon.notification');
         notify.$headerButton = $('.notif-wrapper .nav-elem.alarm', '.mega-header');
@@ -466,12 +429,12 @@ var notify = {
         }
     },
 
-    initFilter(index) {
+    initFilter() {
         'use strict';
 
         const {NotifCenterFilter} = mega.ui.notifyUtils || {};
 
-        notify.filter = NotifCenterFilter && new NotifCenterFilter(
+        notify.filter = notify.filter || NotifCenterFilter && new NotifCenterFilter(
             $('.notif-filter-chips-wrapper', '.notif-wrapper'),
             () => {
                 if (!notify.ndm.isFetching) {
@@ -488,7 +451,7 @@ var notify = {
                 const $button = $('.notif-filter-chip-button', '.notif-wrapper');
                 $button.removeClass('nolink');
                 $('i', $button).removeClass('hidden');
-            }, index);
+            });
         }
     },
 
@@ -571,12 +534,6 @@ var notify = {
                     }
                 }
 
-                if (!notify.pageChangeHandler) {
-                    notify.pageChangeHandler = mBroadcaster.addListener('pagechange', () => {
-                        notify.initFilter(notify.filter && notify.filter.selectedIndex);
-                    });
-                }
-
                 // After the first SC request all subsequent requests can generate notifications
                 notify.initialLoadComplete = true;
 
@@ -631,8 +588,7 @@ var notify = {
             notify.ndm.init();
             notify.ndm.addToPayload(newNotification);
 
-            const $wrapper = notify.$popup.parents('.notif-wrapper').first();
-            const promise = $wrapper.hasClass('show')
+            const promise = notify.$wrapper.hasClass('show')
                 ? notify.renderHydratedNotifications()
                 : Promise.resolve();
 
@@ -1248,8 +1204,7 @@ var notify = {
 
         // Add scrolling for the notifications
         Soon(() => {
-            const $wrapper = notify.$popup.parents('.notif-wrapper').first();
-            initPerfectScrollbar($('.notification-scroll', $wrapper));
+            initPerfectScrollbar($('.notification-scroll', notify.$wrapper));
         });
 
         // Add click handlers for various notifications

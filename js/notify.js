@@ -2026,8 +2026,9 @@ var notify = {
 
         const share = this.ndm.getShare(handle);
 
-        if (M.c.shares[handle] || share) {
-            const sharedFolder = this.ndm.getNode(M.c.shares[handle] ? handle : share);
+        if (share || M.isOutShare(handle)) {
+            const sharedFolder = this.ndm.getNode(share || handle);
+
             if (sharedFolder && sharedFolder.name) {
                 isDefaults = false;
                 this.renderNotificationTitle($notificationHtml, this.shortenNodeName(sharedFolder.name));

@@ -249,7 +249,8 @@
 
         const elem = e.target;
         const isFolderUpload = elem.hasAttribute('webkitdirectory') || elem.hasAttribute('mozdirectory')
-            || elem.hasAttribute('msdirectory') || elem.hasAttribute('odirectory') || elem.hasAttribute('directory');
+            || elem.hasAttribute('msdirectory') || elem.hasAttribute('odirectory') || elem.hasAttribute('directory')
+            || e.type === 'drop' && typeof M.checkFolderDrop === 'function' && M.checkFolderDrop(e);
 
         // Log that User selected a folder (or file) for upload from the file explorer
         eventlog(isFolderUpload ? 500010 : 500012);

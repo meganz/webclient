@@ -770,6 +770,10 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items, forcedSe
                     ) {
                         finalItems.push('.rewind-item');
                     }
+
+                    if (M.currentrootid === 'shares' || M.currentrootid === 'out-shares') {
+                        finalItems.push('.addfrom-cloud-drive');
+                    }
                 }
             }
         }

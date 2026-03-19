@@ -906,6 +906,9 @@ lazy(mega.ui, 'secondaryNav', () => {
             else if (M.currentrootid === M.RootID) {
                 items.push('.import-from-link');
             }
+            if (M.currentrootid === 'shares' || M.currentrootid === 'out-shares') {
+                items.push('.addfrom-cloud-drive');
+            }
             M.contextMenuUI(ev, 8, items);
 
             eventlog(500721);

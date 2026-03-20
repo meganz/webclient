@@ -5183,6 +5183,131 @@ MegaData.prototype.getS4NodeType = function(n) {
 };
 
 /**
+ * Invoke fetch-probe command to retrieve the size of a folder.
+ * @param {String} h node-handle
+ * @returns {Promise<*>} size entry, map to [bytes, files, folders, vbytes, vfiles]
+ * @memberOf MegaData
+ * @name getFolderSize
+ */
+lazy(MegaData.prototype, 'getFolderSize', () => {
+    'use strict';
+    let lock, tmp;
+    const inflight = new Map();
+    const cache = Object.create(null);
+
+    const SizeEntry = class extends Array {
+        valueOf() {
+            return this[0];
+        }
+
+        toString() {
+            return bytesToSize(this[0]);
+        }
+    };
+
+    const setSize = (h, e) => {
+        cache[h] = [Date.now() + 4e6, e];
+
+        const n = M.d[h] || M.getNodeByHandle(h);
+        if (n) {
+            [n.tb, n.tf, n.td, n.tvb, n.tvf] = e;
+        }
+        return new SizeEntry(...e);
+    };
+
+    const getSize = (h) => {
+        if (cache[h]) {
+            if (cache[h][0] > Date.now()) {
+                return setSize(h, cache[h][1]);
+            }
+        }
+        else {
+            const n = M.d[h] || M.getNodeByHandle(h);
+            if (!n.t || n.tb > 0) {
+                if (self.d) {
+                    console.assert(!n || n.t, `Unexpected node(type) provided ${h}`);
+                }
+                return n.tb && new SizeEntry(n.tb, n.tf, n.td, n.tvb, n.tvf);
+            }
+        }
+        return -1;
+    };
+
+    const flush = () => {
+        const now = Date.now();
+        for (const h in cache) {
+            if (now > cache[h][0]) {
+                delete cache[h];
+            }
+        }
+        M.setPersistentData(`fp:cache!${u_handle}`, cache).catch(dump);
+    };
+
+    M.getPersistentData(`fp:cache!${u_handle}`)
+        .then((res) => Object.assign(cache, res))
+        .catch(dump);
+
+    return async(h) => {
+        assert(typeof h === 'string' && h.length === 8);
+        if ((tmp = getSize(h)) !== -1) {
+            return tmp;
+        }
+        const {resolve, promise} = Promise.withResolvers();
+
+        if (inflight.has(h)) {
+            inflight.get(h).push(resolve);
+        }
+        else {
+            inflight.set(h, [resolve]);
+        }
+
+        do {
+            await tSleep(2 + Math.random());
+            // eslint-disable-next-line no-unmodified-loop-condition -- too fancy for eslint?..
+        } while (lock);
+
+        if (inflight.size) {
+            lock = true;
+            await tSleep(1);
+
+            const q = Object.fromEntries(inflight);
+            inflight.clear();
+
+            for (const h in q) {
+                if ((tmp = getSize(h)) !== -1) {
+                    for (let i = q[h].length; i--;) {
+                        q[h][i](tmp);
+                    }
+                    delete q[h];
+                }
+            }
+
+            if ((tmp = Object.keys(q)).length) {
+                const {result = false} = await api.req({a: 'fp', h: tmp}, 6).catch(dump) || !1;
+
+                for (const h in q) {
+                    tmp = false;
+                    if (Array.isArray(result[h]) && result[h].length > 2) {
+                        tmp = setSize(h, result[h]);
+                    }
+                    else if (self.d) {
+                        console.error(`Unexpected API reply for fp(${h})`, result[h]);
+                    }
+                    for (let i = q[h].length; i--;) {
+                        q[h][i](tmp);
+                    }
+                }
+
+                onIdle(flush);
+            }
+            lock = false;
+        }
+
+        return promise;
+    };
+});
+
+/**
  * Utility functions to handle 'My chat files' folder.
  * @name myChatFilesFolder
  * @memberOf MegaData

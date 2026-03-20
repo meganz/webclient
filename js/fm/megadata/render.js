@@ -386,7 +386,8 @@ MegaData.prototype.megaListRenderNode = function(aHandle) {
         }
         return false;
     }
-    if (!M.d[aHandle] && !(mega.infinity && M.getNodeByHandle(aHandle))) {
+    const n = M.d[aHandle] || mega.infinity && M.getNodeByHandle(aHandle);
+    if (!n) {
         if (d) {
             console.warn("megaListRenderNode was called with aHandle '%s' which was not found in M.d", aHandle);
         }
@@ -421,6 +422,21 @@ MegaData.prototype.megaListRenderNode = function(aHandle) {
         else if (selList && selList.length === 0) {
             node.classList.remove('ui-selected');
         }
+    }
+
+    if (n.t && mega.infinity
+        && (M.onFatListView || M.onListView) && M.currentCustomView.subType === 'container') {
+
+        M.getFolderSize(aHandle)
+            .then((size) => {
+                if (size >= 0) {
+                    const elm = node.parentNode && node.querySelector('.size');
+                    if (elm) {
+                        elm.textContent = size;
+                    }
+                }
+            })
+            .catch(dump);
     }
 
     if (M.d[aHandle]) {

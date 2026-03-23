@@ -3655,7 +3655,12 @@ MegaData.prototype.loadNodeShares = function(id) {
     const load = (h, s) => {
         if (!(this.d[h] && this.d[h].shares)) {
             if (s && s.h === h) {
-                p.push(this.nodeShare(h, s, true));
+                if (s.u) {
+                    p.push(this.nodeShare(h, s, true));
+                }
+                else if (self.d) {
+                    console.assert(this.ps[s.h] && this.ps[s.h][s.p], `unexpected node-share state.`, s, this.ps[s.h]);
+                }
             }
             else {
                 if (self.d) {

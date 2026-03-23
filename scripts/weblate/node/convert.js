@@ -24,6 +24,12 @@ module.exports = {
         for (let i = keys.length; i--;) {
             const key = keys[i];
             let val = obj[key];
+            if (typeof val === 'string' && !source) {
+                val = {
+                    description: 'Missing string comment',
+                    other: val,
+                }
+            }
 
             if (!val && source) {
                 val = {description: source[key].description, other: source[key].string};

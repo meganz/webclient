@@ -61,5 +61,11 @@ module.exports = {
                 rl.close();
             });
         });
+    },
+    sleep(ms) {
+        'use strict';
+        return new Promise(resolve => {
+            setTimeout(resolve, ms);
+        });
     }
 };

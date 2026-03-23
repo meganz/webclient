@@ -6,6 +6,8 @@ const { convertToStructuredJSON, convertToGoi18nv2 } = require('./convert.js');
 
 let api;
 
+const JIRA_EXCLUDED = ['api'];
+
 function sanitiseString(string, convertQuotes, escapeTag, isDownload) {
     'use strict';
     if (!string) {
@@ -81,7 +83,7 @@ async function validateStrings(content, enStrings) {
             console.error(`Error: String with key ${key} has no string content`);
             delete content[key];
         }
-        else if (value.developer_comment.length && !jiraRegex.test(value.developer_comment)) {
+        else if (!JIRA_EXCLUDED.includes(api.PROJECT) && value.developer_comment.length && !jiraRegex.test(value.developer_comment)) {
             console.error(`Error: Developer comment for string with key ${key} does not start with a JIRA ticket id`);
             console.error('e.g: WEB-16334: Comment content.');
             delete content[key];
@@ -304,7 +306,7 @@ async function uploadMain(prodStrings, sharedTag) {
         console.error('Error: Cannot upload an empty strings file');
         return false;
     }
-    prodStrings = convertToGoi18nv2(prodStrings, true);
+    prodStrings = convertToGoi18nv2(prodStrings, true).replace(/\\\\u([0-9a-fA-F]{4})/g, '\\u$1');
     console.log('Pushing new strings to component file...');
     const res = await api.componentPutEnglish(api.COMPONENT, prodStrings, isShared);
     if (!res || !res.accepted) {
@@ -351,7 +353,7 @@ async function upload(branchSuffix, webProdStrings, sharedTag) {
         console.error('Error: Cannot upload an empty strings file');
         return false;
     }
-    existingStrings = convertToGoi18nv2(existingStrings, true);
+    existingStrings = convertToGoi18nv2(existingStrings, true).replace(/\\\\u([0-9a-fA-F]{4})/g, '\\u$1');
     console.log('Pushing new strings to branch component file...');
     if (branchId) {
         const res = await api.componentPutEnglish(`${api.COMPONENT}-${branchSuffix}`, existingStrings, isShared);
@@ -525,6 +527,9 @@ async function main() {
     const config = safeParse(configFile);
     const sharedTag = ARGS.shared ? String(ARGS.shared).toLowerCase() : undefined;
     config.SHARED = SHARED_PROJECTS[sharedTag];
+    if (ARGS.component) {
+        config.COMPONENT = ARGS.component;
+    }
     api = API(config);
 
     if (process.env.WEBLATE_PROXY) {

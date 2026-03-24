@@ -1394,7 +1394,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[/A2]', '</a>')
         .replace('[A]', '<a target="_blank" class="green-link" href="https://blog.mega.io">')
         .replace('[/A]', '</a>');
-    l.achievem_dialogfootertext = escapeHTML(l.achievem_dialogfootertext)
+    l.ach_storage_with_pro_plan = escapeHTML(l.ach_storage_with_pro_plan)
         .replace('[A]', '<a href="/pro" class="clickurl" data-eventid="500480">')
         .replace('[/A]', '</a>');
     l.achievem_storagetitle = escapeHTML(l.achievem_storagetitle)

@@ -3,6 +3,203 @@ lazy(s4, 'containers', () => {
 
     const { exportKey, logger } = s4.utils;
     const { S4PagedDialog } = s4.ui.classes;
+    const ce = (n, t, a) => mCreateElement(n, a, t);
+
+    const services = {
+        rclone: {
+            name: 'Rclone',
+            guides: [
+                {
+                    info: l.s4_relcone_guide_info,
+                    link: 'rclone-setup-guide-for-mega-s4',
+                    eventName: 501171
+                }
+            ],
+            ref: {
+                items: [
+                    l.s4_relcone_config,
+                    l.s4_relcone_copy,
+                    l.s4_relcone_sync,
+                    l.s4_relcone_ls,
+                    l.s4_relcone_mkdir
+                ],
+                tip: l.s4_relcone_refs_tip
+            },
+            eventName: 501168
+        },
+        synology: {
+            name: 'Synology',
+            header: l.s4_syn_hdr,
+            guides: [
+                {
+                    name: l.s4_syn_backup_hdr,
+                    info: l.s4_syn_backup_info,
+                    link: 'hyper-backup-setup-guide-for-mega-s4',
+                    eventName: 501173
+                },
+                {
+                    name: l.s4_syn_cloud_hdr,
+                    icon: 'icon-sync-folder-3d',
+                    info: l.s4_syn_cloud_info,
+                    link: 'synology-cloud-sync-setup-guide-for-mega-s4',
+                    eventName: 501174
+                }
+            ],
+            eventName: 501172
+        },
+        truenas: {
+            name: 'TrueNAS',
+            header: l.s4_truenas_header,
+            guides: [
+                {
+                    info: l.s4_truenas_guide_info,
+                    link: 'truenas-setup-guide-for-mega-s4',
+                    eventName: 501176
+                }
+            ],
+            eventName: 501175
+        },
+        proxmox: {
+            name: 'Proxmox',
+            header: l.s4_proxmox_header,
+            guides: [
+                {
+                    name: l.s4_proxmox_guide_hdr,
+                    icon: 'icon-data-plus-3d',
+                    info: l.s4_proxmox_guide_info,
+                    link: 'proxmox-backup-server-setup-guide-for-mega-s4',
+                    eventName: 501178
+                }
+            ],
+            eventName: 501177
+        },
+        cyberduck: {
+            name: 'Cyberduck',
+            header: l.s4_cyberduck_hdr,
+            guides: [
+                {
+                    info: l.s4_cyberduck_guide_info,
+                    link: 'cyberduck-setup-guide-for-mega-s4',
+                    eventName: 501180
+                }
+            ],
+            eventName: 501179
+        },
+        s3browser: {
+            name: 'S3 Browser',
+            header: l.s4_s3_browser_hdr,
+            guides: [
+                {
+                    info: l.s4_s3_browser_guide_info,
+                    link: 's3-browser-setup-guide-for-mega-s4',
+                    eventName: 501182
+                }
+            ],
+            eventName: 501181
+        },
+        qnap: {
+            name: 'QNAP',
+            guides: [
+                {
+                    info: l.s4_qnap_guide_info,
+                    link: 'qnap-hybridmount-and-hbs-setup-guide-for-mega-s4',
+                    eventName: 501184
+                }
+            ],
+            eventName: 501183
+        },
+        anchorpoint: {
+            name: 'Anchorpoint',
+            guides: [
+                {
+                    info: l.s4_anchorpoint_guide_info,
+                    link: 'mega-s4-for-git-lfs-with-anchorpoint',
+                    eventName: 501186
+                }
+            ],
+            eventName: 501185
+        },
+        awscli: {
+            name: 'AWS CLI',
+            header: l.s4_aws_cli_hdr,
+            guides: [
+                {
+                    info: l.s4_aws_cli_guide_info,
+                    link: 'aws-cli-setup-guide-for-mega-s4',
+                    eventName: 501188
+                }
+            ],
+            eventName: 501187
+        },
+        minio: {
+            name: 'MinIO',
+            header: l.s4_minio_hdr,
+            info: `${l.s4_minio_guide_info} ${l.s4_minio_guide_info2}`,
+            guides: [
+                {
+                    info: l.s4_minio_guide_info,
+                    link: 'miniio-client-setup-guide-for-mega-s4',
+                    eventName: 501190
+                }
+            ],
+            eventName: 501189
+        },
+        terraform: {
+            name: 'Terraform',
+            guides: [
+                {
+                    info: l.s4_terraform_guide_info,
+                    link: 'terraform-setup-guide-for-mega-s4',
+                    eventName: 501192
+                }
+            ],
+            eventName: 501191
+        },
+        bunny: {
+            name: 'Bunny CDN',
+            guides: [
+                {
+                    info: l.s4_bunny_cdn_guide_info,
+                    link: 'bunnycdn-setup-guide-for-mega-s4',
+                    eventName: 501194
+                }
+            ],
+            eventName: 501193
+        }
+    };
+
+    const integrations = [
+        {
+            name: l.s4_onbd_backup_hdr,
+            icon: 'icon-cloud-up-arrow-3d',
+            services: [
+                'rclone',
+                'synology',
+                'truenas',
+                'proxmox'
+            ]
+        },
+        {
+            name: l.s4_onbd_manage_hdr,
+            icon: 'icon-folder-switched-3d',
+            services: [
+                'cyberduck',
+                's3browser',
+                'qnap',
+                'anchorpoint'
+            ]
+        },
+        {
+            name: l.s4_onbd_dev_hdr,
+            icon: 'icon-data-3d',
+            services: [
+                'awscli',
+                'minio',
+                'terraform',
+                'bunny'
+            ]
+        }
+    ];
 
     class S4SetupDialog extends S4PagedDialog {
         constructor(name) {
@@ -11,52 +208,24 @@ lazy(s4, 'containers', () => {
             this.bucket = null;
             this.container = null;
             this.key = null;
-            this.skipStep = 0;
 
+            this.$backBtn = $('.back', this.$dialogContainer);
+            this.$intNode = $('.integrations', this.$dialogContainer);
+            this.$openS4Btn = $('.open-s4', this.$dialogContainer);
             this.$manageBucketBtn = $('.manage-bucket-settings', this.$dialogContainer);
             this.$progressLabel = $('span', this.$dialogProgress);
+            this.$serviceNode = $('.service-body', this.$dialogContainer);
             this.$sidePane = $('.side-pane', this.$dialogContainer);
-            this.$skipStepBtn = $('.skip-step', this.$dialogContainer);
             this.$skipSetupBtn = $('.skip-setup', this.$dialogContainer);
+            this.$scrollArea = $('.scroll-area', this.$dialogContainer);
 
             this.$bucketInput = new mega.ui.MegaInputs(
-                $('input[name=bucket-name]', this.$steps[5]),
+                $('input[name=bucket-name]', this.$steps[2]),
                 {onShowError: true}
             );
             this.$keyInput = new mega.ui.MegaInputs(
                 $('input[name=key-name-input]', this.$steps[3]),
                 {onShowError: true}
-            );
-        }
-
-        destroy(skipWarning) {
-            if (this._closing) {
-                return false;
-            }
-
-            if (skipWarning || this.step === 6) {
-                // Skip setup btn at the step 1 and Close btn at the last step
-                eventlog(skipWarning ? 500594 : 500583, JSON.stringify([0]));
-
-                super.destroy();
-                this._clear();
-                return;
-            }
-
-            msgDialog(
-                `confirmation:!^${l.s4_skip_setup_btn}!${l.msg_dlg_cancel}`,
-                l.msg_dlg_cancel,
-                l.s4_skip_setup_question,
-                l.s4_skip_setup_warn,
-                (yes) => {
-                    if (yes) {
-                        // Skip setup button in confirmation dialog when clicking [X] btn
-                        eventlog(500584, JSON.stringify([this.step]));
-
-                        super.destroy();
-                        this._clear();
-                    }
-                }
             );
         }
 
@@ -73,21 +242,21 @@ lazy(s4, 'containers', () => {
             super.unbindEvents();
 
             const {
+                $backBtn,
                 $bucketInput,
                 $keyInput,
                 $manageBucketBtn,
+                $openS4Btn,
                 $skipSetupBtn,
-                $skipStepBtn,
                 $steps
             } = this;
 
+            $backBtn.unbind('click.s4dlg');
             $bucketInput.$input.unbind('keydown.s4dlg input.s4dlg');
             $keyInput.$input.unbind('keydown.s4dlg input.s4dlg');
             $manageBucketBtn.unbind('click.s4dlg');
+            $openS4Btn.unbind('click.s4dlg');
             $skipSetupBtn.unbind('click.s4dlg');
-            $skipStepBtn.unbind('click.s4dlg');
-            $('button.copy', $steps[2]).unbind('click.s4dlg');
-            $('button.toggle-vis', $steps[2]).unbind('click.s4dlg');
             $('button.download-key', $steps[4]).unbind('click.s4dlg');
         }
 
@@ -95,24 +264,31 @@ lazy(s4, 'containers', () => {
             super.bindEvents();
 
             const {
+                $backBtn,
                 $bucketInput,
                 $dialogProgress,
                 $keyInput,
                 $manageBucketBtn,
+                $openS4Btn,
                 $skipSetupBtn,
-                $skipStepBtn,
                 $steps
             } = this;
 
             // Step 1
             $skipSetupBtn.rebind('click.s4dlg', () => {
-                this.destroy(true);
+                eventlog(501167);
+                this.destroy();
             });
 
-            // Step 2
-            $('a.secondary', $steps[2]).rebind('click.s4dlg', () => {
-                // Learn more about endpoints
-                eventlog(500587);
+            // Step 2 events
+            $bucketInput.$input.rebind('keydown.s4dlg', (e) => {
+                if (e.which === 13) {
+                    $dialogProgress.trigger('click');
+                }
+            });
+
+            $bucketInput.$input.rebind('input.s4dlg', () => {
+                this._validateBucket();
             });
 
             // Step 3 events
@@ -126,7 +302,7 @@ lazy(s4, 'containers', () => {
             });
 
             // Step 4 events
-            $('button.copy', $steps[4]).rebind('click.s4dlg', e => {
+            $('.keys-table button.copy', this.$dialogContainer).rebind('click.s4dlg', e => {
                 const { key } = this;
                 const dataKey = $(e.currentTarget).attr('data-key');
                 const { [dataKey]: value } = key;
@@ -136,46 +312,43 @@ lazy(s4, 'containers', () => {
                 copyToClipboard(value, message, 'recoveryKey');
             });
 
-            $('button.toggle-vis', $steps[4]).rebind('click.s4dlg', e => {
+            $('button.toggle-vis', this.$dialogContainer).rebind('click.s4dlg', e => {
                 const $this = $('i', e.currentTarget);
 
                 if ($this.hasClass('icon-eye-reveal')) {
-                    $this.removeClass('icon-eye-reveal').addClass('icon-eye-hidden');
-                    $('.secret-key-value', $steps[4]).attr('type', 'text');
+                    $('.toggle-vis i', this.$dialogContainer)
+                        .removeClass('icon-eye-reveal').addClass('icon-eye-hidden');
+                    $('.secret-key-value', this.$dialogContainer).attr('type', 'text');
                 }
                 else {
-                    $this.removeClass('icon-eye-hidden').addClass('icon-eye-reveal');
-                    $('.secret-key-value', $steps[4]).attr('type', 'password');
+                    $('.toggle-vis i', this.$dialogContainer)
+                        .removeClass('icon-eye-hidden').addClass('icon-eye-reveal');
+                    $('.secret-key-value', this.$dialogContainer).attr('type', 'password');
                 }
             });
 
-            $('button.download-key', $steps[4]).rebind('click.s4dlg', () => {
+            $('button.download-key', this.$dialogContainer).rebind('click.s4dlg', () => {
                 // Download key btn
                 eventlog(500596);
 
                 this._download();
             });
 
-            // Step 5 events
-            $bucketInput.$input.rebind('keydown.s4dlg', (e) => {
-                if (e.which === 13) {
-                    $dialogProgress.trigger('click');
-                }
-            });
-
-            $bucketInput.$input.rebind('input.s4dlg', () => {
-                this._validateBucket();
-            });
-
-            // Step 6
-            $('.info-box.help a', $steps[6]).rebind('click.s4dlg', () => {
+            // Step 5
+            $('.info-box.help a', $steps[5]).rebind('click.s4dlg', () => {
                 // Help centre lnk
                 eventlog(500599);
             });
 
-            $('.info-box.git a', $steps[6]).rebind('click.s4dlg', () => {
-                // Git lnk
-                eventlog(500600);
+            // Step 6
+            $backBtn.rebind('click.s4dlg', () => {
+                this.steps(this.step - 1);
+                eventlog(501169);
+            });
+
+            $openS4Btn.rebind('click.s4dlg', () => {
+                this.destroy();
+                M.openFolder(this.container.h, true).then(() => eventlog(501166)).catch(dump);
             });
 
             $manageBucketBtn.rebind('click.s4dlg', () => {
@@ -191,20 +364,17 @@ lazy(s4, 'containers', () => {
                 }
             });
 
-            // Skip steps btn
-            $skipStepBtn.rebind('click.s4dlg', () => {
-                if (this.skipStep) {
-                    // Skip key creation, Skip bucket creation
-                    eventlog(this.step === 3 ? 500585 : 500586);
-
-                    this.steps(this.skipStep);
-                }
+            $('.expandable-area .min', $steps[6]).rebind('click.s4dlg', (ev) => {
+                const $cn = $(ev.currentTarget).closest('.expandable-area');
+                $cn[$cn.hasClass('active') ? 'removeClass' : 'addClass']('active');
+                initPerfectScrollbar(this.$scrollArea);
             });
         }
 
         step1(finalise) {
             if (finalise) {
                 this.$sidePane.removeClass('intro');
+                this.$skipSetupBtn.addClass('hidden');
 
                 // Start setup btn
                 eventlog(500572);
@@ -218,69 +388,7 @@ lazy(s4, 'containers', () => {
             return Promise.resolve();
         }
 
-        step2(finalise) {
-            if (finalise) {
-                return Promise.resolve();
-            }
-
-            s4.utils.renderEndpointsData(this.$steps[this.step]);
-            this.$progressLabel.text(l[556]);
-            this.$skipSetupBtn.addClass('hidden');
-
-            this._switchStep();
-
-            return Promise.resolve();
-        }
-
-        async step3(finalise) {
-            if (finalise) {
-                // Create key btn
-                eventlog(500595);
-
-                const n = this.$keyInput.$input.val().trim();
-                this.stepLocked = true;
-
-                if (this._getKeyNameError()) {
-                    logger.error(`Incorrect key name: ${n}`);
-                    return;
-                }
-
-                this.key = await s4.kernel.keys.create(this.container, null, n).catch(tell);
-                this.stepLocked = false;
-
-                return;
-            }
-
-            this.skipStep = 5;
-            $(`.nav-step-${ this.step - 1 }`, this.$sidePane).addClass('complete');
-            this.$progressLabel.text(l[158]);
-            this.$skipStepBtn.removeClass('hidden');
-            this._switchStep();
-
-            this._validateKey();
-            delay('s4.keyInput.focus', () => {
-                this.$keyInput.$input.focus();
-            }, 50);
-        }
-
-        async step4(finalise) {
-            if (finalise) {
-                return;
-            }
-
-            if (this.key) {
-                const {ak, sk} = this.key;
-
-                $('.access-key-value', this.$steps[4]).text(ak);
-                $('.secret-key-value', this.$steps[4]).val(sk).attr('type', 'password');
-                this.$progressLabel.text(l[556]);
-                this.$dialogProgress.removeClass('disabled');
-                this.$skipStepBtn.addClass('hidden');
-                this._switchStep();
-            }
-        }
-
-        async step5(finalise) {
+        async step2(finalise) {
             if (finalise) {
                 // Create bucket btn
                 eventlog(500597);
@@ -299,9 +407,7 @@ lazy(s4, 'containers', () => {
                 return;
             }
 
-            this.skipStep = 6;
             $(`.nav-step-${ this.step - 1 }`, this.$sidePane).addClass('complete');
-            this.$skipStepBtn.removeClass('hidden');
             this.$progressLabel.text(l[158]);
             this._switchStep();
 
@@ -311,29 +417,220 @@ lazy(s4, 'containers', () => {
             }, 50);
         }
 
-        async step6(finalise) {
+        async step3(finalise) {
             if (finalise) {
-                // Done btn at the last step
-                eventlog(500583, JSON.stringify([1]));
+                // Create key btn
+                eventlog(500595);
+
+                const n = this.$keyInput.$input.val().trim();
+                this.stepLocked = true;
+
+                if (this._getKeyNameError()) {
+                    logger.error(`Incorrect key name: ${n}`);
+                    return;
+                }
+
+                this.key = await s4.kernel.keys.create(this.container, null, n).catch(tell);
+                this.key.n = n;
+                this.stepLocked = false;
+
                 return;
             }
+
+            $(`.nav-step-${ this.step - 1 }`, this.$sidePane).addClass('complete');
+            this.$progressLabel.text(l[158]);
+            this._switchStep();
+
+            this._validateKey();
+            delay('s4.keyInput.focus', () => {
+                this.$keyInput.$input.focus();
+            }, 50);
+        }
+
+        async step4(finalise) {
+            if (finalise) {
+                return;
+            }
+
+            if (this.key) {
+                const {ak, sk} = this.key;
+
+                $('.access-key-value', this.$dialogContainer).text(ak);
+                $('.secret-key-value', this.$dialogContainer).val(sk).attr('type', 'password');
+                this.$progressLabel.text(l[556]);
+                this.$dialogProgress.removeClass('disabled');
+                this._switchStep();
+            }
+        }
+
+        async step5(finalise) {
+            if (finalise) {
+                return;
+            }
+
+            fmconfig.s4onboarded = 1;
+
+            if (fmconfig.s4skipobd) {
+                fmconfig.s4skipobd = undefined;
+            }
+
+            $(`.nav-step-${this.step - 1}`, this.$sidePane).addClass('complete');
+            $(`.nav-step-${this.step}`, this.$sidePane).removeClass('complete');
+            this.$sidePane.addClass('complete');
+            this.$dialogProgress.addClass('hidden');
+            this.$backBtn.addClass('hidden');
+            this.$openS4Btn.removeClass('hidden');
+            this.$intNode.text('');
 
             if (this.bucket) {
                 this.$manageBucketBtn.removeClass('hidden');
             }
 
-            $(`.nav-step-${ this.step - 1 }`, this.$sidePane).addClass('complete');
-            this.$dialogProgress.removeClass('disabled');
-            this.$skipStepBtn.addClass('hidden');
-            this.$progressLabel.text(l[726]);
+            for (const int of integrations) {
+                this._renderIntegration(int);
+            }
+
             this._switchStep();
         }
 
+        async step6(finalise) {
+            if (finalise) {
+                // Done btn at the last step
+                eventlog(501163);
+                return;
+            }
+
+            $(`.nav-step-${this.step - 1}`, this.$sidePane).addClass('complete');
+            this.$backBtn.removeClass('hidden');
+            this.$dialogProgress.removeClass('hidden disabled');
+            this.$progressLabel.text(l[726]);
+            this.$openS4Btn.addClass('hidden');
+            this.$manageBucketBtn.addClass('hidden');
+
+            this._switchStep();
+        }
+
+        _renderIntegration(int) {
+            const [wrapper] = this.$intNode;
+            const {name, icon, services: serviceNames} = int;
+
+            if (!wrapper) {
+                return false;
+            }
+
+            const col = ce('div', wrapper, {class: 'col'});
+            let node = ce('div', col, {class: 'header'});
+            ce('span', node).textContent = name;
+            ce('img', node, {
+                alt: name,
+                src: `${staticpath}images/mega/icons-3d/${icon}.png`
+            });
+
+            node = ce('div', col, {class: 'body'});
+
+            for (const srv of serviceNames) {
+                const service = services[srv];
+                const {name, eventName} = service;
+
+                if (!service) {
+                    continue;
+                }
+
+                const btn = ce('button', node);
+
+                ce('span', btn).textContent = name;
+                ce('i', btn, {class: 'sprite-fm-mono icon-chevron-right-thin-outline'});
+
+                btn.addEventListener('click', () => {
+                    eventlog(eventName);
+                    this._renderService(service);
+                    this.steps(6);
+                });
+            }
+        }
+
+        _renderService(service) {
+            let [wrapper] = this.$serviceNode;
+
+            if (!wrapper) {
+                return false;
+            }
+
+            const {name, header, guides = [], ref, info} = service;
+            const [cn] = this.$steps[6];
+            const refNode = cn.querySelector('.reference');
+
+            s4.utils.renderEndpointsData($(cn));
+            cn.querySelector('header h2').textContent = header || name;
+            refNode.classList.add('hidden');
+
+            if (ref) {
+                const content = refNode.querySelector('.content.max');
+                const {items, tip} = ref;
+                content.textContent = '';
+                refNode.classList.remove('hidden');
+
+                const node = ce('ul', content);
+
+                for (const item of items) {
+                    ce('li', node).textContent = item;
+                }
+
+                if (tip) {
+                    ce('p', content, {class: 'secondary'}).textContent = tip;
+                }
+            }
+
+            wrapper.textContent = '';
+
+            if (info) {
+                ce('p', wrapper).textContent = info;
+            }
+
+            if (guides.length > 1) {
+                ce('h3', wrapper, {class: 'no-pad'}).textContent = l.s4_onbd_guides_hdr;
+            }
+            wrapper = ce('div', wrapper, {class: 'service-info'});
+
+            for (const guide of guides) {
+                const col = ce('div', wrapper, {class: 'col'});
+                const {
+                    name = l.s4_guide_header.replace(/%1|\[B]/g, service.name),
+                    icon,
+                    info,
+                    link,
+                    eventName
+                } = guide;
+
+                ce('img', col, {
+                    alt: name,
+                    src: `${staticpath}images/mega/icons-3d/${icon || 'icon-cloud-up-arrow-3d'}.png`
+                });
+                ce('h4', col).textContent = name;
+                ce('p', col, {class: 'secondary'}).append(
+                    parseHTML(info)
+                );
+
+                const btn = ce('a', col, {
+                    class: 'clickurl',
+                    href: `https://help.mega.io/megas4/setup-guides/${link}`,
+                    target: '_blank'
+                });
+
+                btn.addEventListener('click', () => eventlog(eventName));
+
+                ce('span', btn).textContent = l[20556];
+                ce('i', btn, {class: 'sprite-fm-mono icon-arrow-right-thin-solid'});
+            }
+        }
+
         _switchStep() {
-            $('.content-pane > .steps', this.$dialogContainer).addClass('hidden');
+            $('.content-pane .steps', this.$dialogContainer).addClass('hidden');
             $(`.nav-step-${ this.step }`, this.$sidePane).addClass('active');
 
+            this.$scrollArea.scrollTop(0);
             this.$steps[this.step].removeClass('hidden');
+            initPerfectScrollbar(this.$scrollArea);
         }
 
         _toggleButtonState(errorMsg) {
@@ -349,17 +646,17 @@ lazy(s4, 'containers', () => {
             this.bucket = null;
             this.container = null;
             this.key = null;
-            this.skipStep = 0;
 
             this.$bucketInput.$input.val('');
             this.$keyInput.$input.val('');
-            $('.secret-key-value', this.$steps[2]).val('').attr('type', 'password');
-            $('.icon-eye-hidden', this.$steps[2]).addClass('icon-eye-reveal').removeClass('icon-eye-hidden');
+            $('.secret-key-value', this.$steps[4]).val('').attr('type', 'password');
+            $('.icon-eye-hidden', this.$steps[4]).addClass('icon-eye-reveal').removeClass('icon-eye-hidden');
             $('.nav-step', this.$sidePane).removeClass('active complete');
-            this.$sidePane.addClass('intro');
+            this.$sidePane.addClass('intro').removeClass('complete');
+            this.$backBtn.addClass('hidden');
             this.$dialogProgress.removeClass('disabled hidden');
             this.$manageBucketBtn.addClass('hidden');
-            this.$skipStepBtn.addClass('hidden');
+            this.$openS4Btn.addClass('hidden');
             this.$skipSetupBtn.removeClass('hidden');
         }
 

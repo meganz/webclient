@@ -425,6 +425,15 @@ FileManager.prototype.initFileManager = async function() {
                 await s4load;
             }
         }
+        else {
+            if (fmconfig.s4onboarded) {
+                fmconfig.s4onboarded = undefined;
+            }
+
+            if (fmconfig.s4skipobd) {
+                fmconfig.s4skipobd = undefined;
+            }
+        }
 
         if (mega.rewindEnabled) {
 

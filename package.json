@@ -40,14 +40,26 @@
   "private": true,
   "readmeFilename": "README.md",
   "sideEffects": false,
+  "overrides": {
+    "mocha": {
+      "diff": "8.0.3",
+      "serialize-javascript": "7.0.3"
+    },
+    "grunt": {
+      "minimatch": "3.1.5"
+    },
+    "postcss-url": {
+      "minimatch": "3.1.5"
+    }
+  },
   "dependencies": {
     "@babel/core": "7.29.0",
     "@babel/plugin-proposal-decorators": "7.29.0",
     "@babel/plugin-transform-class-properties": "7.28.6",
     "@babel/plugin-transform-runtime": "7.29.0",
-    "@babel/preset-env": "7.29.0",
+    "@babel/preset-env": "7.29.2",
     "@babel/preset-react": "7.28.5",
-    "@babel/runtime": "7.28.6",
+    "@babel/runtime": "7.29.2",
     "@lodder/grunt-postcss": "3.1.1",
     "babel-loader": "10.1.1",
     "babel-plugin-minify-constant-folding": "0.5.0",

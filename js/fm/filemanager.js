@@ -310,7 +310,7 @@ FileManager.prototype.initS4FileManager = mutex('s4-object-storage.lock', functi
         .then((h) => {
             this.buildtree({h: 's4'});
 
-            if (h) {
+            if (h && typeof h === 'string') {
                 const st = api.lastst;
                 if (self.d) {
                     console.info(`S4 Container created with handle '${h}'`, st);
@@ -423,6 +423,15 @@ FileManager.prototype.initFileManager = async function() {
             if (onS4Section(path)) {
                 // We're (re)loading over a s4-page, hold it up.
                 await s4load;
+            }
+        }
+        else {
+            if (fmconfig.s4onboarded) {
+                fmconfig.s4onboarded = undefined;
+            }
+
+            if (fmconfig.s4skipobd) {
+                fmconfig.s4skipobd = undefined;
             }
         }
 
@@ -3771,10 +3780,13 @@ FileManager.prototype.onSectionUIOpen = function(id) {
 
             // Remove import and download buttons from the search result.
             if (!String(M.currentdirid).startsWith('search')) {
-                $('.fm-import-to-cloudrive', headerButtons).rebind('click', () => {
-                    eventlog(99765);
+                $('.fm-import-to-cloudrive', headerButtons).rebind('click.flimp', (ev) => {
                     // Import the current folder, could be the root or sub folder
-                    M.importFolderLinkNodes([M.RootID]);
+                    loadingDialog.show();
+                    tSleep(-1)
+                        .then(() => M.importFolderLinkNodes([ev.shiftKey && M.currentdirid || M.RootID]))
+                        .then(() => eventlog(99765))
+                        .catch(tell);
                 });
             }
         }

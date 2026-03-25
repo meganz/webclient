@@ -1553,6 +1553,12 @@ function logExportEvt(evtId, data) {
                 onClose: () => {
                     document.removeEventListener('keydown', onKeyDown, true);
                     sheet.removeClass(name);
+
+                    for (let i = $.itemExport.length; i--;) {
+                        const h = $.itemExport[i];
+                        mega.keyMgr.removeShareSnapshot(h);
+                    }
+                    $.itemExport = false;
                 }
             };
 

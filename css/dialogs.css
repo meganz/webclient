@@ -10025,8 +10025,9 @@ body.web-desktop .mega-sheet.report-abuse .sheet {
 /* S4 Dialogs. Setup/Onboarding dialog */
 
 .mega-dialog.s4-setup-dialog {
+    height: calc(100% - 48px);
+    max-height: 668px;
     overflow: hidden;
-    min-height: 600px;
     width: 800px;
 }
 
@@ -10038,6 +10039,14 @@ body.web-desktop .mega-sheet.report-abuse .sheet {
     flex: 0 0 auto;
     padding: 48px 36px;
     width: 264px;
+}
+
+.mega-dialog.s4-setup-dialog .side-pane.complete {
+    width: auto;
+}
+
+.mega-dialog.s4-setup-dialog .side-pane.complete .name {
+    display: none;
 }
 
 .mega-dialog.s4-setup-dialog .side-pane img,
@@ -10130,6 +10139,37 @@ body.web-desktop .mega-sheet.report-abuse .sheet {
 
 /* Content pane */
 
+.mega-dialog.s4-setup-dialog .content-body {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    overflow: hidden;
+    padding: 48px 48px 0;
+    padding-inline-end: 36px;
+    position: relative;
+}
+
+.mega-dialog.s4-setup-dialog .scroll-area {
+    box-sizing: border-box;
+    padding-bottom: 24px;
+    position: relative;
+}
+
+.mega-dialog.s4-setup-dialog .scroll-area + hr {
+    background-color: var(--mobile-border-subtle);
+    border: 0;
+    bottom: 0;
+    display: none;
+    height: 1px;
+    margin: 0 -48px;
+    padding: 0;
+    position: absolute;
+}
+
+.mega-dialog.s4-setup-dialog .scroll-area.ps--active-y + hr {
+    display: block;
+}
+
 .mega-dialog.s4-setup-dialog .content-pane {
     color: var(--text-color-high);
     flex: 1 1 auto;
@@ -10138,11 +10178,34 @@ body.web-desktop .mega-sheet.report-abuse .sheet {
 }
 
 .mega-dialog.s4-setup-dialog header {
-    padding-bottom: 0;
+    padding: 0;
+}
+
+.mega-dialog.s4-setup-dialog .content-block {
+    padding: 0;
+    padding-inline-end: 12px;
+}
+
+.rtl .mega-dialog.s4-setup-dialog .content-body {
+    padding-inline-end: 28px;
+}
+
+.rtl .mega-dialog.s4-setup-dialog .content-block {
+    padding-inline-end: 20px;
+}
+
+.mega-dialog.s4-setup-dialog header h2 {
+    font: var(--mobile-font-heading-h1);
+    font-family: var(--mobile-font-family-main);
 }
 
 .mega-dialog.s4-setup-dialog p {
     padding-top: 20px;
+}
+
+.mega-dialog.s4-setup-dialog p.sm-size {
+    font: var(--mobile-font-caption-small-regular);
+    padding-top: 24px;
 }
 
 .mega-dialog.s4-setup-dialog p.higher {
@@ -10153,9 +10216,44 @@ body.web-desktop .mega-sheet.report-abuse .sheet {
     font: var(--text-body2);
 }
 
-.mega-dialog.s4-setup-dialog ul {
+.mega-dialog.s4-setup-dialog ul,
+.mega-dialog.s4-setup-dialog ol {
     margin: 12px 0 0;
     padding: 0;
+}
+
+.mega-dialog.s4-setup-dialog ol {
+    counter-reset: item;
+    padding-left: 0;
+}
+
+.mega-dialog.s4-setup-dialog ol li {
+    align-items: center;
+    color: var(--mobile-text-secondary);
+    counter-increment: item;
+    display: flex;
+    font: var(--mobile-font-caption-small-regular);
+    list-style: none;
+    margin: 0;
+}
+
+.mega-dialog.s4-setup-dialog ol li b {
+    font: var(--mobile-font-caption-small-bold);
+}
+
+.mega-dialog.s4-setup-dialog ol li::before {
+    align-items: center;
+    border: 1px solid var(--mobile-border-strong);
+    border-radius: 50%;
+    box-sizing: border-box;
+    color: var(--mobile-text-primary);
+    content: counter(item);
+    display: inline-flex;
+    flex: 0 0 24px;
+    font: var(--mobile-font-caption-small-semibold);
+    height: 24px;
+    justify-content: center;
+    margin-inline-end: 16px;
 }
 
 .mega-dialog.s4-setup-dialog li {
@@ -10169,7 +10267,7 @@ body.web-desktop .mega-sheet.report-abuse .sheet {
 }
 
 .mega-dialog.s4-setup-dialog ul.secondary {
-    margin: 5px 0;
+    margin: 8px 0 0;
 }
 
 .mega-dialog.s4-setup-dialog ul.secondary li {
@@ -10179,7 +10277,7 @@ body.web-desktop .mega-sheet.report-abuse .sheet {
 }
 
 .mega-dialog.s4-setup-dialog span.code {
-    background: var(--surface-grey-1);
+    background: var(--surface-main);
     border: 1px solid var(--stroke-grey-2);
     border-radius: 4px;
     color: var(--text-color-high);
@@ -10191,10 +10289,246 @@ body.web-desktop .mega-sheet.report-abuse .sheet {
     flex: 1 1 auto;
 }
 
-/* Step 2 */
+/* Step 3 */
+
+.mega-dialog.s4-setup-dialog .step-icon {
+    display: block;
+    height: 64px;
+    margin: 20px 0 12px;
+}
+
+/* Step 4 */
+
+.mega-dialog.s4-setup-dialog .keys-table {
+    margin: 20px 0;
+}
+
+.mega-dialog.s4-setup-dialog .secondary-btns {
+    display: flex;
+    justify-content: end;
+}
+
+/* Step 5 */
+
+.mega-dialog.s4-setup-dialog h3 {
+    font: var(--mobile-font-copy-semibold);
+    margin: 24px 0;
+}
+
+.mega-dialog.s4-setup-dialog h3.no-pad {
+    margin: 0;
+}
+
+.mega-dialog.s4-setup-dialog .integrations {
+    display: flex;
+    justify-content: space-between;
+}
+
+.mega-dialog.s4-setup-dialog .integrations .col {
+    background: var(--mobile-surface-2);
+    border-radius: 12px;
+    box-sizing: border-box;
+    display: flex;
+    flex: 0 0 calc(100% / 3 - 4px);
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.mega-dialog.s4-setup-dialog .integrations .header {
+    align-items: center;
+    display: flex;
+    flex: 1 1 auto;
+    padding: 16px;
+}
+
+.mega-dialog.s4-setup-dialog .integrations .header span {
+    color: var(--mobile-text-primary);
+    flex: 1 1 auto;
+    font: var(--mobile-font-copy-bold);
+}
+
+.mega-dialog.s4-setup-dialog .integrations img {
+    margin-inline-start: 8px;
+    width: 48px;
+}
+
+.mega-dialog.s4-setup-dialog .integrations .body {
+    border-radius: 0 0 12px 12px;
+    display: flex;
+    flex-direction: column;
+    margin: 0 2px 2px;
+    overflow: hidden;
+}
+
+.mega-dialog.s4-setup-dialog .integrations button {
+    align-items: center;
+    background-color: var(--mobile-page-background);
+    border: 0;
+    color: var(--mobile-text-primary);
+    cursor: pointer;
+    display: flex;
+    font: var(--mobile-font-caption-large-bold);
+    justify-content: space-between;
+    margin: 1px 0 0;
+    padding: 14px;
+    outline: none;
+    transition: var(--transition-bg-color);
+}
+
+.mega-dialog.s4-setup-dialog .integrations button:hover {
+    background-color: var(--mobile-surface-1);
+}
+
+.mega-dialog.s4-setup-dialog .integrations button i {
+    flex: 0 0 auto;
+    margin-inline-start: 8px;
+}
+
+.mega-dialog.s4-setup-dialog .integrations button:first-child {
+    margin-top: 0;
+}
+
+.mega-dialog.s4-setup-dialog .mega-button.positive {
+    min-width: 112px;
+}
+
+.mega-dialog.s4-setup-dialog footer .footer-container {
+    padding-top: 24px;
+}
+
+/* Step 6 */
+
+.mega-dialog.s4-setup-dialog .service-body {
+    padding: 24px 0;
+}
+
+.mega-dialog.s4-setup-dialog .service-body > p {
+    flex: 0 0 100%;
+    margin: -6px 0 24px;
+    padding: 0;
+}
+
+.mega-dialog.s4-setup-dialog .service-info {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.mega-dialog.s4-setup-dialog .service-body h3 + .service-info {
+    padding-top: 16px;
+}
+
+.mega-dialog.s4-setup-dialog .service-info .col {
+    border: 2px solid var(--stroke-grey-2);
+    border-radius: 12px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    flex: 0 0 calc(50% - 4px);
+    padding: 16px;
+}
+
+.mega-dialog.s4-setup-dialog .service-info .col h4 {
+    color: var(--text-color-high);
+    flex: 0 0 auto;
+    font: var(--mobile-font-copy-semibold);
+    margin: 0;
+    padding: 8px 0 0;
+}
+
+.mega-dialog.s4-setup-dialog .service-info .col p {
+    flex: 1 1 auto;
+    margin: 0;
+    padding: 4px 0 0;
+}
+
+.mega-dialog.s4-setup-dialog .service-info .col a {
+    --icon-size: 20px;
+    --mask-color: var(--icon-active);
+    align-items: center;
+    color: var(--text-color-high);
+    display: inline-flex;
+    flex: 0 0 auto;
+    font: var(--text-body1-bold);
+    margin: 16px 0 0;
+    padding: 10px 0;
+    text-decoration: none;
+}
+
+.mega-dialog.s4-setup-dialog .service-info .col a span {
+    display: block;
+    margin-inline-end: 8px;
+    text-decoration: underline;
+}
+
+.mega-dialog.s4-setup-dialog .service-info .col img {
+    width: 32px;
+}
+
+.mega-dialog.s4-setup-dialog .more-actions {
+    display: grid;
+    gap: 16px;
+    grid-auto-flow: row;
+    width: 100%;
+}
+
+.mega-dialog.s4-setup-dialog .expandable-area {
+    background-color: var(--mobile-surface-1);
+    border-radius: 8px;
+    padding: 12px;
+}
+
+.mega-dialog.s4-setup-dialog .expandable-area ul {
+    margin: 20px 0 0;
+}
+
+.mega-dialog.s4-setup-dialog .expandable-area li {
+    color: var(--text-color-medium);
+    padding: 0 8px;
+    margin-inline-start: 16px;
+}
+
+.mega-dialog.s4-setup-dialog .expandable-area .min {
+    --icon-size: 24px;
+    align-items: center;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+}
+
+.mega-dialog.s4-setup-dialog .expandable-area .min i {
+    --icon-size: 24px;
+    margin-inline-start: 16px;
+}
+
+.mega-dialog.s4-setup-dialog .expandable-area .min .name {
+    color: var(--text-color-high);
+    flex: 1 1 auto;
+    font: var(--mobile-font-copy-regular);
+}
+
+.mega-dialog.s4-setup-dialog .expandable-area .max {
+    display: none;
+}
+
+.mega-dialog.s4-setup-dialog .expandable-area.active .max {
+    display: block;
+}
+
+.mega-dialog.s4-setup-dialog .expandable-area.active .min i {
+    transform: rotate(180deg);
+}
+
+.mega-dialog.s4-setup-dialog .expandable-area .secondary-btns {
+    justify-content: flex-start;
+}
+
+.mega-dialog.s4-setup-dialog .expandable-area .info-box {
+    background: var(--surface-main);
+}
 
 .mega-dialog.s4-setup-dialog .secondary-table {
-    background: var(--surface-grey-1);
+    background: var(--surface-main);
     border: 1px solid var(--stroke-grey-2);
     margin-top: 16px;
     width: 100%;
@@ -10234,80 +10568,6 @@ body.web-desktop .mega-sheet.report-abuse .sheet {
     text-align: end;
 }
 
-/* Step 3 */
-
-.mega-dialog.s4-setup-dialog .step-icon {
-    display: block;
-    height: 64px;
-    margin: 20px 0 12px;
-}
-
-/* Step 4 */
-
-.mega-dialog.s4-setup-dialog .keys-table {
-    margin: 20px 0;
-}
-
-.mega-dialog.s4-setup-dialog .secondary-btns {
-    display: flex;
-    justify-content: end;
-}
-
-/* Step 6 */
-
-.mega-dialog.s4-setup-dialog h3 {
-    margin: 20px 0;
-}
-
-.mega-dialog.s4-setup-dialog .help-wrapper {
-    display: flex;
-    justify-content: space-between;
-}
-
-.mega-dialog.s4-setup-dialog .help-wrapper .info-box {
-    align-items: start;
-    display: flex;
-    flex: 0 0 calc(50% - 4px);
-    flex-direction: column;
-}
-
-.mega-dialog.s4-setup-dialog .help-wrapper h3 {
-    margin: 8px 0;
-}
-
-.mega-dialog.s4-setup-dialog .help-wrapper p {
-    color: var(--text-color-medium);
-    padding: 0 0 16px;
-}
-
-.mega-dialog.s4-setup-dialog a.read-more,
-.mega-dialog.s4-setup-dialog a.read-more:link,
-.mega-dialog.s4-setup-dialog a.read-more:visited {
-    align-items: center;
-    --icon-size: 20px;
-    --mask-color: var(--icon-active);
-    color: var(--text-color-high);
-    display: inline-flex;
-    font: var(--text-body1-bold);
-    margin: auto 0 0;
-    padding: 10px 0;
-    text-decoration: none;
-}
-
-.mega-dialog.s4-setup-dialog a.read-more span {
-    display: block;
-    margin-inline-end: 8px;
-    text-decoration: underline;
-}
-
-.mega-dialog.s4-setup-dialog a.read-more:hover span {
-    text-decoration: none;
-}
-
-.mega-dialog.s4-setup-dialog .help-icon {
-    display: block;
-    height: 32px;
-}
 
 /* S4 Dialogs. End of Onboarding dialog */
 

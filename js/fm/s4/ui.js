@@ -171,11 +171,35 @@ lazy(s4, 'ui', () => {
          * @returns {void} void
          * @memberOf s4.ui
          */
-        showSetupDialog() {
-            if (!mega.config.get('s4onboarded')) {
-                mega.config.set('s4onboarded', 1);
-                this.showDialog(s4.containers.dialogs.setup);
+        async showSetupDialog() {
+            const SEVEN_DAYS = 7 * 86400;
+            const obd = fmconfig.s4onboarded;
+            const now = Math.floor(Date.now() / 1000);
+            const skipDate = fmconfig.s4skipobd;
+
+            if (obd === 1 || (skipDate && now - skipDate < SEVEN_DAYS)) {
+                return;
             }
+
+            const [n] = s4.utils.getContainersList() || [];
+            const hasBuckets = n && n.td;
+            let keys = this.lists.keys || [];
+
+            if (!hasBuckets && !keys.length) {
+                keys = await s4.kernel.keys.list(n.h).catch(nop);
+            }
+
+            if (hasBuckets || keys.length) {
+                fmconfig.s4onboarded = 1;
+
+                if (skipDate) {
+                    fmconfig.s4skipobd = undefined;
+                }
+                return;
+            }
+
+            fmconfig.s4skipobd = now;
+            this.showDialog(s4.containers.dialogs.setup);
         }
 
         /**

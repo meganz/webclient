@@ -687,6 +687,13 @@ mBroadcaster.once('boot_done', function radSetup() {
         const ei = ex instanceof Error;
         const es = `${ei && ex.stack || ex && ex.message || ex || ''}`;
 
+        if (ex instanceof ProgressEvent) {
+            if (self.d) {
+                console.error('trace and fix...', ex);
+            }
+            return null;
+        }
+
         if (es.includes('[object ')) {
             return `Uncaught ${ex.constructor.name || ':fly:'}`;
         }

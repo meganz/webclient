@@ -70,9 +70,7 @@ MegaLink.bindEvent = function() {
 
         e.preventDefault();
 
-        if (window.textEditorVisible) {
-            mega.textEditorUI.doClose();
-        }
+        closeOverlays();
 
         const result = await this.trigger('beforeRedirect');
 

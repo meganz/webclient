@@ -28,6 +28,7 @@ mobile.languageMenu = {
         this.dropdown = new MegaMobileDropdown({
             invisible: true,
             listContainerClass: 'language-selector',
+            containerClasses: 'mx-6',
             parentNode: document.getElementById('fmholder'),
             dropdownItems: dropdownItems,
             sheetHeight: 'full',

@@ -1,4 +1,4 @@
-const { safeParse } = require('./utils.js');
+const { safeParse, sleep } = require('./utils.js');
 const { ARGS } = require('./args.js');
 const { SHARED_PROJECTS } = require('./sharedConf.js');
 
@@ -112,7 +112,7 @@ class API {
                     name,
                 };
                 promises.push(
-                    this.sendRequest(`components/${isShared ? this.sharedProjectSlug : this.projectSlug}/${slug}/statistics/`)
+                    this.getComponentStatistics(slug, isShared ? this.sharedProjectSlug : this.projectSlug)
                         .then(({results}) => {
                             this.components[id].strings = results && results[0] && results[0].total || 0;
                         })
@@ -121,6 +121,12 @@ class API {
 
         }
         return Promise.allSettled(promises);
+    }
+
+    async getComponentStatistics(componentId, projectId) {
+        projectId = projectId || this.projectSlug;
+
+        return this.sendRequest(`components/${projectId}/${componentId}/statistics`);
     }
 
     async fetchTagFilteredComponents(tag) {
@@ -235,7 +241,8 @@ class API {
             return false;
         }
         if (this.components) {
-            const componentData = await this.sendRequest(`components/${projectId}/${name}/statistics/`);
+            await sleep(4000);
+            const componentData = await this.getComponentStatistics(name, projectId);
             this.components[`${projectId}:r:${name}`] = {
                 name,
                 strings: componentData?.results?.[0]?.total || 0,
@@ -270,7 +277,7 @@ class API {
         }
 
         if (this.components) {
-            const componentData = await this.sendRequest(`components/${projectId}/${componentId}/statistics/`);
+            const componentData = await this.getComponentStatistics(componentId, projectId);
             this.components[`${projectId}:r:${componentId}`] = {
                 name: componentId,
                 strings: componentData?.results?.[0]?.total || 0,
@@ -414,6 +421,39 @@ class API {
             this.labels[projectId][name] = id;
         }
         return this.labels[projectId];
+    }
+
+    async fetchUnitsByContext(context, componentId, projectId) {
+        projectId = projectId || this.projectSlug;
+        let query = `?q=context%3A${context}++language%3Aen++project%3A${projectId}`;
+        if (componentId) {
+            query = `${query}++component%3A${componentId}`;
+        }
+        let link = `units/${query}`;
+        const found = [];
+        do {
+            const res = await this.sendRequest(link);
+            if (res.results) {
+                for (const unit of res.results) {
+                    found.push(unit);
+                }
+            }
+            else {
+                return false;
+            }
+            link = res.next;
+        } while (link);
+        return found;
+    }
+
+    async deleteUnit(unitId) {
+        return this.sendRequest(`units/${unitId}`, { method: 'DELETE' });
+    }
+
+    async deleteComponent(componentId, projectId) {
+        projectId = projectId || this.projectSlug;
+
+        return this.sendRequest(`components/${projectId}/${componentId}`, { method: 'DELETE' });
     }
 
     async sendRequest(endpoint, reqOptions = {}) {

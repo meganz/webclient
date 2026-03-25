@@ -3073,22 +3073,9 @@ function loadSubPage(tpage, event) {
 
     if (window.slideshowid) {
         mBroadcaster.sendMessage('trk:event', 'preview', 'close-nav', tpage, slideshowid);
-
-        slideshow(0, 1);
     }
 
-    if ('transferItOverlay' in T.ui && T.ui.transferItOverlay.data.active) {
-        T.ui.transferItOverlay.hide();
-    }
-
-    if (window.textEditorVisible) {
-        // if we are loading a page and text editor was visible, then hide it.
-        mega.textEditorUI.doClose();
-    }
-
-    if (window.fileversioning && fileversioning.isOpen) {
-        fileversioning.closeFileVersioningDialog();
-    }
+    closeOverlays();
 
     if (event && Object(event.state).view) {
         onIdle(function() {
@@ -3221,6 +3208,30 @@ function loadSubPage(tpage, event) {
         init_page();
     }
     mBroadcaster.sendMessage('pagechange', tpage);
+}
+
+function closeOverlays() {
+    'use strict';
+
+    if (window.textEditorVisible) {
+        mega.textEditorUI.doClose();
+    }
+
+    if (window.slideshowid && typeof slideshow === 'function') {
+        slideshow(0, 1);
+    }
+
+    if (is_mobile && mega.ui.viewerOverlay) {
+        mega.ui.viewerOverlay.hide();
+    }
+
+    if ('transferItOverlay' in T.ui && T.ui.transferItOverlay.data.active) {
+        T.ui.transferItOverlay.hide();
+    }
+
+    if (window.fileversioning && fileversioning.isOpen) {
+        fileversioning.closeFileVersioningDialog();
+    }
 }
 
 window.addEventListener('popstate', function(event) {

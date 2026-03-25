@@ -5,6 +5,7 @@ lazy(mega.ui, 'mInfoPanel', () => {
     let activeStats;
     function resetStats() {
         activeStats = Object.create(null);
+        activeStats.folderBytes = 0;
         activeStats.folderCount = 0;
         activeStats.fileCount = 0;
         activeStats.imageCount = 0;
@@ -109,7 +110,8 @@ lazy(mega.ui, 'mInfoPanel', () => {
                 mimeCountStats(node);
                 if (node.t) {
                     activeStats.folderCount++;
-                    activeStats.bytes += node.tb;
+                    activeStats.folderBytes += node.tb || 0;
+                    activeStats.bytes += node.tb || 0;
                 }
                 else if (node.h in M.dcd) {
                     activeStats.bytes += node.tb;
@@ -123,7 +125,7 @@ lazy(mega.ui, 'mInfoPanel', () => {
                     activeStats.takedownCount++;
                 }
                 if (node.t || M.dcd[node.h] || node.isDeviceFolder) {
-                    activeStats.subDirs += node.td;
+                    activeStats.subDirs += node.td || 0;
                     activeStats.subFiles += node.tf;
                 }
 
@@ -1650,7 +1652,7 @@ lazy(mega.ui, 'mInfoPanel', () => {
                 }
                 blockSet.add(TYPES.MIME);
             }
-            if (mega.lite.inLiteMode && activeStats.folderCount) {
+            if (mega.lite.inLiteMode && activeStats.folderCount && !activeStats.folderBytes) {
                 blockSet.delete(TYPES.BYTE_SIZE);
                 blockSet.delete(TYPES.NODE_SIZE);
             }

@@ -613,7 +613,7 @@ lazy(s4, 'utils', () => {
             ));
 
             // Copy to clipboard buttons
-            $('.mega-button.copy', parentNode).rebind('click.copyUrl', (e) => {
+            $('.mega-button.copy', tableNode).rebind('click.copyUrl', (e) => {
                 if ($.dialog === 's4-managed-setup') {
                     // Copy endpoints btn evt
                     eventlog(500582, JSON.stringify([e.currentTarget.dataset.location]));

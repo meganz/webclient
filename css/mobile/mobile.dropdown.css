@@ -22,7 +22,6 @@
 }
 
 .search-box-wrapper {
-    width: 100%;
     display: flex;
     align-items: center;
     margin-bottom: 10px;
@@ -68,6 +67,12 @@
 .language-selector li.list-item {
     height: 65px;
     padding: 0 32px 0 0;
+}
+
+.language-selector li.list-item:active,
+.language-selector li.list-item:hover {
+    background: initial;
+    color: initial;
 }
 
 .no-results {

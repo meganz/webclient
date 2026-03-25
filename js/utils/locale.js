@@ -1052,11 +1052,14 @@ mBroadcaster.once('boot_done', function populate_l() {
         'p-s/p-b/c-s': "https://help.mega.io/plans-storage/payments-billing/cancel-subscription",
         'terms': "https://mega.io/terms",
         'pricing': "https://mega.io/pricing",
+        'privacy': "https://mega.io/privacy",
         'vpn': "https://mega.io/vpn",
         'vpn#dow': "https://mega.io/vpn#downloadapps",
         'pass': "https://mega.io/pass",
         'pass#dow': "https://mega.io/pass#downloadapp",
         'desktop': "https://mega.io/desktop",
+        's4Endpoints': "https://help.mega.io/megas4/setup-guides/mega-s4-endpoint-urls",
+        's4Setup': "https://help.mega.io/megas4/setup-guides",
     };
 
     const mega_io_hyperlinks = Object.create(null);
@@ -1811,6 +1814,23 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[A]', '<a href="mailto:support@mega.io">')
         .replace('[/A]', '</a>');
 
+    l.s4_onbd_ne_tip = escapeHTML(l.s4_onbd_ne_tip)
+        .replace('[A]', mega_io_hyperlinks.privacy)
+        .replace('[/A]', '</a>');
+
+    l.s4_onbd_ready_tip = escapeHTML(l.s4_onbd_ready_tip)
+        .replace('[A1]', mega_io_hyperlinks.s4Endpoints)
+        .replace('[/A1]', '</a>')
+        .replace(
+            '[A2]',
+            '<a href="https://github.com/meganz/s4-specs/" target="_blank" class="clickurl">'
+        )
+        .replace('[/A2]', '</a>');
+
+    l.s4_onbd_tools_tip = escapeHTML(l.s4_onbd_tools_tip)
+        .replace('[A]', mega_io_hyperlinks.s4Setup)
+        .replace('[/A]', '</a>');
+
     l.content_removed = escapeHTML(l.content_removed)
         .replace('[A]', '<a class="clickurl" href="https://mega.io/takedown" target="_blank">')
         .replace('[/A]', '</a>');
@@ -2072,6 +2092,11 @@ mBroadcaster.once('boot_done', function populate_l() {
         's4_disable_feature_info',
         's4_activation_tools_info',
         's4_s3_prefix_usage',
+        's4_onbd_step1',
+        's4_onbd_step2',
+        's4_onbd_step3',
+        's4_syn_backup_info',
+        's4_syn_cloud_info',
         'info_panel_tags_create_btn',
         'bn_odq_text',
         'url_import_feature_warning',

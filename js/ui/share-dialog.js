@@ -2041,9 +2041,6 @@ lazy(mega.ui, 'mShareDialog', () => {
 
             $dialog.off('dialog-closed.share');
 
-            if (self.d) {
-                console.warn(`Revoking share-snapshot for ${target}...`, !!mega.keyMgr.getShareSnapshot(target));
-            }
             mega.keyMgr.removeShareSnapshot(target);
         });
 

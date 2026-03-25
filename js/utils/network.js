@@ -462,7 +462,7 @@ function eventlog(id, msg, once) {
 
         if (!once || !eventlog.sent[id]) {
             eventlog.sent[id] = Date.now();
-            return api.req(req).catch((ex) => dump(id, ex));
+            return api.req(req, 6).catch((ex) => dump(id, ex));
         }
     }
     else {

@@ -904,7 +904,7 @@ FMDB.prototype.stripnode = freeze({
 
         // Remove pollution from the ufs-size-cache
         // 1. non-folder nodes does not need tb/td/tf
-        if (!f.t) {
+        if (!f.t || mega.infinity) {
             delete f.tb;
             delete f.td;
             delete f.tf;

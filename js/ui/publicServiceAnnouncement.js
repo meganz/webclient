@@ -259,8 +259,8 @@ class PsaLayoutManager {
      * @returns {Object} self instance
      */
     mediaPlayer(selector, isCheckPlayButton) {
-        const el = document.querySelector(selector);
-        if (el && !is_mobile) {
+        const el = !is_mobile && tryCatch(() => document.querySelector(selector))();
+        if (el) {
             const playButton = el.querySelector('.play-video-button');
             const isPlayButtonVisible = isCheckPlayButton && playButton && !playButton.classList.contains('hidden');
 

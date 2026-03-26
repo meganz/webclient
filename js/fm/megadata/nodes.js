@@ -4905,7 +4905,11 @@ MegaData.prototype.importFileLink = function importFileLink(ph, key, attr, srcNo
                     if (srcNode && !targetNode) {
                         mega.ui.toast.show(
                             parseHTML(
-                                mega.icu.format(l.toast_import_file, 1).replace('%s', M.getNameByHandle(target))
+                                mega.icu.format(l.toast_import_file, 1)
+                                    .replace(
+                                        /%s/g,
+                                        `<span class="long-title-truncate">${M.getNameByHandle(target)}</span>`
+                                    )
                             ),
                             6,
                             l[16797],

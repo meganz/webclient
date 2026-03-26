@@ -399,7 +399,7 @@ lazy(s4, 'kernel', () => {
             n = M.getNodeByHandle(n);
         }
 
-        while (n && (n = M.d[n.p])) {
+        while (n && (n = M.d[n.p] || M.tnd[n.p])) {
 
             if (getS4BucketAttribute(n)) {
 

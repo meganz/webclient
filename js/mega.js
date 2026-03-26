@@ -81,6 +81,11 @@ Object.defineProperty(mega, 'halt', {
                 delay.abort();
             }
         }
+
+        if ('rad' in mega) {
+            mega.rad.log('\ud83d\udd1a', `Issuing halt(${reason})...`);
+            return mega.rad.flush().catch(dump);
+        }
     }
 });
 

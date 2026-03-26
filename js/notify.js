@@ -234,8 +234,11 @@ lazy(mega.ui, 'notifyUtils', () => {
                         if (type === 'put' && !M.c.shares[handle]) {
                             this.payload.s.add(handle);
                         }
-                        else {
+                        else if (handle.length === 8) {
                             this.payload.n.add(handle);
+                        }
+                        else if (self.d) {
+                            console.warn('Unexpected notification to load nodes for...', handle, notifications[i]);
                         }
                     }
                 }

@@ -3493,11 +3493,12 @@ Object.defineProperty(self, 'dbfetch', (function() {
          * Retrieve nodes by handle.
          * WARNING: emplacenode() is not used, it's up to the caller if so desired.
          *
-         * @param {Array} handles
+         * @param {Array} handles list of node-handles to retrieve nodes for
+         * @param {Object} [options] options to pass through to {@link fmdb.getbykey}
          * @returns {Promise}
          * @memberOf dbfetch
          */
-        async node(handles) {
+        async node(handles, options) {
             const result = [];
 
             for (let i = handles.length; i--;) {
@@ -3514,7 +3515,7 @@ Object.defineProperty(self, 'dbfetch', (function() {
                 return result;
             }
 
-            const r = await fmdb.getbykey('f', 'h', ['h', [...handles]]);
+            const r = await fmdb.getbykey('f', {localOnly: true, ...options}, ['h', [...handles]]);
             if (d && handles.length < 2 && r.length > 1) {
                 console.error('Unexpected DB reply, more than a single node returned.');
             }

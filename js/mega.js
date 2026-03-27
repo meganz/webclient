@@ -2523,7 +2523,7 @@ function loadfm(force) {
             // is this a folder link? or do we have no valid cache for this session?
             if (pfid) {
                 fmdb = false;
-                fetchfm(false).catch(tell);
+                fetchfm(false).catch(folderreqerr);
             }
             else if (!u_k_aes) {
                 console.error('No master key found... please contact support@mega.io');

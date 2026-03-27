@@ -1869,6 +1869,15 @@ lazy(self, 'api', () => {
             for (let i = handles.length; i--;) {
                 const h = handles[i];
 
+                if (typeof h !== 'string' || h.length !== 8) {
+                    if (self.d) {
+                        logger.error(`api.tree() received invalid node-handle...`, h);
+                        console.trace();
+                    }
+                    handles.splice(i, 1);
+                    continue;
+                }
+
                 if (!inflightTreeFetch.has(h)) {
                     pendingTreeFetch.add(h);
                 }

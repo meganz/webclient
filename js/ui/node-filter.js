@@ -551,11 +551,13 @@ lazy(mega.ui, 'mNodeFilter', () => {
                         }
                     })();
                 }
-                if (folderlink && String(M.currentdirid).startsWith('search/')) {
-                    M.fmSearchNodes(M.currentdirid.replace('search/', ''));
-                }
-                else {
-                    M.openFolder(M.currentdirid, true);
+                if (!preventReload) {
+                    if (folderlink && String(M.currentdirid).startsWith('search/')) {
+                        M.fmSearchNodes(M.currentdirid.replace('search/', ''));
+                    }
+                    else {
+                        M.openFolder(M.currentdirid, true);
+                    }
                 }
                 if (this.autoDismiss) {
                     this.hide(true);

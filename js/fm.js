@@ -2643,11 +2643,6 @@ function sharedFolderUI() {
 
         $(rightPanelView).addClass('shared-folder-content');
 
-        if (M.getNodeByHandle(M.currentdirid) !== nodeData || M.getChildren(p)) {
-            // hide leave-share under non-root shares
-            $('.fm-leave-share').addClass('hidden');
-        }
-
         onIdle(function() {
             $(window).trigger('resize');
             onIdle(fm_resize_handler);

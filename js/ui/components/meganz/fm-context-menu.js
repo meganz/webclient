@@ -506,6 +506,47 @@
                     document.getElementById('fileselect2').click();
                 }
             },
+            {
+                buttonId: 'addfrom-cloud-drive',
+                text: l.add_from_cloud_drive,
+                icon: 'sprite-fm-mono icon-cloud-upload-thin-outline',
+                onClick() {
+                    if (M.isInvalidUserStatus()) {
+                        return;
+                    }
+
+                    const target = M.currentCustomView.nodeID || M.currentdirid;
+                    M.initFileAndFolderSelectDialog({title: l.add_from_cloud_drive, selectLabel: l.add})
+                        .then((handles) => {
+                            if (handles && handles.length) {
+                                return M.copyNodes(handles, target);
+                            }
+                        })
+                        .then(res => {
+                            if (res && res.length) {
+                                const addedNodes = res
+                                    .map((handle) => M.getNodeByHandle(handle))
+                                    .filter((node) => node && node.p === target);
+
+                                if (addedNodes.length) {
+                                    mega.ui.toast.show(
+                                        mega.icu.format(l.recents_added_count, addedNodes.length)
+                                    );
+
+                                    for (let i = 0; i < addedNodes.length; i++) {
+                                        mega.ui.toast.show(
+                                            parseHTML(
+                                                l[addedNodes[i].t ? 'folder_added' : 'file_added']
+                                                    .replace('%1', addedNodes[i].name)
+                                            )
+                                        );
+                                    }
+                                }
+                            }
+                        })
+                        .catch((ex) => ex !== EBLOCKED && tell(ex));
+                }
+            }
         ]));
         sections.addChild('create', new MegaContextSection(menu, [
             {

@@ -217,7 +217,11 @@ lazy(s4, 'containers', () => {
             this.$serviceNode = $('.service-body', this.$dialogContainer);
             this.$sidePane = $('.side-pane', this.$dialogContainer);
             this.$skipSetupBtn = $('.skip-setup', this.$dialogContainer);
+            this.$dontShowAgainBtn = $('.dont-show-again', this.$dialogContainer);
             this.$scrollArea = $('.scroll-area', this.$dialogContainer);
+            this.$closeBtn = $('.close', this.$dialogContainer);
+            this.$contentPane = $('.content-pane', this.$dialogContainer);
+            this.$sidePaneParent = this.$sidePane.parent();
 
             this.$bucketInput = new mega.ui.MegaInputs(
                 $('input[name=bucket-name]', this.$steps[2]),
@@ -248,6 +252,7 @@ lazy(s4, 'containers', () => {
                 $manageBucketBtn,
                 $openS4Btn,
                 $skipSetupBtn,
+                $dontShowAgainBtn,
                 $steps
             } = this;
 
@@ -257,6 +262,7 @@ lazy(s4, 'containers', () => {
             $manageBucketBtn.unbind('click.s4dlg');
             $openS4Btn.unbind('click.s4dlg');
             $skipSetupBtn.unbind('click.s4dlg');
+            $dontShowAgainBtn.unbind('click.s4dlg');
             $('button.download-key', $steps[4]).unbind('click.s4dlg');
         }
 
@@ -271,12 +277,18 @@ lazy(s4, 'containers', () => {
                 $manageBucketBtn,
                 $openS4Btn,
                 $skipSetupBtn,
+                $dontShowAgainBtn,
                 $steps
             } = this;
 
             // Step 1
             $skipSetupBtn.rebind('click.s4dlg', () => {
                 eventlog(501167);
+                this.destroy();
+            });
+            $dontShowAgainBtn.rebind('click.s4dlg', () => {
+                fmconfig.s4onboarded = 1;
+                fmconfig.s4skipobd = undefined;
                 this.destroy();
             });
 
@@ -375,6 +387,8 @@ lazy(s4, 'containers', () => {
             if (finalise) {
                 this.$sidePane.removeClass('intro');
                 this.$skipSetupBtn.addClass('hidden');
+                this.$dontShowAgainBtn.addClass('hidden');
+                this._setFullWidthFooter(false);
 
                 // Start setup btn
                 eventlog(500572);
@@ -382,6 +396,7 @@ lazy(s4, 'containers', () => {
                 return Promise.resolve();
             }
 
+            this._setFullWidthFooter(true);
             this.$progressLabel.text(l.s4_setup_s4_btn);
             this._switchStep();
 
@@ -642,6 +657,23 @@ lazy(s4, 'containers', () => {
             }
         }
 
+        _setFullWidthFooter(enable) {
+            if (enable) {
+                if (this.$sidePane.parent()[0] !== this.$contentPane[0]) {
+                    this.$sidePane.prependTo(this.$contentPane);
+                }
+
+                this.$dialogContainer.addClass('full-width-footer');
+            }
+            else {
+                if (this.$sidePane.parent()[0] !== this.$sidePaneParent[0]) {
+                    this.$sidePane.insertAfter(this.$closeBtn);
+                }
+
+                this.$dialogContainer.removeClass('full-width-footer');
+            }
+        }
+
         _clear() {
             this.bucket = null;
             this.container = null;
@@ -658,6 +690,8 @@ lazy(s4, 'containers', () => {
             this.$manageBucketBtn.addClass('hidden');
             this.$openS4Btn.addClass('hidden');
             this.$skipSetupBtn.removeClass('hidden');
+            this.$dontShowAgainBtn.removeClass('hidden');
+            this._setFullWidthFooter(false);
         }
 
         _validateBucket() {

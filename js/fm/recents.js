@@ -912,6 +912,60 @@ RecentsRender.prototype.setActionLocation = function(row, action) {
 };
 
 /**
+ * Build file action
+ * @param {Object<String, any>} $el Action to work with
+ * @param {any|Object<String, any>} data Action to work with or node handle in case external generation
+ * @returns {void}
+ */
+RecentsRender.prototype.buildFileAction = function($el, data) {
+    'use strict';
+
+    let action;
+    let isExternal = false;
+
+    if (typeof data === 'object') {
+        action = data;
+    }
+    else {
+        isExternal = true;
+        action = this.actionIdMap[this._nodeActionMap[data]];
+    }
+
+    let content;
+    const renderedItem = this._nodeRenderedItemIdMap[data];
+    if (!isExternal || renderedItem === undefined) {
+        content = this.getActionUserString(action);
+    }
+    else {
+        const i = renderedItem.split(':')[1];
+        const nodeAction = action.createEmptyClone();
+        const node = action[i];
+        nodeAction.ts = node.ts;
+        nodeAction.push(node);
+        nodeAction.isChild = true;
+        content = this.getActionUserString(nodeAction);
+    }
+
+    $el.safeAppend(content);
+
+    if (action.user === u_handle) {
+        $('.action-user-name', $el)
+            .text(`${u_attr.fullname} (${l[8885]})`)
+            .contents().unwrap();
+    }
+    else {
+        // Show by user if not current user
+        this.handleByUserHandle($el, action);
+    }
+
+    onIdle(() => {
+        if ($el[0].scrollWidth > $el[0].clientWidth) {
+            $el.addClass('simpletip').attr('data-simpletip', $el.text());
+        }
+    });
+};
+
+/**
  * Generate a new action row.
  * @param {Object.<String, any>} action Action to work with
  * @param {String|Number} actionId Action id to map to
@@ -930,22 +984,8 @@ RecentsRender.prototype.generateRow = function(action, actionId) {
     $newRow.attr('id', this.hasMore(action) ? action.path[0].h : action[0].h);
     this._renderFiles($newRow, action, actionId);
 
-    const actionEl = $('.file-action', $newRow);
-    actionEl.safeAppend(this.getActionUserString(action));
-
     this.setActionLocation($newRow, action);
-
-    if (action.user !== u_handle) {
-        // Show by user if not current user
-        this.handleByUserHandle($newRow, action);
-    }
-    else {
-        $('.action-user-name', $newRow)
-            .text(`${u_attr.fullname} (${l[8885]})`)
-            .removeClass();
-    }
-
-    actionEl.addClass('simpletip').attr('data-simpletip', actionEl.text());
+    this.buildFileAction($('.file-action', $newRow), action);
 
     return $newRow;
 };

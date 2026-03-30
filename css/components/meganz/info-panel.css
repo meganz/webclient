@@ -115,12 +115,18 @@
 .info-panel-block .info-badge.dc-badge-status i.tip-icon:hover {
     --mask-color: var(--mobile-icon-primary);
 }
+.info-panel-block .info-action {
+    color: var(--mobile-text-secondary);
+    display: flex;
+    font: var(--mobile-font-caption-small-regular);
+}
 .info-panel-block .info-users {
     color: var(--mobile-text-secondary);
     display: flex;
     font: var(--mobile-font-caption-small-regular);
 }
-.info-panel-block .info-users .info-user-name {
+.info-panel-block .info-users .info-user-name,
+.info-panel-block .info-action .info-user-name {
     margin-inline-start: 8px;
     line-height: 16px;
 }

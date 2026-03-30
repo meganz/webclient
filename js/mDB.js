@@ -375,7 +375,7 @@ FMDB.prototype.serialize = function(table, row) {
 
         var j = {...row.d}; // this references the live object!
 
-        if (self.d) {
+        if (table === 'f' && self.d) {
             this.logger.assert(!this.transient(j), 'a transient node was slipped into FMDB...', j.p, j.h, [j]);
         }
 

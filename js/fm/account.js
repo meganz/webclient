@@ -3169,7 +3169,7 @@ accountUI.transfers = {
                                     }, 700);
 
                                     if (bandwidthLimit > 99) {
-                                        msgDialog('warningb:!' + l[776], l[882], l[12689], 0, function(e) {
+                                        msgDialog(`confirmation:!^${l[776]}!${l[82]}`, l[882], l[12689], 0, (e) => {
                                             if (e) {
                                                 done();
                                             }

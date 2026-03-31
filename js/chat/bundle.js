@@ -28721,9 +28721,20 @@ class PeerVideoThumbFixed extends VideoNode {
     }
   }
   addVideo() {
-    assert(this.source.hasScreenAndCam);
+    if (!this.source.hasScreenAndCam) {
+      if (d) {
+        console.warn('Mismatched state with component type. Clearing player.');
+      }
+      this.delVideo();
+      return;
+    }
     const vidCont = this.contRef.current;
-    assert(vidCont);
+    if (!vidCont) {
+      if (d) {
+        console.error('Video container went missing. Aborting.', this.isMounted());
+      }
+      return;
+    }
     if (vidCont.firstChild !== this.ownVideo) {
       this.displayVideoElement(this.ownVideo, vidCont);
     }

@@ -205,11 +205,10 @@ MegaData.prototype.addDownloadSync = function(n, z, preview) {
                     }
                     for (var k = 0; k < nodes.length; k++) {
                         if (typeof nodes[k] === 'string') {
-                            addNodeToArray(files, M.d[nodes[k]]);
-                            if (M.d[nodes[k]].t) {
-                                if (M.c[nodes[k]]) {
-                                    recursivelyLoadNodes(arr, Object.keys(M.c[nodes[k]]));
-                                }
+                            const n = M.getNodeByHandle(nodes[k]);
+                            addNodeToArray(files, n);
+                            if (n.t && M.c[nodes[k]]) {
+                                recursivelyLoadNodes(arr, Object.keys(M.c[nodes[k]]));
                             }
                         }
                         else { // it's object

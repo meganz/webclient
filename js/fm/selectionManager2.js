@@ -1395,10 +1395,6 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             }
 
             if (mega.lite.inLiteMode) {
-                // If in MEGA Lite mode, temporarily hide the Move to Rubbish Bin button in the outgoing shares area
-                if (M.currentrootid === 'out-shares') {
-                    __hideButton('delete');
-                }
                 __hideButton('move');
             }
 

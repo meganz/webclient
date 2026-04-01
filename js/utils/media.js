@@ -1838,6 +1838,12 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 icon = 'icon-size-36';
                 $speed.addClass('margin-2');
             }
+            else if ($this.hasClass('125x')) {
+                cl = '125x';
+                rate = 1.25;
+                icon = 'icon-size-36';
+                $speed.addClass('margin-2');
+            }
             else if ($this.hasClass('15x')) {
                 cl = '15x';
                 rate = 1.5;
@@ -1847,6 +1853,10 @@ FullScreenManager.prototype.enterFullscreen = function() {
             else if ($this.hasClass('2x')) {
                 cl = '2x';
                 rate = 2;
+            }
+            else if ($this.hasClass('3x')) {
+                cl = '3x';
+                rate = 3;
             }
 
             $('.context-menu.playback-speed button i', $wrapper).addClass('hidden');

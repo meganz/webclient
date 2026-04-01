@@ -182,7 +182,7 @@ lazy(s4, 'ui', () => {
             }
 
             const [n] = s4.utils.getContainersList() || [];
-            const hasBuckets = n && n.td;
+            const hasBuckets = n && !!M.tree[n.h];
             let keys = this.lists.keys || [];
 
             if (!hasBuckets && !keys.length) {

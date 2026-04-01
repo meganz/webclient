@@ -24,6 +24,7 @@ function is_video(n) {
 
 is_video.ext = {
     'MP4': -1,
+    'M4A': -1,
     'M4V': -1
 };
 

@@ -360,7 +360,7 @@ Chat.prototype.init = promisify(function(resolve, reject) {
             }
 
             if (notify) {
-                notify.countAndShowNewNotifications();
+                notify.init();
             }
 
             return true;

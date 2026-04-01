@@ -775,7 +775,7 @@ mBroadcaster.once('boot_done', () => {
                     // Got a new nodeList, cleanup cached DOM nodes.
                     var nodes = Object.values(aNodeList);
                     for (var i = nodes.length; i--;) {
-                        delete this.nodeMap[nodes[i].h];
+                        this.revokeDOMNode(nodes[i].h, true);
                     }
                 }
             }

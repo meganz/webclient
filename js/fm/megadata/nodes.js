@@ -3980,7 +3980,7 @@ MegaData.prototype.delNodeShare = async function(h, u) {
 
     // @todo ditch MegaNode.shares use completely, maintain M.su only, adapt MegaNode.ph uses(?)
 
-    if (!(this.d[h] && this.d[h].shares)) {
+    if (!(this.d[h] && this.d[h].shares) && mega.infinity) {
         if (self.d) {
             console.assert(this.d[h] || mega.infinity, `we don't know about ${h}...yet?`, mega.infinity);
         }
@@ -4905,7 +4905,11 @@ MegaData.prototype.importFileLink = function importFileLink(ph, key, attr, srcNo
                     if (srcNode && !targetNode) {
                         mega.ui.toast.show(
                             parseHTML(
-                                mega.icu.format(l.toast_import_file, 1).replace('%s', M.getNameByHandle(target))
+                                mega.icu.format(l.toast_import_file, 1)
+                                    .replace(
+                                        /%s/g,
+                                        `<span class="long-title-truncate">${M.getNameByHandle(target)}</span>`
+                                    )
                             ),
                             6,
                             l[16797],

@@ -308,10 +308,11 @@
             let remain = conflictRoots.length;
             eventlog(500886, JSON.stringify([1, tree.length, remain]));
             let repeatAction = false;
+            const remainCount = (pending) => Math.max(pending + remain, 0);
 
-            const promptProc = async(impNode, exist, t, remain, skipRepeat) => {
+            const promptProc = async(impNode, exist, t, remain) => {
                 let res;
-                if (!skipRepeat && repeatAction) {
+                if (repeatAction) {
                     res = {
                         name: repeatAction === ns.KEEPBOTH ? this.findNewName(impNode.name, t) : impNode.name,
                         action: repeatAction,
@@ -320,7 +321,7 @@
                 }
                 else {
                     const { promise } = mega;
-                    this.prompt('import', impNode, exist, Math.max(remain || 0, 0), t)
+                    this.prompt('import', impNode, exist, remain, t)
                         .always((file, name, action, checked) => {
                             promise.resolve({ name, action, file, checked });
                         });
@@ -330,7 +331,7 @@
                 if (file === -0xBADF) {
                     return false;
                 }
-                if (!skipRepeat && checked) {
+                if (checked) {
                     repeatAction = action;
                 }
                 if (action === ns.REPLACE) {
@@ -371,7 +372,7 @@
                                 stack.push({ exist: match, node: next });
                             }
                             else if (match) {
-                                const res = await promptProc(next, match, exist.h, 0, true);
+                                const res = await promptProc(next, match, exist.h, remainCount(i + stack.length));
                                 if (res === false) {
                                     return [];
                                 }
@@ -393,7 +394,10 @@
             };
             for (let i = conflictRoots.length; i--;) {
                 const [root, exist] = conflictRoots[i];
-                const action = await promptProc(root, exist, t, --remain);
+                --remain;
+                const action = await promptProc(root, exist, t, remainCount(
+                    exist.t && decrNodes[root.h] && decrNodes[root.h].length || 0
+                ));
                 if (!action) {
                     throw EBLOCKED;
                 }
@@ -725,6 +729,9 @@
                 var remainingConflictText = remaining > 1 ?
                     escapeHTML(l[16494]).replace('%1', '<span>' + remaining + '</span>') :
                     l[23294];
+                if (op === 'import') {
+                    remainingConflictText = l.conflict_apply_all_nc;
+                }
                 $node.removeClass('hidden');
                 $('label', $node).safeHTML(remainingConflictText);
                 this.customRemaining($dialog);

@@ -545,7 +545,6 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
         // delete items['.download-item'];
         delete items['.copy-item'];
         delete items['.sh4r1ng-item'];
-        delete items['.remove-item'];
         delete items['.togglepausesync-item'];
     }
 
@@ -769,6 +768,10 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items, forcedSe
                         && !M.onDeviceCenter
                     ) {
                         finalItems.push('.rewind-item');
+                    }
+
+                    if (M.currentrootid === 'shares' || M.currentrootid === 'out-shares') {
+                        finalItems.push('.addfrom-cloud-drive');
                     }
                 }
             }

@@ -234,8 +234,11 @@ lazy(mega.ui, 'notifyUtils', () => {
                         if (type === 'put' && !M.c.shares[handle]) {
                             this.payload.s.add(handle);
                         }
-                        else {
+                        else if (handle.length === 8) {
                             this.payload.n.add(handle);
+                        }
+                        else if (self.d) {
+                            console.warn('Unexpected notification to load nodes for...', handle, notifications[i]);
                         }
                     }
                 }
@@ -375,6 +378,9 @@ var notify = {
 
     newNotifications: 0,
     lastFavicoState: false,
+
+    // Page change event handler
+    pageChangeHandler: null,
 
     // Notification Shimmer (NotifCenterShimmer) instance
     shimmer: null,
@@ -539,6 +545,17 @@ var notify = {
 
                 // Show the notifications
                 notify.countAndShowNewNotifications();
+
+                if (!notify.pageChangeHandler) {
+                    notify.pageChangeHandler = mBroadcaster.addListener('pagechange', (page) => {
+                        if (page === 'chat' || page.substr(0, 2) === 'fm') {
+                            notify.initFilter();
+                        }
+                        else {
+                            notify.filter = null;
+                        }
+                    });
+                }
 
                 if ($('.notif-wrapper', '.nav-actions').hasClass('show')) {
                     return notify.renderHydratedNotifications();
@@ -1613,7 +1630,7 @@ var notify = {
         }
 
         const $title = $('.notification-title', $notificationHtml);
-        $title.text(title);
+        $title.safeHTML(megaChat.html(title));
 
         if (tooltip) {
             $title.addClass('simpletip')
@@ -2399,7 +2416,7 @@ var notify = {
             else {
                 title = core.cancel[occurrenceKey].replace('%1', chatRoom.topic);
             }
-            return escapeHTML(title).replaceAll('[B]', '<b>').replaceAll('[/B]', '</b>');
+            return megaChat.html(title).replaceAll('[B]', '<b>').replaceAll('[/B]', '</b>');
         };
 
         if (meta.mode === MODE.CREATED) {

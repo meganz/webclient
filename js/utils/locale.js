@@ -1934,11 +1934,23 @@ mBroadcaster.once('boot_done', function populate_l() {
         'item_updated',
         'delete_confirmation_title',
         'item_deleted',
+        'file_added',
+        'folder_added'
     ]) {
-
-        l[key] = escapeHTML(l[key])
-            .replace(/\[S]/g, '<span class="long-title-truncate">')
-            .replace(/\[\/S]/g, '</span>');
+        l[key] = escapeHTML(l[key]).replace(
+            /^(.*?)\[S](.*?)\[\/S](.*?)$/,
+            (_match, before, content, after) => {
+                let result = '';
+                if (before) {
+                    result += `<span>${before}</span>`;
+                }
+                result += `<span class="long-title-truncate">${content}</span>`;
+                if (after) {
+                    result += `<span>${after}</span>`;
+                }
+                return result;
+            }
+        );
     }
 
     l.recovery_key_subtitle = escapeHTML(l.recovery_key_subtitle)

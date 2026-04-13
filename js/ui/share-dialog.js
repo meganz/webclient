@@ -906,7 +906,7 @@ lazy(mega.ui, 'mShareDialog', () => {
             // Add click handler for each contact in the dropdown
             initContactClickHandler();
         }
-        else if (searchString && isValidEmail(searchString)) {
+        else if (searchString && isValidEmail(searchString) && !addedContacts[`email_${searchString.toLowerCase()}`]) {
             renderEmailContactInDropdown(searchString);
         }
         else {
@@ -1896,7 +1896,7 @@ lazy(mega.ui, 'mShareDialog', () => {
 
         // Add keyup handler for searching/filtering the contacts
         $contactSearchInput.rebind('keyup.searchcontact', function(event) {
-            const currentSearchString = $(this).val();
+            const currentSearchString = $(this).val().trim();
             const keyCode = event.key;
 
             // Hide any current error messages until they press Enter again and potentially get another error
@@ -1914,17 +1914,6 @@ lazy(mega.ui, 'mShareDialog', () => {
                 // Hide the dropdown
                 $shareDialogInviteBG.removeClass('dropdown-visible');
                 $selectedContactsContainer.addClass('empty');
-
-                // If there are no matching contacts, but the email is valid one
-                if (isValidEmail(currentSearchString)) {
-
-                    // Show the email in the dropdown (to be clickable by mouse as well)
-                    renderEmailContactInDropdown(currentSearchString);
-
-                    // Show the dropdown and email inside it
-                    $shareDialogInviteBG.addClass('dropdown-visible');
-                    $selectedContactsContainer.removeClass('empty');
-                }
             }
             else {
                 // Show the dropdown and contacts
@@ -1934,44 +1923,73 @@ lazy(mega.ui, 'mShareDialog', () => {
 
             // If they are manually entering an email and indicate they are finished typing by pressing the Enter key
             if (keyCode === 'Enter') {
-                const user = currentSearchString ? M.getUserByEmail(currentSearchString) : false;
 
-                // If existing contact, add using that method
-                if (user && user.c) {
-                    makeRegularContactForInviting(user.h);
-                    $shareDialogInviteBG.removeClass('dropdown-visible');
+                if (!currentSearchString) {
+                    return false;
                 }
-                else if (isValidEmail(currentSearchString)) {
-                    // If it's a valid email, make the styled box for the email to be invited
-                    makeEmailPendingContact(currentSearchString);
-                    $shareDialogInviteBG.removeClass('dropdown-visible');
-                }
-                else if (currentSearchString.length > 0 && !isContactsDropdownEmpty()) {
-                    const handle = $contactDropdownWrapper
-                        .children(':not(.selected):first')
-                        .attr('data-contact-handle');
 
-                    if (handle) {
-                        makeRegularContactForInviting(handle);
+                const inputValues = currentSearchString.split(/[,;]/);
+                let hasInvalidInput = false;
+                const _beforeBreak = i => {
+                    $contactSearchInput.val(inputValues.slice(i).join(';'));
+                    hasInvalidInput = true;
+                };
+
+                for (let i = 0; i < inputValues.length; i++) {
+
+                    const currentToken = inputValues[i].trim();
+
+                    if (!currentToken) {
+
+                        // If this is last token, just ignore it and accept last divider.
+                        if (i !== inputValues.length - 1) {
+                            showErrorMessage(l[2465]);
+                        }
+                        _beforeBreak(i);
+                        break;
+                    }
+
+                    const user = M.getUserByEmail(currentToken);
+
+                    if (user && user.c) {
+                        if (makeRegularContactForInviting(user.h) === false) {
+                            _beforeBreak(i);
+                            break;
+                        }
+                    }
+                    else if (isValidEmail(currentToken)) {
+                        if (makeEmailPendingContact(currentToken) === false) {
+                            _beforeBreak(i);
+                            break;
+                        }
+                    }
+                    else if (inputValues.length === 1 && !isContactsDropdownEmpty()) {
+                        const handle = $contactDropdownWrapper
+                            .children(':not(.selected):first')
+                            .attr('data-contact-handle');
+
+                        if (handle) {
+                            makeRegularContactForInviting(handle);
+                        }
                     }
                     else {
                         showErrorMessage(l[2465]);
-                        $contactSearchInput.focus();
+                        _beforeBreak(i);
+                        break;
                     }
+                }
 
-                    $shareDialogInviteBG.removeClass('dropdown-visible');
+                if (!hasInvalidInput) {
+                    $contactSearchInput.focus().val('');
                 }
-                else if (currentSearchString.length !== 0) {
-                    // Show Invalid Email error if input has value
-                    showErrorMessage(l[2465]);
-                    $contactSearchInput.focus();
-                }
+
+                $shareDialogInviteBG.removeClass('dropdown-visible');
 
                 // Update container or input UI
                 onContactChange();
 
                 // Update the list of contacts in the dropdown
-                renderContactsIntoDropdown(listOfContacts);
+                renderContactsIntoDropdown(listOfContacts, $contactSearchInput.val());
 
                 // Make sure click is not propagated to the close dropdown click handler so the user has time to look
                 event.stopPropagation();
@@ -2002,7 +2020,7 @@ lazy(mega.ui, 'mShareDialog', () => {
         // Add click handler for showing the list of contacts to choose from
         $selectedContactsContainer.rebind('click.clicksearchcontact', (event) => {
             // Do nothing when all contacts is selected
-            if (checkIfAllContactsSelected(listOfContacts) || $contactDropdownWrapper.children().length === 0) {
+            if (checkIfAllContactsSelected(listOfContacts) || contactsDropdownChildrenCount() === 0) {
                 $shareDialogInviteBG.removeClass('dropdown-visible');
                 return;
             }

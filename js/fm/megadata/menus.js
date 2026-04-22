@@ -751,10 +751,6 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items, forcedSe
                 else {
                     finalItems.push('.fileupload-item', '.newfolder-item');
 
-                    if (fmconfig.dlThroughMEGAsync && !window.useMegaSync) {
-                        asyncShow = true;
-                        megasync.preCheck().then(showContextMenu);
-                    }
                     if (nodeRights > 0) {
                         finalItems.push('.newfile-item');
                     }
@@ -912,12 +908,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items, forcedSe
     else if (ll === 9) {
         asyncShow = true;
         finalItems = ['.fileupload-item', '.folderupload-item', '.app-dl-hint'];
-        if (!fmconfig.dlThroughMEGAsync || window.useMegaSync) {
-            onIdle(showContextMenu);
-        }
-        else {
-            megasync.preCheck().then(showContextMenu);
-        }
+        onIdle(showContextMenu);
     }
     else if (ll === 10) {
         asyncShow = true;

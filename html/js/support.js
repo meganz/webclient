@@ -2,10 +2,9 @@ var support = (function() {
     'use strict';
 
     let langGha, $deviceInput, $emailInput, acceptReadArticlesCheckbox, otpInputs,
-        $defaultHiddenElements, $hiddenWhenOtherCategory, $messageInputTextArea,
-        $hideOnShowEmailVerifyForm, $hideOnEmailVerifyCall;
+        $defaultHiddenElements, $hiddenWhenOtherCategory, $messageInputTextArea, successCtaContainer,
+        $hideOnShowEmailVerifyForm, $hideOnEmailVerifyCall, submittedBlockPrimaryCta, submittedBlockSecondaryCta;
     let dds = {category: null, issue: null};
-    let cached = false;
     let $elsToUnbind = $();
     let supportType = null;
     let selectedCategory = null;
@@ -26,12 +25,7 @@ var support = (function() {
             acc[`${prefix}${v[key]}`] = v[label];
             return acc;
         }, {});
-    const cacheDom = () => {
-
-        if (cached) {
-            return;
-        }
-
+    const collateDomRefs = () => {
         const $mainLayout = $('#mainlayout').addClass('get-support');
         dom.$page = $('.get-support-block', $mainLayout);
         // submit flow
@@ -50,9 +44,11 @@ var support = (function() {
         dom.$submissionFlow = $('.submission.request', dom.$page);
         dom.$successBlock = $('.success-block', dom.$page);
         dom.$verifiedEmail = $('.verified-email span', dom.$page);
+        dom.$deviceInfoInputWrapper = $('.device-info', dom.$device);
         // verify flow
         dom.$verifyFlow = $('.verify-flow', dom.$page);
         dom.$email = $('.submit-email', dom.$page);
+        dom.$emailInputWrapper = $('.email-input', dom.$verifyEmailForm);
         dom.$emailError = $('.error', dom.$email);
         dom.$errEmailInput = $('span', dom.$emailError);
         dom.$verifyFlowLanding = $('.verify-flow.landing', dom.$page);
@@ -70,7 +66,6 @@ var support = (function() {
         dom.$resendOtpCta = $('button.cta.resend', dom.$verifyOtpForm);
         dom.$otpError = $('.fields .error', dom.$verifyOtpForm);
         dom.$otpErrorMessage = $('span', dom.$otpError);
-        cached = true;
     };
     const createMobileDropdown = ($node, items, selected, onSelected, titleText) => new MegaMobileDropdown({
         selected,
@@ -279,7 +274,7 @@ var support = (function() {
         if (response === -1 || !Array.isArray(response)) {
             return false;
         }
-        const other = { id: -1, name: l[2007], popularArticles: [] };
+        const other = { id: -1, name: l[2007], parentId: 0, popularArticles: [] };
         const [language, raw] = response;
         dom.$category.closest('.input-block').removeClass('hidden');
         langGha = language;
@@ -305,9 +300,7 @@ var support = (function() {
             }
         }
         menu[-1] = other;
-        raw[-1] = other;
-
-        return {menu, raw};
+        return {menu, raw: {'-1': other, ...raw}};
     };
     const createIssueDropdown = (items, selected, onSelected) => {
 
@@ -345,15 +338,15 @@ var support = (function() {
     ns._initLoggedInUI = async function(verifiedEmail) {
 
         // render success block
-        const successCtaContainer = document.querySelector('.success-block .buttons');
-        MegaLink.factory({
+        successCtaContainer = document.querySelector('.success-block .buttons');
+        submittedBlockPrimaryCta = MegaLink.factory({
             parentNode: successCtaContainer,
             text: l[164],
             href: 'fm',
             componentClassname: 'cta mio-button lg primary',
             icon: 'sprite-fm-mono icon-cloud-drive',
         });
-        MegaLink.factory({
+        submittedBlockSecondaryCta = MegaLink.factory({
             parentNode: successCtaContainer,
             text: l[384],
             href: window.kbLang ? l.megakb_origin : l.mega_help_host,
@@ -474,15 +467,18 @@ var support = (function() {
         };
 
         // create device input
-        const input = mCreateElement('input', {
-            type: 'text',
-            class: 'underlinedText no-title-top',
-            placeholder: l.support_page_device_input_name_placeholder,
-            'data-wrapper-class': 'box-style mobile'
-        }, $('.device-info', dom.$device)[0]);
-        $deviceInput = new mega.ui.MegaInputs($(input)).$input;
+        if (!$deviceInput) {
+            const input = mCreateElement('input', {
+                type: 'text',
+                class: 'underlinedText no-title-top',
+                placeholder: l.support_page_device_input_name_placeholder,
+                'data-wrapper-class': 'box-style mobile'
+            }, dom.$deviceInfoInputWrapper[0]);
+            $deviceInput = new mega.ui.MegaInputs($(input)).$input;
+        }
 
         // create message input
+        dom.$messageTxtAreaWrapper.empty();
         const messageInput = mCreateElement('textarea', {
             class: 'textArea no-title-top',
             placeholder: l.support_page_message_input_placeholder,
@@ -493,12 +489,14 @@ var support = (function() {
         initTextareaScrolling($messageInputTextArea);
 
         // create accept checkbox
-        acceptReadArticlesCheckbox = new MegaCheckbox({
-            parentNode: dom.$articlesRead[0],
-            componentClassname: 'mega-checkbox',
-            checkboxName: 'accept-articles-read',
-            labelTitle: l.support_page_related_articles_read
-        });
+        if (!acceptReadArticlesCheckbox) {
+            acceptReadArticlesCheckbox = new MegaCheckbox({
+                parentNode: dom.$articlesRead[0],
+                componentClassname: 'mega-checkbox',
+                checkboxName: 'accept-articles-read',
+                labelTitle: l.support_page_related_articles_read
+            });
+        }
 
         // prepopulate form, if the user is coming from help-center
         if (window.kbCatId && raw[window.kbCatId]) {
@@ -563,14 +561,14 @@ var support = (function() {
         dom.$submissionFlow.addClass('hidden');
         dom.$verifyFlowLanding.removeClass('hidden');
         dom.$verifyEmailForm.addClass('hidden');
+        // create email input
         if (!$emailInput) {
-            // create email input
             const input = mCreateElement('input', {
                 type: 'email',
                 class: 'underlinedText no-title-top',
                 placeholder: l[16343],
                 'data-wrapper-class': 'user-email box-style mobile'
-            }, $('.email-input', dom.$verifyEmailForm)[0]);
+            }, dom.$emailInputWrapper[0]);
             $emailInput = new mega.ui.MegaInputs($(input)).$input;
         }
         if (!otpInputs) {
@@ -594,15 +592,25 @@ var support = (function() {
         });
     };
 
-    ns.init = async hasAccess => {
+    ns.init = async() => {
+        if (ns._onLoginListener) {
+            mBroadcaster.removeListener(ns._onLoginListener);
+        }
+        if (!self.u_attr) {
+            ns._onLoginListener = mBroadcaster.addListener('login2', () => {
+                ns.destroy();
+                ns.init();
+            });
+        }
 
-        cacheDom();
+        collateDomRefs();
         if (is_mobile) {
             MegaMobileHeader.init(true);
         }
 
-        const res = await(u_attr && hasAccess ?  ns._initLoggedInUI :  ns._initNonLoggedInUI)().catch(dump);
-        mBroadcaster.once('pagechange', ns.destroy);
+        const res = await(u_attr ?  ns._initLoggedInUI :  ns._initNonLoggedInUI)().catch(dump);
+        mBroadcaster.removeListener(ns._pageChangeListener);
+        ns._pageChangeListener = mBroadcaster.addListener('pagechange', ns.destroy);
 
         return res;
     };
@@ -613,13 +621,25 @@ var support = (function() {
             return;
         }
 
+        mBroadcaster.removeListener(ns._onLoginListener);
+        mBroadcaster.removeListener(ns._pageChangeListener);
         $('#mainlayout').removeClass('get-support');
 
-        cached = false;
         clearInterval(tooManyOtpResendMsgReqTimer);
         $elsToUnbind.off();
         $elsToUnbind = $();
-        dom.$page[0].componentSelectorAll('.mega-component').forEach(component => component.destroy());
+        if (dom.$page) {
+            dom.$page[0].componentSelectorAll('.mega-component').forEach(component => component.destroy());
+        }
+        if (submittedBlockPrimaryCta) {
+            submittedBlockPrimaryCta.destroy();
+        }
+        if (submittedBlockSecondaryCta) {
+            submittedBlockSecondaryCta.destroy();
+        }
+        dom.$deviceInfoInputWrapper.empty();
+        dom.$messageTxtAreaWrapper.empty();
+        dom.$emailInputWrapper.empty();
         const keys = Object.keys(dom);
         for (let i = keys.length - 1; i >= 0; i--) {
             const k = keys[i];
@@ -637,6 +657,9 @@ var support = (function() {
         $hideOnEmailVerifyCall = null;
         supportType = null;
         selectedCategory = null;
+        submittedBlockPrimaryCta = null;
+        submittedBlockSecondaryCta = null;
+        successCtaContainer = null;
     };
 
     return ns;

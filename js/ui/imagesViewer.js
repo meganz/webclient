@@ -569,7 +569,8 @@ var slideshowid;
     function slideshow_timereset(sleepTime) {
         slideshow_aborttimer();
 
-        const sTime = sleepTime || mega.slideshow.settings.speed.getValue() / 1e3;
+        const {speed} = mega.slideshow.settings;
+        const sTime = sleepTime || (speed ? speed.getValue() / 1e3 : 3);
 
         if (slideshowplay && !slideshowpause) {
             (slideshowTimer = tSleep(sTime))

@@ -367,8 +367,7 @@ class MegaOverlay extends MegaComponent {
             videoData = { file: videoData };
         }
         const { file, muted = true, loop = true } = videoData;
-        const { browser, version } = browserdetails(ua);
-        if (!file || browser === 'Safari' && parseInt(version.split('.').shift(), 10) < 16) {
+        if (!file || window.safari && parseInt(browserdetails().version) < 16) {
             return;
         }
         const elem = document.createElement('video');

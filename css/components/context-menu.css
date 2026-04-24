@@ -65,6 +65,7 @@
     background: var(--mobile-button-outline-background-hover);
 }
 
+.mega-component.context-menu.overlay-wrap .nav-elem.context-button .text-box-wrapper,
 .mega-component.context-menu.overlay-wrap .nav-elem.context-button .primary-text {
     font: var(--mobile-font-caption-large-regular);
 }

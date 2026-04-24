@@ -51,16 +51,18 @@ async function setupSingleDownloadPage(res) {
 
     var msg;
     var isPageRefresh = false;
+    let errorData = null;
+
     const {
         dlPage = {
             init: nop,
             updateDlOptions: nop,
             showPausedUI: nop,
             showErrorUI: nop,
+            updateUI: v => mega.ui.viewerOverlay[v ? 'showLayout' : 'show'](dl_node.h).catch(dump)
         },
         linkAccess
     } = mega.ui || {};
-    let errorData = null;
 
     if (Object(fdl_queue_var).lastProgress) {
         dlprogress.apply(this, fdl_queue_var.lastProgress);
@@ -107,11 +109,12 @@ async function setupSingleDownloadPage(res) {
                 MegaMobileViewOverlay.init();
             }
 
-            const $pageScrollBlock = $(is_mobile ? '.mega-overlay-view.mega-component' : '.download.download-page')
-                .removeClass('video video-theatre-mode');
+            const $dlPage = $(
+                is_mobile
+                    ? '.mega-overlay-view.mega-component'
+                    : '.download.download-page'
+            ).removeClass('video video-theatre-mode');
             const filename = M.getSafeName(fdl_file.name) || 'unknown.bin';
-            const isVideo = is_video(filename);
-            let prevBut = isVideo;
 
             dl_node = new MegaNode(Object.assign(fdl_file, {
                 k: key,
@@ -198,38 +201,29 @@ async function setupSingleDownloadPage(res) {
                 });
             });
 
-            // DO NOT CHANGE {name: filename} to dl_node as this will called before codec list is loaded
-            $('.info-block .item-type-icon-90', $pageScrollBlock)
-                .removeClass('icon-generic-90')
-                .addClass(`icon-${fileIcon({name: filename})}-90`);
-
             if (dlQueue.isPaused(dlmanager.getGID(fdl_queue_var))) {
                 dlPage.showPausedUI();
             }
 
-            var showPreviewButton = function() {
-
-                if (is_image2(dl_node) || isVideo) {
-
+            // Handle image preview
+            const showPreview = () => {
+                if (is_image2(dl_node) || is_video(dl_node)) {
                     if (is_mobile) {
                         $('.mobile.slideshow-image-previewer').addClass('browserscreen');
                         if (slideshow(dl_node.h) === false) {
-                            mega.ui.viewerOverlay.showLayout(dl_node.h);
+                            dlPage.updateUI(true, 'image');
                         }
                     }
                     else {
-                        window.mediaConIsDl = true;
-                        const $preview = $('.js-image-preview', $pageScrollBlock);
-                        $('.media-viewer-container').appendTo('.js-image-preview');
-                        $('.media-viewer', $preview).removeAttr('style');
-                        $preview.removeClass('hidden');
-                        slideshow(dl_node);
+                        dlPage.updateUI(true, 'image');
                     }
-
                     if (mediaCollectFn) {
                         onIdle(mediaCollectFn);
                         mediaCollectFn = null;
                     }
+                }
+                else {
+                    dlPage.updateUI();
                 }
             };
 
@@ -237,121 +231,42 @@ async function setupSingleDownloadPage(res) {
                 let promise = Promise.resolve(null);
 
                 if (isStreamingEnabled() && String(res.fa).indexOf(':8*') > 0) {
-                    promise = iniVideoStreamLayout(dl_node, $pageScrollBlock);
-                    prevBut = false;
+                    promise = iniVideoStreamLayout(dl_node, $dlPage);
                 }
 
-                promise.then(function(ok) {
+                promise.then((ok) => {
                     if (!ok) {
-                        // not streamable, load thumbnail and quit.
                         if (ok === null) {
-                            showPreviewButton();
+                            // For images, show UI
+                            showPreview();
                         }
-                        else if (is_mobile) {
-                            // Non Pre-viewable file
-                            mega.ui.viewerOverlay.show(dl_node.h);
+                        else {
+                            // Non-streamable file
+                            dlPage.updateUI();
                         }
                         return false;
                     }
-
-                    // Change layout for video
-                    $pageScrollBlock.addClass('video');
-                    $('.download.video-block', $pageScrollBlock).removeClass('hidden');
-                    $('.mobile.filetype-img').addClass('hidden');
-                    $(window).trigger('resize');
-                    if (is_mobile) {
-                        mega.ui.viewerOverlay.showLayout(dl_node.h);
-                    }
-
-                }).catch(function(ex) {
+                    $dlPage.addClass('video');
+                    dlPage.updateUI(true, 'video');
+                }).catch((ex) => {
                     if (ex) {
                         console.warn(ex);
-                        showPreviewButton();
+                        showPreview(); // Fallback to image preview if error occurs
                     }
                 });
             }
-            else if (is_text(dl_node)) {
-                if (is_mobile) {
-                    // Text file - Non Pre-viewable file
-                    mega.ui.viewerOverlay.show(dl_node.h);
-                }
-                else {
-                    const $containerB = $('.js-text-viewer', '.download-page').removeClass('hidden');
-                    $('.viewer-pending', $containerB).removeClass('hidden');
-
-                    // Preload CodeMirror to be available when setupEditor() is invoked.
-                    M.require('codemirror_js', 'codemirrorscroll_js').dump('cm.preload');
-
-                    // Handle partial content for big text-files?
-                    const CHUNK_SIZE = 32768;
-                    const partial = dl_node.s > CHUNK_SIZE;
-
-                    const cachedData = mega.fileTextEditor.getCachedData(dl_node.link);
-
-                    if (cachedData) {
-                        mega.textEditorUI.setupEditor(dl_node.name, cachedData.text, dlpage_ph, true, $containerB);
-                        window.textConIsDl = true;
-                        $('.viewer-pending', $containerB).addClass('hidden');
-                    }
-                    else {
-                        const onError = (ex) => {
-                            $('.js-text-viewer-icon', $containerB).removeClass('hidden');
-                            if (d) {
-                                console.error("Failed to read as text from buffer.", ex);
-                            }
-                        };
-                        const onLoadEnd = () => {
-                            $('.viewer-pending', $containerB).addClass('hidden');
-                        };
-
-                        M.gfsfetch(dl_node.link, 0, partial ? CHUNK_SIZE : -1)
-                            .then((data) => {
-                                return mega.fileTextEditor.getTextFromBuffer(data.buffer);
-                            })
-                            .then(txt => {
-                                if (dl_node && dl_node.name) {
-
-                                    mega.fileTextEditor.cacheData(dl_node.link, txt, partial);
-                                    window.textConIsDl = true;
-                                    mega.textEditorUI.setupEditor(dl_node.name, txt, dlpage_ph, true, $containerB);
-
-                                    if (partial) {
-                                        // @todo streaming
-                                        mBroadcaster.once('txt.viewer:scroll-bottom', (editor) => {
-                                            $('.viewer-pending', $containerB).removeClass('hidden');
-                                            const ln = editor.lineCount();
-                                            M.gfsfetch(dl_node.link, 0, -1)
-                                                .then((data) => {
-                                                    return mega.fileTextEditor.getTextFromBuffer(data.buffer);
-                                                })
-                                                .then(txt => {
-                                                    mega.fileTextEditor.cacheData(dl_node.link, txt, false);
-                                                    editor.setValue(txt);
-                                                    editor.scrollIntoView(ln);
-                                                })
-                                                .catch(onError)
-                                                .finally(onLoadEnd);
-                                        });
-                                    }
-                                }
-                            })
-                            .catch(onError)
-                            .finally(onLoadEnd);
-                    }
-                }
-            }
             else if (fileext(dl_node.name, true) === 'DOCX') {
-                prevBut = true;
-            }
-            else if (is_mobile) {
-                mega.ui.viewerOverlay.show(dl_node.h);
-            }
 
-            if (prevBut) {
-                showPreviewButton();
+                showPreview();
+            }
+            else {
+                // anything else
+                const isText = is_text(dl_node);
+                dlPage.updateUI(isText, isText ? 'text' : null);
             }
         }
         else {
+            // Show link error UI
             return mega.ui.linkAccess.showDecryptionKeyUI(dlpage_ph, false, dlpage_key)
                 .catch(() => {
                     // The file link can't be opened as the decryption key is missing.

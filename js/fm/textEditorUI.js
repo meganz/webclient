@@ -592,7 +592,7 @@ mega.textEditorUI = new function TextEditorUI() {
      * @param {String} handle       Node handle
      * @param {Boolean} isReadonly  Flag to open Editor in read-only mode
      * @param {jQuery} $viewerContainer  just use the plain text content block, aka viewer-mode
-     * @param {Boolean} skipEventLog  Flag to skip event log
+     * @param {Boolean} [skipEventLog]  Flag to skip event log
      * @returns {Promise}           Promise which resolves when editor is setup and initialized
      */
     this.setupEditor = function(fName, txt, handle, isReadonly, $viewerContainer, skipEventLog) {

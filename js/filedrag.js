@@ -513,11 +513,12 @@ function ulDummyFiles(count, len) {
         ts = Math.max(ts, M.v[n].mtime | 0);
     }
 
+    len = len || 512;
     for (var i = count || 6e3; i--;) {
         var now = Date.now();
         var rnd = Math.random();
         var nam = (rnd * now).toString(36);
-        var buf = asmCrypto.getRandomValues(new Uint8Array(rnd * (len || 512)));
+        var buf = mega.getRandomValues(len + rnd * len);
 
         ul.push(new File([buf], nam, {type: 'application/octet-stream', lastModified: ++ts * 1e3}));
     }

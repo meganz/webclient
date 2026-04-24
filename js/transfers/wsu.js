@@ -719,7 +719,7 @@ lazy(mega, 'wsuploadmgr', () => {
                 function errorhandler(ev) {
                     this.pool.wspmgr.wsumgr.logger.error(`Connection error for ${this.url}`, ev);
                     this.reconnectat = this.pool.wspmgr.wsumgr.seconds + 5; // reconnect after 5 seconds
-		}
+                }
 
                 function closehandler(ev) {
                     // ignore the closure of sockets on oDestroy()'d pools
@@ -863,11 +863,7 @@ lazy(mega, 'wsuploadmgr', () => {
             }
 
             // if we have chunks in flight, expect the next response in at most 10 seconds
-            if (ws.chunksonthewire.length) {
-                ws.reconnectat = this.seconds + 10;
-            } else {
-                ws.reconnectat = 0;
-            }
+            ws.reconnectat = ws.chunksonthewire.length ? this.seconds + 10 : 0;
         }
 
         finalise(chunk, type, fu) {
@@ -936,7 +932,7 @@ lazy(mega, 'wsuploadmgr', () => {
         // this loop is responsible for maintaining the (standby) connections and pumping data during transfers
         // since WebSocket doesn't have an onbufferempty(), we need
         // to busy-loop with adaptive frequency to keep the data flowing)
-       async run(val = 500) {
+        async run(val = 500) {
 
             if (!this.poolmgr.pools.length) {
                 this.poolmgr.refreshpools()
@@ -972,7 +968,7 @@ lazy(mega, 'wsuploadmgr', () => {
                 this.running = false;
 
                 // maintain one stand-by connection per pool
-                for (let i = this.poolmgr.pools.length; i--; ) {
+                for (let i = this.poolmgr.pools.length; i--;) {
                     this.poolmgr.pools[i].numconn = 1;
                     this.poolmgr.pools[i].closexconn();
                 }
@@ -1041,6 +1037,62 @@ lazy(mega, 'wsuploadmgr', () => {
 
             this.fileno++;
             this.poolmgr.assignfile(new WsFileUpload(file, this.fileno));
+        }
+
+        // generate file fingerprint (sparse checksum)
+        async fingerprint(file) {
+            const CRC_SIZE = 16;
+            const BLOCK_SIZE = CRC_SIZE << 2;
+
+            const {size, lastModifiedDate, lastModified} = file;
+            const crc = new Uint8Array(CRC_SIZE + 5);
+            const dv = new DataView(crc.buffer);
+
+            if (self.d) {
+                logger.info('Generating fingerprint...', file);
+            }
+
+            if (size <= 8192) {
+                const data = new Uint8Array(await file.arrayBuffer());
+
+                if (size <= CRC_SIZE) {
+                    crc.set(data);
+                }
+                else {
+                    for (let i = 0; i < 4; ++i) {
+                        const offset = i * size >> 2;
+                        const length = (i + 1) * size >> 2;
+
+                        dv.setUint32(i << 2, crc32b(data.subarray(offset, length)));
+                    }
+                }
+            }
+            else {
+                const blocks = parseInt(8192 / (BLOCK_SIZE << 2));
+
+                for (let i = 0; i < 4; ++i) {
+
+                    let v = 0;
+                    for (let j = 0; j < blocks; ++j) {
+                        const offset = parseInt((size - BLOCK_SIZE) * (i * blocks + j) / (4 * blocks - 1));
+                        const data = await file.slice(offset, offset + BLOCK_SIZE).arrayBuffer();
+
+                        v = crc32b(data, v);
+                    }
+
+                    dv.setUint32(i << 2, v);
+                }
+            }
+
+            const ts = Math.min(4294967295, (lastModifiedDate || lastModified || 0) / 1e3);
+
+            dv.setUint8(CRC_SIZE, 4);
+            dv.setUint32(CRC_SIZE + 1, ts, true);
+
+            return {
+                ts,
+                hash: base64urlencode(String.fromCharCode(...crc))
+            };
         }
     }
 

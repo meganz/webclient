@@ -1037,7 +1037,13 @@ if (window.crypto && typeof crypto.getRandomValues === 'function') {
         'use strict';
         mega.getRandomValues = function(len) {
             var seed = new Uint8Array(len || 128);
-            return rand.call(crypto, seed);
+            if (seed.length <= 65536) {
+                return rand.call(crypto, seed);
+            }
+            for (var i = 0; i < seed.length; i += 65536) {
+                rand.call(crypto, seed.subarray(i, i + 65536));
+            }
+            return seed;
         };
         mega.getRandomValues.strong = true;
 

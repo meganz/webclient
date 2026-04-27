@@ -657,22 +657,36 @@ function resetSensitives() {
                     if (!fminitialized || !await onboard().catch(nop)) {
                         return false;
                     }
-
-                    const exportLink = new mega.Share.ExportLink({});
-
                     if (!Array.isArray(handles)) {
                         handles = [handles];
                     }
 
+                    const len = handles.length;
+                    const exportLink = new mega.Share.ExportLink({});
                     const promises = [];
 
-                    for (let i = 0; i < handles.length; i++) {
-                        const n = M.getNodeByHandle(handles[i]);
+                    let hideAnyOutShare = -1; // -1 => ask, 0 => no, 1 => yes
+                    for (let i = 0; i < len; i++) {
+                        const h = handles[i];
+                        const n = M.getNodeByHandle(h);
 
-                        if (!n || exportLink.isTakenDown(n)) {
+                        if (!n || exportLink.isTakenDown(n) || status && mega.sensitives.isSensitive(n)) {
                             continue;
                         }
-
+                        if (status) {
+                            if (hideAnyOutShare === -1 && M.isOutShare(h)) {
+                                const decision = await asyncMsgDialog(
+                                    'confirmation',
+                                    l[870],
+                                    l.warn_hiding_out_shared_nodes,
+                                    l.warn_hiding_out_shared_nodes_confirm
+                                );
+                                hideAnyOutShare = decision ? 1 : 0;
+                            }
+                            if (hideAnyOutShare === 0 && M.isOutShare(h)) {
+                                continue;
+                            }
+                        }
                         if (n.tvf) {
                             fileversioning.sensitiveVersions(n.h, status);
                         }

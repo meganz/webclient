@@ -3579,25 +3579,29 @@ MegaData.prototype.leaveShare = promisify(function(resolve, reject, h) {
 MegaData.prototype.createPublicLink = async function(handle) {
     'use strict';
 
-    await dbfetch.get(handle);
+    await this.collectNodes(handle);
     const n = this.getNodeByHandle(handle);
+    const ns = this.getNodeShare(n);
+    let ph = n.ph || ns.ph;
 
-    if (n.t && this.getNodeShare(n).h !== n.h) {
+    if (n.t && ns.h !== n.h) {
         await api_setshare(n.h, [{u: 'EXP', r: 0}]);
         if (d) {
             console.assert(n.ph, 'Public handle not found...?!');
         }
+        ph = n.ph;
     }
 
-    if (!n.ph) {
+    if (!ph) {
         await api.screq({a: 'l', n: n.h});
+        ph = n.ph;
     }
 
-    if (!n.ph) {
+    if (!ph) {
         throw new Error('Unexpected failure retrieving public handle...');
     }
 
-    const res = {n, ph: n.ph, key: n.t ? u_sharekeys[n.h][0] : n.k};
+    const res = {n, ph, key: n.t ? u_sharekeys[n.h][0] : n.k};
 
     res.link = `${getBaseUrl()}/${n.t ? 'folder' : 'file'}/${res.ph}#${a32_to_base64(res.key)}`;
 

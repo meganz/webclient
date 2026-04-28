@@ -195,6 +195,10 @@ mBroadcaster.once('boot_done', function populate_lx() {
     l.transferit_powered_by_mega = escapeHTML(l.transferit_powered_by_mega)
         .replace(/\[S]/g, '<span class="label">').replace(/\[\/S]/g, '</span>')
         .replace('%1', '<i class="sprite-it-x16-mono icon-mega"></i>');
+    l.blocked_rsn_terminated = escapeHTML(l.blocked_rsn_terminated)
+        .replace('[A]', '<a href="https://mega.io/terms" class="clickurl link primary" target="_blank">')
+        .replace('[/A]', '</a>')
+        .replace('[BR]', ' ');
 
     if (self.is_transferit) {
         for (const k in self.l) {

@@ -11,6 +11,14 @@
 
 /* Dialogs holder */
 
+/* Avoid double blurring */
+
+.global-overlay-container.active ~ .global-dialog-container .it-dialog-holder {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: none;
+}
+
 .it-dialog-holder {
     align-items: center;
     background: var(--main-overlay-strong);
@@ -318,8 +326,6 @@
     max-width: 448px;
     width: 100%;
 }
-
-
 
 
 /* Adaptive layout */

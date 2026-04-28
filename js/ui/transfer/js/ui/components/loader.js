@@ -9,7 +9,7 @@ lazy(T.ui, 'loader', () => {
 
         // @todo: T.ui.overlay
         init() {
-            const cn = document.querySelector('body > .global-overlay-container')
+            const cn = this.data.cn = document.querySelector('body > .global-overlay-container')
                 || ce('div', 'body', { class: 'global-overlay-container' });
 
             this.data.overlay = cn.querySelector('.it-overlay')
@@ -24,6 +24,7 @@ lazy(T.ui, 'loader', () => {
                 return false;
             }
 
+            this.data.cn.classList.remove('active');
             this.data.overlay.classList.add('hidden');
             this.data.spinner.classList.add('hidden');
         },
@@ -33,6 +34,7 @@ lazy(T.ui, 'loader', () => {
                 this.init();
             }
 
+            this.data.cn.classList.add('active');
             this.data.overlay.classList.remove('hidden');
             this.data.spinner.classList.remove('hidden');
         }

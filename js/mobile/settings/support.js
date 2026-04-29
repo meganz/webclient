@@ -15,6 +15,10 @@ mobile.settings.support  = Object.create(mobile.settingsHelper, {
 
             this.domNode = this.generatePage('settings-support');
 
+            const pwmOrVpnFeature = u_attr &&
+                u_attr.features &&
+                u_attr.features.find(e => e[1] === 'pwm' || e[1] === 'vpn');
+            const hasAccess = u_attr && u_attr.p || window.kbCatId || pwmOrVpnFeature;
             /* First Section */
             const menuItems1 = [
                 {
@@ -29,21 +33,22 @@ mobile.settings.support  = Object.create(mobile.settingsHelper, {
                     href: 'contact',
                     rightIcon: null
                 },
-                {
-                    text: l.menu_item_priority_support,
-                    icon: 'sprite-mobile-fm-mono icon-message-circle-thin-outline',
-                    href: 'support',
-                    rightIcon: null,
-                    componentClassname: 'priority-support'
-                },
-                {
-                    text: l[516],
-                    icon: 'sprite-mobile-fm-mono icon-message-circle-thin-outline',
-                    href: 'support',
-                    rightIcon: null,
-                    componentClassname: 'standard-support hidden',
-                    subtext: l.upsell_priority_support
-                }
+                hasAccess ?
+                    {
+                        text: l.menu_item_priority_support,
+                        icon: 'sprite-mobile-fm-mono icon-message-circle-thin-outline',
+                        href: 'support',
+                        rightIcon: null,
+                        componentClassname: 'priority-support'
+                    } :
+                    {
+                        text: l[516],
+                        icon: 'sprite-mobile-fm-mono icon-message-circle-thin-outline',
+                        href: 'support',
+                        rightIcon: null,
+                        componentClassname: 'standard-support',
+                        subtext: l.upsell_priority_support
+                    }
             ];
 
             for (const item of menuItems1) {
@@ -58,15 +63,6 @@ mobile.settings.support  = Object.create(mobile.settingsHelper, {
         value: function() {
 
             mobile.settingsHelper.show.call(this);
-
-            if (u_attr.p) {
-                this.domNode.componentSelector('.priority-support').show();
-                this.domNode.componentSelector('.standard-support').hide();
-            }
-            else {
-                this.domNode.componentSelector('.priority-support').hide();
-                this.domNode.componentSelector('.standard-support').show();
-            }
         }
     }
 });

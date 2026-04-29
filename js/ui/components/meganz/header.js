@@ -550,16 +550,6 @@ class MegaHeader extends MegaMobileHeader {
         mega.ui.header.updateUserName(u_attr.fullname);
         mega.ui.header.updateEmail(u_attr.email);
         mega.ui.header.handleMenu('avatar');
-
-        if (u_attr.p) {
-            mega.ui.header.domNode.component.avatarMenu
-                .querySelector('.priority-support').classList.remove('hidden');
-        }
-        else {
-            mega.ui.header.domNode.component.avatarMenu
-                .querySelector('.standard-support').classList.remove('hidden');
-        }
-
         eventlog(500323);
     }
 
@@ -990,39 +980,44 @@ class MegaHeader extends MegaMobileHeader {
             const upsellSupportOption = {
                 text: l[516],
                 subtext: l.upsell_priority_support,
-                subtextIconSize: 16,
-                href: supportWillRedirect ? 'https://help.mega.io' : '/support',
-                componentClassname: `standard-support ${supportWillRedirect ? 'extlink' : ''} hidden`,
-                ...(supportWillRedirect && { target: '_blank' })
+                href: '/support',
+                componentClassname: 'standard-support',
             };
+
+            const items = [
+                {
+                    componentClassname: 'support small-btn',
+                    text: l[383],
+                    rightIcon: 'sprite-fm-mono icon-chevron-right-thin-outline'
+                },
+                {
+                    componentClassname: 'helpcentre extlink',
+                    text: l[384],
+                    target: '_blank',
+                    href: 'https://help.mega.io/'
+                },
+                {
+                    componentClassname: 'megaio extlink',
+                    text: l.website_label,
+                    target: '_blank',
+                    href: 'https://mega.io/'
+                }
+            ];
+
+            if (page !== 'support') {
+                const supportSubMenu = hasAccess ?
+                    {
+                        componentClassname: 'priority-support',
+                        text: l.menu_item_priority_support,
+                        href: '/support'
+                    } :
+                    upsellSupportOption;
+                items.splice(2, 0, supportSubMenu);
+            }
 
             this.support = _createSubMenu({
                 submenuClass: 'sub-menu support',
-                items: [
-                    {
-                        componentClassname: 'support small-btn',
-                        text: l[383],
-                        rightIcon: 'sprite-fm-mono icon-chevron-right-thin-outline'
-                    },
-                    {
-                        componentClassname: 'helpcentre extlink',
-                        text: l[384],
-                        target: '_blank',
-                        href: 'https://help.mega.io/'
-                    },
-                    {
-                        componentClassname: 'priority-support hidden',
-                        text: l.menu_item_priority_support,
-                        href: '/support'
-                    },
-                    upsellSupportOption,
-                    {
-                        componentClassname: 'megaio extlink',
-                        text: l.website_label,
-                        target: '_blank',
-                        href: 'https://mega.io/'
-                    }
-                ]
+                items,
             });
 
             this.legal = _createSubMenu({

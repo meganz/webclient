@@ -417,7 +417,7 @@ var support = (function() {
             selectedCategory = id;
             supportType = '';
             dom.$relatedList.empty();
-            renderRelatedArticles(raw, id);
+            dom.$related.addClass('hidden');
             createIssueDropDown(id);
             dom.$category.children('span').first().addClass('dirty');
 

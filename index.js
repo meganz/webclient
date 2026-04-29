@@ -1077,14 +1077,8 @@ function init_page() {
         init_key();
     }
     else if (page === 'support') {
-        const hasAccess = (u_attr && u_attr.p) || window.kbCatId;
-        if (u_attr && !hasAccess) {
-            mega.redirect(l.mega_help_host);
-        }
-        else {
-            parsepage(pages.support);
-            support.init(hasAccess);
-        }
+        parsepage(pages.support);
+        support.init();
     }
     else if (page == 'contact') {
         mega.redirect('mega.io', 'contact', false, false);

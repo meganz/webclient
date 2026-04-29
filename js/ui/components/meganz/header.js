@@ -990,7 +990,6 @@ class MegaHeader extends MegaMobileHeader {
             const upsellSupportOption = {
                 text: l[516],
                 subtext: l.upsell_priority_support,
-                subtextIcon: 'sprite-fm-mono icon-help-circle-thin-outline',
                 subtextIconSize: 16,
                 href: supportWillRedirect ? 'https://help.mega.io' : '/support',
                 componentClassname: `standard-support ${supportWillRedirect ? 'extlink' : ''} hidden`,

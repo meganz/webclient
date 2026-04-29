@@ -139,7 +139,7 @@ body.rtl .get-support-block {
     background: var(--mobile-page-background);
 }
 .get-support-block .support-block .mega-input.dropdown-input > * + * {
-    margin-top: 10px;
+    margin-top: 8px;
 }
 .get-support-block .support-block .mega-input.dropdown-input i::before {
     color: var(--mobile-icon-primary);
@@ -153,16 +153,22 @@ body.rtl .get-support-block {
     padding: var(--spacing-3) 0;
     border: 0;
     border-radius: var(--mobile-border-radius-medium);
-    box-shadow: var(--mobile-shadow-subtle);
-    background: var(--mobile-surface-1);
+    box-shadow: var(--mobile-shadow-medium);
+    background: var(--mobile-page-background);
 }
 .get-support-block .support-block .input-blocks .mega-input-dropdown .option {
     min-height: 24px;
-    padding: var(--spacing-4);
+    padding: var(--spacing-5);
     background: none;
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-caption-small-semibold);
+    letter-spacing: 0.02em;
 }
 .get-support-block .support-block .input-blocks .mega-input-dropdown .option:not(.disabled):hover {
-    background: var(--button-hover);
+    background: var(--mobile-surface-1);
+}
+.get-support-block .support-block .input-blocks .mega-input-dropdown .option:not(.disabled):active {
+    background: var(--mobile-surface-2);
 }
 .get-support-block .support-block .info {
     color: var(--mobile-text-secondary);

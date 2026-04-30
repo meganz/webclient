@@ -73,7 +73,6 @@ class MegaHeader extends MegaMobileHeader {
             iconSize: 24,
             dataset: {
                 simpletip: l[165],
-                simpletipClass: 'mobile-theme-tip',
             },
             onClick: () => {
                 if (mega.ui.flyout.name === 'contacts') {
@@ -97,7 +96,6 @@ class MegaHeader extends MegaMobileHeader {
             iconSize: 24,
             dataset: {
                 simpletip: l[7997],
-                simpletipClass: 'mobile-theme-tip',
             },
             onClick: () => {
                 if (!megaChatIsReady) {

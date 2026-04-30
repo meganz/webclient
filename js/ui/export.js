@@ -1057,16 +1057,127 @@ function logExportEvt(evtId, data) {
         return values.join('\n');
     }
 
+    /*
+     * Gets link stats
+     * @param {String} h The node handle.
+     * @returns {Promise<Object|false>} Viewed, downloaded: {v, d}
+     * @private
+     */
+    async function getLinkStats(h) {
+        const {ph} = M.getNodeByHandle(h);
+
+        if (!ph) {
+            if (self.d) {
+                console.warn('Missing public handle when getting link stats for:', ph);
+            }
+            return false;
+        }
+
+        return api.req({ a: 'ls', ph })
+            .then(({result}) => result)
+            .catch(ex => {
+                console.warn(`Getting link stats error for ph: ${ph}`, ex);
+                return false;
+            });
+    }
+
+    /**
+     * Renders link stats (viewing, iteractions).
+     * @param {String} h The node handle.
+     * @param {Element} linkData - DOM element to create stats elems
+     * @returns {void}
+     * @private
+     */
+    function renderLinkStats(h, linkData) {
+        'use strict';
+
+        const ce = (n, t, a) => mCreateElement(n, a, t);
+        const pro = self.u_attr && u_attr.p;
+
+        // Create separator
+        ce('hr', linkData);
+
+        const row = ce('div', linkData, {class: `row${pro ? '' : ' free-usr'}`});
+        const info = ce('div', row, { class: 'flex-1' });
+        const name = ce('div', info, {class: 'flex items-center'});
+        let node = null;
+
+        ce('span', name).textContent = l.link_activity;
+
+        if (!pro) {
+            const loadPro = () => {
+                mega.ui.sheet.hide();
+                loadSubPage('pro');
+            };
+            MegaButton.factory({
+                parentNode: name,
+                text: l[8695],
+                componentClassname: 'pro-only outline link sm-size',
+                type: 'button',
+                eventLog: 501162
+            }).on('click.pro', loadPro);
+
+            node = ce('div', info, {class: 'link-stat-tip'});
+            node.append(parseHTML(l.na_link_activity_info));
+
+            if ((node = node.querySelector('a'))) {
+                node.addEventListener('click', (ev) => {
+                    ev.preventDefault();
+                    eventlog(501161);
+                    loadPro();
+                });
+            }
+        }
+
+        const statsNode = ce('div', row, {class: `flex link-stats${pro ? ' loading' : ''}`});
+        node = ce('div', statsNode, {
+            class: 'link-stat simpletip',
+            'data-simpletip': l.views_tip,
+            'data-simpletip-class': 'compound',
+            'data-simpletipoffset': 4,
+            'data-simpletipposition': 'bottom',
+            'data-simpletiptarget': 'i',
+            'data-simpletipwrapper': 'body'
+        });
+
+        ce('i', node, {class: 'sprite-fm-mono icon-eye-reveal1'});
+        const viewed = ce('span', node, {class: ''});
+
+        node = ce('div', statsNode, {
+            class: 'link-stat simpletip',
+            'data-simpletip': `${l.interactions_tip}[G]${l.interactions_tip_info}[/G]`,
+            'data-simpletip-class': 'large-width compound',
+            'data-simpletipoffset': 4,
+            'data-simpletipposition': 'right',
+            'data-simpletipwrapper': 'body'
+        });
+
+        ce('i', node, {class: 'sprite-fm-mono icon-bar-chart-square'});
+        const interacted = ce('span', node, {class: ''});
+
+        if (pro) {
+            ce('i', statsNode, {class: 'sprite-fm-mono icon-loader-grad-small-regular-outline loader'});
+            getLinkStats(h)
+                .then(({v = 0, d = 0}) => {
+                    viewed.textContent = v;
+                    interacted.textContent = d;
+                })
+                .catch(dump)
+                .finally(() => statsNode.classList.remove('loading'));
+        }
+    }
+
     /**
      * itemExportLinkHtml
      *
      * @param {Object} item Node item to work with
      * @param {Boolean} keySeparated Whether the key should be rendered separately or not
      * @param {String} [protectedLink] Link protected with password
+     * @param {Boolean} isSingle If the link is the only one, display its statistics
      * @returns {String}
      * @private
      */
-    function itemExportLinkHtml(item, keySeparated, protectedLink) {
+    function itemExportLinkHtml(item, keySeparated, protectedLink, isSingle) {
         'use strict';
 
         const nodeHandle = item.h;
@@ -1117,13 +1228,10 @@ function logExportEvt(evtId, data) {
         }
 
         const composeBlock = () => {
+            const ce = (n, t, a) => mCreateElement(n, a, t);
             const addCopyRow = (text, parent, klass, simpletip, copiedMsg, copyEvtId) => {
-                const row = mCreateElement(
-                    'div',
-                    { class: `flex flex-row items-center text-color-high ${klass || ''}` },
-                    parent
-                );
-                mCreateElement('span', { class: 'flex-1 text-ellipsis select-text' }, row).textContent = text;
+                const row = ce('div', parent, {class: `row ${klass || ''}`});
+                ce('span', row, { class: 'flex-1 text-ellipsis select-text' }).textContent = text;
 
                 MegaButton.factory({
                     parentNode: row,
@@ -1142,7 +1250,7 @@ function logExportEvt(evtId, data) {
                     return row;
                 }
 
-                const qrContainer = mCreateElement('div', {class: 'qrcode-container'}, row);
+                const qrContainer = ce('div', row, {class: 'qrcode-container'});
                 let qrPopup;
 
                 const _closeAllActiveQR = () => mega.ui.sheet.overlayNode.componentSelectorAll('.show-qrcode.active')
@@ -1222,11 +1330,7 @@ function logExportEvt(evtId, data) {
                 mCreateElement('i', {class: `item-type-icon icon-${fileIcon(item)}-24 icon-size-8`})
             ]);
             MegaNodeComponent.label.set(item, header.querySelector('i'));
-            const nameRow = mCreateElement(
-                'span',
-                { class: 'text-ellipsis px-2 select-text' },
-                header
-            );
+            const nameRow = ce('span', header, {class: 'text-ellipsis px-2 select-text' });
 
             nameRow.textContent = item.name;
             const numFolders = M.getNodeByHandle(nodeHandle).td;
@@ -1244,30 +1348,27 @@ function logExportEvt(evtId, data) {
                 }
 
                 if (wording) {
-                    mCreateElement(
-                        'span',
-                        { class: 'text-color-medium separator-before px-2 flex-1 whitespace-nowrap' },
-                        header
-                    ).textContent = wording;
+                    ce('span', header, {
+                        class: 'text-color-medium separator-before px-2 flex-1 whitespace-nowrap'
+                    }).textContent = wording;
                 }
             }
             else {
                 nameRow.classList.add('flex-1');
             }
 
-            const block = mCreateElement(
-                'div',
-                { class: 'node-link-block font-body-1', 'data-node-handle': nodeHandle },
-                [header]
-            );
-            const linkData = mCreateElement('div', { class: 'bg-surface-grey-1 rounded-xl p-3' }, block);
+            const block = ce('div', [header], {
+                class: 'node-link-block font-body-1',
+                'data-node-handle': nodeHandle
+            });
+            const linkData = ce('div', block, { class: 'link-body' });
 
             if (protectedLink) {
                 addCopyRow(protectedLink, linkData, 'link-value', l.copy_link, l[1642], 500759);
             }
             else {
                 if (keySeparated) {
-                    mCreateElement('span', { class: 'font-bold text-color-high' }, linkData).textContent = l.link;
+                    ce('span', linkData, { class: 'font-bold text-color-high' }).textContent = l.link;
                 }
 
                 addCopyRow(
@@ -1280,8 +1381,8 @@ function logExportEvt(evtId, data) {
                 );
 
                 if (keySeparated) {
-                    mCreateElement('hr', { class: 'mb-4 border-b border-t-none border-x-none' }, linkData);
-                    mCreateElement('span', { class: 'font-bold text-color-high' }, linkData).textContent = l[1028];
+                    ce('hr', linkData);
+                    ce('span', linkData, { class: 'font-bold text-color-high' }).textContent = l[1028];
                     addCopyRow(
                         fileUrlKey.substring(1),
                         linkData,
@@ -1291,6 +1392,10 @@ function logExportEvt(evtId, data) {
                         500762
                     );
                 }
+            }
+
+            if (isSingle) {
+                renderLinkStats(nodeHandle, linkData);
             }
 
             return block;
@@ -1309,16 +1414,22 @@ function logExportEvt(evtId, data) {
 
         'use strict';
 
-        const { dec, pwdArr } = opts;
-        const items = [];
+        const { dec, pwdArr = [] } = opts;
+        const nodes = [];
 
         for (let i = 0; i < $.itemExport.length; i++) {
-            const value = $.itemExport[i];
-            const node = M.getNodeByHandle(value);
+            const node = M.getNodeByHandle($.itemExport[i]);
 
             if (node && (folderlink || node.ph)) {
-                items.push(itemExportLinkHtml(node, dec, (pwdArr || [])[i]));
+                nodes.push(node);
             }
+        }
+
+        const isSingle = nodes.length === 1;
+        const items = new Array(nodes.length);
+
+        for (let i = 0; i < nodes.length; i++) {
+            items[i] = itemExportLinkHtml(nodes[i], dec, pwdArr[i], isSingle);
         }
 
         return items;
@@ -1912,7 +2023,7 @@ function logExportEvt(evtId, data) {
             const removeBtn = new MegaButton({
                 parentNode: footer.querySelector(':scope > .flex-1'),
                 text: ($.itemExport.length === 1) ? l[6821] : l[8735],
-                componentClassname: 'red text-icon underline-offset-4 font-600 slim no-px'
+                componentClassname: 'button-brand text-icon underline-offset-4 font-600 slim no-px'
             }).on('click.remove', () => {
                 ExportLink.settings.hide();
                 removeLink('settings');
@@ -2631,7 +2742,7 @@ function logExportEvt(evtId, data) {
             MegaButton.factory({
                 parentNode: footer.querySelector(':scope > .flex-1'),
                 text: ($.itemExport.length === 1) ? l[6821] : l[8735],
-                componentClassname: 'red text-icon underline-offset-4 font-600 slim no-px'
+                componentClassname: 'button-brand text-icon underline-offset-4 font-600 slim no-px'
             }).on('click.remove', () => {
                 ExportLink.embed.hide();
                 removeLink('embed');
@@ -3166,6 +3277,31 @@ function logExportEvt(evtId, data) {
         );
     };
 
+    const showLinkStatsDialog = async({ph, h}) => {
+        if (M.isInvalidUserStatus()) {
+            return;
+        }
+
+        h = h || M.getFileLinkHandle(ph);
+
+        if (!h) {
+            return false;
+        }
+
+        const [n] = await dbfetch.node([h]).catch(dump) || [];
+
+        if (!n || !M.getNodeShare(h)) {
+            if (self.d) {
+                console.warn(`Invalid node in link stats dialog for ph: ${ph}...`, h);
+            }
+            return false;
+        }
+
+        await M.openFolder(n.p, true).catch(dump);
+        M.addSelectedNodes([n.h], true);
+        initCopyrightsDialog([n.h]);
+    };
+
     Object.defineProperty(ExportLink, 'pullShareLink', {
         value(handles, quiet, options) {
 
@@ -3187,6 +3323,7 @@ function logExportEvt(evtId, data) {
     scope.mega.Share = scope.mega.Share || {};
     scope.mega.Share.ExportLink = ExportLink;
     scope.mega.Share.initCopyrightsDialog = initCopyrightsDialog;
+    scope.mega.Share.showLinkStatsDialog = showLinkStatsDialog;
     scope.mega.ui = scope.mega.UI || {};
 })(jQuery, window);
 

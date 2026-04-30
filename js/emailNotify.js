@@ -91,5 +91,6 @@
     'account-inactive',
     'DEPRECATED-referral-program',
     'RESERVED-business-usage',
-    'card-expiry'
+    'card-expiry',
+    'link-activity'
 ]);

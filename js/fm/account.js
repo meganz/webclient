@@ -686,7 +686,7 @@ accountUI.inputs = {
             var self = this;
             var $switch = $(identifier, $container);
 
-            if ($switch.attr('id') === 'file-request'){
+            if ($switch.attr('data-inverted')){
                 currentValue = !currentValue;
             }
 
@@ -730,7 +730,7 @@ accountUI.inputs = {
                 newVal = 1;
             }
 
-            newVal = $switch.attr('id') === 'file-request' ? 1 - newVal : newVal;
+            newVal = $switch.attr('data-inverted') ? 1 - newVal : newVal;
             $switch.trigger('update.accessibility');
 
             if (typeof onChangeCb === 'function') {
@@ -1857,6 +1857,9 @@ accountUI.notifications = {
         const $NToggleAll = $('.account-notification .mega-switch.toggle-all', $notificationContent);
         const $NToggle = $('.account-notification .switch-container .mega-switch', $notificationContent);
 
+        // Show Link activity notifications for PRO users
+        $('.link-activity', $notificationContent)[u_attr.p ? 'removeClass' : 'addClass']('hidden');
+
         // Toggle individual notifications
         for (let i = $NToggle.length; i--;) {
             const el = $NToggle[i];
@@ -1896,7 +1899,7 @@ accountUI.notifications = {
                     var $section = $this.closest('.switch-container');
                     var sectionName = accountUI.notifications.getSectionName($section);
 
-                    const invert = $this.attr('name') === 'upload' ? !val : val;
+                    const invert = $this.attr('data-inverted') ? !val : val;
                     const notifChange = invert ? mega.notif.set : mega.notif.unset;
 
                     notifChange($this.attr('name'), sectionName);

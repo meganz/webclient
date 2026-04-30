@@ -136,6 +136,18 @@ a.notification-item.clickable {
 .notification-item:hover {
     background: var(--surface-grey-4);
 }
+.notification-item.auto-height .notification-content {
+    min-height: auto;
+}
+.notification-item .notification-icon {
+    margin: 12px 0;
+}
+.notification-item .notification-icon i {
+    --icon-size: 32px;
+}
+.notification-item .notification-icon i.visible {
+    display: block;
+}
 .notification-filter {
     margin-inline: 2px;
     min-width: 200px;

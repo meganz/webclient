@@ -4707,6 +4707,29 @@ MegaData.prototype.getFileLinkNode = async function(ph, key) {
     return n;
 };
 
+/**
+ * Retrieve handle by public handle if the link.
+ * @param {String} ph public-handle
+ * @return {String} handle.
+ */
+MegaData.prototype.getFileLinkHandle = function(ph) {
+    'use strict';
+
+    const {EXP} = this.su;
+
+    if (!ph || !EXP) {
+        return false;
+    }
+
+    for (const h in EXP) {
+        if (EXP[h].ph === ph) {
+            return h;
+        }
+    }
+
+    return false;
+};
+
 // eslint-disable-next-line complexity -- @private
 MegaData.prototype.bulkLinkReview = async function(data, clean) {
     'use strict';

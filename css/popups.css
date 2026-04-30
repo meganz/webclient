@@ -599,3 +599,18 @@ body.tl .dropdown.body.popup.contacts-search {
     max-width: 206px;
     text-align: start;
 }
+
+.dark-direct-tooltip.simpletip-tooltip.compound {
+    box-sizing: border-box;
+}
+
+.dark-direct-tooltip.simpletip-tooltip.compound span {
+    font: var(--mobile-font-copy-semibold);
+}
+
+.dark-direct-tooltip.simpletip-tooltip.compound span.gray-text {
+    color: var(--mobile-text-inverse-secondary);
+    display: block;
+    font: var(--mobile-font-caption-large-regular);
+    margin: 4px 0 0;
+}

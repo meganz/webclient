@@ -2478,10 +2478,15 @@ body.de .mega-dialog.contact-picker-widget {
         padding: 16px 24px 20px;
     }
 
-
 /* end device-rename-dialog */
 
 /* export-links-dialog */
+
+    .mega-sheet .toggle-wrapper,
+    .mega-sheet button {
+        cursor: pointer;
+    }
+
     .mega-sheet.export-links-dialog,
     .mega-sheet.export-links-settings-dialog,
     .mega-sheet.link-embed-dialog,
@@ -2493,19 +2498,111 @@ body.de .mega-dialog.contact-picker-widget {
     .mega-sheet.export-links-dialog .link-access-text {
         color: var(--mobile-text-info);
     }
+
     .mega-sheet.export-links-settings-dialog .learn-more-text {
         color: var(--mobile-link-primary);
     }
+
     .mega-sheet.export-links-dialog .title {
         width: 100%;
     }
+
     .mega-sheet.export-links-dialog .main {
         max-height: 490px;
     }
-    .mega-sheet .toggle-wrapper,
-    .mega-sheet button {
-        cursor: pointer;
+
+    .mega-sheet.export-links-dialog .link-body {
+        background: var(--surface-grey-1);
+        border-radius: 8px;
+        padding: 12px;
     }
+
+    .mega-sheet.export-links-dialog .link-body .row {
+        align-items: center;
+        color: var(--text-color-high);
+        display: flex;
+        flex-direction: row;
+    }
+
+    .mega-sheet.export-links-dialog .link-body hr {
+        background: var(--mobile-border-strong);
+        border: 0;
+        height: 1px;
+        margin: 14px 0;
+        padding: 0;
+    }
+
+    .mega-sheet.export-links-dialog .link-body button.text-icon {
+        margin: -4px 0;
+    }
+
+    .mega-sheet.export-links-dialog .link-body .pro-only {
+        margin-inline-start: 4px;
+    }
+
+    .mega-sheet.export-links-dialog .link-stats {
+        position: relative;
+    }
+
+    .mega-sheet.export-links-dialog .link-stat {
+        --icon-size: 24px;
+        align-items: center;
+        display: flex;
+        transition: var(--transition-opacity);
+        transition-duration: .4s;
+    }
+
+    .mega-sheet.export-links-dialog .free-usr .link-stat span {
+        filter: blur(0.25em);
+    }
+
+    .mega-sheet.export-links-dialog .free-usr .link-stat span::before {
+        content: '000';
+    }
+
+    .mega-sheet.export-links-dialog .link-stat + .link-stat {
+        margin-inline-start: 16px;
+    }
+
+    .mega-sheet.export-links-dialog .link-stat > * {
+        margin-inline-start: 8px;
+    }
+
+    .mega-sheet.export-links-dialog .loader {
+        margin: -10px 8px;
+        opacity: 0;
+        position: absolute;
+        right: 0;
+        top: 50%;
+        transition: var(--transition-opacity), var(--transition-visibility);
+        transition-duration: .4s;
+        visibility: hidden;
+    }
+
+    .rtl .mega-sheet.export-links-dialog .loader {
+        left: 0;
+        right: auto;
+    }
+
+    .mega-sheet.export-links-dialog .loading .loader {
+        animation: rotate 0.8s infinite linear;
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .mega-sheet.export-links-dialog .loading .link-stat {
+        opacity: 0;
+    }
+
+    .mega-sheet.export-links-dialog .loading .loader {
+        display: block;
+    }
+
+    .mega-sheet.export-links-dialog .link-stat-tip {
+        color: var(--mobile-text-secondary);
+        font: var(--mobile-font-caption-small-regular);
+    }
+
     .export-links-settings-dialog input.set-date {
         cursor: pointer;
         background-color: var(--mobile-page-background);
@@ -2657,7 +2754,9 @@ body.de .mega-dialog.contact-picker-widget {
         margin-top: 0;
     }
 
-    /* QR code popup */
+/* end of export-links-dialog */
+
+/* QR code popup */
 
     body.web-desktop .mega-sheet.export-links-dialog .node-link-block button.copy-field,
     .mega-sheet.export-links-dialog .qrcode-container {

@@ -249,6 +249,10 @@ button.nav-elem.no-active:active,
 .nav-elem.text-icon.red {
     color: var(--secondary-red);
 }
+.nav-elem.text-only.button-brand,
+.nav-elem.text-icon.button-brand {
+    color: var(--mobile-text-brand);
+}
 .nav-elem.text-only.no-deco,
 .nav-elem.full-width.text-icon,
 .nav-elem.full-width.text-only {
@@ -516,12 +520,22 @@ button.nav-elem.no-active:active,
 button.nav-elem.pro-only,
 button.nav-elem.pro-only:hover,
 button.nav-elem.pro-only:active {
-    color: var(--secondary-red);
-    border-color: var(--secondary-red);
-    font-size: 12px;
+    color: var(--mobile-brand-default);
+    border-color: var(--mobile-brand-default);
     padding: 0 8px;
     height: 28px;
     cursor: pointer;
+}
+
+button.nav-elem.pro-only.sm-size {
+    border-radius: 2px;
+    border-width: 1px;
+    height: 18px;
+    padding: 0 4px;
+}
+
+button.nav-elem.pro-only.sm-size span {
+    font: var(--mobile-font-caption-small-regular);
 }
 
 .nav-elem .right-badge {

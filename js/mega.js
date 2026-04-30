@@ -4083,8 +4083,9 @@ function loadfm_done(mDBload) {
 
             // Securing previously generated public album data to use later in the importing procedure
             if (localStorage.albumLinkImport) {
-                $.albumImport = Object.values(mega.gallery.albums.store)
-                    .find(({ph}) => ph === localStorage.albumLinkImport);
+
+                $.albumImport = JSON.parse(localStorage.albumLinkImport);
+
                 delete localStorage.albumLinkImport;
             }
         });

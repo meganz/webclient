@@ -2114,6 +2114,10 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[A1]', `<a class="link" href="https://transfer.it/start" target="_blank" rel="noopener">`)
         .replace('[/A1]', '</a>');
 
+    l.na_link_activity_info = escapeHTML(l.na_link_activity_info)
+        .replace('[A]', `<a href="/pro" class="link clickurl">`)
+        .replace('[/A]', '</a>');
+
     const common = [
         15536, 16119, 16120, 16313, 16316, 16360, 18228, 18268, 18282,
         18284, 18285, 18286, 18287, 18289, 18290, 18291, 18294, 18295, 18296, 18297, 18298, 18302, 18303, 18304,

@@ -1021,7 +1021,7 @@
                                 while (len--) {
 
                                     // Cloud_UPLOAD/file-request is inverted, so this will 'set' it
-                                    if (grp[len] === 'CLOUD_UPLOAD') {
+                                    if (grp[len] === 'CLOUD_UPLOAD' || grp[len] === 'CLOUD_LINKSTATS') {
                                         this.unset(grp[len]);
                                     }
                                     else {
@@ -1056,6 +1056,6 @@
 
 })({
     chat: ['ENABLED'],
-    cloud: ['ENABLED', 'NEWSHARE', 'DELSHARE', 'NEWFILES', 'UPLOAD'],
+    cloud: ['ENABLED', 'NEWSHARE', 'DELSHARE', 'NEWFILES', 'UPLOAD', 'LINKSTATS'],
     contacts: ['ENABLED', 'FCRIN', 'FCRACPT', 'FCRDEL']
 });

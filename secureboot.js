@@ -1037,7 +1037,13 @@ if (window.crypto && typeof crypto.getRandomValues === 'function') {
         'use strict';
         mega.getRandomValues = function(len) {
             var seed = new Uint8Array(len || 128);
-            return rand.call(crypto, seed);
+            if (seed.length <= 65536) {
+                return rand.call(crypto, seed);
+            }
+            for (var i = 0; i < seed.length; i += 65536) {
+                rand.call(crypto, seed.subarray(i, i + 65536));
+            }
+            return seed;
         };
         mega.getRandomValues.strong = true;
 
@@ -2606,7 +2612,6 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/mobile.recovery.enter-key.js', n: 'mobile_rec_enter_key_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.recovery.change-password.js', n: 'mobile_rec_change_password_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.register.js', n: 'mobile_register_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.signin.js', n: 'mobile_signin_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.upload-overlay.js', n: 'mobile_upload_overlay_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.contact-link.js', n: 'mobile_contactlink_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.twofactor.js', n: 'mobile_twofactor_js', j: 1, w: 1});

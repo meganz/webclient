@@ -225,6 +225,13 @@ function api_reqfailed(channel, error) {
     var e = error | 0;
     var c = channel | 0;
 
+    const logout = () => {
+        u_logout(true);
+        if (self.is_transferit) {
+            onIdle(() => T.ui.pageHeader.init());
+        }
+    };
+
     if (mega.state & window.MEGAFLAG_LOADINGCLOUD) {
         if (this.status === true && e === EAGAIN) {
             mega.loadReport.EAGAINs++;
@@ -236,24 +243,12 @@ function api_reqfailed(channel, error) {
             mega.loadReport.errs++;
         }
     }
-    else if (self.is_transferit) {
-        if (e === ESID) {
-            u_logout(true);
-            onIdle(() => T.ui.pageHeader.init());
-            onIdle(() => showToast('clipboard', l[19]));
-            loadSubPage('start');
-        }
-        else {
-            console.error(`unhandled request-level error on #${c}...`, e);
-        }
-        return e;
-    }
     else if (self.is_iframed) {
         // most of the functions used here are not available on i-framed contexts, show a generic message.
         tell(e);
         if (e === ESID || e === EBLOCKED) {
             window.onerror = null;
-            u_logout(true);
+            logout();
         }
         return e;
     }
@@ -266,7 +261,7 @@ function api_reqfailed(channel, error) {
     }
 
     if (e === ESID) {
-        u_logout(true);
+        logout();
         Soon(function() {
             showToast('clipboard', l[19]);
         });
@@ -285,7 +280,11 @@ function api_reqfailed(channel, error) {
 
         api_req({ a: 'whyamiblocked' }, {
             callback: function whyAmIBlocked(reasonCode) {
-                var setLogOutOnNavigation = function() {
+                const setLogOutOnNavigation = () => {
+                    if (self.transfer_it) {
+                        logout();
+                        return false;
+                    }
                     onIdle(function() {
                         mBroadcaster.once('pagechange', function() {
                             u_logout().then(() => location.reload(true));
@@ -321,7 +320,7 @@ function api_reqfailed(channel, error) {
                     if (is_mobile) {
                         loadSubPage('sms/add-phone-suspended');
                     }
-                    else {
+                    else if (self.sms) {
                         sms.phoneInput.init(true);
                     }
 
@@ -342,7 +341,7 @@ function api_reqfailed(channel, error) {
                 }
 
                 // Log the user out for all scenarios except SMS required (500)
-                u_logout(true);
+                logout();
 
                 // if fm-overlay click handler was initialized, we remove the handler to prevent dialog skip
                 $('.fm-dialog-overlay').off('click.fm');

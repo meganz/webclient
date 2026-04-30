@@ -494,7 +494,17 @@
                 icon: 'sprite-fm-mono icon-file-upload-thin-outline',
                 onClick() {
                     eventlog(500011);
-                    document.getElementById('fileselect1').click();
+                    if (fmconfig.dlThroughMEGAsync && !window.useMegaSync) {
+                        // Browser may block this action if megasync takes too long. If so webclient starts the upload.
+                        tSleep.race(1, megasync.preCheck())
+                            .catch(dump)
+                            .finally(() => {
+                                document.getElementById('fileselect1').click();
+                            });
+                    }
+                    else {
+                        document.getElementById('fileselect1').click();
+                    }
                 }
             },
             {
@@ -503,7 +513,16 @@
                 icon: 'sprite-fm-mono icon-folder-arrow-01-thin-outline',
                 onClick() {
                     eventlog(500009);
-                    document.getElementById('fileselect2').click();
+                    if (fmconfig.dlThroughMEGAsync && !window.useMegaSync) {
+                        tSleep.race(1, megasync.preCheck())
+                            .catch(dump)
+                            .finally(() => {
+                                document.getElementById('fileselect2').click();
+                            });
+                    }
+                    else {
+                        document.getElementById('fileselect2').click();
+                    }
                 }
             },
             {

@@ -924,6 +924,14 @@ function init_page() {
     else if (page.substr(0, 11) === 'activate-s4') {
         ActivateS4Page.load();
     }
+    else if (page.substr(0, 5) === 'stats') {
+        const ph = page.slice(6);
+
+        if (ph) {
+            sessionStorage.statsHandle = ph;
+        }
+        loadSubPage('fm');
+    }
     else if (page === 'confirm') {
 
         loadingDialog.show();
@@ -1077,14 +1085,8 @@ function init_page() {
         init_key();
     }
     else if (page === 'support') {
-        const hasAccess = (u_attr && u_attr.p) || window.kbCatId;
-        if (u_attr && !hasAccess) {
-            mega.redirect(l.mega_help_host);
-        }
-        else {
-            parsepage(pages.support);
-            support.init(hasAccess);
-        }
+        parsepage(pages.support);
+        support.init();
     }
     else if (page == 'contact') {
         mega.redirect('mega.io', 'contact', false, false);
@@ -3457,11 +3459,11 @@ mBroadcaster.addListener('fm:initialized', () => {
     return 0xDEAD;
 });
 
-// After open folder call, check if we should restore any previously opened preview node.
+// After open folder call, restore any previously opened preview node/open Share dialog.
 mBroadcaster.once('mega:openfolder', () => {
     'use strict';
 
-    const {previewNode} = sessionStorage;
+    const {previewNode, statsHandle: ph} = sessionStorage;
     if (previewNode) {
         sessionStorage.removeItem('previewNode');
 
@@ -3469,6 +3471,10 @@ mBroadcaster.once('mega:openfolder', () => {
         if (!M.isAlbumsPage()) {
             slideshow(previewNode);
         }
+    }
+    else if (ph) {
+        sessionStorage.removeItem('statsHandle');
+        mega.Share.showLinkStatsDialog({ph}).catch(tell);
     }
 
     // Send some data to mega.io that we logged in

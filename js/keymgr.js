@@ -129,7 +129,7 @@ lazy(mega, 'keyMgr', () => {
         : async(handler) => handler();
 
     const eventlog = (...args) => {
-        if (window.buildOlderThan10Days) {
+        if (window.buildOlderThan10Days || window.isLoggingOut) {
             logger.warn(...args);
         }
         else {
@@ -814,9 +814,15 @@ lazy(mega, 'keyMgr', () => {
 
             const error = this.unserialise(new Uint8Array(res));
             if (error) {
+                if (error === 3 && !self.u_handle) {
+                    assert(self.isLoggingOut, 'ex(3)-unserialise');
+
+                    // wait indefinitely, we're logging out and a reload() must happen
+                    return mega.promise;
+                }
                 const {owner, actors} = mBroadcaster.crossTab;
                 eventlog(501220, JSON.stringify([
-                    1,
+                    2,
                     error,
                     stage,
                     res.byteLength,

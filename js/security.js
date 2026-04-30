@@ -582,6 +582,10 @@ var security = {
             $.hideTopMenu();
         }
 
+        if (!('abort' in M.safeShowDialog)) {
+            return false;
+        }
+
         // abort any ongoing dialog operation that may would get stuck by receiving an whyamiblocked=700
         M.safeShowDialog.abort();
 

@@ -213,6 +213,7 @@ mBroadcaster.once('boot_done', () => {
         getS4NodeType: dummy,
         getNodeShareUsers: dummy,
         getShareNodesSync: dummy,
+        showOverStorageQuota: dummy,
         shouldCreateThumbnail: () => true,
         hasPendingTransfers: () => !!ulmanager.isUploading,
         resetUploadDownload() {
@@ -352,8 +353,10 @@ mBroadcaster.once('boot_done', () => {
             return res || false;
         }
     });
+    self.fm_fullreload = e => e;
     self.percent_megatitle = dummy;
     self.loadingDialog = {show: () => T.ui.loader.show(), hide: () => T.ui.loader.hide()};
+    self.loadingInitDialog = {show: dummy, hide: dummy};
     self.ASSERT = (e, m) => e || dump(m);
     self.requesti = Math.random() * Number.MAX_SAFE_INTEGER;
 
@@ -476,6 +479,13 @@ function msgDialog(type, title, msg, submsg) {
     if (d) {
         console.debug('msgDialog', type, title, msg, submsg);
     }
+
+    if (!title) {
+        title = msg;
+        msg = submsg;
+        submsg = '';
+    }
+
     return T.ui.msgDialog.show({msg, submsg, title, type});
 }
 

@@ -35,6 +35,7 @@
             border-width: 0 0 2px;
             border-radius: 50%;
             transition: var(--transition-all);
+            z-index: 10;
         }
         .media-viewer .viewer-bars.image-controls {
             bottom: 0;

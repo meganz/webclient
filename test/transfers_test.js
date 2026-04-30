@@ -158,13 +158,19 @@ describe("Transfers Unit Test", function() {
         chunk.run();
     });
 
-    it("can generate file fingerprint", function(done) {
-        var file = new Blob([new Array(8195).join("0")]);
-        file.lastModifiedDate = new Date(1445816183620);
-        file.name = 'foo.bin';
-        getFingerprint(file).then(function(r) {
-            chai.assert.strictEqual(r.hash, 'xUNCAcVDQgHFQ0IBxUNCAQR3Zy1W');
-            done();
-        });
+    it("can generate file fingerprint", async() => {
+        const tst = new Map([
+            [7, 'MDAwMDAwAAAAAAAAAAAAAAR3Zy1W'],
+            [25, 'OUYF5jlGBeY5RgXmOUYF5gR3Zy1W'],
+            [2e5, 'xUNCAcVDQgHFQ0IBxUNCAQR3Zy1W'],
+            [8195, 'xUNCAcVDQgHFQ0IBxUNCAQR3Zy1W']
+        ]);
+        const lastModified = new Date(1445816183620);
+
+        for (const [s, c] of tst) {
+            const file = new File([new Array(s).join("0")], 'foo.bin', {lastModified});
+
+            chai.assert.strictEqual((await getFingerprint(file)).hash, c);
+        }
     });
 });

@@ -43,7 +43,6 @@ class MegaFlyoutMenu extends MegaComponent {
             icon: 'sprite-fm-mono icon-dialog-close',
             dataset: {
                 simpletip: l.close_panel,
-                simpletipClass: 'mobile-theme-tip',
             },
             onClick: () => {
                 this.trigger('close');
@@ -363,7 +362,6 @@ class MegaFlyoutMenu extends MegaComponent {
         if (options.targetLabel) {
             this.openButton.dataset = {
                 simpletip: options.targetLabel,
-                simpletipClass: 'mobile-theme-tip',
             };
             this.openButton.addClass('simpletip');
         }
@@ -944,7 +942,6 @@ class MegaFlyoutMenu extends MegaComponent {
                     icon: 'sprite-fm-mono icon-message-chat-circle-thin',
                     dataset: {
                         simpletip: l.send_message,
-                        simpletipClass: 'mobile-theme-tip',
                     },
                     onClick() {
                         mega.ui.flyout.flyoutMenu.hide();
@@ -959,7 +956,6 @@ class MegaFlyoutMenu extends MegaComponent {
                     icon: 'sprite-fm-mono icon-phone-01-thin-outline',
                     dataset: {
                         simpletip: l.call_contact.replace('%s', uName),
-                        simpletipClass: 'mobile-theme-tip',
                     },
                     onClick({ currentTarget }) {
                         if (currentTarget.disabled || M.isInvalidUserStatus()) {
@@ -1013,7 +1009,6 @@ class MegaFlyoutMenu extends MegaComponent {
                     icon: 'sprite-fm-mono icon-share-thin-outline',
                     dataset: {
                         simpletip: l.share_to_contact.replace('%s', uName),
-                        simpletipClass: 'mobile-theme-tip',
                     },
                     onClick({ currentTarget }) {
                         if (currentTarget.disabled || M.isInvalidUserStatus()) {
@@ -1057,7 +1052,6 @@ class MegaFlyoutMenu extends MegaComponent {
                         icon: 'sprite-fm-mono icon-trash-thin-outline',
                         dataset: {
                             simpletip: l[1001],
-                            simpletipClass: 'mobile-theme-tip'
                         },
                         onClick: () => {
                             fmremove(contactHandle);

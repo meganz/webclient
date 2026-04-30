@@ -268,7 +268,30 @@ function chksum(buf) {
      * @returns {Promise}
      * @global
      */
-    scope.getFingerprint = function(file) {
+    scope.getFingerprint = async(file) => {
+        let res;
+        if (file instanceof Blob && file.name) {
+            if (file.hash && file.ts) {
+                return {hash: file.hash, ts: file.ts};
+            }
+            for (let i = 5; i--;) {
+                // @todo tSleep.race() ?
+                res = await mega.wsuploadmgr.fingerprint(file).catch(echo);
+                if (res.hash) {
+                    return res;
+                }
+
+                if (self.d) {
+                    ulmanager.logger.warn(`fingerprint creation failed, retrying...`, res, file);
+                }
+                await tSleep(2 + Math.random());
+            }
+        }
+
+        throw res || 0x8052000e;
+    };
+    // @todo remove in 3 months
+    scope.getFingerprint2 = function(file) {
         return new Promise(function(resolve, reject) {
             var logger = d && new MegaLogger('fingerprint:'
                 + file.size + ':..' + String(file.name).substr(-8), false, ulmanager.logger);

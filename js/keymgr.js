@@ -10,6 +10,7 @@ lazy(mega, 'keyMgr', () => {
     });
     let gUpdateConcurrency = 0;
     const logger = MegaLogger.getLogger('KeyMgr');
+    const stringify = tryCatch(v => JSON.stringify(v));
     const dump = logger.warn.bind(logger, 'Caught Promise Rejection');
     const deepShareScan = tryCatch(() => !!localStorage.deepss)() || mega.flags.dss === 7;
 
@@ -95,30 +96,53 @@ lazy(mega, 'keyMgr', () => {
         if (u_attr['^!keys']) {
             logger.warn('Cleaning ug-provided ^!keys attribute.');
             delete u_attr['^!keys'];
+
+            if (mega.keyMgr.upvtrace) {
+                mega.keyMgr.upvtrace.push('CCU');
+            }
         }
         if (aRemAttrVersion && mega.attr._versions[`${u_handle}_^!keys`]) {
             logger.warn('Cleaning stored ^!keys-attr version...', mega.attr._versions[`${u_handle}_^!keys`]);
             mega.attr._versions[`${u_handle}_^!keys`] = null;
+
+            if (mega.keyMgr.upvtrace) {
+                mega.keyMgr.upvtrace.push('CCV');
+            }
         }
         return attribCache.removeItem(`${u_handle}_^!keys`);
     };
 
     const syncRemoteKeysAttribute = async(keyMgr) => {
+        if (keyMgr.upvtrace) {
+            keyMgr.upvtrace.push('RS');
+        }
         await cleanupCachedAttribute();
 
         return Promise.resolve(mega.attr.get(u_handle, 'keys', -2, true))
             .then((result) => {
                 assert(typeof result === 'string' && result.length > 0, `KeyMgr: Bogus fetch-result, "${result}"`);
 
+                if (keyMgr.upvtrace) {
+                    keyMgr.upvtrace.push('RSI');
+                }
                 return keyMgr.importKeysContainer(result, -0x9f7e);
             })
             .then(() => {
                 if (d) {
                     logger.debug('Remote attribute synced, checking pending shares and missing keys...');
                 }
+                if (keyMgr.upvtrace) {
+                    keyMgr.upvtrace.push('RSC');
+                }
                 keyMgr.acceptPendingInShares().catch(dump);
             })
             .catch((ex) => {
+                if (keyMgr.upvtrace) {
+                    if (keyMgr.importfailure) {
+                        keyMgr.upvtrace.push(`[${keyMgr.importfailure}]`);
+                    }
+                    tryCatch(() => keyMgr.upvtrace.push(`RSE(${ex})`), () => keyMgr.upvtrace.push(`RSE(?)`))();
+                }
                 cleanupCachedAttribute(1).catch(dump);
                 throw ex;
             });
@@ -229,6 +253,12 @@ lazy(mega, 'keyMgr', () => {
 
             // if there was a failure importing ^!keys
             this.importfailure = false;
+
+            // upv request validation from received action-packet version.
+            this.uaAckV = false;
+
+            // upv debug tracing
+            this.upvtrace = false;
 
             // feature flag: enable with the blog post going live
             this.secure = true;
@@ -402,7 +432,9 @@ lazy(mega, 'keyMgr', () => {
             }
 
             const identity = this.gettlv(blob, tagpos, 3);
-            if (ab_to_base64(identity) !== u_handle) {
+            const uh = ab_to_base64(identity);
+            if (uh !== u_handle) {
+                this.importfailure = [uh, u_handle];
                 return 3;
             }
 
@@ -822,14 +854,16 @@ lazy(mega, 'keyMgr', () => {
                 }
                 const {owner, actors} = mBroadcaster.crossTab;
                 eventlog(501220, JSON.stringify([
-                    2,
+                    3,
                     error,
                     stage,
                     res.byteLength,
                     !!owner | 0,
-                    Object(actors).length | 0
+                    Object(actors).length | 0,
+                    this.importfailure,
+                    this.upvtrace && this.upvtrace.join('|')
                 ]));
-                this.importfailure = `unserialise(${error})`;
+                this.importfailure = `unserialise(${error})${this.importfailure || ''}`;
                 throw new SecurityError(`
                     The cryptographic state of your account appears corrupt.
                     Your data cannot be accessed safely. Please try again later.
@@ -851,13 +885,14 @@ lazy(mega, 'keyMgr', () => {
 
                     const {owner, actors} = mBroadcaster.crossTab;
                     eventlog(99812, JSON.stringify([
-                        5,
+                        6,
                         this.generation,
                         lastKnown,
                         !!owner | 0,
                         Object(actors).length | 0,
                         this.versionclash | 0,
-                        stage === -0x9f7e ? 1 : 0
+                        stage === -0x9f7e ? 1 : 0,
+                        this.upvtrace && this.upvtrace.join('|')
                     ]));
 
                     /**
@@ -875,7 +910,11 @@ lazy(mega, 'keyMgr', () => {
 
         // newest known generation persistence.
         async setGeneration(generation) {
-            const key = `keysgen_${u_handle}`;
+            const key = `keysgen2_${u_handle}`;
+
+            if (this.upvtrace) {
+                this.upvtrace.push(`SV${generation}`);
+            }
 
             tryCatch(() => localStorage.setItem(key, generation))();
             await M.setPersistentData(key, generation).catch(dump);
@@ -886,7 +925,7 @@ lazy(mega, 'keyMgr', () => {
             const {u_handle} = window;
             console.assert(String(u_handle).length === 11, 'check this..', u_handle);
 
-            const key = `keysgen_${u_handle}`;
+            const key = `keysgen2_${u_handle}`;
             let value = parseInt(tryCatch(() => localStorage.getItem(key))()) || 0;
 
             if (typeof M.getPersistentData === 'function') {
@@ -904,6 +943,10 @@ lazy(mega, 'keyMgr', () => {
                 value = Math.max(value, dbValue);
             }
 
+            if (this.upvtrace) {
+                this.upvtrace.push(`GV${value}`);
+            }
+
             return value || false;
         }
 
@@ -911,6 +954,10 @@ lazy(mega, 'keyMgr', () => {
         async fetchKeyStore() {
             if (d) {
                 logger.warn('*** FETCH', this.commitPromise, this.fetchPromise);
+            }
+
+            if (this.upvtrace) {
+                this.upvtrace.push(`F(${!!this.commitPromise | 0}${!!this.fetchPromise | 0})`);
             }
 
             // piggyback onto concurent commit()s
@@ -1002,6 +1049,11 @@ lazy(mega, 'keyMgr', () => {
 
                     this.versionclash = false;
                     this.resolveCommitFetchPromises(res || true);
+
+                    if (self.d) {
+                        logger.debug('upvtrace', this.upvtrace.join('|'));
+                    }
+                    this.upvtrace = false;
                 })
                 .catch((ex) => {
 
@@ -1020,8 +1072,10 @@ lazy(mega, 'keyMgr', () => {
                         logger.error('*** FAIL', ex);
                     }
 
-                    tSleep(2 + -Math.log(Math.random()) * 4)
+                    tSleep(2 + Math.random())
                         .then(() => this.resolveCommitFetchPromises(false));
+
+                    tryCatch(() => this.upvtrace.push(`RTY(${ex})`), () => this.upvtrace.push(`RTY(?)`))();
                 });
 
             this.pendingcommit = false;
@@ -1036,6 +1090,14 @@ lazy(mega, 'keyMgr', () => {
                 eventlog(501214, JSON.stringify([1, gUpdateConcurrency, generation, this.versionclash | 0]));
             }
 
+            if (this.upvtrace) {
+                this.upvtrace.push('>S');
+            }
+            else {
+                this.upvtrace = ['S'];
+            }
+            this.uaAckV = -1;
+
             return this.getKeysContainer()
                 .then((result) => {
                     this.prevkeys = result;
@@ -1043,20 +1105,31 @@ lazy(mega, 'keyMgr', () => {
                     return mega.attr.set2(cmds, 'keys', result, -2, true, {kv: generation});
                 })
                 .then((result) => {
-                    if (generation === this.generation + 1) {
+                    const type = typeof result;
+                    const aver = result && type === 'object' && result['^!keys'];
+                    if (generation === this.generation + 1 && this.uaAckV === aver) {
                         this.generation++;
 
                         if (d) {
                             logger.log(`new generation ${generation}`, result);
                         }
                         gUpdateConcurrency--;
-                        return this.setGeneration(generation).catch(dump).then(() => result);
+                        return this.setGeneration(generation).catch(dump).then(() => aver);
                     }
-                    eventlog(501219, JSON.stringify([1, generation, this.generation]), true);
+                    const data = [
+                        2,
+                        generation, this.generation,
+                        type, result,
+                        this.uaAckV,
+                        this.upvtrace.join('|')
+                    ];
+                    eventlog(501219, stringify(data), true);
                     throw EBLOCKED;
                 })
                 .catch(async(ex) => {
                     gUpdateConcurrency--;
+
+                    tryCatch(() => this.upvtrace.push(`E(${ex})`), () => this.upvtrace.push(`E(?)`))();
 
                     if (ex === EEXPIRED) {
 
@@ -1069,6 +1142,9 @@ lazy(mega, 'keyMgr', () => {
                     }
 
                     throw ex;
+                })
+                .finally(() => {
+                    this.uaAckV = false;
                 });
         }
 
@@ -1086,6 +1162,10 @@ lazy(mega, 'keyMgr', () => {
 
             if (d) {
                 logger.warn('Resolving promises...', r, p, rp, fp);
+            }
+
+            if (this.upvtrace) {
+                this.upvtrace.push(`RCFP([${r}]:${!!p | 0}${!!rp | 0}${!!fp | 0})`);
             }
 
             if (p) {
@@ -1985,6 +2065,9 @@ lazy(mega, 'keyMgr', () => {
                 if (!changed || this.unableToCommit()) {
                     return api.screq(cmds);
                 }
+
+                // the below code is not currently reached, but...
+                logger.error('FIXME'); // the caller won't receive the expected apiv3-style response
 
                 const res = await this.commit(cmds);
                 if (res) {

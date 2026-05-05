@@ -791,8 +791,10 @@ mBroadcaster.once('boot_done', () => {
                                 l[`mobile_${node.t ? 'folder' : 'file'}_restored_from_bin`], 1
                             );
 
-                            const nodeParent = node.rr || node.p;
-
+                            let nodeParent = node.rr || node.p;
+                            if (M.getS4NodeType(nodeParent)) {
+                                nodeParent = M.RootID;
+                            }
                             // toast message
                             mega.ui.toast.show(
                                 msg, 4, l[16797], {

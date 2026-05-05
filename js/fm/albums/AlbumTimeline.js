@@ -12,7 +12,7 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
      * @param {MegaNode} node Node to fetch the label from
      * @returns {String}
      */
-    const getMonthLabel = ({ mtime, ts }) => GalleryNodeBlock.getTimeString(mtime || ts, 3);
+    const getMonthLabel = ({ mtime }) => GalleryNodeBlock.getTimeString(mtime || 0, 3);
 
     let globalZoomStep = defZoomStep;
 

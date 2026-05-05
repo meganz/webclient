@@ -461,12 +461,8 @@
             this.downloadButton.removeClass('red-button');
             this.downloadButton.addClass('green-button');
 
-            this.passVisibleButton.classList.add(showTextIcon);
-            this.passVisibleButton.classList.remove(hideTextIcon);
             // On mobile, if the input were readonly, the keyboard would not open when taking focus
-            this.passwordField.removeAttribute('style');
-            this.passwordField.value = '';
-            this.passwordField.type = 'password';
+            this.passwordMegaInput.setValue('');
             this.passwordField.setAttribute('readonly', !is_mobile);
             this.passwordField.classList.remove('hidden');
         }
@@ -620,16 +616,14 @@
 
                 // Step 2: Actual password input + confirm button
                 const passReminderContainer = mCreateElement('div', {'class': 'pass-reminder container hidden'}, [
-                    mCreateElement('div', {'class': 'mega-input title-ontop box-style fixed-width mobile'}, [
-                        mCreateElement('div', {'class': 'mega-input-title'}, [document.createTextNode(l[909])]),
-                        this.passwordField = mCreateElement('input', {
-                            'class': 'underlinedText megaInputs',
-                            'type': 'password',
-                            'id': 'test-pass'
-                        }),
-                        this.passVisibleButton =
-                            mCreateElement('i', {'class': `${mega.ui.sprites.mono} ${showTextIcon} pass-visible`})
-                    ]),
+                    this.passwordField = mCreateElement('input', {
+                        'class': 'pmText',
+                        'data-wrapper-class': 'box-style fixed-width mobile',
+                        'type': 'text',
+                        'id': 'test-pass',
+                        'title': l[909],
+                        'autocomplete': 'new-password'
+                    }),
                     mCreateElement('div', {'class': 'pass-reminder-results'}, [
                         this.correctLabel =
                             mCreateElement('div', {'class': 'pass-reminder result-txt accepted hidden'}, [
@@ -649,20 +643,12 @@
                     ])
                 ], this.dialog);
 
+                this.passwordMegaInput = new mega.ui.MegaInputs($(this.passwordField), {
+                    securePasswordInput: true
+                });
+
                 this.passwordField.addEventListener('focus', () => {
-                    if (this.passwordField.type === 'password') {
-                        if (ua.details.browser === 'Chrome') {
-                            this.passwordField.style.webkitTextSecurity = 'disc';
-                        }
-                        else {
-                            this.passwordField.type = 'password';
-                        }
-                    }
                     this.passwordField.removeAttribute('readonly');
-                    this.passwordField.setAttribute(
-                        'autocomplete',
-                        `section-off${rand_range(1, 123244)} off disabled nope no none`
-                    );
                     eventlog(500317);
                 });
                 this.passwordField.addEventListener('keydown', e => {
@@ -679,25 +665,6 @@
                     this.dialog.classList.remove('accepted');
                     this.correctLabel.classList.add('hidden');
                     this.wrongLabel.classList.add('hidden');
-                });
-
-                this.passVisibleButton.addEventListener('click', () => {
-                    if (this.passVisibleButton.classList.contains(showTextIcon)) {
-                        this.passwordField.type = 'text';
-                        if (this.passwordField.style.webkitTextSecurity) {
-                            this.passwordField.style.webkitTextSecurity = 'none';
-                        }
-                        this.passVisibleButton.classList.remove(showTextIcon);
-                        this.passVisibleButton.classList.add(hideTextIcon);
-                    }
-                    else {
-                        this.passwordField.type = 'password';
-                        if (this.passwordField.style.webkitTextSecurity) {
-                            this.passwordField.style.webkitTextSecurity = 'disc';
-                        }
-                        this.passVisibleButton.classList.add(showTextIcon);
-                        this.passVisibleButton.classList.remove(hideTextIcon);
-                    }
                 });
 
                 // Confirm button

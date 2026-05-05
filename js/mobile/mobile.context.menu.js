@@ -799,6 +799,7 @@ mBroadcaster.once('boot_done', () => {
                             mega.ui.toast.show(
                                 msg, 4, l[16797], {
                                     actionButtonCallback: () => {
+                                        mega.ui.contextMenu.sheet.hide();
                                         M.openFolder(nodeParent)
                                             .finally(() => {
                                                 $.selected = [nodeHandle];

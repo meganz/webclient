@@ -122,7 +122,7 @@ class DiscountPromo {
 
         return pro.membershipPlans.find(plan => {
             return plan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL] === mega.discountInfo.al
-                && plan[pro.UTQA_RES_INDEX_MONTHS] === 1;
+                && plan[pro.UTQA_RES_INDEX_MONTHS] === (mega.discountInfo.m || 1);
         });
     }
 

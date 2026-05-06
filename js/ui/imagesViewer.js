@@ -601,6 +601,7 @@ var slideshowid;
         var $pauseButton = $('.sl-btn.playpause', $slideshowControls);
         var $prevButton = $('.sl-btn.previous', $slideshowControls);
         var $nextButton = $('.sl-btn.next', $slideshowControls);
+        const $repeatButton = $('.v-btn.repeat', $overlay);
 
         if (slideshow_stop) {
             $viewerTopBar.removeClass('hidden');
@@ -608,6 +609,7 @@ var slideshowid;
             $prevNextButtons.removeClass('hidden');
             $slideshowControls.addClass('hidden');
             $slideshowControlsUpper.addClass('hidden');
+            $repeatButton.removeClass('disabled').removeAttr('disabled');
             slideshow_play(false, close);
             slideshowpause = false;
             $pauseButton.attr('data-state', 'pause');
@@ -653,6 +655,7 @@ var slideshowid;
             $slideshowControls.removeClass('hidden');
             $slideshowControlsUpper.removeClass('hidden');
             $prevNextButtons.addClass('hidden');
+            $repeatButton.addClass('disabled').attr('disabled', 'disabled');
 
             if (zoomPan) {
                 zoomPan.reset();

@@ -4,7 +4,7 @@ mBroadcaster.once('startMega', () => {
     const provider = 1; // CJ (one for now...)
     const validPeriod = 86400 * 30; // event ID valid for 30 days (in seconds)
 
-    const parse = tryCatch((v) => JSON.parse(v));
+    const parse = tryCatch((v) => JSON.parse(v), false);
 
     /**
      * Promote sessionStorage entries to localStorage once the user has consented to analytics.
@@ -51,7 +51,7 @@ mBroadcaster.once('startMega', () => {
         if (storage[type]) {
             const tag = parse(storage[type]);
 
-            if (!tag.ts || unixtime() - tag.ts > 86400 * 90) {
+            if (!tag || !tag.ts || unixtime() - tag.ts > 86400 * 90) {
                 delete storage[type];
             }
         }

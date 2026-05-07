@@ -1913,6 +1913,10 @@ mBroadcaster.once('boot_done', function populate_l() {
 
     l.date_added = escapeHTML(l.date_added).replace('[S]', '<span>').replace('[/S]', '</span>');
 
+    l.na_link_analytics_info = escapeHTML(l.na_link_analytics_info)
+        .replace('[UL]', '<ul>').replace('[/UL]', '</ul>')
+        .replace(/\[LI]/g, '<li class="">').replace(/\[\/LI]/g, '</li>');
+
     l.error_fetching_items = escapeHTML(l.error_fetching_items)
         .replace('[A]', '<a href="mailto:support@mega.io">')
         .replace('[/A]', '</a>');

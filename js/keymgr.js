@@ -1082,6 +1082,28 @@ lazy(mega, 'keyMgr', () => {
             return this.commitPromise;
         }
 
+        upvVerifyUAVersion(version) {
+            const {waitsc = false, pfid} = window;
+
+            if (!waitsc.running) {
+                if (this.upvtrace) {
+                    this.upvtrace.push(`VVNSC(${version})`);
+                }
+                logger.warn(`SC connection is not ready, could not verify ${version}...`);
+                return true;
+            }
+
+            if (pfid) {
+                if (this.upvtrace) {
+                    this.upvtrace.push(`VVFL(${version})`);
+                }
+                logger.error(`Did you move from the FM to a folder-link? could not verify ${version}...`);
+                return true;
+            }
+
+            return this.uaAckV === version;
+        }
+
         async updateKeysAttribute(cmds) {
             const generation = this.generation + 1;
 
@@ -1107,7 +1129,7 @@ lazy(mega, 'keyMgr', () => {
                 .then((result) => {
                     const type = typeof result;
                     const aver = result && type === 'object' && result['^!keys'];
-                    if (generation === this.generation + 1 && this.uaAckV === aver) {
+                    if (generation === this.generation + 1 && this.upvVerifyUAVersion(aver)) {
                         this.generation++;
 
                         if (d) {
@@ -1117,7 +1139,7 @@ lazy(mega, 'keyMgr', () => {
                         return this.setGeneration(generation).catch(dump).then(() => aver);
                     }
                     const data = [
-                        2,
+                        3,
                         generation, this.generation,
                         type, result,
                         this.uaAckV,

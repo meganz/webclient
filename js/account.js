@@ -213,17 +213,9 @@ function u_checklogin3a(res, ctx) {
         }
 
         if (localStorage.mctRec) {
-            // Precapturing MCT details for user logged in with an ephemeral account.
-            if (r === 0 && !localStorage.eMctSent) {
-                eventlog(501221, localStorage.mctRec);
-                localStorage.eMctSent = 1;
-            }
-            // Send MCT details if user logged in or create an fully registered account
-            else if (r === 3) {
-                eventlog(501024, localStorage.mctRec);
-                delete localStorage.mctRec;
-                delete localStorage.eMctSent;
-            }
+            // Send MCT details if user logged in or registered
+            eventlog(501024, localStorage.mctRec);
+            delete localStorage.mctRec;
         }
 
         // Notify session resumption.

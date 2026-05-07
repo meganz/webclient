@@ -18,158 +18,184 @@ lazy(mega.ui, 'dlPage', () => {
             super(options);
 
             const header = this.domNode;
-
             const filename = dl_node.name || 'unknown.bin';
             const extPos = filename.lastIndexOf('.') || filename.length;
 
             header.classList.add('dl-header');
-            let node = ce('div', header, {class: 'fileinfo'});
-            let subNode = ce('div', node, {class: 'filename'});
-            ce('div', subNode, {class: 'name'}).textContent = filename.slice(0, extPos);
-            ce('span', subNode, {class: 'ext'}).textContent = filename.slice(extPos);
-            ce('span', node, {class: 'size'}).textContent = bytesToSize(dl_node.s);
 
-            node = ce('div', header, {class: 'actions'});
+            const fileInfo = ce('div', header, {class: 'fileinfo'});
+            const fileName = ce('div', fileInfo, {class: 'filename'});
 
-            const submenu = ce('div');
-            subNode = ce('div', submenu, {class: 'context-section'});
+            ce('div', fileName, {class: 'name'}).textContent = filename.slice(0, extPos);
+            ce('span', fileName, {class: 'ext'}).textContent = filename.slice(extPos);
+            ce('span', fileInfo, {class: 'size'}).textContent = bytesToSize(dl_node.s);
 
-            MegaButton.factory({
-                parentNode: subNode,
-                type: 'fullwidth',
-                componentClassname: 'context-button text-icon',
-                icon: 'sprite-fm-mono icon-link-thin-outline',
-                text: l[1394],
-                onClick: () => {
-                    // @todo get rid of this '$.itemExport' ...
-                    $.itemExport = [dlpage_ph];
+            const actions = ce('div', header, {class: 'actions'});
 
-                    mega.Share.ExportLink.pullShareLink($.itemExport, {showExportLinkDialog: true})
-                        .catch(tell)
-                        .finally(() => {
-                            $(this).removeClass('disabled');
-                        });
-                },
-                eventLog: 501057
-            });
+            this.dlButton = false;
 
-            MegaButton.factory({
-                parentNode: subNode,
-                type: 'fullwidth',
-                componentClassname: 'context-button text-icon',
-                icon: 'sprite-fm-mono icon-message-alert',
-                text: l.report_label,
-                onClick: () => mega.ui.reportAbuse.show(),
-                eventLog: 501059
-            });
+            this.renderActions = (isCompact) => {
+                actions.textContent = '';
 
-            // More actions
-            subNode = new MegaButton({
-                parentNode: node,
-                type: 'icon',
-                componentClassname: 'text-icon secondary visible-active',
-                icon: 'sprite-fm-mono icon-more-vertical-thin-outline',
-                iconSize: 24,
-                simpletip: l.more_actions,
-                simpletipPos: 'bottom',
-                onClick: (ev) => {
-                    const target = ev.currentTarget.domNode;
-                    const {menu} = mega.ui;
+                const submenu = ce('div');
+                const section = ce('div', submenu, {class: 'context-section'});
 
-                    const close = (ev) => {
-                        if (ev.type !== 'click' || !target.contains(ev.target)) {
-                            menu.hide();
-                            mega.ui.menu.trigger('close');
-                        }
-                    };
+                const createBtn = ({
+                    parentNode = section,
+                    type = 'fullwidth',
+                    componentClassname = 'context-button text-icon',
+                    ...opts
+                }) => MegaButton.factory({
+                    parentNode,
+                    type,
+                    componentClassname,
+                    ...opts
+                });
 
-                    const handleKeyDown = (ev) => {
-                        if (ev.key === 'Escape') {
-                            close(ev);
-                        }
-                    };
+                // Copy link
+                createBtn({
+                    icon: 'sprite-fm-mono icon-link-thin-outline',
+                    text: l[1394],
+                    onClick: () => {
+                        $.itemExport = [dlpage_ph];
+                        mega.Share.ExportLink
+                            .pullShareLink($.itemExport, {showExportLinkDialog: true})
+                            .catch(tell)
+                            .finally(() => $(this).removeClass('disabled'));
+                    },
+                    eventLog: 501057
+                });
 
-                    menu.show({
-                        name: 'file-link-items',
-                        event: ev,
-                        eventTarget: target,
-                        contents: [submenu],
-                        pos: 'bottomRight',
-                        posOffset: {
-                            left: -11,
-                            top: 8
-                        },
-                        resizeHandler: true,
-                        onClose: () => {
-                            document.removeEventListener('click', close);
-                            document.removeEventListener('keydown', handleKeyDown);
-                            window.removeEventListener('popstate', close);
-                            target.classList.remove('active');
-                        },
-                        onShow: () => {
-                            document.addEventListener('click', close);
-                            document.addEventListener('keydown', handleKeyDown);
-                            window.addEventListener('popstate', close);
-                            target.classList.add('active');
-                        }
-                    });
-                },
-            });
+                // Report abuse
+                createBtn({
+                    icon: 'sprite-fm-mono icon-message-alert',
+                    text: l.report_label,
+                    onClick: () => mega.ui.reportAbuse.show(),
+                    eventLog: 501059
+                });
 
-            // Download/Save/Resume button
-            this.dlButton = new MegaButton({
-                parentNode: node,
-                type: 'icon',
-                componentClassname: 'text-icon secondary',
-                icon: 'sprite-fm-mono icon-arrow-down-circle-thin-outline',
-                iconSize: 24,
-                loaderIcon: 'icon-loader-throbber-dark-outline-after',
-                simpletip: l[58],
-                simpletipPos: 'bottom',
-                onClick: () => {
-                    mega.ui.dlPage.startDownload();
-                },
-                eventLog: 501056
-            });
+                // More menu
+                createBtn({
+                    parentNode: actions,
+                    type: 'icon',
+                    componentClassname: 'text-icon secondary visible-active',
+                    icon: 'sprite-fm-mono icon-more-vertical-thin-outline',
+                    iconSize: 24,
+                    simpletip: l.more_actions,
+                    simpletipPos: 'bottom',
+                    onClick: (ev) => this.openMenu(ev, submenu)
+                });
 
-            // Save to MEGA button
-            subNode = new MegaButton({
-                parentNode: node,
-                text: l.btn_imptomega,
-                icon: 'sprite-fm-mono icon-cloud-upload-thin-outline icon-size-24',
-                onClick: () => start_import(),
-                eventLog: 501058
-            });
+                const targetNode = isCompact ? actions : section;
+                const type = isCompact ? 'icon' : 'fullwidth';
+                const baseClass = isCompact ? 'text-icon secondary' : 'context-button text-icon';
 
-            // Resize handler to change the order of wrapped buttons
+                // Download
+                this.dlButton = createBtn({
+                    parentNode: targetNode,
+                    type,
+                    text: isCompact ? null : l[58],
+                    componentClassname:
+                        `${baseClass} icon-loading ${isCompact ? 'icon-replace' : 'visible-txt'}`,
+                    icon: 'sprite-fm-mono icon-arrow-down-circle-thin-outline',
+                    iconSize: 24,
+                    loaderIcon: 'icon-loader-throbber-dark-outline-after',
+                    simpletip: isCompact ? l[58] : null,
+                    simpletipPos: 'bottom',
+                    onClick: () => mega.ui.dlPage.startDownload(),
+                    eventLog: 501056
+                });
+
+                // Save to MEGA
+                createBtn({
+                    parentNode: targetNode,
+                    type: isCompact ? null : 'fullwidth',
+                    text: self.u_attr ? l.btn_imptomega : l.save_to_mega_acc,
+                    componentClassname: isCompact ? null : baseClass,
+                    icon: 'sprite-fm-mono icon-cloud-upload-thin-outline',
+                    iconSize: 24,
+                    onClick: start_import,
+                    eventLog: 501058
+                });
+            };
+
             const handleResize = () => {
                 if (page !== 'download') {
                     window.removeEventListener('resize', handleResize);
-                    return false;
+                    return;
                 }
-                if (header.clientHeight > 100) {
-                    header.classList.add('wrapped');
-                }
-                else {
-                    header.classList.remove('wrapped');
-                }
+                header.classList.toggle('wrapped', header.clientHeight > 100);
             };
 
             window.addEventListener('resize', handleResize);
             handleResize();
         }
 
-        get loader() {
-            return this.dlButton.loading;
+        openMenu(ev, submenu) {
+            const target = ev.currentTarget.domNode;
+            const {menu} = mega.ui;
+
+            const close = (e) => {
+                if (e.type !== 'click' || !target.contains(e.target)) {
+                    menu.hide();
+                    mega.ui.menu.trigger('close');
+                }
+            };
+
+            const preventDefault = e => {
+                e.preventDefault();
+            };
+
+            const onKeyDown = e => {
+                if ([32, 33, 34, 35, 36, 37, 38, 39, 40].includes(e.keyCode)) {
+                    e.preventDefault();
+                }
+                if (e.key === 'Escape') {
+                    close(e);
+                }
+            };
+
+            menu.show({
+                name: 'file-link-items',
+                event: ev,
+                eventTarget: target,
+                contents: [submenu],
+                pos: 'bottomRight',
+                posOffset: {left: -11, top: 8},
+                resizeHandler: true,
+                onClose: () => {
+                    document.removeEventListener('click', close);
+                    window.removeEventListener('popstate', close);
+                    window.removeEventListener('keydown', onKeyDown, false);
+                    window.removeEventListener('wheel', preventDefault, {passive: false});
+                    window.removeEventListener('touchmove', preventDefault, {passive: false});
+                    target.classList.remove('active');
+                },
+                onShow: () => {
+                    document.addEventListener('click', close);
+                    window.addEventListener('popstate', close);
+                    window.addEventListener('keydown', onKeyDown, false);
+                    window.addEventListener('wheel', preventDefault, {passive: false});
+                    window.addEventListener('touchmove', preventDefault, {passive: false});
+                    target.classList.add('active');
+                }
+            });
         }
 
-        set loader(value) {
-            this.dlButton.loading = !!value;
+        set viewable(value) {
+            this.renderActions(value);
         }
 
-        set downloadTip(value) {
-            if (value) {
-                this.dlButton.simpletip = value;
+        set loading(value) {
+            if (this.dlButton) {
+                this.dlButton.loading = !!value;
+            }
+        }
+
+        set downloadLabel(value) {
+            const btn = this.dlButton;
+            if (btn && value) {
+                btn[btn.simpletip ? 'simpletip' : 'text'] = value;
             }
         }
     }
@@ -454,13 +480,43 @@ lazy(mega.ui, 'dlPage', () => {
             this.data.progressWg.progressBar.style.width = `${value || 0}%`;
         },
 
+        set loading(value) {
+            const {header, dlButton} = this.data;
+            const text = value ? l[1156] : l[58];
+
+            // Set "Download"/"Downloading" label/tip
+            this.downloadLabel = text;
+
+            // Show loader spinner in header
+            header.loading = !!value;
+
+            // Show loader spinner in body for non-previewable file
+            if (dlButton) {
+                dlButton.loading = !!value;
+            }
+        },
+
+        set downloadLabel(value) {
+            const {header, dlButton} = this.data;
+
+            if (value) {
+                header.downloadLabel = value;
+
+                if (dlButton) {
+                    dlButton.text = value;
+                }
+            }
+        },
+
         init(res = {}) {
             const hcn = startNode.querySelector('.dl-header-container');
             const wcn = startNode.querySelector('.dl-widget-container');
 
-            startNode.querySelector('.download-page').classList.remove('hidden');
             hcn.textContent = '';
             wcn.textContent = '';
+
+            this.data.dlPage = startNode.querySelector('.download-page');
+            this.data.dlPage.classList.remove('hidden');
 
             this.data.header = new DlHeader({
                 parentNode: hcn
@@ -488,6 +544,181 @@ lazy(mega.ui, 'dlPage', () => {
             this.isInitialized = false;
             this.progressValue = 0;
             this.data.msd = res.msd || 0;
+        },
+
+        updateUI(viewable, type) {
+            const {dlPage, header} = this.data;
+
+            header.viewable = viewable;
+            dlPage.classList.remove('video', 'video-theatre-mode');
+
+            if (type === 'image') {
+                return this.renderImage();
+            }
+
+            if (type === 'video') {
+                dlPage.classList.add('video');
+                dlPage.querySelector('.download.video-block').classList.remove('hidden');
+                return false;
+            }
+
+            if (type === 'text') {
+                return this.renderText();
+            }
+
+            this.renderFile();
+        },
+
+        renderImage() {
+            const {dlPage} = this.data;
+            const preview = dlPage.querySelector('.download.image-block');
+            const viewerCn = document.querySelector('.media-viewer-container');
+
+            if (viewerCn) {
+                const viewer = viewerCn.querySelector('.media-viewer');
+                preview.textContent = '';
+                preview.append(viewerCn);
+                viewer.removeAttribute('style');
+            }
+
+            preview.classList.remove('hidden');
+            window.mediaConIsDl = true;
+            slideshow(dl_node.h);
+        },
+
+        renderText() {
+            const {dlPage} = this.data;
+            const textCn = dlPage.querySelector('.js-text-viewer');
+            const loaderCn = textCn.querySelector('.viewer-pending');
+            const icon = dlPage.querySelector('.js-text-viewer-icon');
+
+            const handleLoader = (show) => loaderCn
+                && loaderCn.classList[show ? 'remove' : 'add']('hidden');
+
+            textCn.classList.remove('hidden');
+            handleLoader(true);
+
+            M.require('codemirror_js', 'codemirrorscroll_js').dump('cm.preload');
+
+            // Handle partial content for big text-files
+            const CHUNK_SIZE = 32768;
+            const partial = dl_node.s > CHUNK_SIZE;
+            const cached = mega.fileTextEditor.getCachedData(dl_node.link);
+
+            const fetchText = (partial) =>
+                M.gfsfetch(dl_node.link, 0, partial ? CHUNK_SIZE : -1)
+                    .then(r => mega.fileTextEditor.getTextFromBuffer(r.buffer));
+
+            if (cached) {
+                mega.textEditorUI.setupEditor(
+                    dl_node.name,
+                    cached.text,
+                    dlpage_ph,
+                    true,
+                    $(textCn)
+                );
+
+                window.textConIsDl = true;
+                handleLoader();
+                return;
+            }
+
+            return fetchText(partial)
+                .then(txt => {
+                    if (self.dl_node && dl_node.name) {
+                        // Save and display text
+                        mega.fileTextEditor.cacheData(dl_node.link, txt, partial);
+
+                        handleLoader();
+                        window.textConIsDl = true;
+                        mega.textEditorUI.setupEditor(dl_node.name, txt, dlpage_ph, true, $(textCn));
+
+                        return partial && mBroadcaster.when('txt.viewer:scroll-bottom');
+                    }
+                })
+                .then((editor) => {
+                    if (editor) {
+                        handleLoader(true);
+
+                        const ln = editor.lineCount();
+
+                        return fetchText(false)
+                            .then(fullTxt => {
+                                mega.fileTextEditor.cacheData(dl_node.link, fullTxt, false);
+                                editor.setValue(fullTxt);
+                                editor.scrollIntoView(ln);
+                            });
+                    }
+                })
+                .catch((ex) => {
+                    if (icon) {
+                        icon.classList.remove('hidden');
+                    }
+                    if (d) {
+                        console.error('Failed to read as text from buffer.', ex);
+                    }
+                })
+                .finally(handleLoader);
+        },
+
+        renderFile() {
+            const {dlPage} = this.data;
+            const filename = dl_node.name || 'unknown.bin';
+            const extPos = filename.lastIndexOf('.') || filename.length;
+
+            // Main container
+            let wrap = dlPage.querySelector('.download.info-block');
+
+            wrap.textContent = '';
+            wrap.classList.remove('hidden');
+            wrap = ce('div', wrap, {class: 'nv-container'});
+            wrap = ce('div', wrap, {class: 'body'});
+
+            let node = ce('div', wrap, {class: 'content'});
+
+            // Filetype icon
+            ce('i', node, {class: `item-type-icon-90 icon-${fileIcon({name: filename})}-90`});
+
+            // File name
+            let subNode = ce('div', node, {class: 'info'});
+            ce('span', subNode, {class: 'overflow'}).textContent = filename.slice(0, extPos);
+            ce('span', subNode).textContent = filename.slice(extPos);
+
+            // File size and type
+            subNode = ce('div', node, {class: 'info sm-size'});
+            ce('span', subNode).textContent = bytesToSize(dl_node.s);
+            ce('span', subNode).textContent = filetype(dl_node);
+
+            // Info banner
+            subNode = ce('div', node, {class: 'banner'});
+            ce('i', subNode, {class: 'sprite-fm-mono icon-alert-circle-thin-outline'});
+            ce('span', subNode).textContent = l.non_previewable_tip;
+
+            // Buttons conatainer
+            node = ce('div', wrap, {class: 'footer'});
+
+            // Download
+            this.data.dlButton = MegaButton.factory({
+                parentNode: node,
+                text: l[58],
+                componentClassname: 'lg-size secondary icon-loading visible-txt',
+                icon: 'sprite-fm-mono icon-arrow-down-circle-thin-outline',
+                iconSize: 24,
+                loaderIcon: 'icon-loader-throbber-dark-outline-after',
+                onClick: () => this.startDownload(),
+                eventLog: 501056
+            });
+
+            // Save to MEGA
+            MegaButton.factory({
+                parentNode: node,
+                text: self.u_attr ? l.btn_imptomega : l.save_to_mega_acc,
+                componentClassname: 'lg-size',
+                icon: 'sprite-fm-mono icon-cloud-upload-thin-outline',
+                iconSize: 24,
+                onClick: start_import,
+                eventLog: 501058
+            });
         },
 
         startDownload(forceBrowserDl) {
@@ -596,27 +827,26 @@ lazy(mega.ui, 'dlPage', () => {
         },
 
         updateDlOptions(byteLength) {
-            const {header} = this.data;
-            let tip = l[58]; // Download
+            let txt = l[58]; // Download
 
             // this.closeWidgets();
-            header.loader = false;
+            this.loading = false;
 
             byteLength = byteLength || dlResumeInfo.byteLength;
             if (dlResumeInfo) {
                 if (byteLength === fdl_filesize) {
-                    tip = l[776]; // Save
+                    txt = l[776]; // Save
                 }
                 // Resume
                 else if (byteLength === dlResumeInfo.byteOffset) {
-                    tip = l[1649]; // Resume
+                    txt = l[1649]; // Resume
                 }
             }
-            header.downloadTip = tip;
+            this.downloadLabel = txt;
         },
 
         showInitUI() {
-            const {header, progressWg, appWg} = this.data;
+            const {progressWg, appWg} = this.data;
             const {
                 cancelDlBtn, closeBtn, pauseBtn, locationBtn,
                 statusCn, tryAgainBtn, expandBtn
@@ -632,7 +862,7 @@ lazy(mega.ui, 'dlPage', () => {
             statusCn.classList.remove('complete', 'error');
             statusCn.textContent = `${l[1042]}\u2026`; // Initializing...
 
-            header.loader = true;
+            this.loading = true;
             progressWg.show();
 
             // Show download via app widget
@@ -737,7 +967,7 @@ lazy(mega.ui, 'dlPage', () => {
 
         showCompleteUI(opts = {}) {
             const {msg, ns} = opts;
-            const {header, progressWg} = this.data;
+            const {progressWg} = this.data;
             const {closeBtn, locationBtn, statusCn, expandBtn} = progressWg;
 
             this.showInitUI();
@@ -755,7 +985,7 @@ lazy(mega.ui, 'dlPage', () => {
 
             this.isInitialized = false;
             this.progressValue = 100;
-            header.loader = false;
+            this.loading = false;
             closeBtn.show();
             expandBtn.hide();
 
@@ -769,11 +999,11 @@ lazy(mega.ui, 'dlPage', () => {
         },
 
         closeWidgets() {
-            const {appWg, adsWg, header, progressWg} = this.data;
+            const {appWg, adsWg, progressWg} = this.data;
 
             this.isInitialized = false;
             this.progressValue = 0;
-            header.loader = false;
+            this.loading = false;
             progressWg.hide();
             appWg.hide();
             adsWg.hide();

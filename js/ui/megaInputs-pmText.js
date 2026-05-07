@@ -277,10 +277,17 @@ mega.ui.MegaInputs.prototype.pmText._withIconOrPrefix = function() {
         });
     }
 
-    if (this.type === 'password') {
+    if (this.type === 'password' || this.options.securePasswordInput) {
         const iconSprite = 'sprite-fm-mono';
         const showTextIcon = 'icon-eye-reveal1';
         const hideTextIcon = 'icon-eye-hidden1';
+        const textSecuritySupport = CSS.supports && CSS.supports('-webkit-text-security', 'disc');
+        const useTextSecurity = this.options.securePasswordInput && textSecuritySupport;
+
+        if (this.options.securePasswordInput) {
+            $input.attr('type', useTextSecurity ? 'text' : 'password');
+            $input.css('webkitTextSecurity', useTextSecurity ? 'disc' : '');
+        }
 
         $wrapper.safeAppend(`<i class="${iconSprite} ${showTextIcon} pass-visible
             ${this.options.iconClass || 'icon'}"></i>`);
@@ -295,6 +302,9 @@ mega.ui.MegaInputs.prototype.pmText._withIconOrPrefix = function() {
                 if ($input.hasClass('colorized-password')) {
                     viewPassword.classList.remove('hidden');
                 }
+                else if (useTextSecurity) {
+                    $input.css('webkitTextSecurity', 'none');
+                }
                 else {
                     $input.attr('type', 'text');
                 }
@@ -304,6 +314,9 @@ mega.ui.MegaInputs.prototype.pmText._withIconOrPrefix = function() {
             else {
                 if ($input.hasClass('colorized-password')) {
                     viewPassword.classList.add('hidden');
+                }
+                else if (useTextSecurity) {
+                    $input.css('webkitTextSecurity', 'disc');
                 }
                 else {
                     $input.attr('type', 'password');

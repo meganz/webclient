@@ -158,6 +158,10 @@ lazy(mega.ui, 'linkAccess', () => {
         async showDecryptionKeyUI(ph, fl, keyr, selector) {
             this.init();
 
+            if (is_mobile) {
+                mobile.appBanner.updateBanner(ph);
+            }
+
             this.data.accessBox = new AccessBox({
                 actionButton: l.dl_decrypt_btn,
                 componentClassname: 'decrytion-box',
@@ -217,6 +221,10 @@ lazy(mega.ui, 'linkAccess', () => {
         */
         showDecryptionPassUI(page) {
             this.init();
+
+            if (is_mobile) {
+                mobile.appBanner.updateBanner(page);
+            }
 
             this.data.accessBox = new AccessBox({
                 actionButton: l[507],

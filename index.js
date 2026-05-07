@@ -1617,6 +1617,41 @@ function init_page() {
         loadSubPage('redeem');
         return false;
     }
+
+    /**
+     * Enable 2-year Password Manager promo from campaign URL e.g. /get2ypwm
+     */
+    else if (page === 'get2ypwm') {
+
+        if (!u_type) {
+            localStorage.setItem('pwm2yPromo', '1');
+            login_next = 'get2ypwm';
+            loadSubPage('login');
+            return false;
+        }
+
+        api.screq({a: 'pwme'})
+            .then(() => M.getAccountDetails())
+            .catch(dump)
+            .finally(() => {
+                localStorage.removeItem('pwm2yPromo');
+
+                if (is_mobile) {
+                    if (is_ios) {
+                        openExternalLink('https://apps.apple.com/app/id6468971246');
+                    }
+                    else if (is_android) {
+                        openExternalLink('https://play.google.com/store/apps/details?id=mega.pwm.android.app');
+                    }
+                }
+
+                loadSubPage('fm/pwm');
+            });
+
+        return false;
+    }
+
+
     else if (localStorage.getItem('addContact') !== null && u_type === 3) {
         var contactRequestInfo = JSON.parse(localStorage.getItem('addContact'));
         var contactHandle = contactRequestInfo.u;

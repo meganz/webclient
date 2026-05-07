@@ -6,6 +6,35 @@ mBroadcaster.once('startMega', () => {
 
     const parse = tryCatch((v) => JSON.parse(v));
 
+    /**
+     * Promote sessionStorage entries to localStorage once the user has consented to analytics.
+     * No-op if none of the keys are set in sessionStorage.
+     *
+     * @param {...string} keys sessionStorage keys to promote.
+     * @returns {void}
+     */
+    const toLocalStorage = (...keys) => {
+        if (!keys.some((k) => sessionStorage[k])) {
+            return;
+        }
+        if ('csp' in window) {
+            csp.init().then(() => {
+                // @todo shall we force showing the dialog, when the user may previously dismissed granting 'analyze'?..
+                if (csp.has('analyze')) {
+                    for (const key of keys) {
+                        if (sessionStorage[key]) {
+                            localStorage[key] = sessionStorage[key];
+                            delete sessionStorage[key];
+                        }
+                    }
+                }
+            });
+        }
+        else if (d) {
+            console.warn('CSP unexpectedly not available');
+        }
+    };
+
     for (const type of ['uTagUTM', 'uTagMTM']) {
         if (window[type]) {
             sessionStorage[type] = JSON.stringify({
@@ -15,21 +44,7 @@ mBroadcaster.once('startMega', () => {
         }
     }
 
-    if (sessionStorage.uTagUTM || sessionStorage.uTagMTM) {
-        csp.init().then(() => {
-            if ('csp' in window && csp.has('analyze')) {
-                if (sessionStorage.uTagUTM) {
-                    localStorage.uTagUTM = sessionStorage.uTagUTM;
-                    delete sessionStorage.uTagUTM;
-                }
-
-                if (sessionStorage.uTagMTM) {
-                    localStorage.uTagMTM = sessionStorage.uTagMTM;
-                    delete sessionStorage.uTagMTM;
-                }
-            }
-        });
-    }
+    toLocalStorage('uTagUTM', 'uTagMTM');
 
     for (const type of ['uTagUTM', 'uTagMTM']) {
         const storage = localStorage[type] ? localStorage : sessionStorage;
@@ -89,14 +104,28 @@ mBroadcaster.once('startMega', () => {
      *
      * @returns {void}
      */
-    const setAttr = (eAff) => {
-        if (!eAff) {
-            return;
+    const setAttr = () => {
+
+        const eAff = getEvent();
+
+        if (eAff) {
+            const attr = `${eAff.ts},${eAff.provider},${eAff.id}`;
+
+            mega.attr.set2(null, 'eaffid', attr, mega.attr.PRIVATE_UNENCRYPTED, true).then(clearEvent).catch(nop);
         }
 
-        const attr = `${eAff.ts},${eAff.provider},${eAff.id}`;
+        // gAds attr setting
+        const gdata = parse(localStorage.gAdsAttr || sessionStorage.gAdsAttr);
 
-        mega.attr.set2(null, 'eaffid', attr, mega.attr.PRIVATE_UNENCRYPTED, true).then(clearEvent).catch(nop);
+        if (gdata && typeof gdata === 'object') {
+            gdata.ts = gdata.gclts;
+            delete gdata.gclts;
+
+            mega.attr.set2(null, 'etrac', JSON.stringify(gdata), mega.attr.PRIVATE_UNENCRYPTED, true).then(() => {
+                delete sessionStorage.gAdsAttr;
+                delete localStorage.gAdsAttr;
+            }).catch(nop);
+        }
     };
 
     if (sessionStorage.cjevent) {
@@ -107,31 +136,17 @@ mBroadcaster.once('startMega', () => {
         });
         delete sessionStorage.cjevent;
 
-        if ('csp' in window) {
-            csp.init().then(() => {
-                // @todo shall we force showing the dialog, when the user may previously dismissed granting 'analyze'?..
-
-                if (csp.has('analyze') && sessionStorage.eAff) {
-                    localStorage.eAff = sessionStorage.eAff;
-                    delete sessionStorage.eAff;
-                }
-            });
-        }
-        else if (d) {
-            console.warn('CSP unexpectedly not available');
-        }
+        toLocalStorage('eAff');
     }
 
-    const data = getEvent();
-    if (!data) {
-        return;
-    }
+    toLocalStorage('gAdsAttr');
+
     if (!u_type) {
         mBroadcaster.once('login2', () => {
-            setAttr(data);
+            setAttr();
         });
     }
     else {
-        setAttr(data);
+        setAttr();
     }
 });

@@ -397,6 +397,20 @@ function getCleanSitePath(path) {
             if (path.cjevent) {
                 sessionStorage.cjevent = path.cjevent;
             }
+            // Google Ads click: capture gclid/wbraid/gbraid/ts from the URL.
+            var gAds = {};
+            var gAKeys = ['gclid', 'wbraid', 'gbraid', 'gclts'];
+            for (var i = 0; i < gAKeys.length; i++) {
+                if (path[gAKeys[i]]) {
+                    gAds[gAKeys[i]] = path[gAKeys[i]];
+                }
+                else if (gAKeys[i] === 'gclts' && (path.gclid || path.wbraid || path.gbraid)) {
+                    gAds.gclts = Math.floor(Date.now() / 1000);
+                }
+            }
+            if (Object.keys(gAds).length) {
+                sessionStorage.gAdsAttr = JSON.stringify(gAds);
+            }
             if (path.tab && path[0] === 'pro') {
                 window.mProTab = path.tab;
                 if (window.mProTab === 'flexi') {

@@ -113,7 +113,7 @@ class MegaZoomPan {
 
             if (tip) {
                 tip.textContent = formatPercentage(
-                    val * (this.domNode.dataset.initScale || 1)
+                    val * (this.domNode.dataset.initScale / window.devicePixelRatio || 1)
                 );
             }
         };

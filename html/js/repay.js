@@ -528,7 +528,8 @@ RepayPage.prototype.initPage = function() {
                     mySelf.userInfo = {
                         fname: '',
                         lname: '',
-                        nbOfUsers: res.nb || 0
+                        nbOfUsers: res.nb || 0,
+                        quota: Math.max(res.nbs, res.nbt) | 0,
                     };
                 })
                 .catch(tell);

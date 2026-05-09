@@ -351,7 +351,7 @@ function getCleanSitePath(path) {
     }
 
     // cleanup and handle affiliate tags.
-    path = mURIDecode(path).replace(/^[#/]+|\/+$/g, '').split(/(\/\w+=)/);
+    path = mURIDecode(path).replace(/^[#/]+|["'<>]|\/+$/g, '').split(/(\/\w+=)/);
 
     if (/^\w+=/.test(path[0])) {
         path = [''].concat(path[0].split('=')).concat(path.slice(1));

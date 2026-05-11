@@ -548,24 +548,39 @@ lazy(s4, 'utils', () => {
             // Static endpoints data for now
             const endpoints = [
                 [
-                    'eu-central-1.s4.mega.io',
+                    'eu-amsterdam.megas4.com',
                     l.location_amsterdam,
                     'Amsterdam'
                 ],
                 [
-                    'eu-central-2.s4.mega.io',
+                    'eu-luxembourg.megas4.com',
                     l[18922],
-                    'Bettembourg'
+                    'Luxembourg'
                 ],
                 [
-                    'ca-central-1.s4.mega.io',
+                    'ca-montreal.megas4.com',
                     l.location_montreal,
                     'Montreal'
                 ],
                 [
-                    'ca-west-1.s4.mega.io',
+                    'ca-vancouver.megas4.com',
                     l.location_vancouver,
                     'Vancouver'
+                ],
+                [
+                    'ap-tokyo.megas4.com',
+                    l.location_tokyo,
+                    'Tokyo'
+                ],
+                [
+                    'eu-paris.megas4.com',
+                    l.location_paris,
+                    'Paris'
+                ],
+                [
+                    'eu-barcelona.megas4.com',
+                    l.location_barcelona,
+                    'Barcelona'
                 ]
             ];
 

@@ -73,7 +73,7 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
         account.isAlmostFull = res.cstrg / res.mstrg >= res.uslw / 10000;
 
         // Business base/extra quotas:
-        if (u_attr.p === pro.ACCOUNT_LEVEL_BUSINESS || u_attr.p === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
+        if (b || u_attr.p === pro.ACCOUNT_LEVEL_BUSINESS || u_attr.p === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
             account.space_bus_base = res.b ? res.b.bstrg : undefined; // unit TB
             account.space_bus_ext = res.b ? res.b.estrg : undefined; // unit TB
             account.tfsq_bus_base = res.b ? res.b.bxfer : undefined; // unit TB

@@ -381,7 +381,7 @@
     }
     body.web-desktop .pro-register-dialog-overlay.business-sub-account .pro-register-dialog {
         display: block;
-        min-width: 560px;
+        width: 560px;
     }
     body.web-desktop .pro-register-dialog-overlay.business-sub-account .pro-register-dialog .register-benefits-column {
         display: none;

@@ -527,7 +527,7 @@ function start_import() {
     let _show;
     var dialogHeader = l[20751];
     var dialogTxt = l[20752];
-    var dialogType = 'import_login_or_register';
+    var dialogType = `confirmation:!^${l[209]}!${l[171]}`;
     var buttonEventRegister = () => {
         mega.ui.signup.showDialog({
             showLogin: true,
@@ -552,38 +552,24 @@ function start_import() {
 
     _show = () => {
         msgDialog(dialogType, l[1193], dialogHeader, dialogTxt, e => {
-            if (e === -1) {
-                buttonEventLogin();
-            }
-            else if (e === 1) {
+            if (e) {
                 buttonEventRegister();
             }
-            else if (e === -2) {
-                start_anoimport();
-            }
-            else {
+            else if (e === null) {
                 dl_import = false;
                 delete localStorage.dlimp;
+            }
+            else {
+                buttonEventLogin();
             }
         });
     };
 
-    _show();
-}
+    if (is_mobile) {
+        _show = buttonEventLogin;
+    }
 
-function start_anoimport()
-{
-    loadingDialog.show();
-    u_checklogin(
-    {
-        checkloginresult: function(u_ctx,r)
-        {
-            u_type = r;
-            u_checked=true;
-            loadingDialog.hide();
-            loadSubPage('fm');
-        }
-    },true);
+    _show();
 }
 
 function dlcomplete(dl) {

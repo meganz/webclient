@@ -2540,6 +2540,16 @@ body.de .mega-dialog.contact-picker-widget {
         margin-inline-start: 4px;
     }
 
+    .mega-sheet.export-links-dialog .link-stats-info {
+        margin-inline-start: 8px;
+        display: flex;
+    }
+
+    .mega-sheet.export-links-dialog .link-stats-info i {
+        --icon-size: 20px;
+        --mask-color: var(--text-color-high);
+    }
+
     .mega-sheet.export-links-dialog .link-stats {
         position: relative;
     }

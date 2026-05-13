@@ -358,6 +358,14 @@ var psa = {
             && psa.prefillAnnouncementDetails()) {
 
             psa.showAnnouncement();
+            psa._pclistener = mBroadcaster.addListener('pagechange', () => {
+                if (psa.shouldSkipForPage()) {
+                    psa.hideAnnouncement();
+                }
+                else if (!psa.visible) {
+                    psa.showAnnouncement();
+                }
+            });
         }
         else {
             // If they viewed the site while not logged in, then logged in with
@@ -504,6 +512,11 @@ var psa = {
         return true;
     },
 
+    shouldSkipForPage() {
+        'use strict';
+        return String(page).startsWith('pro') || String(page).startsWith('register') || String(page) === 'login';
+    },
+
     /**
      * Shows the announcement
      */
@@ -511,7 +524,7 @@ var psa = {
         'use strict';
 
         // skip psa where not needed
-        if (is_mobile && page.indexOf('propay_') === 0) {
+        if (psa.shouldSkipForPage()) {
             return;
         }
 
@@ -570,8 +583,14 @@ var psa = {
         // Set to no longer visible
         psa.visible = false;
 
-        // Save last seen announcement number for page changes
-        psa.lastSeenPsaId = psa.config.id;
+        if (!psa.shouldSkipForPage()) {
+            // Save last seen announcement number for page changes
+            psa.lastSeenPsaId = psa.config.id;
+            if (psa._pclistener) {
+                mBroadcaster.removeListener(psa._pclistener);
+                delete psa._pclistener;
+            }
+        }
 
         if (!is_mobile) {
             document.querySelector('.psa-holder').style.removeProperty('height');

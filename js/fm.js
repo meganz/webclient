@@ -2742,7 +2742,7 @@ function fingerprintDialog(userid, isAdminVerify, callback) {
         approveBtnTxt = l[1960];
         credentialsTitle = l.bus_admin_cred;
         listenerToken = mBroadcaster.addListener('mega:openfolder', {
-            callback: () => {
+            onBroadcast: () => {
                 fingerprintDialog(u_attr.b.mu[0], true);
             },
             once: true

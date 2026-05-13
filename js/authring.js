@@ -376,7 +376,7 @@ var authring = (function () {
                 );
             }
             promises.push(this.enqueueKeyMgrCommit());
-            return Promise.all(promises);
+            return Promise.all(promises).then((results) => results.pop());
         });
     };
 
@@ -458,17 +458,18 @@ var authring = (function () {
                 || (oldRecord.method !== method)
                 || (oldRecord.confidence !== confidence)) {
 
-            // Need to update the record.
-            u_authring[keyType][userhandle] = {
+            const record = {
                 fingerprint: fingerprint,
                 method: method,
                 confidence: confidence
             };
 
-            return ns.setContacts(keyType)
-                .then(() => {
-                    return this.enqueueKeyMgrSharesCompletion();
-                });
+            return (async() => {
+                do {
+                    u_authring[keyType][userhandle] = record;
+                } while (!await ns.setContacts(keyType));
+                return this.enqueueKeyMgrSharesCompletion();
+            })();
         }
     };
 

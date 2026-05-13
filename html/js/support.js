@@ -1,5 +1,81 @@
-var support = (function() {
+/** @property window.support */
+lazy(self, 'support', () => {
     'use strict';
+
+    // lang setup start
+
+    /**
+     * Convert webclient language codes to slugs recognised by help.mega.io.
+     *
+     * @param {string} langCode The two character language code used internally by webclient
+     * @returns {string} The slug known by help.mega.io, or empty string (English)
+     */
+    const getKbLangSlug = (langCode) => {
+
+        return {
+            ar: 'ar',
+            br: 'pt',
+            cn: 'zh-hans',
+            ct: 'zh-hant',
+            de: 'de',
+            es: 'es',
+            fr: 'fr',
+            ru: 'ru',
+        }[langCode || lang] || '';
+    };
+    const mega_help_host = 'https://help.mega.io';
+    const megakb_origin = `${mega_help_host}/${getKbLangSlug(window.kbLang)}`.replace(/\/*$/, '');
+
+    l.support_page_para_two = escapeHTML(l.support_page_para_two)
+        .replace('[A1]', `<a class="link" href="https://mega.io/pricing" target="_blank" rel="noopener">`)
+        .replace('[/A1]', '</a>')
+        .replace('[A2]', `<a class="link" href="${megakb_origin}" target="_blank" rel="noopener">`)
+        .replace('[/A2]', '</a>');
+    l.support_pg_paid_user_para_two = escapeHTML(l.support_pg_paid_user_para_two)
+        .replace('[A1]', `<a class="link" href="${megakb_origin}" target="_blank" rel="noopener">`)
+        .replace('[/A1]', '</a>');
+    l.support_pg_verify_email_sub = escapeHTML(l.support_pg_verify_email_sub)
+        .replace('[A]', `<a class="link" href="mailto:support@mega.io">`)
+        .replace('[/A]', '</a>')
+        .replace('[A1]', `<a class="link" href="${megakb_origin}" target="_blank" rel="noopener">`)
+        .replace('[/A1]', '</a>');
+
+    const _collators = new Map();
+    const SORT_PREFIX = 'sup_';
+    const stripSortPrefix = (v) => typeof v === 'string' && v.startsWith(SORT_PREFIX) ? v.slice(SORT_PREFIX.length) : v;
+
+    /**
+     * Returns a mapping of app language codes to valid Intl.Collator locales.
+     * These locales are normalized BCP-47 tags suitable for sorting/localization.
+     *
+     * @returns string
+     */
+    const _getCollatorLangCode = (lang) => {
+
+        if (lang === 'cn') {
+            return 'zh-Hans-u-co-pinyin';
+        }
+        if (lang === 'ct') {
+            return 'zh-Hant-u-co-pinyin';
+        }
+        if (lang === 'br') {
+            return 'pt-BR';
+        }
+
+        return remappedLangLocales[lang] || mega.intl.locale;
+    };
+
+    const mGetCollator = tryCatch((lang) => {
+
+        const locale = window.kbLang || _getCollatorLangCode(lang);
+        if (!_collators.has(locale)) {
+            _collators.set(locale, new Intl.Collator(locale, {sensitivity: 'base', numeric: true}));
+        }
+
+        return _collators.get(locale);
+    });
+
+    // lang setup done
 
     let langGha, $deviceInput, $emailInput, acceptReadArticlesCheckbox, otpInputs,
         $defaultHiddenElements, $hiddenWhenOtherCategory, $messageInputTextArea, successCtaContainer,
@@ -19,12 +95,27 @@ var support = (function() {
         $elsToUnbind = $elsToUnbind.add($el);
         return $el;
     };
-    const toDropdownOptions = (items, prefix = '', key = 'id', label = 'name') => Object
-        .values(items).reduce((acc, v) => {
+    const toDropdownOptions = (items, prefix = SORT_PREFIX, key = 'id', label = 'name') => {
 
-            acc[`${prefix}${v[key]}`] = v[label];
-            return acc;
-        }, {});
+        const collator = mGetCollator(lang);
+        return Object.values(items)
+            .sort((a, b) => {
+
+                // "Other" (id -1) is always pinned at the end
+                if (a[key] === -1) {
+                    return 1;
+                }
+                if (b[key] === -1) {
+                    return -1;
+                }
+                return collator ? collator.compare(a[label], b[label]) : M.compareStrings(a[label], b[label], -1);
+            })
+            .reduce((acc, v) => {
+
+                acc[`${prefix}${v[key]}`] = v[label];
+                return acc;
+            }, {});
+    };
     const collateDomRefs = () => {
         const $mainLayout = $('#mainlayout').addClass('get-support');
         dom.$page = $('.get-support-block', $mainLayout);
@@ -83,12 +174,13 @@ var support = (function() {
     const createSupportDropdown = (type, items, selected, onSelected) => {
 
         const $node = dom[`$${type}`];
+        const prefixedSelected = selected === undefined ? selected : `${SORT_PREFIX}${selected}`;
         if (is_mobile) {
             if (dds[type]) {
                 dds[type].destroy();
             }
 
-            dds[type] = createMobileDropdown($node, items, selected, onSelected, l[type]);
+            dds[type] = createMobileDropdown($node, items, prefixedSelected, onSelected, l[type]);
             bind($node, 'click.support', () => dds[type].trigger('dropdown'));
 
             return;
@@ -97,7 +189,7 @@ var support = (function() {
         window.createDropdown($('.mega-input-dropdown', $node), {
             placeholder: l[1278],
             items,
-            selected: `${selected}`
+            selected: `${prefixedSelected}`
         });
         bindDropdownEvents($node, undefined, undefined, undefined, true);
         bind($node, 'click.support', $e => {
@@ -106,7 +198,7 @@ var support = (function() {
             if (!value) {
                 return;
             }
-            onSelected(value);
+            onSelected(stripSortPrefix(value));
         });
     };
     const showVerifyEmailForm = e => {
@@ -349,7 +441,7 @@ var support = (function() {
         submittedBlockSecondaryCta = MegaLink.factory({
             parentNode: successCtaContainer,
             text: l[384],
-            href: window.kbLang ? l.megakb_origin : l.mega_help_host,
+            href: window.kbLang ? megakb_origin : mega_help_host,
             target: '_blank',
             componentClassname: 'cta mio-button lg secondary',
             icon: 'sprite-fm-mono icon-info',
@@ -374,7 +466,7 @@ var support = (function() {
         const issueClick = id => {
 
             if (is_mobile) {
-                id = dds.issue.selected;
+                id = stripSortPrefix(dds.issue.selected);
             }
 
             dom.$relatedList.empty();
@@ -399,7 +491,7 @@ var support = (function() {
             createIssueDropdown(toDropdownOptions(menu[id].subCategories), selected, issueClick);
         };
         const categoryClick = id => {
-            id = is_mobile ? dds.category.selected : id;
+            id = is_mobile ? stripSortPrefix(dds.category.selected) : id;
             if (selectedCategory === id) {
                 return false;
             }
@@ -592,7 +684,10 @@ var support = (function() {
         });
     };
 
-    ns.init = async() => {
+    ns.init = async(initDom) => {
+        if (initDom) {
+            parsepage(pages.support);
+        }
         if (ns._onLoginListener) {
             mBroadcaster.removeListener(ns._onLoginListener);
         }
@@ -663,4 +758,4 @@ var support = (function() {
     };
 
     return ns;
-})();
+});

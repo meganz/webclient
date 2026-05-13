@@ -21,3 +21,7 @@
 .web-desktop .mega-sheet.msg-dialog .nav-elem.text-only span {
     text-decoration: underline;
 }
+.web-desktop .mega-sheet.msg-dialog .primary-message ul:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+}

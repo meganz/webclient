@@ -199,7 +199,7 @@ lazy(mega.ui, 'notifyUtils', () => {
             }
             while (h) {
                 const n = M.d[h];
-                if (n && n.su) {
+                if (n && (n.su || M.isOutShare(n.h))) {
                     return n.h;
                 }
                 h = n  && n.p;
@@ -334,7 +334,11 @@ lazy(mega.ui, 'notifyUtils', () => {
         async _fetchNodesInShares(handles) {
             for (let i = 0; i < handles.length; i++) {
                 const handle = handles[i];
-                const node = await sharer.has(handle);
+                let node = await sharer.has(handle);
+                if (!node) {
+                    const share = await shared(handle).catch(dump);
+                    node = share && this.getNode(share);
+                }
                 if (node) {
                     // cache shared node
                     this.nodes[node.h] = node;

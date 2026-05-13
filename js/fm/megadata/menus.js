@@ -527,7 +527,8 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
         fmconfig.dlThroughMEGAsync &&
         !useMegaSync &&
         $.selected.length === 1 &&
-        selNode.t
+        selNode.t &&
+        sourceRoot !== M.RubbishID
     ) {
         items['.syncmegasync-item'] = 1;
     }

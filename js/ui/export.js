@@ -1104,7 +1104,25 @@ function logExportEvt(evtId, data) {
 
         ce('span', name).textContent = l.link_activity;
 
-        if (!pro) {
+        if (pro) {
+            /*
+            * Temporarily hide the information icon
+            * until UX designers find a good solution
+            node = ce('a', name, {
+                class: 'clickurl link-stats-info',
+                href: 'https://help.mega.io/files-folders/sharing/how-do-i-use-link-analytics',
+                target: '_blank'
+            });
+            ce('i', node, {
+                class: 'sprite-fm-mono icon-info-thin-outline simpletip',
+                'data-simpletip': l[8742],
+                'data-simpletipoffset': 4,
+                'data-simpletipposition': 'bottom',
+                'data-simpletipwrapper': 'body'
+            });
+            */
+        }
+        else {
             const loadPro = () => {
                 mega.ui.sheet.hide();
                 loadSubPage('pro');
@@ -3278,13 +3296,21 @@ function logExportEvt(evtId, data) {
     };
 
     const showLinkStatsDialog = async({ph, h}) => {
-        if (M.isInvalidUserStatus()) {
+        if (folderlink || M.isInvalidUserStatus()) {
             return;
         }
+
+        const showError = () => msgDialog(
+            'warninga',
+            l[1578],
+            l.na_link_analytics,
+            `<p><b>${l.dl_na_error_reasons}</b></p>${l.na_link_analytics_info}`
+        );
 
         h = h || M.getFileLinkHandle(ph);
 
         if (!h) {
+            showError();
             return false;
         }
 
@@ -3294,6 +3320,7 @@ function logExportEvt(evtId, data) {
             if (self.d) {
                 console.warn(`Invalid node in link stats dialog for ph: ${ph}...`, h);
             }
+            showError();
             return false;
         }
 

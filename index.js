@@ -1085,8 +1085,7 @@ function init_page() {
         init_key();
     }
     else if (page === 'support') {
-        parsepage(pages.support);
-        support.init();
+        support.init(true);
     }
     else if (page == 'contact') {
         mega.redirect('mega.io', 'contact', false, false);

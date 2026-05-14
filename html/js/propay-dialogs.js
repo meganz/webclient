@@ -2901,6 +2901,7 @@ var addressDialog = {
                         fm_fullreload(null, 'ub-business').catch(dump);
                     }
                     else {
+                        delete addressDialog.paymentInProcess;
                         pro.redirectToSite();
                     }
                 });
@@ -3055,9 +3056,6 @@ var addressDialog = {
                 if (typeof result === 'string') {
                     // success
                     this.showPaymentSuccess();
-                    if (pro.propay.planObj && (pro.propay.planObj.level !== pro.ACCOUNT_LEVEL_PRO_FLEXI)) {
-                        delete addressDialog.paymentInProcess;
-                    }
                 }
 
             })

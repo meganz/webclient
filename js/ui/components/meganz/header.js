@@ -930,8 +930,10 @@ class MegaHeader extends MegaMobileHeader {
             _buildInteractable({
                 componentClassname: 'reload-account',
                 text: l[23433],
-                onClick: () => {
-                    M.reload();
+                onClick({originalEvent: ev}) {
+                    const force = ev.ctrlKey || ev.metaKey;
+                    eventlog(99852, String(force | 0));
+                    return M.reload(force);
                 }
             });
 

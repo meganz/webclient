@@ -338,7 +338,7 @@ MegaData.prototype.renderTree = function() {
 
 MegaData.prototype.hideEmptyGrids = function hideEmptyGrids() {
     'use strict';
-    const excluded = ['.transfer-panel-empty-txt', '.fm-recents', '.fm-empty-contacts'];
+    const excluded = ['.fm-recents', '.fm-empty-contacts'];
     $(`.fm-empty-section:not(${excluded.join(',')})`).addClass('hidden');
     $('.fm-empty-section.fm-empty-sharef').remove();
     if (mega.ui.empty) {

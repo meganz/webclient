@@ -2470,9 +2470,6 @@ function fm_resize_handler(force) {
     else if (M.onDeviceCenter && M.onListView && mega.devices.ui.isCustomRender()) {
         initPerfectScrollbar($('.grid-scrolling-table', mega.devices.ui.gridWrapperSelector));
     }
-    else if (M.currentdirid === 'transfers') {
-        fm_tfsupdate(); // this will call $.transferHeader();
-    }
     else if (M.currentdirid && M.currentdirid.substr(0, 7) === 'account') {
         var $accountContent = $('.fm-account-main', '.pm-main');
 
@@ -2518,16 +2515,6 @@ function fm_resize_handler(force) {
         }
         // Resize the cloud drive breadcrumbs
         delay('render:path_breadcrumbs', () => M.renderPathBreadcrumbs());
-    }
-
-    if (M.currentdirid !== 'transfers') {
-        var treePaneWidth = Math.round($('.fm-left-panel:visible').outerWidth());
-
-        if (megaChatIsReady && megaChat.resized) {
-            megaChat.resized();
-        }
-
-        $('.popup.transfer-widget').outerWidth(treePaneWidth - 9);
     }
 
     if (M.currentrootid === 'shares') {

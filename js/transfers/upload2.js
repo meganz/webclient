@@ -187,6 +187,11 @@ var ulmanager = {
             mega.wsuploadmgr.run();
         }
 
+        const uls = ul_queue.filter(isQueueActive).map(ulmanager.getGID);
+        if (uls.length) {
+            tfsheadupdate({t: uls});
+        }
+        mega.tpw.resetErrorsAndQuotasUI(mega.tpw.UPLOAD);
         if (!this.ulOverStorageQueue.length) {
             if (d) {
                 ulmanager.logger.info('ulResumeOverStorageQuotaState: Nothing to resume.');
@@ -197,7 +202,6 @@ var ulmanager = {
             if ($.removeTransferItems) {
                 $.removeTransferItems();
             }
-            $("tr[id^='ul_']").removeClass('transfer-error').find('.transfer-status').text(l[7227]);
 
             this.ulOverStorageQueue.forEach(function(aFileUpload) {
                 var ul = aFileUpload.ul;
@@ -432,7 +436,6 @@ var ulmanager = {
             }
             else {
                 this.ulSetupQueue = false;
-                M.tfsdomqueue = Object.create(null);
                 this.abortAll();
             }
 
@@ -543,17 +546,6 @@ var ulmanager = {
                     ulmanager.logger.error('Too many retries for ' + cid);
                 }
                 var fileName = htmlentities(file.name);
-                var errorstr = reason.match(/"([^"]+)"/);
-
-                if (errorstr) {
-                    errorstr = errorstr.pop();
-                }
-                else {
-                    errorstr = reason.substr(0, 50) + '...';
-                }
-                if (!file.ulSilent) {
-                    $('#ul_' + file.id + ' .transfer-status').text(errorstr);
-                }
                 msgDialog('warninga', l[1309], l[1498] + ': ' + fileName, reason);
                 ulmanager.abort(file);
             }
@@ -750,16 +742,6 @@ var ulmanager = {
         if (req.t === M.InboxID && self.vw) {
             req.vw = 1;
         }
-
-        queueMicrotask(() => {
-            for (var k in M.tfsdomqueue) {
-                if (k[0] === 'u') {
-                    addToTransferTable(k, M.tfsdomqueue[k], 1);
-                    delete M.tfsdomqueue[k];
-                    break;
-                }
-            }
-        });
 
         if (d) {
             ulmanager.logger.info("Enqueueing put-nodes for '%s' into %s; %s", file.name, target, file.owner, req);
@@ -1258,9 +1240,8 @@ var ulmanager = {
             if (ul && handles.indexOf(ul.target) !== -1) {
                 var gid = ulmanager.getGID(ul);
                 toAbort.push(gid);
-                $('.transfer-status', $('#' + gid).addClass('transfer-error')).text(l[20634]);
                 tfsheadupdate({e: gid});
-                mega.tpw.errorDownloadUpload(mega.tpw.UPLOAD, ul, l[20634]);
+                mega.tpw.errorDownloadUpload(gid, l[20634]);
             }
         }
 
@@ -1354,18 +1335,12 @@ FileUpload.prototype.run = function(done) {
     file.ul_lastreason = file.ul_lastreason || 0;
 
     if (!(file.ulSilent || file.xput)) {
-        const domNode = document.getElementById(`ul_${file.id}`);
+        const domNodeExists = M.transferRowExists(`ul_${file.id}`);
 
-        if (ulmanager.ulStartingPhase || !domNode) {
+        if (ulmanager.ulStartingPhase || !domNodeExists) {
             done();
             ASSERT(0, "This shouldn't happen");
             return ulQueue.pushFirst(this);
-        }
-        domNode.classList.add('transfer-initiliazing');
-
-        const transferStatus = domNode.querySelector('.transfer-status');
-        if (transferStatus) {
-            transferStatus.textContent = l[1042];
         }
     }
 
@@ -1517,7 +1492,7 @@ ulQueue.validateTask = function(pzTask) {
     'use strict';
 
     return pzTask instanceof FileUpload
-        && (pzTask.file.xput || pzTask.file.ulSilent || document.getElementById(`ul_${pzTask.file.id}`));
+        && (pzTask.file.xput || pzTask.file.ulSilent || M.transferRowExists(`ul_${pzTask.file.id}`));
 };
 
 ulQueue.canExpand = function(max) {
@@ -1530,7 +1505,7 @@ Object.defineProperty(ulQueue, 'maxActiveTransfers', {
     // eslint-disable-next-line strict
     get: self.is_mobile ? () => 1 : self.is_transferit ? () => ulmanager.ulDefConcurrency << 2
         : function() {
-            return Math.min(Math.floor(M.getTransferTableLengths().size / 1.6), 36);
+            return (fmconfig.ul_maxSlots || ulmanager.ulDefConcurrency) << 2;
         }
 });
 

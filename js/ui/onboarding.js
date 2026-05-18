@@ -18,10 +18,10 @@ window.OBV4_FLAGS = {
     CLOUD_DRIVE_NEW_NAV_ACCOUNT: 'obcdnna',
     CLOUD_DRIVE_NEW_NAV_CHAT: 'obcdnnc',
     CLOUD_DRIVE_NEW_NAV_CONTACT: 'obcdnnp',
-    UNUSED_9: 'unused9',
-    UNUSED_10: 'unused10',
-    UNUSED_11: 'unused11',
-    UNUSED_12: 'unused12',
+    TPW_NEW: 'obtpw',
+    TPW_NEW_MOVE: 'obtpwm',
+    TPW_NEW_VIEW: 'obtpwv',
+    TPW_NEW_HIDE: 'obtpwh',
     CHAT_CALL_UI: 'obmcui',
     CHAT_CALL_RECORDING: 'obmcrec',
     CHAT_CALL_RAISE: 'obmcrai',
@@ -465,6 +465,64 @@ mBroadcaster.addListener('fm:initialized', () => {
                     ]
                 }
             ]
+        },
+        tpw: {
+            flag: OBV4_FLAGS.TPW_NEW,
+            dismissNoConfirm: true,
+            steps: [
+                {
+                    flag: OBV4_FLAGS.TPW_NEW_MOVE,
+                    get prerequisiteCondition() {
+                        return mega.tpw && mega.tpw.isWidgetVisibile() && mega.tpw.canShowOnboarding();
+                    },
+                    actions: [
+                        {
+                            type: 'showDialog',
+                            dialogClass: 'obdark',
+                            dialogTitle: l.ob_tpw_title_1,
+                            dialogDesc: l.ob_tpw_desc_1,
+                            targetElmClass: '.transfer-progress .transfer-progress-head',
+                            targetElmPosition: 'top left',
+                            markComplete: true,
+                        }
+                    ]
+                },
+                {
+                    flag: OBV4_FLAGS.TPW_NEW_VIEW,
+                    get prerequisiteCondition() {
+                        return mega.tpw && mega.tpw.isWidgetVisibile() && mega.tpw.canShowOnboarding();
+                    },
+                    actions: [
+                        {
+                            type: 'showDialog',
+                            dialogClass: 'obdark',
+                            dialogTitle: l.ob_tpw_title_2,
+                            dialogDesc: l.ob_tpw_desc_2,
+                            targetElmClass: '.transfer-progress .transfer-progress-head .js-tpm-open',
+                            targetElmPosition: 'top right',
+                            markComplete: true,
+                        }
+                    ]
+                },
+                {
+                    flag: OBV4_FLAGS.TPW_NEW_HIDE,
+                    get prerequisiteCondition() {
+                        return mega.tpw && mega.tpw.isWidgetVisibile() && mega.tpw.canShowOnboarding();
+                    },
+                    actions: [
+                        {
+                            type: 'showDialog',
+                            dialogClass: 'obdark',
+                            dialogTitle: l.ob_tpw_title_3,
+                            dialogDesc: l.ob_tpw_desc_3,
+                            dialogNext: l[726],
+                            targetElmClass: '.transfer-progress .transfer-progress-head .collapse',
+                            targetElmPosition: 'top right',
+                            markComplete: true,
+                        }
+                    ]
+                },
+            ]
         }
     };
 
@@ -703,7 +761,7 @@ mBroadcaster.addListener('fm:initialized', () => {
             };
             mega.ui.onboarding.map = _obMap;
             mBroadcaster.addListener('pagechange', () => {
-                onIdle(mega.ui.onboarding.start.bind(mega.ui.onboarding));
+                onIdle(() => mega.ui.onboarding.forceSection());
             });
             mega.ui.onboarding.start();
         }
@@ -767,7 +825,7 @@ mBroadcaster.addListener('fm:initialized', () => {
                     return;
                 }
 
-                mega.ui.onboarding.start();
+                mega.ui.onboarding.forceSection();
 
                 _handleMegaPassSteps();
             }, 1000);
@@ -844,8 +902,24 @@ mBroadcaster.addListener('fm:initialized', () => {
             this.flagStorage.safeCommit();
         }
 
+        forceSection(sectionId) {
+            if (!sectionId) {
+                delete this._forcedSection;
+                this.start();
+                return;
+            }
+            if (!this.map[sectionId]) {
+                return;
+            }
+            this._forcedSection = sectionId;
+            this.start();
+        }
+
         get currentSectionName() {
 
+            if (this._forcedSection) {
+                return this._forcedSection;
+            }
             switch (is_fm() && M.currentrootid) {
                 case M.RootID: return 'cloud-drive';
                 case M.InboxID: return 'inbox';
@@ -984,6 +1058,7 @@ mBroadcaster.addListener('fm:initialized', () => {
         setSectionComplete() {
             this.parent.flagStorage.setSync(this.map.flag, 1);
             this.parent.flagStorage.safeCommit();
+            this.parent.forceSection();
         }
     }
 
@@ -1075,20 +1150,42 @@ mBroadcaster.addListener('fm:initialized', () => {
             this.$dialog = $('#ob-dialog');
 
             M.safeShowDialog('onboardingDialog', () => {
-                this.$dialog.removeClass('mcob').addClass(this.map.dialogClass || '');
+                this.$dialog.removeClass('mcob obdark').addClass(this.map.dialogClass || '');
                 // Fill contents for the dialog
                 $('#ob-dialog-title').text(this.map.dialogTitle);
                 $('#ob-dialog-text').text(this.map.dialogDesc);
                 $('.js-next span', this.$dialog).text(this.map.dialogNext || l[556]);
                 $('.js-next', this.$dialog).attr('data-eventid', this.map.nextEvent || 0);
-                $('.js-skip', this.$dialog)
-                    .attr('data-eventid', this.map.skipEvent || 0)
-                    .text(this.map.dialogSkip || l.onboard_v4_dialog_skip)
-                    .removeClass('hidden')
-                    .addClass(this.map.skipHidden ? 'hidden' : '');
 
+                if ((this.map.dialogClass || '').includes('obdark')) {
+                    const steps = this.parentStep.actions.length === 1 ?
+                        this.parentStep.parentSection.steps.length : this.parentStep.actions.length;
+                    const stepIdx = this.parentStep.actions.length === 1 ?
+                        this.parentStep.parentSection.currentStepIndex : this.parentStep.currentActionIndex;
+                    $('.ob-step-count', this.$dialog).removeClass('hidden')
+                        .text(`${(stepIdx | 0) + 1}/${steps}`);
+                    $('.js-skip', this.$dialog).addClass('hidden');
+                    $('.js-dark-skip', this.$dialog)
+                        .attr('data-eventid', this.map.skipEvent || 0)
+                        .removeClass('hidden')
+                        .addClass(this.map.skipHidden ? 'hidden' : '');
+                    $('.js-next', this.$dialog).removeClass('theme-light-forced');
+                }
+                else {
+                    $('.ob-step-count', this.$dialog).addClass('hidden');
+                    $('.js-dark-skip', this.$dialog).addClass('hidden');
+                    $('.js-skip', this.$dialog)
+                        .attr('data-eventid', this.map.skipEvent || 0)
+                        .text(this.map.dialogSkip || l.onboard_v4_dialog_skip)
+                        .removeClass('hidden')
+                        .addClass(this.map.skipHidden ? 'hidden' : '');
+                    $('.js-next', this.$dialog).addClass('theme-light-forced');
+                }
                 this.positionDialog();
                 this.bindDialogEvents();
+                if (this.parentStep.isComplete || this.parentStep.parentSection.isComplete) {
+                    onIdle(() => closeDialog());
+                }
 
                 return this.$dialog;
             });
@@ -1142,6 +1239,16 @@ mBroadcaster.addListener('fm:initialized', () => {
                     at = 'left+34 top';
                     arrowAt = 'top-right';
                     break;
+                case 'top left':
+                    my = 'left bottom';
+                    at = 'left top-8';
+                    arrowAt = 'bottom-left';
+                    break;
+                case 'top right':
+                    my = 'right bottom';
+                    at = 'right top-8';
+                    arrowAt = 'bottom-right';
+                    break;
                 case 'bottom 10':
                 case 'bottom 20':
                     at = 'center bottom+26';
@@ -1169,7 +1276,8 @@ mBroadcaster.addListener('fm:initialized', () => {
                 collision: 'flipfit',
                 using: (obj, info) => {
 
-                    if (arrowAt && arrowAt !== 'top-left' && arrowAt !== 'top-right') {
+                    if (arrowAt && arrowAt !== 'top-left' && arrowAt !== 'top-right' &&
+                        arrowAt !== 'bottom-left' && arrowAt !== 'bottom-right') {
                         // Dialog position is moved due to collision on viewport swap arrow position
                         if (info.horizontal === 'right' && obj.left < info.target.left) {
                             arrowAt = 'right';
@@ -1199,10 +1307,12 @@ mBroadcaster.addListener('fm:initialized', () => {
 
             if (arrowAt) {
                 $('#ob-dialog-arrow', this.$dialog)
-                    .removeClass('hidden top bottom left right top-left top-right').addClass(arrowAt);
+                    .removeClass('hidden top bottom left right top-left top-right bottom-left bottom-right')
+                    .addClass(arrowAt);
             }
             else {
-                $('#ob-dialog-arrow', this.$dialog).addClass('hidden').removeClass('top bottom left right top-left');
+                $('#ob-dialog-arrow', this.$dialog).addClass('hidden')
+                    .removeClass('top bottom left right top-left top-right bottom-left bottom-right');
             }
 
             // If it was temporary bug fixing hidden removal, add hidden back
@@ -1327,13 +1437,13 @@ mBroadcaster.addListener('fm:initialized', () => {
             });
 
             // Skip button clicked, close dialog and mark step as completed
-            $('.js-skip', this.$dialog).rebind('click.onboarding', (ev) => {
+            $('.js-skip, .js-dark-skip', this.$dialog).rebind('click.onboarding', (ev) => {
 
                 const eventId = parseInt(ev.currentTarget.dataset.eventid, 10);
                 if (eventId) {
                     eventlog(eventId);
                 }
-                __closeDialogAction(true);
+                __closeDialogAction();
                 this.parentStep.parentSection.showConfirmDismiss();
             });
 

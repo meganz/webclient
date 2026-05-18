@@ -107,7 +107,7 @@
             console.log('DragEnter', optionReference.touchedElement);
         }
         e.preventDefault();
-        if ($.dialog === 'avatar') {
+        if ($.dialog === 'avatar' || mega.tpw && mega.tpw.isDialog) {
             return;
         }
         e.stopPropagation();
@@ -199,7 +199,7 @@
             console.log('DragLeave', optionReference.touchedElement);
         }
         e.preventDefault();
-        if ($.dialog === 'avatar') {
+        if ($.dialog === 'avatar' || mega.tpw && mega.tpw.isDialog) {
             return;
         }
         e.stopPropagation();
@@ -234,7 +234,7 @@
             return false;
         }
 
-        if ($.dialog === 'avatar') {
+        if ($.dialog === 'avatar' || mega.tpw && mega.tpw.isDialog) {
             return;
         }
         if (e.stopPropagation) {
@@ -267,7 +267,6 @@
                 folderlink || currentDir &&
                 (
                     currentDir !== 'dashboard' &&
-                    currentDir !== 'transfers' &&
                     (M.getNodeRights(currentDir) | 0) < 1
                 )
             ) &&
@@ -430,7 +429,7 @@
                 M.currentdirid === 'file-requests' || // File request page
                 String(M.currentdirid).startsWith('chat/contacts') || // Contacts pages
                 M.currentrootid === M.RubbishID || // Rubbish bin
-                (M.currentrootid === undefined && M.currentdirid !== 'transfers') // Dashboard and Settings pages
+                M.currentrootid === undefined // Dashboard and Settings pages
             ));
     }
 

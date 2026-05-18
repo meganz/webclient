@@ -64,7 +64,7 @@ function msgDialog(type, title, msg, subMsg, callback, checkboxCallback) {
         }
     }
 
-    const reverseAction = ['warninga', 'warningb', 'info', 'error'].includes(type);
+    const reverseAction = ['warninga', 'warningb', 'info', 'error', 'megasync-reconnect'].includes(type);
 
     if (is_mobile) {
 

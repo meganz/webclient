@@ -394,14 +394,15 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
             $.transferprogress = Object.create(null);
         }
 
+        const gid = `dl_${fileid}`;
         if (bytestotal) {
-            $.transferprogress["dl_" + fileid] = [bytesloaded, bytestotal, kbps * 1000];
+            $.transferprogress[gid] = [bytesloaded, bytestotal, kbps * 1000];
         }
-        tfsheadupdate({t: `dl_${fileid}`});
+        tfsheadupdate({t: gid});
         if (mega.tpw) {
             mega.tpw.updateDownloadUpload(
                 mega.tpw.DOWNLOAD,
-                fileid,
+                gid,
                 perc,
                 bytesloaded,
                 bytestotal,
@@ -500,9 +501,10 @@ function dlcomplete(dl) {
         mega.ui.dlPage.showCompleteUI();
     }
 
-    tfsheadupdate({f: dlmanager.getGID(dl)});
+    const gid = dlmanager.getGID(dl);
+    tfsheadupdate({f: gid});
     if (mega.tpw) {
-        mega.tpw.finishDownloadUpload(mega.tpw.DOWNLOAD, dl);
+        mega.tpw.finishDownloadUpload(gid, dl);
     }
 }
 
@@ -571,6 +573,10 @@ function dlPageCleanup() {
         dl_node = false;
     }
 
+    if (dlpage_ph) {
+        dlpage_ph = false;
+    }
+
     if (window.textConIsDl) {
         mega.textEditorUI.cleanup();
         delete window.textConIsDl;
@@ -584,7 +590,13 @@ function dlPageCleanup() {
     }
     if (!is_mobile && typeof fdl_queue_var !== 'undefined') {
         if (mega.tpw && mega.tpw.completeRowsLength) {
-            mega.tpw.clearRows(mega.tpw.DONE);
+            if ($.removeTransferItems) {
+                $.removeTransferItems();
+            }
+            else {
+                tfsheadupdate({c: `dl_${fdl_queue_var.dl_id}`});
+                mega.tpw.clearRows(mega.tpw.DONE);
+            }
         }
     }
 }

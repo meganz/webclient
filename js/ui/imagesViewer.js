@@ -1559,7 +1559,6 @@ var slideshowid;
             for (var i = dl_queue.length; i--;) {
                 if (dl_queue[i] && dl_queue[i].id === slideshow_handle() && dl_queue[i].preview) {
                     dl_queue[i].preview = false;
-                    M.openTransfersPanel();
                     return;
                 }
             }

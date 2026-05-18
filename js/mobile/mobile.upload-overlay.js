@@ -288,10 +288,6 @@ mobile.uploadOverlay = {
         if (uploadTransferComponent) {
             ulmanager.abort(ul.id);
 
-            if (M.tfsdomqueue[ul.id]) {
-                delete M.tfsdomqueue[ul.id];
-            }
-
             // Remove upload file transfer
             this.remove(this.uploadTransfers, `ul_${ul.id}`);
 

@@ -434,6 +434,9 @@ function init_page() {
     if (page === "fm/opc") {
         return loadSubPage("/fm/chat/contacts/sent");
     }
+    if (page === 'fm/transfers') {
+        return loadSubPage('fm');
+    }
 
     $('#loading').hide();
     if (window.loadingDialog) {
@@ -708,7 +711,7 @@ function init_page() {
             page = 'fm';
         }
     }
-    else if (!flhashchange || page !== 'fm/transfers') {
+    else {
         if (pfcol) {
             pfcol = false;
             mega.gallery.albums.disposeAll();
@@ -1481,14 +1484,13 @@ function init_page() {
         page = 'download';
         if (typeof fdl_queue_var !== 'undefined') {
             var handle = Object(fdl_queue_var).ph || '';
-            var $tr = $('.transfer-table tr#dl_' + handle);
-            if ($tr.length) {
+            if (mega.tpw && mega.tpw.hasDOMRow(`dl_${handle}`)) {
                 var dl = dlmanager.getDownloadByHandle(handle);
                 if (dl) {
                     dl.onDownloadProgress = dlprogress;
                     dl.onDownloadComplete = dlcomplete;
                     dl.onDownloadError = M.dlerror;
-                    $tr.remove();
+                    mega.tpw.removeRow(`dl_${handle}`);
                 }
             }
         }
@@ -1752,10 +1754,6 @@ function init_page() {
                 .catch(reportError);
         }
         else {
-            if (ul_queue.length > 0) {
-                M.openTransfersPanel();
-            }
-
             if (u_type === 0 && !u_attr.terms && !is_eplusplus) {
                 $.termsAgree = function () {
                     u_attr.terms = 1;
@@ -1830,10 +1828,6 @@ function init_page() {
             if (fminitialized && !is_mobile) {
                 M.addViewUI();
 
-                if ($.transferHeader) {
-                    $.transferHeader();
-                }
-
                 if (mega.ui.header) {
                     mega.ui.header.show();
                 }
@@ -1841,7 +1835,7 @@ function init_page() {
         }
 
         if (!is_mobile && typeof fdl_queue_var !== 'undefined') {
-            if (!$('.transfer-table tr#dl_' + Object(fdl_queue_var).ph).length) {
+            if (!mega.tpw.hasDOMRow(`dl_${Object(fdl_queue_var).ph}`)) {
                 var fdl = dlmanager.getDownloadByHandle(Object(fdl_queue_var).ph);
                 if (fdl && fdl_queue_var.dlkey === dlpage_key) {
 

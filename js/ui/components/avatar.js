@@ -11,6 +11,7 @@ class MegaAvatarComponent extends MegaLazyRenderComponent {
         if (this.simpletip) {
             this.addClass('simpletip');
             this.domNode.dataset.simpletip = l[5533];
+            this.domNode.dataset.simpletipposition = 'top';
         }
         if (MegaAvatarComponent.SIZES[options.size]) {
             this.addClass(MegaAvatarComponent.SIZES[options.size]);
@@ -81,7 +82,10 @@ class MegaAvatarComponent extends MegaLazyRenderComponent {
         if (!this.lastMeta) {
             return;
         }
-        if (this.simpletip && this.lastMeta.fullName) {
+        if (typeof this.simpletip === 'function') {
+            this.domNode.dataset.simpletip = String(this.simpletip(this.lastMeta));
+        }
+        else if (this.simpletip && this.lastMeta.fullName) {
             this.domNode.dataset.simpletip = this.lastMeta.fullName;
         }
     }

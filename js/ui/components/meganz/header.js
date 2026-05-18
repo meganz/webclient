@@ -523,7 +523,8 @@ class MegaHeader extends MegaMobileHeader {
     closeAvatarMenu(e) {
 
         if (mega.ui.header.isSubmenuClose([mega.ui.header.avatarMenu, '.header-dropdown-menu', 'button.avatar'], e) ||
-            e && (e.target.closest('.sub-menu-wrap') || e.target.closest('.top-mega-version'))) {
+            e && !e.target.closest('.sub-menu.support.active')
+            && (e.target.closest('.sub-menu-wrap') || e.target.closest('.top-mega-version'))) {
             return;
         }
 

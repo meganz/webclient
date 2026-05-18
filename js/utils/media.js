@@ -1163,6 +1163,13 @@ FullScreenManager.prototype.enterFullscreen = function() {
                         return;
                     }
 
+                    if (!$watchAgainButton.hasClass('hidden')) {
+                        if (self.d) {
+                            console.warn('skipping repetitive ended event(s), seeking forward?');
+                        }
+                        return;
+                    }
+
                     $('i', $playpause).removeClass(`icon-pause-small-regular-${style}`)
                         .addClass('icon-rotate-ccw-small-regular-outline');
                     $('.playpause-wrapper .tooltip', $wrapper).text(l.video_player_watch_again);

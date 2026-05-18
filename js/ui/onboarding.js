@@ -907,7 +907,7 @@ mBroadcaster.addListener('fm:initialized', () => {
 
         showConfirmDismiss() {
 
-            this.hotspotNextStep();
+            tSleep(1).then(() => this.hotspotNextStep());
             this.currentStepIndex = undefined;
             if (this.map.dismissNoConfirm) {
                 return this.setSectionComplete();
@@ -1282,7 +1282,9 @@ mBroadcaster.addListener('fm:initialized', () => {
                     }
 
                     __closeDialogAction();
-                    this.parentStep.parentSection.hotspotNextStep();
+                    tSleep(1).then(() => {
+                        this.parentStep.parentSection.hotspotNextStep();
+                    });
                 }
             });
 

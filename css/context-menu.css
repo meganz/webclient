@@ -1,18 +1,19 @@
 .context-menu {
-    background: var(--surface-main);
-    border: var(--context-menu-border);
-    border-radius: 12px;
-    box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.3);
+    background: var(--mobile-page-background);
+    border: 1px solid var(--mobile-border-strong);
+    border-radius: 16px;
     box-sizing: border-box;
+    box-shadow: var(--mobile-shadow-medium);
     display: none;
     left: 0;
+    min-width: 220px;
     opacity: 0;
     padding: 8px 0;
     position: absolute;
-    right: 0;
     top: 0;
     transition: opacity 150ms, left 150ms, right 150ms, top 150ms, margin 150ms;
-    width: 200px;
+    -webkit-user-select: none;
+    user-select: none;
 }
 .context-menu.file-menu {
     left: 0;
@@ -53,14 +54,11 @@
     margin-bottom: 0;
     margin-top: auto;
 }
-.context-menu li.divider {
-    padding: 0;
-}
 .context-menu hr {
-    background: var(--surface-grey-2);
+    background: var(--mobile-border-strong);
     border: none;
     height: 1px;
-    margin: 8px 0;
+    margin: 4px 0;
     width: 100%;
 }
 .context-menu ul {
@@ -69,43 +67,49 @@
     padding: 0;
 }
 .context-menu li {
-    padding: 0 8px;
     position: relative;
 }
 .context-menu li button {
-    --mask-color: var(--icon-rest);
     align-items: center;
-    background: var(--surface-main);
-    border: none;
-    border-radius: 4px;
-    color: var(--text-color-medium);
+    background: transparent;
+    border: 0;
+    border-radius: 8px;
+    box-sizing: border-box;
+    color: var(--mobile-text-primary);
     cursor: pointer;
     display: flex;
-    outline: none;
-    font: var(--text-body1);
-    min-height: 32px;
+    font: var(--mobile-font-caption-large-regular);
+    overflow: hidden;
+    max-width: calc(100% - 16px);
+    min-height: 36px;
+    margin: 0 8px;
+    padding: 0 8px;
+    position: relative;
     text-align: start;
+    text-overflow: ellipsis;
     transition: var(--transition-bg-color), var(--transition-color);
+    white-space: nowrap;
     width: 100%;
 }
 .context-menu li button:hover {
-    --mask-color: var(--icon-active);
-    background: var(--button-hover);
-    color: var(--text-color-high);
+    --mask-color: var(--mobile-button-primary-pressed);
+    background: var(--mobile-button-outline-background-hover);
+    color: var(--mobile-button-primary-pressed);
 }
 .context-menu li i {
-    flex-grow: 0;
-    flex-shrink: 0;
     --icon-size: 24px;
-    margin-inline-end: 8px;
+    flex: 0 0 auto;
+    margin-inline-end: 18px;
     transition: var(--transition-color);
 }
 .context-menu li span ~ i {
     margin-inline-end: 0;
-    margin-inline-start: 8px;
+    margin-inline-start: 18px;
 }
 .context-menu span {
-    width: 100%;
+    flex: 1 1 auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 .context-menu .shortcut {
     color: var(--text-color-low);

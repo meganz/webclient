@@ -2759,6 +2759,8 @@ else if (!browserUpdate) {
         jsl.push({f:'css/embedplayer.css', n: 'embedplayer_css', j: 2, w: 5});
         jsl.push({f:'css/video-player.css', n: 'video_player_css', j: 2});
         jsl.push({f:'css/vars/theme.css', n: 'vars_theme_css', j:2, w:30});
+        jsl.push({f:'css/vars/mobile-theme.css', n: 'vars_mobile_theme_css', j:2, w:30});
+        jsl.push({f:'css/vars/mobile-theme-auto.css', n: 'vars_mobile_theme_auto_css',  j:2, w:30});
         jsl.push({f:'css/sprites/embed-mono@mono.css', n: 'embed_mono_css', j:2});
     }
 

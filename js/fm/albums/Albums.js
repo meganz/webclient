@@ -617,7 +617,7 @@ lazy(mega.gallery, 'albums', () => {
     }));
 
     const sortStore = () => {
-        const {n, d} = fmconfig.sortmodes[M.currentdirid] || M.sortmode || {n: 'date', d: 1};
+        const {n, d} = fmconfig.sortmodes && fmconfig.sortmodes[M.currentdirid] || M.sortmode || {n: 'date', d: 1};
         const albumKeys = Object.keys(scope.albums.store);
 
         albumKeys.sort((keyA, keyB) => sortAlbumsArray(

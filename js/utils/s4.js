@@ -5,7 +5,7 @@ lazy(s4, 'kernel', () => {
     'use strict';
     const S4PTR = Symbol('~~s4~tag');
     const S4SES = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
-    const BASE_DOMAIN = `%n.${localStorage.s4domain || 'g.s4.mega.io'}`;
+    const BASE_DOMAIN = `%n.${localStorage.s4domain || 'g.megas4.com'}`;
     const EMPTY_OBJ = self.freeze(Object.create(null));
 
     const logger = new MegaLogger('S4Kernel', {
@@ -1201,7 +1201,7 @@ lazy(s4, 'kernel', () => {
 
         /**
          * Fetch container information.
-         * If handle corresponds to a MEGA managed node, host is build as <public_handle>.global.mega.io
+         * If handle corresponds to a MEGA managed node, host is build as <public_handle>.global.megas4.com
          * where <public_handle> is the writable folder link ph codified as a 15 decimal numbers string (left
          * padded with 0 if shorter than 15), e.g. 562949953421311. If handle corresponds to a self managed node,
          * ph contains the public handler of the writable folder link, key is build as <share_key>:<writable_secret>

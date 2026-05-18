@@ -171,7 +171,10 @@ var bottompage = {
 
         var $pagesMenu = $('.pages-menu.body', $content);
 
-        $('a.priority-support', bottompage.$footer).toggleClass('hidden', !u_attr || !u_attr.p);
+        const pwmOrVpnFeature = u_attr && u_attr.features &&
+            u_attr.features.find(e => e[1] === 'pwm' || e[1] === 'vpn');
+        $('a.priority-support', bottompage.$footer)
+            .toggleClass('hidden', !u_attr || !u_attr.p && !pwmOrVpnFeature);
 
         // Hide Pricing link for current Business or Pro Flexi accounts
         if ((u_attr && u_attr.b && u_attr.b.s !== pro.ACCOUNT_STATUS_EXPIRED) ||

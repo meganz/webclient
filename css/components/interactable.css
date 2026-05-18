@@ -127,6 +127,12 @@ Implemented styles:
     --icon-size: 24px;
 }
 
+.nav-elem.lg-size {
+    --icon-size: 24px;
+    height: auto;
+    min-height: 56px;
+}
+
 .nav-elem.full-width > *:not(:last-child) {
     margin-inline-end: 18px;
 }
@@ -248,6 +254,10 @@ button.nav-elem.no-active:active,
 .nav-elem.text-only.red,
 .nav-elem.text-icon.red {
     color: var(--secondary-red);
+}
+.nav-elem.text-only.button-brand,
+.nav-elem.text-icon.button-brand {
+    color: var(--mobile-text-brand);
 }
 .nav-elem.text-only.no-deco,
 .nav-elem.full-width.text-icon,
@@ -456,13 +466,16 @@ button.nav-elem.no-active:active,
 }
 
 .nav-elem.loading.sprite-fm-theme-after::after,
-.nav-elem.loading.sprite-fm-uni-after::after {
+.nav-elem.loading.sprite-fm-uni-after::after,
+.nav-elem.loading.sprite-fm-theme-after.icon-replace i::after,
+.nav-elem.loading.sprite-fm-uni-after.icon-replace i::after {
     animation-name: rotate;
     animation-duration: 1000ms;
     animation-iteration-count: infinite;
     animation-timing-function: steps(8, end);
     margin: auto; /* Justify in center */
     display: block;
+    flex: 0 0 auto;
     --icon-size: 22px;
     position: absolute;
 }
@@ -470,15 +483,20 @@ button.nav-elem.no-active:active,
 .nav-elem.loading.sprite-fm-theme-after.visible-txt::after,
 .nav-elem.loading.sprite-fm-uni-after.visible-txt::after {
     position: relative;
-    margin-left: 0.5rem;
+    margin-inline-start: 0.5rem;
 }
 
 .nav-elem.loading .text-box-wrapper.sk-elm {
     opacity: 0;
 }
 
-.nav-elem.loading.visible-txt .text-box-wrapper.sk-elm {
+.nav-elem.loading.visible-txt .text-box-wrapper.sk-elm,
+.nav-elem.loading.icon-replace .text-box-wrapper.sk-elm {
     opacity: 1;
+}
+
+.nav-elem.loading.icon-replace i {
+    opacity: 0;
 }
 
 .nav-elem .multi-text-box {
@@ -516,12 +534,22 @@ button.nav-elem.no-active:active,
 button.nav-elem.pro-only,
 button.nav-elem.pro-only:hover,
 button.nav-elem.pro-only:active {
-    color: var(--secondary-red);
-    border-color: var(--secondary-red);
-    font-size: 12px;
+    color: var(--mobile-brand-default);
+    border-color: var(--mobile-brand-default);
     padding: 0 8px;
     height: 28px;
     cursor: pointer;
+}
+
+button.nav-elem.pro-only.sm-size {
+    border-radius: 2px;
+    border-width: 1px;
+    height: 18px;
+    padding: 0 4px;
+}
+
+button.nav-elem.pro-only.sm-size span {
+    font: var(--mobile-font-caption-small-regular);
 }
 
 .nav-elem .right-badge {

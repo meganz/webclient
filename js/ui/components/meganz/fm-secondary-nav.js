@@ -175,13 +175,16 @@ class MegaNavCard extends MegaComponent {
             `;
         }
         else if (this.isS4) {
-            const bucket = s4.utils.getBucketNode(this.node);
-            const url = s4.kernel.bucket.getHostDomain(bucket.h);
-            return `
-                <div class="fm-item-badge s4 selectable-txt">
-                    ${escapeHTML(url)}
-                </div>
-            `;
+            const n = M.getNodeByHandle(this.node.h);
+
+            if (!n || n.p === M.RubbishID) {
+                return '';
+            }
+
+            const bucket = s4.utils.getBucketNode(n);
+            const url = bucket ? s4.kernel.bucket.getHostDomain(bucket.h) : null;
+
+            return url ? `<div class="fm-item-badge s4 selectable-txt">${escapeHTML(url)}</div>` : '';
         }
         return '';
     }

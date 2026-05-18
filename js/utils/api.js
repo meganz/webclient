@@ -2230,11 +2230,12 @@ lazy(self, 'api', () => {
                 const obj = {...uSearchParams, v: this.version, lang: window.lang};
 
                 // If using an extension, the version is passed through to the API for the helpdesk tool
-                if (is_extension) {
+                if (self.is_extension) {
                     obj.domain = 'meganz';
                     obj.ext = is_chrome_web_ext ? buildVersion.chrome : buildVersion.firefox;
                 }
                 else {
+                    obj.wcv = self.buildVersion && buildVersion.website || 0;
                     obj.domain = location.host.split('.').slice(-3).join('');
                 }
 

@@ -23,7 +23,7 @@ var slideshowid;
     const broadcasts = [];
     const MOUSE_IDLE_TID = 'auto-hide-previewer-controls';
     let zoomPan = false;
-    let videoSlept = false;
+    let activeVideoSlide = false;
 
     const onConfigChange = (name) => {
         if (name === 'speed') {
@@ -213,10 +213,7 @@ var slideshowid;
             }
         }
 
-        if (!videoSlept) {
-            slideshow_timereset();
-        }
-        videoSlept = false;
+        slideshow_timereset();
     }
 
     function slideshow_next(steps) {
@@ -569,9 +566,12 @@ var slideshowid;
     function slideshow_timereset(sleepTime) {
         slideshow_aborttimer();
 
-        const sTime = sleepTime || mega.slideshow.settings.speed.getValue() / 1e3;
+        const {speed} = mega.slideshow.settings;
+        const sTime = sleepTime === undefined
+            ? speed ? speed.getValue() / 1e3 : 3
+            : sleepTime;
 
-        if (slideshowplay && !slideshowpause) {
+        if (slideshowplay && !slideshowpause && !activeVideoSlide) {
             (slideshowTimer = tSleep(sTime))
                 .then(() => {
                     if (slideshowplay) {
@@ -601,6 +601,7 @@ var slideshowid;
         var $pauseButton = $('.sl-btn.playpause', $slideshowControls);
         var $prevButton = $('.sl-btn.previous', $slideshowControls);
         var $nextButton = $('.sl-btn.next', $slideshowControls);
+        const $repeatButton = $('.v-btn.repeat', $overlay);
 
         if (slideshow_stop) {
             $viewerTopBar.removeClass('hidden');
@@ -608,6 +609,7 @@ var slideshowid;
             $prevNextButtons.removeClass('hidden');
             $slideshowControls.addClass('hidden');
             $slideshowControlsUpper.addClass('hidden');
+            $repeatButton.removeClass('disabled').removeAttr('disabled');
             slideshow_play(false, close);
             slideshowpause = false;
             $pauseButton.attr('data-state', 'pause');
@@ -653,6 +655,7 @@ var slideshowid;
             $slideshowControls.removeClass('hidden');
             $slideshowControlsUpper.removeClass('hidden');
             $prevNextButtons.addClass('hidden');
+            $repeatButton.addClass('disabled').attr('disabled', 'disabled');
 
             if (zoomPan) {
                 zoomPan.reset();
@@ -1146,6 +1149,7 @@ var slideshowid;
 
         // Clear previousy set data
         switchedSides = false;
+        activeVideoSlide = false;
         $('header .file-name', $overlay).text(n.name);
         $('header .file-size', $overlay).text(bytesToSize(n.s || 0));
         $('.viewer-error, #pdfpreviewdiv1, #docxpreviewdiv1', $overlay).addClass('hidden');
@@ -1161,10 +1165,7 @@ var slideshowid;
         $playPauseButton.addClass('hidden');
         $('i', $playPauseButton).removeClass().addClass('sprite-fm-mono icon-play-small-regular-solid');
         $('.viewer-progress p, .video-time-bar', $content).removeAttr('style');
-
-        if (!slideshowplay) {
-            $('img', $imgWrap).removeClass('active');
-        }
+        $('img', $imgWrap).removeClass('active');
 
         // Clear video file data
         $video.css('background-image', '').removeAttr('poster src').addClass('hidden');
@@ -1880,16 +1881,9 @@ var slideshowid;
         const $pendingBlock = $('.loader-grad', $content);
         var $video = $('video', $content);
         var $playVideoButton = $('.play-video-button', $content);
-        let hasRestTimer = false;
 
         if (previews[id].fma === undefined && !is_audio(n)) {
             previews[id].fma = MediaAttribute(n).data || false;
-        }
-
-        if (autoPlay && slideshowplay && previews[id].fma && previews[id].fma.playtime) {
-            videoSlept = true;
-            hasRestTimer = true;
-            slideshow_timereset(previews[id].fma.playtime);
         }
 
         $playVideoButton.rebind('click', function() {
@@ -1914,6 +1908,13 @@ var slideshowid;
                 sessionStorage.removeItem('previewTime');
             };
 
+            const toggleSlideshow = (pause) => {
+                if (slideshowplay) {
+                    activeVideoSlide = !!pause;
+                    slideshow_timereset(0);
+                }
+            };
+
             // Show loading spinner until video is playing
             $pendingBlock.removeClass('hidden');
             $('.video-controls', $overlay).removeClass('hidden');
@@ -1927,6 +1928,9 @@ var slideshowid;
                 requestAnimationFrame(() => mega.initMobileVideoControlsToggle($overlay));
             }
 
+            // Stop switching slides until we try to stream
+            toggleSlideshow(true);
+
             initVideoStream(n, $overlay, destroy).done(streamer => {
                 preqs[n.h] = streamer;
                 preqs[n.h].options.uclk = !autoPlay;
@@ -1939,10 +1943,6 @@ var slideshowid;
                 // If video is playing
                 preqs[n.h].on('playing', function() {
                     var video = this.video;
-
-                    if (hasRestTimer) {
-                        slideshow_timereset(previews[id].fma.playtime);
-                    }
 
                     if (video && video.duration) {
 
@@ -1970,10 +1970,20 @@ var slideshowid;
                     return true;
                 });
 
+                preqs[n.h].on('ended', () => {
+                    // Continue slideshow
+                    toggleSlideshow();
+                });
+
                 if (typeof psa !== 'undefined') {
                     psa.repositionMediaPlayer();
                 }
-            }).catch(console.warn.bind(console));
+            }).catch((ex) => {
+                console.warn(ex);
+
+                // Continue slideshow
+                toggleSlideshow();
+            });
         });
 
         $overlay.addClass('video');

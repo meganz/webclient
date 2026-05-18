@@ -212,7 +212,12 @@ function init_key() {
 function ui_keycomplete() {
     'use strict';
 
-    tryCatch(() => mega.ui.key.step2(), self.reportError)();
+    if (localStorage.getItem('pwm2yPromo') === '1') {
+        loadSubPage('get2ypwm');
+    }
+    else {
+        tryCatch(() => mega.ui.key.step2(), self.reportError)();
+    }
 
     // Sets the "Hide Recent Activity" toggle in Settings to `OFF` by default
     mBroadcaster.once('fm:initialized', () => {

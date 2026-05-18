@@ -954,7 +954,7 @@ mBroadcaster.once('boot_done', () => {
                 }
 
                 // This is a Backup folder
-                if (arr[arr.length - 1].h === M.InboxID && arr[arr.length - 2].h === M.BackupsId) {
+                if (arr.length > 1 && arr[arr.length - 1].h === M.InboxID && arr[arr.length - 2].h === M.BackupsId) {
                     arr = [...arr.slice(0, -2), { h: '', name: l.restricted_folder_button }];
                     isBackup = true;
                 }

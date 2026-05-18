@@ -369,7 +369,7 @@ BusinessAccount.prototype.sendSubMKey = async function() {
         .then(({result}) => {
             assert(typeof result === 'string', `Invalid API Response...${result}`);
 
-            return mega.attr.remove('gmk', -2, 0).catch(reportError);
+            return mega.attr.remove('gmk', -2, 0).catch(ex => ex !== ENOENT && reportError(ex));
         });
 };
 

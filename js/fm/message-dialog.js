@@ -85,12 +85,6 @@ function msgDialog(type, title, msg, subMsg, callback, checkboxCallback) {
             $.msgDialog = type;
         }
 
-        // @todo: Remove stuff once mobile msgDialog and ephemeral session UI are ready
-        if (type === 'import_login_or_register' && typeof callback === 'function') {
-            callback(-1);
-            return false;
-        }
-
         megaMsgDialog.render(
             title,
             msg,
@@ -318,7 +312,6 @@ lazy(msgDialog, 'defaultButtons', () => {
         'info': [l.ok_button],
         'error': [l.ok_button],
         'save_discard_cancel': [l.msg_dlg_save, l.msg_dlg_discard, l.msg_dlg_cancel],
-        'import_login_or_register': [l[209], l[171], false, l[20754]],
         'reload-account': [l.reload_account_btn, l.msg_dlg_cancel],
         'megasync-reconnect': [l.reconnect, l[20827]]
     };

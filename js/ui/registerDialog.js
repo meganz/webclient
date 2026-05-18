@@ -179,7 +179,7 @@
         options = {};
     }
 
-    function doProRegister($dialog, aPromise) {
+    function doProRegister($dialog, aPromise, pageBound) {
         const rv = {};
         const registerBtn = $dialog[0].componentSelector('.mega-button:not(.js-close)');
         registerBtn.loading = true;
@@ -437,7 +437,7 @@
             }
         }
         if (err) {
-            eventlog(501133, errReasons.join(','), true);
+            eventlog(pageBound ? 501133 : 501242, errReasons.join(','), true);
             registerBtn.loading = false;
         }
     }
@@ -501,6 +501,10 @@
 
         component.show(showOptions);
         component.toggleClass('business-sub-account', !!options.businessSubAccountInfo);
+
+        if (!pageBound) {
+            eventlog(501240);
+        }
 
         placeLangBtnToLogin(is_mobile ? component : undefined);
 
@@ -684,7 +688,7 @@
         submitButton.rebind('click.proRegister', () => {
             if (!submitButton.loading && !submitButton.disabled) {
                 eventlog(pageBound ? 99809 : 501043);
-                doProRegister($dialog, aPromise);
+                doProRegister($dialog, aPromise, pageBound);
             }
             return false;
         });
@@ -699,7 +703,7 @@
         submitButton.rebind('keydown.proRegister', _keysubmit);
 
         $inputs.rebind('keyup.registerforminteraction', () => {
-            eventlog(501132, true);
+            eventlog(pageBound ? 501132 : 501241, true);
             $inputs.off('keyup.registerforminteraction');
         });
     }

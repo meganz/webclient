@@ -831,8 +831,10 @@ lazy(FS, 'Secureboot', () => {
             else if (f.j == 5) {
                 groups.push(null);
                 size = 0;
-            }else {
-                var fsize = f.f.startsWith('js/mobile/') ? 0 : fs.statSync(f.f)['size'];
+            }
+            else {
+                const st = fs.statSync(f.f);
+                const fsize = f.f.startsWith('js/mobile/') ? 0 : st.size;
                 if (size + fsize > fileLimit) {
                     size = 0;
                     groups.push(null);

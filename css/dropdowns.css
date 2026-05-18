@@ -446,31 +446,29 @@
 .dropdown.notification-text i {
     margin: 0 8px 0 -1px;
 }
+
 .dark-direct-tooltip {
-    font-size: 14px;
-    line-height: 20px;
-    color: var(--text-color-high-inverted);
-    padding: 8px 12px;
     background: var(--mobile-background-inverse);
     border-radius: 6px;
-    white-space: nowrap;
-    position: absolute;
-    display: none;
-}
-.dark-direct-tooltip.mobile-theme-tip {
-    padding: 6px 12px;
-    background: var(--mobile-background-inverse);
+    box-sizing: border-box;
     color: var(--mobile-text-inverse);
+    display: none;
     font: var(--mobile-font-caption-large-regular);
+    padding: 8px 12px;
+    position: absolute;
+    white-space: nowrap;
 }
+
 .dark-direct-tooltip.inverted,
 .dark-direct-tooltip.in-call {
     background: var(--surface-grey-1);
     color: var(--text-color-high);
 }
+
 .dark-direct-tooltip.simpletip-tooltip.in-call i {
     --mask-color: var(--stroke-grey-1);
 }
+
 .dark-direct-tooltip i.icon-tooltip-arrow {
     position: absolute;
     bottom: -6px;
@@ -479,6 +477,7 @@
     --icon-size: 24px;
     height: 14px;
 }
+
 .dropdown.body.tooltip {
     position: fixed;
     visibility: collapse;

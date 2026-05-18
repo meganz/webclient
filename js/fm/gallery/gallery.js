@@ -95,9 +95,9 @@ class GalleryNodeBlock {
         this.isFav = !!this.node.fav;
 
         if (mode === 'm' || mode === 'y') {
-            this.el.dataset.ts = this.node.mtime || this.node.ts;
+            this.el.dataset.ts = this.node.mtime || 0;
             this.el.dataset.date = GalleryNodeBlock.getTimeString(
-                this.node.mtime || this.node.ts,
+                this.node.mtime || 0,
                 mode === 'y' ? 14 : 15
             );
         }
@@ -212,7 +212,7 @@ class MegaGallery {
     }
 
     static sortViewNodes() {
-        const sortFn = M.sortByModTimeFn2();
+        const sortFn = M.sortByModTimeFn();
         M.v.sort((a, b) => sortFn(a, b, -1));
     }
 
@@ -348,7 +348,7 @@ class MegaGallery {
     }
 
     getGroup(n) {
-        const timestamp = n.mtime || n.ts || Date.now() / 1000;
+        const timestamp = n.mtime || 0;
         const time = new Date(timestamp * 1000);
 
         const year = time.getFullYear();
@@ -375,7 +375,7 @@ class MegaGallery {
 
     // For mega dynamic list, every 2 years should be merged as 1 group.
     mergeYearGroup() {
-        const yearKeys = Object.keys(this.groups.y);
+        const yearKeys = Object.keys(this.groups.y).sort((a, b) => a - b);
         const newStructure = {};
 
         for (let i = yearKeys.length - 1; i > -1; i -= 3) {
@@ -400,7 +400,7 @@ class MegaGallery {
 
     splitYearGroup() {
 
-        const yearGroups = Object.keys(this.groups.y);
+        const yearGroups = Object.keys(this.groups.y).sort((a, b) => a - b);
         const splitedYearGroup = {};
 
         for (var i = yearGroups.length; i--;) {
@@ -591,7 +591,7 @@ class MegaGallery {
                 continue;
             }
 
-            const timestamp = n.mtime || n.ts;
+            const timestamp = n.mtime || 0;
             if (start <= timestamp && timestamp <= end) {
                 const res = this.getGroup(n);
                 this.setDayGroup(res[3], n.h);
@@ -610,7 +610,7 @@ class MegaGallery {
                 continue;
             }
 
-            const timestamp = n.mtime || n.ts;
+            const timestamp = n.mtime || 0;
             if (start <= timestamp && timestamp <= end) {
                 const res = this.getGroup(n);
                 this.setMonthGroup(ts, res[3]);
@@ -1721,7 +1721,7 @@ class MegaGallery {
             ? mega.gallery.getNodeCache(bh) || this.updNode[bh]
             : bh;
 
-        return M.sortByModTimeFn2()(a, b, -1);
+        return M.sortByModTimeFn()(a, b, -1);
     }
 
     getGroupMonthNodes(id, group) {
@@ -2442,7 +2442,7 @@ class MegaMediaTypeGallery extends MegaGallery {
         this.updNode = Object.create(null);
 
         // This sort is needed for building groups, do not remove
-        const sortFn = M.sortByModTimeFn2();
+        const sortFn = M.sortByModTimeFn();
         nodes.sort((a, b) => sortFn(a, b, -1));
 
         if (!Array.isArray(nodes)) {

@@ -1085,6 +1085,13 @@ var pro = {
                     return pro.getPlanObj(thisPlan.level, 1);
                 });
 
+                lazy(thisPlan, 'yearlyPlan', () => {
+                    if (thisPlan.months === 12) {
+                        return thisPlan;
+                    }
+                    return pro.getPlanObj(thisPlan.level, 12);
+                });
+
                 lazy(thisPlan, 'saveUpToPrecise', () => {
                     if (thisPlan._saveUpToPrecise === null) {
                         let saveUpToPrecise = false;
@@ -1188,19 +1195,18 @@ var pro = {
                         eda: mPriceEuro * 12 - yPriceEuro,
                         ldan: mPriceN * 12 - yPriceN,
                         edan: mPriceEuroN * 12 - yPriceEuroN,
+                        isYearlyDiscount: true,
                     };
                 });
 
-
-                thisPlan.getPricing = (useMonthlyPrice) => {
+                thisPlan.getPricing = (useMonthlyPrice, months) => {
                     let plan;
-                    let months;
                     if (useMonthlyPrice === undefined) {
                         useMonthlyPrice = true;
                     }
 
                     plan = thisPlan.monthlyPlan;
-                    months = useMonthlyPrice ? thisPlan.months : 1;
+                    months = months || (useMonthlyPrice ? thisPlan.months : 1);
 
                     // If there is no monthly plan, use the regular plan's pricing
                     if (!plan) {

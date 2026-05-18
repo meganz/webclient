@@ -1,11 +1,86 @@
-var support = (function() {
+/** @property window.support */
+lazy(self, 'support', () => {
     'use strict';
 
+    // lang setup start
+
+    /**
+     * Convert webclient language codes to slugs recognised by help.mega.io.
+     *
+     * @param {string} langCode The two character language code used internally by webclient
+     * @returns {string} The slug known by help.mega.io, or empty string (English)
+     */
+    const getKbLangSlug = (langCode) => {
+
+        return {
+            ar: 'ar',
+            br: 'pt',
+            cn: 'zh-hans',
+            ct: 'zh-hant',
+            de: 'de',
+            es: 'es',
+            fr: 'fr',
+            ru: 'ru',
+        }[langCode || lang] || '';
+    };
+    const mega_help_host = 'https://help.mega.io';
+    const megakb_origin = `${mega_help_host}/${getKbLangSlug(window.kbLang)}`.replace(/\/*$/, '');
+
+    l.support_page_para_two = escapeHTML(l.support_page_para_two)
+        .replace('[A1]', `<a class="link" href="https://mega.io/pricing" target="_blank" rel="noopener">`)
+        .replace('[/A1]', '</a>')
+        .replace('[A2]', `<a class="link" href="${megakb_origin}" target="_blank" rel="noopener">`)
+        .replace('[/A2]', '</a>');
+    l.support_pg_paid_user_para_two = escapeHTML(l.support_pg_paid_user_para_two)
+        .replace('[A1]', `<a class="link" href="${megakb_origin}" target="_blank" rel="noopener">`)
+        .replace('[/A1]', '</a>');
+    l.support_pg_verify_email_sub = escapeHTML(l.support_pg_verify_email_sub)
+        .replace('[A]', `<a class="link" href="mailto:support@mega.io">`)
+        .replace('[/A]', '</a>')
+        .replace('[A1]', `<a class="link" href="${megakb_origin}" target="_blank" rel="noopener">`)
+        .replace('[/A1]', '</a>');
+
+    const _collators = new Map();
+    const SORT_PREFIX = 'sup_';
+    const stripSortPrefix = (v) => typeof v === 'string' && v.startsWith(SORT_PREFIX) ? v.slice(SORT_PREFIX.length) : v;
+
+    /**
+     * Returns a mapping of app language codes to valid Intl.Collator locales.
+     * These locales are normalized BCP-47 tags suitable for sorting/localization.
+     *
+     * @returns string
+     */
+    const _getCollatorLangCode = (lang) => {
+
+        if (lang === 'cn') {
+            return 'zh-Hans-u-co-pinyin';
+        }
+        if (lang === 'ct') {
+            return 'zh-Hant-u-co-pinyin';
+        }
+        if (lang === 'br') {
+            return 'pt-BR';
+        }
+
+        return remappedLangLocales[lang] || mega.intl.locale;
+    };
+
+    const mGetCollator = tryCatch((lang) => {
+
+        const locale = window.kbLang || _getCollatorLangCode(lang);
+        if (!_collators.has(locale)) {
+            _collators.set(locale, new Intl.Collator(locale, {sensitivity: 'base', numeric: true}));
+        }
+
+        return _collators.get(locale);
+    });
+
+    // lang setup done
+
     let langGha, $deviceInput, $emailInput, acceptReadArticlesCheckbox, otpInputs,
-        $defaultHiddenElements, $hiddenWhenOtherCategory, $messageInputTextArea,
-        $hideOnShowEmailVerifyForm, $hideOnEmailVerifyCall;
+        $defaultHiddenElements, $hiddenWhenOtherCategory, $messageInputTextArea, successCtaContainer,
+        $hideOnShowEmailVerifyForm, $hideOnEmailVerifyCall, submittedBlockPrimaryCta, submittedBlockSecondaryCta;
     let dds = {category: null, issue: null};
-    let cached = false;
     let $elsToUnbind = $();
     let supportType = null;
     let selectedCategory = null;
@@ -20,18 +95,28 @@ var support = (function() {
         $elsToUnbind = $elsToUnbind.add($el);
         return $el;
     };
-    const toDropdownOptions = (items, prefix = '', key = 'id', label = 'name') => Object
-        .values(items).reduce((acc, v) => {
+    const toDropdownOptions = (items, prefix = SORT_PREFIX, key = 'id', label = 'name') => {
 
-            acc[`${prefix}${v[key]}`] = v[label];
-            return acc;
-        }, {});
-    const cacheDom = () => {
+        const collator = mGetCollator(lang);
+        return Object.values(items)
+            .sort((a, b) => {
 
-        if (cached) {
-            return;
-        }
+                // "Other" (id -1) is always pinned at the end
+                if (a[key] === -1) {
+                    return 1;
+                }
+                if (b[key] === -1) {
+                    return -1;
+                }
+                return collator ? collator.compare(a[label], b[label]) : M.compareStrings(a[label], b[label], -1);
+            })
+            .reduce((acc, v) => {
 
+                acc[`${prefix}${v[key]}`] = v[label];
+                return acc;
+            }, {});
+    };
+    const collateDomRefs = () => {
         const $mainLayout = $('#mainlayout').addClass('get-support');
         dom.$page = $('.get-support-block', $mainLayout);
         // submit flow
@@ -50,9 +135,11 @@ var support = (function() {
         dom.$submissionFlow = $('.submission.request', dom.$page);
         dom.$successBlock = $('.success-block', dom.$page);
         dom.$verifiedEmail = $('.verified-email span', dom.$page);
+        dom.$deviceInfoInputWrapper = $('.device-info', dom.$device);
         // verify flow
         dom.$verifyFlow = $('.verify-flow', dom.$page);
         dom.$email = $('.submit-email', dom.$page);
+        dom.$emailInputWrapper = $('.email-input', dom.$verifyEmailForm);
         dom.$emailError = $('.error', dom.$email);
         dom.$errEmailInput = $('span', dom.$emailError);
         dom.$verifyFlowLanding = $('.verify-flow.landing', dom.$page);
@@ -70,7 +157,6 @@ var support = (function() {
         dom.$resendOtpCta = $('button.cta.resend', dom.$verifyOtpForm);
         dom.$otpError = $('.fields .error', dom.$verifyOtpForm);
         dom.$otpErrorMessage = $('span', dom.$otpError);
-        cached = true;
     };
     const createMobileDropdown = ($node, items, selected, onSelected, titleText) => new MegaMobileDropdown({
         selected,
@@ -88,12 +174,13 @@ var support = (function() {
     const createSupportDropdown = (type, items, selected, onSelected) => {
 
         const $node = dom[`$${type}`];
+        const prefixedSelected = selected === undefined ? selected : `${SORT_PREFIX}${selected}`;
         if (is_mobile) {
             if (dds[type]) {
                 dds[type].destroy();
             }
 
-            dds[type] = createMobileDropdown($node, items, selected, onSelected, l[type]);
+            dds[type] = createMobileDropdown($node, items, prefixedSelected, onSelected, l[type]);
             bind($node, 'click.support', () => dds[type].trigger('dropdown'));
 
             return;
@@ -102,7 +189,7 @@ var support = (function() {
         window.createDropdown($('.mega-input-dropdown', $node), {
             placeholder: l[1278],
             items,
-            selected: `${selected}`
+            selected: `${prefixedSelected}`
         });
         bindDropdownEvents($node, undefined, undefined, undefined, true);
         bind($node, 'click.support', $e => {
@@ -111,7 +198,7 @@ var support = (function() {
             if (!value) {
                 return;
             }
-            onSelected(value);
+            onSelected(stripSortPrefix(value));
         });
     };
     const showVerifyEmailForm = e => {
@@ -279,7 +366,7 @@ var support = (function() {
         if (response === -1 || !Array.isArray(response)) {
             return false;
         }
-        const other = { id: -1, name: l[2007], popularArticles: [] };
+        const other = { id: -1, name: l[2007], parentId: 0, popularArticles: [] };
         const [language, raw] = response;
         dom.$category.closest('.input-block').removeClass('hidden');
         langGha = language;
@@ -305,9 +392,7 @@ var support = (function() {
             }
         }
         menu[-1] = other;
-        raw[-1] = other;
-
-        return {menu, raw};
+        return {menu, raw: {'-1': other, ...raw}};
     };
     const createIssueDropdown = (items, selected, onSelected) => {
 
@@ -345,18 +430,18 @@ var support = (function() {
     ns._initLoggedInUI = async function(verifiedEmail) {
 
         // render success block
-        const successCtaContainer = document.querySelector('.success-block .buttons');
-        MegaLink.factory({
+        successCtaContainer = document.querySelector('.success-block .buttons');
+        submittedBlockPrimaryCta = MegaLink.factory({
             parentNode: successCtaContainer,
             text: l[164],
             href: 'fm',
             componentClassname: 'cta mio-button lg primary',
             icon: 'sprite-fm-mono icon-cloud-drive',
         });
-        MegaLink.factory({
+        submittedBlockSecondaryCta = MegaLink.factory({
             parentNode: successCtaContainer,
             text: l[384],
-            href: window.kbLang ? l.megakb_origin : l.mega_help_host,
+            href: window.kbLang ? megakb_origin : mega_help_host,
             target: '_blank',
             componentClassname: 'cta mio-button lg secondary',
             icon: 'sprite-fm-mono icon-info',
@@ -381,7 +466,7 @@ var support = (function() {
         const issueClick = id => {
 
             if (is_mobile) {
-                id = dds.issue.selected;
+                id = stripSortPrefix(dds.issue.selected);
             }
 
             dom.$relatedList.empty();
@@ -406,7 +491,7 @@ var support = (function() {
             createIssueDropdown(toDropdownOptions(menu[id].subCategories), selected, issueClick);
         };
         const categoryClick = id => {
-            id = is_mobile ? dds.category.selected : id;
+            id = is_mobile ? stripSortPrefix(dds.category.selected) : id;
             if (selectedCategory === id) {
                 return false;
             }
@@ -417,7 +502,7 @@ var support = (function() {
             selectedCategory = id;
             supportType = '';
             dom.$relatedList.empty();
-            renderRelatedArticles(raw, id);
+            dom.$related.addClass('hidden');
             createIssueDropDown(id);
             dom.$category.children('span').first().addClass('dirty');
 
@@ -474,15 +559,18 @@ var support = (function() {
         };
 
         // create device input
-        const input = mCreateElement('input', {
-            type: 'text',
-            class: 'underlinedText no-title-top',
-            placeholder: l.support_page_device_input_name_placeholder,
-            'data-wrapper-class': 'box-style mobile'
-        }, $('.device-info', dom.$device)[0]);
-        $deviceInput = new mega.ui.MegaInputs($(input)).$input;
+        if (!$deviceInput) {
+            const input = mCreateElement('input', {
+                type: 'text',
+                class: 'underlinedText no-title-top',
+                placeholder: l.support_page_device_input_name_placeholder,
+                'data-wrapper-class': 'box-style mobile'
+            }, dom.$deviceInfoInputWrapper[0]);
+            $deviceInput = new mega.ui.MegaInputs($(input)).$input;
+        }
 
         // create message input
+        dom.$messageTxtAreaWrapper.empty();
         const messageInput = mCreateElement('textarea', {
             class: 'textArea no-title-top',
             placeholder: l.support_page_message_input_placeholder,
@@ -493,12 +581,14 @@ var support = (function() {
         initTextareaScrolling($messageInputTextArea);
 
         // create accept checkbox
-        acceptReadArticlesCheckbox = new MegaCheckbox({
-            parentNode: dom.$articlesRead[0],
-            componentClassname: 'mega-checkbox',
-            checkboxName: 'accept-articles-read',
-            labelTitle: l.support_page_related_articles_read
-        });
+        if (!acceptReadArticlesCheckbox) {
+            acceptReadArticlesCheckbox = new MegaCheckbox({
+                parentNode: dom.$articlesRead[0],
+                componentClassname: 'mega-checkbox',
+                checkboxName: 'accept-articles-read',
+                labelTitle: l.support_page_related_articles_read
+            });
+        }
 
         // prepopulate form, if the user is coming from help-center
         if (window.kbCatId && raw[window.kbCatId]) {
@@ -563,14 +653,14 @@ var support = (function() {
         dom.$submissionFlow.addClass('hidden');
         dom.$verifyFlowLanding.removeClass('hidden');
         dom.$verifyEmailForm.addClass('hidden');
+        // create email input
         if (!$emailInput) {
-            // create email input
             const input = mCreateElement('input', {
                 type: 'email',
                 class: 'underlinedText no-title-top',
                 placeholder: l[16343],
                 'data-wrapper-class': 'user-email box-style mobile'
-            }, $('.email-input', dom.$verifyEmailForm)[0]);
+            }, dom.$emailInputWrapper[0]);
             $emailInput = new mega.ui.MegaInputs($(input)).$input;
         }
         if (!otpInputs) {
@@ -594,15 +684,28 @@ var support = (function() {
         });
     };
 
-    ns.init = async hasAccess => {
+    ns.init = async(initDom) => {
+        if (initDom) {
+            parsepage(pages.support);
+        }
+        if (ns._onLoginListener) {
+            mBroadcaster.removeListener(ns._onLoginListener);
+        }
+        if (!self.u_attr) {
+            ns._onLoginListener = mBroadcaster.addListener('login2', () => {
+                ns.destroy();
+                ns.init();
+            });
+        }
 
-        cacheDom();
+        collateDomRefs();
         if (is_mobile) {
             MegaMobileHeader.init(true);
         }
 
-        const res = await(u_attr && hasAccess ?  ns._initLoggedInUI :  ns._initNonLoggedInUI)().catch(dump);
-        mBroadcaster.once('pagechange', ns.destroy);
+        const res = await(u_attr ?  ns._initLoggedInUI :  ns._initNonLoggedInUI)().catch(dump);
+        mBroadcaster.removeListener(ns._pageChangeListener);
+        ns._pageChangeListener = mBroadcaster.addListener('pagechange', ns.destroy);
 
         return res;
     };
@@ -613,13 +716,25 @@ var support = (function() {
             return;
         }
 
+        mBroadcaster.removeListener(ns._onLoginListener);
+        mBroadcaster.removeListener(ns._pageChangeListener);
         $('#mainlayout').removeClass('get-support');
 
-        cached = false;
         clearInterval(tooManyOtpResendMsgReqTimer);
         $elsToUnbind.off();
         $elsToUnbind = $();
-        dom.$page[0].componentSelectorAll('.mega-component').forEach(component => component.destroy());
+        if (dom.$page) {
+            dom.$page[0].componentSelectorAll('.mega-component').forEach(component => component.destroy());
+        }
+        if (submittedBlockPrimaryCta) {
+            submittedBlockPrimaryCta.destroy();
+        }
+        if (submittedBlockSecondaryCta) {
+            submittedBlockSecondaryCta.destroy();
+        }
+        dom.$deviceInfoInputWrapper.empty();
+        dom.$messageTxtAreaWrapper.empty();
+        dom.$emailInputWrapper.empty();
         const keys = Object.keys(dom);
         for (let i = keys.length - 1; i >= 0; i--) {
             const k = keys[i];
@@ -637,7 +752,10 @@ var support = (function() {
         $hideOnEmailVerifyCall = null;
         supportType = null;
         selectedCategory = null;
+        submittedBlockPrimaryCta = null;
+        submittedBlockSecondaryCta = null;
+        successCtaContainer = null;
     };
 
     return ns;
-})();
+});

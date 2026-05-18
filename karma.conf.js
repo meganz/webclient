@@ -134,6 +134,7 @@ module.exports = function(config) {
         'js/transfers/download2.js',
         'js/transfers/reader.js',
         'js/transfers/upload2.js',
+        'js/transfers/wsu.js',
         'js/transfers/zip64.js',
         'js/transfers/meths.js',
         {pattern: 'aesasm.js', included: false},

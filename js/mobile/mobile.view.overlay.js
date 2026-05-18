@@ -590,51 +590,60 @@ class MegaMobileViewOverlay extends MegaComponent {
     }
 
     /**
-     * Gets the relevant link for the app depending on if a public file link, public folder link or in the cloud drive
+     * Gets the relevant link for the app depending on if a public file link, public folder link,
+     * public collection/set or in the cloud drive
      *
      * @param {String} nodeHandle The internal node handle of the folder or file
      * @returns {String} Returns an app link in the following format:
      *
-     * 1) #!<public-file-handle>!<key> Generic public file link, downloads the file. This scenario is handled by
-     * the direct download page logic not here.
+     * 1) #!<public-file-handle>!<key> Generic public file link, downloads the file.
+     * If the key is not available, it is omitted.
      * 2) #F!<public-folder-handle>!<key> Generic public folder link, opens the folder for viewing.
-     * 3) #F!<public-folder-handle>!<key>!<internal-node-handle> Public folder link that will open the sub folder
+     * If the key is not available, it is omitted.
+     * 3) #F!<public-folder-handle>!<key>!<internal-node-handle> Public folder link that will open the subfolder
      * for viewing if the internal node handle is a folder, or will start downloading the file if the internal node
-     * handle is a file.
-     * 4) #<internal-node-handle> If the internal node handle is a folder and they are logged into the same
+     * handle is a file. The internal node handle is only included if the key is available.
+     * 4) collection/<public-collection-handle>#<key> Public collection/set link.
+     * If the key is not available, the fragment is omitted.
+     * 5) #<internal-node-handle> If the internal node handle is a folder and they are logged into the same
      * account, it opens the folder for viewing in the app. If it is a file and they are logged into the same account,
      * then it starts downloading the file. If the internal node handle is not recognised in that account, the app will
      * throw an error dialog saying they need to log into that account.
      */
     static getAppLink(nodeHandle) {
 
-        // If a public file link, add the base file handle and key
+        // If a public file link, add the base file handle and key (only if available)
         if (typeof dlpage_ph !== 'undefined' && typeof dlpage_key !== 'undefined') {
-            return `#!${  dlpage_ph  }!${  dlpage_key}`;
+            const keySuffix = dlpage_key ? `!${dlpage_key}` : '';
+            return `#!${dlpage_ph}${keySuffix}`;
         }
 
         // Otherwise if a public folder
-        else if (pfid && pfkey) {
+        else if (pfid) {
 
-            // If it is a public collection/set
+            // If it is a public collection/set (only include key/suffix if available)
             if (pfcol) {
-                const handle_suffix = nodeHandle !== undefined && nodeHandle !== pfid
+                const handleSuffix = pfkey && nodeHandle !== undefined && nodeHandle !== pfid
                     ? `!${nodeHandle}`
                     : '';
 
-                return `collection/${pfid}#${pfkey}${handle_suffix}`;
-            }
-            // If subfolder or file is specified, add it to the base folder handle and key
-            else if (nodeHandle === undefined || pfid === nodeHandle) {
-                // Otherwise return the base folder handle and key
-                return `#F!${  pfid  }!${  pfkey}`;
+                const fragment = pfkey ? `#${pfkey}${handleSuffix}` : '';
+
+                return `collection/${pfid}${fragment}`;
             }
 
-            return `#F!${  pfid  }!${  pfkey  }!${  nodeHandle}`;
+            // Public folder link (only include key and node handle if key exists)
+            const handleSuffix = pfkey && nodeHandle !== undefined && nodeHandle !== pfid
+                ? `!${nodeHandle}`
+                : '';
+
+            const keySuffix = pfkey ? `!${pfkey}${handleSuffix}` : '';
+
+            return `#F!${pfid}${keySuffix}`;
         }
 
         // Otherwise if in regular cloud drive, return just the node handle
-        return `#${  nodeHandle}`;
+        return `#${nodeHandle}`;
     }
 
     /**

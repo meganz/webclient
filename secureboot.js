@@ -351,7 +351,7 @@ function getCleanSitePath(path) {
     }
 
     // cleanup and handle affiliate tags.
-    path = mURIDecode(path).replace(/^[#/]+|\/+$/g, '').split(/(\/\w+=)/);
+    path = mURIDecode(path).replace(/^[#/]+|["'<>]|\/+$/g, '').split(/(\/\w+=)/);
 
     if (/^\w+=/.test(path[0])) {
         path = [''].concat(path[0].split('=')).concat(path.slice(1));
@@ -396,6 +396,20 @@ function getCleanSitePath(path) {
             }
             if (path.cjevent) {
                 sessionStorage.cjevent = path.cjevent;
+            }
+            // Google Ads click: capture gclid/wbraid/gbraid/ts from the URL.
+            var gAds = {};
+            var gAKeys = ['gclid', 'wbraid', 'gbraid', 'gclts'];
+            for (var i = 0; i < gAKeys.length; i++) {
+                if (path[gAKeys[i]]) {
+                    gAds[gAKeys[i]] = path[gAKeys[i]];
+                }
+                else if (gAKeys[i] === 'gclts' && (path.gclid || path.wbraid || path.gbraid)) {
+                    gAds.gclts = Math.floor(Date.now() / 1000);
+                }
+            }
+            if (Object.keys(gAds).length) {
+                sessionStorage.gAdsAttr = JSON.stringify(gAds);
             }
             if (path.tab && path[0] === 'pro') {
                 window.mProTab = path.tab;
@@ -1037,7 +1051,13 @@ if (window.crypto && typeof crypto.getRandomValues === 'function') {
         'use strict';
         mega.getRandomValues = function(len) {
             var seed = new Uint8Array(len || 128);
-            return rand.call(crypto, seed);
+            if (seed.length <= 65536) {
+                return rand.call(crypto, seed);
+            }
+            for (var i = 0; i < seed.length; i += 65536) {
+                rand.call(crypto, seed.subarray(i, i + 65536));
+            }
+            return seed;
         };
         mega.getRandomValues.strong = true;
 
@@ -2606,7 +2626,6 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/mobile.recovery.enter-key.js', n: 'mobile_rec_enter_key_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.recovery.change-password.js', n: 'mobile_rec_change_password_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.register.js', n: 'mobile_register_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.signin.js', n: 'mobile_signin_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.upload-overlay.js', n: 'mobile_upload_overlay_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.contact-link.js', n: 'mobile_contactlink_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.twofactor.js', n: 'mobile_twofactor_js', j: 1, w: 1});

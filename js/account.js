@@ -212,8 +212,8 @@ function u_checklogin3a(res, ctx) {
             r = 3;      // Fully registered
         }
 
-        // Send MCT details if user logged in or create an fully registered account
-        if (r === 3 && localStorage.mctRec) {
+        if (localStorage.mctRec) {
+            // Send MCT details if user logged in or registered
             eventlog(501024, localStorage.mctRec);
             delete localStorage.mctRec;
         }

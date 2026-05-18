@@ -56,6 +56,10 @@
      * Example:
      * ```<a href="#" data-simpletip="Hey! custom class" data-simpletip-class='small-tip'>Mouse over me</a>```
      *
+     * F) Add cutom child target element to control tip position better `data-simpletiptarget='.child-elm-class'`
+     * Example:
+     * ```<a href="#" data-simpletiptarget='i'><i><span>Mouse over me</span></a>```
+     *
      * How to trigger content update:
      * 1) Create new instance of the simpletip that contains conditional `data-simpletip` attribute.
      * ```<a href="#" data-simpletip={condition ? 'Mute' : 'Unmute' }></a>```
@@ -234,6 +238,12 @@
             let at = 'center bottom';
             let arrowRotation = 180;
             const tipPosition = getTipLRPosition($this.attr('data-simpletipposition'));
+            const target = $this.data('simpletiptarget');
+            const $targetElm = target ? $(target, $this) : $();
+
+            if ($targetElm.length) {
+                $this = $targetElm;
+            }
 
             switch (tipPosition) {
                 /* Top position (case B) */

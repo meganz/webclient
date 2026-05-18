@@ -924,6 +924,14 @@ function init_page() {
     else if (page.substr(0, 11) === 'activate-s4') {
         ActivateS4Page.load();
     }
+    else if (page.substr(0, 5) === 'stats') {
+        const ph = page.slice(6);
+
+        if (ph) {
+            sessionStorage.statsHandle = ph;
+        }
+        loadSubPage('fm');
+    }
     else if (page === 'confirm') {
 
         loadingDialog.show();
@@ -1077,14 +1085,7 @@ function init_page() {
         init_key();
     }
     else if (page === 'support') {
-        const hasAccess = (u_attr && u_attr.p) || window.kbCatId;
-        if (u_attr && !hasAccess) {
-            mega.redirect(l.mega_help_host);
-        }
-        else {
-            parsepage(pages.support);
-            support.init(hasAccess);
-        }
+        support.init(true);
     }
     else if (page == 'contact') {
         mega.redirect('mega.io', 'contact', false, false);
@@ -1615,6 +1616,41 @@ function init_page() {
         loadSubPage('redeem');
         return false;
     }
+
+    /**
+     * Enable 2-year Password Manager promo from campaign URL e.g. /get2ypwm
+     */
+    else if (page === 'get2ypwm') {
+
+        if (!u_type) {
+            localStorage.setItem('pwm2yPromo', '1');
+            login_next = 'get2ypwm';
+            loadSubPage('login');
+            return false;
+        }
+
+        api.screq({a: 'pwme'})
+            .then(() => M.getAccountDetails())
+            .catch(dump)
+            .finally(() => {
+                localStorage.removeItem('pwm2yPromo');
+
+                if (is_mobile) {
+                    if (is_ios) {
+                        openExternalLink('https://apps.apple.com/app/id6468971246');
+                    }
+                    else if (is_android) {
+                        openExternalLink('https://play.google.com/store/apps/details?id=mega.pwm.android.app');
+                    }
+                }
+
+                loadSubPage('fm/pwm');
+            });
+
+        return false;
+    }
+
+
     else if (localStorage.getItem('addContact') !== null && u_type === 3) {
         var contactRequestInfo = JSON.parse(localStorage.getItem('addContact'));
         var contactHandle = contactRequestInfo.u;
@@ -3457,11 +3493,11 @@ mBroadcaster.addListener('fm:initialized', () => {
     return 0xDEAD;
 });
 
-// After open folder call, check if we should restore any previously opened preview node.
+// After open folder call, restore any previously opened preview node/open Share dialog.
 mBroadcaster.once('mega:openfolder', () => {
     'use strict';
 
-    const {previewNode} = sessionStorage;
+    const {previewNode, statsHandle: ph} = sessionStorage;
     if (previewNode) {
         sessionStorage.removeItem('previewNode');
 
@@ -3469,6 +3505,10 @@ mBroadcaster.once('mega:openfolder', () => {
         if (!M.isAlbumsPage()) {
             slideshow(previewNode);
         }
+    }
+    else if (ph) {
+        sessionStorage.removeItem('statsHandle');
+        mega.Share.showLinkStatsDialog({ph}).catch(tell);
     }
 
     // Send some data to mega.io that we logged in

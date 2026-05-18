@@ -340,7 +340,9 @@ lazy(s4, 'main', () => {
             href: 'https://help.mega.io/megas4/setup-guides',
             target: '_blank'
         });
+
         subNode.textContent = l.s4_more_guides;
+        subNode.addEventListener('click', () => eventlog(500583));
 
         // Footer
         node = ce('div', bodyNode, {class: 'footer'});

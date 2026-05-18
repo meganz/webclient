@@ -1355,10 +1355,17 @@ scparser.$add('ua', (a) => {
             const name = ua[idx];
             const version = v[idx];
             const ck = `${usr}_${name}`;
+            const km = name === '^!keys' && 'keyMgr' in mega;
 
             if (local) {
                 if (version && !mega.attr._versions[ck]) {
                     mega.attr._versions[ck] = version;
+                }
+                if (km) {
+                    if (mega.keyMgr.upvtrace) {
+                        mega.keyMgr.upvtrace.push(`UAST[${st}]:${version}`);
+                    }
+                    mega.keyMgr.uaAckV = version;
                 }
             }
             else if (pfid && !pfa.has(name)) {
@@ -1366,6 +1373,13 @@ scparser.$add('ua', (a) => {
                     console.info(`Ignoring ua-packet ${name}...`, JSON.stringify(a));
                 }
                 continue;
+            }
+            else if (km) {
+                if (mega.keyMgr.upvtrace) {
+                    // while firing upv, we received a ^!keys we didn't trigger, or the 'st' is wrong...
+                    mega.keyMgr.upvtrace.push(`UAST[${api.currst}]->st(${st}):${version}`);
+                }
+                mega.keyMgr.uaAckV = version;
             }
 
             gotCu255 = gotCu255 || String(name).includes('Cu255');
@@ -2523,7 +2537,7 @@ function loadfm(force) {
             // is this a folder link? or do we have no valid cache for this session?
             if (pfid) {
                 fmdb = false;
-                fetchfm(false).catch(tell);
+                fetchfm(false).catch(folderreqerr);
             }
             else if (!u_k_aes) {
                 console.error('No master key found... please contact support@mega.io');

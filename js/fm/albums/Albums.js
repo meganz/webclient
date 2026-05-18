@@ -390,7 +390,7 @@ lazy(mega.gallery, 'albums', () => {
      * @returns {void}
      */
     const sortInAlbumNodes = (nodes) => {
-        const sort = M.sortByModTimeFn3();
+        const sort = M.sortByModTimeFn();
         nodes.sort((a, b) => sort(a, b, -1));
     };
 
@@ -596,12 +596,8 @@ lazy(mega.gallery, 'albums', () => {
     };
 
     const sortAlbumsArray = (a, b, n, d) => {
-        let sortFn;
+        let sortFn = sortLabels;
         switch (n) {
-            case 'name': {
-                sortFn = sortLabels;
-                break;
-            }
             case 'date': {
                 sortFn = sortNumeric.bind(null, 'cts');
                 break;

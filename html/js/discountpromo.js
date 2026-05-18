@@ -121,8 +121,7 @@ class DiscountPromo {
     getMatchedPlan() {
 
         return pro.membershipPlans.find(plan => {
-            return plan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL] === mega.discountInfo.al
-                && plan[pro.UTQA_RES_INDEX_MONTHS] === 1;
+            return plan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL] === mega.discountInfo.al;
         });
     }
 

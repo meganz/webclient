@@ -37,7 +37,7 @@ lazy(mega.ui, 'notifyUtils', () => {
                             label: l[164],
                             classes: ['notification-filter'],
                             get data() {
-                                return ['share', 'd', 'dshare', 'put', 'ph', 'puu'];
+                                return ['share', 'd', 'dshare', 'put', 'ph', 'puu', 'ls'];
                             },
                         },
                         {
@@ -199,7 +199,7 @@ lazy(mega.ui, 'notifyUtils', () => {
             }
             while (h) {
                 const n = M.d[h];
-                if (n && n.su) {
+                if (n && (n.su || M.isOutShare(n.h))) {
                     return n.h;
                 }
                 h = n  && n.p;
@@ -232,10 +232,13 @@ lazy(mega.ui, 'notifyUtils', () => {
                 }
 
                 if (!mega.lite.inLiteMode) {
-                    const {h, n} = data;
-                    const handle = typeof h === 'string'
-                        ? h
-                        : typeof n === 'string' ? n : false;
+                    const {h, ph, n} = data;
+                    let handle = typeof h === 'string' ? h : typeof n === 'string' ? n : false;
+
+                    if (!handle && ph) {
+                        handle = M.getFileLinkHandle(ph);
+                        notifications[i].data.h = handle;
+                    }
 
                     if (handle) {
                         if (type === 'put' && !M.c.shares[handle]) {
@@ -331,7 +334,11 @@ lazy(mega.ui, 'notifyUtils', () => {
         async _fetchNodesInShares(handles) {
             for (let i = 0; i < handles.length; i++) {
                 const handle = handles[i];
-                const node = await sharer.has(handle);
+                let node = await sharer.has(handle);
+                if (!node) {
+                    const share = await shared(handle).catch(dump);
+                    node = share && this.getNode(share);
+                }
                 if (node) {
                     // cache shared node
                     this.nodes[node.h] = node;
@@ -645,6 +652,7 @@ var notify = {
             }
             case 'share':
             case 'dshare':
+            case 'ls':
                 if (!mega.notif.has('cloud_enabled')) {
                     return true;
                 }
@@ -679,6 +687,12 @@ var notify = {
 
             case 'share':
                 if (!mega.notif.has('cloud_newshare')) {
+                    return true;
+                }
+                break;
+
+            case 'ls':
+                if (mega.notif.has('cloud_linkstats')) {
                     return true;
                 }
                 break;
@@ -1235,6 +1249,7 @@ var notify = {
         notify.initContactReqClickHandler();
         notify.initFullContactClickHandler();
         notify.initShareClickHandler();
+        notify.initLinkActivityClickHandler();
         notify.initTakedownClickHandler();
         notify.initPaymentClickHandler();
         notify.initPaymentReminderClickHandler();
@@ -1289,6 +1304,7 @@ var notify = {
 
     /**
      * On click of a share or new files/folders notification, go to that share
+     * @returns {void}
      */
     initShareClickHandler: function() {
 
@@ -1332,6 +1348,24 @@ var notify = {
                 .catch(dump);
 
             eventlog(500463);
+        });
+    },
+
+    /**
+     * On click of a Link activity notification, open Get link dialog
+     * @returns {void}
+     */
+    initLinkActivityClickHandler: () => {
+        'use strict';
+
+        // Select the notifications with shares or new files/folders
+        $('.notification-item.nt-link-activity', this.$popup).rebind('click.laclick', (ev) => {
+            const elm = $(ev.currentTarget);
+            const h = elm.attr('data-item-id');
+            const ph = elm.attr('data-item-id');
+
+            notify.closePopup();
+            mega.Share.showLinkStatsDialog({h, ph}).catch(tell);
         });
     },
 
@@ -1592,6 +1626,8 @@ var notify = {
             case 'upci':
             case 'upco':
                 return notify.renderUpdatedPendingContact($notificationHtml, notification);
+            case 'ls':
+                return notify.renderLinkActivity($notificationHtml, notification);
             case 'share':
                 return notify.renderNewShare($notificationHtml, notification, displayName, tooltip);
             case 'd':
@@ -1817,6 +1853,45 @@ var notify = {
                 : l[825];
             this.renderNotificationTitle($notificationHtml, title, tooltip);
         }
+
+        return $notificationHtml;
+    },
+
+    /**
+     * Render link activity
+     * @param {Object} $notificationHtml jQuery object of the notification template HTML
+     * @param {Object} notification Notif data
+     * @returns {Object} The HTML to be rendered for the notification
+     */
+    renderLinkActivity($notificationHtml, notification) {
+        'use strict';
+
+        let {h, ph} = notification.data;
+
+        h = h || M.getFileLinkHandle(ph);
+
+        const n = h && M.getNodeByHandle(h);
+        const title = n ? l.interaction_notif.replace('%1', this.shortenNodeName(n.name)) :
+            l.iteracted_item_notif;
+        const icon = n ? fileIcon(n) : 'generic';
+        const $avatar = $('.notification-avatar', $notificationHtml);
+
+        $notificationHtml
+            .addClass(
+                `nt-link-activity auto-height${h && M.getNodeShare(h) ? ' clickable' : ''}`
+            )
+            .attr({
+                'data-item-id': h || '',
+                'data-item-ph': ph || ''
+            });
+
+        $avatar.safeHTML(
+            `<div class="notification-avatar-custom">
+                <i class="item-type-icon icon-${icon}-24"></i>
+            </div>`
+        );
+
+        $('.notification-title', $notificationHtml).text(title);
 
         return $notificationHtml;
     },

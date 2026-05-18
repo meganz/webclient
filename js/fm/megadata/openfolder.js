@@ -384,7 +384,7 @@
             // Render S4 section / S4 FM header
             queueMicrotask(() => s4.ui.render());
         }
-        else if (this.currentrootid === 'pwm' && is_mobile) {
+        else if (this.currentCustomView && this.currentCustomView.type === 'pwm' && is_mobile) {
             console.error('invalid code-path...');
             return this.openFolder('fm').catch(dump);
         }

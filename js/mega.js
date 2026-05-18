@@ -2586,7 +2586,8 @@ function loadfm(force) {
                     .then(fetchfm)
                     .catch((ex) => {
                         console.error(ex);
-                        siteLoadError(ex, 'loadfm');
+                        return Promise.resolve('rad' in mega && mega.rad.flush().catch(nop))
+                            .then(() => siteLoadError(ex, 'loadfm'));
                     })
                     .finally(() => {
                         if (d) {

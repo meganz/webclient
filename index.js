@@ -2786,6 +2786,7 @@ function topmenuUI() {
                     feedbackDialog._type = 'top-button';
                 }
                 else if (className.indexOf('refresh') > -1) {
+                    // @todo is this dead code? expunge it!
                     if (is_mobile) {
                         eventlog(99852);
                     }

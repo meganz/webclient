@@ -651,6 +651,10 @@ class MEGAPIRequest {
         const signal = this.getAbortSignal();
         const options = {method: body ? 'POST' : 'GET', body, signal};
 
+        if (mega.antileak) {
+            uri = mega.antileak(uri, options);
+        }
+
         while (true) {
             if (this.retryHandler && this.retrying++) {
                 this.retryHandler(options, this.retrying);
@@ -731,7 +735,12 @@ class MEGAPIRequest {
 
     async chunkedFetch(uri, body) {
         const signal = this.getAbortSignal();
-        const response = await fetch(uri, {method: body ? 'POST' : 'GET', body, signal});
+        const options = {method: body ? 'POST' : 'GET', body, signal};
+
+        if (mega.antileak) {
+            uri = mega.antileak(uri, options);
+        }
+        const response = await fetch(uri, options);
         const splitter = new JSONSplitter(this.split, this, true);
 
         this.residual = [];
@@ -1260,8 +1269,17 @@ class MEGAKeepAliveStream {
         this.reader = body.getReader();
         return new ReadableStream(this);
     }
+
     fire(options) {
-        return fetch(this.url, options);
+        let uri = this.url;
+
+        if (mega.antileak) {
+            if (!options) {
+                options = {};
+            }
+            uri = mega.antileak(uri, options);
+        }
+        return fetch(uri, options);
     }
 
     async start(controller) {
@@ -2705,6 +2723,24 @@ mBroadcaster.once('boot_done', () => {
                 console.error('Failed to retrieve API flags...', ex);
             })
     ));
+
+    tryCatch(() => {
+        Object.defineProperty(mega, 'antileak', {
+            value: parseInt(localStorage.antileak) !== 0 && ((uri, options) => {
+                const u = new URL(uri);
+
+                if (u.search) {
+                    options.headers = {
+                        ...options.headers,
+                        'MEGA-Chrome-Antileak': `${u.pathname}${u.search}`
+                    };
+                    uri = `${u.origin}${u.pathname}?`;
+                }
+
+                return uri;
+            })
+        });
+    })();
 
     api.reset();
 });

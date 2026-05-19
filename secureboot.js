@@ -1114,6 +1114,9 @@ else if (tmp.substr(0, 4) === 'test') {
     hashLogic = true;
     tmp = -0x8feed;
 }
+else if (is_extension && tmp.startsWith('oauth.html?')) {
+    location.replace('/webclient/' + tmp);
+}
 
 Object.defineProperty(self, 'mShowAds', {
     value: (is_livesite || localStorage.gads) && !is_extension && !(localStorage.sid || sessionStorage.sid)
@@ -2411,6 +2414,8 @@ else if (!browserUpdate) {
         jsl.push({f:'js/vendor/favico.js', n: 'favico_js', j:1});
         jsl.push({f:'js/vendor/avatar.js', n: 'avatar_js', j:1, w:3});
         jsl.push({f:'js/fm/vpn.js', n: 'fmvpn_js', j: 1});
+        jsl.push({f:'js/fm/migrate.js', n: 'fmmigrate_js', j: 1});
+        jsl.push({f:'css/dialogs/migration-dialogs.css', n: 'migration_dialogs_css', j:2,w:5});
         jsl.push({f:'js/fm/link-import.js', n: 'fm_link_import_js', j: 1});
         jsl.push({f:'css/dialogs/link-import.css', n: 'link_import_css', j:2,w:5});
         jsl.push({f:'js/ui/empty.js', n: 'js_ui_empty_js', j: 1});

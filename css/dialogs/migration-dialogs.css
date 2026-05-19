@@ -1,0 +1,76 @@
+/* Migration Warning dialog */
+
+.migration-warning-image {
+    background-image: url('../../images/mega/migration-warning.webp');
+    width: 96px;
+    height: 96px;
+    background-size: 100%;
+}
+.mega-sheet.modal-dialog.migrate-warning .main {
+    text-align: start;
+    align-items: start;
+}
+
+/* End of Migration Warning dialog */
+
+/* Migration dialog */
+
+.mega-sheet.migrate-dialog .mega-journey div.card-select-container.scrollable {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0 48px;
+    box-sizing: border-box;
+    margin-bottom: 24px;
+    flex-grow: 1;
+    max-height: 100%;
+    border-top: 1px solid var(--mobile-border-subtle);
+    border-bottom: 1px solid var(--mobile-border-subtle);
+    padding-top: 24px;
+}
+.mega-sheet.migrate-dialog .mega-journey .main-content h1 {
+    margin-bottom: 16px;
+}
+
+.mega-sheet.migrate-dialog .main-content .main-content-div,
+.mega-sheet.migrate-dialog .main-content .main-content-div .custom-div,
+.mega-sheet.migrate-dialog .main-content .main-content-div .custom-div > div {
+    height: 100%;
+}
+.mega-sheet.migrate-dialog .main-content .main-content-div .info-box {
+    color: var(--mobile-text-secondary);
+    font: var(--mobile-font-caption-large-regular);
+    margin-bottom: 24px;
+}
+.mega-sheet.migrate-dialog .main-content .main-content-div .info-box i {
+    margin-inline-end: 2px;
+    vertical-align: text-top;
+}
+
+.mega-sheet.migrate-dialog .main-content .main-content-div .data-table {
+    padding: 0;
+}
+.mega-sheet.migrate-dialog .main-content .main-content-div .data-table th {
+    padding-bottom: 16px;
+}
+.mega-sheet.migrate-dialog .main-content .main-content-div .data-table th,
+.mega-sheet.migrate-dialog .main-content .main-content-div .data-table td {
+    font: var(--mobile-font-copy-regular);
+}
+.mega-sheet.migrate-dialog .main-content .main-content-div .data-table td::before {
+    content: none;
+}
+.mega-sheet.migrate-dialog .main-content .main-content-div .data-table td i {
+    display: inline-block;
+    margin-inline-end: 8px;
+    --icon-size: 24px;
+}
+.mega-sheet.migrate-dialog .main-content .main-content-div p {
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+.mega-sheet.migrate-dialog .main-content .main-content-div .card i.icon-size-48 {
+    --icon-size: 60px;
+    margin-top: -6px;
+}
+
+/* End of Migration dialog */

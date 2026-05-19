@@ -936,7 +936,13 @@ var strongvelope = {};
 
                 var proxyPromise = new MegaPromise();
 
-                verifyPromise.always(function() {
+                verifyPromise.done((valid) => {
+                    if (!valid) {
+                        if (this._logRsaAwareCritical('Signature invalid for message from *** on ***')) {
+                            this.logger.error(`Signature invalid for message from ${message.userId} on ${message.ts}`);
+                        }
+                        return proxyPromise.reject(false);
+                    }
                     var isOwnMessage = message.userId === self.ownHandle;
                     var myIndex = parsedMessage.recipients.indexOf(self.ownHandle);
 
@@ -992,8 +998,7 @@ var strongvelope = {};
                         }
                     }
 
-                    // ignore marking this message as "unrerenderable"
-                    // proxyPromise.reject(arg);
+                    proxyPromise.reject(arg);
                 });
 
                 return proxyPromise;
@@ -1841,6 +1846,7 @@ var strongvelope = {};
         var extractContentPromise = this._parseAndExtractKeys({userId: sender, message: message});
         extractContentPromise.fail((ex) => {
             this._logRsaAwareCritical('Message signature invalid.', ex);
+            proxyPromise.reject(ex);
         });
 
         extractContentPromise.done(function(extractedContent) {
@@ -2001,12 +2007,14 @@ var strongvelope = {};
                         );
                     }
                 }
+                proxyPromise.reject(false);
             });
 
-            verifyPromise.always(function(arg) {
+            verifyPromise.done((arg) => {
                 if (!arg) {
                     // signature verification failed.
                     self.logger.error(`Signature invalid for message from ${sender}, chatId: ${self.chatRoom.chatId}`);
+                    return proxyPromise.reject(false);
                 }
 
                 try {

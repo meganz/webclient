@@ -529,8 +529,10 @@ TransferQueue.prototype.pause = function(gid) {
             delay('percent_megatitle', percent_megatitle);
         }
 
-        tfsheadupdate({p: gid});
-        mega.tpw.pauseDownloadUpload(gid);
+        if (mega.tpw) {
+            tfsheadupdate({p: gid});
+            mega.tpw.pauseDownloadUpload(gid);
+        }
     }
     else if (d) {
         if (!GlobalProgress[gid]) {
@@ -548,8 +550,10 @@ TransferQueue.prototype.resume = function(gid) {
     }
 
     if (GlobalProgress[gid] && GlobalProgress[gid].paused) {
-        tfsheadupdate({r: gid});
-        mega.tpw.resumeDownloadUpload(gid);
+        if (mega.tpw) {
+            tfsheadupdate({r: gid});
+            mega.tpw.resumeDownloadUpload(gid);
+        }
 
         delete GlobalProgress[gid].paused;
         if (this.isEmpty()) {

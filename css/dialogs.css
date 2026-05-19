@@ -2491,6 +2491,7 @@ body.de .mega-dialog.contact-picker-widget {
     .mega-sheet.export-links-settings-dialog,
     .mega-sheet.link-embed-dialog,
     .mega-sheet.link-settings-discard-dialog,
+    .mega-sheet.migrate-dialog,
     .mega-sheet.remove-link-dialog {
         z-index: 1111;
     }

@@ -2149,6 +2149,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         's4_syn_backup_info',
         's4_syn_cloud_info',
         'info_panel_tags_create_btn',
+        'mig_find_import',
         'bn_odq_text',
         'url_import_feature_warning',
         'lna_grant_p1',

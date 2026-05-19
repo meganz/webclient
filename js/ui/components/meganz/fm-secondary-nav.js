@@ -923,7 +923,7 @@ lazy(mega.ui, 'secondaryNav', () => {
                 items.push('.newfolder-item', '.newfile-item');
             }
             else if (M.currentrootid === M.RootID) {
-                items.push('.import-from-link');
+                items.push('.import-from-another-cloud', '.import-from-link');
             }
             if (M.currentrootid === 'shares' || M.currentrootid === 'out-shares') {
                 items.push('.addfrom-cloud-drive');

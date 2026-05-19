@@ -5430,6 +5430,23 @@ div.new-bottom-pages li, div.new-bottom-pages p {
     background-repeat: no-repeat;
     cursor: pointer;
 }
+
+/* Backup recovery key page */
+
+.backup-recover.main-mid-pad {
+    max-width: 1020px;
+    margin: 0 auto;
+    box-sizing: border-box;
+    padding: 0 15px;
+}
+.backup-recover .main-left-block {
+    width: 420px;
+    float: left;
+    padding: 42px 0;
+}
+.backup-recover .main-right-block {
+    margin-left: 520px;
+}
 .backup-recover h3.main-italic-header {
     padding: 30px 0 20px 0;
 }

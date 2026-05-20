@@ -122,10 +122,6 @@ var loginFromEphemeral = {
                 u_checked = true;
 
                 if (is_mobile) {
-                    if (mega.ui.header && mega.ui.header.avatarButton) {
-                        mega.ui.header.renderLoggedIn(mega.ui.header.avatarButton);
-                    }
-
                     if (mega.ui.topmenu && mega.ui.topmenu.menuNode) {
                         mega.ui.topmenu.menuNode.textContent = '';
                         mega.ui.topmenu.renderMenuItems();

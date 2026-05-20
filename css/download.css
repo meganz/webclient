@@ -229,6 +229,10 @@
     z-index: 99;
 }
 
+.download-page .media-viewer .image-controls {
+    background: var(--surface-grey-1);
+}
+
 .download-page .media-viewer-container .viewer-progress,
 .download-page .media-viewer-container header {
     display: none;

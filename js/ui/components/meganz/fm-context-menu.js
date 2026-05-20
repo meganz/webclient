@@ -643,6 +643,15 @@
             }
         ]));
         sections.addChild('importFrom', new MegaContextSection(menu, [
+            ...(mega.flags.ff_mis || localStorage.ff_mis) ? [{
+                buttonId: 'import-from-another-cloud',
+                text: l.import_from_another,
+                icon: 'sprite-fm-mono icon-cloud-upload-thin-outline',
+                onClick() {
+                    mega.migrate.showDialog();
+                    eventlog(500943);
+                }
+            }] : [],
             {
                 buttonId: 'import-from-link',
                 text: l.url_import_feature_title,

@@ -1258,7 +1258,7 @@ var notify = {
         notify.initDynamicClickHandler();
 
         // Initialise countdown timer for dynamic notifications with expiry dates
-        if (this.$popup.closest('.js-dropdown-notification').hasClass('show')) {
+        if (notify.$popup.closest('.js-dropdown-notification.show').length) {
             notify.dynamicNotifCountdown.startTimer();
         }
 
@@ -2857,7 +2857,7 @@ var notify = {
                 }
 
                 // If the popup is open, re-render the notifications
-                if (!notify.$popup.hasClass('hidden')) {
+                if (!notify.$popup.closest('.js-dropdown-notification.show').length) {
                     notify.renderNotifications();
                 }
             }

@@ -23,15 +23,15 @@
                             </div>
 
                             <div class="download play-video-button">
-                                <i class="sprite-fm-mono icon-play-small-regular-solid"></i>
+                                <i class="sprite-fm-mono icon-play-thin-solid"></i>
                             </div>
 
                             <div class="play-pause-video-button hidden">
-                                <i class="sprite-fm-mono icon-play-small-regular-solid"></i>
+                                <i class="sprite-fm-mono icon-play-thin-outline"></i>
                             </div>
 
                             <div class="watch-again-button hidden">
-                                <i class="sprite-fm-mono icon-rotate-ccw-small-regular-outline"></i>
+                                <i class="sprite-fm-mono icon-rotate-ccw-thin-solid"></i>
                                 <span>[$video_player_watch_again]</span>
                             </div>
 
@@ -61,7 +61,7 @@
                                         <div class="playpause-wrapper wrapper">
                                             <button class="v-btn playpause" aria-label="[[play pause]]" data-state="play">
                                                 <!-- Active state: .icon-pause !-->
-                                                <i class="sprite-fm-mono icon-play-small-regular-outline"></i>
+                                                <i class="sprite-fm-mono icon-play-thin-outline"></i>
                                             </button>
                                             <div class="tooltip">
                                                 [$video_player_play]
@@ -69,11 +69,10 @@
                                         </div>
                                         <div class="vol-wrapper wrapper">
                                             <button class="v-btn mute" data-state="mute" aria-label="[[volume]]">
-                                                <!-- Active state: .icon-volume-muted !-->
-                                                <i class="sprite-fm-mono icon-volume-max-small-regular-outline"></i>
+                                                <i class="sprite-fm-mono icon-volume-max-thin-outline"></i>
                                             </button>
-                                            <div class="video-vol-range">
-                                                <div class="volume-bar"><span></span></div>
+                                            <div class="slider video-vol-range">
+                                                <div class="slider-bar volume-bar"><span></span></div>
                                             </div>
                                             <div class="tooltip">
                                                 [$video_player_mute]
@@ -102,7 +101,7 @@
                                         </div>
                                         <div class="repeat-wrapper wrapper">
                                             <button class="v-btn repeat" aria-label="[[repeat]]" data-state="repeat">
-                                                <i class="sprite-fm-mono icon-repeat-one-small-regular-solid"></i>
+                                                <i class="sprite-fm-mono icon-repeat-thin-outline"></i>
                                             </button>
                                             <div class="tooltip">
                                                 [$video_player_repeat]
@@ -110,7 +109,7 @@
                                         </div>
                                         <div class="subtitles-wrapper wrapper">
                                             <button class="v-btn subtitles" aria-label="[[subtitles]]" data-state="subtitles">
-                                                <i class="sprite-fm-mono icon-subtitles-02-small-regular-outline"></i>
+                                                <i class="sprite-fm-mono icon-subtitles-thin-outline"></i>
                                             </button>
                                             <div class="tooltip">
                                                 [$video_player_subtitles]
@@ -118,7 +117,7 @@
                                         </div>
                                         <div class="settings-wrapper wrapper">
                                             <button class="v-btn settings" aria-label="[[settings]]" data-state="settings">
-                                                <i class="sprite-fm-mono icon-settings-02-small-regular-outline"></i>
+                                                <i class="sprite-fm-mono icon-settings-thin-outline"></i>
                                             </button>
                                             <div class="tooltip">
                                                 [$823]
@@ -127,7 +126,7 @@
                                         <div class="fs-wrapper wrapper">
                                             <button class="v-btn fs" aria-label="[[fullscreen]]" data-state="go-fullscreen">
                                                 <!-- Active state: .icon-fullscreen-leave !-->
-                                                <i class="sprite-fm-mono icon-maximize-02-small-regular-outline"></i>
+                                                <i class="sprite-fm-mono icon-maximize-02-thin-outline"></i>
                                             </button>
                                             <div class="tooltip">
                                                 [$video_player_fullscreen]
@@ -159,41 +158,31 @@
                                         <li>
                                             <div class="title">[$video_player_playback_speed]</div>
                                         </li>
-                                        <li>
-                                            <button class="05x">
-                                                <span>[$video_player_speed_0.5x]</span>
-                                                <i class="sprite-fm-mono icon-active icon-check-small-regular-outline hidden"></i>
-                                            </button>
-                                        </li>
-                                        <li>
-                                            <button class="1x">
-                                                <span>[$video_player_speed_1x]</span>
-                                                <i class="sprite-fm-mono icon-active icon-check-small-regular-outline"></i>
-                                            </button>
-                                        </li>
-                                        <li>
-                                            <button class="125x">
-                                                <span>1.25x</span>
-                                                <i class="sprite-fm-mono icon-active icon-check-small-regular-outline hidden"></i>
-                                            </button>
-                                        </li>
-                                        <li>
-                                            <button class="15x">
-                                                <span>[$video_player_speed_1.5x]</span>
-                                                <i class="sprite-fm-mono icon-active icon-check-small-regular-outline hidden"></i>
-                                            </button>
-                                        </li>
-                                        <li>
-                                            <button class="2x">
-                                                <span>[$video_player_speed_2x]</span>
-                                                <i class="sprite-fm-mono icon-active icon-check-small-regular-outline hidden"></i>
-                                            </button>
-                                        </li>
-                                        <li>
-                                            <button class="3x">
-                                                <span>3x</span>
-                                                <i class="sprite-fm-mono icon-active icon-check-small-regular-outline hidden"></i>
-                                            </button>
+                                         <li>
+                                            <div class="speed-slider">
+                                                <span class="value">1x</span>
+                                                <div class="body">
+                                                    <button class="speed-btn minus">
+                                                        <i class="sprite-fm-mono icon-minus-thin-outline"></i>
+                                                    </button>
+                                                    <div class="slider">
+                                                        <div class="slider-bar">
+                                                            <span></span>
+                                                        </div>
+                                                    </div>
+                                                    <button class="speed-btn plus">
+                                                        <i class="sprite-fm-mono icon-plus-thin-outline"></i>
+                                                    </button>
+                                                </div>
+                                                <div class="inline-btns">
+                                                    <button>1.0</button>
+                                                    <button>1.25</button>
+                                                    <button>1.5</button>
+                                                    <button>1.75</button>
+                                                    <button>2.0</button>
+                                                    <button>3.0</button>
+                                                </div>
+                                            </div>
                                         </li>
                                     </ul>
                                 </nav>
@@ -204,9 +193,9 @@
                                         <li>
                                             <div class="settings-wrapper">
                                                 <span>[$video_player_brightness]</span>
-                                                <div class="settings-range">
+                                                <div class="slider settings-range">
                                                     <span>0</span>
-                                                    <div class="settings-bar brightness-bar"><span></span></div>
+                                                    <div class="slider-bar settings-bar brightness-bar"><span></span></div>
                                                     <div class="value">50</div>
                                                     <span>100</span>
                                                 </div>
@@ -215,9 +204,9 @@
                                         <li>
                                             <div class="settings-wrapper">
                                                 <span>[$video_player_contrast]</span>
-                                                <div class="settings-range">
+                                                <div class="slider settings-range">
                                                     <span>0</span>
-                                                    <div class="settings-bar contrast-bar"><span></span></div>
+                                                    <div class="slider-bar settings-bar contrast-bar"><span></span></div>
                                                     <div class="value">50</div>
                                                     <span>100</span>
                                                 </div>
@@ -226,9 +215,9 @@
                                         <li>
                                             <div class="settings-wrapper">
                                                 <span>[$video_player_saturation]</span>
-                                                <div class="settings-range">
+                                                <div class="slider settings-range">
                                                     <span>0</span>
-                                                    <div class="settings-bar saturate-bar"><span></span></div>
+                                                    <div class="slider-bar settings-bar saturate-bar"><span></span></div>
                                                     <div class="value">50</div>
                                                     <span>100</span>
                                                 </div>

@@ -53,4 +53,9 @@ class CardGroup extends MegaComponentGroup {
             }
         }
     }
+
+    clear() {
+        this.value = '';
+        this.each(card => card.removeClass('selected'));
+    }
 }

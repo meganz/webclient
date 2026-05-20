@@ -2050,17 +2050,17 @@
 
                     <!-- Video player play button !-->
                     <div class="play-video-button hidden">
-                        <i class="sprite-fm-mono icon-play"></i>
+                        <i class="sprite-fm-mono icon-play-thin-solid"></i>
                     </div>
 
                     <!-- Video player play/pause indicator !-->
                     <div class="play-pause-video-button hidden">
-                        <i class="sprite-fm-mono icon-play-small-regular-solid"></i>
+                        <i class="sprite-fm-mono icon-play-thin-outline"></i>
                     </div>
 
                     <!-- Video player Ad controls !-->
                     <div class="viewer-vad-control lato hidden"></div>
-
+                    
                     <!-- Video player nav bar !-->
                     <nav class="viewer-bars video-controls hidden" data-state="hidden">
                         <ul class="bar">
@@ -2111,8 +2111,12 @@
                     </div>
                 </div>
 
-                <button class="gallery-btn previous" aria-label="[[previous]]"></button>
-                <button class="gallery-btn next" aria-label="[[next]]"></button>
+                <button class="gallery-btn previous" aria-label="[[previous]]">
+                    <i class="sprite-fm-mono icon-arrow-left-thin-solid"></i>
+                </button>
+                <button class="gallery-btn next" aria-label="[[next]]">
+                    <i class="sprite-fm-mono icon-arrow-right-thin-solid"></i>
+                </button>
 
                 <div class="mobile viewer-pending">
                     <div class="bounce1"></div>
@@ -2143,22 +2147,6 @@
                         <li class="right-c"><p><span></span></p></li>
                         <li class="left-c"><p><span></span></p></li>
                     </ul>
-                </div>
-
-                <div class="viewer-slideshow-controls hidden">
-                    <div class="viewer-big-button prev">
-                        <i class="semi-big-icon icons-img prev"></i>
-                    </div>
-                    <div class="viewer-big-button pause" data-state="pause">
-                        <i class="semi-big-icon icons-img pause"></i>
-                    </div>
-                    <div class="viewer-big-button next">
-                        <i class="semi-big-icon icons-img next"></i>
-                    </div>
-                    <div class="viewer-big-button left-pad close">
-                        <i class="semi-big-icon icons-img cross"></i>
-                    </div>
-                    <div class="clear"></div>
                 </div>
             </section>
 
@@ -2194,18 +2182,18 @@
                 <nav class="viewer-bars slideshow-controls hidden">
                     <div class="bar">
                         <button class="sl-btn previous" aria-label="[previous]]">
-                            <i class="sprite-fm-mono icon-rwd"></i>
+                            <i class="sprite-fm-mono icon-chevrons-02-left-thin-outline"></i>
                         </button>
                         <button class="sl-btn playpause" aria-label="[[play pause]]" data-state="pause">
-                            <i class="sprite-fm-mono icon-pause"></i>
+                            <i class="sprite-fm-mono icon-pause-thin"></i>
                         </button>
                         <button class="sl-btn next" aria-label="[[next]]">
-                            <i class="sprite-fm-mono icon-ff"></i>
+                            <i class="sprite-fm-mono icon-chevrons-02-right-thin-outline"></i>
                         </button>
                     </div>
                     <div class="bar">
                         <button class="sl-btn close" aria-label="[[close]]">
-                            <i class="sprite-fm-mono icon-dialog-close"></i>
+                            <i class="sprite-fm-mono icon-dialog-close-thin"></i>
                         </button>
                     </div>
                 </nav>

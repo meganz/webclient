@@ -382,7 +382,6 @@ RecentsRender.prototype.render = function(limit, until, forceInit) {
 
     // Switch to recents panel.
     M.onSectionUIOpen('recents');
-    $('.fmholder').removeClass("transfer-panel-opened");
     $('.fm-right-files-block').addClass('hidden');
     this.$container.removeClass('hidden');
 

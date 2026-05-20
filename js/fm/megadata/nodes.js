@@ -5111,7 +5111,10 @@ MegaData.prototype.importFolderLinkNodes = function importFolderLinkNodes(nodes)
 
                 if (pfcol) {
                     this.preparePublicSetImport(pfid, data);
-                    localStorage.albumLinkImport = pfid;
+
+                    const root = M.d[M.RootID];
+
+                    localStorage.albumLinkImport = JSON.stringify({ph: pfid, id: root.id, label: root.name});
                 }
 
                 if (!localStorage.folderLinkImport || nodes.length > 6000) {

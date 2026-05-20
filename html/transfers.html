@@ -1,0 +1,209 @@
+<div class="banner transfer odq-banner almost-overquota hidden">
+    <button class="btn-icon close-over">
+        <i class="sprite-fm-mono icon-dialog-close-thin"></i>
+    </button>
+    <div class="left-section circle-dashboard">
+        <div class="quota-info-pct-txt">97%</div>
+        <div class="quota-info-pct-circle">
+            <div class="overlay"></div>
+            <ul>
+                <li class="nw-fm-chart0 right-c">
+                    <p>
+                        <span></span>
+                    </p>
+                </li>
+                <li class="nw-fm-chart0 left-c">
+                    <p>
+                        <span></span>
+                    </p>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="right-section upgrade-block">
+        <div class="head-title">[$20666]</div>
+        <div class="content-txt">[$18085]</div>
+        <!-- change button color to mega-button negative when it is overquota -->
+        <button class="mega-component nav-elem normal slim up-action">
+            <div class="text-box-wrapper sk-elm">
+                <span class="primary-text">[$upgrade_now]</span>
+            </div>
+        </button>
+    </div>
+</div>
+<div class="banner transfer obq-banner hidden">
+    <button class="btn-icon close-over">
+        <i class="sprite-fm-mono icon-dialog-close-thin"></i>
+    </button>
+    <div class="left-section alert-icon">
+        <i class="sprite-fm-mono icon-alert-triangle-thin-outline"></i>
+    </div>
+    <div class="right-section upgrade-block">
+        <div class="head-title"></div>
+        <button class="mega-component text-icon nav-elem normal slim up-action">
+            <div class="text-box-wrapper sk-elm">
+                <span class="primary-text">[$upgrade_now]</span>
+            </div>
+        </button>
+    </div>
+</div>
+<div class="float-widget transfer-progress tpw hidden">
+    <!-- add almost-overquota/overquota to banner -->
+    <div class="transfer-progress-head">
+        <div class="widget-collapse hidden">
+            <div class="transfer-progress-type all-transfers">
+                <div class="status-indicator">
+                    <div class="progress-chart">
+                        <div class="transfer-progress charts">
+                            <div class="right-chart low-percent-clip">
+                                <span></span>
+                            </div>
+                            <div class="left-chart low-percent-clip">
+                                <span></span>
+                            </div>
+                        </div>
+                        <i class="sprite-fm-mono icon-arrows-up-down-alt-solid-outline"></i>
+                    </div>
+                </div>
+                <i class="status-icon hidden sprite-fm-mono"></i>
+            </div>
+            <div class="collapse-status-block">
+                <div class="transfer-status-title"></div>
+                <div class="transfer-progress-time hidden"></div>
+                <div class="transfer-progress-subtext hidden"></div>
+            </div>
+        </div>
+        <button class="mega-component nav-elem icon-only button transfer-progress-icon js-tpm-open">
+            <i class="left-icon sprite-fm-mono icon-expand-thin-outline"></i>
+        </button>
+        <button class="mega-component nav-elem icon-only button transfer-progress-icon tpw-c-e expand hidden">
+            <i class="left-icon sprite-fm-mono icon-chevron-up-thin-outline"></i>
+        </button>
+        <button class="mega-component nav-elem icon-only button transfer-progress-icon tpw-c-e collapse">
+            <i class="left-icon sprite-fm-mono icon-chevron-down-thin-outline"></i>
+        </button>
+        <button class="mega-component nav-elem icon-only button transfer-progress-icon tpw-close close hidden">
+            <i class="left-icon sprite-fm-mono icon-dialog-close-thin"></i>
+        </button>
+    </div>
+    <div class="transfer-tabs-panel mega-component tab-group">
+        <div class="mega-component mega-tab-option nav-elem normal js-tab-transfers selected">
+            <div class="text-box-wrapper sk-elm">
+                <span class="primary-text">[$1346]</span>
+            </div>
+            <div class="decorator hidden"><span></span></div>
+        </div>
+        <div class="mega-component mega-tab-option nav-elem normal js-tab-completed">
+            <div class="text-box-wrapper sk-elm">
+                <span class="primary-text">[$tfw_tab_completed]</span>
+            </div>
+            <div class="decorator hidden"><span></span></div>
+        </div>
+        <div class="mega-component mega-tab-option nav-elem normal js-tab-error hidden">
+            <div class="text-box-wrapper sk-elm">
+                <span class="primary-text">[$tfw_generic_fail_msg]</span>
+            </div>
+            <div class="decorator hidden"><span></span></div>
+        </div>
+    </div>
+    <div class="transfer-panel-filters hidden"></div>
+    <div class="transfer-panel-sort">
+        <button class="transfer-column transfer-header-name" data-sortid="name">
+            <span>[$86]</span>
+            <i class="sprite-fm-mono icon-arrow-up-thin-outline hidden"></i>
+        </button>
+        <button class="transfer-column transfer-header-size" data-sortid="size">
+            <span>[$87]</span>
+            <i class="sprite-fm-mono icon-arrow-up-thin-outline hidden"></i>
+        </button>
+        <div class="transfer-column transfer-header-speed">
+            <span>[$tfw_col_speed]</span>
+            <i class="sprite-fm-mono icon-arrow-up-thin-outline hidden"></i>
+        </div>
+        <button class="transfer-column transfer-header-status" data-sortid="status">
+            <span>[$89]</span>
+            <i class="sprite-fm-mono icon-arrow-up-thin-outline hidden"></i>
+        </button>
+        <button class="transfer-column transfer-header-time" data-sortid="timeRemain">
+            <span>[$tfw_col_time]</span>
+            <i class="sprite-fm-mono icon-arrow-up-thin-outline hidden"></i>
+        </button>
+        <button class="transfer-column transfer-header-type" data-sortid="type">
+            <span>[$93]</span>
+            <i class="sprite-fm-mono icon-arrow-up-thin-outline hidden"></i>
+        </button>
+        <div class="transfer-column transfer-header-location">
+            <span>[$file_location_label]</span>
+            <i class="sprite-fm-mono icon-arrow-up-thin-outline hidden"></i>
+        </div>
+        <div class="transfer-column transfer-header-actions"></div>
+    </div>
+    <div class="widget-body-container active">
+        <div class="transfer-progress-widget-body"></div>
+        <div class="transfer-widget-empty tab-transfers hidden">
+            <i class="icon-empty-transfers"></i>
+            <div class="empty-title">[$tfw_no_transfers]</div>
+        </div>
+        <div class="transfer-widget-empty tab-completed hidden">
+            <i class="icon-empty-vault"></i>
+            <div class="empty-title">[$tfw_no_completed]</div>
+        </div>
+        <div class="transfer-widget-empty tab-failed hidden">
+            <i class="icon-empty-error"></i>
+            <div class="empty-title">[$tfw_no_errored]</div>
+        </div>
+    </div>
+    <div class="transfer-widget-footer">
+        <div class="transfer-footer-row">
+            <div class="transfer-progress-type download hidden">
+                <div class="transfer-progress-txt">XX.XX GB / XX.XX GB</div>
+                <div class="status-indicator">
+                    <div class="progress-chart">
+                        <div class="transfer-progress charts">
+                            <div class="right-chart low-percent-clip">
+                                <span></span>
+                            </div>
+                            <div class="left-chart low-percent-clip">
+                                <span></span>
+                            </div>
+                        </div>
+                        <i class="sprite-fm-mono icon-down"></i>
+                    </div>
+                </div>
+                <i class="status-icon hidden sprite-fm-mono icon-check-circle-regular-solid"></i>
+            </div>
+            <div class="transfer-progress-type upload hidden">
+                <div class="transfer-progress-txt">XX.XX GB / XX.XX GB</div>
+                <div class="status-indicator">
+                    <div class="progress-chart">
+                        <div class="transfer-progress charts">
+                            <div class="right-chart low-percent-clip">
+                                <span></span>
+                            </div>
+                            <div class="left-chart low-percent-clip">
+                                <span></span>
+                            </div>
+                        </div>
+                        <i class="sprite-fm-mono icon-up"></i>
+                    </div>
+                </div>
+                <i class="status-icon hidden sprite-fm-mono icon-check-circle-regular-solid"></i>
+            </div>
+        </div>
+        <div class="transfer-footer-row transfer-actions">
+            <div class="transfer-progress-time hidden"></div>
+            <button class="mega-component text-icon nav-elem normal slim transfer-state-btn transfer-pause-icon">
+                <i class="sprite-fm-mono icon-pause-thin-outline left-icon"></i>
+                <div class="text-box-wrapper sk-elm">
+                    <span class="primary-text">[$6993]</span>
+                </div>
+            </button>
+            <button class="mega-component text-icon nav-elem normal slim transfer-clear-all-icon">
+                <i class="sprite-fm-mono icon-dialog-close-thin left-icon"></i>
+                <div class="text-box-wrapper sk-elm">
+                    <span class="primary-text">[$6991]</span>
+                </div>
+            </button>
+        </div>
+    </div>
+</div>

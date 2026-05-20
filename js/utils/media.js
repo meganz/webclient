@@ -942,14 +942,14 @@ FullScreenManager.prototype.enterFullscreen = function() {
                         });
                         manager.displaySubtitles(video.streamer, $subtitles);
                         $button.addClass('mask-color-brand');
-                        $('i', $button).removeClass('icon-subtitles-02-small-regular-outline')
-                            .addClass('icon-subtitles-02-small-regular-solid');
+                        $('i', $button).removeClass('icon-subtitles-thin-outline')
+                            .addClass('icon-subtitles-thin-solid');
                         mBroadcaster.sendMessage('trk:event', 'media-journey', 'subtitles', 'select');
                     }
                     else {
                         $button.removeClass('mask-color-brand');
-                        $('i', $button).addClass('icon-subtitles-02-small-regular-outline')
-                            .removeClass('icon-subtitles-02-small-regular-solid');
+                        $('i', $button).addClass('icon-subtitles-thin-outline')
+                            .removeClass('icon-subtitles-thin-solid');
                         mBroadcaster.sendMessage('trk:event', 'media-journey', 'subtitles', 'off');
                     }
                     $('.context-menu.subtitles button i', $wrapper).addClass('hidden');
@@ -1099,14 +1099,14 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
         const volumeIcon = (volume) => {
             if (volume < 0.5) {
-                return 'icon-volume-small-regular-outline';
+                return 'icon-volume-thin-outline';
             }
 
             if (volume >= 0.5 && volume < 0.75) {
-                return 'icon-volume-min-small-regular-outline';
+                return 'icon-volume-min-thin-outline';
             }
 
-            return 'icon-volume-max-small-regular-outline';
+            return 'icon-volume-max-thin-outline';
         };
 
         const getTimeOffset = (x) => {
@@ -1155,7 +1155,6 @@ FullScreenManager.prototype.enterFullscreen = function() {
             // Play/Pause button
             if (type === 'playpause' && !timeDrag) {
                 const {ended} = streamer || !1;
-                const style = is_embed === 2 ? 'solid' : 'outline';
 
                 if (ended) {
                     if ($repeat.mnh === node.h) {
@@ -1163,8 +1162,15 @@ FullScreenManager.prototype.enterFullscreen = function() {
                         return;
                     }
 
-                    $('i', $playpause).removeClass(`icon-pause-small-regular-${style}`)
-                        .addClass('icon-rotate-ccw-small-regular-outline');
+                    if (!$watchAgainButton.hasClass('hidden')) {
+                        if (self.d) {
+                            console.warn('skipping repetitive ended event(s), seeking forward?');
+                        }
+                        return;
+                    }
+
+                    $('i', $playpause).removeClass('icon-pause-thin-outline')
+                        .addClass('icon-rotate-ccw-thin-solid');
                     $('.playpause-wrapper .tooltip', $wrapper).text(l.video_player_watch_again);
                     $watchAgainButton.removeClass('hidden');
                     videoElement.style.filter = `${videoElement.style.filter.replace('none', '')}blur(6px)`;
@@ -1176,15 +1182,15 @@ FullScreenManager.prototype.enterFullscreen = function() {
                     }
                 }
                 else if (videoElement.paused) {
-                    $('i', $playpause).removeClass(`icon-pause-small-regular-${style}`)
-                        .addClass(`icon-play-small-regular-${style}`);
+                    $('i', $playpause).removeClass('icon-pause-thin-outline')
+                        .addClass('icon-play-thin-outline');
                     $('.playpause-wrapper .tooltip', $wrapper).text(l.video_player_play);
                     $pendingBlock.addClass('hidden');
                     $watchAgainButton.addClass('hidden');
                     showPauseBtn();
                     videoElement.style.filter = videoElement.style.filter.replace('blur(6px)', '');
-                    $('i', $playPauseButton).removeClass('icon-play-small-regular-solid')
-                        .addClass('icon-pause-small-regular-solid');
+                    $('i', $playPauseButton).removeClass('icon-play-thin-outline')
+                        .addClass('icon-pause-thin-outline');
                     hidePauseBtn();
 
                     if (is_mobile && playevent) {
@@ -1194,15 +1200,15 @@ FullScreenManager.prototype.enterFullscreen = function() {
                     $('.media-viewer', $wrapper).addClass('video-paused');
                 }
                 else {
-                    $('i', $playpause).removeClass().addClass(`${SPRITE} icon-pause-small-regular-${style}`);
+                    $('i', $playpause).removeClass().addClass(`${SPRITE} icon-pause-thin-outline`);
                     $('.playpause-wrapper .tooltip', $wrapper).text(l.video_player_pause);
                     $playVideoButton.addClass('hidden');
                     $watchAgainButton.addClass('hidden');
                     videoElement.style.filter = videoElement.style.filter.replace('blur(6px)', '');
-                    if ($('i', $playPauseButton).hasClass('icon-pause-small-regular-solid')) {
+                    if ($('i', $playPauseButton).hasClass('icon-pause-thin-outline')) {
                         showPauseBtn();
-                        $('i', $playPauseButton).addClass('icon-play-small-regular-solid')
-                            .removeClass('icon-pause-small-regular-solid');
+                        $('i', $playPauseButton).addClass('icon-play-thin-outline')
+                            .removeClass('icon-pause-thin-outline');
                         hidePauseBtn();
                     }
 
@@ -1217,7 +1223,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
             else if (type === 'mute') {
                 const $muteTooltip = $('.vol-wrapper .tooltip', $wrapper).removeClass('no-sound');
                 if (videoElement.muted) {
-                    $('i', $mute).removeClass().addClass(`${SPRITE} icon-volume-x-small-regular-outline`);
+                    $('i', $mute).removeClass().addClass(`${SPRITE} icon-volume-x-thin-outline`);
                     $muteTooltip.text(l.video_player_unmute);
                 }
                 else {
@@ -1471,7 +1477,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                             eventlog(99693, streamer.hasUnsupportedAudio);
                             title = escapeHTML(l[19060]).replace('%1', streamer.hasUnsupportedAudio);
                         }
-                        $('i', $vc).removeClass().addClass(`${SPRITE} icon-volume-x-small-regular-outline`);
+                        $('i', $vc).removeClass().addClass(`${SPRITE} icon-volume-x-thin-outline`);
                         $('.vol-wrapper .tooltip', $wrapper).addClass('no-sound').text(title);
                     }
 
@@ -1649,6 +1655,84 @@ FullScreenManager.prototype.enterFullscreen = function() {
             }
         });
 
+        // Playback speed control
+        const values = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 3];
+        let speedIndex = 3;
+        let speedSliderDrag = false;
+
+        const $speedSlWrap = $('.speed-slider', $videoControls);
+        const $speedSlider = $('.slider', $speedSlWrap);
+        const $speedValue = $('.value', $speedSlWrap);
+        const $speedSliderBar = $('.slider-bar', $speedSlider);
+        const $speedFill = $('span', $speedSliderBar);
+        const $inlineBtns = $('.inline-btns button', $speedSlWrap);
+
+        const setSpeedSlider = (index) => {
+            speedIndex = Math.max(0, Math.min(index, values.length - 1));
+
+            const percent = speedIndex / (values.length - 1) * 100;
+            const rate = values[speedIndex];
+
+            $speedFill.css('width', `${percent}%`);
+            $speedValue.text(`${rate}x`);
+
+            $('i', $speed).attr(
+                'class',
+                `${SPRITE} icon-playback-${String(rate).replace('.', '')}x-small-regular-outline`
+            );
+
+            streamer.playbackRate = rate;
+        };
+
+        const updateSpeedSlider = (pageX) => {
+            const rect = $speedSliderBar[0].getBoundingClientRect();
+            let percent = (pageX - (rect.left + window.scrollX)) / rect.width;
+
+            percent = Math.max(0, Math.min(percent, 1));
+
+            setSpeedSlider(
+                Math.round(percent * (values.length - 1))
+            );
+        };
+
+        $speedSlider.rebind(actionEv.DOWN, (e) => {
+            speedSliderDrag = true;
+            updateSpeedSlider(getX(e));
+        });
+
+        $speedSlWrap.rebind('wheel.changeSpeed', (e) => {
+            e.preventDefault();
+
+            const delta = e.originalEvent.deltaY;
+
+            if (delta > 0) {
+                setSpeedSlider(speedIndex - 1);
+            }
+            else if (delta < 0) {
+                setSpeedSlider(speedIndex + 1);
+            }
+        });
+
+        $('.minus', $speedSlWrap).rebind('click.decreaseSpeed', () => {
+            setSpeedSlider(speedIndex - 1);
+        });
+
+        $('.plus', $speedSlWrap).rebind('click.increaseSpeed', () => {
+            setSpeedSlider(speedIndex + 1);
+        });
+
+        $inlineBtns.rebind('click.changeSpeed', (e) => {
+            const value = parseFloat($(e.currentTarget).text());
+            const index = values.indexOf(value);
+
+            if (index !== -1) {
+                setSpeedSlider(index);
+            }
+        });
+
+        setSpeedSlider(speedIndex);
+
+        // Bind Up/down events for all sliders
         $document.rebind(actionEv.UP, (e) => {
             // video progress
             if (timeDrag) {
@@ -1684,6 +1768,12 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 }
                 settingsPanelDrag = false;
             }
+
+            // speed panel control
+            if (speedSliderDrag) {
+                speedSliderDrag = false;
+                updateSpeedSlider(getX(e));
+            }
         });
 
         $document.rebind(actionEv.MOVE, (e) => {
@@ -1700,6 +1790,11 @@ FullScreenManager.prototype.enterFullscreen = function() {
             // settings panel control
             if (settingsPanelDrag && e.pageX > 0) {
                 setVideoFilterLevel(e.pageX, settingsPanelDrag);
+            }
+
+            // speed panel control
+            if (speedSliderDrag) {
+                updateSpeedSlider(getX(e));
             }
         });
 
@@ -1728,13 +1823,13 @@ FullScreenManager.prototype.enterFullscreen = function() {
             $fullscreen.attr('data-state', state ? 'cancel-fullscreen' : 'go-fullscreen');
 
             if (state) {
-                $('i', $fullscreen).removeClass('icon-maximize-02-small-regular-outline')
-                    .addClass('icon-minimize-02-small-regular-outline');
+                $('i', $fullscreen).removeClass('icon-maximize-02-thin-outline')
+                    .addClass('icon-minimize-02-thin-outline');
                 $('.fs-wrapper .tooltip', $wrapper).text(l.video_player_exit_fullscreen);
             }
             else {
-                $('i', $fullscreen).removeClass('icon-minimize-02-small-regular-outline')
-                    .addClass('icon-maximize-02-small-regular-outline');
+                $('i', $fullscreen).removeClass('icon-minimize-02-thin-outline')
+                    .addClass('icon-maximize-02-thin-outline');
                 $('.fs-wrapper .tooltip', $wrapper).text(l.video_player_fullscreen);
             }
 
@@ -1805,7 +1900,8 @@ FullScreenManager.prototype.enterFullscreen = function() {
         $wrapper.rebind('mouseup.video-player', (ev) => {
             const $target = $(ev.target);
 
-            if (!$target.closest('button.speed').length && $speed.hasClass('active')) {
+            if (!$target.closest('button.speed').length
+                && !$target.closest('.context-menu').length && $speed.hasClass('active')) {
                 $speed.trigger('click.media-viewer');
             }
 
@@ -1821,51 +1917,6 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 $settings.hasClass('active')) {
                 $settings.trigger('click.media-viewer');
             }
-        });
-
-        // Bind Playback Speed context menu
-        $('.context-menu.playback-speed button', $wrapper).rebind('click.media-viewer', function() {
-            let rate = 1;
-            let cl = '1x';
-            let icon = '';
-            const $this = $(this);
-
-            $speed.removeClass('margin-2');
-
-            if ($this.hasClass('05x')) {
-                cl = '05x';
-                rate = 0.5;
-                icon = 'icon-size-36';
-                $speed.addClass('margin-2');
-            }
-            else if ($this.hasClass('125x')) {
-                cl = '125x';
-                rate = 1.25;
-                icon = 'icon-size-36';
-                $speed.addClass('margin-2');
-            }
-            else if ($this.hasClass('15x')) {
-                cl = '15x';
-                rate = 1.5;
-                icon = 'icon-size-36';
-                $speed.addClass('margin-2');
-            }
-            else if ($this.hasClass('2x')) {
-                cl = '2x';
-                rate = 2;
-            }
-            else if ($this.hasClass('3x')) {
-                cl = '3x';
-                rate = 3;
-            }
-
-            $('.context-menu.playback-speed button i', $wrapper).addClass('hidden');
-            $(`.context-menu.playback-speed button.${cl} i`, $wrapper).removeClass('hidden');
-            $('i', $speed)
-                .removeClass()
-                .addClass(`${SPRITE} icon-playback-${cl}-small-regular-outline ${icon}`);
-
-            streamer.playbackRate = rate;
         });
 
         // Video playback keyboard event handler.

@@ -33,6 +33,10 @@
     border-color: var(--mobile-border-disabled);
 }
 
+.nav-elem.card > i {
+    margin: 0;
+}
+
 .nav-elem.card .primary-text {
     font: var(--mobile-font-caption-small-semibold);
     color: var(--mobile-text-primary);

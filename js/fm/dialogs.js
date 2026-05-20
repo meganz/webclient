@@ -467,7 +467,7 @@
         scope.classList.remove('hidden');
 
         // Update global $.mcselected with the target handle
-        $.mcselected = aTarget && aTarget !== 'transfers' ? aTarget : undefined;
+        $.mcselected = aTarget || undefined;
         path = path || M.getPath($.mcselected);
         if (
             section === 'shared-with-me' && path.length > 1 ||
@@ -2164,7 +2164,7 @@
             M.safeShowDialog('copy', function() {
                 var tab = M.chat ? 'conversations' : M.currentrootid === 'shares' ?
                     'shared-with-me' : M.currentrootid === 's4' ? 's4' : 'cloud-drive';
-                var dir = M.currentdirid === 'transfers' ? M.lastSeenCloudFolder || M.RootID : M.currentdirid;
+                var dir = M.currentdirid;
                 if (tab === 'conversations' && $.dialogSelChats) {
                     delete $.dialogSelChats;
                 }

@@ -128,7 +128,6 @@
 /* Context menus repositioning accourding */
 .text-editor nav.context-menu {
     left: 2px;
-    right: 2px;
 }
 .text-editor nav.context-menu.visible {
     margin-top: 2px;

@@ -15,25 +15,25 @@ lazy(mega.slideshow.settings, 'order', () => {
                 {
                     'default-order': {
                         cfg: 4,
-                        icon: 'icon-rectangle-stack',
+                        icon: 'icon-rectangle-stack-thin-outline',
                         absolute: true,
                         value: indexList => M.chat ? indexList.reverse() : indexList
                     },
                     'shuffle': {
                         cfg: 1,
-                        icon: 'icon-shuffle',
+                        icon: 'icon-shuffle-thin-outline',
                         absolute: true,
                         value: (indexList) => shuffle(indexList)
                     },
                     'newest': {
                         cfg: 2,
-                        icon: 'icon-hourglass-new',
+                        icon: 'icon-hourglass-newest-thin-outline',
                         absolute: true,
                         value: (indexList, nodeList) => this._timeSort(indexList, nodeList, -1)
                     },
                     'oldest': {
                         cfg: 3,
-                        icon: 'icon-hourglass-old',
+                        icon: 'icon-hourglass-oldest-thin-outline',
                         absolute: true,
                         value: (indexList, nodeList) => this._timeSort(indexList, nodeList, 1)
                     }

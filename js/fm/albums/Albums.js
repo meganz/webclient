@@ -617,7 +617,7 @@ lazy(mega.gallery, 'albums', () => {
     }));
 
     const sortStore = () => {
-        const {n, d} = fmconfig.sortmodes[M.currentdirid] || M.sortmode || {n: 'date', d: 1};
+        const {n, d} = fmconfig.sortmodes && fmconfig.sortmodes[M.currentdirid] || M.sortmode || {n: 'date', d: 1};
         const albumKeys = Object.keys(scope.albums.store);
 
         albumKeys.sort((keyA, keyB) => sortAlbumsArray(
@@ -2937,6 +2937,7 @@ lazy(mega.gallery, 'albums', () => {
         setGlobalButtons() {
             if (Object.values(scope.albums.store).filter(scope.albumIsRenderable).length === 0) {
                 mega.ui.secondaryNav.hideActionButtons();
+                mega.ui.secondaryNav.updateInfoChipsAndViews(true);
                 return;
             }
             mega.ui.secondaryNav.addActionButton({
@@ -2972,6 +2973,7 @@ lazy(mega.gallery, 'albums', () => {
             mega.ui.secondaryNav.hideActionButtons();
             mega.ui.secondaryNav.hideBreadcrumb();
             mega.ui.secondaryNav.updateLayoutButton(true);
+            mega.ui.secondaryNav.domNode.classList.remove('s4-spacer');
             if (albumId) {
                 mega.ui.secondaryNav.domNode.classList.remove('albums-grid-header');
                 this.setSpecificAlbumButtons(albumId);

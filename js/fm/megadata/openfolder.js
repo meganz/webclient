@@ -487,14 +487,9 @@
                 console.time('time for rendering');
             }
 
-            if (id !== 'transfers') {
-                $fmRightFilesBlock.removeClass('hidden');
-            }
+            $fmRightFilesBlock.removeClass('hidden');
 
-            if (id === 'transfers') {
-                this.v = [];
-            }
-            else if ($.ofShowNoFolders) {
+            if ($.ofShowNoFolders) {
                 delete $.ofShowNoFolders;
 
                 this.v = (function _(v) {

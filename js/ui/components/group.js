@@ -51,4 +51,8 @@ class MegaComponentGroup {
             }
         }
     }
+
+    static factory(options) {
+        return new this(options);
+    }
 }

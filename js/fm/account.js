@@ -30,10 +30,6 @@ function accountUI() {
     $('.fm-account-save', accountUI.$contentBlock).removeClass('disabled');
     accountUI.$contentBlock.removeClass('hidden');
 
-    if ($('.fmholder', 'body').hasClass('transfer-panel-opened')) {
-        $.transferClose();
-    }
-
     M.onSectionUIOpen('account');
 
     if (u_attr && u_attr.b && !u_attr.b.m) {
@@ -849,6 +845,9 @@ accountUI.leftPane = {
             const parentPage = accountUI.leftPane.getPageUrlBySection($parentBtn);
             const page = `${parentPage}/${dataScrollto}`;
             const isHidden = $target.hasClass('hidden');
+            if (this.dataset.eventId) {
+                eventlog(parseInt(this.dataset.eventId));
+            }
 
             if (isHidden) {
                 // display: block removes an element from DOM, so we need to mimic it's location for a bit
@@ -3108,6 +3107,9 @@ accountUI.transfers = {
 
         // Transfer Tools - Megasync
         this.transferTools.megasync.render();
+
+        // Migration
+        this.migrate.render();
     },
 
     uploadAndDownload: {
@@ -3294,7 +3296,142 @@ accountUI.transfers = {
                 }
             }
         }
-    }
+    },
+
+    migrate: {
+
+        render() {
+
+            'use strict';
+
+            this.table = document.getElementById('account-migration-table');
+
+            this.renderMigrations();
+        },
+
+        renderMigrations() {
+
+            'use strict';
+
+            mega.migrate.getMigrations().then(migrations => {
+
+                const tbody = this.table.querySelector('tbody');
+
+                if (!migrations.length) {
+                    return;
+                }
+
+                tbody.textContent = '';
+
+                const phmap = {};
+                for (const h of Object.keys(M.su.EXP)) {
+                    phmap[M.su.EXP[h].ph] = h;
+                }
+
+                for (let i = migrations.length; i--;) {
+                    const m = migrations[i];
+                    const provider = mega.migrate.knownProviders[m.p] || {name: 'Unknown', icon: ''};
+                    const date = time2date(m.ts);
+                    let statusText = '';
+
+                    switch (m.s) {
+                        case mega.migrate.states.PENDING:
+                            statusText = l[7379];
+                            break;
+                        case mega.migrate.states.IN_PROGRESS:
+                            statusText = l.tfw_tab_active;
+                            break;
+                        case mega.migrate.states.SUCCESS:
+                            statusText = l[1418];
+                            break;
+                        case mega.migrate.states.CANCELLED:
+                            statusText = l[6112];
+                            break;
+                        case mega.migrate.states.ERROR:
+                            statusText = l.tfw_header_error;
+                            break;
+                        default:
+                            statusText = '';
+                    }
+
+                    const tr = mCreateElement('tr', {id: `migration-${m.id}`}, [
+                        mCreateElement('td', false, [
+                            mCreateElement('div', {class: 'label-with-icon'}, [
+                                mCreateElement('i', {class: provider.icon}),
+                                mCreateElement('span', false, [document.createTextNode(provider.name)])
+                            ])
+                        ]),
+                        mCreateElement('td', false, [
+                            mCreateElement('span', false, [document.createTextNode(date)])
+                        ]),
+                        mCreateElement('td', false, [
+                            mCreateElement('span', {class: 'status-label'}, [document.createTextNode(statusText)])
+                        ]),
+                        mCreateElement('td', {class: 'actions-cell'})
+                    ], tbody);
+
+                    const actionsCell = tr.querySelector('.actions-cell');
+
+                    if (phmap[m.ph]) {
+                        // Show in location button
+                        MegaButton.factory({
+                            parentNode: actionsCell,
+                            componentClassname: 'mega-button action icon-only simpletip show-in-location',
+                            icon: 'sprite-fm-mono icon-file-search-01-thin-outline',
+                            iconSize: 16,
+                            type: 'icon',
+                            dataset: {
+                                simpletip: l.folder_link_show_in_location,
+                                simpletipposition: 'top'
+                            },
+                            onClick: () => {
+                                eventlog(500944);
+                                if (phmap[m.ph]) {
+                                    M.openFolder(phmap[m.ph]);
+                                }
+                                else {
+                                    showToast('info', l[20634]);
+                                    this.renderMigrations();
+                                }
+                            }
+                        });
+                    }
+
+                    // Cancel import button
+                    if (m.s === mega.migrate.states.PENDING || m.s === mega.migrate.states.IN_PROGRESS) {
+                        MegaButton.factory({
+                            parentNode: actionsCell,
+                            componentClassname: 'mega-button action icon-only simpletip cancel-migration',
+                            icon: 'sprite-fm-mono icon-dialog-close-thin',
+                            iconSize: 16,
+                            type: 'icon',
+                            dataset: {
+                                simpletip: l.mig_acc_cancel,
+                                simpletipposition: 'top'
+                            },
+                            onClick: () => {
+                                eventlog(500945);
+                                msgDialog(
+                                    `confirmation:!^${l.mig_acc_cancel}!${l.schedule_cancel_abort}`,
+                                    '',
+                                    l.mig_acc_cancel_confirm_title,
+                                    l.mig_acc_cancel_confirm_desc.replace('%1', provider.name),
+                                    res => {
+                                        if (res) {
+                                            eventlog(500946);
+                                            mega.migrate.cancelMigration(m.id).finally(() => {
+                                                this.renderMigrations();
+                                            });
+                                        }
+                                    }
+                                );
+                            }
+                        });
+                    }
+                }
+            });
+        }
+    },
 };
 
 accountUI.contactAndChat = {

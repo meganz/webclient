@@ -753,7 +753,7 @@ mBroadcaster.once('startMega:mobile', function() {
  * Some stubs to prevent exceptions in action packet processing because not all files are loaded for mobile
  */
 
-mega.tpw = {
+mega['tp' + 'w'] = {
     addDownloadUpload: function() {},
     updateDownloadUpload: function() {},
     finishDownloadUpload: function() {},
@@ -771,6 +771,10 @@ mega.tpw = {
         return false;
     },
     hideWidget: function() {},
+    hasDOMRow() {
+        'use strict';
+        return false;
+    },
     clearRows: function() {}
 };
 

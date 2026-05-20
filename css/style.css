@@ -363,36 +363,6 @@ label span.black {
     padding-bottom: 160px;
 }
 
-.nw-fm-percentage {
-    position: relative;
-    float: left;
-    border-radius: 100%;
-    overflow: hidden;
-}
-.nw-fm-percentage ul {
-    list-style-type: none;
-}
-.nw-fm-percentage li {
-    position: absolute;
-    top: 0;
-}
-.nw-fm-percentage p, .nw-fm-percentage li, .nw-fm-percentage ul, .nw-fm-percentage {
-    width: 148px;
-    height: 148px;
-    padding: 0;
-    margin: 0;
-}
-.nw-fm-percentage span {
-    display: block;
-    width: 74px;
-    height: 148px;
-}
-.nw-fm-percentage ul :nth-child(odd) {
-    clip: rect(0, 148px, 148px, 74px);
-}
-.nw-fm-percentage ul :nth-child(even) {
-    clip: rect(0, 74px, 148px, 0);
-}
 .right-c span {
     -webkit-border-top-left-radius: 74px;
     -webkit-border-bottom-left-radius: 74px;
@@ -1687,15 +1657,6 @@ label.iPhoneCheckLabelOff span {
 .content-panel.active {
     display: block;
 }
-.transfers-header-bl {
-    display: none;
-    position: absolute;
-    padding: 8px 0 0 8px;
-
-}
-.transfers .transfers-header-bl {
-    display: block;
-}
 .dark-tooltip {
     height: 24px;
     font: var(--text-body2);
@@ -1804,30 +1765,10 @@ body.loading .light-overlay {
 .not-logged .fm-right-header.folder-link .fm-files-view-icon {
     display: block;
 }
-.transfer-panel {
-    height: 48px;
-    box-sizing: border-box;
-    overflow: hidden;
-}
 .transfer-icons-block {
     background-color: #101010;
 }
-.transfer-panel-opened .transfer-panel {
-    height: 193px;
-}
-.transfer-panel-title {
-    display: flex;
-    padding: 11px 0 0 8px;
-    float: left;
-    margin-inline-end: auto;
-}
 
-.transfer-table .transfer-type, .transfer-table .tranfer-filetype-txt {
-    white-space: nowrap;
-    overflow: hidden;
-    -o-text-overflow: ellipsis;
-    text-overflow: ellipsis;
-}
 .active-folder-link .tranfer-filetype-txt,
 .active-folder-link .nw-fm-tree-folder,
 .active-folder-link .file-block-title {
@@ -1968,9 +1909,7 @@ body.loading .light-overlay {
 }
 .grid-url-arrow,
 .file-settings-icon,
-.album-settings-icon,
-.clear-transfer-icon,
-.link-transfer-status {
+.album-settings-icon {
     height: 16px;
     width: 16px;
     display: block;
@@ -1982,8 +1921,7 @@ body.loading .light-overlay {
 }
 
 .grid-url-arrow i,
-.file-settings-icon i,
-.clear-transfer-icon i {
+.file-settings-icon i {
     --icon-size: 16px;
     --mask-color: var(--icon-inactive);
 }
@@ -1991,10 +1929,6 @@ body.loading .light-overlay {
     top: 16px;
     left: auto;
     right: 14px;
-}
-.clear-transfer-icon {
-    left: 39px;
-    width: 16px;
 }
 .own-data .grid-url-arrow {
     left: 54px;
@@ -2005,11 +1939,6 @@ body.loading .light-overlay {
     top: auto;
     bottom: 7px;
     z-index: 10;
-}
-.clear-transfer-icon::after {
-    opacity: 0.67;
-    background-position: 1px -4045px;
-    background-image: url(../images/mega/fm-main-sprite.png);
 }
 .hide-settings-icon {
     -moz-opacity: 0;
@@ -2097,124 +2026,9 @@ body.loading .light-overlay {
 .transfer-completed .transfer-status {
     color: var(--text-color-success);
 }
-.transfer-type, .transfer-type ul, .transfer-type li, .transfer-type p, .transfer-type span {
-    height: 20px;
-    width: 20px;
-    padding: 0;
-    margin: 0;
-    list-style-type: none;
-}
-.transfer-type {
-    margin: 2px 0 0 10px;
-    position: relative;
-    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
-    -moz-opacity: 0.7;
-    -khtml-opacity: 0.7;
-    opacity: 0.7;
-}
-.transfer-started .transfer-type, .transfer-error .transfer-type, .transfer-completed .transfer-type {
-    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
-    -moz-opacity: 1;
-    -khtml-opacity: 1;
-    opacity: 1;
-}
-.transfer-completed .link-transfer-status {
-    display: none;
-}
-.transfer-type::before,
-.transfer-type.upload::before,
-.transfer-type.download::before,
-.transfer-type::after {
-    content: '';
-    display: block;
-    position: absolute;
-    left: 2px;
-    top: 2px;
-    width: 16px;
-    height: 16px;
-}
-.transfer-type.upload::after {
-    z-index: 11;
-    --mask-color: var(--secondary-blue);
-}
-.transfer-type.download::after {
-    z-index: 11;
-    --mask-color: var(--secondary-green);
-}
-.transfer-type::after {
-    z-index: 10;
-    background-color: var(--stroke-main);
-    border-radius: 100%;
-}
-.transfer-type ul :nth-child(odd) {
-    clip: rect(0, 20px, 20px, 10px);
-}
-.transfer-type ul li:nth-child(even) {
-    clip: rect(0, 10px, 20px, 0);
-}
-.transfer-type ul li {
-    position: absolute;
-}
-.transfer-type ul li span {
-    width: 10px;
-    height: 20px;
-    background-color: var(--secondary-green);
-    display: block;
-}
-.transfer-type.upload ul span {
-    background-color: var(--secondary-blue);
-}
-.transfer-type.safari-downloaded ul li span {
-    background-color: var(--secondary-red);
-}
-.transfer-started.transfer-paused:not(.transfer-completed) .transfer-type ul li span {
-    background-color: rgba(0,0,0,0.3);
-}
-.transfer-type.safari-downloaded::before {
-    background-position: -7px -4064px;
-}
-.transfer-paused.transfer-started .transfer-type::before {
-    background-position: -13px -4110px;
-}
-.transfer-type ul li.right-c span {
-    border-radius: 10px 0 0 10px;
-}
-.transfer-type ul li.left-c span {
-    margin-left: 10px;
-    border-radius: 0 10px 10px 0;
-}
-.transfer-table .eta {
-    min-width: 100px;
-    display: inline-block;
-}
-.transfer-table .eta span {
-    color: #999999;
-    padding: 0 5px 0 1px;
-}
-.transfer-table .eta.unknown {
-    opacity: 0.36;
-}
-.transfer-table .eta.unknown::before {
-    content: '';
-    display: inline-block;
-    width: 48px;
-    height: 2px;
-    background: linear-gradient(90deg, var(--icon-rest) 0%, var(--icon-rest) 44%, var(--stroke-main) 45%, var(--stroke-main) 55%, var(--icon-rest) 56%, var(--icon-rest) 100%);
-    vertical-align: middle;
-}
-.transfer-table .speed {
-    color: #999999;
-}
-.transfer-table .speed span {
-    padding: 0 5px 0 0;
-    color: #666666;
-}
 .speed.unknown {
     color: #999999;
     text-transform: uppercase;
-}
-.transfer-panel-opened .transfer-table-wrapper {
-    display: block;
 }
 .fm-right-files-block {
     height: calc(100% - 48px);
@@ -3156,29 +2970,11 @@ span.orange {
 .add-star-item .context-menu-icon {
     background-position: -3px -4271px;
 }
-.canceltransfer-item .context-menu-icon {
-    background-position: 4px -3716px;
-}
 .select-all .context-menu-icon {
     background-position: -1px -5290px;
 }
 .preview-item .context-menu-icon {
     background-position: -3px -5380px;
-}
-.transfer-pause .context-menu-icon {
-    background-position: 5px -3612px;
-}
-.transfer-play .context-menu-icon {
-    background-position: 4px -5432px;
-}
-.move-up .context-menu-icon {
-    background-position: 5px -3652px;
-}
-.move-down .context-menu-icon {
-    background-position: 5px -3684px;
-}
-.transfer-clear .context-menu-icon {
-    background-position: 5px -3716px;
 }
 .full-access .context-menu-icon, .read-and-write .context-menu-icon, .read-only .context-menu-icon {
     background-image: url(../images/mega/dialog-sprite.png);
@@ -5633,6 +5429,23 @@ div.new-bottom-pages li, div.new-bottom-pages p {
     background-position: 10px -198px;
     background-repeat: no-repeat;
     cursor: pointer;
+}
+
+/* Backup recovery key page */
+
+.backup-recover.main-mid-pad {
+    max-width: 1020px;
+    margin: 0 auto;
+    box-sizing: border-box;
+    padding: 0 15px;
+}
+.backup-recover .main-left-block {
+    width: 420px;
+    float: left;
+    padding: 42px 0;
+}
+.backup-recover .main-right-block {
+    margin-left: 520px;
 }
 .backup-recover h3.main-italic-header {
     padding: 30px 0 20px 0;

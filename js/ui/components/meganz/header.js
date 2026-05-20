@@ -523,7 +523,8 @@ class MegaHeader extends MegaMobileHeader {
     closeAvatarMenu(e) {
 
         if (mega.ui.header.isSubmenuClose([mega.ui.header.avatarMenu, '.header-dropdown-menu', 'button.avatar'], e) ||
-            e && (e.target.closest('.sub-menu-wrap') || e.target.closest('.top-mega-version'))) {
+            e && !e.target.closest('.sub-menu.support.active')
+            && (e.target.closest('.sub-menu-wrap') || e.target.closest('.top-mega-version'))) {
             return;
         }
 
@@ -930,8 +931,10 @@ class MegaHeader extends MegaMobileHeader {
             _buildInteractable({
                 componentClassname: 'reload-account',
                 text: l[23433],
-                onClick: () => {
-                    M.reload();
+                onClick({originalEvent: ev}) {
+                    const force = ev.ctrlKey || ev.metaKey;
+                    eventlog(99852, String(force | 0));
+                    return M.reload(force);
                 }
             });
 
@@ -1176,7 +1179,7 @@ class MegaHeader extends MegaMobileHeader {
                 M.isGalleryPage() || M.isAlbumsPage() ||
                 M.currentrootid === M.InboxID || // Temporary title for backup
                 M.onDeviceCenter ||
-                M.currentdirid === 'transfers' || M.search) {
+                M.search) {
                 return 'drive';
             }
             else if (M.currentCustomView.type === 'pwm') {

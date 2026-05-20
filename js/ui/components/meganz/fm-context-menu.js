@@ -1962,27 +1962,6 @@
             return array.unique(items.map(s => s.replace('.', '')));
         };
 
-        const prepareOldMenu = () => {
-            // Nothing shown by the new menu. Use the old menu as a fallback e.g: transfers.
-            const menu = document.querySelector('.dropdown.body.files-menu');
-            const sections = menu.querySelectorAll('.dropdown-section');
-            for (const section of sections) {
-                let allHidden = true;
-                for (const child of section.children) {
-                    if (child.classList.contains('dropdown-item') && !child.classList.contains('hidden')) {
-                        allHidden = false;
-                        break;
-                    }
-                }
-                if (allHidden) {
-                    section.classList.add('hidden');
-                }
-                else {
-                    section.classList.remove('hidden');
-                }
-            }
-            return menu;
-        };
         return {
             selectedItems: [],
             get firstNode() {
@@ -2019,7 +1998,7 @@
                     return false;
                 }
                 if (!itemOptions.length) {
-                    return prepareOldMenu();
+                    return false;
                 }
                 if (Array.isArray(forcedSelection) && forcedSelection.length) {
                     this.selectedItems = [...forcedSelection];
@@ -2057,7 +2036,7 @@
                     }
                     return this.domNode;
                 }
-                return prepareOldMenu();
+                return false;
             },
             hide() {
                 if (!this.ready) {

@@ -14,11 +14,10 @@ lazy(mega.slideshow.settings, 'switch', () => {
          */
         constructor(name, defaultValue, isAllowed, isImplemented) {
             this.name = name;
+            this.eventId = 501244; // a subclass may override
             this._defaultValue = defaultValue || 0;
             this._isAllowed = isAllowed;
             this._isImplemented = isImplemented === undefined ? true : isImplemented;
-
-            Object.freeze(this);
         }
 
         /**
@@ -71,6 +70,10 @@ lazy(mega.slideshow.settings, 'switch', () => {
 
                 if (typeof onChange === 'function') {
                     onChange(value);
+                }
+
+                if (this.eventId) {
+                    eventlog(this.eventId, [this.name, value], true);
                 }
             };
 

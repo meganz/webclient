@@ -809,6 +809,10 @@ function fmtopUI() {
         else if (M.isAlbumsPage(1)) {
             primary = '.fm-new-album';
             mega.ui.secondaryNav.domNode.classList.add('albums-grid-header');
+            const store = mega.gallery.albums && mega.gallery.albums.store || {};
+            mega.ui.secondaryNav.updateInfoChipsAndViews(
+                Object.values(store).filter(mega.gallery.albumIsRenderable).length === 0
+            );
         }
         else if (M.currentrootid === 's4' && M.currentCustomView) {
             const {subType, original, nodeID, containerID} = M.currentCustomView;

@@ -407,7 +407,15 @@
                     onAccountCreated(gotLoggedIn, accountData) {
                         if (gotLoggedIn) {
                             completeLogin(u_type);
-                            init_page();
+                            if (pageBound) {
+                                init_page();
+                            }
+                            else if (localStorage.folderLinkImport) {
+                                loadSubPage('fm');
+                            }
+                            else {
+                                loadSubPage(getCleanSitePath());
+                            }
                         }
                         else {
                             security.register.cacheRegistrationData(accountData);

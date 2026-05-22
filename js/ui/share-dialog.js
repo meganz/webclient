@@ -992,13 +992,14 @@ lazy(mega.ui, 'mShareDialog', () => {
 
         // Base64 encode the email (so we can check if it was already added later for deduplication purposes)
         const userEmailEncoded = btoa(userEmail);
+        const emailTip = type === '' ? `data-simpletip="${userEmail}" data-simpletipposition="top"` : '';
 
         html = `
             <div class="share-dialog-access-node${extraClass} ${type === '2' ? 'pending' : ''}" id="${id}"
                 email-encoded="${userEmailEncoded}">
                 <div class="access-node-info-block">
                     ${av}
-                    <div class="access-node-username">
+                    <div class="access-node-username ${emailTip ? 'simpletip' : ''}" ${emailTip}>
                         ${htmlentities(userName)}
                     </div>
                 </div>
@@ -1393,6 +1394,7 @@ lazy(mega.ui, 'mShareDialog', () => {
         // Show when contacts is more than 4
         if (userHandles.length > 4) {
             const names = [];
+            let emails = [];
             let hasUnverified = false;
 
             userHandles.forEach((handle) => {
@@ -1400,6 +1402,7 @@ lazy(mega.ui, 'mShareDialog', () => {
                 const name = user.firstName || M.getNameByHandle(handle) || user.m;
 
                 names.push(name);
+                emails.push(user.m || name);
                 // Check if there's unverified contact to show contact verfication warning banner
                 if (mega.keyMgr.getWarningValue('cv') === '1' && !(handle in pendingShares)) {
                     const ed = authring.getContactAuthenticated(handle, 'Ed25519');
@@ -1414,6 +1417,7 @@ lazy(mega.ui, 'mShareDialog', () => {
             const bottomUser = M.getUser(userHandles[1] || M.opc(userHandles[1]));
             const av = useravatar.contact(topUser.m, 'access-node-avatar top');
             const av2 = useravatar.contact(bottomUser.m, 'access-node-avatar bottom');
+            emails = mega.utils.trans.listToString(emails, '%s');
 
             const html =  `<div class="share-dialog-access-node all ${hasUnverified ? 'unverified-contact' : ''}">
                 <div class="access-node-info-block">
@@ -1421,7 +1425,7 @@ lazy(mega.ui, 'mShareDialog', () => {
                         ${av}
                         ${av2}
                     </div>
-                    <div class="access-node-username">
+                    <div class="access-node-username simpletip" data-simpletip="${emails}" data-simpletipposition="top">
                     ${mega.utils.trans.listToString(names, '%s others', false, 3)}
                     </div>
                 </div>

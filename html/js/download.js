@@ -255,7 +255,7 @@ async function setupSingleDownloadPage(res) {
                     }
                 });
             }
-            else if (fileext(dl_node.name, true) === 'DOCX') {
+            else if (['DOCX', 'XLSX', 'XLSM', 'XLTX', 'XLTM', 'CSV'].includes(fileext(dl_node.name, true))) {
 
                 showPreview();
             }

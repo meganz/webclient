@@ -21,6 +21,22 @@ class MegaPMMenu extends MegaMenu {
         }
 
         super.show(options);
+
+        if (this.onResize) {
+            window.removeEventListener('resize', this.onResize);
+            this.onResize = SoonFc(90, () => {
+                if (this.name !== options.name || !this.visible) {
+                    return;
+                }
+                if (this.eventTarget && !this._isAnchorVisible()) {
+                    this.hide();
+                    this.trigger('close');
+                    return;
+                }
+                this.calcPosition();
+            });
+            window.addEventListener('resize', this.onResize);
+        }
     }
 
     hide() {
@@ -105,6 +121,16 @@ class MegaPMMenu extends MegaMenu {
         }
         dialogStyle.left = `${posLeft}px`;
         dialogStyle.top = `${posTop}px`;
+    }
+
+    _isAnchorVisible() {
+        const {domNode} = this.eventTarget;
+        const rect = domNode.getBoundingClientRect();
+        if (!rect.width && !rect.height) {
+            return false;
+        }
+        const topEl = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
+        return topEl !== null && (domNode.contains(topEl) || this.domNode.contains(topEl));
     }
 }
 

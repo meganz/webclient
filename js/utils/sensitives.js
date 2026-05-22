@@ -635,7 +635,9 @@ function resetSensitives() {
                             const h = $.selected[i];
 
                             if (mega.sensitives.isSensitive(h)) {
-                                selectionManager.remove_from_selection(sel[i]);
+                                if (typeof selectionManager !== 'undefined') {
+                                    selectionManager.remove_from_selection(sel[i]);
+                                }
                             }
                             else {
                                 sel.push(h);

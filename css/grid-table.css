@@ -175,6 +175,9 @@ table tr td:last-child::after {
     pointer-events: all;
     position: relative;
 }
+.table-hover tr i.selected {
+    margin-inline-start: 1px;
+}
 table.grid-table.import-summary tbody tr td i.icon-check:not(.verified-user-icon):not(.icon-dot):not(.selected) {
     opacity: 1;
     --icon-size: 16px;

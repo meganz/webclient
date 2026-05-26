@@ -1181,7 +1181,7 @@ MegaData.prototype.addNewFile = function(fileName, dest) {
 MegaData.prototype.ulprogress = function(ul, perc, bl, bt, bps) {
     'use strict';
 
-    if (!bl || !ul.starttime || uldl_hold) {
+    if (!bl || !ul.starttime || uldl_hold || ulmanager.ulOverStorageQuota) {
         return false;
     }
     const gid = `ul_${ul.id}`;

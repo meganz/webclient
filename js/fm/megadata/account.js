@@ -1397,8 +1397,22 @@ mBroadcaster.once('fm:initialized', tryCatch(() => {
     const lp = self.u_attr && u_attr.lastpurge || [];
     let banner = null;
 
-    if (pfid || !lp.length || lp[0] === fmconfig.lastpurge || lp[1] !== 4) {
+    if (pfid || !lp.length || lp[1] !== 4 || u_attr['^!lpack'] && parseInt(u_attr['^!lpack'], 10) === lp[0]) {
         return false;
+    }
+
+    // Sanity check for nodes newer than the purge
+    const stack = [M.RootID, M.InboxID, M.RubbishID];
+    while (stack.length) {
+        const h = stack.pop();
+        const n = h && M.getNodeByHandle(h);
+
+        if (n && n.ts > lp[0]) {
+            return false;
+        }
+        if (M.c[h]) {
+            stack.push(...Object.keys(M.c[h]));
+        }
     }
 
     const options = {
@@ -1414,7 +1428,7 @@ mBroadcaster.once('fm:initialized', tryCatch(() => {
             );
         },
         onClose: () => {
-            mega.config.set('lastpurge', lp[0]);
+            mega.attr.set2(null, 'lpack', lp[0], -2, true).catch(nop);
 
             if (banner.length) {
                 banner.removeClass('visible');

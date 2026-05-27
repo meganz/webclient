@@ -353,7 +353,7 @@ class MegaTopMenu extends MegaMobileTopMenu {
                 badgeClass: 'indicator brand-filled',
                 text: ''
             },
-            binding: () => s4.main.render()
+            binding: () => s4.main.render().catch(tell)
         });
 
         return loggedInCD;

@@ -396,13 +396,16 @@ FileManager.prototype.initFileManager = async function() {
                     if (self.d) {
                         console.error('Failed to initialize S4 (?!)', [ex]);
                     }
+
+                    Object.defineProperty(s4, 'failure', {
+                        value: [ex, this.s4idd]
+                    });
+
                     this.onFileManagerReady(() => {
                         onIdle(() => {
-                            msgDialog('warningb', l.ri_s4_tab, l.s4_cnt_exists_error, ex < 0 ? api_strerror(ex) : ex);
-
-                            const t = document.querySelector('.js-s4-tree-panel');
+                            const t = document.querySelector('.js-s4-tree-panel .tree-expander');
                             if (t) {
-                                t.classList.add('hidden');
+                                t.remove();
                             }
 
                             const {owner, actors} = mBroadcaster.crossTab;
@@ -418,11 +421,6 @@ FileManager.prototype.initFileManager = async function() {
                                 ])
                             );
                         });
-
-                        if (onS4Section()) {
-
-                            return this.openFolder('fm', true);
-                        }
                     });
                 })
                 .finally(() => {

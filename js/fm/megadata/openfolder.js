@@ -293,7 +293,7 @@
             },
             s4() {
                 if ('main' in s4) {
-                    s4.main.render();
+                    s4.main.render().catch(reportError);
                 }
                 else {
                     M.openFolder('fm');

@@ -285,7 +285,8 @@ Object.defineProperty(msgDialog, 'icons', {
         'warninga': 'sprite-fm-mono icon-alert-triangle-thin-solid warning',
         'warningb': 'sprite-fm-mono icon-alert-triangle-thin-solid warning',
         'error': 'sprite-fm-mono icon-x-circle-thin-solid error',
-        'megasync-reconnect': 'sprite-fm-mono icon-x-circle-thin-solid error'
+        'megasync-reconnect': 'sprite-fm-mono icon-x-circle-thin-solid error',
+        'remove': 'sprite-fm-mono icon-alert-triangle-thin-outline warning'
     },
     writable: false,
     configurable: false

@@ -518,9 +518,10 @@ function dashboardUI(updProcess) {
                 $s4DataItem.removeClass('hidden');
 
                 $('.s4-dashboard', $s4DataItem).rebind('click.openS4', () => {
-                    const res = s4.main.render();
-                    eventlog(501012);
-                    return res;
+                    s4.main.render()
+                        .then(() => eventlog(501012))
+                        .catch(dump);
+                    return false;
                 });
 
                 // Update a tags
@@ -685,9 +686,10 @@ function dashboardUI(updProcess) {
 
             $('.used-storage-info.ba-s4 .object-storage', $bsnDashboard)
                 .rebind('click.openS4', () => {
-                    const res = s4.main.render();
-                    eventlog(501012);
-                    return res;
+                    s4.main.render()
+                        .then(() => eventlog(501012))
+                        .catch(dump);
+                    return false;
                 });
             $('.used-storage-info.ba-root', $bsnDashboard).rebind('click', () => eventlog(501011));
             $('.used-storage-info.ba-version span', $bsnDashboard).rebind('click', () => eventlog(501007));

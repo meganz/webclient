@@ -597,7 +597,9 @@ TransferQueue.prototype.push = function(cl) {
     delay('TransferQueue:push', function() {
         var qbqq = self.qbqq;
         var dispatcher = function() {
-            closeDialog();
+            if ($.dialog && $.dialog !== 'pro-login-dialog') {
+                closeDialog();
+            }
             self.resume();
 
             for (let i = 0; i < qbqq.length; i++) {

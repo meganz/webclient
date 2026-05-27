@@ -482,7 +482,7 @@ mega.tpw = new function TransferProgressWidget() {
     mBroadcaster.addListener('fm:initialized', viewPreparation);
 
     var finalizeUpdates = function() {
-        if (!mega.tpw.isWidgetVisibile() && !page.includes('download')) {
+        if (!mega.tpw.isWidgetVisibile() && !page.includes('download') && page !== 'login') {
             mega.tpw.showWidget();
         }
         else {

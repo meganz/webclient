@@ -489,24 +489,23 @@ var pro = {
      * Calculate the savings of a given percentage savings
      * @param {Array} percentageSavings An array of percentages
      * @param {?Boolean} asMult Whether to return the multiplier or the savings percentage
-     * @param {?Boolean} roundDown Whether to round the calculated savings percentage down
+     * @param {?Boolean} shouldRound Whether to round the calculated savings percentage
      * @param {?Boolean} givenDecimals Whether the percentages are given in decimals or not
      * @returns {Number} The savings percentage. Returned as a decimal
      */
-    calculateSavings(percentageSavings, asMult, roundDown, givenDecimals) {
+    calculateSavings(percentageSavings, asMult, shouldRound, givenDecimals) {
         'use strict';
 
-        if (roundDown === undefined) {
-            roundDown = true;
+        if (shouldRound === undefined) {
+            shouldRound = true;
         }
 
         let multiplier = percentageSavings.reduce((acc, curr) => {
             return acc * (1 - (curr ? curr / (givenDecimals ? 1 : 100) : 0));
         }, 1) * 100;
 
-        // The amount is inverted, so ceil will round the final result down
-        if (roundDown) {
-            multiplier = pro.softCeil(multiplier);
+        if (shouldRound) {
+            multiplier = Math.round(multiplier);
         }
 
         return (asMult ? multiplier : 100 - multiplier) / 100;
@@ -1529,28 +1528,6 @@ var pro = {
             planTypes[type] = pro.planObjects.planKeys[key];
         }
         return pro.planObjects.planKeys[key] || false;
-    },
-
-    /**
-     * Rounds the number down to the nearest whole number, unless it is within 0.05 of the nearest whole number in which
-     * case it rounds up
-     * @param {number} number - The number to round down
-     * @returns {number} - The rounded number
-     */
-    softFloor(number) {
-        'use strict';
-        return Math.floor(Math.round(number * 10) / 10);
-    },
-
-    /**
-     * Rounds the number up to the nearest whole number, unless it is within 0.005 of the nearest whole number in which
-     * case it rounds down
-     * @param {number} number - The number to round up
-     * @returns {number} - The rounded number
-     */
-    softCeil(number) {
-        'use strict';
-        return Math.ceil(Math.round(number * 100) / 100);
     },
 
     getStandardisedTaxInfo(planTaxInfo, type) {

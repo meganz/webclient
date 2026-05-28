@@ -3867,7 +3867,10 @@ else if (!browserUpdate) {
                 return tmp ? p + '&' + new URLSearchParams(JSON.parse(tmp)) : p;
             })(params || '');
 
-            xhr.open("POST", apipath + 'cs?id=0' + (params || ''), true);
+            xhr.open("POST", apipath + 'cs?', true);
+            if (params) {
+                xhr.setRequestHeader('MEGA-Chrome-Antileak', '/cs?id=0' + params);
+            }
             xhr.send(JSON.stringify([].concat(data)));
         };
 

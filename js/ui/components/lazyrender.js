@@ -5,6 +5,11 @@ class MegaLazyRenderComponent extends MegaComponent {
 
         this._toRender = true;
         MegaLazyRenderComponent.observer.observe(this.domNode);
+        this.rebind('destroy.mlrc', () => {
+            if (typeof this.abortLoad === 'function') {
+                this.abortLoad();
+            }
+        });
     }
 
     destroy() {

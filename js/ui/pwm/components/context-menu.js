@@ -91,7 +91,8 @@ class MegaContextMenu extends MegaComponentGroup {
 
         mega.ui.pm.menu.show({
             ...options,
-            contents
+            contents,
+            resizeHandler: true
         });
     }
 }

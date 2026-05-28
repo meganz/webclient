@@ -723,6 +723,10 @@ lazy(mega.ui, 'dlPage', () => {
         },
 
         startDownload(forceBrowserDl) {
+            forceBrowserDl = forceBrowserDl
+                || Object(previews[dlpage_ph]).full
+                || dlResumeInfo && dlResumeInfo.byteLength === fdl_filesize;
+
             if (!forceBrowserDl) {
                 loadingDialog.show('dl-msync-check');
                 megasync.isInstalled((err, is) => {

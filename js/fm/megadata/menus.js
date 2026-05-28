@@ -701,11 +701,12 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items, forcedSe
 
     const showContextMenu = () => {
         menuNode = menuNode || mega.ui.contextMenu.show(finalItems, forcedSelection);
+        if (!menuNode) {
+            return;
+        }
         // This part of code is also executed when ll == 'undefined'
 
         M.adjustContextMenuPosition(e, menuNode);
-
-        M.disableCircularTargets('#fi_');
 
         menuNode.classList.remove('hidden');
 
@@ -869,32 +870,6 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items, forcedSe
         }
         asyncShow = true;
         onIdle(showContextMenu);
-    }
-    else if (ll === 7) { // Columns selection menu
-        if (M && M.columnsWidth && M.columnsWidth.cloud) {
-            // Please be aware that have to hide all hyperlink dropdown items that are options in context menu,
-            // not including any ones under submenu with the span tag.
-            // Then filter them with the classname of visible-col-select
-            // and display correct ones based on the visible columns list.
-            var $currMenuItems = $('.files-menu.context a.dropdown-item')
-                .addClass('hidden').filter('.visible-col-select');
-            finalItems.push('.sort-grid-item-main');
-            for (var col in M.columnsWidth.cloud) {
-                if (M.columnsWidth.cloud[col] && M.columnsWidth.cloud[col].disabled) {
-                    continue;
-                }
-                else {
-                    if (M.columnsWidth.cloud[col] && M.columnsWidth.cloud[col].viewed) {
-                        $currMenuItems.filter('[megatype="' + col + '"]').attr('isviewed', 'y')
-                            .removeClass('hidden').find('i').removeClass('icon-add').addClass('icon-check');
-                    }
-                    else {
-                        $currMenuItems.filter('[megatype="' + col + '"]').removeAttr('isviewed')
-                            .removeClass('hidden').find('i').removeClass('icon-check').addClass('icon-add');
-                    }
-                }
-            }
-        }
     }
     else if (ll === 8 && items) { // Passes requested items
         asyncShow = true;
@@ -1449,15 +1424,6 @@ MegaData.prototype.reCalcMenuPosition = function(menuNode, x, y, ico) {
         ({ width: nmW, height: nmH } = nextNode.getBoundingClientRect());
         if (nmH >= (maxY - TOP_MARGIN)) {// Handle huge menu
             nmH = maxY - TOP_MARGIN;
-            const tmp = document.getElementById(`csb_${String(menuNode.id).replace('fi_', '')}`);
-            if (tmp) {
-                tmp.classList.add('context-scrolling-block');
-                tmp.addEventListener('mousemove', M.scrollMegaSubMenu.bind(this));
-
-                // add scrollable context menu.
-                nextNode.classList.add('mega-height');
-                nextNode.style.height = `${nmH}px`;
-            }
         }
 
         return this.finaliseSubmenuCalcs(

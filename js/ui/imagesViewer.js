@@ -23,11 +23,31 @@ var slideshowid;
     const broadcasts = [];
     const MOUSE_IDLE_TID = 'auto-hide-previewer-controls';
     let zoomPan = false;
-    let activeVideoSlide = false;
 
     const onConfigChange = (name) => {
         if (name === 'speed') {
             slideshow_timereset();
+        }
+    };
+
+    // function invoked when previews[] becomes available, or if there was some error
+    // from gfsfetch() or getfileattr() while on slideshow-play mode, and we need to
+    // move to the next slide (since we may be awaiting a media to load from a timeereset() call)
+    const loadend = (id, type = '?') => {
+        if (self.d) {
+            console.warn(`loadend(${id}) for type=${type}`, slideshowplay, slideshow_handle(1));
+        }
+
+        if (slideshowplay === id || M.chat && String(slideshowplay).split('!')[1] === id) {
+            if (self.d) {
+                console.info('Dispatching slideshow-play for %s...', id);
+            }
+
+            slideshow_next();
+        }
+        else if (id === slideshow_handle()) {
+
+            previewsrc(id);
         }
     };
 
@@ -563,7 +583,7 @@ var slideshowid;
             ? speed ? speed.getValue() / 1e3 : 3
             : sleepTime;
 
-        if (slideshowplay && !slideshowpause && !activeVideoSlide) {
+        if (slideshowplay && !slideshowpause) {
             (slideshowTimer = tSleep(sTime))
                 .then(() => {
                     if (slideshowplay) {
@@ -1048,6 +1068,9 @@ var slideshowid;
             $('button.subtitles', $videoControls).removeClass('mask-color-brand');
             $('button.subtitles i', $videoControls).removeClass('icon-subtitles-thin-solid')
                 .addClass('icon-subtitles-thin-outline');
+
+            console.assert($('.loader-grad', $overlay).hasClass('hidden'), `video-destroy race?`);
+            $('.loader-grad', $overlay).addClass('hidden');
             if (optionsMenu) {
                 contextMenu.close(optionsMenu);
             }
@@ -1139,7 +1162,6 @@ var slideshowid;
 
         // Clear previousy set data
         switchedSides = false;
-        activeVideoSlide = false;
         $('header .file-name', $overlay).text(n.name);
         $('header .file-size', $overlay).text(bytesToSize(n.s || 0));
         $('.viewer-error, #pdfpreviewdiv1, #docxpreviewdiv1', $overlay).addClass('hidden');
@@ -1826,7 +1848,11 @@ var slideshowid;
                 }
             };
 
-            M.gfsfetch(n.link || n.h, 0, -1, progress).then((data) => {
+            tSleep.race(20, M.gfsfetch(n.link || n.h, 0, -1, progress)).then((data) => {
+                if (data === ETEMPUNAVAIL) {
+                    // timed out
+                    throw data;
+                }
                 preview({type: filemime(n, 'image/jpeg')}, n.h, data.buffer);
                 if (!exifImageRotation.fromImage) {
                     previews[n.h].orientation = parseInt(EXIF.readFromArrayBuffer(data, true).Orientation) || 1;
@@ -1843,12 +1869,27 @@ var slideshowid;
                 if (slideshow_handle() === n.h) {
                     $progressBar.addClass('vo-hidden');
                 }
+                else if (slideshowplay && ex === ETEMPUNAVAIL) {
+                    // rather than leaving the user waiting, move to the closest image already cached...if any.
+                    const {forward, backward} = slideshowsteps();
 
-                if (!(loadPreview || isCached)) {
-                    getPreview();
+                    preqs[n.h] = null;
+                    for (let blk = [forward, backward], j = 0; j < 2; ++j) {
+                        for (let i = 0; i < blk[j].length; ++i) {
+                            if (previews[blk[j][i]]) {
+                                return slideshow(blk[j][i]);
+                            }
+                        }
+                    }
                 }
 
-                slideshow_timereset();
+                if (loadPreview || isCached) {
+
+                    loadend(n.h);
+                }
+                else {
+                    getPreview();
+                }
             });
         }
 
@@ -1876,8 +1917,15 @@ var slideshowid;
             previews[id].fma = MediaAttribute(n).data || false;
         }
 
+        if (slideshowplay) {
+            slideshow_timereset(30);
+        }
+
         $playVideoButton.rebind('click', function() {
             if (dlmanager.isOverQuota) {
+                if (slideshowplay) {
+                    return slideshow_timereset(-1);
+                }
                 return dlmanager.showOverQuotaDialog();
             }
 
@@ -1898,13 +1946,6 @@ var slideshowid;
                 sessionStorage.removeItem('previewTime');
             };
 
-            const toggleSlideshow = (pause) => {
-                if (slideshowplay) {
-                    activeVideoSlide = !!pause;
-                    slideshow_timereset(0);
-                }
-            };
-
             // Show loading spinner until video is playing
             $pendingBlock.removeClass('hidden');
             $('.video-controls', $overlay).removeClass('hidden');
@@ -1918,9 +1959,6 @@ var slideshowid;
             if (is_mobile) {
                 requestAnimationFrame(() => mega.initMobileVideoControlsToggle($overlay));
             }
-
-            // Stop switching slides until we try to stream
-            toggleSlideshow(true);
 
             initVideoStream(n, $overlay, destroy).done(streamer => {
                 preqs[n.h] = streamer;
@@ -1961,10 +1999,31 @@ var slideshowid;
                     return true;
                 });
 
-                preqs[n.h].on('ended', () => {
-                    // Continue slideshow
-                    toggleSlideshow();
-                });
+                if (slideshowplay) {
+
+                    preqs[n.h].on('canplay', slideshow_aborttimer);
+
+                    preqs[n.h].on('inactivity', function() {
+                        // @todo disable playVid setting on OBQ?
+                        // @todo is ten seconds suitable to give up waiting?
+                        slideshow_timereset(this.isOverQuota ? 0 : 30);
+                        return true;
+                    });
+
+                    preqs[n.h].on('activity', () => {
+                        slideshow_aborttimer();
+                        return true;
+                    });
+
+                    preqs[n.h].on('ended', () => {
+                        // @todo preload the next video two seconds before (?)
+                        slideshow_timereset(0);
+                    });
+
+                    preqs[n.h].on('error', () => {
+                        slideshow_timereset(0);
+                    });
+                }
 
                 if (typeof psa !== 'undefined') {
                     psa.repositionMediaPlayer();
@@ -1973,7 +2032,7 @@ var slideshowid;
                 console.warn(ex);
 
                 // Continue slideshow
-                toggleSlideshow();
+                slideshow_timereset(0);
             });
         });
 
@@ -2427,29 +2486,12 @@ var slideshowid;
             blob = new Blob([uint8arr.buffer], {type: type});
         }
 
-        const processFullPreview = () => {
-            if (
-                slideshowplay === id
-                || (M.chat && typeof slideshowplay === 'string' && slideshowplay.split('!')[1] === id)
-            ) {
-                if (d) {
-                    console.warn('Dispatching slideshow-play for %s...', id);
-                }
-
-                slideshow_next();
-            }
-            else if (id === slideshow_handle()) {
-                previewsrc(id);
-            }
-        };
-
         if (previews[id]) {
             if (previews[id].full) {
                 if (d && previews[id].fromChat !== null) {
                     console.warn('Not overwriting a full preview...', id);
                 }
-                processFullPreview();
-                return;
+                return loadend(id, type);
             }
             previews[id].prev = previews[id];
         }
@@ -2475,7 +2517,7 @@ var slideshowid;
             previews[n.hash] = previews[id];
         }
 
-        processFullPreview();
+        loadend(id, type);
 
         // Ensure we are not eating too much memory...
         tSleep.schedule(7, slideshow_freemem);

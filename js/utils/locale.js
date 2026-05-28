@@ -1822,7 +1822,11 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[/A3]', '</a>');
 
     l.s4_cnt_exists_error = escapeHTML(l.s4_cnt_exists_error)
-        .replace('[A]', '<a href="mailto:support@mega.io">')
+        .replace('[A]', '<a href="mailto:support@mega.io" class="link mailto">')
+        .replace('[/A]', '</a>');
+
+    l.s4_cnt_init_error = escapeHTML(l.s4_cnt_init_error)
+        .replace('[A]', '<a href="mailto:support@mega.io" class="link">')
         .replace('[/A]', '</a>');
 
     l.s4_onbd_ne_tip = escapeHTML(l.s4_onbd_ne_tip)

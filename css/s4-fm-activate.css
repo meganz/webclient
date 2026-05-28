@@ -10,6 +10,10 @@
     width: 100%;
 }
 
+.s4.fm-activate-section > .body.m-center {
+    margin: auto;
+}
+
 
 /* Typo */
 
@@ -21,6 +25,19 @@
     text-align: start;
 }
 
+.s4.fm-activate-section h3.pt-4 {
+    padding-top: 1rem;
+}
+
+.s4.fm-activate-section h3.text-center {
+    text-align: center;
+}
+
+.s4.fm-activate-section .error-msg {
+    color: var(--mobile-text-secondary);
+    font-style: italic;
+}
+
 .s4.fm-activate-section a.link,
 .s4.fm-activate-section .terms a {
     color: var(--mobile-link-primary);
@@ -29,6 +46,12 @@
 
 
 /* Icons */
+
+.s4.fm-activate-section i.error {
+    --icon-size: 40px;
+    --mask-color: var(--mobile-support-error);
+    margin: 0 auto;
+}
 
 .s4.fm-activate-section i.rotate-180 {
     transform: rotate(180deg);

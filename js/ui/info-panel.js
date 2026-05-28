@@ -670,11 +670,14 @@ lazy(mega.ui, 'mInfoPanel', () => {
                 const MAX_AVATARS = 12;
                 for (let i = 0; i < userHandles.length; i++) {
                     if (i < MAX_AVATARS) {
+                        const userHandle = userHandles[i];
                         MegaAvatarComponent.factory({
                             parentNode: usersNode,
-                            userHandle: userHandles[i],
+                            userHandle,
                             size: size || 24,
-                            simpletip: false,
+                            simpletip(meta) {
+                                return M.u[userHandle] && M.u[userHandle].m || meta.fullName;
+                            },
                         });
                     }
                     else {

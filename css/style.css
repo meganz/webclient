@@ -2809,17 +2809,9 @@ span.orange {
     opacity: 0.7;
     cursor: default;
 }
-.dropdown.body.submenu.mega-height, .dropdown.files-menu.mega-height {
-    padding: 22px 8px;
-    margin-top: -14px;
-}
-.dropdown.body.submenu.mega-height > .context-top-arrow,
-.dropdown.body.submenu.mega-height > .context-bottom-arrow,
 .context-scrolling-block {
     display: block;
 }
-.dropdown.body.submenu.mega-height > .context-scrolling-block,
-.dropdown.files-menu.mega-height > .context-scrolling-block,
 .fm-context-menu.mega-height > .context-scrolling-block {
     height: 100%;
     overflow: hidden;
@@ -2870,124 +2862,6 @@ span.orange {
 .bottom-points-position .context-menu-points {
     top: auto;
     bottom: 4px;
-}
-.open-item .context-menu-icon {
-    background-position: -3px -4633px;
-}
-.cloud-item .context-menu-icon {
-    background-position: 6px -8444px;
-}
-.download-item .context-menu-icon {
-    background-position: -3px -5212px;
-}
-.download-standart-item .context-menu-icon {
-    background-position: -3px -304px;
-}
-.zipdownload-item .context-menu-icon {
-    background-position: -3px -336px;
-}
-.send-to-contact-item .context-menu-icon {
-    background-position: -3px -4694px;
-}
-.send-to-contact-item .context-menu-icon {
-    background-position: -3px -4987px;
-}
-.getlink-item .context-menu-icon {
-    background-position: -3px -4344px;
-}
-.removelink-item .context-menu-icon {
-    background-position: -3px -5186px;
-}
-.sh4r1ng-item .context-menu-icon {
-    background-position: -3px -4800px;
-}
-.image-like-item .context-menu-icon {
-    background-position: -3px -4800px;
-}
-.move-item .context-menu-icon {
-    background-position: -3px -4416px;
-}
-.copy-item .context-menu-icon, .import-item .context-menu-icon {
-    background-position: -2px -4448px;
-}
-.folder-item .context-menu-icon {
-    background-position: -3px -4556px;
-}
-.shared-folder-item .context-menu-icon {
-    background-position: -4px -4666px;
-}
-.newfolder-item .context-menu-icon {
-    background-position: -3px -5160px;
-}
-.fileupload-item .context-menu-icon {
-    background-position: -3px -4312px;
-}
-.folderupload-item .context-menu-icon {
-    background-position: -3px -5250px;
-}
-.remove-item .context-menu-icon, .clearbin-item .context-menu-icon {
-    background-position: -3px -4479px;
-}
-.startchat-item .context-menu-icon {
-    background-position: -4px -7260px;
-}
-.startaudio-item .context-menu-icon {
-    background-position: -4px -2259px;
-}
-.startvideo-item .context-menu-icon {
-    background-position: -5px -2004px;
-}
-.leaveshare-item .context-menu-icon {
-    background-position: -1px -10038px;
-}
-.properties-item .context-menu-icon {
-    background-position: -3px -4240px;
-}
-.advanced-item .context-menu-icon {
-    background-position: 5px -8579px;
-}
-.permissions-item .context-menu-icon {
-    background-position: -2px -4935px;
-}
-.permissions-item .context-menu-icon {
-    background-position: -3px -4935px;
-}
-.rename-item .context-menu-icon {
-    background-position: -3px -4383px;
-}
-.addcontact-item .context-menu-icon {
-    background-position: -3px -5020px;
-}
-.reply-item .context-menu-icon {
-    background-position: -3px -5057px;
-}
-.reply-to-all .context-menu-icon {
-    background-position: -3px -5090px;
-}
-.forward-item .context-menu-icon {
-    background-position: -3px -5123px;
-}
-.add-star-item .context-menu-icon {
-    background-position: -3px -4271px;
-}
-.select-all .context-menu-icon {
-    background-position: -1px -5290px;
-}
-.preview-item .context-menu-icon {
-    background-position: -3px -5380px;
-}
-.full-access .context-menu-icon, .read-and-write .context-menu-icon, .read-only .context-menu-icon {
-    background-image: url(../images/mega/dialog-sprite.png);
-    background-repeat: no-repeat;
-}
-.full-access .context-menu-icon {
-    background-position: -75px -175px;
-}
-.read-and-write .context-menu-icon {
-    background-position: -75px -207px;
-}
-.read-only .context-menu-icon {
-    background-position: -75px -238px;
 }
 .fm-account-main {
     height: 100%;

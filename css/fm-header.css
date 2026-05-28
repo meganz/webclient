@@ -70,7 +70,11 @@
     cursor: pointer;
 }
 .fm-header-buttons button.nav-elem {
+    margin-inline-end: 12px;
+}
+.mega-header .fm-header-buttons button.nav-elem {
     margin-inline-start: 12px;
+    margin-inline-end: 0;
 }
 .fm-header-buttons button.nav-elem span.primary-text,
 .fm-card-holder button.nav-elem span.primary-text {
@@ -347,6 +351,12 @@
     background: var(--mobile-surface-2);
     outline: 1px solid var(--mobile-border-strong-selected);
     padding: 2px;
+}
+.fm-header-grid-extra > i.select-all-checkbox {
+    margin-inline-start: 1px;
+}
+.grid-table i.select-all-checkbox {
+    margin-inline-start: 4px;
 }
 .fm-header-grid-extra > i.some-selected,
 .fm-header-grid-extra > i.all-selected,

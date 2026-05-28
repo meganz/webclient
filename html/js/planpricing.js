@@ -317,6 +317,7 @@ lazy(pro, 'proplan2', () => {
             && new Set(u_attr.features.map(([, f]) => f));
     };
 
+
     const moveToBuyStep = (planId) => {
         pro.proplan2.selectedPlan = planId;
 
@@ -1205,11 +1206,11 @@ lazy(pro, 'proplan2', () => {
 
         $periodNote.toggleClass('monthly-only', !!anyYearlyDiscount);
         if (anyYearlyDiscount) {
-            $periodNote.text(l.pr_save_up_to.replace('%1', pro.softFloor(maxYearlyDiscount * 100)));
+            $periodNote.text(l.pr_save_up_to.replace('%1', Math.round(maxYearlyDiscount * 100)));
         }
         else {
             $periodNote.text(l.pr_save_from
-                .replace('%1', formatPercentage(pro.softFloor(minYearlyDiscount * 100) / 100)));
+                .replace('%1', formatPercentage(Math.round(minYearlyDiscount * 100) / 100)));
         }
     };
 

@@ -320,6 +320,11 @@ lazy(mega, 'migrate', () => {
                 return;
             }
 
+            const quota = await M.getStorageQuota();
+            if (quota.isFull) {
+                return M.showOverStorageQuota(quota);
+            }
+
             loadingDialog.show('migrate-check-active');
             const migrations = await this.getMigrations().catch(dump);
             loadingDialog.hide('migrate-check-active');
@@ -419,6 +424,8 @@ lazy(mega, 'migrate', () => {
 
             const features = `width=${width},height=${height},top=${top},left=${left}`;
 
+            // noopener/noreferrer intentionally omitted, we need the popup reference for polling
+            // eslint-disable-next-line local-rules/open
             const popup = window.open(authUrl, `${receiverId}_oauth_popup`, features);
 
             if (!popup) {
@@ -430,21 +437,41 @@ lazy(mega, 'migrate', () => {
             }
 
             return new Promise((resolve) => {
-                const listener = async(e) => {
-                    if (e.origin !== location.origin || !e.data || !e.data.state) {
+                // throws cross-origin while on OAuth provider; discard
+                const reachedRedirect = tryCatch(() => popup.location.pathname.endsWith('oauth.html'), false);
+
+                const poll = setInterval(() => {
+                    if (popup.closed) {
+                        clearInterval(poll);
+                        resolve({error: 'closed'});
                         return;
                     }
 
-                    const [state, eReceiverId, providerId] = base64urldecode(e.data.state).split('|');
+                    if (!reachedRedirect()) {
+                        return; // still on OAuth provider
+                    }
+
+                    clearInterval(poll);
+
+                    const params = new URLSearchParams(popup.location.search);
+                    const hashParams = new URLSearchParams(popup.location.hash.slice(1));
+
+                    const code = params.get('code') || hashParams.get('code');
+                    const error = params.get('error') || hashParams.get('error_description')
+                        || hashParams.get('error') || !code && 'unknown';
+
+                    popup.close();
+
+                    const rawState = params.get('state');
+                    const [state, eReceiverId, providerId] = base64urldecode(rawState || '').split('|');
+
                     if (!state || !eReceiverId || !providerId || eReceiverId !== receiverId) {
+                        resolve({error: error || 'invalid_state'});
                         return;
                     }
 
-                    window.removeEventListener('message', listener);
-
-                    resolve({ state, code: e.data.code, providerId });
-                };
-                window.addEventListener('message', listener);
+                    resolve({state, code, providerId});
+                }, 200);
             });
         }
 

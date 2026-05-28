@@ -1009,10 +1009,10 @@ pro.proplan = {
         let saveText;
 
         if (anyYearlyDiscount) {
-            saveText = l.pr_save_up_to.replace('%1', pro.softFloor(maxYearlyDiscount * 100));
+            saveText = l.pr_save_up_to.replace('%1', Math.round(maxYearlyDiscount * 100));
         }
         else {
-            saveText = l.pr_save_from.replace('%1', formatPercentage(pro.softFloor(minYearlyDiscount * 100) / 100));
+            saveText = l.pr_save_from.replace('%1', formatPercentage(Math.round(minYearlyDiscount * 100) / 100));
         }
 
         const hide = period === 12 && anyYearlyDiscount;

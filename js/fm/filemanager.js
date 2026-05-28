@@ -396,13 +396,16 @@ FileManager.prototype.initFileManager = async function() {
                     if (self.d) {
                         console.error('Failed to initialize S4 (?!)', [ex]);
                     }
+
+                    Object.defineProperty(s4, 'failure', {
+                        value: [ex, this.s4idd]
+                    });
+
                     this.onFileManagerReady(() => {
                         onIdle(() => {
-                            msgDialog('warningb', l.ri_s4_tab, l.s4_cnt_exists_error, ex < 0 ? api_strerror(ex) : ex);
-
-                            const t = document.querySelector('.js-s4-tree-panel');
+                            const t = document.querySelector('.js-s4-tree-panel .tree-expander');
                             if (t) {
-                                t.classList.add('hidden');
+                                t.remove();
                             }
 
                             const {owner, actors} = mBroadcaster.crossTab;
@@ -418,11 +421,6 @@ FileManager.prototype.initFileManager = async function() {
                                 ])
                             );
                         });
-
-                        if (onS4Section()) {
-
-                            return this.openFolder('fm', true);
-                        }
                     });
                 })
                 .finally(() => {
@@ -1010,7 +1008,6 @@ FileManager.prototype.initFileManagerUI = function() {
     InitFileDrag();
     M.createFolderUI();
     M.initTreePanelSorting();
-    M.initContextUI();
     M.addTransferPanelUI();
     M.initUIKeyEvents();
     M.initMegaSwitchUI();
@@ -1207,7 +1204,7 @@ FileManager.prototype.initFileManagerUI = function() {
 
     $.hideContextMenu = function(event) {
 
-        var a, b, currentNodeClass;
+        var a, currentNodeClass;
 
         if (event && event.target) {
 
@@ -1254,15 +1251,6 @@ FileManager.prototype.initFileManagerUI = function() {
         }
         $('.grid-url-arrow').removeClass('active');
 
-        // Set to default
-        a = $('.dropdown.body.files-menu,.dropdown.body.download');
-        a.addClass('hidden');
-        b = a.find('.dropdown.body.submenu');
-        b.attr('style', '');
-        b.removeClass('active left-position overlap-right overlap-left mega-height');
-        a.find('.disabled,.context-scrolling-block').removeClass('disabled context-scrolling-block');
-        a.find('.dropdown-item.contains-submenu.opened').removeClass('opened');
-
         // Cleanup for scrollable context menu
         const $scroll = $('#cm_scroll');
         if ($scroll.hasClass('fm-context-body')) {
@@ -1272,13 +1260,6 @@ FileManager.prototype.initFileManagerUI = function() {
             const cnt = $scroll.contents();
             $scroll.replaceWith(cnt); // Remove .context-scrollable-block
         }
-        a.removeClass('mega-height');
-        a.find('> .context-top-arrow').remove();
-        a.find('> .context-bottom-arrow').remove();
-        a.css({ 'height': 'auto' });// In case that window is enlarged
-
-        // Remove all sub-menues from context-menu move-item
-        $('#csb_' + M.RootID).empty();
 
         $(window).off('resize.ccmui');
 
@@ -1800,20 +1781,6 @@ FileManager.prototype.updFileManagerUI = async function() {
     if (d) {
         console.timeEnd('rendernew');
     }
-};
-
-/**
- * Initialize context-menu related user interface
- */
-FileManager.prototype.initContextUI = function() {
-    "use strict";
-
-    var c = '.dropdown.body.context .dropdown-item';
-
-    $('.labels .dropdown-colour-item').rebind('mouseout', function() {
-        $('.labels .dropdown-color-info').removeClass('active');
-    });
-
 };
 
 FileManager.prototype.fireKeyMgrDependantActions = async function() {
@@ -2667,20 +2634,6 @@ FileManager.prototype.addGridUI = function(refresh) {
         }
     });
 
-    var showColumnsContextMenu = function(e) {
-        var notAllowedTabs = ['shares', 'out-shares'];
-        if (notAllowedTabs.indexOf(M.currentdirid) !== -1) {
-            return false;
-        }
-
-        if (M.onDeviceCenter && mega.devices.ui.isCustomRender()) {
-            return false;
-        }
-
-        M.contextMenuUI(e, 7);
-        return false;
-    };
-
     $('.grid-table th').rebind('contextmenu', e => {
         $.hideContextMenu();
 
@@ -2705,56 +2658,6 @@ FileManager.prototype.addGridUI = function(refresh) {
         M.fmEventLog('settings');
         return false;
     }).rebind('contextmenu', () => false);
-
-    $('.files-menu.context .dropdown-item.visible-col-select').rebind('click', function(e) {
-        var $me = $(this);
-        if ($me.hasClass('notactive')) {
-            return false;
-        }
-
-        var targetCol = $me.attr('megatype');
-
-        if ($me.attr('isviewed')) {
-            $me.removeAttr('isviewed');
-            $('i', $me).removeClass('icon-check').addClass('icon-add');
-            M.columnsWidth.cloud[targetCol].viewed = false;
-        }
-        else {
-            $me.attr('isviewed', 'y');
-            $('i', $me).removeClass('icon-add').addClass('icon-check');
-            M.columnsWidth.cloud[targetCol].viewed = true;
-        }
-
-        M.columnsWidth.cloud.fname.lastOffsetWidth = null;
-        M.columnsWidth.updateColumnStyle();
-
-        var columnPreferences = mega.config.get('fmColPrefs');
-        if (columnPreferences === undefined) {
-            columnPreferences = 108; // default
-        }
-        var colConfigNb = getNumberColPrefs(targetCol);
-        if (colConfigNb) {
-            if (M.columnsWidth.cloud[targetCol].viewed) {
-                columnPreferences |= colConfigNb;
-            }
-            else {
-                columnPreferences &= ~colConfigNb;
-            }
-        }
-        mega.config.set('fmColPrefs', columnPreferences);
-
-        if (M.megaRender && M.megaRender.megaList) {
-            if (!M.megaRender.megaList._scrollIsInitialized) {
-                M.megaRender.megaList.resized();
-            }
-            else {
-                M.megaRender.megaList.scrollUpdate();
-            }
-        }
-        $.hideContextMenu && $.hideContextMenu();
-        return false;
-    });
-
 
     $('.grid-first-th').rebind('click', function() {
         var $el = $(this).children().first();

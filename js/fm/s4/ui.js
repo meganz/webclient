@@ -17,6 +17,154 @@ lazy(s4, 'ui', () => {
         }
     };
 
+    const renderS4InitFailureError = (reason) => {
+        const ce = (n, t, a) => mCreateElement(n, a, t);
+        const stop = (ev) => {
+            ev.preventDefault();
+            ev.stopPropagation();
+        };
+        const fmNode = document.querySelector('.pm-main > .fm-right-files-block');
+        const domNode = fmNode.querySelector('.fm-activate-section') || ce(
+            'div', fmNode, {class: 'fm-empty-section s4 fm-activate-section hidden'}
+        );
+        domNode.textContent = '';
+
+        const bodyNode = ce('div', domNode, {class: 'body m-center'});
+        let node = ce('div', bodyNode, {class: 'class="flex flex-column text-center'});
+
+        ce('i', node, {class: 'error sprite-fm-mono icon-x-circle-thin-solid'});
+        ce('h3', node, {class: 'pt-4 text-center'}).textContent = l.ri_s4_tab;
+
+        let tmp = l.s4_cnt_exists_error;
+        const spos = tmp.indexOf(l[85].toLowerCase());
+        if (spos > 0) {
+            // turn "reloading" into a clickable link...
+            let pz = tmp.indexOf(' ', spos);
+            if (pz > 0) {
+                pz = tmp.slice(spos, pz);
+                tmp = tmp.replace(pz, `<a class="s4-fail-reload link">${pz}</a>`);
+            }
+        }
+
+        // Error info
+        let subNode = ce('p', node, {class: 'pt-4 my-0'});
+        subNode.append(parseHTML(tmp));
+
+        if ((tmp = subNode.querySelector('a.mailto'))) {
+            tmp.addEventListener('click', (ev) => {
+                stop(ev);
+                window.open('mailto:support@mega.io', '_blank', 'noopener,noreferrer');
+            });
+        }
+
+        // reload
+        if ((tmp = subNode.querySelector('.s4-fail-reload'))) {
+            tmp.addEventListener('click', (ev) => {
+                stop(ev);
+                M.reload(true);
+            });
+        }
+
+        // Buttons wrap
+        subNode = ce('div', node, {class: 'pt-6'});
+
+        const optOut = (eid, then) => {
+            Promise.resolve(M.abortTransfers())
+                .then(() => {
+                    loadingDialog.show('s4optsout.s4r', l[1141]);
+                    return s4.utils.optsOut();
+                })
+                .then(() => eventlog(eid))
+                .then(then)
+                .catch((ex) => {
+                    // user refused to abort transfers?
+                    return ex && tell(ex);
+                })
+                .finally(() => loadingDialog.hide('s4optsout.s4r'));
+        };
+
+        // Disable object storage button
+        node = new MegaButton({
+            parentNode: subNode,
+            text: l.s4_disable_obj_storage,
+            componentClassname: 'secondary mx-2',
+            onClick: () => eventlog(501248, msgDialog(
+                `remove:!^${l.s4_accept_opts_out_btn}!${l.msg_dlg_cancel}`,
+                l.s4_obj_storage_opt_out,
+                l.s4_disable_feature_header,
+                l.s4_disable_feature_info,
+                (yes) => yes && optOut(501249, () => location.reload(loadSubPage('fm')))
+            ))
+        });
+
+        // Restart from scratch (create new container)
+        node = reason[0] === EEXIST && new MegaButton({
+            parentNode: subNode,
+            text: l.s4_cnt_init_fix_lbl,
+            componentClassname: 'primary mx-2',
+            onClick: () => eventlog(501246, msgDialog(
+                `remove:!^${l.s4_cnt_init_error_confirm}!${l.msg_dlg_cancel}`,
+                l.s4_cnt_init_fix_lbl,
+                l.s4_cnt_init_error_hdr,
+                l.s4_cnt_init_error,
+                (yes) => yes && optOut(501247, () => {
+                    localStorage.s4pf = 1;
+                    location.reload(true);
+                })
+            ))
+        });
+
+        tmp = reason[0] < 0 ? `${l.error_code}: ${reason[0]} (${api_strerror(reason[0])})` : `${reason[0]}`;
+        if (reason[1]) {
+            // @todo add different actions based in the actual error reason...
+            const [c, , [v]] = reason[1];
+
+            tmp += `, ${l[89]}: $`;
+            if (!c) {
+                // no nodes with s4-attr in root
+                tmp += '0fe3';
+            }
+            else if (v) {
+                switch (v[0]) {
+                    case 0:
+                        // container tampered
+                        tmp += '1f0a';
+                        break;
+                    case -1:
+                        // lost writable-link
+                        tmp += '1f0b';
+                        break;
+                    case false:
+                        // invalid number of reserved keys
+                        tmp += '1f0c';
+                        break;
+                    default:
+                        if (String(v[3]).includes('s4ses')) {
+                            // container creation abruptly interrupted
+                            tmp += '2e0a';
+                        }
+                        else {
+                            // @todo
+                            tmp += '2e0f';
+                        }
+                }
+            }
+            else {
+                // god knows what happened
+                tmp += 'f911';
+            }
+        }
+        ce('div', subNode, {class: 'pt-4 my-0 error-msg'}).textContent = tmp.replace('.', '');
+
+        // Init
+        if (mega.ui.mInfoPanel) {
+            mega.ui.mInfoPanel.hide();
+        }
+        domNode.classList.remove('hidden');
+
+        return eventlog(501250);
+    };
+
     const s4BcProp = freeze({
         's4': ['', ''],
         'keys': ['s4-keys', l.s4_keys],
@@ -206,10 +354,15 @@ lazy(s4, 'ui', () => {
          * Render Object storage section
          * Show Container content until multiple containers feature is available
          * Create Container if containers list is empty
-         * @returns {void} void
+         * @returns {*} void
          * @memberOf s4.ui
          */
         renderRoot() {
+            if ('failure' in s4) {
+                // Render error page
+                return M.openFolder('s4')
+                    .then(() => renderS4InitFailureError(s4.failure));
+            }
             const cn = s4.utils.getContainersList();
 
             M.openFolder(cn.length ? cn[0].h : 'fm', true);

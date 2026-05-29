@@ -564,6 +564,10 @@ function sync_switchOS(os) {
 function dlPageCleanup() {
     'use strict';
 
+    if (!dlpage_ph) {
+        return;
+    }
+
     if (typeof gifSlider !== 'undefined') {
         gifSlider.clear();
     }
@@ -573,9 +577,7 @@ function dlPageCleanup() {
         dl_node = false;
     }
 
-    if (dlpage_ph) {
-        dlpage_ph = false;
-    }
+    dlpage_ph = false;
 
     if (window.textConIsDl) {
         mega.textEditorUI.cleanup();
@@ -588,15 +590,13 @@ function dlPageCleanup() {
         $(container).appendTo(wrapper);
         delete window.mediaConIsDl;
     }
-    if (!is_mobile && typeof fdl_queue_var !== 'undefined') {
-        if (mega.tpw && mega.tpw.completeRowsLength) {
-            if ($.removeTransferItems) {
-                $.removeTransferItems();
-            }
-            else {
-                tfsheadupdate({c: `dl_${fdl_queue_var.dl_id}`});
-                mega.tpw.clearRows(mega.tpw.DONE);
-            }
+    if (!is_mobile && fdl_queue_var && mega.tpw && mega.tpw.completeRowsLength) {
+        if ($.removeTransferItems) {
+            $.removeTransferItems();
+        }
+        else {
+            tfsheadupdate({c: `dl_${fdl_queue_var.dl_id}`});
+            mega.tpw.clearRows(mega.tpw.DONE);
         }
     }
 }

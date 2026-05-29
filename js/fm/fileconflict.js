@@ -518,7 +518,6 @@
             loadingDialog.phide();
 
             if (file.t) {
-                $a3.addClass('hidden');
                 $icons.addClass(`icon-${folderIcon(node)}-90`);
                 $('.info-txt.light-grey', $dialog).text(l[17556]);
                 $('.info-txt-fn', $dialog)
@@ -566,8 +565,10 @@
                     if (file.t) {
                         $('.red-header', $a1).text(l[17551]);
                         $('.red-header', $a2).text(l[16500]);
+                        $('.red-header', $a3).text(l[17095]);
                         $('.light-grey', $a1).text(l[17552]);
                         $('.light-grey', $a2).text(l[19598]);
+                        $('.light-grey', $a3).text(l.folder_conflict_copy_rename);
                     }
                     else {
                         $('.red-header', $a1).text(l[16496]);
@@ -582,8 +583,10 @@
                     if (file.t) {
                         $('.red-header', $a1).text(l[17553]);
                         $('.red-header', $a2).text(l[16499]);
+                        $('.red-header', $a3).text(l[17096]);
                         $('.light-grey', $a1).text(l[17554]);
                         $('.light-grey', $a2).text(l[19598]);
+                        $('.light-grey', $a3).text(l.folder_conflict_move_rename);
                     }
                     else {
                         $('.red-header', $a1).text(l[16495]);
@@ -598,7 +601,9 @@
                     if (file.t) {
                         $('.red-header', $a1).text(l[17555]);
                         $('.red-header', $a2).text(l[16490]);
+                        $('.red-header', $a3).text(l[17094]);
                         $('.light-grey', $a2).text(l[19598]);
+                        $('.light-grey', $a3).text(l.folder_conflict_upl_rename);
                     }
                     else {
                         $('.red-header', $a1).text(l[17093]);
@@ -625,7 +630,6 @@
                         $('.light-grey', $a1).text(l.conflict_import_merge_note);
                         $('.light-grey', $a2).text(l[19598]);
                         $('.light-grey', $a3).text(l.conflict_import_rename_folder);
-                        $a3.removeClass('hidden');
                     }
                     else {
                         $('.red-header', $a1).text(l[17558]);
@@ -650,7 +654,7 @@
                         $a2.addClass('hidden');
                     }
                 }
-                else if (op === 'import') {
+                else {
                     $('.file-name', $a3).text(this.findNewName(file.name, target));
                 }
             }

@@ -599,6 +599,8 @@ var slideshowid;
                 });
             }
         }
+
+        return true;
     }
 
     // Inits Image viewer bottom control bar
@@ -1069,8 +1071,6 @@ var slideshowid;
             $('button.subtitles i', $videoControls).removeClass('icon-subtitles-thin-solid')
                 .addClass('icon-subtitles-thin-outline');
 
-            console.assert($('.loader-grad', $overlay).hasClass('hidden'), `video-destroy race?`);
-            $('.loader-grad', $overlay).addClass('hidden');
             if (optionsMenu) {
                 contextMenu.close(optionsMenu);
             }
@@ -1166,6 +1166,9 @@ var slideshowid;
         $('header .file-size', $overlay).text(bytesToSize(n.s || 0));
         $('.viewer-error, #pdfpreviewdiv1, #docxpreviewdiv1', $overlay).addClass('hidden');
         $('.viewer-progress', $overlay).addClass('vo-hidden');
+
+        // @todo: Combine loading grad and viewer-progress
+        $('.loader-grad', $overlay).addClass('hidden');
 
         if (!is_mobile) {
             $imageControls.addClass('hidden');
@@ -1661,7 +1664,28 @@ var slideshowid;
             slideshowpause = false;
         }
 
-        slideshow_timereset();
+        let rv;
+        const current = slideshow_handle();
+        const vstream = preqs[current] instanceof Streamer && preqs[current];
+
+        if (vstream) {
+            if (vstream.ended) {
+                rv = 0;
+            }
+            else {
+                if (!slideshowpause) {
+                    vstream.play();
+                }
+
+                if (slideshowpause || vstream.hasStartedPlaying && !vstream.gotIntoBuffering) {
+                    // No need to reset if we're playing a video and is not stalled.
+                    return slideshow_aborttimer();
+                }
+                rv = 30;
+            }
+        }
+
+        slideshow_timereset(rv);
     }
 
     function slideshow_play(isPlayMode, isAbortFetch) {
@@ -1874,6 +1898,12 @@ var slideshowid;
                     const {forward, backward} = slideshowsteps();
 
                     preqs[n.h] = null;
+                    if (slideshowpause) {
+                        if (self.d) {
+                            console.warn(`loading ${n.h} timed out, but slideshow is paused, moving on...`);
+                        }
+                        return;
+                    }
                     for (let blk = [forward, backward], j = 0; j < 2; ++j) {
                         for (let i = 0; i < blk[j].length; ++i) {
                             if (previews[blk[j][i]]) {
@@ -1912,10 +1942,6 @@ var slideshowid;
         const $pendingBlock = $('.loader-grad', $content);
         var $video = $('video', $content);
         var $playVideoButton = $('.play-video-button', $content);
-
-        if (previews[id].fma === undefined && !is_audio(n)) {
-            previews[id].fma = MediaAttribute(n).data || false;
-        }
 
         if (slideshowplay) {
             slideshow_timereset(30);
@@ -2000,14 +2026,12 @@ var slideshowid;
                 });
 
                 if (slideshowplay) {
+                    const reset = (v) => slideshow_timereset(v | 0);
 
                     preqs[n.h].on('canplay', slideshow_aborttimer);
 
                     preqs[n.h].on('inactivity', function() {
-                        // @todo disable playVid setting on OBQ?
-                        // @todo is ten seconds suitable to give up waiting?
-                        slideshow_timereset(this.isOverQuota ? 0 : 30);
-                        return true;
+                        return reset(this.isOverQuota || 30);
                     });
 
                     preqs[n.h].on('activity', () => {
@@ -2015,14 +2039,8 @@ var slideshowid;
                         return true;
                     });
 
-                    preqs[n.h].on('ended', () => {
-                        // @todo preload the next video two seconds before (?)
-                        slideshow_timereset(0);
-                    });
-
-                    preqs[n.h].on('error', () => {
-                        slideshow_timereset(0);
-                    });
+                    preqs[n.h].on('ended', reset);
+                    preqs[n.h].on('error', reset);
                 }
 
                 if (typeof psa !== 'undefined') {

@@ -2089,6 +2089,10 @@ function topmenuUI() {
                 componentClassname: 'mega-header',
                 prepend: true
             });
+
+            if (u_type === 3 && mega.ui.passwordReminderDialog) {
+                mega.ui.passwordReminderDialog.onTopmenuReinit(holder);
+            }
         }
 
         // @todo: remove condition when we start using new header in all sections

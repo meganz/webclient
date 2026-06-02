@@ -8,25 +8,127 @@
         removeOverlay: removeOverlay
     };
 
-    function addOverlay() {
-        $('body', document).addClass('overlayed');
+    function pathInfo() {
+        if (M.chat) {
+            const room = window.megaChatIsReady && megaChat.getCurrentRoom();
+            return room ? megaChat.html(room.getRoomTitle()) : escapeHTML(l[7997]);
+        }
+        if (M.isGalleryPage()) {
+            return escapeHTML(l.media);
+        }
+        if (M.albums) {
+            return escapeHTML(l.albums);
+        }
+        if (M.currentCustomView && M.currentCustomView.type === 'pwm') {
+            return escapeHTML(l[164]);
+        }
+        const name = (handle) => {
+            switch (handle) {
+                case mega.devices.rootId:
+                    return l.device_centre;
+                case 'shares':
+                    return l[5542];
+                case 'out-shares':
+                    return l[5543];
+                case 's4':
+                    return '';
+                default:
+                    if (M.dcd[handle]) {
+                        return M.dcd[handle].name || l[7381];
+                    }
+                    return M.getNameByHandle(handle) || l[164];
+            }
+        };
+        const id = M.currentCustomView ? M.currentCustomView.nodeID
+            : String(M.currentdirid).split('/').pop();
+        const path = [];
+        let data = M.getPath(id);
+        if (M.onDeviceCenter) {
+            data = mega.devices.ui.getFolderChildrenPath(data);
+        }
+        for (let i = data.length; i--;) {
+            const crumb = name(data[i]);
+            if (crumb) {
+                path.push(escapeHTML(crumb));
+            }
+        }
+        if (path.length > 4) {
+            path.splice(1, path.length - 3, '...');
+        }
+        return path.join(' > ') || escapeHTML(l[164]);
+    }
 
+    function addOverlay() {
         if (optionReference.fileRequestEnabled) {
             $('body', document).addClass('file-request-drag');
             return;
         }
 
-        $('.drag-n-drop.overlay').removeClass('hidden');
+        const $overlay = $('.drag-n-drop.overlay');
+        const $block = document.body.classList.contains('overlayed') ? $() : $(`
+            .files-grid-view:visible, 
+            .fm-blocks-view:visible, 
+            .meetings-call:visible,
+            .messages-block:visible, 
+            .gallery-view:visible, 
+            #albums-view:visible,
+            .device-centre-grid-view:visible,
+            .fm-recents:not(.emptied) .fm-recents.scroll:visible,
+            .s4-grid-view:visible,
+            .empty-state:visible,
+            .fm-empty-section:visible
+        `);
+        const setOverlaySize = () => {
+            if ($block.length) {
+                const { height, left, width } = $block[0].getBoundingClientRect();
+                $overlay.removeClass('chat-offset');
+                if (M.chat && $block.parent('.with-pane').length) {
+                    $overlay.addClass('chat-offset');
+                    $overlay.height(height - 32);
+                }
+                else if (
+                    M.currentCustomView && M.currentCustomView.type === 's4' ||
+                    M.onDeviceCenter && mega.devices.ui.isCustomRender()
+                ) {
+                    $overlay.height(height - 32);
+                }
+                else {
+                    $overlay.height(height - 20);
+                }
+                $overlay.toggleClass('flyout-offset', !!(mega.ui && mega.ui.flyout && mega.ui.flyout.name));
+                const maxWidth = $overlay[0].getBoundingClientRect().right - left - 16;
+                $overlay.width(Math.min(width - 32, maxWidth));
+            }
+            else {
+                const { width, height } = document.body.getBoundingClientRect();
+                $overlay.width(width - 32);
+                $overlay.height(height - 32);
+                $overlay.removeClass('flyout-offset chat-offset');
+            }
+        };
+        $overlay.removeClass('hidden');
+        setOverlaySize();
+        $(window).rebind('resize.filedrag', setOverlaySize);
+        let hasItems = M.v && M.v.length;
+        if (M.albums) {
+            const { albums, albumIsRenderable } = mega.gallery;
+            const album = albums.store[mega.gallery.getAlbumIdFromPath()];
+            hasItems = album
+                ? album.nodes && album.nodes.length
+                : Object.values(albums.store).some(albumIsRenderable);
+        }
+        $overlay.toggleClass('transparent-overlay', !!(hasItems || M.chat));
+        $('.crumb', $overlay).safeHTML(pathInfo());
     }
 
     function removeOverlay() {
-        $('body', document).removeClass('overlayed');
-
+        optionReference.touchedElement = 0;
         if (optionReference.fileRequestEnabled) {
             $('body', document).removeClass('file-request-drag');
             return;
         }
 
+        $(window).off('resize.filedrag');
         $('.drag-n-drop.overlay').addClass('hidden');
     }
 
@@ -117,8 +219,8 @@
         if (d > 1) {
             console.info('----- ENTER event :' + e.target.className);
         }
-        optionReference.touchedElement++;
-        if (optionReference.touchedElement === 1) {
+        if (!optionReference.touchedElement) {
+            optionReference.touchedElement = 1;
             addOverlay();
         }
 
@@ -194,6 +296,10 @@
         }
     }
 
+    function eventInView(e) {
+        return e.clientX > 0 && e.clientY > 0 && e.clientX < window.innerWidth && e.clientY < window.innerHeight;
+    }
+
     function FileDragLeave(e) {
         if (d) {
             console.log('DragLeave', optionReference.touchedElement);
@@ -207,15 +313,13 @@
         if (d > 1) {
             console.warn('----- LEAVE event :' + e.target.className + '   ' + e.type);
         }
-        optionReference.touchedElement--;
-        // below condition is due to firefox bug. https://developer.mozilla.org/en-US/docs/Web/Events/dragenter
         if (
-            optionReference.touchedElement <= 0 ||
-            optionReference.touchedElement === 1 && ua.details.browser === 'Firefox'
+            !optionReference.touchedElement ||
+            document.body.contains(e.relatedTarget || e.target) && eventInView(e)
         ) {
-            removeOverlay();
-            optionReference.touchedElement = 0;
+            return;
         }
+        removeOverlay();
     }
 
     // on Drop event or Click to file select event

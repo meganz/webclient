@@ -49,10 +49,10 @@ lazy(mega.ui, 'empty', () => {
         imgDiv.style.backgroundImage = `url(${img})`;
 
         const titleEl = mCreateElement('h3', { class: 'pt-6 font-title-h2-bold text-color-high my-0' });
-        titleEl.textContent = title;
+        titleEl.textContent = l.empty_cloud_hint;
 
         const hint = mCreateElement('div', { class: 'py-6 text-color-medium' });
-        hint.textContent = l.empty_cloud_hint;
+        hint.textContent = title;
 
         const btnRow = mCreateElement('div', { class: 'pb-6 mx-auto'});
 

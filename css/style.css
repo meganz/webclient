@@ -10223,56 +10223,54 @@ div.camera-bottom-txt {
 .dragger-block {
     position: absolute;
     z-index: 900;
-    min-height: 20px;
+    min-height: 40px;
     left: 200px;
     top: 200px;
 }
 
 .dragger-content {
-    min-height: 20px;
+    min-height: 40px;
     position: absolute;
-    background-color: var(--stroke-grey-1);
-    border: 2px solid var(--stroke-main);
+    background: var(--mobile-page-background);
+    border: 1px solid var(--mobile-border-strong);
     border-radius: 8px;
-    padding: 7px 13px 7px 13px;
+    padding: 4px 8px;
     margin: -34px 0 0 -55px;
-    -webkit-background-clip: padding-box;
-    -moz-background-clip: padding-box;
-    background-clip: padding-box;
     box-sizing: border-box;
-    width: auto !important;
+    width: 180px;
 }
-.dragger-content .item-type-icon {
+.dragger-content .dragger-row {
+    height: 24px;
+    display: flex;
+    margin: 4px 0;
+    align-items: center;
+}
+.dragger-content hr {
+    margin: 4px 0;
+    border-bottom: none;
+    border-color: var(--mobile-border-subtle);
+}
+.dragger-content .item-type-icon,
+.dragger-content .icon-files-plus-thin-outline {
+    flex: 0 0 24px;
     --icon-size: 24px;
-    margin: 1px -5px;
-    position: absolute;
+    margin-inline-end: 12px;
+}
+.dragger-content .icon-files-plus-thin-outline {
+    padding-inline-start: 4px;
+    --icon-size: 16px;
+    --mask-color: var(--mobile-icon-primary);
+}
+.dragger-content .item-type-icon.thumb {
+    background: none;
 }
 .dragger-entry {
     white-space: nowrap;
     word-break: keep-all;
-    width: auto;
-    position: relative;
-    padding: 2px 0;
-    overflow: hidden;
-    margin: 0;
-    margin-inline-start: 32px;
-    max-width: 160px;
+    max-width: 136px;
     display: block;
-}
-.dragger-files-number {
-    min-width: 14px;
-    height: 14px;
-    position: absolute;
-    margin: -40px 0 0 -70px;
-    background-color: #D32200;
-    padding: 0 4px;
-    text-align: center;
-    border-radius: 10px;
-    box-sizing: border-box;
-    color: white;
-    font-size: 11px;
-    line-height: 13px;
-    display: none;
+    color: var(--mobile-text-primary);
+    margin: 4px 0;
 }
 .information-highlight {
     box-sizing: border-box;

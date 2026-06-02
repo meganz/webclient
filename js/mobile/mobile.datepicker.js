@@ -24,7 +24,7 @@ class MegaMobileDatePicker extends MegaComponent {
         this.domNode.append(frontInput);
 
         this.frontInput = new mega.ui.MegaInputs(
-            $(frontInput).data('icon', 'sprite-mobile-fm-mono icon-calendar-01-thin-outline')
+            $(frontInput).data('icon', 'sprite-fm-mono icon-calendar-01-thin-outline')
         );
 
         this.frontInput.$wrapper.addClass('box-style mobile');

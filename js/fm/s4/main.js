@@ -219,10 +219,6 @@ lazy(s4, 'main', () => {
     ];
 
     const renderActivation = () => {
-        if (!fmNode) {
-            return loadSubPage('fm');
-        }
-
         // Ignore Started and Basic accounts
         const canEnable = u_attr.p && u_attr.p !== 12 &&
             !pro.filter.simple.miniPlans.has(u_attr.p) || u_attr.pf;
@@ -400,6 +396,11 @@ lazy(s4, 'main', () => {
                 return loadSubPage('fm/s4');
             }
 
+            if (!fmNode) {
+                return loadSubPage('fm');
+            }
+
+            // Render S4 activation page
             renderActivation();
             eventlog(500854);
         },

@@ -250,19 +250,6 @@ class MegaTopMenu extends MegaMobileTopMenu {
                 typeClassname: 'drive'
             },
             {
-                text: l[1346],
-                icon: 'sprite-fm-mono icon-arrows-up-down-circle-thin-outline',
-                href: '/fm/transfers',
-                name: 'transfers',
-                typeClassname: 'drive',
-                simpletip: l[1346],
-                simpletipClass: 'small-sidebar-tip',
-                simpletipPos: 'right',
-                simpletipWrapper: 'body',
-                simpletipOffset: '-16',
-                eventLog: 500634
-            },
-            {
                 text: l[167],
                 icon: 'sprite-fm-mono icon-trash-thin-outline',
                 href: '/fm/rubbish',
@@ -366,7 +353,7 @@ class MegaTopMenu extends MegaMobileTopMenu {
                 badgeClass: 'indicator brand-filled',
                 text: ''
             },
-            binding: () => s4.main.render()
+            binding: () => s4.main.render().catch(tell)
         });
 
         return loggedInCD;
@@ -419,9 +406,6 @@ class MegaTopMenu extends MegaMobileTopMenu {
             else if (M.currentrootid === 's4'
                 && (!M.currentCustomView || M.currentCustomView.subType === 'container')) {
                 selected = items.s4;
-            }
-            else if (M.currentdirid === 'transfers') {
-                selected = items.transfers;
             }
             else if (M.currentCustomView.type === 'pwm') {
                 selected = M.currentCustomView.nodeID === 'account' ? items['pwm-settings'] : items.pwm;

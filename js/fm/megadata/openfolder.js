@@ -293,7 +293,7 @@
             },
             s4() {
                 if ('main' in s4) {
-                    s4.main.render();
+                    s4.main.render().catch(reportError);
                 }
                 else {
                     M.openFolder('fm');
@@ -487,14 +487,9 @@
                 console.time('time for rendering');
             }
 
-            if (id !== 'transfers') {
-                $fmRightFilesBlock.removeClass('hidden');
-            }
+            $fmRightFilesBlock.removeClass('hidden');
 
-            if (id === 'transfers') {
-                this.v = [];
-            }
-            else if ($.ofShowNoFolders) {
+            if ($.ofShowNoFolders) {
                 delete $.ofShowNoFolders;
 
                 this.v = (function _(v) {

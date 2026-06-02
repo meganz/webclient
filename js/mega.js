@@ -2586,7 +2586,8 @@ function loadfm(force) {
                     .then(fetchfm)
                     .catch((ex) => {
                         console.error(ex);
-                        siteLoadError(ex, 'loadfm');
+                        return Promise.resolve('rad' in mega && mega.rad.flush().catch(nop))
+                            .then(() => siteLoadError(ex, 'loadfm'));
                     })
                     .finally(() => {
                         if (d) {
@@ -4083,8 +4084,9 @@ function loadfm_done(mDBload) {
 
             // Securing previously generated public album data to use later in the importing procedure
             if (localStorage.albumLinkImport) {
-                $.albumImport = Object.values(mega.gallery.albums.store)
-                    .find(({ph}) => ph === localStorage.albumLinkImport);
+
+                $.albumImport = JSON.parse(localStorage.albumLinkImport);
+
                 delete localStorage.albumLinkImport;
             }
         });

@@ -393,18 +393,17 @@ var bottompage = {
         var $overlay = $('.nav-overlay', 'body');
         var $header = $('.fm-header', $content);
         var $topMenu = $('.pages-menu.body', $content);
-        var $menuDropdown;
+        var $menuDropdown = $('.mobile.pages-menu-dropdown', $content);
 
         $overlay.addClass('hidden');
 
         // No  pages menu in DOM
         if ($topMenu.length === 0) {
+            $menuDropdown.addClass('hidden');
             $header.unbind('click.closepmenu');
 
             return false;
         }
-
-        $menuDropdown = $('.mobile.pages-menu-dropdown', $content);
 
         // Close pages menu function
         function closePagesMenu() {

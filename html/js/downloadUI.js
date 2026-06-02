@@ -336,20 +336,21 @@ lazy(mega.ui, 'dlPage', () => {
 
                         eventlog(501065, btn.active ? 1 : 0);
 
+                        const gid = `dl_${fdl_queue_var.ph}`;
                         // Resume
                         if (btn.active) {
                             this.statusCn.textContent = dlStatus;
-                            fm_tfsresume(`dl_${fdl_queue_var.ph}`);
+                            fm_tfsresume(gid);
                             if (mega.tpw && mega.tpw.initialized) {
-                                mega.tpw.resumeDownloadUpload(mega.tpw.DOWNLOAD, { id: fdl_queue_var.ph });
+                                mega.tpw.resumeDownloadUpload(gid);
                             }
                         }
                         // Pause
                         else {
                             this.statusCn.textContent = pausedStatus;
-                            fm_tfspause(`dl_${fdl_queue_var.ph}`);
+                            fm_tfspause(gid);
                             if (mega.tpw && mega.tpw.initialized) {
-                                mega.tpw.pauseDownloadUpload(mega.tpw.DOWNLOAD, { id: fdl_queue_var.ph });
+                                mega.tpw.pauseDownloadUpload(gid);
                             }
                         }
                     },
@@ -722,6 +723,10 @@ lazy(mega.ui, 'dlPage', () => {
         },
 
         startDownload(forceBrowserDl) {
+            forceBrowserDl = forceBrowserDl
+                || Object(previews[dlpage_ph]).full
+                || dlResumeInfo && dlResumeInfo.byteLength === fdl_filesize;
+
             if (!forceBrowserDl) {
                 loadingDialog.show('dl-msync-check');
                 megasync.isInstalled((err, is) => {

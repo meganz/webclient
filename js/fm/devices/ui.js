@@ -254,7 +254,18 @@ lazy(mega.devices, 'ui', () => {
             if (h === M.RootID) {
                 const oldSds = u_attr['*!sds'] ? tlvstore.decrypt(u_attr['*!sds']) : {};
                 const sds = { ...oldSds, [id]: `${sdsCode}`};
-                return mega.attr.set2(null, 'sds', sds, false, true, true);
+                return mega.attr.set2(null, 'sds', sds, false, true, true).catch((ex) => {
+                    if (ex === EEXPIRED) {
+                        msgDialog('warninga', '', l[200]);
+                        mega.attr.get(u_handle, 'sds', false, true, (res, ctx) => {
+                            u_attr[ctx.ua] = tlvstore.encrypt(res);
+                            if (M.onDeviceCenter) {
+                                mega.devices.ui.render(M.currentdirid, {isRefresh: true}).catch(dump);
+                            }
+                        }).catch(tell);
+                    }
+                    throw ex;
+                });
             }
             // Anything except a full sync - Changes the node attribute
             const sds = node.sds
@@ -352,9 +363,21 @@ lazy(mega.devices, 'ui', () => {
                 }
 
                 const node = M.getNodeByHandle(h);
+                const isRootSync = node && node.h === M.RootID;
+                const hasIdToRemove = id && id !== h;
 
-                // If `id` is not a folder handle, stop the sync/backup
-                if (id && id !== h) {
+                if (isRootSync && hasIdToRemove) {
+                    // If the user attribute can't be set don't mess the state up.
+                    await this._handleSdsAttributes(node, id, config.sdsCodes.remove);
+                    const {result} = await api.req(config.requests.remove(id));
+
+                    if (d) {
+                        console.log(`Remove backup/sync response: sr -> ${result}`);
+                    }
+                    return;
+                }
+
+                if (hasIdToRemove) {
                     const {result} = await api.req(config.requests.remove(id));
 
                     if (d) {
@@ -364,7 +387,7 @@ lazy(mega.devices, 'ui', () => {
 
                 if (node) {
                     // Set `sds` attr to make sure that SDK will try to clear heartbeat record too
-                    if (id && id !== h) {
+                    if (hasIdToRemove) {
                         await this._handleSdsAttributes(node, id, config.sdsCodes.remove);
                     }
 
@@ -590,10 +613,15 @@ lazy(mega.devices, 'ui', () => {
 
             const proceedWithTogglePause = async() => {
 
-                await api.req(config.requests[action](selectedSync.id));
-                await this._handleSdsAttributes(
-                    node, selectedSync.id, config.sdsCodes[action]
-                );
+                if (node && node.h === M.RootID) {
+                    // If the user attribute can't be set don't mess the state up.
+                    await this._handleSdsAttributes(node, selectedSync.id, config.sdsCodes[action]);
+                    await api.req(config.requests[action](selectedSync.id));
+                }
+                else {
+                    await api.req(config.requests[action](selectedSync.id));
+                    await this._handleSdsAttributes(node, selectedSync.id, config.sdsCodes[action]);
+                }
 
                 const {ui} = mega.devices;
                 ui.clearLastReq();
@@ -615,14 +643,14 @@ lazy(mega.devices, 'ui', () => {
                     l.dc_pause_sync_confirm_desc,
                     (proceed) => {
                         if (proceed) {
-                            proceedWithTogglePause().catch(tell);
+                            proceedWithTogglePause().catch(ex => ex !== EEXPIRED && tell(ex));
                         }
                     },
                     'dcPause'
                 );
             }
             else {
-                await proceedWithTogglePause();
+                await proceedWithTogglePause().catch(ex => ex !== EEXPIRED && tell(ex));
             }
         }
     }
@@ -2309,7 +2337,13 @@ lazy(mega.devices, 'ui', () => {
             if (!('main' in mega.devices)) {
                 await Promise.resolve(M.require('devices')).catch(dump);
             }
-            return this._fetch();
+            // Store latest sds attribute and version once
+            const sdsPromise = u_attr['*!sds'] ?
+                mega.attr.get(u_handle, 'sds', false, true, (res, ctx) => {
+                    u_attr[ctx.ua] = tlvstore.encrypt(res);
+                }).catch(dump) : null;
+            const [fetchResult] = await Promise.all([this._fetch(), sdsPromise]);
+            return fetchResult;
         }
 
         /**

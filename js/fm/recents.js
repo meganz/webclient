@@ -382,7 +382,6 @@ RecentsRender.prototype.render = function(limit, until, forceInit) {
 
     // Switch to recents panel.
     M.onSectionUIOpen('recents');
-    $('.fmholder').removeClass("transfer-panel-opened");
     $('.fm-right-files-block').addClass('hidden');
     this.$container.removeClass('hidden');
 
@@ -734,7 +733,8 @@ RecentsRender.prototype.handleByUserHandle = function($newRow, action) {
     const username = M.getNameByHandle(useInshareUser || action.user) || l[24061];
 
     $userNameContainer
-        .text(username);
+        .text(username)
+        .attr('data-simpletip', user && user.m || username);
 
     if (!user.h || isValidEmail(username) || username === l[24061]) {
         // unknown/deleted contact, no business here...
@@ -819,7 +819,10 @@ RecentsRender.prototype.getActionUserString = function(action) {
         ? (isMore ? mega.icu.format(l.recents_added_count, action.length) : l.recent_added_by)
         : (isMore ? mega.icu.format(l.recents_modified_count, action.length) : l.recent_modified_by);
 
-    str = str.replace("%1", '<a class="action-user-name underline text-color-primary-link"></a>');
+    str = str.replace(
+        '%1',
+        '<a class="action-user-name underline text-color-primary-link simpletip" data-simpletipposition="top"></a>'
+    );
 
     if (isMore) {
         const dot = '<span class="dot-separator">&nbsp;&#183;&nbsp;</span>';
@@ -951,6 +954,7 @@ RecentsRender.prototype.buildFileAction = function($el, data) {
     if (action.user === u_handle) {
         $('.action-user-name', $el)
             .text(`${u_attr.fullname} (${l[8885]})`)
+            .removeClass('simpletip')
             .contents().unwrap();
     }
     else {

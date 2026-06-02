@@ -1114,6 +1114,9 @@ else if (tmp.substr(0, 4) === 'test') {
     hashLogic = true;
     tmp = -0x8feed;
 }
+else if (is_extension && tmp.startsWith('oauth.html?')) {
+    location.replace('/webclient/' + tmp);
+}
 
 Object.defineProperty(self, 'mShowAds', {
     value: (is_livesite || localStorage.gads) && !is_extension && !(localStorage.sid || sessionStorage.sid)
@@ -2374,7 +2377,6 @@ else if (!browserUpdate) {
         jsl.push({f:'html/top.html', n: 'top', j:0});
         jsl.push({f:'css/style.css', n: 'style_css', j:2, w:30});
         jsl.push({f:'css/tree.css', n: 'tree_css', j:2, w:30});
-        jsl.push({f:'css/transfer.css', n: 'style_css', j:2, w:30});
         jsl.push({f:'css/fm-header.css', n: 'fm_header_css', j:2,w:5});
         jsl.push({f:'css/fm-breadcrumb.css', n: 'fm_breadcrumb_css', j:2,w:5});
         jsl.push({f:'css/fm-lists.css', n: 'fm_lists_css', j:2,w:5});
@@ -2412,6 +2414,8 @@ else if (!browserUpdate) {
         jsl.push({f:'js/vendor/favico.js', n: 'favico_js', j:1});
         jsl.push({f:'js/vendor/avatar.js', n: 'avatar_js', j:1, w:3});
         jsl.push({f:'js/fm/vpn.js', n: 'fmvpn_js', j: 1});
+        jsl.push({f:'js/fm/migrate.js', n: 'fmmigrate_js', j: 1});
+        jsl.push({f:'css/dialogs/migration-dialogs.css', n: 'migration_dialogs_css', j:2,w:5});
         jsl.push({f:'js/fm/link-import.js', n: 'fm_link_import_js', j: 1});
         jsl.push({f:'css/dialogs/link-import.css', n: 'link_import_css', j:2,w:5});
         jsl.push({f:'js/ui/empty.js', n: 'js_ui_empty_js', j: 1});
@@ -2496,6 +2500,7 @@ else if (!browserUpdate) {
         jsl.push({f:'css/components/chatitem.css', n: 'chatitem_css', j:2,w:5});
         jsl.push({f:'css/components/meganz/fm-context-menu.css', n: 'fm_context_menu_css', j:2,w:5});
         jsl.push({f:'css/message-dialog.css', n: 'message_dialog_css', j:2,w:5});
+        jsl.push({f:'html/transfers.html', n: 'transfers', j:0});
     } // !is_mobile
 
     // do not change the order...
@@ -2754,6 +2759,8 @@ else if (!browserUpdate) {
         jsl.push({f:'css/embedplayer.css', n: 'embedplayer_css', j: 2, w: 5});
         jsl.push({f:'css/video-player.css', n: 'video_player_css', j: 2});
         jsl.push({f:'css/vars/theme.css', n: 'vars_theme_css', j:2, w:30});
+        jsl.push({f:'css/vars/mobile-theme.css', n: 'vars_mobile_theme_css', j:2, w:30});
+        jsl.push({f:'css/vars/mobile-theme-auto.css', n: 'vars_mobile_theme_auto_css',  j:2, w:30});
         jsl.push({f:'css/sprites/embed-mono@mono.css', n: 'embed_mono_css', j:2});
     }
 
@@ -3869,7 +3876,10 @@ else if (!browserUpdate) {
                 return tmp ? p + '&' + new URLSearchParams(JSON.parse(tmp)) : p;
             })(params || '');
 
-            xhr.open("POST", apipath + 'cs?id=0' + (params || ''), true);
+            xhr.open("POST", apipath + 'cs?', true);
+            if (params) {
+                xhr.setRequestHeader('MEGA-Chrome-Antileak', '/cs?id=0' + params);
+            }
             xhr.send(JSON.stringify([].concat(data)));
         };
 

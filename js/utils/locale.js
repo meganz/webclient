@@ -769,6 +769,27 @@ function secondsToTimeLong(secs) {
 }
 
 /**
+ * Split seconds into a compact readable time with two units. (lossy)
+ * e.g: 90 seconds -> 1m 30s, 5430 seconds -> 1h 30m
+ *
+ * @param {Number} seconds Number of seconds
+ * @returns {string} Formatted string
+ */
+function secondsToCompact(seconds) {
+    'use strict';
+    seconds = Math.floor(seconds);
+
+    if (seconds > 3600) {
+        const remain = seconds % 3600;
+        return l.time_hour_minute.replace('%1', Math.floor(seconds / 3600)).replace('%2', Math.floor(remain / 60));
+    }
+    else if (seconds > 60) {
+        return l.time_minute_second.replace('%1', Math.floor(seconds / 60)).replace('%2', seconds % 60);
+    }
+    return l.time_seconds.replace('%1', seconds);
+}
+
+/**
  * Calculate the number of days since the given date
  * @param {String} dateStr The date string, in YYYY-MM-DD format
  * @returns {Number} the number of days
@@ -1153,7 +1174,6 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[16167] = escapeHTML(l[16167])
         .replace('[A]', '<a href="https://mega.io/mobile" target="_blank" class="clickurl">')
         .replace('[/A]', '</a>');
-    l[16301] = escapeHTML(l[16301]).replace('[S]', '<span class="quota-info-pr-txt-used">').replace('[/S]', '</span>');
     l[16317] = escapeHTML(l[16317]).replace('[S]', '<strong>').replace('[/S]', '</strong>');
     l[16494] = escapeHTML(l[16494]).replace('[S]2[/S]', '%1');
     l[25048] = escapeHTML(l[25048])
@@ -1802,7 +1822,11 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[/A3]', '</a>');
 
     l.s4_cnt_exists_error = escapeHTML(l.s4_cnt_exists_error)
-        .replace('[A]', '<a href="mailto:support@mega.io">')
+        .replace('[A]', '<a href="mailto:support@mega.io" class="link mailto">')
+        .replace('[/A]', '</a>');
+
+    l.s4_cnt_init_error = escapeHTML(l.s4_cnt_init_error)
+        .replace('[A]', '<a href="mailto:support@mega.io" class="link">')
         .replace('[/A]', '</a>');
 
     l.s4_onbd_ne_tip = escapeHTML(l.s4_onbd_ne_tip)
@@ -2129,6 +2153,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         's4_syn_backup_info',
         's4_syn_cloud_info',
         'info_panel_tags_create_btn',
+        'mig_find_import',
         'bn_odq_text',
         'url_import_feature_warning',
         'lna_grant_p1',
@@ -2137,6 +2162,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         'lna_reset_p1',
         'lna_reset_p3',
         'propay_discount_title',
+        'tfw_obq_text',
     ];
     for (let i = common.length; i--;) {
         var num = common[i];

@@ -23,11 +23,31 @@ var slideshowid;
     const broadcasts = [];
     const MOUSE_IDLE_TID = 'auto-hide-previewer-controls';
     let zoomPan = false;
-    let activeVideoSlide = false;
 
     const onConfigChange = (name) => {
         if (name === 'speed') {
             slideshow_timereset();
+        }
+    };
+
+    // function invoked when previews[] becomes available, or if there was some error
+    // from gfsfetch() or getfileattr() while on slideshow-play mode, and we need to
+    // move to the next slide (since we may be awaiting a media to load from a timeereset() call)
+    const loadend = (id, type = '?') => {
+        if (self.d) {
+            console.warn(`loadend(${id}) for type=${type}`, slideshowplay, slideshow_handle(1));
+        }
+
+        if (slideshowplay === id || M.chat && String(slideshowplay).split('!')[1] === id) {
+            if (self.d) {
+                console.info('Dispatching slideshow-play for %s...', id);
+            }
+
+            slideshow_next();
+        }
+        else if (id === slideshow_handle()) {
+
+            previewsrc(id);
         }
     };
 
@@ -237,11 +257,13 @@ var slideshowid;
 
             if (state) {
                 $overlay.addClass('fullscreen').removeClass('browserscreen');
-                $('i', $button).removeClass('icon-fullscreen-enter').addClass('icon-fullscreen-leave');
+                $('i', $button).removeClass('icon-maximize-01-thin-outline')
+                    .addClass('icon-minimize-01-thin-outline');
             }
             else {
                 $overlay.addClass('browserscreen').removeClass('fullscreen');
-                $('i', $button).removeClass('icon-fullscreen-leave').addClass('icon-fullscreen-enter');
+                $('i', $button).removeClass('icon-minimize-01-thin-outline')
+                    .addClass('icon-maximize-01-thin-outline');
 
                 // disable slideshow-mode exiting from full screen
                 if (slideshowplay) {
@@ -267,12 +289,14 @@ var slideshowid;
 
         if (state) {
             $overlay.parents('.download.download-page').addClass('fullscreen').removeClass('browserscreen');
-            $('i', $button).removeClass('icon-fullscreen-enter').addClass('icon-fullscreen-leave');
+            $('i', $button).removeClass('icon-maximize-01-thin-outline')
+                .addClass('icon-minimize-01-thin-outline');
             $overlay.addClass('fullscreen').removeClass('browserscreen');
         }
         else {
             $overlay.parents('.download.download-page').removeClass('browserscreen fullscreen');
-            $('i', $button).removeClass('icon-fullscreen-leave').addClass('icon-fullscreen-enter');
+            $('i', $button).removeClass('icon-minimize-01-thin-outline')
+                .addClass('icon-maximize-01-thin-outline');
             $overlay.removeClass('browserscreen fullscreen');
             slideshow_imgPosition($overlay);
         }
@@ -309,36 +333,23 @@ var slideshowid;
 
                 if (newFavState) {
                     $('span', $button).text(l[5872]);
-                    if (is_video(n)) {
-                        $('i', $button).removeClass('icon-favourite')
-                            .addClass('icon-heart-broken-small-regular-outline');
-                    }
-                    else {
-                        $('i', $button).removeClass('icon-favourite').addClass('icon-favourite-removed');
-                    }
+                    $('i', $button).removeClass('icon-heart-thin-outline').addClass('icon-heart-thin-solid');
                     eventlog(501127);
                 }
                 else {
                     $('span', $button).text(l[5871]);
-                    if (is_video(n)) {
-                        $('i', $button).removeClass('icon-heart-broken-small-regular-outline')
-                            .addClass('icon-favourite');
-                    }
-                    else {
-                        $('i', $button).removeClass('icon-favourite-removed').addClass('icon-favourite');
-                    }
+                    $('i', $button).removeClass('icon-heart-thin-solid').addClass('icon-heart-thin-outline');
                 }
             });
 
             // Change favourite icon
             if (M.isFavourite(n.h)) {
-                const icon = is_video(n) ? 'icon-heart-broken-small-regular-outline' : 'icon-favourite-removed';
                 $('span', $favButton).text(l[5872]);
-                $('i', $favButton).removeClass().addClass(`sprite-fm-mono ${icon}`);
+                $('i', $favButton).removeClass().addClass(`sprite-fm-mono icon-heart-thin-solid`);
             }
             else {
                 $('span', $favButton).text(l[5871]);
-                $('i', $favButton).removeClass().addClass('sprite-fm-mono icon-favourite');
+                $('i', $favButton).removeClass().addClass('sprite-fm-mono icon-heart-thin-outline');
             }
 
             const sen = mega.sensitives.getSensitivityStatus([n.h]);
@@ -510,7 +521,8 @@ var slideshowid;
         const hasLink = M.getNodeShare(n.h);
         const label = hasLink ? l[6909] : mega.icu.format(l.share_link, 1);
 
-        $('i', $getLinkBtn).attr('class', `sprite-fm-mono icon-link${hasLink ? '-gear' : ''}`);
+        $('i', $getLinkBtn)
+            .attr('class', `sprite-fm-mono icon-link${hasLink ? '-gear' : ''}-thin-outline`);
         $getLinkBtn
             .attr('data-simpletip', label).attr('aria-label', label)
             .removeClass('hidden');
@@ -571,7 +583,7 @@ var slideshowid;
             ? speed ? speed.getValue() / 1e3 : 3
             : sleepTime;
 
-        if (slideshowplay && !slideshowpause && !activeVideoSlide) {
+        if (slideshowplay && !slideshowpause) {
             (slideshowTimer = tSleep(sTime))
                 .then(() => {
                     if (slideshowplay) {
@@ -613,7 +625,8 @@ var slideshowid;
             slideshow_play(false, close);
             slideshowpause = false;
             $pauseButton.attr('data-state', 'pause');
-            $('i', $pauseButton).removeClass('icon-play').addClass('icon-pause');
+            $('i', $pauseButton).removeClass('icon-play-thin-outline')
+                .addClass('icon-pause-thin');
 
             slideshow_aborttimer();
             $(window).off('blur.slideshowLoseFocus');
@@ -1038,7 +1051,7 @@ var slideshowid;
             $playVideoButton.addClass('hidden');
             $watchAgainButton.addClass('hidden');
             $playPauseButton.addClass('hidden');
-            $('i', $playPauseButton).removeClass().addClass('sprite-fm-mono icon-play-small-regular-solid');
+            $('i', $playPauseButton).removeClass().addClass('sprite-fm-mono icon-play-thin-outline');
             $videoControls.addClass('hidden');
             $zoomSlider.attr('data-perc', 100);
             $(window).off('resize.imgResize');
@@ -1048,16 +1061,16 @@ var slideshowid;
             $('.v-btn.active', $controls).removeClass('active');
             $('.speed i', $videoControls).removeClass()
                 .addClass('sprite-fm-mono icon-playback-1x-small-regular-outline');
-            $('.speed', $videoControls).removeClass('margin-2');
-            $('.context-menu.playback-speed button i', $videoControls).addClass('hidden');
-            $('.context-menu.playback-speed button.1x i', $videoControls).removeClass('hidden');
             $('div.video-subtitles', $content).remove();
             $('.context-menu.subtitles button i', $videoControls).addClass('hidden');
             $('.context-menu.subtitles button.off i', $videoControls).removeClass('hidden');
             $('.subtitles-wrapper', $videoControls).removeClass('hidden');
             $('button.subtitles', $videoControls).removeClass('mask-color-brand');
-            $('button.subtitles i', $videoControls).removeClass('icon-subtitles-02-small-regular-solid')
-                .addClass('icon-subtitles-02-small-regular-outline');
+            $('button.subtitles i', $videoControls).removeClass('icon-subtitles-thin-solid')
+                .addClass('icon-subtitles-thin-outline');
+
+            console.assert($('.loader-grad', $overlay).hasClass('hidden'), `video-destroy race?`);
+            $('.loader-grad', $overlay).addClass('hidden');
             if (optionsMenu) {
                 contextMenu.close(optionsMenu);
             }
@@ -1149,7 +1162,6 @@ var slideshowid;
 
         // Clear previousy set data
         switchedSides = false;
-        activeVideoSlide = false;
         $('header .file-name', $overlay).text(n.name);
         $('header .file-size', $overlay).text(bytesToSize(n.s || 0));
         $('.viewer-error, #pdfpreviewdiv1, #docxpreviewdiv1', $overlay).addClass('hidden');
@@ -1163,7 +1175,7 @@ var slideshowid;
         $playVideoButton.addClass('hidden');
         $watchAgainButton.addClass('hidden');
         $playPauseButton.addClass('hidden');
-        $('i', $playPauseButton).removeClass().addClass('sprite-fm-mono icon-play-small-regular-solid');
+        $('i', $playPauseButton).removeClass().addClass('sprite-fm-mono icon-play-thin-outline');
         $('.viewer-progress p, .video-time-bar', $content).removeAttr('style');
         $('img', $imgWrap).removeClass('active');
 
@@ -1175,16 +1187,13 @@ var slideshowid;
         $('.video-timing', $videoControls).text('');
         $('.speed i', $videoControls).removeClass()
             .addClass('sprite-fm-mono icon-playback-1x-small-regular-outline');
-        $('.speed', $videoControls).removeClass('margin-2');
-        $('.context-menu.playback-speed button i', $videoControls).addClass('hidden');
-        $('.context-menu.playback-speed button.1x i', $videoControls).removeClass('hidden');
         $('div.video-subtitles', $content).remove();
         $('.context-menu.subtitles button i', $videoControls).addClass('hidden');
         $('.context-menu.subtitles button.off i', $videoControls).removeClass('hidden');
         $('.subtitles-wrapper', $videoControls).removeClass('hidden');
         $('button.subtitles', $videoControls).removeClass('mask-color-brand');
-        $('button.subtitles i', $videoControls).removeClass('icon-subtitles-02-small-regular-solid')
-            .addClass('icon-subtitles-02-small-regular-outline');
+        $('button.subtitles i', $videoControls).removeClass('icon-subtitles-thin-solid')
+            .addClass('icon-subtitles-thin-outline');
 
         // Clear zoomPan data
         if (zoomPan) {
@@ -1195,24 +1204,24 @@ var slideshowid;
         // Init full screen icon and related data attributes
         if ($document.fullScreen()) {
             $('.v-btn.fullscreen i', $imageControls)
-                .addClass('icon-fullscreen-leave')
-                .removeClass('icon-fullscreen-enter');
+                .addClass('icon-minimize-01-thin-outline')
+                .removeClass('icon-maximize-01-thin-outline');
 
             $content.attr('data-fullscreen', 'true');
             $('.v-btn.fs', $videoControls).addClass('cancel-fullscreen').removeClass('go-fullscreen');
             $('.v-btn.fs i', $videoControls).removeClass()
-                .addClass('sprite-fm-mono icon-minimize-02-small-regular-outline');
+                .addClass('sprite-fm-mono icon-minimize-02-thin-outline');
             $('.fs-wrapper .tooltip', $videoControls).text(l.video_player_exit_fullscreen);
         }
         else {
             $('.v-btn.fullscreen i', $imageControls)
-                .removeClass('icon-fullscreen-leave')
-                .addClass('icon-fullscreen-enter');
+                .removeClass('icon-minimize-01-thin-outline')
+                .addClass('icon-maximize-01-thin-outline');
 
             $content.attr('data-fullscreen', 'false');
             $('.v-btn.fs', $videoControls).removeClass('cancel-fullscreen').addClass('go-fullscreen');
             $('.v-btn.fs i', $videoControls).removeClass()
-                .addClass('sprite-fm-mono icon-maximize-02-small-regular-outline');
+                .addClass('sprite-fm-mono icon-maximize-02-thin-outline');
             $('.fs-wrapper .tooltip', $videoControls).text(l.video_player_fullscreen);
         }
 
@@ -1559,7 +1568,6 @@ var slideshowid;
             for (var i = dl_queue.length; i--;) {
                 if (dl_queue[i] && dl_queue[i].id === slideshow_handle() && dl_queue[i].preview) {
                     dl_queue[i].preview = false;
-                    M.openTransfersPanel();
                     return;
                 }
             }
@@ -1638,14 +1646,18 @@ var slideshowid;
     }
 
     function slideshow_toggle_pause($button) {
+        const pauseClass = $button.hasClass('sl-btn') ?
+            'icon-pause-thin' : 'icon-pause-thin-outline';
+
         if ($button.attr('data-state') === 'pause') {
             $button.attr('data-state', 'play');
-            $('i', $button).removeClass('icon-pause').addClass('icon-play');
+            $('i', $button)
+                .removeClass(pauseClass).addClass('icon-play-thin-outline');
             slideshowpause = true;
         }
         else {
             $button.attr('data-state', 'pause');
-            $('i', $button).removeClass('icon-play').addClass('icon-pause');
+            $('i', $button).removeClass('icon-play-thin-outline').addClass(pauseClass);
             slideshowpause = false;
         }
 
@@ -1836,7 +1848,11 @@ var slideshowid;
                 }
             };
 
-            M.gfsfetch(n.link || n.h, 0, -1, progress).then((data) => {
+            tSleep.race(20, M.gfsfetch(n.link || n.h, 0, -1, progress)).then((data) => {
+                if (data === ETEMPUNAVAIL) {
+                    // timed out
+                    throw data;
+                }
                 preview({type: filemime(n, 'image/jpeg')}, n.h, data.buffer);
                 if (!exifImageRotation.fromImage) {
                     previews[n.h].orientation = parseInt(EXIF.readFromArrayBuffer(data, true).Orientation) || 1;
@@ -1853,12 +1869,27 @@ var slideshowid;
                 if (slideshow_handle() === n.h) {
                     $progressBar.addClass('vo-hidden');
                 }
+                else if (slideshowplay && ex === ETEMPUNAVAIL) {
+                    // rather than leaving the user waiting, move to the closest image already cached...if any.
+                    const {forward, backward} = slideshowsteps();
 
-                if (!(loadPreview || isCached)) {
-                    getPreview();
+                    preqs[n.h] = null;
+                    for (let blk = [forward, backward], j = 0; j < 2; ++j) {
+                        for (let i = 0; i < blk[j].length; ++i) {
+                            if (previews[blk[j][i]]) {
+                                return slideshow(blk[j][i]);
+                            }
+                        }
+                    }
                 }
 
-                slideshow_timereset();
+                if (loadPreview || isCached) {
+
+                    loadend(n.h);
+                }
+                else {
+                    getPreview();
+                }
             });
         }
 
@@ -1886,8 +1917,15 @@ var slideshowid;
             previews[id].fma = MediaAttribute(n).data || false;
         }
 
+        if (slideshowplay) {
+            slideshow_timereset(30);
+        }
+
         $playVideoButton.rebind('click', function() {
             if (dlmanager.isOverQuota) {
+                if (slideshowplay) {
+                    return slideshow_timereset(-1);
+                }
                 return dlmanager.showOverQuotaDialog();
             }
 
@@ -1908,13 +1946,6 @@ var slideshowid;
                 sessionStorage.removeItem('previewTime');
             };
 
-            const toggleSlideshow = (pause) => {
-                if (slideshowplay) {
-                    activeVideoSlide = !!pause;
-                    slideshow_timereset(0);
-                }
-            };
-
             // Show loading spinner until video is playing
             $pendingBlock.removeClass('hidden');
             $('.video-controls', $overlay).removeClass('hidden');
@@ -1922,14 +1953,12 @@ var slideshowid;
 
             // Hide play button.
             $(this).addClass('hidden');
-            $('.video-controls .playpause i', $overlay).removeClass('icon-play').addClass('icon-pause');
+            $('.video-controls .playpause i', $overlay)
+                .removeClass('icon-play-thin-outline').addClass('icon-pause-thin-outline');
 
             if (is_mobile) {
                 requestAnimationFrame(() => mega.initMobileVideoControlsToggle($overlay));
             }
-
-            // Stop switching slides until we try to stream
-            toggleSlideshow(true);
 
             initVideoStream(n, $overlay, destroy).done(streamer => {
                 preqs[n.h] = streamer;
@@ -1970,10 +1999,31 @@ var slideshowid;
                     return true;
                 });
 
-                preqs[n.h].on('ended', () => {
-                    // Continue slideshow
-                    toggleSlideshow();
-                });
+                if (slideshowplay) {
+
+                    preqs[n.h].on('canplay', slideshow_aborttimer);
+
+                    preqs[n.h].on('inactivity', function() {
+                        // @todo disable playVid setting on OBQ?
+                        // @todo is ten seconds suitable to give up waiting?
+                        slideshow_timereset(this.isOverQuota ? 0 : 30);
+                        return true;
+                    });
+
+                    preqs[n.h].on('activity', () => {
+                        slideshow_aborttimer();
+                        return true;
+                    });
+
+                    preqs[n.h].on('ended', () => {
+                        // @todo preload the next video two seconds before (?)
+                        slideshow_timereset(0);
+                    });
+
+                    preqs[n.h].on('error', () => {
+                        slideshow_timereset(0);
+                    });
+                }
 
                 if (typeof psa !== 'undefined') {
                     psa.repositionMediaPlayer();
@@ -1982,7 +2032,7 @@ var slideshowid;
                 console.warn(ex);
 
                 // Continue slideshow
-                toggleSlideshow();
+                slideshow_timereset(0);
             });
         });
 
@@ -2436,29 +2486,12 @@ var slideshowid;
             blob = new Blob([uint8arr.buffer], {type: type});
         }
 
-        const processFullPreview = () => {
-            if (
-                slideshowplay === id
-                || (M.chat && typeof slideshowplay === 'string' && slideshowplay.split('!')[1] === id)
-            ) {
-                if (d) {
-                    console.warn('Dispatching slideshow-play for %s...', id);
-                }
-
-                slideshow_next();
-            }
-            else if (id === slideshow_handle()) {
-                previewsrc(id);
-            }
-        };
-
         if (previews[id]) {
             if (previews[id].full) {
                 if (d && previews[id].fromChat !== null) {
                     console.warn('Not overwriting a full preview...', id);
                 }
-                processFullPreview();
-                return;
+                return loadend(id, type);
             }
             previews[id].prev = previews[id];
         }
@@ -2484,7 +2517,7 @@ var slideshowid;
             previews[n.hash] = previews[id];
         }
 
-        processFullPreview();
+        loadend(id, type);
 
         // Ensure we are not eating too much memory...
         tSleep.schedule(7, slideshow_freemem);

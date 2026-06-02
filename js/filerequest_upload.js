@@ -508,6 +508,7 @@ lazy(mega, 'fileRequestUpload', () => {
             const item = this.queue.items[`#${gid}`];
             const $itemElement = item.$;
 
+            $itemElement.element.removeClass('transfer-started').addClass('transfer-completed');
             $itemElement.status.text(l.file_request_upload_status_uploaded);
             $itemElement.progress.css('width', `100%`);
             item.completed = true;

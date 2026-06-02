@@ -2469,32 +2469,6 @@ MegaData.prototype.labelType = function() {
 };
 
 /*
- * update clicked label's display info
- *
- * @param {Object} e  event triggered to excuting this.
- */
-MegaData.prototype.updateLabelInfo = function(e) {
-    "use strict";
-    const $target = $(e.target);
-    const labelTxt = $target.data('label-txt');
-
-    const map = {
-        0: {
-            'Red': l[19570], 'Orange': l[19574], 'Yellow': l[19578],
-            'Green': l[19582], 'Blue': l[19586], 'Purple': l[19590], 'Grey': l[19594],
-        },
-        1: {
-            'Red': l[19571], 'Orange': l[19575], 'Yellow': l[19579],
-            'Green': l[19583], 'Blue': l[19587], 'Purple': l[19591], 'Grey': l[19595]
-        }
-    };
-
-    $('.labels .dropdown-color-info')
-        .safeHTML(map[$target.hasClass('active') | 0][labelTxt] || labelTxt)
-        .addClass('active');
-};
-
-/*
  * Check nodelist contains label
  *
  * @param {Object} nodelist     array of nodes
@@ -5111,7 +5085,10 @@ MegaData.prototype.importFolderLinkNodes = function importFolderLinkNodes(nodes)
 
                 if (pfcol) {
                     this.preparePublicSetImport(pfid, data);
-                    localStorage.albumLinkImport = pfid;
+
+                    const root = M.d[M.RootID];
+
+                    localStorage.albumLinkImport = JSON.stringify({ph: pfid, id: root.id, label: root.name});
                 }
 
                 if (!localStorage.folderLinkImport || nodes.length > 6000) {

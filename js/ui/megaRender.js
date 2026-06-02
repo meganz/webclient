@@ -340,7 +340,24 @@ mBroadcaster.once('boot_done', () => {
                     '</td>' +
                 '</tr>' +
             '</table>'
-        ]
+        ],
+
+        'migration': [
+            // List view mode
+            '<table>' +
+                '<tr>' +
+                    '<td class="space-maintainer-start">' +
+                        '<i class="sprite-fm-mono icon-check selected"></i>' +
+                    '</td>' +
+                    '<td megatype="fname">' +
+                        '<span class="item-type-icon"><img/></span>' +
+                        '<span class="tranfer-filetype-txt"></span>' +
+                    '</td>' +
+                    '<td megatype="timeMd" class="time md"></td>' +
+                    '<td megatype="size" class="size"></td>' +
+                '</tr>' +
+            '</table>',
+        ],
     };
 
     var viewModeContainers = {
@@ -368,7 +385,10 @@ mBroadcaster.once('boot_done', () => {
         ],
         'subtitles': [
             '.mega-dialog .grid-table'
-        ]
+        ],
+        'migration': [
+            '.mega-sheet.journey.migrate-dialog table',
+        ],
     };
 
     var versionColumnPrepare = function(versionsNb, VersionsSize) {
@@ -1326,6 +1346,7 @@ mBroadcaster.once('boot_done', () => {
 
                 props.userHandle = aNode.su || aNode.p;
                 props.userName = M.getNameByHandle(props.userHandle);
+                props.userEmail = M.u[props.userHandle] && M.u[props.userHandle].m || props.userName;
                 props.folderSize = bytesToSize(aNode.tb);
 
                 if (aNode.r === 1) {
@@ -1378,6 +1399,7 @@ mBroadcaster.once('boot_done', () => {
                 props.lastSharedAt = 0;
                 props.userNames = [];
                 props.userHandles = [];
+                props.userEmails = [];
                 props.avatars = [];
 
                 const shares = M.getOutShares(aNode);
@@ -1385,8 +1407,10 @@ mBroadcaster.once('boot_done', () => {
                 for (const u in shares) {
                     if (u !== 'EXP') {
                         props.lastSharedAt = Math.max(props.lastSharedAt, shares[u].ts);
-                        props.userNames.push(M.getNameByHandle(u));
+                        const name = M.getNameByHandle(u);
+                        props.userNames.push(name);
                         props.userHandles.push(u);
+                        props.userEmails.push(M.u[u] && M.u[u].m || name);
                     }
                 }
 
@@ -1408,7 +1432,24 @@ mBroadcaster.once('boot_done', () => {
             },
             'file-requests': function(...args) {
                 return this.nodeProperties['*'].apply(this, args);
-            }
+            },
+            'migration': (aNode) => {
+                const props = { classNames: [] };
+
+                if (aNode.type === 0) {
+                    props.classNames.push('folder');
+                    props.icon = 'icon-folder-24';
+                }
+                else {
+                    props.classNames.push('file');
+                    props.icon = 'icon-generic-24';
+                }
+                props.name = aNode.name;
+                props.mTime = time2date(aNode.mTime);
+                props.size = bytesToSize(aNode.size);
+
+                return props;
+            },
         }),
 
         /** DOM Node Builders */
@@ -1603,7 +1644,11 @@ mBroadcaster.once('boot_done', () => {
                     tmp.classList.add(aProperties.onlineStatus[1]);
                 }
 
-                aTemplate.querySelector('.fm-chat-user span').textContent = aProperties.userName;
+                const uspan = aTemplate.querySelector('.fm-chat-user span');
+                uspan.textContent = aProperties.userName;
+                uspan.classList.add('simpletip');
+                uspan.dataset.simpletip = aProperties.userEmail;
+                uspan.dataset.simpletipposition = 'top';
                 aTemplate.querySelector('.shared-folder-info').textContent = aProperties.shareInfo;
                 aTemplate.querySelector('.shared-folder-size').textContent = aProperties.folderSize;
                 aTemplate.querySelector('.label').textContent = aProperties.labelC || '';
@@ -1657,9 +1702,16 @@ mBroadcaster.once('boot_done', () => {
                     otherCount = aProperties.userNames.length - 3;
                     var sharedUserWrapper = aTemplate.querySelector('.fm-chat-users-wrapper');
                     sharedUserWrapper.classList += ' simpletip';
-                    sharedUserWrapper.dataset.simpletip = aProperties.userNames.join(",[BR]");
+                    sharedUserWrapper.dataset.simpletip = aProperties.userEmails.join(',[BR]');
+                    sharedUserWrapper.dataset.simpletipposition = 'top';
                     aTemplate.querySelector('.fm-chat-users-other').textContent = mega.icu
                         .format(l.users_share_other_count, otherCount);
+                }
+                else {
+                    const sharedUserWrapper = aTemplate.querySelector('.fm-chat-users-wrapper');
+                    sharedUserWrapper.classList += ' simpletip';
+                    sharedUserWrapper.dataset.simpletip = aProperties.userEmails.join(',[BR]');
+                    sharedUserWrapper.dataset.simpletipposition = 'top';
                 }
                 aTemplate.querySelector('.fm-chat-users').textContent = userNames.join(', ');
                 aTemplate.querySelector('.shared-folder-info').textContent = aProperties.shareInfo;
@@ -1736,7 +1788,15 @@ mBroadcaster.once('boot_done', () => {
                 }
 
                 return aTemplate;
-            }
+            },
+            'migration': (aNode, aProperties, aTemplate) => {
+                aTemplate.querySelector('.item-type-icon').classList.add(aProperties.icon);
+                aTemplate.querySelector('.tranfer-filetype-txt').textContent = aProperties.name;
+                aTemplate.querySelector('.time.md').textContent = aProperties.mTime;
+                aTemplate.querySelector('.size').textContent = aProperties.size;
+
+                return aTemplate;
+            },
         }),
 
         /** DOM Node Renderers */

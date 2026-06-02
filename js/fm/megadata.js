@@ -92,7 +92,6 @@ function MegaData() {
     this.csortd = -1;
     this.csort = 'name';
     this.storageQuotaCache = null;
-    this.tfsdomqueue = Object.create(null);
     this.sortTreePanel = Object.create(null);
     this.lastColumn = null;
     this.account = false;
@@ -149,20 +148,6 @@ function MegaData() {
         if (d > 1) {
             console.debug(ev.type, ev);
         }
-
-        var ttl;
-        if (ev.type === 'ps-y-reach-end' && !$.isTfsPsUpdate) {
-            ttl = M.getTransferTableLengths();
-            if (ttl.left > -100) {
-                this.doFlushTransfersDynList(ttl.size);
-            }
-        }
-        else if (ev.type === 'tfs-dynlist-flush') {
-            ttl = M.getTransferTableLengths();
-            if (ttl.left > -10) {
-                this.doFlushTransfersDynList(ttl.size);
-            }
-        }
     };
 
     if (is_mobile) {
@@ -216,9 +201,7 @@ function MegaData() {
     })(this);
 
     // Think twice before adding anything new here.
-    const safe = [
-        'getTransferElements'
-    ];
+    const safe = [];
 
     if (self.hashLogic && String(location.hash).startsWith('#test')) {
         safe.push('accountData', 'getStorageQuota');

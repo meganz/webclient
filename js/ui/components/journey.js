@@ -140,9 +140,22 @@ class MegaJourney {
         }
 
         if (descriptionText) {
-            const description = document.createElement('p');
-            description.textContent = descriptionText;
-            step.appendChild(description);
+
+            const _ = txt => {
+                const description = document.createElement('p');
+                description.textContent = txt;
+                step.appendChild(description);
+            };
+
+            if (typeof descriptionText === 'string') {
+                _(descriptionText);
+            }
+            else if (Array.isArray(descriptionText)) {
+                for (let i = 0; i < descriptionText.length; i++) {
+                    _(descriptionText[i]);
+                }
+            }
+
         }
 
         if (customContent) {
@@ -150,6 +163,7 @@ class MegaJourney {
             const customDiv = document.createElement('div');
             customDiv.className = "custom-div";
             step.appendChild(customDiv);
+
             if (typeof customContent === 'function') {
                 const customNode = customContent();
                 if (customNode instanceof HTMLElement) {

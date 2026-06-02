@@ -396,13 +396,16 @@ FileManager.prototype.initFileManager = async function() {
                     if (self.d) {
                         console.error('Failed to initialize S4 (?!)', [ex]);
                     }
+
+                    Object.defineProperty(s4, 'failure', {
+                        value: [ex, this.s4idd]
+                    });
+
                     this.onFileManagerReady(() => {
                         onIdle(() => {
-                            msgDialog('warningb', l.ri_s4_tab, l.s4_cnt_exists_error, ex < 0 ? api_strerror(ex) : ex);
-
-                            const t = document.querySelector('.js-s4-tree-panel');
+                            const t = document.querySelector('.js-s4-tree-panel .tree-expander');
                             if (t) {
-                                t.classList.add('hidden');
+                                t.remove();
                             }
 
                             const {owner, actors} = mBroadcaster.crossTab;
@@ -418,11 +421,6 @@ FileManager.prototype.initFileManager = async function() {
                                 ])
                             );
                         });
-
-                        if (onS4Section()) {
-
-                            return this.openFolder('fm', true);
-                        }
                     });
                 })
                 .finally(() => {
@@ -1010,7 +1008,6 @@ FileManager.prototype.initFileManagerUI = function() {
     InitFileDrag();
     M.createFolderUI();
     M.initTreePanelSorting();
-    M.initContextUI();
     M.addTransferPanelUI();
     M.initUIKeyEvents();
     M.initMegaSwitchUI();
@@ -1207,7 +1204,7 @@ FileManager.prototype.initFileManagerUI = function() {
 
     $.hideContextMenu = function(event) {
 
-        var a, b, currentNodeClass;
+        var a, currentNodeClass;
 
         if (event && event.target) {
 
@@ -1254,15 +1251,6 @@ FileManager.prototype.initFileManagerUI = function() {
         }
         $('.grid-url-arrow').removeClass('active');
 
-        // Set to default
-        a = $('.dropdown.body.files-menu,.dropdown.body.download');
-        a.addClass('hidden');
-        b = a.find('.dropdown.body.submenu');
-        b.attr('style', '');
-        b.removeClass('active left-position overlap-right overlap-left mega-height');
-        a.find('.disabled,.context-scrolling-block').removeClass('disabled context-scrolling-block');
-        a.find('.dropdown-item.contains-submenu.opened').removeClass('opened');
-
         // Cleanup for scrollable context menu
         const $scroll = $('#cm_scroll');
         if ($scroll.hasClass('fm-context-body')) {
@@ -1272,13 +1260,6 @@ FileManager.prototype.initFileManagerUI = function() {
             const cnt = $scroll.contents();
             $scroll.replaceWith(cnt); // Remove .context-scrollable-block
         }
-        a.removeClass('mega-height');
-        a.find('> .context-top-arrow').remove();
-        a.find('> .context-bottom-arrow').remove();
-        a.css({ 'height': 'auto' });// In case that window is enlarged
-
-        // Remove all sub-menues from context-menu move-item
-        $('#csb_' + M.RootID).empty();
 
         $(window).off('resize.ccmui');
 
@@ -1365,7 +1346,6 @@ FileManager.prototype.initFileManagerUI = function() {
                 prev: null,
                 subpages: ['chat/contacts', 'chat/contacts/received', 'chat/contacts/sent']
             },
-            'transfers':       {root: 'transfers', prev: null},
             'account':         {root: 'account',   prev: null},
             'dashboard':       {root: 'dashboard', prev: null},
             'user-management': {root: 'user-management', prev: null},
@@ -1389,37 +1369,11 @@ FileManager.prototype.initFileManagerUI = function() {
         );
     }
 
-    var isMegaSyncTransfer = true;
-
     $('.js-fm-tab').rebind('click.fmTabState', function() {
         var clickedClass = this.className;
 
         if (!clickedClass) {
             return;
-        }
-
-        if ((ul_queue && ul_queue.length) || (dl_queue && dl_queue.length)) {
-            isMegaSyncTransfer = false;
-        }
-        if (clickedClass.indexOf('transfers') > -1) {
-            if (isMegaSyncTransfer && window.useMegaSync === 2) {
-                megasync.transferManager();
-                return;
-            }
-            else {
-                // reset - to ckeck again next time
-                isMegaSyncTransfer = true;
-                if (!mega.tpw.isWidgetVisibile()) {
-                    mega.tpw.showWidget();
-                    if (mega.tpw.isWidgetVisibile()) {
-                        // do if there's no transfers, we will allow going to transfers page
-                        return false;
-                    }
-                }
-                else {
-                    mega.tpw.hideWidget();
-                }
-            }
         }
 
         let activeClass = '.js-fm-tab';
@@ -1480,10 +1434,6 @@ FileManager.prototype.initFileManagerUI = function() {
         for (var tab in self.fmTabState) {
             if (~clickedClass.indexOf(tab)) {
                 tab = self.fmTabState[tab];
-
-                if (tab.root === 'transfers' && pfcol) {
-                    break;
-                }
 
                 var targetFolder = null;
 
@@ -1831,63 +1781,6 @@ FileManager.prototype.updFileManagerUI = async function() {
     if (d) {
         console.timeEnd('rendernew');
     }
-};
-
-/**
- * Initialize context-menu related user interface
- */
-FileManager.prototype.initContextUI = function() {
-    "use strict";
-
-    var c = '.dropdown.body.context .dropdown-item';
-
-    $('.labels .dropdown-colour-item').rebind('mouseout', function() {
-        $('.labels .dropdown-color-info').removeClass('active');
-    });
-
-    $(c + '.transfer-play, ' + c + '.transfer-pause').rebind('click', function() {
-        var $trs = $('.transfer-table tr.ui-selected');
-
-        if ($(this).hasClass('transfer-play')) {
-            if ($trs.filter('.transfer-upload').length && ulmanager.ulOverStorageQuota) {
-                ulmanager.ulShowOverStorageQuotaDialog();
-                return;
-            }
-
-            if (dlmanager.isOverQuota) {
-                dlmanager.showOverQuotaDialog();
-                return;
-            }
-        }
-
-        var ids = $trs.attrs('id');
-
-        if ($(this).hasClass('transfer-play')) {
-            ids.map(fm_tfsresume);
-        }
-        else {
-            ids.map(fm_tfspause);
-        }
-
-        $trs.removeClass('ui-selected');
-    });
-
-    $(c + '.canceltransfer-item,' + c + '.transfer-clear').rebind('click', function() {
-        var $trs = $('.transfer-table tr.ui-selected');
-        var toabort = $trs.attrs('id');
-        $trs.remove();
-        dlmanager.abort(toabort);
-        ulmanager.abort(toabort);
-        $.clearTransferPanel();
-        tfsheadupdate({c: toabort});
-        mega.tpw.removeRow(toabort);
-
-        onIdle(function() {
-            // XXX: better way to stretch the scrollbar?
-            $(window).trigger('resize');
-        });
-        $('.transfer-table tr.ui-selected').removeClass('ui-selected');
-    });
 };
 
 FileManager.prototype.fireKeyMgrDependantActions = async function() {
@@ -2269,17 +2162,13 @@ FileManager.prototype.initUIKeyEvents = function() {
             return false;
         }
 
-        var is_transfers_or_accounts = (
-            M.currentdirid && (M.currentdirid.substr(0, 7) === 'account' || M.currentdirid === 'transfers')
-        );
+        var is_account_page = M.currentdirid && M.currentdirid.substr(0, 7) === 'account';
 
         // selection manager may not be available on empty folders.
         var is_selection_manager_available = !!window.selectionManager;
 
         var sl = false;
         var s = [];
-
-        var selPanel = $('.fm-transfers-block tr.ui-selected');
 
         if (selectionManager && selectionManager.selected_list && selectionManager.selected_list.length > 0) {
             s = clone(selectionManager.selected_list);
@@ -2326,7 +2215,7 @@ FileManager.prototype.initUIKeyEvents = function() {
         }
         else if (
             is_selection_manager_available &&
-            !is_transfers_or_accounts &&
+            !is_account_page &&
             !$.dialog &&
             !slideshowid &&
             (M.onIconView || M.gallery)
@@ -2353,7 +2242,7 @@ FileManager.prototype.initUIKeyEvents = function() {
 
         if (
             is_selection_manager_available &&
-            !is_transfers_or_accounts &&
+            !is_account_page &&
             e.keyCode == 38 &&
             String($.selectddUIgrid).indexOf('.grid-scrolling-table') > -1 &&
             !$.dialog
@@ -2364,7 +2253,7 @@ FileManager.prototype.initUIKeyEvents = function() {
         }
         else if (
             is_selection_manager_available &&
-            !is_transfers_or_accounts &&
+            !is_account_page &&
             e.keyCode == 40 &&
             String($.selectddUIgrid).indexOf('.grid-scrolling-table') > -1 &&
             !$.dialog
@@ -2374,7 +2263,7 @@ FileManager.prototype.initUIKeyEvents = function() {
             quickFinder.disable_if_active();
         }
         else if (
-            !is_transfers_or_accounts &&
+            !is_account_page &&
             e.keyCode == 46 &&
             s.length > 0 &&
             !$.dialog &&
@@ -2394,19 +2283,8 @@ FileManager.prototype.initUIKeyEvents = function() {
                 fmremove(nodes);
             }
         }
-        else if ((e.keyCode === 46) && (selPanel.length > 0)
-            && !$.dialog && M.getNodeRights(M.currentdirid) > 1) {
-            msgDialog('confirmation', l[1003], mega.icu.format(l[17092], s.length), false, (e) => {
-
-                // we should encapsule the click handler
-                // to call a function rather than use this hacking
-                if (e) {
-                    $('.transfer-clear').trigger('click');
-                }
-            });
-        }
         else if (
-            !is_transfers_or_accounts &&
+            !is_account_page &&
             e.keyCode == 13
             && s.length > 0
             && !$.dialog
@@ -2483,7 +2361,7 @@ FileManager.prototype.initUIKeyEvents = function() {
             closeMsg(true);
         }
         else if (
-            !is_transfers_or_accounts &&
+            !is_account_page &&
             (e.keyCode === 113 /* F2 */) &&
             (s.length > 0) &&
             !$.dialog && M.getNodeRights(s[0]) > 1 &&
@@ -2500,7 +2378,7 @@ FileManager.prototype.initUIKeyEvents = function() {
             (!M.isMediaDiscoveryPage() || !mega.gallery.discovery || mega.gallery.discovery.mode !== 'a') &&
             !$.dialog
         ) {
-            if (is_transfers_or_accounts) {
+            if (is_account_page) {
                 return;
             }
             // ctrl+a/cmd+a - select all
@@ -2531,359 +2409,20 @@ FileManager.prototype.initUIKeyEvents = function() {
 FileManager.prototype.addTransferPanelUI = function() {
     "use strict";
 
-    var transferPanelContextMenu = function(target) {
-        var file;
-        var tclear;
-
-        // Please be aware that menu items are all hyperlink elements with the dropdown-item classname.
-        // Here only hide all menu items and display correct ones,
-        // which should not include any ones under submenu with the span tag.
-        var $menuitems = $('.dropdown.body.files-menu a.dropdown-item');
-        $menuitems.addClass('hidden');
-
-        $menuitems.filter('.transfer-pause,.transfer-play,.move-up,.move-down,.transfer-clear').removeClass('hidden');
-
-        tclear = $menuitems.filter('.transfer-clear').contents('span').get(0) || {};
-        tclear.textContent = l[103];
-
-        if (target === null && (target = $('.transfer-table tr.ui-selected')).length > 1) {
-            var ids = target.attrs('id');
-            var finished = 0;
-            var paused = 0;
-            var started = false;
-
-            ids.forEach(function(id) {
-                file = GlobalProgress[id];
-                if (!file) {
-                    finished++;
-                }
-                else {
-                    if (file.paused) {
-                        paused++;
-                    }
-                    if (file.started) {
-                        started = true;
-                    }
-                }
-            });
-
-            if (finished === ids.length) {
-                $menuitems.addClass('hidden')
-                    .filter('.transfer-clear').removeClass('hidden');
-                tclear.textContent = l[7218];
+    $.removeTransferItems = function(rows) {
+        if (rows) {
+            for (let i = rows.length; i--;) {
+                tfsheadupdate({c: rows[i]});
+                mega.tpw.removeRow(rows[i]);
             }
-            else {
-                if (started) {
-                    $menuitems.filter('.move-up,.move-down').addClass('hidden');
-                }
-                if (paused === ids.length) {
-                    $menuitems.filter('.transfer-pause').addClass('hidden');
-                }
-
-                var prev = target.first().prev();
-                var next = target.last().next();
-
-                if (prev.length === 0 || !prev.hasClass('transfer-queued')) {
-                    $menuitems.filter('.move-up').addClass('hidden');
-                }
-                if (next.length === 0) {
-                    $menuitems.filter('.move-down').addClass('hidden');
-                }
-            }
-        }
-        else if (!(file = GlobalProgress[$(target).attr('id')])) {
-            /* no file, it is a finished operation */
-            $menuitems.addClass('hidden')
-                .filter('.transfer-clear').removeClass('hidden');
-            tclear.textContent = l[7218];
         }
         else {
-            if (file.started) {
-                $menuitems.filter('.move-up,.move-down').addClass('hidden');
-            }
-            if (file.paused) {
-                $menuitems.filter('.transfer-pause').addClass('hidden');
-            }
-            else {
-                $menuitems.filter('.transfer-play').addClass('hidden');
-            }
-
-            if (!target.prev().length || !target.prev().hasClass('transfer-queued')) {
-                $menuitems.filter('.move-up').addClass('hidden');
-            }
-            if (target.next().length === 0) {
-                $menuitems.filter('.move-down').addClass('hidden');
-            }
-        }
-
-        // XXX: Hide context-menu's menu-up/down items for now to check if that's the
-        // origin of some problems, users can still use the new d&d logic to move transfers
-        $menuitems.filter('.move-up,.move-down').addClass('hidden');
-
-        var parent = $menuitems.parent();
-        parent
-            .children('hr').addClass('hidden').end()
-            .children('hr.pause').removeClass('hidden').end();
-
-        if (parent.height() < 56) {
-            parent.find('hr.pause').addClass('hidden');
+            mega.tpw.applyToRows((id) => {
+                tfsheadupdate({c: id});
+                mega.tpw.removeRow(id);
+            }, mega.tpw.TYPE_COMPLETE);
         }
     };
-
-
-    $.transferHeader = function(tfse) {
-        tfse = tfse || M.getTransferElements();
-        if (!tfse) {
-            return;
-        }
-        const {domTableEmptyTxt, domScrollingTable, domTable} = tfse;
-        tfse = undefined;
-
-        // Show/Hide header if there is no items in transfer list
-        if (domTable.querySelector('tr')) {
-            domTableEmptyTxt.classList.add('hidden');
-            domScrollingTable.style.display = '';
-        }
-        else {
-            domTableEmptyTxt.classList.remove('hidden');
-            domScrollingTable.style.display = 'none';
-        }
-
-        $(domScrollingTable).rebind('click.tst contextmenu.tst', function(e) {
-            if (!$(e.target).closest('.transfer-table').length) {
-                $('.ui-selected', domTable).removeClass('ui-selected');
-            }
-        });
-
-        if ($.transferHeader.doBind) {
-            $.transferHeader.doBind(domTable);
-        }
-
-        delay('tfs-ps-update', () => {
-            // XXX: This update will fire ps-y-reach-end, set a flag to ignore it...
-
-            $.isTfsPsUpdate = true;
-            Ps.update(domScrollingTable);
-
-            onIdle(() => {
-                $.isTfsPsUpdate = false;
-            });
-        });
-    };
-
-    $.transferHeader.doBind = (domTable) => {
-        // Bind proxy handlers only once
-        delete $.transferHeader.doBind;
-
-        domTable.addEventListener('click', e => {
-            let $this;
-            if (e.target.closest('.grid-url-arrow')) {
-                $this = $(e.target.closest('.grid-url-arrow'));
-            }
-            else if (e.target.closest('.clear-transfer-icon')) {
-                $this = $(e.target.closest('.clear-transfer-icon'));
-            }
-            else if (e.target.closest('.link-transfer-status')) {
-                $this = $(e.target.closest('.link-transfer-status'));
-            }
-            else {
-                return;
-            }
-            var target = $this.closest('tr');
-            e.preventDefault();
-            e.stopPropagation(); // do not treat it as a regular click on the file
-            $('tr', domTable).removeClass('ui-selected');
-
-            if ($this.hasClass('link-transfer-status')) {
-
-                if ($this.hasClass('transfer-play')) {
-                    if ($this.hasClass('transfer-upload') && ulmanager.ulOverStorageQuota) {
-                        ulmanager.ulShowOverStorageQuotaDialog();
-                        return;
-                    }
-
-                    if (dlmanager.isOverQuota) {
-                        dlmanager.showOverQuotaDialog();
-                        return;
-                    }
-                }
-                if ($this.hasClass('transfer-play')) {
-                    fm_tfsresume(target[0].id);
-                }
-                else if (!String(target[0].id).startsWith('LOCKed_')) {
-                    fm_tfspause(target[0].id);
-                }
-            }
-            else {
-                if (!target.hasClass('transfer-completed')) {
-                    var toabort = target.attr('id');
-                    dlmanager.abort(toabort);
-                    ulmanager.abort(toabort);
-                }
-                target.fadeOut(function() {
-                    target.remove();
-                    tfsheadupdate({c: target.attr('id')});
-                    mega.tpw.removeRow(target.attr('id'));
-                    $.clearTransferPanel();
-                });
-            }
-
-            return false;
-        });
-
-        domTable.addEventListener('dblclick.transferhead', (ev) => {
-            if (!ev.target.closest('tr')) {
-                return;
-            }
-            ev.stopPropagation();
-            ev.preventDefault();
-            let { classList, id } = ev.target.closest('tr');
-            if (classList.contains('transfer-completed')) {
-                if (id[0] === 'd') {
-                    id = id.split('_').pop();
-                }
-                else if (id[0] === 'u') {
-                    id = String(ulmanager.ulIDToNode[id]);
-                }
-                var path = M.getPath(id);
-                if (path.length > 1) {
-                    M.openFolder(path[1], true)
-                        .always(function() {
-                            $.selected = [id];
-                            reselect(1);
-                        });
-                }
-            }
-            return false;
-        });
-
-        const clickContextFn = (e) => {
-            if (!e.target.closest('tr')) {
-                return;
-            }
-            e.stopPropagation();
-            e.preventDefault();
-            const $this = $(e.target.closest('tr'));
-            if (e.type === 'contextmenu') {
-                if (!e.ctrlKey && !e.metaKey && !e.shiftKey) {
-                    $('.ui-selected', domTable).removeClass('ui-selected');
-                }
-                $this.addClass('ui-selected dragover');
-                transferPanelContextMenu(null);
-                return !!M.contextMenuUI(e);
-            }
-            else {
-                var domNode = domTable.querySelector('tr');
-                $.hideContextMenu();
-                if (e.shiftKey && domNode) {
-                    var start = domNode;
-                    var end = $this[0];
-                    if ($.TgridLastSelected && $($.TgridLastSelected).hasClass('ui-selected')) {
-                        start = $.TgridLastSelected;
-                    }
-                    if ($(start).index() > $(end).index()) {
-                        end = start;
-                        start = $this[0];
-                    }
-                    $('.ui-selected', domTable).removeClass('ui-selected');
-                    $([start, end]).addClass('ui-selected');
-                    $(start).nextUntil($(end)).each(function(i, e) {
-                        $(e).addClass('ui-selected');
-                    });
-                }
-                else if (!e.ctrlKey && !e.metaKey) {
-                    $('.ui-selected', domTable).removeClass('ui-selected');
-                    $this.addClass('ui-selected');
-                    $.TgridLastSelected = $this[0];
-                }
-                else {
-                    if ($this.hasClass("ui-selected")) {
-                        $this.removeClass("ui-selected");
-                    }
-                    else {
-                        $this.addClass("ui-selected");
-                        $.TgridLastSelected = $this[0];
-                    }
-                }
-            }
-
-            return false;
-        };
-        domTable.addEventListener('click', clickContextFn);
-        domTable.addEventListener('contextmenu', clickContextFn);
-    };
-
-    $.transferClose = function() {
-        $('#fmholder').removeClass('transfer-panel-opened');
-    };
-
-    $.transferOpen = function(force) {
-        if (force || !$('.menu-item.transfers').hasClass('active')) {
-            $('section.fm-transfers-block', pmlayout).removeClass('hidden');
-            $('#fmholder').addClass('transfer-panel-opened');
-            var domScrollingTable = M.getTransferElements().domScrollingTable;
-            if (!domScrollingTable.classList.contains('ps')) {
-                Ps.initialize(domScrollingTable);
-            }
-            fm_tfsupdate(); // this will call $.transferHeader();
-        }
-    };
-
-    $.clearTransferPanel = function() {
-        var obj = M.getTransferElements();
-        if (obj.domTable && !obj.domTable.querySelector('tr')) {
-            $('.transfer-clear-all-icon').addClass('disabled');
-            $('.transfer-pause-icon').addClass('disabled');
-            $('.transfer-clear-completed').addClass('disabled');
-            obj.domTableEmptyTxt.classList.remove('hidden');
-            obj.domUploadBlock.classList.add('hidden');
-            obj.domDownloadBlock.classList.add('hidden');
-            obj.domUploadBlock.classList.remove('overquota', 'error');
-            obj.domDownloadBlock.classList.remove('overquota', 'error');
-            obj.domUploadProgressText.textContent = l[1418];
-            obj.domDownloadProgressText.textContent = l[1418];
-        }
-
-        if (M.currentdirid === 'transfers') {
-            fm_tfsupdate();
-            $.tresizer();
-        }
-    };
-
-    $.removeTransferItems = function($trs) {
-        var type = null;
-        if (!$trs) {
-            $trs = $('.transfer-table tr.transfer-completed');
-            type = mega.tpw.DONE;
-        }
-        var $len = $trs.length;
-        const ids = [];
-        for (let i = 0; i < $trs.length; i++) {
-            ids.push($trs.eq(i).prop('id'));
-        }
-        if ($len && $len < 100) {
-            $trs.fadeOut(function() {
-                $(this).remove();
-                if (!--$len) {
-                    $.clearTransferPanel();
-                }
-            });
-        }
-        else {
-            $trs.remove();
-            Soon($.clearTransferPanel);
-        }
-        tfsheadupdate({c: ids});
-        mega.tpw.clearRows(type);
-    };
-    bindTransfersMassEvents('.fm-transfers-header');
-
-    $('.transfer-clear-completed').rebind('click', function() {
-        if (!$(this).hasClass('disabled')) {
-            eventlog(501082)
-            $.removeTransferItems();
-        }
-    });
 };
 
 /**
@@ -3095,20 +2634,6 @@ FileManager.prototype.addGridUI = function(refresh) {
         }
     });
 
-    var showColumnsContextMenu = function(e) {
-        var notAllowedTabs = ['shares', 'out-shares'];
-        if (notAllowedTabs.indexOf(M.currentdirid) !== -1) {
-            return false;
-        }
-
-        if (M.onDeviceCenter && mega.devices.ui.isCustomRender()) {
-            return false;
-        }
-
-        M.contextMenuUI(e, 7);
-        return false;
-    };
-
     $('.grid-table th').rebind('contextmenu', e => {
         $.hideContextMenu();
 
@@ -3133,56 +2658,6 @@ FileManager.prototype.addGridUI = function(refresh) {
         M.fmEventLog('settings');
         return false;
     }).rebind('contextmenu', () => false);
-
-    $('.files-menu.context .dropdown-item.visible-col-select').rebind('click', function(e) {
-        var $me = $(this);
-        if ($me.hasClass('notactive')) {
-            return false;
-        }
-
-        var targetCol = $me.attr('megatype');
-
-        if ($me.attr('isviewed')) {
-            $me.removeAttr('isviewed');
-            $('i', $me).removeClass('icon-check').addClass('icon-add');
-            M.columnsWidth.cloud[targetCol].viewed = false;
-        }
-        else {
-            $me.attr('isviewed', 'y');
-            $('i', $me).removeClass('icon-add').addClass('icon-check');
-            M.columnsWidth.cloud[targetCol].viewed = true;
-        }
-
-        M.columnsWidth.cloud.fname.lastOffsetWidth = null;
-        M.columnsWidth.updateColumnStyle();
-
-        var columnPreferences = mega.config.get('fmColPrefs');
-        if (columnPreferences === undefined) {
-            columnPreferences = 108; // default
-        }
-        var colConfigNb = getNumberColPrefs(targetCol);
-        if (colConfigNb) {
-            if (M.columnsWidth.cloud[targetCol].viewed) {
-                columnPreferences |= colConfigNb;
-            }
-            else {
-                columnPreferences &= ~colConfigNb;
-            }
-        }
-        mega.config.set('fmColPrefs', columnPreferences);
-
-        if (M.megaRender && M.megaRender.megaList) {
-            if (!M.megaRender.megaList._scrollIsInitialized) {
-                M.megaRender.megaList.resized();
-            }
-            else {
-                M.megaRender.megaList.scrollUpdate();
-            }
-        }
-        $.hideContextMenu && $.hideContextMenu();
-        return false;
-    });
-
 
     $('.grid-first-th').rebind('click', function() {
         var $el = $(this).children().first();
@@ -3685,7 +3160,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
 
     // Close node Info panel if currently open as it's not applicable when switching to these areas
     if (id === 'account' || id === 'dashboard' || id === 'conversations'
-        || id === 'user-management' || id === 'transfers') {
+        || id === 'user-management') {
 
         if (mega.ui.mInfoPanel) {
             mega.ui.mInfoPanel.hide();
@@ -3769,7 +3244,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         /*if (!isValidShareLink()) {
          $('.fm-breadcrumbs.folder-link .right-arrow-bg').text('Invalid folder');
          } else*/
-        if (id === 'cloud-drive' || id === 'transfers') {
+        if (id === 'cloud-drive') {
             $('.pm-main', $fmholder).addClass('active-folder-link');
             $('.fm-right-header', $fmholder).addClass('folder-link');
 
@@ -3895,17 +3370,6 @@ FileManager.prototype.onSectionUIOpen = function(id) {
 
     if (id !== "recents") {
         $(".fm-recents.container").addClass('hidden');
-    }
-    if (id !== 'transfers') {
-        if ($.transferClose) {
-            $.transferClose();
-        }
-    }
-    else {
-        if (!$.transferOpen) {
-            M.addTransferPanelUI();
-        }
-        $.transferOpen(true);
     }
 
     if (id === 'affiliate') {

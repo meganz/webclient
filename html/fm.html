@@ -1,56 +1,4 @@
-<!-- Please add/remove "left-points-position/right-points-position/top-points-position/bottom-points-position" class to activate points and set its position !-->
-<div class="dropdown body download context hidden">
-    <span class="dropdown-item download-standart-item">
-        <i class="sprite-fm-mono icon-download-standard"></i>
-        <span>[$5928]</span>
-    </span>
-    <span class="dropdown-item zipdownload-item">
-        <i class="sprite-fm-mono icon-download-zip"></i>
-        <span>[$864]</span>
-    </span>
-</div>
 <div class="fm-context-menu hidden"></div>
-<div class="dropdown body files-menu context hidden">
-    <div class="dropdown-section">
-       <a class="dropdown-item view-in-bc-item">
-            <i class="sprite-fm-mono icon-search-cloud"></i>
-            <span>[$view_in_dc]</span>
-        </a>
-        <hr />
-    </div>
-    <div class="dropdown-section">
-        <a class="dropdown-item canceltransfer-item red">
-            <i class="sprite-fm-mono icon-close-component"></i>
-            <span>[$103]</span>
-        </a>
-        <a class="dropdown-item transfer-pause">
-            <i class="sprite-fm-mono icon-pause"></i>
-            <span>[$1647]</span>
-        </a>
-        <a class="dropdown-item transfer-play">
-            <i class="sprite-fm-mono icon-play-small"></i>
-            <span>[$1649]</span>
-        </a>
-    </div>
-    <div class="dropdown-section">
-        <hr class="pause hidden" />
-        <a class="dropdown-item move-up">
-            <i class="sprite-fm-mono icon-queue-up"></i>
-            <span>[$6864]</span>
-        </a>
-        <a class="dropdown-item move-down">
-            <i class="sprite-fm-mono icon-queue-down"></i>
-            <span>[$6865]</span>
-        </a>
-        <hr />
-    </div>
-    <div class="dropdown-section">
-        <a class="dropdown-item transfer-clear red">
-            <i class="sprite-fm-mono icon-close-component"></i>
-            <span>[$103]</span>
-        </a>
-    </div>
-</div>
 
 <div class="main-blur-block">
     <!-- Please add "fm-notification" class and "full"/"almost-full" class !-->
@@ -414,6 +362,7 @@
                             <div class="sub-menu slide-item">
                                 <div class="sub-title" data-scrollto="upload-and-download">[$20170]</div>
                                 <div class="sub-title" data-scrollto="transfer-tools">[$20171]</div>
+                                <div class="sub-title" data-scrollto="migrate-cloud-provider-settings" data-eventid="500942">[$mig_acc_subtitle]</div>
                             </div>
                         </div>
                         <div class="settings-button slide-in-out ts-500 closed contact-chats">
@@ -3410,94 +3359,6 @@
             <!-- END Templates for recents list -->
         </section>
 
-        <section class="fm-transfers-block hidden">
-            <div class="fm-transfers-header">
-                <div class="transfer-panel-title">
-                    <div class="transfer-progress-type upload hidden">
-                        <div class="status-indicator">
-                            <div class="progress-chart">
-                                <div class="transfer-progress charts">
-                                    <div class="right-chart low-percent-clip">
-                                        <span></span>
-                                    </div>
-                                    <div class="left-chart low-percent-clip">
-                                        <span></span>
-                                    </div>
-                                </div>
-                                <i class="sprite-fm-mono icon-up"></i>
-                            </div>
-                        </div>
-                        <div class="transfer-progress-txt">[$20808]</div>
-                    </div>
-                    <div class="transfer-progress-type download hidden">
-                        <div class="status-indicator">
-                            <div class="progress-chart">
-                                <div class="transfer-progress charts">
-                                    <div class="right-chart low-percent-clip">
-                                        <span></span>
-                                    </div>
-                                    <div class="left-chart low-percent-clip">
-                                        <span></span>
-                                    </div>
-                                </div>
-                                <i class="sprite-fm-mono icon-down"></i>
-                            </div>
-                        </div>
-                        <div class="transfer-progress-txt">[$20808]</div>
-                    </div>
-                </div>
-                <div class="transfer-panel-actions">
-                    <button class="mega-button action transfer-clear-all-icon right disabled">
-                        <div>
-                            <i class="sprite-fm-mono icon-close-component"></i>
-                        </div>
-                        <span class="red">[$6991]</span>
-                    </button>
-                    <button class="mega-button action transfer-clear-completed right disabled">
-                        <div>
-                            <i class="sprite-fm-mono icon-clear-transfer"></i>
-                        </div>
-                        <span>[$clear_completed_transfers]</span>
-                    </button>
-                    <button class="mega-button action transfer-pause-icon right disabled">
-                        <div>
-                            <i class="sprite-fm-mono icon-pause"></i>
-                        </div>
-                        <span>[$6993]</span>
-                    </button>
-                </div>
-                <div class="clear"></div>
-            </div>
-            <div class="transfer-table-wrapper">
-                <div class="fm-empty-section transfer-panel-empty-txt">
-                    <div class="fm-empty-pad">
-                        <i class="section-icon sprite-fm-mono icon-transfer-filled"></i>
-                        <div class="fm-empty-cloud-txt">[$6089]</div>
-                    </div>
-                </div>
-                <div class="transfer-scrolling-table">
-                    <div class="grid-wrapper">
-                        <table width="100%" height="100%" border="0" cellspacing="0" cellpadding="0"
-                            class="transfer-table table-hover">
-                            <thead>
-                                <tr>
-                                    <th width="60"></th>
-                                    <th>[$86]</th>
-                                    <th width="192">[$93]</th>
-                                    <th width="96">[$87]</th>
-                                    <th width="96">[$19134]</th>
-                                    <th width="192">[$12441]</th>
-                                    <th width="192">[$89]</th>
-                                    <th width="69" class="grid-url-header"></th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </section>
 
         <!-- check if there is any other place using account qr-block -->
         <section class="fm-right-account-block hidden">
@@ -4723,6 +4584,33 @@
                                         </button>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="account data-block migrate-cloud-provider-settings">
+                        <div class="settings-full-block">
+                            <div class="mega-data-header">
+                                <span class="title-txt">[$mig_acc_subtitle]</span>
+                            </div>
+                            <div id="migration-table-container">
+                                <div class="content-txt">[$mig_acc_desc]</div>
+                                <table width="100%" border="0" cellspacing="0" cellpadding="0" class="data-table migration" id="account-migration-table">
+                                    <thead>
+                                        <tr>
+                                            <th>[$mig_acc_table_header_1]</th>
+                                            <th>[$mig_acc_table_header_2]</th>
+                                            <th class="no-border migration-status">[$488]</th>
+                                            <th class="no-border action-column">&nbsp;</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td colspan="4" class="data-table-empty">
+                                                <span>[$20140]</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>

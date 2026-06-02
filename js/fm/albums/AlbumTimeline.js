@@ -239,7 +239,9 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
                                     selectedItems.push('.add-to-album');
                                 }
 
-                                selectedItems.push('.album-remove-items');
+                                if (!filterFn) {
+                                    selectedItems.push('.album-remove-items');
+                                }
                             }
 
                             if (toApplySensitive) {

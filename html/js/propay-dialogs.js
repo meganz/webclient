@@ -54,6 +54,7 @@ var astroPayDialog = {
     fullName: '',
     address: '',
     city: '',
+    postcode: '',
     taxNumber: '',
     phoneNumber: '',
     country: '',
@@ -103,10 +104,21 @@ var astroPayDialog = {
         pro.propay.skItems.astropay.endLoad('initAstropay');
     },
 
-    getRequiresPhoneNumber() {
+    getIsIndia() {
         'use strict';
         return (((u_attr && u_attr.ipcc) || getCountryAndLocales().country) === 'IN')
             || (astroPayDialog.country === 'IN');
+    },
+
+    getRequiresPhoneNumber() {
+        'use strict';
+        return this.getIsIndia();
+    },
+
+    // India requires a postcode (PIN code) field of exactly 6 digits.
+    getRequiresPostcode() {
+        'use strict';
+        return this.getIsIndia();
     },
 
     /**
@@ -156,8 +168,21 @@ var astroPayDialog = {
         }
 
         if (!astroPayDialog.getRequiresPhoneNumber()) {
-            this.$dialog.find('.astropay-label.phone').addClass('hidden');
-            this.$dialog.find('.astropay-phone-field').parent().addClass('hidden');
+            $('.astropay-label.phone', this.$dialog).addClass('hidden');
+            $('.astropay-phone-field', this.$dialog).parent().addClass('hidden');
+        }
+        else {
+            // India phone numbers are at most 10 digits (national number, no country code)
+            $('.astropay-phone-field', this.$dialog).attr('maxlength', '10');
+        }
+
+        if (astroPayDialog.getRequiresPostcode()) {
+            // India PIN codes are exactly 6 digits
+            $('.astropay-postcode-field', this.$dialog).attr('maxlength', '6');
+        }
+        else {
+            $('.astropay-label.postcode', this.$dialog).addClass('hidden');
+            $('.astropay-postcode-field', this.$dialog).parent().addClass('hidden');
         }
     },
 
@@ -251,21 +276,71 @@ var astroPayDialog = {
         astroPayDialog.fullName = $.trim(astroPayDialog.$dialog.find(`#${propayIndicator}astropay-name-field`).val());
         astroPayDialog.address = $.trim(astroPayDialog.$dialog.find(`#${propayIndicator}astropay-address-field`).val());
         astroPayDialog.city = $.trim(astroPayDialog.$dialog.find(`#${propayIndicator}astropay-city-field`).val());
+        astroPayDialog.postcode =
+            $.trim($(`#${propayIndicator}astropay-postcode-field`, astroPayDialog.$dialog).val());
         astroPayDialog.taxNumber = $.trim(astroPayDialog.$dialog.find(`#${propayIndicator}astropay-tax-field`).val());
         astroPayDialog.phoneNumber =
             $.trim(astroPayDialog.$dialog.find(`#${propayIndicator}astropay-phone-field`).val());
 
         const requirePhoneNumber = astroPayDialog.getRequiresPhoneNumber();
+        const cleanedPhone = requirePhoneNumber && M.validatePhoneNumber(astroPayDialog.phoneNumber);
+        // India mobile numbers are exactly 10 digits (national number, no country code).
+        // M.validatePhoneNumber only enforces a 4-digit floor, so check the digit count explicitly.
+        const phoneDigitCount = cleanedPhone ? cleanedPhone.replace(/\D/g, '').length : 0;
+        const phoneWrongLength = requirePhoneNumber && !!cleanedPhone && phoneDigitCount !== 10;
+        const phoneInvalidForIndia = requirePhoneNumber && (!cleanedPhone || phoneWrongLength);
+
+        const requirePostcode = astroPayDialog.getRequiresPostcode();
+        // India PIN codes must be exactly 6 characters
+        const postcodeWrongLength = requirePostcode
+            && astroPayDialog.postcode && astroPayDialog.postcode.length !== 6;
+        const postcodeInvalidForIndia = requirePostcode && (!astroPayDialog.postcode || postcodeWrongLength);
 
         // Make sure they entered something
         if (
             astroPayDialog.fullName === '' ||
-            (requirePhoneNumber && !M.validatePhoneNumber(astroPayDialog.phoneNumber)) ||
+            phoneInvalidForIndia ||
+            postcodeInvalidForIndia ||
             // If the provider supports extra address information, validate it.
             // Currently only India needs Address and City, but others may need them in future.
             this.selectedProvider.supportsExtraAddressInfo &&
             (astroPayDialog.address === '' || astroPayDialog.city === '')
         ) {
+
+            if (d) {
+                if (astroPayDialog.fullName === '') {
+                    console.warn('AstroPay: Full name is empty');
+                }
+                if (phoneInvalidForIndia) {
+                    if (phoneWrongLength) {
+                        console.warn(
+                            `AstroPay: India phone number is ${phoneDigitCount} digits: ${astroPayDialog.phoneNumber}`);
+                    }
+                    else {
+                        console.warn(
+                            'AstroPay: India phone number is missing or invalid',
+                            astroPayDialog.phoneNumber);
+                    }
+                }
+                if (postcodeInvalidForIndia) {
+                    if (postcodeWrongLength) {
+                        console.warn(
+                            'AstroPay: India postcode is not exactly 6 characters',
+                            astroPayDialog.postcode);
+                    }
+                    else {
+                        console.warn('AstroPay: India postcode is missing');
+                    }
+                }
+                if (this.selectedProvider.supportsExtraAddressInfo) {
+                    if (astroPayDialog.address === '') {
+                        console.warn('AstroPay: Address is empty');
+                    }
+                    if (astroPayDialog.city === '') {
+                        console.warn('AstroPay: City is empty');
+                    }
+                }
+            }
 
             pro.propay.hideLoadingOverlay();
             // Show error dialog with Missing payment details
@@ -278,6 +353,12 @@ var astroPayDialog = {
 
         // If the tax number is invalid, show an error dialog
         if (!astroPayDialog.taxNumberIsValid()) {
+
+            if (d) {
+                console.warn(
+                    'AstroPay: Tax number is invalid for tax label',
+                    astroPayDialog.selectedProvider.extra.taxIdLabel, astroPayDialog.taxNumber);
+            }
 
             pro.propay.hideLoadingOverlay();
             msgDialog('warninga', l[6958], l[17789], '', () => {

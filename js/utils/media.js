@@ -82,7 +82,8 @@ function is_image2(n, ext) {
 function is_image3(n, ext) {
     'use strict';
     ext = ext || fileext(n && n.name || n, true, true);
-    return ext !== 'PDF' && ext !== 'DOCX' && is_image2(n, ext);
+    return ext !== 'PDF' && ext !== 'DOCX' && ext !== 'XLSX' && ext !== 'XLSM'
+        && ext !== 'XLTX' && ext !== 'XLTM' && ext !== 'CSV' && is_image2(n, ext);
 }
 
 /**
@@ -217,7 +218,7 @@ var mThumbHandler = {
     }
 };
 
-mThumbHandler.add('DOCX', function DOCXThumbHandler(ab, cb) {
+mThumbHandler.add('DOCX,XLSX,XLSM,XLTX,XLTM,CSV', function MSThumbHandler(ab, cb) {
     'use strict';
 
     // @todo ..

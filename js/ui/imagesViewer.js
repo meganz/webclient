@@ -17,6 +17,11 @@ var slideshowid;
     var fitToWindow = Object.create(null);
     var _pdfSeen = false;
     var _docxSeen = false;
+    var _xlsxSeen = false;
+    var _xlsxBootSeq = 0;
+    var _xlsxListenerOn = false;
+    var _xlsxGotReady = false;
+    var _xlsxPendingSignal = null;
     var optionsMenu;
     var settingsMenu;
     var preselection;
@@ -1127,6 +1132,8 @@ var slideshowid;
                 })();
             }
 
+            tryCatch(cleanupXlsxViewer)();
+
             slideshow_gesture();
 
             return false;
@@ -1164,7 +1171,7 @@ var slideshowid;
         switchedSides = false;
         $('header .file-name', $overlay).text(n.name);
         $('header .file-size', $overlay).text(bytesToSize(n.s || 0));
-        $('.viewer-error, #pdfpreviewdiv1, #docxpreviewdiv1', $overlay).addClass('hidden');
+        $('.viewer-error, #pdfpreviewdiv1, #docxpreviewdiv1, #xlsxpreviewdiv1', $overlay).addClass('hidden');
         $('.viewer-progress', $overlay).addClass('vo-hidden');
 
         // @todo: Combine loading grad and viewer-progress
@@ -1240,7 +1247,7 @@ var slideshowid;
 
         // Bind static events is viewer is not in slideshow mode to avoid unnecessary rebinds
         if (!slideshowplay) {
-            $overlay.removeClass('fullscreen browserscreen mouse-idle slideshow video pdf docx');
+            $overlay.removeClass('fullscreen browserscreen mouse-idle slideshow video pdf docx xlsx');
 
             // Bind keydown events
             $document.rebind('keydown.slideshow', function(e) {
@@ -1759,13 +1766,32 @@ var slideshowid;
             console.debug('slideshow.fetchsrc', id, n, n.h);
         }
 
-        if (['pdf', 'docx'].includes(fileext(n.name))) {
+        if (['pdf', 'docx', 'xlsx', 'xlsm', 'xltx', 'xltm', 'csv'].includes(fileext(n.name))) {
             if (!preqs[n.h]) {
                 preqs[n.h] = 1;
 
                 const ext = fileext(n.name);
+
+                if (['xlsx', 'xlsm', 'xltx', 'xltm', 'csv'].includes(ext)) {
+
+                    // Cap Excel files to 200MB to avoid issues.
+                    if (!(n.s >= 0 && n.s < 200 * 1024 * 1024)) {
+                        if (d) {
+                            console.warn(`Spreadsheet ${n.h} size ${n.s} fails cap/known check`);
+                        }
+                        previewimg(n.h, null);
+                        preqs[n.h] = 0;
+                        return false;
+                    }
+
+                    if (n.s === 0) {
+                        preview({type: extmime[ext]}, n.h, new ArrayBuffer(0));
+                        return false;
+                    }
+                }
+
                 M.gfsfetch(n.link || n.h, 0, -1).then((data) => {
-                    const type = ext === 'pdf' ? 'application/pdf' : extmime.docx;
+                    const type = extmime[ext];
 
                     preview({ type }, n.h, data.buffer);
 
@@ -2279,6 +2305,153 @@ var slideshowid;
         }).catch(tell);
     }
 
+    async function inlineXlsxViewerHtml() {
+
+        const _fetch = async(url, mime) => {
+            const r = await fetch(url);
+            if (!r.ok) {
+                throw new Error(`fetch ${url}: ${r.status}`);
+            }
+            const blob = new Blob([await r.blob()], { type: mime });
+            return new Promise((resolve, reject) => {
+                const fr = new FileReader();
+                fr.onload = () => resolve(fr.result);
+                fr.onerror = () => reject(fr.error);
+                fr.readAsDataURL(blob);
+            });
+        };
+
+        await M.require('xlsxviewer', 'xlsxparser_js', 'xlsxviewer_js', 'xlsxviewercss');
+        const [parserDataUrl, viewerDataUrl, viewerCssUrl] = await Promise.all([
+            _fetch(window.xlsxparser_js, 'application/javascript'),
+            _fetch(window.xlsxviewer_js, 'application/javascript'),
+            _fetch(window.xlsxviewercss, 'text/css')
+        ]);
+        return pages.xlsxviewer
+            .replace('{{xlsxviewercss}}', viewerCssUrl)
+            .replace('{{xlsxparser}}', parserDataUrl)
+            .replace('{{xlsxviewer}}', viewerDataUrl);
+    }
+
+    function _linkSanityCheck(s) {
+
+        if (typeof s !== 'string') {
+            return false;
+        }
+
+        for (let i = 0; i < s.length; i++) {
+            const c = s.charCodeAt(i);
+            if (c < 0x20 || c === 0x7F) {
+                return false;
+            }
+        }
+        if (!/^(https?:|mailto:)/i.test(s) || /%(0[9ADad]|7[Ff])/.test(s)) {
+            return false;
+        }
+        return s.replace(/[\u202A-\u202E\u2066-\u2069]/g, '');
+    }
+
+    function prepareAndViewXlsxViewer(data) {
+        const ext = data.type === extmime.csv ? 'csv' : 'xlsx';
+        const signal = tryCatch(() => {
+            const elem = document.getElementById('xlsxpreviewdiv1');
+            elem.classList.remove('hidden');
+            elem.contentWindow.postMessage(
+                { type: 'xlsxviewer:load', buffer: data.buffer, ext },
+                '*'
+            );
+            slideshow_gesture(data.h, elem, 'XLSX');
+        });
+
+        if (_xlsxSeen) {
+            signal();
+            return;
+        }
+
+        if (!_xlsxListenerOn) {
+            window.addEventListener('message', ev => {
+                const target = document.getElementById('xlsxpreviewdiv1');
+                if (!target || ev.source !== target.contentWindow) {
+                    return;
+                }
+                const msg = ev.data;
+                if (!msg || typeof msg !== 'object') {
+                    return;
+                }
+                if (msg.type === 'xlsxviewer:ready') {
+                    if (_xlsxGotReady) {
+                        return;
+                    }
+                    _xlsxGotReady = true;
+                    const fn = _xlsxPendingSignal;
+                    if (fn) {
+                        queueMicrotask(fn);
+                    }
+                }
+                else if (msg.type === 'xlsxviewer:error') {
+                    let errBody = '';
+                    if (msg.code === -1) {
+                        errBody = l.preview_failed_support;
+                    }
+                    else if (msg.code === -2) {
+                        errBody = l.preview_failed_temp;
+                    }
+                    msgDialog('error', '', l.preview_failed_title, errBody);
+                }
+                else if (msg.type === 'xlsxviewer:open-url') {
+                    const url = _linkSanityCheck(msg.url);
+                    if (!url) {
+                        return;
+                    }
+                    const w = window.open(url, '_blank', 'noopener,noreferrer');
+                    if (w) {
+                        w.opener = null;
+                    }
+                }
+            });
+            _xlsxListenerOn = true;
+        }
+
+        const bootSeq = ++_xlsxBootSeq;
+        _xlsxGotReady = false;
+        _xlsxPendingSignal = signal;
+        inlineXlsxViewerHtml().then((inlineHtml) => {
+            if (bootSeq !== _xlsxBootSeq) {
+                return;
+            }
+            const id = 'xlsxpreviewdiv1';
+            const iframe = document.getElementById(id);
+            const newIframe = document.createElement('iframe');
+            newIframe.id = id;
+            newIframe.setAttribute('sandbox', 'allow-scripts');
+            newIframe.setAttribute('srcdoc', inlineHtml);
+
+            if (iframe) {
+                iframe.parentNode.replaceChild(newIframe, iframe);
+            }
+            else {
+                const p = document.querySelector('.xlsx .media-viewer .content');
+                if (p) {
+                    p.appendChild(newIframe);
+                }
+            }
+            _xlsxSeen = true;
+        }).catch(tell);
+    }
+
+    function cleanupXlsxViewer() {
+        _xlsxBootSeq++;
+        _xlsxGotReady = false;
+        _xlsxPendingSignal = null;
+        const iframe = document.getElementById('xlsxpreviewdiv1');
+        if (iframe && iframe.contentWindow) {
+            tryCatch(() => {
+                iframe.contentWindow.postMessage({ type: 'xlsxviewer:cleanup' }, '*');
+            })();
+        }
+        _xlsxSeen = false;
+    }
+
     function previewsrc(id) {
         var $overlay = $('.media-viewer-container', 'body');
         var $content = $('.content', $overlay);
@@ -2296,11 +2469,11 @@ var slideshowid;
         var type = typeof previews[id].type === 'string' && previews[id].type || 'image/jpeg';
         mBroadcaster.sendMessage.apply(mBroadcaster, ['trk:event', 'preview'].concat(type.split('/')));
 
-        $overlay.removeClass('pdf video video-theatre-mode');
+        $overlay.removeClass('pdf docx xlsx video video-theatre-mode');
         $('embed', $content).addClass('hidden');
         $('video', $content).addClass('hidden');
         $imgWrap.removeClass('hidden');
-        $('#pdfpreviewdiv1, #docxpreviewdiv1', $content).addClass('hidden');
+        $('#pdfpreviewdiv1, #docxpreviewdiv1, #xlsxpreviewdiv1', $content).addClass('hidden');
         $bottomBar.removeClass('hidden');
 
         if (previews[id].type === 'application/pdf') {
@@ -2327,6 +2500,18 @@ var slideshowid;
             $imgWrap.addClass('hidden');
             prepareAndViewDocxViewer(previews[id]);
             eventlog(99819);
+            return;
+        }
+        if ([extmime.xlsx, extmime.xlsm, extmime.xltx, extmime.xltm, extmime.csv].includes(previews[id].type)) {
+            $overlay.addClass('xlsx');
+            $pendingBlock.addClass('hidden');
+            $progressBlock.addClass('vo-hidden');
+            if (!is_mobile) {
+                $bottomBar.addClass('hidden');
+            }
+            $imgWrap.addClass('hidden');
+            prepareAndViewXlsxViewer(previews[id]);
+            eventlog(501245);
             return;
         }
 
@@ -2578,7 +2763,8 @@ var slideshowid;
                     delete p.prev;
                 }
 
-                if (p.type.startsWith('image') || p.type === 'application/pdf') {
+                if (p.type.startsWith('image') || p.type === 'application/pdf' ||
+                    [extmime.xlsx, extmime.xlsm, extmime.xltx, extmime.xltm, extmime.csv].includes(p.type)) {
                     URL.revokeObjectURL(p.src);
                     if (previews[k] === p) {
                         previews[k] = false;

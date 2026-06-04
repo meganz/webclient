@@ -150,6 +150,11 @@
                 margin-top: 62px;
             }
 
+            #fmholder #xlsxpreviewdiv1 {
+                margin-top: 62px;
+                height: calc(100% - 62px);
+            }
+
         /* Images viewer controls */
 
             .media-viewer .image-controls {

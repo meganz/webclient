@@ -2734,7 +2734,14 @@ mBroadcaster.once('boot_done', () => {
                         ...options.headers,
                         'MEGA-Chrome-Antileak': `${u.pathname}${u.search}`
                     };
-                    uri = `${u.origin}${u.pathname}?`;
+
+                    if (u.pathname[4] === '/' && u.pathname.startsWith('/wsc')) {
+
+                        uri = `${u.origin}/wsc`;
+                    }
+                    else {
+                        uri = `${u.origin}${u.pathname}?`;
+                    }
                 }
 
                 return uri;

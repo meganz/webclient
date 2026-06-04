@@ -3032,15 +3032,12 @@ function FMResizablePane(element, opts) {
             }
         }
 
-        if (opts.shrinkBelow && value < opts.shrinkBelow) {
-            $element.addClass('small-resize-pane');
-        }
-        else if (opts.shrinkBelow) {
-            $element.removeClass('small-resize-pane');
-        }
-
         if (value > 0) {
             $element.width(value);
+        }
+
+        if (opts.shrinkBelow) {
+            $element.toggleClass('small-resize-pane', $element.width() < opts.shrinkBelow);
         }
 
         this.refresh();

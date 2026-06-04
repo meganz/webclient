@@ -745,6 +745,10 @@ pro.propay = {
                 extra.city = astroPayDialog.city;
                 extra.cpf = astroPayDialog.taxNumber;
                 extra.phone = astroPayDialog.phoneNumber;
+                // India PIN code (6 digits) - only collected when country is India
+                if (astroPayDialog.postcode) {
+                    extra.postcode = astroPayDialog.postcode;
+                }
             }
 
             // If Ecomprocessing, send extra details

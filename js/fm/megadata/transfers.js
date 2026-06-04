@@ -957,6 +957,36 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
         delete queue[name];
     };
 
+    // Rename/KEEPBOTH on folder upload conflict requires to rewrite the paths of sub nodes
+    const renameFolder = (oldName, newName) => {
+        if (oldName === newName || !queue[oldName]) {
+            return;
+        }
+        const files = queue[oldName];
+        for (let i = files.length; i--;) {
+            const f = files[i];
+            delete paths[f.path];
+            const segments = String(f.path).split('/');
+            segments[0] = newName;
+            f.path = segments.join('/');
+            paths[f.path] = null;
+        }
+        queue[newName] = files;
+        delete queue[oldName];
+
+        if (emptyFolders) {
+            for (let x = emptyFolders.length; x--;) {
+                const seg = String(emptyFolders[x]).split('/');
+                if (M.getSafeName(seg[0]) === oldName) {
+                    delete paths[emptyFolders[x]];
+                    seg[0] = newName;
+                    emptyFolders[x] = seg.join('/');
+                    paths[emptyFolders[x]] = null;
+                }
+            }
+        }
+    };
+
     var makeDirProc = function() {
         var conflicts = [];
         var folders = Object.keys(queue);
@@ -1000,6 +1030,16 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
                             if (repeat) {
                                 while ((entry = conflicts.pop())) {
                                     dequeue(entry[0].name);
+                                }
+                            }
+                        }
+                        else if (action === fileconflict.KEEPBOTH) {
+                            renameFolder(entry.name, name);
+
+                            if (repeat) {
+                                while ((entry = conflicts.pop())) {
+                                    const renamed = fileconflict.findNewName(entry[0].name, target);
+                                    renameFolder(entry[0].name, renamed);
                                 }
                             }
                         }

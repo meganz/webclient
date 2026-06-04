@@ -360,7 +360,7 @@ mBroadcaster.once('boot_done', () => {
         },
         '.save-as-text': {
             text: l[22664],
-            icon: 'sprite-mobile-fm-mono icon-files-plus-thin-outline',
+            icon: 'sprite-fm-mono icon-files-plus-thin-outline',
             subMenu: false,
             classNames: '',
             onClick() {

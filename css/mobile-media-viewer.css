@@ -103,7 +103,8 @@
 
 .mobile .media-viewer-container.video footer .slideshow-button,
 .mobile .media-viewer-container.pdf footer .slideshow-button,
-.mobile .media-viewer-container.docx footer .slideshow-button {
+.mobile .media-viewer-container.docx footer .slideshow-button,
+.mobile .media-viewer-container.xlsx footer .slideshow-button {
     display: none;
 }
 

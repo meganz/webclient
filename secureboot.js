@@ -2967,6 +2967,10 @@ else if (!browserUpdate) {
         'docxviewer_js': {f:'js/ui/docx.viewer.js', n: 'docxviewer_js', j:4},
         'docxviewer': {f:'html/docx.viewer.html', n: 'docxviewer', j:0},
         'docxviewercss': {f:'css/docx.viewer.css', n: 'docxviewercss', j:4},
+        'xlsxparser_js': {f:'js/ui/xlsx.parser.js', n: 'xlsxparser_js', j:4},
+        'xlsxviewer_js': {f:'js/ui/xlsx.viewer.js', n: 'xlsxviewer_js', j:4},
+        'xlsxviewer': {f:'html/xlsx.viewer.html', n: 'xlsxviewer', j:0},
+        'xlsxviewercss': {f:'css/xlsx.viewer.css', n: 'xlsxviewercss', j:4},
         'clientzip_js': {f:'js/vendor/client-zip.js', n: 'clientzip_js', j:1}
     };
 

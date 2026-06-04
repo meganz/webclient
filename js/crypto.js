@@ -331,8 +331,10 @@ function api_reqfailed(channel, error) {
                     var to = String(page).startsWith('emailverify') && 'login-to-account';
                     security.showVerifyEmailDialog(to);
 
-                    // Allow user to escape from Email verification dialog in order to login a different account.
-                    return setLogOutOnNavigation();
+                    if (self.transfer_it) {
+                        logout();
+                    }
+                    return false;
                 }
                 else {
                     // Unknown reasonCode

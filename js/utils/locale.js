@@ -1067,6 +1067,7 @@ mBroadcaster.once('boot_done', function populate_l() {
 
     // MEGA io links
     const mega_io_links = {
+        'takedown': "https://mega.io/takedown",
         'terms': "https://mega.io/terms",
         'terms#recPaiSub': "https://mega.io/terms#RecurringPaidSubscriptions",
         'terms#ref': "https://mega.io/terms#Refunds",
@@ -1653,6 +1654,34 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[S2]', '<span>')
         .replace('[S3]', '<span>')
         .replace(/\[\/S\d]/g, '</span>');
+
+    l.dl_vals_file_error = escapeHTML(l.dl_vals_file_error)
+        .replace('[A]', mega_io_hyperlinks.terms)
+        .replace('[/A]', '</a>');
+    l.dl_vals_folder_error = escapeHTML(l.dl_vals_folder_error)
+        .replace('[A]', mega_io_hyperlinks.terms)
+        .replace('[/A]', '</a>');
+    l.dl_vals_album_error = escapeHTML(l.dl_vals_album_error)
+        .replace('[A]', mega_io_hyperlinks.terms)
+        .replace('[/A]', '</a>');
+    l.dl_m_vals_file_error = escapeHTML(l.dl_m_vals_file_error)
+        .replace('[A]', mega_io_hyperlinks.terms)
+        .replace('[/A]', '</a>');
+    l.dl_m_vals_folder_error = escapeHTML(l.dl_m_vals_folder_error)
+        .replace('[A]', mega_io_hyperlinks.terms)
+        .replace('[/A]', '</a>');
+    l.dl_m_vals_album_error = escapeHTML(l.dl_m_vals_album_error)
+        .replace('[A]', mega_io_hyperlinks.terms)
+        .replace('[/A]', '</a>');
+    l.dl_vals_file_tip = escapeHTML(l.dl_vals_file_tip)
+        .replace('[A]', mega_io_hyperlinks.takedown)
+        .replace('[/A]', '</a>');
+    l.dl_vals_folder_tip = escapeHTML(l.dl_vals_folder_tip)
+        .replace('[A]', mega_io_hyperlinks.takedown)
+        .replace('[/A]', '</a>');
+    l.dl_vals_album_tip = escapeHTML(l.dl_vals_album_tip)
+        .replace('[A]', mega_io_hyperlinks.takedown)
+        .replace('[/A]', '</a>');
 
     l.manage_link_export_link_text = escapeHTML(l.manage_link_export_link_text)
         .replace('[A]',

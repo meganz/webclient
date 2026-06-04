@@ -13,7 +13,7 @@ lazy(mega.ui, 'linkAccess', () => {
             const {domNode} = this;
             const {
                 actionButton, onClick = nop,
-                icon, items, title, text,
+                icon, items, title, text, tip,
                 inputType, inputLabel
             } = options;
 
@@ -35,10 +35,14 @@ lazy(mega.ui, 'linkAccess', () => {
             }
 
             if (items && items.length) {
-                node = ce('ul', node);
+                const uln = ce('ul', node);
                 for (const item of items) {
-                    ce('li', node).textContent = item;
+                    ce('li', uln).append(parseHTML(item));
                 }
+            }
+
+            if (tip) {
+                ce('p', node).append(parseHTML(tip));
             }
 
             if (inputType) {
@@ -282,7 +286,7 @@ lazy(mega.ui, 'linkAccess', () => {
          * @returns {void}
         */
         showErrorUI(res) {
-            const [title, text, items = []] = Array.isArray(res) ? res : this.getErrorMessage(res) || [];
+            const [title, text, items = [], tip] = Array.isArray(res) ? res : this.getErrorMessage(res) || [];
 
             if (!text) {
                 return false;
@@ -297,6 +301,7 @@ lazy(mega.ui, 'linkAccess', () => {
                 items,
                 icon: is_mobile ? 'sprite-mobile-fm-mono icon-alert-circle-thin-outline' :
                     'sprite-fm-mono icon-x-circle-thin-solid',
+                tip,
             });
 
             this.data.accessBox.show();
@@ -314,9 +319,21 @@ lazy(mega.ui, 'linkAccess', () => {
              * l.dl_na_file_error
              * l.dl_na_folder_error
              * l.dl_na_album_error
+             * l.dl_na_file_tip
+             * l.dl_na_folder_tip
+             * l.dl_na_album_tip
              * l.dl_na_file_err_header
              * l.dl_na_folder_err_header
              * l.dl_na_album_err_header
+             * l.dl_vals_file_error
+             * l.dl_vals_folder_error
+             * l.dl_vals_album_error
+             * l.dl_m_vals_file_error
+             * l.dl_m_vals_folder_error
+             * l.dl_m_vals_album_error
+             * l.dl_vals_file_tip
+             * l.dl_vals_folder_tip
+             * l.dl_vals_album_tip
              * l.dl_expired_file_err
              * l.dl_expired_folder_err
              * l.dl_expired_album_err
@@ -328,9 +345,11 @@ lazy(mega.ui, 'linkAccess', () => {
              * l.dl_temp_na_album_err
             */
             const type = pfcol ? 'album' : pfid ? 'folder' : 'file';
-            const naString = l[`dl_na_${type}_error`].split('[BR]');
+            const naString = l[`dl_na_${type}_error`];
+            const naTip = l[`dl_na_${type}_tip`];
             let text = null;
             let items = null;
+            let tip = null;
             let title = null;
 
             if (typeof res === 'object' && res.err < 0 && res.u !== 7) {
@@ -342,7 +361,9 @@ lazy(mega.ui, 'linkAccess', () => {
             */
             if (res === ETOOMANY) {
                 title = l[`dl_na_${type}_err_header`];
-                text = l[731];
+                text =  l.dl_na_error_reasons;
+                items = l[`dl_m_vals_${type}_error`];
+                tip = l[`dl_vals_${type}_tip`];
             }
             else if (typeof res === 'number' && res < 0) {
                 /*
@@ -365,6 +386,7 @@ lazy(mega.ui, 'linkAccess', () => {
                 else {
                     text = l.dl_na_error_reasons;
                     items = naString;
+                    tip = naTip;
                 }
             }
             else if (res.err < 0) {
@@ -393,7 +415,9 @@ lazy(mega.ui, 'linkAccess', () => {
                 */
                 else {
                     title = l[`dl_na_${type}_err_header`];
-                    text = l.dl_gross_violation_err;
+                    text =  l.dl_na_error_reasons;
+                    items = l[`dl_vals_${type}_error`];
+                    tip = l[`dl_vals_${type}_tip`];
                 }
                 console.assert(res.u === 7);
             }
@@ -411,10 +435,11 @@ lazy(mega.ui, 'linkAccess', () => {
                 */
                 text = l.dl_na_error_reasons;
                 items = naString;
+                tip = naTip;
             }
 
             if (text) {
-                return [title || l[`dl_${type}_wo_access`], text, items];
+                return [title || l[`dl_${type}_wo_access`], text, items && items.split('[BR]'), tip];
             }
 
             return false;

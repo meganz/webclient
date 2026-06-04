@@ -598,6 +598,7 @@ var security = {
                 $('#loading').addClass('hidden');
                 parsepage(pages['dialogs-common']);
                 $dialog = $('.mega-dialog.' + name);
+                onIdle(() => fm_hideoverlay());
             }
             var showLoading = function() {
                 loadingDialog.show();
@@ -639,10 +640,7 @@ var security = {
                             return msgDialog('warninga', l[135], l[47], res < 0 ? api_strerror(res) : l[253], reset);
                         }
 
-                        u_logout(true);
-
-                        u_handle = res[4];
-                        u_attr = {u: u_handle, email: res[1], privk: res[6].privk, evc: code, evk: res[6].k};
+                        const verify = {u: res[4], email: res[1], privk: res[6].privk, evc: code, evk: res[6].k};
 
                         if (is_mobile) {
                             $('button.js-close', $dialog).addClass('hidden');
@@ -657,18 +655,22 @@ var security = {
                             $('.cancel-email-verify', $dialog).addClass('hidden');
                         }
 
-                        $('.mail', $dialog).val(u_attr.email);
+                        $('.mail', $dialog).val(verify.email);
                         $('button.next', $dialog).rebind('click.ve', function() {
                             var $input = $('.pass', $dialog);
                             var pwd = $input.val();
 
-                            if (!window.u_attr || !u_attr.evk) {
+                            if (!verify.evk) {
                                 return tell(ESID);
                             }
 
                             showLoading();
-                            security.verifyPassword(pwd, u_attr.evk, u_attr.privk)
+                            security.verifyPassword(pwd, verify.evk, verify.privk)
                                 .then(function(res) {
+                                    u_logout(true);
+
+                                    u_handle = verify.u;
+                                    u_attr = verify;
                                     u_k = res.k;
                                     u_attr.aav = 1 + !!res.s;
                                     reset({to: 'set-new-pass'});
@@ -730,6 +732,7 @@ var security = {
                                     u_logout(true);
                                     eventlog(99728);
                                     loadSubPage('login');
+                                    location.reload();
                                 })
                                 .catch(function(ex) {
                                     hideLoading();

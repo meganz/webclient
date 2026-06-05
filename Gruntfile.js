@@ -937,7 +937,7 @@ const [postTaskFinalizer, postHtmlTreeWalker, postHtmlURLRebase, postCssURLRebas
     const doImagery = (asset, size, hash, source, mtime) => {
         const ok = !asset.pathname.includes('fonts/') && isNewerThanOneYear(mtime);
 
-        if (ok) {
+        if (ok || /js[\\/]ui/i.test(asset.absolutePath)) {
             const src = asset.absolutePath;
             const dst = getUniquePathID(src).replace(/-(\w+)$/, `.${hash}.$1`);
 

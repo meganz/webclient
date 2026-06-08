@@ -482,6 +482,8 @@ class MegaMobileViewOverlay extends MegaComponent {
      */
     getActionsArray(downloadSupport, isLink, isPreviewable, isInfo) {
 
+        const canShare = !pfid && M.currentrootid !== 'shares';
+
         const buttons = {
             'saveToMegaButton' : ['import-button', l.btn_imptomega, () => {
                 if (!this.nodeComponent) {
@@ -503,7 +505,7 @@ class MegaMobileViewOverlay extends MegaComponent {
                 goToMobileApp(MegaMobileViewOverlay.getAppLink(this.nodeComponent.handle));
             }],
 
-            'downloadButton': ['download-button', pfid ? l[58] : 'icon-download-thin', () => {
+            'downloadButton': ['download-button', canShare ? 'icon-download-thin' : l[58], () => {
                 if (!validateUserAction() || !this.nodeComponent) {
                     return false;
                 }
@@ -533,7 +535,7 @@ class MegaMobileViewOverlay extends MegaComponent {
             'saveTextButton': ['save-text-button', l[776], MegaMobileContextMenu.menuItems['.save-text'].onClick]
         };
 
-        const shareBtn = !pfid && M.currentrootid !== 'shares' && [buttons.sharelinkButton];
+        const shareBtn = canShare && [buttons.sharelinkButton];
 
         if (pfcol) {
             const arr = [[buttons.downloadButton]];

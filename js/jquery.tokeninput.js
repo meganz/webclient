@@ -97,7 +97,7 @@
             var id;
             var avatar;
             var email = item[this.tokenValue];
-            var comma;
+            var comma = this.visibleComma && ',';
 
             M.u.forEach(function (contact, contactHandle) {
                 if (contact.m === email) {
@@ -107,13 +107,9 @@
                 }
             });
 
-            avatar = useravatar.contact(id || email, 'search-avatar', 'span');
-            comma = ',';
-            return '<li class="share-added-contact">'
-                    + (this.addAvatar ? avatar : '')
-                    + (this.enableHTML ? email : _escapeHTML(email))
-                    + (this.visibleComma ? comma : '')
-                    + '</li>';
+            avatar = this.addAvatar && useravatar.contact(id || email, 'search-avatar', 'span');
+
+            return `<li class="share-added-contact">${avatar || ''}${escapeHTML(email)}${comma || ''}</li>`;
         },
         // Tokenization settings
         tokenLimit: null,
@@ -180,27 +176,6 @@
         COMMA: 188,
         SEMICOLON: 186
     };
-
-    var HTML_ESCAPES = {
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#x27;',
-        '/': '&#x2F;'
-    };
-
-    var HTML_ESCAPE_CHARS = /[&<>"'\/]/g;
-
-    function coerceToString(val) {
-        return String((val === null || val === undefined) ? '' : val);
-    }
-
-    function _escapeHTML(text) {
-        return coerceToString(text).replace(HTML_ESCAPE_CHARS, function(match) {
-            return HTML_ESCAPES[match];
-        });
-    }
 
     // Additional public (exposed) methods
     var methods = {
@@ -436,7 +411,7 @@
             // Get width left on the current line
             var width_left = token_list.outerWidth() - input_box.offset().left - token_list.offset().left;
             // Enter new content into resizer and resize input accordingly
-            input_resizer.html(_escapeHTML(input_val));
+            input_resizer.text(input_val);
             // Get maximum width, minimum the size of input and maximum the widget's width
             input_box.width(Math.min(
                 token_list.outerWidth() || 30,
@@ -820,7 +795,9 @@
         //
 
         function escapeHTML(text) {
-            return $(input).data("settings").enableHTML ? text : _escapeHTML(text);
+            // @todo check the achievements.js code, and/or wherever else this may be used
+            console.assert(!$(input).data("settings").enableHTML, `It's 2026+ don't use weak enableHTML`);
+            return self.escapeHTML(text);
         }
 
         // Toggles the widget between enabled and disabled state, or according
@@ -878,7 +855,7 @@
 
         // Inner function to a token to the list
         function insert_token(item) {
-            var $this_token = $($(input).data("settings").tokenFormatter(item));
+            var $this_token = $(parseHTML($(input).data("settings").tokenFormatter(item)).firstElementChild);
             var readonly = item.readonly === true ? true : false;
 
             if (readonly)
@@ -1239,7 +1216,7 @@
 
         function show_dropdown_searching() {
             if ($(input).data("settings").searchingText && $(input).data("settings").searchDropdown) {
-                dropdown.html("<p>" + escapeHTML($(input).data("settings").searchingText) + "</p>");
+                dropdown.safeHTML('<p>@@</p>', $(input).data("settings").searchingText);
                 show_dropdown();
             }
             else {
@@ -1249,7 +1226,7 @@
 
         function show_dropdown_hint() {
             if ($(input).data("settings").hintText && $(input).data("settings").searchDropdown) {
-                dropdown.html("<p>" + escapeHTML($(input).data("settings").hintText) + "</p>");
+                dropdown.safeHTML('<p>@@</p>', $(input).data("settings").hintText);
                 show_dropdown();
             }
         }
@@ -1331,7 +1308,7 @@
                     var this_li = $(input).data("settings").resultsFormatter(value);
 
                     this_li = find_value_and_highlight_term(this_li, value[$(input).data("settings").propertyToSearch], query);
-                    this_li = $(this_li).appendTo(dropdown_ul);
+                    this_li = $(parseHTML(this_li).firstElementChild).appendTo(dropdown_ul);
 
                     if (index % 2) {
                         this_li.addClass($(input).data("settings").classes.dropdownItem);
@@ -1357,7 +1334,7 @@
                 }
             } else {
                 if ($(input).data("settings").noResultsText) {
-                    dropdown.html("<p>" + escapeHTML($(input).data("settings").noResultsText) + "</p>");
+                    dropdown.safeHTML('<p>@@</p>', $(input).data("settings").noResultsText);
                     show_dropdown();
                 }
             }

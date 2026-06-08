@@ -473,6 +473,9 @@ lazy(mega.ui, 'secondaryNav', () => {
             if (!ev.currentTarget.rightIcon) {
                 viewChangeHandler(this.attr('viewmode') | 0);
             }
+            else {
+                mega.ui.menu.hide();
+            }
         }
     };
 

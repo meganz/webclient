@@ -1879,7 +1879,7 @@ pro.propay = {
                 const monthlyPlan = months === 1 ? this.planObj : pro.getPlanObj(this.planObj.level, 1);
 
                 const preTaxPrice = monthlyPlan
-                    ? monthlyPlan.getFormattedPrice('narrowSymbol', forceEuro, false, months)
+                    ? monthlyPlan.getFormattedPrice('narrowSymbol', forceEuro, false, discountDuration)
                     : this.planObj
                         .getFormattedPrice('narrowSymbol', forceEuro, this.isVoucherBalance(), discountDuration);
 

@@ -1718,6 +1718,17 @@ pro.propay = {
                     );
             }
 
+            // S4-flagged discount codes get an extra egress feature line
+            if (this.discountInfo && this.discountInfo.s4) {
+                $includesContent
+                    .safeAppend(
+                        `<div class="plan-card-s4">
+                            <i class="sprite-fm-mono icon-bucket-triangle-thin-outline"></i>
+                            ${l.s4_egress_feature}
+                        </div>`
+                    );
+            }
+
             $('.includes', $planCard).removeClass('hidden');
             $includesContent.removeClass('hidden');
         }

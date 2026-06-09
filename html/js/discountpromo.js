@@ -114,6 +114,19 @@ class DiscountPromo {
         mega.discountCode = mega.discountCode || res.dc;
     }
 
+    static async refreshDiscountInfo() {
+        const dc = mega.discountCode || mega.discountInfo && mega.discountInfo.dc;
+        if (!mega.discountInfo || !dc) {
+            return false;
+        }
+        const { result } = await api.req({a: 'dci', v: 2, dc, su: mega.shortUrl, extra: true}).catch(dump) || {};
+        if (result && result.al && result.pd) {
+            DiscountPromo.storeDiscountInfo(result);
+            return result;
+        }
+        return false;
+    }
+
     /**
      * Get the plan that matches the discount promotion
      * @returns {Array} Returns the plan details

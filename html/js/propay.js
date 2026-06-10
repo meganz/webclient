@@ -1718,6 +1718,17 @@ pro.propay = {
                     );
             }
 
+            // S4-flagged discount codes get an extra egress feature line
+            if (this.discountInfo && this.discountInfo.s4) {
+                $includesContent
+                    .safeAppend(
+                        `<div class="plan-card-s4">
+                            <i class="sprite-fm-mono icon-bucket-triangle-thin-outline"></i>
+                            ${l.s4_egress_feature}
+                        </div>`
+                    );
+            }
+
             $('.includes', $planCard).removeClass('hidden');
             $includesContent.removeClass('hidden');
         }
@@ -1868,7 +1879,7 @@ pro.propay = {
                 const monthlyPlan = months === 1 ? this.planObj : pro.getPlanObj(this.planObj.level, 1);
 
                 const preTaxPrice = monthlyPlan
-                    ? monthlyPlan.getFormattedPrice('narrowSymbol', forceEuro, false, months)
+                    ? monthlyPlan.getFormattedPrice('narrowSymbol', forceEuro, false, discountDuration)
                     : this.planObj
                         .getFormattedPrice('narrowSymbol', forceEuro, this.isVoucherBalance(), discountDuration);
 

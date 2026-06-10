@@ -487,15 +487,15 @@ lazy(T.ui, 'addFilesLayout', () => {
                     if (n.s > 9) {
                         nodes.add(n.h);
                     }
-                    parents[n.p] = 1;
-
                     lst[i].size = n.s;
                     lst[i].name = n.name;
                 }
                 else {
                     lst.splice(i, 1);
                 }
+                parents[n.p] = 1;
             }
+
             if (!lst.length) {
                 console.warn('Nothing (new) to add...', sel);
                 this.toggleLoading(true);

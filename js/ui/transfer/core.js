@@ -247,6 +247,7 @@ lazy(self.T, 'core', () => {
             return resolver.promise;
         }
     };
+    const {xsid, xapipath} = storage;
 
     queueMicrotask(() => {
         T.core.getPersistentValue('opw')
@@ -258,7 +259,7 @@ lazy(self.T, 'core', () => {
 
     return freeze({
         get apipath() {
-            return 'https://bt7.api.mega.co.nz/';
+            return xapipath || 'https://bt7.api.mega.co.nz/';
         },
         wkpool: [],
 
@@ -511,6 +512,9 @@ lazy(self.T, 'core', () => {
             }
             const {h, xh, name} = n;
             const setLink = (base) => {
+                if (xsid) {
+                    base = base.replace('?', `?sid=${(xsid | 0) > 0 ? u_storage.sid : xsid}&`);
+                }
                 M.l[h] = `${base}${encodeURIComponent(name)}`;
                 if (xPwStore[xh]) {
                     M.l[h] += `${M.l[h].includes('?') ? '&' : '?'}pw=${xPwStore[xh]}`;

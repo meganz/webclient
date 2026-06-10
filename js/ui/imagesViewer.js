@@ -1673,7 +1673,7 @@ var slideshowid;
 
         let rv;
         const current = slideshow_handle();
-        const vstream = preqs[current] instanceof Streamer && preqs[current];
+        const vstream = self.Streamer && preqs[current] instanceof Streamer && preqs[current];
 
         if (vstream) {
             if (vstream.ended) {

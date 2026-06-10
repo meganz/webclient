@@ -1119,6 +1119,18 @@ MegaData.prototype.adjustContextMenuPosition = function(ev, menuNode) {
     // at which the event occurred (as opposed to the coordinates within the page)
     const { clientX, clientY } = ev instanceof MegaDataEvent ? ev.originalEvent : ev;
 
+    const getDelegate = (ev) => {
+        let delegate = ev.type === 'contextmenu'
+            ? ev.currentTarget || ev.target || ev.delegateTarget
+            : ev.delegateTarget || ev.currentTarget || ev.target;
+
+        if (delegate instanceof MegaComponent) {
+            delegate = delegate.domNode;
+        }
+
+        return delegate;
+    };
+
     // If a DOM element loses its children while ctx menu is opened from the ... menu,
     // We need to search for the new `delegateTarget` to calculate offsets
     // Currently only necessary for DC. Subject to change.
@@ -1146,12 +1158,10 @@ MegaData.prototype.adjustContextMenuPosition = function(ev, menuNode) {
     };
 
     let mPos;
+    const delegate = getDelegate(ev);
+
     if (ev.type === 'click' && !ev.calculatePosition) {
         // left click
-        let delegate = ev.delegateTarget || ev.currentTarget;
-        if (delegate instanceof MegaComponent) {
-            delegate = delegate.domNode;
-        }
         const ico = { x: delegate.clientWidth, y: delegate.clientHeight };
         if (!ico.x && !ico.y && !document.contains(delegate)) {
             delegate = getLostDelegate(ev);
@@ -1169,7 +1179,23 @@ MegaData.prototype.adjustContextMenuPosition = function(ev, menuNode) {
     }
     else {
         // right click
-        mPos = M.reCalcMenuPosition(menuNode, clientX, clientY);
+        const rect = delegate.getBoundingClientRect();
+        const scrollTop = $.disabledContianer ? $.disabledContianer[0].getBoundingClientRect().top : 0;
+
+        if (!elementIsVisible(delegate) || rect.bottom < scrollTop) {
+            return false;
+        }
+
+        ev.menuAnchorOffset = ev.menuAnchorOffset || {
+            x: clientX - rect.left,
+            y: clientY - rect.top
+        };
+
+        mPos = M.reCalcMenuPosition(
+            menuNode,
+            rect.left + Math.min(ev.menuAnchorOffset.x, rect.width),
+            rect.top + Math.min(ev.menuAnchorOffset.y, rect.height)
+        );
     }
 
     // set menu position

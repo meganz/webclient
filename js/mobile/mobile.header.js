@@ -985,3 +985,5 @@ lazy(MegaMobileHeader, 'headings', () => {
         'keybackup': l[8839]
     });
 });
+
+MegaMobileHeader.prototype.showTargetedDiscountButton = nop;

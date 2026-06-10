@@ -1366,8 +1366,12 @@ lazy(mega.ui, 'secondaryNav', () => {
             startedScrolling = true;
             const doMove = () => {
                 moveUpTimer = false;
+                const { actionsHolder } = this;
+                if (!actionsHolder) {
+                    return;
+                }
                 const actions = mega.ui.header.domNode.querySelector('.nav-secondary-actions');
-                actions.appendChild(this.actionsHolder);
+                actions.appendChild(actionsHolder);
                 actions.classList.remove('hidden');
                 actions.firstElementChild.classList.remove('collapse');
                 actions.classList.add('expand');

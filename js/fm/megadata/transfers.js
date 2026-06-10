@@ -1539,6 +1539,7 @@ function tfsheadupdate(update) {
     if (update) {
         tfsheadcalc(update);
     }
+    return tfsheadupdate.stats;
 }
 
 function tfsheadcalc(update) {

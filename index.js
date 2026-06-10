@@ -2077,7 +2077,7 @@ function topmenuUI() {
             pmlayout : document.getElementById('startholder');
 
         // Header is exist but not available on dom, so lets re-init it.
-        if (!holder.contains(mega.ui.header.domNode)) {
+        if (holder && !holder.contains(mega.ui.header.domNode)) {
             mega.ui.header.destroy();
             delete mega.ui.header;
 

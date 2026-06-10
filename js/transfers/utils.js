@@ -515,20 +515,21 @@ function bindTransfersMassEvents(context) {
                 time('dlm:abort', () => dlmanager.abort(null));
                 time('ulm:abort', () => ulmanager.abort(null));
                 time('tfs:abort', () => {
+                    const stats = tfsheadupdate();
                     if (typeof $.removeTransferItems === 'function') {
                         const keys = Object.keys(ulmanager.ulCompletingPhase);
                         if (d && keys.length) {
                             console.log('Not removing %d completing uploads', keys.length);
                         }
                         const ids = [
-                            ...Object.keys(tfsheadupdate.stats.dl),
-                            Object.keys(tfsheadupdate.stats.ul).filter(id => !keys.includes(id))
+                            ...Object.keys(stats.dl),
+                            Object.keys(stats.ul).filter(id => !keys.includes(id))
                         ];
                         $.removeTransferItems(ids);
                     }
                     else {
                         tfsheadupdate({
-                            c: [...Object.keys(tfsheadupdate.stats.dl), ...Object.keys(tfsheadupdate.stats.ul)]
+                            c: [...Object.keys(stats.dl), ...Object.keys(stats.ul)]
                         });
                         mega.tpw.clearRows(null);
                     }

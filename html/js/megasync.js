@@ -288,7 +288,9 @@ var megasync = (function() {
                                                 `);
                                             }
                                         })
-                                        .catch((ex) => promise.reject(ex));
+                                        .catch((ex) => {
+                                            promise.reject(ex);
+                                        });
                                 }
                             });
                         }

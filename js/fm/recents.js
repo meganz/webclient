@@ -777,7 +777,7 @@ RecentsRender.prototype.getActionIcon = function(action) {
         if (action.path[0].h === M.cf.h) {
             return 'folder-chat';
         }
-        if (action.path[1].s4Root) {
+        if (action.path.length > 1 && action.path[1].s4Root) {
             return 'bucket';
         }
         if (mega.fileRequest && mega.fileRequest.publicFolderExists(action.path[0].h)) {

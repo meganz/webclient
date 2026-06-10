@@ -2387,6 +2387,18 @@ accountUI.security = {
                 }
 
                 M.refreshSessionList(function() {
+                    if (!M.account || !M.account.sessions) {
+                        if (accountUI.security.session.update._retry) {
+                            delete accountUI.security.session.update._retry;
+                        }
+                        else {
+                            // Retry once after bogus state
+                            accountUI.security.session.update._retry = true;
+                            onIdle(() => accountUI.security.session.update(force));
+                        }
+                        return;
+                    }
+                    delete accountUI.security.session.update._retry;
                     var fSession = M.account.sessions[0];
                     var domList =  document.querySelectorAll('.data-table.sessions tr');
 

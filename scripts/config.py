@@ -42,8 +42,12 @@ STYLELINT_RULES = '-f compact'
 JSCS_RULES = ''
 JSCPD_RULES = '-l 13 -r console'
 HTMLHINT_RULES = '--config ./.htmlhintrc'
-VALIDATOR_IGNORE_FILES = ['js/cmsSnapshot.js', 'js/chat/bundle.js', 'nacl-fast.js', 'makecache.js', 'pdf.worker.js']
+ESLINT_CASCADING_RULES = ['no-const-assign', 'no-shadow', 'no-undef', 'no-unreachable', 'no-unused-vars']
+VALIDATOR_IGNORE_FILES = ['js/chat/bundle.js', 'nacl-fast.js', 'sqlite3.js', 'pdf.worker.js']
+VALIDATOR_IGNORE_UTF8 = ['secureboot', 'test', 'emoji', 'dont-deploy', 'pdf.worker', 'images' + os.path.sep]
 VALIDATOR_LINELEN_THRESHOLD = 120 # Max chars per line to trigger.
+VALIDATOR_LARGEFILE_THRESHOLD = 190000  # Max bytes per file to trigger.
+VALIDATOR_LARGEFILE_IGNORE = ['js/ui/xlsx.parser.js']
 
 # Vera++ rules like this should be superseded by a "profile", but it
 # doesn't work well, yet, on Vera++ v1.2 :-(

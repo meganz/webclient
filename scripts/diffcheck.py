@@ -165,6 +165,7 @@ def reduce_eslint(file_line_mapping, **extra):
     os.chdir(PROJECT_PATH)
     rules = config.ESLINT_RULES if not norules else ''
     files_to_test = pick_files_to_test(file_line_mapping)
+    cascading_rules = config.ESLINT_CASCADING_RULES
 
     if len(files_to_test) == 0:
         logging.info('ESLint: No modified JavaScript files found.')
@@ -204,8 +205,11 @@ def reduce_eslint(file_line_mapping, **extra):
         if parse_result:
             file_name, line_no = parse_result[0][0], int(parse_result[0][1])
             file_name = tuple(re.split(PATH_SPLITTER, file_name))
+
+            is_cascading_failure = any(rule in line for rule in cascading_rules)
+
             # Check if the line is part of our selection list.
-            if line_no in file_line_mapping[file_name]:
+            if line_no in file_line_mapping[file_name] or is_cascading_failure:
                 if re.search(r': line \d+, col \d+, Warning - ', line):
                     warnings += 1
                     warning_result.append(line)
@@ -516,29 +520,6 @@ def inspecthtml(file, ln, line, result):
 
     return fatal
 
-def validate_strings(key_value_pairs):
-    strings = OrderedDict()
-    duplicated_keys = []
-    for key, value in key_value_pairs:
-        if key in strings:
-           duplicated_keys.append(key)
-        else:
-           strings[key] = value
-    if len(duplicated_keys) > 0:
-        return (True, duplicated_keys)
-    return (False, strings)
-
-def natural_sort(a,b):
-    if a.isnumeric() and b.isnumeric():
-        a = int(a)
-        b = int(b)
-    if a > b:
-        return 1
-    elif a < b:
-        return -1
-    else:
-        return 0
-
 def reduce_validator(file_line_mapping, **extra):
     """
     Checks changed files for contents and alalyzes them.
@@ -551,7 +532,6 @@ def reduce_validator(file_line_mapping, **extra):
     """
 
     exclude = ['vendor', 'asm', 'sjcl', 'dont-deploy', 'secureboot', 'test']
-    special_chars_exclude = ['secureboot', 'test', 'emoji', 'dont-deploy', 'pdf.worker', 'images' + os.path.sep]
     logging.info('Analyzing modified files ...')
     result = ['\nValidator output:\n=================']
     warning = 'This is a security product. Do not add unverifiable code to the repository!'
@@ -562,7 +542,7 @@ def reduce_validator(file_line_mapping, **extra):
         file_path = os.path.join(*filename)
         file_extension = os.path.splitext(file_path)[-1]
 
-        if not any([n in file_path for n in special_chars_exclude]) and file_extension not in ['.py', '.sh']:
+        if file_extension not in ['.py', '.sh'] and not any([n in file_path for n in config.VALIDATOR_IGNORE_UTF8]):
             if analyse_files_for_special_chars(file_path, result):
                 fatal += 1
                 # break
@@ -586,7 +566,9 @@ def reduce_validator(file_line_mapping, **extra):
                           .format(file_path, warning))
             # continue
 
-        if os.path.getsize(file_path) > 190000 and not file_extension in ['.css', '.html']:
+        if (not file_path in config.VALIDATOR_LARGEFILE_IGNORE
+                and not file_extension in ['.css', '.html']
+                and os.path.getsize(file_path) > config.VALIDATOR_LARGEFILE_THRESHOLD):
             result.append('The file "{}" has turned too big, '
                           'any new functions must be moved elsewhere.'.format(file_path))
             # continue

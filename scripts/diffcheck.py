@@ -206,17 +206,20 @@ def reduce_eslint(file_line_mapping, **extra):
             file_name, line_no = parse_result[0][0], int(parse_result[0][1])
             file_name = tuple(re.split(PATH_SPLITTER, file_name))
 
-            is_cascading_failure = any(rule in line for rule in cascading_rules)
+            is_modified_code = True if line_no in file_line_mapping[file_name] else False
+            is_cascading_failure = False if is_modified_code else any(rule in line for rule in cascading_rules)
 
             # Check if the line is part of our selection list.
-            if line_no in file_line_mapping[file_name] or is_cascading_failure:
-                if re.search(r': line \d+, col \d+, Warning - ', line):
+            if is_modified_code or is_cascading_failure:
+                if ((is_cascading_failure and "no-unused-vars" in line)
+                        or re.search(r': line \d+, col \d+, Warning - ', line)):
+                    submsg = "" if is_modified_code else " - Ignore if it does not affect your code."
+                    warning_result.append(f"{line}{submsg}")
                     warnings += 1
-                    warning_result.append(line)
                 else:
                     result.append(line)
 
-    result = result + warning_result;
+    result = result + warning_result
 
     # Add the number of errors and return in a nicely formatted way.
     error_count = len(result) - 1

@@ -2665,10 +2665,13 @@ var addressDialog = {
                     Promise.resolve(new BusinessAccount().updateBusinessAttrs([{ key: taxAttr, val: taxCode }]))
             )
                 .then(() => {
-                    return Promise.all([
-                        pro.loadMembershipPlans(nop, true),
-                        DiscountPromo.refreshDiscountInfo(),
-                    ]);
+                    if (mega.discountInfo) {
+                        return Promise.all([
+                            pro.loadMembershipPlans(nop, true),
+                            DiscountPromo.refreshDiscountInfo(),
+                        ]);
+                    }
+                    return pro.loadMembershipPlans(nop, true);
                 })
                 .then(() => {
                     // Assume that busines plan does not have an instant discount

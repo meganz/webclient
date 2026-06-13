@@ -710,6 +710,13 @@
                     let target = originalTarget;
                     let isInboxRoot = false;
 
+                    // A supported archive file (.zip/.tar/.gz) opens in the
+                    // read-only archive browser - same as double-clicking it.
+                    if (mega.zipBrowser && mega.zipBrowser.canOpen(target)) {
+                        mega.zipBrowser.openArchive(target).catch(tell);
+                        return;
+                    }
+
                     if (
                         M.currentrootid === 'out-shares' ||
                         M.currentrootid === 'public-links' ||

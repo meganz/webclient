@@ -3137,6 +3137,11 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
                 })
                 .catch(tell);
         }
+        else if (mega.zipBrowser.canOpen(n)) {
+            // Open supported archives (.zip/.tar/.gz) as a read-only folder view.
+            // All logic is encapsulated in js/zip-browser.js.
+            mega.zipBrowser.openArchive(n).catch(tell);
+        }
         else if (is_image2(n) || is_video(n)) {
             if (is_video(n)) {
                 $.autoplay = h;

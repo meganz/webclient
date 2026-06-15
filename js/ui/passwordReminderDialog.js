@@ -12,6 +12,8 @@
     var SHOW_AFTER_LASTSUCCESS = 90 * DAY;
     var RECHECK_INTERVAL = 15 * 60;
 
+    const LOGOUT_DIALOG_START_PAGES = new Set(['pro', 'support']);
+
     if (DEBUG) {
         SHOW_AFTER_LASTLOGIN = 15;
         SHOW_AFTER_LASTSKIP = 30;
@@ -311,8 +313,8 @@
             }
         }
 
-        onTopmenuReinit() {
-            if (this.topIcon && !document.body.contains(this.topIcon)) {
+        onTopmenuReinit(holder) {
+            if (this.topIcon && !(holder || document.body).contains(this.topIcon)) {
                 this.hideDialog();
                 this.initialised = false;
                 this.topIcon = null;
@@ -408,7 +410,7 @@
 
                 if (
                     !skipShowingDialog &&
-                    is_fm() &&
+                    (is_fm() || LOGOUT_DIALOG_START_PAGES.has(page)) &&
                     !pfid &&
                     (
                         !this.passwordReminderAttribute.lastSkipped ||
@@ -557,7 +559,7 @@
                 u_type === 3 &&
                 !this.passwordReminderAttribute.dontShowAgain &&
                 page !== 'start' &&
-                (is_fm() || dlid)
+                (is_fm() || dlid || LOGOUT_DIALOG_START_PAGES.has(page))
             ) {
                 const { promise } = mega;
                 this.showDialog(promise);

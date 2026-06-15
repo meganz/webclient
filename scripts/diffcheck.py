@@ -221,7 +221,10 @@ def reduce_eslint(file_line_mapping, **extra):
             if is_modified_code or is_cascading_failure:
                 if ((is_cascading_failure and "no-unused-vars" in line)
                         or re.search(r': line \d+, col \d+, Warning - ', line)):
-                    submsg = "" if is_modified_code else " - Ignore if it does not affect your code."
+                    submsg = ""
+                    if is_cascading_failure:
+                        submsg = " - Ignore if it does not affect your code."
+                        line = re.sub(r"(?:Error|Warning)[\s-]+", 'XXX ', line)
                     warning_result.append(f"{line}{submsg}")
                     warnings += 1
                 else:

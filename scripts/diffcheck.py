@@ -548,7 +548,7 @@ def reduce_validator(file_line_mapping, **extra):
     warning = 'This is a security product. Do not add unverifiable code to the repository!'
     fatal = 0
     async_msg = "Avoid async event handlers/executors, they bypass local error context and invite race conditions."
-    async_rex = r"(?:\b(?:on)?[a-zA-Z]+['\"]?\s*:\s*|\b(rebind|on|bind|delegate|addEventListener|new\s+Promise)\s*\(\s*([^)]*?)\s*,\s*)\basync\b"
+    async_rex = r"(?:\b(?:on)?[Cc]lick+['\"]?\s*:\s*|then\s*\(\s*|\b(rebind|on|bind|delegate|addEventListener|new\s+Promise)\s*\(\s*([^)]*?)\s*,\s*)\basync\b"
 
     # Analise newly added files
     kebab_pattern = r"^[a-z0-9]+(-[a-z0-9]+)*([.-][0-9]+(\.[0-9]+)*)?$"

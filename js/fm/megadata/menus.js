@@ -1158,7 +1158,7 @@ MegaData.prototype.adjustContextMenuPosition = function(ev, menuNode) {
     };
 
     let mPos;
-    const delegate = getDelegate(ev);
+    let delegate = getDelegate(ev);
 
     if (ev.type === 'click' && !ev.calculatePosition) {
         // left click

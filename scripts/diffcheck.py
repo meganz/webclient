@@ -547,6 +547,8 @@ def reduce_validator(file_line_mapping, **extra):
     result = ['\nValidator output:\n=================']
     warning = 'This is a security product. Do not add unverifiable code to the repository!'
     fatal = 0
+    async_msg = "Avoid async event handlers/executors, they bypass local error context and invite race conditions."
+    async_rex = r"(?:\b(?:on)?[a-zA-Z]+['\"]?\s*:\s*|\b(rebind|on|bind|delegate|addEventListener|new\s+Promise)\s*\(\s*([^)]*?)\s*,\s*)\basync\b"
 
     # Analise newly added files
     kebab_pattern = r"^[a-z0-9]+(-[a-z0-9]+)*([.-][0-9]+(\.[0-9]+)*)?$"
@@ -606,6 +608,10 @@ def reduce_validator(file_line_mapping, **extra):
                 # Analyse worker files.
                 if worker_upd is False and line.find('WORKER_VERSION =') > 0:
                     worker_upd = True
+
+                # Analyse async uses...
+                if re.search(async_rex, line):
+                    result.append('{}:{}: {}\n'.format(file_path, line_number, async_msg))
 
                 # Analyse CSS files...
                 if file_extension == '.css':

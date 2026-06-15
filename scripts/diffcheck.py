@@ -42,6 +42,7 @@ PLATFORMS = {'posix': 'posix',
 PROJECT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__),
                                             os.path.pardir))
 PATH_SPLITTER = re.compile(r'\\|/')
+NEW_FILES = set()
 
 BASE_BRANCH = None
 CURRENT_BRANCH = None
@@ -82,11 +83,18 @@ def get_git_line_sets(base, target):
     # Hunt down lines of changes for different files.
     file_line_mapping = collections.defaultdict(set)
     current_file = None
+    is_new_file = False
+
     for line in diff:
-        if line.startswith('+++ '):
+        if line.startswith('new file mode'):
+            is_new_file = True
+        elif line.startswith('+++ '):
             # Line giving target file.
             for_file = line.split()[1]
             current_file = tuple(re.split(PATH_SPLITTER, for_file[2:]))
+            if is_new_file:
+                NEW_FILES.add(current_file[-1])
+                is_new_file = False
         elif line.startswith('@@ '):
             # Line giving alteration line range of diff fragment.
             target_lines = line.split()[2].split(',')
@@ -539,6 +547,14 @@ def reduce_validator(file_line_mapping, **extra):
     result = ['\nValidator output:\n=================']
     warning = 'This is a security product. Do not add unverifiable code to the repository!'
     fatal = 0
+
+    # Analise newly added files
+    kebab_pattern = r"^[a-z0-9]+(-[a-z0-9]+)*([.-][0-9]+(\.[0-9]+)*)?$"
+    for file in NEW_FILES:
+        name, ext = os.path.splitext(file)
+        if ext in ['.html', '.css', '.js', '.jsx'] and not re.match(kebab_pattern, name):
+            fatal += 1
+            result.append(f"For consistency, file names must follow the kebab-case naming convention: {file}")
 
     # Analise changed lines per modified file
     for filename, line_set in file_line_mapping.items():

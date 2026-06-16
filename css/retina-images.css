@@ -233,10 +233,6 @@
         background-image: url(../images/mega/download-dialog@2x.png);
         background-size: 853px auto;
     }
-    .drag-n-drop.header, .drag-n-drop hr, .drag-n-drop.info-block i {
-        background-image: url(../images/mega/overlay-sprite@2x.png);
-        background-size: 400px auto;
-    }
     .dropdown.hint-thumb {
         background-image: url(../images/mega/hints-sprite@2x.png);
         background-size: 660px auto;

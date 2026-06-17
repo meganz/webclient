@@ -338,6 +338,14 @@ lazy(mega, 'linkImport', () => {
                         return l.url_import_temporarily_unavailable;
                     }
 
+                    if (err === ERATELIMIT) {
+                        return l.url_import_rate_limit;
+                    }
+
+                    if (err === EARGS) {
+                        return l.url_import_too_large;
+                    }
+
                     return l.url_import_invalid_link;
                 }
 
@@ -959,7 +967,11 @@ lazy(mega, 'linkImport', () => {
 
                         if (googleLinks.length) {
 
-                            const googleResArray = await handlers.google.import(googleLinks, h).catch(echo);
+                            const googleResArray = await handlers.google.import(googleLinks, h).catch(ex => {
+                                // surface a friendly error (e.g. rate limit) instead of failing silently
+                                msgDialog('warninga', '', l.mig_fail, ex);
+                                return [];
+                            });
 
                             for (const googleRes of googleResArray) {
 

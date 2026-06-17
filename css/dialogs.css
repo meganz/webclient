@@ -1898,74 +1898,73 @@ body.de .mega-dialog.contact-picker-widget {
     z-index: 2000;
     width: 100%;
     height: 100%;
-    left: 0;
-    top: 0;
-    background-color: rgba(0,0,0,0.4);
+    margin: 16px;
+    bottom: 0;
+    right: 0;
+    background: var(--mobile-surface-1);
+    border: var(--mobile-border-strong-selected) dashed 2px;
+    border-radius: 8px;
 }
+.drag-n-drop.overlay.transparent-overlay {
+    background: var(--mobile-surface-transparent-subtle);
+}
+body:not(.in-call) .drag-n-drop.overlay.chat-offset {
+    right: 256px;
+}
+
+@media only screen and (min-width: 1200px) {
+    .drag-n-drop.overlay.flyout-offset {
+        right: var(--flyout-width);
+    }
+}
+
 .drag-n-drop.content {
     position: absolute;
     width: 400px;
-    height: 168px;
-    display: table;
-    background-color: white;
-    border-radius: 4px;
+    display: flex;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translate(-50%, -50%);
     top: 50%;
-    margin-top: -64px;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    pointer-events: none;
 }
 .drag-n-drop.header {
-    height: 211px;
-    margin: -83px auto 0 auto;
-    background-image: url(../images/mega/overlay-sprite.png);
-    background-position: center top;
+    background-image: url('../images/mega/glass/glass-cloud-arrow-up-angle.png');
+    background-size: contain;
+    background-position: center;
     background-repeat: no-repeat;
-    font-size: 36px;
-    line-height: 40px;
-    letter-spacing: 0.2px;
-    font-family: 'source_sans_prolight', sans-serif;
-    text-align: center;
-    color: rgba(51,51,51,0.8);
-    white-space: nowrap;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
-    padding: 139px 30px 0 30px;
-}
-.drag-n-drop.header strong {
-    font-family: 'source_sans_probold', sans-serif;
-    font-weight: normal;
-}
-.drag-n-drop hr {
+    height: 96px;
     width: 100%;
-    height: 1px;
-    border: 0;
-    margin: 0;
-    padding: 0;
-    background-image: url(../images/mega/overlay-sprite.png);
-    background-position: left -211px;
-    background-repeat: repeat-x;
 }
 .drag-n-drop.info-block {
-    font-size: 14px;
-    line-height: 18px;
-    color: #777E82;
-    padding: 9px 30px 0 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
     text-align: center;
-    opacity: 0.8;
 }
-.drag-n-drop.info-block i {
-    background-image: url(../images/mega/overlay-sprite.png);
-    background-position: 0 -240px;
-    background-repeat: no-repeat;
-    display: inline-block;
-    vertical-align: top;
-    width: 16px;
-    height: 18px;
+.drag-n-drop.info-block h1 {
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-heading-h1);
+    margin: 8px 0;
+    line-height: 40px;
+    width: 100%;
 }
-.drag-n-drop.info-block span {
-    display: inline-block;
-    vertical-align: top;
+.drag-n-drop.info-block .crumb {
+    background: var(--mobile-brand-default);
+    border-radius: 30px;
+    box-sizing: border-box;
+    height: 40px;
+    min-width: 80px;
+    max-width: 450px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding: 8px 24px;
+    color: var(--mobile-icon-on-color);
+    font: var(--mobile-font-copy-semibold);
 }
 
 /* end of Drag and Drop overlay */
@@ -3278,6 +3277,7 @@ body.de .mega-dialog.contact-picker-widget {
     margin-inline-end: 8px;
     height: 20px;
     width: 20px;
+    flex-shrink: 0;
     --icon-size: 18px;
     --mask-color: var(--mobile-text-inverse);
 }

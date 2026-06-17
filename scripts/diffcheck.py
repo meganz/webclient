@@ -42,6 +42,7 @@ PLATFORMS = {'posix': 'posix',
 PROJECT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__),
                                             os.path.pardir))
 PATH_SPLITTER = re.compile(r'\\|/')
+NEW_FILES = set()
 
 BASE_BRANCH = None
 CURRENT_BRANCH = None
@@ -82,11 +83,18 @@ def get_git_line_sets(base, target):
     # Hunt down lines of changes for different files.
     file_line_mapping = collections.defaultdict(set)
     current_file = None
+    is_new_file = False
+
     for line in diff:
-        if line.startswith('+++ '):
+        if line.startswith('new file mode'):
+            is_new_file = True
+        elif line.startswith('+++ '):
             # Line giving target file.
             for_file = line.split()[1]
             current_file = tuple(re.split(PATH_SPLITTER, for_file[2:]))
+            if is_new_file:
+                NEW_FILES.add(current_file[-1])
+                is_new_file = False
         elif line.startswith('@@ '):
             # Line giving alteration line range of diff fragment.
             target_lines = line.split()[2].split(',')
@@ -165,6 +173,7 @@ def reduce_eslint(file_line_mapping, **extra):
     os.chdir(PROJECT_PATH)
     rules = config.ESLINT_RULES if not norules else ''
     files_to_test = pick_files_to_test(file_line_mapping)
+    cascading_rules = config.ESLINT_CASCADING_RULES
 
     if len(files_to_test) == 0:
         logging.info('ESLint: No modified JavaScript files found.')
@@ -204,15 +213,24 @@ def reduce_eslint(file_line_mapping, **extra):
         if parse_result:
             file_name, line_no = parse_result[0][0], int(parse_result[0][1])
             file_name = tuple(re.split(PATH_SPLITTER, file_name))
+
+            is_modified_code = True if line_no in file_line_mapping[file_name] else False
+            is_cascading_failure = False if is_modified_code else any(rule in line for rule in cascading_rules)
+
             # Check if the line is part of our selection list.
-            if line_no in file_line_mapping[file_name]:
-                if re.search(r': line \d+, col \d+, Warning - ', line):
+            if is_modified_code or is_cascading_failure:
+                if ((is_cascading_failure and "no-unused-vars" in line)
+                        or re.search(r': line \d+, col \d+, Warning - ', line)):
+                    submsg = ""
+                    if is_cascading_failure:
+                        submsg = " - Ignore if it does not affect your code."
+                        line = re.sub(r"(?:Error|Warning)[\s-]+", 'XXX ', line)
+                    warning_result.append(f"{line}{submsg}")
                     warnings += 1
-                    warning_result.append(line)
                 else:
                     result.append(line)
 
-    result = result + warning_result;
+    result = result + warning_result
 
     # Add the number of errors and return in a nicely formatted way.
     error_count = len(result) - 1
@@ -516,29 +534,6 @@ def inspecthtml(file, ln, line, result):
 
     return fatal
 
-def validate_strings(key_value_pairs):
-    strings = OrderedDict()
-    duplicated_keys = []
-    for key, value in key_value_pairs:
-        if key in strings:
-           duplicated_keys.append(key)
-        else:
-           strings[key] = value
-    if len(duplicated_keys) > 0:
-        return (True, duplicated_keys)
-    return (False, strings)
-
-def natural_sort(a,b):
-    if a.isnumeric() and b.isnumeric():
-        a = int(a)
-        b = int(b)
-    if a > b:
-        return 1
-    elif a < b:
-        return -1
-    else:
-        return 0
-
 def reduce_validator(file_line_mapping, **extra):
     """
     Checks changed files for contents and alalyzes them.
@@ -551,18 +546,27 @@ def reduce_validator(file_line_mapping, **extra):
     """
 
     exclude = ['vendor', 'asm', 'sjcl', 'dont-deploy', 'secureboot', 'test']
-    special_chars_exclude = ['secureboot', 'test', 'emoji', 'dont-deploy', 'pdf.worker', 'images' + os.path.sep]
     logging.info('Analyzing modified files ...')
     result = ['\nValidator output:\n=================']
     warning = 'This is a security product. Do not add unverifiable code to the repository!'
     fatal = 0
+    async_msg = "Avoid async event handlers/executors, they bypass local error context and invite race conditions."
+    async_rex = r"(?:\b(?:on)?[Cc]lick+['\"]?\s*:\s*|then\s*\(\s*|\b(rebind|on|bind|delegate|addEventListener|new\s+Promise)\s*\(\s*([^)]*?)\s*,\s*)\basync\b"
+
+    # Analise newly added files
+    kebab_pattern = r"^[a-z0-9]+(-[a-z0-9]+)*([.-][0-9]+(\.[0-9]+)*)?$"
+    for file in NEW_FILES:
+        name, ext = os.path.splitext(file)
+        if ext in ['.html', '.css', '.js', '.jsx'] and not re.match(kebab_pattern, name):
+            fatal += 1
+            result.append(f"For consistency, file names must follow the kebab-case naming convention: {file}")
 
     # Analise changed lines per modified file
     for filename, line_set in file_line_mapping.items():
         file_path = os.path.join(*filename)
         file_extension = os.path.splitext(file_path)[-1]
 
-        if not any([n in file_path for n in special_chars_exclude]) and file_extension not in ['.py', '.sh']:
+        if file_extension not in ['.py', '.sh'] and not any([n in file_path for n in config.VALIDATOR_IGNORE_UTF8]):
             if analyse_files_for_special_chars(file_path, result):
                 fatal += 1
                 # break
@@ -586,7 +590,9 @@ def reduce_validator(file_line_mapping, **extra):
                           .format(file_path, warning))
             # continue
 
-        if os.path.getsize(file_path) > 190000 and not file_extension in ['.css', '.html']:
+        if (not file_path in config.VALIDATOR_LARGEFILE_IGNORE
+                and not file_extension in ['.css', '.html']
+                and os.path.getsize(file_path) > config.VALIDATOR_LARGEFILE_THRESHOLD):
             result.append('The file "{}" has turned too big, '
                           'any new functions must be moved elsewhere.'.format(file_path))
             # continue
@@ -605,6 +611,10 @@ def reduce_validator(file_line_mapping, **extra):
                 # Analyse worker files.
                 if worker_upd is False and line.find('WORKER_VERSION =') > 0:
                     worker_upd = True
+
+                # Analyse async uses...
+                if re.search(async_rex, line):
+                    result.append('{}:{}: {}\n'.format(file_path, line_number, async_msg))
 
                 # Analyse CSS files...
                 if file_extension == '.css':

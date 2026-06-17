@@ -623,3 +623,34 @@ body:not(.no-lbl-colour) .folder .item-type-icon-90.icon-rubbish-folder-90,
 body:not(.no-lbl-colour) .folder .item-type-icon.icon-rubbish-folder-24 {
     filter: grayscale(1) brightness(0.85);
 }
+
+.fm-blocks-view .mega-node.fm-item.ui-droppable-hover,
+.files-grid-view tr.ui-droppable-hover {
+    background: var(--mobile-surface-1);
+    overflow: visible;
+    position: relative;
+}
+.fm-blocks-view .mega-node.fm-item.ui-droppable-hover .fm-item-img {
+    background: var(--mobile-surface-2);
+}
+.fm-blocks-view .mega-node.fm-item.ui-droppable-hover::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border: var(--mobile-border-strong-selected) dashed 2px;
+    border-radius: 8px;
+    z-index: 900;
+}
+.files-grid-view tr.ui-droppable-hover > td:first-child::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: auto;
+    width: calc(var(--dd-row-width, 100%) - 4px);
+    border: var(--mobile-border-strong-selected) dashed 2px;
+    border-radius: 8px;
+    z-index: 900;
+}

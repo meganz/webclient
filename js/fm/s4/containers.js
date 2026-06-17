@@ -47,6 +47,15 @@ lazy(s4, 'containers', () => {
             super.show();
         }
 
+        destroy() {
+            this.container = null;
+            this.bucket = null;
+            this.key = null;
+            this._clear();
+
+            super.destroy();
+        }
+
         unbindEvents() {
             super.unbindEvents();
 
@@ -164,8 +173,8 @@ lazy(s4, 'containers', () => {
             });
 
             $openS4Btn.rebind('click.s4dlg', () => {
-                this.destroy();
                 M.openFolder(this.container.h, true).then(() => eventlog(501166)).catch(dump);
+                this.destroy();
             });
 
             $manageBucketBtn.rebind('click.s4dlg', () => {
@@ -201,9 +210,14 @@ lazy(s4, 'containers', () => {
                 return Promise.resolve();
             }
 
+            // Skip welcome stet is S4 has been started before
+            if (this.bucket || this.key) {
+                this._triggerNextStep();
+                return Promise.resolve();
+            }
+
             this._setFullWidthFooter(true);
             this.$progressLabel.text(l.s4_setup_s4_btn);
-            this._switchStep();
 
             return Promise.resolve();
         }
@@ -227,9 +241,14 @@ lazy(s4, 'containers', () => {
                 return;
             }
 
-            $(`.nav-step-${ this.step - 1 }`, this.$sidePane).addClass('complete');
+            if (this.bucket) {
+                this.steps(3);
+                return;
+            }
+
+            this.$backBtn.addClass('hidden');
+            this.$bucketInput.$input.val('');
             this.$progressLabel.text(l[158]);
-            this._switchStep();
 
             this._validateBucket();
             delay('s4.bucketInput.focus', () => {
@@ -257,9 +276,14 @@ lazy(s4, 'containers', () => {
                 return;
             }
 
-            $(`.nav-step-${ this.step - 1 }`, this.$sidePane).addClass('complete');
+            if (this.key) {
+                this.skipNext = true;
+                this.steps(4);
+                return;
+            }
+
+            this.$keyInput.$input.val('');
             this.$progressLabel.text(l[158]);
-            this._switchStep();
 
             this._validateKey();
             delay('s4.keyInput.focus', () => {
@@ -279,8 +303,19 @@ lazy(s4, 'containers', () => {
                 $('.secret-key-value', this.$dialogContainer).val(sk).attr('type', 'password');
                 this.$progressLabel.text(l[556]);
                 this.$dialogProgress.removeClass('disabled');
-                this._switchStep();
             }
+
+            // Skip key info step if key has been created before
+            if (this.skipNext) {
+                this.skipNext = false;
+                this.steps(5, true);
+                return;
+            }
+
+            this.$sidePane.removeClass('complete');
+            this.$dialogProgress.removeClass('hidden');
+            this.$openS4Btn.addClass('hidden');
+            this.$manageBucketBtn.addClass('hidden');
         }
 
         async step5(finalise) {
@@ -294,8 +329,6 @@ lazy(s4, 'containers', () => {
                 fmconfig.s4skipobd = undefined;
             }
 
-            $(`.nav-step-${this.step - 1}`, this.$sidePane).addClass('complete');
-            $(`.nav-step-${this.step}`, this.$sidePane).removeClass('complete');
             this.$sidePane.addClass('complete');
             this.$dialogProgress.addClass('hidden');
             this.$backBtn.addClass('hidden');
@@ -309,8 +342,6 @@ lazy(s4, 'containers', () => {
             for (const int of integrations) {
                 this._renderIntegration(int);
             }
-
-            this._switchStep();
         }
 
         async step6(finalise) {
@@ -320,13 +351,15 @@ lazy(s4, 'containers', () => {
                 return;
             }
 
-            $(`.nav-step-${this.step - 1}`, this.$sidePane).addClass('complete');
             this.$backBtn.removeClass('hidden');
             this.$dialogProgress.removeClass('hidden disabled');
             this.$progressLabel.text(l[726]);
             this.$openS4Btn.addClass('hidden');
             this.$manageBucketBtn.addClass('hidden');
+        }
 
+        async steps(step, isProgressDisabled) {
+            await super.steps(step, isProgressDisabled);
             this._switchStep();
         }
 
@@ -446,7 +479,12 @@ lazy(s4, 'containers', () => {
 
         _switchStep() {
             $('.content-pane .steps', this.$dialogContainer).addClass('hidden');
-            $(`.nav-step-${ this.step }`, this.$sidePane).addClass('active');
+            $('.nav-step', this.$sidePane).removeClass('active complete');
+
+            for (let i = 1; i <= this.step; i++) {
+                $(`.nav-step-${i - 1}`, this.$sidePane).addClass('complete');
+                $(`.nav-step-${i}`, this.$sidePane).addClass('active');
+            }
 
             this.$scrollArea.scrollTop(0);
             this.$steps[this.step].removeClass('hidden');
@@ -480,10 +518,7 @@ lazy(s4, 'containers', () => {
         }
 
         _clear() {
-            this.bucket = null;
-            this.container = null;
-            this.key = null;
-
+            this.skipNext = false;
             this.$bucketInput.$input.val('');
             this.$keyInput.$input.val('');
             $('.secret-key-value', this.$steps[4]).val('').attr('type', 'password');

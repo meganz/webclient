@@ -2804,7 +2804,6 @@ FileManager.prototype.getDDhelper = function getDDhelper() {
     $(id).append(
         '<div class="dragger-block drag" id="draghelper">' +
         '<div class="dragger-content"></div>' +
-        '<div class="dragger-files-number hidden">1</div>' +
         '</div>'
     );
     $('.dragger-block').show();
@@ -2854,26 +2853,58 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
                 $.hideContextMenu(e);
                 $.gridDragging = true;
                 $('body').addClass('dragging');
+
+                // Safari doesn't position absolute against tr's so set width manually.
+                const ddTable = this.closest && this.closest('.grid-table');
+                if (ddTable) {
+                    ddTable.style.setProperty('--dd-row-width', `${ddTable.offsetWidth}px`);
+                }
                 if (!$(this).hasClass('ui-selected')) {
                     selectionManager.resetTo($(this).attr('id'));
                 }
-                var max = ($(window).height() - 96) / 24;
+                const max = 4;
+                const items = $.selected.slice(0, max);
                 var html = [];
-                $.selected.forEach((id, i) => {
+                for (let i = 0; i < items.length; i++) {
+                    const id = items[i];
                     const n = M.getNodeByHandle(id);
-                    if (n && max > i) {
-                        const lblClass = MegaNodeComponent.label[n.lbl | 0] || '';
-                        html.push(
-                            `<div class="item-type-icon icon-${fileIcon(n)}-24 ${lblClass}"></div>` +
-                            '<div class="tranfer-filetype-txt dragger-entry">' +
-                            escapeHTML(n.name) + '</div>'
-                        );
+                    if (i === max - 1 && $.selected.length > max) {
+                        html.push(`
+                            <hr>
+                            <div class="dragger-row">
+                                <div class="sprite-fm-mono icon-files-plus-thin-outline"></div>
+                                <div class="tranfer-filetype-txt dragger-entry">
+                                    ${mega.icu.format(l.dragger_extra_items, $.selected.length - (max - 1))}
+                                </div>
+                            </div>
+                        `);
                     }
-                });
-                // TODO: This count feature currently not really in used we may need to get back to this.
-                if ($.selected.length > max) {
-                    $('.dragger-files-number').text($.selected.length);
-                    $('.dragger-files-number').removeClass('hidden');
+                    else if (n) {
+                        const icon = fileIcon(n);
+                        const lblClass = icon === 'folder' && MegaNodeComponent.label[n.lbl | 0] || '';
+                        const senClass = !folderlink && mega.sensitives.shouldBlurNode(n) ? 'is-sensitive' : '';
+                        html.push(`
+                            <div class="dragger-row ${senClass}">
+                                <div id="dd_${id}" class="item-type-icon icon-${icon}-24 ${lblClass}"></div>
+                                <div class="tranfer-filetype-txt dragger-entry">${escapeHTML(n.name)}</div>
+                            </div>
+                        `);
+
+                        if (String(n.fa).includes(':0*')) {
+                            getImage(n)
+                                .then((uri) => {
+                                    const el = uri && document.getElementById(`dd_${id}`);
+                                    if (el) {
+                                        const img = document.createElement('img');
+                                        img.src = uri;
+                                        el.textContent = '';
+                                        el.classList.add('thumb');
+                                        el.appendChild(img);
+                                    }
+                                })
+                                .catch(nop);
+                        }
+                    }
                 }
                 // eslint-disable-next-line local-rules/jquery-replacements
                 $('#draghelper .dragger-content').html(html.join(""));
@@ -2909,6 +2940,11 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
                 $.gridDragging = $.draggingClass = false;
 
                 $('body').removeClass('dragging').removeClassWith("dndc-");
+
+                const ddTables = document.querySelectorAll('.grid-table');
+                for (let i = 0; i < ddTables.length; i++) {
+                    ddTables[i].style.removeProperty('--dd-row-width');
+                }
 
                 setTimeout(function __onDragStop() {
                     M.onTreeUIOpen(M.currentdirid, false, true);

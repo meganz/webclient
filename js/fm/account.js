@@ -1318,16 +1318,20 @@ accountUI.account = {
                         }
                     }
 
-                    var enteredFirst = $firstNameField.val().trim();
-                    var enteredLast = $lastNameField.val().trim();
+                    const enteredFirst = $firstNameField.val().trim();
+                    const enteredLast = $lastNameField.val().trim();
 
-                    if (enteredFirst.length > 0 && enteredLast.length > 0 &&
+                    const firstNameValid = enteredFirst.length > 0 || !u_attr.firstname;
+                    const lastNameValid = enteredLast.length > 0 || !u_attr.lastname;
+
+                    if (firstNameValid && lastNameValid &&
                         !$('.errored', $personalInfoBlock).length &&
-                        (enteredFirst !== u_attr.firstname ||
-                        enteredLast !== u_attr.lastname ||
+                        (enteredFirst !== (u_attr.firstname || '') ||
+                        enteredLast !== (u_attr.lastname || '') ||
                         ($('.bdate', $birthdayBlock).val() | 0) !== (u_attr.birthday | 0) ||
                         ($('.bmonth', $birthdayBlock).val() | 0) !== (u_attr.birthmonth | 0) ||
-                        ($('.byear', $birthdayBlock).val() | 0)  !== (u_attr.birthyear | 0))) {
+                        ($('.byear', $birthdayBlock).val() | 0) !== (u_attr.birthyear | 0))
+                    ) {
                         $saveBlock.removeClass('closed');
                     }
                     else {

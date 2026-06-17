@@ -291,12 +291,10 @@ function topPopupAlign(button, popup, topPos) {
             pageWidth,
             popupLeftPos,
             arrowLeftPos,
-            buttonTopPos,
-            headerWidth;
+            buttonTopPos;
 
         if ($button.length && $popup.length) {
             pageWidth = $('body').outerWidth();
-            headerWidth = $('.top-head').outerWidth();
             $popup.removeAttr('style');
             $popupArrow.removeAttr('style');
             popupLeftPos = $button.offset().left
@@ -934,6 +932,10 @@ function init_page() {
             sessionStorage.statsHandle = ph;
         }
         loadSubPage('fm');
+    }
+    else if (page.substr(0, 8) === 's4-setup') {
+        sessionStorage.s4Setup = 1;
+        loadSubPage('fm/s4');
     }
     else if (page === 'confirm') {
 
@@ -2328,14 +2330,8 @@ function topmenuUI() {
             var purchasedPlan = pro.getProPlanName(proNum);
 
             // Set colour of plan and body class
-            var cssClass;
-
             if (proNum === pro.ACCOUNT_LEVEL_PRO_LITE) {
-                cssClass = 'lite';
                 document.body.classList.add('lite');
-            }
-            else {
-                cssClass = 'pro' + proNum;
             }
 
             // Show the Pro badge
@@ -3496,7 +3492,7 @@ mBroadcaster.addListener('fm:initialized', () => {
 mBroadcaster.once('mega:openfolder', () => {
     'use strict';
 
-    const {previewNode, statsHandle: ph} = sessionStorage;
+    const {previewNode, statsHandle: ph, s4Setup} = sessionStorage;
     if (previewNode) {
         sessionStorage.removeItem('previewNode');
 
@@ -3508,6 +3504,9 @@ mBroadcaster.once('mega:openfolder', () => {
     else if (ph) {
         sessionStorage.removeItem('statsHandle');
         mega.Share.showLinkStatsDialog({ph}).catch(tell);
+    }
+    else if (s4Setup) {
+        loadSubPage('fm/s4');
     }
 
     // Send some data to mega.io that we logged in

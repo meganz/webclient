@@ -321,23 +321,30 @@ lazy(s4, 'ui', () => {
          */
         async showSetupDialog() {
             const SEVEN_DAYS = 7 * 86400;
-            const obd = fmconfig.s4onboarded;
             const now = Math.floor(Date.now() / 1000);
+            const force = !!sessionStorage.s4Setup;
+            const obd = fmconfig.s4onboarded;
             const skipDate = fmconfig.s4skipobd;
 
-            if (obd === 1 || (skipDate && now - skipDate < SEVEN_DAYS)) {
+            if (force) {
+                eventlog(501256);
+                delete sessionStorage.s4Setup;
+            }
+
+            if (!force && (obd === 1 || skipDate && now - skipDate < SEVEN_DAYS)) {
                 return;
             }
 
             const [n] = s4.utils.getContainersList() || [];
-            const hasBuckets = n && !!M.tree[n.h];
-            let keys = this.lists.keys || [];
 
-            if (!hasBuckets && !keys.length) {
-                keys = await s4.kernel.keys.list(n.h).catch(nop);
+            if (!n) {
+                return;
             }
 
-            if (hasBuckets || keys.length) {
+            const bucket = Object.values(M.tree[n.h] || {})[0];
+            const keys = this.lists.keys || await s4.kernel.keys.list(n.h).catch(() => []);
+
+            if (!force && (bucket || keys.length)) {
                 fmconfig.s4onboarded = 1;
 
                 if (skipDate) {
@@ -347,6 +354,8 @@ lazy(s4, 'ui', () => {
             }
 
             fmconfig.s4skipobd = now;
+            s4.containers.dialogs.setup.bucket = bucket && bucket.h;
+            s4.containers.dialogs.setup.key = keys.find(key => !('ui' in key));
             this.showDialog(s4.containers.dialogs.setup);
         }
 

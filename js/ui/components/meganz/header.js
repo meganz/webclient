@@ -523,7 +523,7 @@ class MegaHeader extends MegaMobileHeader {
     closeAvatarMenu(e) {
 
         if (mega.ui.header.isSubmenuClose([mega.ui.header.avatarMenu, '.header-dropdown-menu', 'button.avatar'], e) ||
-            e && !e.target.closest('.sub-menu.support.active')
+            e && !e.target.closest('.sub-menu.active')
             && (e.target.closest('.sub-menu-wrap') || e.target.closest('.top-mega-version'))) {
             return;
         }
@@ -824,7 +824,7 @@ class MegaHeader extends MegaMobileHeader {
                     }
                 }
 
-                wrapper.addEventListener('mouseover', () => {
+                wrapper.addEventListener('mouseenter', () => {
 
                     $(submenu).addClass('active').position({
                         my: "right top",
@@ -834,7 +834,7 @@ class MegaHeader extends MegaMobileHeader {
                     });
                 });
 
-                wrapper.addEventListener('mouseout', () => {
+                wrapper.addEventListener('mouseleave', () => {
                     submenu.classList.remove('active');
                 });
 

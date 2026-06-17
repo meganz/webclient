@@ -178,7 +178,10 @@ lazy(mega, 'migrate', () => {
                         );
                         loadingDialog.hide('migrate-enqueue-request');
 
-                        if (!prefetchId || Number.isInteger(prefetchId) && prefetchId < 0) {
+                        if (prefetchId === ERATELIMIT) {
+                            msgDialog('warninga', '', l.mig_fail, l.mig_rate_limit, () => dialog.goToStep(1));
+                        }
+                        else if (!prefetchId || Number.isInteger(prefetchId) && prefetchId < 0) {
                             msgDialog('warninga', '', l.mig_fail, l.mig_error, () => dialog.goToStep(1));
                         }
                         else {
@@ -272,6 +275,16 @@ lazy(mega, 'migrate', () => {
 
                         if (migrationId === EEXIST) {
                             msgDialog('warninga', '', l.mig_fail, l.mig_ongoing); // Keep dialog, they can try later
+                            return;
+                        }
+
+                        if (migrationId === ERATELIMIT) {
+                            msgDialog('warninga', '', l.mig_fail, l.mig_rate_limit, () => dialog.hide());
+                            return;
+                        }
+
+                        if (migrationId === EARGS) {
+                            msgDialog('warninga', '', l.mig_fail, l.mig_too_large, () => dialog.hide());
                             return;
                         }
 

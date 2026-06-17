@@ -219,6 +219,7 @@
             this.succeeded = false;
             this.isLogout = false;
 
+            this.autoShownThisSession = false;
             this.NAMESPACE = 'recoverykey-logout-overlay';
 
             // When the user presses the browser's back button, the parameter dialogShown should be updated
@@ -345,7 +346,7 @@
                 .then(() => {
                     onIdle(() => this._scheduleRecheck());
                     this.recheckInterval = null;
-                    this.recheck();
+                    this.recheck(false, true);
                 })
                 .catch(dump);
         }
@@ -380,7 +381,7 @@
                 time - lastLogin > SHOW_AFTER_LASTLOGIN;
         }
 
-        recheck(hideIfShown) {
+        recheck(hideIfShown, allowReshow) {
             if (!u_handle) {
                 // user is in the middle of a logout...
                 return;
@@ -409,6 +410,7 @@
                 const skipShowingDialog = !this.showIcon() || $(selectors.join(',')).length > 0;
 
                 if (
+                    (allowReshow || !this.autoShownThisSession) &&
                     !skipShowingDialog &&
                     (is_fm() || LOGOUT_DIALOG_START_PAGES.has(page)) &&
                     !pfid &&
@@ -417,6 +419,7 @@
                         unixtime() - this.passwordReminderAttribute.lastSkipped > SHOW_AFTER_LASTSKIP
                     )
                 ) {
+                    this.autoShownThisSession = true;
                     this.showDialog();
                 }
                 else if (hideIfShown) {

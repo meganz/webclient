@@ -1,4 +1,4 @@
-(function(scope) {
+(function() {
     'use strict';
     var options = {};
 
@@ -761,7 +761,8 @@
                 subMsg:
                     `<p>${l[217]}</p>
                     <p>${l.account_delete_email_confirmation_no_receive}</p>
-                    <p>${l.contact_support_email}</p>`
+                    <p>${l.contact_support_email.replace('https://mega.nz/support',
+                        '<a class="clickurl" href="/support" target="_blank">https://mega.nz/support</a>')}</p>`
             },
             change: {
                 title: l[7743],
@@ -789,9 +790,7 @@
 
         const _handleResend = (mode) => {
             const email = mode === 'change' ? $.trim(changeEmailInput.value || '') : user.email;
-            const resendTarget = dialogComponent.contentNode.componentSelector(
-                mode === 'change' ? '.resend-email' : '.resend-email-link'
-            );
+            const resendTarget = dialogComponent.contentNode.componentSelector('.resend-email');
 
             if (resendTarget && (resendTarget.disabled || resendTarget.loading)) {
                 return;
@@ -810,7 +809,7 @@
         };
 
         const _formatResendWait = tick => l.register_resend_wait
-            .replace('%1', String(Math.floor(tick / 60)).padStart(2, '0'))
+            .replace('%1', String(Math.floor(tick / 60)))
             .replace('%2', String(tick % 60).padStart(2, '0'));
 
         const _renderDialogContent = (mode, msg, subMsg) => {
@@ -831,8 +830,6 @@
                     text: l.register_update_email_button
                 });
                 resendButton.on('click', () => _handleResend(mode));
-                mCreateElement('span', {class: 'resend-email-wait hidden'}, resendBlock)
-                    .textContent = _formatResendWait(300);
 
                 return content;
             }
@@ -841,18 +838,14 @@
             const subMsgNode = mCreateElement('div', {}, content);
             subMsgNode.append(parseHTML(subMsg));
 
-            const resendBlock = mCreateElement('div', {class: 'signup-link-resend'}, content);
-            mCreateElement('span', {}, resendBlock).textContent = l.register_resend_question;
-            resendBlock.append(' ');
-
-            MegaLink.factory({
+            const resendBlock = mCreateElement('div', {class: 'signup-link-action'}, content);
+            const resendButton = new MegaButton({
                 parentNode: resendBlock,
-                type: 'text',
-                componentClassname: 'resend-email-link',
-                text: l.register_resend_link
-            }).on('click', () => _handleResend(mode));
-            mCreateElement('span', {class: 'resend-email-wait hidden'}, resendBlock)
-                .textContent = _formatResendWait(300);
+                type: 'normal',
+                componentClassname: `mega-button resend-email primary${mode === 'change' ? '' : ' fat'}`,
+                text: l.resend_email
+            });
+            resendButton.on('click', () => _handleResend(mode));
 
             if (is_mobile) {
 
@@ -973,6 +966,7 @@
                 opt.onBack = () => _showDialog('default');
                 opt[is_mobile ? 'title' : 'header'] = title;
                 opt.showClose = false;
+                opt.classList.push('change-email');
             }
             else {
                 opt.showClose = true;
@@ -988,12 +982,9 @@
             }
         }
 
-        function _startTimer(tick = 301) {
+        function _startTimer(tick = 60) {
 
-            const primaryBtn = dialogComponent.contentNode.componentSelector('.resend-email');
-            const resendLink = dialogComponent.contentNode.componentSelector('.resend-email-link');
-            const resendWait = dialogComponent.contentNode.querySelector('.resend-email-wait');
-            const target = primaryBtn || resendLink;
+            const target = dialogComponent.contentNode.componentSelector('.resend-email');
 
             _clearTimer();
 
@@ -1001,23 +992,19 @@
                 return;
             }
 
-            target.hide();
-            if (resendWait) {
-                resendWait.classList.remove('hidden');
-            }
+            const label = target.text;
+
+            target.disabled = true;
+            target.text = _formatResendWait(tick);
 
             resendTimer = setInterval(() => {
                 if (--tick <= 0) {
                     _clearTimer();
-                    target.show();
-                    if (resendWait) {
-                        resendWait.classList.add('hidden');
-                    }
+                    target.disabled = false;
+                    target.text = label;
                     return;
                 }
-                if (resendWait) {
-                    resendWait.textContent = _formatResendWait(tick);
-                }
+                target.text = _formatResendWait(tick);
             }, 1000);
         }
 
@@ -1044,7 +1031,7 @@
 
                     if (res === ETOOMANY) {
                         showToast('warning', l.register_resend_limit_toast);
-                        _showDialog('default', {email, startTimerTick: 301});
+                        _showDialog('default', {email, startTimerTick: 60});
                         return;
                     }
 
@@ -1065,13 +1052,13 @@
                         aca.email = user.email = email;
                         security.register.cacheRegistrationData(aca);
                     }
-                    _showDialog('default', {startTimerTick: 301, customTitle: l.register_update_email_title});
+                    _showDialog('default', {startTimerTick: 60, customTitle: l.register_update_email_title});
                     showToast('success', msg);
                 }
             );
         }
 
-        _showDialog('default', startTimerOnOpen ? {startTimerTick: 301} : undefined);
+        _showDialog('default', startTimerOnOpen ? {startTimerTick: 60} : undefined);
 
     }
 
@@ -1129,4 +1116,4 @@
     mega.ui.signup.showLinkDialog = sendSignupLinkDialog;
     mega.ui.signup.updatePasswordStrength = updatePasswordStrength;
 
-})(this);
+})();

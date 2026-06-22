@@ -320,11 +320,6 @@
         padding: 0;
         height: auto;
     }
-    .overlay-wrap.signup-link-dialog-overlay .content .signup-link-overlay-content .signup-link-resend .resend-email-wait {
-        color: var(--text-color-high);
-        font: var(--mobile-font-caption-large-semibold);
-        white-space: nowrap;
-    }
     .overlay-wrap.signup-link-dialog-overlay .content .signup-link-overlay-content .signup-link-action {
         margin-top: 8px;
         display: flex;
@@ -334,14 +329,10 @@
     .overlay-wrap.signup-link-dialog-overlay .content .signup-link-overlay-content .signup-link-action .resend-email {
         width: auto;
     }
-    .overlay-wrap.signup-link-dialog-overlay .content .signup-link-overlay-content .signup-link-action .resend-email-wait {
-        color: var(--text-color-high);
-        font: var(--mobile-font-caption-large-semibold);
-        white-space: nowrap;
-    }
     body.mobile .overlay-wrap.signup-link-dialog-overlay .content .signup-link-overlay-content .signup-link-action {
         align-items: stretch;
     }
+    .overlay-wrap.signup-link-dialog-overlay:not(.change-email) .content .signup-link-overlay-content .signup-link-action .resend-email,
     body.mobile .overlay-wrap.signup-link-dialog-overlay .content .signup-link-overlay-content .signup-link-action .resend-email {
         width: 100%;
     }

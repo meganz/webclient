@@ -10,6 +10,7 @@ lazy(mega, 'migrate', () => {
     let targetFolderName;
     let targetFolderParent;
     let nodeList;
+    let oAuthPoll;
 
     const knownProviders = {
         1: {name: 'Google Drive', icon: 'sprite-fm-uni icon-googledrive'},
@@ -154,17 +155,15 @@ lazy(mega, 'migrate', () => {
                         const oAuthResults = await mega.migrate.runOAuthPopup(selectedProviderId);
                         if (!oAuthResults.state || !oAuthResults.code) {
 
-                            let errMsg = '';
-
                             if (d) {
-                                console.error('state', oAuthResults.state);
-                                console.error('code', oAuthResults.code);
+                                console.error('OAuth authorisation failed', oAuthResults);
                             }
 
-                            if ((oAuthResults.error || oAuthResults.message) && d) {
-                                console.error('Error', oAuthResults.error, 'Message', oAuthResults.message);
-                                errMsg = `${oAuthResults.error} - ${oAuthResults.message}`;
-                            }
+                            const reasons = {
+                                closed: l.mig_oauth_closed,
+                                access_denied: l.mig_oauth_denied,
+                            };
+                            const errMsg = reasons[oAuthResults.error] || l.mig_oauth_retry;
 
                             return msgDialog('warninga', '', l.mig_oauth_failed, errMsg);
                         }
@@ -428,6 +427,12 @@ lazy(mega, 'migrate', () => {
 
         _openOAuthPopup(authUrl, receiverId, width = 480, height = 640) {
 
+            // Clear any existing popop poll: popup window will be reused
+            if (oAuthPoll) {
+                clearInterval(oAuthPoll);
+                oAuthPoll = null;
+            }
+
             const winX = window.screenX || window.screenLeft;
             const winY = window.screenY || window.screenTop;
             const winW = window.outerWidth || document.documentElement.clientWidth;
@@ -453,9 +458,9 @@ lazy(mega, 'migrate', () => {
                 // throws cross-origin while on OAuth provider; discard
                 const reachedRedirect = tryCatch(() => popup.location.pathname.endsWith('oauth.html'), false);
 
-                const poll = setInterval(() => {
+                oAuthPoll = setInterval(() => {
                     if (popup.closed) {
-                        clearInterval(poll);
+                        clearInterval(oAuthPoll);
                         resolve({error: 'closed'});
                         return;
                     }
@@ -464,14 +469,14 @@ lazy(mega, 'migrate', () => {
                         return; // still on OAuth provider
                     }
 
-                    clearInterval(poll);
+                    clearInterval(oAuthPoll);
 
                     const params = new URLSearchParams(popup.location.search);
                     const hashParams = new URLSearchParams(popup.location.hash.slice(1));
 
                     const code = params.get('code') || hashParams.get('code');
-                    const error = params.get('error') || hashParams.get('error_description')
-                        || hashParams.get('error') || !code && 'unknown';
+                    const error = params.get('error') || hashParams.get('error');
+                    const errorDescription = params.get('error_description') || hashParams.get('error_description');
 
                     popup.close();
 
@@ -479,7 +484,12 @@ lazy(mega, 'migrate', () => {
                     const [state, eReceiverId, providerId] = base64urldecode(rawState || '').split('|');
 
                     if (!state || !eReceiverId || !providerId || eReceiverId !== receiverId) {
-                        resolve({error: error || 'invalid_state'});
+                        resolve({error: error || 'invalid_state', errorDescription});
+                        return;
+                    }
+
+                    if (!code) {
+                        resolve({error: error || 'unknown', errorDescription});
                         return;
                     }
 

@@ -8886,13 +8886,12 @@ class ContextMenu extends REaCt().Component {
         onClick: () => this.close(() => ContactsPanel.verifyCredentials(contact))
       })), REaCt().createElement("div", {
         className: "dropdown-credentials"
-      }, ContactsPanel.getUserFingerprint(contact.u)), REaCt().createElement("hr", null), REaCt().createElement(dropdowns.DropdownItem, {
+      }, ContactsPanel.getUserFingerprint(contact.u)), !contact.b && REaCt().createElement(REaCt().Fragment, null, REaCt().createElement("hr", null), REaCt().createElement(dropdowns.DropdownItem, {
         icon: "sprite-fm-mono icon-disable",
         label: l[1001],
-        disabled: !!contact.b,
         className: "",
         onClick: () => this.close(() => fmremove(contact.u))
-      }));
+      })));
     }
     return REaCt().createElement(REaCt().Fragment, null, REaCt().createElement(dropdowns.DropdownItem, {
       icon: "sprite-fm-mono icon-disabled-filled",

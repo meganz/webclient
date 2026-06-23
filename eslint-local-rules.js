@@ -111,10 +111,30 @@ module.exports = {
                 category: 'possible-errors',
                 recommended: true
             },
+            fixable: 'code',
             schema: []
         },
         create(context) {
             return {
+                BinaryExpression(node) {
+                    if (node.operator === '===' && node.right.type === 'Literal' && node.right.value === '') {
+                        if (!context.sourceCode) {
+                            context.sourceCode = context.getSourceCode();
+                        }
+                        const t = context.sourceCode.getText(node.left);
+
+                        context.report({
+                            node,
+                            message: 'Potential null/undefined bug. ' +
+                                'Check for any falsy value with simple negation !{{variable}} instead, ' +
+                                'unless the numeric value 0 is explicitly expected.',
+                            data: {variable: t},
+                            fix(fixer) {
+                                return fixer.replaceText(node, `!${t}`);
+                            }
+                        });
+                    }
+                },
                 FunctionExpression(node) {
 
                     if (node.id && node.id.name === 'populate_l') {
@@ -126,6 +146,7 @@ module.exports = {
                             let {left, right} = xpath(body[i], 'expression[type=AssignmentExpression]');
 
                             if ((left = traverse(left)).name === 'l') {
+                                const rp = right;
 
                                 switch ((right = traverse(right)).name) {
                                     case 'l': {
@@ -149,8 +170,18 @@ module.exports = {
                                     }
                                     default:
                                         if (right.type === 'Identifier') {
+                                            if (!context.sourceCode) {
+                                                context.sourceCode = context.getSourceCode();
+                                            }
+                                            const t = context.sourceCode.getText(rp);
 
-                                            context.report(right, `Missing call to escapeHTML(${right.name}*)`);
+                                            context.report({
+                                                node: rp,
+                                                message: `Missing call to escapeHTML(${t}*)`,
+                                                fix(fixer) {
+                                                    return fixer.replaceText(rp, `escapeHTML(${t})`);
+                                                }
+                                            });
                                         }
                                 }
                             }
@@ -159,8 +190,18 @@ module.exports = {
                         for (const [node, value] of unescaped) {
 
                             if (!escaped.has(value)) {
+                                if (!context.sourceCode) {
+                                    context.sourceCode = context.getSourceCode();
+                                }
+                                const t = context.sourceCode.getText(node.parent);
 
-                                context.report(node, `Missing call to escapeHTML(l['${value}'])`);
+                                context.report({
+                                    node: node,
+                                    message: `Missing call to escapeHTML(${t})`,
+                                    fix(fixer) {
+                                        return fixer.replaceText(node.parent, `escapeHTML(${t})`);
+                                    }
+                                });
                             }
                         }
                     }

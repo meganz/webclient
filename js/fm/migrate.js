@@ -250,7 +250,22 @@ lazy(mega, 'migrate', () => {
                     icon.className = 'sprite-fm-mono icon-file-02-thin-outline';
                     td.prepend(icon);
 
+                    const totalSize = document.createElement('tr');
+                    tbody.appendChild(totalSize);
+                    td = document.createElement('td');
+                    td.textContent = l.mig_total_size.replace('%1', bytesToSize(prefetch.d.b));
+                    totalSize.appendChild(td);
+
+                    icon = document.createElement('i');
+                    icon.className = 'sprite-fm-mono icon-database';
+                    td.prepend(icon);
+
                     const description = document.createElement('div');
+
+                    const note = document.createElement('p');
+                    note.className = 'import-summary-note';
+                    note.textContent = l.mig_estimate_note;
+                    description.appendChild(note);
 
                     const elm = document.createElement('p');
                     elm.append(parseHTML(l.mig_find_import.replace('%1', targetFolderName)));

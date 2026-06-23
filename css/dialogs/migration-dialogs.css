@@ -68,6 +68,10 @@
     margin-top: 8px;
     margin-bottom: 8px;
 }
+.mega-sheet.migrate-dialog .main-content .main-content-div p.import-summary-note {
+    color: var(--mobile-text-secondary);
+    font: var(--mobile-font-caption-large-regular);
+}
 .mega-sheet.migrate-dialog .main-content .main-content-div .card i.icon-size-48 {
     --icon-size: 60px;
     margin-top: -6px;

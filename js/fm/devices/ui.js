@@ -1515,6 +1515,7 @@ lazy(mega.devices, 'ui', () => {
          * @returns {void}
          */
         renameDevice() {
+
             if (!$.selected.length) {
                 return;
             }
@@ -1522,6 +1523,7 @@ lazy(mega.devices, 'ui', () => {
             const handle = $.selected[0];
             const devNames = Object.create(null);
             const currentDeviceData = M.dcd[handle];
+
             if (!currentDeviceData) {
                 if (handle && M.d[handle]) {
                     // Temporary patch for when there is a node here but not in M.dcd.
@@ -1534,92 +1536,51 @@ lazy(mega.devices, 'ui', () => {
                 devNames[h] = name;
             }
 
-            const deviceIconClass = `icon-${deviceIcon(
-                currentDeviceData.dua || currentDeviceData.name,
-                currentDeviceData.t
-            )}-filled`;
+            if (!mega.ui.renameNode) {
+                mega.ui.renameNode = new NodeNameControl({type: 'rename'});
+            }
 
-            const $dialog = $('.mega-dialog.device-rename-dialog', '.mega-dialog-container');
-            const $input = $('input', $dialog);
-            let errMsg = '';
+            mega.ui.renameNode.show({name: currentDeviceData.name, t: 1}, {
+                noBtnDisable: true,
+                overrideTypeInfo: {
+                    name: 'device-rename-dialog',
+                    placeholder: escapeHTML(l.device_rename_dialog_header),
+                    selection: false,
+                    checkSpaces: false,
+                    title: () => escapeHTML(l.device_rename_dialog_header),
+                    button: escapeHTML(l[61]),
+                    empty: escapeHTML(l[5744]),
+                    submit: nop
+                },
+                overrideAction: ({value, nameInput, close}) => {
 
-            M.safeShowDialog('device-rename-dialog', () => {
-                $dialog.removeClass('hidden').addClass('active');
-                $input.trigger("focus");
-                return $dialog;
-            });
+                    value = value.trim();
 
-            $('button.js-close, .device-rename-dialog-button.cancel', $dialog)
-                .rebind('click.dialogClose', closeDialog);
-
-            $('.device-rename-dialog-button.rename', $dialog).rebind('click.dcdialogRename', () => {
-                if ($dialog.hasClass('active')) {
-
-                    let value = $input.val();
-                    errMsg = '';
-
-                    if (currentDeviceData.name && currentDeviceData.name !== value) {
-
-                        value = value.trim();
-
-                        if (!(errMsg = M.safeNameError(value, 'device', maxDeviceNameLength))) {
-                            // Check for duplicate device names
-                            if (Object.values(devNames).includes(value)) {
-                                errMsg = l.device_rename_dialog_warning_duplicate;
-                            }
-                            else {
-                                devNames[handle] = value;
-                                this.setDeviceNames(devNames, handle).then(() => {
-                                    showToast('info', l.dc_device_renamed, null, null, null, null, 5000);
-                                });
-                            }
-                        }
-
-                        if (errMsg) {
-                            $('.duplicated-input-warning span', $dialog).safeHTML(errMsg);
-                            $dialog.addClass('duplicate');
-                            $input.addClass('error');
-
-                            setTimeout(() => {
-                                $dialog.removeClass('duplicate');
-                                $input.removeClass('error');
-
-                                $input.trigger("focus");
-                            }, 2000);
-
-                            return;
-                        }
+                    if (!currentDeviceData.name || currentDeviceData.name === value) {
+                        close();
+                        return;
                     }
-                    closeDialog();
-                }
-            });
 
-            $input.val(currentDeviceData.name);
+                    let errMsg = M.safeNameError(value, 'device', maxDeviceNameLength);
 
-            $('.device-rename-input-bl > i', $dialog)
-                .attr('class',
-                      `sprite-fm-theme ${deviceIconClass}`
-                );
+                    if (!errMsg && Object.values(devNames).includes(value)) {
+                        // Check for duplicate device names
+                        errMsg = escapeHTML(l.device_rename_dialog_warning_duplicate);
+                    }
 
-            $input.rebind('focus.dcRenameDialog', () => {
-                $dialog.addClass('focused');
-            });
+                    if (errMsg) {
+                        const alertIcon = '<i class="alert sprite-fm-mono icon-alert-triangle-thin-outline"></i>';
 
-            $input.rebind('blur.dcRenameDialog', () => {
-                $dialog.removeClass('focused');
-            });
+                        nameInput.showError(`${alertIcon}${errMsg}`);
+                        return;
+                    }
 
-            $input.rebind('keydown.dcRenameDialog', (event) => {
-                // distingushing only keydown evet, then checking if it's Enter in order to preform the action'
-                if (event.keyCode === 13) { // Enter
-                    $('.device-rename-dialog-button.rename', $dialog).click();
-                }
-                else if (event.keyCode === 27) { // ESC
-                    closeDialog();
-                }
-                else {
-                    $dialog.removeClass('duplicate').addClass('active');
-                    $input.removeClass('error');
+                    devNames[handle] = value;
+                    close();
+
+                    this.setDeviceNames(devNames, handle).then(() => {
+                        showToast('info', l.dc_device_renamed, null, null, null, null, 5000);
+                    });
                 }
             });
         }

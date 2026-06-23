@@ -861,81 +861,68 @@ lazy(s4, 'ui', () => {
             }
         }
 
-        renameDialog(type, item, heading, icon) {
-            M.safeShowDialog('rename', () => {
-                const $dialog = $('.mega-dialog.rename-dialog', '.mega-dialog-container')
-                    .removeClass('hidden').addClass('active');
+        renameDialog(type, item, heading) {
 
-                const $input = $('input', $dialog).trigger('focus').val(item.name);
+            const placeholders = {
+                users: l.s4_user_name,
+                groups: l.s4_group_name,
+                keys: l.s4_key_name
+            };
 
-                const ltWSpaceWarning = new InputFloatWarning($dialog);
-                ltWSpaceWarning.hide().check({name: item.name, ms: 0});
+            if (!mega.ui.renameNode) {
+                mega.ui.renameNode = new NodeNameControl({type: 'rename'});
+            }
 
-                $('.rename-dialog-button.rename', $dialog).rebind('click.rename', () => {
-                    const name = $input.val();
+            mega.ui.renameNode.show({name: item.name, t: 0}, {
+                noBtnDisable: true,
+                overrideTypeInfo: {
+                    name: 's4-item-rename',
+                    placeholder: escapeHTML(placeholders[type] || heading),
+                    selection: false,
+                    checkSpaces: false,
+                    title: () => escapeHTML(heading),
+                    button: escapeHTML(l[61]),
+                    empty: escapeHTML(l[5744]),
+                    submit: nop
+                },
+                overrideAction: ({value: name, nameInput, close}) => {
 
                     if (item.name === name) {
-                        closeDialog();
+                        close();
+                        return;
                     }
-                    else {
-                        mLoadingSpinner.show(`s4-${type}-rename`);
-                        Promise.resolve(s4[type].handlers.validateName(name))
-                            .then((error) => {
-                                if (error) {
-                                    throw new Error(error);
-                                }
-                            })
-                            .then(() => {
-                                const checkNameAvailable = s4[type].handlers.checkNameAvailable;
-                                if (typeof checkNameAvailable === 'function') {
-                                    return checkNameAvailable(name, item.name);
-                                }
-                            })
-                            .then(() => {
-                                closeDialog();
-                                return s4.kernel[item.kernel].rename(
-                                    s4.ui.lists[type].handle, item.id, name);
-                            })
-                            .catch((ex) => {
-                                if ($dialog[0].classList.contains('hidden')) {
-                                    return tell(ex);
-                                }
 
-                                $('.duplicated-input-warning span', $dialog).text(ex.message || ex);
-                                $dialog.addClass('duplicate');
-                                $input.addClass('error');
-                                return tSleep(2)
-                                    .then(() => {
-                                        $dialog.removeClass('duplicate');
-                                        $input.removeClass('error').trigger('focus');
-                                    });
-                            })
-                            .finally(() => {
-                                mLoadingSpinner.hide(`s4-${type}-rename`);
-                            });
-                    }
-                });
+                    mLoadingSpinner.show(`s4-${type}-rename`);
+                    return Promise.resolve(s4[type].handlers.validateName(name))
+                        .then(error => {
+                            if (error) {
+                                throw new Error(error);
+                            }
 
-                $('header h2', $dialog).text(heading);
-                $('.input-icon', $dialog)
-                    .attr('class', `input-icon sprite-fm-mono ${icon}`);
-                $('button.js-close, .rename-dialog-button.cancel', $dialog)
-                    .rebind('click.s4kd.rename.cancel', closeDialog);
+                            const {checkNameAvailable} = s4[type].handlers;
+                            if (typeof checkNameAvailable === 'function') {
+                                return checkNameAvailable(name, item.name);
+                            }
+                        })
+                        .then(() => {
+                            close();
+                            return s4.kernel[item.kernel].rename(
+                                s4.ui.lists[type].handle, item.id, name);
+                        })
+                        .catch(ex => {
+                            if (!mega.ui.sheet.visible || mega.ui.sheet.name !== 's4-item-rename') {
+                                return tell(ex);
+                            }
 
-                $input.rebind('keydown.s4kd.rename', (ev) => {
-                    if (ev.keyCode === 13) {
-                        $('.rename-dialog-button.rename', $dialog).click();
-                    }
-                    else if (ev.keyCode === 27) {
-                        closeDialog();
-                    }
-                });
+                            const alertIcon =
+                                '<i class="alert sprite-fm-mono icon-alert-triangle-thin-outline"></i>';
 
-                $input.rebind('keyup.rename-f', () => {
-                    ltWSpaceWarning.check(true);
-                });
-
-                return $dialog;
+                            nameInput.showError(`${alertIcon}${escapeHTML(ex.message || ex)}`);
+                        })
+                        .finally(() => {
+                            mLoadingSpinner.hide(`s4-${type}-rename`);
+                        });
+                }
             });
         }
 

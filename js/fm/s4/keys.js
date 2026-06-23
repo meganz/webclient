@@ -95,7 +95,7 @@ lazy(s4, 'keys', () => {
                 .then((item) => {
                     const {n: name, ak: id} = item;
                     const obj = {name, id, kernel: 'keys'};
-                    return s4.ui.renameDialog('keys', obj, l.s4_key_rename, 'icon-key');
+                    return s4.ui.renameDialog('keys', obj, l.s4_key_rename);
                 })
                 .catch(tell);
         },

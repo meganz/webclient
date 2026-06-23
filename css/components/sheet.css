@@ -146,6 +146,7 @@ body.mobile .mega-sheet.normal .sheet .main {
 
 body.web-desktop .mega-sheet {
     justify-content: center;
+    z-index: 1201;
 }
 
 body.web-desktop .mega-sheet .sheet {

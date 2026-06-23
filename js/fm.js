@@ -1308,10 +1308,10 @@ function fm_showoverlay() {
 function duplicated(value, target) {
     "use strict";
     if (!target) {
-        return M.v.some((n) => n.name === value);
+        return M.v.some(n => n.name === value);
     }
 
-    return M.getChildren(target, (n) => n.name === value);
+    return M.getChildren(target, n => n.name === value);
 }
 
 /**
@@ -1390,122 +1390,21 @@ lazy(InputFloatWarning, 'validator', () => {
     return Object.freeze(obj);
 });
 
-function renameDialog() {
+function renameDialog(h) {
     "use strict";
 
-    if ($.selected.length > 0) {
-        const n = M.getNodeByHandle($.selected[0]);
-        var ext = fileext(n.name);
-        var $dialog = $('.mega-dialog.rename-dialog');
-        var $input = $('input', $dialog);
-        var errMsg = '';
-        const s4nodeType = M.getS4NodeType(n);
+    h = h || $.selected && $.selected[0];
+    const node = M.getNodeByHandle(h);
 
-        M.safeShowDialog('rename', function() {
-            $dialog.removeClass('hidden').addClass('active');
-            $input.trigger("focus");
-            return $dialog;
-        });
-
-        const ltWSpaceWarning = new InputFloatWarning($dialog);
-        ltWSpaceWarning.hide().check({name: n.name, ms: 0});
-
-        $('button.js-close, .rename-dialog-button.cancel', $dialog).rebind('click', closeDialog);
-
-        $('.rename-dialog-button.rename').rebind('click.rename', () => {
-            if ($dialog.hasClass('active')) {
-                var value = $input.val();
-                errMsg = '';
-
-                if (n.name && value !== n.name) {
-                    if (!value.trim()) {
-                        errMsg = l[5744];
-                    }
-                    else if (s4nodeType || !(errMsg = M.safeNameError(value, n.t))) {
-                        var targetFolder = n.p;
-                        if (duplicated(value, targetFolder)) {
-                            errMsg = l[23219];
-                        }
-                        else if (!s4nodeType || !(errMsg = s4.ui.getInvalidNodeNameError(n, value))) {
-                            M.rename(n.h, value).catch(tell);
-                        }
-                    }
-                    else {
-                        errMsg = M.safeNameError(value, n.t, 250, l[5744]);
-                    }
-
-                    if (errMsg) {
-                        $('.duplicated-input-warning span', $dialog).safeHTML(errMsg);
-                        $dialog.addClass('duplicate');
-                        $input.addClass('error');
-
-                        setTimeout(function() {
-                            $dialog.removeClass('duplicate');
-                            $input.removeClass('error');
-
-                            $input.trigger("focus");
-                        }, 2000);
-
-                        return;
-                    }
-                }
-
-                closeDialog();
-            }
-        });
-
-        $('header h2', $dialog)
-            .text(n.t ? s4nodeType === 'bucket' ? l.s4_bucket_rename : l[425] : l[426]);
-        $input.val(n.name);
-
-        const icon = fileIcon(n);
-        const $icon = $('.input-icon', $dialog).attr('class', `input-icon item-type-icon icon-${icon}-24`);
-        if (icon === 'folder') {
-            MegaNodeComponent.label.set(n, $icon);
-        }
-
-        if (!n.t && ext.length > 0) {
-            $input[0].selectionStart = 0;
-            $input[0].selectionEnd = $input.val().length - ext.length - 1;
-        }
-
-        $input.rebind('focus', function() {
-            var selEnd;
-            $dialog.addClass('focused');
-            var d = $(this).val().lastIndexOf('.');
-            if (d > -1) {
-                selEnd = d;
-            }
-            else {
-                selEnd = $(this).val().length;
-            }
-            $(this)[0].selectionStart = 0;
-            $(this)[0].selectionEnd = selEnd;
-        });
-
-        $input.rebind('blur', function() {
-            $dialog.removeClass('focused');
-        });
-
-        $input.rebind('keydown', (event) => {
-            // distingushing only keydown evet, then checking if it's Enter in order to preform the action'
-            if (event.keyCode === 13) { // Enter
-                $('.rename-dialog-button.rename').click();
-                return;
-            }
-            else if (event.keyCode === 27) { // ESC
-                closeDialog();
-            }
-            else {
-                $dialog.removeClass('duplicate').addClass('active');
-                $input.removeClass('error');
-            }
-        });
-
-        $input.rebind('keyup.rename-f', () => {
-            ltWSpaceWarning.check();
-        });
+    if (!node) {
+        return;
     }
+
+    if (!mega.ui.renameNode) {
+        mega.ui.renameNode = new NodeNameControl({type: 'rename'});
+    }
+
+    mega.ui.renameNode.show(h, {overrideTypeInfo: {placeholder: node.t ? l[157] : l[17506]}});
 }
 
 /**
@@ -1774,11 +1673,7 @@ function closeDialog(ev) {
         }
     }
 
-    if ($.dialog === 'createfolder' && ($.copyDialog || $.moveDialog || $.selectFolderDialog || $.saveAsDialog)) {
-        $('.mega-dialog.create-folder-dialog, .mega-dialog.s4-create-bucket-dialog').addClass('hidden');
-        $('.mega-dialog.create-folder-dialog .create-folder-size-icon').removeClass('hidden');
-    }
-    else if ($.dialog === 'start-group-chat' && ($.copyDialog || $.sendToChatDialog)) {
+    if ($.dialog === 'start-group-chat' && ($.copyDialog || $.sendToChatDialog)) {
         $('.mega-dialog.fm-picker-dialog').removeClass('arrange-to-back');
         fm_showoverlay();
         delete $.dialog;
@@ -1851,6 +1746,20 @@ function closeDialog(ev) {
         // Avoid recursive closeDialog() call from MegaSheet.hide() safeShow branch.
         mega.ui.auth.dialogComponent.safeShow = false;
         mega.ui.auth.dialogComponent.hide($.dialog);
+    }
+    else if ($.dialog && mega.ui.sheet.name === $.dialog) {
+
+        // Consume onClose before firing it, so the sheet's own close-button/background handlers
+        // (which call this.onClose() after hide()) cannot invoke the same callback a second time.
+        const {onClose} = mega.ui.sheet;
+
+        mega.ui.sheet.safeShow = false;
+        mega.ui.sheet.onClose = null;
+        mega.ui.sheet.hide();
+
+        if (typeof onClose === 'function') {
+            onClose();
+        }
     }
     else {
         if ($.dialog === 'properties') {
@@ -1946,7 +1855,7 @@ function closeDialog(ev) {
         delete $.termsAgree;
     }
 
-    if ($.dialog === 'createfolder') {
+    if ($.dialog === 'create-folder') {
         $('.mega-dialog').trigger('dialog-closed::create-folder');
         if ($.cfpromise) {
             $.cfpromise.reject();
@@ -2009,299 +1918,99 @@ function createFolderDialog(close) {
         return;
     }
 
-    var $dialog = $('.mega-dialog.create-folder-dialog');
-    var $input = $('input', $dialog);
-    $input.val('');
-
-    const ltWSpaceWarning = InputFloatWarning($dialog).hide();
-
     if (close) {
-        if ($.dialog === 'createfolder') {
-            closeDialog();
-        }
+        closeDialog();
         return true;
     }
 
-    var doCreateFolder = function(v) {
-        var errorMsg = M.safeNameError(v, 1, 250);
-        if (errorMsg) {
-            $dialog.removeClass('active');
-        }
-        else {
-            var specifyTarget = null;
-            if ($.cftarget) {
-                specifyTarget = $.cftarget;
+    // Show the create folder sheet
+    if (!mega.ui.createFolder) {
+        mega.ui.createFolder = new NodeNameControl({type: 'create'});
+    }
+
+    mega.ui.createFolder.show(false, {
+        noBtnDisable: true,
+        onClose: () => {
+            if ($.cfpromise) {
+                $.cfpromise.reject();
+                delete $.cfpromise;
             }
-            if (duplicated(v, specifyTarget)) {
-                errorMsg = l[23219];
-            }
-        }
-
-        if (errorMsg) {
-            showErrorCreatingFileFolder(errorMsg, $dialog, $input);
-
-            return;
-        }
-
-        var target = $.cftarget = $.cftarget || M.currentCustomView.nodeID || M.currentdirid;
-        var awaitingPromise = $.cfpromise;
-        delete $.cfpromise;
-
-        closeDialog();
-        loadingDialog.pshow();
-
-        M.createFolder(target, v)
-            .then((h) => {
-                if (d) {
-                    console.log('Created new folder %s->%s', target, h);
-                }
-                createFolderDialog(1);
-
-                if (awaitingPromise) {
-                    // dispatch an awaiting promise expecting to perform its own action instead of the default one
-                    queueMicrotask(() => awaitingPromise.resolve(h));
-                    return awaitingPromise;
-                }
-
-                // If this is custom view, we need to open custom view folder instead
-                const {original} = M.currentCustomView;
-                const id = original || M.getNodeByHandle(h).p || target;
-
-                // By default, auto-select the newly created folder as long no awaiting promise
-                return M.openFolder(id)
-                    .always(() => {
-                        $.selected = [h];
-                        reselect(1);
-                    });
-            })
-            .catch((ex) => {
-                msgDialog('warninga', l[135], l[47], ex < 0 ? api_strerror(ex) : ex, function() {
-                    if (awaitingPromise) {
-                        awaitingPromise.reject(ex);
-                    }
-                });
-            })
-            .finally(() => {
-                loadingDialog.phide();
-            });
-    };
-
-    $input.rebind('focus', function() {
-        if ($(this).val() === l[157]) {
-            $input.val('');
-        }
-        $dialog.addClass('focused');
-    });
-
-    $input.rebind('blur', function() {
-        $dialog.removeClass('focused');
-    });
-
-    $input.rebind('keyup', function(e) {
-        ltWSpaceWarning.check();
-        if ($input.val() === '' || $input.val() === l[157]) {
-            $dialog.removeClass('active');
-        }
-        else if (e.which !== 13)  {
-            $dialog.addClass('active');
-            $input.removeClass('error');
-        }
-    });
-
-    $input.rebind('keypress', function(e) {
-        var v = $(this).val();
-        if (e.which === 13 && v.trim() !== '') {
-            doCreateFolder(v);
-        }
-    });
-
-    $('button.js-close, .create-folder-button-cancel', $dialog).rebind('click', createFolderDialog);
-
-    $('.fm-dialog-input-clear').rebind('click', function() {
-        $input.val('');
-        $dialog.removeClass('active');
-    });
-
-    $('.fm-dialog-new-folder-button').rebind('click', () => doCreateFolder($input.val()));
-
-    M.safeShowDialog('createfolder', function() {
-        $dialog.removeClass('hidden');
-        $('.create-folder-wrapper input', $dialog).focus();
-        $dialog.removeClass('active');
-        return $dialog;
-    });
-}
-
-function showErrorCreatingFileFolder(errorMsg, $dialog, $input) {
-    "use strict";
-    $('.duplicated-input-warning span', $dialog).text(errorMsg);
-    $dialog.addClass('duplicate');
-    $input.addClass('error');
-
-    setTimeout(
-        () => {
-            $input.removeClass('error');
-            $dialog.removeClass('duplicate');
-            $input.trigger("focus");
-        },
-        2000
-    );
-}
-
-function createFileDialog(close, action, params) {
-    "use strict";
-
-
-    var closeFunction = function() {
-        if ($.cftarget) {
             delete $.cftarget;
         }
-        closeDialog();
+    });
+}
+
+function createFileDialog() {
+    "use strict";
+
+    if (M.isInvalidUserStatus()) {
         return false;
-    };
-
-
-    if (close) {
-        return closeFunction();
     }
 
-    if (!action) {
-        action = function(name, t) {
-            if (ulmanager.ulOverStorageQuota) {
-                ulmanager.ulShowOverStorageQuotaDialog();
-                return;
-            }
+    const t = M.currentCustomView ? M.currentCustomView.nodeID : M.currentdirid;
 
-            loadingDialog.pshow();
-
-            M.addNewFile(name, t)
-                .done(function(nh) {
-                    if (d) {
-                        console.log('Created new file %s->%s', t, name);
-                    }
-                    loadingDialog.phide();
-
-                    if ($.selectddUIgrid.indexOf('.grid-scrolling-table') > -1 ||
-                        $.selectddUIgrid.indexOf('.file-block-scrolling') > -1) {
-                        var $grid = $($.selectddUIgrid);
-                        var $newElement = $('#' + nh, $grid);
-
-                        if (M.megaRender && M.megaRender.megaList && M.megaRender.megaList._wasRendered) {
-                            M.megaRender.megaList.scrollToItem(nh);
-                            $newElement = $('#' + nh, $grid);
-                        }
-                        else if ($grid.length && $newElement.length && $grid.hasClass('ps')) {
-                            scrollToElement($grid, $newElement);
-                        }
-
-                        // now let's select the item. we can not use the click handler due
-                        // to redraw if element was out of viewport.
-                        $($.selectddUIgrid + ' ' + $.selectddUIitem).removeClass('ui-selected');
-                        $newElement.addClass('ui-selected');
-                        $.gridLastSelected = $newElement[0];
-                        selectionManager.clear_selection();
-                        selectionManager.add_to_selection(nh);
-
-                        loadingDialog.show('common', l[23130]);
-
-                        mega.fileTextEditor.getFile(nh).done(
-                            function(data) {
-                                loadingDialog.hide();
-                                mega.textEditorUI.setupEditor(M.getNodeByHandle(nh).name, data, nh);
-                            }
-                        ).fail(function() {
-                            loadingDialog.hide();
-                        });
-
-                    }
-
-                })
-                .fail(function(error) {
-                    loadingDialog.phide();
-                    msgDialog('warninga', l[135], l[47], api_strerror(error));
-                });
-        };
+    if (!mega.ui.saveTextAs) {
+        mega.ui.saveTextAs = new NodeNameControl({type: 'saveTextAs'});
     }
 
-    // there's no jquery parent for this container.
-    // eslint-disable-next-line local-rules/jquery-scopes
-    var $dialog = $('.mega-dialog.create-file-dialog');
-    var $input = $('input', $dialog);
-    $input.val('.txt')[0].setSelectionRange(0, 0);
+    mega.ui.saveTextAs.onSubmit = name => {
 
-    const ltWSpaceWarning = InputFloatWarning($dialog).hide();
-
-    var doCreateFile = function(v) {
-        var target = $.cftarget = $.cftarget || M.currentdirid;
-
-        var errorMsg = '';
-
-        if ((errorMsg = M.safeNameError(v, 0, 250, l[8566]))) {
-            $dialog.removeClass('active');
-        }
-        else if (duplicated(v, target)) {
-            errorMsg = l[23219];
-        }
-        if (errorMsg) {
-            showErrorCreatingFileFolder(errorMsg, $dialog, $input);
+        if (ulmanager.ulOverStorageQuota) {
+            ulmanager.ulShowOverStorageQuotaDialog();
             return;
         }
-        closeFunction();
-        action(v, target, params);
+
+        loadingDialog.pshow();
+
+        M.addNewFile(name, t).done(nh => {
+            if (d) {
+                console.log('Created new file %s->%s', t, name);
+            }
+            loadingDialog.phide();
+
+            if ($.selectddUIgrid.includes('.grid-scrolling-table') ||
+                $.selectddUIgrid.includes('.file-block-scrolling')) {
+                const $grid = $($.selectddUIgrid);
+                let $newElement = $(`#${nh}`, $grid);
+
+                if (M.megaRender && M.megaRender.megaList && M.megaRender.megaList._wasRendered) {
+                    M.megaRender.megaList.scrollToItem(nh);
+                    $newElement = $(`#${nh}`, $grid);
+                }
+                else if ($grid.length && $newElement.length && $grid.hasClass('ps')) {
+                    scrollToElement($grid, $newElement);
+                }
+
+                $(`${$.selectddUIgrid} ${$.selectddUIitem}`).removeClass('ui-selected');
+                $newElement.addClass('ui-selected');
+                $.gridLastSelected = $newElement[0];
+                selectionManager.clear_selection();
+                selectionManager.add_to_selection(nh);
+
+                loadingDialog.show('common', l[23130]);
+
+                mega.fileTextEditor.getFile(nh)
+                    .done(data => {
+                        loadingDialog.hide();
+                        mega.textEditorUI.setupEditor(M.getNodeByHandle(nh).name, data, nh);
+                    })
+                    .fail(() => {
+                        loadingDialog.hide();
+                    });
+            }
+        }).fail(error => {
+            loadingDialog.phide();
+            msgDialog('warninga', l[135], l[47], api_strerror(error));
+        });
     };
 
-
-    $input.rebind('focus.fileDialog', function() {
-        if ($(this).val() === l[17506]) {
-            $input.val('');
+    mega.ui.saveTextAs.show({name: '.txt', t: 0}, {
+        noBtnDisable: true,
+        overrideTypeInfo: {
+            title: () => escapeHTML(l[23047]),
+            button: escapeHTML(l[158]),
+            placeholder: escapeHTML(l.new_text_file_name)
         }
-        $dialog.addClass('focused');
-    });
-
-    $input.rebind('blur.fileDialog', function() {
-        $dialog.removeClass('focused');
-    });
-
-    $input.rebind('keyup.fileDialog', function() {
-        ltWSpaceWarning.check();
-        if ($input.val() === '' || $input.val() === l[17506]) {
-            $dialog.removeClass('active');
-        }
-        else {
-            $dialog.addClass('active');
-            $input.removeClass('error');
-        }
-    });
-
-    $input.rebind('keypress.fileDialog', function(e) {
-
-        if (e.which === 13) {
-            doCreateFile($(this).val());
-        }
-        else {
-            $input.removeClass('error');
-            $dialog.removeClass('duplicate');
-        }
-    });
-
-    // eslint-disable-next-line sonarjs/no-duplicate-string
-    $('.js-close, .cancel-create-file', $dialog).rebind('click.fileDialog', closeFunction);
-
-    $('.fm-dialog-input-clear', $dialog).rebind('click.fileDialog', function() {
-        $input.val('');
-        $dialog.removeClass('active');
-    });
-
-    $('.create-file', $dialog).rebind('click.fileDialog', function() {
-        var v = $input.val();
-        doCreateFile(v);
-    });
-
-    M.safeShowDialog('createfile', function() {
-        $dialog.removeClass('hidden');
-        $('.create-file-wrapper input', $dialog).focus();
-        $dialog.removeClass('active');
-        return $dialog;
     });
 }
 

@@ -61,8 +61,9 @@ class MegaMobileFooter extends MegaComponent {
 
                     // Show the create folder sheet
                     if (!mobile.createFolder) {
-                        mobile.createFolder = new MobileNodeNameControl({type: 'create'});
+                        mobile.createFolder = new NodeNameControl({type: 'create'});
                     }
+
                     mobile.createFolder.show();
                 }
             },
@@ -76,7 +77,7 @@ class MegaMobileFooter extends MegaComponent {
                     }
 
                     if (!mega.ui.saveTextAs) {
-                        mega.ui.saveTextAs = new MobileNodeNameControl({type: 'saveTextAs'});
+                        mega.ui.saveTextAs = new NodeNameControl({type: 'saveTextAs'});
                     }
 
                     mega.ui.saveTextAs.onSubmit = async nn => {

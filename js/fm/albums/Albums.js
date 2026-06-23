@@ -1912,127 +1912,19 @@ lazy(mega.gallery, 'albums', () => {
         }
     }
 
-    class AlbumNameDialog extends MDialog {
+    class AlbumNameDialog {
         constructor(albumId, okFn, closeFn) {
-            super({
-                ok: {
-                    label: albumId ? l.album_rename_btn_label : l.album_create_btn_label,
-                    callback: () => {
-                        const { value } = this.input;
-                        const { err, isDisabled } = this.validateInput(albumId);
-
-                        if (mega.sets && !err && !isDisabled) {
-                            this.okBtn.loading = true;
-
-                            if (okFn) {
-                                okFn(value);
-                            }
-                            else if (albumId) {
-                                mega.sets.updateAttrValue(
-                                    {
-                                        k: scope.albums.store[albumId].k,
-                                        id: albumId
-                                    },
-                                    'n',
-                                    value
-                                ).then(() => {
-                                    const album = scope.albums.store[albumId];
-
-                                    if (album) {
-                                        album.label = value;
-
-                                        if (album.cellEl) {
-                                            album.cellEl.updateName();
-                                        }
-                                    }
-
-                                    this.hide();
-                                }).catch(() => {
-                                    this.okBtn.loading = false;
-                                    // Show an error?
-                                });
-                            }
-                            else {
-                                if (M.isAlbumsPage(1)) {
-                                    scope.albums.grid.setPendingCell(value);
-                                }
-                                pendingName = value;
-
-                                timemarks.albumCreateNamed = Date.now();
-
-                                delay(
-                                    'albums_stat_99826',
-                                    eventlog.bind(null, 99826, JSON.stringify({
-                                        albumsCount: getAlbumsCount() + 1,
-                                        start: timemarks.albumCreateStarted,
-                                        end: timemarks.albumCreateNamed,
-                                        lifetime: timemarks.albumCreateNamed - timemarks.albumCreateStarted
-                                    }))
-                                );
-
-                                mega.sets.add(value)
-                                    .then((res) => {
-                                        this.albumId = res.id;
-                                        this.hide();
-                                    })
-                                    .catch(() => {
-                                        // Show an error?
-                                        this.okBtn.loading = false;
-                                    });
-                            }
-                        }
-
-                        return false;
-                    }
-                },
-                cancel: true,
-                dialogClasses: 'create-folder-dialog',
-                contentClasses: 'px-2',
-                onclose: () => {
-                    scope.reinitiateEvents();
-
-                    if (closeFn) {
-                        queueMicrotask(() => closeFn(this.albumId));
-                    }
-                }
-            });
 
             this.albumId = albumId;
-            this.setContent(albumId);
-
-            this.disposeInputListener = MComponent.listen(this.input, 'input', () => {
-                this.triggerInputSaveguard();
-            });
-            this._title.classList.add('text-center');
+            this.okFn = okFn;
+            this.closeFn = closeFn;
+            this.existingNames = null;
+            this._closed = false;
 
             scope.albums.removeKeyboardListener();
 
             if (!albumId) {
                 timemarks.albumCreateStarted = Date.now();
-            }
-            mBroadcaster.once('closedialog', scope.reinitiateEvents);
-        }
-
-        triggerInputSaveguard() {
-            const { err, warn, isDisabled } = this.validateInput(this.albumId);
-
-            if (err) {
-                this.disable();
-                this.showError(err);
-            }
-            else if (isDisabled) {
-                this.disable();
-            }
-            else {
-                this.enable();
-            }
-
-            if (!err && warn) {
-                this.showWarning(warn);
-            }
-
-            if (!err && !warn) {
-                this.clearHint();
             }
         }
 
@@ -2040,50 +1932,13 @@ lazy(mega.gallery, 'albums', () => {
             this.existingNames = names;
         }
 
-        setContent(albumId) {
-            this.slot = document.createElement('div');
-            this.slot.className = 'px-6';
-
-            const div = document.createElement('div');
-            div.className = 'create-album-input-bl';
-
-            const inputIcon = document.createElement('i');
-            inputIcon.className = 'sprite-fm-mono icon-album icon-size-6';
-
-            this.input = document.createElement('input');
-            this.input.setAttribute('placeholder', 'Album name');
-            this.input.setAttribute('autofocus', '');
-            this.input.setAttribute('type', 'text');
-
-            if (albumId && scope.albums.store[albumId]) {
-                this.input.value = scope.albums.store[albumId].label;
-                this.title = l.edit_album_name;
-            }
-            else {
-                const name = proposeAlbumName();
-
-                this.title = l.enter_album_name;
-                this.input.value = name;
-
-                if (!name) {
-                    this.disable();
-                }
-            }
-
-            div.appendChild(inputIcon);
-            div.appendChild(this.input);
-            this.slot.appendChild(div);
-        }
-
-        validateInput(albumId) {
-            const { value } = this.input;
+        validateInput(value, albumId) {
 
             const validation = {
                 isDisabled: false,
                 err: null,
                 warn: null
             };
-
 
             if (!value
                 || typeof value !== 'string'
@@ -2115,62 +1970,121 @@ lazy(mega.gallery, 'albums', () => {
             return validation;
         }
 
-        showHint(text, className) {
-            if (!this.hint) {
-                this.hint = document.createElement('div');
-                this.slot.appendChild(this.hint);
-            }
-
-            this.hint.className = className;
-            this.hint.textContent = text;
-        }
-
-        showError(err) {
-            this.input.classList.add('error');
-            this.showHint(err, 'duplicated-input-warning');
-            $('.create-album-input-bl').addClass('duplicated');
-        }
-
-        showWarning(warn) {
-            this.showHint(warn, 'whitespaces-input-warning');
-        }
-
-        clearHint() {
-            this.input.classList.remove('error');
-            $('.create-album-input-bl').removeClass('duplicated');
-
-            if (this.hint) {
-                this.slot.removeChild(this.hint);
-                delete this.hint;
-            }
-        }
-
-        onMDialogShown() {
-            this.triggerInputSaveguard();
-
-            delay('focus:new_album_input', () => {
-                this.input.focus();
-                this.input.select();
-            }, 200);
-        }
-
         hide() {
-            super.hide();
-            this.disposeInputListener();
+            mega.ui.sheet.hide();
+        }
+
+        show() {
+
+            const album = this.albumId && scope.albums.store[this.albumId];
+            const initialValue = album && album.label || proposeAlbumName();
+
+            if (!mega.ui.renameNode) {
+                mega.ui.renameNode = new NodeNameControl({type: 'rename'});
+            }
+
+            const doClose = () => {
+
+                if (this._closed) {
+                    return;
+                }
+                this._closed = true;
+                scope.reinitiateEvents();
+
+                if (typeof this.closeFn === 'function') {
+                    queueMicrotask(() => this.closeFn(this.albumId));
+                }
+            };
+
+            mega.ui.renameNode.show({name: initialValue || '', t: 1}, {
+                onClose: doClose,
+                canSubmit: value => !this.validateInput(value, this.albumId).isDisabled,
+                overrideTypeInfo: {
+                    name: 'album-name-dialog',
+                    placeholder: escapeHTML(l[86]),
+                    title: () => escapeHTML(this.albumId ? l.edit_album_name : l.enter_album_name),
+                    button: escapeHTML(this.albumId ? l.album_rename_btn_label : l.album_create_btn_label),
+                    empty: escapeHTML(l[5744]),
+                    submit: nop
+                },
+                overrideAction: async({value, nameInput}) => {
+
+                    const {err, isDisabled} = this.validateInput(value, this.albumId);
+
+                    if (err) {
+                        const alertIcon = '<i class="alert sprite-fm-mono icon-alert-triangle-thin-outline"></i>';
+
+                        nameInput.showError(`${alertIcon}${escapeHTML(err)}`);
+                        return;
+                    }
+
+                    if (isDisabled || !mega.sets) {
+                        return;
+                    }
+
+                    if (typeof this.okFn === 'function') {
+                        this._closed = true;
+                        mega.ui.sheet.hide();
+                        scope.reinitiateEvents();
+                        this.okFn(value);
+                        return;
+                    }
+
+                    const {albumId} = this;
+
+                    if (albumId) {
+                        return mega.sets.updateAttrValue({k: scope.albums.store[albumId].k, id: albumId}, 'n', value)
+                            .then(() => {
+                                const album = scope.albums.store[albumId];
+
+                                if (album) {
+                                    album.label = value;
+
+                                    if (album.cellEl) {
+                                        album.cellEl.updateName();
+                                    }
+                                }
+
+                                mega.ui.sheet.hide();
+                                doClose();
+                            })
+                            .catch(dump);
+                    }
+
+                    if (M.isAlbumsPage(1)) {
+                        scope.albums.grid.setPendingCell(value);
+                    }
+                    pendingName = value;
+
+                    timemarks.albumCreateNamed = Date.now();
+
+                    delay(
+                        'albums_stat_99826',
+                        eventlog.bind(null, 99826, JSON.stringify({
+                            albumsCount: getAlbumsCount() + 1,
+                            start: timemarks.albumCreateStarted,
+                            end: timemarks.albumCreateNamed,
+                            lifetime: timemarks.albumCreateNamed - timemarks.albumCreateStarted
+                        }))
+                    );
+
+                    return mega.sets.add(value).then(res => {
+                        this.albumId = res.id;
+                        mega.ui.sheet.hide();
+                        doClose();
+                    }).catch(dump);
+                }
+            });
         }
     }
 
     Object.defineProperty(AlbumNameDialog, 'prompt', {
+
         value(albumId, names) {
-            return new Promise((resolve) => {
-                const dialog = new AlbumNameDialog(
-                    albumId,
-                    (name) => {
-                        dialog.hide();
-                        return resolve(name);
-                    },
-                    () => resolve(null)
-                );
+
+            return new Promise(resolve => {
+
+                const dialog = new AlbumNameDialog(albumId, resolve, () => resolve(null));
 
                 if (names) {
                     dialog.setNames(names);

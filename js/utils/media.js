@@ -1238,7 +1238,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
             setIdle(false);
             if (dlmanager.isStreaming) {
                 delay(MOUSE_IDLE_TID, () => {
-                    if (streamer && !streamer.interrupted) {
+                    if (playevent && streamer && !streamer.interrupted) {
                         setIdle(true);
                     }
                 }, 2600);

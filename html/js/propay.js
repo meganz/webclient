@@ -2886,7 +2886,7 @@ pro.propay = {
                     renderOption(this.paymentGateways.tertiary[i], i, 'tertiary', true);
                 }
 
-                $('.txt', $seeAllBtn).text('See all');
+                $('.txt', $seeAllBtn).text(l.see_all);
                 $secondaryOptionsContainer.safeAppend($seeAllBtn.prop('outerHTML'));
 
                 let showingAll = preselectedIsTertiary;

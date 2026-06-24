@@ -1105,6 +1105,10 @@ RecentsRender.prototype._renderFiles = function($newRow, action, actionId) {
                         loadingDialog.hide();
                     });
             }
+            else if (mega.zipBrowser && mega.zipBrowser.canOpen(node)) {
+                // Supported archives (.zip/.tar/.gz) open in the read-only archive browser.
+                mega.zipBrowser.openArchive(node).catch(tell);
+            }
             else {
 
             }

@@ -203,6 +203,12 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
                 else if (is_text(selNode)) {
                     items['.edit-file-item'] = 1;
                 }
+
+                // Supported archives (.zip/.tar/.gz) can be opened as a
+                // read-only folder view - same as double-clicking them.
+                if (mega.zipBrowser && mega.zipBrowser.canOpen(selNode)) {
+                    items['.open-item'] = 1;
+                }
             }
         }
 

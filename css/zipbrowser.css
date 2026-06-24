@@ -1,0 +1,205 @@
+/* ZIP archive browser - read-only folder view for .zip files.
+ * Paired with js/zip-browser.js (mega.zipBrowser). */
+
+/* While a zip is open, hide the underlying FM grid/block views (and their
+ * column headers) and anchor the overlay's inset:0 to this block. We use a
+ * dedicated marker class rather than toggling the view-mode `hidden` class so
+ * view-mode state is never corrupted. The Shared items (in/out) views use their
+ * own grid/block containers, so they must be hidden too or their column header
+ * leaks below the overlay. */
+.fm-right-files-block.zip-browser-open,
+.fm-recents.container.zip-browser-open {
+    position: relative;
+}
+
+/* Hide every sibling under the host (any view/grid/header for Cloud Drive, Shared items
+ * in/out, search, Recents, etc.) except our own overlay - enumerating per-view classes
+ * missed the grid the Shared-items folder view uses. The Recents view has its own
+ * container (a sibling of .fm-right-files-block), so it gets the same treatment. */
+.fm-right-files-block.zip-browser-open > *:not(.zip-explorer-overlay),
+.fm-recents.container.zip-browser-open > *:not(.zip-explorer-overlay) {
+    display: none !important;
+}
+
+.zip-explorer-overlay {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    background: var(--surface-grey-1);
+    color: var(--text-color-high);
+    font: inherit;
+}
+
+.zip-explorer-breadcrumb {
+    display: flex;
+    align-items: center;
+    flex: 0 0 auto;
+    padding: 8px 16px;
+    border-bottom: 1px solid var(--stroke-grey-2);
+}
+
+/* `gap` (flexbox-gap) is unsupported on older browsers; use child margins. */
+.zip-explorer-breadcrumb > * + * {
+    margin-left: 8px;
+}
+
+.zip-explorer-badge {
+    display: inline-flex;
+    align-items: center;
+    color: var(--label-orange);
+}
+
+.zip-explorer-badge .sprite-fm-mono {
+    --icon-size: 24px;
+    --mask-color: var(--label-orange);
+}
+
+.zip-explorer-crumbs {
+    display: inline-flex;
+    align-items: center;
+    min-width: 0;
+    font-size: 14px;
+}
+
+.zip-explorer-crumb {
+    max-width: 240px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: var(--text-color-medium);
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.zip-explorer-crumb:hover {
+    text-decoration: underline;
+}
+
+.zip-explorer-crumb:last-child {
+    color: var(--text-color-high);
+    font-weight: 600;
+}
+
+.zip-explorer-sep {
+    margin: 0 4px;
+    color: var(--text-color-medium);
+}
+
+.zip-explorer-spacer {
+    flex: 1;
+}
+
+.zip-explorer-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+
+.zip-explorer-close .sprite-fm-mono {
+    --icon-size: 24px;
+    --mask-color: var(--text-color-medium);
+}
+
+.zip-explorer-close:hover .sprite-fm-mono {
+    --mask-color: var(--text-color-high);
+}
+
+.zip-explorer-status {
+    padding: 32px;
+    text-align: center;
+    color: var(--text-color-medium);
+}
+
+.zip-explorer-grid {
+    flex: 1 1 auto;
+    overflow: auto;
+    padding: 8px 16px;
+}
+
+.zip-explorer-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 120px 110px 180px;
+    gap: 8px;
+    align-items: center;
+    padding: 6px 4px;
+    border-bottom: 1px solid var(--surface-grey-2);
+    user-select: none;
+}
+
+.zip-explorer-row > div {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.zip-explorer-row .col-name {
+    display: flex;
+    align-items: center;
+}
+
+/* `gap` (flexbox-gap) is unsupported on older browsers; use child margins. */
+.zip-explorer-row .col-name > * + * {
+    margin-left: 8px;
+}
+
+.zip-explorer-name {
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.zip-explorer-row .item-type-icon {
+    --icon-size: 24px;
+    flex: 0 0 auto;
+}
+
+.zip-explorer-header {
+    border-bottom: 2px solid var(--stroke-grey-2);
+    color: var(--text-color-medium);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+}
+
+.zip-explorer-folder,
+.zip-explorer-file {
+    cursor: pointer;
+}
+
+.zip-explorer-folder:hover,
+.zip-explorer-file:hover {
+    background: var(--surface-grey-2);
+}
+
+.zip-explorer-empty {
+    padding: 24px;
+    text-align: center;
+    color: var(--text-color-medium);
+}
+
+/* Zip-browser downloads are synthetic transfers (not in dlQueue), so the
+ * Transfer Progress Widget's pause/cancel row actions don't apply to them.
+ * Our rows carry an id of the form `dl_zipbrowser<seq>_<handle>` (set as the
+ * row element id by the TPW), so we can hide their hover actions. The
+ * `dl_zipbrowser` prefix is >11 chars and cannot collide with a real download
+ * GID (`dl_` + 8-char handle). */
+.transfer-task-row[id^="dl_zipbrowser"] .transfer-task-actions {
+    display: none !important;
+}
+
+.zip-explorer-lock {
+    --icon-size: 16px;
+    --mask-color: var(--text-color-medium);
+    flex: 0 0 auto;
+    margin-left: 4px;
+}

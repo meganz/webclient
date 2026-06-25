@@ -1747,21 +1747,8 @@ function closeDialog(ev) {
         mega.ui.auth.dialogComponent.safeShow = false;
         mega.ui.auth.dialogComponent.hide($.dialog);
     }
-    else if ($.dialog && mega.ui.sheet.name === $.dialog) {
-
-        // Consume onClose before firing it, so the sheet's own close-button/background handlers
-        // (which call this.onClose() after hide()) cannot invoke the same callback a second time.
-        const {onClose} = mega.ui.sheet;
-
-        mega.ui.sheet.safeShow = false;
-        mega.ui.sheet.onClose = null;
-        mega.ui.sheet.hide();
-
-        if (typeof onClose === 'function') {
-            onClose();
-        }
-    }
-    else {
+    else if ($.dialog !== 'create-folder' && $.dialog !== 's4-create-bucket' ||
+        !($.copyDialog || $.moveDialog || $.selectFolderDialog || $.saveAsDialog)) {
         if ($.dialog === 'properties') {
             propertiesDialog(2);
         }

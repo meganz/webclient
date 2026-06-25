@@ -61,7 +61,7 @@ lazy(s4, 'buckets', () => {
 
                     if (errorMsg) {
                         const alertIcon = '<i class="alert sprite-fm-mono icon-alert-triangle-thin-outline"></i>';
-                        nameInput.showError(`${alertIcon}${escapeHTML(errorMsg)}`);
+                        nameInput.showError(`${alertIcon}<span>${errorMsg}</span>`);
 
                         if (actionButton) {
                             actionButton.disabled = false;

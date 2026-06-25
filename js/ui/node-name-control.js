@@ -54,6 +54,7 @@ class NodeNameControl {
                 closeFired = true;
                 onClose();
             }
+            mega.ui.sheet.removeClass('node-name-dialog');
         };
 
         if (!typeInfo) {
@@ -126,7 +127,9 @@ class NodeNameControl {
                         close: () => mega.ui.sheet.hide()
                     });
 
-                    this.setDisabled(submittable($input.val()));
+                    if (this.visible) {
+                        this.setDisabled(submittable($input.val()));
+                    }
                     return;
                 }
 
@@ -220,6 +223,7 @@ class NodeNameControl {
 
             mega.ui.sheet.name = typeInfo.name;
             mega.ui.sheet.safeShow = true;
+            mega.ui.sheet.addClass('node-name-dialog');
 
             mega.ui.sheet.show();
         });
@@ -253,13 +257,13 @@ class NodeNameControl {
             errorMsg = escapeHTML(l[23219]);
         }
         if (!errorMsg && (s4NodeType === 'bucket' || s4NodeType === 'object') && s4.ui) {
-            errorMsg = escapeHTML(s4.ui.getInvalidNodeNameError(node, newName) || '');
+            errorMsg = s4.ui.getInvalidNodeNameError(node, newName) || '';
         }
 
         if (errorMsg) {
             const alertIcon = '<i class="alert sprite-fm-mono icon-alert-triangle-thin-outline"></i>';
 
-            nameInput.showError(`${alertIcon}${errorMsg}`);
+            nameInput.showError(`${alertIcon}<span>${errorMsg}</span>`);
             actionButton.disabled = false;
             return;
         }
@@ -288,7 +292,7 @@ class NodeNameControl {
             const alertIcon = '<i class="alert sprite-fm-mono icon-alert-circle-thin-outline"></i>';
             const warning = nodeType === 1 ? l.whitespaces_on_foldername : l.whitespaces_on_filename;
 
-            nameInput.showError(`${alertIcon}${escapeHTML(warning)}`);
+            nameInput.showError(`${alertIcon}<span>${warning}</span>`);
             nameInput.$wrapper.addClass('warning');
         }
     }

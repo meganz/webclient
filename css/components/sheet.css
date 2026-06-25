@@ -146,6 +146,9 @@ body.mobile .mega-sheet.normal .sheet .main {
 
 body.web-desktop .mega-sheet {
     justify-content: center;
+}
+
+body.web-desktop .mega-sheet.node-name-dialog {
     z-index: 1201;
 }
 

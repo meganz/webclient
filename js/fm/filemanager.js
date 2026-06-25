@@ -281,7 +281,7 @@ FileManager.prototype.initS4FileManager = mutex('s4-object-storage.lock', functi
     'use strict';
     const stringify = tryCatch((v) => JSON.stringify(v));
 
-    this.s4idd = ['load'];
+    this.s4idd = ['load', -1, []];
 
     return Promise.resolve(this.require('s4'))
         .then(() => {
@@ -394,7 +394,7 @@ FileManager.prototype.initFileManager = async function() {
             const s4load = this.initS4FileManager()
                 .catch((ex) => {
                     if (self.d) {
-                        console.error('Failed to initialize S4 (?!)', [ex]);
+                        console.error('Failed to initialize S4 (?!)', ex, `${this.s4idd}`);
                     }
 
                     Object.defineProperty(s4, 'failure', {

@@ -53,7 +53,7 @@ lazy(s4, 'users', () => {
                 .then((item) => {
                     const {name, uid: id} = item;
                     const obj = {name, id, kernel: 'user'};
-                    return s4.ui.renameDialog('users', obj, l.s4_user_rename, 'icon-user-filled');
+                    return s4.ui.renameDialog('users', obj, l.s4_user_rename);
                 })
                 .catch(tell);
         },

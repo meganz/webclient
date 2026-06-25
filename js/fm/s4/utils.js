@@ -480,7 +480,7 @@ lazy(s4, 'utils', () => {
                 const itemNode = mCreateElement('span', {
                     'class': `nw-fm-tree-item${M.tree[id] || M.tree.s4[id] ? ' contains-folders' : ''}`,
                     'id': `${prefix}treea_${id}`,
-                    'data-eventid': eventId,
+                    'data-eventid': eventId || '',
                 }, itemWrap);
                 mCreateElement('span', {'class': 'nw-fm-tree-arrow'}, itemNode);
                 mCreateElement('span', {

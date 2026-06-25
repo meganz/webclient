@@ -134,192 +134,106 @@ var nicknames = {
 
         dialogName: 'update-nickname-dialog',
 
-        /** Cache of the jQuery selector for the dialog */
-        $dialog: null,
+        /** The name-input sheet control showing this dialog */
+        control: null,
 
         /** The contact's user handle (base64 encoded string) */
         contactUserHandle: null,
 
         /**
-         * Initialise the dialog
+         * Initialise and show the dialog
          * @param {String} contactUserHandle The contact's user handle (base64 encoded string)
          */
         init: function(contactUserHandle) {
 
             'use strict';
 
-            // Init global selectors
-            this.$dialog = $('.contact-nickname-dialog');
-            this.$megaInput = new mega.ui.MegaInputs($('#nickname-input',this.$dialog)).$input;
-
             // Set user handle for use later
             this.contactUserHandle = contactUserHandle;
 
-            // Init functionality
-            this.setNicknameDialogTitle();
-            this.prefillUserNickname();
-            this.initTextSave();
-            this.initCancelAndCloseButtons();
-            this.initSaveButton();
-            this.showDialog();
-            this.initInputFocus();
-        },
+            const user = M.u[contactUserHandle];
+            const hasNickname = Boolean(user && user.nickname !== '');
+            let initialValue = '';
 
-        /**
-         * Setup the nickname dialog title
-         */
-        setNicknameDialogTitle: function() {
-
-            'use strict';
-
-            var $nicknameDialogTitle = $('#contact-nickname-dialog-title', this.$dialog);
-
-            if (typeof M.u[this.contactUserHandle] === 'undefined' || M.u[this.contactUserHandle].nickname === '') {
-                $nicknameDialogTitle.text(l.set_nickname_label);
-            }
-            else {
-                $nicknameDialogTitle.text(l.edit_nickname_label);
-            }
-        },
-
-        /**
-         * Automatically fill in the user's current nickname if it is set
-         */
-        prefillUserNickname: function() {
-
-            'use strict';
-
-            var $input = this.$megaInput;
-            var inputValue = '';
-
-            // If the contact exists
-            if (typeof M.u[this.contactUserHandle] !== 'undefined') {
-
-                // If the nickname is set, use that
-                if (M.u[this.contactUserHandle].nickname !== '') {
-                    inputValue = M.u[this.contactUserHandle].nickname;
-                }
-                else {
-                    // Otherwise if the contact details are available, pre-populate with their first and last name
-                    var firstName = M.u[this.contactUserHandle].firstName;
-                    var lastName = M.u[this.contactUserHandle].lastName;
-
-                    inputValue = (firstName + ' ' + lastName).trim();
-                }
+            if (user) {
+                // Use the nickname if set, otherwise pre-populate with the contact's first and last name
+                initialValue = hasNickname ? user.nickname : `${user.firstName} ${user.lastName}`.trim();
             }
 
-            // Show the nickname, name or empty string in the text field
-            $input.val(inputValue);
-        },
+            if (!this.control) {
+                this.control = new NodeNameControl({type: 'rename'});
+                this.control.nameInput.$input.attr('maxlength', 50);
+            }
 
-        /**
-         * Initialise the code to bind the save button to enter key
-         */
-        initTextSave: function() {
-
-            'use strict';
-
-            var $input = this.$megaInput;
-            var $saveButton = this.$dialog.find('.save-button');
-
-            // Set the keyup handler
-            $input.rebind('keyup.inputchange', function(event) {
-
-                // If Enter key is pressed, trigger Save action
-                if (event.which === 13) {
-                    $saveButton.trigger('click');
+            this.control.show({name: initialValue, t: 0}, {
+                noBtnDisable: true,
+                allowEmpty: true,
+                overrideTypeInfo: {
+                    name: this.dialogName,
+                    selection: false,
+                    checkSpaces: false,
+                    title: () => escapeHTML(hasNickname ? l.edit_nickname_label : l.set_nickname_label),
+                    button: escapeHTML(l[776]),
+                    submit: nop
+                },
+                overrideAction: ({value, close}) => {
+                    this.save(value.trim());
+                    close();
                 }
             });
         },
 
         /**
-         * Initialise the Cancel and Close buttons
+         * Save the new nickname, or remove it when an empty value is given
+         * @param {String} nickname The trimmed nickname
+         * @returns {void}
          */
-        initCancelAndCloseButtons: function() {
+        save(nickname) {
 
             'use strict';
 
-            var $cancelButton = this.$dialog.find('.cancel-button');
-            var $closeIconButton = this.$dialog.find('button.js-close');
-            var $input = this.$megaInput;
-            var self = this;
+            const {contactUserHandle} = this;
 
-            // On click of the Cancel or Close icon
-            $cancelButton.add($closeIconButton).rebind('click.closeDialog', function() {
+            // A flag for whether to update the API or not. If they entered a blank nickname and that nickname did
+            // not exist before, then the API won't be updated, but if it did exist before then it will be deleted.
+            let updateApi = false;
 
-                // Clear the entered value
-                $input.val('');
+            // If the nickname is empty
+            if (nickname.length < 1) {
 
-                // Close the dialog
-                self.closeDialog();
-            });
-        },
-
-        /**
-         * Initialise the Save button
-         */
-        initSaveButton: function() {
-
-            'use strict';
-
-            var $saveButton = this.$dialog.find('.save-button');
-            var $nicknameInput = this.$megaInput;
-            var contactUserHandle = this.contactUserHandle;
-            var self = this;
-
-            // On Save button click
-            $saveButton.rebind('click.saveNickname', function() {
-
-                // A flag for whether to update the API or not. If they entered a blank nickname and that nickname did
-                // not exist before, then the API won't be updated, but if if did exist before then it will be deleted.
-                var updateApi = false;
-
-                // Get the nickname and trim it
-                var nickname = $nicknameInput.val().trim();
-
-                // If the nickname is empty
-                if (nickname.length < 1) {
-
-                    // If the nickname previously existed, delete it
-                    if (M.u[contactUserHandle].nickname !== '') {
-                        M.u[contactUserHandle].nickname = '';
-                        useravatar.refresh(contactUserHandle).catch(dump);
-                        updateApi = true;
-                    }
-                }
-                else {
-                    // Set the nickname
-                    M.u[contactUserHandle].nickname = nickname;
+                // If the nickname previously existed, delete it
+                if (M.u[contactUserHandle].nickname !== '') {
+                    M.u[contactUserHandle].nickname = '';
                     useravatar.refresh(contactUserHandle).catch(dump);
                     updateApi = true;
                 }
+            }
+            else {
+                // Set the nickname
+                M.u[contactUserHandle].nickname = nickname;
+                useravatar.refresh(contactUserHandle).catch(dump);
+                updateApi = true;
+            }
 
-                // If the API should be updated with the new attribute or have it removed
-                if (updateApi) {
-                    nicknames._dirty[contactUserHandle] = M.u[contactUserHandle].nickname;
+            // If the API should be updated with the new attribute or have it removed
+            if (updateApi) {
+                nicknames._dirty[contactUserHandle] = M.u[contactUserHandle].nickname;
 
-                    // Get all the contacts with nicknames
-                    var contactNicknames = self.getNicknamesForAllContacts();
+                // Get all the contacts with nicknames
+                const contactNicknames = this.getNicknamesForAllContacts();
 
-                    // If there are nicknames, save them to a private encrypted attribute
-                    var promise;
-                    if (Object.keys(contactNicknames).length > 0) {
-                        promise = self.saveNicknamesToApi(contactNicknames);
-                    }
-                    else {
-                        promise = self.removeNicknamesFromApi();
-                    }
-                    promise.always(function() {
-                        // versioned attributes would proxy their second .get and merge requests and the original
-                        // promise would wait before getting resolve/rejected (so that merge/set had finished
-                        // successfully)
-                        delete nicknames._dirty[contactUserHandle];
-                    });
-                }
+                // If there are nicknames, save them to a private encrypted attribute
+                const promise = Object.keys(contactNicknames).length > 0
+                    ? this.saveNicknamesToApi(contactNicknames)
+                    : this.removeNicknamesFromApi();
 
-                // Hide the dialog
-                self.closeDialog();
-            });
+                promise.always(() => {
+                    // versioned attributes would proxy their second .get and merge requests and the original
+                    // promise would wait before getting resolve/rejected (so that merge/set had finished
+                    // successfully)
+                    delete nicknames._dirty[contactUserHandle];
+                });
+            }
         },
 
         /**
@@ -398,43 +312,6 @@ var nicknames = {
                 .always(function() {
                     loadingDialog.hide();
                 });
-        },
-
-        /**
-         * When the dialog has opened, put the cursor into the text field
-         */
-        initInputFocus: function() {
-
-            'use strict';
-
-            this.$megaInput.trigger('focus');
-        },
-
-        /**
-         * Show the dialog
-         */
-        showDialog() {
-
-            'use strict';
-
-            M.safeShowDialog(this.dialogName, () => {
-                this.$dialog.removeClass('hidden');
-                fm_showoverlay();
-            });
-        },
-
-        /**
-         * Close the dialog
-         */
-        closeDialog() {
-
-            'use strict';
-
-            this.$dialog.addClass('hidden');
-            fm_hideoverlay();
-            if ($.dialog === this.dialogName) {
-                closeDialog();
-            }
         }
     }
 };

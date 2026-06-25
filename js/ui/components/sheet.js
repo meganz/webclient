@@ -51,6 +51,15 @@ class MegaSheet extends MegaOverlay {
         // Aria updates
         this.domNode.ariaModal = "true";
         this.domNode.role = "dialog";
+
+        // Handler for closing sheet on ESC key press
+        this._escHandler = e => {
+            if (e.key === 'Escape' && this.visible && !this.preventBgClosing) {
+                e.stopPropagation();
+                this.hide();
+                this.trigger('close');
+            }
+        };
     }
 
     set type(key) {
@@ -169,6 +178,8 @@ class MegaSheet extends MegaOverlay {
 
         mainlayout.classList.add('fm-overlay');
         tryCatch(() => document.activeElement.blur())();
+
+        document.addEventListener('keydown', this._escHandler);
     }
 
     hide(name) {
@@ -185,6 +196,8 @@ class MegaSheet extends MegaOverlay {
         this.clear();
 
         super.hide(name);
+
+        document.removeEventListener('keydown', this._escHandler);
     }
 
     clear() {

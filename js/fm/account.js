@@ -2484,12 +2484,6 @@ accountUI.fileManagement = {
 
             'use strict';
 
-            // Temporarily hide versioning settings due to it not working correctly in MEGA Lite mode
-            if (mega.lite.inLiteMode) {
-                $('.js-file-version-settings', accountUI.$contentBlock).addClass('hidden');
-                return false;
-            }
-
             // Update versioning info
             var setVersioningAttr = function(val) {
                 showToast('settings', l[16168]);

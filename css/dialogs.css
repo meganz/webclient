@@ -9499,6 +9499,58 @@ body.web-desktop .mega-sheet.report-abuse .sheet {
 .mega-dialog.s4 {
     width: 592px;
 }
+
+body.web-desktop .mega-dialog.s4 {
+    width: calc(100% - 16px);
+    max-width: 640px;
+    min-width: unset;
+    max-height: 95%;
+    margin: auto;
+    padding: 40px 0;
+    background: var(--mobile-page-background);
+    border-radius: var(--mobile-border-radius-extra-large);
+    box-shadow: none;
+}
+body.web-desktop .mega-dialog.s4 > section.content {
+    overflow: auto;
+}
+
+/* Make close button behave like sheet's in-flow close control */
+body.web-desktop .mega-dialog.s4 button.close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    left: auto;
+    z-index: 10;
+    margin: 0;
+}
+body.web-desktop .mega-dialog.s4.dialog-template-main > header {
+    padding: 0 40px 16px;
+}
+body.web-desktop .mega-dialog.s4.dialog-template-main .content-block,
+body.web-desktop .mega-dialog.s4.s4-create-group-dialog.dialog-template-main .content-block,
+body.web-desktop .mega-dialog.s4.s4-create-access-key-dialog.dialog-template-main .content-block {
+    padding: 0 40px;
+    background: transparent;
+}
+body.web-desktop .mega-dialog.s4 > footer .footer-container:empty {
+    display: none;
+}
+body.web-desktop .mega-dialog.s4.dialog-template-main > footer .footer-container {
+    padding: 16px 40px 0;
+    margin-top: 24px;
+}
+body.web-desktop .mega-dialog.s4 a,
+body.web-desktop .mega-dialog.s4 a:visited {
+    color: var(--mobile-link-primary);
+}
+body.web-desktop .mega-dialog.s4 .mega-button {
+    box-shadow: none;
+    transition: none;
+}
+body.web-desktop .mega-dialog.s4 > footer button ~ button {
+    margin-inline-start: unset;
+}
 .mega-dialog.s4 button.close {
     --mask-color: var(--icon-active);
 }
@@ -9506,7 +9558,7 @@ body.web-desktop .mega-sheet.report-abuse .sheet {
     margin-inline-end: auto;
 }
 .mega-dialog.s4 .spaced-margin {
-    margin: 8px 0 24px;
+    margin: 0 0 4px;
 }
 .mega-dialog.s4 .input-container {
     background: var(--surface-main);
@@ -9562,11 +9614,14 @@ body.web-desktop .mega-sheet.report-abuse .sheet {
     padding: 2px 16px;
     text-align: start;
 }
+.mega-dialog.s4 header h2 {
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-heading-h2);
+}
 .mega-dialog.s4 div.offset-text {
-    color: var(--text-color-high);
-    font: var(--text-body2);
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-caption-large-bold);
     padding: 0 0 3px;
-    padding-inline-start: 40px;
 }
 .mega-dialog.s4 .step-head {
     display: flex;
@@ -9767,11 +9822,6 @@ body.web-desktop .mega-sheet.report-abuse .sheet {
     display: flex;
     white-space: nowrap;
 }
-
-.mega-dialog.s4-create-user-dialog .step-1,
-.mega-dialog.s4-create-group-dialog .step-1 {
-    margin: 16px 0 24px;
-}
 .mega-dialog.s4-create-user-dialog .step-4,
 .mega-dialog.s4-create-group-dialog .step-4 {
     margin-top: 8px;
@@ -9899,8 +9949,8 @@ body.web-desktop .mega-sheet.report-abuse .sheet {
     text-decoration: none;
 }
 .mega-dialog.s4-bucket-settings-dialog .bucket-policies .policies-editor {
-    height: 226px;
-    margin: 8px 0 -4px;
+    height: 222px;
+    margin: 8px 0 0;
 }
 .mega-dialog.s4-bucket-settings-dialog .bucket-policies .policies-editor * {
     font: var(--text-code1);
@@ -9925,14 +9975,15 @@ body.web-desktop .mega-sheet.report-abuse .sheet {
     text-decoration: none;
 }
 .mega-dialog.s4-bucket-settings-dialog .policies-editor .CodeMirror {
-    border: 2px solid var(--surface-grey-2);
+    background: var(--mobile-surface-1);
+    border: 2px solid var(--mobile-surface-2);
     border-radius: 12px;
 }
 .mega-dialog.s4-bucket-settings-dialog .policies-editor .CodeMirror-scroll {
     padding: 14px 0;
 }
 .mega-dialog.s4-bucket-settings-dialog .policies-editor .CodeMirror-linenumbers {
-    background-color: var(--surface-grey-2);
+    background: var(--mobile-surface-2);
     width: 48px;
 }
 .mega-dialog.s4-bucket-settings-dialog .bucket-policy-warning {
@@ -10003,17 +10054,18 @@ body.web-desktop .mega-sheet.report-abuse .sheet {
 
 /* S4 Dialogs. Setup/Onboarding dialog */
 
-.mega-dialog.s4-setup-dialog {
-    height: calc(100% - 48px);
-    max-height: 668px;
+body.web-desktop .mega-dialog.s4-setup-dialog {
+    height: 95%;
     overflow: hidden;
-    width: 800px;
+    padding: 0;
+    max-height: 668px;
+    max-width: 800px;
 }
 
 /* Side pane */
 
 .mega-dialog.s4-setup-dialog .side-pane {
-    background: var(--surface-grey-1);
+    background: var(--mobile-surface-2);
     box-sizing: border-box;
     flex: 0 0 auto;
     padding: 48px 36px;
@@ -10161,6 +10213,7 @@ body.web-desktop .mega-sheet.report-abuse .sheet {
 }
 
 .mega-dialog.s4-setup-dialog .content-block {
+    background: none;
     padding: 0;
     padding-inline-end: 12px;
 }
@@ -10351,6 +10404,7 @@ body.web-desktop .mega-sheet.report-abuse .sheet {
     margin: 1px 0 0;
     padding: 14px;
     outline: none;
+    text-align: start;
     transition: var(--transition-bg-color);
 }
 

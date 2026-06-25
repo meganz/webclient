@@ -240,7 +240,7 @@ class MegaMobileHeader extends MegaComponent {
             }
 
             if (!mobile.createFolder) {
-                mobile.createFolder = new MobileNodeNameControl({type: 'create'});
+                mobile.createFolder = new NodeNameControl({type: 'create'});
             }
 
             // Show the create folder overlay

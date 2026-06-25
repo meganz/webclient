@@ -281,7 +281,7 @@ FileManager.prototype.initS4FileManager = mutex('s4-object-storage.lock', functi
     'use strict';
     const stringify = tryCatch((v) => JSON.stringify(v));
 
-    this.s4idd = ['load'];
+    this.s4idd = ['load', -1, []];
 
     return Promise.resolve(this.require('s4'))
         .then(() => {
@@ -394,7 +394,7 @@ FileManager.prototype.initFileManager = async function() {
             const s4load = this.initS4FileManager()
                 .catch((ex) => {
                     if (self.d) {
-                        console.error('Failed to initialize S4 (?!)', [ex]);
+                        console.error('Failed to initialize S4 (?!)', ex, `${this.s4idd}`);
                     }
 
                     Object.defineProperty(s4, 'failure', {
@@ -1146,8 +1146,8 @@ FileManager.prototype.initFileManagerUI = function() {
         text: l[68],
         title: l[68],
         onClick: () => {
-            eventlog(500007);
             createFolderDialog();
+            eventlog(500007);
         }
     });
     mega.ui.secondaryNav.addActionButton({
@@ -2323,9 +2323,6 @@ FileManager.prototype.initUIKeyEvents = function() {
                 }
             }
         }
-        else if ((e.keyCode === 13) && ($.dialog === 'rename')) {
-            $('.rename-dialog-button.rename').trigger('click');
-        }
         else if (e.keyCode === 27 && $.dialog && ($.msgDialog === 'confirmation')) {
             return false;
         }
@@ -3140,6 +3137,11 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
                 })
                 .catch(tell);
         }
+        else if (mega.zipBrowser.canOpen(n)) {
+            // Open supported archives (.zip/.tar/.gz) as a read-only folder view.
+            // All logic is encapsulated in js/zip-browser.js.
+            mega.zipBrowser.openArchive(n).catch(tell);
+        }
         else if (is_image2(n) || is_video(n)) {
             if (is_video(n)) {
                 $.autoplay = h;
@@ -3774,15 +3776,15 @@ FileManager.prototype.cameraUploadUI = function() {
     // Define what dialogs can be opened from other dialogs
     var diagInheritance = {
         'recovery-key-dialog': ['recovery-key-info'],
-        properties: ['links', 'rename', 'copyrights', 'copy', 'move', 'share', 'saveAs'],
-        copy: ['createfolder', 'start-group-chat'],
-        move: ['createfolder'],
+        properties: ['links', 'rename-folder-file', 'copyrights', 'copy', 'move', 'share', 'saveAs'],
+        copy: ['create-folder', 's4-create-bucket', 'start-group-chat'],
+        move: ['create-folder', 's4-create-bucket'],
         'pro-register-dialog': ['languages'],
         'pro-login-dialog': ['languages'],
         'signup-link-overlay': ['languages'],
         'confirm-account-dialog': ['languages'],
-        selectFolder: ['createfolder'],
-        saveAs: ['createfolder'],
+        selectFolder: ['create-folder', 's4-create-bucket'],
+        saveAs: ['create-folder', 's4-create-bucket'],
         share: [
             'share-with-unverified-contacts', 'fingerprint-dialog', 'contact-info', 'share-access-contacts-dialog'
         ],

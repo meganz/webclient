@@ -659,8 +659,9 @@ mBroadcaster.once('boot_done', () => {
 
                 // Show the Rename sheet and close the context menu
                 if (!mobile.renameNode) {
-                    mobile.renameNode = new MobileNodeNameControl({type: 'rename'});
+                    mobile.renameNode = new NodeNameControl({type: 'rename'});
                 }
+
                 mobile.renameNode.show(nodeHandle);
 
                 M.fmEventLog(500701);

@@ -2226,6 +2226,7 @@ else if (!browserUpdate) {
 
     jsl.push({f:'html/transferwidget.html', n: 'transferwidget', j:0});
     jsl.push({f:'js/filetypes.js', n: 'filetypes_js', j:1});
+    jsl.push({f:'js/zip-browser.js', n: 'zipbrowser_js', j:1});
     jsl.push({f:'js/fm/properties.js', n: 'fm_properties_js', j:1});
     jsl.push({f:'js/fm/removenode.js', n: 'fm_removenode_js', j: 1});
     jsl.push({f:'js/fm/ufssizecache.js', n: 'ufssizecache_js', j:1});
@@ -2378,6 +2379,7 @@ else if (!browserUpdate) {
         jsl.push({f:'css/style.css', n: 'style_css', j:2, w:30});
         jsl.push({f:'css/tree.css', n: 'tree_css', j:2, w:30});
         jsl.push({f:'css/fm-header.css', n: 'fm_header_css', j:2,w:5});
+        jsl.push({f:'css/zipbrowser.css', n: 'zipbrowser_css', j:2,w:5});
         jsl.push({f:'css/fm-breadcrumb.css', n: 'fm_breadcrumb_css', j:2,w:5});
         jsl.push({f:'css/fm-lists.css', n: 'fm_lists_css', j:2,w:5});
         jsl.push({f:'css/grid-table.css', n: 'grid_table_css', j:2,w:5});
@@ -2528,6 +2530,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/ui/share-collaborators-dialog.js', n: 'fm_share_collaborators_js', j: 1});
     jsl.push({f:'js/fm/message-dialog.js', n: 'fm_message-dialog_js', j: 1, w: 1});
     jsl.push({f:'js/fm/message-overlay.js', n: 'fm_message_overlay_js', j: 1, w: 1});
+    jsl.push({f:'js/ui/node-name-control.js', n: 'node_name_control_js', j: 1, w: 1});
 
     if (localStorage.makeCache) {
         jsl.push({f:'makecache.js', n: 'makecache', j:1});
@@ -2616,7 +2619,6 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/mobile.megaRender.js', n: 'mobile_mega_render_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.cloud.js', n: 'mobile_cloud_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.cloud.action-bar.js', n: 'mobile_cloud_action_bar_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.node-name-control.js', n: 'mobile_node_name_control_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.password.decryption.js', n: 'mobile_dec_pass_overlay_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.download.overlay.js', n: 'mobile_download_overlay_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.chatlink.js', n: 'mobile_chatlink_js', j: 1, w: 1});

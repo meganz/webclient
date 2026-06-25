@@ -1122,8 +1122,7 @@ Object.defineProperty(self, 'mShowAds', {
     value: (is_livesite || localStorage.gads) && !is_extension && !(localStorage.sid || sessionStorage.sid)
 });
 
-// eslint-disable-next-line es/no-object-fromentries
-if (Object.fromEntries && !self.mShowAds) {
+if (Object.hasOwn && !self.mShowAds) {
     if (is_karma || tmp === -0x8feed) {
         Object.freeze = echo;
     }

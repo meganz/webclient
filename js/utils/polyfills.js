@@ -115,7 +115,6 @@ if (Object.fromEntries === undefined) {
     });
 }
 
-/**
 if (Object.hasOwn === undefined) {
     Object.defineProperty(Object, 'hasOwn', {
         value(o, p) {
@@ -124,7 +123,7 @@ if (Object.hasOwn === undefined) {
         }
     });
 }
-/**/
+
 
 (() => {
     'use strict';

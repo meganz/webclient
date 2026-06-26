@@ -56,6 +56,8 @@
 
             // navigation
             monthsField: 'monthsShort',
+            daysField: 'daysMin',
+            uppercaseDayNames: true,
             prevHtml: '<svg><path d="M 17,12 l -5,5 l 5,5"></path></svg>',
             nextHtml: '<svg><path d="M 14,12 l 5,5 l -5,5"></path></svg>',
             navTitles: {
@@ -171,6 +173,10 @@
 
             if (this.opts.classes) {
                 this.$datepicker.addClass(this.opts.classes)
+            }
+
+            if (!this.opts.uppercaseDayNames) {
+                this.$datepicker.addClass('-no-uppercase-');
             }
 
             if (this.opts.timepicker) {
@@ -1598,7 +1604,8 @@
             if (i > 7) return html;
             if (curDay == 7) return this._getDayNamesHtml(firstDay, 0, html, ++i);
 
-            html += '<div class="datepicker--day-name' + (this.d.isWeekend(curDay) ? " -weekend-" : "") + '">' + this.d.loc.daysMin[curDay] + '</div>';
+            const dayNames = this.d.loc[this.d.opts.daysField] || this.d.loc.daysMin;
+            html += '<div class="datepicker--day-name' + (this.d.isWeekend(curDay) ? " -weekend-" : "") + '">' + dayNames[curDay] + '</div>';
 
             return this._getDayNamesHtml(firstDay, ++curDay, html, ++i);
         },

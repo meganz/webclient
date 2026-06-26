@@ -68,11 +68,6 @@ mobile.settings.notifications = Object.create(mobile.settingsHelper, {
                     label: l[20893],
                 },
                 {
-                    value: 'account-inactive',
-                    id: 'enotif-inactive',
-                    label: l[20895],
-                },
-                {
                     value: 'card-expiry',
                     id: 'enotif-card-expiry',
                     label: l.payment_card_noti_title,

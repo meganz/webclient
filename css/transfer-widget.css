@@ -14,6 +14,9 @@
     --tpw-top: calc(100% - 12px - var(--tpw-height));
     --tpw-banner-height: 175px;
 }
+.psa-notification .transfer-root {
+    --tpw-top: calc(100% - 12px - var(--psa-height, 0px) - var(--tpw-height));
+}
 
 @keyframes tpw-expand {
     0% {

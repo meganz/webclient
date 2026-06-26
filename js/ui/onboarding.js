@@ -498,7 +498,7 @@ mBroadcaster.addListener('fm:initialized', () => {
                             dialogClass: 'obdark',
                             dialogTitle: l.ob_tpw_title_2,
                             dialogDesc: l.ob_tpw_desc_2,
-                            targetElmClass: '.transfer-progress .transfer-progress-head .js-tpm-open',
+                            targetElmClass: '.transfer-progress .transfer-progress-head .tpw-ob2:visible',
                             targetElmPosition: 'top right',
                             markComplete: true,
                         }
@@ -516,7 +516,7 @@ mBroadcaster.addListener('fm:initialized', () => {
                             dialogTitle: l.ob_tpw_title_3,
                             dialogDesc: l.ob_tpw_desc_3,
                             dialogNext: l[726],
-                            targetElmClass: '.transfer-progress .transfer-progress-head .collapse',
+                            targetElmClass: '.transfer-progress .transfer-progress-head .tpw-ob3:visible',
                             targetElmPosition: 'top right',
                             markComplete: true,
                         }

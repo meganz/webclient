@@ -2158,6 +2158,11 @@ mBroadcaster.once('boot_done', function populate_l() {
     l.na_link_activity_info = escapeHTML(l.na_link_activity_info)
         .replace('[A]', `<a href="/pro" class="link clickurl">`)
         .replace('[/A]', '</a>');
+    l.s4_message_info_description = escapeHTML(l.s4_message_info_description)
+        .replace('[A]', `<a class="link clickurl" href="/fm" target="_blank" rel="noopener">`)
+        .replace('[/A]', '</a>')
+        .replace('[A1]', `<a class="link" href="https://transfer.it/start" target="_blank" rel="noopener">`)
+        .replace('[/A1]', '</a>');
 
     const common = [
         15536, 16119, 16120, 16313, 16316, 16360, 18228, 18268, 18282,

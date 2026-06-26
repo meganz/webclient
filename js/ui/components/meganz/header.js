@@ -977,7 +977,6 @@ class MegaHeader extends MegaMobileHeader {
             });
 
             const hasAccess = (u_attr && u_attr.p) || window.kbCatId;
-            const supportWillRedirect = !hasAccess && u_attr;
             const upsellSupportOption = {
                 text: l[516],
                 subtext: l.upsell_priority_support,

@@ -991,7 +991,7 @@ function init_page() {
 
         if (window.nextPage) {
             login_next = window.nextPage;
-            login_txt = login_next === 'support' ? l.support_redirect_login : l[24766];
+            login_txt = l[24766];
             delete window.nextPage;
         }
         parsepage(pages.login);
@@ -1090,7 +1090,7 @@ function init_page() {
         init_key();
     }
     else if (page === 'support') {
-        support.init(true);
+        support.init();
     }
     else if (page == 'contact') {
         mega.redirect('mega.io', 'contact', false, false);
@@ -2978,6 +2978,13 @@ pagemetadata.last = null;
 
 function parsepage(pagehtml) {
     'use strict';
+
+    // indicate to support page that it needs to reparse itself.
+    // this limits the need to public links only.
+    // for nav to fm etc, we need not reparse
+    if (window.support) {
+        support.parsed = false;
+    }
 
     $('#fmholder, #pageholder, #startholder').addClass('hidden');
     pagemetadata();

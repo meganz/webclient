@@ -183,15 +183,17 @@ class MegaMobileContextMenu extends MegaComponentGroup {
 
         M.safeShowDialog('mobile-context-menu', () => {
 
+            // duplicate the file/folder node to show it within the context menu dialog
+            const itemNode = document.getElementById(this.handle)
+                || (mega.ui.viewerOverlay.visible && mega.ui.viewerOverlay.nodeComponent.domNode);
+            if (!itemNode) {
+                throw new Error('Context menu node not found.');
+            }
+
             this.sheet.clear();
             this.sheet.addContent(this.domNode);
             this.sheet.showClose = true;
 
-            // duplicate the file/folder node to show it within the context menu dialog
-            let itemNode = document.getElementById(this.handle);
-            if (!itemNode && mega.ui.viewerOverlay.visible) {
-                itemNode = mega.ui.viewerOverlay.nodeComponent.domNode;
-            }
             const itemImage = itemNode.querySelector('.fm-item-img');
 
             const itemInfo = document.createElement('div');

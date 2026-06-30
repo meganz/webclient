@@ -285,6 +285,10 @@ function setDateTimeFormat(locales, format) {
  *       14: 2021 (Only year)
  *       15: dd mm (Date format with short month and without time and year)
  *       16: dd (Only day)
+ *
+ * Note: When `fmconfig.uidateformat` is `2`, short date formats (0, 1) are rendered
+ *       as dd.mm.yyyy (or dd.mm.yyyy hh:mm) regardless of locale, the same way
+ *       `uidateformat === 1` forces the ISO yyyy-mm-dd rendering.
  */
 function time2date(unixTime, format) {
     'use strict';
@@ -310,10 +314,22 @@ function time2date(unixTime, format) {
         return isodate.toISOString().replace('T', ' ').substr(0, length);
     };
 
+    // print time as dd.mm.yyyy (or dd.mm.yyyy hh:mm) date format
+    var printDMY = function _printDMY() {
+        var isodate = printISO();
+        var datePart = isodate.substr(0, 10).split('-');
+        var dmy = datePart[2] + '.' + datePart[1] + '.' + datePart[0];
+
+        return format === 0 ? dmy + isodate.substr(10) : dmy;
+    };
+
     dateFunc = dFObj === 'ISO' ? printISO : dFObj.format;
 
-    // if it is short date format and user selected to use ISO format
-    if ((fmconfig.uidateformat || countryAndLocales.country === 'ISO') && format < 2) {
+    // if it is short date format and user selected to use ISO or DD.MM.YYYY format
+    if (format < 2 && fmconfig.uidateformat === 2) {
+        result = printDMY();
+    }
+    else if ((fmconfig.uidateformat || countryAndLocales.country === 'ISO') && format < 2) {
         result = printISO();
     }
     else {

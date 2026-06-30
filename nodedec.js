@@ -921,7 +921,6 @@ function base64_to_ab(a) {
 // attr = ab, key as with enc_attr
 // returns [Object] or false
 function dec_attr(attr, key) {
-    var aes;
     var b;
 
     attr = asmCrypto.AES_CBC.decrypt(attr,
@@ -1193,7 +1192,7 @@ lazy(self, 'decWorkerPool', function decWorkerPool() {
     /** @class decWorkerPool */
     return new class extends Array {
         get url() {
-            const WORKER_VERSION = 13;
+            const WORKER_VERSION = 14;
             return `${window.is_extension || window.is_karma ? '' : '/'}nodedec.js?v=${WORKER_VERSION}`;
         }
 
@@ -1207,8 +1206,11 @@ lazy(self, 'decWorkerPool', function decWorkerPool() {
 
         get busy() {
             const res = head - tail > this.limit;
-            if (d && res) {
-                console.debug('decWorkerPool.busy', head, tail);
+            if (res) {
+                if (self.d) {
+                    console.debug('decWorkerPool.busy', head, tail);
+                }
+                this.expedite(true);
             }
             return res;
         }

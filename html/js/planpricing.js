@@ -2150,6 +2150,12 @@ lazy(pro, 'proplan2', () => {
             await fetchPlansData();
             await fetchBusinessPlanInfo();
 
+            // Check if still on pro page
+            if (page !== 'pro') {
+                loadingDialog.hide('pricingReady');
+                return;
+            }
+
             // Temporary fix for desktop propay as it does not using new header
             if (is_mobile && mega.ui.header) {
                 mega.ui.header.update();

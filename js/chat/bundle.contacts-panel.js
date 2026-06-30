@@ -420,13 +420,12 @@ class ContextMenu extends REaCt().Component {
         onClick: () => this.close(() => (0,utils.qH)(contact))
       })), JSX_("div", {
         className: "dropdown-credentials"
-      }, (0,utils.ym)(contact.u)), JSX_("hr", null), JSX_(dropdowns.tJ, {
+      }, (0,utils.ym)(contact.u)), !contact.b && JSX_(REaCt().Fragment, null, JSX_("hr", null), JSX_(dropdowns.tJ, {
         icon: "sprite-fm-mono icon-disable",
         label: l[1001],
-        disabled: !!contact.b,
         className: "",
         onClick: () => this.close(() => fmremove(contact.u))
-      }));
+      })));
     }
     return JSX_(REaCt().Fragment, null, JSX_(dropdowns.tJ, {
       icon: "sprite-fm-mono icon-disabled-filled",

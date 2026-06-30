@@ -180,18 +180,21 @@ export default class ContextMenu extends React.Component {
                     <div className="dropdown-credentials">
                         {getUserFingerprint(contact.u)}
                     </div>
-                    <hr />
-                    <DropdownItem
-                        icon="sprite-fm-mono icon-disable"
-                        label={l[1001] /* `Remove contact` */}
-                        disabled={!!contact.b}
-                        className=""
-                        onClick={() =>
-                            this.close(() =>
-                                fmremove(contact.u)
-                            )
-                        }
-                    />
+                    {!contact.b && (
+                        <>
+                            <hr />
+                            <DropdownItem
+                                icon="sprite-fm-mono icon-disable"
+                                label={l[1001] /* `Remove contact` */}
+                                className=""
+                                onClick={() =>
+                                    this.close(() =>
+                                        fmremove(contact.u)
+                                    )
+                                }
+                            />
+                        </>
+                    )}
                 </>
             );
         }

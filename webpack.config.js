@@ -39,6 +39,7 @@ var webpackConfigs = {
             hot: false,
             static: __dirname,
             liveReload: false,
+            webSocketServer: 'ws',
             historyApiFallback: true
         },
         cache: {

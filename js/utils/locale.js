@@ -1215,7 +1215,6 @@ mBroadcaster.once('boot_done', function populate_l() {
                 .replace('[A]', '<a id="versionhelp" href="' + linktohelp + '" target="_blank" class="red">')
                 .replace('[/A]', '</a>');
     l[17701] = escapeHTML(l[17701]).replace('[B]', '<b>').replace('[/B]', '</b>');
-    l[17742] = escapeHTML(l[17742]).replace('[S]', '<strong>').replace('[/S]', '</strong>');
     l[17805] = escapeHTML(l[17805])
         .replace('[A]', '<a class="mobile red-email" href="mailto:support@mega.io">')
         .replace('[/A]', '</a>');

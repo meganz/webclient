@@ -573,9 +573,6 @@
                 text: l[68],
                 icon: 'sprite-fm-mono icon-folder-plus-thin-outline',
                 onClick() {
-                    if (M.isInvalidUserStatus()) {
-                        return;
-                    }
                     createFolderDialog();
                     eventlog(500007);
                 }
@@ -712,6 +709,13 @@
                     const originalTarget = mega.ui.contextMenu.selectedItems[0];
                     let target = originalTarget;
                     let isInboxRoot = false;
+
+                    // A supported archive file (.zip/.tar/.gz) opens in the
+                    // read-only archive browser - same as double-clicking it.
+                    if (mega.zipBrowser && mega.zipBrowser.canOpen(target)) {
+                        mega.zipBrowser.openArchive(target).catch(tell);
+                        return;
+                    }
 
                     if (
                         M.currentrootid === 'out-shares' ||

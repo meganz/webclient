@@ -2665,6 +2665,12 @@ var addressDialog = {
                     Promise.resolve(new BusinessAccount().updateBusinessAttrs([{ key: taxAttr, val: taxCode }]))
             )
                 .then(() => {
+                    if (mega.discountInfo) {
+                        return Promise.all([
+                            pro.loadMembershipPlans(nop, true),
+                            DiscountPromo.refreshDiscountInfo(),
+                        ]);
+                    }
                     return pro.loadMembershipPlans(nop, true);
                 })
                 .then(() => {
@@ -2982,6 +2988,7 @@ var addressDialog = {
                         fm_fullreload(null, 'ub-business').catch(dump);
                     }
                     else {
+                        delete addressDialog.paymentInProcess;
                         pro.redirectToSite();
                     }
                 });
@@ -3136,9 +3143,6 @@ var addressDialog = {
                 if (typeof result === 'string') {
                     // success
                     this.showPaymentSuccess();
-                    if (pro.propay.planObj && (pro.propay.planObj.level !== pro.ACCOUNT_LEVEL_PRO_FLEXI)) {
-                        delete addressDialog.paymentInProcess;
-                    }
                 }
 
             })

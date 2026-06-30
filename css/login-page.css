@@ -95,6 +95,9 @@
         padding-bottom: 4px;
         margin-top: auto;
     }
+    body.mobile .login-page-footer {
+        flex-wrap: wrap;
+    }
     .login-overlay.overlay-wrap .login-page-footer {
         padding: 0 40px;
         flex-direction: row;
@@ -105,6 +108,9 @@
     .login-page-footer > * + * {
         margin-inline-start: 24px;
         margin-inline-end: 16px;
+    }
+    body.mobile .login-page-footer > * + * {
+        margin-inline-start: 8px;
     }
     .login-page-footer .login-page-client-version {
         margin-inline-end: auto;
@@ -122,8 +128,14 @@
         display: flex;
         margin: 0;
     }
-    body.web-desktop .login-page-footer-links > * + * {
+    body.mobile .login-page-footer-links {
+        margin-inline-end: 16px;
+    }
+    .login-page-footer-links > * + * {
         margin-inline-start: 32px;
+    }
+    body.mobile .login-page-footer-links > * + * {
+        margin-inline-start: 16px;
     }
     .login-page-footer > .login-page-footer-links > a {
         color: var(--text-color-medium);

@@ -1898,74 +1898,73 @@ body.de .mega-dialog.contact-picker-widget {
     z-index: 2000;
     width: 100%;
     height: 100%;
-    left: 0;
-    top: 0;
-    background-color: rgba(0,0,0,0.4);
+    margin: 16px;
+    bottom: 0;
+    right: 0;
+    background: var(--mobile-surface-1);
+    border: var(--mobile-border-strong-selected) dashed 2px;
+    border-radius: 8px;
 }
+.drag-n-drop.overlay.transparent-overlay {
+    background: var(--mobile-surface-transparent-subtle);
+}
+body:not(.in-call) .drag-n-drop.overlay.chat-offset {
+    right: 256px;
+}
+
+@media only screen and (min-width: 1200px) {
+    .drag-n-drop.overlay.flyout-offset {
+        right: var(--flyout-width);
+    }
+}
+
 .drag-n-drop.content {
     position: absolute;
     width: 400px;
-    height: 168px;
-    display: table;
-    background-color: white;
-    border-radius: 4px;
+    display: flex;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translate(-50%, -50%);
     top: 50%;
-    margin-top: -64px;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    pointer-events: none;
 }
 .drag-n-drop.header {
-    height: 211px;
-    margin: -83px auto 0 auto;
-    background-image: url(../images/mega/overlay-sprite.png);
-    background-position: center top;
+    background-image: url('../images/mega/glass/glass-cloud-arrow-up-angle.png');
+    background-size: contain;
+    background-position: center;
     background-repeat: no-repeat;
-    font-size: 36px;
-    line-height: 40px;
-    letter-spacing: 0.2px;
-    font-family: 'source_sans_prolight', sans-serif;
-    text-align: center;
-    color: rgba(51,51,51,0.8);
-    white-space: nowrap;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
-    padding: 139px 30px 0 30px;
-}
-.drag-n-drop.header strong {
-    font-family: 'source_sans_probold', sans-serif;
-    font-weight: normal;
-}
-.drag-n-drop hr {
+    height: 96px;
     width: 100%;
-    height: 1px;
-    border: 0;
-    margin: 0;
-    padding: 0;
-    background-image: url(../images/mega/overlay-sprite.png);
-    background-position: left -211px;
-    background-repeat: repeat-x;
 }
 .drag-n-drop.info-block {
-    font-size: 14px;
-    line-height: 18px;
-    color: #777E82;
-    padding: 9px 30px 0 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
     text-align: center;
-    opacity: 0.8;
 }
-.drag-n-drop.info-block i {
-    background-image: url(../images/mega/overlay-sprite.png);
-    background-position: 0 -240px;
-    background-repeat: no-repeat;
-    display: inline-block;
-    vertical-align: top;
-    width: 16px;
-    height: 18px;
+.drag-n-drop.info-block h1 {
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-heading-h1);
+    margin: 8px 0;
+    line-height: 40px;
+    width: 100%;
 }
-.drag-n-drop.info-block span {
-    display: inline-block;
-    vertical-align: top;
+.drag-n-drop.info-block .crumb {
+    background: var(--mobile-brand-default);
+    border-radius: 30px;
+    box-sizing: border-box;
+    height: 40px;
+    min-width: 80px;
+    max-width: 450px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding: 8px 24px;
+    color: var(--mobile-icon-on-color);
+    font: var(--mobile-font-copy-semibold);
 }
 
 /* end of Drag and Drop overlay */
@@ -3278,6 +3277,7 @@ body.de .mega-dialog.contact-picker-widget {
     margin-inline-end: 8px;
     height: 20px;
     width: 20px;
+    flex-shrink: 0;
     --icon-size: 18px;
     --mask-color: var(--mobile-text-inverse);
 }
@@ -9499,6 +9499,58 @@ body.web-desktop .mega-sheet.report-abuse .sheet {
 .mega-dialog.s4 {
     width: 592px;
 }
+
+body.web-desktop .mega-dialog.s4 {
+    width: calc(100% - 16px);
+    max-width: 640px;
+    min-width: unset;
+    max-height: 95%;
+    margin: auto;
+    padding: 40px 0;
+    background: var(--mobile-page-background);
+    border-radius: var(--mobile-border-radius-extra-large);
+    box-shadow: none;
+}
+body.web-desktop .mega-dialog.s4 > section.content {
+    overflow: auto;
+}
+
+/* Make close button behave like sheet's in-flow close control */
+body.web-desktop .mega-dialog.s4 button.close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    left: auto;
+    z-index: 10;
+    margin: 0;
+}
+body.web-desktop .mega-dialog.s4.dialog-template-main > header {
+    padding: 0 40px 16px;
+}
+body.web-desktop .mega-dialog.s4.dialog-template-main .content-block,
+body.web-desktop .mega-dialog.s4.s4-create-group-dialog.dialog-template-main .content-block,
+body.web-desktop .mega-dialog.s4.s4-create-access-key-dialog.dialog-template-main .content-block {
+    padding: 0 40px;
+    background: transparent;
+}
+body.web-desktop .mega-dialog.s4 > footer .footer-container:empty {
+    display: none;
+}
+body.web-desktop .mega-dialog.s4.dialog-template-main > footer .footer-container {
+    padding: 16px 40px 0;
+    margin-top: 24px;
+}
+body.web-desktop .mega-dialog.s4 a,
+body.web-desktop .mega-dialog.s4 a:visited {
+    color: var(--mobile-link-primary);
+}
+body.web-desktop .mega-dialog.s4 .mega-button {
+    box-shadow: none;
+    transition: none;
+}
+body.web-desktop .mega-dialog.s4 > footer button ~ button {
+    margin-inline-start: unset;
+}
 .mega-dialog.s4 button.close {
     --mask-color: var(--icon-active);
 }
@@ -9506,7 +9558,7 @@ body.web-desktop .mega-sheet.report-abuse .sheet {
     margin-inline-end: auto;
 }
 .mega-dialog.s4 .spaced-margin {
-    margin: 8px 0 24px;
+    margin: 0 0 4px;
 }
 .mega-dialog.s4 .input-container {
     background: var(--surface-main);
@@ -9562,11 +9614,14 @@ body.web-desktop .mega-sheet.report-abuse .sheet {
     padding: 2px 16px;
     text-align: start;
 }
+.mega-dialog.s4 header h2 {
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-heading-h2);
+}
 .mega-dialog.s4 div.offset-text {
-    color: var(--text-color-high);
-    font: var(--text-body2);
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-caption-large-bold);
     padding: 0 0 3px;
-    padding-inline-start: 40px;
 }
 .mega-dialog.s4 .step-head {
     display: flex;
@@ -9767,11 +9822,6 @@ body.web-desktop .mega-sheet.report-abuse .sheet {
     display: flex;
     white-space: nowrap;
 }
-
-.mega-dialog.s4-create-user-dialog .step-1,
-.mega-dialog.s4-create-group-dialog .step-1 {
-    margin: 16px 0 24px;
-}
 .mega-dialog.s4-create-user-dialog .step-4,
 .mega-dialog.s4-create-group-dialog .step-4 {
     margin-top: 8px;
@@ -9899,8 +9949,8 @@ body.web-desktop .mega-sheet.report-abuse .sheet {
     text-decoration: none;
 }
 .mega-dialog.s4-bucket-settings-dialog .bucket-policies .policies-editor {
-    height: 226px;
-    margin: 8px 0 -4px;
+    height: 222px;
+    margin: 8px 0 0;
 }
 .mega-dialog.s4-bucket-settings-dialog .bucket-policies .policies-editor * {
     font: var(--text-code1);
@@ -9925,14 +9975,15 @@ body.web-desktop .mega-sheet.report-abuse .sheet {
     text-decoration: none;
 }
 .mega-dialog.s4-bucket-settings-dialog .policies-editor .CodeMirror {
-    border: 2px solid var(--surface-grey-2);
+    background: var(--mobile-surface-1);
+    border: 2px solid var(--mobile-surface-2);
     border-radius: 12px;
 }
 .mega-dialog.s4-bucket-settings-dialog .policies-editor .CodeMirror-scroll {
     padding: 14px 0;
 }
 .mega-dialog.s4-bucket-settings-dialog .policies-editor .CodeMirror-linenumbers {
-    background-color: var(--surface-grey-2);
+    background: var(--mobile-surface-2);
     width: 48px;
 }
 .mega-dialog.s4-bucket-settings-dialog .bucket-policy-warning {
@@ -10003,17 +10054,18 @@ body.web-desktop .mega-sheet.report-abuse .sheet {
 
 /* S4 Dialogs. Setup/Onboarding dialog */
 
-.mega-dialog.s4-setup-dialog {
-    height: calc(100% - 48px);
-    max-height: 668px;
+body.web-desktop .mega-dialog.s4-setup-dialog {
+    height: 95%;
     overflow: hidden;
-    width: 800px;
+    padding: 0;
+    max-height: 668px;
+    max-width: 800px;
 }
 
 /* Side pane */
 
 .mega-dialog.s4-setup-dialog .side-pane {
-    background: var(--surface-grey-1);
+    background: var(--mobile-surface-2);
     box-sizing: border-box;
     flex: 0 0 auto;
     padding: 48px 36px;
@@ -10161,6 +10213,7 @@ body.web-desktop .mega-sheet.report-abuse .sheet {
 }
 
 .mega-dialog.s4-setup-dialog .content-block {
+    background: none;
     padding: 0;
     padding-inline-end: 12px;
 }
@@ -10351,6 +10404,7 @@ body.web-desktop .mega-sheet.report-abuse .sheet {
     margin: 1px 0 0;
     padding: 14px;
     outline: none;
+    text-align: start;
     transition: var(--transition-bg-color);
 }
 

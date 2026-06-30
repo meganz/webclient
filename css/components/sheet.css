@@ -148,6 +148,10 @@ body.web-desktop .mega-sheet {
     justify-content: center;
 }
 
+body.web-desktop .mega-sheet.node-name-dialog {
+    z-index: 1201;
+}
+
 body.web-desktop .mega-sheet .sheet {
     width: calc(100% - 16px);
 }

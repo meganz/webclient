@@ -4,117 +4,98 @@ lazy(s4, 'buckets', () => {
     const {logger} = s4.utils;
     const {S4Dialog} = s4.ui.classes;
 
-    class S4CreateDialog extends S4Dialog {
+    class S4CreateDialog {
         constructor(name) {
-            super(name, $('.s4-create-bucket-dialog', '.mega-dialog-container'));
-
-            this.$bucketNameInput = $('input', this.$dialogContainer).val('');
-            this.megaInput = new mega.ui.MegaInputs(
-                this.$bucketNameInput,
-                {
-                    onShowError: true,
-                    $msgCn: $('.error-msg', this.$dialogContainer)
-                }
-            );
-            this.ltWSpaceWarning = new InputFloatWarning(this.$dialogContainer);
+            this.dialogName = name;
         }
 
         destroy() {
-            super.destroy();
-
-            this.reset();
-            this.$dialogContainer.addClass('hidden').unbind('dialog-closed.s4dlg');
-        }
-
-        unbindEvents() {
-            super.unbindEvents();
-
-            this.megaInput.$input.unbind('input.s4dlg keydown.s4dlg');
-            this.$dialogProgress.unbind('click.s4dlg');
-        }
-
-        bindEvents() {
-            this.megaInput.$input.rebind('input.s4dlg keydown.s4dlg', (e) => {
-                if (this.progress) {
-                    return;
-                }
-
-                this.megaInput.hideError();
-                if (e.currentTarget.value) {
-                    this.$dialogProgress.removeClass('disabled');
-                }
-                else {
-                    this.$dialogProgress.addClass('disabled');
-                }
-
-                this.ltWSpaceWarning.check();
-
-                if (e.which === 13) {
-                    this.$dialogProgress.trigger('click');
-                }
-            });
-
-            this.$dialogProgress.rebind('click.s4dlg', () => {
-
-                const name = this.megaInput.$input.val();
-                let errorMsg = '';
-
-                if (this.progress || !name || !this.containerId
-                    || this.$dialogProgress.hasClass('disabled')) {
-                    return false;
-                }
-
-                if (!s4.kernel.isValidBucketName(name)) {
-                    errorMsg = l.s4_invalid_bucket_name;
-                }
-                else if (duplicated(name)) { // Check if folder name already exists
-                    errorMsg = l[23219];
-                }
-
-                if (errorMsg) {
-                    return this.megaInput.showError(errorMsg);
-                }
-                mLoadingSpinner.show('s4-loading-toast', l.s4_creating_bucket);
-                this.$dialogProgress.addClass('disabled');
-                this.progress = true;
-                Promise.resolve(M.getNodeByHandle(this.containerId) || dbfetch.get(this.containerId))
-                    .then(() => s4.kernel.bucket.create(this.containerId, name))
-                    .then((h) => {
-                        logger.assert(M.getNodeByHandle(h), `Failed creating bucket on ${this.containerId}`);
-
-                        if (typeof this.callback === 'function') {
-                            return this.callback(h);
-                        }
-
-                        M.addSelectedNodes(h, 1);
-                    })
-                    .catch(tell)
-                    .finally(() => {
-                        if (this.progress) {
-                            mLoadingSpinner.hide('s4-loading-toast');
-                            this.hide();
-                        }
-                    });
-            });
+            // As this reusing the Create Folder dialog, nothing to destroy here.
+            this.hide();
         }
 
         reset() {
             delete this.containerId;
             delete this.callback;
             delete this.progress;
-            this.megaInput.$input.val('');
-            this.megaInput.hideError();
-            this.ltWSpaceWarning.hide();
-            this.$dialogProgress.addClass('disabled');
             mLoadingSpinner.hide('s4-loading-toast');
         }
 
-        show(containerId, callback) {
-            super.show();
+        hide() {
+            if (mega.ui.sheet && mega.ui.sheet.visible && mega.ui.sheet.name === 's4-create-bucket') {
+                mega.ui.sheet.hide();
+            }
+            this.reset();
+        }
 
+        show(containerId, callback) {
             this.reset();
             this.containerId = containerId || M.currentdirid;
             this.callback = callback;
+
+            if (!mega.ui.createFolder) {
+                mega.ui.createFolder = new NodeNameControl({type: 'create'});
+            }
+
+            mega.ui.createFolder.show({name: '', t: 1, s4: true}, {
+                onClose: this.hide.bind(this),
+                overrideTypeInfo: {
+                    name: 's4-create-bucket',
+                    placeholder: escapeHTML(l.s4_bkt_name_txt),
+                    title: () => escapeHTML(l.s4_create_bkt)
+                },
+                overrideAction: async({value, nameInput, actionButton, close}) => {
+                    const name = value;
+                    let errorMsg = '';
+
+                    if (this.progress || !name || !this.containerId) {
+                        return false;
+                    }
+
+                    if (!s4.kernel.isValidBucketName(name)) {
+                        errorMsg = l.s4_invalid_bucket_name;
+                    }
+                    else if (duplicated(name)) {
+                        errorMsg = l[23219];
+                    }
+
+                    if (errorMsg) {
+                        const alertIcon = '<i class="alert sprite-fm-mono icon-alert-triangle-thin-outline"></i>';
+                        nameInput.showError(`${alertIcon}<span>${errorMsg}</span>`);
+
+                        if (actionButton) {
+                            actionButton.disabled = false;
+                        }
+                        return false;
+                    }
+
+                    mLoadingSpinner.show('s4-loading-toast', l.s4_creating_bucket);
+                    if (actionButton) {
+                        actionButton.disabled = true;
+                    }
+                    this.progress = true;
+
+                    return Promise.resolve(M.getNodeByHandle(this.containerId) || dbfetch.get(this.containerId))
+                        .then(() => s4.kernel.bucket.create(this.containerId, name))
+                        .then((h) => {
+                            logger.assert(M.getNodeByHandle(h), `Failed creating bucket on ${this.containerId}`);
+
+                            if (typeof this.callback === 'function') {
+                                return this.callback(h);
+                            }
+
+                            M.addSelectedNodes(h, 1);
+                        })
+                        .catch(tell)
+                        .finally(() => {
+                            if (this.progress) {
+                                mLoadingSpinner.hide('s4-loading-toast');
+                                delete this.progress;
+                            }
+                            close();
+                        });
+                }
+            });
         }
     }
 

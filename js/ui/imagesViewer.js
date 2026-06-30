@@ -745,6 +745,53 @@ var slideshowid;
         });
     }
 
+    function initSlideshowModeEvents(n, $overlay, $controls) {
+        const idleAction = is_mobile ? 'touchstart' : 'mousemove';
+        const $document = $(document);
+
+        // Reset image listeners for other media
+        if (!is_image3(n)) {
+            delay.cancel(MOUSE_IDLE_TID);
+            $document.off(`${idleAction}.idle`);
+            $controls.off('mousemove.idle');
+            return;
+        }
+
+        const resetIdleTimer = () => delay(MOUSE_IDLE_TID, () => {
+            $overlay.addClass('mouse-idle');
+        }, 2e3);
+
+        resetIdleTimer();
+
+        $document.rebind(`${idleAction}.idle`, () => {
+            $overlay.removeClass('mouse-idle');
+            resetIdleTimer();
+        });
+
+        if (!is_mobile) {
+            $controls.rebind('mousemove.idle', () => {
+                onIdle(() => delay.cancel(MOUSE_IDLE_TID));
+            });
+        }
+
+        // Avoid multiple init
+        if (slideshowplay) {
+            return;
+        }
+
+        slideshow_imgControls();
+
+        if (fullScreenManager && fullScreenManager.state) {
+            $('.viewer-bars', $overlay).noTransition(() => {
+                $overlay.addClass('fullscreen');
+            });
+        }
+
+        if (!fullScreenManager) {
+            slideshow_fullscreen($overlay);
+        }
+    }
+
     function getWH(id, viewerWidth, viewerHeight, imgWidth, imgHeight) {
         const wp = viewerWidth / origImgWidth;
         const hp = viewerHeight / origImgHeight;
@@ -1512,43 +1559,10 @@ var slideshowid;
 
                 return false;
             });
-
-            const idleAction = is_mobile ? 'touchstart' : 'mousemove';
-
-            delay.cancel(MOUSE_IDLE_TID);
-            $document.off(`${idleAction}.idle`);
-            $controls.off('mousemove.idle');
-
-            // Slideshow Mode Init
-            if (is_image3(n)) {
-                slideshow_imgControls();
-
-                // Autohide controls
-                (function _() {
-                    $overlay.removeClass('mouse-idle');
-                    delay(MOUSE_IDLE_TID, () => $overlay.addClass('mouse-idle'), 2e3);
-                    $document.rebind(`${idleAction}.idle`, _);
-                })();
-
-                if (!is_mobile) {
-                    $controls.rebind('mousemove.idle', () => {
-                        onIdle(() => {
-                            delay.cancel(MOUSE_IDLE_TID);
-                        });
-                    });
-                }
-
-                if (fullScreenManager && fullScreenManager.state) {
-                    $('.viewer-bars', $overlay).noTransition(() => {
-                        $overlay.addClass('fullscreen');
-                    });
-                }
-
-                if (!fullScreenManager) {
-                    slideshow_fullscreen($overlay);
-                }
-            }
         }
+
+        // Init slideshow mode
+        initSlideshowModeEvents(n, $overlay, $controls);
 
         $dlBut.rebind('click.media-viewer', function _dlButClick() {
 
@@ -1673,7 +1687,7 @@ var slideshowid;
 
         let rv;
         const current = slideshow_handle();
-        const vstream = preqs[current] instanceof Streamer && preqs[current];
+        const vstream = self.Streamer && preqs[current] instanceof Streamer && preqs[current];
 
         if (vstream) {
             if (vstream.ended) {

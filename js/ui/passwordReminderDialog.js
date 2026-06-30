@@ -12,6 +12,8 @@
     var SHOW_AFTER_LASTSUCCESS = 90 * DAY;
     var RECHECK_INTERVAL = 15 * 60;
 
+    const LOGOUT_DIALOG_START_PAGES = new Set(['pro', 'support']);
+
     if (DEBUG) {
         SHOW_AFTER_LASTLOGIN = 15;
         SHOW_AFTER_LASTSKIP = 30;
@@ -217,6 +219,7 @@
             this.succeeded = false;
             this.isLogout = false;
 
+            this.autoShownThisSession = false;
             this.NAMESPACE = 'recoverykey-logout-overlay';
 
             // When the user presses the browser's back button, the parameter dialogShown should be updated
@@ -311,8 +314,8 @@
             }
         }
 
-        onTopmenuReinit() {
-            if (this.topIcon && !document.body.contains(this.topIcon)) {
+        onTopmenuReinit(holder) {
+            if (this.topIcon && !(holder || document.body).contains(this.topIcon)) {
                 this.hideDialog();
                 this.initialised = false;
                 this.topIcon = null;
@@ -343,7 +346,7 @@
                 .then(() => {
                     onIdle(() => this._scheduleRecheck());
                     this.recheckInterval = null;
-                    this.recheck();
+                    this.recheck(false, true);
                 })
                 .catch(dump);
         }
@@ -378,7 +381,7 @@
                 time - lastLogin > SHOW_AFTER_LASTLOGIN;
         }
 
-        recheck(hideIfShown) {
+        recheck(hideIfShown, allowReshow) {
             if (!u_handle) {
                 // user is in the middle of a logout...
                 return;
@@ -407,14 +410,16 @@
                 const skipShowingDialog = !this.showIcon() || $(selectors.join(',')).length > 0;
 
                 if (
+                    (allowReshow || !this.autoShownThisSession) &&
                     !skipShowingDialog &&
-                    is_fm() &&
+                    (is_fm() || LOGOUT_DIALOG_START_PAGES.has(page)) &&
                     !pfid &&
                     (
                         !this.passwordReminderAttribute.lastSkipped ||
                         unixtime() - this.passwordReminderAttribute.lastSkipped > SHOW_AFTER_LASTSKIP
                     )
                 ) {
+                    this.autoShownThisSession = true;
                     this.showDialog();
                 }
                 else if (hideIfShown) {
@@ -557,7 +562,7 @@
                 u_type === 3 &&
                 !this.passwordReminderAttribute.dontShowAgain &&
                 page !== 'start' &&
-                (is_fm() || dlid)
+                (is_fm() || dlid || LOGOUT_DIALOG_START_PAGES.has(page))
             ) {
                 const { promise } = mega;
                 this.showDialog(promise);

@@ -99,6 +99,10 @@ body.mobile .toast-notification .message-body {
     line-clamp: 2;
 }
 
+body.mobile .toast-notification .message-body .long-title-truncate {
+    flex: 1;
+}
+
 @media only screen and (min-width: 768px) and (max-width: 1024px) {
     .rack.toast.bottom.above-btn {
         bottom: 64px;

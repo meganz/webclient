@@ -174,7 +174,7 @@ mega.tpw = new function TransferProgressWidget() {
                 const currFilter = (mega.tpw.currView >>> 3) << 3;
                 viewId |= currFilter;
             }
-            const { odl, oul, edl, eul } = tfsheadupdate.stats;
+            const { odl, oul, edl, eul } = tfsheadupdate();
             if (
                 mega.tpw.currView & mega.tpw.views.ERROR && !(viewId & mega.tpw.views.ERROR) &&
                 odl + oul + edl + eul === 0

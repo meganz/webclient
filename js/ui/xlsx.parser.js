@@ -376,6 +376,16 @@
         };
     }
 
+    const xmlHasError = (doc) => {
+        return doc.querySelector('parsererror')
+            || doc.documentElement.nodeName === 'Error';
+    };
+
+    const freeze = (obj) => {
+        Object.setPrototypeOf(obj, null);
+        return Object.freeze(obj);
+    };
+
     async function readXml(zip, path, maxBytes) {
         var bytes = await zip.extract(path, maxBytes);
         if (!bytes) {
@@ -383,8 +393,7 @@
         }
         var text = new TextDecoder('utf-8').decode(bytes);
         var doc = new DOMParser().parseFromString(text, 'text/xml');
-        var err = doc.querySelector('parsererror');
-        if (err) {
+        if (xmlHasError(doc)) {
             throw new Error(`XML parse error in ${  path}`);
         }
         return doc;
@@ -3779,6 +3788,84 @@
 
     var MAX_INLINE_IMAGE_BYTES = 25 * 1024 * 1024;
     var MAX_TOTAL_IMG_BYTES = 80 * 1024 * 1024;
+    const SVG_DROP_TAGS = freeze({
+        animate: 1, animatemotion: 1, animatetransform: 1, audio: 1,
+        discard: 1, embed: 1, foreignobject: 1, handler: 1, iframe: 1,
+        listener: 1, object: 1, script: 1, set: 1, shadow: 1,
+        template: 1, use: 1, video: 1
+    });
+    const SVG_URL_ATTRS = freeze({href: 1, src: 1});
+
+    function svgUrlIsSafe(value) {
+        if ((value = (typeof value === 'string' && value || '').trim())) {
+
+            if (value[0] === '#') {
+                return /^#[\w-]+$/.test(value);
+            }
+            const u = new URL(value, "https://example.org");
+
+            if (u.protocol === 'data:') {
+                return /^data:image\/(?:png|jpe?g|gif|webp|bmp)[,;]/i.test(u.href);
+            }
+
+            if (u.protocol === 'http:' || u.protocol === 'https:') {
+                return !u.pathname.toLowerCase().endsWith('.svg');
+            }
+        }
+        return false;
+    }
+
+    function sanitizeSvgElement(el) {
+        var attrs = el.attributes;
+        var drop = [];
+        var i;
+        for (i = 0; i < attrs.length; i++) {
+            var attr = attrs[i];
+            var name = (attr.localName || attr.name || '').toLowerCase();
+            if (name.indexOf('on') === 0
+                || SVG_URL_ATTRS[name] && !svgUrlIsSafe(attr.value)) {
+                drop.push(attr);
+            }
+        }
+        for (i = 0; i < drop.length; i++) {
+            el.removeAttributeNode(drop[i]);
+        }
+        var children = [];
+        for (var node = el.firstChild; node; node = node.nextSibling) {
+            children.push(node);
+        }
+        for (i = 0; i < children.length; i++) {
+            var child = children[i];
+            if (child.nodeType !== 1) {
+                continue;
+            }
+            if (SVG_DROP_TAGS[(child.localName || child.nodeName || '').toLowerCase()]) {
+                el.removeChild(child);
+            }
+            else {
+                sanitizeSvgElement(child);
+            }
+        }
+    }
+
+    function sanitizeSvgBytes(bytes) {
+        try {
+            var text = new TextDecoder('utf-8').decode(bytes);
+            var doc = new DOMParser().parseFromString(text, 'image/svg+xml');
+            var root = doc && doc.documentElement;
+            if (!root
+                || xmlHasError(doc)
+                || (root.localName || '').toLowerCase() !== 'svg') {
+                return null;
+            }
+            sanitizeSvgElement(root);
+            return new TextEncoder().encode(new XMLSerializer().serializeToString(root));
+        }
+        catch (ex) {
+            return null;
+        }
+    }
+
     async function loadImageAsDataUrl(zip, path) {
         try {
             var mime = mimeForImage(path);
@@ -3800,6 +3887,13 @@
             if (!bytes || bytes.byteLength > MAX_INLINE_IMAGE_BYTES) {
                 zip._imageDataUrlCache[path] = '';
                 return '';
+            }
+            if (mime === 'image/svg+xml') {
+                bytes = sanitizeSvgBytes(bytes);
+                if (!bytes) {
+                    zip._imageDataUrlCache[path] = '';
+                    return '';
+                }
             }
             var dataUrl = `data:${mime};base64,${bytesToBase64(bytes)}`;
             if (zip._imageDataUrlTotalBytes + dataUrl.length > MAX_TOTAL_IMG_BYTES) {

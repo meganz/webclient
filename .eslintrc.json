@@ -45,7 +45,21 @@
             "requestIdleCallback",
             "scheduler",
             "structuredClone",
-            "WeakRef"
+            "WeakRef",
+            // vendor/web-streams-polyfill.js
+            "ReadableStream",
+            "ReadableStreamDefaultController",
+            "ReadableByteStreamController",
+            "ReadableStreamBYOBRequest",
+            "ReadableStreamDefaultReader",
+            "ReadableStreamBYOBReader",
+            "WritableStream",
+            "WritableStreamDefaultController",
+            "WritableStreamDefaultWriter",
+            "ByteLengthQueuingStrategy",
+            "CountQueuingStrategy",
+            "TransformStream",
+            "TransformStreamDefaultController"
         ],
         "lintAllEsApis": true,
         "react": {

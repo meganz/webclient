@@ -240,7 +240,7 @@ class MegaMobileHeader extends MegaComponent {
             }
 
             if (!mobile.createFolder) {
-                mobile.createFolder = new MobileNodeNameControl({type: 'create'});
+                mobile.createFolder = new NodeNameControl({type: 'create'});
             }
 
             // Show the create folder overlay
@@ -985,3 +985,5 @@ lazy(MegaMobileHeader, 'headings', () => {
         'keybackup': l[8839]
     });
 });
+
+MegaMobileHeader.prototype.showTargetedDiscountButton = nop;

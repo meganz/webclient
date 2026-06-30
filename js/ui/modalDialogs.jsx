@@ -1,9 +1,8 @@
-var React = require("react");
-import utils from "./utils.jsx";
-import { MegaRenderMixin } from "../chat/mixins";
-import Forms from "./forms.jsx";
-
-var ContactsUI = require('./../chat/ui/contacts.jsx');
+import React from 'react';
+import utils from './utils.jsx';
+import { MegaRenderMixin } from '../chat/mixins.js';
+import Forms from './forms.jsx';
+import { ContactPickerWidget } from '../chat/ui/contacts.jsx';
 
 export class ExtraFooterElement extends React.Component {
     render() {
@@ -420,7 +419,7 @@ class SelectContactDialog extends MegaRenderMixin {
                 onClose={this.props.onClose}>
                 <section className="content">
                     <div className="content-block">
-                        <ContactsUI.ContactPickerWidget
+                        <ContactPickerWidget
                             megaChat={this.props.megaChat}
                             exclude={this.props.exclude}
                             selectableContacts="true"

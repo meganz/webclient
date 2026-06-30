@@ -1,5 +1,5 @@
 import React from 'react';
-import Call from './meetings/call.jsx';
+import { isExpanded } from './meetings/utils.jsx';
 import MiniUI from '../../ui/miniui.jsx';
 import { Button } from '../../ui/buttons.jsx';
 import { Dropdown, DropdownItem } from '../../ui/dropdowns.jsx';
@@ -71,7 +71,7 @@ export class InviteParticipantsPanel extends React.Component {
     render() {
         const { chatRoom, disableLinkToggle, onAddParticipants } = this.props;
         const { link, copied } = this.state;
-        const inCall = Call.isExpanded();
+        const inCall = isExpanded();
 
         if (this.loading) {
             return (

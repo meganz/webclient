@@ -3,12 +3,12 @@ import { MegaRenderMixin } from '../../mixins';
 import { Avatar, ContactAwareName } from '../contacts.jsx';
 import { PerfectScrollbar } from '../../../ui/perfectScrollbar.jsx';
 import Collapse from './collapse.jsx';
-import Call from './call.jsx';
+import { isModerator } from './utils.jsx';
 import { Emoji } from '../../../ui/utils.jsx';
 import Button from './button.jsx';
-import ContactsPanel from '../contactsPanel/contactsPanel.jsx';
 import { Pin, Privilege } from './videoNodeMenu.jsx';
 import { AudioLevelIndicator } from './videoNode.jsx';
+import { hasRelationship } from '../contactsPanel/utils.jsx';
 
 class Participant extends MegaRenderMixin {
     domRef = React.createRef();
@@ -61,7 +61,7 @@ class Participant extends MegaRenderMixin {
             onModeChange
         } = this.props;
         const { isOnHold, videoMuted, audioMuted, clientId } = source;
-        const hasRelationship = ContactsPanel.hasRelationship(contact);
+        const isRelated = hasRelationship(contact);
 
         return (
             <div
@@ -78,7 +78,7 @@ class Participant extends MegaRenderMixin {
                         <Emoji>{`${name} ${l.me}`}</Emoji> :
                         <ContactAwareName contact={M.u[handle]} emoji={true}/>
                     }
-                    {Call.isModerator(chatRoom, handle) &&
+                    {isModerator(chatRoom, handle) &&
                         <span>
                             <i className={`${this.baseIconClass} icon-admin-outline`}/>
                         </span>
@@ -104,7 +104,7 @@ class Participant extends MegaRenderMixin {
                         </div>
                         <div className="participants-menu-content">
                             <ul>
-                                {hasRelationship ?
+                                {isRelated ?
                                     <li>
                                         <Button
                                             icon="sprite-fm-mono icon-info"
@@ -136,7 +136,7 @@ class Participant extends MegaRenderMixin {
                                         </Button>
                                     </li>
                                 }
-                                {hasRelationship ?
+                                {isRelated ?
                                     <li>
                                         <Button
                                             icon="sprite-fm-mono icon-chat"
@@ -354,7 +354,7 @@ export default class Participants extends MegaRenderMixin {
                                             ${megaChat.userPresenceToCssClass(contact.presence)}
                                         `}
                                         />
-                                        {Call.isModerator(chatRoom, handle) &&
+                                        {isModerator(chatRoom, handle) &&
                                             <span>
                                                 <i className="sprite-fm-mono icon-admin-outline"/>
                                             </span>

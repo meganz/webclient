@@ -4,8 +4,8 @@ import ModalDialogsUI from '../../../ui/modalDialogs.jsx';
 import Button from './button.jsx';
 import ModeSwitch from './modeSwitch.jsx';
 import { Emoji } from '../../../ui/utils.jsx';
-import { filterAndSplitSources, PAGINATION } from './stream.jsx';
-import { MODE } from './call.jsx';
+import { filterAndSplitSources } from './stream.jsx';
+import { MODE, PAGINATION } from './utils.jsx';
 
 export default class StreamHead extends MegaRenderMixin {
     delayProcID = null;

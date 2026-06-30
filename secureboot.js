@@ -2973,7 +2973,16 @@ else if (!browserUpdate) {
         'xlsxviewer_js': {f:'js/ui/xlsx.viewer.js', n: 'xlsxviewer_js', j:4},
         'xlsxviewer': {f:'html/xlsx.viewer.html', n: 'xlsxviewer', j:0},
         'xlsxviewercss': {f:'css/xlsx.viewer.css', n: 'xlsxviewercss', j:4},
-        'clientzip_js': {f:'js/vendor/client-zip.js', n: 'clientzip_js', j:1}
+        'clientzip_js': {f:'js/vendor/client-zip.js', n: 'clientzip_js', j:1},
+
+        // Chat lazy-loaded chunks
+        'chat:core_ui_js': {f:'js/chat/bundle.core-ui.js', n: 'core_ui_js', j:1},
+        'chat:call_js': {f:'js/chat/bundle.call.js', n: 'call_js', j:1},
+        'chat:contacts_panel_js': {f:'js/chat/bundle.contacts-panel.js', n: 'contacts_panel_js', j:1},
+        'chat:schedule_meeting_js': {f:'js/chat/bundle.schedule-meeting.js', n: 'schedule_meeting_js', j:1},
+        'chat:start_conversation_js': {f:'js/chat/bundle.start-conversation.js', n: 'start_conversation_js', j:1},
+        'chat:cloud_browser_js': {f:'js/chat/bundle.cloud-browser.js', n: 'cloud_browser_js', j:1},
+        'chat:waiting_room_js': {f:'js/chat/bundle.waiting-room.js', n: 'waiting_room_js', j:1},
     };
 
     /* eslint-disable max-len */

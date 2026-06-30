@@ -1,10 +1,9 @@
 import React from 'react';
-import { TYPE, LABEL } from './resultContainer.jsx';
+import { TYPE, LABEL, EVENTS } from './utils.jsx';
 import { Avatar, ContactPresence } from '../contacts.jsx';
 import { MegaRenderMixin } from '../../mixins';
 import { OFlowEmoji, OFlowParsedHTML } from '../../../ui/utils.jsx';
 import { ContactAwareName } from '../contacts.jsx';
-import { EVENTS } from './searchPanel.jsx';
 
 const RESULT_ROW_CLASS = 'result-table-row';
 const USER_CARD_CLASS = 'user-card';

@@ -438,7 +438,7 @@
             if (ids.includes('app-dl-hint')) {
                 const timeout = 120 * 24 * 60 * 60; // 120 days
                 const refused = mega.config.get('dadlh') | 0;
-                const isAppDl = window.useMegaSync === 2 || window.useMegaSync === 3;
+                const isAppDl = window.useMegaSync && window.useMegaSync !== 4;
 
                 if (!isAppDl && (!refused || (refused + timeout) * 1000 < Date.now())) {
                     super.show();
@@ -510,7 +510,7 @@
             {
                 buttonId: 'folderupload-item',
                 text: l[98],
-                icon: 'sprite-fm-mono icon-folder-arrow-01-thin-outline',
+                icon: 'sprite-fm-mono icon-folder-upload-thin-outline',
                 onClick() {
                     eventlog(500009);
                     if (fmconfig.dlThroughMEGAsync && !window.useMegaSync) {
@@ -643,7 +643,7 @@
             ...(mega.flags.ff_mis || localStorage.ff_mis) ? [{
                 buttonId: 'import-from-another-cloud',
                 text: l.import_from_another,
-                icon: 'sprite-fm-mono icon-cloud-upload-thin-outline',
+                icon: 'sprite-fm-mono icon-cloud-thin-outline',
                 onClick() {
                     mega.migrate.showDialog();
                     eventlog(500943);
@@ -652,7 +652,7 @@
             {
                 buttonId: 'import-from-link',
                 text: l.url_import_feature_title,
-                icon: 'sprite-fm-mono icon-cloud-upload-thin-outline',
+                icon: 'sprite-fm-mono icon-link-thin-outline',
                 onClick() {
                     mega.linkImport.showDialog();
                 }

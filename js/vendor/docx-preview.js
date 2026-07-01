@@ -2998,13 +2998,17 @@ section.${c}>article { margin-bottom: auto; }
         var result = this.createElement("a");
         this.renderChildren(elem, result);
         this.renderStyleValues(elem.cssStyle, result);
+        var href;
         if (elem.href) {
-            result.href = elem.href;
+            href = elem.href;
         }
         else if (elem.id) {
             const rel = this.document.documentPart.rels
                 .find(it => it.id == elem.id && it.targetMode === "External");
-            result.href = rel === null || rel === void 0 ? void 0 : rel.target;
+            href = rel === null || rel === void 0 ? void 0 : rel.target;
+        }
+        if (href && /^(https?|mailto):/i.test(href)) {
+            result.href = href;
         }
         return result;
     }

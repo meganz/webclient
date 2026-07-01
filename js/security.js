@@ -686,7 +686,9 @@ var security = {
                     })
                     .catch((ex) => {
                         if (ex === EEXPIRED || ex === ENOENT) {
-                            return msgDialog('warninga', l[135], ex === EEXPIRED ? l[7719] : l[22128], false, reset);
+                            return msgDialog('warninga', l[135], ex === EEXPIRED ? l[7719] : l[22128], false, () => {
+                                reset(!u_sid);
+                            });
                         }
                         tell(ex);
                     })

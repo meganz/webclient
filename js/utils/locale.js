@@ -2065,7 +2065,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[A]', '<a class="clickurl">').replace('[/A]', '</a>');
 
     l.otp_learn_more = escapeHTML(l.otp_learn_more)
-        .replace('[A]', `<a class="clickurl" href=${otpHelpLink}" target="_blank">`)
+        .replace('[A]', `<a class="clickurl" href="${otpHelpLink}" target="_blank">`)
         .replace('[/A]', '</a>');
 
     l.otp_content_non_pwd_users = escapeHTML(l.otp_content_non_pwd_users)

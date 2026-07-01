@@ -349,12 +349,12 @@ mBroadcaster.addListener('fm:initialized', () => {
                 {
                     name: l.mega_pwm,
                     flag: OBV4_FLAGS.PASS_INIT,
+                    get prerequisiteCondition() {
+                        return !!pwmReady;
+                    },
                     actions: [
                         {
                             type: 'showOnBoardingDialog',
-                            get prerequisiteCondition() {
-                                return !!pwmReady;
-                            },
                             options: {
                                 steps: [
                                     {
@@ -443,7 +443,8 @@ mBroadcaster.addListener('fm:initialized', () => {
                                             },
                                             event: 500905
                                         },
-                                        customContent: () => {
+                                        customContent: async() => {
+                                            await M.require('pwm');
                                             mega.ui.onboarding.extension = new MegaExtensionPassSelector();
                                             return mega.ui.onboarding.extension.container;
                                         }

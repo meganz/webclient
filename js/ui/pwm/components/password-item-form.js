@@ -204,41 +204,41 @@ class PasswordItemForm extends MegaForm {
             this.megaTOTPInput.showInfoMessage(`${infoIcon} ${l.otp_field_instructions}`);
 
             const wrapper = this.megaTOTPInput.$wrapper[0];
-            const link = wrapper.querySelector('div.message-container.mega-banner a');
-            if (link) {
-                link.addEventListener('click', () => {
-                    const prompt = document.createElement('p');
-                    prompt.append(l.otp_tutorial_prompt);
-                    prompt.append(document.createElement('br'));
-                    prompt.append(parseHTML(l.otp_learn_more));
-                    this.showInfoSheet({
-                        name: 'totp-info',
-                        title: l.otp_info_title,
-                        contents: [
-                            l.otp_info_description,
-                            prompt
-                        ],
-                        actions: [
-                            {
-                                type: 'normal',
-                                text: l.ok_button,
-                                className: 'primary',
-                                onClick: () => mega.ui.sheet.hide()
-                            },
-                            {
-                                type: 'normal',
-                                text: l.otp_start_tutorial,
-                                className: 'secondary',
-                                onClick: () => {
-                                    mega.ui.sheet.hide();
-                                    const tutorialOTP = new TutorialOTP();
-                                    tutorialOTP.start();
-                                }
+            wrapper.addEventListener('click', (e) => {
+                if (!e.target.closest('div.message-container.mega-banner a')) {
+                    return;
+                }
+                const prompt = document.createElement('p');
+                prompt.append(l.otp_tutorial_prompt);
+                prompt.append(document.createElement('br'));
+                prompt.append(parseHTML(l.otp_learn_more));
+                this.showInfoSheet({
+                    name: 'totp-info',
+                    title: l.otp_info_title,
+                    contents: [
+                        l.otp_info_description,
+                        prompt
+                    ],
+                    actions: [
+                        {
+                            type: 'normal',
+                            text: l.ok_button,
+                            className: 'primary',
+                            onClick: () => mega.ui.sheet.hide()
+                        },
+                        {
+                            type: 'normal',
+                            text: l.otp_start_tutorial,
+                            className: 'secondary',
+                            onClick: () => {
+                                mega.ui.sheet.hide();
+                                const tutorialOTP = new TutorialOTP();
+                                tutorialOTP.start();
                             }
-                        ]
-                    });
+                        }
+                    ]
                 });
-            }
+            });
         });
         mega.ui.pm.overlay.on('close.overlay', () => this.clear());
 

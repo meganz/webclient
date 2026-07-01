@@ -1122,8 +1122,7 @@ Object.defineProperty(self, 'mShowAds', {
     value: (is_livesite || localStorage.gads) && !is_extension && !(localStorage.sid || sessionStorage.sid)
 });
 
-// eslint-disable-next-line es/no-object-fromentries
-if (Object.fromEntries && !self.mShowAds) {
+if (Object.hasOwn && !self.mShowAds) {
     if (is_karma || tmp === -0x8feed) {
         Object.freeze = echo;
     }
@@ -2936,6 +2935,8 @@ else if (!browserUpdate) {
         'recovery': {f:'html/recovery.html', n: 'recovery', j:0},
         'recovery_js': {f:'html/js/recovery.js', n: 'recovery_js', j:1},
         'sdkterms': {f:'html/sdkterms.html', n: 'sdkterms', j:0},
+        'datepicker_utils_js': {f:'js/ui/datetimepicker-utils.js', n: 'datepicker_utils_js', j:1},
+        'mega_time_picker_js': {f:'js/ui/mega-time-picker.js', n: 'mega_time_picker_js', j:1},
         'support_js': {f:'html/js/support.js', n: 'support_js', j:1},
         'support': {f:'html/support.html', n: 'support', j:0},
         'pdfjs': {f:'js/vendor/pdf.js', n: 'pdfjs', j:1},
@@ -3208,7 +3209,7 @@ else if (!browserUpdate) {
         'discount': ['discountpromo_js'],
         's': ['discountpromo_js'], // Short URL for 'sale' e.g. /s/blackfriday
         'disputenotice': ['disputenotice', 'copyright_js'],
-        'support': ['support_js', 'support'],
+        'support': ['datepicker_utils_js', 'mega_time_picker_js', 'support_js', 'support'],
         'recover': ['reset', 'reset_js'],
         'redeem': ['redeem', 'redeem_js'],
         'unsub': ['unsub', 'unsub_js'],

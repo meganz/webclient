@@ -15,6 +15,7 @@ mBroadcaster.once('boot_done', () => {
     if (!eid && !self.is_extension
         || self.buildOlderThan10Days
         || self.onerror === self.nop
+        || /bot|crawl/i.test(self.ua)
         || storage.mSentinelOptOut) {
 
         self.onerror = null;
@@ -66,7 +67,7 @@ mBroadcaster.once('boot_done', () => {
     };
 
     const thirdPartyScript = (dump, data) => {
-        return /userscript|(?:user|inpage|inject)\.js|EvalError/.test(dump.m + data)
+        return /userscript|(?:user|inpage|inject[\w/-]*|ant)\.js|EvalError/.test(dump.m + data)
             || dump.m.includes('on proxy: property')
             || dump.m.includes('Permission denied to access property')
             || dump.m.includes("evaluating 'browser.runtime")

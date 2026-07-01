@@ -1835,10 +1835,11 @@ mega.tpw = new function TransferProgressWidget() {
     const pos = {};
     const tpwLeftVar = '--tpw-left';
     const tpwTopVar = '--tpw-top';
+    const widgetOffsetHeight = () =>  window.psa ? psa.getBannerHeight() : 0;
     const keepWidgetInView = () => {
         const rect = widgetRoot.getBoundingClientRect();
         const maxLeft = Math.max(0, window.innerWidth - rect.width);
-        const maxTop = Math.max(0, window.innerHeight - rect.height);
+        const maxTop = Math.max(0, window.innerHeight - rect.height - widgetOffsetHeight());
         const left = Math.max(0, Math.min(rect.left, maxLeft));
         const top = Math.max(0, Math.min(rect.top, maxTop));
         if (left === rect.left && top === rect.top) {
@@ -1882,7 +1883,7 @@ mega.tpw = new function TransferProgressWidget() {
             pos.origX = rect.left / window.innerWidth * 100;
             pos.origY = rect.top / window.innerHeight * 100;
             pos.maxX = (window.innerWidth - widgetRoot.offsetWidth) / window.innerWidth * 100;
-            pos.maxY = (window.innerHeight - widgetRoot.offsetHeight) / window.innerHeight * 100;
+            pos.maxY = (window.innerHeight - widgetRoot.offsetHeight - widgetOffsetHeight()) / window.innerHeight * 100;
             widgetRoot.style.setProperty(tpwLeftVar, `${pos.origX}%`);
             widgetRoot.style.setProperty(tpwTopVar, `${pos.origY}%`);
             widgetRoot.classList.add('dragging');
@@ -2030,6 +2031,11 @@ mega.tpw = new function TransferProgressWidget() {
         });
         mBroadcaster.addListener('fileversioning:open', () => {
             scope.hideOnboarding();
+        });
+        $(window).rebind('resize.tpw', () => {
+            if (!scope.isDialog && pos.lastX !== undefined && scope.isWidgetVisibile()) {
+                keepWidgetInView();
+            }
         });
     };
     const initFilterChip = () => {
@@ -2509,21 +2515,20 @@ mega.tpw = new function TransferProgressWidget() {
             let top;
             if (pos.lastX === undefined) {
                 left = 'calc(100% - 12px - var(--tpw-width))';
-                top = 'calc(100% - 12px - var(--tpw-height))';
+                top = 'calc(100% - 12px - var(--psa-height, 0px) - var(--tpw-height))';
             }
             else {
                 left = `${Math.max(0, Math.min(pos.lastX, pos.maxX))}%`;
                 top = `${Math.max(0, Math.min(pos.lastY, pos.maxY))}%`;
             }
-            widgetRoot.style.removeProperty(tpwLeftVar);
-            widgetRoot.style.removeProperty(tpwTopVar);
+            widgetRoot.style.setProperty(tpwLeftVar, left);
+            widgetRoot.style.setProperty(tpwTopVar, top);
             widgetRoot.style.setProperty('--tpw-end-left', left);
             widgetRoot.style.setProperty('--tpw-end-top', top);
             tSleep(0.15).then(() => {
                 widgetRoot.classList.remove('shrink');
                 if (pos.lastX) {
-                    widgetRoot.style.setProperty(tpwLeftVar, left);
-                    widgetRoot.style.setProperty(tpwTopVar, top);
+                    keepWidgetInView();
                 }
                 widgetRoot.style.removeProperty('--tpw-end-left');
                 widgetRoot.style.removeProperty('--tpw-end-top');
@@ -2592,7 +2597,6 @@ mega.tpw = new function TransferProgressWidget() {
                     megaList.resized();
                 }
             });
-            scope.hideOnboarding();
             eventlog(501072);
         }
         else {
@@ -2607,6 +2611,10 @@ mega.tpw = new function TransferProgressWidget() {
             eventlog(501073);
         }
         scope.updateHeaderAndContent();
+        if ($.dialog === 'onboardingDialog') {
+            // Reposition onboarding
+            $.tresizer();
+        }
     };
     scope.updateMinimised = (tfStats) => {
         if (!widgetRoot.classList.contains('collapse')) {

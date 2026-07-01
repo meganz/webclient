@@ -1401,6 +1401,12 @@ mBroadcaster.once('fm:initialized', tryCatch(() => {
         return false;
     }
 
+    const lastActiveTs = lp[3] || 0;
+    // 0 if a newer session existed or unexpected/missing value so can skip
+    if (lastActiveTs === 0) {
+        return false;
+    }
+
     // Sanity check for nodes newer than the purge
     const stack = [M.RootID, M.InboxID, M.RubbishID];
     while (stack.length) {
@@ -1414,11 +1420,12 @@ mBroadcaster.once('fm:initialized', tryCatch(() => {
             stack.push(...Object.keys(M.c[h]));
         }
     }
-
+    // Approximate number of inactive months. Min 1
+    const inactiveMonths = Math.max(1, Math.floor((unixtime() - lastActiveTs) / (30 * 86400)));
     const options = {
         name: 'inactive-account',
         title: l.bn_inactive_acc_title,
-        msgText: l.bn_inactive_acc_text.replace('%1', 9),
+        msgText: l.bn_inactive_acc_text.replace('%1', inactiveMonths),
         type: 'error',
         ctaText: l[8742],
         onCtaClick: () => {

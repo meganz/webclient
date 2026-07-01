@@ -51,13 +51,159 @@
                     <div class="list flex flex-column"></div>
                 </div>
                 <div class="accept-articles-read other-hidden hidden"></div>
+                <div class="s4-issue-form flex flex-column other-hidden hidden">
+                    <!-- affected endpoints -->
+                    <div class="endpoints-wrapper input-block">
+                        <span class="caption-b-l">[$affected_endpoints_label]</span>
+                        <div class="endpoints"></div>
+                        <div class="caption-l-r">
+                            [$s4_endpoints_select_subtext]
+                        </div>
+                        <div class="error endpoints-error flex-row-gap-sm hidden">
+                            <div class="icon flex items-center">
+                                <i class="sprite-fm-mono icon-alert-triangle-thin-outline"></i>
+                            </div>
+                            <span>[$err_atleast_one_endpoint]</span>
+                        </div>
+                    </div>
+
+                    <!-- issue occurrence time -->
+                    <div class="input-block">
+                        <span class="caption-b-l">[$when_did_it_occur]</span>
+                        <div class="time-inputs-wrapper flex flex-column">
+                            <div class="time-inputs flex flex-column">
+                                <div class="time-input-row start flex flex-column">
+                                    <span class="caption-l-r label">[$schedule_start_date]</span>
+                                    <div class="inputs flex flex-row">
+                                        <div class="date-input flex"></div>
+                                        <div class="time-input flex"></div>
+                                    </div>
+                                </div>
+                                <div class="time-input-row end flex flex-column">
+                                    <span class="caption-l-r label">[$schedule_end_date]</span>
+                                    <div class="inputs flex flex-row">
+                                        <div class="date-input flex"></div>
+                                        <div class="time-input flex"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="caption-l-r">[$issue_time_occurred_subtext]</div>
+                            <div class="error datetime-error flex-row-gap-sm hidden">
+                                <div class="icon flex items-center">
+                                    <i class="sprite-fm-mono icon-alert-triangle-thin-outline"></i>
+                                </div>
+                                <span>[$err_missing_start_end_datetime]</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- connection mode -->
+                    <div class="connection-info-wrapper input-block">
+                        <span class="caption-b-l">[$how_are_you_connecting]</span>
+                        <div class="connection-info"></div>
+                        <div class="error connection-error flex-row-gap-sm hidden">
+                            <div class="icon flex items-center">
+                                <i class="sprite-fm-mono icon-alert-triangle-thin-outline"></i>
+                            </div>
+                            <span></span>
+                        </div>
+                    </div>
+
+                    <!-- optional request-id -->
+                    <div class="req-id-info-wrapper input-block">
+                        <div class="labels-block flex-row-gap-sm items-center">
+                            <span class="caption-b-l">[$request_id]</span>
+                            <span class="caption-l-r">[$7347]</span>
+                        </div>
+                        <div class="req-id-info"></div>
+                        <span class="caption-l-r">[$request_id_subtext]</span>
+                        <div class="error req-id-error flex-row-gap-sm hidden">
+                            <div class="icon flex items-center">
+                                <i class="sprite-fm-mono icon-alert-triangle-thin-outline"></i>
+                            </div>
+                            <span></span>
+                        </div>
+                    </div>
+
+                    <!-- optional response message -->
+                    <div class="response-message-wrapper input-block">
+                        <div class="labels-block flex-row-gap-sm items-center">
+                            <span class="caption-b-l">[$response_message]</span>
+                            <span class="caption-l-r">[$7347]</span>
+                        </div>
+                        <div class="response-message message mega-textarea"></div>
+                        <div class="error response-message-error flex-row-gap-sm hidden">
+                            <div class="icon flex items-center">
+                                <i class="sprite-fm-mono icon-alert-triangle-thin-outline"></i>
+                            </div>
+                            <span></span>
+                        </div>
+                        <div class="subtext caption-l-r">
+                            <div>[$response_message_subtext]</div>
+                            <div>[$response_message_subtext1]</div>
+                            <div>
+                                <div class="flex align-center">
+                                    <i class="sprite-fm-mono icon-dot"></i>
+                                    [$response_message_subtext2]
+                                </div>
+                                <div class="flex align-center">
+                                    <i class="sprite-fm-mono icon-dot"></i>
+                                    [$response_message_subtext3]
+                                </div>
+                                <div class="flex align-center">
+                                    <i class="sprite-fm-mono icon-dot"></i>
+                                    [$response_message_subtext4]
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Logs -->
+                    <div class="logs-wrapper input-block">
+                        <div class="labels-block flex-row-gap-sm items-center">
+                            <span class="caption-b-l">[$logs]</span>
+                            <span class="caption-l-r">[$7347]</span>
+                        </div>
+                        <div class="logs"></div>
+                        <span class="caption-l-r">[$s4_logs_subtext]</span>
+                        <div class="error logs-error flex-row-gap-sm hidden">
+                            <div class="icon flex items-center">
+                                <i class="sprite-fm-mono icon-alert-triangle-thin-outline"></i>
+                            </div>
+                            <span></span>
+                        </div>
+                    </div>
+
+                    <!-- S4 message -->
+                    <div class="s4-message-wrapper input-block">
+                        <span class="caption-b-l">[$s4_message_title]</span>
+                        <div class="s4-message message mega-textarea"></div>
+                        <div class="error s4-message-error flex-row-gap-sm hidden">
+                            <div class="icon flex items-center">
+                                <i class="sprite-fm-mono icon-alert-triangle-thin-outline"></i>
+                            </div>
+                            <span></span>
+                        </div>
+                    </div>
+
+                    <!-- S4 message info -->
+                    <div class="info flex-row-gap-sm">
+                        <div class="icon">
+                            <i class="sprite-fm-mono icon-alert-circle-thin-outline"></i>
+                        </div>
+                        <div class="text flex-col-gap-sm">
+                            <span class="info-title">[$s4_message_info_title]</span>
+                            <span class="caption-l-r">[$s4_message_info_description]</span>
+                        </div>
+                    </div>
+                </div>
                 <div class="support-device common-hidden input-block flex flex-column hidden">
                     <div class="labels-block flex-row-gap-sm items-center">
                         <div class="caption-b-l">[$support_page_device_input_title_part_one]</div>
                         <span class="caption-l-r">([$support_page_device_input_title_part_two])</span>
                     </div>
                     <div class="device-info"></div>
-                    <div class="info caption-l-r flex-row-gap-sm">
+                    <div class="info plain caption-l-r flex-row-gap-sm">
                         <div class="icon flex items-center">
                             <i class="sprite-fm-mono icon-help-circle-thin-outline"></i>
                         </div>
@@ -69,9 +215,7 @@
                         <div class="labels-block">
                             <div>[$7368]</div>
                         </div>
-                        <div class="message mega-textarea">
-                            <i class="sprite-fm-mono icon-close-component clear-input close-btn hidden"></i>
-                        </div>
+                        <div class="message mega-textarea"></div>
                         <div class="error flex-row-gap-sm hidden">
                             <div class="icon flex items-center">
                                 <i class="sprite-fm-mono icon-alert-triangle-thin-outline"></i>
@@ -132,7 +276,7 @@
                     <div>[$your_email_address]</div>
                 </div>
                 <div class="email-input"></div>
-                <div class="info text-secondary flex-row-gap-sm">
+                <div class="info plain text-secondary flex-row-gap-sm">
                     <div class="icon flex items-center">
                         <i class="sprite-fm-mono icon-help-circle-thin-outline"></i>
                     </div>

@@ -959,7 +959,9 @@ function getCountryAndLocales() {
  * (c) 2011 Colin Snover <http://zetafleet.com>
  * Released under MIT license.
  */
-(function(Date, undefined) {
+(function(Date) {
+    'use strict';
+
     var origParse = Date.parse,
         numericKeys = [1, 4, 5, 6, 7, 10, 11];
     Date.parse = function(date) {
@@ -996,7 +998,7 @@ function getCountryAndLocales() {
 
         return timestamp;
     };
-}(Date));
+})(Date);
 
 
 /**
@@ -1108,13 +1110,15 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[A]', '<a href="https://mega.io/terms" target="_blank" class="clickurl">')
         .replace('[/A]', '</a>');
     l[1942] = escapeHTML(l[1942]).replace('[A]', '<a href="/keybackup" class="clickurl">').replace('[/A]', '</a>');
-    l[1943] = escapeHTML(l[1943]).replace('[A]', '<a href="mailto:support@mega.io">').replace('[/A]', '</a>');
+    l[1943] = escapeHTML(l[1943])
+        .replace('[A]', '<a class="clickurl" target="_blank" href="/support">')
+        .replace('[/A]', '</a>');
     l[1982] = escapeHTML(l[1982]).replace('[A]', '<span class="red">').replace('[/A]', '</span>');
     l[5931] = escapeHTML(l[5931]).replace('[A]', '<a href="/fm/account" class="clickurl">').replace('[/A]', '</a>');
     l[6216] = escapeHTML(l[6216])
         .replace('[A1]', '<a href="/fm/account/security/change-email" class="clickurl">')
         .replace('[/A1]', '</a>')
-        .replace('[A2]', '<a href="mailto:support@mega.io">')
+        .replace('[A2]', '<a class="clickurl" target="_blank" href="/support">')
         .replace('[/A2]', '</a>');
     l[7156] = escapeHTML(l[7156])
         .replace('[A]', '<a href="https://mega.io/mobile" target="_blank" class="clickurl">')
@@ -1125,7 +1129,7 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[7996] = escapeHTML(l[7996]).replace('[S]', '<span class="purchase">').replace('[/S]', '</span>');
 
     l[8436] = escapeHTML(l[8436])
-        .replace('[/A]', '</a>').replace('[A]', '<a class="red" href="mailto:support@mega.io">');
+        .replace('[/A]', '</a>').replace('[A]', '<a class="red clickurl" target="_blank" href="/support">');
 
     l[8644] = escapeHTML(l[8644]).replace('[S]', '<span class="green">').replace('[/S]', '</span>');
     l[8651] = escapeHTML(l[8651]).replace('%1', '<span class="header-pro-plan"></span>');
@@ -1178,9 +1182,7 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[16317] = escapeHTML(l[16317]).replace('[S]', '<strong>').replace('[/S]', '</strong>');
     l[16494] = escapeHTML(l[16494]).replace('[S]2[/S]', '%1');
     l[25048] = escapeHTML(l[25048])
-        .replace('[A]', '<a href="mailto:support@mega.io">').replace('[/A]', '</a>');
-    l[25081] = escapeHTML(l[25081])
-        .replace('[A]', '<a href="mailto:support@mega.io">').replace('[/A]', '</a>');
+        .replace('[A]', '<a class="clickurl" target="_blank" href="/support">').replace('[/A]', '</a>');
 
     l[16649] = escapeHTML(l[16649]).replace('%1', '<span class="amount">10.00</span>');
     l.save_percent = escapeHTML(l.save_percent).replace('%1', '<span class="amount">10%</span>');
@@ -1216,7 +1218,7 @@ mBroadcaster.once('boot_done', function populate_l() {
                 .replace('[/A]', '</a>');
     l[17701] = escapeHTML(l[17701]).replace('[B]', '<b>').replace('[/B]', '</b>');
     l[17805] = escapeHTML(l[17805])
-        .replace('[A]', '<a class="mobile red-email" href="mailto:support@mega.io">')
+        .replace('[A]', '<a class="clickurl mobile red-email" target="_blank" href="/support">')
         .replace('[/A]', '</a>');
     l[18301] = escapeHTML(l[18301]).replace(/\[B]/g , '<b class="megasync-logo">')
         .replace(/\[\/B\]/g, '</b>').replace(/\(M\)/g, '').replace(/\[LOGO\]/g, '');
@@ -1233,17 +1235,21 @@ mBroadcaster.once('boot_done', function populate_l() {
 
     l[19512] = escapeHTML(l[19512]).replace('%1', '<span class="plan-name"></span>')
         .replace('%2', '<span class="user-email"></span>').replace('[B]', '<b>').replace('[/B]', '</b>');
-    l[19513] = escapeHTML(l[19513]).replace('[A]', '<a href="mailto:support@mega.io">').replace('[/A]', '</a>')
+    l[19513] = escapeHTML(l[19513])
+        .replace('[A]', '<a class="clickurl" target="_blank" href="/support">')
+        .replace('[/A]', '</a>')
         .replace('%2', '<span class="user-email"></span>').replace('[B]', '<b>').replace('[/B]', '</b>');
-    l[19514] = escapeHTML(l[19514]).replace('[A]', '<a href="mailto:support@mega.io">').replace('[/A]', '</a>')
+    l[19514] = escapeHTML(l[19514])
+        .replace('[A]', '<a class="clickurl" target="_blank" href="/support">')
+        .replace('[/A]', '</a>')
         .replace('%1', 2)
         .replace('%2', '<span class="user-email"></span>').replace('[B]', '<b>').replace('[/B]', '</b>');
-    l[19834] = escapeHTML(l[19834]).replace('[A]', '<a class="red" href="mailto:support@mega.io">')
+    l[19834] = escapeHTML(l[19834]).replace('[A]', '<a class="red clickurl" target="_blank" href="/support">')
         .replace('[/A]', '</a>');
-    l[19835] = escapeHTML(l[19835]).replace('[A]', '<a class="red" href="mailto:support@mega.io">')
+    l[19835] = escapeHTML(l[19835]).replace('[A]', '<a class="red clickurl" target="_blank" href="/support">')
         .replace('[/A]', '</a>');
     l[19840] = escapeHTML(l[19840]).replace('[A]', '<a class="toResetLink">').replace('[/A]', '</a>');
-    l[19843] = escapeHTML(l[19843]).replace('[A]', '<a class="red" href="mailto:support@mega.io">')
+    l[19843] = escapeHTML(l[19843]).replace('[A]', '<a class="red clickurl" target="_blank" href="/support">')
         .replace('[/A]', '</a>');
     l[23052] = escapeHTML(l[23052]).replace('[A]', '<a class="red" href="mailto:business@mega.io">')
         .replace('[/A]', '</a>');
@@ -1375,7 +1381,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         )
         .replace('[/A3]', '</a>');
     l.redeem_etoomany = escapeHTML(l.redeem_etoomany)
-        .replace('[A]', `<a class="clickurl" href="/support">`)
+        .replace('[A]', `<a class="clickurl" target="_blank" href="/support">`)
         .replace('[/A]', '</a>');
     l.backup_read_only_wrng = escapeHTML(l.backup_read_only_wrng)
         .replace('[S]', '<span>')
@@ -1415,7 +1421,7 @@ mBroadcaster.once('boot_done', function populate_l() {
     l.no_email_try_again = escapeHTML(l.no_email_try_again).replace('[A]', '<a class="try-again">')
         .replace('[/A]', '</a>');
     l.contact_support_email = escapeHTML(l.contact_support_email)
-        .replace('[A]', '<a class="mailto" href="mailto:support@mega.io">')
+        .replace('[A]', '<a class="clickurl" target="_blank" href="/support">')
         .replace('[/A]', '</a>');
     l.agree_s4_tos = escapeHTML(l.agree_s4_tos)
         .replace('[A]', '<a class="clickurl green" target="_blank" href="https://mega.io/terms#S4">')
@@ -1690,7 +1696,8 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[A]', '<a href="https://mega.io/terms" target="_blank" rel="noopener noreferrer">')
         .replace('[/A]', '</a>');
     l.browser_memory_full = escapeHTML(l.browser_memory_full)
-        .replace('[A]', '<a class="anchor-link" href="mailto:support@mega.io">')
+        .replace('[A]', '<a class="clickurl anchor-link" target="_blank" ' +
+                 'href="https://help.mega.io/files-folders/transfers/browser-download-limitations">')
         .replace('[/A]', '</a>');
 
     const megaLiteHelpCenterLink = 'https://help.mega.io/files-folders/view-move/mega-lite';
@@ -1779,7 +1786,8 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace(/\[LI]/g, '<li class="">').replace(/\[\/LI]/g, '</li>');
 
     l.account_reset_email_info = escapeHTML(l.account_reset_email_info)
-        .replace('[A]', '<a href="mailto:support@mega.io" class="primary-link">').replace('[/A]', '</a>');
+        .replace('[A]', '<a class="clickurl primary-link" target="_blank" href="/support">').replace('[/A]', '</a>');
+
     l.account_reset_details = escapeHTML(l.account_reset_details).replace('[B]', '<b>').replace('[/B]', '</b>');
 
     l.file_request_overlay_blurb = escapeHTML(l.file_request_overlay_blurb)
@@ -1850,11 +1858,11 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[/A3]', '</a>');
 
     l.s4_cnt_exists_error = escapeHTML(l.s4_cnt_exists_error)
-        .replace('[A]', '<a href="mailto:support@mega.io" class="link mailto">')
+        .replace('[A]', '<a class="clickurl link" target="_blank" href="/support">')
         .replace('[/A]', '</a>');
 
     l.s4_cnt_init_error = escapeHTML(l.s4_cnt_init_error)
-        .replace('[A]', '<a href="mailto:support@mega.io" class="link">')
+        .replace('[A]', '<a class="clickurl link" target="_blank" href="/support">')
         .replace('[/A]', '</a>');
 
     l.s4_onbd_ne_tip = escapeHTML(l.s4_onbd_ne_tip)
@@ -1951,7 +1959,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[/A]', '</a>');
 
     l.stripe_generic_decline_error = escapeHTML(l.stripe_generic_decline_error)
-        .replace('[A]', '<a href="mailto:support@mega.io">')
+        .replace('[A]', '<a class="clickurl" target="_blank" href="/support">')
         .replace('[/A]', '</a>');
 
     l.vpn_to_disable_text = escapeHTML(l.vpn_to_disable_text)
@@ -1968,7 +1976,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace(/\[LI]/g, '<li class="">').replace(/\[\/LI]/g, '</li>');
 
     l.error_fetching_items = escapeHTML(l.error_fetching_items)
-        .replace('[A]', '<a href="mailto:support@mega.io">')
+        .replace('[A]', '<a class="clickurl" target="_blank" href="/support">')
         .replace('[/A]', '</a>');
 
     for (const key of [
@@ -2057,7 +2065,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[A]', '<a class="clickurl">').replace('[/A]', '</a>');
 
     l.otp_learn_more = escapeHTML(l.otp_learn_more)
-        .replace('[A]', `<a class="clickurl" href=${otpHelpLink}" target="_blank">`)
+        .replace('[A]', `<a class="clickurl" href="${otpHelpLink}" target="_blank">`)
         .replace('[/A]', '</a>');
 
     l.otp_content_non_pwd_users = escapeHTML(l.otp_content_non_pwd_users)
@@ -2158,6 +2166,11 @@ mBroadcaster.once('boot_done', function populate_l() {
     l.na_link_activity_info = escapeHTML(l.na_link_activity_info)
         .replace('[A]', `<a href="/pro" class="link clickurl">`)
         .replace('[/A]', '</a>');
+    l.s4_message_info_description = escapeHTML(l.s4_message_info_description)
+        .replace('[A]', `<a class="link clickurl" href="/fm" target="_blank" rel="noopener">`)
+        .replace('[/A]', '</a>')
+        .replace('[A1]', `<a class="link" href="https://transfer.it/start" target="_blank" rel="noopener">`)
+        .replace('[/A1]', '</a>');
 
     const common = [
         15536, 16119, 16120, 16313, 16316, 16360, 18228, 18268, 18282,

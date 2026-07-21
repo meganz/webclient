@@ -17,10 +17,6 @@
 function FMDB(plainname, schema, channelmap) {
     'use strict';
 
-    if (!(this instanceof FMDB)) {
-        return new FMDB(plainname, schema, channelmap);
-    }
-
     // DB Instance.
     this.db = false;
 
@@ -51,6 +47,15 @@ function FMDB(plainname, schema, channelmap) {
 
     // upper limit when pending data needs to start to get flushed.
     this.limit = FMDB_FLUSH_THRESHOLD;
+
+    // Default batch size for chunked table scans.
+    this.chunkSize = 8192;
+
+    // Upper bound for adaptive read growth when progressively fetching rows.
+    this.growLimit = 4096;
+
+    // underlying db layer allows writing everything at once?
+    this.bulkWrite = false;
 
     // flag indicating whether there is a pending write
     this.writing = false;
@@ -247,6 +252,11 @@ FMDB.prototype.drop = async function fmdb_drop() {
         await this.db.delete().catch(dump);
         this.db = null;
     }
+};
+
+FMDB.prototype.getKeyPath = function(table) {
+    'use strict';
+    return this.db[table].schema.primKey.keyPath;
 };
 
 // check if data for table is currently being written.
@@ -720,6 +730,9 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
             fmdb.writing = null;
             fmdb.writepending(fmdb.head.length - 1);
         }
+        else if (fmdb.finalise && fmdb.state > 0 && !tablesremaining) {
+            fmdb.finalise();
+        }
     }
 
     // bulk write operation
@@ -736,7 +749,7 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
             }
         }
 
-        if (data.length < limit) {
+        if (fmdb.bulkWrite || data.length < limit) {
             fmdb.db[table][op](data).then(writeend).catch(writeerror);
             return;
         }
@@ -796,6 +809,9 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
         if (fmdb.state > 0 && !fmdb.crashed) {
             if (d) {
                 fmdb.logger.info('We are transactional, attempting to retry...');
+            }
+            if (fmdb.rollback) {
+                fmdb.rollback(ex);
             }
             fmdb.inflight = ex;
             return;
@@ -923,6 +939,7 @@ FMDB.prototype.stripnode = freeze({
         delete f.s;
 
         delete f.ts;
+        delete f.name;
 
         if (f.hash) {
             delete f.hash;
@@ -1091,7 +1108,9 @@ FMDB.prototype.restorenode = freeze({
         'use strict';
         f.h = index.h;
         f.p = index.p;
+        f.name = index.name;
         f.ts = index.t < 0 ? 1262304e3 - index.t : index.t;
+
         if (index.c) {
             f.hash = index.c;
         }
@@ -1252,12 +1271,12 @@ FMDB.prototype.get = async function fmdb_get(table, chunked) {
     }
 
     if (chunked) {
-        const limit = 8192;
-        const {keyPath} = this.db[table].schema.primKey;
+        const limit = this.chunkSize;
+        const keyPath = this.getKeyPath(table);
 
         let res = await this.db[table].orderBy(keyPath).limit(limit).toArray();
         while (res.length) {
-            let last = res[res.length - 1][keyPath].slice(0);
+            let last = res[res.length - 1][keyPath];
 
             this.normaliseresult(table, res);
             last = chunked(res, last) || last;
@@ -1347,9 +1366,6 @@ FMDB.prototype.getbykey = async function fmdb_getbykey(table, index, anyof, wher
 
             p[p.t = anyof[0]] = 1;
         }
-    }
-    else if (this.crashed > 1) {
-        return [];
     }
 
     /**
@@ -1730,13 +1746,126 @@ FMDB.prototype.getchunk = async function(table, options, onchunk) {
     }
 };
 
+FMDB.prototype.recent = async function(limit, until, filter, options) {
+    'use strict';
+
+    options = {
+        limit,
+        query(db) {
+            return db.orderBy('t').reverse().filter(filter).until(row => until > row.t);
+        },
+        include(row) {
+            return row.t > until && filter(row);
+        },
+        ...options
+    };
+
+    return this.getbykey('f', options);
+};
+
+FMDB.prototype.media = async function(options) {
+    'use strict';
+
+    let res = await this.getbykey('fa', {...options});
+
+    if (res.length) {
+        res = await this.getbykey('f', 'h', ['h', res.map((n) => n.h)]);
+    }
+
+    return res;
+};
+
+FMDB.prototype.suggest = async function() {
+    'use strict';
+
+    // Not implemented.
+    return false;
+};
+
+FMDB.prototype.search = async function(term, filters, store) {
+    'use strict';
+
+    const fill = function(nodes) {
+        let r = 0;
+
+        for (let i = nodes.length; i--;) {
+            const n = nodes[i];
+
+            if (store[n.h]) {
+                r = 1;
+            }
+            else if (!n.fv) {
+                store[n.h] = n;
+            }
+        }
+
+        return r;
+    };
+
+    if (!store) {
+        store = Object.create(null);
+
+        let ts = 0;
+        let max = 96;
+        const options = {
+            sortBy: 't',
+            limit: 16384,
+
+            query(db) {
+                return db.where('t').aboveOrEqual(ts);
+            },
+            include() {
+                return true;
+            }
+        };
+        let add = (r) => r[r.length - 1].ts + fill(r);
+        add.swap = () => {
+            ts = -1;
+            max = 48;
+            add = (rows) => 1262304e3 - rows[0].ts + -fill(rows);
+            options.query = (db) => db.where('t').belowOrEqual(ts);
+        };
+
+        while (1) {
+            const r = await this.getbykey('f', options);
+
+            if (r.length) {
+                ts = add(r);
+
+                if (--max && r.length >= options.limit) {
+                    continue;
+                }
+            }
+
+            if (ts < 0) {
+                break;
+            }
+
+            // we were loading files, swap direction to load folders
+            add.swap();
+        }
+    }
+    const filter = filters.withName || filters;
+
+    store.result = [];
+
+    for (const h in store) {
+        if (filter(store[h])) {
+            // nodes are not placed into memory, yet - up to the caller if so desired.
+            store.result.push(store[h]);
+        }
+    }
+
+    return store;
+};
+
 // simple/fast/non-recursive object cloning
 FMDB.prototype.clone = function fmdb_clone(o) {
     'use strict';
 
     o = {...o};
 
-    if (!o.d || 'byteLength' in o.d) {
+    if (!o.d || typeof o.d === 'object' && 'byteLength' in o.d) {
 
         for (const k in o) {
 
@@ -3211,7 +3340,7 @@ Object.defineProperty(self, 'dbfetch', (function() {
                 }
 
                 opts.offset += opts.limit;
-                if (opts.limit < 4096) {
+                if (opts.limit < fmdb.growLimit) {
                     opts.limit <<= 2;
                 }
 

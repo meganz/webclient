@@ -1092,7 +1092,6 @@ MegaData.prototype.showOverStorageQuota = async function(quota, options) {
 
     var $strgdlg = $('.mega-dialog.storage-dialog').removeClass('full almost-full');
     var $strgdlgBodyFull = $('.fm-dialog-body.storage-dialog.full', $strgdlg).removeClass('odq');
-    var $strgdlgBodyAFull = $('.fm-dialog-body.storage-dialog.almost-full', $strgdlg);
 
     const $pmMain = $('.pm-main', '.main-layout');
     const prevState = $pmMain.is('.almost-full, .full');
@@ -1100,13 +1099,8 @@ MegaData.prototype.showOverStorageQuota = async function(quota, options) {
     var $odqWarn = $('.odq-warning', $strgdlgBodyFull).addClass('hidden');
     var $upgradeBtn = $('.choose-plan span', $strgdlg).text(l[8696]);
     const $headerFull = $('header h2.full', $strgdlg);
-    const $estimatedPriceText = $('.estimated-price-text', $strgdlg);
     const $fBanner = $('.fm-notification-block.full', $pmMain).removeClass('visible');
     const $afBanner = $('.fm-notification-block.almost-full', $pmMain).removeClass('visible');
-
-    let upgradeTo;
-    let isEuro;
-    let lowestPlanLevel;
 
     if (quota === EPAYWALL) { // ODQ paywall
 
@@ -1127,7 +1121,6 @@ MegaData.prototype.showOverStorageQuota = async function(quota, options) {
         $pmMain.addClass('fm-notification full');
 
         $strgdlg.addClass('full');
-        $('.body-header', $strgdlgBodyFull).text(l[23519]);
 
         await pro.loadMembershipPlans();
         var dlgTexts = odqPaywallDialogTexts(u_attr || {}, M.account);
@@ -1135,7 +1128,6 @@ MegaData.prototype.showOverStorageQuota = async function(quota, options) {
 
         $strgdlgBodyFull.addClass('odq');
         $odqWarn.removeClass('hidden');
-        $upgradeBtn.text(l[5549]);
         $headerFull.text(l[16360]);
 
         $('.storage-dialog.body-p', $odqWarn).safeHTML(dlgTexts.dlgFooterText);
@@ -1157,7 +1149,14 @@ MegaData.prototype.showOverStorageQuota = async function(quota, options) {
 
         if (quota.isFull) {
 
-            ulmanager.ulShowOverStorageQuotaDialog(null);
+            mega.ui.quotaDialogs.storageFull({
+                events: {
+                    close() {
+                        promise.resolve();
+                        return mega.ui.quotaDialogs.EVENTS.storageFull.close;
+                    }
+                }
+            }).catch((ex) => promise.reject(ex));
 
             $('.pm-main').addClass('fm-notification full');
             $fBanner.addClass('visible');
@@ -1173,88 +1172,15 @@ MegaData.prototype.showOverStorageQuota = async function(quota, options) {
             // log almost overquota shown
             eventlog(501160);
 
-            await pro.loadMembershipPlans();
-            if (!pro.membershipPlans.length) {
-                throw EINCOMPLETE;
-            }
-
-            const lowestRequiredPlan = pro.filter.lowestRequired(quota.cstrg || '', 'storageTransferDialogs');
-
-            let upgradeString;
-            isEuro = !lowestRequiredPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY];
-
-            lowestPlanLevel = lowestRequiredPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL];
-
-            // If user requires lowest available plan (Pro Lite or a Mini plan)
-            if (pro.filter.simple.lowStorageQuotaPlans.has(lowestPlanLevel)) {
-                upgradeString = isEuro
-                    ? l[16313]
-                    : l.cloud_strg_upgrade_price_ast;
-                upgradeTo = 'min';
-            }
-            // If user requires pro flexi
-            else if (lowestPlanLevel === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
-                upgradeString = l.over_storage_upgrade_flexi;
-                upgradeTo = 'flexi';
-            }
-            // User requires a regular plan
-            else {
-                upgradeString = l.over_storage_upgrade_pro;
-                upgradeTo = 'regular';
-            }
-
-            const planName = pro.getProPlanName(lowestPlanLevel);
-            const localPrice = isEuro
-                ? lowestRequiredPlan[pro.UTQA_RES_INDEX_PRICE]
-                : lowestRequiredPlan[pro.UTQA_RES_INDEX_LOCALPRICE];
-
-            const localCurrency = isEuro
-                ? 'EUR'
-                : lowestRequiredPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY];
-
-            if (upgradeTo !== 'flexi') {
-                upgradeString = upgradeString.replace('%1', planName)
-                    .replace('%2', formatCurrency(localPrice, localCurrency, 'narrowSymbol'))
-                    .replace('%3', bytesToSize(lowestRequiredPlan[pro.UTQA_RES_INDEX_STORAGE] * pro.BYTES_PER_GB, 0))
-                    .replace('%4', bytesToSize(lowestRequiredPlan[pro.UTQA_RES_INDEX_TRANSFER] * pro.BYTES_PER_GB, 0));
-            }
-
-            $('.body-p.main-text', $strgdlgBodyFull).text(upgradeString);
-            $('.body-p.main-text', $strgdlgBodyAFull).text(upgradeString);
-
-
-            $strgdlg.addClass('almost-full');
-            $('header h2.almost-full', $strgdlg).text(myOptions.title || l[16312]);
-            if (myOptions.body) {
-                $('.body-header', $strgdlgBodyAFull).safeHTML(myOptions.body);
-            }
-
-            // Storage chart and info
-            var strQuotaLimit = bytesToSize(quota.mstrg, 0).split('\u00A0');
-            var strQuotaUsed = bytesToSize(quota.cstrg);
-            var $storageChart = $('.fm-account-blocks.storage', $strgdlg);
-
-            var fullDeg = 360;
-            var deg = fullDeg * quota.percent / 100;
-
-            // Used space chart
-            if (quota.percent < 50) {
-                $('.left-chart span', $storageChart).css('transform', 'rotate(180deg)');
-                $('.right-chart span', $storageChart).css('transform', `rotate(${180 - deg}deg)`);
-                $('.right-chart', $storageChart).addClass('low-percent-clip');
-                $('.left-chart', $storageChart).addClass('low-percent-clip');
-            }
-            else {
-                $('.left-chart span', $storageChart).css('transform', 'rotate(180deg)');
-                $('.right-chart span', $storageChart).css('transform', `rotate(${(deg - 180) * -1}deg)`);
-                $('.right-chart', $storageChart).removeClass('low-percent-clip');
-                $('.left-chart', $storageChart).removeClass('low-percent-clip');
-            }
-
-            $('.chart.data .size-txt', $strgdlg).text(strQuotaUsed);
-            $('.chart.data .pecents-txt', $strgdlg).text(strQuotaLimit[0]);
-            $('.chart.data .gb-txt', $strgdlg).text('\u00A0' + strQuotaLimit[1]);
-            $('.chart.body .perc-txt', $strgdlg).text(quota.percent + '%');
+            mega.ui.quotaDialogs.storageAlmostFull({
+                isUserDriven: !!myOptions.custom,
+                events: {
+                    close() {
+                        promise.resolve();
+                        return mega.ui.quotaDialogs.EVENTS.storageAlmostFull.close;
+                    }
+                }
+            }).catch((ex) => promise.reject(ex));
         }
         else {
             console.error('Huh?');
@@ -1267,6 +1193,9 @@ MegaData.prototype.showOverStorageQuota = async function(quota, options) {
     else {
         if ($strgdlg.is(':visible')) {
             window.closeDialog();
+        }
+        if (mega.ui.sheet && mega.ui.sheet.name === 'quota-dialog') {
+            mega.ui.quotaDialogs.dismissDialog();
         }
         $pmMain.removeClass('fm-notification almost-full full');
         $fBanner.removeClass('visible');
@@ -1285,34 +1214,22 @@ MegaData.prototype.showOverStorageQuota = async function(quota, options) {
     $strgdlg.rebind('dialog-closed', closeDialog);
 
     $upgradeBtn.text(quota.isFull ? l.upgrade_now : l[433]);
-    $estimatedPriceText.toggleClass('hidden', isEuro || (upgradeTo !== 'min'));
 
-    $('button', $strgdlg).rebind('click', function() {
+    $('button', $strgdlg).rebind('click.strgdlg', function() {
         var $this = $(this);
         if ($this.hasClass('disabled')) {
             return false;
         }
         closeDialog();
 
-        if (lowestPlanLevel && pro.filter.simple.miniPlans.has(lowestPlanLevel)) {
-            // Show the user the exclusive offer section of the pro page
-            sessionStorage.mScrollTo = 'exc';
-        }
-        else if (upgradeTo === 'flexi') {
-            // Scroll to flexi section of pro page
-            sessionStorage.mScrollTo = 'flexi';
-        }
-
         loadSubPage('pro');
 
-        eventlog(quota.isFull ? 500493 : quota === EPAYWALL ? 501164 : 500492);
+        eventlog(501164);
 
         return false;
     });
 
-    $('button.js-close, button.skip', $strgdlg).rebind('click', closeDialog);
-
-    $('button.skip', $strgdlg).toggleClass('hidden', upgradeTo === 'min');
+    $('button.js-close', $strgdlg).rebind('click.strgdlg', closeDialog);
 
     // @todo: Use mega.ui.secondaryNav.showBanner instead
     $('.fm-notification-block .end-box button').rebind('click.closeBanners', (ev) => {
@@ -1324,16 +1241,11 @@ MegaData.prototype.showOverStorageQuota = async function(quota, options) {
 
     clickURLs();
 
-    if (quota && quota.isFull && page === 'fm/dashboard') {
-        $('a.dashboard-link', $strgdlg).rebind('click.dashboard', e => {
-            e.preventDefault();
-            closeDialog();
-        });
-    }
-
     // if another dialog wasn't opened previously
     if (!quota.isFull && (!prevState || Object(options).custom || quota === EPAYWALL)) {
-        M.safeShowDialog('over-storage-quota', $strgdlg);
+        if (quota === EPAYWALL) {
+            M.safeShowDialog('over-storage-quota', $strgdlg);
+        }
     }
     else {
         promise.reject();
@@ -1401,6 +1313,12 @@ mBroadcaster.once('fm:initialized', tryCatch(() => {
         return false;
     }
 
+    const lastActiveTs = lp[3] || 0;
+    // 0 if a newer session existed or unexpected/missing value so can skip
+    if (lastActiveTs === 0) {
+        return false;
+    }
+
     // Sanity check for nodes newer than the purge
     const stack = [M.RootID, M.InboxID, M.RubbishID];
     while (stack.length) {
@@ -1414,11 +1332,12 @@ mBroadcaster.once('fm:initialized', tryCatch(() => {
             stack.push(...Object.keys(M.c[h]));
         }
     }
-
+    // Approximate number of inactive months. Min 1
+    const inactiveMonths = Math.max(1, Math.floor((unixtime() - lastActiveTs) / (30 * 86400)));
     const options = {
         name: 'inactive-account',
         title: l.bn_inactive_acc_title,
-        msgText: l.bn_inactive_acc_text.replace('%1', 9),
+        msgText: l.bn_inactive_acc_text.replace('%1', inactiveMonths),
         type: 'error',
         ctaText: l[8742],
         onCtaClick: () => {

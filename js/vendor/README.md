@@ -202,6 +202,11 @@ Unless otherwise noted, they were released under a [MIT License].
 > search & replace any utf character with ""
 > ```
 ---
+[sqlite.wasm]: A C-language library that implements a SQL database engine.
+
+> **This is a fork**, [Compare the changes](https://github.com/sqlite/sqlite/compare/master...meganz:master)
+
+---
 
 [MIT License]: <https://opensource.org/licenses/MIT>
 [Emscripten]: <http://emscripten.org/>

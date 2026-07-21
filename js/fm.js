@@ -1288,6 +1288,13 @@ function fm_hideoverlay() {
         $('.fm-dialog-overlay').addClass('hidden');
         $('body').removeClass('overlayed');
     }
+
+    // Remove revamped dialog classnames
+    if (!(mega.ui.sheet && mega.ui.sheet.visible)) {
+        $('html').removeClass('overlayed');
+        $('#mainlayout', 'body').removeClass('fm-overlay pm-dialog');
+    }
+
     $(document).trigger('MegaCloseDialog');
 }
 

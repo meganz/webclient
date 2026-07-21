@@ -98,6 +98,7 @@ class MegaMobileDatePicker extends MegaComponent {
             this.frontInput.setValue(time2date(ts, 2));
         }
         else {
+            this.picker.ts = 0;
             this.picker.value = is_ios ? this.min : "";
             this.frontInput.setValue('');
         }

@@ -5,18 +5,86 @@ lazy(mega, 'migrate', () => {
     let selectedProviderId = null;
     let dialog;
     let cardGroup;
+    let importingProgress;
     let prefetchId;
     let prefetch;
     let targetFolderName;
     let targetFolderParent;
     let nodeList;
     let oAuthPoll;
+    let onboardingOffset = 0;
+    let options = Object.create(null);
+
+    const ce = (n, t, a) => mCreateElement(n, a, t);
+
+    const navigate = {
+        get dialog() {
+            if (dialog) {
+                return dialog;
+            }
+
+            if (onboardingOffset && mega.ui.onboarding && mega.ui.onboarding.sheet) {
+                return mega.ui.onboarding.sheet;
+            }
+
+            return null;
+        },
+
+        nextEnable() {
+            const {dialog: dlg} = this;
+
+            if (dlg && dlg.next) {
+                dlg.next.disabled = false;
+            }
+        },
+
+        nextDisable() {
+            const {dialog: dlg} = this;
+
+            if (dlg && dlg.next) {
+                dlg.next.disabled = true;
+            }
+        },
+
+        goToStep(step, forceRedraw = false) {
+            const {dialog: dlg} = this;
+
+            if (!dlg) {
+                return;
+            }
+
+            if (onboardingOffset) {
+                step += onboardingOffset;
+            }
+
+            if (step === 0) {
+                dlg.hide();
+            }
+
+            return dlg.goToStep(step, forceRedraw);
+        },
+
+        hide() {
+            const {dialog: dlg} = this;
+
+            if (!dlg) {
+                return;
+            }
+
+            if (onboardingOffset) {
+                return dlg.goToStep(onboardingOffset + options.steps.length + 1);
+            }
+
+            return dlg.hide();
+        }
+    };
 
     const knownProviders = {
         1: {name: 'Google Drive', icon: 'sprite-fm-uni icon-googledrive'},
         2: {name: 'Dropbox', icon: 'sprite-fm-uni icon-dropbox'},
         3: {name: 'Microsoft OneDrive', icon: 'sprite-fm-uni icon-onedrive'},
     };
+
     const migrationStates = {
         PENDING: 0,
         IN_PROGRESS: 1,
@@ -24,6 +92,37 @@ lazy(mega, 'migrate', () => {
         CANCELLED: 3,
         ERROR: 4
     };
+
+    const guidesDomain = 'blog.mega.io';
+    const guidesPrefix = 'how-to-export-files-from-google-drive-and-other-cloud-storage-services#';
+
+    const serviceGuides = [
+        {
+            icon: 'icon-dropbox',
+            name: 'Dropbox',
+            link: 'h-how-to-export-files-from-dropbox',
+            eventName: 501368
+        },
+        {
+            icon: 'icon-onedrive',
+            name: 'OneDrive',
+            link: 'h-how-to-export-files-from-onedrive',
+            eventName: 501369
+        },
+        {
+            icon: 'icon-box',
+            name: 'Box',
+            link: 'h-how-to-export-files-from-box',
+            eventName: 501370
+        },
+        {
+            icon: 'icon-icloud',
+            name: 'iCloud',
+            link: 'h-how-to-export-files-from-apple-icloud-and-airdrop',
+            eventName: 501371
+        },
+    ];
+
     const nodeSelectorTable = document.createElement('table');
     nodeSelectorTable.className = 'select-items grid-table';
 
@@ -55,13 +154,14 @@ lazy(mega, 'migrate', () => {
                     break;
             }
         }
-        while ($.dialog === 'migrate-dialog' && // only loop if migration dialog is opened
+        // only loop if migration dialog is opened
+        while (($.dialog === 'migrate-dialog' || $.dialog === 'Mega-Onboarding') &&
             (prefetch.s === migrationStates.PENDING || prefetch.s === migrationStates.IN_PROGRESS));
 
         loadingDialog.hide('migrate-fetch-files');
 
         if (prefetch.s === migrationStates.CANCELLED) {
-            msgDialog('warninga', '', l.mig_cancelled, l.mig_cancelled_desc, () => dialog.goToStep(1));
+            msgDialog('warninga', '', l.mig_cancelled, l.mig_cancelled_desc, () => navigate.goToStep(1));
             return;
         }
         else if (prefetch.s === migrationStates.ERROR) {
@@ -77,41 +177,47 @@ lazy(mega, 'migrate', () => {
             const errMsg = knownCodes[friendlyCode] || l.mig_fail_show_code
                 .replace('%1', friendlyCode.toString())
                 .replace('%2', debugCode.toString());
-            msgDialog('warninga', '', l.mig_fail, errMsg, () => dialog.goToStep(1));
+            msgDialog('warninga', '', l.mig_fail, errMsg, () => navigate.goToStep(1));
             return;
         }
 
         if (prefetch.s !== migrationStates.SUCCESS || !prefetch.d || !prefetch.d.n) {
             console.error('Unexpected migration prefetch response. Got: ', prefetch);
-            msgDialog('warninga', '', l.mig_fail, l.mig_unexpected_response, () => dialog.goToStep(1));
+            msgDialog('warninga', '', l.mig_fail, l.mig_unexpected_response, () => navigate.goToStep(1));
             return;
         }
 
         if (typeof prefetch.d.n !== 'object' || Object.keys(prefetch.d.n).length === 0) {
-            msgDialog('warninga', '', l.mig_nothing_to, l.mig_nothing_desc, () => dialog.goToStep(1));
+            msgDialog('warninga', '', l.mig_nothing_to, l.mig_nothing_desc, () => navigate.goToStep(1));
             return;
         }
 
         nodeList = Object.keys(prefetch.d.n);
     };
 
-    const options = {
+    options = {
         componentClassname: 'mega-sheet journey migrate-dialog',
+        contentClassname: 'mega-journey migrate',
         showClose: true,
         dialogName: 'migrate-dialog',
         steps: [
-            // Step 1: Select Provider
+            // Step 1: Select Provider (Migrate your files step)
             {
                 label: l.mig_select_provider,
                 title: l.mig_select_provider_title,
                 customContent: () => {
-                    const container = document.createElement('div');
+                    const container = ce('div', null, {class: 'no-padding'});
+                    const cn = ce('div', container, {class: 'services-container'});
+                    let scrollArea = null;
+
+                    if (onboardingOffset) {
+                        eventlog(501367);
+                    }
 
                     loadingDialog.show('migrate-fetch-providers');
                     mega.migrate.getProviders().then(providers => {
 
-                        const cardList = document.createElement('div');
-                        cardList.className = 'card-select-container scrollable';
+                        const cardList = ce('fieldset', cn, {class: 'card-select-container'});
 
                         const items = Object.entries(providers).map(([id]) => ({
                             value: id,
@@ -122,23 +228,66 @@ lazy(mega, 'migrate', () => {
                             iconSize: 48
                         }));
 
-                        const infoBox = document.createElement('div');
-                        infoBox.className = 'info-box';
-                        const icon = document.createElement('i');
-                        icon.className = 'sprite-fm-mono icon-info';
+                        if (importingProgress) {
+                            cardList.disabled = true;
+
+                            const warning = ce('div', cn, {class: 'banner'});
+                            ce('i', warning, {class: 'sprite-fm-mono icon-info-thin-outline'});
+                            ce('span', warning).textContent = l.mig_ongoing;
+                        }
+
+                        const links = ce('div', cn, {class: 'links-container'});
+
+                        ce('h2', links).textContent = l.mig_guides_header;
+                        ce('p', links).textContent = l.mig_guides_info;
+
+                        const linksBody = ce('div', links, {class: 'links-body'});
+
+                        for (const item of serviceGuides) {
+                            const lnk = `${guidesPrefix}${item.link}`;
+                            const node = ce('a', linksBody, {
+                                href: `https://${guidesDomain}/${lnk}`
+                            });
+
+                            ce('i', node, {class: `sprite-fm-uni ${item.icon} icon-size-24`});
+                            ce('span', node).textContent = l.mig_how_to_export.replace('%1', item.name);
+                            ce('i', node, {class: 'sprite-fm-mono icon-arrow-up-right-thin-outline'});
+
+                            node.addEventListener('click', (ev) => {
+                                ev.preventDefault();
+                                eventlog(item.eventName);
+                                mega.redirect(guidesDomain, lnk, false, false, false);
+                            });
+                        }
+
+                        const infoBox = ce('div', container, {class: 'info-box'});
+                        const icon = ce('i', null, {class: 'sprite-fm-mono icon-info'});
+
+                        const slideWrapper = container.closest('.main-content-div');
+
+                        if (slideWrapper) {
+                            slideWrapper.classList.add('custom-scroll');
+                            requestAnimationFrame(() => {
+                                scrollArea = new PerfectScrollbar(cn);
+                            });
+                        }
 
                         cardGroup = new CardGroup({
                             cards: items,
                             onClick: (e) => {
                                 selectedProviderId = e.currentTarget.value;
-                                dialog.next.disabled = false;
+
+                                eventlog(501363, String(selectedProviderId));
+
+                                navigate.nextEnable();
                                 infoBox.textContent = l.mig_permission_required.replace('%1', e.currentTarget.text);
                                 infoBox.prepend(icon);
+
+                                if (scrollArea) {
+                                    scrollArea.update();
+                                }
                             }
                         });
-
-                        container.appendChild(cardList);
-                        container.appendChild(infoBox);
 
                         loadingDialog.hide('migrate-fetch-providers');
                     });
@@ -150,7 +299,7 @@ lazy(mega, 'migrate', () => {
 
                         eventlog(500947);
 
-                        dialog.next.disabled = true;
+                        navigate.nextDisable();
                         cardGroup.clear();
                         const oAuthResults = await mega.migrate.runOAuthPopup(selectedProviderId);
                         if (!oAuthResults.state || !oAuthResults.code) {
@@ -178,10 +327,10 @@ lazy(mega, 'migrate', () => {
                         loadingDialog.hide('migrate-enqueue-request');
 
                         if (prefetchId === ERATELIMIT) {
-                            msgDialog('warninga', '', l.mig_fail, l.mig_rate_limit, () => dialog.goToStep(1));
+                            msgDialog('warninga', '', l.mig_fail, l.mig_rate_limit, () => navigate.goToStep(1));
                         }
                         else if (!prefetchId || Number.isInteger(prefetchId) && prefetchId < 0) {
-                            msgDialog('warninga', '', l.mig_fail, l.mig_error, () => dialog.goToStep(1));
+                            msgDialog('warninga', '', l.mig_fail, l.mig_error, () => navigate.goToStep(1));
                         }
                         else {
                             targetFolderName = `${knownProviders[selectedProviderId].name} - ${time2date(unixtime())}`;
@@ -192,13 +341,28 @@ lazy(mega, 'migrate', () => {
                                 targetFolderName = fileconflict.findNewName(targetFolderName, targetFolderParent);
                             }
 
-                            dialog.goToStep(2, true);
+                            navigate.goToStep(2, true);
                         }
                     },
                     disabled: true
                 },
                 skip: {
+                    action: () => {
+                        eventlog(501372);
+                        navigate.goToStep(0);
+                    },
                     text: l.mig_go_back
+                },
+                redraw: true,
+                get back() {
+                    return {
+                        action: () => {
+                            eventlog(501366);
+                            navigate.hide();
+                        },
+                        hidden: !onboardingOffset,
+                        text: l.import_password_skip
+                    };
                 }
             },
             {
@@ -288,33 +452,34 @@ lazy(mega, 'migrate', () => {
                         loadingDialog.hide('migrate-enqueue');
 
                         if (migrationId === EEXIST) {
-                            msgDialog('warninga', '', l.mig_fail, l.mig_ongoing); // Keep dialog, they can try later
+                            importingProgress = true;
+                            navigate.goToStep(1, true);
                             return;
                         }
 
                         if (migrationId === ERATELIMIT) {
-                            msgDialog('warninga', '', l.mig_fail, l.mig_rate_limit, () => dialog.hide());
+                            msgDialog('warninga', '', l.mig_fail, l.mig_rate_limit, () => navigate.hide());
                             return;
                         }
 
                         if (migrationId === EARGS) {
-                            msgDialog('warninga', '', l.mig_fail, l.mig_too_large, () => dialog.hide());
+                            msgDialog('warninga', '', l.mig_fail, l.mig_too_large, () => navigate.hide());
                             return;
                         }
 
                         if (Number.isInteger(migrationId) && migrationId < 0) {
-                            msgDialog('warninga', '', l.mig_fail, l.mig_error, () => dialog.hide());
+                            msgDialog('warninga', '', l.mig_fail, l.mig_error, () => navigate.hide());
                             return;
                         }
 
-                        dialog.goToStep(3);
+                        navigate.goToStep(3);
                     },
                     text: l.mig_start_import
                 },
                 skip: {
                     action: () => {
                         eventlog(500949);
-                        dialog.goToStep(1, true);
+                        navigate.goToStep(1, true);
                     },
                     text: l.mig_go_back
                 }
@@ -323,12 +488,15 @@ lazy(mega, 'migrate', () => {
                 noStepper: true,
                 title: l.mig_import_started,
                 description: [
-                    l.mig_import_in_progress,
+                    l.mig_import_in_progress_info,
                     l.mig_import_add_more
                 ],
                 imageClass: 'green-check',
-                next: {
-                    text: l[726]
+                get next() {
+                    return {
+                        action: () => navigate.hide(),
+                        text: onboardingOffset ? l[507] : l[726]
+                    };
                 }
             }
         ]
@@ -339,6 +507,15 @@ lazy(mega, 'migrate', () => {
         constructor() {
             this.knownProviders = knownProviders;
             this.states = migrationStates;
+        }
+
+        getOnboardingInfo(offset) {
+            onboardingOffset = offset;
+
+            return {
+                steps: options.steps,
+                count: options.steps.length
+            };
         }
 
         async showDialog() {
@@ -356,11 +533,10 @@ lazy(mega, 'migrate', () => {
             const migrations = await this.getMigrations().catch(dump);
             loadingDialog.hide('migrate-check-active');
 
-            if (Array.isArray(migrations) && migrations.some(m =>
-                m.s === migrationStates.PENDING || m.s === migrationStates.IN_PROGRESS)) {
-                msgDialog('warninga', '', l.mig_fail, l.mig_ongoing);
-                return;
-            }
+            importingProgress = Array.isArray(migrations) && migrations.some(m =>
+                m.s === migrationStates.PENDING || m.s === migrationStates.IN_PROGRESS);
+
+            onboardingOffset = 0;
 
             this.dialog = dialog = new MegaJourney(options);
 
@@ -558,7 +734,7 @@ lazy(mega, 'migrate', () => {
 
             if (!ph || !w || !h) {
                 console.error('mscn failed', response);
-                msgDialog('warninga', '', l.mig_fail, l.mig_error, () => dialog.hide());
+                msgDialog('warninga', '', l.mig_fail, l.mig_error, () => navigate.hide());
                 return null;
             }
 

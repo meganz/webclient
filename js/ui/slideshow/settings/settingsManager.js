@@ -8,8 +8,8 @@ lazy(mega.slideshow.settings, 'manager', () => {
          * @returns {SlideshowSettingsManager} instance
          */
         constructor() {
-            const { order, speed, repeat, sub, playVid } = mega.slideshow.settings;
-            this._settings = [speed, order, repeat, sub, playVid];
+            const { order, speed, repeat, sub, playVid, caption } = mega.slideshow.settings;
+            this._settings = [speed, order, repeat, sub, playVid, caption];
 
             Object.freeze(this);
         }
@@ -52,6 +52,16 @@ lazy(mega.slideshow.settings, 'manager', () => {
             };
 
             const onUpdate = (name, cfg) => {
+                const {override} = mega.slideshow.settings;
+                if (override) {
+                    if (cfg !== override[name]) {
+                        override[name] = cfg;
+                        onConfigChange(name);
+                        this._onConfigChange($container, name, cfg);
+                    }
+                    return;
+                }
+
                 if (fmconfig.viewercfg === undefined) {
                     setSettingsDefaults(name);
                 }

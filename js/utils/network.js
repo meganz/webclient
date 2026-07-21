@@ -63,26 +63,35 @@ async function megaUtilsGFSFetch(aData, aStartOffset, aEndOffset, aProgress) {
     if (!aData.nonce) {
         const {key} = aData;
 
+        const aesBytes =
+            Uint8Array.from({length: 16}, (_, i) => (key[i >> 2] ^ key[(i >> 2) + 4]) >>> 24 - i % 4 * 8 & 0xFF);
+
+        aData.sAESKey = await crypto.subtle.importKey('raw', aesBytes, 'AES-CTR', false, ['decrypt']);
+        aData.sIVNonce = Uint8Array.from({length: 8}, (_, i) => key[4 + (i >> 2)] >>> 24 - i % 4 * 8 & 0xFF);
+
         aData.nonce = JSON.stringify([
             key[0] ^ key[4], key[1] ^ key[5], key[2] ^ key[6], key[3] ^ key[7], key[4], key[5]
         ]);
     }
 
-    return new Promise((resolve, reject) => {
-        const uint8 = new Uint8Array(ev.target.response);
-        const method = window.dlmanager && dlmanager.isDownloading ? 'unshift' : 'push';
+    const iv = new Uint8Array(16);
+    const idv = new DataView(iv.buffer);
+    const blockIndex = aStartOffset / 16;
 
-        Decrypter[method]([[aData, aStartOffset], aData.nonce, aStartOffset / 16, uint8], tryCatch(() => {
-            let {data: uint8} = aData.writer.shift();
+    iv.set(aData.sIVNonce, 0);
+    idv.setUint32(8, Math.floor(blockIndex / 0x100000000), false);
+    idv.setUint32(12, blockIndex >>> 0, false);
 
-            if (byteOffset) {
-                uint8 = new Uint8Array(uint8.buffer.slice(byteOffset));
-            }
+    let uint8 = new Uint8Array(
+        await crypto.subtle.decrypt({name: 'AES-CTR', counter: iv, length: 64}, aData.sAESKey, ev.target.response)
+    );
 
-            uint8.payload = aData;
-            resolve(uint8);
-        }, reject));
-    });
+    if (byteOffset) {
+        uint8 = new Uint8Array(uint8.buffer.slice(byteOffset));
+    }
+
+    uint8.payload = aData;
+    return uint8;
 }
 
 megaUtilsGFSFetch.getTicket = (aData) => {

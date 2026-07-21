@@ -293,6 +293,9 @@ span.rot-90::before {
 .w-0 {
     width: 0;
 }
+.w-8 {
+    width: 2rem;
+}
 .w-12 {
     width: 3rem;
 }

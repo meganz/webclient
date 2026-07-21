@@ -334,6 +334,9 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
     if (selNode) {
         items['.download-item'] = 1;
         items['.zipdownload-item'] = 1;
+        if (fmconfig.dlThroughMEGAsync) {
+            items['.megasyncdownload-item'] = 1;
+        }
         items['.copy-item'] = 1;
         items['.properties-item'] = 1;
     }
@@ -383,6 +386,7 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
         delete items['.add-star-item'];
         delete items['.download-item'];
         delete items['.zipdownload-item'];
+        delete items['.megasyncdownload-item'];
         delete items['.colour-label-items'];
         delete items['.embedcode-item'];
         delete items['.properties-versions'];
@@ -504,14 +508,12 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
         }
     }
 
-    if (folderlink && !window.useMegaSync) {
-        await megasync.preCheck().catch(nop);
-    }
     const {useMegaSync} = window;
 
     if (useMegaSync === 2 || useMegaSync === 3) {
         delete items['.download-standart-item'];
         delete items['.zipdownload-item'];
+        delete items['.megasyncdownload-item'];
         items['.download-item'] = 1;
 
         if (useMegaSync === 2 && $.selected.length === 1 && selNode.t) {
@@ -665,6 +667,11 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
 
     if (!mega.xferit) {
         delete items['.transferit-item'];
+    }
+
+    if (!is_mobile && items['.download-standart-item'] && fmconfig.dlThroughMEGAsync && !useMegaSync) {
+        // If the user saw a download option and has megasync configured check for megasync for later actions.
+        megasync.preCheck().catch(nop);
     }
 
     return items;
@@ -1015,6 +1022,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items, forcedSe
                         delete items['.zipdownload-item'];
                         delete items['.download-item'];
                         delete items['.download-standart-item'];
+                        delete items['.megasyncdownload-item'];
                         delete items['.rename-item'];
                         delete items['.copy-item'];
                         delete items['.move-item'];
@@ -1037,6 +1045,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items, forcedSe
                         delete items['.zipdownload-item'];
                         delete items['.download-item'];
                         delete items['.download-standart-item'];
+                        delete items['.megasyncdownload-item'];
                         delete items['.properties-item'];
                         delete items['.rename-item'];
                         delete items['.rewind-item'];

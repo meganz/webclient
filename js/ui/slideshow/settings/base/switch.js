@@ -26,11 +26,16 @@ lazy(mega.slideshow.settings, 'switch', () => {
          * @returns {*} - current config value
          */
         getValue() {
-            return !is_mobile &&
-            this._isImplemented &&
-            fmconfig.viewercfg && fmconfig.viewercfg[this.name] !== undefined ?
-                fmconfig.viewercfg[this.name] :
-                this._defaultValue;
+            if (!is_mobile && this._isImplemented) {
+                const {override} = mega.slideshow.settings;
+                if (override && override[this.name] !== undefined) {
+                    return override[this.name];
+                }
+                if (fmconfig.viewercfg && fmconfig.viewercfg[this.name] !== undefined) {
+                    return fmconfig.viewercfg[this.name];
+                }
+            }
+            return this._defaultValue;
         }
 
         /**

@@ -75,15 +75,13 @@ var ulmanager = {
     ulHideOverStorageQuotaDialog: function() {
         'use strict';
 
-        $(window).unbind('resize.overQuotaDialog');
-        $('.fm-dialog-overlay', 'body').unbind('click.closeOverQuotaDialog');
-        window.closeDialog();
+        if (!is_mobile) {
+            mega.ui.quotaDialogs.dismissDialog();
+        }
     },
 
     ulShowOverStorageQuotaDialog: function(aFileUpload) {
         'use strict';
-
-        var $dialog = $('.limited-bandwidth-dialog');
 
         ulQueue.pause();
         this.ulOverStorageQuota = true;
@@ -112,49 +110,29 @@ var ulmanager = {
             return;
         }
 
-        M.safeShowDialog('upload-overquota', () => {
-            // Hide loading dialog as from new text file
-            loadingDialog.phide();
+        // Hide loading dialog as from new text file
+        loadingDialog.phide();
 
-            $dialog.removeClass('achievements pro3 pro pro-mini no-cards').addClass('uploads exceeded');
-            $('.header-before-icon.exceeded', $dialog).text(l[19135]);
-            $('.pricing-page.plan .plan-button', $dialog).rebind('click', function() {
-                eventlog(99700, true);
-                const planNum = $(this).closest('.plan').data('payment');
-                if (planNum === pro.ACCOUNT_LEVEL_BUSINESS) {
-                    eventlog(501042);
-                    open(getAppBaseUrl() + '#registerb');
-                }
-                else {
-                    const events = {
-                        4: 501143,
-                        1: 501144,
-                        2: 501145,
-                        3: 501146,
-                    };
-                    eventlog(events[planNum]);
-                    sessionStorage.fromOverquotaPeriod = $(this).parent().data('period') || pro.proplan.period;
-                    open(getAppBaseUrl() + '#propay_' + planNum);
-                }
-                return false;
-            });
-
-            $('button.js-close, .fm-dialog-close', $dialog).add($('.fm-dialog-overlay'))
-                .rebind('click.closeOverQuotaDialog', () => {
-
+        if (aFileUpload !== null) {
+            eventlog(99699, true);
+        }
+        eventlog(501215);
+        mega.ui.quotaDialogs.storageFull({
+            isUserDriven: aFileUpload !== null,
+            events: {
+                planClick(variant, level, period) {
+                    eventlog(99700, true);
+                    sessionStorage.fromOverquotaPeriod = period || pro.proplan.period;
+                    mega.ui.quotaDialogs.EVENTS.storageFull.planClick(variant, level);
+                    return {4: 501143, 1: 501144, 2: 501145, 3: 501146}[level];
+                },
+                close() {
                     ulmanager.ulHideOverStorageQuotaDialog();
-                    eventlog(501140);
-                });
-
-            // Load the membership plans
-            dlmanager.setPlanPrices($dialog);
-
-            if (aFileUpload !== null) {
-                eventlog(99699, true);
-            }
-            eventlog(501215);
-            return $dialog;
-        });
+                    return mega.ui.quotaDialogs.EVENTS.storageFull.close;
+                }
+            },
+        })
+            .catch(tell);
     },
 
     ulShowBusAdminVerifyDialog(upload) {
@@ -176,10 +154,7 @@ var ulmanager = {
     ulResumeOverStorageQuotaState: function() {
         'use strict';
 
-        if ($('.mega-dialog.limited-bandwidth-dialog').is(':visible')) {
-
-            ulmanager.ulHideOverStorageQuotaDialog();
-        }
+        ulmanager.ulHideOverStorageQuotaDialog();
 
         ulQueue.resume();
         this.ulOverStorageQuota = false;

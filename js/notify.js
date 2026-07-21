@@ -1532,9 +1532,9 @@ var notify = {
             return mega.icu.format(
                 diff ? l.notif_date_yesterday : l.notif_date_today,
                 new Date(ts * 1000).getHours())
-                .replace('%1', time2date(ts, 21));
+                .replace('%1', toLocaleTime(ts));
         }
-        return time2date(ts, 8);
+        return toLocaleDateTimeLong(ts);
     },
 
     /**

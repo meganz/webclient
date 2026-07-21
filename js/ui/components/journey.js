@@ -27,9 +27,11 @@ class MegaJourney {
                 subtitle: step.subtitle || '',
                 description: step.description || '',
                 imageClass: step.imageClass || '',
+                contentClassname: step.contentClassname || '',
                 next: step.next,
                 skip: step.skip,
                 back: step.back,
+                redraw: !!step.redraw,
                 customContent: step.customContent
             };
 
@@ -113,9 +115,19 @@ class MegaJourney {
         return main;
     }
 
-    createStepContent(id, titleText, subtitleText, descriptionText, imageClass, customContent) {
+    createStepContent(opts = {}) {
+        const {
+            id,
+            title: titleText,
+            subtitle: subtitleText,
+            description: descriptionText,
+            imageClass,
+            customContent,
+            contentClassname
+        } = opts;
         const step = document.createElement('div');
-        step.className = `main-content-div hidden main-content-${id.replace(/\./g, '_')}`;
+        step.className =
+            `main-content-div hidden main-content-${id.replace(/\./g, '_')} ${contentClassname}`;
 
         if (imageClass) {
             const imageWrapper = document.createElement('div');
@@ -301,7 +313,11 @@ class MegaJourney {
                 this.skip.show();
             }
 
-            if (currentConfig.back) {
+            const currentBack = currentConfig.back;
+            const defaultBack = this.stepConfigs[0].back;
+
+            if (currentBack && !currentBack.hidden) {
+                this.back.text = currentBack.text || defaultBack && defaultBack.text || l[822];
                 this.back.show();
             }
             else {
@@ -324,7 +340,7 @@ class MegaJourney {
                 }
             }
 
-            if (forceRedraw || !this.createdSteps[currentConfig.id]) {
+            if (forceRedraw || currentConfig.redraw || !this.createdSteps[currentConfig.id]) {
                 // If the step content hasn't been created yet, generate it
                 if (this.createdSteps[currentConfig.id]) {
                     const existingStep =
@@ -334,14 +350,7 @@ class MegaJourney {
                     }
                 }
 
-                const stepContent = this.createStepContent(
-                    currentConfig.id,
-                    currentConfig.title,
-                    currentConfig.subtitle,
-                    currentConfig.description,
-                    currentConfig.imageClass,
-                    currentConfig.customContent
-                );
+                const stepContent = this.createStepContent(currentConfig);
                 this.mainContent.insertBefore(stepContent, this.mainContent.lastChild);
                 this.createdSteps[currentConfig.id] = true;
 

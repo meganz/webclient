@@ -198,6 +198,7 @@ UFSSizeCache.prototype.addToDB = function(n) {
             s: n.s >= 0 ? n.s : -n.t,
             t: n.t ? 1262304e3 - n.ts : n.ts,
             c: n.hash || '',
+            name: n.name,
             d: n
         });
 

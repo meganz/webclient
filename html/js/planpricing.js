@@ -2177,8 +2177,8 @@ lazy(pro, 'proplan2', () => {
                     showSignupPromptDialog();
                 }
                 else if (!showExclusiveOffers) {
-                    // Otherwise if the user isn't eligible, show a dialog telling the user this
-                    pro.updateLowTierProPage();
+                    // Currently the exc tab is not used unless user has access to Starter, so instead load the pro page
+                    window.mProTab = 'pro';
                 }
             }
 

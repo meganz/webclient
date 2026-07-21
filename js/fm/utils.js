@@ -360,7 +360,8 @@ MegaUtils.prototype.reload = function megaUtilsReload(force) {
             mInfinity,
             megaLiteMode,
             allownullkeys,
-            testLargeNodes
+            testLargeNodes,
+            disableSqlite
         } = localStorage;
 
         force = force || sessionStorage.fmAetherReload;
@@ -418,6 +419,9 @@ MegaUtils.prototype.reload = function megaUtilsReload(force) {
         }
         if (testLargeNodes) {
             localStorage.testLargeNodes = 1;
+        }
+        if (disableSqlite === '1') {
+            localStorage.disableSqlite = 1;
         }
 
         if (force) {
@@ -1040,179 +1044,81 @@ MegaUtils.prototype.updateSearchCount = function(options){
  * @param {Function|false} customFn Optional function to call in addition to others
  * @returns {Promise}
  */
-MegaUtils.prototype.fmSearchNodes = function(searchTerm, customFn) {
+MegaUtils.prototype.fmSearchNodes = async function(searchTerm, customFn, path) {
     'use strict';
 
     if (String(searchTerm).startsWith('--')) {
         if (pfid) {
             onIdle(() => M.filterBySearch(searchTerm));
         }
-        return Promise.resolve();
+        return;
     }
+    console.time('fm-search-nodes');
 
     // Add log to see how often they use the search
     eventlog(99603, JSON.stringify([1, pfid ? 1 : 0, Object(M.d[M.RootID]).tf, searchTerm.length]), pfid);
 
-    return new Promise(function(resolve, reject) {
-        var promise = MegaPromise.resolve();
-        var fill = function(nodes) {
-            var r = 0;
+    let matches;
+    const filters = {
+        withName: M.getFilterBySearchFn(searchTerm, customFn)
+    };
 
-            for (var i = nodes.length; i--;) {
-                var n = nodes[i];
-                if (M.nn[n.h]) {
-                    r = 1;
-                }
-                else if (!n.fv) {
-                    M.nn[n.h] = {
-                        name: n.name,
-                        p: n.p,
-                        s4: n.s4,
-                        pwm: n.pwm,
-                        sen: n.sen,
-                        fa: n.fa,
-                        k: n.k,
-                        t: n.t,
-                        des: n.des,
-                        tags: n.tags
-                    };
-                }
+    // get matched nodes by name, either with fmdb available or not.
+    if (self.fmdb) {
+        Object.defineProperty(filters, 'tree', {
+            get() {
+                return path && path.length === 8 && M.getNodeByHandle(path) && M.getTreeHandles(path);
             }
-
-            return r;
-        };
-
-        if (d) {
-            console.time('fm-search-nodes');
-        }
-
-        if (!M.nn) {
-            M.nn = Object.create(null);
-
-            if (fmdb) {
-                loadingDialog.show();
-                promise = new Promise(function(resolve, reject) {
-                    var ts = 0;
-                    var max = 96;
-                    var options = {
-                        sortBy: 't',
-                        limit: 16384,
-
-                        query: function(db) {
-                            return db.where('t').aboveOrEqual(ts);
-                        },
-                        include: function() {
-                            return true;
-                        }
-                    };
-                    var add = function(r) {
-                        return r[r.length - 1].ts + fill(r);
-                    };
-
-                    onIdle(function _() {
-                        var done = function(r) {
-                            if (!Array.isArray(r)) {
-                                return reject(r);
-                            }
-
-                            if (r.length) {
-                                ts = add(r);
-
-                                if (--max && r.length >= options.limit) {
-                                    return onIdle(_);
-                                }
-                            }
-
-                            if (ts >= 0) {
-                                ts = -1;
-                                max = 48;
-                                r = null;
-                                options.query = function(db) {
-                                    return db.where('t').belowOrEqual(ts);
-                                };
-                                add = function(r) {
-                                    return 1262304e3 - r[0].ts + -fill(r);
-                                };
-                                return onIdle(_);
-                            }
-
-                            resolve();
-                        };
-                        fmdb.getbykey('f', options).then(done).catch(done);
-                    });
-                });
-            }
-            else {
-                fill(Object.values(M.d));
-            }
-        }
-
-        promise.then(function() {
-
-            var h;
-            var filter = M.getFilterBySearchFn(searchTerm, customFn);
-
-            if (folderlink) {
-                M.v = [];
-
-                const chipBtn = $('button.search-chip', '.searcher-wrapper');
-                const location = mega.ui.searchbar.locationFn(chipBtn.length && chipBtn.attr('data-location'));
-
-                for (h in M.nn) {
-                    if (
-                        filter(M.nn[h])
-                        && h !== M.currentrootid
-                        && (!location || location(M.nn[h]))
-                        && (!mega.ui.mNodeFilter.selectedFilters.value || mega.ui.mNodeFilter.match(M.d[h]))
-                    ) {
-                        M.v.push(M.d[h]);
-                    }
-                }
-
-                M.currentdirid = 'search/' + searchTerm;
-                M.search = true;
-                if (mega.gallery) {
-                    mega.gallery.clearMdView();
-                }
-                M.renderMain();
-                M.onSectionUIOpen('cloud-drive');
-                M.updateSearchCount();
-                $('.fm-right-header .fm-breadcrumbs-wrapper').addClass('hidden');
-                mega.ui.secondaryNav.hideActionButtons();
-                if (M.v.length) {
-                    mega.ui.secondaryNav.extShowFilterChip();
-                }
-                else {
-                    mega.ui.secondaryNav.extHideFilterChip();
-                }
-                onIdle(resolve);
-                // mBroadcaster.sendMessage('!sitesearch', searchTerm, 'folder-link', M.v.length);
-            }
-            else {
-                var handles = [];
-
-                for (h in M.nn) {
-                    if (!M.d[h] && filter(M.nn[h]) && handles.push(h) > 4e3) {
-                        break;
-                    }
-                }
-
-                loadingDialog.show();
-                dbfetch.geta(handles).always(function() {
-                    loadingDialog.hide();
-                    resolve();
-                });
-            }
-
-            if (d) {
-                console.timeEnd('fm-search-nodes');
-            }
-        }).catch(function(ex) {
-            loadingDialog.hide();
-            msgDialog('warninga', l[135], l[47], ex);
-            reject(ex);
         });
-    });
+        filters.byNode = M.getFilterBySearchBasicFn(customFn);
+        const {result} = this.nn = await fmdb.search(searchTerm, filters, this.nn);
+        matches = result;
+    }
+    else {
+        matches = Object.values(this.d).filter(filters.withName);
+    }
+
+    if (folderlink) {
+        M.v = [];
+
+        const chipBtn = $('button.search-chip', '.searcher-wrapper');
+        const location = mega.ui.searchbar.locationFn(chipBtn.length && chipBtn.attr('data-location'));
+
+        for (let i = matches.length; i--;) {
+            const n = matches[i];
+
+            if (n.h !== this.currentrootid
+                && (!location || location(n))
+                && (!mega.ui.mNodeFilter.selectedFilters.value || mega.ui.mNodeFilter.match(n))) {
+
+                M.v.push(n);
+            }
+        }
+
+        M.currentdirid = 'search/' + searchTerm;
+        M.search = true;
+        if (mega.gallery) {
+            mega.gallery.clearMdView();
+        }
+        M.renderMain();
+        M.onSectionUIOpen('cloud-drive');
+        M.updateSearchCount();
+        $('.fm-right-header .fm-breadcrumbs-wrapper').addClass('hidden');
+        mega.ui.secondaryNav.hideActionButtons();
+        if (M.v.length) {
+            mega.ui.secondaryNav.extShowFilterChip();
+        }
+        else {
+            mega.ui.secondaryNav.extHideFilterChip();
+        }
+        // mBroadcaster.sendMessage('!sitesearch', searchTerm, 'folder-link', M.v.length);
+    }
+    else {
+        // @todo We should NOT need to load the entire back-to-root tree merely to render the matches nodes, FIXME!
+        await dbfetch.geta([...matches]);
+    }
+
+    console.timeEnd('fm-search-nodes');
 };
 
 
@@ -2781,6 +2687,77 @@ MegaUtils.prototype.fmEventLog = function(eid) {
             eventlog(eid, true);
         }
     }
+};
+
+MegaUtils.prototype.sqliteCheck = async function() {
+    'use strict';
+
+    if (this.pendingSQLiteCheck) {
+        return this.pendingSQLiteCheck;
+    }
+    const {disableSqlite, opfsready} = localStorage;
+
+    if (disableSqlite) {
+        if (disableSqlite !== '1' && parseInt(disableSqlite) < Date.now()) {
+            delete localStorage.disableSqlite;
+        }
+        throw EBLOCKED;
+    }
+
+    // Check if WebAssembly is available and can be compiled, evade exception like CSP blocking
+    await WebAssembly.compile(Uint8Array.of(0, 97, 115, 109, 1, 0, 0, 0));
+
+    if (!opfsready) {
+        this.pendingSQLiteCheck = tSleep.race(7, new Promise((resolve) => {
+            const blob = URL.createObjectURL(new Blob([
+                'onmessage = async() => {' +
+                'const root = await navigator.storage.getDirectory();' +
+                'const fh   = await root.getFileHandle("_p_.bin", { create: true });' +
+                'const sah  = await fh.createSyncAccessHandle();' +
+                'const size = sah.getSize();' +
+                'sah.close();' +
+                'await root.removeEntry("_p_.bin");' +
+                'postMessage(size);' +
+                '};'
+            ]));
+            const worker = new Worker(blob);
+
+            worker.onerror = worker.onmessage = function(e) {
+                resolve(e && e.data);
+                worker.terminate();
+                URL.revokeObjectURL(blob);
+            };
+            worker.postMessage({});
+        })).then(size => {
+            assert(size === 0, 'SQLite OPFS probe failed', size);
+            localStorage.opfsready = 1;
+        });
+    }
+
+    this.pendingSQLiteCheck = tSleep.race(15, Promise.resolve(this.pendingSQLiteCheck).then(() => M.require('sqlite')))
+        .then((res) => {
+            assert(!res && self.sqlite3Worker1Promiser.defaultConfig.worker, 'SQLite runtime failure', res);
+        })
+        .catch((ex) => {
+            M.sqliteCheck.lock7days(ex);
+            throw ex;
+        });
+
+    return this.pendingSQLiteCheck;
+};
+
+MegaUtils.prototype.sqliteCheck.lock7days = function(message, ex) {
+
+    'use strict';
+
+    if (message && d) {
+        console.warn(message, ex);
+    }
+
+    delete localStorage.opfsready;
+    localStorage.disableSqlite = Date.now() + 7 * 24 * 60 * 60 * 1000;
+
+    return false;
 };
 
 Object.freeze(MegaUtils.prototype);

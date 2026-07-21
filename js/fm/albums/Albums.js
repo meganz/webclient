@@ -2415,7 +2415,9 @@ lazy(mega.gallery, 'albums', () => {
                                 selectedItems.push('.download-item');
                             }
                             else {
-                                selectedItems.push('.zipdownload-item', '.download-standart-item');
+                                selectedItems.push(
+                                    '.zipdownload-item', '.download-standart-item', '.megasyncdownload-item'
+                                );
                             }
                         };
                         if (selectedCells.length > 1) {
@@ -3864,6 +3866,8 @@ lazy(mega.gallery, 'albums', () => {
             mega.ui.topmenu.megaLink.text = l.album_link;
 
             eventlog(99952);
+
+            mBroadcaster.sendMessage('albums:public:ready');
         }
 
         /**

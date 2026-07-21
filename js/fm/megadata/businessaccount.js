@@ -887,7 +887,7 @@ BusinessAccount.prototype.copySubUserTreeToMasterRoot = async function(tree, fol
 BusinessAccount.prototype.decrypteSubUserTree = function(theTree, key, subUserHandle) {
     "use strict";
 
-    if (!theTree || !theTree.ok0) {
+    if (!theTree) {
         return null;
     }
 
@@ -1039,7 +1039,7 @@ BusinessAccount.prototype.getSubUserTree = async function(subUserHandle) {
     };
     const {result} = await api.req(request);
 
-    assert(typeof result === 'object' && 'ok0' in result, `Unexpected 'fsub' response, ${result}`);
+    assert(typeof result === 'object' && 'f' in result, `Unexpected 'fsub' response, ${result}`);
 
     return result;
 };

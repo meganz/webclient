@@ -293,6 +293,18 @@ class PsaLayoutManager {
 
         return this;
     }
+
+    /**
+     * Stores the live banner height for usage in CSS
+     *
+     * @returns {Object} self instance
+     */
+    trackHeight() {
+        if (!is_mobile) {
+            document.body.style.setProperty('--psa-height', `${this.banner.getHeight()}px`);
+        }
+        return this;
+    }
 }
 
 var psa = {
@@ -544,6 +556,7 @@ var psa = {
 
         // Create PSA Layout Manager to reposition UI elements depending on PSA banner visibility & size
         psa.layout = new PsaLayoutManager(banner);
+        psa.layout.trackHeight();
 
         // Add a handler to fix the layout if the window is resized
         $(window).rebind('resize.psa.layout', () => {
@@ -558,6 +571,7 @@ var psa = {
                 .avatarMenu('.mega-header div.header-dropdown-menu')
                 .mediaPlayer('.media-viewer:not(.download-grid *)')
                 .browserScreen('.download-grid .media-viewer-container')
+                .trackHeight()
                 .meetingsCall('.meetings-call');
         });
 
@@ -594,6 +608,7 @@ var psa = {
 
         if (!is_mobile) {
             document.querySelector('.psa-holder').style.removeProperty('height');
+            document.body.style.removeProperty('--psa-height');
         }
 
         // Trigger resize so that full content in the file manager is visible after closing

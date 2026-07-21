@@ -12,16 +12,20 @@ class MegaStepper extends MegaComponent {
 
     render() {
         this.domNode.textContent = '';
-        for (let index = 1; index < this.steps.length + 1; index++) {
-            if (this.steps[index - 1].noStepper) {
+        let displayIndex = 1;
+
+        for (let index = 1; index <= this.steps.length; index++) {
+            const step = this.steps[index - 1];
+            if (step.noStepper) {
                 continue;
             }
-            const stepElement = this.createStepElement(this.steps[index - 1], index);
+            const stepElement = this.createStepElement(step, index, displayIndex);
             this.domNode.appendChild(stepElement);
+            displayIndex++;
         }
     }
 
-    createStepElement(step, index, isSecondary = false) {
+    createStepElement(step, index, displayIndex, isSecondary = false) {
         const stepElement = document.createElement('div');
         const stepPrefix = isSecondary ? 'secondary' : 'primary';
         stepElement.classList.add('step', `${stepPrefix}-step`);
@@ -72,7 +76,7 @@ class MegaStepper extends MegaComponent {
         if (!isSecondary) {
             const stepNumber = document.createElement('div');
             stepNumber.classList.add('step-number');
-            stepNumber.innerText = index;
+            stepNumber.innerText = displayIndex;
             stepIcon.appendChild(stepNumber);
         }
 
@@ -89,7 +93,8 @@ class MegaStepper extends MegaComponent {
 
         // Recursive call to create secondary steps if they exist
         if (!isSecondary && step.secondaryStep) {
-            const secondaryStepElement = this.createStepElement(step.secondaryStep, index, true);
+            const secondaryStepElement =
+                this.createStepElement(step.secondaryStep, index, displayIndex, true);
             stepElement.appendChild(secondaryStepElement);
         }
 

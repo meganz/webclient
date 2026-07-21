@@ -3658,13 +3658,11 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
                     $('.graphic.sent-email', $dialog).removeClass('hidden');
                     $('footer .invite-link-option', $dialog).addClass('hidden');
                 }
+                else if (res === EEXIST) {
+                    $uEmail.megaInputsShowError(l.register_resend_email_exists_error);
+                }
                 else {
-                    if (res === -12) {
-                        $uEmail.megaInputsShowError(l[1783]);
-                    }
-                    else {
-                        msgDialog('warninga', l[135], l[1679]);
-                    }
+                    msgDialog('warninga', l[135], l[1679]);
                 }
 
                 loadingDialog.phide();

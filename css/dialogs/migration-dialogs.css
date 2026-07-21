@@ -6,6 +6,7 @@
     height: 96px;
     background-size: 100%;
 }
+
 .mega-sheet.modal-dialog.migrate-warning .main {
     text-align: start;
     align-items: start;
@@ -15,64 +16,153 @@
 
 /* Migration dialog */
 
-.mega-sheet.migrate-dialog .mega-journey div.card-select-container.scrollable {
-    display: flex;
-    flex-wrap: wrap;
-    padding: 0 48px;
-    box-sizing: border-box;
-    margin-bottom: 24px;
-    flex-grow: 1;
-    max-height: 100%;
-    border-top: 1px solid var(--mobile-border-subtle);
-    border-bottom: 1px solid var(--mobile-border-subtle);
-    padding-top: 24px;
+.mega-sheet .migrate .icon-size-24 {
+    --icon-size: 24px;
 }
-.mega-sheet.migrate-dialog .mega-journey .main-content h1 {
+
+.mega-sheet .migrate .main-content h1 {
     margin-bottom: 16px;
 }
 
-.mega-sheet.migrate-dialog .main-content .main-content-div,
-.mega-sheet.migrate-dialog .main-content .main-content-div .custom-div,
-.mega-sheet.migrate-dialog .main-content .main-content-div .custom-div > div {
-    height: 100%;
-}
-.mega-sheet.migrate-dialog .main-content .main-content-div .info-box {
-    color: var(--mobile-text-secondary);
-    font: var(--mobile-font-caption-large-regular);
-    margin-bottom: 24px;
-}
-.mega-sheet.migrate-dialog .main-content .main-content-div .info-box i {
-    margin-inline-end: 2px;
-    vertical-align: text-top;
+.mega-sheet .migrate .main-content h2:first-child {
+    margin-bottom: 16px;
 }
 
-.mega-sheet.migrate-dialog .main-content .main-content-div .data-table {
+.mega-sheet .migrate .main-content-div,
+.mega-sheet .migrate .main-content-div .custom-div,
+.mega-sheet .migrate .main-content-div .custom-div > div {
+    height: 100%;
+}
+
+.mega-sheet .migrate .main-content-div.custom-scroll .custom-div {
+    overflow: hidden;
+}
+
+.mega-sheet .migrate .main-content-div.custom-scroll ~ .actions {
+    margin-top: 24px;
+}
+
+.mega-sheet .migrate .services-container {
+    border-top: 1px solid var(--mobile-border-subtle);
+    flex: 1 1 auto;
+}
+
+.mega-sheet .migrate .card-select-container {
+    border: 0;
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0;
+    padding: 24px 48px;
+}
+
+.mega-sheet .migrate .card-select-container:disabled button {
+    cursor: default;
+    opacity: 0.3;
+}
+
+.mega-sheet .migrate .main-content .banner {
+    align-items: center;
+    background: var(--mobile-notification-warning);
+    border-radius: var(--mobile-border-radius-medium);
+    color: var(--mobile-text-primary);
+    display: flex;
+    font: var(--mobile-font-caption-large-regular);
+    margin: 0 48px 24px;
+    padding: 16px 24px;
+}
+
+.mega-sheet .migrate .main-content .banner i {
+    --icon-size: 24px;
+    margin-inline-end: 8px;
+}
+
+.mega-sheet .migrate .links-container {
+    border-top: 1px solid var(--mobile-border-subtle);
+    padding: 24px 48px;
+}
+
+.mega-sheet .migrate .links-container h2 {
+    margin: 0;
+    padding: 0 0 4px;
+}
+
+.mega-sheet .migrate .links-container .links-body {
+    display: inline-flex;
+    flex-direction: column;
+    padding: 16px 0 0;
+}
+
+.mega-sheet .migrate .links-container a {
+    --mask-color: var(--mobile-icon-secondary);
+    align-items: center;
+    display: flex;
+    padding: 6px;
+}
+
+.mega-sheet .migrate .links-container a span {
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-caption-large-semibold);
+    padding: 0 10px;
+    text-decoration: underline;
+}
+
+@media (hover: hover) {
+    .mega-sheet .migrate .links-container a:hover span {
+        text-decoration: none;
+    }
+}
+
+.mega-sheet .migrate .main-content-div .info-box {
+    border-top: 1px solid var(--mobile-border-subtle);
+    color: var(--mobile-text-secondary);
+    display: flex;
+    font: var(--mobile-font-caption-large-regular);
+    padding: 24px 48px 0;
+}
+
+.mega-sheet .migrate .main-content-div .info-box:empty {
+    display: none;
+}
+
+.mega-sheet .migrate .main-content-div .info-box i {
+    margin: 2px 0;
+    margin-inline-end: 8px;
+}
+
+.mega-sheet .migrate .main-content-div .data-table {
     padding: 0;
 }
-.mega-sheet.migrate-dialog .main-content .main-content-div .data-table th {
+
+.mega-sheet .migrate .main-content-div .data-table th {
     padding-bottom: 16px;
 }
-.mega-sheet.migrate-dialog .main-content .main-content-div .data-table th,
-.mega-sheet.migrate-dialog .main-content .main-content-div .data-table td {
+
+.mega-sheet .migrate .main-content-div .data-table th,
+.mega-sheet .migrate .main-content-div .data-table td {
     font: var(--mobile-font-copy-regular);
 }
-.mega-sheet.migrate-dialog .main-content .main-content-div .data-table td::before {
+
+.mega-sheet .migrate .main-content-div .data-table td::before {
     content: none;
 }
-.mega-sheet.migrate-dialog .main-content .main-content-div .data-table td i {
+
+.mega-sheet .migrate .main-content-div .data-table td i {
     display: inline-block;
     margin-inline-end: 8px;
     --icon-size: 24px;
 }
-.mega-sheet.migrate-dialog .main-content .main-content-div p {
+
+.mega-sheet .migrate .main-content-div p {
     margin-top: 8px;
     margin-bottom: 8px;
 }
-.mega-sheet.migrate-dialog .main-content .main-content-div p.import-summary-note {
+
+.mega-sheet .migrate .main-content-div p.import-summary-note {
     color: var(--mobile-text-secondary);
     font: var(--mobile-font-caption-large-regular);
 }
-.mega-sheet.migrate-dialog .main-content .main-content-div .card i.icon-size-48 {
+
+.mega-sheet .migrate .main-content-div .card i.icon-size-48 {
     --icon-size: 60px;
     margin-top: -6px;
 }

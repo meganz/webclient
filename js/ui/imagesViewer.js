@@ -189,7 +189,9 @@ var slideshowid;
         var valid = true;
         var h = slideshow_handle();
         var step = dir === 'next' ? 'forward' : 'backward';
-        $.videoAutoFullScreen = $(document).fullScreen();
+        // Autoplaying links may not enter fullscreen so set to allow playing.
+        $.videoAutoFullScreen = $(document).fullScreen()
+            || $('.media-viewer-container', 'body').hasClass('slideshow');
 
         for (const i in self.dl_queue) {
             if (dl_queue[i].id === h && dl_queue[i].preview) {
@@ -623,6 +625,7 @@ var slideshowid;
         const $repeatButton = $('.v-btn.repeat', $overlay);
 
         if (slideshow_stop) {
+            $overlay.removeClass('slideshow');
             $viewerTopBar.removeClass('hidden');
             $imageControls.removeClass('hidden');
             $prevNextButtons.removeClass('hidden');
@@ -649,61 +652,7 @@ var slideshowid;
         $imageControls.removeClass('hidden');
 
         // Bind Slideshow Mode button
-        $startButton.rebind('click.mediaviewer', function() {
-            if (!slideshowplay || mega.slideshow.settings.manager.hasToUpdateRender(settingsMenu)) {
-
-                // Settings menu initialization
-                if (!settingsMenu) {
-                    settingsMenu = contextMenu.create({
-                        template: $('#media-viewer-settings-menu', $overlay)[0],
-                        sibling: $('.sl-btn.settings', $overlay)[0],
-                        animationDuration: 150,
-                        boundingElement: $overlay[0]
-                    });
-                }
-
-                // Slideshow initialization
-                mega.slideshow.settings.manager.render(settingsMenu, onConfigChange);
-                mega.slideshow.manager.setState({nodes: preselection});
-            }
-
-            $overlay.addClass('slideshow');
-            slideshow_play(true);
-            slideshow_timereset();
-            $viewerTopBar.addClass('hidden');
-            $imageControls.addClass('hidden');
-            $slideshowControls.removeClass('hidden');
-            $slideshowControlsUpper.removeClass('hidden');
-            $prevNextButtons.addClass('hidden');
-            $repeatButton.addClass('disabled').attr('disabled', 'disabled');
-
-            if (zoomPan) {
-                zoomPan.reset();
-            }
-
-            if (M.noSleep) {
-                M.noSleep().catch(dump);
-            }
-
-            if (is_mobile) {
-                eventlog(pfcol ? 500841 : 99835);
-                if (is_ios) {
-                    // Due to the handling of the onload event with the previous image in iOS,
-                    // force the call to img position
-                    slideshow_imgPosition();
-                }
-            }
-            else {
-                eventlog(501131);
-            }
-
-            // hack to start the slideshow in full screen mode
-            if (fullScreenManager) {
-                fullScreenManager.enterFullscreen();
-            }
-
-            return false;
-        });
+        $startButton.rebind('click.mediaviewer', () => slideshow_playMode());
 
         // Bind Slideshow Pause button
         $pauseButton.rebind('click.mediaviewer', function() {
@@ -749,29 +698,32 @@ var slideshowid;
         const idleAction = is_mobile ? 'touchstart' : 'mousemove';
         const $document = $(document);
 
-        // Reset image listeners for other media
-        if (!is_image3(n)) {
+        if (is_image3(n)) {
+            const resetIdleTimer = () => delay(MOUSE_IDLE_TID, () => {
+                $overlay.addClass('mouse-idle');
+            }, 2e3);
+
+            resetIdleTimer();
+
+            $document.rebind(`${idleAction}.idle`, () => {
+                $overlay.removeClass('mouse-idle');
+                resetIdleTimer();
+            });
+
+            if (!is_mobile) {
+                $controls.rebind('mousemove.idle', () => {
+                    onIdle(() => delay.cancel(MOUSE_IDLE_TID));
+                });
+            }
+        }
+        else {
+            // Reset the image-only idle listeners for other media.
             delay.cancel(MOUSE_IDLE_TID);
             $document.off(`${idleAction}.idle`);
             $controls.off('mousemove.idle');
-            return;
-        }
-
-        const resetIdleTimer = () => delay(MOUSE_IDLE_TID, () => {
-            $overlay.addClass('mouse-idle');
-        }, 2e3);
-
-        resetIdleTimer();
-
-        $document.rebind(`${idleAction}.idle`, () => {
-            $overlay.removeClass('mouse-idle');
-            resetIdleTimer();
-        });
-
-        if (!is_mobile) {
-            $controls.rebind('mousemove.idle', () => {
-                onIdle(() => delay.cancel(MOUSE_IDLE_TID));
-            });
+            if (!mega.slideshow.settings.playVid.getValue() || !is_video(n)) {
+                return;
+            }
         }
 
         // Avoid multiple init
@@ -1218,6 +1170,7 @@ var slideshowid;
         switchedSides = false;
         $('header .file-name', $overlay).text(n.name);
         $('header .file-size', $overlay).text(bytesToSize(n.s || 0));
+        mega.slideshow.settings.caption.draw(n);
         $('.viewer-error, #pdfpreviewdiv1, #docxpreviewdiv1, #xlsxpreviewdiv1', $overlay).addClass('hidden');
         $('.viewer-progress', $overlay).addClass('vo-hidden');
 
@@ -1709,6 +1662,74 @@ var slideshowid;
         slideshow_timereset(rv);
     }
 
+    function slideshow_playMode(isAuto) {
+        if (!isAuto) {
+            delete mega.slideshow.settings.override;
+        }
+
+        const $overlay = $('.media-viewer-container', 'body');
+        const $slideshowControls = $('.slideshow-controls', $overlay);
+        const $slideshowControlsUpper = $('.slideshow-controls-upper', $overlay);
+        const $imageControls = $('.image-controls', $overlay);
+        const $viewerTopBar = $('header .viewer-bars', $overlay);
+        const $prevNextButtons = $('.gallery-btn', $overlay);
+        const $repeatButton = $('.v-btn.repeat', $overlay);
+
+        if (!slideshowplay || mega.slideshow.settings.manager.hasToUpdateRender(settingsMenu)) {
+
+            // Settings menu initialization
+            if (!settingsMenu) {
+                settingsMenu = contextMenu.create({
+                    template: $('#media-viewer-settings-menu', $overlay)[0],
+                    sibling: $('.sl-btn.settings', $overlay)[0],
+                    animationDuration: 150,
+                    boundingElement: $overlay[0]
+                });
+            }
+
+            // Slideshow initialization
+            mega.slideshow.settings.manager.render(settingsMenu, onConfigChange);
+            mega.slideshow.manager.setState({nodes: preselection});
+        }
+
+        $overlay.addClass('slideshow');
+        slideshow_play(true);
+        slideshow_timereset();
+        $viewerTopBar.addClass('hidden');
+        $imageControls.addClass('hidden');
+        $slideshowControls.removeClass('hidden');
+        $slideshowControlsUpper.removeClass('hidden');
+        $prevNextButtons.addClass('hidden');
+        $repeatButton.addClass('disabled').attr('disabled', 'disabled');
+
+        if (zoomPan) {
+            zoomPan.reset();
+        }
+
+        if (M.noSleep) {
+            M.noSleep().catch(dump);
+        }
+
+        if (is_mobile) {
+            eventlog(pfcol ? 500841 : 99835);
+            if (is_ios) {
+                // Due to the handling of the onload event with the previous image in iOS,
+                // force the call to img position
+                slideshow_imgPosition();
+            }
+        }
+        else {
+            eventlog(501131);
+        }
+
+        // hack to start the slideshow in full screen mode
+        if (!isAuto && fullScreenManager) {
+            fullScreenManager.enterFullscreen();
+        }
+
+        return false;
+    }
+
     function slideshow_play(isPlayMode, isAbortFetch) {
         if (mega.slideshow.manager) {
             mega.slideshow.manager.setState({
@@ -2134,6 +2155,10 @@ var slideshowid;
 
         if ($.autoplay === id) {
             queueMicrotask(() => {
+                // Autoplay with audio is blocked by browsers
+                if (!$(document).fullScreen()) {
+                    $video.prop('muted', true);
+                }
                 $playVideoButton.trigger('click');
             });
             delete $.autoplay;
@@ -2802,6 +2827,7 @@ var slideshowid;
      */
     global.slideshow = slideshow;
     global.slideshow.prepareAndViewPdfViewer = prepareAndViewPdfViewer;
+    global.slideshow_playMode = slideshow_playMode;
     global.slideshow_next = slideshow_next;
     global.slideshow_prev = slideshow_prev;
     global.slideshow_handle = slideshow_handle;

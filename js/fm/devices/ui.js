@@ -1360,16 +1360,16 @@ lazy(mega.devices, 'ui', () => {
          * @returns {Boolen} Whether the node is in inbox
          */
         isDeprecated(node) {
-            if (window.vw) {
+            if (window.vw || !M.InboxID) {
                 return false;
             }
 
-            if (M.InboxID && (node.h === M.InboxID || node.p === M.InboxID)) {
+            if (node.h === M.InboxID || node.p === M.InboxID) {
                 return true;
             }
 
-            const path = M.getPath(node.h);
-            return path.length === 3 && path[2] === M.InboxID;
+            const parent = M.d[node.p];
+            return !!parent && parent.p === M.InboxID;
         }
 
         /**
@@ -1940,6 +1940,7 @@ lazy(mega.devices, 'ui', () => {
                 items['.copy-item'] = 1;
                 items['.download-standart-item'] = 1;
                 items['.zipdownload-item'] = 1;
+                items['.megasyncdownload-item'] = 1;
                 items['.open-in-location'] = 1;
                 items['.leaveshare-item'] = 1;
                 if (M.getNodeRights(folder.h) > 1) {
@@ -1963,6 +1964,7 @@ lazy(mega.devices, 'ui', () => {
             else if (folder.t === backup) {
                 items['.download-standart-item'] = 1;
                 items['.zipdownload-item'] = 1;
+                items['.megasyncdownload-item'] = 1;
                 items['.stopbackup-item'] = 1;
                 items['.copy-item'] = 1;
                 items['.getlink-item'] = 1;
@@ -2002,6 +2004,7 @@ lazy(mega.devices, 'ui', () => {
             items['.send-to-contact-item'] = 1;
             items['.download-standart-item'] = 1;
             items['.zipdownload-item'] = 1;
+            items['.megasyncdownload-item'] = 1;
             items['.copy-item'] = 1;
             items['.properties-item'] = 1;
             items['.getlink-item'] = 1;
@@ -2150,6 +2153,7 @@ lazy(mega.devices, 'ui', () => {
             if (isUndecrypted) {
                 delete items['.add-star-item'];
                 delete items['.download-standart-item'];
+                delete items['.megasyncdownload-item'];
                 delete items['.rename-item'];
                 delete items['.copy-item'];
                 delete items['.move-item'];
@@ -2171,6 +2175,7 @@ lazy(mega.devices, 'ui', () => {
                     delete items['.add-star-item'];
                     delete items['.colour-label-items'];
                     delete items['.download-standart-item'];
+                    delete items['.megasyncdownload-item'];
                     delete items['.play-item'];
                     delete items['.preview-item'];
                     delete items['.edit-file-item'];
@@ -2196,9 +2201,14 @@ lazy(mega.devices, 'ui', () => {
             if (handles.length > 1 && currentSection !== renderSection.cloudDrive) {
 
                 items['.properties-item'] = 1;
-                items['.download-standart-item'] = 1;
-                items['.zipdownload-item'] = 1;
-
+                if (window.useMegaSync === 2 || window.useMegaSync === 3) {
+                    items['.download-standart-item'] = 1;
+                    items['.zipdownload-item'] = 1;
+                    items['.megasyncdownload-item'] = 1;
+                }
+                else {
+                    items['.download-item'] = 1;
+                }
                 this._populateSensitiveCtxItems(handles, items);
                 this._populateCommonCtxItemsMult(handles, items);
                 this._filterRestrictedItems(handles, items);
@@ -2264,6 +2274,14 @@ lazy(mega.devices, 'ui', () => {
                     delete items['.sh4r1ng-item'];
                     delete items['.transferit-item'];
                 }
+            }
+            if (window.useMegaSync === 2 || window.useMegaSync === 3) {
+                if (items['.download-standart-item']) {
+                    delete items['.download-standart-item'];
+                    delete items['.zipdownload-item'];
+                    items['.download-item'] = 1;
+                }
+                delete items['.megasyncdownload-item'];
             }
 
             return items;

@@ -199,7 +199,9 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
                             selectedItems.push('.download-item');
                         }
                         else {
-                            selectedItems.push('.download-standart-item', '.zipdownload-item');
+                            selectedItems.push(
+                                '.download-standart-item', '.zipdownload-item', '.megasyncdownload-item'
+                            );
                         }
 
                         if (albums.isPublic) {

@@ -848,7 +848,9 @@ var dlmanager = {
 
         dlmanager.isOverQuota = false;
         dlmanager.isOverFreeQuota = false;
-        $('.limited-bandwidth-dialog button.js-close, .limited-bandwidth-dialog .fm-dialog-close').trigger('click');
+        if (!is_mobile) {
+            mega.ui.quotaDialogs.dismissDialog();
+        }
     },
 
     dlQueuePushBack: function DM_dlQueuePushBack(aTask) {
@@ -1419,7 +1421,7 @@ var dlmanager = {
 
         if ($dialog) {
             // update transfers buttons on the download page...
-            this._overquotaClickListeners($dialog);
+            this._overquotaClickListeners();
         }
     },
 
@@ -1480,7 +1482,7 @@ var dlmanager = {
                 delay('overquota:retry', () => this._onQuotaRetry(), timeLeft * 1000);
             }
 
-            this._overquotaClickListeners($dialog);
+            this._overquotaClickListeners();
             let lastCheck = Date.now();
 
             if ($dialog.is(':visible')) {
@@ -1544,95 +1546,15 @@ var dlmanager = {
         });
     },
 
-    _overquotaClickListeners($dialog, flags, preWarning) {
+    _overquotaClickListeners(flags, preWarning) {
         'use strict';
-
-        var self = this;
-        var unbindEvents = function() {
-            $(window).unbind('resize.overQuotaDialog');
-            $('.fm-dialog-overlay', 'body').unbind('click.closeOverQuotaDialog').unbind('click.oqDialogEvents');
-        };
-        var closeDialog = function() {
-            if ($.dialog === 'download-pre-warning') {
-                $.dialog = 'was-pre-warning';
-            }
-            unbindEvents();
-            window.closeDialog();
-        };
-        var open = function(url) {
-            if (is_mobile) {
-                location.href = url;
-                return false;
-            }
-            window.open.apply(window, arguments);
-        };
-        var onclick = function onProClicked() {
-            if (preWarning) {
-                api_req({a: 'log', e: 99643, m: 'on overquota pre-warning upgrade/pro-plans clicked'});
-            }
-            else {
-                self.onOverQuotaProClicked = true;
-                delay('overquota:uqft', self._overquotaInfo.bind(self), 30000);
-                api_req({a: 'log', e: 99640, m: 'on overquota pro-plans clicked'});
-            }
-
-            if ($(this).hasClass('plan-button')) {
-                const planNum = $(this).closest('.plan').data('payment');
-                if (planNum === pro.ACCOUNT_LEVEL_BUSINESS) {
-                    open(getAppBaseUrl() + '#registerb');
-                    eventlog(501041, true);
-                }
-                else {
-                    const events = {
-                        4: 501150,
-                        1: 501151,
-                        2: 501152,
-                        3: 501153,
-                    };
-                    eventlog(events[planNum]);
-                    sessionStorage.fromOverquotaPeriod = $(this).parent().data('period') || pro.proplan.period;
-                    open(getAppBaseUrl() + '#propay_' + planNum);
-                }
-            }
-            else {
-                if (flags & dlmanager.LMT_PRO3) {
-                    // Scroll to flexi section of pro page
-                    sessionStorage.mScrollTo = 'flexi';
-                }
-                else if ($dialog.hasClass('pro-mini')) {
-                    // Use the same flag to indicate the exclusive offer tab should be opened
-                    // to prevent the browser extension from breaking
-                    sessionStorage.mScrollTo = 'exc';
-                }
-
-                open(getAppBaseUrl() + '#pro');
-            }
-
-            return false;
-        };
 
         flags = flags !== undefined ? flags : this.lmtUserFlags;
 
         if (preWarning) {
             localStorage.seenQuotaPreWarn = Date.now();
-
-            $('.msg-overquota', $dialog).addClass('hidden');
-            $('.msg-prewarning', $dialog).removeClass('hidden');
-            $('.dialog-action', $dialog)
-                .text(flags & dlmanager.LMT_PRO3 ? l[6826] : l[17091])
-                .rebind('click', this.onLimitedBandwidth.bind(this));
-
-            $('button.positive.upgrade', $dialog).text(l[433]);
         }
         else {
-            $('.msg-overquota', $dialog).removeClass('hidden');
-            $('.msg-prewarning', $dialog).addClass('hidden');
-
-            $('button.positive.upgrade', $dialog).text(l.upgrade_now);
-
-            $('.dialog-action', $dialog)
-                .text(flags & this.LMT_PRO3 ? l.ok_button : l.wait_for_free_tq_btn_text);
-
             $('.video-theatre-mode:visible').addClass('paused');
 
             if (page === 'download') {
@@ -1640,37 +1562,7 @@ var dlmanager = {
             }
         }
 
-        $('button.js-close, .fm-dialog-close, .dialog-action', $dialog).add($('.fm-dialog-overlay'))
-            .rebind('click.closeOverQuotaDialog', () => {
-
-                closeDialog();
-            });
-
-        $('button.positive.upgrade, .plan-button', $dialog).rebind('click', onclick);
-
-        if (flags & this.LMT_ISPRO) {
-            $dialog.addClass(flags & this.LMT_PRO3 ? 'pro3' : 'pro');
-        }
-        else if (!(flags & this.LMT_ISREGISTERED)) {
-            if (preWarning && !u_wasloggedin()) {
-                eventlog(99646); // on pre-warning not-logged-in
-            }
-
-            var $pan = $('.not-logged.no-achievements', $dialog);
-
-            if ($pan.length && !$pan.hasClass('flag-pcset')) {
-                $pan.addClass('flag-pcset');
-
-                api.req({a: 'efqb'}).then(({result: val}) => {
-                    if (val) {
-                        $pan.text(String($pan.text()).replace('10%', `${val | 0}%`));
-                    }
-                });
-            }
-        }
-
         if (flags & this.LMT_HASACHIEVEMENTS) {
-            $dialog.addClass('achievements');
             localStorage.gotOverquotaWithAchievements = 1;
         }
     },
@@ -1732,189 +1624,17 @@ var dlmanager = {
         });
     },
 
-    updateOBQDialogBlurb($dialog, miniPlanId, isStreaming) {
-        'use strict';
-
-        const flags = this.lmtUserFlags;
-        const planName = miniPlanId ? pro.getProPlanName(miniPlanId) : '';
-
-        if ($dialog.hasClass('uploads')) {
-            $('.transfer-overquota-txt', $dialog).text(miniPlanId ? l.upgrade_resume_uploading : l[19136]);
-        }
-        else if ($dialog.hasClass('exceeded')) {
-            const $overQuotaMsg = $('p.msg-overquota', $dialog).empty();
-            let type = isStreaming ? 'stream_media' : 'dl';
-
-            if (flags & dlmanager.LMT_ISPRO) {
-                if (miniPlanId && (miniPlanId === u_attr.p) && !isStreaming) {
-                    $overQuotaMsg.safeAppend(l.dl_tq_exceeded_more_mini.replace('%1', planName));
-                }
-                else {
-                    const plan = flags & dlmanager.LMT_PRO3 ? 'pro3' : 'pro';
-                    $overQuotaMsg.safeAppend(l[`${type}_tq_exceeded_${plan}`]);
-                }
-            }
-            else {
-                const level = miniPlanId ? 'mini' : 'free';
-                type = isStreaming ? 'streaming' : 'dl';
-
-                let string = l[`${type}_tq_exc_${level}_desktop`];
-                if (level === 'mini') {
-                    string = string.replace('%2', planName);
-                }
-
-                $overQuotaMsg.safeAppend(string);
-            }
-        }
-        else {
-            const level = miniPlanId ? 'mini' : 'free';
-
-            let string = l[`dl_limited_tq_${level}`];
-            if (miniPlanId) {
-                string = string.replace('%1', planName);
-            }
-
-            $('p.msg-prewarning', $dialog).empty().safeAppend(string);
-        }
-    },
-
-    prepareOBQDialogPlans($dialog, lowestPlanIsMini, miniPlanId) {
-        'use strict';
-
-        const $pricingBoxTemplate = $('.plan.template', $dialog);
-
-        if (lowestPlanIsMini) {
-            const $monthlyCard = $pricingBoxTemplate.clone(true).appendTo($pricingBoxTemplate.parent());
-            $monthlyCard
-                .removeClass('template')
-                .addClass(`pro${miniPlanId} duration1`)
-                .toggleClass('starter', miniPlanId === pro.ACCOUNT_LEVEL_STARTER)
-                .attr('data-payment', miniPlanId)
-                .attr('data-period', 1);
-        }
-        else {
-            const planIds = pro.sortPlansByStorage(
-                Array.from(pro.filter.simple.obqDialog).filter(p => pro.getPlanObj(p))
-            );
-
-            for (let i = 0; i < planIds.length; i++) {
-                const id = planIds[i];
-                const $newNode = $pricingBoxTemplate.clone(true).appendTo($pricingBoxTemplate.parent());
-                $newNode.removeClass('template').addClass(`pro${id}`).attr('data-payment', id);
-            }
-
-            $('.pricing-page.radio-buttons', $dialog).removeClass('hidden');
-            pro.proplan.initPlanPeriodControls($dialog);
-        }
-        $pricingBoxTemplate.remove();
-        var $pricingBoxes = $('.plan', $dialog);
-
-        // Set yearly prices by default if not showing mini plan cards
-        const preSelectedPeriod = (sessionStorage.getItem('pro.period') | 0) || 12;
-        const planType = 'core'; // 'miniPlans' or 'core'
-        pro.proplan.updateEachPriceBlock("D", $pricingBoxes, $dialog, preSelectedPeriod, planType);
-    },
-
-    async getRequiredStorageQuota() {
-        'use strict';
-
-        const res = M.account || M.storageQuotaCache || false;
-
-        return typeof res.mstrg === 'number' ? res : M.getStorageQuota();
-    },
-
-    async setPlanPrices($dialog, ignoreStorageReq) {
-        'use strict';
-
-        var $scrollBlock = $('.scrollable', $dialog);
-
-        // Set scroll to top
-        $scrollBlock.scrollTop(0);
-
-        const awaitItems = [
-            !ignoreStorageReq && this.getRequiredStorageQuota(),
-            pro.loadMembershipPlans()
-        ];
-
-        // Load the membership plans, and the required storage quota if needed
-        const [storageObj] = await Promise.all(awaitItems);
-
-
-        const slideshowPreview = slideshowid && is_video(M.getNodeByHandle(slideshowid));
-        const isStreaming = !dlmanager.isDownloading && (dlmanager.isStreaming || slideshowPreview);
-
-        const requiredQuota = storageObj.mstrg || 0;
-
-        const freeOrLowerTier = !Object(self.u_attr).p ||
-            [
-                pro.ACCOUNT_LEVEL_STARTER,
-                pro.ACCOUNT_LEVEL_BASIC,
-                pro.ACCOUNT_LEVEL_ESSENTIAL
-            ].includes(u_attr.p);
-
-        const lowestRequiredMiniPlan = freeOrLowerTier
-            && pro.filter.lowestRequired(requiredQuota, 'miniPlans', ignoreStorageReq);
-        const lowestPlanIsMini = !!lowestRequiredMiniPlan;
-
-        let miniPlanId;
-        if (lowestPlanIsMini) {
-            $dialog.addClass('pro-mini');
-
-            if (isStreaming) {
-                $dialog.addClass('no-cards');
-            }
-            miniPlanId = lowestPlanIsMini ? lowestRequiredMiniPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL] : '';
-        }
-
-        // Update the blurb text of the dialog
-        dlmanager.updateOBQDialogBlurb($dialog, miniPlanId, isStreaming);
-
-        // Render the plan details if required
-        if (!$dialog.hasClass('no-cards')) {
-            dlmanager.prepareOBQDialogPlans($dialog, lowestPlanIsMini, miniPlanId);
-        }
-
-        if (dlmanager.isOverQuota) {
-            dlmanager._overquotaInfo();
-        }
-
-        if (!is_mobile) {
-
-            // Check if touch device
-            var is_touch = function() {
-                return 'ontouchstart' in window || 'onmsgesturechange' in window;
-            };
-
-            // Initialise scrolling
-            if (!is_touch()) {
-                if ($scrollBlock.is('.ps')) {
-                    Ps.update($scrollBlock[0]);
-                }
-                else {
-                    Ps.initialize($scrollBlock[0]);
-                }
-            }
-        }
-    },
-
     showLimitedBandwidthDialog: function(res, callback, flags) {
         'use strict';
-
-        var $dialog = $('.limited-bandwidth-dialog');
 
         loadingDialog.hide();
         this.onLimitedBandwidth = function() {
             if (callback) {
-                $dialog.removeClass('exceeded achievements pro3 pro pro-mini no-cards uploads');
-                $('.dialog-action, button.js-close, .fm-dialog-close', $dialog).off('click');
-                $('button.positive.upgrade, .pricing-page.plan', $dialog).off('click');
-
-                if ($.dialog === 'download-pre-warning') {
-                    $.dialog = false;
+                if (!is_mobile) {
+                    mega.ui.quotaDialogs.dismissDialog();
                 }
-                closeDialog();
                 Soon(callback);
-                callback = $dialog = undefined;
+                callback = undefined;
 
                 if (is_mobile) {
                     tryCatch(() => mobile.overBandwidthQuota.closeSheet())();
@@ -1941,26 +1661,22 @@ var dlmanager = {
             return;
         }
 
-        $dialog.removeClass('exceeded achievements pro3 pro pro-mini no-cards uploads');
-
-        // Load the membership plans, then show the dialog
-        dlmanager.setPlanPrices($dialog, true).then(() => {
-            M.safeShowDialog('download-pre-warning', () => {
-                eventlog(99617);// overquota pre-warning shown.
-
-                uiCheckboxes($dialog, 'ignoreLimitedBandwidth');
-                dlmanager._overquotaClickListeners($dialog, flags, res || true);
-
-                $('.fm-dialog-overlay', 'body').rebind('click.oqDialogEvents', () => {
-                    eventlog(501156);
-                });
-                $('.dialog-action', $dialog).rebind('click.oqDialogEvents', () => {
-                    eventlog(501155);
-                });
-
-                return $dialog;
-            });
-        });
+        eventlog(99617);
+        if (!(flags & this.LMT_ISREGISTERED) && !u_wasloggedin()) {
+            eventlog(99646); // on pre-warning not-logged-in
+        }
+        dlmanager._overquotaClickListeners(flags, res || true);
+        mega.ui.quotaDialogs.bandwidthAlmostExceeded({
+            events: {
+                close() {
+                    if (dlmanager.onLimitedBandwidth) {
+                        dlmanager.onLimitedBandwidth();
+                    }
+                    return mega.ui.quotaDialogs.EVENTS.bandwidthAlmostExceeded.close;
+                }
+            },
+        })
+            .catch(tell);
     },
 
     showOverQuotaDialog: function DM_quotaDialog(dlTask, flags) {
@@ -1985,8 +1701,6 @@ var dlmanager = {
         }
         loadingDialog.hide();
 
-        var $dialog = $('.limited-bandwidth-dialog');
-
         $(document).fullScreen(false);
         this._setOverQuotaState(dlTask);
 
@@ -1995,8 +1709,13 @@ var dlmanager = {
             return;
         }
 
-        if ($dialog.is(':visible') && !$dialog.hasClass('uploads')) {
+        if (mega.ui.sheet && mega.ui.sheet.name === 'quota-dialog') {
             this.logger.info('showOverQuotaDialog', 'visible already.');
+            return;
+        }
+
+        if (String(page).startsWith('pro')) {
+            this.logger.info('showOverQuotaDialog', 'on pro/propay page, not re-opening.');
             return;
         }
 
@@ -2005,60 +1724,12 @@ var dlmanager = {
             return;
         }
 
-        $dialog.removeClass('achievements pro3 pro pro-mini no-cards uploads').addClass('exceeded');
-
-        // Load the membership plans, then show the dialog
-        dlmanager.setPlanPrices($dialog, true).then(() => {
-            M.safeShowDialog('download-overquota', () => {
-                $('.header-before-icon.exceeded', $dialog).text(l[17]);
-
-                dlmanager._overquotaClickListeners($dialog, flags);
-
-                $('.fm-dialog-overlay').rebind('click.dloverq', () => {
-                    dlmanager.doCloseModal('dloverq', $dialog);
-                    eventlog(501149);
-                    return false;
-                });
-
-                $dialog
-                    .rebind('dialog-closed', dlmanager.doCloseModal.bind(dlmanager, 'dloverq', $dialog));
-
-                $('button.js-close, .fm-dialog-close', $dialog)
-                    .rebind('click.quota', () => {
-                        dlmanager.doCloseModal('dloverq', $dialog);
-                        eventlog(501149);
-                        return false;
-                    });
-
-                $('.dialog-action', $dialog)
-                    .rebind('click.quota', () => {
-                        dlmanager.doCloseModal('dloverq', $dialog);
-                        eventlog(501154);
-                        return false;
-                    });
-
-                if (window.pfcol) {
-                    eventlog(99956);
-                }
-                eventlog(99648);
-
-                return $dialog;
-            });
-        });
-    },
-
-    doCloseModal(overlayEvent, $dialog) {
-        'use strict';
-
-        if (!$('span.countdown').is(':visible')) {
-            clearInterval(dlmanager._overQuotaTimeLeftTick);
+        if (window.pfcol) {
+            eventlog(99956);
         }
-        $('.fm-dialog-overlay').off(`click.${overlayEvent}`);
-        $dialog.off('dialog-closed');
-        $('button.js-close, .fm-dialog-close', $dialog).off('click.quota');
-        closeDialog();
-
-        return false;
+        eventlog(99648);
+        dlmanager._overquotaClickListeners(flags);
+        mega.ui.quotaDialogs.bandwidthExceeded().catch(tell);
     },
 
     showNothingToDownloadDialog: function DM_noDownloadDialog(callback) {

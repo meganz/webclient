@@ -69,6 +69,24 @@ lazy(mega.ui, 'empty', () => {
         const dropContainer = mCreateElement('div', { class: 'flex-1 py-2 px-6 flex flex-column' }, [dropArea]);
         const importArea = mCreateElement('div', { class: 'pb-6' });
 
+        if ((mega.flags.ff_mis || localStorage.ff_mis) &&
+            (M.currentdirid === M.RootID || !(mega.config.get('mnzw') | 0))) {
+            importArea.classList.add('text-center', 'pt-4');
+
+            importArea.appendChild(mCreateElement('div', { class: 'border-b w-8 mx-auto my-4' }));
+
+            MegaButton.factory({
+                parentNode: importArea,
+                text: l.import_from_another,
+                componentClassname: 'text-icon underline',
+                icon: 'sprite-fm-mono icon-cloud-upload-thin-outline',
+                iconSize: 20,
+                onClick: () => {
+                    mega.migrate.showDialog();
+                }
+            });
+        }
+
         MegaButton.factory({
             parentNode: btnRow,
             text: l[372],

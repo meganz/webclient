@@ -88,7 +88,7 @@
     'chat-message',
     'achievements',
     'quota',
-    'account-inactive',
+    'DEPRECATED-account-inactive',
     'DEPRECATED-referral-program',
     'RESERVED-business-usage',
     'card-expiry',

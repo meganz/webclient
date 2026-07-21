@@ -438,7 +438,7 @@
             if (ids.includes('app-dl-hint')) {
                 const timeout = 120 * 24 * 60 * 60; // 120 days
                 const refused = mega.config.get('dadlh') | 0;
-                const isAppDl = window.useMegaSync === 2 || window.useMegaSync === 3;
+                const isAppDl = window.useMegaSync && window.useMegaSync !== 4;
 
                 if (!isAppDl && (!refused || (refused + timeout) * 1000 < Date.now())) {
                     super.show();
@@ -510,7 +510,7 @@
             {
                 buttonId: 'folderupload-item',
                 text: l[98],
-                icon: 'sprite-fm-mono icon-folder-arrow-01-thin-outline',
+                icon: 'sprite-fm-mono icon-folder-upload-thin-outline',
                 onClick() {
                     eventlog(500009);
                     if (fmconfig.dlThroughMEGAsync && !window.useMegaSync) {
@@ -643,7 +643,7 @@
             ...(mega.flags.ff_mis || localStorage.ff_mis) ? [{
                 buttonId: 'import-from-another-cloud',
                 text: l.import_from_another,
-                icon: 'sprite-fm-mono icon-cloud-upload-thin-outline',
+                icon: 'sprite-fm-mono icon-cloud-thin-outline',
                 onClick() {
                     mega.migrate.showDialog();
                     eventlog(500943);
@@ -652,7 +652,7 @@
             {
                 buttonId: 'import-from-link',
                 text: l.url_import_feature_title,
-                icon: 'sprite-fm-mono icon-cloud-upload-thin-outline',
+                icon: 'sprite-fm-mono icon-link-thin-outline',
                 onClick() {
                     mega.linkImport.showDialog();
                 }
@@ -699,6 +699,13 @@
                 $.autoplay = mega.ui.contextMenu.selectedItems[0];
             }
             slideshow(mega.ui.contextMenu.selectedItems[0]);
+        };
+        const startDl = () => {
+            let dlHandles = mega.ui.contextMenu.selectedItems;
+            if (M.isAlbumsPage(1) || mega.ui.contextMenu.firstAlbum) {
+                dlHandles = mega.gallery.getAlbumsHandles(dlHandles);
+            }
+            M.addDownload(dlHandles);
         };
         sections.addChild('primary', new MegaContextSection(menu, [
             {
@@ -798,12 +805,7 @@
                             text: l[58],
                             icon: 'sprite-fm-mono icon-arrow-down-circle-thin-outline',
                             onClick() {
-                                let dlHandles = mega.ui.contextMenu.selectedItems;
-                                if (M.isAlbumsPage(1) || mega.ui.contextMenu.firstAlbum) {
-                                    dlHandles = mega.gallery.getAlbumsHandles(dlHandles);
-                                }
-
-                                M.addDownload(dlHandles);
+                                startDl();
 
                                 if (M.isAlbumsPage()) {
                                     eventlog(99954);
@@ -827,11 +829,7 @@
                             text: l[5928],
                             icon: 'sprite-fm-mono icon-file-download-thin-outline',
                             onClick() {
-                                let dlHandles = mega.ui.contextMenu.selectedItems;
-                                if (M.isAlbumsPage(1)) {
-                                    dlHandles = mega.gallery.getAlbumsHandles(dlHandles);
-                                }
-                                M.addDownload(dlHandles);
+                                startDl();
 
                                 if (folderlink) {
                                     eventlog(99768);
@@ -858,6 +856,27 @@
                                 M.addDownload(dlHandles, true, preview, zName);
                             }
                         },
+                        {
+                            buttonId: 'megasyncdownload-item',
+                            text: l.download_with_sync,
+                            icon: 'sprite-fm-mono icon-mega-thin-outline',
+                            onClick() {
+                                if (window.useMegaSync && (window.useMegaSync === 2 || window.megasync === 3)) {
+                                    startDl();
+                                }
+                                else {
+                                    megasync.preCheck().then(() => {
+                                        if (!window.useMegaSync || window.useMegaSync === 4) {
+                                            return dlmanager.showMEGASyncOverlay();
+                                        }
+                                        if (window.useMegaSync === 1) {
+                                            return msgDialog('info', '', l.login_sync_err_title, l.login_sync_err_text);
+                                        }
+                                        startDl();
+                                    });
+                                }
+                            }
+                        }
                     ],
                     dropdownText: l[58],
                     dropdownIcon: 'sprite-fm-mono icon-arrow-down-circle-thin-outline',

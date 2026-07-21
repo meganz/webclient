@@ -524,6 +524,9 @@
         if (M.isFileDragPage(page)) {
             return true;
         }
+        if (String(page).startsWith('pro')) {
+            return false;
+        }
         return !(is_fm() && // if page is fm,
             (window.slideshowid || !$('.feedback-dialog').hasClass('hidden') || // preview and feedback dialog show
                 !$('.mega-dialog.duplicate-conflict', 'body').hasClass('hidden') || // conflict dialog show
@@ -531,6 +534,7 @@
                 M.currentdirid === 'out-shares' || // Out-share root page
                 M.currentdirid === 'public-links' || // Public-link root page
                 M.currentdirid === 'file-requests' || // File request page
+                M.currentdirid === 'pwm' || // Password manager
                 String(M.currentdirid).startsWith('chat/contacts') || // Contacts pages
                 M.currentrootid === M.RubbishID || // Rubbish bin
                 M.currentrootid === undefined // Dashboard and Settings pages

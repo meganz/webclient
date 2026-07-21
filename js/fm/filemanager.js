@@ -3079,7 +3079,7 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
     let tappedItemId = '';
     $ddUIitem.rebind('dblclick.openTarget touchend.tabletOpenTarget', (e) => {
         if (e.target.classList.contains('icon-check')) {
-            return false;
+            return;
         }
         let h = $(e.currentTarget).attr('id');
         const n = !missingkeys[h] && M.getNodeByHandle(h);

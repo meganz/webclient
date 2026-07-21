@@ -686,7 +686,9 @@ var security = {
                     })
                     .catch((ex) => {
                         if (ex === EEXPIRED || ex === ENOENT) {
-                            return msgDialog('warninga', l[135], ex === EEXPIRED ? l[7719] : l[22128], false, reset);
+                            return msgDialog('warninga', l[135], ex === EEXPIRED ? l[7719] : l[22128], false, () => {
+                                reset(!u_sid);
+                            });
                         }
                         tell(ex);
                     })
@@ -1597,7 +1599,7 @@ security.login = {
                 l.login_incomplete_registration_title,
                 l.login_incomplete_registration_text + '<br><br>' +
                 l.login_incomplete_registration_detail
-                    .replace('[A]', '<a href="mailto:support@mega.io" class="primary-link">')
+                    .replace('[A]', '<a class="clickurl primary-link" target="_blank" href="/support">')
                     .replace('[/A]', '</a>')
             );
 

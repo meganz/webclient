@@ -3872,6 +3872,7 @@ mega.gallery.initialiseMediaNodes = async(filterFn) => {
 
         // @todo work with the in-memory nodes, without loading them normally!
         await dbfetch.geta(Object.keys(mega.gallery.tmpFa));
+
         for (const h in mega.gallery.tmpFa) {
             mega.gallery.tmpFa[h] = M.d[h] || mega.gallery.tmpFa[h];
         }
@@ -3884,13 +3885,17 @@ mega.gallery.allowedInMedia = (n, filterFn) => {
     'use strict';
 
     const cameraTree = MegaGallery.getCameraHandles();
-    const isInCD = M.getNodeRoot(n) === M.RootID;
 
-    const toAdd = isInCD && M.isGalleryNode(n)
+    if (!mega.gallery.cdTree) {
+        mega.gallery.cdTree = freeze(array.to.object(M.getTreeHandles(M.RootID), true));
+        queueMicrotask(() => {
+            delete mega.gallery.cdTree;
+        });
+    }
+
+    return mega.gallery.cdTree[n.p] && M.isGalleryNode(n)
         && mega.sensitives.shouldShowNode(n)
         && (!filterFn || filterFn(n, cameraTree));
-
-    return toAdd;
 };
 
 mega.gallery.appendAppBanner = async(target) => {

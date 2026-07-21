@@ -49,13 +49,7 @@ lazy(s4, 'ui', () => {
         // Error info
         let subNode = ce('p', node, {class: 'pt-4 my-0'});
         subNode.append(parseHTML(tmp));
-
-        if ((tmp = subNode.querySelector('a.mailto'))) {
-            tmp.addEventListener('click', (ev) => {
-                stop(ev);
-                window.open('mailto:support@mega.io', '_blank', 'noopener,noreferrer');
-            });
-        }
+        onIdle(clickURLs);
 
         // reload
         if ((tmp = subNode.querySelector('.s4-fail-reload'))) {

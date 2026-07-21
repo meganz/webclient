@@ -219,7 +219,7 @@ def reduce_eslint(file_line_mapping, **extra):
 
             # Check if the line is part of our selection list.
             if is_modified_code or is_cascading_failure:
-                if ((is_cascading_failure and "no-unused-vars" in line)
+                if ((is_cascading_failure and ("no-unreachable" in line or "no-unused-vars" in line))
                         or re.search(r': line \d+, col \d+, Warning - ', line)):
                     submsg = ""
                     if is_cascading_failure:

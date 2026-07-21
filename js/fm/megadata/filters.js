@@ -219,8 +219,32 @@ MegaData.prototype.filterBySearch = function(str, customFn) {
 };
 
 /**
- * @param {String} searchTerm Keywords to look for
  * @param {String} [customFn] Optional function to call in addition to others
+ * @returns {Function}
+ */
+MegaData.prototype.getFilterBySearchBasicFn = function(customFn) {
+    'use strict';
+
+    const { showGlobally } = mega.sensitives;
+
+    const basicCheck = (n) => n.p !== 'contacts'
+        && !n.pwm
+        && !n.fv
+        && (!M.BackupsId || n.h !== M.BackupsId && n.p !== M.BackupsId)
+        && (showGlobally || !n.sen)
+        && !mega.devices.ui.isDeprecated(n)
+        && (!customFn || customFn(n));
+
+    if (!folderlink && mega.ui.mNodeFilter.selectedFilters.value) {
+        return n => basicCheck(n) && mega.ui.mNodeFilter.match(n);
+    }
+
+    return basicCheck;
+};
+
+/**
+ * @param {String} searchTerm Keywords to look for
+ * @param {Function} [customFn] Optional function to call in addition to others
  * @returns {Function}
  */
 MegaData.prototype.getFilterBySearchFn = function(searchTerm, customFn) {
@@ -241,20 +265,7 @@ MegaData.prototype.getFilterBySearchFn = function(searchTerm, customFn) {
     const strCheck = regex
         ? ({ name }) => name && regex.test(name) || false
         : ({ name }) => name && name.toLowerCase().includes(str) || false;
-
-    const { showGlobally } = mega.sensitives;
-
-    const basicCheck = (n) => n.p !== 'contacts'
-        && !n.pwm
-        && !n.fv
-        && (!M.BackupsId || n.h !== M.BackupsId && n.p !== M.BackupsId)
-        && (showGlobally || !n.sen)
-        && !mega.devices.ui.isDeprecated(n)
-        && (!customFn || customFn(n));
-
-    if (!folderlink && mega.ui.mNodeFilter.selectedFilters.value) {
-        return n => strCheck(n) && basicCheck(n) && mega.ui.mNodeFilter.match(n);
-    }
+    const basicCheck = this.getFilterBySearchBasicFn(customFn);
 
     return n => strCheck(n) && basicCheck(n);
 };

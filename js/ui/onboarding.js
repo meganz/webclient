@@ -83,6 +83,7 @@ mBroadcaster.addListener('fm:initialized', () => {
                         {
                             type: 'showOnBoardingDialog',
                             options: {
+                                contentClassname: 'mega-journey mega-on-boarding migrate',
                                 showClose: true,
                                 onClose: () => {
                                     if (mega.ui.menu.name === 'ob-upload-menu') {
@@ -93,224 +94,239 @@ mBroadcaster.addListener('fm:initialized', () => {
                                     }
                                     eventlog(500980);
                                 },
-                                steps: [
-                                    {
-                                        label: l[20556],
-                                        title: l.onboard_cd_p1_title,
-                                        description: l.onboard_cd_p1_text,
-                                        imageClass: 'cd-onboard-1',
-                                        next: {
-                                            text: l[20556],
-                                            action: 2,
-                                            event: 500972
-                                        },
-                                        skip: {
-                                            text: l[1379],
-                                            event: 500971
-                                        },
-                                    },
-                                    {
-                                        label: isAchEnabled ? l.onboard_cd_p2_label_ach : l.download_desktop_app,
-                                        title: isAchEnabled ? l.onboard_cd_p2_title_ach : l.onboard_cd_p2_title,
-                                        description: isAchEnabled ? l.onboard_cd_p2_text_ach : '',
-                                        imageClass: 'cd-onboard-2',
-                                        next: {
-                                            text: l.download_continue,
-                                            action: () => {
-                                                window.open(megasync.getMegaSyncUrl(), '_blank', 'noopener,noreferrer');
-                                                mega.ui.onboarding.sheet.nextStep();
+                                steps: (() => {
+                                    const migrateInfo = mega.migrate ?
+                                        mega.migrate.getOnboardingInfo(1) :
+                                        {steps: [], count: 0};
+
+                                    const {
+                                        steps: migrateSteps,
+                                        count: migrateCount
+                                    } = migrateInfo;
+
+                                    return [
+                                        {
+                                            label: l[20556],
+                                            title: l.onboard_cd_p1_title,
+                                            description: l.onboard_cd_p1_text,
+                                            imageClass: 'cd-onboard-1',
+                                            next: {
+                                                text: l[20556],
+                                                action: 2,
+                                                event: 500972
                                             },
-                                            event: 500974,
+                                            skip: {
+                                                text: l[1379],
+                                                event: 500971
+                                            },
                                         },
-                                        skip: {
-                                            text: l.onboard_cd_p2_skip,
-                                            action: 3,
-                                            event: 500973
-                                        },
-                                        customContent: () => {
-                                            return mCreateElement('div', {'class': 'content-block cd-onboard'}, [
-                                                mCreateElement('div', {'class': 'content-title'}, [
-                                                    document.createTextNode(l.onboard_cd_p2_list_title)
-                                                ]),
-                                                mCreateElement('div', {'class': 'content-row'}, [
-                                                    mCreateElement('i', {
-                                                        'class': 'sprite-fm-mono icon-zap-thin-outline'
-                                                    }),
-                                                    mCreateElement('div', {'class': 'content-text'}, [
-                                                        document.createTextNode(l.onboard_cd_p2_list_item1)
-                                                    ])
-                                                ]),
-                                                mCreateElement('div', {'class': 'content-row'}, [
-                                                    mCreateElement('i', {
-                                                        'class': 'sprite-fm-mono icon-sync-thin-outline'
-                                                    }),
-                                                    mCreateElement('div', {'class': 'content-text'}, [
-                                                        document.createTextNode(l.onboard_cd_p2_list_item2)
-                                                    ])
-                                                ]),
-                                                mCreateElement('div', {'class': 'content-row'}, [
-                                                    mCreateElement('i', {
-                                                        'class': 'sprite-fm-mono icon-wifi-off-thin-outline'
-                                                    }),
-                                                    mCreateElement('div', {'class': 'content-text'}, [
-                                                        document.createTextNode(l.onboard_cd_p2_list_item3)
-                                                    ])
-                                                ]),
-                                                mCreateElement('div', {
-                                                    'class': `content-footer ${isAchEnabled ? '' : 'hidden'}`
-                                                }, [
-                                                    document.createTextNode(l.onboard_cd_note_ach)
-                                                ])
-                                            ]);
-                                        }
-                                    },
-                                    {
-                                        label: isAchEnabled ? l.onboard_cd_p3_label_ach : l.download_mobile_app,
-                                        title: isAchEnabled ? l.onboard_cd_p3_title_ach : l.onboard_cd_p3_title,
-                                        description: isAchEnabled ? l.onboard_cd_p3_text_ach : l.onboard_cd_p3_text,
-                                        next: {
-                                            text: l[507],
-                                            action: 4
-                                        },
-                                        back: {
-                                            text: l[822],
-                                            action: 2,
-                                            event: 500988,
-                                        },
-                                        customContent: () => {
-                                            const elm = mCreateElement('div', {
-                                                'class': 'content-block cd-onboard image'
-                                            }, [
-                                                mCreateElement('div', {'class': 'image-wrapper qr-block'}, [
-                                                    mCreateElement('div', {'class': 'app-qr-image'})
-                                                ]),
-                                                mCreateElement('div', {'class': 'content-title'}, [
-                                                    document.createTextNode(l.onboard_cd_p3_list_title)
-                                                ]),
-                                                mCreateElement('div', {'class': 'content-row'}, [
-                                                    mCreateElement('i', {
-                                                        'class': 'sprite-fm-mono icon-image-01-thin-outline'
-                                                    }),
-                                                    mCreateElement('div', {'class': 'content-text'}, [
-                                                        document.createTextNode(l.onboard_cd_p3_list_item1)
-                                                    ])
-                                                ]),
-                                                mCreateElement('div', {'class': 'content-row'}, [
-                                                    mCreateElement('i', {
-                                                        'class': 'sprite-fm-mono icon-sync-thin-outline'
-                                                    }),
-                                                    mCreateElement('div', {'class': 'content-text'}, [
-                                                        document.createTextNode(l.onboard_cd_p3_list_item2)
-                                                    ])
-                                                ]),
-                                                mCreateElement('div', {'class': 'content-row app-store'}, [
-                                                    mCreateElement('a', {
-                                                        'class': 'app-store-link clickurl',
-                                                        'data-eventid': "500986",
-                                                        href: 'https://itunes.apple.com/app/mega/id706857885',
-                                                        target: '_blank'
-                                                    }, [
-                                                        mCreateElement('img', {
-                                                            'class': 'app-store-link',
-                                                            src: `${staticpath}images/mega/locale/${lang}_appstore.svg`
-                                                        }),
+                                        ...migrateSteps,
+                                        {
+                                            label: isAchEnabled ? l.onboard_cd_p2_label_ach : l.download_desktop_app,
+                                            title: isAchEnabled ? l.onboard_cd_p2_title_ach : l.onboard_cd_p2_title,
+                                            description: isAchEnabled ? l.onboard_cd_p2_text_ach : '',
+                                            imageClass: 'cd-onboard-2',
+                                            next: {
+                                                text: l.download_continue,
+                                                action: () => {
+                                                    window.open(
+                                                        megasync.getMegaSyncUrl(), '_blank', 'noopener,noreferrer'
+                                                    );
+                                                    mega.ui.onboarding.sheet.nextStep();
+                                                },
+                                                event: 500974,
+                                            },
+                                            skip: {
+                                                text: l.onboard_cd_p2_skip,
+                                                action: migrateCount + 3,
+                                                event: 500973
+                                            },
+                                            customContent: () => {
+                                                return mCreateElement('div', {'class': 'content-block cd-onboard'}, [
+                                                    mCreateElement('div', {'class': 'content-title'}, [
+                                                        document.createTextNode(l.onboard_cd_p2_list_title)
                                                     ]),
-                                                    mCreateElement('a', {
-                                                        'class': 'app-store-link android clickurl',
-                                                        'data-eventid': "500987",
-                                                        href: psURL,
-                                                        target: '_blank'
-                                                    }, [
-                                                        mCreateElement('img', {
-                                                            'class': 'app-store-link',
-                                                            src: `${staticpath}images/mega/locale/${lang}_playstore.png`
+                                                    mCreateElement('div', {'class': 'content-row'}, [
+                                                        mCreateElement('i', {
+                                                            'class': 'sprite-fm-mono icon-zap-thin-outline'
                                                         }),
+                                                        mCreateElement('div', {'class': 'content-text'}, [
+                                                            document.createTextNode(l.onboard_cd_p2_list_item1)
+                                                        ])
+                                                    ]),
+                                                    mCreateElement('div', {'class': 'content-row'}, [
+                                                        mCreateElement('i', {
+                                                            'class': 'sprite-fm-mono icon-sync-thin-outline'
+                                                        }),
+                                                        mCreateElement('div', {'class': 'content-text'}, [
+                                                            document.createTextNode(l.onboard_cd_p2_list_item2)
+                                                        ])
+                                                    ]),
+                                                    mCreateElement('div', {'class': 'content-row'}, [
+                                                        mCreateElement('i', {
+                                                            'class': 'sprite-fm-mono icon-wifi-off-thin-outline'
+                                                        }),
+                                                        mCreateElement('div', {'class': 'content-text'}, [
+                                                            document.createTextNode(l.onboard_cd_p2_list_item3)
+                                                        ])
+                                                    ]),
+                                                    mCreateElement('div', {
+                                                        'class': `content-footer ${isAchEnabled ? '' : 'hidden'}`
+                                                    }, [
+                                                        document.createTextNode(l.onboard_cd_note_ach)
                                                     ])
-                                                ]),
-                                                mCreateElement('div', {
-                                                    'class': `content-footer ${isAchEnabled ? '' : 'hidden'}`
-                                                }, [document.createTextNode(l.onboard_cd_note_ach)])
-                                            ]);
-                                            onIdle(clickURLs);
-                                            return elm;
-                                        }
-                                    },
-                                    {
-                                        label: l.onboard_cd_p4_label,
-                                        title: l.onboard_cd_p4_title,
-                                        description: l.onboard_cd_p4_text,
-                                        imageClass: 'cd-onboard-3',
-                                        next: {
-                                            text: l[372],
-                                            leftIcon: 'sprite-fm-mono icon-arrow-up-thin-outline',
-                                            rightIcon: 'sprite-fm-mono icon-chevron-down-thin-outline',
-                                            action: (ev) => {
-                                                if (ev.currentTarget.active) {
-                                                    ev.currentTarget.active = false;
-                                                    return;
-                                                }
-                                                ev.stopPropagation();
-                                                ev.currentTarget.active = true;
-                                                const parentNode = document.createElement('div');
-                                                parentNode.className = 'context-section last';
-                                                ulListener = ulListener ||
-                                                    mBroadcaster.addListener('upload:start', () => {
-                                                        ulListener = false;
-                                                        mega.ui.onboarding.sheet.hide();
-                                                        return 0xDEAD;
-                                                    });
-                                                MegaButton.factory({
-                                                    parentNode,
-                                                    buttonId: 'fileupload-item',
-                                                    text: l[99],
-                                                    icon: 'sprite-fm-mono icon-file-upload-thin-outline',
-                                                    type: 'fullwidth',
-                                                    componentClassname: 'context-button text-icon',
-                                                    onClick() {
-                                                        document.getElementById('fileselect1').click();
-                                                        eventlog(500977);
-                                                    }
-                                                });
-                                                MegaButton.factory({
-                                                    parentNode,
-                                                    buttonId: 'folderupload-item',
-                                                    text: l[98],
-                                                    icon: 'sprite-fm-mono icon-folder-arrow-01-thin-outline',
-                                                    type: 'fullwidth',
-                                                    componentClassname: 'context-button text-icon',
-                                                    onClick() {
-                                                        document.getElementById('fileselect2').click();
-                                                        eventlog(500978);
-                                                    }
-                                                });
-                                                mega.ui.menu.show({
-                                                    name: 'ob-upload-menu',
-                                                    classList: ['ob-upload-menu', 'fm-context-menu'],
-                                                    resizeHandler: true,
-                                                    contents: [parentNode],
-                                                    event: ev,
-                                                    onClose: () => {
-                                                        if ($.dialog === 'Mega-Onboarding') {
-                                                            // Remain overlayed
-                                                            document.documentElement.classList.add('overlayed');
-                                                        }
-                                                        ev.currentTarget.active = false;
-                                                    }
-                                                });
+                                                ]);
+                                            }
+                                        },
+                                        {
+                                            label: isAchEnabled ? l.onboard_cd_p3_label_ach : l.download_mobile_app,
+                                            title: isAchEnabled ? l.onboard_cd_p3_title_ach : l.onboard_cd_p3_title,
+                                            description: isAchEnabled ? l.onboard_cd_p3_text_ach : l.onboard_cd_p3_text,
+                                            next: {
+                                                text: l[507],
+                                                action: migrateCount + 4
                                             },
-                                            event: 500976
+                                            back: {
+                                                text: l[822],
+                                                action: migrateCount + 2,
+                                                event: 500988,
+                                            },
+                                            customContent: () => {
+                                                const imgpath = `${staticpath}images/mega/locale/`;
+                                                const elm = mCreateElement('div', {
+                                                    'class': 'content-block cd-onboard image'
+                                                }, [
+                                                    mCreateElement('div', {'class': 'image-wrapper qr-block'}, [
+                                                        mCreateElement('div', {'class': 'app-qr-image'})
+                                                    ]),
+                                                    mCreateElement('div', {'class': 'content-title'}, [
+                                                        document.createTextNode(l.onboard_cd_p3_list_title)
+                                                    ]),
+                                                    mCreateElement('div', {'class': 'content-row'}, [
+                                                        mCreateElement('i', {
+                                                            'class': 'sprite-fm-mono icon-image-01-thin-outline'
+                                                        }),
+                                                        mCreateElement('div', {'class': 'content-text'}, [
+                                                            document.createTextNode(l.onboard_cd_p3_list_item1)
+                                                        ])
+                                                    ]),
+                                                    mCreateElement('div', {'class': 'content-row'}, [
+                                                        mCreateElement('i', {
+                                                            'class': 'sprite-fm-mono icon-sync-thin-outline'
+                                                        }),
+                                                        mCreateElement('div', {'class': 'content-text'}, [
+                                                            document.createTextNode(l.onboard_cd_p3_list_item2)
+                                                        ])
+                                                    ]),
+                                                    mCreateElement('div', {'class': 'content-row app-store'}, [
+                                                        mCreateElement('a', {
+                                                            'class': 'app-store-link clickurl',
+                                                            'data-eventid': "500986",
+                                                            href: 'https://itunes.apple.com/app/mega/id706857885',
+                                                            target: '_blank'
+                                                        }, [
+                                                            mCreateElement('img', {
+                                                                'class': 'app-store-link',
+                                                                src: `${imgpath}${lang}_appstore.svg`
+                                                            }),
+                                                        ]),
+                                                        mCreateElement('a', {
+                                                            'class': 'app-store-link android clickurl',
+                                                            'data-eventid': "500987",
+                                                            href: psURL,
+                                                            target: '_blank'
+                                                        }, [
+                                                            mCreateElement('img', {
+                                                                'class': 'app-store-link',
+                                                                src: `${imgpath}${lang}_playstore.png`
+                                                            }),
+                                                        ])
+                                                    ]),
+                                                    mCreateElement('div', {
+                                                        'class': `content-footer ${isAchEnabled ? '' : 'hidden'}`
+                                                    }, [document.createTextNode(l.onboard_cd_note_ach)])
+                                                ]);
+                                                onIdle(clickURLs);
+                                                return elm;
+                                            }
                                         },
-                                        skip: {
-                                            text: l[18682],
-                                            event: 500975,
-                                        },
-                                        back: {
-                                            text: l[822],
-                                            action: 3,
-                                            event: 500979,
+                                        {
+                                            label: l.onboard_cd_p4_label,
+                                            title: l.onboard_cd_p4_title,
+                                            description: l.onboard_cd_p4_text,
+                                            imageClass: 'cd-onboard-3',
+                                            next: {
+                                                text: l[372],
+                                                leftIcon: 'sprite-fm-mono icon-arrow-up-thin-outline',
+                                                rightIcon: 'sprite-fm-mono icon-chevron-down-thin-outline',
+                                                action: (ev) => {
+                                                    if (ev.currentTarget.active) {
+                                                        ev.currentTarget.active = false;
+                                                        return;
+                                                    }
+                                                    ev.stopPropagation();
+                                                    ev.currentTarget.active = true;
+                                                    const parentNode = document.createElement('div');
+                                                    parentNode.className = 'context-section last';
+                                                    ulListener = ulListener ||
+                                                        mBroadcaster.addListener('upload:start', () => {
+                                                            ulListener = false;
+                                                            mega.ui.onboarding.sheet.hide();
+                                                            return 0xDEAD;
+                                                        });
+                                                    MegaButton.factory({
+                                                        parentNode,
+                                                        buttonId: 'fileupload-item',
+                                                        text: l[99],
+                                                        icon: 'sprite-fm-mono icon-file-upload-thin-outline',
+                                                        type: 'fullwidth',
+                                                        componentClassname: 'context-button text-icon',
+                                                        onClick() {
+                                                            document.getElementById('fileselect1').click();
+                                                            eventlog(500977);
+                                                        }
+                                                    });
+                                                    MegaButton.factory({
+                                                        parentNode,
+                                                        buttonId: 'folderupload-item',
+                                                        text: l[98],
+                                                        icon: 'sprite-fm-mono icon-folder-arrow-01-thin-outline',
+                                                        type: 'fullwidth',
+                                                        componentClassname: 'context-button text-icon',
+                                                        onClick() {
+                                                            document.getElementById('fileselect2').click();
+                                                            eventlog(500978);
+                                                        }
+                                                    });
+                                                    mega.ui.menu.show({
+                                                        name: 'ob-upload-menu',
+                                                        classList: ['ob-upload-menu', 'fm-context-menu'],
+                                                        resizeHandler: true,
+                                                        contents: [parentNode],
+                                                        event: ev,
+                                                        onClose: () => {
+                                                            if ($.dialog === 'Mega-Onboarding') {
+                                                                // Remain overlayed
+                                                                document.documentElement.classList.add('overlayed');
+                                                            }
+                                                            ev.currentTarget.active = false;
+                                                        }
+                                                    });
+                                                },
+                                                event: 500976
+                                            },
+                                            skip: {
+                                                text: l[18682],
+                                                event: 500975,
+                                            },
+                                            back: {
+                                                text: l[822],
+                                                action: migrateCount + 3,
+                                                event: 500979,
+                                            }
                                         }
-                                    }
-                                ]
+                                    ];
+                                })()
                             },
                             markComplete: true
                         }
@@ -349,12 +365,12 @@ mBroadcaster.addListener('fm:initialized', () => {
                 {
                     name: l.mega_pwm,
                     flag: OBV4_FLAGS.PASS_INIT,
+                    get prerequisiteCondition() {
+                        return !!pwmReady;
+                    },
                     actions: [
                         {
                             type: 'showOnBoardingDialog',
-                            get prerequisiteCondition() {
-                                return !!pwmReady;
-                            },
                             options: {
                                 steps: [
                                     {
@@ -443,7 +459,8 @@ mBroadcaster.addListener('fm:initialized', () => {
                                             },
                                             event: 500905
                                         },
-                                        customContent: () => {
+                                        customContent: async() => {
+                                            await M.require('pwm');
                                             mega.ui.onboarding.extension = new MegaExtensionPassSelector();
                                             return mega.ui.onboarding.extension.container;
                                         }
@@ -498,7 +515,7 @@ mBroadcaster.addListener('fm:initialized', () => {
                             dialogClass: 'obdark',
                             dialogTitle: l.ob_tpw_title_2,
                             dialogDesc: l.ob_tpw_desc_2,
-                            targetElmClass: '.transfer-progress .transfer-progress-head .js-tpm-open',
+                            targetElmClass: '.transfer-progress .transfer-progress-head .tpw-ob2:visible',
                             targetElmPosition: 'top right',
                             markComplete: true,
                         }
@@ -516,7 +533,7 @@ mBroadcaster.addListener('fm:initialized', () => {
                             dialogTitle: l.ob_tpw_title_3,
                             dialogDesc: l.ob_tpw_desc_3,
                             dialogNext: l[726],
-                            targetElmClass: '.transfer-progress .transfer-progress-head .collapse',
+                            targetElmClass: '.transfer-progress .transfer-progress-head .tpw-ob3:visible',
                             targetElmPosition: 'top right',
                             markComplete: true,
                         }

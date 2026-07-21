@@ -157,12 +157,15 @@ class CloudBrowserDialog extends ModalDialogsUI.SafeShowDialogController {
         };
         if (searchText && searchText.length >= MIN_SEARCH_LENGTH) {
             this.setState(newState);
+            loadingDialog.show('fmSearchNodes');
             M.fmSearchNodes(searchText).then(() => {
-                newState.nodeLoading = false;
                 newState.searchValue = searchText;
                 newState.currentlyViewedEntry = 'search';
-                this.setState(newState);
                 this.clearSelectionAndHighlight();
+            }).catch(dump).finally(() => {
+                newState.nodeLoading = false;
+                this.setState(newState);
+                loadingDialog.hide('fmSearchNodes');
             });
         }
     }

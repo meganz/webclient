@@ -272,6 +272,21 @@ class MegaComponent extends MegaDataEmitter {
         return new this(options);
     }
 
+    static fromNode(node) {
+        if (!node || !node.parentNode) {
+            return null;
+        }
+        const component = Object.create(this.prototype);
+        component.domNode = node;
+        component.parentNode = node.parentNode;
+        component.rCE = [];
+        if (!Object.getOwnPropertyDescriptor(node, 'component')) {
+            const ref = new WeakRef(component);
+            Object.defineProperty(node, 'component', {get: () => ref.deref()});
+        }
+        return component;
+    }
+
     addBroadcasterListener(event, handler) {
         if (!this._mbls) {
             this._mbls = [];

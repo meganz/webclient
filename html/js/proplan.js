@@ -378,11 +378,11 @@ pro.proplan = {
     /**
      * Pro page Monthly/Yearly price switcher
      */
-    initPlanPeriodControls: function($dialog) {
+    initPlanPeriodControls() {
 
         'use strict';
 
-        var $stepOne = $($dialog ? $dialog : '.scroll-block');
+        var $stepOne = $('.scroll-block');
         var $pricingBoxes = $('.plans-block .pricing-page.plan', $stepOne);
         var $pricePeriod = $('.plan-period', $pricingBoxes);
         var $radioButtons = $('.pricing-page.radio-buttons input', $stepOne);
@@ -390,7 +390,6 @@ pro.proplan = {
         var $savePercs = $('.pricing-page.save-percs:visible', $stepOne);
         var $saveArrow = $('.save-green-arrow:visible', $stepOne);
         var savePercsReposition;
-        let initialising = true;
 
         if ($savePercs.length && $saveArrow.length) {
 
@@ -442,30 +441,16 @@ pro.proplan = {
             pro.proplan.period = value;
 
             // Updte price and transfer values
-            pro.proplan.updateEachPriceBlock($dialog ? 'D' : 'P', $pricingBoxes, $dialog, parseInt(value));
+            pro.proplan.updateEachPriceBlock('P', $pricingBoxes, undefined, parseInt(value));
 
             // Update the plan period text
             $pricePeriod.text('/' + monthOrYearWording);
-
-            if (!initialising && $.dialog) {
-                if ($.dialog === 'upload-overquota') {
-                    eventlog(value === '12' ? 501141 : 501142);
-                }
-                else if ($.dialog === 'download-overquota'
-                    || $.dialog === 'download-pre-warning'
-                ) {
-                    eventlog(value === '12' ? 501147 : 501148);
-                }
-            }
         });
 
         // Set yearly prices by default
         const preSelectedPeriod = (sessionStorage.getItem('pro.period') | 0) || 12;
         pro.proplan.period = preSelectedPeriod;
         $radioButtons.filter(`input[value="${preSelectedPeriod}"]`).trigger('click');
-
-        // Track initialisation as a fake click is made during setup that should not be logged
-        initialising = false;
     },
 
     /**

@@ -93,7 +93,7 @@ MegaData.prototype.addDownloadSync = function(n, z, preview) {
         return webdl();
     }
 
-    if (!folderlink && (z || preview || !fmconfig.dlThroughMEGAsync)) {
+    if (is_mobile || !folderlink && (z || preview || !fmconfig.dlThroughMEGAsync)) {
         return webdl();
     }
     // if in folder link and logged-in and download using mSync is set to 0
@@ -700,6 +700,9 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
     var flag = 'ulMegaSyncAD';
 
     if (u.length > 999 && !ignoreWarning && !localStorage[flag]) {
+        if (is_mobile) {
+            return msgDialog('error', l.too_many_uploads_title, l.too_many_uploads_text);
+        }
         var showMEGAsyncDialog = function(button, syncData) {
             const tag = `addUpload.${makeUUID()}`;
 

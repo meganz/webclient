@@ -1,0 +1,60 @@
+.mega-component.carousel-holder {
+    display: flex;
+    position: relative;
+}
+.carousel-holder .carousel-viewport {
+    display: flex;
+    flex: 1 1 auto;
+    overflow: hidden;
+    box-sizing: border-box;
+    margin: 0 18px;
+    padding: 0 2px;
+}
+.carousel-holder .nav-elem.icon-only.carousel-control {
+    position: absolute;
+    border-radius: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 40px;
+    width: 40px;
+}
+.carousel-holder .nav-elem.icon-only.carousel-control:hover,
+.carousel-holder .nav-elem.icon-only.carousel-control:active {
+    background: var(--mobile-button-primary-hover);
+}
+.carousel-holder .carousel-prev {
+    left: 0;
+}
+.rtl .carousel-holder .nav-elem.icon-only.carousel-control i {
+    transform: rotate(180deg);
+}
+.carousel-holder .carousel-next {
+    right: 0;
+}
+.rtl .carousel-holder .carousel-prev {
+    left: unset;
+    right: 0;
+}
+.rtl .carousel-holder .carousel-next {
+    left: 0;
+    right: unset;
+}
+.carousel-holder .carousel-track {
+    display: flex;
+    flex: 1 1 100%;
+    min-width: 0;
+    transition: transform 500ms ease-in-out;
+    transform: translateX(calc(-1 * var(--carousel-index, 0) * (100% + var(--carousel-gap)) / var(--carousel-per-page, 1)));
+    --carousel-gap: 16px;
+}
+.carousel-holder .carousel-page {
+    display: flex;
+    height: 100%;
+    flex: 0 0 calc((100% - (var(--carousel-per-page, 1) - 1) * var(--carousel-gap)) / var(--carousel-per-page, 1));
+}
+.rtl .carousel-holder .carousel-track {
+    transform: translateX(calc(var(--carousel-index, 0) * (100% + var(--carousel-gap)) / var(--carousel-per-page, 1)));
+}
+.carousel-holder .carousel-track > *:not(:last-child) {
+    margin-inline-end: var(--carousel-gap);
+}

@@ -457,6 +457,9 @@ function u_logout(logout) {
         delete sessionStorage.signinorup;
         localStorage.removeItem('signupcode');
         localStorage.removeItem('registeremail');
+        if (localStorage.disableSqlite !== '1') {
+            localStorage.removeItem('disableSqlite');
+        }
         localStorage.removeItem('mInfinity');
         delete sessionStorage.buextra;
         delete sessionStorage.cnv2free;

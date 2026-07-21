@@ -1923,7 +1923,8 @@ lazy(pro, 'filter', () => {
             obqDialog:
                 new Set([
                     pro.ACCOUNT_LEVEL_BASIC, pro.ACCOUNT_LEVEL_ESSENTIAL, pro.ACCOUNT_LEVEL_PRO_LITE,
-                    pro.ACCOUNT_LEVEL_PRO_I, pro.ACCOUNT_LEVEL_PRO_II, pro.ACCOUNT_LEVEL_PRO_III
+                    pro.ACCOUNT_LEVEL_PRO_I, pro.ACCOUNT_LEVEL_PRO_II, pro.ACCOUNT_LEVEL_PRO_III,
+                    pro.ACCOUNT_LEVEL_PRO_FLEXI
                 ]),
         },
 

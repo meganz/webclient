@@ -189,6 +189,7 @@ var megaMsgDialog = (() => {
                 targetSheet = mega.ui.sheet;
 
                 targetSheet.clear();
+                targetSheet.name = 'msg-dialog';
                 targetSheet.type = options.sheetType || 'modal';
                 targetSheet.showClose = closeButton || false;
                 targetSheet.preventBgClosing = typeof closeButton === 'boolean' ? !closeButton : is_mobile;

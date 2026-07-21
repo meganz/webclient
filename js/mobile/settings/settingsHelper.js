@@ -36,10 +36,10 @@ mobile.settingsHelper = {
         let menuIcon = '';
 
         if (opt.defaultRightIcon) {
-            menuIcon = 'sprite-mobile-fm-mono icon-chevron-right-thin-outline';
+            menuIcon = 'sprite-fm-mono icon-chevron-right-thin-outline';
         }
         else if (!(opt.binding || opt.rightIcon === null)) {
-            menuIcon = opt.rightIcon || 'sprite-mobile-fm-mono icon-chevron-right-thin-outline';
+            menuIcon = opt.rightIcon || 'sprite-fm-mono icon-chevron-right-thin-outline';
         }
 
         const props = {

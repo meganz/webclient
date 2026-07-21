@@ -33,9 +33,10 @@
     background: transparent;
     border-color: transparent;
 }
-.mega-component.tab-group .mega-tab-option.disabled span.primary-text {
+.mega-component.tab-group .mega-tab-option.disabled span.primary-text,
+.mega-component.tab-group.tab-slider .mega-tab-option.slider-tab.disabled span.primary-text,
+.mega-component.tab-group.tab-slider .mega-tab-option.slider-tab.disabled .post-text {
     color: var(--mobile-text-disabled);
-    font: var(--mobile-text-primary);
 }
 .mega-component.tab-group .mega-tab-option.decorated::after {
     background: var(--mobile-icon-brand);
@@ -46,4 +47,131 @@
     min-width: 6px;
     position: relative;
     top: -8px;
+}
+.mega-component.tab-group.tab-slider {
+    background: var(--mobile-surface-2);
+    border-radius: 24px;
+    padding: 0 4px;
+    width: fit-content;
+    position: relative;
+}
+.mega-component.tab-group.tab-slider::after {
+    content: '';
+    position: absolute;
+    top: 4px;
+    left: 0;
+    height: 32px;
+    width: var(--slider-width, 0);
+    transform: translateX(var(--slider-pos-x, 0));
+    background: var(--mobile-page-background);
+    border-radius: 24px;
+    transition: transform 200ms ease-in-out, width 200ms ease-in-out;
+    z-index: 1;
+}
+.mega-component.tab-group.tab-slider.tab-large::after {
+    height: 40px;
+}
+.mega-component.tab-group.tab-slider.tab-small::after {
+    height: 24px;
+}
+.mega-component.tab-group.tab-slider .mega-tab-option.slider-tab {
+    height: 40px;
+    flex: 0;
+    padding: 8px 16px;
+    border-bottom: none;
+    position: relative;
+    z-index: 2;
+}
+.mega-component.tab-group.tab-slider.tab-large .mega-tab-option.slider-tab {
+    height: 48px;
+}
+.mega-component.tab-group.tab-slider.tab-small .mega-tab-option.slider-tab {
+    height: 32px;
+    line-height: 16px;
+}
+.mega-component.tab-group.tab-slider .mega-tab-option.slider-tab:not(.selected)::before {
+    content: '';
+    position: absolute;
+    top: 4px;
+    bottom: 4px;
+    left: 0;
+    width: 100%;
+    border-radius: 24px;
+    z-index: -1;
+}
+.mega-component.tab-group.tab-slider .mega-tab-option.slider-tab:not(.selected):hover::before {
+    background: var(--mobile-surface-2);
+}
+.mega-component.tab-group.tab-slider .mega-tab-option.slider-tab:not(.selected):active::before {
+    background: var(--mobile-surface-3);
+}
+.mega-component.tab-group.tab-slider .mega-tab-option.slider-tab.disabled:hover::before,
+.mega-component.tab-group.tab-slider .mega-tab-option.slider-tab.disabled:active::before {
+    background: transparent;
+}
+.mega-component.tab-group.tab-slider .mega-tab-option.slider-tab.decorated::after {
+    position: absolute;
+    top: 12px;
+    right: 6px;
+}
+.mega-component.tab-group.tab-slider .mega-tab-option.slider-tab .badge {
+    display: inline-flex;
+    margin-inline-start: -4px;
+    background: var(--mobile-brand-default);
+    padding: 4px 2px;
+    color: var(--mobile-text-on-color);
+    font: var(--mobile-font-caption-small-semibold);
+    height: 18px;
+    box-sizing: border-box;
+    align-items: center;
+    border-radius: 2px;
+}
+.mega-component.tab-group.tab-slider.tab-small .mega-tab-option.slider-tab .badge {
+    margin-inline-start: 0;
+}
+.mega-component.tab-group.tab-slider.tab-large .mega-tab-option.slider-tab .badge {
+    margin-inline-start: 0;
+    font: var(--mobile-font-caption-large-semibold);
+    padding: 6px 4px;
+    height: 24px;
+}
+.mega-component.tab-group.tab-slider .mega-tab-option.slider-tab span.primary-text,
+.mega-component.tab-group.tab-slider .mega-tab-option.slider-tab .post-text {
+    display: inline-block;
+    font: var(--mobile-font-caption-large-regular);
+}
+.mega-component.tab-group.tab-slider .mega-tab-option.slider-tab span.primary-text {
+    color: var(--mobile-text-primary);
+}
+.mega-component.tab-group.tab-slider .mega-tab-option.slider-tab .post-text {
+    color: var(--mobile-text-brand);
+}
+.mega-component.tab-group.tab-slider .mega-tab-option.slider-tab.selected span.primary-text,
+.mega-component.tab-group.tab-slider .mega-tab-option.slider-tab.selected .post-text {
+    font: var(--mobile-font-caption-large-semibold);
+}
+.mega-component.tab-group.tab-slider.tab-small .mega-tab-option.slider-tab span.primary-text,
+.mega-component.tab-group.tab-slider.tab-small .mega-tab-option.slider-tab .post-text {
+    font: var(--mobile-font-caption-small-regular);
+}
+.mega-component.tab-group.tab-slider.tab-small .mega-tab-option.slider-tab.selected span.primary-text,
+.mega-component.tab-group.tab-slider.tab-small .mega-tab-option.slider-tab.selected .post-text {
+    font: var(--mobile-font-caption-small-semibold);
+}
+.mega-component.tab-group.tab-slider.tab-large .mega-tab-option.slider-tab span.primary-text,
+.mega-component.tab-group.tab-slider.tab-large .mega-tab-option.slider-tab .post-text {
+    font: var(--mobile-font-copy-regular);
+}
+.mega-component.tab-group.tab-slider.tab-large .mega-tab-option.slider-tab.selected span.primary-text,
+.mega-component.tab-group.tab-slider.tab-large .mega-tab-option.slider-tab.selected .post-text {
+    font: var(--mobile-font-copy-semibold);
+}
+.mega-component.tab-group.tab-slider .mega-tab-option.slider-tab span.primary-text::before,
+.mega-component.tab-group.tab-slider .mega-tab-option.slider-tab .post-text::before {
+    content: attr(data-label);
+    display: block;
+    height: 0;
+    overflow: hidden;
+    visibility: hidden;
+    font-weight: var(--mobile-font-weight-semibold);
 }

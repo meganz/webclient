@@ -2543,8 +2543,8 @@ function loadfm(force) {
                 console.error('No master key found... please contact support@mega.io');
             }
             else {
-                const f_table_schema = '&h, p, s, c, t';
-                fmdb = FMDB(u_handle, {
+                const f_table_schema = '&h, p, s, c, t, name';
+                fmdb = new FMDB(u_handle, {
                     // channel 0: transactional by _sn update
                     f      : f_table_schema,   // nodes - handle, parent, size (negative size: type), checksum
                     s      : '&o_t',           // shares - origin/target; both incoming & outgoing

@@ -618,6 +618,12 @@
                 <img alt="" class="img2" />
             </div>
 
+            <div class="slideshow-caption hidden">
+                <div class="caption-name"></div>
+                <div class="caption-date hidden"></div>
+                <div class="caption-desc hidden"></div>
+            </div>
+
             <div class="viewer-rounded slideshow-controls-upper hidden">
                 <button class="sl-btn close" aria-label="[[close]]">
                     <i class="sprite-fm-mono icon-dialog-close-thin"></i>
@@ -698,6 +704,14 @@
                             <div class="switch-option">
                                 <span class="title">[$gallery_videos]</span>
                                 <div class="mega-switch toggle-off" id="playVid">
+                                    <div class="mega-feature-switch no-trans-init"></div>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="switch-option">
+                                <span class="title">[$6859]</span>
+                                <div class="mega-switch toggle-off" id="caption">
                                     <div class="mega-feature-switch no-trans-init"></div>
                                 </div>
                             </div>
@@ -3508,102 +3522,6 @@
         </footer>
     </div>
 
-    <!-- Dialog: limited-bandwidth-dialog -->
-    <div class="mega-dialog dialog-template-action limited-bandwidth-dialog hidden"
-         role="dialog"
-         aria-label="Limited bandwidth dialog"
-         aria-modal="true">
-
-        <button class="close js-close" aria-label="[$148]">
-            <i class="sprite-fm-mono icon-dialog-close"></i>
-        </button>
-
-        <section class="content">
-            <div class="content-block centered-content">
-                <i class="graphic full sprite-fm-illustration img-dialog-overquota-storage"></i>
-
-                <div class="dialog header-before-icon limited">[$16164]</div>
-                <div class="dialog header-before-icon exceeded">[$17]</div>
-
-                <div class="messages">
-                    <p class="msg-overquota"></p>
-                    <p class="msg-prewarning"></p>
-                    <div class="dialog transfer-overquota-txt"></div>
-                </div>
-
-                <div class="step1-block">
-                    <div class="pricing-page radio-buttons individual-el right hidden">
-                        <div class="radioOff">
-                            <input id="d-pro-monthly-payment" name="d-pro-payment-period" type="radio" class="megaInputs radioOff" value="1">
-                        </div>
-                        <label class="radio-txt" for="d-pro-monthly-payment">[$23779]</label>
-                        <div class="radioOff">
-                            <input id="d-pro-yearly-payment" name="d-pro-payment-period" type="radio" class="megaInputs radioOff" value="12">
-                        </div>
-                        <label class="radio-txt" for="d-pro-yearly-payment">[$23780]</label>
-                        <div class="save-yearly">[$redemption_save_16_percent]</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="content-block scrollable step1-block">
-                <div class="offer-all offer hidden"></div>
-                <div class="step1-block dialog-cards">
-                    <div class="pricing-page plans-block">
-                        <div class="pricing-page plans-row">
-                            <div class="pricing-page plan template hidden" data-payment="">
-                                <div class="offer offer-single hidden"></div>
-                                <div class="pricing-page plan-header-container">
-                                    <div class="pricing-page title-and-saving">
-                                        <div class="pricing-page plan-title"></div>
-                                        <div class="pricing-page plan-saving hidden"></div>
-                                    </div>
-                                    <div class="pricing-page period-subtitle"></div>
-                                </div>
-                                <div class="pricing-page plan-content">
-                                    <div class="pricing-page cost">
-                                        <div class="pricing-page plan-only"></div>
-                                        <div class="pricing-page plan-price">
-                                            <span class="price"></span><span class="ast">*</span>
-                                        </div>
-                                        <div class="pricing-page currency-and-period"></div>
-                                        <div class="pricing-page monthly-price hidden">([$bsn_page_plan_price])</div>
-                                        <div class="pricing-page pricing-plan-tax hidden">
-                                            <span class="tax-info"></span>
-                                            <span class="tax-price hidden"></span>
-                                        </div>
-                                    </div>
-                                    <div class="pricing-page plan-features users hidden"></div>
-                                    <div class="pricing-page info-and-button-wrapper">
-                                        <div class="pricing-page storage-and-transfer">
-                                            <div class="pricing-page plan-feature storage strong">
-                                                <span>[$23789.s]</span>
-                                            </div>
-                                            <div class="pricing-page plan-feature transfer strong">
-                                                <span>[$23790.s]</span>
-                                            </div>
-                                            <div class="pricing-page plan-feature users strong">
-                                                <span></span>
-                                            </div>
-                                        </div>
-                                        <button class="mega-button positive pricing-page plan-button"></button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="condition pricing-page local-currency-tip">* [$18770]</div>
-
-            <div class="dialog bottom-button">
-                <button class="mega-button dialog-action"></button>
-                <button class="mega-button positive upgrade"></button>
-            </div>
-        </section>
-    </div>
-
     <!-- Dialog: achievements-list-dialog -->
     <!-- New achievement dialog, please hide and show block when need !-->
     <div class="mega-dialog dialog-template-main achievements-list-dialog hidden"
@@ -3988,8 +3906,7 @@
         </footer>
     </div>
 
-    <!-- Dialog: storage-dialog -->
-    <!-- Please add "achievements" class and "full"/"almost-full" class !-->
+    <!-- Dialog: storage-dialog (ODQ paywall only; full/almost-full quota use mega.ui.quotaDialogs) -->
     <div class="mega-dialog dialog-template-action storage-dialog hidden"
          role="dialog"
          aria-label="Storage capacity warning"
@@ -4002,7 +3919,6 @@
         <header>
             <i class="graphic full sprite-fm-illustration img-dialog-overquota-storage"></i>
             <h2 class="full"></h2>
-            <h2 class="almost-full">[$16312]</h2>
         </header>
 
         <section class="content">
@@ -4016,57 +3932,10 @@
                     </div>
                     <div class="odq-divider"></div>
                 </div>
-                <div class="storage-dialog body-p rubbish-text top-pad hidden">
-                    [$16306]
-                </div>
                 <div class="storage-dialog buttons-block">
                     <button class="mega-button positive large choose-plan">
                         <span>[$8696]</span>
                     </button>
-                </div>
-                <div class="estimated-price-text hidden">
-                    * [$18770]
-                </div>
-            </div>
-
-            <div class="content-block fm-dialog-body storage-dialog almost-full dialog-bottom">
-                <div class="body-header"></div>
-                <div class="fm-account-blocks storage">
-                    <div class="account chart-block tiny-chart">
-                        <div class="account chart body">
-                            <div class="account chart progressbars">
-                                <div class="chart0 main-chart right-chart"><span></span></div>
-                                <div class="chart0 main-chart left-chart"><span></span></div>
-                            </div>
-                            <span class="perc-txt">0%</span>
-                        </div>
-                        <div class="account chart data">
-                            <div class="fm-account-header"><span>[$16119]</span></div>
-                            <span class="size-txt">0 GB</span>
-                            <span class="of-txt">/</span>
-                            <span class="pecents-txt">0</span>
-                            <span class="gb-txt">GB</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="storage-dialog">
-                    <div class="storage-dialog body-p main-text">
-                        [$16313]
-                    </div>
-                    <div class="storage-dialog body-p rubbish-text top-pad hidden">
-                        [$16306]
-                    </div>
-                    <div class="storage-dialog buttons-block">
-                        <button class="mega-button large skip hidden">
-                            <span>[$ok_button]</span>
-                        </button>
-                        <button class="mega-button positive large choose-plan">
-                            <span>[$8696]</span>
-                        </button>
-                    </div>
-                    <div class="estimated-price-text hidden">
-                        * [$18770]
-                    </div>
                 </div>
             </div>
         </section>

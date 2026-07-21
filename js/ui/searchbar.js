@@ -203,10 +203,33 @@ lazy(mega.ui, 'searchbar', () => {
                 }
             }
 
-            return n => !!parents[n.p] && !n.s4 && M.getNodeRoot(n) !== 's4';
+            return n => !!parents[n.p] && !n.s4 && M.getNodeRoot(n.h) !== 's4';
         }
 
         return false;
+    };
+
+    const getSearchSuggestNodes = async(term, max) => {
+
+        if (term !== searchResults.lastInput) {
+            let nodes;
+            const chipBtn = $('button.search-chip', $topbar);
+            const path = chipBtn.length && chipBtn.attr('data-location');
+
+            if (self.fmdb && !folderlink && path !== 'photos') {
+                nodes = await fmdb.suggest(term, max, path, M.getFilterBySearchBasicFn(locationFn(path))).catch(dump);
+            }
+
+            if (!nodes) {
+                nodes = M.getFilterBy(M.getFilterBySearchFn(term, locationFn(path)))
+                    .filter(n => n.p !== M.RubbishID)
+                    .sort(({name: na}, {name: nb}) => na.localeCompare(nb) || na.length - nb.length);
+            }
+
+            searchResults.lastInput = term;
+            searchResults.lastResults = nodes;
+        }
+        return searchResults.lastResults;
     };
 
     /**
@@ -280,9 +303,11 @@ lazy(mega.ui, 'searchbar', () => {
             }
             else if (val.length >= minTermLen || !asciionly(val)) {
                 const chipBtn = $('button.search-chip', this);
-                const location = locationFn(chipBtn.length && chipBtn.attr('data-location'));
+                const locationPath = chipBtn.length && chipBtn.attr('data-location');
+                const location = locationFn(locationPath);
 
-                M.fmSearchNodes(val, location)
+                loadingDialog.show('fmSearchNodes');
+                M.fmSearchNodes(val, location, locationPath)
                     .then(() => {
                         delay.cancel('searchbar.renderSuggestSearchedItems');
                         if (!pfid) {
@@ -328,7 +353,7 @@ lazy(mega.ui, 'searchbar', () => {
                             // fix a redirect from a bottompage with an 'old' class on it
                             $('body').removeClass('old');
                         });
-                    });
+                    }).catch(dump).finally(() => loadingDialog.hide('fmSearchNodes'));
             }
 
             return false;
@@ -596,7 +621,7 @@ lazy(mega.ui, 'searchbar', () => {
         showRecentSection();
 
         // Show previously cached search results (if applicable)
-        renderSuggestSearchedItems(event);
+        delay('searchbar.renderSuggestSearchedItems', () => renderSuggestSearchedItems(event), 1000);
 
         const sections = $('.dropdown-section:not(.hidden)', $dropdownSearch);
         sections.removeClass('last-section');
@@ -689,9 +714,9 @@ lazy(mega.ui, 'searchbar', () => {
      *
      * @return {undefined}
      */
-    function renderSuggestSearchedItems(event) {
+    async function renderSuggestSearchedItems(event) {
         let term;
-        let nodes = [];
+        const maxSuggestions = 5;
 
         if (event && event.currentTarget) {
             term = $.trim($(event.currentTarget).val());
@@ -723,27 +748,10 @@ lazy(mega.ui, 'searchbar', () => {
                 return;
             }
         }
+        const nodes = await getSearchSuggestNodes(term, maxSuggestions).catch(dump);
 
         $dropdownResultSearched.addClass('hidden');
         $ddLoader.removeClass('hidden');
-
-        if (term === searchResults.lastInput) {
-            nodes = searchResults.lastResults;
-        }
-        else {
-            const chipBtn = $('button.search-chip', $topbar);
-
-            const results = M.getFilterBy(
-                M.getFilterBySearchFn(term, locationFn(chipBtn.length && chipBtn.attr('data-location')))
-            );
-
-            const nodes = results.filter(n => n.p !== M.RubbishID)
-                .sort(({ name: nameA }, { name: nameB }) => nameA.localeCompare(nameB) || nameA.length - nameB.length);
-
-            searchResults.lastInput = term;
-            searchResults.lastResults = nodes;
-        }
-
         $ddLoader.addClass('hidden');
 
         if (nodes && nodes.length) {
@@ -759,6 +767,9 @@ lazy(mega.ui, 'searchbar', () => {
             }
 
             removeDropdownSearch();
+            if (!nodes) {
+                return;
+            }
         }
 
         const $itemTemplate = $('.dropdown-search-results-item-template', $dropdownResults);
@@ -841,7 +852,6 @@ lazy(mega.ui, 'searchbar', () => {
         };
 
         const $resultSearchBody = $('.dropdown-search-results > .dropdown-section-body', $dropdownResults);
-        const maxSuggestions = 5;
 
         $resultSearchBody.empty();
 

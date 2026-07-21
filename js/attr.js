@@ -1380,7 +1380,14 @@
         };
         uaPacketParserHandler['^!usl'] = function() {
             if (fminitialized && u_type) {
-                M.getStorageState(true).always(M.checkStorageQuota.bind(M, 2e3));
+                M.getStorageState(true)
+                    .always((lvl) => {
+                        if (lvl === 1) {
+                            // Allow showing the almost over quota dialog
+                            return M.delPersistentData('storageAlmostFullSeen');
+                        }
+                    })
+                    .always(M.checkStorageQuota.bind(M, 2e3));
             }
         };
         uaPacketParserHandler['*!rp'] = function() {

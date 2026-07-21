@@ -83,7 +83,7 @@ lazy(mega.slideshow.settings, 'order', () => {
                 }
             };
 
-            const cfg = fmconfig.viewercfg ? fmconfig.viewercfg[this.name] : undefined;
+            const cfg = this.getConfig().cfg;
 
             let id = this._defaultConfig;
             for (const [k, v] of Object.entries(this._config)) {

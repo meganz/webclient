@@ -669,7 +669,7 @@ lazy(mega, 'rewindUi', () => {
 
             this.currentIcon = icon;
             if (folderIcon) {
-                folderIcon.classList.add(`icon-${icon}-24`);
+                folderIcon.className = `item-type-icon icon-${icon}-24`;
                 if (icon === 'folder') {
                     MegaNodeComponent.label.set(this.currentNode, folderIcon);
                 }
@@ -2210,7 +2210,7 @@ lazy(mega, 'rewindUi', () => {
             }
 
             nameElement.textContent = this.getNodeNameInfo(node)[0];
-            iconElement.classList.add(`icon-${fileIcon(node)}-24`);
+            iconElement.className = `item-type-icon icon-${fileIcon(node)}-24`;
             template.dataset.id = node.h;
 
             // SAT-1023
@@ -2345,7 +2345,7 @@ lazy(mega, 'rewindUi', () => {
 
             nameElement.textContent = this.getNodeNameInfo(node)[0];
             const icon = fileIcon(node);
-            iconElement.classList.add(`icon-${icon}-24`);
+            iconElement.className = `item-type-icon icon-${icon}-24`;
             if (icon === 'folder') {
                 MegaNodeComponent.label.set(node, iconElement);
             }
@@ -2566,7 +2566,7 @@ lazy(mega, 'rewindUi', () => {
             }
 
             nameElement.textContent = node.name;
-            iconElement.classList.add(`icon-${fileIcon(node)}-24`);
+            iconElement.className = `item-type-icon icon-${fileIcon(node)}-24`;
             template.dataset.id = node.h;
 
             if (mega.sensitives.isSensitive(node)) {

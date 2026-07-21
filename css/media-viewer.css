@@ -101,6 +101,29 @@
         .media-viewer button.gallery-btn:hover i {
             --mask-color: var(--icon-active);
         }
+        .media-viewer .slideshow-caption {
+            position: absolute;
+            bottom: 8px;
+            left: 8px;
+            color: var(--mobile-text-on-color);
+            border-radius: 12px;
+            max-width: 20%;
+            padding: 16px;
+            text-align: start;
+            background: var(--mobile-surface-transparent);
+            z-index: 10;
+        }
+        .media-viewer .slideshow-caption .caption-name {
+            font: var(--mobile-font-caption-large-semibold);
+        }
+        .media-viewer .slideshow-caption .caption-desc,
+        .media-viewer .slideshow-caption .caption-date {
+            font: var(--mobile-font-caption-small-regular);
+            margin-top: 4px;
+        }
+        .media-viewer-container:not(.fullscreen):not(.slideshow) .slideshow-caption {
+            display: none;
+        }
 
     /* Images viewer */
 

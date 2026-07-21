@@ -34,12 +34,28 @@ lazy(mega.slideshow.settings, 'options', () => {
         }
 
         /**
+         * Return the cfg value for a named config option (e.g. 'slow', 'oldest')
+         * @param {String} name - config key
+         * @returns {Number} - the option's cfg value
+         */
+        getCfgByName(name) {
+            return this._config[name].cfg;
+        }
+
+        /**
          * Return current config or default value if undefined
          * TODO: new slideshow not implemented in mobile version
          * @returns {Object} - current config
          */
         getConfig() {
-            const cfg = fmconfig.viewercfg ? fmconfig.viewercfg[this.name] : undefined;
+            const {override} = mega.slideshow.settings;
+            let cfg;
+            if (override && override[this.name] !== undefined) {
+                cfg = override[this.name];
+            }
+            else if (fmconfig.viewercfg) {
+                cfg = fmconfig.viewercfg[this.name];
+            }
 
             let id = this._defaultConfig;
 

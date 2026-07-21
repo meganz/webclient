@@ -608,6 +608,9 @@ function init_page() {
         pfhandle = false;
         pfcol = page.startsWith('collection/');
 
+        const linkParts = isPublicLink(page) || [];
+        const folderLinkOptions = linkParts[2] === 'folder' ? linkParts[4] : linkParts[2];
+
         if (page.length - phLen > 2) {
             if (possibleS === -1) {
                 phLen++;
@@ -639,7 +642,7 @@ function init_page() {
                     keyCutPlace = folderSelectorPlace;
 
                     if (linkRemaining.length - 8 - folderSelectorPlace > 2) {
-                        pfhandle = linkRemaining.substring(folderSelectorPlace + 8, linkRemaining.length);
+                        pfhandle = linkRemaining.substring(folderSelectorPlace + 8).split('/')[0];
                         pfhandle = pfhandle.replace(/[^\w-]+/g, "");
                         newLinkSelector = '/folder/' + pfhandle;
                     }
@@ -699,6 +702,93 @@ function init_page() {
                 delete $.onImportCopyNodes;
                 delete $.mcImport;
                 delete $.albumImport;
+            }
+
+            const slideOpts = {};
+            if (folderLinkOptions) {
+                String(folderLinkOptions)
+                    .replace(/([\w-]{8})h$/, (m, h) => {
+                        slideOpts.h = h;
+                        return '';
+                    })
+                    .replace(/(\d+)([acorsv])/g, (m, v, k) => {
+                        slideOpts[k] = v | 0;
+                        return '';
+                    });
+            }
+
+            if (slideOpts.a) {
+                const startFolderLinkSlideshow = () => {
+                    const {speed, order, repeat, playVid, caption} = mega.slideshow.settings;
+                    // Deterministic default options.
+                    const override = {
+                        speed: speed.getCfgByName('slow'),
+                        order: order.getCfgByName('oldest'),
+                        repeat: repeat.getDefaultCfg(),
+                        playVid: playVid.getDefaultCfg(),
+                        caption: caption.getDefaultCfg()
+                    };
+                    if (slideOpts.s) {
+                        override.speed = slideOpts.s;
+                    }
+                    if (slideOpts.o) {
+                        override.order = slideOpts.o;
+                    }
+                    if (slideOpts.v !== undefined) {
+                        override.playVid = slideOpts.v;
+                    }
+                    if (slideOpts.r !== undefined) {
+                        override.repeat = slideOpts.r;
+                    }
+                    if (slideOpts.c) {
+                        override.caption = slideOpts.c;
+                    }
+                    mega.slideshow.settings.override = override;
+
+                    const orderedFirst = (nodes) => {
+                        if (nodes.length < 2) {
+                            return nodes[0];
+                        }
+                        const idx = nodes.map((n, i) => i);
+                        order.getValue()(idx, nodes);
+                        return nodes[idx[0]];
+                    };
+
+                    let firstNode;
+                    if (pfcol) {
+                        firstNode = slideOpts.h && M.d[slideOpts.h] || orderedFirst(M.v || []);
+                    }
+                    else {
+                        const filter = mega.slideshow.utils
+                            && mega.slideshow.utils.filterNodes(undefined, true) || M.isGalleryImage;
+                        const media = (M.v || []).filter(filter);
+                        if (media.length >= 2) {
+                            firstNode = slideOpts.h && M.d[slideOpts.h] || orderedFirst(media);
+                        }
+                    }
+
+                    if (!firstNode) {
+                        delete mega.slideshow.settings.override;
+                        return;
+                    }
+
+                    mBroadcaster.once('slideshow:close', () => {
+                        delete mega.slideshow.settings.override;
+                    });
+
+                    if (is_video(firstNode)) {
+                        $.autoplay = firstNode.h;
+                    }
+                    slideshow(firstNode.h);
+                    delay('folderlink:slideshow', () => slideshow_playMode(true));
+                };
+
+                if (pfcol) {
+                    mBroadcaster.once('albums:public:ready', startFolderLinkSlideshow);
+                }
+                else {
+                    M.onFileManagerReady(startFolderLinkSlideshow);
+                }
             }
         }
 
@@ -991,7 +1081,7 @@ function init_page() {
 
         if (window.nextPage) {
             login_next = window.nextPage;
-            login_txt = login_next === 'support' ? l.support_redirect_login : l[24766];
+            login_txt = l[24766];
             delete window.nextPage;
         }
         parsepage(pages.login);
@@ -1090,7 +1180,7 @@ function init_page() {
         init_key();
     }
     else if (page === 'support') {
-        support.init(true);
+        support.init();
     }
     else if (page == 'contact') {
         mega.redirect('mega.io', 'contact', false, false);
@@ -1738,11 +1828,18 @@ function init_page() {
 
             assert(!is_chatlink);
             mega.initLoadReport();
-            loadfm();
 
-            if (id) {
-                M.currentdirid = id;
-            }
+            M.sqliteCheck()
+                .catch((ex) => {
+                    console.info("Failed to initialize sqlite layer, continuing anyway...", ex);
+                })
+                .finally(() => {
+                    loadfm();
+
+                    if (id) {
+                        M.currentdirid = id;
+                    }
+                });
         }
         else if ((!pfid || flhashchange) && (id && id !== M.currentdirid || page === 'start' || page === 'fm/pwm')) {
 
@@ -2978,6 +3075,13 @@ pagemetadata.last = null;
 
 function parsepage(pagehtml) {
     'use strict';
+
+    // indicate to support page that it needs to reparse itself.
+    // this limits the need to public links only.
+    // for nav to fm etc, we need not reparse
+    if (window.support) {
+        support.parsed = false;
+    }
 
     $('#fmholder, #pageholder, #startholder').addClass('hidden');
     pagemetadata();

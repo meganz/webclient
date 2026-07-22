@@ -281,12 +281,12 @@ BusinessRegister.prototype.initPage = function(
         let totalQuota = -1;
         let total = 0;
 
-        const localUserPrice = mySelf.planInfo.bd.us.lpn || mySelf.planInfo.bd.us.lp;
         const euroUserPrice = (mySelf.planInfo.bd && (mySelf.planInfo.bd.us.pn || mySelf.planInfo.bd.us.p))
             || (mySelf.planInfo.pn || mySelf.planInfo.p);
+        const localUserPrice = mySelf.planInfo.bd.us.lpn || mySelf.planInfo.bd.us.lp || euroUserPrice;
 
-        const localQuotaPrice = quotaFare || mySelf.planInfo.bd.sto.lpn || mySelf.planInfo.bd.sto.lp;
         const euroQuotaPrice = quotaFare || mySelf.planInfo.bd.sto.pn || mySelf.planInfo.bd.sto.p;
+        const localQuotaPrice = quotaFare || mySelf.planInfo.bd.sto.lpn || mySelf.planInfo.bd.sto.lp || euroQuotaPrice;
 
         if (mySelf.localPricesMode) {
             usrFare = usrFare || mySelf.planInfo.bd.us.lp;

@@ -4223,13 +4223,15 @@ accountUI.s4 = {
     init() {
         'use strict';
 
-        if ((this.$container = ('.fm-account-s4', accountUI.$contentBlock)).length === 0) {
+        this.$container = $('.fm-account-s4', accountUI.$contentBlock);
+
+        if (this.$container.length === 0) {
             return false;
         }
 
         // Render endpoints list
         if ('utils' in s4) {
-            s4.utils.renderEndpointsData(this.$container);
+            s4.main.renderEndpoints(this.$container[0]);
         }
 
         this.bindEvents();

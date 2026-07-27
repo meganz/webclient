@@ -413,7 +413,7 @@ lazy(s4, 'containers', () => {
             const [cn] = this.$steps[6];
             const refNode = cn.querySelector('.reference');
 
-            s4.utils.renderEndpointsData($(cn));
+            s4.main.renderEndpoints(cn);
             cn.querySelector('header h2').textContent = header || name;
             refNode.classList.add('hidden');
 

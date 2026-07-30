@@ -2215,6 +2215,7 @@ var slideshowid;
                 ['../build/pdf.js', 'pdfjs2']
             ]),
             docxviewer: new Map([
+                ['jszip.js', 'jszip_js'],
                 ['docx.js', 'docxviewer_js'],
                 ['viewer.css', 'docxviewercss'],
                 ['docx-preview.js', 'docxpreview_js']
@@ -2297,7 +2298,7 @@ var slideshowid;
             return;
         }
 
-        require('docxviewer', ['docxpreview_js', 'docxviewer_js'], 'docxviewercss').then((myPage) => {
+        require('docxviewer', ['jszip_js', 'docxpreview_js', 'docxviewer_js'], 'docxviewercss').then((myPage) => {
             const id = 'docxpreviewdiv1';
             const iframe = document.getElementById(id);
             const newIframe = document.createElement('iframe');

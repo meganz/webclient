@@ -267,15 +267,20 @@ class MegaJourney {
     }
 
     show() {
+        const {
+            dialogName: name = 'Mega-Onboarding',
+            showClose = false,
+            preventBgClosing = true,
+            onClose = nop
+        } = this.options;
+
         this.dialog.show({
-            name: this.options.dialogName || 'Mega-Onboarding',
+            name,
             contents: [this.megaJourneyDiv],
-            showClose: this.options.showClose || false,
-            preventBgClosing: this.options.preventBgClosing || true,
-            onClose: this.options.onClose || nop,
-            onShow: () => {
-                Ps.initialize(this.mainContent.children[0]);
-            }
+            showClose,
+            preventBgClosing,
+            onClose,
+            onShow: () => Ps.initialize(this.mainContent.children[0])
         });
     }
 

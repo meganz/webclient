@@ -553,7 +553,7 @@
         if (M.isFileDragPage(page)) {
             return true;
         }
-        if (String(page).startsWith('pro')) {
+        if (String(page).startsWith('pro') || page === 'support') {
             return false;
         }
         return !(is_fm() && // if page is fm,

@@ -3848,6 +3848,12 @@ FullScreenManager.prototype.enterFullscreen = function() {
         'avc1', 'f4v ', 'nvr1', 'FACE', 'M4V ', 'M4VH', 'M4VP', 'XAVC', 'MSNV'
     ]);
 
+    const mkvVideoCodecs = new Map([
+        ['V_MPEG4/ISO/AVC', 'video/mp4; codecs="avc1.640029"'],
+        ['V_MPEG4/IS0/AVC', 'video/mp4; codecs="avc1.640029"'],
+        ['V_MPEGH/ISO/HEVC', 'video/mp4; codecs="hvc1.1.6.L93.90"']
+    ]);
+
     function xxkey(k) {
         var key = new Uint32Array(4);
 
@@ -3987,6 +3993,12 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 return canPlayMSEAudio();
 
             case 'Matroska':
+                if (mkvVideoCodecs.has(videocodec)
+                    && MediaSource.isTypeSupported(mkvVideoCodecs.get(videocodec))) {
+
+                    return 1;
+                }
+
                 if (audiocodec && audiocodec !== 'A_OPUS') {
                     return 0;
                 }

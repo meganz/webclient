@@ -76,10 +76,13 @@ lazy(s4, 'objects', () => {
                         loadingDialog.hide('s4-object-pa');
                     })
                     .catch(tell);
+
+                eventlog(501380, this.publicAccess);
             });
 
             this.$copyButton.rebind('click.s4dlg', (e) => {
                 if (!e.currentTarget.classList.contains('disabled')) {
+                    eventlog(501381);
                     copyToClipboard($('input', this.$linkContainer).val(), l[1642]);
                 }
             });

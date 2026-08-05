@@ -1094,6 +1094,7 @@
                             text: l.s4_access_dig_header,
                             icon: 'sprite-fm-mono icon-globe-gear-thin-outline',
                             onClick() {
+                                eventlog(501379);
                                 return s4.ui.showDialog(s4.objects.dialogs.access, mega.ui.contextMenu.firstNode);
                             }
                         },
@@ -1515,6 +1516,7 @@
                 text: l[823],
                 icon: 'sprite-fm-mono icon-settings-thin-outline',
                 onClick() {
+                    eventlog(501387);
                     return s4.ui.showDialog(s4.buckets.dialogs.settings, mega.ui.contextMenu.firstNode);
                 }
             },

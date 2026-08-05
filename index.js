@@ -103,8 +103,6 @@ mBroadcaster.once('startMega:desktop', function() {
             delete pages[p[i]];
         }
     }
-    $('#avatar-svg').safeAppend(pages.contact_avatar);
-    delete pages.contact_avatar;
 });
 
 function startMega() {
@@ -2274,8 +2272,10 @@ function topmenuUI() {
     // Show/hide MEGA for Business/ Try Individual button
     if (u_type > 0 || u_type === 0 && isFm) {
         $headerIndividual.addClass('hidden');
+        $menuAvatar.removeClass('hidden');
     }
     else {
+        $menuAvatar.addClass('hidden');
         $headerIndividual.removeClass('hidden');
     }
 
@@ -2284,14 +2284,6 @@ function topmenuUI() {
     }
     if (page === 'registerb') {
         $headerIndividualSpan.text(l[19529]); // try Mega MEGA Indivisual
-    }
-
-    var avatar = window.useravatar && useravatar.mine();
-    if (!avatar) {
-        $menuAvatar.addClass('hidden');
-    }
-    else {
-        $menuAvatar.removeClass('hidden');
     }
 
     // Show active item in main menu
@@ -3159,7 +3151,6 @@ function parsetopmenu() {
     if (is_chrome_web_ext || is_firefox_web_ext) {
         top = top.replace(/\/#/g, '/' + urlrootfile + '#');
     }
-    top = top.replace("{avatar-top}", window.useravatar && useravatar.mine() || '');
     top = translate(top);
     return top;
 }

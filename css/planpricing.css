@@ -1161,6 +1161,7 @@ i.pricing-i-icon {
 }
 .pricing-pg .pricing-pg.pricing-feature-plan-container .plans-cards-container {
     place-items: center;
+    grid-auto-columns: minmax(0, 1fr);
 }
 .pricing-pg .pricing-pg.pricing-feature-plan-container .plans-cards-container .pricing-plan-card-wrapper {
     width: 100%;

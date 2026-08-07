@@ -1093,7 +1093,6 @@ mBroadcaster.once('boot_done', function populate_l() {
         'terms#recPaiSub': "https://mega.io/terms#RecurringPaidSubscriptions",
         'terms#ref': "https://mega.io/terms#Refunds",
         'p-s/p-b/c-s': "https://help.mega.io/plans-storage/payments-billing/cancel-subscription",
-        'terms': "https://mega.io/terms",
         'pricing': "https://mega.io/pricing",
         'privacy': "https://mega.io/privacy",
         'vpn': "https://mega.io/vpn",
@@ -2264,6 +2263,8 @@ mBroadcaster.once('boot_done', function populate_l() {
         'lna_reset_p3',
         'propay_discount_title',
         'tfw_obq_text',
+        's4_recommended_plans',
+        's4_supported_plans',
     ];
     for (let i = common.length; i--;) {
         var num = common[i];

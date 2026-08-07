@@ -14,6 +14,10 @@
     margin: auto;
 }
 
+.rtl .s4.fm-activate-section {
+    direction: rtl;
+}
+
 
 /* Typo */
 
@@ -67,6 +71,7 @@
     background-image: url('../images/mega/icons-3d/icon-glass-objects.png');
     background-size: 152px auto;
     height: 200px;
+    margin: 0 -60px;
     width: 268px;
 }
 
@@ -90,13 +95,9 @@
     background: radial-gradient(29.19% 92.62% at 84.28% 46.59%, rgba(150, 25, 27, 1) 0%, rgba(92, 0, 1, 1) 100%);
     border-radius: 8px;
     box-sizing: border-box;
-    grid-template-columns: 1fr auto;
+    display: flex;
     margin: 0;
     padding: 32px;
-}
-
-.s4.fm-activate-section .banner .info {
-    max-width: 596px;
 }
 
 .s4.fm-activate-section .banner h3 {
@@ -104,6 +105,7 @@
     font: var(--mobile-font-heading-h1);
     line-height: var(--mobile-font-line-height-lg);
     margin: 4px 0 0;
+    max-width: 660px;
     padding: 0;
 }
 
@@ -115,6 +117,7 @@
     color: var(--mobile-text-on-color);
     font: var(--mobile-font-caption-large-regular);
     margin: 0;
+    max-width: 596px;
     padding: 0;
 }
 
@@ -126,14 +129,29 @@
     padding: 12px 0 0;
 }
 
+.s4.fm-activate-section .banner .btns {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.s4.fm-activate-section .banner .btns p {
+    flex: 1;
+    margin-inline-start: 10px;
+    margin: 32px 0 0;
+    min-width: 320px;
+}
+
 .s4.fm-activate-section .banner button {
     cursor: pointer;
     height: 48px;
     margin: 32px 0 0;
+    margin-inline-end: 10px;
+    white-space: nowrap;
 }
 
-.s4.fm-activate-section .banner button ~ * {
-    margin-inline-start: 10px;
+.s4.fm-activate-section .banner button:nth-child(2) {
+    margin-inline-end: 16px;
 }
 
 .s4.fm-activate-section .banner button.primary:hover {
@@ -151,6 +169,18 @@
 .s4.fm-activate-section .terms {
     color: var(--mobile-text-secondary);
     font: var(--mobile-font-caption-small-regular);
+}
+
+.s4.fm-activate-section .banner .info {
+    flex: 1 1 auto;
+}
+
+.s4.fm-activate-section .banner .illustration {
+    flex: 1 1 auto;
+    display: flex;
+    justify-content: space-around;
+    max-width: 268px;
+    margin-inline-start: 24px;
 }
 
 
@@ -213,6 +243,10 @@
 
 .s4.fm-activate-section .grid.border a i {
     --mask-color: var(--mobile-icon-secondary);
+}
+
+.rtl .s4.fm-activate-section .grid.border a i {
+    transform: rotate(180deg);
 }
 
 .s4.fm-activate-section .m-guides {

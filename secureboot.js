@@ -2973,6 +2973,7 @@ else if (!browserUpdate) {
         'time_checker_js': {f:'js/time_checker.js', n:'time_checker_js', j:1},
         'filerequest_js': {f:'js/filerequest.js', n: 'filerequest_js', j:1 },
         'filerequest_upload_js': {f:'js/filerequest_upload.js', n: 'filerequest_upload_js', j:1 },
+        'jszip_js': {f:'js/vendor/jszip.js', n: 'jszip_js', j:4},
         'docxpreview_js': {f:'js/vendor/docx-preview.js', n: 'docxpreview_js', j:4},
         'docxviewer_js': {f:'js/ui/docx.viewer.js', n: 'docxviewer_js', j:4},
         'docxviewer': {f:'html/docx.viewer.html', n: 'docxviewer', j:0},

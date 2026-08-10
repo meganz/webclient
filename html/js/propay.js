@@ -3036,6 +3036,10 @@ pro.propay = {
         switch (showLoading && this.proPaymentMethod) {
             case 'stripe':
                 break;
+            case 'stripeID':
+                // Debounce so a fast invalidInput from the iframe cancels the show before it appears (avoids flicker)
+                delay('propay.stripeOverlay', () => pro.propay.showLoadingOverlay('transferring'), 100);
+                break;
             case 'bitcoin':
                 pro.propay.showLoadingOverlay('loading');
                 break;

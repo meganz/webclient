@@ -3381,6 +3381,9 @@ var addressDialog = {
                 || (event.data === 'paymentCancelled')
                 || (event.data === 'validInput')) {
 
+                // Iframe now controls the overlay; drop any debounced show queued on continue click
+                delay.cancel('propay.stripeOverlay');
+
                 if (event.data === 'showLoading') {
                     pro.propay.showLoadingOverlay('processing');
                 }

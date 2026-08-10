@@ -113,14 +113,9 @@
 
         var rsv = ['sid', 'k', 'privk', 'v', 'handle', 'fmconfig', 'attr', 'link'];
         for (var key in data) {
-            if (!rsv.includes(key)) {
+            if (!rsv.includes(key) && !key.includes('ath')) {
                 var value = data[key];
 
-                if (key === 'apipath') {
-                    value = value || 'prod';
-                    var target = ['prod', 'staging'].includes(value) ? 'api' : 'developers';
-                    value = apipath = 'https://' + value + '.' + target + '.mega.co.nz/';
-                }
 
                 if (value) {
                     if (localStorage[key] !== String(value)) {

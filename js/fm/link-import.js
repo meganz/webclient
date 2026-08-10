@@ -479,6 +479,7 @@ lazy(mega, 'linkImport', () => {
         componentClassname: 'mega-sheet journey link-import-dialog',
         showClose: false,
         dialogName: 'link-import-dialog',
+        preventBgClosing: false,
         steps: [
             // Step 1: insert url to import
             {

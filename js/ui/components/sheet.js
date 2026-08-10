@@ -54,11 +54,24 @@ class MegaSheet extends MegaOverlay {
 
         // Handler for closing sheet on ESC key press
         this._escHandler = e => {
-            if (e.key === 'Escape' && this.visible && !this.preventBgClosing) {
-                e.stopPropagation();
-                this.hide();
-                this.trigger('close');
+            if (e.key !== 'Escape' || !this.visible) {
+                return;
             }
+
+            // Skip closing the dialog if warning message is displayed
+            if ($.msgDialog && this.name !== 'msg-dialog') {
+                return;
+            }
+
+            e.stopPropagation();
+
+            // Do now allow to run fm_hideoverlay
+            if (this.preventBgClosing) {
+                return;
+            }
+
+            this.hide();
+            this.trigger('close');
         };
     }
 

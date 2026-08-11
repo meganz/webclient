@@ -1220,10 +1220,24 @@ var pro = {
                         plan = thisPlan;
                     }
 
-                    const price = plan.price * months;
-                    const priceEuro = plan.priceEuro * months;
-                    const taxedPrice = plan.taxInfo ? plan.taxInfo.taxedPrice * months : price;
-                    const taxedPriceEuro = plan.taxInfo ? plan.taxInfo.taxedPriceEuro * months : priceEuro;
+                    // The API bills a duration over a year that is not a whole number of years as one
+                    // yearly plan per full 12 months plus a monthly plan per leftover month, so match that.
+                    const remainingMonths = months % 12;
+                    const yearlyPlan = (remainingMonths && months > 12 && thisPlan.yearlyPlan) || false;
+                    const years = (months - remainingMonths) / 12;
+
+                    const combine = (get) => yearlyPlan
+                        ? get(yearlyPlan) * years + get(plan) * remainingMonths
+                        : get(plan) * months;
+
+                    const price = combine((p) => p.price);
+                    const priceEuro = combine((p) => p.priceEuro);
+                    const taxedPrice = plan.taxInfo
+                        ? combine((p) => (p.taxInfo ? p.taxInfo.taxedPrice : p.price))
+                        : price;
+                    const taxedPriceEuro = plan.taxInfo
+                        ? combine((p) => (p.taxInfo ? p.taxInfo.taxedPriceEuro : p.priceEuro))
+                        : priceEuro;
 
                     return {
                         price,

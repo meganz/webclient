@@ -1172,9 +1172,11 @@
 /* Desktop */
 @media only screen and (min-width: 1080px) {
     #propay .right-block .plan-card.fixed {
+        left: calc(var(--left-panel-width) + var(--plan-card-left-gap));
+        max-height: calc(100% - 140px);
+        overflow: auto;
         position: fixed;
         top: 88px;
-        left: calc(var(--left-panel-width) + var(--plan-card-left-gap));
     }
     .rtl #propay .right-block .plan-card.fixed {
         left: initial;

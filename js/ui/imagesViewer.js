@@ -1255,6 +1255,9 @@ var slideshowid;
 
             // Bind keydown events
             $document.rebind('keydown.slideshow', function(e) {
+                if ($.dialog === 'quota-dialog') {
+                    return false;
+                }
                 const isDownloadPage = page === 'download';
 
                 if (e.keyCode === 37 && slideshowid && !e.altKey && !e.ctrlKey && !isDownloadPage) {

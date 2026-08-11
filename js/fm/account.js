@@ -3384,9 +3384,11 @@ accountUI.transfers = {
 
                 tbody.textContent = '';
 
-                const phmap = {};
-                for (const h of Object.keys(M.su.EXP)) {
-                    phmap[M.su.EXP[h].ph] = h;
+                const phmap = Object.create(null);
+                if (M.su.EXP) {
+                    for (const h of Object.keys(M.su.EXP)) {
+                        phmap[M.su.EXP[h].ph] = h;
+                    }
                 }
 
                 for (let i = migrations.length; i--;) {

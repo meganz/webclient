@@ -45,7 +45,7 @@ mobile.appBanner = {
      * @param {String} handle the node handle of the currently shown file or folder
      * @returns {undefined}
      */
-    updateBanner: function(handle) {
+    updateBanner: tryCatch(function(handle) {
         'use strict';
 
         if (!localStorage.closedMobileAppBanner) {
@@ -56,7 +56,7 @@ mobile.appBanner = {
                 this.show(handle);
             }
         }
-    },
+    }),
 
     get visible() {
         'use strict';

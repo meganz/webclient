@@ -67,7 +67,8 @@ mBroadcaster.once('boot_done', () => {
     };
 
     const thirdPartyScript = (dump, data) => {
-        return /userscript|(?:user|inpage|inject[\w/-]*|ant)\.js|EvalError/.test(dump.m + data)
+        return /userscript|(?:user|inpage|inject[\w/-]*|ant|page|rated|bundle)\.js|EvalError/.test(dump.m + data)
+            || /eppiocem|bhmmomii/.test(dump.m + data)
             || dump.m.includes('on proxy: property')
             || dump.m.includes('Permission denied to access property')
             || dump.m.includes("evaluating 'browser.runtime")

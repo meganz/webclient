@@ -1861,7 +1861,7 @@ MegaData.prototype.revertRubbishNodes = mutex('restore-nodes', function(resolve,
                 targets[target] = [h];
             }
         }
-        assert($.len(targets), 'Invalid invocation, nothing to restore.', handles);
+        assert($.len(targets), 'Invalid invocation, nothing to restore.');
 
         let selTarget;
         const promises = [];

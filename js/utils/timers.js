@@ -399,7 +399,7 @@ Object.defineProperty(self, 'sleep', {
 self.mCreateHighPrecisionSleep = (ctx) => {
     'use strict';
 
-    const MIN_THRESHOLD = 100;
+    const MIN_THRESHOLD = 40;
     const MAX_THRESHOLD = 4e6;
 
     const pending = new Set();

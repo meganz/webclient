@@ -1759,23 +1759,6 @@ FileManager.prototype.updFileManagerUI = async function() {
         }
     }
 
-    if (u_type === 0) {
-        // Show "ephemeral session warning"
-        topmenuUI();
-    }
-
-    delay('dashboard:upd', () => {
-        if (M.currentdirid === 'dashboard') {
-            dashboardUI(true);
-        }
-        else if (UImain === M.currentdirid) {
-            delay('rendernew:mediainfo:collect', () => {
-                mBroadcaster.sendMessage('mediainfo:collect');
-                $.tresizer();
-            }, 3200);
-        }
-    }, 2000);
-
     mBroadcaster.sendMessage('updFileManagerUI');
 
     if (d) {

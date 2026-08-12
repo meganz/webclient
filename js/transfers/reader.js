@@ -48,7 +48,7 @@ class FileUploadReader {
         this.readpos = 0;
         this.cache = new Map();
         this.reread = new Map();
-        this.debug = self.d > -1;
+        this.debug = self.d > 1;
         this.verbose = this.debug && !self.is_livesite;
         this.name = `FUR(${file.name.slice(this.verbose ? -56 : -4)}.${file.size})`;
         this.logger = new MegaLogger(this.name, false, self.ulmanager && ulmanager.logger);
@@ -178,7 +178,9 @@ class FileUploadReader {
 
     // @private Get an encrypted chunk from disk
     async _read(offset, length) {
-        const data = await this._getArrayBuffer(offset, length);
+        const data = this.file.pDataBuffer
+            ? this.file.pDataBuffer.slice(offset, offset + length)
+            : await this.file.slice(offset, offset + length).arrayBuffer();
 
         return this._encrypt(offset, data);
     }
@@ -195,12 +197,6 @@ class FileUploadReader {
             };
             Encrypter.push([ctx, this.file.ul_keyNonce, ctx.start / 16, data], () => resolve(ctx.bytes));
         });
-    }
-
-    // @private
-    _getArrayBuffer(offset, length) {
-
-        return this.file.slice(offset, offset + length).arrayBuffer();
     }
 
     destroy() {

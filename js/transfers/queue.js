@@ -164,7 +164,7 @@ MegaQueue.prototype.expand = function() {
         this._expanded++;
         this._process();
         if (d) {
-            this.logger.info("expand queue " + this._running);
+            this.logger.info(`queue limit set to ${this._limit} while running ${this._running} tasks currently.`);
         }
         return true;
     }
@@ -422,11 +422,14 @@ MegaQueue.prototype.destroy = function() {
 
 MegaQueue.prototype._process = function(ms, sp) {
     'use strict';
+    /**
     if (document.hidden) {
         // everything is already throttled...
         return queueMicrotask(() => this.process(sp));
     }
     delay(this.__identity, () => this.process(sp), ms || 10);
+    /**/
+    queueMicrotask(() => this.process(sp));
 };
 
 MegaQueue.prototype.push = function(arg, next, self) {

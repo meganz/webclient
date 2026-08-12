@@ -2058,12 +2058,14 @@ fa_handler.prototype = {
 };
 
 function api_faretry(ctx, error, host) {
-    var logger = MegaLogger.getLogger('crypt');
+    'use strict';
+
     if (ctx.faRetryI) {
-        ctx.faRetryI *= 1.8;
+        ctx.faRetryI = Math.min(ctx.faRetryI * 1.7, Math.random() * 37e3);
     }
     else {
-        ctx.faRetryI = 250;
+        ctx.faRetryC = 15;
+        ctx.faRetryI = Math.random() * 128 + 96;
     }
 
     if (!ctx.p && error === EACCESS) {
@@ -2073,11 +2075,14 @@ function api_faretry(ctx, error, host) {
     if (ctx.errfa && ctx.errfa.timeout && ctx.faRetryI > ctx.errfa.timeout) {
         api_faerrlauncher(ctx, host);
     }
-    else if (error !== EACCESS && ctx.faRetryI < 5e5) {
-        logger.debug("Attribute " + (ctx.p ? 'retrieval' : 'storage') + " failed (" + error + "), retrying...",
-                     ctx.faRetryI);
+    else if (error !== EACCESS && (error === 0 || navigator.onLine === false || --ctx.faRetryC > 0)) {
+        if (self.d && host !== 'local') {
+            const mode = ctx.p ? 'retrieval' : 'storage';
+            console.info(`Attribute ${mode} #${ctx.id} failed (${error}), retrying...`, ctx.faRetryI);
+        }
+        // @todo check if a chat attachment, and give up earlier...
 
-        return setTimeout(function () {
+        return setTimeout(() => {
             if (ctx.p) {
                 api_fareq.fire(ctx.payload, ctx).catch(reportError);
             }
@@ -2117,6 +2122,27 @@ function api_faerrlauncher(ctx, host) {
 Object.defineProperty(api_fareq, 'fire', {
     async value(payload, ctx, channel) {
         'use strict';
+
+        while (1) {
+            let slot = Object.keys(faxhrs).length;
+            if (slot > 0) {
+                while (slot--) {
+                    if (!faxhrs[slot] || faxhrs[slot].readyState === XMLHttpRequest.DONE) {
+                        break;
+                    }
+                }
+            }
+
+            if (slot >= 0) {
+                break;
+            }
+
+            if (self.d > 1) {
+                console.warn(`All fa-sockets are busy, holding...`, ctx);
+            }
+            await tSleep(5);
+        }
+
         payload.a = 'ufa';
         payload.ssl = self.use_ssl;
 
@@ -2156,6 +2182,12 @@ function api_fareq(res, ctx, xhr) {
 
         for (m = pp.length; m--;) {
             for (slot = 0;; slot++) {
+                if (slot > 255) {
+                    if (self.d > 1) {
+                        console.warn('Too many fa-sockets open...', pp.length, res);
+                    }
+                    return api_faretry(ctx, 0, 'local');
+                }
                 if (!faxhrs[slot]) {
                     faxhrs[slot] = new XMLHttpRequest();
                     break;

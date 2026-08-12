@@ -783,7 +783,7 @@ function secondsToTimeLong(secs) {
  * @param {Number} seconds Number of seconds
  * @returns {string} Formatted string
  */
-function secondsToCompact(seconds) {
+var secondsToCompact = (seconds) => {
     'use strict';
     seconds = Math.floor(seconds);
 
@@ -795,7 +795,22 @@ function secondsToCompact(seconds) {
         return l.time_minute_second.replace('%1', Math.floor(seconds / 60)).replace('%2', seconds % 60);
     }
     return l.time_seconds.replace('%1', seconds);
-}
+};
+mBroadcaster.once('startMega', () => {
+    'use strict';
+
+    if (lang === 'en' || lang === 'es') {
+        secondsToCompact = (sec) => {
+            if ((sec |= 0) > 3600) {
+                return `${~~(sec / 3600)}h ${~~(sec % 3600 / 60)}m`;
+            }
+            if (sec > 60) {
+                return `${~~(sec / 60)}m ${~~(sec % 60)}s`;
+            }
+            return `${sec}s`;
+        };
+    }
+});
 
 /**
  * Calculate the number of days since the given date

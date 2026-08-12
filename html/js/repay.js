@@ -529,7 +529,8 @@ RepayPage.prototype.initPage = function() {
                         fname: '',
                         lname: '',
                         nbOfUsers: res.nb || 0,
-                        quota: Math.max(res.nbs, res.nbt) | 0,
+                        transferQuota: res.nbt | 0,
+                        storageQuota: res.nbs | 0
                     };
                 })
                 .catch(tell);

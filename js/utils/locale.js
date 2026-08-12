@@ -783,7 +783,7 @@ function secondsToTimeLong(secs) {
  * @param {Number} seconds Number of seconds
  * @returns {string} Formatted string
  */
-function secondsToCompact(seconds) {
+var secondsToCompact = (seconds) => {
     'use strict';
     seconds = Math.floor(seconds);
 
@@ -795,7 +795,22 @@ function secondsToCompact(seconds) {
         return l.time_minute_second.replace('%1', Math.floor(seconds / 60)).replace('%2', seconds % 60);
     }
     return l.time_seconds.replace('%1', seconds);
-}
+};
+mBroadcaster.once('startMega', () => {
+    'use strict';
+
+    if (lang === 'en' || lang === 'es') {
+        secondsToCompact = (sec) => {
+            if ((sec |= 0) > 3600) {
+                return `${~~(sec / 3600)}h ${~~(sec % 3600 / 60)}m`;
+            }
+            if (sec > 60) {
+                return `${~~(sec / 60)}m ${~~(sec % 60)}s`;
+            }
+            return `${sec}s`;
+        };
+    }
+});
 
 /**
  * Calculate the number of days since the given date
@@ -1093,7 +1108,6 @@ mBroadcaster.once('boot_done', function populate_l() {
         'terms#recPaiSub': "https://mega.io/terms#RecurringPaidSubscriptions",
         'terms#ref': "https://mega.io/terms#Refunds",
         'p-s/p-b/c-s': "https://help.mega.io/plans-storage/payments-billing/cancel-subscription",
-        'terms': "https://mega.io/terms",
         'pricing': "https://mega.io/pricing",
         'privacy': "https://mega.io/privacy",
         'vpn': "https://mega.io/vpn",
@@ -2264,6 +2278,8 @@ mBroadcaster.once('boot_done', function populate_l() {
         'lna_reset_p3',
         'propay_discount_title',
         'tfw_obq_text',
+        's4_recommended_plans',
+        's4_supported_plans',
     ];
     for (let i = common.length; i--;) {
         var num = common[i];

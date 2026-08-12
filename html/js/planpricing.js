@@ -317,6 +317,30 @@ lazy(pro, 'proplan2', () => {
             && new Set(u_attr.features.map(([, f]) => f));
     };
 
+    /**
+     * Render plan features into the target element.
+     *
+     * @param {jQuery} $target Target container.
+     * @param {Array} features Plan features.
+     * @returns {void}
+     */
+    const renderPlanFeatures = ($target, features) => {
+        if (!$target || !$target.length || !Array.isArray(features) || !features.length) {
+            return;
+        }
+
+        const featureHTML = features.filter(Boolean).map((feature) => {
+            return `<div class="feature">
+                <i class="${feature.icon}"></i>
+                <span>${feature.text}</span>
+            </div>`;
+        }).join('');
+
+        $target.empty().safeAppend(`
+            <div class="features-title">${l.pr_includes}</div>
+            ${featureHTML}
+        `);
+    };
 
     const moveToBuyStep = (planId) => {
         pro.proplan2.selectedPlan = planId;
@@ -1049,7 +1073,12 @@ lazy(pro, 'proplan2', () => {
             'faq6': {
                 question: l.pricing_page_faq_question_6,
                 answer: [
-                    l.pricing_page_faq_answer_6,
+                    ProFlexiFound[12]
+                        ? l.pricing_page_faq_answer_6.replace(
+                            /2[,.]50/g,
+                            formatCurrency(ProFlexiFound[12], undefined, 'number')
+                        )
+                        : l.pricing_page_faq_answer_6,
                     l.pricing_page_faq_answer_6_2.replace('%1', bytesToSize(pro.getPlanObj(3, 1).storage, 0)),
                 ],
                 eventId: 500352,
@@ -1158,6 +1187,12 @@ lazy(pro, 'proplan2', () => {
                     .removeClass('hidden');
             }
         }
+
+        // Render plan features
+        renderPlanFeatures(
+            $('.pricing-plan-features .data', $proFlexCard),
+            pro.featureInfo[pro.ACCOUNT_LEVEL_PRO_FLEXI]
+        );
 
         const baseStorage = ProFlexiFound[pro.UTQA_RES_INDEX_STORAGE] / 1024;
 
@@ -1423,6 +1458,12 @@ lazy(pro, 'proplan2', () => {
                 }
             }
 
+            // Render plan features
+            renderPlanFeatures(
+                $('.pricing-plan-features .data', $planCard),
+                planObj.featureStrings
+            );
+
             const yearlyDifference = planObj && planObj.saveUpToPrecise;
 
             if (planObj.months === 12 && planObj.saveUpToPrecise && planObj.monthlyPlan) {
@@ -1682,6 +1723,12 @@ lazy(pro, 'proplan2', () => {
 
         const planTaxInfo = businessPlanObj.taxInfo;
         const $taxInfo = $('.pricing-plan-tax', $businessCard).toggleClass('hidden', !planTaxInfo);
+
+        // Render plan features
+        renderPlanFeatures(
+            $('.pricing-plan-features .data', $businessCard),
+            businessPlanObj.featureStrings
+        );
 
         if (planTaxInfo) {
             if (pro.taxInfo.variant === 1) {
@@ -2081,6 +2128,32 @@ lazy(pro, 'proplan2', () => {
         initBuyPlan();
     };
 
+    // TODO: Use only one of either window or sessionStorage for accessing a mega.nz/pro tab
+    const canAccessProPage = () => u_attr
+        || (window.mProTab === 'exc')       // This will force the user to login, and pre-select the tab
+        || (sessionStorage.mScrollTo === 'exc')     // Does the same as above
+        || (localStorage.allowLoggedOutPricingPage);        // May be useful for future testing
+
+    /**
+     * Check the user is allowed to see the low tier version of the pro page
+     * (i.e. if the lowest plan returned is a mini plan)
+     * @returns {void}
+     */
+    const checkExclusiveTabAccess = () => {
+        if (window.mProTab !== 'exc') {
+            return;
+        }
+
+        if (!u_handle) {
+            // If not logged in, prompt them to do so
+            showSignupPromptDialog();
+        }
+        else if (!showExclusiveOffers) {
+            // Currently the exc tab is not used unless user has access to Starter, so instead load the pro page
+            window.mProTab = 'pro';
+        }
+    };
+
     const resetPricingPageInfo = () => {
         for (const tab in tabsInfo) {
             tabsInfo[tab].requiresUpdate = true;
@@ -2122,15 +2195,13 @@ lazy(pro, 'proplan2', () => {
 
     return new class {
 
+        canAccessProPage() {
+            return !!canAccessProPage();
+        }
+
         async initPage() {
 
-            // TODO: Use only one of either window or sessionStorage for accessing a mega.nz/pro tab
-            const canAccessProPage = u_attr
-                || (window.mProTab === 'exc')       // This will force the user to login, and pre-select the tab
-                || (sessionStorage.mScrollTo === 'exc')     // Does the same as above
-                || (localStorage.allowLoggedOutPricingPage);        // May be useful for future testing
-
-            if (!canAccessProPage) {
+            if (!canAccessProPage()) {
                 mega.redirect('mega.io', 'pricing', false, false);
             }
 
@@ -2149,6 +2220,12 @@ lazy(pro, 'proplan2', () => {
 
             await fetchPlansData();
             await fetchBusinessPlanInfo();
+
+            // Check if still on pro page
+            if (page !== 'pro') {
+                loadingDialog.hide('pricingReady');
+                return;
+            }
 
             // Temporary fix for desktop propay as it does not using new header
             if (is_mobile && mega.ui.header) {
@@ -2169,18 +2246,7 @@ lazy(pro, 'proplan2', () => {
                 eventlog(pro.taxInfo ? 500909 : 500908);
             });
 
-            // Check the user is allowed to see the low tier version of the pro page
-            // (i.e. if the lowest plan returned is a mini plan)
-            if (window.mProTab === 'exc') {
-                if (!u_handle) {
-                    // If not logged in, prompt them to do so
-                    showSignupPromptDialog();
-                }
-                else if (!showExclusiveOffers) {
-                    // Currently the exc tab is not used unless user has access to Starter, so instead load the pro page
-                    window.mProTab = 'pro';
-                }
-            }
+            checkExclusiveTabAccess();
 
             // Using the back arrow will rebuild the page and the cached items will be incorrect
             resetPricingPageInfo();

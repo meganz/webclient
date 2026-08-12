@@ -46,7 +46,7 @@
       "serialize-javascript": "7.0.5"
     },
     "minimatch@3.1.5": {
-      "brace-expansion": "1.1.16"
+      "brace-expansion": "1.1.18"
     },
     "minimatch@10.2.5": {
       "brace-expansion": ">=5.0.8"
@@ -73,12 +73,12 @@
     "babel-plugin-minify-constant-folding": "0.5.0",
     "babel-plugin-minify-dead-code-elimination": "0.5.2",
     "babel-plugin-minify-guarded-expressions": "0.4.4",
-    "cssnano": "8.0.2",
+    "cssnano": "8.0.5",
     "grunt": "1.6.3",
     "grunt-contrib-concat": "2.1.0",
     "grunt-posthtml": "0.5.2",
     "htmlnano": "3.4.0",
-    "postcss": "8.5.25",
+    "postcss": "8.5.26",
     "postcss-url": "10.1.4",
     "posthtml": "0.16.7",
     "posthtml-urls": "1.0.0",
@@ -108,7 +108,7 @@
     "karma-junit-reporter": "2.0",
     "karma-mocha": "2.0.1",
     "karma-sinon": "1.0.5",
-    "mocha": "11.7.6",
+    "mocha": "11.8.0",
     "react-hot-loader": "4.13.1",
     "sass": "1.102.0",
     "sass-loader": "17.0.0",

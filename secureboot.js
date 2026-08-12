@@ -2481,7 +2481,6 @@ else if (!browserUpdate) {
         jsl.push({f:'html/fm.html', n: 'fm', j:0, w:3});
         jsl.push({f:'html/top-login.html', n: 'top-login', j:0});
         jsl.push({f:'html/dialogs.html', n: 'dialogs', j:0,w:2});
-        jsl.push({f:'html/contact-avatar.svg', n: 'contact_avatar', j:0});
         jsl.push({f:'html/rewind.html', n: 'rewind', j:0});
         jsl.push({f:'html/device-centre-shimmer.html', n: 'device_centre_shimmer_html', j:0});
         jsl.push({f:'html/notification-shimmer.html', n: 'notification_shimmer_html', j:0});
@@ -2973,6 +2972,7 @@ else if (!browserUpdate) {
         'time_checker_js': {f:'js/time_checker.js', n:'time_checker_js', j:1},
         'filerequest_js': {f:'js/filerequest.js', n: 'filerequest_js', j:1 },
         'filerequest_upload_js': {f:'js/filerequest_upload.js', n: 'filerequest_upload_js', j:1 },
+        'jszip_js': {f:'js/vendor/jszip.js', n: 'jszip_js', j:4},
         'docxpreview_js': {f:'js/vendor/docx-preview.js', n: 'docxpreview_js', j:4},
         'docxviewer_js': {f:'js/ui/docx.viewer.js', n: 'docxviewer_js', j:4},
         'docxviewer': {f:'html/docx.viewer.html', n: 'docxviewer', j:0},

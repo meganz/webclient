@@ -2658,11 +2658,28 @@ accountUI.fileManagement = {
                 }
             }
         },
-        bindEvents: function() {
+        getRetentionDays: () => {
 
             'use strict';
 
+            if (u_attr.flags.ssrs > 0) {
+                return M.account ? M.account.ssrs | 0 : 0;
+            }
+
+            var opt = String(fmconfig.rubsched || '').split(':');
+
+            return opt[0] === '14' ? opt[1] | 0 : 0;
+        },
+
+        bindEvents: account => {
+
+            'use strict';
+
+            var confirmOpen = false;
+
             $('.rubsched_textopt', accountUI.$contentBlock).rebind('click.rs blur.rs keypress.rs paste.rs', function(e){
+
+                const $this = $(this);
 
                 // Firefox fix bug on allowing strings on input type number applies to Webkit also
                 if (this.id === 'rad14_opt' && (e.type === 'paste' || e.type === 'keypress') &&
@@ -2671,13 +2688,14 @@ accountUI.fileManagement = {
                 }
 
                 // Do not save value until user leave input or click Enter button
-                if (e.which && e.which !== 13) {
+                if (e.which && e.which !== 13 || $this.val().length === 0) {
                     return;
                 }
 
-                if ($(this).val().length !== 0) {
+                // Clamp the entered value to the allowed range, refresh the label and store it.
+                const commit = () => {
 
-                    var curVal = parseInt($(this).val()) | 0;
+                    let curVal = parseInt($this.val()) | 0;
                     var maxVal;
 
                     if (this.id === 'rad14_opt') { // For days option
@@ -2697,11 +2715,44 @@ accountUI.fileManagement = {
                         curVal = Math.min(curVal, maxVal);
                     }
 
-                    $(this).val(curVal);
+                    $this.val(curVal);
 
                     var id = String(this.id).split('_')[0];
                     mega.config.setn('rubsched', `${id.substr(3)}:${curVal}`);
+                };
+
+                const legacyDays = accountUI.fileManagement.rubsched.getRetentionDays();
+
+                if (this.id === 'rad14_opt' && !u_attr.p && legacyDays > 30) {
+
+                    // Field left unchanged - keep the legacy value as-is, don't clamp/save it.
+                    if ((parseInt($this.val()) | 0) === legacyDays || confirmOpen) {
+                        return;
+                    }
+
+                    confirmOpen = true;
+
+                    msgDialog(
+                        `confirmation:!^${l[1776]}!${l.rubsched_downgrade_keep}`,
+                        '',
+                        l.rubsched_downgrade_title,
+                        l.rubsched_downgrade_body,
+                        change => {
+                            confirmOpen = false;
+
+                            if (change) {
+                                commit();
+                            }
+                            else {
+                                $this.val(legacyDays);
+                            }
+                        }
+                    );
+
+                    return;
                 }
+
+                commit();
             });
         }
     },
@@ -3333,9 +3384,11 @@ accountUI.transfers = {
 
                 tbody.textContent = '';
 
-                const phmap = {};
-                for (const h of Object.keys(M.su.EXP)) {
-                    phmap[M.su.EXP[h].ph] = h;
+                const phmap = Object.create(null);
+                if (M.su.EXP) {
+                    for (const h of Object.keys(M.su.EXP)) {
+                        phmap[M.su.EXP[h].ph] = h;
+                    }
                 }
 
                 for (let i = migrations.length; i--;) {
@@ -4172,13 +4225,15 @@ accountUI.s4 = {
     init() {
         'use strict';
 
-        if ((this.$container = ('.fm-account-s4', accountUI.$contentBlock)).length === 0) {
+        this.$container = $('.fm-account-s4', accountUI.$contentBlock);
+
+        if (this.$container.length === 0) {
             return false;
         }
 
         // Render endpoints list
         if ('utils' in s4) {
-            s4.utils.renderEndpointsData(this.$container);
+            s4.main.renderEndpoints(this.$container[0]);
         }
 
         this.bindEvents();

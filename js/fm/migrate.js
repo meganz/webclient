@@ -200,6 +200,7 @@ lazy(mega, 'migrate', () => {
         contentClassname: 'mega-journey migrate',
         showClose: true,
         dialogName: 'migrate-dialog',
+        preventBgClosing: false,
         steps: [
             // Step 1: Select Provider (Migrate your files step)
             {

@@ -1796,8 +1796,9 @@ pro.propay = {
             }
             else if (this.discountInfo) {
                 const discountDuration = this.discountInfo.m || this.planObj.months;
-                localNet = (forceEuro ? priceEuro : price) * discountDuration;
-                localTotal = (forceEuro ? taxedPriceEuro : taxedPrice) * discountDuration;
+                const basePricing = this.planObj.getPricing(true, discountDuration);
+                localNet = forceEuro ? basePricing.priceEuro : basePricing.price;
+                localTotal = forceEuro ? basePricing.taxedPriceEuro : basePricing.taxedPrice;
                 localTaxAmount = localTotal - localNet;
             }
 
@@ -1841,13 +1842,17 @@ pro.propay = {
             let {lda, eda} = discountInfo;
             const {ldtp, edtp} = discountInfo;
 
-            if (monthlyPlan && monthlyPlan.taxInfo) {
-                lda = monthlyPlan.taxInfo.taxedPrice * discountDuration - ldtp;
-                eda = monthlyPlan.taxInfo.taxedPriceEuro * discountDuration - edtp;
-            }
-            else if (monthlyPlan) {
-                lda = monthlyPlan.price * discountDuration - ldtp;
-                eda = monthlyPlan.priceEuro * discountDuration - edtp;
+            if (monthlyPlan) {
+                const basePricing = this.planObj.getPricing(true, discountDuration);
+
+                if (monthlyPlan.taxInfo) {
+                    lda = basePricing.taxedPrice - ldtp;
+                    eda = basePricing.taxedPriceEuro - edtp;
+                }
+                else {
+                    lda = basePricing.price - ldtp;
+                    eda = basePricing.priceEuro - edtp;
+                }
             }
 
             $('.pricing-element .duration-type', $planCard)
@@ -1882,13 +1887,12 @@ pro.propay = {
             if (!this.planObj.taxInfo) {
                 $preDiscount.removeClass('hidden');
 
-                const months = this.planObj.months;
-                const monthlyPlan = months === 1 ? this.planObj : pro.getPlanObj(this.planObj.level, 1);
-
-                const preTaxPrice = monthlyPlan
-                    ? monthlyPlan.getFormattedPrice('narrowSymbol', forceEuro, false, discountDuration)
-                    : this.planObj
-                        .getFormattedPrice('narrowSymbol', forceEuro, this.isVoucherBalance(), discountDuration);
+                const basePricing = this.planObj.getPricing(true, discountDuration);
+                const preTaxPrice = formatCurrency(
+                    forceEuro ? basePricing.priceEuro : basePricing.price,
+                    forceEuro ? 'EUR' : this.planObj.currency,
+                    'narrowSymbol'
+                );
 
                 $('.pre-discount-value', $preDiscount)
                     .text(preTaxPrice
@@ -3036,6 +3040,10 @@ pro.propay = {
         switch (showLoading && this.proPaymentMethod) {
             case 'stripe':
                 break;
+            case 'stripeID':
+                // Debounce so a fast invalidInput from the iframe cancels the show before it appears (avoids flicker)
+                delay('propay.stripeOverlay', () => pro.propay.showLoadingOverlay('transferring'), 100);
+                break;
             case 'bitcoin':
                 pro.propay.showLoadingOverlay('loading');
                 break;
@@ -3709,6 +3717,16 @@ pro.propay = {
             delete pro.propay.pageChangeHandler;
         }
 
+        $('.back-button', this.$page).rebind('click', () => {
+
+            // The pro page bounces to mega.io in this case, so skip the intermediate load
+            if (!pro.proplan2.canAccessProPage()) {
+                return mega.redirect('mega.io', 'pricing', false, false);
+            }
+
+            loadSubPage('pro');
+        });
+
         pro.propay.pageChangeHandler = mBroadcaster.addListener('pagechange', () => {
             if (!pro.propay.onPropayPage()) {
                 pro.propay.hideLoadingOverlay();
@@ -4173,7 +4191,7 @@ pro.propay = {
         const currency = isEuro && 'EUR' || lcc;
         const isBeforeTax = txe === 2;
         const newPrice = isEuro ? (isBeforeTax ? edtpn : edtp) : (isBeforeTax ? ldtpn : ldtp);
-        const prevPrice = matchedPlanObj.getPricing(true)[isEuro ? 'priceEuro' : 'price'];
+        const prevPrice = matchedPlanObj.getPricing(true, m)[isEuro ? 'priceEuro' : 'price'];
 
         const template = mega.templates.getTemplate('discount-dialog-content-temp')[0];
         template.querySelector('h1').textContent = pro.getProPlanName(al);

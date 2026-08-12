@@ -276,6 +276,13 @@
 .pricing-plan-card .pricing-plan-subheading2 {
     background: var(--color-secondary-cobalt-50);
 }
+
+/* Banner fills the card width but must not widen its grid track */
+.pricing-pg .pricing-pg.plans-cards-container .pricing-plan-card .pricing-plan-recommend {
+    box-sizing: border-box;
+    width: 0;
+    min-width: 100%;
+}
 .pricing-plan-card .pricing-plan-title {
     font: var(--text-h5-pricing);
     margin-top: 52px;
@@ -322,25 +329,36 @@
     margin-top: 8px;
     position: relative;
 }
-.pricing-flexi-block-contianer .pricing-plan-card .pricing-plan-features {
+.pricing-flexi-block-contianer .pricing-plan-card .pricing-plan-features .data {
     padding-top: 0;
     padding-bottom: 32px;
 }
 .pricing-plan-card .pricing-plan-features {
     flex-grow: 1;
-    padding-top: 32px;
-    padding-bottom: 56px;
+    padding-top: 24px;
     font: var(--text-copy-medium-pricing);
 }
-.pricing-plan-card .pricing-plan-features:empty {
-    padding-top: 24px;
-    padding-bottom: 0;
+
+.pricing-plan-card .pricing-plan-features .data {
+    padding-top: 8px;
+    padding-bottom: 56px;
 }
-.pricing-plan-card .pricing-plan-features > * {
-    display: flex;
+
+.pricing-plan-card .pricing-plan-features .data:empty {
+    padding: 0;
+}
+
+.pricing-plan-card .pricing-plan-features .feature {
     align-items: center;
+    display: flex;
     margin-top: 8px;
 }
+
+.pricing-plan-card .pricing-plan-features .feature span {
+    min-width: 0;
+    max-width: 100%;
+}
+
 .pricing-plan-card .pricing-plan-features .features-title {
     font: var(--text-copy-card-pricing-medium-bold);
 }
@@ -354,12 +372,14 @@
     font: var(--text-body2);
 }
 .pricing-plan-card .pricing-plan-more {
-    margin-top: 8px;
+    margin: -45px 0 40px;
     font: var(--text-copy-secondary-pricing);
     color: var(--color-copy-secondary);
-    position: absolute;
     padding-inline-end: 24px;
     white-space: initial;
+}
+.pricing-plan-card .pricing-plan-more .data:empty ~.pricing-plan-more {
+    margin-top: 8px;
 }
 .pricing-plan-card .pricing-plan-more span,
 .pricing-plan-card .vpn-read-more,
@@ -1161,6 +1181,7 @@ i.pricing-i-icon {
 }
 .pricing-pg .pricing-pg.pricing-feature-plan-container .plans-cards-container {
     place-items: center;
+    grid-auto-columns: minmax(0, 1fr);
 }
 .pricing-pg .pricing-pg.pricing-feature-plan-container .plans-cards-container .pricing-plan-card-wrapper {
     width: 100%;

@@ -277,7 +277,7 @@ lazy(mega, 'wsuploadmgr', () => {
         // returns [position, size, fileno] of next chunk, or false if we're done
         nextchunk() {
             if (ulQueue.isPaused()) {
-                if (self.d > 1) {
+                if (self.d > 2) {
                     this.logger.warn("All transfers paused.");
                 }
                 return false;
@@ -290,7 +290,7 @@ lazy(mega, 'wsuploadmgr', () => {
 
                 // if the file upload has been cancelled, skip
                 if (!ul || ul.done || ul.abort) {
-                    if (self.d) {
+                    if (self.d > 1) {
                         this.logger.info(`Not resending chunk (file #${fileno} ${pos} ${len}) - done/aborted`);
                     }
                     this.toresend.splice(0, 1);
@@ -299,14 +299,14 @@ lazy(mega, 'wsuploadmgr', () => {
 
                 // if the chunk isn't available yet, proceed with fresh chunks until it is
                 if (pos < ul.reader.file.size && !ul.reader.haveChunk(pos)) {
-                    if (self.d) {
+                    if (self.d > 1) {
                         this.logger.info(`Not resending chunk (file #${fileno} ${pos} ${len}) - waiting for reader`);
                     }
                     break;
                 }
 
-                if (self.d) {
-                    this.logger.info(`Resending chunk (file #${fileno} ${pos} ${len})`);
+                if (self.d > 1) {
+                    this.logger.info(`Resending chunk (file #${fileno} ${pos}-${len} of ${ul.reader.file.size})`);
                 }
 
                 this.toresend.splice(0, 1);
@@ -373,12 +373,12 @@ lazy(mega, 'wsuploadmgr', () => {
             const fu = this.files[chunk[2]];
 
             if (!fu || fu.done || fu.abort) {
-                if (self.d) {
+                if (self.d > 1) {
                     this.logger.debug(`Not retrying chunk ${JSON.stringify(chunk)} (done/aborted)`);
                 }
             }
             else {
-                if (self.d) {
+                if (self.d > 1) {
                     this.logger.debug(`Going to retry chunk ${JSON.stringify(chunk)}`);
                 }
 
@@ -417,7 +417,7 @@ lazy(mega, 'wsuploadmgr', () => {
         // returns true if something was sent, false otherwise
         sendchunk(ws) {
             // if connection is up and buffer is not too full, we send another chunk
-            if (ws.readyState === WebSocket.OPEN && ws.bufferedAmount < 1500000) {
+            if (ws.readyState === WebSocket.OPEN && ws.bufferedAmount < ws.adaptiveLimit * 1.5) {
                 const chunk = this.nextchunk();
 
                 if (chunk) {
@@ -441,7 +441,7 @@ lazy(mega, 'wsuploadmgr', () => {
                             const at = `${chunk[0]}: ${buf.byteLength} != ${chunk[1]}`;
                             this.logger.error(`GetChunk for file #${chunk[2]} failed at ${at}`, buf);
                         }
-                        else {
+                        else if (self.d > 1) {
                             this.logger.log(`No chunk at ${chunk[0]} file #${chunk[2]}`);
                         }
                     }
@@ -468,22 +468,27 @@ lazy(mega, 'wsuploadmgr', () => {
                 }
                 else {
                     // do not overfill send buffers
-                    if (ws.bufferedAmount > 1500000) {
+                    if (ws.bufferedAmount > ws.adaptiveLimit) {
                         break;
                     }
 
                     // did the socket buffer run empty?
-                    if (ws.lastround !== undefined && !ws.bufferedAmount && (round - ws.lastround & 0xffffffff) === 1) {
+                    if (!ws.bufferedAmount && (round - ws.lastround & 0xffffffff) === 1) {
                         tooslow = true;
+
+                        ws.adaptiveLimit = Math.min(2097151, Math.floor(ws.adaptiveLimit * 1.12));
+
+                        // logger.info(`adaptiveLimit set to ${ws.adaptiveLimit}`, ws);
                     }
 
                     // ws is the WebSocket that shall receive the next chunk
                     if (!this.sendchunk(ws)) {
+                        tooslow = tooslow || !ws.bufferedAmount;
                         break;
                     }
 
                     // WebSocket buffer full? tag it with round to see if it ran empty in one interval
-                    if (ws.bufferedAmount > 1500000) {
+                    if (ws.bufferedAmount > ws.adaptiveLimit) {
                         ws.lastround = round;
                     }
                 }
@@ -543,7 +548,7 @@ lazy(mega, 'wsuploadmgr', () => {
             const oldestvalid = Date.now() - 24 * 3600 * 1000;
 
             // set number of concurrent FileUpload instances
-            ulQueue.setSize(Math.max(2, u.length | 0));
+            // ulQueue.setSize(Math.max(2, u.length | 0));
 
             // store API size class allocation and corresponding upload URLs
             for (let i = 0; i < u.length; i++) {
@@ -616,7 +621,7 @@ lazy(mega, 'wsuploadmgr', () => {
                 this.pools[i].files[fileno] = fu;
                 this.pools[i].sendchunks(0);
 
-                if (self.d) {
+                if (self.d > 1) {
                     this.logger.info(`fileno#${fileno} assigned to ${file.owner}`, [fu]);
                 }
             }
@@ -628,7 +633,7 @@ lazy(mega, 'wsuploadmgr', () => {
             }
         }
 
-        pumpdata(wmgr) {
+        pumpdata() {
             // delete empty inactive pools (which start at index this.maxulsize.length + 1)
             for (let i = this.pools.length; --i > this.maxulsize.length;) {
                 if (!this.pools[i].chunksinflight && !Object.keys(this.pools[i].files).length) {
@@ -779,6 +784,8 @@ lazy(mega, 'wsuploadmgr', () => {
                     this.removeEventListener('error', errorhandler);
                     this.close();
                 };
+
+                ws.adaptiveLimit = 524288;
             });
         }
 
@@ -794,7 +801,9 @@ lazy(mega, 'wsuploadmgr', () => {
                 chunk = this.flush(ws, fileno, chunkpos);
 
                 if (!fu.reader) {
-                    this.logger.warn(`No upload associated with file #${fileno}`);
+                    if (self.d > 1) {
+                        this.logger.warn(`No upload associated with file #${fileno}`);
+                    }
                     delete ws.pool.files[fileno];
                     return this.stop();
                 }
@@ -946,12 +955,13 @@ lazy(mega, 'wsuploadmgr', () => {
 
             while (1) {
                 await sleep(val / 1e3);
-                this.seconds += val / 1e3;
 
                 if (pid !== this.running) {
                     break;
                 }
-                if (this.poolmgr.pumpdata(this)) {
+                this.seconds += val / 1e3;
+
+                if (this.poolmgr.pumpdata()) {
                     // (40 ms and 2 MB WebSocket buffers should be fast enough?)
                     val = val * 0.75 + 10;
                 }
@@ -1051,9 +1061,9 @@ lazy(mega, 'wsuploadmgr', () => {
             if (self.d) {
                 logger.info('Generating fingerprint...', file);
             }
+            const data = size < 0x400000 && new Uint8Array(await file.arrayBuffer());
 
             if (size <= 8192) {
-                const data = new Uint8Array(await file.arrayBuffer());
 
                 if (size <= CRC_SIZE) {
                     crc.set(data);
@@ -1075,9 +1085,11 @@ lazy(mega, 'wsuploadmgr', () => {
                     let v = 0;
                     for (let j = 0; j < blocks; ++j) {
                         const offset = parseInt((size - BLOCK_SIZE) * (i * blocks + j) / (4 * blocks - 1));
-                        const data = await file.slice(offset, offset + BLOCK_SIZE).arrayBuffer();
+                        const chunk = data
+                            ? data.subarray(offset, offset + BLOCK_SIZE)
+                            : await file.slice(offset, offset + BLOCK_SIZE).arrayBuffer();
 
-                        v = crc32b(data, v);
+                        v = crc32b(chunk, v);
                     }
 
                     dv.setUint32(i << 2, v);
@@ -1091,6 +1103,7 @@ lazy(mega, 'wsuploadmgr', () => {
 
             return {
                 ts,
+                data,
                 hash: base64urlencode(String.fromCharCode(...crc))
             };
         }

@@ -695,11 +695,20 @@ mBroadcaster.once('boot_done', function radSetup() {
         }
 
         if (es.includes('[object ')) {
-            return `Uncaught ${ex.constructor.name || ':fly:'}`;
+            let {name} = ex.constructor || !1;
+            if (name === 'Object') {
+                const keys = Object.keys(ex).slice(0, 4);
+                if (keys.length) {
+                    name = `~${name}{${keys}}`;
+                }
+            }
+            return `Uncaught ${name || ':fly:'}`;
         }
 
         return ei && ex.name === 'AbortError'
         || es.includes(api_strerror(EROLLEDBACK))
+        || es.includes('IndexedDB API missing.')
+        || es.includes('TypeError: Failed to fetch')
         || es.includes('Restarting connection due ') ? 0 : es;
     });
 

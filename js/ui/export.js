@@ -980,7 +980,7 @@ var exportExpiry = {
  */
 function logExportEvt(evtId, data) {
     'use strict';
-    eventlog(evtId, JSON.stringify(data));
+    eventlog(evtId, data && tryCatch(() => JSON.stringify(data))() || null);
 }
 
 
@@ -1627,7 +1627,7 @@ function logExportEvt(evtId, data) {
         let i = $.itemExport.length;
 
         while (--i >= 0) {
-            counts[M.getNodeByHandle($.itemExport[i]).t]++;
+            counts[M.getNodeByHandle($.itemExport[i]).t | 0]++;
         }
 
         logExportEvt(500767, counts);
@@ -1650,6 +1650,10 @@ function logExportEvt(evtId, data) {
                 evt.preventDefault();
 
                 const texts = sheet.contentNode.querySelectorAll('.select-text');
+                if (!(texts && texts.length)) {
+                    console.warn('.select-text gave nothing...');
+                    return false;
+                }
 
                 const selection = window.getSelection();
                 selection.removeAllRanges();

@@ -1126,7 +1126,7 @@ function avatarDialog(close) {
                 // Update mega.io about the new avatar change
                 initMegaIoIframe(true);
 
-                avatarDialog(1);
+                onIdle(() => avatarDialog(1));
             }
         });
     });

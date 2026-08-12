@@ -47,7 +47,6 @@ var ulmanager = {
     ulIDToNode: Object.create(null),
     ulEventData: Object.create(null),
     isUploading: false,
-    ulSetupQueue: false,
     ulCompletingPhase: Object.create(null),
     ulOverStorageQuota: false,
     ulOverStorageQueue: [],
@@ -68,7 +67,7 @@ var ulmanager = {
     ulStrError: function UM_ulStrError(code) {
         code = parseInt(code);
         var keys = Object.keys(this.ulErrorMap);
-        var values = obj_values(this.ulErrorMap);
+        var values = Object.values(this.ulErrorMap);
         return keys[values.indexOf(code)] || code;
     },
 
@@ -410,7 +409,6 @@ var ulmanager = {
                 gid.forEach(this.abort.bind(this));
             }
             else {
-                this.ulSetupQueue = false;
                 this.abortAll();
             }
 
@@ -624,9 +622,8 @@ var ulmanager = {
     },
 
     ulFinalize: function UM_ul_finalize(file, target) {
-        if (d) {
-            ulmanager.logger.info(file.name, "ul_finalize", file.target, target);
-        }
+        'use strict';
+
         if (file.repair) {
             file.target = target = M.RubbishID;
         }
@@ -727,7 +724,7 @@ var ulmanager = {
             this.ulCompletingPhase[file.owner.gid] = Date.now();
         }
 
-        if (this.ulFinalizeQueue.push([n, req, ctx]) > ulQueue.maxActiveTransfers || ulQueue.isFinalising()) {
+        if (this.ulFinalizeQueue.push([n, req, ctx]) > ulQueue.maxActiveTransfers) {
             this.ulCompletePending();
         }
         else {
@@ -762,21 +759,21 @@ var ulmanager = {
                 ul_key[4],
                 ul_key[5]
             ];
+
+            if (file.ul_aes) {
+                file.ul_aes = new sjcl.cipher.aes([
+                    file.ul_key[0], file.ul_key[1], file.ul_key[2], file.ul_key[3]
+                ]);
+            }
         }
         else if (!file.ul_key) {
-            file.ul_key = Array(6);
             // generate ul_key and nonce
-            for (i = 6; i--;) {
-                file.ul_key[i] = rand(0x100000000);
-            }
+            file.ul_key = [...crypto.getRandomValues(new Uint32Array(6))];
         }
 
         file.ul_lastProgressUpdate = 0;
         file.ul_macs = Object.create(null);
         file.ul_keyNonce = JSON.stringify(file.ul_key);
-        file.ul_aes = new sjcl.cipher.aes([
-            file.ul_key[0], file.ul_key[1], file.ul_key[2], file.ul_key[3]
-        ]);
 
         if (!file.faid && !window.omitthumb) {
             var img = is_image(file.name);
@@ -784,6 +781,9 @@ var ulmanager = {
 
             if (img || vid) {
                 file.faid = ++ulmanager.ulFaId;
+                file.ul_aes = new sjcl.cipher.aes([
+                    file.ul_key[0], file.ul_key[1], file.ul_key[2], file.ul_key[3]
+                ]);
 
                 createthumbnail(
                     file,
@@ -1125,38 +1125,25 @@ var ulmanager = {
      *
      * @param {Object}  aFileUpload  FileUpload instance
      * @param {Object}  aFile        File API interface instance
-     * @param {Boolean} [aForce]     Ignore locking queue.
+     * @returns {void}
      */
-    ulSetup: function ulSetup(aFileUpload, aFile, aForce) {
+    ulSetup(aFileUpload, aFile) {
         'use strict';
-
-        var dequeue = function ulSetupDQ() {
-            if (ulmanager.ulSetupQueue.length) {
-                var upload = ulmanager.ulSetupQueue.shift();
-                onIdle(ulmanager.ulSetup.bind(ulmanager, upload, upload.file, true));
-            }
-            else {
-                ulmanager.ulSetupQueue = false;
-            }
-        };
 
         if (!aFileUpload || !aFile || aFileUpload.file !== aFile || !aFile.hash) {
             if (d) {
                 console.warn('Invalid upload instance, cancelled?', oIsFrozen(aFileUpload), aFileUpload, aFile);
             }
-            return onIdle(dequeue);
+            return;
         }
 
-        if (!aForce) {
-            if (this.ulSetupQueue) {
-                return this.ulSetupQueue.push(aFileUpload);
-            }
-            this.ulSetupQueue = [];
+        if (is_megadrop) {
+            this.ulStart(aFileUpload);
+            return;
         }
 
         var hashNode;
         var startUpload = function _startUpload() {
-            onIdle(dequeue);
 
             var identical = ulmanager.ulIdentical(aFile);
             ulmanager.logger.info(aFile.name, "fingerprint", aFile.hash, M.h[aFile.hash], identical);
@@ -1169,10 +1156,6 @@ var ulmanager = {
             }
         };
 
-        if (is_megadrop) {
-            return startUpload();
-        }
-
         var promises = [];
 
         if (!M.getChildren(aFile.target)) {
@@ -1180,7 +1163,7 @@ var ulmanager = {
         }
 
         const [h] = M.h[aFile.hash] || [];
-        if (!M.getNodeByHandle(h)) {
+        if (!h || !M.getNodeByHandle(h)) {
             promises.push(dbfetch.hash(aFile.hash).then(node => (hashNode = node)));
         }
 
@@ -1269,7 +1252,7 @@ FileUpload.prototype.destroy = function(mul) {
     'use strict';
 
     if (d) {
-        ulmanager.logger[this.file ? 'group' : 'warn'](`Destroying ${this} (%s)`, this.file && this.file.name || 'n/a');
+        ulmanager.logger[this.file ? 'info' : 'warn'](`Destroying ${this} (%s)`, this.file && this.file.name || 'n/a');
     }
     if (!this.file) {
         return;
@@ -1293,7 +1276,6 @@ FileUpload.prototype.destroy = function(mul) {
     if (d) {
         const tr = document.getElementById(ulmanager.getGID(this.file));
         ulmanager.logger.debug(`${this} DOM State: ${tr ? tr.classList.value : 'INVALID'}`);
-        queueMicrotask(() => ulmanager.logger.groupEnd());
     }
     oDestroy(this.file);
     oDestroy(this);
@@ -1309,22 +1291,12 @@ FileUpload.prototype.run = function(done) {
     file.xr = dlmanager.mGetXR();
     file.ul_lastreason = file.ul_lastreason || 0;
 
-    if (!(file.ulSilent || file.xput)) {
-        const domNodeExists = M.transferRowExists(`ul_${file.id}`);
-
-        if (ulmanager.ulStartingPhase || !domNodeExists) {
-            done();
-            ASSERT(0, "This shouldn't happen");
-            return ulQueue.pushFirst(this);
-        }
-    }
-
     if (!GlobalProgress[this.gid].started) {
         GlobalProgress[this.gid].started = true;
     }
 
     if (d) {
-        ulmanager.logger.group(`Starting upload ${this} (%s)`, file.name);
+        ulmanager.logger.info(`Starting upload ${this} (%s)`, file.name);
     }
 
     var started = false;
@@ -1333,12 +1305,8 @@ FileUpload.prototype.run = function(done) {
             return;
         }
         started = true;
-        ulmanager.ulStartingPhase = false;
         delete file.done_starting;
 
-        if (d) {
-            queueMicrotask(() => ulmanager.logger.groupEnd());
-        }
         file = self = false;
         done();
     };
@@ -1354,7 +1322,15 @@ FileUpload.prototype.run = function(done) {
         else {
             file.ts = result.ts;
             file.hash = result.hash;
+            if (result.data) {
+                file.pDataBuffer = result.data;
+            }
             ulmanager.ulSetup(self, file);
+
+            if (file.size < 0x1000000) {
+
+                ulQueue.expand();
+            }
         }
     }).catch(function(ex) {
         // TODO: Improve further what error message we do show to the user.
@@ -1463,13 +1439,6 @@ ulQueue.poke = function(file, meth) {
     }
 };
 
-ulQueue.validateTask = function(pzTask) {
-    'use strict';
-
-    return pzTask instanceof FileUpload
-        && (pzTask.file.xput || pzTask.file.ulSilent || M.transferRowExists(`ul_${pzTask.file.id}`));
-};
-
 ulQueue.canExpand = function(max) {
     max = max || this.maxActiveTransfers;
     return !is_mobile && this._running < max;
@@ -1480,7 +1449,7 @@ Object.defineProperty(ulQueue, 'maxActiveTransfers', {
     // eslint-disable-next-line strict
     get: self.is_mobile ? () => 1 : self.is_transferit ? () => ulmanager.ulDefConcurrency << 2
         : function() {
-            return (fmconfig.ul_maxSlots || ulmanager.ulDefConcurrency) << 2;
+            return (fmconfig.ul_maxSlots || ulmanager.ulDefConcurrency) << 3;
         }
 });
 

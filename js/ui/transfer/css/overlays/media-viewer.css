@@ -158,7 +158,8 @@
 }
 
 .media-viewer-container.docx .media-viewer header,
-.media-viewer-container.pdf .media-viewer header {
+.media-viewer-container.pdf .media-viewer header,
+.media-viewer-container.xlsx .media-viewer header {
     position: relative;
 }
 

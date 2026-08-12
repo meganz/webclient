@@ -42,7 +42,10 @@ pro.propay.signup = {
 
         const currentGatewayId = pro.propay.currentGateway && pro.propay.currentGateway.gatewayId;
 
-        if (currentGatewayId === addressDialog.gatewayId_stripe && !pro.propay.paymentButton) {
+        if (currentGatewayId === addressDialog.gatewayId_stripe
+            && !pro.propay.paymentButton
+            && (pro.propay.currentGateway && pro.propay.currentGateway.gatewayName !== 'stripeID')) {
+
             if (cardValid === undefined) {
                 return this.validateCard(undefined);
             }

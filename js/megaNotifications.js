@@ -68,7 +68,7 @@
             self
                 .rebind("onCounterUpdated.favicon", function() {
                     var count = 0;
-                    obj_values(self._counters).forEach(function(v) {
+                    Object.values(self._counters).forEach((v) => {
                         count += v ? v : 0;
                     });
 

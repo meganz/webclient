@@ -159,12 +159,24 @@ accountUI.plan = {
 
             const $planDetails = $('.accounttype .plan-details', $planContent);
 
-            // Find the first Pro/Business plan the user purchased
+            // Current account level; u_attr.p is undefined for expired Business/Pro Flexi, so derive those.
+            const currentLevel = u_attr.b
+                ? pro.ACCOUNT_LEVEL_BUSINESS
+                : u_attr.pf
+                    ? pro.ACCOUNT_LEVEL_PRO_FLEXI
+                    : u_attr.p;
+
+            // Match the current level; a downgrade can leave a lower recurring sub beside the active plan.
             const activeSubscription = account.subs.find(({ al, next }) =>
-                next >= unixtime() && al !== pro.ACCOUNT_LEVEL_FEATURE
+                next >= unixtime() && al === currentLevel
             );
+            // Business and Pro Flexi accounts stay at their level after expiry, so keep an expired
+            // plan for those; other Pro plans revert to Free once expired.
             const activePlan = !activeSubscription && account.plans.find(({ al, expires }) =>
-                expires >= unixtime() && al !== pro.ACCOUNT_LEVEL_FEATURE
+                al === currentLevel
+                && (expires >= unixtime()
+                    || al === pro.ACCOUNT_LEVEL_BUSINESS
+                    || al === pro.ACCOUNT_LEVEL_PRO_FLEXI)
             );
             const mainPlanDetails = activeSubscription || activePlan;
 
@@ -173,7 +185,7 @@ accountUI.plan = {
                 var planText = pro.getProPlanName(planNum);
 
                 // Add paid class for plan card priority (Non-feature plan > Feature plan > Free)
-                $planDetails.addClass('paid').attr('subid', mainPlanDetails.id);
+                $planDetails.addClass('paid').attr('subid', mainPlanDetails.id || '');
 
                 // if this is p=100 business or p=101 flexi
                 if (planNum === pro.ACCOUNT_LEVEL_BUSINESS || planNum === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
@@ -195,11 +207,12 @@ accountUI.plan = {
                 if (mainPlanDetails.next) {
                     this.renderSubscription(mainPlanDetails, $planContent);
                 }
-                // One-off or cancelled
+                // One-off, cancelled, or expired
                 else if (mainPlanDetails.expires) {
                     const expiryTimestamp = M.account.expiry || mainPlanDetails.expires;
 
-                    $('.subtitle-txt.expiry-txt', $planContent).text(l[987]);
+                    $('.subtitle-txt.expiry-txt', $planContent)
+                        .text(expiryTimestamp < unixtime() ? l[8657] : l[987]);
                     $('.account.plan-info.expiry span', $planContent)
                         .addClass('red')
                         .text(time2date(expiryTimestamp, 2));

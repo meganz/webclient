@@ -169,7 +169,7 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sSubMap) {
     var tree = this.tree[n.h] || cvtree;
 
     if (tree) {
-        folders = obj_values(tree);
+        folders = Object.values(tree);
 
         if (inshares) {
             folders = folders

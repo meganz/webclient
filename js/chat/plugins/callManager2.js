@@ -1215,7 +1215,7 @@
                 const img = new Image;
                 img.onload = resolve.bind(null, img);
                 img.onerror = reject;
-                img.src = useravatar.getAvatarSVGDataURI(this.userHandle);
+                img.src = useravatar.getAvatarLetterDataURI(this.userHandle);
             });
         }
     }

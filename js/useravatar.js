@@ -5,7 +5,7 @@ var useravatar = (function() {
 
     'use strict';
 
-    var _colors = [
+    const _colors = [
         "#55D2F0",
         "#BC2086",
         "#FFD200",
@@ -18,6 +18,21 @@ var useravatar = (function() {
         "#9AEAFF",
         "#00D5E2",
         "#FFEB00"
+    ];
+
+    const _gradientColors = [
+        "#2BA6DE",
+        "#880E4F",
+        "#FFA500",
+        "#31B500",
+        "#00897B",
+        "#FF6F00",
+        "#C51162",
+        "#FF333A",
+        "#FF5252",
+        "#61D2FF",
+        "#00ACC1",
+        "#FFD300"
     ];
 
     const DEBUG = window.d > 3;
@@ -35,22 +50,46 @@ var useravatar = (function() {
     var ns = {};
 
     /**
-     * Return a SVG image representing the Letter avatar
+     * Return a PNG image representing the Letter avatar
      * @param {Object} user The user object or email
      * @returns {String}
      * @private
      */
-    ns.getAvatarSVGDataURI = function(user) {
-        var s = _getAvatarProperties(user);
-        var $template = $('#avatar-svg').clone().removeClass('hidden')
-            .find('svg').addClass('color' + s.colorIndex).end()
-            .find('text').text(s.letters).end();
-        $('circle', $template).eq(1).attr('fill', `url('#color${s.colorIndex}')`);
+    ns.getAvatarLetterDataURI = function(user) {
+        const s = _getAvatarProperties(user);
+        const size = 120;
 
-        $template = window.btoa(to8($template.html()));
+        const canvas = document.createElement('canvas');
+        canvas.width = size;
+        canvas.height = size;
 
-        return 'data:image/svg+xml;base64,' + $template;
-    }
+        const ctx = canvas.getContext('2d');
+
+        // Outer white circle
+        ctx.beginPath();
+        ctx.arc(size / 2, size / 2, 60, 0, Math.PI * 2);
+        ctx.fillStyle = '#fff';
+        ctx.fill();
+
+        // Avatar gradient: CSS linear-gradient(45deg, ...)
+        const gradient = ctx.createLinearGradient(0, size, size, 0);
+        gradient.addColorStop(0, s.color);
+        gradient.addColorStop(1, _gradientColors[s.colorIndex - 1]);
+
+        ctx.beginPath();
+        ctx.arc(size / 2, size / 2, 58, 0, Math.PI * 2);
+        ctx.fillStyle = gradient;
+        ctx.fill();
+
+        // Letter
+        ctx.fillStyle = '#fff';
+        ctx.font = '400 60px "Open Sans", Arial, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'alphabetic';
+        ctx.fillText(s.letters, size / 2, size / 2 + 60 * 0.35);
+
+        return canvas.toDataURL('image/png');
+    };
 
     /**
      * Return two letters and the color for a given string.
@@ -92,7 +131,7 @@ var useravatar = (function() {
         var bgBlock = '';
 
         if (element === 'ximg') {
-            return ns.getAvatarSVGDataURI(user);
+            return ns.getAvatarLetterDataURI(user);
         }
 
         var s = _getAvatarProperties(user);
@@ -287,18 +326,6 @@ var useravatar = (function() {
         }
         if (DEBUG) {
             logger.debug('Processing loaded user-avatar', user);
-        }
-
-        if (user === u_handle) {
-            var myavatar = ns.mine();
-
-            $('.fm-avatar img,.fm-account-avatar img, .top-menu-popup .avatar-block img', 'body')
-                .attr('src', myavatar);
-            $('.fm-account-avatar .avatar-bg span').css('background-image', 'url(' + myavatar + ')');
-            $('.fm-avatar').show();
-
-            // we recreate the top-menu on each navigation, so...
-            ns.my = myavatar;
         }
 
         if (M.u[user]) {

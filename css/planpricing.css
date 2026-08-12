@@ -276,6 +276,13 @@
 .pricing-plan-card .pricing-plan-subheading2 {
     background: var(--color-secondary-cobalt-50);
 }
+
+/* Banner fills the card width but must not widen its grid track */
+.pricing-pg .pricing-pg.plans-cards-container .pricing-plan-card .pricing-plan-recommend {
+    box-sizing: border-box;
+    width: 0;
+    min-width: 100%;
+}
 .pricing-plan-card .pricing-plan-title {
     font: var(--text-h5-pricing);
     margin-top: 52px;

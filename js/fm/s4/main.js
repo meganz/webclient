@@ -308,7 +308,7 @@ lazy(s4, 'main', () => {
             componentClassname: 'primary semibold theme-dark-forced',
             onClick: () => {
                 if (!canEnable) {
-                    eventlog(500887);
+                    eventlog(naPro ? 501390 : 500887);
                     loadSubPage(naPro ? 'propay_101' : 'pro');
                     return false;
                 }
@@ -340,9 +340,11 @@ lazy(s4, 'main', () => {
 
             if (naPro) {
                 plansTip.append(parseHTML(l.s4_recommended_plans));
+                eventlog(501389);
             }
             else {
                 plansTip.append(parseHTML(l.s4_supported_plans));
+                eventlog(501391);
             }
         }
 

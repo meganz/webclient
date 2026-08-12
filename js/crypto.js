@@ -1324,7 +1324,10 @@ async function api_setshare(node, targets, sharenodes) {
         const ec = Number(res && res.result || res);
 
         if (!--maxretry || ec === EARGS || ec === EACCESS) {
-            throw new MEGAException(`Share operation failed for ${node}: ${api.strerror(ec || res)}`, res);
+            if (self.d) {
+                console.error(`Share operation failed for ${node}`, ec, res);
+            }
+            throw new MEGAException(`Share operation failed: ${api.strerror(ec || res)}`, res);
         }
 
         await tSleep(Math.min(2e4, backoff <<= 1) / 1e3);

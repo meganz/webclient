@@ -3717,6 +3717,16 @@ pro.propay = {
             delete pro.propay.pageChangeHandler;
         }
 
+        $('.back-button', this.$page).rebind('click', () => {
+
+            // The pro page bounces to mega.io in this case, so skip the intermediate load
+            if (!pro.proplan2.canAccessProPage()) {
+                return mega.redirect('mega.io', 'pricing', false, false);
+            }
+
+            loadSubPage('pro');
+        });
+
         pro.propay.pageChangeHandler = mBroadcaster.addListener('pagechange', () => {
             if (!pro.propay.onPropayPage()) {
                 pro.propay.hideLoadingOverlay();

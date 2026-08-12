@@ -1678,12 +1678,16 @@ var addressDialog = {
                 proPrice = proPrice.toFixed(2);
             }
             else {
+                // either quota may be unset (no overage); | 0 coerces that to 0 extra blocks
+                const quotaBlocks = Math.max(this.userInfo.storageQuota | 0, this.userInfo.transferQuota | 0);
+                // quotaFare is only set when there is overage, so skip the term when there are no blocks
                 proPrice = (this.userInfo.nbOfUsers * this.businessPlan.userFare
-                    + (this.userInfo.quota ? this.userInfo.quota * this.businessPlan.quotaFare : 0)).toFixed(2);
+                    + (quotaBlocks ? quotaBlocks * this.businessPlan.quotaFare : 0)).toFixed(2);
             }
             this.businessPlan.totalPrice = proPrice;
             this.businessPlan.totalUsers = this.userInfo.nbOfUsers;
-            this.businessPlan.quota = this.userInfo.quota;
+            this.businessPlan.transferQuota = this.userInfo.transferQuota;
+            this.businessPlan.storageQuota = this.userInfo.storageQuota;
             numOfMonths = this.businessPlan.m;
             this.numOfMonths = numOfMonths;
 

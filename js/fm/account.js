@@ -4263,7 +4263,7 @@ accountUI.s4 = {
             }
         );
 
-        const $toggles = $('.fm-account-s4 .s4-warn-dialogs .mega-switch', this.$container);
+        const $toggles = $('.s4-warn-dialogs .mega-switch', this.$container);
 
         // Enable copy/move warning dialog switchers
         for (let i = $toggles.length; i--;) {

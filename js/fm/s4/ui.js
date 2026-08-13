@@ -1139,7 +1139,7 @@ lazy(s4, 'ui', () => {
                     submsg,
                     (yes) => {
                         if (yes) {
-                            this.destroy();
+                            onIdle(() => this.destroy());
                         }
                     });
             }

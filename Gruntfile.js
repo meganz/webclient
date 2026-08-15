@@ -205,7 +205,7 @@ lazy(FS, 'Secureboot', () => {
                     eval(capture.join('\n'));
 
                     for (const k in jsl2) {
-                        if (!/^(?:dc|pdf|tiff|vid|med|doc|xlsx)/.test(k)) {
+                        if (!/^(?:dc|pdf|tiff|vid|med|doc|xlsx|jszip)/.test(k)) {
                             delete jsl2[k];
                         }
                     }

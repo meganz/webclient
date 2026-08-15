@@ -72,6 +72,13 @@ function MegaQueue(worker, limit, name) {
         case 'ul-filereader':
         case 'encrypter-worker':
             parentLogger = ulmanager.logger;
+
+            // @todo figure out what is going on at zip64.js with micro-tasks..
+            Object.defineProperty(this, `_proce${'ss'}`, {
+                value() {
+                    queueMicrotask(() => this.process());
+                }
+            });
             break;
     }
     this.logger = MegaLogger.getLogger(this.__identity, {}, parentLogger);
@@ -427,9 +434,8 @@ MegaQueue.prototype._process = function(ms, sp) {
         // everything is already throttled...
         return queueMicrotask(() => this.process(sp));
     }
-    delay(this.__identity, () => this.process(sp), ms || 10);
     /**/
-    queueMicrotask(() => this.process(sp));
+    delay(this.__identity, () => this.process(sp), ms || 10);
 };
 
 MegaQueue.prototype.push = function(arg, next, self) {

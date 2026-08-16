@@ -185,6 +185,7 @@ class MegaMobileContextMenu extends MegaComponentGroup {
 
             // duplicate the file/folder node to show it within the context menu dialog
             const itemNode = document.getElementById(this.handle)
+                || M.megaRender && M.v.some(n => n.h === this.handle) && M.megaRender.getDOMNode(this.handle)
                 || (mega.ui.viewerOverlay.visible && mega.ui.viewerOverlay.nodeComponent.domNode);
             if (!itemNode) {
                 throw new Error('Context menu node not found.');

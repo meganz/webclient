@@ -340,7 +340,53 @@ pro.propay = {
                 ? !!res.result.reuse && res.result
                 : false;
         }).catch(() => false);
+
+        // Override the fields given to check the saved card UI states, e.g. an expired or expiring card
+        if (d && this.savedCard && localStorage.savedCardUiCheck) {
+            const card = tryCatch(() => JSON.parse(localStorage.savedCardUiCheck), false)();
+
+            if (card) {
+                this.savedCard = {...this.savedCard, ...card};
+            }
+        }
+
         return this.savedCard;
+    },
+
+    /**
+     * Get the expiry state of the saved card
+     * @returns {Object|false} {text, expired, expiringSoon}, or false if the card has no usable expiry date
+     */
+    getSavedCardExpiry() {
+        'use strict';
+
+        if (!this.savedCard) {
+            return false;
+        }
+
+        const month = parseInt(this.savedCard.exp_month);
+        let year = parseInt(this.savedCard.exp_year);
+
+        if (!(month >= 1 && month <= 12) || !year) {
+            return false;
+        }
+
+        // exp_year may come through as two digits, e.g. 28 for 2028
+        if (year < 100) {
+            year += 2000;
+        }
+
+        const now = new Date();
+
+        // Card dates are UTC, and stay chargeable until the end of their expiry month
+        const monthsLeft = (year - now.getUTCFullYear()) * 12 + month - (now.getUTCMonth() + 1);
+
+        return {
+            expired: monthsLeft < 0,
+            // Expires by the end of next month, i.e. no more than two months away
+            expiringSoon: monthsLeft === 0 || monthsLeft === 1,
+            text: `${String(month).padStart(2, '0')}/${String(year).slice(-2)}`
+        };
     },
 
     planNumsByName: {
@@ -2347,32 +2393,64 @@ pro.propay = {
         const $savedCard = $('.saved-card', this.$page);
 
         if (!this.savedCard || !(this.savedCard.gw === this.currentGateway.gatewayId)) {
-            $('.saved-card', this.$page).addClass('hidden');
+            $savedCard.addClass('hidden');
             return;
         }
 
+        const expiry = this.getSavedCardExpiry();
+        const isExpired = !!expiry && expiry.expired;
 
-        const htmlString = `<span class="card-brand">${this.savedCard.brand}</span>
+        // An expired card cannot be charged, so a new one has to be entered
+        if (isExpired) {
+            this.useSavedCard = false;
+        }
+
+        let htmlString = `<div class="card-line"><span class="card-brand">${escapeHTML(this.savedCard.brand)}</span>
             <span class="dots"> \u2022\u2022\u2022\u2022 </span>
-            <span class="last-4">${this.savedCard.last4}</span>`;
+            <span class="last-4">${escapeHTML(this.savedCard.last4)}</span></div>`;
 
-        $savedCard.removeClass('hidden').empty().safeAppend(htmlString);
+        if (expiry) {
+            let icon = '';
+            let label = '';
+            let state = '';
+
+            if (expiry.expired) {
+                icon = 'triangle';
+                label = `${l[8657]} `;
+                state = ' expired';
+            }
+            else if (expiry.expiringSoon) {
+                icon = 'circle';
+                label = `${l.card_expires} `;
+                state = ' warning';
+            }
+
+            htmlString += `<div class="card-expiry${state}">`;
+
+            if (icon) {
+                htmlString += `<i class="sprite-fm-mono icon-alert-${icon}-thin-outline"></i>`;
+            }
+
+            htmlString += `${label}${expiry.text}</div>`;
+        }
 
         const items = [
             {
+                disabled: isExpired,
                 html: htmlString,
                 icon: 'sprite-fm-mono icon-payment',
                 value: 'saved',
-                selected: true,
+                selected: !isExpired,
             },
             {
                 text: l.add_credit_debit_card,
                 icon: 'sprite-fm-mono icon-add',
                 value: 'new',
+                selected: isExpired,
             }
         ];
 
-        $savedCard.empty();
+        $savedCard.removeClass('hidden').empty();
 
         const $radioItemTemplate = mega.templates.getTemplate('radio-with-icon-label-tmplt');
 
@@ -2382,6 +2460,13 @@ pro.propay = {
                 .removeClass('hidden template')
                 .addClass('option payment')
                 .attr('data-value', item.value);
+
+            // Not the global `disabled` class, that dims the whole option and the error with it
+            if (item.disabled) {
+                $radioItem.addClass('expired').attr('aria-disabled', true);
+                $('input', $radioItem).attr('disabled', true);
+            }
+
             if (item.html) {
                 $('.radio-txt', $radioItem).safeAppend(item.html);
             }
@@ -2397,13 +2482,13 @@ pro.propay = {
         }
 
         this.useSavedCard = this.useSavedCard === null ? true : this.useSavedCard;
-        let currentlySelected = 'saved';
+        let currentlySelected = isExpired ? 'new' : 'saved';
         $('.option', $savedCard).rebind('click.propay', (e) => {
 
             const $this = $(e.currentTarget);
             const selected = $this.attr('data-value');
 
-            if (selected === currentlySelected) {
+            if (selected === currentlySelected || $this.hasClass('expired')) {
                 return;
             }
 

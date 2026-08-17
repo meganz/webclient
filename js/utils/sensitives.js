@@ -284,7 +284,7 @@ function resetSensitives() {
                 return false;
             }
 
-            if (!n || !M.getNodeByHandle(n.p).tsf) {
+            if (!n || !n.p) {
                 return false;
             }
 

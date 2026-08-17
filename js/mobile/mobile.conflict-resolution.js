@@ -140,7 +140,7 @@ mBroadcaster.once('startMega', () => {
     fileconflict.customNames = function(dialog) {
         const fileNames = dialog.querySelectorAll('.file-name');
         for (let i = fileNames.length; i--;) {
-            let name = fileNames[i].textContent;
+            let name = escapeHTML(fileNames[i].textContent);
             const index = name && name.search(/(\(\d+\))?(\.[\dA-Za-z]+)?$/);
             name = index === -1 ?
                 `<span>${name}</span>` : `<span>${name.substr(0, index)}</span><span>${name.substr(index)}</span>`;

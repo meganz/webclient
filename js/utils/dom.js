@@ -54,7 +54,7 @@ function parseHTML(markup) {
             // console.debug(node.nodeName, node.outerHTML, node.data, [node]);
 
             var content = String(node.outerHTML).replace(/[\s\x00-\x19]+/g, '');
-            var invalid = /<[^>]+script:/i.test(content);
+            let invalid = /<[^>]+script:|data[%:]|(?:id|name)=["']*(?:child|node|attr|shadow|content)/i.test(content);
 
             if (!invalid) {
                 invalid = domNodeForEach(node, (n) => {
@@ -73,6 +73,7 @@ function parseHTML(markup) {
 
             if (invalid) {
                 console.warn('Filtered out invalid content passed to parseHTML...', [node]);
+                eventlog(99642, JSON.stringify([1, escapeHTML(content.slice(0, 256))]), true);
             }
             else {
                 fragment.appendChild(node);

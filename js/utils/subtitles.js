@@ -56,7 +56,7 @@ lazy(mega.utils, 'subtitles', () => {
                         mBroadcaster.sendMessage('trk:event', 'media-journey', 'subtitles', 'add', node);
 
                         this.disable();
-                        await this.subtitlesManager.addSubtitles(node);
+                        await this.subtitlesManager.addSubtitles(node).catch(dump);
                     }
                 },
                 cancel: true,
@@ -249,11 +249,8 @@ lazy(mega.utils, 'subtitles', () => {
         }
 
         removeTags(cue) {
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(cue, 'text/html');
-            return doc.body.textContent
-                .replace(/<(?!\/?([biu]|br))[^>]*>/gi, '')
-                .replace(/(\[|{)(\/?)([biu]|br)(]|})/gi, '<$2$3>');
+            return escapeHTML(cue)
+                .replace(/\[\/?(strong|em|br|[biu])]/gi, (m) => `<${m.slice(1, -1)}>`);
         }
     }
 
@@ -404,9 +401,13 @@ lazy(mega.utils, 'subtitles', () => {
             }
             else {
                 $(document).fullScreen(false);
+
+                const content = escapeHTML(l.video_player_display_subtitles_error_msg)
+                    .replace('%s', escapeHTML(this._nodes[index].name));
+
                 toaster.main.show({
+                    content,
                     icons: ['error sprite-fm-uni icon-error'],
-                    content: l.video_player_display_subtitles_error_msg.replace('%s', this._nodes[index].name),
                     classes: ['theme-dark-forced']
                 });
                 this._cues = this._subtitles[this._index.node];
@@ -432,19 +433,14 @@ lazy(mega.utils, 'subtitles', () => {
         }
 
         async fetch(index) {
-            return new Promise((resolve, reject) => {
-                M.gfsfetch(this._nodes[index].h, 0, -1).then((data) => {
-                    if (data.buffer === null) {
-                        return reject();
-                    }
+            const {buffer} = await M.gfsfetch(this._nodes[index].h);
 
-                    const reader = new FileReader();
-                    reader.addEventListener('loadend', () => resolve(reader.result));
-                    reader.readAsText(new Blob([data.buffer], { type: "text/plain" }));
-                }).catch(() => {
-                    return reject();
-                });
-            });
+            return new TextDecoder().decode(buffer)
+                .replace(/&amp;/gi, '&')
+                .replace(/&lt;/gi, '<')
+                .replace(/&gt;/gi, '>')
+                .replace(/<(\/?(strong|em|br|[biu]))[^>]*>/gi, '[$1]')
+                .replace(/<\/?[a-z][^>]*>/gi, '');
         }
 
         async searchSubtitles() {
@@ -502,7 +498,7 @@ lazy(mega.utils, 'subtitles', () => {
                 this._nodes.shift();
                 toaster.main.show({
                     icons: ['error sprite-fm-uni icon-error'],
-                    content: l.video_player_add_subtitles_error_msg.replace('%s', node.name),
+                    content: escapeHTML(l.video_player_add_subtitles_error_msg).replace('%s', escapeHTML(node.name)),
                     classes: ['theme-dark-forced']
                 });
                 eventlog(99991);

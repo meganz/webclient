@@ -2898,7 +2898,7 @@
             if (/script:/.test(content)) {
                 return false;
             }
-            if (tag === 'style'
+            if (tag === 'STYLE'
                 && String(e.textContent).replace(/blob:[^-;()]+/g, '').includes('//')) {
                 return false;
             }

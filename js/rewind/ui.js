@@ -150,6 +150,8 @@ lazy(mega, 'rewindUi', () => {
                 });
 
                 $scrollingBlock.safeAppend(this.template);
+                $('.folder-history .history-label', $scrollingBlock)
+                    .text(l.rewind_datepicker_label);
                 $sidebarTemplate.safeAppend($scrollingBlock.prop('outerHTML'));
                 this.parentContainer.appendChild($sidebarTemplate[0]);
             }

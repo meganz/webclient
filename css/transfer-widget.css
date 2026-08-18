@@ -578,6 +578,16 @@
     padding: 0 8px;
     color: var(--mobile-text-secondary);
     white-space: nowrap;
+    align-items: center;
+}
+
+@supports (display: -webkit-box) {
+    .transfer-root.expanded .transfer-task-row .transfer-task-status div {
+        display: -webkit-box;
+        white-space: normal;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+    }
 }
 .transfer-task-row.sprite-fm-mono .transfer-task-status {
     justify-content: flex-end;

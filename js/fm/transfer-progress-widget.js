@@ -1475,6 +1475,16 @@ mega.tpw = new function TransferProgressWidget() {
                 this.progressBar.classList.add('hidden');
                 delete this._transferStr;
                 this.size.textContent = bytesToSize(this._size);
+                if (this.el.classList.contains('sprite-fm-mono')) {
+                    this.el.classList.add('simpletip');
+                }
+                this.el.dataset.simpletip = this.statusText;
+                this.el.dataset.simpletipposition = 'top';
+            }
+            else {
+                delete this.el.dataset.simpletip;
+                delete this.el.dataset.simpletipposition;
+                this.el.classList.remove('simpletip');
             }
         }
 
@@ -1524,6 +1534,7 @@ mega.tpw = new function TransferProgressWidget() {
                 else if (!this.overquota && !this.errored && !this.paused) {
                     this.statusText = this.type === scope.DOWNLOAD ? l[1156] : l[1155];
                 }
+                this.el.classList.remove('simpletip');
             }
             else {
                 this.el.classList.add('sprite-fm-mono');
@@ -1534,6 +1545,9 @@ mega.tpw = new function TransferProgressWidget() {
                 this.itemType.classList.add('hidden');
                 if (this._transferStr) {
                     this.statusText = this._status === 'inqueue' ? l.tfw_status_queued : this._transferStr;
+                }
+                if (this.errored) {
+                    this.el.classList.add('simpletip');
                 }
             }
         }

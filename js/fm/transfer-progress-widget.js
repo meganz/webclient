@@ -319,7 +319,7 @@ mega.tpw = new function TransferProgressWidget() {
                     delete this._lastDone;
                 }
                 if (this._lastDone !== doneBytes) {
-                    this.text.textContent = this._baseText.replace('%1', bytesToSize(doneBytes));
+                    this.text.textContent = this._baseText.replace('%1', bytesToSize(doneBytes, 2));
                 }
             }
 

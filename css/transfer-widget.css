@@ -132,6 +132,10 @@
     margin-inline-end: 24px;
     position: relative;
 }
+.transfer-progress-type .transfer-progress-txt {
+    font-variant-numeric: tabular-nums;
+    min-width: 12ch;
+}
 .transfer-progress-type .progress-chart {
     width: 24px;
     height: 24px;

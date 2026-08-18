@@ -1714,7 +1714,7 @@ var dlmanager = {
             return;
         }
 
-        if (String(page).startsWith('pro')) {
+        if (String(page).startsWith('pro') && !window.slideshowid) {
             this.logger.info('showOverQuotaDialog', 'on pro/propay page, not re-opening.');
             return;
         }

@@ -47,7 +47,16 @@ MobileContactLink.prototype.showContactLinkInfo = function _showContactLinkInfo(
         }
         else {
             $('.avatar-wrapper.avatar img', $mobileContactInfoDlg).addClass('hidden');
-            var curAvatar = useravatar.contact(email);
+            let curAvatar;
+            if (handle in M.u) {
+                curAvatar = useravatar.contact(handle);
+            }
+            else {
+                const avatarH = useravatar.generateContactAvatarMeta(handle);
+                curAvatar = useravatar.contact(name)
+                    .replace(/\bcolor\d+\b/g, `color${avatarH.avatar.colorIndex}`);
+            }
+
             $('.mobile.main-avatar', $mobileContactInfoDlg).html(curAvatar);
         }
         var isContactHtml = '<div class="mobile contact-verification"> <i class="" > </i> </div>';

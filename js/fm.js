@@ -1431,8 +1431,13 @@ function openContactInfoLink(contactLink) {
 
             avatar = `<div class="avatar-wrapper small-rounded-avatar"><img src="${avatars[em].url}"></div>`;
         }
+        else if (ctHandle in M.u) {
+            avatar = useravatar.contact(ctHandle, 'small-rounded-avatar square', 'div', false);
+        }
         else {
-            avatar = useravatar.contact(em, 'small-rounded-avatar square');
+            const avatarH = useravatar.generateContactAvatarMeta(ctHandle);
+            avatar = useravatar.contact(fullname, 'small-rounded-avatar square', 'div', false)
+                .replace(/\bcolor\d+\b/g, `color${avatarH.avatar.colorIndex}`);
         }
         $('.avatar-container-qr-contact', $dialog).safeHTML(avatar);
 

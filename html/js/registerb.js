@@ -485,8 +485,13 @@ BusinessRegister.prototype.initPage = function(
         if (mySelf.isLoggedIn === false) {
             if (!$element || $element.is($passInput) || $element.is($rPassInput)) {
 
+                const password = $passInput.val();
+                const confirmPassword = $rPassInput.val();
+
                 // Check if the entered passwords are valid or strong enough
-                var passwordValidationResult = security.isValidPassword($passInput.val(), $rPassInput.val());
+                var passwordValidationResult = (password && confirmPassword)
+                    ? security.isValidPassword(password, confirmPassword)
+                    : l[9066];
 
                 // If bad result
                 if (passwordValidationResult !== true) {

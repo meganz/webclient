@@ -3495,7 +3495,7 @@ Chat.prototype.openScheduledMeeting = function (meetingId, toCall) {
           }
         }
       }
-      (0,call.dQ)(true, meetingRoom).then(() => meetingRoom.startAudioCall(true)).catch(ex => d && console.warn('Already in a call.', ex));
+      ;(0,call.dQ)(true, meetingRoom).then(() => meetingRoom.startAudioCall(true)).catch(ex => d && console.warn('Already in a call.', ex));
     });
   }
 };
@@ -3536,7 +3536,7 @@ Chat.prototype.fetchSoundBuffer = async function (sound) {
 window.Chat = Chat;
 if (false) // removed by dead control flow
 {}
-const chat = {
+const chat = null && {
   Chat
 };
 
@@ -5656,10 +5656,6 @@ const chatRoom = {
 
 "use strict";
 REQ_.d(EXP_, {
-LP: () => getUniqueId,
-N9: () => timing,
-Zz: () => compose,
-hG: () => SoonFcWrap,
 u9: () => ContactAwareComponent,
 w9: () => MegaRenderMixin
 });
@@ -6423,6 +6419,13 @@ class ContactAwareComponent extends MegaRenderMixin {
 }
 ContactAwareComponent.unavailableAvatars = Object.create(null);
 ContactAwareComponent.unavailableNames = Object.create(null);
+REQ_.d(EXP_, [
+"LP", 0, getUniqueId,
+"N9", 0, timing,
+"Zz", 0, compose,
+"hG", 0, SoonFcWrap
+]);
+
 
 },
 
@@ -10323,12 +10326,15 @@ class CloudBrowserDialog extends modalDialogs.A.SafeShowDialogController {
     };
     if (searchText && searchText.length >= MIN_SEARCH_LENGTH) {
       this.setState(newState);
+      loadingDialog.show('fmSearchNodes');
       M.fmSearchNodes(searchText).then(() => {
-        newState.nodeLoading = false;
         newState.searchValue = searchText;
         newState.currentlyViewedEntry = 'search';
-        this.setState(newState);
         this.clearSelectionAndHighlight();
+      }).catch(dump).finally(() => {
+        newState.nodeLoading = false;
+        this.setState(newState);
+        loadingDialog.hide('fmSearchNodes');
       });
     }
   }
@@ -18008,7 +18014,7 @@ StartGroupChatWizard.defaultProps = {
 window.StartGroupChatDialogUI = {
   StartGroupChatWizard
 };
-const startGroupChatWizard = {
+const startGroupChatWizard = null && {
   StartGroupChatWizard
 };
 // EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 11 modules
@@ -18697,11 +18703,11 @@ const Navigation = ({
   contactRequests,
   renderView
 }) => REaCt().createElement("div", {
-  className: `${NAMESPACE}-nav`
+  className: `${"lhp"}-nav`
 }, REaCt().createElement("div", {
   className: `
-                    ${NAMESPACE}-nav-container
-                    ${NAMESPACE}-chats-tab
+                    ${"lhp"}-nav-container
+                    ${"lhp"}-chats-tab
                     ${view === CHATS && routingSection === 'chat' ? 'active' : ''}
                 `,
   onClick: () => {
@@ -18710,14 +18716,14 @@ const Navigation = ({
   }
 }, REaCt().createElement(meetings_button.A, {
   unreadChats,
-  className: `${NAMESPACE}-nav-button`,
+  className: `${"lhp"}-nav-button`,
   icon: "icon-chat-filled"
 }, !!unreadChats && REaCt().createElement("div", {
   className: "notifications-count"
 })), REaCt().createElement("span", null, l.chats)), REaCt().createElement("div", {
   className: `
-                    ${NAMESPACE}-nav-container
-                    ${NAMESPACE}-meetings-tab
+                    ${"lhp"}-nav-container
+                    ${"lhp"}-meetings-tab
                     ${view === MEETINGS && routingSection === 'chat' ? 'active' : ''}
                 `,
   onClick: () => {
@@ -18726,14 +18732,14 @@ const Navigation = ({
   }
 }, REaCt().createElement(meetings_button.A, {
   unreadMeetings,
-  className: `${NAMESPACE}-nav-button`,
+  className: `${"lhp"}-nav-button`,
   icon: "icon-video-call-filled"
 }, !!unreadMeetings && REaCt().createElement("div", {
   className: "notifications-count"
 })), REaCt().createElement("span", null, l.meetings)), is_eplusplus || is_chatlink ? null : REaCt().createElement("div", {
   className: `
-                        ${NAMESPACE}-nav-container
-                        ${NAMESPACE}-contacts-tab
+                        ${"lhp"}-nav-container
+                        ${"lhp"}-contacts-tab
                         ${routingSection === 'contacts' ? 'active' : ''}
                     `,
   onClick: () => {
@@ -18741,7 +18747,7 @@ const Navigation = ({
     eventlog(500296);
   }
 }, REaCt().createElement(meetings_button.A, {
-  className: `${NAMESPACE}-nav-button`,
+  className: `${"lhp"}-nav-button`,
   contactRequests,
   icon: "icon-contacts"
 }, !!contactRequests && REaCt().createElement("div", {
@@ -18775,7 +18781,7 @@ const Actions = ({
     return null;
   }
   return REaCt().createElement("div", {
-    className: `${NAMESPACE}-action-buttons`
+    className: `${"lhp"}-action-buttons`
   }, view === LOADING && REaCt().createElement(buttons.$, {
     className: "mega-button action loading-sketch"
   }, REaCt().createElement("i", null), REaCt().createElement("span", null)), view === CHATS && routingSection !== 'contacts' && REaCt().createElement(REaCt().Fragment, null, REaCt().createElement(buttons.$, {
@@ -19182,8 +19188,8 @@ const Chats = ({
     contact: M.u[c.getParticipantsExceptMe()[0]]
   })))) : REaCt().createElement("div", {
     className: `
-                            ${NAMESPACE}-nil
-                            ${filter ? `${NAMESPACE}-nil--chats` : ''}
+                            ${"lhp"}-nil
+                            ${filter ? `${"lhp"}-nil--chats` : ''}
                         `
   }, filter ? REaCt().createElement(REaCt().Fragment, null, filter === FILTER.MUTED && REaCt().createElement(REaCt().Fragment, null, REaCt().createElement("i", {
     className: "sprite-fm-mono icon-notification-off-filled"
@@ -19194,9 +19200,9 @@ const Chats = ({
   }, REaCt().createElement(ConversationsListItem, {
     chatRoom: noteChat
   }))), REaCt().createElement("div", {
-    className: `${NAMESPACE}-bottom`
+    className: `${"lhp"}-bottom`
   }, REaCt().createElement("div", {
-    className: `${NAMESPACE}-bottom-control`
+    className: `${"lhp"}-bottom-control`
   }, REaCt().createElement("div", {
     className: "conversations-category",
     onClick: onArchivedClicked
@@ -19212,21 +19218,21 @@ const Archived = ({
   const archivedChats = Object.values(conversations || {}).filter(c => !c.isMeeting && c.isArchived()).sort(M.sortObjFn(c => c.lastActivity || c.ctime, -1));
   return REaCt().createElement("div", {
     className: `
-                ${NAMESPACE}-archived
+                ${"lhp"}-archived
                 ${archivedUnmounting ? 'with-unmount-animation' : ''}
             `
   }, REaCt().createElement("div", {
-    className: `${NAMESPACE}-archived-head`
+    className: `${"lhp"}-archived-head`
   }, REaCt().createElement(meetings_button.A, {
     className: "mega-button round",
     icon: "sprite-fm-mono icon-arrow-left-regular-outline",
     onClick: onClose
   }), REaCt().createElement("h2", null, l.filter_archived__chats)), REaCt().createElement("div", {
-    className: `${NAMESPACE}-archived-content`
+    className: `${"lhp"}-archived-content`
   }, archivedChats && archivedChats.length ? REaCt().createElement(ConversationsList, {
     conversations: archivedChats
   }) : REaCt().createElement("div", {
-    className: `${NAMESPACE}-archived-empty`
+    className: `${"lhp"}-archived-empty`
   }, REaCt().createElement("i", {
     className: "sprite-fm-mono icon-archive"
   }), REaCt().createElement("h3", null, l.filter_archived__nil_chats))));
@@ -19268,7 +19274,7 @@ class Meetings extends mixins.w9 {
       return REaCt().createElement("div", {
         ref: this.navigationRef,
         className: `
-                    ${NAMESPACE}-meetings--navigation
+                    ${"lhp"}-meetings--navigation
                     ${this.props.leftPaneWidth < 230 ? 'narrow-width' : ''}
                 `
       }, REaCt().createElement(meetings_button.A, {
@@ -19315,7 +19321,7 @@ class Meetings extends mixins.w9 {
       ongoingMeetings
     }) => ongoingMeetings != null && ongoingMeetings.length ? REaCt().createElement("div", {
       ref: this.ongoingRef,
-      className: `${NAMESPACE}-meetings--ongoing`
+      className: `${"lhp"}-meetings--ongoing`
     }, REaCt().createElement("strong", null, l.happening_now), REaCt().createElement(ConversationsList, {
       conversations: ongoingMeetings
     })) : null;
@@ -19344,7 +19350,7 @@ class Meetings extends mixins.w9 {
       }, REaCt().createElement("div", {
         className: "conversations-category category--label"
       }, REaCt().createElement("span", null, date)), nextOccurrences.rest[date].map(upcomingItem))) : null) : REaCt().createElement("div", {
-        className: `${NAMESPACE}-nil`
+        className: `${"lhp"}-nil`
       }, REaCt().createElement("i", {
         className: "sprite-fm-mono icon-calendar-plus-thin-solid"
       }), REaCt().createElement("span", null, l.meetings_upcoming_nil)));
@@ -19367,7 +19373,7 @@ class Meetings extends mixins.w9 {
         chatRoom
       })) : REaCt().createElement("div", {
         className: `
-                                ${NAMESPACE}-nil
+                                ${"lhp"}-nil
                                 ${archivedMeetings.length ? 'half-sized' : ''}
                             `
       }, archivedMeetings.length ? REaCt().createElement("strong", null, l.meetings_past_nil_heading) : null, REaCt().createElement("i", {
@@ -19418,14 +19424,14 @@ class Meetings extends mixins.w9 {
     const ongoingMeetings = Object.values(this.props.conversations || {}).filter(c => c.isDisplayable() && c.isMeeting && c.havePendingCall());
     return REaCt().createElement("div", {
       ref: this.domRef,
-      className: `${NAMESPACE}-meetings`
+      className: `${"lhp"}-meetings`
     }, REaCt().createElement(this.Ongoing, {
       ongoingMeetings
     }), REaCt().createElement(this.Navigation, {
       conversations: this.props.conversations
     }), REaCt().createElement("div", (0,esm_extends.A)({
       className: `
-                        ${NAMESPACE}-meetings--content
+                        ${"lhp"}-meetings--content
                         ${tab === UPCOMING ? 'is-upcoming' : ''}
                         ${tab === PAST ? 'is-past' : ''}
                     `
@@ -20244,7 +20250,7 @@ class Result extends REaCt().Component {
       }
     }, REaCt().createElement("div", {
       ref: this.resultRef,
-      className: NODE_CLASS,
+      className: "node",
       style: {
         backgroundImage: HAS_INTERSECTION_OBSERVER ? '' : `url(${image.url})`
       },
@@ -22019,9 +22025,6 @@ class Link extends react0().Component {
 (_, EXP_, REQ_) {
 
 "use strict";
-REQ_.d(EXP_, {
-A: () => __WEBPACK_DEFAULT_EXPORT__
-});
 const react0__ = REQ_(594);
 const react0 = REQ_.n(react0__);
 
@@ -22136,6 +22139,10 @@ class Button extends react0().Component {
 }
 Button.Group = Group;
 const __WEBPACK_DEFAULT_EXPORT__ = Button;
+REQ_.d(EXP_, [
+"A", 0, __WEBPACK_DEFAULT_EXPORT__
+]);
+
 
 },
 
@@ -23698,7 +23705,7 @@ class Call extends mixins.w9 {
       const {
         peers
       } = this.props;
-      if (action === stream.hK.ADD && peers.length === stream.$A) {
+      if (action === stream.hK.ADD && peers.length === 99) {
         return;
       }
       return action === stream.hK.ADD ? peers.addFakeDupStream() : peers.removeFakeDupStream();
@@ -24565,9 +24572,6 @@ const withHostsObserver = Component => {
 (_, EXP_, REQ_) {
 
 "use strict";
-REQ_.d(EXP_, {
-Q: () => withMicObserver
-});
 const _extends0__ = REQ_(168);
 const react1__ = REQ_(594);
 const react1 = REQ_.n(react1__);
@@ -24660,6 +24664,10 @@ const withMicObserver = Component => class extends _mixins2__.w9 {
     }));
   }
 };
+REQ_.d(EXP_, [
+"Q", 0, withMicObserver
+]);
+
 
 },
 
@@ -25017,17 +25025,6 @@ const withPermissionsObserver = Component => {
 (_, EXP_, REQ_) {
 
 "use strict";
-REQ_.d(EXP_, {
-PS: () => addMonths,
-We: () => stringToTime,
-XH: () => stringToDate,
-a4: () => getTimeIntervals,
-cK: () => isToday,
-dB: () => getUserTimezone,
-ef: () => isTomorrow,
-i_: () => getNearestHalfHour,
-ro: () => isSameDay
-});
 
 const stringToDate = string => {
   return moment(string, ['DD MMM YYYY', 'DD-MM-YYYY', 'DD.MM.YYYY', 'MMM DD YYYY', 'YYYY MMM DD', 'YYYY DD MMM']);
@@ -25081,6 +25078,18 @@ const getTimeIntervals = (timestamp, offsetFrom, interval = 30) => {
   }
   return increments;
 };
+REQ_.d(EXP_, [
+"PS", 0, addMonths,
+"We", 0, stringToTime,
+"XH", 0, stringToDate,
+"a4", 0, getTimeIntervals,
+"cK", 0, isToday,
+"dB", 0, getUserTimezone,
+"ef", 0, isTomorrow,
+"i_", 0, getNearestHalfHour,
+"ro", 0, isSameDay
+]);
+
 
 },
 
@@ -25091,7 +25100,6 @@ const getTimeIntervals = (timestamp, offsetFrom, interval = 30) => {
 
 // EXPORTS
 REQ_.d(EXP_, {
-  $A: () => MAX_STREAMS,
   Bq: () => PAGINATION,
   gh: () => STREAMS_PER_PAGE,
   hK: () => STREAM_ACTIONS,
@@ -25099,6 +25107,8 @@ REQ_.d(EXP_, {
   Ay: () => stream_Stream,
   iv: () => filterAndSplitSources
 });
+
+// INLINED EXPORTS: MAX_STREAMS
 
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/esm/extends.js
 const esm_extends = REQ_(168);
@@ -32260,7 +32270,7 @@ class ScheduleMetaChange extends _mixin_jsx1__.M {
       }, 250);
     }
   }
-  static getTitleText(meta, chatRoom) {
+  static getTitleText(meta, chatRoom, plain) {
     const {
       mode,
       recurring,
@@ -32298,7 +32308,8 @@ class ScheduleMetaChange extends _mixin_jsx1__.M {
           break;
         }
     }
-    return megaChat.html(title.replace('%1', topic || chatRoom.topic)).replaceAll('[B]', '<b>').replaceAll('[/B]', '</b>');
+    title = title.replace('%1', topic || chatRoom.topic);
+    return plain ? title.replaceAll('[B]', '').replaceAll('[/B]', '') : megaChat.html(title).replaceAll('[B]', '<b>').replaceAll('[/B]', '</b>');
   }
   renderTimingBlock() {
     const {
@@ -33333,9 +33344,6 @@ const TypingArea = (_dec = (0,mixins.hG)(54, true), _class = class TypingArea ex
 (_, EXP_, REQ_) {
 
 "use strict";
-REQ_.d(EXP_, {
-Y: () => withUpdateObserver
-});
 const _extends0__ = REQ_(168);
 const react1__ = REQ_(594);
 const react1 = REQ_.n(react1__);
@@ -33374,6 +33382,10 @@ const withUpdateObserver = Component => class extends _mixins_js2__.w9 {
     }, this.state, this.props));
   }
 };
+REQ_.d(EXP_, [
+"Y", 0, withUpdateObserver
+]);
+
 
 },
 
@@ -36355,9 +36367,6 @@ class GenericNodePropsComponent extends mixins.w9 {
 (_, EXP_, REQ_) {
 
 "use strict";
-REQ_.d(EXP_, {
-A: () => __WEBPACK_DEFAULT_EXPORT__
-});
 const react0__ = REQ_(594);
 const react0 = REQ_.n(react0__);
 const _chat_mixins1__ = REQ_(137);
@@ -36400,6 +36409,10 @@ class ToggleCheckbox extends _chat_mixins1__.w9 {
 const __WEBPACK_DEFAULT_EXPORT__ = {
   ToggleCheckbox
 };
+REQ_.d(EXP_, [
+"A", 0, __WEBPACK_DEFAULT_EXPORT__
+]);
+
 
 },
 
@@ -37274,13 +37287,7 @@ const PerfectScrollbar = (_dec = (0,_chat_mixins1__.hG)(30, true), _dec2 = (0,_c
 
 "use strict";
 REQ_.d(EXP_, {
-Ay: () => __WEBPACK_DEFAULT_EXPORT__,
-P9: () => ParsedHTML,
-T9: () => withOverflowObserver,
-lI: () => reactStringWrap,
-oM: () => OFlowParsedHTML,
-sp: () => OFlowEmoji,
-zT: () => Emoji
+P9: () => ParsedHTML
 });
 const react0__ = REQ_(594);
 const react0 = REQ_.n(react0__);
@@ -37432,6 +37439,15 @@ const __WEBPACK_DEFAULT_EXPORT__ = {
   OFlowEmoji,
   OFlowParsedHTML
 };
+REQ_.d(EXP_, [
+"Ay", 0, __WEBPACK_DEFAULT_EXPORT__,
+"T9", 0, withOverflowObserver,
+"lI", 0, reactStringWrap,
+"oM", 0, OFlowParsedHTML,
+"sp", 0, OFlowEmoji,
+"zT", 0, Emoji
+]);
+
 
 },
 
@@ -37531,11 +37547,26 @@ function _extends() {
 	
 	
 	(() => {
-		// define getter functions for harmony exports
+		// define getter/value functions for harmony exports
 		REQ_.d = (exports, definition) => {
-			for(const key in definition) {
-				if(REQ_.o(definition, key) && !REQ_.o(exports, key)) {
-					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
+			if(Array.isArray(definition)) {
+				let i = 0;
+				while(i < definition.length) {
+					var key = definition[i++];
+					const binding = definition[i++];
+					if(!REQ_.o(exports, key)) {
+						if(binding === 0) {
+							Object.defineProperty(exports, key, { enumerable: true, value: definition[i++] });
+						} else {
+							Object.defineProperty(exports, key, { enumerable: true, get: binding });
+						}
+					} else if(binding === 0) { i++; }
+				}
+			} else {
+				for(var key in definition) {
+					if(REQ_.o(definition, key) && !REQ_.o(exports, key)) {
+						Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
+					}
 				}
 			}
 		};
@@ -37550,7 +37581,7 @@ function _extends() {
 	(() => {
 		// define __esModule on exports
 		REQ_.r = (exports) => {
-			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+			if(Symbol.toStringTag) {
 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 			}
 			Object.defineProperty(exports, '__esModule', { value: true });

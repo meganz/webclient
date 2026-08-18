@@ -631,6 +631,7 @@ lazy(mega.ui, 'quotaDialogs', () => {
             type: 'modal',
             showClose: true,
             contents: [body],
+            preventBgClosing: true,
             onShow() {
                 tabs.positionSlider();
                 clickURLs();

@@ -1480,6 +1480,7 @@ function openContactInfoLink(contactLink) {
             $('#qr-ctn-add', $dialog).rebind('click', function () {
                 closeDialog();
                 var page = 'fm/chat/contacts';
+                localStorage.clinkh = JSON.stringify({h: contactLink, t: Date.now()});
                 mBroadcaster.once('fm:initialized', function () {
                     openContactInfoLink(contactLink);
                 });

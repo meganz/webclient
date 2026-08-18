@@ -223,6 +223,21 @@ function ui_keycomplete() {
     mBroadcaster.once('fm:initialized', () => {
         // The value for `showRecents` is `undefined` when toggle is `ON`
         mega.config.set('showRecents', 1);
+        if (localStorage.clinkh) {
+            // Resume contact link if one was viewed before
+            const { h, t } = tryCatch(() => JSON.parse(localStorage.clinkh), false)() || {};
+            delete localStorage.clinkh;
+            if (!h || Date.now() - t > 864e5) {
+                return;
+            }
+            if (is_mobile) {
+                mega.ui.contactLinkCardDialog = mega.ui.contactLinkCardDialog || pages['mobile-add-contact-card'];
+                new MobileContactLink(h).showContactLinkInfo();
+            }
+            else {
+                openContactInfoLink(h);
+            }
+        }
     });
 
     onIdle(() => {

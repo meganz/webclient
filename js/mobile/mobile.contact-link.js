@@ -89,6 +89,11 @@ MobileContactLink.prototype.showContactLinkInfo = function _showContactLinkInfo(
                 var megaApp = 'mega://C!' + ct;
                 location.replace(megaApp);
                 var appNotHere = function () {
+                    if (!u_type) {
+                        // Stored in case the user comes back to register on web.
+                        localStorage.clinkh = JSON.stringify({ h: ct, t: Date.now() });
+                    }
+
                     if (is_ios) {
                         var appleStore = 'https://itunes.apple.com/app/mega/id706857885';
                         location.replace(appleStore);

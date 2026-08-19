@@ -3302,6 +3302,7 @@ else if (!browserUpdate) {
                     }
                     if (!contenterror)
                     {
+                        jsl[e.data.jsi].sha256sb = e.data.hash;
                         jsl_current += jsl[e.data.jsi].w || 1;
                         jsl_progress();
                         if (++jslcomplete == jsl.length) initall();
@@ -3733,6 +3734,7 @@ else if (!browserUpdate) {
             else if (jsl[i].j === 4) { // new type to distinguish files to be used on iframes
                 if (!window[jsl[i].n]) {
                     var blobLink;
+
                     if ((jsl[i].n || '').indexOf('css') > -1) {
                         blobLink = mObjectURL([jsl[i].text.replace(j4re, j4tr)], 'text/css');
                     }
@@ -3742,7 +3744,22 @@ else if (!browserUpdate) {
                         }
                         blobLink = mObjectURL([jsl[i].text], 'text/javascript');
                     }
-                    window[jsl[i].n] = blobLink;
+
+                    tryCatch(function(i, blob, base) {
+                        var tmp = Object.defineProperties(mega[jsl[i].n] = {}, {
+                            cdn: {
+                                value: base + jsl[i].f
+                            },
+                            blob: {
+                                value: blob
+                            },
+                            integrity: {
+                                value: jsl[i].sha256sb
+                            }
+                        });
+                        freeze(tmp);
+                        window[jsl[i].n] = true;
+                    })(i, blobLink, bootstaticpath);
                 }
             }
             else if (jsl[i].j === 5) {

@@ -3081,6 +3081,11 @@ pro.propay = {
         else if (gatewayId === astroPayDialog.gatewayId) {
             astroPayDialog.submit();
         }
+
+        // Dynamic/Union Pay and Sabadell need the uts/utc calls first, the utc result carries the redirect form data
+        else if ((gatewayId === unionPay.gatewayId) || (gatewayId === sabadell.gatewayId)) {
+            pro.propay.sendPurchaseToApi(gatewayId);
+        }
     },
 
     toggleContinueButtonLoading(showLoading, loadingReason) {

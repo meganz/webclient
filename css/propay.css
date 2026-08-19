@@ -112,6 +112,46 @@
     font: var(--text-copy-medium-bold-pricing);
     text-transform: capitalize;
 }
+#propay .saved-card .label-wrapper {
+    align-items: center;
+    display: flex;
+}
+#propay .saved-card .label-wrapper > .radio {
+    align-self: baseline;
+    margin-top: 4px;
+}
+#propay .saved-card .radio-txt {
+    display: flex;
+    flex-direction: column;
+}
+#propay .saved-card .card-expiry {
+    align-items: center;
+    color: var(--text-color-secondary);
+    display: flex;
+    font: var(--text-copy-small-pricing);
+    margin-top: 2px;
+}
+#propay .saved-card .card-expiry.warning,
+#propay .saved-card .card-expiry.expired {
+    margin-inline-start: -3px;
+}
+#propay .saved-card .card-expiry.warning {
+    color: var(--color-warning-orange);
+}
+#propay .saved-card .card-expiry.expired {
+    color: var(--text-color-error);
+}
+#propay .saved-card .card-expiry i {
+    margin-inline-end: 4px;
+}
+#propay .saved-card .option.expired .radio,
+#propay .saved-card .option.expired .radio input {
+    cursor: default;
+}
+#propay .saved-card .option.expired .radio,
+#propay .saved-card .option.expired .card-line {
+    opacity: 0.5;
+}
 /* Dropdown */
 #propay .dropdown-wrapper-primary .mega-input-dropdown {
     border-radius: 0;

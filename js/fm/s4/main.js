@@ -2,67 +2,6 @@
 lazy(s4, 'main', () => {
     'use strict';
 
-    const BASE_DOMAIN = 'megas4.com';
-
-    const ENDPOINTS = [
-        [
-            'eu-luxembourg-1',
-            l[18922]
-        ],
-        [
-            'eu-luxembourg-2',
-            l[18922]
-        ],
-        [
-            'eu-amsterdam-1',
-            l.location_amsterdam
-        ],
-        [
-            'eu-amsterdam-2',
-            l.location_amsterdam
-        ],
-        [
-            'eu-paris-1',
-            l.location_paris
-        ],
-        [
-            'eu-paris-2',
-            l.location_paris
-        ],
-        [
-            'eu-barcelona-1',
-            l.location_barcelona
-        ],
-        [
-            'eu-barcelona-2',
-            l.location_barcelona
-        ],
-        [
-            'ca-montreal-1',
-            l.location_montreal
-        ],
-        [
-            'ca-montreal-2',
-            l.location_montreal
-        ],
-        [
-            'ca-vancouver-1',
-            l.location_vancouver
-        ],
-        [
-            'ca-vancouver-2',
-            l.location_vancouver
-        ],
-        [
-            'ap-tokyo-1',
-            l.location_tokyo
-        ],
-        [
-            'ap-tokyo-2',
-            l.location_tokyo
-        ]
-    ];
-
     const ce = (n, t, a) => mCreateElement(n, a, t);
     const rd = (u, p, e) => {
         mega.redirect(u, p, false, false, false);
@@ -505,15 +444,14 @@ lazy(s4, 'main', () => {
             ce('th', rowNode);
 
             // Create enpoint rows
-            for (const item of ENDPOINTS) {
-                const endpoint = `s3.${item[0]}.${BASE_DOMAIN}`;
+            for (const {region, location, host} of s4.endpoints) {
                 let subNode = null;
 
                 // Create table header
                 rowNode = ce('tr', tableNode);
-                ce('td', rowNode).textContent = item[1];
-                ce('td', rowNode).textContent = item[0];
-                ce('td', rowNode).textContent = endpoint;
+                ce('td', rowNode).textContent = location;
+                ce('td', rowNode).textContent = region;
+                ce('td', rowNode).textContent = host;
                 subNode = ce('td', rowNode);
 
                 // Create copy to clipboard button
@@ -525,19 +463,17 @@ lazy(s4, 'main', () => {
                 subNode.addEventListener('click', () => {
                     if ($.dialog === 's4-managed-setup') {
                         // Copy endpoints btn evt
-                        eventlog(500582, JSON.stringify([item[0]]));
+                        eventlog(500582, JSON.stringify([region]));
                     }
 
-                    copyToClipboard(endpoint, l.s4_endpoint_copied, 'hidden');
+                    copyToClipboard(host, l.s4_endpoint_copied, 'hidden');
                 });
             }
 
             // Fill URL examples in the tips
             ce('li', tipsNode).append(parseHTML(l.s4_s3_prefix_usage));
             ce('li', tipsNode).append(parseHTML(
-                l.s4_iam_prefix_usage.replace(
-                    '%1', `iam.${ENDPOINTS[0][0]}.${BASE_DOMAIN}`
-                )
+                l.s4_iam_prefix_usage.replace('%1', s4.endpoints[0].iamHost)
             ));
         },
     });

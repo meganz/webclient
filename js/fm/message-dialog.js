@@ -183,6 +183,8 @@ Object.defineProperty(msgDialog, 'desktop', {
                     componentClassname: 'slim font-600',
                     type: 'normal'
                 }).on('click', () => {
+                    closeMsg();
+
                     let res = usingNumResp ? 1 : true;
                     if (reverseAction) {
                         res = !res;
@@ -190,7 +192,6 @@ Object.defineProperty(msgDialog, 'desktop', {
                     if (typeof callback === 'function') {
                         callback(res);
                     }
-                    closeMsg();
                 });
                 priBtn[isDestructive ? 'addClass' : 'removeClass']('destructive');
             }
@@ -202,6 +203,8 @@ Object.defineProperty(msgDialog, 'desktop', {
                     componentClassname: 'slim font-600 mx-2 secondary',
                     type: 'normal'
                 }).on('click', () => {
+                    closeMsg();
+
                     let res = usingNumResp ? -1 : false;
                     if (reverseAction) {
                         res = !res;
@@ -209,7 +212,6 @@ Object.defineProperty(msgDialog, 'desktop', {
                     if (typeof callback === 'function') {
                         callback(res);
                     }
-                    closeMsg();
                 });
             }
 
@@ -220,10 +222,11 @@ Object.defineProperty(msgDialog, 'desktop', {
                     componentClassname: 'slim font-600 secondary',
                     type: 'normal'
                 }).on('click', () => {
+                    closeMsg();
+
                     if (typeof callback === 'function') {
                         callback(0);
                     }
-                    closeMsg();
                 });
             }
 
@@ -234,10 +237,11 @@ Object.defineProperty(msgDialog, 'desktop', {
                     componentClassname: 'font-600',
                     type: 'text'
                 }).on('click', () => {
+                    closeMsg();
+
                     if (typeof callback === 'function') {
                         callback(-2);
                     }
-                    closeMsg();
                 });
             }
         }

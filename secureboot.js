@@ -2164,6 +2164,7 @@ else if (!browserUpdate) {
     jsl.push({f:'css/cookiepolicy.css', n: 'cookiepolicy_css', j:2,w:5});
     jsl.push({f:'js/ui/loginRequiredDialog.js', n: 'loginrequireddialog_js', j:1,w:1});
     jsl.push({f:'js/ui/registerDialog.js', n: 'registerdialog_js', j:1,w:1});
+    jsl.push({f:'js/fm/s4/endpoints.js', n: 'fm_s4_endpoints_js', j: 1, w: 1});
 
     if (!is_mobile) {
         jsl.push({f:'js/jquery.tokeninput.js', n: 'jquerytokeninput_js', j:1});

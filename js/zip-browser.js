@@ -193,6 +193,8 @@ lazy(mega, 'zipBrowser', () => {
                     if (d) {
                         console.warn('[zipBrowser] openArchive() failed:', ex);
                     }
+                    this.errorOnOverquota(ex);
+
                     // Friendly errors carry a localized, user-ready message; any
                     // other (technical) failure shows a generic localized one -
                     // the raw detail is already in the console.warn above.
@@ -830,6 +832,19 @@ lazy(mega, 'zipBrowser', () => {
             return M.gfsfetch(ctx.dlData, offset, offset + length);
         }
 
+        /**
+         * Show the out of bandwidth error if ex is of that type.
+         * @param {*} ex Exception/error code
+         * @returns {void} void
+         */
+        errorOnOverquota(ex) {
+            if (ex !== EOVERQUOTA && !(ex && ex.target && ex.target.status === 509)) {
+                return;
+            }
+            dlmanager.setUserFlags();
+            dlmanager.showOverQuotaDialog();
+        }
+
         // ---------------------------------------------------------------------
         // Single-file extraction / download
         // ---------------------------------------------------------------------
@@ -894,6 +909,8 @@ lazy(mega, 'zipBrowser', () => {
                         // for failures that happen before piping starts.
                         writable.abort().catch(nop);
                     }
+                    this.errorOnOverquota(ex);
+
                     if (tpw.rowAdded && mega.tpw) {
                         mega.tpw.errorDownloadUpload(tpw.gid, l.zip_download_error);
                         this._tfsHead({e: tpw.gid});
@@ -1196,6 +1213,8 @@ lazy(mega, 'zipBrowser', () => {
                     if (d) {
                         console.warn('[zipBrowser] copy failed:', ex);
                     }
+                    this.errorOnOverquota(ex);
+
                     if (tpw.rowAdded && mega.tpw) {
                         mega.tpw.errorDownloadUpload(tpw.gid, l.zip_copy_error);
                         this._tfsHead({e: tpw.gid});

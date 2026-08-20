@@ -97,20 +97,12 @@ lazy(self, 'support', () => {
     // lang setup done
 
     // S4 specific inputs/controls
-    const s4UnknownEndPoint =  {e: '', r: l[7381], id: -1};
-    const S4_ENDPOINTS = [
-        // EU
-        {e: 's3.eu-amsterdam.megas4.com', r: `${l.location_europe} - ${l.location_amsterdam}`, id: 0},
-        {e: 's3.eu-luxembourg.megas4.com', r: `${l.location_europe} - ${l[18922]}`, id: 1},
-        {e: 's3.eu-paris.megas4.com', r: `${l.location_europe} - ${l.location_paris}`, id: 2},
-        {e: 's3.eu-barcelona.megas4.com', r: `${l.location_europe} - ${l.location_barcelona}`, id: 3},
-        // Canada
-        {e: 's3.ca-montreal.megas4.com', r: `${l[18798]} - ${l.location_montreal}`, id: 4},
-        {e: 's3.ca-vancouver.megas4.com', r: `${l[18798]} - ${l.location_vancouver}`, id: 5},
-        // APAC
-        {e: 's3.ap-tokyo.megas4.com', r: `${l.location_asia_pacific} - ${l.location_tokyo}`, id: 6},
-    ];
-    const endpointById = new Map([...S4_ENDPOINTS, s4UnknownEndPoint].map(p => [`${p.id}`, p]));
+    const s4UnknownEndPoint =  {e: '', r: l[7381], id: -1, name: 'unknown-endpoint', cls: 'endpoint-unknown'};
+    const s4OtherEndPoint =
+        {e: '', r: l.other_endpoint, id: -2, name: 'other-endpoint', cls: 'endpoint-other'};
+    const S4_EXTRA_ENDPOINTS = [s4OtherEndPoint, s4UnknownEndPoint];
+    const S4_ENDPOINTS = s4.endpoints.map(({id, host, label}) => ({e: host, r: label, id}));
+    const endpointById = new Map([...S4_ENDPOINTS, ...S4_EXTRA_ENDPOINTS].map(p => [`${p.id}`, p]));
     const boxOf = $i => $i && $i.closest && $i.closest('.mega-input.box-style');
     const setFieldError = ($err, $box, hasError) => {
         if ($err && $err.length) {
@@ -238,7 +230,7 @@ lazy(self, 'support', () => {
             }
             const ep = endpointById.get(c.domNode.parentNode.dataset.id);
             if (ep) {
-                endpoints.push(ep.e || l[7381]);
+                endpoints.push(ep.e || ep.r);
             }
         }
         put('endpoints', endpoints.join(', '));
@@ -449,20 +441,22 @@ lazy(self, 'support', () => {
             mCreateElement('div', {class: 'bucket-subtitle'}, content).textContent = p.r || '';
         });
 
-        // add a list item for s4UnknownEndPoint
-        const item = mCreateElement('div', {
-            class: 'flex endpoint-item endpoint-unknown',
-            'data-id': `${s4UnknownEndPoint.id}`
-        }, dom.$s4EndpointList[0]);
-        s4EndpointCheckboxes.push(new MegaCheckbox({
-            parentNode: item,
-            componentClassname: 'mega-checkbox endpoint-checkbox',
-            checkboxName: 'unknown-endpoint',
-            labelTitle: undefined,
-            checked: false
-        }));
-        const content = mCreateElement('div', {class: 'flex flex-column endpoint-content'}, item);
-        mCreateElement('div', {class: 'bucket-title'}, content).textContent = s4UnknownEndPoint.r;
+        // add list items for the endpoints without a hostname
+        for (const p of S4_EXTRA_ENDPOINTS) {
+            const item = mCreateElement('div', {
+                class: `flex endpoint-item ${p.cls}`,
+                'data-id': `${p.id}`
+            }, dom.$s4EndpointList[0]);
+            s4EndpointCheckboxes.push(new MegaCheckbox({
+                parentNode: item,
+                componentClassname: 'mega-checkbox endpoint-checkbox',
+                checkboxName: p.name,
+                labelTitle: undefined,
+                checked: false
+            }));
+            const content = mCreateElement('div', {class: 'flex flex-column endpoint-content'}, item);
+            mCreateElement('div', {class: 'bucket-title'}, content).textContent = p.r;
+        }
 
         // makeS4EndpointList - end
 

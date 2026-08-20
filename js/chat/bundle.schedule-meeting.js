@@ -2,18 +2,18 @@
 "use strict";
 (self.webpackChunk_meganz_webclient = self.webpackChunk_meganz_webclient || []).push([[716],{
 
- 8894
-(_, EXP_, REQ_) {
+ 8894:
+ (_, EXP_, REQ_) => {
 
  REQ_.d(EXP_, {
    V: () =>  withDateObserver
  });
- const _babel_runtime_helpers_extends0__ = REQ_(8168);
- const react1__ = REQ_(1594);
- const react1___default = REQ_.n(react1__);
+ const _babel_runtime_helpers_extends1__ = REQ_(8168);
+ const react0__ = REQ_(1594);
+ const react0___default = REQ_.n(react0__);
 
 
-const withDateObserver = Component => class extends react1___default().Component {
+const withDateObserver = Component => class extends react0___default().Component {
   constructor(...args) {
     super(...args);
     this.listener = undefined;
@@ -30,7 +30,7 @@ const withDateObserver = Component => class extends react1___default().Component
     }));
   }
   render() {
-    return JSX_(Component, (0,_babel_runtime_helpers_extends0__ .A)({}, this.props, {
+    return JSX_(Component, (0,_babel_runtime_helpers_extends1__ .A)({}, this.props, {
       timestamp: this.state.timestamp
     }));
   }
@@ -39,16 +39,16 @@ withDateObserver.NAMESPACE = 'meetings:onSelectDate';
 
  },
 
- 9290
-(_, EXP_, REQ_) {
+ 9290:
+ (_, EXP_, REQ_) => {
 
  REQ_.d(EXP_, {
    A: () => __WEBPACK_DEFAULT_EXPORT__
  });
  const react0__ = REQ_(1594);
  const react0___default = REQ_.n(react0__);
- const _mixins_js1__ = REQ_(8264);
- const _dateObserver2__ = REQ_(8894);
+ const _mixins_js2__ = REQ_(8264);
+ const _dateObserver1__ = REQ_(8894);
 
 
 
@@ -78,7 +78,7 @@ class Datepicker extends react0___default().Component {
         const nextDate = new Date(+dateText);
         nextDate.setHours(prevDate.getHours(), prevDate.getMinutes());
         this.props.onSelect(nextDate.getTime());
-        mBroadcaster.sendMessage(_dateObserver2__ .V.NAMESPACE, nextDate.getTime());
+        mBroadcaster.sendMessage(_dateObserver1__ .V.NAMESPACE, nextDate.getTime());
       }
     };
     this.domRef = react0___default().createRef();
@@ -171,12 +171,12 @@ class Datepicker extends react0___default().Component {
   }
 }
 Datepicker.NAMESPACE = 'meetings-datepicker';
- const __WEBPACK_DEFAULT_EXPORT__ = (0,_mixins_js1__ .Zz)(_dateObserver2__ .V)(Datepicker);
+ const __WEBPACK_DEFAULT_EXPORT__ = (0,_mixins_js2__ .Zz)(_dateObserver1__ .V)(Datepicker);
 
  },
 
- 9811
-(_, EXP_, REQ_) {
+ 9811:
+ (_, EXP_, REQ_) => {
 
  REQ_.d(EXP_, {
    c: () =>  DateTime
@@ -288,19 +288,19 @@ class DateTime extends react0___default().Component {
 
  },
 
- 4156
-(_, EXP_, REQ_) {
+ 4156:
+ (_, EXP_, REQ_) => {
 
 REQ_.r(EXP_);
  REQ_.d(EXP_, {
    "default": () =>  Edit
  });
- const _babel_runtime_helpers_extends0__ = REQ_(8168);
- const react1__ = REQ_(1594);
- const react1___default = REQ_.n(react1__);
- const _mixins_js2__ = REQ_(8264);
- const _utils_jsx3__ = REQ_(1497);
- const _ui_modalDialogs_jsx4__ = REQ_(8120);
+ const _babel_runtime_helpers_extends4__ = REQ_(8168);
+ const react0__ = REQ_(1594);
+ const react0___default = REQ_.n(react0__);
+ const _mixins_js1__ = REQ_(8264);
+ const _utils_jsx2__ = REQ_(1497);
+ const _ui_modalDialogs_jsx3__ = REQ_(8120);
  const _ui_utils_jsx5__ = REQ_(6411);
  const _link_jsx6__ = REQ_(4649);
  const _datetime_jsx7__ = REQ_(9811);
@@ -316,7 +316,7 @@ REQ_.r(EXP_);
 
 
 
-class Edit extends _mixins_js2__ .w9 {
+class Edit extends _mixins_js1__ .w9 {
   constructor(props) {
     super(props);
     this.occurrenceRef = null;
@@ -388,13 +388,13 @@ class Edit extends _mixins_js2__ .w9 {
     if (this.incomingCallListener) {
       megaChat.off(this.incomingCallListener);
     }
-    if ($.dialog === _utils_jsx3__ .oK) {
+    if ($.dialog === _utils_jsx2__ .oK) {
       closeDialog();
     }
   }
   componentDidMount() {
     super.componentDidMount();
-    M.safeShowDialog(_utils_jsx3__ .oK, () => {
+    M.safeShowDialog(_utils_jsx2__ .oK, () => {
       if (!this.isMounted()) {
         throw Error(`Edit dialog: component not mounted.`);
       }
@@ -413,13 +413,13 @@ class Edit extends _mixins_js2__ .w9 {
           });
         }
       });
-      return $(`#${_utils_jsx3__ .CU}`);
+      return $(`#${_utils_jsx2__ .CU}`);
     });
   }
   componentDidUpdate(prevProps) {
     if (prevProps.callExpanded && !this.props.callExpanded) {
       if (!$.dialog) {
-        M.safeShowDialog(_utils_jsx3__ .oK, `#${_utils_jsx3__ .CU}`);
+        M.safeShowDialog(_utils_jsx2__ .oK, `#${_utils_jsx2__ .CU}`);
       }
       fm_showoverlay();
       this.setState({
@@ -456,10 +456,10 @@ class Edit extends _mixins_js2__ .w9 {
     if (withUpgrade) {
       dialogClasses.push('upgrade');
     }
-    return JSX_(_ui_modalDialogs_jsx4__ .A.ModalDialog, (0,_babel_runtime_helpers_extends0__ .A)({}, this.state, {
-      id: _utils_jsx3__ .CU,
+    return JSX_(_ui_modalDialogs_jsx3__ .A.ModalDialog, (0,_babel_runtime_helpers_extends4__ .A)({}, this.state, {
+      id: _utils_jsx2__ .CU,
       className: dialogClasses.join(' '),
-      dialogName: _utils_jsx3__ .oK,
+      dialogName: _utils_jsx2__ .oK,
       dialogType: "main",
       onClose: () => {
         return isDirty ? this.setState({
@@ -468,7 +468,7 @@ class Edit extends _mixins_js2__ .w9 {
       }
     }), JSX_("header", null, JSX_("h2", null, l.edit_meeting_title)), JSX_("div", {
       className: "fm-dialog-body"
-    }, JSX_(_utils_jsx3__ .fI, null, JSX_("div", {
+    }, JSX_(_utils_jsx2__ .fI, null, JSX_("div", {
       className: "mega-banner body recurring-edit-banner"
     }, JSX_("div", {
       className: "cell"
@@ -477,9 +477,9 @@ class Edit extends _mixins_js2__ .w9 {
         onClose();
         megaChat.trigger(megaChat.plugins.meetingsManager.EVENTS.EDIT, chatRoom);
       }
-    })))), JSX_(_utils_jsx3__ .fI, {
+    })))), JSX_(_utils_jsx2__ .fI, {
       className: "start-aligned"
-    }, JSX_(_utils_jsx3__ .VP, null, JSX_("i", {
+    }, JSX_(_utils_jsx2__ .VP, null, JSX_("i", {
       className: "sprite-fm-mono icon-recents-filled"
     })), JSX_("div", {
       className: "schedule-date-container"
@@ -530,7 +530,7 @@ class Edit extends _mixins_js2__ .w9 {
         endDateTime: timestamp
       }),
       onBlur: timestamp => timestamp && this.onEndDateSelect(timestamp)
-    }))), withUpgrade && JSX_(_utils_jsx3__ .dh, {
+    }))), withUpgrade && JSX_(_utils_jsx2__ .dh, {
       onUpgradeClicked: () => {
         onClose();
         loadSubPage('pro');
@@ -551,7 +551,7 @@ class Edit extends _mixins_js2__ .w9 {
         }
         onClose();
       }
-    }, JSX_("span", null, l.update_meeting_button)))), !(overlayed || callExpanded) && closeDialog && JSX_(_utils_jsx3__ .pD, {
+    }, JSX_("span", null, l.update_meeting_button)))), !(overlayed || callExpanded) && closeDialog && JSX_(_utils_jsx2__ .pD, {
       onToggle: () => this.setState({
         closeDialog: false
       }),
@@ -562,8 +562,8 @@ class Edit extends _mixins_js2__ .w9 {
 
  },
 
- 8389
-(_, EXP_, REQ_) {
+ 8389:
+ (_, EXP_, REQ_) => {
 
 // ESM COMPAT FLAG
 REQ_.r(EXP_);
@@ -588,7 +588,7 @@ const meetings_button = REQ_(6740);
 const perfectScrollbar = REQ_(1301);
 // EXTERNAL MODULE: ./js/chat/ui/contacts.jsx
 const ui_contacts = REQ_(8022);
-;// ./js/chat/ui/meetings/schedule/invite.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/meetings/schedule/invite.jsx
 
 
 
@@ -846,7 +846,7 @@ const schedule_utils = REQ_(1497);
 const datepicker = REQ_(9290);
 // EXTERNAL MODULE: ./js/chat/ui/meetings/schedule/select.jsx
 const schedule_select = REQ_(3448);
-;// ./js/chat/ui/meetings/schedule/recurring.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/meetings/schedule/recurring.jsx
 
 
 
@@ -1419,7 +1419,7 @@ class Recurring extends mixins.w9 {
   }
 }
 Recurring.NAMESPACE = 'meetings-recurring';
-;// ./js/chat/ui/meetings/schedule/schedule.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/meetings/schedule/schedule.jsx
 
 
 
@@ -2003,17 +2003,17 @@ const Footer = ({
 
  },
 
- 3448
-(_, EXP_, REQ_) {
+ 3448:
+ (_, EXP_, REQ_) => {
 
  REQ_.d(EXP_, {
    A: () => __WEBPACK_DEFAULT_EXPORT__
  });
  const react0__ = REQ_(1594);
  const react0___default = REQ_.n(react0__);
- const _mixins_js1__ = REQ_(8264);
+ const _mixins_js3__ = REQ_(8264);
  const _ui_perfectScrollbar_jsx2__ = REQ_(1301);
- const _helpers_jsx3__ = REQ_(6521);
+ const _helpers_jsx1__ = REQ_(6521);
  const _dateObserver4__ = REQ_(8894);
 
 
@@ -2157,7 +2157,7 @@ class Select extends react0___default().Component {
           value
         } = this.props;
         const prevDate = moment(value);
-        const inputTime = (0,_helpers_jsx3__ .We)(manualTimeInput);
+        const inputTime = (0,_helpers_jsx1__ .We)(manualTimeInput);
         prevDate.set({
           hours: inputTime.get('hours'),
           minutes: inputTime.get('minutes')
@@ -2207,12 +2207,12 @@ class Select extends react0___default().Component {
   }
 }
 Select.NAMESPACE = 'meetings-select';
- const __WEBPACK_DEFAULT_EXPORT__ = (0,_mixins_js1__ .Zz)(_dateObserver4__ .V)(Select);
+ const __WEBPACK_DEFAULT_EXPORT__ = (0,_mixins_js3__ .Zz)(_dateObserver4__ .V)(Select);
 
  },
 
- 1497
-(_, EXP_, REQ_) {
+ 1497:
+ (_, EXP_, REQ_) => {
 
  REQ_.d(EXP_, {
    CU: () =>  NAMESPACE,

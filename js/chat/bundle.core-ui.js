@@ -2,8 +2,8 @@
 "use strict";
 (self.webpackChunk_meganz_webclient = self.webpackChunk_meganz_webclient || []).push([[493],{
 
- 8491
-(_, EXP_, REQ_) {
+ 8491:
+ (_, EXP_, REQ_) => {
 
 REQ_.r(EXP_);
  REQ_.d(EXP_, {
@@ -383,8 +383,8 @@ class ChatToastMsg extends react0___default().Component {
 
  },
 
- 2558
-(_, EXP_, REQ_) {
+ 2558:
+ (_, EXP_, REQ_) => {
 
 
 // EXPORTS
@@ -395,7 +395,7 @@ REQ_.d(EXP_, {
 // EXTERNAL MODULE: external "React"
 const external_React_ = REQ_(1594);
 const REaCt = REQ_.n(external_React_);
-;// ./js/chat/ui/whosTyping.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/whosTyping.jsx
 
 class WhosTyping extends REaCt().Component {
   constructor(...args) {
@@ -499,7 +499,7 @@ const typingArea = REQ_(4762);
 const buttons = REQ_(5155);
 // EXTERNAL MODULE: ./js/ui/dropdowns.jsx
 const dropdowns = REQ_(1510);
-;// ./js/chat/ui/composedTextArea.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/composedTextArea.jsx
 
 
 
@@ -600,15 +600,17 @@ const ComposedTextArea = ({
 
  },
 
- 5677
-(_, EXP_, REQ_) {
+ 5677:
+ (_, EXP_, REQ_) => {
 
+// ESM COMPAT FLAG
+REQ_.r(EXP_);
 
 // EXPORTS
 REQ_.d(EXP_, {
   ConversationPanels: () =>  ConversationPanels,
-  e: () =>  allContactsInChat,
-  z: () =>  excludedParticipants
+  allContactsInChat: () =>  allContactsInChat,
+  excludedParticipants: () =>  excludedParticipants
 });
 
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/esm/applyDecoratedDescriptor.js
@@ -632,7 +634,7 @@ const ui_dropdowns = REQ_(1510);
 const ui_contacts = REQ_(8022);
 // EXTERNAL MODULE: ./js/chat/chatRoom.jsx
 const chat_chatRoom = REQ_(7057);
-;// ./js/ui/historyRetentionDialog.jsx
+;// CONCATENATED MODULE: ./js/ui/historyRetentionDialog.jsx
 
 
 
@@ -860,7 +862,7 @@ function CustomRadioButton({
 }
 // EXTERNAL MODULE: ./js/ui/perfectScrollbar.jsx
 const perfectScrollbar = REQ_(1301);
-;// ./js/ui/accordion.jsx
+;// CONCATENATED MODULE: ./js/ui/accordion.jsx
 
 
 class AccordionPanel extends mixins.w9 {
@@ -951,7 +953,7 @@ class Accordion extends mixins.w9 {
   }
 }
 
-;// ./js/chat/ui/participantsList.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/participantsList.jsx
 
 
 
@@ -1214,7 +1216,7 @@ ParticipantsListInner.defaultProps = {
 
 // EXTERNAL MODULE: ./js/chat/ui/messages/generic.jsx + 14 modules
 const generic = REQ_(8025);
-;// ./js/chat/ui/sharedFilesAccordionPanel.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/sharedFilesAccordionPanel.jsx
 
 let _dec, _class;
 
@@ -1442,7 +1444,7 @@ const SharedFilesAccordionPanel = (_dec = utils.Ay.SoonFcWrap(350), _class = cla
   }
 }, (0,applyDecoratedDescriptor.A)(_class.prototype, "eventuallyRenderThumbnails", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "eventuallyRenderThumbnails"), _class.prototype), _class);
 
-;// ./js/chat/ui/incomingSharesAccordionPanel.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/incomingSharesAccordionPanel.jsx
 
 
 const SharedFolderItem = ({
@@ -1577,7 +1579,7 @@ class IncSharesAccordionPanel extends mixins.w9 {
   }
 }
 
-;// ./js/chat/ui/chatlinkDialog.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/chatlinkDialog.jsx
 
 
 
@@ -1755,7 +1757,7 @@ ChatlinkDialog.NAMESPACE = 'chat-link-dialog';
 const historyPanel = REQ_(5522);
 // EXTERNAL MODULE: ./js/chat/ui/composedTextArea.jsx + 1 modules
 const composedTextArea = REQ_(2558);
-;// ./js/chat/ui/pushSettingsDialog.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/pushSettingsDialog.jsx
 
 let _PushSettingsDialog;
 
@@ -1819,7 +1821,7 @@ PushSettingsDialog.options = {
   Infinity: l[22011]
 };
 PushSettingsDialog.default = _PushSettingsDialog.options[_PushSettingsDialog.options.length - 1];
-;// ./js/chat/ui/meetings/workflow/alert.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/meetings/workflow/alert.jsx
 
 
 const NAMESPACE = 'meetings-alert';
@@ -1888,7 +1890,7 @@ const helpers = REQ_(6521);
 const hostsObserver = REQ_(7677);
 // EXTERNAL MODULE: ./js/chat/ui/inviteParticipantsPanel.jsx
 const inviteParticipantsPanel = REQ_(8956);
-;// ./js/chat/ui/chatOverlay.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/chatOverlay.jsx
 
 
 
@@ -1942,7 +1944,7 @@ class ChatOverlay extends REaCt().Component {
 
 // EXTERNAL MODULE: ./js/chat/ui/meetings/workflow/utils.jsx
 const workflow_utils = REQ_(2153);
-;// ./js/chat/ui/meetings/schedule/occurrences.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/meetings/schedule/occurrences.jsx
 
 
 
@@ -2081,7 +2083,7 @@ class Occurrences extends mixins.w9 {
 const fallback = REQ_(3439);
 // EXTERNAL MODULE: ./js/chat/ui/meetings/utils.jsx
 const meetings_utils = REQ_(3901);
-;// ./js/chat/ui/conversationpanel.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/conversationpanel.jsx
 
 
 let conversationpanel_dec, _dec2, conversationpanel_class;
@@ -2221,10 +2223,9 @@ class EndCallButton extends REaCt().Component {
         });
       }
       return this.renderButton({
-          label: peers ? l[5883] : l[5884],
-          onClick: () => call.hangUp()
-        })
-      ;
+        label: peers ? l[5883] : l[5884],
+        onClick: () => call.hangUp()
+      });
     }
     if (chatRoom.havePendingGroupCall()) {
       return this.IS_MODERATOR ? this.renderButton({
@@ -4249,8 +4250,8 @@ function isStartCallDisabled(room) {
 
  },
 
- 8596
-(_, EXP_, REQ_) {
+ 8596:
+ (_, EXP_, REQ_) => {
 
 REQ_.r(EXP_);
  REQ_.d(EXP_, {
@@ -4259,8 +4260,8 @@ REQ_.r(EXP_);
  const react0__ = REQ_(1594);
  const react0___default = REQ_.n(react0__);
  const _ui_buttons_jsx1__ = REQ_(5155);
- const _link_jsx2__ = REQ_(4649);
- const _ui_utils_jsx3__ = REQ_(6411);
+ const _link_jsx3__ = REQ_(4649);
+ const _ui_utils_jsx2__ = REQ_(6411);
 
 
 
@@ -4323,7 +4324,7 @@ class EmptyConversationsPanel extends react0___default().Component {
       className: "conversations-empty"
     }, JSX_("div", {
       className: "conversations-empty-header"
-    }, JSX_("h1", null, isMeeting ? l.meetings_empty_header : l.chat_empty_header), JSX_("h3", null, (0,_ui_utils_jsx3__ .lI)(isMeeting ? l.meetings_empty_subheader : l.chat_empty_subheader, '[A]', _link_jsx2__ .A, {
+    }, JSX_("h1", null, isMeeting ? l.meetings_empty_header : l.chat_empty_header), JSX_("h3", null, (0,_ui_utils_jsx2__ .lI)(isMeeting ? l.meetings_empty_subheader : l.chat_empty_subheader, '[A]', _link_jsx3__ .A, {
       onClick: () => {
         window.open('https://mega.io/chatandmeetings', '_blank', 'noopener,noreferrer');
         eventlog(this.props.isMeeting ? 500281 : 500280);
@@ -4369,8 +4370,8 @@ class EmptyConversationsPanel extends react0___default().Component {
 
  },
 
- 1635
-(_, EXP_, REQ_) {
+ 1635:
+ (_, EXP_, REQ_) => {
 
  REQ_.d(EXP_, {
    Hc: () =>  GIF_PANEL_CLASS,
@@ -4412,8 +4413,8 @@ const LABELS = freeze({
 
  },
 
- 5522
-(_, EXP_, REQ_) {
+ 5522:
+ (_, EXP_, REQ_) => {
 
 
 // EXPORTS
@@ -4434,7 +4435,7 @@ const utils = REQ_(6411);
 const contacts = REQ_(8022);
 // EXTERNAL MODULE: ./js/chat/ui/messages/mixin.jsx
 const mixin = REQ_(855);
-;// ./js/chat/ui/messages/alterParticipants.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/messages/alterParticipants.jsx
 
 
 
@@ -4540,7 +4541,7 @@ class AltPartsConvMessage extends mixin.M {
   }
 }
 
-;// ./js/chat/ui/messages/truncated.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/messages/truncated.jsx
 
 
 
@@ -4595,7 +4596,7 @@ class TruncatedMessage extends mixin.M {
   }
 }
 
-;// ./js/chat/ui/messages/privilegeChange.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/messages/privilegeChange.jsx
 
 
 
@@ -4667,7 +4668,7 @@ class PrivilegeChange extends mixin.M {
   }
 }
 
-;// ./js/chat/ui/messages/topicChange.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/messages/topicChange.jsx
 
 
 
@@ -4720,7 +4721,7 @@ class TopicChange extends mixin.M {
   }
 }
 
-;// ./js/chat/ui/messages/closeOpenMode.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/messages/closeOpenMode.jsx
 
 
 
@@ -4771,7 +4772,7 @@ class CloseOpenModeMessage extends mixin.M {
   }
 }
 
-;// ./js/chat/ui/messages/chatHandle.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/messages/chatHandle.jsx
 
 
 
@@ -4826,7 +4827,7 @@ class ChatHandleMessage extends mixin.M {
 const generic = REQ_(8025);
 // EXTERNAL MODULE: ./js/ui/perfectScrollbar.jsx
 const perfectScrollbar = REQ_(1301);
-;// ./js/chat/ui/messages/retentionChange.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/messages/retentionChange.jsx
 
 
 
@@ -4862,7 +4863,7 @@ class RetentionChange extends mixin.M {
 const meetings_utils = REQ_(3901);
 // EXTERNAL MODULE: ./js/chat/ui/messages/scheduleMetaChange.jsx
 const scheduleMetaChange = REQ_(5470);
-;// ./js/chat/ui/historyPanel.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/historyPanel.jsx
 
 let _dec, _class;
 
@@ -5532,8 +5533,8 @@ const HistoryPanel = (_dec = (0,mixins.hG)(450, true), _class = class HistoryPan
 
  },
 
- 8956
-(_, EXP_, REQ_) {
+ 8956:
+ (_, EXP_, REQ_) => {
 
  REQ_.d(EXP_, {
    Q: () =>  InviteParticipantsPanel
@@ -5760,8 +5761,8 @@ class InviteParticipantsPanel extends react0___default().Component {
 
  },
 
- 4907
-(_, EXP_, REQ_) {
+ 4907:
+ (_, EXP_, REQ_) => {
 
 // ESM COMPAT FLAG
 REQ_.r(EXP_);
@@ -5778,7 +5779,7 @@ const external_React_ = REQ_(1594);
 const REaCt = REQ_.n(external_React_);
 // EXTERNAL MODULE: ./js/chat/mixins.js
 const mixins = REQ_(8264);
-;// ./js/chat/ui/searchPanel/utils.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/searchPanel/utils.jsx
 const STATUS = {
   IN_PROGRESS: 1,
   PAUSED: 2,
@@ -5809,7 +5810,7 @@ const LABEL = {
   SEARCH_PAUSED: l[23549],
   SEARCH_COMPLETE: l[23546]
 };
-;// ./js/chat/ui/searchPanel/searchField.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/searchPanel/searchField.jsx
 let _SearchField;
 
 
@@ -5925,7 +5926,7 @@ SearchField.select = () => {
 SearchField.focus = () => _SearchField.inputRef && _SearchField.inputRef.current && _SearchField.inputRef.current.focus();
 SearchField.hasValue = () => _SearchField.inputRef && _SearchField.inputRef.current && !!_SearchField.inputRef.current.value.length;
 SearchField.isVisible = () => _SearchField.inputRef && _SearchField.inputRef.current && elementIsVisible(_SearchField.inputRef.current);
-;// ./js/chat/ui/searchPanel/resultTable.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/searchPanel/resultTable.jsx
 
 const ResultTable = ({
   heading,
@@ -5942,7 +5943,7 @@ const ResultTable = ({
 const contacts = REQ_(8022);
 // EXTERNAL MODULE: ./js/ui/utils.jsx
 const utils = REQ_(6411);
-;// ./js/chat/ui/searchPanel/resultRow.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/searchPanel/resultRow.jsx
 
 
 
@@ -6193,7 +6194,7 @@ class ResultRow extends mixins.w9 {
     });
   }
 }
-;// ./js/chat/ui/searchPanel/resultContainer.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/searchPanel/resultContainer.jsx
 
 
 
@@ -6277,7 +6278,7 @@ class ResultContainer extends REaCt().Component {
 }
 // EXTERNAL MODULE: ./js/ui/perfectScrollbar.jsx
 const perfectScrollbar = REQ_(1301);
-;// ./js/chat/ui/searchPanel/searchPanel.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/searchPanel/searchPanel.jsx
 
 
 
@@ -6454,7 +6455,7 @@ class SearchPanel extends mixins.w9 {
 const meetings_button = REQ_(6740);
 // EXTERNAL MODULE: ./js/chat/ui/leftPanel/utils.jsx
 const leftPanel_utils = REQ_(4664);
-;// ./js/chat/ui/leftPanel/navigation.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/leftPanel/navigation.jsx
 
 
 
@@ -6524,7 +6525,7 @@ const Navigation = ({
 const buttons = REQ_(5155);
 // EXTERNAL MODULE: ./js/ui/dropdowns.jsx
 const dropdowns = REQ_(1510);
-;// ./js/chat/ui/leftPanel/actions.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/leftPanel/actions.jsx
 
 
 
@@ -6620,7 +6621,7 @@ const Actions = ({
  const actions = Actions;
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/esm/applyDecoratedDescriptor.js
 const applyDecoratedDescriptor = REQ_(793);
-;// ./js/chat/ui/leftPanel/conversationsListItem.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/leftPanel/conversationsListItem.jsx
 
 let _dec, _dec2, _class;
 
@@ -6896,7 +6897,7 @@ const ConversationsListItem = (_dec = utils.Ay.SoonFcWrap(40, true), _dec2 = (0,
   }
 }, (0,applyDecoratedDescriptor.A)(_class.prototype, "eventuallyScrollTo", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "eventuallyScrollTo"), _class.prototype), (0,applyDecoratedDescriptor.A)(_class.prototype, "render", [_dec2], Object.getOwnPropertyDescriptor(_class.prototype, "render"), _class.prototype), _class);
 
-;// ./js/chat/ui/leftPanel/conversationsList.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/leftPanel/conversationsList.jsx
 
 
 
@@ -7207,7 +7208,7 @@ class Meetings extends mixins.w9 {
 }
 // EXTERNAL MODULE: ./js/chat/ui/updateObserver.jsx
 const updateObserver = REQ_(4372);
-;// ./js/chat/ui/leftPanel/leftPanel.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/leftPanel/leftPanel.jsx
 
 
 
@@ -7383,17 +7384,17 @@ class LeftPanel extends mixins.w9 {
 
  },
 
- 7677
-(_, EXP_, REQ_) {
+ 7677:
+ (_, EXP_, REQ_) => {
 
  REQ_.d(EXP_, {
    C: () =>  withHostsObserver
  });
- const _babel_runtime_helpers_extends0__ = REQ_(8168);
- const react1__ = REQ_(1594);
- const react1___default = REQ_.n(react1__);
- const _mixins_js2__ = REQ_(8264);
- const _ui_modalDialogs_jsx3__ = REQ_(8120);
+ const _babel_runtime_helpers_extends3__ = REQ_(8168);
+ const react0__ = REQ_(1594);
+ const react0___default = REQ_.n(react0__);
+ const _mixins_js1__ = REQ_(8264);
+ const _ui_modalDialogs_jsx2__ = REQ_(8120);
  const _contacts_jsx4__ = REQ_(8022);
  const _ui_buttons_jsx5__ = REQ_(5155);
 
@@ -7403,7 +7404,7 @@ class LeftPanel extends mixins.w9 {
 
 
 const withHostsObserver = Component => {
-  return class extends _mixins_js2__ .w9 {
+  return class extends _mixins_js1__ .w9 {
     constructor(...args) {
       super(...args);
       this.state = {
@@ -7422,7 +7423,7 @@ const withHostsObserver = Component => {
         const {
           selected
         } = this.state;
-        return JSX_(_ui_modalDialogs_jsx3__ .A.ModalDialog, (0,_babel_runtime_helpers_extends0__ .A)({}, this.state, {
+        return JSX_(_ui_modalDialogs_jsx2__ .A.ModalDialog, (0,_babel_runtime_helpers_extends3__ .A)({}, this.state, {
           className: "assign-host contact-picker-widget",
           dialogName: "assign-host-dialog",
           dialogType: "tool",
@@ -7495,7 +7496,7 @@ const withHostsObserver = Component => {
       };
     }
     render() {
-      return JSX_(react1___default().Fragment, null, JSX_(Component, (0,_babel_runtime_helpers_extends0__ .A)({}, this.props, {
+      return JSX_(react0___default().Fragment, null, JSX_(Component, (0,_babel_runtime_helpers_extends3__ .A)({}, this.props, {
         confirmLeave: this.confirmLeave,
         hasHost: this.hasHost
       })), this.state.dialog && this.renderDialog());
@@ -7505,8 +7506,8 @@ const withHostsObserver = Component => {
 
  },
 
- 2153
-(_, EXP_, REQ_) {
+ 2153:
+ (_, EXP_, REQ_) => {
 
  REQ_.d(EXP_, {
    j: () =>  JOIN_VIEW
@@ -7520,8 +7521,8 @@ const JOIN_VIEW = {
 
  },
 
- 8025
-(_, EXP_, REQ_) {
+ 8025:
+ (_, EXP_, REQ_) => {
 
 
 // EXPORTS
@@ -7540,7 +7541,7 @@ const mixin = REQ_(855);
 const ui_contacts = REQ_(8022);
 // EXTERNAL MODULE: ./js/ui/utils.jsx
 const utils = REQ_(6411);
-;// ./js/chat/ui/messages/abstractGenericMessage.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/messages/abstractGenericMessage.jsx
 
 
 
@@ -7618,7 +7619,7 @@ class AbstractGenericMessage extends mixin.M {
 }
 // EXTERNAL MODULE: ./js/chat/ui/messages/utils.jsx
 const messages_utils = REQ_(187);
-;// ./js/chat/ui/messages/types/local.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/messages/types/local.jsx
 
 
 
@@ -7794,8 +7795,7 @@ class Local extends AbstractGenericMessage {
     }, JSX_("i", {
       className: `sprite-fm-mono ${message.cssClass}`
     }));
-    return message.showInitiatorAvatar ? grouped ? null : $$AVATAR : $$ICON
-    ;
+    return message.showInitiatorAvatar ? grouped ? null : $$AVATAR : $$ICON;
   }
   getMessageTimestamp() {
     let _this$props$message;
@@ -7860,7 +7860,7 @@ class Local extends AbstractGenericMessage {
 const dropdowns = REQ_(1510);
 // EXTERNAL MODULE: ./js/ui/buttons.jsx
 const buttons = REQ_(5155);
-;// ./js/chat/ui/messages/types/contact.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/messages/types/contact.jsx
 
 
 
@@ -7895,8 +7895,7 @@ class Contact extends AbstractGenericMessage {
     if ((_this$props$chatRoom = this.props.chatRoom) != null && _this$props$chatRoom.isAnonymous()) {
       return this._doAddContact(contactEmail).then(addedEmail => this.DIALOG.ADDED(addedEmail)).catch(this.DIALOG.DUPLICATE);
     }
-    return Object.values(M.opc).some(opc => opc.m === contactEmail) ? this.DIALOG.DUPLICATE() : this._doAddContact(contactEmail).then(addedEmail => this.DIALOG.ADDED(addedEmail))
-    ;
+    return Object.values(M.opc).some(opc => opc.m === contactEmail) ? this.DIALOG.DUPLICATE() : this._doAddContact(contactEmail).then(addedEmail => this.DIALOG.ADDED(addedEmail));
   }
   _getContactAvatar(contact, className) {
     return JSX_(ui_contacts.eu, {
@@ -8032,7 +8031,7 @@ class Contact extends AbstractGenericMessage {
     }, contacts);
   }
 }
-;// ./js/chat/ui/messages/types/attachment.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/messages/types/attachment.jsx
 
 
 
@@ -8184,7 +8183,7 @@ class Attachment extends AbstractGenericMessage {
               key: "preview-sep"
             })];
           }
-          return JSX_("div", null, previewButton, firstGroupOfButtons, firstGroupOfButtons && firstGroupOfButtons.length > 0 ? JSX_("hr", null) : "", addToAlbumButton, addToAlbumButton ? JSX_("hr", null) : "", downloadButton, linkButtons, revokeButton && downloadButton ? JSX_("hr", null) : "", revokeButton);
+          return JSX_("div", null, previewButton, firstGroupOfButtons, firstGroupOfButtons.length > 0 ? JSX_("hr", null) : "", addToAlbumButton, addToAlbumButton ? JSX_("hr", null) : "", downloadButton, linkButtons, revokeButton && downloadButton ? JSX_("hr", null) : "", revokeButton);
         }
       })) : JSX_(buttons.$, {
         ref: ref => {
@@ -8303,7 +8302,7 @@ class Attachment extends AbstractGenericMessage {
 }
 // EXTERNAL MODULE: ./js/chat/mixins.js
 const mixins = REQ_(8264);
-;// ./js/chat/ui/messages/types/partials/audioPlayer.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/messages/types/partials/audioPlayer.jsx
 
 
 class AudioPlayer extends mixins.w9 {
@@ -8475,7 +8474,7 @@ class AudioPlayer extends mixins.w9 {
     }));
   }
 }
-;// ./js/chat/ui/messages/types/partials/audioContainer.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/messages/types/partials/audioContainer.jsx
 
 
 class AudioContainer extends REaCt().Component {
@@ -8544,7 +8543,7 @@ AudioContainer.defaultProps = {
   h: null,
   mime: null
 };
-;// ./js/chat/ui/messages/types/voiceClip.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/messages/types/voiceClip.jsx
 
 
 
@@ -8596,7 +8595,7 @@ class VoiceClip extends AbstractGenericMessage {
     return JSX_(REaCt().Fragment, null, this.props.message.getState() === Message.STATE.NOT_SENT ? null : this._getActionButtons(), this._getAudioContainer());
   }
 }
-;// ./js/chat/ui/messages/types/partials/metaRichpreviewLoading.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/messages/types/partials/metaRichpreviewLoading.jsx
 
 
 class MetaRichpreviewLoading extends mixin.M {
@@ -8609,7 +8608,7 @@ class MetaRichpreviewLoading extends mixin.M {
   }
 }
 
-;// ./js/chat/ui/messages/types/partials/metaRichpreview.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/messages/types/partials/metaRichpreview.jsx
 
 
 
@@ -8702,7 +8701,7 @@ class MetaRichpreview extends mixin.M {
   }
 }
 
-;// ./js/chat/ui/messages/types/partials/metaRichpreviewConfirmation.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/messages/types/partials/metaRichpreviewConfirmation.jsx
 
 
 class MetaRichprevConfirmation extends mixin.M {
@@ -8779,7 +8778,7 @@ class MetaRichprevConfirmation extends mixin.M {
   }
 }
 
-;// ./js/chat/ui/messages/types/partials/geoLocation.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/messages/types/partials/geoLocation.jsx
 
 function GeoLocation(props) {
   const {
@@ -8826,7 +8825,7 @@ function GeoLocation(props) {
   }, "https://maps.google.com")))))));
 }
  const geoLocation = GeoLocation;
-;// ./js/chat/ui/messages/types/partials/metaRichpreviewMegaLinks.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/messages/types/partials/metaRichpreviewMegaLinks.jsx
 
 
 
@@ -8994,7 +8993,7 @@ class MetaRichpreviewMegaLinks extends mixin.M {
 const typingArea = REQ_(4762);
 // EXTERNAL MODULE: ./js/ui/perfectScrollbar.jsx
 const perfectScrollbar = REQ_(1301);
-;// ./js/chat/ui/messages/types/text.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/messages/types/text.jsx
 
 
 
@@ -9286,7 +9285,7 @@ class Text extends AbstractGenericMessage {
 }
 // EXTERNAL MODULE: ./js/chat/ui/gifPanel/utils.jsx
 const gifPanel_utils = REQ_(1635);
-;// ./js/chat/ui/messages/types/giphy.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/messages/types/giphy.jsx
 
 
 
@@ -9387,7 +9386,7 @@ class Giphy extends AbstractGenericMessage {
     });
   }
 }
-;// ./js/chat/ui/messages/generic.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/messages/generic.jsx
 
 
 
@@ -9752,8 +9751,8 @@ class GenericConversationMessage extends mixin.M {
 
  },
 
- 4762
-(_, EXP_, REQ_) {
+ 4762:
+ (_, EXP_, REQ_) => {
 
 
 // EXPORTS
@@ -9774,7 +9773,7 @@ const mixins = REQ_(8264);
 const emojiDropdown = REQ_(1165);
 // EXTERNAL MODULE: ./js/ui/buttons.jsx
 const ui_buttons = REQ_(5155);
-;// ./js/chat/ui/emojiAutocomplete.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/emojiAutocomplete.jsx
 
 
 
@@ -9995,7 +9994,7 @@ EmojiAutocomplete.defaultProps = {
 const perfectScrollbar = REQ_(1301);
 // EXTERNAL MODULE: ./js/chat/ui/gifPanel/utils.jsx
 const gifPanel_utils = REQ_(1635);
-;// ./js/chat/ui/gifPanel/searchField.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/gifPanel/searchField.jsx
 let _SearchField;
 
 
@@ -10039,7 +10038,7 @@ _SearchField = SearchField;
 SearchField.inputRef = REaCt().createRef();
 SearchField.focus = () => _SearchField.inputRef && _SearchField.inputRef.current && _SearchField.inputRef.current.focus();
 SearchField.hasValue = () => _SearchField.inputRef && _SearchField.inputRef.current && !!_SearchField.inputRef.current.value.length;
-;// ./js/chat/ui/gifPanel/result.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/gifPanel/result.jsx
 
 
 class Result extends REaCt().Component {
@@ -10080,7 +10079,7 @@ class Result extends REaCt().Component {
     }, JSX_("span", null, title)));
   }
 }
-;// ./js/chat/ui/gifPanel/resultContainer.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/gifPanel/resultContainer.jsx
 
 
 
@@ -10196,7 +10195,7 @@ class ResultContainer extends REaCt().Component {
     return null;
   }
 }
-;// ./js/chat/ui/gifPanel/gifPanel.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/gifPanel/gifPanel.jsx
 
 
 
@@ -10404,7 +10403,7 @@ class GifPanel extends REaCt().Component {
     })))));
   }
 }
-;// ./js/chat/ui/typingArea.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/typingArea.jsx
 
 let _dec, _class;
 
@@ -11044,8 +11043,8 @@ const TypingArea = (_dec = (0,mixins.hG)(54, true), _class = class TypingArea ex
 
  },
 
- 5009
-(_, EXP_, REQ_) {
+ 5009:
+ (_, EXP_, REQ_) => {
 
  REQ_.d(EXP_, {
    A: () => __WEBPACK_DEFAULT_EXPORT__

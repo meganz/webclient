@@ -2,18 +2,18 @@
 "use strict";
 (self.webpackChunk_meganz_webclient = self.webpackChunk_meganz_webclient || []).push([[752],{
 
- 192
-(_, EXP_, REQ_) {
+ 192:
+ (_, EXP_, REQ_) => {
 
  REQ_.d(EXP_, {
    $: () =>  withPermissionsObserver
  });
- const _babel_runtime_helpers_extends0__ = REQ_(8168);
- const react1__ = REQ_(1594);
- const react1___default = REQ_.n(react1__);
- const _mixins_js2__ = REQ_(8264);
- const _ui_modalDialogs_jsx3__ = REQ_(8120);
- const _ui_utils_jsx4__ = REQ_(6411);
+ const _babel_runtime_helpers_extends4__ = REQ_(8168);
+ const react0__ = REQ_(1594);
+ const react0___default = REQ_.n(react0__);
+ const _mixins_js1__ = REQ_(8264);
+ const _ui_modalDialogs_jsx2__ = REQ_(8120);
+ const _ui_utils_jsx3__ = REQ_(6411);
 
 
 
@@ -32,7 +32,7 @@ const isUserActionError = error => {
   return error && error === errors.browser;
 };
 const withPermissionsObserver = Component => {
-  return class extends _mixins_js2__ .w9 {
+  return class extends _mixins_js1__ .w9 {
     constructor(props) {
       super(props);
       this.namespace = `PO-${Component.NAMESPACE}`;
@@ -249,7 +249,7 @@ const withPermissionsObserver = Component => {
         buttons,
         cover
       } = content[av] || {};
-      return JSX_(_ui_modalDialogs_jsx3__ .A.ModalDialog, {
+      return JSX_(_ui_modalDialogs_jsx2__ .A.ModalDialog, {
         dialogName: `${this.namespace}-permissions-${av}`,
         className: `
                         meetings-permissions-dialog
@@ -276,7 +276,7 @@ const withPermissionsObserver = Component => {
         className: "permissions-warning-cover"
       }, JSX_("span", {
         className: cover
-      })), JSX_(_ui_utils_jsx4__ .P9, {
+      })), JSX_(_ui_utils_jsx3__ .P9, {
         tag: "p",
         className: "permissions-warning-info",
         content: info
@@ -337,7 +337,7 @@ const withPermissionsObserver = Component => {
       });
     }
     render() {
-      return JSX_(Component, (0,_babel_runtime_helpers_extends0__ .A)({}, this.props, this.state, {
+      return JSX_(Component, (0,_babel_runtime_helpers_extends4__ .A)({}, this.props, this.state, {
         errMic: this.state.errMic,
         errCamera: this.state.errCamera,
         errScreen: this.state.errScreen,
@@ -351,8 +351,8 @@ const withPermissionsObserver = Component => {
 
  },
 
- 3056
-(_, EXP_, REQ_) {
+ 3056:
+ (_, EXP_, REQ_) => {
 
 REQ_.r(EXP_);
  REQ_.d(EXP_, {
@@ -362,10 +362,10 @@ REQ_.r(EXP_);
  const react0___default = REQ_.n(react0__);
  const _mixins_js1__ = REQ_(8264);
  const _ui_utils_jsx2__ = REQ_(6411);
- const _contacts_jsx3__ = REQ_(8022);
- const _button_jsx4__ = REQ_(6740);
- const _ui_perfectScrollbar_jsx5__ = REQ_(1301);
- const _link6__ = REQ_(4649);
+ const _contacts_jsx5__ = REQ_(8022);
+ const _button_jsx6__ = REQ_(6740);
+ const _ui_perfectScrollbar_jsx4__ = REQ_(1301);
+ const _link3__ = REQ_(4649);
 
 
 
@@ -410,7 +410,7 @@ class Admit extends _mixins_js1__ .w9 {
       call
     }) => JSX_("div", {
       className: `${NAMESPACE}-user-limit-banner`
-    }, call.organiser === u_handle ? (0,_ui_utils_jsx2__ .lI)(l.admit_limit_banner_organiser, '[A]', _link6__ .A, {
+    }, call.organiser === u_handle ? (0,_ui_utils_jsx2__ .lI)(l.admit_limit_banner_organiser, '[A]', _link3__ .A, {
       onClick() {
         window.open(`${getBaseUrl()}/pro`, '_blank', 'noopener,noreferrer');
         eventlog(500259);
@@ -423,7 +423,7 @@ class Admit extends _mixins_js1__ .w9 {
         chatRoom
       } = this.props;
       const disableAdding = call.sfuClient.callLimits && call.sfuClient.callLimits.usr && chatRoom.getCallParticipants().length >= call.sfuClient.callLimits.usr;
-      return JSX_(_ui_perfectScrollbar_jsx5__ .O, {
+      return JSX_(_ui_perfectScrollbar_jsx4__ .O, {
         ref: this.peersWaitingRef,
         options: {
           'suppressScrollX': true
@@ -438,11 +438,11 @@ class Admit extends _mixins_js1__ .w9 {
           className: "peers-waiting-card"
         }, JSX_("div", {
           className: "peer-avatar"
-        }, JSX_(_contacts_jsx3__ .eu, {
+        }, JSX_(_contacts_jsx5__ .eu, {
           contact: M.u[handle]
         })), JSX_("div", {
           className: "peer-name"
-        }, JSX_(_contacts_jsx3__ .uA, {
+        }, JSX_(_contacts_jsx5__ .uA, {
           contact: M.u[handle],
           emoji: true
         })), JSX_("div", {
@@ -478,10 +478,10 @@ class Admit extends _mixins_js1__ .w9 {
           className: `${NAMESPACE}-content`
         }, this.renderPeersList()), JSX_("div", {
           className: `${NAMESPACE}-controls`
-        }, expanded ? null : JSX_(_button_jsx4__ .A, {
+        }, expanded ? null : JSX_(_button_jsx6__ .A, {
           className: "mega-button theme-dark-forced",
           onClick: () => onWrListToggle(true)
-        }, JSX_("span", null, l.wr_see_waiting)), JSX_(_button_jsx4__ .A, {
+        }, JSX_("span", null, l.wr_see_waiting)), JSX_(_button_jsx6__ .A, {
           peers,
           className: `mega-button positive theme-dark-forced ${disableAddAll ? 'disabled' : ''}`,
           onClick: () => !disableAddAll && call.sfuClient.wrAllowJoin(peers)
@@ -504,10 +504,10 @@ class Admit extends _mixins_js1__ .w9 {
           call
         }), JSX_("div", {
           className: `${NAMESPACE}-controls`
-        }, JSX_(_button_jsx4__ .A, {
+        }, JSX_(_button_jsx6__ .A, {
           className: "mega-button theme-dark-forced",
           onClick: () => this.doDeny(peer)
-        }, JSX_("span", null, l.wr_deny)), JSX_(_button_jsx4__ .A, {
+        }, JSX_("span", null, l.wr_deny)), JSX_(_button_jsx6__ .A, {
           className: `mega-button positive theme-dark-forced ${disableAdding ? 'disabled' : ''}`,
           onClick: () => !disableAdding && this.doAdmit(peer)
         }, JSX_("span", null, l.wr_admit))));
@@ -545,8 +545,8 @@ class Admit extends _mixins_js1__ .w9 {
 
  },
 
- 2659
-(_, EXP_, REQ_) {
+ 2659:
+ (_, EXP_, REQ_) => {
 
 REQ_.r(EXP_);
  REQ_.d(EXP_, {
@@ -940,18 +940,18 @@ class WaitingRoom extends _mixins_js1__ .w9 {
 
  },
 
- 3546
-(_, EXP_, REQ_) {
+ 3546:
+ (_, EXP_, REQ_) => {
 
  REQ_.d(EXP_, {
    A: () => __WEBPACK_DEFAULT_EXPORT__
  });
  const react0__ = REQ_(1594);
  const react0___default = REQ_.n(react0__);
- const _mixins_js1__ = REQ_(8264);
+ const _mixins_js4__ = REQ_(8264);
  const _contacts_jsx2__ = REQ_(8022);
- const _utils_jsx3__ = REQ_(3901);
- const _button_jsx4__ = REQ_(6740);
+ const _utils_jsx1__ = REQ_(3901);
+ const _button_jsx3__ = REQ_(6740);
  const _permissionsObserver_jsx5__ = REQ_(192);
 
 
@@ -1024,7 +1024,7 @@ class Preview extends react0___default().Component {
       (_this$props$resetErro = (_this$props = this.props).resetError) == null || _this$props$resetErro.call(_this$props, type === Preview.STREAMS.AUDIO ? Av.Audio : Av.Camera);
     };
     this.renderAvatar = () => {
-      if ((0,_utils_jsx3__ .P)()) {
+      if ((0,_utils_jsx1__ .P)()) {
         return JSX_("div", {
           className: "avatar-guest"
         }, JSX_("i", {
@@ -1103,7 +1103,7 @@ class Preview extends react0___default().Component {
       className: `${NAMESPACE}-controls`
     }, JSX_("div", {
       className: "preview-control-wrapper"
-    }, JSX_(_button_jsx4__ .A, {
+    }, JSX_(_button_jsx3__ .A, {
       simpletip: {
         ...SIMPLETIP_PROPS,
         label: audio ? l[16214] : l[16708]
@@ -1121,7 +1121,7 @@ class Preview extends react0___default().Component {
       }
     }), JSX_("span", null, l.mic_button), hasToRenderPermissionsWarning(Av.Audio) ? renderPermissionsWarning(Av.Audio) : null), JSX_("div", {
       className: "preview-control-wrapper"
-    }, JSX_(_button_jsx4__ .A, {
+    }, JSX_(_button_jsx3__ .A, {
       simpletip: {
         ...SIMPLETIP_PROPS,
         label: video ? l[22894] : l[22893]
@@ -1143,7 +1143,7 @@ Preview.STREAMS = {
   AUDIO: 1,
   VIDEO: 2
 };
- const __WEBPACK_DEFAULT_EXPORT__ = (0,_mixins_js1__ .Zz)(_permissionsObserver_jsx5__ .$)(Preview);
+ const __WEBPACK_DEFAULT_EXPORT__ = (0,_mixins_js4__ .Zz)(_permissionsObserver_jsx5__ .$)(Preview);
 
  }
 

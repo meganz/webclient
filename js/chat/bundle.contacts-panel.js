@@ -2,8 +2,8 @@
 "use strict";
 (self.webpackChunk_meganz_webclient = self.webpackChunk_meganz_webclient || []).push([[253],{
 
- 5392
-(_, EXP_, REQ_) {
+ 5392:
+ (_, EXP_, REQ_) => {
 
 // ESM COMPAT FLAG
 REQ_.r(EXP_);
@@ -22,7 +22,7 @@ const mixins = REQ_(8264);
 const buttons = REQ_(5155);
 // EXTERNAL MODULE: ./js/chat/ui/contactsPanel/utils.jsx
 const utils = REQ_(836);
-;// ./js/chat/ui/contactsPanel/navigation.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/contactsPanel/navigation.jsx
 
 
 
@@ -62,7 +62,7 @@ const Navigation = ({
  const navigation = Navigation;
 // EXTERNAL MODULE: ./js/ui/utils.jsx
 const ui_utils = REQ_(6411);
-;// ./js/chat/ui/contactsPanel/nil.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/contactsPanel/nil.jsx
 
 
 
@@ -100,7 +100,7 @@ const fmView = REQ_(872);
 const contacts = REQ_(8022);
 // EXTERNAL MODULE: ./js/ui/jsx/fm/nodes/genericNodePropsComponent.jsx + 1 modules
 const genericNodePropsComponent = REQ_(4285);
-;// ./js/ui/jsx/fm/nodes/columns/columnContactName.jsx
+;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnContactName.jsx
 
 
 
@@ -155,7 +155,7 @@ class ColumnContactName extends genericNodePropsComponent.B {
 ColumnContactName.sortable = true;
 ColumnContactName.id = "name";
 ColumnContactName.megatype = "name";
-;// ./js/ui/jsx/fm/nodes/columns/columnContactStatus.jsx
+;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnContactStatus.jsx
 
 
 class ColumnContactStatus extends genericNodePropsComponent.B {
@@ -182,7 +182,7 @@ class ColumnContactStatus extends genericNodePropsComponent.B {
 ColumnContactStatus.sortable = true;
 ColumnContactStatus.id = "status";
 ColumnContactStatus.megatype = "status";
-;// ./js/ui/jsx/fm/nodes/columns/columnContactLastInteraction.jsx
+;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnContactLastInteraction.jsx
 
 
 class ColumnContactLastInteraction extends genericNodePropsComponent.B {
@@ -240,7 +240,7 @@ class ColumnContactLastInteraction extends genericNodePropsComponent.B {
 ColumnContactLastInteraction.sortable = true;
 ColumnContactLastInteraction.id = "interaction";
 ColumnContactLastInteraction.megatype = "interaction";
-;// ./js/ui/jsx/fm/nodes/columns/columnContactVerifiedStatus.jsx
+;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnContactVerifiedStatus.jsx
 
 
 
@@ -295,7 +295,7 @@ const dropdowns = REQ_(1510);
 const meetings_utils = REQ_(3901);
 // EXTERNAL MODULE: ./js/chat/ui/conversations.jsx + 2 modules
 const conversations = REQ_(4904);
-;// ./js/chat/ui/contactsPanel/contextMenu.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/contactsPanel/contextMenu.jsx
 
 
 
@@ -438,7 +438,7 @@ class ContextMenu extends REaCt().Component {
     }));
   }
 }
-;// ./js/ui/jsx/fm/nodes/columns/columnContactButtons.jsx
+;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnContactButtons.jsx
 
 
 
@@ -520,7 +520,7 @@ ColumnContactButtons.label = "";
 ColumnContactButtons.megatype = "grid-url-header-nw";
 // EXTERNAL MODULE: ./js/chat/ui/updateObserver.jsx
 const updateObserver = REQ_(4372);
-;// ./js/chat/ui/contactsPanel/contactList.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/contactsPanel/contactList.jsx
 
 
 
@@ -682,7 +682,7 @@ class ContactList extends mixins.w9 {
 ContactList.updateListener = 'getLastInteractions';
 ContactList.updateInterval = 6e4;
  const contactList = (0,mixins.Zz)(updateObserver.Y)(ContactList);
-;// ./js/ui/jsx/fm/nodes/columns/columnContactRequestsEmail.jsx
+;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnContactRequestsEmail.jsx
 
 
 
@@ -718,7 +718,7 @@ class ColumnContactRequestsEmail extends mixins.w9 {
 ColumnContactRequestsEmail.sortable = true;
 ColumnContactRequestsEmail.id = "email";
 ColumnContactRequestsEmail.megatype = "email";
-;// ./js/ui/jsx/fm/nodes/columns/columnContactRequestsTs.jsx
+;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnContactRequestsTs.jsx
 
 
 class ColumnContactRequestsTs extends mixins.w9 {
@@ -756,7 +756,7 @@ class ColumnContactRequestsTs extends mixins.w9 {
 ColumnContactRequestsTs.sortable = true;
 ColumnContactRequestsTs.id = "ts";
 ColumnContactRequestsTs.megatype = "ts";
-;// ./js/ui/jsx/fm/nodes/columns/columnContactRequestsRcvdBtns.jsx
+;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnContactRequestsRcvdBtns.jsx
 
 
 
@@ -800,7 +800,7 @@ ColumnContactRequestsRcvdBtns.sortable = true;
 ColumnContactRequestsRcvdBtns.id = "grid-url-header-nw";
 ColumnContactRequestsRcvdBtns.label = "";
 ColumnContactRequestsRcvdBtns.megatype = "grid-url-header-nw contact-controls-container";
-;// ./js/chat/ui/contactsPanel/receivedRequests.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/contactsPanel/receivedRequests.jsx
 
 
 
@@ -865,7 +865,7 @@ const ReceivedRequests = ({
   }));
 };
  const receivedRequests = ReceivedRequests;
-;// ./js/ui/jsx/fm/nodes/columns/columnContactRequestsSentBtns.jsx
+;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnContactRequestsSentBtns.jsx
 
 
 
@@ -908,7 +908,7 @@ ColumnContactRequestsSentBtns.sortable = true;
 ColumnContactRequestsSentBtns.id = "grid-url-header-nw";
 ColumnContactRequestsSentBtns.label = "";
 ColumnContactRequestsSentBtns.megatype = "grid-url-header-nw contact-controls-container";
-;// ./js/ui/jsx/fm/nodes/columns/columnContactRequestsRts.jsx
+;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnContactRequestsRts.jsx
 
 
 class ColumnContactRequestsRts extends ColumnContactRequestsTs {
@@ -919,7 +919,7 @@ class ColumnContactRequestsRts extends ColumnContactRequestsTs {
 ColumnContactRequestsRts.sortable = true;
 ColumnContactRequestsRts.id = "rts";
 ColumnContactRequestsRts.megatype = "rts";
-;// ./js/chat/ui/contactsPanel/sentRequests.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/contactsPanel/sentRequests.jsx
 
 
 
@@ -980,7 +980,7 @@ const SentRequests = ({
  const sentRequests = SentRequests;
 // EXTERNAL MODULE: ./js/ui/jsx/fm/nodes/columns/columnFavIcon.jsx
 const columnFavIcon = REQ_(6794);
-;// ./js/ui/jsx/fm/nodes/columns/columnSharedFolderName.jsx
+;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnSharedFolderName.jsx
 
 
 class ColumnSharedFolderName extends genericNodePropsComponent.B {
@@ -1011,7 +1011,7 @@ class ColumnSharedFolderName extends genericNodePropsComponent.B {
 ColumnSharedFolderName.sortable = true;
 ColumnSharedFolderName.id = "name";
 ColumnSharedFolderName.megatype = "name";
-;// ./js/ui/jsx/fm/nodes/columns/columnSharedFolderAccess.jsx
+;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnSharedFolderAccess.jsx
 
 
 class ColumnSharedFolderAccess extends genericNodePropsComponent.B {
@@ -1038,7 +1038,7 @@ class ColumnSharedFolderAccess extends genericNodePropsComponent.B {
 ColumnSharedFolderAccess.sortable = true;
 ColumnSharedFolderAccess.id = 'access';
 ColumnSharedFolderAccess.megatype = 'access';
-;// ./js/ui/jsx/fm/nodes/columns/columnSharedFolderButtons.jsx
+;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnSharedFolderButtons.jsx
 
 
 
@@ -1085,7 +1085,7 @@ ColumnSharedFolderButtons.label = "";
 ColumnSharedFolderButtons.megatype = "grid-url-header-nw";
 // EXTERNAL MODULE: ./js/chat/ui/link.jsx
 const ui_link = REQ_(4649);
-;// ./js/chat/ui/contactsPanel/contactProfile.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/contactsPanel/contactProfile.jsx
 
 
 
@@ -1295,7 +1295,7 @@ class ContactProfile extends mixins.w9 {
     return null;
   }
 }
-;// ./js/chat/ui/contactsPanel/contactsPanel.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/contactsPanel/contactsPanel.jsx
 
 
 
@@ -1423,8 +1423,8 @@ class ContactsPanel extends mixins.w9 {
 
  },
 
- 872
-(_, EXP_, REQ_) {
+ 872:
+ (_, EXP_, REQ_) => {
 
 
 // EXPORTS
@@ -1441,7 +1441,7 @@ const mixins = REQ_(8264);
 const esm_extends = REQ_(8168);
 // EXTERNAL MODULE: ./js/ui/perfectScrollbar.jsx
 const perfectScrollbar = REQ_(1301);
-;// ./js/ui/jsx/megaList/megaList2.jsx
+;// CONCATENATED MODULE: ./js/ui/jsx/megaList/megaList2.jsx
 
 
 
@@ -1789,7 +1789,7 @@ class MegaList2 extends mixins.w9 {
 }
 // EXTERNAL MODULE: ./js/ui/jsx/fm/nodes/genericNodePropsComponent.jsx + 1 modules
 const genericNodePropsComponent = REQ_(4285);
-;// ./js/ui/jsx/fm/nodes/genericGrid.jsx
+;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/genericGrid.jsx
 
 
 class GenericGrid extends genericNodePropsComponent.B {
@@ -1862,7 +1862,7 @@ class GenericGrid extends genericNodePropsComponent.B {
     }, this.nodeProps.title));
   }
 }
-;// ./js/ui/jsx/fm/nodes/genericTable.jsx
+;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/genericTable.jsx
 
 
 
@@ -1970,7 +1970,7 @@ class GenericTable extends genericNodePropsComponent.B {
     }, columns);
   }
 }
-;// ./js/ui/jsx/megaList/adapters.jsx
+;// CONCATENATED MODULE: ./js/ui/jsx/megaList/adapters.jsx
 
 
 class GenericListAdapter extends mixins.w9 {
@@ -2041,7 +2041,7 @@ Table.itemsPerRow = 1;
 Table.containerClassName = "grid-scrolling-table megaListContainer";
 // EXTERNAL MODULE: ./js/ui/jsx/fm/nodes/columns/columnFavIcon.jsx
 const columnFavIcon = REQ_(6794);
-;// ./js/ui/tooltips.jsx
+;// CONCATENATED MODULE: ./js/ui/tooltips.jsx
 
 
 class Handler extends REaCt().Component {
@@ -2202,7 +2202,7 @@ Tooltip.defaultProps = {
   Handler,
   Contents
 };
-;// ./js/ui/jsx/fm/nodes/columns/columnNodeName.jsx
+;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnNodeName.jsx
 
 
 
@@ -2266,7 +2266,7 @@ class ColumnNodeName extends genericNodePropsComponent.B {
 ColumnNodeName.sortable = true;
 ColumnNodeName.id = 'name';
 ColumnNodeName.megatype = 'fname';
-;// ./js/ui/jsx/fm/nodes/columns/columnSize.jsx
+;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnSize.jsx
 
 
 class ColumnSize extends genericNodePropsComponent.B {
@@ -2286,7 +2286,7 @@ class ColumnSize extends genericNodePropsComponent.B {
 ColumnSize.sortable = true;
 ColumnSize.id = "size";
 ColumnSize.megatype = "size";
-;// ./js/ui/jsx/fm/nodes/columns/columnTimeAdded.jsx
+;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnTimeAdded.jsx
 
 
 class ColumnTimeAdded extends genericNodePropsComponent.B {
@@ -2306,7 +2306,7 @@ class ColumnTimeAdded extends genericNodePropsComponent.B {
 ColumnTimeAdded.sortable = true;
 ColumnTimeAdded.id = "ts";
 ColumnTimeAdded.megatype = "timeAd";
-;// ./js/ui/jsx/fm/nodes/columns/columnExtras.jsx
+;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnExtras.jsx
 
 
 class ColumnExtras extends genericNodePropsComponent.B {
@@ -2328,7 +2328,7 @@ ColumnExtras.id = "extras";
 ColumnExtras.label = "";
 ColumnExtras.megatype = "extras";
 ColumnExtras.headerClassName = "grid-url-header";
-;// ./js/ui/jsx/fm/browserEntries.jsx
+;// CONCATENATED MODULE: ./js/ui/jsx/fm/browserEntries.jsx
 
 
 
@@ -2754,7 +2754,7 @@ BrowserEntries.defaultProps = {
   'hideable': true,
   'requiresUpdateOnResize': true
 };
-;// ./js/ui/jsx/fm/fmView.jsx
+;// CONCATENATED MODULE: ./js/ui/jsx/fm/fmView.jsx
 
 
 
@@ -3116,8 +3116,8 @@ class FMView extends mixins.w9 {
 
  },
 
- 6794
-(_, EXP_, REQ_) {
+ 6794:
+ (_, EXP_, REQ_) => {
 
  REQ_.d(EXP_, {
    $: () =>  ColumnFavIcon
@@ -3158,8 +3158,8 @@ ColumnFavIcon.headerClassName = "grid-first-th fav";
 
  },
 
- 4285
-(_, EXP_, REQ_) {
+ 4285:
+ (_, EXP_, REQ_) => {
 
 
 // EXPORTS
@@ -3169,7 +3169,7 @@ REQ_.d(EXP_, {
 
 // EXTERNAL MODULE: ./js/chat/mixins.js
 const mixins = REQ_(8264);
-;// ./js/ui/jsx/fm/nodes/nodeProperties.jsx
+;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/nodeProperties.jsx
 class NodeProperties {
   static get(node, changeListener) {
     assert(node.h, 'missing handle for node');
@@ -3346,7 +3346,7 @@ NodeProperties.MAX_CACHE_SIZE = 100;
 if (d) {
   window.NodeProperties = NodeProperties;
 }
-;// ./js/ui/jsx/fm/nodes/genericNodePropsComponent.jsx
+;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/genericNodePropsComponent.jsx
 
 
 class GenericNodePropsComponent extends mixins.w9 {
